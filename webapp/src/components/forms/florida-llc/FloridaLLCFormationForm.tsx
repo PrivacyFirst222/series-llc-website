@@ -4,8 +4,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { defaultFormData } from "./defaults";
 import { validateStep } from "./stepValidation";
-import { buildPayload } from "./buildPayload";
-import { api } from "@/lib/api";
+import { buildPayload, flattenForFormspree } from "./buildPayload";
 import { FeeEstimate } from "./FeeEstimate";
 import { ReviewStep } from "./ReviewStep";
 import { StepIntro } from "./sections/StepIntro";
@@ -27,6 +26,8 @@ import { StepSubmissionPayload } from "./sections/StepSubmissionPayload";
 import type { FloridaLLCFormData } from "./types";
 
 const STORAGE_KEY = "fl-llc-formation-draft-v1";
+
+const FORMSPREE_ENDPOINT = "https://formspree.io/f/xjgdeppp";
 
 const STEP_LABELS: string[] = [
   "Intro",
@@ -137,7 +138,21 @@ export function FloridaLLCFormationForm({
     setSubmitting(true);
     try {
       const payload = buildPayload(data);
-      await api.post<{ ok: boolean }>("/api/intake/submit", payload);
+      const res = await fetch(FORMSPREE_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          _subject: `New intake — ${payload.llcName.finalName || payload.llcName.desiredName || "Unnamed LLC"}`,
+          email: payload.correspondence.email,
+          ...flattenForFormspree(payload),
+        }),
+      });
+      if (!res.ok) {
+        throw new Error(`Form submission failed (${res.status})`);
+      }
       setSubmitted(true);
       setStepIndex(STEP_LABELS.length - 1);
       onSubmit?.(data);
