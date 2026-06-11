@@ -5,6 +5,8 @@ import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  // GitHub Pages serves the site from /<repo-name>/, everywhere else from /
+  base: process.env.GITHUB_PAGES ? "/series-llc-website/" : "/",
   server: {
     host: "::",
     port: 8000,
