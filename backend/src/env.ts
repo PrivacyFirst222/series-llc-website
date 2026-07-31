@@ -8,13 +8,6 @@ const envSchema = z.object({
   // Server Configuration
   PORT: z.string().optional().default("3000"),
   NODE_ENV: z.string().optional(),
-
-  // SMTP — used to email completed intake forms
-  SMTP_HOST: z.string().optional(),
-  SMTP_PORT: z.string().optional().default("465"),
-  SMTP_USER: z.string().optional(),
-  SMTP_PASS: z.string().optional(),
-  INTAKE_TO_EMAIL: z.string().optional().default("ck@privacyfirstsolutions.com"),
 });
 
 /**
