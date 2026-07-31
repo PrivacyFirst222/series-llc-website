@@ -8,7 +8,6 @@ const SAVINGS = [
   { label: "Annual report fees", oldVal: "$1,388.75/yr", newVal: "$138.75/yr" },
   { label: "Registered agent fees", oldVal: "$1,200/yr", newVal: "$150/yr" },
   { label: "Tax filings", oldVal: "10 returns", newVal: "1 return" },
-  { label: "Bank accounts", oldVal: "10 accounts", newVal: "1 master + sub-accounts" },
 ];
 
 export default function Benefits() {
@@ -37,8 +36,8 @@ export default function Benefits() {
               </h2>
               <p className="text-base text-muted-foreground leading-relaxed">
                 The real cost of running ten Florida LLCs isn't the formation fee — it's the recurring
-                annual reports, registered agent renewals, separate tax returns, and ten bank
-                relationships. Folding everything into a Protected Series LLC eliminates almost all of it.
+                annual reports, registered agent renewals, and separate tax returns. Folding everything
+                into a Protected Series LLC eliminates almost all of it.
               </p>
               <div className="flex items-center gap-4 pt-3">
                 <div className="rounded-xl bg-trust/10 p-3 text-trust">

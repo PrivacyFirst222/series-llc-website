@@ -98,8 +98,8 @@ export function MothershipDiagram() {
               </div>
 
               <p className="mt-6 border-t border-border pt-4 text-xs text-muted-foreground">
-                Each box is its own legal entity for liability purposes — but a single tax filing,
-                operating agreement, and bank-banking relationship from your perspective.
+                Each box is its own legal entity for liability purposes — but a single tax filing and
+                operating agreement from your perspective.
               </p>
             </div>
           </div>

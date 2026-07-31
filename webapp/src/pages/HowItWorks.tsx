@@ -35,14 +35,14 @@ const STEPS: {
   {
     n: "04",
     icon: Building,
-    title: "EIN, banking & registered agent",
+    title: "EIN & registered agent",
     body: "We obtain your Federal EIN and set you up with a Florida-based registered agent (us).",
     duration: "Days 4–6",
   },
   {
     n: "05",
     icon: Anchor,
-    title: "Series activation & asset transfers",
+    title: "Series Activation",
     body: "We file a Certificate of Designation for each protected series electronically with the Florida Division of Corporations, and deliver the filed certificates once the state accepts them.",
     duration: "Day 7+",
   },

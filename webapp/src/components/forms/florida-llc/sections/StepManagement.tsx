@@ -35,7 +35,7 @@ export function StepManagement({ data, patch, errors }: StepProps) {
         <h2 className="font-display text-3xl">Management structure</h2>
         <p className="text-sm text-muted-foreground max-w-2xl">
           Florida permits the Articles to include a statement that the LLC is
-          manager-managed. Some banks or agencies may require a manager or
+          manager-managed. Some institutions or agencies may require a manager or
           authorized representative to appear in state records.
         </p>
       </header>

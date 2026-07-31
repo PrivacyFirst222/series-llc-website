@@ -1,7 +1,7 @@
 import {
   Shield,
   Layers,
-  Banknote,
+  Coins,
   Scroll,
   MapPin,
   Scale,
@@ -21,7 +21,7 @@ const BENEFITS: { icon: typeof Shield; title: string; body: string }[] = [
     body: "The mothership is insulated from series obligations, and vice versa — a structural feature missing from many older series statutes.",
   },
   {
-    icon: Banknote,
+    icon: Coins,
     title: "One filing, one franchise relationship",
     body: "Pay the $125 Florida formation fee once. Add additional series by filing a Certificate of Designation for each (estimated $25 state filing fee per series).",
   },

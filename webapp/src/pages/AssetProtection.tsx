@@ -54,7 +54,7 @@ export default function AssetProtection() {
               <span className="h-px w-6 bg-border" /> Example
             </div>
             <p className="text-sm text-foreground/80 leading-relaxed">
-              Chuck and Belinda form <strong>Heavenly Havens, LLC</strong> to hold a small apartment complex. A tenant named Ralph slips on an improperly maintained walkway and breaks his leg. Ralph sues. Because the property is titled in the LLC's name and Ralph was clearly dealing with a legal entity, he can only sue Heavenly Havens, LLC — not Chuck and Belinda personally. A judgment against the LLC can reach the LLC's bank accounts and real estate, but cannot touch Chuck and Belinda's personal savings, home, or other assets.
+              Chuck and Belinda form <strong>Heavenly Havens, LLC</strong> to hold a small apartment complex. A tenant named Ralph slips on an improperly maintained walkway and breaks his leg. Ralph sues. Because the property is titled in the LLC's name and Ralph was clearly dealing with a legal entity, he can only sue Heavenly Havens, LLC — not Chuck and Belinda personally. A judgment against the LLC can reach the LLC's own assets, but cannot touch Chuck and Belinda's personal savings, home, or other assets.
             </p>
           </div>
 
@@ -70,7 +70,7 @@ export default function AssetProtection() {
             <ul className="space-y-3">
               {[
                 "One catastrophic judgment cannot cascade across your entire portfolio",
-                "Each series holds its own assets, bank accounts, and books — creditors of one series are legally barred from the rest",
+                "Each series holds its own assets and books — creditors of one series are legally barred from the rest",
                 "Florida §605.2101 gives each series statutory entity status — the firewall is embedded in state law, not just contractual language",
                 "Adding a new asset simply means creating a new series, not a new LLC filing",
               ].map((item) => (

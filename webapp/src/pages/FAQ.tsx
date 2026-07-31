@@ -25,7 +25,7 @@ const FAQ_ITEMS: { q: string; a: string }[] = [
   },
   {
     q: "Is the liability shield really as strong as a separate LLC?",
-    a: "Statutorily, yes — provided you maintain separate books, records, and bank ledgers for each series, and clearly identify each series in contracts. Florida's statute is modeled on the Uniform Protected Series Act, the gold standard for shielding strength.",
+    a: "Statutorily, yes — provided you maintain separate books, records, and ledgers for each series, and clearly identify each series in contracts. Florida's statute is modeled on the Uniform Protected Series Act, the gold standard for shielding strength.",
   },
   {
     q: "Does this work for out-of-state investors?",
