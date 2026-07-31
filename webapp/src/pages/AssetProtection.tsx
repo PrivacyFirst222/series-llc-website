@@ -285,7 +285,7 @@ export default function AssetProtection() {
           </div>
 
           {/* CTA */}
-          <div className="mt-14 rounded-3xl border border-accent bg-card p-10 text-center shadow-[0_30px_80px_-30px_rgba(13,46,85,0.2)]">
+          <div className="mt-8 lg:mt-14 rounded-3xl border border-accent bg-card p-10 text-center shadow-[0_30px_80px_-30px_rgba(13,46,85,0.2)]">
             <div className="flex justify-center mb-4">
               <ShieldCheck className="h-10 w-10 text-trust" />
             </div>

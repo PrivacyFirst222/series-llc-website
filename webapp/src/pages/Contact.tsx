@@ -56,7 +56,7 @@ export default function Contact() {
         description="Send us a message and a formation specialist will respond within one business day with next steps."
       />
 
-      <section className="container-wide -mt-16 lg:-mt-24 relative z-10">
+      <section className="container-wide -mt-6 sm:-mt-12 lg:-mt-24 relative z-10">
         <div className="rounded-2xl border border-amber-300/60 bg-amber-50 p-5 lg:p-6 flex items-start gap-3">
           <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5 shrink-0" />
           <p className="text-sm text-amber-900 leading-relaxed">

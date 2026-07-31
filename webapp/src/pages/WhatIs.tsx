@@ -18,7 +18,7 @@ export default function WhatIs() {
 
       {/* Body */}
       <section className="container-wide section-y">
-        <div className="grid gap-14 lg:grid-cols-12">
+        <div className="grid gap-8 lg:gap-14 lg:grid-cols-12">
           <article className="lg:col-span-8 prose-invert max-w-none space-y-10">
             <div className="space-y-4">
               <span className="eyebrow">In one paragraph</span>

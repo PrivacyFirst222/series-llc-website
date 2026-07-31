@@ -205,7 +205,7 @@ export function FloridaLLCFormationForm({
   const isSubmit = stepIndex === STEP_LABELS.length - 1;
 
   return (
-    <div className="container-wide pb-24">
+    <div className="container-wide pb-12 lg:pb-24">
       <div className="grid gap-8 lg:grid-cols-[260px_1fr] mt-8">
         {/* Sidebar */}
         <aside className="space-y-4">

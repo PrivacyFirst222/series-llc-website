@@ -27,7 +27,7 @@ export default function FloridaAdvantages() {
       {/* Statute deep dive 1 */}
       <section className="bg-secondary/40">
         <div className="container-wide section-y">
-          <div className="grid lg:grid-cols-12 gap-14">
+          <div className="grid lg:grid-cols-12 gap-8 lg:gap-14">
             <div className="lg:col-span-5 space-y-5">
               <div className="inline-flex items-center gap-2 rounded-full border border-trust/30 bg-trust/5 px-3 py-1 text-trust">
                 <Landmark className="h-4 w-4" />
@@ -85,7 +85,7 @@ export default function FloridaAdvantages() {
       {/* Statute deep dive 2 */}
       <section>
         <div className="container-wide section-y">
-          <div className="grid lg:grid-cols-12 gap-14">
+          <div className="grid lg:grid-cols-12 gap-8 lg:gap-14">
             <div className="lg:col-span-7 space-y-5 lg:order-2">
               <div className="rounded-2xl border border-border bg-card p-7">
                 <h3 className="font-display text-lg font-semibold">What it does</h3>

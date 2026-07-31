@@ -119,18 +119,6 @@ export default function HowItWorks() {
                           style={{ width: `${((i + 1) / STEPS.length) * 100}%` }}
                         />
                       </div>
-                      <ul className="mt-5 space-y-2 text-sm text-muted-foreground">
-                        {[
-                          "White-glove preparation by our formation team",
-                          "Thorough review at every checkpoint",
-                          "Email updates with everything signed and on file",
-                        ].map((b) => (
-                          <li key={b} className="flex gap-2">
-                            <span className="mt-1.5 h-1 w-1 rounded-full bg-trust shrink-0" />
-                            {b}
-                          </li>
-                        ))}
-                      </ul>
                     </div>
                   </div>
                 </div>
@@ -139,7 +127,7 @@ export default function HowItWorks() {
           </div>
         </div>
 
-        <div className="mt-20 text-center">
+        <div className="mt-12 lg:mt-20 text-center">
           <Button asChild size="lg" className="rounded-full px-8 h-12 bg-primary text-primary-foreground">
             <Link to="/pricing">See pricing →</Link>
           </Button>

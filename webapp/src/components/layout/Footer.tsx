@@ -85,7 +85,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-14 hairline" />
+        <div className="mt-8 lg:mt-14 hairline" />
 
         <div className="mt-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <p className="text-xs text-muted-foreground max-w-3xl leading-relaxed">

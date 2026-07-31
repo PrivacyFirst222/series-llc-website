@@ -64,7 +64,7 @@ export function BenefitsGrid() {
           </h2>
         </div>
 
-        <div className="mt-14 grid gap-px overflow-hidden rounded-2xl border border-border bg-border md:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-8 lg:mt-14 grid gap-px overflow-hidden rounded-2xl border border-border bg-border md:grid-cols-2 lg:grid-cols-4">
           {BENEFITS.map((b, i) => {
             const Icon = b.icon;
             return (

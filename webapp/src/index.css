@@ -121,13 +121,13 @@
   /* Section rhythm. Phones get a tighter band so stacked sections don't
      read as unintentional empty space; desktop keeps the original air. */
   .section-y {
-    @apply py-12 sm:py-16 lg:py-28;
+    @apply py-10 sm:py-16 lg:py-28;
   }
   .section-pt {
-    @apply pt-12 sm:pt-16 lg:pt-28;
+    @apply pt-10 sm:pt-16 lg:pt-28;
   }
   .section-pb {
-    @apply pb-12 sm:pb-16 lg:pb-28;
+    @apply pb-10 sm:pb-16 lg:pb-28;
   }
 
   .display {

@@ -4,7 +4,7 @@ import { ArrowLeft, Home } from "lucide-react";
 
 export default function NotFound() {
   return (
-    <section className="container-tight py-32 lg:py-40 text-center">
+    <section className="container-tight py-20 lg:py-40 text-center">
       <span className="eyebrow">404</span>
       <h1 className="display mt-4 text-5xl text-balance lg:text-7xl">
         That page <em>drifted out to sea</em>.
