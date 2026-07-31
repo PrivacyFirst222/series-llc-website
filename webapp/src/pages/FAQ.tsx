@@ -4,8 +4,8 @@ import { CallToAction } from "@/components/sections/CallToAction";
 
 const FAQ_ITEMS: { q: string; a: string }[] = [
   {
-    q: "When does Florida's Protected Series LLC statute go into effect?",
-    a: "Florida Statute §605.2101 et seq. takes effect on July 1, 2026. Articles of Organization for protected series LLCs may be filed beginning that date. We accept early filings now and submit them on day one.",
+    q: "Is Florida's Protected Series LLC statute in effect?",
+    a: "Yes. Florida Statute §605.2101 et seq. took effect on July 1, 2026, and Articles of Organization for protected series LLCs are being accepted. We prepare and submit your filing as soon as your intake is complete.",
   },
   {
     q: "How is a Protected Series LLC different from a regular LLC?",

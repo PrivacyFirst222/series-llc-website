@@ -29,7 +29,7 @@ const STEPS: {
     n: "03",
     icon: Stamp,
     title: "File with the Florida Division of Corporations",
-    body: "We submit electronically the moment §605.2101 goes live (July 1, 2026). Your formation date is the first business day of the new statute.",
+    body: "We submit electronically under §605.2101, which is now in effect. Your formation date is the day the Division accepts the filing.",
     duration: "Day 4",
   },
   {

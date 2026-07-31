@@ -175,7 +175,7 @@ export default function FloridaAdvantages() {
       <CallToAction
         eyebrow="Florida-first"
         title="Lock in the Florida edge."
-        body="Beat the July 1, 2026 effective date — early-bird filings reserve your name and start your statutory clock the moment the law takes effect."
+        body="The law is in effect and filings are open — reserve your name and start your statutory clock as soon as the Division accepts your Articles."
       />
     </>
   );

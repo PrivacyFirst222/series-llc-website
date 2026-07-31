@@ -11,7 +11,7 @@ interface CallToActionProps {
 export function CallToAction({
   eyebrow = "Ready when you are",
   title = "Form your Florida Protected Series LLC.",
-  body = "Reserve your mothership and as many protected series as your portfolio needs. Filings open January 2026; effective when the statute goes live July 1, 2026.",
+  body = "Reserve your mothership and as many protected series as your portfolio needs. The statute is in effect and the Division of Corporations is accepting filings now.",
 }: CallToActionProps) {
   return (
     <section className="relative overflow-hidden">
@@ -60,7 +60,7 @@ export function CallToAction({
 
             <div className="lg:col-span-5 flex flex-col justify-center gap-3">
               {[
-                { k: "Filings begin", v: "Jan 2026" },
+                { k: "Filings", v: "Open now" },
                 { k: "Statute effective", v: "Jul 1, 2026" },
                 { k: "Avg. formation time", v: "5–7 days" },
                 { k: "Series under one umbrella", v: "Unlimited" },
