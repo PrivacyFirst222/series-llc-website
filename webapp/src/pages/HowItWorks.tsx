@@ -36,14 +36,14 @@ const STEPS: {
     n: "04",
     icon: Building,
     title: "EIN, banking & registered agent",
-    body: "We obtain your Federal EIN, set you up with a Florida-based registered agent (us), and provide a banker's package for your master + sub-account structure.",
+    body: "We obtain your Federal EIN and set you up with a Florida-based registered agent (us).",
     duration: "Days 4–6",
   },
   {
     n: "05",
     icon: Anchor,
     title: "Series activation & asset transfers",
-    body: "We deliver recording-ready Designations for any series that needs to hold real property — your title agent records them in the proper county.",
+    body: "We file a Certificate of Designation for each protected series electronically with the Florida Division of Corporations, and deliver the filed certificates once the state accepts them.",
     duration: "Day 7+",
   },
   {

@@ -30,7 +30,7 @@ export function MothershipDiagram() {
               {[
                 "Distinct membership interests, managers, and economic rights per series",
                 "Separate books, records, and asset ledger per series",
-                "Recordable Certificate of Designation per series for real property",
+                "Certificate of Designation filed with the state for each series",
                 "All under one Federal EIN structure & one Florida filing",
               ].map((line) => (
                 <li key={line} className="flex gap-3">
