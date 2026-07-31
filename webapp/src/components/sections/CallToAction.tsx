@@ -15,7 +15,7 @@ export function CallToAction({
 }: CallToActionProps) {
   return (
     <section className="relative overflow-hidden">
-      <div className="container-wide py-20 lg:py-28">
+      <div className="container-wide section-y">
         <div className="relative overflow-hidden rounded-3xl border border-border bg-primary text-primary-foreground">
           {/* Decorative wave */}
           <svg

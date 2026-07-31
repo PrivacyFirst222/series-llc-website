@@ -19,7 +19,7 @@ export function FloridaEdge() {
         style={{ background: "radial-gradient(closest-side, hsl(18 88% 56% / 0.28), transparent 70%)" }}
       />
 
-      <div className="container-wide relative py-20 lg:py-28">
+      <div className="container-wide relative section-y">
         <div className="grid gap-14 lg:grid-cols-12">
           <div className="lg:col-span-5 space-y-5">
             <span className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/20 bg-primary-foreground/5 px-3 py-1 text-xs uppercase tracking-[0.18em]">

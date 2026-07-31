@@ -12,7 +12,7 @@ const SERIES: { icon: typeof Anchor; label: string; sub: string }[] = [
 export function MothershipDiagram() {
   return (
     <section className="relative overflow-hidden bg-secondary/40">
-      <div className="container-wide py-20 lg:py-28">
+      <div className="container-wide section-y">
         <div className="grid lg:grid-cols-12 gap-14 items-center">
           <div className="lg:col-span-5 space-y-6">
             <span className="eyebrow">The architecture</span>

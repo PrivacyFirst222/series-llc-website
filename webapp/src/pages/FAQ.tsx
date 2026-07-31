@@ -58,7 +58,7 @@ export default function FAQ() {
         description="Drawn from real client questions and the Florida Bar Journal's commentary on §605.2101."
       />
 
-      <section className="container-wide pb-20 lg:pb-28">
+      <section className="container-wide section-pb">
         <div className="grid lg:grid-cols-12 gap-12">
           <div className="lg:col-span-8">
             <Accordion type="single" collapsible className="rounded-2xl border border-border bg-card divide-y divide-border">

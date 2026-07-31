@@ -25,8 +25,8 @@ const groups: { title: string; links: { to: string; label: string }[] }[] = [
 
 export function Footer() {
   return (
-    <footer className="relative mt-24 border-t border-border bg-secondary/40">
-      <div className="container-wide py-16 lg:py-20">
+    <footer className="relative mt-10 lg:mt-24 border-t border-border bg-secondary/40">
+      <div className="container-wide py-12 lg:py-20">
         <div className="grid gap-12 lg:grid-cols-12">
           <div className="lg:col-span-5 space-y-6">
             <Logo />

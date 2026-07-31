@@ -31,7 +31,7 @@ export default function Pricing() {
         description="A single formation fee covers everything, including preparation of up to three Certificates of Designation. Need more series? Add them at a straightforward per-series rate."
       />
 
-      <section className="container-wide pb-20 lg:pb-28">
+      <section className="container-wide section-pb">
         <div className="mx-auto max-w-2xl">
           <article className="relative flex flex-col rounded-3xl border border-accent bg-card p-10 shadow-[0_30px_80px_-30px_rgba(13,46,85,0.25)] ring-1 ring-accent">
             <span className="font-mono-feature text-xs uppercase tracking-[0.18em] text-accent">

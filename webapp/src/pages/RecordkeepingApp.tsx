@@ -135,7 +135,7 @@ export default function RecordkeepingApp() {
       </section>
 
       {/* ── Why Recordkeeping Matters ── */}
-      <section className="container-wide py-20 lg:py-28">
+      <section className="container-wide section-y">
         <div className="mx-auto max-w-3xl space-y-10">
           <div>
             <span className="eyebrow">Why recordkeeping matters</span>
@@ -197,7 +197,7 @@ export default function RecordkeepingApp() {
       </div>
 
       {/* ── Introducing the App ── */}
-      <section className="container-wide py-20 lg:py-28">
+      <section className="container-wide section-y">
         <div className="mx-auto max-w-3xl space-y-10">
           <div>
             <span className="eyebrow">Your built-in compliance companion</span>
@@ -242,7 +242,7 @@ export default function RecordkeepingApp() {
       </div>
 
       {/* ── Comparison Section ── */}
-      <section className="container-wide py-20 lg:py-28">
+      <section className="container-wide section-y">
         <div className="mx-auto max-w-3xl space-y-10">
           <div>
             <span className="eyebrow">How we compare</span>
@@ -309,7 +309,7 @@ export default function RecordkeepingApp() {
       </div>
 
       {/* ── Common Recordkeeping Problems ── */}
-      <section className="container-wide py-20 lg:py-28">
+      <section className="container-wide section-y">
         <div className="mx-auto max-w-3xl space-y-10">
           <div>
             <span className="eyebrow">Common recordkeeping problems</span>
@@ -349,7 +349,7 @@ export default function RecordkeepingApp() {
       </div>
 
       {/* ── Benefits Section ── */}
-      <section className="container-wide py-20 lg:py-28">
+      <section className="container-wide section-y">
         <div className="mx-auto max-w-3xl space-y-10">
           <div>
             <span className="eyebrow">What the app gives you</span>
@@ -373,7 +373,7 @@ export default function RecordkeepingApp() {
       </section>
 
       {/* ── CTA Section ── */}
-      <section className="container-wide pb-20 lg:pb-28">
+      <section className="container-wide section-pb">
         <div className="mx-auto max-w-3xl">
           <div className="rounded-3xl border border-border bg-primary text-primary-foreground overflow-hidden relative">
             {/* Decorative */}
@@ -429,7 +429,7 @@ export default function RecordkeepingApp() {
       </section>
 
       {/* ── Disclaimer ── */}
-      <section className="container-wide pb-20 lg:pb-28">
+      <section className="container-wide section-pb">
         <div className="mx-auto max-w-3xl rounded-2xl border border-border bg-secondary/40 p-6 lg:p-8">
           <p className="text-xs font-mono-feature uppercase tracking-[0.18em] text-muted-foreground mb-3">Disclaimer</p>
           <p className="text-xs text-muted-foreground leading-relaxed">

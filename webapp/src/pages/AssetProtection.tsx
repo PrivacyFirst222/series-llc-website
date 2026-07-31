@@ -27,7 +27,7 @@ export default function AssetProtection() {
       </section>
 
       {/* Inside Liability */}
-      <section className="container-wide pb-20 lg:pb-24">
+      <section className="container-wide section-pb">
         <div className="mx-auto max-w-3xl space-y-10">
 
           {/* Section header */}
@@ -104,12 +104,12 @@ export default function AssetProtection() {
       </section>
 
       {/* Divider */}
-      <div className="container-wide pb-20 lg:pb-24">
+      <div className="container-wide section-pb">
         <div className="mx-auto max-w-3xl border-t border-border" />
       </div>
 
       {/* Outside Liability */}
-      <section className="container-wide pb-20 lg:pb-24">
+      <section className="container-wide section-pb">
         <div className="mx-auto max-w-3xl space-y-10">
 
           {/* Section header */}
@@ -234,7 +234,7 @@ export default function AssetProtection() {
       </section>
 
       {/* Summary table */}
-      <section className="container-wide pb-20 lg:pb-28">
+      <section className="container-wide section-pb">
         <div className="mx-auto max-w-3xl">
           <h2 className="font-display text-3xl mb-8 text-center">Protection at a glance</h2>
           <div className="overflow-hidden rounded-2xl border border-border">

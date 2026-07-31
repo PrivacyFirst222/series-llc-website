@@ -26,7 +26,7 @@ export default function FloridaAdvantages() {
 
       {/* Statute deep dive 1 */}
       <section className="bg-secondary/40">
-        <div className="container-wide py-20 lg:py-28">
+        <div className="container-wide section-y">
           <div className="grid lg:grid-cols-12 gap-14">
             <div className="lg:col-span-5 space-y-5">
               <div className="inline-flex items-center gap-2 rounded-full border border-trust/30 bg-trust/5 px-3 py-1 text-trust">
@@ -84,7 +84,7 @@ export default function FloridaAdvantages() {
 
       {/* Statute deep dive 2 */}
       <section>
-        <div className="container-wide py-20 lg:py-28">
+        <div className="container-wide section-y">
           <div className="grid lg:grid-cols-12 gap-14">
             <div className="lg:col-span-7 space-y-5 lg:order-2">
               <div className="rounded-2xl border border-border bg-card p-7">
@@ -138,7 +138,7 @@ export default function FloridaAdvantages() {
 
       {/* State comparison table */}
       <section className="bg-primary text-primary-foreground">
-        <div className="container-wide py-20 lg:py-28">
+        <div className="container-wide section-y">
           <div className="max-w-3xl">
             <span className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/20 bg-primary-foreground/5 px-3 py-1 text-xs uppercase tracking-[0.18em]">
               <span className="h-1.5 w-1.5 rounded-full bg-accent" /> State by state

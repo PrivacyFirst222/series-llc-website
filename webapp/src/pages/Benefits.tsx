@@ -28,7 +28,7 @@ export default function Benefits() {
 
       {/* Cost comparison */}
       <section className="bg-secondary/40">
-        <div className="container-wide py-20 lg:py-28">
+        <div className="container-wide section-y">
           <div className="grid lg:grid-cols-12 gap-12">
             <div className="lg:col-span-5 space-y-5">
               <span className="eyebrow">The math</span>
@@ -94,7 +94,7 @@ export default function Benefits() {
       </section>
 
       {/* Side by side traits */}
-      <section className="container-wide py-20 lg:py-28">
+      <section className="container-wide section-y">
         <div className="text-center max-w-2xl mx-auto">
           <span className="eyebrow">Trait by trait</span>
           <h2 className="display mt-3 text-4xl text-balance lg:text-5xl">

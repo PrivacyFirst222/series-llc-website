@@ -68,7 +68,7 @@ export default function HowItWorks() {
         description="A clean, thorough process designed for portfolios — not paperwork people. Most clients move from intake to filed entity in under a week."
       />
 
-      <section className="container-wide py-16 lg:py-24">
+      <section className="container-wide section-y">
         <div className="relative">
           {/* Vertical timeline rail */}
           <div className="absolute left-6 lg:left-1/2 top-0 bottom-0 w-px bg-border" aria-hidden />

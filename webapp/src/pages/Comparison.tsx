@@ -65,7 +65,7 @@ export default function Comparison() {
         description="A clear-eyed comparison against the two most common structures: a Delaware Series LLC and a stack of multiple Florida regular LLCs."
       />
 
-      <section className="container-wide pb-20 lg:pb-28">
+      <section className="container-wide section-pb">
         <div className="overflow-hidden rounded-3xl border border-border bg-card">
           <div className="grid grid-cols-12 border-b border-border bg-secondary/60 px-6 py-5 text-xs uppercase tracking-[0.16em] text-muted-foreground">
             <span className="col-span-5">Feature</span>

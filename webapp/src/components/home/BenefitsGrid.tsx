@@ -55,7 +55,7 @@ const BENEFITS: { icon: typeof Shield; title: string; body: string }[] = [
 export function BenefitsGrid() {
   return (
     <section className="relative">
-      <div className="container-wide py-20 lg:py-28">
+      <div className="container-wide section-y">
         <div className="max-w-2xl">
           <span className="eyebrow">Why investors choose it</span>
           <h2 className="display mt-3 text-4xl text-balance lg:text-5xl">

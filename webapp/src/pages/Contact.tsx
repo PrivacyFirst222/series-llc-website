@@ -66,7 +66,7 @@ export default function Contact() {
         </div>
       </section>
 
-      <section className="container-wide pb-20 lg:pb-28">
+      <section className="container-wide section-pb">
         <div className="max-w-3xl mx-auto">
           <div>
             <form onSubmit={onSubmit} className="rounded-3xl border border-border bg-card p-8 lg:p-10 space-y-6">

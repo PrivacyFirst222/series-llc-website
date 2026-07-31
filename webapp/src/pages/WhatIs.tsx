@@ -17,7 +17,7 @@ export default function WhatIs() {
       />
 
       {/* Body */}
-      <section className="container-wide py-16 lg:py-24">
+      <section className="container-wide section-y">
         <div className="grid gap-14 lg:grid-cols-12">
           <article className="lg:col-span-8 prose-invert max-w-none space-y-10">
             <div className="space-y-4">
