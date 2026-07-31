@@ -78,21 +78,21 @@ export default function HowItWorks() {
               const Icon = step.icon;
               const isEven = i % 2 === 1;
               return (
-                <div
-                  key={step.n}
-                  className={`relative grid lg:grid-cols-2 gap-6 lg:gap-12 ${
-                    isEven ? "lg:[&>:first-child]:order-2" : ""
-                  }`}
-                >
+                <div key={step.n} className="relative grid lg:grid-cols-2 gap-6 lg:gap-12">
                   <div
                     className={`pl-16 lg:pl-0 ${
-                      isEven ? "lg:text-left lg:pl-12" : "lg:text-right lg:pr-12"
+                      isEven
+                        ? "lg:col-start-2 lg:text-left lg:pl-12"
+                        : "lg:col-start-1 lg:text-right lg:pr-12"
                     }`}
                   >
                     <span className="font-mono-feature text-xs uppercase tracking-[0.18em] text-trust">
                       {step.duration}
                     </span>
-                    <h3 className="mt-2 font-display text-2xl lg:text-3xl">{step.title}</h3>
+                    <h3 className="mt-2 font-display text-2xl lg:text-3xl">
+                      <span className="font-mono-feature text-lg text-accent mr-3">{step.n}</span>
+                      {step.title}
+                    </h3>
                     <p className="mt-3 text-base text-muted-foreground leading-relaxed max-w-md lg:inline-block lg:text-left">
                       {step.body}
                     </p>
@@ -103,23 +103,6 @@ export default function HowItWorks() {
                     className={`absolute left-6 lg:left-1/2 -translate-x-1/2 top-1 z-10 flex h-12 w-12 items-center justify-center rounded-full border-4 border-background bg-primary text-primary-foreground shadow-lg`}
                   >
                     <Icon className="h-5 w-5" />
-                  </div>
-
-                  <div className={`pl-16 lg:pl-0 ${isEven ? "lg:pr-12" : "lg:pl-12"}`}>
-                    <div className="rounded-2xl border border-border bg-card p-6 lg:p-7">
-                      <div className="flex items-center justify-between">
-                        <span className="font-mono-feature text-3xl text-accent">{step.n}</span>
-                        <span className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
-                          Step {i + 1} of {STEPS.length}
-                        </span>
-                      </div>
-                      <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-secondary">
-                        <div
-                          className="h-full rounded-full bg-accent transition-all"
-                          style={{ width: `${((i + 1) / STEPS.length) * 100}%` }}
-                        />
-                      </div>
-                    </div>
                   </div>
                 </div>
               );
