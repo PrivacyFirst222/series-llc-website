@@ -6,7 +6,6 @@ interface LogoProps {
 
 export function Logo({ variant = "default" }: LogoProps) {
   const text = variant === "light" ? "text-background" : "text-foreground";
-  const subtle = variant === "light" ? "text-background/60" : "text-muted-foreground";
 
   return (
     <Link to="/" className="group inline-flex items-center gap-2.5">
@@ -30,13 +29,8 @@ export function Logo({ variant = "default" }: LogoProps) {
           <circle cx="18" cy="18" r="2.4" fill="hsl(18 88% 56%)" />
         </svg>
       </span>
-      <span className="flex flex-col leading-none">
-        <span className={`font-display text-[1.05rem] font-semibold tracking-tight ${text}`}>
-          My<span className="text-accent">Florida</span>SeriesLLC
-        </span>
-        <span className={`text-[0.62rem] uppercase tracking-[0.18em] ${subtle}`}>
-          Effective July 1, 2026
-        </span>
+      <span className={`font-display text-[1.05rem] font-semibold tracking-tight leading-tight ${text}`}>
+        My<span className="text-accent">Florida</span>SeriesLLC
       </span>
     </Link>
   );
