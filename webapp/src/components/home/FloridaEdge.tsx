@@ -37,7 +37,7 @@ export function FloridaEdge() {
               to="/florida-advantages"
               className="inline-flex items-center gap-2 text-accent hover:text-primary-foreground transition-colors font-medium"
             >
-              Read the full breakdown
+              Read the statute section by section
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>

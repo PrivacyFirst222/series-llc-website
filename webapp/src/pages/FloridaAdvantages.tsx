@@ -7,13 +7,13 @@ export default function FloridaAdvantages() {
   return (
     <>
       <PageHero
-        eyebrow="The Florida edge"
+        eyebrow="The statute"
         title={
           <>
-            Two sections worth reading before you <em>file</em>.
+            Florida's statute, <em>section by section</em>.
           </>
         }
-        description="Two sections of Florida's protected series statute do most of the day-to-day work: how a series holds property, and how a court reads a series when the chapter applies."
+        description="Two sections do most of the day-to-day work: how a protected series holds property, and how a court reads a series when the chapter applies. Here is what each one says."
       />
 
       {/* Statute deep dive 1 */}
@@ -147,8 +147,8 @@ export default function FloridaAdvantages() {
       </section>
 
       <CallToAction
-        eyebrow="Florida-first"
-        title="Lock in the Florida edge."
+        eyebrow="Formed in Florida"
+        title="File under the Florida statute."
         body="The law is in effect and filings are open — reserve your name and start your statutory clock as soon as the Division accepts your Articles."
       />
     </>

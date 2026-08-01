@@ -10,7 +10,7 @@ const NAV: { to: string; label: string }[] = [
   { to: "/benefits", label: "Benefits" },
   { to: "/asset-protection", label: "Asset Protection" },
   { to: "/recordkeeping-app", label: "Free App" },
-  { to: "/florida-advantages", label: "FL Advantages" },
+  { to: "/florida-advantages", label: "The Statute" },
   { to: "/how-it-works", label: "Process" },
   { to: "/pricing", label: "Pricing" },
   { to: "/comparison", label: "Compare" },
