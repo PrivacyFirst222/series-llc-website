@@ -7,24 +7,18 @@ type Cell = "yes" | "no" | "partial" | string;
 interface Row {
   feature: string;
   fl: Cell;
-  de: Cell;
   multi: Cell;
 }
 
 const ROWS: Row[] = [
-  { feature: "One filing covers unlimited series", fl: "yes", de: "yes", multi: "no" },
-  { feature: "Horizontal liability shield (series ↔ series)", fl: "yes", de: "yes", multi: "yes" },
-  { feature: "Vertical shield (parent ↔ series)", fl: "yes", de: "yes", multi: "—" },
-  { feature: "Series is a person distinct from the LLC", fl: "yes", de: "—", multi: "yes" },
-  { feature: "Series can hold title to property in its own name", fl: "yes", de: "yes", multi: "yes" },
-  {
-    feature: "Shield applies without a notice provision in the certificate of formation",
-    fl: "yes",
-    de: "no",
-    multi: "yes",
-  },
-  { feature: "Annual state charge", fl: "1 annual report", de: "$400 tax + $100 per registered series", multi: "10 annual reports" },
-  { feature: "Federal EIN", fl: "1 EIN structure", de: "1 EIN structure", multi: "10 EINs" },
+  { feature: "One state filing covers unlimited series", fl: "yes", multi: "no" },
+  { feature: "Liability separation between assets", fl: "yes", multi: "yes" },
+  { feature: "Each asset in a person distinct from the others", fl: "yes", multi: "yes" },
+  { feature: "Property titled in the holding entity's own name", fl: "yes", multi: "yes" },
+  { feature: "Annual reports to file", fl: "1 report", multi: "10 reports" },
+  { feature: "Registered agent relationships", fl: "1", multi: "10" },
+  { feature: "Adding another asset", fl: "Certificate of Designation", multi: "A whole new LLC" },
+  { feature: "Federal EIN", fl: "1 EIN structure", multi: "10 EINs" },
 ];
 
 function renderCell(v: Cell, accent?: boolean) {
@@ -61,19 +55,18 @@ export default function Comparison() {
         eyebrow="Side by side"
         title={
           <>
-            Florida Protected Series LLC <em>vs.</em> the alternatives.
+            One Protected Series LLC <em>vs.</em> ten separate LLCs.
           </>
         }
-        description="A clear-eyed comparison against the two most common structures: a Delaware Series LLC and a stack of multiple Florida regular LLCs."
+        description="Both structures separate your assets. The difference is how much filing, paperwork, and annual upkeep you carry to get there."
       />
 
       <section className="container-wide section-pb">
         <div className="overflow-hidden rounded-3xl border border-border bg-card">
           <div className="grid grid-cols-12 border-b border-border bg-secondary/60 px-6 py-5 text-xs uppercase tracking-[0.16em] text-muted-foreground">
-            <span className="col-span-5">Feature</span>
-            <span className="col-span-3 text-center text-accent">Florida Protected Series</span>
-            <span className="col-span-2 text-center">Delaware Series</span>
-            <span className="col-span-2 text-center">Multiple FL LLCs</span>
+            <span className="col-span-6">Feature</span>
+            <span className="col-span-3 text-center text-accent">Protected Series LLC</span>
+            <span className="col-span-3 text-center">10 separate FL LLCs</span>
           </div>
           {ROWS.map((row, i) => (
             <div
@@ -82,14 +75,11 @@ export default function Comparison() {
                 i !== ROWS.length - 1 ? "border-b border-border" : ""
               } ${i % 2 === 1 ? "bg-secondary/20" : ""}`}
             >
-              <span className="col-span-5 font-medium">{row.feature}</span>
+              <span className="col-span-6 font-medium">{row.feature}</span>
               <span className="col-span-3 flex justify-center items-center">
                 {renderCell(row.fl, true)}
               </span>
-              <span className="col-span-2 flex justify-center items-center">
-                {renderCell(row.de)}
-              </span>
-              <span className="col-span-2 flex justify-center items-center">
+              <span className="col-span-3 flex justify-center items-center">
                 {renderCell(row.multi)}
               </span>
             </div>
@@ -101,20 +91,21 @@ export default function Comparison() {
             <div className="font-mono-feature text-xs uppercase tracking-[0.18em] text-accent">
               Verdict
             </div>
-            <h3 className="mt-2 font-display text-xl">Florida Protected Series LLC</h3>
+            <h3 className="mt-2 font-display text-xl">Protected Series LLC</h3>
             <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-              The clear winner for any Florida-domiciled investor or operator with two or more assets.
-              Strongest legal protection, lowest ongoing cost, simplest administration.
+              Built for a Florida owner with two or more assets: one filing, one annual report, one
+              registered agent, and a new series whenever you add something.
             </p>
           </div>
           <div className="rounded-2xl border border-border bg-card p-7">
             <div className="font-mono-feature text-xs uppercase tracking-[0.18em] text-muted-foreground">
-              Use Delaware if…
+              Formed in Florida
             </div>
-            <h3 className="mt-2 font-display text-xl">You operate exclusively outside FL</h3>
+            <h3 className="mt-2 font-display text-xl">No out-of-state detour</h3>
             <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-              You don't hold Florida real estate and you specifically need Delaware Court of Chancery
-              jurisdiction. Otherwise the Florida statute is now strictly better.
+              If you live and do business in Florida, you can form here under Florida's own statute —
+              no forming somewhere else and then registering that entity back into Florida as a foreign
+              LLC.
             </p>
           </div>
           <div className="rounded-2xl border border-border bg-card p-7">

@@ -9,7 +9,7 @@ const groups: { title: string; links: { to: string; label: string }[] }[] = [
       { to: "/what-is", label: "What Is a Series LLC" },
       { to: "/benefits", label: "Key Benefits" },
       { to: "/florida-advantages", label: "Florida Advantages" },
-      { to: "/comparison", label: "Compare to Delaware" },
+      { to: "/comparison", label: "One LLC vs. Many" },
     ],
   },
   {

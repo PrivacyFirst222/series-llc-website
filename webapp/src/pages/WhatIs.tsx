@@ -70,9 +70,7 @@ export default function WhatIs() {
             <div className="space-y-4">
               <h2 className="text-3xl">Why "protected"?</h2>
               <p className="text-base leading-relaxed text-muted-foreground">
-                The word matters. Older series statutes (Delaware 2002, Texas, Tennessee) created series
-                with limited shielding — courts were free to question whether a series was "really" a
-                separate entity. Florida's 2026 statute, modeled on the{" "}
+                The word matters. Florida's 2026 statute, modeled on the{" "}
                 <em className="font-display text-foreground">Uniform Protected Series Act</em>, gives each
                 series statutory entity status. Translation: a much harder shield to pierce.
               </p>

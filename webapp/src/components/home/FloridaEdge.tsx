@@ -23,14 +23,15 @@ export function FloridaEdge() {
         <div className="grid gap-8 lg:gap-14 lg:grid-cols-12">
           <div className="lg:col-span-5 space-y-5">
             <span className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/20 bg-primary-foreground/5 px-3 py-1 text-xs uppercase tracking-[0.18em]">
-              <span className="h-1.5 w-1.5 rounded-full bg-accent" /> Why Florida wins
+              <span className="h-1.5 w-1.5 rounded-full bg-accent" /> Formed in Florida
             </span>
             <h2 className="display text-4xl text-balance lg:text-5xl">
-              The Sunshine State just <em>leapfrogged</em> Delaware.
+              A Florida entity, under <em>Florida's</em> own statute.
             </h2>
             <p className="text-base leading-relaxed text-primary-foreground/80">
-              Most series LLC statutes are minimum-viable. Florida wrote a deeper one — with two
-              provisions that make a real, day-to-day difference for property and fund operators.
+              Form here and stay here — no forming somewhere else and registering that entity back into
+              Florida as a foreign LLC. Two provisions do most of the day-to-day work for property and
+              fund operators.
             </p>
             <Link
               to="/florida-advantages"

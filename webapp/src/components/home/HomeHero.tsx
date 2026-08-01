@@ -58,7 +58,7 @@ export function HomeHero() {
               Florida's new <span className="text-foreground font-medium">Protected Series LLC Act</span>{" "}
               (Statute §605.2101, effective July 1, 2026) lets you segregate every property, fund, or venture
               under a single umbrella — with horizontal <em className="text-foreground font-display">and</em>{" "}
-              vertical liability shields stronger than Delaware's. We file it all for you.
+              vertical liability shields written into the statute. We file it all for you.
             </p>
 
             <div className="flex flex-wrap items-center gap-3 pt-2">

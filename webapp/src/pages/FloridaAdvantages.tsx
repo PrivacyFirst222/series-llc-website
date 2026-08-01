@@ -2,16 +2,6 @@ import { PageHero } from "@/components/sections/PageHero";
 import { CallToAction } from "@/components/sections/CallToAction";
 import { Landmark, ScrollText, Anchor, Scale, FileCheck, Building2 } from "lucide-react";
 
-const COMPARISON_ROWS: { feature: string; fl: string; de: string }[] = [
-  { feature: "Series is a person distinct from the LLC", fl: "Yes (§605.2103)", de: "—" },
-  { feature: "Series can hold title to property in its own name", fl: "Yes (§605.2301)", de: "Yes (§18-215(c))" },
-  { feature: "Series debts enforceable only against that series", fl: "Yes (§605.2401)", de: "Yes (§18-215(b))" },
-  {
-    feature: "Shield applies without a notice provision in the certificate of formation",
-    fl: "Yes",
-    de: "No (§18-215(b))",
-  },
-];
 
 export default function FloridaAdvantages() {
   return (
@@ -23,7 +13,7 @@ export default function FloridaAdvantages() {
             Two sections worth reading before you <em>file</em>.
           </>
         }
-        description="Most series LLC statutes were written 15+ years ago, when nobody quite knew how courts would treat them. Florida had the benefit of hindsight — and used it."
+        description="Two sections of Florida's protected series statute do most of the day-to-day work: how a series holds property, and how a court reads a series when the chapter applies."
       />
 
       {/* Statute deep dive 1 */}
@@ -135,41 +125,24 @@ export default function FloridaAdvantages() {
         </div>
       </section>
 
-      {/* State comparison table */}
+      {/* Florida-formed */}
       <section className="bg-primary text-primary-foreground">
         <div className="container-wide section-y">
           <div className="max-w-3xl">
             <span className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/20 bg-primary-foreground/5 px-3 py-1 text-xs uppercase tracking-[0.18em]">
-              <span className="h-1.5 w-1.5 rounded-full bg-accent" /> Side by side
+              <span className="h-1.5 w-1.5 rounded-full bg-accent" /> Formed in Florida
             </span>
             <h2 className="display mt-4 text-4xl text-balance lg:text-5xl">
-              How Florida compares to <em>Delaware</em>.
+              A Florida entity, under <em>Florida's</em> own statute.
             </h2>
+            <p className="mt-5 text-base leading-relaxed text-primary-foreground/75">
+              If you live and do business in Florida, you can form your protected series LLC here.
+              There is no need to form the entity in another state and then register it back into
+              Florida as a foreign LLC to hold Florida property or do business here — one filing with
+              the Division of Corporations, one annual report, and one registered agent, all governed
+              by Chapter 605.
+            </p>
           </div>
-
-          <div className="mt-12 overflow-hidden rounded-2xl border border-primary-foreground/15 bg-primary-foreground/[0.04]">
-            <div className="grid grid-cols-3 border-b border-primary-foreground/15 px-6 py-4 text-xs uppercase tracking-[0.16em] text-primary-foreground/60">
-              <span>Feature</span>
-              <span className="text-center text-accent">Florida</span>
-              <span className="text-center">Delaware</span>
-            </div>
-            {COMPARISON_ROWS.map((row, i) => (
-              <div
-                key={row.feature}
-                className={`grid grid-cols-3 px-6 py-4 text-sm ${
-                  i !== COMPARISON_ROWS.length - 1 ? "border-b border-primary-foreground/10" : ""
-                }`}
-              >
-                <span className="text-primary-foreground/85">{row.feature}</span>
-                <span className="no-liga text-center font-display text-base text-accent">{row.fl}</span>
-                <span className="no-liga text-center text-primary-foreground/70">{row.de}</span>
-              </div>
-            ))}
-          </div>
-          <p className="mt-4 text-xs text-primary-foreground/60">
-            Delaware citations are to 6 Del. C. ch. 18. Comparisons are limited to what the two statutes
-            say on their face and are not legal advice.
-          </p>
         </div>
       </section>
 
