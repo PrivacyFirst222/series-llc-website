@@ -1,8 +1,7 @@
 import { HomeHero } from "@/components/home/HomeHero";
 import { StatBar } from "@/components/home/StatBar";
-import { MothershipDiagram } from "@/components/home/MothershipDiagram";
 import { BenefitsGrid } from "@/components/home/BenefitsGrid";
-import { FloridaEdge } from "@/components/home/FloridaEdge";
+import { StatuteTeaser } from "@/components/home/StatuteTeaser";
 import { CallToAction } from "@/components/sections/CallToAction";
 
 export default function Home() {
@@ -10,9 +9,8 @@ export default function Home() {
     <>
       <HomeHero />
       <StatBar />
-      <MothershipDiagram />
-      <BenefitsGrid />
-      <FloridaEdge />
+      <BenefitsGrid limit={4} />
+      <StatuteTeaser />
       <CallToAction />
     </>
   );

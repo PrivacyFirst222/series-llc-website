@@ -13,7 +13,6 @@ const NAV: { to: string; label: string }[] = [
   { to: "/the-statute", label: "The Statute" },
   { to: "/how-it-works", label: "Process" },
   { to: "/pricing", label: "Pricing" },
-  { to: "/comparison", label: "Compare" },
   { to: "/faq", label: "FAQ" },
 ];
 

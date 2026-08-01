@@ -52,7 +52,13 @@ const BENEFITS: { icon: typeof Shield; title: string; body: string }[] = [
   },
 ];
 
-export function BenefitsGrid() {
+interface BenefitsGridProps {
+  /** Show only the first N cards. Omit to show all. */
+  limit?: number;
+}
+
+export function BenefitsGrid({ limit }: BenefitsGridProps) {
+  const items = typeof limit === "number" ? BENEFITS.slice(0, limit) : BENEFITS;
   return (
     <section className="relative">
       <div className="container-wide section-y">
@@ -65,7 +71,7 @@ export function BenefitsGrid() {
         </div>
 
         <div className="mt-8 lg:mt-14 grid gap-px overflow-hidden rounded-2xl border border-border bg-border md:grid-cols-2 lg:grid-cols-4">
-          {BENEFITS.map((b, i) => {
+          {items.map((b, i) => {
             const Icon = b.icon;
             return (
               <article

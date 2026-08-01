@@ -10,7 +10,6 @@ import Benefits from "./pages/Benefits";
 import TheStatute from "./pages/TheStatute";
 import HowItWorks from "./pages/HowItWorks";
 import Pricing from "./pages/Pricing";
-import Comparison from "./pages/Comparison";
 import FAQ from "./pages/FAQ";
 import AssetProtection from "./pages/AssetProtection";
 import RecordkeepingApp from "./pages/RecordkeepingApp";
@@ -34,7 +33,6 @@ const App = () => (
             <Route path="/the-statute" element={<TheStatute />} />
             <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/pricing" element={<Pricing />} />
-            <Route path="/comparison" element={<Comparison />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/asset-protection" element={<AssetProtection />} />
             <Route path="/recordkeeping-app" element={<RecordkeepingApp />} />
