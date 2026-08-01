@@ -92,7 +92,7 @@ export default function FAQ() {
               <ul className="mt-3 space-y-2 text-sm">
                 <li>
                   <a
-                    href="https://www.flsenate.gov/Laws/Statutes/2024/Chapter605/All"
+                    href="https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605ContentsIndex.html&StatuteYear=2025&Title=%2D%3E2025%2D%3EChapter%20605"
                     target="_blank"
                     rel="noreferrer"
                     className="hover:text-accent"

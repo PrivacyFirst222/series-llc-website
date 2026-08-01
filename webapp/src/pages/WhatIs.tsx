@@ -129,12 +129,14 @@ export default function WhatIs() {
                   Statute reference
                 </span>
               </div>
-              <h3 className="mt-3 font-display text-xl">Florida Revised LLC Act, Part III</h3>
+              <h3 className="mt-3 font-display text-xl">Uniform Protected Series Provisions</h3>
               <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                Sections §605.2101 through §605.2401. Effective for entities formed on or after July 1, 2026.
+                Sections §605.2101 through §605.2802 of Chapter 605, the Florida Revised Limited
+                Liability Company Act. The chapter governs protected series limited liability companies
+                beginning July 1, 2026 (§605.2802).
               </p>
               <a
-                href="https://www.flsenate.gov/Laws/Statutes/2024/Chapter605/All"
+                href="https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605ContentsIndex.html&StatuteYear=2025&Title=%2D%3E2025%2D%3EChapter%20605"
                 target="_blank"
                 rel="noreferrer"
                 className="mt-4 inline-flex text-sm font-medium text-primary hover:text-accent transition-colors"
