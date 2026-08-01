@@ -27,8 +27,8 @@ const BENEFITS: { icon: typeof Shield; title: string; body: string }[] = [
   },
   {
     icon: MapPin,
-    title: "Real property recording rules",
-    body: "§605.2301 lets you record real property in the name of a series. The county clerk recognizes the series itself — clean title chain.",
+    title: "Real property in the series' name",
+    body: "Real estate can be deeded to and held by a protected series in its own name. Under §605.2301, the recorded deed stands as the record that the property belongs to that series.",
   },
   {
     icon: Scale,
@@ -42,8 +42,8 @@ const BENEFITS: { icon: typeof Shield; title: string; body: string }[] = [
   },
   {
     icon: Building2,
-    title: "Lender & title-friendly",
-    body: "Florida-native structure means Florida lenders, title insurers, and county clerks understand it natively. No out-of-state friction.",
+    title: "Formed under Florida law",
+    body: "A Florida entity governed by Florida's own statute and Chapter 605 caselaw — no need to qualify a foreign series to hold Florida property.",
   },
   {
     icon: Sparkles,

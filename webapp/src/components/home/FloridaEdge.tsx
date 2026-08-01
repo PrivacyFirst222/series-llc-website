@@ -49,12 +49,13 @@ export function FloridaEdge() {
                   §605.2301
                 </span>
               </div>
-              <h3 className="mt-3 font-display text-2xl">Real Property Recording Rules</h3>
+              <h3 className="mt-3 font-display text-2xl">Associated Assets &amp; Real Property</h3>
               <p className="mt-3 text-sm leading-relaxed text-primary-foreground/80">
                 Title to Florida real estate can be held{" "}
                 <em className="font-display text-primary-foreground">in the name of the series itself</em>.
-                County clerks recognize the series, deeds record cleanly, and there's no risk of veil-piercing
-                via title-chain confusion. Out-of-state series can't do this in Florida.
+                Once recorded, a deed to or from a protected series stands as the record that the property
+                is that series' associated asset — provided it's titled in the series' own name and tracked
+                in your records.
               </p>
             </div>
 

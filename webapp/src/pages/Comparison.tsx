@@ -15,7 +15,6 @@ const ROWS: Row[] = [
   { feature: "One filing covers unlimited entities", fl: "yes", de: "yes", multi: "no" },
   { feature: "Horizontal liability shield (series ↔ series)", fl: "yes", de: "yes", multi: "yes" },
   { feature: "Vertical shield (parent ↔ series)", fl: "yes", de: "yes", multi: "—" },
-  { feature: "Real property recordable in series's name", fl: "yes", de: "no", multi: "yes" },
   { feature: "Charging order exclusivity inherited statewide", fl: "yes", de: "partial", multi: "yes" },
   { feature: "Annual reports", fl: "1 report", de: "1 report", multi: "10+ reports" },
   { feature: "Federal EIN", fl: "1 EIN structure", de: "1 EIN structure", multi: "10 EINs" },

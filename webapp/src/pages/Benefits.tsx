@@ -111,7 +111,7 @@ export default function Benefits() {
                 "Full statutory liability protection per series",
                 "Separate creditor pools — judgments don't migrate",
                 "Independent management, governance, and exit options",
-                "Recordable real estate title in the series's name",
+                "Real estate titled in the series' own name",
                 "Charging order exclusivity from Chapter 605",
               ].map((s) => (
                 <li key={s} className="flex gap-2">

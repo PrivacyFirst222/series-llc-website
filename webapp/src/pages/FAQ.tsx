@@ -12,8 +12,8 @@ const FAQ_ITEMS: { q: string; a: string }[] = [
     a: "A regular LLC is a single legal entity. A Protected Series LLC is a parent entity that contains an unlimited number of internal 'series,' each treated as its own entity for liability purposes. You get the asset segregation of multiple LLCs and only pay one annual fee.",
   },
   {
-    q: "Will my Florida county clerk and title insurer recognize series ownership?",
-    a: "Yes. Florida Statute §605.2301 explicitly authorizes county clerks to record real property in the name of a protected series. Title insurers in Florida have already prepared underwriting frameworks for series-level title.",
+    q: "Can a protected series hold Florida real estate in its own name?",
+    a: "Yes. A protected series is its own person under Florida law with the same property powers as the LLC, and §605.2301 addresses deeds directly: a recorded deed granting an interest in real property to or from a protected series is conclusive of the signer's authority in favor of a person who gives value without knowledge of any lack of authority, and stands as the record that the property is that series' associated asset. Title has to be in the series' own statutory name — a series may not hold property in the LLC's name or another series' name. We can't speak for how a particular clerk's office or title underwriter will handle any given transaction.",
   },
   {
     q: "Do I get separate EINs for each series?",
