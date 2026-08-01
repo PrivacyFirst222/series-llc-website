@@ -68,15 +68,6 @@ export default function FloridaAdvantages() {
                   ))}
                 </ul>
               </div>
-              <div className="rounded-2xl border-l-4 border-accent bg-card p-7">
-                <p className="font-display text-xl leading-snug text-foreground">
-                  "Florida is the first state to make series LLCs <em>actually work</em> for residential
-                  and commercial real estate at scale."
-                </p>
-                <p className="mt-3 text-xs text-muted-foreground">
-                  — Florida Bar Journal, "The Protected Series LLC Comes to Florida," Vol. 99, No. 2
-                </p>
-              </div>
             </div>
           </div>
         </div>

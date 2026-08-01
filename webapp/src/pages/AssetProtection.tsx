@@ -71,7 +71,7 @@ export default function AssetProtection() {
               {[
                 "One catastrophic judgment cannot cascade across your entire portfolio",
                 "Each series holds its own assets and books — creditors of one series are legally barred from the rest",
-                "Florida §605.2101 gives each series statutory entity status — the firewall is embedded in state law, not just contractual language",
+                "Florida §605.2401 places the liability shield in the statute itself — the firewall is embedded in state law, not just contractual language",
                 "Adding a new asset simply means creating a new series, not a new LLC filing",
               ].map((item) => (
                 <li key={item} className="flex gap-2.5 text-sm">

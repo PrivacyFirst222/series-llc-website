@@ -84,10 +84,6 @@ export function HomeHero() {
             <div className="flex flex-wrap items-center gap-6 pt-4 text-xs text-muted-foreground">
               <span className="inline-flex items-center gap-2">
                 <ShieldCheck className="h-4 w-4 text-trust" />
-                Featured in the <em className="font-display not-italic text-foreground">Florida Bar Journal</em>
-              </span>
-              <span className="hidden sm:inline-flex items-center gap-2">
-                <span className="h-1 w-1 rounded-full bg-muted-foreground/60" />
                 FL Division of Corporations registered agent
               </span>
             </div>
@@ -109,9 +105,12 @@ export function HomeHero() {
                     Statute snapshot
                   </span>
                   <h3 className="font-display text-2xl leading-tight">
-                    "A series LLC reduces costs and litigation exposure for multi-asset Floridians."
+                    A debt of one protected series is solely that series' debt — not the LLC's, and not
+                    another series'.
                   </h3>
-                  <p className="text-xs text-primary-foreground/80">— Florida Bar Journal, March 2025</p>
+                  <p className="text-xs text-primary-foreground/80">
+                    Florida Statute §605.2401, "Limitations on liability"
+                  </p>
                 </div>
               </div>
               <div className="grid grid-cols-3 divide-x divide-border">

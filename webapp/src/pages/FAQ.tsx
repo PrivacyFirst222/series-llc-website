@@ -55,7 +55,7 @@ export default function FAQ() {
             Everything you might want to ask <em>before</em> you file.
           </>
         }
-        description="Drawn from real client questions and the Florida Bar Journal's commentary on §605.2101."
+        description="Drawn from real client questions about Florida's Protected Series LLC statute."
       />
 
       <section className="container-wide section-pb">
