@@ -391,10 +391,10 @@ export function FloridaLLCFormationForm({
           ) : null}
 
           <p className="mt-6 text-xs text-muted-foreground leading-relaxed">
-            <strong>Disclaimer placeholder:</strong> This service prepares
-            documents based on information you provide. We are not a law firm
-            and do not provide legal, tax, or accounting advice. Your use of
-            this form does not create an attorney-client relationship.
+            <strong>Disclaimer:</strong> This service prepares documents based
+            on information you provide. We are not a law firm and do not provide
+            legal, tax, or accounting advice. Your use of this form does not
+            create an attorney–client relationship.
           </p>
         </main>
       </div>

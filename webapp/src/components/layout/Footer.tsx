@@ -91,8 +91,8 @@ export function Footer() {
           <p className="text-xs text-muted-foreground max-w-3xl leading-relaxed">
             <strong className="text-foreground/80">Disclaimer:</strong> MyFloridaSeriesLLC.com is a document
             preparation and registered agent service. The information on this site is provided for general
-            educational purposes and does not constitute legal advice. Use of this site does not create an
-            attorney–client relationship.
+            educational purposes and does not constitute legal, tax, or accounting advice. Use of this site
+            does not create an attorney–client relationship.
           </p>
           <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} MyFloridaSeriesLLC.com. All rights reserved.
