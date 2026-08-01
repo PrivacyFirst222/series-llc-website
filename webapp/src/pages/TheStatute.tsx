@@ -3,7 +3,7 @@ import { CallToAction } from "@/components/sections/CallToAction";
 import { Landmark, ScrollText, Anchor, Scale, FileCheck, Building2 } from "lucide-react";
 
 
-export default function FloridaAdvantages() {
+export default function TheStatute() {
   return (
     <>
       <PageHero

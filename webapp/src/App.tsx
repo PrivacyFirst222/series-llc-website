@@ -7,7 +7,7 @@ import { Layout } from "@/components/layout/Layout";
 import Home from "./pages/Home";
 import WhatIs from "./pages/WhatIs";
 import Benefits from "./pages/Benefits";
-import FloridaAdvantages from "./pages/FloridaAdvantages";
+import TheStatute from "./pages/TheStatute";
 import HowItWorks from "./pages/HowItWorks";
 import Pricing from "./pages/Pricing";
 import Comparison from "./pages/Comparison";
@@ -31,7 +31,7 @@ const App = () => (
             <Route path="/" element={<Home />} />
             <Route path="/what-is" element={<WhatIs />} />
             <Route path="/benefits" element={<Benefits />} />
-            <Route path="/florida-advantages" element={<FloridaAdvantages />} />
+            <Route path="/the-statute" element={<TheStatute />} />
             <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/comparison" element={<Comparison />} />
