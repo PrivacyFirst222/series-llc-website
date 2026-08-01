@@ -13,7 +13,7 @@ export function MothershipDiagram() {
   return (
     <section className="relative overflow-hidden bg-secondary/40">
       <div className="container-wide section-y">
-        <div className="grid lg:grid-cols-12 gap-8 lg:gap-14 items-center">
+        <div className="grid lg:grid-cols-12 gap-8 lg:gap-10 items-center">
           <div className="lg:col-span-5 space-y-6">
             <span className="eyebrow">The architecture</span>
             <h2 className="display text-4xl text-balance lg:text-5xl">

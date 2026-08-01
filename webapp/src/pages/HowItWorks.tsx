@@ -69,9 +69,9 @@ export default function HowItWorks() {
           })}
         </div>
 
-        <div className="mt-10 lg:mt-16 hairline" />
+        <div className="mt-10 lg:mt-12 hairline" />
 
-        <div className="mt-10 lg:mt-16 grid gap-6 md:grid-cols-3">
+        <div className="mt-10 lg:mt-12 grid gap-6 md:grid-cols-3">
           <div className="rounded-2xl border border-border bg-secondary/40 p-6">
             <Clock className="h-5 w-5 text-trust" />
             <h3 className="mt-4 font-display text-lg">About processing times</h3>
@@ -118,7 +118,7 @@ export default function HowItWorks() {
           </div>
         </div>
 
-        <div className="mt-12 lg:mt-20 text-center">
+        <div className="mt-10 lg:mt-12 text-center">
           <Button asChild size="lg" className="rounded-full px-8 h-12 bg-primary text-primary-foreground">
             <Link to="/pricing">See pricing →</Link>
           </Button>

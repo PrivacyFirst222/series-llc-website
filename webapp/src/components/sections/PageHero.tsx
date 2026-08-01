@@ -15,7 +15,7 @@ export function PageHero({ eyebrow, title, description, align = "left", meta }: 
         aria-hidden
         className="absolute inset-x-0 top-0 h-[420px] ring-spotlight pointer-events-none"
       />
-      <div className="container-wide relative pt-10 pb-10 sm:pt-16 sm:pb-16 lg:pt-24 lg:pb-28">
+      <div className="container-wide relative pt-10 pb-10 sm:pt-14 sm:pb-12 lg:pt-16 lg:pb-14">
         <div className={align === "center" ? "max-w-3xl mx-auto text-center" : "max-w-4xl"}>
           <span className="eyebrow">{eyebrow}</span>
           <h1 className="display mt-4 text-4xl text-balance md:text-5xl lg:text-7xl">{title}</h1>

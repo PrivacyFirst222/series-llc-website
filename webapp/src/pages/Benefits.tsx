@@ -136,7 +136,7 @@ export default function Benefits() {
           </p>
         </div>
 
-        <div className="mt-8 lg:mt-14 overflow-hidden rounded-3xl border border-border bg-card">
+        <div className="mt-8 lg:mt-10 overflow-hidden rounded-3xl border border-border bg-card">
           <div className="grid grid-cols-12 border-b border-border bg-secondary/60 px-6 py-5 text-xs uppercase tracking-[0.16em] text-muted-foreground">
             <span className="col-span-6">Feature</span>
             <span className="col-span-3 text-center text-accent">Protected Series LLC</span>
@@ -160,7 +160,7 @@ export default function Benefits() {
           ))}
         </div>
 
-        <div className="mt-8 lg:mt-14 grid gap-6 md:grid-cols-2">
+        <div className="mt-8 lg:mt-10 grid gap-6 md:grid-cols-2">
           <div className="rounded-2xl border border-border bg-card p-7">
             <div className="font-mono-feature text-xs uppercase tracking-[0.18em] text-muted-foreground">
               Formed in Florida

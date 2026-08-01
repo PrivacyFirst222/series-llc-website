@@ -70,7 +70,7 @@ export function BenefitsGrid({ limit }: BenefitsGridProps) {
           </h2>
         </div>
 
-        <div className="mt-8 lg:mt-14 grid gap-px overflow-hidden rounded-2xl border border-border bg-border md:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-8 lg:mt-10 grid gap-px overflow-hidden rounded-2xl border border-border bg-border md:grid-cols-2 lg:grid-cols-4">
           {items.map((b, i) => {
             const Icon = b.icon;
             return (

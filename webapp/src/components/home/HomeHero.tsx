@@ -34,7 +34,7 @@ export function HomeHero() {
         />
       </svg>
 
-      <div className="container-wide pt-10 pb-14 sm:pt-16 sm:pb-20 lg:pt-24 lg:pb-32">
+      <div className="container-wide pt-10 pb-14 sm:pt-14 sm:pb-16 lg:pt-16 lg:pb-20">
         <div className="grid lg:grid-cols-12 gap-12 items-end">
           <div className="lg:col-span-8 space-y-8 anim-rise">
             <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3 py-1.5 backdrop-blur">

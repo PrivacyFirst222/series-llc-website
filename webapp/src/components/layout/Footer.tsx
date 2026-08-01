@@ -24,8 +24,8 @@ const groups: { title: string; links: { to: string; label: string }[] }[] = [
 
 export function Footer() {
   return (
-    <footer className="relative mt-10 lg:mt-24 border-t border-border bg-secondary/40">
-      <div className="container-wide py-12 lg:py-20">
+    <footer className="relative mt-10 lg:mt-12 border-t border-border bg-secondary/40">
+      <div className="container-wide py-12 lg:py-16">
         <div className="grid gap-12 lg:grid-cols-12">
           <div className="lg:col-span-5 space-y-6">
             <Logo />
@@ -84,7 +84,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-8 lg:mt-14 hairline" />
+        <div className="mt-8 lg:mt-10 hairline" />
 
         <div className="mt-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <p className="text-xs text-muted-foreground max-w-3xl leading-relaxed">

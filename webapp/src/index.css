@@ -118,16 +118,17 @@
     @apply mx-auto max-w-7xl px-6 lg:px-10;
   }
 
-  /* Section rhythm. Phones get a tighter band so stacked sections don't
-     read as unintentional empty space; desktop keeps the original air. */
+  /* Section rhythm. One scale for every width — phones 40px, tablets 56px,
+     desktop 64px per side. Generous for a text-heavy site without leaving
+     half-screen voids between sections. */
   .section-y {
-    @apply py-10 sm:py-16 lg:py-28;
+    @apply py-10 sm:py-14 lg:py-16;
   }
   .section-pt {
-    @apply pt-10 sm:pt-16 lg:pt-28;
+    @apply pt-10 sm:pt-14 lg:pt-16;
   }
   .section-pb {
-    @apply pb-10 sm:pb-16 lg:pb-28;
+    @apply pb-10 sm:pb-14 lg:pb-16;
   }
 
   .display {

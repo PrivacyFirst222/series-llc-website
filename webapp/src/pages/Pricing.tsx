@@ -81,7 +81,7 @@ export default function Pricing() {
         </div>
 
         {/* Trust bar */}
-        <div className="mt-8 lg:mt-14 grid gap-3 md:grid-cols-2 rounded-2xl border border-border bg-secondary/30 p-6">
+        <div className="mt-8 lg:mt-10 grid gap-3 md:grid-cols-2 rounded-2xl border border-border bg-secondary/30 p-6">
           {[
             "30-day no-questions money-back guarantee",
             "Stripe-secured checkout with split-pay options",
@@ -94,7 +94,7 @@ export default function Pricing() {
         </div>
 
         {/* À-la-carte */}
-        <div className="mt-10 lg:mt-16">
+        <div className="mt-10 lg:mt-12">
           <h3 className="font-display text-2xl">Add-ons &amp; à-la-carte</h3>
           <p className="text-sm text-muted-foreground">Choose only what you need.</p>
           <div className="mt-6 grid gap-px overflow-hidden rounded-2xl border border-border bg-border md:grid-cols-2">
