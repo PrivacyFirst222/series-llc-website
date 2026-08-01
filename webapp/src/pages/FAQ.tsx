@@ -36,8 +36,8 @@ const FAQ_ITEMS: { q: string; a: string }[] = [
     a: "A Florida Protect Series LLC can be taxed as (1) a disregarded entity, (2) a partnership, (3) an S corporation, or (4) C corporation, depending on a number of factors, including whether the LLC is owned by one or more people and what elections you file with the IRS. It is also possible for different series to be taxed differently. What is best for you needs to be discussed with your CPA or other tax professional.",
   },
   {
-    q: "What's your turnaround time?",
-    a: "Typically 7 days from intake to filing, however, the processing time depends on the Florida Secretary of State's workload. This means it can take longer from time to time. You can always check on Sunbiz.org (https://dos.fl.gov/sunbiz/document-processing-dates/) to see what their current processing dates are. Unfortunately, the Florida Secretary of State does not offer an expedited filing service.",
+    q: "How long does formation take?",
+    a: "We cannot promise a timeframe. We submit your filing promptly once your intake is complete, but from that point the processing time depends entirely on the Florida Secretary of State's workload, and the state gives no guarantee. You can always check on Sunbiz.org (https://dos.fl.gov/sunbiz/document-processing-dates/) to see what their current processing dates are. Unfortunately, the Florida Secretary of State does not offer an expedited filing service.",
   },
   {
     q: "Can I cancel or get a refund?",

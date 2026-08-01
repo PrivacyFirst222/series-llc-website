@@ -62,7 +62,7 @@ export function CallToAction({
               {[
                 { k: "Filings", v: "Open now" },
                 { k: "Statute effective", v: "Jul 1, 2026" },
-                { k: "Avg. formation time", v: "5–7 days" },
+                { k: "State filing", v: "Electronic" },
                 { k: "Series under one umbrella", v: "Unlimited" },
               ].map((row) => (
                 <div

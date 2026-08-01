@@ -5,13 +5,12 @@ import { PageHero } from "@/components/sections/PageHero";
 
 const FEATURES: string[] = [
   "Articles of Organization filed with FL Div. of Corps",
-  "Master Operating Agreement",
+  "Form Operating Agreement for you to review and adapt",
   "Property titling manual — how to properly title assets in the LLC or series",
   "Ledger forms for each series",
   "Complete Series LLC maintenance guide",
   "Includes preparation of up to 3 Certificates of Designation (to form up to 3 series)",
-  "Federal EIN application",
-  "First-year Florida registered agent",
+  "First-year Florida registered agent service — or serve as your own if you're a Florida resident",
   "Annual report filing reminders",
   "Email support",
   "Free iOS app — track LLC records, income & expenses, asset acquisitions and sales",
@@ -28,7 +27,7 @@ export default function Pricing() {
             Honest pricing. <em>One flat fee</em>. Three series included.
           </>
         }
-        description="A single formation fee covers everything, including preparation of up to three Certificates of Designation. Need more series? Add them at a straightforward per-series rate."
+        description="One flat service fee covers preparation and electronic filing, including up to three Certificates of Designation. Need more series, or a Federal EIN? Add them at a straightforward rate."
       />
 
       <section className="container-wide section-pb">

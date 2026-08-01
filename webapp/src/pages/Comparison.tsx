@@ -20,7 +20,6 @@ const ROWS: Row[] = [
   { feature: "Annual reports", fl: "1 report", de: "1 report", multi: "10+ reports" },
   { feature: "Federal EIN", fl: "1 EIN structure", de: "1 EIN structure", multi: "10 EINs" },
   { feature: "Recognized by Florida courts natively", fl: "yes", de: "partial", multi: "yes" },
-  { feature: "Setup time", fl: "5–7 days", de: "10–14 days", multi: "60+ days for 10 LLCs" },
   { feature: "Formation cost", fl: "$499 + $125 + state fees", de: "$1,499 + $400", multi: "$2,500+ in fees alone" },
   { feature: "Annual cost (10-asset portfolio)", fl: "$138.75", de: "$300 + $400", multi: "$1,200+/yr" },
 ];

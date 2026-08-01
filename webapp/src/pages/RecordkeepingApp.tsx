@@ -38,7 +38,6 @@ const appFeatures = [
 const comparisonRows = [
   { feature: "Files state formation documents", typical: true, ours: true },
   { feature: "Provides operating agreement", typical: true, ours: true },
-  { feature: "Issues EIN (tax ID)", typical: true, ours: true },
   { feature: "Delivers basic document package", typical: true, ours: true },
   { feature: "Explains recordkeeping obligations", typical: false, ours: true },
   { feature: "Provides purpose-built recordkeeping app", typical: false, ours: true },

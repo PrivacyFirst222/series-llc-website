@@ -118,7 +118,7 @@ export function HomeHero() {
                 {[
                   { k: "Effective", v: "7/1/26" },
                   { k: "Fee / series", v: "$0 *" },
-                  { k: "Setup time", v: "5 days" },
+                  { k: "State filing", v: "Electronic" },
                 ].map((s) => (
                   <div key={s.k} className="p-4 text-center">
                     <div className="font-display text-xl">{s.v}</div>
