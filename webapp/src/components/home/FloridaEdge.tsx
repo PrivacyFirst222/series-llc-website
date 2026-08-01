@@ -66,12 +66,12 @@ export function FloridaEdge() {
                   §605.2108
                 </span>
               </div>
-              <h3 className="mt-3 font-display text-2xl">Broader Extrapolation Rule</h3>
+              <h3 className="mt-3 font-display text-2xl">Application of the Chapter</h3>
               <p className="mt-3 text-sm leading-relaxed text-primary-foreground/80">
-                Anything that applies to a Florida regular LLC under Chapter 605 — charging order
-                exclusivity, member liability protections, judicial dissolution standards — applies{" "}
-                <em className="font-display text-primary-foreground">automatically</em> to every series.
-                Decades of caselaw, instantly inherited.
+                For the questions it covers — manager duties, derivative actions, judicial dissolution,
+                winding up — §605.2108 tells a court to read each protected series{" "}
+                <em className="font-display text-primary-foreground">as its own LLC</em>, separately
+                formed and distinct from the company and every other series.
               </p>
             </div>
           </div>

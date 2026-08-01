@@ -167,6 +167,11 @@
 }
 
 @layer utilities {
+  /* Manrope ligates "(c)" into ©, which mangles statutory citations. */
+  .no-liga {
+    font-variant-ligatures: none;
+    font-feature-settings: "liga" 0, "clig" 0, "dlig" 0;
+  }
   .text-balance { text-wrap: balance; }
   .text-pretty { text-wrap: pretty; }
   .font-display { font-family: 'Fraunces', Georgia, serif; }

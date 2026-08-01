@@ -32,8 +32,8 @@ const BENEFITS: { icon: typeof Shield; title: string; body: string }[] = [
   },
   {
     icon: Scale,
-    title: "Broader Florida-LLC extrapolation",
-    body: "§605.2108 imports the rest of Chapter 605 — meaning every protection Florida regular LLCs enjoy applies to your series.",
+    title: "Treated as its own LLC",
+    body: "For the questions §605.2108 covers — manager duties, derivative actions, dissolution and winding up — a protected series is read as a separately formed LLC.",
   },
   {
     icon: Scroll,

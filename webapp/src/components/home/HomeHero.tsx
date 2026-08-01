@@ -116,7 +116,7 @@ export function HomeHero() {
               <div className="grid grid-cols-3 divide-x divide-border">
                 {[
                   { k: "Effective", v: "7/1/26" },
-                  { k: "Fee / series", v: "$0 *" },
+                  { k: "Annual report", v: "One" },
                   { k: "State filing", v: "Electronic" },
                 ].map((s) => (
                   <div key={s.k} className="p-4 text-center">
@@ -128,9 +128,6 @@ export function HomeHero() {
                 ))}
               </div>
             </div>
-            <p className="mt-3 text-[0.7rem] text-muted-foreground">
-              * No additional Florida filing fee per protected series under §605.2106.
-            </p>
           </div>
         </div>
       </div>

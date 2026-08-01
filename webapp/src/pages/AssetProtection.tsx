@@ -196,7 +196,7 @@ export default function AssetProtection() {
             </p>
             <ul className="space-y-3">
               {[
-                "Florida §605.2108 explicitly extends every charging-order protection available to a standard LLC to each protected series — the shield is inherited by statute, not by contract",
+                "Each protected series holds its own assets, and under §605.2401 a debt of one series is solely that series' debt — the separation is statutory, not contractual",
                 "Even if a creditor obtains a charging order against your interest in the master LLC, the individual series assets are separately titled and separately shielded",
                 "Each series can have its own distinct membership interests — structuring each series with multiple members locks in charging-order exclusivity at every level of the structure",
                 'The Florida legislature has established by statute that the charging order is the \u201csole and exclusive\u201d remedy available to a creditor of a person holding a membership interest in a multi-member Florida LLC, including each of its associated series',
@@ -217,7 +217,7 @@ export default function AssetProtection() {
               { entity: "Single-Member LLC", verdict: "bad", note: "Charging order protection does not apply — interest can be seized like corporate stock" },
               { entity: "Single-Member FL Protected Series LLC", verdict: "bad", note: "Same weakness applies — single-member status negates charging order protection regardless of the series structure" },
               { entity: "Multi-Member LLC", verdict: "ok", note: "Charging order protection applies, but all LLC assets are behind a single shield" },
-              { entity: "Multi-Member FL Protected Series LLC", verdict: "best", note: "Charging order protection inherited by every series under §605.2108 — maximum leverage against creditors at every level" },
+              { entity: "Multi-Member FL Protected Series LLC", verdict: "best", note: "Charging order protection at the company level, with each series' assets separately held and separately shielded under §605.2401" },
             ].map((row) => (
               <div key={row.entity} className={`bg-card p-6 space-y-2 ${row.entity === "Multi-Member FL Protected Series LLC" ? "md:col-span-2 lg:col-span-1" : ""}`}>
                 <div className={`font-medium text-sm ${row.entity === "Multi-Member FL Protected Series LLC" ? "text-trust" : ""}`}>{row.entity}</div>

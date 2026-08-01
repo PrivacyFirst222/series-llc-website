@@ -12,15 +12,19 @@ interface Row {
 }
 
 const ROWS: Row[] = [
-  { feature: "One filing covers unlimited entities", fl: "yes", de: "yes", multi: "no" },
+  { feature: "One filing covers unlimited series", fl: "yes", de: "yes", multi: "no" },
   { feature: "Horizontal liability shield (series ↔ series)", fl: "yes", de: "yes", multi: "yes" },
   { feature: "Vertical shield (parent ↔ series)", fl: "yes", de: "yes", multi: "—" },
-  { feature: "Charging order exclusivity inherited statewide", fl: "yes", de: "partial", multi: "yes" },
-  { feature: "Annual reports", fl: "1 report", de: "1 report", multi: "10+ reports" },
+  { feature: "Series is a person distinct from the LLC", fl: "yes", de: "—", multi: "yes" },
+  { feature: "Series can hold title to property in its own name", fl: "yes", de: "yes", multi: "yes" },
+  {
+    feature: "Shield applies without a notice provision in the certificate of formation",
+    fl: "yes",
+    de: "no",
+    multi: "yes",
+  },
+  { feature: "Annual state charge", fl: "1 annual report", de: "$400 tax + $100 per registered series", multi: "10 annual reports" },
   { feature: "Federal EIN", fl: "1 EIN structure", de: "1 EIN structure", multi: "10 EINs" },
-  { feature: "Recognized by Florida courts natively", fl: "yes", de: "partial", multi: "yes" },
-  { feature: "Formation cost", fl: "$499 + $125 + state fees", de: "$1,499 + $400", multi: "$2,500+ in fees alone" },
-  { feature: "Annual cost (10-asset portfolio)", fl: "$138.75", de: "$300 + $400", multi: "$1,200+/yr" },
 ];
 
 function renderCell(v: Cell, accent?: boolean) {
