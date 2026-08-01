@@ -27,7 +27,7 @@ const STEPS: {
     n: "02",
     icon: FileText,
     title: "We prepare and file your documents",
-    body: "We put your information into Florida's Articles of Organization and a Certificate of Designation for each series, then file them electronically with the Division of Corporations. We're a document filing service, not a law firm — we don't draft custom documents and we don't give legal, tax, or accounting advice.",
+    body: "We prepare your Florida Articles of Organization and a Certificate of Designation for each series, then file them electronically with the Division of Corporations.",
   },
   {
     n: "03",
