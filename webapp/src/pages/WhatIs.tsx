@@ -150,7 +150,7 @@ export default function WhatIs() {
                 Quick fact
               </div>
               <h3 className="mt-3 font-display text-xl leading-tight">
-                22 states authorize series LLCs. Florida is one of the newest.
+                22 states authorize series LLCs.
               </h3>
               <p className="mt-2 text-sm text-primary-foreground/80">
                 Florida's took effect July 1, 2026 as the Uniform Protected Series Provisions —
