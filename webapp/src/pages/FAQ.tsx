@@ -29,7 +29,7 @@ const FAQ_ITEMS: { q: string; a: string }[] = [
   },
   {
     q: "Does this work for out-of-state investors?",
-    a: "Absolutely. Out-of-state investors form a Florida Protected Series LLC for Florida-based assets and can foreign-qualify in their home state if needed. The statute's recording-rule benefits attach to Florida real property regardless of where you live.",
+    a: "Absolutely. Out-of-state investors can form a Florida Protected Series LLC for Florida-based assets and foreign-qualify in their home state if needed. The statute applies to the entity and its property regardless of where the owners live.",
   },
   {
     q: "What's the federal tax treatment?",

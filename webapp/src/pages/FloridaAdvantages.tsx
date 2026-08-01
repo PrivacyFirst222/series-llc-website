@@ -6,7 +6,6 @@ const COMPARISON_ROWS: { feature: string; fl: string; de: string; tx: string }[]
   { feature: "Statutory entity status", fl: "Full", de: "Partial", tx: "Limited" },
   { feature: "Charging order exclusivity inherited", fl: "Yes (§605.2108)", de: "Limited", tx: "Limited" },
   { feature: "Vertical (parent ↔ series) shield", fl: "Yes", de: "Yes", tx: "Yes" },
-  { feature: "Foreign series — recognized in FL?", fl: "Yes — but no §605.2301 benefits", de: "—", tx: "—" },
   { feature: "Filing fee per series", fl: "$0", de: "$0", tx: "$0 — but $300 franchise tax/series" },
 ];
 

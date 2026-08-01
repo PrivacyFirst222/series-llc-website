@@ -43,7 +43,7 @@ const BENEFITS: { icon: typeof Shield; title: string; body: string }[] = [
   {
     icon: Building2,
     title: "Formed under Florida law",
-    body: "A Florida entity governed by Florida's own statute and Chapter 605 caselaw — no need to qualify a foreign series to hold Florida property.",
+    body: "A Florida entity formed under Florida's own protected series statute and governed by the rest of Chapter 605, Florida's LLC act.",
   },
   {
     icon: Sparkles,
