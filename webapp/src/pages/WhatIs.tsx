@@ -150,10 +150,11 @@ export default function WhatIs() {
                 Quick fact
               </div>
               <h3 className="mt-3 font-display text-xl leading-tight">
-                Only 16 U.S. states have any series LLC statute.
+                22 states authorize series LLCs. Florida is one of the newest.
               </h3>
               <p className="mt-2 text-sm text-primary-foreground/80">
-                And Florida's is now the most comprehensive — period.
+                Florida's took effect July 1, 2026 as the Uniform Protected Series Provisions —
+                §§605.2101–605.2802 of the Revised LLC Act.
               </p>
             </div>
           </aside>
