@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { PageHero } from "@/components/sections/PageHero";
 import { CallToAction } from "@/components/sections/CallToAction";
 import { MothershipDiagram } from "@/components/home/MothershipDiagram";
@@ -79,21 +80,19 @@ export default function WhatIs() {
             <div className="rounded-2xl border-l-4 border-accent bg-secondary/50 p-7">
               <h3 className="font-display text-xl">What the statute says</h3>
               <p className="mt-3 text-base leading-relaxed text-foreground/85">
-                Florida puts the liability shield in the statute itself. A debt or obligation of a
-                protected series is solely that series' debt, and a debt of the LLC is solely the LLC's —
-                neither the company nor any other series is liable for it merely because of the
-                relationships between them. Members, managers, and transferees are not personally liable
-                on that basis either. The statute also treats each protected series as a person distinct
-                from the LLC, from the other series, and from the members.
-              </p>
-              <p className="mt-3 text-base leading-relaxed text-foreground/85">
-                The shield is not unconditional. A judgment can still be enforced against assets that are
-                not properly associated with the series holding them, which is why keeping each series'
-                assets clearly identified in your records is what keeps the protection intact.
+                Florida puts the liability shield in the statute itself: a debt of a protected series is
+                solely that series' debt, and a debt of the LLC is solely the LLC's. The statute also
+                treats each protected series as a person distinct from the LLC, from the other series,
+                and from the members.
               </p>
               <p className="mt-4 text-sm text-muted-foreground">
-                See Florida Statutes §605.2401, "Limitations on liability"; §605.2404, "Enforcement of
-                claim against non-associated asset"; and §605.2103, "Nature of protected status."
+                Florida Statutes §605.2401 and §605.2103.{" "}
+                <Link
+                  to="/asset-protection"
+                  className="text-foreground underline decoration-accent decoration-2 underline-offset-4 hover:text-accent"
+                >
+                  How the shields work in practice →
+                </Link>
               </p>
             </div>
 

@@ -1,8 +1,9 @@
+import { Link } from "react-router-dom";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { PageHero } from "@/components/sections/PageHero";
 import { CallToAction } from "@/components/sections/CallToAction";
 
-const FAQ_ITEMS: { q: string; a: string }[] = [
+const FAQ_ITEMS: { q: string; a: string; link?: { to: string; label: string } }[] = [
   {
     q: "Is Florida's Protected Series LLC statute in effect?",
     a: "Yes. Florida Statute §605.2101 et seq. took effect on July 1, 2026, and Articles of Organization for protected series LLCs are being accepted. We prepare and submit your filing as soon as your intake is complete.",
@@ -21,7 +22,8 @@ const FAQ_ITEMS: { q: string; a: string }[] = [
   },
   {
     q: "How much does it cost to add a new series later?",
-    a: "Our $499 base formation fee includes preparing up to 3 Certificates of Designation to form up to 3 series. Additional series cost $25 per Certificate of Designation (drafting) plus an estimated $25 state filing fee per series.",
+    a: "The formation fee covers preparing up to 3 Certificates of Designation. Each additional series is $25 to prepare plus an estimated $25 state filing fee.",
+    link: { to: "/pricing", label: "Full pricing and add-ons" },
   },
   {
     q: "Is the liability shield really as strong as a separate LLC?",
@@ -37,7 +39,8 @@ const FAQ_ITEMS: { q: string; a: string }[] = [
   },
   {
     q: "How long does formation take?",
-    a: "We cannot promise a timeframe. We submit your filing promptly once your intake is complete, but from that point the processing time depends entirely on the Florida Secretary of State's workload, and the state gives no guarantee. You can always check on Sunbiz.org (https://dos.fl.gov/sunbiz/document-processing-dates/) to see what their current processing dates are. Unfortunately, the Florida Secretary of State does not offer an expedited filing service.",
+    a: "We cannot promise a timeframe. We file promptly once your intake is complete, but from there the processing time belongs to the Florida Secretary of State, which gives no guarantee and offers no expedited service.",
+    link: { to: "/how-it-works", label: "How to check current processing dates" },
   },
   {
     q: "Can I cancel or get a refund?",
@@ -78,6 +81,17 @@ export default function FAQ() {
                   </AccordionTrigger>
                   <AccordionContent className="text-sm leading-relaxed text-muted-foreground pb-6 pl-10 pr-4">
                     {item.a}
+                    {item.link ? (
+                      <>
+                        {" "}
+                        <Link
+                          to={item.link.to}
+                          className="text-foreground underline decoration-accent decoration-2 underline-offset-4 hover:text-accent"
+                        >
+                          {item.link.label} →
+                        </Link>
+                      </>
+                    ) : null}
                   </AccordionContent>
                 </AccordionItem>
               ))}

@@ -94,19 +94,16 @@ export default function HowItWorks() {
           <div className="rounded-2xl border border-border bg-secondary/40 p-6">
             <PlusCircle className="h-5 w-5 text-trust" />
             <h3 className="mt-4 font-display text-lg">Optional add-ons</h3>
-            <ul className="mt-2 space-y-2 text-sm leading-relaxed text-muted-foreground">
-              <li>
-                A Federal EIN is not included in the formation fee — we can obtain one for the LLC
-                or any series for $50 per EIN.
-              </li>
-              <li>
-                We can serve as your Florida registered agent, or you can serve as your own if
-                you're a Florida resident with a Florida street address.
-              </li>
-              <li>
-                Additional Certificates of Designation beyond the three included.
-              </li>
-            </ul>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              A Federal EIN is not included in the formation fee, and you can either use our registered
+              agent service or serve as your own if you're a Florida resident.{" "}
+              <Link
+                to="/pricing"
+                className="text-foreground underline decoration-accent decoration-2 underline-offset-4 hover:text-accent"
+              >
+                See pricing for what each costs →
+              </Link>
+            </p>
           </div>
 
           <div className="rounded-2xl border border-border bg-secondary/40 p-6">
