@@ -1,7 +1,7 @@
 import { PageHero } from "@/components/sections/PageHero";
 import { CallToAction } from "@/components/sections/CallToAction";
 import { MothershipDiagram } from "@/components/home/MothershipDiagram";
-import { Quote, BookOpen } from "lucide-react";
+import { BookOpen } from "lucide-react";
 
 export default function WhatIs() {
   return (
@@ -78,17 +78,18 @@ export default function WhatIs() {
               </p>
             </div>
 
-            <figure className="rounded-2xl border-l-4 border-accent bg-secondary/50 p-7">
-              <Quote className="h-6 w-6 text-accent" />
-              <blockquote className="mt-3 font-display text-2xl leading-snug text-foreground">
-                A Florida protected series is treated, for liability purposes, as if it were a free-standing
-                limited liability company — with full statutory recognition by Florida courts, lenders, and
-                county clerks.
-              </blockquote>
-              <figcaption className="mt-4 text-sm text-muted-foreground">
-                — Adapted from Florida Statute §605.2104(2)
-              </figcaption>
-            </figure>
+            <div className="rounded-2xl border-l-4 border-accent bg-secondary/50 p-7">
+              <h3 className="font-display text-xl">What the statute says</h3>
+              <p className="mt-3 text-base leading-relaxed text-foreground/85">
+                Florida law treats a protected series as a person distinct from the LLC that created it,
+                from every other protected series of that LLC, and from the LLC's members — subject to
+                limited statutory exceptions. That distinctness is what "protected" refers to: it comes
+                from the statute itself, not from your operating agreement.
+              </p>
+              <p className="mt-4 text-sm text-muted-foreground">
+                See Florida Statute §605.2103, "Nature of protected status."
+              </p>
+            </div>
 
             <div className="space-y-4">
               <h2 className="text-3xl">Who it's built for</h2>
