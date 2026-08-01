@@ -32,7 +32,7 @@ const BENEFITS: { icon: typeof Shield; title: string; body: string }[] = [
   },
   {
     icon: Scale,
-    title: "Treated as its own LLC",
+    title: "Deemed a separate LLC",
     body: "For the questions §605.2108 covers — manager duties, derivative actions, dissolution and winding up — a protected series is read as a separately formed LLC.",
   },
   {

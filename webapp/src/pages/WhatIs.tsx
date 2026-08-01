@@ -14,7 +14,7 @@ export default function WhatIs() {
             What is a <em>Florida Protected</em> Series LLC?
           </>
         }
-        description="A single LLC that contains an unlimited number of internally-segregated 'series.' Each series acts like its own legal entity for liability purposes — but you only file, tax, and administer one company."
+        description="A single LLC that contains an unlimited number of internally-segregated 'series.' Each series is shielded like a separate entity for liability purposes — without being one, and you file, tax, and administer only one company."
       />
 
       {/* Body */}
@@ -34,7 +34,7 @@ export default function WhatIs() {
             <div className="space-y-4">
               <h2 className="text-3xl">The three layers</h2>
               <p className="text-base leading-relaxed text-muted-foreground">
-                Florida's statute (§605.2101 through §605.2401) defines three nested concepts:
+                Florida's statute (§605.2101 through §605.2802) defines three nested concepts:
               </p>
               <ol className="space-y-4 list-none">
                 {[
@@ -46,7 +46,7 @@ export default function WhatIs() {
                   {
                     n: "02",
                     t: "Protected Series",
-                    d: "Internal compartments created via a Certificate of Designation. Each one is recognized by statute as a separate person for liability and contracting purposes.",
+                    d: "Internal compartments created via a Certificate of Designation. The statute calls each one \"a person distinct from\" the LLC and every other series (§605.2103).",
                   },
                   {
                     n: "03",
@@ -71,9 +71,10 @@ export default function WhatIs() {
             <div className="space-y-4">
               <h2 className="text-3xl">Why "protected"?</h2>
               <p className="text-base leading-relaxed text-muted-foreground">
-                The word matters. Florida's 2026 statute, modeled on the{" "}
+                The word matters. Florida's statute, modeled on the{" "}
                 <em className="font-display text-foreground">Uniform Protected Series Act</em>, gives each
-                series statutory entity status. Translation: a much harder shield to pierce.
+                series its own liability shield by statute. A protected series is not a separate legal
+                entity — it gets the liability separation of one without being one.
               </p>
             </div>
 
@@ -81,9 +82,9 @@ export default function WhatIs() {
               <h3 className="font-display text-xl">What the statute says</h3>
               <p className="mt-3 text-base leading-relaxed text-foreground/85">
                 Florida puts the liability shield in the statute itself: a debt of a protected series is
-                solely that series' debt, and a debt of the LLC is solely the LLC's. The statute also
-                treats each protected series as a person distinct from the LLC, from the other series,
-                and from the members.
+                solely that series' debt, and a debt of the LLC is solely the LLC's. The statute calls a
+                protected series "a person distinct from" the LLC, the other series, and the members —
+                which is a term of art in the chapter, not a separate legal entity.
               </p>
               <p className="mt-4 text-sm text-muted-foreground">
                 Florida Statutes §605.2401 and §605.2103.{" "}
@@ -131,8 +132,7 @@ export default function WhatIs() {
               <h3 className="mt-3 font-display text-xl">Uniform Protected Series Provisions</h3>
               <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
                 Sections §605.2101 through §605.2802 of Chapter 605, the Florida Revised Limited
-                Liability Company Act. The chapter governs protected series limited liability companies
-                beginning July 1, 2026 (§605.2802).
+                Liability Company Act.
               </p>
               <a
                 href="https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605ContentsIndex.html&StatuteYear=2025&Title=%2D%3E2025%2D%3EChapter%20605"
@@ -152,8 +152,8 @@ export default function WhatIs() {
                 22 states authorize series LLCs.
               </h3>
               <p className="mt-2 text-sm text-primary-foreground/80">
-                Florida's took effect July 1, 2026 as the Uniform Protected Series Provisions —
-                §§605.2101–605.2802 of the Revised LLC Act.
+                Florida's are the Uniform Protected Series Provisions — §§605.2101–605.2802 of the
+                Revised LLC Act.
               </p>
             </div>
           </aside>

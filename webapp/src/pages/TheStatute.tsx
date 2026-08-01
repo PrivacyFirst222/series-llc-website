@@ -38,8 +38,8 @@ export default function TheStatute() {
               <div className="rounded-2xl border border-border bg-card p-7">
                 <h3 className="font-display text-lg font-semibold">What the statute does</h3>
                 <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                  A protected series is a person distinct from the LLC and from every other series
-                  (§605.2103), with the same powers and purposes as the LLC (§605.2104) — and those powers
+                  The statute calls a protected series "a person distinct from" the LLC and every other
+                  series (§605.2103), with the same powers and purposes as the LLC (§605.2104) — and those powers
                   include acquiring, owning, and conveying real property (§605.0109). Section 605.2301
                   addresses deeds directly: a recorded deed granting an interest in real property{" "}
                   <em className="font-display text-foreground">to or from a protected series</em> is

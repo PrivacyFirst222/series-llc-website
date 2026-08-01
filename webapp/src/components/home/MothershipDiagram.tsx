@@ -20,7 +20,7 @@ export function MothershipDiagram() {
               One umbrella. <em>Six walls</em> between every asset.
             </h2>
             <p className="text-base leading-relaxed text-muted-foreground">
-              Every protected series is its own legal compartment. A judgment, debt, or lawsuit against
+              Every protected series is walled off from the others. A judgment, debt, or lawsuit against
               one series cannot reach the assets of another — or the parent company. That's the
               <em className="text-foreground font-display"> horizontal shield</em>. The
               <em className="text-foreground font-display"> vertical shield</em> insulates the parent from
@@ -98,7 +98,7 @@ export function MothershipDiagram() {
               </div>
 
               <p className="mt-6 border-t border-border pt-4 text-xs text-muted-foreground">
-                Each box is its own legal entity for liability purposes — but a single tax filing and
+                Each box is shielded like a separate entity for liability purposes — but a single tax filing and
                 operating agreement from your perspective.
               </p>
             </div>

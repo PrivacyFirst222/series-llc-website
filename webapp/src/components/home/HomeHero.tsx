@@ -56,7 +56,7 @@ export function HomeHero() {
 
             <p className="max-w-2xl text-lg leading-relaxed text-muted-foreground text-pretty">
               Florida's new <span className="text-foreground font-medium">Protected Series LLC Act</span>{" "}
-              (Statute §605.2101, effective July 1, 2026) lets you segregate every property, fund, or venture
+              (Statute §605.2101) lets you segregate every property, fund, or venture
               under a single umbrella — with horizontal <em className="text-foreground font-display">and</em>{" "}
               vertical liability shields written into the statute. We file it all for you.
             </p>
@@ -115,7 +115,7 @@ export function HomeHero() {
               </div>
               <div className="grid grid-cols-3 divide-x divide-border">
                 {[
-                  { k: "Effective", v: "7/1/26" },
+                  { k: "Statute", v: "§605.2101" },
                   { k: "Annual report", v: "One" },
                   { k: "State filing", v: "Electronic" },
                 ].map((s) => (

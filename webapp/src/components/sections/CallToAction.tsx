@@ -61,7 +61,6 @@ export function CallToAction({
             <div className="lg:col-span-5 flex flex-col justify-center gap-3">
               {[
                 { k: "Filings", v: "Open now" },
-                { k: "Statute effective", v: "Jul 1, 2026" },
                 { k: "State filing", v: "Electronic" },
                 { k: "Series under one umbrella", v: "Unlimited" },
               ].map((row) => (

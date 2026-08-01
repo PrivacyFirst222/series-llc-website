@@ -6,11 +6,11 @@ import { CallToAction } from "@/components/sections/CallToAction";
 const FAQ_ITEMS: { q: string; a: string; link?: { to: string; label: string } }[] = [
   {
     q: "Is Florida's Protected Series LLC statute in effect?",
-    a: "Yes. Florida Statute §605.2101 et seq. took effect on July 1, 2026, and Articles of Organization for protected series LLCs are being accepted. We prepare and submit your filing as soon as your intake is complete.",
+    a: "Yes. Florida Statute §605.2101 et seq. is in effect, and Articles of Organization for protected series LLCs are being accepted. We prepare and submit your filing as soon as your intake is complete.",
   },
   {
     q: "How is a Protected Series LLC different from a regular LLC?",
-    a: "A regular LLC is a single legal entity. A Protected Series LLC is a parent entity that contains an unlimited number of internal 'series,' each treated as its own entity for liability purposes. You get the asset segregation of multiple LLCs and only pay one annual fee.",
+    a: "A regular LLC is a single legal entity. A Protected Series LLC is a parent entity that contains an unlimited number of internal 'series,' each shielded like a separate entity for liability purposes without being a separate legal entity. You get the asset segregation of multiple LLCs and only pay one annual fee.",
   },
   {
     q: "Can a protected series hold Florida real estate in its own name?",
