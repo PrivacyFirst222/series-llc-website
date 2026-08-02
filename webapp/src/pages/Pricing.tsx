@@ -46,7 +46,7 @@ export default function Pricing() {
                 + $125 Florida state filing fee (at cost)
               </div>
               <div className="text-sm text-muted-foreground">
-                + Estimated $25 state filing fee per Protected Series Designation
+                + $25 state filing fee per Protected Series Designation
               </div>
               <div className="mt-2 text-xs text-muted-foreground">
                 Includes preparation of up to 3 Protected Series Designations to form up to 3 series. Additional Protected Series Designations cost $25 each (drafting) plus the $25 state filing fee.

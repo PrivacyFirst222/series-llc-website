@@ -23,7 +23,7 @@ const BENEFITS: { icon: typeof Shield; title: string; body: string }[] = [
   {
     icon: Coins,
     title: "One filing, one franchise relationship",
-    body: "Pay the $125 Florida formation fee once. Add additional series by filing a Protected Series Designation for each (estimated $25 state filing fee per series).",
+    body: "Pay the $125 Florida formation fee once. Add additional series by filing a Protected Series Designation for each ($25 state filing fee per series).",
   },
   {
     icon: MapPin,
@@ -48,7 +48,7 @@ const BENEFITS: { icon: typeof Shield; title: string; body: string }[] = [
   {
     icon: Sparkles,
     title: "Future-proof for growth",
-    body: "Adding another series is a single Protected Series Designation (estimated $25 filing fee) — not another $125 LLC formation, new EIN, registered agent, and annual report.",
+    body: "Adding another series is a single Protected Series Designation ($25 filing fee) — not another $125 LLC formation, new EIN, registered agent, and annual report.",
   },
 ];
 

@@ -10,7 +10,7 @@ const FAQ_ITEMS: { q: string; a: string; link?: { to: string; label: string } }[
   },
   {
     q: "How is a Protected Series LLC different from a regular LLC?",
-    a: "A regular LLC is a single legal entity. A Protected Series LLC is a parent entity that contains an unlimited number of internal 'series,' each shielded like a separate entity for liability purposes without being a separate legal entity. You get the asset segregation of multiple LLCs and only pay one annual fee.",
+    a: "A regular LLC is a single legal entity. A Protected Series LLC is a parent entity that holds an unlimited number of internal 'series,' and each series gets the same liability protection as an individual LLC. You get the asset segregation of multiple LLCs and only pay one annual fee.",
   },
   {
     q: "Can a protected series hold Florida real estate in its own name?",
@@ -22,7 +22,7 @@ const FAQ_ITEMS: { q: string; a: string; link?: { to: string; label: string } }[
   },
   {
     q: "How much does it cost to add a new series later?",
-    a: "The formation fee covers preparing up to 3 Protected Series Designations. Each additional series is $25 to prepare plus an estimated $25 state filing fee.",
+    a: "The formation fee covers preparing up to 3 Protected Series Designations. Each additional series is $25 to prepare plus a $25 state filing fee.",
     link: { to: "/pricing", label: "Full pricing and add-ons" },
   },
   {
@@ -35,7 +35,7 @@ const FAQ_ITEMS: { q: string; a: string; link?: { to: string; label: string } }[
   },
   {
     q: "What's the federal tax treatment?",
-    a: "A Florida Protect Series LLC can be taxed as (1) a disregarded entity, (2) a partnership, (3) an S corporation, or (4) C corporation, depending on a number of factors, including whether the LLC is owned by one or more people and what elections you file with the IRS. It is also possible for different series to be taxed differently. What is best for you needs to be discussed with your CPA or other tax professional.",
+    a: "A Florida Protected Series LLC can be taxed as (1) a disregarded entity, (2) a partnership, (3) an S corporation, or (4) C corporation, depending on a number of factors, including whether the LLC is owned by one or more people and what elections you file with the IRS. It is also possible for different series to be taxed differently. What is best for you needs to be discussed with your CPA or other tax professional.",
   },
   {
     q: "How long does formation take?",
