@@ -10,7 +10,7 @@ export default function TheStatute() {
         eyebrow="The statute"
         title={
           <>
-            Florida's statute, <em>section by section</em>.
+            Florida's statute. <em>Highlights and overview</em>.
           </>
         }
         description="Two sections do most of the day-to-day work: how a protected series holds property, and how a court reads a series when the chapter applies. Here is what each one says."
