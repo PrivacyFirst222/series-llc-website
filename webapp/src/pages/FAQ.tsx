@@ -22,16 +22,16 @@ const FAQ_ITEMS: { q: string; a: string; link?: { to: string; label: string } }[
   },
   {
     q: "How much does it cost to add a new series later?",
-    a: "The formation fee covers preparing up to 3 Certificates of Designation. Each additional series is $25 to prepare plus an estimated $25 state filing fee.",
+    a: "The formation fee covers preparing up to 3 Protected Series Designations. Each additional series is $25 to prepare plus an estimated $25 state filing fee.",
     link: { to: "/pricing", label: "Full pricing and add-ons" },
   },
   {
     q: "Is the liability shield really as strong as a separate LLC?",
-    a: "Statutorily, yes — provided you maintain separate books, records, and ledgers for each series, and clearly identify each series in contracts. Florida's statute is modeled on the Uniform Protected Series Act, the gold standard for shielding strength.",
+    a: "Statutorily, yes — provided you maintain separate books, records, and ledgers for each series, and clearly identify each series in contracts. Florida's statute is modeled on the Uniform Protected Series Act. The recordkeeping is not optional: it is what the shield rests on.",
   },
   {
     q: "Does this work for out-of-state investors?",
-    a: "Absolutely. Out-of-state investors can form a Florida Protected Series LLC for Florida-based assets and foreign-qualify in their home state if needed. The statute applies to the entity and its property regardless of where the owners live.",
+    a: "A Florida Protected Series LLC works well for Floridians and for Florida businesses and assets. There is no way to guarantee how the courts of another state — particularly one with no series LLC legislation of its own — will interpret it. If you are not a Floridian, or you plan to transfer out-of-state property into a Florida Protected Series LLC, you should seek advice from an attorney licensed to practice in the relevant state.",
   },
   {
     q: "What's the federal tax treatment?",

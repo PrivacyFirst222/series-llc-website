@@ -9,7 +9,7 @@ const FEATURES: string[] = [
   "Property titling manual — how to properly title assets in the LLC or series",
   "Ledger forms for each series",
   "Complete Series LLC maintenance guide",
-  "Includes preparation of up to 3 Certificates of Designation (to form up to 3 series)",
+  "Includes preparation of up to 3 Protected Series Designations (to form up to 3 series)",
   "First-year Florida registered agent service — or serve as your own if you're a Florida resident",
   "Annual report filing reminders",
   "Email support",
@@ -27,7 +27,7 @@ export default function Pricing() {
             Honest pricing. <em>One flat fee</em>. Three series included.
           </>
         }
-        description="One flat service fee covers preparation and electronic filing, including up to three Certificates of Designation. Need more series, or a Federal EIN? Add them at a straightforward rate."
+        description="One flat service fee covers preparation and electronic filing, including up to three Protected Series Designations. Need more series, or a Federal EIN? Add them at a straightforward rate."
       />
 
       <section className="container-wide section-pb">
@@ -46,10 +46,10 @@ export default function Pricing() {
                 + $125 Florida state filing fee (at cost)
               </div>
               <div className="text-sm text-muted-foreground">
-                + Estimated $25 state filing fee per Certificate of Designation
+                + Estimated $25 state filing fee per Protected Series Designation
               </div>
               <div className="mt-2 text-xs text-muted-foreground">
-                Includes preparation of up to 3 Certificates of Designation to form up to 3 series. Additional Certificates of Designation cost $25 each (drafting) plus the $25 state filing fee.
+                Includes preparation of up to 3 Protected Series Designations to form up to 3 series. Additional Protected Series Designations cost $25 each (drafting) plus the $25 state filing fee.
               </div>
             </div>
 
@@ -99,7 +99,7 @@ export default function Pricing() {
           <p className="text-sm text-muted-foreground">Choose only what you need.</p>
           <div className="mt-6 grid gap-px overflow-hidden rounded-2xl border border-border bg-border md:grid-cols-2">
             {[
-              { t: "Extra Certificate of Designation (drafting)", p: "$25 / series + $25 state filing fee" },
+              { t: "Extra Protected Series Designation (drafting)", p: "$25 / series + $25 state filing fee" },
               { t: "EIN obtained for the LLC or any series", p: "$50 / EIN" },
               { t: "Registered agent service after year one", p: "$99 / yr" },
             ].map((a) => (

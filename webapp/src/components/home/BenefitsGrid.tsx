@@ -12,18 +12,18 @@ import {
 const BENEFITS: { icon: typeof Shield; title: string; body: string }[] = [
   {
     icon: Shield,
-    title: "Horizontal liability shield",
-    body: "A creditor of Series A cannot reach Series B's assets. Statutorily-mandated asset segregation across every series.",
+    title: "Horizontal shield (series ↔ series, series ↔ parent)",
+    body: "A creditor of Series A cannot reach Series B's assets, or the parent LLC's. Each series' debts stay with that series under §605.2401.",
   },
   {
     icon: Layers,
-    title: "Vertical shield (parent ↔ series)",
-    body: "The mothership is insulated from series obligations, and vice versa — a structural feature missing from many older series statutes.",
+    title: "Vertical shield (owners ↔ entity)",
+    body: "Members, managers, and transferees are not personally liable for the debts of the LLC or of any series merely by holding those roles.",
   },
   {
     icon: Coins,
     title: "One filing, one franchise relationship",
-    body: "Pay the $125 Florida formation fee once. Add additional series by filing a Certificate of Designation for each (estimated $25 state filing fee per series).",
+    body: "Pay the $125 Florida formation fee once. Add additional series by filing a Protected Series Designation for each (estimated $25 state filing fee per series).",
   },
   {
     icon: MapPin,
@@ -48,7 +48,7 @@ const BENEFITS: { icon: typeof Shield; title: string; body: string }[] = [
   {
     icon: Sparkles,
     title: "Future-proof for growth",
-    body: "Adding another series is a single Certificate of Designation (estimated $25 filing fee) — not another $125 LLC formation, new EIN, registered agent, and annual report.",
+    body: "Adding another series is a single Protected Series Designation (estimated $25 filing fee) — not another $125 LLC formation, new EIN, registered agent, and annual report.",
   },
 ];
 

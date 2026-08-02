@@ -46,7 +46,7 @@ export default function WhatIs() {
                   {
                     n: "02",
                     t: "Protected Series",
-                    d: "Internal compartments created via a Certificate of Designation. The statute calls each one \"a person distinct from\" the LLC and every other series (§605.2103).",
+                    d: "Internal compartments created via a Protected Series Designation. The statute calls each one \"a person distinct from\" the LLC and every other series (§605.2103).",
                   },
                   {
                     n: "03",

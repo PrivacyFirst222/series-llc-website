@@ -23,14 +23,14 @@ export function MothershipDiagram() {
               Every protected series is walled off from the others. A judgment, debt, or lawsuit against
               one series cannot reach the assets of another — or the parent company. That's the
               <em className="text-foreground font-display"> horizontal shield</em>. The
-              <em className="text-foreground font-display"> vertical shield</em> insulates the parent from
-              series obligations, and vice versa.
+              <em className="text-foreground font-display"> vertical shield</em> is the familiar one: it
+              keeps members, managers, and transferees off the hook for the entity's debts.
             </p>
             <ul className="space-y-3 pt-2 text-sm">
               {[
                 "Distinct membership interests, managers, and economic rights per series",
                 "Separate books, records, and asset ledger per series",
-                "Certificate of Designation filed with the state for each series",
+                "Protected Series Designation filed with the state for each series",
                 "All under one Federal EIN structure & one Florida filing",
               ].map((line) => (
                 <li key={line} className="flex gap-3">

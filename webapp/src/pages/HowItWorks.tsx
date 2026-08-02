@@ -27,13 +27,13 @@ const STEPS: {
     n: "02",
     icon: FileText,
     title: "We prepare and file your documents",
-    body: "We prepare your Florida Articles of Organization and a Certificate of Designation for each series, then file them electronically with the Division of Corporations.",
+    body: "We prepare your Florida Articles of Organization and a Protected Series Designation for each series, then file them electronically with the Division of Corporations.",
   },
   {
     n: "03",
     icon: FolderCheck,
     title: "You get your filed documents and records package",
-    body: "Once the state accepts your filing, we send you the filed Articles of Organization and each filed Certificate of Designation, along with a form Operating Agreement to adapt to your own situation, a property titling manual, ledger forms for each series, a maintenance guide, and free access to our iPhone recordkeeping app.",
+    body: "Once the state accepts your filing, we send you the filed Articles of Organization and each filed Protected Series Designation, along with a form Operating Agreement to adapt to your own situation, a property titling manual, ledger forms for each series, a maintenance guide, and free access to our iPhone recordkeeping app.",
   },
 ];
 
@@ -111,7 +111,7 @@ export default function HowItWorks() {
             <h3 className="mt-4 font-display text-lg">Ongoing compliance</h3>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
               One Florida annual report each year covers the whole structure. Add another protected
-              series whenever you need one by filing an additional Certificate of Designation.
+              series whenever you need one by filing an additional Protected Series Designation.
               Keeping separate books and records for each series is what preserves the liability
               shield.
             </p>

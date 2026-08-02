@@ -13,7 +13,7 @@ const STRUCTURE: { feature: string; series: Cell; many: Cell }[] = [
   { feature: "Annual reports to file", series: "1 report", many: "10 reports" },
   { feature: "Registered agent relationships", series: "1", many: "10" },
   { feature: "Federal EIN", series: "1 EIN structure", many: "10 EINs" },
-  { feature: "Adding another series", series: "Certificate of Designation", many: "A whole new LLC" },
+  { feature: "Adding another series", series: "Protected Series Designation", many: "A whole new LLC" },
 ];
 
 function renderCell(v: Cell, accent?: boolean) {
@@ -38,7 +38,7 @@ function renderCell(v: Cell, accent?: boolean) {
 const ONE_TIME: { label: string; oldVal: string; newVal: string; costlier?: boolean }[] = [
   { label: "State filing fee to form", oldVal: "$1,250", newVal: "$125" },
   {
-    label: "Certificates of Designation (10 series)",
+    label: "Protected Series Designations (10 series)",
     oldVal: "—",
     newVal: "$250",
     costlier: true,
@@ -172,7 +172,7 @@ export default function Benefits() {
                 Estimates assume ten property-owning Florida LLCs, each paying the $125 state filing fee,
                 the $138.75 annual report fee, and $99/yr for a registered agent — against one Protected
                 Series LLC holding ten protected series, at $125 to file the Articles, $25 in state
-                filing fees per Certificate of Designation, one $138.75 annual report, and one $99/yr
+                filing fees per Protected Series Designation, one $138.75 annual report, and one $99/yr
                 registered agent. Registered agent pricing is held at $99/yr on both sides, so the
                 comparison turns on the number of entities rather than on what any agent charges. Florida does not require an annual report in the year an
                 entity is formed, so the first-year figure covers filing fees and registered agent only.

@@ -1,7 +1,7 @@
 const STATS: { k: string; v: string; sub: string }[] = [
   { v: "$125", k: "One filing fee", sub: "covers your mothership and all series" },
   { v: "∞", k: "Protected series", sub: "spin up as many as your portfolio needs" },
-  { v: "2x", k: "Liability shields", sub: "horizontal + vertical, statute-backed" },
+  { v: "2x", k: "Liability shields", sub: "horizontal + vertical, both statute-backed" },
   { v: "1st", k: "Florida-native", sub: "purpose-built for §605.2101" },
 ];
 

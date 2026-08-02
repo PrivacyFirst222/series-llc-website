@@ -50,8 +50,8 @@ export function StepSeries({ data, patch, errors }: StepProps) {
       <header className="space-y-2">
         <h2 className="font-display text-3xl">Your protected series</h2>
         <p className="text-sm text-muted-foreground max-w-2xl">
-          Each series is a legally separate compartment within your LLC, created
-          by filing a Certificate of Designation with the state. Define your
+          Each series is a separate compartment within your LLC, created by
+          filing a Protected Series Designation with the state. Define your
           initial series below.
         </p>
       </header>
