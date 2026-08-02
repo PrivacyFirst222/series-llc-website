@@ -65,7 +65,7 @@ export default function AssetProtection() {
               A standard LLC keeps inside liability from reaching your personal assets. That's valuable — but it's a single wall. If you hold ten rental properties in one LLC, a catastrophic judgment against that LLC could wipe out all ten properties at once.
             </p>
             <p className="text-sm text-foreground/80 leading-relaxed">
-              A Florida Protected Series LLC builds a separate firewall around every single property. Each property lives in its own designated series. A slip-and-fall on Series A's Miami duplex cannot touch Series B's Tampa office, Series C's vacation rental, or any other series. The liability is hermetically sealed at the series level — not just at the entity level.
+              A Florida Protected Series LLC builds a separate firewall around every single property. Each property lives in its own designated series. A slip-and-fall on Series A's Miami duplex cannot touch Series B's Tampa office, Series C's vacation rental, or any other series. The liability is contained at the series level — not just at the entity level.
             </p>
             <ul className="space-y-3">
               {[
@@ -173,10 +173,10 @@ export default function AssetProtection() {
           <div className="rounded-2xl border border-yellow-500/30 bg-yellow-500/5 p-6 space-y-3">
             <div className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-yellow-500 shrink-0" />
-              <h4 className="font-medium text-sm">Important: single-member LLCs do not get this protection</h4>
+              <h4 className="font-medium text-sm">Important: single-member LLCs get weaker protection</h4>
             </div>
             <p className="text-sm text-foreground/70 leading-relaxed">
-              Charging order protection only applies to LLCs with two or more members. If you own a single-member LLC, a creditor can seize your entire ownership interest just as easily as corporate stock — negating the outside liability shield entirely. This is true regardless of how the LLC is taxed (disregarded entity, S-corp election, or otherwise).
+              The exclusivity of the charging order is weaker for a single-member LLC. Under §605.0503(4), if a judgment creditor shows a court that distributions will not satisfy the judgment within a reasonable time, the court may order a foreclosure sale of the sole member's interest — and under subsection (5) the purchaser takes the entire interest and becomes the member. This is true regardless of how the LLC is taxed (disregarded entity, S-corp election, or otherwise).
             </p>
           </div>
 
@@ -187,7 +187,7 @@ export default function AssetProtection() {
             <div className="flex items-start gap-3 rounded-xl border border-yellow-500/40 bg-yellow-500/10 p-4">
               <AlertTriangle className="h-4 w-4 text-yellow-500 shrink-0 mt-0.5" />
               <p className="text-xs text-foreground/80 leading-relaxed">
-                <strong>Membership structure matters.</strong> A Florida Protected Series LLC with two or more members receives full charging order protection against outside liability. A <strong>single-member</strong> Protected Series LLC does not — a creditor can seize the sole member's interest directly, just as with a corporation. This rule is the same regardless of how the LLC is taxed.
+                <strong>Membership structure matters.</strong> A Florida Protected Series LLC with two or more members gets the full benefit of the charging order as the exclusive remedy. For a <strong>single-member</strong> Protected Series LLC, §605.0503(4)–(5) lets a court order a foreclosure sale of that member's interest on the right showing. This rule is the same regardless of how the LLC is taxed.
               </p>
             </div>
 
@@ -198,8 +198,8 @@ export default function AssetProtection() {
               {[
                 "Each protected series holds its own assets, and under §605.2401 a debt of one series is solely that series' debt — the separation is statutory, not contractual",
                 "Even if a creditor obtains a charging order against your interest in the master LLC, the individual series assets are separately titled and separately shielded",
-                "Each series can have its own distinct membership interests — structuring each series with multiple members locks in charging-order exclusivity at every level of the structure",
-                'The Florida legislature has established by statute that the charging order is the \u201csole and exclusive\u201d remedy available to a creditor of a person holding a membership interest in a multi-member Florida LLC, including each of its associated series',
+                "Each series can have its own distinct membership interests. Charging-order language drafted into your operating agreement, consistent with \u00a7605.0503, is how that protection is carried down to protected-series interests",
+                'Under \u00a7605.0503(3), a charging order is the \u201csole and exclusive\u201d remedy by which a judgment creditor of a member may satisfy a judgment out of that member\u2019s interest \u2014 subject to the single-member exception in subsections (4) and (5)',
                 "With an entire portfolio protected across multiple series, a creditor has no single point of attack — their only remedy is to wait, which gives you enormous negotiating leverage",
               ].map((item) => (
                 <li key={item} className="flex gap-2.5 text-sm">
@@ -214,10 +214,10 @@ export default function AssetProtection() {
           <div className="grid gap-px overflow-hidden rounded-2xl border border-border bg-border md:grid-cols-2 lg:grid-cols-3">
             {[
               { entity: "Corporation", verdict: "bad", note: "Stock can be seized directly — creditors become your business partner instantly" },
-              { entity: "Single-Member LLC", verdict: "bad", note: "Charging order protection does not apply — interest can be seized like corporate stock" },
-              { entity: "Single-Member FL Protected Series LLC", verdict: "bad", note: "Same weakness applies — single-member status negates charging order protection regardless of the series structure" },
-              { entity: "Multi-Member LLC", verdict: "ok", note: "Charging order protection applies, but all LLC assets are behind a single shield" },
-              { entity: "Multi-Member FL Protected Series LLC", verdict: "best", note: "Charging order protection at the company level, with each series' assets separately held and separately shielded under §605.2401" },
+              { entity: "Single-Member LLC", verdict: "bad", note: "A court can order a foreclosure sale of the sole member's interest under §605.0503(4)–(5) if distributions won't satisfy the judgment in a reasonable time" },
+              { entity: "Single-Member FL Protected Series LLC", verdict: "bad", note: "Same exception applies — a sole member's interest can be foreclosed under §605.0503(4)–(5) regardless of the series structure" },
+              { entity: "Multi-Member LLC", verdict: "ok", note: "Charging order protection under §605.0503, but all LLC assets sit behind a single shield" },
+              { entity: "Multi-Member FL Protected Series LLC", verdict: "best", note: "Charging order protection at the company level under §605.0503, with each series' assets separately held and separately shielded under §605.2401" },
             ].map((row) => (
               <div key={row.entity} className={`bg-card p-6 space-y-2 ${row.entity === "Multi-Member FL Protected Series LLC" ? "md:col-span-2 lg:col-span-1" : ""}`}>
                 <div className={`font-medium text-sm ${row.entity === "Multi-Member FL Protected Series LLC" ? "text-trust" : ""}`}>{row.entity}</div>

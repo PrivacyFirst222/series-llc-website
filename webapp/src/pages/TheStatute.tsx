@@ -146,49 +146,6 @@ export default function TheStatute() {
         </div>
       </section>
 
-      {/* Further reading */}
-      <section className="container-wide section-y">
-        <div className="max-w-3xl">
-          <span className="eyebrow">Further reading</span>
-          <h2 className="display mt-3 text-3xl text-balance lg:text-4xl">
-            Practitioner commentary on the statute.
-          </h2>
-          <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-            Louis T. M. Conti and Gary I. Teblum wrote a two-part analysis of the protected series
-            provisions for <em className="font-display text-foreground">The Florida Bar Journal</em>.
-            Both are worth reading before you form.
-          </p>
-        </div>
-        <div className="mt-8 lg:mt-10 grid gap-6 md:grid-cols-2">
-          {[
-            {
-              title: "Florida's New Protected Series LLC Law: Part I",
-              cite: "The Florida Bar Journal, Vol. 100, No. 3",
-              href: "https://www.floridabar.org/the-florida-bar-journal/floridas-new-protected-series-llc-law-part-i/",
-            },
-            {
-              title: "Florida's New Protected Series LLC Legislation: Part II",
-              cite: "The Florida Bar Journal, Vol. 100, No. 4",
-              href: "https://www.floridabar.org/the-florida-bar-journal/floridas-new-protected-series-llc-legislation-part-ii/",
-            },
-          ].map((a) => (
-            <a
-              key={a.href}
-              href={a.href}
-              target="_blank"
-              rel="noreferrer"
-              className="group rounded-2xl border border-border bg-card p-6 transition-colors hover:border-accent"
-            >
-              <h3 className="font-display text-lg leading-snug group-hover:text-accent">{a.title}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">{a.cite}</p>
-              <span className="mt-3 inline-block text-sm font-medium text-primary group-hover:text-accent">
-                Read on floridabar.org →
-              </span>
-            </a>
-          ))}
-        </div>
-      </section>
-
       <CallToAction
         eyebrow="Formed in Florida"
         title="File under the Florida statute."
