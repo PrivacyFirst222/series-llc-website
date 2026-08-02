@@ -34,14 +34,8 @@ const formData: FloridaLLCFormData = {
     zip: "33139",
     country: "United States",
   },
-  mailingAddress: {
-    address1: "100 Ocean Drive",
-    address2: "",
-    city: "Miami",
-    state: "FL",
-    zip: "33139",
-    country: "United States",
-  },
+  // mailingSameAsPrincipal stays true (the default) with mailingAddress left
+  // blank — regression coverage: the server must fill it from principal.
   registeredAgentType: "INDIVIDUAL",
   registeredAgentName: "Pat Agent",
   registeredAgentStreetAddress1: "200 Palm Ave",

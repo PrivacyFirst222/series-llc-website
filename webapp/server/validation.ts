@@ -6,7 +6,7 @@ import { hasProtectedSeriesPhrase } from "../src/components/forms/florida-llc/va
  * formationFormSchema predates the series + conversion work (the form enforces
  * those in validateStep). The server must enforce everything, so extend it here.
  */
-export const orderFormSchema = formationFormSchema
+const extendedFormSchema = formationFormSchema
   .extend({
     filingPath: z.enum(["NEW", "CONVERT"]).optional(),
     existingLlcName: z.string().max(300).optional().or(z.literal("")),
@@ -46,3 +46,15 @@ export const orderFormSchema = formationFormSchema
       });
     }
   });
+
+/** Mirror the form: with "mailing same as principal" checked, the mailing
+ *  fields stay blank in the browser and the principal address is used. */
+export const orderFormSchema = z.preprocess((raw) => {
+  if (raw && typeof raw === "object") {
+    const d = raw as Record<string, unknown>;
+    if (d.mailingSameAsPrincipal && d.principalAddress) {
+      return { ...d, mailingAddress: d.principalAddress };
+    }
+  }
+  return raw;
+}, extendedFormSchema);

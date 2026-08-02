@@ -56748,7 +56748,7 @@ function hasProtectedSeriesPhrase(name) {
 }
 
 // server/validation.ts
-var orderFormSchema = formationFormSchema.extend({
+var extendedFormSchema = formationFormSchema.extend({
   filingPath: external_exports.enum(["NEW", "CONVERT"]).optional(),
   existingLlcName: external_exports.string().max(300).optional().or(external_exports.literal("")),
   sunbizDocumentNumber: external_exports.string().max(50).optional().or(external_exports.literal("")),
@@ -56784,6 +56784,15 @@ var orderFormSchema = formationFormSchema.extend({
     });
   }
 });
+var orderFormSchema = external_exports.preprocess((raw2) => {
+  if (raw2 && typeof raw2 === "object") {
+    const d2 = raw2;
+    if (d2.mailingSameAsPrincipal && d2.principalAddress) {
+      return { ...d2, mailingAddress: d2.principalAddress };
+    }
+  }
+  return raw2;
+}, extendedFormSchema);
 
 // src/components/forms/florida-llc/buildPayload.ts
 function buildPayload(data) {
