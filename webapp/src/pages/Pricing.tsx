@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Check, ArrowUpRight, ShieldCheck } from "lucide-react";
+import { Check, ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageHero } from "@/components/sections/PageHero";
 
@@ -70,24 +70,8 @@ export default function Pricing() {
                   <ArrowUpRight className="ml-1.5 h-4 w-4" />
                 </Link>
               </Button>
-              <p className="mt-3 text-center text-xs text-muted-foreground">
-                Stripe checkout — secure &amp; encrypted
-              </p>
             </div>
           </article>
-        </div>
-
-        {/* Trust bar */}
-        <div className="mt-8 lg:mt-10 grid gap-3 md:grid-cols-2 rounded-2xl border border-border bg-secondary/30 p-6">
-          {[
-            "30-day no-questions money-back guarantee",
-            "Stripe-secured checkout with split-pay options",
-          ].map((t) => (
-            <div key={t} className="flex items-center gap-2 text-sm text-foreground/80">
-              <ShieldCheck className="h-4 w-4 text-trust" />
-              {t}
-            </div>
-          ))}
         </div>
 
         {/* À-la-carte */}
