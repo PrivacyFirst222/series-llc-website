@@ -111,8 +111,8 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
   };
 }
 
-// Formspree renders each top-level key as one line in the notification email,
-// so nested objects must be flattened to readable "a / b / c" keys.
+// Legacy fallback path: while online ordering is not yet enabled in production,
+// intakes still go to Formspree, whose emails need flat readable keys.
 export function flattenForFormspree(
   value: unknown,
   prefix = "",

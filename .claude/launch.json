@@ -9,10 +9,10 @@
       "port": 8000
     },
     {
-      "name": "backend",
+      "name": "api",
       "runtimeExecutable": "bun",
-      "runtimeArgs": ["run", "dev"],
-      "cwd": "backend",
+      "runtimeArgs": ["run", "--hot", "server/dev.ts"],
+      "cwd": "webapp",
       "port": 3000
     }
   ]

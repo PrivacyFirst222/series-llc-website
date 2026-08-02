@@ -178,23 +178,24 @@
 </styling>
 
 <backend>
-  This app has a backend server at ../backend/.
-  API requests use relative URLs by default (/api/...) so the app works on any domain in production.
-  VITE_BACKEND_URL is only needed in development for cross-origin requests to the backend on a different port.
-  DO NOT hardcode localhost URLs.
+  The API lives in server/ (Hono app, app.ts) and is served as one Vercel serverless
+  function via api/[[...route]].ts. In dev, run `bun run --hot server/dev.ts` (port
+  3000); vite proxies /api there, so the app always uses relative URLs (/api/...).
+  DO NOT hardcode localhost URLs. DO NOT recreate the old ../backend/ (deleted 2026-08-02).
 
-  To call backend APIs, use the api helper from src/lib/api.ts:
+  To call the API from React, use the api helper from src/lib/api.ts:
   ```typescript
   import { api } from "@/lib/api";
   const data = await api.get<MyType>("/api/your-endpoint"); // Always use /api/ prefix
   ```
 
-  For setting up authentication and database, use the database-auth skill.
-
-  <shared_types>
-    API contracts are defined as Zod schemas in ../backend/src/types.ts.
-    Import and use them to validate responses.
-  </shared_types>
+  All routes return { data: ... } (errors: { error: { message, code } }). Server-side
+  intake validation is server/validation.ts (extends the form's Zod schema); pricing is
+  server/pricing.ts (mirrors the client estimator — the client's numbers are never
+  trusted). Auth: session cookies (server/auth.ts); client accounts are created by the
+  Square payment webhook, /admin uses the shared ADMIN_PASSWORD. Env keys and their dev
+  fallbacks are documented in .env.example. E2E walk: `bun run server/e2e.ts` with the
+  dev API running.
 </backend>
 
 <skills>

@@ -15,6 +15,13 @@ import AssetProtection from "./pages/AssetProtection";
 import RecordkeepingApp from "./pages/RecordkeepingApp";
 import Contact from "./pages/Contact";
 import FormLLC from "./pages/FormLLC";
+import OrderConfirmed from "./pages/OrderConfirmed";
+import PortalLogin from "./pages/portal/PortalLogin";
+import PortalForgot from "./pages/portal/PortalForgot";
+import PortalSetPassword from "./pages/portal/PortalSetPassword";
+import PortalDashboard from "./pages/portal/PortalDashboard";
+import AdminLogin from "./pages/admin/AdminLogin";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +45,13 @@ const App = () => (
             <Route path="/recordkeeping-app" element={<RecordkeepingApp />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/form-llc" element={<FormLLC />} />
+            <Route path="/order/confirmed" element={<OrderConfirmed />} />
+            <Route path="/portal" element={<PortalDashboard />} />
+            <Route path="/portal/login" element={<PortalLogin />} />
+            <Route path="/portal/forgot" element={<PortalForgot />} />
+            <Route path="/portal/set-password" element={<PortalSetPassword />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>

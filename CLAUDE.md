@@ -3,8 +3,14 @@
 This workspace contains a mobile app and backend server.
 
 <projects>
-  webapp/    — React app (port 8000, environment variable VITE_BASE_URL)
-  backend/   — Hono API server (port 3000)
+  webapp/          — React app (port 8000)
+  webapp/server/   — Hono API (all /api/* routes). Runs as ONE Vercel serverless
+                     function via webapp/api/[[...route]].ts in production, and as a
+                     local dev server on port 3000 via `bun run --hot server/dev.ts`
+                     (vite proxies /api there). The old top-level backend/ was deleted
+                     2026-08-02; do not recreate it. Server env vars are documented in
+                     webapp/.env.example; every integration has a dev fallback (local
+                     DB via PGlite, fake checkout, logged emails, local file storage).
 
   In production, the webapp uses relative URLs (/api/...) so it works on any domain.
   VITE_BACKEND_URL is only needed in development for cross-origin requests to the backend on a different port.
