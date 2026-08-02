@@ -113,8 +113,23 @@ check("returns checkout URL", typeof order.body?.data?.checkoutUrl === "string")
 const pre = await api(`/api/orders/${orderId}/status`);
 check("status pending before payment", pre.body?.data?.status === "pending_payment");
 
-// 4. Simulate Square saying "paid"
-const sim = await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId }) });
+// 4. Simulate Square saying "paid". With no Square creds the dev route exists;
+//    with real sandbox creds it does not, so post a Square-shaped webhook event
+//    instead (dev accepts unsigned webhooks when no signature key is set).
+let sim = await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId }) });
+if (sim.status === 404) {
+  const adminEarly = await api("/api/admin/login", { method: "POST", body: JSON.stringify({ password: "dev-admin" }) });
+  const full = await api(`/api/admin/orders/${orderId}`, { cookies: adminEarly.cookie });
+  const squareOrderId = (full.body?.data as { square_order_id?: string })?.square_order_id;
+  sim = await api("/api/square/webhook", {
+    method: "POST",
+    body: JSON.stringify({
+      event_id: `e2e-${orderId}`,
+      type: "payment.updated",
+      data: { object: { payment: { id: `e2e-pay-${orderId.slice(0, 8)}`, status: "COMPLETED", order_id: squareOrderId } } },
+    }),
+  });
+}
 check("payment fulfillment runs", sim.status === 200, sim.body);
 const post = await api(`/api/orders/${orderId}/status`);
 check("status flips to paid", post.body?.data?.status === "paid");

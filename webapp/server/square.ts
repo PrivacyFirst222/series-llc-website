@@ -28,36 +28,45 @@ export async function createCheckout(opts: {
       squareOrderId: `dev-${opts.orderId}`,
     };
   }
-  const res = await fetch(`${API_BASE}/v2/online-checkout/payment-links`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${env.SQUARE_ACCESS_TOKEN}`,
-      "Content-Type": "application/json",
-      "Square-Version": "2025-01-23",
-    },
-    body: JSON.stringify({
-      idempotency_key: randomBytes(16).toString("hex"),
-      order: {
-        location_id: env.SQUARE_LOCATION_ID,
-        reference_id: opts.orderId,
-        line_items: opts.priced.lineItems.map((li) => ({
-          name: li.name,
-          quantity: "1",
-          base_price_money: { amount: li.amountCents, currency: "USD" },
-        })),
+  const request = (withPrefill: boolean) =>
+    fetch(`${API_BASE}/v2/online-checkout/payment-links`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${env.SQUARE_ACCESS_TOKEN}`,
+        "Content-Type": "application/json",
+        "Square-Version": "2025-01-23",
       },
-      checkout_options: {
-        redirect_url: redirectUrl,
-        merchant_support_email: "support@myfloridaseriesllc.com",
-      },
-      pre_populated_data: { buyer_email: opts.buyerEmail },
-      description: `Florida Protected Series LLC formation — ${opts.llcName}`,
-    }),
-  });
-  const body = (await res.json()) as {
+      body: JSON.stringify({
+        idempotency_key: randomBytes(16).toString("hex"),
+        order: {
+          location_id: env.SQUARE_LOCATION_ID,
+          reference_id: opts.orderId,
+          line_items: opts.priced.lineItems.map((li) => ({
+            name: li.name,
+            quantity: "1",
+            base_price_money: { amount: li.amountCents, currency: "USD" },
+          })),
+        },
+        checkout_options: {
+          redirect_url: redirectUrl,
+          merchant_support_email: "support@myfloridaseriesllc.com",
+        },
+        ...(withPrefill ? { pre_populated_data: { buyer_email: opts.buyerEmail } } : {}),
+        description: `Florida Protected Series LLC formation — ${opts.llcName}`,
+      }),
+    });
+
+  let res = await request(true);
+  let body = (await res.json()) as {
     payment_link?: { url: string; order_id: string };
-    errors?: unknown[];
+    errors?: { field?: string }[];
   };
+  // The email prefill is a convenience — if Square dislikes the address,
+  // retry without it rather than failing the whole checkout.
+  if (!res.ok && body.errors?.some((e) => e.field?.includes("buyer_email"))) {
+    res = await request(false);
+    body = (await res.json()) as typeof body;
+  }
   if (!res.ok || !body.payment_link) {
     throw new Error(`Square payment link failed (${res.status}): ${JSON.stringify(body.errors ?? body)}`);
   }

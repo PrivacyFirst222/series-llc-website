@@ -57075,7 +57075,7 @@ async function createCheckout(opts) {
       squareOrderId: `dev-${opts.orderId}`
     };
   }
-  const res = await fetch(`${API_BASE}/v2/online-checkout/payment-links`, {
+  const request = (withPrefill) => fetch(`${API_BASE}/v2/online-checkout/payment-links`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${env.SQUARE_ACCESS_TOKEN}`,
@@ -57097,11 +57097,16 @@ async function createCheckout(opts) {
         redirect_url: redirectUrl,
         merchant_support_email: "support@myfloridaseriesllc.com"
       },
-      pre_populated_data: { buyer_email: opts.buyerEmail },
+      ...withPrefill ? { pre_populated_data: { buyer_email: opts.buyerEmail } } : {},
       description: `Florida Protected Series LLC formation \u2014 ${opts.llcName}`
     })
   });
-  const body = await res.json();
+  let res = await request(true);
+  let body = await res.json();
+  if (!res.ok && body.errors?.some((e) => e.field?.includes("buyer_email"))) {
+    res = await request(false);
+    body = await res.json();
+  }
   if (!res.ok || !body.payment_link) {
     throw new Error(`Square payment link failed (${res.status}): ${JSON.stringify(body.errors ?? body)}`);
   }
