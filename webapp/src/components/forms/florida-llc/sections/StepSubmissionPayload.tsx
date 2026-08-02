@@ -1,7 +1,5 @@
-import { useMemo, useState } from "react";
-import { Check, Copy, Download } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { buildPayload } from "../buildPayload";
+import { CheckCircle2, Mail } from "lucide-react";
+import { buildFinalLlcName } from "../validation";
 import type { FloridaLLCFormData } from "../types";
 
 interface StepProps {
@@ -9,82 +7,79 @@ interface StepProps {
 }
 
 export function StepSubmissionPayload({ data }: StepProps) {
-  const payload = useMemo(() => buildPayload(data), [data]);
-  const json = useMemo(() => JSON.stringify(payload, null, 2), [payload]);
-  const [copied, setCopied] = useState<boolean>(false);
-
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(json);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {
-      // ignore
-    }
-  };
-
-  const download = () => {
-    const blob = new Blob([json], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `florida-llc-${Date.now()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
+  const llcName =
+    buildFinalLlcName(data.desiredLlcName, data.llcDesignator) || "your LLC";
+  const seriesCount = data.series.length;
+  const email = data.correspondentEmail?.trim();
 
   return (
     <div className="space-y-6">
       <header className="space-y-2">
-        <h2 className="font-display text-3xl">Submission summary</h2>
+        <h2 className="font-display text-3xl">Intake received</h2>
         <p className="text-sm text-muted-foreground max-w-2xl">
-          Below is the structured JSON payload generated from your inputs.
-          This is the data that would be sent to your filing pipeline (no
-          actual filing has been made).
+          Thank you — we have everything we need to get started on {llcName}.
         </p>
       </header>
 
-      <div className="flex flex-wrap gap-3">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={copy}
-          className="rounded-full"
-        >
-          {copied ? (
-            <Check className="mr-1.5 h-4 w-4" />
-          ) : (
-            <Copy className="mr-1.5 h-4 w-4" />
-          )}
-          {copied ? "Copied" : "Copy JSON"}
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={download}
-          className="rounded-full"
-        >
-          <Download className="mr-1.5 h-4 w-4" />
-          Download .json
-        </Button>
+      <div className="rounded-2xl border border-trust/30 bg-trust/5 p-6 space-y-4">
+        <div className="flex items-center gap-2 text-trust">
+          <CheckCircle2 className="h-5 w-5 shrink-0" />
+          <span className="font-display text-lg">What happens next</span>
+        </div>
+        <ol className="space-y-3 text-sm text-foreground/85">
+          <li className="flex gap-3">
+            <span className="font-mono-feature text-xs text-trust mt-0.5">01</span>
+            <span>
+              Our team reviews your intake and prepares your Articles of
+              Organization
+              {seriesCount > 0 ? (
+                <>
+                  {" "}
+                  and {seriesCount} Protected Series Designation
+                  {seriesCount === 1 ? "" : "s"}
+                </>
+              ) : null}
+              .
+            </span>
+          </li>
+          <li className="flex gap-3">
+            <span className="font-mono-feature text-xs text-trust mt-0.5">02</span>
+            <span>
+              We file electronically with the Florida Division of Corporations.
+              Processing time is set by the state.
+            </span>
+          </li>
+          <li className="flex gap-3">
+            <span className="font-mono-feature text-xs text-trust mt-0.5">03</span>
+            <span>
+              Once the state accepts the filing, we send you the filed documents
+              along with your form Operating Agreement, property titling manual,
+              ledger forms, and maintenance guide.
+            </span>
+          </li>
+        </ol>
       </div>
 
-      <pre className="overflow-x-auto rounded-2xl border border-border bg-secondary/40 p-4 text-xs leading-relaxed font-mono-feature max-h-[520px]">
-        {json}
-      </pre>
-
-      <div className="rounded-xl border border-trust/30 bg-trust/5 p-4 text-sm text-foreground/85">
-        <strong>Next steps (placeholder):</strong> A real submission would now
-        be queued for internal review, payment collection, and Sunbiz
-        preparation. We do not file directly with the State of Florida from
-        this form.
+      <div className="flex items-start gap-3 rounded-xl border border-border bg-secondary/40 p-4 text-sm text-muted-foreground">
+        <Mail className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+        <p className="leading-relaxed">
+          We&rsquo;ll be in touch
+          {email ? (
+            <>
+              {" "}
+              at <span className="text-foreground">{email}</span>
+            </>
+          ) : null}
+          . Questions in the meantime? Email{" "}
+          <a
+            href="mailto:support@myfloridaseriesllc.com"
+            className="text-foreground underline decoration-accent decoration-2 underline-offset-4 hover:text-accent"
+          >
+            support@myfloridaseriesllc.com
+          </a>
+          .
+        </p>
       </div>
-
-      {/*
-        TODO(integration): POST `payload` to /api/llc/formations to persist the
-        submission, charge the customer via Stripe, attach payment receipt,
-        and create a CRM record / case in your back office.
-      */}
     </div>
   );
 }

@@ -383,9 +383,8 @@ export function FloridaLLCFormationForm({
 
           {submitted && isSubmit ? (
             <div className="mt-6 rounded-2xl border border-trust/40 bg-trust/5 p-5 text-sm">
-              <strong className="text-trust">Payload generated.</strong>{" "}
-              Your submission has been recorded for processing. Our team will
-              prepare the Articles of Organization for filing with the Florida
+              <strong className="text-trust">Submission received.</strong>{" "}
+              Our team will prepare your documents for filing with the Florida
               Division of Corporations.
             </div>
           ) : null}

@@ -25,6 +25,11 @@ const FAQ_ITEMS: {
     a: "Most clients use a single EIN at the parent level with internal accounting that tracks each series. The IRS does, however, permit separate EINs for series that elect to be treated as separate entities for federal tax.",
   },
   {
+    q: "I already have a Florida LLC. Can I convert it instead of starting over?",
+    a: "Yes. Florida law lets an existing Florida LLC add protected series, so you don't need to dissolve anything or form a new company. The service fee is the same $499, and you skip the $125 Articles filing fee because your LLC is already on file with the state. You still pay the $25 state filing fee for each Protected Series Designation.",
+    link: { to: "/pricing", label: "See both options" },
+  },
+  {
     q: "How much does it cost to add a new series later?",
     a: "The formation fee covers preparing up to 3 Protected Series Designations. Each additional series is $25 to prepare plus a $25 state filing fee.",
     link: { to: "/pricing", label: "Full pricing and add-ons" },
