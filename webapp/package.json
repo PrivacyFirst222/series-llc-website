@@ -10,10 +10,9 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-    "build:api": "esbuild server/vercel-entry.ts --bundle --platform=node --format=esm --external:@electric-sql/pglite --outfile=\"api/[[...route]].mjs\" --log-level=warning"
+    "build:api": "esbuild server/vercel-entry.ts --bundle --platform=node --format=esm --external:@electric-sql/pglite --outfile=\"api/[[...route]].mjs\" --log-level=warning --banner:js=\"import { createRequire } from 'node:module'; const require = createRequire(import.meta.url);\""
   },
   "dependencies": {
-    "@hono/node-server": "^2.0.12",
     "@hookform/resolvers": "^3.10.0",
     "@neondatabase/serverless": "^1.1.0",
     "@radix-ui/react-accordion": "^1.2.12",
