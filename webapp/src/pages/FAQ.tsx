@@ -14,7 +14,7 @@ const FAQ_ITEMS: { q: string; a: string; link?: { to: string; label: string } }[
   },
   {
     q: "Can a protected series hold Florida real estate in its own name?",
-    a: "Yes. A protected series is its own person under Florida law with the same property powers as the LLC, and §605.2301 addresses deeds directly: a recorded deed granting an interest in real property to or from a protected series is conclusive of the signer's authority in favor of a person who gives value without knowledge of any lack of authority, and stands as the record that the property is that series' associated asset. Title has to be in the series' own statutory name — a series may not hold property in the LLC's name or another series' name. We can't speak for how a particular clerk's office or title underwriter will handle any given transaction.",
+    a: "Yes. The deed goes in the series' own full name — something like \"Sunshine Holdings, LLC, PS A.\" Not the LLC's name, and not another series' name. Recording that deed does two jobs at once: it puts the property in the series, and it becomes your record that the property belongs to that series and not to the LLC or to a different one. One honest caveat — we can't promise how any particular clerk's office or title company will handle a given closing. (§605.2301)",
   },
   {
     q: "Do I get separate EINs for each series?",
