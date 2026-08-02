@@ -186,3 +186,11 @@ export function calculateEstimatedFees(opts: {
  * 9. Verify both correspondent emails match.
  * 10. Sanitize all string inputs and reject HTML/script payloads.
  */
+
+/**
+ * s. 605.2202(2)(b): a protected series name must contain the phrase
+ * "protected series" or the abbreviation "P.S." or "PS."
+ */
+export function hasProtectedSeriesPhrase(name: string): boolean {
+  return /protected\s+series/i.test(name) || /(^|\s)p\.?s\.?(\s|$)/i.test(name);
+}

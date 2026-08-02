@@ -18,10 +18,10 @@ const ADDITIONAL_FEE = 50;
 function nextDefaultName(existing: SeriesEntry[]): string {
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   for (let i = 0; i < letters.length; i++) {
-    const candidate = `Series ${letters[i]}`;
+    const candidate = `PS ${letters[i]}`;
     if (!existing.some((s) => s.name === candidate)) return candidate;
   }
-  return `Series ${existing.length + 1}`;
+  return `PS ${existing.length + 1}`;
 }
 
 export function StepSeries({ data, patch, errors }: StepProps) {
@@ -63,18 +63,21 @@ export function StepSeries({ data, patch, errors }: StepProps) {
         </div>
         <ul className="list-disc list-inside space-y-1.5 text-blue-800 leading-relaxed">
           <li>
-            Each series must reference your LLC name and carry a unique
-            identifier that distinguishes it from all other series.
+            Florida requires every protected series name to <strong>begin with your
+            LLC&rsquo;s name</strong> and to <strong>contain the phrase &ldquo;protected
+            series&rdquo; or the abbreviation &ldquo;P.S.&rdquo; or &ldquo;PS&rdquo;</strong>{" "}
+            (&sect;605.2202). We use <strong>PS</strong>.
           </li>
           <li>
             <strong>Full name format:</strong>{" "}
             <span className="font-mono text-xs bg-blue-100 px-1 py-0.5 rounded">
-              {llcName}, Series [Identifier]
+              {llcName}, PS [Identifier]
             </span>
           </li>
           <li>
-            Identifiers can be letters (A, B, C …), numbers (1, 2, 3 …), or
-            descriptive words (Real Estate, Investments, Vehicles).
+            The identifier after PS can be a letter (A, B, C &hellip;), a number
+            (1, 2, 3 &hellip;), or a descriptive word (Real Estate, Investments,
+            Vehicles).
           </li>
           <li>
             No two series of the same LLC may share an identical name.
@@ -98,8 +101,8 @@ export function StepSeries({ data, patch, errors }: StepProps) {
           </li>
         </ul>
         <p className="text-xs text-muted-foreground pt-1 border-t border-border">
-          The $50 additional series fee includes $25 to prepare the Certificate
-          of Designation and a $25 state filing fee.
+          The $50 additional series fee includes $25 to prepare the Protected
+          Series Designation and a $25 state filing fee.
         </p>
         {extraSeries > 0 ? (
           <div className="flex justify-between font-semibold text-sm pt-1 border-t border-border">
@@ -148,7 +151,7 @@ export function StepSeries({ data, patch, errors }: StepProps) {
                   type="text"
                   value={s.name}
                   onChange={(e) => updateName(s.id, e.target.value)}
-                  placeholder="e.g. Series A or Series Real Estate"
+                  placeholder="e.g. PS A or PS Real Estate"
                   aria-invalid={!!errors[`series.${i}.name`]}
                   className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-trust/30 focus:border-trust/50"
                 />

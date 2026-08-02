@@ -2,6 +2,7 @@ import { isPoBox } from "./schema";
 import {
   buildFinalLlcName,
   designatorAllowedForFormationType,
+  hasProtectedSeriesPhrase,
   nameContainsLegalDesignator,
   validateEffectiveDate,
 } from "./validation";
@@ -78,8 +79,13 @@ export function validateStep(
     if (data.series.length === 0)
       e.series = "Add at least one series to proceed.";
     data.series.forEach((s, i) => {
-      if (!s.name.trim())
+      const name = s.name.trim();
+      if (!name) {
         e[`series.${i}.name`] = "Series identifier is required.";
+      } else if (!hasProtectedSeriesPhrase(name)) {
+        e[`series.${i}.name`] =
+          'Include "PS" (or "P.S." / "protected series") — §605.2202 requires it in every series name.';
+      }
     });
     const names = data.series.map((s) => s.name.trim().toLowerCase());
     names.forEach((n, i) => {
