@@ -26,12 +26,12 @@ const FAQ_ITEMS: {
   },
   {
     q: "I already have a Florida LLC. Can I convert it instead of starting over?",
-    a: "Yes. Florida law lets an existing Florida LLC add protected series, so you don't need to dissolve anything or form a new company. The service fee is the same $499, and you skip the $125 Articles filing fee because your LLC is already on file with the state. You still pay the $25 state filing fee for each Protected Series Designation.",
+    a: "Yes. Florida law lets an existing Florida LLC add protected series, so you don't need to dissolve anything or form a new company. The service fee is the same $499 and covers up to 3 Protected Series Designations including their state filing fees, and you skip the $125 Articles filing fee because your LLC is already on file with the state.",
     link: { to: "/pricing", label: "See both options" },
   },
   {
     q: "How much does it cost to add a new series later?",
-    a: "The formation fee covers preparing up to 3 Protected Series Designations. Each additional series is $25 to prepare plus a $25 state filing fee.",
+    a: "The formation fee covers up to 3 Protected Series Designations, including their state filing fees — three series cost you nothing beyond the $499. Each series after that is $25 to prepare plus a $25 state filing fee.",
     link: { to: "/pricing", label: "Full pricing and add-ons" },
   },
   {

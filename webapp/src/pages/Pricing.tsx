@@ -8,7 +8,7 @@ const SHARED_FEATURES: string[] = [
   "Property titling manual — how to properly title assets in the LLC or series",
   "Ledger forms for each series",
   "Complete Series LLC maintenance guide",
-  "Includes preparation of up to 3 Protected Series Designations (to form up to 3 series)",
+  "Up to 3 Protected Series Designations, including their state filing fees",
   "Free iOS app (available end of year) — track LLC records, income & expenses, asset acquisitions and sales",
 ];
 
@@ -87,9 +87,9 @@ export default function Pricing() {
                   </div>
                 ))}
                 <div className="mt-2 text-xs text-muted-foreground">
-                  Includes preparation of up to 3 Protected Series Designations to form up to 3
-                  series. Additional Protected Series Designations cost $25 each (drafting) plus the
-                  $25 state filing fee.
+                  Covers up to 3 Protected Series Designations, including their state filing fees.
+                  Additional Protected Series Designations cost $25 each to prepare plus the $25
+                  state filing fee.
                 </div>
               </div>
 

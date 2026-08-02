@@ -38,9 +38,9 @@ function renderCell(v: Cell, accent?: boolean) {
 const ONE_TIME: { label: string; oldVal: string; newVal: string; costlier?: boolean }[] = [
   { label: "State filing fee to form", oldVal: "$1,250", newVal: "$125" },
   {
-    label: "Protected Series Designations (10 series)",
+    label: "Protected Series Designations (3 of 10 covered by the fee)",
     oldVal: "—",
-    newVal: "$250",
+    newVal: "$175",
     costlier: true,
   },
 ];
@@ -160,7 +160,7 @@ export default function Benefits() {
                     </span>
                   </span>
                   <span className="text-center text-primary-foreground/60 font-mono-feature">—</span>
-                  <span className="text-right font-display text-lg sm:text-2xl whitespace-nowrap">≈ $1,765</span>
+                  <span className="text-right font-display text-lg sm:text-2xl whitespace-nowrap">≈ $1,840</span>
                 </div>
                 <div className="grid grid-cols-[1.2fr_1fr_1fr] gap-2 bg-primary px-4 sm:px-6 py-4 sm:py-5 text-primary-foreground">
                   <span className="font-display text-base sm:text-lg">Every year after</span>
@@ -172,8 +172,8 @@ export default function Benefits() {
                 Estimates assume ten property-owning Florida LLCs, each paying the $125 state filing fee,
                 the $138.75 annual report fee, and $99/yr for a registered agent — against one Protected
                 Series LLC holding ten protected series, at $125 to file the Articles, $25 in state
-                filing fees per Protected Series Designation, one $138.75 annual report, and one $99/yr
-                registered agent. Registered agent pricing is held at $99/yr on both sides, so the
+                filing fees for each designation past the three the service fee covers, one $138.75
+                annual report, and one $99/yr registered agent. Registered agent pricing is held at $99/yr on both sides, so the
                 comparison turns on the number of entities rather than on what any agent charges. Florida does not require an annual report in the year an
                 entity is formed, so the first-year figure covers filing fees and registered agent only.
                 State fees only; our service fee is on the{" "}
