@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Mail, ShieldCheck, Building2 } from "lucide-react";
+import { Mail } from "lucide-react";
 import { Logo } from "./Logo";
 
 const groups: { title: string; links: { to: string; label: string }[] }[] = [
@@ -33,16 +33,6 @@ export function Footer() {
               The first dedicated formation service for Florida's new Protected Series LLC —
               statute-driven asset protection, designed for investors and operators across the Sunshine State.
             </p>
-            <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
-              <span className="inline-flex items-center gap-1.5">
-                <ShieldCheck className="h-3.5 w-3.5 text-trust" />
-                Statute §605.2101 compliant
-              </span>
-              <span className="inline-flex items-center gap-1.5">
-                <Building2 className="h-3.5 w-3.5 text-trust" />
-                FL Div. of Corps registered agent
-              </span>
-            </div>
           </div>
 
           {groups.map((group) => (
