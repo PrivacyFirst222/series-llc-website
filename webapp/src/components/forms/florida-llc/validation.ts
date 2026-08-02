@@ -196,3 +196,17 @@ export function calculateEstimatedFees(opts: {
 export function hasProtectedSeriesPhrase(name: string): boolean {
   return /protected\s+series/i.test(name) || /(^|\s)p\.?s\.?(\s|$)/i.test(name);
 }
+
+/** Same strictness as the server's Zod email rule — no colons, spaces, or
+ *  missing domains sneak through to the final submit. */
+const EMAIL_REGEX =
+  /^[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$/;
+
+export function isValidEmail(s: string): boolean {
+  return EMAIL_REGEX.test(s);
+}
+
+/** Fixes the classic paste accidents: "mailto:" prefixes and stray spaces. */
+export function cleanEmailInput(s: string): string {
+  return s.replace(/^\s*mailto:\s*/i, "").trim();
+}

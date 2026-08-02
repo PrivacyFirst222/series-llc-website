@@ -1,6 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { FieldShell } from "../FieldShell";
 import { AddressFieldsBlock } from "../AddressFields";
+import { cleanEmailInput } from "../validation";
 import type { FloridaLLCFormData } from "../types";
 
 interface StepProps {
@@ -66,7 +67,7 @@ export function StepCorrespondence({ data, patch, errors }: StepProps) {
           <Input
             type="email"
             value={data.correspondentEmail}
-            onChange={(e) => patch({ correspondentEmail: e.target.value })}
+            onChange={(e) => patch({ correspondentEmail: cleanEmailInput(e.target.value) })}
           />
         </FieldShell>
         <FieldShell
@@ -78,7 +79,7 @@ export function StepCorrespondence({ data, patch, errors }: StepProps) {
             type="email"
             value={data.confirmCorrespondentEmail}
             onChange={(e) =>
-              patch({ confirmCorrespondentEmail: e.target.value })
+              patch({ confirmCorrespondentEmail: cleanEmailInput(e.target.value) })
             }
           />
         </FieldShell>

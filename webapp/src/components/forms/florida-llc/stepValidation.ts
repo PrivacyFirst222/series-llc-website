@@ -3,6 +3,7 @@ import {
   buildFinalLlcName,
   designatorAllowedForFormationType,
   hasProtectedSeriesPhrase,
+  isValidEmail,
   nameContainsLegalDesignator,
   validateEffectiveDate,
 } from "./validation";
@@ -227,6 +228,8 @@ export function validateStep(
   if (step === "correspondence") {
     if (!data.correspondentName) e.correspondentName = "Name required.";
     if (!data.correspondentEmail) e.correspondentEmail = "Email required.";
+    else if (!isValidEmail(data.correspondentEmail))
+      e.correspondentEmail = "That doesn't look like a valid email address.";
     if (!data.confirmCorrespondentEmail)
       e.confirmCorrespondentEmail = "Please confirm email.";
     if (
