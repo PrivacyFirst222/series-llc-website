@@ -11,7 +11,7 @@ interface CallToActionProps {
 export function CallToAction({
   eyebrow = "Ready when you are",
   title = "Form your Florida Protected Series LLC.",
-  body = "Reserve your mothership and as many protected series as your portfolio needs. The statute is in effect and the Division of Corporations is accepting filings now.",
+  body = "Form your mothership and as many protected series as your portfolio needs. The statute is in effect and the Division of Corporations is accepting filings now.",
 }: CallToActionProps) {
   return (
     <section className="relative overflow-hidden">

@@ -3,7 +3,11 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { PageHero } from "@/components/sections/PageHero";
 import { CallToAction } from "@/components/sections/CallToAction";
 
-const FAQ_ITEMS: { q: string; a: string; link?: { to: string; label: string } }[] = [
+const FAQ_ITEMS: {
+  q: string;
+  a: string;
+  link?: { to?: string; href?: string; label: string };
+}[] = [
   {
     q: "Is Florida's Protected Series LLC statute in effect?",
     a: "Yes. Florida Statute §605.2101 et seq. is in effect, and Articles of Organization for protected series LLCs are being accepted. We prepare and submit your filing as soon as your intake is complete.",
@@ -40,7 +44,10 @@ const FAQ_ITEMS: { q: string; a: string; link?: { to: string; label: string } }[
   {
     q: "How long does formation take?",
     a: "We cannot promise a timeframe. We file promptly once your intake is complete, but from there the processing time belongs to the Florida Secretary of State, which gives no guarantee and offers no expedited service.",
-    link: { to: "/how-it-works", label: "How to check current processing dates" },
+    link: {
+      href: "https://dos.fl.gov/sunbiz/document-processing-dates/",
+      label: "Check current processing dates on Sunbiz",
+    },
   },
   {
     q: "Can I cancel or get a refund?",
@@ -84,12 +91,23 @@ export default function FAQ() {
                     {item.link ? (
                       <>
                         {" "}
-                        <Link
-                          to={item.link.to}
-                          className="text-foreground underline decoration-accent decoration-2 underline-offset-4 hover:text-accent"
-                        >
-                          {item.link.label} →
-                        </Link>
+                        {item.link.href ? (
+                          <a
+                            href={item.link.href}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-foreground underline decoration-accent decoration-2 underline-offset-4 hover:text-accent"
+                          >
+                            {item.link.label} →
+                          </a>
+                        ) : (
+                          <Link
+                            to={item.link.to!}
+                            className="text-foreground underline decoration-accent decoration-2 underline-offset-4 hover:text-accent"
+                          >
+                            {item.link.label} →
+                          </Link>
+                        )}
                       </>
                     ) : null}
                   </AccordionContent>
