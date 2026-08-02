@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import {
   Smartphone,
+  Clock,
   CheckCircle2,
   XCircle,
   AlertTriangle,
@@ -120,8 +121,19 @@ export default function RecordkeepingApp() {
         }
       />
 
+      {/* In-development notice */}
+      <section className="container-wide pt-10 pb-2">
+        <div className="mx-auto max-w-3xl flex items-start gap-3 rounded-2xl border border-amber-300/60 bg-amber-50 p-5 lg:p-6">
+          <Clock className="h-5 w-5 shrink-0 text-amber-600 mt-0.5" />
+          <p className="text-sm leading-relaxed text-amber-900">
+            <span className="font-semibold">Coming soon:</span> the recordkeeping app is currently in
+            development and will be available by the end of the year.
+          </p>
+        </div>
+      </section>
+
       {/* Free app callout banner */}
-      <section className="container-wide pt-10 pb-4">
+      <section className="container-wide pt-6 pb-4">
         <div className="mx-auto max-w-3xl flex items-start gap-4 rounded-2xl border border-trust/30 bg-trust/5 p-6">
           <Smartphone className="h-8 w-8 shrink-0 text-trust mt-0.5" />
           <div>
