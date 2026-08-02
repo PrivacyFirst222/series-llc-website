@@ -45,9 +45,14 @@ const ONE_TIME: { label: string; oldVal: string; newVal: string; costlier?: bool
   },
 ];
 
-const RECURRING = [
-  { label: "Annual report fees", oldVal: "$1,387.50/yr", newVal: "$138.75/yr" },
+const RECURRING: { label: string; note?: string; oldVal: string; newVal: string }[] = [
   { label: "Registered agent fees", oldVal: "$1,200/yr", newVal: "$99/yr" },
+  {
+    label: "Annual report fees",
+    note: "First one is due the year after you form",
+    oldVal: "$1,387.50/yr",
+    newVal: "$138.75/yr",
+  },
   { label: "Tax filings", oldVal: "10 returns", newVal: "1 return" },
 ];
 
@@ -78,8 +83,9 @@ export default function Benefits() {
               <p className="text-base text-muted-foreground leading-relaxed">
                 The real cost of running ten Florida LLCs isn't the one-time filing fee — it's the
                 recurring annual reports, registered agent renewals, and separate tax returns. Folding
-                everything into a Protected Series LLC eliminates almost all of it. The one-time filing
-                fees are shown separately below, since they are paid once and not every year.
+                everything into a Protected Series LLC eliminates almost all of it. One-time filing fees
+                are listed separately below, and your first annual report is not due until the year after
+                you form — so year one and every year after it are shown as two different numbers.
               </p>
               <div className="flex items-center gap-4 pt-3">
                 <div className="rounded-xl bg-trust/10 p-3 text-trust">
@@ -129,7 +135,14 @@ export default function Benefits() {
                 </div>
                 {RECURRING.map((row) => (
                   <div key={row.label} className="grid grid-cols-[1.2fr_1fr_1fr] gap-2 border-b border-border px-4 sm:px-6 py-4 sm:py-5 text-xs sm:text-sm">
-                    <span className="font-medium">{row.label}</span>
+                    <span className="font-medium">
+                      {row.label}
+                      {row.note ? (
+                        <span className="mt-1 block text-[0.68rem] font-normal leading-snug text-muted-foreground">
+                          {row.note}
+                        </span>
+                      ) : null}
+                    </span>
                     <span className="text-center font-mono-feature text-muted-foreground line-through">
                       {row.oldVal}
                     </span>
@@ -140,9 +153,14 @@ export default function Benefits() {
                 ))}
 
                 <div className="grid grid-cols-[1.2fr_1fr_1fr] gap-2 border-b border-primary/20 bg-primary/90 px-4 sm:px-6 py-4 sm:py-5 text-primary-foreground">
-                  <span className="font-display text-base sm:text-lg">First-year savings</span>
+                  <span className="font-display text-base sm:text-lg">
+                    First-year savings
+                    <span className="mt-1 block font-sans text-[0.68rem] font-normal leading-snug text-primary-foreground/70">
+                      No annual report in your formation year
+                    </span>
+                  </span>
                   <span className="text-center text-primary-foreground/60 font-mono-feature">—</span>
-                  <span className="text-right font-display text-lg sm:text-2xl whitespace-nowrap">≈ $3,225</span>
+                  <span className="text-right font-display text-lg sm:text-2xl whitespace-nowrap">≈ $1,975</span>
                 </div>
                 <div className="grid grid-cols-[1.2fr_1fr_1fr] gap-2 bg-primary px-4 sm:px-6 py-4 sm:py-5 text-primary-foreground">
                   <span className="font-display text-base sm:text-lg">Every year after</span>
@@ -155,7 +173,9 @@ export default function Benefits() {
                 the $138.75 annual report fee, and a $120/yr commercial registered agent — against one
                 Protected Series LLC holding ten protected series, at $125 to file the Articles, $25 in
                 state filing fees per Certificate of Designation, one $138.75 annual report, and our
-                $99/yr registered agent service. State fees only; our service fee is on the{" "}
+                $99/yr registered agent service. Florida does not require an annual report in the year an
+                entity is formed, so the first-year figure covers filing fees and registered agent only.
+                State fees only; our service fee is on the{" "}
                 <Link
                   to="/pricing"
                   className="text-foreground underline decoration-accent decoration-2 underline-offset-4 hover:text-accent"
