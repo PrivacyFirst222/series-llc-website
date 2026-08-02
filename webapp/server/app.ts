@@ -155,7 +155,11 @@ async function fulfillPaidOrder(orderId: string, squarePaymentId: string | null)
       [tokenHash, clientId, new Date(Date.now() + 7 * 86400_000).toISOString()],
     );
     const mail = welcomeEmail(order.contact_name, `${env.PUBLIC_BASE_URL}/portal/set-password?token=${token}`);
-    await sendMail({ to: order.contact_email, ...mail });
+    // Email failures must never unwind a recorded payment; the client can
+    // always recover portal access through the forgot-password flow.
+    await sendMail({ to: order.contact_email, ...mail }).catch((e) =>
+      console.error("[fulfill] welcome email failed:", e),
+    );
   }
 
   if (env.ADMIN_NOTIFY_EMAIL) {
@@ -167,7 +171,9 @@ async function fulfillPaidOrder(orderId: string, squarePaymentId: string | null)
       orderId: order.id,
       adminUrl: `${env.PUBLIC_BASE_URL}/admin`,
     });
-    await sendMail({ to: env.ADMIN_NOTIFY_EMAIL, ...mail, replyTo: order.contact_email });
+    await sendMail({ to: env.ADMIN_NOTIFY_EMAIL, ...mail, replyTo: order.contact_email }).catch((e) =>
+      console.error("[fulfill] admin notification email failed:", e),
+    );
   }
 }
 
@@ -440,11 +446,18 @@ app.post("/admin/documents", async (c) => {
     [clientId, kind, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes],
   );
 
+  let notified = false;
   if (notify) {
     const mail = newDocumentEmail(`${env.PUBLIC_BASE_URL}/portal`);
-    await sendMail({ to: clients[0].email, ...mail });
+    notified = await sendMail({ to: clients[0].email, ...mail }).then(
+      () => true,
+      (e) => {
+        console.error("[admin] document alert email failed:", e);
+        return false;
+      },
+    );
   }
-  return c.json({ data: { id: rows[0].id } });
+  return c.json({ data: { id: rows[0].id, notified } });
 });
 
 app.notFound((c) => c.json(err("Not found", "NOT_FOUND"), 404));

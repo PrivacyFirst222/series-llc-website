@@ -57352,8 +57352,8 @@ async function putFile(filename, data, contentType) {
   if (env.BLOB_READ_WRITE_TOKEN) {
     const { put: put2 } = await Promise.resolve().then(() => (init_dist(), dist_exports));
     const blob = await put2(`docs/${key}`, data, {
-      access: "public",
-      // unguessable pathname; never exposed — served via authed API
+      access: "private",
+      // store is private; downloads go through the authed API
       contentType,
       addRandomSuffix: false
     });
@@ -57373,7 +57373,9 @@ async function readFileStream(storageKey) {
     const dir = fileURLToPath(new URL("../.dev-data/blob/", import.meta.url));
     return readFile(dir + storageKey.slice(4));
   }
-  const res = await fetch(storageKey);
+  const res = await fetch(storageKey, {
+    headers: { authorization: `Bearer ${env.BLOB_READ_WRITE_TOKEN}` }
+  });
   if (!res.ok || !res.body) throw new Error(`blob fetch failed: ${res.status}`);
   return res.body;
 }
@@ -57569,7 +57571,9 @@ async function fulfillPaidOrder(orderId, squarePaymentId) {
       [tokenHash, clientId, new Date(Date.now() + 7 * 864e5).toISOString()]
     );
     const mail = welcomeEmail(order.contact_name, `${env.PUBLIC_BASE_URL}/portal/set-password?token=${token}`);
-    await sendMail({ to: order.contact_email, ...mail });
+    await sendMail({ to: order.contact_email, ...mail }).catch(
+      (e) => console.error("[fulfill] welcome email failed:", e)
+    );
   }
   if (env.ADMIN_NOTIFY_EMAIL) {
     const mail = orderPaidEmail({
@@ -57580,7 +57584,9 @@ async function fulfillPaidOrder(orderId, squarePaymentId) {
       orderId: order.id,
       adminUrl: `${env.PUBLIC_BASE_URL}/admin`
     });
-    await sendMail({ to: env.ADMIN_NOTIFY_EMAIL, ...mail, replyTo: order.contact_email });
+    await sendMail({ to: env.ADMIN_NOTIFY_EMAIL, ...mail, replyTo: order.contact_email }).catch(
+      (e) => console.error("[fulfill] admin notification email failed:", e)
+    );
   }
 }
 app.post("/square/webhook", async (c) => {
@@ -57813,11 +57819,18 @@ app.post("/admin/documents", async (c) => {
      VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
     [clientId, kind, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes]
   );
+  let notified = false;
   if (notify) {
     const mail = newDocumentEmail(`${env.PUBLIC_BASE_URL}/portal`);
-    await sendMail({ to: clients[0].email, ...mail });
+    notified = await sendMail({ to: clients[0].email, ...mail }).then(
+      () => true,
+      (e) => {
+        console.error("[admin] document alert email failed:", e);
+        return false;
+      }
+    );
   }
-  return c.json({ data: { id: rows[0].id } });
+  return c.json({ data: { id: rows[0].id, notified } });
 });
 app.notFound((c) => c.json(err("Not found", "NOT_FOUND"), 404));
 app.onError((e, c) => {

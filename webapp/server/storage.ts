@@ -13,7 +13,7 @@ export async function putFile(filename: string, data: ArrayBuffer, contentType: 
   if (env.BLOB_READ_WRITE_TOKEN) {
     const { put } = await import("@vercel/blob");
     const blob = await put(`docs/${key}`, data, {
-      access: "public", // unguessable pathname; never exposed — served via authed API
+      access: "private", // store is private; downloads go through the authed API
       contentType,
       addRandomSuffix: false,
     });
@@ -34,7 +34,9 @@ export async function readFileStream(storageKey: string): Promise<ReadableStream
     const dir = fileURLToPath(new URL("../.dev-data/blob/", import.meta.url));
     return readFile(dir + storageKey.slice(4));
   }
-  const res = await fetch(storageKey);
+  const res = await fetch(storageKey, {
+    headers: { authorization: `Bearer ${env.BLOB_READ_WRITE_TOKEN}` },
+  });
   if (!res.ok || !res.body) throw new Error(`blob fetch failed: ${res.status}`);
   return res.body;
 }
