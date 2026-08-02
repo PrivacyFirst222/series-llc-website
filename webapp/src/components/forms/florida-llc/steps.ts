@@ -48,3 +48,57 @@ export const STEPS: { key: StepKey; label: string }[] = [
 
 export const stepIndexOf = (key: StepKey): number =>
   STEPS.findIndex((s) => s.key === key);
+
+/** Which step edits a given top-level form field — used to send the user to
+ *  the right screen when server-side validation flags something. */
+const FIELD_STEP: Record<string, StepKey> = {
+  filingPath: "path",
+  existingLlcName: "path",
+  sunbizDocumentNumber: "path",
+  formationType: "intro",
+  isFloridaDomesticEntityOnly: "intro",
+  notLegalAdvice: "intro",
+  publicRecordNotice: "intro",
+  desiredLlcName: "name",
+  llcDesignator: "name",
+  alternateName1: "name",
+  alternateName2: "name",
+  nameSearchAcknowledgment: "name",
+  governmentAffiliationAcknowledgment: "name",
+  lawfulPurposeNameAcknowledgment: "name",
+  principalAddress: "principal",
+  mailingSameAsPrincipal: "mailing",
+  mailingAddress: "mailing",
+  series: "series",
+  registeredAgentAcceptanceCheckbox: "acceptance",
+  registeredAgentAcceptanceName: "acceptance",
+  registeredAgentAcceptanceCapacity: "acceptance",
+  registeredAgentElectronicSignature: "acceptance",
+  registeredAgentSignatureAuthorizationCheckbox: "acceptance",
+  managementStructure: "management",
+  includeManagementStatementInArticles: "management",
+  managers: "managers",
+  members: "members",
+  collectMembersForInternalRecords: "members",
+  includeMembersInArticles: "members",
+  purposeType: "purpose",
+  businessPurposeText: "purpose",
+  effectiveDateOption: "effective",
+  requestedEffectiveDate: "effective",
+  correspondentName: "correspondence",
+  correspondentEmail: "correspondence",
+  confirmCorrespondentEmail: "correspondence",
+  correspondentCompany: "correspondence",
+  correspondentPhone: "correspondence",
+  correspondentAddress: "correspondence",
+  orderCertificateOfStatus: "optional",
+  orderCertifiedCopy: "optional",
+};
+
+export function stepForField(field: string): StepKey {
+  if (FIELD_STEP[field]) return FIELD_STEP[field];
+  // Remaining registeredAgent* fields belong to the agent step; the
+  // certification fields and anything unknown land on certify.
+  if (field.startsWith("registeredAgent")) return "agent";
+  return "certify";
+}

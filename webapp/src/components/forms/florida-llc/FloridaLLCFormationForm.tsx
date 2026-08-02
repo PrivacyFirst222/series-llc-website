@@ -25,7 +25,7 @@ import { StepSeries } from "./sections/StepSeries";
 import { StepCertification } from "./sections/StepCertification";
 import { StepSubmissionPayload } from "./sections/StepSubmissionPayload";
 import { StepFilingPath } from "./sections/StepFilingPath";
-import { STEPS, stepIndexOf } from "./steps";
+import { STEPS, stepIndexOf, stepForField } from "./steps";
 import type { FloridaLLCFormData } from "./types";
 
 const STORAGE_KEY = "fl-llc-formation-draft-v1";
@@ -36,33 +36,64 @@ interface FormProps {
   onSubmit?: (data: FloridaLLCFormData) => void;
 }
 
+interface StoredDraft {
+  __draft: 2;
+  data: FloridaLLCFormData;
+  stepIndex: number;
+  maxStep: number;
+}
+
+function loadDraft(initialData?: FloridaLLCFormData): {
+  data: FloridaLLCFormData;
+  step: number;
+  max: number;
+} {
+  if (initialData) return { data: initialData, step: 0, max: 0 };
+  // Refreshing must never lose the customer's place: the draft stores both
+  // the answers and how far they had gotten.
+  const lastResumable = STEPS.length - 2; // never restore onto the submit screen
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as StoredDraft | FloridaLLCFormData;
+      if (parsed && (parsed as StoredDraft).__draft === 2) {
+        const d = parsed as StoredDraft;
+        const max = Math.min(d.maxStep ?? 0, lastResumable);
+        return {
+          data: { ...defaultFormData, ...d.data },
+          step: Math.min(d.stepIndex ?? 0, max),
+          max,
+        };
+      }
+      // Older drafts stored the answers alone.
+      return { data: { ...defaultFormData, ...(parsed as FloridaLLCFormData) }, step: 0, max: 0 };
+    }
+  } catch {
+    // ignore
+  }
+  return { data: defaultFormData, step: 0, max: 0 };
+}
+
 export function FloridaLLCFormationForm({
   initialData,
   onSubmit,
 }: FormProps) {
-  const [data, setData] = useState<FloridaLLCFormData>(() => {
-    if (initialData) return initialData;
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) return { ...defaultFormData, ...JSON.parse(raw) };
-    } catch {
-      // ignore
-    }
-    return defaultFormData;
-  });
-  const [stepIndex, setStepIndex] = useState<number>(0);
+  const [data, setData] = useState<FloridaLLCFormData>(() => loadDraft(initialData).data);
+  const [stepIndex, setStepIndex] = useState<number>(() => loadDraft(initialData).step);
+  const [maxStep, setMaxStep] = useState<number>(() => loadDraft(initialData).max);
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Auto-save draft
+  // Auto-save draft (answers + position)
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      const draft: StoredDraft = { __draft: 2, data, stepIndex, maxStep };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
     } catch {
       // ignore quota
     }
-  }, [data]);
+  }, [data, stepIndex, maxStep]);
 
   // Re-run validation for the current step on data changes (after first attempt)
   useEffect(() => {
@@ -85,7 +116,11 @@ export function FloridaLLCFormationForm({
       return;
     }
     setErrors({});
-    setStepIndex((i) => Math.min(i + 1, STEPS.length - 1));
+    setStepIndex((i) => {
+      const next = Math.min(i + 1, STEPS.length - 1);
+      setMaxStep((m) => Math.max(m, next));
+      return next;
+    });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -140,12 +175,24 @@ export function FloridaLLCFormationForm({
         ? (err.data as { issues?: { path?: (string | number)[]; message?: string }[] } | undefined)?.issues
         : undefined) ?? [];
       if (issues.length > 0) {
+        // Send the customer to the screen that owns the first flagged field,
+        // with the messages attached to the fields themselves.
+        const fieldErrors: Record<string, string> = {};
+        for (const issue of issues) {
+          const key = (issue.path ?? []).join(".");
+          if (key && !fieldErrors[key]) fieldErrors[key] = issue.message ?? "Please review this field.";
+        }
+        const firstField = String(issues[0]?.path?.[0] ?? "");
+        const target = stepIndexOf(stepForField(firstField));
+        if (target >= 0) {
+          setStepIndex(target);
+          setMaxStep((m) => Math.max(m, target));
+        }
+        setErrors(fieldErrors);
+        window.scrollTo({ top: 0, behavior: "smooth" });
         toast({
-          title: "The server flagged a problem with your answers.",
-          description: issues
-            .slice(0, 3)
-            .map((i) => `${(i.path ?? []).join(" → ") || "form"}: ${i.message ?? "invalid"}`)
-            .join(" • "),
+          title: "Almost there — one of your answers needs attention.",
+          description: `We've taken you to the "${STEPS[target >= 0 ? target : 0].label}" step and highlighted what to fix.`,
         });
       } else {
         toast({
@@ -257,15 +304,15 @@ export function FloridaLLCFormationForm({
                 <li key={key}>
                   <button
                     type="button"
-                    onClick={() => i <= stepIndex && goToStep(i)}
+                    onClick={() => i <= maxStep && goToStep(i)}
                     className={`w-full flex items-center gap-2 text-left rounded-md px-3 py-2 text-sm transition-colors ${
                       active
                         ? "bg-trust/10 text-foreground font-medium"
-                        : done
+                        : i <= maxStep
                           ? "text-foreground/80 hover:bg-secondary"
                           : "text-muted-foreground cursor-not-allowed"
                     }`}
-                    disabled={i > stepIndex}
+                    disabled={i > maxStep}
                   >
                     <span
                       className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-medium ${
