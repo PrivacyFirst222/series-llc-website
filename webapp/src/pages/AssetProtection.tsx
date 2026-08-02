@@ -45,7 +45,7 @@ export default function AssetProtection() {
           </div>
 
           <p className="text-base text-foreground/80 leading-relaxed">
-            Every asset you own carries the potential to generate a lawsuit. A rental property tenant slips on an icy walkway. A piece of heavy equipment injures a worker. An environmental contamination issue surfaces. These are liabilities that are <em>born inside</em> the entity — they arise from the asset itself.
+            Every asset you own carries the potential to generate a lawsuit. A rental property tenant slips on an icy walkway. A piece of heavy equipment injures a worker. These are liabilities that are <em>born inside</em> the entity — they arise from the asset itself.
           </p>
 
           {/* Example */}

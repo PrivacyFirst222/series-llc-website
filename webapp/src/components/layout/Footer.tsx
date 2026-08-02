@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Mail, MapPin, ShieldCheck, Building2 } from "lucide-react";
+import { Mail, ShieldCheck, Building2 } from "lucide-react";
 import { Logo } from "./Logo";
 
 const groups: { title: string; links: { to: string; label: string }[] }[] = [
@@ -66,18 +66,10 @@ export function Footer() {
           <div className="lg:col-span-3 space-y-4">
             <h4 className="font-display text-sm font-semibold tracking-wide">Contact</h4>
             <ul className="space-y-2.5 text-sm text-muted-foreground">
-              <li className="flex items-start gap-2">
-                <MapPin className="mt-0.5 h-4 w-4 text-primary shrink-0" />
-                <span>
-                  201 E. Las Olas Blvd, Suite 1700
-                  <br />
-                  Fort Lauderdale, FL 33301
-                </span>
-              </li>
               <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-primary" />
-                <a href="mailto:hello@myfloridaseriesllc.com" className="hover:text-foreground">
-                  hello@myfloridaseriesllc.com
+                <a href="mailto:support@myfloridaseriesllc.com" className="hover:text-foreground">
+                  support@myfloridaseriesllc.com
                 </a>
               </li>
             </ul>
