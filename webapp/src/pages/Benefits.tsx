@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { PageHero } from "@/components/sections/PageHero";
 import { CallToAction } from "@/components/sections/CallToAction";
 import { BenefitsGrid } from "@/components/home/BenefitsGrid";
@@ -34,10 +35,19 @@ function renderCell(v: Cell, accent?: boolean) {
   return <span className={accent ? "text-accent font-medium" : "text-foreground/85"}>{v}</span>;
 }
 
-const SAVINGS = [
-  { label: "FL filing fees (10 LLCs)", oldVal: "$1,250", newVal: "$125" },
-  { label: "Annual report fees", oldVal: "$1,388.75/yr", newVal: "$138.75/yr" },
-  { label: "Registered agent fees", oldVal: "$1,200/yr", newVal: "$150/yr" },
+const ONE_TIME: { label: string; oldVal: string; newVal: string; costlier?: boolean }[] = [
+  { label: "State filing fee to form", oldVal: "$1,250", newVal: "$125" },
+  {
+    label: "Certificates of Designation (10 series)",
+    oldVal: "—",
+    newVal: "$250",
+    costlier: true,
+  },
+];
+
+const RECURRING = [
+  { label: "Annual report fees", oldVal: "$1,387.50/yr", newVal: "$138.75/yr" },
+  { label: "Registered agent fees", oldVal: "$1,200/yr", newVal: "$99/yr" },
   { label: "Tax filings", oldVal: "10 returns", newVal: "1 return" },
 ];
 
@@ -63,21 +73,22 @@ export default function Benefits() {
             <div className="lg:col-span-5 space-y-5">
               <span className="eyebrow">The math</span>
               <h2 className="display text-4xl text-balance lg:text-5xl">
-                A 10-property investor saves <em>~$2,400/yr</em>.
+                A 10-property investor saves <em>~$2,350</em> every year.
               </h2>
               <p className="text-base text-muted-foreground leading-relaxed">
-                The real cost of running ten Florida LLCs isn't the formation fee — it's the recurring
-                annual reports, registered agent renewals, and separate tax returns. Folding everything
-                into a Protected Series LLC eliminates almost all of it.
+                The real cost of running ten Florida LLCs isn't the one-time filing fee — it's the
+                recurring annual reports, registered agent renewals, and separate tax returns. Folding
+                everything into a Protected Series LLC eliminates almost all of it. The one-time filing
+                fees are shown separately below, since they are paid once and not every year.
               </p>
               <div className="flex items-center gap-4 pt-3">
                 <div className="rounded-xl bg-trust/10 p-3 text-trust">
                   <TrendingDown className="h-6 w-6" />
                 </div>
                 <div>
-                  <div className="font-display text-3xl">~80%</div>
+                  <div className="font-display text-3xl">~91%</div>
                   <div className="text-xs text-muted-foreground uppercase tracking-[0.16em]">
-                    annual admin cost reduction
+                    recurring admin cost reduction
                   </div>
                 </div>
               </div>
@@ -85,18 +96,39 @@ export default function Benefits() {
 
             <div className="lg:col-span-7">
               <div className="overflow-hidden rounded-2xl border border-border bg-card">
-                <div className="grid grid-cols-3 border-b border-border bg-secondary/60 px-6 py-3 text-xs uppercase tracking-[0.16em] text-muted-foreground">
+                <div className="grid grid-cols-[1.2fr_1fr_1fr] gap-2 border-b border-border bg-secondary/60 px-4 sm:px-6 py-3 text-[0.65rem] sm:text-xs uppercase tracking-[0.16em] text-muted-foreground">
                   <span>Item</span>
                   <span className="text-center">10 separate LLCs</span>
                   <span className="text-right">1 Protected Series LLC</span>
                 </div>
-                {SAVINGS.map((row, i) => (
-                  <div
-                    key={row.label}
-                    className={`grid grid-cols-3 px-6 py-5 text-sm ${
-                      i !== SAVINGS.length - 1 ? "border-b border-border" : ""
-                    }`}
-                  >
+                <div className="border-b border-border bg-secondary/30 px-4 sm:px-6 py-2 text-[0.65rem] sm:text-[0.7rem] uppercase tracking-[0.16em] text-muted-foreground">
+                  Paid once, at formation
+                </div>
+                {ONE_TIME.map((row) => (
+                  <div key={row.label} className="grid grid-cols-[1.2fr_1fr_1fr] gap-2 border-b border-border px-4 sm:px-6 py-4 sm:py-5 text-xs sm:text-sm">
+                    <span className="font-medium">{row.label}</span>
+                    <span
+                      className={`text-center font-mono-feature text-muted-foreground ${
+                        row.oldVal === "—" ? "" : "line-through"
+                      }`}
+                    >
+                      {row.oldVal}
+                    </span>
+                    <span
+                      className={`text-right font-mono-feature font-semibold ${
+                        row.costlier ? "text-foreground/70" : "text-trust"
+                      }`}
+                    >
+                      {row.newVal}
+                    </span>
+                  </div>
+                ))}
+
+                <div className="border-b border-border bg-secondary/30 px-4 sm:px-6 py-2 text-[0.65rem] sm:text-[0.7rem] uppercase tracking-[0.16em] text-muted-foreground">
+                  Paid every year
+                </div>
+                {RECURRING.map((row) => (
+                  <div key={row.label} className="grid grid-cols-[1.2fr_1fr_1fr] gap-2 border-b border-border px-4 sm:px-6 py-4 sm:py-5 text-xs sm:text-sm">
                     <span className="font-medium">{row.label}</span>
                     <span className="text-center font-mono-feature text-muted-foreground line-through">
                       {row.oldVal}
@@ -106,17 +138,31 @@ export default function Benefits() {
                     </span>
                   </div>
                 ))}
-                <div className="grid grid-cols-3 bg-primary px-6 py-5 text-primary-foreground">
-                  <span className="font-display text-lg">Year 1 savings</span>
-                  <span className="text-center text-primary-foreground/60 line-through font-mono-feature">
-                    —
-                  </span>
-                  <span className="text-right font-display text-2xl">≈ $3,600</span>
+
+                <div className="grid grid-cols-[1.2fr_1fr_1fr] gap-2 border-b border-primary/20 bg-primary/90 px-4 sm:px-6 py-4 sm:py-5 text-primary-foreground">
+                  <span className="font-display text-base sm:text-lg">First-year savings</span>
+                  <span className="text-center text-primary-foreground/60 font-mono-feature">—</span>
+                  <span className="text-right font-display text-lg sm:text-2xl whitespace-nowrap">≈ $3,225</span>
+                </div>
+                <div className="grid grid-cols-[1.2fr_1fr_1fr] gap-2 bg-primary px-4 sm:px-6 py-4 sm:py-5 text-primary-foreground">
+                  <span className="font-display text-base sm:text-lg">Every year after</span>
+                  <span className="text-center text-primary-foreground/60 font-mono-feature">—</span>
+                  <span className="text-right font-display text-lg sm:text-2xl whitespace-nowrap">≈ $2,350</span>
                 </div>
               </div>
               <p className="mt-3 text-xs text-muted-foreground">
-                Estimates assume 10 property-owning LLCs in Florida, each with $138.75 annual report fee
-                and a $120/yr commercial registered agent.
+                Estimates assume ten property-owning Florida LLCs, each paying the $125 state filing fee,
+                the $138.75 annual report fee, and a $120/yr commercial registered agent — against one
+                Protected Series LLC holding ten protected series, at $125 to file the Articles, $25 in
+                state filing fees per Certificate of Designation, one $138.75 annual report, and our
+                $99/yr registered agent service. State fees only; our service fee is on the{" "}
+                <Link
+                  to="/pricing"
+                  className="text-foreground underline decoration-accent decoration-2 underline-offset-4 hover:text-accent"
+                >
+                  pricing page
+                </Link>
+                .
               </p>
             </div>
           </div>

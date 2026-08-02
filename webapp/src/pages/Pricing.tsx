@@ -101,6 +101,7 @@ export default function Pricing() {
             {[
               { t: "Extra Certificate of Designation (drafting)", p: "$25 / series + $25 state filing fee" },
               { t: "EIN obtained for the LLC or any series", p: "$50 / EIN" },
+              { t: "Registered agent service after year one", p: "$99 / yr" },
             ].map((a) => (
               <div key={a.t} className="bg-card p-5">
                 <div className="text-sm font-medium">{a.t}</div>
