@@ -5,6 +5,7 @@ interface FeeEstimateProps {
   certificateOfStatus: boolean;
   certifiedCopy: boolean;
   seriesCount?: number;
+  isConversion?: boolean;
   compact?: boolean;
 }
 
@@ -12,12 +13,14 @@ export function FeeEstimate({
   certificateOfStatus,
   certifiedCopy,
   seriesCount = 0,
+  isConversion = false,
   compact,
 }: FeeEstimateProps) {
   const fees = calculateEstimatedFees({
     certificateOfStatus,
     certifiedCopy,
     seriesCount,
+    isConversion,
   });
 
   const extraSeries = Math.max(0, seriesCount - 3);
@@ -37,10 +40,12 @@ export function FeeEstimate({
         </span>
       </div>
       <ul className="mt-3 text-sm space-y-1.5">
-        <li className="flex justify-between">
-          <span className="text-foreground/80">Articles of Organization</span>
-          <span className="font-mono-feature">${fees.articlesOfOrganization}</span>
-        </li>
+        {isConversion ? null : (
+          <li className="flex justify-between">
+            <span className="text-foreground/80">Articles of Organization</span>
+            <span className="font-mono-feature">${fees.articlesOfOrganization}</span>
+          </li>
+        )}
         <li className="flex justify-between">
           <span className="text-foreground/80">Registered Agent Designation</span>
           <span className="font-mono-feature">

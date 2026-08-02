@@ -23,31 +23,13 @@ import { StepOptionalDocs } from "./sections/StepOptionalDocs";
 import { StepSeries } from "./sections/StepSeries";
 import { StepCertification } from "./sections/StepCertification";
 import { StepSubmissionPayload } from "./sections/StepSubmissionPayload";
+import { StepFilingPath } from "./sections/StepFilingPath";
+import { STEPS, stepIndexOf } from "./steps";
 import type { FloridaLLCFormData } from "./types";
 
 const STORAGE_KEY = "fl-llc-formation-draft-v1";
 
 const FORMSPREE_ENDPOINT = "https://formspree.io/f/xjgdeppp";
-
-const STEP_LABELS: string[] = [
-  "Intro",
-  "LLC name",
-  "Principal address",
-  "Mailing address",
-  "Series",
-  "Registered agent",
-  "Agent acceptance",
-  "Management",
-  "Managers / AR",
-  "Members",
-  "Purpose",
-  "Effective date",
-  "Correspondence",
-  "Optional docs",
-  "Review",
-  "Certify & sign",
-  "Submit",
-];
 
 interface FormProps {
   initialData?: FloridaLLCFormData;
@@ -85,7 +67,7 @@ export function FloridaLLCFormationForm({
   // Re-run validation for the current step on data changes (after first attempt)
   useEffect(() => {
     if (Object.keys(errors).length > 0) {
-      setErrors(validateStep(stepIndex, data));
+      setErrors(validateStep(stepKey, data));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
@@ -94,7 +76,7 @@ export function FloridaLLCFormationForm({
     setData((d) => ({ ...d, ...p }));
 
   const goNext = () => {
-    const e = validateStep(stepIndex, data);
+    const e = validateStep(stepKey, data);
     setErrors(e);
     if (Object.keys(e).length > 0) {
       const first = document.querySelector<HTMLElement>("[aria-invalid='true']");
@@ -103,7 +85,7 @@ export function FloridaLLCFormationForm({
       return;
     }
     setErrors({});
-    setStepIndex((i) => Math.min(i + 1, STEP_LABELS.length - 1));
+    setStepIndex((i) => Math.min(i + 1, STEPS.length - 1));
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -121,14 +103,14 @@ export function FloridaLLCFormationForm({
 
   const handleFinalSubmit = async () => {
     // Validate every step before final submission
-    for (let i = 0; i < STEP_LABELS.length - 1; i++) {
-      const e = validateStep(i, data);
+    for (let i = 0; i < STEPS.length - 1; i++) {
+      const e = validateStep(STEPS[i].key, data);
       if (Object.keys(e).length > 0) {
         setStepIndex(i);
         setErrors(e);
         toast({
           title: "Please fix the highlighted fields before submitting.",
-          description: `Step "${STEP_LABELS[i]}" needs attention.`,
+          description: `Step "${STEPS[i].label}" needs attention.`,
         });
         return;
       }
@@ -154,7 +136,7 @@ export function FloridaLLCFormationForm({
         throw new Error(`Form submission failed (${res.status})`);
       }
       setSubmitted(true);
-      setStepIndex(STEP_LABELS.length - 1);
+      setStepIndex(STEPS.length - 1);
       onSubmit?.(data);
       try {
         localStorage.removeItem(STORAGE_KEY);
@@ -194,15 +176,17 @@ export function FloridaLLCFormationForm({
     }
   };
 
+  const stepKey = STEPS[stepIndex].key;
+
   const progressPct = useMemo(
-    () => Math.round(((stepIndex + 1) / STEP_LABELS.length) * 100),
+    () => Math.round(((stepIndex + 1) / STEPS.length) * 100),
     [stepIndex],
   );
 
-  const isLastBeforeReview = stepIndex === STEP_LABELS.length - 3; // 13: review
-  const isReview = stepIndex === STEP_LABELS.length - 3;
-  const isCertify = stepIndex === STEP_LABELS.length - 2;
-  const isSubmit = stepIndex === STEP_LABELS.length - 1;
+  const isReview = stepKey === "review";
+  const isCertify = stepKey === "certify";
+  const isSubmit = stepKey === "submit";
+  const isLastBeforeReview = stepKey === "optional";
 
   return (
     <div className="container-wide pb-12 lg:pb-16">
@@ -216,7 +200,7 @@ export function FloridaLLCFormationForm({
             <div className="mt-2 flex items-baseline gap-2">
               <span className="font-display text-3xl">{progressPct}%</span>
               <span className="text-xs text-muted-foreground">
-                Step {stepIndex + 1} of {STEP_LABELS.length}
+                Step {stepIndex + 1} of {STEPS.length}
               </span>
             </div>
             <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-border">
@@ -228,11 +212,11 @@ export function FloridaLLCFormationForm({
           </div>
 
           <ol className="hidden lg:block rounded-2xl border border-border bg-card p-3 space-y-1">
-            {STEP_LABELS.map((label, i) => {
+            {STEPS.map(({ key, label }, i) => {
               const done = i < stepIndex;
               const active = i === stepIndex;
               return (
-                <li key={label}>
+                <li key={key}>
                   <button
                     type="button"
                     onClick={() => i <= stepIndex && goToStep(i)}
@@ -265,6 +249,7 @@ export function FloridaLLCFormationForm({
 
           {stepIndex >= 4 ? (
             <FeeEstimate
+              isConversion={data.filingPath === "CONVERT"}
               certificateOfStatus={data.orderCertificateOfStatus}
               certifiedCopy={data.orderCertifiedCopy}
               seriesCount={data.series.length}
@@ -276,40 +261,42 @@ export function FloridaLLCFormationForm({
         {/* Form panel */}
         <main>
           <div className="rounded-3xl border border-border bg-card p-6 sm:p-10">
-            {stepIndex === 0 ? (
+            {stepKey === "path" ? (
+              <StepFilingPath data={data} patch={patch} errors={errors} />
+            ) : stepKey === "intro" ? (
               <StepIntro data={data} patch={patch} errors={errors} />
-            ) : stepIndex === 1 ? (
+            ) : stepKey === "name" ? (
               <StepName data={data} patch={patch} errors={errors} />
-            ) : stepIndex === 2 ? (
+            ) : stepKey === "principal" ? (
               <StepPrincipalAddress data={data} patch={patch} errors={errors} />
-            ) : stepIndex === 3 ? (
+            ) : stepKey === "mailing" ? (
               <StepMailingAddress data={data} patch={patch} errors={errors} />
-            ) : stepIndex === 4 ? (
+            ) : stepKey === "series" ? (
               <StepSeries data={data} patch={patch} errors={errors} />
-            ) : stepIndex === 5 ? (
+            ) : stepKey === "agent" ? (
               <StepRegisteredAgent data={data} patch={patch} errors={errors} />
-            ) : stepIndex === 6 ? (
+            ) : stepKey === "acceptance" ? (
               <StepRegisteredAgentAcceptance
                 data={data}
                 patch={patch}
                 errors={errors}
               />
-            ) : stepIndex === 7 ? (
+            ) : stepKey === "management" ? (
               <StepManagement data={data} patch={patch} errors={errors} />
-            ) : stepIndex === 8 ? (
+            ) : stepKey === "managers" ? (
               <StepManagers data={data} patch={patch} errors={errors} />
-            ) : stepIndex === 9 ? (
+            ) : stepKey === "members" ? (
               <StepMembers data={data} patch={patch} errors={errors} />
-            ) : stepIndex === 10 ? (
+            ) : stepKey === "purpose" ? (
               <StepPurpose data={data} patch={patch} errors={errors} />
-            ) : stepIndex === 11 ? (
+            ) : stepKey === "effective" ? (
               <StepEffectiveDate data={data} patch={patch} errors={errors} />
-            ) : stepIndex === 12 ? (
+            ) : stepKey === "correspondence" ? (
               <StepCorrespondence data={data} patch={patch} errors={errors} />
-            ) : stepIndex === 13 ? (
+            ) : stepKey === "optional" ? (
               <StepOptionalDocs data={data} patch={patch} />
             ) : isReview ? (
-              <ReviewStep data={data} goToStep={goToStep} />
+              <ReviewStep data={data} goToStep={(k) => goToStep(stepIndexOf(k))} />
             ) : isCertify ? (
               <StepCertification data={data} patch={patch} errors={errors} />
             ) : isSubmit ? (
@@ -360,9 +347,7 @@ export function FloridaLLCFormationForm({
                         : "bg-primary text-primary-foreground hover:bg-primary/90"
                     }`}
                   >
-                    {stepIndex === STEP_LABELS.length - 4
-                      ? "Continue to review"
-                      : "Continue"}
+                    {isLastBeforeReview ? "Continue to review" : "Continue"}
                     <ArrowRight className="ml-1.5 h-4 w-4" />
                   </Button>
                 )}

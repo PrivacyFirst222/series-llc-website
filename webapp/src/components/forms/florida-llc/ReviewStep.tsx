@@ -9,7 +9,7 @@ import type {
 
 interface ReviewStepProps {
   data: FloridaLLCFormData;
-  goToStep: (i: number) => void;
+  goToStep: (key: StepKey) => void;
 }
 
 const fmtAddr = (a: AddressType | undefined): string => {
@@ -82,7 +82,7 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <ReviewCard title="LLC Name" onEdit={() => goToStep(1)}>
+        <ReviewCard title="LLC Name" onEdit={() => goToStep("name")}>
           <Row
             label="Formation type"
             value={
@@ -95,16 +95,16 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
           <Row label="Alt #2" value={data.alternateName2} />
         </ReviewCard>
 
-        <ReviewCard title="Principal Office Address" onEdit={() => goToStep(2)}>
+        <ReviewCard title="Principal Office Address" onEdit={() => goToStep("principal")}>
           <Row label="Address" value={fmtAddr(data.principalAddress)} />
         </ReviewCard>
 
-        <ReviewCard title="Mailing Address" onEdit={() => goToStep(3)}>
+        <ReviewCard title="Mailing Address" onEdit={() => goToStep("mailing")}>
           <Row label="Same as principal?" value={data.mailingSameAsPrincipal ? "Yes" : "No"} />
           <Row label="Address" value={fmtAddr(mailing)} />
         </ReviewCard>
 
-        <ReviewCard title="Registered Agent" onEdit={() => goToStep(4)}>
+        <ReviewCard title="Registered Agent" onEdit={() => goToStep("agent")}>
           <Row label="Type" value={data.registeredAgentType} />
           <Row
             label="Name"
@@ -129,7 +129,7 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
           <Row label="Phone" value={data.registeredAgentPhone} />
         </ReviewCard>
 
-        <ReviewCard title="Registered Agent Acceptance" onEdit={() => goToStep(5)}>
+        <ReviewCard title="Registered Agent Acceptance" onEdit={() => goToStep("acceptance")}>
           <Row label="Acceptance signer" value={data.registeredAgentAcceptanceName} />
           <Row label="Capacity" value={data.registeredAgentAcceptanceCapacity} />
           <Row
@@ -142,7 +142,7 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
           />
         </ReviewCard>
 
-        <ReviewCard title="Management" onEdit={() => goToStep(6)}>
+        <ReviewCard title="Management" onEdit={() => goToStep("management")}>
           <Row label="Structure" value={data.managementStructure} />
           <Row
             label="Statement in Articles?"
@@ -164,7 +164,7 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
           />
         </ReviewCard>
 
-        <ReviewCard title="Members / Ownership" onEdit={() => goToStep(8)}>
+        <ReviewCard title="Members / Ownership" onEdit={() => goToStep("members")}>
           <Row
             label="In Articles?"
             value={data.includeMembersInArticles ? "Yes" : "No"}
@@ -191,12 +191,12 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
           />
         </ReviewCard>
 
-        <ReviewCard title="Business Purpose" onEdit={() => goToStep(9)}>
+        <ReviewCard title="Business Purpose" onEdit={() => goToStep("purpose")}>
           <Row label="Type" value={data.purposeType} />
           <Row label="Description" value={data.businessPurposeText} />
         </ReviewCard>
 
-        <ReviewCard title="Effective Date" onEdit={() => goToStep(10)}>
+        <ReviewCard title="Effective Date" onEdit={() => goToStep("effective")}>
           <Row
             label="Option"
             value={
@@ -210,7 +210,7 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
           ) : null}
         </ReviewCard>
 
-        <ReviewCard title="Correspondence" onEdit={() => goToStep(11)}>
+        <ReviewCard title="Correspondence" onEdit={() => goToStep("correspondence")}>
           <Row label="Name" value={data.correspondentName} />
           <Row label="Company" value={data.correspondentCompany} />
           <Row label="Email" value={data.correspondentEmail} />
@@ -220,7 +220,7 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
           ) : null}
         </ReviewCard>
 
-        <ReviewCard title="Optional Documents" onEdit={() => goToStep(12)}>
+        <ReviewCard title="Optional Documents" onEdit={() => goToStep("optional")}>
           <Row
             label="Cert of Status"
             value={data.orderCertificateOfStatus ? "Yes (+$5)" : "No"}
@@ -231,7 +231,7 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
           />
         </ReviewCard>
 
-        <ReviewCard title="Protected Series" onEdit={() => goToStep(13)}>
+        <ReviewCard title="Protected Series" onEdit={() => goToStep("series")}>
           <Row
             label="Series count"
             value={`${data.series.length} series`}
@@ -248,6 +248,7 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
       </div>
 
       <FeeEstimate
+              isConversion={data.filingPath === "CONVERT"}
         certificateOfStatus={data.orderCertificateOfStatus}
         certifiedCopy={data.orderCertifiedCopy}
         seriesCount={data.series.length}

@@ -53,6 +53,7 @@ export function StepOptionalDocs({ data, patch }: StepProps) {
       </div>
 
       <FeeEstimate
+              isConversion={data.filingPath === "CONVERT"}
         certificateOfStatus={data.orderCertificateOfStatus}
         certifiedCopy={data.orderCertifiedCopy}
       />

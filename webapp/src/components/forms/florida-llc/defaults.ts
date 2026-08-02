@@ -83,6 +83,9 @@ export const defaultFormData: FloridaLLCFormData = {
   effectiveDateOption: "FILED_BY_DIVISION",
   requestedEffectiveDate: "",
 
+  filingPath: "NEW",
+  existingLlcName: "",
+  sunbizDocumentNumber: "",
   correspondentName: "",
   correspondentCompany: "",
   correspondentEmail: "",

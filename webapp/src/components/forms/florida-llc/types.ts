@@ -1,3 +1,5 @@
+export type FilingPath = "NEW" | "CONVERT";
+
 export type FormationType = "DOMESTIC_LLC" | "PLLC";
 
 export type LlcDesignator =
@@ -75,6 +77,12 @@ export interface SeriesEntry {
 }
 
 export interface FloridaLLCFormData {
+  /** Which service the customer wants. Optional so saved drafts predating
+   *  the conversion option still parse; treated as "NEW" when absent. */
+  filingPath?: FilingPath;
+  /** CONVERT path only: the LLC already on file with the state. */
+  existingLlcName?: string;
+  sunbizDocumentNumber?: string;
   // Section 1
   formationType: FormationType;
   isFloridaDomesticEntityOnly: boolean;

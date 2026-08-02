@@ -25,10 +25,7 @@ const PACKAGES: {
     eyebrow: "New formation",
     heading: "Form a new Protected Series LLC",
     blurb: "You do not have an LLC yet. We file the Articles of Organization and your Protected Series Designations together.",
-    stateFees: [
-      "+ $125 Florida state filing fee (at cost)",
-      "+ $25 state filing fee per Protected Series Designation",
-    ],
+    stateFees: ["+ $125 Florida state filing fee (at cost)"],
     features: ["Articles of Organization filed with FL Div. of Corps", ...SHARED_FEATURES],
   },
   {
@@ -36,10 +33,7 @@ const PACKAGES: {
     eyebrow: "Existing LLC",
     heading: "Convert your existing Florida LLC",
     blurb: "You already have a Florida LLC. There is no $125 Articles fee, because the company is already on file with the state.",
-    stateFees: [
-      "No $125 Articles filing fee — your LLC already exists",
-      "+ $25 state filing fee per Protected Series Designation",
-    ],
+    stateFees: ["No $125 Articles filing fee — your LLC already exists"],
     features: [
       "Protected Series Designations filed for your existing LLC",
       ...SHARED_FEATURES,

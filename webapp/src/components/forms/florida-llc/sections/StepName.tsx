@@ -21,6 +21,7 @@ const PROFESSIONAL: LlcDesignator[] = [
 ];
 
 export function StepName({ data, patch, errors }: StepProps) {
+  const isConversion = data.filingPath === "CONVERT";
   const opts =
     data.formationType === "PLLC"
       ? [...STANDARD, ...PROFESSIONAL]
@@ -35,6 +36,58 @@ export function StepName({ data, patch, errors }: StepProps) {
       data.llcDesignator as LlcDesignator,
       data.formationType,
     );
+
+  if (isConversion) {
+    return (
+      <div className="space-y-6">
+        <header className="space-y-2">
+          <h2 className="font-display text-3xl">Your existing LLC</h2>
+          <p className="text-sm text-muted-foreground max-w-2xl">
+            Tell us which company you want to convert. Enter the name exactly as
+            it appears on Sunbiz, along with its document number, so we file
+            against the right entity.
+          </p>
+        </header>
+
+        <FieldShell
+          label="Existing LLC name"
+          htmlFor="existing-llc-name"
+          required
+          helper="Exactly as it appears with the Florida Division of Corporations, including the designator."
+          error={errors.existingLlcName}
+        >
+          <Input
+            id="existing-llc-name"
+            value={data.existingLlcName ?? ""}
+            onChange={(e) => patch({ existingLlcName: e.target.value })}
+            placeholder="Sunshine Holdings, LLC"
+            aria-invalid={!!errors.existingLlcName}
+          />
+        </FieldShell>
+
+        <FieldShell
+          label="Sunbiz document number"
+          htmlFor="sunbiz-doc-number"
+          required
+          helper="Found on your Sunbiz record — usually letter-and-digit, e.g. L24000123456."
+          error={errors.sunbizDocumentNumber}
+        >
+          <Input
+            id="sunbiz-doc-number"
+            value={data.sunbizDocumentNumber ?? ""}
+            onChange={(e) => patch({ sunbizDocumentNumber: e.target.value })}
+            placeholder="L24000123456"
+            aria-invalid={!!errors.sunbizDocumentNumber}
+          />
+        </FieldShell>
+
+        <div className="rounded-xl border border-border bg-secondary/40 p-4 text-sm text-muted-foreground leading-relaxed">
+          Because the company is already on file, there is no name availability
+          check and no $125 Articles of Organization filing fee.
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

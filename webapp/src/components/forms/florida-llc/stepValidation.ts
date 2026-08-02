@@ -7,16 +7,21 @@ import {
   validateEffectiveDate,
 } from "./validation";
 import type { FloridaLLCFormData, LlcDesignator } from "./types";
+import type { StepKey } from "./steps";
 
 export type StepErrors = Record<string, string>;
 
 export function validateStep(
-  index: number,
+  step: StepKey,
   data: FloridaLLCFormData,
 ): StepErrors {
   const e: StepErrors = {};
 
-  if (index === 0) {
+  if (step === "path") {
+    if (!data.filingPath) e.filingPath = "Choose one to continue.";
+  }
+
+  if (step === "intro") {
     if (!data.isFloridaDomesticEntityOnly)
       e.isFloridaDomesticEntityOnly = "Acknowledgment is required.";
     if (!data.notLegalAdvice) e.notLegalAdvice = "Acknowledgment is required.";
@@ -24,34 +29,41 @@ export function validateStep(
       e.publicRecordNotice = "Acknowledgment is required.";
   }
 
-  if (index === 1) {
-    if (!data.desiredLlcName.trim())
-      e.desiredLlcName = "LLC name is required.";
-    if (!data.llcDesignator) e.llcDesignator = "Choose a designator.";
-    if (
-      data.llcDesignator &&
-      !designatorAllowedForFormationType(
-        data.llcDesignator as LlcDesignator,
-        data.formationType,
-      )
-    ) {
-      e.llcDesignator =
-        "Designator not allowed for the selected formation type.";
+  if (step === "name") {
+    if (data.filingPath === "CONVERT") {
+      if (!data.existingLlcName?.trim())
+        e.existingLlcName = "Enter the LLC's name exactly as it appears with the state.";
+      if (!data.sunbizDocumentNumber?.trim())
+        e.sunbizDocumentNumber = "Sunbiz document number is required.";
+    } else {
+      if (!data.desiredLlcName.trim())
+        e.desiredLlcName = "LLC name is required.";
+      if (!data.llcDesignator) e.llcDesignator = "Choose a designator.";
+      if (
+        data.llcDesignator &&
+        !designatorAllowedForFormationType(
+          data.llcDesignator as LlcDesignator,
+          data.formationType,
+        )
+      ) {
+        e.llcDesignator =
+          "Designator not allowed for the selected formation type.";
+      }
+      const finalName = buildFinalLlcName(data.desiredLlcName, data.llcDesignator);
+      if (finalName && !nameContainsLegalDesignator(finalName)) {
+        e.desiredLlcName =
+          "Florida LLC name must include LLC, L.L.C., or Limited Liability Company.";
+      }
+      if (!data.nameSearchAcknowledgment)
+        e.nameSearchAcknowledgment = "Acknowledgment is required.";
+      if (!data.governmentAffiliationAcknowledgment)
+        e.governmentAffiliationAcknowledgment = "Acknowledgment is required.";
+      if (!data.lawfulPurposeNameAcknowledgment)
+        e.lawfulPurposeNameAcknowledgment = "Acknowledgment is required.";
     }
-    const finalName = buildFinalLlcName(data.desiredLlcName, data.llcDesignator);
-    if (finalName && !nameContainsLegalDesignator(finalName)) {
-      e.desiredLlcName =
-        "Florida LLC name must include LLC, L.L.C., or Limited Liability Company.";
-    }
-    if (!data.nameSearchAcknowledgment)
-      e.nameSearchAcknowledgment = "Acknowledgment is required.";
-    if (!data.governmentAffiliationAcknowledgment)
-      e.governmentAffiliationAcknowledgment = "Acknowledgment is required.";
-    if (!data.lawfulPurposeNameAcknowledgment)
-      e.lawfulPurposeNameAcknowledgment = "Acknowledgment is required.";
   }
 
-  if (index === 2) {
+  if (step === "principal") {
     const a = data.principalAddress;
     if (!a.address1) e["principalAddress.address1"] = "Street address required.";
     if (!a.city) e["principalAddress.city"] = "City required.";
@@ -64,7 +76,7 @@ export function validateStep(
     }
   }
 
-  if (index === 3) {
+  if (step === "mailing") {
     if (!data.mailingSameAsPrincipal) {
       const a = data.mailingAddress;
       if (!a.address1) e["mailingAddress.address1"] = "Street address required.";
@@ -75,7 +87,7 @@ export function validateStep(
     }
   }
 
-  if (index === 4) {
+  if (step === "series") {
     if (data.series.length === 0)
       e.series = "Add at least one series to proceed.";
     data.series.forEach((s, i) => {
@@ -94,7 +106,7 @@ export function validateStep(
     });
   }
 
-  if (index === 5) {
+  if (step === "agent") {
     if (!data.registeredAgentType)
       e.registeredAgentType = "Choose individual or business entity.";
     if (data.registeredAgentType === "INDIVIDUAL" && !data.registeredAgentName)
@@ -124,7 +136,7 @@ export function validateStep(
         "Acknowledgment is required.";
   }
 
-  if (index === 6) {
+  if (step === "acceptance") {
     if (!data.registeredAgentAcceptanceName)
       e.registeredAgentAcceptanceName = "Acceptance signer name required.";
     if (!data.registeredAgentAcceptanceCapacity)
@@ -144,12 +156,12 @@ export function validateStep(
         "Authorization is required.";
   }
 
-  if (index === 7) {
+  if (step === "management") {
     if (!data.managementStructure)
       e.managementStructure = "Choose a management structure.";
   }
 
-  if (index === 8) {
+  if (step === "managers") {
     const needsManager =
       data.managementStructure === "MANAGER_MANAGED" &&
       data.includeManagementStatementInArticles;
@@ -170,7 +182,7 @@ export function validateStep(
     });
   }
 
-  if (index === 9 && data.collectMembersForInternalRecords) {
+  if (step === "members" && data.collectMembersForInternalRecords) {
     if (data.members.length === 0)
       e.members =
         "At least one initial member is required for internal formation records.";
@@ -186,7 +198,7 @@ export function validateStep(
       e.members = "Mark at least one member as an initial member.";
   }
 
-  if (index === 10) {
+  if (step === "purpose") {
     if (!data.purposeType) e.purposeType = "Choose a purpose type.";
     if (data.formationType === "PLLC") {
       if (data.purposeType !== "PROFESSIONAL")
@@ -201,7 +213,7 @@ export function validateStep(
     }
   }
 
-  if (index === 11) {
+  if (step === "effective") {
     if (data.effectiveDateOption === "SPECIFIC") {
       if (!data.requestedEffectiveDate)
         e.requestedEffectiveDate = "Please select a date.";
@@ -212,7 +224,7 @@ export function validateStep(
     }
   }
 
-  if (index === 12) {
+  if (step === "correspondence") {
     if (!data.correspondentName) e.correspondentName = "Name required.";
     if (!data.correspondentEmail) e.correspondentEmail = "Email required.";
     if (!data.confirmCorrespondentEmail)
@@ -225,10 +237,10 @@ export function validateStep(
       e.confirmCorrespondentEmail = "Emails do not match.";
   }
 
-  // index 13 is optional docs — no required validation
+  // "optional" step has no required validation
 
-  // index 14 is review
-  if (index === 15) {
+  // "review" step has no required validation
+  if (step === "certify") {
     if (!data.authorizedRepresentativeName)
       e.authorizedRepresentativeName = "Authorized representative name required.";
     if (!data.authorizedRepresentativeSignature)

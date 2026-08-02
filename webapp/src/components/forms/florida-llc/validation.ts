@@ -142,6 +142,8 @@ export function calculateEstimatedFees(opts: {
   certificateOfStatus: boolean;
   certifiedCopy: boolean;
   seriesCount?: number;
+  /** Converting an existing LLC means no Articles of Organization filing. */
+  isConversion?: boolean;
 }): {
   articlesOfOrganization: number;
   registeredAgentDesignation: number;
@@ -150,7 +152,7 @@ export function calculateEstimatedFees(opts: {
   additionalSeriesFee: number;
   estimatedTotal: number;
 } {
-  const articlesOfOrganization = 100;
+  const articlesOfOrganization = opts.isConversion ? 0 : 100;
   const registeredAgentDesignation = 25;
   const certificateOfStatus = opts.certificateOfStatus ? 5 : 0;
   const certifiedCopy = opts.certifiedCopy ? 30 : 0;

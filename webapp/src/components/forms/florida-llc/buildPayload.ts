@@ -2,7 +2,9 @@ import { buildFinalLlcName, calculateEstimatedFees } from "./validation";
 import type { FloridaLLCFormData, SubmissionPayload } from "./types";
 
 export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
+  const isConversion = data.filingPath === "CONVERT";
   const fees = calculateEstimatedFees({
+    isConversion,
     certificateOfStatus: data.orderCertificateOfStatus,
     certifiedCopy: data.orderCertifiedCopy,
     seriesCount: data.series.length,
@@ -14,6 +16,9 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
   );
 
   return {
+    filingPath: data.filingPath ?? "NEW",
+    existingLlcName: data.existingLlcName ?? "",
+    sunbizDocumentNumber: data.sunbizDocumentNumber ?? "",
     formationType: data.formationType,
     llcName: {
       desiredName: data.desiredLlcName,
