@@ -48,7 +48,7 @@ const BENEFITS: { icon: typeof Shield; title: string; body: string }[] = [
   {
     icon: Sparkles,
     title: "Future-proof for growth",
-    body: "Adding another asset is a single Certificate of Designation (estimated $25 filing fee) — not another $125 LLC formation, new EIN, registered agent, and annual report.",
+    body: "Adding another series is a single Certificate of Designation (estimated $25 filing fee) — not another $125 LLC formation, new EIN, registered agent, and annual report.",
   },
 ];
 

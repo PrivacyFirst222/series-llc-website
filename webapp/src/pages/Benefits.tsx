@@ -13,7 +13,7 @@ const STRUCTURE: { feature: string; series: Cell; many: Cell }[] = [
   { feature: "Annual reports to file", series: "1 report", many: "10 reports" },
   { feature: "Registered agent relationships", series: "1", many: "10" },
   { feature: "Federal EIN", series: "1 EIN structure", many: "10 EINs" },
-  { feature: "Adding another asset", series: "Certificate of Designation", many: "A whole new LLC" },
+  { feature: "Adding another series", series: "Certificate of Designation", many: "A whole new LLC" },
 ];
 
 function renderCell(v: Cell, accent?: boolean) {

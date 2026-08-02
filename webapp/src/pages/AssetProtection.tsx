@@ -72,7 +72,7 @@ export default function AssetProtection() {
                 "One catastrophic judgment cannot cascade across your entire portfolio",
                 "Each series holds its own assets and books — creditors of one series are legally barred from the rest",
                 "Florida §605.2401 places the liability shield in the statute itself — the firewall is embedded in state law, not just contractual language",
-                "Adding a new asset simply means creating a new series, not a new LLC filing",
+                "Each new asset can go into its own series — a Certificate of Designation, not a whole new LLC",
               ].map((item) => (
                 <li key={item} className="flex gap-2.5 text-sm">
                   <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-trust" />
