@@ -10,7 +10,7 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-    "build:api": "esbuild server/vercel-entry.ts --bundle --platform=node --format=esm --external:@electric-sql/pglite --outfile=\"api/[[...route]].mjs\" --log-level=warning --banner:js=\"import { createRequire } from 'node:module'; const require = createRequire(import.meta.url);\""
+    "build:api": "esbuild server/vercel-entry.ts --bundle --platform=node --format=esm --external:@electric-sql/pglite --outfile=api/index.mjs --log-level=warning --banner:js=\"import { createRequire } from 'node:module'; const require = createRequire(import.meta.url);\""
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
