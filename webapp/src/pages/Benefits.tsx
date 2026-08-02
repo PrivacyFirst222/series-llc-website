@@ -46,7 +46,7 @@ const ONE_TIME: { label: string; oldVal: string; newVal: string; costlier?: bool
 ];
 
 const RECURRING: { label: string; note?: string; oldVal: string; newVal: string }[] = [
-  { label: "Registered agent fees", oldVal: "$1,200/yr", newVal: "$99/yr" },
+  { label: "Registered agent fees", oldVal: "$990/yr", newVal: "$99/yr" },
   {
     label: "Annual report fees",
     note: "First one is due the year after you form",
@@ -78,7 +78,7 @@ export default function Benefits() {
             <div className="lg:col-span-5 space-y-5">
               <span className="eyebrow">The math</span>
               <h2 className="display text-4xl text-balance lg:text-5xl">
-                A 10-property investor saves <em>~$2,350</em> every year.
+                A 10-property investor saves <em>~$2,140</em> every year.
               </h2>
               <p className="text-base text-muted-foreground leading-relaxed">
                 The real cost of running ten Florida LLCs isn't the one-time filing fee — it's the
@@ -92,7 +92,7 @@ export default function Benefits() {
                   <TrendingDown className="h-6 w-6" />
                 </div>
                 <div>
-                  <div className="font-display text-3xl">~91%</div>
+                  <div className="font-display text-3xl">~90%</div>
                   <div className="text-xs text-muted-foreground uppercase tracking-[0.16em]">
                     recurring admin cost reduction
                   </div>
@@ -160,20 +160,21 @@ export default function Benefits() {
                     </span>
                   </span>
                   <span className="text-center text-primary-foreground/60 font-mono-feature">—</span>
-                  <span className="text-right font-display text-lg sm:text-2xl whitespace-nowrap">≈ $1,975</span>
+                  <span className="text-right font-display text-lg sm:text-2xl whitespace-nowrap">≈ $1,765</span>
                 </div>
                 <div className="grid grid-cols-[1.2fr_1fr_1fr] gap-2 bg-primary px-4 sm:px-6 py-4 sm:py-5 text-primary-foreground">
                   <span className="font-display text-base sm:text-lg">Every year after</span>
                   <span className="text-center text-primary-foreground/60 font-mono-feature">—</span>
-                  <span className="text-right font-display text-lg sm:text-2xl whitespace-nowrap">≈ $2,350</span>
+                  <span className="text-right font-display text-lg sm:text-2xl whitespace-nowrap">≈ $2,140</span>
                 </div>
               </div>
               <p className="mt-3 text-xs text-muted-foreground">
                 Estimates assume ten property-owning Florida LLCs, each paying the $125 state filing fee,
-                the $138.75 annual report fee, and a $120/yr commercial registered agent — against one
-                Protected Series LLC holding ten protected series, at $125 to file the Articles, $25 in
-                state filing fees per Certificate of Designation, one $138.75 annual report, and our
-                $99/yr registered agent service. Florida does not require an annual report in the year an
+                the $138.75 annual report fee, and $99/yr for a registered agent — against one Protected
+                Series LLC holding ten protected series, at $125 to file the Articles, $25 in state
+                filing fees per Certificate of Designation, one $138.75 annual report, and one $99/yr
+                registered agent. Registered agent pricing is held at $99/yr on both sides, so the
+                comparison turns on the number of entities rather than on what any agent charges. Florida does not require an annual report in the year an
                 entity is formed, so the first-year figure covers filing fees and registered agent only.
                 State fees only; our service fee is on the{" "}
                 <Link
