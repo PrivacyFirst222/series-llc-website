@@ -65,8 +65,15 @@ function loadDraft(initialData?: FloridaLLCFormData): {
           max,
         };
       }
-      // Older drafts stored the answers alone.
-      return { data: { ...defaultFormData, ...(parsed as FloridaLLCFormData) }, step: 0, max: 0 };
+      // Older drafts stored the answers alone — recover the customer's
+      // position by walking forward through steps their answers satisfy.
+      const merged = { ...defaultFormData, ...(parsed as FloridaLLCFormData) };
+      let max = 0;
+      for (let i = 0; i < lastResumable; i++) {
+        if (Object.keys(validateStep(STEPS[i].key, merged)).length > 0) break;
+        max = i + 1;
+      }
+      return { data: merged, step: max, max };
     }
   } catch {
     // ignore
