@@ -5,7 +5,7 @@
 import { defaultFormData } from "../src/components/forms/florida-llc/defaults";
 import type { FloridaLLCFormData } from "../src/components/forms/florida-llc/types";
 
-const BASE = "http://localhost:3000";
+const BASE = process.env.E2E_BASE_URL || "http://localhost:3000";
 let failures = 0;
 
 function check(label: string, ok: boolean, detail?: unknown) {

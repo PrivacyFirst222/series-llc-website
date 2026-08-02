@@ -136,11 +136,26 @@ export function FloridaLLCFormationForm({
         return;
       }
       console.error("Intake submission failed:", err);
-      toast({
-        title: "We couldn't submit your form.",
-        description:
-          "Please check your connection and try again. Your draft is saved on this device.",
-      });
+      const issues = (err instanceof ApiError
+        ? (err.data as { issues?: { path?: (string | number)[]; message?: string }[] } | undefined)?.issues
+        : undefined) ?? [];
+      if (issues.length > 0) {
+        toast({
+          title: "The server flagged a problem with your answers.",
+          description: issues
+            .slice(0, 3)
+            .map((i) => `${(i.path ?? []).join(" → ") || "form"}: ${i.message ?? "invalid"}`)
+            .join(" • "),
+        });
+      } else {
+        toast({
+          title: "We couldn't submit your form.",
+          description:
+            err instanceof ApiError && err.message
+              ? `${err.message} Your draft is saved on this device.`
+              : "Please check your connection and try again. Your draft is saved on this device.",
+        });
+      }
       setSubmitting(false);
     }
   };
