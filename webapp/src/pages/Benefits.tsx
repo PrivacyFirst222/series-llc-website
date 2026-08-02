@@ -46,7 +46,12 @@ const ONE_TIME: { label: string; oldVal: string; newVal: string; costlier?: bool
 ];
 
 const RECURRING: { label: string; note?: string; oldVal: string; newVal: string }[] = [
-  { label: "Registered agent fees", oldVal: "$990/yr", newVal: "$99/yr" },
+  {
+    label: "Registered agent fees",
+    note: "Your first year is included in the service fee",
+    oldVal: "$990/yr",
+    newVal: "$99/yr",
+  },
   {
     label: "Annual report fees",
     note: "First one is due the year after you form",
@@ -160,7 +165,7 @@ export default function Benefits() {
                     </span>
                   </span>
                   <span className="text-center text-primary-foreground/60 font-mono-feature">—</span>
-                  <span className="text-right font-display text-lg sm:text-2xl whitespace-nowrap">≈ $1,840</span>
+                  <span className="text-right font-display text-lg sm:text-2xl whitespace-nowrap">≈ $1,940</span>
                 </div>
                 <div className="grid grid-cols-[1.2fr_1fr_1fr] gap-2 bg-primary px-4 sm:px-6 py-4 sm:py-5 text-primary-foreground">
                   <span className="font-display text-base sm:text-lg">Every year after</span>
@@ -173,7 +178,8 @@ export default function Benefits() {
                 the $138.75 annual report fee, and $99/yr for a registered agent — against one Protected
                 Series LLC holding ten protected series, at $125 to file the Articles, $25 in state
                 filing fees for each designation past the three the service fee covers, one $138.75
-                annual report, and one $99/yr registered agent. Registered agent pricing is held at $99/yr on both sides, so the
+                annual report, and one $99/yr registered agent whose first year is included in the
+                service fee. Registered agent pricing is held at $99/yr on both sides, so the
                 comparison turns on the number of entities rather than on what any agent charges. Florida does not require an annual report in the year an
                 entity is formed, so the first-year figure covers filing fees and registered agent only.
                 State fees only; our service fee is on the{" "}

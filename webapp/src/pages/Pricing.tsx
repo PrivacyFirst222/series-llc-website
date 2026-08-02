@@ -9,6 +9,7 @@ const SHARED_FEATURES: string[] = [
   "Ledger forms for each series",
   "Complete Series LLC maintenance guide",
   "Up to 3 Protected Series Designations, including their state filing fees",
+  "Florida registered agent service — first year included ($99/yr after)",
   "Free iOS app (available end of year) — track LLC records, income & expenses, asset acquisitions and sales",
 ];
 
@@ -130,7 +131,7 @@ export default function Pricing() {
             {[
               { t: "Extra Protected Series Designation (drafting)", p: "$25 / series + $25 state filing fee" },
               { t: "EIN obtained for the LLC or any series", p: "$50 / EIN" },
-              { t: "Florida registered agent service", p: "$99 / yr" },
+              { t: "Florida registered agent service (after year one)", p: "$99 / yr" },
             ].map((a) => (
               <div key={a.t} className="bg-card p-5">
                 <div className="text-sm font-medium">{a.t}</div>
