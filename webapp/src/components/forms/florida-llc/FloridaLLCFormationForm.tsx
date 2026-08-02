@@ -305,7 +305,9 @@ export function FloridaLLCFormationForm({
 
           <ol className="hidden lg:block rounded-2xl border border-border bg-card p-3 space-y-1">
             {STEPS.map(({ key, label }, i) => {
-              const done = i < stepIndex;
+              // Completed status is permanent: it reflects the furthest point
+              // reached, not wherever the customer is currently standing.
+              const done = i < maxStep;
               const active = i === stepIndex;
               return (
                 <li key={key}>
