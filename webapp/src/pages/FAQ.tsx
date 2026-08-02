@@ -48,6 +48,19 @@ const FAQ_ITEMS: { q: string; a: string; link?: { to: string; label: string } }[
   },
 ];
 
+const FURTHER_READING: { title: string; cite: string; href: string }[] = [
+  {
+    title: "Florida's New Protected Series LLC Law: Part I",
+    cite: "Conti & Teblum, The Florida Bar Journal, Vol. 100, No. 3",
+    href: "https://www.floridabar.org/the-florida-bar-journal/floridas-new-protected-series-llc-law-part-i/",
+  },
+  {
+    title: "Florida's New Protected Series LLC Legislation: Part II",
+    cite: "Conti & Teblum, The Florida Bar Journal, Vol. 100, No. 4",
+    href: "https://www.floridabar.org/the-florida-bar-journal/floridas-new-protected-series-llc-legislation-part-ii/",
+  },
+];
+
 export default function FAQ() {
   return (
     <>
@@ -124,6 +137,25 @@ export default function FAQ() {
                     FL Division of Corporations (Sunbiz) →
                   </a>
                 </li>
+              </ul>
+
+              <span className="mt-6 block font-mono-feature text-xs uppercase tracking-[0.18em] text-trust">
+                Further reading
+              </span>
+              <ul className="mt-3 space-y-3 text-sm">
+                {FURTHER_READING.map((a) => (
+                  <li key={a.href}>
+                    <a
+                      href={a.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="hover:text-accent"
+                    >
+                      {a.title} →
+                    </a>
+                    <span className="mt-0.5 block text-xs text-muted-foreground">{a.cite}</span>
+                  </li>
+                ))}
               </ul>
             </div>
           </aside>
