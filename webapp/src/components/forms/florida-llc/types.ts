@@ -106,6 +106,8 @@ export interface FloridaLLCFormData {
   mailingAddress: AddressFields;
 
   // Section 5
+  /** SERVICE = our registered agent service; SELF = the customer is the agent. */
+  registeredAgentChoice?: "SERVICE" | "SELF";
   registeredAgentType: RegisteredAgentType | "";
   registeredAgentName?: string;
   registeredAgentBusinessEntityName?: string;
@@ -186,6 +188,7 @@ export interface SubmissionPayload {
   principalOfficeAddress: AddressFields;
   mailingAddress: AddressFields;
   registeredAgent: {
+    choice: string;
     type: string;
     name: string;
     businessEntityName: string;

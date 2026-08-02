@@ -108,46 +108,32 @@ export function validateStep(
   }
 
   if (step === "agent") {
-    if (!data.registeredAgentType)
-      e.registeredAgentType = "Choose individual or business entity.";
-    if (data.registeredAgentType === "INDIVIDUAL" && !data.registeredAgentName)
-      e.registeredAgentName = "Registered agent name required.";
-    if (
-      data.registeredAgentType === "ENTITY" &&
-      !data.registeredAgentBusinessEntityName
-    )
-      e.registeredAgentBusinessEntityName = "Business entity name required.";
-    if (!data.registeredAgentStreetAddress1)
-      e.registeredAgentStreetAddress1 = "Street address required.";
-    if (!data.registeredAgentCity) e.registeredAgentCity = "City required.";
-    if (data.registeredAgentState !== "FL")
-      e.registeredAgentState =
-        "Registered agent address must be a physical Florida street address.";
-    if (!data.registeredAgentZip) e.registeredAgentZip = "ZIP required.";
-    if (
-      isPoBox(data.registeredAgentStreetAddress1) ||
-      isPoBox(data.registeredAgentStreetAddress2 ?? "")
-    )
-      e.registeredAgentStreetAddress1 =
-        "A P.O. Box cannot be used for the registered agent address.";
-    if (!data.registeredAgentNotSameAsLlc)
-      e.registeredAgentNotSameAsLlc = "Acknowledgment is required.";
-    if (!data.registeredAgentPhysicalAddressAcknowledgment)
-      e.registeredAgentPhysicalAddressAcknowledgment =
-        "Acknowledgment is required.";
+    if (!data.registeredAgentChoice)
+      e.registeredAgentChoice = "Choose who will serve as registered agent.";
+    if (data.registeredAgentChoice === "SELF") {
+      if (!data.registeredAgentName)
+        e.registeredAgentName = "Your full legal name is required.";
+      if (!data.registeredAgentStreetAddress1)
+        e.registeredAgentStreetAddress1 = "Street address required.";
+      if (!data.registeredAgentCity) e.registeredAgentCity = "City required.";
+      if (!data.registeredAgentZip) e.registeredAgentZip = "ZIP required.";
+      if (
+        isPoBox(data.registeredAgentStreetAddress1) ||
+        isPoBox(data.registeredAgentStreetAddress2 ?? "")
+      )
+        e.registeredAgentStreetAddress1 =
+          "A P.O. Box cannot be used for the registered agent address.";
+      if (!data.registeredAgentNotSameAsLlc)
+        e.registeredAgentNotSameAsLlc = "Acknowledgment is required.";
+      if (!data.registeredAgentPhysicalAddressAcknowledgment)
+        e.registeredAgentPhysicalAddressAcknowledgment =
+          "Acknowledgment is required.";
+    }
   }
 
-  if (step === "acceptance") {
+  if (step === "acceptance" && data.registeredAgentChoice !== "SERVICE") {
     if (!data.registeredAgentAcceptanceName)
-      e.registeredAgentAcceptanceName = "Acceptance signer name required.";
-    if (!data.registeredAgentAcceptanceCapacity)
-      e.registeredAgentAcceptanceCapacity = "Capacity required.";
-    if (
-      data.registeredAgentType === "ENTITY" &&
-      data.registeredAgentAcceptanceCapacity === "INDIVIDUAL_AGENT"
-    )
-      e.registeredAgentAcceptanceCapacity =
-        "Signer must be a Principal of the registered agent entity.";
+      e.registeredAgentAcceptanceName = "Your name is required.";
     if (!data.registeredAgentElectronicSignature)
       e.registeredAgentElectronicSignature = "Electronic signature required.";
     if (!data.registeredAgentAcceptanceCheckbox)

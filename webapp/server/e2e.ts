@@ -36,19 +36,19 @@ const formData: FloridaLLCFormData = {
   },
   // mailingSameAsPrincipal stays true (the default) with mailingAddress left
   // blank — regression coverage: the server must fill it from principal.
+  registeredAgentChoice: "SELF",
   registeredAgentType: "INDIVIDUAL",
-  registeredAgentName: "Pat Agent",
-  registeredAgentStreetAddress1: "200 Palm Ave",
-  registeredAgentCity: "Tampa",
+  registeredAgentName: "Casey Member",
+  registeredAgentStreetAddress1: "100 Ocean Drive",
+  registeredAgentCity: "Miami",
   registeredAgentState: "FL",
-  registeredAgentZip: "33601",
-  registeredAgentEmail: "agent@example.com",
+  registeredAgentZip: "33139",
   registeredAgentNotSameAsLlc: true,
   registeredAgentPhysicalAddressAcknowledgment: true,
   registeredAgentAcceptanceCheckbox: true,
-  registeredAgentAcceptanceName: "Pat Agent",
+  registeredAgentAcceptanceName: "Casey Member",
   registeredAgentAcceptanceCapacity: "INDIVIDUAL_AGENT",
-  registeredAgentElectronicSignature: "Pat Agent",
+  registeredAgentElectronicSignature: "Casey Member",
   registeredAgentSignatureAuthorizationCheckbox: true,
   managementStructure: "MEMBER_MANAGED",
   members: [
@@ -94,6 +94,25 @@ async function api(path: string, init?: RequestInit & { cookies?: string }) {
 // 1. Reject garbage
 const bad = await api("/api/orders", { method: "POST", body: JSON.stringify({ nope: true }) });
 check("rejects invalid order payload (400)", bad.status === 400);
+
+// 1b. A tampered "service RA" order cannot alter our agent details — the
+//     server re-applies the canonical values (verified via schema acceptance:
+//     bogus agent fields with choice=SERVICE must still validate cleanly).
+const svc = await api("/api/orders", {
+  method: "POST",
+  body: JSON.stringify({
+    ...formData,
+    registeredAgentChoice: "SERVICE",
+    registeredAgentBusinessEntityName: "EVIL AGENT CO",
+    registeredAgentStreetAddress1: "1 Hacker Way",
+    registeredAgentCity: "Reno",
+    registeredAgentState: "NV",
+    registeredAgentZip: "89501",
+    correspondentEmail: testEmail.replace("@", "+svc@"),
+    confirmCorrespondentEmail: testEmail.replace("@", "+svc@"),
+  }),
+});
+check("service-RA order accepted with canonical details enforced", svc.status === 200, svc.body);
 
 // 2. Place a valid order
 const order = await api("/api/orders", { method: "POST", body: JSON.stringify(formData) });

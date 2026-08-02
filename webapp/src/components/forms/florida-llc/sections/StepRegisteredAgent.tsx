@@ -1,8 +1,9 @@
+import { ShieldCheck, UserRound } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { AcknowledgeBox, FieldShell } from "../FieldShell";
-import { US_STATES } from "../AddressFields";
 import { isPoBox } from "../schema";
-import type { FloridaLLCFormData, RegisteredAgentType } from "../types";
+import { RA_SERVICE, raServicePatch, raSelfPatch } from "../raService";
+import type { FloridaLLCFormData } from "../types";
 
 interface StepProps {
   data: FloridaLLCFormData;
@@ -11,11 +12,7 @@ interface StepProps {
 }
 
 export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
-  const isIndividual = data.registeredAgentType === "INDIVIDUAL";
-  const stateError =
-    data.registeredAgentState && data.registeredAgentState !== "FL"
-      ? "Registered agent address must be a physical Florida street address."
-      : errors.registeredAgentState;
+  const choice = data.registeredAgentChoice;
   const poBoxError =
     isPoBox(data.registeredAgentStreetAddress1) ||
     isPoBox(data.registeredAgentStreetAddress2 ?? "")
@@ -27,190 +24,169 @@ export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
       <header className="space-y-2">
         <h2 className="font-display text-3xl">Registered agent</h2>
         <p className="text-sm text-muted-foreground max-w-2xl">
-          The registered agent receives legal notices on behalf of the LLC. The
-          registered agent must have a physical Florida street address. The LLC
-          itself cannot serve as its own registered agent.
+          The registered agent receives legal notices on behalf of the LLC and
+          must have a physical Florida street address. Florida requires the
+          agent's signed acceptance, so the agent must be our service or you.
         </p>
       </header>
 
-      <FieldShell label="Registered agent type" required>
+      <FieldShell label="Who will serve as registered agent?" required error={errors.registeredAgentChoice}>
         <div className="grid sm:grid-cols-2 gap-3">
-          {([
-            { v: "INDIVIDUAL", t: "Individual", s: "A person who lives or works in Florida." },
-            { v: "ENTITY", t: "Business entity", s: "A FL-registered company offering registered agent services." },
-          ] as { v: RegisteredAgentType; t: string; s: string }[]).map((o) => (
-            <label
-              key={o.v}
-              className={`cursor-pointer rounded-xl border p-4 transition-colors ${
-                data.registeredAgentType === o.v
-                  ? "border-accent bg-accent/5 ring-1 ring-accent"
-                  : "border-border hover:border-foreground/30"
-              }`}
-            >
-              <input
-                type="radio"
-                name="agent-type"
-                className="sr-only"
-                checked={data.registeredAgentType === o.v}
-                onChange={() => patch({ registeredAgentType: o.v })}
-              />
-              <div className="font-medium">{o.t}</div>
-              <div className="text-xs text-muted-foreground mt-1">{o.s}</div>
-            </label>
-          ))}
+          <label
+            className={`cursor-pointer rounded-xl border p-4 transition-colors ${
+              choice === "SERVICE"
+                ? "border-accent bg-accent/5 ring-1 ring-accent"
+                : "border-border hover:border-foreground/30"
+            }`}
+          >
+            <input
+              type="radio"
+              name="ra-choice"
+              className="sr-only"
+              checked={choice === "SERVICE"}
+              onChange={() => patch(raServicePatch())}
+            />
+            <div className="flex items-center gap-2 font-medium">
+              <ShieldCheck className="h-4 w-4 text-trust" />
+              Use our registered agent service
+            </div>
+            <div className="text-xs text-muted-foreground mt-1">
+              First year included in your service fee ($99/yr after). We accept
+              the appointment and handle legal mail for you.
+            </div>
+          </label>
+          <label
+            className={`cursor-pointer rounded-xl border p-4 transition-colors ${
+              choice === "SELF"
+                ? "border-accent bg-accent/5 ring-1 ring-accent"
+                : "border-border hover:border-foreground/30"
+            }`}
+          >
+            <input
+              type="radio"
+              name="ra-choice"
+              className="sr-only"
+              checked={choice === "SELF"}
+              onChange={() => patch(raSelfPatch())}
+            />
+            <div className="flex items-center gap-2 font-medium">
+              <UserRound className="h-4 w-4 text-trust" />
+              I'll serve as my own registered agent
+            </div>
+            <div className="text-xs text-muted-foreground mt-1">
+              You must have a physical Florida street address and you'll sign
+              the acceptance on the next screen.
+            </div>
+          </label>
         </div>
       </FieldShell>
 
-      {isIndividual ? (
-        <FieldShell
-          label="Registered agent name"
-          required
-          error={errors.registeredAgentName}
-        >
-          <Input
-            value={data.registeredAgentName ?? ""}
-            onChange={(e) => patch({ registeredAgentName: e.target.value })}
-          />
-        </FieldShell>
-      ) : data.registeredAgentType === "ENTITY" ? (
-        <FieldShell
-          label="Registered agent business entity name"
-          required
-          error={errors.registeredAgentBusinessEntityName}
-        >
-          <Input
-            value={data.registeredAgentBusinessEntityName ?? ""}
-            onChange={(e) =>
-              patch({ registeredAgentBusinessEntityName: e.target.value })
-            }
-          />
-        </FieldShell>
+      {choice === "SERVICE" ? (
+        <div className="rounded-xl border border-trust/30 bg-trust/5 p-5 space-y-1.5">
+          <div className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
+            Your registered agent will be
+          </div>
+          <div className="font-medium">{RA_SERVICE.name}</div>
+          <div className="text-sm text-muted-foreground">
+            {RA_SERVICE.address1}, {RA_SERVICE.address2}
+            <br />
+            {RA_SERVICE.city}, {RA_SERVICE.state} {RA_SERVICE.zip}
+          </div>
+          <p className="pt-2 text-xs text-muted-foreground">
+            Nothing to sign here — we execute the registered agent acceptance
+            when we prepare your filing, and anything we receive for your LLC
+            is posted to your client portal.
+          </p>
+        </div>
       ) : null}
 
-      <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
-        <FieldShell
-          label="Florida street address"
-          required
-          className="md:col-span-6"
-          error={poBoxError ?? errors.registeredAgentStreetAddress1}
-        >
-          <Input
-            value={data.registeredAgentStreetAddress1}
-            onChange={(e) =>
-              patch({ registeredAgentStreetAddress1: e.target.value })
-            }
-          />
-        </FieldShell>
-
-        <FieldShell
-          label="Suite / Unit (optional)"
-          className="md:col-span-6"
-        >
-          <Input
-            value={data.registeredAgentStreetAddress2 ?? ""}
-            onChange={(e) =>
-              patch({ registeredAgentStreetAddress2: e.target.value })
-            }
-          />
-        </FieldShell>
-
-        <FieldShell
-          label="City"
-          required
-          className="md:col-span-3"
-          error={errors.registeredAgentCity}
-        >
-          <Input
-            value={data.registeredAgentCity}
-            onChange={(e) => patch({ registeredAgentCity: e.target.value })}
-          />
-        </FieldShell>
-
-        <FieldShell
-          label="State"
-          required
-          className="md:col-span-2"
-          error={stateError}
-        >
-          <select
-            value={data.registeredAgentState}
-            onChange={(e) =>
-              patch({ registeredAgentState: e.target.value })
-            }
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+      {choice === "SELF" ? (
+        <>
+          <FieldShell
+            label="Your full legal name"
+            required
+            error={errors.registeredAgentName}
           >
-            <option value="">Select…</option>
-            {US_STATES.map((s) => (
-              <option key={s.code} value={s.code}>
-                {s.code} — {s.name}
-              </option>
-            ))}
-          </select>
-        </FieldShell>
+            <Input
+              value={data.registeredAgentName ?? ""}
+              onChange={(e) => patch({ registeredAgentName: e.target.value })}
+            />
+          </FieldShell>
 
-        <FieldShell
-          label="ZIP"
-          required
-          className="md:col-span-1"
-          error={errors.registeredAgentZip}
-        >
-          <Input
-            value={data.registeredAgentZip}
-            onChange={(e) => patch({ registeredAgentZip: e.target.value })}
-            inputMode="numeric"
-          />
-        </FieldShell>
-      </div>
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+            <FieldShell
+              label="Florida street address"
+              required
+              className="md:col-span-6"
+              error={poBoxError ?? errors.registeredAgentStreetAddress1}
+            >
+              <Input
+                value={data.registeredAgentStreetAddress1}
+                onChange={(e) =>
+                  patch({ registeredAgentStreetAddress1: e.target.value })
+                }
+              />
+            </FieldShell>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FieldShell label="Email (optional)">
-          <Input
-            type="email"
-            value={data.registeredAgentEmail ?? ""}
-            onChange={(e) => patch({ registeredAgentEmail: e.target.value })}
-          />
-        </FieldShell>
-        <FieldShell label="Phone (optional)">
-          <Input
-            value={data.registeredAgentPhone ?? ""}
-            onChange={(e) => patch({ registeredAgentPhone: e.target.value })}
-          />
-        </FieldShell>
-      </div>
+            <FieldShell label="Suite / Unit (optional)" className="md:col-span-6">
+              <Input
+                value={data.registeredAgentStreetAddress2 ?? ""}
+                onChange={(e) =>
+                  patch({ registeredAgentStreetAddress2: e.target.value })
+                }
+              />
+            </FieldShell>
 
-      <FieldShell label="Affiliated with the LLC?">
-        <label className="flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={data.registeredAgentIsAffiliatedPerson}
-            onChange={(e) =>
-              patch({ registeredAgentIsAffiliatedPerson: e.target.checked })
-            }
-            className="h-4 w-4 accent-trust"
-          />
-          The registered agent is a member, manager, or other affiliated party
-          (for internal records).
-        </label>
-      </FieldShell>
+            <FieldShell
+              label="City"
+              required
+              className="md:col-span-3"
+              error={errors.registeredAgentCity}
+            >
+              <Input
+                value={data.registeredAgentCity}
+                onChange={(e) => patch({ registeredAgentCity: e.target.value })}
+              />
+            </FieldShell>
 
-      <div className="space-y-3">
-        <AcknowledgeBox
-          id="ra-not-llc"
-          checked={data.registeredAgentNotSameAsLlc}
-          onChange={(v) => patch({ registeredAgentNotSameAsLlc: v })}
-          label="I understand that the LLC itself cannot serve as its own registered agent."
-          error={errors.registeredAgentNotSameAsLlc}
-        />
-        <AcknowledgeBox
-          id="ra-physical"
-          checked={data.registeredAgentPhysicalAddressAcknowledgment}
-          onChange={(v) =>
-            patch({ registeredAgentPhysicalAddressAcknowledgment: v })
-          }
-          label="I confirm the registered agent has a physical street address in Florida and that this is not a P.O. Box."
-          error={errors.registeredAgentPhysicalAddressAcknowledgment}
-        />
-      </div>
+            <FieldShell label="State" required className="md:col-span-2">
+              <Input value="FL — Florida" disabled />
+            </FieldShell>
+
+            <FieldShell
+              label="ZIP"
+              required
+              className="md:col-span-1"
+              error={errors.registeredAgentZip}
+            >
+              <Input
+                value={data.registeredAgentZip}
+                onChange={(e) => patch({ registeredAgentZip: e.target.value })}
+                inputMode="numeric"
+              />
+            </FieldShell>
+          </div>
+
+          <div className="space-y-3">
+            <AcknowledgeBox
+              id="ra-not-llc"
+              checked={data.registeredAgentNotSameAsLlc}
+              onChange={(v) => patch({ registeredAgentNotSameAsLlc: v })}
+              label="I understand that the LLC itself cannot serve as its own registered agent — I am accepting this role personally."
+              error={errors.registeredAgentNotSameAsLlc}
+            />
+            <AcknowledgeBox
+              id="ra-physical"
+              checked={data.registeredAgentPhysicalAddressAcknowledgment}
+              onChange={(v) =>
+                patch({ registeredAgentPhysicalAddressAcknowledgment: v })
+              }
+              label="I confirm this is my physical street address in Florida and not a P.O. Box."
+              error={errors.registeredAgentPhysicalAddressAcknowledgment}
+            />
+          </div>
+        </>
+      ) : null}
     </div>
   );
 }

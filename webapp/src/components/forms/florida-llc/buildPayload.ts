@@ -33,6 +33,7 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
       ? data.principalAddress
       : data.mailingAddress,
     registeredAgent: {
+      choice: data.registeredAgentChoice ?? "",
       type: data.registeredAgentType || "",
       name: data.registeredAgentName ?? "",
       businessEntityName: data.registeredAgentBusinessEntityName ?? "",

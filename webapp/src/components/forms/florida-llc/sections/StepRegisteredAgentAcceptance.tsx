@@ -1,10 +1,9 @@
-import { AlertTriangle } from "lucide-react";
+import { useEffect } from "react";
+import { AlertTriangle, ShieldCheck } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { AcknowledgeBox, FieldShell } from "../FieldShell";
-import type {
-  FloridaLLCFormData,
-  RegisteredAgentCapacity,
-} from "../types";
+import { RA_SERVICE } from "../raService";
+import type { FloridaLLCFormData } from "../types";
 
 interface StepProps {
   data: FloridaLLCFormData;
@@ -17,30 +16,61 @@ export function StepRegisteredAgentAcceptance({
   patch,
   errors,
 }: StepProps) {
-  const isEntity = data.registeredAgentType === "ENTITY";
+  const isService = data.registeredAgentChoice === "SERVICE";
+
+  // Self-agents sign as themselves — carry the name over so they don't
+  // retype it, and pin the capacity.
+  useEffect(() => {
+    if (!isService && data.registeredAgentName && !data.registeredAgentAcceptanceName) {
+      patch({
+        registeredAgentAcceptanceName: data.registeredAgentName,
+        registeredAgentAcceptanceCapacity: "INDIVIDUAL_AGENT",
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (isService) {
+    return (
+      <div className="space-y-6">
+        <header className="space-y-2">
+          <h2 className="font-display text-3xl">Registered agent acceptance</h2>
+        </header>
+        <div className="rounded-xl border border-trust/30 bg-trust/5 p-5 flex gap-3">
+          <ShieldCheck className="h-5 w-5 shrink-0 text-trust mt-0.5" />
+          <div className="space-y-1.5">
+            <p className="text-sm font-medium">Handled by us — nothing to sign.</p>
+            <p className="text-sm text-muted-foreground">
+              {RA_SERVICE.name} accepts the appointment as your registered
+              agent, and we execute the signed acceptance when we prepare your
+              filing with the Florida Division of Corporations.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <header className="space-y-2">
         <h2 className="font-display text-3xl">Registered agent acceptance</h2>
         <p className="text-sm text-muted-foreground max-w-2xl">
-          Florida requires the registered agent to accept the appointment. If
-          the agent is a business entity, an authorized individual principal
-          must sign on its behalf.
+          Florida requires the registered agent to accept the appointment.
+          Because you're serving as your own agent, you sign as yourself.
         </p>
       </header>
 
       <div className="rounded-xl border border-amber-300/60 bg-amber-50 p-4 flex gap-3 text-amber-900">
         <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
         <p className="text-sm">
-          Typing someone's name without permission may have legal
-          consequences. Only sign if you are the registered agent or you are
-          authorized to sign on their behalf.
+          Your typed name below is your electronic signature accepting the
+          registered agent role and its obligations.
         </p>
       </div>
 
       <FieldShell
-        label="Acceptance signer name"
+        label="Your name (as registered agent)"
         required
         error={errors.registeredAgentAcceptanceName}
       >
@@ -50,32 +80,6 @@ export function StepRegisteredAgentAcceptance({
             patch({ registeredAgentAcceptanceName: e.target.value })
           }
         />
-      </FieldShell>
-
-      <FieldShell label="Capacity" required>
-        <select
-          value={data.registeredAgentAcceptanceCapacity}
-          onChange={(e) =>
-            patch({
-              registeredAgentAcceptanceCapacity: e.target
-                .value as RegisteredAgentCapacity,
-            })
-          }
-          className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-        >
-          <option value="">Select…</option>
-          <option value="INDIVIDUAL_AGENT">Individual Registered Agent</option>
-          <option value="PRINCIPAL_OF_ENTITY">
-            Principal of Registered Agent Entity
-          </option>
-        </select>
-        {isEntity &&
-        data.registeredAgentAcceptanceCapacity === "INDIVIDUAL_AGENT" ? (
-          <p className="mt-1 text-xs text-destructive">
-            Because the registered agent is a business entity, the signer must
-            be a Principal of the entity.
-          </p>
-        ) : null}
       </FieldShell>
 
       <FieldShell
@@ -97,10 +101,8 @@ export function StepRegisteredAgentAcceptance({
         <AcknowledgeBox
           id="ra-accept"
           checked={data.registeredAgentAcceptanceCheckbox}
-          onChange={(v) =>
-            patch({ registeredAgentAcceptanceCheckbox: v })
-          }
-          label="The registered agent accepts the appointment and acknowledges the obligations of serving as registered agent for this Florida LLC."
+          onChange={(v) => patch({ registeredAgentAcceptanceCheckbox: v })}
+          label="I accept the appointment and acknowledge the obligations of serving as registered agent for this Florida LLC."
           error={errors.registeredAgentAcceptanceCheckbox}
         />
         <AcknowledgeBox
@@ -109,7 +111,7 @@ export function StepRegisteredAgentAcceptance({
           onChange={(v) =>
             patch({ registeredAgentSignatureAuthorizationCheckbox: v })
           }
-          label="I certify that I am authorized to type this electronic signature."
+          label="I certify that I am signing for myself as the registered agent."
           error={errors.registeredAgentSignatureAuthorizationCheckbox}
         />
       </div>

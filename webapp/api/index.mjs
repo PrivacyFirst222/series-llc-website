@@ -56747,8 +56747,45 @@ function hasProtectedSeriesPhrase(name) {
   return /protected\s+series/i.test(name) || /(^|\s)p\.?s\.?(\s|$)/i.test(name);
 }
 
+// src/components/forms/florida-llc/raService.ts
+var RA_SERVICE = {
+  name: "FLORIDA PROTECTED SERIES, LLC, PS 1",
+  address1: "301 N. Fern Creek Avenue",
+  address2: "Suite C",
+  city: "Orlando",
+  state: "FL",
+  zip: "32803",
+  email: "support@myfloridaseriesllc.com"
+};
+function raServicePatch() {
+  return {
+    registeredAgentChoice: "SERVICE",
+    registeredAgentType: "ENTITY",
+    registeredAgentName: "",
+    registeredAgentBusinessEntityName: RA_SERVICE.name,
+    registeredAgentStreetAddress1: RA_SERVICE.address1,
+    registeredAgentStreetAddress2: RA_SERVICE.address2,
+    registeredAgentCity: RA_SERVICE.city,
+    registeredAgentState: RA_SERVICE.state,
+    registeredAgentZip: RA_SERVICE.zip,
+    registeredAgentEmail: RA_SERVICE.email,
+    registeredAgentPhone: "",
+    registeredAgentIsAffiliatedPerson: false,
+    registeredAgentNotSameAsLlc: true,
+    registeredAgentPhysicalAddressAcknowledgment: true,
+    registeredAgentAcceptanceName: RA_SERVICE.name,
+    registeredAgentAcceptanceCapacity: "PRINCIPAL_OF_ENTITY",
+    registeredAgentElectronicSignature: RA_SERVICE.name,
+    registeredAgentAcceptanceCheckbox: true,
+    registeredAgentSignatureAuthorizationCheckbox: true
+  };
+}
+
 // server/validation.ts
 var extendedFormSchema = formationFormSchema.extend({
+  registeredAgentChoice: external_exports.enum(["SERVICE", "SELF"], {
+    errorMap: () => ({ message: "Choose who will serve as registered agent." })
+  }),
   filingPath: external_exports.enum(["NEW", "CONVERT"]).optional(),
   existingLlcName: external_exports.string().max(300).optional().or(external_exports.literal("")),
   sunbizDocumentNumber: external_exports.string().max(50).optional().or(external_exports.literal("")),
@@ -56783,13 +56820,24 @@ var extendedFormSchema = formationFormSchema.extend({
       message: "The existing LLC's name is required for a conversion."
     });
   }
+  if (data.registeredAgentChoice === "SELF" && !data.registeredAgentName?.trim()) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      path: ["registeredAgentName"],
+      message: "The registered agent's full legal name is required."
+    });
+  }
 });
 var orderFormSchema = external_exports.preprocess((raw2) => {
   if (raw2 && typeof raw2 === "object") {
-    const d2 = raw2;
+    let d2 = raw2;
     if (d2.mailingSameAsPrincipal && d2.principalAddress) {
-      return { ...d2, mailingAddress: d2.principalAddress };
+      d2 = { ...d2, mailingAddress: d2.principalAddress };
     }
+    if (d2.registeredAgentChoice === "SERVICE") {
+      d2 = { ...d2, ...raServicePatch() };
+    }
+    return d2;
   }
   return raw2;
 }, extendedFormSchema);
@@ -56823,6 +56871,7 @@ function buildPayload(data) {
     principalOfficeAddress: data.principalAddress,
     mailingAddress: data.mailingSameAsPrincipal ? data.principalAddress : data.mailingAddress,
     registeredAgent: {
+      choice: data.registeredAgentChoice ?? "",
       type: data.registeredAgentType || "",
       name: data.registeredAgentName ?? "",
       businessEntityName: data.registeredAgentBusinessEntityName ?? "",

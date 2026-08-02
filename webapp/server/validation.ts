@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { formationFormSchema } from "../src/components/forms/florida-llc/schema";
 import { hasProtectedSeriesPhrase } from "../src/components/forms/florida-llc/validation";
+import { raServicePatch } from "../src/components/forms/florida-llc/raService";
 
 /**
  * formationFormSchema predates the series + conversion work (the form enforces
@@ -8,6 +9,9 @@ import { hasProtectedSeriesPhrase } from "../src/components/forms/florida-llc/va
  */
 const extendedFormSchema = formationFormSchema
   .extend({
+    registeredAgentChoice: z.enum(["SERVICE", "SELF"], {
+      errorMap: () => ({ message: "Choose who will serve as registered agent." }),
+    }),
     filingPath: z.enum(["NEW", "CONVERT"]).optional(),
     existingLlcName: z.string().max(300).optional().or(z.literal("")),
     sunbizDocumentNumber: z.string().max(50).optional().or(z.literal("")),
@@ -45,16 +49,30 @@ const extendedFormSchema = formationFormSchema
         message: "The existing LLC's name is required for a conversion.",
       });
     }
+    if (data.registeredAgentChoice === "SELF" && !data.registeredAgentName?.trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["registeredAgentName"],
+        message: "The registered agent's full legal name is required.",
+      });
+    }
   });
 
-/** Mirror the form: with "mailing same as principal" checked, the mailing
- *  fields stay blank in the browser and the principal address is used. */
+/** Mirror the form's behavior before validating:
+ *  - "mailing same as principal" leaves the mailing fields blank in the
+ *    browser; substitute the principal address.
+ *  - our RA service: re-apply the canonical service details server-side so a
+ *    tampered submission cannot alter the designated agent or its acceptance. */
 export const orderFormSchema = z.preprocess((raw) => {
   if (raw && typeof raw === "object") {
-    const d = raw as Record<string, unknown>;
+    let d = raw as Record<string, unknown>;
     if (d.mailingSameAsPrincipal && d.principalAddress) {
-      return { ...d, mailingAddress: d.principalAddress };
+      d = { ...d, mailingAddress: d.principalAddress };
     }
+    if (d.registeredAgentChoice === "SERVICE") {
+      d = { ...d, ...raServicePatch() };
+    }
+    return d;
   }
   return raw;
 }, extendedFormSchema);
