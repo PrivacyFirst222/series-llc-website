@@ -6,10 +6,11 @@
   "scripts": {
     "dev": "vite",
     "start": "vite",
-    "build": "vite build",
+    "build": "vite build && bun run build:api",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:api": "esbuild server/vercel-entry.ts --bundle --platform=node --format=esm --external:@electric-sql/pglite --outfile=\"api/[[...route]].mjs\" --log-level=warning"
   },
   "dependencies": {
     "@hono/node-server": "^2.0.12",
@@ -78,6 +79,7 @@
     "@vibecodeapp/webapp": "^1.0.7",
     "@vitejs/plugin-react-swc": "^3.11.0",
     "autoprefixer": "^10.4.22",
+    "esbuild": "^0.28.1",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.24",
@@ -89,6 +91,7 @@
     "vite": "^5.4.21"
   },
   "trustedDependencies": [
-    "@swc/core"
+    "@swc/core",
+    "esbuild"
   ]
 }
