@@ -243,6 +243,8 @@ export function validateStep(
       e.accuracyAcknowledgment = "Acknowledgment is required.";
     if (!data.addressAccuracyAcknowledgment)
       e.addressAccuracyAcknowledgment = "Acknowledgment is required.";
+    if (!data.termsOfServiceAcknowledgment)
+      e.termsOfServiceAcknowledgment = "You must agree to the Terms of Service to continue.";
     if (!data.publicRecordAcknowledgment)
       e.publicRecordAcknowledgment = "Acknowledgment is required.";
     if (!data.legalAdviceAcknowledgment)

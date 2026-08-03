@@ -174,6 +174,7 @@ export interface FloridaLLCFormData {
   atLeastOneMemberAcknowledgment: boolean;
   accuracyAcknowledgment: boolean;
   addressAccuracyAcknowledgment: boolean;
+  termsOfServiceAcknowledgment: boolean;
   publicRecordAcknowledgment: boolean;
   legalAdviceAcknowledgment: boolean;
 }

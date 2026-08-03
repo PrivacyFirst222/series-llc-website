@@ -1,7 +1,18 @@
 import { useNavigate } from "react-router-dom";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { FileText, Mail, LogOut, Download } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { FileText, Mail, LogOut, Download, ShieldCheck, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { api } from "@/lib/api";
 
 interface PortalDoc {
@@ -15,6 +26,7 @@ interface PortalDoc {
 interface Me {
   email: string;
   name: string;
+  raCancellationRequestedAt: string | null;
 }
 
 function formatDate(iso: string): string {
@@ -42,6 +54,101 @@ function DocList({ docs, empty }: { docs: PortalDoc[]; empty: string }) {
         </li>
       ))}
     </ul>
+  );
+}
+
+function RegisteredAgentCard({ me }: { me: Me | null }) {
+  const queryClient = useQueryClient();
+  const cancelMutation = useMutation({
+    mutationFn: () =>
+      api.post<{ raCancellationRequestedAt: string }>(
+        "/api/portal/registered-agent/cancel",
+        {},
+      ),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["portal-me"] }),
+  });
+
+  const requestedAt = me?.raCancellationRequestedAt ?? null;
+
+  return (
+    <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card">
+      <div className="flex items-center gap-2.5 border-b border-border bg-secondary/40 px-5 py-4">
+        <ShieldCheck className="h-4 w-4 text-trust" />
+        <h2 className="font-display text-lg">Registered agent service</h2>
+      </div>
+      <div className="px-5 py-4">
+        {requestedAt ? (
+          <div className="flex gap-2.5 rounded-lg border border-amber-300/60 bg-amber-50 p-3 text-xs leading-relaxed text-amber-900">
+            <Clock className="mt-0.5 h-4 w-4 shrink-0" />
+            <div>
+              <p className="font-medium">
+                Cancellation requested on {formatDate(requestedAt)}.
+              </p>
+              <p className="mt-1">
+                To complete it, designate a successor registered agent with the Florida
+                Division of Corporations and email proof of the change to{" "}
+                <a href="mailto:support@myfloridaseriesllc.com" className="underline underline-offset-2">
+                  support@myfloridaseriesllc.com
+                </a>
+                . Until we receive that proof, we remain your agent of record and service
+                continues to be billed as described in the Terms of Service.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-muted-foreground">
+              Your registered agent service is active and renews annually. You can cancel
+              here at any time.
+            </p>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="shrink-0 self-start rounded-full sm:self-auto"
+                  disabled={cancelMutation.isPending}
+                >
+                  Cancel registered agent service
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Cancel registered agent service?</AlertDialogTitle>
+                  <AlertDialogDescription asChild>
+                    <div className="space-y-2 text-sm">
+                      <p>
+                        This records your cancellation notice today. If your notice is at
+                        least 30 days before your renewal date, your service will not renew.
+                      </p>
+                      <p>
+                        Florida law requires your LLC to have a registered agent at all
+                        times. To finish cancelling, you must designate a successor
+                        registered agent with the Florida Division of Corporations and send
+                        us proof of the change. Until we receive that proof, we remain your
+                        agent of record and service continues to be billed.
+                      </p>
+                    </div>
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Keep my service</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => cancelMutation.mutate()}>
+                    Request cancellation
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        )}
+        {cancelMutation.isError ? (
+          <p className="mt-2 text-xs text-destructive">
+            Something went wrong recording your request. Please try again or email
+            support@myfloridaseriesllc.com.
+          </p>
+        ) : null}
+      </div>
+    </div>
   );
 }
 
@@ -122,6 +229,8 @@ export default function PortalDashboard() {
           />
         </div>
       </div>
+
+      <RegisteredAgentCard me={meQuery.data ?? null} />
 
       <p className="mt-8 text-xs leading-relaxed text-muted-foreground">
         Documents are download-only. If something looks wrong or missing, email{" "}

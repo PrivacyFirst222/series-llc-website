@@ -76,6 +76,42 @@ export function newDocumentEmail(portalUrl: string): { subject: string; html: st
   };
 }
 
+export function raCancellationEmail(name: string): { subject: string; html: string } {
+  return {
+    subject: "Your registered agent cancellation request",
+    html: wrap(`
+      <p>Hi ${escapeHtml(name || "there")},</p>
+      <p>We received your request to cancel registered agent service. Two things determine
+      what happens next:</p>
+      <p><strong>1. The renewal charge.</strong> Because you gave notice through your portal,
+      your service will not renew at the next renewal date — as long as your notice was given
+      at least 30 days before that date.</p>
+      <p><strong>2. Removing us as agent of record.</strong> Florida requires your LLC to have
+      a registered agent at all times, so you must designate a successor registered agent with
+      the Florida Division of Corporations and send written proof (such as the filed change)
+      to support@myfloridaseriesllc.com. Until we receive that proof, we remain your agent of
+      record and service is billed at the then-current rate, prorated monthly, as described in
+      the Terms of Service.</p>
+      <p>Questions? Just reply to this email.</p>
+    `),
+  };
+}
+
+export function raCancellationAdminEmail(opts: {
+  clientName: string;
+  clientEmail: string;
+}): { subject: string; html: string } {
+  return {
+    subject: `RA cancellation requested — ${opts.clientName || opts.clientEmail}`,
+    html: wrap(`
+      <p><strong>${escapeHtml(opts.clientName)}</strong> &lt;${escapeHtml(opts.clientEmail)}&gt;
+      requested cancellation of registered agent service through the portal.</p>
+      <p>Renewal billing should stop once their notice window is satisfied; watch for proof of
+      a successor designation before treating the agency as terminated.</p>
+    `),
+  };
+}
+
 export function orderPaidEmail(opts: {
   llcName: string;
   contactName: string;

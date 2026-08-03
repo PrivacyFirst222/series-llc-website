@@ -74,6 +74,7 @@ const formData: FloridaLLCFormData = {
   atLeastOneMemberAcknowledgment: true,
   accuracyAcknowledgment: true,
   addressAccuracyAcknowledgment: true,
+  termsOfServiceAcknowledgment: true,
   publicRecordAcknowledgment: true,
   legalAdviceAcknowledgment: true,
 };
@@ -188,6 +189,43 @@ check("login rejected before password is set", noLogin.status === 401);
 // 9. Portal endpoints require auth
 const docsNoAuth = await api("/api/portal/documents");
 check("portal requires sign-in", docsNoAuth.status === 401);
+const cancelNoAuth = await api("/api/portal/registered-agent/cancel", { method: "POST", body: "{}" });
+check("RA cancel requires sign-in", cancelNoAuth.status === 401);
+
+// 10. Full portal walk via dev-minted token: set password, sign in, cancel RA
+const mint = await api("/api/dev/mint-reset-token", {
+  method: "POST",
+  body: JSON.stringify({ email: testEmail }),
+});
+if (mint.status === 200) {
+  const setPw = await api("/api/auth/set-password", {
+    method: "POST",
+    body: JSON.stringify({ token: mint.body.data.token, password: "e2e-password-1" }),
+  });
+  check("set password via minted token", setPw.status === 200);
+  const me = await api("/api/auth/me", { cookies: setPw.cookie });
+  check("me shows no RA cancellation yet", me.status === 200 && me.body.data.raCancellationRequestedAt === null);
+  const cancel = await api("/api/portal/registered-agent/cancel", {
+    method: "POST",
+    body: "{}",
+    cookies: setPw.cookie,
+  });
+  check("RA cancel records a timestamp", cancel.status === 200 && Boolean(cancel.body.data.raCancellationRequestedAt));
+  const cancelAgain = await api("/api/portal/registered-agent/cancel", {
+    method: "POST",
+    body: "{}",
+    cookies: setPw.cookie,
+  });
+  check(
+    "RA cancel is idempotent",
+    cancelAgain.status === 200 &&
+      cancelAgain.body.data.raCancellationRequestedAt === cancel.body.data.raCancellationRequestedAt,
+  );
+  const meAfter = await api("/api/auth/me", { cookies: setPw.cookie });
+  check("me reflects the cancellation request", Boolean(meAfter.body.data.raCancellationRequestedAt));
+} else {
+  check("dev mint-reset-token available (dev only)", false);
+}
 
 console.log(failures === 0 ? "\nALL PASS" : `\n${failures} FAILURES`);
 process.exit(failures === 0 ? 0 : 1);

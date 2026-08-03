@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { AlertTriangle } from "lucide-react";
 import { AcknowledgeBox, FieldShell } from "../FieldShell";
@@ -122,6 +123,26 @@ export function StepCertification({ data, patch, errors }: StepProps) {
           onChange={(v) => patch({ addressAccuracyAcknowledgment: v })}
           label="I am solely responsible for the accuracy of all addresses I have provided. I understand that state filings, legal notices, and official correspondence will be directed to these addresses exactly as entered, and that MyFloridaSeriesLLC does not verify the accuracy or deliverability of any address. Any address-suggestion or address-checking feature in this form is a convenience only and is not a verification, warranty, or guarantee of any kind."
           error={errors.addressAccuracyAcknowledgment}
+        />
+        <AcknowledgeBox
+          id="cert-terms"
+          checked={data.termsOfServiceAcknowledgment}
+          onChange={(v) => patch({ termsOfServiceAcknowledgment: v })}
+          label={
+            <>
+              I agree to all terms and conditions set forth in the{" "}
+              <Link
+                to="/terms"
+                target="_blank"
+                rel="noopener"
+                className="underline underline-offset-2 font-medium"
+              >
+                Terms of Service
+              </Link>
+              , including its binding individual arbitration provision and class action waiver.
+            </>
+          }
+          error={errors.termsOfServiceAcknowledgment}
         />
         <AcknowledgeBox
           id="cert-public"

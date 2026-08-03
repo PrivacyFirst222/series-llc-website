@@ -56749,7 +56749,7 @@ function hasProtectedSeriesPhrase(name) {
 
 // src/components/forms/florida-llc/raService.ts
 var RA_SERVICE = {
-  name: "FLORIDA PROTECTED SERIES, LLC, PS 1",
+  name: "FLORIDA PROTECTED SERIES, LLC - PS 2",
   address1: "301 N. Fern Creek Avenue",
   address2: "Suite C",
   city: "Orlando",
@@ -56788,6 +56788,9 @@ var extendedFormSchema = formationFormSchema.extend({
   }),
   addressAccuracyAcknowledgment: external_exports.literal(true, {
     errorMap: () => ({ message: "Acknowledgment is required." })
+  }),
+  termsOfServiceAcknowledgment: external_exports.literal(true, {
+    errorMap: () => ({ message: "You must agree to the Terms of Service to continue." })
   }),
   filingPath: external_exports.enum(["NEW", "CONVERT"]).optional(),
   existingLlcName: external_exports.string().max(300).optional().or(external_exports.literal("")),
@@ -57060,6 +57063,7 @@ CREATE TABLE IF NOT EXISTS webhook_events (
   event_id text PRIMARY KEY,
   received_at timestamptz NOT NULL DEFAULT now()
 );
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS ra_cancellation_requested_at timestamptz;
 `;
 async function getDb() {
   if (!db) db = await createDb();
@@ -57519,6 +57523,37 @@ function newDocumentEmail(portalUrl) {
     `)
   };
 }
+function raCancellationEmail(name) {
+  return {
+    subject: "Your registered agent cancellation request",
+    html: wrap(`
+      <p>Hi ${escapeHtml(name || "there")},</p>
+      <p>We received your request to cancel registered agent service. Two things determine
+      what happens next:</p>
+      <p><strong>1. The renewal charge.</strong> Because you gave notice through your portal,
+      your service will not renew at the next renewal date \u2014 as long as your notice was given
+      at least 30 days before that date.</p>
+      <p><strong>2. Removing us as agent of record.</strong> Florida requires your LLC to have
+      a registered agent at all times, so you must designate a successor registered agent with
+      the Florida Division of Corporations and send written proof (such as the filed change)
+      to support@myfloridaseriesllc.com. Until we receive that proof, we remain your agent of
+      record and service is billed at the then-current rate, prorated monthly, as described in
+      the Terms of Service.</p>
+      <p>Questions? Just reply to this email.</p>
+    `)
+  };
+}
+function raCancellationAdminEmail(opts) {
+  return {
+    subject: `RA cancellation requested \u2014 ${opts.clientName || opts.clientEmail}`,
+    html: wrap(`
+      <p><strong>${escapeHtml(opts.clientName)}</strong> &lt;${escapeHtml(opts.clientEmail)}&gt;
+      requested cancellation of registered agent service through the portal.</p>
+      <p>Renewal billing should stop once their notice window is satisfied; watch for proof of
+      a successor designation before treating the agency as terminated.</p>
+    `)
+  };
+}
 function orderPaidEmail(opts) {
   return {
     subject: `Paid order \u2014 ${opts.llcName}`,
@@ -57697,6 +57732,22 @@ if (!env.SQUARE_ACCESS_TOKEN && !env.isProd) {
     return c.json({ data: { ok: true } });
   });
 }
+if (!env.isProd) {
+  app.post("/dev/mint-reset-token", async (c) => {
+    const { email } = await c.req.json();
+    const db2 = await getDb();
+    const rows = await db2.query("SELECT id FROM clients WHERE email = $1", [
+      email.toLowerCase()
+    ]);
+    if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+    const { token, tokenHash } = newToken();
+    await db2.query(
+      "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at) VALUES ($1, $2, 'reset_password', $3)",
+      [tokenHash, rows[0].id, new Date(Date.now() + 36e5).toISOString()]
+    );
+    return c.json({ data: { token } });
+  });
+}
 var verifyAddressSchema = external_exports.object({
   address1: external_exports.string().min(1).max(200),
   address2: external_exports.string().max(200).optional().or(external_exports.literal("")),
@@ -57780,10 +57831,16 @@ app.get("/auth/me", async (c) => {
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const db2 = await getDb();
   const rows = await db2.query(
-    "SELECT email, name FROM clients WHERE id = $1",
+    "SELECT email, name, ra_cancellation_requested_at FROM clients WHERE id = $1",
     [session.clientId]
   );
-  return c.json({ data: { email: rows[0]?.email ?? "", name: rows[0]?.name ?? "" } });
+  return c.json({
+    data: {
+      email: rows[0]?.email ?? "",
+      name: rows[0]?.name ?? "",
+      raCancellationRequestedAt: rows[0]?.ra_cancellation_requested_at ?? null
+    }
+  });
 });
 app.post("/auth/forgot", async (c) => {
   if (!rateLimit(`forgot:${clientIp(c)}`, 5, 36e5)) {
@@ -57861,6 +57918,36 @@ app.get("/portal/documents/:id/download", async (c) => {
     }
   });
 });
+app.post("/portal/registered-agent/cancel", async (c) => {
+  const session = await getSession(c);
+  if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const db2 = await getDb();
+  const rows = await db2.query(
+    "SELECT email, name, ra_cancellation_requested_at FROM clients WHERE id = $1",
+    [session.clientId]
+  );
+  if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+  const client = rows[0];
+  if (client.ra_cancellation_requested_at) {
+    return c.json({ data: { raCancellationRequestedAt: client.ra_cancellation_requested_at } });
+  }
+  const updated = await db2.query(
+    "UPDATE clients SET ra_cancellation_requested_at = now() WHERE id = $1 RETURNING ra_cancellation_requested_at",
+    [session.clientId]
+  );
+  const requestedAt = updated[0]?.ra_cancellation_requested_at ?? (/* @__PURE__ */ new Date()).toISOString();
+  const confirmation = raCancellationEmail(client.name);
+  sendMail({ to: client.email, ...confirmation }).catch(
+    (e) => console.error("ra-cancel confirmation email failed", e)
+  );
+  if (env.ADMIN_NOTIFY_EMAIL) {
+    const notice = raCancellationAdminEmail({ clientName: client.name, clientEmail: client.email });
+    sendMail({ to: env.ADMIN_NOTIFY_EMAIL, ...notice, replyTo: client.email }).catch(
+      (e) => console.error("ra-cancel admin email failed", e)
+    );
+  }
+  return c.json({ data: { raCancellationRequestedAt: requestedAt } });
+});
 app.post("/admin/login", async (c) => {
   if (!rateLimit(`admin:${clientIp(c)}`, 10, 9e5)) {
     return c.json(err("Too many attempts.", "RATE_LIMITED"), 429);
@@ -57906,7 +57993,7 @@ app.get("/admin/clients", async (c) => {
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const db2 = await getDb();
   const rows = await db2.query(
-    `SELECT cl.id, cl.email, cl.name, cl.created_at,
+    `SELECT cl.id, cl.email, cl.name, cl.created_at, cl.ra_cancellation_requested_at,
             (cl.password_hash IS NOT NULL) AS has_password,
             COUNT(d.id)::int AS document_count
      FROM clients cl LEFT JOIN documents d ON d.client_id = cl.id

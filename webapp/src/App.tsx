@@ -14,6 +14,7 @@ import FAQ from "./pages/FAQ";
 import AssetProtection from "./pages/AssetProtection";
 import RecordkeepingApp from "./pages/RecordkeepingApp";
 import Contact from "./pages/Contact";
+import Terms from "./pages/Terms";
 import FormLLC from "./pages/FormLLC";
 import OrderConfirmed from "./pages/OrderConfirmed";
 import PortalLogin from "./pages/portal/PortalLogin";
@@ -44,6 +45,7 @@ const App = () => (
             <Route path="/asset-protection" element={<AssetProtection />} />
             <Route path="/recordkeeping-app" element={<RecordkeepingApp />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/terms" element={<Terms />} />
             <Route path="/form-llc" element={<FormLLC />} />
             <Route path="/order/confirmed" element={<OrderConfirmed />} />
             <Route path="/portal" element={<PortalDashboard />} />

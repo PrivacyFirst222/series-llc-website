@@ -107,6 +107,7 @@ export const defaultFormData: FloridaLLCFormData = {
   atLeastOneMemberAcknowledgment: false,
   accuracyAcknowledgment: false,
   addressAccuracyAcknowledgment: false,
+  termsOfServiceAcknowledgment: false,
   publicRecordAcknowledgment: false,
   legalAdviceAcknowledgment: false,
 };

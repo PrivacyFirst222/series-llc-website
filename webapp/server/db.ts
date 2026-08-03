@@ -90,6 +90,7 @@ CREATE TABLE IF NOT EXISTS webhook_events (
   event_id text PRIMARY KEY,
   received_at timestamptz NOT NULL DEFAULT now()
 );
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS ra_cancellation_requested_at timestamptz;
 `;
 
 export async function getDb(): Promise<Db> {

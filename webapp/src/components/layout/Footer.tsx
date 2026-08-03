@@ -18,6 +18,7 @@ const groups: { title: string; links: { to: string; label: string }[] }[] = [
       { to: "/pricing", label: "Packages & Pricing" },
       { to: "/contact", label: "Contact Us" },
       { to: "/faq", label: "FAQ" },
+      { to: "/terms", label: "Terms of Service" },
     ],
   },
 ];

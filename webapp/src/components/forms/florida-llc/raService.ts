@@ -2,7 +2,7 @@ import type { FloridaLLCFormData } from "./types";
 
 /** Our registered agent service, exactly as designated on filings. */
 export const RA_SERVICE = {
-  name: "FLORIDA PROTECTED SERIES, LLC, PS 1",
+  name: "FLORIDA PROTECTED SERIES, LLC - PS 2",
   address1: "301 N. Fern Creek Avenue",
   address2: "Suite C",
   city: "Orlando",

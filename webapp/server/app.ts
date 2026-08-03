@@ -17,6 +17,8 @@ import {
   resetEmail,
   newDocumentEmail,
   orderPaidEmail,
+  raCancellationEmail,
+  raCancellationAdminEmail,
 } from "./email";
 
 export const app = new Hono().basePath("/api");
@@ -221,6 +223,25 @@ if (!env.SQUARE_ACCESS_TOKEN && !env.isProd) {
   });
 }
 
+// Dev-only: mint a set-password token so e2e can walk the portal without
+// reading the emailed link from the API process's stdout.
+if (!env.isProd) {
+  app.post("/dev/mint-reset-token", async (c) => {
+    const { email } = (await c.req.json()) as { email: string };
+    const db = await getDb();
+    const rows = await db.query<{ id: string }>("SELECT id FROM clients WHERE email = $1", [
+      email.toLowerCase(),
+    ]);
+    if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+    const { token, tokenHash } = newToken();
+    await db.query(
+      "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at) VALUES ($1, $2, 'reset_password', $3)",
+      [tokenHash, rows[0].id, new Date(Date.now() + 3600_000).toISOString()],
+    );
+    return c.json({ data: { token } });
+  });
+}
+
 /* ---------------------------- address verify ---------------------------- */
 
 const verifyAddressSchema = z.object({
@@ -338,11 +359,17 @@ app.get("/auth/me", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const db = await getDb();
-  const rows = await db.query<{ email: string; name: string }>(
-    "SELECT email, name FROM clients WHERE id = $1",
+  const rows = await db.query<{ email: string; name: string; ra_cancellation_requested_at: string | null }>(
+    "SELECT email, name, ra_cancellation_requested_at FROM clients WHERE id = $1",
     [session.clientId],
   );
-  return c.json({ data: { email: rows[0]?.email ?? "", name: rows[0]?.name ?? "" } });
+  return c.json({
+    data: {
+      email: rows[0]?.email ?? "",
+      name: rows[0]?.name ?? "",
+      raCancellationRequestedAt: rows[0]?.ra_cancellation_requested_at ?? null,
+    },
+  });
 });
 
 app.post("/auth/forgot", async (c) => {
@@ -432,6 +459,42 @@ app.get("/portal/documents/:id/download", async (c) => {
   });
 });
 
+/** Online cancellation of registered agent service — required by §501.165
+ *  because the service is accepted online. Recording the request is the
+ *  §9(g)(i) notice; the agency itself ends only when proof of a successor
+ *  designation arrives (handled by hand from the admin notification). */
+app.post("/portal/registered-agent/cancel", async (c) => {
+  const session = await getSession(c);
+  if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const db = await getDb();
+  const rows = await db.query<{ email: string; name: string; ra_cancellation_requested_at: string | null }>(
+    "SELECT email, name, ra_cancellation_requested_at FROM clients WHERE id = $1",
+    [session.clientId],
+  );
+  if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+  const client = rows[0];
+  if (client.ra_cancellation_requested_at) {
+    return c.json({ data: { raCancellationRequestedAt: client.ra_cancellation_requested_at } });
+  }
+  const updated = await db.query<{ ra_cancellation_requested_at: string }>(
+    "UPDATE clients SET ra_cancellation_requested_at = now() WHERE id = $1 RETURNING ra_cancellation_requested_at",
+    [session.clientId],
+  );
+  const requestedAt = updated[0]?.ra_cancellation_requested_at ?? new Date().toISOString();
+  // Confirmation + admin notice must not unwind the recorded request.
+  const confirmation = raCancellationEmail(client.name);
+  sendMail({ to: client.email, ...confirmation }).catch((e) =>
+    console.error("ra-cancel confirmation email failed", e),
+  );
+  if (env.ADMIN_NOTIFY_EMAIL) {
+    const notice = raCancellationAdminEmail({ clientName: client.name, clientEmail: client.email });
+    sendMail({ to: env.ADMIN_NOTIFY_EMAIL, ...notice, replyTo: client.email }).catch((e) =>
+      console.error("ra-cancel admin email failed", e),
+    );
+  }
+  return c.json({ data: { raCancellationRequestedAt: requestedAt } });
+});
+
 /* --------------------------------- admin ------------------------------- */
 
 app.post("/admin/login", async (c) => {
@@ -484,7 +547,7 @@ app.get("/admin/clients", async (c) => {
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const db = await getDb();
   const rows = await db.query(
-    `SELECT cl.id, cl.email, cl.name, cl.created_at,
+    `SELECT cl.id, cl.email, cl.name, cl.created_at, cl.ra_cancellation_requested_at,
             (cl.password_hash IS NOT NULL) AS has_password,
             COUNT(d.id)::int AS document_count
      FROM clients cl LEFT JOIN documents d ON d.client_id = cl.id

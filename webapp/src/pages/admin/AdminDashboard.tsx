@@ -33,6 +33,7 @@ interface AdminClient {
   email: string;
   name: string;
   created_at: string;
+  ra_cancellation_requested_at: string | null;
   has_password: boolean;
   document_count: number;
 }
@@ -265,6 +266,11 @@ export default function AdminDashboard() {
                 <tr key={cl.id}>
                   <td className="px-4 py-3">
                     <span className="font-medium">{cl.name || "—"}</span>
+                    {cl.ra_cancellation_requested_at ? (
+                      <span className="ml-2 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-900">
+                        RA cancel requested {day(cl.ra_cancellation_requested_at)}
+                      </span>
+                    ) : null}
                     <div className="text-xs text-muted-foreground">{cl.email}</div>
                   </td>
                   <td className="px-4 py-3">{cl.has_password ? "Active" : "Invite sent"}</td>
