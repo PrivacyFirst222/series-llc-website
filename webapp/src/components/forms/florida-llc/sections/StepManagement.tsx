@@ -75,6 +75,42 @@ export function StepManagement({ data, patch, errors }: StepProps) {
         </div>
       </FieldShell>
 
+      <details className="rounded-xl border border-trust/30 bg-trust/5 p-4">
+        <summary className="cursor-pointer text-sm font-medium text-trust">
+          Why manager-managed is usually the smarter choice — learn why
+        </summary>
+        <div className="mt-3 space-y-3 text-sm leading-relaxed text-foreground/85">
+          <p>
+            In a member-managed LLC, every owner automatically has management
+            power. That means every owner can sign contracts and bind the
+            company — and carries the exposure that comes with control. If an
+            owner later transfers their share to a trust, a holding company, or
+            a passive investor, that new owner still carries management
+            authority and the extra risk that comes with it. Most people don't
+            want that.
+          </p>
+          <p>
+            A manager-managed LLC fixes this. Only the people you specifically
+            name as managers have day-to-day control and the related exposure.
+            Everyone else simply owns their share without management duties.
+            And if you want all the active owners to share control equally, you
+            can still name each of them as a manager.
+          </p>
+          <p>
+            It also gives better privacy. Florida's public records list the
+            managers of a manager-managed LLC — and being listed as a manager
+            does not identify you as an owner, so passive owners stay off the
+            public listing. In a member-managed LLC, the people listed are
+            identified as members (owners), so ownership is more visible.
+          </p>
+          <p>
+            If you ever plan to bring in passive owners, use trusts, or simply
+            want to limit who can bind the company and who appears in public
+            records, the manager-managed structure is cleaner and safer.
+          </p>
+        </div>
+      </details>
+
       <details className="rounded-xl border border-border bg-secondary/30 p-4">
         <summary className="cursor-pointer text-sm font-medium">
           Why we ask this
