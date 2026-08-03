@@ -77,20 +77,6 @@ export function RepeatableMemberFields({
               </select>
             </FieldShell>
 
-            <FieldShell label="Initial member?">
-              <label className="flex h-10 items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={entry.isInitialMember}
-                  onChange={(e) =>
-                    update(entry.id, { isInitialMember: e.target.checked })
-                  }
-                  className="h-4 w-4 accent-trust"
-                />
-                Yes — initial member at formation
-              </label>
-            </FieldShell>
-
             {entry.memberType === "INDIVIDUAL" ? (
               <FieldShell
                 label="Full legal name"

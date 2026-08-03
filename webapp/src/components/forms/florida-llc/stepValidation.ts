@@ -183,9 +183,6 @@ export function validateStep(
         e[`members.${i}.entityName`] = "Entity name required.";
       if (!m.address1) e[`members.${i}.address1`] = "Address required.";
     });
-    const hasInitial = data.members.some((m) => m.isInitialMember);
-    if (!hasInitial && data.members.length > 0)
-      e.members = "Mark at least one member as an initial member.";
   }
 
   if (step === "purpose") {
