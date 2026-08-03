@@ -106,18 +106,6 @@ export function StepManagement({ data, patch, errors }: StepProps) {
         </div>
       </details>
 
-      <details className="rounded-xl border border-border bg-secondary/30 p-4">
-        <summary className="cursor-pointer text-sm font-medium">
-          Why we ask this
-        </summary>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Sunbiz instructions say not to list members in the Manager /
-          Authorized Representative section. If the LLC is member-managed, you
-          may collect members for internal records in the next steps without
-          listing them as managers.
-        </p>
-      </details>
-
       {data.managementStructure === "MANAGER_MANAGED" ? (
         <div className="rounded-xl border border-trust/30 bg-trust/5 p-4 text-sm">
           <p className="font-medium">
