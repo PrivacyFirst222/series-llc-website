@@ -10,7 +10,7 @@ export interface AddressSuggestion {
   zip: string;
 }
 
-const RADAR_KEY = import.meta.env.VITE_RADAR_PUBLISHABLE_KEY as string | undefined;
+const GEOAPIFY_KEY = import.meta.env.VITE_GEOAPIFY_API_KEY as string | undefined;
 
 interface AddressAutocompleteProps {
   id?: string;
@@ -48,7 +48,7 @@ export function AddressAutocomplete({
 
   const query = (text: string) => {
     onChangeText(text);
-    if (!RADAR_KEY || text.trim().length < 4) {
+    if (!GEOAPIFY_KEY || text.trim().length < 4) {
       setSuggestions([]);
       setOpen(false);
       return;
@@ -60,28 +60,29 @@ export function AddressAutocomplete({
       abortRef.current = controller;
       try {
         const res = await fetch(
-          `https://api.radar.io/v1/search/autocomplete?query=${encodeURIComponent(text)}&countryCode=US&layers=address&limit=5`,
-          { headers: { Authorization: RADAR_KEY }, signal: controller.signal },
+          `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(text)}&filter=countrycode:us&format=json&limit=5&apiKey=${GEOAPIFY_KEY}`,
+          { signal: controller.signal },
         );
         if (!res.ok) return;
         const body = (await res.json()) as {
-          addresses?: {
-            addressLabel?: string;
-            formattedAddress?: string;
-            number?: string;
+          results?: {
+            formatted?: string;
+            address_line1?: string;
+            housenumber?: string;
             street?: string;
             city?: string;
-            stateCode?: string;
-            postalCode?: string;
+            state_code?: string;
+            postcode?: string;
           }[];
         };
-        const next = (body.addresses ?? [])
+        const next = (body.results ?? [])
           .map((a) => ({
-            label: a.formattedAddress || a.addressLabel || "",
-            address1: a.addressLabel || [a.number, a.street].filter(Boolean).join(" "),
+            label: a.formatted || a.address_line1 || "",
+            address1:
+              a.address_line1 || [a.housenumber, a.street].filter(Boolean).join(" "),
             city: a.city ?? "",
-            state: a.stateCode ?? "",
-            zip: a.postalCode ?? "",
+            state: a.state_code?.toUpperCase() ?? "",
+            zip: a.postcode ?? "",
           }))
           .filter((s) => s.address1 && s.city);
         setSuggestions(next);

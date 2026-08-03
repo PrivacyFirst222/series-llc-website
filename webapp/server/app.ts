@@ -231,47 +231,63 @@ const verifyAddressSchema = z.object({
   zip: z.string().min(3).max(20),
 });
 
-/** Soft USPS-backed check via Radar. Never blocks: with no key, on vendor
- *  errors, or on timeouts the answer is "skipped" and the form proceeds. */
+/** Soft plausibility check via Geoapify geocoding. Never blocks: with no key,
+ *  on vendor errors, or on timeouts the answer is "skipped" and the form
+ *  proceeds. Benchmarked 2026-08-03: real addresses score ~1.0/full_match,
+ *  typos ~0.7 with a corrected suggestion, fabricated streets fall back to a
+ *  city-level match around 0.25. */
 app.post("/address/verify", async (c) => {
   if (!rateLimit(`addr:${clientIp(c)}`, 60, 900_000)) {
     return c.json({ data: { status: "skipped" } });
   }
   const body = verifyAddressSchema.safeParse(await c.req.json().catch(() => null));
   if (!body.success) return c.json(err("Invalid address payload", "INVALID_INPUT"), 400);
-  if (!env.RADAR_SECRET_KEY) return c.json({ data: { status: "skipped" } });
+  if (!env.GEOAPIFY_API_KEY) return c.json({ data: { status: "skipped" } });
 
   const a = body.data;
   const params = new URLSearchParams({
-    countryCode: "US",
-    stateCode: a.state,
-    city: a.city,
-    postalCode: a.zip,
-    addressLabel: a.address1,
-    ...(a.address2 ? { unit: a.address2 } : {}),
+    text: `${a.address1}, ${a.city}, ${a.state} ${a.zip}`,
+    filter: "countrycode:us",
+    format: "json",
+    limit: "1",
+    apiKey: env.GEOAPIFY_API_KEY,
   });
   try {
-    const res = await fetch(`https://api.radar.io/v1/addresses/validate?${params}`, {
-      headers: { Authorization: env.RADAR_SECRET_KEY },
+    const res = await fetch(`https://api.geoapify.com/v1/geocode/search?${params}`, {
       signal: AbortSignal.timeout(5000),
     });
     if (!res.ok) return c.json({ data: { status: "skipped" } });
     const out = (await res.json()) as {
-      result?: { verificationStatus?: string };
-      address?: { addressLabel?: string; city?: string; stateCode?: string; postalCode?: string };
+      results?: {
+        formatted?: string;
+        housenumber?: string;
+        street?: string;
+        city?: string;
+        state_code?: string;
+        postcode?: string;
+        rank?: { confidence?: number; match_type?: string };
+      }[];
     };
-    const status = (out.result?.verificationStatus ?? "unknown").toLowerCase();
+    const top = out.results?.[0];
+    if (!top) return c.json({ data: { status: "unverified", normalized: null } });
+    const confidence = top.rank?.confidence ?? 0;
+    const matchType = top.rank?.match_type ?? "";
+    // Street/building-level match required; city/postcode fallbacks mean the
+    // street or number was not actually found.
+    const goodMatch = ["full_match", "inner_part", "match_by_building"].includes(matchType);
+    const status = confidence >= 0.9 && goodMatch ? "verified" : "unverified";
     return c.json({
       data: {
         status,
-        normalized: out.address
-          ? {
-              address1: out.address.addressLabel ?? "",
-              city: out.address.city ?? "",
-              state: out.address.stateCode ?? "",
-              zip: out.address.postalCode ?? "",
-            }
-          : null,
+        normalized:
+          top.housenumber && top.street
+            ? {
+                address1: `${top.housenumber} ${top.street}`,
+                city: top.city ?? "",
+                state: top.state_code?.toUpperCase() ?? "",
+                zip: top.postcode ?? "",
+              }
+            : null,
       },
     });
   } catch {

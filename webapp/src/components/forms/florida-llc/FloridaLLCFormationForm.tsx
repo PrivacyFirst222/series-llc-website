@@ -172,13 +172,18 @@ export function FloridaLLCFormationForm({
     if (candidate && !checkingAddress) {
       setCheckingAddress(true);
       try {
-        const result = await api.post<{ status: string }>("/api/address/verify", candidate);
-        const bad = ["unverified", "ambiguous", "partially verified"].includes(result.status);
-        if (bad) {
+        const result = await api.post<{
+          status: string;
+          normalized: { address1: string; city: string; state: string; zip: string } | null;
+        }>("/api/address/verify", candidate);
+        if (result.status === "unverified") {
+          const suggestion =
+            result.normalized && result.normalized.address1.toLowerCase() !== candidate.address1.toLowerCase()
+              ? ` Closest match found: ${result.normalized.address1}, ${result.normalized.city}, ${result.normalized.state} ${result.normalized.zip}.`
+              : "";
           setAddressWarning({
             step: stepKey,
-            message:
-              "USPS doesn't fully recognize this address. Please double-check the street number, spelling, and ZIP — or press Continue again to use it as entered.",
+            message: `We couldn't fully match this address. Please double-check the street number, spelling, and ZIP.${suggestion} Or press Continue again to use it exactly as entered.`,
           });
           return;
         }

@@ -56970,7 +56970,7 @@ var env = {
   ADMIN_NOTIFY_EMAIL: process.env.ADMIN_NOTIFY_EMAIL ?? "",
   ADMIN_PASSWORD: process.env.ADMIN_PASSWORD ?? "",
   BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN ?? "",
-  RADAR_SECRET_KEY: process.env.RADAR_SECRET_KEY ?? "",
+  GEOAPIFY_API_KEY: process.env.GEOAPIFY_API_KEY ?? "",
   /** Public origin for links in emails and Square redirects. */
   PUBLIC_BASE_URL: process.env.PUBLIC_BASE_URL ?? (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "http://localhost:8000"),
   isProd: !!process.env.VERCEL
@@ -57709,32 +57709,35 @@ app.post("/address/verify", async (c) => {
   }
   const body = verifyAddressSchema.safeParse(await c.req.json().catch(() => null));
   if (!body.success) return c.json(err("Invalid address payload", "INVALID_INPUT"), 400);
-  if (!env.RADAR_SECRET_KEY) return c.json({ data: { status: "skipped" } });
+  if (!env.GEOAPIFY_API_KEY) return c.json({ data: { status: "skipped" } });
   const a2 = body.data;
   const params = new URLSearchParams({
-    countryCode: "US",
-    stateCode: a2.state,
-    city: a2.city,
-    postalCode: a2.zip,
-    addressLabel: a2.address1,
-    ...a2.address2 ? { unit: a2.address2 } : {}
+    text: `${a2.address1}, ${a2.city}, ${a2.state} ${a2.zip}`,
+    filter: "countrycode:us",
+    format: "json",
+    limit: "1",
+    apiKey: env.GEOAPIFY_API_KEY
   });
   try {
-    const res = await fetch(`https://api.radar.io/v1/addresses/validate?${params}`, {
-      headers: { Authorization: env.RADAR_SECRET_KEY },
+    const res = await fetch(`https://api.geoapify.com/v1/geocode/search?${params}`, {
       signal: AbortSignal.timeout(5e3)
     });
     if (!res.ok) return c.json({ data: { status: "skipped" } });
     const out = await res.json();
-    const status = (out.result?.verificationStatus ?? "unknown").toLowerCase();
+    const top = out.results?.[0];
+    if (!top) return c.json({ data: { status: "unverified", normalized: null } });
+    const confidence = top.rank?.confidence ?? 0;
+    const matchType = top.rank?.match_type ?? "";
+    const goodMatch = ["full_match", "inner_part", "match_by_building"].includes(matchType);
+    const status = confidence >= 0.9 && goodMatch ? "verified" : "unverified";
     return c.json({
       data: {
         status,
-        normalized: out.address ? {
-          address1: out.address.addressLabel ?? "",
-          city: out.address.city ?? "",
-          state: out.address.stateCode ?? "",
-          zip: out.address.postalCode ?? ""
+        normalized: top.housenumber && top.street ? {
+          address1: `${top.housenumber} ${top.street}`,
+          city: top.city ?? "",
+          state: top.state_code?.toUpperCase() ?? "",
+          zip: top.postcode ?? ""
         } : null
       }
     });
