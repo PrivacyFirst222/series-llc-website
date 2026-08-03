@@ -1,6 +1,8 @@
+import { useEffect } from "react";
+import { ShieldCheck } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { FieldShell } from "../FieldShell";
-import type { FloridaLLCFormData, PurposeType } from "../types";
+import type { FloridaLLCFormData } from "../types";
 
 interface StepProps {
   data: FloridaLLCFormData;
@@ -13,90 +15,35 @@ const GENERAL_DEFAULT =
 
 export function StepPurpose({ data, patch, errors }: StepProps) {
   const isPllc = data.formationType === "PLLC";
+  const addingSpecific = data.purposeType === "SPECIFIC";
 
-  const options: { v: PurposeType; t: string; s: string; disabled?: boolean }[] = isPllc
-    ? [
-        {
-          v: "PROFESSIONAL",
-          t: "Professional service purpose",
-          s: "Required for PLLC. Provide a single, specific professional service.",
-        },
-      ]
-    : [
-        {
-          v: "GENERAL",
-          t: "General lawful business purpose",
-          s: "Default — any lawful activity allowed in Florida.",
-        },
-        {
-          v: "SPECIFIC",
-          t: "Specific purpose",
-          s: "Describe the LLC's specific business purpose.",
-        },
-      ];
-
-  const onSelect = (v: PurposeType) => {
-    if (v === "GENERAL") {
-      patch({ purposeType: v, businessPurposeText: GENERAL_DEFAULT });
-    } else {
-      patch({
-        purposeType: v,
-        businessPurposeText:
-          data.purposeType === v ? data.businessPurposeText : "",
-      });
+  // Non-professional LLCs always carry the general lawful purpose; there is
+  // no way to narrow it in this flow.
+  useEffect(() => {
+    if (!isPllc && !data.purposeType) {
+      patch({ purposeType: "GENERAL", businessPurposeText: "" });
     }
-  };
+    if (isPllc && data.purposeType !== "PROFESSIONAL") {
+      patch({ purposeType: "PROFESSIONAL", businessPurposeText: "" });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPllc]);
 
-  return (
-    <div className="space-y-6">
-      <header className="space-y-2">
-        <h2 className="font-display text-3xl">Business purpose</h2>
-        <p className="text-sm text-muted-foreground max-w-2xl">
-          Non-professional LLCs are not required to list a purpose but may do
-          so. A Professional LLC must list a single specific professional
-          purpose.
-        </p>
-      </header>
-
-      <FieldShell label="Purpose type" required error={errors.purposeType}>
-        <div className="grid sm:grid-cols-2 gap-3">
-          {options.map((o) => (
-            <label
-              key={o.v}
-              className={`cursor-pointer rounded-xl border p-4 transition-colors ${
-                data.purposeType === o.v
-                  ? "border-accent bg-accent/5 ring-1 ring-accent"
-                  : "border-border hover:border-foreground/30"
-              }`}
-            >
-              <input
-                type="radio"
-                name="purpose"
-                className="sr-only"
-                checked={data.purposeType === o.v}
-                onChange={() => onSelect(o.v)}
-              />
-              <div className="font-medium">{o.t}</div>
-              <div className="text-xs text-muted-foreground mt-1">{o.s}</div>
-            </label>
-          ))}
-        </div>
-      </FieldShell>
-
-      {data.purposeType && data.purposeType !== "GENERAL" ? (
+  if (isPllc) {
+    return (
+      <div className="space-y-6">
+        <header className="space-y-2">
+          <h2 className="font-display text-3xl">Business purpose</h2>
+          <p className="text-sm text-muted-foreground max-w-2xl">
+            A Professional LLC must list a single specific professional
+            purpose. Vague or general purposes are not accepted.
+          </p>
+        </header>
         <FieldShell
-          label={
-            data.purposeType === "PROFESSIONAL"
-              ? "Specific professional purpose"
-              : "Specific business purpose"
-          }
+          label="Specific professional purpose"
           required
           error={errors.businessPurposeText}
-          helper={
-            data.purposeType === "PROFESSIONAL"
-              ? "e.g., 'The practice of law,' 'Accounting services,' 'Practicing medicine.'"
-              : "Describe the primary lawful business activity."
-          }
+          helper="e.g., 'The practice of law,' 'Accounting services,' 'Practicing medicine.'"
         >
           <Textarea
             value={data.businessPurposeText}
@@ -104,22 +51,64 @@ export function StepPurpose({ data, patch, errors }: StepProps) {
             rows={4}
           />
         </FieldShell>
-      ) : null}
+      </div>
+    );
+  }
 
-      {data.purposeType === "GENERAL" ? (
-        <div className="rounded-xl border border-border bg-secondary/40 p-4 text-sm">
-          <div className="text-xs uppercase tracking-[0.18em] text-trust font-medium mb-1">
-            Default purpose text
-          </div>
-          {data.businessPurposeText || GENERAL_DEFAULT}
-        </div>
-      ) : null}
-
-      {isPllc ? (
-        <p className="text-xs text-muted-foreground">
-          A Professional LLC must provide a specific professional purpose.
-          Vague or general purposes are not accepted.
+  return (
+    <div className="space-y-6">
+      <header className="space-y-2">
+        <h2 className="font-display text-3xl">Business purpose</h2>
+        <p className="text-sm text-muted-foreground max-w-2xl">
+          Your Articles will always include a general purpose covering any
+          lawful business activity, so your LLC is never limited to one line of
+          business.
         </p>
+      </header>
+
+      <div className="rounded-xl border border-trust/30 bg-trust/5 p-5">
+        <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-trust font-medium mb-2">
+          <ShieldCheck className="h-4 w-4" />
+          Included in every filing
+        </div>
+        <p className="text-sm text-foreground/85">{GENERAL_DEFAULT}</p>
+      </div>
+
+      <FieldShell label="Additional specific purpose (optional)">
+        <label className="flex items-start gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={addingSpecific}
+            onChange={(e) =>
+              patch({
+                purposeType: e.target.checked ? "SPECIFIC" : "GENERAL",
+                businessPurposeText: e.target.checked
+                  ? data.businessPurposeText
+                  : "",
+              })
+            }
+            className="h-4 w-4 mt-0.5 accent-trust shrink-0"
+          />
+          <span>
+            Also list a specific purpose in the Articles — for example, if a
+            lender or licensing agency wants to see one.
+          </span>
+        </label>
+      </FieldShell>
+
+      {addingSpecific ? (
+        <FieldShell
+          label="Specific purpose"
+          required
+          error={errors.businessPurposeText}
+          helper="This is added alongside the general purpose above — it does not narrow what the LLC may lawfully do."
+        >
+          <Textarea
+            value={data.businessPurposeText}
+            onChange={(e) => patch({ businessPurposeText: e.target.value })}
+            rows={4}
+          />
+        </FieldShell>
       ) : null}
     </div>
   );
