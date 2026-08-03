@@ -146,6 +146,9 @@ export function validateStep(
   if (step === "management") {
     if (!data.managementStructure)
       e.managementStructure = "Choose a management structure.";
+    else if (data.managementStructure === "NOT_SPECIFIED")
+      e.managementStructure =
+        "Please choose member-managed or manager-managed.";
   }
 
   if (step === "managers") {

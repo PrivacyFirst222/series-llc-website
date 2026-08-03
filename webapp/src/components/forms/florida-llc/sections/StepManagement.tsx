@@ -21,11 +21,6 @@ const OPTIONS: { v: ManagementStructure; t: string; s: string }[] = [
     t: "Manager-managed",
     s: "One or more managers run the LLC; members may be passive.",
   },
-  {
-    v: "NOT_SPECIFIED",
-    t: "Not specified in Articles",
-    s: "Defer the choice to the operating agreement.",
-  },
 ];
 
 export function StepManagement({ data, patch, errors }: StepProps) {
@@ -45,7 +40,7 @@ export function StepManagement({ data, patch, errors }: StepProps) {
         required
         error={errors.managementStructure}
       >
-        <div className="grid sm:grid-cols-3 gap-3">
+        <div className="grid sm:grid-cols-2 gap-3">
           {OPTIONS.map((o) => (
             <label
               key={o.v}
@@ -63,8 +58,8 @@ export function StepManagement({ data, patch, errors }: StepProps) {
                 onChange={() =>
                   patch({
                     managementStructure: o.v,
-                    includeManagementStatementInArticles:
-                      o.v === "MANAGER_MANAGED" ? true : data.includeManagementStatementInArticles,
+                    // The manager-managed statement always goes in the Articles.
+                    includeManagementStatementInArticles: o.v === "MANAGER_MANAGED",
                   })
                 }
               />
@@ -124,29 +119,17 @@ export function StepManagement({ data, patch, errors }: StepProps) {
       </details>
 
       {data.managementStructure === "MANAGER_MANAGED" ? (
-        <FieldShell
-          label="Include manager-managed statement in Articles?"
-        >
-          <label className="flex items-start gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={data.includeManagementStatementInArticles}
-              onChange={(e) =>
-                patch({
-                  includeManagementStatementInArticles: e.target.checked,
-                })
-              }
-              className="h-4 w-4 mt-0.5 accent-trust shrink-0"
-            />
-            <span>Yes, include a statement that the LLC is manager-managed.</span>
-          </label>
-          <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
-            <p className="font-medium">Important — Manager-Managed Statement Required</p>
-            <p className="mt-1">
-              For your LLC to be legally recognized as manager-managed, this statement must appear in either the <strong>Articles of Organization</strong> or the company's <strong>Operating Agreement</strong>. We <strong>strongly recommend</strong> including it in the Articles of Organization so it becomes part of the public record filed with the State of Florida.
-            </p>
-          </div>
-        </FieldShell>
+        <div className="rounded-xl border border-trust/30 bg-trust/5 p-4 text-sm">
+          <p className="font-medium">
+            Your Articles will state that the LLC is manager-managed.
+          </p>
+          <p className="mt-1 text-muted-foreground">
+            Florida recognizes the manager-managed structure when it appears in
+            the Articles of Organization, so we include the statement in every
+            manager-managed filing — it becomes part of the public record and
+            is what banks and title companies look for.
+          </p>
+        </div>
       ) : null}
     </div>
   );

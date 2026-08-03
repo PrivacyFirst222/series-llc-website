@@ -56,6 +56,13 @@ const extendedFormSchema = formationFormSchema
         message: "The registered agent's full legal name is required.",
       });
     }
+    if (data.managementStructure === "NOT_SPECIFIED") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["managementStructure"],
+        message: "Choose member-managed or manager-managed.",
+      });
+    }
   });
 
 /** Mirror the form's behavior before validating:
@@ -71,6 +78,10 @@ export const orderFormSchema = z.preprocess((raw) => {
     }
     if (d.registeredAgentChoice === "SERVICE") {
       d = { ...d, ...raServicePatch() };
+    }
+    if (d.managementStructure === "MANAGER_MANAGED") {
+      // The manager-managed statement always goes in the Articles.
+      d = { ...d, includeManagementStatementInArticles: true };
     }
     return d;
   }
