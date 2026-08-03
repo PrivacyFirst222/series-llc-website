@@ -71,6 +71,12 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <Link
+            to="/portal/login"
+            className="hidden md:inline-flex px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Client Login
+          </Link>
           <Button asChild size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-5 hidden md:inline-flex">
             <Link to="/pricing">
               Form your LLC
@@ -114,6 +120,15 @@ export function Header() {
                 {item.label}
               </NavLink>
             ))}
+            <Link
+              to="/portal/login"
+              className={cn(
+                "py-3 text-base font-medium border-t border-border/50",
+                location.pathname.startsWith("/portal") ? "text-foreground" : "text-muted-foreground",
+              )}
+            >
+              Client Login
+            </Link>
             <div className="mt-4">
               <Button asChild className="w-full rounded-full bg-primary text-primary-foreground">
                 <Link to="/pricing">Form LLC</Link>
