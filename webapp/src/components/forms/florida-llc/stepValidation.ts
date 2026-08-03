@@ -172,7 +172,7 @@ export function validateStep(
     });
   }
 
-  if (step === "members" && data.collectMembersForInternalRecords) {
+  if (step === "members") {
     if (data.members.length === 0)
       e.members =
         "At least one initial member is required for internal formation records.";

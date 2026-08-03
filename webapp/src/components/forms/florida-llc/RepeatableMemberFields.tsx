@@ -142,69 +142,6 @@ export function RepeatableMemberFields({
             }
           />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FieldShell
-              label="Ownership %"
-              helper="Optional. If used, all members combined should equal 100%."
-            >
-              <Input
-                type="number"
-                min={0}
-                max={100}
-                step="0.01"
-                value={
-                  entry.ownershipPercentage === undefined
-                    ? ""
-                    : entry.ownershipPercentage
-                }
-                onChange={(e) =>
-                  update(entry.id, {
-                    ownershipPercentage:
-                      e.target.value === ""
-                        ? undefined
-                        : Number(e.target.value),
-                  })
-                }
-              />
-            </FieldShell>
-            <FieldShell label="Capital contribution (USD, optional)">
-              <Input
-                type="number"
-                min={0}
-                step="0.01"
-                value={
-                  entry.capitalContribution === undefined
-                    ? ""
-                    : entry.capitalContribution
-                }
-                onChange={(e) =>
-                  update(entry.id, {
-                    capitalContribution:
-                      e.target.value === ""
-                        ? undefined
-                        : Number(e.target.value),
-                  })
-                }
-              />
-            </FieldShell>
-            <FieldShell label="Email (optional)">
-              <Input
-                type="email"
-                value={entry.email ?? ""}
-                onChange={(e) =>
-                  update(entry.id, { email: e.target.value })
-                }
-              />
-            </FieldShell>
-            <FieldShell label="Phone (optional)">
-              <Input
-                value={entry.phone ?? ""}
-                onChange={(e) =>
-                  update(entry.id, { phone: e.target.value })
-                }
-              />
-            </FieldShell>
-          </div>
         </div>
       ))}
 

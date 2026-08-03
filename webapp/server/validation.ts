@@ -83,6 +83,9 @@ export const orderFormSchema = z.preprocess((raw) => {
       // The manager-managed statement always goes in the Articles.
       d = { ...d, includeManagementStatementInArticles: true };
     }
+    // Member info is always collected for internal records and never listed
+    // in the Articles (the form no longer offers either toggle).
+    d = { ...d, collectMembersForInternalRecords: true, includeMembersInArticles: false };
     return d;
   }
   return raw;

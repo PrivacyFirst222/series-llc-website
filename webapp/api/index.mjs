@@ -56847,6 +56847,7 @@ var orderFormSchema = external_exports.preprocess((raw2) => {
     if (d2.managementStructure === "MANAGER_MANAGED") {
       d2 = { ...d2, includeManagementStatementInArticles: true };
     }
+    d2 = { ...d2, collectMembersForInternalRecords: true, includeMembersInArticles: false };
     return d2;
   }
   return raw2;
