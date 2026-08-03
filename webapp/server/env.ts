@@ -23,6 +23,8 @@ export const env = {
 
   BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN ?? "",
 
+  RADAR_SECRET_KEY: process.env.RADAR_SECRET_KEY ?? "",
+
   /** Public origin for links in emails and Square redirects. */
   PUBLIC_BASE_URL:
     process.env.PUBLIC_BASE_URL ??

@@ -1,5 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { FieldShell } from "./FieldShell";
+import { AddressAutocomplete } from "./AddressAutocomplete";
 import type { AddressFields as AddressType } from "./types";
 
 export const US_STATES: { code: string; name: string }[] = [
@@ -60,10 +61,20 @@ export function AddressFieldsBlock({
         error={errors?.address1}
         className="md:col-span-6"
       >
-        <Input
+        <AddressAutocomplete
           id={`${prefix}-address1`}
           value={value.address1}
-          onChange={(e) => set("address1", e.target.value)}
+          onChangeText={(text) => set("address1", text)}
+          onSelect={(s) =>
+            onChange({
+              ...value,
+              address1: s.address1,
+              city: s.city,
+              state: lockState ?? s.state,
+              zip: s.zip,
+              country: "United States",
+            })
+          }
           placeholder="123 Main St"
           aria-invalid={Boolean(errors?.address1)}
         />

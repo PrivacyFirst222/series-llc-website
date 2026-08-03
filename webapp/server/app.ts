@@ -221,6 +221,64 @@ if (!env.SQUARE_ACCESS_TOKEN && !env.isProd) {
   });
 }
 
+/* ---------------------------- address verify ---------------------------- */
+
+const verifyAddressSchema = z.object({
+  address1: z.string().min(1).max(200),
+  address2: z.string().max(200).optional().or(z.literal("")),
+  city: z.string().min(1).max(100),
+  state: z.string().min(2).max(2),
+  zip: z.string().min(3).max(20),
+});
+
+/** Soft USPS-backed check via Radar. Never blocks: with no key, on vendor
+ *  errors, or on timeouts the answer is "skipped" and the form proceeds. */
+app.post("/address/verify", async (c) => {
+  if (!rateLimit(`addr:${clientIp(c)}`, 60, 900_000)) {
+    return c.json({ data: { status: "skipped" } });
+  }
+  const body = verifyAddressSchema.safeParse(await c.req.json().catch(() => null));
+  if (!body.success) return c.json(err("Invalid address payload", "INVALID_INPUT"), 400);
+  if (!env.RADAR_SECRET_KEY) return c.json({ data: { status: "skipped" } });
+
+  const a = body.data;
+  const params = new URLSearchParams({
+    countryCode: "US",
+    stateCode: a.state,
+    city: a.city,
+    postalCode: a.zip,
+    addressLabel: a.address1,
+    ...(a.address2 ? { unit: a.address2 } : {}),
+  });
+  try {
+    const res = await fetch(`https://api.radar.io/v1/addresses/validate?${params}`, {
+      headers: { Authorization: env.RADAR_SECRET_KEY },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!res.ok) return c.json({ data: { status: "skipped" } });
+    const out = (await res.json()) as {
+      result?: { verificationStatus?: string };
+      address?: { addressLabel?: string; city?: string; stateCode?: string; postalCode?: string };
+    };
+    const status = (out.result?.verificationStatus ?? "unknown").toLowerCase();
+    return c.json({
+      data: {
+        status,
+        normalized: out.address
+          ? {
+              address1: out.address.addressLabel ?? "",
+              city: out.address.city ?? "",
+              state: out.address.stateCode ?? "",
+              zip: out.address.postalCode ?? "",
+            }
+          : null,
+      },
+    });
+  } catch {
+    return c.json({ data: { status: "skipped" } });
+  }
+});
+
 /* --------------------------------- auth -------------------------------- */
 
 const loginSchema = z.object({ email: z.string().email(), password: z.string().min(1) });

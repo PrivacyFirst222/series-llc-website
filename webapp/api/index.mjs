@@ -56967,6 +56967,7 @@ var env = {
   ADMIN_NOTIFY_EMAIL: process.env.ADMIN_NOTIFY_EMAIL ?? "",
   ADMIN_PASSWORD: process.env.ADMIN_PASSWORD ?? "",
   BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN ?? "",
+  RADAR_SECRET_KEY: process.env.RADAR_SECRET_KEY ?? "",
   /** Public origin for links in emails and Square redirects. */
   PUBLIC_BASE_URL: process.env.PUBLIC_BASE_URL ?? (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "http://localhost:8000"),
   isProd: !!process.env.VERCEL
@@ -57692,6 +57693,52 @@ if (!env.SQUARE_ACCESS_TOKEN && !env.isProd) {
     return c.json({ data: { ok: true } });
   });
 }
+var verifyAddressSchema = external_exports.object({
+  address1: external_exports.string().min(1).max(200),
+  address2: external_exports.string().max(200).optional().or(external_exports.literal("")),
+  city: external_exports.string().min(1).max(100),
+  state: external_exports.string().min(2).max(2),
+  zip: external_exports.string().min(3).max(20)
+});
+app.post("/address/verify", async (c) => {
+  if (!rateLimit(`addr:${clientIp(c)}`, 60, 9e5)) {
+    return c.json({ data: { status: "skipped" } });
+  }
+  const body = verifyAddressSchema.safeParse(await c.req.json().catch(() => null));
+  if (!body.success) return c.json(err("Invalid address payload", "INVALID_INPUT"), 400);
+  if (!env.RADAR_SECRET_KEY) return c.json({ data: { status: "skipped" } });
+  const a2 = body.data;
+  const params = new URLSearchParams({
+    countryCode: "US",
+    stateCode: a2.state,
+    city: a2.city,
+    postalCode: a2.zip,
+    addressLabel: a2.address1,
+    ...a2.address2 ? { unit: a2.address2 } : {}
+  });
+  try {
+    const res = await fetch(`https://api.radar.io/v1/addresses/validate?${params}`, {
+      headers: { Authorization: env.RADAR_SECRET_KEY },
+      signal: AbortSignal.timeout(5e3)
+    });
+    if (!res.ok) return c.json({ data: { status: "skipped" } });
+    const out = await res.json();
+    const status = (out.result?.verificationStatus ?? "unknown").toLowerCase();
+    return c.json({
+      data: {
+        status,
+        normalized: out.address ? {
+          address1: out.address.addressLabel ?? "",
+          city: out.address.city ?? "",
+          state: out.address.stateCode ?? "",
+          zip: out.address.postalCode ?? ""
+        } : null
+      }
+    });
+  } catch {
+    return c.json({ data: { status: "skipped" } });
+  }
+});
 var loginSchema = external_exports.object({ email: external_exports.string().email(), password: external_exports.string().min(1) });
 app.post("/auth/login", async (c) => {
   if (!rateLimit(`login:${clientIp(c)}`, 10, 9e5)) {

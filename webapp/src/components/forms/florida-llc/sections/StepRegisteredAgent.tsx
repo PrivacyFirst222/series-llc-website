@@ -1,6 +1,7 @@
 import { ShieldCheck, UserRound } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { AcknowledgeBox, FieldShell } from "../FieldShell";
+import { AddressAutocomplete } from "../AddressAutocomplete";
 import { isPoBox } from "../schema";
 import { RA_SERVICE, raServicePatch, raSelfPatch } from "../raService";
 import type { FloridaLLCFormData } from "../types";
@@ -120,10 +121,18 @@ export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
               className="md:col-span-6"
               error={poBoxError ?? errors.registeredAgentStreetAddress1}
             >
-              <Input
+              <AddressAutocomplete
                 value={data.registeredAgentStreetAddress1}
-                onChange={(e) =>
-                  patch({ registeredAgentStreetAddress1: e.target.value })
+                onChangeText={(text) =>
+                  patch({ registeredAgentStreetAddress1: text })
+                }
+                onSelect={(s) =>
+                  patch({
+                    registeredAgentStreetAddress1: s.address1,
+                    registeredAgentCity: s.city,
+                    registeredAgentState: "FL",
+                    registeredAgentZip: s.zip,
+                  })
                 }
               />
             </FieldShell>

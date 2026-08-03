@@ -113,16 +113,37 @@ export function FloridaLLCFormationForm({
   const patch = (p: Partial<FloridaLLCFormData>) =>
     setData((d) => ({ ...d, ...p }));
 
-  const goNext = () => {
-    const e = validateStep(stepKey, data);
-    setErrors(e);
-    if (Object.keys(e).length > 0) {
-      const first = document.querySelector<HTMLElement>("[aria-invalid='true']");
-      first?.focus?.();
-      first?.scrollIntoView({ behavior: "smooth", block: "center" });
-      return;
+  // Soft USPS check state: which step has an unresolved warning. Continuing a
+  // second time proceeds — the check advises, it never blocks.
+  const [addressWarning, setAddressWarning] = useState<{ step: string; message: string } | null>(null);
+  const [checkingAddress, setCheckingAddress] = useState<boolean>(false);
+
+  const addressToVerify = (): { address1: string; address2?: string; city: string; state: string; zip: string } | null => {
+    if (stepKey === "principal") {
+      const a = data.principalAddress;
+      if (a.state !== "FL" && a.state.length !== 2) return null;
+      return { address1: a.address1, address2: a.address2, city: a.city, state: a.state, zip: a.zip };
     }
+    if (stepKey === "mailing" && !data.mailingSameAsPrincipal) {
+      const a = data.mailingAddress;
+      if (a.state.length !== 2) return null;
+      return { address1: a.address1, address2: a.address2, city: a.city, state: a.state, zip: a.zip };
+    }
+    if (stepKey === "agent" && data.registeredAgentChoice === "SELF") {
+      return {
+        address1: data.registeredAgentStreetAddress1,
+        address2: data.registeredAgentStreetAddress2,
+        city: data.registeredAgentCity,
+        state: "FL",
+        zip: data.registeredAgentZip,
+      };
+    }
+    return null;
+  };
+
+  const advance = () => {
     setErrors({});
+    setAddressWarning(null);
     setStepIndex((i) => {
       const next = Math.min(i + 1, STEPS.length - 1);
       setMaxStep((m) => Math.max(m, next));
@@ -131,14 +152,55 @@ export function FloridaLLCFormationForm({
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const goNext = async () => {
+    const e = validateStep(stepKey, data);
+    setErrors(e);
+    if (Object.keys(e).length > 0) {
+      const first = document.querySelector<HTMLElement>("[aria-invalid='true']");
+      first?.focus?.();
+      first?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+
+    // Second click after a warning: the customer has confirmed their address.
+    if (addressWarning?.step === stepKey) {
+      advance();
+      return;
+    }
+
+    const candidate = addressToVerify();
+    if (candidate && !checkingAddress) {
+      setCheckingAddress(true);
+      try {
+        const result = await api.post<{ status: string }>("/api/address/verify", candidate);
+        const bad = ["unverified", "ambiguous", "partially verified"].includes(result.status);
+        if (bad) {
+          setAddressWarning({
+            step: stepKey,
+            message:
+              "USPS doesn't fully recognize this address. Please double-check the street number, spelling, and ZIP — or press Continue again to use it as entered.",
+          });
+          return;
+        }
+      } catch {
+        // Verification is best-effort; never hold up the form.
+      } finally {
+        setCheckingAddress(false);
+      }
+    }
+    advance();
+  };
+
   const goBack = () => {
     setErrors({});
+    setAddressWarning(null);
     setStepIndex((i) => Math.max(i - 1, 0));
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const goToStep = (i: number) => {
     setErrors({});
+    setAddressWarning(null);
     setStepIndex(i);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -397,6 +459,12 @@ export function FloridaLLCFormationForm({
               <StepSubmissionPayload data={data} />
             ) : null}
 
+            {addressWarning?.step === stepKey ? (
+              <div className="mt-6 rounded-xl border border-amber-300/60 bg-amber-50 p-4 text-sm text-amber-900">
+                {addressWarning.message}
+              </div>
+            ) : null}
+
             {/* Nav */}
             {!isSubmit ? (
               <div className="mt-10 flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 border-t border-border pt-6">
@@ -435,13 +503,20 @@ export function FloridaLLCFormationForm({
                   <Button
                     type="button"
                     onClick={goNext}
+                    disabled={checkingAddress}
                     className={`rounded-full ${
                       isLastBeforeReview
                         ? "bg-accent text-accent-foreground hover:bg-accent/90"
                         : "bg-primary text-primary-foreground hover:bg-primary/90"
                     }`}
                   >
-                    {isLastBeforeReview ? "Continue to review" : "Continue"}
+                    {checkingAddress
+                      ? "Checking address…"
+                      : addressWarning?.step === stepKey
+                        ? "Continue anyway"
+                        : isLastBeforeReview
+                          ? "Continue to review"
+                          : "Continue"}
                     <ArrowRight className="ml-1.5 h-4 w-4" />
                   </Button>
                 )}
