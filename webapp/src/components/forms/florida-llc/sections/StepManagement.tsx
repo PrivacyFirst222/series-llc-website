@@ -76,20 +76,30 @@ export function StepManagement({ data, patch, errors }: StepProps) {
         </summary>
         <div className="mt-3 space-y-3 text-sm leading-relaxed text-foreground/85">
           <p>
-            In a member-managed LLC, every owner automatically has management
-            power. That means every owner can sign contracts and bind the
-            company — and carries the exposure that comes with control. If an
-            owner later transfers their share to a trust, a holding company, or
-            a passive investor, that new owner still carries management
-            authority and the extra risk that comes with it. Most people don't
-            want that.
+            An LLC shields its owners from most personal liability — but anyone
+            with management authority keeps some exposure that ownership alone
+            doesn't carry. People who manage the company owe duties to it, and
+            while ordinary business mistakes are generally protected, willful
+            and reckless conduct is not. In a member-managed LLC, every owner
+            automatically has that management power: every owner can sign
+            contracts and bind the company, and every owner carries
+            manager-level exposure. If a share later passes to a trust, a
+            holding company, or a passive investor, the new owner inherits
+            management authority — and the exposure — too.
           </p>
           <p>
-            A manager-managed LLC fixes this. Only the people you specifically
-            name as managers have day-to-day control and the related exposure.
-            Everyone else simply owns their share without management duties.
-            And if you want all the active owners to share control equally, you
-            can still name each of them as a manager.
+            An example: a manager who knows a rental property's balcony railing
+            is failing and lets it go unrepaired. If someone gets hurt, that
+            manager's own reckless inaction can expose them personally — while
+            an owner with no management role and no part in that decision
+            generally has no comparable exposure.
+          </p>
+          <p>
+            A manager-managed LLC confines that exposure to the people you
+            actually name as managers. Everyone else simply owns their share,
+            with no management duties. And if you want all the active owners to
+            share control equally, you can still name each of them as a
+            manager.
           </p>
           <p>
             It also gives better privacy. Florida's public records list the
