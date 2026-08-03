@@ -56970,7 +56970,8 @@ var env = {
   ADMIN_NOTIFY_EMAIL: process.env.ADMIN_NOTIFY_EMAIL ?? "",
   ADMIN_PASSWORD: process.env.ADMIN_PASSWORD ?? "",
   BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN ?? "",
-  GEOAPIFY_API_KEY: process.env.GEOAPIFY_API_KEY ?? "",
+  SMARTY_AUTH_ID: process.env.SMARTY_AUTH_ID ?? "",
+  SMARTY_AUTH_TOKEN: process.env.SMARTY_AUTH_TOKEN ?? "",
   /** Public origin for links in emails and Square redirects. */
   PUBLIC_BASE_URL: process.env.PUBLIC_BASE_URL ?? (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "http://localhost:8000"),
   isProd: !!process.env.VERCEL
@@ -57709,36 +57710,43 @@ app.post("/address/verify", async (c) => {
   }
   const body = verifyAddressSchema.safeParse(await c.req.json().catch(() => null));
   if (!body.success) return c.json(err("Invalid address payload", "INVALID_INPUT"), 400);
-  if (!env.GEOAPIFY_API_KEY) return c.json({ data: { status: "skipped" } });
+  if (!env.SMARTY_AUTH_ID || !env.SMARTY_AUTH_TOKEN) {
+    return c.json({ data: { status: "skipped" } });
+  }
   const a2 = body.data;
   const params = new URLSearchParams({
-    text: `${a2.address1}, ${a2.city}, ${a2.state} ${a2.zip}`,
-    filter: "countrycode:us",
-    format: "json",
-    limit: "1",
-    apiKey: env.GEOAPIFY_API_KEY
+    "auth-id": env.SMARTY_AUTH_ID,
+    "auth-token": env.SMARTY_AUTH_TOKEN,
+    street: a2.address1,
+    ...a2.address2 ? { secondary: a2.address2 } : {},
+    city: a2.city,
+    state: a2.state,
+    zipcode: a2.zip,
+    candidates: "1",
+    match: "strict"
   });
   try {
-    const res = await fetch(`https://api.geoapify.com/v1/geocode/search?${params}`, {
+    const res = await fetch(`https://us-street.api.smarty.com/street-address?${params}`, {
       signal: AbortSignal.timeout(5e3)
     });
     if (!res.ok) return c.json({ data: { status: "skipped" } });
     const out = await res.json();
-    const top = out.results?.[0];
+    if (!Array.isArray(out)) return c.json({ data: { status: "skipped" } });
+    const top = out[0];
     if (!top) return c.json({ data: { status: "unverified", normalized: null } });
-    const confidence = top.rank?.confidence ?? 0;
-    const matchType = top.rank?.match_type ?? "";
-    const goodMatch = ["full_match", "inner_part", "match_by_building"].includes(matchType);
-    const status = confidence >= 0.9 && goodMatch ? "verified" : "unverified";
+    const dpv = (top.analysis?.dpv_match_code ?? "").toUpperCase();
+    const status = dpv === "Y" ? "verified" : dpv === "D" ? "missing_unit" : dpv === "S" ? "invalid_unit" : "unverified";
+    const comp = top.components ?? {};
+    const normalized = {
+      address1: [top.delivery_line_1, top.delivery_line_2].filter(Boolean).join(" "),
+      city: comp.city_name ?? "",
+      state: comp.state_abbreviation ?? "",
+      zip: comp.zipcode ?? ""
+    };
     return c.json({
       data: {
         status,
-        normalized: top.housenumber && top.street ? {
-          address1: `${top.housenumber} ${top.street}`,
-          city: top.city ?? "",
-          state: top.state_code?.toUpperCase() ?? "",
-          zip: top.postcode ?? ""
-        } : null
+        normalized: normalized.address1 ? normalized : null
       }
     });
   } catch {

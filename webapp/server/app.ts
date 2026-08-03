@@ -231,63 +231,75 @@ const verifyAddressSchema = z.object({
   zip: z.string().min(3).max(20),
 });
 
-/** Soft plausibility check via Geoapify geocoding. Never blocks: with no key,
- *  on vendor errors, or on timeouts the answer is "skipped" and the form
- *  proceeds. Benchmarked 2026-08-03: real addresses score ~1.0/full_match,
- *  typos ~0.7 with a corrected suggestion, fabricated streets fall back to a
- *  city-level match around 0.25. */
+/** USPS-certified (CASS) verification via Smarty. Never blocks: with no
+ *  credentials, on vendor errors, or on timeouts the answer is "skipped" and
+ *  the form proceeds.
+ *
+ *  Driven by Smarty's dpv_match_code, which is the authoritative signal
+ *  (footnotes are not: N# means "standardized", e.g. a typo was fixed):
+ *    Y -> verified      USPS confirms delivery to this exact address
+ *    D -> missing_unit  building is real but needs a suite/unit number
+ *    S -> invalid_unit  building is real but that unit is not recognized
+ *    N -> unverified    USPS does not recognize the address at all
+ *  `normalized` carries Smarty's standardized version, so a typo or wrong
+ *  ZIP comes back corrected for the customer to accept. */
 app.post("/address/verify", async (c) => {
   if (!rateLimit(`addr:${clientIp(c)}`, 60, 900_000)) {
     return c.json({ data: { status: "skipped" } });
   }
   const body = verifyAddressSchema.safeParse(await c.req.json().catch(() => null));
   if (!body.success) return c.json(err("Invalid address payload", "INVALID_INPUT"), 400);
-  if (!env.GEOAPIFY_API_KEY) return c.json({ data: { status: "skipped" } });
+  if (!env.SMARTY_AUTH_ID || !env.SMARTY_AUTH_TOKEN) {
+    return c.json({ data: { status: "skipped" } });
+  }
 
   const a = body.data;
   const params = new URLSearchParams({
-    text: `${a.address1}, ${a.city}, ${a.state} ${a.zip}`,
-    filter: "countrycode:us",
-    format: "json",
-    limit: "1",
-    apiKey: env.GEOAPIFY_API_KEY,
+    "auth-id": env.SMARTY_AUTH_ID,
+    "auth-token": env.SMARTY_AUTH_TOKEN,
+    street: a.address1,
+    ...(a.address2 ? { secondary: a.address2 } : {}),
+    city: a.city,
+    state: a.state,
+    zipcode: a.zip,
+    candidates: "1",
+    match: "strict",
   });
   try {
-    const res = await fetch(`https://api.geoapify.com/v1/geocode/search?${params}`, {
+    const res = await fetch(`https://us-street.api.smarty.com/street-address?${params}`, {
       signal: AbortSignal.timeout(5000),
     });
     if (!res.ok) return c.json({ data: { status: "skipped" } });
-    const out = (await res.json()) as {
-      results?: {
-        formatted?: string;
-        housenumber?: string;
-        street?: string;
-        city?: string;
-        state_code?: string;
-        postcode?: string;
-        rank?: { confidence?: number; match_type?: string };
-      }[];
-    };
-    const top = out.results?.[0];
+    const out = (await res.json()) as
+      | {
+          delivery_line_1?: string;
+          delivery_line_2?: string;
+          components?: { city_name?: string; state_abbreviation?: string; zipcode?: string; plus4_code?: string };
+          analysis?: { dpv_match_code?: string; footnotes?: string };
+        }[]
+      | { errors?: unknown };
+    if (!Array.isArray(out)) return c.json({ data: { status: "skipped" } });
+    const top = out[0];
+    // No candidate at all: USPS does not know this address.
     if (!top) return c.json({ data: { status: "unverified", normalized: null } });
-    const confidence = top.rank?.confidence ?? 0;
-    const matchType = top.rank?.match_type ?? "";
-    // Street/building-level match required; city/postcode fallbacks mean the
-    // street or number was not actually found.
-    const goodMatch = ["full_match", "inner_part", "match_by_building"].includes(matchType);
-    const status = confidence >= 0.9 && goodMatch ? "verified" : "unverified";
+
+    const dpv = (top.analysis?.dpv_match_code ?? "").toUpperCase();
+    const status =
+      dpv === "Y" ? "verified"
+      : dpv === "D" ? "missing_unit"
+      : dpv === "S" ? "invalid_unit"
+      : "unverified";
+    const comp = top.components ?? {};
+    const normalized = {
+      address1: [top.delivery_line_1, top.delivery_line_2].filter(Boolean).join(" "),
+      city: comp.city_name ?? "",
+      state: comp.state_abbreviation ?? "",
+      zip: comp.zipcode ?? "",
+    };
     return c.json({
       data: {
         status,
-        normalized:
-          top.housenumber && top.street
-            ? {
-                address1: `${top.housenumber} ${top.street}`,
-                city: top.city ?? "",
-                state: top.state_code?.toUpperCase() ?? "",
-                zip: top.postcode ?? "",
-              }
-            : null,
+        normalized: normalized.address1 ? normalized : null,
       },
     });
   } catch {

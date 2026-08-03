@@ -23,7 +23,8 @@ export const env = {
 
   BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN ?? "",
 
-  GEOAPIFY_API_KEY: process.env.GEOAPIFY_API_KEY ?? "",
+  SMARTY_AUTH_ID: process.env.SMARTY_AUTH_ID ?? "",
+  SMARTY_AUTH_TOKEN: process.env.SMARTY_AUTH_TOKEN ?? "",
 
   /** Public origin for links in emails and Square redirects. */
   PUBLIC_BASE_URL:

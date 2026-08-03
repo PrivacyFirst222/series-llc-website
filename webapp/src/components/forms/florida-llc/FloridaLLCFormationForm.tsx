@@ -176,14 +176,48 @@ export function FloridaLLCFormationForm({
           status: string;
           normalized: { address1: string; city: string; state: string; zip: string } | null;
         }>("/api/address/verify", candidate);
+
+        // Compare every part, not just the street line: a corrected ZIP or
+        // city matters just as much on a filing.
+        const norm = (s: string) => s.toLowerCase().replace(/[.,]/g, "").replace(/\s+/g, " ").trim();
+        const enteredStreet = [candidate.address1, candidate.address2].filter(Boolean).join(" ");
+        const corrected =
+          result.normalized &&
+          (norm(result.normalized.address1) !== norm(enteredStreet) ||
+            norm(result.normalized.city) !== norm(candidate.city) ||
+            norm(result.normalized.state) !== norm(candidate.state) ||
+            norm(result.normalized.zip) !== norm(candidate.zip))
+            ? `${result.normalized.address1}, ${result.normalized.city}, ${result.normalized.state} ${result.normalized.zip}`
+            : "";
+
         if (result.status === "unverified") {
-          const suggestion =
-            result.normalized && result.normalized.address1.toLowerCase() !== candidate.address1.toLowerCase()
-              ? ` Closest match found: ${result.normalized.address1}, ${result.normalized.city}, ${result.normalized.state} ${result.normalized.zip}.`
-              : "";
           setAddressWarning({
             step: stepKey,
-            message: `We couldn't fully match this address. Please double-check the street number, spelling, and ZIP.${suggestion} Or press Continue again to use it exactly as entered.`,
+            message:
+              "The Postal Service doesn't recognize this address. Please double-check the street number, spelling, city, and ZIP — or press Continue again to use it exactly as entered.",
+          });
+          return;
+        }
+        if (result.status === "missing_unit") {
+          setAddressWarning({
+            step: stepKey,
+            message:
+              "This building requires a suite or unit number — mail sent without one may not be delivered. Add it above, or press Continue again to use the address exactly as entered.",
+          });
+          return;
+        }
+        if (result.status === "invalid_unit") {
+          setAddressWarning({
+            step: stepKey,
+            message:
+              "The Postal Service doesn't recognize that suite or unit number at this building. Please check it — or press Continue again to use the address exactly as entered.",
+          });
+          return;
+        }
+        if (corrected) {
+          setAddressWarning({
+            step: stepKey,
+            message: `The Postal Service lists this address as: ${corrected}. Update it above to match, or press Continue again to keep what you entered.`,
           });
           return;
         }

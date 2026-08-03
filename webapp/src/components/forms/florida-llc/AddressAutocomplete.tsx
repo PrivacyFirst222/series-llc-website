@@ -10,36 +10,7 @@ export interface AddressSuggestion {
   zip: string;
 }
 
-const GEOAPIFY_KEY = import.meta.env.VITE_GEOAPIFY_API_KEY as string | undefined;
-
-const DIRECTIONALS: Record<string, string> = {
-  n: "N", "n.": "N", north: "N",
-  s: "S", "s.": "S", south: "S",
-  e: "E", "e.": "E", east: "E",
-  w: "W", "w.": "W", west: "W",
-  ne: "NE", "n.e.": "NE", northeast: "NE",
-  nw: "NW", "n.w.": "NW", northwest: "NW",
-  se: "SE", "s.e.": "SE", southeast: "SE",
-  sw: "SW", "s.w.": "SW", southwest: "SW",
-};
-
-/** Suggestion data (OpenStreetMap-derived) sometimes omits a street's
- *  directional — "301 N. Fern Creek Ave" comes back as "301 Fern Creek
- *  Avenue". Never drop a directional the customer typed: if their text has
- *  one and the suggestion doesn't, put it back. */
-export function preserveDirectional(typed: string, suggested: string): string {
-  const words = typed.trim().split(/\s+/);
-  const found = words
-    .map((w) => DIRECTIONALS[w.toLowerCase()])
-    .find((d): d is string => Boolean(d));
-  if (!found) return suggested;
-  const alreadyThere = suggested
-    .split(/\s+/)
-    .some((w) => DIRECTIONALS[w.toLowerCase()] === found);
-  if (alreadyThere) return suggested;
-  const m = suggested.match(/^(\d+[A-Za-z]?\s+)(.*)$/);
-  return m ? `${m[1]}${found} ${m[2]}` : `${found} ${suggested}`;
-}
+const SMARTY_KEY = import.meta.env.VITE_SMARTY_EMBEDDED_KEY as string | undefined;
 
 interface AddressAutocompleteProps {
   id?: string;
@@ -50,7 +21,7 @@ interface AddressAutocompleteProps {
   onSelect: (s: AddressSuggestion) => void;
 }
 
-/** Street-address input with Radar type-ahead. Without a key (or when the
+/** Street-address input with Smarty type-ahead. Without a key (or when the
  *  API is unreachable) it is just a normal text input — never blocking. */
 export function AddressAutocomplete({
   id,
@@ -77,7 +48,7 @@ export function AddressAutocomplete({
 
   const query = (text: string) => {
     onChangeText(text);
-    if (!GEOAPIFY_KEY || text.trim().length < 4) {
+    if (!SMARTY_KEY || text.trim().length < 4) {
       setSuggestions([]);
       setOpen(false);
       return;
@@ -89,31 +60,39 @@ export function AddressAutocomplete({
       abortRef.current = controller;
       try {
         const res = await fetch(
-          `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(text)}&filter=countrycode:us&format=json&limit=5&apiKey=${GEOAPIFY_KEY}`,
+          `https://us-autocomplete-pro.api.smarty.com/lookup?key=${SMARTY_KEY}&search=${encodeURIComponent(text)}&max_results=5`,
           { signal: controller.signal },
         );
         if (!res.ok) return;
         const body = (await res.json()) as {
-          results?: {
-            formatted?: string;
-            address_line1?: string;
-            housenumber?: string;
-            street?: string;
+          suggestions?: {
+            street_line?: string;
+            secondary?: string;
             city?: string;
-            state_code?: string;
-            postcode?: string;
+            state?: string;
+            zipcode?: string;
+            entries?: number;
           }[];
         };
-        const next = (body.results ?? [])
-          .map((a) => ({
-            label: a.formatted || a.address_line1 || "",
-            address1:
-              a.address_line1 || [a.housenumber, a.street].filter(Boolean).join(" "),
-            city: a.city ?? "",
-            state: a.state_code?.toUpperCase() ?? "",
-            zip: a.postcode ?? "",
-          }))
-          .filter((s) => s.address1 && s.city);
+        const seen = new Set<string>();
+        const next = (body.suggestions ?? [])
+          .map((a) => {
+            const street = [a.street_line, a.secondary].filter(Boolean).join(" ");
+            return {
+              label: `${street}, ${a.city} ${a.state} ${a.zipcode}`,
+              address1: street,
+              city: a.city ?? "",
+              state: a.state?.toUpperCase() ?? "",
+              zip: a.zipcode ?? "",
+            };
+          })
+          .filter((s) => {
+            if (!s.address1 || !s.city) return false;
+            // Smarty returns one row per matching unit; collapse duplicates.
+            if (seen.has(s.label)) return false;
+            seen.add(s.label);
+            return true;
+          });
         setSuggestions(next);
         setOpen(next.length > 0);
         setHighlight(-1);
@@ -126,7 +105,7 @@ export function AddressAutocomplete({
   const choose = (s: AddressSuggestion) => {
     setOpen(false);
     setSuggestions([]);
-    onSelect({ ...s, address1: preserveDirectional(value, s.address1) });
+    onSelect(s);
   };
 
   return (
