@@ -12,6 +12,9 @@ const extendedFormSchema = formationFormSchema
     registeredAgentChoice: z.enum(["SERVICE", "SELF"], {
       errorMap: () => ({ message: "Choose who will serve as registered agent." }),
     }),
+    addressAccuracyAcknowledgment: z.literal(true, {
+      errorMap: () => ({ message: "Acknowledgment is required." }),
+    }),
     filingPath: z.enum(["NEW", "CONVERT"]).optional(),
     existingLlcName: z.string().max(300).optional().or(z.literal("")),
     sunbizDocumentNumber: z.string().max(50).optional().or(z.literal("")),

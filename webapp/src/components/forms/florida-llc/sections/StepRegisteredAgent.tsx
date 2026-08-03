@@ -174,6 +174,13 @@ export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
                 inputMode="numeric"
               />
             </FieldShell>
+
+            <p className="md:col-span-6 text-xs leading-relaxed text-muted-foreground">
+              We prepare your filing using this address exactly as entered.
+              Please double-check it — an incorrect address can cause missed
+              legal notices and state correspondence. Address suggestions are a
+              convenience, not a verification.
+            </p>
           </div>
 
           <div className="space-y-3">

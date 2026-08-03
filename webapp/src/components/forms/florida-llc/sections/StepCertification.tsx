@@ -117,6 +117,13 @@ export function StepCertification({ data, patch, errors }: StepProps) {
           error={errors.accuracyAcknowledgment}
         />
         <AcknowledgeBox
+          id="cert-address-accuracy"
+          checked={data.addressAccuracyAcknowledgment}
+          onChange={(v) => patch({ addressAccuracyAcknowledgment: v })}
+          label="I am solely responsible for the accuracy of all addresses I have provided. I understand that state filings, legal notices, and official correspondence will be directed to these addresses exactly as entered, and that MyFloridaSeriesLLC does not verify the accuracy or deliverability of any address. Any address-suggestion or address-checking feature in this form is a convenience only and is not a verification, warranty, or guarantee of any kind."
+          error={errors.addressAccuracyAcknowledgment}
+        />
+        <AcknowledgeBox
           id="cert-public"
           checked={data.publicRecordAcknowledgment}
           onChange={(v) => patch({ publicRecordAcknowledgment: v })}

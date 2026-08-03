@@ -56786,6 +56786,9 @@ var extendedFormSchema = formationFormSchema.extend({
   registeredAgentChoice: external_exports.enum(["SERVICE", "SELF"], {
     errorMap: () => ({ message: "Choose who will serve as registered agent." })
   }),
+  addressAccuracyAcknowledgment: external_exports.literal(true, {
+    errorMap: () => ({ message: "Acknowledgment is required." })
+  }),
   filingPath: external_exports.enum(["NEW", "CONVERT"]).optional(),
   existingLlcName: external_exports.string().max(300).optional().or(external_exports.literal("")),
   sunbizDocumentNumber: external_exports.string().max(50).optional().or(external_exports.literal("")),

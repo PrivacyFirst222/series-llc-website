@@ -73,6 +73,7 @@ const formData: FloridaLLCFormData = {
   authorizedRepresentativeSignatureCheckbox: true,
   atLeastOneMemberAcknowledgment: true,
   accuracyAcknowledgment: true,
+  addressAccuracyAcknowledgment: true,
   publicRecordAcknowledgment: true,
   legalAdviceAcknowledgment: true,
 };

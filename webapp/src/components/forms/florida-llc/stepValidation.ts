@@ -241,6 +241,8 @@ export function validateStep(
       e.atLeastOneMemberAcknowledgment = "Acknowledgment is required.";
     if (!data.accuracyAcknowledgment)
       e.accuracyAcknowledgment = "Acknowledgment is required.";
+    if (!data.addressAccuracyAcknowledgment)
+      e.addressAccuracyAcknowledgment = "Acknowledgment is required.";
     if (!data.publicRecordAcknowledgment)
       e.publicRecordAcknowledgment = "Acknowledgment is required.";
     if (!data.legalAdviceAcknowledgment)

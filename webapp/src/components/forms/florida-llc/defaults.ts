@@ -106,6 +106,7 @@ export const defaultFormData: FloridaLLCFormData = {
   authorizedRepresentativeSignatureCheckbox: false,
   atLeastOneMemberAcknowledgment: false,
   accuracyAcknowledgment: false,
+  addressAccuracyAcknowledgment: false,
   publicRecordAcknowledgment: false,
   legalAdviceAcknowledgment: false,
 };

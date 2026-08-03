@@ -173,6 +173,7 @@ export interface FloridaLLCFormData {
   authorizedRepresentativeSignatureCheckbox: boolean;
   atLeastOneMemberAcknowledgment: boolean;
   accuracyAcknowledgment: boolean;
+  addressAccuracyAcknowledgment: boolean;
   publicRecordAcknowledgment: boolean;
   legalAdviceAcknowledgment: boolean;
 }
