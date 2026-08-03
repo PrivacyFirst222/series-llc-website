@@ -12,6 +12,35 @@ export interface AddressSuggestion {
 
 const GEOAPIFY_KEY = import.meta.env.VITE_GEOAPIFY_API_KEY as string | undefined;
 
+const DIRECTIONALS: Record<string, string> = {
+  n: "N", "n.": "N", north: "N",
+  s: "S", "s.": "S", south: "S",
+  e: "E", "e.": "E", east: "E",
+  w: "W", "w.": "W", west: "W",
+  ne: "NE", "n.e.": "NE", northeast: "NE",
+  nw: "NW", "n.w.": "NW", northwest: "NW",
+  se: "SE", "s.e.": "SE", southeast: "SE",
+  sw: "SW", "s.w.": "SW", southwest: "SW",
+};
+
+/** Suggestion data (OpenStreetMap-derived) sometimes omits a street's
+ *  directional — "301 N. Fern Creek Ave" comes back as "301 Fern Creek
+ *  Avenue". Never drop a directional the customer typed: if their text has
+ *  one and the suggestion doesn't, put it back. */
+export function preserveDirectional(typed: string, suggested: string): string {
+  const words = typed.trim().split(/\s+/);
+  const found = words
+    .map((w) => DIRECTIONALS[w.toLowerCase()])
+    .find((d): d is string => Boolean(d));
+  if (!found) return suggested;
+  const alreadyThere = suggested
+    .split(/\s+/)
+    .some((w) => DIRECTIONALS[w.toLowerCase()] === found);
+  if (alreadyThere) return suggested;
+  const m = suggested.match(/^(\d+[A-Za-z]?\s+)(.*)$/);
+  return m ? `${m[1]}${found} ${m[2]}` : `${found} ${suggested}`;
+}
+
 interface AddressAutocompleteProps {
   id?: string;
   value: string;
@@ -97,7 +126,7 @@ export function AddressAutocomplete({
   const choose = (s: AddressSuggestion) => {
     setOpen(false);
     setSuggestions([]);
-    onSelect(s);
+    onSelect({ ...s, address1: preserveDirectional(value, s.address1) });
   };
 
   return (
