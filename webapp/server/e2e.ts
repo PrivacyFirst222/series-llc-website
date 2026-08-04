@@ -287,6 +287,32 @@ if (mint.status === 200) {
   check("admin decrypts TIN for SS-4", adminDetail.body?.data?.tin === "123456789", adminDetail.body?.data);
   check("client-facing record keeps only last 4", adminDetail.body?.data?.details?.tinLast4 === "6789");
 
+  // 13b. Fulfill the series order WITH an attached document — it must land in
+  //      the client's portal documents in the same action.
+  const fulfillFd = new FormData();
+  fulfillFd.set("notify", "false");
+  fulfillFd.set(
+    "file",
+    new File([new TextEncoder().encode("%PDF-1.4 filed designation for e2e")], "designation.pdf", {
+      type: "application/pdf",
+    }),
+  );
+  const fulfillSeries = await fetch(`${BASE}/api/admin/services/${seriesId}/fulfill`, {
+    method: "POST",
+    headers: { Cookie: adminLogin2.cookie },
+    body: fulfillFd,
+  });
+  const fulfillSeriesBody = (await fulfillSeries.json().catch(() => null)) as {
+    data?: { documentId?: string | null };
+  } | null;
+  check("series fulfill with attachment succeeds", fulfillSeries.ok, fulfillSeriesBody);
+  check("fulfill returns a document id", Boolean(fulfillSeriesBody?.data?.documentId));
+  const docsAfter = await api("/api/portal/documents", { cookies: setPw.cookie });
+  const attached = (docsAfter.body?.data as { title: string }[] | undefined)?.find((d) =>
+    d.title.includes("Protected Series Designation"),
+  );
+  check("attached designation appears in client portal documents", Boolean(attached), docsAfter.body?.data);
+
   // 14. Fulfill deletes the TIN permanently
   const fulfill = await api(`/api/admin/services/${intakeEin.id}/fulfill`, {
     method: "POST", cookies: adminLogin2.cookie, body: JSON.stringify({ notify: false }),

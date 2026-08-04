@@ -58384,7 +58384,22 @@ app.get("/admin/services/:id", async (c) => {
 app.post("/admin/services/:id/fulfill", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-  const body = await c.req.json().catch(() => ({}));
+  const contentType = c.req.header("content-type") ?? "";
+  let notify = true;
+  let file = null;
+  let titleOverride = "";
+  if (contentType.includes("multipart/form-data")) {
+    const form = await c.req.parseBody();
+    if (form.file instanceof File && form.file.size > 0) file = form.file;
+    notify = form.notify !== "false";
+    if (typeof form.title === "string") titleOverride = form.title.trim();
+  } else {
+    const body = await c.req.json().catch(() => ({}));
+    notify = body.notify !== false;
+  }
+  if (file && file.size > MAX_UPLOAD_BYTES) {
+    return c.json(err("File is too large (20 MB max).", "TOO_LARGE"), 400);
+  }
   const db2 = await getDb();
   const rows = await db2.query(
     "SELECT id, client_id, type, status, llc_name, details FROM service_orders WHERE id = $1",
@@ -58395,14 +58410,25 @@ app.post("/admin/services/:id/fulfill", async (c) => {
   if (so2.status === "pending_payment" || so2.status === "fulfilled") {
     return c.json(err("This order is not in a fulfillable state.", "BAD_STATE"), 400);
   }
+  const details = typeof so2.details === "string" ? JSON.parse(so2.details) : so2.details;
+  const summary = so2.type === "series" ? `Protected Series Designation \u2014 ${details.seriesName ?? so2.llc_name}` : `Federal EIN \u2014 ${details.target === "series" ? details.seriesName ?? "series" : so2.llc_name}`;
+  let documentId = null;
+  if (file) {
+    const title = titleOverride || (so2.type === "series" ? `Protected Series Designation \u2014 ${details.seriesName ?? so2.llc_name}` : `EIN Confirmation Letter \u2014 ${details.target === "series" ? details.seriesName ?? so2.llc_name : so2.llc_name}`);
+    const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
+    const doc = await db2.query(
+      `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)
+       VALUES ($1, 'package', $2, $3, $4, $5) RETURNING id`,
+      [so2.client_id, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes]
+    );
+    documentId = doc[0].id;
+  }
   await db2.query(
     "UPDATE service_orders SET status = 'fulfilled', fulfilled_at = now(), ein_secret = NULL WHERE id = $1",
     [so2.id]
   );
-  if (body.notify !== false) {
+  if (notify) {
     const clients = await db2.query("SELECT email FROM clients WHERE id = $1", [so2.client_id]);
-    const details = typeof so2.details === "string" ? JSON.parse(so2.details) : so2.details;
-    const summary = so2.type === "series" ? `Protected Series Designation \u2014 ${details.seriesName ?? so2.llc_name}` : `Federal EIN \u2014 ${details.target === "series" ? details.seriesName ?? "series" : so2.llc_name}`;
     if (clients[0]) {
       const mail = serviceFulfilledClientEmail({ summary, portalUrl: `${env.PUBLIC_BASE_URL}/portal` });
       sendMail({ to: clients[0].email, ...mail }).catch(
@@ -58410,7 +58436,7 @@ app.post("/admin/services/:id/fulfill", async (c) => {
       );
     }
   }
-  return c.json({ data: { ok: true } });
+  return c.json({ data: { ok: true, documentId } });
 });
 app.get("/admin/clients/:id/documents", async (c) => {
   const admin = await requireAdmin(c);

@@ -54,6 +54,8 @@ function summaryOf(o: { type: string; details: AdminServiceOrder["details"]; llc
 export function ServiceOrdersSection({ enabled }: { enabled: boolean }) {
   const queryClient = useQueryClient();
   const [viewing, setViewing] = useState<AdminServiceOrder | null>(null);
+  const [attachment, setAttachment] = useState<File | null>(null);
+  const [skipDocument, setSkipDocument] = useState(false);
 
   const servicesQuery = useQuery({
     queryKey: ["admin-services"],
@@ -68,9 +70,24 @@ export function ServiceOrdersSection({ enabled }: { enabled: boolean }) {
   });
 
   const fulfill = useMutation({
-    mutationFn: (id: string) => api.post(`/api/admin/services/${id}/fulfill`, {}),
+    mutationFn: async (args: { id: string; file: File | null }) => {
+      const fd = new FormData();
+      if (args.file) fd.set("file", args.file);
+      const res = await fetch(`/api/admin/services/${args.id}/fulfill`, {
+        method: "POST",
+        body: fd,
+        credentials: "same-origin",
+      });
+      if (!res.ok) {
+        const body = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
+        throw new Error(body?.error?.message ?? "Fulfill failed");
+      }
+      return res.json();
+    },
     onSuccess: () => {
       setViewing(null);
+      setAttachment(null);
+      setSkipDocument(false);
       queryClient.invalidateQueries({ queryKey: ["admin-services"] });
     },
   });
@@ -123,7 +140,16 @@ export function ServiceOrdersSection({ enabled }: { enabled: boolean }) {
         </table>
       </div>
 
-      <Dialog open={viewing !== null} onOpenChange={(v) => { if (!v) setViewing(null); }}>
+      <Dialog
+        open={viewing !== null}
+        onOpenChange={(v) => {
+          if (!v) {
+            setViewing(null);
+            setAttachment(null);
+            setSkipDocument(false);
+          }
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{viewing ? summaryOf(viewing) : ""}</DialogTitle>
@@ -167,13 +193,44 @@ export function ServiceOrdersSection({ enabled }: { enabled: boolean }) {
               )}
             </div>
           ) : null}
+          <div className="space-y-2 border-t border-border pt-3">
+            <label className="text-sm font-medium">
+              {viewing?.type === "ein" ? "Attach the EIN confirmation letter (CP 575)" : "Attach the filed Designation"}
+            </label>
+            <input
+              type="file"
+              accept="application/pdf,image/*"
+              onChange={(e) => setAttachment(e.target.files?.[0] ?? null)}
+              className="block w-full text-sm text-muted-foreground file:mr-3 file:rounded-full file:border file:border-border file:bg-secondary file:px-4 file:py-1.5 file:text-sm file:font-medium"
+            />
+            <p className="text-xs text-muted-foreground">
+              Posted to the client's portal documents in the same action, so "documents have been
+              posted" in their completion email is true.
+            </p>
+            <label className="flex items-center gap-2 text-xs text-muted-foreground">
+              <input
+                type="checkbox"
+                checked={skipDocument}
+                onChange={(e) => setSkipDocument(e.target.checked)}
+                className="h-3.5 w-3.5 accent-trust"
+              />
+              Fulfill without attaching a document
+            </label>
+          </div>
+          {fulfill.isError ? (
+            <p className="text-xs text-destructive">{(fulfill.error as Error).message}</p>
+          ) : null}
           <DialogFooter>
             <Button
               className="rounded-full"
-              disabled={fulfill.isPending || (viewing?.type === "ein" && viewing?.status === "awaiting_info")}
-              onClick={() => viewing && fulfill.mutate(viewing.id)}
+              disabled={
+                fulfill.isPending ||
+                (viewing?.type === "ein" && viewing?.status === "awaiting_info") ||
+                (!attachment && !skipDocument)
+              }
+              onClick={() => viewing && fulfill.mutate({ id: viewing.id, file: attachment })}
             >
-              {fulfill.isPending ? "Fulfilling…" : "Mark fulfilled"}
+              {fulfill.isPending ? "Fulfilling…" : attachment ? "Upload & fulfill" : "Mark fulfilled"}
             </Button>
           </DialogFooter>
         </DialogContent>

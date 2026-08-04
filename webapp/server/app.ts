@@ -885,7 +885,26 @@ app.get("/admin/services/:id", async (c) => {
 app.post("/admin/services/:id/fulfill", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-  const body = (await c.req.json().catch(() => ({}))) as { notify?: boolean };
+
+  // JSON (no attachment) or multipart (attachment posted to the client's
+  // portal documents in the same action).
+  const contentType = c.req.header("content-type") ?? "";
+  let notify = true;
+  let file: File | null = null;
+  let titleOverride = "";
+  if (contentType.includes("multipart/form-data")) {
+    const form = await c.req.parseBody();
+    if (form.file instanceof File && form.file.size > 0) file = form.file;
+    notify = form.notify !== "false";
+    if (typeof form.title === "string") titleOverride = form.title.trim();
+  } else {
+    const body = (await c.req.json().catch(() => ({}))) as { notify?: boolean };
+    notify = body.notify !== false;
+  }
+  if (file && file.size > MAX_UPLOAD_BYTES) {
+    return c.json(err("File is too large (20 MB max).", "TOO_LARGE"), 400);
+  }
+
   const db = await getDb();
   const rows = await db.query<{ id: string; client_id: string; type: string; status: string; llc_name: string; details: unknown }>(
     "SELECT id, client_id, type, status, llc_name, details FROM service_orders WHERE id = $1",
@@ -896,21 +915,39 @@ app.post("/admin/services/:id/fulfill", async (c) => {
   if (so.status === "pending_payment" || so.status === "fulfilled") {
     return c.json(err("This order is not in a fulfillable state.", "BAD_STATE"), 400);
   }
+  const details = (typeof so.details === "string" ? JSON.parse(so.details) : so.details) as {
+    seriesName?: string; target?: string;
+  };
+  const summary =
+    so.type === "series"
+      ? `Protected Series Designation — ${details.seriesName ?? so.llc_name}`
+      : `Federal EIN — ${details.target === "series" ? details.seriesName ?? "series" : so.llc_name}`;
+
+  let documentId: string | null = null;
+  if (file) {
+    const title =
+      titleOverride ||
+      (so.type === "series"
+        ? `Protected Series Designation — ${details.seriesName ?? so.llc_name}`
+        : `EIN Confirmation Letter — ${details.target === "series" ? details.seriesName ?? so.llc_name : so.llc_name}`);
+    const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
+    const doc = await db.query<{ id: string }>(
+      `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)
+       VALUES ($1, 'package', $2, $3, $4, $5) RETURNING id`,
+      [so.client_id, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes],
+    );
+    documentId = doc[0].id;
+  }
+
   // The TIN is deleted the moment the order is fulfilled — this is what makes
   // the Privacy Policy's "not retained after issuance" promise true.
   await db.query(
     "UPDATE service_orders SET status = 'fulfilled', fulfilled_at = now(), ein_secret = NULL WHERE id = $1",
     [so.id],
   );
-  if (body.notify !== false) {
+
+  if (notify) {
     const clients = await db.query<{ email: string }>("SELECT email FROM clients WHERE id = $1", [so.client_id]);
-    const details = (typeof so.details === "string" ? JSON.parse(so.details) : so.details) as {
-      seriesName?: string; target?: string;
-    };
-    const summary =
-      so.type === "series"
-        ? `Protected Series Designation — ${details.seriesName ?? so.llc_name}`
-        : `Federal EIN — ${details.target === "series" ? details.seriesName ?? "series" : so.llc_name}`;
     if (clients[0]) {
       const mail = serviceFulfilledClientEmail({ summary, portalUrl: `${env.PUBLIC_BASE_URL}/portal` });
       sendMail({ to: clients[0].email, ...mail }).catch((e) =>
@@ -918,7 +955,7 @@ app.post("/admin/services/:id/fulfill", async (c) => {
       );
     }
   }
-  return c.json({ data: { ok: true } });
+  return c.json({ data: { ok: true, documentId } });
 });
 
 app.get("/admin/clients/:id/documents", async (c) => {
