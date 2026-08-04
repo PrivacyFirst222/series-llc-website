@@ -19,6 +19,7 @@ const groups: { title: string; links: { to: string; label: string }[] }[] = [
       { to: "/contact", label: "Contact Us" },
       { to: "/faq", label: "FAQ" },
       { to: "/terms", label: "Terms of Service" },
+      { to: "/privacy", label: "Privacy Policy" },
     ],
   },
 ];
