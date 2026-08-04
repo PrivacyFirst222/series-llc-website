@@ -1,19 +1,40 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { Menu, X, ArrowUpRight } from "lucide-react";
+import { Menu, X, ArrowUpRight, ChevronDown } from "lucide-react";
 import { Logo } from "./Logo";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
+const LEARN: { to: string; label: string; sub: string }[] = [
+  { to: "/what-is", label: "What Is a Series LLC", sub: "The structure, in plain English" },
+  { to: "/benefits", label: "Key Benefits", sub: "Why investors choose it" },
+  { to: "/asset-protection", label: "Asset Protection", sub: "The two liability shields" },
+  { to: "/the-statute", label: "The Florida Statute", sub: "Ch. 605 highlights" },
+  { to: "/faq", label: "FAQ", sub: "Common questions, answered" },
+];
+
 const NAV: { to: string; label: string }[] = [
+  { to: "/how-it-works", label: "How It Works" },
+  { to: "/pricing", label: "Pricing" },
+  { to: "/recordkeeping-app", label: "Free App" },
+];
+
+/** Full flat list for the mobile drawer. */
+const MOBILE_NAV: { to: string; label: string }[] = [
   { to: "/what-is", label: "What Is" },
   { to: "/benefits", label: "Benefits" },
   { to: "/asset-protection", label: "Asset Protection" },
-  { to: "/recordkeeping-app", label: "Free App" },
   { to: "/the-statute", label: "The Statute" },
-  { to: "/how-it-works", label: "Process" },
-  { to: "/pricing", label: "Pricing" },
   { to: "/faq", label: "FAQ" },
+  { to: "/how-it-works", label: "How It Works" },
+  { to: "/pricing", label: "Pricing" },
+  { to: "/recordkeeping-app", label: "Free App" },
 ];
 
 export function Header() {
@@ -32,6 +53,8 @@ export function Header() {
     setOpen(false);
   }, [location.pathname]);
 
+  const learnActive = LEARN.some((l) => location.pathname === l.to);
+
   return (
     <header
       className={cn(
@@ -44,40 +67,73 @@ export function Header() {
       <div className="container-wide flex h-16 items-center justify-between gap-4 lg:h-20">
         <Logo />
 
-        <nav className="hidden xl:flex items-center gap-1">
+        <nav className="hidden items-center gap-0.5 rounded-full border border-border/70 bg-card/80 p-1 shadow-sm backdrop-blur lg:flex">
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              className={cn(
+                "group inline-flex items-center gap-1 whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-medium outline-none transition-colors",
+                learnActive
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:bg-secondary hover:text-foreground data-[state=open]:bg-secondary data-[state=open]:text-foreground",
+              )}
+            >
+              Learn
+              <ChevronDown className="h-3.5 w-3.5 transition-transform group-data-[state=open]:rotate-180" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="start"
+              sideOffset={10}
+              className="w-72 rounded-xl border border-border bg-card p-1.5 shadow-lg"
+            >
+              {LEARN.map((item) => (
+                <DropdownMenuItem key={item.to} asChild className="rounded-lg px-3 py-2.5">
+                  <Link to={item.to} className="flex w-full cursor-pointer flex-col !items-start gap-0.5 text-left">
+                    <span
+                      className={cn(
+                        "text-sm font-medium leading-snug",
+                        location.pathname === item.to ? "text-accent" : "text-foreground",
+                      )}
+                    >
+                      {item.label}
+                    </span>
+                    <span className="text-xs leading-snug text-muted-foreground">{item.sub}</span>
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           {NAV.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               className={({ isActive }) =>
                 cn(
-                  "relative px-3 py-2 text-sm font-medium transition-colors",
+                  "whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
                   isActive
-                    ? "text-foreground"
-                    : "text-muted-foreground hover:text-foreground",
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:bg-secondary hover:text-foreground",
                 )
               }
             >
-              {({ isActive }) => (
-                <span className="relative">
-                  {item.label}
-                  {isActive ? (
-                    <span className="absolute -bottom-1 left-0 h-px w-full bg-accent" />
-                  ) : null}
-                </span>
-              )}
+              {item.label}
             </NavLink>
           ))}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 lg:gap-2">
           <Link
             to="/portal/login"
-            className="hidden md:inline-flex px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            className="hidden whitespace-nowrap px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground lg:inline-flex"
           >
             Client Login
           </Link>
-          <Button asChild size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-5 hidden md:inline-flex">
+          <span className="hidden h-5 w-px bg-border lg:block" />
+          <Button
+            asChild
+            size="sm"
+            className="hidden whitespace-nowrap rounded-full bg-primary px-5 text-primary-foreground hover:bg-primary/90 lg:inline-flex"
+          >
             <Link to="/pricing">
               Form your LLC
               <ArrowUpRight className="ml-1 h-4 w-4" />
@@ -87,7 +143,7 @@ export function Header() {
             type="button"
             aria-label="Menu"
             onClick={() => setOpen((v) => !v)}
-            className="xl:hidden inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-foreground"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-foreground lg:hidden"
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -95,7 +151,7 @@ export function Header() {
       </div>
 
       {open ? (
-        <div className="xl:hidden border-t border-border/70 bg-background/95 backdrop-blur">
+        <div className="border-t border-border/70 bg-background/95 backdrop-blur lg:hidden">
           <nav className="container-wide flex flex-col py-4">
             <Link
               to="/"
@@ -106,13 +162,13 @@ export function Header() {
             >
               Home
             </Link>
-            {NAV.map((item) => (
+            {MOBILE_NAV.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 className={({ isActive }) =>
                   cn(
-                    "py-3 text-base font-medium border-t border-border/50",
+                    "border-t border-border/50 py-3 text-base font-medium",
                     isActive ? "text-foreground" : "text-muted-foreground",
                   )
                 }
@@ -123,7 +179,7 @@ export function Header() {
             <Link
               to="/portal/login"
               className={cn(
-                "py-3 text-base font-medium border-t border-border/50",
+                "border-t border-border/50 py-3 text-base font-medium",
                 location.pathname.startsWith("/portal") ? "text-foreground" : "text-muted-foreground",
               )}
             >
