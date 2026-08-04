@@ -14,6 +14,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { api } from "@/lib/api";
+import { ServicesCard } from "./ServicesCard";
 
 interface PortalDoc {
   id: string;
@@ -229,6 +230,8 @@ export default function PortalDashboard() {
           />
         </div>
       </div>
+
+      <ServicesCard />
 
       <RegisteredAgentCard me={meQuery.data ?? null} />
 

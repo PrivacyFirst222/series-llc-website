@@ -1,6 +1,9 @@
 import { calculateEstimatedFees } from "../src/components/forms/florida-llc/validation";
 
 export const SERVICE_FEE_CENTS = 499_00;
+export const EIN_FEE_CENTS = 50_00;
+export const SERIES_ADDON_PREP_CENTS = 25_00;
+export const SERIES_ADDON_STATE_CENTS = 25_00;
 
 export interface PricedOrder {
   serviceFeeCents: number;
@@ -16,6 +19,7 @@ export function priceOrder(opts: {
   seriesCount: number;
   certificateOfStatus: boolean;
   certifiedCopy: boolean;
+  ein: boolean;
 }): PricedOrder {
   const fees = calculateEstimatedFees({
     certificateOfStatus: opts.certificateOfStatus,
@@ -27,6 +31,9 @@ export function priceOrder(opts: {
   const lineItems: { name: string; amountCents: number }[] = [
     { name: "Formation service fee", amountCents: SERVICE_FEE_CENTS },
   ];
+  if (opts.ein) {
+    lineItems.push({ name: "Federal EIN service", amountCents: EIN_FEE_CENTS });
+  }
   if (fees.articlesOfOrganization) {
     lineItems.push({ name: "FL state fee — Articles of Organization", amountCents: fees.articlesOfOrganization * 100 });
   }
@@ -40,10 +47,11 @@ export function priceOrder(opts: {
   if (fees.certifiedCopy) {
     lineItems.push({ name: "FL state fee — certified copy", amountCents: fees.certifiedCopy * 100 });
   }
+  const serviceFeeCents = SERVICE_FEE_CENTS + (opts.ein ? EIN_FEE_CENTS : 0);
   return {
-    serviceFeeCents: SERVICE_FEE_CENTS,
+    serviceFeeCents,
     stateFeesCents,
-    totalCents: SERVICE_FEE_CENTS + stateFeesCents,
+    totalCents: serviceFeeCents + stateFeesCents,
     lineItems,
   };
 }

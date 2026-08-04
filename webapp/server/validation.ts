@@ -19,6 +19,7 @@ const extendedFormSchema = formationFormSchema
       errorMap: () => ({ message: "You must agree to the Terms of Service to continue." }),
     }),
     filingPath: z.enum(["NEW", "CONVERT"]).optional(),
+    orderEin: z.boolean().optional().default(false),
     existingLlcName: z.string().max(300).optional().or(z.literal("")),
     sunbizDocumentNumber: z.string().max(50).optional().or(z.literal("")),
     series: z

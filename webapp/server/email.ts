@@ -112,6 +112,78 @@ export function raCancellationAdminEmail(opts: {
   };
 }
 
+export function serviceOrderClientEmail(opts: {
+  type: "series" | "ein";
+  summary: string;
+  needsInfo: boolean;
+  portalUrl: string;
+}): { subject: string; html: string } {
+  const subject =
+    opts.type === "series" ? "Your Protected Series order is confirmed" : "Your EIN order is confirmed";
+  const action = opts.needsInfo
+    ? `<p><strong>One step is needed from you:</strong> sign in to your portal and provide the
+       responsible party's details through the secure form. We cannot obtain the EIN until you do.
+       For your security, never send Social Security numbers by email.</p>`
+    : `<p>No further action is needed from you. We'll post the confirmation to your portal when
+       the work is complete.</p>`;
+  return {
+    subject,
+    html: wrap(`
+      <p>Thanks — payment received for: <strong>${escapeHtml(opts.summary)}</strong>.</p>
+      ${action}
+      <p><a href="${opts.portalUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Open your portal</a></p>
+    `),
+  };
+}
+
+export function serviceOrderAdminEmail(opts: {
+  type: string;
+  summary: string;
+  clientName: string;
+  clientEmail: string;
+  amountCents: number;
+  adminUrl: string;
+}): { subject: string; html: string } {
+  return {
+    subject: `Paid service order — ${opts.summary}`,
+    html: wrap(`
+      <p><strong>${escapeHtml(opts.summary)}</strong> — $${(opts.amountCents / 100).toFixed(2)} paid.</p>
+      <p>${escapeHtml(opts.clientName)} &lt;${escapeHtml(opts.clientEmail)}&gt;</p>
+      <p><a href="${opts.adminUrl}">Open admin</a></p>
+    `),
+  };
+}
+
+export function einDetailsSubmittedAdminEmail(opts: {
+  summary: string;
+  clientEmail: string;
+  adminUrl: string;
+}): { subject: string; html: string } {
+  return {
+    subject: `EIN details submitted — ready to file (${opts.clientEmail})`,
+    html: wrap(`
+      <p>The responsible-party details for <strong>${escapeHtml(opts.summary)}</strong> have been
+      submitted through the portal. View them once in the admin dashboard; the identification
+      number is deleted automatically when you mark the order fulfilled.</p>
+      <p><a href="${opts.adminUrl}">Open admin</a></p>
+    `),
+  };
+}
+
+export function serviceFulfilledClientEmail(opts: {
+  summary: string;
+  portalUrl: string;
+}): { subject: string; html: string } {
+  return {
+    subject: "Your order is complete",
+    html: wrap(`
+      <p><strong>${escapeHtml(opts.summary)}</strong> is complete. Any related documents have been
+      posted to your client portal.</p>
+      <p><a href="${opts.portalUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Open your portal</a></p>
+    `),
+  };
+}
+
 export function orderPaidEmail(opts: {
   llcName: string;
   contactName: string;

@@ -75,6 +75,7 @@ const formData: FloridaLLCFormData = {
   accuracyAcknowledgment: true,
   addressAccuracyAcknowledgment: true,
   termsOfServiceAcknowledgment: true,
+  orderEin: true,
   publicRecordAcknowledgment: true,
   legalAdviceAcknowledgment: true,
 };
@@ -121,7 +122,7 @@ const order = await api("/api/orders", { method: "POST", body: JSON.stringify(fo
 check("accepts valid order (200)", order.status === 200, order.body);
 const orderId = order.body?.data?.orderId as string;
 const totalCents = order.body?.data?.totalCents as number;
-check("price recomputed server-side: $499 + $125 = $624.00", totalCents === 62400, { totalCents });
+check("price recomputed server-side: $499 + $50 EIN + $125 = $674.00", totalCents === 67400, { totalCents });
 check("returns checkout URL", typeof order.body?.data?.checkoutUrl === "string");
 
 // 3. Status is pending before payment
@@ -223,6 +224,80 @@ if (mint.status === 200) {
   );
   const meAfter = await api("/api/auth/me", { cookies: setPw.cookie });
   check("me reflects the cancellation request", Boolean(meAfter.body.data.raCancellationRequestedAt));
+
+  // 11. Service orders: intake EIN became a paid order awaiting details
+  const svc0 = await api("/api/portal/services", { cookies: setPw.cookie });
+  check("portal services lists LLC name", svc0.body?.data?.llcName?.length > 0, svc0.body?.data);
+  const intakeEin = (svc0.body?.data?.orders ?? []).find(
+    (o: { type: string; status: string }) => o.type === "ein" && o.status === "awaiting_info",
+  );
+  check("intake EIN order created awaiting_info", Boolean(intakeEin));
+
+  // 12. Order an additional series from the portal, pay, and check state
+  const badSeries = await api("/api/portal/services/series", {
+    method: "POST", cookies: setPw.cookie, body: JSON.stringify({ suffix: "Tower Nine" }),
+  });
+  check("series without PS phrase rejected", badSeries.status === 400);
+  const series = await api("/api/portal/services/series", {
+    method: "POST", cookies: setPw.cookie, body: JSON.stringify({ suffix: "PS 9" }),
+  });
+  check("portal series order accepted", series.status === 200, series.body);
+  check("series order total $50", series.body?.data?.totalCents === 5000);
+  const seriesId = series.body?.data?.serviceOrderId as string;
+  const simSvc = await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: seriesId }) });
+  if (simSvc.status === 404) {
+    // Sandbox Square creds present: pay via a webhook-shaped event instead.
+    const adminSvc = await api("/api/admin/login", { method: "POST", body: JSON.stringify({ password: "dev-admin" }) });
+    const svcDetail = await api(`/api/admin/services/${seriesId}`, { cookies: adminSvc.cookie });
+    await api("/api/square/webhook", {
+      method: "POST",
+      body: JSON.stringify({
+        event_id: `e2e-svc-${seriesId}`,
+        type: "payment.updated",
+        data: {
+          object: {
+            payment: {
+              id: `e2e-pay-svc-${seriesId.slice(0, 8)}`,
+              status: "COMPLETED",
+              order_id: svcDetail.body?.data?.square_order_id,
+            },
+          },
+        },
+      }),
+    });
+  }
+  const svc1 = await api("/api/portal/services", { cookies: setPw.cookie });
+  const paidSeries = (svc1.body?.data?.orders ?? []).find((o: { id: string }) => o.id === seriesId);
+  check("paid series order is in_progress", paidSeries?.status === "in_progress", paidSeries);
+
+  // 13. Submit EIN details securely; verify encryption round-trip via admin
+  const einDetails = await api(`/api/portal/services/${intakeEin.id}/ein-details`, {
+    method: "POST", cookies: setPw.cookie,
+    body: JSON.stringify({ responsibleName: "Casey Member", tin: "123-45-6789" }),
+  });
+  check("EIN details accepted", einDetails.status === 200, einDetails.body);
+  const einAgain = await api(`/api/portal/services/${intakeEin.id}/ein-details`, {
+    method: "POST", cookies: setPw.cookie,
+    body: JSON.stringify({ responsibleName: "X", tin: "999999999" }),
+  });
+  check("EIN details cannot be resubmitted", einAgain.status === 400);
+
+  const adminLogin2 = await api("/api/admin/login", { method: "POST", body: JSON.stringify({ password: "dev-admin" }) });
+  const adminDetail = await api(`/api/admin/services/${intakeEin.id}`, { cookies: adminLogin2.cookie });
+  check("admin decrypts TIN for SS-4", adminDetail.body?.data?.tin === "123456789", adminDetail.body?.data);
+  check("client-facing record keeps only last 4", adminDetail.body?.data?.details?.tinLast4 === "6789");
+
+  // 14. Fulfill deletes the TIN permanently
+  const fulfill = await api(`/api/admin/services/${intakeEin.id}/fulfill`, {
+    method: "POST", cookies: adminLogin2.cookie, body: JSON.stringify({ notify: false }),
+  });
+  check("admin fulfills EIN order", fulfill.status === 200, fulfill.body);
+  const afterFulfill = await api(`/api/admin/services/${intakeEin.id}`, { cookies: adminLogin2.cookie });
+  check(
+    "TIN deleted at fulfillment",
+    afterFulfill.body?.data?.status === "fulfilled" && afterFulfill.body?.data?.tin === null,
+    afterFulfill.body?.data,
+  );
 } else {
   check("dev mint-reset-token available (dev only)", false);
 }

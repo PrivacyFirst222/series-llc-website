@@ -88,6 +88,7 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
     optionalDocuments: {
       certificateOfStatus: data.orderCertificateOfStatus,
       certifiedCopy: data.orderCertifiedCopy,
+      ein: data.orderEin,
     },
     series: data.series,
     estimatedStateFees: fees,

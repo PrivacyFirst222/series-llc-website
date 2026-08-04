@@ -160,6 +160,7 @@ export interface FloridaLLCFormData {
   // Section 13
   orderCertificateOfStatus: boolean;
   orderCertifiedCopy: boolean;
+  orderEin: boolean;
 
   // Section 13.5 – Series
   series: SeriesEntry[];
@@ -233,6 +234,7 @@ export interface SubmissionPayload {
   optionalDocuments: {
     certificateOfStatus: boolean;
     certifiedCopy: boolean;
+    ein: boolean;
   };
   series: SeriesEntry[];
   estimatedStateFees: {

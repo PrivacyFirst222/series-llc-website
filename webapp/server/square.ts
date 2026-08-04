@@ -20,8 +20,12 @@ export async function createCheckout(opts: {
   llcName: string;
   priced: PricedOrder;
   buyerEmail: string;
+  /** Defaults to the formation confirmation page; portal service orders
+   *  redirect back to the portal instead. */
+  redirectUrl?: string;
+  description?: string;
 }): Promise<CheckoutLink> {
-  const redirectUrl = `${env.PUBLIC_BASE_URL}/order/confirmed?ref=${opts.orderId}`;
+  const redirectUrl = opts.redirectUrl ?? `${env.PUBLIC_BASE_URL}/order/confirmed?ref=${opts.orderId}`;
   if (!env.SQUARE_ACCESS_TOKEN) {
     return {
       url: `${redirectUrl}&dev=1`,
@@ -52,7 +56,7 @@ export async function createCheckout(opts: {
           merchant_support_email: "support@myfloridaseriesllc.com",
         },
         ...(withPrefill ? { pre_populated_data: { buyer_email: opts.buyerEmail } } : {}),
-        description: `Florida Protected Series LLC formation — ${opts.llcName}`,
+        description: opts.description ?? `Florida Protected Series LLC formation — ${opts.llcName}`,
       }),
     });
 

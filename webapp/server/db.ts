@@ -91,6 +91,22 @@ CREATE TABLE IF NOT EXISTS webhook_events (
   received_at timestamptz NOT NULL DEFAULT now()
 );
 ALTER TABLE clients ADD COLUMN IF NOT EXISTS ra_cancellation_requested_at timestamptz;
+CREATE TABLE IF NOT EXISTS service_orders (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  client_id uuid NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+  type text NOT NULL,
+  status text NOT NULL DEFAULT 'pending_payment',
+  llc_name text NOT NULL DEFAULT '',
+  details jsonb NOT NULL DEFAULT '{}'::jsonb,
+  ein_secret text,
+  amount_cents int NOT NULL,
+  square_order_id text,
+  square_payment_id text,
+  formation_order_id uuid REFERENCES orders(id),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  paid_at timestamptz,
+  fulfilled_at timestamptz
+);
 `;
 
 export async function getDb(): Promise<Db> {

@@ -56793,6 +56793,7 @@ var extendedFormSchema = formationFormSchema.extend({
     errorMap: () => ({ message: "You must agree to the Terms of Service to continue." })
   }),
   filingPath: external_exports.enum(["NEW", "CONVERT"]).optional(),
+  orderEin: external_exports.boolean().optional().default(false),
   existingLlcName: external_exports.string().max(300).optional().or(external_exports.literal("")),
   sunbizDocumentNumber: external_exports.string().max(50).optional().or(external_exports.literal("")),
   series: external_exports.array(
@@ -56937,7 +56938,8 @@ function buildPayload(data) {
     },
     optionalDocuments: {
       certificateOfStatus: data.orderCertificateOfStatus,
-      certifiedCopy: data.orderCertifiedCopy
+      certifiedCopy: data.orderCertifiedCopy,
+      ein: data.orderEin
     },
     series: data.series,
     estimatedStateFees: fees,
@@ -57064,6 +57066,22 @@ CREATE TABLE IF NOT EXISTS webhook_events (
   received_at timestamptz NOT NULL DEFAULT now()
 );
 ALTER TABLE clients ADD COLUMN IF NOT EXISTS ra_cancellation_requested_at timestamptz;
+CREATE TABLE IF NOT EXISTS service_orders (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  client_id uuid NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+  type text NOT NULL,
+  status text NOT NULL DEFAULT 'pending_payment',
+  llc_name text NOT NULL DEFAULT '',
+  details jsonb NOT NULL DEFAULT '{}'::jsonb,
+  ein_secret text,
+  amount_cents int NOT NULL,
+  square_order_id text,
+  square_payment_id text,
+  formation_order_id uuid REFERENCES orders(id),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  paid_at timestamptz,
+  fulfilled_at timestamptz
+);
 `;
 async function getDb() {
   if (!db) db = await createDb();
@@ -57078,6 +57096,9 @@ async function getDb() {
 
 // server/pricing.ts
 var SERVICE_FEE_CENTS = 49900;
+var EIN_FEE_CENTS = 5e3;
+var SERIES_ADDON_PREP_CENTS = 2500;
+var SERIES_ADDON_STATE_CENTS = 2500;
 function priceOrder(opts) {
   const fees = calculateEstimatedFees({
     certificateOfStatus: opts.certificateOfStatus,
@@ -57089,6 +57110,9 @@ function priceOrder(opts) {
   const lineItems = [
     { name: "Formation service fee", amountCents: SERVICE_FEE_CENTS }
   ];
+  if (opts.ein) {
+    lineItems.push({ name: "Federal EIN service", amountCents: EIN_FEE_CENTS });
+  }
   if (fees.articlesOfOrganization) {
     lineItems.push({ name: "FL state fee \u2014 Articles of Organization", amountCents: fees.articlesOfOrganization * 100 });
   }
@@ -57102,10 +57126,11 @@ function priceOrder(opts) {
   if (fees.certifiedCopy) {
     lineItems.push({ name: "FL state fee \u2014 certified copy", amountCents: fees.certifiedCopy * 100 });
   }
+  const serviceFeeCents = SERVICE_FEE_CENTS + (opts.ein ? EIN_FEE_CENTS : 0);
   return {
-    serviceFeeCents: SERVICE_FEE_CENTS,
+    serviceFeeCents,
     stateFeesCents,
-    totalCents: SERVICE_FEE_CENTS + stateFeesCents,
+    totalCents: serviceFeeCents + stateFeesCents,
     lineItems
   };
 }
@@ -57114,7 +57139,16 @@ function priceOrder(opts) {
 import { randomBytes as randomBytes2 } from "node:crypto";
 
 // server/crypto.ts
-import { randomBytes, scrypt as scryptCb, timingSafeEqual, createHash, createHmac } from "node:crypto";
+import {
+  randomBytes,
+  scrypt as scryptCb,
+  timingSafeEqual,
+  createHash,
+  createHmac,
+  createCipheriv,
+  createDecipheriv,
+  hkdfSync
+} from "node:crypto";
 function scrypt(password, salt) {
   return new Promise(
     (resolve, reject) => scryptCb(password, salt, 64, (err2, key) => err2 ? reject(err2) : resolve(key))
@@ -57142,11 +57176,28 @@ function hashToken(token) {
 function hmacSha256Base64(key, message) {
   return createHmac("sha256", key).update(message).digest("base64");
 }
+function secretKey() {
+  return Buffer.from(hkdfSync("sha256", env.SESSION_SECRET, "fpsllc-ein-v1", "ein-encryption", 32));
+}
+function encryptSecret(plain) {
+  const iv = randomBytes(12);
+  const cipher = createCipheriv("aes-256-gcm", secretKey(), iv);
+  const ct2 = Buffer.concat([cipher.update(plain, "utf8"), cipher.final()]);
+  const tag = cipher.getAuthTag();
+  return `v1:${iv.toString("hex")}:${tag.toString("hex")}:${ct2.toString("hex")}`;
+}
+function decryptSecret(stored) {
+  const [v2, ivHex, tagHex, ctHex] = stored.split(":");
+  if (v2 !== "v1" || !ivHex || !tagHex || !ctHex) throw new Error("bad secret format");
+  const decipher = createDecipheriv("aes-256-gcm", secretKey(), Buffer.from(ivHex, "hex"));
+  decipher.setAuthTag(Buffer.from(tagHex, "hex"));
+  return Buffer.concat([decipher.update(Buffer.from(ctHex, "hex")), decipher.final()]).toString("utf8");
+}
 
 // server/square.ts
 var API_BASE = env.SQUARE_ENV === "production" ? "https://connect.squareup.com" : "https://connect.squareupsandbox.com";
 async function createCheckout(opts) {
-  const redirectUrl = `${env.PUBLIC_BASE_URL}/order/confirmed?ref=${opts.orderId}`;
+  const redirectUrl = opts.redirectUrl ?? `${env.PUBLIC_BASE_URL}/order/confirmed?ref=${opts.orderId}`;
   if (!env.SQUARE_ACCESS_TOKEN) {
     return {
       url: `${redirectUrl}&dev=1`,
@@ -57176,7 +57227,7 @@ async function createCheckout(opts) {
         merchant_support_email: "support@myfloridaseriesllc.com"
       },
       ...withPrefill ? { pre_populated_data: { buyer_email: opts.buyerEmail } } : {},
-      description: `Florida Protected Series LLC formation \u2014 ${opts.llcName}`
+      description: opts.description ?? `Florida Protected Series LLC formation \u2014 ${opts.llcName}`
     })
   });
   let res = await request(true);
@@ -57554,6 +57605,52 @@ function raCancellationAdminEmail(opts) {
     `)
   };
 }
+function serviceOrderClientEmail(opts) {
+  const subject = opts.type === "series" ? "Your Protected Series order is confirmed" : "Your EIN order is confirmed";
+  const action = opts.needsInfo ? `<p><strong>One step is needed from you:</strong> sign in to your portal and provide the
+       responsible party's details through the secure form. We cannot obtain the EIN until you do.
+       For your security, never send Social Security numbers by email.</p>` : `<p>No further action is needed from you. We'll post the confirmation to your portal when
+       the work is complete.</p>`;
+  return {
+    subject,
+    html: wrap(`
+      <p>Thanks \u2014 payment received for: <strong>${escapeHtml(opts.summary)}</strong>.</p>
+      ${action}
+      <p><a href="${opts.portalUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Open your portal</a></p>
+    `)
+  };
+}
+function serviceOrderAdminEmail(opts) {
+  return {
+    subject: `Paid service order \u2014 ${opts.summary}`,
+    html: wrap(`
+      <p><strong>${escapeHtml(opts.summary)}</strong> \u2014 $${(opts.amountCents / 100).toFixed(2)} paid.</p>
+      <p>${escapeHtml(opts.clientName)} &lt;${escapeHtml(opts.clientEmail)}&gt;</p>
+      <p><a href="${opts.adminUrl}">Open admin</a></p>
+    `)
+  };
+}
+function einDetailsSubmittedAdminEmail(opts) {
+  return {
+    subject: `EIN details submitted \u2014 ready to file (${opts.clientEmail})`,
+    html: wrap(`
+      <p>The responsible-party details for <strong>${escapeHtml(opts.summary)}</strong> have been
+      submitted through the portal. View them once in the admin dashboard; the identification
+      number is deleted automatically when you mark the order fulfilled.</p>
+      <p><a href="${opts.adminUrl}">Open admin</a></p>
+    `)
+  };
+}
+function serviceFulfilledClientEmail(opts) {
+  return {
+    subject: "Your order is complete",
+    html: wrap(`
+      <p><strong>${escapeHtml(opts.summary)}</strong> is complete. Any related documents have been
+      posted to your client portal.</p>
+      <p><a href="${opts.portalUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Open your portal</a></p>
+    `)
+  };
+}
 function orderPaidEmail(opts) {
   return {
     subject: `Paid order \u2014 ${opts.llcName}`,
@@ -57609,7 +57706,8 @@ app.post("/orders", async (c) => {
     isConversion: data.filingPath === "CONVERT",
     seriesCount: data.series.length,
     certificateOfStatus: data.orderCertificateOfStatus,
-    certifiedCopy: data.orderCertifiedCopy
+    certifiedCopy: data.orderCertifiedCopy,
+    ein: !!data.orderEin
   });
   const llcName = payload.llcName.finalName || payload.llcName.desiredName || "Unnamed LLC";
   const db2 = await getDb();
@@ -57651,7 +57749,7 @@ app.get("/orders/:id/status", async (c) => {
 });
 async function fulfillPaidOrder(orderId, squarePaymentId) {
   const db2 = await getDb();
-  const orders = await db2.query("SELECT id, status, contact_name, contact_email, llc_name, total_cents FROM orders WHERE id = $1", [orderId]);
+  const orders = await db2.query("SELECT id, status, contact_name, contact_email, llc_name, total_cents, payload FROM orders WHERE id = $1", [orderId]);
   if (orders.length === 0 || orders[0].status === "paid") return;
   const order = orders[0];
   await db2.query(
@@ -57673,6 +57771,14 @@ async function fulfillPaidOrder(orderId, squarePaymentId) {
     clientId = created[0].id;
   }
   await db2.query("UPDATE orders SET client_id = $1 WHERE id = $2", [clientId, orderId]);
+  const payload = typeof order.payload === "string" ? JSON.parse(order.payload) : order.payload;
+  if (payload?.optionalDocuments?.ein) {
+    await db2.query(
+      `INSERT INTO service_orders (client_id, type, status, llc_name, details, amount_cents, formation_order_id, paid_at, square_payment_id)
+       VALUES ($1, 'ein', 'awaiting_info', $2, $3, $4, $5, now(), $6)`,
+      [clientId, order.llc_name, JSON.stringify({ target: "company" }), EIN_FEE_CENTS, orderId, squarePaymentId]
+    );
+  }
   if (existing.length === 0 || !existing[0].password_hash) {
     const { token, tokenHash } = newToken();
     await db2.query(
@@ -57698,6 +57804,46 @@ async function fulfillPaidOrder(orderId, squarePaymentId) {
     );
   }
 }
+async function fulfillPaidServiceOrder(serviceOrderId, squarePaymentId) {
+  const db2 = await getDb();
+  const rows = await db2.query("SELECT id, client_id, type, status, llc_name, details, amount_cents FROM service_orders WHERE id = $1", [serviceOrderId]);
+  if (rows.length === 0 || rows[0].status !== "pending_payment") return;
+  const so2 = rows[0];
+  const nextStatus = so2.type === "ein" ? "awaiting_info" : "in_progress";
+  await db2.query(
+    "UPDATE service_orders SET status = $1, paid_at = now(), square_payment_id = $2 WHERE id = $3",
+    [nextStatus, squarePaymentId, so2.id]
+  );
+  const details = typeof so2.details === "string" ? JSON.parse(so2.details) : so2.details;
+  const summary = so2.type === "series" ? `Protected Series Designation \u2014 ${details.seriesName ?? so2.llc_name}` : `Federal EIN \u2014 ${details.target === "series" ? details.seriesName ?? "series" : so2.llc_name}`;
+  const clients = await db2.query(
+    "SELECT email, name FROM clients WHERE id = $1",
+    [so2.client_id]
+  );
+  const client = clients[0];
+  if (client) {
+    const mail = serviceOrderClientEmail({
+      type: so2.type,
+      summary,
+      needsInfo: so2.type === "ein",
+      portalUrl: `${env.PUBLIC_BASE_URL}/portal`
+    });
+    sendMail({ to: client.email, ...mail }).catch((e) => console.error("[service] client email failed:", e));
+    if (env.ADMIN_NOTIFY_EMAIL) {
+      const notice = serviceOrderAdminEmail({
+        type: so2.type,
+        summary,
+        clientName: client.name,
+        clientEmail: client.email,
+        amountCents: so2.amount_cents,
+        adminUrl: `${env.PUBLIC_BASE_URL}/admin`
+      });
+      sendMail({ to: env.ADMIN_NOTIFY_EMAIL, ...notice, replyTo: client.email }).catch(
+        (e) => console.error("[service] admin email failed:", e)
+      );
+    }
+  }
+}
 app.post("/square/webhook", async (c) => {
   const rawBody = await c.req.text();
   const ok = verifyWebhookSignature({
@@ -57721,14 +57867,28 @@ app.post("/square/webhook", async (c) => {
       "SELECT id FROM orders WHERE square_order_id = $1",
       [payment.order_id]
     );
-    if (rows.length > 0) await fulfillPaidOrder(rows[0].id, payment.id);
+    if (rows.length > 0) {
+      await fulfillPaidOrder(rows[0].id, payment.id);
+    } else {
+      const svc = await db2.query(
+        "SELECT id FROM service_orders WHERE square_order_id = $1",
+        [payment.order_id]
+      );
+      if (svc.length > 0) await fulfillPaidServiceOrder(svc[0].id, payment.id);
+    }
   }
   return c.json({ data: { ok: true } });
 });
 if (!env.SQUARE_ACCESS_TOKEN && !env.isProd) {
   app.post("/dev/simulate-payment", async (c) => {
     const { orderId } = await c.req.json();
-    await fulfillPaidOrder(orderId, "dev-payment");
+    const db2 = await getDb();
+    const isFormation = await db2.query("SELECT id FROM orders WHERE id = $1", [orderId]);
+    if (isFormation.length > 0) {
+      await fulfillPaidOrder(orderId, "dev-payment");
+    } else {
+      await fulfillPaidServiceOrder(orderId, "dev-payment");
+    }
     return c.json({ data: { ok: true } });
   });
 }
@@ -57918,6 +58078,179 @@ app.get("/portal/documents/:id/download", async (c) => {
     }
   });
 });
+var SERVICE_SAFE_COLUMNS = "id, type, status, llc_name, details, amount_cents, created_at, paid_at, fulfilled_at";
+async function clientLlcName(clientId) {
+  const db2 = await getDb();
+  const rows = await db2.query(
+    "SELECT llc_name FROM orders WHERE client_id = $1 AND status = 'paid' ORDER BY paid_at DESC NULLS LAST LIMIT 1",
+    [clientId]
+  );
+  return rows[0]?.llc_name ?? "";
+}
+app.get("/portal/services", async (c) => {
+  const session = await getSession(c);
+  if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const db2 = await getDb();
+  const orders = await db2.query(
+    `SELECT ${SERVICE_SAFE_COLUMNS} FROM service_orders WHERE client_id = $1 ORDER BY created_at DESC`,
+    [session.clientId]
+  );
+  return c.json({
+    data: {
+      llcName: await clientLlcName(session.clientId),
+      dev: !env.isProd && !env.SQUARE_ACCESS_TOKEN,
+      pricing: {
+        seriesCents: SERIES_ADDON_PREP_CENTS + SERIES_ADDON_STATE_CENTS,
+        einCents: EIN_FEE_CENTS
+      },
+      orders
+    }
+  });
+});
+app.post("/portal/services/series", async (c) => {
+  const session = await getSession(c);
+  if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  if (!rateLimit(`svc:${session.clientId}`, 20, 36e5)) {
+    return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
+  }
+  const body = external_exports.object({ suffix: external_exports.string().min(1).max(60), purpose: external_exports.string().max(300).optional() }).safeParse(await c.req.json().catch(() => null));
+  if (!body.success) return c.json(err("A series identifier is required.", "INVALID_INPUT"), 400);
+  const llcName = await clientLlcName(session.clientId);
+  if (!llcName) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
+  const suffix = body.data.suffix.trim().replace(/\s+/g, " ");
+  if (!/^[\w .,'&-]+$/.test(suffix)) {
+    return c.json(err("The series identifier contains unsupported characters.", "INVALID_INPUT"), 400);
+  }
+  const seriesName = `${llcName} - ${suffix}`;
+  if (!hasProtectedSeriesPhrase(seriesName)) {
+    return c.json(
+      err('The series name must include "PS", "P.S.", or "protected series" (\xA7605.2202).', "INVALID_INPUT"),
+      400
+    );
+  }
+  const amountCents = SERIES_ADDON_PREP_CENTS + SERIES_ADDON_STATE_CENTS;
+  const db2 = await getDb();
+  const rows = await db2.query(
+    `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents)
+     VALUES ($1, 'series', $2, $3, $4) RETURNING id`,
+    [session.clientId, llcName, JSON.stringify({ seriesName, purpose: body.data.purpose ?? "" }), amountCents]
+  );
+  const serviceOrderId = rows[0].id;
+  const clients = await db2.query("SELECT email FROM clients WHERE id = $1", [session.clientId]);
+  const checkout = await createCheckout({
+    orderId: serviceOrderId,
+    llcName,
+    priced: {
+      serviceFeeCents: SERIES_ADDON_PREP_CENTS,
+      stateFeesCents: SERIES_ADDON_STATE_CENTS,
+      totalCents: amountCents,
+      lineItems: [
+        { name: `Protected Series Designation (drafting) \u2014 ${seriesName}`, amountCents: SERIES_ADDON_PREP_CENTS },
+        { name: "FL state fee \u2014 Protected Series Designation", amountCents: SERIES_ADDON_STATE_CENTS }
+      ]
+    },
+    buyerEmail: clients[0]?.email ?? "",
+    redirectUrl: `${env.PUBLIC_BASE_URL}/portal?paid=${serviceOrderId}`,
+    description: `Protected Series Designation \u2014 ${seriesName}`
+  });
+  await db2.query("UPDATE service_orders SET square_order_id = $1 WHERE id = $2", [
+    checkout.squareOrderId,
+    serviceOrderId
+  ]);
+  return c.json({ data: { serviceOrderId, checkoutUrl: checkout.url, totalCents: amountCents } });
+});
+app.post("/portal/services/ein", async (c) => {
+  const session = await getSession(c);
+  if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  if (!rateLimit(`svc:${session.clientId}`, 20, 36e5)) {
+    return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
+  }
+  const body = external_exports.object({ target: external_exports.enum(["company", "series"]), seriesName: external_exports.string().max(300).optional() }).safeParse(await c.req.json().catch(() => null));
+  if (!body.success) return c.json(err("Choose what the EIN is for.", "INVALID_INPUT"), 400);
+  const llcName = await clientLlcName(session.clientId);
+  if (!llcName) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
+  if (body.data.target === "series" && !body.data.seriesName?.trim()) {
+    return c.json(err("Name the protected series the EIN is for.", "INVALID_INPUT"), 400);
+  }
+  const target = body.data.target;
+  const seriesName = body.data.seriesName?.trim() ?? "";
+  const db2 = await getDb();
+  const rows = await db2.query(
+    `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents)
+     VALUES ($1, 'ein', $2, $3, $4) RETURNING id`,
+    [session.clientId, llcName, JSON.stringify({ target, seriesName }), EIN_FEE_CENTS]
+  );
+  const serviceOrderId = rows[0].id;
+  const clients = await db2.query("SELECT email FROM clients WHERE id = $1", [session.clientId]);
+  const forName = target === "series" ? seriesName : llcName;
+  const checkout = await createCheckout({
+    orderId: serviceOrderId,
+    llcName,
+    priced: {
+      serviceFeeCents: EIN_FEE_CENTS,
+      stateFeesCents: 0,
+      totalCents: EIN_FEE_CENTS,
+      lineItems: [{ name: `Federal EIN service \u2014 ${forName}`, amountCents: EIN_FEE_CENTS }]
+    },
+    buyerEmail: clients[0]?.email ?? "",
+    redirectUrl: `${env.PUBLIC_BASE_URL}/portal?paid=${serviceOrderId}`,
+    description: `Federal EIN service \u2014 ${forName}`
+  });
+  await db2.query("UPDATE service_orders SET square_order_id = $1 WHERE id = $2", [
+    checkout.squareOrderId,
+    serviceOrderId
+  ]);
+  return c.json({ data: { serviceOrderId, checkoutUrl: checkout.url, totalCents: EIN_FEE_CENTS } });
+});
+var einDetailsSchema = external_exports.object({
+  responsibleName: external_exports.string().min(1, "The responsible party's name is required.").max(200),
+  tin: external_exports.string().transform((s) => s.replace(/[\s-]/g, "")).refine((s) => /^\d{9}$/.test(s), "Enter a 9-digit SSN or ITIN."),
+  note: external_exports.string().max(1e3).optional()
+});
+app.post("/portal/services/:id/ein-details", async (c) => {
+  const session = await getSession(c);
+  if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const body = einDetailsSchema.safeParse(await c.req.json().catch(() => null));
+  if (!body.success) {
+    return c.json(err(body.error.issues[0]?.message ?? "Invalid details.", "INVALID_INPUT"), 400);
+  }
+  const db2 = await getDb();
+  const rows = await db2.query(
+    "SELECT id, client_id, type, status, details, llc_name FROM service_orders WHERE id = $1",
+    [c.req.param("id")]
+  );
+  if (rows.length === 0 || rows[0].client_id !== session.clientId) {
+    return c.json(err("Not found", "NOT_FOUND"), 404);
+  }
+  const so2 = rows[0];
+  if (so2.type !== "ein" || so2.status !== "awaiting_info") {
+    return c.json(err("This order is not awaiting details.", "BAD_STATE"), 400);
+  }
+  const details = typeof so2.details === "string" ? JSON.parse(so2.details) : so2.details;
+  const merged = {
+    ...details,
+    responsibleName: body.data.responsibleName,
+    tinLast4: body.data.tin.slice(-4),
+    note: body.data.note ?? ""
+  };
+  await db2.query(
+    "UPDATE service_orders SET details = $1, ein_secret = $2, status = 'in_progress' WHERE id = $3",
+    [JSON.stringify(merged), encryptSecret(body.data.tin), so2.id]
+  );
+  if (env.ADMIN_NOTIFY_EMAIL) {
+    const clients = await db2.query("SELECT email FROM clients WHERE id = $1", [session.clientId]);
+    const summary = `Federal EIN \u2014 ${(details.target === "series" ? details.seriesName : so2.llc_name) || so2.llc_name}`;
+    const mail = einDetailsSubmittedAdminEmail({
+      summary,
+      clientEmail: clients[0]?.email ?? "",
+      adminUrl: `${env.PUBLIC_BASE_URL}/admin`
+    });
+    sendMail({ to: env.ADMIN_NOTIFY_EMAIL, ...mail }).catch(
+      (e) => console.error("[service] ein-details admin email failed:", e)
+    );
+  }
+  return c.json({ data: { ok: true } });
+});
 app.post("/portal/registered-agent/cancel", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
@@ -58000,6 +58333,84 @@ app.get("/admin/clients", async (c) => {
      GROUP BY cl.id ORDER BY cl.created_at DESC`
   );
   return c.json({ data: rows });
+});
+app.get("/admin/services", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const db2 = await getDb();
+  const rows = await db2.query(
+    `SELECT so.id, so.type, so.status, so.llc_name, so.details, so.amount_cents,
+            so.created_at, so.paid_at, so.fulfilled_at,
+            (so.ein_secret IS NOT NULL) AS has_secret,
+            cl.email AS client_email, cl.name AS client_name
+     FROM service_orders so JOIN clients cl ON cl.id = so.client_id
+     ORDER BY so.created_at DESC`
+  );
+  return c.json({ data: rows });
+});
+app.get("/admin/services/:id", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const db2 = await getDb();
+  const rows = await db2.query(
+    "SELECT id, type, status, llc_name, details, amount_cents, ein_secret, created_at, paid_at, square_order_id FROM service_orders WHERE id = $1",
+    [c.req.param("id")]
+  );
+  if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+  const so2 = rows[0];
+  let tin = null;
+  if (so2.ein_secret) {
+    try {
+      tin = decryptSecret(so2.ein_secret);
+    } catch (e) {
+      console.error("[admin] EIN secret decrypt failed:", e);
+    }
+  }
+  return c.json({
+    data: {
+      id: so2.id,
+      type: so2.type,
+      status: so2.status,
+      llc_name: so2.llc_name,
+      details: so2.details,
+      amount_cents: so2.amount_cents,
+      created_at: so2.created_at,
+      paid_at: so2.paid_at,
+      square_order_id: so2.square_order_id,
+      tin
+    }
+  });
+});
+app.post("/admin/services/:id/fulfill", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const body = await c.req.json().catch(() => ({}));
+  const db2 = await getDb();
+  const rows = await db2.query(
+    "SELECT id, client_id, type, status, llc_name, details FROM service_orders WHERE id = $1",
+    [c.req.param("id")]
+  );
+  if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+  const so2 = rows[0];
+  if (so2.status === "pending_payment" || so2.status === "fulfilled") {
+    return c.json(err("This order is not in a fulfillable state.", "BAD_STATE"), 400);
+  }
+  await db2.query(
+    "UPDATE service_orders SET status = 'fulfilled', fulfilled_at = now(), ein_secret = NULL WHERE id = $1",
+    [so2.id]
+  );
+  if (body.notify !== false) {
+    const clients = await db2.query("SELECT email FROM clients WHERE id = $1", [so2.client_id]);
+    const details = typeof so2.details === "string" ? JSON.parse(so2.details) : so2.details;
+    const summary = so2.type === "series" ? `Protected Series Designation \u2014 ${details.seriesName ?? so2.llc_name}` : `Federal EIN \u2014 ${details.target === "series" ? details.seriesName ?? "series" : so2.llc_name}`;
+    if (clients[0]) {
+      const mail = serviceFulfilledClientEmail({ summary, portalUrl: `${env.PUBLIC_BASE_URL}/portal` });
+      sendMail({ to: clients[0].email, ...mail }).catch(
+        (e) => console.error("[admin] fulfill email failed:", e)
+      );
+    }
+  }
+  return c.json({ data: { ok: true } });
 });
 app.get("/admin/clients/:id/documents", async (c) => {
   const admin = await requireAdmin(c);
