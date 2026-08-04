@@ -34,6 +34,10 @@ export function Footer() {
               The first dedicated formation service for Florida's new Protected Series LLC —
               statute-driven asset protection, designed for investors and operators across the Sunshine State.
             </p>
+            <p className="max-w-sm text-xs leading-relaxed text-muted-foreground">
+              MyFloridaSeriesLLC is operated by FLORIDA PROTECTED SERIES, LLC — itself a Florida
+              Protected Series LLC.
+            </p>
           </div>
 
           {groups.map((group) => (

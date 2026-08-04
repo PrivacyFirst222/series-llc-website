@@ -40,7 +40,7 @@ export function HomeHero() {
             <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3 py-1.5 backdrop-blur">
               <Sparkles className="h-3.5 w-3.5 text-accent" />
               <span className="text-xs font-medium tracking-wide text-foreground/80">
-                Florida's first dedicated Protected Series LLC formation service
+                Florida's first and only dedicated Protected Series LLC formation service
               </span>
             </div>
 

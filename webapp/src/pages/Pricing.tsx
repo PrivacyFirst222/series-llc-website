@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Check, ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageHero } from "@/components/sections/PageHero";
+import { WhyOnlyUsCompact } from "@/components/home/WhyOnlyUs";
 
 const SHARED_FEATURES: string[] = [
   "Form Operating Agreement for you to review and adapt",
@@ -140,6 +141,8 @@ export default function Pricing() {
             ))}
           </div>
         </div>
+
+        <WhyOnlyUsCompact />
       </section>
     </>
   );
