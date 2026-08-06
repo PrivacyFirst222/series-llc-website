@@ -22,6 +22,7 @@ import PortalLogin from "./pages/portal/PortalLogin";
 import PortalForgot from "./pages/portal/PortalForgot";
 import PortalSetPassword from "./pages/portal/PortalSetPassword";
 import PortalDashboard from "./pages/portal/PortalDashboard";
+import OAQuestionnaire from "./pages/portal/OAQuestionnaire";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import NotFound from "./pages/NotFound";
@@ -51,6 +52,7 @@ const App = () => (
             <Route path="/form-llc" element={<FormLLC />} />
             <Route path="/order/confirmed" element={<OrderConfirmed />} />
             <Route path="/portal" element={<PortalDashboard />} />
+            <Route path="/portal/agreement" element={<OAQuestionnaire />} />
             <Route path="/portal/login" element={<PortalLogin />} />
             <Route path="/portal/forgot" element={<PortalForgot />} />
             <Route path="/portal/set-password" element={<PortalSetPassword />} />

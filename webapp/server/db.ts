@@ -91,6 +91,29 @@ CREATE TABLE IF NOT EXISTS webhook_events (
   received_at timestamptz NOT NULL DEFAULT now()
 );
 ALTER TABLE clients ADD COLUMN IF NOT EXISTS ra_cancellation_requested_at timestamptz;
+CREATE TABLE IF NOT EXISTS oa_profiles (
+  client_id uuid PRIMARY KEY REFERENCES clients(id) ON DELETE CASCADE,
+  answers jsonb NOT NULL DEFAULT '{}'::jsonb,
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS oa_generations (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  client_id uuid NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+  document_id uuid REFERENCES documents(id),
+  template_version text NOT NULL,
+  amended_restated boolean NOT NULL DEFAULT false,
+  inputs jsonb NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS library_documents (
+  key text PRIMARY KEY,
+  title text NOT NULL,
+  edition text NOT NULL DEFAULT '',
+  storage_key text NOT NULL,
+  content_type text NOT NULL DEFAULT 'application/pdf',
+  size_bytes int NOT NULL DEFAULT 0,
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
 CREATE TABLE IF NOT EXISTS service_orders (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   client_id uuid NOT NULL REFERENCES clients(id) ON DELETE CASCADE,

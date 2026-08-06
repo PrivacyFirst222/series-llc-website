@@ -313,11 +313,70 @@ if (mint.status === 200) {
   );
   check("attached designation appears in client portal documents", Boolean(attached), docsAfter.body?.data);
 
-  // 14. Fulfill deletes the TIN permanently
-  const fulfill = await api(`/api/admin/services/${intakeEin.id}/fulfill`, {
+  // 13c. Operating agreement: seed, answers, generate, regenerate as A&R
+  const oaSeed = await api("/api/portal/oa", { cookies: setPw.cookie });
+  check("OA seed loads with LLC + member", oaSeed.status === 200 && oaSeed.body?.data?.seed?.members?.length === 1, oaSeed.body?.data?.seed);
+  check("OA seed includes portal-added series", (oaSeed.body?.data?.seed?.series ?? []).some((sr: { name: string }) => sr.name.endsWith("PS 9")), oaSeed.body?.data?.seed?.series);
+  const oaAnswers = {
+    firstOrAmended: "first",
+    effectiveDate: "2026-08-05",
+    authorized: true,
+    contributionToCompany: "$1,000 cash",
+    members: [{ todBeneficiary: "Jordan Member" }],
+    series: [],
+  };
+  const saveAns = await api("/api/portal/oa/answers", { method: "PUT", cookies: setPw.cookie, body: JSON.stringify(oaAnswers) });
+  check("OA answers save", saveAns.status === 200);
+  const gen1 = await api("/api/portal/oa/generate", { method: "POST", cookies: setPw.cookie, body: JSON.stringify(oaAnswers) });
+  check("OA generates", gen1.status === 200, gen1.body);
+  check("OA titled as first agreement", gen1.body?.data?.title?.startsWith("Operating Agreement"), gen1.body?.data);
+  const gen2 = await api("/api/portal/oa/generate", {
+    method: "POST", cookies: setPw.cookie,
+    body: JSON.stringify({ ...oaAnswers, firstOrAmended: "amended" }),
+  });
+  check("OA regenerates as Amended & Restated", gen2.status === 200 && gen2.body?.data?.title?.startsWith("Amended and Restated"), gen2.body?.data);
+  const oaAfter = await api("/api/portal/oa", { cookies: setPw.cookie });
+  check("generation history has 2 entries", (oaAfter.body?.data?.generations ?? []).length === 2);
+  const oaDocId = gen1.body?.data?.documentId as string;
+  const oaPdf = await fetch(`${BASE}/api/portal/documents/${oaDocId}/download`, { headers: { Cookie: setPw.cookie } });
+  const oaBytes = new Uint8Array(await oaPdf.arrayBuffer());
+  check("generated OA downloads as PDF", oaPdf.ok && oaBytes[0] === 0x25 && oaBytes[1] === 0x50, { status: oaPdf.status, len: oaBytes.length });
+
+  // 13d. Manual library: admin publishes, client downloads stamped copy
+  const manualFd = new FormData();
+  manualFd.set("title", "Series LLC Owner's Manual");
+  manualFd.set("edition", "E2E Edition");
+  manualFd.set("file", new File([new TextEncoder().encode("%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 612 792]>>endobj\ntrailer<</Root 1 0 R/Size 4>>\n%%EOF")], "manual.pdf", { type: "application/pdf" }));
+  const pub = await fetch(`${BASE}/api/admin/library/owners-manual`, { method: "POST", headers: { Cookie: adminLogin2.cookie }, body: manualFd });
+  check("admin publishes manual", pub.ok, await pub.json().catch(() => null));
+  const lib = await api("/api/portal/library", { cookies: setPw.cookie });
+  check("portal library lists manual", (lib.body?.data ?? []).some((d: { key: string }) => d.key === "owners-manual"), lib.body);
+  const dl = await fetch(`${BASE}/api/portal/library/owners-manual/download`, { headers: { Cookie: setPw.cookie } });
+  const dlBytes = new Uint8Array(await dl.arrayBuffer());
+  check("manual downloads stamped as PDF", dl.ok && dlBytes[0] === 0x25 && dlBytes[1] === 0x50, { status: dl.status, len: dlBytes.length });
+
+  // 14. EIN fulfillment requires the IRS letter; fulfilling deletes the TIN
+  const noLetter = await api(`/api/admin/services/${intakeEin.id}/fulfill`, {
     method: "POST", cookies: adminLogin2.cookie, body: JSON.stringify({ notify: false }),
   });
-  check("admin fulfills EIN order", fulfill.status === 200, fulfill.body);
+  check("EIN fulfill without letter rejected", noLetter.status === 400, noLetter.body);
+  const einFd = new FormData();
+  einFd.set("notify", "false");
+  einFd.set(
+    "file",
+    new File([new TextEncoder().encode("%PDF-1.4 CP 575 letter for e2e")], "cp575.pdf", { type: "application/pdf" }),
+  );
+  const fulfillRes = await fetch(`${BASE}/api/admin/services/${intakeEin.id}/fulfill`, {
+    method: "POST", headers: { Cookie: adminLogin2.cookie }, body: einFd,
+  });
+  const fulfill = { status: fulfillRes.status, body: await fulfillRes.json().catch(() => null) as unknown };
+  check("admin fulfills EIN order with letter", fulfill.status === 200, fulfill.body);
+  const einDocs = await api("/api/portal/documents", { cookies: setPw.cookie });
+  check(
+    "EIN letter appears in client portal documents",
+    (einDocs.body?.data as { title: string }[] | undefined)?.some((d) => d.title.includes("EIN Confirmation Letter")) === true,
+    einDocs.body?.data,
+  );
   const afterFulfill = await api(`/api/admin/services/${intakeEin.id}`, { cookies: adminLogin2.cookie });
   check(
     "TIN deleted at fulfillment",

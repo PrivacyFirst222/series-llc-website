@@ -10,6 +10,8 @@ import { priceOrder, EIN_FEE_CENTS, SERIES_ADDON_PREP_CENTS, SERIES_ADDON_STATE_
 import { createCheckout, verifyWebhookSignature } from "./square";
 import { hashPassword, verifyPassword, newToken, hashToken, encryptSecret, decryptSecret } from "./crypto";
 import { hasProtectedSeriesPhrase } from "../src/components/forms/florida-llc/validation";
+import { assembleOa, OA_TEMPLATE_VERSION, type OaInputs } from "./oa";
+import { renderMarkdownPdf, stampExistingPdf } from "./pdf-render";
 import { createSession, getSession, destroySession, rateLimit, clientIp } from "./auth";
 import { putFile, readFileStream } from "./storage";
 import {
@@ -541,6 +543,383 @@ app.get("/portal/documents/:id/download", async (c) => {
   });
 });
 
+/* ------------------------- operating agreement ------------------------- */
+
+interface SeedPayload {
+  filingPath?: string;
+  llcName?: { finalName?: string; desiredName?: string };
+  principalOfficeAddress?: { address1?: string; address2?: string; city?: string; state?: string; zip?: string };
+  management?: { structure?: string; managersOrAuthorizedRepresentatives?: { fullName?: string; businessEntityName?: string }[] };
+  members?: { memberList?: { fullLegalName?: string; address1?: string; address2?: string; city?: string; state?: string; zip?: string }[] };
+  series?: { id: string; name: string }[];
+}
+
+async function oaSeed(clientId: string): Promise<{
+  llcName: string;
+  filingPath: string;
+  managementStructure: string;
+  managerName: string;
+  principalAddress: string;
+  members: { name: string; address: string }[];
+  series: { name: string; purpose: string }[];
+} | null> {
+  const db = await getDb();
+  const orders = await db.query<{ payload: unknown; llc_name: string }>(
+    "SELECT payload, llc_name FROM orders WHERE client_id = $1 AND status = 'paid' ORDER BY paid_at DESC NULLS LAST LIMIT 1",
+    [clientId],
+  );
+  if (orders.length === 0) return null;
+  const p = (typeof orders[0].payload === "string" ? JSON.parse(orders[0].payload) : orders[0].payload) as SeedPayload;
+  const addr = p.principalOfficeAddress ?? {};
+  const principalAddress = [addr.address1, addr.address2, [addr.city, addr.state].filter(Boolean).join(", "), addr.zip]
+    .filter((x) => x && String(x).trim())
+    .join(", ");
+  const members = (p.members?.memberList ?? []).map((m) => ({
+    name: m.fullLegalName ?? "",
+    address: [m.address1, m.address2, [m.city, m.state].filter(Boolean).join(", "), m.zip]
+      .filter((x) => x && String(x).trim())
+      .join(", "),
+  }));
+  const mgr = p.management?.managersOrAuthorizedRepresentatives?.[0];
+  const managementStructure = p.management?.structure ?? "";
+  const managerName =
+    (mgr?.fullName || mgr?.businessEntityName || "").trim() ||
+    (members[0]?.name ?? "");
+  // Series = intake series + any fulfilled portal series orders
+  const svcSeries = await db.query<{ details: unknown }>(
+    "SELECT details FROM service_orders WHERE client_id = $1 AND type = 'series' AND status IN ('in_progress','fulfilled')",
+    [clientId],
+  );
+  const series: { name: string; purpose: string }[] = (p.series ?? []).map((sr) => ({ name: sr.name, purpose: "" }));
+  for (const row of svcSeries) {
+    const d = (typeof row.details === "string" ? JSON.parse(row.details) : row.details) as { seriesName?: string; purpose?: string };
+    if (d.seriesName && !series.some((sr) => sr.name === d.seriesName)) {
+      series.push({ name: d.seriesName, purpose: d.purpose ?? "" });
+    }
+  }
+  return {
+    llcName: p.llcName?.finalName || orders[0].llc_name,
+    filingPath: p.filingPath ?? "NEW",
+    managementStructure,
+    managerName,
+    principalAddress,
+    members,
+    series,
+  };
+}
+
+const oaAnswersSchema = z.object({
+  firstOrAmended: z.enum(["first", "amended"]).optional(),
+  effectiveDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  authorized: z.boolean().optional(),
+  contributionToCompany: z.string().max(300).optional(),
+  members: z
+    .array(
+      z.object({
+        percentage: z.number().min(0).max(100).optional(),
+        contribution: z.string().max(300).optional(),
+        todBeneficiary: z.string().max(300).optional(),
+      }),
+    )
+    .optional(),
+  series: z
+    .array(
+      z.object({
+        purpose: z.string().max(300).optional(),
+        contribution: z.string().max(300).optional(),
+        associated: z.array(z.object({ memberIndex: z.number().int().min(0), seriesPercentage: z.number().min(0).max(100) })).optional(),
+      }),
+    )
+    .optional(),
+  includeCapitalCalls: z.boolean().optional(),
+  capitalCallCap: z.number().min(0).max(100_000_000).optional(),
+  competition: z.enum(["A", "B"]).optional(),
+  includeShotgun: z.boolean().optional(),
+  borrowingThreshold: z.number().min(0).max(100_000_000).optional(),
+});
+
+function fmtDate(iso: string): string {
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    timeZone: "UTC",
+  });
+}
+
+app.get("/portal/oa", async (c) => {
+  const session = await getSession(c);
+  if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const seed = await oaSeed(session.clientId);
+  if (!seed) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
+  const db = await getDb();
+  const saved = await db.query<{ answers: unknown }>("SELECT answers FROM oa_profiles WHERE client_id = $1", [session.clientId]);
+  const gens = await db.query(
+    "SELECT id, document_id, template_version, amended_restated, created_at FROM oa_generations WHERE client_id = $1 ORDER BY created_at DESC",
+    [session.clientId],
+  );
+  const version = seed.members.length > 1 ? "multi" : "single";
+  const blocked = version === "multi" && seed.managementStructure === "MEMBER_MANAGED";
+  return c.json({
+    data: {
+      seed,
+      version,
+      blocked,
+      templateVersion: OA_TEMPLATE_VERSION,
+      answers: saved.length > 0 ? (typeof saved[0].answers === "string" ? JSON.parse(saved[0].answers as string) : saved[0].answers) : {},
+      generations: gens,
+    },
+  });
+});
+
+app.put("/portal/oa/answers", async (c) => {
+  const session = await getSession(c);
+  if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const body = oaAnswersSchema.safeParse(await c.req.json().catch(() => null));
+  if (!body.success) return c.json(err("Invalid answers.", "INVALID_INPUT"), 400);
+  const db = await getDb();
+  await db.query(
+    `INSERT INTO oa_profiles (client_id, answers, updated_at) VALUES ($1, $2, now())
+     ON CONFLICT (client_id) DO UPDATE SET answers = $2, updated_at = now()`,
+    [session.clientId, JSON.stringify(body.data)],
+  );
+  return c.json({ data: { ok: true } });
+});
+
+app.post("/portal/oa/generate", async (c) => {
+  const session = await getSession(c);
+  if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  if (!rateLimit(`oagen:${session.clientId}`, 10, 3600_000)) {
+    return c.json(err("Too many generations. Try again later.", "RATE_LIMITED"), 429);
+  }
+  const body = oaAnswersSchema.safeParse(await c.req.json().catch(() => null));
+  if (!body.success) return c.json(err("Invalid answers.", "INVALID_INPUT"), 400);
+  const a = body.data;
+  const seed = await oaSeed(session.clientId);
+  if (!seed) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
+  const version: "single" | "multi" = seed.members.length > 1 ? "multi" : "single";
+  if (version === "multi" && seed.managementStructure === "MEMBER_MANAGED") {
+    return c.json(err("Member-managed agreements are prepared manually — we'll be in touch.", "MANUAL_PREP"), 400);
+  }
+  if (a.authorized !== true) {
+    return c.json(err("Please confirm you are authorized to provide this information.", "INVALID_INPUT"), 400);
+  }
+  if (!a.effectiveDate) return c.json(err("An effective date is required.", "INVALID_INPUT"), 400);
+  if (!a.firstOrAmended) return c.json(err("Choose first agreement or amended and restated.", "INVALID_INPUT"), 400);
+
+  const db = await getDb();
+  const priorGens = await db.query<{ created_at: unknown }>(
+    "SELECT created_at FROM oa_generations WHERE client_id = $1 ORDER BY created_at DESC LIMIT 1",
+    [session.clientId],
+  );
+  // Drivers differ: Neon returns ISO strings, PGlite returns Date objects.
+  const priorDate =
+    priorGens.length > 0
+      ? new Date(String(priorGens[0].created_at)).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
+      : null;
+
+  const members = seed.members.map((m, i) => ({
+    name: m.name,
+    address: m.address,
+    percentage: version === "single" ? 100 : a.members?.[i]?.percentage ?? 0,
+    contribution: a.members?.[i]?.contribution ?? "",
+    todBeneficiary: a.members?.[i]?.todBeneficiary ?? "",
+  }));
+  if (version === "multi") {
+    const total = members.reduce((acc, m) => acc + m.percentage, 0);
+    if (Math.abs(total - 100) > 0.01) {
+      return c.json(err("Percentage interests must total exactly 100%.", "INVALID_INPUT"), 400);
+    }
+    if (a.competition !== "A" && a.competition !== "B") {
+      return c.json(err("Choose a competition alternative.", "INVALID_INPUT"), 400);
+    }
+    if (a.includeCapitalCalls === undefined || a.includeShotgun === undefined) {
+      return c.json(err("Answer the optional-provision questions.", "INVALID_INPUT"), 400);
+    }
+    if (a.includeCapitalCalls && !a.capitalCallCap) {
+      return c.json(err("Set the annual capital-call cap.", "INVALID_INPUT"), 400);
+    }
+    if (!a.borrowingThreshold) {
+      return c.json(err("Set the manager's borrowing limit.", "INVALID_INPUT"), 400);
+    }
+  }
+
+  const series = seed.series.map((sr, i) => ({
+    name: sr.name,
+    purpose: a.series?.[i]?.purpose ?? sr.purpose ?? "",
+    contribution: a.series?.[i]?.contribution ?? "",
+    associated:
+      version === "single"
+        ? [{ memberName: seed.members[0].name, seriesPercentage: 100 }]
+        : (a.series?.[i]?.associated ?? []).map((x) => ({
+            memberName: seed.members[x.memberIndex]?.name ?? "",
+            seriesPercentage: x.seriesPercentage,
+          })),
+  }));
+
+  const inputs: OaInputs = {
+    version,
+    companyName: seed.llcName,
+    principalAddress: seed.principalAddress,
+    managerName: seed.managerName,
+    effectiveDate: fmtDate(a.effectiveDate),
+    amendedRestated: a.firstOrAmended === "amended",
+    priorAgreementDate: priorDate,
+    members,
+    series,
+    includeCapitalCalls: a.includeCapitalCalls,
+    capitalCallCap: a.capitalCallCap,
+    competition: a.competition,
+    includeShotgun: a.includeShotgun,
+    borrowingThreshold: a.borrowingThreshold,
+    contributionToCompany: a.contributionToCompany,
+  };
+
+  const clients = await db.query<{ email: string; name: string }>("SELECT email, name FROM clients WHERE id = $1", [
+    session.clientId,
+  ]);
+  const client = clients[0];
+
+  let pdf: Uint8Array;
+  let title: string;
+  try {
+    const assembled = assembleOa(inputs);
+    title = assembled.title;
+    pdf = await renderMarkdownPdf({
+      markdown: assembled.markdown,
+      watermark: { name: client?.name || members[0].name, email: client?.email ?? "", note: OA_TEMPLATE_VERSION },
+      title,
+    });
+  } catch (e) {
+    console.error("[oa] generation failed:", e);
+    return c.json(err("We could not generate the agreement. Our team has been notified.", "GENERATION_FAILED"), 500);
+  }
+
+  await db.query(
+    `INSERT INTO oa_profiles (client_id, answers, updated_at) VALUES ($1, $2, now())
+     ON CONFLICT (client_id) DO UPDATE SET answers = $2, updated_at = now()`,
+    [session.clientId, JSON.stringify(a)],
+  );
+  const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength) as ArrayBuffer;
+  const stored = await putFile(`${title.replace(/[^\w-]+/g, "_")}.pdf`, buf, "application/pdf");
+  const doc = await db.query<{ id: string }>(
+    `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)
+     VALUES ($1, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,
+    [session.clientId, title, stored.storageKey, stored.sizeBytes],
+  );
+  const gen = await db.query<{ id: string }>(
+    `INSERT INTO oa_generations (client_id, document_id, template_version, amended_restated, inputs)
+     VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+    [session.clientId, doc[0].id, OA_TEMPLATE_VERSION, inputs.amendedRestated, JSON.stringify(inputs)],
+  );
+  return c.json({ data: { generationId: gen[0].id, documentId: doc[0].id, title } });
+});
+
+/* ----------------------------- library docs ---------------------------- */
+
+app.get("/portal/library", async (c) => {
+  const session = await getSession(c);
+  if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const db = await getDb();
+  const rows = await db.query("SELECT key, title, edition, size_bytes, updated_at FROM library_documents ORDER BY title");
+  return c.json({ data: rows });
+});
+
+app.get("/portal/library/:key/download", async (c) => {
+  const session = await getSession(c);
+  if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const db = await getDb();
+  const rows = await db.query<{ storage_key: string; title: string; edition: string }>(
+    "SELECT storage_key, title, edition FROM library_documents WHERE key = $1",
+    [c.req.param("key")],
+  );
+  if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+  const clients = await db.query<{ email: string; name: string }>("SELECT email, name FROM clients WHERE id = $1", [
+    session.clientId,
+  ]);
+  const src = await readFileStream(rows[0].storage_key);
+  const bytes = src instanceof Buffer ? src : Buffer.from(await new Response(src as ReadableStream).arrayBuffer());
+  let out: Uint8Array;
+  try {
+    out = await stampExistingPdf({
+      bytes,
+      watermark: { name: clients[0]?.name ?? "", email: clients[0]?.email ?? "", note: rows[0].edition },
+      title: rows[0].title,
+    });
+  } catch (e) {
+    console.error("[library] stamp failed; serving original:", e);
+    out = bytes;
+  }
+  const filename = rows[0].title.replace(/[^\w.-]+/g, "_");
+  return new Response(out as unknown as BodyInit, {
+    headers: {
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `attachment; filename="${filename}.pdf"`,
+      "Cache-Control": "private, no-store",
+    },
+  });
+});
+
+app.post("/admin/library/:key", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const form = await c.req.parseBody();
+  const file = form.file;
+  const title = typeof form.title === "string" ? form.title.trim() : "";
+  const edition = typeof form.edition === "string" ? form.edition.trim() : "";
+  if (!(file instanceof File) || !title) {
+    return c.json(err("title and file are required.", "INVALID_INPUT"), 400);
+  }
+  if (file.size > MAX_UPLOAD_BYTES) return c.json(err("File is too large (20 MB max).", "TOO_LARGE"), 400);
+  const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
+  const db = await getDb();
+  await db.query(
+    `INSERT INTO library_documents (key, title, edition, storage_key, content_type, size_bytes, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, now())
+     ON CONFLICT (key) DO UPDATE SET title = $2, edition = $3, storage_key = $4, content_type = $5, size_bytes = $6, updated_at = now()`,
+    [c.req.param("key"), title, edition, stored.storageKey, file.type || "application/pdf", stored.sizeBytes],
+  );
+  return c.json({ data: { ok: true } });
+});
+
+/** Confirmation-page "resend my portal invitation" — only for paid orders
+ *  whose client has not yet set a password. */
+app.post("/orders/:id/resend-welcome", async (c) => {
+  if (!rateLimit(`resend:${clientIp(c)}`, 5, 3600_000)) {
+    return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
+  }
+  const db = await getDb();
+  const orders = await db.query<{ client_id: string | null; status: string; contact_name: string; contact_email: string }>(
+    "SELECT client_id, status, contact_name, contact_email FROM orders WHERE id = $1",
+    [c.req.param("id")],
+  );
+  // Always report success — never confirm order existence to a guesser.
+  if (orders.length === 0 || orders[0].status !== "paid" || !orders[0].client_id) {
+    return c.json({ data: { ok: true } });
+  }
+  const clients = await db.query<{ id: string; password_hash: string | null }>(
+    "SELECT id, password_hash FROM clients WHERE id = $1",
+    [orders[0].client_id],
+  );
+  if (clients.length > 0 && !clients[0].password_hash) {
+    const { token, tokenHash } = newToken();
+    await db.query(
+      "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at) VALUES ($1, $2, 'set_password', $3)",
+      [tokenHash, clients[0].id, new Date(Date.now() + 7 * 86400_000).toISOString()],
+    );
+    const mail = welcomeEmail(orders[0].contact_name, `${env.PUBLIC_BASE_URL}/portal/set-password?token=${token}`);
+    await sendMail({ to: orders[0].contact_email, ...mail }).catch((e) =>
+      console.error("[resend-welcome] failed:", e),
+    );
+  }
+  return c.json({ data: { ok: true } });
+});
+
 /* --------------------------- portal services --------------------------- */
 
 const SERVICE_SAFE_COLUMNS =
@@ -914,6 +1293,11 @@ app.post("/admin/services/:id/fulfill", async (c) => {
   const so = rows[0];
   if (so.status === "pending_payment" || so.status === "fulfilled") {
     return c.json(err("This order is not in a fulfillable state.", "BAD_STATE"), 400);
+  }
+  // An EIN order's deliverable IS the IRS letter — and fulfillment deletes the
+  // TIN, so completing without the letter would strand the client. Required.
+  if (so.type === "ein" && !file) {
+    return c.json(err("Attach the EIN confirmation letter (CP 575) to fulfill an EIN order.", "LETTER_REQUIRED"), 400);
   }
   const details = (typeof so.details === "string" ? JSON.parse(so.details) : so.details) as {
     seriesName?: string; target?: string;

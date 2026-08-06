@@ -16,3 +16,4 @@ logs/
 
 # macOS
 .DS_Store
+.claude/.edit-approved

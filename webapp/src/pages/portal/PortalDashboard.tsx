@@ -1,6 +1,6 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { FileText, Mail, LogOut, Download, ShieldCheck, Clock } from "lucide-react";
+import { FileText, Mail, LogOut, Download, ShieldCheck, Clock, ScrollText, BookOpen, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -55,6 +55,105 @@ function DocList({ docs, empty }: { docs: PortalDoc[]; empty: string }) {
         </li>
       ))}
     </ul>
+  );
+}
+
+interface LibraryDoc {
+  key: string;
+  title: string;
+  edition: string;
+  size_bytes: number;
+  updated_at: string;
+}
+
+interface OaStatus {
+  generations: { id: string }[];
+  blocked: boolean;
+}
+
+function AgreementAndLibraryRow() {
+  const oaQuery = useQuery({
+    queryKey: ["portal-oa-status"],
+    queryFn: () => api.get<OaStatus>("/api/portal/oa"),
+    retry: false,
+  });
+  const libraryQuery = useQuery({
+    queryKey: ["portal-library"],
+    queryFn: () => api.get<LibraryDoc[]>("/api/portal/library"),
+  });
+
+  const hasGeneration = (oaQuery.data?.generations?.length ?? 0) > 0;
+  const library = libraryQuery.data ?? [];
+
+  return (
+    <div className="mt-6 grid gap-6 lg:grid-cols-2">
+      <div className="overflow-hidden rounded-2xl border border-border bg-card">
+        <div className="flex items-center gap-2.5 border-b border-border bg-secondary/40 px-5 py-4">
+          <ScrollText className="h-4 w-4 text-trust" />
+          <h2 className="font-display text-lg">Operating agreement</h2>
+        </div>
+        <div className="px-5 py-4">
+          {oaQuery.isError ? (
+            <p className="text-sm text-muted-foreground">
+              Your agreement questionnaire unlocks once your formation order is complete.
+            </p>
+          ) : oaQuery.data?.blocked ? (
+            <p className="text-sm text-muted-foreground">
+              Your member-managed agreement is prepared by our team and will be posted to your
+              documents.
+            </p>
+          ) : (
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm text-muted-foreground">
+                {hasGeneration
+                  ? "Your agreement is generated. Update your answers and regenerate anytime — always on the current master edition."
+                  : "Answer a short questionnaire and we'll generate your operating agreement as a signed-ready PDF."}
+              </p>
+              <Button asChild size="sm" className="shrink-0 self-start rounded-full sm:self-auto">
+                <Link to="/portal/agreement">
+                  {hasGeneration ? "Update / regenerate" : "Complete questionnaire"}
+                  <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+                </Link>
+              </Button>
+            </div>
+          )}
+          {!hasGeneration && !oaQuery.isError && !oaQuery.data?.blocked ? (
+            <p className="mt-2 text-xs font-medium text-amber-700">Action needed</p>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="overflow-hidden rounded-2xl border border-border bg-card">
+        <div className="flex items-center gap-2.5 border-b border-border bg-secondary/40 px-5 py-4">
+          <BookOpen className="h-4 w-4 text-trust" />
+          <h2 className="font-display text-lg">Reference library</h2>
+        </div>
+        {library.length === 0 ? (
+          <p className="px-5 py-6 text-sm text-muted-foreground">
+            The Series LLC Owner's Manual and other reference materials will appear here.
+          </p>
+        ) : (
+          <ul className="divide-y divide-border">
+            {library.map((d) => (
+              <li key={d.key} className="flex items-center justify-between gap-3 px-5 py-4">
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-medium">{d.title}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {d.edition ? `${d.edition} · ` : ""}always the latest edition
+                  </div>
+                </div>
+                <Button asChild variant="outline" size="sm" className="shrink-0 rounded-full">
+                  <a href={`/api/portal/library/${d.key}/download`}>
+                    <Download className="mr-1.5 h-3.5 w-3.5" />
+                    Download
+                  </a>
+                </Button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -230,6 +329,8 @@ export default function PortalDashboard() {
           />
         </div>
       </div>
+
+      <AgreementAndLibraryRow />
 
       <ServicesCard />
 

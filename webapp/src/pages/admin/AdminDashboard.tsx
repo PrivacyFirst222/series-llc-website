@@ -16,6 +16,7 @@ import {
 import { toast } from "@/components/ui/use-toast";
 import { api } from "@/lib/api";
 import { ServiceOrdersSection } from "./ServiceOrdersSection";
+import { LibrarySection } from "./LibrarySection";
 
 interface AdminOrder {
   id: string;
@@ -244,6 +245,8 @@ export default function AdminDashboard() {
       </div>
 
       <ServiceOrdersSection enabled={authQuery.isSuccess} />
+
+      <LibrarySection enabled={authQuery.isSuccess} />
 
       <h2 className="mt-12 font-display text-xl">Clients</h2>
       <div className="mt-4 overflow-x-auto rounded-2xl border border-border bg-card">

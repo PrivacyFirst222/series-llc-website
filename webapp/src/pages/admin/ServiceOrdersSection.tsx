@@ -206,16 +206,21 @@ export function ServiceOrdersSection({ enabled }: { enabled: boolean }) {
             <p className="text-xs text-muted-foreground">
               Posted to the client's portal documents in the same action, so "documents have been
               posted" in their completion email is true.
+              {viewing?.type === "ein"
+                ? " The letter is required — fulfilling deletes the TIN, so an EIN order can't complete without it."
+                : ""}
             </p>
-            <label className="flex items-center gap-2 text-xs text-muted-foreground">
-              <input
-                type="checkbox"
-                checked={skipDocument}
-                onChange={(e) => setSkipDocument(e.target.checked)}
-                className="h-3.5 w-3.5 accent-trust"
-              />
-              Fulfill without attaching a document
-            </label>
+            {viewing?.type !== "ein" ? (
+              <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                <input
+                  type="checkbox"
+                  checked={skipDocument}
+                  onChange={(e) => setSkipDocument(e.target.checked)}
+                  className="h-3.5 w-3.5 accent-trust"
+                />
+                Fulfill without attaching a document
+              </label>
+            ) : null}
           </div>
           {fulfill.isError ? (
             <p className="text-xs text-destructive">{(fulfill.error as Error).message}</p>

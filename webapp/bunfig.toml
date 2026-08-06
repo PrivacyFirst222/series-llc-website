@@ -1,0 +1,3 @@
+# Bun dev runtime: import .md templates as text (matches esbuild --loader:.md=text)
+[loader]
+".md" = "text"
