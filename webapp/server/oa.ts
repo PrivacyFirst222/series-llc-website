@@ -19,17 +19,19 @@ const multiTemplate = loadTemplate(multiTemplateRaw as string);
 export const OA_TEMPLATE_VERSION = "First Edition — August 2026";
 
 export interface OaMemberInput {
-  name: string;
+  name: string; // an individual, or a marital unit ("A and B, husband and wife, as tenants by the entireties")
   address: string;
   percentage: number; // 100 for single member
   contribution: string; // free text, may be ""
   todBeneficiary: string; // "" = none
+  /** Humans who sign for this interest — both spouses for a marital unit. */
+  signatories?: string[];
 }
 
 export interface OaSeriesInput {
   name: string; // full filed name
   purpose: string;
-  associated: { memberName: string; seriesPercentage: number }[]; // single-member: sole member 100
+  associated: { memberName: string; seriesPercentage: number; signatories?: string[] }[]; // single-member: sole member 100
   contribution: string;
 }
 
@@ -225,10 +227,17 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
     ex = ex.replace(/\| Special terms \(if any\) \|[^\n]*\|/, "| Special terms (if any) | None |");
     ex = ex.replace(/\| Dissolution events[^\n]*\|[^\n]*\|/, "| Dissolution events specific to this Protected Series (if any) | None |");
     // signature placeholders
+    const adoptNames =
+      ser.associated.length > 0
+        ? ser.associated.flatMap((u) => u.signatories ?? [u.memberName])
+        : inputs.members.flatMap((m) => m.signatories ?? [m.name]);
+    const adoptLines = adoptNames.map((n) => `_____________________________\n${n}, Member`).join("\n\n");
+    ex = ex.replace(
+      /_+\n\[ASSOCIATED MEMBER 1\], Member[\s\S]*?_+\n\[ASSOCIATED MEMBER 2\], Member/,
+      adoptLines,
+    );
+    ex = ex.replace(/_+\n\[MEMBER NAME\], Member/, adoptLines);
     ex = ex
-      .split("[MEMBER NAME], Member").join(`${inputs.members[0].name}, Member`)
-      .split("[ASSOCIATED MEMBER 1], Member").join(`${(ser.associated[0]?.memberName ?? inputs.members[0].name)}, Member`)
-      .split("[ASSOCIATED MEMBER 2], Member").join(ser.associated[1] ? `${ser.associated[1].memberName}, Member` : "Member (if applicable)")
       .split("[NAME], Protected Series Manager").join(`${inputs.managerName}, Protected Series Manager`)
       .split("effective [DATE]").join(`effective ${inputs.effectiveDate}`);
     let sched = ex2.section.replace(
@@ -243,7 +252,10 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
     s = s.split("[MEMBER NAME]").join(inputs.members[0].name);
     s = s.split("[ADDRESS]").join(inputs.members[0].address);
   } else {
-    const sigLines = inputs.members.map((m) => `_____________________________\n${m.name}`).join("\n\n");
+    const sigLines = inputs.members
+      .flatMap((m) => m.signatories ?? [m.name])
+      .map((n) => `_____________________________\n${n}`)
+      .join("\n\n");
     s = s.replace(
       /\*\*MEMBERS:\*\*[\s\S]*?(?=\*\*ACKNOWLEDGED AND AGREED BY MANAGER:\*\*)/,
       `**MEMBERS:**\n\n${sigLines}\n\n`,

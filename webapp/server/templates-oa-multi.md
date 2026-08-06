@@ -267,6 +267,8 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **9.5 Fiscal Year.** The fiscal year of the Company and of each Protected Series is the calendar year unless the Manager selects another permitted year.
 
+**9.6 S Corporation Election.** The Members may cause the Company (or any Protected Series treated as a separate entity for federal income tax purposes) to elect classification as an association taxable as a corporation and to elect S corporation status, only upon the affirmative vote or consent of all Members. From and after the effective date of any S corporation election and for so long as it remains in effect: (a) the Members of the Company and the Associated Members of every Protected Series, and their respective Percentage Interests and Series Percentages, shall at all times be identical, and no Protected Series may be established, and no association or adjustment made, that would cause the ownership of any Protected Series to differ from the ownership of the Company; (b) all allocations and distributions shall be made in a manner consistent with the one-class-of-stock requirement of section 1361 of the Code and the Treasury Regulations thereunder, pro rata in accordance with the Members' identical percentages; (c) no Transfer may be made to a person whose ownership would terminate or impair the election, and any purported Transfer in violation of this clause is void to the fullest extent permitted by law; and (d) the provisions of this Agreement shall be applied and, to the minimum extent necessary, deemed modified so as to preserve the validity of the election.
+
 ---
 
 ## ARTICLE 10 — TRANSFERS; CREDITOR PROVISIONS

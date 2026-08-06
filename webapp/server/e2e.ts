@@ -387,5 +387,76 @@ if (mint.status === 200) {
   check("dev mint-reset-token available (dev only)", false);
 }
 
+// 15. Multi-member order with a TBE spousal couple → generated agreement
+{
+  const coupleEmail = `e2e-couple-${Math.random().toString(36).slice(2, 8)}@example.com`;
+  const multiData = {
+    ...formData,
+    managementStructure: "MANAGER_MANAGED",
+    includeManagementStatementInArticles: true,
+    managers: [
+      {
+        id: "mgr1", role: "MGR", personOrEntity: "INDIVIDUAL", fullName: "Casey Member",
+        streetAddress1: "100 Ocean Drive", city: "Miami", state: "FL", zip: "33139", country: "United States",
+      },
+    ],
+    members: [
+      { ...structuredClone(defaultFormData.members[0]), fullLegalName: "Sam Ortiz", address1: "50 Sunset Blvd", city: "Orlando", state: "FL", zip: "32801" },
+      { ...structuredClone(defaultFormData.members[0]), fullLegalName: "Riley Ortiz", address1: "50 Sunset Blvd", city: "Orlando", state: "FL", zip: "32801" },
+    ],
+    correspondentEmail: coupleEmail,
+    confirmCorrespondentEmail: coupleEmail,
+    orderEin: false,
+  };
+  const mOrder = await api("/api/orders", { method: "POST", body: JSON.stringify(multiData) });
+  check("multi-member order accepted", mOrder.status === 200, mOrder.body);
+  const mOrderId = mOrder.body?.data?.orderId as string;
+  let mSim = await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: mOrderId }) });
+  if (mSim.status === 404) {
+    const adm = await api("/api/admin/login", { method: "POST", body: JSON.stringify({ password: "dev-admin" }) });
+    const full = await api(`/api/admin/orders/${mOrderId}`, { cookies: adm.cookie });
+    const sqId = (full.body?.data as { square_order_id?: string })?.square_order_id;
+    mSim = await api("/api/square/webhook", {
+      method: "POST",
+      body: JSON.stringify({
+        event_id: `e2e-multi-${mOrderId}`, type: "payment.updated",
+        data: { object: { payment: { id: `e2e-pay-m-${mOrderId.slice(0, 8)}`, status: "COMPLETED", order_id: sqId } } },
+      }),
+    });
+  }
+  check("multi-member order paid", mSim.status === 200);
+  const mMint = await api("/api/dev/mint-reset-token", { method: "POST", body: JSON.stringify({ email: coupleEmail }) });
+  const mPw = await api("/api/auth/set-password", {
+    method: "POST",
+    body: JSON.stringify({ token: mMint.body?.data?.token, password: "e2e-password-2" }),
+  });
+  check("couple client signs in", mPw.status === 200);
+  const mSeed = await api("/api/portal/oa", { cookies: mPw.cookie });
+  check("multi OA seed has 2 members", mSeed.body?.data?.version === "multi" && mSeed.body?.data?.seed?.members?.length === 2, mSeed.body?.data);
+  const coupleAnswers = {
+    firstOrAmended: "first",
+    effectiveDate: "2026-08-06",
+    authorized: true,
+    members: [{}, {}],
+    series: [{ associated: [{ memberIndex: 0, seriesPercentage: 100 }] }],
+    couples: [{ a: 0, b: 1, form: "TBE", percentage: 100, contribution: "$2,000 cash", todBeneficiary: "Ortiz Family Trust" }],
+    includeCapitalCalls: false,
+    competition: "B",
+    includeShotgun: false,
+    borrowingThreshold: 20000,
+  };
+  const badCouple = await api("/api/portal/oa/generate", {
+    method: "POST", cookies: mPw.cookie,
+    body: JSON.stringify({ ...coupleAnswers, couples: [{ a: 0, b: 0, form: "TBE", percentage: 100 }] }),
+  });
+  check("self-pairing rejected", badCouple.status === 400);
+  const mGen = await api("/api/portal/oa/generate", { method: "POST", cookies: mPw.cookie, body: JSON.stringify(coupleAnswers) });
+  check("TBE couple agreement generates", mGen.status === 200, mGen.body);
+  const mDocId = mGen.body?.data?.documentId as string;
+  const mPdf = await fetch(`${BASE}/api/portal/documents/${mDocId}/download`, { headers: { Cookie: mPw.cookie } });
+  const mBytes = new Uint8Array(await mPdf.arrayBuffer());
+  check("TBE agreement downloads as PDF", mPdf.ok && mBytes[0] === 0x25 && mBytes[1] === 0x50, { status: mPdf.status, len: mBytes.length });
+}
+
 console.log(failures === 0 ? "\nALL PASS" : `\n${failures} FAILURES`);
 process.exit(failures === 0 ? 0 : 1);

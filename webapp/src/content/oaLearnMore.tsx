@@ -199,6 +199,66 @@ export const LEARN_MORE: Record<string, LearnMoreScreen> = {
       </div>
     ),
   },
+  spousal: {
+    title: "Owning Your Interest Together as Spouses",
+    body: (
+      <div className="space-y-3">
+        <P>
+          Married couples in Florida can own property — including an interest in this company —
+          in a special form called <strong className="text-foreground">tenancy by the entireties
+          (TBE)</strong>, available only to spouses. The law treats the couple as a single owner:
+          neither spouse owns a share; the marriage owns the whole thing. That one idea produces
+          a powerful asset-protection result.
+        </P>
+        <Choice label="If you choose tenants by the entireties:">
+          A creditor of just <em>one</em> spouse generally cannot touch the interest at all — not
+          seize it, not lien it, not force its sale — because neither spouse individually owns
+          anything to take. Only a creditor of <em>both</em> spouses jointly (like a debt you both
+          signed) can reach TBE property. If one spouse dies, the survivor automatically owns the
+          entire interest, with no probate. The trade-offs: it only works while you're married
+          (divorce converts the interest to ordinary co-ownership, and the protection ends),
+          neither spouse can sell or transfer their piece alone, and you must actually be married
+          when you acquire the interest this way.
+        </Choice>
+        <Choice label="If you choose joint tenants with right of survivorship (JTWROS):">
+          The survivorship benefit is the same — the surviving spouse (or co-owner) automatically
+          inherits, skipping probate. But the asset protection is much weaker: each owner holds
+          their own separate half, so a creditor of one spouse <em>can</em> reach that spouse's
+          half, and either owner can sever the joint tenancy on their own. JTWROS also doesn't
+          require marriage. In practice, spouses choose JTWROS mainly when TBE isn't available to
+          them.
+        </Choice>
+        <Choice label="If each spouse owns individually:">
+          Each interest stands alone — separately transferable, and passing at death by TOD
+          designation, will, or probate rather than automatic survivorship. A creditor of one
+          spouse can pursue that spouse's interest, though Florida's charging-order protection may
+          still apply — in a multi-member company, the creditor is generally limited to receiving
+          that spouse's distributions, with no voting rights and no power to seize the interest
+          itself. That's meaningful protection, but it isn't the same as TBE's full exemption: a
+          charging order still captures the money as it flows, while a creditor of one spouse
+          generally can't reach a TBE interest at all.
+        </Choice>
+        <P>
+          <strong className="text-foreground">Worth knowing:</strong> TBE and JTWROS both require
+          the spouses to own <strong className="text-foreground">equal, undivided shares of a
+          single interest</strong> — the couple owns the whole thing together, not pieces of it.
+          If you want unequal ownership between spouses (say, 51% and 49%), neither form is
+          available; each spouse owns their percentage individually, with the individual-ownership
+          consequences above. Also, with TBE and JTWROS ownership, the couple votes as a single
+          unit — the agreement requires both spouses to agree to vote the interest — and a TOD
+          beneficiary designated for a jointly held interest takes effect at the death of the last
+          surviving spouse.
+        </P>
+        <P>
+          ⚠️ <strong className="text-foreground">If you don't live in Florida:</strong> tenancy by
+          the entireties is a creature of state law. Some states don't recognize it at all, others
+          limit it to real estate, and which state's law applies to you can depend on where you
+          live. Before relying on this protection, check with an attorney in the state where you
+          reside.
+        </P>
+      </div>
+    ),
+  },
   contributions: {
     title: "Initial Contributions",
     body: (

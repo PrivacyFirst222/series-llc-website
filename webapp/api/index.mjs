@@ -77413,6 +77413,8 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **9.5 Fiscal Year.** The fiscal year of the Company and of each Protected Series is the calendar year unless the Manager selects another permitted year.
 
+**9.6 S Corporation Election.** The Members may cause the Company (or any Protected Series treated as a separate entity for federal income tax purposes) to elect classification as an association taxable as a corporation and to elect S corporation status, only upon the affirmative vote or consent of all Members. From and after the effective date of any S corporation election and for so long as it remains in effect: (a) the Members of the Company and the Associated Members of every Protected Series, and their respective Percentage Interests and Series Percentages, shall at all times be identical, and no Protected Series may be established, and no association or adjustment made, that would cause the ownership of any Protected Series to differ from the ownership of the Company; (b) all allocations and distributions shall be made in a manner consistent with the one-class-of-stock requirement of section 1361 of the Code and the Treasury Regulations thereunder, pro rata in accordance with the Members' identical percentages; (c) no Transfer may be made to a person whose ownership would terminate or impair the election, and any purported Transfer in violation of this clause is void to the fullest extent permitted by law; and (d) the provisions of this Agreement shall be applied and, to the minimum extent necessary, deemed modified so as to preserve the validity of the election.
+
 ---
 
 ## ARTICLE 10 \u2014 TRANSFERS; CREDITOR PROVISIONS
@@ -77750,7 +77752,15 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
     ex = ex.replace(/\| Contributions to this Protected Series \|[^\n]*\|/, `| Contributions to this Protected Series | ${ser.contribution || "\u2014"} |`);
     ex = ex.replace(/\| Special terms \(if any\) \|[^\n]*\|/, "| Special terms (if any) | None |");
     ex = ex.replace(/\| Dissolution events[^\n]*\|[^\n]*\|/, "| Dissolution events specific to this Protected Series (if any) | None |");
-    ex = ex.split("[MEMBER NAME], Member").join(`${inputs.members[0].name}, Member`).split("[ASSOCIATED MEMBER 1], Member").join(`${ser.associated[0]?.memberName ?? inputs.members[0].name}, Member`).split("[ASSOCIATED MEMBER 2], Member").join(ser.associated[1] ? `${ser.associated[1].memberName}, Member` : "Member (if applicable)").split("[NAME], Protected Series Manager").join(`${inputs.managerName}, Protected Series Manager`).split("effective [DATE]").join(`effective ${inputs.effectiveDate}`);
+    const adoptNames = ser.associated.length > 0 ? ser.associated.flatMap((u) => u.signatories ?? [u.memberName]) : inputs.members.flatMap((m2) => m2.signatories ?? [m2.name]);
+    const adoptLines = adoptNames.map((n2) => `_____________________________
+${n2}, Member`).join("\n\n");
+    ex = ex.replace(
+      /_+\n\[ASSOCIATED MEMBER 1\], Member[\s\S]*?_+\n\[ASSOCIATED MEMBER 2\], Member/,
+      adoptLines
+    );
+    ex = ex.replace(/_+\n\[MEMBER NAME\], Member/, adoptLines);
+    ex = ex.split("[NAME], Protected Series Manager").join(`${inputs.managerName}, Protected Series Manager`).split("effective [DATE]").join(`effective ${inputs.effectiveDate}`);
     let sched = ex2.section.replace(
       "## ASSET SCHEDULE \u2014 ATTACHMENT TO SERIES EXHIBIT PS-[N]",
       `## ASSET SCHEDULE \u2014 ATTACHMENT TO SERIES EXHIBIT ${n} (${ser.name})`
@@ -77761,8 +77771,8 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
     s = s.split("[MEMBER NAME]").join(inputs.members[0].name);
     s = s.split("[ADDRESS]").join(inputs.members[0].address);
   } else {
-    const sigLines = inputs.members.map((m2) => `_____________________________
-${m2.name}`).join("\n\n");
+    const sigLines = inputs.members.flatMap((m2) => m2.signatories ?? [m2.name]).map((n) => `_____________________________
+${n}`).join("\n\n");
     s = s.replace(
       /\*\*MEMBERS:\*\*[\s\S]*?(?=\*\*ACKNOWLEDGED AND AGREED BY MANAGER:\*\*)/,
       `**MEMBERS:**
@@ -103796,7 +103806,9 @@ async function finishWithPermissions(doc) {
     if (typeof anyDoc.encrypt === "function") {
       await anyDoc.encrypt({
         ownerPassword: `mfsl-${Math.random().toString(36).slice(2)}${Date.now().toString(36)}`,
-        permissions: { printing: "highResolution", modifying: false, copying: false, annotating: false }
+        // Clients may print and add their own notes/signatures; the underlying
+        // text stays locked against copying and editing.
+        permissions: { printing: "highResolution", modifying: false, copying: false, annotating: true }
       });
     }
     return await doc.save({ useObjectStreams: false });
@@ -104701,8 +104713,22 @@ var oaAnswersSchema = external_exports.object({
   capitalCallCap: external_exports.number().min(0).max(1e8).optional(),
   competition: external_exports.enum(["A", "B"]).optional(),
   includeShotgun: external_exports.boolean().optional(),
-  borrowingThreshold: external_exports.number().min(0).max(1e8).optional()
+  borrowingThreshold: external_exports.number().min(0).max(1e8).optional(),
+  couples: external_exports.array(
+    external_exports.object({
+      a: external_exports.number().int().min(0),
+      b: external_exports.number().int().min(0),
+      form: external_exports.enum(["TBE", "JTWROS"]),
+      percentage: external_exports.number().min(0).max(100).optional(),
+      contribution: external_exports.string().max(300).optional(),
+      todBeneficiary: external_exports.string().max(300).optional()
+    })
+  ).max(10).optional()
 });
+var SPOUSAL_FORM_LABEL = {
+  TBE: "tenants by the entireties",
+  JTWROS: "joint tenants with right of survivorship"
+};
 function fmtDate(iso) {
   const [y, m2, d2] = iso.split("-").map(Number);
   return new Date(Date.UTC(y, m2 - 1, d2)).toLocaleDateString("en-US", {
@@ -104779,13 +104805,42 @@ app.post("/portal/oa/generate", async (c) => {
     month: "long",
     day: "numeric"
   }) : null;
-  const members = seed.members.map((m2, i) => ({
-    name: m2.name,
-    address: m2.address,
-    percentage: version === "single" ? 100 : a2.members?.[i]?.percentage ?? 0,
-    contribution: a2.members?.[i]?.contribution ?? "",
-    todBeneficiary: a2.members?.[i]?.todBeneficiary ?? ""
-  }));
+  const couples = version === "multi" ? a2.couples ?? [] : [];
+  const pairedIdx = /* @__PURE__ */ new Set();
+  for (const cpl of couples) {
+    if (cpl.a === cpl.b || !seed.members[cpl.a] || !seed.members[cpl.b] || pairedIdx.has(cpl.a) || pairedIdx.has(cpl.b)) {
+      return c.json(err2("Invalid spousal pairing.", "INVALID_INPUT"), 400);
+    }
+    pairedIdx.add(cpl.a);
+    pairedIdx.add(cpl.b);
+  }
+  const coupleAt = (i) => couples.find((cpl) => cpl.a === i || cpl.b === i);
+  const coupleName = (cpl) => `${seed.members[cpl.a].name} and ${seed.members[cpl.b].name}, husband and wife, as ${SPOUSAL_FORM_LABEL[cpl.form]}`;
+  const members = [];
+  const emittedCouples = /* @__PURE__ */ new Set();
+  seed.members.forEach((m2, i) => {
+    const cpl = coupleAt(i);
+    if (cpl) {
+      if (emittedCouples.has(cpl)) return;
+      emittedCouples.add(cpl);
+      members.push({
+        name: coupleName(cpl),
+        address: seed.members[cpl.a].address,
+        percentage: cpl.percentage ?? 0,
+        contribution: cpl.contribution ?? "",
+        todBeneficiary: cpl.todBeneficiary ? `${cpl.todBeneficiary} (effective at the death of the last surviving spouse)` : "",
+        signatories: [seed.members[cpl.a].name, seed.members[cpl.b].name]
+      });
+    } else {
+      members.push({
+        name: m2.name,
+        address: m2.address,
+        percentage: version === "single" ? 100 : a2.members?.[i]?.percentage ?? 0,
+        contribution: a2.members?.[i]?.contribution ?? "",
+        todBeneficiary: a2.members?.[i]?.todBeneficiary ?? ""
+      });
+    }
+  });
   if (version === "multi") {
     const total = members.reduce((acc, m2) => acc + m2.percentage, 0);
     if (Math.abs(total - 100) > 0.01) {
@@ -104808,10 +104863,19 @@ app.post("/portal/oa/generate", async (c) => {
     name: sr.name,
     purpose: a2.series?.[i]?.purpose ?? sr.purpose ?? "",
     contribution: a2.series?.[i]?.contribution ?? "",
-    associated: version === "single" ? [{ memberName: seed.members[0].name, seriesPercentage: 100 }] : (a2.series?.[i]?.associated ?? []).map((x2) => ({
-      memberName: seed.members[x2.memberIndex]?.name ?? "",
-      seriesPercentage: x2.seriesPercentage
-    }))
+    associated: version === "single" ? [{ memberName: seed.members[0].name, seriesPercentage: 100 }] : (() => {
+      const out = [];
+      for (const x2 of a2.series?.[i]?.associated ?? []) {
+        const cpl = coupleAt(x2.memberIndex);
+        const entry = cpl ? {
+          memberName: coupleName(cpl),
+          seriesPercentage: x2.seriesPercentage,
+          signatories: [seed.members[cpl.a].name, seed.members[cpl.b].name]
+        } : { memberName: seed.members[x2.memberIndex]?.name ?? "", seriesPercentage: x2.seriesPercentage };
+        if (!out.some((e) => e.memberName === entry.memberName)) out.push(entry);
+      }
+      return out;
+    })()
   }));
   const inputs = {
     version,

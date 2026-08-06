@@ -636,7 +636,25 @@ const oaAnswersSchema = z.object({
   competition: z.enum(["A", "B"]).optional(),
   includeShotgun: z.boolean().optional(),
   borrowingThreshold: z.number().min(0).max(100_000_000).optional(),
+  couples: z
+    .array(
+      z.object({
+        a: z.number().int().min(0),
+        b: z.number().int().min(0),
+        form: z.enum(["TBE", "JTWROS"]),
+        percentage: z.number().min(0).max(100).optional(),
+        contribution: z.string().max(300).optional(),
+        todBeneficiary: z.string().max(300).optional(),
+      }),
+    )
+    .max(10)
+    .optional(),
 });
+
+const SPOUSAL_FORM_LABEL: Record<"TBE" | "JTWROS", string> = {
+  TBE: "tenants by the entireties",
+  JTWROS: "joint tenants with right of survivorship",
+};
 
 function fmtDate(iso: string): string {
   const [y, m, d] = iso.split("-").map(Number);
@@ -723,13 +741,54 @@ app.post("/portal/oa/generate", async (c) => {
         })
       : null;
 
-  const members = seed.members.map((m, i) => ({
-    name: m.name,
-    address: m.address,
-    percentage: version === "single" ? 100 : a.members?.[i]?.percentage ?? 0,
-    contribution: a.members?.[i]?.contribution ?? "",
-    todBeneficiary: a.members?.[i]?.todBeneficiary ?? "",
-  }));
+  // Spousal joint-ownership units: two seed members merge into one marital
+  // interest ("A and B, husband and wife, as tenants by the entireties").
+  const couples = version === "multi" ? (a.couples ?? []) : [];
+  const pairedIdx = new Set<number>();
+  for (const cpl of couples) {
+    if (
+      cpl.a === cpl.b ||
+      !seed.members[cpl.a] ||
+      !seed.members[cpl.b] ||
+      pairedIdx.has(cpl.a) ||
+      pairedIdx.has(cpl.b)
+    ) {
+      return c.json(err("Invalid spousal pairing.", "INVALID_INPUT"), 400);
+    }
+    pairedIdx.add(cpl.a);
+    pairedIdx.add(cpl.b);
+  }
+  const coupleAt = (i: number) => couples.find((cpl) => cpl.a === i || cpl.b === i);
+  const coupleName = (cpl: (typeof couples)[number]) =>
+    `${seed.members[cpl.a].name} and ${seed.members[cpl.b].name}, husband and wife, as ${SPOUSAL_FORM_LABEL[cpl.form]}`;
+
+  const members: OaInputs["members"] = [];
+  const emittedCouples = new Set<(typeof couples)[number]>();
+  seed.members.forEach((m, i) => {
+    const cpl = coupleAt(i);
+    if (cpl) {
+      if (emittedCouples.has(cpl)) return;
+      emittedCouples.add(cpl);
+      members.push({
+        name: coupleName(cpl),
+        address: seed.members[cpl.a].address,
+        percentage: cpl.percentage ?? 0,
+        contribution: cpl.contribution ?? "",
+        todBeneficiary: cpl.todBeneficiary
+          ? `${cpl.todBeneficiary} (effective at the death of the last surviving spouse)`
+          : "",
+        signatories: [seed.members[cpl.a].name, seed.members[cpl.b].name],
+      });
+    } else {
+      members.push({
+        name: m.name,
+        address: m.address,
+        percentage: version === "single" ? 100 : a.members?.[i]?.percentage ?? 0,
+        contribution: a.members?.[i]?.contribution ?? "",
+        todBeneficiary: a.members?.[i]?.todBeneficiary ?? "",
+      });
+    }
+  });
   if (version === "multi") {
     const total = members.reduce((acc, m) => acc + m.percentage, 0);
     if (Math.abs(total - 100) > 0.01) {
@@ -756,10 +815,21 @@ app.post("/portal/oa/generate", async (c) => {
     associated:
       version === "single"
         ? [{ memberName: seed.members[0].name, seriesPercentage: 100 }]
-        : (a.series?.[i]?.associated ?? []).map((x) => ({
-            memberName: seed.members[x.memberIndex]?.name ?? "",
-            seriesPercentage: x.seriesPercentage,
-          })),
+        : (() => {
+            const out: { memberName: string; seriesPercentage: number; signatories?: string[] }[] = [];
+            for (const x of a.series?.[i]?.associated ?? []) {
+              const cpl = coupleAt(x.memberIndex);
+              const entry = cpl
+                ? {
+                    memberName: coupleName(cpl),
+                    seriesPercentage: x.seriesPercentage,
+                    signatories: [seed.members[cpl.a].name, seed.members[cpl.b].name],
+                  }
+                : { memberName: seed.members[x.memberIndex]?.name ?? "", seriesPercentage: x.seriesPercentage };
+              if (!out.some((e) => e.memberName === entry.memberName)) out.push(entry);
+            }
+            return out;
+          })(),
   }));
 
   const inputs: OaInputs = {

@@ -307,7 +307,9 @@ async function finishWithPermissions(doc: PDFDocument): Promise<Uint8Array> {
     if (typeof anyDoc.encrypt === "function") {
       await anyDoc.encrypt({
         ownerPassword: `mfsl-${Math.random().toString(36).slice(2)}${Date.now().toString(36)}`,
-        permissions: { printing: "highResolution", modifying: false, copying: false, annotating: false },
+        // Clients may print and add their own notes/signatures; the underlying
+        // text stays locked against copying and editing.
+        permissions: { printing: "highResolution", modifying: false, copying: false, annotating: true },
       });
     }
     return await doc.save({ useObjectStreams: false });

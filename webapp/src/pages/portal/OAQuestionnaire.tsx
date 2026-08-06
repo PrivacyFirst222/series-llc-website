@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Download, FileText, HelpCircle, History } from "lucide-react";
+import { ArrowLeft, Download, FileText, Heart, HelpCircle, History, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -41,6 +41,14 @@ interface SeriesAnswer {
   contribution?: string;
   associated?: { memberIndex: number; seriesPercentage: number }[];
 }
+interface CoupleAnswer {
+  a: number;
+  b: number;
+  form: "TBE" | "JTWROS";
+  percentage?: number;
+  contribution?: string;
+  todBeneficiary?: string;
+}
 interface Answers {
   firstOrAmended?: "first" | "amended";
   effectiveDate?: string;
@@ -48,6 +56,7 @@ interface Answers {
   contributionToCompany?: string;
   members?: MemberAnswer[];
   series?: SeriesAnswer[];
+  couples?: CoupleAnswer[];
   includeCapitalCalls?: boolean;
   capitalCallCap?: number;
   competition?: "A" | "B";
@@ -63,6 +72,15 @@ interface OaData {
   answers: Answers;
   generations: OaGeneration[];
 }
+
+type Unit =
+  | { kind: "couple"; ci: number; label: string; note: string; repIndex: number }
+  | { kind: "member"; index: number; label: string };
+
+const FORM_LABEL: Record<"TBE" | "JTWROS", string> = {
+  TBE: "tenants by the entireties",
+  JTWROS: "joint tenants with right of survivorship",
+};
 
 function todayIso(): string {
   return new Date().toISOString().slice(0, 10);
@@ -119,6 +137,9 @@ export default function OAQuestionnaire() {
   const [a, setA] = useState<Answers>({});
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState("");
+  const [pairA, setPairA] = useState<number | "">("");
+  const [pairB, setPairB] = useState<number | "">("");
+  const [pairForm, setPairForm] = useState<"TBE" | "JTWROS">("TBE");
 
   const meQuery = useQuery({
     queryKey: ["portal-me"],
@@ -146,6 +167,7 @@ export default function OAQuestionnaire() {
         contributionToCompany: saved.contributionToCompany ?? "",
         members: data.seed.members.map((_, i) => saved.members?.[i] ?? {}),
         series: data.seed.series.map((_, i) => saved.series?.[i] ?? {}),
+        couples: saved.couples ?? [],
         includeCapitalCalls: saved.includeCapitalCalls,
         capitalCallCap: saved.capitalCallCap,
         competition: saved.competition,
@@ -188,10 +210,46 @@ export default function OAQuestionnaire() {
     series[i] = { ...series[i], ...p };
     patch({ series });
   };
+  const patchCouple = (ci: number, p: Partial<CoupleAnswer>) => {
+    const couples = [...(a.couples ?? [])];
+    couples[ci] = { ...couples[ci], ...p };
+    patch({ couples });
+  };
+
+  const couples = a.couples ?? [];
+  const pairedIdx = useMemo(() => new Set(couples.flatMap((c) => [c.a, c.b])), [couples]);
+
+  const units: Unit[] = useMemo(() => {
+    if (!data) return [];
+    const out: Unit[] = [];
+    const emitted = new Set<number>();
+    data.seed.members.forEach((m, i) => {
+      const ci = couples.findIndex((c) => c.a === i || c.b === i);
+      if (ci >= 0) {
+        if (emitted.has(ci)) return;
+        emitted.add(ci);
+        const c = couples[ci];
+        out.push({
+          kind: "couple",
+          ci,
+          label: `${data.seed.members[c.a]?.name} & ${data.seed.members[c.b]?.name}`,
+          note: FORM_LABEL[c.form],
+          repIndex: c.a,
+        });
+      } else {
+        out.push({ kind: "member", index: i, label: m.name });
+      }
+    });
+    return out;
+  }, [data, couples]);
 
   const pctTotal = useMemo(
-    () => (a.members ?? []).reduce((acc, m) => acc + (m.percentage ?? 0), 0),
-    [a.members],
+    () =>
+      units.reduce((acc, u) => {
+        const v = u.kind === "couple" ? couples[u.ci]?.percentage : a.members?.[u.index]?.percentage;
+        return acc + (v ?? 0);
+      }, 0),
+    [units, couples, a.members],
   );
 
   if (meQuery.isError) {
@@ -217,6 +275,29 @@ export default function OAQuestionnaire() {
   }
 
   const isMulti = data.version === "multi";
+  const unpaired = data.seed.members
+    .map((m, i) => ({ name: m.name, i }))
+    .filter((x) => !pairedIdx.has(x.i));
+
+  const unitPercentage = (u: Unit) =>
+    u.kind === "couple" ? couples[u.ci]?.percentage : a.members?.[u.index]?.percentage;
+  const setUnitPercentage = (u: Unit, v: number | undefined) => {
+    if (u.kind === "couple") patchCouple(u.ci, { percentage: v });
+    else patchMember(u.index, { percentage: v });
+  };
+  const unitContribution = (u: Unit) =>
+    u.kind === "couple" ? couples[u.ci]?.contribution : a.members?.[u.index]?.contribution;
+  const setUnitContribution = (u: Unit, v: string) => {
+    if (u.kind === "couple") patchCouple(u.ci, { contribution: v });
+    else patchMember(u.index, { contribution: v });
+  };
+  const unitTod = (u: Unit) =>
+    u.kind === "couple" ? couples[u.ci]?.todBeneficiary : a.members?.[u.index]?.todBeneficiary;
+  const setUnitTod = (u: Unit, v: string) => {
+    if (u.kind === "couple") patchCouple(u.ci, { todBeneficiary: v });
+    else patchMember(u.index, { todBeneficiary: v });
+  };
+  const unitAssocIndex = (u: Unit) => (u.kind === "couple" ? u.repIndex : u.index);
 
   return (
     <section className="container-wide section-y">
@@ -266,23 +347,127 @@ export default function OAQuestionnaire() {
 
             {isMulti ? (
               <>
+                {data.seed.members.length >= 2 ? (
+                  <QuestionCard title="Do any owners hold their interest together as spouses?" learnMore="spousal">
+                    <p className="text-xs text-muted-foreground">
+                      Married couples can hold one combined interest together — as tenants by the
+                      entireties (Florida's strongest form for spouses) or as joint tenants with
+                      right of survivorship. The couple owns equal, undivided shares of a single
+                      interest and votes as one unit.
+                    </p>
+                    {couples.map((c, ci) => (
+                      <div key={ci} className="flex items-center justify-between gap-3 rounded-lg border border-border bg-secondary/30 p-3">
+                        <div className="flex items-center gap-2 text-sm">
+                          <Heart className="h-4 w-4 shrink-0 text-trust" />
+                          <span>
+                            {data.seed.members[c.a]?.name} &amp; {data.seed.members[c.b]?.name}
+                            <span className="ml-2 text-xs text-muted-foreground">{FORM_LABEL[c.form]}</span>
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          aria-label="Remove pairing"
+                          onClick={() => patch({ couples: couples.filter((_, i) => i !== ci) })}
+                          className="text-muted-foreground hover:text-foreground"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))}
+                    {unpaired.length >= 2 ? (
+                      <div className="space-y-2 rounded-lg border border-dashed border-border p-3">
+                        <div className="flex flex-wrap items-center gap-2 text-sm">
+                          <select
+                            value={pairA}
+                            onChange={(e) => setPairA(e.target.value === "" ? "" : Number(e.target.value))}
+                            className="rounded-md border border-border bg-background px-2 py-1.5 text-sm"
+                          >
+                            <option value="">Select spouse…</option>
+                            {unpaired.map((m) => (
+                              <option key={m.i} value={m.i} disabled={pairB === m.i}>
+                                {m.name}
+                              </option>
+                            ))}
+                          </select>
+                          <span className="text-muted-foreground">and</span>
+                          <select
+                            value={pairB}
+                            onChange={(e) => setPairB(e.target.value === "" ? "" : Number(e.target.value))}
+                            className="rounded-md border border-border bg-background px-2 py-1.5 text-sm"
+                          >
+                            <option value="">Select spouse…</option>
+                            {unpaired.map((m) => (
+                              <option key={m.i} value={m.i} disabled={pairA === m.i}>
+                                {m.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-4 text-sm">
+                          <label className="flex items-center gap-1.5">
+                            <input
+                              type="radio"
+                              name="pairForm"
+                              checked={pairForm === "TBE"}
+                              onChange={() => setPairForm("TBE")}
+                              className="accent-trust"
+                            />
+                            Tenants by the entireties
+                          </label>
+                          <label className="flex items-center gap-1.5">
+                            <input
+                              type="radio"
+                              name="pairForm"
+                              checked={pairForm === "JTWROS"}
+                              onChange={() => setPairForm("JTWROS")}
+                              className="accent-trust"
+                            />
+                            JTWROS
+                          </label>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            className="rounded-full"
+                            disabled={pairA === "" || pairB === "" || pairA === pairB}
+                            onClick={() => {
+                              if (pairA === "" || pairB === "") return;
+                              patch({ couples: [...couples, { a: pairA, b: pairB, form: pairForm }] });
+                              setPairA("");
+                              setPairB("");
+                            }}
+                          >
+                            Pair as spouses
+                          </Button>
+                        </div>
+                      </div>
+                    ) : null}
+                  </QuestionCard>
+                ) : null}
+
                 <QuestionCard title="Ownership percentages">
                   <p className="text-xs text-muted-foreground">
                     Must total exactly 100%. These control voting power, profit shares, and
-                    distributions at the company level.
+                    distributions at the company level. A spousal pair holds one combined
+                    percentage.
                   </p>
-                  {data.seed.members.map((m, i) => (
-                    <div key={i} className="flex items-center gap-3">
-                      <span className="w-1/2 truncate text-sm">{m.name}</span>
+                  {units.map((u) => (
+                    <div key={u.kind === "couple" ? `c${u.ci}` : `m${u.index}`} className="flex items-center gap-3">
+                      <span className="w-1/2 truncate text-sm">
+                        {u.label}
+                        {u.kind === "couple" ? (
+                          <span className="ml-1 text-xs text-muted-foreground">({u.note})</span>
+                        ) : null}
+                      </span>
                       <div className="flex items-center gap-1">
                         <Input
                           type="number"
                           min={0}
                           max={100}
                           step="0.01"
-                          value={a.members?.[i]?.percentage ?? ""}
+                          value={unitPercentage(u) ?? ""}
                           onChange={(e) =>
-                            patchMember(i, { percentage: e.target.value === "" ? undefined : Number(e.target.value) })
+                            setUnitPercentage(u, e.target.value === "" ? undefined : Number(e.target.value))
                           }
                           className="w-24"
                         />
@@ -398,16 +583,17 @@ export default function OAQuestionnaire() {
                   <p className="text-xs text-muted-foreground">
                     Only owners associated with a series share in that series' profits and vote on
                     its affairs. Percentages within each series must total 100 (or leave a series
-                    blank if the company itself holds it).
+                    blank if the company itself holds it). A spousal pair counts as one owner.
                   </p>
                   {data.seed.series.map((sr, si) => (
                     <div key={si} className="rounded-lg border border-border p-3">
                       <p className="text-sm font-medium">{sr.name}</p>
-                      {data.seed.members.map((m, mi) => {
-                        const current = a.series?.[si]?.associated?.find((x) => x.memberIndex === mi);
+                      {units.map((u) => {
+                        const idx = unitAssocIndex(u);
+                        const current = a.series?.[si]?.associated?.find((x) => x.memberIndex === idx);
                         return (
-                          <div key={mi} className="mt-2 flex items-center gap-3">
-                            <span className="w-1/2 truncate text-sm">{m.name}</span>
+                          <div key={u.kind === "couple" ? `c${u.ci}` : `m${u.index}`} className="mt-2 flex items-center gap-3">
+                            <span className="w-1/2 truncate text-sm">{u.label}</span>
                             <div className="flex items-center gap-1">
                               <Input
                                 type="number"
@@ -416,10 +602,10 @@ export default function OAQuestionnaire() {
                                 value={current?.seriesPercentage ?? ""}
                                 onChange={(e) => {
                                   const val = e.target.value === "" ? undefined : Number(e.target.value);
-                                  const rest = (a.series?.[si]?.associated ?? []).filter((x) => x.memberIndex !== mi);
+                                  const rest = (a.series?.[si]?.associated ?? []).filter((x) => x.memberIndex !== idx);
                                   patchSeries(si, {
                                     associated:
-                                      val === undefined ? rest : [...rest, { memberIndex: mi, seriesPercentage: val }],
+                                      val === undefined ? rest : [...rest, { memberIndex: idx, seriesPercentage: val }],
                                   });
                                 }}
                                 className="w-24"
@@ -441,13 +627,13 @@ export default function OAQuestionnaire() {
                   Contribution to the company{isMulti ? " (per owner below)" : ""}
                 </label>
                 {isMulti ? (
-                  data.seed.members.map((m, i) => (
-                    <div key={i} className="flex items-center gap-3">
-                      <span className="w-1/2 truncate text-sm">{m.name}</span>
+                  units.map((u) => (
+                    <div key={u.kind === "couple" ? `c${u.ci}` : `m${u.index}`} className="flex items-center gap-3">
+                      <span className="w-1/2 truncate text-sm">{u.label}</span>
                       <Input
                         placeholder='e.g., "$1,000 cash"'
-                        value={a.members?.[i]?.contribution ?? ""}
-                        onChange={(e) => patchMember(i, { contribution: e.target.value })}
+                        value={unitContribution(u) ?? ""}
+                        onChange={(e) => setUnitContribution(u, e.target.value)}
                       />
                     </div>
                   ))
@@ -485,14 +671,21 @@ export default function OAQuestionnaire() {
             </QuestionCard>
 
             <QuestionCard title="Transfer-on-death designation (optional)" learnMore="tod">
-              {data.seed.members.map((m, i) => (
-                <div key={i} className="flex items-center gap-3">
-                  <span className="w-1/2 truncate text-sm">{m.name}</span>
-                  <Input
-                    placeholder="Beneficiary name (or leave blank)"
-                    value={a.members?.[i]?.todBeneficiary ?? ""}
-                    onChange={(e) => patchMember(i, { todBeneficiary: e.target.value })}
-                  />
+              {(isMulti ? units : [{ kind: "member", index: 0, label: data.seed.members[0]?.name ?? "" } as Unit]).map((u) => (
+                <div key={u.kind === "couple" ? `c${u.ci}` : `m${u.index}`} className="space-y-1">
+                  <div className="flex items-center gap-3">
+                    <span className="w-1/2 truncate text-sm">{u.label}</span>
+                    <Input
+                      placeholder="Beneficiary name (or leave blank)"
+                      value={unitTod(u) ?? ""}
+                      onChange={(e) => setUnitTod(u, e.target.value)}
+                    />
+                  </div>
+                  {u.kind === "couple" ? (
+                    <p className="pl-[50%] text-xs text-muted-foreground">
+                      Takes effect at the death of the last surviving spouse.
+                    </p>
+                  ) : null}
                 </div>
               ))}
             </QuestionCard>
