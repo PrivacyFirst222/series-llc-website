@@ -7,6 +7,7 @@
 import { readFileSync } from "node:fs";
 import singleTemplateRaw from "./templates-oa-single.md";
 import multiTemplateRaw from "./templates-oa-multi.md";
+import sCorpTemplateRaw from "./templates-oa-s.md";
 
 /** esbuild bundles .md as text; Bun without the bunfig loader resolves the
  *  import to a file path instead — read it from disk in that case. */
@@ -15,6 +16,7 @@ function loadTemplate(v: string): string {
 }
 const singleTemplate = loadTemplate(singleTemplateRaw as string);
 const multiTemplate = loadTemplate(multiTemplateRaw as string);
+const sCorpTemplate = loadTemplate(sCorpTemplateRaw as string);
 
 export const OA_TEMPLATE_VERSION = "First Edition — August 2026";
 
@@ -36,7 +38,7 @@ export interface OaSeriesInput {
 }
 
 export interface OaInputs {
-  version: "single" | "multi";
+  version: "single" | "multi" | "s"; // "s" = S corporation form (any member count)
   companyName: string;
   principalAddress: string;
   managerName: string;
@@ -90,7 +92,7 @@ function stripInstructionNotes(s: string): string {
 }
 
 export function assembleOa(inputs: OaInputs): { markdown: string; title: string } {
-  let s = inputs.version === "single" ? singleTemplate : multiTemplate;
+  let s = inputs.version === "single" ? singleTemplate : inputs.version === "s" ? sCorpTemplate : multiTemplate;
   const co = inputs.companyName;
 
   // ---- global fields ----
@@ -103,8 +105,8 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
   s = s.split("[MANAGER NAME], Manager").join(`${inputs.managerName}, Manager`);
   s = s.split("[MANAGER NAME]").join(inputs.managerName);
 
-  // ---- multi-member options ----
-  if (inputs.version === "multi") {
+  // ---- multi-member options (the S corp form shares the multi chassis) ----
+  if (inputs.version === "multi" || inputs.version === "s") {
     must(s, "$[THRESHOLD]", "threshold");
     s = s.split("$[THRESHOLD]").join(money(inputs.borrowingThreshold ?? 25000));
 
@@ -219,9 +221,12 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
     ex = ex.replace("## SERIES EXHIBIT PS-[N]", `## SERIES EXHIBIT ${n}`);
     ex = ex.replace(/\*\*Protected Series name \(exactly as filed with the Department\):\*\*\n\*\*[^\n]+\*\*/, `**Protected Series name (exactly as filed with the Department):**\n**${ser.name}**`);
     ex = ex.replace(/\| Purpose of this Protected Series \|[^\n]*\|/, `| Purpose of this Protected Series | ${ser.purpose || "Any lawful business, purpose, or activity"} |`);
-    ex = ex.replace(/\| Associated Member\(s\)[^\n]*\|[^\n]*\|/, inputs.version === "single"
-      ? `| Associated Member(s) | ${inputs.members[0].name} — 100% |`
-      : `| Associated Member(s) and Series Percentages | ${assoc} |`);
+    if (inputs.version !== "s") {
+      // the S corp form's row is fixed text: all Members, identically to their Percentage Interests
+      ex = ex.replace(/\| Associated Member\(s\)[^\n]*\|[^\n]*\|/, inputs.version === "single"
+        ? `| Associated Member(s) | ${inputs.members[0].name} — 100% |`
+        : `| Associated Member(s) and Series Percentages | ${assoc} |`);
+    }
     ex = ex.replace(/\| Protected Series Manager \|[^\n]*\|/, `| Protected Series Manager | ${inputs.managerName} |`);
     ex = ex.replace(/\| Contributions to this Protected Series \|[^\n]*\|/, `| Contributions to this Protected Series | ${ser.contribution || "—"} |`);
     ex = ex.replace(/\| Special terms \(if any\) \|[^\n]*\|/, "| Special terms (if any) | None |");

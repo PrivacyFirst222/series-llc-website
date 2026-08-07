@@ -50,6 +50,27 @@ export function StepOptionalDocs({ data, patch }: StepProps) {
             </span>
           </label>
         </FieldShell>
+        {data.filingPath !== "CONVERT" ? (
+          <FieldShell label="S corporation election (+$95 service fee)">
+            <label className="flex items-start gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={data.orderSElection}
+                onChange={(e) => patch({ orderSElection: e.target.checked })}
+                className="mt-0.5 h-4 w-4 accent-trust"
+              />
+              <span>
+                We prepare IRS Form 2553 — completed, with a cover letter and
+                step-by-step filing instructions — so your new LLC can elect S
+                corporation status. You review, sign, and mail it; there is no
+                IRS filing fee. The IRS deadline is strict (2 months and 15
+                days from formation), so this is available only at formation
+                and for a limited time afterward in your portal. Choose this
+                only if your tax professional recommends the election.
+              </span>
+            </label>
+          </FieldShell>
+        ) : null}
         <FieldShell label="Federal EIN (+$50 service fee)">
           <label className="flex items-start gap-2 text-sm">
             <input

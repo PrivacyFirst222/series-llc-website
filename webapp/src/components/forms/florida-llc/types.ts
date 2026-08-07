@@ -161,6 +161,7 @@ export interface FloridaLLCFormData {
   orderCertificateOfStatus: boolean;
   orderCertifiedCopy: boolean;
   orderEin: boolean;
+  orderSElection: boolean;
 
   // Section 13.5 – Series
   series: SeriesEntry[];

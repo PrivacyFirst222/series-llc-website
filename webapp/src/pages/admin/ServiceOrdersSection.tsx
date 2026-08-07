@@ -11,17 +11,30 @@ import {
 } from "@/components/ui/dialog";
 import { api } from "@/lib/api";
 
+interface SElectionShareholderView {
+  name: string;
+  address: string;
+  percentage: number;
+  dateAcquired: string;
+  ssnLast4: string;
+}
+
 interface AdminServiceOrder {
   id: string;
-  type: "series" | "ein";
+  type: "series" | "ein" | "s-election";
   status: string;
   llc_name: string;
-  details: { seriesName?: string; target?: string; responsibleName?: string; tinLast4?: string; purpose?: string; note?: string };
+  details: {
+    seriesName?: string; target?: string; responsibleName?: string; tinLast4?: string; purpose?: string; note?: string;
+    ein?: string; einPending?: boolean; dateIncorporated?: string; effectiveDate?: string;
+    officerName?: string; officerTitle?: string; phone?: string; shareholders?: SElectionShareholderView[];
+  };
   amount_cents: number;
   created_at: string;
   paid_at: string | null;
   fulfilled_at: string | null;
   has_secret: boolean;
+  ein_pending: boolean;
   client_email: string;
   client_name: string;
 }
@@ -33,6 +46,7 @@ interface ServiceDetail {
   llc_name: string;
   details: AdminServiceOrder["details"];
   tin: string | null;
+  ssns: string[] | null;
 }
 
 const money = (cents: number) => `$${(cents / 100).toFixed(2)}`;
@@ -48,6 +62,7 @@ const STATUS_STYLE: Record<string, string> = {
 
 function summaryOf(o: { type: string; details: AdminServiceOrder["details"]; llc_name: string }): string {
   if (o.type === "series") return o.details.seriesName ?? o.llc_name;
+  if (o.type === "s-election") return `S Election (2553) — ${o.llc_name}`;
   return `EIN — ${o.details.target === "series" ? o.details.seriesName ?? "series" : o.llc_name}`;
 }
 
@@ -113,7 +128,14 @@ export function ServiceOrdersSection({ enabled }: { enabled: boolean }) {
           <tbody className="divide-y divide-border">
             {services.map((s) => (
               <tr key={s.id}>
-                <td className="px-4 py-3 font-medium">{summaryOf(s)}</td>
+                <td className="px-4 py-3 font-medium">
+                  {summaryOf(s)}
+                  {s.ein_pending ? (
+                    <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900">
+                      waiting on EIN
+                    </span>
+                  ) : null}
+                </td>
                 <td className="px-4 py-3">
                   {s.client_name || "—"}
                   <div className="text-xs text-muted-foreground">{s.client_email}</div>
@@ -156,7 +178,9 @@ export function ServiceOrdersSection({ enabled }: { enabled: boolean }) {
             <DialogDescription>
               {viewing?.type === "ein"
                 ? "The identification number below is shown for SS-4 preparation and is permanently deleted when you mark the order fulfilled."
-                : "Mark fulfilled once the designation is filed and the confirmation is uploaded to the client's documents."}
+                : viewing?.type === "s-election"
+                  ? "Download the draft package, review the filled Form 2553, and attach the final PDF to fulfill. The SSNs below are permanently deleted when you mark the order fulfilled."
+                  : "Mark fulfilled once the designation is filed and the confirmation is uploaded to the client's documents."}
             </DialogDescription>
           </DialogHeader>
           {viewing ? (
@@ -168,6 +192,46 @@ export function ServiceOrdersSection({ enabled }: { enabled: boolean }) {
                   <div><span className="text-muted-foreground">Series name:</span> {viewing.details.seriesName}</div>
                   {viewing.details.purpose ? (
                     <div><span className="text-muted-foreground">Purpose:</span> {viewing.details.purpose}</div>
+                  ) : null}
+                </>
+              ) : viewing.type === "s-election" ? (
+                <>
+                  <div>
+                    <span className="text-muted-foreground">EIN:</span>{" "}
+                    {detailQuery.data?.details.einPending
+                      ? "pending — we're obtaining it"
+                      : detailQuery.data?.details.ein || "— not yet provided —"}
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Formed / effective:</span>{" "}
+                    {detailQuery.data?.details.dateIncorporated ?? "—"} / {detailQuery.data?.details.effectiveDate ?? "—"}
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Officer:</span>{" "}
+                    {detailQuery.data?.details.officerName
+                      ? `${detailQuery.data.details.officerName}, ${detailQuery.data.details.officerTitle ?? ""}`
+                      : "— not yet provided —"}
+                  </div>
+                  {(detailQuery.data?.details.shareholders ?? []).map((sh, i) => (
+                    <div key={i} className="rounded-md border border-border px-3 py-2">
+                      <div className="font-medium">{sh.name} — {sh.percentage}%</div>
+                      <div className="text-xs text-muted-foreground">{sh.address}</div>
+                      <div className="text-xs">
+                        SSN:{" "}
+                        <span className="font-mono-feature">
+                          {detailQuery.data?.ssns?.[i] ?? `•••-••-${sh.ssnLast4}`}
+                        </span>{" "}
+                        · acquired {sh.dateAcquired}
+                      </div>
+                    </div>
+                  ))}
+                  {viewing.has_secret ? (
+                    <a
+                      href={`/api/admin/services/${viewing.id}/s-election-draft`}
+                      className="inline-block rounded-full border border-border px-4 py-1.5 text-sm font-medium hover:border-accent"
+                    >
+                      Download draft package (Form 2553 + letter + instructions)
+                    </a>
                   ) : null}
                 </>
               ) : (
@@ -195,7 +259,11 @@ export function ServiceOrdersSection({ enabled }: { enabled: boolean }) {
           ) : null}
           <div className="space-y-2 border-t border-border pt-3">
             <label className="text-sm font-medium">
-              {viewing?.type === "ein" ? "Attach the EIN confirmation letter (CP 575)" : "Attach the filed Designation"}
+              {viewing?.type === "ein"
+                ? "Attach the EIN confirmation letter (CP 575)"
+                : viewing?.type === "s-election"
+                  ? "Attach the final election package PDF"
+                  : "Attach the filed Designation"}
             </label>
             <input
               type="file"
@@ -208,9 +276,11 @@ export function ServiceOrdersSection({ enabled }: { enabled: boolean }) {
               posted" in their completion email is true.
               {viewing?.type === "ein"
                 ? " The letter is required — fulfilling deletes the TIN, so an EIN order can't complete without it."
-                : ""}
+                : viewing?.type === "s-election"
+                  ? " The package is required — fulfilling deletes the shareholder SSNs, so an S election order can't complete without it."
+                  : ""}
             </p>
-            {viewing?.type !== "ein" ? (
+            {viewing?.type !== "ein" && viewing?.type !== "s-election" ? (
               <label className="flex items-center gap-2 text-xs text-muted-foreground">
                 <input
                   type="checkbox"
@@ -230,7 +300,7 @@ export function ServiceOrdersSection({ enabled }: { enabled: boolean }) {
               className="rounded-full"
               disabled={
                 fulfill.isPending ||
-                (viewing?.type === "ein" && viewing?.status === "awaiting_info") ||
+                ((viewing?.type === "ein" || viewing?.type === "s-election") && viewing?.status === "awaiting_info") ||
                 (!attachment && !skipDocument)
               }
               onClick={() => viewing && fulfill.mutate({ id: viewing.id, file: attachment })}

@@ -12,7 +12,7 @@ To prepare filings and provide the Services, we collect: your name and contact i
 
 **Please note:** most of this information is filed with the Florida Division of Corporations and becomes **public record**. That is a function of state filing law, not our choice.
 
-Our website forms do not request, and you should not enter into them, Social Security numbers, driver's license numbers, government identification numbers, biometric data, or bank account numbers. If you purchase our EIN service, we collect the responsible party's Social Security number or ITIN separately, through a secure channel we designate, solely to prepare and submit IRS Form SS-4, and we do not retain it after the EIN is issued.
+Our website forms do not request, and you should not enter into them, Social Security numbers, driver's license numbers, government identification numbers, biometric data, or bank account numbers. If you purchase our EIN service, we collect the responsible party's Social Security number or ITIN separately, through a secure channel we designate, solely to prepare and submit IRS Form SS-4, and we do not retain it after the EIN is issued. If you purchase our S corporation election service, we likewise collect each owner's Social Security number through the same secure channel, solely to prepare IRS Form 2553, and we do not retain those numbers after your election package is delivered.
 
 ### 3. Payment Information
 

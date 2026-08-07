@@ -140,8 +140,12 @@ function wrapSegs(f: Fonts, segs: Seg[], width: number, size: number): Seg[][] {
 
 export async function renderMarkdownPdf(opts: {
   markdown: string;
-  watermark: WatermarkInfo;
+  /** null renders a plain document — page numbers only, no license footer, no encryption
+   *  (used for filing packages the client mails out, not licensed deliverables). */
+  watermark: WatermarkInfo | null;
   title: string;
+  /** Business letters set flush left throughout — no centered title block. */
+  centerTitleBlock?: boolean;
 }): Promise<Uint8Array> {
   const blocks = parseMarkdown(opts.markdown);
   const doc = await PDFDocument.create();
@@ -178,7 +182,7 @@ export async function renderMarkdownPdf(opts: {
   };
 
   // Center the title block (everything before the first ARTICLE/RECITALS heading).
-  let inTitle = true;
+  let inTitle = opts.centerTitleBlock !== false;
 
   for (const block of blocks) {
     if (block.kind === "heading") {
@@ -200,6 +204,13 @@ export async function renderMarkdownPdf(opts: {
       continue;
     }
     if (block.kind === "para") {
+      // Sentinel: a paragraph of exactly "[[left]]" ends the centered title
+      // block (used by business letters, where no ARTICLE-style heading ever
+      // appears). It renders nothing.
+      if (block.segs.length === 1 && block.segs[0].text.trim() === "[[left]]") {
+        inTitle = false;
+        continue;
+      }
       const centered = inTitle;
       const size = BODY_SIZE;
       const lineH = size + LINE_GAP;
@@ -268,9 +279,27 @@ export async function renderMarkdownPdf(opts: {
     }
   }
 
+  if (!opts.watermark) {
+    stampPageNumbers(doc, fonts.regular);
+    doc.setTitle(opts.title);
+    doc.setAuthor("MyFloridaSeriesLLC");
+    doc.setProducer("MyFloridaSeriesLLC document engine");
+    doc.setCreationDate(new Date());
+    return doc.save();
+  }
   stampFooters(doc, fonts.regular, opts.watermark);
   setMeta(doc, opts.title, opts.watermark);
   return finishWithPermissions(doc);
+}
+
+function stampPageNumbers(doc: PDFDocument, font: PDFFont): void {
+  const pages = doc.getPages();
+  pages.forEach((p, i) => {
+    const { width } = p.getSize();
+    const pn = `Page ${i + 1} of ${pages.length}`;
+    const w = font.widthOfTextAtSize(pn, 7.5);
+    p.drawText(pn, { x: width - MARGIN - w, y: FOOTER_Y, size: 7.5, font, color: rgb(0.55, 0.57, 0.6) });
+  });
 }
 
 function stampFooters(doc: PDFDocument, font: PDFFont, wm: WatermarkInfo): void {

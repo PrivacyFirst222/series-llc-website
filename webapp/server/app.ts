@@ -6,7 +6,15 @@ import { validateRegisteredAgentAddress } from "../src/components/forms/florida-
 import type { FloridaLLCFormData } from "../src/components/forms/florida-llc/types";
 import { getDb } from "./db";
 import { env } from "./env";
-import { priceOrder, EIN_FEE_CENTS, SERIES_ADDON_PREP_CENTS, SERIES_ADDON_STATE_CENTS } from "./pricing";
+import {
+  priceOrder,
+  EIN_FEE_CENTS,
+  S_ELECTION_FEE_CENTS,
+  S_ELECTION_WINDOW_DAYS,
+  SERIES_ADDON_PREP_CENTS,
+  SERIES_ADDON_STATE_CENTS,
+} from "./pricing";
+import { buildSElectionPackage, type SElectionDetails } from "./s-election";
 import { createCheckout, verifyWebhookSignature } from "./square";
 import { hashPassword, verifyPassword, newToken, hashToken, encryptSecret, decryptSecret } from "./crypto";
 import { hasProtectedSeriesPhrase } from "../src/components/forms/florida-llc/validation";
@@ -80,6 +88,9 @@ app.post("/orders", async (c) => {
     certificateOfStatus: data.orderCertificateOfStatus,
     certifiedCopy: data.orderCertifiedCopy,
     ein: !!data.orderEin,
+    // S election package: new formations only — a converted entity's election
+    // window is measured from its original existence, not our filing.
+    sElection: !!data.orderSElection && data.filingPath !== "CONVERT",
   });
   const llcName = payload.llcName.finalName || payload.llcName.desiredName || "Unnamed LLC";
 
@@ -160,13 +171,21 @@ async function fulfillPaidOrder(orderId: string, squarePaymentId: string | null)
   // An EIN purchased with the formation becomes a paid service order awaiting
   // the responsible party's details, provided through the portal's secure form.
   const payload = (typeof order.payload === "string" ? JSON.parse(order.payload) : order.payload) as {
-    optionalDocuments?: { ein?: boolean };
+    optionalDocuments?: { ein?: boolean; sElection?: boolean };
+    filingPath?: string;
   } | null;
   if (payload?.optionalDocuments?.ein) {
     await db.query(
       `INSERT INTO service_orders (client_id, type, status, llc_name, details, amount_cents, formation_order_id, paid_at, square_payment_id)
        VALUES ($1, 'ein', 'awaiting_info', $2, $3, $4, $5, now(), $6)`,
       [clientId, order.llc_name, JSON.stringify({ target: "company" }), EIN_FEE_CENTS, orderId, squarePaymentId],
+    );
+  }
+  if (payload?.optionalDocuments?.sElection && payload?.filingPath !== "CONVERT") {
+    await db.query(
+      `INSERT INTO service_orders (client_id, type, status, llc_name, details, amount_cents, formation_order_id, paid_at, square_payment_id)
+       VALUES ($1, 's-election', 'awaiting_info', $2, $3, $4, $5, now(), $6)`,
+      [clientId, order.llc_name, JSON.stringify({}), S_ELECTION_FEE_CENTS, orderId, squarePaymentId],
     );
   }
 
@@ -208,7 +227,7 @@ async function fulfillPaidServiceOrder(serviceOrderId: string, squarePaymentId: 
   }>("SELECT id, client_id, type, status, llc_name, details, amount_cents FROM service_orders WHERE id = $1", [serviceOrderId]);
   if (rows.length === 0 || rows[0].status !== "pending_payment") return;
   const so = rows[0];
-  const nextStatus = so.type === "ein" ? "awaiting_info" : "in_progress";
+  const nextStatus = so.type === "ein" || so.type === "s-election" ? "awaiting_info" : "in_progress";
   await db.query(
     "UPDATE service_orders SET status = $1, paid_at = now(), square_payment_id = $2 WHERE id = $3",
     [nextStatus, squarePaymentId, so.id],
@@ -219,7 +238,9 @@ async function fulfillPaidServiceOrder(serviceOrderId: string, squarePaymentId: 
   const summary =
     so.type === "series"
       ? `Protected Series Designation — ${details.seriesName ?? so.llc_name}`
-      : `Federal EIN — ${details.target === "series" ? details.seriesName ?? "series" : so.llc_name}`;
+      : so.type === "s-election"
+        ? `S Corporation Election Package — ${so.llc_name}`
+        : `Federal EIN — ${details.target === "series" ? details.seriesName ?? "series" : so.llc_name}`;
   const clients = await db.query<{ email: string; name: string }>(
     "SELECT email, name FROM clients WHERE id = $1",
     [so.client_id],
@@ -227,9 +248,9 @@ async function fulfillPaidServiceOrder(serviceOrderId: string, squarePaymentId: 
   const client = clients[0];
   if (client) {
     const mail = serviceOrderClientEmail({
-      type: so.type as "series" | "ein",
+      type: so.type as "series" | "ein" | "s-election",
       summary,
-      needsInfo: so.type === "ein",
+      needsInfo: so.type === "ein" || so.type === "s-election",
       portalUrl: `${env.PUBLIC_BASE_URL}/portal`,
     });
     sendMail({ to: client.email, ...mail }).catch((e) => console.error("[service] client email failed:", e));
@@ -323,6 +344,20 @@ if (!env.isProd) {
       [tokenHash, rows[0].id, new Date(Date.now() + 3600_000).toISOString()],
     );
     return c.json({ data: { token } });
+  });
+
+  // Dev-only: backdate a client's formation payment so e2e can exercise the
+  // S election 65-day ordering window without waiting.
+  app.post("/dev/age-formation", async (c) => {
+    const { email, days } = (await c.req.json()) as { email: string; days: number };
+    const db = await getDb();
+    const rows = await db.query<{ id: string }>("SELECT id FROM clients WHERE email = $1", [email.toLowerCase()]);
+    if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+    await db.query(
+      "UPDATE orders SET paid_at = now() - ($1 || ' days')::interval WHERE client_id = $2 AND status = 'paid'",
+      [String(Math.round(days)), rows[0].id],
+    );
+    return c.json({ data: { ok: true } });
   });
 }
 
@@ -610,6 +645,7 @@ async function oaSeed(clientId: string): Promise<{
 
 const oaAnswersSchema = z.object({
   firstOrAmended: z.enum(["first", "amended"]).optional(),
+  sElection: z.boolean().optional(), // true = build on the S corporation form
   effectiveDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   authorized: z.boolean().optional(),
   contributionToCompany: z.string().max(300).optional(),
@@ -716,8 +752,10 @@ app.post("/portal/oa/generate", async (c) => {
   const a = body.data;
   const seed = await oaSeed(session.clientId);
   if (!seed) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
-  const version: "single" | "multi" = seed.members.length > 1 ? "multi" : "single";
-  if (version === "multi" && seed.managementStructure === "MEMBER_MANAGED") {
+  const multiOwner = seed.members.length > 1;
+  // An S election routes any member count onto the S corporation form.
+  const version: "single" | "multi" | "s" = a.sElection ? "s" : multiOwner ? "multi" : "single";
+  if (multiOwner && seed.managementStructure === "MEMBER_MANAGED") {
     return c.json(err("Member-managed agreements are prepared manually — we'll be in touch.", "MANUAL_PREP"), 400);
   }
   if (a.authorized !== true) {
@@ -743,7 +781,7 @@ app.post("/portal/oa/generate", async (c) => {
 
   // Spousal joint-ownership units: two seed members merge into one marital
   // interest ("A and B, husband and wife, as tenants by the entireties").
-  const couples = version === "multi" ? (a.couples ?? []) : [];
+  const couples = multiOwner ? (a.couples ?? []) : [];
   const pairedIdx = new Set<number>();
   for (const cpl of couples) {
     if (
@@ -783,13 +821,17 @@ app.post("/portal/oa/generate", async (c) => {
       members.push({
         name: m.name,
         address: m.address,
-        percentage: version === "single" ? 100 : a.members?.[i]?.percentage ?? 0,
+        percentage: multiOwner ? a.members?.[i]?.percentage ?? 0 : 100,
         contribution: a.members?.[i]?.contribution ?? "",
         todBeneficiary: a.members?.[i]?.todBeneficiary ?? "",
       });
     }
   });
-  if (version === "multi") {
+  if (version === "s" && !multiOwner && !members[0].contribution) {
+    // sole owner on the S form: the single flow collects the contribution as contributionToCompany
+    members[0].contribution = a.contributionToCompany ?? "";
+  }
+  if (multiOwner) {
     const total = members.reduce((acc, m) => acc + m.percentage, 0);
     if (Math.abs(total - 100) > 0.01) {
       return c.json(err("Percentage interests must total exactly 100%.", "INVALID_INPUT"), 400);
@@ -813,7 +855,11 @@ app.post("/portal/oa/generate", async (c) => {
     purpose: a.series?.[i]?.purpose ?? sr.purpose ?? "",
     contribution: a.series?.[i]?.contribution ?? "",
     associated:
-      version === "single"
+      version === "s"
+        ? // identical ownership is hardwired in the S corp form: every Member is an
+          // Associated Member of every series at their company percentage
+          members.map((m) => ({ memberName: m.name, seriesPercentage: m.percentage, signatories: m.signatories }))
+        : version === "single"
         ? [{ memberName: seed.members[0].name, seriesPercentage: 100 }]
         : (() => {
             const out: { memberName: string; seriesPercentage: number; signatories?: string[] }[] = [];
@@ -842,11 +888,13 @@ app.post("/portal/oa/generate", async (c) => {
     priorAgreementDate: priorDate,
     members,
     series,
-    includeCapitalCalls: a.includeCapitalCalls,
+    // A sole owner on the S corp form skips the multi-member option questions;
+    // sensible defaults: no capital calls, competition permitted, no shotgun.
+    includeCapitalCalls: a.includeCapitalCalls ?? (version === "s" && !multiOwner ? false : undefined),
     capitalCallCap: a.capitalCallCap,
-    competition: a.competition,
-    includeShotgun: a.includeShotgun,
-    borrowingThreshold: a.borrowingThreshold,
+    competition: a.competition ?? (version === "s" && !multiOwner ? "B" : undefined),
+    includeShotgun: a.includeShotgun ?? (version === "s" && !multiOwner ? false : undefined),
+    borrowingThreshold: a.borrowingThreshold ?? (version === "s" && !multiOwner ? 25000 : undefined),
     contributionToCompany: a.contributionToCompany,
   };
 
@@ -1005,6 +1053,38 @@ async function clientLlcName(clientId: string): Promise<string> {
   return rows[0]?.llc_name ?? "";
 }
 
+/** S election package gate: NEW formations we filed, purchasable only through
+ *  day 65 after the formation order was paid (the IRS election deadline is
+ *  2 months + 15 days — the shorter window leaves time to prepare and mail). */
+async function sElectionEligibility(clientId: string): Promise<{
+  eligible: boolean;
+  reason: "ok" | "no_new_formation" | "window_closed" | "already_ordered";
+  orderBy: string | null;
+  formationPaidAt: string | null;
+}> {
+  const db = await getDb();
+  const formed = await db.query<{ paid_at: unknown }>(
+    "SELECT paid_at FROM orders WHERE client_id = $1 AND status = 'paid' AND package = 'NEW' ORDER BY paid_at DESC NULLS LAST LIMIT 1",
+    [clientId],
+  );
+  if (formed.length === 0 || !formed[0].paid_at) {
+    return { eligible: false, reason: "no_new_formation", orderBy: null, formationPaidAt: null };
+  }
+  const paidAt = new Date(String(formed[0].paid_at));
+  const orderBy = new Date(paidAt.getTime() + S_ELECTION_WINDOW_DAYS * 86400_000);
+  const existing = await db.query(
+    "SELECT id FROM service_orders WHERE client_id = $1 AND type = 's-election' AND status <> 'cancelled'",
+    [clientId],
+  );
+  if (existing.length > 0) {
+    return { eligible: false, reason: "already_ordered", orderBy: orderBy.toISOString(), formationPaidAt: paidAt.toISOString() };
+  }
+  if (Date.now() > orderBy.getTime()) {
+    return { eligible: false, reason: "window_closed", orderBy: orderBy.toISOString(), formationPaidAt: paidAt.toISOString() };
+  }
+  return { eligible: true, reason: "ok", orderBy: orderBy.toISOString(), formationPaidAt: paidAt.toISOString() };
+}
+
 app.get("/portal/services", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
@@ -1020,10 +1100,58 @@ app.get("/portal/services", async (c) => {
       pricing: {
         seriesCents: SERIES_ADDON_PREP_CENTS + SERIES_ADDON_STATE_CENTS,
         einCents: EIN_FEE_CENTS,
+        sElectionCents: S_ELECTION_FEE_CENTS,
       },
+      sElection: await sElectionEligibility(session.clientId),
       orders,
     },
   });
+});
+
+app.post("/portal/services/s-election", async (c) => {
+  const session = await getSession(c);
+  if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  if (!rateLimit(`svc:${session.clientId}`, 20, 3600_000)) {
+    return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
+  }
+  const llcName = await clientLlcName(session.clientId);
+  if (!llcName) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
+  const gate = await sElectionEligibility(session.clientId);
+  if (!gate.eligible) {
+    const msg =
+      gate.reason === "already_ordered"
+        ? "You already have an S election order — see your orders below."
+        : gate.reason === "window_closed"
+          ? "The ordering window for the S election package has closed. A late election requires IRS relief — please consult a tax professional."
+          : "The S election package is available only for new LLCs we formed.";
+    return c.json(err(msg, gate.reason === "window_closed" ? "WINDOW_CLOSED" : "NOT_ELIGIBLE"), 400);
+  }
+  const db = await getDb();
+  const rows = await db.query<{ id: string }>(
+    `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents)
+     VALUES ($1, 's-election', $2, $3, $4) RETURNING id`,
+    [session.clientId, llcName, JSON.stringify({}), S_ELECTION_FEE_CENTS],
+  );
+  const serviceOrderId = rows[0].id;
+  const clients = await db.query<{ email: string }>("SELECT email FROM clients WHERE id = $1", [session.clientId]);
+  const checkout = await createCheckout({
+    orderId: serviceOrderId,
+    llcName,
+    priced: {
+      serviceFeeCents: S_ELECTION_FEE_CENTS,
+      stateFeesCents: 0,
+      totalCents: S_ELECTION_FEE_CENTS,
+      lineItems: [{ name: `S corporation election package (Form 2553) — ${llcName}`, amountCents: S_ELECTION_FEE_CENTS }],
+    },
+    buyerEmail: clients[0]?.email ?? "",
+    redirectUrl: `${env.PUBLIC_BASE_URL}/portal?paid=${serviceOrderId}`,
+    description: `S corporation election package — ${llcName}`,
+  });
+  await db.query("UPDATE service_orders SET square_order_id = $1 WHERE id = $2", [
+    checkout.squareOrderId,
+    serviceOrderId,
+  ]);
+  return c.json({ data: { serviceOrderId, checkoutUrl: checkout.url, totalCents: S_ELECTION_FEE_CENTS } });
 });
 
 app.post("/portal/services/series", async (c) => {
@@ -1181,6 +1309,97 @@ app.post("/portal/services/:id/ein-details", async (c) => {
   return c.json({ data: { ok: true } });
 });
 
+const sElectionDetailsSchema = z
+  .object({
+    ein: z
+      .string()
+      .transform((s) => s.replace(/[\s-]/g, ""))
+      .refine((s) => s === "" || /^\d{9}$/.test(s), "Enter the 9-digit EIN, or leave it blank if we're obtaining it."),
+    einPending: z.boolean().optional().default(false),
+    dateIncorporated: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    effectiveDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    officerName: z.string().min(1, "The signing officer's name is required.").max(200),
+    officerTitle: z.string().min(1).max(100),
+    phone: z.string().max(40).optional().default(""),
+    shareholders: z
+      .array(
+        z.object({
+          name: z.string().min(1).max(200),
+          address: z.string().min(1).max(300),
+          percentage: z.number().min(0).max(100),
+          dateAcquired: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+          ssn: z
+            .string()
+            .transform((s) => s.replace(/[\s-]/g, ""))
+            .refine((s) => /^\d{9}$/.test(s), "Each owner's SSN must be 9 digits."),
+        }),
+      )
+      .min(1, "At least one owner is required.")
+      .max(7, "The IRS form holds 7 owners — contact us for more."),
+  })
+  .refine((d) => d.ein !== "" || d.einPending, {
+    message: "Provide the EIN, or mark that we are obtaining it for you.",
+  })
+  .refine((d) => Math.abs(d.shareholders.reduce((a, s) => a + s.percentage, 0) - 100) < 0.01, {
+    message: "Ownership percentages must total exactly 100%.",
+  });
+
+app.post("/portal/services/:id/s-election-details", async (c) => {
+  const session = await getSession(c);
+  if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const body = sElectionDetailsSchema.safeParse(await c.req.json().catch(() => null));
+  if (!body.success) {
+    return c.json(err(body.error.issues[0]?.message ?? "Invalid details.", "INVALID_INPUT"), 400);
+  }
+  const db = await getDb();
+  const rows = await db.query<{ id: string; client_id: string; type: string; status: string; llc_name: string }>(
+    "SELECT id, client_id, type, status, llc_name FROM service_orders WHERE id = $1",
+    [c.req.param("id")],
+  );
+  if (rows.length === 0 || rows[0].client_id !== session.clientId) {
+    return c.json(err("Not found", "NOT_FOUND"), 404);
+  }
+  const so = rows[0];
+  if (so.type !== "s-election" || so.status !== "awaiting_info") {
+    return c.json(err("This order is not awaiting details.", "BAD_STATE"), 400);
+  }
+  const d = body.data;
+  // SSNs live only in the encrypted secret, deleted at fulfillment; the
+  // visible record keeps the last 4 digits for identification.
+  const merged = {
+    ein: d.ein,
+    einPending: d.einPending,
+    dateIncorporated: d.dateIncorporated,
+    effectiveDate: d.effectiveDate,
+    officerName: d.officerName,
+    officerTitle: d.officerTitle,
+    phone: d.phone,
+    shareholders: d.shareholders.map((s) => ({
+      name: s.name,
+      address: s.address,
+      percentage: s.percentage,
+      dateAcquired: s.dateAcquired,
+      ssnLast4: s.ssn.slice(-4),
+    })),
+  };
+  await db.query(
+    "UPDATE service_orders SET details = $1, ein_secret = $2, status = 'in_progress' WHERE id = $3",
+    [JSON.stringify(merged), encryptSecret(JSON.stringify(d.shareholders.map((s) => s.ssn))), so.id],
+  );
+  if (env.ADMIN_NOTIFY_EMAIL) {
+    const clients = await db.query<{ email: string }>("SELECT email FROM clients WHERE id = $1", [session.clientId]);
+    const mail = einDetailsSubmittedAdminEmail({
+      summary: `S Corporation Election Package — ${so.llc_name}`,
+      clientEmail: clients[0]?.email ?? "",
+      adminUrl: `${env.PUBLIC_BASE_URL}/admin`,
+    });
+    sendMail({ to: env.ADMIN_NOTIFY_EMAIL, ...mail }).catch((e) =>
+      console.error("[service] s-election-details admin email failed:", e),
+    );
+  }
+  return c.json({ data: { ok: true } });
+});
+
 /** Online cancellation of registered agent service — required by §501.165
  *  because the service is accepted online. Recording the request is the
  *  §9(g)(i) notice; the agency itself ends only when proof of a successor
@@ -1286,6 +1505,11 @@ app.get("/admin/services", async (c) => {
     `SELECT so.id, so.type, so.status, so.llc_name, so.details, so.amount_cents,
             so.created_at, so.paid_at, so.fulfilled_at,
             (so.ein_secret IS NOT NULL) AS has_secret,
+            (so.type = 's-election' AND EXISTS (
+              SELECT 1 FROM service_orders e
+              WHERE e.client_id = so.client_id AND e.type = 'ein'
+                AND e.status NOT IN ('fulfilled', 'cancelled')
+            )) AS ein_pending,
             cl.email AS client_email, cl.name AS client_name
      FROM service_orders so JOIN clients cl ON cl.id = so.client_id
      ORDER BY so.created_at DESC`,
@@ -1308,9 +1532,12 @@ app.get("/admin/services/:id", async (c) => {
   if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
   const so = rows[0];
   let tin: string | null = null;
+  let ssns: string[] | null = null; // s-election: one SSN per listed shareholder
   if (so.ein_secret) {
     try {
-      tin = decryptSecret(so.ein_secret);
+      const secret = decryptSecret(so.ein_secret);
+      if (so.type === "s-election") ssns = JSON.parse(secret) as string[];
+      else tin = secret;
     } catch (e) {
       console.error("[admin] EIN secret decrypt failed:", e);
     }
@@ -1327,8 +1554,66 @@ app.get("/admin/services/:id", async (c) => {
       paid_at: so.paid_at,
       square_order_id: so.square_order_id,
       tin,
+      ssns,
     },
   });
+});
+
+/** Draft S election package for admin review: instructions + cover letter +
+ *  the filled official Form 2553. Generated on demand from the encrypted
+ *  details; nothing is stored — Adam reviews and attaches it at fulfillment. */
+app.get("/admin/services/:id/s-election-draft", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const db = await getDb();
+  const rows = await db.query<{
+    id: string; client_id: string; type: string; status: string; llc_name: string;
+    details: unknown; ein_secret: string | null;
+  }>(
+    "SELECT id, client_id, type, status, llc_name, details, ein_secret FROM service_orders WHERE id = $1",
+    [c.req.param("id")],
+  );
+  if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+  const so = rows[0];
+  if (so.type !== "s-election" || !so.ein_secret) {
+    return c.json(err("This order has no S election details yet.", "BAD_STATE"), 400);
+  }
+  const details = (typeof so.details === "string" ? JSON.parse(so.details) : so.details) as {
+    ein: string; dateIncorporated: string; effectiveDate: string;
+    officerName: string; officerTitle: string; phone: string;
+    shareholders: { name: string; address: string; percentage: number; dateAcquired: string }[];
+  };
+  let ssns: string[];
+  try {
+    ssns = JSON.parse(decryptSecret(so.ein_secret)) as string[];
+  } catch (e) {
+    console.error("[admin] s-election secret decrypt failed:", e);
+    return c.json(err("Could not decrypt the shareholder details.", "DECRYPT_FAILED"), 500);
+  }
+  const seed = await oaSeed(so.client_id);
+  const input: SElectionDetails = {
+    llcName: so.llc_name,
+    principalAddress: seed?.principalAddress ?? "",
+    ein: details.ein ?? "",
+    dateIncorporated: details.dateIncorporated,
+    effectiveDate: details.effectiveDate,
+    officerName: details.officerName,
+    officerTitle: details.officerTitle,
+    phone: details.phone ?? "",
+    shareholders: details.shareholders.map((s, i) => ({ ...s, ssn: ssns[i] ?? "" })),
+  };
+  try {
+    const pdf = await buildSElectionPackage(input);
+    return new Response(pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength) as ArrayBuffer, {
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `attachment; filename="S-Election-Package-${so.llc_name.replace(/[^\w-]+/g, "_")}.pdf"`,
+      },
+    });
+  } catch (e) {
+    console.error("[admin] s-election draft failed:", e);
+    return c.json(err("Draft generation failed.", "GENERATION_FAILED"), 500);
+  }
 });
 
 app.post("/admin/services/:id/fulfill", async (c) => {
@@ -1366,8 +1651,12 @@ app.post("/admin/services/:id/fulfill", async (c) => {
   }
   // An EIN order's deliverable IS the IRS letter — and fulfillment deletes the
   // TIN, so completing without the letter would strand the client. Required.
+  // Same for the S election package: fulfilling deletes the shareholder SSNs.
   if (so.type === "ein" && !file) {
     return c.json(err("Attach the EIN confirmation letter (CP 575) to fulfill an EIN order.", "LETTER_REQUIRED"), 400);
+  }
+  if (so.type === "s-election" && !file) {
+    return c.json(err("Attach the election package PDF to fulfill an S election order.", "PACKAGE_REQUIRED"), 400);
   }
   const details = (typeof so.details === "string" ? JSON.parse(so.details) : so.details) as {
     seriesName?: string; target?: string;
@@ -1375,7 +1664,9 @@ app.post("/admin/services/:id/fulfill", async (c) => {
   const summary =
     so.type === "series"
       ? `Protected Series Designation — ${details.seriesName ?? so.llc_name}`
-      : `Federal EIN — ${details.target === "series" ? details.seriesName ?? "series" : so.llc_name}`;
+      : so.type === "s-election"
+        ? `S Corporation Election Package — ${so.llc_name}`
+        : `Federal EIN — ${details.target === "series" ? details.seriesName ?? "series" : so.llc_name}`;
 
   let documentId: string | null = null;
   if (file) {
@@ -1383,7 +1674,9 @@ app.post("/admin/services/:id/fulfill", async (c) => {
       titleOverride ||
       (so.type === "series"
         ? `Protected Series Designation — ${details.seriesName ?? so.llc_name}`
-        : `EIN Confirmation Letter — ${details.target === "series" ? details.seriesName ?? so.llc_name : so.llc_name}`);
+        : so.type === "s-election"
+          ? `S Corporation Election Package (Form 2553) — ${so.llc_name}`
+          : `EIN Confirmation Letter — ${details.target === "series" ? details.seriesName ?? so.llc_name : so.llc_name}`);
     const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
     const doc = await db.query<{ id: string }>(
       `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)

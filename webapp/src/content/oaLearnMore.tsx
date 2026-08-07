@@ -21,6 +21,41 @@ const Choice = ({ label, children }: { label: string; children: ReactNode }) => 
 );
 
 export const LEARN_MORE: Record<string, LearnMoreScreen> = {
+  sElection: {
+    title: "S Corporation Status",
+    body: (
+      <div className="space-y-3">
+        <P>
+          An S election is a federal tax status made with the IRS (Form 2553, with every owner's
+          consent) — often used to reduce self-employment taxes on an active business. It comes
+          with strict rules: one class of ownership, strictly pro-rata distributions, and only
+          eligible shareholders (generally individuals and certain trusts — no entities or
+          nonresident aliens, and no more than 100).
+        </P>
+        <Choice label={'If you choose "Yes":'}>
+          Your agreement is built on our dedicated S corporation form. It has no partnership tax
+          machinery, every distribution is strictly pro rata, and every owner shares in the
+          company and in every protected series identically — per-series ownership cannot vary,
+          because the current state of the law is uncertain if different series have different
+          members, which could cause you to lose your S corporation status. And that can be
+          extremely expensive. The agreement also restricts transfers and transfer-on-death
+          designations to eligible shareholders, and includes a savings clause that keeps the
+          election valid and requires everyone to cooperate in fixing an inadvertent termination.
+        </Choice>
+        <Choice label={'If you choose "No":'}>
+          Your agreement uses our standard form — with one owner, the company is simply part of
+          your personal tax return; with multiple owners, it is taxed as a partnership — and
+          different owners can share in different protected series in different percentages.
+        </Choice>
+        <P>
+          <strong className="text-foreground">Worth knowing:</strong> this questionnaire does not
+          make the election — that happens with the IRS. Choose Yes only if you have made, or
+          your tax professional is making, the election. You can switch forms later by generating
+          an amended and restated agreement.
+        </P>
+      </div>
+    ),
+  },
   firstOrAmended: {
     title: "First Agreement, or Amending and Restating?",
     body: (

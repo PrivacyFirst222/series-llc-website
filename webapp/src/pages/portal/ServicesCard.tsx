@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { PlusCircle, Landmark, ShoppingBag, Lock } from "lucide-react";
+import { PlusCircle, Landmark, ShoppingBag, Lock, FileCheck2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -16,7 +16,7 @@ import { api, ApiError } from "@/lib/api";
 
 interface ServiceOrder {
   id: string;
-  type: "series" | "ein";
+  type: "series" | "ein" | "s-election";
   status: "pending_payment" | "awaiting_info" | "in_progress" | "fulfilled" | "cancelled";
   llc_name: string;
   details: { seriesName?: string; target?: string; responsibleName?: string; tinLast4?: string };
@@ -29,8 +29,21 @@ interface ServiceOrder {
 interface ServicesData {
   llcName: string;
   dev: boolean;
-  pricing: { seriesCents: number; einCents: number };
+  pricing: { seriesCents: number; einCents: number; sElectionCents: number };
+  sElection: {
+    eligible: boolean;
+    reason: "ok" | "no_new_formation" | "window_closed" | "already_ordered";
+    orderBy: string | null;
+  };
   orders: ServiceOrder[];
+}
+
+interface ShareholderRow {
+  name: string;
+  address: string;
+  percentage: string;
+  dateAcquired: string;
+  ssn: string;
 }
 
 const STATUS_LABEL: Record<ServiceOrder["status"], string> = {
@@ -47,13 +60,18 @@ function money(cents: number): string {
 
 function summaryOf(o: ServiceOrder): string {
   if (o.type === "series") return `Protected Series Designation — ${o.details.seriesName ?? o.llc_name}`;
+  if (o.type === "s-election") return `S Corporation Election Package — ${o.llc_name}`;
   return `Federal EIN — ${o.details.target === "series" ? o.details.seriesName ?? "series" : o.llc_name}`;
 }
+
+const fmtDay = (iso: string) =>
+  new Date(iso).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
 
 export function ServicesCard() {
   const queryClient = useQueryClient();
   const [seriesOpen, setSeriesOpen] = useState(false);
   const [einOpen, setEinOpen] = useState(false);
+  const [sElectionOpen, setSElectionOpen] = useState(false);
   const [detailsFor, setDetailsFor] = useState<ServiceOrder | null>(null);
   const [error, setError] = useState<string>("");
 
@@ -76,6 +94,14 @@ export function ServicesCard() {
   const orderEin = useMutation({
     mutationFn: (body: { target: "company" | "series"; seriesName?: string }) =>
       api.post<{ checkoutUrl: string }>("/api/portal/services/ein", body),
+    onSuccess: (res) => {
+      window.location.href = res.checkoutUrl;
+    },
+    onError: (e) => setError(e instanceof ApiError ? e.message : "Something went wrong."),
+  });
+
+  const orderSElection = useMutation({
+    mutationFn: () => api.post<{ checkoutUrl: string }>("/api/portal/services/s-election", {}),
     onSuccess: (res) => {
       window.location.href = res.checkoutUrl;
     },
@@ -237,6 +263,61 @@ export function ServicesCard() {
             </form>
           </DialogContent>
         </Dialog>
+
+        {/* S corporation election — only inside the post-formation window */}
+        {data.sElection.eligible ? (
+          <Dialog open={sElectionOpen} onOpenChange={(v) => { setSElectionOpen(v); setError(""); }}>
+            <DialogTrigger asChild>
+              <button
+                type="button"
+                className="rounded-xl border border-border bg-background p-4 text-left transition-all hover:border-accent hover:shadow-md"
+              >
+                <div className="flex items-center gap-2 text-trust">
+                  <FileCheck2 className="h-4 w-4" />
+                  <span className="text-sm font-medium text-foreground">S Corporation Election Package</span>
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Completed IRS Form 2553 with a cover letter and filing instructions — you sign
+                  and mail it.
+                  {data.sElection.orderBy ? (
+                    <span className="font-medium text-amber-700">
+                      {" "}Available until {fmtDay(data.sElection.orderBy)}.
+                    </span>
+                  ) : null}
+                </p>
+                <p className="mt-2 font-display text-lg text-trust">{money(data.pricing.sElectionCents)}</p>
+              </button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>S Corporation Election Package</DialogTitle>
+                <DialogDescription>
+                  {money(data.pricing.sElectionCents)}. We prepare IRS Form 2553 for{" "}
+                  {data.llcName || "your LLC"} — completed and ready to sign — plus a cover letter
+                  and step-by-step filing instructions. You review, sign, and mail or fax it to the
+                  IRS yourself; there is no IRS filing fee. After payment, you'll provide the
+                  owners' details through a secure form here in the portal.
+                </DialogDescription>
+              </DialogHeader>
+              <p className="text-xs text-muted-foreground">
+                The IRS deadline is strict — 2 months and 15 days from the start of the company's
+                first tax year — which is why this package is only available until{" "}
+                {data.sElection.orderBy ? fmtDay(data.sElection.orderBy) : "the window closes"}.
+                Choose this only if your tax professional recommends the election.
+              </p>
+              {error ? <p className="text-xs text-destructive">{error}</p> : null}
+              <DialogFooter>
+                <Button
+                  className="rounded-full"
+                  disabled={orderSElection.isPending}
+                  onClick={() => orderSElection.mutate()}
+                >
+                  {orderSElection.isPending ? "Preparing checkout…" : "Continue to payment"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        ) : null}
       </div>
 
       {data.orders.length > 0 ? (
@@ -280,8 +361,32 @@ export function ServicesCard() {
         </ul>
       ) : null}
 
+      {/* Secure S election details dialog */}
+      <Dialog
+        open={detailsFor !== null && detailsFor.type === "s-election"}
+        onOpenChange={(v) => { if (!v) setDetailsFor(null); }}
+      >
+        <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>S corporation election details</DialogTitle>
+            <DialogDescription>
+              We use this to complete IRS Form 2553 for {detailsFor?.llc_name}. This form is
+              transmitted over your secure portal session; Social Security numbers are encrypted,
+              used only to prepare the form, and deleted from our systems when your package is
+              delivered.
+            </DialogDescription>
+          </DialogHeader>
+          {detailsFor ? (
+            <SElectionDetailsForm
+              orderId={detailsFor.id}
+              onDone={() => { setDetailsFor(null); refresh(); }}
+            />
+          ) : null}
+        </DialogContent>
+      </Dialog>
+
       {/* Secure EIN details dialog */}
-      <Dialog open={detailsFor !== null} onOpenChange={(v) => { if (!v) setDetailsFor(null); }}>
+      <Dialog open={detailsFor !== null && detailsFor.type === "ein"} onOpenChange={(v) => { if (!v) setDetailsFor(null); }}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Responsible party details</DialogTitle>
@@ -328,5 +433,172 @@ export function ServicesCard() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+const EMPTY_ROW: ShareholderRow = { name: "", address: "", percentage: "", dateAcquired: "", ssn: "" };
+
+function SElectionDetailsForm({ orderId, onDone }: { orderId: string; onDone: () => void }) {
+  const [ein, setEin] = useState("");
+  const [einPending, setEinPending] = useState(false);
+  const [dateIncorporated, setDateIncorporated] = useState("");
+  const [effectiveDate, setEffectiveDate] = useState("");
+  const [officerName, setOfficerName] = useState("");
+  const [officerTitle, setOfficerTitle] = useState("Manager");
+  const [phone, setPhone] = useState("");
+  const [rows, setRows] = useState<ShareholderRow[]>([{ ...EMPTY_ROW }]);
+  const [formError, setFormError] = useState("");
+
+  const patchRow = (i: number, p: Partial<ShareholderRow>) =>
+    setRows((prev) => prev.map((r, ri) => (ri === i ? { ...r, ...p } : r)));
+
+  const submit = useMutation({
+    mutationFn: () =>
+      api.post(`/api/portal/services/${orderId}/s-election-details`, {
+        ein,
+        einPending,
+        dateIncorporated,
+        effectiveDate: effectiveDate || dateIncorporated,
+        officerName,
+        officerTitle,
+        phone,
+        shareholders: rows.map((r) => ({
+          name: r.name,
+          address: r.address,
+          percentage: Number(r.percentage),
+          dateAcquired: r.dateAcquired || dateIncorporated,
+          ssn: r.ssn,
+        })),
+      }),
+    onSuccess: onDone,
+    onError: (e) => setFormError(e instanceof ApiError ? e.message : "Something went wrong."),
+  });
+
+  const pctTotal = rows.reduce((a, r) => a + (Number(r.percentage) || 0), 0);
+
+  return (
+    <form
+      className="space-y-4"
+      onSubmit={(e) => {
+        e.preventDefault();
+        setFormError("");
+        submit.mutate();
+      }}
+    >
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium">EIN (9 digits)</label>
+          <Input
+            value={ein}
+            onChange={(e) => setEin(e.target.value)}
+            placeholder="XX-XXXXXXX"
+            autoComplete="off"
+            disabled={einPending}
+          />
+          <label className="flex items-center gap-2 text-xs text-muted-foreground">
+            <input
+              type="checkbox"
+              checked={einPending}
+              onChange={(e) => { setEinPending(e.target.checked); if (e.target.checked) setEin(""); }}
+              className="h-3.5 w-3.5 accent-trust"
+            />
+            You're obtaining our EIN — use it when issued
+          </label>
+        </div>
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium">Date the LLC was formed</label>
+          <Input type="date" value={dateIncorporated} onChange={(e) => setDateIncorporated(e.target.value)} />
+          <p className="text-xs text-muted-foreground">From your filed Articles of Organization.</p>
+        </div>
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium">Election effective date</label>
+          <Input type="date" value={effectiveDate} onChange={(e) => setEffectiveDate(e.target.value)} />
+          <p className="text-xs text-muted-foreground">Usually the formation date. Leave blank to use it.</p>
+        </div>
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium">Phone for IRS questions</label>
+          <Input value={phone} onChange={(e) => setPhone(e.target.value)} autoComplete="off" />
+        </div>
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium">Signing officer</label>
+          <Input value={officerName} onChange={(e) => setOfficerName(e.target.value)} placeholder="Full legal name" autoComplete="off" />
+        </div>
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium">Officer title</label>
+          <Input value={officerTitle} onChange={(e) => setOfficerTitle(e.target.value)} autoComplete="off" />
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <p className="text-sm font-medium">Owners (every owner must be listed and will sign the form)</p>
+        {rows.map((r, i) => (
+          <div key={i} className="space-y-2 rounded-lg border border-border p-3">
+            <div className="grid gap-2 sm:grid-cols-2">
+              <Input placeholder="Owner's full legal name" value={r.name} onChange={(e) => patchRow(i, { name: e.target.value })} autoComplete="off" />
+              <Input placeholder="Home address" value={r.address} onChange={(e) => patchRow(i, { address: e.target.value })} autoComplete="off" />
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex items-center gap-1">
+                <Input
+                  type="number" min={0} max={100} step="0.01" placeholder="%"
+                  value={r.percentage}
+                  onChange={(e) => patchRow(i, { percentage: e.target.value })}
+                  className="w-24"
+                />
+                <span className="text-sm text-muted-foreground">%</span>
+              </div>
+              <Input
+                type="date"
+                title="Date the interest was acquired"
+                value={r.dateAcquired}
+                onChange={(e) => patchRow(i, { dateAcquired: e.target.value })}
+                className="w-40"
+              />
+              <Input
+                type="password" inputMode="numeric" placeholder="SSN •••-••-••••"
+                value={r.ssn}
+                onChange={(e) => patchRow(i, { ssn: e.target.value })}
+                className="w-40"
+                autoComplete="off"
+              />
+              {rows.length > 1 ? (
+                <button
+                  type="button"
+                  aria-label="Remove owner"
+                  onClick={() => setRows((prev) => prev.filter((_, ri) => ri !== i))}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              ) : null}
+            </div>
+          </div>
+        ))}
+        <div className="flex items-center justify-between">
+          {rows.length < 7 ? (
+            <Button type="button" size="sm" variant="outline" className="rounded-full" onClick={() => setRows((prev) => [...prev, { ...EMPTY_ROW }])}>
+              <PlusCircle className="mr-1.5 h-3.5 w-3.5" />
+              Add owner
+            </Button>
+          ) : <span />}
+          <p className={`text-xs font-medium ${Math.abs(pctTotal - 100) < 0.01 ? "text-trust" : "text-destructive"}`}>
+            Total: {pctTotal}%
+          </p>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Spouses who own an interest together (tenants by the entireties or joint tenants):
+          enter one row with both names — e.g., "Sam Lee and Alex Lee, as tenants by the
+          entireties" — their combined percentage, and either spouse's SSN. The instruction
+          sheet will direct <em>both</em> spouses to sign that row's consent line.
+        </p>
+      </div>
+
+      {formError ? <p className="text-xs text-destructive">{formError}</p> : null}
+      <DialogFooter>
+        <Button type="submit" disabled={submit.isPending} className="rounded-full">
+          {submit.isPending ? "Submitting…" : "Submit securely"}
+        </Button>
+      </DialogFooter>
+    </form>
   );
 }

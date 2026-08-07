@@ -3700,41 +3700,41 @@ var init_serverless = __esm({
       p();
       Object.defineProperty(Ft, "__esModule", { value: true });
       Ft.serialize = void 0;
-      var pn = Qs(), F = new pn.Writer(), yc = a((r) => {
-        F.addInt16(3).addInt16(0);
-        for (let n of Object.keys(r)) F.addCString(
+      var pn = Qs(), F2 = new pn.Writer(), yc = a((r) => {
+        F2.addInt16(3).addInt16(0);
+        for (let n of Object.keys(r)) F2.addCString(
           n
         ).addCString(r[n]);
-        F.addCString("client_encoding").addCString("UTF8");
-        let e = F.addCString("").flush(), t = e.length + 4;
+        F2.addCString("client_encoding").addCString("UTF8");
+        let e = F2.addCString("").flush(), t = e.length + 4;
         return new pn.Writer().addInt32(t).add(e).flush();
       }, "startup"), mc = a(() => {
         let r = d.allocUnsafe(
           8
         );
         return r.writeInt32BE(8, 0), r.writeInt32BE(80877103, 4), r;
-      }, "requestSsl"), wc = a((r) => F.addCString(r).flush(
+      }, "requestSsl"), wc = a((r) => F2.addCString(r).flush(
         112
       ), "password"), gc = a(function(r, e) {
-        return F.addCString(r).addInt32(d.byteLength(e)).addString(e), F.flush(112);
+        return F2.addCString(r).addInt32(d.byteLength(e)).addString(e), F2.flush(112);
       }, "sendSASLInitialResponseMessage"), bc = a(function(r) {
-        return F.addString(r).flush(112);
-      }, "sendSCRAMClientFinalMessage"), vc = a((r) => F.addCString(r).flush(81), "query"), Ns = [], xc = a((r) => {
+        return F2.addString(r).flush(112);
+      }, "sendSCRAMClientFinalMessage"), vc = a((r) => F2.addCString(r).flush(81), "query"), Ns = [], xc = a((r) => {
         let e = r.name || "";
         e.length > 63 && (console.error("Warning! Postgres only supports 63 characters for query names."), console.error("You supplied %s (%s)", e, e.length), console.error("This can cause conflicts and silent errors executing queries"));
-        let t = r.types || Ns, n = t.length, i = F.addCString(e).addCString(r.text).addInt16(n);
+        let t = r.types || Ns, n = t.length, i = F2.addCString(e).addCString(r.text).addInt16(n);
         for (let s = 0; s < n; s++) i.addInt32(t[s]);
-        return F.flush(80);
+        return F2.flush(80);
       }, "parse"), qe = new pn.Writer(), Sc = a(function(r, e) {
         for (let t = 0; t < r.length; t++) {
           let n = e ? e(r[t], t) : r[t];
-          n == null ? (F.addInt16(0), qe.addInt32(-1)) : n instanceof d ? (F.addInt16(
+          n == null ? (F2.addInt16(0), qe.addInt32(-1)) : n instanceof d ? (F2.addInt16(
             1
-          ), qe.addInt32(n.length), qe.add(n)) : (F.addInt16(0), qe.addInt32(d.byteLength(n)), qe.addString(n));
+          ), qe.addInt32(n.length), qe.add(n)) : (F2.addInt16(0), qe.addInt32(d.byteLength(n)), qe.addString(n));
         }
       }, "writeValues"), Ec = a((r = {}) => {
         let e = r.portal || "", t = r.statement || "", n = r.binary || false, i = r.values || Ns, s = i.length;
-        return F.addCString(e).addCString(t), F.addInt16(s), Sc(i, r.valueMapper), F.addInt16(s), F.add(qe.flush()), F.addInt16(n ? 1 : 0), F.flush(66);
+        return F2.addCString(e).addCString(t), F2.addInt16(s), Sc(i, r.valueMapper), F2.addInt16(s), F2.add(qe.flush()), F2.addInt16(n ? 1 : 0), F2.flush(66);
       }, "bind"), Ac = d.from([69, 0, 0, 0, 9, 0, 0, 0, 0, 0]), Cc = a((r) => {
         if (!r || !r.portal && !r.rows) return Ac;
         let e = r.portal || "", t = r.rows || 0, n = d.byteLength(e), i = 4 + n + 1 + 4, s = d.allocUnsafe(1 + i);
@@ -3751,10 +3751,10 @@ var init_serverless = __esm({
       ), dn = a((r, e) => {
         let n = 4 + d.byteLength(e) + 1, i = d.allocUnsafe(1 + n);
         return i[0] = r, i.writeInt32BE(n, 1), i.write(e, 5, "utf-8"), i[n] = 0, i;
-      }, "cstringMessage"), Ic = F.addCString("P").flush(68), Tc = F.addCString("S").flush(68), Pc = a((r) => r.name ? dn(68, `${r.type}${r.name || ""}`) : r.type === "P" ? Ic : Tc, "describe"), Rc = a((r) => {
+      }, "cstringMessage"), Ic = F2.addCString("P").flush(68), Tc = F2.addCString("S").flush(68), Pc = a((r) => r.name ? dn(68, `${r.type}${r.name || ""}`) : r.type === "P" ? Ic : Tc, "describe"), Rc = a((r) => {
         let e = `${r.type}${r.name || ""}`;
         return dn(67, e);
-      }, "close"), Bc = a((r) => F.add(r).flush(100), "copyData"), Lc = a((r) => dn(102, r), "copyFail"), Lt = a((r) => d.from([r, 0, 0, 0, 4]), "codeOnlyBuffer"), Fc = Lt(72), kc = Lt(83), Mc = Lt(88), Uc = Lt(99), Dc = {
+      }, "close"), Bc = a((r) => F2.add(r).flush(100), "copyData"), Lc = a((r) => dn(102, r), "copyFail"), Lt = a((r) => d.from([r, 0, 0, 0, 4]), "codeOnlyBuffer"), Fc = Lt(72), kc = Lt(83), Mc = Lt(88), Uc = Lt(99), Dc = {
         startup: yc,
         password: wc,
         requestSsl: mc,
@@ -15579,13 +15579,13 @@ var require_core = __commonJS({
           throw new Error("Native crypto module could not be used to get secure random number.");
         };
         var create = Object.create || /* @__PURE__ */ (function() {
-          function F() {
+          function F2() {
           }
           return function(obj) {
             var subtype;
-            F.prototype = obj;
-            subtype = new F();
-            F.prototype = null;
+            F2.prototype = obj;
+            subtype = new F2();
+            F2.prototype = null;
             return subtype;
           };
         })();
@@ -21947,7 +21947,7 @@ var require_blowfish = __commonJS({
           pbox: [],
           sbox: []
         };
-        function F(ctx, x2) {
+        function F2(ctx, x2) {
           let a2 = x2 >> 24 & 255;
           let b2 = x2 >> 16 & 255;
           let c = x2 >> 8 & 255;
@@ -21963,7 +21963,7 @@ var require_blowfish = __commonJS({
           let temp;
           for (let i = 0; i < N; ++i) {
             Xl = Xl ^ ctx.pbox[i];
-            Xr = F(ctx, Xl) ^ Xr;
+            Xr = F2(ctx, Xl) ^ Xr;
             temp = Xl;
             Xl = Xr;
             Xr = temp;
@@ -21981,7 +21981,7 @@ var require_blowfish = __commonJS({
           let temp;
           for (let i = N + 1; i > 1; --i) {
             Xl = Xl ^ ctx.pbox[i];
-            Xr = F(ctx, Xl) ^ Xr;
+            Xr = F2(ctx, Xl) ^ Xr;
             temp = Xl;
             Xl = Xr;
             Xr = temp;
@@ -28518,8 +28518,8 @@ var require_util = __commonJS({
         return false;
       }
       try {
-        const F = Function;
-        new F("");
+        const F2 = Function;
+        new F2("");
         return true;
       } catch (_) {
         return false;
@@ -29987,11 +29987,11 @@ var require_doc = __commonJS({
         }
       }
       compile() {
-        const F = Function;
+        const F2 = Function;
         const args = this?.args;
         const content = this?.content ?? [``];
         const lines = [...content.map((x2) => `  ${x2}`)];
-        return new F(...args, lines.join("\n"));
+        return new F2(...args, lines.join("\n"));
       }
     };
     exports.Doc = Doc;
@@ -31824,9 +31824,9 @@ var require_schemas = __commonJS({
         return payload;
       };
       inst.input = (...args) => {
-        const F = inst.constructor;
+        const F2 = inst.constructor;
         if (Array.isArray(args[0])) {
-          return new F({
+          return new F2({
             type: "function",
             input: new exports.$ZodTuple({
               type: "tuple",
@@ -31836,15 +31836,15 @@ var require_schemas = __commonJS({
             output: inst._def.output
           });
         }
-        return new F({
+        return new F2({
           type: "function",
           input: args[0],
           output: inst._def.output
         });
       };
       inst.output = (output) => {
-        const F = inst.constructor;
-        return new F({
+        const F2 = inst.constructor;
+        return new F2({
           type: "function",
           input: inst._def.input,
           output
@@ -76299,6 +76299,7 @@ var extendedFormSchema = formationFormSchema.extend({
   }),
   filingPath: external_exports.enum(["NEW", "CONVERT"]).optional(),
   orderEin: external_exports.boolean().optional().default(false),
+  orderSElection: external_exports.boolean().optional().default(false),
   existingLlcName: external_exports.string().max(300).optional().or(external_exports.literal("")),
   sunbizDocumentNumber: external_exports.string().max(50).optional().or(external_exports.literal("")),
   series: external_exports.array(
@@ -76444,7 +76445,8 @@ function buildPayload(data) {
     optionalDocuments: {
       certificateOfStatus: data.orderCertificateOfStatus,
       certifiedCopy: data.orderCertifiedCopy,
-      ein: data.orderEin
+      ein: data.orderEin,
+      sElection: data.orderSElection && data.filingPath !== "CONVERT"
     },
     series: data.series,
     estimatedStateFees: fees,
@@ -76625,8 +76627,10 @@ async function getDb() {
 // server/pricing.ts
 var SERVICE_FEE_CENTS = 49900;
 var EIN_FEE_CENTS = 5e3;
+var S_ELECTION_FEE_CENTS = 9500;
 var SERIES_ADDON_PREP_CENTS = 2500;
 var SERIES_ADDON_STATE_CENTS = 2500;
+var S_ELECTION_WINDOW_DAYS = 65;
 function priceOrder(opts) {
   const fees = calculateEstimatedFees({
     certificateOfStatus: opts.certificateOfStatus,
@@ -76641,6 +76645,9 @@ function priceOrder(opts) {
   if (opts.ein) {
     lineItems.push({ name: "Federal EIN service", amountCents: EIN_FEE_CENTS });
   }
+  if (opts.sElection) {
+    lineItems.push({ name: "S corporation election package (Form 2553)", amountCents: S_ELECTION_FEE_CENTS });
+  }
   if (fees.articlesOfOrganization) {
     lineItems.push({ name: "FL state fee \u2014 Articles of Organization", amountCents: fees.articlesOfOrganization * 100 });
   }
@@ -76654,1144 +76661,13 @@ function priceOrder(opts) {
   if (fees.certifiedCopy) {
     lineItems.push({ name: "FL state fee \u2014 certified copy", amountCents: fees.certifiedCopy * 100 });
   }
-  const serviceFeeCents = SERVICE_FEE_CENTS + (opts.ein ? EIN_FEE_CENTS : 0);
+  const serviceFeeCents = SERVICE_FEE_CENTS + (opts.ein ? EIN_FEE_CENTS : 0) + (opts.sElection ? S_ELECTION_FEE_CENTS : 0);
   return {
     serviceFeeCents,
     stateFeesCents,
     totalCents: serviceFeeCents + stateFeesCents,
     lineItems
   };
-}
-
-// server/square.ts
-import { randomBytes as randomBytes2 } from "node:crypto";
-
-// server/crypto.ts
-import {
-  randomBytes,
-  scrypt as scryptCb,
-  timingSafeEqual,
-  createHash,
-  createHmac,
-  createCipheriv,
-  createDecipheriv,
-  hkdfSync
-} from "node:crypto";
-function scrypt(password, salt) {
-  return new Promise(
-    (resolve, reject) => scryptCb(password, salt, 64, (err3, key) => err3 ? reject(err3) : resolve(key))
-  );
-}
-async function hashPassword(password) {
-  const salt = randomBytes(16);
-  const key = await scrypt(password, salt);
-  return `s1:${salt.toString("hex")}:${key.toString("hex")}`;
-}
-async function verifyPassword(password, stored) {
-  const [v2, saltHex, keyHex] = stored.split(":");
-  if (v2 !== "s1" || !saltHex || !keyHex) return false;
-  const key = await scrypt(password, Buffer.from(saltHex, "hex"));
-  const expected = Buffer.from(keyHex, "hex");
-  return key.length === expected.length && timingSafeEqual(key, expected);
-}
-function newToken() {
-  const token = randomBytes(32).toString("base64url");
-  return { token, tokenHash: hashToken(token) };
-}
-function hashToken(token) {
-  return createHash("sha256").update(token).digest("hex");
-}
-function hmacSha256Base64(key, message) {
-  return createHmac("sha256", key).update(message).digest("base64");
-}
-function secretKey() {
-  return Buffer.from(hkdfSync("sha256", env.SESSION_SECRET, "fpsllc-ein-v1", "ein-encryption", 32));
-}
-function encryptSecret(plain) {
-  const iv = randomBytes(12);
-  const cipher = createCipheriv("aes-256-gcm", secretKey(), iv);
-  const ct2 = Buffer.concat([cipher.update(plain, "utf8"), cipher.final()]);
-  const tag = cipher.getAuthTag();
-  return `v1:${iv.toString("hex")}:${tag.toString("hex")}:${ct2.toString("hex")}`;
-}
-function decryptSecret(stored) {
-  const [v2, ivHex, tagHex, ctHex] = stored.split(":");
-  if (v2 !== "v1" || !ivHex || !tagHex || !ctHex) throw new Error("bad secret format");
-  const decipher = createDecipheriv("aes-256-gcm", secretKey(), Buffer.from(ivHex, "hex"));
-  decipher.setAuthTag(Buffer.from(tagHex, "hex"));
-  return Buffer.concat([decipher.update(Buffer.from(ctHex, "hex")), decipher.final()]).toString("utf8");
-}
-
-// server/square.ts
-var API_BASE = env.SQUARE_ENV === "production" ? "https://connect.squareup.com" : "https://connect.squareupsandbox.com";
-async function createCheckout(opts) {
-  const redirectUrl = opts.redirectUrl ?? `${env.PUBLIC_BASE_URL}/order/confirmed?ref=${opts.orderId}`;
-  if (!env.SQUARE_ACCESS_TOKEN) {
-    return {
-      url: `${redirectUrl}&dev=1`,
-      squareOrderId: `dev-${opts.orderId}`
-    };
-  }
-  const request = (withPrefill) => fetch(`${API_BASE}/v2/online-checkout/payment-links`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${env.SQUARE_ACCESS_TOKEN}`,
-      "Content-Type": "application/json",
-      "Square-Version": "2025-01-23"
-    },
-    body: JSON.stringify({
-      idempotency_key: randomBytes2(16).toString("hex"),
-      order: {
-        location_id: env.SQUARE_LOCATION_ID,
-        reference_id: opts.orderId,
-        line_items: opts.priced.lineItems.map((li) => ({
-          name: li.name,
-          quantity: "1",
-          base_price_money: { amount: li.amountCents, currency: "USD" }
-        }))
-      },
-      checkout_options: {
-        redirect_url: redirectUrl,
-        merchant_support_email: "support@myfloridaseriesllc.com"
-      },
-      ...withPrefill ? { pre_populated_data: { buyer_email: opts.buyerEmail } } : {},
-      description: opts.description ?? `Florida Protected Series LLC formation \u2014 ${opts.llcName}`
-    })
-  });
-  let res = await request(true);
-  let body = await res.json();
-  if (!res.ok && body.errors?.some((e) => e.field?.includes("buyer_email"))) {
-    res = await request(false);
-    body = await res.json();
-  }
-  if (!res.ok || !body.payment_link) {
-    throw new Error(`Square payment link failed (${res.status}): ${JSON.stringify(body.errors ?? body)}`);
-  }
-  return { url: body.payment_link.url, squareOrderId: body.payment_link.order_id };
-}
-function verifyWebhookSignature(opts) {
-  if (!env.SQUARE_WEBHOOK_SIGNATURE_KEY) return !env.isProd;
-  if (!opts.signatureHeader) return false;
-  const expected = hmacSha256Base64(
-    env.SQUARE_WEBHOOK_SIGNATURE_KEY,
-    opts.notificationUrl + opts.rawBody
-  );
-  return expected === opts.signatureHeader;
-}
-
-// server/oa.ts
-import { readFileSync } from "node:fs";
-
-// server/templates-oa-single.md
-var templates_oa_single_default = `# OPERATING AGREEMENT
-## OF
-## [COMPANY NAME], LLC
-### A FLORIDA PROTECTED SERIES LIMITED LIABILITY COMPANY
-
-**(Manager-Managed \u2014 Single Member)**
-
----
-
-THIS OPERATING AGREEMENT (this "Agreement") of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the "Company"), is made and entered into effective as of [DATE] (the "Effective Date"), by the undersigned sole member (the "Member") and is acknowledged by the undersigned manager (the "Manager").
-
-### RECITALS
-
-A. The Company was formed as a Florida limited liability company by the filing of Articles of Organization with the Florida Department of State, Division of Corporations (the "Department").
-
-B. The Company is a **protected series limited liability company** within the meaning of ss. 605.2101\u2013605.2802, Florida Statutes, having designated, or intending to designate, one or more protected series by filing one or more Protected Series Designations with the Department.
-
-C. The Member is the sole member of the Company, and intends by this Agreement to set forth the terms governing the Company, each Protected Series designated by the Company, and the relations among the Company, each Protected Series, the Member, and the Manager.
-
-NOW, THEREFORE, the Member adopts the following as the operating agreement of the Company and of each Protected Series:
-
----
-
-## ARTICLE 1 \u2014 THE COMPANY
-
-**1.1 Definitions.** Capitalized terms have the meanings set forth in Article 2 or in the Section in which they are used.
-
-**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes (the "Act"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101\u2013605.2802 (the "Protected Series Provisions"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.
-
-**1.3 Name; Names of Protected Series.** The name of the Company is **[COMPANY NAME], LLC**. The name of each Protected Series shall comply with s. 605.2202, Florida Statutes: it shall begin with the full name of the Company and shall contain the phrase "protected series" or the abbreviation "P.S." or "PS." The name of each Protected Series shall be as set forth in its filed Protected Series Designation and its Series Exhibit. If the Company changes its name, the Manager shall promptly make all filings required to conform the name of each Protected Series.
-
-**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series except as limited by its Series Exhibit, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
-
-**1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as the Manager may determine. A Protected Series may maintain its own place of business as determined by its Protected Series Manager.
-
-**1.6 Registered Agent and Registered Office.** The registered agent and registered office of the Company shall be as stated in the records of the Department. As required by the Act, the registered agent and registered office of the Company shall also serve as the registered agent and registered office for each Protected Series. Service of process, notice, or demand on a Protected Series may be made as provided by law, including s. 48.062, Florida Statutes.
-
-**1.7 Term.** The Company's existence is perpetual unless the Company is dissolved and wound up in accordance with this Agreement and the Act. No Protected Series may have a duration extending beyond the existence of the Company.
-
-**1.8 Location of Records.** The records of the Company and of each Protected Series \u2014 including the records required by Article 8 \u2014 shall be maintained at the Company's principal office or at such other location (including secure electronic storage) as the Manager determines, and shall at all times be retrievable in perceivable form.
-
-**1.9 Filings.** The Manager shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, and statements of dissolution, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
-
-**1.10 Title to Property.** Title to each Associated Asset of a Protected Series shall be acquired, held, and conveyed **in the name of that Protected Series**. Title to each Associated Asset of the Company shall be acquired, held, and conveyed in the name of the Company. No property of the Company or of any Protected Series shall be held in the individual name of the Member or the Manager. The Member's interest in the Company is personal property for all purposes.
-
-**1.11 Waiver of Partition Rights.** The Member irrevocably waives any right to maintain an action for partition or any similar action with respect to any property of the Company or of any Protected Series.
-
-**1.12 No Payments of Individual Obligations.** The credit and property of the Company and of each Protected Series shall be used solely for the benefit of the Company or the applicable Protected Series, and no such property shall be transferred or encumbered for, or in payment of, any individual obligation of the Member or the Manager.
-
----
-
-## ARTICLE 2 \u2014 DEFINITIONS
-
-**2.1 "Act"** means the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.
-
-**2.2 "Associated Asset"** means an asset of a Protected Series, or of the Company, that satisfies the recordkeeping requirements of s. 605.2301, Florida Statutes, and Article 8 of this Agreement.
-
-**2.3 "Associated Liability"** means a liability incurred by, contracted for, or otherwise existing with respect to a particular Protected Series or the Company, as reflected in the records maintained under Article 8.
-
-**2.4 "Associated Member"** means, with respect to a Protected Series, a member of the Company associated with that Protected Series under this Agreement and its Series Exhibit. If no member of the Company is associated with a Protected Series, the Company itself is deemed the sole Associated Member of that Protected Series as provided by the Act.
-
-**2.5 "Company"** means [COMPANY NAME], LLC.
-
-**2.6 "Immediate Family Member"** means (a) any ancestor of the Member or descendant of a grandparent of the Member (each an "Individual Family Member," and including persons legally adopted before age 18), or (b) a trust or other entity for the benefit of one or more Individual Family Members, provided all beneficial interests in that entity are held by such persons; a trust is not excluded merely because a remainder beneficiary is not an Individual Family Member.
-
-**2.7 "Manager"** means the person named in Section 5.1 and any successor designated under this Agreement.
-
-**2.8 "Member"** means the person identified as such on Exhibit A and any successor admitted in accordance with this Agreement.
-
-**2.9 "Membership Interest"** means the Member's entire interest in the Company, including the Member's interest in capital, profits, and distributions of the Company and of each Protected Series with which the Member is associated, and all rights of a member under the Act and this Agreement.
-
-**2.10 "Protected Series"** or **"PS"** means a protected series of the Company established under s. 605.2201, Florida Statutes, and identified in a Series Exhibit.
-
-**2.11 "Protected Series Designation"** means a designation of a protected series filed with the Department under s. 605.2201, Florida Statutes, as amended from time to time.
-
-**2.12 "Protected Series Manager"** means the person responsible for management of a Protected Series under Section 5.2.
-
-**2.13 "Series Exhibit"** means, for each Protected Series, the exhibit to this Agreement (each numbered PS-1, PS-2, and so on) setting forth the terms specific to that Protected Series. Each Series Exhibit is a part of this Agreement.
-
-**2.14 "Transfer"** means any assignment, transfer, conveyance, devise, gift, pledge, hypothecation, encumbrance, or other disposition, direct or indirect, voluntary or involuntary, in trust or otherwise, and as a verb has a corresponding meaning.
-
----
-
-## ARTICLE 3 \u2014 PROTECTED SERIES
-
-**3.1 Establishment.** With the affirmative vote or consent of all members of the Company (which, while the Member is the sole member, means the consent of the Member), the Company may establish one or more Protected Series by causing a Protected Series Designation to be signed and filed with the Department as provided in s. 605.2201, Florida Statutes. At or before the filing of each Protected Series Designation, the Member and the Manager shall adopt a Series Exhibit for the new Protected Series. The Manager is authorized to execute and file each Protected Series Designation approved under this Section.
-
-**3.2 Status of Each Protected Series.** As provided by the Act, each Protected Series:
-
-(a) is a "person" for purposes of the Act and the Uniform Commercial Code, distinct from the Company, from every other Protected Series, from the Member, and from the Manager;
-
-(b) may, in its own name, conduct any activity in furtherance of its purpose, exercise the powers described in Section 1.4, and sue and be sued;
-
-(c) is **not** a separate legal entity capable of existing independently of the Company, may not be a member of the Company, may not itself designate a protected series, and may not merge, convert, domesticate, or engage in an interest exchange except through the single statutory channel provided in s. 605.2604, Florida Statutes; and
-
-(d) shall be governed by this Agreement, applied to that Protected Series as though the Protected Series were a separate limited liability company, except as its Series Exhibit expressly provides otherwise and except as the Act requires otherwise.
-
-**3.3 Limitation of Liability Among Series (Statutory Shields).** Consistent with s. 605.2401, Florida Statutes:
-
-(a) A debt, obligation, or other liability of the Company is solely the debt, obligation, or liability of the Company, and is enforceable only against the Associated Assets of the Company;
-
-(b) A debt, obligation, or other liability of a Protected Series is solely the debt, obligation, or liability of that Protected Series, and is enforceable only against the Associated Assets of that Protected Series;
-
-(c) No Protected Series is liable for, and the Associated Assets of a Protected Series are not available to satisfy, any debt, obligation, or liability of the Company or of any other Protected Series; and the Company is not liable for, and the Associated Assets of the Company are not available to satisfy, any debt, obligation, or liability of any Protected Series; and
-
-(d) The Member and the Manager are not personally liable, directly or indirectly, by way of contribution or otherwise, for any debt, obligation, or liability of the Company or of any Protected Series solely by reason of being or acting as a member, manager, or protected-series manager.
-
-**3.4 Dissolution of a Protected Series Distinguished.** The dissolution and winding up of a Protected Series does not, by itself, cause the dissolution of the Company or of any other Protected Series. The dissolution of the Company causes the dissolution of every Protected Series, and the winding up of the Company is not complete until each Protected Series is wound up.
-
-**3.5 Series Exhibits Control Series Terms.** The terms specific to each Protected Series \u2014 including its name, purpose, Associated Members, Protected Series Manager, capital, and any variations from the default rules of this Agreement \u2014 are set forth in its Series Exhibit. In the event of a conflict between a Series Exhibit and this Agreement with respect to the Protected Series to which the Series Exhibit relates, the Series Exhibit controls, except that no Series Exhibit may vary a provision of the Act that may not be varied by an operating agreement (see s. 605.2107, Florida Statutes) or the provisions of Article 8.
-
----
-
-## ARTICLE 4 \u2014 THE MEMBER; MEMBERSHIP INTEREST
-
-**4.1 Sole Member.** The Member identified on Exhibit A is the sole member of the Company and holds one hundred percent (100%) of the Membership Interest. Membership interests are of a single class and are expressed as percentages; no certificates shall be issued unless the Manager determines otherwise.
-
-**4.2 Association with Protected Series.** The Member shall be an Associated Member of each Protected Series identified as such in the applicable Series Exhibit. For any Protected Series as to which no member is associated, the Company is deemed the sole Associated Member as provided by the Act. Only a member of the Company may be an Associated Member of a Protected Series.
-
-**4.3 Limited Liability.** The Member shall not be personally liable for any debt, obligation, or liability of the Company or of any Protected Series, whether arising in contract, tort, or otherwise, solely by reason of being a member or Associated Member.
-
-**4.4 No Agency by Status.** The Member is not an agent of the Company or of any Protected Series solely by reason of being a member.
-
-**4.5 Other Activities.** The Member and the Manager may engage in or possess interests in other business ventures of any nature, independently or with others, and neither the Company nor any Protected Series shall have any right in such ventures by virtue of this Agreement.
-
-**4.6 Transfer on Death Designation.** The Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50\u2013711.512, Florida Statutes, and reflects the Member's designation, if any, of the person or persons who will become the owner of the Membership Interest upon the Member's death. The Member may designate any person or entity as a beneficiary. The Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, delivered to the Manager; the change is effective upon receipt unless the Manager objects in writing within seven (7) days, and the Manager shall thereafter update Exhibit A (though updating is not required for effectiveness). A beneficiary who becomes the owner of the Membership Interest under this Section succeeds to the Membership Interest subject to this Agreement and is admitted as the Member upon delivery to the Company of a written agreement to be bound by this Agreement.
-
----
-
-## ARTICLE 5 \u2014 MANAGEMENT
-
-**5.1 Manager-Managed; the Manager.** The Company is **manager-managed** as provided in its Articles of Organization and this Agreement. The initial Manager is **[MANAGER NAME]**. The Manager need not be a member. The Manager serves until resignation, removal by the Member, death, or incapacity; the Member may remove and replace the Manager, and shall fill any vacancy, by a signed writing delivered to the Company.
-
-**5.2 Management of Each Protected Series.** Each Protected Series is **manager-managed**. The Protected Series Manager of each Protected Series is the Manager of the Company unless the applicable Series Exhibit names a different person. A Protected Series Manager has, with respect to its Protected Series, the rights, powers, and duties that a manager of a manager-managed limited liability company has under the Act, subject to this Agreement and the Series Exhibit.
-
-**5.3 Authority of the Manager.** Except as limited by an applicable Series Exhibit, the Manager (and, as to a Protected Series, its Protected Series Manager) has full and exclusive authority to manage and conduct the activities and affairs of the Company or that Protected Series, including authority to: acquire, hold, improve, lease, sell, exchange, and convey property; borrow money and grant liens and security interests on Associated Assets; open, maintain, and close bank and investment accounts and designate signatories; engage and compensate employees, attorneys, accountants, and other agents; procure insurance; prosecute, defend, settle, and compromise claims; make tax filings and elections consistent with Article 9; execute and deliver instruments of every kind; and do all other acts necessary, appropriate, or convenient to the conduct of the activities and affairs of the Company or the applicable Protected Series.
-
-**5.4 Standard of Conduct; Exculpation.** The Manager and each Protected Series Manager shall discharge their duties consistent with the Act, including the duties applicable to protected-series managers, which are not varied by this Agreement. No Manager or Protected Series Manager shall be liable to the Company, any Protected Series, or the Member for any act or omission performed or omitted in good faith and in a manner reasonably believed to be within the scope of authority conferred by this Agreement, except for conduct for which exoneration is prohibited by the Act.
-
-**5.5 Indemnification.** The Company shall indemnify the Manager, and each Protected Series shall indemnify its Protected Series Manager, to the fullest extent permitted by the Act, against losses, claims, and expenses (including reasonable attorney's fees) incurred by reason of service in that capacity, except to the extent arising from conduct for which exoneration is prohibited by the Act; **provided, that any indemnification obligation relating to the activities of a particular Protected Series is an Associated Liability of that Protected Series, payable solely from its Associated Assets**, and any indemnification obligation relating to the activities of the Company generally is payable solely from the Associated Assets of the Company.
-
-**5.6 Compensation; Reimbursement; Shared Expenses.** The Manager shall serve without salary unless the Member consents in writing to compensation. The Manager and each Protected Series Manager shall be reimbursed for reasonable expenses properly incurred on behalf of the Company or the applicable Protected Series. Costs and expenses that benefit the Company and one or more Protected Series (including formation and filing fees, registered agent fees, accounting, insurance, and administrative overhead) shall be allocated among the Company and the Protected Series benefited on a reasonable and consistent basis determined by the Manager \u2014 by specific attribution where practicable and otherwise pro rata or by such other reasonable formula as the Manager adopts \u2014 and the allocation shall be recorded in the records maintained under Article 8.
-
----
-
-## ARTICLE 6 \u2014 CAPITAL
-
-**6.1 Contributions.** The Member's contributions to the Company, and to each Protected Series, are set forth on Exhibit A and in the applicable Series Exhibits. Each contribution shall identify whether it is made to the Company or to a specific Protected Series, and shall be deposited to, and recorded in the records of, the recipient. A promise by the Member to make a contribution is enforceable only if set out in a writing signed by the Member.
-
-**6.2 No Obligation; No Interest.** The Member is not obligated to make any additional contribution to the Company or to any Protected Series. No interest shall be paid on any contribution.
-
-**6.3 Separate Accounting.** The Company shall maintain a separate accounting of contributions to, and the capital of, the Company and each Protected Series.
-
-**6.4 Member Loans.** The Member may lend funds to the Company or to a specific Protected Series upon commercially reasonable terms evidenced by a written instrument identifying the borrower. A loan is not a contribution, and shall be an Associated Liability solely of the borrowing Protected Series or of the Company, as applicable.
-
-**6.5 No Right to Specific Property.** The Member has no right to demand or receive any distribution in any specific property of the Company or of any Protected Series.
-
----
-
-## ARTICLE 7 \u2014 DISTRIBUTIONS
-
-**7.1 Distributions.** The Manager (or, as to a Protected Series, its Protected Series Manager) may from time to time determine the extent to which cash on hand of the Company or of a Protected Series exceeds current and anticipated needs, including operating expenses, debt service, acquisitions, and reserves, and may distribute any such excess to the Member (or, in the case of a Protected Series, to its Associated Members, which while the Member is the sole Associated Member means the Member).
-
-**7.2 Source Limitation.** Distributions in respect of a Protected Series shall be made **solely from the Associated Assets of that Protected Series**, and distributions in respect of the Company shall be made solely from the Associated Assets of the Company. Each distribution shall be recorded in the records maintained under Article 8, identifying its source.
-
-**7.3 Statutory Limitations.** No distribution shall be made to the extent prohibited by the limitations of the Act applicable to distributions, applied separately to the Company and to each Protected Series as the Act provides.
-
----
-
-## ARTICLE 8 \u2014 RECORDS; MAINTENANCE OF THE LIABILITY SHIELDS
-
-**8.1 Records Covenants.** The Company and each Protected Series shall create and maintain records satisfying s. 605.2301, Florida Statutes, in accordance with this Article. This Article may not be varied by any Series Exhibit.
-
-**8.2 Asset Association Records.** The Manager shall create and maintain, and shall cause each Protected Series Manager to create and maintain, records that state the name of the Company or of the applicable Protected Series and describe each of its assets with sufficient specificity to permit a **disinterested, reasonable individual** to:
-
-(a) identify the asset and distinguish it from any other asset of the Company, of that Protected Series, and of every other Protected Series;
-
-(b) determine when and from which person the asset was acquired, or how the asset otherwise became an asset of the Company or that Protected Series; and
-
-(c) for any asset acquired from the Company or from another Protected Series, determine the consideration paid, the payor, and the payee.
-
-Records may be organized by specific listing, category, type, quantity, or computational or allocative formula or procedure (including a percentage or share of any asset), or in any other reasonable manner, consistent with s. 605.2301(4), Florida Statutes, provided the standard of this Section is met.
-
-**8.3 Separate Accounts; No Commingling.** The Company and each Protected Series shall maintain its own deposit account or accounts, and its funds shall not be commingled with the funds of the Member, the Manager, the Company (as to a Protected Series), or any other Protected Series. All income of a Protected Series shall be deposited to its accounts, and its expenses paid from its accounts. Transfers of funds between accounts shall be made only pursuant to a documented Inter-Series Transfer, loan, contribution, or distribution.
-
-**8.4 Inter-Series Transfers.** Any transfer, re-association, or re-titling of an asset between the Company and a Protected Series or between Protected Series (an "Inter-Series Transfer") shall be documented contemporaneously by a written record stating (a) the asset transferred, (b) the transferor and transferee (the Company or the specific Protected Series), (c) the date, and (d) the consideration paid, the payor, and the payee. Inter-Series Transfers shall be made for fair value unless the transfer is a documented contribution or distribution.
-
-**8.5 Real Property.** Each acquisition or conveyance of an interest in real property by a Protected Series or the Company shall be made by an instrument naming the acquiring or conveying Protected Series (by its full statutory name) or the Company, as applicable, and shall be recorded where required. Properly recorded instruments affecting real property serve as association records as provided in ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes.
-
-**8.6 Contracts and Liabilities.** Each contract, account, loan, or other obligation shall be entered into in the name of, and shall identify, the Company or the specific Protected Series incurring it, and shall be recorded as an Associated Liability of the person incurring it.
-
-**8.7 Financial Records; Inspection.** Separate books of account shall be maintained for the Company and for each Protected Series, showing income, expenses, assets, liabilities, contributions, and distributions of each. The Member (and any Associated Member, as to the applicable Protected Series) may inspect and copy the records described in this Article at reasonable times, consistent with the Act.
-
-**8.8 Annual Review.** At least annually, the Manager shall review the records maintained under this Article for compliance with s. 605.2301, Florida Statutes, and shall correct any deficiency promptly upon discovery.
-
-**8.9 Standing Association Rules; Savings Provisions.**
-
-(a) **Records.** This Agreement, each Series Exhibit, each asset schedule, and the account, titling, and transaction records maintained under this Article are records within the meaning of s. 605.2301, Florida Statutes, and may be read together, in combination, to satisfy its requirements.
-
-(b) **Standing association rules.** As a standing procedure adopted pursuant to s. 605.2301(4), Florida Statutes, and without limiting any other record: (i) an asset acquired by an instrument naming a Protected Series, or titled in the name of a Protected Series, is an Associated Asset of that Protected Series from the date of acquisition; (ii) an asset acquired with consideration paid from a deposit account of a Protected Series is an Associated Asset of that Protected Series; (iii) funds on deposit in an account established in the name of a Protected Series, and interest thereon, are Associated Assets of that Protected Series; (iv) the income, rents, profits, proceeds, and products of, the insurance proceeds relating to, and every replacement or substitution for, an Associated Asset are Associated Assets of the same person; and (v) every asset acquired in the name of the Company, and every asset not associated with a Protected Series under clauses (i) through (iv) or under any other record maintained under this Article, is an Associated Asset of the Company.
-
-(c) **Interpretation.** This Agreement shall be interpreted and applied to give the fullest effect permitted by law to the separateness of the Company and of each Protected Series and to the limitations of liability described in Section 3.3.
-
-(d) **Correction of records.** The Manager may, and upon discovery of any inaccuracy or omission shall, supplement or correct any record maintained under this Article so that it accurately reflects the association of assets and liabilities, and records as so supplemented or corrected shall be given effect to the fullest extent permitted by law.
-
-(e) **Severability in favor of separateness.** If any provision of this Agreement or of any Series Exhibit would otherwise be construed to impair the separateness of the Company or of any Protected Series or the limitations of liability described in Section 3.3, that provision shall be deemed modified to the minimum extent necessary to preserve them.
-
----
-
-## ARTICLE 9 \u2014 TAX MATTERS
-
-**9.1 Intended Classification.** While the Member is the sole member of the Company and the sole Associated Member of each Protected Series, it is intended that the Company and each Protected Series each be disregarded as an entity separate from the Member for federal income tax purposes, and that all items of income, gain, loss, deduction, and credit be reported directly by the Member. The classification of the Company and of each Protected Series shall in all events be determined under federal tax law as applied to each of them, and nothing in this Agreement constitutes tax advice or a guarantee of any particular tax treatment.
-
-**9.2 Tax Filings and Elections.** The Manager shall make, or cause to be made, all tax filings required of the Company or of any Protected Series and may make any tax election the Manager determines to be in the best interests of the Member, consistent with Section 9.1.
-
-**9.3 Fiscal Year.** The fiscal year of the Company and of each Protected Series is the calendar year unless the Manager selects another permitted year.
-
-**9.4 Change in Circumstances.** If any Protected Series or the Company ceases to qualify for disregarded treatment (including upon the admission of an additional member or the association of an additional person with any Protected Series), the Member and the Manager shall amend this Agreement (or adopt the Company's partnership-form operating agreement) as provided in Article 11 before or promptly upon the change.
-
----
-
-## ARTICLE 10 \u2014 TRANSFERS
-
-**10.1 Restriction on Transfer.** The Member shall not Transfer all or any portion of the Membership Interest, or any right to receive distributions from the Company or any Protected Series, except (a) a Transfer to an Immediate Family Member made in compliance with Section 10.2, (b) a Transfer effective at death pursuant to the TOD designation under Section 4.6, or (c) another Transfer made with the written consent of the Company (acting through the Manager) reflected in an amendment to Exhibit A. Any purported Transfer in violation of this Article is void to the fullest extent permitted by law, and the transferee acquires no rights other than those, if any, mandated by the Act.
-
-**10.2 Permitted Family Transfers.** A Transfer of all or part of the Membership Interest to an Immediate Family Member is permitted, provided the transferee delivers to the Company a signed agreement to be bound by this Agreement. A transferee (other than a person admitted as a member under Section 11.1) holds only the transferable interest \u2014 the right to receive distributions that would otherwise be paid to the Member with respect to the transferred interest \u2014 and has no right to participate in management, to inspect records, or to exercise any other right of a member.
-
-**10.3 No Dissociation by Transfer Alone.** A Transfer does not by itself dissociate the Member or dissolve the Company or any Protected Series.
-
-## ARTICLE 11 \u2014 ADMISSION OF ADDITIONAL MEMBERS
-
-**11.1 Admission.** One or more additional members may be admitted to the Company, and any member may be associated with any Protected Series, only with the written consent of the Member and upon the admitted person's delivery of a signed agreement to be bound by this Agreement.
-
-**11.2 Successor Agreement.** The parties acknowledge that this Agreement is drafted for a Company having a single member and intended disregarded-entity tax treatment. Prior to or promptly upon the admission of an additional member (or the association of any additional person with any Protected Series), the members shall amend and restate this Agreement in a form appropriate for multiple members \u2014 including provisions for percentages, capital accounts, allocations, and partnership tax administration \u2014 and until such amendment and restatement, the default provisions of the Act shall govern the matters this Agreement does not address for multiple members.
-
-**11.3 Continuation on Termination of Last Member.** Upon the termination of the membership of the last remaining member, the Company shall not be dissolved, and the legal representative of the last remaining member shall agree in writing to continue the Company, and the representative (or an Immediate Family Member designated by the representative who is not a creditor of the last remaining member) shall be admitted as a member effective as of the terminating event, all as permitted by the Act.
-
----
-
-## ARTICLE 12 \u2014 DISSOLUTION AND WINDING UP
-
-**12.1 Dissolution of a Protected Series.** A Protected Series is dissolved, and its activities and affairs shall be wound up, upon the first to occur of: (a) the dissolution of the Company; (b) an event or circumstance specified in its Series Exhibit; (c) the affirmative vote or consent of all Associated Members of that Protected Series (or, if the Company is the deemed sole Associated Member, the consent of the Member); or (d) entry of a judicial order dissolving the Protected Series as provided by the Act.
-
-**12.2 Winding Up a Protected Series.** Upon dissolution of a Protected Series, its Protected Series Manager (or another person designated by the Member) shall wind up its activities and affairs in the manner provided by the Act for winding up a limited liability company, applied to that Protected Series. Its Associated Assets shall be applied: first, to pay or provide for its Associated Liabilities to creditors (including the Member as a creditor, to the extent permitted by law); and then the balance to its Associated Members (or, if the Company is the deemed sole Associated Member, to the Company). The Manager shall cause any statement or filing required by the Act or the Department in connection with the dissolution of the Protected Series to be made. The winding up of a Protected Series shall not draw upon, and its creditors shall have no recourse to, the Associated Assets of the Company or of any other Protected Series.
-
-**12.3 Dissolution of the Company.** The Company is dissolved, and its activities and affairs shall be wound up, upon the first to occur of: (a) the written consent of the Member; (b) entry of a decree of judicial dissolution under the Act; or (c) any other event that under the Act requires dissolution. Dissolution of the Company causes the dissolution of each Protected Series, and the winding up of the Company is not complete until the winding up of each Protected Series is complete.
-
-**12.4 Winding Up the Company.** Upon dissolution of the Company, the Manager (or, if there is none, a person designated by the Member) shall wind up the Company and each Protected Series. After the winding up of each Protected Series under Section 12.2, the remaining Associated Assets of the Company shall be applied: first, to pay or provide for the Company's Associated Liabilities to creditors; and then the balance to the Member. Articles of dissolution shall be filed as the Act requires, and the Company shall terminate when winding up is complete.
-
-**12.5 No Deficit Obligation; Recourse Limited.** The Member shall have no obligation to restore any deficit or to contribute capital in connection with any winding up, and each creditor of the Company or of any Protected Series shall look solely to the Associated Assets of its obligor.
-
----
-
-## ARTICLE 13 \u2014 AMENDMENTS; CONSENTS
-
-**13.1 Amendments.** This Agreement, including any Series Exhibit, may be amended only by a written instrument signed by the Member; provided, that any amendment changing the rights or obligations of the Manager may not impose new obligations on the Manager without the Manager's written consent. Oral, implied, or course-of-dealing amendments are of no effect.
-
-**13.2 Action by Written Consent.** Any action of the Member, or of the Company, under this Agreement may be taken by a written consent signed by the Member and maintained with the Company's records. No meetings are required.
-
----
-
-## ARTICLE 14 \u2014 MISCELLANEOUS
-
-**14.1 Governing Law; Internal Affairs.** This Agreement, the internal affairs of the Company and of each Protected Series, and the relations among the Member, the Manager, each Protected Series Manager, the Company, and each Protected Series, are governed by the laws of the State of Florida, without regard to conflict-of-laws principles.
-
-**14.2 Venue.** Any action or proceeding arising out of or relating to this Agreement, the Company, or any Protected Series shall be brought exclusively in the courts of the county in Florida in which the Company's principal office is located, and each party consents to the jurisdiction of such courts and waives any objection to venue there.
-
-**14.3 Severability.** If any provision of this Agreement is held invalid or unenforceable, that provision shall be modified to the minimum extent necessary to make it enforceable, and the remainder of this Agreement shall remain in full force; provided, that nothing in this Agreement shall be construed to vary any provision of the Act that may not be varied by an operating agreement.
-
-**14.4 Entire Agreement.** This Agreement, including Exhibit A and each Series Exhibit, constitutes the entire agreement governing the Company and each Protected Series and supersedes all prior agreements and understandings with respect to their subject matter.
-
-**14.5 Binding Effect.** This Agreement binds and benefits the Member, the Manager, and their respective heirs, personal representatives, successors, and permitted assigns, and any person who acquires an interest in the Company or is admitted as a member.
-
-**14.6 Counterparts; Electronic Signatures.** This Agreement may be executed in counterparts, each of which is an original and all of which together constitute one instrument. Electronic signatures and electronic records have the same effect as originals.
-
-**14.7 Notices.** Any notice under this Agreement shall be in writing and is effective upon delivery to the recipient's address on Exhibit A (or another address designated in writing), whether delivered personally, by nationally recognized courier, by certified mail, or by e-mail with confirmation of transmission.
-
-**14.8 No Third-Party Beneficiaries.** This Agreement is for the exclusive benefit of the parties and confers no rights on any creditor or other third party.
-
-**14.9 Interpretation.** Headings are for convenience only. "Including" means "including without limitation." References to statutes include amendments and successor provisions.
-
-**14.10 Unregistered Interests.** The Membership Interest has not been registered under federal or state securities laws and may not be offered, sold, or transferred except in compliance with this Agreement and applicable law.
-
----
-
-## SIGNATURES
-
-IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of the Effective Date.
-
-**MEMBER:**
-
-_____________________________
-[MEMBER NAME]
-
-**ACKNOWLEDGED AND AGREED BY MANAGER:**
-
-_____________________________
-[MANAGER NAME], Manager
-
----
-
-## EXHIBIT A \u2014 MEMBER; CONTRIBUTIONS; TOD DESIGNATION
-
-**Company:** [COMPANY NAME], LLC
-
-| Item | Information |
-|---|---|
-| Member name | [MEMBER NAME] |
-| Member address | [ADDRESS] |
-| Membership Interest | 100% (single class) |
-| Initial contribution to the Company | $[AMOUNT] [and/or described property] |
-| Date of contribution | [DATE] |
-
-**Transfer on Death designation (ss. 711.50\u2013711.512, Fla. Stat.):**
-
-Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENEFICIARY NAME(S)]**, or if none is designated or the designation fails, the Membership Interest passes as provided by law.
-
----
-
-## SERIES EXHIBIT PS-[N]
-
-**Protected Series name (exactly as filed with the Department):**
-**[COMPANY NAME], LLC - PS [N]**
-
-| Item | Terms |
-|---|---|
-| Purpose of this Protected Series | [PURPOSE \u2014 e.g., "to acquire, own, lease, and manage the real property located at ___" or "any lawful business"] |
-| Associated Member(s) | [MEMBER NAME] \u2014 100% [or: "None \u2014 the Company is the deemed sole Associated Member"] |
-| Protected Series Manager | [Same as Company Manager / NAME] |
-| Contributions to this Protected Series | $[AMOUNT] [and/or described property], contributed [DATE] |
-| Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the Member(s), together with the records maintained under Article 8. |
-| Special terms (if any) | [None / variations from the base Agreement \u2014 may not vary Article 8 or non-variable provisions of the Act] |
-| Dissolution events specific to this Protected Series (if any) | [None / describe] |
-
-**Adopted by the Member and the [Protected Series] Manager effective [DATE]:**
-
-_____________________________
-[MEMBER NAME], Member
-
-_____________________________
-[NAME], Protected Series Manager
-
-
-## ASSET SCHEDULE \u2014 ATTACHMENT TO SERIES EXHIBIT PS-[N]
-
-*Complete this schedule for each asset of this Protected Series. Describe each asset so that a stranger could identify it without asking you anything: real property \u2014 street address AND legal description, date acquired, and grantor; deposit account \u2014 institution, account title, last four digits, and date opened; vehicle \u2014 year, make, model, and VIN; equipment \u2014 description and serial number; contract \u2014 parties and date. For any asset acquired from the Company or from another Protected Series, also state the consideration paid, the payor, and the payee. Add pages as needed; keep this schedule current as assets are acquired and disposed of.*
-
-| Asset description | Date acquired | Acquired from | Consideration / payor / payee (if from the Company or another series) |
-|---|---|---|---|
-| | | | |
-| | | | |
-| | | | |
-| | | | |
-| | | | |
-
----
-
-*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Manager-Managed, Single Member / Disregarded Entity), v1 draft. Statutory citations verified against Online Sunshine on August 3, 2026: ss. 605.2103, 605.2107, 605.2201, 605.2202, 605.2301, 605.2401, 605.2501, 605.2604, 48.062, 711.50\u2013711.512, Fla. Stat.*
-`;
-
-// server/templates-oa-multi.md
-var templates_oa_multi_default = `# OPERATING AGREEMENT
-## OF
-## [COMPANY NAME], LLC
-### A FLORIDA PROTECTED SERIES LIMITED LIABILITY COMPANY
-
-**(Manager-Managed \u2014 Multiple Members / Partnership Taxation)**
-
----
-
-THIS OPERATING AGREEMENT (this "Agreement") of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the "Company"), is made and entered into effective as of [DATE] (the "Effective Date"), by and among the undersigned members (each a "Member" and collectively the "Members") and is acknowledged by the undersigned manager (the "Manager").
-
-### RECITALS
-
-A. The Company was formed as a Florida limited liability company by the filing of Articles of Organization with the Florida Department of State, Division of Corporations (the "Department").
-
-B. The Company is a **protected series limited liability company** within the meaning of ss. 605.2101\u2013605.2802, Florida Statutes, having designated, or intending to designate, one or more protected series by filing one or more Protected Series Designations with the Department.
-
-C. The Members intend by this Agreement to set forth the terms governing the Company, each Protected Series designated by the Company, and the relations among the Company, each Protected Series, the Members, and the Manager.
-
-NOW, THEREFORE, the Members adopt the following as the operating agreement of the Company and of each Protected Series:
-
----
-
-## ARTICLE 1 \u2014 THE COMPANY
-
-**1.1 Definitions.** Capitalized terms have the meanings set forth in Article 2 or in the Section in which they are used.
-
-**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes (the "Act"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101\u2013605.2802 (the "Protected Series Provisions"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.
-
-**1.3 Name; Names of Protected Series.** The name of the Company is **[COMPANY NAME], LLC**. The name of each Protected Series shall comply with s. 605.2202, Florida Statutes: it shall begin with the full name of the Company and shall contain the phrase "protected series" or the abbreviation "P.S." or "PS." The name of each Protected Series shall be as set forth in its filed Protected Series Designation and its Series Exhibit. If the Company changes its name, the Manager shall promptly make all filings required to conform the name of each Protected Series.
-
-**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series except as limited by its Series Exhibit, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
-
-**1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as the Manager may determine. A Protected Series may maintain its own place of business as determined by its Protected Series Manager.
-
-**1.6 Registered Agent and Registered Office.** The registered agent and registered office of the Company shall be as stated in the records of the Department. As required by the Act, the registered agent and registered office of the Company shall also serve as the registered agent and registered office for each Protected Series. Service of process, notice, or demand on a Protected Series may be made as provided by law, including s. 48.062, Florida Statutes.
-
-**1.7 Term.** The Company's existence is perpetual unless the Company is dissolved and wound up in accordance with this Agreement and the Act. No Protected Series may have a duration extending beyond the existence of the Company.
-
-**1.8 Location of Records.** The records of the Company and of each Protected Series \u2014 including the records required by Article 8 \u2014 shall be maintained at the Company's principal office or at such other location (including secure electronic storage) as the Manager determines, and shall at all times be retrievable in perceivable form.
-
-**1.9 Filings.** The Manager shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, and statements of dissolution, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
-
-**1.10 Title to Property.** Title to each Associated Asset of a Protected Series shall be acquired, held, and conveyed **in the name of that Protected Series**. Title to each Associated Asset of the Company shall be acquired, held, and conveyed in the name of the Company. No property of the Company or of any Protected Series shall be held in the individual name of any Member or the Manager. Each Member's interest in the Company is personal property for all purposes.
-
-**1.11 Waiver of Partition Rights.** Each Member irrevocably waives any right to maintain an action for partition or any similar action with respect to any property of the Company or of any Protected Series.
-
-**1.12 No Payments of Individual Obligations.** The credit and property of the Company and of each Protected Series shall be used solely for the benefit of the Company or the applicable Protected Series, and no such property shall be transferred or encumbered for, or in payment of, any individual obligation of any Member or the Manager.
-
----
-
-## ARTICLE 2 \u2014 DEFINITIONS
-
-**2.1 "Act"** means the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.
-
-**2.2 "Associated Asset"** means an asset of a Protected Series, or of the Company, that satisfies the recordkeeping requirements of s. 605.2301, Florida Statutes, and Article 8 of this Agreement.
-
-**2.3 "Associated Liability"** means a liability incurred by, contracted for, or otherwise existing with respect to a particular Protected Series or the Company, as reflected in the records maintained under Article 8.
-
-**2.4 "Associated Member"** means, with respect to a Protected Series, a Member associated with that Protected Series under this Agreement and its Series Exhibit. If no Member is associated with a Protected Series, the Company itself is deemed the sole Associated Member of that Protected Series as provided by the Act.
-
-**2.5 "Company"** means [COMPANY NAME], LLC.
-
-**2.6 "Immediate Family Member"** means, as to any Member, (a) any ancestor of that Member or descendant of a grandparent of that Member (each an "Individual Family Member," and including persons legally adopted before age 18), or (b) a trust or other entity for the benefit of one or more Individual Family Members, provided all beneficial interests in that entity are held by such persons; a trust is not excluded merely because a remainder beneficiary is not an Individual Family Member.
-
-**2.7 "Involuntary Transfer"** means any Transfer by which a Member or transferee is deprived or divested of any right, title, or interest in a Membership Interest other than voluntarily, including (a) a Transfer to or for the benefit of a judgment creditor pursuant to court order, subject in all events to Section 10.6, (b) a Transfer in connection with reorganization, insolvency, bankruptcy, or receivership, (c) a Transfer to a public officer or agency under any abandoned-property or escheat law, and (d) a Transfer to a spouse or former spouse in connection with dissolution of marriage or marital separation.
-
-**2.8 "Majority in Interest"** means one or more Members holding, in the aggregate, more than fifty percent (50%) of the Percentage Interests of all Members; and, when used with respect to a Protected Series, one or more Associated Members of that Protected Series holding, in the aggregate, more than fifty percent (50%) of the Series Percentages of that Protected Series.
-
-**2.9 "Manager"** means the person named in Section 5.1 and any successor designated under this Agreement.
-
-**2.10 "Member"** means each person identified as a member on Exhibit A and each person admitted as a member in accordance with this Agreement, in each case until dissociated.
-
-**2.11 "Membership Interest"** means a Member's entire interest in the Company, including the Member's interest in capital, profits, and distributions of the Company and of each Protected Series with which the Member is associated, and all rights of a member under the Act and this Agreement.
-
-**2.12 "Percentage Interest"** means, as to each Member, the percentage set forth for that Member on Exhibit A, as adjusted from time to time under this Agreement. Membership interests are of a single class.
-
-**2.13 "Protected Series"** or **"PS"** means a protected series of the Company established under s. 605.2201, Florida Statutes, and identified in a Series Exhibit.
-
-**2.14 "Protected Series Designation"** means a designation of a protected series filed with the Department under s. 605.2201, Florida Statutes, as amended from time to time.
-
-**2.15 "Protected Series Manager"** means the person responsible for management of a Protected Series under Section 5.2.
-
-**2.16 "Series Exhibit"** means, for each Protected Series, the exhibit to this Agreement (each numbered PS-1, PS-2, and so on) setting forth the terms specific to that Protected Series, including its Associated Members and their Series Percentages. Each Series Exhibit is a part of this Agreement.
-
-**2.17 "Series Percentage"** means, as to each Associated Member of a Protected Series, the percentage set forth for that Associated Member in the applicable Series Exhibit, as adjusted from time to time under this Agreement.
-
-**2.18 "Transfer"** means any assignment, transfer, conveyance, devise, gift, pledge, hypothecation, encumbrance, or other disposition, direct or indirect, voluntary or involuntary, in trust or otherwise, and as a verb has a corresponding meaning.
-
----
-
-## ARTICLE 3 \u2014 PROTECTED SERIES
-
-**3.1 Establishment.** With the affirmative vote or consent of **all** Members, the Company may establish one or more Protected Series by causing a Protected Series Designation to be signed and filed with the Department as provided in s. 605.2201, Florida Statutes. At or before the filing of each Protected Series Designation, the Members and the Manager shall adopt a Series Exhibit for the new Protected Series. The Manager is authorized to execute and file each Protected Series Designation approved under this Section.
-
-**3.2 Status of Each Protected Series.** As provided by the Act, each Protected Series:
-
-(a) is a "person" for purposes of the Act and the Uniform Commercial Code, distinct from the Company, from every other Protected Series, from each Member, and from the Manager;
-
-(b) may, in its own name, conduct any activity in furtherance of its purpose, exercise the powers described in Section 1.4, and sue and be sued;
-
-(c) is **not** a separate legal entity capable of existing independently of the Company, may not be a member of the Company, may not itself designate a protected series, and may not merge, convert, domesticate, or engage in an interest exchange except through the single statutory channel provided in s. 605.2604, Florida Statutes; and
-
-(d) shall be governed by this Agreement, applied to that Protected Series as though the Protected Series were a separate limited liability company, except as its Series Exhibit expressly provides otherwise and except as the Act requires otherwise.
-
-**3.3 Limitation of Liability Among Series (Statutory Shields).** Consistent with s. 605.2401, Florida Statutes:
-
-(a) A debt, obligation, or other liability of the Company is solely the debt, obligation, or liability of the Company, and is enforceable only against the Associated Assets of the Company;
-
-(b) A debt, obligation, or other liability of a Protected Series is solely the debt, obligation, or liability of that Protected Series, and is enforceable only against the Associated Assets of that Protected Series;
-
-(c) No Protected Series is liable for, and the Associated Assets of a Protected Series are not available to satisfy, any debt, obligation, or liability of the Company or of any other Protected Series; and the Company is not liable for, and the Associated Assets of the Company are not available to satisfy, any debt, obligation, or liability of any Protected Series; and
-
-(d) No Member and no Manager is personally liable, directly or indirectly, by way of contribution or otherwise, for any debt, obligation, or liability of the Company or of any Protected Series solely by reason of being or acting as a member, manager, or protected-series manager.
-
-**3.4 Dissolution of a Protected Series Distinguished.** The dissolution and winding up of a Protected Series does not, by itself, cause the dissolution of the Company or of any other Protected Series. The dissolution of the Company causes the dissolution of every Protected Series, and the winding up of the Company is not complete until each Protected Series is wound up.
-
-**3.5 Series Exhibits Control Series Terms.** The terms specific to each Protected Series \u2014 including its name, purpose, Associated Members and their Series Percentages, Protected Series Manager, capital, and any variations from the default rules of this Agreement \u2014 are set forth in its Series Exhibit. In the event of a conflict between a Series Exhibit and this Agreement with respect to the Protected Series to which the Series Exhibit relates, the Series Exhibit controls, except that no Series Exhibit may vary a provision of the Act that may not be varied by an operating agreement (see s. 605.2107, Florida Statutes) or the provisions of Article 8.
-
----
-
-## ARTICLE 4 \u2014 MEMBERS; VOTING; MEMBER DUTIES
-
-**4.1 Members; Percentage Interests.** The Members and their Percentage Interests are set forth on Exhibit A. Membership interests are of a single class and are expressed as percentages; no certificates shall be issued unless the Manager determines otherwise.
-
-**4.2 Association with Protected Series.** A Member is an Associated Member of a Protected Series only if, and to the extent, identified as such in the applicable Series Exhibit, and each Associated Member's Series Percentage is as stated there. Only a Member may be an Associated Member of a Protected Series. No Member is associated with any Protected Series except as so identified, and rights, allocations, and distributions in respect of a Protected Series belong exclusively to its Associated Members. For any Protected Series as to which no Member is associated, the Company is deemed the sole Associated Member as provided by the Act.
-
-**4.3 Voting.** Each Member votes in proportion to the Member's Percentage Interest on matters as to which Members are entitled to vote or consent at the Company level, and each Associated Member votes in proportion to the Member's Series Percentage on matters concerning the applicable Protected Series. Except where this Agreement or a non-variable provision of the Act requires a greater vote, the act of a Majority in Interest constitutes the act of the Members (or, for a matter concerning a Protected Series, the act of that Protected Series' Associated Members). A Membership Interest owned by spouses as tenants by the entireties shall be voted only by the consensus of both spouses; neither spouse acting alone may vote the interest except as the other spouse's attorney-in-fact under a duly executed power of attorney.
-
-**4.4 Meetings; Written Consents.** No regular meetings are required. Any Member or the Manager may call a meeting of the Members (or of the Associated Members of a Protected Series) on at least five (5) days' written notice stating the purpose. Members may participate by any means of remote communication by which all participants can hear one another. Any action that may be taken at a meeting may be taken without a meeting by a written consent signed by Members holding the Percentage Interests (or Series Percentages) required to approve the action, delivered to the Company and maintained with its records, with prompt notice to any non-consenting Member.
-
-**4.5 Limited Liability; No Agency.** No Member shall be personally liable for any debt, obligation, or liability of the Company or of any Protected Series, whether arising in contract, tort, or otherwise, solely by reason of being a Member or Associated Member. No Member is an agent of the Company or of any Protected Series solely by reason of being a member.
-
-**4.6 Duty to Participate in Governance.** Each Member shall materially participate in the governance of the Company and of each Protected Series with which the Member is associated, including by voting or consenting in a timely manner on matters submitted to the Members, attending meetings duly called under Section 4.4 in person or by remote means, furnishing information reasonably requested by the Manager for the Company's or a Protected Series' filings, records, and tax reporting, and executing and delivering instruments reasonably required to carry out actions duly approved under this Agreement.
-
-**4.7 Competition. [SELECT ONE ALTERNATIVE \u2014 see Instructions]**
-
-**[ ] Alternative A \u2014 Noncompetition.** Before the dissolution of the Company, no Member shall compete with the Company, or with any Protected Series with which the Member is associated, in the conduct of the Company's or that Protected Series' activities and affairs, consistent with the standard described in s. 605.04091(2)(c), Florida Statutes. This Section does not prohibit a Member from engaging in any business or venture that does not so compete, and Section 4.10 applies to all other activities.
-
-**[ ] Alternative B \u2014 Competition Permitted.** Each Member may engage in and possess interests in other business ventures of every kind, whether or not competitive with the activities of the Company or of any Protected Series. Engaging in such ventures shall not be deemed to violate this Agreement or any duty under the Act, no Member is obligated to offer any business opportunity to the Company, any Protected Series, or any other Member, and neither the Company, any Protected Series, nor any Member shall have any right in such ventures or their income by virtue of this Agreement. *(Retain the selected Alternative and delete the other. If Alternative B is selected, replace Section 11.1(c) with "(c) [Reserved.]" \u2014 do not renumber.)*
-
-**4.8 Confidentiality.** Each Member shall hold in confidence, and shall not disclose or use other than for purposes of the Company or the applicable Protected Series, all confidential information of the Company and of each Protected Series, including financial records, customer and tenant information, contracts, and the contents of the records maintained under Article 8, except for disclosures required by law or made to the Member's professional advisors who are bound to confidentiality.
-
-**4.9 Non-Disparagement; No Interference.** No Member shall hinder or delay the activities and affairs of the Company or of any Protected Series, or slander, defame, or otherwise tarnish the reputation of the Company or of any Protected Series.
-
-**4.10 Other Activities.** Subject to Sections 4.7 through 4.9, each Member and the Manager may engage in or possess interests in other business ventures of any nature, independently or with others, and neither the Company nor any Protected Series nor any other Member shall have any right in such ventures by virtue of this Agreement.
-
-**4.11 Information Rights.** Each Member has the information and inspection rights provided by the Act with respect to the Company. Information and inspection rights with respect to a particular Protected Series belong to its Associated Members (and to the Manager and its Protected Series Manager); a Member who is not an Associated Member of a Protected Series has only the information rights with respect to that Protected Series that the Act mandates.
-
-**4.12 Transfer on Death Designation.** Each Member's Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50\u2013711.512, Florida Statutes, and reflects each Member's designation, if any, of the person or persons who will become the owner of that Member's Membership Interest upon that Member's death. A Member may designate any person or entity as a beneficiary. A Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, delivered to the Manager; the change is effective upon receipt unless the Manager objects in writing within seven (7) days, and the Manager shall thereafter update Exhibit A (though updating is not required for effectiveness). Upon the designating Member's death, the designated beneficiary automatically succeeds to the deceased Member's transferable interest \u2014 including the economic rights of the deceased Member's Percentage Interest and Series Percentages \u2014 taking subject to this Agreement, and holds the rights of a transferee described in Section 10.3 until admitted as a Member. A beneficiary who is an Immediate Family Member of the deceased Member is admitted as a Member upon delivery to the Company of a written agreement to be bound by this Agreement; any other beneficiary is admitted as a Member upon such delivery and the written consent of a Majority in Interest of the Members other than the deceased Member.
-
----
-
-## ARTICLE 5 \u2014 MANAGEMENT
-
-**5.1 Manager-Managed; the Manager.** The Company is **manager-managed** as provided in its Articles of Organization and this Agreement. The initial Manager is **[MANAGER NAME]**. The Manager need not be a Member. The Manager serves until resignation, removal, death, or incapacity. The Manager may be removed, with or without cause, and any successor Manager shall be appointed, by a Majority in Interest, evidenced by a signed writing delivered to the Company.
-
-**5.2 Management of Each Protected Series.** Each Protected Series is **manager-managed**. The Protected Series Manager of each Protected Series is the Manager of the Company unless the applicable Series Exhibit names a different person. A Protected Series Manager has, with respect to its Protected Series, the rights, powers, and duties that a manager of a manager-managed limited liability company has under the Act, subject to this Agreement and the Series Exhibit, and may be removed and replaced with respect to that Protected Series by a Majority in Interest of its Associated Members.
-
-**5.3 Authority of the Manager.** Except as limited by Section 5.4 or an applicable Series Exhibit, the Manager (and, as to a Protected Series, its Protected Series Manager) has full and exclusive authority to manage and conduct the activities and affairs of the Company or that Protected Series, including authority to: acquire, hold, improve, lease, sell, exchange, and convey property; borrow money and grant liens and security interests on Associated Assets; open, maintain, and close bank and investment accounts and designate signatories; engage and compensate employees, attorneys, accountants, and other agents; procure insurance; prosecute, defend, settle, and compromise claims; make tax filings and elections consistent with Article 9; execute and deliver instruments of every kind; and do all other acts necessary, appropriate, or convenient to the conduct of the activities and affairs of the Company or the applicable Protected Series.
-
-**5.4 Actions Requiring Member Approval.** Notwithstanding Section 5.3, neither the Manager nor any Protected Series Manager shall do any of the following without the approval stated:
-
-(a) establish a new Protected Series \u2014 the consent of **all Members** (Section 3.1);
-
-(b) **transfer, re-associate, or re-title any asset between the Company and a Protected Series or between Protected Series** (an "Inter-Series Transfer") \u2014 the consent of a Majority in Interest and, as to each Protected Series affected, a Majority in Interest of its Associated Members;
-
-(c) sell, exchange, or otherwise dispose of all or substantially all of the Associated Assets of the Company or of any Protected Series, other than in the ordinary course \u2014 the consent of a Majority in Interest (of the Company or of the affected Protected Series' Associated Members, as applicable);
-
-(d) merge the Company as permitted by the Act \u2014 the consent of **all Members**; or file a statement of dissolution of a Protected Series \u2014 the approval required by Section 14.1;
-
-(e) admit any additional Member, or associate any person with a Protected Series \u2014 the approval required by Article 12;
-
-(f) incur, on behalf of the Company or any Protected Series, indebtedness in excess of $[THRESHOLD] in a single transaction or series of related transactions, or guarantee the obligation of any person (and no guarantee of the obligations of one Protected Series by another or by the Company shall be made except by an express written instrument approved under this Section) \u2014 the consent of a Majority in Interest (of the Company or of the affected Protected Series' Associated Members, as applicable);
-
-(g) lend money of the Company or of a Protected Series to, or borrow from, a Member, the Manager, or their affiliates, other than loans under Section 6.5 \u2014 the consent of a Majority in Interest of the disinterested Members (or disinterested Associated Members, as applicable); or
-
-(h) amend this Agreement or any Series Exhibit \u2014 the approval required by Section 15.1.
-
-**5.5 Standard of Conduct; Exculpation.** The Manager and each Protected Series Manager shall discharge their duties consistent with the Act, including the duties applicable to managers and protected-series managers, which are not varied by this Agreement. No Manager or Protected Series Manager shall be liable to the Company, any Protected Series, or any Member for any act or omission performed or omitted in good faith and in a manner reasonably believed to be within the scope of authority conferred by this Agreement, except for conduct for which exoneration is prohibited by the Act.
-
-**5.6 Indemnification.** The Company shall indemnify the Manager, and each Protected Series shall indemnify its Protected Series Manager, to the fullest extent permitted by the Act, against losses, claims, and expenses (including reasonable attorney's fees) incurred by reason of service in that capacity, except to the extent arising from conduct for which exoneration is prohibited by the Act; **provided, that any indemnification obligation relating to the activities of a particular Protected Series is an Associated Liability of that Protected Series, payable solely from its Associated Assets**, and any indemnification obligation relating to the activities of the Company generally is payable solely from the Associated Assets of the Company.
-
-**5.7 Compensation; Reimbursement; Shared Expenses.** The Manager shall serve without salary unless a Majority in Interest consents in writing to compensation. The Manager and each Protected Series Manager shall be reimbursed for reasonable expenses properly incurred on behalf of the Company or the applicable Protected Series. Costs and expenses that benefit the Company and one or more Protected Series (including formation and filing fees, registered agent fees, accounting, insurance, and administrative overhead) shall be allocated among the Company and the Protected Series benefited on a reasonable and consistent basis determined by the Manager \u2014 by specific attribution where practicable and otherwise pro rata or by such other reasonable formula as the Manager adopts \u2014 and the allocation shall be recorded in the records maintained under Article 8.
-
----
-
-## ARTICLE 6 \u2014 CAPITAL; CAPITAL ACCOUNTS
-
-**6.1 Initial Contributions.** Each Member's contributions to the Company, and each Associated Member's contributions to each Protected Series, are set forth on Exhibit A and in the applicable Series Exhibits. Each contribution shall identify whether it is made to the Company or to a specific Protected Series, and shall be deposited to, and recorded in the records of, the recipient. A promise by a Member to make a contribution is enforceable only if set out in a writing signed by the Member.
-
-**6.2 Additional Capital Contributions. [OPTIONAL PROVISION \u2014 include or omit; see Instructions]** Upon the approval of a Majority in Interest (or, for a capital need of a particular Protected Series, a Majority in Interest of its Associated Members), each Member (or each Associated Member of the affected Protected Series) shall have the duty and obligation to contribute additional capital to the Company or to the affected Protected Series, in proportion to the Members' Percentage Interests (or the Associated Members' Series Percentages), in the aggregate amount so approved, payable within thirty (30) days after written notice of the approved call; provided, that unless approved by all Members, no Member shall be required to contribute more than $[CAP] in the aggregate in any calendar year under this Section. This obligation is a material, unperformed, future obligation of each Member within the meaning of Section 11.1. *(To omit this provision, replace the text of this Section 6.2 and of Section 6.3 with "[Reserved.]" and replace Section 11.1(a) with "(a) [Reserved.]" \u2014 do not renumber any section. If omitted, no Member has any obligation to contribute capital beyond Section 6.1.)*
-
-**6.3 Failure to Contribute.** If a Member fails to pay an additional capital contribution required under Section 6.2 when due, the Company (or the affected Protected Series) may pursue any remedy available at law or in equity for the failure, and in addition, the non-defaulting Members who elect to do so may advance the defaulted amount, in which case the Percentage Interests (or Series Percentages) of the defaulting and advancing Members shall be adjusted to reflect the aggregate capital contributed by each Member following the advance.
-
-**6.4 No Interest; No Withdrawal.** No interest shall be paid on any contribution. No Member may withdraw or demand the return of any contribution except as this Agreement provides.
-
-**6.5 Member Loans.** A Member may lend funds to the Company or to a specific Protected Series upon commercially reasonable terms evidenced by a written instrument identifying the borrower. A loan is not a contribution, and shall be an Associated Liability solely of the borrowing Protected Series or of the Company, as applicable.
-
-**6.6 Capital Accounts.** A capital account shall be established and maintained for each Member, with separate sub-accounts reflecting the Member's capital in the Company and in each Protected Series with which the Member is associated. Capital accounts shall be maintained in accordance with the capital accounting rules of section 704(b) of the Internal Revenue Code of 1986, as amended (the "Code"), and the Treasury Regulations thereunder, and shall be credited with contributions and allocations of profit and debited with distributions and allocations of loss as so required. A transferee of all or part of a Membership Interest succeeds to the portion of the transferor's capital account (and sub-accounts) attributable to the transferred interest. Nothing in this Agreement creates a deficit restoration obligation or otherwise personally obligates any Member to contribute capital beyond the contributions required by Sections 6.1 and 6.2.
-
-**6.7 No Right to Specific Property.** No Member has any right to demand or receive any distribution in any specific property of the Company or of any Protected Series.
-
----
-
-## ARTICLE 7 \u2014 ALLOCATIONS AND DISTRIBUTIONS
-
-**7.1 Allocations.** Profits, losses, and each item of income, gain, loss, deduction, and credit of each Protected Series shall be allocated among its Associated Members in proportion to their Series Percentages, and those of the Company (exclusive of every Protected Series) shall be allocated among the Members in proportion to their Percentage Interests. Notwithstanding the foregoing, allocations shall be made in a manner consistent with the capital-account maintenance rules of section 704(b) of the Code and the Treasury Regulations thereunder \u2014 including, to the extent required, a qualified income offset, minimum-gain chargebacks, and limitations on loss allocations that would create or increase an impermissible deficit \u2014 and allocations with respect to property contributed with a value different from its adjusted basis shall be made in accordance with section 704(c) of the Code. The Manager shall apply this Section so that the allocations have substantial economic effect and shall resolve questions of application consistently and in good faith.
-
-**7.2 Distributions.** The Manager (or, as to a Protected Series, its Protected Series Manager) may from time to time determine the extent to which cash on hand of the Company or of a Protected Series exceeds current and anticipated needs, including operating expenses, debt service, acquisitions, and reserves, and may distribute any such excess. Distributions in respect of a Protected Series shall be made **solely from the Associated Assets of that Protected Series, and solely to its Associated Members in proportion to their Series Percentages**; distributions in respect of the Company shall be made solely from the Associated Assets of the Company, to the Members in proportion to their Percentage Interests. Each distribution shall be recorded in the records maintained under Article 8, identifying its source.
-
-**7.3 Tax Distributions.** To the extent of available cash of the Company or the applicable Protected Series, the Manager may make distributions intended to enable each Member to satisfy federal and state income tax liabilities attributable to the Member's distributive share of income, and is authorized to pay any such amount directly to the government agency responsible for collection of the tax on the Member's behalf. Tax distributions in respect of a Protected Series shall be made solely from its Associated Assets and treated as advances against later distributions under Section 7.2.
-
-**7.4 Statutory Limitations.** No distribution shall be made to the extent prohibited by the limitations of the Act applicable to distributions, applied separately to the Company and to each Protected Series as the Act provides.
-
----
-
-## ARTICLE 8 \u2014 RECORDS; MAINTENANCE OF THE LIABILITY SHIELDS
-
-**8.1 Records Covenants.** The Company and each Protected Series shall create and maintain records satisfying s. 605.2301, Florida Statutes, in accordance with this Article. This Article may not be varied by any Series Exhibit.
-
-**8.2 Asset Association Records.** The Manager shall create and maintain, and shall cause each Protected Series Manager to create and maintain, records that state the name of the Company or of the applicable Protected Series and describe each of its assets with sufficient specificity to permit a **disinterested, reasonable individual** to:
-
-(a) identify the asset and distinguish it from any other asset of the Company, of that Protected Series, and of every other Protected Series;
-
-(b) determine when and from which person the asset was acquired, or how the asset otherwise became an asset of the Company or that Protected Series; and
-
-(c) for any asset acquired from the Company or from another Protected Series, determine the consideration paid, the payor, and the payee.
-
-Records may be organized by specific listing, category, type, quantity, or computational or allocative formula or procedure (including a percentage or share of any asset), or in any other reasonable manner, consistent with s. 605.2301(4), Florida Statutes, provided the standard of this Section is met.
-
-**8.3 Separate Accounts; No Commingling.** The Company and each Protected Series shall maintain its own deposit account or accounts, and its funds shall not be commingled with the funds of any Member, the Manager, the Company (as to a Protected Series), or any other Protected Series. All income of a Protected Series shall be deposited to its accounts, and its expenses paid from its accounts. Transfers of funds between accounts shall be made only pursuant to a documented Inter-Series Transfer, loan, contribution, or distribution.
-
-**8.4 Inter-Series Transfers.** Any Inter-Series Transfer (as defined in Section 5.4(b)) requires the approvals stated in Section 5.4(b) and shall be documented contemporaneously by a written record stating (a) the asset transferred, (b) the transferor and transferee (the Company or the specific Protected Series), (c) the date, and (d) the consideration paid, the payor, and the payee. Inter-Series Transfers shall be made for fair value unless the transfer is a documented contribution or distribution.
-
-**8.5 Real Property.** Each acquisition or conveyance of an interest in real property by a Protected Series or the Company shall be made by an instrument naming the acquiring or conveying Protected Series (by its full statutory name) or the Company, as applicable, and shall be recorded where required. Properly recorded instruments affecting real property serve as association records as provided in ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes.
-
-**8.6 Contracts and Liabilities.** Each contract, account, loan, or other obligation shall be entered into in the name of, and shall identify, the Company or the specific Protected Series incurring it, and shall be recorded as an Associated Liability of the person incurring it.
-
-**8.7 Financial Records; Inspection.** Separate books of account shall be maintained for the Company and for each Protected Series, showing income, expenses, assets, liabilities, contributions, and distributions of each. Members' inspection rights are as stated in Section 4.11.
-
-**8.8 Annual Review.** At least annually, the Manager shall review the records maintained under this Article for compliance with s. 605.2301, Florida Statutes, and shall correct any deficiency promptly upon discovery.
-
-**8.9 Standing Association Rules; Savings Provisions.**
-
-(a) **Records.** This Agreement, each Series Exhibit, each asset schedule, and the account, titling, and transaction records maintained under this Article are records within the meaning of s. 605.2301, Florida Statutes, and may be read together, in combination, to satisfy its requirements.
-
-(b) **Standing association rules.** As a standing procedure adopted pursuant to s. 605.2301(4), Florida Statutes, and without limiting any other record: (i) an asset acquired by an instrument naming a Protected Series, or titled in the name of a Protected Series, is an Associated Asset of that Protected Series from the date of acquisition; (ii) an asset acquired with consideration paid from a deposit account of a Protected Series is an Associated Asset of that Protected Series; (iii) funds on deposit in an account established in the name of a Protected Series, and interest thereon, are Associated Assets of that Protected Series; (iv) the income, rents, profits, proceeds, and products of, the insurance proceeds relating to, and every replacement or substitution for, an Associated Asset are Associated Assets of the same person; and (v) every asset acquired in the name of the Company, and every asset not associated with a Protected Series under clauses (i) through (iv) or under any other record maintained under this Article, is an Associated Asset of the Company.
-
-(c) **Interpretation.** This Agreement shall be interpreted and applied to give the fullest effect permitted by law to the separateness of the Company and of each Protected Series and to the limitations of liability described in Section 3.3.
-
-(d) **Correction of records.** The Manager may, and upon discovery of any inaccuracy or omission shall, supplement or correct any record maintained under this Article so that it accurately reflects the association of assets and liabilities, and records as so supplemented or corrected shall be given effect to the fullest extent permitted by law.
-
-(e) **Severability in favor of separateness.** If any provision of this Agreement or of any Series Exhibit would otherwise be construed to impair the separateness of the Company or of any Protected Series or the limitations of liability described in Section 3.3, that provision shall be deemed modified to the minimum extent necessary to preserve them.
-
----
-
-## ARTICLE 9 \u2014 TAX MATTERS
-
-**9.1 Intended Classification.** It is intended that the Company, and each Protected Series having two or more Associated Members, be classified as a partnership for federal income tax purposes (and that any Protected Series having a single Associated Member be disregarded as an entity separate from that Associated Member), in each case as federal tax law provides as applied to each of them. Nothing in this Agreement constitutes tax advice or a guarantee of any particular tax treatment, and no Member or Manager makes any representation regarding the tax consequences of the protected series structure.
-
-**9.2 Tax Returns; Information.** The Manager shall cause to be prepared and filed all tax returns required of the Company and of each Protected Series, and shall deliver to each Member, after the end of each fiscal year, the tax information (including Schedule K-1s, where applicable) necessary for the Member's returns.
-
-**9.3 Partnership Representative.** The Manager (or a person the Manager designates) shall serve as the "partnership representative" within the meaning of section 6223 of the Code for the Company and for each Protected Series classified as a partnership, with all authority granted to a partnership representative under the Code, including the authority to make or revoke elections (including elections under sections 6221(b) and 6226 of the Code), to conduct and resolve audits and proceedings, and to bind the Members as the Code provides. Each Member shall provide the information, and take the actions, reasonably requested by the partnership representative in connection with any tax matter, and shall pay the Member's share of any imputed underpayment or similar amount attributable to the Member as reasonably determined by the partnership representative.
-
-**9.4 Tax Elections.** The Manager may make, change, or revoke any tax election for the Company or any Protected Series (including an election under section 754 of the Code) that the Manager determines to be in the best interests of the Members as a whole.
-
-**9.5 Fiscal Year.** The fiscal year of the Company and of each Protected Series is the calendar year unless the Manager selects another permitted year.
-
-**9.6 S Corporation Election.** The Members may cause the Company (or any Protected Series treated as a separate entity for federal income tax purposes) to elect classification as an association taxable as a corporation and to elect S corporation status, only upon the affirmative vote or consent of all Members. From and after the effective date of any S corporation election and for so long as it remains in effect: (a) the Members of the Company and the Associated Members of every Protected Series, and their respective Percentage Interests and Series Percentages, shall at all times be identical, and no Protected Series may be established, and no association or adjustment made, that would cause the ownership of any Protected Series to differ from the ownership of the Company; (b) all allocations and distributions shall be made in a manner consistent with the one-class-of-stock requirement of section 1361 of the Code and the Treasury Regulations thereunder, pro rata in accordance with the Members' identical percentages; (c) no Transfer may be made to a person whose ownership would terminate or impair the election, and any purported Transfer in violation of this clause is void to the fullest extent permitted by law; and (d) the provisions of this Agreement shall be applied and, to the minimum extent necessary, deemed modified so as to preserve the validity of the election.
-
----
-
-## ARTICLE 10 \u2014 TRANSFERS; CREDITOR PROVISIONS
-
-**10.1 Restriction on Transfer.** No Member shall Transfer all or any portion of a Membership Interest, or any right to receive distributions from the Company or any Protected Series, except (a) a Transfer to an Immediate Family Member of the transferring Member made in compliance with Section 10.2, (b) a Transfer effective at death pursuant to the transferring Member's TOD designation under Section 4.12, or (c) another Transfer made with the prior written consent of the Manager and of a Majority in Interest of the Members other than the transferring Member. Any purported Transfer in violation of this Article is void to the fullest extent permitted by law, and the transferee acquires no rights other than those, if any, mandated by the Act.
-
-**10.2 Permitted Family Transfers.** A Transfer of all or part of a Membership Interest to an Immediate Family Member of the transferring Member is permitted, provided the transferee delivers to the Company a signed agreement to be bound by this Agreement.
-
-**10.3 Rights of Transferees.** A transferee (including a permitted family transferee) who is not admitted as a Member under Article 12 holds only the transferable interest \u2014 the right to receive the distributions that would otherwise be paid to the transferor with respect to the transferred interest \u2014 and has no right to vote, to participate in management, to inspect records, or to exercise any other right of a member, except as the Act mandates. A transferred interest remains subject to this Agreement in the hands of every transferee.
-
-**10.4 Involuntary Transfers; Option to Acquire.** Upon any Involuntary Transfer or any event that would result in an Involuntary Transfer of all or part of a Membership Interest, the Company shall have the option, exercisable by the Manager at any time within ninety (90) days after the Company receives written notice that the Involuntary Transfer has occurred, to acquire the interest that is the subject of the Involuntary Transfer at its fair value. Fair value shall be the value agreed in writing between the Manager and the holder of the interest or, absent agreement within thirty (30) days after the option is exercised, the value determined by an independent appraiser selected by the Manager (who shall hold the MAI designation if the assets principally concerned are real property), whose determination is final and binding, with the appraiser's fee borne one-half by the Company and one-half by the holder. The purchase price is payable on commercially reasonable terms determined by the Manager, including payment in installments over a period of up to five (5) years bearing interest at the applicable federal rate. If the Company does not exercise its option, the Members other than the affected Member may, within thirty (30) days after the Company's option lapses, elect to acquire the interest on the same terms, in proportion to their Percentage Interests or as they otherwise agree. Pending exercise or lapse of the options, the holder of the interest has only the rights of a transferee described in Section 10.3.
-
-**10.5 No Dissociation by Transfer Alone.** A Transfer does not by itself dissociate a Member or dissolve the Company or any Protected Series.
-
-**10.6 Charging Order \u2014 Exclusive Remedy.** As provided in ss. 605.0502 and 605.0503, Florida Statutes, a charging order is the sole and exclusive remedy by which a judgment creditor of a Member or of a transferee may satisfy a judgment from the judgment debtor's Membership Interest or transferable interest, whether in the Company or in respect of any Protected Series. A judgment creditor or other holder of a charging order has only the right to receive distributions to which the judgment debtor would otherwise be entitled, has none of the rights of a member or manager, is not entitled to any accounting, inspection, or information rights except as the Act mandates, and may not foreclose upon the charged interest. Nothing in this Agreement enlarges any remedy of any creditor beyond those provided by the Act.
-
----
-
-## ARTICLE 11 \u2014 EXECUTORY CONTRACT
-
-**11.1 Executory Contract.** The parties agree that this Agreement constitutes an executory contract and shall be governed by 11 U.S.C. \xA7365 in connection with the bankruptcy of the Company or any Member because, among other provisions and obligations, this Agreement imposes on each Member the following affirmative duties (each of which constitutes a material unperformed, future obligation): (a) *[include only if optional Section 6.2 is included; otherwise replace with "(a) [Reserved.]"]* upon approval of a Majority in Interest as provided in Section 6.2, the duty and obligation of each Member to contribute additional capital to the Company or the affected Protected Series; (b) the duty and obligation of each Member to materially participate in the governance of the Company and of each Protected Series with which the Member is associated, as provided in Section 4.6; (c) *[include only if Section 4.7 Alternative A is selected; otherwise replace with "(c) [Reserved.]"]* the duty and obligation of each Member not to compete with the Company, or with any Protected Series with which the Member is associated, in the conduct of their activities and affairs before the dissolution of the Company, as provided in Section 4.7 and consistent with s. 605.04091(2)(c), Florida Statutes; (d) the duty and obligation of each Member not to disclose confidential information, as provided in Section 4.8; and (e) the duty and obligation of each Member not to hinder, delay, slander, or tarnish the reputation of the Company or of any Protected Series, as provided in Section 4.9. The failure of a Member to perform the duties and obligations set forth herein releases and excuses the mutual duties and obligations owed by the Company and the other Members to such defaulting Member.
-
-**11.2 Personal Service Agreement; No Assumption or Assignment.** In accordance with *In re Soderstrom*, 484 B.R. 874 (M.D. Fla. 2013), this Agreement is a personal service agreement due to the managerial and governance duties and obligations owed by each Member and the Manager, and a bankruptcy trustee cannot assume or assign a debtor Member's interest in the Company in accordance with 11 U.S.C. \xA7365(c)(1) without the prior written consent of the other Members.
-
-**11.3 Compliance upon Assumption or Rejection.** Notwithstanding the foregoing, to the extent that a trustee of a Member's bankruptcy is allowed either to assume or reject a debtor Member's interest in the Company governed by this Agreement, such action shall comply with the time period set forth in 11 U.S.C. \xA7365(d), and if the trustee assumes such debtor Member's interest, such trustee shall comply with the terms of this Agreement and Florida law governing this Agreement, including, without limitation, the restrictions of the rights of a creditor of a Member or transferee pursuant to ss. 605.0502 and 605.0503, Florida Statutes.
-
----
-
-## ARTICLE 12 \u2014 ADMISSION OF MEMBERS; ASSOCIATION WITH PROTECTED SERIES
-
-**12.1 Admission of Members.** A person may be admitted as a Member of the Company only with the written consent of **all** Members and upon the person's delivery of a signed agreement to be bound by this Agreement, except that (a) a TOD beneficiary is admitted as provided in Section 4.12, and (b) a permitted family transferee under Section 10.2 may be admitted with the written consent of a Majority in Interest of the Members other than the transferor.
-
-**12.2 Association with a Protected Series.** A Member may be associated with a Protected Series, and Series Percentages may be established or adjusted, only by an amendment to the applicable Series Exhibit adopted with the written consent of the Manager, the Member to be associated, and all Associated Members of that Protected Series.
-
-**12.3 Continuation on Termination of Last Member.** Upon the termination of the membership of the last remaining member of the Company, the Company shall not be dissolved, and the legal representative of the last remaining member shall agree in writing to continue the Company, and the representative (or an Immediate Family Member designated by the representative who is not a creditor of the last remaining member) shall be admitted as a member effective as of the terminating event, all as permitted by the Act.
-
----
-
-## ARTICLE 13 \u2014 WITHDRAWAL; DEADLOCK
-
-**13.1 No Voluntary Withdrawal.** No Member may voluntarily withdraw, resign, or dissociate from the Company before the dissolution and winding up of the Company without the written consent of all other Members. A Member's dissociation, whether or not wrongful, does not entitle the dissociated Member to any distribution or payment for the Member's interest except as this Agreement or the Act provides, and a dissociated Member (or the Member's successor) holds thereafter only the rights of a transferee described in Section 10.3.
-
-**13.2 Deadlock; Buy-Sell Election. [OPTIONAL PROVISION \u2014 see Instructions; to omit, replace the text of this Section with "[Reserved.]" \u2014 do not renumber]**
-
-(a) A "Deadlock" exists if the Members (or, as to a matter concerning a Protected Series, its Associated Members) are unable, by the vote required under this Agreement, to approve or reject a matter duly submitted for approval, and the inability continues for sixty (60) days after any Member delivers written notice to the Company and the other Members describing the matter and stating that a Deadlock exists.
-
-(b) During a Deadlock, any Member holding twenty-five percent (25%) or more of the Percentage Interests (the "Offeror") may deliver to the other Members (the "Offerees") a written offer (the "Buy-Sell Offer") stating a single gross valuation for the Company and all Protected Series, in cash. The Buy-Sell Offer constitutes both (i) an offer by the Offeror to purchase all of the Offerees' Membership Interests at their proportionate share of that valuation, and (ii) an offer by the Offeror to sell all of the Offeror's Membership Interest to the Offerees at the Offeror's proportionate share of that valuation.
-
-(c) Within forty-five (45) days after delivery of the Buy-Sell Offer, the Offerees (acting jointly, or severally in proportion to their Percentage Interests among those electing) shall elect in writing either to sell their Membership Interests to the Offeror, or to purchase the Offeror's Membership Interest, in each case at the price determined under the Buy-Sell Offer. Failure to deliver a timely election is an election to sell.
-
-(d) The closing shall occur within sixty (60) days after the election, for cash unless the parties agree otherwise. At closing, the selling Members shall Transfer their Membership Interests free of liens, and the purchasing Member(s) shall be substituted with respect to the transferred interests, including all associated Series Percentages. If the purchasing party fails to close, the other party may elect to purchase on the same terms, and the defaulting party bears the costs of the failed closing.
-
-(e) This Section does not apply to any matter for which the Act or this Agreement requires the consent of all Members and a Member's withholding of consent is expressly permitted by the Act, and does not limit any Member's right to seek judicial dissolution as provided by the Act.
-
----
-
-## ARTICLE 14 \u2014 DISSOLUTION AND WINDING UP
-
-**14.1 Dissolution of a Protected Series.** A Protected Series is dissolved, and its activities and affairs shall be wound up, upon the first to occur of: (a) the dissolution of the Company; (b) an event or circumstance specified in its Series Exhibit; (c) the affirmative vote or consent of **all** Associated Members of that Protected Series (or, if the Company is the deemed sole Associated Member, the consent of a Majority in Interest); or (d) entry of a judicial order dissolving the Protected Series as provided by the Act.
-
-**14.2 Winding Up a Protected Series.** Upon dissolution of a Protected Series, its Protected Series Manager (or another person designated by a Majority in Interest of its Associated Members) shall wind up its activities and affairs in the manner provided by the Act for winding up a limited liability company, applied to that Protected Series. Its Associated Assets shall be applied: first, to pay or provide for its Associated Liabilities to creditors other than Members; next, to pay or provide for its Associated Liabilities to Members as creditors, to the extent permitted by law; next, to its Associated Members to the extent of their capital sub-account balances for that Protected Series; and finally, the balance to its Associated Members in proportion to their Series Percentages (or, if the Company is the deemed sole Associated Member, to the Company). The Manager shall cause any statement or filing required by the Act or the Department in connection with the dissolution of the Protected Series to be made. The winding up of a Protected Series shall not draw upon, and its creditors shall have no recourse to, the Associated Assets of the Company or of any other Protected Series.
-
-**14.3 Dissolution of the Company.** The Company is dissolved, and its activities and affairs shall be wound up, upon the first to occur of: (a) the written consent of **all** Members; (b) entry of a decree of judicial dissolution under the Act; or (c) any other event that under the Act requires dissolution. The death, incapacity, bankruptcy, dissociation, or withdrawal of a Member does not by itself dissolve the Company. Dissolution of the Company causes the dissolution of each Protected Series, and the winding up of the Company is not complete until the winding up of each Protected Series is complete.
-
-**14.4 Winding Up the Company.** Upon dissolution of the Company, the Manager (or, if there is none, a person designated by a Majority in Interest) shall wind up the Company and each Protected Series. After the winding up of each Protected Series under Section 14.2, the remaining Associated Assets of the Company shall be applied: first, to pay or provide for the Company's Associated Liabilities to creditors other than Members; next, to pay or provide for the Company's Associated Liabilities to Members as creditors; next, to the Members to the extent of their capital sub-account balances for the Company; and finally, the balance to the Members in proportion to their Percentage Interests. Articles of dissolution shall be filed as the Act requires, and the Company shall terminate when winding up is complete.
-
-**14.5 No Deficit Obligation; Recourse Limited.** No Member shall have any obligation to restore any deficit or to contribute capital in connection with any winding up (beyond unpaid contributions duly required under Sections 6.1 and 6.2), and each creditor of the Company or of any Protected Series shall look solely to the Associated Assets of its obligor.
-
----
-
-## ARTICLE 15 \u2014 AMENDMENTS; CONSENTS
-
-**15.1 Amendments.** This Agreement may be amended only by a written instrument signed by **all** Members; provided, that (a) a Series Exhibit may be amended by a written instrument signed by the Manager and all Associated Members of the affected Protected Series (and, if the amendment would alter the rights or obligations of a Member not associated with that Protected Series, by that Member); (b) the Manager may amend Exhibit A and the Series Exhibits without further consent solely to record changes duly made under this Agreement (admissions, Transfers, TOD designations, capital adjustments under Section 6.3); and (c) no amendment may impose new obligations on the Manager without the Manager's written consent. Oral, implied, or course-of-dealing amendments are of no effect.
-
-**15.2 Action by Written Consent.** Any action of the Members under this Agreement may be taken by written consent as provided in Section 4.4.
-
----
-
-## ARTICLE 16 \u2014 MISCELLANEOUS
-
-**16.1 Governing Law; Internal Affairs.** This Agreement, the internal affairs of the Company and of each Protected Series, and the relations among the Members, the Manager, each Protected Series Manager, the Company, and each Protected Series, are governed by the laws of the State of Florida, without regard to conflict-of-laws principles.
-
-**16.2 Venue.** Any action or proceeding arising out of or relating to this Agreement, the Company, or any Protected Series shall be brought exclusively in the courts of the county in Florida in which the Company's principal office is located, and each party consents to the jurisdiction of such courts and waives any objection to venue there.
-
-**16.3 Severability.** If any provision of this Agreement is held invalid or unenforceable, that provision shall be modified to the minimum extent necessary to make it enforceable, and the remainder of this Agreement shall remain in full force; provided, that nothing in this Agreement shall be construed to vary any provision of the Act that may not be varied by an operating agreement.
-
-**16.4 Entire Agreement.** This Agreement, including Exhibit A and each Series Exhibit, constitutes the entire agreement governing the Company and each Protected Series and supersedes all prior agreements and understandings with respect to their subject matter.
-
-**16.5 Binding Effect.** This Agreement binds and benefits the Members, the Manager, and their respective heirs, personal representatives, successors, and permitted assigns, and any person who acquires an interest in the Company or is admitted as a member.
-
-**16.6 Counterparts; Electronic Signatures.** This Agreement may be executed in counterparts, each of which is an original and all of which together constitute one instrument. Electronic signatures and electronic records have the same effect as originals.
-
-**16.7 Notices.** Any notice under this Agreement shall be in writing and is effective upon delivery to the recipient's address on Exhibit A (or another address designated in writing), whether delivered personally, by nationally recognized courier, by certified mail, or by e-mail with confirmation of transmission.
-
-**16.8 No Third-Party Beneficiaries.** This Agreement is for the exclusive benefit of the parties and confers no rights on any creditor or other third party.
-
-**16.9 Interpretation.** Headings are for convenience only. "Including" means "including without limitation." References to statutes include amendments and successor provisions.
-
-**16.10 Unregistered Interests.** The Membership Interests have not been registered under federal or state securities laws and may not be offered, sold, or transferred except in compliance with this Agreement and applicable law.
-
----
-
-## SIGNATURES
-
-IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of the Effective Date.
-
-**MEMBERS:**
-
-_____________________________
-[MEMBER 1 NAME]
-
-_____________________________
-[MEMBER 2 NAME]
-
-_____________________________
-[MEMBER 3 NAME, if any]
-
-**ACKNOWLEDGED AND AGREED BY MANAGER:**
-
-_____________________________
-[MANAGER NAME], Manager
-
----
-
-## EXHIBIT A \u2014 MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS
-
-**Company:** [COMPANY NAME], LLC
-
-| Member name | Address | Percentage Interest | Initial contribution to the Company | Date |
-|---|---|---|---|---|
-| [MEMBER 1] | [ADDRESS] | [___]% | $[AMOUNT] [and/or described property] | [DATE] |
-| [MEMBER 2] | [ADDRESS] | [___]% | $[AMOUNT] [and/or described property] | [DATE] |
-| [MEMBER 3] | [ADDRESS] | [___]% | $[AMOUNT] [and/or described property] | [DATE] |
-| **Total** | | **100%** | | |
-
-**Transfer on Death designations (ss. 711.50\u2013711.512, Fla. Stat.):**
-
-| Designating Member | TOD beneficiary (any person or entity) |
-|---|---|
-| [MEMBER 1] | [NAME(S) / None] |
-| [MEMBER 2] | [NAME(S) / None] |
-| [MEMBER 3] | [NAME(S) / None] |
-
-If no beneficiary is designated, or a designation fails, the Member's interest passes as provided by law, subject to this Agreement.
-
----
-
-## SERIES EXHIBIT PS-[N]
-
-**Protected Series name (exactly as filed with the Department):**
-**[COMPANY NAME], LLC - PS [N]**
-
-| Item | Terms |
-|---|---|
-| Purpose of this Protected Series | [PURPOSE \u2014 e.g., "to acquire, own, lease, and manage the real property located at ___" or "any lawful business"] |
-| Associated Member(s) and Series Percentages | [MEMBER 1] \u2014 [___]%; [MEMBER 2] \u2014 [___]% [must total 100%; or: "None \u2014 the Company is the deemed sole Associated Member"] |
-| Protected Series Manager | [Same as Company Manager / NAME] |
-| Contributions to this Protected Series | [MEMBER 1]: $[AMOUNT] on [DATE]; [MEMBER 2]: $[AMOUNT] on [DATE] [and/or described property] |
-| Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the Member(s), together with the records maintained under Article 8. |
-| Special terms (if any) | [None / variations from the base Agreement \u2014 may not vary Article 8 or non-variable provisions of the Act] |
-| Dissolution events specific to this Protected Series (if any) | [None / describe] |
-
-**Adopted effective [DATE] by the Manager and all Associated Members of this Protected Series:**
-
-_____________________________
-[NAME], Protected Series Manager
-
-_____________________________
-[ASSOCIATED MEMBER 1], Member
-
-_____________________________
-[ASSOCIATED MEMBER 2], Member
-
-
-## ASSET SCHEDULE \u2014 ATTACHMENT TO SERIES EXHIBIT PS-[N]
-
-*Complete this schedule for each asset of this Protected Series. Describe each asset so that a stranger could identify it without asking you anything: real property \u2014 street address AND legal description, date acquired, and grantor; deposit account \u2014 institution, account title, last four digits, and date opened; vehicle \u2014 year, make, model, and VIN; equipment \u2014 description and serial number; contract \u2014 parties and date. For any asset acquired from the Company or from another Protected Series, also state the consideration paid, the payor, and the payee. Add pages as needed; keep this schedule current as assets are acquired and disposed of.*
-
-| Asset description | Date acquired | Acquired from | Consideration / payor / payee (if from the Company or another series) |
-|---|---|---|---|
-| | | | |
-| | | | |
-| | | | |
-| | | | |
-| | | | |
-
----
-
-*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Manager-Managed, Multiple Members / Partnership Taxation), v1 draft. Statutory citations verified against Online Sunshine on August 3, 2026: ss. 605.2103, 605.2107, 605.2201, 605.2202, 605.2301, 605.2401, 605.2501, 605.2604, 605.0502, 605.0503, 605.04091, 48.062, 711.50\u2013711.512, Fla. Stat.; 11 U.S.C. \xA7365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013).*
-`;
-
-// server/oa.ts
-function loadTemplate(v2) {
-  return v2.includes("OPERATING AGREEMENT") ? v2 : readFileSync(v2, "utf8");
-}
-var singleTemplate = loadTemplate(templates_oa_single_default);
-var multiTemplate = loadTemplate(templates_oa_multi_default);
-var OA_TEMPLATE_VERSION = "First Edition \u2014 August 2026";
-function must(haystack, needle, label) {
-  const found = typeof needle === "string" ? haystack.includes(needle) : needle.test(haystack);
-  if (!found) throw new Error(`OA template marker missing: ${label}`);
-}
-function replaceOnce(s, from, to, label) {
-  must(s, from, label);
-  return typeof from === "string" ? s.replace(from, to) : s.replace(from, to);
-}
-var money = (n) => `$${Math.round(n).toLocaleString("en-US")}`;
-function replaceSection(s, heading, replacement, label) {
-  const re = new RegExp(`## ${heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[\\s\\S]*?(?=
-## |$)`);
-  must(s, re, label);
-  return s.replace(re, replacement);
-}
-function extractSection(s, heading, label) {
-  const re = new RegExp(`## ${heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[\\s\\S]*?(?=
-## |$)`);
-  const m2 = s.match(re);
-  if (!m2) throw new Error(`OA template section missing: ${label}`);
-  return { doc: s.replace(re, ""), section: m2[0] };
-}
-function stripInstructionNotes(s) {
-  return s.replace(/\s*\*\((To omit|Retain the selected|If this Section is omitted)[\s\S]*?\)\*/g, "").replace(/\s*\*\[include only if[\s\S]*?\]\*/g, "").replace(/ \[OPTIONAL PROVISION[\s\S]*?\](?=\*\*|$)/gm, "").replace(/ \[SELECT ONE ALTERNATIVE[\s\S]*?\](?=\*\*|$)/gm, "");
-}
-function assembleOa(inputs) {
-  let s = inputs.version === "single" ? singleTemplate : multiTemplate;
-  const co = inputs.companyName;
-  must(s, "[COMPANY NAME], LLC", "company name");
-  s = s.split("[COMPANY NAME], LLC").join(co);
-  s = s.split("[COMPANY NAME]").join(co);
-  s = replaceOnce(s, 'effective as of [DATE] (the "Effective Date")', `effective as of ${inputs.effectiveDate} (the "Effective Date")`, "effective date");
-  s = s.split("[PRINCIPAL ADDRESS]").join(inputs.principalAddress);
-  s = s.split("**[MANAGER NAME]**").join(`**${inputs.managerName}**`);
-  s = s.split("[MANAGER NAME], Manager").join(`${inputs.managerName}, Manager`);
-  s = s.split("[MANAGER NAME]").join(inputs.managerName);
-  if (inputs.version === "multi") {
-    must(s, "$[THRESHOLD]", "threshold");
-    s = s.split("$[THRESHOLD]").join(money(inputs.borrowingThreshold ?? 25e3));
-    if (inputs.includeCapitalCalls) {
-      s = s.split("$[CAP]").join(money(inputs.capitalCallCap ?? 25e3));
-    } else {
-      s = replaceSectionBody(s, /\*\*6\.2 Additional Capital Contributions\.[^\n]*\n[\s\S]*?(?=\n\*\*6\.3)/, "**6.2 Additional Capital Contributions.** [Reserved.]\n\n", "6.2 omit");
-      s = replaceSectionBody(s, /\*\*6\.3 Failure to Contribute\.\*\*[\s\S]*?(?=\n\*\*6\.4)/, "**6.3 Failure to Contribute.** [Reserved.]\n\n", "6.3 omit");
-      s = replaceSectionBody(s, /\(a\) \*\[include only if optional Section 6\.2[\s\S]*?\]\*[\s\S]*?; \(b\)/, "(a) [Reserved.]; (b)", "11.1(a) reserve");
-    }
-    const altA = s.match(/\*\*\[ \] Alternative A — Noncompetition\.\*\*([\s\S]*?)(?=\n\*\*\[ \] Alternative B)/);
-    const altB = s.match(/\*\*\[ \] Alternative B — Competition Permitted\.\*\*([\s\S]*?)(?=\n\n\*\*4\.8)/);
-    if (!altA || !altB) throw new Error("OA template marker missing: 4.7 alternatives");
-    const chosen = (inputs.competition === "B" ? altB[1] : altA[1]).trim();
-    s = replaceSectionBody(
-      s,
-      /\*\*4\.7 Competition\.[^\n]*\n[\s\S]*?(?=\n\n\*\*4\.8)/,
-      `**4.7 Competition.** ${chosen}
-`,
-      "4.7 rebuild"
-    );
-    if (inputs.competition === "B") {
-      s = replaceSectionBody(s, /\(c\) \*\[include only if Section 4\.7 Alternative A[\s\S]*?\]\*[\s\S]*?; \(d\)/, "(c) [Reserved.]; (d)", "11.1(c) reserve");
-    }
-    if (!inputs.includeShotgun) {
-      s = replaceSectionBody(s, /\*\*13\.2 Deadlock; Buy-Sell Election\.[^\n]*\*\*[\s\S]*?(?=\n---|\n## ARTICLE 14)/, "**13.2 Deadlock; Buy-Sell Election.** [Reserved.]\n\n", "13.2 omit");
-    }
-  }
-  s = stripInstructionNotes(s);
-  let titleName = "OPERATING AGREEMENT";
-  if (inputs.amendedRestated) {
-    titleName = "AMENDED AND RESTATED OPERATING AGREEMENT";
-    s = replaceOnce(s, "# OPERATING AGREEMENT", "# AMENDED AND RESTATED\n# OPERATING AGREEMENT", "title");
-    s = replaceOnce(s, 'THIS OPERATING AGREEMENT (this "Agreement")', 'THIS AMENDED AND RESTATED OPERATING AGREEMENT (this "Agreement")', "preamble");
-    const supersede = inputs.priorAgreementDate ? `the Operating Agreement of the Company dated ${inputs.priorAgreementDate}` : "any and all prior operating agreements of the Company, whether written or oral";
-    s = replaceOnce(
-      s,
-      "NOW, THEREFORE,",
-      `D. This Agreement amends, restates, and supersedes in its entirety ${supersede}, which shall be of no further force or effect from the Effective Date.
-
-NOW, THEREFORE,`,
-      "supersede recital"
-    );
-  }
-  if (inputs.version === "single") {
-    const m2 = inputs.members[0];
-    const exhibitA = `## EXHIBIT A \u2014 MEMBER; CONTRIBUTIONS; TOD DESIGNATION
-
-**Company:** ${co}
-
-| Item | Information |
-|---|---|
-| Member name | ${m2.name} |
-| Member address | ${m2.address} |
-| Membership Interest | 100% (single class) |
-| Initial contribution to the Company | ${inputs.contributionToCompany || m2.contribution || "\u2014"} |
-| Date of contribution | ${inputs.effectiveDate} |
-
-**Transfer on Death designation (ss. 711.50\u2013711.512, Fla. Stat.):**
-
-Upon the death of the Member, the Membership Interest shall pass to: **${m2.todBeneficiary || "No beneficiary designated"}**${m2.todBeneficiary ? "" : " \u2014 the Membership Interest passes as provided by law"}, subject in all events to this Agreement.
-`;
-    s = replaceSection(s, "EXHIBIT A \u2014 MEMBER; CONTRIBUTIONS; TOD DESIGNATION", exhibitA, "Exhibit A single");
-  } else {
-    const rows = inputs.members.map((m2) => `| ${m2.name} | ${m2.address} | ${m2.percentage}% | ${m2.contribution || "\u2014"} | ${inputs.effectiveDate} |`).join("\n");
-    const todRows = inputs.members.map((m2) => `| ${m2.name} | ${m2.todBeneficiary || "None"} |`).join("\n");
-    const exhibitA = `## EXHIBIT A \u2014 MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS
-
-**Company:** ${co}
-
-| Member name | Address | Percentage Interest | Initial contribution to the Company | Date |
-|---|---|---|---|---|
-${rows}
-| **Total** | | **100%** | | |
-
-**Transfer on Death designations (ss. 711.50\u2013711.512, Fla. Stat.):**
-
-| Designating Member | TOD beneficiary (any person or entity) |
-|---|---|
-${todRows}
-
-If no beneficiary is designated, or a designation fails, the Member's interest passes as provided by law, subject to this Agreement.
-`;
-    s = replaceSection(s, "EXHIBIT A \u2014 MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS", exhibitA, "Exhibit A multi");
-  }
-  const ex1 = extractSection(s, "SERIES EXHIBIT PS-[N]", "series exhibit template");
-  s = ex1.doc;
-  const ex2 = extractSection(s, "ASSET SCHEDULE \u2014 ATTACHMENT TO SERIES EXHIBIT PS-[N]", "asset schedule template");
-  s = ex2.doc;
-  const exhibits = [];
-  inputs.series.forEach((ser, idx) => {
-    const n = idx + 1;
-    const assoc = ser.associated.length > 0 ? ser.associated.map((a2) => `${a2.memberName} \u2014 ${a2.seriesPercentage}%`).join("; ") : "None \u2014 the Company is the deemed sole Associated Member";
-    let ex = ex1.section;
-    ex = ex.replace("## SERIES EXHIBIT PS-[N]", `## SERIES EXHIBIT ${n}`);
-    ex = ex.replace(/\*\*Protected Series name \(exactly as filed with the Department\):\*\*\n\*\*[^\n]+\*\*/, `**Protected Series name (exactly as filed with the Department):**
-**${ser.name}**`);
-    ex = ex.replace(/\| Purpose of this Protected Series \|[^\n]*\|/, `| Purpose of this Protected Series | ${ser.purpose || "Any lawful business, purpose, or activity"} |`);
-    ex = ex.replace(/\| Associated Member\(s\)[^\n]*\|[^\n]*\|/, inputs.version === "single" ? `| Associated Member(s) | ${inputs.members[0].name} \u2014 100% |` : `| Associated Member(s) and Series Percentages | ${assoc} |`);
-    ex = ex.replace(/\| Protected Series Manager \|[^\n]*\|/, `| Protected Series Manager | ${inputs.managerName} |`);
-    ex = ex.replace(/\| Contributions to this Protected Series \|[^\n]*\|/, `| Contributions to this Protected Series | ${ser.contribution || "\u2014"} |`);
-    ex = ex.replace(/\| Special terms \(if any\) \|[^\n]*\|/, "| Special terms (if any) | None |");
-    ex = ex.replace(/\| Dissolution events[^\n]*\|[^\n]*\|/, "| Dissolution events specific to this Protected Series (if any) | None |");
-    const adoptNames = ser.associated.length > 0 ? ser.associated.flatMap((u) => u.signatories ?? [u.memberName]) : inputs.members.flatMap((m2) => m2.signatories ?? [m2.name]);
-    const adoptLines = adoptNames.map((n2) => `_____________________________
-${n2}, Member`).join("\n\n");
-    ex = ex.replace(
-      /_+\n\[ASSOCIATED MEMBER 1\], Member[\s\S]*?_+\n\[ASSOCIATED MEMBER 2\], Member/,
-      adoptLines
-    );
-    ex = ex.replace(/_+\n\[MEMBER NAME\], Member/, adoptLines);
-    ex = ex.split("[NAME], Protected Series Manager").join(`${inputs.managerName}, Protected Series Manager`).split("effective [DATE]").join(`effective ${inputs.effectiveDate}`);
-    let sched = ex2.section.replace(
-      "## ASSET SCHEDULE \u2014 ATTACHMENT TO SERIES EXHIBIT PS-[N]",
-      `## ASSET SCHEDULE \u2014 ATTACHMENT TO SERIES EXHIBIT ${n} (${ser.name})`
-    );
-    exhibits.push(ex.trim() + "\n\n" + sched.trim());
-  });
-  if (inputs.version === "single") {
-    s = s.split("[MEMBER NAME]").join(inputs.members[0].name);
-    s = s.split("[ADDRESS]").join(inputs.members[0].address);
-  } else {
-    const sigLines = inputs.members.flatMap((m2) => m2.signatories ?? [m2.name]).map((n) => `_____________________________
-${n}`).join("\n\n");
-    s = s.replace(
-      /\*\*MEMBERS:\*\*[\s\S]*?(?=\*\*ACKNOWLEDGED AND AGREED BY MANAGER:\*\*)/,
-      `**MEMBERS:**
-
-${sigLines}
-
-`
-    );
-  }
-  s = s.replace(/\n\*Form document —[\s\S]*$/, "\n");
-  s = s.trimEnd() + "\n\n" + exhibits.join("\n\n") + `
-
-*${titleName} of ${co} \u2014 generated by MyFloridaSeriesLLC \xB7 Master ${OA_TEMPLATE_VERSION}*
-`;
-  return { markdown: s, title: `${inputs.amendedRestated ? "Amended and Restated " : ""}Operating Agreement \u2014 ${co}` };
-}
-function replaceSectionBody(s, re, replacement, label) {
-  if (!re.test(s)) throw new Error(`OA template marker missing: ${label}`);
-  return s.replace(re, replacement);
 }
 
 // node_modules/@cantoo/pdf-lib/es/utils/base64.js
@@ -103570,6 +102446,9 @@ PDFButton.of = (acroPushButton, ref, doc) => new PDFButton(acroPushButton, ref, 
 var FACTUR_X_NAMESPACE_URI = "urn:factur-x:pdfa:CrossIndustryDocument:invoice:1p0#";
 var FACTUR_X_EXTENSION_SCHEMA = `<rdf:Description rdf:about="" xmlns:pdfaExtension="http://www.aiim.org/pdfa/ns/extension/" xmlns:pdfaSchema="http://www.aiim.org/pdfa/ns/schema#" xmlns:pdfaProperty="http://www.aiim.org/pdfa/ns/property#"><pdfaExtension:schemas><rdf:Bag><rdf:li rdf:parseType="Resource"><pdfaSchema:schema>Factur-X PDFA Extension Schema</pdfaSchema:schema><pdfaSchema:namespaceURI>${FACTUR_X_NAMESPACE_URI}</pdfaSchema:namespaceURI><pdfaSchema:prefix>fx</pdfaSchema:prefix><pdfaSchema:property><rdf:Seq><rdf:li rdf:parseType="Resource"><pdfaProperty:name>DocumentFileName</pdfaProperty:name><pdfaProperty:valueType>Text</pdfaProperty:valueType><pdfaProperty:category>external</pdfaProperty:category><pdfaProperty:description>name of the embedded XML invoice file</pdfaProperty:description></rdf:li><rdf:li rdf:parseType="Resource"><pdfaProperty:name>DocumentType</pdfaProperty:name><pdfaProperty:valueType>Text</pdfaProperty:valueType><pdfaProperty:category>external</pdfaProperty:category><pdfaProperty:description>INVOICE</pdfaProperty:description></rdf:li><rdf:li rdf:parseType="Resource"><pdfaProperty:name>Version</pdfaProperty:name><pdfaProperty:valueType>Text</pdfaProperty:valueType><pdfaProperty:category>external</pdfaProperty:category><pdfaProperty:description>The actual version of the Factur-X XML schema</pdfaProperty:description></rdf:li><rdf:li rdf:parseType="Resource"><pdfaProperty:name>ConformanceLevel</pdfaProperty:name><pdfaProperty:valueType>Text</pdfaProperty:valueType><pdfaProperty:category>external</pdfaProperty:category><pdfaProperty:description>The conformance level of the embedded Factur-X data</pdfaProperty:description></rdf:li></rdf:Seq></pdfaSchema:property></rdf:li></rdf:Bag></pdfaExtension:schemas></rdf:Description>`;
 
+// server/assets/f2553-b64.ts
+var f2553_b64_default = "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aXhbMS4wIDAuMCAwLjAgMS4wIDAuMCAwLjBdL1Jlc291cmNlczw8L1Byb2NTZXRbL1BERl0+Pi9TdWJ0eXBlL0Zvcm0vVHlwZS9YT2JqZWN0Pj5zdHJlYW0NCjAuNzQ5MDIzIGcKMCAwIDggOCByZQpmCg0KZW5kc3RyZWFtDWVuZG9iag0yNCAwIG9iag08PC9CQm94WzAuMCAwLjAgOC4wIDguMF0vRm9ybVR5cGUgMS9MZW5ndGggNDMvTWF0cml4WzEuMCAwLjAgMC4wIDEuMCAwLjAgMC4wXS9SZXNvdXJjZXM8PC9Qcm9jU2V0Wy9QREZdPj4vU3VidHlwZS9Gb3JtL1R5cGUvWE9iamVjdD4+c3RyZWFtDQowLjc0OTAyMyBnCjAgMCA4IDggcmUKZgpxCjEgMSA2IDYgcmUKVwpuClEKDQplbmRzdHJlYW0NZW5kb2JqDTI1IDAgb2JqDTw8L0JCb3hbMC4wIDAuMCA4LjAgOC4wXS9Gb3JtVHlwZSAxL0xlbmd0aCAyNC9NYXRyaXhbMS4wIDAuMCAwLjAgMS4wIDAuMCAwLjBdL1Jlc291cmNlczw8L1Byb2NTZXRbL1BERl0+Pi9TdWJ0eXBlL0Zvcm0vVHlwZS9YT2JqZWN0Pj5zdHJlYW0NCjAuNzQ5MDIzIGcKMCAwIDggOCByZQpmCg0KZW5kc3RyZWFtDWVuZG9iag0yNiAwIG9iag08PC9CQm94WzAuMCAwLjAgOC4wIDguMF0vRm9ybVR5cGUgMS9MZW5ndGggNDMvTWF0cml4WzEuMCAwLjAgMC4wIDEuMCAwLjAgMC4wXS9SZXNvdXJjZXM8PC9Qcm9jU2V0Wy9QREZdPj4vU3VidHlwZS9Gb3JtL1R5cGUvWE9iamVjdD4+c3RyZWFtDQowLjc0OTAyMyBnCjAgMCA4IDggcmUKZgpxCjEgMSA2IDYgcmUKVwpuClEKDQplbmRzdHJlYW0NZW5kb2JqDTI3IDAgb2JqDTw8L0JCb3hbMC4wIDAuMCA4LjAgOC4wXS9GaWx0ZXJbL0ZsYXRlRGVjb2RlXS9Gb3JtVHlwZSAxL0xlbmd0aCA4Mi9NYXRyaXhbMS4wIDAuMCAwLjAgMS4wIDAuMCAwLjBdL1Jlc291cmNlczw8L0ZvbnQ8PC9aYURiIDk3IDAgUj4+L1Byb2NTZXRbL1BERi9UZXh0XT4+L1N1YnR5cGUvRm9ybS9UeXBlL1hPYmplY3Q+PnN0cmVhbQ0KSIkq5DJUMFQwA8KiVK5wrjwupxAu/ahElyQFUz0zhZA0LkM9M2NDIwUjPUMDExOFkBQuUz1jSyMLhRAfLhtjEzuFkCwu1xCuQC6AAAMAQX4PcQ0KZW5kc3RyZWFtDWVuZG9iag0yOCAwIG9iag08PC9CQm94WzAuMCAwLjAgOC4wIDguMF0vRmlsdGVyWy9GbGF0ZURlY29kZV0vRm9ybVR5cGUgMS9MZW5ndGggODIvTWF0cml4WzEuMCAwLjAgMC4wIDEuMCAwLjAgMC4wXS9SZXNvdXJjZXM8PC9Gb250PDwvWmFEYiA5NyAwIFI+Pi9Qcm9jU2V0Wy9QREYvVGV4dF0+Pi9TdWJ0eXBlL0Zvcm0vVHlwZS9YT2JqZWN0Pj5zdHJlYW0NCkiJKuQyVDBUMAPColSucK48LqcQLv2oRJckBVM9M4WQNC5DPTNjQyMFIz1DAxMThZAULlM9Y0sjC4UQHy4bYxM7hZAsLtcQrkAugAADAEF+D3ENCmVuZHN0cmVhbQ1lbmRvYmoNMjkgMCBvYmoNPDwvQkJveFswLjAgMC4wIDguMCA4LjBdL0Zvcm1UeXBlIDEvTGVuZ3RoIDI0L01hdHJpeFsxLjAgMC4wIDAuMCAxLjAgMC4wIDAuMF0vUmVzb3VyY2VzPDwvUHJvY1NldFsvUERGXT4+L1N1YnR5cGUvRm9ybS9UeXBlL1hPYmplY3Q+PnN0cmVhbQ0KMC43NDkwMjMgZwowIDAgOCA4IHJlCmYKDQplbmRzdHJlYW0NZW5kb2JqDTMwIDAgb2JqDTw8L0JCb3hbMC4wIDAuMCA4LjAgOC4wXS9GaWx0ZXJbL0ZsYXRlRGVjb2RlXS9Gb3JtVHlwZSAxL0xlbmd0aCA4Mi9NYXRyaXhbMS4wIDAuMCAwLjAgMS4wIDAuMCAwLjBdL1Jlc291cmNlczw8L0ZvbnQ8PC9aYURiIDk3IDAgUj4+L1Byb2NTZXRbL1BERi9UZXh0XT4+L1N1YnR5cGUvRm9ybS9UeXBlL1hPYmplY3Q+PnN0cmVhbQ0KSIkq5DJUMFQwA8KiVK5wrjwupxAu/ahElyQFUz0zhZA0LkM9M2NDIwUjPUMDExOFkBQuUz1jSyMLhRAfLhtjEzuFkCwu1xCuQC6AAAMAQX4PcQ0KZW5kc3RyZWFtDWVuZG9iag0zMSAwIG9iag08PC9CQm94WzAuMCAwLjAgOC4wIDguMF0vRm9ybVR5cGUgMS9MZW5ndGggNDMvTWF0cml4WzEuMCAwLjAgMC4wIDEuMCAwLjAgMC4wXS9SZXNvdXJjZXM8PC9Qcm9jU2V0Wy9QREZdPj4vU3VidHlwZS9Gb3JtL1R5cGUvWE9iamVjdD4+c3RyZWFtDQowLjc0OTAyMyBnCjAgMCA4IDggcmUKZgpxCjEgMSA2IDYgcmUKVwpuClEKDQplbmRzdHJlYW0NZW5kb2JqDTMyIDAgb2JqDTw8L0JCb3hbMC4wIDAuMCA4LjAgOC4wXS9GaWx0ZXJbL0ZsYXRlRGVjb2RlXS9Gb3JtVHlwZSAxL0xlbmd0aCA4Mi9NYXRyaXhbMS4wIDAuMCAwLjAgMS4wIDAuMCAwLjBdL1Jlc291cmNlczw8L0ZvbnQ8PC9aYURiIDk3IDAgUj4+L1Byb2NTZXRbL1BERi9UZXh0XT4+L1N1YnR5cGUvRm9ybS9UeXBlL1hPYmplY3Q+PnN0cmVhbQ0KSIkq5DJUMFQwA8KiVK5wrjwupxAu/ahElyQFUz0zhZA0LkM9M2NDIwUjPUMDExOFkBQuUz1jSyMLhRAfLhtjEzuFkCwu1xCuQC6AAAMAQX4PcQ0KZW5kc3RyZWFtDWVuZG9iag0zMyAwIG9iag08PC9CQm94WzAuMCAwLjAgOC4wIDguMF0vRm9ybVR5cGUgMS9MZW5ndGggMjQvTWF0cml4WzEuMCAwLjAgMC4wIDEuMCAwLjAgMC4wXS9SZXNvdXJjZXM8PC9Qcm9jU2V0Wy9QREZdPj4vU3VidHlwZS9Gb3JtL1R5cGUvWE9iamVjdD4+c3RyZWFtDQowLjc0OTAyMyBnCjAgMCA4IDggcmUKZgoNCmVuZHN0cmVhbQ1lbmRvYmoNMzQgMCBvYmoNPDwvQkJveFswLjAgMC4wIDguMCA4LjBdL0Zvcm1UeXBlIDEvTGVuZ3RoIDI0L01hdHJpeFsxLjAgMC4wIDAuMCAxLjAgMC4wIDAuMF0vUmVzb3VyY2VzPDwvUHJvY1NldFsvUERGXT4+L1N1YnR5cGUvRm9ybS9UeXBlL1hPYmplY3Q+PnN0cmVhbQ0KMC43NDkwMjMgZwowIDAgOCA4IHJlCmYKDQplbmRzdHJlYW0NZW5kb2JqDTM1IDAgb2JqDTw8L0JCb3hbMC4wIDAuMCA4LjAgOC4wXS9Gb3JtVHlwZSAxL0xlbmd0aCA0My9NYXRyaXhbMS4wIDAuMCAwLjAgMS4wIDAuMCAwLjBdL1Jlc291cmNlczw8L1Byb2NTZXRbL1BERl0+Pi9TdWJ0eXBlL0Zvcm0vVHlwZS9YT2JqZWN0Pj5zdHJlYW0NCjAuNzQ5MDIzIGcKMCAwIDggOCByZQpmCnEKMSAxIDYgNiByZQpXCm4KUQoNCmVuZHN0cmVhbQ1lbmRvYmoNMzYgMCBvYmoNPDwvQkJveFswLjAgMC4wIDguMCA4LjBdL0Zvcm1UeXBlIDEvTGVuZ3RoIDQzL01hdHJpeFsxLjAgMC4wIDAuMCAxLjAgMC4wIDAuMF0vUmVzb3VyY2VzPDwvUHJvY1NldFsvUERGXT4+L1N1YnR5cGUvRm9ybS9UeXBlL1hPYmplY3Q+PnN0cmVhbQ0KMC43NDkwMjMgZwowIDAgOCA4IHJlCmYKcQoxIDEgNiA2IHJlClcKbgpRCg0KZW5kc3RyZWFtDWVuZG9iag0zNyAwIG9iag08PC9CQm94WzAuMCAwLjAgOC4wIDguMF0vRmlsdGVyWy9GbGF0ZURlY29kZV0vRm9ybVR5cGUgMS9MZW5ndGggODIvTWF0cml4WzEuMCAwLjAgMC4wIDEuMCAwLjAgMC4wXS9SZXNvdXJjZXM8PC9Gb250PDwvWmFEYiA5NyAwIFI+Pi9Qcm9jU2V0Wy9QREYvVGV4dF0+Pi9TdWJ0eXBlL0Zvcm0vVHlwZS9YT2JqZWN0Pj5zdHJlYW0NCkiJKuQyVDBUMAPColSucK48LqcQLv2oRJckBVM9M4WQNC5DPTNjQyMFIz1DAxMThZAULlM9Y0sjC4UQHy4bYxM7hZAsLtcQrkAugAADAEF+D3ENCmVuZHN0cmVhbQ1lbmRvYmoNMzggMCBvYmoNPDwvQkJveFswLjAgMC4wIDguMCA4LjBdL0Zvcm1UeXBlIDEvTGVuZ3RoIDI0L01hdHJpeFsxLjAgMC4wIDAuMCAxLjAgMC4wIDAuMF0vUmVzb3VyY2VzPDwvUHJvY1NldFsvUERGXT4+L1N1YnR5cGUvRm9ybS9UeXBlL1hPYmplY3Q+PnN0cmVhbQ0KMC43NDkwMjMgZwowIDAgOCA4IHJlCmYKDQplbmRzdHJlYW0NZW5kb2JqDTM5IDAgb2JqDTw8L0JCb3hbMC4wIDAuMCA4LjAgOC4wXS9Gb3JtVHlwZSAxL0xlbmd0aCA0My9NYXRyaXhbMS4wIDAuMCAwLjAgMS4wIDAuMCAwLjBdL1Jlc291cmNlczw8L1Byb2NTZXRbL1BERl0+Pi9TdWJ0eXBlL0Zvcm0vVHlwZS9YT2JqZWN0Pj5zdHJlYW0NCjAuNzQ5MDIzIGcKMCAwIDggOCByZQpmCnEKMSAxIDYgNiByZQpXCm4KUQoNCmVuZHN0cmVhbQ1lbmRvYmoNNDAgMCBvYmoNPDwvQkJveFswLjAgMC4wIDguMCA4LjBdL0ZpbHRlclsvRmxhdGVEZWNvZGVdL0Zvcm1UeXBlIDEvTGVuZ3RoIDgyL01hdHJpeFsxLjAgMC4wIDAuMCAxLjAgMC4wIDAuMF0vUmVzb3VyY2VzPDwvRm9udDw8L1phRGIgOTcgMCBSPj4vUHJvY1NldFsvUERGL1RleHRdPj4vU3VidHlwZS9Gb3JtL1R5cGUvWE9iamVjdD4+c3RyZWFtDQpIiSrkMlQwVDADwqJUrnCuPC6nEC79qESXJAVTPTOFkDQuQz0zY0MjBSM9QwMTE4WQFC5TPWNLIwuFEB8uG2MTO4WQLC7XEK5ALoAAAwBBfg9xDQplbmRzdHJlYW0NZW5kb2JqDTQxIDAgb2JqDTw8L0JCb3hbMC4wIDAuMCA4LjAgOC4wXS9GaWx0ZXJbL0ZsYXRlRGVjb2RlXS9Gb3JtVHlwZSAxL0xlbmd0aCA4Mi9NYXRyaXhbMS4wIDAuMCAwLjAgMS4wIDAuMCAwLjBdL1Jlc291cmNlczw8L0ZvbnQ8PC9aYURiIDk3IDAgUj4+L1Byb2NTZXRbL1BERi9UZXh0XT4+L1N1YnR5cGUvRm9ybS9UeXBlL1hPYmplY3Q+PnN0cmVhbQ0KSIkq5DJUMFQwA8KiVK5wrjwupxAu/ahElyQFUz0zhZA0LkM9M2NDIwUjPUMDExOFkBQuUz1jSyMLhRAfLhtjEzuFkCwu1xCuQC6AAAMAQX4PcQ0KZW5kc3RyZWFtDWVuZG9iag00MiAwIG9iag08PC9CQm94WzAuMCAwLjAgOC4wIDguMF0vRmlsdGVyWy9GbGF0ZURlY29kZV0vRm9ybVR5cGUgMS9MZW5ndGggODIvTWF0cml4WzEuMCAwLjAgMC4wIDEuMCAwLjAgMC4wXS9SZXNvdXJjZXM8PC9Gb250PDwvWmFEYiA5NyAwIFI+Pi9Qcm9jU2V0Wy9QREYvVGV4dF0+Pi9TdWJ0eXBlL0Zvcm0vVHlwZS9YT2JqZWN0Pj5zdHJlYW0NCkiJKuQyVDBUMAPColSucK48LqcQLv2oRJckBVM9M4WQNC5DPTNjQyMFIz1DAxMThZAULlM9Y0sjC4UQHy4bYxM7hZAsLtcQrkAugAADAEF+D3ENCmVuZHN0cmVhbQ1lbmRvYmoNNDMgMCBvYmoNPDwvQkJveFswLjAgMC4wIDguMCA4LjBdL0Zvcm1UeXBlIDEvTGVuZ3RoIDQzL01hdHJpeFsxLjAgMC4wIDAuMCAxLjAgMC4wIDAuMF0vUmVzb3VyY2VzPDwvUHJvY1NldFsvUERGXT4+L1N1YnR5cGUvRm9ybS9UeXBlL1hPYmplY3Q+PnN0cmVhbQ0KMC43NDkwMjMgZwowIDAgOCA4IHJlCmYKcQoxIDEgNiA2IHJlClcKbgpRCg0KZW5kc3RyZWFtDWVuZG9iag00NCAwIG9iag08PC9CQm94WzAuMCAwLjAgOC4wIDguMF0vRmlsdGVyWy9GbGF0ZURlY29kZV0vRm9ybVR5cGUgMS9MZW5ndGggODIvTWF0cml4WzEuMCAwLjAgMC4wIDEuMCAwLjAgMC4wXS9SZXNvdXJjZXM8PC9Gb250PDwvWmFEYiA5NyAwIFI+Pi9Qcm9jU2V0Wy9QREYvVGV4dF0+Pi9TdWJ0eXBlL0Zvcm0vVHlwZS9YT2JqZWN0Pj5zdHJlYW0NCkiJKuQyVDBUMAPColSucK48LqcQLv2oRJckBVM9M4WQNC5DPTNjQyMFIz1DAxMThZAULlM9Y0sjC4UQHy4bYxM7hZAsLtcQrkAugAADAEF+D3ENCmVuZHN0cmVhbQ1lbmRvYmoNNDUgMCBvYmoNPDwvQkJveFswLjAgMC4wIDguMCA4LjBdL0Zvcm1UeXBlIDEvTGVuZ3RoIDI0L01hdHJpeFsxLjAgMC4wIDAuMCAxLjAgMC4wIDAuMF0vUmVzb3VyY2VzPDwvUHJvY1NldFsvUERGXT4+L1N1YnR5cGUvRm9ybS9UeXBlL1hPYmplY3Q+PnN0cmVhbQ0KMC43NDkwMjMgZwowIDAgOCA4IHJlCmYKDQplbmRzdHJlYW0NZW5kb2JqDTQ2IDAgb2JqDTw8L0JCb3hbMC4wIDAuMCA4LjAgOC4wXS9Gb3JtVHlwZSAxL0xlbmd0aCAyNC9NYXRyaXhbMS4wIDAuMCAwLjAgMS4wIDAuMCAwLjBdL1Jlc291cmNlczw8L1Byb2NTZXRbL1BERl0+Pi9TdWJ0eXBlL0Zvcm0vVHlwZS9YT2JqZWN0Pj5zdHJlYW0NCjAuNzQ5MDIzIGcKMCAwIDggOCByZQpmCg0KZW5kc3RyZWFtDWVuZG9iag00NyAwIG9iag08PC9CQm94WzAuMCAwLjAgOC4wIDguMF0vRm9ybVR5cGUgMS9MZW5ndGggMjQvTWF0cml4WzEuMCAwLjAgMC4wIDEuMCAwLjAgMC4wXS9SZXNvdXJjZXM8PC9Qcm9jU2V0Wy9QREZdPj4vU3VidHlwZS9Gb3JtL1R5cGUvWE9iamVjdD4+c3RyZWFtDQowLjc0OTAyMyBnCjAgMCA4IDggcmUKZgoNCmVuZHN0cmVhbQ1lbmRvYmoNNDggMCBvYmoNPDwvQkJveFswLjAgMC4wIDguMCA4LjBdL0Zvcm1UeXBlIDEvTGVuZ3RoIDI0L01hdHJpeFsxLjAgMC4wIDAuMCAxLjAgMC4wIDAuMF0vUmVzb3VyY2VzPDwvUHJvY1NldFsvUERGXT4+L1N1YnR5cGUvRm9ybS9UeXBlL1hPYmplY3Q+PnN0cmVhbQ0KMC43NDkwMjMgZwowIDAgOCA4IHJlCmYKDQplbmRzdHJlYW0NZW5kb2JqDTQ5IDAgb2JqDTw8L0JCb3hbMC4wIDAuMCA4LjAgOC4wXS9Gb3JtVHlwZSAxL0xlbmd0aCA0My9NYXRyaXhbMS4wIDAuMCAwLjAgMS4wIDAuMCAwLjBdL1Jlc291cmNlczw8L1Byb2NTZXRbL1BERl0+Pi9TdWJ0eXBlL0Zvcm0vVHlwZS9YT2JqZWN0Pj5zdHJlYW0NCjAuNzQ5MDIzIGcKMCAwIDggOCByZQpmCnEKMSAxIDYgNiByZQpXCm4KUQoNCmVuZHN0cmVhbQ1lbmRvYmoNNTAgMCBvYmoNPDwvQkJveFswLjAgMC4wIDguMCA4LjBdL0ZpbHRlclsvRmxhdGVEZWNv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cy8xLjEvIgogICAgICAgICAgICB4bWxuczpwZGZ4PSJodHRwOi8vbnMuYWRvYmUuY29tL3BkZngvMS4zLyIKICAgICAgICAgICAgeG1sbnM6cGRmdWFpZD0iaHR0cDovL3d3dy5haWltLm9yZy9wZGZ1YS9ucy9pZC8iPgogICAgICAgICA8cGRmOktleXdvcmRzPkZpbGxhYmxlPC9wZGY6S2V5d29yZHM+CiAgICAgICAgIDxwZGY6UHJvZHVjZXI+RGVzaWduZXIgNi41PC9wZGY6UHJvZHVjZXI+CiAgICAgICAgIDx4bXA6Q3JlYXRvclRvb2w+RGVzaWduZXIgNi41PC94bXA6Q3JlYXRvclRvb2w+CiAgICAgICAgIDx4bXA6TWV0YWRhdGFEYXRlPjIwMjUtMDEtMTNUMTM6MzI6NDItMDU6MDA8L3htcDpNZXRhZGF0YURhdGU+CiAgICAgICAgIDx4bXA6TW9kaWZ5RGF0ZT4yMDI1LTAxLTEzVDEzOjMyOjQyLTA1OjAwPC94bXA6TW9kaWZ5RGF0ZT4KICAgICAgICAgPHhtcDpDcmVhdGVEYXRlPjIwMTktMDYtMTNUMTQ6MTA6NTgtMDU6MDA8L3htcDpDcmVhdGVEYXRlPgogICAgICAgICA8eG1wTU06RG9jdW1lbnRJRD51dWlkOjAxYjUxZDViLTdiNzYtNDg3Mi1iYzQ4LTVlNTcxNWFiNTQ5YzwveG1wTU06RG9jdW1lbnRJRD4KICAgICAgICAgPHhtcE1NOkluc3RhbmNlSUQ+dXVpZDplMGQ2ODdhYy01MGM2LTRmNGItYmUzZi0yMWNhMWU5YzVmM2U8L3htcE1NOkluc3RhbmNlSUQ+CiAgICAgICAgIDxkYzpmb3JtYXQ+YXBwbGljYXRpb24vcGRmPC9kYzpmb3JtYXQ+CiAgICAgICAgIDxkYzpzdWJqZWN0PgogICAgICAgICAgICA8cmRmOkJhZz4KICAgICAgICAgICAgICAgPHJkZjpsaT5GaWxsYWJsZTwvcmRmOmxpPgogICAgICAgICAgICA8L3JkZjpCYWc+CiAgICAgICAgIDwvZGM6c3ViamVjdD4KICAgICAgICAgPGRjOmRlc2NyaXB0aW9uPgogICAgICAgICAgICA8cmRmOkFsdD4KICAgICAgICAgICAgICAgPHJkZjpsaSB4bWw6bGFuZz0ieC1kZWZhdWx0Ij5FbGVjdGlvbiBieSBhIFNtYWxsIEJ1c2luZXNzIENvcnBvcmF0aW9uIChVbmRlciBTZWN0aW9uIDEzNjIgb2YgdGhlIEludGVybmFsIFJldmVudWUgQ29kZSk8L3JkZjpsaT4KICAgICAgICAgICAgPC9yZGY6QWx0PgogICAgICAgICA8L2RjOmRlc2NyaXB0aW9uPgogICAgICAgICA8ZGM6Y3JlYXRvcj4KICAgICAgICAgICAgPHJkZjpTZXE+CiAgICAgICAgICAgICAgIDxyZGY6bGk+U0U6VzpDQVI6TVA8L3JkZjpsaT4KICAgICAgICAgICAgPC9yZGY6U2VxPgogICAgICAgICA8L2RjOmNyZWF0b3I+CiAgICAgICAgIDxkYzp0aXRsZT4KICAgICAgICAgICAgPHJkZjpBbHQ+CiAgICAgICAgICAgICAgIDxyZGY6bGkgeG1sOmxhbmc9IngtZGVmYXVsdCI+Rm9ybSAyNTUzIChSZXYuIERlY2VtYmVyIDIwMTcpPC9yZGY6bGk+CiAgICAgICAgICAgIDwvcmRmOkFsdD4KICAgICAgICAgPC9kYzp0aXRsZT4KICAgICAgICAgPHBkZng6U1BERj4xMTEyPC9wZGZ4OlNQREY+CiAgICAgICAgIDxwZGZ4OkFjY2Vzc2liaWxpdHk+c3RydWN0dXJlZDsgdGFnZ2VkPC9wZGZ4OkFjY2Vzc2liaWxpdHk+CiAgICAgICAgIDxwZGZ4OkZvcm3ihoIwMDIwZmllbGRzPmZpbGxhYmxlPC9wZGZ4OkZvcm3ihoIwMDIwZmllbGRzPgogICAgICAgICA8cGRmdWFpZDpwYXJ0PjE8L3BkZnVhaWQ6cGFydD4KICAgICAgPC9yZGY6RGVzY3JpcHRpb24+CiAgIDwvcmRmOlJERj4KPC94OnhtcG1ldGE+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAKPD94cGFja2V0IGVuZD0idyI/Pg0KZW5kc3RyZWFtDWVuZG9iag05MCAwIG9iag08PC9GaWx0ZXIvRmxhdGVEZWNvZGUvRmlyc3QgMTUvTGVuZ3RoIDc4L04gMi9UeXBlL09ialN0bT4+c3RyZWFtDQpo3jI0MDZTMFAwNDA2VzA1U7Cx0XfOL80rUTDR985MKY42NDAxAUoHKRiCSVMwaQEiY/VDKgtS9QMS01OL7ew0UvN0Q4M1AQIMAMreE1sNCmVuZHN0cmVhbQ1lbmRvYmoNOTEgMCBvYmoNPDwvRmlsdGVyL0ZsYXRlRGVjb2RlL0ZpcnN0IDcvTGVuZ3RoIDI4My9OIDEvVHlwZS9PYmpTdG0+PnN0cmVhbQ0KaN5cUE1rAjEQ/SsDPZg91E2yrrVbEayrUIogbksvXrKbUVNiUrJJi/++UxEPvQzD433MG8GLCXCYTvN512Hfm9ZYE8+sjyF1MQXUTxDV4YA6y+cpHn1gzbL6qBbzbbXeZPkioIrGu1pFZHUluXjkY1GIkeDl5J6XA84HVxZJa+zNwWGA8bDM8pUPpzvJ9wat7tneWKtai1n+iucfHwha3aC117cEWXJBCUUhR/KWsAlepw7/RzSbesWEEJLW1H5iF9nS0qSLoT2DguakrIXn1BtH7WHhw5cPl0awY+9Ok1Fz5YtiLMHvIR4RXlzE4JSFLX6jS0hCjbssy99MtMj+moEsy4JMiDGEGjs8tWRGD3og3mz2K8AACPZ2MQ0KZW5kc3RyZWFtDWVuZG9iag05MiAwIG9iag08PC9EZWNvZGVQYXJtczw8L0NvbHVtbnMgNS9QcmVkaWN0b3IgMTI+Pi9GaWx0ZXIvRmxhdGVEZWNvZGUvSURbPEU3MjQwRDYwNjQzNzM2NDVCNEU0QUMyQUYyREE4OEVFPjwyN0Y3MDJENENERTA5OTRGQTM3MjM5QjI1QUEzMzQ5QT5dL0luZm8gMTAzOCAwIFIvTGVuZ3RoIDI2Ni9Sb290IDEwNDAgMCBSL1NpemUgMTAzOS9UeXBlL1hSZWYvV1sxIDMgMV0+PnN0cmVhbQ0KaN7s0rFOwlAUBuBzbzGFyuKuL3AZ2Bh4EGR3NSxOJia6SggrE5OTxrAzmfsO3X0GRmLipefv0Nrbupg4/QxfTk5PT2/Lb0V/1sgiEytiUvV8p1p07Av6X+rwVZVN1RnMUD9DBz3MK6VWlzMWio/u8s0N4pv3/ph30VXffgbj2rdZ99se6ThVy3zXafNoQ9ez8mi+POER9UHtXRWah2v0L9UEdW+JDW+Y/EB9i6sL/EeJmq3U/lw9G8EnNb1BPcaeCepH7FmrF3vU7/C+yEmY32G/GDUJEJ1prZ+Fqi41380OpX/XbPkdKHNFmSvKXFHKXFHmijJXlDJXlLn6D+1n7b3CSYABAI12S3wNCmVuZHN0cmVhbQ1lbmRvYmoNc3RhcnR4cmVmDQoxMTYNCiUlRU9GDQoxMDQwIDAgb2JqCjw8L0Fjcm9Gb3JtIDEwNjcgMCBSL0V4dGVuc2lvbnM8PC9BREJFPDwvQmFzZVZlcnNpb24vMS43L0V4dGVuc2lvbkxldmVsIDg+Pj4+L0xhbmcgMTAzNyAwIFIvTWFya0luZm88PC9NYXJrZWQgdHJ1ZT4+L01ldGFkYXRhIDg5IDAgUi9OYW1lcyAxMDY4IDAgUi9QYWdlcyAxMDM2IDAgUi9TdHJ1Y3RUcmVlUm9vdCAxMDIgMCBSL1R5cGUvQ2F0YWxvZy9WaWV3ZXJQcmVmZXJlbmNlczw8L0Rpc3BsYXlEb2NUaXRsZSAxMDczIDAgUj4+L1Blcm1zIDExMDAgMCBSPj4KZW5kb2JqCjEwOTkgMCBvYmoKPDwvVHlwZS9TaWcvRmlsdGVyL0Fkb2JlLlBQS0xpdGUvU3ViRmlsdGVyL2FkYmUucGtjczcuZGV0YWNoZWQvUmVmZXJlbmNlWzw8L1R5cGUvU2lnUmVmL1RyYW5zZm9ybU1ldGhvZC9VUjMvVHJhbnNmb3JtUGFyYW1zPDwvVi8yLjIvVHlwZS9UcmFuc2Zvcm1QYXJhbXMvTXNnKFRoaXMgaXMgYSBSaWdodHMtRW5hYmxlZCBQREYgRG9jdW1lbnQpL0RvY3VtZW50Wy9GdWxsU2F2ZV0vQW5ub3RzWy9DcmVhdGUvRGVsZXRlL01vZGlmeS9Db3B5L0ltcG9ydC9FeHBvcnQvT25saW5lXS9Gb3JtWy9GaWxsSW4vSW1wb3J0L0V4cG9ydC9TdWJtaXRTdGFuZGFsb25lL09ubGluZS9BZGQvRGVsZXRlXS9TaWduYXR1cmVbL01vZGlmeV0vUCBmYWxzZS9FRlsvQ3JlYXRlL0RlbGV0ZS9JbXBvcnQvTW9kaWZ5XT4+L0RhdGEgMTA0MCAwIFI+Pl0vTmFtZShBUkUgUHJvZHVjdGlvbiBWOC4xIEczIFAyNCAxMDA3Njg1KS9NKEQ6MjAyNTAxMTMxMzMyNTItMDUnMDAnKS9Db250ZW50czwzMDgwMDYwOTJhODY0ODg2ZjcwZDAxMDcwMmEwODAzMDgwMDIwMTAxMzEwYjMwMDkwNjA1MmIwZTAzMDIxYTA1MDAzMDgwMDYwOTJhODY0ODg2ZjcwZDAxMDcwMTAwMDBhMDgwMzA4MjA2MWIzMDgyMDQwM2EwMDMwMjAxMDIwMjEwMDkwMTM1N2E0NmMzMGQxN2IyZjdkNjRiNDUzYzA4MTgzMDBkMDYwOTJhODY0ODg2ZjcwZDAxMDEwYjA1MDAzMDc1MzEwYjMwMDkwNjAzNTUwNDA2MTMwMjU1NTMzMTIzMzAyMTA2MDM1NTA0MGExMzFhNDE2NDZmNjI2NTIwNTM3OTczNzQ2NTZkNzMyMDQ5NmU2MzZmNzI3MDZmNzI2MTc0NjU2NDMxMWQzMDFiMDYwMzU1MDQwYjEzMTQ0MTY0NmY2MjY1MjA1NDcyNzU3Mzc0MjA1MzY1NzI3NjY5NjM2NTczMzEyMjMwMjAwNjAzNTUwNDAzMTMxOTQxNjQ2ZjYyNjUyMDUwNzI2ZjY0NzU2Mzc0MjA1MzY1NzI3NjY5NjM2NTczMjA0NzMzMzAxZTE3MGQzMjMyMzAzMjMxMzEzMDMwMzAzMDMwMzA1YTE3MGQzMzM1MzEzMjMzMzEzMjMzMzUzOTM1Mzk1YTMwN2UzMTJiMzAyOTA2MDM1NTA0MDMwYzIyNDE1MjQ1MjA1MDcyNmY2NDc1NjM3NDY5NmY2ZTIwNTYzODJlMzEyMDQ3MzMyMDUwMzIzNDIwMzEzMDMwMzczNjM4MzUzMTFkMzAxYjA2MDM1NTA0MGIwYzE0NDE2NDZmNjI2NTIwNTQ3Mjc1NzM3NDIwNTM2NTcyNzY2OTYzNjU3MzMxMjMzMDIxMDYwMzU1MDQwYTBjMWE0MTY0NmY2MjY1MjA1Mzc5NzM3NDY1NmQ3MzIwNDk2ZTYzNmY3MjcwNmY3MjYxNzQ2NTY0MzEwYjMwMDkwNjAzNTUwNDA2MTMwMjU1NTMzMDgyMDEyMjMwMGQwNjA5MmE4NjQ4ODZmNzBkMDEwMTAxMDUwMDAzODIwMTBmMDAzMDgyMDEwYTAyODIwMTAxMDBiMDBlMjdlYmQ0ZmVhNmFlZGRjMzVjMjIzZTFjNDhhZjk0M2JhM2JkOTUyYjYxOTJiNDdhMjE5MjVhNDNjMTI5MTcxYzVjOTZlZTM2ODk5NmYyODU1MjhkMzJjMGMwZmUxMWQ3YzFjYTdmZjg4MDNmMTcwZTdiOTZmOTlkZjYyZmYxYWJjZWYzZjdhNDA0NTBhMjMyNDA1MDQ0NzViNjE4OGI1ZWIzNDJkZjBmZTAwZDg5YTE1MzAxZDc3M2EwYmU3ZjI4NmQ2MzAwYmZhYjJlNGVkMGNjMDBkNjZjODc5OGJiOWVmYTQ0ZjE5M2FhYzQyNGM0OWIzOWY1Yjk0ZmMyMDUzMDRhNzNlMzJhYzg0NmQ3ZWI4MjNmYjBjOGI5MzQwMTJmZTc1NTFmNjdhOGVjNjk4ZTE5NGM1ZDM4YTQ1MjgzMTU4YmRiMTU5MjRlY2Q2MzEyNTBhMmY0NzBkMTdkYTQyMDk4NTE4ZGEwOTk5MmUwYjMxNzFhMTQzOWRiOWE3MjMwZDE4YmNjMzU1NTU2YmQwYzQ4YzhhMmI5MGRlMjBlNDg5ZWE4ZmNiNGE0YzlhMjU1MDFhOWJmN2QwZGYxN2QyMTc3ODBiOWI3YzI2NWMyODU2YTc2M2ZkZmRhMmE3ZjdkMmM3NDU0YjZkNmRhYjhlYjVhYjE1NmViNjhiMzAyMDMwMTAwMDFhMzgyMDE5YzMwODIwMTk4MzAwYzA2MDM1NTFkMTMwMTAxZmYwNDAyMzAwMDMwMGIwNjAzNTUxZDBmMDQwNDAzMDIwNzgwMzAxNDA2MDM1NTFkMjUwNDBkMzAwYjA2MDkyYTg2NDg4NmY3MmYwMTAxMDczMDgxOGUwNjAzNTUxZDIwMDQ4MTg2MzA4MTgzMzA4MTgwMDYwOTJhODY0ODg2ZjcyZjAxMDIwMzMwNzMzMDcxMDYwODJiMDYwMTA1MDUwNzAyMDIzMDY1MGM2MzU5NmY3NTIwNjE3MjY1MjA2ZTZmNzQyMDcwNjU3MjZkNjk3NDc0NjU2NDIwNzQ2ZjIwNzU3MzY1MjA3NDY4Njk3MzIwNGM2OTYzNjU2ZTczNjUyMDQzNjU3Mjc0Njk2NjY5NjM2MTc0NjUyMDY1Nzg2MzY1NzA3NDIwNjE3MzIwNzA2NTcyNmQ2OTc0NzQ2NTY0MjA2Mjc5MjA3NDY4NjUyMDZjNjk2MzY1NmU3MzY1MjA2MTY3NzI2NTY1NmQ2NTZlNzQyZTMwNWQwNjAzNTUxZDFmMDQ1NjMwNTQzMDUyYTA1MGEwNGU4NjRjNjg3NDc0NzAzYTJmMmY3MDZiNjkyZDYzNzI2YzJlNzM3OTZkNjE3NTc0NjgyZTYzNmY2ZDJmNjM2MTVmMzc2MTM1NjMzMzYxMzA2MzM3MzMzMTMxMzczNDMwMzY2MTY0NjQzMTM5MzMzMTMyNjI2MzMxNjI2MzMyMzM2NjJmNGM2MTc0NjU3Mzc0NDM1MjRjMmU2MzcyNmMzMDM3MDYwODJiMDYwMTA1MDUwNzAxMDEwNDJiMzAyOTMwMjcwNjA4MmIwNjAxMDUwNTA3MzAwMTg2MWI2ODc0NzQ3MDNhMmYyZjcwNmI2OTJkNmY2MzczNzAyZTczNzk2ZDYxNzU3NDY4MmU2MzZmNmQzMDFmMDYwMzU1MWQyMzA0MTgzMDE2ODAxNDU3Mjk3YTMyNGRjY2ZlZTQzNTRlYzAxZjI0NzNjZTczNTNhYmRmNmEzMDFiMDYwYTJhODY0ODg2ZjcyZjAxMDEwNzAxMDQwZDMwMGIwMjAxMDEwMzAzMDRmZmYwMGEwMTAzMzAwZDA2MDkyYTg2NDg4NmY3MGQwMTAxMGIwNTAwMDM4MjAyMDEwMDIyYTZlMDRiYTJmMzliZjg3YmYwMmQ3YTdmYjdiOWU5YmM3Y2IyNTYxMWQ3YTY5NGEzOGI0NDA3YmFmYTljYmRkZjg5YTA5MTA3ZDkwNTY0NzJiZDU0Y2NhNDFhNjI2ZDkzYmFhYTg5NTY5MGU2ZDZjYTUzYjY4MjhiZDljMjdkMjA3ZmYxY2E1YjNkYWE2MjllZGI0YjJiZTQyYzY0MjIwMGY1NjNhNDBmY2VlMmJjZmRhMDBmMjBlNDRhMGI0YWI0OWFjOTIyN2IxYWVkODU2MzA1OTA4NjM5M2QyM2MzNzdlZmI5OTY1NTI4ZTE0ZWY5ZDkwMDdlOWE3MDJiOTdkYzYzMTYwZDQwY2VhODgzYTNkYjJhNGIxNTBjZDA1NDZhNzczNTI5NmNhZjRmYzk1YjA5MWNkMWI3YzQ4NzZkYmM2ZTg5ODkzNmNmOThhYTIxMmFhZmViYTRhZGY1NWI4MTQwMzBmMDFlMTE3ZDk0OGU5NzViNWJiOTNiOGM1ZjY0NzkwOWVlMTcxNDdhMTljMjAwMmNlZWJmZmQ2NTIzYzQ3ZGM0YjQxMDgxOTVlYzRmMDYxMmMyYmE5YmFlODVmMTY4MTFlNThlNTA4NjljMTJjMmFlZGVjNGMyODQ1MTNlNDc2ZGUyY2YyODBhZWNhNDEyYzA4NWY0NmE1ODI1Yzk5ZTdmN2NiZTUxNGFlOGE5NzRhMWM0OGUyOTY3MDczMmZhNzFjMzhjZTNmYmU5NjE5NGY2Yzc3YzAwNjM5MWU0Yjc5ZjQ1ZjgxN2Y4ZDlkNGRkMDJlNmYyMjhlNTMzOTFjOWZlZDcyMmIyYWFlMjQwYWMyMzBiMjViODRjMjQ1MjI2Yzc1NmJhOWU2YWFiMmVkNDFmM2U3YjU3YTllYjE0ZTI1NjgzYTQxODI0OGI0ZDk2ZDVkZjQ1MjE2MmE4NjU1NDBmMmZiYTA1ZjY5ZWU2NDY3MzM2NWJkNGRiMDFmNThkYWQ5MTM4OTc3ODM3MzkzYWM1ZmFlMWVjM2MwMjY5NjE1NzVlZGUyODRjZTBmYWE2OGRmZWU4ZTUwYWRlZDNkN2UyYWU4MGVkNzAxNDc4ZDdlZThlNmI4MmIyZGYxNDI0NmQyZDgzNGNhZDYzNjY4ZDAzM2MxNGNkM2QzNzljZGMwYWY4ODE1MTI3OWIxOGEzZDYxZDk2ZGM1ZWIyNDY2YmM4YmNmYWU2Mzk4ZGMwZTY3NzE1NThjOGRlMmI0MzBjOTAzYWVjYjdhMmQ2ODIzNDNhOWJkYTlmODNkMTA3MGMzYWJiMDkyNzQ1NTJkY2E4NzI3M2UxNTQ3NGJlMjRkMTY3YjM3MzhiYTBmZDg2MTdlMmI5MmUzYWIzNjQzMDgyMDZhMTMwODIwNDg5YTAwMzAyMDEwMjAyMTAwY2E4YjY1NDdiODllNmQyMDY4OTc1Y2Q4YjliODllMjMwMGQwNjA5MmE4NjQ4ODZmNzBkMDEwMTBiMDUwMDMwNmMzMTBiMzAwOTA2MDM1NTA0MDYxMzAyNTU1MzMxMjMzMDIxMDYwMzU1MDQwYTEzMWE0MTY0NmY2MjY1MjA1Mzc5NzM3NDY1NmQ3MzIwNDk2ZTYzNmY3MjcwNmY3MjYxNzQ2NTY0MzExZDMwMWIwNjAzNTUwNDBiMTMxNDQxNjQ2ZjYyNjUyMDU0NzI3NTczNzQyMDUzNjU3Mjc2Njk2MzY1NzMzMTE5MzAxNzA2MDM1NTA0MDMxMzEwNDE2NDZmNjI2NTIwNTI2ZjZmNzQyMDQzNDEyMDQ3MzIzMDFlMTcwZDMxMzYzMTMxMzIzOTMwMzAzMDMwMzAzMDVhMTcwZDM0MzEzMTMxMzIzODMyMzMzNTM5MzUzOTVhMzA3NTMxMGIzMDA5MDYwMzU1MDQwNjEzMDI1NTUzMzEyMzMwMjEwNjAzNTUwNDBhMTMxYTQxNjQ2ZjYyNjUyMDUzNzk3Mzc0NjU2ZDczMjA0OTZlNjM2ZjcyNzA2ZjcyNjE3NDY1NjQzMTFkMzAxYjA2MDM1NTA0MGIxMzE0NDE2NDZmNjI2NTIwNTQ3Mjc1NzM3NDIwNTM2NTcyNzY2OTYzNjU3MzMxMjIzMDIwMDYwMzU1MDQwMzEzMTk0MTY0NmY2MjY1MjA1MDcyNmY2NDc1NjM3NDIwNTM2NTcyNzY2OTYzNjU3MzIwNDczMzMwODIwMjIyMzAwZDA2MDkyYTg2NDg4NmY3MGQwMTAxMDEwNTAwMDM4MjAyMGYwMDMwODIwMjBhMDI4MjAyMDEwMGI3MWYyZWJkYmQwOWIzNWM0ODZjZmUwYzgzYWU2YzAxZWE1MTc4MjVhNDgwM2U4OWE3YjFiMjg4NjRkYWY2ODk3NjgxZjlmOTFkZjM5NWZjNzg5ODhkOTg4ZWNmZTRlZTFjNTUzZTBkNzM1YTc3Y2ViMTEyYTgxNTc4NjU0Yzk2ZjIwNzE5ZWZjNDFkYzI4MWM2ZjEwMzVkZDk1MzVjMWU3MzIwNDkxZjk3NGZkMjFhN2VjOWVhZjRkN2YwYzM3MjZkZjRhMmY3OTc5MDBkNDM5OWY1ZjhjMjZhYWY4ZjA0NThkMmU1OTdkZTM2NmNlMmZmMjQ3ZTMyYzAzNDhjYTJhODU5YWFkMjQ0MjE0NTE0MWE1NDE1MDU5ZjAyMDJmMjVjZWNiMTNhNzVkMDM5MGI5ZDhmMTM2M2U5NmJiNDVmNDIwMWQ3N2Y4ODFmNWQ1NjcwYTcxNjExNjVjY2UyM2UyMzg3YTg0YmNiNmY0Mjc3NzEyODU0NmRlOGM1YzU1ZTljYzE3ZjEwYzgwM2RhZDVlM2M3ODM1NDZkMzM0MWQ3ZjgzZGY4YzQ3YTM3MGU0Yzg2OWU2NGZlMGRkYWI0ZDEzMTAzMTg2ZGJhMDBiZTRmNzQ4MzRhMTQ4NDI1ZmIzNmFhZThhMjQ1NDFlZDVmNzQ2MTM5YzJiNWIzNTM4OTgxM2U2Y2RhY2Y3MTFiMmU3ZmJiMTU2OTcwMDIxYTJiNjJhMjBjOTVkNmRmMWM0ZGYyNzVjZjlhNGQ0ZDQ5NWJiZjliMWI1ZjZhOWFmODRlZjQ4OTZlMWFkNGVkNDAzN2FhMTQxOGY2N2UwZTlmNmIxYjFmNTVmNTRmMGZiYjJkMzdhNGYwYTA4MGU1OTBlMDg0ZTExMTNlMjIyOWZjOWI3Y2Y3N2FhOGJmNTZjNGU2YjI2NDZhMDcxNTgzNDVhYThlMWYzZDM2MTA5YTA0MGYxNWM5MWI3N2EyZjk0NmM4MjI5ZDM1NWQ5NDJmNzZlN2U2Zjc0NWIxMzkzYmFhYTlhOWY2NjZhNGNmNWZkMmI5NTVkOGM0ODdmYTJmYWZiYzQ1NzM5YWI1NzU5YTNlNDlhZTcyZTJjNGQ1MzNjZTc4ZmVkMmQ0ZGU0OTRlODE0MmIzY2QyNWQ4M2Q4NGI3MWExMDVjNjA5MWUzYzJiZjcxMzUxMWU3MzU3ZjdkMGZhMTc0ODNiM2EyOGQyNzE2N2VmYjYzYzYxZDc3NjkzYmZmMWY0MTEzYmYyOTlhODc4YzlmMGU5NTVkODdkNzBhZTU4NDgyM2VhOWVlM2E1YjJlOGM1MDMyODU4YzA5NWNlNTgzYmQ5NjU0ZDg0OTE2NTRiMGUxYTBmYzdkY2U5ZWNkZTEwMjAzMDEwMDAxYTM4MjAxMzQzMDgyMDEzMDMwMTIwNjAzNTUxZDEzMDEwMWZmMDQwODMwMDYwMTAxZmYwMjAxMDAzMDM1MDYwMzU1MWQxZjA0MmUzMDJjMzAyYWEwMjhhMDI2ODYyNDY4NzQ3NDcwM2EyZjJmNjM3MjZjMmU2MTY0NmY2MjY1MmU2MzZmNmQyZjYxNjQ2ZjYyNjU3MjZmNmY3NDY3MzIyZTYzNzI2YzMwMGUwNjAzNTUxZDBmMDEwMWZmMDQwNDAzMDIwMTA2MzAxNDA2MDM1NTFkMjUwNDBkMzAwYjA2MDkyYTg2NDg4NmY3MmYwMTAxMDczMDU3MDYwMzU1MWQyMDA0NTAzMDRlMzA0YzA2MDkyYTg2NDg4NmY3MmYwMTAyMDMzMDNmMzAzZDA2MDgyYjA2MDEwNTA1MDcwMjAxMTYzMTY4NzQ3NDcwNzMzYTJmMmY3Nzc3NzcyZTYxNjQ2ZjYyNjUyZTYzNmY2ZDJmNmQ2OTczNjMyZjcwNmI2OTJmNzA3MjZmNjQ1ZjczNzY2MzY1NWY2MzcwNzMyZTY4NzQ2ZDZjMzAyNDA2MDM1NTFkMTEwNDFkMzAxYmE0MTkzMDE3MzExNTMwMTMwNjAzNTUwNDAzMTMwYzUzNTk0ZDQzMmQzNDMwMzkzNjJkMzMzMzMwMWQwNjAzNTUxZDBlMDQxNjA0MTQ1NzI5N2EzMjRkY2NmZWU0MzU0ZWMwMWYyNDczY2U3MzUzYWJkZjZhMzAxZjA2MDM1NTFkMjMwNDE4MzAxNjgwMTRhNjFjZTE2ZDU0MjQ0Y2E4OGY0ODcyYmY2ZWE5OGNkNWU0ZWMzMWQ0MzAwZDA2MDkyYTg2NDg4NmY3MGQwMTAxMGIwNTAwMDM4MjAyMDEwMDcxY2VlNTA3OGNhNmRjMmRkY2M4ZTAzYjY1NWUwMDkyODE5NWViOTUyMDI0YWY5ZjY5Mzg1ZGM5N2NmMWI4ZGFhNTRkMDA2NTNiMjVjMTE4NWM5ZWJlNTliN2RjMWIwNjNiNTk4MzI1ZmEzM2JiMjJmMjRmNmZiYjIxNWM1NjE2ZjViOWM5ODMxNWZiOTRiNTM1ZTBhMTMxNzIxOTljMmNkNjM1NzllZTg4ODQxMjc2NjNjM2YzNjRjNDU0MjkyNzc5MGE0NTExM2UwZDBmMDRiMWEzY2ZmMjkxZmMzYTFmMWYxZjg2ZTJiM2QzMDhlMThlNDU4YzVlNjJiNzc0ZDY1NzIyZTYxNTcxYmNhNzFjYmM4OTNiMzAzZWJkNjUzN2IwN2Q5M2QyMzNlZDE2OWVjNTM3N2Y0NjY2NzdiODYwNmQxYTU0Yzk2NzFlMWI0Nzg3MTY5NzU0MjhhZmQ5MTU2ODQ3OGMzNTQyZGJjYTFkMGE3MzdjZjM5YjQ3OWRjMjk3YmUyMjJkMmI0NjU0NTI4ZmMwMjJkODQ1MmE1ODQ0NWVjOWVhZjU1MmZkN2M1NmUwYmNlZjM3NjZmYTU0NDI4ZTcyZjI2NjM3NzJlMWE3MTE1MTk3NzYxOGNkNmY5ZGMyN2MyZDZlZTFkNmU5NjI2NTlhMzdkZjZjYjliNTMzMTJjNTFhNTFiZGU1YTBiM2RmNTVmY2MzM2E5ODM2Y2JkYmY3ZWU0MDVkY2JmYzJlNWViZGI0YjVlNjNiNTNhZGIxOGZmN2MwODJjZDUwNGE3ODU0YjY1MzEzN2MyYTliNzlmYzg0YzljMjk1OThhMjJiMjY0MjRiYjJmODEzNDk4Mjk1YmM3ZTA1MTQ4YzFmNzc5NWEzYThlMGJkZWUzNWZkZjJiNzE1MDMzODQwMjM0ODkyOTFhY2VjNThlMzJmMmZhOWI0MmY4OWNiMjVhYTcxZmJjZTQ2YjE1NWZjNjNhMDA3OTg0M2Y4NmU2MDg0OTcwOGE1ZThhMDBmZjk0N2IwMjQ1OGIwZTZiOWIwNTc2YTQ0NDg3MDIxNjJlNjQ5NmI0ZGMxZjJkOTc0OWRkZDkwMjczYmM5MWE2NmRlMDZhNWVhYTQ1ZjRlNDYyOWM1MzM3MWM0YWNhZjI5YjkxYTI0M2EzMTQ3ZGJlZDVhYjBiNzg4ZGFkMDc3ZDU2ZmM0MmRkMzVlZGJiM2EwNzZlYWJhNjdhYTgxYzAyYTc5ZjU4NWY2ZWVhYzlkMGUxMGY0NTkxN2NkZWI4OTAyYjM2ZTRhZjNjODg2MDA2MzU2ZDgyMDFmNGMzNGJlNmZlNTk4MjQxODg4MmZkOGQ3NjE5ZTBiMTdlMDYyNTJmN2RkYmIzMDgyMDVhNDMwODIwMzhjYTAwMzAyMDEwMjAyMTA1ZGYxMmY1ZjU3YTdjM2UxYjAwMmQ4OTMyNzBjZGRlMTMwMGQwNjA5MmE4NjQ4ODZmNzBkMDEwMTBiMDUwMDMwNmMzMTBiMzAwOTA2MDM1NTA0MDYxMzAyNTU1MzMxMjMzMDIxMDYwMzU1MDQwYTEzMWE0MTY0NmY2MjY1MjA1Mzc5NzM3NDY1NmQ3MzIwNDk2ZTYzNmY3MjcwNmY3MjYxNzQ2NTY0MzExZDMwMWIwNjAzNTUwNDBiMTMxNDQxNjQ2ZjYyNjUyMDU0NzI3NTczNzQyMDUzNjU3Mjc2Njk2MzY1NzMzMTE5MzAxNzA2MDM1NTA0MDMxMzEwNDE2NDZmNjI2NTIwNTI2ZjZmNzQyMDQzNDEyMDQ3MzIzMDFlMTcwZDMxMzYzMTMxMzIzOTMwMzAzMDMwMzAzMDVhMTcwZDM0MzYzMTMxMzIzODMyMzMzNTM5MzUzOTVhMzA2YzMxMGIzMDA5MDYwMzU1MDQwNjEzMDI1NTUzMzEyMzMwMjEwNjAzNTUwNDBhMTMxYTQxNjQ2ZjYyNjUyMDUzNzk3Mzc0NjU2ZDczMjA0OTZlNjM2ZjcyNzA2ZjcyNjE3NDY1NjQzMTFkMzAxYjA2MDM1NTA0MGIxMzE0NDE2NDZmNjI2NTIwNTQ3Mjc1NzM3NDIwNTM2NTcyNzY2OTYzNjU3MzMxMTkzMDE3MDYwMzU1MDQwMzEzMTA0MTY0NmY2MjY1MjA1MjZmNmY3NDIwNDM0MTIwNDczMjMwODIwMjIyMzAwZDA2MDkyYTg2NDg4NmY3MGQwMTAxMDEwNTAwMDM4MjAyMGYwMDMwODIwMjBhMDI4MjAyMDEwMGI2ZGE3MjYyOWJlZTgzN2IzMmEyNDZlMzhhMjMzMjk3NTdhYzJkNzM3NDUxY2IwNmZmN2IzMmU2OTcwY2FjYzhlN2Q5MjA2NzQ4NGFmNzRkMjU4MTRmMjI1ZDZmNjlkYTJjMTg0MmNmYzU2YzlkM2U3MTM0NzE1MjUyYTFiNjFhNWI5ZDE0Y2RiYjhkOTFlNGIxODhmOTcwMGY2ZDBjZTdjNmE3ZWJmMzY0OWM0ZjVkNDFjMDVmZTYxNzg4NDA0Y2ViMDNjYjk1ZWZiMmE1ZTY4ZTM4YmQxYzIzNzk1N2MzMjI3MTA0Yzk3MTBlYjMyYmQ1YmQ1MzlkYTZlZTUyZWRkZWYyYjU0ZmY3OTAyODUyZmQ1MDE3N2UyNGRkMzdkODBhMTIxYjEzOGJhMzE0MzllNmE5NDlhN2M2ZDU0YzE2YzE1ZjZkYjQ2NzBhZTcxYTk5NzY0MzlmNDVlY2NjMWNmNGE0MTI1MDZmZmE5MDlmZTY2YWE4YmI5NzkxM2ZmZGU1MjA4ZmUwOGZmOTYzYmNkOWM1Yjk1ZDA5OGNhNzk2OTI2N2E4NjBkNWQ1YjY3NDEyYzM3NWQxMTk3YmJmZjM5NzhkZGU1YTlmOTJmMDM0NDFjYjM0Mjg3YzNiN2VjODAyYTRhN2IzMDkyYjk1NWQ4NjFlMTE5Y2MxOWQwMjQ5MjBkNmNlZGVkYThiMzExYjRmNzQ4NDg3ZWFjMTVlMjkxMzk5YmI0MTNlMjI5MGQyNjZjNzFhMmJiZDkzNDQ0ZGYzYmUxNzEwODlhM2JkYTJlZjIzMzI5OTk1ODc5OGE1Y2U2ZWY5NmUzZWYwNzJjZWE1NjliODUzZTU3NzJjMGFiZDk4MDcyMmQ3YmJkZjQ0ZDlkODk2NmQ5YzBhZDdlYjdmM2YwMGY4YzMyODdkZTEyNTEyNGQ5ZjFmMGExZjZmZDY1OGQ0ZGU5MzYyMThmMmZiYjIzMGNhYzViYTQyOGNjYzM4YTA5NmE3Y2JkOTAxYjNjOTZhNGU2Y2M0ZGFjZTFiY2ZmZDlkOGMzMjNiNTY1NmQzMjg2NWUxOWM3OTQ0ZGY0YWFlYjgxY2RjMzMxNjQ2NjhjZjdhY2UzZDhiYjU2NThjMzhmNzczYzQ4ZWE2OThlNWZjNDgzMmQwNWRmZTRiZjY5Yjk1OTIxNTQ1MzAwNDBkOWUyNTYyYTRjNzRiYmY3MTlmNzU2NDA3ZjE0YjBiODY2ZGFhNjUwZWZhZmQzNzMyMDk1ZDE3NmQ4OTk0NDAyMzg3ZTliNDUzOTVjZDIzNmYwOTBmNDJjY2FlZDA0MTFhZGI2Y2I3NDU4ZWMzMGZkZDVjNTI3ZWMyMDk3MmI3MGMwMTM0ODMyZTZlODEwMjAzMDEwMDAxYTM0MjMwNDAzMDBlMDYwMzU1MWQwZjAxMDFmZjA0MDQwMzAyMDEwNjMwMGYwNjAzNTUxZDEzMDEwMWZmMDQwNTMwMDMwMTAxZmYzMDFkMDYwMzU1MWQwZTA0MTYwNDE0YTYxY2UxNmQ1NDI0NGNhODhmNDg3MmJmNmVhOThjZDVlNGVjMzFkNDMwMGQwNjA5MmE4NjQ4ODZmNzBkMDEwMTBiMDUwMDAzODIwMjAxMDA5NWZhNzU2M2JmNmEyNjEzMzY5NzQ0MjBhNWE1ZTI3OWUxMDFlZjA4MTQ0NGQ5NDA0MTEzZDAzYTNjMzZlMGQ5NjY5Y2NlMGFhYWVjZjFmNGI0OTVhMGZkNDQzZTU0ZjFmYjc5MmVkMWQxOWM0ZDg4NTk4ODFiMGI0ZGUzOTM4Y2M0Zjg4ZjdlYTNlNjMyOTM1OWY1YWViODZjMTA2ZTg2YjBiNTI3ZWQ2ZTY1YmIwNmNjYjljN2M2NDQ1M2I4M2JkMmRhMTk0NzYxZDU5NTc2ZGE0NzhlODI4NjI5Yzc5NGRiYmJmNDg1YzFiNTY2NmM2ZGQxYmVmZGJiNjMxYWI1NjBlOWM0MDBiMzc1M2YxODAxNmNhMGJlMDZkNGM5MmE1N2FiMjEwZWYxZDAzNjM5NzMxMDE2ZTQ0YjQyMWQ3MmZiN2UyNzdiMmE5ZmYzYTYyNTRmMmQwMmFjY2RjN2I3YjY0NGI1MDhkOTkxZjgwZDNkNTA4ZDU2OWQ4MjI5Mzk1MTUzM2QwMDA3OTM0YjU4MTNiMDhhNzc5YzIwYTI3NzY2ODVkMGNhNWUyMTlhNzViYjZlNDRmMzI0MTFjNDE2MWU1NDVhMjNkNTk2MmRjNzA2MWY3MzNkZDdlODBlYmM4MDg2ZmE2NDE3OTFjY2ZhYmVjMmRmMWIxMjk0YmM4NzhlY2VlYTEyNzlhNzIzNDE2ZGRhODEwZGVlOTI1NWRjMzNlZDk1MmQ4YzYwNDQyNGNlNjg3M2FmMjNmOTAzNTI4Njc5MWVkYjdmZGRiODg3OGFkMjNhMjljMjljODI3ODRiNDU3MjRjOGQ4YzBhMGI2MmNhYzYxYjdmOGM0MTAxOTUwZWE4MTg2N2Y1YmMzYjBkMDA0MzNmZDliNzQ0NWY3MmE0MjY3YzI3NWJjNTY2ZDNiYWM0N2M5Njk2NWZmMmI3OWEzZDRkOTdlNWE3Njk2MDNhNThmMTZmYWI1NGQ1MGI3MmM5M2Y0YTNmODE2N2M2Mjk3MmIzMjRmNzQwNWI1ZGZkOGFlZGI2ZjM0MzBkOGUwZWRjYzdhNjEyZmE0OTA5MmRkYzk2YmFhMGEyZGE1OTFiZDA0ZWM2OGFlY2FmMzBmOTY0YTI5NWYwYWRiNzhiYjgwMDBjNDFjYjE5NzA5YWRmY2ExZGUzMWYxZDliMjRiNzJmZWIxY2JjYTRlZTRjMjBiNTFjZDc3NmZhNDBlZWFiOTg5MDZjOGI1YWQ0ZWQ2NjgwNzkyNzU2ZmIzOTg1MmI2OGMwZWVhODZkNmNkZmQ4Y2M3MjExZTM3NWFkNDZhOGVjMmMwNTZjNDNhODJlMDdhYWQ3NThlZDMyYjZhMWY2NGJiZWE0YzdiZDNlMDAwMDMxODIwMjRkMzA4MjAyNDkwMjAxMDEzMDgxODkzMDc1MzEwYjMwMDkwNjAzNTUwNDA2MTMwMjU1NTMzMTIzMzAyMTA2MDM1NTA0MGExMzFhNDE2NDZmNjI2NTIwNTM3OTczNzQ2NTZkNzMyMDQ5NmU2MzZmNzI3MDZmNzI2MTc0NjU2NDMxMWQzMDFiMDYwMzU1MDQwYjEzMTQ0MTY0NmY2MjY1MjA1NDcyNzU3Mzc0MjA1MzY1NzI3NjY5NjM2NTczMzEyMjMwMjAwNjAzNTUwNDAzMTMxOTQxNjQ2ZjYyNjUyMDUwNzI2ZjY0NzU2Mzc0MjA1MzY1NzI3NjY5NjM2NTczMjA0NzMzMDIxMDA5MDEzNTdhNDZjMzBkMTdiMmY3ZDY0YjQ1M2MwODE4MzAwOTA2MDUyYjBlMDMwMjFhMDUwMGEwODE5OTMwMGYwNjA5MmE4NjQ4ODZmNzBkMDEwMTA1MzEwMjA1MDAzMDE4MDYwOTJhODY0ODg2ZjcwZDAxMDkwMzMxMGIwNjA5MmE4NjQ4ODZmNzBkMDEwNzAxMzAxYzA2MDkyYTg2NDg4NmY3MGQwMTA5MDUzMTBmMTcwZDMyMzUzMDMxMzEzMzMxMzgzMzMyMzUzMjVhMzAyMzA2MDkyYTg2NDg4NmY3MGQwMTA5MDQzMTE2MDQxNGI1NTZjMDIyZWNlMjk4ZmYwMDUwOWM0MjM1MDM1NDFkZTNiNGRkMTgzMDI5MDYwOTJhODY0ODg2ZjcwZDAxMDkzNDMxMWMzMDFhMzAwOTA2MDUyYjBlMDMwMjFhMDUwMGExMGQwNjA5MmE4NjQ4ODZmNzBkMDEwMTAxMDUwMDMwMGQwNjA5MmE4NjQ4ODZmNzBkMDEwMTAxMDUwMDA0ODIwMTAwMTU4OTU1MWNiNmY3NDgyOGIyOTU2OGYyZGYxZDdlZGFhNjk5YWVlZjU3NmYyMmFkZmFjYTBjMWIwNmI4ODczYjE4MmEzNmI3MjRkM2Y3ZDc5NWU3NGVhNjVlN2ZkYWViYWM1NTgwYTEwZDg2N2YzZWM4NzIzMzU5Zjk0OGNhNTliYmE4ZjIzNGYzOWI4Y2E3ZWY1NTI1NGYzNDc4ZDE1NDE0MjZhMGNmZTc4NjBiN2EzNDViZWYwNWQ4YTkyODc4NmZjOWNjNTljOGRlNjZlMTk5NTEwMTJkODE1Y2M1YTYwNTAxOTk0YTE4ODk1NGZkNmI3YjE0YTkzZmQzYmM1Njc2YTllMjJiZjU5M2JkY2UxM2YxNGIyZDQ4Yzg2Yjc0MmE2MjQ1MDFlYmJkZTQ3YmUwYmI4YjA3MDRiYjg0NDg0MDljODI5NGU5YWE3NDg4NWQwNWE3YWJiNzk0ZjY2NGM1ZmNhMTk5MjljNzA4MjMzNWFmMDBkYWEzYmI4N2MzYTcxNTg0OGFmZjU1NjhiNzU1Nzc3Yjk5NmU0OTM4ZjA3ZWQ2ZWY2ZTA5MmFhM2MxYjUyZWVmM2MxYWJkNTEwMzBlM2EyNTk5NzE1ZmRkNWRiOGVlYWRhYmNhOTY3ZjgwZjlkNWI2YjM1NzJjYjMyZjEyMTM4ODEyM2RiODAwZGYwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwPi9CeXRlUmFuZ2VbMCAxMDk5OTkgMTIyMjY5IDEwMjBdICAgICAgICAgICAgICAgICAgICAgICAvUHJvcF9CdWlsZDw8L0ZpbHRlcjw8L05hbWUvQWRvYmVQREZKYXZhVG9vbGtpdC5QUEtMaXRlL1ByZVJlbGVhc2UgZmFsc2UvUiAwLjA+Pi9BcHA8PC9OYW1lL0Fjcm9iYXQjMjBSZWFkZXIjMjBEQyMyMGV4dGVuc2lvbnMvRGF0ZSgyMDIzLTAyLTIwVDEzOjM5OjQyKzAwMDApL1IgMjAyMzAyMjAxMzAyODYwPj4+Pj4+CmVuZG9iagoxMTAyIDAgb2JqCjw8L0xlbmd0aCAgICAyMDEvVHlwZS9PYmpTdG0vRmlyc3QgNy9OIDEvRmlsdGVyL0ZsYXRlRGVjb2RlPj5zdHJlYW0KeNotjs2qgzAQRl9llnFRorZXsYhgEenirrSL0tJFaiYixEbqUPr4dzq9gfyc85EvSeIshxjKUje10kf0L6aT42WESDcdB214EG+SFQUnnZyRpsH8nnqym0PwFpI4luximjsUn9Ku4qHbCb1dr2mafNRNn9v6qt522fOMIJNCNYSHm8YIculQhPPiDSELuaWsIbMirSxSET4MxmOPxGYr5j0vM5Jh3n3ZWcfwI+DCc2bIBEr9/3zFKv/+qp/G1ptxhbSq4A8BsEw0CmVuZHN0cmVhbQplbmRvYmoKMTEwMyAwIG9iago8PC9MZW5ndGggICAgMzEvVHlwZS9PYmpTdG0vRmlyc3QgNy9OIDEvRmlsdGVyL0ZsYXRlRGVjb2RlPj5zdHJlYW0KeNozNDQwUDBQsLHRDw0yVjA0sLQE8oLs7BQAQF4FBQplbmRzdHJlYW0KZW5kb2JqCjExMDQgMCBvYmoKPDwvTGVuZ3RoICAgIDQzL1R5cGUvWFJlZi9Sb290IDEwNDAgMCBSL0luZm8gMTAzOCAwIFIvSURbPEU3MjQwRDYwNjQzNzM2NDVCNEU0QUMyQUYyREE4OEVFPjxBQTUzMTdGOTNGNjRFQjRDMUNBQzQ5NTg4NkY3NTgyOT5dL1NpemUgMTEwNS9QcmV2IDExNi9JbmRleFsxMDQwIDEgMTA2NyAxIDEwOTkgMiAxMTAyIDNdL1dbMSAzIDFdL0RlY29kZVBhcm1zPDwvQ29sdW1ucyA1L1ByZWRpY3RvciAxMj4+L0ZpbHRlci9GbGF0ZURlY29kZT4+c3RyZWFtCnjaY2JkXLWQgYnxf9RaBqb/jMtzQOzIqSD2LScGJgYGRi0wWc8AAP0TCisKZW5kc3RyZWFtCmVuZG9iagpzdGFydHhyZWYKMTIyOTM4CiUlRU9GCg==";
+
 // server/pdf-render.ts
 var PAGE_W = 612;
 var PAGE_H = 792;
@@ -103691,7 +102570,7 @@ async function renderMarkdownPdf(opts) {
       }
     }
   };
-  let inTitle = true;
+  let inTitle = opts.centerTitleBlock !== false;
   for (const block of blocks) {
     if (block.kind === "heading") {
       const isPart = /^(ARTICLE|RECITALS|SIGNATURES|EXHIBIT|SERIES EXHIBIT|ASSET SCHEDULE)/.test(block.text.trim());
@@ -103711,6 +102590,10 @@ async function renderMarkdownPdf(opts) {
       continue;
     }
     if (block.kind === "para") {
+      if (block.segs.length === 1 && block.segs[0].text.trim() === "[[left]]") {
+        inTitle = false;
+        continue;
+      }
       const centered = inTitle;
       const size = BODY_SIZE;
       const lineH = size + LINE_GAP;
@@ -103777,9 +102660,26 @@ async function renderMarkdownPdf(opts) {
       continue;
     }
   }
+  if (!opts.watermark) {
+    stampPageNumbers(doc, fonts.regular);
+    doc.setTitle(opts.title);
+    doc.setAuthor("MyFloridaSeriesLLC");
+    doc.setProducer("MyFloridaSeriesLLC document engine");
+    doc.setCreationDate(/* @__PURE__ */ new Date());
+    return doc.save();
+  }
   stampFooters(doc, fonts.regular, opts.watermark);
   setMeta(doc, opts.title, opts.watermark);
   return finishWithPermissions(doc);
+}
+function stampPageNumbers(doc, font) {
+  const pages = doc.getPages();
+  pages.forEach((p2, i) => {
+    const { width } = p2.getSize();
+    const pn = `Page ${i + 1} of ${pages.length}`;
+    const w = font.widthOfTextAtSize(pn, 7.5);
+    p2.drawText(pn, { x: width - MARGIN - w, y: FOOTER_Y, size: 7.5, font, color: rgb(0.55, 0.57, 0.6) });
+  });
 }
 function stampFooters(doc, font, wm) {
   const pages = doc.getPages();
@@ -103823,6 +102723,1779 @@ async function stampExistingPdf(opts) {
   stampFooters(doc, font, opts.watermark);
   setMeta(doc, opts.title, opts.watermark);
   return finishWithPermissions(doc);
+}
+
+// server/s-election.ts
+var IRS_MAIL_ADDRESS = "Department of the Treasury, Internal Revenue Service Center, Ogden, UT 84201";
+var IRS_FAX = "855-214-7520";
+var F = "topmostSubform[0].Page1[0]";
+var P2 = "topmostSubform[0].Page2[0]";
+var ROW_FIELDS = [3, 4, 5, 6, 7, 8, 9];
+function fmtDate(iso) {
+  const [y, m2, d2] = iso.split("-").map(Number);
+  return `${String(m2).padStart(2, "0")}/${String(d2).padStart(2, "0")}/${y}`;
+}
+function fmtDateLong(iso) {
+  const [y, m2, d2] = iso.split("-").map(Number);
+  return new Date(Date.UTC(y, m2 - 1, d2)).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    timeZone: "UTC"
+  });
+}
+function fmtEin(ein) {
+  return ein ? `${ein.slice(0, 2)}-${ein.slice(2)}` : "";
+}
+function electionDeadline(startIso) {
+  const [y, m2, d2] = startIso.split("-").map(Number);
+  const dt = new Date(Date.UTC(y, m2 - 1, d2));
+  dt.setUTCMonth(dt.getUTCMonth() + 2);
+  dt.setUTCDate(dt.getUTCDate() + 14);
+  return dt.toISOString().slice(0, 10);
+}
+function splitAddress(addr) {
+  const parts = addr.split(",").map((s) => s.trim()).filter(Boolean);
+  if (parts.length >= 2) {
+    return { street: parts.slice(0, parts.length - 2).join(", ") || parts[0], cityStateZip: parts.slice(-2).join(", ") };
+  }
+  return { street: addr, cityStateZip: "" };
+}
+async function fillForm2553(d2) {
+  const bytes2 = Uint8Array.from(atob(f2553_b64_default), (ch) => ch.charCodeAt(0));
+  const doc = await PDFDocument.load(bytes2, { updateMetadata: false });
+  const form = doc.getForm();
+  const setText = (name, value) => {
+    if (!value) return;
+    const field = form.getTextField(name);
+    field.setText(value);
+  };
+  const addr = splitAddress(d2.principalAddress);
+  setText(`${F}.NameAddress[0].f1_01[0]`, d2.llcName);
+  setText(`${F}.NameAddress[0].f1_02[0]`, addr.street);
+  setText(`${F}.NameAddress[0].f1_03[0]`, addr.cityStateZip);
+  setText(`${F}.f1_04[0]`, fmtEin(d2.ein));
+  setText(`${F}.f1_05[0]`, fmtDate(d2.dateIncorporated));
+  setText(`${F}.f1_06[0]`, "Florida");
+  setText(`${F}.f1_07[0]`, fmtDate(d2.effectiveDate));
+  form.getCheckBox(`${F}.c1_3[0]`).check();
+  setText(`${F}.f1_10[0]`, `${d2.officerName}, ${d2.officerTitle}`);
+  setText(`${F}.f1_11[0]`, d2.phone);
+  setText(`${F}.f1_21[0]`, d2.officerTitle);
+  setText(`${P2}.f2_01[0]`, d2.llcName);
+  setText(`${P2}.f2_02[0]`, fmtEin(d2.ein));
+  d2.shareholders.slice(0, 7).forEach((sh, i) => {
+    const base = i * 7;
+    const fieldNum = (col) => String(ROW_FIELDS[col] + base).padStart(2, "0");
+    const row = `${P2}.Table_Part1[0].Row${i + 1}[0]`;
+    setText(`${row}.f2_${fieldNum(0)}[0]`, `${sh.name}
+${sh.address}`);
+    setText(`${row}.f2_${fieldNum(3)}[0]`, `${sh.percentage}%`);
+    setText(`${row}.f2_${fieldNum(4)}[0]`, fmtDate(sh.dateAcquired));
+    setText(`${row}.f2_${fieldNum(5)}[0]`, `${sh.ssn.slice(0, 3)}-${sh.ssn.slice(3, 5)}-${sh.ssn.slice(5)}`);
+    setText(`${row}.f2_${fieldNum(6)}[0]`, "12/31");
+  });
+  form.updateFieldAppearances();
+  form.flatten();
+  return doc;
+}
+function instructionsMarkdown(d2, deadlineIso) {
+  const einLine = d2.ein ? `The form is completed with your EIN, **${fmtEin(d2.ein)}**.` : `**Your EIN was not yet available when this package was prepared.** Write it in item A on page 1 (and the box at the top of page 2) before filing \u2014 the IRS will not process the form without it.`;
+  return `# S CORPORATION ELECTION PACKAGE
+
+**${d2.llcName}**
+
+*Prepared by MyFloridaSeriesLLC \u2014 please read this page before signing anything.*
+
+## WHAT IS IN THIS PACKAGE
+
+1. This instruction sheet \u2014 keep it.
+2. A cover letter to the IRS \u2014 mail it with the form.
+3. **IRS Form 2553, completed and ready to sign** \u2014 the election by ${d2.llcName} to be taxed as an S corporation effective ${fmtDateLong(d2.effectiveDate)}.
+
+${einLine}
+
+## STEP 1 \u2014 CHECK THE FORM
+
+Review every entry, especially the company name and address, the EIN, the effective date in item E, and each owner's name, ownership percentage, and Social Security number on page 2. If anything is wrong, contact us before filing.
+
+## STEP 2 \u2014 SIGN
+
+- **Officer signature (page 1, bottom):** ${d2.officerName}, ${d2.officerTitle}, signs and dates the "Sign Here" line. The title is already filled in.
+- **Every owner signs page 2:** each shareholder listed in column J must sign and date column K. For an interest held jointly by spouses, **both spouses sign** \u2014 each spouse counts as a shareholder who must consent.
+
+An election without every required signature is invalid. Do not leave any consent line blank.
+
+## STEP 3 \u2014 FILE IT (DEADLINE: ${fmtDateLong(deadlineIso).toUpperCase()})
+
+The IRS must receive Form 2553 **no later than 2 months and 15 days after the start of the company's first tax year** \u2014 for your company, that is **${fmtDateLong(deadlineIso)}**. File as soon as the form is signed; do not wait for the deadline.
+
+Choose ONE of the following. There is no IRS filing fee.
+
+- **Fax (recommended):** ${IRS_FAX}. Keep the fax transmission confirmation with your records \u2014 it is your proof of filing.
+- **Mail:** ${IRS_MAIL_ADDRESS}. Send it by **certified mail, return receipt requested**, and keep the receipt \u2014 a timely postmark by U.S. mail counts as timely filing.
+
+Keep a complete copy of the signed form for the company's records.
+
+## STEP 4 \u2014 WATCH FOR THE IRS RESPONSE
+
+The IRS normally mails an acceptance letter (Notice CP261) within about 60 days. Keep it with your permanent records \u2014 banks and accountants will ask for it. If you have heard nothing after 90 days, call the IRS Business line at 800-829-4933.
+
+## IMPORTANT REMINDERS
+
+- If this package was prepared close to the deadline above, **file it immediately** \u2014 a late election requires a separate IRS relief procedure that is not part of this service.
+- The S election changes how the company files and pays federal tax (Form 1120-S, owner payroll, quarterly filings). Work with a tax professional on what comes next.
+- This package is document preparation based on the information you provided. It is not legal or tax advice.
+`;
+}
+function coverLetterMarkdown(d2) {
+  const addr = splitAddress(d2.principalAddress);
+  return `# ${d2.llcName.toUpperCase()}
+
+${addr.street}
+
+${addr.cityStateZip}
+
+[[left]]
+
+Date: _______________________
+
+Department of the Treasury
+Internal Revenue Service Center
+Ogden, UT 84201
+
+**Re: ${d2.llcName}${d2.ein ? ` \u2014 EIN ${fmtEin(d2.ein)}` : ""} \u2014 Form 2553, Election by a Small Business Corporation**
+
+To whom it may concern:
+
+Enclosed for filing is Form 2553, electing S corporation status for ${d2.llcName}, a Florida limited liability company, effective for the tax year beginning ${fmtDateLong(d2.effectiveDate)}. The form has been signed by an officer of the company, and every shareholder has signed the consent statement in Part I.
+
+Please direct any questions regarding this election to ${d2.officerName}, ${d2.officerTitle}${d2.phone ? `, at ${d2.phone}` : ""}.
+
+Respectfully,
+
+_____________________________
+${d2.officerName}, ${d2.officerTitle}
+${d2.llcName}
+`;
+}
+async function buildSElectionPackage(d2) {
+  const deadline = electionDeadline(d2.effectiveDate);
+  const title = `S Corporation Election Package \u2014 ${d2.llcName}`;
+  const instructions = await renderMarkdownPdf({
+    markdown: instructionsMarkdown(d2, deadline),
+    watermark: null,
+    title
+  });
+  const letter = await renderMarkdownPdf({
+    markdown: coverLetterMarkdown(d2),
+    watermark: null,
+    title: `Cover Letter \u2014 ${d2.llcName}`
+    // centered letterhead (name + two address lines); the [[left]] sentinel
+    // in the markdown then switches the body to flush left
+  });
+  const filled = await fillForm2553(d2);
+  const out = await PDFDocument.create();
+  for (const part of [await PDFDocument.load(instructions), await PDFDocument.load(letter), filled]) {
+    for (const p2 of await out.copyPages(part, part.getPageIndices())) out.addPage(p2);
+  }
+  out.setTitle(`S Corporation Election Package \u2014 ${d2.llcName}`);
+  out.setAuthor("MyFloridaSeriesLLC");
+  out.setProducer("MyFloridaSeriesLLC document engine");
+  return out.save();
+}
+
+// server/square.ts
+import { randomBytes as randomBytes2 } from "node:crypto";
+
+// server/crypto.ts
+import {
+  randomBytes,
+  scrypt as scryptCb,
+  timingSafeEqual,
+  createHash,
+  createHmac,
+  createCipheriv,
+  createDecipheriv,
+  hkdfSync
+} from "node:crypto";
+function scrypt(password, salt) {
+  return new Promise(
+    (resolve, reject) => scryptCb(password, salt, 64, (err3, key) => err3 ? reject(err3) : resolve(key))
+  );
+}
+async function hashPassword(password) {
+  const salt = randomBytes(16);
+  const key = await scrypt(password, salt);
+  return `s1:${salt.toString("hex")}:${key.toString("hex")}`;
+}
+async function verifyPassword(password, stored) {
+  const [v2, saltHex, keyHex] = stored.split(":");
+  if (v2 !== "s1" || !saltHex || !keyHex) return false;
+  const key = await scrypt(password, Buffer.from(saltHex, "hex"));
+  const expected = Buffer.from(keyHex, "hex");
+  return key.length === expected.length && timingSafeEqual(key, expected);
+}
+function newToken() {
+  const token = randomBytes(32).toString("base64url");
+  return { token, tokenHash: hashToken(token) };
+}
+function hashToken(token) {
+  return createHash("sha256").update(token).digest("hex");
+}
+function hmacSha256Base64(key, message) {
+  return createHmac("sha256", key).update(message).digest("base64");
+}
+function secretKey() {
+  return Buffer.from(hkdfSync("sha256", env.SESSION_SECRET, "fpsllc-ein-v1", "ein-encryption", 32));
+}
+function encryptSecret(plain) {
+  const iv = randomBytes(12);
+  const cipher = createCipheriv("aes-256-gcm", secretKey(), iv);
+  const ct2 = Buffer.concat([cipher.update(plain, "utf8"), cipher.final()]);
+  const tag = cipher.getAuthTag();
+  return `v1:${iv.toString("hex")}:${tag.toString("hex")}:${ct2.toString("hex")}`;
+}
+function decryptSecret(stored) {
+  const [v2, ivHex, tagHex, ctHex] = stored.split(":");
+  if (v2 !== "v1" || !ivHex || !tagHex || !ctHex) throw new Error("bad secret format");
+  const decipher = createDecipheriv("aes-256-gcm", secretKey(), Buffer.from(ivHex, "hex"));
+  decipher.setAuthTag(Buffer.from(tagHex, "hex"));
+  return Buffer.concat([decipher.update(Buffer.from(ctHex, "hex")), decipher.final()]).toString("utf8");
+}
+
+// server/square.ts
+var API_BASE = env.SQUARE_ENV === "production" ? "https://connect.squareup.com" : "https://connect.squareupsandbox.com";
+async function createCheckout(opts) {
+  const redirectUrl = opts.redirectUrl ?? `${env.PUBLIC_BASE_URL}/order/confirmed?ref=${opts.orderId}`;
+  if (!env.SQUARE_ACCESS_TOKEN) {
+    return {
+      url: `${redirectUrl}&dev=1`,
+      squareOrderId: `dev-${opts.orderId}`
+    };
+  }
+  const request = (withPrefill) => fetch(`${API_BASE}/v2/online-checkout/payment-links`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${env.SQUARE_ACCESS_TOKEN}`,
+      "Content-Type": "application/json",
+      "Square-Version": "2025-01-23"
+    },
+    body: JSON.stringify({
+      idempotency_key: randomBytes2(16).toString("hex"),
+      order: {
+        location_id: env.SQUARE_LOCATION_ID,
+        reference_id: opts.orderId,
+        line_items: opts.priced.lineItems.map((li) => ({
+          name: li.name,
+          quantity: "1",
+          base_price_money: { amount: li.amountCents, currency: "USD" }
+        }))
+      },
+      checkout_options: {
+        redirect_url: redirectUrl,
+        merchant_support_email: "support@myfloridaseriesllc.com"
+      },
+      ...withPrefill ? { pre_populated_data: { buyer_email: opts.buyerEmail } } : {},
+      description: opts.description ?? `Florida Protected Series LLC formation \u2014 ${opts.llcName}`
+    })
+  });
+  let res = await request(true);
+  let body = await res.json();
+  if (!res.ok && body.errors?.some((e) => e.field?.includes("buyer_email"))) {
+    res = await request(false);
+    body = await res.json();
+  }
+  if (!res.ok || !body.payment_link) {
+    throw new Error(`Square payment link failed (${res.status}): ${JSON.stringify(body.errors ?? body)}`);
+  }
+  return { url: body.payment_link.url, squareOrderId: body.payment_link.order_id };
+}
+function verifyWebhookSignature(opts) {
+  if (!env.SQUARE_WEBHOOK_SIGNATURE_KEY) return !env.isProd;
+  if (!opts.signatureHeader) return false;
+  const expected = hmacSha256Base64(
+    env.SQUARE_WEBHOOK_SIGNATURE_KEY,
+    opts.notificationUrl + opts.rawBody
+  );
+  return expected === opts.signatureHeader;
+}
+
+// server/oa.ts
+import { readFileSync } from "node:fs";
+
+// server/templates-oa-single.md
+var templates_oa_single_default = `# OPERATING AGREEMENT
+## OF
+## [COMPANY NAME], LLC
+### A FLORIDA PROTECTED SERIES LIMITED LIABILITY COMPANY
+
+**(Manager-Managed \u2014 Single Member)**
+
+---
+
+THIS OPERATING AGREEMENT (this "Agreement") of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the "Company"), is made and entered into effective as of [DATE] (the "Effective Date"), by the undersigned sole member (the "Member") and is acknowledged by the undersigned manager (the "Manager").
+
+### RECITALS
+
+A. The Company was formed as a Florida limited liability company by the filing of Articles of Organization with the Florida Department of State, Division of Corporations (the "Department").
+
+B. The Company is a **protected series limited liability company** within the meaning of ss. 605.2101\u2013605.2802, Florida Statutes, having designated, or intending to designate, one or more protected series by filing one or more Protected Series Designations with the Department.
+
+C. The Member is the sole member of the Company, and intends by this Agreement to set forth the terms governing the Company, each Protected Series designated by the Company, and the relations among the Company, each Protected Series, the Member, and the Manager.
+
+NOW, THEREFORE, the Member adopts the following as the operating agreement of the Company and of each Protected Series:
+
+---
+
+## ARTICLE 1 \u2014 THE COMPANY
+
+**1.1 Definitions.** Capitalized terms have the meanings set forth in Article 2 or in the Section in which they are used.
+
+**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes (the "Act"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101\u2013605.2802 (the "Protected Series Provisions"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.
+
+**1.3 Name; Names of Protected Series.** The name of the Company is **[COMPANY NAME], LLC**. The name of each Protected Series shall comply with s. 605.2202, Florida Statutes: it shall begin with the full name of the Company and shall contain the phrase "protected series" or the abbreviation "P.S." or "PS." The name of each Protected Series shall be as set forth in its filed Protected Series Designation and its Series Exhibit. If the Company changes its name, the Manager shall promptly make all filings required to conform the name of each Protected Series.
+
+**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series except as limited by its Series Exhibit, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
+
+**1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as the Manager may determine. A Protected Series may maintain its own place of business as determined by its Protected Series Manager.
+
+**1.6 Registered Agent and Registered Office.** The registered agent and registered office of the Company shall be as stated in the records of the Department. As required by the Act, the registered agent and registered office of the Company shall also serve as the registered agent and registered office for each Protected Series. Service of process, notice, or demand on a Protected Series may be made as provided by law, including s. 48.062, Florida Statutes.
+
+**1.7 Term.** The Company's existence is perpetual unless the Company is dissolved and wound up in accordance with this Agreement and the Act. No Protected Series may have a duration extending beyond the existence of the Company.
+
+**1.8 Location of Records.** The records of the Company and of each Protected Series \u2014 including the records required by Article 8 \u2014 shall be maintained at the Company's principal office or at such other location (including secure electronic storage) as the Manager determines, and shall at all times be retrievable in perceivable form.
+
+**1.9 Filings.** The Manager shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, and statements of dissolution, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
+
+**1.10 Title to Property.** Title to each Associated Asset of a Protected Series shall be acquired, held, and conveyed **in the name of that Protected Series**. Title to each Associated Asset of the Company shall be acquired, held, and conveyed in the name of the Company. No property of the Company or of any Protected Series shall be held in the individual name of the Member or the Manager. The Member's interest in the Company is personal property for all purposes.
+
+**1.11 Waiver of Partition Rights.** The Member irrevocably waives any right to maintain an action for partition or any similar action with respect to any property of the Company or of any Protected Series.
+
+**1.12 No Payments of Individual Obligations.** The credit and property of the Company and of each Protected Series shall be used solely for the benefit of the Company or the applicable Protected Series, and no such property shall be transferred or encumbered for, or in payment of, any individual obligation of the Member or the Manager.
+
+---
+
+## ARTICLE 2 \u2014 DEFINITIONS
+
+**2.1 "Act"** means the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.
+
+**2.2 "Associated Asset"** means an asset of a Protected Series, or of the Company, that satisfies the recordkeeping requirements of s. 605.2301, Florida Statutes, and Article 8 of this Agreement.
+
+**2.3 "Associated Liability"** means a liability incurred by, contracted for, or otherwise existing with respect to a particular Protected Series or the Company, as reflected in the records maintained under Article 8.
+
+**2.4 "Associated Member"** means, with respect to a Protected Series, a member of the Company associated with that Protected Series under this Agreement and its Series Exhibit. If no member of the Company is associated with a Protected Series, the Company itself is deemed the sole Associated Member of that Protected Series as provided by the Act.
+
+**2.5 "Company"** means [COMPANY NAME], LLC.
+
+**2.6 "Immediate Family Member"** means (a) any ancestor of the Member or descendant of a grandparent of the Member (each an "Individual Family Member," and including persons legally adopted before age 18), or (b) a trust or other entity for the benefit of one or more Individual Family Members, provided all beneficial interests in that entity are held by such persons; a trust is not excluded merely because a remainder beneficiary is not an Individual Family Member.
+
+**2.7 "Manager"** means the person named in Section 5.1 and any successor designated under this Agreement.
+
+**2.8 "Member"** means the person identified as such on Exhibit A and any successor admitted in accordance with this Agreement.
+
+**2.9 "Membership Interest"** means the Member's entire interest in the Company, including the Member's interest in capital, profits, and distributions of the Company and of each Protected Series with which the Member is associated, and all rights of a member under the Act and this Agreement.
+
+**2.10 "Protected Series"** or **"PS"** means a protected series of the Company established under s. 605.2201, Florida Statutes, and identified in a Series Exhibit.
+
+**2.11 "Protected Series Designation"** means a designation of a protected series filed with the Department under s. 605.2201, Florida Statutes, as amended from time to time.
+
+**2.12 "Protected Series Manager"** means the person responsible for management of a Protected Series under Section 5.2.
+
+**2.13 "Series Exhibit"** means, for each Protected Series, the exhibit to this Agreement (each numbered PS-1, PS-2, and so on) setting forth the terms specific to that Protected Series. Each Series Exhibit is a part of this Agreement.
+
+**2.14 "Transfer"** means any assignment, transfer, conveyance, devise, gift, pledge, hypothecation, encumbrance, or other disposition, direct or indirect, voluntary or involuntary, in trust or otherwise, and as a verb has a corresponding meaning.
+
+---
+
+## ARTICLE 3 \u2014 PROTECTED SERIES
+
+**3.1 Establishment.** With the affirmative vote or consent of all members of the Company (which, while the Member is the sole member, means the consent of the Member), the Company may establish one or more Protected Series by causing a Protected Series Designation to be signed and filed with the Department as provided in s. 605.2201, Florida Statutes. At or before the filing of each Protected Series Designation, the Member and the Manager shall adopt a Series Exhibit for the new Protected Series. The Manager is authorized to execute and file each Protected Series Designation approved under this Section.
+
+**3.2 Status of Each Protected Series.** As provided by the Act, each Protected Series:
+
+(a) is a "person" for purposes of the Act and the Uniform Commercial Code, distinct from the Company, from every other Protected Series, from the Member, and from the Manager;
+
+(b) may, in its own name, conduct any activity in furtherance of its purpose, exercise the powers described in Section 1.4, and sue and be sued;
+
+(c) is **not** a separate legal entity capable of existing independently of the Company, may not be a member of the Company, may not itself designate a protected series, and may not merge, convert, domesticate, or engage in an interest exchange except through the single statutory channel provided in s. 605.2604, Florida Statutes; and
+
+(d) shall be governed by this Agreement, applied to that Protected Series as though the Protected Series were a separate limited liability company, except as its Series Exhibit expressly provides otherwise and except as the Act requires otherwise.
+
+**3.3 Limitation of Liability Among Series (Statutory Shields).** Consistent with s. 605.2401, Florida Statutes:
+
+(a) A debt, obligation, or other liability of the Company is solely the debt, obligation, or liability of the Company, and is enforceable only against the Associated Assets of the Company;
+
+(b) A debt, obligation, or other liability of a Protected Series is solely the debt, obligation, or liability of that Protected Series, and is enforceable only against the Associated Assets of that Protected Series;
+
+(c) No Protected Series is liable for, and the Associated Assets of a Protected Series are not available to satisfy, any debt, obligation, or liability of the Company or of any other Protected Series; and the Company is not liable for, and the Associated Assets of the Company are not available to satisfy, any debt, obligation, or liability of any Protected Series; and
+
+(d) The Member and the Manager are not personally liable, directly or indirectly, by way of contribution or otherwise, for any debt, obligation, or liability of the Company or of any Protected Series solely by reason of being or acting as a member, manager, or protected-series manager.
+
+**3.4 Dissolution of a Protected Series Distinguished.** The dissolution and winding up of a Protected Series does not, by itself, cause the dissolution of the Company or of any other Protected Series. The dissolution of the Company causes the dissolution of every Protected Series, and the winding up of the Company is not complete until each Protected Series is wound up.
+
+**3.5 Series Exhibits Control Series Terms.** The terms specific to each Protected Series \u2014 including its name, purpose, Associated Members, Protected Series Manager, capital, and any variations from the default rules of this Agreement \u2014 are set forth in its Series Exhibit. In the event of a conflict between a Series Exhibit and this Agreement with respect to the Protected Series to which the Series Exhibit relates, the Series Exhibit controls, except that no Series Exhibit may vary a provision of the Act that may not be varied by an operating agreement (see s. 605.2107, Florida Statutes) or the provisions of Article 8.
+
+---
+
+## ARTICLE 4 \u2014 THE MEMBER; MEMBERSHIP INTEREST
+
+**4.1 Sole Member.** The Member identified on Exhibit A is the sole member of the Company and holds one hundred percent (100%) of the Membership Interest. Membership interests are of a single class and are expressed as percentages; no certificates shall be issued unless the Manager determines otherwise.
+
+**4.2 Association with Protected Series.** The Member shall be an Associated Member of each Protected Series identified as such in the applicable Series Exhibit. For any Protected Series as to which no member is associated, the Company is deemed the sole Associated Member as provided by the Act. Only a member of the Company may be an Associated Member of a Protected Series.
+
+**4.3 Limited Liability.** The Member shall not be personally liable for any debt, obligation, or liability of the Company or of any Protected Series, whether arising in contract, tort, or otherwise, solely by reason of being a member or Associated Member.
+
+**4.4 No Agency by Status.** The Member is not an agent of the Company or of any Protected Series solely by reason of being a member.
+
+**4.5 Other Activities.** The Member and the Manager may engage in or possess interests in other business ventures of any nature, independently or with others, and neither the Company nor any Protected Series shall have any right in such ventures by virtue of this Agreement.
+
+**4.6 Transfer on Death Designation.** The Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50\u2013711.512, Florida Statutes, and reflects the Member's designation, if any, of the person or persons who will become the owner of the Membership Interest upon the Member's death. The Member may designate any person or entity as a beneficiary. The Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, delivered to the Manager; the change is effective upon receipt unless the Manager objects in writing within seven (7) days, and the Manager shall thereafter update Exhibit A (though updating is not required for effectiveness). A beneficiary who becomes the owner of the Membership Interest under this Section succeeds to the Membership Interest subject to this Agreement and is admitted as the Member upon delivery to the Company of a written agreement to be bound by this Agreement.
+
+---
+
+## ARTICLE 5 \u2014 MANAGEMENT
+
+**5.1 Manager-Managed; the Manager.** The Company is **manager-managed** as provided in its Articles of Organization and this Agreement. The initial Manager is **[MANAGER NAME]**. The Manager need not be a member. The Manager serves until resignation, removal by the Member, death, or incapacity; the Member may remove and replace the Manager, and shall fill any vacancy, by a signed writing delivered to the Company.
+
+**5.2 Management of Each Protected Series.** Each Protected Series is **manager-managed**. The Protected Series Manager of each Protected Series is the Manager of the Company unless the applicable Series Exhibit names a different person. A Protected Series Manager has, with respect to its Protected Series, the rights, powers, and duties that a manager of a manager-managed limited liability company has under the Act, subject to this Agreement and the Series Exhibit.
+
+**5.3 Authority of the Manager.** Except as limited by an applicable Series Exhibit, the Manager (and, as to a Protected Series, its Protected Series Manager) has full and exclusive authority to manage and conduct the activities and affairs of the Company or that Protected Series, including authority to: acquire, hold, improve, lease, sell, exchange, and convey property; borrow money and grant liens and security interests on Associated Assets; open, maintain, and close bank and investment accounts and designate signatories; engage and compensate employees, attorneys, accountants, and other agents; procure insurance; prosecute, defend, settle, and compromise claims; make tax filings and elections consistent with Article 9; execute and deliver instruments of every kind; and do all other acts necessary, appropriate, or convenient to the conduct of the activities and affairs of the Company or the applicable Protected Series.
+
+**5.4 Standard of Conduct; Exculpation.** The Manager and each Protected Series Manager shall discharge their duties consistent with the Act, including the duties applicable to protected-series managers, which are not varied by this Agreement. No Manager or Protected Series Manager shall be liable to the Company, any Protected Series, or the Member for any act or omission performed or omitted in good faith and in a manner reasonably believed to be within the scope of authority conferred by this Agreement, except for conduct for which exoneration is prohibited by the Act.
+
+**5.5 Indemnification.** The Company shall indemnify the Manager, and each Protected Series shall indemnify its Protected Series Manager, to the fullest extent permitted by the Act, against losses, claims, and expenses (including reasonable attorney's fees) incurred by reason of service in that capacity, except to the extent arising from conduct for which exoneration is prohibited by the Act; **provided, that any indemnification obligation relating to the activities of a particular Protected Series is an Associated Liability of that Protected Series, payable solely from its Associated Assets**, and any indemnification obligation relating to the activities of the Company generally is payable solely from the Associated Assets of the Company.
+
+**5.6 Compensation; Reimbursement; Shared Expenses.** The Manager shall serve without salary unless the Member consents in writing to compensation. The Manager and each Protected Series Manager shall be reimbursed for reasonable expenses properly incurred on behalf of the Company or the applicable Protected Series. Costs and expenses that benefit the Company and one or more Protected Series (including formation and filing fees, registered agent fees, accounting, insurance, and administrative overhead) shall be allocated among the Company and the Protected Series benefited on a reasonable and consistent basis determined by the Manager \u2014 by specific attribution where practicable and otherwise pro rata or by such other reasonable formula as the Manager adopts \u2014 and the allocation shall be recorded in the records maintained under Article 8.
+
+---
+
+## ARTICLE 6 \u2014 CAPITAL
+
+**6.1 Contributions.** The Member's contributions to the Company, and to each Protected Series, are set forth on Exhibit A and in the applicable Series Exhibits. Each contribution shall identify whether it is made to the Company or to a specific Protected Series, and shall be deposited to, and recorded in the records of, the recipient. A promise by the Member to make a contribution is enforceable only if set out in a writing signed by the Member.
+
+**6.2 No Obligation; No Interest.** The Member is not obligated to make any additional contribution to the Company or to any Protected Series. No interest shall be paid on any contribution.
+
+**6.3 Separate Accounting.** The Company shall maintain a separate accounting of contributions to, and the capital of, the Company and each Protected Series.
+
+**6.4 Member Loans.** The Member may lend funds to the Company or to a specific Protected Series upon commercially reasonable terms evidenced by a written instrument identifying the borrower. A loan is not a contribution, and shall be an Associated Liability solely of the borrowing Protected Series or of the Company, as applicable.
+
+**6.5 No Right to Specific Property.** The Member has no right to demand or receive any distribution in any specific property of the Company or of any Protected Series.
+
+---
+
+## ARTICLE 7 \u2014 DISTRIBUTIONS
+
+**7.1 Distributions.** The Manager (or, as to a Protected Series, its Protected Series Manager) may from time to time determine the extent to which cash on hand of the Company or of a Protected Series exceeds current and anticipated needs, including operating expenses, debt service, acquisitions, and reserves, and may distribute any such excess to the Member (or, in the case of a Protected Series, to its Associated Members, which while the Member is the sole Associated Member means the Member).
+
+**7.2 Source Limitation.** Distributions in respect of a Protected Series shall be made **solely from the Associated Assets of that Protected Series**, and distributions in respect of the Company shall be made solely from the Associated Assets of the Company. Each distribution shall be recorded in the records maintained under Article 8, identifying its source.
+
+**7.3 Statutory Limitations.** No distribution shall be made to the extent prohibited by the limitations of the Act applicable to distributions, applied separately to the Company and to each Protected Series as the Act provides.
+
+---
+
+## ARTICLE 8 \u2014 RECORDS; MAINTENANCE OF THE LIABILITY SHIELDS
+
+**8.1 Records Covenants.** The Company and each Protected Series shall create and maintain records satisfying s. 605.2301, Florida Statutes, in accordance with this Article. This Article may not be varied by any Series Exhibit.
+
+**8.2 Asset Association Records.** The Manager shall create and maintain, and shall cause each Protected Series Manager to create and maintain, records that state the name of the Company or of the applicable Protected Series and describe each of its assets with sufficient specificity to permit a **disinterested, reasonable individual** to:
+
+(a) identify the asset and distinguish it from any other asset of the Company, of that Protected Series, and of every other Protected Series;
+
+(b) determine when and from which person the asset was acquired, or how the asset otherwise became an asset of the Company or that Protected Series; and
+
+(c) for any asset acquired from the Company or from another Protected Series, determine the consideration paid, the payor, and the payee.
+
+Records may be organized by specific listing, category, type, quantity, or computational or allocative formula or procedure (including a percentage or share of any asset), or in any other reasonable manner, consistent with s. 605.2301(4), Florida Statutes, provided the standard of this Section is met.
+
+**8.3 Separate Accounts; No Commingling.** The Company and each Protected Series shall maintain its own deposit account or accounts, and its funds shall not be commingled with the funds of the Member, the Manager, the Company (as to a Protected Series), or any other Protected Series. All income of a Protected Series shall be deposited to its accounts, and its expenses paid from its accounts. Transfers of funds between accounts shall be made only pursuant to a documented Inter-Series Transfer, loan, contribution, or distribution.
+
+**8.4 Inter-Series Transfers.** Any transfer, re-association, or re-titling of an asset between the Company and a Protected Series or between Protected Series (an "Inter-Series Transfer") shall be documented contemporaneously by a written record stating (a) the asset transferred, (b) the transferor and transferee (the Company or the specific Protected Series), (c) the date, and (d) the consideration paid, the payor, and the payee. Inter-Series Transfers shall be made for fair value unless the transfer is a documented contribution or distribution.
+
+**8.5 Real Property.** Each acquisition or conveyance of an interest in real property by a Protected Series or the Company shall be made by an instrument naming the acquiring or conveying Protected Series (by its full statutory name) or the Company, as applicable, and shall be recorded where required. Properly recorded instruments affecting real property serve as association records as provided in ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes.
+
+**8.6 Contracts and Liabilities.** Each contract, account, loan, or other obligation shall be entered into in the name of, and shall identify, the Company or the specific Protected Series incurring it, and shall be recorded as an Associated Liability of the person incurring it.
+
+**8.7 Financial Records; Inspection.** Separate books of account shall be maintained for the Company and for each Protected Series, showing income, expenses, assets, liabilities, contributions, and distributions of each. The Member (and any Associated Member, as to the applicable Protected Series) may inspect and copy the records described in this Article at reasonable times, consistent with the Act.
+
+**8.8 Annual Review.** At least annually, the Manager shall review the records maintained under this Article for compliance with s. 605.2301, Florida Statutes, and shall correct any deficiency promptly upon discovery.
+
+**8.9 Standing Association Rules; Savings Provisions.**
+
+(a) **Records.** This Agreement, each Series Exhibit, each asset schedule, and the account, titling, and transaction records maintained under this Article are records within the meaning of s. 605.2301, Florida Statutes, and may be read together, in combination, to satisfy its requirements.
+
+(b) **Standing association rules.** As a standing procedure adopted pursuant to s. 605.2301(4), Florida Statutes, and without limiting any other record: (i) an asset acquired by an instrument naming a Protected Series, or titled in the name of a Protected Series, is an Associated Asset of that Protected Series from the date of acquisition; (ii) an asset acquired with consideration paid from a deposit account of a Protected Series is an Associated Asset of that Protected Series; (iii) funds on deposit in an account established in the name of a Protected Series, and interest thereon, are Associated Assets of that Protected Series; (iv) the income, rents, profits, proceeds, and products of, the insurance proceeds relating to, and every replacement or substitution for, an Associated Asset are Associated Assets of the same person; and (v) every asset acquired in the name of the Company, and every asset not associated with a Protected Series under clauses (i) through (iv) or under any other record maintained under this Article, is an Associated Asset of the Company.
+
+(c) **Interpretation.** This Agreement shall be interpreted and applied to give the fullest effect permitted by law to the separateness of the Company and of each Protected Series and to the limitations of liability described in Section 3.3.
+
+(d) **Correction of records.** The Manager may, and upon discovery of any inaccuracy or omission shall, supplement or correct any record maintained under this Article so that it accurately reflects the association of assets and liabilities, and records as so supplemented or corrected shall be given effect to the fullest extent permitted by law.
+
+(e) **Severability in favor of separateness.** If any provision of this Agreement or of any Series Exhibit would otherwise be construed to impair the separateness of the Company or of any Protected Series or the limitations of liability described in Section 3.3, that provision shall be deemed modified to the minimum extent necessary to preserve them.
+
+---
+
+## ARTICLE 9 \u2014 TAX MATTERS
+
+**9.1 Intended Classification.** While the Member is the sole member of the Company and the sole Associated Member of each Protected Series, it is intended that the Company and each Protected Series each be disregarded as an entity separate from the Member for federal income tax purposes, and that all items of income, gain, loss, deduction, and credit be reported directly by the Member. The classification of the Company and of each Protected Series shall in all events be determined under federal tax law as applied to each of them, and nothing in this Agreement constitutes tax advice or a guarantee of any particular tax treatment.
+
+**9.2 Tax Filings and Elections.** The Manager shall make, or cause to be made, all tax filings required of the Company or of any Protected Series and may make any tax election the Manager determines to be in the best interests of the Member, consistent with Section 9.1.
+
+**9.3 Fiscal Year.** The fiscal year of the Company and of each Protected Series is the calendar year unless the Manager selects another permitted year.
+
+**9.4 Change in Circumstances.** If any Protected Series or the Company ceases to qualify for disregarded treatment (including upon the admission of an additional member or the association of an additional person with any Protected Series), the Member and the Manager shall amend this Agreement (or adopt the Company's partnership-form operating agreement) as provided in Article 11 before or promptly upon the change.
+
+---
+
+## ARTICLE 10 \u2014 TRANSFERS
+
+**10.1 Restriction on Transfer.** The Member shall not Transfer all or any portion of the Membership Interest, or any right to receive distributions from the Company or any Protected Series, except (a) a Transfer to an Immediate Family Member made in compliance with Section 10.2, (b) a Transfer effective at death pursuant to the TOD designation under Section 4.6, or (c) another Transfer made with the written consent of the Company (acting through the Manager) reflected in an amendment to Exhibit A. Any purported Transfer in violation of this Article is void to the fullest extent permitted by law, and the transferee acquires no rights other than those, if any, mandated by the Act.
+
+**10.2 Permitted Family Transfers.** A Transfer of all or part of the Membership Interest to an Immediate Family Member is permitted, provided the transferee delivers to the Company a signed agreement to be bound by this Agreement. A transferee (other than a person admitted as a member under Section 11.1) holds only the transferable interest \u2014 the right to receive distributions that would otherwise be paid to the Member with respect to the transferred interest \u2014 and has no right to participate in management, to inspect records, or to exercise any other right of a member.
+
+**10.3 No Dissociation by Transfer Alone.** A Transfer does not by itself dissociate the Member or dissolve the Company or any Protected Series.
+
+## ARTICLE 11 \u2014 ADMISSION OF ADDITIONAL MEMBERS
+
+**11.1 Admission.** One or more additional members may be admitted to the Company, and any member may be associated with any Protected Series, only with the written consent of the Member and upon the admitted person's delivery of a signed agreement to be bound by this Agreement.
+
+**11.2 Successor Agreement.** The parties acknowledge that this Agreement is drafted for a Company having a single member and intended disregarded-entity tax treatment. Prior to or promptly upon the admission of an additional member (or the association of any additional person with any Protected Series), the members shall amend and restate this Agreement in a form appropriate for multiple members \u2014 including provisions for percentages, capital accounts, allocations, and partnership tax administration \u2014 and until such amendment and restatement, the default provisions of the Act shall govern the matters this Agreement does not address for multiple members.
+
+**11.3 Continuation on Termination of Last Member.** Upon the termination of the membership of the last remaining member, the Company shall not be dissolved, and the legal representative of the last remaining member shall agree in writing to continue the Company, and the representative (or an Immediate Family Member designated by the representative who is not a creditor of the last remaining member) shall be admitted as a member effective as of the terminating event, all as permitted by the Act.
+
+---
+
+## ARTICLE 12 \u2014 DISSOLUTION AND WINDING UP
+
+**12.1 Dissolution of a Protected Series.** A Protected Series is dissolved, and its activities and affairs shall be wound up, upon the first to occur of: (a) the dissolution of the Company; (b) an event or circumstance specified in its Series Exhibit; (c) the affirmative vote or consent of all Associated Members of that Protected Series (or, if the Company is the deemed sole Associated Member, the consent of the Member); or (d) entry of a judicial order dissolving the Protected Series as provided by the Act.
+
+**12.2 Winding Up a Protected Series.** Upon dissolution of a Protected Series, its Protected Series Manager (or another person designated by the Member) shall wind up its activities and affairs in the manner provided by the Act for winding up a limited liability company, applied to that Protected Series. Its Associated Assets shall be applied: first, to pay or provide for its Associated Liabilities to creditors (including the Member as a creditor, to the extent permitted by law); and then the balance to its Associated Members (or, if the Company is the deemed sole Associated Member, to the Company). The Manager shall cause any statement or filing required by the Act or the Department in connection with the dissolution of the Protected Series to be made. The winding up of a Protected Series shall not draw upon, and its creditors shall have no recourse to, the Associated Assets of the Company or of any other Protected Series.
+
+**12.3 Dissolution of the Company.** The Company is dissolved, and its activities and affairs shall be wound up, upon the first to occur of: (a) the written consent of the Member; (b) entry of a decree of judicial dissolution under the Act; or (c) any other event that under the Act requires dissolution. Dissolution of the Company causes the dissolution of each Protected Series, and the winding up of the Company is not complete until the winding up of each Protected Series is complete.
+
+**12.4 Winding Up the Company.** Upon dissolution of the Company, the Manager (or, if there is none, a person designated by the Member) shall wind up the Company and each Protected Series. After the winding up of each Protected Series under Section 12.2, the remaining Associated Assets of the Company shall be applied: first, to pay or provide for the Company's Associated Liabilities to creditors; and then the balance to the Member. Articles of dissolution shall be filed as the Act requires, and the Company shall terminate when winding up is complete.
+
+**12.5 No Deficit Obligation; Recourse Limited.** The Member shall have no obligation to restore any deficit or to contribute capital in connection with any winding up, and each creditor of the Company or of any Protected Series shall look solely to the Associated Assets of its obligor.
+
+---
+
+## ARTICLE 13 \u2014 AMENDMENTS; CONSENTS
+
+**13.1 Amendments.** This Agreement, including any Series Exhibit, may be amended only by a written instrument signed by the Member; provided, that any amendment changing the rights or obligations of the Manager may not impose new obligations on the Manager without the Manager's written consent. Oral, implied, or course-of-dealing amendments are of no effect.
+
+**13.2 Action by Written Consent.** Any action of the Member, or of the Company, under this Agreement may be taken by a written consent signed by the Member and maintained with the Company's records. No meetings are required.
+
+---
+
+## ARTICLE 14 \u2014 MISCELLANEOUS
+
+**14.1 Governing Law; Internal Affairs.** This Agreement, the internal affairs of the Company and of each Protected Series, and the relations among the Member, the Manager, each Protected Series Manager, the Company, and each Protected Series, are governed by the laws of the State of Florida, without regard to conflict-of-laws principles.
+
+**14.2 Venue.** Any action or proceeding arising out of or relating to this Agreement, the Company, or any Protected Series shall be brought exclusively in the courts of the county in Florida in which the Company's principal office is located, and each party consents to the jurisdiction of such courts and waives any objection to venue there.
+
+**14.3 Severability.** If any provision of this Agreement is held invalid or unenforceable, that provision shall be modified to the minimum extent necessary to make it enforceable, and the remainder of this Agreement shall remain in full force; provided, that nothing in this Agreement shall be construed to vary any provision of the Act that may not be varied by an operating agreement.
+
+**14.4 Entire Agreement.** This Agreement, including Exhibit A and each Series Exhibit, constitutes the entire agreement governing the Company and each Protected Series and supersedes all prior agreements and understandings with respect to their subject matter.
+
+**14.5 Binding Effect.** This Agreement binds and benefits the Member, the Manager, and their respective heirs, personal representatives, successors, and permitted assigns, and any person who acquires an interest in the Company or is admitted as a member.
+
+**14.6 Counterparts; Electronic Signatures.** This Agreement may be executed in counterparts, each of which is an original and all of which together constitute one instrument. Electronic signatures and electronic records have the same effect as originals.
+
+**14.7 Notices.** Any notice under this Agreement shall be in writing and is effective upon delivery to the recipient's address on Exhibit A (or another address designated in writing), whether delivered personally, by nationally recognized courier, by certified mail, or by e-mail with confirmation of transmission.
+
+**14.8 No Third-Party Beneficiaries.** This Agreement is for the exclusive benefit of the parties and confers no rights on any creditor or other third party.
+
+**14.9 Interpretation.** Headings are for convenience only. "Including" means "including without limitation." References to statutes include amendments and successor provisions.
+
+**14.10 Unregistered Interests.** The Membership Interest has not been registered under federal or state securities laws and may not be offered, sold, or transferred except in compliance with this Agreement and applicable law.
+
+---
+
+## SIGNATURES
+
+IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of the Effective Date.
+
+**MEMBER:**
+
+_____________________________
+[MEMBER NAME]
+
+**ACKNOWLEDGED AND AGREED BY MANAGER:**
+
+_____________________________
+[MANAGER NAME], Manager
+
+---
+
+## EXHIBIT A \u2014 MEMBER; CONTRIBUTIONS; TOD DESIGNATION
+
+**Company:** [COMPANY NAME], LLC
+
+| Item | Information |
+|---|---|
+| Member name | [MEMBER NAME] |
+| Member address | [ADDRESS] |
+| Membership Interest | 100% (single class) |
+| Initial contribution to the Company | $[AMOUNT] [and/or described property] |
+| Date of contribution | [DATE] |
+
+**Transfer on Death designation (ss. 711.50\u2013711.512, Fla. Stat.):**
+
+Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENEFICIARY NAME(S)]**, or if none is designated or the designation fails, the Membership Interest passes as provided by law.
+
+---
+
+## SERIES EXHIBIT PS-[N]
+
+**Protected Series name (exactly as filed with the Department):**
+**[COMPANY NAME], LLC - PS [N]**
+
+| Item | Terms |
+|---|---|
+| Purpose of this Protected Series | [PURPOSE \u2014 e.g., "to acquire, own, lease, and manage the real property located at ___" or "any lawful business"] |
+| Associated Member(s) | [MEMBER NAME] \u2014 100% [or: "None \u2014 the Company is the deemed sole Associated Member"] |
+| Protected Series Manager | [Same as Company Manager / NAME] |
+| Contributions to this Protected Series | $[AMOUNT] [and/or described property], contributed [DATE] |
+| Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the Member(s), together with the records maintained under Article 8. |
+| Special terms (if any) | [None / variations from the base Agreement \u2014 may not vary Article 8 or non-variable provisions of the Act] |
+| Dissolution events specific to this Protected Series (if any) | [None / describe] |
+
+**Adopted by the Member and the [Protected Series] Manager effective [DATE]:**
+
+_____________________________
+[MEMBER NAME], Member
+
+_____________________________
+[NAME], Protected Series Manager
+
+
+## ASSET SCHEDULE \u2014 ATTACHMENT TO SERIES EXHIBIT PS-[N]
+
+*Complete this schedule for each asset of this Protected Series. Describe each asset so that a stranger could identify it without asking you anything: real property \u2014 street address AND legal description, date acquired, and grantor; deposit account \u2014 institution, account title, last four digits, and date opened; vehicle \u2014 year, make, model, and VIN; equipment \u2014 description and serial number; contract \u2014 parties and date. For any asset acquired from the Company or from another Protected Series, also state the consideration paid, the payor, and the payee. Add pages as needed; keep this schedule current as assets are acquired and disposed of.*
+
+| Asset description | Date acquired | Acquired from | Consideration / payor / payee (if from the Company or another series) |
+|---|---|---|---|
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+
+---
+
+*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Manager-Managed, Single Member / Disregarded Entity), v1 draft. Statutory citations verified against Online Sunshine on August 3, 2026: ss. 605.2103, 605.2107, 605.2201, 605.2202, 605.2301, 605.2401, 605.2501, 605.2604, 48.062, 711.50\u2013711.512, Fla. Stat.*
+`;
+
+// server/templates-oa-multi.md
+var templates_oa_multi_default = `# OPERATING AGREEMENT
+## OF
+## [COMPANY NAME], LLC
+### A FLORIDA PROTECTED SERIES LIMITED LIABILITY COMPANY
+
+**(Manager-Managed \u2014 Multiple Members / Partnership Taxation)**
+
+---
+
+THIS OPERATING AGREEMENT (this "Agreement") of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the "Company"), is made and entered into effective as of [DATE] (the "Effective Date"), by and among the undersigned members (each a "Member" and collectively the "Members") and is acknowledged by the undersigned manager (the "Manager").
+
+### RECITALS
+
+A. The Company was formed as a Florida limited liability company by the filing of Articles of Organization with the Florida Department of State, Division of Corporations (the "Department").
+
+B. The Company is a **protected series limited liability company** within the meaning of ss. 605.2101\u2013605.2802, Florida Statutes, having designated, or intending to designate, one or more protected series by filing one or more Protected Series Designations with the Department.
+
+C. The Members intend by this Agreement to set forth the terms governing the Company, each Protected Series designated by the Company, and the relations among the Company, each Protected Series, the Members, and the Manager.
+
+NOW, THEREFORE, the Members adopt the following as the operating agreement of the Company and of each Protected Series:
+
+---
+
+## ARTICLE 1 \u2014 THE COMPANY
+
+**1.1 Definitions.** Capitalized terms have the meanings set forth in Article 2 or in the Section in which they are used.
+
+**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes (the "Act"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101\u2013605.2802 (the "Protected Series Provisions"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.
+
+**1.3 Name; Names of Protected Series.** The name of the Company is **[COMPANY NAME], LLC**. The name of each Protected Series shall comply with s. 605.2202, Florida Statutes: it shall begin with the full name of the Company and shall contain the phrase "protected series" or the abbreviation "P.S." or "PS." The name of each Protected Series shall be as set forth in its filed Protected Series Designation and its Series Exhibit. If the Company changes its name, the Manager shall promptly make all filings required to conform the name of each Protected Series.
+
+**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series except as limited by its Series Exhibit, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
+
+**1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as the Manager may determine. A Protected Series may maintain its own place of business as determined by its Protected Series Manager.
+
+**1.6 Registered Agent and Registered Office.** The registered agent and registered office of the Company shall be as stated in the records of the Department. As required by the Act, the registered agent and registered office of the Company shall also serve as the registered agent and registered office for each Protected Series. Service of process, notice, or demand on a Protected Series may be made as provided by law, including s. 48.062, Florida Statutes.
+
+**1.7 Term.** The Company's existence is perpetual unless the Company is dissolved and wound up in accordance with this Agreement and the Act. No Protected Series may have a duration extending beyond the existence of the Company.
+
+**1.8 Location of Records.** The records of the Company and of each Protected Series \u2014 including the records required by Article 8 \u2014 shall be maintained at the Company's principal office or at such other location (including secure electronic storage) as the Manager determines, and shall at all times be retrievable in perceivable form.
+
+**1.9 Filings.** The Manager shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, and statements of dissolution, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
+
+**1.10 Title to Property.** Title to each Associated Asset of a Protected Series shall be acquired, held, and conveyed **in the name of that Protected Series**. Title to each Associated Asset of the Company shall be acquired, held, and conveyed in the name of the Company. No property of the Company or of any Protected Series shall be held in the individual name of any Member or the Manager. Each Member's interest in the Company is personal property for all purposes.
+
+**1.11 Waiver of Partition Rights.** Each Member irrevocably waives any right to maintain an action for partition or any similar action with respect to any property of the Company or of any Protected Series.
+
+**1.12 No Payments of Individual Obligations.** The credit and property of the Company and of each Protected Series shall be used solely for the benefit of the Company or the applicable Protected Series, and no such property shall be transferred or encumbered for, or in payment of, any individual obligation of any Member or the Manager.
+
+---
+
+## ARTICLE 2 \u2014 DEFINITIONS
+
+**2.1 "Act"** means the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.
+
+**2.2 "Associated Asset"** means an asset of a Protected Series, or of the Company, that satisfies the recordkeeping requirements of s. 605.2301, Florida Statutes, and Article 8 of this Agreement.
+
+**2.3 "Associated Liability"** means a liability incurred by, contracted for, or otherwise existing with respect to a particular Protected Series or the Company, as reflected in the records maintained under Article 8.
+
+**2.4 "Associated Member"** means, with respect to a Protected Series, a Member associated with that Protected Series under this Agreement and its Series Exhibit. If no Member is associated with a Protected Series, the Company itself is deemed the sole Associated Member of that Protected Series as provided by the Act.
+
+**2.5 "Company"** means [COMPANY NAME], LLC.
+
+**2.6 "Immediate Family Member"** means, as to any Member, (a) any ancestor of that Member or descendant of a grandparent of that Member (each an "Individual Family Member," and including persons legally adopted before age 18), or (b) a trust or other entity for the benefit of one or more Individual Family Members, provided all beneficial interests in that entity are held by such persons; a trust is not excluded merely because a remainder beneficiary is not an Individual Family Member.
+
+**2.7 "Involuntary Transfer"** means any Transfer by which a Member or transferee is deprived or divested of any right, title, or interest in a Membership Interest other than voluntarily, including (a) a Transfer to or for the benefit of a judgment creditor pursuant to court order, subject in all events to Section 10.6, (b) a Transfer in connection with reorganization, insolvency, bankruptcy, or receivership, (c) a Transfer to a public officer or agency under any abandoned-property or escheat law, and (d) a Transfer to a spouse or former spouse in connection with dissolution of marriage or marital separation.
+
+**2.8 "Majority in Interest"** means one or more Members holding, in the aggregate, more than fifty percent (50%) of the Percentage Interests of all Members; and, when used with respect to a Protected Series, one or more Associated Members of that Protected Series holding, in the aggregate, more than fifty percent (50%) of the Series Percentages of that Protected Series.
+
+**2.9 "Manager"** means the person named in Section 5.1 and any successor designated under this Agreement.
+
+**2.10 "Member"** means each person identified as a member on Exhibit A and each person admitted as a member in accordance with this Agreement, in each case until dissociated.
+
+**2.11 "Membership Interest"** means a Member's entire interest in the Company, including the Member's interest in capital, profits, and distributions of the Company and of each Protected Series with which the Member is associated, and all rights of a member under the Act and this Agreement.
+
+**2.12 "Percentage Interest"** means, as to each Member, the percentage set forth for that Member on Exhibit A, as adjusted from time to time under this Agreement. Membership interests are of a single class.
+
+**2.13 "Protected Series"** or **"PS"** means a protected series of the Company established under s. 605.2201, Florida Statutes, and identified in a Series Exhibit.
+
+**2.14 "Protected Series Designation"** means a designation of a protected series filed with the Department under s. 605.2201, Florida Statutes, as amended from time to time.
+
+**2.15 "Protected Series Manager"** means the person responsible for management of a Protected Series under Section 5.2.
+
+**2.16 "Series Exhibit"** means, for each Protected Series, the exhibit to this Agreement (each numbered PS-1, PS-2, and so on) setting forth the terms specific to that Protected Series, including its Associated Members and their Series Percentages. Each Series Exhibit is a part of this Agreement.
+
+**2.17 "Series Percentage"** means, as to each Associated Member of a Protected Series, the percentage set forth for that Associated Member in the applicable Series Exhibit, as adjusted from time to time under this Agreement.
+
+**2.18 "Transfer"** means any assignment, transfer, conveyance, devise, gift, pledge, hypothecation, encumbrance, or other disposition, direct or indirect, voluntary or involuntary, in trust or otherwise, and as a verb has a corresponding meaning.
+
+---
+
+## ARTICLE 3 \u2014 PROTECTED SERIES
+
+**3.1 Establishment.** With the affirmative vote or consent of **all** Members, the Company may establish one or more Protected Series by causing a Protected Series Designation to be signed and filed with the Department as provided in s. 605.2201, Florida Statutes. At or before the filing of each Protected Series Designation, the Members and the Manager shall adopt a Series Exhibit for the new Protected Series. The Manager is authorized to execute and file each Protected Series Designation approved under this Section.
+
+**3.2 Status of Each Protected Series.** As provided by the Act, each Protected Series:
+
+(a) is a "person" for purposes of the Act and the Uniform Commercial Code, distinct from the Company, from every other Protected Series, from each Member, and from the Manager;
+
+(b) may, in its own name, conduct any activity in furtherance of its purpose, exercise the powers described in Section 1.4, and sue and be sued;
+
+(c) is **not** a separate legal entity capable of existing independently of the Company, may not be a member of the Company, may not itself designate a protected series, and may not merge, convert, domesticate, or engage in an interest exchange except through the single statutory channel provided in s. 605.2604, Florida Statutes; and
+
+(d) shall be governed by this Agreement, applied to that Protected Series as though the Protected Series were a separate limited liability company, except as its Series Exhibit expressly provides otherwise and except as the Act requires otherwise.
+
+**3.3 Limitation of Liability Among Series (Statutory Shields).** Consistent with s. 605.2401, Florida Statutes:
+
+(a) A debt, obligation, or other liability of the Company is solely the debt, obligation, or liability of the Company, and is enforceable only against the Associated Assets of the Company;
+
+(b) A debt, obligation, or other liability of a Protected Series is solely the debt, obligation, or liability of that Protected Series, and is enforceable only against the Associated Assets of that Protected Series;
+
+(c) No Protected Series is liable for, and the Associated Assets of a Protected Series are not available to satisfy, any debt, obligation, or liability of the Company or of any other Protected Series; and the Company is not liable for, and the Associated Assets of the Company are not available to satisfy, any debt, obligation, or liability of any Protected Series; and
+
+(d) No Member and no Manager is personally liable, directly or indirectly, by way of contribution or otherwise, for any debt, obligation, or liability of the Company or of any Protected Series solely by reason of being or acting as a member, manager, or protected-series manager.
+
+**3.4 Dissolution of a Protected Series Distinguished.** The dissolution and winding up of a Protected Series does not, by itself, cause the dissolution of the Company or of any other Protected Series. The dissolution of the Company causes the dissolution of every Protected Series, and the winding up of the Company is not complete until each Protected Series is wound up.
+
+**3.5 Series Exhibits Control Series Terms.** The terms specific to each Protected Series \u2014 including its name, purpose, Associated Members and their Series Percentages, Protected Series Manager, capital, and any variations from the default rules of this Agreement \u2014 are set forth in its Series Exhibit. In the event of a conflict between a Series Exhibit and this Agreement with respect to the Protected Series to which the Series Exhibit relates, the Series Exhibit controls, except that no Series Exhibit may vary a provision of the Act that may not be varied by an operating agreement (see s. 605.2107, Florida Statutes) or the provisions of Article 8.
+
+---
+
+## ARTICLE 4 \u2014 MEMBERS; VOTING; MEMBER DUTIES
+
+**4.1 Members; Percentage Interests.** The Members and their Percentage Interests are set forth on Exhibit A. Membership interests are of a single class and are expressed as percentages; no certificates shall be issued unless the Manager determines otherwise.
+
+**4.2 Association with Protected Series.** A Member is an Associated Member of a Protected Series only if, and to the extent, identified as such in the applicable Series Exhibit, and each Associated Member's Series Percentage is as stated there. Only a Member may be an Associated Member of a Protected Series. No Member is associated with any Protected Series except as so identified, and rights, allocations, and distributions in respect of a Protected Series belong exclusively to its Associated Members. For any Protected Series as to which no Member is associated, the Company is deemed the sole Associated Member as provided by the Act.
+
+**4.3 Voting.** Each Member votes in proportion to the Member's Percentage Interest on matters as to which Members are entitled to vote or consent at the Company level, and each Associated Member votes in proportion to the Member's Series Percentage on matters concerning the applicable Protected Series. Except where this Agreement or a non-variable provision of the Act requires a greater vote, the act of a Majority in Interest constitutes the act of the Members (or, for a matter concerning a Protected Series, the act of that Protected Series' Associated Members). A Membership Interest owned by spouses as tenants by the entireties shall be voted only by the consensus of both spouses; neither spouse acting alone may vote the interest except as the other spouse's attorney-in-fact under a duly executed power of attorney.
+
+**4.4 Meetings; Written Consents.** No regular meetings are required. Any Member or the Manager may call a meeting of the Members (or of the Associated Members of a Protected Series) on at least five (5) days' written notice stating the purpose. Members may participate by any means of remote communication by which all participants can hear one another. Any action that may be taken at a meeting may be taken without a meeting by a written consent signed by Members holding the Percentage Interests (or Series Percentages) required to approve the action, delivered to the Company and maintained with its records, with prompt notice to any non-consenting Member.
+
+**4.5 Limited Liability; No Agency.** No Member shall be personally liable for any debt, obligation, or liability of the Company or of any Protected Series, whether arising in contract, tort, or otherwise, solely by reason of being a Member or Associated Member. No Member is an agent of the Company or of any Protected Series solely by reason of being a member.
+
+**4.6 Duty to Participate in Governance.** Each Member shall materially participate in the governance of the Company and of each Protected Series with which the Member is associated, including by voting or consenting in a timely manner on matters submitted to the Members, attending meetings duly called under Section 4.4 in person or by remote means, furnishing information reasonably requested by the Manager for the Company's or a Protected Series' filings, records, and tax reporting, and executing and delivering instruments reasonably required to carry out actions duly approved under this Agreement.
+
+**4.7 Competition. [SELECT ONE ALTERNATIVE \u2014 see Instructions]**
+
+**[ ] Alternative A \u2014 Noncompetition.** Before the dissolution of the Company, no Member shall compete with the Company, or with any Protected Series with which the Member is associated, in the conduct of the Company's or that Protected Series' activities and affairs, consistent with the standard described in s. 605.04091(2)(c), Florida Statutes. This Section does not prohibit a Member from engaging in any business or venture that does not so compete, and Section 4.10 applies to all other activities.
+
+**[ ] Alternative B \u2014 Competition Permitted.** Each Member may engage in and possess interests in other business ventures of every kind, whether or not competitive with the activities of the Company or of any Protected Series. Engaging in such ventures shall not be deemed to violate this Agreement or any duty under the Act, no Member is obligated to offer any business opportunity to the Company, any Protected Series, or any other Member, and neither the Company, any Protected Series, nor any Member shall have any right in such ventures or their income by virtue of this Agreement. *(Retain the selected Alternative and delete the other. If Alternative B is selected, replace Section 11.1(c) with "(c) [Reserved.]" \u2014 do not renumber.)*
+
+**4.8 Confidentiality.** Each Member shall hold in confidence, and shall not disclose or use other than for purposes of the Company or the applicable Protected Series, all confidential information of the Company and of each Protected Series, including financial records, customer and tenant information, contracts, and the contents of the records maintained under Article 8, except for disclosures required by law or made to the Member's professional advisors who are bound to confidentiality.
+
+**4.9 Non-Disparagement; No Interference.** No Member shall hinder or delay the activities and affairs of the Company or of any Protected Series, or slander, defame, or otherwise tarnish the reputation of the Company or of any Protected Series.
+
+**4.10 Other Activities.** Subject to Sections 4.7 through 4.9, each Member and the Manager may engage in or possess interests in other business ventures of any nature, independently or with others, and neither the Company nor any Protected Series nor any other Member shall have any right in such ventures by virtue of this Agreement.
+
+**4.11 Information Rights.** Each Member has the information and inspection rights provided by the Act with respect to the Company. Information and inspection rights with respect to a particular Protected Series belong to its Associated Members (and to the Manager and its Protected Series Manager); a Member who is not an Associated Member of a Protected Series has only the information rights with respect to that Protected Series that the Act mandates.
+
+**4.12 Transfer on Death Designation.** Each Member's Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50\u2013711.512, Florida Statutes, and reflects each Member's designation, if any, of the person or persons who will become the owner of that Member's Membership Interest upon that Member's death. A Member may designate any person or entity as a beneficiary. A Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, delivered to the Manager; the change is effective upon receipt unless the Manager objects in writing within seven (7) days, and the Manager shall thereafter update Exhibit A (though updating is not required for effectiveness). Upon the designating Member's death, the designated beneficiary automatically succeeds to the deceased Member's transferable interest \u2014 including the economic rights of the deceased Member's Percentage Interest and Series Percentages \u2014 taking subject to this Agreement, and holds the rights of a transferee described in Section 10.3 until admitted as a Member. A beneficiary who is an Immediate Family Member of the deceased Member is admitted as a Member upon delivery to the Company of a written agreement to be bound by this Agreement; any other beneficiary is admitted as a Member upon such delivery and the written consent of a Majority in Interest of the Members other than the deceased Member.
+
+---
+
+## ARTICLE 5 \u2014 MANAGEMENT
+
+**5.1 Manager-Managed; the Manager.** The Company is **manager-managed** as provided in its Articles of Organization and this Agreement. The initial Manager is **[MANAGER NAME]**. The Manager need not be a Member. The Manager serves until resignation, removal, death, or incapacity. The Manager may be removed, with or without cause, and any successor Manager shall be appointed, by a Majority in Interest, evidenced by a signed writing delivered to the Company.
+
+**5.2 Management of Each Protected Series.** Each Protected Series is **manager-managed**. The Protected Series Manager of each Protected Series is the Manager of the Company unless the applicable Series Exhibit names a different person. A Protected Series Manager has, with respect to its Protected Series, the rights, powers, and duties that a manager of a manager-managed limited liability company has under the Act, subject to this Agreement and the Series Exhibit, and may be removed and replaced with respect to that Protected Series by a Majority in Interest of its Associated Members.
+
+**5.3 Authority of the Manager.** Except as limited by Section 5.4 or an applicable Series Exhibit, the Manager (and, as to a Protected Series, its Protected Series Manager) has full and exclusive authority to manage and conduct the activities and affairs of the Company or that Protected Series, including authority to: acquire, hold, improve, lease, sell, exchange, and convey property; borrow money and grant liens and security interests on Associated Assets; open, maintain, and close bank and investment accounts and designate signatories; engage and compensate employees, attorneys, accountants, and other agents; procure insurance; prosecute, defend, settle, and compromise claims; make tax filings and elections consistent with Article 9; execute and deliver instruments of every kind; and do all other acts necessary, appropriate, or convenient to the conduct of the activities and affairs of the Company or the applicable Protected Series.
+
+**5.4 Actions Requiring Member Approval.** Notwithstanding Section 5.3, neither the Manager nor any Protected Series Manager shall do any of the following without the approval stated:
+
+(a) establish a new Protected Series \u2014 the consent of **all Members** (Section 3.1);
+
+(b) **transfer, re-associate, or re-title any asset between the Company and a Protected Series or between Protected Series** (an "Inter-Series Transfer") \u2014 the consent of a Majority in Interest and, as to each Protected Series affected, a Majority in Interest of its Associated Members;
+
+(c) sell, exchange, or otherwise dispose of all or substantially all of the Associated Assets of the Company or of any Protected Series, other than in the ordinary course \u2014 the consent of a Majority in Interest (of the Company or of the affected Protected Series' Associated Members, as applicable);
+
+(d) merge the Company as permitted by the Act \u2014 the consent of **all Members**; or file a statement of dissolution of a Protected Series \u2014 the approval required by Section 14.1;
+
+(e) admit any additional Member, or associate any person with a Protected Series \u2014 the approval required by Article 12;
+
+(f) incur, on behalf of the Company or any Protected Series, indebtedness in excess of $[THRESHOLD] in a single transaction or series of related transactions, or guarantee the obligation of any person (and no guarantee of the obligations of one Protected Series by another or by the Company shall be made except by an express written instrument approved under this Section) \u2014 the consent of a Majority in Interest (of the Company or of the affected Protected Series' Associated Members, as applicable);
+
+(g) lend money of the Company or of a Protected Series to, or borrow from, a Member, the Manager, or their affiliates, other than loans under Section 6.5 \u2014 the consent of a Majority in Interest of the disinterested Members (or disinterested Associated Members, as applicable); or
+
+(h) amend this Agreement or any Series Exhibit \u2014 the approval required by Section 15.1.
+
+**5.5 Standard of Conduct; Exculpation.** The Manager and each Protected Series Manager shall discharge their duties consistent with the Act, including the duties applicable to managers and protected-series managers, which are not varied by this Agreement. No Manager or Protected Series Manager shall be liable to the Company, any Protected Series, or any Member for any act or omission performed or omitted in good faith and in a manner reasonably believed to be within the scope of authority conferred by this Agreement, except for conduct for which exoneration is prohibited by the Act.
+
+**5.6 Indemnification.** The Company shall indemnify the Manager, and each Protected Series shall indemnify its Protected Series Manager, to the fullest extent permitted by the Act, against losses, claims, and expenses (including reasonable attorney's fees) incurred by reason of service in that capacity, except to the extent arising from conduct for which exoneration is prohibited by the Act; **provided, that any indemnification obligation relating to the activities of a particular Protected Series is an Associated Liability of that Protected Series, payable solely from its Associated Assets**, and any indemnification obligation relating to the activities of the Company generally is payable solely from the Associated Assets of the Company.
+
+**5.7 Compensation; Reimbursement; Shared Expenses.** The Manager shall serve without salary unless a Majority in Interest consents in writing to compensation. The Manager and each Protected Series Manager shall be reimbursed for reasonable expenses properly incurred on behalf of the Company or the applicable Protected Series. Costs and expenses that benefit the Company and one or more Protected Series (including formation and filing fees, registered agent fees, accounting, insurance, and administrative overhead) shall be allocated among the Company and the Protected Series benefited on a reasonable and consistent basis determined by the Manager \u2014 by specific attribution where practicable and otherwise pro rata or by such other reasonable formula as the Manager adopts \u2014 and the allocation shall be recorded in the records maintained under Article 8.
+
+---
+
+## ARTICLE 6 \u2014 CAPITAL; CAPITAL ACCOUNTS
+
+**6.1 Initial Contributions.** Each Member's contributions to the Company, and each Associated Member's contributions to each Protected Series, are set forth on Exhibit A and in the applicable Series Exhibits. Each contribution shall identify whether it is made to the Company or to a specific Protected Series, and shall be deposited to, and recorded in the records of, the recipient. A promise by a Member to make a contribution is enforceable only if set out in a writing signed by the Member.
+
+**6.2 Additional Capital Contributions. [OPTIONAL PROVISION \u2014 include or omit; see Instructions]** Upon the approval of a Majority in Interest (or, for a capital need of a particular Protected Series, a Majority in Interest of its Associated Members), each Member (or each Associated Member of the affected Protected Series) shall have the duty and obligation to contribute additional capital to the Company or to the affected Protected Series, in proportion to the Members' Percentage Interests (or the Associated Members' Series Percentages), in the aggregate amount so approved, payable within thirty (30) days after written notice of the approved call; provided, that unless approved by all Members, no Member shall be required to contribute more than $[CAP] in the aggregate in any calendar year under this Section. This obligation is a material, unperformed, future obligation of each Member within the meaning of Section 11.1. *(To omit this provision, replace the text of this Section 6.2 and of Section 6.3 with "[Reserved.]" and replace Section 11.1(a) with "(a) [Reserved.]" \u2014 do not renumber any section. If omitted, no Member has any obligation to contribute capital beyond Section 6.1.)*
+
+**6.3 Failure to Contribute.** If a Member fails to pay an additional capital contribution required under Section 6.2 when due, the Company (or the affected Protected Series) may pursue any remedy available at law or in equity for the failure, and in addition, the non-defaulting Members who elect to do so may advance the defaulted amount, in which case the Percentage Interests (or Series Percentages) of the defaulting and advancing Members shall be adjusted to reflect the aggregate capital contributed by each Member following the advance.
+
+**6.4 No Interest; No Withdrawal.** No interest shall be paid on any contribution. No Member may withdraw or demand the return of any contribution except as this Agreement provides.
+
+**6.5 Member Loans.** A Member may lend funds to the Company or to a specific Protected Series upon commercially reasonable terms evidenced by a written instrument identifying the borrower. A loan is not a contribution, and shall be an Associated Liability solely of the borrowing Protected Series or of the Company, as applicable.
+
+**6.6 Capital Accounts.** A capital account shall be established and maintained for each Member, with separate sub-accounts reflecting the Member's capital in the Company and in each Protected Series with which the Member is associated. Capital accounts shall be maintained in accordance with the capital accounting rules of section 704(b) of the Internal Revenue Code of 1986, as amended (the "Code"), and the Treasury Regulations thereunder, and shall be credited with contributions and allocations of profit and debited with distributions and allocations of loss as so required. A transferee of all or part of a Membership Interest succeeds to the portion of the transferor's capital account (and sub-accounts) attributable to the transferred interest. Nothing in this Agreement creates a deficit restoration obligation or otherwise personally obligates any Member to contribute capital beyond the contributions required by Sections 6.1 and 6.2.
+
+**6.7 No Right to Specific Property.** No Member has any right to demand or receive any distribution in any specific property of the Company or of any Protected Series.
+
+---
+
+## ARTICLE 7 \u2014 ALLOCATIONS AND DISTRIBUTIONS
+
+**7.1 Allocations.** Profits, losses, and each item of income, gain, loss, deduction, and credit of each Protected Series shall be allocated among its Associated Members in proportion to their Series Percentages, and those of the Company (exclusive of every Protected Series) shall be allocated among the Members in proportion to their Percentage Interests. Notwithstanding the foregoing, allocations shall be made in a manner consistent with the capital-account maintenance rules of section 704(b) of the Code and the Treasury Regulations thereunder \u2014 including, to the extent required, a qualified income offset, minimum-gain chargebacks, and limitations on loss allocations that would create or increase an impermissible deficit \u2014 and allocations with respect to property contributed with a value different from its adjusted basis shall be made in accordance with section 704(c) of the Code. The Manager shall apply this Section so that the allocations have substantial economic effect and shall resolve questions of application consistently and in good faith.
+
+**7.2 Distributions.** The Manager (or, as to a Protected Series, its Protected Series Manager) may from time to time determine the extent to which cash on hand of the Company or of a Protected Series exceeds current and anticipated needs, including operating expenses, debt service, acquisitions, and reserves, and may distribute any such excess. Distributions in respect of a Protected Series shall be made **solely from the Associated Assets of that Protected Series, and solely to its Associated Members in proportion to their Series Percentages**; distributions in respect of the Company shall be made solely from the Associated Assets of the Company, to the Members in proportion to their Percentage Interests. Each distribution shall be recorded in the records maintained under Article 8, identifying its source.
+
+**7.3 Tax Distributions.** To the extent of available cash of the Company or the applicable Protected Series, the Manager may make distributions intended to enable each Member to satisfy federal and state income tax liabilities attributable to the Member's distributive share of income, and is authorized to pay any such amount directly to the government agency responsible for collection of the tax on the Member's behalf. Tax distributions in respect of a Protected Series shall be made solely from its Associated Assets and treated as advances against later distributions under Section 7.2.
+
+**7.4 Statutory Limitations.** No distribution shall be made to the extent prohibited by the limitations of the Act applicable to distributions, applied separately to the Company and to each Protected Series as the Act provides.
+
+---
+
+## ARTICLE 8 \u2014 RECORDS; MAINTENANCE OF THE LIABILITY SHIELDS
+
+**8.1 Records Covenants.** The Company and each Protected Series shall create and maintain records satisfying s. 605.2301, Florida Statutes, in accordance with this Article. This Article may not be varied by any Series Exhibit.
+
+**8.2 Asset Association Records.** The Manager shall create and maintain, and shall cause each Protected Series Manager to create and maintain, records that state the name of the Company or of the applicable Protected Series and describe each of its assets with sufficient specificity to permit a **disinterested, reasonable individual** to:
+
+(a) identify the asset and distinguish it from any other asset of the Company, of that Protected Series, and of every other Protected Series;
+
+(b) determine when and from which person the asset was acquired, or how the asset otherwise became an asset of the Company or that Protected Series; and
+
+(c) for any asset acquired from the Company or from another Protected Series, determine the consideration paid, the payor, and the payee.
+
+Records may be organized by specific listing, category, type, quantity, or computational or allocative formula or procedure (including a percentage or share of any asset), or in any other reasonable manner, consistent with s. 605.2301(4), Florida Statutes, provided the standard of this Section is met.
+
+**8.3 Separate Accounts; No Commingling.** The Company and each Protected Series shall maintain its own deposit account or accounts, and its funds shall not be commingled with the funds of any Member, the Manager, the Company (as to a Protected Series), or any other Protected Series. All income of a Protected Series shall be deposited to its accounts, and its expenses paid from its accounts. Transfers of funds between accounts shall be made only pursuant to a documented Inter-Series Transfer, loan, contribution, or distribution.
+
+**8.4 Inter-Series Transfers.** Any Inter-Series Transfer (as defined in Section 5.4(b)) requires the approvals stated in Section 5.4(b) and shall be documented contemporaneously by a written record stating (a) the asset transferred, (b) the transferor and transferee (the Company or the specific Protected Series), (c) the date, and (d) the consideration paid, the payor, and the payee. Inter-Series Transfers shall be made for fair value unless the transfer is a documented contribution or distribution.
+
+**8.5 Real Property.** Each acquisition or conveyance of an interest in real property by a Protected Series or the Company shall be made by an instrument naming the acquiring or conveying Protected Series (by its full statutory name) or the Company, as applicable, and shall be recorded where required. Properly recorded instruments affecting real property serve as association records as provided in ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes.
+
+**8.6 Contracts and Liabilities.** Each contract, account, loan, or other obligation shall be entered into in the name of, and shall identify, the Company or the specific Protected Series incurring it, and shall be recorded as an Associated Liability of the person incurring it.
+
+**8.7 Financial Records; Inspection.** Separate books of account shall be maintained for the Company and for each Protected Series, showing income, expenses, assets, liabilities, contributions, and distributions of each. Members' inspection rights are as stated in Section 4.11.
+
+**8.8 Annual Review.** At least annually, the Manager shall review the records maintained under this Article for compliance with s. 605.2301, Florida Statutes, and shall correct any deficiency promptly upon discovery.
+
+**8.9 Standing Association Rules; Savings Provisions.**
+
+(a) **Records.** This Agreement, each Series Exhibit, each asset schedule, and the account, titling, and transaction records maintained under this Article are records within the meaning of s. 605.2301, Florida Statutes, and may be read together, in combination, to satisfy its requirements.
+
+(b) **Standing association rules.** As a standing procedure adopted pursuant to s. 605.2301(4), Florida Statutes, and without limiting any other record: (i) an asset acquired by an instrument naming a Protected Series, or titled in the name of a Protected Series, is an Associated Asset of that Protected Series from the date of acquisition; (ii) an asset acquired with consideration paid from a deposit account of a Protected Series is an Associated Asset of that Protected Series; (iii) funds on deposit in an account established in the name of a Protected Series, and interest thereon, are Associated Assets of that Protected Series; (iv) the income, rents, profits, proceeds, and products of, the insurance proceeds relating to, and every replacement or substitution for, an Associated Asset are Associated Assets of the same person; and (v) every asset acquired in the name of the Company, and every asset not associated with a Protected Series under clauses (i) through (iv) or under any other record maintained under this Article, is an Associated Asset of the Company.
+
+(c) **Interpretation.** This Agreement shall be interpreted and applied to give the fullest effect permitted by law to the separateness of the Company and of each Protected Series and to the limitations of liability described in Section 3.3.
+
+(d) **Correction of records.** The Manager may, and upon discovery of any inaccuracy or omission shall, supplement or correct any record maintained under this Article so that it accurately reflects the association of assets and liabilities, and records as so supplemented or corrected shall be given effect to the fullest extent permitted by law.
+
+(e) **Severability in favor of separateness.** If any provision of this Agreement or of any Series Exhibit would otherwise be construed to impair the separateness of the Company or of any Protected Series or the limitations of liability described in Section 3.3, that provision shall be deemed modified to the minimum extent necessary to preserve them.
+
+---
+
+## ARTICLE 9 \u2014 TAX MATTERS
+
+**9.1 Intended Classification.** It is intended that the Company, and each Protected Series having two or more Associated Members, be classified as a partnership for federal income tax purposes (and that any Protected Series having a single Associated Member be disregarded as an entity separate from that Associated Member), in each case as federal tax law provides as applied to each of them. Nothing in this Agreement constitutes tax advice or a guarantee of any particular tax treatment, and no Member or Manager makes any representation regarding the tax consequences of the protected series structure.
+
+**9.2 Tax Returns; Information.** The Manager shall cause to be prepared and filed all tax returns required of the Company and of each Protected Series, and shall deliver to each Member, after the end of each fiscal year, the tax information (including Schedule K-1s, where applicable) necessary for the Member's returns.
+
+**9.3 Partnership Representative.** The Manager (or a person the Manager designates) shall serve as the "partnership representative" within the meaning of section 6223 of the Code for the Company and for each Protected Series classified as a partnership, with all authority granted to a partnership representative under the Code, including the authority to make or revoke elections (including elections under sections 6221(b) and 6226 of the Code), to conduct and resolve audits and proceedings, and to bind the Members as the Code provides. Each Member shall provide the information, and take the actions, reasonably requested by the partnership representative in connection with any tax matter, and shall pay the Member's share of any imputed underpayment or similar amount attributable to the Member as reasonably determined by the partnership representative.
+
+**9.4 Tax Elections.** The Manager may make, change, or revoke any tax election for the Company or any Protected Series (including an election under section 754 of the Code) that the Manager determines to be in the best interests of the Members as a whole.
+
+**9.5 Fiscal Year.** The fiscal year of the Company and of each Protected Series is the calendar year unless the Manager selects another permitted year.
+
+**9.6 S Corporation Election.** The Company (or any Protected Series treated as a separate entity for federal income tax purposes) may elect classification as an association taxable as a corporation and S corporation status only upon the affirmative vote or consent of all Members. Before or promptly upon making any such election, the Members shall amend and restate this Agreement in the Company's S corporation form of operating agreement, under which the Company and every Protected Series must have identical Members with identical percentages and all allocations and distributions are made strictly pro rata. Until such amendment and restatement, and while any such election is in effect, all allocations and distributions shall be made strictly pro rata in accordance with Percentage Interests notwithstanding any other provision of this Agreement, and this Agreement shall be applied and, to the minimum extent necessary, deemed modified so as to preserve the validity of the election.
+
+## ARTICLE 10 \u2014 TRANSFERS; CREDITOR PROVISIONS
+
+**10.1 Restriction on Transfer.** No Member shall Transfer all or any portion of a Membership Interest, or any right to receive distributions from the Company or any Protected Series, except (a) a Transfer to an Immediate Family Member of the transferring Member made in compliance with Section 10.2, (b) a Transfer effective at death pursuant to the transferring Member's TOD designation under Section 4.12, or (c) another Transfer made with the prior written consent of the Manager and of a Majority in Interest of the Members other than the transferring Member. Any purported Transfer in violation of this Article is void to the fullest extent permitted by law, and the transferee acquires no rights other than those, if any, mandated by the Act.
+
+**10.2 Permitted Family Transfers.** A Transfer of all or part of a Membership Interest to an Immediate Family Member of the transferring Member is permitted, provided the transferee delivers to the Company a signed agreement to be bound by this Agreement.
+
+**10.3 Rights of Transferees.** A transferee (including a permitted family transferee) who is not admitted as a Member under Article 12 holds only the transferable interest \u2014 the right to receive the distributions that would otherwise be paid to the transferor with respect to the transferred interest \u2014 and has no right to vote, to participate in management, to inspect records, or to exercise any other right of a member, except as the Act mandates. A transferred interest remains subject to this Agreement in the hands of every transferee.
+
+**10.4 Involuntary Transfers; Option to Acquire.** Upon any Involuntary Transfer or any event that would result in an Involuntary Transfer of all or part of a Membership Interest, the Company shall have the option, exercisable by the Manager at any time within ninety (90) days after the Company receives written notice that the Involuntary Transfer has occurred, to acquire the interest that is the subject of the Involuntary Transfer at its fair value. Fair value shall be the value agreed in writing between the Manager and the holder of the interest or, absent agreement within thirty (30) days after the option is exercised, the value determined by an independent appraiser selected by the Manager (who shall hold the MAI designation if the assets principally concerned are real property), whose determination is final and binding, with the appraiser's fee borne one-half by the Company and one-half by the holder. The purchase price is payable on commercially reasonable terms determined by the Manager, including payment in installments over a period of up to five (5) years bearing interest at the applicable federal rate. If the Company does not exercise its option, the Members other than the affected Member may, within thirty (30) days after the Company's option lapses, elect to acquire the interest on the same terms, in proportion to their Percentage Interests or as they otherwise agree. Pending exercise or lapse of the options, the holder of the interest has only the rights of a transferee described in Section 10.3.
+
+**10.5 No Dissociation by Transfer Alone.** A Transfer does not by itself dissociate a Member or dissolve the Company or any Protected Series.
+
+**10.6 Charging Order \u2014 Exclusive Remedy.** As provided in ss. 605.0502 and 605.0503, Florida Statutes, a charging order is the sole and exclusive remedy by which a judgment creditor of a Member or of a transferee may satisfy a judgment from the judgment debtor's Membership Interest or transferable interest, whether in the Company or in respect of any Protected Series. A judgment creditor or other holder of a charging order has only the right to receive distributions to which the judgment debtor would otherwise be entitled, has none of the rights of a member or manager, is not entitled to any accounting, inspection, or information rights except as the Act mandates, and may not foreclose upon the charged interest. Nothing in this Agreement enlarges any remedy of any creditor beyond those provided by the Act.
+
+---
+
+## ARTICLE 11 \u2014 EXECUTORY CONTRACT
+
+**11.1 Executory Contract.** The parties agree that this Agreement constitutes an executory contract and shall be governed by 11 U.S.C. \xA7365 in connection with the bankruptcy of the Company or any Member because, among other provisions and obligations, this Agreement imposes on each Member the following affirmative duties (each of which constitutes a material unperformed, future obligation): (a) *[include only if optional Section 6.2 is included; otherwise replace with "(a) [Reserved.]"]* upon approval of a Majority in Interest as provided in Section 6.2, the duty and obligation of each Member to contribute additional capital to the Company or the affected Protected Series; (b) the duty and obligation of each Member to materially participate in the governance of the Company and of each Protected Series with which the Member is associated, as provided in Section 4.6; (c) *[include only if Section 4.7 Alternative A is selected; otherwise replace with "(c) [Reserved.]"]* the duty and obligation of each Member not to compete with the Company, or with any Protected Series with which the Member is associated, in the conduct of their activities and affairs before the dissolution of the Company, as provided in Section 4.7 and consistent with s. 605.04091(2)(c), Florida Statutes; (d) the duty and obligation of each Member not to disclose confidential information, as provided in Section 4.8; and (e) the duty and obligation of each Member not to hinder, delay, slander, or tarnish the reputation of the Company or of any Protected Series, as provided in Section 4.9. The failure of a Member to perform the duties and obligations set forth herein releases and excuses the mutual duties and obligations owed by the Company and the other Members to such defaulting Member.
+
+**11.2 Personal Service Agreement; No Assumption or Assignment.** In accordance with *In re Soderstrom*, 484 B.R. 874 (M.D. Fla. 2013), this Agreement is a personal service agreement due to the managerial and governance duties and obligations owed by each Member and the Manager, and a bankruptcy trustee cannot assume or assign a debtor Member's interest in the Company in accordance with 11 U.S.C. \xA7365(c)(1) without the prior written consent of the other Members.
+
+**11.3 Compliance upon Assumption or Rejection.** Notwithstanding the foregoing, to the extent that a trustee of a Member's bankruptcy is allowed either to assume or reject a debtor Member's interest in the Company governed by this Agreement, such action shall comply with the time period set forth in 11 U.S.C. \xA7365(d), and if the trustee assumes such debtor Member's interest, such trustee shall comply with the terms of this Agreement and Florida law governing this Agreement, including, without limitation, the restrictions of the rights of a creditor of a Member or transferee pursuant to ss. 605.0502 and 605.0503, Florida Statutes.
+
+---
+
+## ARTICLE 12 \u2014 ADMISSION OF MEMBERS; ASSOCIATION WITH PROTECTED SERIES
+
+**12.1 Admission of Members.** A person may be admitted as a Member of the Company only with the written consent of **all** Members and upon the person's delivery of a signed agreement to be bound by this Agreement, except that (a) a TOD beneficiary is admitted as provided in Section 4.12, and (b) a permitted family transferee under Section 10.2 may be admitted with the written consent of a Majority in Interest of the Members other than the transferor.
+
+**12.2 Association with a Protected Series.** A Member may be associated with a Protected Series, and Series Percentages may be established or adjusted, only by an amendment to the applicable Series Exhibit adopted with the written consent of the Manager, the Member to be associated, and all Associated Members of that Protected Series.
+
+**12.3 Continuation on Termination of Last Member.** Upon the termination of the membership of the last remaining member of the Company, the Company shall not be dissolved, and the legal representative of the last remaining member shall agree in writing to continue the Company, and the representative (or an Immediate Family Member designated by the representative who is not a creditor of the last remaining member) shall be admitted as a member effective as of the terminating event, all as permitted by the Act.
+
+---
+
+## ARTICLE 13 \u2014 WITHDRAWAL; DEADLOCK
+
+**13.1 No Voluntary Withdrawal.** No Member may voluntarily withdraw, resign, or dissociate from the Company before the dissolution and winding up of the Company without the written consent of all other Members. A Member's dissociation, whether or not wrongful, does not entitle the dissociated Member to any distribution or payment for the Member's interest except as this Agreement or the Act provides, and a dissociated Member (or the Member's successor) holds thereafter only the rights of a transferee described in Section 10.3.
+
+**13.2 Deadlock; Buy-Sell Election. [OPTIONAL PROVISION \u2014 see Instructions; to omit, replace the text of this Section with "[Reserved.]" \u2014 do not renumber]**
+
+(a) A "Deadlock" exists if the Members (or, as to a matter concerning a Protected Series, its Associated Members) are unable, by the vote required under this Agreement, to approve or reject a matter duly submitted for approval, and the inability continues for sixty (60) days after any Member delivers written notice to the Company and the other Members describing the matter and stating that a Deadlock exists.
+
+(b) During a Deadlock, any Member holding twenty-five percent (25%) or more of the Percentage Interests (the "Offeror") may deliver to the other Members (the "Offerees") a written offer (the "Buy-Sell Offer") stating a single gross valuation for the Company and all Protected Series, in cash. The Buy-Sell Offer constitutes both (i) an offer by the Offeror to purchase all of the Offerees' Membership Interests at their proportionate share of that valuation, and (ii) an offer by the Offeror to sell all of the Offeror's Membership Interest to the Offerees at the Offeror's proportionate share of that valuation.
+
+(c) Within forty-five (45) days after delivery of the Buy-Sell Offer, the Offerees (acting jointly, or severally in proportion to their Percentage Interests among those electing) shall elect in writing either to sell their Membership Interests to the Offeror, or to purchase the Offeror's Membership Interest, in each case at the price determined under the Buy-Sell Offer. Failure to deliver a timely election is an election to sell.
+
+(d) The closing shall occur within sixty (60) days after the election, for cash unless the parties agree otherwise. At closing, the selling Members shall Transfer their Membership Interests free of liens, and the purchasing Member(s) shall be substituted with respect to the transferred interests, including all associated Series Percentages. If the purchasing party fails to close, the other party may elect to purchase on the same terms, and the defaulting party bears the costs of the failed closing.
+
+(e) This Section does not apply to any matter for which the Act or this Agreement requires the consent of all Members and a Member's withholding of consent is expressly permitted by the Act, and does not limit any Member's right to seek judicial dissolution as provided by the Act.
+
+---
+
+## ARTICLE 14 \u2014 DISSOLUTION AND WINDING UP
+
+**14.1 Dissolution of a Protected Series.** A Protected Series is dissolved, and its activities and affairs shall be wound up, upon the first to occur of: (a) the dissolution of the Company; (b) an event or circumstance specified in its Series Exhibit; (c) the affirmative vote or consent of **all** Associated Members of that Protected Series (or, if the Company is the deemed sole Associated Member, the consent of a Majority in Interest); or (d) entry of a judicial order dissolving the Protected Series as provided by the Act.
+
+**14.2 Winding Up a Protected Series.** Upon dissolution of a Protected Series, its Protected Series Manager (or another person designated by a Majority in Interest of its Associated Members) shall wind up its activities and affairs in the manner provided by the Act for winding up a limited liability company, applied to that Protected Series. Its Associated Assets shall be applied: first, to pay or provide for its Associated Liabilities to creditors other than Members; next, to pay or provide for its Associated Liabilities to Members as creditors, to the extent permitted by law; next, to its Associated Members to the extent of their capital sub-account balances for that Protected Series; and finally, the balance to its Associated Members in proportion to their Series Percentages (or, if the Company is the deemed sole Associated Member, to the Company). The Manager shall cause any statement or filing required by the Act or the Department in connection with the dissolution of the Protected Series to be made. The winding up of a Protected Series shall not draw upon, and its creditors shall have no recourse to, the Associated Assets of the Company or of any other Protected Series.
+
+**14.3 Dissolution of the Company.** The Company is dissolved, and its activities and affairs shall be wound up, upon the first to occur of: (a) the written consent of **all** Members; (b) entry of a decree of judicial dissolution under the Act; or (c) any other event that under the Act requires dissolution. The death, incapacity, bankruptcy, dissociation, or withdrawal of a Member does not by itself dissolve the Company. Dissolution of the Company causes the dissolution of each Protected Series, and the winding up of the Company is not complete until the winding up of each Protected Series is complete.
+
+**14.4 Winding Up the Company.** Upon dissolution of the Company, the Manager (or, if there is none, a person designated by a Majority in Interest) shall wind up the Company and each Protected Series. After the winding up of each Protected Series under Section 14.2, the remaining Associated Assets of the Company shall be applied: first, to pay or provide for the Company's Associated Liabilities to creditors other than Members; next, to pay or provide for the Company's Associated Liabilities to Members as creditors; next, to the Members to the extent of their capital sub-account balances for the Company; and finally, the balance to the Members in proportion to their Percentage Interests. Articles of dissolution shall be filed as the Act requires, and the Company shall terminate when winding up is complete.
+
+**14.5 No Deficit Obligation; Recourse Limited.** No Member shall have any obligation to restore any deficit or to contribute capital in connection with any winding up (beyond unpaid contributions duly required under Sections 6.1 and 6.2), and each creditor of the Company or of any Protected Series shall look solely to the Associated Assets of its obligor.
+
+---
+
+## ARTICLE 15 \u2014 AMENDMENTS; CONSENTS
+
+**15.1 Amendments.** This Agreement may be amended only by a written instrument signed by **all** Members; provided, that (a) a Series Exhibit may be amended by a written instrument signed by the Manager and all Associated Members of the affected Protected Series (and, if the amendment would alter the rights or obligations of a Member not associated with that Protected Series, by that Member); (b) the Manager may amend Exhibit A and the Series Exhibits without further consent solely to record changes duly made under this Agreement (admissions, Transfers, TOD designations, capital adjustments under Section 6.3); and (c) no amendment may impose new obligations on the Manager without the Manager's written consent. Oral, implied, or course-of-dealing amendments are of no effect.
+
+**15.2 Action by Written Consent.** Any action of the Members under this Agreement may be taken by written consent as provided in Section 4.4.
+
+---
+
+## ARTICLE 16 \u2014 MISCELLANEOUS
+
+**16.1 Governing Law; Internal Affairs.** This Agreement, the internal affairs of the Company and of each Protected Series, and the relations among the Members, the Manager, each Protected Series Manager, the Company, and each Protected Series, are governed by the laws of the State of Florida, without regard to conflict-of-laws principles.
+
+**16.2 Venue.** Any action or proceeding arising out of or relating to this Agreement, the Company, or any Protected Series shall be brought exclusively in the courts of the county in Florida in which the Company's principal office is located, and each party consents to the jurisdiction of such courts and waives any objection to venue there.
+
+**16.3 Severability.** If any provision of this Agreement is held invalid or unenforceable, that provision shall be modified to the minimum extent necessary to make it enforceable, and the remainder of this Agreement shall remain in full force; provided, that nothing in this Agreement shall be construed to vary any provision of the Act that may not be varied by an operating agreement.
+
+**16.4 Entire Agreement.** This Agreement, including Exhibit A and each Series Exhibit, constitutes the entire agreement governing the Company and each Protected Series and supersedes all prior agreements and understandings with respect to their subject matter.
+
+**16.5 Binding Effect.** This Agreement binds and benefits the Members, the Manager, and their respective heirs, personal representatives, successors, and permitted assigns, and any person who acquires an interest in the Company or is admitted as a member.
+
+**16.6 Counterparts; Electronic Signatures.** This Agreement may be executed in counterparts, each of which is an original and all of which together constitute one instrument. Electronic signatures and electronic records have the same effect as originals.
+
+**16.7 Notices.** Any notice under this Agreement shall be in writing and is effective upon delivery to the recipient's address on Exhibit A (or another address designated in writing), whether delivered personally, by nationally recognized courier, by certified mail, or by e-mail with confirmation of transmission.
+
+**16.8 No Third-Party Beneficiaries.** This Agreement is for the exclusive benefit of the parties and confers no rights on any creditor or other third party.
+
+**16.9 Interpretation.** Headings are for convenience only. "Including" means "including without limitation." References to statutes include amendments and successor provisions.
+
+**16.10 Unregistered Interests.** The Membership Interests have not been registered under federal or state securities laws and may not be offered, sold, or transferred except in compliance with this Agreement and applicable law.
+
+---
+
+## SIGNATURES
+
+IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of the Effective Date.
+
+**MEMBERS:**
+
+_____________________________
+[MEMBER 1 NAME]
+
+_____________________________
+[MEMBER 2 NAME]
+
+_____________________________
+[MEMBER 3 NAME, if any]
+
+**ACKNOWLEDGED AND AGREED BY MANAGER:**
+
+_____________________________
+[MANAGER NAME], Manager
+
+---
+
+## EXHIBIT A \u2014 MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS
+
+**Company:** [COMPANY NAME], LLC
+
+| Member name | Address | Percentage Interest | Initial contribution to the Company | Date |
+|---|---|---|---|---|
+| [MEMBER 1] | [ADDRESS] | [___]% | $[AMOUNT] [and/or described property] | [DATE] |
+| [MEMBER 2] | [ADDRESS] | [___]% | $[AMOUNT] [and/or described property] | [DATE] |
+| [MEMBER 3] | [ADDRESS] | [___]% | $[AMOUNT] [and/or described property] | [DATE] |
+| **Total** | | **100%** | | |
+
+**Transfer on Death designations (ss. 711.50\u2013711.512, Fla. Stat.):**
+
+| Designating Member | TOD beneficiary (any person or entity) |
+|---|---|
+| [MEMBER 1] | [NAME(S) / None] |
+| [MEMBER 2] | [NAME(S) / None] |
+| [MEMBER 3] | [NAME(S) / None] |
+
+If no beneficiary is designated, or a designation fails, the Member's interest passes as provided by law, subject to this Agreement.
+
+---
+
+## SERIES EXHIBIT PS-[N]
+
+**Protected Series name (exactly as filed with the Department):**
+**[COMPANY NAME], LLC - PS [N]**
+
+| Item | Terms |
+|---|---|
+| Purpose of this Protected Series | [PURPOSE \u2014 e.g., "to acquire, own, lease, and manage the real property located at ___" or "any lawful business"] |
+| Associated Member(s) and Series Percentages | [MEMBER 1] \u2014 [___]%; [MEMBER 2] \u2014 [___]% [must total 100%; or: "None \u2014 the Company is the deemed sole Associated Member"] |
+| Protected Series Manager | [Same as Company Manager / NAME] |
+| Contributions to this Protected Series | [MEMBER 1]: $[AMOUNT] on [DATE]; [MEMBER 2]: $[AMOUNT] on [DATE] [and/or described property] |
+| Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the Member(s), together with the records maintained under Article 8. |
+| Special terms (if any) | [None / variations from the base Agreement \u2014 may not vary Article 8 or non-variable provisions of the Act] |
+| Dissolution events specific to this Protected Series (if any) | [None / describe] |
+
+**Adopted effective [DATE] by the Manager and all Associated Members of this Protected Series:**
+
+_____________________________
+[NAME], Protected Series Manager
+
+_____________________________
+[ASSOCIATED MEMBER 1], Member
+
+_____________________________
+[ASSOCIATED MEMBER 2], Member
+
+
+## ASSET SCHEDULE \u2014 ATTACHMENT TO SERIES EXHIBIT PS-[N]
+
+*Complete this schedule for each asset of this Protected Series. Describe each asset so that a stranger could identify it without asking you anything: real property \u2014 street address AND legal description, date acquired, and grantor; deposit account \u2014 institution, account title, last four digits, and date opened; vehicle \u2014 year, make, model, and VIN; equipment \u2014 description and serial number; contract \u2014 parties and date. For any asset acquired from the Company or from another Protected Series, also state the consideration paid, the payor, and the payee. Add pages as needed; keep this schedule current as assets are acquired and disposed of.*
+
+| Asset description | Date acquired | Acquired from | Consideration / payor / payee (if from the Company or another series) |
+|---|---|---|---|
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+
+---
+
+*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Manager-Managed, Multiple Members / Partnership Taxation), v1 draft. Statutory citations verified against Online Sunshine on August 3, 2026: ss. 605.2103, 605.2107, 605.2201, 605.2202, 605.2301, 605.2401, 605.2501, 605.2604, 605.0502, 605.0503, 605.04091, 48.062, 711.50\u2013711.512, Fla. Stat.; 11 U.S.C. \xA7365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013).*
+`;
+
+// server/templates-oa-s.md
+var templates_oa_s_default = `# OPERATING AGREEMENT
+## OF
+## [COMPANY NAME], LLC
+### A FLORIDA PROTECTED SERIES LIMITED LIABILITY COMPANY
+
+**(Manager-Managed \u2014 S Corporation)**
+
+---
+
+THIS OPERATING AGREEMENT (this "Agreement") of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the "Company"), is made and entered into effective as of [DATE] (the "Effective Date"), by and among the undersigned members (each a "Member" and collectively the "Members") and is acknowledged by the undersigned manager (the "Manager").
+
+### RECITALS
+
+A. The Company was formed as a Florida limited liability company by the filing of Articles of Organization with the Florida Department of State, Division of Corporations (the "Department").
+
+B. The Company is a **protected series limited liability company** within the meaning of ss. 605.2101\u2013605.2802, Florida Statutes, having designated, or intending to designate, one or more protected series by filing one or more Protected Series Designations with the Department.
+
+C. The Members intend by this Agreement to set forth the terms governing the Company, each Protected Series designated by the Company, and the relations among the Company, each Protected Series, the Members, and the Manager.
+
+NOW, THEREFORE, the Members adopt the following as the operating agreement of the Company and of each Protected Series:
+
+---
+
+## ARTICLE 1 \u2014 THE COMPANY
+
+**1.1 Definitions.** Capitalized terms have the meanings set forth in Article 2 or in the Section in which they are used.
+
+**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes (the "Act"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101\u2013605.2802 (the "Protected Series Provisions"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.
+
+**1.3 Name; Names of Protected Series.** The name of the Company is **[COMPANY NAME], LLC**. The name of each Protected Series shall comply with s. 605.2202, Florida Statutes: it shall begin with the full name of the Company and shall contain the phrase "protected series" or the abbreviation "P.S." or "PS." The name of each Protected Series shall be as set forth in its filed Protected Series Designation and its Series Exhibit. If the Company changes its name, the Manager shall promptly make all filings required to conform the name of each Protected Series.
+
+**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series except as limited by its Series Exhibit, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
+
+**1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as the Manager may determine. A Protected Series may maintain its own place of business as determined by its Protected Series Manager.
+
+**1.6 Registered Agent and Registered Office.** The registered agent and registered office of the Company shall be as stated in the records of the Department. As required by the Act, the registered agent and registered office of the Company shall also serve as the registered agent and registered office for each Protected Series. Service of process, notice, or demand on a Protected Series may be made as provided by law, including s. 48.062, Florida Statutes.
+
+**1.7 Term.** The Company's existence is perpetual unless the Company is dissolved and wound up in accordance with this Agreement and the Act. No Protected Series may have a duration extending beyond the existence of the Company.
+
+**1.8 Location of Records.** The records of the Company and of each Protected Series \u2014 including the records required by Article 8 \u2014 shall be maintained at the Company's principal office or at such other location (including secure electronic storage) as the Manager determines, and shall at all times be retrievable in perceivable form.
+
+**1.9 Filings.** The Manager shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, and statements of dissolution, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
+
+**1.10 Title to Property.** Title to each Associated Asset of a Protected Series shall be acquired, held, and conveyed **in the name of that Protected Series**. Title to each Associated Asset of the Company shall be acquired, held, and conveyed in the name of the Company. No property of the Company or of any Protected Series shall be held in the individual name of any Member or the Manager. Each Member's interest in the Company is personal property for all purposes.
+
+**1.11 Waiver of Partition Rights.** Each Member irrevocably waives any right to maintain an action for partition or any similar action with respect to any property of the Company or of any Protected Series.
+
+**1.12 No Payments of Individual Obligations.** The credit and property of the Company and of each Protected Series shall be used solely for the benefit of the Company or the applicable Protected Series, and no such property shall be transferred or encumbered for, or in payment of, any individual obligation of any Member or the Manager.
+
+---
+
+## ARTICLE 2 \u2014 DEFINITIONS
+
+**2.1 "Act"** means the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.
+
+**2.2 "Associated Asset"** means an asset of a Protected Series, or of the Company, that satisfies the recordkeeping requirements of s. 605.2301, Florida Statutes, and Article 8 of this Agreement.
+
+**2.3 "Associated Liability"** means a liability incurred by, contracted for, or otherwise existing with respect to a particular Protected Series or the Company, as reflected in the records maintained under Article 8.
+
+**2.4 "Associated Member"** means, with respect to a Protected Series, a Member associated with that Protected Series under this Agreement and its Series Exhibit. If no Member is associated with a Protected Series, the Company itself is deemed the sole Associated Member of that Protected Series as provided by the Act.
+
+**2.5 "Company"** means [COMPANY NAME], LLC.
+
+**2.6 "Immediate Family Member"** means, as to any Member, (a) any ancestor of that Member or descendant of a grandparent of that Member (each an "Individual Family Member," and including persons legally adopted before age 18), or (b) a trust or other entity for the benefit of one or more Individual Family Members, provided all beneficial interests in that entity are held by such persons; a trust is not excluded merely because a remainder beneficiary is not an Individual Family Member.
+
+**2.7 "Involuntary Transfer"** means any Transfer by which a Member or transferee is deprived or divested of any right, title, or interest in a Membership Interest other than voluntarily, including (a) a Transfer to or for the benefit of a judgment creditor pursuant to court order, subject in all events to Section 10.6, (b) a Transfer in connection with reorganization, insolvency, bankruptcy, or receivership, (c) a Transfer to a public officer or agency under any abandoned-property or escheat law, and (d) a Transfer to a spouse or former spouse in connection with dissolution of marriage or marital separation.
+
+**2.8 "Majority in Interest"** means one or more Members holding, in the aggregate, more than fifty percent (50%) of the Percentage Interests of all Members; and, when used with respect to a Protected Series, one or more Associated Members of that Protected Series holding, in the aggregate, more than fifty percent (50%) of the Series Percentages of that Protected Series.
+
+**2.9 "Manager"** means the person named in Section 5.1 and any successor designated under this Agreement.
+
+**2.10 "Member"** means each person identified as a member on Exhibit A and each person admitted as a member in accordance with this Agreement, in each case until dissociated.
+
+**2.11 "Membership Interest"** means a Member's entire interest in the Company, including the Member's interest in capital, profits, and distributions of the Company and of each Protected Series with which the Member is associated, and all rights of a member under the Act and this Agreement.
+
+**2.12 "Percentage Interest"** means, as to each Member, the percentage set forth for that Member on Exhibit A, as adjusted from time to time under this Agreement. Membership interests are of a single class.
+
+**2.13 "Protected Series"** or **"PS"** means a protected series of the Company established under s. 605.2201, Florida Statutes, and identified in a Series Exhibit.
+
+**2.14 "Protected Series Designation"** means a designation of a protected series filed with the Department under s. 605.2201, Florida Statutes, as amended from time to time.
+
+**2.15 "Protected Series Manager"** means the person responsible for management of a Protected Series under Section 5.2.
+
+**2.16 "Series Exhibit"** means, for each Protected Series, the exhibit to this Agreement (each numbered PS-1, PS-2, and so on) setting forth the terms specific to that Protected Series, including its Associated Members and their Series Percentages. Each Series Exhibit is a part of this Agreement.
+
+**2.17 "Series Percentage"** means, as to each Associated Member of a Protected Series, the percentage set forth for that Associated Member in the applicable Series Exhibit, as adjusted from time to time under this Agreement.
+
+**2.18 "Transfer"** means any assignment, transfer, conveyance, devise, gift, pledge, hypothecation, encumbrance, or other disposition, direct or indirect, voluntary or involuntary, in trust or otherwise, and as a verb has a corresponding meaning.
+
+---
+
+## ARTICLE 3 \u2014 PROTECTED SERIES
+
+**3.1 Establishment.** With the affirmative vote or consent of **all** Members, the Company may establish one or more Protected Series by causing a Protected Series Designation to be signed and filed with the Department as provided in s. 605.2201, Florida Statutes. At or before the filing of each Protected Series Designation, the Members and the Manager shall adopt a Series Exhibit for the new Protected Series. The Manager is authorized to execute and file each Protected Series Designation approved under this Section.
+
+**3.2 Status of Each Protected Series.** As provided by the Act, each Protected Series:
+
+(a) is a "person" for purposes of the Act and the Uniform Commercial Code, distinct from the Company, from every other Protected Series, from each Member, and from the Manager;
+
+(b) may, in its own name, conduct any activity in furtherance of its purpose, exercise the powers described in Section 1.4, and sue and be sued;
+
+(c) is **not** a separate legal entity capable of existing independently of the Company, may not be a member of the Company, may not itself designate a protected series, and may not merge, convert, domesticate, or engage in an interest exchange except through the single statutory channel provided in s. 605.2604, Florida Statutes; and
+
+(d) shall be governed by this Agreement, applied to that Protected Series as though the Protected Series were a separate limited liability company, except as its Series Exhibit expressly provides otherwise and except as the Act requires otherwise.
+
+**3.3 Limitation of Liability Among Series (Statutory Shields).** Consistent with s. 605.2401, Florida Statutes:
+
+(a) A debt, obligation, or other liability of the Company is solely the debt, obligation, or liability of the Company, and is enforceable only against the Associated Assets of the Company;
+
+(b) A debt, obligation, or other liability of a Protected Series is solely the debt, obligation, or liability of that Protected Series, and is enforceable only against the Associated Assets of that Protected Series;
+
+(c) No Protected Series is liable for, and the Associated Assets of a Protected Series are not available to satisfy, any debt, obligation, or liability of the Company or of any other Protected Series; and the Company is not liable for, and the Associated Assets of the Company are not available to satisfy, any debt, obligation, or liability of any Protected Series; and
+
+(d) No Member and no Manager is personally liable, directly or indirectly, by way of contribution or otherwise, for any debt, obligation, or liability of the Company or of any Protected Series solely by reason of being or acting as a member, manager, or protected-series manager.
+
+**3.4 Dissolution of a Protected Series Distinguished.** The dissolution and winding up of a Protected Series does not, by itself, cause the dissolution of the Company or of any other Protected Series. The dissolution of the Company causes the dissolution of every Protected Series, and the winding up of the Company is not complete until each Protected Series is wound up.
+
+**3.5 Series Exhibits Control Series Terms.** The terms specific to each Protected Series \u2014 including its name, purpose, Associated Members and their Series Percentages, Protected Series Manager, capital, and any variations from the default rules of this Agreement \u2014 are set forth in its Series Exhibit. In the event of a conflict between a Series Exhibit and this Agreement with respect to the Protected Series to which the Series Exhibit relates, the Series Exhibit controls, except that no Series Exhibit may vary a provision of the Act that may not be varied by an operating agreement (see s. 605.2107, Florida Statutes) or the provisions of Article 8.
+
+---
+
+## ARTICLE 4 \u2014 MEMBERS; VOTING; MEMBER DUTIES
+
+**4.1 Members; Percentage Interests.** The Members and their Percentage Interests are set forth on Exhibit A. Membership interests are of a single class and are expressed as percentages; no certificates shall be issued unless the Manager determines otherwise.
+
+**4.2 Association with Protected Series.** Each Member is an Associated Member of every Protected Series, and each Member's Series Percentage in every Protected Series is at all times identical to that Member's Percentage Interest. No Protected Series may have Associated Members, Series Percentages, or economic rights that differ from the Members and their Percentage Interests in the Company. Only a Member may be an Associated Member of a Protected Series.
+
+**4.3 Voting.** Each Member votes in proportion to the Member's Percentage Interest on matters as to which Members are entitled to vote or consent at the Company level, and each Associated Member votes in proportion to the Member's Series Percentage on matters concerning the applicable Protected Series. Except where this Agreement or a non-variable provision of the Act requires a greater vote, the act of a Majority in Interest constitutes the act of the Members (or, for a matter concerning a Protected Series, the act of that Protected Series' Associated Members). A Membership Interest owned by spouses as tenants by the entireties shall be voted only by the consensus of both spouses; neither spouse acting alone may vote the interest except as the other spouse's attorney-in-fact under a duly executed power of attorney.
+
+**4.4 Meetings; Written Consents.** No regular meetings are required. Any Member or the Manager may call a meeting of the Members (or of the Associated Members of a Protected Series) on at least five (5) days' written notice stating the purpose. Members may participate by any means of remote communication by which all participants can hear one another. Any action that may be taken at a meeting may be taken without a meeting by a written consent signed by Members holding the Percentage Interests (or Series Percentages) required to approve the action, delivered to the Company and maintained with its records, with prompt notice to any non-consenting Member.
+
+**4.5 Limited Liability; No Agency.** No Member shall be personally liable for any debt, obligation, or liability of the Company or of any Protected Series, whether arising in contract, tort, or otherwise, solely by reason of being a Member or Associated Member. No Member is an agent of the Company or of any Protected Series solely by reason of being a member.
+
+**4.6 Duty to Participate in Governance.** Each Member shall materially participate in the governance of the Company and of each Protected Series with which the Member is associated, including by voting or consenting in a timely manner on matters submitted to the Members, attending meetings duly called under Section 4.4 in person or by remote means, furnishing information reasonably requested by the Manager for the Company's or a Protected Series' filings, records, and tax reporting, and executing and delivering instruments reasonably required to carry out actions duly approved under this Agreement.
+
+**4.7 Competition. [SELECT ONE ALTERNATIVE \u2014 see Instructions]**
+
+**[ ] Alternative A \u2014 Noncompetition.** Before the dissolution of the Company, no Member shall compete with the Company, or with any Protected Series with which the Member is associated, in the conduct of the Company's or that Protected Series' activities and affairs, consistent with the standard described in s. 605.04091(2)(c), Florida Statutes. This Section does not prohibit a Member from engaging in any business or venture that does not so compete, and Section 4.10 applies to all other activities.
+
+**[ ] Alternative B \u2014 Competition Permitted.** Each Member may engage in and possess interests in other business ventures of every kind, whether or not competitive with the activities of the Company or of any Protected Series. Engaging in such ventures shall not be deemed to violate this Agreement or any duty under the Act, no Member is obligated to offer any business opportunity to the Company, any Protected Series, or any other Member, and neither the Company, any Protected Series, nor any Member shall have any right in such ventures or their income by virtue of this Agreement. *(Retain the selected Alternative and delete the other. If Alternative B is selected, replace Section 11.1(c) with "(c) [Reserved.]" \u2014 do not renumber.)*
+
+**4.8 Confidentiality.** Each Member shall hold in confidence, and shall not disclose or use other than for purposes of the Company or the applicable Protected Series, all confidential information of the Company and of each Protected Series, including financial records, customer and tenant information, contracts, and the contents of the records maintained under Article 8, except for disclosures required by law or made to the Member's professional advisors who are bound to confidentiality.
+
+**4.9 Non-Disparagement; No Interference.** No Member shall hinder or delay the activities and affairs of the Company or of any Protected Series, or slander, defame, or otherwise tarnish the reputation of the Company or of any Protected Series.
+
+**4.10 Other Activities.** Subject to Sections 4.7 through 4.9, each Member and the Manager may engage in or possess interests in other business ventures of any nature, independently or with others, and neither the Company nor any Protected Series nor any other Member shall have any right in such ventures by virtue of this Agreement.
+
+**4.11 Information Rights.** Each Member has the information and inspection rights provided by the Act with respect to the Company. Information and inspection rights with respect to a particular Protected Series belong to its Associated Members (and to the Manager and its Protected Series Manager); a Member who is not an Associated Member of a Protected Series has only the information rights with respect to that Protected Series that the Act mandates.
+
+**4.12 Transfer on Death Designation.** Each Member's Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50\u2013711.512, Florida Statutes, and reflects each Member's designation, if any, of the person or persons who will become the owner of that Member's Membership Interest upon that Member's death. A Member may designate any person or entity as a beneficiary. A Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, delivered to the Manager; the change is effective upon receipt unless the Manager objects in writing within seven (7) days, and the Manager shall thereafter update Exhibit A (though updating is not required for effectiveness). Upon the designating Member's death, the designated beneficiary automatically succeeds to the deceased Member's transferable interest \u2014 including the economic rights of the deceased Member's Percentage Interest and Series Percentages \u2014 taking subject to this Agreement, and holds the rights of a transferee described in Section 10.3 until admitted as a Member. A beneficiary who is an Immediate Family Member of the deceased Member is admitted as a Member upon delivery to the Company of a written agreement to be bound by this Agreement; any other beneficiary is admitted as a Member upon such delivery and the written consent of a Majority in Interest of the Members other than the deceased Member.
+
+---
+
+## ARTICLE 5 \u2014 MANAGEMENT
+
+**5.1 Manager-Managed; the Manager.** The Company is **manager-managed** as provided in its Articles of Organization and this Agreement. The initial Manager is **[MANAGER NAME]**. The Manager need not be a Member. The Manager serves until resignation, removal, death, or incapacity. The Manager may be removed, with or without cause, and any successor Manager shall be appointed, by a Majority in Interest, evidenced by a signed writing delivered to the Company.
+
+**5.2 Management of Each Protected Series.** Each Protected Series is **manager-managed**. The Protected Series Manager of each Protected Series is the Manager of the Company unless the applicable Series Exhibit names a different person. A Protected Series Manager has, with respect to its Protected Series, the rights, powers, and duties that a manager of a manager-managed limited liability company has under the Act, subject to this Agreement and the Series Exhibit, and may be removed and replaced with respect to that Protected Series by a Majority in Interest of its Associated Members.
+
+**5.3 Authority of the Manager.** Except as limited by Section 5.4 or an applicable Series Exhibit, the Manager (and, as to a Protected Series, its Protected Series Manager) has full and exclusive authority to manage and conduct the activities and affairs of the Company or that Protected Series, including authority to: acquire, hold, improve, lease, sell, exchange, and convey property; borrow money and grant liens and security interests on Associated Assets; open, maintain, and close bank and investment accounts and designate signatories; engage and compensate employees, attorneys, accountants, and other agents; procure insurance; prosecute, defend, settle, and compromise claims; make tax filings and elections consistent with Article 9; execute and deliver instruments of every kind; and do all other acts necessary, appropriate, or convenient to the conduct of the activities and affairs of the Company or the applicable Protected Series.
+
+**5.4 Actions Requiring Member Approval.** Notwithstanding Section 5.3, neither the Manager nor any Protected Series Manager shall do any of the following without the approval stated:
+
+(a) establish a new Protected Series \u2014 the consent of **all Members** (Section 3.1);
+
+(b) **transfer, re-associate, or re-title any asset between the Company and a Protected Series or between Protected Series** (an "Inter-Series Transfer") \u2014 the consent of a Majority in Interest and, as to each Protected Series affected, a Majority in Interest of its Associated Members;
+
+(c) sell, exchange, or otherwise dispose of all or substantially all of the Associated Assets of the Company or of any Protected Series, other than in the ordinary course \u2014 the consent of a Majority in Interest (of the Company or of the affected Protected Series' Associated Members, as applicable);
+
+(d) merge the Company as permitted by the Act \u2014 the consent of **all Members**; or file a statement of dissolution of a Protected Series \u2014 the approval required by Section 14.1;
+
+(e) admit any additional Member, or associate any person with a Protected Series \u2014 the approval required by Article 12;
+
+(f) incur, on behalf of the Company or any Protected Series, indebtedness in excess of $[THRESHOLD] in a single transaction or series of related transactions, or guarantee the obligation of any person (and no guarantee of the obligations of one Protected Series by another or by the Company shall be made except by an express written instrument approved under this Section) \u2014 the consent of a Majority in Interest (of the Company or of the affected Protected Series' Associated Members, as applicable);
+
+(g) lend money of the Company or of a Protected Series to, or borrow from, a Member, the Manager, or their affiliates, other than loans under Section 6.5 \u2014 the consent of a Majority in Interest of the disinterested Members (or disinterested Associated Members, as applicable); or
+
+(h) amend this Agreement or any Series Exhibit \u2014 the approval required by Section 15.1.
+
+**5.5 Standard of Conduct; Exculpation.** The Manager and each Protected Series Manager shall discharge their duties consistent with the Act, including the duties applicable to managers and protected-series managers, which are not varied by this Agreement. No Manager or Protected Series Manager shall be liable to the Company, any Protected Series, or any Member for any act or omission performed or omitted in good faith and in a manner reasonably believed to be within the scope of authority conferred by this Agreement, except for conduct for which exoneration is prohibited by the Act.
+
+**5.6 Indemnification.** The Company shall indemnify the Manager, and each Protected Series shall indemnify its Protected Series Manager, to the fullest extent permitted by the Act, against losses, claims, and expenses (including reasonable attorney's fees) incurred by reason of service in that capacity, except to the extent arising from conduct for which exoneration is prohibited by the Act; **provided, that any indemnification obligation relating to the activities of a particular Protected Series is an Associated Liability of that Protected Series, payable solely from its Associated Assets**, and any indemnification obligation relating to the activities of the Company generally is payable solely from the Associated Assets of the Company.
+
+**5.7 Compensation; Reimbursement; Shared Expenses.** The Manager shall serve without salary unless a Majority in Interest consents in writing to compensation. The Manager and each Protected Series Manager shall be reimbursed for reasonable expenses properly incurred on behalf of the Company or the applicable Protected Series. Costs and expenses that benefit the Company and one or more Protected Series (including formation and filing fees, registered agent fees, accounting, insurance, and administrative overhead) shall be allocated among the Company and the Protected Series benefited on a reasonable and consistent basis determined by the Manager \u2014 by specific attribution where practicable and otherwise pro rata or by such other reasonable formula as the Manager adopts \u2014 and the allocation shall be recorded in the records maintained under Article 8.
+
+---
+
+## ARTICLE 6 \u2014 CAPITAL
+
+**6.1 Initial Contributions.** Each Member's contributions to the Company, and each Associated Member's contributions to each Protected Series, are set forth on Exhibit A and in the applicable Series Exhibits. Each contribution shall identify whether it is made to the Company or to a specific Protected Series, and shall be deposited to, and recorded in the records of, the recipient. A promise by a Member to make a contribution is enforceable only if set out in a writing signed by the Member.
+
+**6.2 Additional Capital Contributions. [OPTIONAL PROVISION \u2014 include or omit; see Instructions]** Upon the approval of a Majority in Interest (or, for a capital need of a particular Protected Series, a Majority in Interest of its Associated Members), each Member (or each Associated Member of the affected Protected Series) shall have the duty and obligation to contribute additional capital to the Company or to the affected Protected Series, in proportion to the Members' Percentage Interests (or the Associated Members' Series Percentages), in the aggregate amount so approved, payable within thirty (30) days after written notice of the approved call; provided, that unless approved by all Members, no Member shall be required to contribute more than $[CAP] in the aggregate in any calendar year under this Section. This obligation is a material, unperformed, future obligation of each Member within the meaning of Section 11.1. *(To omit this provision, replace the text of this Section 6.2 and of Section 6.3 with "[Reserved.]" and replace Section 11.1(a) with "(a) [Reserved.]" \u2014 do not renumber any section. If omitted, no Member has any obligation to contribute capital beyond Section 6.1.)*
+
+**6.3 Failure to Contribute.** If a Member fails to pay an additional capital contribution required under Section 6.2 when due, the Company (or the affected Protected Series) may pursue any remedy available at law or in equity for the failure, and in addition, the non-defaulting Members who elect to do so may advance the defaulted amount, in which case the Percentage Interests (or Series Percentages) of the defaulting and advancing Members shall be adjusted to reflect the aggregate capital contributed by each Member following the advance.
+
+**6.4 No Interest; No Withdrawal.** No interest shall be paid on any contribution. No Member may withdraw or demand the return of any contribution except as this Agreement provides.
+
+**6.5 Member Loans.** A Member may lend funds to the Company or to a specific Protected Series upon commercially reasonable terms evidenced by a written instrument identifying the borrower. A loan is not a contribution, and shall be an Associated Liability solely of the borrowing Protected Series or of the Company, as applicable.
+
+**6.6 Contribution Records; Identical Rights.** The Company shall maintain a record of each Member's contributions to the Company and to each Protected Series. Contributions do not bear interest and confer no priority or preference of any kind: every Membership Interest carries rights to allocations, distributions, and liquidation proceeds identical in proportion to Percentage Interests. Nothing in this Agreement creates a deficit restoration obligation or otherwise personally obligates any Member to contribute capital beyond the contributions required by Sections 6.1 and 6.2.
+
+**6.7 No Right to Specific Property.** No Member has any right to demand or receive any distribution in any specific property of the Company or of any Protected Series.
+
+---
+
+## ARTICLE 7 \u2014 ALLOCATIONS AND DISTRIBUTIONS
+
+**7.1 Allocations.** All items of income, gain, loss, deduction, and credit of the Company and of each Protected Series shall be allocated among the Members strictly pro rata in accordance with their Percentage Interests, consistently with sections 1366 and 1377 of the Internal Revenue Code of 1986, as amended (the "Code").
+
+**7.2 Distributions.** The Manager (or, as to a Protected Series, its Protected Series Manager) may from time to time determine the extent to which cash on hand of the Company or of a Protected Series exceeds current and anticipated needs, including operating expenses, debt service, acquisitions, and reserves, and may distribute any such excess. Distributions in respect of a Protected Series shall be made **solely from the Associated Assets of that Protected Series**; all distributions, from whatever source, shall be made to the Members strictly pro rata in accordance with their Percentage Interests, and every distribution shall confer identical rights on every Membership Interest. Each distribution shall be recorded in the records maintained under Article 8, identifying its source.
+
+**7.3 Tax Distributions.** To the extent of available cash of the Company or the applicable Protected Series, the Manager may make distributions intended to enable the Members to satisfy federal and state income tax liabilities attributable to the Company's income, made strictly pro rata in accordance with Percentage Interests, and is authorized to pay any such amount directly to the government agency responsible for collection on a Member's behalf, with any amount so paid treated as distributed to that Member. Tax distributions in respect of a Protected Series shall be made solely from its Associated Assets and treated as advances against later distributions under Section 7.2.
+
+**7.4 Statutory Limitations.** No distribution shall be made to the extent prohibited by the limitations of the Act applicable to distributions, applied separately to the Company and to each Protected Series as the Act provides.
+
+---
+
+## ARTICLE 8 \u2014 RECORDS; MAINTENANCE OF THE LIABILITY SHIELDS
+
+**8.1 Records Covenants.** The Company and each Protected Series shall create and maintain records satisfying s. 605.2301, Florida Statutes, in accordance with this Article. This Article may not be varied by any Series Exhibit.
+
+**8.2 Asset Association Records.** The Manager shall create and maintain, and shall cause each Protected Series Manager to create and maintain, records that state the name of the Company or of the applicable Protected Series and describe each of its assets with sufficient specificity to permit a **disinterested, reasonable individual** to:
+
+(a) identify the asset and distinguish it from any other asset of the Company, of that Protected Series, and of every other Protected Series;
+
+(b) determine when and from which person the asset was acquired, or how the asset otherwise became an asset of the Company or that Protected Series; and
+
+(c) for any asset acquired from the Company or from another Protected Series, determine the consideration paid, the payor, and the payee.
+
+Records may be organized by specific listing, category, type, quantity, or computational or allocative formula or procedure (including a percentage or share of any asset), or in any other reasonable manner, consistent with s. 605.2301(4), Florida Statutes, provided the standard of this Section is met.
+
+**8.3 Separate Accounts; No Commingling.** The Company and each Protected Series shall maintain its own deposit account or accounts, and its funds shall not be commingled with the funds of any Member, the Manager, the Company (as to a Protected Series), or any other Protected Series. All income of a Protected Series shall be deposited to its accounts, and its expenses paid from its accounts. Transfers of funds between accounts shall be made only pursuant to a documented Inter-Series Transfer, loan, contribution, or distribution.
+
+**8.4 Inter-Series Transfers.** Any Inter-Series Transfer (as defined in Section 5.4(b)) requires the approvals stated in Section 5.4(b) and shall be documented contemporaneously by a written record stating (a) the asset transferred, (b) the transferor and transferee (the Company or the specific Protected Series), (c) the date, and (d) the consideration paid, the payor, and the payee. Inter-Series Transfers shall be made for fair value unless the transfer is a documented contribution or distribution.
+
+**8.5 Real Property.** Each acquisition or conveyance of an interest in real property by a Protected Series or the Company shall be made by an instrument naming the acquiring or conveying Protected Series (by its full statutory name) or the Company, as applicable, and shall be recorded where required. Properly recorded instruments affecting real property serve as association records as provided in ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes.
+
+**8.6 Contracts and Liabilities.** Each contract, account, loan, or other obligation shall be entered into in the name of, and shall identify, the Company or the specific Protected Series incurring it, and shall be recorded as an Associated Liability of the person incurring it.
+
+**8.7 Financial Records; Inspection.** Separate books of account shall be maintained for the Company and for each Protected Series, showing income, expenses, assets, liabilities, contributions, and distributions of each. Members' inspection rights are as stated in Section 4.11.
+
+**8.8 Annual Review.** At least annually, the Manager shall review the records maintained under this Article for compliance with s. 605.2301, Florida Statutes, and shall correct any deficiency promptly upon discovery.
+
+**8.9 Standing Association Rules; Savings Provisions.**
+
+(a) **Records.** This Agreement, each Series Exhibit, each asset schedule, and the account, titling, and transaction records maintained under this Article are records within the meaning of s. 605.2301, Florida Statutes, and may be read together, in combination, to satisfy its requirements.
+
+(b) **Standing association rules.** As a standing procedure adopted pursuant to s. 605.2301(4), Florida Statutes, and without limiting any other record: (i) an asset acquired by an instrument naming a Protected Series, or titled in the name of a Protected Series, is an Associated Asset of that Protected Series from the date of acquisition; (ii) an asset acquired with consideration paid from a deposit account of a Protected Series is an Associated Asset of that Protected Series; (iii) funds on deposit in an account established in the name of a Protected Series, and interest thereon, are Associated Assets of that Protected Series; (iv) the income, rents, profits, proceeds, and products of, the insurance proceeds relating to, and every replacement or substitution for, an Associated Asset are Associated Assets of the same person; and (v) every asset acquired in the name of the Company, and every asset not associated with a Protected Series under clauses (i) through (iv) or under any other record maintained under this Article, is an Associated Asset of the Company.
+
+(c) **Interpretation.** This Agreement shall be interpreted and applied to give the fullest effect permitted by law to the separateness of the Company and of each Protected Series and to the limitations of liability described in Section 3.3.
+
+(d) **Correction of records.** The Manager may, and upon discovery of any inaccuracy or omission shall, supplement or correct any record maintained under this Article so that it accurately reflects the association of assets and liabilities, and records as so supplemented or corrected shall be given effect to the fullest extent permitted by law.
+
+(e) **Severability in favor of separateness.** If any provision of this Agreement or of any Series Exhibit would otherwise be construed to impair the separateness of the Company or of any Protected Series or the limitations of liability described in Section 3.3, that provision shall be deemed modified to the minimum extent necessary to preserve them.
+
+---
+
+## ARTICLE 9 \u2014 TAX MATTERS
+
+**9.1 S Corporation Status.** The Company has elected, or intends to elect, classification as an association taxable as a corporation and S corporation status under section 1362 of the Code, and it is intended that the election remain continuously in effect. Each Member shall execute the consents and other instruments (including IRS Form 2553) necessary or appropriate to make and maintain the election, and no election shall be revoked without the affirmative vote or consent of all Members. The classification of the Company and of each Protected Series shall in all events be determined under federal tax law as applied to each of them, and nothing in this Agreement constitutes tax advice or a guarantee of any particular tax treatment.
+
+**9.2 Returns; Information.** The Manager shall cause to be prepared and filed all tax returns required of the Company (including Form 1120-S) and of each Protected Series, and shall deliver to each Member, after the end of each fiscal year, the information (including Schedule K-1) necessary for the Member's returns.
+
+**9.3 Protecting the Election.** While the S corporation election is in effect: (a) no Transfer of any Membership Interest or transferable interest may be made to any person who is not an eligible S corporation shareholder, or that would cause the number of shareholders to exceed the limit of section 1361 of the Code, and any purported Transfer in violation of this clause is void to the fullest extent permitted by law; (b) a TOD designation under Section 4.12 is effective only in favor of a beneficiary that is an eligible S corporation shareholder; and (c) no Protected Series may be established, and no interest issued or adjusted, except consistently with Section 4.2 and the one-class-of-stock requirement of section 1361 of the Code.
+
+**9.4 S Corporation Savings Clause.** Notwithstanding any other provision of this Agreement or of any Series Exhibit: (a) all allocations and distributions shall be made strictly pro rata in accordance with Percentage Interests, and every Membership Interest confers identical rights to distributions and liquidation proceeds; (b) this Agreement shall be applied and, to the minimum extent necessary, deemed modified so that the Company has a single class of ownership and the S corporation election remains valid; and (c) if the election nonetheless terminates or is determined to be invalid, the Members and the Manager shall cooperate to obtain relief for an inadvertent termination or invalid election under section 1362(f) of the Code, including making the adjustments and taking the actions the Internal Revenue Service may require.
+
+**9.5 Other Elections.** The Manager may make, change, or revoke any other tax election for the Company or any Protected Series that is consistent with maintaining the S corporation election and that the Manager determines to be in the best interests of the Members as a whole.
+
+**9.6 Fiscal Year.** The fiscal year of the Company and of each Protected Series is the calendar year unless another year is permitted for an S corporation under section 1378 of the Code and selected by the Manager.
+
+## ARTICLE 10 \u2014 TRANSFERS; CREDITOR PROVISIONS
+
+**10.1 Restriction on Transfer.** No Member shall Transfer all or any portion of a Membership Interest, or any right to receive distributions from the Company or any Protected Series, except (a) a Transfer to an Immediate Family Member of the transferring Member made in compliance with Section 10.2, (b) a Transfer effective at death pursuant to the transferring Member's TOD designation under Section 4.12, or (c) another Transfer made with the prior written consent of the Manager and of a Majority in Interest of the Members other than the transferring Member. Any purported Transfer in violation of this Article is void to the fullest extent permitted by law, and the transferee acquires no rights other than those, if any, mandated by the Act.
+
+**10.2 Permitted Family Transfers.** A Transfer of all or part of a Membership Interest to an Immediate Family Member of the transferring Member is permitted, provided the transferee delivers to the Company a signed agreement to be bound by this Agreement.
+
+**10.3 Rights of Transferees.** A transferee (including a permitted family transferee) who is not admitted as a Member under Article 12 holds only the transferable interest \u2014 the right to receive the distributions that would otherwise be paid to the transferor with respect to the transferred interest \u2014 and has no right to vote, to participate in management, to inspect records, or to exercise any other right of a member, except as the Act mandates. A transferred interest remains subject to this Agreement in the hands of every transferee.
+
+**10.4 Involuntary Transfers; Option to Acquire.** Upon any Involuntary Transfer or any event that would result in an Involuntary Transfer of all or part of a Membership Interest, the Company shall have the option, exercisable by the Manager at any time within ninety (90) days after the Company receives written notice that the Involuntary Transfer has occurred, to acquire the interest that is the subject of the Involuntary Transfer at its fair value. Fair value shall be the value agreed in writing between the Manager and the holder of the interest or, absent agreement within thirty (30) days after the option is exercised, the value determined by an independent appraiser selected by the Manager (who shall hold the MAI designation if the assets principally concerned are real property), whose determination is final and binding, with the appraiser's fee borne one-half by the Company and one-half by the holder. The purchase price is payable on commercially reasonable terms determined by the Manager, including payment in installments over a period of up to five (5) years bearing interest at the applicable federal rate. If the Company does not exercise its option, the Members other than the affected Member may, within thirty (30) days after the Company's option lapses, elect to acquire the interest on the same terms, in proportion to their Percentage Interests or as they otherwise agree. Pending exercise or lapse of the options, the holder of the interest has only the rights of a transferee described in Section 10.3.
+
+**10.5 No Dissociation by Transfer Alone.** A Transfer does not by itself dissociate a Member or dissolve the Company or any Protected Series.
+
+**10.6 Charging Order \u2014 Exclusive Remedy.** As provided in ss. 605.0502 and 605.0503, Florida Statutes, a charging order is the sole and exclusive remedy by which a judgment creditor of a Member or of a transferee may satisfy a judgment from the judgment debtor's Membership Interest or transferable interest, whether in the Company or in respect of any Protected Series. A judgment creditor or other holder of a charging order has only the right to receive distributions to which the judgment debtor would otherwise be entitled, has none of the rights of a member or manager, is not entitled to any accounting, inspection, or information rights except as the Act mandates, and may not foreclose upon the charged interest. Nothing in this Agreement enlarges any remedy of any creditor beyond those provided by the Act.
+
+---
+
+## ARTICLE 11 \u2014 EXECUTORY CONTRACT
+
+**11.1 Executory Contract.** The parties agree that this Agreement constitutes an executory contract and shall be governed by 11 U.S.C. \xA7365 in connection with the bankruptcy of the Company or any Member because, among other provisions and obligations, this Agreement imposes on each Member the following affirmative duties (each of which constitutes a material unperformed, future obligation): (a) *[include only if optional Section 6.2 is included; otherwise replace with "(a) [Reserved.]"]* upon approval of a Majority in Interest as provided in Section 6.2, the duty and obligation of each Member to contribute additional capital to the Company or the affected Protected Series; (b) the duty and obligation of each Member to materially participate in the governance of the Company and of each Protected Series with which the Member is associated, as provided in Section 4.6; (c) *[include only if Section 4.7 Alternative A is selected; otherwise replace with "(c) [Reserved.]"]* the duty and obligation of each Member not to compete with the Company, or with any Protected Series with which the Member is associated, in the conduct of their activities and affairs before the dissolution of the Company, as provided in Section 4.7 and consistent with s. 605.04091(2)(c), Florida Statutes; (d) the duty and obligation of each Member not to disclose confidential information, as provided in Section 4.8; and (e) the duty and obligation of each Member not to hinder, delay, slander, or tarnish the reputation of the Company or of any Protected Series, as provided in Section 4.9. The failure of a Member to perform the duties and obligations set forth herein releases and excuses the mutual duties and obligations owed by the Company and the other Members to such defaulting Member.
+
+**11.2 Personal Service Agreement; No Assumption or Assignment.** In accordance with *In re Soderstrom*, 484 B.R. 874 (M.D. Fla. 2013), this Agreement is a personal service agreement due to the managerial and governance duties and obligations owed by each Member and the Manager, and a bankruptcy trustee cannot assume or assign a debtor Member's interest in the Company in accordance with 11 U.S.C. \xA7365(c)(1) without the prior written consent of the other Members.
+
+**11.3 Compliance upon Assumption or Rejection.** Notwithstanding the foregoing, to the extent that a trustee of a Member's bankruptcy is allowed either to assume or reject a debtor Member's interest in the Company governed by this Agreement, such action shall comply with the time period set forth in 11 U.S.C. \xA7365(d), and if the trustee assumes such debtor Member's interest, such trustee shall comply with the terms of this Agreement and Florida law governing this Agreement, including, without limitation, the restrictions of the rights of a creditor of a Member or transferee pursuant to ss. 605.0502 and 605.0503, Florida Statutes.
+
+---
+
+## ARTICLE 12 \u2014 ADMISSION OF MEMBERS; ASSOCIATION WITH PROTECTED SERIES
+
+**12.1 Admission of Members.** A person may be admitted as a Member of the Company only with the written consent of **all** Members and upon the person's delivery of a signed agreement to be bound by this Agreement, except that (a) a TOD beneficiary is admitted as provided in Section 4.12, and (b) a permitted family transferee under Section 10.2 may be admitted with the written consent of a Majority in Interest of the Members other than the transferor.
+
+**12.2 Association with a Protected Series.** A Member may be associated with a Protected Series, and Series Percentages may be established or adjusted, only by an amendment to the applicable Series Exhibit adopted with the written consent of the Manager, the Member to be associated, and all Associated Members of that Protected Series.
+
+**12.3 Continuation on Termination of Last Member.** Upon the termination of the membership of the last remaining member of the Company, the Company shall not be dissolved, and the legal representative of the last remaining member shall agree in writing to continue the Company, and the representative (or an Immediate Family Member designated by the representative who is not a creditor of the last remaining member) shall be admitted as a member effective as of the terminating event, all as permitted by the Act.
+
+---
+
+## ARTICLE 13 \u2014 WITHDRAWAL; DEADLOCK
+
+**13.1 No Voluntary Withdrawal.** No Member may voluntarily withdraw, resign, or dissociate from the Company before the dissolution and winding up of the Company without the written consent of all other Members. A Member's dissociation, whether or not wrongful, does not entitle the dissociated Member to any distribution or payment for the Member's interest except as this Agreement or the Act provides, and a dissociated Member (or the Member's successor) holds thereafter only the rights of a transferee described in Section 10.3.
+
+**13.2 Deadlock; Buy-Sell Election. [OPTIONAL PROVISION \u2014 see Instructions; to omit, replace the text of this Section with "[Reserved.]" \u2014 do not renumber]**
+
+(a) A "Deadlock" exists if the Members (or, as to a matter concerning a Protected Series, its Associated Members) are unable, by the vote required under this Agreement, to approve or reject a matter duly submitted for approval, and the inability continues for sixty (60) days after any Member delivers written notice to the Company and the other Members describing the matter and stating that a Deadlock exists.
+
+(b) During a Deadlock, any Member holding twenty-five percent (25%) or more of the Percentage Interests (the "Offeror") may deliver to the other Members (the "Offerees") a written offer (the "Buy-Sell Offer") stating a single gross valuation for the Company and all Protected Series, in cash. The Buy-Sell Offer constitutes both (i) an offer by the Offeror to purchase all of the Offerees' Membership Interests at their proportionate share of that valuation, and (ii) an offer by the Offeror to sell all of the Offeror's Membership Interest to the Offerees at the Offeror's proportionate share of that valuation.
+
+(c) Within forty-five (45) days after delivery of the Buy-Sell Offer, the Offerees (acting jointly, or severally in proportion to their Percentage Interests among those electing) shall elect in writing either to sell their Membership Interests to the Offeror, or to purchase the Offeror's Membership Interest, in each case at the price determined under the Buy-Sell Offer. Failure to deliver a timely election is an election to sell.
+
+(d) The closing shall occur within sixty (60) days after the election, for cash unless the parties agree otherwise. At closing, the selling Members shall Transfer their Membership Interests free of liens, and the purchasing Member(s) shall be substituted with respect to the transferred interests, including all associated Series Percentages. If the purchasing party fails to close, the other party may elect to purchase on the same terms, and the defaulting party bears the costs of the failed closing.
+
+(e) This Section does not apply to any matter for which the Act or this Agreement requires the consent of all Members and a Member's withholding of consent is expressly permitted by the Act, and does not limit any Member's right to seek judicial dissolution as provided by the Act.
+
+---
+
+## ARTICLE 14 \u2014 DISSOLUTION AND WINDING UP
+
+**14.1 Dissolution of a Protected Series.** A Protected Series is dissolved, and its activities and affairs shall be wound up, upon the first to occur of: (a) the dissolution of the Company; (b) an event or circumstance specified in its Series Exhibit; (c) the affirmative vote or consent of **all** Associated Members of that Protected Series (or, if the Company is the deemed sole Associated Member, the consent of a Majority in Interest); or (d) entry of a judicial order dissolving the Protected Series as provided by the Act.
+
+**14.2 Winding Up a Protected Series.** Upon dissolution of a Protected Series, its Protected Series Manager (or another person designated by a Majority in Interest of its Associated Members) shall wind up its activities and affairs in the manner provided by the Act for winding up a limited liability company, applied to that Protected Series. Its Associated Assets shall be applied: first, to pay or provide for its Associated Liabilities to creditors other than Members; next, to pay or provide for its Associated Liabilities to Members as creditors, to the extent permitted by law; next, to its Associated Members to the extent of their capital sub-account balances for that Protected Series; and finally, the balance to its Associated Members in proportion to their Series Percentages (or, if the Company is the deemed sole Associated Member, to the Company). The Manager shall cause any statement or filing required by the Act or the Department in connection with the dissolution of the Protected Series to be made. The winding up of a Protected Series shall not draw upon, and its creditors shall have no recourse to, the Associated Assets of the Company or of any other Protected Series.
+
+**14.3 Dissolution of the Company.** The Company is dissolved, and its activities and affairs shall be wound up, upon the first to occur of: (a) the written consent of **all** Members; (b) entry of a decree of judicial dissolution under the Act; or (c) any other event that under the Act requires dissolution. The death, incapacity, bankruptcy, dissociation, or withdrawal of a Member does not by itself dissolve the Company. Dissolution of the Company causes the dissolution of each Protected Series, and the winding up of the Company is not complete until the winding up of each Protected Series is complete.
+
+**14.4 Winding Up the Company.** Upon dissolution of the Company, the Manager (or, if there is none, a person designated by a Majority in Interest) shall wind up the Company and each Protected Series. After the winding up of each Protected Series under Section 14.2, the remaining Associated Assets of the Company shall be applied: first, to pay or provide for the Company's Associated Liabilities to creditors other than Members; next, to pay or provide for the Company's Associated Liabilities to Members as creditors; next, to the Members to the extent of their capital sub-account balances for the Company; and finally, the balance to the Members in proportion to their Percentage Interests. Articles of dissolution shall be filed as the Act requires, and the Company shall terminate when winding up is complete.
+
+**14.5 No Deficit Obligation; Recourse Limited.** No Member shall have any obligation to restore any deficit or to contribute capital in connection with any winding up (beyond unpaid contributions duly required under Sections 6.1 and 6.2), and each creditor of the Company or of any Protected Series shall look solely to the Associated Assets of its obligor.
+
+---
+
+## ARTICLE 15 \u2014 AMENDMENTS; CONSENTS
+
+**15.1 Amendments.** This Agreement may be amended only by a written instrument signed by **all** Members; provided, that (a) a Series Exhibit may be amended by a written instrument signed by the Manager and all Associated Members of the affected Protected Series (and, if the amendment would alter the rights or obligations of a Member not associated with that Protected Series, by that Member); (b) the Manager may amend Exhibit A and the Series Exhibits without further consent solely to record changes duly made under this Agreement (admissions, Transfers, TOD designations, capital adjustments under Section 6.3); and (c) no amendment may impose new obligations on the Manager without the Manager's written consent. Oral, implied, or course-of-dealing amendments are of no effect.
+
+**15.2 Action by Written Consent.** Any action of the Members under this Agreement may be taken by written consent as provided in Section 4.4.
+
+---
+
+## ARTICLE 16 \u2014 MISCELLANEOUS
+
+**16.1 Governing Law; Internal Affairs.** This Agreement, the internal affairs of the Company and of each Protected Series, and the relations among the Members, the Manager, each Protected Series Manager, the Company, and each Protected Series, are governed by the laws of the State of Florida, without regard to conflict-of-laws principles.
+
+**16.2 Venue.** Any action or proceeding arising out of or relating to this Agreement, the Company, or any Protected Series shall be brought exclusively in the courts of the county in Florida in which the Company's principal office is located, and each party consents to the jurisdiction of such courts and waives any objection to venue there.
+
+**16.3 Severability.** If any provision of this Agreement is held invalid or unenforceable, that provision shall be modified to the minimum extent necessary to make it enforceable, and the remainder of this Agreement shall remain in full force; provided, that nothing in this Agreement shall be construed to vary any provision of the Act that may not be varied by an operating agreement.
+
+**16.4 Entire Agreement.** This Agreement, including Exhibit A and each Series Exhibit, constitutes the entire agreement governing the Company and each Protected Series and supersedes all prior agreements and understandings with respect to their subject matter.
+
+**16.5 Binding Effect.** This Agreement binds and benefits the Members, the Manager, and their respective heirs, personal representatives, successors, and permitted assigns, and any person who acquires an interest in the Company or is admitted as a member.
+
+**16.6 Counterparts; Electronic Signatures.** This Agreement may be executed in counterparts, each of which is an original and all of which together constitute one instrument. Electronic signatures and electronic records have the same effect as originals.
+
+**16.7 Notices.** Any notice under this Agreement shall be in writing and is effective upon delivery to the recipient's address on Exhibit A (or another address designated in writing), whether delivered personally, by nationally recognized courier, by certified mail, or by e-mail with confirmation of transmission.
+
+**16.8 No Third-Party Beneficiaries.** This Agreement is for the exclusive benefit of the parties and confers no rights on any creditor or other third party.
+
+**16.9 Interpretation.** Headings are for convenience only. "Including" means "including without limitation." References to statutes include amendments and successor provisions.
+
+**16.10 Unregistered Interests.** The Membership Interests have not been registered under federal or state securities laws and may not be offered, sold, or transferred except in compliance with this Agreement and applicable law.
+
+---
+
+## SIGNATURES
+
+IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of the Effective Date.
+
+**MEMBERS:**
+
+_____________________________
+[MEMBER 1 NAME]
+
+_____________________________
+[MEMBER 2 NAME]
+
+_____________________________
+[MEMBER 3 NAME, if any]
+
+**ACKNOWLEDGED AND AGREED BY MANAGER:**
+
+_____________________________
+[MANAGER NAME], Manager
+
+---
+
+## EXHIBIT A \u2014 MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS
+
+**Company:** [COMPANY NAME], LLC
+
+| Member name | Address | Percentage Interest | Initial contribution to the Company | Date |
+|---|---|---|---|---|
+| [MEMBER 1] | [ADDRESS] | [___]% | $[AMOUNT] [and/or described property] | [DATE] |
+| [MEMBER 2] | [ADDRESS] | [___]% | $[AMOUNT] [and/or described property] | [DATE] |
+| [MEMBER 3] | [ADDRESS] | [___]% | $[AMOUNT] [and/or described property] | [DATE] |
+| **Total** | | **100%** | | |
+
+**Transfer on Death designations (ss. 711.50\u2013711.512, Fla. Stat.):**
+
+| Designating Member | TOD beneficiary (any person or entity) |
+|---|---|
+| [MEMBER 1] | [NAME(S) / None] |
+| [MEMBER 2] | [NAME(S) / None] |
+| [MEMBER 3] | [NAME(S) / None] |
+
+If no beneficiary is designated, or a designation fails, the Member's interest passes as provided by law, subject to this Agreement.
+
+---
+
+## SERIES EXHIBIT PS-[N]
+
+**Protected Series name (exactly as filed with the Department):**
+**[COMPANY NAME], LLC - PS [N]**
+
+| Item | Terms |
+|---|---|
+| Purpose of this Protected Series | [PURPOSE \u2014 e.g., "to acquire, own, lease, and manage the real property located at ___" or "any lawful business"] |
+| Associated Member(s) and Series Percentages | All Members of the Company, identically in proportion to their Percentage Interests |
+| Protected Series Manager | [Same as Company Manager / NAME] |
+| Contributions to this Protected Series | [MEMBER 1]: $[AMOUNT] on [DATE]; [MEMBER 2]: $[AMOUNT] on [DATE] [and/or described property] |
+| Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the Member(s), together with the records maintained under Article 8. |
+| Special terms (if any) | [None / variations from the base Agreement \u2014 may not vary Article 8 or non-variable provisions of the Act] |
+| Dissolution events specific to this Protected Series (if any) | [None / describe] |
+
+**Adopted effective [DATE] by the Manager and all Associated Members of this Protected Series:**
+
+_____________________________
+[NAME], Protected Series Manager
+
+_____________________________
+[ASSOCIATED MEMBER 1], Member
+
+_____________________________
+[ASSOCIATED MEMBER 2], Member
+
+
+## ASSET SCHEDULE \u2014 ATTACHMENT TO SERIES EXHIBIT PS-[N]
+
+*Complete this schedule for each asset of this Protected Series. Describe each asset so that a stranger could identify it without asking you anything: real property \u2014 street address AND legal description, date acquired, and grantor; deposit account \u2014 institution, account title, last four digits, and date opened; vehicle \u2014 year, make, model, and VIN; equipment \u2014 description and serial number; contract \u2014 parties and date. For any asset acquired from the Company or from another Protected Series, also state the consideration paid, the payor, and the payee. Add pages as needed; keep this schedule current as assets are acquired and disposed of.*
+
+| Asset description | Date acquired | Acquired from | Consideration / payor / payee (if from the Company or another series) |
+|---|---|---|---|
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+
+---
+
+*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Manager-Managed / S Corporation), v1 draft. Statutory citations verified against Online Sunshine on August 3, 2026: ss. 605.2103, 605.2107, 605.2201, 605.2202, 605.2301, 605.2401, 605.2501, 605.2604, 605.0502, 605.0503, 605.04091, 48.062, 711.50\u2013711.512, Fla. Stat.; 11 U.S.C. \xA7365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013).*
+`;
+
+// server/oa.ts
+function loadTemplate(v2) {
+  return v2.includes("OPERATING AGREEMENT") ? v2 : readFileSync(v2, "utf8");
+}
+var singleTemplate = loadTemplate(templates_oa_single_default);
+var multiTemplate = loadTemplate(templates_oa_multi_default);
+var sCorpTemplate = loadTemplate(templates_oa_s_default);
+var OA_TEMPLATE_VERSION = "First Edition \u2014 August 2026";
+function must(haystack, needle, label) {
+  const found = typeof needle === "string" ? haystack.includes(needle) : needle.test(haystack);
+  if (!found) throw new Error(`OA template marker missing: ${label}`);
+}
+function replaceOnce(s, from, to, label) {
+  must(s, from, label);
+  return typeof from === "string" ? s.replace(from, to) : s.replace(from, to);
+}
+var money = (n) => `$${Math.round(n).toLocaleString("en-US")}`;
+function replaceSection(s, heading, replacement, label) {
+  const re = new RegExp(`## ${heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[\\s\\S]*?(?=
+## |$)`);
+  must(s, re, label);
+  return s.replace(re, replacement);
+}
+function extractSection(s, heading, label) {
+  const re = new RegExp(`## ${heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[\\s\\S]*?(?=
+## |$)`);
+  const m2 = s.match(re);
+  if (!m2) throw new Error(`OA template section missing: ${label}`);
+  return { doc: s.replace(re, ""), section: m2[0] };
+}
+function stripInstructionNotes(s) {
+  return s.replace(/\s*\*\((To omit|Retain the selected|If this Section is omitted)[\s\S]*?\)\*/g, "").replace(/\s*\*\[include only if[\s\S]*?\]\*/g, "").replace(/ \[OPTIONAL PROVISION[\s\S]*?\](?=\*\*|$)/gm, "").replace(/ \[SELECT ONE ALTERNATIVE[\s\S]*?\](?=\*\*|$)/gm, "");
+}
+function assembleOa(inputs) {
+  let s = inputs.version === "single" ? singleTemplate : inputs.version === "s" ? sCorpTemplate : multiTemplate;
+  const co = inputs.companyName;
+  must(s, "[COMPANY NAME], LLC", "company name");
+  s = s.split("[COMPANY NAME], LLC").join(co);
+  s = s.split("[COMPANY NAME]").join(co);
+  s = replaceOnce(s, 'effective as of [DATE] (the "Effective Date")', `effective as of ${inputs.effectiveDate} (the "Effective Date")`, "effective date");
+  s = s.split("[PRINCIPAL ADDRESS]").join(inputs.principalAddress);
+  s = s.split("**[MANAGER NAME]**").join(`**${inputs.managerName}**`);
+  s = s.split("[MANAGER NAME], Manager").join(`${inputs.managerName}, Manager`);
+  s = s.split("[MANAGER NAME]").join(inputs.managerName);
+  if (inputs.version === "multi" || inputs.version === "s") {
+    must(s, "$[THRESHOLD]", "threshold");
+    s = s.split("$[THRESHOLD]").join(money(inputs.borrowingThreshold ?? 25e3));
+    if (inputs.includeCapitalCalls) {
+      s = s.split("$[CAP]").join(money(inputs.capitalCallCap ?? 25e3));
+    } else {
+      s = replaceSectionBody(s, /\*\*6\.2 Additional Capital Contributions\.[^\n]*\n[\s\S]*?(?=\n\*\*6\.3)/, "**6.2 Additional Capital Contributions.** [Reserved.]\n\n", "6.2 omit");
+      s = replaceSectionBody(s, /\*\*6\.3 Failure to Contribute\.\*\*[\s\S]*?(?=\n\*\*6\.4)/, "**6.3 Failure to Contribute.** [Reserved.]\n\n", "6.3 omit");
+      s = replaceSectionBody(s, /\(a\) \*\[include only if optional Section 6\.2[\s\S]*?\]\*[\s\S]*?; \(b\)/, "(a) [Reserved.]; (b)", "11.1(a) reserve");
+    }
+    const altA = s.match(/\*\*\[ \] Alternative A — Noncompetition\.\*\*([\s\S]*?)(?=\n\*\*\[ \] Alternative B)/);
+    const altB = s.match(/\*\*\[ \] Alternative B — Competition Permitted\.\*\*([\s\S]*?)(?=\n\n\*\*4\.8)/);
+    if (!altA || !altB) throw new Error("OA template marker missing: 4.7 alternatives");
+    const chosen = (inputs.competition === "B" ? altB[1] : altA[1]).trim();
+    s = replaceSectionBody(
+      s,
+      /\*\*4\.7 Competition\.[^\n]*\n[\s\S]*?(?=\n\n\*\*4\.8)/,
+      `**4.7 Competition.** ${chosen}
+`,
+      "4.7 rebuild"
+    );
+    if (inputs.competition === "B") {
+      s = replaceSectionBody(s, /\(c\) \*\[include only if Section 4\.7 Alternative A[\s\S]*?\]\*[\s\S]*?; \(d\)/, "(c) [Reserved.]; (d)", "11.1(c) reserve");
+    }
+    if (!inputs.includeShotgun) {
+      s = replaceSectionBody(s, /\*\*13\.2 Deadlock; Buy-Sell Election\.[^\n]*\*\*[\s\S]*?(?=\n---|\n## ARTICLE 14)/, "**13.2 Deadlock; Buy-Sell Election.** [Reserved.]\n\n", "13.2 omit");
+    }
+  }
+  s = stripInstructionNotes(s);
+  let titleName = "OPERATING AGREEMENT";
+  if (inputs.amendedRestated) {
+    titleName = "AMENDED AND RESTATED OPERATING AGREEMENT";
+    s = replaceOnce(s, "# OPERATING AGREEMENT", "# AMENDED AND RESTATED\n# OPERATING AGREEMENT", "title");
+    s = replaceOnce(s, 'THIS OPERATING AGREEMENT (this "Agreement")', 'THIS AMENDED AND RESTATED OPERATING AGREEMENT (this "Agreement")', "preamble");
+    const supersede = inputs.priorAgreementDate ? `the Operating Agreement of the Company dated ${inputs.priorAgreementDate}` : "any and all prior operating agreements of the Company, whether written or oral";
+    s = replaceOnce(
+      s,
+      "NOW, THEREFORE,",
+      `D. This Agreement amends, restates, and supersedes in its entirety ${supersede}, which shall be of no further force or effect from the Effective Date.
+
+NOW, THEREFORE,`,
+      "supersede recital"
+    );
+  }
+  if (inputs.version === "single") {
+    const m2 = inputs.members[0];
+    const exhibitA = `## EXHIBIT A \u2014 MEMBER; CONTRIBUTIONS; TOD DESIGNATION
+
+**Company:** ${co}
+
+| Item | Information |
+|---|---|
+| Member name | ${m2.name} |
+| Member address | ${m2.address} |
+| Membership Interest | 100% (single class) |
+| Initial contribution to the Company | ${inputs.contributionToCompany || m2.contribution || "\u2014"} |
+| Date of contribution | ${inputs.effectiveDate} |
+
+**Transfer on Death designation (ss. 711.50\u2013711.512, Fla. Stat.):**
+
+Upon the death of the Member, the Membership Interest shall pass to: **${m2.todBeneficiary || "No beneficiary designated"}**${m2.todBeneficiary ? "" : " \u2014 the Membership Interest passes as provided by law"}, subject in all events to this Agreement.
+`;
+    s = replaceSection(s, "EXHIBIT A \u2014 MEMBER; CONTRIBUTIONS; TOD DESIGNATION", exhibitA, "Exhibit A single");
+  } else {
+    const rows = inputs.members.map((m2) => `| ${m2.name} | ${m2.address} | ${m2.percentage}% | ${m2.contribution || "\u2014"} | ${inputs.effectiveDate} |`).join("\n");
+    const todRows = inputs.members.map((m2) => `| ${m2.name} | ${m2.todBeneficiary || "None"} |`).join("\n");
+    const exhibitA = `## EXHIBIT A \u2014 MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS
+
+**Company:** ${co}
+
+| Member name | Address | Percentage Interest | Initial contribution to the Company | Date |
+|---|---|---|---|---|
+${rows}
+| **Total** | | **100%** | | |
+
+**Transfer on Death designations (ss. 711.50\u2013711.512, Fla. Stat.):**
+
+| Designating Member | TOD beneficiary (any person or entity) |
+|---|---|
+${todRows}
+
+If no beneficiary is designated, or a designation fails, the Member's interest passes as provided by law, subject to this Agreement.
+`;
+    s = replaceSection(s, "EXHIBIT A \u2014 MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS", exhibitA, "Exhibit A multi");
+  }
+  const ex1 = extractSection(s, "SERIES EXHIBIT PS-[N]", "series exhibit template");
+  s = ex1.doc;
+  const ex2 = extractSection(s, "ASSET SCHEDULE \u2014 ATTACHMENT TO SERIES EXHIBIT PS-[N]", "asset schedule template");
+  s = ex2.doc;
+  const exhibits = [];
+  inputs.series.forEach((ser, idx) => {
+    const n = idx + 1;
+    const assoc = ser.associated.length > 0 ? ser.associated.map((a2) => `${a2.memberName} \u2014 ${a2.seriesPercentage}%`).join("; ") : "None \u2014 the Company is the deemed sole Associated Member";
+    let ex = ex1.section;
+    ex = ex.replace("## SERIES EXHIBIT PS-[N]", `## SERIES EXHIBIT ${n}`);
+    ex = ex.replace(/\*\*Protected Series name \(exactly as filed with the Department\):\*\*\n\*\*[^\n]+\*\*/, `**Protected Series name (exactly as filed with the Department):**
+**${ser.name}**`);
+    ex = ex.replace(/\| Purpose of this Protected Series \|[^\n]*\|/, `| Purpose of this Protected Series | ${ser.purpose || "Any lawful business, purpose, or activity"} |`);
+    if (inputs.version !== "s") {
+      ex = ex.replace(/\| Associated Member\(s\)[^\n]*\|[^\n]*\|/, inputs.version === "single" ? `| Associated Member(s) | ${inputs.members[0].name} \u2014 100% |` : `| Associated Member(s) and Series Percentages | ${assoc} |`);
+    }
+    ex = ex.replace(/\| Protected Series Manager \|[^\n]*\|/, `| Protected Series Manager | ${inputs.managerName} |`);
+    ex = ex.replace(/\| Contributions to this Protected Series \|[^\n]*\|/, `| Contributions to this Protected Series | ${ser.contribution || "\u2014"} |`);
+    ex = ex.replace(/\| Special terms \(if any\) \|[^\n]*\|/, "| Special terms (if any) | None |");
+    ex = ex.replace(/\| Dissolution events[^\n]*\|[^\n]*\|/, "| Dissolution events specific to this Protected Series (if any) | None |");
+    const adoptNames = ser.associated.length > 0 ? ser.associated.flatMap((u) => u.signatories ?? [u.memberName]) : inputs.members.flatMap((m2) => m2.signatories ?? [m2.name]);
+    const adoptLines = adoptNames.map((n2) => `_____________________________
+${n2}, Member`).join("\n\n");
+    ex = ex.replace(
+      /_+\n\[ASSOCIATED MEMBER 1\], Member[\s\S]*?_+\n\[ASSOCIATED MEMBER 2\], Member/,
+      adoptLines
+    );
+    ex = ex.replace(/_+\n\[MEMBER NAME\], Member/, adoptLines);
+    ex = ex.split("[NAME], Protected Series Manager").join(`${inputs.managerName}, Protected Series Manager`).split("effective [DATE]").join(`effective ${inputs.effectiveDate}`);
+    let sched = ex2.section.replace(
+      "## ASSET SCHEDULE \u2014 ATTACHMENT TO SERIES EXHIBIT PS-[N]",
+      `## ASSET SCHEDULE \u2014 ATTACHMENT TO SERIES EXHIBIT ${n} (${ser.name})`
+    );
+    exhibits.push(ex.trim() + "\n\n" + sched.trim());
+  });
+  if (inputs.version === "single") {
+    s = s.split("[MEMBER NAME]").join(inputs.members[0].name);
+    s = s.split("[ADDRESS]").join(inputs.members[0].address);
+  } else {
+    const sigLines = inputs.members.flatMap((m2) => m2.signatories ?? [m2.name]).map((n) => `_____________________________
+${n}`).join("\n\n");
+    s = s.replace(
+      /\*\*MEMBERS:\*\*[\s\S]*?(?=\*\*ACKNOWLEDGED AND AGREED BY MANAGER:\*\*)/,
+      `**MEMBERS:**
+
+${sigLines}
+
+`
+    );
+  }
+  s = s.replace(/\n\*Form document —[\s\S]*$/, "\n");
+  s = s.trimEnd() + "\n\n" + exhibits.join("\n\n") + `
+
+*${titleName} of ${co} \u2014 generated by MyFloridaSeriesLLC \xB7 Master ${OA_TEMPLATE_VERSION}*
+`;
+  return { markdown: s, title: `${inputs.amendedRestated ? "Amended and Restated " : ""}Operating Agreement \u2014 ${co}` };
+}
+function replaceSectionBody(s, re, replacement, label) {
+  if (!re.test(s)) throw new Error(`OA template marker missing: ${label}`);
+  return s.replace(re, replacement);
 }
 
 // node_modules/hono/dist/utils/cookie.js
@@ -104180,8 +104853,12 @@ function raCancellationAdminEmail(opts) {
   };
 }
 function serviceOrderClientEmail(opts) {
-  const subject = opts.type === "series" ? "Your Protected Series order is confirmed" : "Your EIN order is confirmed";
-  const action = opts.needsInfo ? `<p><strong>One step is needed from you:</strong> sign in to your portal and provide the
+  const subject = opts.type === "series" ? "Your Protected Series order is confirmed" : opts.type === "s-election" ? "Your S corporation election order is confirmed" : "Your EIN order is confirmed";
+  const action = opts.needsInfo ? opts.type === "s-election" ? `<p><strong>One step is needed from you:</strong> sign in to your portal and provide the
+         election details (owners, ownership percentages, and identification numbers) through the
+         secure form. We cannot prepare Form 2553 until you do. The election has a strict IRS
+         deadline, so please do this promptly. For your security, never send Social Security
+         numbers by email.</p>` : `<p><strong>One step is needed from you:</strong> sign in to your portal and provide the
        responsible party's details through the secure form. We cannot obtain the EIN until you do.
        For your security, never send Social Security numbers by email.</p>` : `<p>No further action is needed from you. We'll post the confirmation to your portal when
        the work is complete.</p>`;
@@ -104281,7 +104958,10 @@ app.post("/orders", async (c) => {
     seriesCount: data.series.length,
     certificateOfStatus: data.orderCertificateOfStatus,
     certifiedCopy: data.orderCertifiedCopy,
-    ein: !!data.orderEin
+    ein: !!data.orderEin,
+    // S election package: new formations only — a converted entity's election
+    // window is measured from its original existence, not our filing.
+    sElection: !!data.orderSElection && data.filingPath !== "CONVERT"
   });
   const llcName = payload.llcName.finalName || payload.llcName.desiredName || "Unnamed LLC";
   const db2 = await getDb();
@@ -104353,6 +105033,13 @@ async function fulfillPaidOrder(orderId, squarePaymentId) {
       [clientId, order.llc_name, JSON.stringify({ target: "company" }), EIN_FEE_CENTS, orderId, squarePaymentId]
     );
   }
+  if (payload?.optionalDocuments?.sElection && payload?.filingPath !== "CONVERT") {
+    await db2.query(
+      `INSERT INTO service_orders (client_id, type, status, llc_name, details, amount_cents, formation_order_id, paid_at, square_payment_id)
+       VALUES ($1, 's-election', 'awaiting_info', $2, $3, $4, $5, now(), $6)`,
+      [clientId, order.llc_name, JSON.stringify({}), S_ELECTION_FEE_CENTS, orderId, squarePaymentId]
+    );
+  }
   if (existing.length === 0 || !existing[0].password_hash) {
     const { token, tokenHash } = newToken();
     await db2.query(
@@ -104383,13 +105070,13 @@ async function fulfillPaidServiceOrder(serviceOrderId, squarePaymentId) {
   const rows = await db2.query("SELECT id, client_id, type, status, llc_name, details, amount_cents FROM service_orders WHERE id = $1", [serviceOrderId]);
   if (rows.length === 0 || rows[0].status !== "pending_payment") return;
   const so2 = rows[0];
-  const nextStatus = so2.type === "ein" ? "awaiting_info" : "in_progress";
+  const nextStatus = so2.type === "ein" || so2.type === "s-election" ? "awaiting_info" : "in_progress";
   await db2.query(
     "UPDATE service_orders SET status = $1, paid_at = now(), square_payment_id = $2 WHERE id = $3",
     [nextStatus, squarePaymentId, so2.id]
   );
   const details = typeof so2.details === "string" ? JSON.parse(so2.details) : so2.details;
-  const summary = so2.type === "series" ? `Protected Series Designation \u2014 ${details.seriesName ?? so2.llc_name}` : `Federal EIN \u2014 ${details.target === "series" ? details.seriesName ?? "series" : so2.llc_name}`;
+  const summary = so2.type === "series" ? `Protected Series Designation \u2014 ${details.seriesName ?? so2.llc_name}` : so2.type === "s-election" ? `S Corporation Election Package \u2014 ${so2.llc_name}` : `Federal EIN \u2014 ${details.target === "series" ? details.seriesName ?? "series" : so2.llc_name}`;
   const clients = await db2.query(
     "SELECT email, name FROM clients WHERE id = $1",
     [so2.client_id]
@@ -104399,7 +105086,7 @@ async function fulfillPaidServiceOrder(serviceOrderId, squarePaymentId) {
     const mail = serviceOrderClientEmail({
       type: so2.type,
       summary,
-      needsInfo: so2.type === "ein",
+      needsInfo: so2.type === "ein" || so2.type === "s-election",
       portalUrl: `${env.PUBLIC_BASE_URL}/portal`
     });
     sendMail({ to: client.email, ...mail }).catch((e) => console.error("[service] client email failed:", e));
@@ -104480,6 +105167,17 @@ if (!env.isProd) {
       [tokenHash, rows[0].id, new Date(Date.now() + 36e5).toISOString()]
     );
     return c.json({ data: { token } });
+  });
+  app.post("/dev/age-formation", async (c) => {
+    const { email, days } = await c.req.json();
+    const db2 = await getDb();
+    const rows = await db2.query("SELECT id FROM clients WHERE email = $1", [email.toLowerCase()]);
+    if (rows.length === 0) return c.json(err2("Not found", "NOT_FOUND"), 404);
+    await db2.query(
+      "UPDATE orders SET paid_at = now() - ($1 || ' days')::interval WHERE client_id = $2 AND status = 'paid'",
+      [String(Math.round(days)), rows[0].id]
+    );
+    return c.json({ data: { ok: true } });
   });
 }
 var verifyAddressSchema = external_exports.object({
@@ -104692,6 +105390,8 @@ async function oaSeed(clientId) {
 }
 var oaAnswersSchema = external_exports.object({
   firstOrAmended: external_exports.enum(["first", "amended"]).optional(),
+  sElection: external_exports.boolean().optional(),
+  // true = build on the S corporation form
   effectiveDate: external_exports.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   authorized: external_exports.boolean().optional(),
   contributionToCompany: external_exports.string().max(300).optional(),
@@ -104729,7 +105429,7 @@ var SPOUSAL_FORM_LABEL = {
   TBE: "tenants by the entireties",
   JTWROS: "joint tenants with right of survivorship"
 };
-function fmtDate(iso) {
+function fmtDate2(iso) {
   const [y, m2, d2] = iso.split("-").map(Number);
   return new Date(Date.UTC(y, m2 - 1, d2)).toLocaleDateString("en-US", {
     year: "numeric",
@@ -104786,8 +105486,9 @@ app.post("/portal/oa/generate", async (c) => {
   const a2 = body.data;
   const seed = await oaSeed(session.clientId);
   if (!seed) return c.json(err2("No formed LLC found on your account.", "NO_LLC"), 400);
-  const version = seed.members.length > 1 ? "multi" : "single";
-  if (version === "multi" && seed.managementStructure === "MEMBER_MANAGED") {
+  const multiOwner = seed.members.length > 1;
+  const version = a2.sElection ? "s" : multiOwner ? "multi" : "single";
+  if (multiOwner && seed.managementStructure === "MEMBER_MANAGED") {
     return c.json(err2("Member-managed agreements are prepared manually \u2014 we'll be in touch.", "MANUAL_PREP"), 400);
   }
   if (a2.authorized !== true) {
@@ -104805,7 +105506,7 @@ app.post("/portal/oa/generate", async (c) => {
     month: "long",
     day: "numeric"
   }) : null;
-  const couples = version === "multi" ? a2.couples ?? [] : [];
+  const couples = multiOwner ? a2.couples ?? [] : [];
   const pairedIdx = /* @__PURE__ */ new Set();
   for (const cpl of couples) {
     if (cpl.a === cpl.b || !seed.members[cpl.a] || !seed.members[cpl.b] || pairedIdx.has(cpl.a) || pairedIdx.has(cpl.b)) {
@@ -104835,13 +105536,16 @@ app.post("/portal/oa/generate", async (c) => {
       members.push({
         name: m2.name,
         address: m2.address,
-        percentage: version === "single" ? 100 : a2.members?.[i]?.percentage ?? 0,
+        percentage: multiOwner ? a2.members?.[i]?.percentage ?? 0 : 100,
         contribution: a2.members?.[i]?.contribution ?? "",
         todBeneficiary: a2.members?.[i]?.todBeneficiary ?? ""
       });
     }
   });
-  if (version === "multi") {
+  if (version === "s" && !multiOwner && !members[0].contribution) {
+    members[0].contribution = a2.contributionToCompany ?? "";
+  }
+  if (multiOwner) {
     const total = members.reduce((acc, m2) => acc + m2.percentage, 0);
     if (Math.abs(total - 100) > 0.01) {
       return c.json(err2("Percentage interests must total exactly 100%.", "INVALID_INPUT"), 400);
@@ -104863,7 +105567,11 @@ app.post("/portal/oa/generate", async (c) => {
     name: sr.name,
     purpose: a2.series?.[i]?.purpose ?? sr.purpose ?? "",
     contribution: a2.series?.[i]?.contribution ?? "",
-    associated: version === "single" ? [{ memberName: seed.members[0].name, seriesPercentage: 100 }] : (() => {
+    associated: version === "s" ? (
+      // identical ownership is hardwired in the S corp form: every Member is an
+      // Associated Member of every series at their company percentage
+      members.map((m2) => ({ memberName: m2.name, seriesPercentage: m2.percentage, signatories: m2.signatories }))
+    ) : version === "single" ? [{ memberName: seed.members[0].name, seriesPercentage: 100 }] : (() => {
       const out = [];
       for (const x2 of a2.series?.[i]?.associated ?? []) {
         const cpl = coupleAt(x2.memberIndex);
@@ -104882,16 +105590,18 @@ app.post("/portal/oa/generate", async (c) => {
     companyName: seed.llcName,
     principalAddress: seed.principalAddress,
     managerName: seed.managerName,
-    effectiveDate: fmtDate(a2.effectiveDate),
+    effectiveDate: fmtDate2(a2.effectiveDate),
     amendedRestated: a2.firstOrAmended === "amended",
     priorAgreementDate: priorDate,
     members,
     series,
-    includeCapitalCalls: a2.includeCapitalCalls,
+    // A sole owner on the S corp form skips the multi-member option questions;
+    // sensible defaults: no capital calls, competition permitted, no shotgun.
+    includeCapitalCalls: a2.includeCapitalCalls ?? (version === "s" && !multiOwner ? false : void 0),
     capitalCallCap: a2.capitalCallCap,
-    competition: a2.competition,
-    includeShotgun: a2.includeShotgun,
-    borrowingThreshold: a2.borrowingThreshold,
+    competition: a2.competition ?? (version === "s" && !multiOwner ? "B" : void 0),
+    includeShotgun: a2.includeShotgun ?? (version === "s" && !multiOwner ? false : void 0),
+    borrowingThreshold: a2.borrowingThreshold ?? (version === "s" && !multiOwner ? 25e3 : void 0),
     contributionToCompany: a2.contributionToCompany
   };
   const clients = await db2.query("SELECT email, name FROM clients WHERE id = $1", [
@@ -105031,6 +105741,29 @@ async function clientLlcName(clientId) {
   );
   return rows[0]?.llc_name ?? "";
 }
+async function sElectionEligibility(clientId) {
+  const db2 = await getDb();
+  const formed = await db2.query(
+    "SELECT paid_at FROM orders WHERE client_id = $1 AND status = 'paid' AND package = 'NEW' ORDER BY paid_at DESC NULLS LAST LIMIT 1",
+    [clientId]
+  );
+  if (formed.length === 0 || !formed[0].paid_at) {
+    return { eligible: false, reason: "no_new_formation", orderBy: null, formationPaidAt: null };
+  }
+  const paidAt = new Date(String(formed[0].paid_at));
+  const orderBy = new Date(paidAt.getTime() + S_ELECTION_WINDOW_DAYS * 864e5);
+  const existing = await db2.query(
+    "SELECT id FROM service_orders WHERE client_id = $1 AND type = 's-election' AND status <> 'cancelled'",
+    [clientId]
+  );
+  if (existing.length > 0) {
+    return { eligible: false, reason: "already_ordered", orderBy: orderBy.toISOString(), formationPaidAt: paidAt.toISOString() };
+  }
+  if (Date.now() > orderBy.getTime()) {
+    return { eligible: false, reason: "window_closed", orderBy: orderBy.toISOString(), formationPaidAt: paidAt.toISOString() };
+  }
+  return { eligible: true, reason: "ok", orderBy: orderBy.toISOString(), formationPaidAt: paidAt.toISOString() };
+}
 app.get("/portal/services", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err2("Not signed in", "UNAUTHENTICATED"), 401);
@@ -105045,11 +105778,53 @@ app.get("/portal/services", async (c) => {
       dev: !env.isProd && !env.SQUARE_ACCESS_TOKEN,
       pricing: {
         seriesCents: SERIES_ADDON_PREP_CENTS + SERIES_ADDON_STATE_CENTS,
-        einCents: EIN_FEE_CENTS
+        einCents: EIN_FEE_CENTS,
+        sElectionCents: S_ELECTION_FEE_CENTS
       },
+      sElection: await sElectionEligibility(session.clientId),
       orders
     }
   });
+});
+app.post("/portal/services/s-election", async (c) => {
+  const session = await getSession(c);
+  if (!session?.clientId) return c.json(err2("Not signed in", "UNAUTHENTICATED"), 401);
+  if (!rateLimit(`svc:${session.clientId}`, 20, 36e5)) {
+    return c.json(err2("Too many requests. Try again later.", "RATE_LIMITED"), 429);
+  }
+  const llcName = await clientLlcName(session.clientId);
+  if (!llcName) return c.json(err2("No formed LLC found on your account.", "NO_LLC"), 400);
+  const gate = await sElectionEligibility(session.clientId);
+  if (!gate.eligible) {
+    const msg = gate.reason === "already_ordered" ? "You already have an S election order \u2014 see your orders below." : gate.reason === "window_closed" ? "The ordering window for the S election package has closed. A late election requires IRS relief \u2014 please consult a tax professional." : "The S election package is available only for new LLCs we formed.";
+    return c.json(err2(msg, gate.reason === "window_closed" ? "WINDOW_CLOSED" : "NOT_ELIGIBLE"), 400);
+  }
+  const db2 = await getDb();
+  const rows = await db2.query(
+    `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents)
+     VALUES ($1, 's-election', $2, $3, $4) RETURNING id`,
+    [session.clientId, llcName, JSON.stringify({}), S_ELECTION_FEE_CENTS]
+  );
+  const serviceOrderId = rows[0].id;
+  const clients = await db2.query("SELECT email FROM clients WHERE id = $1", [session.clientId]);
+  const checkout = await createCheckout({
+    orderId: serviceOrderId,
+    llcName,
+    priced: {
+      serviceFeeCents: S_ELECTION_FEE_CENTS,
+      stateFeesCents: 0,
+      totalCents: S_ELECTION_FEE_CENTS,
+      lineItems: [{ name: `S corporation election package (Form 2553) \u2014 ${llcName}`, amountCents: S_ELECTION_FEE_CENTS }]
+    },
+    buyerEmail: clients[0]?.email ?? "",
+    redirectUrl: `${env.PUBLIC_BASE_URL}/portal?paid=${serviceOrderId}`,
+    description: `S corporation election package \u2014 ${llcName}`
+  });
+  await db2.query("UPDATE service_orders SET square_order_id = $1 WHERE id = $2", [
+    checkout.squareOrderId,
+    serviceOrderId
+  ]);
+  return c.json({ data: { serviceOrderId, checkoutUrl: checkout.url, totalCents: S_ELECTION_FEE_CENTS } });
 });
 app.post("/portal/services/series", async (c) => {
   const session = await getSession(c);
@@ -105195,6 +105970,81 @@ app.post("/portal/services/:id/ein-details", async (c) => {
   }
   return c.json({ data: { ok: true } });
 });
+var sElectionDetailsSchema = external_exports.object({
+  ein: external_exports.string().transform((s) => s.replace(/[\s-]/g, "")).refine((s) => s === "" || /^\d{9}$/.test(s), "Enter the 9-digit EIN, or leave it blank if we're obtaining it."),
+  einPending: external_exports.boolean().optional().default(false),
+  dateIncorporated: external_exports.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  effectiveDate: external_exports.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  officerName: external_exports.string().min(1, "The signing officer's name is required.").max(200),
+  officerTitle: external_exports.string().min(1).max(100),
+  phone: external_exports.string().max(40).optional().default(""),
+  shareholders: external_exports.array(
+    external_exports.object({
+      name: external_exports.string().min(1).max(200),
+      address: external_exports.string().min(1).max(300),
+      percentage: external_exports.number().min(0).max(100),
+      dateAcquired: external_exports.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+      ssn: external_exports.string().transform((s) => s.replace(/[\s-]/g, "")).refine((s) => /^\d{9}$/.test(s), "Each owner's SSN must be 9 digits.")
+    })
+  ).min(1, "At least one owner is required.").max(7, "The IRS form holds 7 owners \u2014 contact us for more.")
+}).refine((d2) => d2.ein !== "" || d2.einPending, {
+  message: "Provide the EIN, or mark that we are obtaining it for you."
+}).refine((d2) => Math.abs(d2.shareholders.reduce((a2, s) => a2 + s.percentage, 0) - 100) < 0.01, {
+  message: "Ownership percentages must total exactly 100%."
+});
+app.post("/portal/services/:id/s-election-details", async (c) => {
+  const session = await getSession(c);
+  if (!session?.clientId) return c.json(err2("Not signed in", "UNAUTHENTICATED"), 401);
+  const body = sElectionDetailsSchema.safeParse(await c.req.json().catch(() => null));
+  if (!body.success) {
+    return c.json(err2(body.error.issues[0]?.message ?? "Invalid details.", "INVALID_INPUT"), 400);
+  }
+  const db2 = await getDb();
+  const rows = await db2.query(
+    "SELECT id, client_id, type, status, llc_name FROM service_orders WHERE id = $1",
+    [c.req.param("id")]
+  );
+  if (rows.length === 0 || rows[0].client_id !== session.clientId) {
+    return c.json(err2("Not found", "NOT_FOUND"), 404);
+  }
+  const so2 = rows[0];
+  if (so2.type !== "s-election" || so2.status !== "awaiting_info") {
+    return c.json(err2("This order is not awaiting details.", "BAD_STATE"), 400);
+  }
+  const d2 = body.data;
+  const merged = {
+    ein: d2.ein,
+    einPending: d2.einPending,
+    dateIncorporated: d2.dateIncorporated,
+    effectiveDate: d2.effectiveDate,
+    officerName: d2.officerName,
+    officerTitle: d2.officerTitle,
+    phone: d2.phone,
+    shareholders: d2.shareholders.map((s) => ({
+      name: s.name,
+      address: s.address,
+      percentage: s.percentage,
+      dateAcquired: s.dateAcquired,
+      ssnLast4: s.ssn.slice(-4)
+    }))
+  };
+  await db2.query(
+    "UPDATE service_orders SET details = $1, ein_secret = $2, status = 'in_progress' WHERE id = $3",
+    [JSON.stringify(merged), encryptSecret(JSON.stringify(d2.shareholders.map((s) => s.ssn))), so2.id]
+  );
+  if (env.ADMIN_NOTIFY_EMAIL) {
+    const clients = await db2.query("SELECT email FROM clients WHERE id = $1", [session.clientId]);
+    const mail = einDetailsSubmittedAdminEmail({
+      summary: `S Corporation Election Package \u2014 ${so2.llc_name}`,
+      clientEmail: clients[0]?.email ?? "",
+      adminUrl: `${env.PUBLIC_BASE_URL}/admin`
+    });
+    sendMail({ to: env.ADMIN_NOTIFY_EMAIL, ...mail }).catch(
+      (e) => console.error("[service] s-election-details admin email failed:", e)
+    );
+  }
+  return c.json({ data: { ok: true } });
+});
 app.post("/portal/registered-agent/cancel", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err2("Not signed in", "UNAUTHENTICATED"), 401);
@@ -105286,6 +106136,11 @@ app.get("/admin/services", async (c) => {
     `SELECT so.id, so.type, so.status, so.llc_name, so.details, so.amount_cents,
             so.created_at, so.paid_at, so.fulfilled_at,
             (so.ein_secret IS NOT NULL) AS has_secret,
+            (so.type = 's-election' AND EXISTS (
+              SELECT 1 FROM service_orders e
+              WHERE e.client_id = so.client_id AND e.type = 'ein'
+                AND e.status NOT IN ('fulfilled', 'cancelled')
+            )) AS ein_pending,
             cl.email AS client_email, cl.name AS client_name
      FROM service_orders so JOIN clients cl ON cl.id = so.client_id
      ORDER BY so.created_at DESC`
@@ -105303,9 +106158,12 @@ app.get("/admin/services/:id", async (c) => {
   if (rows.length === 0) return c.json(err2("Not found", "NOT_FOUND"), 404);
   const so2 = rows[0];
   let tin = null;
+  let ssns = null;
   if (so2.ein_secret) {
     try {
-      tin = decryptSecret(so2.ein_secret);
+      const secret = decryptSecret(so2.ein_secret);
+      if (so2.type === "s-election") ssns = JSON.parse(secret);
+      else tin = secret;
     } catch (e) {
       console.error("[admin] EIN secret decrypt failed:", e);
     }
@@ -105321,9 +106179,56 @@ app.get("/admin/services/:id", async (c) => {
       created_at: so2.created_at,
       paid_at: so2.paid_at,
       square_order_id: so2.square_order_id,
-      tin
+      tin,
+      ssns
     }
   });
+});
+app.get("/admin/services/:id/s-election-draft", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json(err2("Not signed in", "UNAUTHENTICATED"), 401);
+  const db2 = await getDb();
+  const rows = await db2.query(
+    "SELECT id, client_id, type, status, llc_name, details, ein_secret FROM service_orders WHERE id = $1",
+    [c.req.param("id")]
+  );
+  if (rows.length === 0) return c.json(err2("Not found", "NOT_FOUND"), 404);
+  const so2 = rows[0];
+  if (so2.type !== "s-election" || !so2.ein_secret) {
+    return c.json(err2("This order has no S election details yet.", "BAD_STATE"), 400);
+  }
+  const details = typeof so2.details === "string" ? JSON.parse(so2.details) : so2.details;
+  let ssns;
+  try {
+    ssns = JSON.parse(decryptSecret(so2.ein_secret));
+  } catch (e) {
+    console.error("[admin] s-election secret decrypt failed:", e);
+    return c.json(err2("Could not decrypt the shareholder details.", "DECRYPT_FAILED"), 500);
+  }
+  const seed = await oaSeed(so2.client_id);
+  const input = {
+    llcName: so2.llc_name,
+    principalAddress: seed?.principalAddress ?? "",
+    ein: details.ein ?? "",
+    dateIncorporated: details.dateIncorporated,
+    effectiveDate: details.effectiveDate,
+    officerName: details.officerName,
+    officerTitle: details.officerTitle,
+    phone: details.phone ?? "",
+    shareholders: details.shareholders.map((s, i) => ({ ...s, ssn: ssns[i] ?? "" }))
+  };
+  try {
+    const pdf = await buildSElectionPackage(input);
+    return new Response(pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength), {
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `attachment; filename="S-Election-Package-${so2.llc_name.replace(/[^\w-]+/g, "_")}.pdf"`
+      }
+    });
+  } catch (e) {
+    console.error("[admin] s-election draft failed:", e);
+    return c.json(err2("Draft generation failed.", "GENERATION_FAILED"), 500);
+  }
 });
 app.post("/admin/services/:id/fulfill", async (c) => {
   const admin = await requireAdmin(c);
@@ -105357,11 +106262,14 @@ app.post("/admin/services/:id/fulfill", async (c) => {
   if (so2.type === "ein" && !file) {
     return c.json(err2("Attach the EIN confirmation letter (CP 575) to fulfill an EIN order.", "LETTER_REQUIRED"), 400);
   }
+  if (so2.type === "s-election" && !file) {
+    return c.json(err2("Attach the election package PDF to fulfill an S election order.", "PACKAGE_REQUIRED"), 400);
+  }
   const details = typeof so2.details === "string" ? JSON.parse(so2.details) : so2.details;
-  const summary = so2.type === "series" ? `Protected Series Designation \u2014 ${details.seriesName ?? so2.llc_name}` : `Federal EIN \u2014 ${details.target === "series" ? details.seriesName ?? "series" : so2.llc_name}`;
+  const summary = so2.type === "series" ? `Protected Series Designation \u2014 ${details.seriesName ?? so2.llc_name}` : so2.type === "s-election" ? `S Corporation Election Package \u2014 ${so2.llc_name}` : `Federal EIN \u2014 ${details.target === "series" ? details.seriesName ?? "series" : so2.llc_name}`;
   let documentId = null;
   if (file) {
-    const title = titleOverride || (so2.type === "series" ? `Protected Series Designation \u2014 ${details.seriesName ?? so2.llc_name}` : `EIN Confirmation Letter \u2014 ${details.target === "series" ? details.seriesName ?? so2.llc_name : so2.llc_name}`);
+    const title = titleOverride || (so2.type === "series" ? `Protected Series Designation \u2014 ${details.seriesName ?? so2.llc_name}` : so2.type === "s-election" ? `S Corporation Election Package (Form 2553) \u2014 ${so2.llc_name}` : `EIN Confirmation Letter \u2014 ${details.target === "series" ? details.seriesName ?? so2.llc_name : so2.llc_name}`);
     const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
     const doc = await db2.query(
       `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)

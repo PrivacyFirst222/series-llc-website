@@ -113,15 +113,25 @@ export function raCancellationAdminEmail(opts: {
 }
 
 export function serviceOrderClientEmail(opts: {
-  type: "series" | "ein";
+  type: "series" | "ein" | "s-election";
   summary: string;
   needsInfo: boolean;
   portalUrl: string;
 }): { subject: string; html: string } {
   const subject =
-    opts.type === "series" ? "Your Protected Series order is confirmed" : "Your EIN order is confirmed";
+    opts.type === "series"
+      ? "Your Protected Series order is confirmed"
+      : opts.type === "s-election"
+        ? "Your S corporation election order is confirmed"
+        : "Your EIN order is confirmed";
   const action = opts.needsInfo
-    ? `<p><strong>One step is needed from you:</strong> sign in to your portal and provide the
+    ? opts.type === "s-election"
+      ? `<p><strong>One step is needed from you:</strong> sign in to your portal and provide the
+         election details (owners, ownership percentages, and identification numbers) through the
+         secure form. We cannot prepare Form 2553 until you do. The election has a strict IRS
+         deadline, so please do this promptly. For your security, never send Social Security
+         numbers by email.</p>`
+      : `<p><strong>One step is needed from you:</strong> sign in to your portal and provide the
        responsible party's details through the secure form. We cannot obtain the EIN until you do.
        For your security, never send Social Security numbers by email.</p>`
     : `<p>No further action is needed from you. We'll post the confirmation to your portal when

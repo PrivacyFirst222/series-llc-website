@@ -2,8 +2,13 @@ import { calculateEstimatedFees } from "../src/components/forms/florida-llc/vali
 
 export const SERVICE_FEE_CENTS = 499_00;
 export const EIN_FEE_CENTS = 50_00;
+export const S_ELECTION_FEE_CENTS = 95_00;
 export const SERIES_ADDON_PREP_CENTS = 25_00;
 export const SERIES_ADDON_STATE_CENTS = 25_00;
+/** S election package is purchasable only this many days after the formation
+ *  order is paid — leaves ~10 days of buffer inside the IRS's 2-months-and-15-days
+ *  election deadline for preparation, signing, and mailing. */
+export const S_ELECTION_WINDOW_DAYS = 65;
 
 export interface PricedOrder {
   serviceFeeCents: number;
@@ -20,6 +25,7 @@ export function priceOrder(opts: {
   certificateOfStatus: boolean;
   certifiedCopy: boolean;
   ein: boolean;
+  sElection: boolean;
 }): PricedOrder {
   const fees = calculateEstimatedFees({
     certificateOfStatus: opts.certificateOfStatus,
@@ -34,6 +40,9 @@ export function priceOrder(opts: {
   if (opts.ein) {
     lineItems.push({ name: "Federal EIN service", amountCents: EIN_FEE_CENTS });
   }
+  if (opts.sElection) {
+    lineItems.push({ name: "S corporation election package (Form 2553)", amountCents: S_ELECTION_FEE_CENTS });
+  }
   if (fees.articlesOfOrganization) {
     lineItems.push({ name: "FL state fee — Articles of Organization", amountCents: fees.articlesOfOrganization * 100 });
   }
@@ -47,7 +56,8 @@ export function priceOrder(opts: {
   if (fees.certifiedCopy) {
     lineItems.push({ name: "FL state fee — certified copy", amountCents: fees.certifiedCopy * 100 });
   }
-  const serviceFeeCents = SERVICE_FEE_CENTS + (opts.ein ? EIN_FEE_CENTS : 0);
+  const serviceFeeCents =
+    SERVICE_FEE_CENTS + (opts.ein ? EIN_FEE_CENTS : 0) + (opts.sElection ? S_ELECTION_FEE_CENTS : 0);
   return {
     serviceFeeCents,
     stateFeesCents,

@@ -51,6 +51,7 @@ interface CoupleAnswer {
 }
 interface Answers {
   firstOrAmended?: "first" | "amended";
+  sElection?: boolean;
   effectiveDate?: string;
   authorized?: boolean;
   contributionToCompany?: string;
@@ -162,6 +163,7 @@ export default function OAQuestionnaire() {
         firstOrAmended:
           saved.firstOrAmended ??
           (data.seed.filingPath === "CONVERT" || data.generations.length > 0 ? "amended" : "first"),
+        sElection: saved.sElection ?? false,
         effectiveDate: saved.effectiveDate ?? todayIso(),
         authorized: saved.authorized ?? false,
         contributionToCompany: saved.contributionToCompany ?? "",
@@ -343,6 +345,38 @@ export default function OAQuestionnaire() {
                 />
                 <span>I'm amending and restating an existing operating agreement</span>
               </label>
+            </QuestionCard>
+
+            <QuestionCard title="Has the company elected, or will it elect, S corporation status?" learnMore="sElection">
+              <label className="flex items-start gap-2 text-sm">
+                <input
+                  type="radio"
+                  name="sElection"
+                  checked={a.sElection !== true}
+                  onChange={() => patch({ sElection: false })}
+                  className="mt-0.5 accent-trust"
+                />
+                <span>No — use the standard agreement</span>
+              </label>
+              <label className="flex items-start gap-2 text-sm">
+                <input
+                  type="radio"
+                  name="sElection"
+                  checked={a.sElection === true}
+                  onChange={() => patch({ sElection: true })}
+                  className="mt-0.5 accent-trust"
+                />
+                <span>Yes — build the agreement on our S corporation form</span>
+              </label>
+              {a.sElection === true ? (
+                <p className="rounded-lg border border-border bg-secondary/30 p-3 text-xs text-muted-foreground">
+                  The S corporation form keeps the election safe: every owner shares in the company
+                  and in <em>every</em> protected series identically, in proportion to their
+                  ownership percentages, and all distributions are strictly pro rata. Only choose
+                  this if you have made — or your tax professional is making — the election with
+                  the IRS.
+                </p>
+              ) : null}
             </QuestionCard>
 
             {isMulti ? (
@@ -579,6 +613,13 @@ export default function OAQuestionnaire() {
                   </div>
                 </QuestionCard>
 
+                {a.sElection === true ? (
+                  <div className="rounded-2xl border border-border bg-secondary/30 p-5 text-sm text-muted-foreground">
+                    With an S election, every owner automatically shares in every protected series
+                    in proportion to their ownership percentages — per-series ownership cannot
+                    vary, so there is nothing to choose here.
+                  </div>
+                ) : (
                 <QuestionCard title="Who shares in each protected series?">
                   <p className="text-xs text-muted-foreground">
                     Only owners associated with a series share in that series' profits and vote on
@@ -618,6 +659,7 @@ export default function OAQuestionnaire() {
                     </div>
                   ))}
                 </QuestionCard>
+                )}
               </>
             ) : null}
 
@@ -671,6 +713,13 @@ export default function OAQuestionnaire() {
             </QuestionCard>
 
             <QuestionCard title="Transfer-on-death designation (optional)" learnMore="tod">
+              {a.sElection === true ? (
+                <p className="rounded-lg border border-border bg-secondary/30 p-3 text-xs text-muted-foreground">
+                  Because of the S election, a beneficiary must be an eligible S corporation
+                  shareholder — generally an individual (or certain trusts). A designation in favor
+                  of an ineligible beneficiary has no effect while the election is in place.
+                </p>
+              ) : null}
               {(isMulti ? units : [{ kind: "member", index: 0, label: data.seed.members[0]?.name ?? "" } as Unit]).map((u) => (
                 <div key={u.kind === "couple" ? `c${u.ci}` : `m${u.index}`} className="space-y-1">
                   <div className="flex items-center gap-3">

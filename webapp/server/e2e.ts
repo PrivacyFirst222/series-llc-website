@@ -76,6 +76,7 @@ const formData: FloridaLLCFormData = {
   addressAccuracyAcknowledgment: true,
   termsOfServiceAcknowledgment: true,
   orderEin: true,
+  orderSElection: true,
   publicRecordAcknowledgment: true,
   legalAdviceAcknowledgment: true,
 };
@@ -122,7 +123,7 @@ const order = await api("/api/orders", { method: "POST", body: JSON.stringify(fo
 check("accepts valid order (200)", order.status === 200, order.body);
 const orderId = order.body?.data?.orderId as string;
 const totalCents = order.body?.data?.totalCents as number;
-check("price recomputed server-side: $499 + $50 EIN + $125 = $674.00", totalCents === 67400, { totalCents });
+check("price recomputed server-side: $499 + $50 EIN + $95 S election + $125 = $769.00", totalCents === 76900, { totalCents });
 check("returns checkout URL", typeof order.body?.data?.checkoutUrl === "string");
 
 // 3. Status is pending before payment
@@ -232,6 +233,10 @@ if (mint.status === 200) {
     (o: { type: string; status: string }) => o.type === "ein" && o.status === "awaiting_info",
   );
   check("intake EIN order created awaiting_info", Boolean(intakeEin));
+  const intakeSElection = (svc0.body?.data?.orders ?? []).find(
+    (o: { type: string; status: string }) => o.type === "s-election" && o.status === "awaiting_info",
+  );
+  check("intake S election order created awaiting_info", Boolean(intakeSElection));
 
   // 12. Order an additional series from the portal, pay, and check state
   const badSeries = await api("/api/portal/services/series", {
@@ -342,6 +347,17 @@ if (mint.status === 200) {
   const oaBytes = new Uint8Array(await oaPdf.arrayBuffer());
   check("generated OA downloads as PDF", oaPdf.ok && oaBytes[0] === 0x25 && oaBytes[1] === 0x50, { status: oaPdf.status, len: oaBytes.length });
 
+  // 13c-2. Sole owner on the S corporation form (option defaults applied server-side)
+  const genS = await api("/api/portal/oa/generate", {
+    method: "POST", cookies: setPw.cookie,
+    body: JSON.stringify({ ...oaAnswers, sElection: true }),
+  });
+  check("sole-owner S corp agreement generates", genS.status === 200, genS.body);
+  const sDocId = genS.body?.data?.documentId as string;
+  const sPdf = await fetch(`${BASE}/api/portal/documents/${sDocId}/download`, { headers: { Cookie: setPw.cookie } });
+  const sBytes = new Uint8Array(await sPdf.arrayBuffer());
+  check("S corp agreement downloads as PDF", sPdf.ok && sBytes[0] === 0x25 && sBytes[1] === 0x50, { status: sPdf.status, len: sBytes.length });
+
   // 13d. Manual library: admin publishes, client downloads stamped copy
   const manualFd = new FormData();
   manualFd.set("title", "Series LLC Owner's Manual");
@@ -407,6 +423,7 @@ if (mint.status === 200) {
     correspondentEmail: coupleEmail,
     confirmCorrespondentEmail: coupleEmail,
     orderEin: false,
+    orderSElection: false, // the couple's S election is purchased from the portal in 15c
   };
   const mOrder = await api("/api/orders", { method: "POST", body: JSON.stringify(multiData) });
   check("multi-member order accepted", mOrder.status === 200, mOrder.body);
@@ -456,6 +473,97 @@ if (mint.status === 200) {
   const mPdf = await fetch(`${BASE}/api/portal/documents/${mDocId}/download`, { headers: { Cookie: mPw.cookie } });
   const mBytes = new Uint8Array(await mPdf.arrayBuffer());
   check("TBE agreement downloads as PDF", mPdf.ok && mBytes[0] === 0x25 && mBytes[1] === 0x50, { status: mPdf.status, len: mBytes.length });
+
+  // 15b. Same couple on the S corporation form (series associations ignored — identical ownership)
+  const sCoupleGen = await api("/api/portal/oa/generate", {
+    method: "POST", cookies: mPw.cookie,
+    body: JSON.stringify({ ...coupleAnswers, sElection: true, series: [{}] }),
+  });
+  check("multi-owner S corp agreement generates", sCoupleGen.status === 200, sCoupleGen.body);
+  const sCoupleDocId = sCoupleGen.body?.data?.documentId as string;
+  const sCouplePdf = await fetch(`${BASE}/api/portal/documents/${sCoupleDocId}/download`, { headers: { Cookie: mPw.cookie } });
+  const sCoupleBytes = new Uint8Array(await sCouplePdf.arrayBuffer());
+  check("multi-owner S corp PDF downloads", sCouplePdf.ok && sCoupleBytes[0] === 0x25 && sCoupleBytes[1] === 0x50, { status: sCouplePdf.status, len: sCoupleBytes.length });
+
+  // 15c. S corporation election package: 65-day window, secure details, draft, fulfillment
+  await api("/api/dev/age-formation", { method: "POST", body: JSON.stringify({ email: coupleEmail, days: 66 }) });
+  const closedTry = await api("/api/portal/services/s-election", { method: "POST", cookies: mPw.cookie, body: "{}" });
+  check("S election blocked after 65-day window", closedTry.status === 400 && closedTry.body?.error?.code === "WINDOW_CLOSED", closedTry.body);
+  await api("/api/dev/age-formation", { method: "POST", body: JSON.stringify({ email: coupleEmail, days: 0 }) });
+  const svcS = await api("/api/portal/services", { cookies: mPw.cookie });
+  check(
+    "portal advertises S election with order-by date",
+    svcS.body?.data?.sElection?.eligible === true && Boolean(svcS.body?.data?.sElection?.orderBy),
+    svcS.body?.data?.sElection,
+  );
+  const sOrder = await api("/api/portal/services/s-election", { method: "POST", cookies: mPw.cookie, body: "{}" });
+  check("S election order accepted in window", sOrder.status === 200 && sOrder.body?.data?.totalCents === 9500, sOrder.body);
+  const sId = sOrder.body?.data?.serviceOrderId as string;
+  const adminS = await api("/api/admin/login", { method: "POST", body: JSON.stringify({ password: "dev-admin" }) });
+  let sPay = await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: sId }) });
+  if (sPay.status === 404) {
+    const det = await api(`/api/admin/services/${sId}`, { cookies: adminS.cookie });
+    sPay = await api("/api/square/webhook", {
+      method: "POST",
+      body: JSON.stringify({
+        event_id: `e2e-sel-${sId}`, type: "payment.updated",
+        data: { object: { payment: { id: `e2e-pay-sel-${sId.slice(0, 8)}`, status: "COMPLETED", order_id: det.body?.data?.square_order_id } } },
+      }),
+    });
+  }
+  check("S election order paid", sPay.status === 200);
+  const dupTry = await api("/api/portal/services/s-election", { method: "POST", cookies: mPw.cookie, body: "{}" });
+  check("duplicate S election order rejected", dupTry.status === 400, dupTry.body);
+  const badPct = await api(`/api/portal/services/${sId}/s-election-details`, {
+    method: "POST", cookies: mPw.cookie,
+    body: JSON.stringify({
+      ein: "", einPending: true, dateIncorporated: "2026-08-01", effectiveDate: "2026-08-01",
+      officerName: "Maria Ortiz", officerTitle: "Manager", phone: "(305) 555-0100",
+      shareholders: [
+        { name: "Maria Ortiz and Carlos Ortiz, as tenants by the entireties", address: "500 Bay Street, Miami, FL 33131", percentage: 60, dateAcquired: "2026-08-01", ssn: "123456789" },
+      ],
+    }),
+  });
+  check("S election details with bad percentages rejected", badPct.status === 400);
+  const sDetails = await api(`/api/portal/services/${sId}/s-election-details`, {
+    method: "POST", cookies: mPw.cookie,
+    body: JSON.stringify({
+      ein: "88-1234567", einPending: false, dateIncorporated: "2026-08-01", effectiveDate: "2026-08-01",
+      officerName: "Maria Ortiz", officerTitle: "Manager", phone: "(305) 555-0100",
+      shareholders: [
+        { name: "Maria Ortiz and Carlos Ortiz, as tenants by the entireties", address: "500 Bay Street, Miami, FL 33131", percentage: 100, dateAcquired: "2026-08-01", ssn: "123-45-6789" },
+      ],
+    }),
+  });
+  check("S election details accepted", sDetails.status === 200, sDetails.body);
+  const sAdminDetail = await api(`/api/admin/services/${sId}`, { cookies: adminS.cookie });
+  check("admin decrypts shareholder SSNs", sAdminDetail.body?.data?.ssns?.[0] === "123456789", sAdminDetail.body?.data);
+  check(
+    "client-facing record keeps only SSN last 4",
+    sAdminDetail.body?.data?.details?.shareholders?.[0]?.ssnLast4 === "6789",
+    sAdminDetail.body?.data?.details,
+  );
+  const draft = await fetch(`${BASE}/api/admin/services/${sId}/s-election-draft`, { headers: { Cookie: adminS.cookie } });
+  const draftBytes = new Uint8Array(await draft.arrayBuffer());
+  check("draft election package renders as PDF", draft.ok && draftBytes[0] === 0x25 && draftBytes[1] === 0x50, { status: draft.status, len: draftBytes.length });
+  const noPkg = await fetch(`${BASE}/api/admin/services/${sId}/fulfill`, {
+    method: "POST", headers: { Cookie: adminS.cookie }, body: new FormData(),
+  });
+  check("S election fulfill without package rejected", noPkg.status === 400, await noPkg.json().catch(() => null));
+  const pkgFd = new FormData();
+  pkgFd.set("file", new File([draftBytes], "s-election-package.pdf", { type: "application/pdf" }));
+  const sFulfill = await fetch(`${BASE}/api/admin/services/${sId}/fulfill`, {
+    method: "POST", headers: { Cookie: adminS.cookie }, body: pkgFd,
+  });
+  check("S election fulfilled with package", sFulfill.ok, await sFulfill.json().catch(() => null));
+  const sAfter = await api(`/api/admin/services/${sId}`, { cookies: adminS.cookie });
+  check("shareholder SSNs deleted at fulfillment", sAfter.body?.data?.ssns === null, sAfter.body?.data);
+  const sDocs = await api("/api/portal/documents", { cookies: mPw.cookie });
+  check(
+    "election package posted to client documents",
+    (sDocs.body?.data ?? []).some((d: { title: string }) => d.title.includes("S Corporation Election Package")),
+    sDocs.body?.data,
+  );
 }
 
 console.log(failures === 0 ? "\nALL PASS" : `\n${failures} FAILURES`);
