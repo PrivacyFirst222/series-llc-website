@@ -566,5 +566,75 @@ if (mint.status === 200) {
   );
 }
 
+// 16. Member-managed multi-member: routed to the member-managed masters
+{
+  const mmEmail = `e2e-mm-${Math.random().toString(36).slice(2, 8)}@example.com`;
+  const mmData = {
+    ...formData,
+    managementStructure: "MEMBER_MANAGED",
+    includeManagementStatementInArticles: true,
+    managers: [],
+    members: [
+      { ...structuredClone(defaultFormData.members[0]), fullLegalName: "Dana Reed", address1: "70 Palm Way", city: "Tampa", state: "FL", zip: "33601", ownershipPercentage: 50 },
+      { ...structuredClone(defaultFormData.members[0]), fullLegalName: "Jamie Reed", address1: "70 Palm Way", city: "Tampa", state: "FL", zip: "33601", ownershipPercentage: 50 },
+    ],
+    correspondentName: "Dana Reed",
+    correspondentEmail: mmEmail,
+    confirmCorrespondentEmail: mmEmail,
+    registeredAgentName: "Dana Reed",
+    registeredAgentAcceptanceName: "Dana Reed",
+    registeredAgentElectronicSignature: "Dana Reed",
+    authorizedRepresentativeName: "Dana Reed",
+    authorizedRepresentativeSignature: "Dana Reed",
+    desiredLlcName: "E2E Member Managed Holdings",
+    series: [{ id: "s1", name: "E2E Member Managed Holdings, LLC, PS A" }],
+    orderEin: false,
+    orderSElection: false,
+  };
+  const mmOrder = await api("/api/orders", { method: "POST", body: JSON.stringify(mmData) });
+  check("member-managed order accepted", mmOrder.status === 200, mmOrder.body);
+  const mmId = mmOrder.body?.data?.orderId as string;
+  let mmPay = await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: mmId }) });
+  if (mmPay.status === 404) {
+    const adm = await api("/api/admin/login", { method: "POST", body: JSON.stringify({ password: "dev-admin" }) });
+    const full = await api(`/api/admin/orders/${mmId}`, { cookies: adm.cookie });
+    mmPay = await api("/api/square/webhook", {
+      method: "POST",
+      body: JSON.stringify({
+        event_id: `e2e-mm-${mmId}`, type: "payment.updated",
+        data: { object: { payment: { id: `e2e-pay-mm-${mmId.slice(0, 8)}`, status: "COMPLETED", order_id: full.body?.data?.square_order_id } } },
+      }),
+    });
+  }
+  check("member-managed order paid", mmPay.status === 200);
+  const mmMint = await api("/api/dev/mint-reset-token", { method: "POST", body: JSON.stringify({ email: mmEmail }) });
+  const mmPw = await api("/api/auth/set-password", {
+    method: "POST", body: JSON.stringify({ token: mmMint.body?.data?.token, password: "e2e-password-3" }),
+  });
+  check("member-managed client signs in", mmPw.status === 200);
+  const mmSeed = await api("/api/portal/oa", { cookies: mmPw.cookie });
+  check(
+    "OA seed routes to member-managed (no longer blocked)",
+    mmSeed.body?.data?.version === "member" && mmSeed.body?.data?.blocked === false && mmSeed.body?.data?.memberManaged === true,
+    mmSeed.body?.data,
+  );
+  const mmAnswers = {
+    firstOrAmended: "first", effectiveDate: "2026-08-08", authorized: true,
+    members: [{ percentage: 50, contribution: "$500 cash" }, { percentage: 50, contribution: "$500 cash" }],
+    series: [{ associated: [{ memberIndex: 0, seriesPercentage: 50 }, { memberIndex: 1, seriesPercentage: 50 }] }],
+    includeCapitalCalls: false, competition: "A", includeShotgun: false, borrowingThreshold: 30000,
+  };
+  const mmGen = await api("/api/portal/oa/generate", { method: "POST", cookies: mmPw.cookie, body: JSON.stringify(mmAnswers) });
+  check("member-managed agreement generates", mmGen.status === 200, mmGen.body);
+  const mmDoc = mmGen.body?.data?.documentId as string;
+  const mmPdf = await fetch(`${BASE}/api/portal/documents/${mmDoc}/download`, { headers: { Cookie: mmPw.cookie } });
+  const mmBytes = new Uint8Array(await mmPdf.arrayBuffer());
+  check("member-managed PDF downloads", mmPdf.ok && mmBytes[0] === 0x25 && mmBytes[1] === 0x50, { status: mmPdf.status });
+  const mmSGen = await api("/api/portal/oa/generate", {
+    method: "POST", cookies: mmPw.cookie, body: JSON.stringify({ ...mmAnswers, sElection: true, series: [{}] }),
+  });
+  check("member-managed S corp agreement generates", mmSGen.status === 200, mmSGen.body);
+}
+
 console.log(failures === 0 ? "\nALL PASS" : `\n${failures} FAILURES`);
 process.exit(failures === 0 ? 0 : 1);

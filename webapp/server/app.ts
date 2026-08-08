@@ -713,13 +713,14 @@ app.get("/portal/oa", async (c) => {
     "SELECT id, document_id, template_version, amended_restated, created_at FROM oa_generations WHERE client_id = $1 ORDER BY created_at DESC",
     [session.clientId],
   );
-  const version = seed.members.length > 1 ? "multi" : "single";
-  const blocked = version === "multi" && seed.managementStructure === "MEMBER_MANAGED";
+  const memberManaged = seed.managementStructure === "MEMBER_MANAGED";
+  const version = seed.members.length > 1 ? (memberManaged ? "member" : "multi") : "single";
   return c.json({
     data: {
       seed,
       version,
-      blocked,
+      memberManaged,
+      blocked: false,
       templateVersion: OA_TEMPLATE_VERSION,
       answers: saved.length > 0 ? (typeof saved[0].answers === "string" ? JSON.parse(saved[0].answers as string) : saved[0].answers) : {},
       generations: gens,
@@ -753,11 +754,19 @@ app.post("/portal/oa/generate", async (c) => {
   const seed = await oaSeed(session.clientId);
   if (!seed) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
   const multiOwner = seed.members.length > 1;
-  // An S election routes any member count onto the S corporation form.
-  const version: "single" | "multi" | "s" = a.sElection ? "s" : multiOwner ? "multi" : "single";
-  if (multiOwner && seed.managementStructure === "MEMBER_MANAGED") {
-    return c.json(err("Member-managed agreements are prepared manually — we'll be in touch.", "MANUAL_PREP"), 400);
-  }
+  const memberManaged = seed.managementStructure === "MEMBER_MANAGED";
+  // Management structure × tax posture. A single owner is always the
+  // disregarded form unless they elect S; member-managed only applies with
+  // more than one owner (a sole owner has no one to share management with).
+  const version: OaInputs["version"] = a.sElection
+    ? multiOwner && memberManaged
+      ? "member-s"
+      : "s"
+    : multiOwner
+      ? memberManaged
+        ? "member"
+        : "multi"
+      : "single";
   if (a.authorized !== true) {
     return c.json(err("Please confirm you are authorized to provide this information.", "INVALID_INPUT"), 400);
   }
@@ -827,7 +836,8 @@ app.post("/portal/oa/generate", async (c) => {
       });
     }
   });
-  if (version === "s" && !multiOwner && !members[0].contribution) {
+  const isSCorp = version === "s" || version === "member-s";
+  if (isSCorp && !multiOwner && !members[0].contribution) {
     // sole owner on the S form: the single flow collects the contribution as contributionToCompany
     members[0].contribution = a.contributionToCompany ?? "";
   }
@@ -855,7 +865,7 @@ app.post("/portal/oa/generate", async (c) => {
     purpose: a.series?.[i]?.purpose ?? sr.purpose ?? "",
     contribution: a.series?.[i]?.contribution ?? "",
     associated:
-      version === "s"
+      isSCorp
         ? // identical ownership is hardwired in the S corp form: every Member is an
           // Associated Member of every series at their company percentage
           members.map((m) => ({ memberName: m.name, seriesPercentage: m.percentage, signatories: m.signatories }))
@@ -890,11 +900,11 @@ app.post("/portal/oa/generate", async (c) => {
     series,
     // A sole owner on the S corp form skips the multi-member option questions;
     // sensible defaults: no capital calls, competition permitted, no shotgun.
-    includeCapitalCalls: a.includeCapitalCalls ?? (version === "s" && !multiOwner ? false : undefined),
+    includeCapitalCalls: a.includeCapitalCalls ?? (isSCorp && !multiOwner ? false : undefined),
     capitalCallCap: a.capitalCallCap,
-    competition: a.competition ?? (version === "s" && !multiOwner ? "B" : undefined),
-    includeShotgun: a.includeShotgun ?? (version === "s" && !multiOwner ? false : undefined),
-    borrowingThreshold: a.borrowingThreshold ?? (version === "s" && !multiOwner ? 25000 : undefined),
+    competition: a.competition ?? (isSCorp && !multiOwner ? "B" : undefined),
+    includeShotgun: a.includeShotgun ?? (isSCorp && !multiOwner ? false : undefined),
+    borrowingThreshold: a.borrowingThreshold ?? (isSCorp && !multiOwner ? 25000 : undefined),
     contributionToCompany: a.contributionToCompany,
   };
 

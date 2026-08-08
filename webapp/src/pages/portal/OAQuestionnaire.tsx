@@ -67,7 +67,8 @@ interface Answers {
 
 interface OaData {
   seed: OaSeed;
-  version: "single" | "multi";
+  version: "single" | "multi" | "member";
+  memberManaged: boolean;
   blocked: boolean;
   templateVersion: string;
   answers: Answers;
@@ -276,7 +277,7 @@ export default function OAQuestionnaire() {
     );
   }
 
-  const isMulti = data.version === "multi";
+  const isMulti = data.version !== "single";
   const unpaired = data.seed.members
     .map((m, i) => ({ name: m.name, i }))
     .filter((x) => !pairedIdx.has(x.i));
@@ -316,13 +317,14 @@ export default function OAQuestionnaire() {
           return anytime, and regenerate whenever anything changes.
         </p>
 
-        {data.blocked ? (
-          <div className="mt-6 rounded-2xl border border-amber-300/60 bg-amber-50 p-4 text-sm text-amber-900">
-            Your company is member-managed with multiple members — that agreement is prepared
-            manually by our team. We'll post it to your documents; questions to
-            support@myfloridaseriesllc.com.
+        {data.memberManaged ? (
+          <div className="mt-6 rounded-2xl border border-border bg-secondary/30 p-4 text-sm text-muted-foreground">
+            Your company is <strong className="text-foreground">member-managed</strong>, so your
+            agreement is built on our member-managed form: the owners manage the company
+            themselves, decisions are made by majority of ownership, and there is no manager.
           </div>
-        ) : (
+        ) : null}
+        {true ? (
           <div className="mt-8 space-y-5">
             <QuestionCard title="Is this the company's first operating agreement?" learnMore="firstOrAmended">
               <label className="flex items-start gap-2 text-sm">

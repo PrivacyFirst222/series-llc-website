@@ -8,6 +8,8 @@ import { readFileSync } from "node:fs";
 import singleTemplateRaw from "./templates-oa-single.md";
 import multiTemplateRaw from "./templates-oa-multi.md";
 import sCorpTemplateRaw from "./templates-oa-s.md";
+import memberTemplateRaw from "./templates-oa-member.md";
+import memberSCorpTemplateRaw from "./templates-oa-member-s.md";
 
 /** esbuild bundles .md as text; Bun without the bunfig loader resolves the
  *  import to a file path instead — read it from disk in that case. */
@@ -17,6 +19,8 @@ function loadTemplate(v: string): string {
 const singleTemplate = loadTemplate(singleTemplateRaw as string);
 const multiTemplate = loadTemplate(multiTemplateRaw as string);
 const sCorpTemplate = loadTemplate(sCorpTemplateRaw as string);
+const memberTemplate = loadTemplate(memberTemplateRaw as string);
+const memberSCorpTemplate = loadTemplate(memberSCorpTemplateRaw as string);
 
 export const OA_TEMPLATE_VERSION = "First Edition — August 2026";
 
@@ -38,7 +42,9 @@ export interface OaSeriesInput {
 }
 
 export interface OaInputs {
-  version: "single" | "multi" | "s"; // "s" = S corporation form (any member count)
+  /** Management structure × tax posture. "s" forms are the S corporation
+   *  masters and serve any member count; "member*" are member-managed. */
+  version: "single" | "multi" | "s" | "member" | "member-s";
   companyName: string;
   principalAddress: string;
   managerName: string;
@@ -92,7 +98,20 @@ function stripInstructionNotes(s: string): string {
 }
 
 export function assembleOa(inputs: OaInputs): { markdown: string; title: string } {
-  let s = inputs.version === "single" ? singleTemplate : inputs.version === "s" ? sCorpTemplate : multiTemplate;
+  const TEMPLATES = {
+    single: singleTemplate,
+    multi: multiTemplate,
+    s: sCorpTemplate,
+    member: memberTemplate,
+    "member-s": memberSCorpTemplate,
+  } as const;
+  let s = TEMPLATES[inputs.version];
+  /** Every form except the single-member one shares the multi chassis. */
+  const isMulti = inputs.version !== "single";
+  /** The S corporation forms hardwire identical ownership across all series. */
+  const isSCorp = inputs.version === "s" || inputs.version === "member-s";
+  /** Member-managed forms have no Manager to name. */
+  const isMemberManaged = inputs.version === "member" || inputs.version === "member-s";
   const co = inputs.companyName;
 
   // ---- global fields ----
@@ -101,12 +120,15 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
   s = s.split("[COMPANY NAME]").join(co); // any stragglers
   s = replaceOnce(s, "effective as of [DATE] (the \"Effective Date\")", `effective as of ${inputs.effectiveDate} (the "Effective Date")`, "effective date");
   s = s.split("[PRINCIPAL ADDRESS]").join(inputs.principalAddress);
-  s = s.split("**[MANAGER NAME]**").join(`**${inputs.managerName}**`);
-  s = s.split("[MANAGER NAME], Manager").join(`${inputs.managerName}, Manager`);
-  s = s.split("[MANAGER NAME]").join(inputs.managerName);
+  // Member-managed masters name no Manager at all.
+  if (!isMemberManaged) {
+    s = s.split("**[MANAGER NAME]**").join(`**${inputs.managerName}**`);
+    s = s.split("[MANAGER NAME], Manager").join(`${inputs.managerName}, Manager`);
+    s = s.split("[MANAGER NAME]").join(inputs.managerName);
+  }
 
-  // ---- multi-member options (the S corp form shares the multi chassis) ----
-  if (inputs.version === "multi" || inputs.version === "s") {
+  // ---- multi-member options (every form but the single-member one) ----
+  if (isMulti) {
     must(s, "$[THRESHOLD]", "threshold");
     s = s.split("$[THRESHOLD]").join(money(inputs.borrowingThreshold ?? 25000));
 
@@ -221,13 +243,16 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
     ex = ex.replace("## SERIES EXHIBIT PS-[N]", `## SERIES EXHIBIT ${n}`);
     ex = ex.replace(/\*\*Protected Series name \(exactly as filed with the Department\):\*\*\n\*\*[^\n]+\*\*/, `**Protected Series name (exactly as filed with the Department):**\n**${ser.name}**`);
     ex = ex.replace(/\| Purpose of this Protected Series \|[^\n]*\|/, `| Purpose of this Protected Series | ${ser.purpose || "Any lawful business, purpose, or activity"} |`);
-    if (inputs.version !== "s") {
-      // the S corp form's row is fixed text: all Members, identically to their Percentage Interests
+    if (!isSCorp) {
+      // the S corp forms' row is fixed text: all Members, identically to their Percentage Interests
       ex = ex.replace(/\| Associated Member\(s\)[^\n]*\|[^\n]*\|/, inputs.version === "single"
         ? `| Associated Member(s) | ${inputs.members[0].name} — 100% |`
         : `| Associated Member(s) and Series Percentages | ${assoc} |`);
     }
-    ex = ex.replace(/\| Protected Series Manager \|[^\n]*\|/, `| Protected Series Manager | ${inputs.managerName} |`);
+    // Member-managed Series Exhibits carry a fixed "Managed by" row instead.
+    if (!isMemberManaged) {
+      ex = ex.replace(/\| Protected Series Manager \|[^\n]*\|/, `| Protected Series Manager | ${inputs.managerName} |`);
+    }
     ex = ex.replace(/\| Contributions to this Protected Series \|[^\n]*\|/, `| Contributions to this Protected Series | ${ser.contribution || "—"} |`);
     ex = ex.replace(/\| Special terms \(if any\) \|[^\n]*\|/, "| Special terms (if any) | None |");
     ex = ex.replace(/\| Dissolution events[^\n]*\|[^\n]*\|/, "| Dissolution events specific to this Protected Series (if any) | None |");
@@ -244,6 +269,7 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
     ex = ex.replace(/_+\n\[MEMBER NAME\], Member/, adoptLines);
     ex = ex
       .split("[NAME], Protected Series Manager").join(`${inputs.managerName}, Protected Series Manager`)
+      .split("[NAME], Associated Member").join(adoptNames[0] ?? "")
       .split("effective [DATE]").join(`effective ${inputs.effectiveDate}`);
     let sched = ex2.section.replace(
       "## ASSET SCHEDULE — ATTACHMENT TO SERIES EXHIBIT PS-[N]",
@@ -261,8 +287,12 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
       .flatMap((m) => m.signatories ?? [m.name])
       .map((n) => `_____________________________\n${n}`)
       .join("\n\n");
+    // The member-managed masters have no manager acknowledgment block, so the
+    // members' signatures run to the end of the signature section instead.
     s = s.replace(
-      /\*\*MEMBERS:\*\*[\s\S]*?(?=\*\*ACKNOWLEDGED AND AGREED BY MANAGER:\*\*)/,
+      isMemberManaged
+        ? /\*\*MEMBERS:\*\*[\s\S]*?(?=\n---|\n## |$)/
+        : /\*\*MEMBERS:\*\*[\s\S]*?(?=\*\*ACKNOWLEDGED AND AGREED BY MANAGER:\*\*)/,
       `**MEMBERS:**\n\n${sigLines}\n\n`,
     );
   }

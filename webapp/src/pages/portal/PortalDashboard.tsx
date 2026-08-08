@@ -68,7 +68,7 @@ interface LibraryDoc {
 
 interface OaStatus {
   generations: { id: string }[];
-  blocked: boolean;
+  memberManaged: boolean;
 }
 
 function AgreementAndLibraryRow() {
@@ -97,11 +97,6 @@ function AgreementAndLibraryRow() {
             <p className="text-sm text-muted-foreground">
               Your agreement questionnaire unlocks once your formation order is complete.
             </p>
-          ) : oaQuery.data?.blocked ? (
-            <p className="text-sm text-muted-foreground">
-              Your member-managed agreement is prepared by our team and will be posted to your
-              documents.
-            </p>
           ) : (
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-sm text-muted-foreground">
@@ -117,7 +112,7 @@ function AgreementAndLibraryRow() {
               </Button>
             </div>
           )}
-          {!hasGeneration && !oaQuery.isError && !oaQuery.data?.blocked ? (
+          {!hasGeneration && !oaQuery.isError ? (
             <p className="mt-2 text-xs font-medium text-amber-700">Action needed</p>
           ) : null}
         </div>

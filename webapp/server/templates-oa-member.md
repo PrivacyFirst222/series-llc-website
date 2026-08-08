@@ -1,0 +1,466 @@
+# OPERATING AGREEMENT
+## OF
+## [COMPANY NAME], LLC
+### A FLORIDA PROTECTED SERIES LIMITED LIABILITY COMPANY
+
+**(Member-Managed — Multiple Members / Partnership Taxation)**
+
+---
+
+THIS OPERATING AGREEMENT (this "Agreement") of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the "Company"), is made and entered into effective as of [DATE] (the "Effective Date"), by and among the undersigned members (each a "Member" and collectively the "Members").
+
+### RECITALS
+
+A. The Company was formed as a Florida limited liability company by the filing of Articles of Organization with the Florida Department of State, Division of Corporations (the "Department").
+
+B. The Company is a **protected series limited liability company** within the meaning of ss. 605.2101–605.2802, Florida Statutes, having designated, or intending to designate, one or more protected series by filing one or more Protected Series Designations with the Department.
+
+C. The Members intend by this Agreement to set forth the terms governing the Company, each Protected Series designated by the Company, and the relations among the Company, each Protected Series, and the Members.
+
+NOW, THEREFORE, the Members adopt the following as the operating agreement of the Company and of each Protected Series:
+
+---
+
+## ARTICLE 1 — THE COMPANY
+
+**1.1 Definitions.** Capitalized terms have the meanings set forth in Article 2 or in the Section in which they are used.
+
+**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes (the "Act"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101–605.2802 (the "Protected Series Provisions"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.
+
+**1.3 Name; Names of Protected Series.** The name of the Company is **[COMPANY NAME], LLC**. The name of each Protected Series shall comply with s. 605.2202, Florida Statutes: it shall begin with the full name of the Company and shall contain the phrase "protected series" or the abbreviation "P.S." or "PS." The name of each Protected Series shall be as set forth in its filed Protected Series Designation and its Series Exhibit. If the Company changes its name, the Administrative Member shall promptly make all filings required to conform the name of each Protected Series.
+
+**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series except as limited by its Series Exhibit, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
+
+**1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as a Majority in Interest may determine. A Protected Series may maintain its own place of business as determined by its Associated Members.
+
+**1.6 Registered Agent and Registered Office.** The registered agent and registered office of the Company shall be as stated in the records of the Department. As required by the Act, the registered agent and registered office of the Company shall also serve as the registered agent and registered office for each Protected Series. Service of process, notice, or demand on a Protected Series may be made as provided by law, including s. 48.062, Florida Statutes.
+
+**1.7 Term.** The Company's existence is perpetual unless the Company is dissolved and wound up in accordance with this Agreement and the Act. No Protected Series may have a duration extending beyond the existence of the Company.
+
+**1.8 Location of Records.** The records of the Company and of each Protected Series — including the records required by Article 8 — shall be maintained at the Company's principal office or at such other location (including secure electronic storage) as the Administrative Member determines, and shall at all times be retrievable in perceivable form.
+
+**1.9 Filings.** The Administrative Member shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, and statements of dissolution, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
+
+**1.10 Title to Property.** Title to each Associated Asset of a Protected Series shall be acquired, held, and conveyed **in the name of that Protected Series**. Title to each Associated Asset of the Company shall be acquired, held, and conveyed in the name of the Company. No property of the Company or of any Protected Series shall be held in the individual name of any Member. Each Member's interest in the Company is personal property for all purposes.
+
+**1.11 Waiver of Partition Rights.** Each Member irrevocably waives any right to maintain an action for partition or any similar action with respect to any property of the Company or of any Protected Series.
+
+**1.12 No Payments of Individual Obligations.** The credit and property of the Company and of each Protected Series shall be used solely for the benefit of the Company or the applicable Protected Series, and no such property shall be transferred or encumbered for, or in payment of, any individual obligation of any Member.
+
+---
+
+## ARTICLE 2 — DEFINITIONS
+
+**2.1 "Act"** means the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.
+
+**2.2 "Associated Asset"** means an asset of a Protected Series, or of the Company, that satisfies the recordkeeping requirements of s. 605.2301, Florida Statutes, and Article 8 of this Agreement.
+
+**2.3 "Associated Liability"** means a liability incurred by, contracted for, or otherwise existing with respect to a particular Protected Series or the Company, as reflected in the records maintained under Article 8.
+
+**2.4 "Associated Member"** means, with respect to a Protected Series, a Member associated with that Protected Series under this Agreement and its Series Exhibit. If no Member is associated with a Protected Series, the Company itself is deemed the sole Associated Member of that Protected Series as provided by the Act.
+
+**2.5 "Company"** means [COMPANY NAME], LLC.
+
+**2.6 "Immediate Family Member"** means, as to any Member, (a) any ancestor of that Member or descendant of a grandparent of that Member (each an "Individual Family Member," and including persons legally adopted before age 18), or (b) a trust or other entity for the benefit of one or more Individual Family Members, provided all beneficial interests in that entity are held by such persons; a trust is not excluded merely because a remainder beneficiary is not an Individual Family Member.
+
+**2.7 "Involuntary Transfer"** means any Transfer by which a Member or transferee is deprived or divested of any right, title, or interest in a Membership Interest other than voluntarily, including (a) a Transfer to or for the benefit of a judgment creditor pursuant to court order, subject in all events to Section 10.6, (b) a Transfer in connection with reorganization, insolvency, bankruptcy, or receivership, (c) a Transfer to a public officer or agency under any abandoned-property or escheat law, and (d) a Transfer to a spouse or former spouse in connection with dissolution of marriage or marital separation.
+
+**2.8 "Majority in Interest"** means one or more Members holding, in the aggregate, more than fifty percent (50%) of the Percentage Interests of all Members; and, when used with respect to a Protected Series, one or more Associated Members of that Protected Series holding, in the aggregate, more than fifty percent (50%) of the Series Percentages of that Protected Series.
+
+**2.9 "Administrative Member"** means the Member designated under Section 5.8 to perform the ministerial functions assigned to that role by this Agreement, and any successor so designated. The Administrative Member has no authority beyond that expressly conferred by this Agreement or by a Majority in Interest.
+
+**2.10 "Member"** means each person identified as a member on Exhibit A and each person admitted as a member in accordance with this Agreement, in each case until dissociated.
+
+**2.11 "Membership Interest"** means a Member's entire interest in the Company, including the Member's interest in capital, profits, and distributions of the Company and of each Protected Series with which the Member is associated, and all rights of a member under the Act and this Agreement.
+
+**2.12 "Percentage Interest"** means, as to each Member, the percentage set forth for that Member on Exhibit A, as adjusted from time to time under this Agreement. Membership interests are of a single class.
+
+**2.13 "Protected Series"** or **"PS"** means a protected series of the Company established under s. 605.2201, Florida Statutes, and identified in a Series Exhibit.
+
+**2.14 "Protected Series Designation"** means a designation of a protected series filed with the Department under s. 605.2201, Florida Statutes, as amended from time to time.
+
+**2.15 "Series Managing Members"** means, with respect to a Protected Series, its Associated Members, who manage that Protected Series under Section 5.2.
+
+**2.16 "Series Exhibit"** means, for each Protected Series, the exhibit to this Agreement (each numbered PS-1, PS-2, and so on) setting forth the terms specific to that Protected Series, including its Associated Members and their Series Percentages. Each Series Exhibit is a part of this Agreement.
+
+**2.17 "Series Percentage"** means, as to each Associated Member of a Protected Series, the percentage set forth for that Associated Member in the applicable Series Exhibit, as adjusted from time to time under this Agreement.
+
+**2.18 "Transfer"** means any assignment, transfer, conveyance, devise, gift, pledge, hypothecation, encumbrance, or other disposition, direct or indirect, voluntary or involuntary, in trust or otherwise, and as a verb has a corresponding meaning.
+
+---
+
+## ARTICLE 3 — PROTECTED SERIES
+
+**3.1 Establishment.** With the affirmative vote or consent of **all** Members, the Company may establish one or more Protected Series by causing a Protected Series Designation to be signed and filed with the Department as provided in s. 605.2201, Florida Statutes. At or before the filing of each Protected Series Designation, the Members shall adopt a Series Exhibit for the new Protected Series. The Administrative Member is authorized to execute and file each Protected Series Designation approved under this Section.
+
+**3.2 Status of Each Protected Series.** As provided by the Act, each Protected Series:
+
+(a) is a "person" for purposes of the Act and the Uniform Commercial Code, distinct from the Company, from every other Protected Series, and from each Member;
+
+(b) may, in its own name, conduct any activity in furtherance of its purpose, exercise the powers described in Section 1.4, and sue and be sued;
+
+(c) is **not** a separate legal entity capable of existing independently of the Company, may not be a member of the Company, may not itself designate a protected series, and may not merge, convert, domesticate, or engage in an interest exchange except through the single statutory channel provided in s. 605.2604, Florida Statutes; and
+
+(d) shall be governed by this Agreement, applied to that Protected Series as though the Protected Series were a separate limited liability company, except as its Series Exhibit expressly provides otherwise and except as the Act requires otherwise.
+
+**3.3 Limitation of Liability Among Series (Statutory Shields).** Consistent with s. 605.2401, Florida Statutes:
+
+(a) A debt, obligation, or other liability of the Company is solely the debt, obligation, or liability of the Company, and is enforceable only against the Associated Assets of the Company;
+
+(b) A debt, obligation, or other liability of a Protected Series is solely the debt, obligation, or liability of that Protected Series, and is enforceable only against the Associated Assets of that Protected Series;
+
+(c) No Protected Series is liable for, and the Associated Assets of a Protected Series are not available to satisfy, any debt, obligation, or liability of the Company or of any other Protected Series; and the Company is not liable for, and the Associated Assets of the Company are not available to satisfy, any debt, obligation, or liability of any Protected Series; and
+
+(d) No Member is personally liable, directly or indirectly, by way of contribution or otherwise, for any debt, obligation, or liability of the Company or of any Protected Series solely by reason of being or acting as a member, manager, or protected-series manager.
+
+**3.4 Dissolution of a Protected Series Distinguished.** The dissolution and winding up of a Protected Series does not, by itself, cause the dissolution of the Company or of any other Protected Series. The dissolution of the Company causes the dissolution of every Protected Series, and the winding up of the Company is not complete until each Protected Series is wound up.
+
+**3.5 Series Exhibits Control Series Terms.** The terms specific to each Protected Series — including its name, purpose, Associated Members and their Series Percentages, capital, and any variations from the default rules of this Agreement — are set forth in its Series Exhibit. In the event of a conflict between a Series Exhibit and this Agreement with respect to the Protected Series to which the Series Exhibit relates, the Series Exhibit controls, except that no Series Exhibit may vary a provision of the Act that may not be varied by an operating agreement (see s. 605.2107, Florida Statutes) or the provisions of Article 8.
+
+---
+
+## ARTICLE 4 — MEMBERS; VOTING; MEMBER DUTIES
+
+**4.1 Members; Percentage Interests.** The Members and their Percentage Interests are set forth on Exhibit A. Membership interests are of a single class and are expressed as percentages; no certificates shall be issued unless a Majority in Interest determines otherwise.
+
+**4.2 Association with Protected Series.** A Member is an Associated Member of a Protected Series only if, and to the extent, identified as such in the applicable Series Exhibit, and each Associated Member's Series Percentage is as stated there. Only a Member may be an Associated Member of a Protected Series. No Member is associated with any Protected Series except as so identified, and rights, allocations, and distributions in respect of a Protected Series belong exclusively to its Associated Members. For any Protected Series as to which no Member is associated, the Company is deemed the sole Associated Member as provided by the Act.
+
+**4.3 Voting.** Each Member votes in proportion to the Member's Percentage Interest on matters as to which Members are entitled to vote or consent at the Company level, and each Associated Member votes in proportion to the Member's Series Percentage on matters concerning the applicable Protected Series. Except where this Agreement or a non-variable provision of the Act requires a greater vote, the act of a Majority in Interest constitutes the act of the Members (or, for a matter concerning a Protected Series, the act of that Protected Series' Associated Members). A Membership Interest owned by spouses as tenants by the entireties shall be voted only by the consensus of both spouses; neither spouse acting alone may vote the interest except as the other spouse's attorney-in-fact under a duly executed power of attorney.
+
+**4.4 Meetings; Written Consents.** No regular meetings are required. Any Member may call a meeting of the Members (or of the Associated Members of a Protected Series) on at least five (5) days' written notice stating the purpose. Members may participate by any means of remote communication by which all participants can hear one another. Any action that may be taken at a meeting may be taken without a meeting by a written consent signed by Members holding the Percentage Interests (or Series Percentages) required to approve the action, delivered to the Company and maintained with its records, with prompt notice to any non-consenting Member.
+
+**4.5 Limited Liability; No Agency.** No Member shall be personally liable for any debt, obligation, or liability of the Company or of any Protected Series, whether arising in contract, tort, or otherwise, solely by reason of being a Member or Associated Member. No Member is an agent of the Company or of any Protected Series solely by reason of being a member.
+
+**4.6 Duty to Participate in Governance.** Each Member shall materially participate in the governance of the Company and of each Protected Series with which the Member is associated, including by voting or consenting in a timely manner on matters submitted to the Members, attending meetings duly called under Section 4.4 in person or by remote means, furnishing information reasonably requested by the Administrative Member for the Company's or a Protected Series' filings, records, and tax reporting, and executing and delivering instruments reasonably required to carry out actions duly approved under this Agreement.
+
+**4.7 Competition. [SELECT ONE ALTERNATIVE — see Instructions]**
+
+**[ ] Alternative A — Noncompetition.** Before the dissolution of the Company, no Member shall compete with the Company, or with any Protected Series with which the Member is associated, in the conduct of the Company's or that Protected Series' activities and affairs, consistent with the standard described in s. 605.04091(2)(c), Florida Statutes. This Section does not prohibit a Member from engaging in any business or venture that does not so compete, and Section 4.10 applies to all other activities.
+
+**[ ] Alternative B — Competition Permitted.** Each Member may engage in and possess interests in other business ventures of every kind, whether or not competitive with the activities of the Company or of any Protected Series. Engaging in such ventures shall not be deemed to violate this Agreement or any duty under the Act, no Member is obligated to offer any business opportunity to the Company, any Protected Series, or any other Member, and neither the Company, any Protected Series, nor any Member shall have any right in such ventures or their income by virtue of this Agreement. *(Retain the selected Alternative and delete the other. If Alternative B is selected, replace Section 11.1(c) with "(c) [Reserved.]" — do not renumber.)*
+
+**4.8 Confidentiality.** Each Member shall hold in confidence, and shall not disclose or use other than for purposes of the Company or the applicable Protected Series, all confidential information of the Company and of each Protected Series, including financial records, customer and tenant information, contracts, and the contents of the records maintained under Article 8, except for disclosures required by law or made to the Member's professional advisors who are bound to confidentiality.
+
+**4.9 Non-Disparagement; No Interference.** No Member shall hinder or delay the activities and affairs of the Company or of any Protected Series, or slander, defame, or otherwise tarnish the reputation of the Company or of any Protected Series.
+
+**4.10 Other Activities.** Subject to Sections 4.7 through 4.9, each Member may engage in or possess interests in other business ventures of any nature, independently or with others, and neither the Company nor any Protected Series nor any other Member shall have any right in such ventures by virtue of this Agreement.
+
+**4.11 Information Rights.** Each Member has the information and inspection rights provided by the Act with respect to the Company. Information and inspection rights with respect to a particular Protected Series belong to its Associated Members; a Member who is not an Associated Member of a Protected Series has only the information rights with respect to that Protected Series that the Act mandates.
+
+**4.12 Transfer on Death Designation.** Each Member's Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50–711.512, Florida Statutes, and reflects each Member's designation, if any, of the person or persons who will become the owner of that Member's Membership Interest upon that Member's death. A Member may designate any person or entity as a beneficiary. A Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, delivered to the Administrative Member; the change is effective upon receipt unless the Administrative Member objects in writing within seven (7) days, and the Administrative Member shall thereafter update Exhibit A (though updating is not required for effectiveness). Upon the designating Member's death, the designated beneficiary automatically succeeds to the deceased Member's transferable interest — including the economic rights of the deceased Member's Percentage Interest and Series Percentages — taking subject to this Agreement, and holds the rights of a transferee described in Section 10.3 until admitted as a Member. A beneficiary who is an Immediate Family Member of the deceased Member is admitted as a Member upon delivery to the Company of a written agreement to be bound by this Agreement; any other beneficiary is admitted as a Member upon such delivery and the written consent of a Majority in Interest of the Members other than the deceased Member.
+
+---
+
+## ARTICLE 5 — MANAGEMENT BY THE MEMBERS
+
+**5.1 Member-Managed.** The Company is **member-managed** as provided in its Articles of Organization and this Agreement. The management and conduct of the activities and affairs of the Company are vested in the Members. There is no manager, and no person shall be designated or hold out as a manager of the Company or of any Protected Series.
+
+**5.2 Management of Each Protected Series.** Each Protected Series is managed by its Associated Members. All decisions with respect to a Protected Series are made by a Majority in Interest of its Associated Members, determined by Series Percentages. If a Protected Series has no Associated Member other than the Company, it is managed by a Majority in Interest of the Members.
+
+**5.3 Voting; Decisions.** Each Member's vote is proportionate to that Member's Percentage Interest, and each Associated Member's vote with respect to a Protected Series is proportionate to that Associated Member's Series Percentage. Except where this Agreement or the Act requires a greater vote, any act may be undertaken, and any difference among the Members may be decided, by a Majority in Interest — whether the act is within or outside the ordinary course of the activities and affairs of the Company or the applicable Protected Series.
+
+**5.4 Authority to Act; Limits on Authority.** Each Member is an agent of the Company for the purpose of its activities and affairs to the extent provided by the Act. As among the Members, and notwithstanding that authority:
+
+(a) no Member acting alone has actual authority to undertake any act outside the ordinary course of the activities and affairs of the Company or of a Protected Series, or any act listed in Section 5.5, without the approval there stated;
+
+(b) no Member acting alone has actual authority to sell, convey, mortgage, pledge, or otherwise encumber any interest in real property of the Company or of any Protected Series, or to execute any instrument affecting such an interest, without the consent of a Majority in Interest and, as to a Protected Series, a Majority in Interest of its Associated Members; and
+
+(c) a Member who exceeds the authority conferred by this Agreement is liable to the Company or the affected Protected Series for any loss caused by that act, and the Company or Protected Series is entitled to indemnity from that Member.
+
+**5.5 Actions Requiring Member Approval.** No Member shall do any of the following without the approval stated:
+
+(a) establish a new Protected Series — the consent of **all Members** (Section 3.1);
+
+(b) **transfer, re-associate, or re-title any asset between the Company and a Protected Series or between Protected Series** (an "Inter-Series Transfer") — the consent of a Majority in Interest and, as to each Protected Series affected, a Majority in Interest of its Associated Members;
+
+(c) sell, exchange, or otherwise dispose of all or substantially all of the Associated Assets of the Company or of any Protected Series, other than in the ordinary course — the consent of a Majority in Interest (of the Company or of the affected Protected Series' Associated Members, as applicable);
+
+(d) merge the Company as permitted by the Act — the consent of **all Members**; or file a statement of dissolution of a Protected Series — the approval required by Section 14.1;
+
+(e) admit any additional Member, or associate any person with a Protected Series — the approval required by Article 12;
+
+(f) incur, on behalf of the Company or any Protected Series, indebtedness in excess of $[THRESHOLD] in a single transaction or series of related transactions, or guarantee the obligation of any person (and no guarantee of the obligations of one Protected Series by another or by the Company shall be made except by an express written instrument approved under this Section) — the consent of a Majority in Interest (of the Company or of the affected Protected Series' Associated Members, as applicable);
+
+(g) lend money of the Company or of a Protected Series to, or borrow from, a Member or an affiliate of a Member, other than loans under Section 6.5 — the consent of a Majority in Interest of the disinterested Members (or disinterested Associated Members, as applicable); or
+
+(h) amend this Agreement or any Series Exhibit — the approval required by Section 15.1.
+
+**5.6 Standard of Conduct; Exculpation.** Each Member shall discharge the duties of a member of a member-managed limited liability company consistent with the Act, which are not varied by this Agreement except to the extent expressly permitted by s. 605.0105, Florida Statutes. No Member shall be liable to the Company, any Protected Series, or any other Member for any act or omission performed or omitted in good faith and in a manner reasonably believed to be within the scope of authority conferred by this Agreement, except for conduct for which exoneration is prohibited by the Act.
+
+**5.7 Indemnification.** The Company shall indemnify each Member, and each Protected Series shall indemnify each of its Associated Members, to the fullest extent permitted by the Act, against losses, claims, and expenses (including reasonable attorney's fees) incurred by reason of acting in the management of the Company or that Protected Series, except to the extent arising from conduct for which exoneration is prohibited by the Act or from an act exceeding the authority conferred by Section 5.4; **provided, that any indemnification obligation relating to the activities of a particular Protected Series is an Associated Liability of that Protected Series, payable solely from its Associated Assets**, and any indemnification obligation relating to the activities of the Company generally is payable solely from the Associated Assets of the Company.
+
+**5.8 Administrative Member.** A Majority in Interest may designate one Member as the "Administrative Member" to perform the ministerial functions assigned to that role by this Agreement, including making filings with the Department, maintaining the records required by Article 8, preparing and filing tax returns, and updating Exhibit A and the Series Exhibits to reflect changes properly made. The Administrative Member serves at the pleasure of a Majority in Interest, has no authority beyond that expressly conferred by this Agreement or by a Majority in Interest, and is not a manager of the Company. Until a designation is made, and whenever the office is vacant, the functions of the Administrative Member shall be performed by a Majority in Interest.
+
+**5.9 Statement of Authority.** If the Company or any Protected Series holds or acquires an interest in real property, the Members shall cause the Company to file with the Department a statement of authority under s. 605.0302, Florida Statutes, stating the authority, and the limitations on the authority, of Members to transfer or encumber real property held in the name of the Company or of that Protected Series, and shall cause a certified copy of that statement to be recorded in the official records of each county in which the real property is located. The Members shall cause the statement to be amended or cancelled as necessary to keep it accurate. The limitations in Section 5.4(b) apply among the Members whether or not a statement of authority is on record.
+
+**5.10 Compensation; Reimbursement; Shared Expenses.** No Member shall receive a salary for acting in the management of the Company or of a Protected Series unless a Majority in Interest consents in writing to compensation. Each Member shall be reimbursed for reasonable expenses properly incurred on behalf of the Company or the applicable Protected Series. Costs and expenses that benefit the Company and one or more Protected Series (including formation and filing fees, registered agent fees, accounting, insurance, and administrative overhead) shall be allocated among the Company and the Protected Series benefited on a reasonable and consistent basis determined by a Majority in Interest — by specific attribution where practicable and otherwise pro rata or by such other reasonable formula as a Majority in Interest adopts — and the allocation shall be recorded in the records maintained under Article 8.
+
+---
+
+## ARTICLE 6 — CAPITAL; CAPITAL ACCOUNTS
+
+**6.1 Initial Contributions.** Each Member's contributions to the Company, and each Associated Member's contributions to each Protected Series, are set forth on Exhibit A and in the applicable Series Exhibits. Each contribution shall identify whether it is made to the Company or to a specific Protected Series, and shall be deposited to, and recorded in the records of, the recipient. A promise by a Member to make a contribution is enforceable only if set out in a writing signed by the Member.
+
+**6.2 Additional Capital Contributions. [OPTIONAL PROVISION — include or omit; see Instructions]** Upon the approval of a Majority in Interest (or, for a capital need of a particular Protected Series, a Majority in Interest of its Associated Members), each Member (or each Associated Member of the affected Protected Series) shall have the duty and obligation to contribute additional capital to the Company or to the affected Protected Series, in proportion to the Members' Percentage Interests (or the Associated Members' Series Percentages), in the aggregate amount so approved, payable within thirty (30) days after written notice of the approved call; provided, that unless approved by all Members, no Member shall be required to contribute more than $[CAP] in the aggregate in any calendar year under this Section. This obligation is a material, unperformed, future obligation of each Member within the meaning of Section 11.1. *(To omit this provision, replace the text of this Section 6.2 and of Section 6.3 with "[Reserved.]" and replace Section 11.1(a) with "(a) [Reserved.]" — do not renumber any section. If omitted, no Member has any obligation to contribute capital beyond Section 6.1.)*
+
+**6.3 Failure to Contribute.** If a Member fails to pay an additional capital contribution required under Section 6.2 when due, the Company (or the affected Protected Series) may pursue any remedy available at law or in equity for the failure, and in addition, the non-defaulting Members who elect to do so may advance the defaulted amount, in which case the Percentage Interests (or Series Percentages) of the defaulting and advancing Members shall be adjusted to reflect the aggregate capital contributed by each Member following the advance.
+
+**6.4 No Interest; No Withdrawal.** No interest shall be paid on any contribution. No Member may withdraw or demand the return of any contribution except as this Agreement provides.
+
+**6.5 Member Loans.** A Member may lend funds to the Company or to a specific Protected Series upon commercially reasonable terms evidenced by a written instrument identifying the borrower. A loan is not a contribution, and shall be an Associated Liability solely of the borrowing Protected Series or of the Company, as applicable.
+
+**6.6 Capital Accounts.** A capital account shall be established and maintained for each Member, with separate sub-accounts reflecting the Member's capital in the Company and in each Protected Series with which the Member is associated. Capital accounts shall be maintained in accordance with the capital accounting rules of section 704(b) of the Internal Revenue Code of 1986, as amended (the "Code"), and the Treasury Regulations thereunder, and shall be credited with contributions and allocations of profit and debited with distributions and allocations of loss as so required. A transferee of all or part of a Membership Interest succeeds to the portion of the transferor's capital account (and sub-accounts) attributable to the transferred interest. Nothing in this Agreement creates a deficit restoration obligation or otherwise personally obligates any Member to contribute capital beyond the contributions required by Sections 6.1 and 6.2.
+
+**6.7 No Right to Specific Property.** No Member has any right to demand or receive any distribution in any specific property of the Company or of any Protected Series.
+
+---
+
+## ARTICLE 7 — ALLOCATIONS AND DISTRIBUTIONS
+
+**7.1 Allocations.** Profits, losses, and each item of income, gain, loss, deduction, and credit of each Protected Series shall be allocated among its Associated Members in proportion to their Series Percentages, and those of the Company (exclusive of every Protected Series) shall be allocated among the Members in proportion to their Percentage Interests. Notwithstanding the foregoing, allocations shall be made in a manner consistent with the capital-account maintenance rules of section 704(b) of the Code and the Treasury Regulations thereunder — including, to the extent required, a qualified income offset, minimum-gain chargebacks, and limitations on loss allocations that would create or increase an impermissible deficit — and allocations with respect to property contributed with a value different from its adjusted basis shall be made in accordance with section 704(c) of the Code. The Administrative Member shall apply this Section so that the allocations have substantial economic effect and shall resolve questions of application consistently and in good faith.
+
+**7.2 Distributions.** A Majority in Interest (or, as to a Protected Series, a Majority in Interest of its Associated Members) may from time to time determine the extent to which cash on hand of the Company or of a Protected Series exceeds current and anticipated needs, including operating expenses, debt service, acquisitions, and reserves, and may distribute any such excess. Distributions in respect of a Protected Series shall be made **solely from the Associated Assets of that Protected Series, and solely to its Associated Members in proportion to their Series Percentages**; distributions in respect of the Company shall be made solely from the Associated Assets of the Company, to the Members in proportion to their Percentage Interests. Each distribution shall be recorded in the records maintained under Article 8, identifying its source.
+
+**7.3 Tax Distributions.** To the extent of available cash of the Company or the applicable Protected Series, a Majority in Interest may cause distributions to be made intended to enable each Member to satisfy federal and state income tax liabilities attributable to the Member's distributive share of income, and is authorized to pay any such amount directly to the government agency responsible for collection of the tax on the Member's behalf. Tax distributions in respect of a Protected Series shall be made solely from its Associated Assets and treated as advances against later distributions under Section 7.2.
+
+**7.4 Statutory Limitations.** No distribution shall be made to the extent prohibited by the limitations of the Act applicable to distributions, applied separately to the Company and to each Protected Series as the Act provides.
+
+---
+
+## ARTICLE 8 — RECORDS; MAINTENANCE OF THE LIABILITY SHIELDS
+
+**8.1 Records Covenants.** The Company and each Protected Series shall create and maintain records satisfying s. 605.2301, Florida Statutes, in accordance with this Article. This Article may not be varied by any Series Exhibit.
+
+**8.2 Asset Association Records.** The Administrative Member shall create and maintain, for the Company and for each Protected Series, records that state the name of the Company or of the applicable Protected Series and describe each of its assets with sufficient specificity to permit a **disinterested, reasonable individual** to:
+
+(a) identify the asset and distinguish it from any other asset of the Company, of that Protected Series, and of every other Protected Series;
+
+(b) determine when and from which person the asset was acquired, or how the asset otherwise became an asset of the Company or that Protected Series; and
+
+(c) for any asset acquired from the Company or from another Protected Series, determine the consideration paid, the payor, and the payee.
+
+Records may be organized by specific listing, category, type, quantity, or computational or allocative formula or procedure (including a percentage or share of any asset), or in any other reasonable manner, consistent with s. 605.2301(4), Florida Statutes, provided the standard of this Section is met.
+
+**8.3 Separate Accounts; No Commingling.** The Company and each Protected Series shall maintain its own deposit account or accounts, and its funds shall not be commingled with the funds of any Member, the Company (as to a Protected Series), or any other Protected Series. All income of a Protected Series shall be deposited to its accounts, and its expenses paid from its accounts. Transfers of funds between accounts shall be made only pursuant to a documented Inter-Series Transfer, loan, contribution, or distribution.
+
+**8.4 Inter-Series Transfers.** Any Inter-Series Transfer (as defined in Section 5.4(b)) requires the approvals stated in Section 5.4(b) and shall be documented contemporaneously by a written record stating (a) the asset transferred, (b) the transferor and transferee (the Company or the specific Protected Series), (c) the date, and (d) the consideration paid, the payor, and the payee. Inter-Series Transfers shall be made for fair value unless the transfer is a documented contribution or distribution.
+
+**8.5 Real Property.** Each acquisition or conveyance of an interest in real property by a Protected Series or the Company shall be made by an instrument naming the acquiring or conveying Protected Series (by its full statutory name) or the Company, as applicable, and shall be recorded where required. Properly recorded instruments affecting real property serve as association records as provided in ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes.
+
+**8.6 Contracts and Liabilities.** Each contract, account, loan, or other obligation shall be entered into in the name of, and shall identify, the Company or the specific Protected Series incurring it, and shall be recorded as an Associated Liability of the person incurring it.
+
+**8.7 Financial Records; Inspection.** Separate books of account shall be maintained for the Company and for each Protected Series, showing income, expenses, assets, liabilities, contributions, and distributions of each. Members' inspection rights are as stated in Section 4.11.
+
+**8.8 Annual Review.** At least annually, the Administrative Member shall review the records maintained under this Article for compliance with s. 605.2301, Florida Statutes, and shall correct any deficiency promptly upon discovery.
+
+**8.9 Standing Association Rules; Savings Provisions.**
+
+(a) **Records.** This Agreement, each Series Exhibit, each asset schedule, and the account, titling, and transaction records maintained under this Article are records within the meaning of s. 605.2301, Florida Statutes, and may be read together, in combination, to satisfy its requirements.
+
+(b) **Standing association rules.** As a standing procedure adopted pursuant to s. 605.2301(4), Florida Statutes, and without limiting any other record: (i) an asset acquired by an instrument naming a Protected Series, or titled in the name of a Protected Series, is an Associated Asset of that Protected Series from the date of acquisition; (ii) an asset acquired with consideration paid from a deposit account of a Protected Series is an Associated Asset of that Protected Series; (iii) funds on deposit in an account established in the name of a Protected Series, and interest thereon, are Associated Assets of that Protected Series; (iv) the income, rents, profits, proceeds, and products of, the insurance proceeds relating to, and every replacement or substitution for, an Associated Asset are Associated Assets of the same person; and (v) every asset acquired in the name of the Company, and every asset not associated with a Protected Series under clauses (i) through (iv) or under any other record maintained under this Article, is an Associated Asset of the Company.
+
+(c) **Interpretation.** This Agreement shall be interpreted and applied to give the fullest effect permitted by law to the separateness of the Company and of each Protected Series and to the limitations of liability described in Section 3.3.
+
+(d) **Correction of records.** The Administrative Member may, and upon discovery of any inaccuracy or omission shall, supplement or correct any record maintained under this Article so that it accurately reflects the association of assets and liabilities, and records as so supplemented or corrected shall be given effect to the fullest extent permitted by law.
+
+(e) **Severability in favor of separateness.** If any provision of this Agreement or of any Series Exhibit would otherwise be construed to impair the separateness of the Company or of any Protected Series or the limitations of liability described in Section 3.3, that provision shall be deemed modified to the minimum extent necessary to preserve them.
+
+---
+
+## ARTICLE 9 — TAX MATTERS
+
+**9.1 Intended Classification.** It is intended that the Company, and each Protected Series having two or more Associated Members, be classified as a partnership for federal income tax purposes (and that any Protected Series having a single Associated Member be disregarded as an entity separate from that Associated Member), in each case as federal tax law provides as applied to each of them. Nothing in this Agreement constitutes tax advice or a guarantee of any particular tax treatment, and no Member makes any representation regarding the tax consequences of the protected series structure.
+
+**9.2 Tax Returns; Information.** The Administrative Member shall cause to be prepared and filed all tax returns required of the Company and of each Protected Series, and shall deliver to each Member, after the end of each fiscal year, the tax information (including Schedule K-1s, where applicable) necessary for the Member's returns.
+
+**9.3 Partnership Representative.** The Administrative Member (or a person a Majority in Interest designates) shall serve as the "partnership representative" within the meaning of section 6223 of the Code for the Company and for each Protected Series classified as a partnership, with all authority granted to a partnership representative under the Code, including the authority to make or revoke elections (including elections under sections 6221(b) and 6226 of the Code), to conduct and resolve audits and proceedings, and to bind the Members as the Code provides. Each Member shall provide the information, and take the actions, reasonably requested by the partnership representative in connection with any tax matter, and shall pay the Member's share of any imputed underpayment or similar amount attributable to the Member as reasonably determined by the partnership representative.
+
+**9.4 Tax Elections.** A Majority in Interest may make, change, or revoke any tax election for the Company or any Protected Series (including an election under section 754 of the Code) that it determines to be in the best interests of the Members as a whole.
+
+**9.5 Fiscal Year.** The fiscal year of the Company and of each Protected Series is the calendar year unless a Majority in Interest selects another permitted year.
+
+**9.6 S Corporation Election.** The Company (or any Protected Series treated as a separate entity for federal income tax purposes) may elect classification as an association taxable as a corporation and S corporation status only upon the affirmative vote or consent of all Members. Before or promptly upon making any such election, the Members shall amend and restate this Agreement in the Company's S corporation form of operating agreement, under which the Company and every Protected Series must have identical Members with identical percentages and all allocations and distributions are made strictly pro rata. Until such amendment and restatement, and while any such election is in effect, all allocations and distributions shall be made strictly pro rata in accordance with Percentage Interests notwithstanding any other provision of this Agreement, and this Agreement shall be applied and, to the minimum extent necessary, deemed modified so as to preserve the validity of the election.
+
+## ARTICLE 10 — TRANSFERS; CREDITOR PROVISIONS
+
+**10.1 Restriction on Transfer.** No Member shall Transfer all or any portion of a Membership Interest, or any right to receive distributions from the Company or any Protected Series, except (a) a Transfer to an Immediate Family Member of the transferring Member made in compliance with Section 10.2, (b) a Transfer effective at death pursuant to the transferring Member's TOD designation under Section 4.12, or (c) another Transfer made with the prior written consent of a Majority in Interest of the Members other than the transferring Member. Any purported Transfer in violation of this Article is void to the fullest extent permitted by law, and the transferee acquires no rights other than those, if any, mandated by the Act.
+
+**10.2 Permitted Family Transfers.** A Transfer of all or part of a Membership Interest to an Immediate Family Member of the transferring Member is permitted, provided the transferee delivers to the Company a signed agreement to be bound by this Agreement.
+
+**10.3 Rights of Transferees.** A transferee (including a permitted family transferee) who is not admitted as a Member under Article 12 holds only the transferable interest — the right to receive the distributions that would otherwise be paid to the transferor with respect to the transferred interest — and has no right to vote, to participate in management, to inspect records, or to exercise any other right of a member, except as the Act mandates. A transferred interest remains subject to this Agreement in the hands of every transferee.
+
+**10.4 Involuntary Transfers; Option to Acquire.** Upon any Involuntary Transfer or any event that would result in an Involuntary Transfer of all or part of a Membership Interest, the Company shall have the option, exercisable by a Majority in Interest of the Members other than the affected Member at any time within ninety (90) days after the Company receives written notice that the Involuntary Transfer has occurred, to acquire the interest that is the subject of the Involuntary Transfer at its fair value. Fair value shall be the value agreed in writing between the Company and the holder of the interest or, absent agreement within thirty (30) days after the option is exercised, the value determined by an independent appraiser selected by a Majority in Interest of the Members other than the affected Member (who shall hold the MAI designation if the assets principally concerned are real property), whose determination is final and binding, with the appraiser's fee borne one-half by the Company and one-half by the holder. The purchase price is payable on commercially reasonable terms determined by a Majority in Interest, including payment in installments over a period of up to five (5) years bearing interest at the applicable federal rate. If the Company does not exercise its option, the Members other than the affected Member may, within thirty (30) days after the Company's option lapses, elect to acquire the interest on the same terms, in proportion to their Percentage Interests or as they otherwise agree. Pending exercise or lapse of the options, the holder of the interest has only the rights of a transferee described in Section 10.3.
+
+**10.5 No Dissociation by Transfer Alone.** A Transfer does not by itself dissociate a Member or dissolve the Company or any Protected Series.
+
+**10.6 Charging Order — Exclusive Remedy.** As provided in ss. 605.0502 and 605.0503, Florida Statutes, a charging order is the sole and exclusive remedy by which a judgment creditor of a Member or of a transferee may satisfy a judgment from the judgment debtor's Membership Interest or transferable interest, whether in the Company or in respect of any Protected Series. A judgment creditor or other holder of a charging order has only the right to receive distributions to which the judgment debtor would otherwise be entitled, has none of the rights of a member or manager, is not entitled to any accounting, inspection, or information rights except as the Act mandates, and may not foreclose upon the charged interest. Nothing in this Agreement enlarges any remedy of any creditor beyond those provided by the Act.
+
+---
+
+## ARTICLE 11 — EXECUTORY CONTRACT
+
+**11.1 Executory Contract.** The parties agree that this Agreement constitutes an executory contract and shall be governed by 11 U.S.C. §365 in connection with the bankruptcy of the Company or any Member because, among other provisions and obligations, this Agreement imposes on each Member the following affirmative duties (each of which constitutes a material unperformed, future obligation): (a) *[include only if optional Section 6.2 is included; otherwise replace with "(a) [Reserved.]"]* upon approval of a Majority in Interest as provided in Section 6.2, the duty and obligation of each Member to contribute additional capital to the Company or the affected Protected Series; (b) the duty and obligation of each Member to materially participate in the governance of the Company and of each Protected Series with which the Member is associated, as provided in Section 4.6; (c) *[include only if Section 4.7 Alternative A is selected; otherwise replace with "(c) [Reserved.]"]* the duty and obligation of each Member not to compete with the Company, or with any Protected Series with which the Member is associated, in the conduct of their activities and affairs before the dissolution of the Company, as provided in Section 4.7 and consistent with s. 605.04091(2)(c), Florida Statutes; (d) the duty and obligation of each Member not to disclose confidential information, as provided in Section 4.8; and (e) the duty and obligation of each Member not to hinder, delay, slander, or tarnish the reputation of the Company or of any Protected Series, as provided in Section 4.9. The failure of a Member to perform the duties and obligations set forth herein releases and excuses the mutual duties and obligations owed by the Company and the other Members to such defaulting Member.
+
+**11.2 Personal Service Agreement; No Assumption or Assignment.** In accordance with *In re Soderstrom*, 484 B.R. 874 (M.D. Fla. 2013), this Agreement is a personal service agreement due to the managerial and governance duties and obligations owed by each Member, and a bankruptcy trustee cannot assume or assign a debtor Member's interest in the Company in accordance with 11 U.S.C. §365(c)(1) without the prior written consent of the other Members.
+
+**11.3 Compliance upon Assumption or Rejection.** Notwithstanding the foregoing, to the extent that a trustee of a Member's bankruptcy is allowed either to assume or reject a debtor Member's interest in the Company governed by this Agreement, such action shall comply with the time period set forth in 11 U.S.C. §365(d), and if the trustee assumes such debtor Member's interest, such trustee shall comply with the terms of this Agreement and Florida law governing this Agreement, including, without limitation, the restrictions of the rights of a creditor of a Member or transferee pursuant to ss. 605.0502 and 605.0503, Florida Statutes.
+
+---
+
+## ARTICLE 12 — ADMISSION OF MEMBERS; ASSOCIATION WITH PROTECTED SERIES
+
+**12.1 Admission of Members.** A person may be admitted as a Member of the Company only with the written consent of **all** Members and upon the person's delivery of a signed agreement to be bound by this Agreement, except that (a) a TOD beneficiary is admitted as provided in Section 4.12, and (b) a permitted family transferee under Section 10.2 may be admitted with the written consent of a Majority in Interest of the Members other than the transferor.
+
+**12.2 Association with a Protected Series.** A Member may be associated with a Protected Series, and Series Percentages may be established or adjusted, only by an amendment to the applicable Series Exhibit adopted with the written consent of the Member to be associated and all Associated Members of that Protected Series.
+
+**12.3 Continuation on Termination of Last Member.** Upon the termination of the membership of the last remaining member of the Company, the Company shall not be dissolved, and the legal representative of the last remaining member shall agree in writing to continue the Company, and the representative (or an Immediate Family Member designated by the representative who is not a creditor of the last remaining member) shall be admitted as a member effective as of the terminating event, all as permitted by the Act.
+
+---
+
+## ARTICLE 13 — WITHDRAWAL; DEADLOCK
+
+**13.1 No Voluntary Withdrawal.** No Member may voluntarily withdraw, resign, or dissociate from the Company before the dissolution and winding up of the Company without the written consent of all other Members. A Member's dissociation, whether or not wrongful, does not entitle the dissociated Member to any distribution or payment for the Member's interest except as this Agreement or the Act provides, and a dissociated Member (or the Member's successor) holds thereafter only the rights of a transferee described in Section 10.3.
+
+**13.2 Deadlock; Buy-Sell Election. [OPTIONAL PROVISION — see Instructions; to omit, replace the text of this Section with "[Reserved.]" — do not renumber]**
+
+(a) A "Deadlock" exists if the Members (or, as to a matter concerning a Protected Series, its Associated Members) are unable, by the vote required under this Agreement, to approve or reject a matter duly submitted for approval, and the inability continues for sixty (60) days after any Member delivers written notice to the Company and the other Members describing the matter and stating that a Deadlock exists.
+
+(b) During a Deadlock, any Member holding twenty-five percent (25%) or more of the Percentage Interests (the "Offeror") may deliver to the other Members (the "Offerees") a written offer (the "Buy-Sell Offer") stating a single gross valuation for the Company and all Protected Series, in cash. The Buy-Sell Offer constitutes both (i) an offer by the Offeror to purchase all of the Offerees' Membership Interests at their proportionate share of that valuation, and (ii) an offer by the Offeror to sell all of the Offeror's Membership Interest to the Offerees at the Offeror's proportionate share of that valuation.
+
+(c) Within forty-five (45) days after delivery of the Buy-Sell Offer, the Offerees (acting jointly, or severally in proportion to their Percentage Interests among those electing) shall elect in writing either to sell their Membership Interests to the Offeror, or to purchase the Offeror's Membership Interest, in each case at the price determined under the Buy-Sell Offer. Failure to deliver a timely election is an election to sell.
+
+(d) The closing shall occur within sixty (60) days after the election, for cash unless the parties agree otherwise. At closing, the selling Members shall Transfer their Membership Interests free of liens, and the purchasing Member(s) shall be substituted with respect to the transferred interests, including all associated Series Percentages. If the purchasing party fails to close, the other party may elect to purchase on the same terms, and the defaulting party bears the costs of the failed closing.
+
+(e) This Section does not apply to any matter for which the Act or this Agreement requires the consent of all Members and a Member's withholding of consent is expressly permitted by the Act, and does not limit any Member's right to seek judicial dissolution as provided by the Act.
+
+---
+
+## ARTICLE 14 — DISSOLUTION AND WINDING UP
+
+**14.1 Dissolution of a Protected Series.** A Protected Series is dissolved, and its activities and affairs shall be wound up, upon the first to occur of: (a) the dissolution of the Company; (b) an event or circumstance specified in its Series Exhibit; (c) the affirmative vote or consent of **all** Associated Members of that Protected Series (or, if the Company is the deemed sole Associated Member, the consent of a Majority in Interest); or (d) entry of a judicial order dissolving the Protected Series as provided by the Act.
+
+**14.2 Winding Up a Protected Series.** Upon dissolution of a Protected Series, a Majority in Interest of its Associated Members (or a person they designate) shall wind up its activities and affairs in the manner provided by the Act for winding up a limited liability company, applied to that Protected Series. Its Associated Assets shall be applied: first, to pay or provide for its Associated Liabilities to creditors other than Members; next, to pay or provide for its Associated Liabilities to Members as creditors, to the extent permitted by law; next, to its Associated Members to the extent of their capital sub-account balances for that Protected Series; and finally, the balance to its Associated Members in proportion to their Series Percentages (or, if the Company is the deemed sole Associated Member, to the Company). The Administrative Member shall cause any statement or filing required by the Act or the Department in connection with the dissolution of the Protected Series to be made. The winding up of a Protected Series shall not draw upon, and its creditors shall have no recourse to, the Associated Assets of the Company or of any other Protected Series.
+
+**14.3 Dissolution of the Company.** The Company is dissolved, and its activities and affairs shall be wound up, upon the first to occur of: (a) the written consent of **all** Members; (b) entry of a decree of judicial dissolution under the Act; or (c) any other event that under the Act requires dissolution. The death, incapacity, bankruptcy, dissociation, or withdrawal of a Member does not by itself dissolve the Company. Dissolution of the Company causes the dissolution of each Protected Series, and the winding up of the Company is not complete until the winding up of each Protected Series is complete.
+
+**14.4 Winding Up the Company.** Upon dissolution of the Company, a person designated by a Majority in Interest shall wind up the Company and each Protected Series. After the winding up of each Protected Series under Section 14.2, the remaining Associated Assets of the Company shall be applied: first, to pay or provide for the Company's Associated Liabilities to creditors other than Members; next, to pay or provide for the Company's Associated Liabilities to Members as creditors; next, to the Members to the extent of their capital sub-account balances for the Company; and finally, the balance to the Members in proportion to their Percentage Interests. Articles of dissolution shall be filed as the Act requires, and the Company shall terminate when winding up is complete.
+
+**14.5 No Deficit Obligation; Recourse Limited.** No Member shall have any obligation to restore any deficit or to contribute capital in connection with any winding up (beyond unpaid contributions duly required under Sections 6.1 and 6.2), and each creditor of the Company or of any Protected Series shall look solely to the Associated Assets of its obligor.
+
+---
+
+## ARTICLE 15 — AMENDMENTS; CONSENTS
+
+**15.1 Amendments.** This Agreement may be amended only by a written instrument signed by **all** Members; provided, that (a) a Series Exhibit may be amended by a written instrument signed by all Associated Members of the affected Protected Series (and, if the amendment would alter the rights or obligations of a Member not associated with that Protected Series, by that Member); (b) the Administrative Member may amend Exhibit A and the Series Exhibits without further consent solely to record changes duly made under this Agreement (admissions, Transfers, TOD designations, capital adjustments under Section 6.3); and (c) no amendment may impose new obligations on any Member without that Member's written consent. Oral, implied, or course-of-dealing amendments are of no effect.
+
+**15.2 Action by Written Consent.** Any action of the Members under this Agreement may be taken by written consent as provided in Section 4.4.
+
+---
+
+## ARTICLE 16 — MISCELLANEOUS
+
+**16.1 Governing Law; Internal Affairs.** This Agreement, the internal affairs of the Company and of each Protected Series, and the relations among the Members, the Company, and each Protected Series, are governed by the laws of the State of Florida, without regard to conflict-of-laws principles.
+
+**16.2 Venue.** Any action or proceeding arising out of or relating to this Agreement, the Company, or any Protected Series shall be brought exclusively in the courts of the county in Florida in which the Company's principal office is located, and each party consents to the jurisdiction of such courts and waives any objection to venue there.
+
+**16.3 Severability.** If any provision of this Agreement is held invalid or unenforceable, that provision shall be modified to the minimum extent necessary to make it enforceable, and the remainder of this Agreement shall remain in full force; provided, that nothing in this Agreement shall be construed to vary any provision of the Act that may not be varied by an operating agreement.
+
+**16.4 Entire Agreement.** This Agreement, including Exhibit A and each Series Exhibit, constitutes the entire agreement governing the Company and each Protected Series and supersedes all prior agreements and understandings with respect to their subject matter.
+
+**16.5 Binding Effect.** This Agreement binds and benefits the Members and their respective heirs, personal representatives, successors, and permitted assigns, and any person who acquires an interest in the Company or is admitted as a member.
+
+**16.6 Counterparts; Electronic Signatures.** This Agreement may be executed in counterparts, each of which is an original and all of which together constitute one instrument. Electronic signatures and electronic records have the same effect as originals.
+
+**16.7 Notices.** Any notice under this Agreement shall be in writing and is effective upon delivery to the recipient's address on Exhibit A (or another address designated in writing), whether delivered personally, by nationally recognized courier, by certified mail, or by e-mail with confirmation of transmission.
+
+**16.8 No Third-Party Beneficiaries.** This Agreement is for the exclusive benefit of the parties and confers no rights on any creditor or other third party.
+
+**16.9 Interpretation.** Headings are for convenience only. "Including" means "including without limitation." References to statutes include amendments and successor provisions.
+
+**16.10 Unregistered Interests.** The Membership Interests have not been registered under federal or state securities laws and may not be offered, sold, or transferred except in compliance with this Agreement and applicable law.
+
+---
+
+## SIGNATURES
+
+IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of the Effective Date.
+
+**MEMBERS:**
+
+_____________________________
+[MEMBER 1 NAME]
+
+_____________________________
+[MEMBER 2 NAME]
+
+_____________________________
+[MEMBER 3 NAME, if any]
+
+
+---
+
+## EXHIBIT A — MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS
+
+**Company:** [COMPANY NAME], LLC
+
+| Member name | Address | Percentage Interest | Initial contribution to the Company | Date |
+|---|---|---|---|---|
+| [MEMBER 1] | [ADDRESS] | [___]% | $[AMOUNT] [and/or described property] | [DATE] |
+| [MEMBER 2] | [ADDRESS] | [___]% | $[AMOUNT] [and/or described property] | [DATE] |
+| [MEMBER 3] | [ADDRESS] | [___]% | $[AMOUNT] [and/or described property] | [DATE] |
+| **Total** | | **100%** | | |
+
+**Transfer on Death designations (ss. 711.50–711.512, Fla. Stat.):**
+
+| Designating Member | TOD beneficiary (any person or entity) |
+|---|---|
+| [MEMBER 1] | [NAME(S) / None] |
+| [MEMBER 2] | [NAME(S) / None] |
+| [MEMBER 3] | [NAME(S) / None] |
+
+If no beneficiary is designated, or a designation fails, the Member's interest passes as provided by law, subject to this Agreement.
+
+---
+
+## SERIES EXHIBIT PS-[N]
+
+**Protected Series name (exactly as filed with the Department):**
+**[COMPANY NAME], LLC - PS [N]**
+
+| Item | Terms |
+|---|---|
+| Purpose of this Protected Series | [PURPOSE — e.g., "to acquire, own, lease, and manage the real property located at ___" or "any lawful business"] |
+| Associated Member(s) and Series Percentages | [MEMBER 1] — [___]%; [MEMBER 2] — [___]% [must total 100%; or: "None — the Company is the deemed sole Associated Member"] |
+| Managed by | Its Associated Members, by Majority in Interest of Series Percentages |
+| Contributions to this Protected Series | [MEMBER 1]: $[AMOUNT] on [DATE]; [MEMBER 2]: $[AMOUNT] on [DATE] [and/or described property] |
+| Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the Member(s), together with the records maintained under Article 8. |
+| Special terms (if any) | [None / variations from the base Agreement — may not vary Article 8 or non-variable provisions of the Act] |
+| Dissolution events specific to this Protected Series (if any) | [None / describe] |
+
+**Adopted effective [DATE] by all Associated Members of this Protected Series:**
+
+_____________________________
+[NAME], Associated Member
+
+_____________________________
+[ASSOCIATED MEMBER 1], Member
+
+_____________________________
+[ASSOCIATED MEMBER 2], Member
+
+
+## ASSET SCHEDULE — ATTACHMENT TO SERIES EXHIBIT PS-[N]
+
+*Complete this schedule for each asset of this Protected Series. Describe each asset so that a stranger could identify it without asking you anything: real property — street address AND legal description, date acquired, and grantor; deposit account — institution, account title, last four digits, and date opened; vehicle — year, make, model, and VIN; equipment — description and serial number; contract — parties and date. For any asset acquired from the Company or from another Protected Series, also state the consideration paid, the payor, and the payee. Add pages as needed; keep this schedule current as assets are acquired and disposed of.*
+
+| Asset description | Date acquired | Acquired from | Consideration / payor / payee (if from the Company or another series) |
+|---|---|---|---|
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+
+---
+
+*Form document — [COMPANY NAME], LLC Operating Agreement (Member-Managed, Multiple Members / Partnership Taxation), v1 draft. Statutory citations verified against Online Sunshine on August 3, 2026: ss. 605.2103, 605.2107, 605.2201, 605.2202, 605.2301, 605.2401, 605.2501, 605.2604, 605.0502, 605.0503, 605.04091, 48.062, 711.50–711.512, Fla. Stat.; 11 U.S.C. §365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013).*
