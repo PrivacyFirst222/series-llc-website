@@ -90,8 +90,8 @@ export default function Pricing() {
                 ))}
                 <div className="mt-2 text-xs text-muted-foreground">
                   Covers up to 3 Protected Series Designations, including their state filing fees.
-                  Additional Protected Series Designations cost $25 each to prepare plus the $25
-                  state filing fee.
+                  Additional Protected Series Designations cost $50 each — $25 to prepare plus the
+                  $25 state filing fee.
                 </div>
               </div>
 
@@ -130,13 +130,25 @@ export default function Pricing() {
           <p className="text-sm text-muted-foreground">Choose only what you need.</p>
           <div className="mt-6 grid gap-px overflow-hidden rounded-2xl border border-border bg-border md:grid-cols-2">
             {[
-              { t: "Extra Protected Series Designation (drafting)", p: "$25 / series + $25 state filing fee" },
+              {
+                t: "Extra Protected Series Designation",
+                p: "$50 / series",
+                n: "$25 to prepare plus the $25 state filing fee.",
+              },
               { t: "EIN obtained for the LLC or any series", p: "$50 / EIN" },
+              {
+                t: "S corporation election package",
+                p: "$95",
+                n: "We prepare IRS Form 2553 complete, with a cover letter and filing instructions — you sign and file it. Available for new LLCs we form, ordered within 65 days of formation. The IRS deadline for a first-year election is 2 months and 15 days from formation.",
+              },
               { t: "Florida registered agent service (after year one)", p: "$99 / yr" },
+              { t: "Certificate of Status (state fee, at cost)", p: "$5" },
+              { t: "Certified copy of the Articles (state fee, at cost)", p: "$30" },
             ].map((a) => (
               <div key={a.t} className="bg-card p-5">
                 <div className="text-sm font-medium">{a.t}</div>
                 <div className="mt-1 font-display text-lg text-trust">{a.p}</div>
+                {a.n ? <div className="mt-1.5 text-xs text-muted-foreground">{a.n}</div> : null}
               </div>
             ))}
           </div>

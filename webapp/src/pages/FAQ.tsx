@@ -31,7 +31,7 @@ const FAQ_ITEMS: {
   },
   {
     q: "How much does it cost to add a new series later?",
-    a: "The formation fee covers up to 3 Protected Series Designations, including their state filing fees — three series cost you nothing beyond the $499. Each series after that is $25 to prepare plus a $25 state filing fee.",
+    a: "The formation fee covers up to 3 Protected Series Designations, including their state filing fees — three series cost you nothing beyond the $499. Each series after that is $50 — $25 to prepare plus a $25 state filing fee.",
     link: { to: "/pricing", label: "Full pricing and add-ons" },
   },
   {
@@ -44,7 +44,8 @@ const FAQ_ITEMS: {
   },
   {
     q: "What's the federal tax treatment?",
-    a: "A Florida Protected Series LLC can be taxed as (1) a disregarded entity, (2) a partnership, (3) an S corporation, or (4) C corporation, depending on a number of factors, including whether the LLC is owned by one or more people and what elections you file with the IRS. It is also possible for different series to be taxed differently. What is best for you needs to be discussed with your CPA or other tax professional.",
+    a: "A Florida Protected Series LLC can be taxed as (1) a disregarded entity, (2) a partnership, (3) an S corporation, or (4) C corporation, depending on a number of factors, including whether the LLC is owned by one or more people and what elections you file with the IRS. It is also possible for different series to be taxed differently. What is best for you needs to be discussed with your CPA or other tax professional. If you decide on an S corporation election, we offer a $95 package that prepares IRS Form 2553 for you to sign and file, along with an operating agreement drafted for S corporation status.",
+    link: { to: "/pricing", label: "See the election package" },
   },
   {
     q: "How long does formation take?",

@@ -1,4 +1,4 @@
-Last updated: **August 3, 2026**
+Last updated: **August 8, 2026**
 
 ### 1. The Parties
 These Terms of Service ("Terms") are a binding agreement between you and **FLORIDA PROTECTED SERIES, LLC - PS 1** ("Filing Services") and **FLORIDA PROTECTED SERIES, LLC - PS 2** ("Agent Services"), each a protected series of FLORIDA PROTECTED SERIES, LLC, a Florida limited liability company (the "Company"; each series a "Company party" and together the "Companies"). "We," "us," and "our" refer to the Company party providing the Service at issue.
@@ -19,6 +19,8 @@ We are not a law firm, are not licensed to practice law, and do not provide lega
 
 ### 4. The Services
 Filing Services prepares and submits Florida limited liability company filings — including Articles of Organization and Protected Series Designations — using information you supply, and provides related deliverables (form operating agreement, guides, ledger forms). Agent Services provides registered agent service if you select it. We do not review your information for legal sufficiency, select entities or structures for you, or exercise legal judgment on your behalf. You are solely responsible for deciding whether a Florida Protected Series LLC is appropriate for you.
+
+**Federal tax documents.** Certain Services consist of preparing federal tax documents from information you supply. Where you purchase EIN service, we prepare and submit the application for an Employer Identification Number. Where you purchase the S corporation election package, we prepare IRS Form 2553 and deliver it to you complete, together with a cover letter and filing instructions. **You are responsible for reviewing the prepared form, obtaining every required signature, and filing it with the Internal Revenue Service by the applicable deadline.** We do not sign, file, or transmit Form 2553, and we do not monitor whether or when you do.
 
 ### 5. Eligibility
 You must be at least 18 years old and legally competent to enter contracts. If you order on behalf of an entity, you represent that you are authorized to bind it.
@@ -70,7 +72,7 @@ You must notify us immediately of any change to your email address, mailing addr
 **(c) After submission.** No portion of the service fee is refundable.
 **(d) Government fees.** Fees remitted to the State of Florida are never refundable by us.
 **(e) Registered agent service.** Refundable within 30 days of a renewal charge if we have not yet received or posted any document for you in that term; otherwise non-refundable. No prorated refunds.
-**(f) Add-on services.** EIN service and additional Protected Series Designations are refundable until work begins on them.
+**(f) Add-on services.** EIN service and additional Protected Series Designations are refundable until work begins on them. The S corporation election package is refundable until the prepared package is delivered to your client portal; it is not refundable after delivery.
 
 ### 12. Chargebacks
 Chargebacks initiated after services are performed constitute a breach of these Terms. You agree to reimburse us our costs of responding, including a $100 administrative charge, and we may suspend the Services and portal access pending resolution.
@@ -79,7 +81,7 @@ Chargebacks initiated after services are performed constitute a breach of these 
 The portal provides download access to documents we prepare or receive for you. It is download-only; we are not a document-storage service and do not warrant perpetual availability. Retain your own copies. We may suspend portal access for nonpayment or breach.
 
 ### 14. Post-Formation Obligations Are Yours
-Forming an LLC creates ongoing obligations we do not perform unless you separately purchase them, including Florida annual reports, maintaining a registered agent, keeping records for each protected series, tax filings and elections, and any federal beneficial ownership reporting that applies to your company. We do not monitor deadlines for you or file annual reports unless you have purchased that service. Failure to meet these obligations can result in penalties or administrative dissolution.
+Forming an LLC creates ongoing obligations we do not perform unless you separately purchase them, including Florida annual reports, maintaining a registered agent, keeping records for each protected series, tax filings and elections, including the filing of any election package we prepare for you, and any federal beneficial ownership reporting that applies to your company. We do not monitor deadlines for you or file annual reports unless you have purchased that service. Failure to meet these obligations can result in penalties or administrative dissolution.
 
 ### 15. Artificial Intelligence
 We may use software that includes artificial intelligence or machine learning to assist with internal operations such as reviewing submissions for completeness, drafting communications, and improving the Site. A human reviews every filing before it is submitted.
@@ -102,8 +104,10 @@ The Services incorporate third-party services, including payment processing (Squ
 ### 21. Internet Delays and Availability
 The Services depend on internet and third-party systems and may be delayed, interrupted, or unavailable. We are not liable for delays or failures caused by such systems.
 
-### 22. No Guarantee of State Action, Timing, or Outcome
+### 22. No Guarantee of Government Action, Timing, or Outcome
 Filing acceptance, processing, and timing are controlled exclusively by the Florida Department of State, Division of Corporations. We make no representation about state processing times or outcomes and are not responsible for state delays, rejections, name unavailability, or changes in law.
+
+Acceptance, processing, and timing of any federal tax filing or election are controlled exclusively by the Internal Revenue Service. We make no representation about Internal Revenue Service processing times or outcomes, and we are not responsible for the rejection or late filing of any election, for the consequences of any election you make, or for changes in federal tax law.
 
 ### 23. Language
 These Terms are written in English. Any translation is provided for convenience only; the English version governs.
