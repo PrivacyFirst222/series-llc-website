@@ -35,6 +35,11 @@ const FAQ_ITEMS: {
     link: { to: "/pricing", label: "Full pricing and add-ons" },
   },
   {
+    q: "What does it cost each year to keep it going?",
+    a: "One Florida annual report — $138.75 — filed between January 1 and May 1, and it covers the company and every protected series no matter how many you have. Ten separate LLCs would mean ten of those reports. After your first year, registered agent service is $99/yr, or nothing if you serve as your own agent. That's the whole recurring cost. File the annual report late and Florida adds a $400 penalty that cannot be waived, so calendar it.",
+    link: { to: "/pricing", label: "Full pricing and add-ons" },
+  },
+  {
     q: "Is the liability shield really as strong as a separate LLC?",
     a: "Statutorily, yes — provided you maintain separate books, records, and ledgers for each series, and clearly identify each series in contracts. Florida's statute is modeled on the Uniform Protected Series Act. The recordkeeping is not optional: it is what the shield rests on.",
   },
