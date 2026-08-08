@@ -191,7 +191,9 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **8.7 Financial Records; Inspection.** Separate books of account shall be maintained for the Company and for each Protected Series, showing income, expenses, assets, liabilities, contributions, and distributions of each. The Member (and any Associated Member, as to the applicable Protected Series) may inspect and copy the records described in this Article at reasonable times, consistent with the Act.
 
-**8.8 Annual Review.** At least annually, the Manager shall review the records maintained under this Article for compliance with s. 605.2301, Florida Statutes, and shall correct any deficiency promptly upon discovery.
+**8.7A Exclusive Means of Moving Value.** Value may be moved between the Company and any Protected Series, or between Protected Series, only by an Inter-Series Transfer, a contribution, or a distribution, in each case approved as this Agreement requires and documented under this Article at the time it occurs. No other transfer, allocation, offset, netting, or informal accommodation between the Company and a Protected Series, or between Protected Series, is permitted, and any such act shall be documented and corrected under Section 8.9(d) upon discovery.
+
+**8.8 Annual Review.** At least annually, the Manager shall review the records maintained under this Article for compliance with s. 605.2301, Florida Statutes, and shall correct any deficiency promptly upon discovery. Upon completing the review, the Manager shall sign and retain with the records a short certification stating the date of the review, the period covered, that the records of the Company and of each Protected Series were reviewed, and any deficiency found and the correction made. Each certification shall be retained for so long as the Company exists.
 
 **8.9 Standing Association Rules; Savings Provisions.**
 
