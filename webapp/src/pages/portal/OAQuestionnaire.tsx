@@ -324,7 +324,7 @@ export default function OAQuestionnaire() {
             themselves, decisions are made by majority of ownership, and there is no manager.
           </div>
         ) : null}
-        {true ? (
+        {(
           <div className="mt-8 space-y-5">
             <QuestionCard title="Is this the company's first operating agreement?" learnMore="firstOrAmended">
               <label className="flex items-start gap-2 text-sm">
