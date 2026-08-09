@@ -624,6 +624,32 @@ if (mint.status === 200) {
     series: [{ associated: [{ memberIndex: 0, seriesPercentage: 50 }, { memberIndex: 1, seriesPercentage: 50 }] }],
     includeCapitalCalls: false, competition: "A", includeShotgun: false, borrowingThreshold: 30000,
   };
+  // Fractions: three equal owners are 1/3 each, which percentages cannot express.
+  const thirdsAnswers = {
+    ...mmAnswers,
+    ownershipMode: "fraction",
+    members: [{ numerator: 1, denominator: 2, contribution: "$500 cash" }, { numerator: 1, denominator: 2, contribution: "$500 cash" }],
+    series: [{ ownershipMode: "fraction", associated: [
+      { memberIndex: 0, numerator: 1, denominator: 3 },
+      { memberIndex: 1, numerator: 1, denominator: 3 },
+    ] }],
+  };
+  const badFractions = await api("/api/portal/oa/generate", {
+    method: "POST", cookies: mmPw.cookie, body: JSON.stringify(thirdsAnswers),
+  });
+  check("series fractions that don't total one whole are rejected", badFractions.status === 400, badFractions.body);
+  const goodFractions = await api("/api/portal/oa/generate", {
+    method: "POST", cookies: mmPw.cookie,
+    body: JSON.stringify({
+      ...thirdsAnswers,
+      series: [{ ownershipMode: "fraction", associated: [
+        { memberIndex: 0, numerator: 1, denominator: 2 },
+        { memberIndex: 1, numerator: 1, denominator: 2 },
+      ] }],
+    }),
+  });
+  check("fractional ownership generates", goodFractions.status === 200, goodFractions.body);
+
   const badSeriesPct = await api("/api/portal/oa/generate", {
     method: "POST", cookies: mmPw.cookie,
     body: JSON.stringify({ ...mmAnswers, series: [{ associated: [{ memberIndex: 0, seriesPercentage: 40 }, { memberIndex: 1, seriesPercentage: 55 }] }] }),

@@ -15,6 +15,13 @@ import {
   SERIES_ADDON_STATE_CENTS,
 } from "./pricing";
 import { buildSElectionPackage, type SElectionDetails } from "./s-election";
+import {
+  sharesAreComplete,
+  shareLabel,
+  shareValue,
+  type OwnershipMode,
+  type OwnershipShare,
+} from "../src/lib/ownership";
 import { createCheckout, verifyWebhookSignature } from "./square";
 import { hashPassword, verifyPassword, newToken, hashToken, encryptSecret, decryptSecret } from "./crypto";
 import { hasProtectedSeriesPhrase } from "../src/components/forms/florida-llc/validation";
@@ -672,10 +679,13 @@ const oaAnswersSchema = z.object({
   effectiveDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   authorized: z.boolean().optional(),
   contributionToCompany: z.string().max(300).optional(),
+  ownershipMode: z.enum(["percent", "fraction"]).optional(),
   members: z
     .array(
       z.object({
         percentage: z.number().min(0).max(100).optional(),
+        numerator: z.number().int().min(0).max(100_000).optional(),
+        denominator: z.number().int().min(1).max(100_000).optional(),
         contribution: z.string().max(300).optional(),
         todBeneficiary: z.string().max(300).optional(),
       }),
@@ -686,7 +696,17 @@ const oaAnswersSchema = z.object({
       z.object({
         purpose: z.string().max(300).optional(),
         contribution: z.string().max(300).optional(),
-        associated: z.array(z.object({ memberIndex: z.number().int().min(0), seriesPercentage: z.number().min(0).max(100) })).optional(),
+        ownershipMode: z.enum(["percent", "fraction"]).optional(),
+        associated: z
+          .array(
+            z.object({
+              memberIndex: z.number().int().min(0),
+              seriesPercentage: z.number().min(0).max(100).optional(),
+              numerator: z.number().int().min(0).max(100_000).optional(),
+              denominator: z.number().int().min(1).max(100_000).optional(),
+            }),
+          )
+          .optional(),
       }),
     )
     .optional(),
@@ -702,6 +722,8 @@ const oaAnswersSchema = z.object({
         b: z.number().int().min(0),
         form: z.enum(["TBE", "JTWROS"]),
         percentage: z.number().min(0).max(100).optional(),
+        numerator: z.number().int().min(0).max(100_000).optional(),
+        denominator: z.number().int().min(1).max(100_000).optional(),
         contribution: z.string().max(300).optional(),
         todBeneficiary: z.string().max(300).optional(),
       }),
@@ -813,6 +835,7 @@ app.post("/portal/oa/generate", async (c) => {
 
   // Spousal joint-ownership units: two seed members merge into one marital
   // interest ("A and B, husband and wife, as tenants by the entireties").
+  const ownershipMode: OwnershipMode = a.ownershipMode ?? "percent";
   const couples = multiOwner ? (a.couples ?? []) : [];
   const pairedIdx = new Set<number>();
   for (const cpl of couples) {
@@ -839,10 +862,13 @@ app.post("/portal/oa/generate", async (c) => {
     if (cpl) {
       if (emittedCouples.has(cpl)) return;
       emittedCouples.add(cpl);
+      const cplShare: OwnershipShare = { percentage: cpl.percentage, numerator: cpl.numerator, denominator: cpl.denominator };
       members.push({
         name: coupleName(cpl),
         address: seed.members[cpl.a].address,
-        percentage: cpl.percentage ?? 0,
+        percentage: shareValue(ownershipMode, cplShare),
+        percentageLabel: shareLabel(ownershipMode, cplShare),
+        jointHolding: `husband and wife, as ${SPOUSAL_FORM_LABEL[cpl.form]}`,
         contribution: cpl.contribution ?? "",
         todBeneficiary: cpl.todBeneficiary
           ? `${cpl.todBeneficiary} (effective at the death of the last surviving spouse)`
@@ -850,10 +876,14 @@ app.post("/portal/oa/generate", async (c) => {
         signatories: [seed.members[cpl.a].name, seed.members[cpl.b].name],
       });
     } else {
+      const mShare: OwnershipShare = multiOwner
+        ? { percentage: a.members?.[i]?.percentage, numerator: a.members?.[i]?.numerator, denominator: a.members?.[i]?.denominator }
+        : { percentage: 100 };
       members.push({
         name: m.name,
         address: m.address,
-        percentage: multiOwner ? a.members?.[i]?.percentage ?? 0 : 100,
+        percentage: shareValue(multiOwner ? ownershipMode : "percent", mShare),
+        percentageLabel: shareLabel(multiOwner ? ownershipMode : "percent", mShare),
         contribution: a.members?.[i]?.contribution ?? "",
         todBeneficiary: a.members?.[i]?.todBeneficiary ?? "",
       });
@@ -865,9 +895,34 @@ app.post("/portal/oa/generate", async (c) => {
     members[0].contribution = a.contributionToCompany ?? "";
   }
   if (multiOwner) {
-    const total = members.reduce((acc, m) => acc + m.percentage, 0);
-    if (Math.abs(total - 100) > 0.01) {
-      return c.json(err("Percentage interests must total exactly 100%.", "INVALID_INPUT"), 400);
+    // Exact arithmetic: three owners at 1/3 each must total one whole, which
+    // no float comparison of 33.33 can honestly report.
+    const shares: OwnershipShare[] = [];
+    const seenCouples = new Set<(typeof couples)[number]>();
+    seed.members.forEach((_, i) => {
+      const cpl = coupleAt(i);
+      if (cpl) {
+        if (seenCouples.has(cpl)) return;
+        seenCouples.add(cpl);
+        shares.push({ percentage: cpl.percentage, numerator: cpl.numerator, denominator: cpl.denominator });
+      } else {
+        shares.push({
+          percentage: a.members?.[i]?.percentage,
+          numerator: a.members?.[i]?.numerator,
+          denominator: a.members?.[i]?.denominator,
+        });
+      }
+    });
+    if (!sharesAreComplete(ownershipMode, shares)) {
+      return c.json(
+        err(
+          ownershipMode === "fraction"
+            ? "Ownership fractions must add up to exactly one whole."
+            : "Percentage interests must total exactly 100%.",
+          "INVALID_INPUT",
+        ),
+        400,
+      );
     }
     if (a.competition !== "A" && a.competition !== "B") {
       return c.json(err("Choose a competition alternative.", "INVALID_INPUT"), 400);
@@ -890,11 +945,18 @@ app.post("/portal/oa/generate", async (c) => {
     for (let i = 0; i < seed.series.length; i++) {
       const assoc = a.series?.[i]?.associated ?? [];
       if (assoc.length === 0) continue; // series held by the Company itself
-      const total = assoc.reduce((acc, x) => acc + Math.round((x.seriesPercentage ?? 0) * 100), 0);
-      if (total !== 10_000) {
+      const mode: OwnershipMode = a.series?.[i]?.ownershipMode ?? "percent";
+      const shares = assoc.map((x) => ({
+        percentage: x.seriesPercentage,
+        numerator: x.numerator,
+        denominator: x.denominator,
+      }));
+      if (!sharesAreComplete(mode, shares)) {
         return c.json(
           err(
-            `Ownership of ${seed.series[i].name} totals ${(total / 100).toFixed(2)}% — each series must total exactly 100%.`,
+            `Ownership of ${seed.series[i].name} does not add up — each series must total exactly ${
+              mode === "fraction" ? "one whole" : "100%"
+            }.`,
             "INVALID_INPUT",
           ),
           400,
@@ -915,16 +977,28 @@ app.post("/portal/oa/generate", async (c) => {
         : version === "single"
         ? [{ memberName: seed.members[0].name, seriesPercentage: 100 }]
         : (() => {
-            const out: { memberName: string; seriesPercentage: number; signatories?: string[] }[] = [];
+            const out: OaInputs["series"][number]["associated"] = [];
+            const sMode: OwnershipMode = a.series?.[i]?.ownershipMode ?? "percent";
             for (const x of a.series?.[i]?.associated ?? []) {
+              const share: OwnershipShare = {
+                percentage: x.seriesPercentage,
+                numerator: x.numerator,
+                denominator: x.denominator,
+              };
               const cpl = coupleAt(x.memberIndex);
               const entry = cpl
                 ? {
                     memberName: coupleName(cpl),
-                    seriesPercentage: x.seriesPercentage,
+                    seriesPercentage: shareValue(sMode, share),
+                    seriesPercentageLabel: shareLabel(sMode, share),
                     signatories: [seed.members[cpl.a].name, seed.members[cpl.b].name],
+                    jointHolding: `husband and wife, as ${SPOUSAL_FORM_LABEL[cpl.form]}`,
                   }
-                : { memberName: seed.members[x.memberIndex]?.name ?? "", seriesPercentage: x.seriesPercentage };
+                : {
+                    memberName: seed.members[x.memberIndex]?.name ?? "",
+                    seriesPercentage: shareValue(sMode, share),
+                    seriesPercentageLabel: shareLabel(sMode, share),
+                  };
               if (!out.some((e) => e.memberName === entry.memberName)) out.push(entry);
             }
             return out;

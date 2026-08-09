@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/dialog";
 import { api, ApiError } from "@/lib/api";
 import { LEARN_MORE } from "@/content/oaLearnMore";
+import { OwnershipEditor, type OwnershipRow } from "./OwnershipEditor";
+import { shareValue, type OwnershipMode, type OwnershipShare } from "@/lib/ownership";
 
 interface OaSeed {
   llcName: string;
@@ -33,19 +35,24 @@ interface OaGeneration {
 
 interface MemberAnswer {
   percentage?: number;
+  numerator?: number;
+  denominator?: number;
   contribution?: string;
   todBeneficiary?: string;
 }
 interface SeriesAnswer {
   purpose?: string;
   contribution?: string;
-  associated?: { memberIndex: number; seriesPercentage: number }[];
+  ownershipMode?: OwnershipMode;
+  associated?: { memberIndex: number; seriesPercentage?: number; numerator?: number; denominator?: number }[];
 }
 interface CoupleAnswer {
   a: number;
   b: number;
   form: "TBE" | "JTWROS";
   percentage?: number;
+  numerator?: number;
+  denominator?: number;
   contribution?: string;
   todBeneficiary?: string;
 }
@@ -58,6 +65,7 @@ interface Answers {
   members?: MemberAnswer[];
   series?: SeriesAnswer[];
   couples?: CoupleAnswer[];
+  ownershipMode?: OwnershipMode;
   includeCapitalCalls?: boolean;
   capitalCallCap?: number;
   competition?: "A" | "B";
@@ -171,6 +179,7 @@ export default function OAQuestionnaire() {
         members: data.seed.members.map((_, i) => saved.members?.[i] ?? {}),
         series: data.seed.series.map((_, i) => saved.series?.[i] ?? {}),
         couples: saved.couples ?? [],
+        ownershipMode: saved.ownershipMode ?? "percent",
         includeCapitalCalls: saved.includeCapitalCalls,
         capitalCallCap: saved.capitalCallCap,
         competition: saved.competition,
@@ -246,14 +255,6 @@ export default function OAQuestionnaire() {
     return out;
   }, [data, couples]);
 
-  const pctTotal = useMemo(
-    () =>
-      units.reduce((acc, u) => {
-        const v = u.kind === "couple" ? couples[u.ci]?.percentage : a.members?.[u.index]?.percentage;
-        return acc + (v ?? 0);
-      }, 0),
-    [units, couples, a.members],
-  );
 
   if (meQuery.isError) {
     navigate("/portal/login");
@@ -282,12 +283,17 @@ export default function OAQuestionnaire() {
     .map((m, i) => ({ name: m.name, i }))
     .filter((x) => !pairedIdx.has(x.i));
 
-  const unitPercentage = (u: Unit) =>
-    u.kind === "couple" ? couples[u.ci]?.percentage : a.members?.[u.index]?.percentage;
-  const setUnitPercentage = (u: Unit, v: number | undefined) => {
-    if (u.kind === "couple") patchCouple(u.ci, { percentage: v });
-    else patchMember(u.index, { percentage: v });
+  const unitShare = (u: Unit): OwnershipShare => {
+    const src = u.kind === "couple" ? couples[u.ci] : a.members?.[u.index];
+    return { percentage: src?.percentage, numerator: src?.numerator, denominator: src?.denominator };
   };
+  const setUnitShare = (u: Unit, share: OwnershipShare) => {
+    if (u.kind === "couple") patchCouple(u.ci, share);
+    else patchMember(u.index, share);
+  };
+  const unitKey = (u: Unit) => (u.kind === "couple" ? `c${u.ci}` : `m${u.index}`);
+  const unitByKey = (key: string) =>
+    units.find((u) => unitKey(u) === key) ?? units[0];
   const unitContribution = (u: Unit) =>
     u.kind === "couple" ? couples[u.ci]?.contribution : a.members?.[u.index]?.contribution;
   const setUnitContribution = (u: Unit, v: string) => {
@@ -481,40 +487,36 @@ export default function OAQuestionnaire() {
                   </QuestionCard>
                 ) : null}
 
-                <QuestionCard title="Ownership percentages">
-                  <p className="text-xs text-muted-foreground">
-                    Must total exactly 100%. These control voting power, profit shares, and
-                    distributions at the company level. A spousal pair holds one combined
-                    percentage.
-                  </p>
-                  {units.map((u) => (
-                    <div key={u.kind === "couple" ? `c${u.ci}` : `m${u.index}`} className="flex items-center gap-3">
-                      <span className="w-1/2 truncate text-sm">
-                        {u.label}
-                        {u.kind === "couple" ? (
-                          <span className="ml-1 text-xs text-muted-foreground">({u.note})</span>
-                        ) : null}
-                      </span>
-                      <div className="flex items-center gap-1">
-                        <Input
-                          type="number"
-                          min={0}
-                          max={100}
-                          step="0.01"
-                          value={unitPercentage(u) ?? ""}
-                          onChange={(e) =>
-                            setUnitPercentage(u, e.target.value === "" ? undefined : Number(e.target.value))
-                          }
-                          className="w-24"
-                        />
-                        <span className="text-sm text-muted-foreground">%</span>
-                      </div>
-                    </div>
-                  ))}
-                  <p className={`text-xs font-medium ${Math.abs(pctTotal - 100) < 0.01 ? "text-trust" : "text-destructive"}`}>
-                    Total: {pctTotal}%
-                  </p>
-                </QuestionCard>
+                {units.length > 1 ? (
+                  <QuestionCard title="Ownership">
+                    <p className="text-xs text-muted-foreground">
+                      These control voting power, profit shares, and distributions at the company
+                      level. A spousal pair holds one combined share. Use fractions when the split
+                      won't divide evenly — three equal owners are 1/3 each, which no percentage
+                      can express exactly.
+                    </p>
+                    <OwnershipEditor
+                      mode={a.ownershipMode ?? "percent"}
+                      rows={units.map((u) => ({
+                        key: unitKey(u),
+                        label: u.label,
+                        note: u.kind === "couple" ? u.note : undefined,
+                        share: unitShare(u),
+                      }))}
+                      onModeChange={(mode) => patch({ ownershipMode: mode })}
+                      onShareChange={(key, share) => setUnitShare(unitByKey(key), share)}
+                      onEqualize={(mode, shares) => {
+                        const members = [...(a.members ?? [])];
+                        const nextCouples = [...couples];
+                        units.forEach((u, i) => {
+                          if (u.kind === "couple") nextCouples[u.ci] = { ...nextCouples[u.ci], ...shares[i] };
+                          else members[u.index] = { ...members[u.index], ...shares[i] };
+                        });
+                        patch({ ownershipMode: mode, members, couples: nextCouples });
+                      }}
+                    />
+                  </QuestionCard>
+                ) : null}
 
                 <QuestionCard title="Additional capital calls" learnMore="capitalCalls">
                   <label className="flex items-start gap-2 text-sm">
@@ -625,41 +627,69 @@ export default function OAQuestionnaire() {
                 <QuestionCard title="Who shares in each protected series?">
                   <p className="text-xs text-muted-foreground">
                     Only owners associated with a series share in that series' profits and vote on
-                    its affairs. Percentages within each series must total 100 (or leave a series
-                    blank if the company itself holds it). A spousal pair counts as one owner.
+                    its affairs. Each series must add up to a whole — leave a series blank if the
+                    company itself holds it. A spousal pair counts as one owner. Each series can
+                    use its own notation.
                   </p>
-                  {data.seed.series.map((sr, si) => (
-                    <div key={si} className="rounded-lg border border-border p-3">
-                      <p className="text-sm font-medium">{sr.name}</p>
-                      {units.map((u) => {
-                        const idx = unitAssocIndex(u);
-                        const current = a.series?.[si]?.associated?.find((x) => x.memberIndex === idx);
-                        return (
-                          <div key={u.kind === "couple" ? `c${u.ci}` : `m${u.index}`} className="mt-2 flex items-center gap-3">
-                            <span className="w-1/2 truncate text-sm">{u.label}</span>
-                            <div className="flex items-center gap-1">
-                              <Input
-                                type="number"
-                                min={0}
-                                max={100}
-                                value={current?.seriesPercentage ?? ""}
-                                onChange={(e) => {
-                                  const val = e.target.value === "" ? undefined : Number(e.target.value);
-                                  const rest = (a.series?.[si]?.associated ?? []).filter((x) => x.memberIndex !== idx);
-                                  patchSeries(si, {
-                                    associated:
-                                      val === undefined ? rest : [...rest, { memberIndex: idx, seriesPercentage: val }],
-                                  });
-                                }}
-                                className="w-24"
-                              />
-                              <span className="text-sm text-muted-foreground">%</span>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ))}
+                  {data.seed.series.map((sr, si) => {
+                    const sMode = a.series?.[si]?.ownershipMode ?? "percent";
+                    const assoc = a.series?.[si]?.associated ?? [];
+                    const shareFor = (idx: number): OwnershipShare => {
+                      const cur = assoc.find((x) => x.memberIndex === idx);
+                      return {
+                        percentage: cur?.seriesPercentage,
+                        numerator: cur?.numerator,
+                        denominator: cur?.denominator,
+                      };
+                    };
+                    const writeShare = (idx: number, share: OwnershipShare) => {
+                      const rest = assoc.filter((x) => x.memberIndex !== idx);
+                      const empty =
+                        share.percentage === undefined &&
+                        share.numerator === undefined &&
+                        share.denominator === undefined;
+                      patchSeries(si, {
+                        associated: empty
+                          ? rest
+                          : [
+                              ...rest,
+                              {
+                                memberIndex: idx,
+                                seriesPercentage: share.percentage,
+                                numerator: share.numerator,
+                                denominator: share.denominator,
+                              },
+                            ],
+                      });
+                    };
+                    return (
+                      <div key={si} className="space-y-2 rounded-lg border border-border p-3">
+                        <p className="text-sm font-medium">{sr.name}</p>
+                        <OwnershipEditor
+                          mode={sMode}
+                          rows={units.map((u) => ({
+                            key: String(unitAssocIndex(u)),
+                            label: u.label,
+                            note: u.kind === "couple" ? u.note : undefined,
+                            share: shareFor(unitAssocIndex(u)),
+                          }))}
+                          onModeChange={(mode) => patchSeries(si, { ownershipMode: mode })}
+                          onShareChange={(key, share) => writeShare(Number(key), share)}
+                          onEqualize={(mode, shares) =>
+                            patchSeries(si, {
+                              ownershipMode: mode,
+                              associated: units.map((u, i) => ({
+                                memberIndex: unitAssocIndex(u),
+                                seriesPercentage: shares[i].percentage,
+                                numerator: shares[i].numerator,
+                                denominator: shares[i].denominator,
+                              })),
+                            })
+                          }
+                        />
+                      </div>
+                    );
+                  })}
                 </QuestionCard>
                 )}
               </>

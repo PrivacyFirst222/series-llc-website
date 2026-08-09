@@ -102933,6 +102933,49 @@ async function buildSElectionPackage(d2) {
   return out.save();
 }
 
+// src/lib/ownership.ts
+function gcd(a2, b2) {
+  a2 = Math.abs(a2);
+  b2 = Math.abs(b2);
+  while (b2) [a2, b2] = [b2, a2 % b2];
+  return a2;
+}
+function reduceFraction(numerator, denominator) {
+  if (denominator === 0) return { numerator, denominator };
+  const d2 = gcd(numerator, denominator) || 1;
+  return { numerator: numerator / d2, denominator: denominator / d2 };
+}
+function sharesAreComplete(mode, shares) {
+  if (shares.length === 0) return false;
+  if (mode === "percent") {
+    const total = shares.reduce((acc, s) => acc + Math.round((s.percentage ?? 0) * 100), 0);
+    return total === 1e4;
+  }
+  let num = 0;
+  let den = 1;
+  for (const s of shares) {
+    const n = s.numerator ?? 0;
+    const d2 = s.denominator ?? 0;
+    if (d2 <= 0 || n < 0) return false;
+    num = num * d2 + n * den;
+    den = den * d2;
+  }
+  return num === den;
+}
+function shareLabel(mode, share) {
+  if (mode === "percent") {
+    const pct = share.percentage ?? 0;
+    return `${Number.isInteger(pct) ? pct : Number(pct.toFixed(2))}%`;
+  }
+  const { numerator, denominator } = reduceFraction(share.numerator ?? 0, share.denominator ?? 1);
+  return `${numerator}/${denominator}`;
+}
+function shareValue(mode, share) {
+  if (mode === "percent") return share.percentage ?? 0;
+  const d2 = share.denominator ?? 0;
+  return d2 > 0 ? (share.numerator ?? 0) / d2 * 100 : 0;
+}
+
 // server/square.ts
 import { randomBytes as randomBytes2 } from "node:crypto";
 
@@ -106493,9 +106536,12 @@ var oaAnswersSchema = external_exports.object({
   effectiveDate: external_exports.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   authorized: external_exports.boolean().optional(),
   contributionToCompany: external_exports.string().max(300).optional(),
+  ownershipMode: external_exports.enum(["percent", "fraction"]).optional(),
   members: external_exports.array(
     external_exports.object({
       percentage: external_exports.number().min(0).max(100).optional(),
+      numerator: external_exports.number().int().min(0).max(1e5).optional(),
+      denominator: external_exports.number().int().min(1).max(1e5).optional(),
       contribution: external_exports.string().max(300).optional(),
       todBeneficiary: external_exports.string().max(300).optional()
     })
@@ -106504,7 +106550,15 @@ var oaAnswersSchema = external_exports.object({
     external_exports.object({
       purpose: external_exports.string().max(300).optional(),
       contribution: external_exports.string().max(300).optional(),
-      associated: external_exports.array(external_exports.object({ memberIndex: external_exports.number().int().min(0), seriesPercentage: external_exports.number().min(0).max(100) })).optional()
+      ownershipMode: external_exports.enum(["percent", "fraction"]).optional(),
+      associated: external_exports.array(
+        external_exports.object({
+          memberIndex: external_exports.number().int().min(0),
+          seriesPercentage: external_exports.number().min(0).max(100).optional(),
+          numerator: external_exports.number().int().min(0).max(1e5).optional(),
+          denominator: external_exports.number().int().min(1).max(1e5).optional()
+        })
+      ).optional()
     })
   ).optional(),
   includeCapitalCalls: external_exports.boolean().optional(),
@@ -106518,6 +106572,8 @@ var oaAnswersSchema = external_exports.object({
       b: external_exports.number().int().min(0),
       form: external_exports.enum(["TBE", "JTWROS"]),
       percentage: external_exports.number().min(0).max(100).optional(),
+      numerator: external_exports.number().int().min(0).max(1e5).optional(),
+      denominator: external_exports.number().int().min(1).max(1e5).optional(),
       contribution: external_exports.string().max(300).optional(),
       todBeneficiary: external_exports.string().max(300).optional()
     })
@@ -106603,6 +106659,7 @@ app.post("/portal/oa/generate", async (c) => {
     month: "long",
     day: "numeric"
   }) : null;
+  const ownershipMode = a2.ownershipMode ?? "percent";
   const couples = multiOwner ? a2.couples ?? [] : [];
   const pairedIdx = /* @__PURE__ */ new Set();
   for (const cpl of couples) {
@@ -106621,19 +106678,24 @@ app.post("/portal/oa/generate", async (c) => {
     if (cpl) {
       if (emittedCouples.has(cpl)) return;
       emittedCouples.add(cpl);
+      const cplShare = { percentage: cpl.percentage, numerator: cpl.numerator, denominator: cpl.denominator };
       members.push({
         name: coupleName(cpl),
         address: seed.members[cpl.a].address,
-        percentage: cpl.percentage ?? 0,
+        percentage: shareValue(ownershipMode, cplShare),
+        percentageLabel: shareLabel(ownershipMode, cplShare),
+        jointHolding: `husband and wife, as ${SPOUSAL_FORM_LABEL[cpl.form]}`,
         contribution: cpl.contribution ?? "",
         todBeneficiary: cpl.todBeneficiary ? `${cpl.todBeneficiary} (effective at the death of the last surviving spouse)` : "",
         signatories: [seed.members[cpl.a].name, seed.members[cpl.b].name]
       });
     } else {
+      const mShare = multiOwner ? { percentage: a2.members?.[i]?.percentage, numerator: a2.members?.[i]?.numerator, denominator: a2.members?.[i]?.denominator } : { percentage: 100 };
       members.push({
         name: m2.name,
         address: m2.address,
-        percentage: multiOwner ? a2.members?.[i]?.percentage ?? 0 : 100,
+        percentage: shareValue(multiOwner ? ownershipMode : "percent", mShare),
+        percentageLabel: shareLabel(multiOwner ? ownershipMode : "percent", mShare),
         contribution: a2.members?.[i]?.contribution ?? "",
         todBeneficiary: a2.members?.[i]?.todBeneficiary ?? ""
       });
@@ -106644,9 +106706,30 @@ app.post("/portal/oa/generate", async (c) => {
     members[0].contribution = a2.contributionToCompany ?? "";
   }
   if (multiOwner) {
-    const total = members.reduce((acc, m2) => acc + m2.percentage, 0);
-    if (Math.abs(total - 100) > 0.01) {
-      return c.json(err2("Percentage interests must total exactly 100%.", "INVALID_INPUT"), 400);
+    const shares = [];
+    const seenCouples = /* @__PURE__ */ new Set();
+    seed.members.forEach((_, i) => {
+      const cpl = coupleAt(i);
+      if (cpl) {
+        if (seenCouples.has(cpl)) return;
+        seenCouples.add(cpl);
+        shares.push({ percentage: cpl.percentage, numerator: cpl.numerator, denominator: cpl.denominator });
+      } else {
+        shares.push({
+          percentage: a2.members?.[i]?.percentage,
+          numerator: a2.members?.[i]?.numerator,
+          denominator: a2.members?.[i]?.denominator
+        });
+      }
+    });
+    if (!sharesAreComplete(ownershipMode, shares)) {
+      return c.json(
+        err2(
+          ownershipMode === "fraction" ? "Ownership fractions must add up to exactly one whole." : "Percentage interests must total exactly 100%.",
+          "INVALID_INPUT"
+        ),
+        400
+      );
     }
     if (a2.competition !== "A" && a2.competition !== "B") {
       return c.json(err2("Choose a competition alternative.", "INVALID_INPUT"), 400);
@@ -106665,11 +106748,16 @@ app.post("/portal/oa/generate", async (c) => {
     for (let i = 0; i < seed.series.length; i++) {
       const assoc = a2.series?.[i]?.associated ?? [];
       if (assoc.length === 0) continue;
-      const total = assoc.reduce((acc, x2) => acc + Math.round((x2.seriesPercentage ?? 0) * 100), 0);
-      if (total !== 1e4) {
+      const mode = a2.series?.[i]?.ownershipMode ?? "percent";
+      const shares = assoc.map((x2) => ({
+        percentage: x2.seriesPercentage,
+        numerator: x2.numerator,
+        denominator: x2.denominator
+      }));
+      if (!sharesAreComplete(mode, shares)) {
         return c.json(
           err2(
-            `Ownership of ${seed.series[i].name} totals ${(total / 100).toFixed(2)}% \u2014 each series must total exactly 100%.`,
+            `Ownership of ${seed.series[i].name} does not add up \u2014 each series must total exactly ${mode === "fraction" ? "one whole" : "100%"}.`,
             "INVALID_INPUT"
           ),
           400
@@ -106687,13 +106775,25 @@ app.post("/portal/oa/generate", async (c) => {
       members.map((m2) => ({ memberName: m2.name, seriesPercentage: m2.percentage, signatories: m2.signatories }))
     ) : version === "single" ? [{ memberName: seed.members[0].name, seriesPercentage: 100 }] : (() => {
       const out = [];
+      const sMode = a2.series?.[i]?.ownershipMode ?? "percent";
       for (const x2 of a2.series?.[i]?.associated ?? []) {
+        const share = {
+          percentage: x2.seriesPercentage,
+          numerator: x2.numerator,
+          denominator: x2.denominator
+        };
         const cpl = coupleAt(x2.memberIndex);
         const entry = cpl ? {
           memberName: coupleName(cpl),
-          seriesPercentage: x2.seriesPercentage,
-          signatories: [seed.members[cpl.a].name, seed.members[cpl.b].name]
-        } : { memberName: seed.members[x2.memberIndex]?.name ?? "", seriesPercentage: x2.seriesPercentage };
+          seriesPercentage: shareValue(sMode, share),
+          seriesPercentageLabel: shareLabel(sMode, share),
+          signatories: [seed.members[cpl.a].name, seed.members[cpl.b].name],
+          jointHolding: `husband and wife, as ${SPOUSAL_FORM_LABEL[cpl.form]}`
+        } : {
+          memberName: seed.members[x2.memberIndex]?.name ?? "",
+          seriesPercentage: shareValue(sMode, share),
+          seriesPercentageLabel: shareLabel(sMode, share)
+        };
         if (!out.some((e) => e.memberName === entry.memberName)) out.push(entry);
       }
       return out;
