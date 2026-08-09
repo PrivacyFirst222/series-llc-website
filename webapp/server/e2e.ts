@@ -278,12 +278,17 @@ if (mint.status === 200) {
   // 13. Submit EIN details securely; verify encryption round-trip via admin
   const einDetails = await api(`/api/portal/services/${intakeEin.id}/ein-details`, {
     method: "POST", cookies: setPw.cookie,
-    body: JSON.stringify({ responsibleName: "Casey Member", tin: "123-45-6789" }),
+    body: JSON.stringify({ responsibleName: "Casey Member", tin: "123-45-6789", certified: true }),
   });
   check("EIN details accepted", einDetails.status === 200, einDetails.body);
+  const einUncertified = await api(`/api/portal/services/${intakeEin.id}/ein-details`, {
+    method: "POST", cookies: setPw.cookie,
+    body: JSON.stringify({ responsibleName: "Casey Member", tin: "123-45-6789" }),
+  });
+  check("EIN details without the certification rejected", einUncertified.status === 400, einUncertified.body);
   const einAgain = await api(`/api/portal/services/${intakeEin.id}/ein-details`, {
     method: "POST", cookies: setPw.cookie,
-    body: JSON.stringify({ responsibleName: "X", tin: "999999999" }),
+    body: JSON.stringify({ responsibleName: "X", tin: "999999999", certified: true }),
   });
   check("EIN details cannot be resubmitted", einAgain.status === 400);
 
@@ -557,17 +562,55 @@ if (mint.status === 200) {
     }),
   });
   check("S election details with bad percentages rejected", badPct.status === 400);
-  const sDetails = await api(`/api/portal/services/${sId}/s-election-details`, {
+  const goodDetails = {
+    ein: "88-1234567", einPending: false, dateIncorporated: "2026-08-01", effectiveDate: "2026-08-01",
+    officerName: "Maria Ortiz", officerTitle: "Manager", phone: "(305) 555-0100",
+    certified: true as const,
+    shareholders: [
+      { name: "Maria Ortiz and Carlos Ortiz, as tenants by the entireties", address: "500 Bay Street, Miami, FL 33131", percentage: 100, dateAcquired: "2026-08-01", ssn: "123-45-6789" },
+    ],
+  };
+  const uncertified = await api(`/api/portal/services/${sId}/s-election-details`, {
     method: "POST", cookies: mPw.cookie,
-    body: JSON.stringify({
-      ein: "88-1234567", einPending: false, dateIncorporated: "2026-08-01", effectiveDate: "2026-08-01",
-      officerName: "Maria Ortiz", officerTitle: "Manager", phone: "(305) 555-0100",
-      shareholders: [
-        { name: "Maria Ortiz and Carlos Ortiz, as tenants by the entireties", address: "500 Bay Street, Miami, FL 33131", percentage: 100, dateAcquired: "2026-08-01", ssn: "123-45-6789" },
-      ],
-    }),
+    body: JSON.stringify({ ...goodDetails, certified: false }),
+  });
+  check("S election details without the certification rejected", uncertified.status === 400, uncertified.body);
+  const sDetails = await api(`/api/portal/services/${sId}/s-election-details`, {
+    method: "POST", cookies: mPw.cookie, body: JSON.stringify(goodDetails),
   });
   check("S election details accepted", sDetails.status === 200, sDetails.body);
+  check("package built and returned immediately", Boolean(sDetails.body?.data?.documentId), sDetails.body?.data);
+  const readyDoc = await fetch(`${BASE}/api/portal/documents/${sDetails.body?.data?.documentId}/download`, {
+    headers: { Cookie: mPw.cookie },
+  });
+  const readyBytes = new Uint8Array(await readyDoc.arrayBuffer());
+  check(
+    "client can download the package right away",
+    readyDoc.ok && readyBytes[0] === 0x25 && readyBytes[1] === 0x50,
+    { status: readyDoc.status, len: readyBytes.length },
+  );
+  const svcNow = await api("/api/portal/services", { cookies: mPw.cookie });
+  const sRow = (svcNow.body?.data?.orders ?? []).find((o: { id: string }) => o.id === sId);
+  check("order shows an edit deadline", Boolean(sRow?.editable && sRow?.editableUntil), sRow);
+  check("owner dropdown gets the LLC's members", (svcNow.body?.data?.members ?? []).length > 0, svcNow.body?.data?.members);
+  // Editing inside the window: a blank SSN keeps the number already on file.
+  const edited = await api(`/api/portal/services/${sId}/s-election-details`, {
+    method: "POST", cookies: mPw.cookie,
+    body: JSON.stringify({
+      ...goodDetails,
+      phone: "(305) 555-0199",
+      shareholders: [{ ...goodDetails.shareholders[0], ssn: "" }],
+    }),
+  });
+  check("client can edit inside the window without retyping SSNs", edited.status === 200, edited.body);
+  const afterEdit = await api(`/api/admin/services/${sId}`, { cookies: adminS.cookie });
+  check("kept SSN survives the edit", afterEdit.body?.data?.ssns?.[0] === "123456789", afterEdit.body?.data?.ssns);
+  const docsAfterEdit = await api("/api/portal/documents", { cookies: mPw.cookie });
+  check(
+    "regenerating replaces the package instead of stacking copies",
+    (docsAfterEdit.body?.data ?? []).filter((d: { title: string }) => d.title.includes("S Corporation Election Package")).length === 1,
+    docsAfterEdit.body?.data?.map((d: { title: string }) => d.title),
+  );
   const sAdminDetail = await api(`/api/admin/services/${sId}`, { cookies: adminS.cookie });
   check("admin decrypts shareholder SSNs", sAdminDetail.body?.data?.ssns?.[0] === "123456789", sAdminDetail.body?.data);
   check(
@@ -577,25 +620,29 @@ if (mint.status === 200) {
   );
   const draft = await fetch(`${BASE}/api/admin/services/${sId}/s-election-draft`, { headers: { Cookie: adminS.cookie } });
   const draftBytes = new Uint8Array(await draft.arrayBuffer());
-  check("draft election package renders as PDF", draft.ok && draftBytes[0] === 0x25 && draftBytes[1] === 0x50, { status: draft.status, len: draftBytes.length });
-  const noPkg = await fetch(`${BASE}/api/admin/services/${sId}/fulfill`, {
-    method: "POST", headers: { Cookie: adminS.cookie }, body: new FormData(),
-  });
-  check("S election fulfill without package rejected", noPkg.status === 400, await noPkg.json().catch(() => null));
-  const pkgFd = new FormData();
-  pkgFd.set("file", new File([draftBytes], "s-election-package.pdf", { type: "application/pdf" }));
-  const sFulfill = await fetch(`${BASE}/api/admin/services/${sId}/fulfill`, {
-    method: "POST", headers: { Cookie: adminS.cookie }, body: pkgFd,
-  });
-  check("S election fulfilled with package", sFulfill.ok, await sFulfill.json().catch(() => null));
+  check("admin can still review the package", draft.ok && draftBytes[0] === 0x25 && draftBytes[1] === 0x50, { status: draft.status, len: draftBytes.length });
+
+  // The two-week clock: backdate the order and prove the sweep destroys the
+  // package, the SSNs and the owner rows, leaving the order record behind.
+  const purgeRes = await api("/api/dev/expire-s-election", { method: "POST", body: JSON.stringify({ orderId: sId }) });
+  check("dev backdate hook available", purgeRes.status === 200, purgeRes.body);
+  const swept = await api("/api/portal/services", { cookies: mPw.cookie });
+  const sweptRow = (swept.body?.data?.orders ?? []).find((o: { id: string }) => o.id === sId);
+  check("expired package is no longer editable", sweptRow?.editable === false, sweptRow);
+  check("expired package records when it was deleted", Boolean(sweptRow?.details?.purgedAt), sweptRow?.details);
+  check("owner rows destroyed", !sweptRow?.details?.shareholders, sweptRow?.details);
   const sAfter = await api(`/api/admin/services/${sId}`, { cookies: adminS.cookie });
-  check("shareholder SSNs deleted at fulfillment", sAfter.body?.data?.ssns === null, sAfter.body?.data);
+  check("shareholder SSNs destroyed after the window", sAfter.body?.data?.ssns === null, sAfter.body?.data);
   const sDocs = await api("/api/portal/documents", { cookies: mPw.cookie });
   check(
-    "election package posted to client documents",
-    (sDocs.body?.data ?? []).some((d: { title: string }) => d.title.includes("S Corporation Election Package")),
-    sDocs.body?.data,
+    "the completed form is gone from the client's documents",
+    !(sDocs.body?.data ?? []).some((d: { title: string }) => d.title.includes("S Corporation Election Package")),
+    sDocs.body?.data?.map((d: { title: string }) => d.title),
   );
+  const lateEdit = await api(`/api/portal/services/${sId}/s-election-details`, {
+    method: "POST", cookies: mPw.cookie, body: JSON.stringify(goodDetails),
+  });
+  check("editing after the window is refused", lateEdit.status === 400, lateEdit.body);
 }
 
 // 16. Member-managed multi-member: routed to the member-managed masters

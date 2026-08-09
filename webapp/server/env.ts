@@ -21,6 +21,9 @@ export const env = {
 
   ADMIN_PASSWORD: process.env.ADMIN_PASSWORD ?? "",
 
+  /** Shared secret for the daily purge cron. Required in production. */
+  CRON_SECRET: process.env.CRON_SECRET ?? "",
+
   BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN ?? "",
 
   SMARTY_AUTH_ID: process.env.SMARTY_AUTH_ID ?? "",

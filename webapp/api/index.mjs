@@ -76481,6 +76481,8 @@ var env = {
   MAIL_FROM: process.env.MAIL_FROM ?? "MyFloridaSeriesLLC <onboarding@resend.dev>",
   ADMIN_NOTIFY_EMAIL: process.env.ADMIN_NOTIFY_EMAIL ?? "",
   ADMIN_PASSWORD: process.env.ADMIN_PASSWORD ?? "",
+  /** Shared secret for the daily purge cron. Required in production. */
+  CRON_SECRET: process.env.CRON_SECRET ?? "",
   BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN ?? "",
   SMARTY_AUTH_ID: process.env.SMARTY_AUTH_ID ?? "",
   SMARTY_AUTH_TOKEN: process.env.SMARTY_AUTH_TOKEN ?? "",
@@ -106108,6 +106110,21 @@ function serviceFulfilledClientEmail(opts) {
     `)
   };
 }
+function sElectionReadyEmail(opts) {
+  return {
+    subject: `Your Form 2553 package is ready \u2014 ${opts.llcName}`,
+    html: wrap(`
+      <p>Your S corporation election package for <strong>${escapeHtml(opts.llcName)}</strong> is
+      ready to download in your portal: the completed IRS Form 2553, a cover letter, and
+      step-by-step instructions for signing and mailing it to the IRS.</p>
+      <p>You can correct your answers and regenerate the package until
+      <strong>${escapeHtml(opts.editableUntil)}</strong>. After that we delete the completed form
+      and every Social Security number from our systems \u2014 <strong>download and keep a copy before
+      then</strong>.</p>
+      <p><a href="${opts.portalUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Open your portal</a></p>
+    `)
+  };
+}
 function orderPaidEmail(opts) {
   return {
     subject: `Paid order \u2014 ${opts.llcName}`,
@@ -106396,6 +106413,15 @@ if (!env.isProd) {
     await db2.query(
       "UPDATE orders SET paid_at = now() - ($1 || ' days')::interval WHERE client_id = $2 AND status = 'paid'",
       [String(Math.round(days)), rows[0].id]
+    );
+    return c.json({ data: { ok: true } });
+  });
+  app.post("/dev/expire-s-election", async (c) => {
+    const { orderId } = await c.req.json();
+    const db2 = await getDb();
+    await db2.query(
+      "UPDATE service_orders SET fulfilled_at = now() - interval '15 days' WHERE id = $1 AND type = 's-election'",
+      [orderId]
     );
     return c.json({ data: { ok: true } });
   });
@@ -107108,27 +107134,90 @@ async function sElectionEligibility(clientId) {
   }
   return { eligible: true, reason: "ok", orderBy: orderBy.toISOString(), formationPaidAt: paidAt.toISOString() };
 }
+var S_ELECTION_EDIT_DAYS = 14;
+function sElectionWindow(fulfilledAt) {
+  if (!fulfilledAt) return { open: false, deleteOn: null };
+  const start = new Date(String(fulfilledAt)).getTime();
+  if (Number.isNaN(start)) return { open: false, deleteOn: null };
+  const deleteOn = new Date(start + S_ELECTION_EDIT_DAYS * 864e5);
+  return { open: Date.now() < deleteOn.getTime(), deleteOn: deleteOn.toISOString() };
+}
+async function purgeExpiredSElections() {
+  const db2 = await getDb();
+  const cutoff = new Date(Date.now() - S_ELECTION_EDIT_DAYS * 864e5).toISOString();
+  const rows = await db2.query(
+    `SELECT id, client_id, details FROM service_orders
+      WHERE type = 's-election' AND status = 'fulfilled'
+        AND fulfilled_at IS NOT NULL AND fulfilled_at < $1
+        AND (ein_secret IS NOT NULL OR details->>'purgedAt' IS NULL)`,
+    [cutoff]
+  );
+  for (const row of rows) {
+    const d2 = typeof row.details === "string" ? JSON.parse(row.details) : row.details;
+    if (d2?.documentId) {
+      const docs = await db2.query(
+        "SELECT storage_key FROM documents WHERE id = $1",
+        [d2.documentId]
+      );
+      await db2.query("DELETE FROM documents WHERE id = $1", [d2.documentId]);
+      if (docs[0]?.storage_key) await deleteFile(docs[0].storage_key).catch(() => {
+      });
+    }
+    const kept = {
+      ein: d2?.ein,
+      einPending: d2?.einPending,
+      dateIncorporated: d2?.dateIncorporated,
+      effectiveDate: d2?.effectiveDate,
+      officerName: d2?.officerName,
+      officerTitle: d2?.officerTitle,
+      certifiedAt: d2?.certifiedAt,
+      purgedAt: (/* @__PURE__ */ new Date()).toISOString()
+    };
+    await db2.query("UPDATE service_orders SET details = $1, ein_secret = NULL WHERE id = $2", [
+      JSON.stringify(kept),
+      row.id
+    ]);
+  }
+  if (rows.length > 0) console.log(`[purge] destroyed ${rows.length} expired S election package(s)`);
+  return rows.length;
+}
 app.get("/portal/services", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err2("Not signed in", "UNAUTHENTICATED"), 401);
+  await purgeExpiredSElections().catch((e) => console.error("[purge] failed:", e));
   const db2 = await getDb();
   const orders = await db2.query(
     `SELECT ${SERVICE_SAFE_COLUMNS} FROM service_orders WHERE client_id = $1 ORDER BY created_at DESC`,
     [session.clientId]
   );
+  const seed = await oaSeed(session.clientId);
   return c.json({
     data: {
       llcName: await clientLlcName(session.clientId),
       dev: !env.isProd && !env.SQUARE_ACCESS_TOKEN,
+      members: seed?.members ?? [],
       pricing: {
         seriesCents: SERIES_ADDON_PREP_CENTS + SERIES_ADDON_STATE_CENTS,
         einCents: EIN_FEE_CENTS,
         sElectionCents: S_ELECTION_FEE_CENTS
       },
       sElection: await sElectionEligibility(session.clientId),
-      orders
+      orders: orders.map((o) => {
+        if (o.type !== "s-election") return o;
+        const d2 = typeof o.details === "string" ? JSON.parse(o.details) : o.details;
+        const w = sElectionWindow(o.fulfilled_at);
+        return { ...o, editableUntil: w.deleteOn, editable: w.open, documentId: d2?.documentId ?? null };
+      })
     }
   });
+});
+app.get("/cron/purge", async (c) => {
+  const auth = c.req.header("authorization") ?? "";
+  const secret = env.CRON_SECRET;
+  if (secret && auth !== `Bearer ${secret}`) return c.json(err2("Not authorized", "UNAUTHENTICATED"), 401);
+  if (!secret && env.isProd) return c.json(err2("Not authorized", "UNAUTHENTICATED"), 401);
+  const purged = await purgeExpiredSElections();
+  return c.json({ data: { purged } });
 });
 app.post("/portal/services/s-election", async (c) => {
   const session = await getSession(c);
@@ -107268,7 +107357,10 @@ app.post("/portal/services/ein", async (c) => {
 var einDetailsSchema = external_exports.object({
   responsibleName: external_exports.string().min(1, "The responsible party's name is required.").max(200),
   tin: external_exports.string().transform((s) => s.replace(/[\s-]/g, "")).refine((s) => /^\d{9}$/.test(s), "Enter a 9-digit SSN or ITIN."),
-  note: external_exports.string().max(1e3).optional()
+  note: external_exports.string().max(1e3).optional(),
+  certified: external_exports.literal(true, {
+    errorMap: () => ({ message: "You must confirm the certification before submitting." })
+  })
 });
 app.post("/portal/services/:id/ein-details", async (c) => {
   const session = await getSession(c);
@@ -107294,7 +107386,8 @@ app.post("/portal/services/:id/ein-details", async (c) => {
     ...details,
     responsibleName: body.data.responsibleName,
     tinLast4: body.data.tin.slice(-4),
-    note: body.data.note ?? ""
+    note: body.data.note ?? "",
+    certifiedAt: (/* @__PURE__ */ new Date()).toISOString()
   };
   await db2.query(
     "UPDATE service_orders SET details = $1, ein_secret = $2, status = 'in_progress' WHERE id = $3",
@@ -107328,9 +107421,14 @@ var sElectionDetailsSchema = external_exports.object({
       address: external_exports.string().min(1).max(300),
       percentage: external_exports.number().min(0).max(100),
       dateAcquired: external_exports.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-      ssn: external_exports.string().transform((s) => s.replace(/[\s-]/g, "")).refine((s) => /^\d{9}$/.test(s), "Each owner's SSN must be 9 digits.")
+      // Blank means "keep the number already on file" when re-editing; a
+      // first submission is rejected below if any are blank.
+      ssn: external_exports.string().transform((s) => s.replace(/[\s-]/g, "")).refine((s) => s === "" || /^\d{9}$/.test(s), "Each owner's SSN must be 9 digits.")
     })
-  ).min(1, "At least one owner is required.").max(7, "The IRS form holds 7 owners \u2014 contact us for more.")
+  ).min(1, "At least one owner is required.").max(7, "The IRS form holds 7 owners \u2014 contact us for more."),
+  certified: external_exports.literal(true, {
+    errorMap: () => ({ message: "You must confirm the certification before submitting." })
+  })
 }).refine((d2) => d2.ein !== "" || d2.einPending, {
   message: "Provide the EIN, or mark that we are obtaining it for you."
 }).refine((d2) => Math.abs(d2.shareholders.reduce((a2, s) => a2 + s.percentage, 0) - 100) < 0.01, {
@@ -107345,17 +107443,44 @@ app.post("/portal/services/:id/s-election-details", async (c) => {
   }
   const db2 = await getDb();
   const rows = await db2.query(
-    "SELECT id, client_id, type, status, llc_name FROM service_orders WHERE id = $1",
+    "SELECT id, client_id, type, status, llc_name, details, ein_secret, fulfilled_at FROM service_orders WHERE id = $1",
     [c.req.param("id")]
   );
   if (rows.length === 0 || rows[0].client_id !== session.clientId) {
     return c.json(err2("Not found", "NOT_FOUND"), 404);
   }
   const so2 = rows[0];
-  if (so2.type !== "s-election" || so2.status !== "awaiting_info") {
-    return c.json(err2("This order is not awaiting details.", "BAD_STATE"), 400);
+  if (so2.type !== "s-election") return c.json(err2("Not found", "NOT_FOUND"), 404);
+  const prior = typeof so2.details === "string" ? JSON.parse(so2.details) : so2.details;
+  const editable = so2.status === "awaiting_info" || sElectionWindow(so2.fulfilled_at).open;
+  if (!editable) {
+    return c.json(
+      err2(
+        "The two-week window for changing this package has closed, and the details have been deleted. Contact us if you need a new one.",
+        "WINDOW_CLOSED"
+      ),
+      400
+    );
   }
   const d2 = body.data;
+  let onFile = [];
+  if (so2.ein_secret) {
+    try {
+      onFile = JSON.parse(decryptSecret(so2.ein_secret));
+    } catch (e) {
+      console.error("[service] s-election secret decrypt failed:", e);
+    }
+  }
+  const ssns = [];
+  for (let i = 0; i < d2.shareholders.length; i++) {
+    const typed = d2.shareholders[i].ssn;
+    const kept = d2.shareholders.length === onFile.length ? onFile[i] : "";
+    const use = typed || kept;
+    if (!/^\d{9}$/.test(use)) {
+      return c.json(err2("Each owner's SSN must be 9 digits.", "INVALID_INPUT"), 400);
+    }
+    ssns.push(use);
+  }
   const merged = {
     ein: d2.ein,
     einPending: d2.einPending,
@@ -107364,30 +107489,97 @@ app.post("/portal/services/:id/s-election-details", async (c) => {
     officerName: d2.officerName,
     officerTitle: d2.officerTitle,
     phone: d2.phone,
-    shareholders: d2.shareholders.map((s) => ({
+    certifiedAt: (/* @__PURE__ */ new Date()).toISOString(),
+    documentId: prior?.documentId,
+    shareholders: d2.shareholders.map((s, i) => ({
       name: s.name,
       address: s.address,
       percentage: s.percentage,
       dateAcquired: s.dateAcquired,
-      ssnLast4: s.ssn.slice(-4)
+      ssnLast4: ssns[i].slice(-4)
     }))
   };
+  const seed = await oaSeed(session.clientId);
+  const clients = await db2.query(
+    "SELECT email, name FROM clients WHERE id = $1",
+    [session.clientId]
+  );
+  let pdf;
+  try {
+    pdf = await buildSElectionPackage({
+      llcName: so2.llc_name,
+      principalAddress: seed?.principalAddress ?? "",
+      ein: d2.ein,
+      dateIncorporated: d2.dateIncorporated,
+      effectiveDate: d2.effectiveDate,
+      officerName: d2.officerName,
+      officerTitle: d2.officerTitle,
+      phone: d2.phone,
+      shareholders: d2.shareholders.map((s, i) => ({
+        name: s.name,
+        address: s.address,
+        percentage: s.percentage,
+        dateAcquired: s.dateAcquired,
+        ssn: ssns[i]
+      }))
+    });
+  } catch (e) {
+    console.error("[service] s-election package build failed:", e);
+    return c.json(err2("We could not build the package. Our team has been notified.", "GENERATION_FAILED"), 500);
+  }
+  if (prior?.documentId) {
+    const old = await db2.query(
+      "SELECT storage_key FROM documents WHERE id = $1 AND client_id = $2",
+      [prior.documentId, session.clientId]
+    );
+    await db2.query("DELETE FROM documents WHERE id = $1 AND client_id = $2", [prior.documentId, session.clientId]);
+    if (old[0]?.storage_key) await deleteFile(old[0].storage_key).catch(() => {
+    });
+  }
+  const title = `S Corporation Election Package (Form 2553) \u2014 ${so2.llc_name}`;
+  const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength);
+  const stored = await putFile(
+    `${title.replace(/[^\w-]+/g, "_")}_${stampForFilename()}.pdf`,
+    buf,
+    "application/pdf"
+  );
+  const docRows = await db2.query(
+    `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)
+     VALUES ($1, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,
+    [session.clientId, title, stored.storageKey, stored.sizeBytes]
+  );
+  merged.documentId = docRows[0].id;
   await db2.query(
-    "UPDATE service_orders SET details = $1, ein_secret = $2, status = 'in_progress' WHERE id = $3",
-    [JSON.stringify(merged), encryptSecret(JSON.stringify(d2.shareholders.map((s) => s.ssn))), so2.id]
+    `UPDATE service_orders
+        SET details = $1, ein_secret = $2, status = 'fulfilled',
+            fulfilled_at = COALESCE(fulfilled_at, now())
+      WHERE id = $3`,
+    [JSON.stringify(merged), encryptSecret(JSON.stringify(ssns)), so2.id]
+  );
+  const after = await db2.query(
+    "SELECT fulfilled_at FROM service_orders WHERE id = $1",
+    [so2.id]
+  );
+  const window2 = sElectionWindow(after[0]?.fulfilled_at ?? null);
+  const mail = sElectionReadyEmail({
+    llcName: so2.llc_name,
+    editableUntil: window2.deleteOn ? stampEastern(new Date(window2.deleteOn)) : "",
+    portalUrl: `${env.PUBLIC_BASE_URL}/portal`
+  });
+  sendMail({ to: clients[0]?.email ?? "", ...mail }).catch(
+    (e) => console.error("[service] s-election ready email failed:", e)
   );
   if (env.ADMIN_NOTIFY_EMAIL) {
-    const clients = await db2.query("SELECT email FROM clients WHERE id = $1", [session.clientId]);
-    const mail = einDetailsSubmittedAdminEmail({
+    const adminMail = einDetailsSubmittedAdminEmail({
       summary: `S Corporation Election Package \u2014 ${so2.llc_name}`,
       clientEmail: clients[0]?.email ?? "",
       adminUrl: `${env.PUBLIC_BASE_URL}/admin`
     });
-    sendMail({ to: env.ADMIN_NOTIFY_EMAIL, ...mail }).catch(
+    sendMail({ to: env.ADMIN_NOTIFY_EMAIL, ...adminMail }).catch(
       (e) => console.error("[service] s-election-details admin email failed:", e)
     );
   }
-  return c.json({ data: { ok: true } });
+  return c.json({ data: { ok: true, documentId: merged.documentId, editableUntil: window2.deleteOn } });
 });
 function maskEmail(email) {
   const [local, domain] = email.split("@");
@@ -107622,6 +107814,7 @@ app.get("/admin/services", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err2("Not signed in", "UNAUTHENTICATED"), 401);
   const db2 = await getDb();
+  await purgeExpiredSElections().catch((e) => console.error("[purge] failed:", e));
   const rows = await db2.query(
     `SELECT so.id, so.type, so.status, so.llc_name, so.details, so.amount_cents,
             so.created_at, so.paid_at, so.fulfilled_at,

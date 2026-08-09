@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { PlusCircle, Landmark, ShoppingBag, Lock, FileCheck2, Trash2 } from "lucide-react";
+import { PlusCircle, Landmark, ShoppingBag, Lock, FileCheck2, Trash2, Download, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -13,22 +13,51 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { api, ApiError } from "@/lib/api";
+import { AddressAutocomplete } from "@/components/forms/florida-llc/AddressAutocomplete";
+import { formatDateTime } from "@/lib/datetime";
+
+interface StoredShareholder {
+  name: string;
+  address: string;
+  percentage: number;
+  dateAcquired: string;
+  ssnLast4: string;
+}
 
 interface ServiceOrder {
   id: string;
   type: "series" | "ein" | "s-election";
   status: "pending_payment" | "awaiting_info" | "in_progress" | "fulfilled" | "cancelled";
   llc_name: string;
-  details: { seriesName?: string; target?: string; responsibleName?: string; tinLast4?: string };
+  details: {
+    seriesName?: string;
+    target?: string;
+    responsibleName?: string;
+    tinLast4?: string;
+    ein?: string;
+    einPending?: boolean;
+    dateIncorporated?: string;
+    effectiveDate?: string;
+    officerName?: string;
+    officerTitle?: string;
+    phone?: string;
+    purgedAt?: string;
+    shareholders?: StoredShareholder[];
+  };
   amount_cents: number;
   created_at: string;
   paid_at: string | null;
   fulfilled_at: string | null;
+  /** s-election only: when the package and the SSNs are destroyed. */
+  editableUntil?: string | null;
+  editable?: boolean;
+  documentId?: string | null;
 }
 
 interface ServicesData {
   llcName: string;
   dev: boolean;
+  members: { name: string; address: string }[];
   pricing: { seriesCents: number; einCents: number; sElectionCents: number };
   sElection: {
     eligible: boolean;
@@ -44,6 +73,11 @@ interface ShareholderRow {
   percentage: string;
   dateAcquired: string;
   ssn: string;
+  /** Set when the number is already on file: the field stays blank and the
+   *  server keeps what it has, so an edit never means retyping SSNs. */
+  ssnLast4?: string;
+  /** True once the address came from a verified suggestion. */
+  verified?: boolean;
 }
 
 const STATUS_LABEL: Record<ServiceOrder["status"], string> = {
@@ -73,6 +107,7 @@ export function ServicesCard() {
   const [einOpen, setEinOpen] = useState(false);
   const [sElectionOpen, setSElectionOpen] = useState(false);
   const [detailsFor, setDetailsFor] = useState<ServiceOrder | null>(null);
+  const [einCertified, setEinCertified] = useState(false);
   const [error, setError] = useState<string>("");
 
   const servicesQuery = useQuery({
@@ -114,6 +149,7 @@ export function ServicesCard() {
         responsibleName: args.responsibleName,
         tin: args.tin,
         note: args.note,
+        certified: true,
       }),
     onSuccess: () => {
       setDetailsFor(null);
@@ -325,15 +361,49 @@ export function ServicesCard() {
           {data.orders.map((o) => (
             <li key={o.id} className="flex flex-col gap-2 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="min-w-0">
-                <div className="truncate text-sm font-medium">{summaryOf(o)}</div>
+                <div className="text-sm font-medium">{summaryOf(o)}</div>
                 <div className="text-xs text-muted-foreground">
                   {money(o.amount_cents)} ·{" "}
                   <span className={o.status === "awaiting_info" ? "font-medium text-amber-700" : ""}>
-                    {STATUS_LABEL[o.status]}
+                    {o.type === "s-election" && o.status === "fulfilled"
+                      ? "Ready to download"
+                      : STATUS_LABEL[o.status]}
                   </span>
                 </div>
+                {/* The package carries every owner's SSN, so it does not live
+                    here indefinitely — say so where they will see it. */}
+                {o.type === "s-election" && o.editable && o.editableUntil ? (
+                  <p className="mt-1 text-xs text-amber-700">
+                    Editable until {formatDateTime(o.editableUntil)} — after that we delete the
+                    package and the Social Security numbers. Download and keep a copy.
+                  </p>
+                ) : null}
+                {o.type === "s-election" && o.details.purgedAt ? (
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Deleted on {formatDateTime(o.details.purgedAt)} as promised — the package and
+                    every Social Security number are gone from our systems.
+                  </p>
+                ) : null}
               </div>
-              <div className="flex shrink-0 items-center gap-2">
+              <div className="flex shrink-0 flex-wrap items-center gap-2">
+                {o.type === "s-election" && o.documentId ? (
+                  <Button asChild size="sm" variant="outline" className="rounded-full">
+                    <a href={`/api/portal/documents/${o.documentId}/download`}>
+                      <Download className="mr-1.5 h-3.5 w-3.5" />
+                      Download
+                    </a>
+                  </Button>
+                ) : null}
+                {o.type === "s-election" && o.status === "fulfilled" && o.editable ? (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="rounded-full"
+                    onClick={() => { setDetailsFor(o); setError(""); }}
+                  >
+                    Edit answers
+                  </Button>
+                ) : null}
                 {o.status === "awaiting_info" ? (
                   <Button
                     size="sm"
@@ -370,23 +440,28 @@ export function ServicesCard() {
           <DialogHeader>
             <DialogTitle>S corporation election details</DialogTitle>
             <DialogDescription>
-              We use this to complete IRS Form 2553 for {detailsFor?.llc_name}. This form is
+              We use this to complete IRS Form 2553 for {detailsFor?.llc_name}. You sign the
+              finished form and mail it to the IRS yourself — we file nothing. This form is
               transmitted over your secure portal session; Social Security numbers are encrypted,
-              used only to prepare the form, and deleted from our systems when your package is
-              delivered.
+              and both they and the completed package are deleted from our systems two weeks after
+              you build it, so download and keep your copy.
             </DialogDescription>
           </DialogHeader>
           {detailsFor ? (
             <SElectionDetailsForm
-              orderId={detailsFor.id}
-              onDone={() => { setDetailsFor(null); refresh(); }}
+              order={detailsFor}
+              members={data.members ?? []}
+              onDone={() => { setDetailsFor(null); refresh(); queryClient.invalidateQueries({ queryKey: ["portal-documents"] }); }}
             />
           ) : null}
         </DialogContent>
       </Dialog>
 
       {/* Secure EIN details dialog */}
-      <Dialog open={detailsFor !== null && detailsFor.type === "ein"} onOpenChange={(v) => { if (!v) setDetailsFor(null); }}>
+      <Dialog
+        open={detailsFor !== null && detailsFor.type === "ein"}
+        onOpenChange={(v) => { if (!v) { setDetailsFor(null); setEinCertified(false); } }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Responsible party details</DialogTitle>
@@ -423,10 +498,23 @@ export function ServicesCard() {
               <label className="text-sm font-medium">Note (optional)</label>
               <Input name="note" autoComplete="off" />
             </div>
+            <label className="flex items-start gap-2.5 rounded-lg border border-border bg-secondary/40 p-3">
+              <input
+                type="checkbox"
+                checked={einCertified}
+                onChange={(e) => setEinCertified(e.target.checked)}
+                className="mt-0.5 h-4 w-4 shrink-0 accent-trust"
+              />
+              <span className="text-xs leading-relaxed">{EIN_CERTIFICATION}</span>
+            </label>
             {error ? <p className="text-xs text-destructive">{error}</p> : null}
             <DialogFooter>
-              <Button type="submit" disabled={submitDetails.isPending} className="rounded-full">
-                {submitDetails.isPending ? "Submitting…" : "Submit securely"}
+              <Button
+                type="submit"
+                disabled={submitDetails.isPending || !einCertified}
+                className="rounded-full"
+              >
+                {submitDetails.isPending ? "Submitting…" : "Certify and submit securely"}
               </Button>
             </DialogFooter>
           </form>
@@ -438,15 +526,60 @@ export function ServicesCard() {
 
 const EMPTY_ROW: ShareholderRow = { name: "", address: "", percentage: "", dateAcquired: "", ssn: "" };
 
-function SElectionDetailsForm({ orderId, onDone }: { orderId: string; onDone: () => void }) {
-  const [ein, setEin] = useState("");
-  const [einPending, setEinPending] = useState(false);
-  const [dateIncorporated, setDateIncorporated] = useState("");
-  const [effectiveDate, setEffectiveDate] = useState("");
-  const [officerName, setOfficerName] = useState("");
-  const [officerTitle, setOfficerTitle] = useState("Manager");
-  const [phone, setPhone] = useState("");
-  const [rows, setRows] = useState<ShareholderRow[]>([{ ...EMPTY_ROW }]);
+/** The certification a client gives before we build the form. They sign the
+ *  finished Form 2553 under penalties of perjury and mail it themselves — we
+ *  prepare it from what they supply and file nothing. */
+const CERTIFICATION =
+  "I am authorized to provide this information on behalf of the company. I understand it will be " +
+  "used to prepare IRS Form 2553, that I must sign that form under penalties of perjury before " +
+  "filing it with the IRS, and that knowingly giving false information to the IRS may result in " +
+  "civil penalties and criminal prosecution. Having examined the information I am submitting, I " +
+  "declare that it is true, correct, and complete to the best of my knowledge and belief. I " +
+  "understand MyFloridaSeriesLLC prepares the form from what I supply, does not verify it, does " +
+  "not file it, and does not give legal or tax advice.";
+
+const OTHER = "__other__";
+
+/** Form SS-4 is signed under penalties of perjury too, and we prepare it from
+ *  what the client gives us. */
+const EIN_CERTIFICATION =
+  "I am authorized to provide this information on behalf of the company. I understand it will be " +
+  "used to apply for a federal Employer Identification Number on IRS Form SS-4, which is signed " +
+  "under penalties of perjury, and that knowingly giving false information to the IRS may result " +
+  "in civil penalties and criminal prosecution. I declare that the information I am submitting is " +
+  "true, correct, and complete to the best of my knowledge and belief.";
+
+function SElectionDetailsForm({
+  order,
+  members,
+  onDone,
+}: {
+  order: ServiceOrder;
+  members: { name: string; address: string }[];
+  onDone: () => void;
+}) {
+  const prior = order.details;
+  const [ein, setEin] = useState(prior.ein ?? "");
+  const [einPending, setEinPending] = useState(Boolean(prior.einPending));
+  const [dateIncorporated, setDateIncorporated] = useState(prior.dateIncorporated ?? "");
+  const [effectiveDate, setEffectiveDate] = useState(prior.effectiveDate ?? "");
+  const [officerName, setOfficerName] = useState(prior.officerName ?? "");
+  const [officerTitle, setOfficerTitle] = useState(prior.officerTitle ?? "Manager");
+  const [phone, setPhone] = useState(prior.phone ?? "");
+  const [rows, setRows] = useState<ShareholderRow[]>(
+    prior.shareholders?.length
+      ? prior.shareholders.map((s) => ({
+          name: s.name,
+          address: s.address,
+          percentage: String(s.percentage),
+          dateAcquired: s.dateAcquired,
+          ssn: "",
+          ssnLast4: s.ssnLast4,
+          verified: true,
+        }))
+      : [{ ...EMPTY_ROW }],
+  );
+  const [certified, setCertified] = useState(false);
   const [formError, setFormError] = useState("");
 
   const patchRow = (i: number, p: Partial<ShareholderRow>) =>
@@ -454,7 +587,7 @@ function SElectionDetailsForm({ orderId, onDone }: { orderId: string; onDone: ()
 
   const submit = useMutation({
     mutationFn: () =>
-      api.post(`/api/portal/services/${orderId}/s-election-details`, {
+      api.post<{ documentId: string }>(`/api/portal/services/${order.id}/s-election-details`, {
         ein,
         einPending,
         dateIncorporated,
@@ -462,6 +595,7 @@ function SElectionDetailsForm({ orderId, onDone }: { orderId: string; onDone: ()
         officerName,
         officerTitle,
         phone,
+        certified,
         shareholders: rows.map((r) => ({
           name: r.name,
           address: r.address,
@@ -534,8 +668,64 @@ function SElectionDetailsForm({ orderId, onDone }: { orderId: string; onDone: ()
         {rows.map((r, i) => (
           <div key={i} className="space-y-2 rounded-lg border border-border p-3">
             <div className="grid gap-2 sm:grid-cols-2">
-              <Input placeholder="Owner's full legal name" value={r.name} onChange={(e) => patchRow(i, { name: e.target.value })} autoComplete="off" />
-              <Input placeholder="Home address" value={r.address} onChange={(e) => patchRow(i, { address: e.target.value })} autoComplete="off" />
+              {/* Owners are usually the members on the formation record —
+                  choosing one fills in the address we already verified. */}
+              <div className="space-y-1.5">
+                <select
+                  aria-label="Owner"
+                  value={members.some((m) => m.name === r.name) ? r.name : r.name === "" ? "" : OTHER}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    if (v === OTHER) {
+                      patchRow(i, { name: " ", address: r.address, verified: false });
+                      return;
+                    }
+                    const m = members.find((mm) => mm.name === v);
+                    patchRow(i, { name: v, address: m?.address ?? r.address, verified: Boolean(m?.address) });
+                  }}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                >
+                  <option value="">Select an owner…</option>
+                  {members.map((m) => (
+                    <option key={m.name} value={m.name}>
+                      {m.name}
+                    </option>
+                  ))}
+                  <option value={OTHER}>Other — enter a name</option>
+                </select>
+                {r.name !== "" && !members.some((m) => m.name === r.name) ? (
+                  <Input
+                    placeholder="Owner's full legal name"
+                    value={r.name.trim() === "" ? "" : r.name}
+                    onChange={(e) => patchRow(i, { name: e.target.value })}
+                    autoComplete="off"
+                  />
+                ) : null}
+              </div>
+              <div className="space-y-1">
+                <AddressAutocomplete
+                  value={r.address}
+                  placeholder="Home address"
+                  onChangeText={(text) => patchRow(i, { address: text, verified: false })}
+                  onSelect={(s) =>
+                    patchRow(i, {
+                      address: `${s.address1}, ${s.city} ${s.state} ${s.zip}`,
+                      verified: true,
+                    })
+                  }
+                />
+                {r.address ? (
+                  r.verified ? (
+                    <p className="flex items-center gap-1 text-xs text-trust">
+                      <CheckCircle2 className="h-3 w-3" /> Verified address
+                    </p>
+                  ) : (
+                    <p className="text-xs text-amber-700">
+                      Pick the address from the list so the IRS gets a deliverable address.
+                    </p>
+                  )
+                ) : null}
+              </div>
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <div className="flex items-center gap-1">
@@ -555,10 +745,13 @@ function SElectionDetailsForm({ orderId, onDone }: { orderId: string; onDone: ()
                 className="w-40"
               />
               <Input
-                type="password" inputMode="numeric" placeholder="SSN •••-••-••••"
+                type="password"
+                inputMode="numeric"
+                placeholder={r.ssnLast4 ? `SSN on file •••-••-${r.ssnLast4}` : "SSN •••-••-••••"}
+                title={r.ssnLast4 ? "Leave blank to keep the number already on file" : "Social Security number"}
                 value={r.ssn}
                 onChange={(e) => patchRow(i, { ssn: e.target.value })}
-                className="w-40"
+                className="w-44"
                 autoComplete="off"
               />
               {rows.length > 1 ? (
@@ -593,10 +786,23 @@ function SElectionDetailsForm({ orderId, onDone }: { orderId: string; onDone: ()
         </p>
       </div>
 
+      <label className="flex items-start gap-2.5 rounded-lg border border-border bg-secondary/40 p-3">
+        <input
+          type="checkbox"
+          checked={certified}
+          onChange={(e) => setCertified(e.target.checked)}
+          className="mt-0.5 h-4 w-4 shrink-0 accent-trust"
+        />
+        <span className="text-xs leading-relaxed">{CERTIFICATION}</span>
+      </label>
+
       {formError ? <p className="text-xs text-destructive">{formError}</p> : null}
-      <DialogFooter>
-        <Button type="submit" disabled={submit.isPending} className="rounded-full">
-          {submit.isPending ? "Submitting…" : "Submit securely"}
+      <DialogFooter className="flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:justify-end">
+        <p className="text-xs text-muted-foreground sm:mr-auto">
+          We build your package immediately — you'll be able to download it here.
+        </p>
+        <Button type="submit" disabled={submit.isPending || !certified} className="rounded-full">
+          {submit.isPending ? "Building your package…" : "Certify and build my package"}
         </Button>
       </DialogFooter>
     </form>

@@ -247,6 +247,26 @@ export function serviceFulfilledClientEmail(opts: {
   };
 }
 
+export function sElectionReadyEmail(opts: {
+  llcName: string;
+  editableUntil: string;
+  portalUrl: string;
+}): { subject: string; html: string } {
+  return {
+    subject: `Your Form 2553 package is ready — ${opts.llcName}`,
+    html: wrap(`
+      <p>Your S corporation election package for <strong>${escapeHtml(opts.llcName)}</strong> is
+      ready to download in your portal: the completed IRS Form 2553, a cover letter, and
+      step-by-step instructions for signing and mailing it to the IRS.</p>
+      <p>You can correct your answers and regenerate the package until
+      <strong>${escapeHtml(opts.editableUntil)}</strong>. After that we delete the completed form
+      and every Social Security number from our systems — <strong>download and keep a copy before
+      then</strong>.</p>
+      <p><a href="${opts.portalUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Open your portal</a></p>
+    `),
+  };
+}
+
 export function orderPaidEmail(opts: {
   llcName: string;
   contactName: string;

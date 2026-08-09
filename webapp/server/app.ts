@@ -46,6 +46,7 @@ import {
   emailChangeRequestedEmail,
   emailChangedEmail,
   serviceFulfilledClientEmail,
+  sElectionReadyEmail,
 } from "./email";
 
 export const app = new Hono().basePath("/api");
@@ -386,6 +387,18 @@ if (!env.isProd) {
     await db.query(
       "UPDATE orders SET paid_at = now() - ($1 || ' days')::interval WHERE client_id = $2 AND status = 'paid'",
       [String(Math.round(days)), rows[0].id],
+    );
+    return c.json({ data: { ok: true } });
+  });
+
+  /** Backdate an S election order past its edit window so the purge can be
+   *  proven end to end instead of waited out for two weeks. */
+  app.post("/dev/expire-s-election", async (c) => {
+    const { orderId } = (await c.req.json()) as { orderId: string };
+    const db = await getDb();
+    await db.query(
+      "UPDATE service_orders SET fulfilled_at = now() - interval '15 days' WHERE id = $1 AND type = 's-election'",
+      [orderId],
     );
     return c.json({ data: { ok: true } });
   });
@@ -1275,27 +1288,120 @@ async function sElectionEligibility(clientId: string): Promise<{
   return { eligible: true, reason: "ok", orderBy: orderBy.toISOString(), formationPaidAt: paidAt.toISOString() };
 }
 
+/** How long a client may edit and re-download the S election package before we
+ *  destroy it. The package IS the clients' copy of Form 2553, complete with
+ *  every owner's Social Security number, so it does not live here longer than
+ *  it has to. */
+const S_ELECTION_EDIT_DAYS = 14;
+
+interface SElectionStoredDetails {
+  ein?: string;
+  einPending?: boolean;
+  dateIncorporated?: string;
+  effectiveDate?: string;
+  officerName?: string;
+  officerTitle?: string;
+  phone?: string;
+  certifiedAt?: string;
+  documentId?: string;
+  purgedAt?: string;
+  shareholders?: { name: string; address: string; percentage: number; dateAcquired: string; ssnLast4: string }[];
+}
+
+/** The edit/download window for one order. Drivers differ: Neon returns ISO
+ *  strings, PGlite returns Date objects. */
+function sElectionWindow(fulfilledAt: unknown): { open: boolean; deleteOn: string | null } {
+  if (!fulfilledAt) return { open: false, deleteOn: null };
+  const start = new Date(String(fulfilledAt)).getTime();
+  if (Number.isNaN(start)) return { open: false, deleteOn: null };
+  const deleteOn = new Date(start + S_ELECTION_EDIT_DAYS * 86400_000);
+  return { open: Date.now() < deleteOn.getTime(), deleteOn: deleteOn.toISOString() };
+}
+
+/** Destroy expired S election packages: the PDF, the encrypted Social Security
+ *  numbers, and the owner rows. The order record survives so the client and we
+ *  can both see the service was delivered. Safe to call on any request. */
+async function purgeExpiredSElections(): Promise<number> {
+  const db = await getDb();
+  const cutoff = new Date(Date.now() - S_ELECTION_EDIT_DAYS * 86400_000).toISOString();
+  const rows = await db.query<{ id: string; client_id: string; details: unknown }>(
+    `SELECT id, client_id, details FROM service_orders
+      WHERE type = 's-election' AND status = 'fulfilled'
+        AND fulfilled_at IS NOT NULL AND fulfilled_at < $1
+        AND (ein_secret IS NOT NULL OR details->>'purgedAt' IS NULL)`,
+    [cutoff],
+  );
+  for (const row of rows) {
+    const d = (typeof row.details === "string" ? JSON.parse(row.details) : row.details) as SElectionStoredDetails;
+    if (d?.documentId) {
+      const docs = await db.query<{ storage_key: string }>(
+        "SELECT storage_key FROM documents WHERE id = $1",
+        [d.documentId],
+      );
+      await db.query("DELETE FROM documents WHERE id = $1", [d.documentId]);
+      if (docs[0]?.storage_key) await deleteFile(docs[0].storage_key).catch(() => {});
+    }
+    const kept: SElectionStoredDetails = {
+      ein: d?.ein,
+      einPending: d?.einPending,
+      dateIncorporated: d?.dateIncorporated,
+      effectiveDate: d?.effectiveDate,
+      officerName: d?.officerName,
+      officerTitle: d?.officerTitle,
+      certifiedAt: d?.certifiedAt,
+      purgedAt: new Date().toISOString(),
+    };
+    await db.query("UPDATE service_orders SET details = $1, ein_secret = NULL WHERE id = $2", [
+      JSON.stringify(kept),
+      row.id,
+    ]);
+  }
+  if (rows.length > 0) console.log(`[purge] destroyed ${rows.length} expired S election package(s)`);
+  return rows.length;
+}
+
 app.get("/portal/services", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  await purgeExpiredSElections().catch((e) => console.error("[purge] failed:", e));
   const db = await getDb();
-  const orders = await db.query(
+  const orders = await db.query<{ id: string; type: string; details: unknown; fulfilled_at: unknown }>(
     `SELECT ${SERVICE_SAFE_COLUMNS} FROM service_orders WHERE client_id = $1 ORDER BY created_at DESC`,
     [session.clientId],
   );
+  // The owner dropdown is built from the members on the formation record, so a
+  // client picks a name instead of retyping one.
+  const seed = await oaSeed(session.clientId);
   return c.json({
     data: {
       llcName: await clientLlcName(session.clientId),
       dev: !env.isProd && !env.SQUARE_ACCESS_TOKEN,
+      members: seed?.members ?? [],
       pricing: {
         seriesCents: SERIES_ADDON_PREP_CENTS + SERIES_ADDON_STATE_CENTS,
         einCents: EIN_FEE_CENTS,
         sElectionCents: S_ELECTION_FEE_CENTS,
       },
       sElection: await sElectionEligibility(session.clientId),
-      orders,
+      orders: orders.map((o) => {
+        if (o.type !== "s-election") return o;
+        const d = (typeof o.details === "string" ? JSON.parse(o.details) : o.details) as SElectionStoredDetails;
+        const w = sElectionWindow(o.fulfilled_at);
+        return { ...o, editableUntil: w.deleteOn, editable: w.open, documentId: d?.documentId ?? null };
+      }),
     },
   });
+});
+
+/** Daily sweep so expired packages are destroyed even if nobody signs in.
+ *  Vercel cron calls this; a shared secret keeps it from being public. */
+app.get("/cron/purge", async (c) => {
+  const auth = c.req.header("authorization") ?? "";
+  const secret = env.CRON_SECRET;
+  if (secret && auth !== `Bearer ${secret}`) return c.json(err("Not authorized", "UNAUTHENTICATED"), 401);
+  if (!secret && env.isProd) return c.json(err("Not authorized", "UNAUTHENTICATED"), 401);
+  const purged = await purgeExpiredSElections();
+  return c.json({ data: { purged } });
 });
 
 app.post("/portal/services/s-election", async (c) => {
@@ -1452,6 +1558,9 @@ const einDetailsSchema = z.object({
     .transform((s) => s.replace(/[\s-]/g, ""))
     .refine((s) => /^\d{9}$/.test(s), "Enter a 9-digit SSN or ITIN."),
   note: z.string().max(1000).optional(),
+  certified: z.literal(true, {
+    errorMap: () => ({ message: "You must confirm the certification before submitting." }),
+  }),
 });
 
 app.post("/portal/services/:id/ein-details", async (c) => {
@@ -1479,6 +1588,7 @@ app.post("/portal/services/:id/ein-details", async (c) => {
     responsibleName: body.data.responsibleName,
     tinLast4: body.data.tin.slice(-4),
     note: body.data.note ?? "",
+    certifiedAt: new Date().toISOString(),
   };
   await db.query(
     "UPDATE service_orders SET details = $1, ein_secret = $2, status = 'in_progress' WHERE id = $3",
@@ -1518,14 +1628,19 @@ const sElectionDetailsSchema = z
           address: z.string().min(1).max(300),
           percentage: z.number().min(0).max(100),
           dateAcquired: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+          // Blank means "keep the number already on file" when re-editing; a
+          // first submission is rejected below if any are blank.
           ssn: z
             .string()
             .transform((s) => s.replace(/[\s-]/g, ""))
-            .refine((s) => /^\d{9}$/.test(s), "Each owner's SSN must be 9 digits."),
+            .refine((s) => s === "" || /^\d{9}$/.test(s), "Each owner's SSN must be 9 digits."),
         }),
       )
       .min(1, "At least one owner is required.")
       .max(7, "The IRS form holds 7 owners — contact us for more."),
+    certified: z.literal(true, {
+      errorMap: () => ({ message: "You must confirm the certification before submitting." }),
+    }),
   })
   .refine((d) => d.ein !== "" || d.einPending, {
     message: "Provide the EIN, or mark that we are obtaining it for you.",
@@ -1542,21 +1657,56 @@ app.post("/portal/services/:id/s-election-details", async (c) => {
     return c.json(err(body.error.issues[0]?.message ?? "Invalid details.", "INVALID_INPUT"), 400);
   }
   const db = await getDb();
-  const rows = await db.query<{ id: string; client_id: string; type: string; status: string; llc_name: string }>(
-    "SELECT id, client_id, type, status, llc_name FROM service_orders WHERE id = $1",
+  const rows = await db.query<{
+    id: string; client_id: string; type: string; status: string; llc_name: string;
+    details: unknown; ein_secret: string | null; fulfilled_at: unknown;
+  }>(
+    "SELECT id, client_id, type, status, llc_name, details, ein_secret, fulfilled_at FROM service_orders WHERE id = $1",
     [c.req.param("id")],
   );
   if (rows.length === 0 || rows[0].client_id !== session.clientId) {
     return c.json(err("Not found", "NOT_FOUND"), 404);
   }
   const so = rows[0];
-  if (so.type !== "s-election" || so.status !== "awaiting_info") {
-    return c.json(err("This order is not awaiting details.", "BAD_STATE"), 400);
+  if (so.type !== "s-election") return c.json(err("Not found", "NOT_FOUND"), 404);
+  const prior = (typeof so.details === "string" ? JSON.parse(so.details) : so.details) as SElectionStoredDetails;
+  const editable = so.status === "awaiting_info" || sElectionWindow(so.fulfilled_at).open;
+  if (!editable) {
+    return c.json(
+      err(
+        "The two-week window for changing this package has closed, and the details have been deleted. Contact us if you need a new one.",
+        "WINDOW_CLOSED",
+      ),
+      400,
+    );
   }
   const d = body.data;
-  // SSNs live only in the encrypted secret, deleted at fulfillment; the
-  // visible record keeps the last 4 digits for identification.
-  const merged = {
+
+  // A blank SSN means "keep the one already on file" — the browser is never
+  // sent a Social Security number back, so an edit does not require retyping
+  // them. Position is the only link, so the row count must not have changed.
+  let onFile: string[] = [];
+  if (so.ein_secret) {
+    try {
+      onFile = JSON.parse(decryptSecret(so.ein_secret)) as string[];
+    } catch (e) {
+      console.error("[service] s-election secret decrypt failed:", e);
+    }
+  }
+  const ssns: string[] = [];
+  for (let i = 0; i < d.shareholders.length; i++) {
+    const typed = d.shareholders[i].ssn;
+    const kept = d.shareholders.length === onFile.length ? onFile[i] : "";
+    const use = typed || kept;
+    if (!/^\d{9}$/.test(use)) {
+      return c.json(err("Each owner's SSN must be 9 digits.", "INVALID_INPUT"), 400);
+    }
+    ssns.push(use);
+  }
+
+  // SSNs live only in the encrypted secret; the visible record keeps the last
+  // four digits so a row is identifiable without exposing the number.
+  const merged: SElectionStoredDetails = {
     ein: d.ein,
     einPending: d.einPending,
     dateIncorporated: d.dateIncorporated,
@@ -1564,30 +1714,106 @@ app.post("/portal/services/:id/s-election-details", async (c) => {
     officerName: d.officerName,
     officerTitle: d.officerTitle,
     phone: d.phone,
-    shareholders: d.shareholders.map((s) => ({
+    certifiedAt: new Date().toISOString(),
+    documentId: prior?.documentId,
+    shareholders: d.shareholders.map((s, i) => ({
       name: s.name,
       address: s.address,
       percentage: s.percentage,
       dateAcquired: s.dateAcquired,
-      ssnLast4: s.ssn.slice(-4),
+      ssnLast4: ssns[i].slice(-4),
     })),
   };
+
+  // Build the package now — the client downloads it themselves; we file
+  // nothing. A failure here must not record a submission that produced no
+  // document, so it happens before anything is written.
+  const seed = await oaSeed(session.clientId);
+  const clients = await db.query<{ email: string; name: string }>(
+    "SELECT email, name FROM clients WHERE id = $1",
+    [session.clientId],
+  );
+  let pdf: Uint8Array;
+  try {
+    pdf = await buildSElectionPackage({
+      llcName: so.llc_name,
+      principalAddress: seed?.principalAddress ?? "",
+      ein: d.ein,
+      dateIncorporated: d.dateIncorporated,
+      effectiveDate: d.effectiveDate,
+      officerName: d.officerName,
+      officerTitle: d.officerTitle,
+      phone: d.phone,
+      shareholders: d.shareholders.map((s, i) => ({
+        name: s.name,
+        address: s.address,
+        percentage: s.percentage,
+        dateAcquired: s.dateAcquired,
+        ssn: ssns[i],
+      })),
+    });
+  } catch (e) {
+    console.error("[service] s-election package build failed:", e);
+    return c.json(err("We could not build the package. Our team has been notified.", "GENERATION_FAILED"), 500);
+  }
+
+  // Regenerating replaces the earlier PDF rather than stacking copies of the
+  // same form, each carrying the owners' Social Security numbers.
+  if (prior?.documentId) {
+    const old = await db.query<{ storage_key: string }>(
+      "SELECT storage_key FROM documents WHERE id = $1 AND client_id = $2",
+      [prior.documentId, session.clientId],
+    );
+    await db.query("DELETE FROM documents WHERE id = $1 AND client_id = $2", [prior.documentId, session.clientId]);
+    if (old[0]?.storage_key) await deleteFile(old[0].storage_key).catch(() => {});
+  }
+  const title = `S Corporation Election Package (Form 2553) — ${so.llc_name}`;
+  const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength) as ArrayBuffer;
+  const stored = await putFile(
+    `${title.replace(/[^\w-]+/g, "_")}_${stampForFilename()}.pdf`,
+    buf,
+    "application/pdf",
+  );
+  const docRows = await db.query<{ id: string }>(
+    `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)
+     VALUES ($1, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,
+    [session.clientId, title, stored.storageKey, stored.sizeBytes],
+  );
+  merged.documentId = docRows[0].id;
+
+  // fulfilled_at starts the two-week clock, and a re-edit must not extend it.
   await db.query(
-    "UPDATE service_orders SET details = $1, ein_secret = $2, status = 'in_progress' WHERE id = $3",
-    [JSON.stringify(merged), encryptSecret(JSON.stringify(d.shareholders.map((s) => s.ssn))), so.id],
+    `UPDATE service_orders
+        SET details = $1, ein_secret = $2, status = 'fulfilled',
+            fulfilled_at = COALESCE(fulfilled_at, now())
+      WHERE id = $3`,
+    [JSON.stringify(merged), encryptSecret(JSON.stringify(ssns)), so.id],
+  );
+  const after = await db.query<{ fulfilled_at: unknown }>(
+    "SELECT fulfilled_at FROM service_orders WHERE id = $1",
+    [so.id],
+  );
+  const window = sElectionWindow(after[0]?.fulfilled_at ?? null);
+
+  const mail = sElectionReadyEmail({
+    llcName: so.llc_name,
+    editableUntil: window.deleteOn ? stampEastern(new Date(window.deleteOn)) : "",
+    portalUrl: `${env.PUBLIC_BASE_URL}/portal`,
+  });
+  sendMail({ to: clients[0]?.email ?? "", ...mail }).catch((e) =>
+    console.error("[service] s-election ready email failed:", e),
   );
   if (env.ADMIN_NOTIFY_EMAIL) {
-    const clients = await db.query<{ email: string }>("SELECT email FROM clients WHERE id = $1", [session.clientId]);
-    const mail = einDetailsSubmittedAdminEmail({
+    const adminMail = einDetailsSubmittedAdminEmail({
       summary: `S Corporation Election Package — ${so.llc_name}`,
       clientEmail: clients[0]?.email ?? "",
       adminUrl: `${env.PUBLIC_BASE_URL}/admin`,
     });
-    sendMail({ to: env.ADMIN_NOTIFY_EMAIL, ...mail }).catch((e) =>
+    sendMail({ to: env.ADMIN_NOTIFY_EMAIL, ...adminMail }).catch((e) =>
       console.error("[service] s-election-details admin email failed:", e),
     );
   }
-  return c.json({ data: { ok: true } });
+  return c.json({ data: { ok: true, documentId: merged.documentId, editableUntil: window.deleteOn } });
 });
 
 /* ---------------------------- account settings --------------------------- */
@@ -1857,6 +2083,7 @@ app.get("/admin/services", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const db = await getDb();
+  await purgeExpiredSElections().catch((e) => console.error("[purge] failed:", e));
   const rows = await db.query(
     `SELECT so.id, so.type, so.status, so.llc_name, so.details, so.amount_cents,
             so.created_at, so.paid_at, so.fulfilled_at,
