@@ -342,10 +342,23 @@ if (mint.status === 200) {
   check("OA regenerates as Amended & Restated", gen2.status === 200 && gen2.body?.data?.title?.startsWith("Amended and Restated"), gen2.body?.data);
   const oaAfter = await api("/api/portal/oa", { cookies: setPw.cookie });
   check("generation history has 2 entries", (oaAfter.body?.data?.generations ?? []).length === 2);
+  check("generations are numbered in the title", /\(No\. \d\)/.test(gen2.body?.data?.title ?? ""), gen2.body?.data?.title);
   const oaDocId = gen1.body?.data?.documentId as string;
   const oaPdf = await fetch(`${BASE}/api/portal/documents/${oaDocId}/download`, { headers: { Cookie: setPw.cookie } });
   const oaBytes = new Uint8Array(await oaPdf.arrayBuffer());
   check("generated OA downloads as PDF", oaPdf.ok && oaBytes[0] === 0x25 && oaBytes[1] === 0x50, { status: oaPdf.status, len: oaBytes.length });
+
+  // A client can tidy their own drafts, but never a document we posted.
+  const genList = oaAfter.body?.data?.generations ?? [];
+  const oldest = genList[genList.length - 1];
+  const delOther = await api(`/api/portal/oa/generations/${crypto.randomUUID()}`, { method: "DELETE", cookies: setPw.cookie });
+  check("deleting an unknown generation is refused", delOther.status === 404);
+  const delOk = await api(`/api/portal/oa/generations/${oldest.id}`, { method: "DELETE", cookies: setPw.cookie });
+  check("client deletes their own draft", delOk.status === 200, delOk.body);
+  const oaAfterDel = await api("/api/portal/oa", { cookies: setPw.cookie });
+  check("generation history now has 1 entry", (oaAfterDel.body?.data?.generations ?? []).length === 1);
+  const goneDoc = await fetch(`${BASE}/api/portal/documents/${oldest.document_id}/download`, { headers: { Cookie: setPw.cookie } });
+  check("the deleted draft's PDF is gone", goneDoc.status === 404, { status: goneDoc.status });
 
   // 13c-2. Sole owner on the S corporation form (option defaults applied server-side)
   const genS = await api("/api/portal/oa/generate", {

@@ -27,6 +27,24 @@ export async function putFile(filename: string, data: ArrayBuffer, contentType: 
   return { storageKey: `dev:${key}`, sizeBytes: data.byteLength };
 }
 
+/** Best-effort removal. A stranded blob is untidy; a failed delete that blocks
+ *  the client from tidying their own list is worse, so this never throws. */
+export async function deleteFile(storageKey: string): Promise<void> {
+  try {
+    if (storageKey.startsWith("dev:")) {
+      const { unlink } = await import("node:fs/promises");
+      const { fileURLToPath } = await import("node:url");
+      const dir = fileURLToPath(new URL("../.dev-data/blob/", import.meta.url));
+      await unlink(dir + storageKey.slice(4));
+      return;
+    }
+    const { del } = await import("@vercel/blob");
+    await del(storageKey);
+  } catch (e) {
+    console.error("[storage] delete failed:", e);
+  }
+}
+
 export async function readFileStream(storageKey: string): Promise<ReadableStream | Buffer> {
   if (storageKey.startsWith("dev:")) {
     const { readFile } = await import("node:fs/promises");

@@ -28,7 +28,7 @@ import { hasProtectedSeriesPhrase } from "../src/components/forms/florida-llc/va
 import { assembleOa, OA_TEMPLATE_VERSION, type OaInputs } from "./oa";
 import { renderMarkdownPdf, stampExistingPdf } from "./pdf-render";
 import { createSession, getSession, destroySession, rateLimit, clientIp } from "./auth";
-import { putFile, readFileStream } from "./storage";
+import { deleteFile, putFile, readFileStream } from "./storage";
 import {
   sendMail,
   welcomeEmail,
@@ -1030,6 +1030,7 @@ app.post("/portal/oa/generate", async (c) => {
     includeShotgun: a.includeShotgun ?? (isSCorp && !multiOwner ? false : undefined),
     borrowingThreshold: a.borrowingThreshold ?? (isSCorp && !multiOwner ? 25000 : undefined),
     contributionToCompany: a.contributionToCompany,
+    generationNumber: priorGens.length + 1,
   };
 
   const clients = await db.query<{ email: string; name: string }>("SELECT email, name FROM clients WHERE id = $1", [
@@ -1070,6 +1071,37 @@ app.post("/portal/oa/generate", async (c) => {
     [session.clientId, doc[0].id, OA_TEMPLATE_VERSION, inputs.amendedRestated, JSON.stringify(inputs)],
   );
   return c.json({ data: { generationId: gen[0].id, documentId: doc[0].id, title } });
+});
+
+/** A client may remove a draft they generated. Documents WE posted — the
+ *  formation package, EIN letter, legal mail, the 2553 package — are not
+ *  reachable here, which keeps the download-only rule intact. */
+app.delete("/portal/oa/generations/:id", async (c) => {
+  const session = await getSession(c);
+  if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const db = await getDb();
+  const rows = await db.query<{ id: string; client_id: string; document_id: string | null }>(
+    "SELECT id, client_id, document_id FROM oa_generations WHERE id = $1",
+    [c.req.param("id")],
+  );
+  if (rows.length === 0 || rows[0].client_id !== session.clientId) {
+    return c.json(err("Not found", "NOT_FOUND"), 404);
+  }
+  if (rows[0].document_id) {
+    const docs = await db.query<{ storage_key: string }>(
+      "SELECT storage_key FROM documents WHERE id = $1 AND client_id = $2",
+      [rows[0].document_id, session.clientId],
+    );
+    await db.query("DELETE FROM oa_generations WHERE id = $1", [rows[0].id]);
+    await db.query("DELETE FROM documents WHERE id = $1 AND client_id = $2", [
+      rows[0].document_id,
+      session.clientId,
+    ]);
+    if (docs[0]?.storage_key) await deleteFile(docs[0].storage_key);
+  } else {
+    await db.query("DELETE FROM oa_generations WHERE id = $1", [rows[0].id]);
+  }
+  return c.json({ data: { ok: true } });
 });
 
 /* ----------------------------- library docs ---------------------------- */

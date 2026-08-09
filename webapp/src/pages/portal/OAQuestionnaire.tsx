@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Download, FileText, Heart, HelpCircle, History, X } from "lucide-react";
+import { ArrowLeft, Download, FileText, Heart, HelpCircle, History, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -203,6 +203,16 @@ export default function OAQuestionnaire() {
       setError("");
     },
     onError: (e) => setError(e instanceof ApiError ? e.message : "Something went wrong."),
+  });
+
+  const deleteGeneration = useMutation({
+    mutationFn: (id: string) => api.delete(`/api/portal/oa/generations/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["portal-oa"] });
+      queryClient.invalidateQueries({ queryKey: ["portal-documents"] });
+      setError("");
+    },
+    onError: (e) => setError(e instanceof ApiError ? e.message : "Could not delete that draft."),
   });
 
   const patch = (p: Partial<Answers>) => {
@@ -833,24 +843,58 @@ export default function OAQuestionnaire() {
                   <h3 className="font-display text-base font-semibold">Generation history</h3>
                 </div>
                 <ul className="mt-3 divide-y divide-border">
-                  {data.generations.map((g) => (
-                    <li key={g.id} className="flex items-center justify-between gap-3 py-2.5">
-                      <div className="text-sm">
-                        {g.amended_restated ? "Amended & Restated" : "Operating Agreement"}
-                        <span className="ml-2 text-xs text-muted-foreground">
-                          {new Date(g.created_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })} · {g.template_version}
-                        </span>
-                      </div>
-                      {g.document_id ? (
-                        <Button asChild variant="outline" size="sm" className="rounded-full">
-                          <a href={`/api/portal/documents/${g.document_id}/download`}>
-                            <Download className="mr-1.5 h-3.5 w-3.5" />
-                            Download
-                          </a>
-                        </Button>
-                      ) : null}
-                    </li>
-                  ))}
+                  {data.generations.map((g, gi) => {
+                    // The API returns newest first, so index 0 is the live one
+                    // and the sequence number counts up from the oldest.
+                    const isCurrent = gi === 0;
+                    const seq = data.generations.length - gi;
+                    return (
+                      <li key={g.id} className="flex flex-col gap-2 py-2.5 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="min-w-0 text-sm">
+                          <span className={isCurrent ? "font-medium" : "text-muted-foreground"}>
+                            {g.amended_restated ? "Amended & Restated" : "Operating Agreement"} (No. {seq})
+                          </span>
+                          <span
+                            className={`ml-2 rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                              isCurrent ? "bg-trust/10 text-trust" : "bg-secondary text-muted-foreground"
+                            }`}
+                          >
+                            {isCurrent ? "Current" : "Superseded"}
+                          </span>
+                          <span className="ml-2 text-xs text-muted-foreground">
+                            {new Date(g.created_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })} · {g.template_version}
+                          </span>
+                        </div>
+                        <div className="flex shrink-0 items-center gap-2">
+                          {g.document_id ? (
+                            <Button asChild variant="outline" size="sm" className="rounded-full">
+                              <a href={`/api/portal/documents/${g.document_id}/download`}>
+                                <Download className="mr-1.5 h-3.5 w-3.5" />
+                                Download
+                              </a>
+                            </Button>
+                          ) : null}
+                          <button
+                            type="button"
+                            aria-label="Delete this draft"
+                            title="Delete this draft"
+                            className="rounded-full p-2 text-muted-foreground hover:text-destructive disabled:opacity-40"
+                            disabled={deleteGeneration.isPending}
+                            onClick={() => {
+                              const ok = window.confirm(
+                                isCurrent
+                                  ? "Delete your most recent agreement? The PDF is removed from your documents. Anything we posted for you is unaffected."
+                                  : "Delete this superseded draft? The PDF is removed from your documents.",
+                              );
+                              if (ok) deleteGeneration.mutate(g.id);
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             ) : null}
