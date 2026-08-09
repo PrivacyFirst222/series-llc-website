@@ -25,6 +25,7 @@ import {
 import { createCheckout, verifyWebhookSignature } from "./square";
 import { hashPassword, verifyPassword, newToken, hashToken, encryptSecret, decryptSecret } from "./crypto";
 import { hasProtectedSeriesPhrase } from "../src/components/forms/florida-llc/validation";
+import { stampEastern, stampForFilename } from "./datetime";
 import { assembleOa, OA_TEMPLATE_VERSION, type OaInputs } from "./oa";
 import { renderMarkdownPdf, stampExistingPdf } from "./pdf-render";
 import { createSession, getSession, destroySession, rateLimit, clientIp } from "./auth";
@@ -756,7 +757,8 @@ app.get("/portal/oa", async (c) => {
   const saved = await db.query<{ answers: unknown }>("SELECT answers FROM oa_profiles WHERE client_id = $1", [session.clientId]);
   const gens = await db.query(
     `SELECT id, document_id, template_version, amended_restated, created_at,
-            COALESCE(generation_number, 0) AS generation_number
+            COALESCE(generation_number, 0) AS generation_number,
+            inputs->>'version' AS version
        FROM oa_generations WHERE client_id = $1 ORDER BY created_at DESC`,
     [session.clientId],
   );
@@ -1050,12 +1052,20 @@ app.post("/portal/oa/generate", async (c) => {
 
   let pdf: Uint8Array;
   let title: string;
+  // One instant for the footer, the filename, and the portal row, so the three
+  // can never disagree by a minute.
+  const generatedOn = new Date();
   try {
     const assembled = assembleOa(inputs);
     title = assembled.title;
     pdf = await renderMarkdownPdf({
       markdown: assembled.markdown,
-      watermark: { name: client?.name || members[0].name, email: client?.email ?? "", note: OA_TEMPLATE_VERSION },
+      watermark: {
+        name: client?.name || members[0].name,
+        email: client?.email ?? "",
+        note: OA_TEMPLATE_VERSION,
+        generatedAt: stampEastern(generatedOn),
+      },
       title,
     });
   } catch (e) {
@@ -1069,7 +1079,11 @@ app.post("/portal/oa/generate", async (c) => {
     [session.clientId, JSON.stringify(a)],
   );
   const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength) as ArrayBuffer;
-  const stored = await putFile(`${title.replace(/[^\w-]+/g, "_")}.pdf`, buf, "application/pdf");
+  const stored = await putFile(
+    `${title.replace(/[^\w-]+/g, "_")}_${stampForFilename(generatedOn)}.pdf`,
+    buf,
+    "application/pdf",
+  );
   const doc = await db.query<{ id: string }>(
     `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)
      VALUES ($1, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,

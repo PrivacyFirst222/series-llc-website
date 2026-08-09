@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { api, ApiError } from "@/lib/api";
+import { formatDateTime, taxationLabel } from "@/lib/datetime";
 import { LEARN_MORE } from "@/content/oaLearnMore";
 import { OwnershipEditor, type OwnershipRow } from "./OwnershipEditor";
 import { shareValue, type OwnershipMode, type OwnershipShare } from "@/lib/ownership";
@@ -31,6 +32,7 @@ interface OaGeneration {
   template_version: string;
   amended_restated: boolean;
   generation_number: number;
+  version: string | null;
   created_at: string;
 }
 
@@ -854,8 +856,11 @@ export default function OAQuestionnaire() {
                           >
                             {isCurrent ? "Current" : "Superseded"}
                           </span>
+                          <span className="ml-2 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
+                            {taxationLabel(g.version ?? "")}
+                          </span>
                           <span className="ml-2 text-xs text-muted-foreground">
-                            {new Date(g.created_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })} · {g.template_version}
+                            {formatDateTime(g.created_at)} · {g.template_version}
                           </span>
                         </div>
                         <div className="flex shrink-0 items-center gap-2">

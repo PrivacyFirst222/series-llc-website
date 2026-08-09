@@ -18,6 +18,9 @@ export interface WatermarkInfo {
   name: string;
   email: string;
   note?: string;
+  /** "August 9, 2026 at 4:12 PM ET" — printed on every page, so a paper copy
+   *  identifies which generation it is without the portal. */
+  generatedAt?: string;
 }
 
 interface Seg {
@@ -344,12 +347,19 @@ function stampFooters(doc: PDFDocument, font: PDFFont, wm: WatermarkInfo): void 
   const pages = doc.getPages();
   const total = pages.length;
   const text = sanitize(`Licensed to ${wm.name} (${wm.email}) - MyFloridaSeriesLLC${wm.note ? " - " + wm.note : ""}`);
+  const stamp = wm.generatedAt ? sanitize(`Generated ${wm.generatedAt}`) : "";
+  const grey = rgb(0.55, 0.57, 0.6);
   pages.forEach((p, i) => {
     const { width } = p.getSize();
-    p.drawText(text, { x: MARGIN, y: FOOTER_Y, size: 7.5, font, color: rgb(0.55, 0.57, 0.6) });
+    // The generated stamp sits on its own line above the license line so it
+    // can never collide with the page number on the right.
+    if (stamp) {
+      p.drawText(stamp, { x: MARGIN, y: FOOTER_Y + 10, size: 7.5, font, color: grey });
+    }
+    p.drawText(text, { x: MARGIN, y: FOOTER_Y, size: 7.5, font, color: grey });
     const pn = `Page ${i + 1} of ${total}`;
     const w = font.widthOfTextAtSize(pn, 7.5);
-    p.drawText(pn, { x: width - MARGIN - w, y: FOOTER_Y, size: 7.5, font, color: rgb(0.55, 0.57, 0.6) });
+    p.drawText(pn, { x: width - MARGIN - w, y: FOOTER_Y, size: 7.5, font, color: grey });
   });
 }
 

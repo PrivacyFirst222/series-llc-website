@@ -334,12 +334,20 @@ if (mint.status === 200) {
   check("OA answers save", saveAns.status === 200);
   const gen1 = await api("/api/portal/oa/generate", { method: "POST", cookies: setPw.cookie, body: JSON.stringify(oaAnswers) });
   check("OA generates", gen1.status === 200, gen1.body);
-  check("OA titled as first agreement", gen1.body?.data?.title?.startsWith("Operating Agreement"), gen1.body?.data);
+  check(
+    "OA title carries the taxation designation",
+    /^(Single-Member|Partnership|S Corporation) Operating Agreement/.test(gen1.body?.data?.title ?? ""),
+    gen1.body?.data,
+  );
   const gen2 = await api("/api/portal/oa/generate", {
     method: "POST", cookies: setPw.cookie,
     body: JSON.stringify({ ...oaAnswers, firstOrAmended: "amended" }),
   });
   check("OA regenerates as Amended & Restated", gen2.status === 200 && gen2.body?.data?.title?.startsWith("Amended and Restated"), gen2.body?.data);
+  check(
+    "generation records carry the taxation version",
+    typeof (await api("/api/portal/oa", { cookies: setPw.cookie })).body?.data?.generations?.[0]?.version === "string",
+  );
   const oaAfter = await api("/api/portal/oa", { cookies: setPw.cookie });
   check("generation history has 2 entries", (oaAfter.body?.data?.generations ?? []).length === 2);
   check("generations are numbered in the title", /\(No\. \d\)/.test(gen2.body?.data?.title ?? ""), gen2.body?.data?.title);

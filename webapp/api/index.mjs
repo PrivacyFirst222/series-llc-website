@@ -102729,12 +102729,17 @@ function stampFooters(doc, font, wm) {
   const pages = doc.getPages();
   const total = pages.length;
   const text = sanitize(`Licensed to ${wm.name} (${wm.email}) - MyFloridaSeriesLLC${wm.note ? " - " + wm.note : ""}`);
+  const stamp = wm.generatedAt ? sanitize(`Generated ${wm.generatedAt}`) : "";
+  const grey = rgb(0.55, 0.57, 0.6);
   pages.forEach((p2, i) => {
     const { width } = p2.getSize();
-    p2.drawText(text, { x: MARGIN, y: FOOTER_Y, size: 7.5, font, color: rgb(0.55, 0.57, 0.6) });
+    if (stamp) {
+      p2.drawText(stamp, { x: MARGIN, y: FOOTER_Y + 10, size: 7.5, font, color: grey });
+    }
+    p2.drawText(text, { x: MARGIN, y: FOOTER_Y, size: 7.5, font, color: grey });
     const pn = `Page ${i + 1} of ${total}`;
     const w = font.widthOfTextAtSize(pn, 7.5);
-    p2.drawText(pn, { x: width - MARGIN - w, y: FOOTER_Y, size: 7.5, font, color: rgb(0.55, 0.57, 0.6) });
+    p2.drawText(pn, { x: width - MARGIN - w, y: FOOTER_Y, size: 7.5, font, color: grey });
   });
 }
 function setMeta(doc, title, wm) {
@@ -103106,6 +103111,42 @@ function verifyWebhookSignature(opts) {
     opts.notificationUrl + opts.rawBody
   );
   return expected === opts.signatureHeader;
+}
+
+// server/datetime.ts
+var ZONE = "America/New_York";
+function stampEastern(d2 = /* @__PURE__ */ new Date()) {
+  const date = d2.toLocaleDateString("en-US", {
+    timeZone: ZONE,
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  });
+  const time = d2.toLocaleTimeString("en-US", {
+    timeZone: ZONE,
+    hour: "numeric",
+    minute: "2-digit"
+  });
+  return `${date} at ${time} ET`;
+}
+function stampForFilename(d2 = /* @__PURE__ */ new Date()) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  }).formatToParts(d2);
+  const get2 = (t) => parts.find((p2) => p2.type === t)?.value ?? "";
+  const hour = get2("hour") === "24" ? "00" : get2("hour");
+  return `${get2("year")}-${get2("month")}-${get2("day")}-${hour}${get2("minute")}ET`;
+}
+function taxationLabel(version) {
+  if (version === "s" || version === "member-s") return "S Corporation";
+  if (version === "single") return "Single-Member";
+  return "Partnership";
 }
 
 // server/oa.ts
@@ -105575,9 +105616,10 @@ ${sigLines}
     throw new Error("OA assembly leaked the internal draft footer into the client document");
   }
   const seq = inputs.generationNumber ? ` (No. ${inputs.generationNumber})` : "";
+  const tax = taxationLabel(inputs.version);
   return {
     markdown: s,
-    title: `${inputs.amendedRestated ? "Amended and Restated " : ""}Operating Agreement${seq} \u2014 ${co}`
+    title: `${inputs.amendedRestated ? "Amended and Restated " : ""}${tax} Operating Agreement${seq} \u2014 ${co}`
   };
 }
 function signatureBlock(holders, suffix) {
@@ -106639,7 +106681,8 @@ app.get("/portal/oa", async (c) => {
   const saved = await db2.query("SELECT answers FROM oa_profiles WHERE client_id = $1", [session.clientId]);
   const gens = await db2.query(
     `SELECT id, document_id, template_version, amended_restated, created_at,
-            COALESCE(generation_number, 0) AS generation_number
+            COALESCE(generation_number, 0) AS generation_number,
+            inputs->>'version' AS version
        FROM oa_generations WHERE client_id = $1 ORDER BY created_at DESC`,
     [session.clientId]
   );
@@ -106874,12 +106917,18 @@ app.post("/portal/oa/generate", async (c) => {
   const client = clients[0];
   let pdf;
   let title;
+  const generatedOn = /* @__PURE__ */ new Date();
   try {
     const assembled = assembleOa(inputs);
     title = assembled.title;
     pdf = await renderMarkdownPdf({
       markdown: assembled.markdown,
-      watermark: { name: client?.name || members[0].name, email: client?.email ?? "", note: OA_TEMPLATE_VERSION },
+      watermark: {
+        name: client?.name || members[0].name,
+        email: client?.email ?? "",
+        note: OA_TEMPLATE_VERSION,
+        generatedAt: stampEastern(generatedOn)
+      },
       title
     });
   } catch (e) {
@@ -106892,7 +106941,11 @@ app.post("/portal/oa/generate", async (c) => {
     [session.clientId, JSON.stringify(a2)]
   );
   const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength);
-  const stored = await putFile(`${title.replace(/[^\w-]+/g, "_")}.pdf`, buf, "application/pdf");
+  const stored = await putFile(
+    `${title.replace(/[^\w-]+/g, "_")}_${stampForFilename(generatedOn)}.pdf`,
+    buf,
+    "application/pdf"
+  );
   const doc = await db2.query(
     `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)
      VALUES ($1, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,

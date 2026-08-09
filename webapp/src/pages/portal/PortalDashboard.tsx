@@ -15,6 +15,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { api } from "@/lib/api";
+import { formatDate, formatDateTime, taxationLabel } from "@/lib/datetime";
 import { ServicesCard } from "./ServicesCard";
 import { AccountCard } from "./AccountCard";
 
@@ -33,15 +34,15 @@ interface Me {
   raCancellationRequestedAt: string | null;
 }
 
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
-}
-
 /** Agreements the client generated themselves, keyed by document, so the list
  *  they actually look at is where they manage them. */
 interface OwnAgreement {
   generationId: string;
   isCurrent: boolean;
+  /** "S Corporation" / "Partnership" / "Single-Member". Read from the
+   *  generation record, so agreements made before the designation was part of
+   *  the title are labeled too. */
+  taxation: string;
 }
 
 function DocList({
@@ -65,21 +66,32 @@ function DocList({
       {docs.map((d) => {
         const mine = own?.get(d.id);
         return (
-          <li key={d.id} className="flex items-center justify-between gap-3 px-5 py-4">
+          <li
+            key={d.id}
+            className="flex flex-col items-start gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
+          >
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="truncate text-sm font-medium">{d.title}</span>
+                {/* Wrap rather than truncate: the agreement number and company
+                    name sit at the end of the title and are what tell two
+                    agreements apart. */}
+                <span className="text-sm font-medium">{d.title}</span>
                 {mine ? (
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
-                      mine.isCurrent ? "bg-trust/10 text-trust" : "bg-secondary text-muted-foreground"
-                    }`}
-                  >
-                    {mine.isCurrent ? "Current" : "Superseded"}
-                  </span>
+                  <>
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                        mine.isCurrent ? "bg-trust/10 text-trust" : "bg-secondary text-muted-foreground"
+                      }`}
+                    >
+                      {mine.isCurrent ? "Current" : "Superseded"}
+                    </span>
+                    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
+                      {mine.taxation}
+                    </span>
+                  </>
                 ) : null}
               </div>
-              <div className="text-xs text-muted-foreground">{formatDate(d.created_at)}</div>
+              <div className="text-xs text-muted-foreground">{formatDateTime(d.created_at)}</div>
             </div>
             <div className="flex shrink-0 items-center gap-2">
               <Button asChild variant="outline" size="sm" className="rounded-full">
@@ -317,7 +329,9 @@ export default function PortalDashboard() {
   const oaGenerations = useQuery({
     queryKey: ["portal-oa"],
     queryFn: () =>
-      api.get<{ generations: { id: string; document_id: string | null }[] }>("/api/portal/oa"),
+      api.get<{ generations: { id: string; document_id: string | null; version: string | null }[] }>(
+        "/api/portal/oa",
+      ),
     enabled: meQuery.isSuccess,
     retry: false,
   });
@@ -337,7 +351,11 @@ export default function PortalDashboard() {
     const map = new Map<string, OwnAgreement>();
     gens.forEach((g, i) => {
       if (g.document_id) {
-        map.set(g.document_id, { generationId: g.id, isCurrent: i === 0 });
+        map.set(g.document_id, {
+          generationId: g.id,
+          isCurrent: i === 0,
+          taxation: taxationLabel(g.version ?? ""),
+        });
       }
     });
     return map;

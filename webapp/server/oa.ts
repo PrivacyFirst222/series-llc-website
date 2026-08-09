@@ -10,6 +10,7 @@ import multiTemplateRaw from "./templates-oa-multi.md";
 import sCorpTemplateRaw from "./templates-oa-s.md";
 import memberTemplateRaw from "./templates-oa-member.md";
 import memberSCorpTemplateRaw from "./templates-oa-member-s.md";
+import { taxationLabel } from "./datetime";
 
 /** esbuild bundles .md as text; Bun without the bunfig loader resolves the
  *  import to a file path instead — read it from disk in that case. */
@@ -332,9 +333,13 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
   }
 
   const seq = inputs.generationNumber ? ` (No. ${inputs.generationNumber})` : "";
+  // The taxation designation leads the name: a client holding three PDFs should
+  // be able to tell the S corporation form from the partnership form without
+  // opening any of them.
+  const tax = taxationLabel(inputs.version);
   return {
     markdown: s,
-    title: `${inputs.amendedRestated ? "Amended and Restated " : ""}Operating Agreement${seq} — ${co}`,
+    title: `${inputs.amendedRestated ? "Amended and Restated " : ""}${tax} Operating Agreement${seq} — ${co}`,
   };
 }
 
