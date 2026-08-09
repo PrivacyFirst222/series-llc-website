@@ -636,5 +636,112 @@ if (mint.status === 200) {
   check("member-managed S corp agreement generates", mmSGen.status === 200, mmSGen.body);
 }
 
+// 17. Account settings: change password, change email (verified two-step)
+{
+  const acctEmail = `e2e-acct-${Math.random().toString(36).slice(2, 8)}@example.com`;
+  const newEmail = `e2e-acct-new-${Math.random().toString(36).slice(2, 8)}@example.com`;
+  const acctData = {
+    ...formData,
+    desiredLlcName: "E2E Account Settings",
+    correspondentEmail: acctEmail, confirmCorrespondentEmail: acctEmail,
+    series: [{ id: "s1", name: "E2E Account Settings, LLC, PS A" }],
+    orderEin: false, orderSElection: false,
+  };
+  const aOrder = await api("/api/orders", { method: "POST", body: JSON.stringify(acctData) });
+  check("account-test order accepted", aOrder.status === 200, aOrder.body);
+  const aId = aOrder.body?.data?.orderId as string;
+  let aPay = await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: aId }) });
+  if (aPay.status === 404) {
+    const adm = await api("/api/admin/login", { method: "POST", body: JSON.stringify({ password: "dev-admin" }) });
+    const full = await api(`/api/admin/orders/${aId}`, { cookies: adm.cookie });
+    aPay = await api("/api/square/webhook", {
+      method: "POST",
+      body: JSON.stringify({
+        event_id: `e2e-acct-${aId}`, type: "payment.updated",
+        data: { object: { payment: { id: `e2e-pay-acct-${aId.slice(0, 8)}`, status: "COMPLETED", order_id: full.body?.data?.square_order_id } } },
+      }),
+    });
+  }
+  check("account-test order paid", aPay.status === 200);
+  const aMint = await api("/api/dev/mint-reset-token", { method: "POST", body: JSON.stringify({ email: acctEmail }) });
+  const aPw = await api("/api/auth/set-password", {
+    method: "POST", body: JSON.stringify({ token: aMint.body?.data?.token, password: "e2e-acct-pass-1" }),
+  });
+  check("account-test client signs in", aPw.status === 200);
+
+  // --- change password ---
+  const wrongCur = await api("/api/portal/account/password", {
+    method: "POST", cookies: aPw.cookie,
+    body: JSON.stringify({ currentPassword: "not-the-password", newPassword: "e2e-acct-pass-2" }),
+  });
+  check("password change with wrong current password rejected", wrongCur.status === 401, wrongCur.body);
+  const shortPw = await api("/api/portal/account/password", {
+    method: "POST", cookies: aPw.cookie,
+    body: JSON.stringify({ currentPassword: "e2e-acct-pass-1", newPassword: "short" }),
+  });
+  check("password change with short new password rejected", shortPw.status === 400);
+  const okPw = await api("/api/portal/account/password", {
+    method: "POST", cookies: aPw.cookie,
+    body: JSON.stringify({ currentPassword: "e2e-acct-pass-1", newPassword: "e2e-acct-pass-2" }),
+  });
+  check("password changed", okPw.status === 200, okPw.body);
+  const oldLogin = await api("/api/auth/login", { method: "POST", body: JSON.stringify({ email: acctEmail, password: "e2e-acct-pass-1" }) });
+  check("old password no longer works", oldLogin.status === 401);
+  const newLogin = await api("/api/auth/login", { method: "POST", body: JSON.stringify({ email: acctEmail, password: "e2e-acct-pass-2" }) });
+  check("new password works", newLogin.status === 200);
+  const stillMe = await api("/api/auth/me", { cookies: aPw.cookie });
+  check("current session survives a password change", stillMe.status === 200, stillMe.body);
+
+  // --- change email ---
+  const badPwEmail = await api("/api/portal/account/email", {
+    method: "POST", cookies: newLogin.cookie,
+    body: JSON.stringify({ newEmail, currentPassword: "wrong" }),
+  });
+  check("email change with wrong password rejected", badPwEmail.status === 401);
+  const takenEmail = await api("/api/portal/account/email", {
+    method: "POST", cookies: newLogin.cookie,
+    body: JSON.stringify({ newEmail: testEmail, currentPassword: "e2e-acct-pass-2" }),
+  });
+  check("email change to an in-use address rejected", takenEmail.status === 400 && takenEmail.body?.error?.code === "EMAIL_TAKEN", takenEmail.body);
+  const reqEmail = await api("/api/portal/account/email", {
+    method: "POST", cookies: newLogin.cookie,
+    body: JSON.stringify({ newEmail, currentPassword: "e2e-acct-pass-2" }),
+  });
+  check("email change requested", reqEmail.status === 200, reqEmail.body);
+  const pendingMe = await api("/api/auth/me", { cookies: newLogin.cookie });
+  check("pending email shown, address not yet changed",
+    pendingMe.body?.data?.pendingEmail === newEmail && pendingMe.body?.data?.email === acctEmail,
+    pendingMe.body?.data);
+  const stillOld = await api("/api/auth/login", { method: "POST", body: JSON.stringify({ email: acctEmail, password: "e2e-acct-pass-2" }) });
+  check("old address still signs in before confirmation", stillOld.status === 200);
+  const badToken = await api("/api/auth/verify-email", { method: "POST", body: JSON.stringify({ token: "x".repeat(40) }) });
+  check("bogus verification token rejected", badToken.status === 400);
+  const vTok = await api("/api/dev/pending-email-token", { method: "POST", body: JSON.stringify({ email: acctEmail }) });
+  if (vTok.status === 200) {
+    const verified = await api("/api/auth/verify-email", { method: "POST", body: JSON.stringify({ token: vTok.body.data.token }) });
+    check("email change confirmed", verified.status === 200 && verified.body?.data?.email === newEmail, verified.body);
+    const newAddrLogin = await api("/api/auth/login", { method: "POST", body: JSON.stringify({ email: newEmail, password: "e2e-acct-pass-2" }) });
+    check("new address signs in", newAddrLogin.status === 200);
+    const oldAddrLogin = await api("/api/auth/login", { method: "POST", body: JSON.stringify({ email: acctEmail, password: "e2e-acct-pass-2" }) });
+    check("old address no longer signs in", oldAddrLogin.status === 401);
+    const reuse = await api("/api/auth/verify-email", { method: "POST", body: JSON.stringify({ token: vTok.body.data.token }) });
+    check("verification token cannot be reused", reuse.status === 400);
+  } else {
+    check("dev pending-email-token available (dev only)", false);
+  }
+
+  // --- admin override ---
+  const adminAcct = await api("/api/admin/login", { method: "POST", body: JSON.stringify({ password: "dev-admin" }) });
+  const allClients = await api("/api/admin/clients", { cookies: adminAcct.cookie });
+  const target = (allClients.body?.data ?? []).find((cl: { email: string }) => cl.email === newEmail);
+  const overrideEmail = `e2e-acct-admin-${Math.random().toString(36).slice(2, 8)}@example.com`;
+  const override = await api(`/api/admin/clients/${target?.id}/email`, {
+    method: "POST", cookies: adminAcct.cookie, body: JSON.stringify({ newEmail: overrideEmail }),
+  });
+  check("admin can change a client's email", override.status === 200, override.body);
+  const afterOverride = await api("/api/auth/login", { method: "POST", body: JSON.stringify({ email: overrideEmail, password: "e2e-acct-pass-2" }) });
+  check("client signs in with the admin-set address", afterOverride.status === 200);
+}
+
 console.log(failures === 0 ? "\nALL PASS" : `\n${failures} FAILURES`);
 process.exit(failures === 0 ? 0 : 1);

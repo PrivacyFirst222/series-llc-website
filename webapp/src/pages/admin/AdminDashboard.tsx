@@ -9,12 +9,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/use-toast";
-import { api } from "@/lib/api";
+import { api, ApiError } from "@/lib/api";
 import { ServiceOrdersSection } from "./ServiceOrdersSection";
 import { LibrarySection } from "./LibrarySection";
 
@@ -152,6 +154,66 @@ function UploadDialog({ client }: { client: AdminClient }) {
   );
 }
 
+/** Support override: a client who can reach neither their old nor new address
+ *  cannot fix this themselves. Both addresses are notified by the server. */
+function ChangeEmailDialog({ client }: { client: AdminClient }) {
+  const queryClient = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [error, setError] = useState("");
+  const change = useMutation({
+    mutationFn: (newEmail: string) =>
+      api.post(`/api/admin/clients/${client.id}/email`, { newEmail }),
+    onSuccess: () => {
+      setOpen(false);
+      setError("");
+      queryClient.invalidateQueries({ queryKey: ["admin-clients"] });
+    },
+    onError: (e) => setError(e instanceof ApiError ? e.message : "Something went wrong."),
+  });
+  return (
+    <Dialog open={open} onOpenChange={(v) => { setOpen(v); setError(""); }}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm" className="rounded-full">
+          Change email
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Change client email</DialogTitle>
+          <DialogDescription>
+            Sets the sign-in address for {client.name || client.email} without a confirmation
+            link. Use this only when the client cannot reach either address. Both the old and new
+            addresses are notified.
+          </DialogDescription>
+        </DialogHeader>
+        <form
+          className="space-y-3"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const fd = new FormData(e.currentTarget);
+            change.mutate(String(fd.get("newEmail") ?? ""));
+          }}
+        >
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium">Current address</label>
+            <p className="text-sm text-muted-foreground">{client.email}</p>
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium">New address</label>
+            <Input name="newEmail" type="email" autoComplete="off" />
+          </div>
+          {error ? <p className="text-xs text-destructive">{error}</p> : null}
+          <DialogFooter>
+            <Button type="submit" disabled={change.isPending} className="rounded-full">
+              {change.isPending ? "Changing…" : "Change email"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export default function AdminDashboard() {
   const navigate = useNavigate();
 
@@ -283,7 +345,10 @@ export default function AdminDashboard() {
                   <td className="px-4 py-3">{cl.document_count}</td>
                   <td className="px-4 py-3 text-muted-foreground">{day(cl.created_at)}</td>
                   <td className="px-4 py-3 text-right">
-                    <UploadDialog client={cl} />
+                    <div className="flex justify-end gap-2">
+                      <ChangeEmailDialog client={cl} />
+                      <UploadDialog client={cl} />
+                    </div>
                   </td>
                 </tr>
               ))

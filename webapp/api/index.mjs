@@ -76573,6 +76573,9 @@ CREATE TABLE IF NOT EXISTS webhook_events (
   received_at timestamptz NOT NULL DEFAULT now()
 );
 ALTER TABLE clients ADD COLUMN IF NOT EXISTS ra_cancellation_requested_at timestamptz;
+-- Email changes are verified before they take effect: the requested address
+-- parks here until the client clicks the link sent to it.
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS pending_email text;
 CREATE TABLE IF NOT EXISTS oa_profiles (
   client_id uuid PRIMARY KEY REFERENCES clients(id) ON DELETE CASCADE,
   answers jsonb NOT NULL DEFAULT '{}'::jsonb,
@@ -105683,12 +105686,13 @@ async function getSession(c) {
   const token = getCookie(c, SESSION_COOKIE);
   if (!token) return null;
   const db2 = await getDb();
+  const tokenHash = hashToken(token);
   const rows = await db2.query(
     "SELECT client_id, is_admin FROM sessions WHERE token_hash = $1 AND expires_at > now()",
-    [hashToken(token)]
+    [tokenHash]
   );
   if (rows.length === 0) return null;
-  return { clientId: rows[0].client_id, isAdmin: rows[0].is_admin };
+  return { clientId: rows[0].client_id, isAdmin: rows[0].is_admin, tokenHash };
 }
 async function destroySession(c) {
   const token = getCookie(c, SESSION_COOKIE);
@@ -105801,6 +105805,53 @@ function resetEmail(resetUrl) {
       <p>Someone requested a password reset for your MyFloridaSeriesLLC portal account.
       If this was you, use the button below within 1 hour. If not, you can ignore this email.</p>
       <p><a href="${resetUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Choose a new password</a></p>
+    `)
+  };
+}
+function passwordChangedEmail(portalUrl) {
+  return {
+    subject: "Your portal password was changed",
+    html: wrap(`
+      <p>The password for your MyFloridaSeriesLLC portal account was just changed, and every
+      other signed-in device was signed out.</p>
+      <p><strong>If you did not do this,</strong> use "Forgot your password" on the sign-in page
+      to regain control of the account, and email support@myfloridaseriesllc.com immediately.</p>
+      <p><a href="${portalUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Open your portal</a></p>
+    `)
+  };
+}
+function verifyNewEmail(verifyUrl) {
+  return {
+    subject: "Confirm your new email address",
+    html: wrap(`
+      <p>This address was given as the new email for a MyFloridaSeriesLLC portal account.
+      Confirm it below within 1 hour and it becomes the address you sign in with, and where we
+      send your documents and notices.</p>
+      <p><a href="${verifyUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Confirm this address</a></p>
+      <p>Until you confirm, nothing changes. If you were not expecting this, ignore this email.</p>
+    `)
+  };
+}
+function emailChangeRequestedEmail(maskedNew) {
+  return {
+    subject: "A change to your portal email was requested",
+    html: wrap(`
+      <p>Someone requested changing the email address on your MyFloridaSeriesLLC portal account
+      to <strong>${escapeHtml(maskedNew)}</strong>. The change takes effect only if that address
+      is confirmed.</p>
+      <p><strong>If this was not you,</strong> sign in and change your password immediately, then
+      email support@myfloridaseriesllc.com. This address remains on the account until the new one
+      is confirmed.</p>
+    `)
+  };
+}
+function emailChangedEmail(newEmail) {
+  return {
+    subject: "Your portal email address was changed",
+    html: wrap(`
+      <p>The email address on your MyFloridaSeriesLLC portal account is now
+      <strong>${escapeHtml(newEmail)}</strong>. Sign in with that address from now on.</p>
+      <p>If you did not authorize this, email support@myfloridaseriesllc.com immediately.</p>
     `)
   };
 }
@@ -106160,6 +106211,20 @@ if (!env.isProd) {
     );
     return c.json({ data: { token } });
   });
+  app.post("/dev/pending-email-token", async (c) => {
+    const { email } = await c.req.json();
+    const db2 = await getDb();
+    const rows = await db2.query("SELECT id FROM clients WHERE email = $1", [
+      email.toLowerCase()
+    ]);
+    if (rows.length === 0) return c.json(err2("Not found", "NOT_FOUND"), 404);
+    const { token, tokenHash } = newToken();
+    await db2.query(
+      "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at) VALUES ($1, $2, 'verify_email', $3)",
+      [tokenHash, rows[0].id, new Date(Date.now() + 36e5).toISOString()]
+    );
+    return c.json({ data: { token } });
+  });
   app.post("/dev/age-formation", async (c) => {
     const { email, days } = await c.req.json();
     const db2 = await getDb();
@@ -106255,13 +106320,14 @@ app.get("/auth/me", async (c) => {
   if (!session?.clientId) return c.json(err2("Not signed in", "UNAUTHENTICATED"), 401);
   const db2 = await getDb();
   const rows = await db2.query(
-    "SELECT email, name, ra_cancellation_requested_at FROM clients WHERE id = $1",
+    "SELECT email, name, pending_email, ra_cancellation_requested_at FROM clients WHERE id = $1",
     [session.clientId]
   );
   return c.json({
     data: {
       email: rows[0]?.email ?? "",
       name: rows[0]?.name ?? "",
+      pendingEmail: rows[0]?.pending_email ?? null,
       raCancellationRequestedAt: rows[0]?.ra_cancellation_requested_at ?? null
     }
   });
@@ -107037,6 +107103,122 @@ app.post("/portal/services/:id/s-election-details", async (c) => {
   }
   return c.json({ data: { ok: true } });
 });
+function maskEmail(email) {
+  const [local, domain] = email.split("@");
+  return `${local.slice(0, 1)}${"\u2022".repeat(Math.max(2, local.length - 1))}@${domain ?? ""}`;
+}
+app.post("/portal/account/password", async (c) => {
+  const session = await getSession(c);
+  if (!session?.clientId) return c.json(err2("Not signed in", "UNAUTHENTICATED"), 401);
+  if (!rateLimit(`acct:${session.clientId}`, 10, 36e5)) {
+    return c.json(err2("Too many requests. Try again later.", "RATE_LIMITED"), 429);
+  }
+  const body = external_exports.object({
+    currentPassword: external_exports.string().min(1),
+    newPassword: external_exports.string().min(8, "Use at least 8 characters.")
+  }).safeParse(await c.req.json().catch(() => null));
+  if (!body.success) {
+    return c.json(err2(body.error.issues[0]?.message ?? "Invalid request.", "INVALID_INPUT"), 400);
+  }
+  const db2 = await getDb();
+  const rows = await db2.query(
+    "SELECT email, password_hash FROM clients WHERE id = $1",
+    [session.clientId]
+  );
+  const client = rows[0];
+  if (!client?.password_hash || !await verifyPassword(body.data.currentPassword, client.password_hash)) {
+    return c.json(err2("That current password is not correct.", "BAD_CREDENTIALS"), 401);
+  }
+  await db2.query("UPDATE clients SET password_hash = $1 WHERE id = $2", [
+    await hashPassword(body.data.newPassword),
+    session.clientId
+  ]);
+  await db2.query("DELETE FROM sessions WHERE client_id = $1 AND token_hash <> $2", [
+    session.clientId,
+    session.tokenHash
+  ]);
+  const mail = passwordChangedEmail(`${env.PUBLIC_BASE_URL}/portal`);
+  sendMail({ to: client.email, ...mail }).catch(
+    (e) => console.error("[account] password-changed email failed:", e)
+  );
+  return c.json({ data: { ok: true } });
+});
+app.post("/portal/account/email", async (c) => {
+  const session = await getSession(c);
+  if (!session?.clientId) return c.json(err2("Not signed in", "UNAUTHENTICATED"), 401);
+  if (!rateLimit(`acct:${session.clientId}`, 10, 36e5)) {
+    return c.json(err2("Too many requests. Try again later.", "RATE_LIMITED"), 429);
+  }
+  const body = external_exports.object({ newEmail: external_exports.string().email("Enter a valid email address."), currentPassword: external_exports.string().min(1) }).safeParse(await c.req.json().catch(() => null));
+  if (!body.success) {
+    return c.json(err2(body.error.issues[0]?.message ?? "Invalid request.", "INVALID_INPUT"), 400);
+  }
+  const newEmail = body.data.newEmail.toLowerCase();
+  const db2 = await getDb();
+  const rows = await db2.query(
+    "SELECT email, password_hash FROM clients WHERE id = $1",
+    [session.clientId]
+  );
+  const client = rows[0];
+  if (!client?.password_hash || !await verifyPassword(body.data.currentPassword, client.password_hash)) {
+    return c.json(err2("That password is not correct.", "BAD_CREDENTIALS"), 401);
+  }
+  if (newEmail === client.email) {
+    return c.json(err2("That is already the address on your account.", "INVALID_INPUT"), 400);
+  }
+  const taken = await db2.query("SELECT id FROM clients WHERE email = $1", [newEmail]);
+  if (taken.length > 0) {
+    return c.json(err2("That address is already in use on another account.", "EMAIL_TAKEN"), 400);
+  }
+  const { token, tokenHash } = newToken();
+  await db2.query("UPDATE clients SET pending_email = $1 WHERE id = $2", [newEmail, session.clientId]);
+  await db2.query(
+    "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at) VALUES ($1, $2, 'verify_email', $3)",
+    [tokenHash, session.clientId, new Date(Date.now() + 36e5).toISOString()]
+  );
+  const verify = verifyNewEmail(`${env.PUBLIC_BASE_URL}/portal/verify-email?token=${token}`);
+  sendMail({ to: newEmail, ...verify }).catch((e) => console.error("[account] verify email failed:", e));
+  const notice = emailChangeRequestedEmail(maskEmail(newEmail));
+  sendMail({ to: client.email, ...notice }).catch(
+    (e) => console.error("[account] change-requested notice failed:", e)
+  );
+  return c.json({ data: { ok: true, pendingEmail: newEmail } });
+});
+app.post("/auth/verify-email", async (c) => {
+  const body = external_exports.object({ token: external_exports.string().min(10) }).safeParse(await c.req.json().catch(() => null));
+  if (!body.success) return c.json(err2("Invalid request.", "INVALID_INPUT"), 400);
+  const db2 = await getDb();
+  const rows = await db2.query(
+    "SELECT token_hash, client_id FROM auth_tokens WHERE token_hash = $1 AND purpose = 'verify_email' AND expires_at > now() AND used_at IS NULL",
+    [hashToken(body.data.token)]
+  );
+  if (rows.length === 0) {
+    return c.json(err2("This link is invalid or has expired. Request the change again from your portal.", "BAD_TOKEN"), 400);
+  }
+  const clients = await db2.query(
+    "SELECT email, pending_email FROM clients WHERE id = $1",
+    [rows[0].client_id]
+  );
+  const pending = clients[0]?.pending_email;
+  if (!pending) {
+    return c.json(err2("There is no pending email change on this account.", "BAD_STATE"), 400);
+  }
+  const taken = await db2.query("SELECT id FROM clients WHERE email = $1", [pending]);
+  if (taken.length > 0) {
+    await db2.query("UPDATE clients SET pending_email = NULL WHERE id = $1", [rows[0].client_id]);
+    return c.json(err2("That address is now in use on another account.", "EMAIL_TAKEN"), 400);
+  }
+  const previous = clients[0].email;
+  await db2.query("UPDATE clients SET email = $1, pending_email = NULL WHERE id = $2", [
+    pending,
+    rows[0].client_id
+  ]);
+  await db2.query("UPDATE auth_tokens SET used_at = now() WHERE token_hash = $1", [rows[0].token_hash]);
+  const mail = emailChangedEmail(pending);
+  sendMail({ to: pending, ...mail }).catch((e) => console.error("[account] email-changed (new) failed:", e));
+  sendMail({ to: previous, ...mail }).catch((e) => console.error("[account] email-changed (old) failed:", e));
+  return c.json({ data: { ok: true, email: pending } });
+});
 app.post("/portal/registered-agent/cancel", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err2("Not signed in", "UNAUTHENTICATED"), 401);
@@ -107119,6 +107301,36 @@ app.get("/admin/clients", async (c) => {
      GROUP BY cl.id ORDER BY cl.created_at DESC`
   );
   return c.json({ data: rows });
+});
+app.post("/admin/clients/:id/email", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json(err2("Not signed in", "UNAUTHENTICATED"), 401);
+  const body = external_exports.object({ newEmail: external_exports.string().email("Enter a valid email address.") }).safeParse(await c.req.json().catch(() => null));
+  if (!body.success) {
+    return c.json(err2(body.error.issues[0]?.message ?? "Invalid request.", "INVALID_INPUT"), 400);
+  }
+  const newEmail = body.data.newEmail.toLowerCase();
+  const db2 = await getDb();
+  const rows = await db2.query("SELECT email FROM clients WHERE id = $1", [
+    c.req.param("id")
+  ]);
+  if (rows.length === 0) return c.json(err2("Not found", "NOT_FOUND"), 404);
+  const previous = rows[0].email;
+  if (previous === newEmail) {
+    return c.json(err2("That is already the address on this account.", "INVALID_INPUT"), 400);
+  }
+  const taken = await db2.query("SELECT id FROM clients WHERE email = $1", [newEmail]);
+  if (taken.length > 0) {
+    return c.json(err2("That address is already in use on another account.", "EMAIL_TAKEN"), 400);
+  }
+  await db2.query("UPDATE clients SET email = $1, pending_email = NULL WHERE id = $2", [
+    newEmail,
+    c.req.param("id")
+  ]);
+  const mail = emailChangedEmail(newEmail);
+  sendMail({ to: newEmail, ...mail }).catch((e) => console.error("[admin] email-changed (new) failed:", e));
+  sendMail({ to: previous, ...mail }).catch((e) => console.error("[admin] email-changed (old) failed:", e));
+  return c.json({ data: { ok: true, email: newEmail } });
 });
 app.get("/admin/services", async (c) => {
   const admin = await requireAdmin(c);

@@ -91,6 +91,9 @@ CREATE TABLE IF NOT EXISTS webhook_events (
   received_at timestamptz NOT NULL DEFAULT now()
 );
 ALTER TABLE clients ADD COLUMN IF NOT EXISTS ra_cancellation_requested_at timestamptz;
+-- Email changes are verified before they take effect: the requested address
+-- parks here until the client clicks the link sent to it.
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS pending_email text;
 CREATE TABLE IF NOT EXISTS oa_profiles (
   client_id uuid PRIMARY KEY REFERENCES clients(id) ON DELETE CASCADE,
   answers jsonb NOT NULL DEFAULT '{}'::jsonb,

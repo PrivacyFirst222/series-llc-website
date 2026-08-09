@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { api } from "@/lib/api";
 import { ServicesCard } from "./ServicesCard";
+import { AccountCard } from "./AccountCard";
 
 interface PortalDoc {
   id: string;
@@ -27,6 +28,7 @@ interface PortalDoc {
 interface Me {
   email: string;
   name: string;
+  pendingEmail: string | null;
   raCancellationRequestedAt: string | null;
 }
 
@@ -330,6 +332,11 @@ export default function PortalDashboard() {
       <ServicesCard />
 
       <RegisteredAgentCard me={meQuery.data ?? null} />
+
+      <AccountCard
+        email={meQuery.data?.email ?? ""}
+        pendingEmail={meQuery.data?.pendingEmail ?? null}
+      />
 
       <p className="mt-8 text-xs leading-relaxed text-muted-foreground">
         Documents are download-only. If something looks wrong or missing, email{" "}

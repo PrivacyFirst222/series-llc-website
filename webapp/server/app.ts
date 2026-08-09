@@ -33,6 +33,10 @@ import {
   serviceOrderClientEmail,
   serviceOrderAdminEmail,
   einDetailsSubmittedAdminEmail,
+  passwordChangedEmail,
+  verifyNewEmail,
+  emailChangeRequestedEmail,
+  emailChangedEmail,
   serviceFulfilledClientEmail,
 } from "./email";
 
@@ -346,6 +350,24 @@ if (!env.isProd) {
     return c.json({ data: { token } });
   });
 
+  // Dev-only: hand back the pending email-verification token so e2e can
+  // confirm an address change without reading the emailed link.
+  app.post("/dev/pending-email-token", async (c) => {
+    const { email } = (await c.req.json()) as { email: string };
+    const db = await getDb();
+    const rows = await db.query<{ id: string }>("SELECT id FROM clients WHERE email = $1", [
+      email.toLowerCase(),
+    ]);
+    if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+    // Mint a fresh token rather than reversing the stored hash.
+    const { token, tokenHash } = newToken();
+    await db.query(
+      "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at) VALUES ($1, $2, 'verify_email', $3)",
+      [tokenHash, rows[0].id, new Date(Date.now() + 3600_000).toISOString()],
+    );
+    return c.json({ data: { token } });
+  });
+
   // Dev-only: backdate a client's formation payment so e2e can exercise the
   // S election 65-day ordering window without waiting.
   app.post("/dev/age-formation", async (c) => {
@@ -478,14 +500,15 @@ app.get("/auth/me", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const db = await getDb();
-  const rows = await db.query<{ email: string; name: string; ra_cancellation_requested_at: string | null }>(
-    "SELECT email, name, ra_cancellation_requested_at FROM clients WHERE id = $1",
+  const rows = await db.query<{ email: string; name: string; pending_email: string | null; ra_cancellation_requested_at: string | null }>(
+    "SELECT email, name, pending_email, ra_cancellation_requested_at FROM clients WHERE id = $1",
     [session.clientId],
   );
   return c.json({
     data: {
       email: rows[0]?.email ?? "",
       name: rows[0]?.name ?? "",
+      pendingEmail: rows[0]?.pending_email ?? null,
       raCancellationRequestedAt: rows[0]?.ra_cancellation_requested_at ?? null,
     },
   });
@@ -1410,6 +1433,137 @@ app.post("/portal/services/:id/s-election-details", async (c) => {
   return c.json({ data: { ok: true } });
 });
 
+/* ---------------------------- account settings --------------------------- */
+
+/** Masks an address for the anti-hijack notice: a•••@example.com */
+function maskEmail(email: string): string {
+  const [local, domain] = email.split("@");
+  return `${local.slice(0, 1)}${"•".repeat(Math.max(2, local.length - 1))}@${domain ?? ""}`;
+}
+
+app.post("/portal/account/password", async (c) => {
+  const session = await getSession(c);
+  if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  if (!rateLimit(`acct:${session.clientId}`, 10, 3600_000)) {
+    return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
+  }
+  const body = z
+    .object({
+      currentPassword: z.string().min(1),
+      newPassword: z.string().min(8, "Use at least 8 characters."),
+    })
+    .safeParse(await c.req.json().catch(() => null));
+  if (!body.success) {
+    return c.json(err(body.error.issues[0]?.message ?? "Invalid request.", "INVALID_INPUT"), 400);
+  }
+  const db = await getDb();
+  const rows = await db.query<{ email: string; password_hash: string | null }>(
+    "SELECT email, password_hash FROM clients WHERE id = $1",
+    [session.clientId],
+  );
+  const client = rows[0];
+  if (!client?.password_hash || !(await verifyPassword(body.data.currentPassword, client.password_hash))) {
+    return c.json(err("That current password is not correct.", "BAD_CREDENTIALS"), 401);
+  }
+  await db.query("UPDATE clients SET password_hash = $1 WHERE id = $2", [
+    await hashPassword(body.data.newPassword),
+    session.clientId,
+  ]);
+  // Sign out every other device; the current session stays valid.
+  await db.query("DELETE FROM sessions WHERE client_id = $1 AND token_hash <> $2", [
+    session.clientId,
+    session.tokenHash,
+  ]);
+  const mail = passwordChangedEmail(`${env.PUBLIC_BASE_URL}/portal`);
+  sendMail({ to: client.email, ...mail }).catch((e) =>
+    console.error("[account] password-changed email failed:", e),
+  );
+  return c.json({ data: { ok: true } });
+});
+
+app.post("/portal/account/email", async (c) => {
+  const session = await getSession(c);
+  if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  if (!rateLimit(`acct:${session.clientId}`, 10, 3600_000)) {
+    return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
+  }
+  const body = z
+    .object({ newEmail: z.string().email("Enter a valid email address."), currentPassword: z.string().min(1) })
+    .safeParse(await c.req.json().catch(() => null));
+  if (!body.success) {
+    return c.json(err(body.error.issues[0]?.message ?? "Invalid request.", "INVALID_INPUT"), 400);
+  }
+  const newEmail = body.data.newEmail.toLowerCase();
+  const db = await getDb();
+  const rows = await db.query<{ email: string; password_hash: string | null }>(
+    "SELECT email, password_hash FROM clients WHERE id = $1",
+    [session.clientId],
+  );
+  const client = rows[0];
+  if (!client?.password_hash || !(await verifyPassword(body.data.currentPassword, client.password_hash))) {
+    return c.json(err("That password is not correct.", "BAD_CREDENTIALS"), 401);
+  }
+  if (newEmail === client.email) {
+    return c.json(err("That is already the address on your account.", "INVALID_INPUT"), 400);
+  }
+  const taken = await db.query("SELECT id FROM clients WHERE email = $1", [newEmail]);
+  if (taken.length > 0) {
+    return c.json(err("That address is already in use on another account.", "EMAIL_TAKEN"), 400);
+  }
+  const { token, tokenHash } = newToken();
+  await db.query("UPDATE clients SET pending_email = $1 WHERE id = $2", [newEmail, session.clientId]);
+  await db.query(
+    "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at) VALUES ($1, $2, 'verify_email', $3)",
+    [tokenHash, session.clientId, new Date(Date.now() + 3600_000).toISOString()],
+  );
+  // The link goes to the new address; the old address gets a warning at the
+  // same moment, so a hijacker cannot move an account silently.
+  const verify = verifyNewEmail(`${env.PUBLIC_BASE_URL}/portal/verify-email?token=${token}`);
+  sendMail({ to: newEmail, ...verify }).catch((e) => console.error("[account] verify email failed:", e));
+  const notice = emailChangeRequestedEmail(maskEmail(newEmail));
+  sendMail({ to: client.email, ...notice }).catch((e) =>
+    console.error("[account] change-requested notice failed:", e),
+  );
+  return c.json({ data: { ok: true, pendingEmail: newEmail } });
+});
+
+app.post("/auth/verify-email", async (c) => {
+  const body = z.object({ token: z.string().min(10) }).safeParse(await c.req.json().catch(() => null));
+  if (!body.success) return c.json(err("Invalid request.", "INVALID_INPUT"), 400);
+  const db = await getDb();
+  const rows = await db.query<{ token_hash: string; client_id: string }>(
+    "SELECT token_hash, client_id FROM auth_tokens WHERE token_hash = $1 AND purpose = 'verify_email' AND expires_at > now() AND used_at IS NULL",
+    [hashToken(body.data.token)],
+  );
+  if (rows.length === 0) {
+    return c.json(err("This link is invalid or has expired. Request the change again from your portal.", "BAD_TOKEN"), 400);
+  }
+  const clients = await db.query<{ email: string; pending_email: string | null }>(
+    "SELECT email, pending_email FROM clients WHERE id = $1",
+    [rows[0].client_id],
+  );
+  const pending = clients[0]?.pending_email;
+  if (!pending) {
+    return c.json(err("There is no pending email change on this account.", "BAD_STATE"), 400);
+  }
+  // Someone else may have claimed the address between request and confirmation.
+  const taken = await db.query("SELECT id FROM clients WHERE email = $1", [pending]);
+  if (taken.length > 0) {
+    await db.query("UPDATE clients SET pending_email = NULL WHERE id = $1", [rows[0].client_id]);
+    return c.json(err("That address is now in use on another account.", "EMAIL_TAKEN"), 400);
+  }
+  const previous = clients[0].email;
+  await db.query("UPDATE clients SET email = $1, pending_email = NULL WHERE id = $2", [
+    pending,
+    rows[0].client_id,
+  ]);
+  await db.query("UPDATE auth_tokens SET used_at = now() WHERE token_hash = $1", [rows[0].token_hash]);
+  const mail = emailChangedEmail(pending);
+  sendMail({ to: pending, ...mail }).catch((e) => console.error("[account] email-changed (new) failed:", e));
+  sendMail({ to: previous, ...mail }).catch((e) => console.error("[account] email-changed (old) failed:", e));
+  return c.json({ data: { ok: true, email: pending } });
+});
+
 /** Online cancellation of registered agent service — required by §501.165
  *  because the service is accepted online. Recording the request is the
  *  §9(g)(i) notice; the agency itself ends only when proof of a successor
@@ -1505,6 +1659,41 @@ app.get("/admin/clients", async (c) => {
      GROUP BY cl.id ORDER BY cl.created_at DESC`,
   );
   return c.json({ data: rows });
+});
+
+/** Support override for the case a client can reach neither address. Both the
+ *  old and the new address are notified, so a change is never silent. */
+app.post("/admin/clients/:id/email", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const body = z
+    .object({ newEmail: z.string().email("Enter a valid email address.") })
+    .safeParse(await c.req.json().catch(() => null));
+  if (!body.success) {
+    return c.json(err(body.error.issues[0]?.message ?? "Invalid request.", "INVALID_INPUT"), 400);
+  }
+  const newEmail = body.data.newEmail.toLowerCase();
+  const db = await getDb();
+  const rows = await db.query<{ email: string }>("SELECT email FROM clients WHERE id = $1", [
+    c.req.param("id"),
+  ]);
+  if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+  const previous = rows[0].email;
+  if (previous === newEmail) {
+    return c.json(err("That is already the address on this account.", "INVALID_INPUT"), 400);
+  }
+  const taken = await db.query("SELECT id FROM clients WHERE email = $1", [newEmail]);
+  if (taken.length > 0) {
+    return c.json(err("That address is already in use on another account.", "EMAIL_TAKEN"), 400);
+  }
+  await db.query("UPDATE clients SET email = $1, pending_email = NULL WHERE id = $2", [
+    newEmail,
+    c.req.param("id"),
+  ]);
+  const mail = emailChangedEmail(newEmail);
+  sendMail({ to: newEmail, ...mail }).catch((e) => console.error("[admin] email-changed (new) failed:", e));
+  sendMail({ to: previous, ...mail }).catch((e) => console.error("[admin] email-changed (old) failed:", e));
+  return c.json({ data: { ok: true, email: newEmail } });
 });
 
 app.get("/admin/services", async (c) => {

@@ -66,6 +66,59 @@ export function resetEmail(resetUrl: string): { subject: string; html: string } 
   };
 }
 
+export function passwordChangedEmail(portalUrl: string): { subject: string; html: string } {
+  return {
+    subject: "Your portal password was changed",
+    html: wrap(`
+      <p>The password for your MyFloridaSeriesLLC portal account was just changed, and every
+      other signed-in device was signed out.</p>
+      <p><strong>If you did not do this,</strong> use "Forgot your password" on the sign-in page
+      to regain control of the account, and email support@myfloridaseriesllc.com immediately.</p>
+      <p><a href="${portalUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Open your portal</a></p>
+    `),
+  };
+}
+
+/** Sent to the NEW address — clicking the link is what actually changes it. */
+export function verifyNewEmail(verifyUrl: string): { subject: string; html: string } {
+  return {
+    subject: "Confirm your new email address",
+    html: wrap(`
+      <p>This address was given as the new email for a MyFloridaSeriesLLC portal account.
+      Confirm it below within 1 hour and it becomes the address you sign in with, and where we
+      send your documents and notices.</p>
+      <p><a href="${verifyUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Confirm this address</a></p>
+      <p>Until you confirm, nothing changes. If you were not expecting this, ignore this email.</p>
+    `),
+  };
+}
+
+/** Sent to the OLD address at the same time — this is the anti-hijack notice. */
+export function emailChangeRequestedEmail(maskedNew: string): { subject: string; html: string } {
+  return {
+    subject: "A change to your portal email was requested",
+    html: wrap(`
+      <p>Someone requested changing the email address on your MyFloridaSeriesLLC portal account
+      to <strong>${escapeHtml(maskedNew)}</strong>. The change takes effect only if that address
+      is confirmed.</p>
+      <p><strong>If this was not you,</strong> sign in and change your password immediately, then
+      email support@myfloridaseriesllc.com. This address remains on the account until the new one
+      is confirmed.</p>
+    `),
+  };
+}
+
+export function emailChangedEmail(newEmail: string): { subject: string; html: string } {
+  return {
+    subject: "Your portal email address was changed",
+    html: wrap(`
+      <p>The email address on your MyFloridaSeriesLLC portal account is now
+      <strong>${escapeHtml(newEmail)}</strong>. Sign in with that address from now on.</p>
+      <p>If you did not authorize this, email support@myfloridaseriesllc.com immediately.</p>
+    `),
+  };
+}
+
 export function newDocumentEmail(portalUrl: string): { subject: string; html: string } {
   return {
     subject: "A new document is available in your portal",

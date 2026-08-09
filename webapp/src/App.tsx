@@ -21,6 +21,7 @@ import OrderConfirmed from "./pages/OrderConfirmed";
 import PortalLogin from "./pages/portal/PortalLogin";
 import PortalForgot from "./pages/portal/PortalForgot";
 import PortalSetPassword from "./pages/portal/PortalSetPassword";
+import PortalVerifyEmail from "./pages/portal/PortalVerifyEmail";
 import PortalDashboard from "./pages/portal/PortalDashboard";
 import OAQuestionnaire from "./pages/portal/OAQuestionnaire";
 import AdminLogin from "./pages/admin/AdminLogin";
@@ -56,6 +57,7 @@ const App = () => (
             <Route path="/portal/login" element={<PortalLogin />} />
             <Route path="/portal/forgot" element={<PortalForgot />} />
             <Route path="/portal/set-password" element={<PortalSetPassword />} />
+            <Route path="/portal/verify-email" element={<PortalVerifyEmail />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="*" element={<NotFound />} />

@@ -10,6 +10,9 @@ const SESSION_DAYS = 30;
 export interface SessionInfo {
   clientId: string | null;
   isAdmin: boolean;
+  /** Hash of this request's session token — lets a caller sign out every
+   *  OTHER device without logging the current one out. */
+  tokenHash: string;
 }
 
 export async function createSession(c: Context, opts: { clientId?: string; isAdmin?: boolean }): Promise<void> {
@@ -33,12 +36,13 @@ export async function getSession(c: Context): Promise<SessionInfo | null> {
   const token = getCookie(c, SESSION_COOKIE);
   if (!token) return null;
   const db = await getDb();
+  const tokenHash = hashToken(token);
   const rows = await db.query<{ client_id: string | null; is_admin: boolean }>(
     "SELECT client_id, is_admin FROM sessions WHERE token_hash = $1 AND expires_at > now()",
-    [hashToken(token)],
+    [tokenHash],
   );
   if (rows.length === 0) return null;
-  return { clientId: rows[0].client_id, isAdmin: rows[0].is_admin };
+  return { clientId: rows[0].client_id, isAdmin: rows[0].is_admin, tokenHash };
 }
 
 export async function destroySession(c: Context): Promise<void> {
