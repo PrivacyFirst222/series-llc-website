@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Download, FileText, Heart, HelpCircle, History, Trash2, X } from "lucide-react";
+import { ArrowLeft, Download, FileText, Heart, HelpCircle, History, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -30,6 +30,7 @@ interface OaGeneration {
   document_id: string | null;
   template_version: string;
   amended_restated: boolean;
+  generation_number: number;
   created_at: string;
 }
 
@@ -203,16 +204,6 @@ export default function OAQuestionnaire() {
       setError("");
     },
     onError: (e) => setError(e instanceof ApiError ? e.message : "Something went wrong."),
-  });
-
-  const deleteGeneration = useMutation({
-    mutationFn: (id: string) => api.delete(`/api/portal/oa/generations/${id}`),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["portal-oa"] });
-      queryClient.invalidateQueries({ queryKey: ["portal-documents"] });
-      setError("");
-    },
-    onError: (e) => setError(e instanceof ApiError ? e.message : "Could not delete that draft."),
   });
 
   const patch = (p: Partial<Answers>) => {
@@ -840,14 +831,16 @@ export default function OAQuestionnaire() {
               <div className="rounded-2xl border border-border bg-card p-5">
                 <div className="flex items-center gap-2">
                   <History className="h-4 w-4 text-trust" />
-                  <h3 className="font-display text-base font-semibold">Generation history</h3>
+                  <h3 className="font-display text-base font-semibold">Your agreements</h3>
                 </div>
                 <ul className="mt-3 divide-y divide-border">
                   {data.generations.map((g, gi) => {
                     // The API returns newest first, so index 0 is the live one
                     // and the sequence number counts up from the oldest.
                     const isCurrent = gi === 0;
-                    const seq = data.generations.length - gi;
+                    // The number is stored with the generation, not derived from
+                    // position — deleting a draft must not renumber the others.
+                    const seq = g.generation_number;
                     return (
                       <li key={g.id} className="flex flex-col gap-2 py-2.5 sm:flex-row sm:items-center sm:justify-between">
                         <div className="min-w-0 text-sm">
@@ -874,23 +867,6 @@ export default function OAQuestionnaire() {
                               </a>
                             </Button>
                           ) : null}
-                          <button
-                            type="button"
-                            aria-label="Delete this draft"
-                            title="Delete this draft"
-                            className="rounded-full p-2 text-muted-foreground hover:text-destructive disabled:opacity-40"
-                            disabled={deleteGeneration.isPending}
-                            onClick={() => {
-                              const ok = window.confirm(
-                                isCurrent
-                                  ? "Delete your most recent agreement? The PDF is removed from your documents. Anything we posted for you is unaffected."
-                                  : "Delete this superseded draft? The PDF is removed from your documents.",
-                              );
-                              if (ok) deleteGeneration.mutate(g.id);
-                            }}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
                         </div>
                       </li>
                     );

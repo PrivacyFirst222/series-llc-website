@@ -94,6 +94,9 @@ ALTER TABLE clients ADD COLUMN IF NOT EXISTS ra_cancellation_requested_at timest
 -- Email changes are verified before they take effect: the requested address
 -- parks here until the client clicks the link sent to it.
 ALTER TABLE clients ADD COLUMN IF NOT EXISTS pending_email text;
+-- High-water mark for operating agreement numbering. A number printed on a PDF
+-- is never reused, even if the client deletes that agreement afterwards.
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS oa_generation_seq integer NOT NULL DEFAULT 0;
 CREATE TABLE IF NOT EXISTS oa_profiles (
   client_id uuid PRIMARY KEY REFERENCES clients(id) ON DELETE CASCADE,
   answers jsonb NOT NULL DEFAULT '{}'::jsonb,
@@ -106,8 +109,21 @@ CREATE TABLE IF NOT EXISTS oa_generations (
   template_version text NOT NULL,
   amended_restated boolean NOT NULL DEFAULT false,
   inputs jsonb NOT NULL,
+  generation_number integer,
   created_at timestamptz NOT NULL DEFAULT now()
 );
+ALTER TABLE oa_generations ADD COLUMN IF NOT EXISTS generation_number integer;
+-- Backfill agreements generated before the number was stored. Idempotent: it
+-- only touches NULL rows, and starts above any number already assigned.
+UPDATE oa_generations g
+   SET generation_number = r.n + COALESCE(
+         (SELECT MAX(x.generation_number) FROM oa_generations x WHERE x.client_id = g.client_id), 0)
+  FROM (SELECT id, row_number() OVER (PARTITION BY client_id ORDER BY created_at) AS n
+          FROM oa_generations WHERE generation_number IS NULL) r
+ WHERE g.id = r.id AND g.generation_number IS NULL;
+UPDATE clients c SET oa_generation_seq = sub.n
+  FROM (SELECT client_id, MAX(generation_number) AS n FROM oa_generations GROUP BY client_id) sub
+ WHERE c.id = sub.client_id AND c.oa_generation_seq < sub.n;
 CREATE TABLE IF NOT EXISTS library_documents (
   key text PRIMARY KEY,
   title text NOT NULL,

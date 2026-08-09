@@ -1,6 +1,7 @@
+import { useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { FileText, Mail, LogOut, Download, ShieldCheck, Clock, ScrollText, BookOpen, ArrowRight } from "lucide-react";
+import { FileText, Mail, LogOut, Download, ShieldCheck, Clock, ScrollText, BookOpen, ArrowRight, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -36,26 +37,73 @@ function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
 }
 
-function DocList({ docs, empty }: { docs: PortalDoc[]; empty: string }) {
+/** Agreements the client generated themselves, keyed by document, so the list
+ *  they actually look at is where they manage them. */
+interface OwnAgreement {
+  generationId: string;
+  isCurrent: boolean;
+}
+
+function DocList({
+  docs,
+  empty,
+  own,
+  onDelete,
+  deleting,
+}: {
+  docs: PortalDoc[];
+  empty: string;
+  own?: Map<string, OwnAgreement>;
+  onDelete?: (generationId: string, isCurrent: boolean) => void;
+  deleting?: boolean;
+}) {
   if (docs.length === 0) {
     return <p className="px-5 py-6 text-sm text-muted-foreground">{empty}</p>;
   }
   return (
     <ul className="divide-y divide-border">
-      {docs.map((d) => (
-        <li key={d.id} className="flex items-center justify-between gap-3 px-5 py-4">
-          <div className="min-w-0">
-            <div className="truncate text-sm font-medium">{d.title}</div>
-            <div className="text-xs text-muted-foreground">{formatDate(d.created_at)}</div>
-          </div>
-          <Button asChild variant="outline" size="sm" className="shrink-0 rounded-full">
-            <a href={`/api/portal/documents/${d.id}/download`}>
-              <Download className="mr-1.5 h-3.5 w-3.5" />
-              Download
-            </a>
-          </Button>
-        </li>
-      ))}
+      {docs.map((d) => {
+        const mine = own?.get(d.id);
+        return (
+          <li key={d.id} className="flex items-center justify-between gap-3 px-5 py-4">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="truncate text-sm font-medium">{d.title}</span>
+                {mine ? (
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                      mine.isCurrent ? "bg-trust/10 text-trust" : "bg-secondary text-muted-foreground"
+                    }`}
+                  >
+                    {mine.isCurrent ? "Current" : "Superseded"}
+                  </span>
+                ) : null}
+              </div>
+              <div className="text-xs text-muted-foreground">{formatDate(d.created_at)}</div>
+            </div>
+            <div className="flex shrink-0 items-center gap-2">
+              <Button asChild variant="outline" size="sm" className="rounded-full">
+                <a href={`/api/portal/documents/${d.id}/download`}>
+                  <Download className="mr-1.5 h-3.5 w-3.5" />
+                  Download
+                </a>
+              </Button>
+              {mine && onDelete ? (
+                <button
+                  type="button"
+                  aria-label="Delete this agreement"
+                  title="Delete this agreement"
+                  disabled={deleting}
+                  onClick={() => onDelete(mine.generationId, mine.isCurrent)}
+                  className="rounded-full p-2 text-muted-foreground hover:text-destructive disabled:opacity-40"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              ) : null}
+            </div>
+          </li>
+        );
+      })}
     </ul>
   );
 }
@@ -265,6 +313,36 @@ export default function PortalDashboard() {
     enabled: meQuery.isSuccess,
   });
 
+  // Same key as the agreement card, so React Query serves one request.
+  const oaGenerations = useQuery({
+    queryKey: ["portal-oa"],
+    queryFn: () =>
+      api.get<{ generations: { id: string; document_id: string | null }[] }>("/api/portal/oa"),
+    enabled: meQuery.isSuccess,
+    retry: false,
+  });
+
+  const deleteGeneration = useMutation({
+    mutationFn: (id: string) => api.delete(`/api/portal/oa/generations/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["portal-documents"] });
+      queryClient.invalidateQueries({ queryKey: ["portal-oa"] });
+    },
+  });
+
+  // The agreements a client generated are the only documents they may remove;
+  // everything else on this list was posted by us and stays download-only.
+  const ownAgreements = useMemo(() => {
+    const gens = oaGenerations.data?.generations ?? [];
+    const map = new Map<string, OwnAgreement>();
+    gens.forEach((g, i) => {
+      if (g.document_id) {
+        map.set(g.document_id, { generationId: g.id, isCurrent: i === 0 });
+      }
+    });
+    return map;
+  }, [oaGenerations.data]);
+
   if (meQuery.isError) {
     navigate("/portal/login");
     return null;
@@ -279,6 +357,7 @@ export default function PortalDashboard() {
 
   const docs = docsQuery.data ?? [];
   const packageDocs = docs.filter((d) => d.kind === "package");
+
   const legalMail = docs.filter((d) => d.kind === "legal_mail");
 
   const logout = async () => {
@@ -312,6 +391,16 @@ export default function PortalDashboard() {
           <DocList
             docs={packageDocs}
             empty="Your documents will appear here once your formation is prepared."
+            own={ownAgreements}
+            deleting={deleteGeneration.isPending}
+            onDelete={(generationId, isCurrent) => {
+              const ok = window.confirm(
+                isCurrent
+                  ? "Delete your most recent agreement? The PDF is removed from your documents. Anything we posted for you is unaffected."
+                  : "Delete this superseded agreement? The PDF is removed from your documents.",
+              );
+              if (ok) deleteGeneration.mutate(generationId);
+            }}
           />
         </div>
 

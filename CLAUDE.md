@@ -1,5 +1,27 @@
 # Vibecode Workspace
 
+## Design from the user's seat, not the data model
+
+This rule is not optional and is not waived by convenience.
+
+1. **Where will the user look for this?** Put it there — not where the
+   existing code made it convenient to add. If a control acts on something
+   the user sees in one place, it belongs in that place.
+2. **What will the user actually see?** Verify by opening the artifact —
+   the rendered page, the generated PDF, the sent email — not by reading
+   the code that produces it. Code that "should" produce the right output
+   is not evidence.
+3. **Would the user need to be told where it is?** If yes, it is in the
+   wrong place. Fix the placement; do not write the explanation.
+
+Name things what the user calls them, never what the table or the record
+is called. "Generation history" is a database concept; "your agreements"
+is what the user has.
+
+When a question or control is hidden or skipped conditionally, confirm the
+underlying value is still set. A question removed from the screen is not a
+value removed from the system.
+
 This workspace contains a mobile app and backend server.
 
 <projects>

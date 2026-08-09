@@ -755,7 +755,9 @@ app.get("/portal/oa", async (c) => {
   const db = await getDb();
   const saved = await db.query<{ answers: unknown }>("SELECT answers FROM oa_profiles WHERE client_id = $1", [session.clientId]);
   const gens = await db.query(
-    "SELECT id, document_id, template_version, amended_restated, created_at FROM oa_generations WHERE client_id = $1 ORDER BY created_at DESC",
+    `SELECT id, document_id, template_version, amended_restated, created_at,
+            COALESCE(generation_number, 0) AS generation_number
+       FROM oa_generations WHERE client_id = $1 ORDER BY created_at DESC`,
     [session.clientId],
   );
   const memberManaged = seed.managementStructure === "MEMBER_MANAGED";
@@ -832,6 +834,14 @@ app.post("/portal/oa/generate", async (c) => {
           day: "numeric",
         })
       : null;
+  // Never reuse a number: it is printed on the PDF, and a client may still hold
+  // a copy of an agreement they later deleted. The counter lives on the client,
+  // so deleting a row cannot roll it back.
+  const bumped = await db.query<{ oa_generation_seq: number }>(
+    "UPDATE clients SET oa_generation_seq = oa_generation_seq + 1 WHERE id = $1 RETURNING oa_generation_seq",
+    [session.clientId],
+  );
+  const nextGenerationNumber = Number(bumped[0]?.oa_generation_seq ?? 1);
 
   // Spousal joint-ownership units: two seed members merge into one marital
   // interest ("A and B, husband and wife, as tenants by the entireties").
@@ -1030,7 +1040,7 @@ app.post("/portal/oa/generate", async (c) => {
     includeShotgun: a.includeShotgun ?? (isSCorp && !multiOwner ? false : undefined),
     borrowingThreshold: a.borrowingThreshold ?? (isSCorp && !multiOwner ? 25000 : undefined),
     contributionToCompany: a.contributionToCompany,
-    generationNumber: priorGens.length + 1,
+    generationNumber: nextGenerationNumber,
   };
 
   const clients = await db.query<{ email: string; name: string }>("SELECT email, name FROM clients WHERE id = $1", [
@@ -1066,9 +1076,9 @@ app.post("/portal/oa/generate", async (c) => {
     [session.clientId, title, stored.storageKey, stored.sizeBytes],
   );
   const gen = await db.query<{ id: string }>(
-    `INSERT INTO oa_generations (client_id, document_id, template_version, amended_restated, inputs)
-     VALUES ($1, $2, $3, $4, $5) RETURNING id`,
-    [session.clientId, doc[0].id, OA_TEMPLATE_VERSION, inputs.amendedRestated, JSON.stringify(inputs)],
+    `INSERT INTO oa_generations (client_id, document_id, template_version, amended_restated, inputs, generation_number)
+     VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
+    [session.clientId, doc[0].id, OA_TEMPLATE_VERSION, inputs.amendedRestated, JSON.stringify(inputs), nextGenerationNumber],
   );
   return c.json({ data: { generationId: gen[0].id, documentId: doc[0].id, title } });
 });

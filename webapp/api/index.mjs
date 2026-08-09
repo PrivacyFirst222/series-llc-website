@@ -76576,6 +76576,9 @@ ALTER TABLE clients ADD COLUMN IF NOT EXISTS ra_cancellation_requested_at timest
 -- Email changes are verified before they take effect: the requested address
 -- parks here until the client clicks the link sent to it.
 ALTER TABLE clients ADD COLUMN IF NOT EXISTS pending_email text;
+-- High-water mark for operating agreement numbering. A number printed on a PDF
+-- is never reused, even if the client deletes that agreement afterwards.
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS oa_generation_seq integer NOT NULL DEFAULT 0;
 CREATE TABLE IF NOT EXISTS oa_profiles (
   client_id uuid PRIMARY KEY REFERENCES clients(id) ON DELETE CASCADE,
   answers jsonb NOT NULL DEFAULT '{}'::jsonb,
@@ -76588,8 +76591,21 @@ CREATE TABLE IF NOT EXISTS oa_generations (
   template_version text NOT NULL,
   amended_restated boolean NOT NULL DEFAULT false,
   inputs jsonb NOT NULL,
+  generation_number integer,
   created_at timestamptz NOT NULL DEFAULT now()
 );
+ALTER TABLE oa_generations ADD COLUMN IF NOT EXISTS generation_number integer;
+-- Backfill agreements generated before the number was stored. Idempotent: it
+-- only touches NULL rows, and starts above any number already assigned.
+UPDATE oa_generations g
+   SET generation_number = r.n + COALESCE(
+         (SELECT MAX(x.generation_number) FROM oa_generations x WHERE x.client_id = g.client_id), 0)
+  FROM (SELECT id, row_number() OVER (PARTITION BY client_id ORDER BY created_at) AS n
+          FROM oa_generations WHERE generation_number IS NULL) r
+ WHERE g.id = r.id AND g.generation_number IS NULL;
+UPDATE clients c SET oa_generation_seq = sub.n
+  FROM (SELECT client_id, MAX(generation_number) AS n FROM oa_generations GROUP BY client_id) sub
+ WHERE c.id = sub.client_id AND c.oa_generation_seq < sub.n;
 CREATE TABLE IF NOT EXISTS library_documents (
   key text PRIMARY KEY,
   title text NOT NULL,
@@ -106622,7 +106638,9 @@ app.get("/portal/oa", async (c) => {
   const db2 = await getDb();
   const saved = await db2.query("SELECT answers FROM oa_profiles WHERE client_id = $1", [session.clientId]);
   const gens = await db2.query(
-    "SELECT id, document_id, template_version, amended_restated, created_at FROM oa_generations WHERE client_id = $1 ORDER BY created_at DESC",
+    `SELECT id, document_id, template_version, amended_restated, created_at,
+            COALESCE(generation_number, 0) AS generation_number
+       FROM oa_generations WHERE client_id = $1 ORDER BY created_at DESC`,
     [session.clientId]
   );
   const memberManaged = seed.managementStructure === "MEMBER_MANAGED";
@@ -106681,6 +106699,11 @@ app.post("/portal/oa/generate", async (c) => {
     month: "long",
     day: "numeric"
   }) : null;
+  const bumped = await db2.query(
+    "UPDATE clients SET oa_generation_seq = oa_generation_seq + 1 WHERE id = $1 RETURNING oa_generation_seq",
+    [session.clientId]
+  );
+  const nextGenerationNumber = Number(bumped[0]?.oa_generation_seq ?? 1);
   const ownershipMode = a2.ownershipMode ?? "percent";
   const couples = multiOwner ? a2.couples ?? [] : [];
   const pairedIdx = /* @__PURE__ */ new Set();
@@ -106843,7 +106866,7 @@ app.post("/portal/oa/generate", async (c) => {
     includeShotgun: a2.includeShotgun ?? (isSCorp && !multiOwner ? false : void 0),
     borrowingThreshold: a2.borrowingThreshold ?? (isSCorp && !multiOwner ? 25e3 : void 0),
     contributionToCompany: a2.contributionToCompany,
-    generationNumber: priorGens.length + 1
+    generationNumber: nextGenerationNumber
   };
   const clients = await db2.query("SELECT email, name FROM clients WHERE id = $1", [
     session.clientId
@@ -106876,9 +106899,9 @@ app.post("/portal/oa/generate", async (c) => {
     [session.clientId, title, stored.storageKey, stored.sizeBytes]
   );
   const gen = await db2.query(
-    `INSERT INTO oa_generations (client_id, document_id, template_version, amended_restated, inputs)
-     VALUES ($1, $2, $3, $4, $5) RETURNING id`,
-    [session.clientId, doc[0].id, OA_TEMPLATE_VERSION, inputs.amendedRestated, JSON.stringify(inputs)]
+    `INSERT INTO oa_generations (client_id, document_id, template_version, amended_restated, inputs, generation_number)
+     VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
+    [session.clientId, doc[0].id, OA_TEMPLATE_VERSION, inputs.amendedRestated, JSON.stringify(inputs), nextGenerationNumber]
   );
   return c.json({ data: { generationId: gen[0].id, documentId: doc[0].id, title } });
 });
