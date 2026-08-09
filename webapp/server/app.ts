@@ -883,6 +883,26 @@ app.post("/portal/oa/generate", async (c) => {
     }
   }
 
+  // Series percentages must total 100 within each series, exactly as company
+  // percentages must. Without this a signed agreement can say a series is
+  // 40% + 55% owned, which is simply wrong on its face.
+  if (multiOwner && !a.sElection) {
+    for (let i = 0; i < seed.series.length; i++) {
+      const assoc = a.series?.[i]?.associated ?? [];
+      if (assoc.length === 0) continue; // series held by the Company itself
+      const total = assoc.reduce((acc, x) => acc + Math.round((x.seriesPercentage ?? 0) * 100), 0);
+      if (total !== 10_000) {
+        return c.json(
+          err(
+            `Ownership of ${seed.series[i].name} totals ${(total / 100).toFixed(2)}% — each series must total exactly 100%.`,
+            "INVALID_INPUT",
+          ),
+          400,
+        );
+      }
+    }
+  }
+
   const series = seed.series.map((sr, i) => ({
     name: sr.name,
     purpose: a.series?.[i]?.purpose ?? sr.purpose ?? "",

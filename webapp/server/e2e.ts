@@ -624,6 +624,11 @@ if (mint.status === 200) {
     series: [{ associated: [{ memberIndex: 0, seriesPercentage: 50 }, { memberIndex: 1, seriesPercentage: 50 }] }],
     includeCapitalCalls: false, competition: "A", includeShotgun: false, borrowingThreshold: 30000,
   };
+  const badSeriesPct = await api("/api/portal/oa/generate", {
+    method: "POST", cookies: mmPw.cookie,
+    body: JSON.stringify({ ...mmAnswers, series: [{ associated: [{ memberIndex: 0, seriesPercentage: 40 }, { memberIndex: 1, seriesPercentage: 55 }] }] }),
+  });
+  check("series percentages that don't total 100 are rejected", badSeriesPct.status === 400, badSeriesPct.body);
   const mmGen = await api("/api/portal/oa/generate", { method: "POST", cookies: mmPw.cookie, body: JSON.stringify(mmAnswers) });
   check("member-managed agreement generates", mmGen.status === 200, mmGen.body);
   const mmDoc = mmGen.body?.data?.documentId as string;

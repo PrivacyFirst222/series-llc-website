@@ -28,16 +28,28 @@ export interface OaMemberInput {
   name: string; // an individual, or a marital unit ("A and B, husband and wife, as tenants by the entireties")
   address: string;
   percentage: number; // 100 for single member
+  /** How the interest reads in the document — "40%" or "1/3". Falls back to
+   *  `percentage` + "%" when absent. */
+  percentageLabel?: string;
   contribution: string; // free text, may be ""
   todBeneficiary: string; // "" = none
   /** Humans who sign for this interest — both spouses for a marital unit. */
   signatories?: string[];
+  /** Present when this interest is held jointly, e.g. "husband and wife, as
+   *  tenants by the entireties" — drives the joint signature block. */
+  jointHolding?: string;
 }
 
 export interface OaSeriesInput {
   name: string; // full filed name
   purpose: string;
-  associated: { memberName: string; seriesPercentage: number; signatories?: string[] }[]; // single-member: sole member 100
+  associated: {
+    memberName: string;
+    seriesPercentage: number;
+    seriesPercentageLabel?: string;
+    signatories?: string[];
+    jointHolding?: string;
+  }[]; // single-member: sole member 100
   contribution: string;
 }
 
@@ -200,10 +212,11 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
 
 Upon the death of the Member, the Membership Interest shall pass to: **${m.todBeneficiary || "No beneficiary designated"}**${m.todBeneficiary ? "" : " — the Membership Interest passes as provided by law"}, subject in all events to this Agreement.
 `;
-    s = replaceSection(s, "EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION", exhibitA, "Exhibit A single");
+    s = replaceSection(s, "EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION", "[[pagebreak]]\n\n" + exhibitA, "Exhibit A single");
   } else {
+    const pctOf = (m: OaMemberInput) => m.percentageLabel ?? `${m.percentage}%`;
     const rows = inputs.members
-      .map((m) => `| ${m.name} | ${m.address} | ${m.percentage}% | ${m.contribution || "—"} | ${inputs.effectiveDate} |`)
+      .map((m) => `| ${m.name} | ${m.address} | ${pctOf(m)} | ${m.contribution || "—"} | ${inputs.effectiveDate} |`)
       .join("\n");
     const todRows = inputs.members.map((m) => `| ${m.name} | ${m.todBeneficiary || "None"} |`).join("\n");
     const exhibitA = `## EXHIBIT A — MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS
@@ -223,7 +236,7 @@ ${todRows}
 
 If no beneficiary is designated, or a designation fails, the Member's interest passes as provided by law, subject to this Agreement.
 `;
-    s = replaceSection(s, "EXHIBIT A — MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS", exhibitA, "Exhibit A multi");
+    s = replaceSection(s, "EXHIBIT A — MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS", "[[pagebreak]]\n\n" + exhibitA, "Exhibit A multi");
   }
 
   // ---- Series Exhibits + Asset Schedules ----
@@ -237,7 +250,7 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
     const n = idx + 1;
     const assoc =
       ser.associated.length > 0
-        ? ser.associated.map((a) => `${a.memberName} — ${a.seriesPercentage}%`).join("; ")
+        ? ser.associated.map((a) => `${a.memberName} — ${a.seriesPercentageLabel ?? `${a.seriesPercentage}%`}`).join("; ")
         : "None — the Company is the deemed sole Associated Member";
     let ex = ex1.section;
     ex = ex.replace("## SERIES EXHIBIT PS-[N]", `## SERIES EXHIBIT ${n}`);
@@ -261,7 +274,11 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
       ser.associated.length > 0
         ? ser.associated.flatMap((u) => u.signatories ?? [u.memberName])
         : inputs.members.flatMap((m) => m.signatories ?? [m.name]);
-    const adoptLines = adoptNames.map((n) => `_____________________________\n${n}, Member`).join("\n\n");
+    const adoptSource =
+      ser.associated.length > 0
+        ? ser.associated.map((u) => ({ name: u.memberName, signatories: u.signatories, jointHolding: u.jointHolding }))
+        : inputs.members.map((m) => ({ name: m.name, signatories: m.signatories, jointHolding: m.jointHolding }));
+    const adoptLines = signatureBlock(adoptSource, ", Member");
     ex = ex.replace(
       /_+\n\[ASSOCIATED MEMBER 1\], Member[\s\S]*?_+\n\[ASSOCIATED MEMBER 2\], Member/,
       adoptLines,
@@ -275,7 +292,7 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
       "## ASSET SCHEDULE — ATTACHMENT TO SERIES EXHIBIT PS-[N]",
       `## ASSET SCHEDULE — ATTACHMENT TO SERIES EXHIBIT ${n} (${ser.name})`,
     );
-    exhibits.push(ex.trim() + "\n\n" + sched.trim());
+    exhibits.push("[[pagebreak]]\n\n" + ex.trim() + "\n\n[[pagebreak]]\n\n" + sched.trim());
   });
 
   // ---- signatures ----
@@ -283,10 +300,7 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
     s = s.split("[MEMBER NAME]").join(inputs.members[0].name);
     s = s.split("[ADDRESS]").join(inputs.members[0].address);
   } else {
-    const sigLines = inputs.members
-      .flatMap((m) => m.signatories ?? [m.name])
-      .map((n) => `_____________________________\n${n}`)
-      .join("\n\n");
+    const sigLines = signatureBlock(inputs.members, "");
     // The member-managed masters have no manager acknowledgment block, so the
     // members' signatures run to the end of the signature section instead.
     s = s.replace(
@@ -297,6 +311,10 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
     );
   }
 
+  // Signatures start a fresh page — it is the page people detach, sign, and
+  // scan back, and it should never begin halfway down a page of Article 16.
+  s = s.replace(/\n## SIGNATURES/, "\n[[pagebreak]]\n\n## SIGNATURES");
+
   // strip the draft footer note
   s = s.replace(/\n\*Form document —[\s\S]*$/, "\n");
 
@@ -304,6 +322,27 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
   s = s.trimEnd() + "\n\n" + exhibits.join("\n\n") + `\n\n*${titleName} of ${co} — generated by MyFloridaSeriesLLC · Master ${OA_TEMPLATE_VERSION}*\n`;
 
   return { markdown: s, title: `${inputs.amendedRestated ? "Amended and Restated " : ""}Operating Agreement — ${co}` };
+}
+
+/** Signature lines, with jointly-held interests grouped under a heading so a
+ *  married couple reads as one owner signing together rather than two owners. */
+function signatureBlock(
+  holders: { name: string; signatories?: string[]; jointHolding?: string }[],
+  suffix: string,
+): string {
+  return holders
+    .map((h) => {
+      const names = h.signatories ?? [h.name];
+      const lines = names.map((n) => `_____________________________\n${n}${suffix}`).join("\n\n");
+      if (names.length > 1) {
+        const heading = h.jointHolding
+          ? `**${names.join(" and ")}, ${h.jointHolding}:**`
+          : `**${names.join(" and ")}, jointly:**`;
+        return `${heading}\n\n${lines}`;
+      }
+      return lines;
+    })
+    .join("\n\n");
 }
 
 function replaceSectionBody(s: string, re: RegExp, replacement: string, label: string): string {

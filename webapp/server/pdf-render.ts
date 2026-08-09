@@ -168,15 +168,43 @@ export async function renderMarkdownPdf(opts: {
     if (y - h < MARGIN) newPage();
   };
 
-  const drawSegLine = (p: PDFPage, segs: Seg[], x: number, yy: number, size: number) => {
+  const segWidth = (seg: Seg, size: number): number => {
+    try {
+      return fontFor(fonts, seg).widthOfTextAtSize(seg.text, size);
+    } catch {
+      return seg.text.length * size * 0.5;
+    }
+  };
+
+  /** `justifyTo` stretches inter-word gaps to that width (full justification).
+   *  Omitted, the line is drawn at its natural width. */
+  const drawSegLine = (p: PDFPage, segs: Seg[], x: number, yy: number, size: number, justifyTo?: number) => {
+    let extraPerGap = 0;
+    if (justifyTo) {
+      const natural = segs.reduce((acc, s) => acc + segWidth(s, size), 0);
+      // Count the gaps we can stretch: spaces between words, across segments.
+      const gaps = segs.reduce((acc, s) => acc + (s.text.match(/ /g)?.length ?? 0), 0);
+      // Never stretch absurdly — a short last-ish line looks worse justified.
+      if (gaps > 0 && justifyTo > natural && justifyTo - natural < width * 0.25) {
+        extraPerGap = (justifyTo - natural) / gaps;
+      }
+    }
     let cx = x;
     for (const seg of segs) {
       const font = fontFor(fonts, seg);
-      p.drawText(seg.text, { x: cx, y: yy, size, font, color: rgb(0.1, 0.12, 0.16) });
-      try {
-        cx += font.widthOfTextAtSize(seg.text, size);
-      } catch {
-        cx += seg.text.length * size * 0.5;
+      if (extraPerGap > 0 && seg.text.includes(" ")) {
+        // Draw word by word so the added space lands in the gaps.
+        const parts = seg.text.split(" ");
+        parts.forEach((word, i) => {
+          if (word) {
+            p.drawText(word, { x: cx, y: yy, size, font, color: rgb(0.1, 0.12, 0.16) });
+            cx += segWidth({ ...seg, text: word }, size);
+          }
+          if (i < parts.length - 1) cx += segWidth({ ...seg, text: " " }, size) + extraPerGap;
+        });
+      } else {
+        p.drawText(seg.text, { x: cx, y: yy, size, font, color: rgb(0.1, 0.12, 0.16) });
+        cx += segWidth(seg, size);
       }
     }
   };
@@ -211,24 +239,34 @@ export async function renderMarkdownPdf(opts: {
         inTitle = false;
         continue;
       }
+      // Sentinel: force the next content onto a fresh page. Exhibits and
+      // asset schedules get detached and handed to banks, so they start clean.
+      if (block.segs.length === 1 && block.segs[0].text.trim() === "[[pagebreak]]") {
+        newPage();
+        continue;
+      }
       const centered = inTitle;
       const size = BODY_SIZE;
       const lineH = size + LINE_GAP;
       const lines = wrapSegs(fonts, block.segs.map((s) => ({ ...s })), width, size);
-      for (const ln of lines) {
+      // Orphan control: never leave a single line of a multi-line paragraph
+      // stranded at the foot of a page.
+      if (lines.length > 2 && y - 2 * lineH < MARGIN) newPage();
+      for (let li = 0; li < lines.length; li++) {
+        const ln = lines[li];
+        // Widow control: if breaking here would strand the final line alone on
+        // the next page, take the previous line with it.
+        const isSecondToLast = li === lines.length - 2;
+        if (isSecondToLast && y - 2 * lineH < MARGIN) newPage();
         need(lineH);
         let x = MARGIN;
+        const isLastLine = li === lines.length - 1;
         if (centered) {
-          const textW = ln.reduce((acc, s) => {
-            try {
-              return acc + fontFor(fonts, s).widthOfTextAtSize(s.text, size);
-            } catch {
-              return acc + s.text.length * size * 0.5;
-            }
-          }, 0);
+          const textW = ln.reduce((acc, s) => acc + segWidth(s, size), 0);
           x = MARGIN + Math.max(0, (width - textW) / 2);
         }
-        drawSegLine(page, ln, x, y - size, size);
+        // Full justification for body copy; last lines and centered text stay natural.
+        drawSegLine(page, ln, x, y - size, size, !centered && !isLastLine ? width : undefined);
         y -= lineH;
       }
       y -= 6;

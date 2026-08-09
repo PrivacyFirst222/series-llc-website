@@ -102561,15 +102561,37 @@ async function renderMarkdownPdf(opts) {
   const need = (h) => {
     if (y - h < MARGIN) newPage();
   };
-  const drawSegLine = (p2, segs, x2, yy, size) => {
+  const segWidth = (seg, size) => {
+    try {
+      return fontFor(fonts, seg).widthOfTextAtSize(seg.text, size);
+    } catch {
+      return seg.text.length * size * 0.5;
+    }
+  };
+  const drawSegLine = (p2, segs, x2, yy, size, justifyTo) => {
+    let extraPerGap = 0;
+    if (justifyTo) {
+      const natural = segs.reduce((acc, s) => acc + segWidth(s, size), 0);
+      const gaps = segs.reduce((acc, s) => acc + (s.text.match(/ /g)?.length ?? 0), 0);
+      if (gaps > 0 && justifyTo > natural && justifyTo - natural < width * 0.25) {
+        extraPerGap = (justifyTo - natural) / gaps;
+      }
+    }
     let cx2 = x2;
     for (const seg of segs) {
       const font = fontFor(fonts, seg);
-      p2.drawText(seg.text, { x: cx2, y: yy, size, font, color: rgb(0.1, 0.12, 0.16) });
-      try {
-        cx2 += font.widthOfTextAtSize(seg.text, size);
-      } catch {
-        cx2 += seg.text.length * size * 0.5;
+      if (extraPerGap > 0 && seg.text.includes(" ")) {
+        const parts = seg.text.split(" ");
+        parts.forEach((word, i) => {
+          if (word) {
+            p2.drawText(word, { x: cx2, y: yy, size, font, color: rgb(0.1, 0.12, 0.16) });
+            cx2 += segWidth({ ...seg, text: word }, size);
+          }
+          if (i < parts.length - 1) cx2 += segWidth({ ...seg, text: " " }, size) + extraPerGap;
+        });
+      } else {
+        p2.drawText(seg.text, { x: cx2, y: yy, size, font, color: rgb(0.1, 0.12, 0.16) });
+        cx2 += segWidth(seg, size);
       }
     }
   };
@@ -102597,24 +102619,27 @@ async function renderMarkdownPdf(opts) {
         inTitle = false;
         continue;
       }
+      if (block.segs.length === 1 && block.segs[0].text.trim() === "[[pagebreak]]") {
+        newPage();
+        continue;
+      }
       const centered = inTitle;
       const size = BODY_SIZE;
       const lineH = size + LINE_GAP;
       const lines = wrapSegs(fonts, block.segs.map((s) => ({ ...s })), width, size);
-      for (const ln2 of lines) {
+      if (lines.length > 2 && y - 2 * lineH < MARGIN) newPage();
+      for (let li = 0; li < lines.length; li++) {
+        const ln2 = lines[li];
+        const isSecondToLast = li === lines.length - 2;
+        if (isSecondToLast && y - 2 * lineH < MARGIN) newPage();
         need(lineH);
         let x2 = MARGIN;
+        const isLastLine = li === lines.length - 1;
         if (centered) {
-          const textW = ln2.reduce((acc, s) => {
-            try {
-              return acc + fontFor(fonts, s).widthOfTextAtSize(s.text, size);
-            } catch {
-              return acc + s.text.length * size * 0.5;
-            }
-          }, 0);
+          const textW = ln2.reduce((acc, s) => acc + segWidth(s, size), 0);
           x2 = MARGIN + Math.max(0, (width - textW) / 2);
         }
-        drawSegLine(page, ln2, x2, y - size, size);
+        drawSegLine(page, ln2, x2, y - size, size, !centered && !isLastLine ? width : void 0);
         y -= lineH;
       }
       y -= 6;
@@ -103470,7 +103495,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **2.11 "Membership Interest"** means a Member's entire interest in the Company, including the Member's interest in capital, profits, and distributions of the Company and of each Protected Series with which the Member is associated, and all rights of a member under the Act and this Agreement.
 
-**2.12 "Percentage Interest"** means, as to each Member, the percentage set forth for that Member on Exhibit A, as adjusted from time to time under this Agreement. Membership interests are of a single class.
+**2.12 "Percentage Interest"** means, as to each Member, the percentage or fractional interest set forth for that Member on Exhibit A, as adjusted from time to time under this Agreement. Membership interests are of a single class.
 
 **2.13 "Protected Series"** or **"PS"** means a protected series of the Company established under s. 605.2201, Florida Statutes, and identified in a Series Exhibit.
 
@@ -103480,7 +103505,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **2.16 "Series Exhibit"** means, for each Protected Series, the exhibit to this Agreement (each numbered PS-1, PS-2, and so on) setting forth the terms specific to that Protected Series, including its Associated Members and their Series Percentages. Each Series Exhibit is a part of this Agreement.
 
-**2.17 "Series Percentage"** means, as to each Associated Member of a Protected Series, the percentage set forth for that Associated Member in the applicable Series Exhibit, as adjusted from time to time under this Agreement.
+**2.17 "Series Percentage"** means, as to each Associated Member of a Protected Series, the percentage or fractional interest set forth for that Associated Member in the applicable Series Exhibit, as adjusted from time to time under this Agreement.
 
 **2.18 "Transfer"** means any assignment, transfer, conveyance, devise, gift, pledge, hypothecation, encumbrance, or other disposition, direct or indirect, voluntary or involuntary, in trust or otherwise, and as a verb has a corresponding meaning.
 
@@ -103933,7 +103958,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **2.11 "Membership Interest"** means a Member's entire interest in the Company, including the Member's interest in capital, profits, and distributions of the Company and of each Protected Series with which the Member is associated, and all rights of a member under the Act and this Agreement.
 
-**2.12 "Percentage Interest"** means, as to each Member, the percentage set forth for that Member on Exhibit A, as adjusted from time to time under this Agreement. Membership interests are of a single class.
+**2.12 "Percentage Interest"** means, as to each Member, the percentage or fractional interest set forth for that Member on Exhibit A, as adjusted from time to time under this Agreement. Membership interests are of a single class.
 
 **2.13 "Protected Series"** or **"PS"** means a protected series of the Company established under s. 605.2201, Florida Statutes, and identified in a Series Exhibit.
 
@@ -103943,7 +103968,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **2.16 "Series Exhibit"** means, for each Protected Series, the exhibit to this Agreement (each numbered PS-1, PS-2, and so on) setting forth the terms specific to that Protected Series, including its Associated Members and their Series Percentages. Each Series Exhibit is a part of this Agreement.
 
-**2.17 "Series Percentage"** means, as to each Associated Member of a Protected Series, the percentage set forth for that Associated Member in the applicable Series Exhibit, as adjusted from time to time under this Agreement.
+**2.17 "Series Percentage"** means, as to each Associated Member of a Protected Series, the percentage or fractional interest set forth for that Associated Member in the applicable Series Exhibit, as adjusted from time to time under this Agreement.
 
 **2.18 "Transfer"** means any assignment, transfer, conveyance, devise, gift, pledge, hypothecation, encumbrance, or other disposition, direct or indirect, voluntary or involuntary, in trust or otherwise, and as a verb has a corresponding meaning.
 
@@ -104408,7 +104433,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **2.11 "Membership Interest"** means a Member's entire interest in the Company, including the Member's interest in capital, profits, and distributions of the Company and of each Protected Series with which the Member is associated, and all rights of a member under the Act and this Agreement.
 
-**2.12 "Percentage Interest"** means, as to each Member, the percentage set forth for that Member on Exhibit A, as adjusted from time to time under this Agreement. Membership interests are of a single class.
+**2.12 "Percentage Interest"** means, as to each Member, the percentage or fractional interest set forth for that Member on Exhibit A, as adjusted from time to time under this Agreement. Membership interests are of a single class.
 
 **2.13 "Protected Series"** or **"PS"** means a protected series of the Company established under s. 605.2201, Florida Statutes, and identified in a Series Exhibit.
 
@@ -104418,7 +104443,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **2.16 "Series Exhibit"** means, for each Protected Series, the exhibit to this Agreement (each numbered PS-1, PS-2, and so on) setting forth the terms specific to that Protected Series, including its Associated Members and their Series Percentages. Each Series Exhibit is a part of this Agreement.
 
-**2.17 "Series Percentage"** means, as to each Associated Member of a Protected Series, the percentage set forth for that Associated Member in the applicable Series Exhibit, as adjusted from time to time under this Agreement.
+**2.17 "Series Percentage"** means, as to each Associated Member of a Protected Series, the percentage or fractional interest set forth for that Associated Member in the applicable Series Exhibit, as adjusted from time to time under this Agreement.
 
 **2.18 "Transfer"** means any assignment, transfer, conveyance, devise, gift, pledge, hypothecation, encumbrance, or other disposition, direct or indirect, voluntary or involuntary, in trust or otherwise, and as a verb has a corresponding meaning.
 
@@ -104879,7 +104904,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **2.11 "Membership Interest"** means a Member's entire interest in the Company, including the Member's interest in capital, profits, and distributions of the Company and of each Protected Series with which the Member is associated, and all rights of a member under the Act and this Agreement.
 
-**2.12 "Percentage Interest"** means, as to each Member, the percentage set forth for that Member on Exhibit A, as adjusted from time to time under this Agreement. Membership interests are of a single class.
+**2.12 "Percentage Interest"** means, as to each Member, the percentage or fractional interest set forth for that Member on Exhibit A, as adjusted from time to time under this Agreement. Membership interests are of a single class.
 
 **2.13 "Protected Series"** or **"PS"** means a protected series of the Company established under s. 605.2201, Florida Statutes, and identified in a Series Exhibit.
 
@@ -104889,7 +104914,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **2.16 "Series Exhibit"** means, for each Protected Series, the exhibit to this Agreement (each numbered PS-1, PS-2, and so on) setting forth the terms specific to that Protected Series, including its Associated Members and their Series Percentages. Each Series Exhibit is a part of this Agreement.
 
-**2.17 "Series Percentage"** means, as to each Associated Member of a Protected Series, the percentage set forth for that Associated Member in the applicable Series Exhibit, as adjusted from time to time under this Agreement.
+**2.17 "Series Percentage"** means, as to each Associated Member of a Protected Series, the percentage or fractional interest set forth for that Associated Member in the applicable Series Exhibit, as adjusted from time to time under this Agreement.
 
 **2.18 "Transfer"** means any assignment, transfer, conveyance, devise, gift, pledge, hypothecation, encumbrance, or other disposition, direct or indirect, voluntary or involuntary, in trust or otherwise, and as a verb has a corresponding meaning.
 
@@ -105406,9 +105431,10 @@ NOW, THEREFORE,`,
 
 Upon the death of the Member, the Membership Interest shall pass to: **${m2.todBeneficiary || "No beneficiary designated"}**${m2.todBeneficiary ? "" : " \u2014 the Membership Interest passes as provided by law"}, subject in all events to this Agreement.
 `;
-    s = replaceSection(s, "EXHIBIT A \u2014 MEMBER; CONTRIBUTIONS; TOD DESIGNATION", exhibitA, "Exhibit A single");
+    s = replaceSection(s, "EXHIBIT A \u2014 MEMBER; CONTRIBUTIONS; TOD DESIGNATION", "[[pagebreak]]\n\n" + exhibitA, "Exhibit A single");
   } else {
-    const rows = inputs.members.map((m2) => `| ${m2.name} | ${m2.address} | ${m2.percentage}% | ${m2.contribution || "\u2014"} | ${inputs.effectiveDate} |`).join("\n");
+    const pctOf = (m2) => m2.percentageLabel ?? `${m2.percentage}%`;
+    const rows = inputs.members.map((m2) => `| ${m2.name} | ${m2.address} | ${pctOf(m2)} | ${m2.contribution || "\u2014"} | ${inputs.effectiveDate} |`).join("\n");
     const todRows = inputs.members.map((m2) => `| ${m2.name} | ${m2.todBeneficiary || "None"} |`).join("\n");
     const exhibitA = `## EXHIBIT A \u2014 MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS
 
@@ -105427,7 +105453,7 @@ ${todRows}
 
 If no beneficiary is designated, or a designation fails, the Member's interest passes as provided by law, subject to this Agreement.
 `;
-    s = replaceSection(s, "EXHIBIT A \u2014 MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS", exhibitA, "Exhibit A multi");
+    s = replaceSection(s, "EXHIBIT A \u2014 MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS", "[[pagebreak]]\n\n" + exhibitA, "Exhibit A multi");
   }
   const ex1 = extractSection(s, "SERIES EXHIBIT PS-[N]", "series exhibit template");
   s = ex1.doc;
@@ -105436,7 +105462,7 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
   const exhibits = [];
   inputs.series.forEach((ser, idx) => {
     const n = idx + 1;
-    const assoc = ser.associated.length > 0 ? ser.associated.map((a2) => `${a2.memberName} \u2014 ${a2.seriesPercentage}%`).join("; ") : "None \u2014 the Company is the deemed sole Associated Member";
+    const assoc = ser.associated.length > 0 ? ser.associated.map((a2) => `${a2.memberName} \u2014 ${a2.seriesPercentageLabel ?? `${a2.seriesPercentage}%`}`).join("; ") : "None \u2014 the Company is the deemed sole Associated Member";
     let ex = ex1.section;
     ex = ex.replace("## SERIES EXHIBIT PS-[N]", `## SERIES EXHIBIT ${n}`);
     ex = ex.replace(/\*\*Protected Series name \(exactly as filed with the Department\):\*\*\n\*\*[^\n]+\*\*/, `**Protected Series name (exactly as filed with the Department):**
@@ -105452,8 +105478,8 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
     ex = ex.replace(/\| Special terms \(if any\) \|[^\n]*\|/, "| Special terms (if any) | None |");
     ex = ex.replace(/\| Dissolution events[^\n]*\|[^\n]*\|/, "| Dissolution events specific to this Protected Series (if any) | None |");
     const adoptNames = ser.associated.length > 0 ? ser.associated.flatMap((u) => u.signatories ?? [u.memberName]) : inputs.members.flatMap((m2) => m2.signatories ?? [m2.name]);
-    const adoptLines = adoptNames.map((n2) => `_____________________________
-${n2}, Member`).join("\n\n");
+    const adoptSource = ser.associated.length > 0 ? ser.associated.map((u) => ({ name: u.memberName, signatories: u.signatories, jointHolding: u.jointHolding })) : inputs.members.map((m2) => ({ name: m2.name, signatories: m2.signatories, jointHolding: m2.jointHolding }));
+    const adoptLines = signatureBlock(adoptSource, ", Member");
     ex = ex.replace(
       /_+\n\[ASSOCIATED MEMBER 1\], Member[\s\S]*?_+\n\[ASSOCIATED MEMBER 2\], Member/,
       adoptLines
@@ -105464,14 +105490,13 @@ ${n2}, Member`).join("\n\n");
       "## ASSET SCHEDULE \u2014 ATTACHMENT TO SERIES EXHIBIT PS-[N]",
       `## ASSET SCHEDULE \u2014 ATTACHMENT TO SERIES EXHIBIT ${n} (${ser.name})`
     );
-    exhibits.push(ex.trim() + "\n\n" + sched.trim());
+    exhibits.push("[[pagebreak]]\n\n" + ex.trim() + "\n\n[[pagebreak]]\n\n" + sched.trim());
   });
   if (inputs.version === "single") {
     s = s.split("[MEMBER NAME]").join(inputs.members[0].name);
     s = s.split("[ADDRESS]").join(inputs.members[0].address);
   } else {
-    const sigLines = inputs.members.flatMap((m2) => m2.signatories ?? [m2.name]).map((n) => `_____________________________
-${n}`).join("\n\n");
+    const sigLines = signatureBlock(inputs.members, "");
     s = s.replace(
       isMemberManaged ? /\*\*MEMBERS:\*\*[\s\S]*?(?=\n---|\n## |$)/ : /\*\*MEMBERS:\*\*[\s\S]*?(?=\*\*ACKNOWLEDGED AND AGREED BY MANAGER:\*\*)/,
       `**MEMBERS:**
@@ -105481,12 +105506,27 @@ ${sigLines}
 `
     );
   }
+  s = s.replace(/\n## SIGNATURES/, "\n[[pagebreak]]\n\n## SIGNATURES");
   s = s.replace(/\n\*Form document —[\s\S]*$/, "\n");
   s = s.trimEnd() + "\n\n" + exhibits.join("\n\n") + `
 
 *${titleName} of ${co} \u2014 generated by MyFloridaSeriesLLC \xB7 Master ${OA_TEMPLATE_VERSION}*
 `;
   return { markdown: s, title: `${inputs.amendedRestated ? "Amended and Restated " : ""}Operating Agreement \u2014 ${co}` };
+}
+function signatureBlock(holders, suffix) {
+  return holders.map((h) => {
+    const names = h.signatories ?? [h.name];
+    const lines = names.map((n) => `_____________________________
+${n}${suffix}`).join("\n\n");
+    if (names.length > 1) {
+      const heading = h.jointHolding ? `**${names.join(" and ")}, ${h.jointHolding}:**` : `**${names.join(" and ")}, jointly:**`;
+      return `${heading}
+
+${lines}`;
+    }
+    return lines;
+  }).join("\n\n");
 }
 function replaceSectionBody(s, re, replacement, label) {
   if (!re.test(s)) throw new Error(`OA template marker missing: ${label}`);
@@ -106619,6 +106659,22 @@ app.post("/portal/oa/generate", async (c) => {
     }
     if (!a2.borrowingThreshold) {
       return c.json(err2("Set the manager's borrowing limit.", "INVALID_INPUT"), 400);
+    }
+  }
+  if (multiOwner && !a2.sElection) {
+    for (let i = 0; i < seed.series.length; i++) {
+      const assoc = a2.series?.[i]?.associated ?? [];
+      if (assoc.length === 0) continue;
+      const total = assoc.reduce((acc, x2) => acc + Math.round((x2.seriesPercentage ?? 0) * 100), 0);
+      if (total !== 1e4) {
+        return c.json(
+          err2(
+            `Ownership of ${seed.series[i].name} totals ${(total / 100).toFixed(2)}% \u2014 each series must total exactly 100%.`,
+            "INVALID_INPUT"
+          ),
+          400
+        );
+      }
     }
   }
   const series = seed.series.map((sr, i) => ({

@@ -73,7 +73,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **2.11 "Membership Interest"** means a Member's entire interest in the Company, including the Member's interest in capital, profits, and distributions of the Company and of each Protected Series with which the Member is associated, and all rights of a member under the Act and this Agreement.
 
-**2.12 "Percentage Interest"** means, as to each Member, the percentage set forth for that Member on Exhibit A, as adjusted from time to time under this Agreement. Membership interests are of a single class.
+**2.12 "Percentage Interest"** means, as to each Member, the percentage or fractional interest set forth for that Member on Exhibit A, as adjusted from time to time under this Agreement. Membership interests are of a single class.
 
 **2.13 "Protected Series"** or **"PS"** means a protected series of the Company established under s. 605.2201, Florida Statutes, and identified in a Series Exhibit.
 
@@ -83,7 +83,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **2.16 "Series Exhibit"** means, for each Protected Series, the exhibit to this Agreement (each numbered PS-1, PS-2, and so on) setting forth the terms specific to that Protected Series, including its Associated Members and their Series Percentages. Each Series Exhibit is a part of this Agreement.
 
-**2.17 "Series Percentage"** means, as to each Associated Member of a Protected Series, the percentage set forth for that Associated Member in the applicable Series Exhibit, as adjusted from time to time under this Agreement.
+**2.17 "Series Percentage"** means, as to each Associated Member of a Protected Series, the percentage or fractional interest set forth for that Associated Member in the applicable Series Exhibit, as adjusted from time to time under this Agreement.
 
 **2.18 "Transfer"** means any assignment, transfer, conveyance, devise, gift, pledge, hypothecation, encumbrance, or other disposition, direct or indirect, voluntary or involuntary, in trust or otherwise, and as a verb has a corresponding meaning.
 
