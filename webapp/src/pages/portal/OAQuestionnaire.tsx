@@ -255,6 +255,19 @@ export default function OAQuestionnaire() {
     return out;
   }, [data, couples]);
 
+  // The ownership question is hidden when the owners are a single unit — a
+  // couple holding jointly, or one member — so nothing would otherwise record
+  // their 100%. Write it once the units resolve.
+  useEffect(() => {
+    if (!loaded || units.length !== 1) return;
+    const u = units[0];
+    const current = u.kind === "couple" ? couples[u.ci]?.percentage : a.members?.[u.index]?.percentage;
+    if (current === 100) return;
+    if (u.kind === "couple") patchCouple(u.ci, { percentage: 100 });
+    else patchMember(u.index, { percentage: 100 });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loaded, units.length]);
+
 
   if (meQuery.isError) {
     navigate("/portal/login");

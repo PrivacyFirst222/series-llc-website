@@ -894,7 +894,14 @@ app.post("/portal/oa/generate", async (c) => {
     // sole owner on the S form: the single flow collects the contribution as contributionToCompany
     members[0].contribution = a.contributionToCompany ?? "";
   }
-  if (multiOwner) {
+  // One ownership unit — a couple holding jointly with no third owner — owns
+  // the whole company by definition. The questionnaire doesn't ask, so nothing
+  // is stored; fill it in rather than failing a total check against nothing.
+  if (members.length === 1) {
+    members[0].percentage = 100;
+    members[0].percentageLabel = "100%";
+  }
+  if (multiOwner && members.length > 1) {
     // Exact arithmetic: three owners at 1/3 each must total one whole, which
     // no float comparison of 33.33 can honestly report.
     const shares: OwnershipShare[] = [];

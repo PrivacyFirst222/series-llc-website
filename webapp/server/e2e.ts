@@ -467,6 +467,17 @@ if (mint.status === 200) {
     body: JSON.stringify({ ...coupleAnswers, couples: [{ a: 0, b: 0, form: "TBE", percentage: 100 }] }),
   });
   check("self-pairing rejected", badCouple.status === 400);
+  // A couple holding jointly with no third owner owns 100% by definition, and
+  // the questionnaire never asks — so generation must succeed with no
+  // percentage recorded anywhere.
+  const noPctAnswers = {
+    ...coupleAnswers,
+    couples: [{ a: 0, b: 1, form: "TBE", contribution: "$2,000 cash", todBeneficiary: "Ortiz Family Trust" }],
+    series: [{ associated: [{ memberIndex: 0, seriesPercentage: 100 }] }],
+  };
+  const noPctGen = await api("/api/portal/oa/generate", { method: "POST", cookies: mPw.cookie, body: JSON.stringify(noPctAnswers) });
+  check("couple-only company generates without any ownership answer", noPctGen.status === 200, noPctGen.body);
+
   const mGen = await api("/api/portal/oa/generate", { method: "POST", cookies: mPw.cookie, body: JSON.stringify(coupleAnswers) });
   check("TBE couple agreement generates", mGen.status === 200, mGen.body);
   const mDocId = mGen.body?.data?.documentId as string;

@@ -106705,7 +106705,11 @@ app.post("/portal/oa/generate", async (c) => {
   if (isSCorp && !multiOwner && !members[0].contribution) {
     members[0].contribution = a2.contributionToCompany ?? "";
   }
-  if (multiOwner) {
+  if (members.length === 1) {
+    members[0].percentage = 100;
+    members[0].percentageLabel = "100%";
+  }
+  if (multiOwner && members.length > 1) {
     const shares = [];
     const seenCouples = /* @__PURE__ */ new Set();
     seed.members.forEach((_, i) => {
