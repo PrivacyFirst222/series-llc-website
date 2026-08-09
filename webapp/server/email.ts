@@ -259,9 +259,10 @@ export function sElectionReadyEmail(opts: {
       ready to download in your portal: the completed IRS Form 2553, a cover letter, and
       step-by-step instructions for signing and mailing it to the IRS.</p>
       <p>You can correct your answers and regenerate the package until
-      <strong>${escapeHtml(opts.editableUntil)}</strong>. After that we delete the completed form
-      and every Social Security number from our systems — <strong>download and keep a copy before
-      then</strong>.</p>
+      <strong>${escapeHtml(opts.editableUntil)}</strong>. After that we permanently delete every
+      Social Security number from our systems and replace your copy with a record copy that shows
+      only the last four digits and cannot be filed with the IRS —
+      <strong>download the filing copy before then</strong>.</p>
       <p><a href="${opts.portalUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Open your portal</a></p>
     `),
   };

@@ -102843,7 +102843,8 @@ async function fillForm2553(d2) {
 ${sh.address}`);
     setText(`${row}.f2_${fieldNum(3)}[0]`, `${sh.percentage}%`);
     setText(`${row}.f2_${fieldNum(4)}[0]`, fmtDate(sh.dateAcquired));
-    setText(`${row}.f2_${fieldNum(5)}[0]`, `${sh.ssn.slice(0, 3)}-${sh.ssn.slice(3, 5)}-${sh.ssn.slice(5)}`);
+    const ssnText = d2.recordCopy ? `XXX-XX-${sh.ssn.slice(-4)}` : `${sh.ssn.slice(0, 3)}-${sh.ssn.slice(3, 5)}-${sh.ssn.slice(5)}`;
+    setText(`${row}.f2_${fieldNum(5)}[0]`, ssnText);
     setText(`${row}.f2_${fieldNum(6)}[0]`, "12/31");
   });
   form.updateFieldAppearances();
@@ -102852,6 +102853,28 @@ ${sh.address}`);
 }
 function instructionsMarkdown(d2, deadlineIso) {
   const einLine = d2.ein ? `The form is completed with your EIN, **${fmtEin(d2.ein)}**.` : `**Your EIN was not yet available when this package was prepared.** Write it in item A on page 1 (and the box at the top of page 2) before filing \u2014 the IRS will not process the form without it.`;
+  if (d2.recordCopy) {
+    return `# S CORPORATION ELECTION PACKAGE \u2014 RECORD COPY
+
+**${d2.llcName}**
+
+## DO NOT FILE THIS COPY
+
+The two-week period for changing this package has passed, and every Social Security number has been permanently deleted from our systems, as we said it would be. The Form 2553 in this copy shows only the last four digits of each number.
+
+**An election filed with incomplete Social Security numbers is invalid.** Do not sign or mail this copy. It is here so you keep a record of what was prepared for ${d2.llcName} \u2014 the election to be taxed as an S corporation effective ${fmtDateLong(d2.effectiveDate)}, prepared with ${d2.ein ? `EIN **${fmtEin(d2.ein)}**` : "no EIN on file"}.
+
+If you still need to file, contact us and we will prepare a new package.
+
+## WHAT IS IN THIS COPY
+
+1. This notice.
+2. The cover letter as it was prepared.
+3. **IRS Form 2553 as it was completed**, with the Social Security numbers removed.
+
+The IRS deadline for this election was ${fmtDateLong(deadlineIso)}. A late election requires IRS relief \u2014 talk to your tax professional.
+`;
+  }
   return `# S CORPORATION ELECTION PACKAGE
 
 **${d2.llcName}**
@@ -102930,6 +102953,26 @@ ${d2.officerName}, ${d2.officerTitle}
 ${d2.llcName}
 `;
 }
+async function stampRecordCopy(doc) {
+  const bold = await doc.embedFont(StandardFonts.HelveticaBold);
+  const red = rgb(0.72, 0.11, 0.11);
+  const top = "RECORD COPY \u2014 SOCIAL SECURITY NUMBERS REMOVED \u2014 DO NOT FILE THIS COPY WITH THE IRS";
+  for (const page of doc.getPages()) {
+    const { width, height } = page.getSize();
+    const size = 7.5;
+    const w = bold.widthOfTextAtSize(top, size);
+    page.drawText(top, { x: Math.max(6, (width - w) / 2), y: height - 12, size, font: bold, color: red });
+    page.drawText("RECORD COPY", {
+      x: width * 0.16,
+      y: height * 0.34,
+      size: 54,
+      font: bold,
+      color: red,
+      opacity: 0.12,
+      rotate: degrees(32)
+    });
+  }
+}
 async function buildSElectionPackage(d2) {
   const deadline = electionDeadline(d2.effectiveDate);
   const title = `S Corporation Election Package \u2014 ${d2.llcName}`;
@@ -102950,6 +102993,7 @@ async function buildSElectionPackage(d2) {
   for (const part of [await PDFDocument.load(instructions), await PDFDocument.load(letter), filled]) {
     for (const p2 of await out.copyPages(part, part.getPageIndices())) out.addPage(p2);
   }
+  if (d2.recordCopy) await stampRecordCopy(out);
   out.setTitle(`S Corporation Election Package \u2014 ${d2.llcName}`);
   out.setAuthor("MyFloridaSeriesLLC");
   out.setProducer("MyFloridaSeriesLLC document engine");
@@ -106118,9 +106162,10 @@ function sElectionReadyEmail(opts) {
       ready to download in your portal: the completed IRS Form 2553, a cover letter, and
       step-by-step instructions for signing and mailing it to the IRS.</p>
       <p>You can correct your answers and regenerate the package until
-      <strong>${escapeHtml(opts.editableUntil)}</strong>. After that we delete the completed form
-      and every Social Security number from our systems \u2014 <strong>download and keep a copy before
-      then</strong>.</p>
+      <strong>${escapeHtml(opts.editableUntil)}</strong>. After that we permanently delete every
+      Social Security number from our systems and replace your copy with a record copy that shows
+      only the last four digits and cannot be filed with the IRS \u2014
+      <strong>download the filing copy before then</strong>.</p>
       <p><a href="${opts.portalUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Open your portal</a></p>
     `)
   };
@@ -107146,7 +107191,7 @@ async function purgeExpiredSElections() {
   const db2 = await getDb();
   const cutoff = new Date(Date.now() - S_ELECTION_EDIT_DAYS * 864e5).toISOString();
   const rows = await db2.query(
-    `SELECT id, client_id, details FROM service_orders
+    `SELECT id, client_id, llc_name, details FROM service_orders
       WHERE type = 's-election' AND status = 'fulfilled'
         AND fulfilled_at IS NOT NULL AND fulfilled_at < $1
         AND (ein_secret IS NOT NULL OR details->>'purgedAt' IS NULL)`,
@@ -107154,31 +107199,66 @@ async function purgeExpiredSElections() {
   );
   for (const row of rows) {
     const d2 = typeof row.details === "string" ? JSON.parse(row.details) : row.details;
-    if (d2?.documentId) {
-      const docs = await db2.query(
-        "SELECT storage_key FROM documents WHERE id = $1",
-        [d2.documentId]
-      );
-      await db2.query("DELETE FROM documents WHERE id = $1", [d2.documentId]);
-      if (docs[0]?.storage_key) await deleteFile(docs[0].storage_key).catch(() => {
-      });
+    const kept = { ...d2, purgedAt: (/* @__PURE__ */ new Date()).toISOString() };
+    if (d2?.shareholders?.length && d2.dateIncorporated && d2.effectiveDate) {
+      const seed = await oaSeed(row.client_id);
+      try {
+        const pdf = await buildSElectionPackage({
+          llcName: row.llc_name,
+          principalAddress: seed?.principalAddress ?? "",
+          ein: d2.ein ?? "",
+          dateIncorporated: d2.dateIncorporated,
+          effectiveDate: d2.effectiveDate,
+          officerName: d2.officerName ?? "",
+          officerTitle: d2.officerTitle ?? "",
+          phone: d2.phone ?? "",
+          recordCopy: true,
+          // Only the last four survive in the stored record — that is all the
+          // record copy can show, and all it needs to.
+          shareholders: d2.shareholders.map((s) => ({ ...s, ssn: s.ssnLast4 }))
+        });
+        const title = `S Corporation Election Package \u2014 Record Copy \u2014 ${row.llc_name}`;
+        const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength);
+        const stored = await putFile(`${title.replace(/[^\w-]+/g, "_")}.pdf`, buf, "application/pdf");
+        if (d2.documentId) {
+          const old = await db2.query(
+            "SELECT storage_key FROM documents WHERE id = $1",
+            [d2.documentId]
+          );
+          await db2.query(
+            `UPDATE documents SET title = $1, storage_key = $2, size_bytes = $3 WHERE id = $4`,
+            [title, stored.storageKey, stored.sizeBytes, d2.documentId]
+          );
+          if (old[0]?.storage_key) await deleteFile(old[0].storage_key).catch(() => {
+          });
+        } else {
+          const doc = await db2.query(
+            `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)
+             VALUES ($1, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,
+            [row.client_id, title, stored.storageKey, stored.sizeBytes]
+          );
+          kept.documentId = doc[0].id;
+        }
+      } catch (e) {
+        console.error("[purge] record copy rebuild failed; removing the original:", e);
+        if (d2.documentId) {
+          const old = await db2.query(
+            "SELECT storage_key FROM documents WHERE id = $1",
+            [d2.documentId]
+          );
+          await db2.query("DELETE FROM documents WHERE id = $1", [d2.documentId]);
+          if (old[0]?.storage_key) await deleteFile(old[0].storage_key).catch(() => {
+          });
+          kept.documentId = void 0;
+        }
+      }
     }
-    const kept = {
-      ein: d2?.ein,
-      einPending: d2?.einPending,
-      dateIncorporated: d2?.dateIncorporated,
-      effectiveDate: d2?.effectiveDate,
-      officerName: d2?.officerName,
-      officerTitle: d2?.officerTitle,
-      certifiedAt: d2?.certifiedAt,
-      purgedAt: (/* @__PURE__ */ new Date()).toISOString()
-    };
     await db2.query("UPDATE service_orders SET details = $1, ein_secret = NULL WHERE id = $2", [
       JSON.stringify(kept),
       row.id
     ]);
   }
-  if (rows.length > 0) console.log(`[purge] destroyed ${rows.length} expired S election package(s)`);
+  if (rows.length > 0) console.log(`[purge] redacted ${rows.length} expired S election package(s)`);
   return rows.length;
 }
 app.get("/portal/services", async (c) => {

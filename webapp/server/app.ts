@@ -1318,14 +1318,17 @@ function sElectionWindow(fulfilledAt: unknown): { open: boolean; deleteOn: strin
   return { open: Date.now() < deleteOn.getTime(), deleteOn: deleteOn.toISOString() };
 }
 
-/** Destroy expired S election packages: the PDF, the encrypted Social Security
- *  numbers, and the owner rows. The order record survives so the client and we
- *  can both see the service was delivered. Safe to call on any request. */
+/** When the edit window closes, the Social Security numbers are destroyed —
+ *  but the client keeps a record of what was prepared. The package is REBUILT
+ *  with only the last four digits of each number and stamped unfileable, and
+ *  the encrypted numbers are deleted. Rebuilding rather than editing the old
+ *  PDF matters: a black box drawn over text leaves the text underneath, still
+ *  extractable. Safe to call on any request. */
 async function purgeExpiredSElections(): Promise<number> {
   const db = await getDb();
   const cutoff = new Date(Date.now() - S_ELECTION_EDIT_DAYS * 86400_000).toISOString();
-  const rows = await db.query<{ id: string; client_id: string; details: unknown }>(
-    `SELECT id, client_id, details FROM service_orders
+  const rows = await db.query<{ id: string; client_id: string; llc_name: string; details: unknown }>(
+    `SELECT id, client_id, llc_name, details FROM service_orders
       WHERE type = 's-election' AND status = 'fulfilled'
         AND fulfilled_at IS NOT NULL AND fulfilled_at < $1
         AND (ein_secret IS NOT NULL OR details->>'purgedAt' IS NULL)`,
@@ -1333,30 +1336,68 @@ async function purgeExpiredSElections(): Promise<number> {
   );
   for (const row of rows) {
     const d = (typeof row.details === "string" ? JSON.parse(row.details) : row.details) as SElectionStoredDetails;
-    if (d?.documentId) {
-      const docs = await db.query<{ storage_key: string }>(
-        "SELECT storage_key FROM documents WHERE id = $1",
-        [d.documentId],
-      );
-      await db.query("DELETE FROM documents WHERE id = $1", [d.documentId]);
-      if (docs[0]?.storage_key) await deleteFile(docs[0].storage_key).catch(() => {});
+    const kept: SElectionStoredDetails = { ...d, purgedAt: new Date().toISOString() };
+
+    if (d?.shareholders?.length && d.dateIncorporated && d.effectiveDate) {
+      const seed = await oaSeed(row.client_id);
+      try {
+        const pdf = await buildSElectionPackage({
+          llcName: row.llc_name,
+          principalAddress: seed?.principalAddress ?? "",
+          ein: d.ein ?? "",
+          dateIncorporated: d.dateIncorporated,
+          effectiveDate: d.effectiveDate,
+          officerName: d.officerName ?? "",
+          officerTitle: d.officerTitle ?? "",
+          phone: d.phone ?? "",
+          recordCopy: true,
+          // Only the last four survive in the stored record — that is all the
+          // record copy can show, and all it needs to.
+          shareholders: d.shareholders.map((s) => ({ ...s, ssn: s.ssnLast4 })),
+        });
+        const title = `S Corporation Election Package — Record Copy — ${row.llc_name}`;
+        const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength) as ArrayBuffer;
+        const stored = await putFile(`${title.replace(/[^\w-]+/g, "_")}.pdf`, buf, "application/pdf");
+        if (d.documentId) {
+          const old = await db.query<{ storage_key: string }>(
+            "SELECT storage_key FROM documents WHERE id = $1",
+            [d.documentId],
+          );
+          await db.query(
+            `UPDATE documents SET title = $1, storage_key = $2, size_bytes = $3 WHERE id = $4`,
+            [title, stored.storageKey, stored.sizeBytes, d.documentId],
+          );
+          if (old[0]?.storage_key) await deleteFile(old[0].storage_key).catch(() => {});
+        } else {
+          const doc = await db.query<{ id: string }>(
+            `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)
+             VALUES ($1, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,
+            [row.client_id, title, stored.storageKey, stored.sizeBytes],
+          );
+          kept.documentId = doc[0].id;
+        }
+      } catch (e) {
+        // A rebuild that fails must not leave the full-SSN copy in place: drop
+        // it, and the client still has whatever they downloaded.
+        console.error("[purge] record copy rebuild failed; removing the original:", e);
+        if (d.documentId) {
+          const old = await db.query<{ storage_key: string }>(
+            "SELECT storage_key FROM documents WHERE id = $1",
+            [d.documentId],
+          );
+          await db.query("DELETE FROM documents WHERE id = $1", [d.documentId]);
+          if (old[0]?.storage_key) await deleteFile(old[0].storage_key).catch(() => {});
+          kept.documentId = undefined;
+        }
+      }
     }
-    const kept: SElectionStoredDetails = {
-      ein: d?.ein,
-      einPending: d?.einPending,
-      dateIncorporated: d?.dateIncorporated,
-      effectiveDate: d?.effectiveDate,
-      officerName: d?.officerName,
-      officerTitle: d?.officerTitle,
-      certifiedAt: d?.certifiedAt,
-      purgedAt: new Date().toISOString(),
-    };
+
     await db.query("UPDATE service_orders SET details = $1, ein_secret = NULL WHERE id = $2", [
       JSON.stringify(kept),
       row.id,
     ]);
   }
-  if (rows.length > 0) console.log(`[purge] destroyed ${rows.length} expired S election package(s)`);
+  if (rows.length > 0) console.log(`[purge] redacted ${rows.length} expired S election package(s)`);
   return rows.length;
 }
 

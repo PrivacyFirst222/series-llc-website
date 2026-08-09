@@ -629,16 +629,27 @@ if (mint.status === 200) {
   const swept = await api("/api/portal/services", { cookies: mPw.cookie });
   const sweptRow = (swept.body?.data?.orders ?? []).find((o: { id: string }) => o.id === sId);
   check("expired package is no longer editable", sweptRow?.editable === false, sweptRow);
-  check("expired package records when it was deleted", Boolean(sweptRow?.details?.purgedAt), sweptRow?.details);
-  check("owner rows destroyed", !sweptRow?.details?.shareholders, sweptRow?.details);
+  check("expired package records when the numbers went", Boolean(sweptRow?.details?.purgedAt), sweptRow?.details);
   const sAfter = await api(`/api/admin/services/${sId}`, { cookies: adminS.cookie });
   check("shareholder SSNs destroyed after the window", sAfter.body?.data?.ssns === null, sAfter.body?.data);
   const sDocs = await api("/api/portal/documents", { cookies: mPw.cookie });
+  const recordDoc = (sDocs.body?.data ?? []).find((d: { title: string }) => d.title.includes("S Corporation Election Package"));
+  check("the client keeps a record copy", recordDoc?.title.includes("Record Copy"), sDocs.body?.data?.map((d: { title: string }) => d.title));
+  const recordPdf = await fetch(`${BASE}/api/portal/documents/${recordDoc?.id}/download`, { headers: { Cookie: mPw.cookie } });
+  const recordBytes = new Uint8Array(await recordPdf.arrayBuffer());
   check(
-    "the completed form is gone from the client's documents",
-    !(sDocs.body?.data ?? []).some((d: { title: string }) => d.title.includes("S Corporation Election Package")),
-    sDocs.body?.data?.map((d: { title: string }) => d.title),
+    "record copy still downloads as a PDF",
+    recordPdf.ok && recordBytes[0] === 0x25 && recordBytes[1] === 0x50,
+    { status: recordPdf.status, len: recordBytes.length },
   );
+  // The whole point of rebuilding rather than drawing boxes: the digits are
+  // not in the file at all, so no viewer can recover them.
+  const asText = new TextDecoder("latin1").decode(recordBytes);
+  check("full SSN is absent from the record copy bytes", !asText.includes("123-45-6789") && !asText.includes("123456789"), null);
+  // Page count proves the notice sheet, cover letter and both form pages are
+  // all still there; the stamp itself is checked by eye against the render.
+  const recordPages = (asText.match(/\/Type\s*\/Page[^s]/g) ?? []).length;
+  check("record copy keeps the whole package", recordPages >= 4, { recordPages });
   const lateEdit = await api(`/api/portal/services/${sId}/s-election-details`, {
     method: "POST", cookies: mPw.cookie, body: JSON.stringify(goodDetails),
   });

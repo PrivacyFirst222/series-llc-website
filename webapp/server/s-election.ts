@@ -9,7 +9,7 @@
  *   Department of the Treasury, Internal Revenue Service Center, Ogden, UT 84201
  *   Fax: 855-214-7520. There is no IRS filing fee.
  */
-import { PDFDocument } from "@cantoo/pdf-lib";
+import { PDFDocument, StandardFonts, degrees, rgb } from "@cantoo/pdf-lib";
 import f2553Base64 from "./assets/f2553-b64";
 import { renderMarkdownPdf } from "./pdf-render";
 
@@ -21,7 +21,8 @@ export interface SElectionShareholder {
   address: string;
   percentage: number;
   dateAcquired: string; // YYYY-MM-DD
-  ssn: string; // 9 digits — decrypted only for draft generation
+  /** 9 digits, or the last 4 alone on a record copy. */
+  ssn: string;
 }
 
 export interface SElectionDetails {
@@ -34,6 +35,11 @@ export interface SElectionDetails {
   officerTitle: string;
   phone: string;
   shareholders: SElectionShareholder[];
+  /** Record copy: the Social Security numbers are gone for good, so the form
+   *  shows only their last four digits and every page is stamped unfileable.
+   *  An election with incomplete SSNs is invalid, and a client who mailed one
+   *  would lose the election — the stamp is the whole point. */
+  recordCopy?: boolean;
 }
 
 const F = "topmostSubform[0].Page1[0]";
@@ -116,7 +122,10 @@ async function fillForm2553(d: SElectionDetails): Promise<PDFDocument> {
     // K signature + date stay blank — each shareholder signs by hand
     setText(`${row}.f2_${fieldNum(3)}[0]`, `${sh.percentage}%`); // L — percentage of ownership
     setText(`${row}.f2_${fieldNum(4)}[0]`, fmtDate(sh.dateAcquired)); // L — date(s) acquired
-    setText(`${row}.f2_${fieldNum(5)}[0]`, `${sh.ssn.slice(0, 3)}-${sh.ssn.slice(3, 5)}-${sh.ssn.slice(5)}`); // M
+    const ssnText = d.recordCopy
+      ? `XXX-XX-${sh.ssn.slice(-4)}`
+      : `${sh.ssn.slice(0, 3)}-${sh.ssn.slice(3, 5)}-${sh.ssn.slice(5)}`;
+    setText(`${row}.f2_${fieldNum(5)}[0]`, ssnText); // M
     setText(`${row}.f2_${fieldNum(6)}[0]`, "12/31"); // N — shareholder tax year end
   });
 
@@ -131,6 +140,28 @@ function instructionsMarkdown(d: SElectionDetails, deadlineIso: string): string 
   const einLine = d.ein
     ? `The form is completed with your EIN, **${fmtEin(d.ein)}**.`
     : `**Your EIN was not yet available when this package was prepared.** Write it in item A on page 1 (and the box at the top of page 2) before filing — the IRS will not process the form without it.`;
+  if (d.recordCopy) {
+    return `# S CORPORATION ELECTION PACKAGE — RECORD COPY
+
+**${d.llcName}**
+
+## DO NOT FILE THIS COPY
+
+The two-week period for changing this package has passed, and every Social Security number has been permanently deleted from our systems, as we said it would be. The Form 2553 in this copy shows only the last four digits of each number.
+
+**An election filed with incomplete Social Security numbers is invalid.** Do not sign or mail this copy. It is here so you keep a record of what was prepared for ${d.llcName} — the election to be taxed as an S corporation effective ${fmtDateLong(d.effectiveDate)}, prepared with ${d.ein ? `EIN **${fmtEin(d.ein)}**` : "no EIN on file"}.
+
+If you still need to file, contact us and we will prepare a new package.
+
+## WHAT IS IN THIS COPY
+
+1. This notice.
+2. The cover letter as it was prepared.
+3. **IRS Form 2553 as it was completed**, with the Social Security numbers removed.
+
+The IRS deadline for this election was ${fmtDateLong(deadlineIso)}. A late election requires IRS relief — talk to your tax professional.
+`;
+  }
   return `# S CORPORATION ELECTION PACKAGE
 
 **${d.llcName}**
@@ -214,6 +245,29 @@ ${d.llcName}
 /** The full package: instructions + cover letter + filled Form 2553. The
  *  instruction sheet and cover letter are rendered as separate documents so
  *  the letter always starts on its own page — it gets mailed with the form. */
+/** Marks every page of a record copy so it cannot be mistaken for the filing
+ *  copy: a red line across the top and a diagonal across the middle. */
+async function stampRecordCopy(doc: PDFDocument): Promise<void> {
+  const bold = await doc.embedFont(StandardFonts.HelveticaBold);
+  const red = rgb(0.72, 0.11, 0.11);
+  const top = "RECORD COPY — SOCIAL SECURITY NUMBERS REMOVED — DO NOT FILE THIS COPY WITH THE IRS";
+  for (const page of doc.getPages()) {
+    const { width, height } = page.getSize();
+    const size = 7.5;
+    const w = bold.widthOfTextAtSize(top, size);
+    page.drawText(top, { x: Math.max(6, (width - w) / 2), y: height - 12, size, font: bold, color: red });
+    page.drawText("RECORD COPY", {
+      x: width * 0.16,
+      y: height * 0.34,
+      size: 54,
+      font: bold,
+      color: red,
+      opacity: 0.12,
+      rotate: degrees(32),
+    });
+  }
+}
+
 export async function buildSElectionPackage(d: SElectionDetails): Promise<Uint8Array> {
   const deadline = electionDeadline(d.effectiveDate);
   const title = `S Corporation Election Package — ${d.llcName}`;
@@ -235,6 +289,7 @@ export async function buildSElectionPackage(d: SElectionDetails): Promise<Uint8A
   for (const part of [await PDFDocument.load(instructions), await PDFDocument.load(letter), filled]) {
     for (const p of await out.copyPages(part, part.getPageIndices())) out.addPage(p);
   }
+  if (d.recordCopy) await stampRecordCopy(out);
   out.setTitle(`S Corporation Election Package — ${d.llcName}`);
   out.setAuthor("MyFloridaSeriesLLC");
   out.setProducer("MyFloridaSeriesLLC document engine");
