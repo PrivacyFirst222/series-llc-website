@@ -93,7 +93,7 @@ export default function TheStatute() {
       <CallToAction
         eyebrow="Formed in Florida"
         title="File under the Florida statute."
-        body="The law is in effect and filings are open — reserve your name and start your statutory clock as soon as the Division accepts your Articles."
+        body="The law is in effect and filings are open — form your Florida Protected Series LLC now!"
       />
     </>
   );
