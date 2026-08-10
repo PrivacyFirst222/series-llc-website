@@ -46,9 +46,17 @@ export function priceOrder(opts: {
   if (fees.articlesOfOrganization) {
     lineItems.push({ name: "FL state fee — Articles of Organization", amountCents: fees.articlesOfOrganization * 100 });
   }
-  lineItems.push({ name: "FL state fee — registered agent designation", amountCents: fees.registeredAgentDesignation * 100 });
+  if (fees.additionalSeriesPrepFee) {
+    lineItems.push({
+      name: "Additional Protected Series Designations — preparation",
+      amountCents: fees.additionalSeriesPrepFee * 100,
+    });
+  }
   if (fees.additionalSeriesFee) {
-    lineItems.push({ name: "Additional Protected Series Designations", amountCents: fees.additionalSeriesFee * 100 });
+    lineItems.push({
+      name: "FL state fee — Additional Protected Series Designations",
+      amountCents: fees.additionalSeriesFee * 100,
+    });
   }
   if (fees.certificateOfStatus) {
     lineItems.push({ name: "FL state fee — Certificate of Status", amountCents: fees.certificateOfStatus * 100 });
@@ -57,7 +65,10 @@ export function priceOrder(opts: {
     lineItems.push({ name: "FL state fee — certified copy", amountCents: fees.certifiedCopy * 100 });
   }
   const serviceFeeCents =
-    SERVICE_FEE_CENTS + (opts.ein ? EIN_FEE_CENTS : 0) + (opts.sElection ? S_ELECTION_FEE_CENTS : 0);
+    SERVICE_FEE_CENTS +
+    fees.additionalSeriesPrepFee * 100 +
+    (opts.ein ? EIN_FEE_CENTS : 0) +
+    (opts.sElection ? S_ELECTION_FEE_CENTS : 0);
   return {
     serviceFeeCents,
     stateFeesCents,

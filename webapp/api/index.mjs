@@ -76233,18 +76233,20 @@ function validateRegisteredAgentAddress(street1, street2, state) {
   return null;
 }
 function calculateEstimatedFees(opts) {
-  const articlesOfOrganization = opts.isConversion ? 0 : 100;
-  const registeredAgentDesignation = 25;
+  const articlesOfOrganization = opts.isConversion ? 0 : 125;
+  const registeredAgentDesignation = 0;
   const certificateOfStatus = opts.certificateOfStatus ? 5 : 0;
   const certifiedCopy = opts.certifiedCopy ? 30 : 0;
   const extraSeries = Math.max(0, (opts.seriesCount ?? 0) - 3);
-  const additionalSeriesFee = extraSeries * 50;
+  const additionalSeriesFee = extraSeries * 25;
+  const additionalSeriesPrepFee = extraSeries * 25;
   return {
     articlesOfOrganization,
     registeredAgentDesignation,
     certificateOfStatus,
     certifiedCopy,
     additionalSeriesFee,
+    additionalSeriesPrepFee,
     estimatedTotal: articlesOfOrganization + registeredAgentDesignation + certificateOfStatus + certifiedCopy + additionalSeriesFee
   };
 }
@@ -76672,9 +76674,17 @@ function priceOrder(opts) {
   if (fees.articlesOfOrganization) {
     lineItems.push({ name: "FL state fee \u2014 Articles of Organization", amountCents: fees.articlesOfOrganization * 100 });
   }
-  lineItems.push({ name: "FL state fee \u2014 registered agent designation", amountCents: fees.registeredAgentDesignation * 100 });
+  if (fees.additionalSeriesPrepFee) {
+    lineItems.push({
+      name: "Additional Protected Series Designations \u2014 preparation",
+      amountCents: fees.additionalSeriesPrepFee * 100
+    });
+  }
   if (fees.additionalSeriesFee) {
-    lineItems.push({ name: "Additional Protected Series Designations", amountCents: fees.additionalSeriesFee * 100 });
+    lineItems.push({
+      name: "FL state fee \u2014 Additional Protected Series Designations",
+      amountCents: fees.additionalSeriesFee * 100
+    });
   }
   if (fees.certificateOfStatus) {
     lineItems.push({ name: "FL state fee \u2014 Certificate of Status", amountCents: fees.certificateOfStatus * 100 });
@@ -76682,7 +76692,7 @@ function priceOrder(opts) {
   if (fees.certifiedCopy) {
     lineItems.push({ name: "FL state fee \u2014 certified copy", amountCents: fees.certifiedCopy * 100 });
   }
-  const serviceFeeCents = SERVICE_FEE_CENTS + (opts.ein ? EIN_FEE_CENTS : 0) + (opts.sElection ? S_ELECTION_FEE_CENTS : 0);
+  const serviceFeeCents = SERVICE_FEE_CENTS + fees.additionalSeriesPrepFee * 100 + (opts.ein ? EIN_FEE_CENTS : 0) + (opts.sElection ? S_ELECTION_FEE_CENTS : 0);
   return {
     serviceFeeCents,
     stateFeesCents,

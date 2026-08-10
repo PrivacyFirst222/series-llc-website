@@ -46,12 +46,6 @@ export function FeeEstimate({
             <span className="font-mono-feature">${fees.articlesOfOrganization}</span>
           </li>
         )}
-        <li className="flex justify-between">
-          <span className="text-foreground/80">Registered Agent Designation</span>
-          <span className="font-mono-feature">
-            ${fees.registeredAgentDesignation}
-          </span>
-        </li>
         <li className="flex justify-between text-muted-foreground">
           <span>Certificate of Status (optional)</span>
           <span className="font-mono-feature">
@@ -68,7 +62,7 @@ export function FeeEstimate({
           <li className="flex justify-between">
             <span className={extraSeries > 0 ? "text-foreground/80" : "text-muted-foreground"}>
               {extraSeries > 0
-                ? `Additional series (${extraSeries} × $50)`
+                ? `Additional series — state fee (${extraSeries} × $25)`
                 : `Series (${seriesCount} of 3 included)`}
             </span>
             <span className="font-mono-feature">
@@ -85,8 +79,9 @@ export function FeeEstimate({
       </div>
       <p className="mt-2 text-[11px] text-muted-foreground leading-relaxed">
         Government fees are subject to change. Base $499 service fee not
-        included. Additional series fees ($50 each) include both $25 drafting
-        and $25 state filing.
+        included. Each series beyond the included three costs $50 — the $25
+        shown here is Florida's filing fee; our $25 preparation charge is
+        billed with the service fee.
       </p>
     </div>
   );

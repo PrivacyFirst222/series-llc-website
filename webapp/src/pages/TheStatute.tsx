@@ -1,6 +1,6 @@
 import { PageHero } from "@/components/sections/PageHero";
 import { CallToAction } from "@/components/sections/CallToAction";
-import { Landmark, ScrollText, Anchor, Scale, FileCheck, Building2 } from "lucide-react";
+import { Landmark, FileCheck } from "lucide-react";
 
 
 export default function TheStatute() {
@@ -10,10 +10,10 @@ export default function TheStatute() {
         eyebrow="The statute"
         title={
           <>
-            Florida's statute. <em>Highlights and overview</em>.
+            What the statute requires <em>of you</em>.
           </>
         }
-        description="Two sections do most of the day-to-day work: how a protected series holds property, and how a court reads a series when the chapter applies. Here is what each one says."
+        description="The liability shield between your series is not automatic. It rests on how each asset is titled and on records you have to keep. This is what the statute asks of you, in plain language."
       />
 
       {/* Statute deep dive 1 */}
@@ -64,62 +64,6 @@ export default function TheStatute() {
                   ))}
                 </ul>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Statute deep dive 2 */}
-      <section>
-        <div className="container-wide section-y">
-          <div className="grid lg:grid-cols-12 gap-8 lg:gap-10">
-            <div className="lg:col-span-7 space-y-5 lg:order-2">
-              <div className="rounded-2xl border border-border bg-card p-7">
-                <h3 className="font-display text-lg font-semibold">What it does</h3>
-                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                  Where it applies, §605.2108 tells a court to read a protected series{" "}
-                  <em className="text-foreground">as if it were its own LLC</em> — separately formed and
-                  distinct from the company and every other series, with its associated members treated as
-                  that LLC's members, its managers as its managers, and its assets as its assets. It is a
-                  targeted rule, not a blanket one: it operates in the application of the specific sections
-                  the statute lists.
-                </p>
-              </div>
-              <div className="rounded-2xl border border-border bg-card p-7">
-                <h3 className="font-display text-lg font-semibold">Where it applies</h3>
-                <ul className="mt-3 grid gap-2 sm:grid-cols-2 text-sm">
-                  {[
-                    { i: ScrollText, t: "§605.2106 — operating agreement" },
-                    { i: Building2, t: "§605.2304(3) — manager duties" },
-                    { i: Scale, t: "§605.2304(6) — derivative actions" },
-                    { i: FileCheck, t: "§605.2501(4)(a) — judicial dissolution" },
-                    { i: Anchor, t: "§605.2502(1) — winding up" },
-                    { i: Scale, t: "§605.2503(2) — reinstatement" },
-                  ].map((row) => {
-                    const Icon = row.i;
-                    return (
-                      <li key={row.t} className="flex items-center gap-2">
-                        <Icon className="h-4 w-4 text-primary" />
-                        {row.t}
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            </div>
-            <div className="lg:col-span-5 space-y-5 lg:order-1">
-              <div className="inline-flex items-center gap-2 rounded-full border border-trust/30 bg-trust/5 px-3 py-1 text-trust">
-                <ScrollText className="h-4 w-4" />
-                <span className="font-mono-feature text-xs uppercase tracking-[0.18em]">§605.2108</span>
-              </div>
-              <h2 className="display text-4xl text-balance lg:text-5xl">
-                Application of the Chapter
-              </h2>
-              <p className="text-base text-muted-foreground leading-relaxed">
-                For the questions it covers, Florida's statute says how to treat a protected series
-                instead of leaving a court to work it out — a deeming rule that stands the series up as
-                its own LLC for those purposes.
-              </p>
             </div>
           </div>
         </div>

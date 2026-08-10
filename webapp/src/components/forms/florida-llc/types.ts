@@ -241,6 +241,7 @@ export interface SubmissionPayload {
   estimatedStateFees: {
     articlesOfOrganization: number;
     registeredAgentDesignation: number;
+    additionalSeriesPrepFee?: number;
     certificateOfStatus: number;
     certifiedCopy: number;
     estimatedTotal: number;

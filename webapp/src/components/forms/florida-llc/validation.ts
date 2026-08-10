@@ -150,20 +150,31 @@ export function calculateEstimatedFees(opts: {
   certificateOfStatus: number;
   certifiedCopy: number;
   additionalSeriesFee: number;
+  /** Our preparation charge for series beyond the included three — NOT a
+   *  state fee; billed with the service fee. */
+  additionalSeriesPrepFee: number;
   estimatedTotal: number;
 } {
-  const articlesOfOrganization = opts.isConversion ? 0 : 100;
-  const registeredAgentDesignation = 25;
+  // Florida charges $125 to file Articles of Organization. Designating a
+  // registered agent carries no separate fee, and a conversion files no
+  // Articles at all — so a conversion owes the state nothing on the base
+  // package.
+  const articlesOfOrganization = opts.isConversion ? 0 : 125;
+  const registeredAgentDesignation = 0;
   const certificateOfStatus = opts.certificateOfStatus ? 5 : 0;
   const certifiedCopy = opts.certifiedCopy ? 30 : 0;
   const extraSeries = Math.max(0, (opts.seriesCount ?? 0) - 3);
-  const additionalSeriesFee = extraSeries * 50;
+  // $50 per extra series, but only half of it is Florida's. The other $25 is
+  // our preparation fee and must not be presented as a government charge.
+  const additionalSeriesFee = extraSeries * 25;
+  const additionalSeriesPrepFee = extraSeries * 25;
   return {
     articlesOfOrganization,
     registeredAgentDesignation,
     certificateOfStatus,
     certifiedCopy,
     additionalSeriesFee,
+    additionalSeriesPrepFee,
     estimatedTotal:
       articlesOfOrganization +
       registeredAgentDesignation +

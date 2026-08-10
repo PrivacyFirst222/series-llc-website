@@ -18,7 +18,7 @@ const FAQ_ITEMS: {
   },
   {
     q: "Can a protected series hold Florida real estate in its own name?",
-    a: "Yes. The deed goes in the series' own full name — something like \"Sunshine Holdings, LLC, PS A.\" Not the LLC's name, and not another series' name. Recording that deed does two jobs at once: it puts the property in the series, and it becomes your record that the property belongs to that series and not to the LLC or to a different one. One honest caveat — we can't promise how any particular clerk's office or title company will handle a given closing. (§605.2301)",
+    a: "Yes. The deed goes in the series' own full name — something like \"Sunshine Holdings, LLC - PS A.\" Not the LLC's name, and not another series' name. Recording that deed does two jobs at once: it puts the property in the series, and it becomes your record that the property belongs to that series and not to the LLC or to a different one. One honest caveat — we can't promise how any particular clerk's office or title company will handle a given closing. (§605.2301)",
   },
   {
     q: "Do I get separate EINs for each series?",
