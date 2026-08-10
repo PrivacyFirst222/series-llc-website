@@ -124,6 +124,19 @@ check("accepts valid order (200)", order.status === 200, order.body);
 const orderId = order.body?.data?.orderId as string;
 const totalCents = order.body?.data?.totalCents as number;
 check("price recomputed server-side: $499 + $50 EIN + $95 S election + $125 = $769.00", totalCents === 76900, { totalCents });
+
+// s. 605.0213: $100 articles + $25 agent designation on a new formation; a
+// conversion pays the $25 only when it switches agents.
+{
+  const { priceOrder } = await import("./pricing");
+  const base = { seriesCount: 3, certificateOfStatus: false, certifiedCopy: false, ein: false, sElection: false };
+  const brandNew = priceOrder({ ...base, isConversion: false, registeredAgentChange: true });
+  const convSwitch = priceOrder({ ...base, isConversion: true, registeredAgentChange: true });
+  const convKeep = priceOrder({ ...base, isConversion: true, registeredAgentChange: false });
+  check("new formation state fees are $125", brandNew.stateFeesCents === 125_00, brandNew.stateFeesCents);
+  check("conversion switching agents owes $25", convSwitch.stateFeesCents === 25_00, convSwitch.stateFeesCents);
+  check("conversion keeping its agent owes nothing", convKeep.stateFeesCents === 0, convKeep.stateFeesCents);
+}
 check("returns checkout URL", typeof order.body?.data?.checkoutUrl === "string");
 
 // 3. Status is pending before payment

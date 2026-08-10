@@ -182,6 +182,11 @@ export interface FloridaLLCFormData {
 }
 
 export interface SubmissionPayload {
+  /** Conversion of an existing Florida LLC, or a new formation. The server
+   *  reads these three; they were set by buildPayload but never declared. */
+  filingPath: string;
+  existingLlcName: string;
+  sunbizDocumentNumber: string;
   formationType: string;
   llcName: {
     desiredName: string;
@@ -236,6 +241,7 @@ export interface SubmissionPayload {
     certificateOfStatus: boolean;
     certifiedCopy: boolean;
     ein: boolean;
+    sElection: boolean;
   };
   series: SeriesEntry[];
   estimatedStateFees: {

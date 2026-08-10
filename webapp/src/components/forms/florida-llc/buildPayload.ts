@@ -8,6 +8,7 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
     certificateOfStatus: data.orderCertificateOfStatus,
     certifiedCopy: data.orderCertifiedCopy,
     seriesCount: data.series.length,
+    registeredAgentChange: data.registeredAgentChoice === "SERVICE",
   });
 
   const finalName = buildFinalLlcName(

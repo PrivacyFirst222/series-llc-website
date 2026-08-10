@@ -33,7 +33,11 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     }
 
     const response = await app.fetch(
-      new Request(`${proto}://${host}${req.url ?? "/"}`, { method, headers, body }),
+      new Request(`${proto}://${host}${req.url ?? "/"}`, {
+        method,
+        headers,
+        body: body as BodyInit | undefined,
+      }),
     );
 
     res.statusCode = response.status;

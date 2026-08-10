@@ -76233,8 +76233,8 @@ function validateRegisteredAgentAddress(street1, street2, state) {
   return null;
 }
 function calculateEstimatedFees(opts) {
-  const articlesOfOrganization = opts.isConversion ? 0 : 125;
-  const registeredAgentDesignation = 0;
+  const articlesOfOrganization = opts.isConversion ? 0 : 100;
+  const registeredAgentDesignation = opts.isConversion ? opts.registeredAgentChange ? 25 : 0 : 25;
   const certificateOfStatus = opts.certificateOfStatus ? 5 : 0;
   const certifiedCopy = opts.certifiedCopy ? 30 : 0;
   const extraSeries = Math.max(0, (opts.seriesCount ?? 0) - 3);
@@ -76375,7 +76375,8 @@ function buildPayload(data) {
     isConversion,
     certificateOfStatus: data.orderCertificateOfStatus,
     certifiedCopy: data.orderCertifiedCopy,
-    seriesCount: data.series.length
+    seriesCount: data.series.length,
+    registeredAgentChange: data.registeredAgentChoice === "SERVICE"
   });
   const finalName = buildFinalLlcName(
     data.desiredLlcName,
@@ -76659,7 +76660,8 @@ function priceOrder(opts) {
     certificateOfStatus: opts.certificateOfStatus,
     certifiedCopy: opts.certifiedCopy,
     seriesCount: opts.seriesCount,
-    isConversion: opts.isConversion
+    isConversion: opts.isConversion,
+    registeredAgentChange: opts.registeredAgentChange
   });
   const stateFeesCents = fees.estimatedTotal * 100;
   const lineItems = [
@@ -76673,6 +76675,12 @@ function priceOrder(opts) {
   }
   if (fees.articlesOfOrganization) {
     lineItems.push({ name: "FL state fee \u2014 Articles of Organization", amountCents: fees.articlesOfOrganization * 100 });
+  }
+  if (fees.registeredAgentDesignation) {
+    lineItems.push({
+      name: opts.isConversion ? "FL state fee \u2014 change of registered agent" : "FL state fee \u2014 registered agent designation",
+      amountCents: fees.registeredAgentDesignation * 100
+    });
   }
   if (fees.additionalSeriesPrepFee) {
     lineItems.push({
@@ -106264,7 +106272,10 @@ app.post("/orders", async (c) => {
     ein: !!data.orderEin,
     // S election package: new formations only — a converted entity's election
     // window is measured from its original existence, not our filing.
-    sElection: !!data.orderSElection && data.filingPath !== "CONVERT"
+    sElection: !!data.orderSElection && data.filingPath !== "CONVERT",
+    // Taking our registered agent service on a conversion changes the agent
+    // on file — s. 605.0213(7).
+    registeredAgentChange: data.registeredAgentChoice === "SERVICE"
   });
   const llcName = payload.llcName.finalName || payload.llcName.desiredName || "Unnamed LLC";
   const db2 = await getDb();
@@ -108109,7 +108120,11 @@ async function handler(req, res) {
       body = Buffer.concat(chunks);
     }
     const response = await app.fetch(
-      new Request(`${proto}://${host}${req.url ?? "/"}`, { method, headers, body })
+      new Request(`${proto}://${host}${req.url ?? "/"}`, {
+        method,
+        headers,
+        body
+      })
     );
     res.statusCode = response.status;
     response.headers.forEach((value, key) => {

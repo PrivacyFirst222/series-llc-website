@@ -2,6 +2,7 @@ import { Pencil, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FeeEstimate } from "./FeeEstimate";
 import { buildFinalLlcName } from "./validation";
+import type { StepKey } from "./steps";
 import type {
   AddressFields as AddressType,
   FloridaLLCFormData,

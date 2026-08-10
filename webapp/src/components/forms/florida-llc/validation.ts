@@ -144,6 +144,10 @@ export function calculateEstimatedFees(opts: {
   seriesCount?: number;
   /** Converting an existing LLC means no Articles of Organization filing. */
   isConversion?: boolean;
+  /** Converting AND switching to a new registered agent. A new formation
+   *  designates its agent in the articles; a conversion pays the same $25
+   *  under s. 605.0213(7) only when the agent actually changes. */
+  registeredAgentChange?: boolean;
 }): {
   articlesOfOrganization: number;
   registeredAgentDesignation: number;
@@ -155,12 +159,13 @@ export function calculateEstimatedFees(opts: {
   additionalSeriesPrepFee: number;
   estimatedTotal: number;
 } {
-  // Florida charges $125 to file Articles of Organization. Designating a
-  // registered agent carries no separate fee, and a conversion files no
-  // Articles at all — so a conversion owes the state nothing on the base
-  // package.
-  const articlesOfOrganization = opts.isConversion ? 0 : 125;
-  const registeredAgentDesignation = 0;
+  // s. 605.0213(2) — $100 to file articles of organization.
+  // s. 605.0213(7) — $25 for a certificate designating or CHANGING a
+  // registered agent. A new formation designates its agent in the articles
+  // and owes both, $125 in total. A conversion files no articles and owes
+  // the $25 only if it is switching agents.
+  const articlesOfOrganization = opts.isConversion ? 0 : 100;
+  const registeredAgentDesignation = opts.isConversion ? (opts.registeredAgentChange ? 25 : 0) : 25;
   const certificateOfStatus = opts.certificateOfStatus ? 5 : 0;
   const certifiedCopy = opts.certifiedCopy ? 30 : 0;
   const extraSeries = Math.max(0, (opts.seriesCount ?? 0) - 3);

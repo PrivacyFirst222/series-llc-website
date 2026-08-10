@@ -26,12 +26,16 @@ export function priceOrder(opts: {
   certifiedCopy: boolean;
   ein: boolean;
   sElection: boolean;
+  /** A converting client who takes our registered agent service is changing
+   *  the agent on file — s. 605.0213(7), $25. */
+  registeredAgentChange: boolean;
 }): PricedOrder {
   const fees = calculateEstimatedFees({
     certificateOfStatus: opts.certificateOfStatus,
     certifiedCopy: opts.certifiedCopy,
     seriesCount: opts.seriesCount,
     isConversion: opts.isConversion,
+    registeredAgentChange: opts.registeredAgentChange,
   });
   const stateFeesCents = fees.estimatedTotal * 100;
   const lineItems: { name: string; amountCents: number }[] = [
@@ -45,6 +49,14 @@ export function priceOrder(opts: {
   }
   if (fees.articlesOfOrganization) {
     lineItems.push({ name: "FL state fee — Articles of Organization", amountCents: fees.articlesOfOrganization * 100 });
+  }
+  if (fees.registeredAgentDesignation) {
+    lineItems.push({
+      name: opts.isConversion
+        ? "FL state fee — change of registered agent"
+        : "FL state fee — registered agent designation",
+      amountCents: fees.registeredAgentDesignation * 100,
+    });
   }
   if (fees.additionalSeriesPrepFee) {
     lineItems.push({

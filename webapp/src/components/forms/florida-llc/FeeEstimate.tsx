@@ -6,6 +6,7 @@ interface FeeEstimateProps {
   certifiedCopy: boolean;
   seriesCount?: number;
   isConversion?: boolean;
+  registeredAgentChange?: boolean;
   compact?: boolean;
 }
 
@@ -14,6 +15,7 @@ export function FeeEstimate({
   certifiedCopy,
   seriesCount = 0,
   isConversion = false,
+  registeredAgentChange = false,
   compact,
 }: FeeEstimateProps) {
   const fees = calculateEstimatedFees({
@@ -21,6 +23,7 @@ export function FeeEstimate({
     certifiedCopy,
     seriesCount,
     isConversion,
+    registeredAgentChange,
   });
 
   const extraSeries = Math.max(0, seriesCount - 3);
@@ -46,6 +49,14 @@ export function FeeEstimate({
             <span className="font-mono-feature">${fees.articlesOfOrganization}</span>
           </li>
         )}
+        {fees.registeredAgentDesignation > 0 ? (
+          <li className="flex justify-between">
+            <span className="text-foreground/80">
+              {isConversion ? "Change of Registered Agent" : "Registered Agent Designation"}
+            </span>
+            <span className="font-mono-feature">${fees.registeredAgentDesignation}</span>
+          </li>
+        ) : null}
         <li className="flex justify-between text-muted-foreground">
           <span>Certificate of Status (optional)</span>
           <span className="font-mono-feature">
@@ -81,7 +92,10 @@ export function FeeEstimate({
         Government fees are subject to change. Base $499 service fee not
         included. Each series beyond the included three costs $50 — the $25
         shown here is Florida's filing fee; our $25 preparation charge is
-        billed with the service fee.
+        billed with the service fee.{isConversion && fees.registeredAgentDesignation === 0
+          ? " If you are changing the registered agent already on file for your"
+            + " LLC, Florida charges $25 for that filing."
+          : ""}
       </p>
     </div>
   );

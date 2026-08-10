@@ -104,6 +104,9 @@ app.post("/orders", async (c) => {
     // S election package: new formations only — a converted entity's election
     // window is measured from its original existence, not our filing.
     sElection: !!data.orderSElection && data.filingPath !== "CONVERT",
+    // Taking our registered agent service on a conversion changes the agent
+    // on file — s. 605.0213(7).
+    registeredAgentChange: data.registeredAgentChoice === "SERVICE",
   });
   const llcName = payload.llcName.finalName || payload.llcName.desiredName || "Unnamed LLC";
 
