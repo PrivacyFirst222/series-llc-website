@@ -22,22 +22,44 @@ When a question or control is hidden or skipped conditionally, confirm the
 underlying value is still set. A question removed from the screen is not a
 value removed from the system.
 
-## Never filter a verification search by what you expect to find
+## Never trade accuracy for convenience
 
-This rule is not optional and is not waived by convenience.
+This rule is not optional. It is not waived by deadline, by output length,
+or by how obvious the answer seems.
 
-When checking whether a change is complete, search for the raw term with
-**zero exclusions** and read every hit. Filtering results by the sections,
-headings, or phrasings you expect turns a check into a confirmation of your
-own assumption — it can only surface hits you had not already explained
-away, so it cannot tell you that you were wrong.
+When choosing how to check something, the only question that matters is
+whether the method can actually detect the failure it is supposed to detect.
+A faster, shorter, or more readable method that cannot detect it is not a
+check — it is a way of feeling finished.
 
-- Long output is not a reason to filter. Read all of it.
-- Narrow by file or directory if you must. Never by expected content.
-- The same applies to assertions and tests: a check that only inspects the
-  cases you thought of is not a check.
-- State the raw count. "37 hits, 33 intentional, 4 to fix" is a
-  verification. "No unexpected hits" is not.
+Never:
+
+- filter, truncate, sample, or summarize the output of a verification —
+  read all of it
+- check a subset of files, cases, or records when the claim covers all of
+  them
+- infer from the code what the artifact contains when the artifact can be
+  opened
+- assert on a case chosen because it was easy to construct rather than
+  because it could fail
+- stop at the first passing result when the question was "is it complete"
+- substitute "should be fine", "likely", or "no unexpected issues" for a
+  count, a diff, or the artifact itself
+
+If the thorough version is genuinely expensive, do it anyway — or say
+plainly that you did not, and exactly what you skipped. Never silently run
+the cheap version and report its result as though it were the thorough one.
+
+**The tell:** if you catch yourself making output easier to read, or a job
+faster to finish, at the moment you are deciding whether your own work is
+correct — stop and do it the slow way. That impulse is the bug.
+
+The instance that produced this rule: searching for a term across five
+documents, then excluding from the results every section already believed to
+be intentional. The audit came back clean; five defects were still there.
+Search the raw term with zero exclusions, read every hit, and state the raw
+count — "37 hits, 33 intentional, 4 to fix" is a verification, "no
+unexpected hits" is not.
 
 This workspace contains a mobile app and backend server.
 
