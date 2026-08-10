@@ -11,7 +11,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "build:api": "esbuild server/vercel-entry.ts --bundle --platform=node --format=esm --external:@electric-sql/pglite --loader:.md=text --outfile=api/index.mjs --log-level=warning --banner:js=\"import { createRequire } from 'node:module'; const require = createRequire(import.meta.url);\"",
-    "typecheck": "tsc --noEmit -p tsconfig.app.json"
+    "typecheck": "tsc --noEmit -p tsconfig.app.json",
+    "docs:sync": "bun run ../docs/sync.ts"
   },
   "dependencies": {
     "@cantoo/pdf-lib": "^2.8.1",

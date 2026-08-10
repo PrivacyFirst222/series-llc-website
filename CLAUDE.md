@@ -76,6 +76,31 @@ hits" is not. Then, one turn after writing that rule, reading 18% of Chapter
 605 and reporting it as having read the statute, without ever stating the
 fraction.
 
+## Every deliverable must have a home in version control
+
+Before building anything that stores, serves, or delivers a document,
+establish where the source document lives. If it is not in the repo, say so
+immediately and do not proceed as though the question is settled.
+
+- Anything the business sells, promises, or hands a client must exist in the
+  repo — as source if we author it, or as a committed copy plus a converted,
+  diffable version if it is authored elsewhere.
+- `docs/README.md` is the inventory of every client-facing deliverable and
+  its source path. A deliverable with no entry there is a defect to report,
+  not a detail to assume someone else handles. `bun run docs:sync` refreshes
+  the copies and fails if the origin folder holds anything untracked.
+- Cloud sync is not version control. Dropbox, iCloud and Drive have no
+  diffable history and silently propagate destruction.
+- Never explain why something cannot be found until you have searched for it.
+  "It's a PDF I can't read" was invented. "No path matching *manual* appears
+  in `git log --all`" was checked. Only the second is an answer.
+
+This rule exists because the Owner's Manual, the Instructions, and five
+operating agreement drafts — every one of them a deliverable the pricing page
+sells — lived only in Dropbox for the entire build, while the Reference
+Library that serves them was built in this repo without anyone asking what it
+would serve.
+
 ## Never use WebFetch
 
 Never call WebFetch. Not for statutes, not for documentation, not for an
