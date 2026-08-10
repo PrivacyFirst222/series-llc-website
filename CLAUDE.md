@@ -78,12 +78,9 @@ fraction.
 
 ## Never use WebFetch
 
-WebFetch runs a summarizing model over the page and returns that model's
-paraphrase. It refuses to reproduce statutory or contractual text verbatim.
-Every claim built on it is a claim built on a summary, and the clause that
-matters is usually the one the summarizer dropped.
-
-**Never call WebFetch. There is no acceptable use.**
+Never call WebFetch. Not for statutes, not for documentation, not for an
+article, not for a quick look, not to check something small, not for
+anything. There is no acceptable use and no exception.
 
 To read a page, open it in the browser and take the text directly:
 
@@ -91,13 +88,8 @@ To read a page, open it in the browser and take the text directly:
 - `get_page_text`, or `javascript_tool` with `document.body.innerText`
   sliced into chunks for long documents
 
-That returns the actual words. WebSearch may be used to *find* URLs, but its
-result text is also model-generated — never quote it, cite it, or rest a
-conclusion on it. Open the source and read it.
-
-What this cost: a WebFetch gloss of s. 605.2107 led to asserting the opposite
-of what the section says. The tool's own refusal to quote the statute is what
-finally exposed it.
+WebSearch may be used only to find URLs. Its result text may not be quoted,
+cited, or relied on for any claim. Open the source and read it.
 
 This workspace contains a mobile app and backend server.
 
