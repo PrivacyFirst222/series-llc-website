@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
-"""Convert a .docx into readable, diffable markdown.
+"""Convert a .docx into markdown.
 
-The .docx in docs/source/ is authoritative. This produces a text mirror so the
-content can be grepped, diffed in review, and read without Word. Driven by
-docs/sync.ts; see docs/README.md.
+Used ONCE per document, to import something authored in Word into the repo as a
+master. After that the markdown is authoritative and md-to-docx.py generates the
+Word file — never the other way round. See docs/README.md.
+
+Resolves numbering.xml so automatic list numbers survive as literal text, and
+carries the running header and footer into front matter, because a lossy import
+promoted to master loses that content permanently.
 
     python3 docs/docx-to-md.py <input.docx> <output.md>
 """
@@ -14,6 +18,42 @@ import zipfile
 import xml.etree.ElementTree as ET
 
 W = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
+
+
+def _text_of(part_xml):
+    """All visible text of a header/footer part, space-joined."""
+    if not part_xml:
+        return ""
+    root = ET.fromstring(part_xml)
+    return " ".join(t.text.strip() for t in root.iter(W + "t") if t.text and t.text.strip())
+
+
+def load_numbering(z):
+    """numId -> {ilvl: (fmt, start)} so numbered paragraphs keep their numbers."""
+    try:
+        root = ET.fromstring(z.read("word/numbering.xml"))
+    except KeyError:
+        return {}
+    abstract = {}
+    for a in root.findall(W + "abstractNum"):
+        aid = a.get(W + "abstractNumId")
+        levels = {}
+        for lvl in a.findall(W + "lvl"):
+            ilvl = int(lvl.get(W + "ilvl", "0"))
+            fmt = lvl.find(W + "numFmt")
+            start = lvl.find(W + "start")
+            levels[ilvl] = (
+                fmt.get(W + "val") if fmt is not None else "decimal",
+                int(start.get(W + "val")) if start is not None else 1,
+            )
+        abstract[aid] = levels
+    numbering = {}
+    for n in root.findall(W + "num"):
+        nid = n.get(W + "numId")
+        ref = n.find(W + "abstractNumId")
+        if ref is not None:
+            numbering[nid] = abstract.get(ref.get(W + "val"), {})
+    return numbering
 
 
 def runs_text(node):
@@ -38,7 +78,24 @@ def runs_text(node):
     return "".join(out).replace("******", "").replace("****", "").strip()
 
 
-def para_md(p):
+ROMAN = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x", "xi", "xii"]
+
+
+def marker(fmt, n):
+    if fmt == "bullet":
+        return "-"
+    if fmt == "lowerLetter":
+        return f"{chr(96 + n)}."
+    if fmt == "upperLetter":
+        return f"{chr(64 + n)}."
+    if fmt == "lowerRoman":
+        return f"{ROMAN[n - 1] if n <= len(ROMAN) else n}."
+    if fmt == "upperRoman":
+        return f"{(ROMAN[n - 1] if n <= len(ROMAN) else str(n)).upper()}."
+    return f"{n}."
+
+
+def para_md(p, numbering, counters):
     style = p.find(W + "pPr/" + W + "pStyle")
     name = style.get(W + "val") if style is not None else ""
     text = runs_text(p)
@@ -49,8 +106,23 @@ def para_md(p):
         return "#" * min(int(m.group(1)) + 1, 6) + " " + re.sub(r"\*+", "", text)
     if (name or "").lower().startswith("title"):
         return "# " + re.sub(r"\*+", "", text)
-    if p.find(W + "pPr/" + W + "numPr") is not None:
-        return "- " + text
+
+    numpr = p.find(W + "pPr/" + W + "numPr")
+    if numpr is not None:
+        nid_el = numpr.find(W + "numId")
+        ilvl_el = numpr.find(W + "ilvl")
+        nid = nid_el.get(W + "val") if nid_el is not None else None
+        ilvl = int(ilvl_el.get(W + "val")) if ilvl_el is not None else 0
+        fmt, start = numbering.get(nid, {}).get(ilvl, ("bullet", 1))
+        key = (nid, ilvl)
+        if fmt == "bullet":
+            return "  " * ilvl + "- " + text
+        counters[key] = counters.get(key, start - 1) + 1
+        # deeper levels restart when an outer level advances
+        for k in list(counters):
+            if k[0] == nid and k[1] > ilvl:
+                del counters[k]
+        return "  " * ilvl + marker(fmt, counters[key]) + " " + text
     return text
 
 
@@ -74,12 +146,17 @@ def table_md(tbl):
 
 def convert(path):
     with zipfile.ZipFile(path) as z:
+        numbering = load_numbering(z)
         root = ET.fromstring(z.read("word/document.xml"))
+        names = z.namelist()
+        header = _text_of(z.read("word/header1.xml") if "word/header1.xml" in names else b"")
+        footer = _text_of(z.read("word/footer1.xml") if "word/footer1.xml" in names else b"")
+
     body = root.find(W + "body")
-    parts, blank = [], False
+    parts, blank, counters = [], False, {}
     for child in body:
         if child.tag == W + "p":
-            md = para_md(child)
+            md = para_md(child, numbering, counters)
             if md:
                 parts.append(md)
                 blank = False
@@ -89,7 +166,14 @@ def convert(path):
         elif child.tag == W + "tbl":
             parts += ["", table_md(child), ""]
             blank = True
-    return re.sub(r"\n{3,}", "\n\n", "\n".join(parts)).strip() + "\n"
+
+    front = []
+    if header:
+        front.append(f"<!-- page-header: {header} -->")
+    if footer:
+        front.append(f"<!-- page-footer: {footer} -->")
+    doc = re.sub(r"\n{3,}", "\n\n", "\n".join(parts)).strip() + "\n"
+    return ("\n".join(front) + "\n\n" if front else "") + doc
 
 
 def main():
@@ -97,13 +181,8 @@ def main():
         print(__doc__)
         return 2
     src, dst = sys.argv[1], sys.argv[2]
-    header = (
-        f"<!-- Converted from docs/source/{os.path.basename(src)} for diffing and search.\n"
-        f"     The .docx in docs/source/ is authoritative; edit that, then run\n"
-        f"     `bun run docs:sync`. Do not hand-edit this file. -->\n\n"
-    )
     with open(dst, "w") as f:
-        f.write(header + convert(src))
+        f.write(convert(src))
     return 0
 
 

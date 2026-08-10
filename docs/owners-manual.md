@@ -1,6 +1,8 @@
-<!-- Converted from docs/source/Series LLC Owners Manual - REVISED DRAFT.docx for diffing and search.
-     The .docx in docs/source/ is authoritative; edit that, then run
-     `bun run docs:sync`. Do not hand-edit this file. -->
+<!-- MASTER. This file is the Owner's Manual. Edit it here.
+     The Word version in Dropbox is generated from it by
+     .claude/hooks/update-word-docs.sh and is overwritten on every
+     change — never edit the .docx. See docs/README.md. -->
+<!-- page-header: THE FLORIDA SERIES LLC OWNER'S MANUAL -->
 
 ***THE FLORIDA SERIES LLC***
 ***OWNER'S MANUAL***
