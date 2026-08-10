@@ -54,12 +54,50 @@ the cheap version and report its result as though it were the thorough one.
 faster to finish, at the moment you are deciding whether your own work is
 correct — stop and do it the slow way. That impulse is the bug.
 
-The instance that produced this rule: searching for a term across five
-documents, then excluding from the results every section already believed to
-be intentional. The audit came back clean; five defects were still there.
-Search the raw term with zero exclusions, read every hit, and state the raw
-count — "37 hits, 33 intentional, 4 to fix" is a verification, "no
-unexpected hits" is not.
+**This rule covers reading source material, not only checking your own
+work.** Reading part of a statute, a contract, a spec, or a file and
+reporting on it as though you read the whole thing is the same failure. It
+does not feel like a shortcut — narrowing to "the relevant part" feels like
+expertise, which is exactly why it goes uncaught.
+
+**Always state the scope as a fraction.** Never report a reading or a check
+without saying how much of the whole it covered: "read ss. 605.2101-605.2802,
+75,474 of the chapter's 417,137 characters" is checkable at a glance. "Read
+the statute" is not. If the denominator is unknown, say that. This
+requirement does not depend on judgment being right — it makes the judgment
+visible so it can be rejected.
+
+Two instances produced this rule. Searching for a term across five documents,
+then excluding from the results every section already believed to be
+intentional: the audit came back clean and five defects were still there.
+Search the raw term with zero exclusions, read every hit, state the raw
+count — "37 hits, 33 intentional, 4 to fix" is a verification, "no unexpected
+hits" is not. Then, one turn after writing that rule, reading 18% of Chapter
+605 and reporting it as having read the statute, without ever stating the
+fraction.
+
+## Never use WebFetch
+
+WebFetch runs a summarizing model over the page and returns that model's
+paraphrase. It refuses to reproduce statutory or contractual text verbatim.
+Every claim built on it is a claim built on a summary, and the clause that
+matters is usually the one the summarizer dropped.
+
+**Never call WebFetch. There is no acceptable use.**
+
+To read a page, open it in the browser and take the text directly:
+
+- `preview_start` or `navigate` to the URL
+- `get_page_text`, or `javascript_tool` with `document.body.innerText`
+  sliced into chunks for long documents
+
+That returns the actual words. WebSearch may be used to *find* URLs, but its
+result text is also model-generated — never quote it, cite it, or rest a
+conclusion on it. Open the source and read it.
+
+What this cost: a WebFetch gloss of s. 605.2107 led to asserting the opposite
+of what the section says. The tool's own refusal to quote the statute is what
+finally exposed it.
 
 This workspace contains a mobile app and backend server.
 
