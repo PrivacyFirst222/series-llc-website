@@ -94,7 +94,7 @@ export default function TheStatute() {
                     { i: Scale, t: "§605.2304(6) — derivative actions" },
                     { i: FileCheck, t: "§605.2501(4)(a) — judicial dissolution" },
                     { i: Anchor, t: "§605.2502(1) — winding up" },
-                    { i: Scale, t: "§605.2503(2) — claims process" },
+                    { i: Scale, t: "§605.2503(2) — reinstatement" },
                   ].map((row) => {
                     const Icon = row.i;
                     return (

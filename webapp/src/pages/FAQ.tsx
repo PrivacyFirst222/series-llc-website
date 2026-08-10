@@ -22,7 +22,7 @@ const FAQ_ITEMS: {
   },
   {
     q: "Do I get separate EINs for each series?",
-    a: "Most clients use a single EIN at the parent level with internal accounting that tracks each series. The IRS does, however, permit separate EINs for series that elect to be treated as separate entities for federal tax.",
+    a: "One. Every protected series in the LLC we form for you is owned by the LLC itself, so the company and all of its series operate under a single Federal Tax ID Number. A series would need its own EIN only in narrower situations — for example, if it has its own employees. If you believe you need separate EINs for separate series, that is a question for your CPA, and it generally signals a structure more complex than the one we prepare.",
   },
   {
     q: "I already have a Florida LLC. Can I convert it instead of starting over?",
@@ -49,7 +49,7 @@ const FAQ_ITEMS: {
   },
   {
     q: "What's the federal tax treatment?",
-    a: "A Florida Protected Series LLC can be taxed as (1) a disregarded entity, (2) a partnership, (3) an S corporation, or (4) C corporation, depending on a number of factors, including whether the LLC is owned by one or more people and what elections you file with the IRS. It is also possible for different series to be taxed differently. What is best for you needs to be discussed with your CPA or other tax professional. If you decide on an S corporation election, we offer a $95 package that prepares IRS Form 2553 for you to sign and file, along with an operating agreement drafted for S corporation status.",
+    a: "A Florida Protected Series LLC can be taxed as (1) a disregarded entity, (2) a partnership, (3) an S corporation, or (4) C corporation, depending on a number of factors, including whether the LLC is owned by one or more people and what elections you file with the IRS. It is also possible for different series to be taxed differently, however, that raises some very complex income tax issues. The Florida Protected Series LLC we create for you has the individual series owned by the LLC. This results in it having a single Federal Tax ID Number. If 100% of the LLC is owned by a single person, it can be taxed as a disregarded entity meaning that its income is reported directly on the owner's tax return and doesn't need to file its own return. If the LLC has two or more owners, it will file a single annual return for the LLC reporting the combined income of the LLC and all of the series. What is best for you needs to be discussed with your CPA or other tax professional. If you decide on an S corporation election, we offer a $95 package that prepares IRS Form 2553 for you to sign and file, along with an operating agreement drafted for S corporation status. If you need a series LLC that allows for different series to be owned by different individuals and in differing percentages, the added complexity will require you to hire an attorney to draft your operating agreement. We will not be able to provide that service here.",
     link: { to: "/pricing", label: "See the election package" },
   },
   {
@@ -62,7 +62,8 @@ const FAQ_ITEMS: {
   },
   {
     q: "Can I cancel or get a refund?",
-    a: "We strive to file your LLC formation documents with the Florida Secretary of State within one business day from receiving your order. Oftentimes, it's sooner. If you cancel before the formation documents are filed, we are happy to provide a refund, however, after that, no refunds will be given for any reason.",
+    a: "Yes, until we start. Your service fee is fully refundable up to the point we begin preparing your documents, and it is not refundable after that, or after we submit your filing to the Division of Corporations. State fees already paid to Florida are never refundable by us. Add-on services are refundable until we begin work on them — for the S corporation election package that means until you submit your details, since the completed package is generated and delivered the moment you do.",
+    link: { to: "/terms", label: "Full refund terms" },
   },
 ];
 

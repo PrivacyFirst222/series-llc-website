@@ -68,11 +68,11 @@ You must notify us immediately of any change to your email address, mailing addr
 
 ### 11. Refunds
 **(a) Before preparation begins.** Full refund of our service fee.
-**(b) After preparation begins, before submission.** Our service fee is 90% refundable until the earlier of submission to the Florida Department of State, Division of Corporations, or delivery of prepared documents.
+**(b) After preparation begins.** Our service fee is not refundable once we have begun preparing your documents, and in no event after submission to the Florida Department of State, Division of Corporations.
 **(c) After submission.** No portion of the service fee is refundable.
 **(d) Government fees.** Fees remitted to the State of Florida are never refundable by us.
 **(e) Registered agent service.** Refundable within 30 days of a renewal charge if we have not yet received or posted any document for you in that term; otherwise non-refundable. No prorated refunds.
-**(f) Add-on services.** EIN service and additional Protected Series Designations are refundable until work begins on them. The S corporation election package is refundable until the prepared package is delivered to your client portal; it is not refundable after delivery.
+**(f) Add-on services.** Each add-on service is refundable until we begin work on it. The S corporation election package is not refundable once you submit your details, because the completed package is generated and delivered to your client portal at that moment.
 
 ### 12. Chargebacks
 Chargebacks initiated after services are performed constitute a breach of these Terms. You agree to reimburse us our costs of responding, including a $100 administrative charge, and we may suspend the Services and portal access pending resolution.

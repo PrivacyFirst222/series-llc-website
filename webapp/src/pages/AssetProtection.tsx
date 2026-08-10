@@ -180,36 +180,6 @@ export default function AssetProtection() {
             </p>
           </div>
 
-          {/* How Series amplifies outside liability protection */}
-          <div className="rounded-2xl border border-trust/30 bg-trust/5 p-8 space-y-5">
-            <h3 className="font-display text-xl text-trust">How a <em>multi-member</em> Protected Series LLC amplifies Outside Liability protection</h3>
-
-            <div className="flex items-start gap-3 rounded-xl border border-yellow-500/40 bg-yellow-500/10 p-4">
-              <AlertTriangle className="h-4 w-4 text-yellow-500 shrink-0 mt-0.5" />
-              <p className="text-xs text-foreground/80 leading-relaxed">
-                <strong>Membership structure matters.</strong> A Florida Protected Series LLC with two or more members receives full charging order protection against outside liability. A <strong>single-member</strong> Protected Series LLC does not — a creditor can seize the sole member's interest directly, just as with a corporation. This rule is the same regardless of how the LLC is taxed.
-              </p>
-            </div>
-
-            <p className="text-sm text-foreground/80 leading-relaxed">
-              When structured as a multi-member entity, a Florida Protected Series LLC goes beyond what any standard LLC can offer:
-            </p>
-            <ul className="space-y-3">
-              {[
-                "Each protected series holds its own assets, and under §605.2401 a debt of one series is solely that series' debt — the separation is statutory, not contractual",
-                "Even if a creditor obtains a charging order against your interest in the master LLC, the individual series assets are separately titled and separately shielded",
-                "Each series can have its own distinct membership interests. Charging-order language drafted into your operating agreement, consistent with \u00a7605.0503, is how that protection is carried down to protected-series interests",
-                'Under \u00a7605.0503(3), a charging order is the \u201csole and exclusive\u201d remedy by which a judgment creditor of a member may satisfy a judgment out of that member\u2019s interest in a multi-member LLC',
-                "With an entire portfolio protected across multiple series, a creditor has no single point of attack — their only remedy is to wait, which gives you enormous negotiating leverage",
-              ].map((item) => (
-                <li key={item} className="flex gap-2.5 text-sm">
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-trust" />
-                  <span className="text-foreground/80">{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
           {/* Outside liability comparison grid */}
           <div className="grid gap-px overflow-hidden rounded-2xl border border-border bg-border md:grid-cols-2 lg:grid-cols-3">
             {[
@@ -249,7 +219,7 @@ export default function AssetProtection() {
               </thead>
               <tbody className="divide-y divide-border">
                 {[
-                  { name: "Corporation", inside: false, outside: false, inter: false },
+                  { name: "Corporation", inside: true, outside: false, inter: false },
                   { name: "Single-Member LLC", inside: true, outside: false, inter: false },
                   { name: "Multi-Member LLC", inside: true, outside: true, inter: false },
                   { name: "Single-Member FL Protected Series LLC", inside: true, outside: false, inter: true },
