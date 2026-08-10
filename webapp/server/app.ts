@@ -710,17 +710,6 @@ const oaAnswersSchema = z.object({
       z.object({
         purpose: z.string().max(300).optional(),
         contribution: z.string().max(300).optional(),
-        ownershipMode: z.enum(["percent", "fraction"]).optional(),
-        associated: z
-          .array(
-            z.object({
-              memberIndex: z.number().int().min(0),
-              seriesPercentage: z.number().min(0).max(100).optional(),
-              numerator: z.number().int().min(0).max(100_000).optional(),
-              denominator: z.number().int().min(1).max(100_000).optional(),
-            }),
-          )
-          .optional(),
       }),
     )
     .optional(),
@@ -970,71 +959,12 @@ app.post("/portal/oa/generate", async (c) => {
     }
   }
 
-  // Series percentages must total 100 within each series, exactly as company
-  // percentages must. Without this a signed agreement can say a series is
-  // 40% + 55% owned, which is simply wrong on its face.
-  if (multiOwner && !a.sElection) {
-    for (let i = 0; i < seed.series.length; i++) {
-      const assoc = a.series?.[i]?.associated ?? [];
-      if (assoc.length === 0) continue; // series held by the Company itself
-      const mode: OwnershipMode = a.series?.[i]?.ownershipMode ?? "percent";
-      const shares = assoc.map((x) => ({
-        percentage: x.seriesPercentage,
-        numerator: x.numerator,
-        denominator: x.denominator,
-      }));
-      if (!sharesAreComplete(mode, shares)) {
-        return c.json(
-          err(
-            `Ownership of ${seed.series[i].name} does not add up — each series must total exactly ${
-              mode === "fraction" ? "one whole" : "100%"
-            }.`,
-            "INVALID_INPUT",
-          ),
-          400,
-        );
-      }
-    }
-  }
-
+  // Every Protected Series is wholly owned by the Company (ss. 605.2302(1),
+  // 605.2303(2), Fla. Stat.), so a series carries no member-level ownership.
   const series = seed.series.map((sr, i) => ({
     name: sr.name,
     purpose: a.series?.[i]?.purpose ?? sr.purpose ?? "",
     contribution: a.series?.[i]?.contribution ?? "",
-    associated:
-      isSCorp
-        ? // identical ownership is hardwired in the S corp form: every Member is an
-          // Associated Member of every series at their company percentage
-          members.map((m) => ({ memberName: m.name, seriesPercentage: m.percentage, signatories: m.signatories }))
-        : version === "single"
-        ? [{ memberName: seed.members[0].name, seriesPercentage: 100 }]
-        : (() => {
-            const out: OaInputs["series"][number]["associated"] = [];
-            const sMode: OwnershipMode = a.series?.[i]?.ownershipMode ?? "percent";
-            for (const x of a.series?.[i]?.associated ?? []) {
-              const share: OwnershipShare = {
-                percentage: x.seriesPercentage,
-                numerator: x.numerator,
-                denominator: x.denominator,
-              };
-              const cpl = coupleAt(x.memberIndex);
-              const entry = cpl
-                ? {
-                    memberName: coupleName(cpl),
-                    seriesPercentage: shareValue(sMode, share),
-                    seriesPercentageLabel: shareLabel(sMode, share),
-                    signatories: [seed.members[cpl.a].name, seed.members[cpl.b].name],
-                    jointHolding: `husband and wife, as ${SPOUSAL_FORM_LABEL[cpl.form]}`,
-                  }
-                : {
-                    memberName: seed.members[x.memberIndex]?.name ?? "",
-                    seriesPercentage: shareValue(sMode, share),
-                    seriesPercentageLabel: shareLabel(sMode, share),
-                  };
-              if (!out.some((e) => e.memberName === entry.memberName)) out.push(entry);
-            }
-            return out;
-          })(),
   }));
 
   const inputs: OaInputs = {

@@ -44,13 +44,9 @@ export interface OaMemberInput {
 export interface OaSeriesInput {
   name: string; // full filed name
   purpose: string;
-  associated: {
-    memberName: string;
-    seriesPercentage: number;
-    seriesPercentageLabel?: string;
-    signatories?: string[];
-    jointHolding?: string;
-  }[]; // single-member: sole member 100
+  /** Contribution made BY THE COMPANY — every Protected Series is wholly owned
+   *  by the Company (ss. 605.2302(1), 605.2303(2), Fla. Stat.), so no member
+   *  holds a series-level interest. */
   contribution: string;
 }
 
@@ -251,20 +247,10 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
   const exhibits: string[] = [];
   inputs.series.forEach((ser, idx) => {
     const n = idx + 1;
-    const assoc =
-      ser.associated.length > 0
-        ? ser.associated.map((a) => `${a.memberName} — ${a.seriesPercentageLabel ?? `${a.seriesPercentage}%`}`).join("; ")
-        : "None — the Company is the deemed sole Associated Member";
     let ex = ex1.section;
     ex = ex.replace("## SERIES EXHIBIT PS-[N]", `## SERIES EXHIBIT ${n}`);
     ex = ex.replace(/\*\*Protected Series name \(exactly as filed with the Department\):\*\*\n\*\*[^\n]+\*\*/, `**Protected Series name (exactly as filed with the Department):**\n**${ser.name}**`);
     ex = ex.replace(/\| Purpose of this Protected Series \|[^\n]*\|/, `| Purpose of this Protected Series | ${ser.purpose || "Any lawful business, purpose, or activity"} |`);
-    if (!isSCorp) {
-      // the S corp forms' row is fixed text: all Members, identically to their Percentage Interests
-      ex = ex.replace(/\| Associated Member\(s\)[^\n]*\|[^\n]*\|/, inputs.version === "single"
-        ? `| Associated Member(s) | ${inputs.members[0].name} — 100% |`
-        : `| Associated Member(s) and Series Percentages | ${assoc} |`);
-    }
     // Member-managed Series Exhibits carry a fixed "Managed by" row instead.
     if (!isMemberManaged) {
       ex = ex.replace(/\| Protected Series Manager \|[^\n]*\|/, `| Protected Series Manager | ${inputs.managerName} |`);
@@ -272,21 +258,19 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
     ex = ex.replace(/\| Contributions to this Protected Series \|[^\n]*\|/, `| Contributions to this Protected Series | ${ser.contribution || "—"} |`);
     ex = ex.replace(/\| Special terms \(if any\) \|[^\n]*\|/, "| Special terms (if any) | None |");
     ex = ex.replace(/\| Dissolution events[^\n]*\|[^\n]*\|/, "| Dissolution events specific to this Protected Series (if any) | None |");
-    // signature placeholders
-    const adoptNames =
-      ser.associated.length > 0
-        ? ser.associated.flatMap((u) => u.signatories ?? [u.memberName])
-        : inputs.members.flatMap((m) => m.signatories ?? [m.name]);
-    const adoptSource =
-      ser.associated.length > 0
-        ? ser.associated.map((u) => ({ name: u.memberName, signatories: u.signatories, jointHolding: u.jointHolding }))
-        : inputs.members.map((m) => ({ name: m.name, signatories: m.signatories, jointHolding: m.jointHolding }));
+    // Each Protected Series is owned by the Company, so the Series Exhibit is
+    // adopted by whoever acts for the Company — the Manager, or all Members in
+    // a member-managed company.
+    const adoptSource = inputs.members.map((m) => ({
+      name: m.name,
+      signatories: m.signatories,
+      jointHolding: m.jointHolding,
+    }));
+    const adoptNames = inputs.members.flatMap((m) => m.signatories ?? [m.name]);
     const adoptLines = signatureBlock(adoptSource, ", Member");
-    ex = ex.replace(
-      /_+\n\[ASSOCIATED MEMBER 1\], Member[\s\S]*?_+\n\[ASSOCIATED MEMBER 2\], Member/,
-      adoptLines,
-    );
-    ex = ex.replace(/_+\n\[MEMBER NAME\], Member/, adoptLines);
+    // Member-managed Series Exhibits are adopted by all Members acting for the
+    // Company; manager-managed ones by the Manager alone.
+    ex = ex.replace(/_+\n\[MEMBER 1\], Member[\s\S]*?_+\n\[MEMBER 2\], Member/, adoptLines);
     ex = ex
       .split("[NAME], Protected Series Manager").join(`${inputs.managerName}, Protected Series Manager`)
       .split("[NAME], Associated Member").join(adoptNames[0] ?? "")

@@ -46,8 +46,7 @@ interface MemberAnswer {
 interface SeriesAnswer {
   purpose?: string;
   contribution?: string;
-  ownershipMode?: OwnershipMode;
-  associated?: { memberIndex: number; seriesPercentage?: number; numerator?: number; denominator?: number }[];
+
 }
 interface CoupleAnswer {
   a: number;
@@ -322,7 +321,6 @@ export default function OAQuestionnaire() {
     if (u.kind === "couple") patchCouple(u.ci, { todBeneficiary: v });
     else patchMember(u.index, { todBeneficiary: v });
   };
-  const unitAssocIndex = (u: Unit) => (u.kind === "couple" ? u.repIndex : u.index);
 
   return (
     <section className="container-wide section-y">
@@ -633,81 +631,14 @@ export default function OAQuestionnaire() {
                   </div>
                 </QuestionCard>
 
-                {a.sElection === true ? (
+                {data.seed.series.length > 0 ? (
                   <div className="rounded-2xl border border-border bg-secondary/30 p-5 text-sm text-muted-foreground">
-                    With an S election, every owner automatically shares in every protected series
-                    in proportion to their ownership percentages — per-series ownership cannot
-                    vary, so there is nothing to choose here.
+                    Each protected series is owned by the company itself, not by the owners
+                    directly, so every owner shares in every series through their ownership of the
+                    company. That keeps the series out of separate tax returns and there is nothing
+                    to choose here.
                   </div>
-                ) : (
-                <QuestionCard title="Who shares in each protected series?">
-                  <p className="text-xs text-muted-foreground">
-                    Only owners associated with a series share in that series' profits and vote on
-                    its affairs. Each series must add up to a whole — leave a series blank if the
-                    company itself holds it. A spousal pair counts as one owner. Each series can
-                    use its own notation.
-                  </p>
-                  {data.seed.series.map((sr, si) => {
-                    const sMode = a.series?.[si]?.ownershipMode ?? "percent";
-                    const assoc = a.series?.[si]?.associated ?? [];
-                    const shareFor = (idx: number): OwnershipShare => {
-                      const cur = assoc.find((x) => x.memberIndex === idx);
-                      return {
-                        percentage: cur?.seriesPercentage,
-                        numerator: cur?.numerator,
-                        denominator: cur?.denominator,
-                      };
-                    };
-                    const writeShare = (idx: number, share: OwnershipShare) => {
-                      const rest = assoc.filter((x) => x.memberIndex !== idx);
-                      const empty =
-                        share.percentage === undefined &&
-                        share.numerator === undefined &&
-                        share.denominator === undefined;
-                      patchSeries(si, {
-                        associated: empty
-                          ? rest
-                          : [
-                              ...rest,
-                              {
-                                memberIndex: idx,
-                                seriesPercentage: share.percentage,
-                                numerator: share.numerator,
-                                denominator: share.denominator,
-                              },
-                            ],
-                      });
-                    };
-                    return (
-                      <div key={si} className="space-y-2 rounded-lg border border-border p-3">
-                        <p className="text-sm font-medium">{sr.name}</p>
-                        <OwnershipEditor
-                          mode={sMode}
-                          rows={units.map((u) => ({
-                            key: String(unitAssocIndex(u)),
-                            label: u.label,
-                            note: u.kind === "couple" ? u.note : undefined,
-                            share: shareFor(unitAssocIndex(u)),
-                          }))}
-                          onModeChange={(mode) => patchSeries(si, { ownershipMode: mode })}
-                          onShareChange={(key, share) => writeShare(Number(key), share)}
-                          onEqualize={(mode, shares) =>
-                            patchSeries(si, {
-                              ownershipMode: mode,
-                              associated: units.map((u, i) => ({
-                                memberIndex: unitAssocIndex(u),
-                                seriesPercentage: shares[i].percentage,
-                                numerator: shares[i].numerator,
-                                denominator: shares[i].denominator,
-                              })),
-                            })
-                          }
-                        />
-                      </div>
-                    );
-                  })}
-                </QuestionCard>
-                )}
+                ) : null}
               </>
             ) : null}
 

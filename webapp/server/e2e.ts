@@ -481,7 +481,7 @@ if (mint.status === 200) {
     effectiveDate: "2026-08-06",
     authorized: true,
     members: [{}, {}],
-    series: [{ associated: [{ memberIndex: 0, seriesPercentage: 100 }] }],
+    series: [{}],
     couples: [{ a: 0, b: 1, form: "TBE", percentage: 100, contribution: "$2,000 cash", todBeneficiary: "Ortiz Family Trust" }],
     includeCapitalCalls: false,
     competition: "B",
@@ -499,7 +499,7 @@ if (mint.status === 200) {
   const noPctAnswers = {
     ...coupleAnswers,
     couples: [{ a: 0, b: 1, form: "TBE", contribution: "$2,000 cash", todBeneficiary: "Ortiz Family Trust" }],
-    series: [{ associated: [{ memberIndex: 0, seriesPercentage: 100 }] }],
+    series: [{}],
   };
   const noPctGen = await api("/api/portal/oa/generate", { method: "POST", cookies: mPw.cookie, body: JSON.stringify(noPctAnswers) });
   check("couple-only company generates without any ownership answer", noPctGen.status === 200, noPctGen.body);
@@ -711,7 +711,7 @@ if (mint.status === 200) {
   const mmAnswers = {
     firstOrAmended: "first", effectiveDate: "2026-08-08", authorized: true,
     members: [{ percentage: 50, contribution: "$500 cash" }, { percentage: 50, contribution: "$500 cash" }],
-    series: [{ associated: [{ memberIndex: 0, seriesPercentage: 50 }, { memberIndex: 1, seriesPercentage: 50 }] }],
+    series: [{}],
     includeCapitalCalls: false, competition: "A", includeShotgun: false, borrowingThreshold: 30000,
   };
   // Fractions: three equal owners are 1/3 each, which percentages cannot express.
@@ -719,32 +719,20 @@ if (mint.status === 200) {
     ...mmAnswers,
     ownershipMode: "fraction",
     members: [{ numerator: 1, denominator: 2, contribution: "$500 cash" }, { numerator: 1, denominator: 2, contribution: "$500 cash" }],
-    series: [{ ownershipMode: "fraction", associated: [
-      { memberIndex: 0, numerator: 1, denominator: 3 },
-      { memberIndex: 1, numerator: 1, denominator: 3 },
-    ] }],
+    series: [{}],
   };
-  const badFractions = await api("/api/portal/oa/generate", {
+  const badThirds = await api("/api/portal/oa/generate", {
+    method: "POST", cookies: mmPw.cookie,
+    body: JSON.stringify({ ...thirdsAnswers, members: [
+      { numerator: 1, denominator: 3, contribution: "$500 cash" },
+      { numerator: 1, denominator: 3, contribution: "$500 cash" },
+    ] }),
+  });
+  check("company fractions that don't total one whole are rejected", badThirds.status === 400, badThirds.body);
+  const goodFractions = await api("/api/portal/oa/generate", {
     method: "POST", cookies: mmPw.cookie, body: JSON.stringify(thirdsAnswers),
   });
-  check("series fractions that don't total one whole are rejected", badFractions.status === 400, badFractions.body);
-  const goodFractions = await api("/api/portal/oa/generate", {
-    method: "POST", cookies: mmPw.cookie,
-    body: JSON.stringify({
-      ...thirdsAnswers,
-      series: [{ ownershipMode: "fraction", associated: [
-        { memberIndex: 0, numerator: 1, denominator: 2 },
-        { memberIndex: 1, numerator: 1, denominator: 2 },
-      ] }],
-    }),
-  });
   check("fractional ownership generates", goodFractions.status === 200, goodFractions.body);
-
-  const badSeriesPct = await api("/api/portal/oa/generate", {
-    method: "POST", cookies: mmPw.cookie,
-    body: JSON.stringify({ ...mmAnswers, series: [{ associated: [{ memberIndex: 0, seriesPercentage: 40 }, { memberIndex: 1, seriesPercentage: 55 }] }] }),
-  });
-  check("series percentages that don't total 100 are rejected", badSeriesPct.status === 400, badSeriesPct.body);
   const mmGen = await api("/api/portal/oa/generate", { method: "POST", cookies: mmPw.cookie, body: JSON.stringify(mmAnswers) });
   check("member-managed agreement generates", mmGen.status === 200, mmGen.body);
   const mmDoc = mmGen.body?.data?.documentId as string;

@@ -57,7 +57,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **2.3 "Associated Liability"** means a liability incurred by, contracted for, or otherwise existing with respect to a particular Protected Series or the Company, as reflected in the records maintained under Article 8.
 
-**2.4 "Associated Member"** means, with respect to a Protected Series, a member of the Company associated with that Protected Series under this Agreement and its Series Exhibit. If no member of the Company is associated with a Protected Series, the Company itself is deemed the sole Associated Member of that Protected Series as provided by the Act.
+**2.4 "Associated Member"** means, with respect to a Protected Series, a member of the Company associated with that Protected Series under this Agreement and its Series Exhibit. Consistent with s. 605.2302(1), Florida Statutes, only a member of the Company may be an Associated Member. No Protected Series established under this Agreement has an Associated Member; each Protected Series is owned and managed by the Company as provided in Section 3.6.
 
 **2.5 "Company"** means [COMPANY NAME], LLC.
 
@@ -83,7 +83,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 ## ARTICLE 3 — PROTECTED SERIES
 
-**3.1 Establishment.** With the affirmative vote or consent of all members of the Company (which, while the Member is the sole member, means the consent of the Member), the Company may establish one or more Protected Series by causing a Protected Series Designation to be signed and filed with the Department as provided in s. 605.2201, Florida Statutes. At or before the filing of each Protected Series Designation, the Member and the Manager shall adopt a Series Exhibit for the new Protected Series. The Manager is authorized to execute and file each Protected Series Designation approved under this Section.
+**3.1 Establishment.** With the affirmative vote or consent of all members of the Company (which, while the Member is the sole member, means the consent of the Member), the Company may establish one or more Protected Series by causing a Protected Series Designation to be signed and filed with the Department as provided in s. 605.2201, Florida Statutes. At or before the filing of each Protected Series Designation, the Member and the Manager shall adopt a Series Exhibit for the new Protected Series. The Manager is authorized to execute and file each Protected Series Designation approved under this Section. Each Protected Series shall be established without Associated Members. Consistent with s. 605.2303(2), Florida Statutes, the Company owns all of the protected-series transferable interests of each Protected Series, and no member of the Company holds any interest in any Protected Series except indirectly, through that member's interest in the Company.
 
 **3.2 Status of Each Protected Series.** As provided by the Act, each Protected Series:
 
@@ -107,7 +107,15 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **3.4 Dissolution of a Protected Series Distinguished.** The dissolution and winding up of a Protected Series does not, by itself, cause the dissolution of the Company or of any other Protected Series. The dissolution of the Company causes the dissolution of every Protected Series, and the winding up of the Company is not complete until each Protected Series is wound up.
 
-**3.5 Series Exhibits Control Series Terms.** The terms specific to each Protected Series — including its name, purpose, Associated Members, Protected Series Manager, capital, and any variations from the default rules of this Agreement — are set forth in its Series Exhibit. In the event of a conflict between a Series Exhibit and this Agreement with respect to the Protected Series to which the Series Exhibit relates, the Series Exhibit controls, except that no Series Exhibit may vary a provision of the Act that may not be varied by an operating agreement (see s. 605.2107, Florida Statutes) or the provisions of Article 8.
+**3.5 Series Exhibits Control Series Terms.** The terms specific to each Protected Series — including its name, purpose, Protected Series Manager, capital, and any variations from the default rules of this Agreement — are set forth in its Series Exhibit. In the event of a conflict between a Series Exhibit and this Agreement with respect to the Protected Series to which the Series Exhibit relates, the Series Exhibit controls, except that no Series Exhibit may vary a provision of the Act that may not be varied by an operating agreement (see s. 605.2107, Florida Statutes) or the provisions of Article 8.
+
+**3.6 Company as Owner and Protected-Series Manager.**
+
+(a) **Ownership.** The Company owns all of the protected-series transferable interests of each Protected Series, as provided in s. 605.2303(1)-(3), Florida Statutes. Every distribution made by a Protected Series is made to the Company.
+
+(b) **Management.** Because no Protected Series has an Associated Member, the Company is the protected-series manager of each Protected Series under s. 605.2304(2), Florida Statutes. The Manager acts for the Company in that capacity and may designate a Protected Series Manager in a Series Exhibit to act under the Manager's supervision.
+
+(c) **Transferee provisions inapplicable to the Company.** Section 605.2303(4), Florida Statutes, applies to the Company, in its capacity as owner of a protected-series transferable interest, any provision of this Agreement that applies to a protected-series transferee. No provision of this Agreement restricting the rights of a transferee applies to the Company in that capacity, and nothing in this Agreement limits the Company's rights to manage, direct, receive distributions from, or obtain the records and information of any Protected Series.
 
 ---
 
@@ -115,9 +123,9 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **4.1 Sole Member.** The Member identified on Exhibit A is the sole member of the Company and holds one hundred percent (100%) of the Membership Interest. Membership interests are of a single class and are expressed as percentages; no certificates shall be issued unless the Manager determines otherwise.
 
-**4.2 Association with Protected Series.** The Member shall be an Associated Member of each Protected Series identified as such in the applicable Series Exhibit. For any Protected Series as to which no member is associated, the Company is deemed the sole Associated Member as provided by the Act. Only a member of the Company may be an Associated Member of a Protected Series.
+**4.2 No Series-Level Ownership.** The Member is not an Associated Member of any Protected Series and holds no protected-series transferable interest. Each Protected Series is wholly owned by the Company as provided in Section 3.6, and the Member's economic rights in every Protected Series arise solely through the Member's interest in the Company.
 
-**4.3 Limited Liability.** The Member shall not be personally liable for any debt, obligation, or liability of the Company or of any Protected Series, whether arising in contract, tort, or otherwise, solely by reason of being a member or Associated Member.
+**4.3 Limited Liability.** The Member shall not be personally liable for any debt, obligation, or liability of the Company or of any Protected Series, whether arising in contract, tort, or otherwise, solely by reason of being a member.
 
 **4.4 No Agency by Status.** The Member is not an agent of the Company or of any Protected Series solely by reason of being a member.
 
@@ -159,7 +167,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 ## ARTICLE 7 — DISTRIBUTIONS
 
-**7.1 Distributions.** The Manager (or, as to a Protected Series, its Protected Series Manager) may from time to time determine the extent to which cash on hand of the Company or of a Protected Series exceeds current and anticipated needs, including operating expenses, debt service, acquisitions, and reserves, and may distribute any such excess to the Member (or, in the case of a Protected Series, to its Associated Members, which while the Member is the sole Associated Member means the Member).
+**7.1 Distributions.** The Manager (or, as to a Protected Series, its Protected Series Manager) may from time to time determine the extent to which cash on hand of the Company or of a Protected Series exceeds current and anticipated needs, including operating expenses, debt service, acquisitions, and reserves, and may distribute any such excess to the Member (or, in the case of a Protected Series, to the Company).
 
 **7.2 Source Limitation.** Distributions in respect of a Protected Series shall be made **solely from the Associated Assets of that Protected Series**, and distributions in respect of the Company shall be made solely from the Associated Assets of the Company. Each distribution shall be recorded in the records maintained under Article 8, identifying its source.
 
@@ -189,7 +197,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **8.6 Contracts and Liabilities.** Each contract, account, loan, or other obligation shall be entered into in the name of, and shall identify, the Company or the specific Protected Series incurring it, and shall be recorded as an Associated Liability of the person incurring it.
 
-**8.7 Financial Records; Inspection.** Separate books of account shall be maintained for the Company and for each Protected Series, showing income, expenses, assets, liabilities, contributions, and distributions of each. The Member (and any Associated Member, as to the applicable Protected Series) may inspect and copy the records described in this Article at reasonable times, consistent with the Act.
+**8.7 Financial Records; Inspection.** Separate books of account shall be maintained for the Company and for each Protected Series, showing income, expenses, assets, liabilities, contributions, and distributions of each. The Member may inspect and copy the records described in this Article at reasonable times, consistent with the Act.
 
 **8.7A Exclusive Means of Moving Value.** Value may be moved between the Company and any Protected Series, or between Protected Series, only by an Inter-Series Transfer, a contribution, or a distribution, in each case approved as this Agreement requires and documented under this Article at the time it occurs. No other transfer, allocation, offset, netting, or informal accommodation between the Company and a Protected Series, or between Protected Series, is permitted, and any such act shall be documented and corrected under Section 8.9(d) upon discovery.
 
@@ -211,7 +219,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 ## ARTICLE 9 — TAX MATTERS
 
-**9.1 Intended Classification.** While the Member is the sole member of the Company and the sole Associated Member of each Protected Series, it is intended that the Company and each Protected Series each be disregarded as an entity separate from the Member for federal income tax purposes, and that all items of income, gain, loss, deduction, and credit be reported directly by the Member. The classification of the Company and of each Protected Series shall in all events be determined under federal tax law as applied to each of them, and nothing in this Agreement constitutes tax advice or a guarantee of any particular tax treatment.
+**9.1 Intended Classification.** It is intended that the Company and each Protected Series each be disregarded as an entity separate from the Member for federal income tax purposes, and that all items of income, gain, loss, deduction, and credit be reported directly by the Member. The classification of the Company and of each Protected Series shall in all events be determined under federal tax law as applied to each of them, and nothing in this Agreement constitutes tax advice or a guarantee of any particular tax treatment.
 
 **9.2 Tax Filings and Elections.** The Manager shall make, or cause to be made, all tax filings required of the Company or of any Protected Series and may make any tax election the Manager determines to be in the best interests of the Member, consistent with Section 9.1.
 
@@ -245,9 +253,9 @@ From the effective date of any such election, and whether or not this Agreement 
 
 ## ARTICLE 12 — DISSOLUTION AND WINDING UP
 
-**12.1 Dissolution of a Protected Series.** A Protected Series is dissolved, and its activities and affairs shall be wound up, upon the first to occur of: (a) the dissolution of the Company; (b) an event or circumstance specified in its Series Exhibit; (c) the affirmative vote or consent of all Associated Members of that Protected Series (or, if the Company is the deemed sole Associated Member, the consent of the Member); or (d) entry of a judicial order dissolving the Protected Series as provided by the Act.
+**12.1 Dissolution of a Protected Series.** A Protected Series is dissolved, and its activities and affairs shall be wound up, upon the first to occur of: (a) the dissolution of the Company; (b) an event or circumstance specified in its Series Exhibit; (c) the affirmative vote or consent of the Member; or (d) entry of a judicial order dissolving the Protected Series as provided by the Act.
 
-**12.2 Winding Up a Protected Series.** Upon dissolution of a Protected Series, its Protected Series Manager (or another person designated by the Member) shall wind up its activities and affairs in the manner provided by the Act for winding up a limited liability company, applied to that Protected Series. Its Associated Assets shall be applied: first, to pay or provide for its Associated Liabilities to creditors (including the Member as a creditor, to the extent permitted by law); and then the balance to its Associated Members (or, if the Company is the deemed sole Associated Member, to the Company). The Manager shall cause any statement or filing required by the Act or the Department in connection with the dissolution of the Protected Series to be made. The winding up of a Protected Series shall not draw upon, and its creditors shall have no recourse to, the Associated Assets of the Company or of any other Protected Series.
+**12.2 Winding Up a Protected Series.** Upon dissolution of a Protected Series, its Protected Series Manager (or another person designated by the Member) shall wind up its activities and affairs in the manner provided by the Act for winding up a limited liability company, applied to that Protected Series. Its Associated Assets shall be applied: first, to pay or provide for its Associated Liabilities to creditors (including the Member as a creditor, to the extent permitted by law); and then the balance to the Company. The Manager shall cause any statement or filing required by the Act or the Department in connection with the dissolution of the Protected Series to be made. The winding up of a Protected Series shall not draw upon, and its creditors shall have no recourse to, the Associated Assets of the Company or of any other Protected Series.
 
 **12.3 Dissolution of the Company.** The Company is dissolved, and its activities and affairs shall be wound up, upon the first to occur of: (a) the written consent of the Member; (b) entry of a decree of judicial dissolution under the Act; or (c) any other event that under the Act requires dissolution. Dissolution of the Company causes the dissolution of each Protected Series, and the winding up of the Company is not complete until the winding up of each Protected Series is complete.
 
@@ -331,17 +339,14 @@ Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENE
 | Item | Terms |
 |---|---|
 | Purpose of this Protected Series | [PURPOSE — e.g., "to acquire, own, lease, and manage the real property located at ___" or "any lawful business"] |
-| Associated Member(s) | [MEMBER NAME] — 100% [or: "None — the Company is the deemed sole Associated Member"] |
+| Owner of this Protected Series | The Company. This Protected Series has no Associated Members (ss. 605.2302(1), 605.2303(2), Fla. Stat.). |
 | Protected Series Manager | [Same as Company Manager / NAME] |
-| Contributions to this Protected Series | $[AMOUNT] [and/or described property], contributed [DATE] |
+| Contributions to this Protected Series | By the Company: $[AMOUNT] on [DATE] [and/or described property] |
 | Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the Member(s), together with the records maintained under Article 8. |
 | Special terms (if any) | [None / variations from the base Agreement — may not vary Article 8 or non-variable provisions of the Act] |
 | Dissolution events specific to this Protected Series (if any) | [None / describe] |
 
-**Adopted by the Member and the [Protected Series] Manager effective [DATE]:**
-
-_____________________________
-[MEMBER NAME], Member
+**Adopted effective [DATE] by the Company, acting through its Manager:**
 
 _____________________________
 [NAME], Protected Series Manager
