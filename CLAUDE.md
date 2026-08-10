@@ -22,6 +22,23 @@ When a question or control is hidden or skipped conditionally, confirm the
 underlying value is still set. A question removed from the screen is not a
 value removed from the system.
 
+## Never filter a verification search by what you expect to find
+
+This rule is not optional and is not waived by convenience.
+
+When checking whether a change is complete, search for the raw term with
+**zero exclusions** and read every hit. Filtering results by the sections,
+headings, or phrasings you expect turns a check into a confirmation of your
+own assumption — it can only surface hits you had not already explained
+away, so it cannot tell you that you were wrong.
+
+- Long output is not a reason to filter. Read all of it.
+- Narrow by file or directory if you must. Never by expected content.
+- The same applies to assertions and tests: a check that only inspects the
+  cases you thought of is not a check.
+- State the raw count. "37 hits, 33 intentional, 4 to fix" is a
+  verification. "No unexpected hits" is not.
+
 This workspace contains a mobile app and backend server.
 
 <projects>

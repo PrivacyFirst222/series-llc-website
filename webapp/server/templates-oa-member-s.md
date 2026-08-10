@@ -31,7 +31,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series except as limited by its Series Exhibit, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
 
-**1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as a Majority in Interest may determine. A Protected Series may maintain its own place of business as determined by its Associated Members.
+**1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as a Majority in Interest may determine. A Protected Series may maintain its own place of business as determined by the Company.
 
 **1.6 Registered Agent and Registered Office.** The registered agent and registered office of the Company shall be as stated in the records of the Department. As required by the Act, the registered agent and registered office of the Company shall also serve as the registered agent and registered office for each Protected Series. Service of process, notice, or demand on a Protected Series may be made as provided by law, including s. 48.062, Florida Statutes.
 
@@ -171,7 +171,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 (a) no Member acting alone has actual authority to undertake any act outside the ordinary course of the activities and affairs of the Company or of a Protected Series, or any act listed in Section 5.5, without the approval there stated;
 
-(b) no Member acting alone has actual authority to sell, convey, mortgage, pledge, or otherwise encumber any interest in real property of the Company or of any Protected Series, or to execute any instrument affecting such an interest, without the consent of a Majority in Interest and, as to a Protected Series, a Majority in Interest of its Associated Members; and
+(b) no Member acting alone has actual authority to sell, convey, mortgage, pledge, or otherwise encumber any interest in real property of the Company or of any Protected Series, or to execute any instrument affecting such an interest, without the consent of a Majority in Interest; and
 
 (c) a Member who exceeds the authority conferred by this Agreement is liable to the Company or the affected Protected Series for any loss caused by that act, and the Company or Protected Series is entitled to indemnity from that Member.
 
@@ -207,7 +207,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 ## ARTICLE 6 — CAPITAL
 
-**6.1 Initial Contributions.** Each Member's contributions to the Company are set forth on Exhibit A and in the applicable Series Exhibits. Each contribution shall identify whether it is made to the Company or to a specific Protected Series, and shall be deposited to, and recorded in the records of, the recipient. A promise by a Member to make a contribution is enforceable only if set out in a writing signed by the Member.
+**6.1 Initial Contributions.** Each Member's contributions to the Company are set forth on Exhibit A. Contributions to a Protected Series are made by the Company and are set forth in the applicable Series Exhibit. Each contribution shall identify whether it is made to the Company or to a specific Protected Series, and shall be deposited to, and recorded in the records of, the recipient. A promise by a Member to make a contribution is enforceable only if set out in a writing signed by the Member.
 
 **6.2 Additional Capital Contributions. [OPTIONAL PROVISION — include or omit; see Instructions]** Upon the approval of a Majority in Interest, each Member shall have the duty and obligation to contribute additional capital to the Company or to the affected Protected Series, in proportion to the Members' Percentage Interests, in the aggregate amount so approved, payable within thirty (30) days after written notice of the approved call; provided, that unless approved by all Members, no Member shall be required to contribute more than $[CAP] in the aggregate in any calendar year under this Section. This obligation is a material, unperformed, future obligation of each Member within the meaning of Section 11.1. *(To omit this provision, replace the text of this Section 6.2 and of Section 6.3 with "[Reserved.]" and replace Section 11.1(a) with "(a) [Reserved.]" — do not renumber any section. If omitted, no Member has any obligation to contribute capital beyond Section 6.1.)*
 

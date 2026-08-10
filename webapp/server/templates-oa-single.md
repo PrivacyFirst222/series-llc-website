@@ -153,7 +153,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 ## ARTICLE 6 — CAPITAL
 
-**6.1 Contributions.** The Member's contributions to the Company, and to each Protected Series, are set forth on Exhibit A and in the applicable Series Exhibits. Each contribution shall identify whether it is made to the Company or to a specific Protected Series, and shall be deposited to, and recorded in the records of, the recipient. A promise by the Member to make a contribution is enforceable only if set out in a writing signed by the Member.
+**6.1 Contributions.** The Member's contributions to the Company are set forth on Exhibit A. Contributions to a Protected Series are made by the Company and are set forth in the applicable Series Exhibit. Each contribution shall identify whether it is made to the Company or to a specific Protected Series, and shall be deposited to, and recorded in the records of, the recipient. A promise by the Member to make a contribution is enforceable only if set out in a writing signed by the Member.
 
 **6.2 No Obligation; No Interest.** The Member is not obligated to make any additional contribution to the Company or to any Protected Series. No interest shall be paid on any contribution.
 
