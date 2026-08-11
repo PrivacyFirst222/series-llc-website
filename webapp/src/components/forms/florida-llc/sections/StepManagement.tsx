@@ -10,16 +10,19 @@ interface StepProps {
   errors: Record<string, string>;
 }
 
-const OPTIONS: { v: ManagementStructure; t: string; s: string }[] = [
-  {
-    v: "MEMBER_MANAGED",
-    t: "Member-managed",
-    s: "Members run day-to-day operations.",
-  },
+// Manager-managed leads, and is preselected, because the panel below argues for
+// it: reading order was working against the recommendation it sits above.
+const OPTIONS: { v: ManagementStructure; t: string; s: string; recommended?: boolean }[] = [
   {
     v: "MANAGER_MANAGED",
     t: "Manager-managed",
     s: "One or more managers run the LLC; members may be passive.",
+    recommended: true,
+  },
+  {
+    v: "MEMBER_MANAGED",
+    t: "Member-managed",
+    s: "Members run day-to-day operations.",
   },
 ];
 
@@ -63,7 +66,14 @@ export function StepManagement({ data, patch, errors }: StepProps) {
                   })
                 }
               />
-              <div className="font-medium">{o.t}</div>
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-medium">{o.t}</span>
+                {o.recommended ? (
+                  <span className="shrink-0 rounded-full bg-trust/10 px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-trust">
+                    Recommended
+                  </span>
+                ) : null}
+              </div>
               <div className="text-xs text-muted-foreground mt-1">{o.s}</div>
             </label>
           ))}

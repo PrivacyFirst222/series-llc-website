@@ -68,8 +68,10 @@ export const defaultFormData: FloridaLLCFormData = {
   registeredAgentElectronicSignature: "",
   registeredAgentSignatureAuthorizationCheckbox: false,
 
-  managementStructure: "",
-  includeManagementStatementInArticles: false,
+  // Preselected: manager-managed is what the step recommends, and the Articles
+  // statement always travels with it (the step's own handler does the same).
+  managementStructure: "MANAGER_MANAGED",
+  includeManagementStatementInArticles: true,
 
   managers: [],
 
