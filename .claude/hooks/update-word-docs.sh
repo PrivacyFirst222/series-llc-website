@@ -54,6 +54,15 @@ for entry in "${DOCS[@]}"; do
   count=$((count + 1))
 done
 
+# Drafting gate. Every check here exists because a fault reached a document and
+# Adam found it by reading. Runs before the formatting gate: no point measuring
+# the typography of a document that says "should" in a covenant.
+echo "linting the agreement masters"
+if ! python3 "$ROOT/docs/drafting-lint.py" "$ROOT"/webapp/server/templates-oa-*.md; then
+  echo "update-word-docs: DRAFTING PROBLEM — nothing written" >&2
+  exit 1
+fi
+
 # The gate. Measured against the originals; a regression stops everything here,
 # before a single file has been replaced.
 echo "checking $count documents against docs/source/"

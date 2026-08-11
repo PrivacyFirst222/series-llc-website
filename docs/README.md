@@ -44,6 +44,29 @@ To regenerate by hand at any time:
 .claude/hooks/update-word-docs.sh
 ```
 
+### The drafting gate
+
+`drafting-lint.py` runs first, on the five agreement masters. Every check exists
+because a fault reached a document and was caught by reading it, so the lint
+catches the recurrence rather than the intention:
+
+| Check | What it refuses |
+|---|---|
+| hortatory | `should`, `may wish to`, `is recommended` — a form binds or permits; advice belongs in the manual |
+| duplicate | the same rule stated in two articles, which can drift apart and then has to be litigated |
+| reservation | a `[Reserved.]` with no omission instruction behind it — reserving a number protects cross-references in a *signed* document, and these are unsigned forms |
+| orphan term | a defined term nothing else references |
+| citation | an `s. 605.xxxx` that `chapter-605-notes.md` has no entry for, so an invented cite cannot pass silently |
+
+Each check is proven against a deliberately reintroduced defect; the first run
+found a genuine one nobody had noticed — `"Series Managing Members"`, defined in
+the member-managed masters and used nowhere, a leftover from the move to
+company-owned series.
+
+```bash
+python3 docs/drafting-lint.py webapp/server/templates-oa-*.md
+```
+
 ### The formatting gate
 
 Generation writes to a staging directory first. Every document is measured
