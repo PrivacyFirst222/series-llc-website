@@ -406,23 +406,30 @@ export function FloridaLLCFormationForm({
 
           <ol className="hidden lg:block rounded-2xl border border-border bg-card p-3 space-y-1">
             {STEPS.map(({ key, label }, i) => {
-              // Completed status is permanent: it reflects the furthest point
-              // reached, not wherever the customer is currently standing.
-              const done = i < maxStep;
+              // Every step is reachable at any time, in any order. A tick means
+              // the step's own required fields are answered — so the sidebar is
+              // a checklist of what is left, not a track you must walk.
+              //
+              // The last entry is the exception: it is the confirmation screen
+              // shown after filing, not a step to fill in. Reaching it by
+              // clicking would show a completed filing that never happened.
+              const isConfirmation = i === STEPS.length - 1;
+              const reachable = !isConfirmation || stepIndex === i;
+              const done = !isConfirmation && Object.keys(validateStep(key, data)).length === 0;
               const active = i === stepIndex;
               return (
                 <li key={key}>
                   <button
                     type="button"
-                    onClick={() => i <= maxStep && goToStep(i)}
+                    onClick={() => reachable && goToStep(i)}
                     className={`w-full flex items-center gap-2 text-left rounded-md px-3 py-2 text-sm transition-colors ${
                       active
                         ? "bg-trust/10 text-foreground font-medium"
-                        : i <= maxStep
+                        : reachable
                           ? "text-foreground/80 hover:bg-secondary"
                           : "text-muted-foreground cursor-not-allowed"
                     }`}
-                    disabled={i > maxStep}
+                    disabled={!reachable}
                   >
                     <span
                       className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-medium ${
