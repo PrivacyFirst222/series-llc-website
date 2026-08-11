@@ -103304,15 +103304,9 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **1.9 Filings.** The Manager shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, and statements of dissolution, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
 
-**1.10 Title to Property; How Assets Are Associated.** An asset becomes an Associated Asset of a Protected Series, or of the Company, by the records required under Article 8 and s. 605.2301, Florida Statutes \u2014 not by the form of its title. Subject to that requirement:
+**1.10 How Assets Are Associated.** An asset becomes an Associated Asset of a Protected Series, or of the Company, by the records required under Article 8 and s. 605.2301, Florida Statutes.
 
-(a) An Associated Asset may be held directly, or indirectly through a representative, nominee, or similar arrangement, as permitted by s. 605.2301(5), Florida Statutes. Any such indirect arrangement shall be documented in the records maintained under Article 8, identifying the holder, the Protected Series or the Company for which the asset is held, and the date the arrangement began.
-
-(b) **The following are prohibited and may not be varied:** a Protected Series may not hold an Associated Asset in the name of the Company or of another Protected Series, and the Company may not hold an Associated Asset in the name of a Protected Series (s. 605.2301(5)(a)-(b), Florida Statutes).
-
-(c) A recorded instrument naming the owner is conclusive of the signer's authority in favor of a person who gives value without knowledge of a lack of authority, and itself constitutes a record that the interest is an Associated Asset (ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes). Where an interest in real property is held through a representative, nominee, or similar arrangement, the Member shall cause the arrangement to be documented under Article 8 before the acquisition is complete.
-
-(d) No property of the Company or of any Protected Series shall be held in the individual name of the Member or the Manager other than under a documented arrangement permitted by paragraph (a). The Member's interest in the Company is personal property for all purposes.
+**1.10A Membership Interest.** The Member's interest in the Company is personal property for all purposes.
 
 **1.11 Waiver of Partition Rights.** The Member irrevocably waives any right to maintain an action for partition or any similar action with respect to any property of the Company or of any Protected Series.
 
@@ -103466,7 +103460,11 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **8.4 Inter-Series Transfers.** Any transfer, re-association, or re-titling of an asset between the Company and a Protected Series or between Protected Series (an "Inter-Series Transfer") shall be documented contemporaneously by a written record stating (a) the asset transferred, (b) the transferor and transferee (the Company or the specific Protected Series), (c) the date, and (d) the consideration paid, the payor, and the payee. Inter-Series Transfers shall be made for fair value unless the transfer is a documented contribution or distribution.
 
-**8.5 Real Property.** A properly recorded instrument naming the acquiring or conveying Protected Series (by its full statutory name) or the Company, as applicable, serves as an association record and is conclusive of the signer's authority in favor of a person giving value without knowledge of a lack of authority (ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes). Where an interest in real property is held through a representative, nominee, or similar arrangement as permitted by s. 605.2301(5), Florida Statutes, the arrangement shall be documented under this Article and under Section 1.10(a), and the association of the interest shall be established by those records.
+**8.5 Real Property.** A properly recorded instrument naming the acquiring or conveying Protected Series (by its full statutory name) or the Company, as applicable, serves as an association record and is conclusive of the signer's authority in favor of a person giving value without knowledge of a lack of authority (ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes). Where an interest in real property is held through a representative, nominee, or similar arrangement as permitted by s. 605.2301(5), Florida Statutes, the arrangement shall be documented under Section 8.5A, and the association of the interest shall be established by those records.
+
+**8.5A Holding Associated Assets.** An Associated Asset may be held directly, or indirectly through a representative, nominee, or similar arrangement, as permitted by s. 605.2301(5), Florida Statutes. Any such indirect arrangement shall be documented in the records maintained under this Article, identifying the holder, the Protected Series or the Company for which the asset is held, and the date the arrangement began. No property of the Company or of any Protected Series shall be held in the individual name of the Member or the Manager other than under an arrangement documented under this Section.
+
+**The following are prohibited and may not be varied:** a Protected Series may not hold an Associated Asset in the name of the Company or of another Protected Series, and the Company may not hold an Associated Asset in the name of a Protected Series (s. 605.2301(5)(a)-(b), Florida Statutes).
 
 **8.6 Contracts and Liabilities.** Each contract, account, loan, or other obligation shall be entered into in the name of, and shall identify, the Company or the specific Protected Series incurring it, and shall be recorded as an Associated Liability of the person incurring it.
 
@@ -103686,15 +103684,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **1.9 Filings.** The Manager shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, and statements of dissolution, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
 
-**1.10 Title to Property; How Assets Are Associated.** An asset becomes an Associated Asset of a Protected Series, or of the Company, by the records required under Article 8 and s. 605.2301, Florida Statutes \u2014 not by the form of its title. Subject to that requirement:
-
-(a) An Associated Asset may be held directly, or indirectly through a representative, nominee, or similar arrangement, as permitted by s. 605.2301(5), Florida Statutes. Any such indirect arrangement shall be documented in the records maintained under Article 8, identifying the holder, the Protected Series or the Company for which the asset is held, and the date the arrangement began.
-
-(b) **The following are prohibited and may not be varied:** a Protected Series may not hold an Associated Asset in the name of the Company or of another Protected Series, and the Company may not hold an Associated Asset in the name of a Protected Series (s. 605.2301(5)(a)-(b), Florida Statutes).
-
-(c) A recorded instrument naming the owner is conclusive of the signer's authority in favor of a person who gives value without knowledge of a lack of authority, and itself constitutes a record that the interest is an Associated Asset (ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes). Where an interest in real property is held through a representative, nominee, or similar arrangement, the Members shall cause the arrangement to be documented under Article 8 before the acquisition is complete.
-
-(d) No property of the Company or of any Protected Series shall be held in the individual name of any Member or the Manager other than under a documented arrangement permitted by paragraph (a). Each Member's interest in the Company is personal property for all purposes.
+**1.10 How Assets Are Associated.** An asset becomes an Associated Asset of a Protected Series, or of the Company, by the records required under Article 8 and s. 605.2301, Florida Statutes.
 
 **1.11 Waiver of Partition Rights.** Each Member irrevocably waives any right to maintain an action for partition or any similar action with respect to any property of the Company or of any Protected Series.
 
@@ -103782,7 +103772,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 ## ARTICLE 4 \u2014 MEMBERS; VOTING; MEMBER DUTIES
 
-**4.1 Members; Percentage Interests.** The Members and their Percentage Interests are set forth on Exhibit A. Membership interests are of a single class and are expressed as percentages; no certificates shall be issued unless the Manager determines otherwise.
+**4.1 Members; Percentage Interests.** The Members and their Percentage Interests are set forth on Exhibit A. Membership interests are of a single class and are expressed as percentages; no certificates shall be issued unless the Manager determines otherwise. Each Member's interest in the Company is personal property for all purposes.
 
 **4.2 No Series-Level Ownership.** No Member is an Associated Member of any Protected Series, and no Member holds a protected-series transferable interest. Each Protected Series is wholly owned by the Company as provided in Section 3.6. Every Member's economic rights in every Protected Series arise solely through the Member's Percentage Interest in the Company, so that all Members participate in every Protected Series identically and in proportion to their Percentage Interests at all times.
 
@@ -103896,7 +103886,11 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **8.4 Inter-Series Transfers.** Any Inter-Series Transfer (as defined in Section 5.4(b)) requires the approvals stated in Section 5.4(b) and shall be documented contemporaneously by a written record stating (a) the asset transferred, (b) the transferor and transferee (the Company or the specific Protected Series), (c) the date, and (d) the consideration paid, the payor, and the payee. Inter-Series Transfers shall be made for fair value unless the transfer is a documented contribution or distribution.
 
-**8.5 Real Property.** A properly recorded instrument naming the acquiring or conveying Protected Series (by its full statutory name) or the Company, as applicable, serves as an association record and is conclusive of the signer's authority in favor of a person giving value without knowledge of a lack of authority (ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes). Where an interest in real property is held through a representative, nominee, or similar arrangement as permitted by s. 605.2301(5), Florida Statutes, the arrangement shall be documented under this Article and under Section 1.10(a), and the association of the interest shall be established by those records.
+**8.5 Real Property.** A properly recorded instrument naming the acquiring or conveying Protected Series (by its full statutory name) or the Company, as applicable, serves as an association record and is conclusive of the signer's authority in favor of a person giving value without knowledge of a lack of authority (ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes). Where an interest in real property is held through a representative, nominee, or similar arrangement as permitted by s. 605.2301(5), Florida Statutes, the arrangement shall be documented under Section 8.5A, and the association of the interest shall be established by those records.
+
+**8.5A Holding Associated Assets.** An Associated Asset may be held directly, or indirectly through a representative, nominee, or similar arrangement, as permitted by s. 605.2301(5), Florida Statutes. Any such indirect arrangement shall be documented in the records maintained under this Article, identifying the holder, the Protected Series or the Company for which the asset is held, and the date the arrangement began. No property of the Company or of any Protected Series shall be held in the individual name of any Member or the Manager other than under an arrangement documented under this Section.
+
+**The following are prohibited and may not be varied:** a Protected Series may not hold an Associated Asset in the name of the Company or of another Protected Series, and the Company may not hold an Associated Asset in the name of a Protected Series (s. 605.2301(5)(a)-(b), Florida Statutes).
 
 **8.6 Contracts and Liabilities.** Each contract, account, loan, or other obligation shall be entered into in the name of, and shall identify, the Company or the specific Protected Series incurring it, and shall be recorded as an Associated Liability of the person incurring it.
 
@@ -104165,15 +104159,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **1.9 Filings.** The Manager shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, and statements of dissolution, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
 
-**1.10 Title to Property; How Assets Are Associated.** An asset becomes an Associated Asset of a Protected Series, or of the Company, by the records required under Article 8 and s. 605.2301, Florida Statutes \u2014 not by the form of its title. Subject to that requirement:
-
-(a) An Associated Asset may be held directly, or indirectly through a representative, nominee, or similar arrangement, as permitted by s. 605.2301(5), Florida Statutes. Any such indirect arrangement shall be documented in the records maintained under Article 8, identifying the holder, the Protected Series or the Company for which the asset is held, and the date the arrangement began.
-
-(b) **The following are prohibited and may not be varied:** a Protected Series may not hold an Associated Asset in the name of the Company or of another Protected Series, and the Company may not hold an Associated Asset in the name of a Protected Series (s. 605.2301(5)(a)-(b), Florida Statutes).
-
-(c) A recorded instrument naming the owner is conclusive of the signer's authority in favor of a person who gives value without knowledge of a lack of authority, and itself constitutes a record that the interest is an Associated Asset (ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes). Where an interest in real property is held through a representative, nominee, or similar arrangement, the Members shall cause the arrangement to be documented under Article 8 before the acquisition is complete.
-
-(d) No property of the Company or of any Protected Series shall be held in the individual name of any Member or the Manager other than under a documented arrangement permitted by paragraph (a). Each Member's interest in the Company is personal property for all purposes.
+**1.10 How Assets Are Associated.** An asset becomes an Associated Asset of a Protected Series, or of the Company, by the records required under Article 8 and s. 605.2301, Florida Statutes.
 
 **1.11 Waiver of Partition Rights.** Each Member irrevocably waives any right to maintain an action for partition or any similar action with respect to any property of the Company or of any Protected Series.
 
@@ -104261,7 +104247,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 ## ARTICLE 4 \u2014 MEMBERS; VOTING; MEMBER DUTIES
 
-**4.1 Members; Percentage Interests.** The Members and their Percentage Interests are set forth on Exhibit A. Membership interests are of a single class and are expressed as percentages; no certificates shall be issued unless the Manager determines otherwise.
+**4.1 Members; Percentage Interests.** The Members and their Percentage Interests are set forth on Exhibit A. Membership interests are of a single class and are expressed as percentages; no certificates shall be issued unless the Manager determines otherwise. Each Member's interest in the Company is personal property for all purposes.
 
 **4.2 No Series-Level Ownership.** No Member is an Associated Member of any Protected Series, and no Member holds a protected-series transferable interest. Each Protected Series is wholly owned by the Company as provided in Section 3.6. Every Member's economic rights in every Protected Series arise solely through the Member's Percentage Interest in the Company, so that all Members participate in every Protected Series identically and in proportion to their Percentage Interests at all times.
 
@@ -104375,7 +104361,11 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **8.4 Inter-Series Transfers.** Any Inter-Series Transfer (as defined in Section 5.4(b)) requires the approvals stated in Section 5.4(b) and shall be documented contemporaneously by a written record stating (a) the asset transferred, (b) the transferor and transferee (the Company or the specific Protected Series), (c) the date, and (d) the consideration paid, the payor, and the payee. Inter-Series Transfers shall be made for fair value unless the transfer is a documented contribution or distribution.
 
-**8.5 Real Property.** A properly recorded instrument naming the acquiring or conveying Protected Series (by its full statutory name) or the Company, as applicable, serves as an association record and is conclusive of the signer's authority in favor of a person giving value without knowledge of a lack of authority (ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes). Where an interest in real property is held through a representative, nominee, or similar arrangement as permitted by s. 605.2301(5), Florida Statutes, the arrangement shall be documented under this Article and under Section 1.10(a), and the association of the interest shall be established by those records.
+**8.5 Real Property.** A properly recorded instrument naming the acquiring or conveying Protected Series (by its full statutory name) or the Company, as applicable, serves as an association record and is conclusive of the signer's authority in favor of a person giving value without knowledge of a lack of authority (ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes). Where an interest in real property is held through a representative, nominee, or similar arrangement as permitted by s. 605.2301(5), Florida Statutes, the arrangement shall be documented under Section 8.5A, and the association of the interest shall be established by those records.
+
+**8.5A Holding Associated Assets.** An Associated Asset may be held directly, or indirectly through a representative, nominee, or similar arrangement, as permitted by s. 605.2301(5), Florida Statutes. Any such indirect arrangement shall be documented in the records maintained under this Article, identifying the holder, the Protected Series or the Company for which the asset is held, and the date the arrangement began. No property of the Company or of any Protected Series shall be held in the individual name of any Member or the Manager other than under an arrangement documented under this Section.
+
+**The following are prohibited and may not be varied:** a Protected Series may not hold an Associated Asset in the name of the Company or of another Protected Series, and the Company may not hold an Associated Asset in the name of a Protected Series (s. 605.2301(5)(a)-(b), Florida Statutes).
 
 **8.6 Contracts and Liabilities.** Each contract, account, loan, or other obligation shall be entered into in the name of, and shall identify, the Company or the specific Protected Series incurring it, and shall be recorded as an Associated Liability of the person incurring it.
 
@@ -104656,15 +104646,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **1.9 Filings.** The Administrative Member shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, and statements of dissolution, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
 
-**1.10 Title to Property; How Assets Are Associated.** An asset becomes an Associated Asset of a Protected Series, or of the Company, by the records required under Article 8 and s. 605.2301, Florida Statutes \u2014 not by the form of its title. Subject to that requirement:
-
-(a) An Associated Asset may be held directly, or indirectly through a representative, nominee, or similar arrangement, as permitted by s. 605.2301(5), Florida Statutes. Any such indirect arrangement shall be documented in the records maintained under Article 8, identifying the holder, the Protected Series or the Company for which the asset is held, and the date the arrangement began.
-
-(b) **The following are prohibited and may not be varied:** a Protected Series may not hold an Associated Asset in the name of the Company or of another Protected Series, and the Company may not hold an Associated Asset in the name of a Protected Series (s. 605.2301(5)(a)-(b), Florida Statutes).
-
-(c) A recorded instrument naming the owner is conclusive of the signer's authority in favor of a person who gives value without knowledge of a lack of authority, and itself constitutes a record that the interest is an Associated Asset (ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes). Where an interest in real property is held through a representative, nominee, or similar arrangement, the Members shall cause the arrangement to be documented under Article 8 before the acquisition is complete.
-
-(d) No property of the Company or of any Protected Series shall be held in the individual name of any Member other than under a documented arrangement permitted by paragraph (a). Each Member's interest in the Company is personal property for all purposes.
+**1.10 How Assets Are Associated.** An asset becomes an Associated Asset of a Protected Series, or of the Company, by the records required under Article 8 and s. 605.2301, Florida Statutes.
 
 **1.11 Waiver of Partition Rights.** Each Member irrevocably waives any right to maintain an action for partition or any similar action with respect to any property of the Company or of any Protected Series.
 
@@ -104752,7 +104734,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 ## ARTICLE 4 \u2014 MEMBERS; VOTING; MEMBER DUTIES
 
-**4.1 Members; Percentage Interests.** The Members and their Percentage Interests are set forth on Exhibit A. Membership interests are of a single class and are expressed as percentages; no certificates shall be issued unless a Majority in Interest determines otherwise.
+**4.1 Members; Percentage Interests.** The Members and their Percentage Interests are set forth on Exhibit A. Membership interests are of a single class and are expressed as percentages; no certificates shall be issued unless a Majority in Interest determines otherwise. Each Member's interest in the Company is personal property for all purposes.
 
 **4.2 No Series-Level Ownership.** No Member is an Associated Member of any Protected Series, and no Member holds a protected-series transferable interest. Each Protected Series is wholly owned by the Company as provided in Section 3.6. Every Member's economic rights in every Protected Series arise solely through the Member's Percentage Interest in the Company, so that all Members participate in every Protected Series identically and in proportion to their Percentage Interests at all times.
 
@@ -104876,7 +104858,11 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **8.4 Inter-Series Transfers.** Any Inter-Series Transfer (as defined in Section 5.4(b)) requires the approvals stated in Section 5.4(b) and shall be documented contemporaneously by a written record stating (a) the asset transferred, (b) the transferor and transferee (the Company or the specific Protected Series), (c) the date, and (d) the consideration paid, the payor, and the payee. Inter-Series Transfers shall be made for fair value unless the transfer is a documented contribution or distribution.
 
-**8.5 Real Property.** A properly recorded instrument naming the acquiring or conveying Protected Series (by its full statutory name) or the Company, as applicable, serves as an association record and is conclusive of the signer's authority in favor of a person giving value without knowledge of a lack of authority (ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes). Where an interest in real property is held through a representative, nominee, or similar arrangement as permitted by s. 605.2301(5), Florida Statutes, the arrangement shall be documented under this Article and under Section 1.10(a), and the association of the interest shall be established by those records.
+**8.5 Real Property.** A properly recorded instrument naming the acquiring or conveying Protected Series (by its full statutory name) or the Company, as applicable, serves as an association record and is conclusive of the signer's authority in favor of a person giving value without knowledge of a lack of authority (ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes). Where an interest in real property is held through a representative, nominee, or similar arrangement as permitted by s. 605.2301(5), Florida Statutes, the arrangement shall be documented under Section 8.5A, and the association of the interest shall be established by those records.
+
+**8.5A Holding Associated Assets.** An Associated Asset may be held directly, or indirectly through a representative, nominee, or similar arrangement, as permitted by s. 605.2301(5), Florida Statutes. Any such indirect arrangement shall be documented in the records maintained under this Article, identifying the holder, the Protected Series or the Company for which the asset is held, and the date the arrangement began. No property of the Company or of any Protected Series shall be held in the individual name of any Member other than under an arrangement documented under this Section.
+
+**The following are prohibited and may not be varied:** a Protected Series may not hold an Associated Asset in the name of the Company or of another Protected Series, and the Company may not hold an Associated Asset in the name of a Protected Series (s. 605.2301(5)(a)-(b), Florida Statutes).
 
 **8.6 Contracts and Liabilities.** Each contract, account, loan, or other obligation shall be entered into in the name of, and shall identify, the Company or the specific Protected Series incurring it, and shall be recorded as an Associated Liability of the person incurring it.
 
@@ -105145,15 +105131,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **1.9 Filings.** The Administrative Member shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, and statements of dissolution, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
 
-**1.10 Title to Property; How Assets Are Associated.** An asset becomes an Associated Asset of a Protected Series, or of the Company, by the records required under Article 8 and s. 605.2301, Florida Statutes \u2014 not by the form of its title. Subject to that requirement:
-
-(a) An Associated Asset may be held directly, or indirectly through a representative, nominee, or similar arrangement, as permitted by s. 605.2301(5), Florida Statutes. Any such indirect arrangement shall be documented in the records maintained under Article 8, identifying the holder, the Protected Series or the Company for which the asset is held, and the date the arrangement began.
-
-(b) **The following are prohibited and may not be varied:** a Protected Series may not hold an Associated Asset in the name of the Company or of another Protected Series, and the Company may not hold an Associated Asset in the name of a Protected Series (s. 605.2301(5)(a)-(b), Florida Statutes).
-
-(c) A recorded instrument naming the owner is conclusive of the signer's authority in favor of a person who gives value without knowledge of a lack of authority, and itself constitutes a record that the interest is an Associated Asset (ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes). Where an interest in real property is held through a representative, nominee, or similar arrangement, the Members shall cause the arrangement to be documented under Article 8 before the acquisition is complete.
-
-(d) No property of the Company or of any Protected Series shall be held in the individual name of any Member other than under a documented arrangement permitted by paragraph (a). Each Member's interest in the Company is personal property for all purposes.
+**1.10 How Assets Are Associated.** An asset becomes an Associated Asset of a Protected Series, or of the Company, by the records required under Article 8 and s. 605.2301, Florida Statutes.
 
 **1.11 Waiver of Partition Rights.** Each Member irrevocably waives any right to maintain an action for partition or any similar action with respect to any property of the Company or of any Protected Series.
 
@@ -105241,7 +105219,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 ## ARTICLE 4 \u2014 MEMBERS; VOTING; MEMBER DUTIES
 
-**4.1 Members; Percentage Interests.** The Members and their Percentage Interests are set forth on Exhibit A. Membership interests are of a single class and are expressed as percentages; no certificates shall be issued unless a Majority in Interest determines otherwise.
+**4.1 Members; Percentage Interests.** The Members and their Percentage Interests are set forth on Exhibit A. Membership interests are of a single class and are expressed as percentages; no certificates shall be issued unless a Majority in Interest determines otherwise. Each Member's interest in the Company is personal property for all purposes.
 
 **4.2 No Series-Level Ownership.** No Member is an Associated Member of any Protected Series, and no Member holds a protected-series transferable interest. Each Protected Series is wholly owned by the Company as provided in Section 3.6. Every Member's economic rights in every Protected Series arise solely through the Member's Percentage Interest in the Company, so that all Members participate in every Protected Series identically and in proportion to their Percentage Interests at all times.
 
@@ -105365,7 +105343,11 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **8.4 Inter-Series Transfers.** Any Inter-Series Transfer (as defined in Section 5.4(b)) requires the approvals stated in Section 5.4(b) and shall be documented contemporaneously by a written record stating (a) the asset transferred, (b) the transferor and transferee (the Company or the specific Protected Series), (c) the date, and (d) the consideration paid, the payor, and the payee. Inter-Series Transfers shall be made for fair value unless the transfer is a documented contribution or distribution.
 
-**8.5 Real Property.** A properly recorded instrument naming the acquiring or conveying Protected Series (by its full statutory name) or the Company, as applicable, serves as an association record and is conclusive of the signer's authority in favor of a person giving value without knowledge of a lack of authority (ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes). Where an interest in real property is held through a representative, nominee, or similar arrangement as permitted by s. 605.2301(5), Florida Statutes, the arrangement shall be documented under this Article and under Section 1.10(a), and the association of the interest shall be established by those records.
+**8.5 Real Property.** A properly recorded instrument naming the acquiring or conveying Protected Series (by its full statutory name) or the Company, as applicable, serves as an association record and is conclusive of the signer's authority in favor of a person giving value without knowledge of a lack of authority (ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes). Where an interest in real property is held through a representative, nominee, or similar arrangement as permitted by s. 605.2301(5), Florida Statutes, the arrangement shall be documented under Section 8.5A, and the association of the interest shall be established by those records.
+
+**8.5A Holding Associated Assets.** An Associated Asset may be held directly, or indirectly through a representative, nominee, or similar arrangement, as permitted by s. 605.2301(5), Florida Statutes. Any such indirect arrangement shall be documented in the records maintained under this Article, identifying the holder, the Protected Series or the Company for which the asset is held, and the date the arrangement began. No property of the Company or of any Protected Series shall be held in the individual name of any Member other than under an arrangement documented under this Section.
+
+**The following are prohibited and may not be varied:** a Protected Series may not hold an Associated Asset in the name of the Company or of another Protected Series, and the Company may not hold an Associated Asset in the name of a Protected Series (s. 605.2301(5)(a)-(b), Florida Statutes).
 
 **8.6 Contracts and Liabilities.** Each contract, account, loan, or other obligation shall be entered into in the name of, and shall identify, the Company or the specific Protected Series incurring it, and shall be recorded as an Associated Liability of the person incurring it.
 
