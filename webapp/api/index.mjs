@@ -103292,7 +103292,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **1.3 Name; Names of Protected Series.** The name of the Company is **[COMPANY NAME], LLC**. The name of each Protected Series shall comply with s. 605.2202, Florida Statutes: it shall begin with the full name of the Company and shall contain the phrase "protected series" or the abbreviation "P.S." or "PS." The name of each Protected Series shall be as set forth in its filed Protected Series Designation and its Series Exhibit. If the Company changes its name, the Manager shall promptly make all filings required to conform the name of each Protected Series.
 
-**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series except as limited by its Series Exhibit, is [COMPANY PURPOSE]. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
+**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
 
 **1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as the Manager may determine. A Protected Series may maintain its own place of business as determined by its Protected Series Manager.
 
@@ -103674,7 +103674,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **1.3 Name; Names of Protected Series.** The name of the Company is **[COMPANY NAME], LLC**. The name of each Protected Series shall comply with s. 605.2202, Florida Statutes: it shall begin with the full name of the Company and shall contain the phrase "protected series" or the abbreviation "P.S." or "PS." The name of each Protected Series shall be as set forth in its filed Protected Series Designation and its Series Exhibit. If the Company changes its name, the Manager shall promptly make all filings required to conform the name of each Protected Series.
 
-**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series except as limited by its Series Exhibit, is [COMPANY PURPOSE]. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
+**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
 
 **1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as the Manager may determine. A Protected Series may maintain its own place of business as determined by its Protected Series Manager.
 
@@ -104153,7 +104153,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **1.3 Name; Names of Protected Series.** The name of the Company is **[COMPANY NAME], LLC**. The name of each Protected Series shall comply with s. 605.2202, Florida Statutes: it shall begin with the full name of the Company and shall contain the phrase "protected series" or the abbreviation "P.S." or "PS." The name of each Protected Series shall be as set forth in its filed Protected Series Designation and its Series Exhibit. If the Company changes its name, the Manager shall promptly make all filings required to conform the name of each Protected Series.
 
-**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series except as limited by its Series Exhibit, is [COMPANY PURPOSE]. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
+**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
 
 **1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as the Manager may determine. A Protected Series may maintain its own place of business as determined by its Protected Series Manager.
 
@@ -104644,7 +104644,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **1.3 Name; Names of Protected Series.** The name of the Company is **[COMPANY NAME], LLC**. The name of each Protected Series shall comply with s. 605.2202, Florida Statutes: it shall begin with the full name of the Company and shall contain the phrase "protected series" or the abbreviation "P.S." or "PS." The name of each Protected Series shall be as set forth in its filed Protected Series Designation and its Series Exhibit. If the Company changes its name, the Administrative Member shall promptly make all filings required to conform the name of each Protected Series.
 
-**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series except as limited by its Series Exhibit, is [COMPANY PURPOSE]. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
+**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
 
 **1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as a Majority in Interest may determine. A Protected Series may maintain its own place of business as determined by the Company.
 
@@ -105133,7 +105133,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **1.3 Name; Names of Protected Series.** The name of the Company is **[COMPANY NAME], LLC**. The name of each Protected Series shall comply with s. 605.2202, Florida Statutes: it shall begin with the full name of the Company and shall contain the phrase "protected series" or the abbreviation "P.S." or "PS." The name of each Protected Series shall be as set forth in its filed Protected Series Designation and its Series Exhibit. If the Company changes its name, the Administrative Member shall promptly make all filings required to conform the name of each Protected Series.
 
-**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series except as limited by its Series Exhibit, is [COMPANY PURPOSE]. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
+**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
 
 **1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as a Majority in Interest may determine. A Protected Series may maintain its own place of business as determined by the Company.
 
@@ -105655,12 +105655,6 @@ function assembleOa(inputs) {
   s = s.split("[COMPANY NAME]").join(co);
   s = replaceOnce(s, 'effective as of [DATE] (the "Effective Date")', `effective as of ${inputs.effectiveDate} (the "Effective Date")`, "effective date");
   s = s.split("[PRINCIPAL ADDRESS]").join(inputs.principalAddress);
-  const GENERAL_PURPOSE = "to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act";
-  const stated = (inputs.companyPurpose ?? "").trim().replace(/\.$/, "");
-  must(s, "[COMPANY PURPOSE]", "company purpose");
-  s = s.split("[COMPANY PURPOSE]").join(
-    stated ? `${GENERAL_PURPOSE}, and in particular ${stated}` : GENERAL_PURPOSE
-  );
   if (!isMemberManaged) {
     s = s.split("**[MANAGER NAME]**").join(`**${inputs.managerName}**`);
     s = s.split("[MANAGER NAME], Manager").join(`${inputs.managerName}, Manager`);
@@ -106832,9 +106826,6 @@ async function oaSeed(clientId) {
     managementStructure,
     managerName,
     principalAddress,
-    // A specific or professional purpose the client stated at intake belongs in
-    // the agreement; a general one adds nothing the Act does not already give.
-    companyPurpose: p2.purpose?.purposeType === "GENERAL" ? "" : (p2.purpose?.businessPurposeText ?? "").trim(),
     members,
     series
   };
@@ -107066,7 +107057,6 @@ app.post("/portal/oa/generate", async (c) => {
     version,
     companyName: seed.llcName,
     principalAddress: seed.principalAddress,
-    companyPurpose: seed.companyPurpose,
     managerName: seed.managerName,
     effectiveDate: fmtDate2(a2.effectiveDate),
     amendedRestated: a2.firstOrAmended === "amended",

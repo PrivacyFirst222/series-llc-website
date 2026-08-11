@@ -69,9 +69,6 @@ export interface OaInputs {
   includeShotgun?: boolean;
   borrowingThreshold?: number; // dollars
   contributionToCompany?: string; // single-member Exhibit A line
-  /** The purpose the client gave at intake. Empty means the general lawful
-   *  purpose; a professional company must state a single specific purpose. */
-  companyPurpose?: string;
   /** 1-based sequence for this client, so successive drafts are tellable apart. */
   generationNumber?: number;
 }
@@ -134,16 +131,6 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
   s = s.split("[COMPANY NAME]").join(co); // any stragglers
   s = replaceOnce(s, "effective as of [DATE] (the \"Effective Date\")", `effective as of ${inputs.effectiveDate} (the "Effective Date")`, "effective date");
   s = s.split("[PRINCIPAL ADDRESS]").join(inputs.principalAddress);
-
-  // The purpose the client actually stated, where they stated one. Left general
-  // otherwise — s. 605.0109 does not require a Florida LLC to declare one.
-  const GENERAL_PURPOSE =
-    "to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act";
-  const stated = (inputs.companyPurpose ?? "").trim().replace(/\.$/, "");
-  must(s, "[COMPANY PURPOSE]", "company purpose");
-  s = s.split("[COMPANY PURPOSE]").join(
-    stated ? `${GENERAL_PURPOSE}, and in particular ${stated}` : GENERAL_PURPOSE,
-  );
   // Member-managed masters name no Manager at all.
   if (!isMemberManaged) {
     s = s.split("**[MANAGER NAME]**").join(`**${inputs.managerName}**`);
