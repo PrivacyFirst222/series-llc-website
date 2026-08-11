@@ -25,6 +25,7 @@ import {
 import { createCheckout, verifyWebhookSignature } from "./square";
 import { hashPassword, verifyPassword, newToken, hashToken, encryptSecret, decryptSecret } from "./crypto";
 import { hasProtectedSeriesPhrase } from "../src/components/forms/florida-llc/validation";
+import { assembleNewSeries } from "./new-series";
 import { stampEastern, stampForFilename } from "./datetime";
 import { assembleOa, OA_TEMPLATE_VERSION, type OaInputs } from "./oa";
 import { renderMarkdownPdf, stampExistingPdf } from "./pdf-render";
@@ -1054,6 +1055,91 @@ app.post("/portal/oa/generate", async (c) => {
     [session.clientId, doc[0].id, OA_TEMPLATE_VERSION, inputs.amendedRestated, JSON.stringify(inputs), nextGenerationNumber],
   );
   return c.json({ data: { generationId: gen[0].id, documentId: doc[0].id, title } });
+});
+
+/** Consent + Series Exhibit for a series established after formation.
+ *  Regenerating the whole agreement as Amended & Restated also carries the new
+ *  exhibit; this produces just the two documents that actually change hands. */
+app.post("/portal/series/consent", async (c) => {
+  const session = await getSession(c);
+  if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const body = z
+    .object({
+      seriesName: z.string().min(1).max(300),
+      seriesNumber: z.string().min(1).max(40),
+      purpose: z.string().max(600).optional().default(""),
+      effectiveDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    })
+    .safeParse(await c.req.json().catch(() => null));
+  if (!body.success) return c.json(err("Series name, identifier, and date are required.", "INVALID_INPUT"), 400);
+
+  const seed = await oaSeed(session.clientId);
+  if (!seed) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
+
+  // s. 605.2202 requires every protected series name to begin with the
+  // company's full name; a designation filed otherwise is rejected.
+  if (!body.data.seriesName.trim().toLowerCase().startsWith(seed.llcName.trim().toLowerCase())) {
+    return c.json(
+      err(`The series name must begin with "${seed.llcName}" (s. 605.2202, Fla. Stat.).`, "INVALID_INPUT"),
+      400,
+    );
+  }
+  if (!hasProtectedSeriesPhrase(body.data.seriesName)) {
+    return c.json(
+      err('The series name must contain "protected series", "P.S.", or "PS" (s. 605.2202, Fla. Stat.).', "INVALID_INPUT"),
+      400,
+    );
+  }
+
+  const memberManaged = seed.managementStructure === "MEMBER_MANAGED";
+  const generatedOn = new Date();
+  let pdf: Uint8Array;
+  let title: string;
+  try {
+    const assembled = assembleNewSeries({
+      companyName: seed.llcName,
+      seriesName: body.data.seriesName.trim(),
+      seriesNumber: body.data.seriesNumber.trim(),
+      purpose: body.data.purpose,
+      effectiveDate: fmtDate(body.data.effectiveDate),
+      memberNames: seed.members.map((m) => m.name),
+      managerName: seed.managerName,
+      memberManaged,
+    });
+    title = assembled.title;
+    const dbc = await getDb();
+    const clients = await dbc.query<{ email: string; name: string }>(
+      "SELECT email, name FROM clients WHERE id = $1",
+      [session.clientId],
+    );
+    pdf = await renderMarkdownPdf({
+      markdown: assembled.markdown,
+      watermark: {
+        name: clients[0]?.name || seed.members[0]?.name || "",
+        email: clients[0]?.email ?? "",
+        note: OA_TEMPLATE_VERSION,
+        generatedAt: stampEastern(generatedOn),
+      },
+      title,
+    });
+  } catch (e) {
+    console.error("[new-series] generation failed:", e);
+    return c.json(err("We could not generate the documents. Our team has been notified.", "GENERATION_FAILED"), 500);
+  }
+
+  const db = await getDb();
+  const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength) as ArrayBuffer;
+  const stored = await putFile(
+    `${title.replace(/[^\w-]+/g, "_")}_${stampForFilename(generatedOn)}.pdf`,
+    buf,
+    "application/pdf",
+  );
+  const doc = await db.query<{ id: string }>(
+    `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)
+     VALUES ($1, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,
+    [session.clientId, title, stored.storageKey, stored.sizeBytes],
+  );
+  return c.json({ data: { documentId: doc[0].id, title } });
 });
 
 /** A client may remove a draft they generated. Documents WE posted — the

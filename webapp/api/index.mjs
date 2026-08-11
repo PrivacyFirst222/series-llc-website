@@ -103223,6 +103223,113 @@ function verifyWebhookSignature(opts) {
   return expected === opts.signatureHeader;
 }
 
+// server/templates-new-series.md
+var templates_new_series_default = `# UNANIMOUS WRITTEN CONSENT OF THE MEMBERS
+
+## OF [COMPANY NAME], LLC
+
+### ESTABLISHING A NEW PROTECTED SERIES
+
+---
+
+The undersigned, being **all** of the members of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the "Company"), acting by written consent without a meeting as permitted by the Company's operating agreement (the "Agreement"), adopt the following as of **[EFFECTIVE DATE]**:
+
+**1. Approval of the new Protected Series.** Under s. 605.2201(1), Florida Statutes, a limited liability company may establish a protected series with the affirmative vote or consent of all of its members, and Section 3.1 of the Agreement requires that consent. The Members, constituting all members of the Company, approve the establishment of a protected series to be named:
+
+> **[SERIES NAME]**
+
+**2. Purpose.** The purpose of the new Protected Series is [SERIES PURPOSE].
+
+**3. Ownership.** The new Protected Series is established without associated members. The Company owns all of its protected-series transferable interests, and no member of the Company holds any interest in it except indirectly, through that member's interest in the Company (ss. 605.2302(1), 605.2303(2), Fla. Stat.).
+
+**4. Authority to file.** [SIGNER ROLE SENTENCE] The protected series is established when its Protected Series Designation takes effect under s. 605.0207, Florida Statutes.
+
+**5. Series Exhibit.** The Series Exhibit set forth below is adopted as part of the Agreement for the new Protected Series, as Section 3.1 of the Agreement requires at or before the filing of the Protected Series Designation.
+
+**6. Records.** The Company shall create and maintain, for the new Protected Series, the records required by s. 605.2301, Florida Statutes, and by Article 8 of the Agreement, and shall open and maintain a separate deposit account for it before any asset is associated with it.
+
+**7. Effect.** This consent has the same effect as a vote taken at a meeting and shall be retained with the records of the Company.
+
+**MEMBERS:**
+
+[MEMBER SIGNATURE BLOCKS]
+
+[[pagebreak]]
+
+## SERIES EXHIBIT PS-[N]
+
+**Protected Series name (exactly as filed with the Department):**
+**[SERIES NAME]**
+
+| Item | Terms |
+|---|---|
+| Purpose of this Protected Series | [SERIES PURPOSE] |
+| Owner of this Protected Series | The Company. This Protected Series has no Associated Members (ss. 605.2302(1), 605.2303(2), Fla. Stat.). |
+| Protected Series Manager | [PS MANAGER] |
+| Contributions to this Protected Series | By the Company: $[AMOUNT] on [DATE] [and/or described property] |
+| Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit, together with the records maintained under Article 8. |
+| Special terms (if any) | [None / variations from the base Agreement \u2014 may not vary Article 8 or non-variable provisions of the Act] |
+| Dissolution events specific to this Protected Series (if any) | [None / describe] |
+
+**Adopted effective [EFFECTIVE DATE] by the Company:**
+
+_____________________________
+[PS MANAGER SIGNATURE LINE]
+
+[[pagebreak]]
+
+## ASSET SCHEDULE \u2014 ATTACHMENT TO SERIES EXHIBIT PS-[N]
+
+*Complete this schedule for each asset of this Protected Series. Describe each asset so that a stranger could identify it without asking you anything: real property \u2014 street address AND legal description, date acquired, and grantor; deposit account \u2014 institution, account title, last four digits, and date opened; vehicle \u2014 year, make, model, and VIN; equipment \u2014 description and serial number; contract \u2014 parties and date. For any asset acquired from the Company or from another Protected Series, also state the consideration paid, the payor, and the payee. Add pages as needed; keep this schedule current as assets are acquired and disposed of.*
+
+| Asset description | Date acquired | Acquired from | Consideration / payor / payee (if from the Company or another series) |
+|---|---|---|---|
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+
+---
+
+*Form document \u2014 prepared for [COMPANY NAME], LLC. Statutory citations: ss. 605.0207, 605.2201, 605.2301, 605.2302(1), 605.2303(2), Florida Statutes.*
+`;
+
+// server/new-series.ts
+function must(haystack, needle, label) {
+  if (!haystack.includes(needle)) throw new Error(`new-series template marker missing: ${label}`);
+}
+function assembleNewSeries(input) {
+  let s = templates_new_series_default;
+  const purpose = input.purpose.trim() || "any lawful business, purpose, or activity for which the Company may be organized under the Act";
+  const authority = input.memberManaged ? "The Members authorize the Administrative Member, or any Member the Members designate, to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement." : `The Members authorize the Manager to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.`;
+  const psManager = input.memberManaged ? "The Company, as protected-series manager (s. 605.2304(2), Fla. Stat.), acting through a Majority in Interest of the Members" : `${input.managerName || "[MANAGER NAME]"}, as Protected Series Manager`;
+  const psSignature = input.memberManaged ? `${input.memberNames[0] ?? "[MEMBER NAME]"}, Member, for the Company` : `${input.managerName || "[MANAGER NAME]"}, Manager`;
+  const blocks = input.memberNames.length ? input.memberNames.map((n) => `_____________________________
+${n}`).join("\n\n") : "_____________________________\n[MEMBER NAME]";
+  must(s, "[COMPANY NAME], LLC", "company name");
+  s = s.split("[COMPANY NAME], LLC").join(input.companyName);
+  s = s.split("[COMPANY NAME]").join(input.companyName);
+  must(s, "[SERIES NAME]", "series name");
+  s = s.split("[SERIES NAME]").join(input.seriesName);
+  must(s, "PS-[N]", "series number");
+  s = s.split("PS-[N]").join(`PS-${input.seriesNumber}`);
+  must(s, "[SERIES PURPOSE]", "series purpose");
+  s = s.split("[SERIES PURPOSE]").join(purpose);
+  must(s, "[EFFECTIVE DATE]", "effective date");
+  s = s.split("[EFFECTIVE DATE]").join(input.effectiveDate);
+  must(s, "[SIGNER ROLE SENTENCE]", "authority sentence");
+  s = s.split("[SIGNER ROLE SENTENCE]").join(authority);
+  must(s, "[PS MANAGER SIGNATURE LINE]", "ps manager signature");
+  s = s.split("[PS MANAGER SIGNATURE LINE]").join(psSignature);
+  must(s, "[PS MANAGER]", "ps manager");
+  s = s.split("[PS MANAGER]").join(psManager);
+  must(s, "[MEMBER SIGNATURE BLOCKS]", "member signature blocks");
+  s = s.split("[MEMBER SIGNATURE BLOCKS]").join(blocks);
+  const leftovers = s.match(/\[(COMPANY NAME|SERIES NAME|SERIES PURPOSE|EFFECTIVE DATE|PS MANAGER|MEMBER SIGNATURE BLOCKS|SIGNER ROLE SENTENCE)[^\]]*\]/g);
+  if (leftovers) throw new Error(`new-series template left unfilled: ${leftovers.join(", ")}`);
+  return { markdown: s, title: `New Protected Series \u2014 ${input.seriesName}` };
+}
+
 // server/datetime.ts
 var ZONE = "America/New_York";
 function stampEastern(d2 = /* @__PURE__ */ new Date()) {
@@ -105585,19 +105692,19 @@ var sCorpTemplate = loadTemplate(templates_oa_s_default);
 var memberTemplate = loadTemplate(templates_oa_member_default);
 var memberSCorpTemplate = loadTemplate(templates_oa_member_s_default);
 var OA_TEMPLATE_VERSION = "First Edition \u2014 August 2026";
-function must(haystack, needle, label) {
+function must2(haystack, needle, label) {
   const found = typeof needle === "string" ? haystack.includes(needle) : needle.test(haystack);
   if (!found) throw new Error(`OA template marker missing: ${label}`);
 }
 function replaceOnce(s, from, to, label) {
-  must(s, from, label);
+  must2(s, from, label);
   return typeof from === "string" ? s.replace(from, to) : s.replace(from, to);
 }
 var money = (n) => `$${Math.round(n).toLocaleString("en-US")}`;
 function replaceSection(s, heading, replacement, label) {
   const re = new RegExp(`## ${heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[\\s\\S]*?(?=
 ## |$)`);
-  must(s, re, label);
+  must2(s, re, label);
   return s.replace(re, replacement);
 }
 function extractSection(s, heading, label) {
@@ -105623,7 +105730,7 @@ function assembleOa(inputs) {
   const isSCorp = inputs.version === "s" || inputs.version === "member-s";
   const isMemberManaged = inputs.version === "member" || inputs.version === "member-s";
   const co = inputs.companyName;
-  must(s, "[COMPANY NAME], LLC", "company name");
+  must2(s, "[COMPANY NAME], LLC", "company name");
   s = s.split("[COMPANY NAME], LLC").join(co);
   s = s.split("[COMPANY NAME]").join(co);
   s = replaceOnce(s, 'effective as of [DATE] (the "Effective Date")', `effective as of ${inputs.effectiveDate} (the "Effective Date")`, "effective date");
@@ -105634,7 +105741,7 @@ function assembleOa(inputs) {
     s = s.split("[MANAGER NAME]").join(inputs.managerName);
   }
   if (isMulti) {
-    must(s, "$[THRESHOLD]", "threshold");
+    must2(s, "$[THRESHOLD]", "threshold");
     s = s.split("$[THRESHOLD]").join(money(inputs.borrowingThreshold ?? 25e3));
     if (inputs.includeCapitalCalls) {
       s = s.split("$[CAP]").join(money(inputs.capitalCallCap ?? 25e3));
@@ -107092,6 +107199,79 @@ app.post("/portal/oa/generate", async (c) => {
     [session.clientId, doc[0].id, OA_TEMPLATE_VERSION, inputs.amendedRestated, JSON.stringify(inputs), nextGenerationNumber]
   );
   return c.json({ data: { generationId: gen[0].id, documentId: doc[0].id, title } });
+});
+app.post("/portal/series/consent", async (c) => {
+  const session = await getSession(c);
+  if (!session?.clientId) return c.json(err2("Not signed in", "UNAUTHENTICATED"), 401);
+  const body = external_exports.object({
+    seriesName: external_exports.string().min(1).max(300),
+    seriesNumber: external_exports.string().min(1).max(40),
+    purpose: external_exports.string().max(600).optional().default(""),
+    effectiveDate: external_exports.string().regex(/^\d{4}-\d{2}-\d{2}$/)
+  }).safeParse(await c.req.json().catch(() => null));
+  if (!body.success) return c.json(err2("Series name, identifier, and date are required.", "INVALID_INPUT"), 400);
+  const seed = await oaSeed(session.clientId);
+  if (!seed) return c.json(err2("No formed LLC found on your account.", "NO_LLC"), 400);
+  if (!body.data.seriesName.trim().toLowerCase().startsWith(seed.llcName.trim().toLowerCase())) {
+    return c.json(
+      err2(`The series name must begin with "${seed.llcName}" (s. 605.2202, Fla. Stat.).`, "INVALID_INPUT"),
+      400
+    );
+  }
+  if (!hasProtectedSeriesPhrase(body.data.seriesName)) {
+    return c.json(
+      err2('The series name must contain "protected series", "P.S.", or "PS" (s. 605.2202, Fla. Stat.).', "INVALID_INPUT"),
+      400
+    );
+  }
+  const memberManaged = seed.managementStructure === "MEMBER_MANAGED";
+  const generatedOn = /* @__PURE__ */ new Date();
+  let pdf;
+  let title;
+  try {
+    const assembled = assembleNewSeries({
+      companyName: seed.llcName,
+      seriesName: body.data.seriesName.trim(),
+      seriesNumber: body.data.seriesNumber.trim(),
+      purpose: body.data.purpose,
+      effectiveDate: fmtDate2(body.data.effectiveDate),
+      memberNames: seed.members.map((m2) => m2.name),
+      managerName: seed.managerName,
+      memberManaged
+    });
+    title = assembled.title;
+    const dbc = await getDb();
+    const clients = await dbc.query(
+      "SELECT email, name FROM clients WHERE id = $1",
+      [session.clientId]
+    );
+    pdf = await renderMarkdownPdf({
+      markdown: assembled.markdown,
+      watermark: {
+        name: clients[0]?.name || seed.members[0]?.name || "",
+        email: clients[0]?.email ?? "",
+        note: OA_TEMPLATE_VERSION,
+        generatedAt: stampEastern(generatedOn)
+      },
+      title
+    });
+  } catch (e) {
+    console.error("[new-series] generation failed:", e);
+    return c.json(err2("We could not generate the documents. Our team has been notified.", "GENERATION_FAILED"), 500);
+  }
+  const db2 = await getDb();
+  const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength);
+  const stored = await putFile(
+    `${title.replace(/[^\w-]+/g, "_")}_${stampForFilename(generatedOn)}.pdf`,
+    buf,
+    "application/pdf"
+  );
+  const doc = await db2.query(
+    `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)
+     VALUES ($1, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,
+    [session.clientId, title, stored.storageKey, stored.sizeBytes]
+  );
+  return c.json({ data: { documentId: doc[0].id, title } });
 });
 app.delete("/portal/oa/generations/:id", async (c) => {
   const session = await getSession(c);

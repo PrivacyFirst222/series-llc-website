@@ -490,6 +490,37 @@ if (mint.status === 200) {
   const oaBytes = new Uint8Array(await oaPdf.arrayBuffer());
   check("generated OA downloads as PDF", oaPdf.ok && oaBytes[0] === 0x25 && oaBytes[1] === 0x50, { status: oaPdf.status, len: oaBytes.length });
 
+  // --- consent + Series Exhibit for a series added after formation ---
+  const badName = await api("/api/portal/series/consent", {
+    method: "POST", cookies: setPw.cookie,
+    body: JSON.stringify({ seriesName: "Totally Different Co, PS 4", seriesNumber: "4", purpose: "", effectiveDate: "2026-09-01" }),
+  });
+  check("series name not beginning with the company name is refused (s. 605.2202)",
+    badName.status === 400, badName.body);
+  const noPS = await api("/api/portal/series/consent", {
+    method: "POST", cookies: setPw.cookie,
+    body: JSON.stringify({ seriesName: "E2E Coastal Holdings, LLC - Unit 4", seriesNumber: "4", purpose: "", effectiveDate: "2026-09-01" }),
+  });
+  check('series name without "PS" is refused (s. 605.2202)', noPS.status === 400, noPS.body);
+  const consent = await api("/api/portal/series/consent", {
+    method: "POST", cookies: setPw.cookie,
+    body: JSON.stringify({
+      seriesName: "E2E Coastal Holdings, LLC, PS D",
+      seriesNumber: "D",
+      purpose: "to acquire, own, and lease the real property at 400 Bay Court",
+      effectiveDate: "2026-09-01",
+    }),
+  });
+  check("consent + Series Exhibit generates", consent.status === 200, consent.body);
+  const consentPdf = await fetch(`${BASE}/api/portal/documents/${consent.body?.data?.documentId}/download`,
+    { headers: { Cookie: setPw.cookie } });
+  const consentBytes = new Uint8Array(await consentPdf.arrayBuffer());
+  check("consent downloads as PDF", consentPdf.ok && consentBytes[0] === 0x25 && consentBytes[1] === 0x50,
+    { status: consentPdf.status, len: consentBytes.length });
+  check("consent appears in the client's documents",
+    ((await api("/api/portal/documents", { cookies: setPw.cookie })).body?.data ?? [])
+      .some((d: { title: string }) => d.title.includes("PS D")));
+
   // A client can tidy their own drafts, but never a document we posted.
   const genList = oaAfter.body?.data?.generations ?? [];
   const oldest = genList[genList.length - 1];
