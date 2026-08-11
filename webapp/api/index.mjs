@@ -103292,7 +103292,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **1.3 Name; Names of Protected Series.** The name of the Company is **[COMPANY NAME], LLC**. The name of each Protected Series shall comply with s. 605.2202, Florida Statutes: it shall begin with the full name of the Company and shall contain the phrase "protected series" or the abbreviation "P.S." or "PS." The name of each Protected Series shall be as set forth in its filed Protected Series Designation and its Series Exhibit. If the Company changes its name, the Manager shall promptly make all filings required to conform the name of each Protected Series.
 
-**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series except as limited by its Series Exhibit, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
+**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series except as limited by its Series Exhibit, is [COMPANY PURPOSE]. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
 
 **1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as the Manager may determine. A Protected Series may maintain its own place of business as determined by its Protected Series Manager.
 
@@ -103304,7 +103304,15 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **1.9 Filings.** The Manager shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, and statements of dissolution, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
 
-**1.10 Title to Property.** Title to each Associated Asset of a Protected Series shall be acquired, held, and conveyed **in the name of that Protected Series**. Title to each Associated Asset of the Company shall be acquired, held, and conveyed in the name of the Company. No property of the Company or of any Protected Series shall be held in the individual name of the Member or the Manager. The Member's interest in the Company is personal property for all purposes.
+**1.10 Title to Property; How Assets Are Associated.** An asset becomes an Associated Asset of a Protected Series, or of the Company, by the records required under Article 8 and s. 605.2301, Florida Statutes \u2014 not by the form of its title. Subject to that requirement:
+
+(a) An Associated Asset may be held directly, or indirectly through a representative, nominee, or similar arrangement, as permitted by s. 605.2301(5), Florida Statutes. Any such indirect arrangement shall be documented in the records maintained under Article 8, identifying the holder, the Protected Series or the Company for which the asset is held, and the date the arrangement began.
+
+(b) **The following are prohibited and may not be varied:** a Protected Series may not hold an Associated Asset in the name of the Company or of another Protected Series, and the Company may not hold an Associated Asset in the name of a Protected Series (s. 605.2301(5)(a)-(b), Florida Statutes).
+
+(c) Title to an interest in real property should be acquired, held, and conveyed in the name of the Protected Series or the Company that owns it. A recorded instrument naming the owner is conclusive of the signer's authority in favor of a person who gives value without knowledge of a lack of authority, and itself constitutes a record that the interest is an Associated Asset (ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes). Where an interest in real property is instead held through a nominee, the Member shall cause the arrangement to be documented under Article 8 before the acquisition is complete.
+
+(d) No property of the Company or of any Protected Series shall be held in the individual name of the Member or the Manager other than under a documented arrangement permitted by paragraph (a). The Member's interest in the Company is personal property for all purposes.
 
 **1.11 Waiver of Partition Rights.** The Member irrevocably waives any right to maintain an action for partition or any similar action with respect to any property of the Company or of any Protected Series.
 
@@ -103458,7 +103466,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **8.4 Inter-Series Transfers.** Any transfer, re-association, or re-titling of an asset between the Company and a Protected Series or between Protected Series (an "Inter-Series Transfer") shall be documented contemporaneously by a written record stating (a) the asset transferred, (b) the transferor and transferee (the Company or the specific Protected Series), (c) the date, and (d) the consideration paid, the payor, and the payee. Inter-Series Transfers shall be made for fair value unless the transfer is a documented contribution or distribution.
 
-**8.5 Real Property.** Each acquisition or conveyance of an interest in real property by a Protected Series or the Company shall be made by an instrument naming the acquiring or conveying Protected Series (by its full statutory name) or the Company, as applicable, and shall be recorded where required. Properly recorded instruments affecting real property serve as association records as provided in ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes.
+**8.5 Real Property.** Each acquisition or conveyance of an interest in real property by a Protected Series or the Company should be made by an instrument naming the acquiring or conveying Protected Series (by its full statutory name) or the Company, as applicable, and recorded where required; a properly recorded instrument then serves as an association record and is conclusive of the signer's authority in favor of a person giving value without knowledge of a lack of authority (ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes). Where an interest in real property is held through a representative, nominee, or similar arrangement as permitted by s. 605.2301(5), Florida Statutes, the arrangement shall be documented under this Article and under Section 1.10(a), and the association of the interest shall be established by those records.
 
 **8.6 Contracts and Liabilities.** Each contract, account, loan, or other obligation shall be entered into in the name of, and shall identify, the Company or the specific Protected Series incurring it, and shall be recorded as an Associated Liability of the person incurring it.
 
@@ -103666,7 +103674,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **1.3 Name; Names of Protected Series.** The name of the Company is **[COMPANY NAME], LLC**. The name of each Protected Series shall comply with s. 605.2202, Florida Statutes: it shall begin with the full name of the Company and shall contain the phrase "protected series" or the abbreviation "P.S." or "PS." The name of each Protected Series shall be as set forth in its filed Protected Series Designation and its Series Exhibit. If the Company changes its name, the Manager shall promptly make all filings required to conform the name of each Protected Series.
 
-**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series except as limited by its Series Exhibit, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
+**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series except as limited by its Series Exhibit, is [COMPANY PURPOSE]. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
 
 **1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as the Manager may determine. A Protected Series may maintain its own place of business as determined by its Protected Series Manager.
 
@@ -103678,7 +103686,15 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **1.9 Filings.** The Manager shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, and statements of dissolution, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
 
-**1.10 Title to Property.** Title to each Associated Asset of a Protected Series shall be acquired, held, and conveyed **in the name of that Protected Series**. Title to each Associated Asset of the Company shall be acquired, held, and conveyed in the name of the Company. No property of the Company or of any Protected Series shall be held in the individual name of any Member or the Manager. Each Member's interest in the Company is personal property for all purposes.
+**1.10 Title to Property; How Assets Are Associated.** An asset becomes an Associated Asset of a Protected Series, or of the Company, by the records required under Article 8 and s. 605.2301, Florida Statutes \u2014 not by the form of its title. Subject to that requirement:
+
+(a) An Associated Asset may be held directly, or indirectly through a representative, nominee, or similar arrangement, as permitted by s. 605.2301(5), Florida Statutes. Any such indirect arrangement shall be documented in the records maintained under Article 8, identifying the holder, the Protected Series or the Company for which the asset is held, and the date the arrangement began.
+
+(b) **The following are prohibited and may not be varied:** a Protected Series may not hold an Associated Asset in the name of the Company or of another Protected Series, and the Company may not hold an Associated Asset in the name of a Protected Series (s. 605.2301(5)(a)-(b), Florida Statutes).
+
+(c) Title to an interest in real property should be acquired, held, and conveyed in the name of the Protected Series or the Company that owns it. A recorded instrument naming the owner is conclusive of the signer's authority in favor of a person who gives value without knowledge of a lack of authority, and itself constitutes a record that the interest is an Associated Asset (ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes). Where an interest in real property is instead held through a nominee, the Members shall cause the arrangement to be documented under Article 8 before the acquisition is complete.
+
+(d) No property of the Company or of any Protected Series shall be held in the individual name of any Member or the Manager other than under a documented arrangement permitted by paragraph (a). Each Member's interest in the Company is personal property for all purposes.
 
 **1.11 Waiver of Partition Rights.** Each Member irrevocably waives any right to maintain an action for partition or any similar action with respect to any property of the Company or of any Protected Series.
 
@@ -103880,7 +103896,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **8.4 Inter-Series Transfers.** Any Inter-Series Transfer (as defined in Section 5.4(b)) requires the approvals stated in Section 5.4(b) and shall be documented contemporaneously by a written record stating (a) the asset transferred, (b) the transferor and transferee (the Company or the specific Protected Series), (c) the date, and (d) the consideration paid, the payor, and the payee. Inter-Series Transfers shall be made for fair value unless the transfer is a documented contribution or distribution.
 
-**8.5 Real Property.** Each acquisition or conveyance of an interest in real property by a Protected Series or the Company shall be made by an instrument naming the acquiring or conveying Protected Series (by its full statutory name) or the Company, as applicable, and shall be recorded where required. Properly recorded instruments affecting real property serve as association records as provided in ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes.
+**8.5 Real Property.** Each acquisition or conveyance of an interest in real property by a Protected Series or the Company should be made by an instrument naming the acquiring or conveying Protected Series (by its full statutory name) or the Company, as applicable, and recorded where required; a properly recorded instrument then serves as an association record and is conclusive of the signer's authority in favor of a person giving value without knowledge of a lack of authority (ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes). Where an interest in real property is held through a representative, nominee, or similar arrangement as permitted by s. 605.2301(5), Florida Statutes, the arrangement shall be documented under this Article and under Section 1.10(a), and the association of the interest shall be established by those records.
 
 **8.6 Contracts and Liabilities.** Each contract, account, loan, or other obligation shall be entered into in the name of, and shall identify, the Company or the specific Protected Series incurring it, and shall be recorded as an Associated Liability of the person incurring it.
 
@@ -104137,7 +104153,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **1.3 Name; Names of Protected Series.** The name of the Company is **[COMPANY NAME], LLC**. The name of each Protected Series shall comply with s. 605.2202, Florida Statutes: it shall begin with the full name of the Company and shall contain the phrase "protected series" or the abbreviation "P.S." or "PS." The name of each Protected Series shall be as set forth in its filed Protected Series Designation and its Series Exhibit. If the Company changes its name, the Manager shall promptly make all filings required to conform the name of each Protected Series.
 
-**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series except as limited by its Series Exhibit, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
+**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series except as limited by its Series Exhibit, is [COMPANY PURPOSE]. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
 
 **1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as the Manager may determine. A Protected Series may maintain its own place of business as determined by its Protected Series Manager.
 
@@ -104149,7 +104165,15 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **1.9 Filings.** The Manager shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, and statements of dissolution, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
 
-**1.10 Title to Property.** Title to each Associated Asset of a Protected Series shall be acquired, held, and conveyed **in the name of that Protected Series**. Title to each Associated Asset of the Company shall be acquired, held, and conveyed in the name of the Company. No property of the Company or of any Protected Series shall be held in the individual name of any Member or the Manager. Each Member's interest in the Company is personal property for all purposes.
+**1.10 Title to Property; How Assets Are Associated.** An asset becomes an Associated Asset of a Protected Series, or of the Company, by the records required under Article 8 and s. 605.2301, Florida Statutes \u2014 not by the form of its title. Subject to that requirement:
+
+(a) An Associated Asset may be held directly, or indirectly through a representative, nominee, or similar arrangement, as permitted by s. 605.2301(5), Florida Statutes. Any such indirect arrangement shall be documented in the records maintained under Article 8, identifying the holder, the Protected Series or the Company for which the asset is held, and the date the arrangement began.
+
+(b) **The following are prohibited and may not be varied:** a Protected Series may not hold an Associated Asset in the name of the Company or of another Protected Series, and the Company may not hold an Associated Asset in the name of a Protected Series (s. 605.2301(5)(a)-(b), Florida Statutes).
+
+(c) Title to an interest in real property should be acquired, held, and conveyed in the name of the Protected Series or the Company that owns it. A recorded instrument naming the owner is conclusive of the signer's authority in favor of a person who gives value without knowledge of a lack of authority, and itself constitutes a record that the interest is an Associated Asset (ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes). Where an interest in real property is instead held through a nominee, the Members shall cause the arrangement to be documented under Article 8 before the acquisition is complete.
+
+(d) No property of the Company or of any Protected Series shall be held in the individual name of any Member or the Manager other than under a documented arrangement permitted by paragraph (a). Each Member's interest in the Company is personal property for all purposes.
 
 **1.11 Waiver of Partition Rights.** Each Member irrevocably waives any right to maintain an action for partition or any similar action with respect to any property of the Company or of any Protected Series.
 
@@ -104351,7 +104375,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **8.4 Inter-Series Transfers.** Any Inter-Series Transfer (as defined in Section 5.4(b)) requires the approvals stated in Section 5.4(b) and shall be documented contemporaneously by a written record stating (a) the asset transferred, (b) the transferor and transferee (the Company or the specific Protected Series), (c) the date, and (d) the consideration paid, the payor, and the payee. Inter-Series Transfers shall be made for fair value unless the transfer is a documented contribution or distribution.
 
-**8.5 Real Property.** Each acquisition or conveyance of an interest in real property by a Protected Series or the Company shall be made by an instrument naming the acquiring or conveying Protected Series (by its full statutory name) or the Company, as applicable, and shall be recorded where required. Properly recorded instruments affecting real property serve as association records as provided in ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes.
+**8.5 Real Property.** Each acquisition or conveyance of an interest in real property by a Protected Series or the Company should be made by an instrument naming the acquiring or conveying Protected Series (by its full statutory name) or the Company, as applicable, and recorded where required; a properly recorded instrument then serves as an association record and is conclusive of the signer's authority in favor of a person giving value without knowledge of a lack of authority (ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes). Where an interest in real property is held through a representative, nominee, or similar arrangement as permitted by s. 605.2301(5), Florida Statutes, the arrangement shall be documented under this Article and under Section 1.10(a), and the association of the interest shall be established by those records.
 
 **8.6 Contracts and Liabilities.** Each contract, account, loan, or other obligation shall be entered into in the name of, and shall identify, the Company or the specific Protected Series incurring it, and shall be recorded as an Associated Liability of the person incurring it.
 
@@ -104620,7 +104644,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **1.3 Name; Names of Protected Series.** The name of the Company is **[COMPANY NAME], LLC**. The name of each Protected Series shall comply with s. 605.2202, Florida Statutes: it shall begin with the full name of the Company and shall contain the phrase "protected series" or the abbreviation "P.S." or "PS." The name of each Protected Series shall be as set forth in its filed Protected Series Designation and its Series Exhibit. If the Company changes its name, the Administrative Member shall promptly make all filings required to conform the name of each Protected Series.
 
-**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series except as limited by its Series Exhibit, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
+**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series except as limited by its Series Exhibit, is [COMPANY PURPOSE]. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
 
 **1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as a Majority in Interest may determine. A Protected Series may maintain its own place of business as determined by the Company.
 
@@ -104632,7 +104656,15 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **1.9 Filings.** The Administrative Member shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, and statements of dissolution, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
 
-**1.10 Title to Property.** Title to each Associated Asset of a Protected Series shall be acquired, held, and conveyed **in the name of that Protected Series**. Title to each Associated Asset of the Company shall be acquired, held, and conveyed in the name of the Company. No property of the Company or of any Protected Series shall be held in the individual name of any Member. Each Member's interest in the Company is personal property for all purposes.
+**1.10 Title to Property; How Assets Are Associated.** An asset becomes an Associated Asset of a Protected Series, or of the Company, by the records required under Article 8 and s. 605.2301, Florida Statutes \u2014 not by the form of its title. Subject to that requirement:
+
+(a) An Associated Asset may be held directly, or indirectly through a representative, nominee, or similar arrangement, as permitted by s. 605.2301(5), Florida Statutes. Any such indirect arrangement shall be documented in the records maintained under Article 8, identifying the holder, the Protected Series or the Company for which the asset is held, and the date the arrangement began.
+
+(b) **The following are prohibited and may not be varied:** a Protected Series may not hold an Associated Asset in the name of the Company or of another Protected Series, and the Company may not hold an Associated Asset in the name of a Protected Series (s. 605.2301(5)(a)-(b), Florida Statutes).
+
+(c) Title to an interest in real property should be acquired, held, and conveyed in the name of the Protected Series or the Company that owns it. A recorded instrument naming the owner is conclusive of the signer's authority in favor of a person who gives value without knowledge of a lack of authority, and itself constitutes a record that the interest is an Associated Asset (ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes). Where an interest in real property is instead held through a nominee, the Members shall cause the arrangement to be documented under Article 8 before the acquisition is complete.
+
+(d) No property of the Company or of any Protected Series shall be held in the individual name of any Member other than under a documented arrangement permitted by paragraph (a). Each Member's interest in the Company is personal property for all purposes.
 
 **1.11 Waiver of Partition Rights.** Each Member irrevocably waives any right to maintain an action for partition or any similar action with respect to any property of the Company or of any Protected Series.
 
@@ -104844,7 +104876,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **8.4 Inter-Series Transfers.** Any Inter-Series Transfer (as defined in Section 5.4(b)) requires the approvals stated in Section 5.4(b) and shall be documented contemporaneously by a written record stating (a) the asset transferred, (b) the transferor and transferee (the Company or the specific Protected Series), (c) the date, and (d) the consideration paid, the payor, and the payee. Inter-Series Transfers shall be made for fair value unless the transfer is a documented contribution or distribution.
 
-**8.5 Real Property.** Each acquisition or conveyance of an interest in real property by a Protected Series or the Company shall be made by an instrument naming the acquiring or conveying Protected Series (by its full statutory name) or the Company, as applicable, and shall be recorded where required. Properly recorded instruments affecting real property serve as association records as provided in ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes.
+**8.5 Real Property.** Each acquisition or conveyance of an interest in real property by a Protected Series or the Company should be made by an instrument naming the acquiring or conveying Protected Series (by its full statutory name) or the Company, as applicable, and recorded where required; a properly recorded instrument then serves as an association record and is conclusive of the signer's authority in favor of a person giving value without knowledge of a lack of authority (ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes). Where an interest in real property is held through a representative, nominee, or similar arrangement as permitted by s. 605.2301(5), Florida Statutes, the arrangement shall be documented under this Article and under Section 1.10(a), and the association of the interest shall be established by those records.
 
 **8.6 Contracts and Liabilities.** Each contract, account, loan, or other obligation shall be entered into in the name of, and shall identify, the Company or the specific Protected Series incurring it, and shall be recorded as an Associated Liability of the person incurring it.
 
@@ -105101,7 +105133,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **1.3 Name; Names of Protected Series.** The name of the Company is **[COMPANY NAME], LLC**. The name of each Protected Series shall comply with s. 605.2202, Florida Statutes: it shall begin with the full name of the Company and shall contain the phrase "protected series" or the abbreviation "P.S." or "PS." The name of each Protected Series shall be as set forth in its filed Protected Series Designation and its Series Exhibit. If the Company changes its name, the Administrative Member shall promptly make all filings required to conform the name of each Protected Series.
 
-**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series except as limited by its Series Exhibit, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
+**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series except as limited by its Series Exhibit, is [COMPANY PURPOSE]. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
 
 **1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as a Majority in Interest may determine. A Protected Series may maintain its own place of business as determined by the Company.
 
@@ -105113,7 +105145,15 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **1.9 Filings.** The Administrative Member shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, and statements of dissolution, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
 
-**1.10 Title to Property.** Title to each Associated Asset of a Protected Series shall be acquired, held, and conveyed **in the name of that Protected Series**. Title to each Associated Asset of the Company shall be acquired, held, and conveyed in the name of the Company. No property of the Company or of any Protected Series shall be held in the individual name of any Member. Each Member's interest in the Company is personal property for all purposes.
+**1.10 Title to Property; How Assets Are Associated.** An asset becomes an Associated Asset of a Protected Series, or of the Company, by the records required under Article 8 and s. 605.2301, Florida Statutes \u2014 not by the form of its title. Subject to that requirement:
+
+(a) An Associated Asset may be held directly, or indirectly through a representative, nominee, or similar arrangement, as permitted by s. 605.2301(5), Florida Statutes. Any such indirect arrangement shall be documented in the records maintained under Article 8, identifying the holder, the Protected Series or the Company for which the asset is held, and the date the arrangement began.
+
+(b) **The following are prohibited and may not be varied:** a Protected Series may not hold an Associated Asset in the name of the Company or of another Protected Series, and the Company may not hold an Associated Asset in the name of a Protected Series (s. 605.2301(5)(a)-(b), Florida Statutes).
+
+(c) Title to an interest in real property should be acquired, held, and conveyed in the name of the Protected Series or the Company that owns it. A recorded instrument naming the owner is conclusive of the signer's authority in favor of a person who gives value without knowledge of a lack of authority, and itself constitutes a record that the interest is an Associated Asset (ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes). Where an interest in real property is instead held through a nominee, the Members shall cause the arrangement to be documented under Article 8 before the acquisition is complete.
+
+(d) No property of the Company or of any Protected Series shall be held in the individual name of any Member other than under a documented arrangement permitted by paragraph (a). Each Member's interest in the Company is personal property for all purposes.
 
 **1.11 Waiver of Partition Rights.** Each Member irrevocably waives any right to maintain an action for partition or any similar action with respect to any property of the Company or of any Protected Series.
 
@@ -105325,7 +105365,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **8.4 Inter-Series Transfers.** Any Inter-Series Transfer (as defined in Section 5.4(b)) requires the approvals stated in Section 5.4(b) and shall be documented contemporaneously by a written record stating (a) the asset transferred, (b) the transferor and transferee (the Company or the specific Protected Series), (c) the date, and (d) the consideration paid, the payor, and the payee. Inter-Series Transfers shall be made for fair value unless the transfer is a documented contribution or distribution.
 
-**8.5 Real Property.** Each acquisition or conveyance of an interest in real property by a Protected Series or the Company shall be made by an instrument naming the acquiring or conveying Protected Series (by its full statutory name) or the Company, as applicable, and shall be recorded where required. Properly recorded instruments affecting real property serve as association records as provided in ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes.
+**8.5 Real Property.** Each acquisition or conveyance of an interest in real property by a Protected Series or the Company should be made by an instrument naming the acquiring or conveying Protected Series (by its full statutory name) or the Company, as applicable, and recorded where required; a properly recorded instrument then serves as an association record and is conclusive of the signer's authority in favor of a person giving value without knowledge of a lack of authority (ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes). Where an interest in real property is held through a representative, nominee, or similar arrangement as permitted by s. 605.2301(5), Florida Statutes, the arrangement shall be documented under this Article and under Section 1.10(a), and the association of the interest shall be established by those records.
 
 **8.6 Contracts and Liabilities.** Each contract, account, loan, or other obligation shall be entered into in the name of, and shall identify, the Company or the specific Protected Series incurring it, and shall be recorded as an Associated Liability of the person incurring it.
 
@@ -105615,6 +105655,12 @@ function assembleOa(inputs) {
   s = s.split("[COMPANY NAME]").join(co);
   s = replaceOnce(s, 'effective as of [DATE] (the "Effective Date")', `effective as of ${inputs.effectiveDate} (the "Effective Date")`, "effective date");
   s = s.split("[PRINCIPAL ADDRESS]").join(inputs.principalAddress);
+  const GENERAL_PURPOSE = "to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act";
+  const stated = (inputs.companyPurpose ?? "").trim().replace(/\.$/, "");
+  must(s, "[COMPANY PURPOSE]", "company purpose");
+  s = s.split("[COMPANY PURPOSE]").join(
+    stated ? `${GENERAL_PURPOSE}, and in particular ${stated}` : GENERAL_PURPOSE
+  );
   if (!isMemberManaged) {
     s = s.split("**[MANAGER NAME]**").join(`**${inputs.managerName}**`);
     s = s.split("[MANAGER NAME], Manager").join(`${inputs.managerName}, Manager`);
@@ -106786,6 +106832,9 @@ async function oaSeed(clientId) {
     managementStructure,
     managerName,
     principalAddress,
+    // A specific or professional purpose the client stated at intake belongs in
+    // the agreement; a general one adds nothing the Act does not already give.
+    companyPurpose: p2.purpose?.purposeType === "GENERAL" ? "" : (p2.purpose?.businessPurposeText ?? "").trim(),
     members,
     series
   };
@@ -107017,6 +107066,7 @@ app.post("/portal/oa/generate", async (c) => {
     version,
     companyName: seed.llcName,
     principalAddress: seed.principalAddress,
+    companyPurpose: seed.companyPurpose,
     managerName: seed.managerName,
     effectiveDate: fmtDate2(a2.effectiveDate),
     amendedRestated: a2.firstOrAmended === "amended",

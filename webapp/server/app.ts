@@ -647,6 +647,7 @@ interface SeedPayload {
   management?: { structure?: string; managersOrAuthorizedRepresentatives?: { fullName?: string; businessEntityName?: string }[] };
   members?: { memberList?: { fullLegalName?: string; address1?: string; address2?: string; city?: string; state?: string; zip?: string }[] };
   series?: { id: string; name: string }[];
+  purpose?: { purposeType?: string; businessPurposeText?: string };
 }
 
 async function oaSeed(clientId: string): Promise<{
@@ -655,6 +656,7 @@ async function oaSeed(clientId: string): Promise<{
   managementStructure: string;
   managerName: string;
   principalAddress: string;
+  companyPurpose: string;
   members: { name: string; address: string }[];
   series: { name: string; purpose: string }[];
 } | null> {
@@ -698,6 +700,10 @@ async function oaSeed(clientId: string): Promise<{
     managementStructure,
     managerName,
     principalAddress,
+    // A specific or professional purpose the client stated at intake belongs in
+    // the agreement; a general one adds nothing the Act does not already give.
+    companyPurpose:
+      p.purpose?.purposeType === "GENERAL" ? "" : (p.purpose?.businessPurposeText ?? "").trim(),
     members,
     series,
   };
@@ -987,6 +993,7 @@ app.post("/portal/oa/generate", async (c) => {
     version,
     companyName: seed.llcName,
     principalAddress: seed.principalAddress,
+    companyPurpose: seed.companyPurpose,
     managerName: seed.managerName,
     effectiveDate: fmtDate(a.effectiveDate),
     amendedRestated: a.firstOrAmended === "amended",
