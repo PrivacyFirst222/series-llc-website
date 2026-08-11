@@ -76,6 +76,32 @@ hits" is not. Then, one turn after writing that rule, reading 18% of Chapter
 605 and reporting it as having read the statute, without ever stating the
 fraction.
 
+## When you replace an artifact, the thing you replaced is the baseline
+
+**The baseline is the artifact you are replacing, and the check is whether the
+replacement is worse.** A check that only detects total failure — the file
+exists, the archive opens, the words are all present — is not a check.
+
+Before building anything that regenerates, converts, or overwrites an existing
+artifact:
+
+1. Measure the existing one first, and keep the measurement. `docs/source/` and
+   `docs/format-baseline.json` are that for the Word documents.
+2. Make the comparison automatic and make it fail closed. A rule that depends on
+   remembering to look is not a safeguard; `docs/format-check.py` runs on every
+   generation and blocks the write.
+3. Verify by looking at a rendered page. Not the markup, not a grep for the
+   right words. Colour and italics survived every XML check here and were caught
+   only by opening the file.
+4. A lossy conversion must report what it dropped, as a number.
+
+This rule exists because the markdown masters took over on 8 August 2026 and the
+generator preserved every word while silently discarding the typography: 165
+justified paragraphs became 0, 171 keepLines became 0, Georgia became Times New
+Roman, the page-number footer vanished, and 34 chapter headings became plain body
+text. Nothing errored, so two generations of wrecked documents were written
+straight into Dropbox and reported as done.
+
 ## Every deliverable must have a home in version control
 
 Before building anything that stores, serves, or delivers a document,

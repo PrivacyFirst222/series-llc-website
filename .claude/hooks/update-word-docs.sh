@@ -5,6 +5,13 @@
 # the Owner's Manual. The .docx files are OUTPUT — regenerated here and never
 # edited by hand. Anything typed into a Word file is lost on the next run.
 #
+# Everything is generated into a staging directory first and measured against
+# docs/format-baseline.json, which is taken from the hand-formatted originals in
+# docs/source/. If any document comes out less formatted than its original,
+# NOTHING is copied anywhere and this script fails. That check exists because a
+# generator once preserved every word, silently discarded the typography, and
+# wrote the result straight into Dropbox twice.
+#
 # Invoked three ways:
 #   - the git pre-commit hook, whenever a master is staged
 #   - Claude, via the exact-match allowlist in edit-gate-pretool.sh
@@ -15,8 +22,12 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 GEN="$ROOT/docs/md-to-docx.py"
+CHECK="$ROOT/docs/format-check.py"
 OUT_REPO="$ROOT/docs/word"
 OUT_DROPBOX="/Users/adam/Library/CloudStorage/Dropbox/00 SharedWithMac/FPSLLC Operating Agreement"
+
+STAGE="$(mktemp -d)"
+trap 'rm -rf "$STAGE"' EXIT
 
 mkdir -p "$OUT_REPO"
 
@@ -38,14 +49,24 @@ for entry in "${DOCS[@]}"; do
     echo "MASTER MISSING: $src" >&2
     exit 1
   fi
-  # Generate into the repo first. md-to-docx.py writes to a temp file and only
-  # moves it into place after verifying the archive, so a failure here cannot
-  # truncate an existing document.
-  python3 "$GEN" "$ROOT/$src" "$OUT_REPO/$name"
-  if [ -d "$OUT_DROPBOX" ]; then
-    cp "$OUT_REPO/$name" "$OUT_DROPBOX/$name"
-  fi
+  python3 "$GEN" "$ROOT/$src" "$STAGE/$name"
   count=$((count + 1))
+done
+
+# The gate. Measured against the originals; a regression stops everything here,
+# before a single file has been replaced.
+echo "checking $count documents against docs/source/"
+if ! python3 "$CHECK" "$STAGE"/*.docx; then
+  echo "update-word-docs: FORMATTING REGRESSION — nothing written" >&2
+  exit 1
+fi
+
+for entry in "${DOCS[@]}"; do
+  name="${entry##*|}"
+  cp "$STAGE/$name" "$OUT_REPO/$name"
+  if [ -d "$OUT_DROPBOX" ]; then
+    cp "$STAGE/$name" "$OUT_DROPBOX/$name"
+  fi
 done
 
 if [ -d "$OUT_DROPBOX" ]; then

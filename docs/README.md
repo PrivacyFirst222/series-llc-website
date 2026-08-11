@@ -36,6 +36,49 @@ To regenerate by hand at any time:
 .claude/hooks/update-word-docs.sh
 ```
 
+### The formatting gate
+
+Generation writes to a staging directory first. Every document is measured
+against `format-baseline.json` — justification, `keepLines`, headings, indents,
+typeface, body size, colour, italics, tables, page numbers — taken from the
+hand-formatted originals in `source/`. **If any document comes out less
+formatted than its original, nothing is copied anywhere and the run fails.**
+The pre-commit hook fails with it.
+
+```bash
+python3 docs/format-check.py docs/word/*.docx   # check
+python3 docs/format-check.py --baseline         # rebuild from source/
+```
+
+Rebuild the baseline only when `source/` itself changes. Never rebuild it to
+make a failure go away — that is the check deleting itself.
+
+### The house typography
+
+Measured from `source/`, applied by `md-to-docx.py`. Two profiles:
+
+| | Owner's Manual | Operating agreements |
+|---|---|---|
+| Typeface | Georgia 11pt | Times New Roman 12pt |
+| Body | justified, 8pt after, `keepLines` | justified, 8pt after, `keepLines` |
+| Headings | 20pt part / 14pt chapter / 12pt sub, navy `0D2E55`, `keepNext` | 13pt Heading 1, black, `keepNext` |
+| Front matter | title page + generated contents | centered caption block |
+| Footer | centered page number | none, as in the original |
+
+Markdown the masters use:
+
+| Markup | Result |
+|---|---|
+| `<!-- titlepage ... -->` | title page; lines are `size\|text\|after=NNN\|accent` |
+| `[[contents]]` | contents built from the document's own headings — it cannot drift |
+| `# X` | part divider (manual) / document title (agreement) |
+| `## X` | chapter (manual) / `ARTICLE` heading (agreement) |
+| `### X` | sub-heading |
+| `- x` | bullet |
+| `1. x` | indented numbered item |
+| `> x` | set-off block |
+| `[[pagebreak]]` | page break |
+
 ## Still authored in Word
 
 These have no markdown master yet. They are pulled in by `bun run docs:sync`,
