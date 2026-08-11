@@ -41,14 +41,19 @@ interface StoredDraft {
   data: FloridaLLCFormData;
   stepIndex: number;
   maxStep: number;
+  /** Steps the customer has actually opened. Added when navigation became free;
+   *  absent in older drafts, where reaching a step required walking to it. */
+  visited?: number[];
 }
 
 function loadDraft(initialData?: FloridaLLCFormData): {
   data: FloridaLLCFormData;
   step: number;
   max: number;
+  visited: number[];
 } {
-  if (initialData) return { data: initialData, step: 0, max: 0 };
+  const upTo = (n: number) => Array.from({ length: n + 1 }, (_, i) => i);
+  if (initialData) return { data: initialData, step: 0, max: 0, visited: [0] };
   // Refreshing must never lose the customer's place: the draft stores both
   // the answers and how far they had gotten.
   const lastResumable = STEPS.length - 2; // never restore onto the submit screen
@@ -63,6 +68,7 @@ function loadDraft(initialData?: FloridaLLCFormData): {
           data: { ...defaultFormData, ...d.data },
           step: Math.min(d.stepIndex ?? 0, max),
           max,
+          visited: d.visited ?? upTo(max),
         };
       }
       // Older drafts stored the answers alone — recover the customer's
@@ -73,12 +79,12 @@ function loadDraft(initialData?: FloridaLLCFormData): {
         if (Object.keys(validateStep(STEPS[i].key, merged)).length > 0) break;
         max = i + 1;
       }
-      return { data: merged, step: max, max };
+      return { data: merged, step: max, max, visited: upTo(max) };
     }
   } catch {
     // ignore
   }
-  return { data: defaultFormData, step: 0, max: 0 };
+  return { data: defaultFormData, step: 0, max: 0, visited: [0] };
 }
 
 export function FloridaLLCFormationForm({
@@ -88,6 +94,12 @@ export function FloridaLLCFormationForm({
   const [data, setData] = useState<FloridaLLCFormData>(() => loadDraft(initialData).data);
   const [stepIndex, setStepIndex] = useState<number>(() => loadDraft(initialData).step);
   const [maxStep, setMaxStep] = useState<number>(() => loadDraft(initialData).max);
+  // A tick means "you have seen this step and nothing on it is outstanding".
+  // Completeness alone is not enough: several steps validate at their defaults,
+  // so ticking those would claim a question was answered that was never shown.
+  const [visited, setVisited] = useState<Set<number>>(
+    () => new Set(loadDraft(initialData).visited),
+  );
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -95,12 +107,23 @@ export function FloridaLLCFormationForm({
   // Auto-save draft (answers + position)
   useEffect(() => {
     try {
-      const draft: StoredDraft = { __draft: 2, data, stepIndex, maxStep };
+      const draft: StoredDraft = {
+        __draft: 2,
+        data,
+        stepIndex,
+        maxStep,
+        visited: [...visited],
+      };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
     } catch {
       // ignore quota
     }
-  }, [data, stepIndex, maxStep]);
+  }, [data, stepIndex, maxStep, visited]);
+
+  // Whatever step is on screen counts as seen.
+  useEffect(() => {
+    setVisited((prev) => (prev.has(stepIndex) ? prev : new Set(prev).add(stepIndex)));
+  }, [stepIndex]);
 
   // Re-run validation for the current step on data changes (after first attempt)
   useEffect(() => {
@@ -407,15 +430,19 @@ export function FloridaLLCFormationForm({
           <ol className="hidden lg:block rounded-2xl border border-border bg-card p-3 space-y-1">
             {STEPS.map(({ key, label }, i) => {
               // Every step is reachable at any time, in any order. A tick means
-              // the step's own required fields are answered — so the sidebar is
-              // a checklist of what is left, not a track you must walk.
+              // the customer has BEEN here and nothing on the step is
+              // outstanding — never completeness alone, which would tick steps
+              // that validate at their defaults and were never opened.
               //
               // The last entry is the exception: it is the confirmation screen
               // shown after filing, not a step to fill in. Reaching it by
               // clicking would show a completed filing that never happened.
               const isConfirmation = i === STEPS.length - 1;
               const reachable = !isConfirmation || stepIndex === i;
-              const done = !isConfirmation && Object.keys(validateStep(key, data)).length === 0;
+              const done =
+                !isConfirmation &&
+                visited.has(i) &&
+                Object.keys(validateStep(key, data)).length === 0;
               const active = i === stepIndex;
               return (
                 <li key={key}>
