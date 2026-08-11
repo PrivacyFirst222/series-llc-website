@@ -103566,7 +103566,7 @@ From the effective date of any such election, and whether or not this Agreement 
 
 **14.10 Unregistered Interests.** The Membership Interest has not been registered under federal or state securities laws and may not be offered, sold, or transferred except in compliance with this Agreement and applicable law.
 
----
+[[pagebreak]]
 
 ## SIGNATURES
 
@@ -103582,7 +103582,7 @@ _____________________________
 _____________________________
 [MANAGER NAME], Manager
 
----
+[[pagebreak]]
 
 ## EXHIBIT A \u2014 MEMBER; CONTRIBUTIONS; TOD DESIGNATION
 
@@ -103600,7 +103600,7 @@ _____________________________
 
 Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENEFICIARY NAME(S)]**, or if none is designated or the designation fails, the Membership Interest passes as provided by law.
 
----
+[[pagebreak]]
 
 ## SERIES EXHIBIT PS-[N]
 
@@ -103622,6 +103622,7 @@ Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENE
 _____________________________
 [NAME], Protected Series Manager
 
+[[pagebreak]]
 
 ## ASSET SCHEDULE \u2014 ATTACHMENT TO SERIES EXHIBIT PS-[N]
 
@@ -103726,9 +103727,8 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **2.16 "Series Exhibit"** means, for each Protected Series, the exhibit to this Agreement (each numbered PS-1, PS-2, and so on) setting forth the terms specific to that Protected Series, including its purpose, its capital, and its Associated Assets. Each Series Exhibit is a part of this Agreement.
 
-**2.17 "Series Percentage."** [Reserved.]
 
-**2.18 "Transfer"** means any assignment, transfer, conveyance, devise, gift, pledge, hypothecation, encumbrance, or other disposition, direct or indirect, voluntary or involuntary, in trust or otherwise, and as a verb has a corresponding meaning.
+**2.17 "Transfer"** means any assignment, transfer, conveyance, devise, gift, pledge, hypothecation, encumbrance, or other disposition, direct or indirect, voluntary or involuntary, in trust or otherwise, and as a verb has a corresponding meaning.
 
 ---
 
@@ -104028,7 +104028,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **16.10 Unregistered Interests.** The Membership Interests have not been registered under federal or state securities laws and may not be offered, sold, or transferred except in compliance with this Agreement and applicable law.
 
----
+[[pagebreak]]
 
 ## SIGNATURES
 
@@ -104050,7 +104050,7 @@ _____________________________
 _____________________________
 [MANAGER NAME], Manager
 
----
+[[pagebreak]]
 
 ## EXHIBIT A \u2014 MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS
 
@@ -104073,7 +104073,7 @@ _____________________________
 
 If no beneficiary is designated, or a designation fails, the Member's interest passes as provided by law, subject to this Agreement.
 
----
+[[pagebreak]]
 
 ## SERIES EXHIBIT PS-[N]
 
@@ -104095,8 +104095,7 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
 _____________________________
 [NAME], Protected Series Manager
 
-
-
+[[pagebreak]]
 
 ## ASSET SCHEDULE \u2014 ATTACHMENT TO SERIES EXHIBIT PS-[N]
 
@@ -104201,9 +104200,8 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **2.16 "Series Exhibit"** means, for each Protected Series, the exhibit to this Agreement (each numbered PS-1, PS-2, and so on) setting forth the terms specific to that Protected Series, including its purpose, its capital, and its Associated Assets. Each Series Exhibit is a part of this Agreement.
 
-**2.17 "Series Percentage."** [Reserved.]
 
-**2.18 "Transfer"** means any assignment, transfer, conveyance, devise, gift, pledge, hypothecation, encumbrance, or other disposition, direct or indirect, voluntary or involuntary, in trust or otherwise, and as a verb has a corresponding meaning.
+**2.17 "Transfer"** means any assignment, transfer, conveyance, devise, gift, pledge, hypothecation, encumbrance, or other disposition, direct or indirect, voluntary or involuntary, in trust or otherwise, and as a verb has a corresponding meaning.
 
 ---
 
@@ -104515,7 +104513,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **16.10 Unregistered Interests.** The Membership Interests have not been registered under federal or state securities laws and may not be offered, sold, or transferred except in compliance with this Agreement and applicable law.
 
----
+[[pagebreak]]
 
 ## SIGNATURES
 
@@ -104537,7 +104535,7 @@ _____________________________
 _____________________________
 [MANAGER NAME], Manager
 
----
+[[pagebreak]]
 
 ## EXHIBIT A \u2014 MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS
 
@@ -104560,7 +104558,7 @@ _____________________________
 
 If no beneficiary is designated, or a designation fails, the Member's interest passes as provided by law, subject to this Agreement.
 
----
+[[pagebreak]]
 
 ## SERIES EXHIBIT PS-[N]
 
@@ -104582,8 +104580,7 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
 _____________________________
 [NAME], Protected Series Manager
 
-
-
+[[pagebreak]]
 
 ## ASSET SCHEDULE \u2014 ATTACHMENT TO SERIES EXHIBIT PS-[N]
 
@@ -104688,9 +104685,8 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **2.16 "Series Exhibit"** means, for each Protected Series, the exhibit to this Agreement (each numbered PS-1, PS-2, and so on) setting forth the terms specific to that Protected Series, including its purpose, its capital, and its Associated Assets. Each Series Exhibit is a part of this Agreement.
 
-**2.17 "Series Percentage."** [Reserved.]
 
-**2.18 "Transfer"** means any assignment, transfer, conveyance, devise, gift, pledge, hypothecation, encumbrance, or other disposition, direct or indirect, voluntary or involuntary, in trust or otherwise, and as a verb has a corresponding meaning.
+**2.17 "Transfer"** means any assignment, transfer, conveyance, devise, gift, pledge, hypothecation, encumbrance, or other disposition, direct or indirect, voluntary or involuntary, in trust or otherwise, and as a verb has a corresponding meaning.
 
 ---
 
@@ -105000,7 +104996,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **16.10 Unregistered Interests.** The Membership Interests have not been registered under federal or state securities laws and may not be offered, sold, or transferred except in compliance with this Agreement and applicable law.
 
----
+[[pagebreak]]
 
 ## SIGNATURES
 
@@ -105017,8 +105013,7 @@ _____________________________
 _____________________________
 [MEMBER 3 NAME, if any]
 
-
----
+[[pagebreak]]
 
 ## EXHIBIT A \u2014 MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS
 
@@ -105041,7 +105036,7 @@ _____________________________
 
 If no beneficiary is designated, or a designation fails, the Member's interest passes as provided by law, subject to this Agreement.
 
----
+[[pagebreak]]
 
 ## SERIES EXHIBIT PS-[N]
 
@@ -105066,9 +105061,7 @@ _____________________________
 _____________________________
 [MEMBER 2], Member
 
-
-
-
+[[pagebreak]]
 
 ## ASSET SCHEDULE \u2014 ATTACHMENT TO SERIES EXHIBIT PS-[N]
 
@@ -105173,9 +105166,8 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **2.16 "Series Exhibit"** means, for each Protected Series, the exhibit to this Agreement (each numbered PS-1, PS-2, and so on) setting forth the terms specific to that Protected Series, including its purpose, its capital, and its Associated Assets. Each Series Exhibit is a part of this Agreement.
 
-**2.17 "Series Percentage."** [Reserved.]
 
-**2.18 "Transfer"** means any assignment, transfer, conveyance, devise, gift, pledge, hypothecation, encumbrance, or other disposition, direct or indirect, voluntary or involuntary, in trust or otherwise, and as a verb has a corresponding meaning.
+**2.17 "Transfer"** means any assignment, transfer, conveyance, devise, gift, pledge, hypothecation, encumbrance, or other disposition, direct or indirect, voluntary or involuntary, in trust or otherwise, and as a verb has a corresponding meaning.
 
 ---
 
@@ -105497,7 +105489,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **16.10 Unregistered Interests.** The Membership Interests have not been registered under federal or state securities laws and may not be offered, sold, or transferred except in compliance with this Agreement and applicable law.
 
----
+[[pagebreak]]
 
 ## SIGNATURES
 
@@ -105514,8 +105506,7 @@ _____________________________
 _____________________________
 [MEMBER 3 NAME, if any]
 
-
----
+[[pagebreak]]
 
 ## EXHIBIT A \u2014 MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS
 
@@ -105538,7 +105529,7 @@ _____________________________
 
 If no beneficiary is designated, or a designation fails, the Member's interest passes as provided by law, subject to this Agreement.
 
----
+[[pagebreak]]
 
 ## SERIES EXHIBIT PS-[N]
 
@@ -105563,9 +105554,7 @@ _____________________________
 _____________________________
 [MEMBER 2], Member
 
-
-
-
+[[pagebreak]]
 
 ## ASSET SCHEDULE \u2014 ATTACHMENT TO SERIES EXHIBIT PS-[N]
 

@@ -340,9 +340,11 @@ def body_xml(md, P):
 
         # Set-off block
         if stripped.startswith("- ") is False and stripped.startswith("&gt; ") is False and stripped.startswith("> "):
+            body = stripped[2:].strip()
             out.append(
-                para(stripped[2:].strip(), P, sz=P["small_sz"], after=80,
-                     ind_left=P["quote_ind"], ind_right=P["quote_ind"])
+                para(body, P, sz=P["small_sz"], after=80,
+                     ind_left=P["quote_ind"], ind_right=P["quote_ind"],
+                     keep_next=body.rstrip("*_ ").endswith(":"))
             )
             i += 1
             continue
@@ -362,7 +364,23 @@ def body_xml(md, P):
             i += 1
             continue
 
-        out.append(para(stripped, P, justify=True, after=P["body_after"]))
+        # A paragraph that ends in a colon introduces the list, table, or block
+        # that follows it. Left free it strands at the foot of a page with its
+        # own content overleaf — "each Protected Series:" alone at the bottom,
+        # the list on the next page. keepLines stops a paragraph splitting; only
+        # keepNext holds it to what it introduces.
+        out.append(
+            para(
+                stripped,
+                P,
+                justify=True,
+                after=P["body_after"],
+                # Strip emphasis markers first: a bold lead-in ends "**", not
+                # ":", and those are the signature and exhibit headings most
+                # likely to strand.
+                keep_next=stripped.rstrip("*_ ").endswith(":"),
+            )
+        )
         i += 1
 
     sect = "<w:sectPr>"

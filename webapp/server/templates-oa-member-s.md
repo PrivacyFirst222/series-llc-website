@@ -83,9 +83,8 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **2.16 "Series Exhibit"** means, for each Protected Series, the exhibit to this Agreement (each numbered PS-1, PS-2, and so on) setting forth the terms specific to that Protected Series, including its purpose, its capital, and its Associated Assets. Each Series Exhibit is a part of this Agreement.
 
-**2.17 "Series Percentage."** [Reserved.]
 
-**2.18 "Transfer"** means any assignment, transfer, conveyance, devise, gift, pledge, hypothecation, encumbrance, or other disposition, direct or indirect, voluntary or involuntary, in trust or otherwise, and as a verb has a corresponding meaning.
+**2.17 "Transfer"** means any assignment, transfer, conveyance, devise, gift, pledge, hypothecation, encumbrance, or other disposition, direct or indirect, voluntary or involuntary, in trust or otherwise, and as a verb has a corresponding meaning.
 
 ---
 
@@ -407,7 +406,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **16.10 Unregistered Interests.** The Membership Interests have not been registered under federal or state securities laws and may not be offered, sold, or transferred except in compliance with this Agreement and applicable law.
 
----
+[[pagebreak]]
 
 ## SIGNATURES
 
@@ -424,8 +423,7 @@ _____________________________
 _____________________________
 [MEMBER 3 NAME, if any]
 
-
----
+[[pagebreak]]
 
 ## EXHIBIT A — MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS
 
@@ -448,7 +446,7 @@ _____________________________
 
 If no beneficiary is designated, or a designation fails, the Member's interest passes as provided by law, subject to this Agreement.
 
----
+[[pagebreak]]
 
 ## SERIES EXHIBIT PS-[N]
 
@@ -473,9 +471,7 @@ _____________________________
 _____________________________
 [MEMBER 2], Member
 
-
-
-
+[[pagebreak]]
 
 ## ASSET SCHEDULE — ATTACHMENT TO SERIES EXHIBIT PS-[N]
 

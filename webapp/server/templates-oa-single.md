@@ -303,7 +303,7 @@ From the effective date of any such election, and whether or not this Agreement 
 
 **14.10 Unregistered Interests.** The Membership Interest has not been registered under federal or state securities laws and may not be offered, sold, or transferred except in compliance with this Agreement and applicable law.
 
----
+[[pagebreak]]
 
 ## SIGNATURES
 
@@ -319,7 +319,7 @@ _____________________________
 _____________________________
 [MANAGER NAME], Manager
 
----
+[[pagebreak]]
 
 ## EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION
 
@@ -337,7 +337,7 @@ _____________________________
 
 Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENEFICIARY NAME(S)]**, or if none is designated or the designation fails, the Membership Interest passes as provided by law.
 
----
+[[pagebreak]]
 
 ## SERIES EXHIBIT PS-[N]
 
@@ -359,6 +359,7 @@ Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENE
 _____________________________
 [NAME], Protected Series Manager
 
+[[pagebreak]]
 
 ## ASSET SCHEDULE — ATTACHMENT TO SERIES EXHIBIT PS-[N]
 
