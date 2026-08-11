@@ -191,6 +191,8 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **5.7 Compensation; Reimbursement; Shared Expenses.** The Manager shall serve without salary unless a Majority in Interest consents in writing to compensation. The Manager and each Protected Series Manager shall be reimbursed for reasonable expenses properly incurred on behalf of the Company or the applicable Protected Series. Costs and expenses that benefit the Company and one or more Protected Series (including formation and filing fees, registered agent fees, accounting, insurance, and administrative overhead) shall be allocated among the Company and the Protected Series benefited on a reasonable and consistent basis determined by the Manager — by specific attribution where practicable and otherwise pro rata or by such other reasonable formula as the Manager adopts — and the allocation shall be recorded in the records maintained under Article 8.
 
+**5.8 Statement of Authority.** The Manager may cause the Company to file with the Department a statement of authority under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Manager, of any Protected Series Manager, or of any person holding a specified position, to transfer or encumber real property held in the name of the Company or of a Protected Series, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate.
+
 ---
 
 ## ARTICLE 6 — CAPITAL
@@ -245,7 +247,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **8.6 Contracts and Liabilities.** Each contract, account, loan, or other obligation shall be entered into in the name of, and shall identify, the Company or the specific Protected Series incurring it, and shall be recorded as an Associated Liability of the person incurring it.
 
-**8.7 Financial Records; Inspection.** Separate books of account shall be maintained for the Company and for each Protected Series, showing income, expenses, assets, liabilities, contributions, and distributions of each. Members' inspection rights are as stated in Section 4.11.
+**8.7 Financial Records; Inspection.** Separate books of account shall be maintained for the Company and for each Protected Series, showing income, expenses, assets, liabilities, contributions, and distributions of each. The Company shall maintain at its principal office the records required by s. 605.0410(1), Florida Statutes, including its federal, state, and local income tax returns and reports for the three most recent years and its financial statements for the three most recent years, and shall maintain the corresponding tax and financial records of each Protected Series with the records of that Protected Series. Members' inspection rights are as stated in Section 4.11.
 
 **8.7A Exclusive Means of Moving Value.** Value may be moved between the Company and any Protected Series, or between Protected Series, only by an Inter-Series Transfer, a contribution, or a distribution, in each case approved as this Agreement requires and documented under this Article at the time it occurs. No other transfer, allocation, offset, netting, or informal accommodation between the Company and a Protected Series, or between Protected Series, is permitted, and any such act shall be documented and corrected under Section 8.9(d) upon discovery.
 
@@ -342,6 +344,8 @@ Records may be organized by specific listing, category, type, quantity, or compu
 (d) The closing shall occur within sixty (60) days after the election, for cash unless the parties agree otherwise. At closing, the selling Members shall Transfer their Membership Interests free of liens, and the purchasing Member(s) shall be substituted with respect to the transferred interests. If the purchasing party fails to close, the other party may elect to purchase on the same terms, and the defaulting party bears the costs of the failed closing.
 
 (e) This Section does not apply to any matter for which the Act or this Agreement requires the consent of all Members and a Member's withholding of consent is expressly permitted by the Act, and does not limit any Member's right to seek judicial dissolution as provided by the Act.
+
+(f) This Section is a deadlock sale provision within the meaning of s. 605.0702(2), Florida Statutes, providing for a purchase and sale of interests. Delivery of a Buy-Sell Offer under subsection (b) initiates this deadlock sale provision as of the date of delivery.
 
 ---
 
