@@ -1,5 +1,42 @@
 # Vibecode Workspace
 
+## Quote the source before you act, not after
+
+**Before changing anything, name the source that determines whether the change is
+correct, and put its text in front of you verbatim. If you cannot quote it, you
+have not read it, and you are not entitled to act yet.**
+
+Naming the source is half the rule. It is not always the statute: for a provision
+generated from an intake answer, the governing source is the screen the client
+saw. When you cannot say what governs, that is the signal you do not understand
+the change well enough to make it — find out before writing, not after.
+
+Verifying afterwards does not substitute, because the failure mode is checking
+the wrong proposition — confirming an edit applied while never testing the
+premise it rests on. A check that compares your work against your own model
+always passes.
+
+The rule leaves an artifact, and its absence is the tell: either the verbatim
+quote is in what you show Adam, or it is not. **Adam: if a change to legal text
+arrives without the governing source quoted, reject it without reading further.**
+You should not have to check the reasoning to catch this.
+
+This rule exists because of one night's evidence, and the correlation was perfect.
+Everything written after quoting the source verbatim was right — s. 605.2301 on
+holding assets through a nominee, s. 605.0102(8)(a) on authorized
+representatives, the Division of Corporations' filing instructions, two
+competitors' published terms. Everything written from memory or inference was
+wrong — an operating agreement clause that limited the company's purpose to the
+client's *optional additional* purpose, when the governing sentence sat two lines
+above the field in a file already open; a domain reported as parked that one dig
+showed was live and taking orders; Word documents rebuilt without ever measuring
+the originals sitting in docs/source/; a production API declared broken on a probe
+that could not have returned the answer. Earlier, s. 605.2107 asserted to say the
+opposite of what its text says.
+
+This rule governs the ones below it. Each of them is a specific case of acting on
+the artifact rather than on a model of it.
+
 ## Design from the user's seat, not the data model
 
 This rule is not optional and is not waived by convenience.
