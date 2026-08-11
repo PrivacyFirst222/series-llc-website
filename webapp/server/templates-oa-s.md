@@ -57,7 +57,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **2.3 "Associated Liability"** means a liability incurred by, contracted for, or otherwise existing with respect to a particular Protected Series or the Company, as reflected in the records maintained under Article 8.
 
-**2.4 "Associated Member"** means, with respect to a Protected Series, a member of the Company associated with that Protected Series under this Agreement and its Series Exhibit. Consistent with s. 605.2302(1), Florida Statutes, only a member of the Company may be an Associated Member. No Protected Series established under this Agreement has an Associated Member; each Protected Series is owned and managed by the Company as provided in Section 3.6.
+**2.4 "Associated Member"** means, with respect to a Protected Series, a member of the Company associated with that Protected Series under this Agreement and its Series Exhibit. Consistent with s. 605.2302(1), Florida Statutes, only a member of the Company may be an Associated Member. No Protected Series established under this Agreement has an Associated Member; each Protected Series is owned by the Company as provided in Section 3.6 and managed as provided in Section 5.2.
 
 **2.5 "Company"** means [COMPANY NAME], LLC.
 
@@ -116,13 +116,12 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **3.5 Series Exhibits Control Series Terms.** The terms specific to each Protected Series — including its name, purpose, Protected Series Manager, capital, and any variations from the default rules of this Agreement — are set forth in its Series Exhibit. In the event of a conflict between a Series Exhibit and this Agreement with respect to the Protected Series to which the Series Exhibit relates, the Series Exhibit controls, except that no Series Exhibit may vary a provision of the Act that may not be varied by an operating agreement (see s. 605.2107, Florida Statutes) or the provisions of Article 8.
 
-**3.6 Company as Owner and Protected-Series Manager.**
+**3.6 Company as Owner.**
 
 (a) **Ownership.** The Company owns all of the protected-series transferable interests of each Protected Series, as provided in s. 605.2303(1)-(3), Florida Statutes. Every distribution made by a Protected Series is made to the Company.
 
-(b) **Management.** Because no Protected Series has an Associated Member, the Company is the protected-series manager of each Protected Series under s. 605.2304(2), Florida Statutes. The Manager acts for the Company in that capacity and may designate a Protected Series Manager in a Series Exhibit to act under the Manager's supervision.
 
-(c) **Transferee provisions inapplicable to the Company.** Section 605.2303(4), Florida Statutes, applies to the Company, in its capacity as owner of a protected-series transferable interest, any provision of this Agreement that applies to a protected-series transferee. No provision of this Agreement restricting the rights of a transferee applies to the Company in that capacity, and nothing in this Agreement limits the Company's rights to manage, direct, receive distributions from, or obtain the records and information of any Protected Series.
+(b) **Transferee provisions inapplicable to the Company.** Section 605.2303(4), Florida Statutes, applies to the Company, in its capacity as owner of a protected-series transferable interest, any provision of this Agreement that applies to a protected-series transferee. No provision of this Agreement restricting the rights of a transferee applies to the Company in that capacity, and nothing in this Agreement limits the Company's rights to manage, direct, receive distributions from, or obtain the records and information of any Protected Series.
 
 ---
 
@@ -162,7 +161,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **5.1 Manager-Managed; the Manager.** The Company is **manager-managed** as provided in its Articles of Organization and this Agreement. The initial Manager is **[MANAGER NAME]**. The Manager need not be a Member. The Manager serves until resignation, removal, death, or incapacity. The Manager may be removed, with or without cause, and any successor Manager shall be appointed, by a Majority in Interest, evidenced by a signed writing delivered to the Company.
 
-**5.2 Management of Each Protected Series.** Each Protected Series is **manager-managed**. The Protected Series Manager of each Protected Series is the Manager of the Company unless the applicable Series Exhibit names a different person. A Protected Series Manager has, with respect to its Protected Series, the rights, powers, and duties that a manager of a manager-managed limited liability company has under the Act, subject to this Agreement and the Series Exhibit, and may be removed and replaced with respect to that Protected Series by a Majority in Interest of the Members.
+**5.2 Management of Each Protected Series.** Each Protected Series is **manager-managed**. The Series Exhibit for a Protected Series may name one or more Protected Series Managers of that Protected Series. If it names none, each person then serving as a Manager of the Company is a Protected Series Manager of that Protected Series. As permitted by s. 605.2107(1)(n), Florida Statutes, this Section varies s. 605.2304(2) so that the Protected Series Managers are the Manager or Managers of the Company rather than the Company itself. A Protected Series Manager has, with respect to its Protected Series, the rights, powers, and duties that a manager of a manager-managed limited liability company has under the Act, subject to this Agreement and the Series Exhibit, and may be removed and replaced with respect to that Protected Series by a Majority in Interest of the Members.
 
 **5.3 Authority of the Manager.** Except as limited by Section 5.4 or an applicable Series Exhibit, the Manager (and, as to a Protected Series, its Protected Series Manager) has full and exclusive authority to manage and conduct the activities and affairs of the Company or that Protected Series, including authority to: acquire, hold, improve, lease, sell, exchange, and convey property; borrow money and grant liens and security interests on Associated Assets; open, maintain, and close bank and investment accounts and designate signatories; engage and compensate employees, attorneys, accountants, and other agents; procure insurance; prosecute, defend, settle, and compromise claims; make tax filings and elections consistent with Article 9; execute and deliver instruments of every kind; and do all other acts necessary, appropriate, or convenient to the conduct of the activities and affairs of the Company or the applicable Protected Series.
 
