@@ -56,6 +56,9 @@ export default function TheStatute() {
                     "A protected series may not hold an asset in the LLC's name or another series' name (§605.2301(5)).",
                     "Your records must let a disinterested, reasonable person identify the asset, when and from whom it was acquired, and any consideration paid (§605.2301(2)).",
                     "Property not properly associated with its series can be reached by a judgment against the company or another series (§605.2404).",
+                    "If it is ever disputed, the burden of proof is on the party asserting that an asset is an associated asset — the owner, not the creditor (§605.2404(4)).",
+                    "Failing to observe formalities is not a ground to disregard the protection members have against company and series debts, but it may be a ground to disregard the separation between the company and a series (§605.2402(2)).",
+                    "Unless a certified statement of authority limiting that authority is recorded in the real estate records, an instrument transferring the company's interest in real property, signed by a member of a member-managed company or the manager of a manager-managed one, is conclusive in favor of a person who gives value without knowledge of the lack of authority (§605.04074(3)).",
                   ].map((p) => (
                     <li key={p} className="flex gap-2">
                       <FileCheck className="mt-0.5 h-4 w-4 text-trust shrink-0" />

@@ -180,6 +180,14 @@ export default function AssetProtection() {
             </p>
           </div>
 
+          {/* What the charging order does not cover */}
+          <div className="rounded-2xl border border-border bg-card p-6 space-y-3">
+            <h4 className="font-medium text-sm">What charging order protection does not cover</h4>
+            <p className="text-sm text-foreground/70 leading-relaxed">
+              The statute sets out its own limits. Section 605.0503(7) provides that the charging order section does not limit a creditor's rights under a security interest the member consented to, does not limit Florida's fraudulent transfer law (Chapter 726), and does not limit "the equitable principles of alter ego, equitable lien, or constructive trust." A member who pledges an interest as collateral, transfers an interest to put it out of a creditor's reach, or runs the company as a personal account is outside what this rule protects.
+            </p>
+          </div>
+
           {/* Outside liability comparison grid */}
           <div className="grid gap-px overflow-hidden rounded-2xl border border-border bg-border md:grid-cols-2 lg:grid-cols-3">
             {[
