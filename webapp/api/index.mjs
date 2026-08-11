@@ -102708,6 +102708,8 @@ async function renderMarkdownPdf(opts) {
       const lineH = size + LINE_GAP;
       const lines = wrapSegs(fonts, block.segs.map((s) => ({ ...s })), width, size);
       if (lines.length > 2 && y - 2 * lineH < MARGIN) newPage();
+      const leadIn = block.segs.map((s) => s.text).join("").trimEnd().endsWith(":");
+      if (leadIn) need(lines.length * lineH + 2 * lineH + 6);
       for (let li = 0; li < lines.length; li++) {
         const ln2 = lines[li];
         const isSecondToLast = li === lines.length - 2;

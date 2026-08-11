@@ -255,6 +255,17 @@ export async function renderMarkdownPdf(opts: {
       // Orphan control: never leave a single line of a multi-line paragraph
       // stranded at the foot of a page.
       if (lines.length > 2 && y - 2 * lineH < MARGIN) newPage();
+      // Lead-in control: a paragraph ending in a colon introduces the list or
+      // block that follows. The orphan rule above never catches it, because a
+      // lead-in is usually one or two lines — so "each Protected Series:" could
+      // sit alone at the foot with its list overleaf. Keep it with two lines of
+      // whatever it introduces, as headings are kept.
+      const leadIn = block.segs
+        .map((s) => s.text)
+        .join("")
+        .trimEnd()
+        .endsWith(":");
+      if (leadIn) need(lines.length * lineH + 2 * lineH + 6);
       for (let li = 0; li < lines.length; li++) {
         const ln = lines[li];
         // Widow control: if breaking here would strand the final line alone on
