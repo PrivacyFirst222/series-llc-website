@@ -95,6 +95,8 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
     series: data.series,
     estimatedStateFees: fees,
     certifications: {
+      articlesSignedBy: data.articlesSignerChoice,
+      articlesSignerAppointed: data.articlesSignerAppointment,
       authorizedRepresentativeName: data.authorizedRepresentativeName,
       authorizedRepresentativeTitle:
         data.authorizedRepresentativeTitle ?? "",

@@ -233,13 +233,22 @@ export function validateStep(
 
   // "review" step has no required validation
   if (step === "certify") {
-    if (!data.authorizedRepresentativeName)
-      e.authorizedRepresentativeName = "Authorized representative name required.";
-    if (!data.authorizedRepresentativeSignature)
-      e.authorizedRepresentativeSignature = "Electronic signature required.";
-    if (!data.authorizedRepresentativeSignatureCheckbox)
-      e.authorizedRepresentativeSignatureCheckbox =
-        "Acknowledgment is required.";
+    // Only the person actually signing supplies a name and signature: when the
+    // client appoints us, our own representative types their name into Sunbiz,
+    // and what we need from the client is the appointment.
+    if (data.articlesSignerChoice === "SERVICE") {
+      if (!data.articlesSignerAppointment)
+        e.articlesSignerAppointment =
+          "Please appoint us as your authorized representative, or choose to sign yourself.";
+    } else {
+      if (!data.authorizedRepresentativeName)
+        e.authorizedRepresentativeName = "Authorized representative name required.";
+      if (!data.authorizedRepresentativeSignature)
+        e.authorizedRepresentativeSignature = "Electronic signature required.";
+      if (!data.authorizedRepresentativeSignatureCheckbox)
+        e.authorizedRepresentativeSignatureCheckbox =
+          "Acknowledgment is required.";
+    }
     if (!data.atLeastOneMemberAcknowledgment)
       e.atLeastOneMemberAcknowledgment = "Acknowledgment is required.";
     if (!data.accuracyAcknowledgment)

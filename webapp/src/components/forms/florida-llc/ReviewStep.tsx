@@ -254,6 +254,27 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
             }
           />
         </ReviewCard>
+
+        <ReviewCard title="Signing the Articles" onEdit={() => goToStep("certify")}>
+          <Row
+            label="Signed by"
+            value={
+              data.articlesSignerChoice === "SERVICE"
+                ? "MyFloridaSeriesLLC, as your appointed authorized representative"
+                : data.authorizedRepresentativeName || "You (name not yet entered)"
+            }
+          />
+          {data.articlesSignerChoice === "SERVICE" ? (
+            <Row
+              label="Appointment"
+              value={
+                data.articlesSignerAppointment
+                  ? "Appointed — your name stays off the filed Articles"
+                  : "Not yet appointed"
+              }
+            />
+          ) : null}
+        </ReviewCard>
       </div>
 
       <FeeEstimate

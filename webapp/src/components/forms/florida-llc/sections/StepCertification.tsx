@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { AlertTriangle, UserCheck } from "lucide-react";
 import { AcknowledgeBox, FieldShell } from "../FieldShell";
+import { cn } from "@/lib/utils";
 import type { FloridaLLCFormData } from "../types";
 
 interface StepProps {
@@ -57,6 +58,94 @@ export function StepCertification({ data, patch, errors }: StepProps) {
         </p>
       </div>
 
+      <div className="space-y-3">
+        <p className="text-sm font-medium">
+          Who will sign the Articles of Organization?
+        </p>
+        {(
+          [
+            {
+              key: "SELF" as const,
+              title: "I will sign",
+              blurb:
+                "Your name appears on the filed Articles as the authorized representative.",
+            },
+            {
+              key: "SERVICE" as const,
+              title: "MyFloridaSeriesLLC signs for me",
+              blurb:
+                "You appoint us to sign and file. Our name appears on the public record instead of yours.",
+            },
+          ]
+        ).map((opt) => (
+          <button
+            key={opt.key}
+            type="button"
+            onClick={() => patch({ articlesSignerChoice: opt.key })}
+            className={cn(
+              "w-full text-left rounded-xl border p-4 transition",
+              data.articlesSignerChoice === opt.key
+                ? "border-trust bg-trust/5 ring-1 ring-trust/30"
+                : "border-border bg-card hover:border-trust/40",
+            )}
+          >
+            <span className="block font-medium text-sm">{opt.title}</span>
+            <span className="block text-sm text-muted-foreground mt-0.5">
+              {opt.blurb}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {data.articlesSignerChoice === "SERVICE" ? (
+        <div className="rounded-xl border border-amber-300/60 bg-amber-50 p-4 space-y-3 text-sm text-amber-950">
+          <div className="flex items-center gap-2 font-semibold">
+            <AlertTriangle className="h-4 w-4 shrink-0" />
+            Before you choose this
+          </div>
+          <p className="leading-relaxed">
+            You are appointing MyFloridaSeriesLLC as your authorized
+            representative under &sect;605.0102(8)(a), for the single purpose of
+            executing and filing your Articles of Organization.
+          </p>
+          <ul className="space-y-2 leading-relaxed list-disc list-inside">
+            <li>
+              <strong>You remain responsible for the information.</strong> We
+              prepare the filing from exactly what you entered. We do not verify
+              it and we do not review it for legal sufficiency. If it is wrong,
+              your Articles are wrong, and correcting them is a separate filing
+              at additional cost.
+            </li>
+            <li>
+              <strong>Our name appears on the public record instead of
+              yours.</strong> For many owners that is the reason to choose it.
+              But a bank, or the Division of Workers&rsquo; Compensation, may ask
+              why the name on your formation document is not yours. We include a
+              signed Statement of Authorized Representative with your documents
+              to answer that.
+            </li>
+            <li>
+              <strong>We step out as soon as it is filed.</strong> Signing gives
+              us no ownership, no management authority, and no continuing role in
+              your company.
+            </li>
+            <li>
+              <strong>You can still be listed.</strong> Florida&rsquo;s
+              Manager/Authorized Representative block is optional; tell us in the
+              correspondence notes if you want your own name in it.
+            </li>
+          </ul>
+          <AcknowledgeBox
+            id="cert-appoint"
+            checked={data.articlesSignerAppointment}
+            onChange={(v) => patch({ articlesSignerAppointment: v })}
+            label="I appoint MyFloridaSeriesLLC as my authorized representative to sign and file my Articles of Organization, and I certify that the information I have provided is true, accurate, and complete."
+            error={errors.articlesSignerAppointment}
+          />
+        </div>
+      ) : null}
+
+      {data.articlesSignerChoice === "SELF" ? (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FieldShell
           label="Authorized representative name"
@@ -97,7 +186,9 @@ export function StepCertification({ data, patch, errors }: StepProps) {
           />
         </FieldShell>
       </div>
+      ) : null}
 
+      {data.articlesSignerChoice === "SELF" ? (
       <FieldShell
         label="Electronic signature"
         required
@@ -112,8 +203,9 @@ export function StepCertification({ data, patch, errors }: StepProps) {
           className="font-display italic text-lg"
         />
       </FieldShell>
+      ) : null}
 
-      {sigMismatch ? (
+      {sigMismatch && data.articlesSignerChoice === "SELF" ? (
         <div className="rounded-lg border border-amber-300/60 bg-amber-50 p-3 flex gap-2 text-amber-900 text-xs">
           <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
           Your signature does not match the authorized representative name. You
@@ -122,15 +214,17 @@ export function StepCertification({ data, patch, errors }: StepProps) {
       ) : null}
 
       <div className="space-y-3">
-        <AcknowledgeBox
-          id="cert-sig-auth"
-          checked={data.authorizedRepresentativeSignatureCheckbox}
-          onChange={(v) =>
-            patch({ authorizedRepresentativeSignatureCheckbox: v })
-          }
-          label="I certify that I am authorized to sign and submit information for this LLC."
-          error={errors.authorizedRepresentativeSignatureCheckbox}
-        />
+        {data.articlesSignerChoice === "SELF" ? (
+          <AcknowledgeBox
+            id="cert-sig-auth"
+            checked={data.authorizedRepresentativeSignatureCheckbox}
+            onChange={(v) =>
+              patch({ authorizedRepresentativeSignatureCheckbox: v })
+            }
+            label="I certify that I am authorized to sign and submit information for this LLC."
+            error={errors.authorizedRepresentativeSignatureCheckbox}
+          />
+        ) : null}
         <AcknowledgeBox
           id="cert-member"
           checked={data.atLeastOneMemberAcknowledgment}

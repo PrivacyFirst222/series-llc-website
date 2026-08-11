@@ -171,6 +171,13 @@ export interface FloridaLLCFormData {
   seriesOwnershipAcknowledgment: boolean;
 
   // Section 15
+  /** Who signs the Articles. Florida requires an "authorized representative"
+   *  (s. 605.0203(1)(b)) — at formation, a person a prospective member has
+   *  authorised to execute and file them (s. 605.0102(8)(a)). That may be the
+   *  client or, on appointment, us. */
+  articlesSignerChoice: "SELF" | "SERVICE";
+  /** Required only when the client appoints us. */
+  articlesSignerAppointment: boolean;
   authorizedRepresentativeName: string;
   authorizedRepresentativeTitle?: string;
   authorizedRepresentativeEmail?: string;
@@ -257,6 +264,8 @@ export interface SubmissionPayload {
     estimatedTotal: number;
   };
   certifications: {
+    articlesSignedBy: "SELF" | "SERVICE";
+    articlesSignerAppointed: boolean;
     authorizedRepresentativeName: string;
     authorizedRepresentativeTitle: string;
     authorizedRepresentativeSignature: string;

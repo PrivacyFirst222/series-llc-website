@@ -187,14 +187,15 @@ export const formationFormSchema = z.object({
   orderCertificateOfStatus: z.boolean(),
   orderCertifiedCopy: z.boolean(),
 
-  authorizedRepresentativeName: z.string().min(1, "Authorized representative name required"),
+  // Required only when the client signs. When the client appoints us instead,
+  // our own representative signs, so these stay empty — the conditional rule
+  // lives in the server's superRefine so neither path can be skipped.
+  authorizedRepresentativeName: z.string().optional().or(z.literal("")),
   authorizedRepresentativeTitle: z.string().optional().or(z.literal("")),
   authorizedRepresentativeEmail: z.string().email().optional().or(z.literal("")),
   authorizedRepresentativePhone: z.string().optional().or(z.literal("")),
-  authorizedRepresentativeSignature: z.string().min(1, "Electronic signature required"),
-  authorizedRepresentativeSignatureCheckbox: z.literal(true, {
-    errorMap: () => ({ message: "Acknowledgment is required." }),
-  }),
+  authorizedRepresentativeSignature: z.string().optional().or(z.literal("")),
+  authorizedRepresentativeSignatureCheckbox: z.boolean().optional(),
   atLeastOneMemberAcknowledgment: z.literal(true, {
     errorMap: () => ({ message: "Acknowledgment is required." }),
   }),

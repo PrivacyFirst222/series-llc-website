@@ -76192,14 +76192,15 @@ var formationFormSchema = external_exports.object({
   correspondentPhone: external_exports.string().optional().or(external_exports.literal("")),
   orderCertificateOfStatus: external_exports.boolean(),
   orderCertifiedCopy: external_exports.boolean(),
-  authorizedRepresentativeName: external_exports.string().min(1, "Authorized representative name required"),
+  // Required only when the client signs. When the client appoints us instead,
+  // our own representative signs, so these stay empty — the conditional rule
+  // lives in the server's superRefine so neither path can be skipped.
+  authorizedRepresentativeName: external_exports.string().optional().or(external_exports.literal("")),
   authorizedRepresentativeTitle: external_exports.string().optional().or(external_exports.literal("")),
   authorizedRepresentativeEmail: external_exports.string().email().optional().or(external_exports.literal("")),
   authorizedRepresentativePhone: external_exports.string().optional().or(external_exports.literal("")),
-  authorizedRepresentativeSignature: external_exports.string().min(1, "Electronic signature required"),
-  authorizedRepresentativeSignatureCheckbox: external_exports.literal(true, {
-    errorMap: () => ({ message: "Acknowledgment is required." })
-  }),
+  authorizedRepresentativeSignature: external_exports.string().optional().or(external_exports.literal("")),
+  authorizedRepresentativeSignatureCheckbox: external_exports.boolean().optional(),
   atLeastOneMemberAcknowledgment: external_exports.literal(true, {
     errorMap: () => ({ message: "Acknowledgment is required." })
   }),
@@ -76314,7 +76315,11 @@ var extendedFormSchema = formationFormSchema.extend({
     errorMap: () => ({
       message: "Please confirm you understand that your LLC will own every protected series."
     })
-  })
+  }),
+  articlesSignerChoice: external_exports.enum(["SELF", "SERVICE"], {
+    errorMap: () => ({ message: "Choose who will sign the Articles." })
+  }),
+  articlesSignerAppointment: external_exports.boolean().optional().default(false)
 }).superRefine((data, ctx) => {
   data.series.forEach((s, i) => {
     if (!hasProtectedSeriesPhrase(s.name)) {
@@ -76346,6 +76351,37 @@ var extendedFormSchema = formationFormSchema.extend({
       path: ["registeredAgentName"],
       message: "The registered agent's full legal name is required."
     });
+  }
+  if (data.articlesSignerChoice === "SERVICE") {
+    if (!data.articlesSignerAppointment) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        path: ["articlesSignerAppointment"],
+        message: "Appoint us as your authorized representative, or choose to sign yourself."
+      });
+    }
+  } else {
+    if (!data.authorizedRepresentativeName?.trim()) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        path: ["authorizedRepresentativeName"],
+        message: "The authorized representative's name is required."
+      });
+    }
+    if (!data.authorizedRepresentativeSignature?.trim()) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        path: ["authorizedRepresentativeSignature"],
+        message: "An electronic signature is required."
+      });
+    }
+    if (data.authorizedRepresentativeSignatureCheckbox !== true) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        path: ["authorizedRepresentativeSignatureCheckbox"],
+        message: "Acknowledgment is required."
+      });
+    }
   }
   if (data.managementStructure === "NOT_SPECIFIED") {
     ctx.addIssue({
@@ -76459,6 +76495,8 @@ function buildPayload(data) {
     series: data.series,
     estimatedStateFees: fees,
     certifications: {
+      articlesSignedBy: data.articlesSignerChoice,
+      articlesSignerAppointed: data.articlesSignerAppointment,
       authorizedRepresentativeName: data.authorizedRepresentativeName,
       authorizedRepresentativeTitle: data.authorizedRepresentativeTitle ?? "",
       authorizedRepresentativeSignature: data.authorizedRepresentativeSignature,

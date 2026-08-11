@@ -37,6 +37,10 @@ const extendedFormSchema = formationFormSchema
           "Please confirm you understand that your LLC will own every protected series.",
       }),
     }),
+    articlesSignerChoice: z.enum(["SELF", "SERVICE"], {
+      errorMap: () => ({ message: "Choose who will sign the Articles." }),
+    }),
+    articlesSignerAppointment: z.boolean().optional().default(false),
   })
   .superRefine((data, ctx) => {
     data.series.forEach((s, i) => {
@@ -69,6 +73,40 @@ const extendedFormSchema = formationFormSchema
         path: ["registeredAgentName"],
         message: "The registered agent's full legal name is required.",
       });
+    }
+    // Exactly one of the two signing paths must be complete. Relaxing the base
+    // schema to allow an empty signature block is only safe because of this.
+    if (data.articlesSignerChoice === "SERVICE") {
+      if (!data.articlesSignerAppointment) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["articlesSignerAppointment"],
+          message:
+            "Appoint us as your authorized representative, or choose to sign yourself.",
+        });
+      }
+    } else {
+      if (!data.authorizedRepresentativeName?.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["authorizedRepresentativeName"],
+          message: "The authorized representative's name is required.",
+        });
+      }
+      if (!data.authorizedRepresentativeSignature?.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["authorizedRepresentativeSignature"],
+          message: "An electronic signature is required.",
+        });
+      }
+      if (data.authorizedRepresentativeSignatureCheckbox !== true) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["authorizedRepresentativeSignatureCheckbox"],
+          message: "Acknowledgment is required.",
+        });
+      }
     }
     if (data.managementStructure === "NOT_SPECIFIED") {
       ctx.addIssue({

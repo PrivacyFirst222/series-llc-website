@@ -139,7 +139,7 @@ check("un-acknowledged order creates no order and no checkout link",
 //     to be charged before the form was read, so a customer who mistyped a zip
 //     twelve times was locked out for an hour and told "too many submissions".
 {
-  const rejects = [];
+  const rejects: number[] = [];
   for (let i = 0; i < 12; i++) {
     rejects.push(
       (await api("/api/orders", { method: "POST", body: JSON.stringify({ nope: i }) })).status,
@@ -177,6 +177,52 @@ const svc = await api("/api/orders", {
   }),
 });
 check("service-RA order accepted with canonical details enforced", svc.status === 200, svc.body);
+
+// 1e. Signing the Articles: exactly one of the two paths must be complete.
+//     Florida requires an authorized representative's signature (s. 605.0203(1)(b)),
+//     and where the client appoints us, the appointment is what stands in for it.
+{
+  const noAppointment = await api("/api/orders", {
+    method: "POST",
+    body: JSON.stringify({
+      ...formData,
+      articlesSignerChoice: "SERVICE",
+      articlesSignerAppointment: false,
+      authorizedRepresentativeName: "",
+      authorizedRepresentativeSignature: "",
+      authorizedRepresentativeSignatureCheckbox: false,
+    }),
+  });
+  check("'we sign' without the appointment is rejected", noAppointment.status === 400,
+    noAppointment.body);
+
+  const noSignature = await api("/api/orders", {
+    method: "POST",
+    body: JSON.stringify({
+      ...formData,
+      articlesSignerChoice: "SELF",
+      authorizedRepresentativeSignature: "",
+    }),
+  });
+  check("'I sign' without a signature is rejected", noSignature.status === 400,
+    noSignature.body);
+
+  const appointed = await api("/api/orders", {
+    method: "POST",
+    body: JSON.stringify({
+      ...formData,
+      articlesSignerChoice: "SERVICE",
+      articlesSignerAppointment: true,
+      authorizedRepresentativeName: "",
+      authorizedRepresentativeSignature: "",
+      authorizedRepresentativeSignatureCheckbox: false,
+      correspondentEmail: testEmail.replace("@", "+appointed@"),
+      confirmCorrespondentEmail: testEmail.replace("@", "+appointed@"),
+    }),
+  });
+  check("'we sign' with the appointment is accepted, with no client signature",
+    appointed.status === 200, { status: appointed.status, body: appointed.body });
+}
 
 // 2. Place a valid order. The bogus price fields ride along deliberately: the
 //    server must price the order from the answers and ignore anything the

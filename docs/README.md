@@ -19,10 +19,18 @@ That is why the masters live here.
 | `webapp/server/templates-oa-member.md` | FPSLLC Operating Agreement - Member-Managed Multi-Member (Partnership) - DRAFT.docx |
 | `webapp/server/templates-oa-member-s.md` | FPSLLC Operating Agreement - Member-Managed (S Corporation) - DRAFT.docx |
 | `docs/owners-manual.md` | Series LLC Owners Manual - REVISED DRAFT.docx |
+| `docs/statement-of-authorized-representative.md` | FPSLLC Statement of Authorized Representative - FORM.docx |
 
 The five operating agreement masters are also what the portal uses to generate a
 client's agreement, so the Word file and the client's PDF always come from the
 same text.
+
+The Statement of Authorized Representative is furnished when a client appoints
+us to sign and file their Articles under s. 605.0102(8)(a), so a bank looking at
+the public record can see why the name on the Articles is not a member's. It has
+**no baseline in `source/`** — it is new, not a reconstruction — so the format
+check reports SKIP for it, which is correct. It is **not yet generated
+automatically** on fulfilment: today it is completed from this form by hand.
 
 ### How the Word files stay current
 

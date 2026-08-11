@@ -10,7 +10,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 
 MASTERS=$(git diff --cached --name-only --diff-filter=ACM \
-  | grep -E '^(webapp/server/templates-oa-.*\.md|docs/owners-manual\.md)$' || true)
+  | grep -E '^(webapp/server/templates-oa-.*\.md|docs/owners-manual\.md|docs/statement-of-authorized-representative\.md)$' || true)
 
 if [ -z "$MASTERS" ]; then
   exit 0

@@ -106,6 +106,8 @@ export const defaultFormData: FloridaLLCFormData = {
   authorizedRepresentativeEmail: "",
   authorizedRepresentativePhone: "",
   authorizedRepresentativeSignature: "",
+  articlesSignerChoice: "SELF",
+  articlesSignerAppointment: false,
   authorizedRepresentativeSignatureCheckbox: false,
   atLeastOneMemberAcknowledgment: false,
   accuracyAcknowledgment: false,
