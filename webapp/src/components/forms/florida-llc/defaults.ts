@@ -99,6 +99,7 @@ export const defaultFormData: FloridaLLCFormData = {
   orderSElection: false,
 
   series: [],
+  seriesOwnershipAcknowledgment: false,
 
   authorizedRepresentativeName: "",
   authorizedRepresentativeTitle: "",

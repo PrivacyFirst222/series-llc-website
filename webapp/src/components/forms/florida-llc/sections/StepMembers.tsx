@@ -19,6 +19,15 @@ export function StepMembers({ data, patch, errors }: StepProps) {
         </p>
       </header>
 
+      {data.members.length > 1 ? (
+        <div className="rounded-xl border border-border bg-card p-4 text-sm text-foreground/80 leading-relaxed">
+          <strong>All members own the LLC itself</strong>, in the percentages
+          you agree among yourselves. No member will own a particular protected
+          series — the LLC owns every series, as you confirmed on the Series
+          step.
+        </div>
+      ) : null}
+
       <RepeatableMemberFields
         members={data.members}
         onChange={(next) => patch({ members: next })}

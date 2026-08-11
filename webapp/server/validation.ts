@@ -31,6 +31,12 @@ const extendedFormSchema = formationFormSchema
         }),
       )
       .min(1, "Add at least one series."),
+    seriesOwnershipAcknowledgment: z.literal(true, {
+      errorMap: () => ({
+        message:
+          "Please confirm you understand that your LLC will own every protected series.",
+      }),
+    }),
   })
   .superRefine((data, ctx) => {
     data.series.forEach((s, i) => {

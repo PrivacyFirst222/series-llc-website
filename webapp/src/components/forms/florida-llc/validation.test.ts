@@ -121,9 +121,10 @@ const baseFees = calculateEstimatedFees({
 });
 assert(baseFees.estimatedTotal === 125, "base fees: 100+25 = 125");
 
+const failed = results.filter((r) => !r.ok);
+
 // Print results to console when imported in dev
 if (typeof console !== "undefined") {
-  const failed = results.filter((r) => !r.ok);
   if (failed.length === 0) {
     console.info(
       `[fl-llc] All ${results.length} validation tests passed.`,
@@ -134,6 +135,13 @@ if (typeof console !== "undefined") {
       failed,
     );
   }
+}
+
+// Run directly (bun run validation.test.ts): exit non-zero on failure. Printing
+// a warning and exiting 0 is how a broken fee calculation ships — the run has
+// to fail, not merely say something.
+if (typeof process !== "undefined" && import.meta.main) {
+  process.exit(failed.length === 0 ? 0 : 1);
 }
 
 export const validationTestResults = results;

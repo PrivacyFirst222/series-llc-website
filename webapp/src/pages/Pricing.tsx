@@ -5,7 +5,7 @@ import { PageHero } from "@/components/sections/PageHero";
 import { WhyOnlyUsCompact } from "@/components/home/WhyOnlyUs";
 
 const SHARED_FEATURES: string[] = [
-  "Form Operating Agreement for you to review and adapt",
+  "Form Operating Agreement for you to review and adapt — your LLC owns every series, so the whole structure stays on one tax return",
   "Property titling manual — how to properly title assets in the LLC or series",
   "Ledger forms for each series",
   "Complete Series LLC maintenance guide",

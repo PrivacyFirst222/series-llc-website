@@ -104,6 +104,7 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
       accuracyAcknowledged: data.accuracyAcknowledgment,
       publicRecordAcknowledged: data.publicRecordAcknowledgment,
       notLegalAdviceAcknowledged: data.legalAdviceAcknowledgment,
+      seriesOwnershipAcknowledged: data.seriesOwnershipAcknowledgment,
     },
     metadata: {
       submittedAt: new Date().toISOString(),

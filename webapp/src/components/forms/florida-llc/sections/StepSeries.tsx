@@ -1,6 +1,6 @@
-import { Plus, Trash2, Layers, Info, DollarSign } from "lucide-react";
+import { Plus, Trash2, Layers, Info, DollarSign, Network } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { FieldShell } from "../FieldShell";
+import { AcknowledgeBox, FieldShell } from "../FieldShell";
 import { buildFinalLlcName } from "../validation";
 import type { FloridaLLCFormData, SeriesEntry } from "../types";
 
@@ -83,6 +83,36 @@ export function StepSeries({ data, patch, errors }: StepProps) {
             No two series of the same LLC may share an identical name.
           </li>
         </ul>
+      </div>
+
+      <div className="rounded-xl border border-border bg-card p-4 space-y-3 text-sm">
+        <div className="flex items-center gap-2 font-semibold">
+          <Network className="h-4 w-4 shrink-0 text-trust" />
+          How ownership works in this structure
+        </div>
+        <p className="text-foreground/80 leading-relaxed">
+          <strong>Your LLC owns every protected series. You own the LLC.</strong>{" "}
+          No series has its own separate owners, and ownership cannot differ from
+          one series to the next.
+        </p>
+        <p className="text-foreground/80 leading-relaxed">
+          This is deliberate. It keeps the entire structure on{" "}
+          <strong>one federal tax return</strong> no matter how many series you
+          create, and it protects an S corporation election that divergent
+          per-series ownership would otherwise break.
+        </p>
+        <p className="text-muted-foreground leading-relaxed">
+          If you need different people to own different series, this is not the
+          right product. That structure carries significant tax complexity and
+          needs an operating agreement custom drafted by an attorney.
+        </p>
+        <AcknowledgeBox
+          id="series-ownership"
+          checked={data.seriesOwnershipAcknowledgment}
+          onChange={(v) => patch({ seriesOwnershipAcknowledgment: v })}
+          label="I understand that every protected series will be owned by my LLC, and that no series will have its own separate owners."
+          error={errors.seriesOwnershipAcknowledgment}
+        />
       </div>
 
       <div className="rounded-xl border border-border bg-secondary/40 p-4 space-y-2 text-sm">

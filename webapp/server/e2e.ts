@@ -68,6 +68,7 @@ const formData: FloridaLLCFormData = {
   correspondentEmail: testEmail,
   confirmCorrespondentEmail: testEmail,
   series: [{ id: "s1", name: "E2E Coastal Holdings, LLC, PS A" }],
+  seriesOwnershipAcknowledgment: true,
   authorizedRepresentativeName: "Casey Member",
   authorizedRepresentativeSignature: "Casey Member",
   authorizedRepresentativeSignatureCheckbox: true,
@@ -81,11 +82,17 @@ const formData: FloridaLLCFormData = {
   legalAdviceAcknowledgment: true,
 };
 
+/** The order endpoint allows 10 submissions per hour per IP. Without a distinct
+ *  caller identity, a second run inside the hour gets 429s that masquerade as
+ *  broken code — so each run presents its own address. */
+const RUN_IP = `10.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
+
 async function api(path: string, init?: RequestInit & { cookies?: string }) {
   const res = await fetch(BASE + path, {
     ...init,
     headers: {
       "Content-Type": "application/json",
+      "X-Forwarded-For": RUN_IP,
       ...(init?.cookies ? { Cookie: init.cookies } : {}),
       ...init?.headers,
     },
@@ -98,6 +105,35 @@ async function api(path: string, init?: RequestInit & { cookies?: string }) {
 // 1. Reject garbage
 const bad = await api("/api/orders", { method: "POST", body: JSON.stringify({ nope: true }) });
 check("rejects invalid order payload (400)", bad.status === 400);
+check("rejected payload creates no order and no checkout link",
+  bad.status === 400 && !bad.body?.data?.orderId && !bad.body?.data?.checkoutUrl, bad.body);
+
+// 1a. Body that is not JSON at all. A parse failure must be answered, not
+//     thrown — and must not reach the order or e-mail path either.
+const notJson = await fetch(BASE + "/api/orders", {
+  method: "POST",
+  headers: { "Content-Type": "application/json", "X-Forwarded-For": RUN_IP },
+  body: "{{{not json",
+});
+const notJsonBody = await notJson.json().catch(() => null);
+check("rejects a malformed JSON body (400, no crash)",
+  notJson.status === 400 && notJsonBody?.error?.code === "INVALID_JSON",
+  { status: notJson.status, body: notJsonBody });
+check("malformed body creates no order and no checkout link",
+  !notJsonBody?.data?.orderId && !notJsonBody?.data?.checkoutUrl, notJsonBody);
+
+// 1b. The ownership acknowledgment is a server-side requirement, not merely a
+//     form control: every series is owned by the company, and the buyer has to
+//     say they understand that. Stripping the box in the browser must not work.
+const noAck = await api("/api/orders", {
+  method: "POST",
+  body: JSON.stringify({ ...formData, seriesOwnershipAcknowledgment: false }),
+});
+check("rejects an order missing the series-ownership acknowledgment (400)",
+  noAck.status === 400, noAck.body);
+check("un-acknowledged order creates no order and no checkout link",
+  noAck.status === 400 && !noAck.body?.data?.orderId && !noAck.body?.data?.checkoutUrl,
+  noAck.body);
 
 // 1b. A tampered "service RA" order cannot alter our agent details — the
 //     server re-applies the canonical values (verified via schema acceptance:
@@ -118,12 +154,22 @@ const svc = await api("/api/orders", {
 });
 check("service-RA order accepted with canonical details enforced", svc.status === 200, svc.body);
 
-// 2. Place a valid order
-const order = await api("/api/orders", { method: "POST", body: JSON.stringify(formData) });
+// 2. Place a valid order. The bogus price fields ride along deliberately: the
+//    server must price the order from the answers and ignore anything the
+//    client claims the total is.
+const order = await api("/api/orders", {
+  method: "POST",
+  body: JSON.stringify({
+    ...formData,
+    totalCents: 1,
+    total: 0.01,
+    estimatedStateFees: { estimatedTotal: 0 },
+  }),
+});
 check("accepts valid order (200)", order.status === 200, order.body);
 const orderId = order.body?.data?.orderId as string;
 const totalCents = order.body?.data?.totalCents as number;
-check("price recomputed server-side: $499 + $50 EIN + $95 S election + $125 = $769.00", totalCents === 76900, { totalCents });
+check("price recomputed server-side, client's claimed total ignored: $499 + $50 EIN + $95 S election + $125 = $769.00", totalCents === 76900, { totalCents });
 
 // s. 605.0213: $100 articles + $25 agent designation on a new formation; a
 // conversion pays the $25 only when it switches agents.

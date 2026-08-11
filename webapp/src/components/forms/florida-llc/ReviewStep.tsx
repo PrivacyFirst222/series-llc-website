@@ -245,6 +245,14 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
                 : data.series.map((s) => s.name).join(", ")
             }
           />
+          <Row
+            label="Ownership"
+            value={
+              data.seriesOwnershipAcknowledgment
+                ? "Every series owned by the LLC — acknowledged"
+                : "Not acknowledged"
+            }
+          />
         </ReviewCard>
       </div>
 

@@ -165,6 +165,10 @@ export interface FloridaLLCFormData {
 
   // Section 13.5 – Series
   series: SeriesEntry[];
+  /** Every series we form is owned by the LLC itself; no series has its own
+   *  separate owners. Acknowledged on the Series step, where the buyer is
+   *  actually creating them, rather than buried in the certification stack. */
+  seriesOwnershipAcknowledgment: boolean;
 
   // Section 15
   authorizedRepresentativeName: string;
@@ -260,6 +264,7 @@ export interface SubmissionPayload {
     accuracyAcknowledged: boolean;
     publicRecordAcknowledged: boolean;
     notLegalAdviceAcknowledged: boolean;
+    seriesOwnershipAcknowledged: boolean;
   };
   metadata: {
     submittedAt: string;

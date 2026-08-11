@@ -17,6 +17,10 @@ const FAQ_ITEMS: {
     a: "A regular LLC is a single legal entity. A Protected Series LLC is a parent entity that holds an unlimited number of internal 'series,' and each series gets the same liability protection as an individual LLC. You get the asset segregation of multiple LLCs and only pay one annual fee.",
   },
   {
+    q: "Can different people own different series?",
+    a: "Not in the structure we prepare, and you should know that before you order. Every Protected Series LLC formed through this site is built the same way: your LLC owns every protected series, and you own the LLC. No series has its own separate owners, and ownership cannot differ from one series to the next. That is a deliberate design choice, not a shortcut. Because each series has a single owner — the LLC — the entire structure stays on one federal tax return no matter how many series you create, and an S corporation election cannot be broken by owners holding different interests in different series. Split the ownership up and each series can become its own taxpayer, with its own EIN, its own annual return, and penalties on returns nobody realized were due. If you genuinely need different people to own different series, that is a legitimate structure — but it is not this product. It carries real tax and state-law complexity and needs an operating agreement custom drafted by an attorney. We confirm this with you during the order, and it is explained in full in the Owner's Manual you receive.",
+  },
+  {
     q: "Can a protected series hold Florida real estate in its own name?",
     a: "Yes. The deed goes in the series' own full name — something like \"Sunshine Holdings, LLC - PS A.\" Not the LLC's name, and not another series' name. Recording that deed does two jobs at once: it puts the property in the series, and it becomes your record that the property belongs to that series and not to the LLC or to a different one. One honest caveat — we can't promise how any particular clerk's office or title company will handle a given closing. (§605.2301)",
   },
@@ -36,7 +40,7 @@ const FAQ_ITEMS: {
   },
   {
     q: "What does it cost each year to keep it going?",
-    a: "One Florida annual report — $138.75 — filed between January 1 and May 1, and it covers the company and every protected series no matter how many you have. Ten separate LLCs would mean ten of those reports. After your first year, registered agent service is $99/yr, or nothing if you serve as your own agent. That's the whole recurring cost. File the annual report late and Florida adds a $400 penalty that cannot be waived, so calendar it.",
+    a: "One Florida annual report — $138.75 — filed between January 1 and May 1, and it covers the company and every protected series no matter how many you have. Ten separate LLCs would mean ten of those reports. After your first year, registered agent service is $99/yr, or nothing if you serve as your own agent. That's the whole recurring cost. File the annual report late and Florida adds a $400 penalty that cannot be waived, so calendar it. Miss it entirely and the deadlines are exact: under §605.0714 the Department may administratively dissolve a company that has not delivered its annual report by 5:00 p.m. Eastern Time on the third Friday in September, and dissolution for failure to file occurs on the fourth Friday in September. For a series LLC that takes every protected series down with the company, so treat May 1 as the deadline and September as the cliff.",
     link: { to: "/pricing", label: "Full pricing and add-ons" },
   },
   {
@@ -45,7 +49,7 @@ const FAQ_ITEMS: {
   },
   {
     q: "Does this work for out-of-state investors?",
-    a: "A Florida Protected Series LLC works well for Floridians and for Florida businesses and assets. There is no way to guarantee how the courts of another state — particularly one with no series LLC legislation of its own — will interpret it. If you are not a Floridian, or you plan to transfer out-of-state property into a Florida Protected Series LLC, you should seek advice from an attorney licensed to practice in the relevant state.",
+    a: "A Florida Protected Series LLC works well for Floridians and for Florida businesses and assets. There is no way to guarantee how the courts of another state — particularly one with no series LLC legislation of its own — will interpret it. There is also a registration question that runs in both directions: under §605.0905(3), owning income-producing real property or tangible personal property in a state is itself transacting business there, which means a company formed elsewhere that owns Florida rental property has to qualify here — and a Florida company that buys rental property in another state should expect that state to take the same position. The consequences of skipping it are real: §605.0904 bars a company transacting business in Florida without a certificate of authority from maintaining an action here, and §605.0904(7) adds liability for all back fees plus a civil penalty of at least $500 and not more than $1,000 for each year or part of a year. If you are not a Floridian, or you plan to hold out-of-state property in a Florida Protected Series LLC, you should seek advice from an attorney licensed to practice in the relevant state.",
   },
   {
     q: "What's the federal tax treatment?",

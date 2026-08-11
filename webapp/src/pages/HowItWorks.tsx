@@ -115,6 +115,11 @@ export default function HowItWorks() {
               Keeping separate books and records for each series is what preserves the liability
               shield.
             </p>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              <strong className="text-foreground">One note on ownership:</strong> in every structure
+              we form, your LLC owns each protected series and you own the LLC. No series has its own
+              separate owners. That keeps the whole structure on a single federal tax return.
+            </p>
           </div>
         </div>
 

@@ -91,6 +91,9 @@ export function validateStep(
   if (step === "series") {
     if (data.series.length === 0)
       e.series = "Add at least one series to proceed.";
+    if (!data.seriesOwnershipAcknowledgment)
+      e.seriesOwnershipAcknowledgment =
+        "Please confirm you understand that your LLC will own every protected series.";
     data.series.forEach((s, i) => {
       const name = s.name.trim();
       if (!name) {
