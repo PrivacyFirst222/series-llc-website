@@ -66,8 +66,15 @@ app.post("/orders", async (c) => {
   if (!orderingEnabled()) {
     return c.json(err("Online ordering is not enabled yet.", "ORDERING_DISABLED"), 503);
   }
-  if (!rateLimit(`orders:${clientIp(c)}`, 10, 3600_000)) {
-    return c.json(err("Too many submissions. Try again later.", "RATE_LIMITED"), 429);
+  // Two tiers, because the limit used to be charged before the form was even
+  // read: a customer who mistyped a zip ten times was locked out for an hour
+  // and told "too many submissions". A rejected attempt costs nothing anyone
+  // pays for, so it is charged against a generous abuse ceiling; only an order
+  // that validates — the one that creates a checkout and sends mail — is
+  // charged against the low limit. The budget is per IP, which an office or a
+  // mobile carrier's shared address will share.
+  if (!rateLimit(`orders:req:${clientIp(c)}`, 60, 3600_000)) {
+    return c.json(err("Too many attempts. Try again in an hour.", "RATE_LIMITED"), 429);
   }
   let raw: unknown;
   try {
@@ -80,6 +87,12 @@ app.post("/orders", async (c) => {
     return c.json(
       { error: { message: "Validation failed", code: "INVALID_INPUT", issues: parsed.error.issues.slice(0, 20) } },
       400,
+    );
+  }
+  if (!rateLimit(`orders:ok:${clientIp(c)}`, 10, 3600_000)) {
+    return c.json(
+      err("Too many submissions. Try again in an hour.", "RATE_LIMITED"),
+      429,
     );
   }
   const data = parsed.data as FloridaLLCFormData;

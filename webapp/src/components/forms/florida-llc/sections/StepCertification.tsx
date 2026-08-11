@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, UserCheck } from "lucide-react";
 import { AcknowledgeBox, FieldShell } from "../FieldShell";
 import type { FloridaLLCFormData } from "../types";
 
@@ -21,13 +21,41 @@ export function StepCertification({ data, patch, errors }: StepProps) {
   return (
     <div className="space-y-6">
       <header className="space-y-2">
-        <h2 className="font-display text-3xl">Certification & signature</h2>
+        <h2 className="font-display text-3xl">Certification &amp; signature</h2>
         <p className="text-sm text-muted-foreground max-w-2xl">
-          A person authorized to act for the LLC must certify and electronically
-          sign these articles. By signing, you affirm everything you've entered
-          is true and accurate.
+          Florida requires the Articles of Organization to be signed by an
+          &ldquo;authorized representative&rdquo; (&sect;605.0203(1)(b)).
         </p>
       </header>
+
+      <div className="rounded-xl border border-border bg-card p-4 space-y-3 text-sm">
+        <div className="flex items-center gap-2 font-semibold">
+          <UserCheck className="h-4 w-4 shrink-0 text-trust" />
+          Who is the authorized representative?
+        </div>
+        <p className="text-foreground/80 leading-relaxed">
+          For a company being formed, Florida defines it as{" "}
+          <em>
+            a person authorized by a prospective member to form the company by
+            executing and filing its articles of organization
+          </em>{" "}
+          (&sect;605.0102(8)(a)).
+        </p>
+        <p className="text-foreground/80 leading-relaxed">
+          <strong>For almost everyone, that is you</strong> &mdash; an owner
+          signing for the company you are about to create. It does not have to be
+          an owner: you may authorize your attorney, your accountant, or anyone
+          else you trust to sign and file for you. What matters is that whoever
+          signs has an intended owner&rsquo;s authority to do it.
+        </p>
+        <p className="text-foreground/80 leading-relaxed">
+          <strong>You are signing under penalty of perjury.</strong> Under
+          &sect;605.0205(3), the person who signs &ldquo;affirms under penalty of
+          perjury that the information stated in the record is accurate.&rdquo;
+          If you have not read the Review step, go back and read it before you
+          sign.
+        </p>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FieldShell

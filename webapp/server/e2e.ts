@@ -135,6 +135,30 @@ check("un-acknowledged order creates no order and no checkout link",
   noAck.status === 400 && !noAck.body?.data?.orderId && !noAck.body?.data?.checkoutUrl,
   noAck.body);
 
+// 1d. Rejected attempts must not spend the submission allowance. The limit used
+//     to be charged before the form was read, so a customer who mistyped a zip
+//     twelve times was locked out for an hour and told "too many submissions".
+{
+  const rejects = [];
+  for (let i = 0; i < 12; i++) {
+    rejects.push(
+      (await api("/api/orders", { method: "POST", body: JSON.stringify({ nope: i }) })).status,
+    );
+  }
+  check("twelve rejected attempts all answer 400, never 429",
+    rejects.every((s) => s === 400), rejects);
+  const afterRejects = await api("/api/orders", {
+    method: "POST",
+    body: JSON.stringify({
+      ...formData,
+      correspondentEmail: testEmail.replace("@", "+afterrejects@"),
+      confirmCorrespondentEmail: testEmail.replace("@", "+afterrejects@"),
+    }),
+  });
+  check("a valid order still goes through after twelve rejections",
+    afterRejects.status === 200, { status: afterRejects.status, body: afterRejects.body });
+}
+
 // 1b. A tampered "service RA" order cannot alter our agent details — the
 //     server re-applies the canonical values (verified via schema acceptance:
 //     bogus agent fields with choice=SERVICE must still validate cleanly).

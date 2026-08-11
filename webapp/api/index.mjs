@@ -106257,8 +106257,8 @@ app.post("/orders", async (c) => {
   if (!orderingEnabled()) {
     return c.json(err2("Online ordering is not enabled yet.", "ORDERING_DISABLED"), 503);
   }
-  if (!rateLimit(`orders:${clientIp(c)}`, 10, 36e5)) {
-    return c.json(err2("Too many submissions. Try again later.", "RATE_LIMITED"), 429);
+  if (!rateLimit(`orders:req:${clientIp(c)}`, 60, 36e5)) {
+    return c.json(err2("Too many attempts. Try again in an hour.", "RATE_LIMITED"), 429);
   }
   let raw2;
   try {
@@ -106271,6 +106271,12 @@ app.post("/orders", async (c) => {
     return c.json(
       { error: { message: "Validation failed", code: "INVALID_INPUT", issues: parsed.error.issues.slice(0, 20) } },
       400
+    );
+  }
+  if (!rateLimit(`orders:ok:${clientIp(c)}`, 10, 36e5)) {
+    return c.json(
+      err2("Too many submissions. Try again in an hour.", "RATE_LIMITED"),
+      429
     );
   }
   const data = parsed.data;
