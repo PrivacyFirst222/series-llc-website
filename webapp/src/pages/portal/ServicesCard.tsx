@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { PlusCircle, Landmark, ShoppingBag, Lock, FileCheck2, Trash2, Download, CheckCircle2 } from "lucide-react";
+import { PlusCircle, Landmark, ShoppingBag, Lock, FileCheck2, Trash2, Download, CheckCircle2, FileSignature } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -31,6 +31,7 @@ interface ServiceOrder {
   llc_name: string;
   details: {
     seriesName?: string;
+    purpose?: string;
     target?: string;
     responsibleName?: string;
     tinLast4?: string;
@@ -161,6 +162,25 @@ export function ServicesCard() {
   const simulate = useMutation({
     mutationFn: (id: string) => api.post("/api/dev/simulate-payment", { orderId: id }),
     onSuccess: refresh,
+  });
+
+  // s. 605.2201(1) and Section 3.1 require the consent of all members before a
+  // series is established, and the designation filed with the state is signed
+  // by the company — so nothing on the public record shows the members agreed.
+  // This is the only document that does, and it carries the Series Exhibit
+  // Section 3.1 requires adopted at or before the filing.
+  const [consentFor, setConsentFor] = useState<ServiceOrder | null>(null);
+  const makeConsent = useMutation({
+    mutationFn: (body: { seriesName: string; seriesNumber: string; purpose: string; effectiveDate: string }) =>
+      api.post<{ documentId: string; title: string }>("/api/portal/series/consent", body),
+    onSuccess: (res) => {
+      setConsentFor(null);
+      // The document card reads a separate query; without this the client
+      // downloads the file and the portal still says nothing is here.
+      queryClient.invalidateQueries({ queryKey: ["portal-documents"] });
+      window.location.href = `/api/portal/documents/${res.documentId}/download`;
+    },
+    onError: (e) => setError(e instanceof ApiError ? e.message : "Something went wrong."),
   });
 
   const data = servicesQuery.data;
@@ -386,6 +406,17 @@ export function ServicesCard() {
                 ) : null}
               </div>
               <div className="flex shrink-0 flex-wrap items-center gap-2">
+                {o.type === "series" && o.status !== "pending_payment" && o.status !== "cancelled" ? (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="rounded-full"
+                    onClick={() => { setError(""); setConsentFor(o); }}
+                  >
+                    <FileSignature className="mr-1.5 h-3.5 w-3.5" />
+                    Consent &amp; Series Exhibit
+                  </Button>
+                ) : null}
                 {o.type === "s-election" && o.documentId ? (
                   <Button asChild size="sm" variant="outline" className="rounded-full">
                     <a href={`/api/portal/documents/${o.documentId}/download`}>
@@ -454,6 +485,82 @@ export function ServicesCard() {
               onDone={() => { setDetailsFor(null); refresh(); queryClient.invalidateQueries({ queryKey: ["portal-documents"] }); }}
             />
           ) : null}
+        </DialogContent>
+      </Dialog>
+
+      {/* Consent + Series Exhibit for a series established after formation */}
+      <Dialog open={consentFor !== null} onOpenChange={(v) => { if (!v) { setConsentFor(null); setError(""); } }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Consent &amp; Series Exhibit</DialogTitle>
+            <DialogDescription>
+              Florida lets the company establish a protected series only with the consent of
+              <strong> all members</strong> (s. 605.2201(1)), and Section 3.1 of your agreement
+              requires it. The designation filed with the state is signed by the company, so
+              nothing on the public record shows the members agreed — this is the document that
+              does. It comes with the Series Exhibit your agreement requires adopted at or before
+              the filing.
+            </DialogDescription>
+          </DialogHeader>
+          <form
+            className="space-y-3"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const fd = new FormData(e.currentTarget);
+              makeConsent.mutate({
+                seriesName: String(fd.get("seriesName") ?? ""),
+                seriesNumber: String(fd.get("seriesNumber") ?? ""),
+                purpose: String(fd.get("purpose") ?? ""),
+                effectiveDate: String(fd.get("effectiveDate") ?? ""),
+              });
+            }}
+          >
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium">Protected series name</label>
+              <Input name="seriesName" defaultValue={consentFor?.details.seriesName ?? ""} required />
+              <p className="text-xs text-muted-foreground">Exactly as filed with the Department.</p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium">Exhibit identifier</label>
+                <Input
+                  name="seriesNumber"
+                  defaultValue={(consentFor?.details.seriesName ?? "").replace(/.*\bP\.?S\.?\s*/i, "").trim()}
+                  required
+                />
+                <p className="text-xs text-muted-foreground">Appears as “Series Exhibit PS-___”.</p>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium">Effective date</label>
+                <Input
+                  name="effectiveDate"
+                  type="date"
+                  defaultValue={new Date().toISOString().slice(0, 10)}
+                  required
+                />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium">Purpose of this series</label>
+              <Input
+                name="purpose"
+                defaultValue={consentFor?.details.purpose ?? ""}
+                placeholder="e.g. to acquire, own, and lease 101 Palm Street"
+              />
+              <p className="text-xs text-muted-foreground">
+                Leave blank for any lawful business.
+              </p>
+            </div>
+            {error ? <p className="text-xs text-destructive">{error}</p> : null}
+            <DialogFooter className="flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:justify-end">
+              <p className="text-xs text-muted-foreground sm:mr-auto">
+                Every member signs it; keep it with your company records.
+              </p>
+              <Button type="submit" disabled={makeConsent.isPending} className="rounded-full">
+                {makeConsent.isPending ? "Preparing…" : "Prepare the documents"}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
 
