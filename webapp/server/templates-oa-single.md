@@ -152,6 +152,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **5.7 Statement of Authority.** The Manager may cause the Company to file with the Department a statement of authority under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Manager, of any Protected Series Manager, or of any person holding a specified position, to transfer or encumber real property held in the name of the Company or of a Protected Series, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate.
 
+
 ---
 
 ## ARTICLE 6 — CAPITAL

@@ -167,6 +167,27 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
       s = replaceSectionBody(s, /\(c\) \*\[include only if Section 4\.7 Alternative A[\s\S]*?\]\*[\s\S]*?; \(d\)/, "(c) [Reserved.]; (d)", "11.1(c) reserve");
     }
 
+    // The Manager's parallel provision takes the SAME answer — the questionnaire
+    // asks once, and a delivered agreement must never carry both alternatives.
+    // Present only in the manager-managed masters that have a s. 4.7; the
+    // single-member master's s. 4.5 already covers the Member and the Manager.
+    const mgr = s.match(/\*\*(5\.\d+) Competition; Other Activities of the Manager\./);
+    if (mgr) {
+      const mA = s.match(/\*\*\[ \] Alternative A — Noncompetition\.\*\* Before the dissolution of the Company, the Manager([\s\S]*?)(?=\n\*\*\[ \] Alternative B)/);
+      const mB = s.match(/\*\*\[ \] Alternative B — Competition Permitted\.\*\* The Manager([\s\S]*?)(?=\n---|\n## ARTICLE 6)/);
+      if (!mA || !mB) throw new Error("OA template marker missing: manager competition alternatives");
+      const pick =
+        inputs.competition === "B"
+          ? `The Manager${mB[1]}`.replace(/\s*\*\(Retain the Alternative[^)]*\)\*/, "")
+          : `Before the dissolution of the Company, the Manager${mA[1]}`;
+      s = replaceSectionBody(
+        s,
+        new RegExp(`\\*\\*${mgr[1]} Competition; Other Activities of the Manager\\.[^\\n]*\\n[\\s\\S]*?(?=\\n---|\\n## ARTICLE 6)`),
+        `**${mgr[1]} Competition; Other Activities of the Manager.** ${pick.trim()}\n`,
+        "manager competition rebuild",
+      );
+    }
+
     // Shotgun
     if (!inputs.includeShotgun) {
       s = replaceSectionBody(s, /\*\*13\.2 Deadlock; Buy-Sell Election\.[^\n]*\*\*[\s\S]*?(?=\n---|\n## ARTICLE 14)/, "**13.2 Deadlock; Buy-Sell Election.** [Reserved.]\n\n", "13.2 omit");
