@@ -69,7 +69,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **2.8 "Member"** means the person identified as such on Exhibit A and any successor admitted in accordance with this Agreement.
 
-**2.9 "Membership Interest"** means the Member's entire interest in the Company, including the Member's interest in capital, profits, and distributions of the Company and of each Protected Series with which the Member is associated, and all rights of a member under the Act and this Agreement.
+**2.9 "Membership Interest"** means the Member's entire interest in the Company, including the Member's interest in capital, profits, and distributions of the Company, and all rights of a member under the Act and this Agreement.
 
 **2.10 "Protected Series"** or **"PS"** means a protected series of the Company established under s. 605.2201, Florida Statutes, and identified in a Series Exhibit.
 
@@ -250,9 +250,11 @@ From the effective date of any such election, and whether or not this Agreement 
 
 ## ARTICLE 11 — ADMISSION OF ADDITIONAL MEMBERS
 
-**11.1 Admission.** One or more additional members may be admitted to the Company, and any member may be associated with any Protected Series, only with the written consent of the Member and upon the admitted person's delivery of a signed agreement to be bound by this Agreement.
+**11.1 Admission.** One or more additional members may be admitted to the Company only with the written consent of the Member and upon the admitted person's delivery of a signed agreement to be bound by this Agreement.
 
-**11.2 Successor Agreement.** The parties acknowledge that this Agreement is drafted for a Company having a single member and intended disregarded-entity tax treatment. Prior to or promptly upon the admission of an additional member (or the association of any additional person with any Protected Series), the members shall amend and restate this Agreement in a form appropriate for multiple members — including provisions for percentages, capital accounts, allocations, and partnership tax administration — and until such amendment and restatement, the default provisions of the Act shall govern the matters this Agreement does not address for multiple members.
+**11.1A No Association with a Protected Series.** No member may be associated with a Protected Series. A Protected Series may not be established with, and may not admit, an Associated Member. Any amendment permitting Associated Members may cause each Protected Series to be treated as an entity separate from the Company for federal income tax purposes, with its own filing obligations, and may terminate any election the Company has made.
+
+**11.2 Successor Agreement.** The parties acknowledge that this Agreement is drafted for a Company having a single member and intended disregarded-entity tax treatment. Prior to or promptly upon the admission of an additional member, the members shall amend and restate this Agreement in a form appropriate for multiple members — including provisions for percentages, capital accounts, allocations, and partnership tax administration — and until such amendment and restatement, the default provisions of the Act shall govern the matters this Agreement does not address for multiple members.
 
 **11.3 Continuation on Termination of Last Member.** Upon the termination of the membership of the last remaining member, the Company shall not be dissolved, and the legal representative of the last remaining member shall agree in writing to continue the Company, and the representative (or an Immediate Family Member designated by the representative who is not a creditor of the last remaining member) shall be admitted as a member effective as of the terminating event, all as permitted by the Act.
 
