@@ -20,7 +20,7 @@ interface OaSeed {
   llcName: string;
   filingPath: string;
   managementStructure: string;
-  managerName: string;
+  managerNames: string[];
   principalAddress: string;
   members: { name: string; address: string }[];
   series: { name: string; purpose: string }[];

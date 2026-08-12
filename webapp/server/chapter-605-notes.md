@@ -335,6 +335,17 @@ penalty as unverified until the Department's schedule is checked.
 - **s. 605.0302(10)** — an effective statement of authority "is canceled by
   operation of law 5 years after" it or its most recent amendment became
   effective.
+- **s. 605.04074(2)(b)** — in a manager-managed company "each manager is an agent
+  of the limited liability company," and an ordinary-course act "binds the company
+  unless the manager had no authority to act for the company in the particular
+  matter and the person with whom the manager was dealing knew or had notice that
+  the manager lacked authority." A majority-of-managers rule in the operating
+  agreement is therefore effective among the members and managers, but does not by
+  itself defeat a third party who dealt without knowledge or notice — which is what
+  s. 5.1's final sentence says.
+- **s. 605.04074(2)(a)** — in a manager-managed company a member "is not an agent
+  of the limited liability company for the purpose of its business solely by reason
+  of being a member."
 - **s. 605.0301** — a person binds the company only through s. 605.04074 agency,
   the articles or operating agreement, a filed statement of authority, or other
   law.

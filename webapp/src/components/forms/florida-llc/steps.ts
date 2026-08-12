@@ -35,8 +35,10 @@ export const STEPS: { key: StepKey; label: string }[] = [
   { key: "agent", label: "Registered agent" },
   { key: "acceptance", label: "Agent acceptance" },
   { key: "management", label: "Management" },
-  { key: "managers", label: "Managers / AR" },
+  // Members before managers: the managers are almost always the members, so the
+  // managers step offers them by name rather than making the client retype one.
   { key: "members", label: "Members" },
+  { key: "managers", label: "Managers / AR" },
   { key: "purpose", label: "Purpose" },
   { key: "effective", label: "Effective date" },
   { key: "correspondence", label: "Correspondence" },

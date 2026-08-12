@@ -56,7 +56,8 @@ export interface OaInputs {
   version: "single" | "multi" | "s" | "member" | "member-s";
   companyName: string;
   principalAddress: string;
-  managerName: string;
+  /** Every person serving as Manager. s. 5.1 makes them act by majority. */
+  managerNames: string[];
   effectiveDate: string; // human format e.g. "August 5, 2026"
   amendedRestated: boolean;
   priorAgreementDate: string | null; // known prior generation date, else null
@@ -131,11 +132,38 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
   s = s.split("[COMPANY NAME]").join(co); // any stragglers
   s = replaceOnce(s, "effective as of [DATE] (the \"Effective Date\")", `effective as of ${inputs.effectiveDate} (the "Effective Date")`, "effective date");
   s = s.split("[PRINCIPAL ADDRESS]").join(inputs.principalAddress);
+  // Managers are almost always the members themselves, and there is often more
+  // than one of them. The appointment sentence and the signature block are built
+  // from the list; s. 5.1's majority rule then governs every later reference to
+  // "the Manager" without pluralising each one.
+  const managerNames = (inputs.managerNames ?? []).map((n) => n.trim()).filter(Boolean);
+  const managerList = managerNames.join(", ");
   // Member-managed masters name no Manager at all.
   if (!isMemberManaged) {
-    s = s.split("**[MANAGER NAME]**").join(`**${inputs.managerName}**`);
-    s = s.split("[MANAGER NAME], Manager").join(`${inputs.managerName}, Manager`);
-    s = s.split("[MANAGER NAME]").join(inputs.managerName);
+    if (managerNames.length === 0) throw new Error("OA: at least one manager is required");
+    const bold = managerNames.map((n) => `**${n}**`);
+    const joined =
+      bold.length === 1 ? bold[0] : `${bold.slice(0, -1).join(", ")} and ${bold[bold.length - 1]}`;
+    s = replaceOnce(
+      s,
+      "[MANAGER APPOINTMENT]",
+      managerNames.length === 1 ? `The initial Manager is ${joined}.` : `The initial Managers are ${joined}.`,
+      "manager appointment",
+    );
+    if (managerNames.length > 1) {
+      s = replaceOnce(
+        s,
+        "**ACKNOWLEDGED AND AGREED BY MANAGER:**",
+        "**ACKNOWLEDGED AND AGREED BY MANAGERS:**",
+        "manager signature heading",
+      );
+    }
+    s = replaceOnce(
+      s,
+      "[MANAGER SIGNATURE BLOCKS]",
+      managerNames.map((n) => `_____________________________\n${n}, Manager`).join("\n\n"),
+      "manager signature blocks",
+    );
   }
 
   // ---- multi-member options (every form but the single-member one) ----
@@ -274,7 +302,7 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
     ex = ex.replace(/\| Purpose of this Protected Series \|[^\n]*\|/, `| Purpose of this Protected Series | ${ser.purpose || "Any lawful business, purpose, or activity"} |`);
     // Member-managed Series Exhibits carry a fixed "Managed by" row instead.
     if (!isMemberManaged) {
-      ex = ex.replace(/\| Protected Series Manager \|[^\n]*\|/, `| Protected Series Manager | ${inputs.managerName} |`);
+      ex = ex.replace(/\| Protected Series Manager \|[^\n]*\|/, `| Protected Series Manager | ${managerList} |`);
     }
     ex = ex.replace(/\| Contributions to this Protected Series \|[^\n]*\|/, `| Contributions to this Protected Series | ${ser.contribution || "—"} |`);
     ex = ex.replace(/\| Special terms \(if any\) \|[^\n]*\|/, "| Special terms (if any) | None |");
@@ -292,8 +320,16 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
     // Member-managed Series Exhibits are adopted by all Members acting for the
     // Company; manager-managed ones by the Manager alone.
     ex = ex.replace(/_+\n\[MEMBER 1\], Member[\s\S]*?_+\n\[MEMBER 2\], Member/, adoptLines);
+    // One signature line per Manager, as in the Agreement's signature page.
+    const psManagerLines = managerNames
+      .map((n) => `${n}, Protected Series Manager`)
+      .join("\n\n_____________________________\n");
     ex = ex
-      .split("[NAME], Protected Series Manager").join(`${inputs.managerName}, Protected Series Manager`)
+      .replace(
+        "Adopted effective [DATE] by the Company, acting through its Manager:",
+        `Adopted effective [DATE] by the Company, acting through its ${managerNames.length > 1 ? "Managers" : "Manager"}:`,
+      )
+      .split("[NAME], Protected Series Manager").join(psManagerLines)
       .split("[NAME], Associated Member").join(adoptNames[0] ?? "")
       .split("effective [DATE]").join(`effective ${inputs.effectiveDate}`);
     let sched = ex2.section.replace(
@@ -336,6 +372,10 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
   if (/Form document —|v1 draft/.test(s)) {
     throw new Error("OA assembly leaked the internal draft footer into the client document");
   }
+
+  // The exhibit templates end with their own page break and the assembler adds
+  // one between exhibits, so a run of them would print a blank page.
+  s = s.replace(/(\[\[pagebreak\]\]\s*){2,}/g, "[[pagebreak]]\n\n");
 
   const seq = inputs.generationNumber ? ` (No. ${inputs.generationNumber})` : "";
   // The taxation designation leads the name: a client holding three PDFs should

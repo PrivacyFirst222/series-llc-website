@@ -103302,8 +103302,9 @@ function assembleNewSeries(input) {
   let s = templates_new_series_default;
   const purpose = input.purpose.trim() || "any lawful business, purpose, or activity for which the Company may be organized under the Act";
   const authority = input.memberManaged ? "The Members authorize the Administrative Member, or any Member the Members designate, to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement." : `The Members authorize the Manager to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.`;
-  const psManager = input.memberManaged ? "The Company, as protected-series manager (s. 605.2304(2), Fla. Stat.), acting through a Majority in Interest of the Members" : `${input.managerName || "[MANAGER NAME]"}, as Protected Series Manager`;
-  const psSignature = input.memberManaged ? `${input.memberNames[0] ?? "[MEMBER NAME]"}, Member, for the Company` : `${input.managerName || "[MANAGER NAME]"}, Manager`;
+  const managers = input.managerNames.map((n) => n.trim()).filter(Boolean);
+  const psManager = input.memberManaged ? "The Company, as protected-series manager (s. 605.2304(2), Fla. Stat.), acting through a Majority in Interest of the Members" : managers.join(", ") || "[MANAGER NAME]";
+  const psSignature = input.memberManaged ? `${input.memberNames[0] ?? "[MEMBER NAME]"}, Member, for the Company` : managers.length ? managers.map((n) => `${n}, Manager`).join("\n\n_____________________________\n") : "[MANAGER NAME], Manager";
   const blocks = input.memberNames.length ? input.memberNames.map((n) => `_____________________________
 ${n}`).join("\n\n") : "_____________________________\n[MEMBER NAME]";
   must(s, "[COMPANY NAME], LLC", "company name");
@@ -103510,7 +103511,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 ## ARTICLE 5 \u2014 MANAGEMENT
 
-**5.1 Manager-Managed; the Manager.** The Company is **manager-managed** as provided in its Articles of Organization and this Agreement. The initial Manager is **[MANAGER NAME]**. The Manager need not be a member. The Manager serves until resignation, removal by the Member, death, or incapacity; the Member may remove and replace the Manager, and shall fill any vacancy, by a signed writing delivered to the Company.
+**5.1 Manager-Managed; the Manager.** The Company is **manager-managed** as provided in its Articles of Organization and this Agreement. [MANAGER APPOINTMENT] If more than one person is serving as Manager, every act, approval, consent, decision, or determination of the Manager under this Agreement requires the approval of a majority of the Managers then serving, and no Manager acting alone has actual authority to act for the Company or for any Protected Series. Anything required to be delivered to the Manager may be delivered to any Manager, and a covenant, restriction, or standard of conduct stated in this Agreement as applying to the Manager applies to each Manager individually. This Section governs among the Members and the Managers; it does not affect the agency rights of a Manager under s. 605.04074(2)(b), Florida Statutes, as to a person who dealt with the Manager without knowledge or notice that the Manager lacked authority. A Manager need not be a member. A Manager serves until that Manager's resignation, removal by the Member, death, or incapacity; the Member may remove and replace a Manager, appoint an additional Manager, and shall fill any vacancy, by a signed writing delivered to the Company.
 
 **5.2 Management of Each Protected Series.** Each Protected Series is **manager-managed**. The Series Exhibit for a Protected Series may name one or more Protected Series Managers of that Protected Series. If it names none, each person then serving as a Manager of the Company is a Protected Series Manager of that Protected Series. As permitted by s. 605.2107(1)(n), Florida Statutes, this Section varies s. 605.2304(2) so that the Protected Series Managers are the Manager or Managers of the Company rather than the Company itself. A Protected Series Manager has, with respect to its Protected Series, the rights, powers, and duties that a manager of a manager-managed limited liability company has under the Act, subject to this Agreement and the Series Exhibit.
 
@@ -103690,8 +103691,7 @@ _____________________________
 
 **ACKNOWLEDGED AND AGREED BY MANAGER:**
 
-_____________________________
-[MANAGER NAME], Manager
+[MANAGER SIGNATURE BLOCKS]
 
 [[pagebreak]]
 
@@ -103913,7 +103913,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 ## ARTICLE 5 \u2014 MANAGEMENT
 
-**5.1 Manager-Managed; the Manager.** The Company is **manager-managed** as provided in its Articles of Organization and this Agreement. The initial Manager is **[MANAGER NAME]**. The Manager need not be a Member. The Manager serves until resignation, removal, death, or incapacity. The Manager may be removed, with or without cause, and any successor Manager shall be appointed, by a Majority in Interest, evidenced by a signed writing delivered to the Company.
+**5.1 Manager-Managed; the Manager.** The Company is **manager-managed** as provided in its Articles of Organization and this Agreement. [MANAGER APPOINTMENT] If more than one person is serving as Manager, every act, approval, consent, decision, or determination of the Manager under this Agreement requires the approval of a majority of the Managers then serving, and no Manager acting alone has actual authority to act for the Company or for any Protected Series. Anything required to be delivered to the Manager may be delivered to any Manager, and a covenant, restriction, or standard of conduct stated in this Agreement as applying to the Manager applies to each Manager individually. This Section governs among the Members and the Managers; it does not affect the agency rights of a Manager under s. 605.04074(2)(b), Florida Statutes, as to a person who dealt with the Manager without knowledge or notice that the Manager lacked authority. A Manager need not be a Member. A Manager serves until that Manager's resignation, removal, death, or incapacity. A Manager may be removed, with or without cause, and a successor or additional Manager may be appointed, by a Majority in Interest, evidenced by a signed writing delivered to the Company.
 
 **5.2 Management of Each Protected Series.** Each Protected Series is **manager-managed**. The Series Exhibit for a Protected Series may name one or more Protected Series Managers of that Protected Series. If it names none, each person then serving as a Manager of the Company is a Protected Series Manager of that Protected Series. As permitted by s. 605.2107(1)(n), Florida Statutes, this Section varies s. 605.2304(2) so that the Protected Series Managers are the Manager or Managers of the Company rather than the Company itself. A Protected Series Manager has, with respect to its Protected Series, the rights, powers, and duties that a manager of a manager-managed limited liability company has under the Act, subject to this Agreement and the Series Exhibit, and may be removed and replaced with respect to that Protected Series by a Majority in Interest of the Members.
 
@@ -104163,8 +104163,7 @@ _____________________________
 
 **ACKNOWLEDGED AND AGREED BY MANAGER:**
 
-_____________________________
-[MANAGER NAME], Manager
+[MANAGER SIGNATURE BLOCKS]
 
 [[pagebreak]]
 
@@ -104391,7 +104390,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 ## ARTICLE 5 \u2014 MANAGEMENT
 
-**5.1 Manager-Managed; the Manager.** The Company is **manager-managed** as provided in its Articles of Organization and this Agreement. The initial Manager is **[MANAGER NAME]**. The Manager need not be a Member. The Manager serves until resignation, removal, death, or incapacity. The Manager may be removed, with or without cause, and any successor Manager shall be appointed, by a Majority in Interest, evidenced by a signed writing delivered to the Company.
+**5.1 Manager-Managed; the Manager.** The Company is **manager-managed** as provided in its Articles of Organization and this Agreement. [MANAGER APPOINTMENT] If more than one person is serving as Manager, every act, approval, consent, decision, or determination of the Manager under this Agreement requires the approval of a majority of the Managers then serving, and no Manager acting alone has actual authority to act for the Company or for any Protected Series. Anything required to be delivered to the Manager may be delivered to any Manager, and a covenant, restriction, or standard of conduct stated in this Agreement as applying to the Manager applies to each Manager individually. This Section governs among the Members and the Managers; it does not affect the agency rights of a Manager under s. 605.04074(2)(b), Florida Statutes, as to a person who dealt with the Manager without knowledge or notice that the Manager lacked authority. A Manager need not be a Member. A Manager serves until that Manager's resignation, removal, death, or incapacity. A Manager may be removed, with or without cause, and a successor or additional Manager may be appointed, by a Majority in Interest, evidenced by a signed writing delivered to the Company.
 
 **5.2 Management of Each Protected Series.** Each Protected Series is **manager-managed**. The Series Exhibit for a Protected Series may name one or more Protected Series Managers of that Protected Series. If it names none, each person then serving as a Manager of the Company is a Protected Series Manager of that Protected Series. As permitted by s. 605.2107(1)(n), Florida Statutes, this Section varies s. 605.2304(2) so that the Protected Series Managers are the Manager or Managers of the Company rather than the Company itself. A Protected Series Manager has, with respect to its Protected Series, the rights, powers, and duties that a manager of a manager-managed limited liability company has under the Act, subject to this Agreement and the Series Exhibit, and may be removed and replaced with respect to that Protected Series by a Majority in Interest of the Members.
 
@@ -104653,8 +104652,7 @@ _____________________________
 
 **ACKNOWLEDGED AND AGREED BY MANAGER:**
 
-_____________________________
-[MANAGER NAME], Manager
+[MANAGER SIGNATURE BLOCKS]
 
 [[pagebreak]]
 
@@ -105743,10 +105741,33 @@ function assembleOa(inputs) {
   s = s.split("[COMPANY NAME]").join(co);
   s = replaceOnce(s, 'effective as of [DATE] (the "Effective Date")', `effective as of ${inputs.effectiveDate} (the "Effective Date")`, "effective date");
   s = s.split("[PRINCIPAL ADDRESS]").join(inputs.principalAddress);
+  const managerNames = (inputs.managerNames ?? []).map((n) => n.trim()).filter(Boolean);
+  const managerList = managerNames.join(", ");
   if (!isMemberManaged) {
-    s = s.split("**[MANAGER NAME]**").join(`**${inputs.managerName}**`);
-    s = s.split("[MANAGER NAME], Manager").join(`${inputs.managerName}, Manager`);
-    s = s.split("[MANAGER NAME]").join(inputs.managerName);
+    if (managerNames.length === 0) throw new Error("OA: at least one manager is required");
+    const bold = managerNames.map((n) => `**${n}**`);
+    const joined = bold.length === 1 ? bold[0] : `${bold.slice(0, -1).join(", ")} and ${bold[bold.length - 1]}`;
+    s = replaceOnce(
+      s,
+      "[MANAGER APPOINTMENT]",
+      managerNames.length === 1 ? `The initial Manager is ${joined}.` : `The initial Managers are ${joined}.`,
+      "manager appointment"
+    );
+    if (managerNames.length > 1) {
+      s = replaceOnce(
+        s,
+        "**ACKNOWLEDGED AND AGREED BY MANAGER:**",
+        "**ACKNOWLEDGED AND AGREED BY MANAGERS:**",
+        "manager signature heading"
+      );
+    }
+    s = replaceOnce(
+      s,
+      "[MANAGER SIGNATURE BLOCKS]",
+      managerNames.map((n) => `_____________________________
+${n}, Manager`).join("\n\n"),
+      "manager signature blocks"
+    );
   }
   if (isMulti) {
     must2(s, "$[THRESHOLD]", "threshold");
@@ -105861,7 +105882,7 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
 **${ser.name}**`);
     ex = ex.replace(/\| Purpose of this Protected Series \|[^\n]*\|/, `| Purpose of this Protected Series | ${ser.purpose || "Any lawful business, purpose, or activity"} |`);
     if (!isMemberManaged) {
-      ex = ex.replace(/\| Protected Series Manager \|[^\n]*\|/, `| Protected Series Manager | ${inputs.managerName} |`);
+      ex = ex.replace(/\| Protected Series Manager \|[^\n]*\|/, `| Protected Series Manager | ${managerList} |`);
     }
     ex = ex.replace(/\| Contributions to this Protected Series \|[^\n]*\|/, `| Contributions to this Protected Series | ${ser.contribution || "\u2014"} |`);
     ex = ex.replace(/\| Special terms \(if any\) \|[^\n]*\|/, "| Special terms (if any) | None |");
@@ -105874,7 +105895,11 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
     const adoptNames = inputs.members.flatMap((m2) => m2.signatories ?? [m2.name]);
     const adoptLines = signatureBlock(adoptSource, ", Member");
     ex = ex.replace(/_+\n\[MEMBER 1\], Member[\s\S]*?_+\n\[MEMBER 2\], Member/, adoptLines);
-    ex = ex.split("[NAME], Protected Series Manager").join(`${inputs.managerName}, Protected Series Manager`).split("[NAME], Associated Member").join(adoptNames[0] ?? "").split("effective [DATE]").join(`effective ${inputs.effectiveDate}`);
+    const psManagerLines = managerNames.map((n2) => `${n2}, Protected Series Manager`).join("\n\n_____________________________\n");
+    ex = ex.replace(
+      "Adopted effective [DATE] by the Company, acting through its Manager:",
+      `Adopted effective [DATE] by the Company, acting through its ${managerNames.length > 1 ? "Managers" : "Manager"}:`
+    ).split("[NAME], Protected Series Manager").join(psManagerLines).split("[NAME], Associated Member").join(adoptNames[0] ?? "").split("effective [DATE]").join(`effective ${inputs.effectiveDate}`);
     let sched = ex2.section.replace(
       "## ASSET SCHEDULE \u2014 ATTACHMENT TO SERIES EXHIBIT PS-[N]",
       `## ASSET SCHEDULE \u2014 ATTACHMENT TO SERIES EXHIBIT ${n} (${ser.name})`
@@ -105904,6 +105929,7 @@ ${sigLines}
   if (/Form document —|v1 draft/.test(s)) {
     throw new Error("OA assembly leaked the internal draft footer into the client document");
   }
+  s = s.replace(/(\[\[pagebreak\]\]\s*){2,}/g, "[[pagebreak]]\n\n");
   const seq = inputs.generationNumber ? ` (No. ${inputs.generationNumber})` : "";
   const tax = taxationLabel(inputs.version);
   return {
@@ -106908,9 +106934,9 @@ async function oaSeed(clientId) {
     name: m2.fullLegalName ?? "",
     address: [m2.address1, m2.address2, [m2.city, m2.state].filter(Boolean).join(", "), m2.zip].filter((x2) => x2 && String(x2).trim()).join(", ")
   }));
-  const mgr = p2.management?.managersOrAuthorizedRepresentatives?.[0];
   const managementStructure = p2.management?.structure ?? "";
-  const managerName = (mgr?.fullName || mgr?.businessEntityName || "").trim() || (members[0]?.name ?? "");
+  const managerNames = (p2.management?.managersOrAuthorizedRepresentatives ?? []).filter((e) => (e.role ?? "MGR") === "MGR").map((e) => (e.fullName || e.businessEntityName || "").trim()).filter(Boolean);
+  if (managerNames.length === 0 && members[0]?.name) managerNames.push(members[0].name);
   const svcSeries = await db2.query(
     "SELECT details FROM service_orders WHERE client_id = $1 AND type = 'series' AND status IN ('in_progress','fulfilled')",
     [clientId]
@@ -106926,7 +106952,7 @@ async function oaSeed(clientId) {
     llcName: p2.llcName?.finalName || orders[0].llc_name,
     filingPath: p2.filingPath ?? "NEW",
     managementStructure,
-    managerName,
+    managerNames,
     principalAddress,
     members,
     series
@@ -107159,7 +107185,7 @@ app.post("/portal/oa/generate", async (c) => {
     version,
     companyName: seed.llcName,
     principalAddress: seed.principalAddress,
-    managerName: seed.managerName,
+    managerNames: seed.managerNames,
     effectiveDate: fmtDate2(a2.effectiveDate),
     amendedRestated: a2.firstOrAmended === "amended",
     priorAgreementDate: priorDate,
@@ -107258,7 +107284,7 @@ app.post("/portal/series/consent", async (c) => {
       purpose: body.data.purpose,
       effectiveDate: fmtDate2(body.data.effectiveDate),
       memberNames: seed.members.map((m2) => m2.name),
-      managerName: seed.managerName,
+      managerNames: seed.managerNames,
       memberManaged
     });
     title = assembled.title;

@@ -645,7 +645,10 @@ interface SeedPayload {
   filingPath?: string;
   llcName?: { finalName?: string; desiredName?: string };
   principalOfficeAddress?: { address1?: string; address2?: string; city?: string; state?: string; zip?: string };
-  management?: { structure?: string; managersOrAuthorizedRepresentatives?: { fullName?: string; businessEntityName?: string }[] };
+  management?: {
+    structure?: string;
+    managersOrAuthorizedRepresentatives?: { role?: string; fullName?: string; businessEntityName?: string }[];
+  };
   members?: { memberList?: { fullLegalName?: string; address1?: string; address2?: string; city?: string; state?: string; zip?: string }[] };
   series?: { id: string; name: string }[];
 }
@@ -654,7 +657,7 @@ async function oaSeed(clientId: string): Promise<{
   llcName: string;
   filingPath: string;
   managementStructure: string;
-  managerName: string;
+  managerNames: string[];
   principalAddress: string;
   members: { name: string; address: string }[];
   series: { name: string; purpose: string }[];
@@ -676,11 +679,16 @@ async function oaSeed(clientId: string): Promise<{
       .filter((x) => x && String(x).trim())
       .join(", "),
   }));
-  const mgr = p.management?.managersOrAuthorizedRepresentatives?.[0];
   const managementStructure = p.management?.structure ?? "";
-  const managerName =
-    (mgr?.fullName || mgr?.businessEntityName || "").trim() ||
-    (members[0]?.name ?? "");
+  // Every MGR entry becomes a Manager. Authorized representatives sign the
+  // Articles and manage nothing, so a listed AR must never be named Manager —
+  // and the list is not ordered, so taking the first entry named whoever the
+  // client happened to type first.
+  const managerNames = (p.management?.managersOrAuthorizedRepresentatives ?? [])
+    .filter((e) => (e.role ?? "MGR") === "MGR")
+    .map((e) => (e.fullName || e.businessEntityName || "").trim())
+    .filter(Boolean);
+  if (managerNames.length === 0 && members[0]?.name) managerNames.push(members[0].name);
   // Series = intake series + any fulfilled portal series orders
   const svcSeries = await db.query<{ details: unknown }>(
     "SELECT details FROM service_orders WHERE client_id = $1 AND type = 'series' AND status IN ('in_progress','fulfilled')",
@@ -697,7 +705,7 @@ async function oaSeed(clientId: string): Promise<{
     llcName: p.llcName?.finalName || orders[0].llc_name,
     filingPath: p.filingPath ?? "NEW",
     managementStructure,
-    managerName,
+    managerNames,
     principalAddress,
     members,
     series,
@@ -988,7 +996,7 @@ app.post("/portal/oa/generate", async (c) => {
     version,
     companyName: seed.llcName,
     principalAddress: seed.principalAddress,
-    managerName: seed.managerName,
+    managerNames: seed.managerNames,
     effectiveDate: fmtDate(a.effectiveDate),
     amendedRestated: a.firstOrAmended === "amended",
     priorAgreementDate: priorDate,
@@ -1103,7 +1111,7 @@ app.post("/portal/series/consent", async (c) => {
       purpose: body.data.purpose,
       effectiveDate: fmtDate(body.data.effectiveDate),
       memberNames: seed.members.map((m) => m.name),
-      managerName: seed.managerName,
+      managerNames: seed.managerNames,
       memberManaged,
     });
     title = assembled.title;

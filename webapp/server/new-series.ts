@@ -31,7 +31,8 @@ export interface NewSeriesInput {
   /** Human format, e.g. "August 11, 2026". */
   effectiveDate: string;
   memberNames: string[];
-  managerName: string;
+  /** Every person serving as Manager; s. 5.1 makes them act by majority. */
+  managerNames: string[];
   memberManaged: boolean;
 }
 
@@ -49,12 +50,19 @@ export function assembleNewSeries(input: NewSeriesInput): { markdown: string; ti
   const authority = input.memberManaged
     ? "The Members authorize the Administrative Member, or any Member the Members designate, to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement."
     : `The Members authorize the Manager to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.`;
+  const managers = input.managerNames.map((n) => n.trim()).filter(Boolean);
+  // The table row is already labelled "Protected Series Manager"; it takes the
+  // names alone. The member-managed row states who acts, because the statutory
+  // protected-series manager there is the Company itself.
   const psManager = input.memberManaged
     ? "The Company, as protected-series manager (s. 605.2304(2), Fla. Stat.), acting through a Majority in Interest of the Members"
-    : `${input.managerName || "[MANAGER NAME]"}, as Protected Series Manager`;
+    : managers.join(", ") || "[MANAGER NAME]";
+  // Manager-managed: one signature line per Manager, matching the Agreement.
   const psSignature = input.memberManaged
     ? `${input.memberNames[0] ?? "[MEMBER NAME]"}, Member, for the Company`
-    : `${input.managerName || "[MANAGER NAME]"}, Manager`;
+    : managers.length
+      ? managers.map((n) => `${n}, Manager`).join("\n\n_____________________________\n")
+      : "[MANAGER NAME], Manager";
 
   const blocks = input.memberNames.length
     ? input.memberNames.map((n) => `_____________________________\n${n}`).join("\n\n")
