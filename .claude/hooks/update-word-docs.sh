@@ -71,16 +71,32 @@ if ! python3 "$CHECK" "$STAGE"/*.docx; then
   exit 1
 fi
 
+# The repository is the deliverable; Dropbox is a convenience copy. Write every
+# document to the repo FIRST and as a complete set, so a problem reaching Dropbox
+# can never leave docs/word/ half old and half new. That happened once: macOS
+# denied access to the Dropbox folder mid-loop, set -e aborted, and one of seven
+# documents had been replaced.
 for entry in "${DOCS[@]}"; do
   name="${entry##*|}"
   cp "$STAGE/$name" "$OUT_REPO/$name"
-  if [ -d "$OUT_DROPBOX" ]; then
-    cp "$STAGE/$name" "$OUT_DROPBOX/$name"
-  fi
 done
+echo "regenerated $count Word documents -> docs/word/"
 
+# Dropbox second, and never fatal. -d is not enough: under a macOS privacy denial
+# the directory tests as present and every write fails.
 if [ -d "$OUT_DROPBOX" ]; then
-  echo "regenerated $count Word documents -> docs/word/ and Dropbox"
+  failed=0
+  for entry in "${DOCS[@]}"; do
+    name="${entry##*|}"
+    cp "$STAGE/$name" "$OUT_DROPBOX/$name" 2>/dev/null || failed=$((failed + 1))
+  done
+  if [ "$failed" -eq 0 ]; then
+    echo "copied $count Word documents -> Dropbox"
+  else
+    echo "DROPBOX NOT UPDATED: $failed of $count could not be written." >&2
+    echo "  docs/word/ is complete and current; only the Dropbox copies are stale." >&2
+    echo "  Usually macOS privacy: grant the terminal access to the Dropbox folder." >&2
+  fi
 else
-  echo "regenerated $count Word documents -> docs/word/ (Dropbox not mounted)"
+  echo "Dropbox folder not present — docs/word/ only"
 fi

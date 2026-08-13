@@ -83,7 +83,6 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **2.16 "Series Exhibit"** means, for each Protected Series, the exhibit to this Agreement (each numbered PS-1, PS-2, and so on) setting forth the terms specific to that Protected Series, including its purpose, its capital, and its Associated Assets. Each Series Exhibit is a part of this Agreement.
 
-
 **2.17 "Transfer"** means any assignment, transfer, conveyance, devise, gift, pledge, hypothecation, encumbrance, or other disposition, direct or indirect, voluntary or involuntary, in trust or otherwise, and as a verb has a corresponding meaning.
 
 ---
@@ -120,7 +119,6 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 (a) **Ownership.** The Company owns all of the protected-series transferable interests of each Protected Series, as provided in s. 605.2303(1)-(3), Florida Statutes. Every distribution made by a Protected Series is made to the Company.
 
-
 (b) **Transferee provisions inapplicable to the Company.** Section 605.2303(4), Florida Statutes, applies to the Company, in its capacity as owner of a protected-series transferable interest, any provision of this Agreement that applies to a protected-series transferee. No provision of this Agreement restricting the rights of a transferee applies to the Company in that capacity, and nothing in this Agreement limits the Company's rights to manage, direct, receive distributions from, or obtain the records and information of any Protected Series.
 
 ---
@@ -148,7 +146,6 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 **4.8 Confidentiality.** Each Member shall hold in confidence, and shall not disclose or use other than for purposes of the Company or the applicable Protected Series, all confidential information of the Company and of each Protected Series, including financial records, customer and tenant information, contracts, and the contents of the records maintained under Article 8, except for disclosures required by law or made to the Member's professional advisors who are bound to confidentiality.
 
 **4.9 Non-Disparagement; No Interference.** No Member shall hinder or delay the activities and affairs of the Company or of any Protected Series, or slander, defame, or otherwise tarnish the reputation of the Company or of any Protected Series.
-
 
 **4.10 Information Rights.** Each Member has the information and inspection rights provided by the Act with respect to the Company. The records of the Company that each Member may inspect include the records maintained under Article 8 for every Protected Series.
 
@@ -189,7 +186,6 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 **5.7 Compensation; Reimbursement; Shared Expenses.** The Manager shall serve without salary unless a Majority in Interest consents in writing to compensation. The Manager and each Protected Series Manager shall be reimbursed for reasonable expenses properly incurred on behalf of the Company or the applicable Protected Series. Costs and expenses that benefit the Company and one or more Protected Series (including formation and filing fees, registered agent fees, accounting, insurance, and administrative overhead) shall be allocated among the Company and the Protected Series benefited on a reasonable and consistent basis determined by the Manager — by specific attribution where practicable and otherwise pro rata or by such other reasonable formula as the Manager adopts — and the allocation shall be recorded in the records maintained under Article 8.
 
 **5.8 Statement of Authority.** The Manager may cause the Company to file with the Department a statement of authority under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Manager, of any Protected Series Manager, or of any person holding a specified position, to transfer or encumber real property held in the name of the Company or of a Protected Series, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate.
-
 
 **5.9 Competition; Other Activities of the Manager. [SELECT THE SAME ALTERNATIVE AS SECTION 4.7]**
 
@@ -247,21 +243,13 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **8.4 Inter-Series Transfers.** Any Inter-Series Transfer (as defined in Section 5.4(b)) requires the approvals stated in Section 5.4(b) and shall be documented contemporaneously by a written record stating (a) the asset transferred, (b) the transferor and transferee (the Company or the specific Protected Series), (c) the date, and (d) the consideration paid, the payor, and the payee. Inter-Series Transfers shall be made for fair value unless the transfer is a documented contribution or distribution.
 
-**8.5 Real Property.** A properly recorded instrument naming the acquiring or conveying Protected Series (by its full statutory name) or the Company, as applicable, serves as an association record and is conclusive of the signer's authority in favor of a person giving value without knowledge of a lack of authority (ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes). Where an interest in real property is held through a representative, nominee, or similar arrangement as permitted by s. 605.2301(5), Florida Statutes, the arrangement shall be documented under Section 8.5A, and the association of the interest shall be established by those records.
+**8.5 Real Property.** A properly recorded instrument naming the acquiring or conveying Protected Series (by its full statutory name) or the Company, as applicable, serves as an association record and is conclusive of the signer's authority in favor of a person giving value without knowledge of a lack of authority (ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes). Where an interest in real property is held through a representative, nominee, or similar arrangement as permitted by s. 605.2301(5), Florida Statutes, the arrangement shall be documented under Section 8.6, and the association of the interest shall be established by those records.
 
-**8.5A Holding Associated Assets.** An Associated Asset may be held directly, or indirectly through a representative, nominee, or similar arrangement, as permitted by s. 605.2301(5), Florida Statutes. Any such indirect arrangement shall be documented in the records maintained under this Article, identifying the holder, the Protected Series or the Company for which the asset is held, and the date the arrangement began. No property of the Company or of any Protected Series shall be held in the individual name of any Member or the Manager other than under an arrangement documented under this Section.
+**8.6 Holding Associated Assets.** An Associated Asset may be held directly, or indirectly through a representative, nominee, or similar arrangement, as permitted by s. 605.2301(5), Florida Statutes. Any such indirect arrangement shall be documented in the records maintained under this Article, identifying the holder, the Protected Series or the Company for which the asset is held, and the date the arrangement began. No property of the Company or of any Protected Series shall be held in the individual name of any Member or the Manager other than under an arrangement documented under this Section.
 
-**The following are prohibited and may not be varied:** a Protected Series may not hold an Associated Asset in the name of the Company or of another Protected Series, and the Company may not hold an Associated Asset in the name of a Protected Series (s. 605.2301(5)(a)-(b), Florida Statutes).
+**8.7 Exclusive Means of Moving Value.** Value may be moved between the Company and any Protected Series, or between Protected Series, only by an Inter-Series Transfer, a contribution, or a distribution, in each case approved as this Agreement requires and documented under this Article at the time it occurs.
 
-**8.6 Contracts and Liabilities.** Each contract, account, loan, or other obligation shall be entered into in the name of, and shall identify, the Company or the specific Protected Series incurring it, and shall be recorded as an Associated Liability of the person incurring it.
-
-**8.7 Financial Records; Inspection.** Separate books of account shall be maintained for the Company and for each Protected Series, showing income, expenses, assets, liabilities, contributions, and distributions of each. The Company shall maintain at its principal office the records required by s. 605.0410(1), Florida Statutes, including its federal, state, and local income tax returns and reports for the three most recent years and its financial statements for the three most recent years, and shall maintain the corresponding tax and financial records of each Protected Series with the records of that Protected Series. Members' inspection rights are as stated in Section 4.10.
-
-**8.7A Exclusive Means of Moving Value.** Value may be moved between the Company and any Protected Series, or between Protected Series, only by an Inter-Series Transfer, a contribution, or a distribution, in each case approved as this Agreement requires and documented under this Article at the time it occurs. No other transfer, allocation, offset, netting, or informal accommodation between the Company and a Protected Series, or between Protected Series, is permitted, and any such act shall be documented and corrected under Section 8.9(d) upon discovery.
-
-**8.8 Annual Review.** At least annually, the Manager shall review the records maintained under this Article for compliance with s. 605.2301, Florida Statutes, and shall correct any deficiency promptly upon discovery. Upon completing the review, the Manager shall sign and retain with the records a short certification stating the date of the review, the period covered, that the records of the Company and of each Protected Series were reviewed, and any deficiency found and the correction made. Each certification shall be retained for so long as the Company exists.
-
-**8.9 Standing Association Rules; Savings Provisions.**
+**8.8 Standing Association Rules; Savings Provisions.**
 
 (a) **Records.** This Agreement, each Series Exhibit, each asset schedule, and the account, titling, and transaction records maintained under this Article are records within the meaning of s. 605.2301, Florida Statutes, and may be read together, in combination, to satisfy its requirements.
 
