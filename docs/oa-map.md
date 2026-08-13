@@ -21,12 +21,12 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 |---|---|---|---|---|---|---|---|---|
 | mbr mbs mul scp sgl | 1.1 | Definitions | ae42c9cb | definition | — | members manager | — | drafting convention |
 | mbr mbs mul scp sgl | 1.2 | Formation; Status as Protected Series LLC | 4e8d1156 | statutory-route | company | members | — | s. 605.2201 |
-| mul scp sgl | 1.3 | Name; Names of Protected Series | f4b3f323 | covenant | company | nobody | Their own agreement required the series name to comply with s. 605.2202; this series' name does not, so the series was never validly established. | s. 605.2202 (non-variable, s. 605.2107(1)(j)) |
-| mbr mbs | 1.3 | Name; Names of Protected Series | f3e35a02 | covenant | company | nobody | Their own agreement required the series name to comply with s. 605.2202; this series' name does not, so the series was never validly established. | s. 605.2202 (non-variable, s. 605.2107(1)(j)) |
+| mul scp sgl | 1.3 | Name; Names of Protected Series | f145a65b | covenant | manager | members | The company changed its name and never conformed the series names, so the series were not maintained. | s. 605.2202; the compliance recital was cut 2026-08-13 — non-variable under s. 605.2107(1)(j), so restating it only supplied a yardstick |
+| mbr mbs | 1.3 | Name; Names of Protected Series | 4b9d47d5 | covenant | manager | members | The company changed its name and never conformed the series names, so the series were not maintained. | s. 605.2202; the compliance recital was cut 2026-08-13 — non-variable under s. 605.2107(1)(j), so restating it only supplied a yardstick |
 | mbr mbs mul scp sgl | 1.4 | Purposes and Powers | 493808f8 | benefit | company | members | — | s. 605.0108 |
 | mul scp sgl | 1.5 | Principal Office | c4203c65 | mechanic | company | members | — | s. 605.0113 |
 | mbr mbs | 1.5 | Principal Office | de02adc7 | mechanic | company | members | — | s. 605.0113 |
-| mbr mbs mul scp sgl | 1.6 | Registered Agent and Registered Office | e86e55ec | covenant | company | nobody | The company failed to keep a registered agent for a series, so the series was not maintained. | s. 605.0113(6) |
+| mbr mbs mul scp sgl | 1.6 | Registered Agent and Registered Office | e86e55ec | statutory-route | — | members third-party | — | s. 605.0113(6); kept by Adam 2026-08-13 — it tells a process server where to serve a series |
 | mbr mbs mul scp sgl | 1.7 | Term | 4ed8bc66 | mechanic | company | members | — | s. 605.0108(3) |
 | mul scp sgl | 1.8 | Location of Records | 34bea4c4 | covenant | manager | members | The records were not kept where the agreement says, so they were not maintained. | s. 605.0410(1) |
 | mbr mbs | 1.8 | Location of Records | 79554fa8 | covenant | manager | members | The records were not kept where the agreement says, so they were not maintained. | s. 605.0410(1) |
@@ -34,11 +34,8 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbr mbs | 1.9 | Filings | d789508c | covenant | manager | members | The manager did not file what the agreement required, so the series lacks the standing it claims. | s. 605.2201 |
 | mbr mbs mul scp sgl | 1.10 | How Assets Are Associated | de49f23e | statutory-route | — | members | — | s. 605.2301 |
 | sgl | 1.10A | Membership Interest | fc8c6106 | definition | — | members | — | s. 605.0102(41) |
-| sgl | 1.11 | Waiver of Partition Rights | 34fb8a3f | benefit | members | company members | — | common law |
-| mbr mbs mul scp | 1.11 | Waiver of Partition Rights | fbaf34a2 | benefit | members | company members | — | common law |
-| sgl | 1.12 | No Payments of Individual Obligations | 0f5edd2d | covenant | members manager | nobody | Company property was used for a member's personal obligation in breach of their own agreement — the silos were never respected. | none; drafting convention |
-| mul scp | 1.12 | No Payments of Individual Obligations | 3af9b66f | covenant | members manager | nobody | Company property was used for a member's personal obligation in breach of their own agreement — the silos were never respected. | none; drafting convention |
-| mbr mbs | 1.12 | No Payments of Individual Obligations | 861462da | covenant | members manager | nobody | Company property was used for a member's personal obligation in breach of their own agreement — the silos were never respected. | none; drafting convention |
+| sgl | 1.11 | Waiver of Partition Rights | 72b01d2e | benefit | members | company members | — | common law |
+| mbr mbs mul scp | 1.11 | Waiver of Partition Rights | e24cf863 | benefit | members | company members | — | common law |
 | mbr mbs mul scp sgl | 2.1 | "Act" | 1f5154e3 | definition | — | members manager | — | ch. 605 |
 | mbr mbs mul scp sgl | 2.2 | "Associated Asset" | 6bc88113 | definition | — | members | — | s. 605.2102(2) |
 | mbr mbs mul scp sgl | 2.3 | "Associated Liability" | c6835881 | definition | — | members | — | no statutory definition; ours |
@@ -114,11 +111,11 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mul scp | 5.3 | Authority of the Manager | e6c44bc9 | authority | manager | members manager | — | s. 605.04073(2) |
 | mbr mbs | 5.3 | Voting; Decisions | 0b631d8f | authority | members | members | — | s. 605.04073 |
 | sgl | 5.4 | Standard of Conduct; Exculpation | 6d0bcc00 | benefit | manager members | manager members | — | ss. 605.04091, 605.0105(3) |
-| mul scp | 5.4 | Actions Requiring Member Approval | a3f2dfd6 | authority | manager | members | — | s. 605.04073(2)(d) |
+| mul scp | 5.4 | Actions Requiring Member Approval | a3095fdd | authority | manager | members | — | s. 605.04073(2)(d) |
 | mbr mbs | 5.4 | Authority to Act; Limits on Authority | be68b5c7 | authority | members | members | — | s. 605.04074(1) |
 | sgl | 5.5 | Indemnification | 5fba8bac | benefit | company series | manager members | — | s. 605.0408 |
 | mul scp | 5.5 | Standard of Conduct; Exculpation | f9ea0bce | benefit | manager members | manager members | — | ss. 605.04091, 605.0105(3) |
-| mbr mbs | 5.5 | Actions Requiring Member Approval | f492cc76 | authority | manager | members | — | s. 605.04073(2)(d) |
+| mbr mbs | 5.5 | Actions Requiring Member Approval | 4974640a | authority | manager | members | — | s. 605.04073(2)(d) |
 | sgl | 5.6 | Compensation; Reimbursement; Shared Expenses | a0c4af21 | benefit | company | manager members | — | s. 605.04091(1) |
 | mul scp | 5.6 | Indemnification | 5fba8bac | benefit | company series | manager members | — | s. 605.0408 |
 | mbr mbs | 5.6 | Standard of Conduct; Exculpation | c60198a0 | benefit | manager members | manager members | — | ss. 605.04091, 605.0105(3) |
@@ -163,19 +160,12 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbr mbs | 8.1 | Records | 17f045db | covenant | manager | members | The records were not maintained by the person the agreement names. | s. 605.2301(2)(a) |
 | mul scp sgl | 8.2 | Asset Association Records | 61ff2bee | covenant | manager | members | The records do not meet the standard the agreement itself sets, so the assets were never associated. | s. 605.2301(2)(a), (4) |
 | mbr mbs | 8.2 | Asset Association Records | 43a3675a | covenant | manager | members | The records do not meet the standard the agreement itself sets, so the assets were never associated. | s. 605.2301(2)(a), (4) |
-| sgl | 8.3 | Separate Accounts; No Commingling | 56b07c14 | covenant | company manager members | nobody | Their own agreement forbids commingling; here are the transfers that commingled — the silos are a fiction. | none; stricter than s. 605.2301, which requires records, not accounts |
-| mul scp | 8.3 | Separate Accounts; No Commingling | d1e9e3dd | covenant | company manager members | nobody | Their own agreement forbids commingling; here are the transfers that commingled — the silos are a fiction. | none; stricter than s. 605.2301, which requires records, not accounts |
-| mbr mbs | 8.3 | Separate Accounts; No Commingling | c08363c0 | covenant | company manager members | nobody | Their own agreement forbids commingling; here are the transfers that commingled — the silos are a fiction. | none; stricter than s. 605.2301, which requires records, not accounts |
-| sgl | 8.4 | Inter-Series Transfers | c9c987a4 | covenant | manager members | nobody | The agreement required contemporaneous documentation; this transfer was documented late or not at all. | duplicates s. 8.2(c); 'contemporaneously' appears nowhere in s. 605.2301 |
-| mbr mbs mul scp | 8.4 | Inter-Series Transfers | 75c9ed1f | covenant | manager members | nobody | The agreement required contemporaneous documentation; this transfer was documented late or not at all. | duplicates s. 8.2(c); 'contemporaneously' appears nowhere in s. 605.2301 |
-| mbr mbs mul scp sgl | 8.5 | Real Property | b0e8414b | statutory-route | — | members series | — | s. 605.2301(2)(b), (3)(b) |
-| sgl | 8.6 | Holding Associated Assets | 5fbf2f0d | benefit | company series | members | — | s. 605.2301(5) |
-| mul scp | 8.6 | Holding Associated Assets | cf35798b | benefit | company series | members | — | s. 605.2301(5) |
-| mbr mbs | 8.6 | Holding Associated Assets | 3b8d0f0b | benefit | company series | members | — | s. 605.2301(5) |
-| sgl | 8.7 | Standing Association Rules; Savings Provisions | 80e7bb6e | benefit | — | members series company | — | s. 605.2301(2)(a), (4); s. 605.2404(4) burden of proof |
-| mbr mbs mul scp | 8.7 | Exclusive Means of Moving Value | 1bde9614 | covenant | manager | nobody | Value moved between silos outside the only means their agreement permits — the separateness was not observed. | none; duplicates the consent requirement in s. 5.4(b) |
-| mul scp | 8.8 | Standing Association Rules; Savings Provisions | 80e7bb6e | benefit | — | members series company | — | s. 605.2301(2)(a), (4); s. 605.2404(4) burden of proof |
-| mbr mbs | 8.8 | Standing Association Rules; Savings Provisions | d64564e6 | benefit | — | members series company | — | s. 605.2301(2)(a), (4); s. 605.2404(4) burden of proof |
+| mbr mbs mul scp sgl | 8.3 | Real Property | 77263b30 | statutory-route | — | members series | — | s. 605.2301(2)(b), (3)(b) |
+| sgl | 8.4 | Holding Associated Assets | 5fbf2f0d | benefit | company series | members | — | s. 605.2301(5) |
+| mul scp | 8.4 | Holding Associated Assets | cf35798b | benefit | company series | members | — | s. 605.2301(5) |
+| mbr mbs | 8.4 | Holding Associated Assets | 3b8d0f0b | benefit | company series | members | — | s. 605.2301(5) |
+| mul scp sgl | 8.5 | Standing Association Rules; Savings Provisions | 80e7bb6e | benefit | — | members series company | — | s. 605.2301(2)(a), (4); s. 605.2404(4) burden of proof |
+| mbr mbs | 8.5 | Standing Association Rules; Savings Provisions | d64564e6 | benefit | — | members series company | — | s. 605.2301(2)(a), (4); s. 605.2404(4) burden of proof |
 | sgl | 9.1 | Intended Classification | f8a8f895 | benefit | members | members | — | Treas. Reg. 301.7701-3 |
 | mul | 9.1 | Intended Classification | 1f1ba112 | benefit | members | members | — | Treas. Reg. 301.7701-3 |
 | mbs scp | 9.1 | S Corporation Status | 43271a98 | benefit | members | members | — | IRC 1362 |
@@ -215,8 +205,7 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbr mbs mul scp | 10.6 | Charging Order — Exclusive Remedy | 7cb3504e | statutory-route | — | members | — | ss. 605.0503, 605.0503(7) |
 | sgl | 11.1 | Admission | 2b14cbb5 | authority | member | member | — | s. 605.0401(3) |
 | mbr mbs mul scp | 11.1 | Executory Contract | 050e6248 | benefit | members | members company | — | 11 U.S.C. 365; In re Soderstrom |
-| sgl | 11.1A | No Association with a Protected Series | 675f3143 | covenant | company members | members | The company associated a member with a series in breach of its own agreement. | s. 605.2302; preserves the disregarded/partnership design |
-| sgl | 11.2 | Successor Agreement | 66341708 | covenant | member | nobody | The member admitted a second member and never amended, so the agreement no longer fits the company it governs. | none; ours — this is advice, not a term |
+| sgl | 11.2 | No Association with a Protected Series | 675f3143 | covenant | company members | members | The company associated a member with a series in breach of its own agreement. | s. 605.2302; preserves the disregarded/partnership design |
 | mul scp | 11.2 | Personal Service Agreement; No Assumption or Assignment | 439e9643 | benefit | members | members company | — | 11 U.S.C. 365(c); In re Soderstrom |
 | mbr mbs | 11.2 | Personal Service Agreement; No Assumption or Assignment | 3d769064 | benefit | members | members company | — | 11 U.S.C. 365(c); In re Soderstrom |
 | sgl | 11.3 | Continuation on Termination of Last Member | ea924089 | benefit | — | members company | — | s. 605.0701(3) |

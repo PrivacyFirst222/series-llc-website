@@ -54,6 +54,20 @@ for entry in "${DOCS[@]}"; do
   count=$((count + 1))
 done
 
+# Provision gate. Runs first, because it answers the question that comes before
+# "is this well drafted": should this provision exist at all. Every numbered
+# provision must have a row in docs/oa-map.md naming who it binds and who
+# benefits, and a covenant that benefits nobody fails. Change a provision and
+# its hash changes, so its row resets and must be re-annotated — a covenant
+# cannot be reworded without restating who it is for.
+echo "mapping the provisions"
+if ! python3 "$ROOT/docs/provision-map.py" --check; then
+  echo "update-word-docs: UNMAPPED OR UNJUSTIFIED PROVISION — nothing written" >&2
+  echo "  run: python3 docs/provision-map.py --update, then annotate the new rows" >&2
+  exit 1
+fi
+python3 "$ROOT/docs/provision-map.py" --diff
+
 # Drafting gate. Every check here exists because a fault reached a document and
 # Adam found it by reading. Runs before the formatting gate: no point measuring
 # the typography of a document that says "should" in a covenant.

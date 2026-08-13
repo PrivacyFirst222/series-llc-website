@@ -27,7 +27,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes (the "Act"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101–605.2802 (the "Protected Series Provisions"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.
 
-**1.3 Name; Names of Protected Series.** The name of the Company is **[COMPANY NAME], LLC**. The name of each Protected Series shall comply with s. 605.2202, Florida Statutes: it shall begin with the full name of the Company and shall contain the phrase "protected series" or the abbreviation "P.S." or "PS." The name of each Protected Series shall be as set forth in its filed Protected Series Designation and its Series Exhibit. If the Company changes its name, the Manager shall promptly make all filings required to conform the name of each Protected Series.
+**1.3 Name; Names of Protected Series.** The name of the Company is **[COMPANY NAME], LLC**. The name of each Protected Series shall be as set forth in its filed Protected Series Designation and its Series Exhibit. If the Company changes its name, the Manager shall promptly make all filings required to conform the name of each Protected Series.
 
 **1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
 
@@ -44,8 +44,6 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 **1.10 How Assets Are Associated.** An asset becomes an Associated Asset of a Protected Series, or of the Company, by the records required under Article 8 and s. 605.2301, Florida Statutes.
 
 **1.11 Waiver of Partition Rights.** Each Member irrevocably waives any right to maintain an action for partition or any similar action with respect to any property of the Company or of any Protected Series.
-
-**1.12 No Payments of Individual Obligations.** The credit and property of the Company and of each Protected Series shall be used solely for the benefit of the Company or the applicable Protected Series, and no such property shall be transferred or encumbered for, or in payment of, any individual obligation of any Member or the Manager.
 
 ---
 
@@ -165,7 +163,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 (a) establish a new Protected Series — the consent of **all Members** (Section 3.1);
 
-(b) **transfer, re-associate, or re-title any asset between the Company and a Protected Series or between Protected Series** (an "Inter-Series Transfer") — the consent of a Majority in Interest;
+(b) **transfer, re-associate, or re-title any asset between the Company and a Protected Series or between Protected Series** (an "Inter-Series Transfer") — the consent of a Majority in Interest. Inter-Series Transfers shall be made for fair value unless the transfer is a documented contribution or distribution;
 
 (c) sell, exchange, or otherwise dispose of all or substantially all of the Associated Assets of the Company or of any Protected Series, other than in the ordinary course — the consent of a Majority in Interest;
 
@@ -239,17 +237,11 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 Records may be organized by specific listing, category, type, quantity, or computational or allocative formula or procedure (including a percentage or share of any asset), or in any other reasonable manner, consistent with s. 605.2301(4), Florida Statutes, provided the standard of this Section is met.
 
-**8.3 Separate Accounts; No Commingling.** The Company and each Protected Series shall maintain its own deposit account or accounts, and its funds shall not be commingled with the funds of any Member, the Manager, the Company (as to a Protected Series), or any other Protected Series. All income of a Protected Series shall be deposited to its accounts, and its expenses paid from its accounts. Transfers of funds between accounts shall be made only pursuant to a documented Inter-Series Transfer, loan, contribution, or distribution.
+**8.3 Real Property.** A properly recorded instrument naming the acquiring or conveying Protected Series (by its full statutory name) or the Company, as applicable, serves as an association record and is conclusive of the signer's authority in favor of a person giving value without knowledge of a lack of authority (ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes). Where an interest in real property is held through a representative, nominee, or similar arrangement as permitted by s. 605.2301(5), Florida Statutes, the arrangement shall be documented under Section 8.4, and the association of the interest shall be established by those records.
 
-**8.4 Inter-Series Transfers.** Any Inter-Series Transfer (as defined in Section 5.4(b)) requires the approvals stated in Section 5.4(b) and shall be documented contemporaneously by a written record stating (a) the asset transferred, (b) the transferor and transferee (the Company or the specific Protected Series), (c) the date, and (d) the consideration paid, the payor, and the payee. Inter-Series Transfers shall be made for fair value unless the transfer is a documented contribution or distribution.
+**8.4 Holding Associated Assets.** An Associated Asset may be held directly, or indirectly through a representative, nominee, or similar arrangement, as permitted by s. 605.2301(5), Florida Statutes. Any such indirect arrangement shall be documented in the records maintained under this Article, identifying the holder, the Protected Series or the Company for which the asset is held, and the date the arrangement began. No property of the Company or of any Protected Series shall be held in the individual name of any Member or the Manager other than under an arrangement documented under this Section.
 
-**8.5 Real Property.** A properly recorded instrument naming the acquiring or conveying Protected Series (by its full statutory name) or the Company, as applicable, serves as an association record and is conclusive of the signer's authority in favor of a person giving value without knowledge of a lack of authority (ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes). Where an interest in real property is held through a representative, nominee, or similar arrangement as permitted by s. 605.2301(5), Florida Statutes, the arrangement shall be documented under Section 8.6, and the association of the interest shall be established by those records.
-
-**8.6 Holding Associated Assets.** An Associated Asset may be held directly, or indirectly through a representative, nominee, or similar arrangement, as permitted by s. 605.2301(5), Florida Statutes. Any such indirect arrangement shall be documented in the records maintained under this Article, identifying the holder, the Protected Series or the Company for which the asset is held, and the date the arrangement began. No property of the Company or of any Protected Series shall be held in the individual name of any Member or the Manager other than under an arrangement documented under this Section.
-
-**8.7 Exclusive Means of Moving Value.** Value may be moved between the Company and any Protected Series, or between Protected Series, only by an Inter-Series Transfer, a contribution, or a distribution, in each case approved as this Agreement requires and documented under this Article at the time it occurs.
-
-**8.8 Standing Association Rules; Savings Provisions.**
+**8.5 Standing Association Rules; Savings Provisions.**
 
 (a) **Records.** This Agreement, each Series Exhibit, each asset schedule, and the account, titling, and transaction records maintained under this Article are records within the meaning of s. 605.2301, Florida Statutes, and may be read together, in combination, to satisfy its requirements.
 

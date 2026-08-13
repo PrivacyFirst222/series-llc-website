@@ -164,7 +164,7 @@ Titling in the series' name does double duty. It puts the world on notice who ow
 ## 10. PUTTING ASSETS IN — AND MOVING THEM BETWEEN SILOS
 **Funding a series (contributions).** When you put your own money or property into a series, that is a capital contribution. Your agreement requires each contribution to be made *to a specific silo*, deposited to that silo's account, and recorded (Article 6; the Series Exhibit's contribution line). The record answers §605.2301's second question — when and from whom the asset came.
 **Buying assets.** When a series buys from an outsider, buy *in the series' name*, pay *from the series' account*, and keep the closing document. Purchase money out of PS 2's account + deed naming PS 2 = a self-documenting acquisition under those standing rules.
-**Moving assets between silos — the highest-risk routine transaction in the structure.** Every transfer between the company and a series, or between series ("inter-series transfer"), must be documented **at the time it happens** with the four facts s. 605.2301 demands: the asset, the two silos, the date, and **the consideration — the price, the payor, and the payee** (agreement §8.4). In the multi-member agreement, inter-series transfers also require member approval (§5.4(b)) — because quietly shuffling assets between silos owned by different people is how a manager robs Peter's series to pay Paul's.
+**Moving assets between silos — the highest-risk routine transaction in the structure.** Every transfer between the company and a series, or between series ("inter-series transfer"), must be documented **at the time it happens** with the four facts s. 605.2301 demands: the asset, the two silos, the date, and **the consideration — the price, the payor, and the payee**. In the multi-member agreement, inter-series transfers also require member approval and must be made for fair value (§5.4(b)) — because quietly shuffling assets between silos owned by different people is how a manager robs Peter's series to pay Paul's.
 Do it like this, every time:
 1. Decide the terms: sale at fair value, or a documented distribution up / contribution down.
 2. Paper it: a one-page transfer memo (Section 30 has the form) — asset, from, to, date, consideration, payor, payee.
@@ -225,7 +225,7 @@ Rules of the road:
 ## 14. THE RECORDKEEPING SYSTEM — YOUR ARTICLE 8 FIELD GUIDE
 Article 8 of your operating agreement turns s. 605.2301 into a checklist. Here is the whole system — six habits:
 **Habit 1 — The asset schedule (per series).** Every asset, described so a stranger could pick it out: address *and* legal description for real estate; institution/title/last-four for accounts; year-make-model-VIN for vehicles; serial numbers for equipment; parties-and-date for contracts. Plus: date acquired, from whom, and — if acquired from another silo — consideration, payor, payee. This is the record §605.2301 names first, and the first thing to update after any acquisition. *(App: the Assets tab, per series.)*
-**Habit 2 — One account per silo, no commingling** (Section 12). Bank statements in the series' name are association records a stranger believes instantly.
+**Habit 2 — One account per silo, no commingling** (Section 12). Nothing in ch. 605 requires it and your agreement does not either — it is evidence, and it is the best evidence there is. Bank statements in the series' name are association records a stranger believes instantly.
 **Habit 3 — Paper every inter-series move, contemporaneously** (Section 10). The statute's consideration/payor/payee requirement exists precisely for these transfers — it is the difference between compartments and one big pot with labels. *(App: the Transfer Log writes both silos' entries at once.)*
 **Habit 4 — Separate books.** Income, expenses, contributions, and distributions per silo. Your accountant can run one accounting file with a class/location per series — what matters is that each series' picture can be produced *separately*. *(App: per-series ledger with income/expense categories.)*
 **Habit 5 — File the paper.** Designations, Series Exhibits, deeds, titles, contracts, insurance, consents, and resolutions — one file per series (digital is fine; the statute requires records "retrievable in perceivable form"). Your portal already holds the formation package; keep the rest with your app records or alongside them.
@@ -446,7 +446,7 @@ Practical rules:
 **B. New-series checklist (every time)**
 ☐ All-member consent (documented) → ☐ File designation online ($25) → ☐ Adopt and sign the Series Exhibit (name exactly as filed; purpose; associated members; manager; capital) → ☐ EIN if needed → ☐ Open the series' bank account → ☐ Fund it (recorded contribution) → ☐ First asset onto the asset schedule → ☐ Insurance in the series' name → ☐ Add the series to the app.
 **C. Asset-into-series checklist (every asset)**
-☐ Confirm which series (and that its exhibit's purpose covers it) → ☐ Approvals per agreement (multi-member: §5.4 as applicable) → ☐ Transfer document (deed / bill of sale / assignment) naming the series' full filed name → ☐ Consideration documented — price, payor, payee (if from you: recorded contribution; if from another silo: §8.4 memo + bank movement) → ☐ Re-title / record → ☐ Asset schedule + ledger updated → ☐ Insurance moved → ☐ Related contracts and deposits assigned.
+☐ Confirm which series (and that its exhibit's purpose covers it) → ☐ Approvals per agreement (multi-member: §5.4 as applicable) → ☐ Transfer document (deed / bill of sale / assignment) naming the series' full filed name → ☐ Consideration documented — price, payor, payee (if from you: recorded contribution; if from another silo: transfer memo + bank movement) → ☐ Re-title / record → ☐ Asset schedule + ledger updated → ☐ Insurance moved → ☐ Related contracts and deposits assigned.
 **D. Real-estate-specific additions**
 ☐ Mortgage consent / due-on-sale cleared in writing → ☐ Documentary stamp treatment confirmed with closing agent → ☐ Title insurance addressed (endorsement or new policy) → ☐ NOT homestead → ☐ Deed grantee = full filed series name; recorded → ☐ Landlord policy re-issued; flood/wind reviewed → ☐ Leases assigned; deposits moved to series account; tenants notified → ☐ Property appraiser mailing address updated → ☐ Out-of-state property: Section 25 advice first.
 ## 30. SAMPLE LANGUAGE (COPY CAREFULLY — NAMES EXACTLY AS FILED)
@@ -467,7 +467,7 @@ Practical rules:
 **Bill of sale (inter-series or inbound):**
 > For value received, [transferor: Sunshine Holdings, LLC - PS 2 / (your name)] hereby sells, assigns, and conveys to **Sunshine Holdings, LLC - PS 1** all right, title, and interest in the property described on Exhibit A. Consideration: $______, paid by Sunshine Holdings, LLC - PS 1 to [payee]. Dated ______.
 
-**Inter-series transfer memo (agreement §8.4 — one per transfer, kept in both silos' files):**
+**Inter-series transfer memo (one per transfer, kept in both silos' files):**
 > INTER-SERIES TRANSFER RECORD
 > Date: ______  |  Asset: ______________________
 > From: Sunshine Holdings, LLC[ - PS __]   To: Sunshine Holdings, LLC - PS __
