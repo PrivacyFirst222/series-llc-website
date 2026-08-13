@@ -164,8 +164,8 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | sgl | 8.4 | Holding Associated Assets | 5fbf2f0d | benefit | company series | members | — | s. 605.2301(5) |
 | mul scp | 8.4 | Holding Associated Assets | cf35798b | benefit | company series | members | — | s. 605.2301(5) |
 | mbr mbs | 8.4 | Holding Associated Assets | 3b8d0f0b | benefit | company series | members | — | s. 605.2301(5) |
-| mul scp sgl | 8.5 | Standing Association Rules; Savings Provisions | 80e7bb6e | benefit | — | members series company | — | s. 605.2301(2)(a), (4); s. 605.2404(4) burden of proof |
-| mbr mbs | 8.5 | Standing Association Rules; Savings Provisions | d64564e6 | benefit | — | members series company | — | s. 605.2301(2)(a), (4); s. 605.2404(4) burden of proof |
+| mul scp sgl | 8.5 | Standing Association Rules; Savings Provisions | 17f856b7 | benefit | — | members series company | — | s. 605.2301(2)(a), (4); s. 605.2404(4) burden of proof |
+| mbr mbs | 8.5 | Standing Association Rules; Savings Provisions | 17bdf849 | benefit | — | members series company | — | s. 605.2301(2)(a), (4); s. 605.2404(4) burden of proof |
 | sgl | 9.1 | Intended Classification | f8a8f895 | benefit | members | members | — | Treas. Reg. 301.7701-3 |
 | mul | 9.1 | Intended Classification | 1f1ba112 | benefit | members | members | — | Treas. Reg. 301.7701-3 |
 | mbs scp | 9.1 | S Corporation Status | 43271a98 | benefit | members | members | — | IRC 1362 |
