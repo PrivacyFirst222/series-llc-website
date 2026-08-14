@@ -193,7 +193,7 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mul scp | 10.1 | Restriction on Transfer | 3ca8ae94 | covenant | members | members | The member transferred in breach of the agreement — a claim among the members, and the transferee takes as a transferee only. | ss. 605.0502, 605.0602 |
 | mbr mbs | 10.1 | Restriction on Transfer | 8f158066 | covenant | members | members | The member transferred in breach of the agreement — a claim among the members, and the transferee takes as a transferee only. | ss. 605.0502, 605.0602 |
 | sgl | 10.2 | Permitted Family Transfers | 771bfa0e | benefit | members | members | — | s. 605.0502 |
-| mbr mbs mul scp | 10.2 | Permitted Family Transfers | 5971b885 | benefit | members | members | — | s. 605.0502 |
+| mbr mbs mul scp | 10.2 | Permitted Family Transfers | 384fae5f | benefit | members | members | — | s. 605.0502 |
 | sgl | 10.3 | No Dissociation by Transfer Alone | b7639b44 | benefit | — | members | — | s. 605.0602(5) |
 | mbr mbs mul scp | 10.3 | Rights of Transferees | 81b80fe4 | benefit | — | members company | — | s. 605.0502(3) |
 | mul scp | 10.4 | Involuntary Transfers; Option to Acquire | c5cfced5 | benefit | members | members company | — | ss. 605.0502, 605.0503 |
