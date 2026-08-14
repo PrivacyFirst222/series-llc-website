@@ -166,10 +166,9 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbr mbs | 8.4 | Holding Associated Assets | 3b8d0f0b | benefit | company series | members | — | s. 605.2301(5) |
 | mul scp sgl | 8.5 | Standing Association Rules; Savings Provisions | 17f856b7 | benefit | — | members series company | — | s. 605.2301(2)(a), (4); s. 605.2404(4) burden of proof |
 | mbr mbs | 8.5 | Standing Association Rules; Savings Provisions | 17bdf849 | benefit | — | members series company | — | s. 605.2301(2)(a), (4); s. 605.2404(4) burden of proof |
-| sgl | 9.1 | Intended Classification | f8a8f895 | benefit | members | members | — | Treas. Reg. 301.7701-3 |
-| mul | 9.1 | Intended Classification | 1f1ba112 | benefit | members | members | — | Treas. Reg. 301.7701-3 |
-| mbs scp | 9.1 | S Corporation Status | 43271a98 | benefit | members | members | — | IRC 1362 |
-| mbr | 9.1 | Intended Classification | 01e118e7 | benefit | members | members | — | Treas. Reg. 301.7701-3 |
+| sgl | 9.1 | Intended Classification | ecebb4fc | benefit | members | members | — | Treas. Reg. 301.7701-3 |
+| mbr mul | 9.1 | Intended Classification | 6c18356d | benefit | members | members | — | Treas. Reg. 301.7701-3 |
+| mbs scp | 9.1 | S Corporation Status | 86c3eddc | benefit | members | members | — | IRC 1362 |
 | sgl | 9.2 | Tax Filings and Elections | 33370c47 | authority | manager | members | — | IRC 6031 |
 | mul | 9.2 | Tax Returns; Information | 5fae98ab | covenant | manager | members | The manager did not deliver the tax information the agreement requires — a claim among the members. | IRC 6031(b) |
 | scp | 9.2 | Returns; Information | 47303325 | covenant | manager | members | The manager did not deliver the tax information the agreement requires — a claim among the members. | IRC 6037 |
