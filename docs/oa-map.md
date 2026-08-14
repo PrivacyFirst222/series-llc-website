@@ -178,17 +178,15 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mul | 9.3 | Partnership Representative | e7d81c29 | authority | manager | members | — | IRC 6223 |
 | mbs scp | 9.3 | Protecting the Election | 94583d7c | covenant | members | members | The transfer breached the agreement's S corporation restrictions — a claim among the members. | IRC 1361(b) |
 | mbr | 9.3 | Partnership Representative | d4a24a46 | authority | manager | members | — | IRC 6223 |
-| sgl | 9.4 | Change in Circumstances | 74ac9525 | mechanic | member | member | — | Treas. Reg. 301.7701-3 |
+| sgl | 9.4 | Change in Circumstances | 48c55481 | mechanic | member | member | — | Treas. Reg. 301.7701-3 |
 | mul | 9.4 | Tax Elections | 4ca8f78f | authority | manager members | members | — | IRC 754 |
 | scp | 9.4 | S Corporation Status; Intent; Savings Clause | b5bd736c | benefit | members | members | — | IRC 1361, 1362 |
 | mbr | 9.4 | Tax Elections | 157b3294 | authority | manager members | members | — | IRC 754 |
 | mbs | 9.4 | S Corporation Status; Intent; Savings Clause | 8bed3e5f | benefit | members | members | — | IRC 1361, 1362 |
-| sgl | 9.5 | S Corporation Election | ebd32c9b | authority | members | members | — | IRC 1362 |
 | mul | 9.5 | Fiscal Year | 19362c64 | mechanic | company | members | — | IRC 706; 1378 for the S forms |
 | scp | 9.5 | Other Elections | 2da32cea | authority | manager members | members | — | IRC 1362 |
 | mbr | 9.5 | Fiscal Year | 5c940732 | mechanic | company | members | — | IRC 706; 1378 for the S forms |
 | mbs | 9.5 | Other Elections | 8869aa20 | authority | manager members | members | — | IRC 1362 |
-| mbr mul | 9.6 | S Corporation Election | 3f671f93 | authority | members | members | — | IRC 1362 |
 | scp | 9.6 | Fiscal Year | 98ee3c50 | mechanic | company | members | — | IRC 706; 1378 for the S forms |
 | mbs | 9.6 | Fiscal Year | 30cd60ee | mechanic | company | members | — | IRC 706; 1378 for the S forms |
 | sgl | 10.1 | Restriction on Transfer | 9b0fffa5 | covenant | members | members | The member transferred in breach of the agreement — a claim among the members, and the transferee takes as a transferee only. | ss. 605.0502, 605.0602 |
