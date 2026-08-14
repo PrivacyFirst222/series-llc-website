@@ -59,6 +59,16 @@ catches the recurrence rather than the intention:
 | orphan term | a defined term nothing else references |
 | citation | an `s. 605.xxxx` that `chapter-605-notes.md` has no entry for, so an invented cite cannot pass silently |
 
+The consistency gate runs beside it: `docs-consistency.py` resolves every
+section the Owner's Manual and the Instructions cite against the five masters
+and refuses a dangling reference. It reads numbers, not meaning — CLAUDE.md's
+rule about reading a document for its substance is the half no script can do.
+
+```bash
+python3 docs/docs-consistency.py          # check
+python3 docs/docs-consistency.py --list   # every reference and where it resolves
+```
+
 Each check is proven against a deliberately reintroduced defect; the first run
 found a genuine one nobody had noticed — `"Series Managing Members"`, defined in
 the member-managed masters and used nowhere, a leftover from the move to

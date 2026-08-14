@@ -69,6 +69,17 @@ if ! python3 "$ROOT/docs/provision-map.py" --check; then
 fi
 python3 "$ROOT/docs/provision-map.py" --diff
 
+# Consistency gate. The manual and the Instructions describe the agreements, so
+# every section they cite is a claim about a file in this repo. Provisions get
+# renumbered and deleted; the sentences around the numbers do not follow on their
+# own. This resolves every reference and refuses a dangling one — it cannot read a
+# sentence for meaning, which is the rule in CLAUDE.md and stays a human job.
+echo "resolving the guidance documents' references"
+if ! python3 "$ROOT/docs/docs-consistency.py"; then
+  echo "update-word-docs: DANGLING REFERENCE — nothing written" >&2
+  exit 1
+fi
+
 # Drafting gate. Every check here exists because a fault reached a document and
 # Adam found it by reading. Runs before the formatting gate: no point measuring
 # the typography of a document that says "should" in a covenant.

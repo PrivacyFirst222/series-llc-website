@@ -37,6 +37,40 @@ opposite of what its text says.
 This rule governs the ones below it. Each of them is a specific case of acting on
 the artifact rather than on a model of it.
 
+## Read every document for its substance, not for the thing you came to change
+
+**Before you touch a document, read all of it, and read it for substance and
+legal accuracy — not for the defect you arrived to fix. Reading its
+cross-references is not reading it.**
+
+This applies to every document you edit, generate, promote, import, or hand to a
+client, and to every document that describes another one. When the Instructions
+say "your agreement requires X," that is a claim about a file you can open. An
+unverified claim about your own deliverable is a defect, and it is worse than a
+stale section number: the number is obviously wrong to anyone who looks, while
+the sentence sounds authoritative and is read as advice.
+
+The tell is the same as the fraction rule below. Say what you read and what you
+checked it against: "read all 71 lines of `oa-instructions.md`; checked every
+statement about the agreement against the five masters" is verifiable. "Updated
+the stale references" is not. **Adam: if a change to a document arrives without a
+statement of what was read in full and what it was checked against, reject it.**
+
+`docs/docs-consistency.py` is the mechanical half — it resolves every section
+reference in the manual and the Instructions against the masters and fails on any
+that no longer exists. It cannot read a sentence for meaning. That part is yours
+to do, every time, and the check passing is not evidence that you did.
+
+This rule exists because on 13 August 2026 the Operating Agreement Instructions
+were promoted to a master and five stale section numbers in them were corrected,
+while the sentences around those numbers went unread. Those sentences told the
+client that Article 8 "tells you exactly what to do," that they must keep one
+bank account per series, and how to document assets moved between series — in a
+week when Article 8 had been cut to five sections, the transfer-documentation
+covenant had been deleted, and the client should have been told not to move
+assets between series at all. Every cross-reference was correct and the document
+was wrong.
+
 ## Design from the user's seat, not the data model
 
 This rule is not optional and is not waived by convenience.
