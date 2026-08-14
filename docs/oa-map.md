@@ -240,8 +240,8 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | sgl | 14.8 | No Third-Party Beneficiaries | 4d830aa4 | benefit | — | members manager company | — | drafting convention |
 | sgl | 14.9 | Interpretation | 88791917 | mechanic | — | members manager | — | drafting convention |
 | sgl | 14.10 | Unregistered Interests | 5909e292 | mechanic | — | members company | — | 15 U.S.C. 77e; ch. 517, Fla. Stat. |
-| mul scp | 15.1 | Amendments | 8859efd7 | authority | members | members | — | s. 605.04073(1)(d), (2)(e) |
-| mbr mbs | 15.1 | Amendments | 18f22a44 | authority | members | members | — | s. 605.04073(1)(d), (2)(e) |
+| mul scp | 15.1 | Amendments | fa5b242d | authority | members | members | — | s. 605.04073(1)(d), (2)(e) |
+| mbr mbs | 15.1 | Amendments | a9428a3a | authority | members | members | — | s. 605.04073(1)(d), (2)(e) |
 | mbr mbs mul scp | 15.2 | Action by Written Consent | b25652f8 | mechanic | members | members | — | s. 605.04073(4) |
 | mul scp | 16.1 | Governing Law; Internal Affairs | b6174e72 | mechanic | — | members manager | — | s. 605.0104 |
 | mbr mbs | 16.1 | Governing Law; Internal Affairs | 6d41bc2b | mechanic | — | members manager | — | s. 605.0104 |

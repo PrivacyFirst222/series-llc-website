@@ -341,7 +341,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 ## ARTICLE 15 — AMENDMENTS; CONSENTS
 
-**15.1 Amendments.** This Agreement may be amended only by a written instrument signed by **all** Members; provided, that (a) a Series Exhibit may be amended by a written instrument signed by all Members (and, if the amendment would alter the rights or obligations of a Member not associated with that Protected Series, by that Member); (b) the Administrative Member may amend Exhibit A and the Series Exhibits without further consent solely to record changes duly made under this Agreement (admissions, Transfers, TOD designations, capital adjustments under Section 6.3); and (c) no amendment may impose new obligations on any Member without that Member's written consent. Oral, implied, or course-of-dealing amendments are of no effect.
+**15.1 Amendments.** This Agreement may be amended only by a written instrument signed by **all** Members; provided, that (a) a Series Exhibit may be amended by a written instrument signed by all Members; (b) the Administrative Member may amend Exhibit A and the Series Exhibits without further consent solely to record changes duly made under this Agreement (admissions, Transfers, TOD designations, capital adjustments under Section 6.3); and (c) no amendment may impose new obligations on any Member without that Member's written consent. Oral, implied, or course-of-dealing amendments are of no effect.
 
 **15.2 Action by Written Consent.** Any action of the Members under this Agreement may be taken by written consent as provided in Section 4.4.
 
