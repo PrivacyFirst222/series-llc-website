@@ -40,6 +40,7 @@ DOCS=(
   "webapp/server/templates-oa-member-s.md|FPSLLC Operating Agreement - Member-Managed (S Corporation) - DRAFT.docx"
   "docs/owners-manual.md|Series LLC Owners Manual - REVISED DRAFT.docx"
   "docs/statement-of-authorized-representative.md|FPSLLC Statement of Authorized Representative - FORM.docx"
+  "docs/oa-instructions.md|FPSLLC Operating Agreement Instructions - DRAFT.docx"
 )
 
 count=0

@@ -82,7 +82,17 @@ PROFILES = {
 
 
 def profile_for(md_path):
-    return "agreement" if "templates-oa-" in os.path.basename(md_path) else "manual"
+    """Which house typography a master gets.
+
+    Both were measured from docs/source/: the manual is Georgia 11pt with page
+    numbers, everything that sits alongside a signed agreement is Times New
+    Roman 12pt without them. The Instructions and the Statement of Authorized
+    Representative belong to the second group — they are handed to the client
+    with the agreement and should not look like a different product.
+    """
+    name = os.path.basename(md_path)
+    agreement_like = ("templates-oa-", "oa-instructions", "statement-of-authorized-representative")
+    return "agreement" if any(k in name for k in agreement_like) else "manual"
 
 
 def esc(s):

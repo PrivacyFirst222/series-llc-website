@@ -20,6 +20,7 @@ That is why the masters live here.
 | `webapp/server/templates-oa-member-s.md` | FPSLLC Operating Agreement - Member-Managed (S Corporation) - DRAFT.docx |
 | `docs/owners-manual.md` | Series LLC Owners Manual - REVISED DRAFT.docx |
 | `docs/statement-of-authorized-representative.md` | FPSLLC Statement of Authorized Representative - FORM.docx |
+| `docs/oa-instructions.md` | FPSLLC Operating Agreement Instructions - DRAFT.docx |
 
 The five operating agreement masters are also what the portal uses to generate a
 client's agreement, so the Word file and the client's PDF always come from the
@@ -112,13 +113,13 @@ Markdown the masters use:
 
 ## Still authored in Word
 
-These have no markdown master yet. They are pulled in by `bun run docs:sync`,
-which also refreshes their mirrors. They will drift the same way the operating
-agreements did until they are promoted to masters.
-
-| Document | Committed copy | Mirror |
-|---|---|---|
-| Operating Agreement Instructions | `source/FPSLLC Operating Agreement Instructions - DRAFT.docx` | `oa-instructions.md` |
+None. The Operating Agreement Instructions were the last one, promoted to a
+master on 13 August 2026 after five of its cross-references went stale in a
+single night of edits — it told clients their agreement required an annual
+review and required them to adopt the multi-member form, both of which had
+just been deleted, and nothing caught it because the file sat outside every
+gate. `bun run docs:sync` now pulls nothing; it only refuses to let an
+unlisted document sit in the origin folder.
 
 ## History
 

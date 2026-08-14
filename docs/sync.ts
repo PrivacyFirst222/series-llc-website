@@ -24,7 +24,6 @@ const ORIGIN =
 
 /** Still authored in Word. Pulled in and mirrored to markdown. */
 const WORD_AUTHORED: { file: string; md?: string }[] = [
-  { file: "FPSLLC Operating Agreement Instructions - DRAFT.docx", md: "oa-instructions.md" },
   { file: "Series LLC Owners Manual.pdf" }, // superseded PDF, kept for history
 ];
 
@@ -37,6 +36,7 @@ const GENERATED = new Set([
   "FPSLLC Operating Agreement - Manager-Managed (S Corporation) - DRAFT.docx",
   "FPSLLC Operating Agreement - Member-Managed Multi-Member (Partnership) - DRAFT.docx",
   "FPSLLC Operating Agreement - Member-Managed (S Corporation) - DRAFT.docx",
+  "FPSLLC Operating Agreement Instructions - DRAFT.docx",
 ]);
 
 /** Research material deliberately not committed: samples and other people's
