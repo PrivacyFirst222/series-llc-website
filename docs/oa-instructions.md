@@ -11,11 +11,11 @@
 ## 1. READ THIS FIRST — The Recordkeeping Warning
 A Florida Protected Series LLC gives you two layers of liability protection. The first protects you personally from the company's debts. The second — the one that makes this structure special — walls off each protected series from the debts of the company and of every other series.
 **That second wall exists only as long as your records exist.** Florida law (s. 605.2301, Florida Statutes) protects a series' assets only if the company keeps records specific enough that a "disinterested, reasonable individual" could tell exactly which assets belong to which series, when and from whom each asset was acquired, and — for anything moved between series — what was paid, by whom, and to whom. If those records are not kept, a creditor of one series can reach the assets of the company and of your other series, and Florida law places the burden of proving the records were adequate on **you**.
-Article 8 of your operating agreement tells you exactly what to do. In practice it means:
-**One bank account per series.** Never pay one series' expenses from another's account, or from your personal account.
-**Title every asset in the full legal name of the series that owns it** — exactly as filed, for example: *[COMPANY NAME], LLC - PS 1*.
+In practice:
+**Every series should have at least one bank account of its own.** Never pay one series' expenses from another's account, or from your personal account.
+**Every asset must be properly associated with the series that owns it.** The best way to do that is to title it in the full legal name of that series — exactly as filed, for example: *[COMPANY NAME], LLC - PS 1*.
 **Deposit each series' income to that series' account** and pay its expenses from that account.
-**Document every asset moved between series** — what was transferred, the date, the price, who paid, and who received — at the time it happens.
+**Do not move assets between series.** Treat each series as though it were a separate limited liability company — its own account, its own assets, its own contracts, its own records.
 **Keep the mothership (the company itself) asset-light.** Under §8.5(b) of your agreement, any asset you fail to associate with a series defaults to the company, where it is exposed to the company's creditors. Owning assets at the series level, with clean records, is the whole point of the structure.
 **Review your records once a year.** Neither the statute nor your agreement requires it; do it anyway — it is the cheapest way to find a gap while it can still be fixed.
 The free MyFloridaSeriesLLC recordkeeping app and the Series LLC User's Manual included with your formation package are built around these requirements.
