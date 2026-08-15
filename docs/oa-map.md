@@ -33,8 +33,7 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mul scp sgl | 1.9 | Filings | 14414961 | covenant | manager | members | The manager did not file what the agreement required, so the series lacks the standing it claims. | s. 605.2201 |
 | mbr mbs | 1.9 | Filings | d789508c | covenant | manager | members | The manager did not file what the agreement required, so the series lacks the standing it claims. | s. 605.2201 |
 | mbr mbs mul scp sgl | 1.10 | How Assets Are Associated | de49f23e | statutory-route | — | members | — | s. 605.2301 |
-| sgl | 1.10A | Membership Interest | fc8c6106 | definition | — | members | — | s. 605.0102(41) |
-| sgl | 1.11 | Waiver of Partition Rights | 72b01d2e | benefit | members | company members | — | common law |
+| sgl | 1.11 | Membership Interest | 3adc00c1 | definition | — | members | — | s. 605.0102(41) |
 | mbr mbs mul scp | 1.11 | Waiver of Partition Rights | e24cf863 | benefit | members | company members | — | common law |
 | mbr mbs mul scp sgl | 2.1 | "Act" | 1f5154e3 | definition | — | members manager | — | ch. 605 |
 | mul scp sgl | 2.2 | "Associated Asset" | 6bc88113 | definition | — | members | — | s. 605.2102(2) |

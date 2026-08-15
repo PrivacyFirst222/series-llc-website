@@ -43,9 +43,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **1.10 How Assets Are Associated.** An asset becomes an Associated Asset of a Protected Series, or of the Company, by the records required under Article 8 and s. 605.2301, Florida Statutes.
 
-**1.10A Membership Interest.** The Member's interest in the Company is personal property for all purposes.
-
-**1.11 Waiver of Partition Rights.** The Member irrevocably waives any right to maintain an action for partition or any similar action with respect to any property of the Company or of any Protected Series.
+**1.11 Membership Interest.** The Member's interest in the Company is personal property for all purposes.
 
 ---
 
