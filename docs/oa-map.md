@@ -138,7 +138,7 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | sgl | 6.5 | No Right to Specific Property | f3efef85 | benefit | members | company members | — | s. 605.0110(1) |
 | mbr mbs mul scp | 6.5 | Member Loans | 99d1121e | mechanic | members | members | — | s. 605.0110(3) |
 | mbr mul | 6.6 | Capital Accounts | 9932dfcc | mechanic | company | members | — | Treas. Reg. 1.704-1(b)(2)(iv) |
-| mbs scp | 6.6 | Contribution Records; Identical Rights | 0e2924e4 | mechanic | company | members | — | IRC 1361(b)(1)(D) |
+| mbs scp | 6.6 | Contribution Records; Identical Rights | 31a89541 | mechanic | company | members | — | IRC 1361(b)(1)(D) |
 | mbr mbs mul scp | 6.7 | No Right to Specific Property | 3e1803bb | benefit | members | company members | — | s. 605.0110(1) |
 | sgl | 7.1 | Distributions | 0ce91b89 | authority | manager members | members | — | s. 605.0404 |
 | mul | 7.1 | Allocations | b3e8d7e5 | mechanic | company | members | — | IRC 704(b); 1361(b)(1)(D) for the S forms |
@@ -234,7 +234,8 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbr | 14.4 | Winding Up the Company | 2698c4e6 | mechanic | manager members | members | — | ss. 605.0709, 605.0710 |
 | mbs | 14.4 | Winding Up the Company | 7f3dbab2 | mechanic | manager members | members | — | ss. 605.0709, 605.0710 |
 | sgl | 14.5 | Binding Effect | 43d6e2af | mechanic | — | members manager | — | s. 605.0106 |
-| mbr mbs mul scp | 14.5 | No Deficit Obligation; Recourse Limited | a80b2aad | benefit | — | members | — | s. 605.0405 |
+| mbr mul | 14.5 | No Deficit Obligation; Recourse Limited | a80b2aad | benefit | — | members | — | s. 605.0405 |
+| mbs scp | 14.5 | No Obligation to Contribute; Recourse Limited | 758ff4ef | benefit | — | members | — | s. 605.0405; the S corporation forms carry no capital accounts, so deficit-restoration language was removed 2026-08-14 |
 | sgl | 14.6 | Counterparts; Electronic Signatures | a8dc325e | mechanic | — | members manager | — | ch. 668, Fla. Stat. |
 | sgl | 14.7 | Notices | 2c077363 | mechanic | — | members manager | — | drafting convention |
 | sgl | 14.8 | No Third-Party Beneficiaries | 4d830aa4 | benefit | — | members manager company | — | drafting convention |

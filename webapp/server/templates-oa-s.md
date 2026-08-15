@@ -205,7 +205,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **6.5 Member Loans.** A Member may lend funds to the Company or to a specific Protected Series upon commercially reasonable terms evidenced by a written instrument identifying the borrower. A loan is not a contribution, and shall be an Associated Liability solely of the borrowing Protected Series or of the Company, as applicable.
 
-**6.6 Contribution Records; Identical Rights.** The Company shall maintain a record of each Member's contributions to the Company and to each Protected Series. Contributions do not bear interest and confer no priority or preference of any kind: every Membership Interest carries rights to allocations, distributions, and liquidation proceeds identical in proportion to Percentage Interests. Nothing in this Agreement creates a deficit restoration obligation or otherwise personally obligates any Member to contribute capital beyond the contributions required by Sections 6.1 and 6.2.
+**6.6 Contribution Records; Identical Rights.** The Company shall maintain a record of each Member's contributions to the Company and to each Protected Series. Contributions do not bear interest and confer no priority or preference of any kind: every Membership Interest carries rights to allocations, distributions, and liquidation proceeds identical in proportion to Percentage Interests. Nothing in this Agreement personally obligates any Member to contribute capital beyond the contributions required by Sections 6.1 and 6.2.
 
 **6.7 No Right to Specific Property.** No Member has any right to demand or receive any distribution in any specific property of the Company or of any Protected Series.
 
@@ -345,7 +345,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **14.4 Winding Up the Company.** Upon dissolution of the Company, the Manager (or, if there is none, a person designated by a Majority in Interest) shall wind up the Company and each Protected Series. After the winding up of each Protected Series under Section 14.2, the remaining Associated Assets of the Company shall be applied: first, to pay or provide for the Company's Associated Liabilities to creditors other than Members; next, to pay or provide for the Company's Associated Liabilities to Members as creditors; and finally, the balance to the Members in proportion to their Percentage Interests. All distributions in winding up, whether of the Company or of any Protected Series, shall be made in proportion to Percentage Interests, so that every Membership Interest confers identical rights to liquidation proceeds. Articles of dissolution shall be filed as the Act requires, and the Company shall terminate when winding up is complete.
 
-**14.5 No Deficit Obligation; Recourse Limited.** No Member shall have any obligation to restore any deficit or to contribute capital in connection with any winding up (beyond unpaid contributions duly required under Sections 6.1 and 6.2), and each creditor of the Company or of any Protected Series shall look solely to the Associated Assets of its obligor.
+**14.5 No Obligation to Contribute; Recourse Limited.** No Member shall have any obligation to contribute capital in connection with any winding up (beyond unpaid contributions duly required under Sections 6.1 and 6.2), and each creditor of the Company or of any Protected Series shall look solely to the Associated Assets of its obligor.
 
 ---
 
