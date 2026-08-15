@@ -37,6 +37,7 @@ const GENERATED = new Set([
   "FPSLLC Operating Agreement - Member-Managed Multi-Member (Partnership) - DRAFT.docx",
   "FPSLLC Operating Agreement - Member-Managed (S Corporation) - DRAFT.docx",
   "FPSLLC Operating Agreement Instructions - DRAFT.docx",
+  "FPSLLC Redline - Manager-Managed Partnership vs S Corporation.docx",
 ]);
 
 /** Research material deliberately not committed: samples and other people's

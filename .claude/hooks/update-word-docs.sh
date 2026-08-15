@@ -108,6 +108,13 @@ for entry in "${DOCS[@]}"; do
 done
 echo "regenerated $count Word documents -> docs/word/"
 
+# The redline is derived from two masters rather than one, so it runs after the
+# set is written. A stale redline is worse than none — it would show a
+# difference that no longer exists.
+echo "redlining the partnership form against the S corporation form"
+python3 "$ROOT/docs/redline.py"
+REDLINE="FPSLLC Redline - Manager-Managed Partnership vs S Corporation.docx"
+
 # Dropbox second, and never fatal. -d is not enough: under a macOS privacy denial
 # the directory tests as present and every write fails.
 if [ -d "$OUT_DROPBOX" ]; then
@@ -116,6 +123,7 @@ if [ -d "$OUT_DROPBOX" ]; then
     name="${entry##*|}"
     cp "$STAGE/$name" "$OUT_DROPBOX/$name" 2>/dev/null || failed=$((failed + 1))
   done
+  cp "$OUT_REPO/$REDLINE" "$OUT_DROPBOX/$REDLINE" 2>/dev/null || failed=$((failed + 1))
   if [ "$failed" -eq 0 ]; then
     echo "copied $count Word documents -> Dropbox"
   else
