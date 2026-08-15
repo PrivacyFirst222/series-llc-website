@@ -146,9 +146,9 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbr | 7.1 | Allocations | 1ab53dac | mechanic | company | members | — | IRC 704(b); 1361(b)(1)(D) for the S forms |
 | sgl | 7.2 | Source Limitation | 3af8aa49 | statutory-route | — | members series | — | ss. 605.2401, 605.2404 |
 | mul | 7.2 | Distributions | 17034e98 | authority | manager members | members | — | s. 605.0404 |
-| scp | 7.2 | Distributions | 3c677010 | authority | manager members | members | — | s. 605.0404 |
+| scp | 7.2 | Distributions | 14ee142f | authority | manager members | members | — | s. 605.0404 |
 | mbr | 7.2 | Distributions | e8cfc8f9 | authority | manager members | members | — | s. 605.0404 |
-| mbs | 7.2 | Distributions | 734e8ee7 | authority | manager members | members | — | s. 605.0404 |
+| mbs | 7.2 | Distributions | 7d29af44 | authority | manager members | members | — | s. 605.0404 |
 | sgl | 7.3 | Statutory Limitations | 71189177 | benefit | company | members manager | — | ss. 605.0405, 605.0406 |
 | mul | 7.3 | Tax Distributions | ab767988 | authority | manager members | members | — | s. 605.0404 |
 | scp | 7.3 | Tax Distributions | 008f2988 | authority | manager members | members | — | s. 605.0404 |
