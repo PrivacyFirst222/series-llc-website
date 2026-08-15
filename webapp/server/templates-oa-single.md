@@ -171,8 +171,6 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **7.2 Source Limitation.** Distributions in respect of a Protected Series shall be made **solely from the Associated Assets of that Protected Series**, and distributions in respect of the Company shall be made solely from the Associated Assets of the Company. Each distribution shall be recorded in the records maintained under Article 8, identifying its source.
 
-**7.3 Statutory Limitations.** No distribution shall be made to the extent prohibited by the limitations of the Act applicable to distributions, applied separately to the Company and to each Protected Series as the Act provides.
-
 ---
 
 ## ARTICLE 8 — RECORDS

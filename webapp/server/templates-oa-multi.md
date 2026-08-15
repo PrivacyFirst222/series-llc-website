@@ -219,8 +219,6 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **7.3 Tax Distributions.** To the extent of available cash of the Company or the applicable Protected Series, the Manager may make distributions intended to enable each Member to satisfy federal and state income tax liabilities attributable to the Member's distributive share of income, and is authorized to pay any such amount directly to the government agency responsible for collection of the tax on the Member's behalf. A tax distribution funded from the Associated Assets of a Protected Series shall be made by that Protected Series to the Company and distributed by the Company to the Members, and is treated as an advance against later distributions under Section 7.2.
 
-**7.4 Statutory Limitations.** No distribution shall be made to the extent prohibited by the limitations of the Act applicable to distributions, applied separately to the Company and to each Protected Series as the Act provides.
-
 ---
 
 ## ARTICLE 8 — RECORDS

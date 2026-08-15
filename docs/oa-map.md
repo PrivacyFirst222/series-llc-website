@@ -144,17 +144,15 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mul | 7.1 | Allocations | b3e8d7e5 | mechanic | company | members | — | IRC 704(b); 1361(b)(1)(D) for the S forms |
 | mbs scp | 7.1 | Allocations | 5ee5aa81 | mechanic | company | members | — | IRC 704(b); 1361(b)(1)(D) for the S forms |
 | mbr | 7.1 | Allocations | 1ab53dac | mechanic | company | members | — | IRC 704(b); 1361(b)(1)(D) for the S forms |
-| sgl | 7.2 | Source Limitation | 3af8aa49 | statutory-route | — | members series | — | ss. 605.2401, 605.2404 |
+| sgl | 7.2 | Source Limitation | b575fd06 | statutory-route | — | members series | — | ss. 605.2401, 605.2404 |
 | mul | 7.2 | Distributions | 17034e98 | authority | manager members | members | — | s. 605.0404 |
 | scp | 7.2 | Distributions | 14ee142f | authority | manager members | members | — | s. 605.0404 |
 | mbr | 7.2 | Distributions | e8cfc8f9 | authority | manager members | members | — | s. 605.0404 |
 | mbs | 7.2 | Distributions | 7d29af44 | authority | manager members | members | — | s. 605.0404 |
-| sgl | 7.3 | Statutory Limitations | 71189177 | benefit | company | members manager | — | ss. 605.0405, 605.0406 |
-| mul | 7.3 | Tax Distributions | da8d0d42 | authority | manager members | members | — | s. 605.0404 |
-| scp | 7.3 | Tax Distributions | 77134dff | authority | manager members | members | — | s. 605.0404 |
-| mbr | 7.3 | Tax Distributions | 070d3e50 | authority | manager members | members | — | s. 605.0404 |
-| mbs | 7.3 | Tax Distributions | 7cc1ad0a | authority | manager members | members | — | s. 605.0404 |
-| mbr mbs mul scp | 7.4 | Statutory Limitations | 71189177 | benefit | company | members manager | — | ss. 605.0405, 605.0406 |
+| mul | 7.3 | Tax Distributions | 1c52aaa7 | authority | manager members | members | — | s. 605.0404 |
+| scp | 7.3 | Tax Distributions | 7ecf5184 | authority | manager members | members | — | s. 605.0404 |
+| mbr | 7.3 | Tax Distributions | 4f27ae8e | authority | manager members | members | — | s. 605.0404 |
+| mbs | 7.3 | Tax Distributions | c1c945cc | authority | manager members | members | — | s. 605.0404 |
 | sgl | 8.1 | Records | d58c1627 | covenant | manager | members | The records were not maintained by the person the agreement names. | s. 605.2301(2)(a) |
 | mul scp | 8.1 | Records | 495681ad | covenant | manager | members | The records were not maintained by the person the agreement names. | s. 605.2301(2)(a) |
 | mbr mbs | 8.1 | Records | 17f045db | covenant | manager | members | The records were not maintained by the person the agreement names. | s. 605.2301(2)(a) |
