@@ -37,20 +37,26 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | sgl | 1.11 | Waiver of Partition Rights | 72b01d2e | benefit | members | company members | — | common law |
 | mbr mbs mul scp | 1.11 | Waiver of Partition Rights | e24cf863 | benefit | members | company members | — | common law |
 | mbr mbs mul scp sgl | 2.1 | "Act" | 1f5154e3 | definition | — | members manager | — | ch. 605 |
-| mbr mbs mul scp sgl | 2.2 | "Associated Asset" | 6bc88113 | definition | — | members | — | s. 605.2102(2) |
-| mbr mbs mul scp sgl | 2.3 | "Associated Liability" | c6835881 | definition | — | members | — | no statutory definition; ours |
+| mul scp sgl | 2.2 | "Associated Asset" | 6bc88113 | definition | — | members | — | s. 605.2102(2) |
+| mbr mbs | 2.2 | "Administrative Member" | 45b7580e | definition | — | members | — | drafting convention |
+| mul scp sgl | 2.3 | "Associated Liability" | c6835881 | definition | — | members | — | no statutory definition; ours |
+| mbr mbs | 2.3 | "Associated Asset" | 6bc88113 | definition | — | members | — | s. 605.2102(2) |
 | mul scp sgl | 2.4 | "Associated Member" | 750ce59c | definition | — | members | — | s. 605.2302 |
-| mbr mbs | 2.4 | "Associated Member" | 8d347d55 | definition | — | members | — | s. 605.2302 |
-| mbr mbs mul scp sgl | 2.5 | "Company" | 3e7a84d5 | definition | — | members manager | — | drafting convention |
+| mbr mbs | 2.4 | "Associated Liability" | c6835881 | definition | — | members | — | no statutory definition; ours |
+| mul scp sgl | 2.5 | "Company" | 3e7a84d5 | definition | — | members manager | — | drafting convention |
+| mbr mbs | 2.5 | "Associated Member" | 8d347d55 | definition | — | members | — | s. 605.2302 |
 | sgl | 2.6 | "Immediate Family Member" | e9425924 | definition | — | members | — | drafting convention |
-| mbr mbs mul scp | 2.6 | "Immediate Family Member" | c9ea8021 | definition | — | members | — | drafting convention |
+| mul scp | 2.6 | "Immediate Family Member" | c9ea8021 | definition | — | members | — | drafting convention |
+| mbr mbs | 2.6 | "Company" | 3e7a84d5 | definition | — | members manager | — | drafting convention |
 | sgl | 2.7 | "Manager" | bcaedf26 | definition | — | members manager | — | s. 605.0102(31) |
-| mbr mbs mul scp | 2.7 | "Involuntary Transfer" | 9b2fd4b9 | definition | — | members | — | drafting convention |
+| mul scp | 2.7 | "Involuntary Transfer" | 9b2fd4b9 | definition | — | members | — | drafting convention |
+| mbr mbs | 2.7 | "Immediate Family Member" | c9ea8021 | definition | — | members | — | drafting convention |
 | sgl | 2.8 | "Member" | 9d0067b8 | definition | — | members | — | s. 605.0102(40) |
-| mbr mbs mul scp | 2.8 | "Majority in Interest" | 310dbe0d | definition | — | members | — | s. 605.04073(1)(c) |
+| mul scp | 2.8 | "Majority in Interest" | 310dbe0d | definition | — | members | — | s. 605.04073(1)(c) |
+| mbr mbs | 2.8 | "Involuntary Transfer" | 9b2fd4b9 | definition | — | members | — | drafting convention |
 | sgl | 2.9 | "Membership Interest" | 4c485ee0 | definition | — | members | — | s. 605.0102(41) |
 | mul scp | 2.9 | "Manager" | bcaedf26 | definition | — | members manager | — | s. 605.0102(31) |
-| mbr mbs | 2.9 | "Administrative Member" | 45b7580e | definition | — | members | — | drafting convention |
+| mbr mbs | 2.9 | "Majority in Interest" | 310dbe0d | definition | — | members | — | s. 605.04073(1)(c) |
 | sgl | 2.10 | "Protected Series" | d9412d95 | definition | — | members | — | s. 605.2102(8) |
 | mbr mbs mul scp | 2.10 | "Member" | b5f3896b | definition | — | members | — | s. 605.0102(40) |
 | sgl | 2.11 | "Protected Series Designation" | f35c80e6 | definition | — | members | — | s. 605.2201 |

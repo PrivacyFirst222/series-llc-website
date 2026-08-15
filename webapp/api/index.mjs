@@ -104696,21 +104696,21 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **2.1 "Act"** means the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.
 
-**2.2 "Associated Asset"** means an asset of a Protected Series, or of the Company, that satisfies the recordkeeping requirements of s. 605.2301, Florida Statutes, and Article 8 of this Agreement.
+**2.2 "Administrative Member"** means the Member designated under Section 5.8 to perform the ministerial functions assigned to that role by this Agreement, and any successor so designated. The Administrative Member has no authority beyond that expressly conferred by this Agreement or by a Majority in Interest.
 
-**2.3 "Associated Liability"** means a liability incurred by, contracted for, or otherwise existing with respect to a particular Protected Series or the Company, as reflected in the records maintained under Article 8.
+**2.3 "Associated Asset"** means an asset of a Protected Series, or of the Company, that satisfies the recordkeeping requirements of s. 605.2301, Florida Statutes, and Article 8 of this Agreement.
 
-**2.4 "Associated Member"** means, with respect to a Protected Series, a member of the Company associated with that Protected Series under this Agreement and its Series Exhibit. Consistent with s. 605.2302(1), Florida Statutes, only a member of the Company may be an Associated Member. No Protected Series established under this Agreement has an Associated Member; each Protected Series is owned and managed by the Company as provided in Section 3.6.
+**2.4 "Associated Liability"** means a liability incurred by, contracted for, or otherwise existing with respect to a particular Protected Series or the Company, as reflected in the records maintained under Article 8.
 
-**2.5 "Company"** means [COMPANY NAME], LLC.
+**2.5 "Associated Member"** means, with respect to a Protected Series, a member of the Company associated with that Protected Series under this Agreement and its Series Exhibit. Consistent with s. 605.2302(1), Florida Statutes, only a member of the Company may be an Associated Member. No Protected Series established under this Agreement has an Associated Member; each Protected Series is owned and managed by the Company as provided in Section 3.6.
 
-**2.6 "Immediate Family Member"** means, as to any Member, (a) any ancestor of that Member or descendant of a grandparent of that Member (each an "Individual Family Member," and including persons legally adopted before age 18), or (b) a trust or other entity for the benefit of one or more Individual Family Members, provided all beneficial interests in that entity are held by such persons; a trust is not excluded merely because a remainder beneficiary is not an Individual Family Member.
+**2.6 "Company"** means [COMPANY NAME], LLC.
 
-**2.7 "Involuntary Transfer"** means any Transfer by which a Member or transferee is deprived or divested of any right, title, or interest in a Membership Interest other than voluntarily, including (a) a Transfer to or for the benefit of a judgment creditor pursuant to court order, subject in all events to Section 10.6, (b) a Transfer in connection with reorganization, insolvency, bankruptcy, or receivership, (c) a Transfer to a public officer or agency under any abandoned-property or escheat law, and (d) a Transfer to a spouse or former spouse in connection with dissolution of marriage or marital separation.
+**2.7 "Immediate Family Member"** means, as to any Member, (a) any ancestor of that Member or descendant of a grandparent of that Member (each an "Individual Family Member," and including persons legally adopted before age 18), or (b) a trust or other entity for the benefit of one or more Individual Family Members, provided all beneficial interests in that entity are held by such persons; a trust is not excluded merely because a remainder beneficiary is not an Individual Family Member.
 
-**2.8 "Majority in Interest"** means one or more Members holding, in the aggregate, more than fifty percent (50%) of the Percentage Interests then held by Members, excluding for all purposes any Percentage Interest held by a transferee, assignee, beneficiary, or holder of a charging order who has not been admitted as a Member.
+**2.8 "Involuntary Transfer"** means any Transfer by which a Member or transferee is deprived or divested of any right, title, or interest in a Membership Interest other than voluntarily, including (a) a Transfer to or for the benefit of a judgment creditor pursuant to court order, subject in all events to Section 10.6, (b) a Transfer in connection with reorganization, insolvency, bankruptcy, or receivership, (c) a Transfer to a public officer or agency under any abandoned-property or escheat law, and (d) a Transfer to a spouse or former spouse in connection with dissolution of marriage or marital separation.
 
-**2.9 "Administrative Member"** means the Member designated under Section 5.8 to perform the ministerial functions assigned to that role by this Agreement, and any successor so designated. The Administrative Member has no authority beyond that expressly conferred by this Agreement or by a Majority in Interest.
+**2.9 "Majority in Interest"** means one or more Members holding, in the aggregate, more than fifty percent (50%) of the Percentage Interests then held by Members, excluding for all purposes any Percentage Interest held by a transferee, assignee, beneficiary, or holder of a charging order who has not been admitted as a Member.
 
 **2.10 "Member"** means each person identified as a member on Exhibit A and each person admitted as a member in accordance with this Agreement, in each case until dissociated.
 
@@ -105150,21 +105150,21 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **2.1 "Act"** means the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.
 
-**2.2 "Associated Asset"** means an asset of a Protected Series, or of the Company, that satisfies the recordkeeping requirements of s. 605.2301, Florida Statutes, and Article 8 of this Agreement.
+**2.2 "Administrative Member"** means the Member designated under Section 5.8 to perform the ministerial functions assigned to that role by this Agreement, and any successor so designated. The Administrative Member has no authority beyond that expressly conferred by this Agreement or by a Majority in Interest.
 
-**2.3 "Associated Liability"** means a liability incurred by, contracted for, or otherwise existing with respect to a particular Protected Series or the Company, as reflected in the records maintained under Article 8.
+**2.3 "Associated Asset"** means an asset of a Protected Series, or of the Company, that satisfies the recordkeeping requirements of s. 605.2301, Florida Statutes, and Article 8 of this Agreement.
 
-**2.4 "Associated Member"** means, with respect to a Protected Series, a member of the Company associated with that Protected Series under this Agreement and its Series Exhibit. Consistent with s. 605.2302(1), Florida Statutes, only a member of the Company may be an Associated Member. No Protected Series established under this Agreement has an Associated Member; each Protected Series is owned and managed by the Company as provided in Section 3.6.
+**2.4 "Associated Liability"** means a liability incurred by, contracted for, or otherwise existing with respect to a particular Protected Series or the Company, as reflected in the records maintained under Article 8.
 
-**2.5 "Company"** means [COMPANY NAME], LLC.
+**2.5 "Associated Member"** means, with respect to a Protected Series, a member of the Company associated with that Protected Series under this Agreement and its Series Exhibit. Consistent with s. 605.2302(1), Florida Statutes, only a member of the Company may be an Associated Member. No Protected Series established under this Agreement has an Associated Member; each Protected Series is owned and managed by the Company as provided in Section 3.6.
 
-**2.6 "Immediate Family Member"** means, as to any Member, (a) any ancestor of that Member or descendant of a grandparent of that Member (each an "Individual Family Member," and including persons legally adopted before age 18), or (b) a trust or other entity for the benefit of one or more Individual Family Members, provided all beneficial interests in that entity are held by such persons; a trust is not excluded merely because a remainder beneficiary is not an Individual Family Member.
+**2.6 "Company"** means [COMPANY NAME], LLC.
 
-**2.7 "Involuntary Transfer"** means any Transfer by which a Member or transferee is deprived or divested of any right, title, or interest in a Membership Interest other than voluntarily, including (a) a Transfer to or for the benefit of a judgment creditor pursuant to court order, subject in all events to Section 10.6, (b) a Transfer in connection with reorganization, insolvency, bankruptcy, or receivership, (c) a Transfer to a public officer or agency under any abandoned-property or escheat law, and (d) a Transfer to a spouse or former spouse in connection with dissolution of marriage or marital separation.
+**2.7 "Immediate Family Member"** means, as to any Member, (a) any ancestor of that Member or descendant of a grandparent of that Member (each an "Individual Family Member," and including persons legally adopted before age 18), or (b) a trust or other entity for the benefit of one or more Individual Family Members, provided all beneficial interests in that entity are held by such persons; a trust is not excluded merely because a remainder beneficiary is not an Individual Family Member.
 
-**2.8 "Majority in Interest"** means one or more Members holding, in the aggregate, more than fifty percent (50%) of the Percentage Interests then held by Members, excluding for all purposes any Percentage Interest held by a transferee, assignee, beneficiary, or holder of a charging order who has not been admitted as a Member.
+**2.8 "Involuntary Transfer"** means any Transfer by which a Member or transferee is deprived or divested of any right, title, or interest in a Membership Interest other than voluntarily, including (a) a Transfer to or for the benefit of a judgment creditor pursuant to court order, subject in all events to Section 10.6, (b) a Transfer in connection with reorganization, insolvency, bankruptcy, or receivership, (c) a Transfer to a public officer or agency under any abandoned-property or escheat law, and (d) a Transfer to a spouse or former spouse in connection with dissolution of marriage or marital separation.
 
-**2.9 "Administrative Member"** means the Member designated under Section 5.8 to perform the ministerial functions assigned to that role by this Agreement, and any successor so designated. The Administrative Member has no authority beyond that expressly conferred by this Agreement or by a Majority in Interest.
+**2.9 "Majority in Interest"** means one or more Members holding, in the aggregate, more than fifty percent (50%) of the Percentage Interests then held by Members, excluding for all purposes any Percentage Interest held by a transferee, assignee, beneficiary, or holder of a charging order who has not been admitted as a Member.
 
 **2.10 "Member"** means each person identified as a member on Exhibit A and each person admitted as a member in accordance with this Agreement, in each case until dissociated.
 
