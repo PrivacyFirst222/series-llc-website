@@ -40,10 +40,10 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbr mbs | 2.2 | "Administrative Member" | 45b7580e | definition | — | members | — | drafting convention |
 | mul scp sgl | 2.3 | "Associated Liability" | c6835881 | definition | — | members | — | no statutory definition; ours |
 | mbr mbs | 2.3 | "Associated Asset" | 6bc88113 | definition | — | members | — | s. 605.2102(2) |
-| mul scp sgl | 2.4 | "Associated Member" | 750ce59c | definition | — | members | — | s. 605.2302 |
+| mul scp sgl | 2.4 | "Associated Member" | 84872358 | definition | — | members | — | s. 605.2302 |
 | mbr mbs | 2.4 | "Associated Liability" | c6835881 | definition | — | members | — | no statutory definition; ours |
 | mul scp sgl | 2.5 | "Company" | 3e7a84d5 | definition | — | members manager | — | drafting convention |
-| mbr mbs | 2.5 | "Associated Member" | 8d347d55 | definition | — | members | — | s. 605.2302 |
+| mbr mbs | 2.5 | "Associated Member" | 84872358 | definition | — | members | — | s. 605.2302 |
 | sgl | 2.6 | "Immediate Family Member" | e9425924 | definition | — | members | — | drafting convention |
 | mul scp | 2.6 | "Immediate Family Member" | c9ea8021 | definition | — | members | — | drafting convention |
 | mbr mbs | 2.6 | "Company" | 3e7a84d5 | definition | — | members manager | — | drafting convention |

@@ -57,7 +57,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **2.4 "Associated Liability"** means a liability incurred by, contracted for, or otherwise existing with respect to a particular Protected Series or the Company, as reflected in the records maintained under Article 8.
 
-**2.5 "Associated Member"** means, with respect to a Protected Series, a member of the Company associated with that Protected Series under this Agreement and its Series Exhibit. Consistent with s. 605.2302(1), Florida Statutes, only a member of the Company may be an Associated Member. No Protected Series established under this Agreement has an Associated Member; each Protected Series is owned and managed by the Company as provided in Section 3.6.
+**2.5 "Associated Member"** has the meaning given in s. 605.2302, Florida Statutes — a member of the Company whom an operating agreement designates as an associated member of a Protected Series. This Agreement designates none: no Protected Series established under it has an Associated Member, and each Protected Series is owned by the Company as provided in Section 3.6 and managed as provided in Section 5.2.
 
 **2.6 "Company"** means [COMPANY NAME], LLC.
 
