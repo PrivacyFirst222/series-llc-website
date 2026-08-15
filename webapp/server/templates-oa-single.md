@@ -211,8 +211,6 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **9.4 Change in Circumstances.** If any Protected Series or the Company ceases to qualify for disregarded treatment (including upon the admission of an additional member or the association of an additional person with any Protected Series), the Member and the Manager shall amend this Agreement (or adopt the Company's partnership-form operating agreement) as provided in Article 11 before or promptly upon the change.
 
-From the effective date of any such election, and whether or not this Agreement has yet been amended and restated, it is the express intent of the Member that the Company qualify at all times as a small business corporation eligible for a valid election under section 1362 of the Code and that the election remain in effect; any provision of this Agreement, of any Series Exhibit, or of any other agreement relating to the Company or any Protected Series that would cause the election to be invalid or to terminate is null and void ab initio and shall be given no force or effect for any purpose; and, to the extent any provision can be conformed rather than voided, this Agreement shall be applied and, to the minimum extent necessary, deemed modified so as to preserve the validity of the election. If the election nonetheless terminates or is determined to be invalid, the Member shall cooperate to obtain relief for an inadvertent termination or invalid election under section 1362(f) of the Code.
-
 ---
 
 ## ARTICLE 10 — TRANSFERS

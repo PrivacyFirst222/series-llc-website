@@ -180,7 +180,7 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mul | 9.3 | Partnership Representative | e7d81c29 | authority | manager | members | — | IRC 6223 |
 | mbs scp | 9.3 | Protecting the Election | dc89049a | covenant | members | members | The transfer breached the agreement's S corporation restrictions — a claim among the members. | IRC 1361(b) |
 | mbr | 9.3 | Partnership Representative | d4a24a46 | authority | manager | members | — | IRC 6223 |
-| sgl | 9.4 | Change in Circumstances | 48c55481 | mechanic | member | member | — | Treas. Reg. 301.7701-3 |
+| sgl | 9.4 | Change in Circumstances | 5befec9b | mechanic | member | member | — | Treas. Reg. 301.7701-3 |
 | mul | 9.4 | Tax Elections | 4ca8f78f | authority | manager members | members | — | IRC 754 |
 | scp | 9.4 | S Corporation Status; Intent; Savings Clause | 9ae38848 | benefit | members | members | — | IRC 1361, 1362 |
 | mbr | 9.4 | Tax Elections | 157b3294 | authority | manager members | members | — | IRC 754 |

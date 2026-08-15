@@ -168,6 +168,43 @@ def write_map(found, existing):
     return carried, new
 
 
+def orphans():
+    """Text inside an article that belongs to no numbered provision.
+
+    Deleting a provision is a two-line edit when the provision runs to two
+    paragraphs, and deleting only the first leaves the second sitting under its
+    neighbour, saying something nobody meant. That happened on 15 August 2026:
+    the single-member form's s. 9.5 was deleted and its second paragraph — an S
+    corporation savings clause — survived under s. 9.4 Change in Circumstances,
+    where "any such election" referred to nothing. Every other gate passed. The
+    map itself could not see it, because the map only ever looked at numbered
+    provisions.
+
+    Continuation lines are legitimate: a provision's own second paragraph, list
+    items, tables, block quotes, italic instructions, page breaks. What is not
+    legitimate is a prose paragraph that starts a new thought after a blank line
+    and carries no number — so this reports those and lets a human judge.
+    """
+    ok_start = re.compile(r"^(\*\*\d+\.\d|\([a-z]\)|\d+\.\s|\||>|\*|-|#|\[\[)")
+    out = []
+    for rel in MASTERS.values():
+        name = os.path.basename(rel)
+        in_article = False
+        for i, line in enumerate(open(os.path.join(ROOT, rel)).read().split("\n"), 1):
+            if line.startswith("## ARTICLE"):
+                in_article = True
+                continue
+            if line.startswith("# ") or (line.startswith("## ") and not line.startswith("## ARTICLE")):
+                in_article = False
+            if not in_article or not line.strip() or ok_start.match(line):
+                continue
+            if line.strip() in ("---",) or line.startswith("Records may be organized"):
+                continue  # the one legitimate continuation line, in s. 8.2
+            out.append(f"{name}:{i}  text inside an article belonging to no numbered provision — "
+                       f"\"{line.strip()[:60]}...\". A deletion probably left it behind.")
+    return out
+
+
 def check():
     found = collect()
     rows = read_map()
@@ -208,6 +245,8 @@ def check():
     for section, heading in sorted((k[0], r["heading"]) for k, r in rows.items() if k not in found):
         problems.append(f"s. {section} {heading} — row for a provision that no longer exists; "
                         "run --update")
+
+    problems.extend(orphans())
 
     for p in problems:
         print("  " + p)
