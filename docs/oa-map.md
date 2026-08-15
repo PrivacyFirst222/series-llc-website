@@ -174,13 +174,13 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbs | 9.2 | Returns; Information | 1186ce7a | covenant | manager | members | The manager did not deliver the tax information the agreement requires — a claim among the members. | IRC 6037 |
 | sgl | 9.3 | Fiscal Year | 19362c64 | mechanic | company | members | — | IRC 706; 1378 for the S forms |
 | mul | 9.3 | Partnership Representative | e7d81c29 | authority | manager | members | — | IRC 6223 |
-| mbs scp | 9.3 | Protecting the Election | 1ad59f45 | covenant | members | members | The transfer breached the agreement's S corporation restrictions — a claim among the members. | IRC 1361(b) |
+| mbs scp | 9.3 | Protecting the Election | dc89049a | covenant | members | members | The transfer breached the agreement's S corporation restrictions — a claim among the members. | IRC 1361(b) |
 | mbr | 9.3 | Partnership Representative | d4a24a46 | authority | manager | members | — | IRC 6223 |
 | sgl | 9.4 | Change in Circumstances | 48c55481 | mechanic | member | member | — | Treas. Reg. 301.7701-3 |
 | mul | 9.4 | Tax Elections | 4ca8f78f | authority | manager members | members | — | IRC 754 |
-| scp | 9.4 | S Corporation Status; Intent; Savings Clause | 916c9ccc | benefit | members | members | — | IRC 1361, 1362 |
+| scp | 9.4 | S Corporation Status; Intent; Savings Clause | 9ae38848 | benefit | members | members | — | IRC 1361, 1362 |
 | mbr | 9.4 | Tax Elections | 157b3294 | authority | manager members | members | — | IRC 754 |
-| mbs | 9.4 | S Corporation Status; Intent; Savings Clause | d902e7aa | benefit | members | members | — | IRC 1361, 1362 |
+| mbs | 9.4 | S Corporation Status; Intent; Savings Clause | 5f4827e9 | benefit | members | members | — | IRC 1361, 1362 |
 | mul | 9.5 | Fiscal Year | 19362c64 | mechanic | company | members | — | IRC 706; 1378 for the S forms |
 | scp | 9.5 | Other Elections | 2da32cea | authority | manager members | members | — | IRC 1362 |
 | mbr | 9.5 | Fiscal Year | 5c940732 | mechanic | company | members | — | IRC 706; 1378 for the S forms |
