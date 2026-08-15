@@ -175,7 +175,9 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 (g) lend money of the Company or of a Protected Series to, or borrow from, a Member, the Manager, or their affiliates, other than loans under Section 6.5 — the consent of a Majority in Interest of the disinterested Members; or
 
-(h) amend this Agreement or any Series Exhibit — the approval required by Section 15.1.
+(h) amend this Agreement or any Series Exhibit — the approval required by Section 15.1; or
+
+(i) file, amend, or cancel a statement of authority under s. 605.0302, Florida Statutes, or record a certified copy of one — the consent of **all Members**.
 
 **5.5 Standard of Conduct; Exculpation.** The Manager and each Protected Series Manager shall discharge their duties consistent with the Act, including the duties applicable to managers and protected-series managers. No Manager or Protected Series Manager shall be liable to the Company, any Protected Series, or any Member for any act or omission performed or omitted in good faith and in a manner reasonably believed to be within the scope of authority conferred by this Agreement, except for conduct for which exoneration is prohibited by the Act.
 
@@ -183,7 +185,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **5.7 Compensation; Reimbursement; Shared Expenses.** The Manager shall serve without salary unless a Majority in Interest consents in writing to compensation. The Manager and each Protected Series Manager shall be reimbursed for reasonable expenses properly incurred on behalf of the Company or the applicable Protected Series. Costs and expenses that benefit the Company and one or more Protected Series (including formation and filing fees, registered agent fees, accounting, insurance, and administrative overhead) shall be allocated among the Company and the Protected Series benefited on a reasonable and consistent basis determined by the Manager — by specific attribution where practicable and otherwise pro rata or by such other reasonable formula as the Manager adopts — and the allocation shall be recorded in the records maintained under Article 8.
 
-**5.8 Statement of Authority.** The Manager may cause the Company to file with the Department a statement of authority under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Manager, of any Protected Series Manager, or of any person holding a specified position, to transfer or encumber real property held in the name of the Company or of a Protected Series, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate.
+**5.8 Statement of Authority.** With the consent of all Members required by Section 5.4(i), the Manager may cause the Company to file with the Department a statement of authority under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Manager, of any Protected Series Manager, or of any person holding a specified position, to transfer or encumber real property held in the name of the Company or of a Protected Series, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate.
 
 **5.9 Competition; Other Activities of the Manager. [SELECT THE SAME ALTERNATIVE AS SECTION 4.7]**
 
