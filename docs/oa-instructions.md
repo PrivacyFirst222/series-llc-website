@@ -35,7 +35,7 @@ Every blank appears in [BRACKETS]. Complete all of them:
 **[PRINCIPAL ADDRESS]** — the company's principal office. This address also sets the courthouse for any dispute (venue is the county of the principal office).
 **[MANAGER NAME]** — the manager. The manager does not have to be an owner.
 **[MEMBER NAME(S)], addresses, percentages, contributions** — on Exhibit A. Multi-member percentages must total 100%.
-**[THRESHOLD]** (multi-member §5.4(f)) — the dollar amount of debt the manager may incur without a member vote. Common choices: $10,000–$50,000 for small companies.
+**[THRESHOLD]** (multi-member §5.4(f)) — the dollar amount of debt the manager may incur without the written consent of every owner. Above this number, any one owner can refuse. Common choices: $10,000–$50,000 for small companies.
 **[CAP]** (multi-member §6.2, if included) — see Section 5(a) below.
 **Series Exhibits** — one per protected series. See Section 4.
 ## 4. Completing a Series Exhibit

@@ -182,11 +182,11 @@ export const LEARN_MORE: Record<string, LearnMoreScreen> = {
       <div className="space-y-3">
         <P>
           Your manager runs day-to-day operations without needing a vote for every decision. This
-          number sets the ceiling: debt above it requires owner approval.
+          number sets the ceiling: debt above it requires the consent of every owner.
         </P>
         <Choice label="If you set a lower amount:">
-          Owners keep tighter control — the manager must come back for a vote before borrowing
-          anything significant. More protection, more friction.
+          Owners keep tighter control — the manager must come back to everyone before borrowing
+          anything significant, and any one owner can say no. More protection, more friction.
         </Choice>
         <Choice label="If you set a higher amount:">
           The manager can act quickly — financing a repair or closing a time-sensitive deal
@@ -195,7 +195,7 @@ export const LEARN_MORE: Record<string, LearnMoreScreen> = {
         <P>
           Common choices for small companies run from $10,000 to $50,000. The limit applies per
           transaction (or related series of transactions), and guarantees of anyone else's debt
-          always require approval regardless of amount.
+          always require every owner's consent regardless of amount.
         </P>
       </div>
     ),

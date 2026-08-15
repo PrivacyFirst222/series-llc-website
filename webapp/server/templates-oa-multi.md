@@ -165,13 +165,13 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 (b) **transfer, re-associate, or re-title any asset between the Company and a Protected Series or between Protected Series** (an "Inter-Series Transfer") — the consent of a Majority in Interest. Inter-Series Transfers shall be made for fair value unless the transfer is a documented contribution or distribution;
 
-(c) sell, exchange, or otherwise dispose of all or substantially all of the Associated Assets of the Company or of any Protected Series, other than in the ordinary course of business — the consent of a Majority in Interest;
+(c) sell, exchange, or otherwise dispose of all or substantially all of the Associated Assets of the Company or of any Protected Series, other than in the ordinary course of business — the consent of **all Members**;
 
 (d) merge the Company as permitted by the Act — the consent of **all Members**; or file a statement of dissolution of a Protected Series — the approval required by Section 14.1;
 
 (e) admit any additional Member — the approval required by Article 12;
 
-(f) incur, on behalf of the Company or any Protected Series, indebtedness in excess of $[THRESHOLD] in a single transaction or series of related transactions, or guarantee the obligation of any person (and no guarantee of the obligations of one Protected Series by another or by the Company shall be made except by an express written instrument approved under this Section) — the consent of a Majority in Interest;
+(f) incur, on behalf of the Company or any Protected Series, indebtedness in excess of $[THRESHOLD] in a single transaction or series of related transactions, or guarantee the obligation of any person (and no guarantee of the obligations of one Protected Series by another or by the Company shall be made except by an express written instrument approved under this Section) — the consent of **all Members**;
 
 (g) lend money of the Company or of a Protected Series to, or borrow from, a Member, the Manager, or their affiliates, other than loans under Section 6.5 — the consent of a Majority in Interest of the disinterested Members; or
 

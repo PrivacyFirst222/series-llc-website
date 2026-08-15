@@ -116,11 +116,11 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mul scp | 5.3 | Authority of the Manager | e6c44bc9 | authority | manager | members manager | — | s. 605.04073(2) |
 | mbr mbs | 5.3 | Voting; Decisions | 0b631d8f | authority | members | members | — | s. 605.04073 |
 | sgl | 5.4 | Standard of Conduct; Exculpation | 65aa77c4 | benefit | manager members | manager members | — | ss. 605.04091, 605.0105(3) |
-| mul scp | 5.4 | Actions Requiring Member Approval | aea226bb | authority | manager | members | — | s. 605.04073(2)(d) |
+| mul scp | 5.4 | Actions Requiring Member Approval | a1a49007 | authority | manager | members | — | s. 605.04073(2)(d) |
 | mbr mbs | 5.4 | Authority to Act; Limits on Authority | be68b5c7 | authority | members | members | — | s. 605.04074(1) |
 | sgl | 5.5 | Indemnification | 5fba8bac | benefit | company series | manager members | — | s. 605.0408 |
 | mul scp | 5.5 | Standard of Conduct; Exculpation | db5f385a | benefit | manager members | manager members | — | ss. 605.04091, 605.0105(3) |
-| mbr mbs | 5.5 | Actions Requiring Member Approval | ac3203a7 | authority | manager | members | — | s. 605.04073(2)(d) |
+| mbr mbs | 5.5 | Actions Requiring Member Approval | cec609df | authority | manager | members | — | s. 605.04073(2)(d) |
 | sgl | 5.6 | Compensation; Reimbursement; Shared Expenses | a0c4af21 | benefit | company | manager members | — | s. 605.04091(1) |
 | mul scp | 5.6 | Indemnification | 5fba8bac | benefit | company series | manager members | — | s. 605.0408 |
 | mbr mbs | 5.6 | Standard of Conduct; Exculpation | dfa8cbf5 | benefit | manager members | manager members | — | ss. 605.04091, 605.0105(3) |
