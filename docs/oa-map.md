@@ -142,7 +142,7 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbr mbs mul scp | 6.7 | No Right to Specific Property | 3e1803bb | benefit | members | company members | — | s. 605.0110(1) |
 | sgl | 7.1 | Distributions | 0ce91b89 | authority | manager members | members | — | s. 605.0404 |
 | mul | 7.1 | Allocations | b3e8d7e5 | mechanic | company | members | — | IRC 704(b); 1361(b)(1)(D) for the S forms |
-| mbs scp | 7.1 | Allocations | 6d2c73d7 | mechanic | company | members | — | IRC 704(b); 1361(b)(1)(D) for the S forms |
+| mbs scp | 7.1 | Allocations | 5ee5aa81 | mechanic | company | members | — | IRC 704(b); 1361(b)(1)(D) for the S forms |
 | mbr | 7.1 | Allocations | 1ab53dac | mechanic | company | members | — | IRC 704(b); 1361(b)(1)(D) for the S forms |
 | sgl | 7.2 | Source Limitation | 3af8aa49 | statutory-route | — | members series | — | ss. 605.2401, 605.2404 |
 | mul | 7.2 | Distributions | 17034e98 | authority | manager members | members | — | s. 605.0404 |
@@ -176,13 +176,13 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbs | 9.2 | Returns; Information | 45706de9 | covenant | manager | members | The manager did not deliver the tax information the agreement requires — a claim among the members. | IRC 6037 |
 | sgl | 9.3 | Fiscal Year | 19362c64 | mechanic | company | members | — | IRC 706; 1378 for the S forms |
 | mul | 9.3 | Partnership Representative | e7d81c29 | authority | manager | members | — | IRC 6223 |
-| mbs scp | 9.3 | Protecting the Election | 94583d7c | covenant | members | members | The transfer breached the agreement's S corporation restrictions — a claim among the members. | IRC 1361(b) |
+| mbs scp | 9.3 | Protecting the Election | 1ad59f45 | covenant | members | members | The transfer breached the agreement's S corporation restrictions — a claim among the members. | IRC 1361(b) |
 | mbr | 9.3 | Partnership Representative | d4a24a46 | authority | manager | members | — | IRC 6223 |
 | sgl | 9.4 | Change in Circumstances | 48c55481 | mechanic | member | member | — | Treas. Reg. 301.7701-3 |
 | mul | 9.4 | Tax Elections | 4ca8f78f | authority | manager members | members | — | IRC 754 |
-| scp | 9.4 | S Corporation Status; Intent; Savings Clause | b5bd736c | benefit | members | members | — | IRC 1361, 1362 |
+| scp | 9.4 | S Corporation Status; Intent; Savings Clause | 916c9ccc | benefit | members | members | — | IRC 1361, 1362 |
 | mbr | 9.4 | Tax Elections | 157b3294 | authority | manager members | members | — | IRC 754 |
-| mbs | 9.4 | S Corporation Status; Intent; Savings Clause | 8bed3e5f | benefit | members | members | — | IRC 1361, 1362 |
+| mbs | 9.4 | S Corporation Status; Intent; Savings Clause | d902e7aa | benefit | members | members | — | IRC 1361, 1362 |
 | mul | 9.5 | Fiscal Year | 19362c64 | mechanic | company | members | — | IRC 706; 1378 for the S forms |
 | scp | 9.5 | Other Elections | 2da32cea | authority | manager members | members | — | IRC 1362 |
 | mbr | 9.5 | Fiscal Year | 5c940732 | mechanic | company | members | — | IRC 706; 1378 for the S forms |
