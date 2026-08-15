@@ -103303,7 +103303,7 @@ function assembleNewSeries(input) {
   const purpose = input.purpose.trim() || "any lawful business, purpose, or activity for which the Company may be organized under the Act";
   const authority = input.memberManaged ? "The Members authorize the Administrative Member, or any Member the Members designate, to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement." : `The Members authorize the Manager to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.`;
   const managers = input.managerNames.map((n) => n.trim()).filter(Boolean);
-  const psManager = input.memberManaged ? "The Company, acting through a Majority in Interest of the Members" : managers.join(", ") || "[MANAGER NAME]";
+  const psManager = input.memberManaged ? "The Company, as protected-series manager (s. 605.2304(2), Fla. Stat.), acting through a Majority in Interest of the Members" : managers.join(", ") || "[MANAGER NAME]";
   const psSignature = input.memberManaged ? `${input.memberNames[0] ?? "[MEMBER NAME]"}, Member, for the Company` : managers.length ? managers.map((n) => `${n}, Manager`).join("\n\n_____________________________\n") : "[MANAGER NAME], Manager";
   const blocks = input.memberNames.length ? input.memberNames.map((n) => `_____________________________
 ${n}`).join("\n\n") : "_____________________________\n[MEMBER NAME]";
@@ -103894,7 +103894,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 (b) **transfer, re-associate, or re-title any asset between the Company and a Protected Series or between Protected Series** (an "Inter-Series Transfer") \u2014 the consent of a Majority in Interest. Inter-Series Transfers shall be made for fair value unless the transfer is a documented contribution or distribution;
 
-(c) sell, exchange, or otherwise dispose of all or substantially all of the Associated Assets of the Company or of any Protected Series, other than in the ordinary course \u2014 the consent of a Majority in Interest;
+(c) sell, exchange, or otherwise dispose of all or substantially all of the Associated Assets of the Company or of any Protected Series, other than in the ordinary course of business \u2014 the consent of a Majority in Interest;
 
 (d) merge the Company as permitted by the Act \u2014 the consent of **all Members**; or file a statement of dissolution of a Protected Series \u2014 the approval required by Section 14.1;
 
@@ -104345,7 +104345,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 (b) **transfer, re-associate, or re-title any asset between the Company and a Protected Series or between Protected Series** (an "Inter-Series Transfer") \u2014 the consent of a Majority in Interest. Inter-Series Transfers shall be made for fair value unless the transfer is a documented contribution or distribution;
 
-(c) sell, exchange, or otherwise dispose of all or substantially all of the Associated Assets of the Company or of any Protected Series, other than in the ordinary course \u2014 the consent of a Majority in Interest;
+(c) sell, exchange, or otherwise dispose of all or substantially all of the Associated Assets of the Company or of any Protected Series, other than in the ordinary course of business \u2014 the consent of a Majority in Interest;
 
 (d) merge the Company as permitted by the Act \u2014 the consent of **all Members**; or file a statement of dissolution of a Protected Series \u2014 the approval required by Section 14.1;
 
@@ -104816,7 +104816,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 (b) **transfer, re-associate, or re-title any asset between the Company and a Protected Series or between Protected Series** (an "Inter-Series Transfer") \u2014 the consent of a Majority in Interest. Inter-Series Transfers shall be made for fair value unless the transfer is a documented contribution or distribution;
 
-(c) sell, exchange, or otherwise dispose of all or substantially all of the Associated Assets of the Company or of any Protected Series, other than in the ordinary course \u2014 the consent of a Majority in Interest;
+(c) sell, exchange, or otherwise dispose of all or substantially all of the Associated Assets of the Company or of any Protected Series, other than in the ordinary course of business \u2014 the consent of a Majority in Interest;
 
 (d) merge the Company as permitted by the Act \u2014 the consent of **all Members**; or file a statement of dissolution of a Protected Series \u2014 the approval required by Section 14.1;
 
@@ -105061,7 +105061,7 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
 |---|---|
 | Purpose of this Protected Series | [PURPOSE \u2014 e.g., "to acquire, own, lease, and manage the real property located at ___" or "any lawful business"] |
 | Owner of this Protected Series | The Company. This Protected Series has no Associated Members (ss. 605.2302(1), 605.2303(2), Fla. Stat.). |
-| Managed by | The Company, acting through a Majority in Interest of the Members |
+| Managed by | The Company, as protected-series manager (s. 605.2304(2), Fla. Stat.), acting through a Majority in Interest of the Members |
 | Contributions to this Protected Series | By the Company: $[AMOUNT] on [DATE] [and/or described property] |
 | Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the Member(s), together with the records maintained under Article 8. |
 | Special terms (if any) | [None / variations from the base Agreement \u2014 may not vary Article 8 or non-variable provisions of the Act] |
@@ -105268,7 +105268,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 (b) **transfer, re-associate, or re-title any asset between the Company and a Protected Series or between Protected Series** (an "Inter-Series Transfer") \u2014 the consent of a Majority in Interest. Inter-Series Transfers shall be made for fair value unless the transfer is a documented contribution or distribution;
 
-(c) sell, exchange, or otherwise dispose of all or substantially all of the Associated Assets of the Company or of any Protected Series, other than in the ordinary course \u2014 the consent of a Majority in Interest;
+(c) sell, exchange, or otherwise dispose of all or substantially all of the Associated Assets of the Company or of any Protected Series, other than in the ordinary course of business \u2014 the consent of a Majority in Interest;
 
 (d) merge the Company as permitted by the Act \u2014 the consent of **all Members**; or file a statement of dissolution of a Protected Series \u2014 the approval required by Section 14.1;
 
@@ -105527,7 +105527,7 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
 |---|---|
 | Purpose of this Protected Series | [PURPOSE \u2014 e.g., "to acquire, own, lease, and manage the real property located at ___" or "any lawful business"] |
 | Owner of this Protected Series | The Company. This Protected Series has no Associated Members (ss. 605.2302(1), 605.2303(2), Fla. Stat.). |
-| Managed by | The Company, acting through a Majority in Interest of the Members |
+| Managed by | The Company, as protected-series manager (s. 605.2304(2), Fla. Stat.), acting through a Majority in Interest of the Members |
 | Contributions to this Protected Series | By the Company: $[AMOUNT] on [DATE] [and/or described property] |
 | Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the Member(s), together with the records maintained under Article 8. |
 | Special terms (if any) | [None / variations from the base Agreement \u2014 may not vary Article 8 or non-variable provisions of the Act] |

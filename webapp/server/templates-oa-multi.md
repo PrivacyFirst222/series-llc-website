@@ -165,7 +165,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 (b) **transfer, re-associate, or re-title any asset between the Company and a Protected Series or between Protected Series** (an "Inter-Series Transfer") — the consent of a Majority in Interest. Inter-Series Transfers shall be made for fair value unless the transfer is a documented contribution or distribution;
 
-(c) sell, exchange, or otherwise dispose of all or substantially all of the Associated Assets of the Company or of any Protected Series, other than in the ordinary course — the consent of a Majority in Interest;
+(c) sell, exchange, or otherwise dispose of all or substantially all of the Associated Assets of the Company or of any Protected Series, other than in the ordinary course of business — the consent of a Majority in Interest;
 
 (d) merge the Company as permitted by the Act — the consent of **all Members**; or file a statement of dissolution of a Protected Series — the approval required by Section 14.1;
 

@@ -55,7 +55,7 @@ export function assembleNewSeries(input: NewSeriesInput): { markdown: string; ti
   // names alone. The member-managed row states who acts, because the statutory
   // protected-series manager there is the Company itself.
   const psManager = input.memberManaged
-    ? "The Company, acting through a Majority in Interest of the Members"
+    ? "The Company, as protected-series manager (s. 605.2304(2), Fla. Stat.), acting through a Majority in Interest of the Members"
     : managers.join(", ") || "[MANAGER NAME]";
   // Manager-managed: one signature line per Manager, matching the Agreement.
   const psSignature = input.memberManaged
