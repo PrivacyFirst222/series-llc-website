@@ -110,15 +110,15 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | sgl | 5.3 | Authority of the Manager | 138c6dd4 | authority | manager | members manager | — | s. 605.04073(2) |
 | mul scp | 5.3 | Authority of the Manager | e6c44bc9 | authority | manager | members manager | — | s. 605.04073(2) |
 | mbr mbs | 5.3 | Voting; Decisions | 0b631d8f | authority | members | members | — | s. 605.04073 |
-| sgl | 5.4 | Standard of Conduct; Exculpation | 6d0bcc00 | benefit | manager members | manager members | — | ss. 605.04091, 605.0105(3) |
+| sgl | 5.4 | Standard of Conduct; Exculpation | 65aa77c4 | benefit | manager members | manager members | — | ss. 605.04091, 605.0105(3) |
 | mul scp | 5.4 | Actions Requiring Member Approval | a3095fdd | authority | manager | members | — | s. 605.04073(2)(d) |
 | mbr mbs | 5.4 | Authority to Act; Limits on Authority | be68b5c7 | authority | members | members | — | s. 605.04074(1) |
 | sgl | 5.5 | Indemnification | 5fba8bac | benefit | company series | manager members | — | s. 605.0408 |
-| mul scp | 5.5 | Standard of Conduct; Exculpation | f9ea0bce | benefit | manager members | manager members | — | ss. 605.04091, 605.0105(3) |
+| mul scp | 5.5 | Standard of Conduct; Exculpation | db5f385a | benefit | manager members | manager members | — | ss. 605.04091, 605.0105(3) |
 | mbr mbs | 5.5 | Actions Requiring Member Approval | 4974640a | authority | manager | members | — | s. 605.04073(2)(d) |
 | sgl | 5.6 | Compensation; Reimbursement; Shared Expenses | a0c4af21 | benefit | company | manager members | — | s. 605.04091(1) |
 | mul scp | 5.6 | Indemnification | 5fba8bac | benefit | company series | manager members | — | s. 605.0408 |
-| mbr mbs | 5.6 | Standard of Conduct; Exculpation | c60198a0 | benefit | manager members | manager members | — | ss. 605.04091, 605.0105(3) |
+| mbr mbs | 5.6 | Standard of Conduct; Exculpation | dfa8cbf5 | benefit | manager members | manager members | — | ss. 605.04091, 605.0105(3) |
 | sgl | 5.7 | Statement of Authority | ffe88ce0 | authority | company | members manager third-party | — | s. 605.0302 |
 | mul scp | 5.7 | Compensation; Reimbursement; Shared Expenses | 95dfa725 | benefit | company | manager members | — | s. 605.04091(1) |
 | mbr mbs | 5.7 | Indemnification | b6c395f8 | benefit | company series | manager members | — | s. 605.0408 |
