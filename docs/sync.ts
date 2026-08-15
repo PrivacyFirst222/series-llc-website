@@ -41,6 +41,7 @@ const GENERATED = new Set([
   "FPSLLC Redline - Manager-Managed vs Member-Managed Partnership.docx",
   "FPSLLC Redline - Manager-Managed vs Member-Managed S Corporation.docx",
   "FPSLLC Redline - Member-Managed Partnership vs S Corporation.docx",
+  "FPSLLC Redline - Manager-Managed Multi-Member vs Single Member.docx",
 ]);
 
 /** Research material deliberately not committed: samples and other people's

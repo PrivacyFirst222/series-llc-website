@@ -122,11 +122,15 @@ python3 "$ROOT/docs/redline.py" "$ROOT/webapp/server/templates-oa-s.md" \
 python3 "$ROOT/docs/redline.py" "$ROOT/webapp/server/templates-oa-member.md" \
         "$ROOT/webapp/server/templates-oa-member-s.md" \
         "FPSLLC Redline - Member-Managed Partnership vs S Corporation.docx"
+python3 "$ROOT/docs/redline.py" "$ROOT/webapp/server/templates-oa-multi.md" \
+        "$ROOT/webapp/server/templates-oa-single.md" \
+        "FPSLLC Redline - Manager-Managed Multi-Member vs Single Member.docx"
 REDLINES=(
   "FPSLLC Redline - Manager-Managed Partnership vs S Corporation.docx"
   "FPSLLC Redline - Manager-Managed vs Member-Managed Partnership.docx"
   "FPSLLC Redline - Manager-Managed vs Member-Managed S Corporation.docx"
   "FPSLLC Redline - Member-Managed Partnership vs S Corporation.docx"
+  "FPSLLC Redline - Manager-Managed Multi-Member vs Single Member.docx"
 )
 
 # Dropbox second, and never fatal. -d is not enough: under a macOS privacy denial
