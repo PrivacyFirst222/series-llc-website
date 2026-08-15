@@ -84,8 +84,7 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbr mbs mul scp sgl | 3.4 | Dissolution of a Protected Series Distinguished | ab68ccd0 | statutory-route | — | members | — | s. 605.2501 |
 | mul scp sgl | 3.5 | Series Exhibits Control Series Terms | 70d3c7b8 | mechanic | company | members | — | drafting convention |
 | mbr mbs | 3.5 | Series Exhibits Control Series Terms | a3eb038e | mechanic | company | members | — | drafting convention |
-| mul scp sgl | 3.6 | Company as Owner | 4690fc28 | statutory-route | — | members company | — | s. 605.2303(1)-(3) |
-| mbr mbs | 3.6 | Company as Owner and Protected-Series Manager | 78f03269 | statutory-route | — | members company | — | s. 605.2303(1)-(3) |
+| mbr mbs mul scp sgl | 3.6 | Company as Owner | 4690fc28 | statutory-route | — | members company | — | s. 605.2303(1)-(3) |
 | sgl | 4.1 | Sole Member | 86821bf1 | mechanic | — | member | — | drafting convention |
 | mul scp | 4.1 | Members; Percentage Interests | 65ad85a1 | mechanic | — | members | — | s. 605.04073(1)(b) |
 | mbr mbs | 4.1 | Members; Percentage Interests | eaf1d35a | mechanic | — | members | — | s. 605.04073(1)(b) |
@@ -112,7 +111,7 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbr mbs | 5.1 | Member-Managed | b9f7026e | authority | members | members | — | ss. 605.0407(1), 605.04073(1) |
 | sgl | 5.2 | Management of Each Protected Series | 7295d2ea | authority | manager | members series | — | ss. 605.2304(2), 605.2107(1)(n) |
 | mul scp | 5.2 | Management of Each Protected Series | 00750ec0 | authority | manager | members series | — | ss. 605.2304(2), 605.2107(1)(n) |
-| mbr mbs | 5.2 | Management of Each Protected Series | cfcea194 | authority | manager | members series | — | ss. 605.2304(2), 605.2107(1)(n) |
+| mbr mbs | 5.2 | Management of Each Protected Series | 55f990eb | authority | manager | members series | — | ss. 605.2304(2), 605.2107(1)(n) |
 | sgl | 5.3 | Authority of the Manager | 138c6dd4 | authority | manager | members manager | — | s. 605.04073(2) |
 | mul scp | 5.3 | Authority of the Manager | e6c44bc9 | authority | manager | members manager | — | s. 605.04073(2) |
 | mbr mbs | 5.3 | Voting; Decisions | 0b631d8f | authority | members | members | — | s. 605.04073 |
