@@ -168,10 +168,10 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbr mul | 9.1 | Intended Classification | 6c18356d | benefit | members | members | — | Treas. Reg. 301.7701-3 |
 | mbs scp | 9.1 | S Corporation Status | 86c3eddc | benefit | members | members | — | IRC 1362 |
 | sgl | 9.2 | Tax Filings and Elections | 33370c47 | authority | manager | members | — | IRC 6031 |
-| mul | 9.2 | Tax Returns; Information | 5fae98ab | covenant | manager | members | The manager did not deliver the tax information the agreement requires — a claim among the members. | IRC 6031(b) |
-| scp | 9.2 | Returns; Information | 47303325 | covenant | manager | members | The manager did not deliver the tax information the agreement requires — a claim among the members. | IRC 6037 |
-| mbr | 9.2 | Tax Returns; Information | e7224241 | covenant | manager | members | The manager did not deliver the tax information the agreement requires — a claim among the members. | IRC 6031(b) |
-| mbs | 9.2 | Returns; Information | 45706de9 | covenant | manager | members | The manager did not deliver the tax information the agreement requires — a claim among the members. | IRC 6037 |
+| mul | 9.2 | Tax Returns; Information | c3466478 | covenant | manager | members | The manager did not deliver the tax information the agreement requires — a claim among the members. | IRC 6031(b) |
+| scp | 9.2 | Returns; Information | 90b2b500 | covenant | manager | members | The manager did not deliver the tax information the agreement requires — a claim among the members. | IRC 6037 |
+| mbr | 9.2 | Tax Returns; Information | a115b23e | covenant | manager | members | The manager did not deliver the tax information the agreement requires — a claim among the members. | IRC 6031(b) |
+| mbs | 9.2 | Returns; Information | 1186ce7a | covenant | manager | members | The manager did not deliver the tax information the agreement requires — a claim among the members. | IRC 6037 |
 | sgl | 9.3 | Fiscal Year | 19362c64 | mechanic | company | members | — | IRC 706; 1378 for the S forms |
 | mul | 9.3 | Partnership Representative | e7d81c29 | authority | manager | members | — | IRC 6223 |
 | mbs scp | 9.3 | Protecting the Election | 1ad59f45 | covenant | members | members | The transfer breached the agreement's S corporation restrictions — a claim among the members. | IRC 1361(b) |
