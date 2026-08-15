@@ -111,9 +111,15 @@ echo "regenerated $count Word documents -> docs/word/"
 # The redline is derived from two masters rather than one, so it runs after the
 # set is written. A stale redline is worse than none — it would show a
 # difference that no longer exists.
-echo "redlining the partnership form against the S corporation form"
+echo "redlining the forms against each other"
 python3 "$ROOT/docs/redline.py"
-REDLINE="FPSLLC Redline - Manager-Managed Partnership vs S Corporation.docx"
+python3 "$ROOT/docs/redline.py" "$ROOT/webapp/server/templates-oa-multi.md" \
+        "$ROOT/webapp/server/templates-oa-member.md" \
+        "FPSLLC Redline - Manager-Managed vs Member-Managed Partnership.docx"
+REDLINES=(
+  "FPSLLC Redline - Manager-Managed Partnership vs S Corporation.docx"
+  "FPSLLC Redline - Manager-Managed vs Member-Managed Partnership.docx"
+)
 
 # Dropbox second, and never fatal. -d is not enough: under a macOS privacy denial
 # the directory tests as present and every write fails.
@@ -123,7 +129,9 @@ if [ -d "$OUT_DROPBOX" ]; then
     name="${entry##*|}"
     cp "$STAGE/$name" "$OUT_DROPBOX/$name" 2>/dev/null || failed=$((failed + 1))
   done
-  cp "$OUT_REPO/$REDLINE" "$OUT_DROPBOX/$REDLINE" 2>/dev/null || failed=$((failed + 1))
+  for name in "${REDLINES[@]}"; do
+    cp "$OUT_REPO/$name" "$OUT_DROPBOX/$name" 2>/dev/null || failed=$((failed + 1))
+  done
   if [ "$failed" -eq 0 ]; then
     echo "copied $count Word documents -> Dropbox"
   else
