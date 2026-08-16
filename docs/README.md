@@ -20,11 +20,12 @@ That is why the masters live here.
 | `webapp/server/templates-oa-member-s.md` | FPSLLC Operating Agreement - Member-Managed (S Corporation) - DRAFT.docx |
 | `webapp/server/templates-oa-single-s.md` | SMMMS - FPSLLC Operating Agreement - Manager-Managed Single Member (S Corporation) - DRAFT.docx |
 | `webapp/server/templates-oa-member-single.md` | SMMEMDE - FPSLLC Operating Agreement - Member-Managed Single Member (Disregarded) - DRAFT.docx |
+| `webapp/server/templates-oa-member-single-s.md` | SMMEMS - FPSLLC Operating Agreement - Member-Managed Single Member (S Corporation) - DRAFT.docx |
 | `docs/owners-manual.md` | Series LLC Owners Manual - REVISED DRAFT.docx |
 | `docs/statement-of-authorized-representative.md` | FPSLLC Statement of Authorized Representative - FORM.docx |
 | `docs/oa-instructions.md` | FPSLLC Operating Agreement Instructions - DRAFT.docx |
 
-The six operating agreement masters are also what the portal uses to generate a
+The eight operating agreement masters are also what the portal uses to generate a
 client's agreement, so the Word file and the client's PDF always come from the
 same text.
 

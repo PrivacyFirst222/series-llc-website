@@ -9,7 +9,7 @@ time, by Adam, by reading.
 
 This file makes the model an artifact and the rule a gate:
 
-  1. EVERY numbered provision in the five masters must have a row in
+  1. EVERY numbered provision in every master must have a row in
      docs/oa-map.md naming who it binds, who benefits, and — for anything that
      can be breached — the sentence a plaintiff will say about it.
 
@@ -52,6 +52,7 @@ MASTERS = {
     "mbs": "webapp/server/templates-oa-member-s.md",
     "sgs": "webapp/server/templates-oa-single-s.md",
     "sgm": "webapp/server/templates-oa-member-single.md",
+    "sgms": "webapp/server/templates-oa-member-single-s.md",
 }
 
 # What a provision is FOR. Anything that can be breached is a covenant, and a
@@ -92,7 +93,7 @@ def provisions(path):
 def collect(root=ROOT):
     """Unique provisions across the masters, keyed by (section, hash).
 
-    Identical text in five forms is one row listing the forms that carry it.
+    Identical text in several forms is one row listing the forms that carry it.
     """
     found = {}
     for code, rel in MASTERS.items():

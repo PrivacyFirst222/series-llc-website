@@ -114,6 +114,26 @@
     },
     "tables": 3
   },
+  "SMMEMS - FPSLLC Operating Agreement - Member-Managed Single Member (S Corporation) - DRAFT.docx": {
+    "_derivation": "No hand-formatted original exists: drafted 16 August 2026, never authored in Word. Every value here is copied from the SMMEMDE entry \u2014 the member-managed single-member agreement, which is this document minus the S corporation Article 9 and the Code definition. SMMEMS is strictly LARGER than SMMEMDE, so the absolute counts (paragraphs, headings, justified, keep_next, tables) are conservative floors rather than expectations, and the ratios are the real test. Deliberately NOT measured from the generated output: a baseline taken from the artifact it is meant to police can never fail. format-check applies TOLERANCE = 0.80 to every ratio and every absolute, so this detects wholesale flattening \u2014 the 8 August 2026 failure \u2014 and not the loss of a single heading.",
+    "body_size": 24,
+    "coloured_runs": 0,
+    "headings": 20,
+    "indented": 0,
+    "italic_runs": 3,
+    "justified": 117,
+    "keep_lines": 0,
+    "keep_next": 23,
+    "page_numbers": false,
+    "paragraphs": 199,
+    "primary_font": "Times New Roman",
+    "ratios": {
+      "headings_pct": 0.1005,
+      "justified_pct": 0.7005347593582888,
+      "keep_lines_pct": 0.0
+    },
+    "tables": 3
+  },
   "SMMMDE - FPSLLC Operating Agreement - Manager-Managed Single Member (Disregarded) - DRAFT.docx": {
     "body_size": 24,
     "coloured_runs": 0,

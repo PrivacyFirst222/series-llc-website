@@ -13,7 +13,7 @@ This resolves every reference and fails on any that no longer exists. It is the
 mechanical half of the rule in CLAUDE.md; it cannot read a sentence for meaning,
 and it passing is not evidence that anyone did.
 
-A reference is satisfied if the section exists in ANY of the five masters, since
+A reference is satisfied if the section exists in ANY master, since
 the guidance documents describe all of them and often name the form in prose
 ("§4.6 in the single-member form"). Where a reference names a form, that form is
 checked specifically.
@@ -36,6 +36,7 @@ MASTERS = {
     "member-managed S corporation": "webapp/server/templates-oa-member-s.md",
     "single-member S corporation": "webapp/server/templates-oa-single-s.md",
     "member-managed single-member": "webapp/server/templates-oa-member-single.md",
+    "member-managed single-member S corporation": "webapp/server/templates-oa-member-single-s.md",
 }
 
 GUIDANCE = [

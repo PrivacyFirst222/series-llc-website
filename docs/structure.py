@@ -28,7 +28,7 @@ together as a document". None of the three reads for meaning.
                defined twice. Adam moved 2.9 to 2.2 by hand to restore the
                alphabet; this keeps it restored
 
-    python3 docs/structure.py                       # all five masters
+    python3 docs/structure.py                       # every master
     python3 docs/structure.py --selftest            # break each invariant, watch it fire
     python3 docs/structure.py path/to/master.md     # one
 """
@@ -48,6 +48,7 @@ MASTERS = [
     "webapp/server/templates-oa-member-s.md",
     "webapp/server/templates-oa-single-s.md",
     "webapp/server/templates-oa-member-single.md",
+    "webapp/server/templates-oa-member-single-s.md",
 ]
 
 PROVISION_RE = re.compile(
@@ -170,7 +171,7 @@ def check(path):
 
 # Each entry breaks one invariant in a real master and names the words the check
 # must say about it. A check nobody has watched fail is not known to work: the
-# first version of this file passed all five masters while three of its checks
+# first version of this file passed every master while three of its checks
 # were dead, and the mutations that "proved" them had silently changed nothing.
 # So a mutation that leaves the text identical is a failure here, not a pass.
 MUTATIONS = [

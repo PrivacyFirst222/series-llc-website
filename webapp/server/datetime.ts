@@ -41,7 +41,7 @@ export function stampForFilename(d: Date = new Date()): string {
 /** How the agreement is taxed, in the words a client would use. */
 export function taxationLabel(version: string): string {
   if (version === "s" || version === "member-s") return "S Corporation";
-  if (version === "single-s") return "Single-Member S Corporation";
+  if (version === "single-s" || version === "member-single-s") return "Single-Member S Corporation";
   if (version === "member-single") return "Single-Member";
   if (version === "single") return "Single-Member";
   return "Partnership";

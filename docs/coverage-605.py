@@ -37,6 +37,7 @@ MASTERS = [
     "webapp/server/templates-oa-member-s.md",
     "webapp/server/templates-oa-single-s.md",
     "webapp/server/templates-oa-member-single.md",
+    "webapp/server/templates-oa-member-single-s.md",
 ]
 
 DISPOSITIONS = {"non-variable", "varied", "relied", "n/a"}

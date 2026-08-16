@@ -831,18 +831,20 @@ app.post("/portal/oa/generate", async (c) => {
   if (!seed) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
   const multiOwner = seed.members.length > 1;
   const memberManaged = seed.managementStructure === "MEMBER_MANAGED";
-  // Management structure × tax posture. A single owner is always the
-  // disregarded form unless they elect S; member-managed only applies with
-  // more than one owner (a sole owner has no one to share management with).
-  const version: OaInputs["version"] = a.sElection
-    ? multiOwner && memberManaged
-      ? "member-s"
-      : "s"
-    : multiOwner
-      ? memberManaged
-        ? "member"
-        : "multi"
-      : "single";
+  // Management structure × tax posture, all four structures by both postures.
+  // A sole owner CAN be member-managed and often is: managementStructure comes
+  // off the formation record, which is what was filed with the Division, and
+  // handing a member-managed filer a manager-managed agreement contradicts
+  // their own Articles. Until 16 August this collapsed every sole owner onto
+  // the manager-managed forms because the member-managed single-member forms
+  // did not exist yet.
+  const version: OaInputs["version"] = multiOwner
+    ? a.sElection
+      ? memberManaged ? "member-s" : "s"
+      : memberManaged ? "member" : "multi"
+    : a.sElection
+      ? memberManaged ? "member-single-s" : "single-s"
+      : memberManaged ? "member-single" : "single";
   if (a.authorized !== true) {
     return c.json(err("Please confirm you are authorized to provide this information.", "INVALID_INPUT"), 400);
   }
@@ -928,7 +930,9 @@ app.post("/portal/oa/generate", async (c) => {
       });
     }
   });
-  const isSCorp = version === "s" || version === "member-s";
+  const isSCorp =
+    version === "s" || version === "member-s" ||
+    version === "single-s" || version === "member-single-s";
   if (isSCorp && !multiOwner && !members[0].contribution) {
     // sole owner on the S form: the single flow collects the contribution as contributionToCompany
     members[0].contribution = a.contributionToCompany ?? "";

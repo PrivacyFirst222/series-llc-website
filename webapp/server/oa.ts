@@ -12,6 +12,7 @@ import memberTemplateRaw from "./templates-oa-member.md";
 import memberSCorpTemplateRaw from "./templates-oa-member-s.md";
 import singleSCorpTemplateRaw from "./templates-oa-single-s.md";
 import memberSingleTemplateRaw from "./templates-oa-member-single.md";
+import memberSingleSCorpTemplateRaw from "./templates-oa-member-single-s.md";
 import { taxationLabel } from "./datetime";
 
 /** esbuild bundles .md as text; Bun without the bunfig loader resolves the
@@ -26,6 +27,7 @@ const memberTemplate = loadTemplate(memberTemplateRaw as string);
 const memberSCorpTemplate = loadTemplate(memberSCorpTemplateRaw as string);
 const singleSCorpTemplate = loadTemplate(singleSCorpTemplateRaw as string);
 const memberSingleTemplate = loadTemplate(memberSingleTemplateRaw as string);
+const memberSingleSCorpTemplate = loadTemplate(memberSingleSCorpTemplateRaw as string);
 
 export const OA_TEMPLATE_VERSION = "First Edition — August 2026";
 
@@ -57,7 +59,9 @@ export interface OaSeriesInput {
 export interface OaInputs {
   /** Management structure × tax posture. "s" forms are the S corporation
    *  masters and serve any member count; "member*" are member-managed. */
-  version: "single" | "single-s" | "member-single" | "multi" | "s" | "member" | "member-s";
+  version:
+    | "single" | "single-s" | "member-single" | "member-single-s"
+    | "multi" | "s" | "member" | "member-s";
   companyName: string;
   principalAddress: string;
   /** Every person serving as Manager. s. 5.1 makes them act by majority. */
@@ -122,20 +126,22 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
     "member-s": memberSCorpTemplate,
     "single-s": singleSCorpTemplate,
     "member-single": memberSingleTemplate,
+    "member-single-s": memberSingleSCorpTemplate,
   } as const;
   let s = TEMPLATES[inputs.version];
-  /** Every form except the single-member one shares the multi chassis. */
+  /** Every form except the single-member ones shares the multi chassis. */
   const isSingle =
     inputs.version === "single" || inputs.version === "single-s" ||
-    inputs.version === "member-single";
+    inputs.version === "member-single" || inputs.version === "member-single-s";
   const isMulti = !isSingle;
   /** The S corporation forms hardwire identical ownership across all series. */
   const isSCorp =
-    inputs.version === "s" || inputs.version === "member-s" || inputs.version === "single-s";
+    inputs.version === "s" || inputs.version === "member-s" ||
+    inputs.version === "single-s" || inputs.version === "member-single-s";
   /** Member-managed forms have no Manager to name. */
   const isMemberManaged =
     inputs.version === "member" || inputs.version === "member-s" ||
-    inputs.version === "member-single";
+    inputs.version === "member-single" || inputs.version === "member-single-s";
   const co = inputs.companyName;
 
   // ---- global fields ----
@@ -183,8 +189,10 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
   // agreement: there the Member manages, so an approval gate would be the Member
   // consenting to themselves and the provision does not exist. Making this
   // unconditional on 16 August was right for the five forms that existed then and
-  // wrong the moment a form without the gate was added.
-  const hasBorrowingThreshold = inputs.version !== "member-single";
+  // wrong the moment a form without the gate was added. Derived from the two
+  // predicates rather than listed by name, so the next member-managed
+  // single-member form is covered without anyone remembering to add it.
+  const hasBorrowingThreshold = !(isMemberManaged && isSingle);
   if (hasBorrowingThreshold) {
     must(s, "$[THRESHOLD]", "threshold");
     s = s.split("$[THRESHOLD]").join(money(inputs.borrowingThreshold ?? 25000));
@@ -274,13 +282,21 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
 |---|---|
 | Member name | ${m.name} |
 | Member address | ${m.address} |
-| Membership Interest | 100% (single class) |
+| Membership Interest | 100% (single class${isSCorp ? " of ownership" : ""}) |
 | Initial contribution to the Company | ${inputs.contributionToCompany || m.contribution || "—"} |
 | Date of contribution | ${inputs.effectiveDate} |
 
 **Transfer on Death designation (ss. 711.50–711.512, Fla. Stat.):**
 
-Upon the death of the Member, the Membership Interest shall pass to: **${m.todBeneficiary || "No beneficiary designated"}**${m.todBeneficiary ? "" : " — the Membership Interest passes as provided by law"}, subject in all events to this Agreement.
+Upon the death of the Member, the Membership Interest shall pass to: **${m.todBeneficiary || "No beneficiary designated"}**${m.todBeneficiary ? "" : " — the Membership Interest passes as provided by law"}, subject in all events to this Agreement.${
+      // The S corporation masters put the eligible-shareholder limit on the TOD
+      // line of Exhibit A, and this builder replaces that whole section — so
+      // without this the restriction is in the master and absent from the
+      // document the client actually signs.
+      isSCorp
+        ? " A designation is effective only in favor of a beneficiary that is an eligible S corporation shareholder (Section 9.3(b))."
+        : ""
+    }
 `;
     s = replaceSection(s, "EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION", "[[pagebreak]]\n\n" + exhibitA, "Exhibit A single");
   } else {
