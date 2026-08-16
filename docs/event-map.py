@@ -120,17 +120,17 @@ def check(path=None):
 
 MUTATIONS = [
     ("an event left unanswered for one form",
-     lambda t: t.replace("| A member divorces | s. 605.0502 | 10.1 |", "| A member divorces | s. 605.0502 |  |", 1),
+     lambda t: t.replace("| The company misses its annual report | ss. 605.0212, 605.0714, 605.2206 | 1.9 |", "| The company misses its annual report | ss. 605.0212, 605.0714, 605.2206 |  |", 1),
      "sgl is unanswered"),
     ("silence with no reason given",
      lambda t: t.replace("| The members deadlock | s. 605.0702(2) | none | 13.2 | 13.2 | 13.2 | 13.2 | a sole member cannot deadlock |",
                          "| The members deadlock | s. 605.0702(2) | none | 13.2 | 13.2 | 13.2 | 13.2 |  |", 1),
      "says none with no reason"),
     ("an event answered by a provision that form does not have",
-     lambda t: t.replace("| A member divorces | s. 605.0502 | 10.1 |", "| A member divorces | s. 605.0502 | 10.6 |", 1),
+     lambda t: t.replace("| The company misses its annual report | ss. 605.0212, 605.0714, 605.2206 | 1.9 |", "| The company misses its annual report | ss. 605.0212, 605.0714, 605.2206 | 10.6 |", 1),
      "which that form does not contain"),
     ("a cell that is not a section list",
-     lambda t: t.replace("| A member divorces | s. 605.0502 | 10.1 |", "| A member divorces | s. 605.0502 | probably |", 1),
+     lambda t: t.replace("| The company misses its annual report | ss. 605.0212, 605.0714, 605.2206 | 1.9 |", "| The company misses its annual report | ss. 605.0212, 605.0714, 605.2206 | probably |", 1),
      "is not a section list"),
 ]
 

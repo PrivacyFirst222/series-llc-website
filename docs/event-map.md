@@ -32,29 +32,29 @@ Forms: `sgl` single-member · `mul` manager-managed multi-member ·
 | An asset moves between the company and a series | s. 605.2301(2)(a) | 1.10 8.2 8.5 | 1.10 8.2 8.5 | 1.10 8.2 8.5 | 1.10 8.2 8.5 | 1.10 8.2 8.5 | consideration, payor and payee must be recorded |
 | Someone disputes whether an asset is associated | s. 605.2404(4) | 8.2 8.5 3.3 | 8.2 8.5 3.3 | 8.2 8.5 3.3 | 8.2 8.5 3.3 | 8.2 8.5 3.3 | the party asserting association carries the burden of proof |
 | A company creditor pursues a series asset | ss. 605.2401(2), 605.2404(2) | 3.3 8.2 8.5 | 3.3 8.2 8.5 | 3.3 8.2 8.5 | 3.3 8.2 8.5 | 3.3 8.2 8.5 | |
-| A protected series is dissolved and wound up | s. 605.2501 | 3.4 12.1 12.2 | 3.4 14.1 14.2 | 3.4 14.1 14.2 | 3.4 14.1 14.2 | 3.4 14.1 14.2 | |
+| A protected series is dissolved and wound up | s. 605.2501 | 3.4 11.1 11.2 | 3.4 14.1 14.2 | 3.4 14.1 14.2 | 3.4 14.1 14.2 | 3.4 14.1 14.2 |  |
 | A protected series is asked to merge or convert | ss. 605.2602-605.2604 | 3.2 | 3.2 5.4 | 3.2 5.4 | 3.2 5.5 | 3.2 5.5 | s. 3.2 recites the bar on a series; s. 605.2603 bars the Company itself from converting, domesticating or exchanging interests, and s. 605.2604 confines its mergers to LLC parties with no newly created survivor |
 | The company sells substantially all of its assets | s. 605.1006(1)(d) | 5.3 5.4 | 5.4 | 5.4 | 5.5 | 5.5 | the consent of all Members; a member who consents forfeits appraisal under s. 605.1064, and one who withholds it stops the sale, so no appraisal right can arise |
-| The company is dissolved and wound up | ss. 605.0701, 605.0710 | 1.7 12.3 12.4 12.5 | 1.7 14.3 14.4 14.5 | 1.7 14.3 14.4 14.5 | 1.7 14.3 14.4 14.5 | 1.7 14.3 14.4 14.5 | liquidation is strictly pro rata, overriding s. 605.0710(2) |
-| The company has no members for 90 days | s. 605.0701(3) | 11.3 | 12.3 | 12.3 | 12.3 | 12.3 | |
+| The company is dissolved and wound up | ss. 605.0701, 605.0710 | 1.7 11.3 11.4 11.5 | 1.7 14.3 14.4 14.5 | 1.7 14.3 14.4 14.5 | 1.7 14.3 14.4 14.5 | 1.7 14.3 14.4 14.5 | liquidation is strictly pro rata, overriding s. 605.0710(2) |
+| The company has no members for 90 days | s. 605.0701(3) | 10.3 | 12.3 | 12.3 | 12.3 | 12.3 |  |
 | The company misses its annual report | ss. 605.0212, 605.0714, 605.2206 | 1.9 | 1.9 | 1.9 | 1.9 | 1.9 | the annual report must name every protected series |
 | The company is administratively dissolved | ss. 605.0714, 605.0715 | none | none | none | none | none | GAP: no form addresses reinstatement, which relates back to the dissolution date |
 | The registered agent changes or resigns | ss. 605.0113, 605.2203 | 1.6 1.9 | 1.6 1.9 | 1.6 1.9 | 1.6 1.9 | 1.6 1.9 | one agent serves the company and every series |
-| A member dies | ss. 605.0502, 605.0602 | 4.6 10.1 | 4.11 10.1 10.3 12.1 | 4.11 10.1 10.3 12.1 | 4.11 10.1 10.3 12.1 | 4.11 10.1 10.3 12.1 | a transferee at death needs a majority vote to become a member |
-| A member becomes incapacitated | s. 605.0602(6) | 4.7 12.3 | 4.12 14.3 | 4.12 14.3 | 4.12 14.3 | 4.12 14.3 | the holder of a durable power of attorney, or the court-appointed guardian, exercises the Member's rights; incapacity does not dissolve the Company |
-| A member divorces | s. 605.0502 | 10.1 | 2.8 10.4 | 2.8 10.4 | 2.9 10.4 | 2.9 10.4 | a marital-dissolution transfer is an Involuntary Transfer |
+| A member dies | ss. 605.0502, 605.0602 | 4.6 | 4.11 10.1 10.3 12.1 | 4.11 10.1 10.3 12.1 | 4.11 10.1 10.3 12.1 | 4.11 10.1 10.3 12.1 | a transferee at death needs a majority vote to become a member |
+| A member becomes incapacitated | s. 605.0602(6) | 4.7 11.3 | 4.12 14.3 | 4.12 14.3 | 4.12 14.3 | 4.12 14.3 | the holder of a durable power of attorney, or the court-appointed guardian, exercises the Member's rights; incapacity does not dissolve the Company |
+| A member divorces | s. 605.0502 | none | 2.8 10.4 | 2.8 10.4 | 2.9 10.4 | 2.9 10.4 | a marital-dissolution transfer is an Involuntary Transfer. s. 605.0502(1) makes a transfer permissible and gives the transferee distributions only, and s. 605.0106(4) binds a transferee whether or not they sign; the single-member form's Article 10 said no more than that and came out on 16 August |
 | A member files bankruptcy | s. 605.0602 | none | 2.8 11.1 11.2 11.3 10.4 | 2.8 11.1 11.2 11.3 10.4 | 2.9 11.1 11.2 11.3 10.4 | 2.9 11.1 11.2 11.3 10.4 | GAP: the single-member form has no executory-contract article, and a single-member LLC in bankruptcy is where it matters most |
 | A creditor obtains a charging order | s. 605.0503 | none | 10.6 | 10.6 | 10.6 | 10.6 | the single-member form is silent, and under s. 605.0503(4) foreclosure IS available against a single member — decide whether silence is right |
-| A member wants to sell to an outsider | s. 605.0502(6) | 10.1 10.3 | 10.1 10.3 10.5 | 10.1 10.3 10.5 | 10.1 10.3 10.5 | 10.1 10.3 10.5 | a restriction binds a transferee with knowledge or notice |
-| A member gives an interest to family | — | 10.2 | 10.2 | 10.2 | 10.2 | 10.2 | |
+| A member wants to sell to an outsider | s. 605.0502(6) | none | 10.1 10.3 10.5 | 10.1 10.3 10.5 | 10.1 10.3 10.5 | 10.1 10.3 10.5 | a restriction binds a transferee with knowledge or notice. s. 605.0502(1) makes a transfer permissible and gives the transferee distributions only, and s. 605.0106(4) binds a transferee whether or not they sign; the single-member form's Article 10 said no more than that and came out on 16 August |
+| A member gives an interest to family | — | none | 10.2 | 10.2 | 10.2 | 10.2 | s. 605.0502(1) makes a transfer permissible and gives the transferee distributions only, and s. 605.0106(4) binds a transferee whether or not they sign; the single-member form's Article 10 said no more than that and came out on 16 August |
 | A member wants to withdraw | s. 605.0601(1) | none | 13.1 | 13.1 | 13.1 | 13.1 | the power to dissociate cannot be removed, only made wrongful; a sole member's withdrawal is a dissolution question |
-| A new member is admitted | s. 605.0401 | 11.1 11.2 | 12.1 12.2 | 12.1 12.2 | 12.1 12.2 | 12.1 12.2 | no member may be associated with a protected series |
+| A new member is admitted | s. 605.0401 | 10.1 10.2 | 12.1 12.2 | 12.1 12.2 | 12.1 12.2 | 12.1 12.2 | no member may be associated with a protected series |
 | A member fails to make a promised contribution | ss. 605.0403(1), (5) | 6.1 6.2 | 6.1 6.2 6.3 | 6.1 6.2 6.3 | 6.1 6.2 6.3 | 6.1 6.2 6.3 | a promise binds only if signed |
 | The members deadlock | s. 605.0702(2) | none | 13.2 | 13.2 | 13.2 | 13.2 | a sole member cannot deadlock |
 | A member competes with the company | s. 605.04091(2)(c) | 4.5 | 4.7 5.9 | 4.7 5.9 | 4.7 | 4.7 | one selected alternative governs members and managers alike |
 | A member asks to inspect the records | ss. 605.0410, 605.2305 | 1.8 8.1 | 1.8 4.10 8.1 | 1.8 4.10 8.1 | 1.8 4.10 8.1 | 1.8 4.10 8.1 | information rights may be restricted reasonably, never unreasonably |
-| A member sues the company or another member | ss. 605.0801-605.0806 | 14.1 14.2 | 16.1 16.2 | 16.1 16.2 | 16.1 16.2 | 16.1 16.2 | the right to sue may not be unreasonably restricted |
-| A decision needs the members' approval | s. 605.04073 | 13.2 | 4.3 4.4 5.4 15.2 | 4.3 4.4 5.4 15.2 | 4.3 4.4 5.1 5.3 5.5 15.2 | 4.3 4.4 5.1 5.3 5.5 15.2 | |
+| A member sues the company or another member | ss. 605.0801-605.0806 | 13.1 13.2 | 16.1 16.2 | 16.1 16.2 | 16.1 16.2 | 16.1 16.2 | the right to sue may not be unreasonably restricted |
+| A decision needs the members' approval | s. 605.04073 | 12.2 | 4.3 4.4 5.4 15.2 | 4.3 4.4 5.4 15.2 | 4.3 4.4 5.1 5.3 5.5 15.2 | 4.3 4.4 5.1 5.3 5.5 15.2 |  |
 | A member seeks partition of an asset | s. 605.0110(4) | 1.11 6.5 | 1.11 6.7 | 1.11 6.7 | 1.11 6.7 | 1.11 6.7 | a sole member has nobody to partition against; s. 6.5 denies any interest in specific property instead |
 | A distribution is made | ss. 605.0404, 605.0405 | 7.1 7.2 | 7.1 7.2 7.3 | 7.1 7.2 7.3 | 7.1 7.2 7.3 | 7.1 7.2 7.3 | a series distributes to the Company, which distributes to the members |
 | The manager dies, resigns, or is removed | s. 605.04072 | 5.1 | 5.1 | 5.1 | 5.8 | 5.8 | the member-managed forms have no manager; s. 5.8 names the Administrative Member |
@@ -66,18 +66,18 @@ Forms: `sgl` single-member · `mul` manager-managed multi-member ·
 | The company files its tax return | — | 9.2 | 9.2 | 9.2 | 9.2 | 9.2 | |
 | The IRS examines a partnership year | subch. C of ch. 63 | none | 9.3 | none | 9.3 | none | the S corporation forms are not partnerships; the single-member form is disregarded |
 | The S election is threatened | § 1362 | none | none | 9.3 9.4 9.5 | none | 9.3 9.4 9.5 | only the S corporation forms carry an election to protect |
-| The tax classification changes | s. 605.1103(2) | 9.1 11.2 | 9.4 | 9.4 | 9.4 | 9.4 | an S election also changes the Florida ch. 220 analysis. The single-member form's duty to amend on a change of classification (its old s. 9.4) was deleted on 16 August: s. 9.1 states the intended classification and s. 11.2 carries the warning, and no provision now compels anyone to act |
+| The tax classification changes | s. 605.1103(2) | 9.1 10.2 | 9.4 | 9.4 | 9.4 | 9.4 | an S election also changes the Florida ch. 220 analysis. The single-member form's duty to amend on a change of classification (its old s. 9.4) was deleted on 16 August: s. 9.1 states the intended classification and s. 11.2 carries the warning, and no provision now compels anyone to act |
 | A fiscal year is chosen | — | 9.3 | 9.5 | 9.6 | 9.5 | 9.6 | |
-| The agreement is amended | s. 605.04073(1)(d) | 13.1 | 15.1 | 15.1 | 15.1 | 15.1 | unanimous; oral and implied amendments are of no effect |
-| The parties act without a meeting | s. 605.0407 | 13.2 | 4.4 15.2 | 4.4 15.2 | 4.4 15.2 | 4.4 15.2 | |
-| Notice must be given | — | 14.7 | 16.7 | 16.7 | 16.7 | 16.7 | |
-| A provision is held invalid | — | 14.3 | 16.3 | 16.3 | 16.3 | 16.3 | |
-| The agreement is signed | ss. 605.0106(5), (6) | 14.6 | 16.6 | 16.6 | 16.6 | 16.6 | a one-member agreement is enforceable |
-| A term of the agreement must be interpreted | — | 14.9 8.5 3.5 | 16.9 8.5 3.5 | 16.9 8.5 3.5 | 16.9 8.5 3.5 | 16.9 8.5 3.5 | s. 8.5 resolves association questions in favour of the record |
-| Someone not a party claims rights under it | — | 14.8 14.5 | 16.8 16.5 | 16.8 16.5 | 16.8 16.5 | 16.8 16.5 | |
-| An interest is offered without securities registration | — | 14.10 | 16.10 | 16.10 | 16.10 | 16.10 | |
-| A filed record conflicts with the agreement | s. 605.0107(4) | 14.4 1.9 | 16.4 1.9 | 16.4 1.9 | 16.4 1.9 | 16.4 1.9 | the agreement prevails among members; the record prevails for those who rely |
-| A protected series is established with no associated member | s. 605.2303(2) | 3.6 4.2 11.2 | 3.6 4.2 12.2 | 3.6 4.2 12.2 | 3.6 4.2 12.2 | 3.6 4.2 12.2 | the Company owns the protected-series transferable interests |
+| The agreement is amended | s. 605.04073(1)(d) | 12.1 | 15.1 | 15.1 | 15.1 | 15.1 | unanimous; oral and implied amendments are of no effect |
+| The parties act without a meeting | s. 605.0407 | 12.2 | 4.4 15.2 | 4.4 15.2 | 4.4 15.2 | 4.4 15.2 |  |
+| Notice must be given | — | 13.7 | 16.7 | 16.7 | 16.7 | 16.7 |  |
+| A provision is held invalid | — | 13.3 | 16.3 | 16.3 | 16.3 | 16.3 |  |
+| The agreement is signed | ss. 605.0106(5), (6) | 13.6 | 16.6 | 16.6 | 16.6 | 16.6 | a one-member agreement is enforceable |
+| A term of the agreement must be interpreted | — | 13.9 8.5 3.5 | 16.9 8.5 3.5 | 16.9 8.5 3.5 | 16.9 8.5 3.5 | 16.9 8.5 3.5 | s. 8.5 resolves association questions in favour of the record |
+| Someone not a party claims rights under it | — | 13.8 13.5 | 16.8 16.5 | 16.8 16.5 | 16.8 16.5 | 16.8 16.5 |  |
+| An interest is offered without securities registration | — | 13.10 | 16.10 | 16.10 | 16.10 | 16.10 |  |
+| A filed record conflicts with the agreement | s. 605.0107(4) | 13.4 1.9 | 16.4 1.9 | 16.4 1.9 | 16.4 1.9 | 16.4 1.9 | the agreement prevails among members; the record prevails for those who rely |
+| A protected series is established with no associated member | s. 605.2303(2) | 3.6 4.2 10.2 | 3.6 4.2 12.2 | 3.6 4.2 12.2 | 3.6 4.2 12.2 | 3.6 4.2 12.2 | the Company owns the protected-series transferable interests |
 | A decision has to be made for one protected series | s. 605.2304(2) | 3.5 5.2 | 3.5 5.2 | 3.5 5.2 | 3.5 5.2 | 3.5 5.2 | the Act makes the company the manager of a series with no associated members; s. 5.2 designates otherwise |
 | A member discloses confidential information or disparages the company | — | none | 4.8 4.9 | 4.8 4.9 | 4.8 4.9 | 4.8 4.9 | a sole member has nobody to keep a confidence from |
 | A member will not participate in a decision | s. 605.04073 | none | 4.3 4.6 | 4.3 4.6 | 4.3 4.6 | 4.3 4.6 | a sole member cannot obstruct themselves |

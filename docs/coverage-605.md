@@ -70,7 +70,7 @@ checker lists every one on each run.
 | 605.0302 | Statement of authority. | varied | 5.4 5.5 5.8 5.9 | a recorded certified statement of authority is the only limitation good against the world; it is cancelled by operation of law after 5 years |
 | 605.0303 | Statement of denial. | relied |  | a named person may file a statement of denial |
 | 605.0304 | Liability of members and managers. | relied | 4.3 4.5 | the members' liability shield |
-| 605.0401 | Becoming a member. | varied | 11.1 12.1 | admission requires the approval our forms specify |
+| 605.0401 | Becoming a member. | varied | 10.1 12.1 | admission requires the approval our forms specify |
 | 605.0402 | Form of contribution. | relied | 6.1 | any form of benefit may be contributed |
 | 605.0403 | Liability for contributions. | varied | 6.1 6.2 6.3 | a promise binds only in a signed writing; (5) expressly authorises our dilution remedy |
 | 605.0404 | Sharing of distributions before dissolution and profits and losses. | varied | 4.1 7.1 7.2 | the statutory default shares by agreed value of contributions; our forms share by Percentage Interest |
@@ -88,13 +88,13 @@ checker lists every one on each run.
 | 605.0410 | Records to be kept; rights of member, manager, and person dissociated to information. | varied | 1.8 4.10 8.1 | (1) requires 3 years of tax returns and financial statements; (10) forbids confidentiality restrictions on those records |
 | 605.0411 | Court-ordered inspection. | n/a |  | court-ordered inspection |
 | 605.0501 | Nature of transferable interest. | relied | 1.11 2.11 | a transferable interest is personal property |
-| 605.0502 | Transfer of transferable interest. | varied | 10.1 10.2 10.3 10.5 | (6) a transfer violating our restriction is ineffective against a person with knowledge or notice |
+| 605.0502 | Transfer of transferable interest. | varied | 10.1 10.2 10.3 10.5 | the four multi-member forms restrict transfers, and (6) makes a transfer in violation ineffective against a person with knowledge or notice. The single-member form has no transfer article: (1) already makes a transfer permissible, denies the transferee management and records, and prevents dissociation or dissolution, and s. 605.0106(4) binds a transferee who never signs, so everything there was recital |
 | 605.0503 | Charging order. | varied | 10.6 | the charging order is the exclusive remedy except (4)-(5); the single-member form is silent, and foreclosure IS available against a single member |
 | 605.0504 | Power of legal representative. | relied | 4.11 10.3 | a legal representative's powers on death or incapacity; our TOD designation and transferee provisions carry the result |
 | 605.0601 | Power to dissociate as member; wrongful dissociation. | varied | 13.1 | the power to dissociate cannot be removed, only made wrongful — which is exactly how s. 13.1 is drafted |
 | 605.0602 | Events causing dissociation. | relied | 10.4 11.1 | the statutory dissociation events, including bankruptcy and incapacity |
 | 605.0603 | Effect of dissociation. | relied | 10.5 | dissociation ends management rights and leaves a transferable interest |
-| 605.0701 | Events causing dissolution. | non-variable | 14.3 12.3 | s. 605.0105(3)(i) forbids varying the grounds for dissolution; (3) is the 90-days-without-members rule |
+| 605.0701 | Events causing dissolution. | non-variable | 14.3 11.3 | s. 605.0105(3)(i) forbids varying the grounds for dissolution; (3) is the 90-days-without-members rule |
 | 605.0702 | Grounds for judicial dissolution. | varied | 13.2 | (2) a deadlock sale provision initiated in time displaces judicial dissolution — our buy-sell is one and now says so |
 | 605.0703 | Procedure for judicial dissolution; alternative remedies. | n/a |  | judicial procedure |
 | 605.0704 | Receivership or custodianship. | n/a |  | receivership |
@@ -102,8 +102,8 @@ checker lists every one on each run.
 | 605.0706 | Election to purchase instead of dissolution. | varied | 13.2 | an election to purchase instead of dissolution; (2), (3) and (5) each carve out an interest already acquired under a deadlock sale provision |
 | 605.0707 | Articles of dissolution; filing of articles of dissolution. | n/a |  | articles of dissolution |
 | 605.0708 | Revocation of articles of dissolution. | n/a |  | revocation of articles of dissolution |
-| 605.0709 | Winding up. | non-variable | 14.4 12.4 | s. 605.0105(3)(j) makes (1), (2)(a) and (5) non-variable |
-| 605.0710 | Disposition of assets in winding up. | varied | 14.4 12.4 | the default returns unreturned contributions first; our strictly pro rata liquidation overrides it, which the S corporation forms require to avoid a second class of stock |
+| 605.0709 | Winding up. | non-variable | 14.4 11.4 | s. 605.0105(3)(j) makes (1), (2)(a) and (5) non-variable |
+| 605.0710 | Disposition of assets in winding up. | varied | 14.4 11.4 | the default returns unreturned contributions first; our strictly pro rata liquidation overrides it, which the S corporation forms require to avoid a second class of stock |
 | 605.0711 | Known claims against dissolved limited liability company. | relied |  | known claims against a dissolved company |
 | 605.0712 | Other claims against a dissolved limited liability company. | relied |  | unknown claims; a 4-year bar after notice |
 | 605.0713 | Court proceedings. | n/a |  | court proceedings in winding up |

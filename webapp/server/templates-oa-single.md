@@ -227,67 +227,59 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 ---
 
-## ARTICLE 10 — TRANSFERS
+## ARTICLE 10 — ADMISSION OF ADDITIONAL MEMBERS
 
-**10.1 Restriction on Transfer.** The Member shall not Transfer all or any portion of the Membership Interest, or any right to receive distributions from the Company or any Protected Series, except (a) a Transfer to an Immediate Family Member made in compliance with Section 10.2, (b) a Transfer effective at death pursuant to the TOD designation under Section 4.6, or (c) another Transfer approved in writing by the Member and reflected in an amendment to Exhibit A. Any purported Transfer in violation of this Article is void to the fullest extent permitted by law, and the transferee acquires no rights other than those, if any, mandated by the Act.
+**10.1 Admission.** One or more additional members may be admitted to the Company only with the written consent of the Member and upon the admitted person's delivery of a signed agreement to be bound by this Agreement.
 
-**10.2 Permitted Family Transfers.** A Transfer of all or part of the Membership Interest to an Immediate Family Member is permitted, provided the transferee delivers to the Company a signed agreement to be bound by this Agreement. A transferee (other than a person admitted as a member under Section 11.1) holds only the transferable interest — the right to receive distributions that would otherwise be paid to the Member with respect to the transferred interest — and has no right to participate in management, to inspect records, or to exercise any other right of a member.
+**10.2 No Association with a Protected Series.** No Member may be associated with a Protected Series. A Protected Series may not be established with, and may not admit, an Associated Member. Any amendment permitting Associated Members may cause each Protected Series to be treated as an entity separate from the Company for federal income tax purposes, with its own filing obligations, and may terminate any election the Company has made.
 
-**10.3 No Dissociation by Transfer Alone.** A Transfer does not by itself dissociate the Member or dissolve the Company or any Protected Series.
-
-## ARTICLE 11 — ADMISSION OF ADDITIONAL MEMBERS
-
-**11.1 Admission.** One or more additional members may be admitted to the Company only with the written consent of the Member and upon the admitted person's delivery of a signed agreement to be bound by this Agreement.
-
-**11.2 No Association with a Protected Series.** No Member may be associated with a Protected Series. A Protected Series may not be established with, and may not admit, an Associated Member. Any amendment permitting Associated Members may cause each Protected Series to be treated as an entity separate from the Company for federal income tax purposes, with its own filing obligations, and may terminate any election the Company has made.
-
-**11.3 Continuation on Termination of Last Member.** Upon the termination of the membership of the last remaining member, the Company shall not be dissolved, and the legal representative of the last remaining member shall agree in writing to continue the Company, and the representative (or an Immediate Family Member designated by the representative who is not a creditor of the last remaining member) shall be admitted as a member effective as of the terminating event, all as permitted by the Act.
+**10.3 Continuation on Termination of Last Member.** Upon the termination of the membership of the last remaining member, the Company shall not be dissolved, and the legal representative of the last remaining member shall agree in writing to continue the Company, and the representative (or an Immediate Family Member designated by the representative who is not a creditor of the last remaining member) shall be admitted as a member effective as of the terminating event, all as permitted by the Act.
 
 ---
 
-## ARTICLE 12 — DISSOLUTION AND WINDING UP
+## ARTICLE 11 — DISSOLUTION AND WINDING UP
 
-**12.1 Dissolution of a Protected Series.** A Protected Series is dissolved, and its activities and affairs shall be wound up, upon the first to occur of: (a) the dissolution of the Company; (b) an event or circumstance specified in its Series Exhibit; (c) the affirmative vote or consent of the Member; or (d) entry of a judicial order dissolving the Protected Series as provided by the Act.
+**11.1 Dissolution of a Protected Series.** A Protected Series is dissolved, and its activities and affairs shall be wound up, upon the first to occur of: (a) the dissolution of the Company; (b) an event or circumstance specified in its Series Exhibit; (c) the affirmative vote or consent of the Member; or (d) entry of a judicial order dissolving the Protected Series as provided by the Act.
 
-**12.2 Winding Up a Protected Series.** Upon dissolution of a Protected Series, its Protected Series Manager (or another person designated by the Member) shall wind up its activities and affairs in the manner provided by the Act for winding up a limited liability company, applied to that Protected Series. Its Associated Assets shall be applied: first, to pay or provide for its Associated Liabilities to creditors (including the Member as a creditor, to the extent permitted by law); and then the balance to the Company. The Manager shall cause any statement or filing required by the Act or the Department in connection with the dissolution of the Protected Series to be made. The winding up of a Protected Series shall not draw upon, and its creditors shall have no recourse to, the Associated Assets of the Company or of any other Protected Series.
+**11.2 Winding Up a Protected Series.** Upon dissolution of a Protected Series, its Protected Series Manager (or another person designated by the Member) shall wind up its activities and affairs in the manner provided by the Act for winding up a limited liability company, applied to that Protected Series. Its Associated Assets shall be applied: first, to pay or provide for its Associated Liabilities to creditors (including the Member as a creditor, to the extent permitted by law); and then the balance to the Company. The Manager shall cause any statement or filing required by the Act or the Department in connection with the dissolution of the Protected Series to be made. The winding up of a Protected Series shall not draw upon, and its creditors shall have no recourse to, the Associated Assets of the Company or of any other Protected Series.
 
-**12.3 Dissolution of the Company.** The Company is dissolved, and its activities and affairs shall be wound up, upon the first to occur of: (a) the written consent of the Member; (b) entry of a decree of judicial dissolution under the Act; or (c) any other event that under the Act requires dissolution. The death, incapacity, bankruptcy, dissociation, or withdrawal of the Member does not by itself dissolve the Company. Dissolution of the Company causes the dissolution of each Protected Series, and the winding up of the Company is not complete until the winding up of each Protected Series is complete.
+**11.3 Dissolution of the Company.** The Company is dissolved, and its activities and affairs shall be wound up, upon the first to occur of: (a) the written consent of the Member; (b) entry of a decree of judicial dissolution under the Act; or (c) any other event that under the Act requires dissolution. The death, incapacity, bankruptcy, dissociation, or withdrawal of the Member does not by itself dissolve the Company. Dissolution of the Company causes the dissolution of each Protected Series, and the winding up of the Company is not complete until the winding up of each Protected Series is complete.
 
-**12.4 Winding Up the Company.** Upon dissolution of the Company, the Manager (or, if there is none, a person designated by the Member) shall wind up the Company and each Protected Series. After the winding up of each Protected Series under Section 12.2, the remaining Associated Assets of the Company shall be applied: first, to pay or provide for the Company's Associated Liabilities to creditors; and then the balance to the Member. Articles of dissolution shall be filed as the Act requires, and the Company shall terminate when winding up is complete.
+**11.4 Winding Up the Company.** Upon dissolution of the Company, the Manager (or, if there is none, a person designated by the Member) shall wind up the Company and each Protected Series. After the winding up of each Protected Series under Section 11.2, the remaining Associated Assets of the Company shall be applied: first, to pay or provide for the Company's Associated Liabilities to creditors; and then the balance to the Member. Articles of dissolution shall be filed as the Act requires, and the Company shall terminate when winding up is complete.
 
-**12.5 No Deficit Obligation; Recourse Limited.** The Member shall have no obligation to restore any deficit or to contribute capital in connection with any winding up, and each creditor of the Company or of any Protected Series shall look solely to the Associated Assets of its obligor.
-
----
-
-## ARTICLE 13 — AMENDMENTS; CONSENTS
-
-**13.1 Amendments.** This Agreement, including any Series Exhibit, may be amended only by a written instrument signed by the Member; provided, that (a) the Manager may amend Exhibit A and each Series Exhibit without further consent solely to record changes duly made under this Agreement (admissions, Transfers, and TOD designations); and (b) any amendment changing the rights or obligations of the Manager may not impose new obligations on the Manager without the Manager's written consent. Oral, implied, or course-of-dealing amendments are of no effect.
-
-**13.2 Action by Written Consent.** Any action of the Member, or of the Company, under this Agreement may be taken by a written consent signed by the Member and maintained with the Company's records. No meetings are required.
+**11.5 No Deficit Obligation; Recourse Limited.** The Member shall have no obligation to restore any deficit or to contribute capital in connection with any winding up, and each creditor of the Company or of any Protected Series shall look solely to the Associated Assets of its obligor.
 
 ---
 
-## ARTICLE 14 — MISCELLANEOUS
+## ARTICLE 12 — AMENDMENTS; CONSENTS
 
-**14.1 Governing Law; Internal Affairs.** This Agreement, the internal affairs of the Company and of each Protected Series, and the relations among the Member, the Manager, each Protected Series Manager, the Company, and each Protected Series, are governed by the laws of the State of Florida, without regard to conflict-of-laws principles.
+**12.1 Amendments.** This Agreement, including any Series Exhibit, may be amended only by a written instrument signed by the Member; provided, that (a) the Manager may amend Exhibit A and each Series Exhibit without further consent solely to record changes duly made under this Agreement (admissions, Transfers, and TOD designations); and (b) any amendment changing the rights or obligations of the Manager may not impose new obligations on the Manager without the Manager's written consent. Oral, implied, or course-of-dealing amendments are of no effect.
 
-**14.2 Venue.** Any action or proceeding arising out of or relating to this Agreement, the Company, or any Protected Series shall be brought exclusively in the courts of the county in Florida in which the Company's principal office is located, and each party consents to the jurisdiction of such courts and waives any objection to venue there.
+**12.2 Action by Written Consent.** Any action of the Member, or of the Company, under this Agreement may be taken by a written consent signed by the Member and maintained with the Company's records. No meetings are required.
 
-**14.3 Severability.** If any provision of this Agreement is held invalid or unenforceable, that provision shall be modified to the minimum extent necessary to make it enforceable, and the remainder of this Agreement shall remain in full force; provided, that nothing in this Agreement shall be construed to vary any provision of the Act that may not be varied by an operating agreement.
+---
 
-**14.4 Entire Agreement.** This Agreement, including Exhibit A and each Series Exhibit, constitutes the entire agreement governing the Company and each Protected Series and supersedes all prior agreements and understandings with respect to their subject matter.
+## ARTICLE 13 — MISCELLANEOUS
 
-**14.5 Binding Effect.** This Agreement binds and benefits the Member, the Manager, and their respective heirs, personal representatives, successors, and permitted assigns, and any person who acquires an interest in the Company or is admitted as a member.
+**13.1 Governing Law; Internal Affairs.** This Agreement, the internal affairs of the Company and of each Protected Series, and the relations among the Member, the Manager, each Protected Series Manager, the Company, and each Protected Series, are governed by the laws of the State of Florida, without regard to conflict-of-laws principles.
 
-**14.6 Counterparts; Electronic Signatures.** This Agreement may be executed in counterparts, each of which is an original and all of which together constitute one instrument. Electronic signatures and electronic records have the same effect as originals.
+**13.2 Venue.** Any action or proceeding arising out of or relating to this Agreement, the Company, or any Protected Series shall be brought exclusively in the courts of the county in Florida in which the Company's principal office is located, and each party consents to the jurisdiction of such courts and waives any objection to venue there.
 
-**14.7 Notices.** Any notice under this Agreement shall be in writing and is effective upon delivery to the recipient's address on Exhibit A (or another address designated in writing), whether delivered personally, by nationally recognized courier, by certified mail, or by e-mail with confirmation of transmission.
+**13.3 Severability.** If any provision of this Agreement is held invalid or unenforceable, that provision shall be modified to the minimum extent necessary to make it enforceable, and the remainder of this Agreement shall remain in full force; provided, that nothing in this Agreement shall be construed to vary any provision of the Act that may not be varied by an operating agreement.
 
-**14.8 No Third-Party Beneficiaries.** This Agreement is for the exclusive benefit of the parties and confers no rights on any creditor or other third party.
+**13.4 Entire Agreement.** This Agreement, including Exhibit A and each Series Exhibit, constitutes the entire agreement governing the Company and each Protected Series and supersedes all prior agreements and understandings with respect to their subject matter.
 
-**14.9 Interpretation.** Headings are for convenience only. "Including" means "including without limitation." References to statutes include amendments and successor provisions.
+**13.5 Binding Effect.** This Agreement binds and benefits the Member, the Manager, and their respective heirs, personal representatives, successors, and permitted assigns, and any person who acquires an interest in the Company or is admitted as a member.
 
-**14.10 Unregistered Interests.** The Membership Interest has not been registered under federal or state securities laws and may not be offered, sold, or transferred except in compliance with this Agreement and applicable law.
+**13.6 Counterparts; Electronic Signatures.** This Agreement may be executed in counterparts, each of which is an original and all of which together constitute one instrument. Electronic signatures and electronic records have the same effect as originals.
+
+**13.7 Notices.** Any notice under this Agreement shall be in writing and is effective upon delivery to the recipient's address on Exhibit A (or another address designated in writing), whether delivered personally, by nationally recognized courier, by certified mail, or by e-mail with confirmation of transmission.
+
+**13.8 No Third-Party Beneficiaries.** This Agreement is for the exclusive benefit of the parties and confers no rights on any creditor or other third party.
+
+**13.9 Interpretation.** Headings are for convenience only. "Including" means "including without limitation." References to statutes include amendments and successor provisions.
+
+**13.10 Unregistered Interests.** The Membership Interest has not been registered under federal or state securities laws and may not be offered, sold, or transferred except in compliance with this Agreement and applicable law.
 
 [[pagebreak]]
 

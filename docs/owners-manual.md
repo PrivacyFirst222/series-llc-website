@@ -115,7 +115,7 @@ Your operating agreement comes in one of five versions. Two questions decide whi
 | **A designated manager runs it** | Manager-Managed, Multiple Members | Manager-Managed, S Corporation |
 | **All owners manage together** | Member-Managed, Multiple Members | Member-Managed, S Corporation |
 
-All five share the same skeleton; here is the map, so you know where things live when a bank, title company, or lawyer asks:
+All five share the same skeleton through Article 9. From there the single-member form runs one article shorter, because it needs no transfer article — so its Articles 10 through 13 are the other forms' Articles 11 through 14. Here is the map, so you know where things live when a bank, title company, or lawyer asks:
 
 | **Where** | **What it does** |
 |---|---|
@@ -126,8 +126,8 @@ All five share the same skeleton; here is the map, so you know where things live
 | **Articles 6–7** | Money: contributions (always made *to a specific silo* and recorded), capital accounts, distributions — always **from a series' own assets, and by a series only to the company that owns it** |
 | **Article 8** | The recordkeeping covenants (this manual's Section 14 is its field guide) and the standing association rules that close the Article |
 | **Article 9** | Taxes (Part Four) |
-| **Article 10** | Transfers: family transfers permitted, everything else needs consent, transferees get money rights only — plus, in the multi-member form, the charging-order and involuntary-transfer armor (Section 23) |
-| **Article 11 (multi-member)** | The executory-contract provisions — bankruptcy armor built on your members' ongoing duties (Section 23) |
+| **Article 10** | **In the multi-member forms:** transfers — family transfers permitted, everything else needs consent, transferees get money rights only, plus the charging-order and involuntary-transfer armor (Section 23). **In the single-member form:** admission of an additional member. That form has no transfer article, because Chapter 605 already makes a transfer permissible, gives a transferee distributions and nothing else, and binds a transferee who never signs — there was nothing left for the agreement to add |
+| **Article 11 (multi-member)** | The executory-contract provisions — bankruptcy armor built on your members' ongoing duties (Section 23). In the single-member form, Article 11 is dissolution and winding up |
 | **Series Exhibits** | One per series: name, purpose, who manages it, capital, opening asset schedule — and the statement that the company owns it and it has no associated members |
 
 ### The choices you made

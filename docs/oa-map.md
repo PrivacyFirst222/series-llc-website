@@ -195,58 +195,55 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbs | 9.5 | Other Elections | 8869aa20 | authority | manager members | members | — | IRC 1362 |
 | scp | 9.6 | Fiscal Year | 98ee3c50 | mechanic | company | members | — | IRC 706; 1378 for the S forms |
 | mbs | 9.6 | Fiscal Year | 30cd60ee | mechanic | company | members | — | IRC 706; 1378 for the S forms |
-| sgl | 10.1 | Restriction on Transfer | 9b0fffa5 | covenant | members | members | The member transferred in breach of the agreement — a claim among the members, and the transferee takes as a transferee only. | ss. 605.0502, 605.0602 |
+| sgl | 10.1 | Admission | 2b14cbb5 | authority | member | member | — | s. 605.0401(3) |
 | mul scp | 10.1 | Restriction on Transfer | 3ca8ae94 | covenant | members | members | The member transferred in breach of the agreement — a claim among the members, and the transferee takes as a transferee only. | ss. 605.0502, 605.0602 |
 | mbr mbs | 10.1 | Restriction on Transfer | 8f158066 | covenant | members | members | The member transferred in breach of the agreement — a claim among the members, and the transferee takes as a transferee only. | ss. 605.0502, 605.0602 |
-| sgl | 10.2 | Permitted Family Transfers | 771bfa0e | benefit | members | members | — | s. 605.0502 |
+| sgl | 10.2 | No Association with a Protected Series | 96a9d58f | covenant | company members | members | The company associated a member with a series in breach of its own agreement. | s. 605.2302; preserves the disregarded/partnership design |
 | mbr mbs mul scp | 10.2 | Permitted Family Transfers | 384fae5f | benefit | members | members | — | s. 605.0502 |
-| sgl | 10.3 | No Dissociation by Transfer Alone | b7639b44 | benefit | — | members | — | s. 605.0602(5) |
+| sgl | 10.3 | Continuation on Termination of Last Member | ea924089 | benefit | — | members company | — | s. 605.0701(3) |
 | mbr mbs mul scp | 10.3 | Rights of Transferees | 81b80fe4 | benefit | — | members company | — | s. 605.0502(3) |
 | mul scp | 10.4 | Involuntary Transfers; Option to Acquire | c5cfced5 | benefit | members | members company | — | ss. 605.0502, 605.0503 |
 | mbr mbs | 10.4 | Involuntary Transfers; Option to Acquire | dbd8051f | benefit | members | members company | — | ss. 605.0502, 605.0503 |
 | mbr mbs mul scp | 10.5 | No Dissociation by Transfer Alone | 578ce2db | benefit | — | members | — | s. 605.0602(5) |
 | mbr mbs mul scp | 10.6 | Charging Order — Exclusive Remedy | 7cb3504e | statutory-route | — | members | — | ss. 605.0503, 605.0503(7) |
-| sgl | 11.1 | Admission | 2b14cbb5 | authority | member | member | — | s. 605.0401(3) |
+| sgl | 11.1 | Dissolution of a Protected Series | baccbda5 | mechanic | — | members series | — | s. 605.2501 |
 | mbr mbs mul scp | 11.1 | Executory Contract | 050e6248 | benefit | members | members company | — | 11 U.S.C. 365; In re Soderstrom |
-| sgl | 11.2 | No Association with a Protected Series | 96a9d58f | covenant | company member | member | The company associated a member with a series in breach of its own agreement. | s. 605.2302; preserves the disregarded design |
+| sgl | 11.2 | Winding Up a Protected Series | 90fe7e4e | mechanic | manager members | members series | — | s. 605.2502 |
 | mul scp | 11.2 | Personal Service Agreement; No Assumption or Assignment | 439e9643 | benefit | members | members company | — | 11 U.S.C. 365(c); In re Soderstrom |
 | mbr mbs | 11.2 | Personal Service Agreement; No Assumption or Assignment | 3d769064 | benefit | members | members company | — | 11 U.S.C. 365(c); In re Soderstrom |
-| sgl | 11.3 | Continuation on Termination of Last Member | ea924089 | benefit | — | members company | — | s. 605.0701(3) |
+| sgl | 11.3 | Dissolution of the Company | 922d7938 | mechanic | — | member | — | s. 605.0701 |
 | mbr mbs mul scp | 11.3 | Compliance upon Assumption or Rejection | 5c8f9b13 | benefit | members | members company | — | 11 U.S.C. 365 |
-| sgl | 12.1 | Dissolution of a Protected Series | baccbda5 | mechanic | — | members series | — | s. 605.2501 |
+| sgl | 11.4 | Winding Up the Company | 697fd05e | mechanic | manager member | member | — | ss. 605.0709, 605.0710 |
+| sgl | 11.5 | No Deficit Obligation; Recourse Limited | 9712f7e9 | benefit | — | members | — | s. 605.0405 |
+| sgl | 12.1 | Amendments | 95c1e577 | authority | member | member | — | s. 605.04073(1)(d), (2)(e) |
 | mbr mbs mul scp | 12.1 | Admission of Members | fc6d8b94 | authority | members | members | — | s. 605.0401(3) |
-| sgl | 12.2 | Winding Up a Protected Series | 90fe7e4e | mechanic | manager members | members series | — | s. 605.2502 |
+| sgl | 12.2 | Action by Written Consent | 57614354 | mechanic | members | members | — | s. 605.04073(4) |
 | mbr mbs mul scp | 12.2 | No Association with a Protected Series | 96a9d58f | covenant | company members | members | The company associated a member with a series in breach of its own agreement. | s. 605.2302; preserves the disregarded/partnership design |
-| sgl | 12.3 | Dissolution of the Company | 922d7938 | mechanic | — | member | — | s. 605.0701 |
 | mbr mbs mul scp | 12.3 | Continuation on Termination of Last Member | 0415885d | benefit | — | members company | — | s. 605.0701(3) |
-| sgl | 12.4 | Winding Up the Company | 4b4fc788 | mechanic | manager members | members | — | ss. 605.0709, 605.0710 |
-| sgl | 12.5 | No Deficit Obligation; Recourse Limited | 9712f7e9 | benefit | — | members | — | s. 605.0405 |
-| sgl | 13.1 | Amendments | 95c1e577 | authority | member | member | — | s. 605.04073(1)(d), (2)(e) |
+| sgl | 13.1 | Governing Law; Internal Affairs | 053b67a8 | mechanic | — | members manager | — | s. 605.0104 |
 | mbr mbs mul scp | 13.1 | No Voluntary Withdrawal | bd50185a | covenant | members | members company | The member withdrew in breach of the agreement — a claim among the members. | s. 605.0601 |
-| sgl | 13.2 | Action by Written Consent | 57614354 | mechanic | members | members | — | s. 605.04073(4) |
+| sgl | 13.2 | Venue | 8966bedb | mechanic | members | members company | — | drafting convention |
 | mbr mbs mul scp | 13.2 | Deadlock; Buy-Sell Election. [OPTIONAL PROVISION — see Instructions; to omit, replace the text of this Section with "[Reserved.]" — do not renumber] | 7cbd82d7 | mechanic | members | members | — | s. 605.0702(2) |
-| sgl | 14.1 | Governing Law; Internal Affairs | 053b67a8 | mechanic | — | members manager | — | s. 605.0104 |
+| sgl | 13.3 | Severability | f3e788ce | benefit | — | members manager company | — | drafting convention |
+| sgl | 13.4 | Entire Agreement | ee3bd681 | mechanic | — | members manager | — | drafting convention |
+| sgl | 13.5 | Binding Effect | 43d6e2af | mechanic | — | members manager | — | s. 605.0106 |
+| sgl | 13.6 | Counterparts; Electronic Signatures | a8dc325e | mechanic | — | members manager | — | ch. 668, Fla. Stat. |
+| sgl | 13.7 | Notices | 2c077363 | mechanic | — | members manager | — | drafting convention |
+| sgl | 13.8 | No Third-Party Beneficiaries | 4d830aa4 | benefit | — | members manager company | — | drafting convention |
+| sgl | 13.9 | Interpretation | 88791917 | mechanic | — | members manager | — | drafting convention |
+| sgl | 13.10 | Unregistered Interests | 5909e292 | mechanic | — | members company | — | 15 U.S.C. 77e; ch. 517, Fla. Stat. |
 | mbr mbs mul scp | 14.1 | Dissolution of a Protected Series | 4b25dea8 | mechanic | — | members series | — | s. 605.2501 |
-| sgl | 14.2 | Venue | 8966bedb | mechanic | members | members company | — | drafting convention |
 | mul | 14.2 | Winding Up a Protected Series | 48e94158 | mechanic | manager members | members series | — | s. 605.2502 |
 | scp | 14.2 | Winding Up a Protected Series | 600b1603 | mechanic | manager members | members series | — | s. 605.2502 |
 | mbr | 14.2 | Winding Up a Protected Series | 0c1bc8b3 | mechanic | manager members | members series | — | s. 605.2502 |
 | mbs | 14.2 | Winding Up a Protected Series | 5f431084 | mechanic | manager members | members series | — | s. 605.2502 |
-| sgl | 14.3 | Severability | f3e788ce | benefit | — | members manager company | — | drafting convention |
 | mbr mbs mul scp | 14.3 | Dissolution of the Company | 92dba41b | mechanic | — | members | — | s. 605.0701 |
-| sgl | 14.4 | Entire Agreement | ee3bd681 | mechanic | — | members manager | — | drafting convention |
 | mul | 14.4 | Winding Up the Company | f234c2e9 | mechanic | manager members | members | — | ss. 605.0709, 605.0710 |
 | scp | 14.4 | Winding Up the Company | aedb6377 | mechanic | manager members | members | — | ss. 605.0709, 605.0710 |
 | mbr | 14.4 | Winding Up the Company | 2698c4e6 | mechanic | manager members | members | — | ss. 605.0709, 605.0710 |
 | mbs | 14.4 | Winding Up the Company | 7f3dbab2 | mechanic | manager members | members | — | ss. 605.0709, 605.0710 |
-| sgl | 14.5 | Binding Effect | 43d6e2af | mechanic | — | members manager | — | s. 605.0106 |
 | mbr mul | 14.5 | No Deficit Obligation; Recourse Limited | a80b2aad | benefit | — | members | — | s. 605.0405 |
 | mbs scp | 14.5 | No Obligation to Contribute; Recourse Limited | 758ff4ef | benefit | — | members | — | s. 605.0405; the S corporation forms carry no capital accounts, so deficit-restoration language was removed 2026-08-14 |
-| sgl | 14.6 | Counterparts; Electronic Signatures | a8dc325e | mechanic | — | members manager | — | ch. 668, Fla. Stat. |
-| sgl | 14.7 | Notices | 2c077363 | mechanic | — | members manager | — | drafting convention |
-| sgl | 14.8 | No Third-Party Beneficiaries | 4d830aa4 | benefit | — | members manager company | — | drafting convention |
-| sgl | 14.9 | Interpretation | 88791917 | mechanic | — | members manager | — | drafting convention |
-| sgl | 14.10 | Unregistered Interests | 5909e292 | mechanic | — | members company | — | 15 U.S.C. 77e; ch. 517, Fla. Stat. |
 | mul scp | 15.1 | Amendments | fa5b242d | authority | members | members | — | s. 605.04073(1)(d), (2)(e) |
 | mbr mbs | 15.1 | Amendments | a9428a3a | authority | members | members | — | s. 605.04073(1)(d), (2)(e) |
 | mbr mbs mul scp | 15.2 | Action by Written Consent | b25652f8 | mechanic | members | members | — | s. 605.04073(4) |
