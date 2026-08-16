@@ -345,8 +345,11 @@ Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENE
 
 **Adopted effective [DATE] by the Company, acting through the Member:**
 
+<!-- repeat:adopter -->
 _____________________________
-[MEMBER NAME], Member
+[ADOPTER NAME], Member
+
+<!-- /repeat -->
 
 [[pagebreak]]
 

@@ -240,12 +240,12 @@ export const LEARN_MORE: Record<string, LearnMoreScreen> = {
       <div className="space-y-3">
         <P>
           Married couples in Florida can own property — including an interest in this company —
-          in a special form called <strong className="text-foreground">tenancy by the entireties
+          in a special form called <strong className="text-foreground">tenancy by the entirety
           (TBE)</strong>, available only to spouses. The law treats the couple as a single owner:
           neither spouse owns a share; the marriage owns the whole thing. That one idea produces
           a powerful asset-protection result.
         </P>
-        <Choice label="If you choose tenants by the entireties:">
+        <Choice label="If you choose tenants by the entirety:">
           A creditor of just <em>one</em> spouse generally cannot touch the interest at all — not
           seize it, not lien it, not force its sale — because neither spouse individually owns
           anything to take. Only a creditor of <em>both</em> spouses jointly (like a debt you both
@@ -286,7 +286,7 @@ export const LEARN_MORE: Record<string, LearnMoreScreen> = {
         </P>
         <P>
           ⚠️ <strong className="text-foreground">If you don't live in Florida:</strong> tenancy by
-          the entireties is a creature of state law. Some states don't recognize it at all, others
+          the entirety is a creature of state law. Some states don't recognize it at all, others
           limit it to real estate, and which state's law applies to you can depend on where you
           live. Before relying on this protection, check with an attorney in the state where you
           reside.

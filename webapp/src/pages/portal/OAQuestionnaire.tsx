@@ -90,7 +90,7 @@ type Unit =
   | { kind: "member"; index: number; label: string };
 
 const FORM_LABEL: Record<"TBE" | "JTWROS", string> = {
-  TBE: "tenants by the entireties",
+  TBE: "tenants by the entirety",
   JTWROS: "joint tenants with right of survivorship",
 };
 
@@ -407,7 +407,7 @@ export default function OAQuestionnaire() {
                   <QuestionCard title="Do any owners hold their interest together as spouses?" learnMore="spousal">
                     <p className="text-xs text-muted-foreground">
                       Married couples can hold one combined interest together — as tenants by the
-                      entireties (Florida's strongest form for spouses) or as joint tenants with
+                      entirety (Florida's strongest form for spouses) or as joint tenants with
                       right of survivorship. The couple owns equal, undivided shares of a single
                       interest and votes as one unit.
                     </p>
@@ -468,7 +468,7 @@ export default function OAQuestionnaire() {
                               onChange={() => setPairForm("TBE")}
                               className="accent-trust"
                             />
-                            Tenants by the entireties
+                            Tenants by the entirety
                           </label>
                           <label className="flex items-center gap-1.5">
                             <input

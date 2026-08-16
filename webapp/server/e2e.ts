@@ -717,7 +717,7 @@ if (mint.status === 200) {
       ein: "", einPending: true, dateIncorporated: "2026-08-01", effectiveDate: "2026-08-01",
       officerName: "Maria Ortiz", officerTitle: "Manager", phone: "(305) 555-0100",
       shareholders: [
-        { name: "Maria Ortiz and Carlos Ortiz, as tenants by the entireties", address: "500 Bay Street, Miami, FL 33131", percentage: 60, dateAcquired: "2026-08-01", ssn: "123456789" },
+        { name: "Maria Ortiz and Carlos Ortiz, as tenants by the entirety", address: "500 Bay Street, Miami, FL 33131", percentage: 60, dateAcquired: "2026-08-01", ssn: "123456789" },
       ],
     }),
   });
@@ -727,7 +727,7 @@ if (mint.status === 200) {
     officerName: "Maria Ortiz", officerTitle: "Manager", phone: "(305) 555-0100",
     certified: true as const,
     shareholders: [
-      { name: "Maria Ortiz and Carlos Ortiz, as tenants by the entireties", address: "500 Bay Street, Miami, FL 33131", percentage: 100, dateAcquired: "2026-08-01", ssn: "123-45-6789" },
+      { name: "Maria Ortiz and Carlos Ortiz, as tenants by the entirety", address: "500 Bay Street, Miami, FL 33131", percentage: 100, dateAcquired: "2026-08-01", ssn: "123-45-6789" },
     ],
   };
   const uncertified = await api(`/api/portal/services/${sId}/s-election-details`, {

@@ -32,7 +32,7 @@ const memberSingleSCorpTemplate = loadTemplate(memberSingleSCorpTemplateRaw as s
 export const OA_TEMPLATE_VERSION = "First Edition — August 2026";
 
 export interface OaMemberInput {
-  name: string; // an individual, or a marital unit ("A and B, husband and wife, as tenants by the entireties")
+  name: string; // an individual, or a marital unit ("A and B") — the tenancy goes in jointHolding
   address: string;
   percentage: number; // 100 for single member
   /** How the interest reads in the document — "40%" or "1/3". Falls back to
@@ -42,8 +42,8 @@ export interface OaMemberInput {
   todBeneficiary: string; // "" = none
   /** Humans who sign for this interest — both spouses for a marital unit. */
   signatories?: string[];
-  /** Present when this interest is held jointly, e.g. "husband and wife, as
-   *  tenants by the entireties" — drives the joint signature block. */
+  /** The tenancy alone when this interest is held jointly — "tenants by the
+   *  entirety". The master's Exhibit A row supplies the words around it. */
   jointHolding?: string;
 }
 
@@ -147,12 +147,25 @@ function expandRepeat(
     const body = (s.match(re) as RegExpMatchArray)[1];
     const out = rows
       .map((r) => {
-        let b = body;
+        // `<!-- if:KEY -->…<!-- /if -->` keeps its contents for a row that
+        // supplies a value for KEY and drops them for one that does not. It is
+        // how " as tenants by the entirety" can live in the master rather than
+        // be pasted on in code: the words are the master's, and the row
+        // supplies only the tenancy, or nothing at all.
+        let b = body.replace(
+          /<!--\s*if:([A-Za-z]+)\s*-->([\s\S]*?)<!--\s*\/if\s*-->/g,
+          (_m, key: string, inner: string) => (r[`[${key.toUpperCase()}]`] ? inner : ""),
+        );
         for (const [slot, val] of Object.entries(r)) b = b.split(slot).join(val);
-        return b.replace(/\n+$/, "");
+        return b;
       })
-      .join("\n");
-    s = s.replace(re, () => out + "\n");
+      // The master decides the spacing, not this function. A table row's block
+      // ends in a single newline so the rows stay contiguous — a blank line
+      // between them would end the table; a signature block's ends in a blank
+      // line so the lines are separated. Joining on "\n" here instead ran every
+      // signature together.
+      .join("");
+    s = s.replace(re, () => out);
     count += 1;
     if (count > 50) throw new Error(`OA repeat:${key} did not terminate (${label})`);
   }
@@ -374,6 +387,10 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
       "[MEMBER CONTRIBUTION]": m.contribution || "—",
       "[MEMBER DATE]": inputs.effectiveDate,
       "[MEMBER TOD]": m.todBeneficiary || "None",
+      // Empty for an individual, which drops the master's " as […]" fragment.
+      // The name matches the marker that guards it — <!-- if:holding --> looks
+      // up [HOLDING] — so a renamed slot cannot silently stop guarding.
+      "[HOLDING]": m.jointHolding ?? "",
     }));
     s = expandRepeat(s, "member", rows, "Exhibit A multi");
   }
@@ -401,32 +418,23 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
     // Each Protected Series is owned by the Company, so the Series Exhibit is
     // adopted by whoever acts for the Company — the Manager, or all Members in
     // a member-managed company.
-    const adoptSource = inputs.members.map((m) => ({
-      name: m.name,
-      signatories: m.signatories,
-      jointHolding: m.jointHolding,
-    }));
-    const adoptNames = inputs.members.flatMap((m) => m.signatories ?? [m.name]);
-    const adoptLines = signatureBlock(adoptSource, ", Member");
-    // Member-managed Series Exhibits are adopted by all Members acting for the
-    // Company; manager-managed ones by the Manager alone. The multi-member
-    // masters scaffold two signature lines; the member-managed SINGLE-member
-    // master scaffolds one, because a two-member block in a one-member form
-    // would be scaffolding for people who cannot exist.
-    ex = ex
-      .replace(/_+\n\[MEMBER 1\], Member[\s\S]*?_+\n\[MEMBER 2\], Member/, adoptLines)
-      .replace(/_+\n\[MEMBER NAME\], Member/, adoptLines);
-    // One signature line per Manager, as in the Agreement's signature page.
-    const psManagerLines = managerNames
-      .map((n) => `${n}, Protected Series Manager`)
-      .join("\n\n_____________________________\n");
+    // Whoever adopts it signs on the master's own line: every Member in a
+    // member-managed company, every Manager otherwise. The line, its rule and
+    // its ", Member" / ", Protected Series Manager" suffix are all the master's.
+    const adopters = isMemberManaged
+      ? inputs.members.flatMap((m) => m.signatories ?? [m.name])
+      : managerNames;
+    ex = expandRepeat(
+      ex,
+      "adopter",
+      adopters.map((n) => ({ "[ADOPTER NAME]": n })),
+      "series exhibit adoption",
+    );
     ex = ex
       .replace(
         "Adopted effective [DATE] by the Company, acting through its Manager:",
         `Adopted effective [DATE] by the Company, acting through its ${managerNames.length > 1 ? "Managers" : "Manager"}:`,
       )
-      .split("[NAME], Protected Series Manager").join(psManagerLines)
-      .split("[NAME], Associated Member").join(adoptNames[0] ?? "")
       .split("effective [DATE]").join(`effective ${inputs.effectiveDate}`);
     let sched = ex2.section.replace(
       "## ASSET SCHEDULE — ATTACHMENT TO SERIES EXHIBIT PS-[N]",
@@ -440,14 +448,16 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
     s = s.split("[MEMBER NAME]").join(inputs.members[0].name);
     s = s.split("[ADDRESS]").join(inputs.members[0].address);
   } else {
-    const sigLines = signatureBlock(inputs.members, "");
-    // The member-managed masters have no manager acknowledgment block, so the
-    // members' signatures run to the end of the signature section instead.
-    s = s.replace(
-      isMemberManaged
-        ? /\*\*MEMBERS:\*\*[\s\S]*?(?=\n---|\n## |$)/
-        : /\*\*MEMBERS:\*\*[\s\S]*?(?=\*\*ACKNOWLEDGED AND AGREED BY MANAGER:\*\*)/,
-      `**MEMBERS:**\n\n${sigLines}\n\n`,
+    // One line per human who signs — both spouses for a marital unit — and the
+    // line is the master's own. signatureBlock() used to build a heading here
+    // ("**A and B, husband and wife, as tenants by the entirety:**"), which was
+    // prose composed in TypeScript AND a second statement of a fact Exhibit A
+    // already carries in the member-name cell. Deleted on both counts.
+    s = expandRepeat(
+      s,
+      "signatory",
+      inputs.members.flatMap((m) => (m.signatories ?? [m.name]).map((n) => ({ "[SIGNATORY NAME]": n }))),
+      "member signatures",
     );
   }
 
@@ -486,24 +496,6 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
 
 /** Signature lines, with jointly-held interests grouped under a heading so a
  *  married couple reads as one owner signing together rather than two owners. */
-function signatureBlock(
-  holders: { name: string; signatories?: string[]; jointHolding?: string }[],
-  suffix: string,
-): string {
-  return holders
-    .map((h) => {
-      const names = h.signatories ?? [h.name];
-      const lines = names.map((n) => `_____________________________\n${n}${suffix}`).join("\n\n");
-      if (names.length > 1) {
-        const heading = h.jointHolding
-          ? `**${names.join(" and ")}, ${h.jointHolding}:**`
-          : `**${names.join(" and ")}, jointly:**`;
-        return `${heading}\n\n${lines}`;
-      }
-      return lines;
-    })
-    .join("\n\n");
-}
 
 function replaceSectionBody(s: string, re: RegExp, replacement: string, label: string): string {
   if (!re.test(s)) throw new Error(`OA template marker missing: ${label}`);

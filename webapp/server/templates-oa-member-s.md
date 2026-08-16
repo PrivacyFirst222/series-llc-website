@@ -129,7 +129,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **4.2 No Series-Level Ownership.** No Member is an Associated Member of any Protected Series, and no Member holds a protected-series transferable interest. Each Protected Series is wholly owned by the Company as provided in Section 3.6. Every Member's economic rights in every Protected Series arise solely through the Member's Percentage Interest in the Company, so that all Members participate in every Protected Series identically and in proportion to their Percentage Interests at all times.
 
-**4.3 Voting.** Each Member votes in proportion to the Member's Percentage Interest on matters as to which Members are entitled to vote or consent at the Company level. Except where this Agreement or a non-variable provision of the Act requires a greater vote, the act of a Majority in Interest constitutes the act of the Members. A Membership Interest owned by spouses as tenants by the entireties shall be voted only by the consensus of both spouses; neither spouse acting alone may vote the interest except as the other spouse's attorney-in-fact under a duly executed power of attorney.
+**4.3 Voting.** Each Member votes in proportion to the Member's Percentage Interest on matters as to which Members are entitled to vote or consent at the Company level. Except where this Agreement or a non-variable provision of the Act requires a greater vote, the act of a Majority in Interest constitutes the act of the Members. A Membership Interest owned by spouses as tenants by the entirety shall be voted only by the consensus of both spouses; neither spouse acting alone may vote the interest except as the other spouse's attorney-in-fact under a duly executed power of attorney.
 
 **4.4 Meetings; Written Consents.** No regular meetings are required. Any Member may call a meeting of the Members on at least five (5) days' written notice stating the purpose. Members may participate by any means of remote communication by which all participants can hear one another. Any action that may be taken at a meeting may be taken without a meeting by a written consent signed by Members holding the Percentage Interests required to approve the action, delivered to the Company and maintained with its records, with prompt notice to any non-consenting Member.
 
@@ -397,14 +397,11 @@ IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of
 
 **MEMBERS:**
 
+<!-- repeat:signatory -->
 _____________________________
-[MEMBER 1 NAME]
+[SIGNATORY NAME]
 
-_____________________________
-[MEMBER 2 NAME]
-
-_____________________________
-[MEMBER 3 NAME, if any]
+<!-- /repeat -->
 
 [[pagebreak]]
 
@@ -415,7 +412,7 @@ _____________________________
 | Member name | Address | Percentage Interest | Initial contribution to the Company | Date |
 |---|---|---|---|---|
 <!-- repeat:member -->
-| [MEMBER NAME] | [MEMBER ADDRESS] | [MEMBER SHARE] | [MEMBER CONTRIBUTION] | [MEMBER DATE] |
+| [MEMBER NAME]<!-- if:holding --> as [HOLDING]<!-- /if --> | [MEMBER ADDRESS] | [MEMBER SHARE] | [MEMBER CONTRIBUTION] | [MEMBER DATE] |
 <!-- /repeat -->
 | **Total** | | **100%** | | |
 
@@ -448,11 +445,11 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
 
 **Adopted effective [DATE] by the Company, acting through a Majority in Interest of its Members:**
 
+<!-- repeat:adopter -->
 _____________________________
-[MEMBER 1], Member
+[ADOPTER NAME], Member
 
-_____________________________
-[MEMBER 2], Member
+<!-- /repeat -->
 
 [[pagebreak]]
 

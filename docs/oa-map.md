@@ -14,10 +14,9 @@ without restating who it is for.
 benefits neither the members nor the manager does not belong in the agreement.
 Teaching that cannot be breached goes in the Owner's Manual instead.
 
-Forms: `sgl` manager-managed single-member · `mul` multi-member ·
-`scp` S corporation · `mbr` member-managed · `mbs` member-managed S corporation ·
-`sgs` manager-managed single-member S corporation ·
-`sgm` member-managed single-member · `sgms` member-managed single-member S corporation.
+Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
+`mbr` member-managed · `mbs` member-managed S corporation ·
+`sgs` single-member S corporation.
 
 | masters | section | heading | hash | category | binds | benefits | attack | source |
 |---|---|---|---|---|---|---|---|---|
@@ -124,7 +123,7 @@ Forms: `sgl` manager-managed single-member · `mul` multi-member ·
 | sgl sgm sgms sgs | 4.2 | No Series-Level Ownership | d1845c86 | statutory-route | — | members | — | ss. 605.2302(1), 605.2303 |
 | mbr mbs mul scp | 4.2 | No Series-Level Ownership | df25fdbf | statutory-route | — | members | — | ss. 605.2302(1), 605.2303 |
 | sgl sgm sgms sgs | 4.3 | Limited Liability | 3b4531b8 | benefit | — | member | — | s. 605.0304 |
-| mbr mbs mul scp | 4.3 | Voting | f85cb4dc | authority | members | members | — | s. 605.04073 |
+| mbr mbs mul scp | 4.3 | Voting | 3126c1e9 | authority | members | members | — | s. 605.04073; the spousal sentence now reads "tenants by the entirety" — Adam, 16 August: "It is typically not plural. I prefer the plural never be used." Only the plural changed; the consensus-of-both-spouses rule is unaltered |
 | sgl sgs | 4.4 | No Agency by Status | b494e85e | benefit | — | member | — | s. 605.04074(2)(a) |
 | mul scp | 4.4 | Meetings; Written Consents | 896b1845 | mechanic | members | members | — | s. 605.04073(4), (6) |
 | mbr mbs | 4.4 | Meetings; Written Consents | ef89ac7e | mechanic | members | members | — | s. 605.04073(4), (6) |

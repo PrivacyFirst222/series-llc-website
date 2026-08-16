@@ -886,9 +886,9 @@ function SElectionDetailsForm({
           </p>
         </div>
         <p className="text-xs text-muted-foreground">
-          Spouses who own an interest together (tenants by the entireties or joint tenants):
+          Spouses who own an interest together (tenants by the entirety or joint tenants):
           enter one row with both names — e.g., "Sam Lee and Alex Lee, as tenants by the
-          entireties" — their combined percentage, and either spouse's SSN. The instruction
+          entirety" — their combined percentage, and either spouse's SSN. The instruction
           sheet will direct <em>both</em> spouses to sign that row's consent line.
         </p>
       </div>

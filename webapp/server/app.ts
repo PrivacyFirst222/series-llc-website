@@ -761,7 +761,7 @@ const oaAnswersSchema = z.object({
 });
 
 const SPOUSAL_FORM_LABEL: Record<"TBE" | "JTWROS", string> = {
-  TBE: "tenants by the entireties",
+  TBE: "tenants by the entirety",
   JTWROS: "joint tenants with right of survivorship",
 };
 
@@ -875,7 +875,7 @@ app.post("/portal/oa/generate", async (c) => {
   const nextGenerationNumber = Number(bumped[0]?.oa_generation_seq ?? 1);
 
   // Spousal joint-ownership units: two seed members merge into one marital
-  // interest ("A and B, husband and wife, as tenants by the entireties").
+  // interest ("A and B, husband and wife, as tenants by the entirety").
   const ownershipMode: OwnershipMode = a.ownershipMode ?? "percent";
   const couples = multiOwner ? (a.couples ?? []) : [];
   const pairedIdx = new Set<number>();
@@ -893,8 +893,12 @@ app.post("/portal/oa/generate", async (c) => {
     pairedIdx.add(cpl.b);
   }
   const coupleAt = (i: number) => couples.find((cpl) => cpl.a === i || cpl.b === i);
+  // Names only. The words around them — " as …" — belong to the master's
+  // Exhibit A row, not to this file; and Adam's rule is that "John Doe and Jane
+  // Doe as tenants by the entirety" is sufficient, so "husband and wife," is
+  // gone from the document entirely.
   const coupleName = (cpl: (typeof couples)[number]) =>
-    `${seed.members[cpl.a].name} and ${seed.members[cpl.b].name}, husband and wife, as ${SPOUSAL_FORM_LABEL[cpl.form]}`;
+    `${seed.members[cpl.a].name} and ${seed.members[cpl.b].name}`;
 
   const members: OaInputs["members"] = [];
   const emittedCouples = new Set<(typeof couples)[number]>();
@@ -909,7 +913,7 @@ app.post("/portal/oa/generate", async (c) => {
         address: seed.members[cpl.a].address,
         percentage: shareValue(ownershipMode, cplShare),
         percentageLabel: shareLabel(ownershipMode, cplShare),
-        jointHolding: `husband and wife, as ${SPOUSAL_FORM_LABEL[cpl.form]}`,
+        jointHolding: SPOUSAL_FORM_LABEL[cpl.form],
         contribution: cpl.contribution ?? "",
         todBeneficiary: cpl.todBeneficiary
           ? `${cpl.todBeneficiary} (effective at the death of the last surviving spouse)`

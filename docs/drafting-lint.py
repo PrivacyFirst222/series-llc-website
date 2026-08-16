@@ -57,6 +57,17 @@ def check(path, notes_text):
         if m:
             problems.append(f"{name}:{i}  hortatory '{m.group(0)}' — a form document binds or permits; it does not advise")
 
+    # --- house terminology --------------------------------------------------
+    # Adam, 16 August 2026, on "tenants by the entireties": "It is typically not
+    # plural. I prefer the plural never be used." A preference stated once is a
+    # preference I will forget; this is it written down where it fails a build.
+    for i, line in enumerate(text.split("\n"), 1):
+        if re.search(r"\bentireties\b", line, re.I):
+            problems.append(
+                f"{name}:{i}  \"entireties\" — the house form is the singular, "
+                "\"tenants by the entirety\""
+            )
+
     # --- duplicate provisions ----------------------------------------------
     seen = defaultdict(list)
     for label, body in sections(text):
