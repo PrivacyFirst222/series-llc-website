@@ -56,7 +56,7 @@ Forms: `sgl` single-member · `mul` manager-managed multi-member ·
 | A member sues the company or another member | ss. 605.0801-605.0806 | 13.1 13.2 | 16.1 16.2 | 16.1 16.2 | 16.1 16.2 | 16.1 16.2 | 13.1 13.2 | the right to sue may not be unreasonably restricted |
 | A decision needs the members' approval | s. 605.04073 | 12.2 | 4.3 4.4 5.4 15.2 | 4.3 4.4 5.4 15.2 | 4.3 4.4 5.1 5.3 5.5 15.2 | 4.3 4.4 5.1 5.3 5.5 15.2 | 12.2 |  |
 | A member seeks partition of an asset | s. 605.0110(4) | 1.11 6.5 | 1.11 6.7 | 1.11 6.7 | 1.11 6.7 | 1.11 6.7 | 1.11 6.5 | a sole member has nobody to partition against; s. 6.5 denies any interest in specific property instead |
-| A distribution is made | ss. 605.0404, 605.0405 | 7.1 7.2 | 7.1 7.2 7.3 | 7.1 7.2 7.3 | 7.1 7.2 7.3 | 7.1 7.2 7.3 | 7.1 7.2 7.3 | a series distributes to the Company, which distributes to the members |
+| A distribution is made | ss. 605.0404, 605.0405 | 7.1 7.2 | 7.1 7.2 7.3 | 7.1 7.2 7.3 | 7.1 7.2 7.3 | 7.1 7.2 7.3 | 7.1 7.2 | a series distributes to the Company, which distributes to the members |
 | The manager dies, resigns, or is removed | s. 605.04072 | 5.1 | 5.1 | 5.1 | 5.8 | 5.8 | 5.1 | the member-managed forms have no manager; s. 5.8 names the Administrative Member |
 | A manager acts outside the authority given | s. 605.04074(2)(b) | 5.3 5.4 5.8 | 5.3 5.4 5.8 | 5.3 5.4 5.8 | 5.4 5.5 5.9 | 5.4 5.5 5.9 | 5.3 5.4 5.8 | an internal limit does not defeat a third party without knowledge or notice |
 | A manager or member is sued for a management decision | ss. 605.04093, 605.0408 | 5.5 5.6 | 5.5 5.6 | 5.5 5.6 | 5.6 5.7 | 5.6 5.7 | 5.5 5.6 | indemnity cannot reach bad faith or an improper personal benefit |

@@ -189,7 +189,6 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **7.2 Source Limitation.** Distributions in respect of a Protected Series shall be made **solely from the Associated Assets of that Protected Series, and solely to the Company**; distributions in respect of the Company shall be made solely from the Associated Assets of the Company, to the Member. Each distribution shall be recorded in the records maintained under Article 8, identifying its source.
 
-**7.3 Tax Distributions.** To the extent of available cash of the Company or the applicable Protected Series, the Manager may make distributions intended to enable the Member to satisfy federal and state income tax liabilities attributable to the Company's income, and is authorized to pay any such amount directly to the government agency responsible for collection on the Member's behalf, with any amount so paid treated as distributed to the Member. A tax distribution funded from the Associated Assets of a Protected Series shall be made by that Protected Series to the Company and distributed by the Company to the Member, and is treated as an advance against later distributions under Section 7.1.
 
 ---
 

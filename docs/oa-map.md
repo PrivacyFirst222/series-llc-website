@@ -168,17 +168,15 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mul | 7.1 | Allocations | b3e8d7e5 | mechanic | company | members | — | IRC 704(b); 1361(b)(1)(D) for the S forms |
 | mbs scp | 7.1 | Allocations | 5ee5aa81 | mechanic | company | members | — | IRC 704(b); 1361(b)(1)(D) for the S forms |
 | mbr | 7.1 | Allocations | 1ab53dac | mechanic | company | members | — | IRC 704(b); 1361(b)(1)(D) for the S forms |
-| sgl | 7.2 | Source Limitation | 40e0cd75 | benefit | manager | series | the series paid its owner's owner directly, so nobody was respecting the silos | ss. 605.2303(2), 605.2401(2) |
+| sgl sgs | 7.2 | Source Limitation | 40e0cd75 | benefit | manager | series | the series paid its owner's owner directly, so nobody was respecting the silos | ss. 605.2303(2), 605.2401(2) |
 | mul | 7.2 | Distributions | 17034e98 | authority | manager members | members | — | s. 605.0404 |
 | scp | 7.2 | Distributions | 14ee142f | authority | manager members | members | — | s. 605.0404 |
 | mbr | 7.2 | Distributions | e8cfc8f9 | authority | manager members | members | — | s. 605.0404 |
 | mbs | 7.2 | Distributions | 7d29af44 | authority | manager members | members | — | s. 605.0404 |
-| sgs | 7.2 | Source Limitation | a9aa3440 | benefit | manager | series | the series paid its owner's owner directly, so nobody was respecting the silos | ss. 605.2303(2), 605.2401(2) |
 | mul | 7.3 | Tax Distributions | 1c52aaa7 | authority | manager members | members | — | s. 605.0404 |
 | scp | 7.3 | Tax Distributions | 7ecf5184 | authority | manager members | members | — | s. 605.0404 |
 | mbr | 7.3 | Tax Distributions | 4f27ae8e | authority | manager members | members | — | s. 605.0404 |
 | mbs | 7.3 | Tax Distributions | c1c945cc | authority | manager members | members | — | s. 605.0404 |
-| sgs | 7.3 | Tax Distributions | 82a7a012 | authority | manager | member | — | IRC 1366; the Member is taxed on Company income whether or not cash is distributed |
 | sgl sgs | 8.1 | Records | 22a1d870 | covenant | manager | member | The records were not maintained by the person the agreement names, and I was never shown the series records. | ss. 605.2301(2)(a), 605.0410, 605.2305 |
 | mul scp | 8.1 | Records | 495681ad | covenant | manager | members | The records were not maintained by the person the agreement names. | s. 605.2301(2)(a) |
 | mbr mbs | 8.1 | Records | 17f045db | covenant | manager | members | The records were not maintained by the person the agreement names. | s. 605.2301(2)(a) |
