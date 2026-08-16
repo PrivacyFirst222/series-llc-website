@@ -105,7 +105,7 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbr mbs mul scp | 4.10 | Information Rights | b897a44b | benefit | company | members | — | ss. 605.0410, 605.2305 |
 | mul scp | 4.11 | Transfer on Death Designation | ba6ce8d5 | benefit | company | members | — | ss. 711.50-711.512 |
 | mbr mbs | 4.11 | Transfer on Death Designation | ada01e7a | benefit | company | members | — | ss. 711.50-711.512 |
-| sgl | 5.1 | Manager-Managed; the Manager | 717d4ec1 | authority | manager members | members manager | — | ss. 605.04072, 605.04073(2), 605.04074(2)(b) |
+| sgl | 5.1 | Manager-Managed; the Manager | 50e6861c | authority | manager members | members manager | — | ss. 605.04072, 605.04073(2), 605.04074(2)(b) |
 | mul scp | 5.1 | Manager-Managed; the Manager | 3396138b | authority | manager members | members manager | — | ss. 605.04072, 605.04073(2), 605.04074(2)(b) |
 | mbr mbs | 5.1 | Member-Managed | b9f7026e | authority | members | members | — | ss. 605.0407(1), 605.04073(1) |
 | sgl | 5.2 | Management of Each Protected Series | 7295d2ea | authority | manager | members series | — | ss. 605.2304(2), 605.2107(1)(n) |
