@@ -152,7 +152,17 @@ if ! python3 "$ROOT/docs/drafting-lint.py" "$ROOT"/webapp/server/templates-oa-*.
 fi
 
 # The gate. Measured against the originals; a regression stops everything here,
-# before a single file has been replaced.
+# before a single file has been replaced. The pagination half of it is new on
+# 16 August and its checks are broken on purpose first: the four faults it now
+# measures — single spacing instead of 1.15, headings flush against their text,
+# keepLines on every paragraph, and page breaks as empty paragraphs — all
+# shipped in eight agreements precisely because nothing measured them, and a
+# measurement that has never been watched fail would repeat that.
+echo "breaking the pagination checks on purpose"
+if ! python3 "$ROOT/docs/format-selftest.py"; then
+  echo "update-word-docs: A FORMATTING CHECK IS DEAD — nothing written" >&2
+  exit 1
+fi
 echo "checking $count documents against docs/source/"
 if ! python3 "$CHECK" "$STAGE"/*.docx; then
   echo "update-word-docs: FORMATTING REGRESSION — nothing written" >&2

@@ -65,6 +65,30 @@ def measure(path):
     if footer:
         page_num = "PAGE" in z.read("word/footer1.xml").decode("utf8", "replace")
 
+    # Pagination. None of this was measured until 16 August, which is why four
+    # separate regressions shipped: the 1.15 line spacing dropped to single,
+    # every heading's space-below became 0, keepLines went from 0 paragraphs to
+    # all of them, and page breaks were empty paragraphs that opened each
+    # exhibit one blank line down. Every check passed through all four.
+    styles = z.read("word/styles.xml").decode("utf8", "replace") if "word/styles.xml" in names else ""
+    line_rule = re.search(r'<w:pPrDefault>.*?w:line="(\d+)".*?</w:pPrDefault>', styles, re.S)
+    # Count paragraphs that START a page rather than break markers, so the two
+    # idioms cannot double-count a paragraph carrying both. In docs/source/ the
+    # Owner's Manual has 8: six pageBreakBefore on the PART dividers, and two
+    # break runs — before CONTENTS and before the disclaimer that follows it.
+    page_breaks = sum(
+        1 for p in paras
+        if "<w:pageBreakBefore/>" in p or re.search(r'w:type="page"', p)
+    )
+    # Space below a heading, taken from the headings themselves rather than the
+    # profile, so a document hand-checked once stays checkable.
+    heading_afters = []
+    for p in body_paras:
+        ps = [int(s) for s in re.findall(r'<w:sz w:val="(\d+)"/>', p)]
+        if ps and max(ps) > body_sz:
+            m = re.search(r'<w:spacing[^/]*w:after="(\d+)"', p)
+            heading_afters.append(int(m.group(1)) if m else -1)  # -1 = inherits
+
     return {
         "paragraphs": n_paras,
         "justified": count(r'<w:jc w:val="both"/>'),
@@ -78,6 +102,11 @@ def measure(path):
         "tables": count(r"<w:tbl>"),
         "primary_font": primary,
         "page_numbers": page_num,
+        "line_spacing": int(line_rule.group(1)) if line_rule else 240,
+        "widow_control": count(r"<w:widowControl/>"),
+        "page_breaks": page_breaks,
+        # 0 would mean every heading sits flush against its text.
+        "headings_with_space_below": sum(1 for a in heading_afters if a != 0),
     }
 
 
@@ -146,6 +175,29 @@ def check(paths):
         for key, label in (("coloured_runs", "coloured runs"), ("italic_runs", "italics")):
             if b.get(key, 0) and m[key] < b[key] * TOLERANCE:
                 problems.append(f"{label}: {m[key]}, baseline {b[key]}")
+
+        # Pagination. Exact, not toleranced: line spacing is one number for the
+        # whole document and 240 (single) instead of 276 (1.15) is a different
+        # document, not a drifted one.
+        if b.get("line_spacing") and m["line_spacing"] != b["line_spacing"]:
+            problems.append(
+                f"line spacing: {m['line_spacing']/240:.2f} lines, "
+                f"baseline {b['line_spacing']/240:.2f}"
+            )
+        # Every paragraph carries widowControl or inherits Word's default. A
+        # document that switches it OFF is the failure this catches.
+        if re.search(r'<w:widowControl w:val="(0|false)"',
+                     zipfile.ZipFile(path).read("word/document.xml").decode("utf8", "replace")):
+            problems.append("widow control: explicitly disabled somewhere")
+        # Page breaks are added by us, so the baseline floor is what the master
+        # asks for; losing them silently is how the exhibits ran together.
+        if b.get("page_breaks", 0) and m["page_breaks"] < b["page_breaks"]:
+            problems.append(f"page breaks: {m['page_breaks']}, baseline {b['page_breaks']}")
+        # 0 headings with space below = every heading flush against its text,
+        # which is exactly what shipped in all eight agreements.
+        if m["headings"] and not m["headings_with_space_below"]:
+            problems.append("headings: every one sits flush against the text below it")
+
         if problems:
             failed.append(name)
             print(f"FAIL  {name}")

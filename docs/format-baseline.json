@@ -1,13 +1,17 @@
 {
   "FPSLLC Operating Agreement - Manager-Managed (S Corporation) - DRAFT.docx": {
+    "_pagination": "line_spacing / widow_control / headings_with_space_below measured from docs/source/FPSLLC Operating Agreement - Manager-Managed (S Corporation) - DRAFT.docx. page_breaks is the [[pagebreak]] count in webapp/server/templates-oa-s.md \u2014 the hand-formatted originals have none, because the exhibits used to run on.",
     "body_size": 24,
     "coloured_runs": 0,
     "headings": 23,
+    "headings_with_space_below": 23,
     "indented": 0,
     "italic_runs": 8,
     "justified": 180,
     "keep_lines": 0,
     "keep_next": 25,
+    "line_spacing": 276,
+    "page_breaks": 4,
     "page_numbers": false,
     "paragraphs": 256,
     "primary_font": "Times New Roman",
@@ -16,17 +20,22 @@
       "justified_pct": 0.703125,
       "keep_lines_pct": 0.0
     },
-    "tables": 4
+    "tables": 4,
+    "widow_control": 0
   },
   "FPSLLC Operating Agreement - Manager-Managed Multi-Member (Partnership) - DRAFT.docx": {
+    "_pagination": "line_spacing / widow_control / headings_with_space_below measured from docs/source/FPSLLC Operating Agreement - Manager-Managed Multi-Member (Partnership) - DRAFT.docx. page_breaks is the [[pagebreak]] count in webapp/server/templates-oa-multi.md \u2014 the hand-formatted originals have none, because the exhibits used to run on.",
     "body_size": 24,
     "coloured_runs": 0,
     "headings": 23,
+    "headings_with_space_below": 23,
     "indented": 0,
     "italic_runs": 8,
     "justified": 174,
     "keep_lines": 0,
     "keep_next": 25,
+    "line_spacing": 276,
+    "page_breaks": 4,
     "page_numbers": false,
     "paragraphs": 250,
     "primary_font": "Times New Roman",
@@ -35,17 +44,22 @@
       "justified_pct": 0.696,
       "keep_lines_pct": 0.0
     },
-    "tables": 4
+    "tables": 4,
+    "widow_control": 0
   },
   "FPSLLC Operating Agreement - Member-Managed (S Corporation) - DRAFT.docx": {
+    "_pagination": "line_spacing / widow_control / headings_with_space_below measured from docs/source/FPSLLC Operating Agreement - Member-Managed (S Corporation) - DRAFT.docx. page_breaks is the [[pagebreak]] count in webapp/server/templates-oa-member-s.md \u2014 the hand-formatted originals have none, because the exhibits used to run on.",
     "body_size": 24,
     "coloured_runs": 0,
     "headings": 23,
+    "headings_with_space_below": 23,
     "indented": 0,
     "italic_runs": 8,
     "justified": 183,
     "keep_lines": 0,
     "keep_next": 25,
+    "line_spacing": 276,
+    "page_breaks": 4,
     "page_numbers": false,
     "paragraphs": 259,
     "primary_font": "Times New Roman",
@@ -54,17 +68,22 @@
       "justified_pct": 0.7065637065637066,
       "keep_lines_pct": 0.0
     },
-    "tables": 4
+    "tables": 4,
+    "widow_control": 0
   },
   "FPSLLC Operating Agreement - Member-Managed Multi-Member (Partnership) - DRAFT.docx": {
+    "_pagination": "line_spacing / widow_control / headings_with_space_below measured from docs/source/FPSLLC Operating Agreement - Member-Managed Multi-Member (Partnership) - DRAFT.docx. page_breaks is the [[pagebreak]] count in webapp/server/templates-oa-member.md \u2014 the hand-formatted originals have none, because the exhibits used to run on.",
     "body_size": 24,
     "coloured_runs": 0,
     "headings": 23,
+    "headings_with_space_below": 23,
     "indented": 0,
     "italic_runs": 8,
     "justified": 177,
     "keep_lines": 0,
     "keep_next": 25,
+    "line_spacing": 276,
+    "page_breaks": 4,
     "page_numbers": false,
     "paragraphs": 253,
     "primary_font": "Times New Roman",
@@ -73,17 +92,22 @@
       "justified_pct": 0.6996047430830039,
       "keep_lines_pct": 0.0
     },
-    "tables": 4
+    "tables": 4,
+    "widow_control": 0
   },
   "FPSLLC Operating Agreement Instructions - DRAFT.docx": {
+    "_pagination": "line_spacing / widow_control / headings_with_space_below measured from docs/source/FPSLLC Operating Agreement Instructions - DRAFT.docx. page_breaks is the [[pagebreak]] count in docs/oa-instructions.md \u2014 the hand-formatted originals have none, because the exhibits used to run on.",
     "body_size": 24,
     "coloured_runs": 0,
     "headings": 10,
+    "headings_with_space_below": 10,
     "indented": 0,
     "italic_runs": 7,
     "justified": 20,
     "keep_lines": 19,
     "keep_next": 11,
+    "line_spacing": 276,
+    "page_breaks": 0,
     "page_numbers": false,
     "paragraphs": 72,
     "primary_font": "Times New Roman",
@@ -92,18 +116,23 @@
       "justified_pct": 0.2777777777777778,
       "keep_lines_pct": 0.2638888888888889
     },
-    "tables": 2
+    "tables": 2,
+    "widow_control": 0
   },
   "SMMEMDE - FPSLLC Operating Agreement - Member-Managed Single Member (Disregarded) - DRAFT.docx": {
     "_derivation": "No hand-formatted original exists: drafted 16 August 2026, never authored in Word. Absolute expectations come from SMMMDE, the manager-managed single-member agreement, which is the same document minus the Manager \u2014 20 headings, same typography. headings_pct is 20/199 because this form runs 199 paragraphs. As recorded on the SMMMS entry and tested there, format-check applies TOLERANCE = 0.80 to every ratio, so this detects wholesale flattening \u2014 the 8 August 2026 failure \u2014 and not the loss of a single heading.",
+    "_pagination": "line_spacing / widow_control / headings_with_space_below measured from docs/source/FPSLLC Operating Agreement - Manager-Managed Single Member (Disregarded) - DRAFT.docx. page_breaks is the [[pagebreak]] count in webapp/server/templates-oa-member-single.md \u2014 the hand-formatted originals have none, because the exhibits used to run on.",
     "body_size": 24,
     "coloured_runs": 0,
     "headings": 20,
+    "headings_with_space_below": 21,
     "indented": 0,
     "italic_runs": 3,
     "justified": 117,
     "keep_lines": 0,
     "keep_next": 23,
+    "line_spacing": 276,
+    "page_breaks": 4,
     "page_numbers": false,
     "paragraphs": 199,
     "primary_font": "Times New Roman",
@@ -112,18 +141,23 @@
       "justified_pct": 0.7005347593582888,
       "keep_lines_pct": 0.0
     },
-    "tables": 3
+    "tables": 3,
+    "widow_control": 0
   },
   "SMMEMS - FPSLLC Operating Agreement - Member-Managed Single Member (S Corporation) - DRAFT.docx": {
     "_derivation": "No hand-formatted original exists: drafted 16 August 2026, never authored in Word. Every value here is copied from the SMMEMDE entry \u2014 the member-managed single-member agreement, which is this document minus the S corporation Article 9 and the Code definition. SMMEMS is strictly LARGER than SMMEMDE, so the absolute counts (paragraphs, headings, justified, keep_next, tables) are conservative floors rather than expectations, and the ratios are the real test. Deliberately NOT measured from the generated output: a baseline taken from the artifact it is meant to police can never fail. format-check applies TOLERANCE = 0.80 to every ratio and every absolute, so this detects wholesale flattening \u2014 the 8 August 2026 failure \u2014 and not the loss of a single heading.",
+    "_pagination": "line_spacing / widow_control / headings_with_space_below measured from docs/source/FPSLLC Operating Agreement - Manager-Managed Single Member (Disregarded) - DRAFT.docx. page_breaks is the [[pagebreak]] count in webapp/server/templates-oa-member-single-s.md \u2014 the hand-formatted originals have none, because the exhibits used to run on.",
     "body_size": 24,
     "coloured_runs": 0,
     "headings": 20,
+    "headings_with_space_below": 21,
     "indented": 0,
     "italic_runs": 3,
     "justified": 117,
     "keep_lines": 0,
     "keep_next": 23,
+    "line_spacing": 276,
+    "page_breaks": 4,
     "page_numbers": false,
     "paragraphs": 199,
     "primary_font": "Times New Roman",
@@ -132,17 +166,22 @@
       "justified_pct": 0.7005347593582888,
       "keep_lines_pct": 0.0
     },
-    "tables": 3
+    "tables": 3,
+    "widow_control": 0
   },
   "SMMMDE - FPSLLC Operating Agreement - Manager-Managed Single Member (Disregarded) - DRAFT.docx": {
+    "_pagination": "line_spacing / widow_control / headings_with_space_below measured from docs/source/FPSLLC Operating Agreement - Manager-Managed Single Member (Disregarded) - DRAFT.docx. page_breaks is the [[pagebreak]] count in webapp/server/templates-oa-single.md \u2014 the hand-formatted originals have none, because the exhibits used to run on.",
     "body_size": 24,
     "coloured_runs": 0,
     "headings": 21,
+    "headings_with_space_below": 21,
     "indented": 0,
     "italic_runs": 3,
     "justified": 131,
     "keep_lines": 0,
     "keep_next": 23,
+    "line_spacing": 276,
+    "page_breaks": 4,
     "page_numbers": false,
     "paragraphs": 187,
     "primary_font": "Times New Roman",
@@ -151,18 +190,23 @@
       "justified_pct": 0.7005347593582888,
       "keep_lines_pct": 0.0
     },
-    "tables": 3
+    "tables": 3,
+    "widow_control": 0
   },
   "SMMMS - FPSLLC Operating Agreement - Manager-Managed Single Member (S Corporation) - DRAFT.docx": {
     "_derivation": "No hand-formatted original exists: this form was drafted on 16 August 2026 and never authored in Word, so there is nothing to measure it against. Every absolute expectation is taken from the disregarded single-member agreement, its structural twin \u2014 same articles, same typography, 20 headings. Only headings_pct is recomputed, because this document carries 225 paragraphs to the twin's 208 (Article 9 is six provisions instead of three), so the same 20 headings are a smaller share of it. NOTE, tested rather than assumed: format-check applies TOLERANCE = 0.80 to every ratio, so this entry does NOT fail when a single heading is flattened \u2014 19 of 225 was generated deliberately and passed. It fails at wholesale flattening, which is the 8 August 2026 failure it exists for (34 of 34 headings lost). That looseness is a property of the gate, not of this entry. Without any entry the document is SKIPped and nothing is measured at all.",
+    "_pagination": "line_spacing / widow_control / headings_with_space_below measured from docs/source/FPSLLC Operating Agreement - Manager-Managed Single Member (Disregarded) - DRAFT.docx. page_breaks is the [[pagebreak]] count in webapp/server/templates-oa-single-s.md \u2014 the hand-formatted originals have none, because the exhibits used to run on.",
     "body_size": 24,
     "coloured_runs": 0,
     "headings": 20,
+    "headings_with_space_below": 21,
     "indented": 0,
     "italic_runs": 3,
     "justified": 143,
     "keep_lines": 0,
     "keep_next": 23,
+    "line_spacing": 276,
+    "page_breaks": 4,
     "page_numbers": false,
     "paragraphs": 225,
     "primary_font": "Times New Roman",
@@ -171,17 +215,22 @@
       "justified_pct": 0.7005347593582888,
       "keep_lines_pct": 0.0
     },
-    "tables": 3
+    "tables": 3,
+    "widow_control": 0
   },
   "Series LLC Owners Manual - REVISED DRAFT.docx": {
+    "_pagination": "line_spacing / widow_control / headings_with_space_below measured from docs/source/Series LLC Owners Manual - REVISED DRAFT.docx. page_breaks is the [[pagebreak]] count in docs/owners-manual.md \u2014 the hand-formatted originals have none, because the exhibits used to run on.",
     "body_size": 22,
     "coloured_runs": 50,
     "headings": 49,
+    "headings_with_space_below": 47,
     "indented": 141,
     "italic_runs": 57,
     "justified": 165,
     "keep_lines": 171,
     "keep_next": 65,
+    "line_spacing": 276,
+    "page_breaks": 8,
     "page_numbers": true,
     "paragraphs": 509,
     "primary_font": "Georgia",
@@ -190,6 +239,7 @@
       "justified_pct": 0.3241650294695481,
       "keep_lines_pct": 0.33595284872298625
     },
-    "tables": 7
+    "tables": 7,
+    "widow_control": 0
   }
 }

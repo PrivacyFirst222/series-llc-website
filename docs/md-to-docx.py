@@ -46,10 +46,16 @@ PROFILES = {
         "body_sz": 22,          # 11pt
         "small_sz": 21,         # 10.5pt, set-off blocks
         "table_sz": 20,         # 10pt
+        # Each PART divider starts a fresh page in the hand-set original (six
+        # pageBreakBefore in docs/source/), and the markdown carries no
+        # [[pagebreak]] to say so — so the generated manual ran the parts
+        # together from the day it took over.
+        "h1_starts_page": True,
         "h1": dict(sz=40, before=0, after=320, accent=True),    # PART divider
         "h2": dict(sz=28, before=320, after=160, accent=True),  # chapter
         "h3": dict(sz=24, before=200, after=80),               # sub-heading
         "body_after": 160,
+        "default_after": 200,   # docs/source/ docDefaults
         "item_ind": 432,
         "quote_ind": 504,
         "footer_page_numbers": True,
@@ -64,15 +70,23 @@ PROFILES = {
         "body_sz": 24,          # 12pt
         "small_sz": 22,
         "table_sz": 22,
-        "h1": dict(sz=28, before=240, after=0, center=True),
-        "h2": dict(sz=26, before=240, after=0),
-        "h3": dict(sz=24, before=240, after=0, center=True),
+        # after=200, not 0. In docs/source/ an ARTICLE heading carries
+        # before=240 and NO after, so it inherits the docDefault of 200; this
+        # generator wrote an explicit 0 instead and every heading in all eight
+        # agreements sat flush against the text beneath it.
+        "h1": dict(sz=28, before=240, after=200, center=True),
+        "h2": dict(sz=26, before=240, after=200),
+        "h3": dict(sz=24, before=240, after=200, center=True),
         "body_after": 160,
+        "default_after": 200,   # docs/source/ docDefaults
         "item_ind": 0,
         "quote_ind": 432,
         # The hand-formatted originals carry no footer. Adding one would be an
         # unrequested change to a signed instrument's appearance.
         "footer_page_numbers": False,
+        # An agreement's h1 is its cover caption, not a divider: it must not
+        # start a page.
+        "h1_starts_page": False,
         # An agreement opens with a centered caption block; the first horizontal
         # rule ends it, and every ARTICLE heading after that is left-aligned.
         "center_before_rule": True,
@@ -130,15 +144,31 @@ def runs(text, P, sz=None, bold=False, italic=False, accent=False):
 
 
 def ppr(justify=False, before=None, after=None, ind_left=None, ind_right=None,
-        center=False, keep_next=False, keep_lines=True, style=None, numbered=False):
-    """Paragraph properties. keep_lines defaults ON — no paragraph splits across
-    a page break unless a caller deliberately allows it. That, with keep_next on
-    every heading, is the widow and orphan control."""
+        center=False, keep_next=False, keep_lines=False, page_break_before=False,
+        style=None, numbered=False):
+    """Paragraph properties.
+
+    keep_lines defaults OFF, which is what every document in docs/source/ does:
+    the five agreements carry it on zero paragraphs and the Owner's Manual on
+    171 of 526 — its list items and set-off blocks, never its body text. It is
+    not widow and orphan control. keepLines forbids a paragraph to split AT ALL,
+    so a long one that will not fit moves entire and leaves the rest of the page
+    blank; widowControl is the setting that keeps a single line from being
+    stranded, and it is applied to everything. Short things that read badly when
+    broken — a bullet, a numbered item, a quoted block — pass keep_lines=True.
+    """
     p = "<w:pPr>"
     if style:
         p += f'<w:pStyle w:val="{style}"/>'
     if numbered:
         p += '<w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr>'
+    # The page starts ON this paragraph. An empty paragraph carrying a break run
+    # leaves its own paragraph mark at the top of the new page, so every exhibit
+    # began one blank line down — which is what a page break in this document
+    # used to be. The Owner's Manual original uses pageBreakBefore on the PART
+    # heading itself; this is that idiom.
+    if page_break_before:
+        p += "<w:pageBreakBefore/>"
     if keep_next:
         p += "<w:keepNext/>"
     if keep_lines:
@@ -177,7 +207,23 @@ def para(text, P, **kw):
 
 
 def page_break():
+    """A standalone break. Kept only as the fallback below — see stamp_page_break."""
     return '<w:p><w:r><w:br w:type="page"/></w:r></w:p>'
+
+
+def stamp_page_break(element):
+    """Make `element` start a new page, by marking it rather than preceding it.
+
+    Word puts an empty break-run paragraph's own mark at the top of the new
+    page, so a document built that way opens every exhibit one blank line down.
+    pageBreakBefore in the paragraph's own properties starts the page on the
+    text. A table has no paragraph properties to stamp, so it falls back.
+    """
+    if "<w:pageBreakBefore/>" in element:
+        return element  # already starts a page — a [[pagebreak]] before a PART
+    if element.startswith("<w:p") and "<w:pPr>" in element:
+        return element.replace("<w:pPr>", "<w:pPr><w:pageBreakBefore/>", 1)
+    return page_break() + element
 
 
 def table(rows, P):
@@ -285,8 +331,17 @@ def body_xml(md, P):
     if tp:
         out.append(title_page(tp, P))
     seen_rule = False
+    # A [[pagebreak]] marks the NEXT paragraph as starting a page, rather than
+    # emitting a paragraph of its own; `emitted_at` is where that paragraph
+    # landed, stamped on the following pass once we know it exists.
+    pending_break, emitted_at = False, None
 
     while i < len(lines):
+        if pending_break and emitted_at is not None and len(out) > emitted_at:
+            out[emitted_at] = stamp_page_break(out[emitted_at])
+            pending_break = False
+        emitted_at = len(out)
+
         line = lines[i].rstrip()
         stripped = line.strip()
 
@@ -298,7 +353,7 @@ def body_xml(md, P):
             i += 1
             continue
         if stripped == "[[pagebreak]]":
-            out.append(page_break())
+            pending_break = True
             i += 1
             continue
         if stripped == "[[left]]":
@@ -306,7 +361,12 @@ def body_xml(md, P):
             continue
         if stripped == "[[contents]]":
             if P["toc"]:
-                out.append(contents(headings, P))
+                # In docs/source/ the contents sits on its own page: a break
+                # before CONTENTS and another after the list. The markdown says
+                # neither, so the generated manual ran the title page, the
+                # contents and the disclaimer together.
+                out.append(stamp_page_break(contents(headings, P)))
+                pending_break, emitted_at = True, len(out)
             i += 1
             continue
 
@@ -336,14 +396,19 @@ def body_xml(md, P):
             out.append(
                 para(text, P, sz=spec["sz"], bold=True, keep_next=True,
                      before=spec["before"], after=spec["after"], center=center,
-                     accent=spec.get("accent", False))
+                     accent=spec.get("accent", False),
+                     page_break_before=(level == 1 and P["h1_starts_page"]
+                                        and (seen_rule or not P["center_before_rule"])))
             )
             i += 1
             continue
 
         # A wholly bold line inside the title block is a centered sub-title.
         if P["center_before_rule"] and not seen_rule and re.fullmatch(r"\*\*.+\*\*", stripped):
-            out.append(para(stripped, P, center=True, before=0, after=0,
+            # after=0 ran "(Member-Managed — Single Member / S Corporation)"
+            # straight into "THIS OPERATING AGREEMENT"; it stays tight to the
+            # heading above it (before=0) and breathes below.
+            out.append(para(stripped, P, center=True, before=0, after=P["body_after"],
                             sz=P["h3"]["sz"], keep_next=True))
             i += 1
             continue
@@ -352,7 +417,7 @@ def body_xml(md, P):
         if stripped.startswith("- ") is False and stripped.startswith("&gt; ") is False and stripped.startswith("> "):
             body = stripped[2:].strip()
             out.append(
-                para(body, P, sz=P["small_sz"], after=80,
+                para(body, P, sz=P["small_sz"], after=80, keep_lines=True,
                      ind_left=P["quote_ind"], ind_right=P["quote_ind"],
                      keep_next=body.rstrip("*_ ").endswith(":"))
             )
@@ -363,14 +428,15 @@ def body_xml(md, P):
         if re.match(r"^[-*]\s+", stripped):
             out.append(
                 para(re.sub(r"^[-*]\s+", "", stripped), P, numbered=True, after=80,
-                     justify=True)
+                     justify=True, keep_lines=True)
             )
             i += 1
             continue
 
         # Indented numbered item, and the manual's "[ ] " checklist lines
         if P["item_ind"] and (re.match(r"^\d+\.\s+", stripped) or stripped.startswith("[ ] ")):
-            out.append(para(stripped, P, ind_left=P["item_ind"], after=80, justify=True))
+            out.append(para(stripped, P, ind_left=P["item_ind"], after=80,
+                            justify=True, keep_lines=True))
             i += 1
             continue
 
@@ -392,6 +458,11 @@ def body_xml(md, P):
             )
         )
         i += 1
+
+    # The last paragraph of the document is stamped here: the loop stamps on the
+    # pass after the paragraph is emitted, and for the final one there is none.
+    if pending_break and emitted_at is not None and len(out) > emitted_at:
+        out[emitted_at] = stamp_page_break(out[emitted_at])
 
     sect = "<w:sectPr>"
     if header:
@@ -423,8 +494,17 @@ def styles_xml(P):
         f'<w:rFonts w:ascii="{P["font"]}" w:hAnsi="{P["font"]}" w:cs="{P["font"]}"/>'
         f'<w:sz w:val="{P["body_sz"]}"/><w:szCs w:val="{P["body_sz"]}"/>'
         "</w:rPr></w:rPrDefault>"
-        "<w:pPrDefault><w:pPr><w:widowControl/><w:keepLines/>"
-        f'<w:spacing w:after="{P["body_after"]}"/><w:jc w:val="both"/>'
+        # Measured from docs/source/, which every original shares:
+        #   <w:spacing w:after="200" w:line="276" w:lineRule="auto"/>
+        # and NO keepLines. The 1.15 line spacing (276/240) is the house look and
+        # was silently dropped when this generator took over; keepLines here made
+        # every paragraph unsplittable, which is not widow control — it is what
+        # pushes whole paragraphs onto the next page and leaves the ragged page
+        # bottoms Adam found on 16 August. widowControl stays: Word defaults it
+        # on, and stating it keeps a viewer that defaults it off honest.
+        "<w:pPrDefault><w:pPr><w:widowControl/>"
+        f'<w:spacing w:after="{P["default_after"]}" w:line="276" w:lineRule="auto"/>'
+        '<w:jc w:val="both"/>'
         "</w:pPr></w:pPrDefault></w:docDefaults>"
         '<w:style w:type="paragraph" w:default="1" w:styleId="Normal">'
         '<w:name w:val="Normal"/></w:style>'
