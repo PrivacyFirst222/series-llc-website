@@ -46,6 +46,7 @@ FORMS = {
     "mbr": "webapp/server/templates-oa-member.md",
     "mbs": "webapp/server/templates-oa-member-s.md",
     "sgs": "webapp/server/templates-oa-single-s.md",
+    "sgm": "webapp/server/templates-oa-member-single.md",
 }
 COLUMNS = ["event", "source", "sgl", "scp", "mul", "mbr", "mbs", "note"]
 SECTION_RE = re.compile(r"^\*\*(\d+\.\d+[A-Z]?)\s+([^*]+?)\*\*", re.M)

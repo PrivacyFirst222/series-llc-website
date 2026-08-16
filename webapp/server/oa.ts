@@ -11,6 +11,7 @@ import sCorpTemplateRaw from "./templates-oa-s.md";
 import memberTemplateRaw from "./templates-oa-member.md";
 import memberSCorpTemplateRaw from "./templates-oa-member-s.md";
 import singleSCorpTemplateRaw from "./templates-oa-single-s.md";
+import memberSingleTemplateRaw from "./templates-oa-member-single.md";
 import { taxationLabel } from "./datetime";
 
 /** esbuild bundles .md as text; Bun without the bunfig loader resolves the
@@ -24,6 +25,7 @@ const sCorpTemplate = loadTemplate(sCorpTemplateRaw as string);
 const memberTemplate = loadTemplate(memberTemplateRaw as string);
 const memberSCorpTemplate = loadTemplate(memberSCorpTemplateRaw as string);
 const singleSCorpTemplate = loadTemplate(singleSCorpTemplateRaw as string);
+const memberSingleTemplate = loadTemplate(memberSingleTemplateRaw as string);
 
 export const OA_TEMPLATE_VERSION = "First Edition — August 2026";
 
@@ -55,7 +57,7 @@ export interface OaSeriesInput {
 export interface OaInputs {
   /** Management structure × tax posture. "s" forms are the S corporation
    *  masters and serve any member count; "member*" are member-managed. */
-  version: "single" | "single-s" | "multi" | "s" | "member" | "member-s";
+  version: "single" | "single-s" | "member-single" | "multi" | "s" | "member" | "member-s";
   companyName: string;
   principalAddress: string;
   /** Every person serving as Manager. s. 5.1 makes them act by majority. */
@@ -119,16 +121,21 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
     member: memberTemplate,
     "member-s": memberSCorpTemplate,
     "single-s": singleSCorpTemplate,
+    "member-single": memberSingleTemplate,
   } as const;
   let s = TEMPLATES[inputs.version];
   /** Every form except the single-member one shares the multi chassis. */
-  const isSingle = inputs.version === "single" || inputs.version === "single-s";
+  const isSingle =
+    inputs.version === "single" || inputs.version === "single-s" ||
+    inputs.version === "member-single";
   const isMulti = !isSingle;
   /** The S corporation forms hardwire identical ownership across all series. */
   const isSCorp =
     inputs.version === "s" || inputs.version === "member-s" || inputs.version === "single-s";
   /** Member-managed forms have no Manager to name. */
-  const isMemberManaged = inputs.version === "member" || inputs.version === "member-s";
+  const isMemberManaged =
+    inputs.version === "member" || inputs.version === "member-s" ||
+    inputs.version === "member-single";
   const co = inputs.companyName;
 
   // ---- global fields ----
@@ -171,10 +178,17 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
     );
   }
 
-  // The borrowing threshold is in every form: the single-member master gained
-  // s. 5.4(b) on 16 August, so this can no longer live inside the isMulti block.
-  must(s, "$[THRESHOLD]", "threshold");
-  s = s.split("$[THRESHOLD]").join(money(inputs.borrowingThreshold ?? 25000));
+  // A borrowing threshold belongs to an "Actions Requiring Member Approval"
+  // provision, and every form has one EXCEPT the member-managed single-member
+  // agreement: there the Member manages, so an approval gate would be the Member
+  // consenting to themselves and the provision does not exist. Making this
+  // unconditional on 16 August was right for the five forms that existed then and
+  // wrong the moment a form without the gate was added.
+  const hasBorrowingThreshold = inputs.version !== "member-single";
+  if (hasBorrowingThreshold) {
+    must(s, "$[THRESHOLD]", "threshold");
+    s = s.split("$[THRESHOLD]").join(money(inputs.borrowingThreshold ?? 25000));
+  }
 
   // ---- multi-member options (every form but the single-member one) ----
   if (isMulti) {
@@ -326,8 +340,13 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
     const adoptNames = inputs.members.flatMap((m) => m.signatories ?? [m.name]);
     const adoptLines = signatureBlock(adoptSource, ", Member");
     // Member-managed Series Exhibits are adopted by all Members acting for the
-    // Company; manager-managed ones by the Manager alone.
-    ex = ex.replace(/_+\n\[MEMBER 1\], Member[\s\S]*?_+\n\[MEMBER 2\], Member/, adoptLines);
+    // Company; manager-managed ones by the Manager alone. The multi-member
+    // masters scaffold two signature lines; the member-managed SINGLE-member
+    // master scaffolds one, because a two-member block in a one-member form
+    // would be scaffolding for people who cannot exist.
+    ex = ex
+      .replace(/_+\n\[MEMBER 1\], Member[\s\S]*?_+\n\[MEMBER 2\], Member/, adoptLines)
+      .replace(/_+\n\[MEMBER NAME\], Member/, adoptLines);
     // One signature line per Manager, as in the Agreement's signature page.
     const psManagerLines = managerNames
       .map((n) => `${n}, Protected Series Manager`)

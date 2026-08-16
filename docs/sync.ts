@@ -33,6 +33,7 @@ const GENERATED = new Set([
   "Series LLC Owners Manual - REVISED DRAFT.docx",
   "SMMMDE - FPSLLC Operating Agreement - Manager-Managed Single Member (Disregarded) - DRAFT.docx",
   "SMMMS - FPSLLC Operating Agreement - Manager-Managed Single Member (S Corporation) - DRAFT.docx",
+  "SMMEMDE - FPSLLC Operating Agreement - Member-Managed Single Member (Disregarded) - DRAFT.docx",
   "FPSLLC Operating Agreement - Manager-Managed Multi-Member (Partnership) - DRAFT.docx",
   "FPSLLC Operating Agreement - Manager-Managed (S Corporation) - DRAFT.docx",
   "FPSLLC Operating Agreement - Member-Managed Multi-Member (Partnership) - DRAFT.docx",
@@ -44,6 +45,7 @@ const GENERATED = new Set([
   "FPSLLC Redline - Member-Managed Partnership vs S Corporation.docx",
   "FPSLLC Redline - Manager-Managed Multi-Member vs Single Member.docx",
   "SMMMDE vs SMMMS - FPSLLC Redline - Single Member Disregarded vs S Corporation.docx",
+  "SMMMDE vs SMMEMDE - FPSLLC Redline - Single Member Manager-Managed vs Member-Managed.docx",
 ]);
 
 /** Research material deliberately not committed: samples and other people's

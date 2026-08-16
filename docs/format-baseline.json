@@ -94,6 +94,26 @@
     },
     "tables": 2
   },
+  "SMMEMDE - FPSLLC Operating Agreement - Member-Managed Single Member (Disregarded) - DRAFT.docx": {
+    "_derivation": "No hand-formatted original exists: drafted 16 August 2026, never authored in Word. Absolute expectations come from SMMMDE, the manager-managed single-member agreement, which is the same document minus the Manager \u2014 20 headings, same typography. headings_pct is 20/199 because this form runs 199 paragraphs. As recorded on the SMMMS entry and tested there, format-check applies TOLERANCE = 0.80 to every ratio, so this detects wholesale flattening \u2014 the 8 August 2026 failure \u2014 and not the loss of a single heading.",
+    "body_size": 24,
+    "coloured_runs": 0,
+    "headings": 20,
+    "indented": 0,
+    "italic_runs": 3,
+    "justified": 117,
+    "keep_lines": 0,
+    "keep_next": 23,
+    "page_numbers": false,
+    "paragraphs": 199,
+    "primary_font": "Times New Roman",
+    "ratios": {
+      "headings_pct": 0.1005,
+      "justified_pct": 0.7005347593582888,
+      "keep_lines_pct": 0.0
+    },
+    "tables": 3
+  },
   "SMMMDE - FPSLLC Operating Agreement - Manager-Managed Single Member (Disregarded) - DRAFT.docx": {
     "body_size": 24,
     "coloured_runs": 0,

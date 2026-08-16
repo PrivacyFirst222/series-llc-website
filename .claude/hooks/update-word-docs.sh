@@ -39,6 +39,7 @@ DOCS=(
   "webapp/server/templates-oa-member.md|FPSLLC Operating Agreement - Member-Managed Multi-Member (Partnership) - DRAFT.docx"
   "webapp/server/templates-oa-member-s.md|FPSLLC Operating Agreement - Member-Managed (S Corporation) - DRAFT.docx"
   "webapp/server/templates-oa-single-s.md|SMMMS - FPSLLC Operating Agreement - Manager-Managed Single Member (S Corporation) - DRAFT.docx"
+  "webapp/server/templates-oa-member-single.md|SMMEMDE - FPSLLC Operating Agreement - Member-Managed Single Member (Disregarded) - DRAFT.docx"
   "docs/owners-manual.md|Series LLC Owners Manual - REVISED DRAFT.docx"
   "docs/statement-of-authorized-representative.md|FPSLLC Statement of Authorized Representative - FORM.docx"
   "docs/oa-instructions.md|FPSLLC Operating Agreement Instructions - DRAFT.docx"
@@ -188,6 +189,9 @@ python3 "$ROOT/docs/redline.py" "$ROOT/webapp/server/templates-oa-multi.md" \
 python3 "$ROOT/docs/redline.py" "$ROOT/webapp/server/templates-oa-single.md" \
         "$ROOT/webapp/server/templates-oa-single-s.md" \
         "SMMMDE vs SMMMS - FPSLLC Redline - Single Member Disregarded vs S Corporation.docx"
+python3 "$ROOT/docs/redline.py" "$ROOT/webapp/server/templates-oa-single.md" \
+        "$ROOT/webapp/server/templates-oa-member-single.md" \
+        "SMMMDE vs SMMEMDE - FPSLLC Redline - Single Member Manager-Managed vs Member-Managed.docx"
 REDLINES=(
   "FPSLLC Redline - Manager-Managed Partnership vs S Corporation.docx"
   "FPSLLC Redline - Manager-Managed vs Member-Managed Partnership.docx"
@@ -195,6 +199,7 @@ REDLINES=(
   "FPSLLC Redline - Member-Managed Partnership vs S Corporation.docx"
   "FPSLLC Redline - Manager-Managed Multi-Member vs Single Member.docx"
   "SMMMDE vs SMMMS - FPSLLC Redline - Single Member Disregarded vs S Corporation.docx"
+  "SMMMDE vs SMMEMDE - FPSLLC Redline - Single Member Manager-Managed vs Member-Managed.docx"
 )
 
 # Dropbox second, and never fatal. -d is not enough: under a macOS privacy denial

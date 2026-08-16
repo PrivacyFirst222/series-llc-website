@@ -51,6 +51,7 @@ MASTERS = {
     "mbr": "webapp/server/templates-oa-member.md",
     "mbs": "webapp/server/templates-oa-member-s.md",
     "sgs": "webapp/server/templates-oa-single-s.md",
+    "sgm": "webapp/server/templates-oa-member-single.md",
 }
 
 # What a provision is FOR. Anything that can be breached is a covenant, and a
