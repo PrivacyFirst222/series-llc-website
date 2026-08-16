@@ -103454,7 +103454,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 ## ARTICLE 3 \u2014 PROTECTED SERIES
 
-**3.1 Establishment.** With the affirmative vote or consent of all members of the Company (which, while the Member is the sole member, means the consent of the Member), the Company may establish one or more Protected Series by causing a Protected Series Designation to be signed and filed with the Department as provided in s. 605.2201, Florida Statutes. At or before the filing of each Protected Series Designation, the Member and the Manager shall adopt a Series Exhibit for the new Protected Series. The Manager is authorized to execute and file each Protected Series Designation approved under this Section. Each Protected Series shall be established without Associated Members. Consistent with s. 605.2303(2), Florida Statutes, the Company owns all of the protected-series transferable interests of each Protected Series, and no member of the Company holds any interest in any Protected Series except indirectly, through that member's interest in the Company.
+**3.1 Establishment.** With the consent of the Member, the Company may establish one or more Protected Series by causing a Protected Series Designation to be signed and filed with the Department as provided in s. 605.2201, Florida Statutes. At or before the filing of each Protected Series Designation, the Member and the Manager shall adopt a Series Exhibit for the new Protected Series. The Manager is authorized to execute and file each Protected Series Designation the Member approves. Each Protected Series shall be established without Associated Members.
 
 **3.2 Status of Each Protected Series.** As provided by the Act, each Protected Series:
 
@@ -103812,7 +103812,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 ## ARTICLE 3 \u2014 PROTECTED SERIES
 
-**3.1 Establishment.** With the affirmative vote or consent of **all** Members, the Company may establish one or more Protected Series by causing a Protected Series Designation to be signed and filed with the Department as provided in s. 605.2201, Florida Statutes. At or before the filing of each Protected Series Designation, the Members and the Manager shall adopt a Series Exhibit for the new Protected Series. The Manager is authorized to execute and file each Protected Series Designation approved under this Section. Each Protected Series shall be established without Associated Members. Consistent with s. 605.2303(2), Florida Statutes, the Company owns all of the protected-series transferable interests of each Protected Series, and no member of the Company holds any interest in any Protected Series except indirectly, through that member's interest in the Company.
+**3.1 Establishment.** With the affirmative vote or consent of **all** Members, the Company may establish one or more Protected Series by causing a Protected Series Designation to be signed and filed with the Department as provided in s. 605.2201, Florida Statutes. At or before the filing of each Protected Series Designation, the Members and the Manager shall adopt a Series Exhibit for the new Protected Series. The Manager is authorized to execute and file each Protected Series Designation approved under this Section. Each Protected Series shall be established without Associated Members.
 
 **3.2 Status of Each Protected Series.** As provided by the Act, each Protected Series:
 
@@ -104265,7 +104265,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 ## ARTICLE 3 \u2014 PROTECTED SERIES
 
-**3.1 Establishment.** With the affirmative vote or consent of **all** Members, the Company may establish one or more Protected Series by causing a Protected Series Designation to be signed and filed with the Department as provided in s. 605.2201, Florida Statutes. At or before the filing of each Protected Series Designation, the Members and the Manager shall adopt a Series Exhibit for the new Protected Series. The Manager is authorized to execute and file each Protected Series Designation approved under this Section. Each Protected Series shall be established without Associated Members. Consistent with s. 605.2303(2), Florida Statutes, the Company owns all of the protected-series transferable interests of each Protected Series, and no member of the Company holds any interest in any Protected Series except indirectly, through that member's interest in the Company.
+**3.1 Establishment.** With the affirmative vote or consent of **all** Members, the Company may establish one or more Protected Series by causing a Protected Series Designation to be signed and filed with the Department as provided in s. 605.2201, Florida Statutes. At or before the filing of each Protected Series Designation, the Members and the Manager shall adopt a Series Exhibit for the new Protected Series. The Manager is authorized to execute and file each Protected Series Designation approved under this Section. Each Protected Series shall be established without Associated Members.
 
 **3.2 Status of Each Protected Series.** As provided by the Act, each Protected Series:
 
@@ -104730,7 +104730,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 ## ARTICLE 3 \u2014 PROTECTED SERIES
 
-**3.1 Establishment.** With the affirmative vote or consent of **all** Members, the Company may establish one or more Protected Series by causing a Protected Series Designation to be signed and filed with the Department as provided in s. 605.2201, Florida Statutes. At or before the filing of each Protected Series Designation, the Members shall adopt a Series Exhibit for the new Protected Series. The Administrative Member is authorized to execute and file each Protected Series Designation approved under this Section. Each Protected Series shall be established without Associated Members. Consistent with s. 605.2303(2), Florida Statutes, the Company owns all of the protected-series transferable interests of each Protected Series, and no member of the Company holds any interest in any Protected Series except indirectly, through that member's interest in the Company.
+**3.1 Establishment.** With the affirmative vote or consent of **all** Members, the Company may establish one or more Protected Series by causing a Protected Series Designation to be signed and filed with the Department as provided in s. 605.2201, Florida Statutes. At or before the filing of each Protected Series Designation, the Members shall adopt a Series Exhibit for the new Protected Series. The Administrative Member is authorized to execute and file each Protected Series Designation approved under this Section. Each Protected Series shall be established without Associated Members.
 
 **3.2 Status of Each Protected Series.** As provided by the Act, each Protected Series:
 
@@ -105184,7 +105184,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 ## ARTICLE 3 \u2014 PROTECTED SERIES
 
-**3.1 Establishment.** With the affirmative vote or consent of **all** Members, the Company may establish one or more Protected Series by causing a Protected Series Designation to be signed and filed with the Department as provided in s. 605.2201, Florida Statutes. At or before the filing of each Protected Series Designation, the Members shall adopt a Series Exhibit for the new Protected Series. The Administrative Member is authorized to execute and file each Protected Series Designation approved under this Section. Each Protected Series shall be established without Associated Members. Consistent with s. 605.2303(2), Florida Statutes, the Company owns all of the protected-series transferable interests of each Protected Series, and no member of the Company holds any interest in any Protected Series except indirectly, through that member's interest in the Company.
+**3.1 Establishment.** With the affirmative vote or consent of **all** Members, the Company may establish one or more Protected Series by causing a Protected Series Designation to be signed and filed with the Department as provided in s. 605.2201, Florida Statutes. At or before the filing of each Protected Series Designation, the Members shall adopt a Series Exhibit for the new Protected Series. The Administrative Member is authorized to execute and file each Protected Series Designation approved under this Section. Each Protected Series shall be established without Associated Members.
 
 **3.2 Status of Each Protected Series.** As provided by the Act, each Protected Series:
 

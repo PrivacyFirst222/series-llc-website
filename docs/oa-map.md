@@ -71,9 +71,9 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mul scp | 2.16 | "Series Exhibit" | 7998e3b3 | definition | — | members | — | drafting convention |
 | mbr mbs | 2.16 | "Transfer" | a5129002 | definition | — | members | — | drafting convention |
 | mul scp | 2.17 | "Transfer" | a5129002 | definition | — | members | — | drafting convention |
-| sgl | 3.1 | Establishment | d76b4262 | authority | company members | members | — | s. 605.2201 |
-| mul scp | 3.1 | Establishment | b00be1c1 | authority | company members | members | — | s. 605.2201 |
-| mbr mbs | 3.1 | Establishment | 045997c3 | authority | company members | members | — | s. 605.2201 |
+| sgl | 3.1 | Establishment | 37edb48e | authority | company members | members | — | s. 605.2201 |
+| mul scp | 3.1 | Establishment | 6411b254 | authority | company members | members | — | s. 605.2201 |
+| mbr mbs | 3.1 | Establishment | 8c9018bb | authority | company members | members | — | s. 605.2201 |
 | sgl | 3.2 | Status of Each Protected Series | 46e12a62 | statutory-route | — | members series | — | ss. 605.2104, 605.2201 |
 | mul scp | 3.2 | Status of Each Protected Series | a2fc6c48 | statutory-route | — | members series | — | ss. 605.2104, 605.2201 |
 | mbr mbs | 3.2 | Status of Each Protected Series | 87e0ec17 | statutory-route | — | members series | — | ss. 605.2104, 605.2201 |
