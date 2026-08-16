@@ -105,7 +105,7 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | sgl sgs | 3.3 | Limitation of Liability Among Series (Statutory Shields) | eadcbd5b | statutory-route | — | members series company | — | s. 605.2401 |
 | mul scp | 3.3 | Limitation of Liability Among Series (Statutory Shields) | d197829d | statutory-route | — | members series company | — | s. 605.2401 |
 | mbr mbs | 3.3 | Limitation of Liability Among Series (Statutory Shields) | 762530e8 | statutory-route | — | members series company | — | s. 605.2401 |
-| sgm | 3.3 | Limitation of Liability Among Series (Statutory Shields) | 435cf028 | statutory-route | — | members series company | — | s. 605.2401 |
+| sgm | 3.3 | Limitation of Liability Among Series (Statutory Shields) | b41afb07 | benefit | — | member series company | — | s. 605.2401; the Member now holds the protected-series manager office, so the shield names that capacity |
 | mbr mbs mul scp sgl sgm sgs | 3.4 | Dissolution of a Protected Series Distinguished | ab68ccd0 | statutory-route | — | members | — | s. 605.2501 |
 | mul scp sgl | 3.5 | Series Exhibits Control Series Terms | 70d3c7b8 | mechanic | company | members | — | drafting convention |
 | mbr mbs sgm | 3.5 | Series Exhibits Control Series Terms | a3eb038e | mechanic | company | members | — | drafting convention |
@@ -148,7 +148,7 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | sgl sgs | 5.2 | Management of Each Protected Series | 9391162b | authority | manager | member series | — | ss. 605.2304(2), 605.2107(1)(n) |
 | mul scp | 5.2 | Management of Each Protected Series | 00750ec0 | authority | manager | members series | — | ss. 605.2304(2), 605.2107(1)(n) |
 | mbr mbs | 5.2 | Management of Each Protected Series | 55f990eb | authority | manager | members series | — | ss. 605.2304(2), 605.2107(1)(n) |
-| sgm | 5.2 | Management of Each Protected Series | b4aa81f5 | authority | manager | member series | — | ss. 605.2304(2), 605.2107(1)(n) |
+| sgm | 5.2 | Management of Each Protected Series | 21315c82 | authority | member | member series | — | ss. 605.2304(1)-(2), 605.2107(1)(n) |
 | mul scp sgl sgs | 5.3 | Authority of the Manager | e6c44bc9 | authority | manager | members manager | — | s. 605.04073(2) |
 | mbr mbs | 5.3 | Voting; Decisions | 0b631d8f | authority | members | members | — | s. 605.04073 |
 | sgm | 5.3 | Authority to Act | 088acca7 | authority | member | member third-party | — | ss. 605.04074(1), 605.0301 |
@@ -160,7 +160,7 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | sgl sgs | 5.5 | Standard of Conduct; Exculpation | cce8e03a | benefit | manager member | manager member | — | ss. 605.04091, 605.0105(3) |
 | mul scp | 5.5 | Standard of Conduct; Exculpation | db5f385a | benefit | manager members | manager members | — | ss. 605.04091, 605.0105(3) |
 | mbr mbs | 5.5 | Actions Requiring Member Approval | f455ec6e | authority | members | members | the Member moved the building into another series without the other members' consent | ss. 605.04073(1)(c), 605.0302, 605.2301 |
-| sgm | 5.5 | Indemnification | 365c9126 | benefit | company series | manager members | — | s. 605.0408 |
+| sgm | 5.5 | Indemnification | 789d7df9 | benefit | company series | member | — | s. 605.0408 |
 | mul scp sgl sgs | 5.6 | Indemnification | 88f2b141 | benefit | company series | manager members | — | s. 605.0408 |
 | mbr mbs | 5.6 | Standard of Conduct; Exculpation | dfa8cbf5 | benefit | manager members | manager members | — | ss. 605.04091, 605.0105(3) |
 | sgm | 5.6 | Reimbursement; Shared Expenses | 1892460b | benefit | company | member | — | s. 605.04091(1); the shared-expense allocation is the record Article 8 relies on |
