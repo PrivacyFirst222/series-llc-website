@@ -231,7 +231,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **10.1 Admission.** One or more additional members may be admitted to the Company only with the written consent of the Member and upon the admitted person's delivery of a signed agreement to be bound by this Agreement.
 
-**10.2 No Association with a Protected Series.** No Member may be associated with a Protected Series. A Protected Series may not be established with, and may not admit, an Associated Member. Any amendment permitting Associated Members may cause each Protected Series to be treated as an entity separate from the Company for federal income tax purposes, with its own filing obligations, and may terminate any election the Company has made.
+**10.2 No Association with a Protected Series.** No Member may be associated with a Protected Series. A Protected Series may not be established with, and may not admit, an Associated Member.
 
 **10.3 Continuation on Termination of Last Member.** Upon the termination of the membership of the last remaining member, the Company shall not be dissolved, and the legal representative of the last remaining member shall agree in writing to continue the Company, and the representative (or an Immediate Family Member designated by the representative who is not a creditor of the last remaining member) shall be admitted as a member effective as of the terminating event, all as permitted by the Act.
 

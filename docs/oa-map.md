@@ -198,7 +198,7 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | sgl | 10.1 | Admission | 2b14cbb5 | authority | member | member | — | s. 605.0401(3) |
 | mul scp | 10.1 | Restriction on Transfer | 3ca8ae94 | covenant | members | members | The member transferred in breach of the agreement — a claim among the members, and the transferee takes as a transferee only. | ss. 605.0502, 605.0602 |
 | mbr mbs | 10.1 | Restriction on Transfer | 8f158066 | covenant | members | members | The member transferred in breach of the agreement — a claim among the members, and the transferee takes as a transferee only. | ss. 605.0502, 605.0602 |
-| sgl | 10.2 | No Association with a Protected Series | 96a9d58f | covenant | company members | members | The company associated a member with a series in breach of its own agreement. | s. 605.2302; preserves the disregarded/partnership design |
+| sgl | 10.2 | No Association with a Protected Series | aa036b65 | covenant | company members | members | The company associated a member with a series in breach of its own agreement. | s. 605.2302; preserves the disregarded/partnership design |
 | mbr mbs mul scp | 10.2 | Permitted Family Transfers | 384fae5f | benefit | members | members | — | s. 605.0502 |
 | sgl | 10.3 | Continuation on Termination of Last Member | ea924089 | benefit | — | members company | — | s. 605.0701(3) |
 | mbr mbs mul scp | 10.3 | Rights of Transferees | 81b80fe4 | benefit | — | members company | — | s. 605.0502(3) |
@@ -218,7 +218,7 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | sgl | 12.1 | Amendments | 95c1e577 | authority | member | member | — | s. 605.04073(1)(d), (2)(e) |
 | mbr mbs mul scp | 12.1 | Admission of Members | fc6d8b94 | authority | members | members | — | s. 605.0401(3) |
 | sgl | 12.2 | Action by Written Consent | 57614354 | mechanic | members | members | — | s. 605.04073(4) |
-| mbr mbs mul scp | 12.2 | No Association with a Protected Series | 96a9d58f | covenant | company members | members | The company associated a member with a series in breach of its own agreement. | s. 605.2302; preserves the disregarded/partnership design |
+| mbr mbs mul scp | 12.2 | No Association with a Protected Series | aa036b65 | covenant | company members | members | The company associated a member with a series in breach of its own agreement. | s. 605.2302; preserves the disregarded/partnership design |
 | mbr mbs mul scp | 12.3 | Continuation on Termination of Last Member | 0415885d | benefit | — | members company | — | s. 605.0701(3) |
 | sgl | 13.1 | Governing Law; Internal Affairs | 053b67a8 | mechanic | — | members manager | — | s. 605.0104 |
 | mbr mbs mul scp | 13.1 | No Voluntary Withdrawal | bd50185a | covenant | members | members company | The member withdrew in breach of the agreement — a claim among the members. | s. 605.0601 |
