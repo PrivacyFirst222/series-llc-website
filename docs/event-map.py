@@ -28,6 +28,7 @@ Then two reports, which do not fail:
                 tell which, and neither can a count that has been filtered.
 
     python3 docs/event-map.py            # gate, then both reports
+    python3 docs/event-map.py --selftest # break the map, watch the gate fire
     python3 docs/event-map.py --quiet    # gate only
 """
 import os
@@ -54,10 +55,10 @@ def sections_of(rel):
     return {m.group(1): m.group(2).strip().rstrip(".") for m in SECTION_RE.finditer(text)}
 
 
-def rows():
+def rows(path=None):
     """Every data row of the table, as a dict keyed by the header cells."""
     header, out = None, []
-    for line in open(MAP_PATH):
+    for line in open(path or MAP_PATH):
         if not line.startswith("|"):
             continue
         cells = [c.strip() for c in line.strip().strip("|").split("|")]
@@ -78,10 +79,9 @@ def rows():
     return out
 
 
-def main():
-    quiet = "--quiet" in sys.argv
+def check(path=None):
     known = {code: sections_of(rel) for code, rel in FORMS.items()}
-    table = rows()
+    table = rows(path)
     problems, named = [], {code: set() for code in FORMS}
 
     for row in table:
@@ -106,23 +106,76 @@ def main():
                 else:
                     named[code].add(r)
 
-    for p in problems:
-        print("  " + p)
-    if problems:
-        print(f"\n{len(problems)} problem(s) in the event map.", file=sys.stderr)
-        return 1
-
     # A provision no event reaches is a provision nobody asked for. Adding one is
     # therefore expensive: name the event it answers, or delete it. Article 2 is
     # exempt — a definition answers no event by itself, it supplies a word to the
     # provisions that do, and the last row of the map says so.
     orphaned = []
     for code in FORMS:
-        for s in set(known[code]) - named[code]:
-            if not known[code][s].startswith('"'):
-                orphaned.append(f"  {code}  Section {s} {known[code][s]} — no event in the map reaches it")
-    for o in sorted(orphaned):
-        print(o)
+        for sec in set(known[code]) - named[code]:
+            if not known[code][sec].startswith('"'):
+                orphaned.append(f"{code}  Section {sec} {known[code][sec]} — no event in the map reaches it")
+    return table, problems, sorted(orphaned), known, named
+
+
+MUTATIONS = [
+    ("an event left unanswered for one form",
+     lambda t: t.replace("| A member divorces | s. 605.0502 | 10.1 |", "| A member divorces | s. 605.0502 |  |", 1),
+     "sgl is unanswered"),
+    ("silence with no reason given",
+     lambda t: t.replace("| The members deadlock | s. 605.0702(2) | none | 13.2 | 13.2 | 13.2 | 13.2 | a sole member cannot deadlock |",
+                         "| The members deadlock | s. 605.0702(2) | none | 13.2 | 13.2 | 13.2 | 13.2 |  |", 1),
+     "says none with no reason"),
+    ("an event answered by a provision that form does not have",
+     lambda t: t.replace("| A member divorces | s. 605.0502 | 10.1 |", "| A member divorces | s. 605.0502 | 10.6 |", 1),
+     "which that form does not contain"),
+    ("a cell that is not a section list",
+     lambda t: t.replace("| A member divorces | s. 605.0502 | 10.1 |", "| A member divorces | s. 605.0502 | probably |", 1),
+     "is not a section list"),
+]
+
+
+def selftest():
+    import tempfile
+    base = open(MAP_PATH).read()
+    target = os.path.join(tempfile.mkdtemp(), "event-map.md")
+    failures = 0
+    for label, mutate, expect in MUTATIONS:
+        text = mutate(base)
+        if text == base:
+            print(f"  VOID  {label} — the mutation changed nothing, so it proved nothing")
+            failures += 1
+            continue
+        open(target, "w").write(text)
+        try:
+            _, problems, _, _, _ = check(target)
+        except SystemExit as e:
+            problems = [str(e)]
+        if any(expect in p for p in problems):
+            print(f"  ok    {label}")
+        else:
+            print(f"  MISS  {label} — broke it and the gate said: {problems[:1] or 'nothing'}")
+            failures += 1
+    if failures:
+        print(f"\n{failures} of {len(MUTATIONS)} checks did not fire.", file=sys.stderr)
+        return 1
+    print(f"  {len(MUTATIONS)} checks each caught the defect it exists for")
+    return 0
+
+
+def main():
+    quiet = "--quiet" in sys.argv
+    if "--selftest" in sys.argv:
+        return selftest()
+    table, problems, orphaned, known, named = check()
+    for p in problems:
+        print("  " + p)
+    if problems:
+        print(f"\n{len(problems)} problem(s) in the event map.", file=sys.stderr)
+        return 1
+
+    for o in orphaned:
+        print("  " + o)
     if orphaned:
         print(f"\n{len(orphaned)} provision(s) answer no event. Add the event, or delete the "
               "provision.", file=sys.stderr)

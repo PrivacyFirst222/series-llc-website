@@ -104,8 +104,27 @@ fi
 # something that was not on the screen. Silence about an event is allowed and must
 # carry a written reason; a provision that answers no event fails.
 echo "answering the events"
+if ! python3 "$ROOT/docs/event-map.py" --selftest; then
+  echo "update-word-docs: AN EVENT CHECK IS DEAD — nothing written" >&2
+  exit 1
+fi
 if ! python3 "$ROOT/docs/event-map.py" --quiet; then
   echo "update-word-docs: THE EVENT MAP NO LONGER MATCHES THE FORMS — nothing written" >&2
+  exit 1
+fi
+
+# Coverage gate. The event map runs from the world; this runs from the statute,
+# and catches the one thing neither of the others can — a section of Chapter 605
+# NOBODY EVER CONSIDERED. An unconsidered provision leaves no trace at all, so
+# the only way to find it is to enumerate the chapter: all 191 sections, each
+# with a disposition and a written reason. Four are marked GAP today.
+echo "answering Chapter 605"
+if ! python3 "$ROOT/docs/coverage-605.py" --selftest; then
+  echo "update-word-docs: A COVERAGE CHECK IS DEAD — nothing written" >&2
+  exit 1
+fi
+if ! python3 "$ROOT/docs/coverage-605.py" --quiet; then
+  echo "update-word-docs: THE COVERAGE MAP NO LONGER MATCHES THE FORMS — nothing written" >&2
   exit 1
 fi
 
