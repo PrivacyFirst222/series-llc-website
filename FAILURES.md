@@ -498,6 +498,76 @@ he had to say it twice. This section is thin because the evidence is thin, not
 because the class is small — and the insult rule in `CLAUDE.md` exists largely to
 catch it going forward.
 
+## L10 — The back matter of a signed instrument is drafted in TypeScript
+**16 August 2026** · the OA generator
+
+Adam, on being told the generator "replaces whole sections" of the master:
+
+> *"I thought when there were two choices, the appropriate paragraph was inserted
+> word for word. That is the only acceptable way for this to work. Having ai
+> redraft paragraphs from scratch each time is a failure and wholly
+> unacceptable."*
+
+He is right, and the scope is four places in `webapp/server/oa.ts`:
+
+| site | lines | what it does |
+|---|---|---|
+| Exhibit A, single-member | 277-300 | the whole section is a TypeScript template literal |
+| Exhibit A, multi-member | 308-324 | the same |
+| `signatureBlock()` | 436 | composes the signature lines |
+| Series Exhibit adoption / PS-manager lines | 357-377 | composes strings |
+
+Articles 1 to 13 are not affected: s. 4.7 Competition is done correctly, the
+master carrying both alternatives in full and the generator extracting the chosen
+one verbatim, and an omitted provision is replaced by `[Reserved.]` rather than
+rewritten. **So I knew the right pattern. I had already implemented it. I did not
+apply it to the back matter.**
+
+The consequence already found: the S corporation masters put the eligible-
+shareholder restriction on the TOD line of Exhibit A, and the generator's
+replacement said only "subject in all events to this Agreement." A restriction
+Adam approved was in the master and absent from the document the client signs,
+from the day SMMMS was built.
+
+**Why.**
+
+*I classified Exhibit A as data, because it is shaped like a table.* Member name,
+address, percentage, contribution, date — those are fields, and fields belong to
+the code that has the values. But the section also contains sentences, and one of
+them was a restriction on who may inherit a membership interest. **The form of the
+thing decided its treatment, and the form was misleading.** Everything between the
+cover page and the last signature is drafting; a table in an operating agreement
+is drafting laid out in columns.
+
+*The two hard cases pushed me to code rather than to the master, and I let them.*
+A multi-member Exhibit A needs one row per member, and the TOD sentence changes
+when no beneficiary is named. Repetition and conditionals are things a template
+literal does easily and a static markdown file does not — so I moved the section
+to where the mechanism was convenient. The master needed a repeatable-row marker
+and a second alternative, which is perhaps thirty lines of work I did not do.
+**Difficulty in the master was treated as a reason to leave the master.**
+
+*And once it was code, it stopped being reviewable.* Adam reviews masters. He
+reads the Word files generated from masters. Neither shows him a sentence that
+lives in `oa.ts`, so the text I wrote there was never going to be caught by the
+process he actually runs — I put drafting in the one place his review does not
+reach. That is worse than a wrong sentence in a master, which he would have
+found in a redline.
+
+*The tell I ignored:* I wrote `replaceSection(...)` for Exhibit A and
+`replaceSectionBody(...)` for s. 4.7 in the same file. One substitutes a section
+with new text; the other selects text already in the master. Two functions, one
+of which is a licence to draft, and I never asked why the safe one was not good
+enough for both.
+
+**Fixed by.** Every sentence a client receives originates in a master.
+`oa.ts` may substitute values into marked slots, choose between alternatives
+written in the master, delete an omitted provision, and repeat a marked block —
+nothing else. Enforced by a gate: every paragraph of generated output must match
+a paragraph of its master after slot substitution, or the build fails. That
+forecloses the class rather than the instance, and it would have caught the
+Exhibit A drop the day it was written.
+
 ## C1 — A correction applied to three of five forms
 
 **Date:** 15 August 2026 · **Evidence:** conversation
@@ -1099,4 +1169,18 @@ test. — P21, C3
 **M19 · The artefact I am editing verified in place of the artefact the client
 receives.** The master and the Word file both carried the restriction; the generated
 agreement, which is the master with sections replaced, did not. — P21
+
+**M20 · The shape of a thing decides how I treat it.** Exhibit A is laid out as a
+table, so I handled it as data and drafted its sentences in code — including a
+restriction on who may inherit. — L10
+
+**M21 · Difficulty in the right place treated as permission to move to the wrong
+one.** Repeated rows and a conditional sentence are awkward in a markdown master
+and easy in a template literal, so the section moved to the template literal. —
+L10
+
+**M22 · Work placed where the reviewer's process cannot reach it.** Adam reviews
+masters and the documents built from them; nothing in that loop shows him a
+sentence living in TypeScript. — L10
+
 
