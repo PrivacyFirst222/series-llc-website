@@ -43,7 +43,7 @@ const GENERATED = new Set([
   "FPSLLC Redline - Manager-Managed vs Member-Managed S Corporation.docx",
   "FPSLLC Redline - Member-Managed Partnership vs S Corporation.docx",
   "FPSLLC Redline - Manager-Managed Multi-Member vs Single Member.docx",
-  "FPSLLC Redline - Single Member Disregarded vs S Corporation.docx",
+  "SMMMDE vs SMMMS - FPSLLC Redline - Single Member Disregarded vs S Corporation.docx",
 ]);
 
 /** Research material deliberately not committed: samples and other people's
