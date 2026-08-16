@@ -32,6 +32,7 @@ times the document.
     python3 docs/provision-map.py --update   # add/refresh rows, keep annotations
     python3 docs/provision-map.py --check    # the gate; non-zero on any failure
     python3 docs/provision-map.py --diff     # provisions and words vs HEAD
+    python3 docs/provision-map.py --result   # the full text of every changed provision
 """
 import hashlib
 import os
@@ -259,13 +260,6 @@ def check():
 
 def diff():
     """Net provisions and words against HEAD, so a commit can lead with removals."""
-    def head_copy(rel):
-        try:
-            return subprocess.run(["git", "show", f"HEAD:{rel}"], cwd=ROOT,
-                                  capture_output=True, text=True, check=True).stdout
-        except subprocess.CalledProcessError:
-            return ""
-
     added = removed = words_before = words_after = 0
     for rel in MASTERS.values():
         before_text, after_text = head_copy(rel), open(os.path.join(ROOT, rel)).read()
@@ -281,6 +275,55 @@ def diff():
     return 0
 
 
+def head_copy(rel):
+    try:
+        return subprocess.run(["git", "show", f"HEAD:{rel}"], cwd=ROOT,
+                              capture_output=True, text=True, check=True).stdout
+    except subprocess.CalledProcessError:
+        return ""
+
+
+def result():
+    """Print, in full, every provision whose text changed — the RESULT, not the diff.
+
+    A diff shows what you did. It cannot show what you left behind, because what
+    you left behind did not change. On 15 August 2026 a deletion removed a
+    section's heading and stranded its second paragraph under the neighbouring
+    provision: the diff looked exactly as intended, and the neighbour — whose own
+    text was untouched — was printed by nothing. Reading the resulting provision
+    would have shown an S corporation savings clause hanging off "Change in
+    Circumstances" in the disregarded-entity form.
+
+    So this prints the current text of every provision that differs from HEAD,
+    and of the provision on either side of it, because stranded text lands on a
+    neighbour.
+    """
+    shown = 0
+    for rel in MASTERS.values():
+        path = os.path.join(ROOT, rel)
+        before = {m.group(1): normalise(m.group(0)) for m in PROVISION_RE.finditer(head_copy(rel))}
+        after = [(m.group(1), m.group(2), m.group(3), normalise(m.group(0)))
+                 for m in PROVISION_RE.finditer(open(path).read())]
+        changed = {s for s, h, b, whole in after if before.get(s) != whole}
+        if not changed:
+            continue
+        print(f"\n=== {os.path.basename(rel)} ===")
+        for i, (section, heading, body, _) in enumerate(after):
+            neighbour = ((i > 0 and after[i - 1][0] in changed) or
+                         (i + 1 < len(after) and after[i + 1][0] in changed))
+            if section not in changed and not neighbour:
+                continue
+            print(f"\n[{'CHANGED  ' if section in changed else 'neighbour'}] {section} {heading}")
+            print("  " + normalise(body)[:1400])
+            shown += 1
+    if shown == 0:
+        print("  no provision text differs from HEAD")
+    else:
+        print(f"\n  {shown} provision(s) above. Read them. No gate can tell you whether what "
+              "remains says what you meant.")
+    return 0
+
+
 def main():
     if "--update" in sys.argv:
         found = collect()
@@ -289,6 +332,8 @@ def main():
         return 0
     if "--diff" in sys.argv:
         return diff()
+    if "--result" in sys.argv:
+        return result()
     if "--check" in sys.argv or len(sys.argv) == 1:
         return check()
     print(__doc__)

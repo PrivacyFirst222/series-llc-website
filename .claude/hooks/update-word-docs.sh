@@ -69,6 +69,16 @@ if ! python3 "$ROOT/docs/provision-map.py" --check; then
 fi
 python3 "$ROOT/docs/provision-map.py" --diff
 
+# The result, not the diff. A diff shows what was done; it cannot show what was
+# left behind, because what was left behind did not change. This prints the
+# current full text of every provision that differs from HEAD and of the
+# provision on either side, because stranded text lands on an untouched
+# neighbour — which is exactly how a deleted s. 9.5 left an S corporation
+# savings clause hanging off "Change in Circumstances". Nothing here fails; it
+# is text to read, and it is the only step in this file addressed to a reader.
+echo "reading back the changed provisions"
+python3 "$ROOT/docs/provision-map.py" --result
+
 # Consistency gate. The manual and the Instructions describe the agreements, so
 # every section they cite is a claim about a file in this repo. Provisions get
 # renumbered and deleted; the sentences around the numbers do not follow on their
