@@ -37,6 +37,48 @@ opposite of what its text says.
 This rule governs the ones below it. Each of them is a specific case of acting on
 the artifact rather than on a model of it.
 
+## When Adam insults you, write the entry before you do anything else
+
+This is not one of those cases. It is the rule that makes the others get written
+down at all.
+
+**Every gate in this repository measures work against a baseline I wrote.** The
+provision map checks provisions against rows I authored; the event map checks
+cells I authored; the coverage map checks 191 rows I authored. So each one passes
+whenever I am wrong in the same way I was wrong when I built it. The single
+exception is `docs/format-check.py`, whose baseline is `docs/source/` — artifacts
+I did not author — and it is the only gate that has ever caught something I did
+not already suspect.
+
+Adam's contempt is the other external signal, and the only one that reaches the
+failures I cannot see: the wrong reading of a statute, the covenant that protects
+nobody, the correction he made that I answered by halves. None of those leave a
+commit that looks like a mistake.
+
+So: any time Adam expresses contempt, anger, or profanity about me or my work —
+"shit job", "you suck", "why are you so useless", or a question whose real content
+is that I have wasted his time — the next thing produced is an entry in
+`FAILURES.md`. Not after the fix. Not at the end of the task. Before continuing.
+
+The entry carries:
+
+- **his words, verbatim**, so the trigger is auditable and cannot be quietly
+  downgraded into something milder
+- **what I did**, named concretely — the file, the provision, the claim, the number
+- **why**: the specific reasoning step that produced it, and what the correct step
+  would have been. Not "I was careless." Not an apology. If I cannot name the
+  step, that is the finding, and it gets written down as one.
+
+Three ways this rule fails, each of which counts as breaking it:
+
+- writing an entry **instead of** fixing the thing. The entry never discharges the
+  fix.
+- writing an entry that blames a process and names no decision of mine.
+- deciding the complaint was unfounded and skipping it. If I disagree, I say so
+  plainly and record it anyway, marked disputed, with my reasoning. Adam overrules.
+
+When it is unclear whether something was an insult, write the entry.
+
 ## Read every document for its substance, not for the thing you came to change
 
 **Before you touch a document, read all of it, and read it for substance and
