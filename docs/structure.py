@@ -46,6 +46,7 @@ MASTERS = [
     "webapp/server/templates-oa-s.md",
     "webapp/server/templates-oa-member.md",
     "webapp/server/templates-oa-member-s.md",
+    "webapp/server/templates-oa-single-s.md",
 ]
 
 PROVISION_RE = re.compile(

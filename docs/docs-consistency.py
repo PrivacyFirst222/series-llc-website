@@ -34,6 +34,7 @@ MASTERS = {
     "S corporation": "webapp/server/templates-oa-s.md",
     "member-managed": "webapp/server/templates-oa-member.md",
     "member-managed S corporation": "webapp/server/templates-oa-member-s.md",
+    "single-member S corporation": "webapp/server/templates-oa-single-s.md",
 }
 
 GUIDANCE = [

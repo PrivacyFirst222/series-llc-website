@@ -50,6 +50,7 @@ MASTERS = {
     "scp": "webapp/server/templates-oa-s.md",
     "mbr": "webapp/server/templates-oa-member.md",
     "mbs": "webapp/server/templates-oa-member-s.md",
+    "sgs": "webapp/server/templates-oa-single-s.md",
 }
 
 # What a provision is FOR. Anything that can be breached is a covenant, and a
@@ -138,7 +139,8 @@ benefits neither the members nor the manager does not belong in the agreement.
 Teaching that cannot be breached goes in the Owner's Manual instead.
 
 Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
-`mbr` member-managed · `mbs` member-managed S corporation.
+`mbr` member-managed · `mbs` member-managed S corporation ·
+`sgs` single-member S corporation.
 """
 
 

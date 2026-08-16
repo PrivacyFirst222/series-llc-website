@@ -56,6 +56,26 @@
     },
     "tables": 3
   },
+  "FPSLLC Operating Agreement - Manager-Managed Single Member (S Corporation) - DRAFT.docx": {
+    "_derivation": "No hand-formatted original exists: this form was drafted on 16 August 2026 and never authored in Word, so there is nothing to measure it against. Every absolute expectation is taken from the disregarded single-member agreement, its structural twin \u2014 same articles, same typography, 20 headings. Only headings_pct is recomputed, because this document carries 225 paragraphs to the twin's 208 (Article 9 is six provisions instead of three), so the same 20 headings are a smaller share of it. NOTE, tested rather than assumed: format-check applies TOLERANCE = 0.80 to every ratio, so this entry does NOT fail when a single heading is flattened \u2014 19 of 225 was generated deliberately and passed. It fails at wholesale flattening, which is the 8 August 2026 failure it exists for (34 of 34 headings lost). That looseness is a property of the gate, not of this entry. Without any entry the document is SKIPped and nothing is measured at all.",
+    "body_size": 24,
+    "coloured_runs": 0,
+    "headings": 20,
+    "indented": 0,
+    "italic_runs": 3,
+    "justified": 143,
+    "keep_lines": 0,
+    "keep_next": 23,
+    "page_numbers": false,
+    "paragraphs": 225,
+    "primary_font": "Times New Roman",
+    "ratios": {
+      "headings_pct": 0.088,
+      "justified_pct": 0.7005347593582888,
+      "keep_lines_pct": 0.0
+    },
+    "tables": 3
+  },
   "FPSLLC Operating Agreement - Member-Managed (S Corporation) - DRAFT.docx": {
     "body_size": 24,
     "coloured_runs": 0,

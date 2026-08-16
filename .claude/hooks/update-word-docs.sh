@@ -1,7 +1,7 @@
 #!/bin/bash
 # Regenerates every Word document from its master markdown.
 #
-# The markdown in this repo is the master for the five operating agreements and
+# The markdown in this repo is the master for the six operating agreements and
 # the Owner's Manual. The .docx files are OUTPUT — regenerated here and never
 # edited by hand. Anything typed into a Word file is lost on the next run.
 #
@@ -38,6 +38,7 @@ DOCS=(
   "webapp/server/templates-oa-s.md|FPSLLC Operating Agreement - Manager-Managed (S Corporation) - DRAFT.docx"
   "webapp/server/templates-oa-member.md|FPSLLC Operating Agreement - Member-Managed Multi-Member (Partnership) - DRAFT.docx"
   "webapp/server/templates-oa-member-s.md|FPSLLC Operating Agreement - Member-Managed (S Corporation) - DRAFT.docx"
+  "webapp/server/templates-oa-single-s.md|FPSLLC Operating Agreement - Manager-Managed Single Member (S Corporation) - DRAFT.docx"
   "docs/owners-manual.md|Series LLC Owners Manual - REVISED DRAFT.docx"
   "docs/statement-of-authorized-representative.md|FPSLLC Statement of Authorized Representative - FORM.docx"
   "docs/oa-instructions.md|FPSLLC Operating Agreement Instructions - DRAFT.docx"
@@ -184,12 +185,16 @@ python3 "$ROOT/docs/redline.py" "$ROOT/webapp/server/templates-oa-member.md" \
 python3 "$ROOT/docs/redline.py" "$ROOT/webapp/server/templates-oa-multi.md" \
         "$ROOT/webapp/server/templates-oa-single.md" \
         "FPSLLC Redline - Manager-Managed Multi-Member vs Single Member.docx"
+python3 "$ROOT/docs/redline.py" "$ROOT/webapp/server/templates-oa-single.md" \
+        "$ROOT/webapp/server/templates-oa-single-s.md" \
+        "FPSLLC Redline - Single Member Disregarded vs S Corporation.docx"
 REDLINES=(
   "FPSLLC Redline - Manager-Managed Partnership vs S Corporation.docx"
   "FPSLLC Redline - Manager-Managed vs Member-Managed Partnership.docx"
   "FPSLLC Redline - Manager-Managed vs Member-Managed S Corporation.docx"
   "FPSLLC Redline - Member-Managed Partnership vs S Corporation.docx"
   "FPSLLC Redline - Manager-Managed Multi-Member vs Single Member.docx"
+  "FPSLLC Redline - Single Member Disregarded vs S Corporation.docx"
 )
 
 # Dropbox second, and never fatal. -d is not enough: under a macOS privacy denial

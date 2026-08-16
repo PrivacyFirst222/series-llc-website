@@ -10,6 +10,7 @@ import multiTemplateRaw from "./templates-oa-multi.md";
 import sCorpTemplateRaw from "./templates-oa-s.md";
 import memberTemplateRaw from "./templates-oa-member.md";
 import memberSCorpTemplateRaw from "./templates-oa-member-s.md";
+import singleSCorpTemplateRaw from "./templates-oa-single-s.md";
 import { taxationLabel } from "./datetime";
 
 /** esbuild bundles .md as text; Bun without the bunfig loader resolves the
@@ -22,6 +23,7 @@ const multiTemplate = loadTemplate(multiTemplateRaw as string);
 const sCorpTemplate = loadTemplate(sCorpTemplateRaw as string);
 const memberTemplate = loadTemplate(memberTemplateRaw as string);
 const memberSCorpTemplate = loadTemplate(memberSCorpTemplateRaw as string);
+const singleSCorpTemplate = loadTemplate(singleSCorpTemplateRaw as string);
 
 export const OA_TEMPLATE_VERSION = "First Edition — August 2026";
 
@@ -53,7 +55,7 @@ export interface OaSeriesInput {
 export interface OaInputs {
   /** Management structure × tax posture. "s" forms are the S corporation
    *  masters and serve any member count; "member*" are member-managed. */
-  version: "single" | "multi" | "s" | "member" | "member-s";
+  version: "single" | "single-s" | "multi" | "s" | "member" | "member-s";
   companyName: string;
   principalAddress: string;
   /** Every person serving as Manager. s. 5.1 makes them act by majority. */
@@ -116,12 +118,15 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
     s: sCorpTemplate,
     member: memberTemplate,
     "member-s": memberSCorpTemplate,
+    "single-s": singleSCorpTemplate,
   } as const;
   let s = TEMPLATES[inputs.version];
   /** Every form except the single-member one shares the multi chassis. */
-  const isMulti = inputs.version !== "single";
+  const isSingle = inputs.version === "single" || inputs.version === "single-s";
+  const isMulti = !isSingle;
   /** The S corporation forms hardwire identical ownership across all series. */
-  const isSCorp = inputs.version === "s" || inputs.version === "member-s";
+  const isSCorp =
+    inputs.version === "s" || inputs.version === "member-s" || inputs.version === "single-s";
   /** Member-managed forms have no Manager to name. */
   const isMemberManaged = inputs.version === "member" || inputs.version === "member-s";
   const co = inputs.companyName;
@@ -245,7 +250,7 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
   }
 
   // ---- Exhibit A ----
-  if (inputs.version === "single") {
+  if (isSingle) {
     const m = inputs.members[0];
     const exhibitA = `## EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION
 
@@ -343,7 +348,7 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
   });
 
   // ---- signatures ----
-  if (inputs.version === "single") {
+  if (isSingle) {
     s = s.split("[MEMBER NAME]").join(inputs.members[0].name);
     s = s.split("[ADDRESS]").join(inputs.members[0].address);
   } else {

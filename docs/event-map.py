@@ -45,6 +45,7 @@ FORMS = {
     "scp": "webapp/server/templates-oa-s.md",
     "mbr": "webapp/server/templates-oa-member.md",
     "mbs": "webapp/server/templates-oa-member-s.md",
+    "sgs": "webapp/server/templates-oa-single-s.md",
 }
 COLUMNS = ["event", "source", "sgl", "scp", "mul", "mbr", "mbs", "note"]
 SECTION_RE = re.compile(r"^\*\*(\d+\.\d+[A-Z]?)\s+([^*]+?)\*\*", re.M)
@@ -122,9 +123,11 @@ MUTATIONS = [
     ("an event left unanswered for one form",
      lambda t: t.replace("| The company misses its annual report | ss. 605.0212, 605.0714, 605.2206 | 1.9 |", "| The company misses its annual report | ss. 605.0212, 605.0714, 605.2206 |  |", 1),
      "sgl is unanswered"),
+    # Written as a regex rather than a literal row: the literal broke the day a
+    # sixth form added a column, and a mutation that no longer matches proves
+    # nothing. The VOID condition caught it, which is why it is there.
     ("silence with no reason given",
-     lambda t: t.replace("| The members deadlock | s. 605.0702(2) | none | 13.2 | 13.2 | 13.2 | 13.2 | a sole member cannot deadlock |",
-                         "| The members deadlock | s. 605.0702(2) | none | 13.2 | 13.2 | 13.2 | 13.2 |  |", 1),
+     lambda t: re.sub(r"^(\| The members deadlock \|.*\|)[^|]*\|$", r"\1  |", t, count=1, flags=re.M),
      "says none with no reason"),
     ("an event answered by a provision that form does not have",
      lambda t: t.replace("| The company misses its annual report | ss. 605.0212, 605.0714, 605.2206 | 1.9 |", "| The company misses its annual report | ss. 605.0212, 605.0714, 605.2206 | 10.6 |", 1),
