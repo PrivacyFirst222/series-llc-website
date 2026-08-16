@@ -28,13 +28,13 @@ Forms: `sgl` single-member · `mul` manager-managed multi-member ·
 |---|---|---|---|---|---|---|---|
 | The company establishes a new protected series | s. 605.2201(1) | 3.1 3.5 1.9 | 3.1 3.5 1.9 | 3.1 3.5 1.9 | 3.1 3.5 1.9 | 3.1 3.5 1.9 | unanimous member approval is non-variable except as to manner |
 | A protected series acquires an asset | s. 605.2301 | 1.10 8.2 8.4 8.5 | 1.10 8.2 8.4 8.5 | 1.10 8.2 8.4 8.5 | 1.10 8.2 8.4 8.5 | 1.10 8.2 8.4 8.5 | |
-| A protected series buys or sells real property | ss. 605.2301(2)(b), 605.04074(3) | 8.3 5.7 | 8.3 5.8 | 8.3 5.8 | 8.3 5.9 | 8.3 5.9 | only a recorded statement of authority binds a good-faith purchaser |
+| A protected series buys or sells real property | ss. 605.2301(2)(b), 605.04074(3) | 8.3 5.8 | 8.3 5.8 | 8.3 5.8 | 8.3 5.9 | 8.3 5.9 | only a recorded statement of authority binds a good-faith purchaser |
 | An asset moves between the company and a series | s. 605.2301(2)(a) | 1.10 8.2 8.5 | 1.10 8.2 8.5 | 1.10 8.2 8.5 | 1.10 8.2 8.5 | 1.10 8.2 8.5 | consideration, payor and payee must be recorded |
 | Someone disputes whether an asset is associated | s. 605.2404(4) | 8.2 8.5 3.3 | 8.2 8.5 3.3 | 8.2 8.5 3.3 | 8.2 8.5 3.3 | 8.2 8.5 3.3 | the party asserting association carries the burden of proof |
 | A company creditor pursues a series asset | ss. 605.2401(2), 605.2404(2) | 3.3 8.2 8.5 | 3.3 8.2 8.5 | 3.3 8.2 8.5 | 3.3 8.2 8.5 | 3.3 8.2 8.5 | |
 | A protected series is dissolved and wound up | s. 605.2501 | 3.4 12.1 12.2 | 3.4 14.1 14.2 | 3.4 14.1 14.2 | 3.4 14.1 14.2 | 3.4 14.1 14.2 | |
 | A protected series is asked to merge or convert | ss. 605.2602-605.2604 | 3.2 | 3.2 5.4 | 3.2 5.4 | 3.2 5.5 | 3.2 5.5 | s. 3.2 recites the bar on a series; s. 605.2603 bars the Company itself from converting, domesticating or exchanging interests, and s. 605.2604 confines its mergers to LLC parties with no newly created survivor |
-| The company sells substantially all of its assets | s. 605.1006(1)(d) | 5.3 | 5.4 | 5.4 | 5.5 | 5.5 | the consent of all Members; a member who consents forfeits appraisal under s. 605.1064, and one who withholds it stops the sale, so no appraisal right can arise |
+| The company sells substantially all of its assets | s. 605.1006(1)(d) | 5.3 5.4 | 5.4 | 5.4 | 5.5 | 5.5 | the consent of all Members; a member who consents forfeits appraisal under s. 605.1064, and one who withholds it stops the sale, so no appraisal right can arise |
 | The company is dissolved and wound up | ss. 605.0701, 605.0710 | 1.7 12.3 12.4 12.5 | 1.7 14.3 14.4 14.5 | 1.7 14.3 14.4 14.5 | 1.7 14.3 14.4 14.5 | 1.7 14.3 14.4 14.5 | liquidation is strictly pro rata, overriding s. 605.0710(2) |
 | The company has no members for 90 days | s. 605.0701(3) | 11.3 | 12.3 | 12.3 | 12.3 | 12.3 | |
 | The company misses its annual report | ss. 605.0212, 605.0714, 605.2206 | 1.9 | 1.9 | 1.9 | 1.9 | 1.9 | the annual report must name every protected series |
@@ -58,11 +58,11 @@ Forms: `sgl` single-member · `mul` manager-managed multi-member ·
 | A member seeks partition of an asset | s. 605.0110(4) | 1.11 6.5 | 1.11 6.7 | 1.11 6.7 | 1.11 6.7 | 1.11 6.7 | a sole member has nobody to partition against; s. 6.5 denies any interest in specific property instead |
 | A distribution is made | ss. 605.0404, 605.0405 | 7.1 7.2 | 7.1 7.2 7.3 | 7.1 7.2 7.3 | 7.1 7.2 7.3 | 7.1 7.2 7.3 | a series distributes to the Company, which distributes to the members |
 | The manager dies, resigns, or is removed | s. 605.04072 | 5.1 | 5.1 | 5.1 | 5.8 | 5.8 | the member-managed forms have no manager; s. 5.8 names the Administrative Member |
-| A manager acts outside the authority given | s. 605.04074(2)(b) | 5.3 5.7 | 5.3 5.4 5.8 | 5.3 5.4 5.8 | 5.4 5.5 5.9 | 5.4 5.5 5.9 | an internal limit does not defeat a third party without knowledge or notice |
-| A manager or member is sued for a management decision | ss. 605.04093, 605.0408 | 5.4 5.5 | 5.5 5.6 | 5.5 5.6 | 5.6 5.7 | 5.6 5.7 | indemnity cannot reach bad faith or an improper personal benefit |
-| A manager or member is on both sides of a deal | s. 605.04092 | 5.4 | 5.5 | 5.5 | 5.6 | 5.6 | GAP: no form adopts the conflict-of-interest safe harbor, so the common-law analysis applies |
-| A manager or member wants to be paid | — | 5.6 | 5.7 | 5.7 | 5.10 | 5.10 | |
-| A third party relies on apparent authority | ss. 605.0301, 605.0302(7) | 5.7 | 5.1 5.8 | 5.1 5.8 | 5.4 5.9 | 5.4 5.9 | only a recorded certified statement of authority is notice to the world |
+| A manager acts outside the authority given | s. 605.04074(2)(b) | 5.3 5.4 5.8 | 5.3 5.4 5.8 | 5.3 5.4 5.8 | 5.4 5.5 5.9 | 5.4 5.5 5.9 | an internal limit does not defeat a third party without knowledge or notice |
+| A manager or member is sued for a management decision | ss. 605.04093, 605.0408 | 5.5 5.6 | 5.5 5.6 | 5.5 5.6 | 5.6 5.7 | 5.6 5.7 | indemnity cannot reach bad faith or an improper personal benefit |
+| A manager or member is on both sides of a deal | s. 605.04092 | 5.5 | 5.5 | 5.5 | 5.6 | 5.6 | GAP: no form adopts the conflict-of-interest safe harbor, so the common-law analysis applies |
+| A manager or member wants to be paid | — | 5.7 | 5.7 | 5.7 | 5.10 | 5.10 | |
+| A third party relies on apparent authority | ss. 605.0301, 605.0302(7) | 5.1 5.8 | 5.1 5.8 | 5.1 5.8 | 5.4 5.9 | 5.4 5.9 | only a recorded certified statement of authority is notice to the world |
 | The company files its tax return | — | 9.2 | 9.2 | 9.2 | 9.2 | 9.2 | |
 | The IRS examines a partnership year | subch. C of ch. 63 | none | 9.3 | none | 9.3 | none | the S corporation forms are not partnerships; the single-member form is disregarded |
 | The S election is threatened | § 1362 | none | none | 9.3 9.4 9.5 | none | 9.3 9.4 9.5 | only the S corporation forms carry an election to protect |
@@ -90,3 +90,4 @@ Forms: `sgl` single-member · `mul` manager-managed multi-member ·
 | The company or a series has to be identified to a third party | ss. 605.2202(2), 605.0112 | 1.2 1.3 1.4 1.5 | 1.2 1.3 1.4 1.5 | 1.2 1.3 1.4 1.5 | 1.2 1.3 1.4 1.5 | 1.2 1.3 1.4 1.5 | a series name must begin with the company name and carry "protected series", "P.S." or "PS" |
 | A capitalized term has to be given its meaning | — | 1.1 | 1.1 | 1.1 | 1.1 | 1.1 | Article 2 carries the definitions themselves; they are reached through this row and are expected to appear in no other |
 | The company converts, domesticates, or takes part in an interest exchange | ss. 605.2603, 605.2102(14) | none | none | none | none | none | it cannot: s. 605.2603 bars a series limited liability company from all three, and s. 605.2107(1)(v) makes that non-variable. The Owner's Manual says so; the agreement does not recite a prohibition it cannot lift |
+| An asset moves from one Protected Series to another | s. 605.2301(2)(a)3 | 8.6 8.2 6.1 7.2 | 8.6 8.2 6.1 7.2 5.4 | 8.6 8.2 6.1 7.2 5.4 | 8.6 8.2 6.1 7.2 5.5 | 8.6 8.2 6.1 7.2 5.5 | to the extent of any shortfall in value it is deemed a distribution up to the Company and a contribution back down, so the payor and payee the statute demands are always identifiable; the single-member form carries no approval item, and the guidance tells every client not to move assets between series at all |

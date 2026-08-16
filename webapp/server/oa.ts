@@ -166,10 +166,13 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
     );
   }
 
+  // The borrowing threshold is in every form: the single-member master gained
+  // s. 5.4(b) on 16 August, so this can no longer live inside the isMulti block.
+  must(s, "$[THRESHOLD]", "threshold");
+  s = s.split("$[THRESHOLD]").join(money(inputs.borrowingThreshold ?? 25000));
+
   // ---- multi-member options (every form but the single-member one) ----
   if (isMulti) {
-    must(s, "$[THRESHOLD]", "threshold");
-    s = s.split("$[THRESHOLD]").join(money(inputs.borrowingThreshold ?? 25000));
 
     // Capital calls
     if (inputs.includeCapitalCalls) {

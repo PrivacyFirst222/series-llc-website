@@ -67,7 +67,7 @@ checker lists every one on each run.
 | 605.0215 | Certificates to be received in evidence and evidentiary effect of certified copy of filed document. | n/a |  | evidentiary effect of certified copies |
 | 605.0216 | Statement of dissociation or resignation. | relied | 13.1 | a dissociating member may file a statement; our forms make withdrawal wrongful without removing the power |
 | 605.0301 | Power to bind limited liability company. | relied | 5.3 5.4 | a person binds the company only through agency, the agreement, or a filed statement |
-| 605.0302 | Statement of authority. | varied | 5.7 5.8 5.9 | a recorded certified statement of authority is the only limitation good against the world; it is cancelled by operation of law after 5 years |
+| 605.0302 | Statement of authority. | varied | 5.4 5.5 5.8 5.9 | a recorded certified statement of authority is the only limitation good against the world; it is cancelled by operation of law after 5 years |
 | 605.0303 | Statement of denial. | relied |  | a named person may file a statement of denial |
 | 605.0304 | Liability of members and managers. | relied | 4.3 4.5 | the members' liability shield |
 | 605.0401 | Becoming a member. | varied | 11.1 12.1 | admission requires the approval our forms specify |
@@ -81,7 +81,7 @@ checker lists every one on each run.
 | 605.04072 | Selection and terms of managers in a manager-managed limited liability company. | varied | 5.1 5.8 | selection and removal of managers, and who continues to serve when one ceases |
 | 605.04073 | Voting rights of members and managers. | varied | 4.3 5.4 5.5 15.1 | our approval thresholds; (1)(d) and (2)(e) require unanimity to amend, which our s. 15.1 matches |
 | 605.04074 | Agency rights of members and managers. | varied | 5.1 5.4 5.8 5.9 | (3) an internal limit does not defeat a good-faith purchaser of real property — only a recorded certified statement does |
-| 605.0408 | Reimbursement, indemnification, advancement, and insurance. | varied | 5.5 5.6 5.7 5.10 | indemnification to the fullest extent permitted; (2) bars indemnity for the enumerated breaches |
+| 605.0408 | Reimbursement, indemnification, advancement, and insurance. | varied | 5.6 5.7 5.10 | indemnification to the fullest extent permitted; (2) bars indemnity for the enumerated breaches |
 | 605.04091 | Standards of conduct for members and managers. | varied | 4.7 5.5 5.6 5.9 | (2)(c) is the duty not to compete our Article 4 alternatives address; s. 605.0105(4)(c) permits altering it if not manifestly unreasonable |
 | 605.04092 | Conflict of interest transactions. | relied | 5.5 5.6 | GAP: no form adopts the conflict-of-interest safe harbour, so a conflicted transaction is judged at common law; (4)(a) says a single manager or single member cannot satisfy it alone |
 | 605.04093 | Limitation of liability of managers and members. | relied | 5.5 5.6 | no monetary liability for management decisions absent the enumerated conduct |

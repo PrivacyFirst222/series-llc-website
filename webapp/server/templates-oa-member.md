@@ -171,7 +171,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 (a) establish a new Protected Series — the consent of **all Members** (Section 3.1);
 
-(b) **transfer, re-associate, or re-title any asset between the Company and a Protected Series or between Protected Series** (an "Inter-Series Transfer") — the consent of a Majority in Interest. Inter-Series Transfers shall be made for fair value unless the transfer is a documented contribution or distribution;
+(b) **cause any Associated Asset to become an Associated Asset of the Company or of a different Protected Series** — the consent of a Majority in Interest;
 
 (c) sell, exchange, or otherwise dispose of all or substantially all of the Associated Assets of the Company or of any Protected Series, other than in the ordinary course of business — the consent of **all Members**;
 
@@ -254,6 +254,8 @@ Records may be organized by specific listing, category, type, quantity, or compu
 (c) **Correction of records.** The Administrative Member may, and upon discovery of any inaccuracy or omission shall, supplement or correct any record maintained under this Article so that it accurately reflects the association of assets and liabilities, and records as so supplemented or corrected shall be given effect to the fullest extent permitted by law. A record supplemented or corrected under this paragraph relates back to, and is given effect from, the date of the record it supplements or corrects, to the fullest extent permitted by law.
 
 (d) **Reformation; severability in favor of association and separateness.** If any provision of this Agreement or of any Series Exhibit, or any act taken under either, would otherwise be construed to impair the association of an asset under this Article, the separateness of the Company or of any Protected Series, or the limitations of liability described in Section 3.3, this Agreement shall be applied and, to the minimum extent necessary, deemed modified so as to preserve them, and the provision or act shall be given effect as so modified from the time it was made. To the extent a provision cannot be so conformed, it is null and void ab initio and shall be given no force or effect for any purpose, and every other provision of this Agreement and of each Series Exhibit remains in full force.
+
+**8.6 Movement of an Asset Between Protected Series.** If an Associated Asset of a Protected Series becomes an Associated Asset of another Protected Series, however the transaction is denominated, then to the extent the fair market value of what one Protected Series gives exceeds the fair market value of what it receives, the excess is deemed for all purposes of this Agreement to have been distributed by that Protected Series to the Company as provided in Section 7.2 and, immediately thereafter, contributed by the Company to the other Protected Series as provided in Section 6.1.
 
 ---
 

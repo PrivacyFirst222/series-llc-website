@@ -105,27 +105,26 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbr mbs mul scp | 4.10 | Information Rights | b897a44b | benefit | company | members | — | ss. 605.0410, 605.2305 |
 | mul scp | 4.11 | Transfer on Death Designation | ba6ce8d5 | benefit | company | members | — | ss. 711.50-711.512 |
 | mbr mbs | 4.11 | Transfer on Death Designation | ada01e7a | benefit | company | members | — | ss. 711.50-711.512 |
-| sgl | 5.1 | Manager-Managed; the Manager | 50e6861c | authority | manager members | members manager | — | ss. 605.04072, 605.04073(2), 605.04074(2)(b) |
+| sgl | 5.1 | Manager-Managed; the Manager | be45c4f1 | authority | manager member | member manager | — | ss. 605.04072, 605.04073(2), 605.04074(2)(b) |
 | mul scp | 5.1 | Manager-Managed; the Manager | 3396138b | authority | manager members | members manager | — | ss. 605.04072, 605.04073(2), 605.04074(2)(b) |
 | mbr mbs | 5.1 | Member-Managed | b9f7026e | authority | members | members | — | ss. 605.0407(1), 605.04073(1) |
-| sgl | 5.2 | Management of Each Protected Series | 7295d2ea | authority | manager | members series | — | ss. 605.2304(2), 605.2107(1)(n) |
+| sgl | 5.2 | Management of Each Protected Series | 9391162b | authority | manager | member series | — | ss. 605.2304(2), 605.2107(1)(n) |
 | mul scp | 5.2 | Management of Each Protected Series | 00750ec0 | authority | manager | members series | — | ss. 605.2304(2), 605.2107(1)(n) |
 | mbr mbs | 5.2 | Management of Each Protected Series | 55f990eb | authority | manager | members series | — | ss. 605.2304(2), 605.2107(1)(n) |
-| sgl | 5.3 | Authority of the Manager | 138c6dd4 | authority | manager | members manager | — | s. 605.04073(2) |
-| mul scp | 5.3 | Authority of the Manager | e6c44bc9 | authority | manager | members manager | — | s. 605.04073(2) |
+| mul scp sgl | 5.3 | Authority of the Manager | e6c44bc9 | authority | manager | members manager | — | s. 605.04073(2) |
 | mbr mbs | 5.3 | Voting; Decisions | 0b631d8f | authority | members | members | — | s. 605.04073 |
-| sgl | 5.4 | Standard of Conduct; Exculpation | 65aa77c4 | benefit | manager members | manager members | — | ss. 605.04091, 605.0105(3) |
-| mul scp | 5.4 | Actions Requiring Member Approval | 84102ff5 | authority | manager | members | — | s. 605.04073(2)(d) |
+| sgl | 5.4 | Actions Requiring Member Approval | 40922d7a | authority | manager | member | the Manager sold everything the Company and its series owned and I never consented | ss. 605.04073(2)(d), 605.0302 |
+| mul scp | 5.4 | Actions Requiring Member Approval | dcfcd3e4 | authority | manager | members | the Manager moved the building into another series without the members' consent | ss. 605.04073(2)(d), 605.0302, 605.2301 |
 | mbr mbs | 5.4 | Authority to Act; Limits on Authority | be68b5c7 | authority | members | members | — | s. 605.04074(1) |
-| sgl | 5.5 | Indemnification | 5fba8bac | benefit | company series | manager members | — | s. 605.0408 |
+| sgl | 5.5 | Standard of Conduct; Exculpation | cce8e03a | benefit | manager member | manager member | — | ss. 605.04091, 605.0105(3) |
 | mul scp | 5.5 | Standard of Conduct; Exculpation | db5f385a | benefit | manager members | manager members | — | ss. 605.04091, 605.0105(3) |
-| mbr mbs | 5.5 | Actions Requiring Member Approval | e5d3f72d | authority | manager | members | — | s. 605.04073(2)(d) |
-| sgl | 5.6 | Compensation; Reimbursement; Shared Expenses | a0c4af21 | benefit | company | manager members | — | s. 605.04091(1) |
-| mul scp | 5.6 | Indemnification | 5fba8bac | benefit | company series | manager members | — | s. 605.0408 |
+| mbr mbs | 5.5 | Actions Requiring Member Approval | f455ec6e | authority | members | members | the Member moved the building into another series without the other members' consent | ss. 605.04073(1)(c), 605.0302, 605.2301 |
+| mul scp sgl | 5.6 | Indemnification | 5fba8bac | benefit | company series | manager members | — | s. 605.0408 |
 | mbr mbs | 5.6 | Standard of Conduct; Exculpation | dfa8cbf5 | benefit | manager members | manager members | — | ss. 605.04091, 605.0105(3) |
-| sgl | 5.7 | Statement of Authority | ffe88ce0 | authority | company | members manager third-party | — | s. 605.0302 |
+| sgl | 5.7 | Compensation; Reimbursement; Shared Expenses | a0c4af21 | benefit | company | manager member | — | s. 605.04091(1) |
 | mul scp | 5.7 | Compensation; Reimbursement; Shared Expenses | 95dfa725 | benefit | company | manager members | — | s. 605.04091(1) |
 | mbr mbs | 5.7 | Indemnification | b6c395f8 | benefit | company series | manager members | — | s. 605.0408 |
+| sgl | 5.8 | Statement of Authority | ea05a878 | authority | company | member manager third-party | — | s. 605.0302 |
 | mul scp | 5.8 | Statement of Authority | 233a09d3 | authority | company | members manager third-party | — | s. 605.0302 |
 | mbr mbs | 5.8 | Administrative Member | 8a779b5a | authority | members | members | — | drafting convention |
 | mul scp | 5.9 | Competition; Other Activities of the Manager. [SELECT THE SAME ALTERNATIVE AS SECTION 4.7] | b206cf04 | covenant | members | members | The member competed in breach of the agreement — a claim among the members, not against the company. | s. 605.04091(2)(c) as varied under s. 605.0105(3) |
@@ -157,7 +156,7 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | scp | 7.3 | Tax Distributions | 7ecf5184 | authority | manager members | members | — | s. 605.0404 |
 | mbr | 7.3 | Tax Distributions | 4f27ae8e | authority | manager members | members | — | s. 605.0404 |
 | mbs | 7.3 | Tax Distributions | c1c945cc | authority | manager members | members | — | s. 605.0404 |
-| sgl | 8.1 | Records | d58c1627 | covenant | manager | members | The records were not maintained by the person the agreement names. | s. 605.2301(2)(a) |
+| sgl | 8.1 | Records | 22a1d870 | covenant | manager | member | The records were not maintained by the person the agreement names, and I was never shown the series records. | ss. 605.2301(2)(a), 605.0410, 605.2305 |
 | mul scp | 8.1 | Records | 495681ad | covenant | manager | members | The records were not maintained by the person the agreement names. | s. 605.2301(2)(a) |
 | mbr mbs | 8.1 | Records | 17f045db | covenant | manager | members | The records were not maintained by the person the agreement names. | s. 605.2301(2)(a) |
 | mul scp sgl | 8.2 | Asset Association Records | 61ff2bee | covenant | manager | members | The records do not meet the standard the agreement itself sets, so the assets were never associated. | s. 605.2301(2)(a), (4) |
@@ -166,8 +165,9 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | sgl | 8.4 | Holding Associated Assets | 5fbf2f0d | benefit | company series | members | — | s. 605.2301(5) |
 | mul scp | 8.4 | Holding Associated Assets | cf35798b | benefit | company series | members | — | s. 605.2301(5) |
 | mbr mbs | 8.4 | Holding Associated Assets | 3b8d0f0b | benefit | company series | members | — | s. 605.2301(5) |
-| mul scp sgl | 8.5 | Standing Association Rules; Savings Provisions | 17f856b7 | benefit | — | members series company | — | s. 605.2301(2)(a), (4); s. 605.2404(4) burden of proof |
-| mbr mbs | 8.5 | Standing Association Rules; Savings Provisions | 17bdf849 | benefit | — | members series company | — | s. 605.2301(2)(a), (4); s. 605.2404(4) burden of proof |
+| mul scp sgl | 8.5 | Standing Association Rules; Savings Provisions | af447ece | benefit | — | members series company | — | s. 605.2301(2)(a), (4); s. 605.2404(4) burden of proof |
+| mbr mbs | 8.5 | Standing Association Rules; Savings Provisions | d49d603a | benefit | — | members series company | — | s. 605.2301(2)(a), (4); s. 605.2404(4) burden of proof |
+| mbr mbs mul scp sgl | 8.6 | Movement of an Asset Between Protected Series | e77a53b4 | mechanic | company series | members series company | — | ss. 605.2301(2)(a)3, 605.0404, 605.0405 |
 | sgl | 9.1 | Intended Classification | 10663e90 | benefit | member | member | — | Treas. Reg. 301.7701-3 |
 | mbr mul | 9.1 | Intended Classification | 6c18356d | benefit | members | members | — | Treas. Reg. 301.7701-3 |
 | mbs scp | 9.1 | S Corporation Status | 86c3eddc | benefit | members | members | — | IRC 1362 |
@@ -203,7 +203,7 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbr mbs mul scp | 10.6 | Charging Order — Exclusive Remedy | 7cb3504e | statutory-route | — | members | — | ss. 605.0503, 605.0503(7) |
 | sgl | 11.1 | Admission | 2b14cbb5 | authority | member | member | — | s. 605.0401(3) |
 | mbr mbs mul scp | 11.1 | Executory Contract | 050e6248 | benefit | members | members company | — | 11 U.S.C. 365; In re Soderstrom |
-| sgl | 11.2 | No Association with a Protected Series | 675f3143 | covenant | company members | members | The company associated a member with a series in breach of its own agreement. | s. 605.2302; preserves the disregarded/partnership design |
+| sgl | 11.2 | No Association with a Protected Series | 96a9d58f | covenant | company member | member | The company associated a member with a series in breach of its own agreement. | s. 605.2302; preserves the disregarded design |
 | mul scp | 11.2 | Personal Service Agreement; No Assumption or Assignment | 439e9643 | benefit | members | members company | — | 11 U.S.C. 365(c); In re Soderstrom |
 | mbr mbs | 11.2 | Personal Service Agreement; No Assumption or Assignment | 3d769064 | benefit | members | members company | — | 11 U.S.C. 365(c); In re Soderstrom |
 | sgl | 11.3 | Continuation on Termination of Last Member | ea924089 | benefit | — | members company | — | s. 605.0701(3) |
@@ -212,11 +212,11 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbr mbs mul scp | 12.1 | Admission of Members | fc6d8b94 | authority | members | members | — | s. 605.0401(3) |
 | sgl | 12.2 | Winding Up a Protected Series | 90fe7e4e | mechanic | manager members | members series | — | s. 605.2502 |
 | mbr mbs mul scp | 12.2 | No Association with a Protected Series | 96a9d58f | covenant | company members | members | The company associated a member with a series in breach of its own agreement. | s. 605.2302; preserves the disregarded/partnership design |
-| sgl | 12.3 | Dissolution of the Company | 15c42dac | mechanic | — | members | — | s. 605.0701 |
+| sgl | 12.3 | Dissolution of the Company | 922d7938 | mechanic | — | member | — | s. 605.0701 |
 | mbr mbs mul scp | 12.3 | Continuation on Termination of Last Member | 0415885d | benefit | — | members company | — | s. 605.0701(3) |
 | sgl | 12.4 | Winding Up the Company | 4b4fc788 | mechanic | manager members | members | — | ss. 605.0709, 605.0710 |
 | sgl | 12.5 | No Deficit Obligation; Recourse Limited | 9712f7e9 | benefit | — | members | — | s. 605.0405 |
-| sgl | 13.1 | Amendments | 86cb6dd4 | authority | members | members | — | s. 605.04073(1)(d), (2)(e) |
+| sgl | 13.1 | Amendments | 95c1e577 | authority | member | member | — | s. 605.04073(1)(d), (2)(e) |
 | mbr mbs mul scp | 13.1 | No Voluntary Withdrawal | bd50185a | covenant | members | members company | The member withdrew in breach of the agreement — a claim among the members. | s. 605.0601 |
 | sgl | 13.2 | Action by Written Consent | 57614354 | mechanic | members | members | — | s. 605.04073(4) |
 | mbr mbs mul scp | 13.2 | Deadlock; Buy-Sell Election. [OPTIONAL PROVISION — see Instructions; to omit, replace the text of this Section with "[Reserved.]" — do not renumber] | 7cbd82d7 | mechanic | members | members | — | s. 605.0702(2) |
