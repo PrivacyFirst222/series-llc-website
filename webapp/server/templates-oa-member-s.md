@@ -63,23 +63,25 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **2.7 "Immediate Family Member"** means, as to any Member, (a) any ancestor of that Member or descendant of a grandparent of that Member (each an "Individual Family Member," and including persons legally adopted before age 18), or (b) a trust or other entity for the benefit of one or more Individual Family Members, provided all beneficial interests in that entity are held by such persons; a trust is not excluded merely because a remainder beneficiary is not an Individual Family Member.
 
-**2.8 "Involuntary Transfer"** means any Transfer by which a Member or transferee is deprived or divested of any right, title, or interest in a Membership Interest other than voluntarily, including (a) a Transfer to or for the benefit of a judgment creditor pursuant to court order, subject in all events to Section 10.6, (b) a Transfer in connection with reorganization, insolvency, bankruptcy, or receivership, (c) a Transfer to a public officer or agency under any abandoned-property or escheat law, and (d) a Transfer to a spouse or former spouse in connection with dissolution of marriage or marital separation.
+**2.8 "Incapacitated"** means, as to any person, that (a) a court of competent jurisdiction has determined the person to be incapacitated or has appointed a guardian of the person's property, or (b) two licensed physicians have certified in writing that the person is unable to manage the person's financial affairs. A person ceases to be Incapacitated upon a court order restoring capacity or a written certification by two licensed physicians that the person is again able to manage the person's financial affairs.
 
-**2.9 "Majority in Interest"** means one or more Members holding, in the aggregate, more than fifty percent (50%) of the Percentage Interests then held by Members, excluding for all purposes any Percentage Interest held by a transferee, assignee, beneficiary, or holder of a charging order who has not been admitted as a Member.
+**2.9 "Involuntary Transfer"** means any Transfer by which a Member or transferee is deprived or divested of any right, title, or interest in a Membership Interest other than voluntarily, including (a) a Transfer to or for the benefit of a judgment creditor pursuant to court order, subject in all events to Section 10.6, (b) a Transfer in connection with reorganization, insolvency, bankruptcy, or receivership, (c) a Transfer to a public officer or agency under any abandoned-property or escheat law, and (d) a Transfer to a spouse or former spouse in connection with dissolution of marriage or marital separation.
 
-**2.10 "Member"** means each person identified as a member on Exhibit A and each person admitted as a member in accordance with this Agreement, in each case until dissociated.
+**2.10 "Majority in Interest"** means one or more Members holding, in the aggregate, more than fifty percent (50%) of the Percentage Interests then held by Members, excluding for all purposes any Percentage Interest held by a transferee, assignee, beneficiary, or holder of a charging order who has not been admitted as a Member.
 
-**2.11 "Membership Interest"** means a Member's entire interest in the Company, including the Member's interest in capital, profits, and distributions of the Company, and all rights of a member under the Act and this Agreement.
+**2.11 "Member"** means each person identified as a member on Exhibit A and each person admitted as a member in accordance with this Agreement, in each case until dissociated.
 
-**2.12 "Percentage Interest"** means, as to each Member, the percentage or fractional interest set forth for that Member on Exhibit A, as adjusted from time to time under this Agreement. Membership interests are of a single class.
+**2.12 "Membership Interest"** means a Member's entire interest in the Company, including the Member's interest in capital, profits, and distributions of the Company, and all rights of a member under the Act and this Agreement.
 
-**2.13 "Protected Series"** or **"PS"** means a protected series of the Company established under s. 605.2201, Florida Statutes, and identified in a Series Exhibit.
+**2.13 "Percentage Interest"** means, as to each Member, the percentage or fractional interest set forth for that Member on Exhibit A, as adjusted from time to time under this Agreement. Membership interests are of a single class.
 
-**2.14 "Protected Series Designation"** means a designation of a protected series filed with the Department under s. 605.2201, Florida Statutes, as amended from time to time.
+**2.14 "Protected Series"** or **"PS"** means a protected series of the Company established under s. 605.2201, Florida Statutes, and identified in a Series Exhibit.
 
-**2.15 "Series Exhibit"** means, for each Protected Series, the exhibit to this Agreement (each numbered PS-1, PS-2, and so on) setting forth the terms specific to that Protected Series, including its purpose, its capital, and its Associated Assets. Each Series Exhibit is a part of this Agreement.
+**2.15 "Protected Series Designation"** means a designation of a protected series filed with the Department under s. 605.2201, Florida Statutes, as amended from time to time.
 
-**2.16 "Transfer"** means any assignment, transfer, conveyance, devise, gift, pledge, hypothecation, encumbrance, or other disposition, direct or indirect, voluntary or involuntary, in trust or otherwise, and as a verb has a corresponding meaning.
+**2.16 "Series Exhibit"** means, for each Protected Series, the exhibit to this Agreement (each numbered PS-1, PS-2, and so on) setting forth the terms specific to that Protected Series, including its purpose, its capital, and its Associated Assets. Each Series Exhibit is a part of this Agreement.
+
+**2.17 "Transfer"** means any assignment, transfer, conveyance, devise, gift, pledge, hypothecation, encumbrance, or other disposition, direct or indirect, voluntary or involuntary, in trust or otherwise, and as a verb has a corresponding meaning.
 
 ---
 
@@ -148,6 +150,8 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 **4.10 Information Rights.** Each Member has the information and inspection rights provided by the Act with respect to the Company. The records of the Company that each Member may inspect include the records maintained under Article 8 for every Protected Series.
 
 **4.11 Transfer on Death Designation.** Each Member's Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50–711.512, Florida Statutes, and reflects each Member's designation, if any, of the person or persons who will become the owner of that Member's Membership Interest upon that Member's death. A Member may designate any person or entity as a beneficiary. A Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, delivered to the Administrative Member; the change is effective upon receipt unless the Administrative Member objects in writing within seven (7) days, and the Administrative Member shall thereafter update Exhibit A (though updating is not required for effectiveness). Upon the designating Member's death, the designated beneficiary automatically succeeds to the deceased Member's transferable interest — including the economic rights of the deceased Member's Percentage Interest — taking subject to this Agreement, and holds the rights of a transferee described in Section 10.3 until admitted as a Member. A beneficiary is admitted as a Member upon delivery to the Company of a written agreement to be bound by this Agreement and the written consent of a Majority in Interest of the Members other than the deceased Member.
+
+**4.12 Incapacity of a Member.** While a Member is Incapacitated, that Member's rights under this Agreement — including the right to vote, to consent, and to sign any instrument — are exercised by the Member's agent under a durable power of attorney conferring that authority or, if there is none, by the Member's court-appointed guardian. The Company and the other Members may rely on a certified copy of the power of attorney or of the letters of guardianship without further inquiry.
 
 ---
 

@@ -47,30 +47,32 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | sgl | 2.6 | "Immediate Family Member" | e9425924 | definition | — | members | — | drafting convention |
 | mul scp | 2.6 | "Immediate Family Member" | c9ea8021 | definition | — | members | — | drafting convention |
 | mbr mbs | 2.6 | "Company" | 3e7a84d5 | definition | — | members manager | — | drafting convention |
-| sgl | 2.7 | "Manager" | bcaedf26 | definition | — | members manager | — | s. 605.0102(31) |
-| mul scp | 2.7 | "Involuntary Transfer" | 9b2fd4b9 | definition | — | members | — | drafting convention |
+| mul scp sgl | 2.7 | "Incapacitated" | 7f0e40b4 | definition | — | members manager | — | ch. 744, Fla. Stat.; standard durable-power-of-attorney practice |
 | mbr mbs | 2.7 | "Immediate Family Member" | c9ea8021 | definition | — | members | — | drafting convention |
-| sgl | 2.8 | "Member" | 9d0067b8 | definition | — | members | — | s. 605.0102(40) |
-| mul scp | 2.8 | "Majority in Interest" | 310dbe0d | definition | — | members | — | s. 605.04073(1)(c) |
-| mbr mbs | 2.8 | "Involuntary Transfer" | 9b2fd4b9 | definition | — | members | — | drafting convention |
-| sgl | 2.9 | "Membership Interest" | 4c485ee0 | definition | — | members | — | s. 605.0102(41) |
-| mul scp | 2.9 | "Manager" | bcaedf26 | definition | — | members manager | — | s. 605.0102(31) |
-| mbr mbs | 2.9 | "Majority in Interest" | 310dbe0d | definition | — | members | — | s. 605.04073(1)(c) |
-| sgl | 2.10 | "Protected Series" | d9412d95 | definition | — | members | — | s. 605.2102(8) |
-| mbr mbs mul scp | 2.10 | "Member" | b5f3896b | definition | — | members | — | s. 605.0102(40) |
-| sgl | 2.11 | "Protected Series Designation" | f35c80e6 | definition | — | members | — | s. 605.2201 |
-| mbr mbs mul scp | 2.11 | "Membership Interest" | 44cba7a2 | definition | — | members | — | s. 605.0102(41) |
-| sgl | 2.12 | "Protected Series Manager" | 356e1117 | definition | — | members manager | — | s. 605.2102(9) |
-| mbr mbs mul scp | 2.12 | "Percentage Interest" | be447c4c | definition | — | members | — | s. 605.04073(1)(b) |
-| sgl | 2.13 | "Series Exhibit" | 7ef43e0c | definition | — | members | — | drafting convention |
-| mbr mbs mul scp | 2.13 | "Protected Series" | d9412d95 | definition | — | members | — | s. 605.2102(8) |
-| sgl | 2.14 | "Transfer" | a5129002 | definition | — | members | — | drafting convention |
-| mbr mbs mul scp | 2.14 | "Protected Series Designation" | f35c80e6 | definition | — | members | — | s. 605.2201 |
-| mul scp | 2.15 | "Protected Series Manager" | 356e1117 | definition | — | members manager | — | s. 605.2102(9) |
-| mbr mbs | 2.15 | "Series Exhibit" | 7998e3b3 | definition | — | members | — | drafting convention |
-| mul scp | 2.16 | "Series Exhibit" | 7998e3b3 | definition | — | members | — | drafting convention |
-| mbr mbs | 2.16 | "Transfer" | a5129002 | definition | — | members | — | drafting convention |
-| mul scp | 2.17 | "Transfer" | a5129002 | definition | — | members | — | drafting convention |
+| sgl | 2.8 | "Manager" | bcaedf26 | definition | — | members manager | — | s. 605.0102(31) |
+| mul scp | 2.8 | "Involuntary Transfer" | 9b2fd4b9 | definition | — | members | — | drafting convention |
+| mbr mbs | 2.8 | "Incapacitated" | 7f0e40b4 | definition | — | members manager | — | ch. 744, Fla. Stat.; standard durable-power-of-attorney practice |
+| sgl | 2.9 | "Member" | 9d0067b8 | definition | — | members | — | s. 605.0102(40) |
+| mul scp | 2.9 | "Majority in Interest" | 310dbe0d | definition | — | members | — | s. 605.04073(1)(c) |
+| mbr mbs | 2.9 | "Involuntary Transfer" | 9b2fd4b9 | definition | — | members | — | drafting convention |
+| sgl | 2.10 | "Membership Interest" | 4c485ee0 | definition | — | members | — | s. 605.0102(41) |
+| mul scp | 2.10 | "Manager" | bcaedf26 | definition | — | members manager | — | s. 605.0102(31) |
+| mbr mbs | 2.10 | "Majority in Interest" | 310dbe0d | definition | — | members | — | s. 605.04073(1)(c) |
+| sgl | 2.11 | "Protected Series" | d9412d95 | definition | — | members | — | s. 605.2102(8) |
+| mbr mbs mul scp | 2.11 | "Member" | b5f3896b | definition | — | members | — | s. 605.0102(40) |
+| sgl | 2.12 | "Protected Series Designation" | f35c80e6 | definition | — | members | — | s. 605.2201 |
+| mbr mbs mul scp | 2.12 | "Membership Interest" | 44cba7a2 | definition | — | members | — | s. 605.0102(41) |
+| sgl | 2.13 | "Protected Series Manager" | 356e1117 | definition | — | members manager | — | s. 605.2102(9) |
+| mbr mbs mul scp | 2.13 | "Percentage Interest" | be447c4c | definition | — | members | — | s. 605.04073(1)(b) |
+| sgl | 2.14 | "Series Exhibit" | 7ef43e0c | definition | — | members | — | drafting convention |
+| mbr mbs mul scp | 2.14 | "Protected Series" | d9412d95 | definition | — | members | — | s. 605.2102(8) |
+| sgl | 2.15 | "Transfer" | a5129002 | definition | — | members | — | drafting convention |
+| mbr mbs mul scp | 2.15 | "Protected Series Designation" | f35c80e6 | definition | — | members | — | s. 605.2201 |
+| mul scp | 2.16 | "Protected Series Manager" | 356e1117 | definition | — | members manager | — | s. 605.2102(9) |
+| mbr mbs | 2.16 | "Series Exhibit" | 7998e3b3 | definition | — | members | — | drafting convention |
+| mul scp | 2.17 | "Series Exhibit" | 7998e3b3 | definition | — | members | — | drafting convention |
+| mbr mbs | 2.17 | "Transfer" | a5129002 | definition | — | members | — | drafting convention |
+| mul scp | 2.18 | "Transfer" | a5129002 | definition | — | members | — | drafting convention |
 | sgl | 3.1 | Establishment | 37edb48e | authority | company members | members | — | s. 605.2201 |
 | mul scp | 3.1 | Establishment | 6411b254 | authority | company members | members | — | s. 605.2201 |
 | mbr mbs | 3.1 | Establishment | 8c9018bb | authority | company members | members | — | s. 605.2201 |
@@ -96,17 +98,20 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbr mbs | 4.4 | Meetings; Written Consents | ef89ac7e | mechanic | members | members | — | s. 605.04073(4), (6) |
 | sgl | 4.5 | Other Activities | 42b7c7de | benefit | — | member manager | — | s. 605.04091(5) |
 | mbr mbs mul scp | 4.5 | Limited Liability; No Agency | e2f32855 | benefit | — | members | — | ss. 605.0304, 605.04074(2)(a) |
-| sgl | 4.6 | Transfer on Death Designation | 311f9e1e | benefit | company | members | — | ss. 711.50-711.512 |
+| sgl | 4.6 | Transfer on Death Designation | 046d5513 | benefit | company | member third-party | — | ss. 711.50-711.512, Fla. Stat. |
 | mul scp | 4.6 | Duty to Participate in Governance | 3cfedf2d | covenant | members | members | A member who missed votes breached the agreement, so the company was not run as the document describes. | none; ours, to support the personal-service position in Art. 11 |
 | mbr mbs | 4.6 | Duty to Participate in Governance | dfa66454 | covenant | members | members | A member who missed votes breached the agreement, so the company was not run as the document describes. | none; ours, to support the personal-service position in Art. 11 |
+| sgl | 4.7 | Incapacity of the Member | 0f9e940d | benefit | company manager | member | — | ch. 744, Fla. Stat.; s. 605.0602(6) |
 | mbr mbs mul scp | 4.7 | Competition. [SELECT ONE ALTERNATIVE — see Instructions] | f33c9018 | covenant | members | members | The member competed in breach of the agreement — a claim among the members, not against the company. | s. 605.04091(2)(c) as varied under s. 605.0105(3) |
 | mbr mbs mul scp | 4.8 | Confidentiality | 769fb729 | covenant | members | members company | The member disclosed confidential information in breach of the agreement. | s. 605.04091(2) |
 | mbr mbs mul scp | 4.9 | Non-Disparagement; No Interference | 88367cf9 | covenant | members | members company | The member interfered in breach of the agreement. | none; ours |
 | mbr mbs mul scp | 4.10 | Information Rights | b897a44b | benefit | company | members | — | ss. 605.0410, 605.2305 |
-| mul scp | 4.11 | Transfer on Death Designation | ba6ce8d5 | benefit | company | members | — | ss. 711.50-711.512 |
-| mbr mbs | 4.11 | Transfer on Death Designation | ada01e7a | benefit | company | members | — | ss. 711.50-711.512 |
-| sgl | 5.1 | Manager-Managed; the Manager | be45c4f1 | authority | manager member | member manager | — | ss. 605.04072, 605.04073(2), 605.04074(2)(b) |
-| mul scp | 5.1 | Manager-Managed; the Manager | 3396138b | authority | manager members | members manager | — | ss. 605.04072, 605.04073(2), 605.04074(2)(b) |
+| mul scp | 4.11 | Transfer on Death Designation | 75c60a34 | benefit | company | members third-party | — | ss. 711.50-711.512, Fla. Stat. |
+| mbr mbs | 4.11 | Transfer on Death Designation | c63e7ddb | benefit | company | members third-party | — | ss. 711.50-711.512, Fla. Stat. |
+| mul scp | 4.12 | Incapacity of a Member | afdee6cc | benefit | company manager members | members | — | ch. 744, Fla. Stat.; s. 605.0602(6) |
+| mbr mbs | 4.12 | Incapacity of a Member | 09d33983 | benefit | company members | members | — | ch. 744, Fla. Stat.; s. 605.0602(6) |
+| sgl | 5.1 | Manager-Managed; the Manager | b44b0edc | authority | manager member | member manager | — | ss. 605.04072, 605.04073(2), 605.04074(2)(b) |
+| mul scp | 5.1 | Manager-Managed; the Manager | f42797c3 | authority | manager members | members manager | — | ss. 605.04072, 605.04073(2), 605.04074(2)(b) |
 | mbr mbs | 5.1 | Member-Managed | b9f7026e | authority | members | members | — | ss. 605.0407(1), 605.04073(1) |
 | sgl | 5.2 | Management of Each Protected Series | 9391162b | authority | manager | member series | — | ss. 605.2304(2), 605.2107(1)(n) |
 | mul scp | 5.2 | Management of Each Protected Series | 00750ec0 | authority | manager | members series | — | ss. 605.2304(2), 605.2107(1)(n) |

@@ -61,21 +61,23 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **2.6 "Immediate Family Member"** means (a) any ancestor of the Member or descendant of a grandparent of the Member (each an "Individual Family Member," and including persons legally adopted before age 18), or (b) a trust or other entity for the benefit of one or more Individual Family Members, provided all beneficial interests in that entity are held by such persons; a trust is not excluded merely because a remainder beneficiary is not an Individual Family Member.
 
-**2.7 "Manager"** means the person named in Section 5.1 and any successor designated under this Agreement.
+**2.7 "Incapacitated"** means, as to any person, that (a) a court of competent jurisdiction has determined the person to be incapacitated or has appointed a guardian of the person's property, or (b) two licensed physicians have certified in writing that the person is unable to manage the person's financial affairs. A person ceases to be Incapacitated upon a court order restoring capacity or a written certification by two licensed physicians that the person is again able to manage the person's financial affairs.
 
-**2.8 "Member"** means the person identified as such on Exhibit A and any successor admitted in accordance with this Agreement.
+**2.8 "Manager"** means the person named in Section 5.1 and any successor designated under this Agreement.
 
-**2.9 "Membership Interest"** means the Member's entire interest in the Company, including the Member's interest in capital, profits, and distributions of the Company, and all rights of a member under the Act and this Agreement.
+**2.9 "Member"** means the person identified as such on Exhibit A and any successor admitted in accordance with this Agreement.
 
-**2.10 "Protected Series"** or **"PS"** means a protected series of the Company established under s. 605.2201, Florida Statutes, and identified in a Series Exhibit.
+**2.10 "Membership Interest"** means the Member's entire interest in the Company, including the Member's interest in capital, profits, and distributions of the Company, and all rights of a member under the Act and this Agreement.
 
-**2.11 "Protected Series Designation"** means a designation of a protected series filed with the Department under s. 605.2201, Florida Statutes, as amended from time to time.
+**2.11 "Protected Series"** or **"PS"** means a protected series of the Company established under s. 605.2201, Florida Statutes, and identified in a Series Exhibit.
 
-**2.12 "Protected Series Manager"** means the person responsible for management of a Protected Series under Section 5.2.
+**2.12 "Protected Series Designation"** means a designation of a protected series filed with the Department under s. 605.2201, Florida Statutes, as amended from time to time.
 
-**2.13 "Series Exhibit"** means, for each Protected Series, the exhibit to this Agreement (each numbered PS-1, PS-2, and so on) setting forth the terms specific to that Protected Series. Each Series Exhibit is a part of this Agreement.
+**2.13 "Protected Series Manager"** means the person responsible for management of a Protected Series under Section 5.2.
 
-**2.14 "Transfer"** means any assignment, transfer, conveyance, devise, gift, pledge, hypothecation, encumbrance, or other disposition, direct or indirect, voluntary or involuntary, in trust or otherwise, and as a verb has a corresponding meaning.
+**2.14 "Series Exhibit"** means, for each Protected Series, the exhibit to this Agreement (each numbered PS-1, PS-2, and so on) setting forth the terms specific to that Protected Series. Each Series Exhibit is a part of this Agreement.
+
+**2.15 "Transfer"** means any assignment, transfer, conveyance, devise, gift, pledge, hypothecation, encumbrance, or other disposition, direct or indirect, voluntary or involuntary, in trust or otherwise, and as a verb has a corresponding meaning.
 
 ---
 
@@ -131,11 +133,13 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **4.6 Transfer on Death Designation.** The Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50–711.512, Florida Statutes, and reflects the Member's designation, if any, of the person or persons who will become the owner of the Membership Interest upon the Member's death. The Member may designate any person or entity as a beneficiary. The Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, delivered to the Manager; the change is effective upon receipt unless the Manager objects in writing within seven (7) days, and the Manager shall thereafter update Exhibit A (though updating is not required for effectiveness). A beneficiary who becomes the owner of the Membership Interest under this Section succeeds to the Membership Interest subject to this Agreement and is admitted as the Member upon delivery to the Company of a written agreement to be bound by this Agreement.
 
+**4.7 Incapacity of the Member.** While the Member is Incapacitated, the Member's rights under this Agreement — including the right to vote, to consent, and to sign any instrument — are exercised by the Member's agent under a durable power of attorney conferring that authority or, if there is none, by the Member's court-appointed guardian. The Company and the Manager may rely on a certified copy of the power of attorney or of the letters of guardianship without further inquiry.
+
 ---
 
 ## ARTICLE 5 — MANAGEMENT
 
-**5.1 Manager-Managed; the Manager.** The Company is **manager-managed** as provided in its Articles of Organization and this Agreement. [MANAGER APPOINTMENT] If more than one person is serving as Manager, every act, approval, consent, decision, or determination of the Manager under this Agreement requires the approval of a majority of the Managers then serving, and no Manager acting alone has actual authority to act for the Company or for any Protected Series. Anything required to be delivered to the Manager may be delivered to any Manager, and a covenant, restriction, or standard of conduct stated in this Agreement as applying to the Manager applies to each Manager individually. This Section governs among the Member and the Managers; it does not affect the agency rights of a Manager under s. 605.04074(2)(b), Florida Statutes, as to a person who dealt with the Manager without knowledge or notice that the Manager lacked authority. A Manager need not be a Member. A Manager serves until that Manager's resignation, removal by the Member, death, or incapacity; the Member may remove and replace a Manager, appoint an additional Manager, and shall fill any vacancy, by a signed writing delivered to the Company. If a Manager ceases to serve as Manager for any reason, the remaining Managers shall continue to serve.
+**5.1 Manager-Managed; the Manager.** The Company is **manager-managed** as provided in its Articles of Organization and this Agreement. [MANAGER APPOINTMENT] If more than one person is serving as Manager, every act, approval, consent, decision, or determination of the Manager under this Agreement requires the approval of a majority of the Managers then serving, and no Manager acting alone has actual authority to act for the Company or for any Protected Series. Anything required to be delivered to the Manager may be delivered to any Manager, and a covenant, restriction, or standard of conduct stated in this Agreement as applying to the Manager applies to each Manager individually. This Section governs among the Member and the Managers; it does not affect the agency rights of a Manager under s. 605.04074(2)(b), Florida Statutes, as to a person who dealt with the Manager without knowledge or notice that the Manager lacked authority. A Manager need not be a Member. A Manager serves until that Manager's resignation, removal by the Member, death, or Incapacity; the Member may remove and replace a Manager, appoint an additional Manager, and shall fill any vacancy, by a signed writing delivered to the Company. If a Manager ceases to serve as Manager for any reason, the remaining Managers shall continue to serve.
 
 **5.2 Management of Each Protected Series.** Each Protected Series is **manager-managed**. The Series Exhibit for a Protected Series may name one or more Protected Series Managers of that Protected Series. If it names none, each person then serving as a Manager of the Company is a Protected Series Manager of that Protected Series. As permitted by s. 605.2107(1)(n), Florida Statutes, this Section varies s. 605.2304(2) so that the Protected Series Managers are the Manager or Managers of the Company rather than the Company itself. A Protected Series Manager has, with respect to its Protected Series, the rights, powers, and duties that a manager of a manager-managed limited liability company has under the Act, subject to this Agreement and the Series Exhibit, and may be removed and replaced with respect to that Protected Series by the Member.
 
