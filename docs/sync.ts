@@ -31,7 +31,8 @@ const WORD_AUTHORED: { file: string; md?: string }[] = [
  *  master with its own output. */
 const GENERATED = new Set([
   "Series LLC Owners Manual - REVISED DRAFT.docx",
-  "FPSLLC Operating Agreement - Manager-Managed Single Member (Disregarded) - DRAFT.docx",
+  "SMMMDE - FPSLLC Operating Agreement - Manager-Managed Single Member (Disregarded) - DRAFT.docx",
+  "SMMMS - FPSLLC Operating Agreement - Manager-Managed Single Member (S Corporation) - DRAFT.docx",
   "FPSLLC Operating Agreement - Manager-Managed Multi-Member (Partnership) - DRAFT.docx",
   "FPSLLC Operating Agreement - Manager-Managed (S Corporation) - DRAFT.docx",
   "FPSLLC Operating Agreement - Member-Managed Multi-Member (Partnership) - DRAFT.docx",
@@ -42,6 +43,7 @@ const GENERATED = new Set([
   "FPSLLC Redline - Manager-Managed vs Member-Managed S Corporation.docx",
   "FPSLLC Redline - Member-Managed Partnership vs S Corporation.docx",
   "FPSLLC Redline - Manager-Managed Multi-Member vs Single Member.docx",
+  "FPSLLC Redline - Single Member Disregarded vs S Corporation.docx",
 ]);
 
 /** Research material deliberately not committed: samples and other people's

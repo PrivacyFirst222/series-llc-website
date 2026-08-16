@@ -33,12 +33,12 @@ mkdir -p "$OUT_REPO"
 
 # master markdown | Word filename
 DOCS=(
-  "webapp/server/templates-oa-single.md|FPSLLC Operating Agreement - Manager-Managed Single Member (Disregarded) - DRAFT.docx"
+  "webapp/server/templates-oa-single.md|SMMMDE - FPSLLC Operating Agreement - Manager-Managed Single Member (Disregarded) - DRAFT.docx"
   "webapp/server/templates-oa-multi.md|FPSLLC Operating Agreement - Manager-Managed Multi-Member (Partnership) - DRAFT.docx"
   "webapp/server/templates-oa-s.md|FPSLLC Operating Agreement - Manager-Managed (S Corporation) - DRAFT.docx"
   "webapp/server/templates-oa-member.md|FPSLLC Operating Agreement - Member-Managed Multi-Member (Partnership) - DRAFT.docx"
   "webapp/server/templates-oa-member-s.md|FPSLLC Operating Agreement - Member-Managed (S Corporation) - DRAFT.docx"
-  "webapp/server/templates-oa-single-s.md|FPSLLC Operating Agreement - Manager-Managed Single Member (S Corporation) - DRAFT.docx"
+  "webapp/server/templates-oa-single-s.md|SMMMS - FPSLLC Operating Agreement - Manager-Managed Single Member (S Corporation) - DRAFT.docx"
   "docs/owners-manual.md|Series LLC Owners Manual - REVISED DRAFT.docx"
   "docs/statement-of-authorized-representative.md|FPSLLC Statement of Authorized Representative - FORM.docx"
   "docs/oa-instructions.md|FPSLLC Operating Agreement Instructions - DRAFT.docx"
