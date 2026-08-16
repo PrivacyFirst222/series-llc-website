@@ -96,6 +96,19 @@ if ! python3 "$ROOT/docs/structure.py"; then
   exit 1
 fi
 
+# Event gate. Everything above reads the document and asks whether what is there
+# is sound. This starts from the world — 63 things that happen to a real company —
+# and asks whether each form answers them, because the fault that leaves no trace
+# is the ABSENCE. A missing provision produces no text, no diff and no failing
+# check, and every high-value catch Adam made this month was a question about
+# something that was not on the screen. Silence about an event is allowed and must
+# carry a written reason; a provision that answers no event fails.
+echo "answering the events"
+if ! python3 "$ROOT/docs/event-map.py" --quiet; then
+  echo "update-word-docs: THE EVENT MAP NO LONGER MATCHES THE FORMS — nothing written" >&2
+  exit 1
+fi
+
 # Consistency gate. The manual and the Instructions describe the agreements, so
 # every section they cite is a claim about a file in this repo. Provisions get
 # renumbered and deleted; the sentences around the numbers do not follow on their
