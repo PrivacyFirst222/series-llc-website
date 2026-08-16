@@ -118,22 +118,22 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbr mbs | 5.2 | Management of Each Protected Series | 55f990eb | authority | manager | members series | — | ss. 605.2304(2), 605.2107(1)(n) |
 | mul scp sgl | 5.3 | Authority of the Manager | e6c44bc9 | authority | manager | members manager | — | s. 605.04073(2) |
 | mbr mbs | 5.3 | Voting; Decisions | 0b631d8f | authority | members | members | — | s. 605.04073 |
-| sgl | 5.4 | Actions Requiring Member Approval | 40922d7a | authority | manager | member | the Manager sold everything the Company and its series owned and I never consented | ss. 605.04073(2)(d), 605.0302 |
+| sgl | 5.4 | Actions Requiring Member Approval | 40922d7a | authority | manager | members | the Manager moved the building into another series without the members' consent | ss. 605.04073(2)(d), 605.0302, 605.2301 |
 | mul scp | 5.4 | Actions Requiring Member Approval | dcfcd3e4 | authority | manager | members | the Manager moved the building into another series without the members' consent | ss. 605.04073(2)(d), 605.0302, 605.2301 |
 | mbr mbs | 5.4 | Authority to Act; Limits on Authority | be68b5c7 | authority | members | members | — | s. 605.04074(1) |
 | sgl | 5.5 | Standard of Conduct; Exculpation | cce8e03a | benefit | manager member | manager member | — | ss. 605.04091, 605.0105(3) |
 | mul scp | 5.5 | Standard of Conduct; Exculpation | db5f385a | benefit | manager members | manager members | — | ss. 605.04091, 605.0105(3) |
 | mbr mbs | 5.5 | Actions Requiring Member Approval | f455ec6e | authority | members | members | the Member moved the building into another series without the other members' consent | ss. 605.04073(1)(c), 605.0302, 605.2301 |
-| mul scp sgl | 5.6 | Indemnification | 5fba8bac | benefit | company series | manager members | — | s. 605.0408 |
+| mul scp sgl | 5.6 | Indemnification | 88f2b141 | benefit | company series | manager members | — | s. 605.0408 |
 | mbr mbs | 5.6 | Standard of Conduct; Exculpation | dfa8cbf5 | benefit | manager members | manager members | — | ss. 605.04091, 605.0105(3) |
 | sgl | 5.7 | Compensation; Reimbursement; Shared Expenses | a0c4af21 | benefit | company | manager member | — | s. 605.04091(1) |
 | mul scp | 5.7 | Compensation; Reimbursement; Shared Expenses | 95dfa725 | benefit | company | manager members | — | s. 605.04091(1) |
 | mbr mbs | 5.7 | Indemnification | b6c395f8 | benefit | company series | manager members | — | s. 605.0408 |
-| sgl | 5.8 | Statement of Authority | ea05a878 | authority | company | member manager third-party | — | s. 605.0302 |
-| mul scp | 5.8 | Statement of Authority | 233a09d3 | authority | company | members manager third-party | — | s. 605.0302 |
+| sgl | 5.8 | Statement of Authority | 05628a3d | authority | company | members manager third-party | — | s. 605.0302 |
+| mul scp | 5.8 | Statement of Authority | df63a96d | authority | company | members manager third-party | — | s. 605.0302 |
 | mbr mbs | 5.8 | Administrative Member | 8a779b5a | authority | members | members | — | drafting convention |
 | mul scp | 5.9 | Competition; Other Activities of the Manager. [SELECT THE SAME ALTERNATIVE AS SECTION 4.7] | b206cf04 | covenant | members | members | The member competed in breach of the agreement — a claim among the members, not against the company. | s. 605.04091(2)(c) as varied under s. 605.0105(3) |
-| mbr mbs | 5.9 | Statement of Authority | d95ed334 | authority | company | members manager third-party | — | s. 605.0302 |
+| mbr mbs | 5.9 | Statement of Authority | 0cce8cea | authority | company | members manager third-party | — | s. 605.0302 |
 | mbr mbs | 5.10 | Compensation; Reimbursement; Shared Expenses | 5d683322 | benefit | company | manager members | — | s. 605.04091(1) |
 | sgl | 6.1 | Contributions | 2d7ae1b4 | mechanic | — | members | — | s. 605.0402 |
 | mbr mbs mul scp | 6.1 | Initial Contributions | 1b58f807 | mechanic | — | members | — | s. 605.0402 |
