@@ -211,7 +211,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **9.3 Fiscal Year.** The fiscal year of the Company and of each Protected Series is the calendar year unless the Manager selects another permitted year.
 
-**9.4 Change in Circumstances.** If any Protected Series or the Company ceases to qualify for disregarded treatment (including upon the admission of an additional member or the association of an additional person with any Protected Series), the Member and the Manager shall amend this Agreement (or adopt the Company's partnership-form operating agreement) as provided in Article 11 before or promptly upon the change.
+**9.4 Change in Circumstances.** If any Protected Series or the Company ceases to qualify for disregarded treatment (including upon the admission of an additional member or the association of an additional person with any Protected Series), the Member and the Manager shall amend this Agreement (or adopt the Company's partnership-form operating agreement) as provided in Section 13.1 before or promptly upon the change.
 
 ---
 
