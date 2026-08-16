@@ -909,6 +909,75 @@ s. 605.2301 as requiring separate bank accounts and it does not" yields no
 generalisable mechanism, so it fell out. I let the shape of the artefact decide what
 counted as a failure.
 
+## P21 — Five defects behind a gate that could only see whether a number resolved
+**16 August 2026** · building SMMEMS
+
+Building the eighth form meant cloning the `sgm` event-map column. Before cloning it
+I printed every cell of the map next to the **title** of the provision each number
+names, and read all 528 — 66 events × 8 forms. Five defects, none of which any gate
+could have reported:
+
+- `sgm` *"A member competes with the company"* → **4.5**, which in that form is
+  *Transfer on Death Designation*. The competition provision is 4.4.
+- `sgm` *"A creditor pursues a member personally"* → **4.3 4.4**, and 4.4 there is
+  *Other Activities*. The member-managed single-member form has no *No Agency by
+  Status* provision at all — correctly, since the Member **is** the agent — so the
+  second reference should never have existed.
+- `sgs` *"A manager becomes incapacitated"* → **2.7**, which is *"Immediate Family
+  Member"*. The *"Incapacitated"* definition is 2.8.
+- `oa-map.md` cited **IRC 706** as the source of the S corporation fiscal-year
+  provision. The provision cites **1378**; 706 is the general rule.
+- The generator's Exhibit A builder replaces the master's whole Exhibit A section,
+  and its TOD sentence omitted the eligible-shareholder restriction the S corporation
+  masters carry. **The restriction was in the master and absent from the document the
+  client signs** — true of SMMMS since the day it was built.
+
+**Why.**
+
+*Every one of the first three is the same act: a column cloned from a form whose
+numbering had shifted underneath it.* SMMEMDE dropped *No Agency by Status*, so
+everything from 4.4 down moved up one. SMMMS added the *"Code"* definition at 2.5, so
+everything from 2.5 down moved down one. In both cases I copied the neighbouring
+column and adjusted the numbers I was thinking about — Article 9, Article 5, the ones
+the new form was *about* — and left untouched the ones I was not thinking about,
+which are exactly the ones that shifted for a reason unrelated to my edit.
+
+*The gate passed, and its passing is what made this invisible.* `event-map.py`
+resolves each reference against that form's own master, which is a real check and
+catches a genuinely missing section. It cannot detect a number that exists and is the
+wrong provision. **A reference that resolves is not a reference that is right.**
+
+*And I wrote that sentence here claiming it was already M18 in this index.* It was
+not. The index ended at M17; `git grep` for the phrase across the tree returns
+nothing; I created M18 in the same edit that asserted it had been there all along. I
+took it from my own working memory of a previous session, which had recorded the
+observation as though it had been committed. So inside the entry about trusting a
+number instead of opening the file, I trusted my model of this file instead of
+opening it — and it survived until I counted the M-entries for an unrelated reason.
+The count is the only thing that caught it.
+
+*And I would not have printed the titles if I had not been about to copy the column.*
+The check happened because I needed the column to be right for something *else*.
+Nothing in the workflow asks whether a column already committed is right; the map was
+verified when written, and verified-when-written is treated as verified.
+
+*The Exhibit A defect is a different fault with the same shape.* I checked the master
+and the rendered Word file, both of which carry the restriction. The client does not
+receive either — they receive the generator's output, which is the master with several
+sections **replaced**. I verified the artefact I was editing rather than the artefact
+the client gets, having written the rule that says the opposite in `CLAUDE.md`. The
+lesson SMMMS should have taught, three forms ago.
+
+**Fixed.** All five corrected in `ef02df2`. The generator now appends the restriction
+for both S corporation single-member forms, and `docs/format-baseline.json` records
+why a baseline may never be measured from the output it polices.
+
+**Not fixed.** The check that found these is a script in a scratchpad, not a gate.
+Reading 528 cells against their titles is not something anyone will repeat by hand,
+which is the same argument that produced every other gate here — and there is no
+mechanical form of it, because "does this number name the provision I meant" has no
+answer a machine can compute.
+
 ---
 
 # MECHANISM INDEX
@@ -1021,3 +1090,13 @@ that leaves measurements. — P20
 
 **M17 · My own metric gamed.** Closing the "unreached provisions" list by adding a
 citation rather than by finding the event. — P15, P19
+
+**M18 · A number that resolves, treated as a number that is right.** Cloning a
+column, a form, or a cross-reference from a neighbour whose numbering has shifted
+underneath it — and every gate I own reports success, because resolving is all it can
+test. — P21, C3
+
+**M19 · The artefact I am editing verified in place of the artefact the client
+receives.** The master and the Word file both carried the restriction; the generated
+agreement, which is the master with sections replaced, did not. — P21
+
