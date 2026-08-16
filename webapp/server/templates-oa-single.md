@@ -167,9 +167,9 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 ## ARTICLE 7 — DISTRIBUTIONS
 
-**7.1 Distributions.** The Manager (or, as to a Protected Series, its Protected Series Manager) may from time to time determine the extent to which cash on hand of the Company or of a Protected Series exceeds current and anticipated needs, including operating expenses, debt service, acquisitions, and reserves, and may distribute any such excess to the Member (or, in the case of a Protected Series, to the Company).
+**7.1 Distributions.** The Manager (or, as to a Protected Series, its Protected Series Manager) may from time to time determine the extent to which cash on hand of the Company or of a Protected Series exceeds current and anticipated needs, including operating expenses, debt service, acquisitions, and reserves, and may distribute any such excess.
 
-**7.2 Source Limitation.** Distributions in respect of a Protected Series shall be made **solely from the Associated Assets of that Protected Series**, and distributions in respect of the Company shall be made solely from the Associated Assets of the Company. Each distribution shall be recorded in the records maintained under Article 8, identifying its source.
+**7.2 Source Limitation.** Distributions in respect of a Protected Series shall be made **solely from the Associated Assets of that Protected Series, and solely to the Company**; distributions in respect of the Company shall be made solely from the Associated Assets of the Company, to the Member. Each distribution shall be recorded in the records maintained under Article 8, identifying its source.
 
 ---
 

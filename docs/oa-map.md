@@ -144,11 +144,11 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbr mul | 6.6 | Capital Accounts | 9932dfcc | mechanic | company | members | — | Treas. Reg. 1.704-1(b)(2)(iv) |
 | mbs scp | 6.6 | Contribution Records; Identical Rights | 31a89541 | mechanic | company | members | — | IRC 1361(b)(1)(D) |
 | mbr mbs mul scp | 6.7 | No Right to Specific Property | 3e1803bb | benefit | members | company members | — | s. 605.0110(1) |
-| sgl | 7.1 | Distributions | 0ce91b89 | authority | manager members | members | — | s. 605.0404 |
+| sgl | 7.1 | Distributions | 0c3c8347 | authority | manager | member | — | s. 605.0404 |
 | mul | 7.1 | Allocations | b3e8d7e5 | mechanic | company | members | — | IRC 704(b); 1361(b)(1)(D) for the S forms |
 | mbs scp | 7.1 | Allocations | 5ee5aa81 | mechanic | company | members | — | IRC 704(b); 1361(b)(1)(D) for the S forms |
 | mbr | 7.1 | Allocations | 1ab53dac | mechanic | company | members | — | IRC 704(b); 1361(b)(1)(D) for the S forms |
-| sgl | 7.2 | Source Limitation | b575fd06 | statutory-route | — | members series | — | ss. 605.2401, 605.2404 |
+| sgl | 7.2 | Source Limitation | 40e0cd75 | benefit | manager | series | the series paid its owner's owner directly, so nobody was respecting the silos | ss. 605.2303(2), 605.2401(2) |
 | mul | 7.2 | Distributions | 17034e98 | authority | manager members | members | — | s. 605.0404 |
 | scp | 7.2 | Distributions | 14ee142f | authority | manager members | members | — | s. 605.0404 |
 | mbr | 7.2 | Distributions | e8cfc8f9 | authority | manager members | members | — | s. 605.0404 |

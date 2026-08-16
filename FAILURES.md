@@ -513,6 +513,35 @@ no output. This is the heading-shaped search of P7 in another costume: the form
 that differs structurally is the form most likely to differ substantively, and it
 is the one every text-matching method steps over.
 
+**Second instance, 16 August 2026 — the same class, six days later, found by Adam
+again.** On 14 August, at his direction, commit `d86e43c` made a series distribute
+"solely to the Company" rather than to the members. It reached four masters. The
+single-member form did not get it, because its provision is titled **Source
+Limitation** while the other four are titled **Distributions** — the identical
+heading-shaped miss, in the identical form, on a rule about the identical subject.
+It sat wrong for two days and I did not find it; Adam pasted the provision back to
+me.
+
+Two things this second instance shows that the first did not.
+
+*The register was written and did not help.* This entry existed, naming this
+mechanism, committed the same morning. Recording a failure does not create the
+habit of checking for it — the entry is consulted when I go looking for failures,
+which is exactly the moment I am not drafting.
+
+*It had already propagated into a client document.* `owners-manual.md:126` tells
+the client that Articles 6–7 provide for distributions "always from a series' own
+assets, and by a series only to the company that owns it." True of four forms.
+False of the fifth, from 14 August until this fix. So an incomplete sweep does not
+stay contained in the masters; the guidance documents describe the class, and the
+moment one member of the class diverges the description becomes a false statement
+to the client — L8's failure produced by C1's mechanism.
+
+*What the correct step is.* When a correction is directed at a provision, do not
+search for its text. Enumerate all five forms, open the article that owns the
+subject in each, and read it. Five reads. That is the only method that does not
+inherit the vocabulary of the example.
+
 ## C2 — A sweep reported clean with four defects still in it
 
 **Date:** 10 August 2026 · **Evidence:** commit `e5d8760`
