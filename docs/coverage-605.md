@@ -136,35 +136,35 @@ checker lists every one on each run.
 | 605.1003 | Status of filings. | n/a |  | status of filings in an entity transaction |
 | 605.1004 | Nonexclusivity. | n/a |  | the entity-transaction provisions are not exclusive |
 | 605.1005 | Reference to external facts. | relied | 3.5 | terms may be fixed by reference to facts outside the agreement, which is how each Series Exhibit works |
-| 605.1006 | Appraisal rights. | relied | 5.4 5.5 | GAP: appraisal rights arise on a sale of substantially all assets a member could vote on; (2) permits eliminating them only with each affected member's authorisation, and no form does |
-| 605.1021 | Merger authorized. | relied | 5.4 5.5 | merger requires the member approval our forms specify |
+| 605.1006 | Appraisal rights. | relied | 5.4 5.5 15.1 | no appraisal event can occur under our forms. (1)(b)-(c) conversion and interest exchange are barred outright by s. 605.2603; (1)(a) merger and (1)(d) a sale of substantially all assets each require the consent of ALL Members under s. 5.4/5.5, and (1)(e)-(g) amendments require all Members under s. 15.1 — and s. 605.1064 bars a member who consents from asserting appraisal. (1)(h) authorises none. A waiver under (2) would take a protection from a member and buy nothing |
+| 605.1021 | Merger authorized. | varied | 5.4 5.5 | merger requires the consent of all Members, where s. 605.1023(1)(a) would default to a majority-in-interest; s. 605.2604 separately confines a series LLC to a merger in which every other party is an LLC and the surviving company is not created in the merger |
 | 605.1022 | Plan of merger. | n/a |  | contents of a plan of merger |
-| 605.1023 | Approval of merger. | relied | 5.4 5.5 | approval of a merger |
+| 605.1023 | Approval of merger. | varied | 5.4 5.5 | (1)(a) defaults to a majority-in-interest; our forms require all Members. (1)(b) separately requires a record consent from any member who would take on interest holder liability, and no form varies that |
 | 605.1024 | Amendment or abandonment of plan of merger. | n/a |  | amending or abandoning a plan of merger |
 | 605.1025 | Articles of merger. | n/a |  | articles of merger |
 | 605.1026 | Effect of merger. | n/a |  | effect of a merger |
-| 605.1031 | Interest exchange authorized. | relied | 5.4 5.5 | an interest exchange requires member approval |
+| 605.1031 | Interest exchange authorized. | n/a |  | s. 605.2603 forbids a series limited liability company from participating in, being a party to, or resulting from a conversion, domestication or interest exchange, and s. 605.2107(1)(v) makes that non-variable — so there is nothing here for an operating agreement to approve |
 | 605.1032 | Plan of interest exchange. | n/a |  | contents of a plan of interest exchange |
-| 605.1033 | Approval of interest exchange. | relied | 5.4 5.5 | approval of an interest exchange |
+| 605.1033 | Approval of interest exchange. | n/a |  | s. 605.2603 forbids a series limited liability company from participating in, being a party to, or resulting from a conversion, domestication or interest exchange, and s. 605.2107(1)(v) makes that non-variable — so there is nothing here for an operating agreement to approve |
 | 605.1034 | Amendment or abandonment of plan of interest exchange. | n/a |  | amending or abandoning a plan of interest exchange |
 | 605.1035 | Articles of interest exchange. | n/a |  | articles of interest exchange |
 | 605.1036 | Effect of interest exchange. | n/a |  | effect of an interest exchange |
-| 605.1041 | Conversion authorized. | relied | 5.4 5.5 | a conversion requires member approval |
+| 605.1041 | Conversion authorized. | n/a |  | s. 605.2603 forbids a series limited liability company from participating in, being a party to, or resulting from a conversion, domestication or interest exchange, and s. 605.2107(1)(v) makes that non-variable — so there is nothing here for an operating agreement to approve |
 | 605.1042 | Plan of conversion. | n/a |  | contents of a plan of conversion |
-| 605.1043 | Approval of conversion. | relied | 5.4 5.5 | approval of a conversion |
+| 605.1043 | Approval of conversion. | n/a |  | s. 605.2603 forbids a series limited liability company from participating in, being a party to, or resulting from a conversion, domestication or interest exchange, and s. 605.2107(1)(v) makes that non-variable — so there is nothing here for an operating agreement to approve |
 | 605.1044 | Amendment or abandonment of plan of conversion. | n/a |  | amending or abandoning a plan of conversion |
 | 605.1045 | Articles of conversion. | n/a |  | articles of conversion |
 | 605.1046 | Effect of conversion. | n/a |  | effect of a conversion |
-| 605.1051 | Domestication authorized. | relied | 5.4 5.5 | a domestication requires member approval |
+| 605.1051 | Domestication authorized. | n/a |  | s. 605.2603 forbids a series limited liability company from participating in, being a party to, or resulting from a conversion, domestication or interest exchange, and s. 605.2107(1)(v) makes that non-variable — so there is nothing here for an operating agreement to approve |
 | 605.1052 | Plan of domestication. | n/a |  | contents of a plan of domestication |
-| 605.1053 | Approval of domestication. | relied | 5.4 5.5 | approval of a domestication |
+| 605.1053 | Approval of domestication. | n/a |  | s. 605.2603 forbids a series limited liability company from participating in, being a party to, or resulting from a conversion, domestication or interest exchange, and s. 605.2107(1)(v) makes that non-variable — so there is nothing here for an operating agreement to approve |
 | 605.1054 | Amendment or abandonment of plan of domestication. | n/a |  | amending or abandoning a plan of domestication |
 | 605.1055 | Articles of domestication. | n/a |  | articles of domestication |
 | 605.1056 | Effect of domestication. | n/a |  | effect of a domestication |
 | 605.1061 | Appraisal rights; definitions. | relied | 10.4 13.2 | (5) fair value is determined "without discounting for lack of marketability or minority status" — both provisions use fair value and neither says otherwise |
 | 605.1062 | Assertion of rights by nominees and beneficial owners. | n/a |  | appraisal procedure |
 | 605.1063 | Notice of appraisal rights. | n/a |  | appraisal procedure |
-| 605.1064 | Notice of intent to demand payment. | n/a |  | appraisal procedure |
+| 605.1064 | Notice of intent to demand payment. | relied | 5.4 5.5 15.1 | the load-bearing provision behind s. 605.1006: a member asserting appraisal "may not vote ... in favor" and, on written consent, "must not sign a consent in favor". Every event our forms permit needs that member's own consent, so consenting forfeits the right and withholding it stops the event |
 | 605.1065 | Appraisal notice and form. | n/a |  | appraisal procedure |
 | 605.1066 | Perfection of rights; right to withdraw. | n/a |  | appraisal procedure |
 | 605.1067 | Member's acceptance of limited liability company's offer. | n/a |  | appraisal procedure |
@@ -209,8 +209,8 @@ checker lists every one on each run.
 | 605.2503 | Effects of reinstatement of series limited liability company; revocation of voluntary dissolution. | non-variable |  | s. 605.2107(1)(u); reinstatement of the company revives its protected series — the other half of the administrative-dissolution gap |
 | 605.2601 | Entity transactions involving a series limited liability company or a protected series of the company restricted; definitions. | non-variable | 3.2 | s. 605.2107(1)(v); entity transactions involving a series are restricted |
 | 605.2602 | Restrictions on entity transactions involving protected series. | non-variable | 3.2 | s. 605.2107(1)(v); a protected series may not convert, domesticate, or take part in an interest exchange |
-| 605.2603 | Restrictions on entity transactions involving series limited liability company. | non-variable | 3.2 | s. 605.2107(1)(v); restrictions on the company's own entity transactions |
-| 605.2604 | Restrictions on merger. | non-variable | 3.2 | s. 605.2107(1)(v); a series may merge only through this single channel, and no form supplies the machinery |
+| 605.2603 | Restrictions on entity transactions involving series limited liability company. | non-variable | 3.2 | s. 605.2107(1)(v). A series LLC may not convert, domesticate or take part in an interest exchange at all, and may merge only through s. 605.2604. s. 605.2102(14) defines a series LLC as a company that HAS at least one protected series, so the bar bites from the first designation. The Owner's Manual carries this; the agreement does not recite it |
+| 605.2604 | Restrictions on merger. | non-variable | 3.2 | s. 605.2107(1)(v). A merger is permitted only if every other party is a limited liability company and the surviving company is not created in the merger; no form supplies the machinery |
 | 605.2605 | Plan of merger. | non-variable |  | s. 605.2107(1)(v); plan of merger for a protected series |
 | 605.2606 | Articles of merger. | non-variable |  | s. 605.2107(1)(v); articles of merger for a protected series |
 | 605.2607 | Effect of merger. | non-variable |  | s. 605.2107(1)(v); effect of a protected series merger |

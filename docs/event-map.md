@@ -33,8 +33,8 @@ Forms: `sgl` single-member · `mul` manager-managed multi-member ·
 | Someone disputes whether an asset is associated | s. 605.2404(4) | 8.2 8.5 3.3 | 8.2 8.5 3.3 | 8.2 8.5 3.3 | 8.2 8.5 3.3 | 8.2 8.5 3.3 | the party asserting association carries the burden of proof |
 | A company creditor pursues a series asset | ss. 605.2401(2), 605.2404(2) | 3.3 8.2 8.5 | 3.3 8.2 8.5 | 3.3 8.2 8.5 | 3.3 8.2 8.5 | 3.3 8.2 8.5 | |
 | A protected series is dissolved and wound up | s. 605.2501 | 3.4 12.1 12.2 | 3.4 14.1 14.2 | 3.4 14.1 14.2 | 3.4 14.1 14.2 | 3.4 14.1 14.2 | |
-| A protected series is asked to merge or convert | ss. 605.2602-605.2604 | 3.2 | 3.2 5.4 | 3.2 5.4 | 3.2 5.5 | 3.2 5.5 | s. 3.2 recites the statutory bar; no form supplies merger machinery |
-| The company sells substantially all of its assets | s. 605.1006(1) | 5.3 | 5.4 | 5.4 | 5.5 | 5.5 | GAP: appraisal rights are neither waived nor mentioned in any form |
+| A protected series is asked to merge or convert | ss. 605.2602-605.2604 | 3.2 | 3.2 5.4 | 3.2 5.4 | 3.2 5.5 | 3.2 5.5 | s. 3.2 recites the bar on a series; s. 605.2603 bars the Company itself from converting, domesticating or exchanging interests, and s. 605.2604 confines its mergers to LLC parties with no newly created survivor |
+| The company sells substantially all of its assets | s. 605.1006(1)(d) | 5.3 | 5.4 | 5.4 | 5.5 | 5.5 | the consent of all Members; a member who consents forfeits appraisal under s. 605.1064, and one who withholds it stops the sale, so no appraisal right can arise |
 | The company is dissolved and wound up | ss. 605.0701, 605.0710 | 1.7 12.3 12.4 12.5 | 1.7 14.3 14.4 14.5 | 1.7 14.3 14.4 14.5 | 1.7 14.3 14.4 14.5 | 1.7 14.3 14.4 14.5 | liquidation is strictly pro rata, overriding s. 605.0710(2) |
 | The company has no members for 90 days | s. 605.0701(3) | 11.3 | 12.3 | 12.3 | 12.3 | 12.3 | |
 | The company misses its annual report | ss. 605.0212, 605.0714, 605.2206 | 1.9 | 1.9 | 1.9 | 1.9 | 1.9 | the annual report must name every protected series |
@@ -89,3 +89,4 @@ Forms: `sgl` single-member · `mul` manager-managed multi-member ·
 | The tax classification is set when the company is formed | s. 605.1103(1) | 9.1 | 9.1 | 9.1 | 9.1 | 9.1 | |
 | The company or a series has to be identified to a third party | ss. 605.2202(2), 605.0112 | 1.2 1.3 1.4 1.5 | 1.2 1.3 1.4 1.5 | 1.2 1.3 1.4 1.5 | 1.2 1.3 1.4 1.5 | 1.2 1.3 1.4 1.5 | a series name must begin with the company name and carry "protected series", "P.S." or "PS" |
 | A capitalized term has to be given its meaning | — | 1.1 | 1.1 | 1.1 | 1.1 | 1.1 | Article 2 carries the definitions themselves; they are reached through this row and are expected to appear in no other |
+| The company converts, domesticates, or takes part in an interest exchange | ss. 605.2603, 605.2102(14) | none | none | none | none | none | it cannot: s. 605.2603 bars a series limited liability company from all three, and s. 605.2107(1)(v) makes that non-variable. The Owner's Manual says so; the agreement does not recite a prohibition it cannot lift |
