@@ -79,6 +79,23 @@ python3 "$ROOT/docs/provision-map.py" --diff
 echo "reading back the changed provisions"
 python3 "$ROOT/docs/provision-map.py" --result
 
+# Structural gate. Whether the document still holds together as a document:
+# articles and sections in order with no gaps and no reuse, lettered paragraphs
+# unbroken, every internal Section/Article/Exhibit reference resolving inside the
+# SAME form, no provision cut off mid-sentence, definitions alphabetical and
+# defined once. A reader assumes all of this and therefore never checks it.
+# --selftest runs first and breaks each invariant on purpose: a check nobody has
+# watched fail is not known to work.
+echo "checking the masters hold together"
+if ! python3 "$ROOT/docs/structure.py" --selftest; then
+  echo "update-word-docs: A STRUCTURAL CHECK IS DEAD — nothing written" >&2
+  exit 1
+fi
+if ! python3 "$ROOT/docs/structure.py"; then
+  echo "update-word-docs: STRUCTURAL DEFECT — nothing written" >&2
+  exit 1
+fi
+
 # Consistency gate. The manual and the Instructions describe the agreements, so
 # every section they cite is a claim about a file in this repo. Provisions get
 # renumbered and deleted; the sentences around the numbers do not follow on their
