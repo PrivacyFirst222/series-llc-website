@@ -214,7 +214,7 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | sgl | 11.3 | Dissolution of the Company | 922d7938 | mechanic | — | member | — | s. 605.0701 |
 | mbr mbs mul scp | 11.3 | Compliance upon Assumption or Rejection | 5c8f9b13 | benefit | members | members company | — | 11 U.S.C. 365 |
 | sgl | 11.4 | Winding Up the Company | 697fd05e | mechanic | manager member | member | — | ss. 605.0709, 605.0710 |
-| sgl | 11.5 | No Deficit Obligation; Recourse Limited | 9712f7e9 | benefit | — | members | — | s. 605.0405 |
+| sgl | 11.5 | Recourse Limited | a5f259ef | benefit | — | member | — | s. 605.0405; the single-member form carries no capital accounts, so deficit-restoration language was removed 2026-08-16, as it was from the S corporation forms on 2026-08-14 |
 | sgl | 12.1 | Amendments | 95c1e577 | authority | member | member | — | s. 605.04073(1)(d), (2)(e) |
 | mbr mbs mul scp | 12.1 | Admission of Members | fc6d8b94 | authority | members | members | — | s. 605.0401(3) |
 | sgl | 12.2 | Action by Written Consent | 57614354 | mechanic | members | members | — | s. 605.04073(4) |

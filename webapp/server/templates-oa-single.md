@@ -247,7 +247,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **11.4 Winding Up the Company.** Upon dissolution of the Company, the Manager (or, if there is none, a person designated by the Member) shall wind up the Company and each Protected Series. After the winding up of each Protected Series under Section 11.2, the remaining Associated Assets of the Company shall be applied: first, to pay or provide for the Company's Associated Liabilities to creditors; and then the balance to the Member. Articles of dissolution shall be filed as the Act requires, and the Company shall terminate when winding up is complete.
 
-**11.5 No Deficit Obligation; Recourse Limited.** The Member shall have no obligation to restore any deficit or to contribute capital in connection with any winding up, and each creditor of the Company or of any Protected Series shall look solely to the Associated Assets of its obligor.
+**11.5 Recourse Limited.** The Member shall have no obligation to contribute capital in connection with any winding up, and each creditor of the Company or of any Protected Series shall look solely to the Associated Assets of its obligor.
 
 ---
 
