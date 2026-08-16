@@ -103486,6 +103486,8 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 (b) **Transferee provisions inapplicable to the Company.** Section 605.2303(4), Florida Statutes, applies to the Company, in its capacity as owner of a protected-series transferable interest, any provision of this Agreement that applies to a protected-series transferee. No provision of this Agreement restricting the rights of a transferee applies to the Company in that capacity, and nothing in this Agreement limits the Company's rights to manage, direct, receive distributions from, or obtain the records and information of any Protected Series.
 
+(c) **No transfer of a protected-series transferable interest.** The Company shall not transfer, assign, pledge, encumber, or otherwise dispose of all or any part of a protected-series transferable interest of any Protected Series to any person, and no Protected Series shall issue a protected-series transferable interest to any person other than the Company. Any purported transfer or issuance in violation of this paragraph is null and void ab initio and shall be given no force or effect for any purpose.
+
 ---
 
 ## ARTICLE 4 \u2014 THE MEMBER; MEMBERSHIP INTEREST
@@ -103843,6 +103845,8 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 (a) **Ownership.** The Company owns all of the protected-series transferable interests of each Protected Series, as provided in s. 605.2303(1)-(3), Florida Statutes. Every distribution made by a Protected Series is made to the Company.
 
 (b) **Transferee provisions inapplicable to the Company.** Section 605.2303(4), Florida Statutes, applies to the Company, in its capacity as owner of a protected-series transferable interest, any provision of this Agreement that applies to a protected-series transferee. No provision of this Agreement restricting the rights of a transferee applies to the Company in that capacity, and nothing in this Agreement limits the Company's rights to manage, direct, receive distributions from, or obtain the records and information of any Protected Series.
+
+(c) **No transfer of a protected-series transferable interest.** The Company shall not transfer, assign, pledge, encumber, or otherwise dispose of all or any part of a protected-series transferable interest of any Protected Series to any person, and no Protected Series shall issue a protected-series transferable interest to any person other than the Company. Any purported transfer or issuance in violation of this paragraph is null and void ab initio and shall be given no force or effect for any purpose.
 
 ---
 
@@ -104297,6 +104301,8 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 (b) **Transferee provisions inapplicable to the Company.** Section 605.2303(4), Florida Statutes, applies to the Company, in its capacity as owner of a protected-series transferable interest, any provision of this Agreement that applies to a protected-series transferee. No provision of this Agreement restricting the rights of a transferee applies to the Company in that capacity, and nothing in this Agreement limits the Company's rights to manage, direct, receive distributions from, or obtain the records and information of any Protected Series.
 
+(c) **No transfer of a protected-series transferable interest.** The Company shall not transfer, assign, pledge, encumber, or otherwise dispose of all or any part of a protected-series transferable interest of any Protected Series to any person, and no Protected Series shall issue a protected-series transferable interest to any person other than the Company. Any purported transfer or issuance in violation of this paragraph is null and void ab initio and shall be given no force or effect for any purpose.
+
 ---
 
 ## ARTICLE 4 \u2014 MEMBERS; VOTING; MEMBER DUTIES
@@ -104437,7 +104443,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **9.2 Returns; Information.** The Manager shall cause to be prepared and filed all tax returns required of the Company (including Form 1120-S) and of each Protected Series, if necessary or required, and shall deliver to each Member, after the end of each fiscal year, the information (including Schedule K-1) necessary for the Member's returns.
 
-**9.3 Protecting the Election.** While the S corporation election is in effect: (a) no Transfer of any Membership Interest or transferable interest may be made to any person who is not an eligible S corporation shareholder, or that would cause the number of shareholders to exceed the limit of section 1361 of the Code, and any purported Transfer in violation of this clause is null and void ab initio and shall be given no force or effect for any purpose; (b) a TOD designation under Section 4.11 is effective only in favor of a beneficiary that is an eligible S corporation shareholder; and (c) no Protected Series may be established, and no interest issued or adjusted, except consistent with Section 4.2 and the one-class-of-stock requirement of section 1361 of the Code, and any such establishment, issuance, or adjustment in violation of this clause is null and void ab initio and shall be given no force or effect for any purpose.
+**9.3 Protecting the Election.** While the S corporation election is in effect: (a) no Transfer of any Membership Interest or transferable interest may be made to any person who is not an eligible S corporation shareholder, or that would cause the number of shareholders to exceed the limit of section 1361 of the Code, and any purported Transfer in violation of this clause is null and void ab initio and shall be given no force or effect for any purpose; (b) a TOD designation under Section 4.11 is effective only in favor of a beneficiary that is an eligible S corporation shareholder; and (c) no Protected Series may be established, and no interest issued or adjusted, except consistent with Section 3.6(c), Section 4.2, and the one-class-of-stock requirement of section 1361 of the Code, and any such establishment, issuance, or adjustment in violation of this clause is null and void ab initio and shall be given no force or effect for any purpose.
 
 **9.4 S Corporation Status; Intent; Savings Clause.**
 
@@ -104761,6 +104767,8 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 (a) **Ownership.** The Company owns all of the protected-series transferable interests of each Protected Series, as provided in s. 605.2303(1)-(3), Florida Statutes. Every distribution made by a Protected Series is made to the Company.
 
 (b) **Transferee provisions inapplicable to the Company.** Section 605.2303(4), Florida Statutes, applies to the Company, in its capacity as owner of a protected-series transferable interest, any provision of this Agreement that applies to a protected-series transferee. No provision of this Agreement restricting the rights of a transferee applies to the Company in that capacity, and nothing in this Agreement limits the Company's rights to manage, direct, receive distributions from, or obtain the records and information of any Protected Series.
+
+(c) **No transfer of a protected-series transferable interest.** The Company shall not transfer, assign, pledge, encumber, or otherwise dispose of all or any part of a protected-series transferable interest of any Protected Series to any person, and no Protected Series shall issue a protected-series transferable interest to any person other than the Company. Any purported transfer or issuance in violation of this paragraph is null and void ab initio and shall be given no force or effect for any purpose.
 
 ---
 
@@ -105216,6 +105224,8 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 (b) **Transferee provisions inapplicable to the Company.** Section 605.2303(4), Florida Statutes, applies to the Company, in its capacity as owner of a protected-series transferable interest, any provision of this Agreement that applies to a protected-series transferee. No provision of this Agreement restricting the rights of a transferee applies to the Company in that capacity, and nothing in this Agreement limits the Company's rights to manage, direct, receive distributions from, or obtain the records and information of any Protected Series.
 
+(c) **No transfer of a protected-series transferable interest.** The Company shall not transfer, assign, pledge, encumber, or otherwise dispose of all or any part of a protected-series transferable interest of any Protected Series to any person, and no Protected Series shall issue a protected-series transferable interest to any person other than the Company. Any purported transfer or issuance in violation of this paragraph is null and void ab initio and shall be given no force or effect for any purpose.
+
 ---
 
 ## ARTICLE 4 \u2014 MEMBERS; VOTING; MEMBER DUTIES
@@ -105360,7 +105370,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **9.2 Returns; Information.** The Administrative Member shall cause to be prepared and filed all tax returns required of the Company (including Form 1120-S) and of each Protected Series, if necessary or required, and shall deliver to each Member, after the end of each fiscal year, the information (including Schedule K-1) necessary for the Member's returns.
 
-**9.3 Protecting the Election.** While the S corporation election is in effect: (a) no Transfer of any Membership Interest or transferable interest may be made to any person who is not an eligible S corporation shareholder, or that would cause the number of shareholders to exceed the limit of section 1361 of the Code, and any purported Transfer in violation of this clause is null and void ab initio and shall be given no force or effect for any purpose; (b) a TOD designation under Section 4.11 is effective only in favor of a beneficiary that is an eligible S corporation shareholder; and (c) no Protected Series may be established, and no interest issued or adjusted, except consistent with Section 4.2 and the one-class-of-stock requirement of section 1361 of the Code, and any such establishment, issuance, or adjustment in violation of this clause is null and void ab initio and shall be given no force or effect for any purpose.
+**9.3 Protecting the Election.** While the S corporation election is in effect: (a) no Transfer of any Membership Interest or transferable interest may be made to any person who is not an eligible S corporation shareholder, or that would cause the number of shareholders to exceed the limit of section 1361 of the Code, and any purported Transfer in violation of this clause is null and void ab initio and shall be given no force or effect for any purpose; (b) a TOD designation under Section 4.11 is effective only in favor of a beneficiary that is an eligible S corporation shareholder; and (c) no Protected Series may be established, and no interest issued or adjusted, except consistent with Section 3.6(c), Section 4.2, and the one-class-of-stock requirement of section 1361 of the Code, and any such establishment, issuance, or adjustment in violation of this clause is null and void ab initio and shall be given no force or effect for any purpose.
 
 **9.4 S Corporation Status; Intent; Savings Clause.**
 

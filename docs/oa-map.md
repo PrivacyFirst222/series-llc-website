@@ -83,7 +83,7 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbr mbs mul scp sgl | 3.4 | Dissolution of a Protected Series Distinguished | ab68ccd0 | statutory-route | — | members | — | s. 605.2501 |
 | mul scp sgl | 3.5 | Series Exhibits Control Series Terms | 70d3c7b8 | mechanic | company | members | — | drafting convention |
 | mbr mbs | 3.5 | Series Exhibits Control Series Terms | a3eb038e | mechanic | company | members | — | drafting convention |
-| mbr mbs mul scp sgl | 3.6 | Company as Owner | 4690fc28 | statutory-route | — | members company | — | s. 605.2303(1)-(3) |
+| mbr mbs mul scp sgl | 3.6 | Company as Owner | a566e682 | statutory-route | — | members company | — | s. 605.2303(1)-(3) |
 | sgl | 4.1 | Sole Member | 86821bf1 | mechanic | — | member | — | drafting convention |
 | mul scp | 4.1 | Members; Percentage Interests | 65ad85a1 | mechanic | — | members | — | s. 605.04073(1)(b) |
 | mbr mbs | 4.1 | Members; Percentage Interests | eaf1d35a | mechanic | — | members | — | s. 605.04073(1)(b) |
@@ -178,7 +178,7 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbs | 9.2 | Returns; Information | 1186ce7a | covenant | manager | members | The manager did not deliver the tax information the agreement requires — a claim among the members. | IRC 6037 |
 | sgl | 9.3 | Fiscal Year | 19362c64 | mechanic | company | members | — | IRC 706; 1378 for the S forms |
 | mul | 9.3 | Partnership Representative | e7d81c29 | authority | manager | members | — | IRC 6223 |
-| mbs scp | 9.3 | Protecting the Election | dc89049a | covenant | members | members | The transfer breached the agreement's S corporation restrictions — a claim among the members. | IRC 1361(b) |
+| mbs scp | 9.3 | Protecting the Election | 2a033950 | covenant | members | members | The transfer breached the agreement's S corporation restrictions — a claim among the members. | IRC 1361(b) |
 | mbr | 9.3 | Partnership Representative | d4a24a46 | authority | manager | members | — | IRC 6223 |
 | sgl | 9.4 | Change in Circumstances | 5befec9b | mechanic | member | member | — | Treas. Reg. 301.7701-3 |
 | mul | 9.4 | Tax Elections | 4ca8f78f | authority | manager members | members | — | IRC 754 |

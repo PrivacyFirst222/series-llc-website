@@ -117,6 +117,8 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 (b) **Transferee provisions inapplicable to the Company.** Section 605.2303(4), Florida Statutes, applies to the Company, in its capacity as owner of a protected-series transferable interest, any provision of this Agreement that applies to a protected-series transferee. No provision of this Agreement restricting the rights of a transferee applies to the Company in that capacity, and nothing in this Agreement limits the Company's rights to manage, direct, receive distributions from, or obtain the records and information of any Protected Series.
 
+(c) **No transfer of a protected-series transferable interest.** The Company shall not transfer, assign, pledge, encumber, or otherwise dispose of all or any part of a protected-series transferable interest of any Protected Series to any person, and no Protected Series shall issue a protected-series transferable interest to any person other than the Company. Any purported transfer or issuance in violation of this paragraph is null and void ab initio and shall be given no force or effect for any purpose.
+
 ---
 
 ## ARTICLE 4 — MEMBERS; VOTING; MEMBER DUTIES
