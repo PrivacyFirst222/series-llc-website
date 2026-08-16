@@ -205,13 +205,11 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 ## ARTICLE 9 — TAX MATTERS
 
-**9.1 Intended Classification.** It is intended that the Company and each Protected Series each be disregarded as an entity separate from the Member for federal income tax purposes, and that all items of income, gain, loss, deduction, and credit be reported directly by the Member.
+**9.1 Intended Classification.** It is intended that the Company be disregarded as an entity separate from the Member for federal income tax purposes. Each Protected Series is wholly owned by the Company. If a Protected Series is treated as an entity separate from the Company for federal income tax purposes, it is intended that the Protected Series be disregarded as an entity separate from its owner. Accordingly, all items of income, gain, loss, deduction, and credit of the Company and of each Protected Series are reported directly by the Member.
 
 **9.2 Tax Filings and Elections.** The Manager shall make, or cause to be made, all tax filings required of the Company or of any Protected Series and may make any tax election the Manager determines to be in the best interests of the Member, consistent with Section 9.1.
 
 **9.3 Fiscal Year.** The fiscal year of the Company and of each Protected Series is the calendar year unless the Manager selects another permitted year.
-
-**9.4 Change in Circumstances.** If any Protected Series or the Company ceases to qualify for disregarded treatment (including upon the admission of an additional member or the association of an additional person with any Protected Series), the Member and the Manager shall amend this Agreement (or adopt the Company's partnership-form operating agreement) as provided in Section 13.1 before or promptly upon the change.
 
 ---
 

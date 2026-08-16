@@ -66,7 +66,7 @@ Forms: `sgl` single-member · `mul` manager-managed multi-member ·
 | The company files its tax return | — | 9.2 | 9.2 | 9.2 | 9.2 | 9.2 | |
 | The IRS examines a partnership year | subch. C of ch. 63 | none | 9.3 | none | 9.3 | none | the S corporation forms are not partnerships; the single-member form is disregarded |
 | The S election is threatened | § 1362 | none | none | 9.3 9.4 9.5 | none | 9.3 9.4 9.5 | only the S corporation forms carry an election to protect |
-| The tax classification changes | s. 605.1103(2) | 9.4 | 9.4 | 9.4 | 9.4 | 9.4 | an S election also changes the Florida ch. 220 analysis |
+| The tax classification changes | s. 605.1103(2) | 9.1 11.2 | 9.4 | 9.4 | 9.4 | 9.4 | an S election also changes the Florida ch. 220 analysis. The single-member form's duty to amend on a change of classification (its old s. 9.4) was deleted on 16 August: s. 9.1 states the intended classification and s. 11.2 carries the warning, and no provision now compels anyone to act |
 | A fiscal year is chosen | — | 9.3 | 9.5 | 9.6 | 9.5 | 9.6 | |
 | The agreement is amended | s. 605.04073(1)(d) | 13.1 | 15.1 | 15.1 | 15.1 | 15.1 | unanimous; oral and implied amendments are of no effect |
 | The parties act without a meeting | s. 605.0407 | 13.2 | 4.4 15.2 | 4.4 15.2 | 4.4 15.2 | 4.4 15.2 | |

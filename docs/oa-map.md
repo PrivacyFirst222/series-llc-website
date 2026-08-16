@@ -168,7 +168,7 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbr mbs | 8.4 | Holding Associated Assets | 3b8d0f0b | benefit | company series | members | — | s. 605.2301(5) |
 | mul scp sgl | 8.5 | Standing Association Rules; Savings Provisions | 17f856b7 | benefit | — | members series company | — | s. 605.2301(2)(a), (4); s. 605.2404(4) burden of proof |
 | mbr mbs | 8.5 | Standing Association Rules; Savings Provisions | 17bdf849 | benefit | — | members series company | — | s. 605.2301(2)(a), (4); s. 605.2404(4) burden of proof |
-| sgl | 9.1 | Intended Classification | ecebb4fc | benefit | members | members | — | Treas. Reg. 301.7701-3 |
+| sgl | 9.1 | Intended Classification | 10663e90 | benefit | member | member | — | Treas. Reg. 301.7701-3 |
 | mbr mul | 9.1 | Intended Classification | 6c18356d | benefit | members | members | — | Treas. Reg. 301.7701-3 |
 | mbs scp | 9.1 | S Corporation Status | 86c3eddc | benefit | members | members | — | IRC 1362 |
 | sgl | 9.2 | Tax Filings and Elections | 33370c47 | authority | manager | members | — | IRC 6031 |
@@ -176,11 +176,10 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | scp | 9.2 | Returns; Information | 90b2b500 | covenant | manager | members | The manager did not deliver the tax information the agreement requires — a claim among the members. | IRC 6037 |
 | mbr | 9.2 | Tax Returns; Information | a115b23e | covenant | manager | members | The manager did not deliver the tax information the agreement requires — a claim among the members. | IRC 6031(b) |
 | mbs | 9.2 | Returns; Information | 1186ce7a | covenant | manager | members | The manager did not deliver the tax information the agreement requires — a claim among the members. | IRC 6037 |
-| sgl | 9.3 | Fiscal Year | 19362c64 | mechanic | company | members | — | IRC 706; 1378 for the S forms |
+| sgl | 9.3 | Fiscal Year | cc0c6c19 | mechanic | company | member | — | IRC 706 |
 | mul | 9.3 | Partnership Representative | e7d81c29 | authority | manager | members | — | IRC 6223 |
 | mbs scp | 9.3 | Protecting the Election | 2a033950 | covenant | members | members | The transfer breached the agreement's S corporation restrictions — a claim among the members. | IRC 1361(b) |
 | mbr | 9.3 | Partnership Representative | d4a24a46 | authority | manager | members | — | IRC 6223 |
-| sgl | 9.4 | Change in Circumstances | aaccb085 | covenant | member manager | member | the Manager knew the Company had stopped being disregarded and never amended, so I filed the wrong return | Treas. Reg. 301.7701-3 |
 | mul | 9.4 | Tax Elections | 4ca8f78f | authority | manager members | members | — | IRC 754 |
 | scp | 9.4 | S Corporation Status; Intent; Savings Clause | 9ae38848 | benefit | members | members | — | IRC 1361, 1362 |
 | mbr | 9.4 | Tax Elections | 157b3294 | authority | manager members | members | — | IRC 754 |
