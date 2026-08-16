@@ -206,6 +206,26 @@ def para(text, P, **kw):
     )
 
 
+def introduces(text):
+    """Does this paragraph exist to introduce the one after it?
+
+    Two shapes, and both must be held to what follows or they strand at the foot
+    of a page with their content overleaf:
+
+      - it ends in a colon — "the Company shall:" above its lettered list;
+      - it is WHOLLY bold — a provision heading whose text lives in the lettered
+        paragraphs beneath it ("**8.5 Standing Association Rules; Savings
+        Provisions.**"), or the series name above its signature block.
+
+    Only the colon half existed until 16 August, and every heading of the second
+    shape ends in "." rather than ":", so s. 8.5 sat alone at the foot of page 9
+    of SMMEMS. This is one function because the same rule is needed by the body,
+    set-off block and indented-item branches, and fixing it in one of the three
+    is how it survived at all.
+    """
+    return bool(text.rstrip("*_ ").endswith(":") or re.fullmatch(r"\*\*.+\*\*", text))
+
+
 def page_break():
     """A standalone break. Kept only as the fallback below — see stamp_page_break."""
     return '<w:p><w:r><w:br w:type="page"/></w:r></w:p>'
@@ -419,7 +439,7 @@ def body_xml(md, P):
             out.append(
                 para(body, P, sz=P["small_sz"], after=80, keep_lines=True,
                      ind_left=P["quote_ind"], ind_right=P["quote_ind"],
-                     keep_next=body.rstrip("*_ ").endswith(":"))
+                     keep_next=introduces(body))
             )
             i += 1
             continue
@@ -436,7 +456,8 @@ def body_xml(md, P):
         # Indented numbered item, and the manual's "[ ] " checklist lines
         if P["item_ind"] and (re.match(r"^\d+\.\s+", stripped) or stripped.startswith("[ ] ")):
             out.append(para(stripped, P, ind_left=P["item_ind"], after=80,
-                            justify=True, keep_lines=True))
+                            justify=True, keep_lines=True,
+                            keep_next=introduces(stripped)))
             i += 1
             continue
 
@@ -451,10 +472,7 @@ def body_xml(md, P):
                 P,
                 justify=True,
                 after=P["body_after"],
-                # Strip emphasis markers first: a bold lead-in ends "**", not
-                # ":", and those are the signature and exhibit headings most
-                # likely to strand.
-                keep_next=stripped.rstrip("*_ ").endswith(":"),
+                keep_next=introduces(stripped),
             )
         )
         i += 1

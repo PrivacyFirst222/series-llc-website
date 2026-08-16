@@ -89,6 +89,42 @@ def measure(path):
             m = re.search(r'<w:spacing[^/]*w:after="(\d+)"', p)
             heading_afters.append(int(m.group(1)) if m else -1)  # -1 = inherits
 
+    # A paragraph whose every run is bold is a heading standing on its own, and
+    # what it introduces is the paragraph after it. Without keepNext it strands
+    # at the foot of a page — s. 8.5 on page 9 of SMMEMS, found by Adam reading
+    # the document, not by any check here. This is the static half of that: it
+    # cannot see a page, but it can see a heading that is free to be left behind.
+    # Table cells are excluded: a bold header cell is bold-only too, and it
+    # cannot strand — its row carries cantSplit and the header repeats on every
+    # page. Counting them reported 12 in SMMEMS where 3 provisions were at risk.
+    #
+    # And a bold-only paragraph is only at risk when what follows it is BODY
+    # text. A contents entry is followed by another contents entry, and a table
+    # of contents in which every line keeps with the next is one unbreakable
+    # block — the manual's 32 chapter entries are why this rule is "followed by
+    # something that is not itself a heading" rather than "is bold".
+    outside_tables = re.sub(r"<w:tbl>.*?</w:tbl>", "", doc, flags=re.S)
+    seq = [p for p in re.findall(r"<w:p[ >].*?</w:p>", outside_tables, flags=re.S)
+           if "<w:t" in p]
+
+    def bold_only(p):
+        texts = [r for r in re.findall(r"<w:r[ >].*?</w:r>", p, flags=re.S) if "<w:t" in r]
+        return bool(texts) and all("<w:b/>" in r for r in texts)
+
+    stranded = 0
+    for idx, p in enumerate(seq):
+        nxt = seq[idx + 1] if idx + 1 < len(seq) else None
+        if (
+            bold_only(p)
+            and nxt is not None
+            and not bold_only(nxt)
+            and "<w:keepNext/>" not in p
+            # A paragraph that starts its own page cannot be left at the foot
+            # of the previous one.
+            and "<w:pageBreakBefore/>" not in p
+        ):
+            stranded += 1
+
     return {
         "paragraphs": n_paras,
         "justified": count(r'<w:jc w:val="both"/>'),
@@ -107,6 +143,7 @@ def measure(path):
         "page_breaks": page_breaks,
         # 0 would mean every heading sits flush against its text.
         "headings_with_space_below": sum(1 for a in heading_afters if a != 0),
+        "bold_only_without_keepnext": stranded,
     }
 
 
@@ -149,10 +186,30 @@ def check(paths):
     for path in paths:
         name = os.path.basename(path)
         b = base.get(name)
-        if b is None:
-            print(f"SKIP  {name} — no baseline entry")
-            continue
         m = measure(path)
+        if b is None:
+            # No baseline is not a reason to check nothing. Stranding and a
+            # disabled widow control are absolute faults — they need no
+            # original to compare against — and the Statement of Authorized
+            # Representative, which has no original, was the one document in
+            # the set where a pagination defect could ship unmeasured.
+            absolute = []
+            if m["bold_only_without_keepnext"]:
+                absolute.append(
+                    f"stranding: {m['bold_only_without_keepnext']} bold-only heading(s) "
+                    "with no keepNext"
+                )
+            if re.search(r'<w:widowControl w:val="(0|false)"',
+                         zipfile.ZipFile(path).read("word/document.xml").decode("utf8", "replace")):
+                absolute.append("widow control: explicitly disabled somewhere")
+            if absolute:
+                failed.append(name)
+                print(f"FAIL  {name} — no baseline, but:")
+                for a in absolute:
+                    print(f"        {a}")
+            else:
+                print(f"PART  {name} — no baseline entry; pagination checked, formatting not")
+            continue
         r, br = ratios(m), b["ratios"]
         problems = []
         for key in ("justified_pct", "keep_lines_pct", "headings_pct"):
@@ -197,6 +254,14 @@ def check(paths):
         # which is exactly what shipped in all eight agreements.
         if m["headings"] and not m["headings_with_space_below"]:
             problems.append("headings: every one sits flush against the text below it")
+        # Absolute, not relative to a baseline: the originals are not the
+        # authority here, since this is a fault they can have too. One free
+        # heading is one that can be left at the foot of a page.
+        if m["bold_only_without_keepnext"]:
+            problems.append(
+                f"stranding: {m['bold_only_without_keepnext']} bold-only heading(s) "
+                "with no keepNext — free to be left at the foot of a page"
+            )
 
         if problems:
             failed.append(name)

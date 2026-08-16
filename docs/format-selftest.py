@@ -44,6 +44,9 @@ MUTATIONS = [
     ("widow control switched off", "word/document.xml",
      lambda s: s.replace("<w:widowControl/>", '<w:widowControl w:val="0"/>', 1),
      "widow control"),
+    # s. 8.5 on page 9 of SMMEMS: a heading alone above a third of a blank page.
+    ("keepNext stripped from every heading", "word/document.xml",
+     lambda s: s.replace("<w:keepNext/>", ""), "stranding"),
 ]
 
 tmp = tempfile.mkdtemp()
