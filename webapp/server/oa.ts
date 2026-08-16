@@ -94,6 +94,72 @@ function replaceOnce(s: string, from: string | RegExp, to: string, label: string
 
 const money = (n: number) => `$${Math.round(n).toLocaleString("en-US")}`;
 
+/** Fill slots inside ONE section, leaving every word of the master intact.
+ *
+ *  This is what replaceSection should always have been. Every sentence a client
+ *  receives has to come from a master: the generator may put a value into a
+ *  marked slot, choose between alternatives the master spells out, delete an
+ *  omitted provision, or repeat a marked block — and nothing else. It may not
+ *  compose a sentence. Exhibit A was built from a TypeScript template literal
+ *  until 16 August, which is how the S corporation masters' eligible-shareholder
+ *  restriction stayed in the master and never reached a signed document.
+ *
+ *  A missing slot throws rather than passing silently: a slot that is not there
+ *  is a master and a generator that disagree about the document's shape. */
+function fillSection(
+  s: string,
+  heading: string,
+  slots: Record<string, string>,
+  label: string,
+): string {
+  const re = new RegExp(`## ${heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[\\s\\S]*?(?=\n## |$)`);
+  const m = s.match(re);
+  if (!m) throw new Error(`OA template section missing: ${label}`);
+  let sec = m[0];
+  for (const [slot, val] of Object.entries(slots)) {
+    if (!sec.includes(slot)) throw new Error(`OA slot missing in ${label}: ${slot}`);
+    sec = sec.split(slot).join(val);
+  }
+  return s.replace(re, () => sec);
+}
+
+/** Repeat a `<!-- repeat:KEY -->…<!-- /repeat -->` block once per row.
+ *
+ *  Repetition is why Exhibit A was built in code: a table needs one row per
+ *  member and a markdown master has a fixed number of them. The master now
+ *  carries ONE specimen row inside the marker and this repeats it, so the row a
+ *  client sees is the row that was drafted and reviewed. md-to-docx.py strips
+ *  HTML comments, so the markers leave no trace in the Word masters. */
+function expandRepeat(
+  s: string,
+  key: string,
+  rows: Array<Record<string, string>>,
+  label: string,
+): string {
+  const re = new RegExp(
+    `[ \\t]*<!--\\s*repeat:${key}\\s*-->[ \\t]*\\n([\\s\\S]*?)[ \\t]*<!--\\s*/repeat\\s*-->[ \\t]*\\n?`,
+  );
+  // Every block with this key, not the first: Exhibit A has two — the schedule
+  // of interests and the TOD designations — and expanding one of them would
+  // leave the other's marker in the delivered document.
+  let count = 0;
+  while (re.test(s)) {
+    const body = (s.match(re) as RegExpMatchArray)[1];
+    const out = rows
+      .map((r) => {
+        let b = body;
+        for (const [slot, val] of Object.entries(r)) b = b.split(slot).join(val);
+        return b.replace(/\n+$/, "");
+      })
+      .join("\n");
+    s = s.replace(re, () => out + "\n");
+    count += 1;
+    if (count > 50) throw new Error(`OA repeat:${key} did not terminate (${label})`);
+  }
+  if (count === 0) throw new Error(`OA template marker missing: repeat:${key} (${label})`);
+  return s;
+}
+
 /** Replace a whole `## HEADING` section (through the next ## or end). */
 function replaceSection(s: string, heading: string, replacement: string, label: string): string {
   const re = new RegExp(`## ${heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[\\s\\S]*?(?=\n## |$)`);
@@ -272,57 +338,44 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
   }
 
   // ---- Exhibit A ----
+  // Slots only. The master's Exhibit A is its own drafting — including the
+  // sentence about who may inherit, and in the S corporation forms the
+  // restriction that the beneficiary be an eligible shareholder. A sole member
+  // needs no repetition: one member, one row, so every word here is the
+  // master's and the generator supplies four values.
   if (isSingle) {
     const m = inputs.members[0];
-    const exhibitA = `## EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION
-
-**Company:** ${co}
-
-| Item | Information |
-|---|---|
-| Member name | ${m.name} |
-| Member address | ${m.address} |
-| Membership Interest | 100% (single class${isSCorp ? " of ownership" : ""}) |
-| Initial contribution to the Company | ${inputs.contributionToCompany || m.contribution || "—"} |
-| Date of contribution | ${inputs.effectiveDate} |
-
-**Transfer on Death designation (ss. 711.50–711.512, Fla. Stat.):**
-
-Upon the death of the Member, the Membership Interest shall pass to: **${m.todBeneficiary || "No beneficiary designated"}**${m.todBeneficiary ? "" : " — the Membership Interest passes as provided by law"}, subject in all events to this Agreement.${
-      // The S corporation masters put the eligible-shareholder limit on the TOD
-      // line of Exhibit A, and this builder replaces that whole section — so
-      // without this the restriction is in the master and absent from the
-      // document the client actually signs.
-      isSCorp
-        ? " A designation is effective only in favor of a beneficiary that is an eligible S corporation shareholder (Section 9.3(b))."
-        : ""
-    }
-`;
-    s = replaceSection(s, "EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION", "[[pagebreak]]\n\n" + exhibitA, "Exhibit A single");
+    s = fillSection(
+      s,
+      "EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION",
+      {
+        "$[AMOUNT] [and/or described property]":
+          inputs.contributionToCompany || m.contribution || "—",
+        "[DATE]": inputs.effectiveDate,
+        // The master's own sentence carries the fallback: "…shall pass to:
+        // **X**, or if none is designated or the designation fails, the
+        // Membership Interest passes as provided by law." So an absent
+        // beneficiary is a value, not a different sentence.
+        "[TOD BENEFICIARY NAME(S)]": m.todBeneficiary || "None",
+      },
+      "Exhibit A single",
+    );
   } else {
+    // The master carries ONE specimen row inside a repeat marker for each of
+    // the two tables; this fills it once per member. Every heading, every
+    // column, the Total row and the sentence about a failed designation are the
+    // master's own words — the generator supplies five values per member and
+    // nothing else.
     const pctOf = (m: OaMemberInput) => m.percentageLabel ?? `${m.percentage}%`;
-    const rows = inputs.members
-      .map((m) => `| ${m.name} | ${m.address} | ${pctOf(m)} | ${m.contribution || "—"} | ${inputs.effectiveDate} |`)
-      .join("\n");
-    const todRows = inputs.members.map((m) => `| ${m.name} | ${m.todBeneficiary || "None"} |`).join("\n");
-    const exhibitA = `## EXHIBIT A — MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS
-
-**Company:** ${co}
-
-| Member name | Address | Percentage Interest | Initial contribution to the Company | Date |
-|---|---|---|---|---|
-${rows}
-| **Total** | | **100%** | | |
-
-**Transfer on Death designations (ss. 711.50–711.512, Fla. Stat.):**
-
-| Designating Member | TOD beneficiary (any person or entity) |
-|---|---|
-${todRows}
-
-If no beneficiary is designated, or a designation fails, the Member's interest passes as provided by law, subject to this Agreement.
-`;
-    s = replaceSection(s, "EXHIBIT A — MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS", "[[pagebreak]]\n\n" + exhibitA, "Exhibit A multi");
+    const rows = inputs.members.map((m) => ({
+      "[MEMBER NAME]": m.name,
+      "[MEMBER ADDRESS]": m.address,
+      "[MEMBER SHARE]": pctOf(m),
+      "[MEMBER CONTRIBUTION]": m.contribution || "—",
+      "[MEMBER DATE]": inputs.effectiveDate,
+      "[MEMBER TOD]": m.todBeneficiary || "None",
+    }));
+    s = expandRepeat(s, "member", rows, "Exhibit A multi");
   }
 
   // ---- Series Exhibits + Asset Schedules ----

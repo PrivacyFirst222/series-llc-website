@@ -416,18 +416,18 @@ _____________________________
 
 | Member name | Address | Percentage Interest | Initial contribution to the Company | Date |
 |---|---|---|---|---|
-| [MEMBER 1] | [ADDRESS] | [___]% | $[AMOUNT] [and/or described property] | [DATE] |
-| [MEMBER 2] | [ADDRESS] | [___]% | $[AMOUNT] [and/or described property] | [DATE] |
-| [MEMBER 3] | [ADDRESS] | [___]% | $[AMOUNT] [and/or described property] | [DATE] |
+<!-- repeat:member -->
+| [MEMBER NAME] | [MEMBER ADDRESS] | [MEMBER SHARE] | [MEMBER CONTRIBUTION] | [MEMBER DATE] |
+<!-- /repeat -->
 | **Total** | | **100%** | | |
 
 **Transfer on Death designations (ss. 711.50–711.512, Fla. Stat.):**
 
 | Designating Member | TOD beneficiary (any person or entity) |
 |---|---|
-| [MEMBER 1] | [NAME(S) / None] |
-| [MEMBER 2] | [NAME(S) / None] |
-| [MEMBER 3] | [NAME(S) / None] |
+<!-- repeat:member -->
+| [MEMBER NAME] | [MEMBER TOD] |
+<!-- /repeat -->
 
 If no beneficiary is designated, or a designation fails, the Member's interest passes as provided by law, subject to this Agreement.
 
