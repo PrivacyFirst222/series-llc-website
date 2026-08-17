@@ -143,7 +143,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 ## ARTICLE 5 — MANAGEMENT
 
-**5.1 Manager-Managed; the Manager.** The Company is **manager-managed** as provided in its Articles of Organization and this Agreement. [MANAGER APPOINTMENT] If more than one person is serving as Manager, every act, approval, consent, decision, or determination of the Manager under this Agreement requires the approval of a majority of the Managers then serving, and no Manager acting alone has actual authority to act for the Company or for any Protected Series. Anything required to be delivered to the Manager may be delivered to any Manager, and a covenant, restriction, or standard of conduct stated in this Agreement as applying to the Manager applies to each Manager individually. This Section governs among the Member and the Managers; it does not affect the agency rights of a Manager under s. 605.04074(2)(b), Florida Statutes, as to a person who dealt with the Manager without knowledge or notice that the Manager lacked authority. A Manager need not be a Member. A Manager serves until that Manager's resignation, removal by the Member, death, or Incapacity; the Member may remove and replace a Manager, appoint an additional Manager, and shall fill any vacancy, by a signed writing delivered to the Company. If a Manager ceases to serve as Manager for any reason, the remaining Managers shall continue to serve.
+**5.1 Manager-Managed; the Manager.** The Company is **manager-managed** as provided in its Articles of Organization and this Agreement. <!-- one:manager -->The initial Manager is [MANAGER NAMES].<!-- /one --><!-- many:manager -->The initial Managers are [MANAGER NAMES].<!-- /many --> If more than one person is serving as Manager, every act, approval, consent, decision, or determination of the Manager under this Agreement requires the approval of a majority of the Managers then serving, and no Manager acting alone has actual authority to act for the Company or for any Protected Series. Anything required to be delivered to the Manager may be delivered to any Manager, and a covenant, restriction, or standard of conduct stated in this Agreement as applying to the Manager applies to each Manager individually. This Section governs among the Member and the Managers; it does not affect the agency rights of a Manager under s. 605.04074(2)(b), Florida Statutes, as to a person who dealt with the Manager without knowledge or notice that the Manager lacked authority. A Manager need not be a Member. A Manager serves until that Manager's resignation, removal by the Member, death, or Incapacity; the Member may remove and replace a Manager, appoint an additional Manager, and shall fill any vacancy, by a signed writing delivered to the Company. If a Manager ceases to serve as Manager for any reason, the remaining Managers shall continue to serve.
 
 **5.2 Management of Each Protected Series.** Each Protected Series is **manager-managed**. The Series Exhibit for a Protected Series may name one or more Protected Series Managers of that Protected Series. If it names none, each person then serving as a Manager of the Company is a Protected Series Manager of that Protected Series. As permitted by s. 605.2107(1)(n), Florida Statutes, this Section varies s. 605.2304(2) so that the Protected Series Managers are the Manager or Managers of the Company rather than the Company itself. A Protected Series Manager has, with respect to its Protected Series, the rights, powers, and duties that a manager of a manager-managed limited liability company has under the Act, subject to this Agreement and the Series Exhibit, and may be removed and replaced with respect to that Protected Series by the Member.
 
@@ -325,9 +325,13 @@ IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of
 _____________________________
 [MEMBER NAME]
 
-**ACKNOWLEDGED AND AGREED BY MANAGER:**
+<!-- one:manager -->**ACKNOWLEDGED AND AGREED BY MANAGER:**<!-- /one --><!-- many:manager -->**ACKNOWLEDGED AND AGREED BY MANAGERS:**<!-- /many -->
 
-[MANAGER SIGNATURE BLOCKS]
+<!-- repeat:manager -->
+_____________________________
+[MANAGER NAME], Manager
+
+<!-- /repeat -->
 
 [[pagebreak]]
 
@@ -364,7 +368,7 @@ Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENE
 | Special terms (if any) | [None / variations from the base Agreement — may not vary Article 8, Article 9, or non-variable provisions of the Act] |
 | Dissolution events specific to this Protected Series (if any) | [None / describe] |
 
-**Adopted effective [DATE] by the Company, acting through its Manager:**
+<!-- one:manager -->**Adopted effective [DATE] by the Company, acting through its Manager:**<!-- /one --><!-- many:manager -->**Adopted effective [DATE] by the Company, acting through its Managers:**<!-- /many -->
 
 <!-- repeat:adopter -->
 _____________________________

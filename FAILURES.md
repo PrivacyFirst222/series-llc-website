@@ -1464,6 +1464,79 @@ The false sentence in P23 is replaced with the correction and a pointer here. Th
 proposal it generated — rewrite every older entry — is withdrawn pending an actual
 reading: 5 of 37 read so far, and the honest next step is to read the other 32
 and report counts before touching any of them.
+## P25 — One of four callers fixed, and the other three reported as an environment problem
+**17 August 2026** · the owner's board
+
+### THE FAILURE
+
+Building the board I reshaped `GET /admin/orders/:id` from the raw database row
+into a structured object, which dropped `square_order_id`. The end-to-end suite
+reads that field to address its simulated Square webhook. Three payment
+assertions failed.
+
+I found the cause, added `squareOrderId` to the response, and fixed **the one
+caller the failure surfaced** — `e2e.ts:269`. Three more callers read the same
+field from the same endpoint: lines 621, 855 and 930. `grep square_order_id
+server/e2e.ts` returns all four and takes two seconds.
+
+The run after my fix still failed 11 assertions. **I attributed that to the
+environment** — first a wedged four-day-old dev server, then two servers
+contending on one PGlite database — reported both to Adam as the likely cause,
+and committed the board in `27b72b9` with "NOT verified: a clean full e2e."
+
+Both attributions were wrong. The server restart changed nothing; the same 11
+failed. And the database is **Neon**, not PGlite — a cloud database with a single
+writer, so the contention story was not merely unproven, it was impossible. Every
+one of the 11 traced to the three callers I had not fixed: the webhook was posted
+with `order_id: undefined`, matched no order, returned 200 — which the suite reads
+as success — and created no client, so everything downstream failed
+unauthenticated.
+
+### WHY IT HAPPENED
+
+**A failing test names one caller, and the named one feels like the population.**
+The suite told me line 269. Fixing it turned that assertion green, and a green
+assertion is a completion signal — the thing that had been wrong is now right, so
+the work is done. **Nothing in a passing test says how many other callers exist**,
+and I let the test's report of the failure stand in for an inventory of the
+change I had made. This is C1 and C3 exactly, both recorded, one of them twice,
+the second instance six days after the first.
+
+**Reshaping a response did not register as a breaking change.** I was adding
+fields for a new panel; removing `square_order_id` was incidental to that, and
+incidental changes do not prompt the question "who reads this." Had I been
+deleting the field on purpose I would have looked for readers. Because the
+deletion was a side effect of restructuring, it inherited the low ceremony of the
+thing it was a side effect of.
+
+**When the fix did not work, I reached for an external cause and stopped
+looking.** The server had been up four days; that is a real fact and a plausible
+story, and plausibility is where I stopped. An environmental explanation is
+attractive precisely because it terminates the investigation without implicating
+the change I just made — and the more recently I have made a change, the more I
+want it not to be that. I then built a second server to "prove the code fine",
+which proved only that code paths run in isolation, and invented database
+contention to explain why the proof did not transfer. **I never checked what
+database it was.** Three fabricated-in-good-faith environmental claims, each
+delivered to Adam with more confidence than the one before.
+
+**The suite's own success criterion hid it.** `check("multi-member order paid",
+mSim.status === 200)` passes when the webhook returns 200, and the webhook returns
+200 for an event it cannot match — correct behaviour for a webhook, useless as an
+assertion. So the step that actually failed reported success, and the failure
+surfaced three steps later as "couple client signs in", pointing away from its
+cause.
+
+### FIXED BY
+
+All three remaining callers now read `squareOrderId`. The two that read the same
+field from `/admin/services/:id` are untouched — that endpoint was never
+reshaped, and checking rather than assuming is the point of this entry.
+
+Not fixed, and worth more than the bug: `check("multi-member order paid", status
+=== 200)` still passes when nothing was paid. An assertion on a webhook should
+require the effect — the order's status, or the client's existence — not the
+acknowledgement.
 ---
 
 # MECHANISM INDEX
@@ -1619,5 +1692,14 @@ tested" can be used against me tomorrow. — P23
 **M27 · Self-accusation exempted from fact-checking.** Overstating my own failures
 performs rigour at no apparent cost, so it is the one class of claim I never
 verify — and it puts false statements into the record Adam relies on. — P24
+
+**M28 · An environmental explanation reached for the moment my own change is the
+other candidate.** Plausible, external, and it terminates the search without
+implicating what I just did. Three such claims in a row, each more confident. —
+P25
+
+**M29 · A failing test's report of one caller, mistaken for the inventory.** The
+test names where it broke; it never says how many other places read the same
+thing. — P25
 
 

@@ -146,8 +146,8 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbr mbs | 4.11 | Transfer on Death Designation | c63e7ddb | benefit | company | members third-party | — | ss. 711.50-711.512, Fla. Stat. |
 | mul scp | 4.12 | Incapacity of a Member | afdee6cc | benefit | company manager members | members | — | ch. 744, Fla. Stat.; s. 605.0602(6) |
 | mbr mbs | 4.12 | Incapacity of a Member | 09d33983 | benefit | company members | members | — | ch. 744, Fla. Stat.; s. 605.0602(6) |
-| sgl sgs | 5.1 | Manager-Managed; the Manager | b44b0edc | authority | manager member | member manager | — | ss. 605.04072, 605.04073(2), 605.04074(2)(b) |
-| mul scp | 5.1 | Manager-Managed; the Manager | f42797c3 | authority | manager members | members manager | — | ss. 605.04072, 605.04073(2), 605.04074(2)(b) |
+| sgl sgs | 5.1 | Manager-Managed; the Manager | 0af0229e | authority | manager member | member manager | — | ss. 605.04072, 605.04073(2), 605.04074(2)(b); the appointment sentence moved from oa.ts into the master on 17 August as a singular/plural pair — same operative terms, no substantive change |
+| mul scp | 5.1 | Manager-Managed; the Manager | 6e7136b6 | authority | manager members | members manager | — | ss. 605.04072, 605.04073(2), 605.04074(2)(b); the appointment sentence moved from oa.ts into the master on 17 August as a singular/plural pair — same operative terms, no substantive change |
 | mbr mbs | 5.1 | Member-Managed | b9f7026e | authority | members | members | — | ss. 605.0407(1), 605.04073(1) |
 | sgm sgms | 5.1 | Member-Managed | c3a381a5 | authority | members | members | — | ss. 605.0407(1), 605.04073(1) |
 | sgl sgs | 5.2 | Management of Each Protected Series | 9391162b | authority | manager | member series | — | ss. 605.2304(2), 605.2107(1)(n) |

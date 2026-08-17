@@ -618,7 +618,7 @@ if (mint.status === 200) {
   if (mSim.status === 404) {
     const adm = await api("/api/admin/login", { method: "POST", body: JSON.stringify({ password: "dev-admin" }) });
     const full = await api(`/api/admin/orders/${mOrderId}`, { cookies: adm.cookie });
-    const sqId = (full.body?.data as { square_order_id?: string })?.square_order_id;
+    const sqId = (full.body?.data as { squareOrderId?: string })?.squareOrderId;
     mSim = await api("/api/square/webhook", {
       method: "POST",
       body: JSON.stringify({
@@ -852,7 +852,7 @@ if (mint.status === 200) {
       method: "POST",
       body: JSON.stringify({
         event_id: `e2e-mm-${mmId}`, type: "payment.updated",
-        data: { object: { payment: { id: `e2e-pay-mm-${mmId.slice(0, 8)}`, status: "COMPLETED", order_id: full.body?.data?.square_order_id } } },
+        data: { object: { payment: { id: `e2e-pay-mm-${mmId.slice(0, 8)}`, status: "COMPLETED", order_id: full.body?.data?.squareOrderId } } },
       }),
     });
   }
@@ -927,7 +927,7 @@ if (mint.status === 200) {
       method: "POST",
       body: JSON.stringify({
         event_id: `e2e-acct-${aId}`, type: "payment.updated",
-        data: { object: { payment: { id: `e2e-pay-acct-${aId.slice(0, 8)}`, status: "COMPLETED", order_id: full.body?.data?.square_order_id } } },
+        data: { object: { payment: { id: `e2e-pay-acct-${aId.slice(0, 8)}`, status: "COMPLETED", order_id: full.body?.data?.squareOrderId } } },
       }),
     });
   }

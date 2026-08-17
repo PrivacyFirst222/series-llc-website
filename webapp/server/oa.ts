@@ -173,6 +173,26 @@ function expandRepeat(
   return s;
 }
 
+/** Choose between the singular and plural wordings the master spells out.
+ *
+ *  `<!-- one:KEY -->…<!-- /one -->` and `<!-- many:KEY -->…<!-- /many -->` are a
+ *  pair of alternatives, exactly like the two competition alternatives in s. 4.7
+ *  that this generator has always selected between correctly. One survives; the
+ *  other is deleted. Neither is written here.
+ *
+ *  Throws when a key appears with no pair — a master and a generator that
+ *  disagree about which wordings exist should fail the build, not ship whichever
+ *  half happens to be present. */
+function chooseNumber(s: string, key: string, singular: boolean): string {
+  const keep = new RegExp(`<!--\\s*${singular ? "one" : "many"}:${key}\\s*-->([\\s\\S]*?)<!--\\s*/${singular ? "one" : "many"}\\s*-->`, "g");
+  const drop = new RegExp(`<!--\\s*${singular ? "many" : "one"}:${key}\\s*-->[\\s\\S]*?<!--\\s*/${singular ? "many" : "one"}\\s*-->`, "g");
+  if (!keep.test(s) || !drop.test(s)) {
+    throw new Error(`OA template marker missing: one:${key} / many:${key}`);
+  }
+  keep.lastIndex = 0;
+  return s.replace(drop, "").replace(keep, (_m, inner: string) => inner);
+}
+
 /** Replace a whole `## HEADING` section (through the next ## or end). */
 function replaceSection(s: string, heading: string, replacement: string, label: string): string {
   const re = new RegExp(`## ${heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[\\s\\S]*?(?=\n## |$)`);
@@ -238,28 +258,22 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
   // Member-managed masters name no Manager at all.
   if (!isMemberManaged) {
     if (managerNames.length === 0) throw new Error("OA: at least one manager is required");
+    // Both numbers are written out in the master and one is chosen here. Until
+    // 17 August this sentence — "The initial Managers are X and Y." — was
+    // composed in TypeScript, along with the signature label, the
+    // acknowledgment heading and the Series Exhibit adoption line. They were
+    // the last legal text in a delivered agreement that Adam could not find by
+    // reading a master.
+    s = chooseNumber(s, "manager", managerNames.length === 1);
     const bold = managerNames.map((n) => `**${n}**`);
-    const joined =
-      bold.length === 1 ? bold[0] : `${bold.slice(0, -1).join(", ")} and ${bold[bold.length - 1]}`;
-    s = replaceOnce(
-      s,
-      "[MANAGER APPOINTMENT]",
-      managerNames.length === 1 ? `The initial Manager is ${joined}.` : `The initial Managers are ${joined}.`,
-      "manager appointment",
+    s = s.split("[MANAGER NAMES]").join(
+      bold.length === 1 ? bold[0] : `${bold.slice(0, -1).join(", ")} and ${bold[bold.length - 1]}`,
     );
-    if (managerNames.length > 1) {
-      s = replaceOnce(
-        s,
-        "**ACKNOWLEDGED AND AGREED BY MANAGER:**",
-        "**ACKNOWLEDGED AND AGREED BY MANAGERS:**",
-        "manager signature heading",
-      );
-    }
-    s = replaceOnce(
+    s = expandRepeat(
       s,
-      "[MANAGER SIGNATURE BLOCKS]",
-      managerNames.map((n) => `_____________________________\n${n}, Manager`).join("\n\n"),
-      "manager signature blocks",
+      "manager",
+      managerNames.map((n) => ({ "[MANAGER NAME]": n })),
+      "manager signatures",
     );
   }
 
