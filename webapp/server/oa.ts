@@ -303,7 +303,15 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
 
     // Capital calls
     if (inputs.includeCapitalCalls) {
-      s = s.split("$[CAP]").join(money(inputs.capitalCallCap ?? 25000));
+      // No default, for the same reason as the borrowing threshold: an annual
+      // per-owner capital-call ceiling is the client's decision. This one is
+      // unreachable today — the server requires a cap whenever capital calls
+      // are included — but a default that is safe only because of a condition
+      // somewhere else is a default waiting for that condition to move.
+      if (inputs.capitalCallCap === undefined) {
+        throw new Error("OA: capital calls are included but no annual cap was given");
+      }
+      s = s.split("$[CAP]").join(money(inputs.capitalCallCap));
     } else {
       s = replaceSectionBody(s, /\*\*6\.2 Additional Capital Contributions\.[^\n]*\n[\s\S]*?(?=\n\*\*6\.3)/, "**6.2 Additional Capital Contributions.** [Reserved.]\n\n", "6.2 omit");
       s = replaceSectionBody(s, /\*\*6\.3 Failure to Contribute\.\*\*[\s\S]*?(?=\n\*\*6\.4)/, "**6.3 Failure to Contribute.** [Reserved.]\n\n", "6.3 omit");
