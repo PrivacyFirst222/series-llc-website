@@ -115,6 +115,24 @@ const extendedFormSchema = formationFormSchema
         message: "Choose member-managed or manager-managed.",
       });
     }
+    // Check 6 of this file's own docstring, which until 17 August was described
+    // here and implemented only in the browser (stepValidation.ts). An order
+    // reaching the server with no MGR produced an agreement reading "The initial
+    // Manager is <first member>" — an office nobody appointed anyone to — because
+    // oaSeed filled the empty list from the member list. An authorized
+    // representative signs the Articles and manages nothing, so an AR can never
+    // satisfy this.
+    if (
+      data.managementStructure === "MANAGER_MANAGED" &&
+      !(data.managers ?? []).some((m) => (m.role ?? "MGR") === "MGR")
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["managers"],
+        message:
+          "A manager-managed LLC needs at least one Manager. An authorized representative signs the Articles and manages nothing.",
+      });
+    }
   });
 
 /** Mirror the form's behavior before validating:

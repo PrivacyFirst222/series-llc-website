@@ -694,7 +694,17 @@ async function oaSeed(clientId: string): Promise<{
     .filter((e) => (e.role ?? "MGR") === "MGR")
     .map((e) => (e.fullName || e.businessEntityName || "").trim())
     .filter(Boolean);
-  if (managerNames.length === 0 && members[0]?.name) managerNames.push(members[0].name);
+  // No fallback. Naming the first member as Manager because the list was
+  // empty appoints someone to an office the client never put them in — the
+  // same fault as the comment above warns about for authorized
+  // representatives, one step removed. The order should never have been
+  // accepted without a Manager (server/validation.ts, check 6); if one
+  // reaches here, refuse rather than invent.
+  if (managementStructure === "MANAGER_MANAGED" && managerNames.length === 0) {
+    throw new Error(
+      "This order is manager-managed but lists no Manager. Correct the order before generating an agreement.",
+    );
+  }
   // Series = intake series + any fulfilled portal series orders
   const svcSeries = await db.query<{ details: unknown }>(
     "SELECT details FROM service_orders WHERE client_id = $1 AND type = 'series' AND status IN ('in_progress','fulfilled')",
