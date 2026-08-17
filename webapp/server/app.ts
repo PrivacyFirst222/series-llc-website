@@ -1090,7 +1090,10 @@ app.post("/portal/oa/generate", async (c) => {
      VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
     [session.clientId, doc[0].id, OA_TEMPLATE_VERSION, inputs.amendedRestated, JSON.stringify(inputs), nextGenerationNumber],
   );
-  return c.json({ data: { generationId: gen[0].id, documentId: doc[0].id, title } });
+  // `version` names which of the eight masters was used. Without it the only
+  // way to know is to re-read the generations list, so nothing that calls this
+  // route can tell a correct routing from a wrong one.
+  return c.json({ data: { generationId: gen[0].id, documentId: doc[0].id, title, version } });
 });
 
 /** Consent + Series Exhibit for a series established after formation.

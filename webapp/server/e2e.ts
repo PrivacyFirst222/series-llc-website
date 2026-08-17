@@ -468,6 +468,7 @@ if (mint.status === 200) {
   check("OA answers save", saveAns.status === 200);
   const gen1 = await api("/api/portal/oa/generate", { method: "POST", cookies: setPw.cookie, body: JSON.stringify(oaAnswers) });
   check("OA generates", gen1.status === 200, gen1.body);
+  check("a sole owner who is member-managed gets the member-single master", gen1.body?.data?.version === "member-single", gen1.body?.data);
   check(
     "OA title carries the taxation designation",
     /^(Single-Member|Partnership|S Corporation) Operating Agreement/.test(gen1.body?.data?.title ?? ""),
@@ -478,9 +479,11 @@ if (mint.status === 200) {
     body: JSON.stringify({ ...oaAnswers, firstOrAmended: "amended" }),
   });
   check("OA regenerates as Amended & Restated", gen2.status === 200 && gen2.body?.data?.title?.startsWith("Amended and Restated"), gen2.body?.data);
+  // Was: typeof version === "string" — true for all eight masters, so it could
+  // not tell a correct routing from a wrong one. Name the master.
   check(
-    "generation records carry the taxation version",
-    typeof (await api("/api/portal/oa", { cookies: setPw.cookie })).body?.data?.generations?.[0]?.version === "string",
+    "the stored generation records which master was used",
+    (await api("/api/portal/oa", { cookies: setPw.cookie })).body?.data?.generations?.[0]?.version === "member-single",
   );
   const oaAfter = await api("/api/portal/oa", { cookies: setPw.cookie });
   check("generation history has 2 entries", (oaAfter.body?.data?.generations ?? []).length === 2);
@@ -539,6 +542,7 @@ if (mint.status === 200) {
     body: JSON.stringify({ ...oaAnswers, sElection: true }),
   });
   check("sole-owner S corp agreement generates", genS.status === 200, genS.body);
+  check("...and member-single-s once the S election is on", genS.body?.data?.version === "member-single-s", genS.body?.data);
   const sDocId = genS.body?.data?.documentId as string;
   const sPdf = await fetch(`${BASE}/api/portal/documents/${sDocId}/download`, { headers: { Cookie: setPw.cookie } });
   const sBytes = new Uint8Array(await sPdf.arrayBuffer());
@@ -666,6 +670,7 @@ if (mint.status === 200) {
 
   const mGen = await api("/api/portal/oa/generate", { method: "POST", cookies: mPw.cookie, body: JSON.stringify(coupleAnswers) });
   check("TBE couple agreement generates", mGen.status === 200, mGen.body);
+  check("two owners, manager-managed, gets the multi master", mGen.body?.data?.version === "multi", mGen.body?.data);
   const mDocId = mGen.body?.data?.documentId as string;
   const mPdf = await fetch(`${BASE}/api/portal/documents/${mDocId}/download`, { headers: { Cookie: mPw.cookie } });
   const mBytes = new Uint8Array(await mPdf.arrayBuffer());
@@ -677,6 +682,7 @@ if (mint.status === 200) {
     body: JSON.stringify({ ...coupleAnswers, sElection: true, series: [{}] }),
   });
   check("multi-owner S corp agreement generates", sCoupleGen.status === 200, sCoupleGen.body);
+  check("...and the s master once the S election is on", sCoupleGen.body?.data?.version === "s", sCoupleGen.body?.data);
   const sCoupleDocId = sCoupleGen.body?.data?.documentId as string;
   const sCouplePdf = await fetch(`${BASE}/api/portal/documents/${sCoupleDocId}/download`, { headers: { Cookie: mPw.cookie } });
   const sCoupleBytes = new Uint8Array(await sCouplePdf.arrayBuffer());
@@ -895,6 +901,7 @@ if (mint.status === 200) {
   check("fractional ownership generates", goodFractions.status === 200, goodFractions.body);
   const mmGen = await api("/api/portal/oa/generate", { method: "POST", cookies: mmPw.cookie, body: JSON.stringify(mmAnswers) });
   check("member-managed agreement generates", mmGen.status === 200, mmGen.body);
+  check("two owners, member-managed, gets the member master", mmGen.body?.data?.version === "member", mmGen.body?.data);
   const mmDoc = mmGen.body?.data?.documentId as string;
   const mmPdf = await fetch(`${BASE}/api/portal/documents/${mmDoc}/download`, { headers: { Cookie: mmPw.cookie } });
   const mmBytes = new Uint8Array(await mmPdf.arrayBuffer());
@@ -903,6 +910,124 @@ if (mint.status === 200) {
     method: "POST", cookies: mmPw.cookie, body: JSON.stringify({ ...mmAnswers, sElection: true, series: [{}] }),
   });
   check("member-managed S corp agreement generates", mmSGen.status === 200, mmSGen.body);
+  check("...and the member-s master once the S election is on", mmSGen.body?.data?.version === "member-s", mmSGen.body?.data);
+}
+
+// 16b. Manager-managed SOLE owner — the two forms nothing else exercised.
+//
+// The suite covered six of eight: the main flow is a member-managed sole owner
+// (member-single, member-single-s), s. 15 is a manager-managed pair (multi, s),
+// s. 16 a member-managed pair (member, member-s). "single" and "single-s" were
+// untested — and they are the two carrying s. 5.4 Actions Requiring Member
+// Approval, where a sole owner was silently given a $25,000 borrowing limit
+// nobody chose. There was no client in the database with this shape, which is
+// why that defect had to be verified in the generator instead of end to end.
+{
+  const smEmail = `e2e-sm-${Math.random().toString(36).slice(2, 8)}@example.com`;
+  const smData = {
+    ...formData,
+    managementStructure: "MANAGER_MANAGED",
+    includeManagementStatementInArticles: true,
+    managers: [
+      {
+        id: "mgr1", role: "MGR", personOrEntity: "INDIVIDUAL", fullName: "Robin Vale",
+        streetAddress1: "9 Harbor Road", city: "Naples", state: "FL", zip: "34102", country: "United States",
+      },
+    ],
+    members: [
+      { ...structuredClone(defaultFormData.members[0]), fullLegalName: "Alex Vale", address1: "9 Harbor Road", city: "Naples", state: "FL", zip: "34102" },
+    ],
+    correspondentName: "Alex Vale",
+    correspondentEmail: smEmail,
+    confirmCorrespondentEmail: smEmail,
+    registeredAgentName: "Alex Vale",
+    registeredAgentAcceptanceName: "Alex Vale",
+    registeredAgentElectronicSignature: "Alex Vale",
+    authorizedRepresentativeName: "Alex Vale",
+    authorizedRepresentativeSignature: "Alex Vale",
+    desiredLlcName: "E2E Harbor Single Manager",
+    series: [{ id: "s1", name: "E2E Harbor Single Manager, LLC, PS A" }],
+    orderEin: false,
+    orderSElection: false,
+  };
+
+  // An order with no Manager must be refused — server/validation.ts check 6,
+  // which until 17 August existed only in the browser.
+  const noMgr = await api("/api/orders", { method: "POST", body: JSON.stringify({ ...smData, managers: [] }) });
+  check("manager-managed order with no Manager is rejected", noMgr.status === 400, noMgr.body);
+  const arOnly = await api("/api/orders", {
+    method: "POST",
+    body: JSON.stringify({ ...smData, managers: [{ ...smData.managers[0], role: "AR" }] }),
+  });
+  check("an authorized representative does not satisfy the Manager requirement", arOnly.status === 400, arOnly.body);
+
+  const smOrder = await api("/api/orders", { method: "POST", body: JSON.stringify(smData) });
+  check("manager-managed sole-owner order accepted", smOrder.status === 200, smOrder.body);
+  const smId = smOrder.body?.data?.orderId as string;
+  let smPay = await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: smId }) });
+  if (smPay.status === 404) {
+    const adm = await api("/api/admin/login", { method: "POST", body: JSON.stringify({ password: "dev-admin" }) });
+    const full = await api(`/api/admin/orders/${smId}`, { cookies: adm.cookie });
+    smPay = await api("/api/square/webhook", {
+      method: "POST",
+      body: JSON.stringify({
+        event_id: `e2e-sm-${smId}`, type: "payment.updated",
+        data: { object: { payment: { id: `e2e-pay-sm-${smId.slice(0, 8)}`, status: "COMPLETED", order_id: full.body?.data?.squareOrderId } } },
+      }),
+    });
+  }
+  check("manager-managed sole-owner order paid", smPay.status === 200);
+  const smMint = await api("/api/dev/mint-reset-token", { method: "POST", body: JSON.stringify({ email: smEmail }) });
+  const smPw = await api("/api/auth/set-password", {
+    method: "POST", body: JSON.stringify({ token: smMint.body?.data?.token, password: "e2e-password-4" }),
+  });
+  check("manager-managed sole owner signs in", smPw.status === 200, smPw.body);
+  const smSeed = await api("/api/portal/oa", { cookies: smPw.cookie });
+  check(
+    "seed reports a sole owner who is NOT member-managed",
+    smSeed.body?.data?.version === "single" && smSeed.body?.data?.multiOwner === false && smSeed.body?.data?.memberManaged === false,
+    smSeed.body?.data,
+  );
+
+  const smAnswers = {
+    firstOrAmended: "first", effectiveDate: "2026-08-08", authorized: true,
+    contributionToCompany: "$2,500 cash", series: [{}],
+  };
+  // The defect this case exists for: without a borrowing limit the agreement
+  // used to say $25,000 on nobody's authority. It must now be refused.
+  const noThreshold = await api("/api/portal/oa/generate", {
+    method: "POST", cookies: smPw.cookie, body: JSON.stringify(smAnswers),
+  });
+  check("sole owner on a manager-managed form must set the borrowing limit", noThreshold.status === 400, noThreshold.body);
+
+  const smGen = await api("/api/portal/oa/generate", {
+    method: "POST", cookies: smPw.cookie, body: JSON.stringify({ ...smAnswers, borrowingThreshold: 60000 }),
+  });
+  check("manager-managed sole-owner agreement generates (single)", smGen.status === 200, smGen.body);
+  check("a sole owner who is manager-managed gets the single master", smGen.body?.data?.version === "single", smGen.body?.data);
+  const smAfter = await api("/api/portal/oa", { cookies: smPw.cookie });
+  check(
+    "it was built on the 'single' master",
+    smAfter.body?.data?.generations?.[0]?.version === "single",
+    smAfter.body?.data?.generations?.[0],
+  );
+  const smDoc = smGen.body?.data?.documentId as string;
+  const smPdf = await fetch(`${BASE}/api/portal/documents/${smDoc}/download`, { headers: { Cookie: smPw.cookie } });
+  const smBytes = new Uint8Array(await smPdf.arrayBuffer());
+  check("manager-managed sole-owner PDF downloads", smPdf.ok && smBytes[0] === 0x25 && smBytes[1] === 0x50, { status: smPdf.status });
+
+  const smSGen = await api("/api/portal/oa/generate", {
+    method: "POST", cookies: smPw.cookie,
+    body: JSON.stringify({ ...smAnswers, borrowingThreshold: 60000, sElection: true, series: [{}] }),
+  });
+  check("manager-managed sole-owner S corp agreement generates (single-s)", smSGen.status === 200, smSGen.body);
+  check("...and single-s once the S election is on", smSGen.body?.data?.version === "single-s", smSGen.body?.data);
+  const smSAfter = await api("/api/portal/oa", { cookies: smPw.cookie });
+  check(
+    "it was built on the 'single-s' master",
+    smSAfter.body?.data?.generations?.[0]?.version === "single-s",
+    smSAfter.body?.data?.generations?.[0],
+  );
 }
 
 // 17. Account settings: change password, change email (verified two-step)
