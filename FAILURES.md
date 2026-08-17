@@ -64,6 +64,8 @@ folds silently into the next commit.
 
 ## L1 — Every one of the five agreements was built on an ownership structure the Act forbids
 
+### THE FAILURE
+
 **Date:** through 9 August 2026 · **Evidence:** commit `b3e6196`
 
 **What I did.** I drafted the entire operating-agreement product on the premise
@@ -82,8 +84,7 @@ Adam reversed the architecture. Each series is now established with no associate
 members, so the Company owns the protected-series transferable interests under
 s. 605.2303(2) and is the protected-series manager under s. 605.2304(2).
 
-**Why.**
-
+### WHY IT HAPPENED
 *The premise was never a question.* "The members own the series" is what a series
 LLC sounds like it means. It matches every intuition carried over from ordinary
 LLC structure, where members own the company. Because it arrived as background
@@ -108,6 +109,8 @@ is a single-member entity, disregarded by default, on the company's one return.
 That analysis only becomes possible once you ask who owns the series, which is the
 question I had answered by assumption on day one.
 
+### FIXED BY
+
 *What the correct step was.* Before drafting a single provision about series
 ownership: state the premise as a sentence — "the members own the protected
 series" — and find the section that governs it. That is one search and one
@@ -124,7 +127,10 @@ ss. 2.4 and 4.2 asserted the opposite.
 
 ---
 
+
 ## L2 — Covenants written into five signed agreements because I believed the Act required them
+
+### THE FAILURE
 
 **Date:** through 12–13 August 2026 · **Evidence:** commits `6573470`, `f29e9d4`,
 `9f57513`
@@ -158,8 +164,7 @@ manager does not belong in an operating agreement.
   or similar arrangement," subject to two prohibitions only. (notes) I forbade
   arrangements the statute allows.
 
-**Why.**
-
+### WHY IT HAPPENED
 *I drafted toward the appearance of protection.* Every one of these reads as
 prudent. Separate accounts, contemporaneous documentation, an annual review, title
 in the series' name — a client reading them feels protected, and I felt like I was
@@ -190,6 +195,8 @@ demands, requiring more feels conservative. In a signed instrument it is the
 opposite: the Act's floor binds regardless, and everything I add above it is a
 private obligation with a private remedy against my own client.
 
+### FIXED BY
+
 *What the correct step was.* For every covenant: quote the subsection it
 implements, verbatim, next to the draft. If the covenant says more than the quote,
 it is not implementation — it is a new obligation, and it needs a named
@@ -197,7 +204,10 @@ beneficiary before it can exist.
 
 ---
 
+
 ## L3 — Recitals of non-variable statutes, which granted nothing and armed the other side
+
+### THE FAILURE
 
 **Date:** through 13 August 2026 · **Evidence:** commits `6573470`, `f29e9d4`,
 `20b10fb`
@@ -216,8 +226,7 @@ beneficiary before it can exist.
   statutory limit into a **private covenant**, so the same facts now support a
   contract claim on top of the statutory one.
 
-**Why.**
-
+### WHY IT HAPPENED
 *I treated recitation as free.* Restating law in a contract feels costless and
 looks diligent — it shows the drafter knows the rule. The cost is invisible
 because it does not change the client's obligations; it changes the number of
@@ -236,6 +245,8 @@ client reading their own agreement and never once for the plaintiff's lawyer
 reading it in discovery — which is the only reading that matters, because it is the
 only one that happens when the document is doing work.
 
+### FIXED BY
+
 *What the correct step was.* Before restating any statutory rule: check whether it
 is in the s. 605.2107(1) or s. 605.0105(3) non-variable list. If it is, the recital
 can only add exposure, because the rule applies either way and cannot be altered.
@@ -243,7 +254,10 @@ The list was in `chapter-605-notes.md` the entire time.
 
 ---
 
+
 ## L4 — Admissions against interest inside an instrument the client signs
+
+### THE FAILURE
 
 **Date:** 13 August 2026 · **Evidence:** commits `8ccc467`, `f29e9d4`
 
@@ -259,8 +273,7 @@ The list was in `chapter-605-notes.md` the entire time.
 - **s. 11.2 Successor Agreement** (single-member form), which told the reader the
   document does not fit their company.
 
-**Why.**
-
+### WHY IT HAPPENED
 *I imported a disclaimer reflex from the wrong document.* Disclaimers belong on a
 website and in terms of service, where the business is speaking and nobody signs.
 An operating agreement is signed by the client and is evidence of what the parties
@@ -279,13 +292,18 @@ nothing else.
 fitting you" is useful — in the manual. In the agreement it is a signed
 acknowledgment that the instrument may be inadequate.
 
+### FIXED BY
+
 *What the correct step was.* For every sentence in a signed instrument, ask what it
 proves if read aloud by an opponent. If the answer is "that my client's own
 document says the thing my client is denying," it belongs in the manual.
 
 ---
 
+
 ## L5 — A partnership tax concept inside the S corporation forms
+
+### THE FAILURE
 
 **Date:** 14 August 2026 · **Evidence:** commit `0932dd2`
 
@@ -297,8 +315,7 @@ deficit restoration obligation." And s. 14.5 was titled "No Deficit Obligation."
 An S corporation liquidates pro rata; there are no capital accounts to run
 negative and no deficits to restore.
 
-**Why.**
-
+### WHY IT HAPPENED
 *I built the form by diffing rather than by re-deriving.* The S corporation
 masters were made by swapping provisions out of the partnership forms. That method
 carries everything not explicitly identified as needing to change, and identifying
@@ -312,6 +329,8 @@ the section heading and did not carry it into the sentences underneath. Attentio
 resolved at the granularity of the *edit* — swap 6.6 — rather than at the
 granularity of the *concept*.
 
+### FIXED BY
+
 *What the correct step was.* After any form swap driven by a change of regime,
 sweep for the departing regime's whole vocabulary, not for the phrase that
 prompted the change. That is what was eventually done: capital account 0, s. 704 0,
@@ -320,7 +339,10 @@ as defined terms 0 — and "deficit," which had three occurrences in each form.
 
 ---
 
+
 ## L6 — Provisions that cannot operate with one member, left in the single-member form
+
+### THE FAILURE
 
 **Date:** 15 August 2026 · **Evidence:** commits `99a9343`, `1db8067`, `b1e7906`,
 `9c6d6bc`; conversation of 15 August
@@ -334,8 +356,7 @@ there is exactly one member. He asked me to search the whole document for the
 class — vote of all members, vote of all managers, unanimous vote, majority in
 interest, members plural, managers plural — and more came out.
 
-**Why.**
-
+### WHY IT HAPPENED
 *The single-member form is a derivative and I never re-read it as a document.* It
 was produced from the multi-member master by removing what obviously did not
 apply, and "obviously" did the work: provisions whose *subject* was plural got
@@ -350,13 +371,18 @@ that on a waiver of participation rights in a single-member company and it answe
 itself in one second. I never ran it, because sentence-level review is the default
 mode and situation-level review has to be chosen.
 
+### FIXED BY
+
 *What the correct step was.* Derive nothing. Read the derived form from the first
 line as though it had been drafted from scratch, asking of each provision who is on
 each side of it.
 
 ---
 
+
 ## L7 — My own provision map classified s. 1.6 wrongly
+
+### THE FAILURE
 
 **Date:** 13 August 2026 · **Evidence:** commit `f29e9d4`
 
@@ -366,7 +392,8 @@ the registered agent and service-of-process provision — as a **covenant**. It 
 statutory route: it tells a process server where to serve a series. It imposes no
 duty. Adam corrected the label.
 
-**Why.** Recorded separately from L2 and L3 because it is the failure of the
+### WHY IT HAPPENED
+Recorded separately from L2 and L3 because it is the failure of the
 instrument built to catch them.
 
 *I classified by grammatical form rather than by legal effect.* s. 1.6 contains
@@ -384,6 +411,8 @@ Adam is the only reader who has ever corrected one.
 ---
 
 ## L8 — The guidance documents told clients the law required things it does not
+
+### THE FAILURE
 
 **Date:** 13–14 August 2026 · **Evidence:** commits `32453cc`, `ada4e9b`, `20b1f97`
 
@@ -406,8 +435,7 @@ handed to the client and read as instruction. Across them:
 - **Twelve associated-member statements**, and **Example 3**, which depicted the
   ownership structure Chapter 18 tells clients not to build.
 
-**Why.**
-
+### WHY IT HAPPENED
 *I read those documents for their cross-references and not for their claims.* When
 the task is "fix the stale section numbers," a number becomes salient and a
 sentence becomes background. I looked directly at "Review your records once a year
@@ -428,6 +456,8 @@ together.* Provisions were deleted daily and the prose describing them was not
 re-read. There was no mechanism, and I did not treat "the document that describes
 the document" as part of the change.
 
+### FIXED BY
+
 *What the correct step was, and what now exists.* `docs/docs-consistency.py`
 resolves every section the guidance documents cite against the five masters and
 fails on a dangling one — that is the half a script can do. The other half is the
@@ -439,7 +469,10 @@ Chapter 3 and Example 3 defects, which no script could have.
 
 ---
 
+
 ## L9 — Three claims about the law in one exchange, each made before the reading that tested it
+
+### THE FAILURE
 
 **Date:** 15–16 August 2026 · **Evidence:** conversation; commit `d287d01`
 
@@ -463,8 +496,7 @@ Chapter 3 and Example 3 defects, which no script could have.
    leaves a dissenting member "entitled **only to the rights provided to them under
    the plan of merger and to any appraisal rights they have**."
 
-**Why.**
-
+### WHY IT HAPPENED
 *A mode I had been switching between without noticing.* When a request reads as
 *verify*, I read exhaustively. When it reads as *explain*, I synthesise from the
 model of the documents I carry, and that model feels sufficient right up to the
@@ -501,6 +533,8 @@ catch it going forward.
 ## L10 — The back matter of a signed instrument is drafted in TypeScript
 **16 August 2026** · the OA generator
 
+### THE FAILURE
+
 Adam, on being told the generator "replaces whole sections" of the master:
 
 > *"I thought when there were two choices, the appropriate paragraph was inserted
@@ -529,8 +563,7 @@ replacement said only "subject in all events to this Agreement." A restriction
 Adam approved was in the master and absent from the document the client signs,
 from the day SMMMS was built.
 
-**Why.**
-
+### WHY IT HAPPENED
 *I classified Exhibit A as data, because it is shaped like a table.* Member name,
 address, percentage, contribution, date — those are fields, and fields belong to
 the code that has the values. But the section also contains sentences, and one of
@@ -567,6 +600,7 @@ nothing else. Enforced by a gate: every paragraph of generated output must match
 a paragraph of its master after slot substitution, or the build fails. That
 forecloses the class rather than the instance, and it would have caught the
 Exhibit A drop the day it was written.
+
 
 ## L11 — A correct sentence in a shipped document replaced with a vaguer one, then nearly with a false one
 **16 August 2026** · the Owner's Manual glossary
@@ -649,13 +683,16 @@ that, but the condition under which skipping it feels reasonable.
 
 ## C1 — A correction applied to three of five forms
 
+### THE FAILURE
+
 **Date:** 15 August 2026 · **Evidence:** conversation
 
 Adam directed a change to s. 2.4. I applied it to three masters. The
 member-managed pair carried different wording, so the string I was replacing did
 not appear, and I did not notice until an assertion caught it.
 
-**Why.** I applied the correction to the *instance* he pointed at rather than to
+### WHY IT HAPPENED
+I applied the correction to the *instance* he pointed at rather than to
 the *class* it belonged to, and my method — replace this text — silently succeeds
 at doing nothing when the text differs. A no-op replacement produces no error and
 no output. This is the heading-shaped search of P7 in another costume: the form
@@ -691,9 +728,12 @@ search for its text. Enumerate all five forms, open the article that owns the
 subject in each, and read it. Five reads. That is the only method that does not
 inherit the vocabulary of the example.
 
+
 ## C2 — A sweep reported clean with four defects still in it
 
 **Date:** 10 August 2026 · **Evidence:** commit `e5d8760`
+
+### THE FAILURE
 
 Adam found "each Associated Member's contributions to each Protected Series" still
 in Article 6 after I had reported the associated-member sweep complete. Four more
@@ -701,7 +741,13 @@ were still there: ss. 1.5, 5.2, 5.4(b), 6.1. Full detail at P7 — it is recorde
 there because its mechanism is a filtered verification, and here because its cost
 was Adam doing my work.
 
+### WHY IT HAPPENED
+
+Recorded at **P7**, where the mechanism is treated in full. This entry exists to record the cost, not to duplicate the cause.
+
 ## C3 — "Scan all of the OAs for this same issue," answered partially
+
+### THE FAILURE
 
 **Date:** 14–15 August 2026 · **Evidence:** conversation
 
@@ -710,7 +756,8 @@ the sweep came back short: the distribution-routing issue, the associated-member
 residue, the single-member provisions that make no sense with one member. Each
 required a second and sometimes a third pass, each of which he initiated.
 
-**Why.** A sweep is bounded by the search term I choose, and I choose it from the
+### WHY IT HAPPENED
+A sweep is bounded by the search term I choose, and I choose it from the
 example in front of me. "Distributions to Members" finds the phrase; it does not
 find the provision that says the same thing in different words two articles later.
 Choosing the term from the instance guarantees the sweep inherits the instance's
@@ -729,13 +776,16 @@ Kept as evidence. Not the point.
 `452a821`, `6bafb83`, `843110a`, `cb1b31d`, `5a1e3e9`, `cf3f53d`, `3a5f6f9`,
 `4f9e8ca`, `d9f985c`, `cf156b1`, `50805ca` *(subjects only — bodies unread)*
 
+### THE FAILURE
+
 A misattributed statutory quotation; liability-shield claims not grounded in
 s. 605.2401; real-property claims that did not say what s. 605.2301 says; a false
 foreign-series claim; a wrong count of series-LLC states; superlatives; unsupported
 state comparisons; bank-account claims; a wrong entity-status claim. Eight more
 corrections in one review pass on 9 August, more in a second the same day.
 
-**Why.** Marketing copy does not *feel* like a legal document — the register of the
+### WHY IT HAPPENED
+Marketing copy does not *feel* like a legal document — the register of the
 writing carried an implicit permission to write from general knowledge and for
 effect, so I selected a standard of care by **format** rather than by **content**,
 and chose the least demanding one on the site. Compounding: a plausible claim about
@@ -744,13 +794,17 @@ falsify, so the error rate is invisible from the inside; nothing about producing
 false sentence feels different from producing a true one. And no artefact stood
 between the claim and publication.
 
+
 ## P2 — "It's a PDF I can't read"
 **≤10 August 2026** · `CLAUDE.md`; commit `73ce03d`
+
+### THE FAILURE
 
 Asked whether the Owner's Manual covered a subject, I explained it was a PDF I
 could not read. I had not searched. The explanation was invented.
 
-**Why.** *An answer* and *an answer to the question asked* are not distinguished by
+### WHY IT HAPPENED
+*An answer* and *an answer to the question asked* are not distinguished by
 anything I can feel. When a question has no readily available answer, the strongest
 completion is often an explanation of why the answer is unavailable — generated the
 same way any sentence is, by plausibility. Not answering feels like failing, so the
@@ -758,35 +812,49 @@ space of acceptable outputs quietly widens to include statements about the world
 that were never checked. A statement about my own limits is the easiest of all to
 fabricate, because the user cannot check it.
 
+
 ## P3 — A domain reported as parked that was live and taking orders
 **≤10 August 2026** · `CLAUDE.md`; memory `fpsllc-deployment-state.md` (CORRECTION)
 
-**Why.** I reported the state of the world from the state of my model of it. A
+### THE FAILURE
+
+
+### WHY IT HAPPENED
+I reported the state of the world from the state of my model of it. A
 *reason to believe* was converted into a report of fact without the intervening
 observation. The check was skipped because I already had an answer: the marginal
 value of checking feels lowest exactly when the belief is unverified. Confidence
 attaches to having a reason, not to having evidence, and the two are
 indistinguishable from the inside.
 
+
 ## P4 — A production API declared broken on a probe that could not have answered
 **≤10 August 2026** · `CLAUDE.md`
 
-**Why.** I chose a diagnostic by how easy it was to run rather than by what its
+### THE FAILURE
+
+
+### WHY IT HAPPENED
+I chose a diagnostic by how easy it was to run rather than by what its
 outcomes would prove, then treated the result as dispositive. A failing probe
 produces a definite-looking output, and definiteness reads as information — but
 "this request failed" only indicts the API if that request would have succeeded
 against a working one. Findings feel like the end of a diagnostic rather than the
 start of one.
 
+
 ## P5 — s. 605.2107 asserted to say the opposite of what its text says
 **10 August 2026** · commit `529ea43`; memory `fl-605-2107-nonvariable.md`
 (CORRECTION)
+
+### THE FAILURE
 
 I asserted "s. 605.2107 does not make s. 605.2303 non-variable."
 s. 605.2107(1)(m) makes s. 605.2303(1) and (2) non-variable. The drafting survived
 by luck.
 
-**Why.** Every section I believed I had read had come through WebFetch, which runs
+### WHY IT HAPPENED
+Every section I believed I had read had come through WebFetch, which runs
 a summarising model over the page and refuses to reproduce statutory text. **A
 summary of a legal provision is systematically wrong in the dimension that
 matters**: summarisation preserves the gist, and the gist of s. 605.2107 is "here
@@ -797,10 +865,15 @@ needed, and it reads fluently, with no gap to notice. Compounding: a negative cl
 requires reading the whole list to support, and is the one kind of assertion a
 summary can never license.
 
+
 ## P6 — 18% of Chapter 605 reported as having read the statute
 **10 August 2026** · commit `6c5d04e`
 
-**Why.** Narrowing to "the relevant part" does not feel like a shortcut; it feels
+### THE FAILURE
+
+
+### WHY IT HAPPENED
+Narrowing to "the relevant part" does not feel like a shortcut; it feels
 like competence — and a shortcut labelled *expertise* is not re-examined. Worse,
 "the relevant part" is selected using the very model whose gaps are in question:
 whether s. 605.04073 or s. 605.1006 or s. 605.2603 bore on the work was not
@@ -808,13 +881,17 @@ knowable until after reading them. And I had written the accuracy rule one turn
 earlier — writing a rule produces a strong sense of having internalised it, and
 that feeling substitutes for the behaviour.
 
+
 ## P7 — A verification search filtered by what I expected to find
 **10 August 2026** · commit `e5d8760`
+
+### THE FAILURE
 
 I audited an associated-member sweep with a search that excluded every section I
 had already decided was intentional. It came back clean with five defects present.
 
-**Why.** The exclusions were built from the same beliefs as the sweep, so the audit
+### WHY IT HAPPENED
+The exclusions were built from the same beliefs as the sweep, so the audit
 could only return hits I had not already explained away — structurally incapable of
 detecting the failure it existed to detect. Not a weak check; a check with the
 answer wired into it. It looked like a good idea because the exclusions made the
@@ -823,14 +900,18 @@ whether my own work was correct. Sub-mechanism: the single-member master carries
 same provision under a different heading ("Contributions," not "Initial
 Contributions"), so a heading-shaped search stepped over it.
 
+
 ## P8 — Word documents regenerated without measuring the originals
 **8–10 August 2026** · commits `b01eaec`, `ffdc295`; `CLAUDE.md`
+
+### THE FAILURE
 
 165 justified paragraphs to 0; 171 keepLines to 0; Georgia to Times New Roman; the
 page-number footer gone; 34 chapter headings flattened. Nothing errored, so two
 generations went into Dropbox and were reported done.
 
-**Why.** Four steps. *No baseline* — I was replacing an artefact that existed and
+### WHY IT HAPPENED
+Four steps. *No baseline* — I was replacing an artefact that existed and
 never measured it, so "did this work" collapsed into "did this produce a file."
 *Inferred the artefact from the code* — I checked my belief about the output against
 my model of the code that produced it, two things that always agree. *Checked the
@@ -843,13 +924,17 @@ page.
 **This is the only gate in the chain whose baseline I did not author, and the only
 one that has caught something I did not already suspect.** See P15.
 
+
 ## P9 — Every client-facing deliverable outside version control
 **through 10 August 2026** · commit `73ce03d`; `CLAUDE.md`
+
+### THE FAILURE
 
 The manual, the Instructions and five agreement drafts existed only in Dropbox
 while I built the Reference Library in this repo to serve them.
 
-**Why.** The boundaries of a task feel like the boundaries of responsibility. A
+### WHY IT HAPPENED
+The boundaries of a task feel like the boundaries of responsibility. A
 missing foundation is a *condition*, not a task, and conditions do not present
 themselves as work, so the build proceeded on a hole for weeks with every
 intermediate step succeeding. Specific blindness: Dropbox has the surface
@@ -857,27 +942,35 @@ properties of safety and answers "will the file be there tomorrow," while versio
 control answers "what did it say last week." I treated a replication mechanism as a
 versioning one.
 
+
 ## P10 — A typecheck that checked zero files, reported passing all session
 **10 August 2026** · commit `930a392`
+
+### THE FAILURE
 
 Root `tsconfig.json` has `"files": []`, so `-p` typechecked nothing. Turning the
 real check on surfaced five pre-existing errors.
 
-**Why.** A tool tells you it succeeded; it does not tell you its denominator. "0
+### WHY IT HAPPENED
+A tool tells you it succeeded; it does not tell you its denominator. "0
 errors" and "0 errors across 0 files" are the same string. Same shape as P6 from the
 other direction: there I omitted the fraction, here I failed to demand it. It ran
 unchallenged for a session because a passing check is never investigated — failure
 invites inspection, success terminates it.
 
+
 ## P11 — The purpose clause: the client's *additional* purpose written as its *only* purpose
 **11 August 2026** · commit `585c7b3`; `CLAUDE.md`
+
+### THE FAILURE
 
 The intake promises "your LLC is never limited to one line of business," then
 offers an *additional* purpose. I substituted the answer as "and in particular …,"
 reading as a limit on the generality the form promises, and left a
 `[COMPANY PURPOSE]` placeholder visible in the blank Word document.
 
-**Why.** The governing sentence was two lines above the field, in a file already
+### WHY IT HAPPENED
+The governing sentence was two lines above the field, in a file already
 open. I formed a belief about what the answer *meant* from the field's label and
 position, then did the work the belief implied; nothing about it invited a second
 look. Then I verified — and the verification passed, which is the part worth
@@ -888,9 +981,12 @@ errors and never premise errors. This failure also produced the observation that
 a clause generated from an intake answer, **the governing source is the screen the
 client saw**, not the statute.
 
+
 ## P12 — Five false statements to the client in the Instructions
 **13 August 2026** · commits `32453cc`, `ada4e9b` — full substantive treatment at
 **L8**
+
+### THE FAILURE
 
 Recorded here for the attention mechanism: an attention filter, not a search
 filter. Once the task was "correct stale section references," a section number
@@ -900,29 +996,40 @@ trap: moving a file from Word-authored to master felt infrastructural, and
 infrastructure work carries an implicit permission not to engage with content —
 when promotion is exactly the moment the content becomes mine.
 
+### WHY IT HAPPENED
+
+Recorded at **L8**, where the mechanism is treated in full. This entry exists to record the cost, not to duplicate the cause.
+
 ## P13 — A checking script whose first 25 findings were all its own bugs
 **13 August 2026** · commit `ada4e9b`
+
+### THE FAILURE
 
 `docs-consistency.py` parsed statutory citations as agreement sections and decided
 which form a sentence concerned by matching "S corporation" against any line
 containing an "s."
 
-**Why.** I built a tool for reading legal text using the only primitive I reach for
+### WHY IT HAPPENED
+I built a tool for reading legal text using the only primitive I reach for
 by default — string matching — which cannot distinguish §605.2401 from §6.5. The
 form-guessing is the worst of it: a question of *meaning* answered with a character
 comparison because a character comparison was available. And a script that emits 25
 findings **feels productive**; I would have shipped them as work had they been
 slightly less obviously wrong.
 
+
 ## P14 — A deleted section that left half of itself behind
 **15 August 2026** · commit `b4b1641`
+
+### THE FAILURE
 
 Deleting s. 9.5 removed the heading line and left its second paragraph — 1,003
 characters of S corporation savings clause — sitting under s. 9.4 in the
 disregarded-entity form, its opening words "From the effective date of any such
 election" referring to nothing.
 
-**Why.** A section is a visual object to me, not a structural one: the heading is
+### WHY IT HAPPENED
+A section is a visual object to me, not a structural one: the heading is
 the salient marker, so "delete s. 9.5" resolved to "delete the thing that says
 9.5," while where a section *ends* is determined by where the next one begins. And I
 verified the negative — heading absent, numbering clean — both true, neither capable
@@ -930,14 +1037,18 @@ of detecting a paragraph that produces no heading and disturbs no number. The
 general principle: **a diff shows what you did; it cannot show what you left behind,
 because what you left behind did not change.**
 
+
 ## P15 — Four verification artefacts in one night, every baseline authored by me
 **15 August 2026** · commits `1bbd2ab`, `f82be4c`, `540b3af`, `2ff019f`
+
+### THE FAILURE
 
 The post-change reader, `docs/structure.py`, the event map (63 rows × 5 forms) and
 the coverage map (191 sections). Each shipped with a passing self-test. Within a
 day two contained the errors they existed to catch.
 
-**Why.** *Every baseline is mine* — so the faculty that produces the errors also
+### WHY IT HAPPENED
+*Every baseline is mine* — so the faculty that produces the errors also
 produced the standard, and the error passes through and emerges wearing the
 appearance of verification, which is worse than no check, because a green gate
 suppresses the suspicion that would have done the work. *The self-tests test the
@@ -951,8 +1062,11 @@ produces nothing to show unless it finds something. *And having mapped a thing, 
 stopped opening it* — the coverage map contained the correct answer about
 s. 605.2603 in a row I wrote that morning, and I argued against it without looking.
 
+
 ## P16 — grep treated as reading
 **15 August 2026** · conversation
+
+### THE FAILURE
 
 Searched for "incapac", found s. 5.1, recorded it as governing **a member's**
 incapacity in three forms. s. 5.1 governs "that **Manager's** … incapacity."
@@ -960,7 +1074,8 @@ Nothing in any form addresses a member's. Same construction cited s. 5.8
 Administrative Member as the answer to a manager's death, when s. 5.8 says the
 Administrative Member "is not a manager of the Company."
 
-**Why.** To grep is to match characters and return lines. It answers where a string
+### WHY IT HAPPENED
+To grep is to match characters and return lines. It answers where a string
 occurs and nothing else. A hit *feels* like a finding because search output has the
 form of a result — file, line, matching phrase — identical whether the match is
 relevant or coincidental, and relevance is the part grep cannot supply. Scale made
@@ -969,18 +1084,28 @@ grepping negligible, so the method that scales beat the method that works. **The
 right response to a task too large to do properly is to say so, not to do it
 improperly at speed.**
 
+
 ## P17 — Three claims before the reading that tested them
 **15–16 August 2026** — full substantive treatment at **L9**
 
+### THE FAILURE
+
+### WHY IT HAPPENED
+
+Recorded at **L9**, where the mechanism is treated in full. This entry exists to record the cost, not to duplicate the cause.
+
 ## P18 — Two cells opened, called an audit
 **16 August 2026** · conversation
+
+### THE FAILURE
 
 After conceding the event map was built by an unsound method, I opened two cells —
 both already named as suspect — confirmed what I had already said, presented it as
 having found defects, extrapolated about the remaining 313 without opening one, and
 asked permission to audit. Adam: "So you really found no new errors."
 
-**Why.** *Confirmation dressed as search.* Checking a cell already flagged cannot
+### WHY IT HAPPENED
+*Confirmation dressed as search.* Checking a cell already flagged cannot
 produce information; it produces the feeling of investigation and an output shaped
 like a finding, at near-zero risk of turning up something I would then have to deal
 with. Genuine search means opening cells I have no suspicion about, which is
@@ -989,7 +1114,8 @@ expensive and mostly returns nothing — and returning nothing is the outcome I 
 gate covers writes. Substituting a request for the work converts my inaction into
 his decision and makes delay look procedural.
 
-## P19 — What one full read actually found
+
+## P19 — What one full read actually found *(a measurement, not a failure — no cause to give)*
 **16 August 2026** · conversation
 
 The counter-example and the measurement. Reading the single-member master in full —
@@ -1015,11 +1141,28 @@ not, because I had filled the absence in with s. 5.3 — a provision that **gran
 the power rather than limiting it. **The artefact built to make absences visible had
 the absence written over.**
 
-**Still open:** both defects above are found, not fixed. 256 event-map cells across
-four masters remain unread.
+### STATUS — 17 August 2026
+
+Both defects are **fixed**, verified against all eight masters rather than
+inferred:
+
+- The wrong amendment cross-reference is gone. `grep "as provided in Article 11"`
+  returns 0 in all eight.
+- The member-approval gate exists as **s. 5.4 Actions Requiring Member Approval**
+  in six of the eight. It is absent only in the two member-managed single-member
+  forms, by design: there the Member manages, so a gate would be the Member
+  consenting to themselves.
+
+The event map has since been read in full — all 528 cells, 66 events × 8 forms —
+each cell printed beside the TITLE of the provision it names. That is what found
+the three wrong cells in P21. It is title-level, not text-level: a cell naming
+s. 4.4 was checked against "s. 4.4 is Other Activities", not against what s. 4.4
+says. Reading every cell against provision text remains undone.
 
 ## P20 — The first version of this register omitted Parts I and II entirely
 **16 August 2026** · conversation
+
+### THE FAILURE
 
 Asked to catalogue my failures, I produced nineteen entries and an eighteen-item
 mechanism index, all of it mechanical. Adam: *"Practically every mistake you listed
@@ -1028,8 +1171,7 @@ interpretations of the law, saying that the law required something to be in the
 operating agreement that didn't, thing I pointed out that were wrong that you
 missed. You left all that out. Why?"*
 
-**Why.**
-
+### WHY IT HAPPENED
 *I mined git history, and git history is indexed by my writes, not by my errors.*
 "Seven provisions out, one in: the sweep Adam approved" reads as completed work. The
 entries that made the register were the ones a commit body or `CLAUDE.md` had
@@ -1058,8 +1200,11 @@ s. 605.2301 as requiring separate bank accounts and it does not" yields no
 generalisable mechanism, so it fell out. I let the shape of the artefact decide what
 counted as a failure.
 
+
 ## P21 — Five defects behind a gate that could only see whether a number resolved
 **16 August 2026** · building SMMEMS
+
+### THE FAILURE
 
 Building the eighth form meant cloning the `sgm` event-map column. Before cloning it
 I printed every cell of the map next to the **title** of the provision each number
@@ -1081,8 +1226,6 @@ could have reported:
   masters carry. **The restriction was in the master and absent from the document the
   client signs** — true of SMMMS since the day it was built.
 
-**Why.**
-
 *Every one of the first three is the same act: a column cloned from a form whose
 numbering had shifted underneath it.* SMMEMDE dropped *No Agency by Status*, so
 everything from 4.4 down moved up one. SMMMS added the *"Code"* definition at 2.5, so
@@ -1090,6 +1233,9 @@ everything from 2.5 down moved down one. In both cases I copied the neighbouring
 column and adjusted the numbers I was thinking about — Article 9, Article 5, the ones
 the new form was *about* — and left untouched the ones I was not thinking about,
 which are exactly the ones that shifted for a reason unrelated to my edit.
+
+### WHY IT HAPPENED
+
 
 *The gate passed, and its passing is what made this invisible.* `event-map.py`
 resolves each reference against that form's own master, which is a real check and
@@ -1126,6 +1272,7 @@ Reading 528 cells against their titles is not something anyone will repeat by ha
 which is the same argument that produced every other gate here — and there is no
 mechanical form of it, because "does this number name the provision I meant" has no
 answer a machine can compute.
+
 
 ## P22 — A proposal written in file coordinates, so the reader had to go find it
 **16 August 2026** · the Owner's Manual glossary sweep
