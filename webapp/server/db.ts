@@ -149,6 +149,23 @@ CREATE TABLE IF NOT EXISTS service_orders (
   paid_at timestamptz,
   fulfilled_at timestamptz
 );
+
+-- Formation pipeline. status runs pending_payment -> paid -> filed -> formed:
+-- "paid" is a new order, "filed" is sent to the Division, "formed" is set by the
+-- upload that puts the Articles and the Protected Series Designations into the
+-- client's portal. formed is never a button on its own — the endpoint that sets
+-- it is the same one that writes the documents, in one transaction, so the board
+-- cannot say an order is complete while the client's portal is empty.
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS filed_at timestamptz;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS formed_at timestamptz;
+-- Which fields have been copied into the state's form, so an interrupted filing
+-- resumes where it left off — on any machine, which is why this is here and not
+-- in the browser.
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS copied_fields jsonb NOT NULL DEFAULT '{}'::jsonb;
+-- One Protected Series Designation document may cover several series, so the
+-- coverage is recorded per document rather than assumed one-to-one.
+ALTER TABLE documents ADD COLUMN IF NOT EXISTS meta jsonb NOT NULL DEFAULT '{}'::jsonb;
+ALTER TABLE documents ADD COLUMN IF NOT EXISTS order_id uuid REFERENCES orders(id);
 `;
 
 export async function getDb(): Promise<Db> {

@@ -287,6 +287,34 @@ export function orderPaidEmail(opts: {
   };
 }
 
+/** The company exists. This is the message the whole formation was for, so it
+ *  names the company and lists what is now in the client's portal rather than
+ *  saying "a new document is available" like every other upload. */
+export function llcFormedEmail(opts: {
+  llcName: string;
+  seriesNames: string[];
+  portalUrl: string;
+}): { subject: string; html: string } {
+  const series = opts.seriesNames.map((n) => `<li>${escapeHtml(n)}</li>`).join("");
+  return {
+    subject: `${opts.llcName} is formed`,
+    html: wrap(`
+      <p><strong>${escapeHtml(opts.llcName)}</strong> has been formed with the Florida
+      Division of Corporations.</p>
+      <p>Two things are waiting in your portal, ready to download:</p>
+      <ul>
+        <li>Your <strong>Articles of Organization</strong>, as filed</li>
+        <li>Your <strong>Protected Series Designation</strong>${opts.seriesNames.length > 1 ? "s" : ""},
+            as filed, covering:</li>
+      </ul>
+      <ul>${series}</ul>
+      <p>Keep both with your company records — a bank, a title company, or a
+      closing agent will ask for them.</p>
+      <p><a href="${opts.portalUrl}">Open your portal</a></p>
+    `),
+  };
+}
+
 export function escapeHtml(s: string): string {
   return s
     .replace(/&/g, "&amp;")

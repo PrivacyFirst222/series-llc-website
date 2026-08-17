@@ -266,7 +266,7 @@ let sim = await api("/api/dev/simulate-payment", { method: "POST", body: JSON.st
 if (sim.status === 404) {
   const adminEarly = await api("/api/admin/login", { method: "POST", body: JSON.stringify({ password: "dev-admin" }) });
   const full = await api(`/api/admin/orders/${orderId}`, { cookies: adminEarly.cookie });
-  const squareOrderId = (full.body?.data as { square_order_id?: string })?.square_order_id;
+  const squareOrderId = (full.body?.data as { squareOrderId?: string })?.squareOrderId;
   sim = await api("/api/square/webhook", {
     method: "POST",
     body: JSON.stringify({

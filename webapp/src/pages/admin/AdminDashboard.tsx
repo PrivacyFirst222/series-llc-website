@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/use-toast";
 import { api, ApiError } from "@/lib/api";
+import OrderBoard from "./OrderBoard";
 import { ServiceOrdersSection } from "./ServiceOrdersSection";
 import { LibrarySection } from "./LibrarySection";
 
@@ -223,11 +224,6 @@ export default function AdminDashboard() {
     retry: false,
   });
 
-  const ordersQuery = useQuery({
-    queryKey: ["admin-orders"],
-    queryFn: () => api.get<AdminOrder[]>("/api/admin/orders"),
-    enabled: authQuery.isSuccess,
-  });
 
   const clientsQuery = useQuery({
     queryKey: ["admin-clients"],
@@ -247,7 +243,6 @@ export default function AdminDashboard() {
     );
   }
 
-  const orders = ordersQuery.data ?? [];
   const clients = clientsQuery.data ?? [];
 
   return (
@@ -255,56 +250,7 @@ export default function AdminDashboard() {
       <span className="eyebrow">Admin</span>
       <h1 className="display mt-3 text-3xl lg:text-4xl">Orders &amp; clients</h1>
 
-      <h2 className="mt-10 font-display text-xl">Orders</h2>
-      <div className="mt-4 overflow-x-auto rounded-2xl border border-border bg-card">
-        <table className="w-full min-w-[640px] text-sm">
-          <thead>
-            <tr className="border-b border-border bg-secondary/40 text-left text-xs uppercase tracking-[0.14em] text-muted-foreground">
-              <th className="px-4 py-3 font-medium">LLC</th>
-              <th className="px-4 py-3 font-medium">Contact</th>
-              <th className="px-4 py-3 font-medium">Package</th>
-              <th className="px-4 py-3 font-medium">Total</th>
-              <th className="px-4 py-3 font-medium">Status</th>
-              <th className="px-4 py-3 font-medium">Placed</th>
-              <th className="px-4 py-3 font-medium">Paid</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {orders.length === 0 ? (
-              <tr>
-                <td colSpan={7} className="px-4 py-6 text-muted-foreground">
-                  No orders yet.
-                </td>
-              </tr>
-            ) : (
-              orders.map((o) => (
-                <tr key={o.id}>
-                  <td className="px-4 py-3 font-medium">{o.llc_name}</td>
-                  <td className="px-4 py-3">
-                    {o.contact_name}
-                    <div className="text-xs text-muted-foreground">{o.contact_email}</div>
-                  </td>
-                  <td className="px-4 py-3">{o.package === "CONVERT" ? "Conversion" : "New"}</td>
-                  <td className="px-4 py-3 font-mono-feature">{money(o.total_cents)}</td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={
-                        o.status === "paid"
-                          ? "rounded-full bg-trust/10 px-2.5 py-1 text-xs font-medium text-trust"
-                          : "rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-muted-foreground"
-                      }
-                    >
-                      {o.status === "paid" ? "Paid" : "Pending payment"}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-muted-foreground">{day(o.created_at)}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{day(o.paid_at)}</td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+      <OrderBoard enabled={authQuery.isSuccess} />
 
       <ServiceOrdersSection enabled={authQuery.isSuccess} />
 

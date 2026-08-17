@@ -374,9 +374,19 @@ export default function PortalDashboard() {
   }
 
   const docs = docsQuery.data ?? [];
-  const packageDocs = docs.filter((d) => d.kind === "package");
+  // "articles" and "psd" are the filed originals, uploaded when the company is
+  // formed. They belong with the formation package rather than in a section of
+  // their own — and they must be listed explicitly, because a filter that names
+  // only the kinds it knows drops silently the day a new one is added.
+  const FORMATION_KINDS = ["articles", "psd", "package"];
+  const packageDocs = docs.filter((d) => FORMATION_KINDS.includes(d.kind));
 
   const legalMail = docs.filter((d) => d.kind === "legal_mail");
+  // Anything whose kind no section claims. Better a plainly labelled leftover
+  // than a document the client paid for and never sees.
+  const otherDocs = docs.filter(
+    (d) => !FORMATION_KINDS.includes(d.kind) && d.kind !== "legal_mail",
+  );
 
   const logout = async () => {
     await api.post("/api/auth/logout", {});
@@ -433,6 +443,16 @@ export default function PortalDashboard() {
           />
         </div>
       </div>
+
+      {otherDocs.length > 0 ? (
+        <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card">
+          <div className="flex items-center gap-2.5 border-b border-border bg-secondary/40 px-5 py-4">
+            <FileText className="h-4 w-4 text-trust" />
+            <h2 className="font-display text-lg">Other documents</h2>
+          </div>
+          <DocList docs={otherDocs} empty="" />
+        </div>
+      ) : null}
 
       <AgreementAndLibraryRow />
 
