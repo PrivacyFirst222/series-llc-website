@@ -77,23 +77,24 @@ Your operating agreement fights this battle for you in two ways. Article 8 puts 
 - **A business you plan to sell soon.** A protected series cannot be sold as an entity — it cannot merge, convert, or domesticate on its own (s. 605.2602). You sell its *assets*, or the membership interests. Plan exits with advice.
 - **Anything you will not maintain.** If you already know you will never keep separate accounts, buy the insurance, skip the structure, and sleep honestly. A neglected series LLC is an expensive way to own one big pool of assets.
 **The honest cost-benefit:** the structure trades a modest, permanent administrative discipline (Part Three) for compartmentalized risk at a fraction of the cost of parallel LLCs. It rewards disciplined owners and punishes careless ones.
-## 5. THE VOCABULARY — TWELVE TERMS THAT DO REAL WORK
-Full glossary in Section 31; these twelve carry the load.
+## 5. THE VOCABULARY — THIRTEEN TERMS THAT DO REAL WORK
+Full glossary in Section 31; these thirteen carry the load.
 
 | **Term** | **What it means** |
 |---|---|
 | **Series LLC / PSLLC / mothership** | The one legal entity — the Florida LLC that designates protected series |
 | **Protected series (PS)** | A compartment of the company: a legal "person" with its own assets, debts, members, and manager, but not a separate entity — it cannot exist without the mothership |
 | **Protected Series Designation** | The $25 online Sunbiz filing that creates a protected series |
-| **Member** | An owner of the company. You must be a member of the company before you can be associated with any series |
-| **Associated member** | A member of the company linked to a particular series (s. 605.2302). **Our agreements deliberately have none:** every series is wholly owned by the company, which is why the whole structure files one return (Section 18). Where a series has no associated member, s. 605.2304(2) makes the company its protected-series manager |
-| **Manager / Protected Series Manager** | Who runs the company / who runs a particular series. Under your agreement, each series is run by the company's Manager unless its Series Exhibit names someone else |
+| **Member** | An owner of the company. In our structure the members own the company, and the company owns every series |
+| **Associated member** | A member of the company linked to a particular series (s. 605.2302). **Our agreements deliberately have none:** every series is wholly owned by the company, which is why the whole structure files one return (Section 18). Because no series has an associated member, s. 605.2304(2) would make the company its protected-series manager; your agreement may name the member instead (Section 18) |
+| **Manager / Protected Series Manager** | Who runs the company / who runs a particular series. Under your agreement, each series is run by whoever runs the company — the Manager in a manager-managed company, the members in a member-managed one — as its Series Exhibit records |
 | **Associated asset** | An asset whose records satisfy s. 605.2301 for a particular silo — the only kind of asset the horizontal shield protects |
 | **Non-associated asset** | An asset whose records fail the test — reachable by creditors under s. 605.2404, with the burden of proof on you |
 | **Series Exhibit** | The exhibit to your operating agreement (PS-1, PS-2, …) that states each series' name, purpose, manager, capital, and starting asset schedule, and records that the series has no associated members |
 | **Transferable interest** | The economic slice of a membership interest — the right to receive distributions. A creditor or unapproved transferee can hold this and nothing more |
 | **Charging order** | The court order that gives a member's personal creditor the member's distributions — and, in a multi-member LLC, nothing else (Section 23) |
-| **Distribution** | Money or property paid by a silo to its owners — always from that silo's own assets, always recorded |
+| **Distribution** | Money or property paid out by a silo — a series pays the company; the company pays the members — always from that silo's own assets, always recorded |
+| **Contribution** | Money or property put into a silo. You fund the company; the company funds each series (s. 6.1 of your agreement). Recorded against the silo that receives it |
 
 # PART TWO — FORMATION AND STRUCTURE
 ## 6. HOW A FLORIDA PROTECTED SERIES LLC IS FORMED
@@ -122,7 +123,7 @@ All five share the same skeleton through Article 9. From there the single-member
 | **Article 1** | The company: name, principal office, registered agent, and the titling rule — every asset is held in the name of the silo that owns it, never your personal name |
 | **Article 3** | The series engine: how series are established (unanimous consent, per the statute), their legal status, the liability shields in both directions, and the rule that Series Exhibits control series-specific terms |
 | **Article 4** | The owners: membership interests as simple percentages, association with series, voting (multi-member), the transfer-on-death designation (Section 23), and — in the multi-member form — the member duties that power the bankruptcy protections |
-| **Article 5** | Management. In the **manager-managed** forms, the Manager runs the company, and each series is run by the company's Manager unless its Series Exhibit names someone else. In the **member-managed** forms there is no manager at all: the owners run the company by majority of ownership, each series is run by the company acting through its owners, and one owner may be designated **Administrative Member** to handle filings, records, and returns (a paperwork role, not a decision-making one). Every multi-owner form lists the big decisions that need an owner vote — including **moving any asset between silos** |
+| **Article 5** | Management. In the **manager-managed** forms, the Manager runs the company, and each series is run by the company's Manager unless its Series Exhibit names someone else. In the **member-managed** forms there is no manager at all: the owners run the company by majority of ownership, each series is run by the company acting through its owners, and one owner may be designated **Administrative Member** to handle filings, records, and returns (a paperwork role, not a decision-making one). In the **single-owner member-managed** forms you are named the protected-series manager of each series directly, as s. 605.2107(1)(n) permits. Every multi-owner form lists the big decisions that need an owner vote — including **moving any asset between silos** |
 | **Articles 6–7** | Money: contributions (always made *to a specific silo* and recorded), capital accounts, distributions — always **from a series' own assets, and by a series only to the company that owns it** |
 | **Article 8** | The recordkeeping covenants (this manual's Section 14 is its field guide) and the standing association rules that close the Article |
 | **Article 9** | Taxes (Part Four) |
