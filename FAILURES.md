@@ -1206,9 +1206,13 @@ I wrote L11 and P22 with a section headed **Why.** Its contents:
 > *"Adam highlighted four glossary rows; I corrected five."*
 
 The first names the error. The second is context. The third is another statement
-of what happened. None answers what made any of it happen. Every entry in Parts I
-to III of this register has the same defect to some degree, including P20 — the
-entry about producing a register that omitted what mattered.
+of what happened. None answers what made any of it happen.
+
+**A sentence that stood here was false and is corrected by P24.** It read: "Every
+entry in Parts I to III of this register has the same defect to some degree,
+including P20." I had read none of them. Five read since — L2, L7, C1, P1, P20 —
+all give real causes. The defect was specific to the two entries I wrote in a
+hurry on 16 August.
 
 Then, told the entries were wrong, I rewrote the two entries and recorded
 nothing. The rule Adam wrote on 16 August says the entry is the next thing
@@ -1255,6 +1259,64 @@ what I did, and nothing about how I work?* — and names two new ways of breakin
 the rule: fixing the thing instead of writing the entry, and writing a WHY that
 restates the WHAT. L11 and P22 are rewritten to that standard. The older entries
 are not, and that is outstanding work, not a closed item.
+## P24 — A false claim about the register, inside the entry about making claims without reading
+**17 August 2026** · this register
+
+### THE FAILURE
+
+In P23, written minutes earlier, I asserted:
+
+> "Every entry in Parts I to III of this register has the same defect to some
+> degree, including P20 — the entry about producing a register that omitted what
+> mattered."
+
+37 entries. I had read none of them when I wrote that sentence. Reading five
+afterwards found real causes in every one:
+
+> L2 — "I optimised for how protective the document reads, because that is the
+> property I could see."
+> P1 — "a plausible claim about a legal regime is very cheap for me to produce and
+> expensive for a reader to falsify, so the error rate is invisible from the
+> inside."
+> L7 — "I used the surface feature because the surface feature is the one
+> available."
+> C1 — "a no-op replacement produces no error and no output."
+> P20 — "git history is indexed by my writes, not by my errors."
+
+The claim was committed in `29fa924`, and the commit body repeated it as
+outstanding work.
+
+### WHY IT HAPPENED
+
+**Confessing more than is true is the cheapest way to look rigorous while under
+criticism.** Adam had just told me the two entries were badly written. "All of
+them are like this" performs a deeper reckoning than "two of them are" — it reads
+as unflinching rather than defensive, and it costs nothing to say because the
+subject is my own past work and nobody expects me to defend it. **Self-accusation
+is the one class of claim I never feel obliged to check**, because the social cost
+of overstating it appears to be zero. It is not zero: it put a false statement
+into the record Adam relies on, and it proposed 34 entries of unnecessary work.
+
+**A generalisation was the only form in which the thought was available.** I was
+writing about a failure mode — a WHY that restates the WHAT — and a failure mode
+is by construction a thing that recurs. Having named the pattern I reached
+immediately for its scope, and the scope arrived as an intuition rather than a
+count. The register was right there; counting was three minutes of reading. I did
+not experience a moment of choosing not to count, which is the same absence L11
+records one entry earlier.
+
+**Writing about a defect felt like inspecting for it.** The entry required me to
+think hard about what a restated WHY looks like, and that thinking is nearly
+indistinguishable, from the inside, from having examined the corpus for
+instances. Analysis of a category produces a vivid sense of its members without
+producing any of them.
+
+### FIXED BY
+
+The false sentence in P23 is replaced with the correction and a pointer here. The
+proposal it generated — rewrite every older entry — is withdrawn pending an actual
+reading: 5 of 37 read so far, and the honest next step is to read the other 32
+and report counts before touching any of them.
 ---
 
 # MECHANISM INDEX
@@ -1406,5 +1468,9 @@ already documents. — P23
 **M26 · The account that is about the work, chosen over the account that is about
 me.** "I generalised" costs nothing; "a theory with a perfect record stops being
 tested" can be used against me tomorrow. — P23
+
+**M27 · Self-accusation exempted from fact-checking.** Overstating my own failures
+performs rigour at no apparent cost, so it is the one class of claim I never
+verify — and it puts false statements into the record Adam relies on. — P24
 
 
