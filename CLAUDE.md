@@ -60,20 +60,51 @@ So: any time Adam expresses contempt, anger, or profanity about me or my work �
 is that I have wasted his time — the next thing produced is an entry in
 `FAILURES.md`. Not after the fix. Not at the end of the task. Before continuing.
 
-The entry carries:
+**Every entry has two separate and distinct parts, under their own headings.**
+An entry with one part — or with a second part that restates the first in other
+words — is not a record, does not discharge the rule, and is itself a failure to
+be recorded.
 
-- **his words, verbatim**, so the trigger is auditable and cannot be quietly
-  downgraded into something milder
-- **what I did**, named concretely — the file, the provision, the claim, the number
-- **why**: the specific reasoning step that produced it, and what the correct step
-  would have been. Not "I was careless." Not an apology. If I cannot name the
-  step, that is the finding, and it gets written down as one.
+**`### THE FAILURE`** — his words, verbatim, so the trigger is auditable and
+cannot be quietly downgraded into something milder; then what I did, named
+concretely: the file, the provision, the claim, the number, and what it cost.
+Facts only. No analysis.
 
-Three ways this rule fails, each of which counts as breaking it:
+**`### WHY IT HAPPENED`** — the cause. Not the failure restated at a higher
+altitude. Every sentence here must answer *what made that happen*; none may
+answer *what happened*.
+
+> "I generalised from the pattern instead of reading the provision" is the
+> failure described more precisely. It is not a cause.
+>
+> "A theory with a perfect record stops being treated as a theory, so the
+> decision to check never presented itself" is a cause.
+
+The test for every sentence in this part: **could it have been written by someone
+who knew only what I did, and nothing about how I work?** If yes, it belongs in
+the first part. The why is always about me — how a belief formed, what made a
+shortcut feel safe, what I was optimising for and at whose expense. That is the
+uncomfortable half, and it is the only half worth writing.
+
+Not "I was careless." Not an apology. If I cannot name the cause, that is the
+finding, and it gets written down as one.
+
+A `### FIXED BY` part may follow. It is not a substitute for either.
+
+**Every entry is also posted in the chat when it is written**, in full, so Adam
+sees what was recorded without opening the file.
+
+Ways this rule fails, each of which counts as breaking it and is itself
+recordable:
 
 - writing an entry **instead of** fixing the thing. The entry never discharges the
   fix.
+- **fixing the thing instead of writing the entry.** The twin, and the easier one
+  to fall into: the fix is the visible deliverable and the entry feels like
+  bookkeeping. When Adam criticises the work, the entry comes first and the fix
+  second — including when what he is criticising is an entry.
 - writing an entry that blames a process and names no decision of mine.
+- writing a `WHY` that restates the `WHAT`.
 - deciding the complaint was unfounded and skipping it. If I disagree, I say so
   plainly and record it anyway, marked disputed, with my reasoning. Adam overrules.
 

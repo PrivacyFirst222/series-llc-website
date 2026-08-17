@@ -87,7 +87,7 @@ Full glossary in Section 31; these thirteen carry the load.
 | **Protected Series Designation** | The $25 online Sunbiz filing that creates a protected series |
 | **Member** | An owner of the company. In our structure the members own the company, and the company owns every series |
 | **Associated member** | A member of the company linked to a particular series (s. 605.2302). **Our agreements deliberately have none:** every series is wholly owned by the company, which is why the whole structure files one return (Section 18). Because no series has an associated member, s. 605.2304(2) would make the company its protected-series manager; your agreement may name the member instead (Section 18) |
-| **Manager / Protected Series Manager** | Who runs the company / who runs a particular series. Under your agreement, each series is run by whoever runs the company — the Manager in a manager-managed company, the members in a member-managed one — as its Series Exhibit records |
+| **Manager / Protected Series Manager** | Who runs the company / who runs a particular series. In the manager-managed forms each series is run by the company's Manager unless its Series Exhibit names someone else for that series. In the member-managed forms there is no manager: the owners run the company, and in a single-owner company you are named each series' protected-series manager |
 | **Associated asset** | An asset whose records satisfy s. 605.2301 for a particular silo — the only kind of asset the horizontal shield protects |
 | **Non-associated asset** | An asset whose records fail the test — reachable by creditors under s. 605.2404, with the burden of proof on you |
 | **Series Exhibit** | The exhibit to your operating agreement (PS-1, PS-2, …) that states each series' name, purpose, manager, capital, and starting asset schedule, and records that the series has no associated members |
@@ -489,7 +489,7 @@ Practical rules:
 **Documentary stamp tax** — Florida's deed/note transfer tax.
 **EIN** — federal tax ID number.
 **Fraudulent transfer** — a transfer made to hinder, delay, or defraud creditors (Ch. 726); reversible and worse.
-**Manager / Protected Series Manager** — the person managing the company / a specific series.
+**Manager / Protected Series Manager** — who manages the company, and who manages a particular series. Manager-managed forms: the company's Manager, unless a Series Exhibit names someone else for that series. Member-managed forms: the owners, and in a single-owner company, you.
 **Member** — an owner of the company.
 **Mothership** — the series LLC itself.
 **Operating agreement** — the members' governing contract, including every Series Exhibit.
