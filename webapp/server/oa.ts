@@ -288,7 +288,14 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
   const hasBorrowingThreshold = !(isMemberManaged && isSingle);
   if (hasBorrowingThreshold) {
     must(s, "$[THRESHOLD]", "threshold");
-    s = s.split("$[THRESHOLD]").join(money(inputs.borrowingThreshold ?? 25000));
+    // No default. A number governing when the Manager needs the Member's
+    // written consent is not something to supply on the client's behalf; a
+    // missing one fails here rather than printing $25,000 into a signed
+    // instrument that nobody chose.
+    if (inputs.borrowingThreshold === undefined) {
+      throw new Error("OA: this form has a Section 5.4 approval gate and no borrowing limit was given");
+    }
+    s = s.split("$[THRESHOLD]").join(money(inputs.borrowingThreshold));
   }
 
   // ---- multi-member options (every form but the single-member one) ----

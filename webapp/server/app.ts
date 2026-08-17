@@ -993,9 +993,14 @@ app.post("/portal/oa/generate", async (c) => {
     if (a.includeCapitalCalls && !a.capitalCallCap) {
       return c.json(err("Set the annual capital-call cap.", "INVALID_INPUT"), 400);
     }
-    if (!a.borrowingThreshold) {
-      return c.json(err("Set the manager's borrowing limit.", "INVALID_INPUT"), 400);
-    }
+  }
+  // s. 5.4 exists in every form except the member-managed single-owner ones —
+  // the same predicate oa.ts uses to decide whether to fill $[THRESHOLD]. Until
+  // 17 August this check sat inside the multi-owner block, so a sole owner was
+  // never asked and the agreement said $25,000 on nobody's authority.
+  const hasApprovalGate = !(memberManaged && !multiOwner);
+  if (hasApprovalGate && !a.borrowingThreshold) {
+    return c.json(err("Set the manager's borrowing limit.", "INVALID_INPUT"), 400);
   }
 
   // Every Protected Series is wholly owned by the Company (ss. 605.2302(1),
@@ -1022,7 +1027,7 @@ app.post("/portal/oa/generate", async (c) => {
     capitalCallCap: a.capitalCallCap,
     competition: a.competition ?? (isSCorp && !multiOwner ? "B" : undefined),
     includeShotgun: a.includeShotgun ?? (isSCorp && !multiOwner ? false : undefined),
-    borrowingThreshold: a.borrowingThreshold ?? (isSCorp && !multiOwner ? 25000 : undefined),
+    borrowingThreshold: a.borrowingThreshold,
     contributionToCompany: a.contributionToCompany,
     generationNumber: nextGenerationNumber,
   };

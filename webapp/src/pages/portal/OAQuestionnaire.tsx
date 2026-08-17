@@ -294,6 +294,12 @@ export default function OAQuestionnaire() {
   }
 
   const isMulti = data.version !== "single";
+  // s. 5.4 exists in every form EXCEPT the member-managed single-owner ones,
+  // where the owner manages and a gate would be the owner consenting to
+  // themselves. Sole owners on the manager-managed forms were never shown this
+  // and received $25,000 by default — the number deciding when their Manager
+  // needs written consent to borrow, chosen by nobody.
+  const hasApprovalGate = !(data.memberManaged && !isMulti);
   const unpaired = data.seed.members
     .map((m, i) => ({ name: m.name, i }))
     .filter((x) => !pairedIdx.has(x.i));
@@ -615,22 +621,6 @@ export default function OAQuestionnaire() {
                   </label>
                 </QuestionCard>
 
-                <QuestionCard title="Manager's borrowing limit" learnMore="threshold">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm">Debt above $</span>
-                    <Input
-                      type="number"
-                      min={0}
-                      value={a.borrowingThreshold ?? ""}
-                      onChange={(e) =>
-                        patch({ borrowingThreshold: e.target.value === "" ? undefined : Number(e.target.value) })
-                      }
-                      className="w-32"
-                    />
-                    <span className="text-sm">requires an owner vote</span>
-                  </div>
-                </QuestionCard>
-
                 {data.seed.series.length > 0 ? (
                   <div className="rounded-2xl border border-border bg-secondary/30 p-5 text-sm text-muted-foreground">
                     Each protected series is owned by the company itself, not by the owners
@@ -640,6 +630,30 @@ export default function OAQuestionnaire() {
                   </div>
                 ) : null}
               </>
+            ) : null}
+
+            {hasApprovalGate ? (
+              <QuestionCard title="Manager's borrowing limit" learnMore="threshold">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">Debt above $</span>
+                  <Input
+                    type="number"
+                    min={0}
+                    value={a.borrowingThreshold ?? ""}
+                    onChange={(e) =>
+                      patch({ borrowingThreshold: e.target.value === "" ? undefined : Number(e.target.value) })
+                    }
+                    className="w-32"
+                  />
+                  <span className="text-sm">
+                    requires {isMulti ? "an owner vote" : "your written consent"}
+                  </span>
+                </div>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Above this amount your Manager cannot borrow, or guarantee anyone's debt, without
+                  your written consent (Section 5.4). There is no default — choose the number.
+                </p>
+              </QuestionCard>
             ) : null}
 
             <QuestionCard title="Initial contributions" learnMore="contributions">
