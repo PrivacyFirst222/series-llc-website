@@ -82,6 +82,33 @@ export interface OaInputs {
   generationNumber?: number;
 }
 
+/** Which of the eight forms a client gets: management structure × tax posture.
+ *
+ *  The ONE place this is decided. Until 17 August there were two calculations —
+ *  this one, and a three-valued string the seed endpoint computed to shape the
+ *  questionnaire. They could not disagree visibly, because the seed one could
+ *  not see the S election and was only ever compared against "single". They were
+ *  one refactor away from disagreeing, which is how every coupling failure in
+ *  FAILURES.md began.
+ *
+ *  The questionnaire now receives the two facts it actually needs — multiOwner
+ *  and memberManaged — instead of a version string that resembled this one and
+ *  was not. */
+export function oaVersion(opts: {
+  multiOwner: boolean;
+  memberManaged: boolean;
+  sElection: boolean;
+}): OaInputs["version"] {
+  const { multiOwner, memberManaged, sElection } = opts;
+  return multiOwner
+    ? sElection
+      ? memberManaged ? "member-s" : "s"
+      : memberManaged ? "member" : "multi"
+    : sElection
+      ? memberManaged ? "member-single-s" : "single-s"
+      : memberManaged ? "member-single" : "single";
+}
+
 function must(haystack: string, needle: string | RegExp, label: string): void {
   const found = typeof needle === "string" ? haystack.includes(needle) : needle.test(haystack);
   if (!found) throw new Error(`OA template marker missing: ${label}`);

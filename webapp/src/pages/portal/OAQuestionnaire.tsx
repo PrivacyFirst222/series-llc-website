@@ -77,7 +77,8 @@ interface Answers {
 
 interface OaData {
   seed: OaSeed;
-  version: "single" | "multi" | "member";
+  version: string;
+  multiOwner: boolean;
   memberManaged: boolean;
   blocked: boolean;
   templateVersion: string;
@@ -293,7 +294,12 @@ export default function OAQuestionnaire() {
     );
   }
 
-  const isMulti = data.version !== "single";
+  // The fact, not a string that encodes it. Deriving this from the version
+  // string was safe only while the seed computed a three-valued lookalike;
+  // the moment it returned the real eight-valued version, "member-single"
+  // would have read as multi-owner and shown a sole owner the whole
+  // multi-member block.
+  const isMulti = data.multiOwner;
   // s. 5.4 exists in every form EXCEPT the member-managed single-owner ones,
   // where the owner manages and a gate would be the owner consenting to
   // themselves. Sole owners on the manager-managed forms were never shown this

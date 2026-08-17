@@ -27,7 +27,7 @@ import { hashPassword, verifyPassword, newToken, hashToken, encryptSecret, decry
 import { hasProtectedSeriesPhrase } from "../src/components/forms/florida-llc/validation";
 import { assembleNewSeries } from "./new-series";
 import { stampEastern, stampForFilename } from "./datetime";
-import { assembleOa, OA_TEMPLATE_VERSION, type OaInputs } from "./oa";
+import { assembleOa, oaVersion, OA_TEMPLATE_VERSION, type OaInputs } from "./oa";
 import { renderMarkdownPdf, stampExistingPdf } from "./pdf-render";
 import { createSession, getSession, destroySession, rateLimit, clientIp } from "./auth";
 import { deleteFile, putFile, readFileStream } from "./storage";
@@ -806,11 +806,16 @@ app.get("/portal/oa", async (c) => {
     [session.clientId],
   );
   const memberManaged = seed.managementStructure === "MEMBER_MANAGED";
-  const version = seed.members.length > 1 ? (memberManaged ? "member" : "multi") : "single";
+  const multiOwner = seed.members.length > 1;
+  // The S election is an ANSWER, not a fact about the order, so the seed cannot
+  // know it. It reports the two structural facts and the version they imply
+  // before any election — never a second, differently-shaped version string.
+  const version = oaVersion({ multiOwner, memberManaged, sElection: false });
   return c.json({
     data: {
       seed,
       version,
+      multiOwner,
       memberManaged,
       blocked: false,
       templateVersion: OA_TEMPLATE_VERSION,
@@ -854,13 +859,7 @@ app.post("/portal/oa/generate", async (c) => {
   // their own Articles. Until 16 August this collapsed every sole owner onto
   // the manager-managed forms because the member-managed single-member forms
   // did not exist yet.
-  const version: OaInputs["version"] = multiOwner
-    ? a.sElection
-      ? memberManaged ? "member-s" : "s"
-      : memberManaged ? "member" : "multi"
-    : a.sElection
-      ? memberManaged ? "member-single-s" : "single-s"
-      : memberManaged ? "member-single" : "single";
+  const version = oaVersion({ multiOwner, memberManaged, sElection: !!a.sElection });
   if (a.authorized !== true) {
     return c.json(err("Please confirm you are authorized to provide this information.", "INVALID_INPUT"), 400);
   }

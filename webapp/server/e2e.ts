@@ -635,7 +635,7 @@ if (mint.status === 200) {
   });
   check("couple client signs in", mPw.status === 200);
   const mSeed = await api("/api/portal/oa", { cookies: mPw.cookie });
-  check("multi OA seed has 2 members", mSeed.body?.data?.version === "multi" && mSeed.body?.data?.seed?.members?.length === 2, mSeed.body?.data);
+  check("multi OA seed has 2 members", mSeed.body?.data?.version === "multi" && mSeed.body?.data?.multiOwner === true && mSeed.body?.data?.seed?.members?.length === 2, mSeed.body?.data);
   const coupleAnswers = {
     firstOrAmended: "first",
     effectiveDate: "2026-08-06",
@@ -865,7 +865,7 @@ if (mint.status === 200) {
   const mmSeed = await api("/api/portal/oa", { cookies: mmPw.cookie });
   check(
     "OA seed routes to member-managed (no longer blocked)",
-    mmSeed.body?.data?.version === "member" && mmSeed.body?.data?.blocked === false && mmSeed.body?.data?.memberManaged === true,
+    mmSeed.body?.data?.version === "member" && mmSeed.body?.data?.multiOwner === true && mmSeed.body?.data?.blocked === false && mmSeed.body?.data?.memberManaged === true,
     mmSeed.body?.data,
   );
   const mmAnswers = {
