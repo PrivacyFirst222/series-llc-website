@@ -3,6 +3,8 @@
  * Requires the dev API on :3000. Uses the same defaults + validation the form uses.
  */
 import { defaultFormData } from "../src/components/forms/florida-llc/defaults";
+import { assembleOa } from "./oa";
+import { getDb } from "./db";
 import type { FloridaLLCFormData } from "../src/components/forms/florida-llc/types";
 
 const BASE = process.env.E2E_BASE_URL || "http://localhost:3000";
@@ -100,6 +102,19 @@ async function api(path: string, init?: RequestInit & { cookies?: string }) {
   const setCookie = res.headers.get("set-cookie") ?? "";
   const body = await res.json().catch(() => null);
   return { status: res.status, body, cookie: setCookie.split(";")[0] };
+}
+
+// One admin session for the whole run. /api/admin/login is rate limited to 10
+// attempts per 15 minutes per IP — a real control against password guessing —
+// and the suite was spending it on itself: an eleventh login returned 429, the
+// cookie came back empty, and the failure surfaced two tests later as "Not
+// signed in" on a route that was working fine. The suite bends, not the limit.
+let adminLogin: Awaited<ReturnType<typeof api>> | null = null;
+async function adminSession() {
+  if (!adminLogin) {
+    adminLogin = await api("/api/admin/login", { method: "POST", body: JSON.stringify({ password: "dev-admin" }) });
+  }
+  return adminLogin;
 }
 
 // 1. Reject garbage
@@ -264,7 +279,7 @@ check("status pending before payment", pre.body?.data?.status === "pending_payme
 //    instead (dev accepts unsigned webhooks when no signature key is set).
 let sim = await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId }) });
 if (sim.status === 404) {
-  const adminEarly = await api("/api/admin/login", { method: "POST", body: JSON.stringify({ password: "dev-admin" }) });
+  const adminEarly = await adminSession();
   const full = await api(`/api/admin/orders/${orderId}`, { cookies: adminEarly.cookie });
   const squareOrderId = (full.body?.data as { squareOrderId?: string })?.squareOrderId;
   sim = await api("/api/square/webhook", {
@@ -281,7 +296,7 @@ const post = await api(`/api/orders/${orderId}/status`);
 check("status flips to paid", post.body?.data?.status === "paid");
 
 // 5. Welcome email was "sent" (dev log) with a set-password link — grab the token from the DB instead
-const admin = await api("/api/admin/login", { method: "POST", body: JSON.stringify({ password: "dev-admin" }) });
+const admin = await adminSession();
 check("admin login", admin.status === 200);
 const clients = await api("/api/admin/clients", { cookies: admin.cookie });
 const client = (clients.body?.data as { id: string; email: string; has_password: boolean }[])?.find(
@@ -381,7 +396,7 @@ if (mint.status === 200) {
   const simSvc = await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: seriesId }) });
   if (simSvc.status === 404) {
     // Sandbox Square creds present: pay via a webhook-shaped event instead.
-    const adminSvc = await api("/api/admin/login", { method: "POST", body: JSON.stringify({ password: "dev-admin" }) });
+    const adminSvc = await adminSession();
     const svcDetail = await api(`/api/admin/services/${seriesId}`, { cookies: adminSvc.cookie });
     await api("/api/square/webhook", {
       method: "POST",
@@ -421,7 +436,7 @@ if (mint.status === 200) {
   });
   check("EIN details cannot be resubmitted", einAgain.status === 400);
 
-  const adminLogin2 = await api("/api/admin/login", { method: "POST", body: JSON.stringify({ password: "dev-admin" }) });
+  const adminLogin2 = await adminSession();
   const adminDetail = await api(`/api/admin/services/${intakeEin.id}`, { cookies: adminLogin2.cookie });
   check("admin decrypts TIN for SS-4", adminDetail.body?.data?.tin === "123456789", adminDetail.body?.data);
   check("client-facing record keeps only last 4", adminDetail.body?.data?.details?.tinLast4 === "6789");
@@ -620,7 +635,7 @@ if (mint.status === 200) {
   const mOrderId = mOrder.body?.data?.orderId as string;
   let mSim = await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: mOrderId }) });
   if (mSim.status === 404) {
-    const adm = await api("/api/admin/login", { method: "POST", body: JSON.stringify({ password: "dev-admin" }) });
+    const adm = await adminSession();
     const full = await api(`/api/admin/orders/${mOrderId}`, { cookies: adm.cookie });
     const sqId = (full.body?.data as { squareOrderId?: string })?.squareOrderId;
     mSim = await api("/api/square/webhook", {
@@ -702,7 +717,7 @@ if (mint.status === 200) {
   const sOrder = await api("/api/portal/services/s-election", { method: "POST", cookies: mPw.cookie, body: "{}" });
   check("S election order accepted in window", sOrder.status === 200 && sOrder.body?.data?.totalCents === 9500, sOrder.body);
   const sId = sOrder.body?.data?.serviceOrderId as string;
-  const adminS = await api("/api/admin/login", { method: "POST", body: JSON.stringify({ password: "dev-admin" }) });
+  const adminS = await adminSession();
   let sPay = await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: sId }) });
   if (sPay.status === 404) {
     const det = await api(`/api/admin/services/${sId}`, { cookies: adminS.cookie });
@@ -852,7 +867,7 @@ if (mint.status === 200) {
   const mmId = mmOrder.body?.data?.orderId as string;
   let mmPay = await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: mmId }) });
   if (mmPay.status === 404) {
-    const adm = await api("/api/admin/login", { method: "POST", body: JSON.stringify({ password: "dev-admin" }) });
+    const adm = await adminSession();
     const full = await api(`/api/admin/orders/${mmId}`, { cookies: adm.cookie });
     mmPay = await api("/api/square/webhook", {
       method: "POST",
@@ -966,7 +981,7 @@ if (mint.status === 200) {
   const smId = smOrder.body?.data?.orderId as string;
   let smPay = await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: smId }) });
   if (smPay.status === 404) {
-    const adm = await api("/api/admin/login", { method: "POST", body: JSON.stringify({ password: "dev-admin" }) });
+    const adm = await adminSession();
     const full = await api(`/api/admin/orders/${smId}`, { cookies: adm.cookie });
     smPay = await api("/api/square/webhook", {
       method: "POST",
@@ -1030,6 +1045,143 @@ if (mint.status === 200) {
   );
 }
 
+// 16c. Owners are editable after formation.
+//
+// Members are never filed with the Division (server/filing.ts has no member
+// field), so the intake list is where the owner list starts, not what it is
+// fixed to. A client who takes on a partner must be able to say so, and the
+// added owner has to reach Exhibit A and the signature block.
+{
+  const edEmail = `e2e-ed-${Math.random().toString(36).slice(2, 8)}@example.com`;
+  const edData = {
+    ...formData,
+    correspondentEmail: edEmail,
+    confirmCorrespondentEmail: edEmail,
+    desiredLlcName: "E2E Editable Owners",
+    series: [{ id: "s1", name: "E2E Editable Owners, LLC, PS A" }],
+    orderEin: false,
+    orderSElection: false,
+  };
+  const edOrder = await api("/api/orders", { method: "POST", body: JSON.stringify(edData) });
+  check("editable-owners order accepted", edOrder.status === 200, edOrder.body);
+  const edId = edOrder.body?.data?.orderId as string;
+  let edPay = await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: edId }) });
+  if (edPay.status === 404) {
+    const adm = await adminSession();
+    const full = await api(`/api/admin/orders/${edId}`, { cookies: adm.cookie });
+    edPay = await api("/api/square/webhook", {
+      method: "POST",
+      body: JSON.stringify({
+        event_id: `e2e-ed-${edId}`, type: "payment.updated",
+        data: { object: { payment: { id: `e2e-pay-ed-${edId.slice(0, 8)}`, status: "COMPLETED", order_id: full.body?.data?.squareOrderId } } },
+      }),
+    });
+  }
+  check("editable-owners order paid", edPay.status === 200);
+  const edMint = await api("/api/dev/mint-reset-token", { method: "POST", body: JSON.stringify({ email: edEmail }) });
+  const edPw = await api("/api/auth/set-password", {
+    method: "POST", body: JSON.stringify({ token: edMint.body?.data?.token, password: "e2e-password-5" }),
+  });
+  check("editable-owners client signs in", edPw.status === 200, edPw.body);
+
+  // Formed with one owner, member-managed.
+  const edSeed = await api("/api/portal/oa", { cookies: edPw.cookie });
+  check("starts as a sole owner", edSeed.body?.data?.multiOwner === false, edSeed.body?.data);
+
+  const base = {
+    firstOrAmended: "first", effectiveDate: "2026-08-17", authorized: true,
+    series: [{}], ownershipMode: "percent",
+    includeCapitalCalls: false, competition: "A", includeShotgun: false, borrowingThreshold: 40000,
+  };
+  const twoOwners = [
+    { name: "Casey Member", address: "100 Ocean Drive, Miami, FL 33139", percentage: 60, contribution: "$600 cash" },
+    { name: "Jordan Vale", address: "22 Bay Street, Miami, FL 33130", percentage: 40, contribution: "$400 cash" },
+  ];
+
+  // An owner with no address would print a blank line in Exhibit A.
+  const noAddr = await api("/api/portal/oa/generate", {
+    method: "POST", cookies: edPw.cookie,
+    body: JSON.stringify({ ...base, multiOwner: true, members: [twoOwners[0], { name: "Jordan Vale", percentage: 40 }] }),
+  });
+  check("an owner without an address is rejected", noAddr.status === 400, noAddr.body);
+
+  // The answer to "more than one owner?" and the list have to agree.
+  const saysOne = await api("/api/portal/oa/generate", {
+    method: "POST", cookies: edPw.cookie,
+    body: JSON.stringify({ ...base, multiOwner: false, members: twoOwners }),
+  });
+  check("answering 'one owner' with two listed is rejected", saysOne.status === 400, saysOne.body);
+  const saysMany = await api("/api/portal/oa/generate", {
+    method: "POST", cookies: edPw.cookie,
+    body: JSON.stringify({ ...base, multiOwner: true, members: [twoOwners[0]] }),
+  });
+  check("answering 'more than one' with one listed is rejected", saysMany.status === 400, saysMany.body);
+
+  // Adding the partner re-routes a sole owner onto the multi-member master.
+  const edGen = await api("/api/portal/oa/generate", {
+    method: "POST", cookies: edPw.cookie,
+    body: JSON.stringify({ ...base, multiOwner: true, members: twoOwners }),
+  });
+  check("an owner added in the portal generates", edGen.status === 200, edGen.body);
+  check(
+    "adding an owner re-routes a sole owner to the member-managed multi master",
+    edGen.body?.data?.version === "member",
+    edGen.body?.data,
+  );
+
+  const edPdf = await fetch(`${BASE}/api/portal/documents/${edGen.body?.data?.documentId}/download`, {
+    headers: { Cookie: edPw.cookie },
+  });
+  const edBytes = new Uint8Array(await edPdf.arrayBuffer());
+  check("the agreement downloads as a PDF", edPdf.ok && edBytes[0] === 0x25 && edBytes[1] === 0x50, { status: edPdf.status });
+
+  // The added owner has to be IN the text, not merely accepted by the route.
+  // Searching the PDF bytes cannot show this — the file embeds subset fonts, so
+  // not one word of it is recoverable as ASCII, and a byte search comes back
+  // empty whether the name is there or not. Re-assemble from the inputs the
+  // route actually STORED: that is the exact markdown the PDF was rendered from,
+  // and it covers the answers-to-inputs mapping, which is where a lost owner
+  // would go missing.
+  const storedText = async (generationId: string) => {
+    const db = await getDb();
+    const rows = await db.query<{ inputs: unknown }>("SELECT inputs FROM oa_generations WHERE id = $1", [generationId]);
+    const raw = rows[0]?.inputs;
+    return assembleOa((typeof raw === "string" ? JSON.parse(raw) : raw) as Parameters<typeof assembleOa>[0]).markdown;
+  };
+  const twoOwnerText = await storedText(edGen.body?.data?.generationId as string);
+  check("the added owner is named in the agreement", twoOwnerText.includes("Jordan Vale"), {
+    casey: twoOwnerText.includes("Casey Member"),
+  });
+  check("the added owner's address is in the agreement", twoOwnerText.includes("22 Bay Street, Miami, FL 33130"));
+  check("the added owner appears in Exhibit A and the signature block (twice or more)",
+    (twoOwnerText.match(/Jordan Vale/g) ?? []).length >= 2,
+    (twoOwnerText.match(/Jordan Vale/g) ?? []).length);
+
+  // Removing the partner again puts them back on a sole-owner master.
+  const backToOne = await api("/api/portal/oa/generate", {
+    method: "POST", cookies: edPw.cookie,
+    body: JSON.stringify({ ...base, multiOwner: false, members: [twoOwners[0]], contributionToCompany: "$600 cash" }),
+  });
+  check("removing an owner generates", backToOne.status === 200, backToOne.body);
+  check(
+    "removing the added owner returns them to the member-single master",
+    backToOne.body?.data?.version === "member-single",
+    backToOne.body?.data,
+  );
+  const oneOwnerText = await storedText(backToOne.body?.data?.generationId as string);
+  check("the removed owner is gone from the agreement", !oneOwnerText.includes("Jordan Vale"));
+  check("the remaining owner is still in it", oneOwnerText.includes("Casey Member"));
+
+  // The seed reports where the client actually is, not where they started.
+  const edAfter = await api("/api/portal/oa/answers", {
+    method: "PUT", cookies: edPw.cookie,
+    body: JSON.stringify({ ...base, multiOwner: true, members: twoOwners }),
+  });
+  check("edited owners save", edAfter.status === 200, edAfter.body);
+  const reseed = await api("/api/portal/oa", { cookies: edPw.cookie });
+  check("the seed now reports two owners", reseed.body?.data?.multiOwner === true, reseed.body?.data);
+}
+
 // 17. Account settings: change password, change email (verified two-step)
 {
   const acctEmail = `e2e-acct-${Math.random().toString(36).slice(2, 8)}@example.com`;
@@ -1046,7 +1198,7 @@ if (mint.status === 200) {
   const aId = aOrder.body?.data?.orderId as string;
   let aPay = await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: aId }) });
   if (aPay.status === 404) {
-    const adm = await api("/api/admin/login", { method: "POST", body: JSON.stringify({ password: "dev-admin" }) });
+    const adm = await adminSession();
     const full = await api(`/api/admin/orders/${aId}`, { cookies: adm.cookie });
     aPay = await api("/api/square/webhook", {
       method: "POST",
@@ -1125,7 +1277,7 @@ if (mint.status === 200) {
   }
 
   // --- admin override ---
-  const adminAcct = await api("/api/admin/login", { method: "POST", body: JSON.stringify({ password: "dev-admin" }) });
+  const adminAcct = await adminSession();
   const allClients = await api("/api/admin/clients", { cookies: adminAcct.cookie });
   const target = (allClients.body?.data ?? []).find((cl: { email: string }) => cl.email === newEmail);
   const overrideEmail = `e2e-acct-admin-${Math.random().toString(36).slice(2, 8)}@example.com`;

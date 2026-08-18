@@ -11,11 +11,12 @@ export function StepMembers({ data, patch, errors }: StepProps) {
   return (
     <div className="space-y-6">
       <header className="space-y-2">
-        <h2 className="font-display text-3xl">Members / ownership</h2>
+        <h2 className="font-display text-3xl">Initial members</h2>
         <p className="text-sm text-muted-foreground max-w-2xl">
           We collect member information for your internal records and operating
           agreement preparation. Members are not listed in the Articles of
-          Organization.
+          Organization. You can add, remove, or change owners later when you
+          build your operating agreement.
         </p>
       </header>
 

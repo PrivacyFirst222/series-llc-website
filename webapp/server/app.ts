@@ -731,6 +731,9 @@ async function oaSeed(clientId: string): Promise<{
 const oaAnswersSchema = z.object({
   firstOrAmended: z.enum(["first", "amended"]).optional(),
   sElection: z.boolean().optional(), // true = build on the S corporation form
+  // Asked, not derived. The intake list is where the owners START; a client can
+  // take on a partner or buy one out before the agreement is written.
+  multiOwner: z.boolean().optional(),
   effectiveDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   authorized: z.boolean().optional(),
   contributionToCompany: z.string().max(300).optional(),
@@ -738,6 +741,10 @@ const oaAnswersSchema = z.object({
   members: z
     .array(
       z.object({
+        // Name and address travel WITH the owner. Held in a second array keyed
+        // by position, a deletion would shift every share onto the wrong person.
+        name: z.string().max(200).optional(),
+        address: z.string().max(300).optional(),
         percentage: z.number().min(0).max(100).optional(),
         numerator: z.number().int().min(0).max(100_000).optional(),
         denominator: z.number().int().min(1).max(100_000).optional(),
@@ -745,6 +752,7 @@ const oaAnswersSchema = z.object({
         todBeneficiary: z.string().max(300).optional(),
       }),
     )
+    .max(20)
     .optional(),
   series: z
     .array(
@@ -781,6 +789,31 @@ const SPOUSAL_FORM_LABEL: Record<"TBE" | "JTWROS", string> = {
   JTWROS: "joint tenants with right of survivorship",
 };
 
+// Who owns the company, as the client last said. The intake list is only the
+// starting point: members are never filed with the Division (server/filing.ts
+// has no member field), so nothing about the formation record fixes it. An
+// untouched draft carries shares but no names, which is how the two are told
+// apart. Every document that names the owners resolves them HERE — otherwise
+// two documents generated the same afternoon disagree about who owns the company.
+export function effectiveOwners(
+  seedMembers: { name: string; address: string }[],
+  answers: { members?: { name?: string; address?: string }[] } | null | undefined,
+): { name: string; address: string }[] {
+  const answered = answers?.members ?? [];
+  const edited = answered.some((m) => (m.name ?? "").trim() !== "");
+  return edited
+    ? answered.map((m) => ({ name: (m.name ?? "").trim(), address: (m.address ?? "").trim() }))
+    : seedMembers.map((m) => ({ name: m.name, address: m.address }));
+}
+
+async function savedOaAnswers(clientId: string): Promise<{ members?: { name?: string; address?: string }[] } | null> {
+  const db = await getDb();
+  const rows = await db.query<{ answers: unknown }>("SELECT answers FROM oa_profiles WHERE client_id = $1", [clientId]);
+  if (rows.length === 0) return null;
+  const raw = rows[0].answers;
+  return (typeof raw === "string" ? JSON.parse(raw) : raw) as { members?: { name?: string; address?: string }[] };
+}
+
 function fmtDate(iso: string): string {
   const [y, m, d] = iso.split("-").map(Number);
   return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString("en-US", {
@@ -805,8 +838,14 @@ app.get("/portal/oa", async (c) => {
        FROM oa_generations WHERE client_id = $1 ORDER BY created_at DESC`,
     [session.clientId],
   );
+  const savedAnswers =
+    saved.length > 0
+      ? ((typeof saved[0].answers === "string" ? JSON.parse(saved[0].answers as string) : saved[0].answers) as Record<string, unknown>)
+      : {};
   const memberManaged = seed.managementStructure === "MEMBER_MANAGED";
-  const multiOwner = seed.members.length > 1;
+  // Reports where the client actually is, not where they started: an owner
+  // added in the portal makes this true even though the intake list had one.
+  const multiOwner = effectiveOwners(seed.members, savedAnswers as { members?: { name?: string }[] }).length > 1;
   // The S election is an ANSWER, not a fact about the order, so the seed cannot
   // know it. It reports the two structural facts and the version they imply
   // before any election — never a second, differently-shaped version string.
@@ -819,7 +858,7 @@ app.get("/portal/oa", async (c) => {
       memberManaged,
       blocked: false,
       templateVersion: OA_TEMPLATE_VERSION,
-      answers: saved.length > 0 ? (typeof saved[0].answers === "string" ? JSON.parse(saved[0].answers as string) : saved[0].answers) : {},
+      answers: savedAnswers,
       generations: gens,
     },
   });
@@ -850,7 +889,34 @@ app.post("/portal/oa/generate", async (c) => {
   const a = body.data;
   const seed = await oaSeed(session.clientId);
   if (!seed) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
-  const multiOwner = seed.members.length > 1;
+  // The owners are an answer, not a reading of the formation record. Members
+  // are never filed with the Division — server/filing.ts has no member field —
+  // so the intake list is where the list starts, not what it is fixed to.
+  // Untouched drafts carry shares but no names, which is how we tell them apart.
+  const owners = effectiveOwners(seed.members, a);
+  if (owners.length === 0) {
+    return c.json(err("An operating agreement needs at least one owner.", "INVALID_INPUT"), 400);
+  }
+  if (owners.some((o) => !o.name || !o.address)) {
+    return c.json(
+      err("Every owner needs a full legal name and an address — both are printed in Exhibit A and the signature block.", "INVALID_INPUT"),
+      400,
+    );
+  }
+  const multiOwner = owners.length > 1;
+  // The answer to "more than one owner?" and the list itself must agree, or one
+  // of the two is wrong and we cannot know which.
+  if (a.multiOwner !== undefined && a.multiOwner !== multiOwner) {
+    return c.json(
+      err(
+        a.multiOwner
+          ? "You answered that the LLC has more than one owner, but only one is listed. Add the others."
+          : "You answered that the LLC has one owner, but more than one is listed. Remove the others.",
+        "INVALID_INPUT",
+      ),
+      400,
+    );
+  }
   const memberManaged = seed.managementStructure === "MEMBER_MANAGED";
   // Management structure × tax posture, all four structures by both postures.
   // A sole owner CAN be member-managed and often is: managementStructure comes
@@ -897,8 +963,8 @@ app.post("/portal/oa/generate", async (c) => {
   for (const cpl of couples) {
     if (
       cpl.a === cpl.b ||
-      !seed.members[cpl.a] ||
-      !seed.members[cpl.b] ||
+      !owners[cpl.a] ||
+      !owners[cpl.b] ||
       pairedIdx.has(cpl.a) ||
       pairedIdx.has(cpl.b)
     ) {
@@ -913,11 +979,11 @@ app.post("/portal/oa/generate", async (c) => {
   // Doe as tenants by the entirety" is sufficient, so "husband and wife," is
   // gone from the document entirely.
   const coupleName = (cpl: (typeof couples)[number]) =>
-    `${seed.members[cpl.a].name} and ${seed.members[cpl.b].name}`;
+    `${owners[cpl.a].name} and ${owners[cpl.b].name}`;
 
   const members: OaInputs["members"] = [];
   const emittedCouples = new Set<(typeof couples)[number]>();
-  seed.members.forEach((m, i) => {
+  owners.forEach((m, i) => {
     const cpl = coupleAt(i);
     if (cpl) {
       if (emittedCouples.has(cpl)) return;
@@ -925,7 +991,7 @@ app.post("/portal/oa/generate", async (c) => {
       const cplShare: OwnershipShare = { percentage: cpl.percentage, numerator: cpl.numerator, denominator: cpl.denominator };
       members.push({
         name: coupleName(cpl),
-        address: seed.members[cpl.a].address,
+        address: owners[cpl.a].address,
         percentage: shareValue(ownershipMode, cplShare),
         percentageLabel: shareLabel(ownershipMode, cplShare),
         jointHolding: SPOUSAL_FORM_LABEL[cpl.form],
@@ -933,7 +999,7 @@ app.post("/portal/oa/generate", async (c) => {
         todBeneficiary: cpl.todBeneficiary
           ? `${cpl.todBeneficiary} (effective at the death of the last surviving spouse)`
           : "",
-        signatories: [seed.members[cpl.a].name, seed.members[cpl.b].name],
+        signatories: [owners[cpl.a].name, owners[cpl.b].name],
       });
     } else {
       const mShare: OwnershipShare = multiOwner
@@ -968,7 +1034,7 @@ app.post("/portal/oa/generate", async (c) => {
     // no float comparison of 33.33 can honestly report.
     const shares: OwnershipShare[] = [];
     const seenCouples = new Set<(typeof couples)[number]>();
-    seed.members.forEach((_, i) => {
+    owners.forEach((_, i) => {
       const cpl = coupleAt(i);
       if (cpl) {
         if (seenCouples.has(cpl)) return;
@@ -1131,6 +1197,9 @@ app.post("/portal/series/consent", async (c) => {
   }
 
   const memberManaged = seed.managementStructure === "MEMBER_MANAGED";
+  // Same owners the operating agreement uses — a client who added or removed an
+  // owner must not get a series document that names the intake list.
+  const seriesOwners = effectiveOwners(seed.members, await savedOaAnswers(session.clientId));
   const generatedOn = new Date();
   let pdf: Uint8Array;
   let title: string;
@@ -1141,7 +1210,7 @@ app.post("/portal/series/consent", async (c) => {
       seriesNumber: body.data.seriesNumber.trim(),
       purpose: body.data.purpose,
       effectiveDate: fmtDate(body.data.effectiveDate),
-      memberNames: seed.members.map((m) => m.name),
+      memberNames: seriesOwners.map((m) => m.name),
       managerNames: seed.managerNames,
       memberManaged,
     });

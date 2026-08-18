@@ -171,7 +171,7 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
             value={data.includeMembersInArticles ? "Yes" : "No"}
           />
           <Row
-            label="Members"
+            label="Initial members"
             value={
               data.members.length === 0
                 ? "None"

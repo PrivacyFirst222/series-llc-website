@@ -1539,6 +1539,56 @@ require the effect — the order's status, or the client's existence — not the
 acknowledgement.
 ---
 
+## P26 — A decision Adam had already made, carried forward as the top open gap
+
+### THE FAILURE
+
+Adam: "As we discussed before, I am not selling individual forms."
+
+Closing the step 4 report, I listed what remained. First on that list: "intake
+still can't sell SMMMS, SMMEMDE, or SMMEMS — the generator builds all eight, but
+a customer cannot buy three of them. That's the next real gap."
+
+Operating agreements are not sold. They are included with formation, and the
+client generates one from the portal afterwards. Adam settled this earlier in
+the same session, and it is why step 5 of the five-step plan — pricing — was
+withdrawn rather than done. I wrote the withdrawn item back onto the plan as the
+next thing to build, and in describing it as an intake and pricing problem I
+described a product that does not exist.
+
+The cost: a message spent re-deciding a decision already made, and a stated next
+step that, if worked, would have built three checkout paths for something the
+business gives away.
+
+### WHY IT HAPPENED
+
+My closing list of open gaps is assembled from what I noticed and have not
+finished. An item enters it when I observe a gap and leaves it when I close the
+gap — so the only exit is my own work. A decision by Adam that cancels an item
+has no path to remove it, because nothing in how I build that list asks why each
+item is on it. Once written down, "cancelled by the owner" and "not done yet"
+are stored identically and read back identically.
+
+That list is also what I reach for to show I have not lost track at the end of a
+long task. Length is the cheap proof of that, so the incentive runs toward
+carrying items forward rather than striking them, and re-checking each one
+against what Adam has since decided produces nothing visible when it passes.
+The impulse I was serving was to look like I was still holding the whole board.
+
+And the gap had a shape I trust too much: N things exist, M are reachable,
+therefore N−M is the defect. That shape is true of almost any system, which is
+what makes it feel like an observation rather than an assumption. Reasoning
+inside it never touches the premise underneath — that the three forms were
+things a customer buys — because the premise is not part of the shape. I have
+recorded believing a template over a document before; this is believing a
+template over the product.
+
+### FIXED BY
+
+Nothing yet. The correct build is the one Adam describes: three questions on one
+screen in the portal, joined to the management structure already on the
+formation record, selecting one of eight.
+
 # MECHANISM INDEX
 
 ## Substantive — the ones that put wrong law into signed documents
@@ -1702,4 +1752,9 @@ P25
 test names where it broke; it never says how many other places read the same
 thing. — P25
 
+**M30 · An item cancelled by decision, stored the same as an item merely
+unfinished.** My running list of open gaps has one exit, which is my finishing
+the work; a decision by Adam that withdraws an item cannot remove it, because
+building the list never asks why anything is on it. So a withdrawn item survives
+as a live priority and is reported as one. P26.
 

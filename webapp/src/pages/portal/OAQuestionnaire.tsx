@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Download, FileText, Heart, HelpCircle, History, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Download, FileText, Heart, HelpCircle, History, Plus, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -37,6 +37,10 @@ interface OaGeneration {
 }
 
 interface MemberAnswer {
+  // Identity travels with the owner. Kept in a parallel array keyed by
+  // position, deleting an owner would slide every share onto the wrong person.
+  name?: string;
+  address?: string;
   percentage?: number;
   numerator?: number;
   denominator?: number;
@@ -61,6 +65,7 @@ interface CoupleAnswer {
 interface Answers {
   firstOrAmended?: "first" | "amended";
   sElection?: boolean;
+  multiOwner?: boolean;
   effectiveDate?: string;
   authorized?: boolean;
   contributionToCompany?: string;
@@ -150,6 +155,10 @@ export default function OAQuestionnaire() {
   const [a, setA] = useState<Answers>({});
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState("");
+  // Three questions decide which of the eight forms this is. They come first,
+  // on their own screen, so the rest of the page is only ever the questions
+  // that form actually has.
+  const [stage, setStage] = useState<"start" | "details">("start");
   const [pairA, setPairA] = useState<number | "">("");
   const [pairB, setPairB] = useState<number | "">("");
   const [pairForm, setPairForm] = useState<"TBE" | "JTWROS">("TBE");
@@ -179,7 +188,16 @@ export default function OAQuestionnaire() {
         effectiveDate: saved.effectiveDate ?? todayIso(),
         authorized: saved.authorized ?? false,
         contributionToCompany: saved.contributionToCompany ?? "",
-        members: data.seed.members.map((_, i) => saved.members?.[i] ?? {}),
+        multiOwner: saved.multiOwner ?? data.multiOwner,
+        // Once the client has edited the owners, the draft IS the list — it may
+        // be longer or shorter than the one captured at formation.
+        members: saved.members?.some((m) => (m?.name ?? "").trim() !== "")
+          ? saved.members
+          : data.seed.members.map((m, i) => ({
+              ...(saved.members?.[i] ?? {}),
+              name: m.name,
+              address: m.address,
+            })),
         series: data.seed.series.map((_, i) => saved.series?.[i] ?? {}),
         couples: saved.couples ?? [],
         ownershipMode: saved.ownershipMode ?? "percent",
@@ -231,14 +249,31 @@ export default function OAQuestionnaire() {
     patch({ couples });
   };
 
+  const addOwner = () => patch({ members: [...(a.members ?? []), { name: "", address: "" }] });
+  // Deleting an owner renumbers everyone after them. A spousal pairing holds
+  // positions, not names, so the indexes have to move with the list or the
+  // pairing quietly re-marries two different people.
+  const removeOwner = (i: number) => {
+    const members = (a.members ?? []).filter((_, k) => k !== i);
+    const nextCouples = (a.couples ?? [])
+      .filter((c) => c.a !== i && c.b !== i)
+      .map((c) => ({ ...c, a: c.a > i ? c.a - 1 : c.a, b: c.b > i ? c.b - 1 : c.b }));
+    patch({ members, couples: nextCouples });
+  };
+
   const couples = a.couples ?? [];
   const pairedIdx = useMemo(() => new Set(couples.flatMap((c) => [c.a, c.b])), [couples]);
 
+  const owners = useMemo(() => a.members ?? [], [a.members]);
+  // A just-added owner has no name yet. Falling back to "" leaves a blank row in
+  // the ownership table and a blank line in the spouse pickers, so the client
+  // cannot tell which owner a field belongs to.
+  const ownerLabel = (m: MemberAnswer | undefined, i: number) => m?.name?.trim() || `Owner ${i + 1}`;
+
   const units: Unit[] = useMemo(() => {
-    if (!data) return [];
     const out: Unit[] = [];
     const emitted = new Set<number>();
-    data.seed.members.forEach((m, i) => {
+    owners.forEach((m, i) => {
       const ci = couples.findIndex((c) => c.a === i || c.b === i);
       if (ci >= 0) {
         if (emitted.has(ci)) return;
@@ -247,16 +282,16 @@ export default function OAQuestionnaire() {
         out.push({
           kind: "couple",
           ci,
-          label: `${data.seed.members[c.a]?.name} & ${data.seed.members[c.b]?.name}`,
+          label: `${ownerLabel(owners[c.a], c.a)} & ${ownerLabel(owners[c.b], c.b)}`,
           note: FORM_LABEL[c.form],
           repIndex: c.a,
         });
       } else {
-        out.push({ kind: "member", index: i, label: m.name });
+        out.push({ kind: "member", index: i, label: ownerLabel(m, i) });
       }
     });
     return out;
-  }, [data, couples]);
+  }, [owners, couples]);
 
   // The ownership question is hidden when the owners are a single unit — a
   // couple holding jointly, or one member — so nothing would otherwise record
@@ -299,16 +334,35 @@ export default function OAQuestionnaire() {
   // the moment it returned the real eight-valued version, "member-single"
   // would have read as multi-owner and shown a sole owner the whole
   // multi-member block.
-  const isMulti = data.multiOwner;
+  const isMulti = a.multiOwner ?? data.multiOwner;
   // s. 5.4 exists in every form EXCEPT the member-managed single-owner ones,
   // where the owner manages and a gate would be the owner consenting to
   // themselves. Sole owners on the manager-managed forms were never shown this
   // and received $25,000 by default — the number deciding when their Manager
   // needs written consent to borrow, chosen by nobody.
   const hasApprovalGate = !(data.memberManaged && !isMulti);
-  const unpaired = data.seed.members
-    .map((m, i) => ({ name: m.name, i }))
+  const unpaired = owners
+    .map((m, i) => ({ name: ownerLabel(m, i), i }))
     .filter((x) => !pairedIdx.has(x.i));
+
+  // The answer and the list can disagree, and neither one silently wins: we
+  // cannot know which the client meant, so we say so and refuse to generate.
+  const ownerCountMismatch =
+    isMulti === (owners.length > 1)
+      ? ""
+      : isMulti
+        ? "You answered that the LLC has more than one owner. Add the other owners here."
+        : "You answered that the LLC has one owner, but more than one is listed. Remove the others here.";
+  const incompleteOwner = owners.some((o) => !(o.name ?? "").trim() || !(o.address ?? "").trim());
+
+  // Answering "more than one owner" with one name on file would otherwise dead-end
+  // — there would be nowhere to type the second owner.
+  const goToDetails = () => {
+    if (a.multiOwner === true && owners.length < 2) {
+      patch({ members: [...owners, { name: "", address: "" }] });
+    }
+    setStage("details");
+  };
 
   const unitShare = (u: Unit): OwnershipShare => {
     const src = u.kind === "couple" ? couples[u.ci] : a.members?.[u.index];
@@ -349,39 +403,60 @@ export default function OAQuestionnaire() {
           return anytime, and regenerate whenever anything changes.
         </p>
 
-        {data.memberManaged ? (
-          <div className="mt-6 rounded-2xl border border-border bg-secondary/30 p-4 text-sm text-muted-foreground">
-            Your company is <strong className="text-foreground">member-managed</strong>, so your
-            agreement is built on our member-managed form: the owners manage the company
-            themselves, decisions are made by majority of ownership, and there is no manager.
-          </div>
-        ) : null}
-        {(
+        <div className="mt-6 rounded-2xl border border-border bg-secondary/30 p-4 text-sm text-muted-foreground">
+          {data.memberManaged ? (
+            <>
+              Your company is <strong className="text-foreground">member-managed</strong>, so your
+              agreement is built on our member-managed form: the owners manage the company
+              themselves, decisions are made by majority of ownership, and there is no manager.
+            </>
+          ) : (
+            <>
+              Your company is <strong className="text-foreground">manager-managed</strong>, so your
+              agreement is built on our manager-managed form: {data.seed.managerNames.length > 0 ? data.seed.managerNames.join(", ") : "your Manager"} runs
+              the company day to day. We take this from your formation record — there's nothing to
+              choose here.
+            </>
+          )}
+        </div>
+        {stage === "start" ? (
           <div className="mt-8 space-y-5">
-            <QuestionCard title="Is this the company's first operating agreement?" learnMore="firstOrAmended">
+            <p className="text-sm text-muted-foreground">
+              Three questions decide which agreement you get. Everything after this is only the
+              questions that agreement actually asks.
+            </p>
+
+            <QuestionCard title="Will there be more than one LLC owner?">
               <label className="flex items-start gap-2 text-sm">
                 <input
                   type="radio"
-                  name="firstOrAmended"
-                  checked={a.firstOrAmended === "first"}
-                  onChange={() => patch({ firstOrAmended: "first" })}
+                  name="multiOwner"
+                  checked={a.multiOwner === false}
+                  onChange={() => patch({ multiOwner: false })}
                   className="mt-0.5 accent-trust"
                 />
-                <span>This is the company's first operating agreement</span>
+                <span>One owner</span>
               </label>
               <label className="flex items-start gap-2 text-sm">
                 <input
                   type="radio"
-                  name="firstOrAmended"
-                  checked={a.firstOrAmended === "amended"}
-                  onChange={() => patch({ firstOrAmended: "amended" })}
+                  name="multiOwner"
+                  checked={a.multiOwner === true}
+                  onChange={() => patch({ multiOwner: true })}
                   className="mt-0.5 accent-trust"
                 />
-                <span>I'm amending and restating an existing operating agreement</span>
+                <span>More than one owner</span>
               </label>
+              <p className="text-xs text-muted-foreground">
+                You'll list the owners by name on the next screen. Owners are never filed with the
+                State, so this can differ from what you told us when the company was formed.
+              </p>
             </QuestionCard>
 
-            <QuestionCard title="Has the company elected, or will it elect, S corporation status?" learnMore="sElection">
+            <QuestionCard
+              title="Is the LLC taxed as an S corporation, or will it be making an S election?"
+              learnMore="sElection"
+            >
               <label className="flex items-start gap-2 text-sm">
                 <input
                   type="radio"
@@ -413,9 +488,99 @@ export default function OAQuestionnaire() {
               ) : null}
             </QuestionCard>
 
+            <QuestionCard
+              title="Is this the LLC's first operating agreement, or an amendment to a previous one?"
+              learnMore="firstOrAmended"
+            >
+              <label className="flex items-start gap-2 text-sm">
+                <input
+                  type="radio"
+                  name="firstOrAmended"
+                  checked={a.firstOrAmended === "first"}
+                  onChange={() => patch({ firstOrAmended: "first" })}
+                  className="mt-0.5 accent-trust"
+                />
+                <span>This is the company's first operating agreement</span>
+              </label>
+              <label className="flex items-start gap-2 text-sm">
+                <input
+                  type="radio"
+                  name="firstOrAmended"
+                  checked={a.firstOrAmended === "amended"}
+                  onChange={() => patch({ firstOrAmended: "amended" })}
+                  className="mt-0.5 accent-trust"
+                />
+                <span>I'm amending and restating an existing operating agreement</span>
+              </label>
+            </QuestionCard>
+
+            <Button className="w-full rounded-full" size="lg" onClick={goToDetails}>
+              Continue
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        ) : (
+          <div className="mt-8 space-y-5">
+            <button
+              type="button"
+              onClick={() => setStage("start")}
+              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Change those three answers
+            </button>
+
+            <QuestionCard title={isMulti ? "Owners" : "Owner"}>
+              <p className="text-xs text-muted-foreground">
+                Every name and address here is printed in Exhibit A and in the signature block. They
+                start from what you gave us when the company was formed — change them if ownership
+                has changed since.
+              </p>
+              {owners.map((m, i) => (
+                <div key={i} className="space-y-2 rounded-lg border border-border bg-secondary/30 p-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-xs font-medium text-muted-foreground">
+                      {isMulti ? `Owner ${i + 1}` : "Sole owner"}
+                    </span>
+                    {owners.length > 1 ? (
+                      <button
+                        type="button"
+                        aria-label={`Remove ${m.name?.trim() || `owner ${i + 1}`}`}
+                        onClick={() => removeOwner(i)}
+                        className="text-muted-foreground hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    ) : null}
+                  </div>
+                  <Input
+                    placeholder="Full legal name"
+                    value={m.name ?? ""}
+                    onChange={(e) => patchMember(i, { name: e.target.value })}
+                  />
+                  <Input
+                    placeholder="Street address, city, state ZIP"
+                    value={m.address ?? ""}
+                    onChange={(e) => patchMember(i, { address: e.target.value })}
+                  />
+                </div>
+              ))}
+              {isMulti ? (
+                <Button type="button" variant="outline" size="sm" className="rounded-full" onClick={addOwner}>
+                  <Plus className="mr-1.5 h-3.5 w-3.5" />
+                  Add owner
+                </Button>
+              ) : null}
+              {ownerCountMismatch ? (
+                <p className="rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-xs text-destructive">
+                  {ownerCountMismatch}
+                </p>
+              ) : null}
+            </QuestionCard>
+
             {isMulti ? (
               <>
-                {data.seed.members.length >= 2 ? (
+                {owners.length >= 2 ? (
                   <QuestionCard title="Do any owners hold their interest together as spouses?" learnMore="spousal">
                     <p className="text-xs text-muted-foreground">
                       Married couples can hold one combined interest together — as tenants by the
@@ -428,7 +593,7 @@ export default function OAQuestionnaire() {
                         <div className="flex items-center gap-2 text-sm">
                           <Heart className="h-4 w-4 shrink-0 text-trust" />
                           <span>
-                            {data.seed.members[c.a]?.name} &amp; {data.seed.members[c.b]?.name}
+                            {owners[c.a]?.name} &amp; {owners[c.b]?.name}
                             <span className="ml-2 text-xs text-muted-foreground">{FORM_LABEL[c.form]}</span>
                           </span>
                         </div>
@@ -719,7 +884,7 @@ export default function OAQuestionnaire() {
                   of an ineligible beneficiary has no effect while the election is in place.
                 </p>
               ) : null}
-              {(isMulti ? units : [{ kind: "member", index: 0, label: data.seed.members[0]?.name ?? "" } as Unit]).map((u) => (
+              {(isMulti ? units : [{ kind: "member", index: 0, label: ownerLabel(owners[0], 0) } as Unit]).map((u) => (
                 <div key={u.kind === "couple" ? `c${u.ci}` : `m${u.index}`} className="space-y-1">
                   <div className="flex items-center gap-3">
                     <span className="w-1/2 truncate text-sm">{u.label}</span>
@@ -760,11 +925,20 @@ export default function OAQuestionnaire() {
                   {isMulti ? " and its members" : ""}.
                 </span>
               </label>
+              {ownerCountMismatch ? (
+                <p className="mt-3 text-sm text-destructive">{ownerCountMismatch}</p>
+              ) : null}
+              {incompleteOwner ? (
+                <p className="mt-3 text-sm text-destructive">
+                  Every owner needs a full legal name and an address — both are printed in Exhibit A
+                  and the signature block.
+                </p>
+              ) : null}
               {error ? <p className="mt-3 text-sm text-destructive">{error}</p> : null}
               <Button
                 className="mt-4 w-full rounded-full"
                 size="lg"
-                disabled={generate.isPending || a.authorized !== true}
+                disabled={generate.isPending || a.authorized !== true || ownerCountMismatch !== "" || incompleteOwner}
                 onClick={() => generate.mutate(a)}
               >
                 <FileText className="mr-2 h-4 w-4" />
