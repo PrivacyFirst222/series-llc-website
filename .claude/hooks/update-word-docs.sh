@@ -151,6 +151,20 @@ if ! python3 "$ROOT/docs/drafting-lint.py" "$ROOT"/webapp/server/templates-oa-*.
   exit 1
 fi
 
+# Provenance gate. Adam's rule: the generator may fill a slot, choose an
+# alternative the master spells out, omit a marked provision, or repeat a
+# marked block — it may never compose a sentence. This regenerates all eight
+# forms with sentinel inputs and requires every delivered paragraph to trace
+# verbatim to its master. One known divergence (the series-exhibit
+# contributions cell) is tolerated pending Adam's wording decision and is
+# listed, loudly, inside provenance.ts.
+echo "tracing every generated paragraph to a master"
+if ! (cd "$ROOT/webapp" && bun run server/provenance.ts >/dev/null); then
+  (cd "$ROOT/webapp" && bun run server/provenance.ts) 2>&1 | tail -30 >&2
+  echo "update-word-docs: COMPOSED PROSE IN A GENERATED AGREEMENT — nothing written" >&2
+  exit 1
+fi
+
 # The gate. Measured against the originals; a regression stops everything here,
 # before a single file has been replaced. The pagination half of it is new on
 # 16 August and its checks are broken on purpose first: the four faults it now
