@@ -46,8 +46,8 @@ this event would not find the consent requirement. The single-member forms are
 correctly record-only: their 5.4 (sgl/sgs) has no re-association clause, and a
 sole member's consent to their own act is not a meaningful gate.
 
-**Proposed fix (awaiting Adam):** event 4's cells become
+**Fixed 17 August 2026, approved by Adam:** event 4's cells are now
 `1.10 8.2 8.5 5.4` for `mul scp` and `1.10 8.2 8.5 5.5` for `mbr mbs`;
-the four single-form cells stay `1.10 8.2 8.5`.
+the four single-form cells stay `1.10 8.2 8.5`. Gate re-run, passes.
 
 Remaining: events 12–66 (55 events, 440 cells) in tranches 2–6.
