@@ -1589,6 +1589,50 @@ Nothing yet. The correct build is the one Adam describes: three questions on one
 screen in the portal, joined to the management structure already on the
 formation record, selecting one of eight.
 
+## P27 — A review that tested every sentence against the law and none against the audience
+
+### THE FAILURE
+
+On 18 August Adam ordered a review of the Owner's Manual for grammar, accuracy,
+and consistency with the website, the agreements, and the Florida statutes. I
+read all 521 lines, verified fourteen statutes at the source, and reported
+fourteen findings. The manual's line 165 was headed "**What the statute permits
+that our earlier drafts did not.**" and line 103 carried "(If an earlier
+document or guide told you the operating agreement can modify this rule, it was
+wrong.)" — two client-facing admissions that our own earlier documents were
+defective. The review flagged neither, while flagging a British spelling in the
+same section. Adam caught the line-165 heading himself, by highlighting it in
+the Word document, after the review was reported complete.
+
+### WHY IT HAPPENED
+
+I built the review's checklist from the nouns of the request — grammar,
+statutes, agreements, website — so every sentence was tested by comparison:
+against the statute it cited, against the master it described, against the
+questionnaire it explained. Comparison can only find a mismatch between two
+artifacts, and these sentences mismatch nothing: they are grammatical,
+statutorily accurate, and consistent with the agreements. What they offend is
+not an artifact but a standing rule — no admissions against interest, nothing
+in a client document that serves only an adversary — and no comparison I ran
+had that rule as its other side.
+
+The rule was available to me. I had applied it the same day, in the same
+conversation, to text I was writing (arguing against the reinstatement covenant
+because a breachable duty serves adversaries). Drafting put me in the author's
+seat, where "who does this sentence serve?" is a live question; auditing put me
+in a checker's seat, where the question became "is this sentence correct?" —
+and a sentence can be perfectly correct and still be evidence for the other
+side. I did not lose the rule; I confined it to one posture, because in the
+auditing posture correctness felt like the whole job.
+
+### FIXED BY
+
+Both lines corrected on Adam's Go (the heading rewritten, the parenthetical
+deleted), and this class added to how I review client-facing documents: after
+the comparisons, a separate pass that asks of each sentence only "who does this
+serve, and should this reader see it?" — the question that has no artifact on
+the other side.
+
 # MECHANISM INDEX
 
 ## Substantive — the ones that put wrong law into signed documents
@@ -1757,4 +1801,10 @@ unfinished.** My running list of open gaps has one exit, which is my finishing
 the work; a decision by Adam that withdraws an item cannot remove it, because
 building the list never asks why anything is on it. So a withdrawn item survives
 as a live priority and is reported as one. P26.
+
+**M31 · A standing rule applied in the author's seat but not the checker's.** The
+no-admissions rule was live while drafting new text the same day, and absent
+while auditing old text, because auditing was run as artifact-comparison —
+and a defect that matches every artifact and offends only the audience
+survives any number of comparisons. P27.
 
