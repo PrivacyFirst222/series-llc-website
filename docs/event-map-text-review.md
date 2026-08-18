@@ -90,4 +90,22 @@ bankruptcy; 19 single-member charging-order silence).
 | 32 | The manager dies, resigns, or is removed | ok — 5.1 succession in manager forms; 5.8 Administrative Member in mbr/mbs; `none` with reason in sgm/sgms |
 | 33 | A manager acts outside the authority given | ok — 5.3/5.4/5.8 manager forms; 5.4/5.5/5.9 mbr/mbs incl. 5.4(c) liability; `none` with reason in sgm/sgms |
 
-Remaining: events 34–66 (33 events, 264 cells) in tranches 4–6.
+## Tranche 4 — events 34–44 — 17 August 2026
+
+**88 of 88 cells read (11 events × 8 forms). 88 verified, 0 findings.**
+
+| # | event | verdict |
+|---|---|---|
+| 34 | A manager or member is sued for a management decision | ok — exculpation + indemnification pair in each chassis |
+| 35 | A manager or member is on both sides of a deal | ok — standard-of-conduct section; the s. 605.04092 GAP is already flagged in the map |
+| 36 | A manager or member wants to be paid | ok — compensation/reimbursement section per form; sole-member form is reimbursement-only by design |
+| 37 | A third party relies on apparent authority | ok — 5.1's s. 605.04074(2)(b) sentence + statement-of-authority section per form |
+| 38 | The company files its tax return | ok — 9.2 in all 8, correctly varied by taxonomy |
+| 39 | The IRS examines a partnership year | ok — 9.3 partnership representative in mul/mbr; `none` with reason elsewhere |
+| 40 | The S election is threatened | ok — 9.3/9.4/9.5 in the four S forms; `none` with reason elsewhere |
+| 41 | The tax classification changes | ok — per the note; 9.1/10.2 singles, 9.4 multis, 9.1/9.4/10.2 S singles |
+| 42 | A fiscal year is chosen | ok — fiscal-year section per form, S forms cite s. 1378 |
+| 43 | The agreement is amended | ok — 12.1/15.1; unanimous, oral amendments void, per the note |
+| 44 | The parties act without a meeting | ok — 12.2 singles; 4.4 + 15.2 multis |
+
+Remaining: events 45–66 (22 events, 176 cells) in tranches 5–6.
