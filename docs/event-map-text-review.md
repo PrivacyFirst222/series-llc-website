@@ -126,4 +126,27 @@ bankruptcy; 19 single-member charging-order silence).
 | 54 | A member discloses confidential information or disparages | ok — 4.8/4.9 multi; `none` with reason single |
 | 55 | A member will not participate in a decision | ok — 4.3/4.6 multi; `none` with reason single |
 
-Remaining: events 56–66 (11 events, 88 cells) in tranche 6.
+## Tranche 6 — events 56–66 — 17 August 2026
+
+**88 of 88 cells read (11 events × 8 forms). 88 verified, 0 findings.**
+
+| # | event | verdict |
+|---|---|---|
+| 56 | A member lends money to the company or a series | ok — member-loan section; S singles add the no-second-class sentence |
+| 57 | A member wants their capital back | ok — no-interest/no-withdrawal + no specific property |
+| 58 | Capital and contribution records have to be kept | ok — capital accounts in partnership forms, contribution records in S forms, per the note |
+| 59 | A creditor of the company pursues a member personally | ok — limited-liability section in each chassis |
+| 60 | Percentage interests have to be set or adjusted | ok — 4.1 + 6.1 (+6.3 adjustment in multi forms) |
+| 61 | The tax classification is set when the company is formed | ok — 9.1 in all 8, correctly varied |
+| 62 | The company or a series has to be identified to a third party | ok — 1.2–1.5 |
+| 63 | A capitalized term has to be given its meaning | ok — 1.1 in all 8 |
+| 64 | The company converts, domesticates, or takes part in an interest exchange | ok — `none` ×8; s. 605.2603 bars it non-variably and the education lives in the manual, per Adam's rule |
+| 65 | An asset moves from one Protected Series to another | ok — 8.6 deemed-distribution mechanics + records + 5.4/5.5 consent in multi forms (consistent with the event-4 fix) |
+| 66 | A manager becomes incapacitated | ok — Incapacitated definition + 5.1 / 5.8; `none` with reason in sgm/sgms |
+
+## COMPLETE — 17 August 2026
+
+**528 of 528 cells read (66 events × 8 forms), across six tranches.**
+527 verified as written; 1 finding (event 4, tranche 1), fixed with Adam's
+approval the same day. The event map's cells now rest on the provisions' text,
+not only on their titles.
