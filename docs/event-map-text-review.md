@@ -108,4 +108,22 @@ bankruptcy; 19 single-member charging-order silence).
 | 43 | The agreement is amended | ok — 12.1/15.1; unanimous, oral amendments void, per the note |
 | 44 | The parties act without a meeting | ok — 12.2 singles; 4.4 + 15.2 multis |
 
-Remaining: events 45–66 (22 events, 176 cells) in tranches 5–6.
+## Tranche 5 — events 45–55 — 17 August 2026
+
+**88 of 88 cells read (11 events × 8 forms). 88 verified, 0 findings.**
+
+| # | event | verdict |
+|---|---|---|
+| 45 | Notice must be given | ok — 13.7/16.7 |
+| 46 | A provision is held invalid | ok — 13.3/16.3 severability |
+| 47 | The agreement is signed | ok — 13.6/16.6 counterparts and electronic signatures |
+| 48 | A term of the agreement must be interpreted | ok — 13.9/16.9 + 8.5(a) association-favoring interpretation + 3.5 |
+| 49 | Someone not a party claims rights under it | ok — no-third-party-beneficiaries + binding effect |
+| 50 | An interest is offered without securities registration | ok — 13.10/16.10 |
+| 51 | A filed record conflicts with the agreement | ok — entire agreement + 1.9 filings duty |
+| 52 | A protected series is established with no associated member | ok — 3.6, 4.2, 10.2/12.2 |
+| 53 | A decision has to be made for one protected series | ok — 3.5 + 5.2 in each management variant, incl. the mbr/mbs Company-as-manager and sgm/sgms Member-as-manager designs |
+| 54 | A member discloses confidential information or disparages | ok — 4.8/4.9 multi; `none` with reason single |
+| 55 | A member will not participate in a decision | ok — 4.3/4.6 multi; `none` with reason single |
+
+Remaining: events 56–66 (11 events, 88 cells) in tranche 6.
