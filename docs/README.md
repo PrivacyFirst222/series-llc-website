@@ -139,7 +139,10 @@ unlisted document sit in the origin folder.
 - `source/` — the original Word and PDF documents as they existed on 8 August
   2026, before the markdown masters took over. Kept so the pre-generation
   versions are always recoverable.
-- `oa-draft-*.md` — mirrors of those 8 August drafts. **Historical only.** The
+- `oa-draft-*.md` — mirrors of the 8 August drafts, deleted 17 August 2026:
+  they still described the abandoned Associated Member ownership model (135
+  references across the five files), and a reader who found them got wrong law.
+  Recoverable from git history; the originals also survive in `source/`. The
   live masters are `webapp/server/templates-oa-*.md`.
 - Tag `pre-word-generation` marks the commit before the first generation.
 
