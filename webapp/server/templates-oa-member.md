@@ -159,7 +159,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **5.1 Member-Managed.** The Company is **member-managed** as provided in its Articles of Organization and this Agreement. The management and conduct of the activities and affairs of the Company are vested in the Members. There is no manager, and no person shall be designated or hold out as a manager of the Company or of any Protected Series.
 
-**5.2 Management of Each Protected Series.** Every decision with respect to a Protected Series is made by a Majority in Interest of the Members, and the Administrative Member performs for each Protected Series the ministerial functions described in Section 5.8. Because no Protected Series has an Associated Member, the Company is the protected-series manager of each Protected Series under s. 605.2304(2), Florida Statutes; it acts in that capacity through the Members.
+**5.2 Management of Each Protected Series.** Each Protected Series is managed by the Members. As permitted by s. 605.2107(1)(n), Florida Statutes, this Section varies s. 605.2304(2) so that the Members, rather than the Company, are the protected-series managers of each Protected Series. Every decision with respect to a Protected Series is made by a Majority in Interest of the Members as provided in Section 5.3, and the Administrative Member performs for each Protected Series the ministerial functions described in Section 5.8. The Members have, with respect to each Protected Series, the rights, powers, and duties of protected-series managers under the Act, subject to this Agreement and the Series Exhibit.
 
 **5.3 Voting; Decisions.** Each Member's vote is proportionate to that Member's Percentage Interest. Except where this Agreement or the Act requires a greater vote, any act may be undertaken, and any difference among the Members may be decided, by a Majority in Interest — whether the act is within or outside the ordinary course of the activities and affairs of the Company or the applicable Protected Series.
 
@@ -423,7 +423,7 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
 |---|---|
 | Purpose of this Protected Series | [PURPOSE — e.g., "to acquire, own, lease, and manage the real property located at ___" or "any lawful business"] |
 | Owner of this Protected Series | The Company. This Protected Series has no Associated Members (ss. 605.2302(1), 605.2303(2), Fla. Stat.). |
-| Managed by | The Company, as protected-series manager (s. 605.2304(2), Fla. Stat.), acting through a Majority in Interest of the Members |
+| Managed by | The Members, as protected-series managers (s. 605.2304, Fla. Stat., as varied by Section 5.2 of the Agreement), acting by a Majority in Interest |
 | Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
 | Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the Member(s), together with the records maintained under Article 8. |
 | Special terms (if any) | [None / variations from the base Agreement — may not vary Article 8 or non-variable provisions of the Act] |

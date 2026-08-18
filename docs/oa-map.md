@@ -152,7 +152,7 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | sgm sgms | 5.1 | Member-Managed | c3a381a5 | authority | members | members | — | ss. 605.0407(1), 605.04073(1) |
 | sgl sgs | 5.2 | Management of Each Protected Series | 9391162b | authority | manager | member series | — | ss. 605.2304(2), 605.2107(1)(n) |
 | mul scp | 5.2 | Management of Each Protected Series | 00750ec0 | authority | manager | members series | — | ss. 605.2304(2), 605.2107(1)(n) |
-| mbr mbs | 5.2 | Management of Each Protected Series | 55f990eb | authority | manager | members series | — | ss. 605.2304(2), 605.2107(1)(n) |
+| mbr mbs | 5.2 | Management of Each Protected Series | 8d99d6e7 | authority | members | members series | The Company was the protected-series manager, so a management-conduct judgment against the Company exposed its ownership of every series — each a single-owner interest a company creditor could take outright rather than charge. | ss. 605.2304(2), 605.2107(1)(n); varied per Adam 2026-08-18: management authority carries liability, and the one holder it must never rest on is the entity that owns all the series interests (s. 605.2303) |
 | sgm sgms | 5.2 | Management of Each Protected Series | 21315c82 | authority | member | member series | — | ss. 605.2304(1)-(2), 605.2107(1)(n) |
 | mul scp sgl sgs | 5.3 | Authority of the Manager | e6c44bc9 | authority | manager | members manager | — | s. 605.04073(2) |
 | mbr mbs | 5.3 | Voting; Decisions | 0b631d8f | authority | members | members | — | s. 605.04073 |
