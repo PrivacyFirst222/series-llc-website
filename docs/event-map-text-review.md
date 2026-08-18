@@ -50,4 +50,26 @@ sole member's consent to their own act is not a meaningful gate.
 `1.10 8.2 8.5 5.4` for `mul scp` and `1.10 8.2 8.5 5.5` for `mbr mbs`;
 the four single-form cells stay `1.10 8.2 8.5`. Gate re-run, passes.
 
-Remaining: events 12–66 (55 events, 440 cells) in tranches 2–6.
+## Tranche 2 — events 12–22 — 17 August 2026
+
+**88 of 88 cells read (11 events × 8 forms). 88 verified, 0 findings.**
+30 of the 88 are `none` cells; every one carries its reason in the note, and
+the three that are GAPs awaiting Adam's decision were already marked as such
+in the map (13 administrative dissolution / reinstatement; 18 single-member
+bankruptcy; 19 single-member charging-order silence).
+
+| # | event | verdict |
+|---|---|---|
+| 12 | The company misses its annual report | ok — 1.9 filing duty in all 8 |
+| 13 | The company is administratively dissolved | ok — `none` ×8, marked GAP in the map |
+| 14 | The registered agent changes or resigns | ok — 1.6, 1.9 in all 8 |
+| 15 | A member dies | ok — TOD section (4.6/4.11/4.5) plus 10.1, 10.3, 12.1 in multi forms; 9.3 adds the eligible-shareholder limit in S forms |
+| 16 | A member becomes incapacitated | ok — incapacity section plus the dissolution section's no-dissolution sentence, all 8 |
+| 17 | A member divorces | ok — Involuntary Transfer definition + 10.4 option in multi forms; `none` with reason in single forms |
+| 18 | A member files bankruptcy | ok — 2.8/2.9, 11.1–11.3, 10.4 in multi forms; `none` ×4 marked GAP |
+| 19 | A creditor obtains a charging order | ok — 10.6 in multi forms; `none` ×4 with the s. 605.0503(4) decision flagged |
+| 20 | A member wants to sell to an outsider | ok — 10.1, 10.3, 10.5 in multi forms; 9.3 in single S forms; `none` with reason in sgl/sgm |
+| 21 | A member gives an interest to family | ok — 10.2 in multi forms; `none` with reason in single forms |
+| 22 | A member wants to withdraw | ok — 13.1 in multi forms; `none` with reason in single forms |
+
+Remaining: events 23–66 (44 events, 352 cells) in tranches 3–6.
