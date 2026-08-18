@@ -155,9 +155,7 @@ fi
 # alternative the master spells out, omit a marked provision, or repeat a
 # marked block — it may never compose a sentence. This regenerates all eight
 # forms with sentinel inputs and requires every delivered paragraph to trace
-# verbatim to its master. One known divergence (the series-exhibit
-# contributions cell) is tolerated pending Adam's wording decision and is
-# listed, loudly, inside provenance.ts.
+# verbatim to its master. Zero divergence is tolerated.
 echo "tracing every generated paragraph to a master"
 if ! (cd "$ROOT/webapp" && bun run server/provenance.ts >/dev/null); then
   (cd "$ROOT/webapp" && bun run server/provenance.ts) 2>&1 | tail -30 >&2

@@ -479,7 +479,11 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
     if (!isMemberManaged) {
       ex = ex.replace(/\| Protected Series Manager \|[^\n]*\|/, `| Protected Series Manager | ${managerList} |`);
     }
-    ex = ex.replace(/\| Contributions to this Protected Series \|[^\n]*\|/, `| Contributions to this Protected Series | ${ser.contribution || "—"} |`);
+    // Adam's ruling, 17 August 2026: the cell keeps the master's "By the
+    // Company:" prefix — only the Company can contribute to a protected series
+    // (ss. 605.2302(1), 605.2303(2), Fla. Stat.) — and the client's text fills
+    // the [CONTRIBUTION] slot after it.
+    ex = ex.replace("[CONTRIBUTION]", ser.contribution || "—");
     ex = ex.replace(/\| Special terms \(if any\) \|[^\n]*\|/, "| Special terms (if any) | None |");
     ex = ex.replace(/\| Dissolution events[^\n]*\|[^\n]*\|/, "| Dissolution events specific to this Protected Series (if any) | None |");
     // Each Protected Series is owned by the Company, so the Series Exhibit is

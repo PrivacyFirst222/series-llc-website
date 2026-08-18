@@ -23,18 +23,6 @@
 import { assembleOa, OA_TEMPLATE_VERSION, type OaInputs } from "./oa";
 import { readFileSync } from "node:fs";
 
-/**
- * PENDING ADAM'S DECISION — 17 August 2026. The masters' series-exhibit cell
- * reads "By the Company: $[AMOUNT] on [DATE] [and/or described property]"; the
- * generator discards that scaffolding and prints the client's contribution text
- * alone. Which one is right is a legal-wording decision. Until it is made, this
- * ONE line is tolerated so the gate can run; anything else fails the build.
- * Remove this set the moment the decision lands.
- */
-const PENDING_DECISION = new Set<string>([
-  "| Contributions to this Protected Series | [SERCONTRIB] |",
-]);
-
 const MASTERS: Record<OaInputs["version"], string> = {
   single: "templates-oa-single.md",
   "single-s": "templates-oa-single-s.md",
@@ -176,6 +164,7 @@ function masterKey(s: string): string {
       .replace(/\[MEMBER NAME\]|\[SIGNATORY NAME\]|\[ADOPTER NAME\]|\[MANAGER NAME\]|\[MANAGER NAMES\]|\[NAME\]/g, "[NAME]")
       .replace(/\[MEMBER ADDRESS\]|\[ADDRESS\]/g, "[ADDRESS]")
       .replace(/\[MEMBER CONTRIBUTION\]|\$\[AMOUNT\] \[and\/or described property\]|\$\[AMOUNT\]/g, "[AMOUNT]")
+      .replace(/\[CONTRIBUTION\]/g, "[SERCONTRIB]")
       .replace(/\[MEMBER DATE\]|\[DATE\]/g, "[DATE]")
       .replace(/\[MEMBER TOD\]|\[TOD BENEFICIARY NAME\(S\)\]|\[NAME\(S\) \/ None\]/g, "[TOD]")
       .replace(/\[MEMBER SHARE\]|\[___\]%/g, "[PCT]")
@@ -200,7 +189,6 @@ const blocks = (s: string): string[] =>
   s.split(/\n\s*\n/).map((b) => b.trim()).filter(Boolean);
 
 let violations = 0;
-let tolerated = 0;
 for (const [version, file] of Object.entries(MASTERS) as [OaInputs["version"], string][]) {
   const raw = readFileSync(`${import.meta.dir}/${file}`, "utf8");
   // A master paragraph carrying <!-- one:… --> / <!-- many:… --> holds BOTH
@@ -237,10 +225,7 @@ for (const [version, file] of Object.entries(MASTERS) as [OaInputs["version"], s
     // Line-wise: repeat-expanded tables have more rows than the master
     // paragraph; each row must itself be a master line.
     const lines = block.split("\n").map((l) => keyOutput(l)).filter(Boolean);
-    if (lines.length > 1 && lines.every((l) => known.has(l) || PENDING_DECISION.has(l))) {
-      if (lines.some((l) => PENDING_DECISION.has(l))) tolerated++;
-      return true;
-    }
+    if (lines.length > 1 && lines.every((l) => known.has(l))) return true;
     // Heading-join: the generator merges a section heading with the master
     // paragraph of the chosen alternative ("**4.7 Competition.**" + the text of
     // Alternative A). Both pieces must be master text on their own.
@@ -259,10 +244,4 @@ for (const [version, file] of Object.entries(MASTERS) as [OaInputs["version"], s
   violations += orphans.length;
 }
 console.log(`\n${violations} untraceable paragraph(s) across the eight forms.`);
-if (tolerated > 0) {
-  console.log(
-    `⚠ ${tolerated} paragraph(s) pass only through PENDING_DECISION — the series-exhibit ` +
-      `contributions cell diverges from the master and Adam has not yet ruled which wording wins.`,
-  );
-}
 process.exit(violations > 0 ? 1 : 0);
