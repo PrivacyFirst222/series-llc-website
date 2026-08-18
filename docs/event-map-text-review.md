@@ -72,4 +72,22 @@ bankruptcy; 19 single-member charging-order silence).
 | 21 | A member gives an interest to family | ok — 10.2 in multi forms; `none` with reason in single forms |
 | 22 | A member wants to withdraw | ok — 13.1 in multi forms; `none` with reason in single forms |
 
-Remaining: events 23–66 (44 events, 352 cells) in tranches 3–6.
+## Tranche 3 — events 23–33 — 17 August 2026
+
+**88 of 88 cells read (11 events × 8 forms). 88 verified, 0 findings.**
+
+| # | event | verdict |
+|---|---|---|
+| 23 | A new member is admitted | ok — 10.1/10.2 single, 12.1/12.2 multi, 9.3 added in the S singles |
+| 24 | A member fails to make a promised contribution | ok — 6.1/6.2 (+6.3 remedies in multi); signed-writing rule present in all 8 |
+| 25 | The members deadlock | ok — 13.2 in multi forms; `none` with reason in single forms |
+| 26 | A member competes with the company | ok — 4.7 (+5.9 manager mirror in mul/scp); 4.5/4.4 permit other ventures in single forms |
+| 27 | A member asks to inspect the records | ok — 1.8/8.1 (+4.10 in multi forms) |
+| 28 | A member sues the company or another member | ok — governing-law and venue sections in all 8 |
+| 29 | A decision needs the members' approval | ok — written consent single; 4.3/4.4/5.4/15.2 mul-scp; +5.1/5.3/5.5 mbr-mbs; 5.1/5.2/12.2 sgm-sgms |
+| 30 | A member seeks partition of an asset | ok — 1.11 waiver + 6.7 multi; 1.11 personal-property + 6.5 single, per the note |
+| 31 | A distribution is made | ok — Article 7 in each chassis; series-to-Company source limitation present in all 8 |
+| 32 | The manager dies, resigns, or is removed | ok — 5.1 succession in manager forms; 5.8 Administrative Member in mbr/mbs; `none` with reason in sgm/sgms |
+| 33 | A manager acts outside the authority given | ok — 5.3/5.4/5.8 manager forms; 5.4/5.5/5.9 mbr/mbs incl. 5.4(c) liability; `none` with reason in sgm/sgms |
+
+Remaining: events 34–66 (33 events, 264 cells) in tranches 4–6.
