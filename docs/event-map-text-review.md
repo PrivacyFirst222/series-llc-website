@@ -152,9 +152,12 @@ approval the same day. The event map's cells now rest on the provisions' text,
 not only on their titles.
 
 Post-review, 17 August 2026: Adam resolved the three GAP decisions the review
-surfaced. Event 35 — the four multi-member forms adopted a conflict-of-interest
-section (5.10/5.11) requiring disclosure and disinterested-member approval,
-tracking s. 605.04092(4)(a); the single forms stay silent because (4)(a) bars
-approval solely by a single manager or member. Events 13 and the 0714/0715
-coverage rows — silence stands: s. 1.9 carries the good-standing covenant and
-the Owner's Manual carries the education.
+surfaced, all in favour of documented silence. Event 35 (s. 605.04092) — a
+safe-harbor section was drafted, adopted, and then removed the same day on
+Adam's final decision: the statute's burden-shift is self-executing, and an
+in-document covenant was judged to add a breachable duty without adding
+protection. Events 13 / ss. 605.0714-.0715 — silence stands: s. 1.9 carries
+the good-standing covenant and the Owner's Manual carries the education; a
+prompt-reinstatement covenant was drafted, its downsides weighed (a breachable
+duty benefiting adversaries, undefined promptness, no beneficiary at all in
+the sole-owner forms), and Adam declined it.

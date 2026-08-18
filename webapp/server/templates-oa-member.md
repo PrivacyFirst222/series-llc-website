@@ -203,8 +203,6 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 ---
 
-**5.11 Conflict of Interest Transactions.** No Member shall cause the Company or any Protected Series to enter into a transaction in which a Member is directly or indirectly a party, or has a direct or indirect material financial interest or other material interest (each within the meaning of s. 605.04092, Florida Statutes), unless the material facts of the transaction and of the interest have been disclosed or are known to the Members and the transaction is authorized, approved, or ratified by a Majority in Interest of the disinterested Members. A transaction so authorized, approved, or ratified is not void or voidable because of that relationship or interest, and a person challenging it bears the burden of proving its lack of fairness, as provided in s. 605.04092(2) and (4), Florida Statutes. A loan approved under Section 5.5(g), and compensation approved under Section 5.10, satisfy this Section.
-
 ## ARTICLE 6 — CAPITAL; CAPITAL ACCOUNTS
 
 **6.1 Initial Contributions.** Each Member's contributions to the Company are set forth on Exhibit A. Contributions to a Protected Series are made by the Company and are set forth in the applicable Series Exhibit. Each contribution shall identify whether it is made to the Company or to a specific Protected Series, and shall be deposited to, and recorded in the records of, the recipient. A promise by a Member to make a contribution is enforceable only if set out in a writing signed by the Member.
