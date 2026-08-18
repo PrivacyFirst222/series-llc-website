@@ -45,9 +45,13 @@ export function welcomeEmail(name: string, setPasswordUrl: string): { subject: s
     subject: "Your MyFloridaSeriesLLC client portal",
     html: wrap(`
       <p>Hi ${escapeHtml(name || "there")},</p>
-      <p>Thanks for your order. Your client portal is ready — it's where your formation
-      documents will be posted, and where any legal mail we receive as your registered
-      agent will be available to download.</p>
+      <p>Thanks for your order. We're preparing your Articles of Organization now and will
+      file them with the Florida Division of Corporations — you'll get an email here when
+      your LLC is formed.</p>
+      <p>Your client portal is ready — it's where your formation documents will be posted,
+      and where any legal mail we receive as your registered agent will be available to
+      download. Your Owner's Manual — the plain-English guide to running your protected
+      series LLC — is already in your portal's library, ready to download.</p>
       <p><a href="${setPasswordUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Set your password</a></p>
       <p style="color:#555;font-size:13px">This link expires in 7 days. If it expires, use
       "Forgot password" on the portal sign-in page with this email address.</p>

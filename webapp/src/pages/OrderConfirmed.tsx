@@ -71,7 +71,8 @@ export default function OrderConfirmed() {
             <CheckCircle2 className="mx-auto h-12 w-12 text-trust" />
             <h1 className="display mt-5 text-3xl lg:text-4xl">Payment received.</h1>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-              Thank you{statusQuery.data?.llcName ? ` — we have everything we need to begin on ${statusQuery.data.llcName}` : ""}. Two
+              Thank you{statusQuery.data?.llcName ? ` — we have everything we need to begin on ${statusQuery.data.llcName}` : ""}. We're
+              preparing your filing now — you'll get an email when your LLC is formed. Two
               steps to finish setting up:
             </p>
 
