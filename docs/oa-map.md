@@ -178,7 +178,9 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbr mbs | 5.8 | Administrative Member | 8a779b5a | authority | members | members | — | drafting convention |
 | mul scp | 5.9 | Competition; Other Activities of the Manager. [SELECT THE SAME ALTERNATIVE AS SECTION 4.7] | b206cf04 | covenant | members | members | The member competed in breach of the agreement — a claim among the members, not against the company. | s. 605.04091(2)(c) as varied under s. 605.0105(3) |
 | mbr mbs | 5.9 | Statement of Authority | 0cce8cea | authority | company | members manager third-party | — | s. 605.0302 |
+| mul scp | 5.10 | Conflict of Interest Transactions | 6e6973a2 | covenant | manager members | members | The manager sold company property to their own LLC with no disinterested approval, and the members had to prove unfairness instead of the manager proving fairness. | s. 605.04092(2), (4)(a)2 — disclosure plus disinterested-member approval shifts the burden to the challenger; adopted 2026-08-17 |
 | mbr mbs | 5.10 | Compensation; Reimbursement; Shared Expenses | 5d683322 | benefit | company | manager members | — | s. 605.04091(1) |
+| mbr mbs | 5.11 | Conflict of Interest Transactions | 5cbe0a99 | covenant | members | members | A member steered a series' contract to their spouse's company with no disinterested approval, and the other members had to prove unfairness instead of the interested member proving fairness. | s. 605.04092(2), (4)(a)2 — disclosure plus disinterested-member approval shifts the burden to the challenger; adopted 2026-08-17 |
 | sgl sgm sgms sgs | 6.1 | Contributions | 2d7ae1b4 | mechanic | — | members | — | s. 605.0402 |
 | mbr mbs mul scp | 6.1 | Initial Contributions | 1b58f807 | mechanic | — | members | — | s. 605.0402 |
 | sgl sgm sgms sgs | 6.2 | No Obligation; No Interest | 0b816109 | benefit | — | member | — | s. 605.0403 |

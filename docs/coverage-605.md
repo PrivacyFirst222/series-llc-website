@@ -83,7 +83,7 @@ checker lists every one on each run.
 | 605.04074 | Agency rights of members and managers. | varied | 5.1 5.4 5.8 5.9 | (3) an internal limit does not defeat a good-faith purchaser of real property — only a recorded certified statement does |
 | 605.0408 | Reimbursement, indemnification, advancement, and insurance. | varied | 5.6 5.7 5.10 | indemnification to the fullest extent permitted; (2) bars indemnity for the enumerated breaches |
 | 605.04091 | Standards of conduct for members and managers. | varied | 4.7 5.5 5.6 5.9 | (2)(c) is the duty not to compete our Article 4 alternatives address; s. 605.0105(4)(c) permits altering it if not manifestly unreasonable |
-| 605.04092 | Conflict of interest transactions. | relied | 5.5 5.6 | GAP: no form adopts the conflict-of-interest safe harbour, so a conflicted transaction is judged at common law; (4)(a) says a single manager or single member cannot satisfy it alone |
+| 605.04092 | Conflict of interest transactions. | relied | 5.5 5.6 5.10 5.11 | the four multi-member forms require disclosure and approval by a Majority in Interest of the disinterested Members before a conflicted transaction (5.10 manager forms, 5.11 member forms), tracking (4)(a); the single-member forms remain silent by Adam's decision of 17 Aug 2026 — (4)(a) bars approval solely by a single manager or member, so there is nothing a sole-owner form can adopt |
 | 605.04093 | Limitation of liability of managers and members. | relied | 5.5 5.6 | no monetary liability for management decisions absent the enumerated conduct |
 | 605.0410 | Records to be kept; rights of member, manager, and person dissociated to information. | varied | 1.8 4.10 8.1 | (1) requires 3 years of tax returns and financial statements; (10) forbids confidentiality restrictions on those records |
 | 605.0411 | Court-ordered inspection. | n/a |  | court-ordered inspection |
@@ -107,8 +107,8 @@ checker lists every one on each run.
 | 605.0711 | Known claims against dissolved limited liability company. | relied |  | known claims against a dissolved company |
 | 605.0712 | Other claims against a dissolved limited liability company. | relied |  | unknown claims; a 4-year bar after notice |
 | 605.0713 | Court proceedings. | n/a |  | court proceedings in winding up |
-| 605.0714 | Administrative dissolution. | n/a |  | GAP: administrative dissolution on the fourth Friday in September, or for failing to maintain a registered agent — no form addresses it |
-| 605.0715 | Reinstatement. | n/a |  | GAP: reinstatement relates back to the dissolution date; no form addresses it |
+| 605.0714 | Administrative dissolution. | n/a |  | silence stands by Adam's decision of 17 Aug 2026: s. 1.9's good-standing covenant is the preventive duty, and the education lives in the Owner's Manual (its s. 19 carries the September dates and the registered-agent ground) |
+| 605.0715 | Reinstatement. | n/a |  | silence stands by Adam's decision of 17 Aug 2026: reinstatement relates back by statute without any agreement text, and the Owner's Manual carries the education |
 | 605.0716 | Judicial review of denial of reinstatement. | n/a |  | judicial review of a denied reinstatement |
 | 605.0717 | Effect of dissolution. | relied |  | dissolution does not end the registered agent's authority |
 | 605.0801 | Direct action by member. | relied | 16.1 16.2 | s. 605.0105(3)(k) forbids unreasonably restricting the right to sue; our forms do not restrict it |

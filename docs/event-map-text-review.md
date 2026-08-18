@@ -150,3 +150,11 @@ bankruptcy; 19 single-member charging-order silence).
 527 verified as written; 1 finding (event 4, tranche 1), fixed with Adam's
 approval the same day. The event map's cells now rest on the provisions' text,
 not only on their titles.
+
+Post-review, 17 August 2026: Adam resolved the three GAP decisions the review
+surfaced. Event 35 — the four multi-member forms adopted a conflict-of-interest
+section (5.10/5.11) requiring disclosure and disinterested-member approval,
+tracking s. 605.04092(4)(a); the single forms stay silent because (4)(a) bars
+approval solely by a single manager or member. Events 13 and the 0714/0715
+coverage rows — silence stands: s. 1.9 carries the good-standing covenant and
+the Owner's Manual carries the education.
