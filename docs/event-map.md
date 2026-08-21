@@ -70,7 +70,7 @@ Forms: `sgl` single-member · `mul` manager-managed multi-member ·
 | The tax classification changes | s. 605.1103(2) | 9.1 10.2 | 9.4 | 9.4 | 9.4 | 9.4 | 9.1 9.4 10.2 | 9.1 10.2 | 9.1 9.4 10.2 | an S election also changes the Florida ch. 220 analysis. The single-member form's duty to amend on a change of classification (its old s. 9.4) was deleted on 16 August: s. 9.1 states the intended classification and s. 11.2 carries the warning, and no provision now compels anyone to act |
 | A fiscal year is chosen | — | 9.3 | 9.5 | 9.6 | 9.5 | 9.6 | 9.6 | 9.3 | 9.6 |  |
 | The agreement is amended | s. 605.04073(1)(d) | 12.1 | 15.1 | 15.1 | 15.1 | 15.1 | 12.1 | 12.1 | 12.1 | unanimous; oral and implied amendments are of no effect |
-| The parties act without a meeting | s. 605.0407 | 12.2 | 4.4 15.2 | 4.4 15.2 | 4.4 15.2 | 4.4 15.2 | 12.2 | 12.2 | 12.2 |  |
+| The parties act without a meeting | ss. 605.04073(2)(b), (4) | 12.2 | 4.4 15.2 | 4.4 15.2 | 4.4 15.2 | 4.4 15.2 | 12.2 | 12.2 | 12.2 |  |
 | Notice must be given | — | 13.7 | 16.7 | 16.7 | 16.7 | 16.7 | 13.7 | 13.7 | 13.7 |  |
 | A provision is held invalid | — | 13.3 | 16.3 | 16.3 | 16.3 | 16.3 | 13.3 | 13.3 | 13.3 |  |
 | The agreement is signed | ss. 605.0106(5), (6) | 13.6 | 16.6 | 16.6 | 16.6 | 16.6 | 13.6 | 13.6 | 13.6 | a one-member agreement is enforceable |

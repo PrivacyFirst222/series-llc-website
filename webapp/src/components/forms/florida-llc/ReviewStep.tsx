@@ -111,7 +111,7 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
             label="Name"
             value={
               data.registeredAgentType === "INDIVIDUAL"
-                ? data.registeredAgentName
+                ? [data.registeredAgentFirstName, data.registeredAgentLastName].filter(Boolean).join(" ")
                 : data.registeredAgentBusinessEntityName
             }
           />
@@ -157,7 +157,7 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
                 : data.managers
                     .map((m) =>
                       m.personOrEntity === "INDIVIDUAL"
-                        ? `${m.role}: ${m.fullName}`
+                        ? `${m.role}: ${[m.firstName, m.lastName].filter(Boolean).join(" ")}`
                         : `${m.role}: ${m.businessEntityName}`,
                     )
                     .join("; ")
@@ -179,7 +179,7 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
                     .map((m) => {
                       const name =
                         m.memberType === "INDIVIDUAL"
-                          ? m.fullLegalName
+                          ? [m.firstName, m.lastName].filter(Boolean).join(" ")
                           : m.entityName;
                       const pct =
                         m.ownershipPercentage !== undefined

@@ -67,11 +67,14 @@ const extendedFormSchema = formationFormSchema
         message: "The existing LLC's name is required for a conversion.",
       });
     }
-    if (data.registeredAgentChoice === "SELF" && !data.registeredAgentName?.trim()) {
+    if (
+      data.registeredAgentChoice === "SELF" &&
+      (!data.registeredAgentFirstName?.trim() || !data.registeredAgentLastName?.trim())
+    ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: ["registeredAgentName"],
-        message: "The registered agent's full legal name is required.",
+        path: ["registeredAgentLastName"],
+        message: "The registered agent's first and last name are required.",
       });
     }
     // Exactly one of the two signing paths must be complete. Relaxing the base
@@ -153,9 +156,16 @@ export const orderFormSchema = z.preprocess((raw) => {
       // The manager-managed statement always goes in the Articles.
       d = { ...d, includeManagementStatementInArticles: true };
     }
-    // Member info is always collected for internal records and never listed
-    // in the Articles (the form no longer offers either toggle).
-    d = { ...d, collectMembersForInternalRecords: true, includeMembersInArticles: false };
+    // Member info is always collected for internal records. Adam's policy of
+    // 21 Aug 2026 (option b): a member-managed company lists its members as
+    // AMBR in the Articles — Sunbiz's own guidance says the listing is what
+    // banks and workers'-comp exemptions rely on, and a post-filing amendment
+    // is paper-only plus $25. Manager-managed companies list managers instead.
+    d = {
+      ...d,
+      collectMembersForInternalRecords: true,
+      includeMembersInArticles: d.managementStructure === "MEMBER_MANAGED",
+    };
     return d;
   }
   return raw;

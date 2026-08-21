@@ -82,7 +82,8 @@ assert(
 const m = (pct?: number, isInitial = true): MemberEntry => ({
   id: Math.random().toString(),
   memberType: "INDIVIDUAL",
-  fullLegalName: "Test",
+  firstName: "Test",
+  lastName: "Member",
   entityName: "",
   address1: "1 Main",
   city: "Miami",

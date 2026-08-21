@@ -15,7 +15,8 @@ const newId = () => Math.random().toString(36).slice(2, 10);
 const blank = (): MemberEntry => ({
   id: newId(),
   memberType: "INDIVIDUAL",
-  fullLegalName: "",
+  firstName: "",
+  lastName: "",
   entityName: "",
   address1: "",
   address2: "",
@@ -78,18 +79,24 @@ export function RepeatableMemberFields({
             </FieldShell>
 
             {entry.memberType === "INDIVIDUAL" ? (
-              <FieldShell
-                label="Full legal name"
-                required
-                className="md:col-span-2"
-              >
-                <Input
-                  value={entry.fullLegalName ?? ""}
-                  onChange={(e) =>
-                    update(entry.id, { fullLegalName: e.target.value })
-                  }
-                />
-              </FieldShell>
+              <>
+                <FieldShell label="First name" required>
+                  <Input
+                    value={entry.firstName ?? ""}
+                    onChange={(e) =>
+                      update(entry.id, { firstName: e.target.value })
+                    }
+                  />
+                </FieldShell>
+                <FieldShell label="Last name" required>
+                  <Input
+                    value={entry.lastName ?? ""}
+                    onChange={(e) =>
+                      update(entry.id, { lastName: e.target.value })
+                    }
+                  />
+                </FieldShell>
+              </>
             ) : (
               <FieldShell
                 label="Entity name"

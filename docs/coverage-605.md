@@ -76,7 +76,7 @@ checker lists every one on each run.
 | 605.0404 | Sharing of distributions before dissolution and profits and losses. | varied | 4.1 7.1 7.2 | the statutory default shares by agreed value of contributions; our forms share by Percentage Interest |
 | 605.0405 | Limitations on distributions. | relied | 7.2 | the solvency limits on distributions are not varied |
 | 605.0406 | Liability for improper distributions. | relied |  | personal liability of a consenting member or manager for an improper distribution; barred after 2 years |
-| 605.0407 | Management of limited liability company. | varied | 5.1 | member-managed is the default; three of our forms elect manager-managed |
+| 605.0407 | Management of limited liability company. | varied | 5.1 | member-managed is the default; four of our eight forms elect manager-managed |
 | 605.04071 | Delegation of rights and powers to manage. | relied | 5.3 5.4 | delegation of management rights |
 | 605.04072 | Selection and terms of managers in a manager-managed limited liability company. | varied | 5.1 5.8 | selection and removal of managers, and who continues to serve when one ceases |
 | 605.04073 | Voting rights of members and managers. | varied | 4.3 5.4 5.5 15.1 | our approval thresholds; (1)(d) and (2)(e) require unanimity to amend, which our s. 15.1 matches |

@@ -76045,7 +76045,8 @@ var partyEntrySchema = external_exports.object({
   id: external_exports.string(),
   role: external_exports.enum(["MGR", "AR"]),
   personOrEntity: external_exports.enum(["INDIVIDUAL", "ENTITY"]),
-  fullName: external_exports.string().optional().or(external_exports.literal("")),
+  firstName: external_exports.string().optional().or(external_exports.literal("")),
+  lastName: external_exports.string().optional().or(external_exports.literal("")),
   businessEntityName: external_exports.string().optional().or(external_exports.literal("")),
   streetAddress1: external_exports.string().min(1, "Street address is required"),
   streetAddress2: external_exports.string().optional().or(external_exports.literal("")),
@@ -76056,10 +76057,10 @@ var partyEntrySchema = external_exports.object({
   phone: external_exports.string().optional().or(external_exports.literal("")),
   email: external_exports.string().email("Enter a valid email").optional().or(external_exports.literal(""))
 }).superRefine((p2, ctx) => {
-  if (p2.personOrEntity === "INDIVIDUAL" && !p2.fullName) {
+  if (p2.personOrEntity === "INDIVIDUAL" && (!p2.firstName || !p2.lastName)) {
     ctx.addIssue({
       code: external_exports.ZodIssueCode.custom,
-      path: ["fullName"],
+      path: ["lastName"],
       message: "Full name is required"
     });
   }
@@ -76074,7 +76075,8 @@ var partyEntrySchema = external_exports.object({
 var memberEntrySchema = external_exports.object({
   id: external_exports.string(),
   memberType: external_exports.enum(["INDIVIDUAL", "ENTITY"]),
-  fullLegalName: external_exports.string().optional().or(external_exports.literal("")),
+  firstName: external_exports.string().optional().or(external_exports.literal("")),
+  lastName: external_exports.string().optional().or(external_exports.literal("")),
   entityName: external_exports.string().optional().or(external_exports.literal("")),
   address1: external_exports.string().min(1, "Address is required"),
   address2: external_exports.string().optional().or(external_exports.literal("")),
@@ -76088,10 +76090,10 @@ var memberEntrySchema = external_exports.object({
   phone: external_exports.string().optional().or(external_exports.literal("")),
   isInitialMember: external_exports.boolean()
 }).superRefine((m2, ctx) => {
-  if (m2.memberType === "INDIVIDUAL" && !m2.fullLegalName) {
+  if (m2.memberType === "INDIVIDUAL" && (!m2.firstName || !m2.lastName)) {
     ctx.addIssue({
       code: external_exports.ZodIssueCode.custom,
-      path: ["fullLegalName"],
+      path: ["lastName"],
       message: "Full legal name is required"
     });
   }
@@ -76141,7 +76143,8 @@ var formationFormSchema = external_exports.object({
   mailingSameAsPrincipal: external_exports.boolean(),
   mailingAddress: addressSchema,
   registeredAgentType: external_exports.enum(["INDIVIDUAL", "ENTITY"]),
-  registeredAgentName: external_exports.string().optional().or(external_exports.literal("")),
+  registeredAgentFirstName: external_exports.string().optional().or(external_exports.literal("")),
+  registeredAgentLastName: external_exports.string().optional().or(external_exports.literal("")),
   registeredAgentBusinessEntityName: external_exports.string().optional().or(external_exports.literal("")),
   registeredAgentStreetAddress1: external_exports.string().min(1, "Street address required"),
   registeredAgentStreetAddress2: external_exports.string().optional().or(external_exports.literal("")),
@@ -76269,7 +76272,8 @@ function raServicePatch() {
   return {
     registeredAgentChoice: "SERVICE",
     registeredAgentType: "ENTITY",
-    registeredAgentName: "",
+    registeredAgentFirstName: "",
+    registeredAgentLastName: "",
     registeredAgentBusinessEntityName: RA_SERVICE.name,
     registeredAgentStreetAddress1: RA_SERVICE.address1,
     registeredAgentStreetAddress2: RA_SERVICE.address2,
@@ -76345,11 +76349,11 @@ var extendedFormSchema = formationFormSchema.extend({
       message: "The existing LLC's name is required for a conversion."
     });
   }
-  if (data.registeredAgentChoice === "SELF" && !data.registeredAgentName?.trim()) {
+  if (data.registeredAgentChoice === "SELF" && (!data.registeredAgentFirstName?.trim() || !data.registeredAgentLastName?.trim())) {
     ctx.addIssue({
       code: external_exports.ZodIssueCode.custom,
-      path: ["registeredAgentName"],
-      message: "The registered agent's full legal name is required."
+      path: ["registeredAgentLastName"],
+      message: "The registered agent's first and last name are required."
     });
   }
   if (data.articlesSignerChoice === "SERVICE") {
@@ -76410,13 +76414,18 @@ var orderFormSchema = external_exports.preprocess((raw2) => {
     if (d2.managementStructure === "MANAGER_MANAGED") {
       d2 = { ...d2, includeManagementStatementInArticles: true };
     }
-    d2 = { ...d2, collectMembersForInternalRecords: true, includeMembersInArticles: false };
+    d2 = {
+      ...d2,
+      collectMembersForInternalRecords: true,
+      includeMembersInArticles: d2.managementStructure === "MEMBER_MANAGED"
+    };
     return d2;
   }
   return raw2;
 }, extendedFormSchema);
 
 // src/components/forms/florida-llc/buildPayload.ts
+var joinName = (first, last2) => [first, last2].map((x2) => (x2 ?? "").trim()).filter(Boolean).join(" ");
 function buildPayload(data) {
   const isConversion = data.filingPath === "CONVERT";
   const fees = calculateEstimatedFees({
@@ -76448,7 +76457,9 @@ function buildPayload(data) {
     registeredAgent: {
       choice: data.registeredAgentChoice ?? "",
       type: data.registeredAgentType || "",
-      name: data.registeredAgentName ?? "",
+      name: joinName(data.registeredAgentFirstName, data.registeredAgentLastName),
+      firstName: data.registeredAgentFirstName ?? "",
+      lastName: data.registeredAgentLastName ?? "",
       businessEntityName: data.registeredAgentBusinessEntityName ?? "",
       address: {
         address1: data.registeredAgentStreetAddress1,
@@ -104873,7 +104884,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **5.1 Member-Managed.** The Company is **member-managed** as provided in its Articles of Organization and this Agreement. The management and conduct of the activities and affairs of the Company are vested in the Members. There is no manager, and no person shall be designated or hold out as a manager of the Company or of any Protected Series.
 
-**5.2 Management of Each Protected Series.** Every decision with respect to a Protected Series is made by a Majority in Interest of the Members, and the Administrative Member performs for each Protected Series the ministerial functions described in Section 5.8. Because no Protected Series has an Associated Member, the Company is the protected-series manager of each Protected Series under s. 605.2304(2), Florida Statutes; it acts in that capacity through the Members.
+**5.2 Management of Each Protected Series.** Each Protected Series is managed by the Members. As permitted by s. 605.2107(1)(n), Florida Statutes, this Section varies s. 605.2304(2) so that the Members, rather than the Company, are the protected-series managers of each Protected Series. Every decision with respect to a Protected Series is made by a Majority in Interest of the Members as provided in Section 5.3, and the Administrative Member performs for each Protected Series the ministerial functions described in Section 5.8. The Members have, with respect to each Protected Series, the rights, powers, and duties of protected-series managers under the Act, subject to this Agreement and the Series Exhibit.
 
 **5.3 Voting; Decisions.** Each Member's vote is proportionate to that Member's Percentage Interest. Except where this Agreement or the Act requires a greater vote, any act may be undertaken, and any difference among the Members may be decided, by a Majority in Interest \u2014 whether the act is within or outside the ordinary course of the activities and affairs of the Company or the applicable Protected Series.
 
@@ -105137,7 +105148,7 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
 |---|---|
 | Purpose of this Protected Series | [PURPOSE \u2014 e.g., "to acquire, own, lease, and manage the real property located at ___" or "any lawful business"] |
 | Owner of this Protected Series | The Company. This Protected Series has no Associated Members (ss. 605.2302(1), 605.2303(2), Fla. Stat.). |
-| Managed by | The Company, as protected-series manager (s. 605.2304(2), Fla. Stat.), acting through a Majority in Interest of the Members |
+| Managed by | The Members, as protected-series managers (s. 605.2304, Fla. Stat., as varied by Section 5.2 of the Agreement), acting by a Majority in Interest |
 | Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
 | Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the Member(s), together with the records maintained under Article 8. |
 | Special terms (if any) | [None / variations from the base Agreement \u2014 may not vary Article 8 or non-variable provisions of the Act] |
@@ -105334,7 +105345,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **5.1 Member-Managed.** The Company is **member-managed** as provided in its Articles of Organization and this Agreement. The management and conduct of the activities and affairs of the Company are vested in the Members. There is no manager, and no person shall be designated or hold out as a manager of the Company or of any Protected Series.
 
-**5.2 Management of Each Protected Series.** Every decision with respect to a Protected Series is made by a Majority in Interest of the Members, and the Administrative Member performs for each Protected Series the ministerial functions described in Section 5.8. Because no Protected Series has an Associated Member, the Company is the protected-series manager of each Protected Series under s. 605.2304(2), Florida Statutes; it acts in that capacity through the Members.
+**5.2 Management of Each Protected Series.** Each Protected Series is managed by the Members. As permitted by s. 605.2107(1)(n), Florida Statutes, this Section varies s. 605.2304(2) so that the Members, rather than the Company, are the protected-series managers of each Protected Series. Every decision with respect to a Protected Series is made by a Majority in Interest of the Members as provided in Section 5.3, and the Administrative Member performs for each Protected Series the ministerial functions described in Section 5.8. The Members have, with respect to each Protected Series, the rights, powers, and duties of protected-series managers under the Act, subject to this Agreement and the Series Exhibit.
 
 **5.3 Voting; Decisions.** Each Member's vote is proportionate to that Member's Percentage Interest. Except where this Agreement or the Act requires a greater vote, any act may be undertaken, and any difference among the Members may be decided, by a Majority in Interest \u2014 whether the act is within or outside the ordinary course of the activities and affairs of the Company or the applicable Protected Series.
 
@@ -105612,7 +105623,7 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
 |---|---|
 | Purpose of this Protected Series | [PURPOSE \u2014 e.g., "to acquire, own, lease, and manage the real property located at ___" or "any lawful business"] |
 | Owner of this Protected Series | The Company. This Protected Series has no Associated Members (ss. 605.2302(1), 605.2303(2), Fla. Stat.). |
-| Managed by | The Company, as protected-series manager (s. 605.2304(2), Fla. Stat.), acting through a Majority in Interest of the Members |
+| Managed by | The Members, as protected-series managers (s. 605.2304, Fla. Stat., as varied by Section 5.2 of the Agreement), acting by a Majority in Interest |
 | Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
 | Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the Member(s), together with the records maintained under Article 8. |
 | Special terms (if any) | [None / variations from the base Agreement \u2014 may not vary Article 8 or non-variable provisions of the Act] |
@@ -107576,25 +107587,44 @@ function escapeHtml(s) {
 
 // server/filing.ts
 var oneLine = (a2) => !a2 ? "" : [a2.address1, a2.address2, [a2.city, a2.state].filter(Boolean).join(", "), a2.zip].map((x2) => (x2 ?? "").trim()).filter(Boolean).join(", ");
-var yesNo = (v2) => v2 ? "Yes" : "No";
+var addrFields = (prefix, a2) => !a2 ? [] : [
+  { key: `${prefix}Street`, label: "Street address", value: (a2.address1 ?? "").trim() },
+  { key: `${prefix}Suite`, label: "Suite, Apt. #, etc.", value: (a2.address2 ?? "").trim() },
+  { key: `${prefix}City`, label: "City", value: (a2.city ?? "").trim() },
+  { key: `${prefix}State`, label: "State", value: (a2.state ?? "").trim() },
+  { key: `${prefix}Zip`, label: "Zip code", value: (a2.zip ?? "").trim() }
+];
+var personName = (m2) => ({
+  first: (m2?.firstName ?? "").trim(),
+  last: (m2?.lastName ?? "").trim(),
+  legacy: (m2?.fullLegalName ?? m2?.fullName ?? m2?.name ?? "").trim()
+});
+var personAddr = (m2) => ({
+  address1: m2?.streetAddress1 ?? m2?.address1,
+  address2: m2?.streetAddress2 ?? m2?.address2,
+  city: m2?.city,
+  state: m2?.state,
+  zip: m2?.zip
+});
+var sameAddr = (a2, b2) => oneLine(a2) !== "" && oneLine(a2) === oneLine(b2);
 var MANAGEMENT_LABEL = {
   MEMBER_MANAGED: "Member-managed",
   MANAGER_MANAGED: "Manager-managed"
 };
-var ROLE_LABEL = {
-  MGR: "Manager",
-  AR: "Authorized representative (signs only \u2014 do NOT list as a manager)",
-  AMBR: "Authorized member"
+var MGMT_PROVISION = {
+  MANAGER_MANAGED: "Pursuant to Florida Statutes Section 605.0407, the company is or will be manager-managed.",
+  MEMBER_MANAGED: "Pursuant to Florida Statutes Section 605.0407, the company is or will be member-managed."
 };
 function filingGroups(payload) {
   const p2 = payload ?? {};
   const ra = p2.registeredAgent ?? {};
   const mgmt = p2.management ?? {};
+  const cert = p2.certifications ?? {};
+  const membersInfo = p2.members ?? {};
   const groups = [];
   groups.push({
-    title: "Company",
+    title: "Filing information",
     fields: [
-      { key: "llcName", label: "LLC name", value: p2.llcName?.finalName ?? "" },
       {
         key: "filingPath",
         label: "Filing",
@@ -107604,10 +107634,54 @@ function filingGroups(payload) {
         { key: "existingName", label: "Existing entity name", value: p2.existingLlcName ?? "" },
         { key: "sunbizDoc", label: "Existing document number", value: p2.sunbizDocumentNumber ?? "" }
       ] : [],
-      { key: "principal", label: "Principal office address", value: oneLine(p2.principalOfficeAddress), block: true },
-      { key: "mailing", label: "Mailing address", value: oneLine(p2.mailingAddress), block: true }
+      {
+        key: "effectiveDate",
+        label: "Effective date",
+        value: p2.effectiveDate?.option === "SPECIFIC" ? p2.effectiveDate?.requestedEffectiveDate ?? "" : "Leave blank \u2014 effective on the date of filing"
+      },
+      { key: "filingFee", label: "Required filing fee", value: "$125.00" },
+      {
+        key: "certStatus",
+        label: "Certificate of Status ($5.00)",
+        value: p2.optionalDocuments?.certificateOfStatus ? "Yes \u2014 tick the box (client paid for it)" : "No \u2014 leave unticked"
+      },
+      {
+        key: "certifiedCopy",
+        label: "Certified Copy ($30.00)",
+        value: p2.optionalDocuments?.certifiedCopy ? "Yes \u2014 tick the box (client paid for it)" : "No \u2014 leave unticked"
+      }
     ]
   });
+  const alternates = (p2.llcName?.alternateNames ?? []).filter(
+    (n) => (n ?? "").trim() !== ""
+  );
+  groups.push({
+    title: "Company name",
+    fields: [
+      { key: "llcName", label: "Limited Liability Company Name", value: p2.llcName?.finalName ?? "" },
+      ...alternates.map((n, i) => ({
+        key: `altName${i + 1}`,
+        label: `Alternate name ${i + 1} (if the first choice is unavailable)`,
+        value: n.trim()
+      }))
+    ]
+  });
+  groups.push({
+    title: "Principal place of business",
+    fields: addrFields("principal", p2.principalOfficeAddress)
+  });
+  groups.push({
+    title: "Mailing address",
+    fields: sameAddr(p2.mailingAddress, p2.principalOfficeAddress) ? [
+      {
+        key: "mailingSame",
+        label: "Mailing address",
+        value: 'Same as principal \u2014 tick "Mailing address same as principal address"'
+      }
+    ] : addrFields("mailing", p2.mailingAddress)
+  });
+  const raIsBusiness = (ra.businessEntityName ?? "").trim() !== "";
+  const raName = personName(ra);
   groups.push({
     title: "Registered agent",
     fields: [
@@ -107616,82 +107690,163 @@ function filingGroups(payload) {
         label: "Agent",
         value: ra.choice === "SERVICE" ? "Our registered agent service" : "Client's own agent"
       },
-      {
-        key: "raName",
-        label: "Agent name",
-        value: (ra.businessEntityName || ra.name || "").trim()
-      },
-      { key: "raAddress", label: "Agent address", value: oneLine(ra.address), block: true },
+      ...raIsBusiness ? [
+        {
+          key: "raBusiness",
+          label: "Business to serve as RA",
+          value: ra.businessEntityName.trim()
+        }
+      ] : raName.last ? [
+        { key: "raLast", label: "RA last name", value: raName.last },
+        { key: "raFirst", label: "RA first name", value: raName.first }
+      ] : [
+        {
+          key: "raFull",
+          label: "RA full name (legacy order \u2014 split manually)",
+          value: raName.legacy
+        }
+      ],
+      ...addrFields("ra", ra.address),
       {
         key: "raSignature",
-        label: "Acceptance signature",
+        label: "Registered Agent Signature (must be an individual's name)",
         value: ra.acceptance?.electronicSignature ?? ra.acceptance?.acceptanceName ?? ""
       }
     ]
   });
-  const people = mgmt.managersOrAuthorizedRepresentatives ?? [];
+  const provisions = [];
+  if (mgmt.includeManagementStatementInArticles && MGMT_PROVISION[mgmt.structure]) {
+    provisions.push(MGMT_PROVISION[mgmt.structure]);
+  }
+  if (p2.purpose?.purposeType === "SPECIFIC" && (p2.purpose?.businessPurposeText ?? "").trim()) {
+    provisions.push(p2.purpose.businessPurposeText.trim());
+  }
   groups.push({
-    title: "Management",
+    title: "Any Other Provisions (optional box, 240 characters)",
+    fields: provisions.length === 0 ? [
+      {
+        key: "otherProvisions",
+        label: "Other provisions",
+        value: "Leave blank \u2014 the client chose a general purpose and no statement"
+      }
+    ] : provisions.map((text, i) => ({
+      key: `provision${i}`,
+      label: i === 0 && provisions.length > 1 ? "Paste both, this first" : "Paste into the box",
+      value: text,
+      block: true
+    }))
+  });
+  groups.push({
+    title: "Correspondence name and e-mail",
     fields: [
-      {
-        key: "structure",
-        label: "Management structure",
-        value: MANAGEMENT_LABEL[mgmt.structure] ?? mgmt.structure ?? ""
-      },
-      {
-        key: "mgmtStatement",
-        label: "State the management structure in the Articles",
-        value: yesNo(mgmt.includeManagementStatementInArticles)
-      },
-      ...people.map((m2, i) => ({
-        key: `person${i}`,
-        label: ROLE_LABEL[m2.role ?? "MGR"] ?? (m2.role ?? "Manager"),
-        value: [
-          (m2.fullName || m2.businessEntityName || "").trim(),
-          oneLine(m2)
-        ].filter(Boolean).join(" \u2014 "),
-        block: true
-      }))
+      { key: "corrName", label: "Name", value: p2.correspondence?.name ?? "" },
+      { key: "corrEmail", label: "E-mail address (entered twice)", value: p2.correspondence?.email ?? "" }
     ]
   });
+  groups.push({
+    title: "Electronic signature (member or authorized representative)",
+    fields: [
+      {
+        key: "signedBy",
+        label: "Articles signed by",
+        value: cert.articlesSignedBy === "SERVICE" ? "Our service, as authorized representative" : "The client's authorized representative"
+      },
+      {
+        key: "arName",
+        label: "Authorized representative",
+        value: [cert.authorizedRepresentativeName, cert.authorizedRepresentativeTitle].map((x2) => (x2 ?? "").trim()).filter(Boolean).join(" \u2014 ")
+      },
+      {
+        key: "arSignature",
+        label: "Electronic Signature (type exactly)",
+        value: (cert.authorizedRepresentativeSignature ?? "").trim()
+      }
+    ]
+  });
+  const personFields = [
+    {
+      key: "structure",
+      label: "Management structure",
+      value: MANAGEMENT_LABEL[mgmt.structure] ?? mgmt.structure ?? ""
+    }
+  ];
+  const people = mgmt.managersOrAuthorizedRepresentatives ?? [];
+  let slot = 0;
+  for (const m2 of people) {
+    const role = m2.role ?? "MGR";
+    if (role === "AR") {
+      personFields.push({
+        key: `person${slot}Ar`,
+        label: "Authorized representative",
+        value: `${(m2.fullName || m2.businessEntityName || "").trim()} \u2014 signs only, do NOT list in this section`,
+        block: true
+      });
+      slot++;
+      continue;
+    }
+    const isEntity = (m2.businessEntityName ?? "").trim() !== "";
+    const nm = personName(m2);
+    personFields.push({ key: `person${slot}Title`, label: `Person ${slot + 1} \u2014 Title`, value: role });
+    if (isEntity) {
+      personFields.push({
+        key: `person${slot}Entity`,
+        label: `Person ${slot + 1} \u2014 Entity name`,
+        value: m2.businessEntityName.trim()
+      });
+    } else if (nm.last) {
+      personFields.push(
+        { key: `person${slot}Last`, label: `Person ${slot + 1} \u2014 Last name`, value: nm.last },
+        { key: `person${slot}First`, label: `Person ${slot + 1} \u2014 First name`, value: nm.first }
+      );
+    } else {
+      personFields.push({
+        key: `person${slot}Full`,
+        label: `Person ${slot + 1} \u2014 Full name (legacy order \u2014 split manually)`,
+        value: nm.legacy
+      });
+    }
+    personFields.push(...addrFields(`person${slot}`, personAddr(m2)));
+    slot++;
+  }
+  const memberList = membersInfo.memberList ?? [];
+  if (mgmt.structure === "MEMBER_MANAGED") {
+    for (const m2 of memberList) {
+      const isEntity = (m2.entityName ?? "").trim() !== "" && m2.memberType === "ENTITY";
+      const nm = personName(m2);
+      personFields.push({ key: `person${slot}Title`, label: `Person ${slot + 1} \u2014 Title`, value: "AMBR" });
+      if (isEntity) {
+        personFields.push({
+          key: `person${slot}Entity`,
+          label: `Person ${slot + 1} \u2014 Entity name`,
+          value: m2.entityName.trim()
+        });
+      } else if (nm.last) {
+        personFields.push(
+          { key: `person${slot}Last`, label: `Person ${slot + 1} \u2014 Last name`, value: nm.last },
+          { key: `person${slot}First`, label: `Person ${slot + 1} \u2014 First name`, value: nm.first }
+        );
+      } else {
+        personFields.push({
+          key: `person${slot}Full`,
+          label: `Person ${slot + 1} \u2014 Full name (legacy order \u2014 split manually)`,
+          value: nm.legacy
+        });
+      }
+      personFields.push(...addrFields(`person${slot}`, personAddr(m2)));
+      slot++;
+    }
+  }
+  groups.push({ title: "Persons authorized to manage (MGR / AMBR)", fields: personFields });
   const series = p2.series ?? [];
   groups.push({
-    title: `Protected series (${series.length})`,
+    title: `Protected series \u2014 filed separately after the Articles ($25 designation each) (${series.length})`,
     fields: series.map((s, i) => ({
       key: `series${i}`,
       label: `Series ${i + 1}`,
       value: s.name ?? ""
     }))
   });
-  groups.push({
-    title: "Other",
-    fields: [
-      {
-        key: "purpose",
-        label: "Purpose",
-        value: p2.purpose?.purposeType === "SPECIFIC" ? p2.purpose?.businessPurposeText ?? "" : "Any lawful business",
-        block: true
-      },
-      {
-        key: "effectiveDate",
-        label: "Effective date",
-        value: p2.effectiveDate?.option === "SPECIFIC" ? p2.effectiveDate?.requestedEffectiveDate ?? "" : "Date of filing"
-      },
-      { key: "corrEmail", label: "Correspondence email", value: p2.correspondence?.email ?? "" },
-      { key: "corrName", label: "Correspondence name", value: p2.correspondence?.name ?? "" },
-      {
-        key: "certStatus",
-        label: "Certificate of status ordered",
-        value: yesNo(p2.optionalDocuments?.certificateOfStatus)
-      },
-      {
-        key: "certifiedCopy",
-        label: "Certified copy ordered",
-        value: yesNo(p2.optionalDocuments?.certifiedCopy)
-      }
-    ]
-  });
-  return groups.map((g) => ({ ...g, fields: g.fields.filter((f) => f.value !== "") }));
+  return groups.map((g) => ({ ...g, fields: g.fields.filter((f) => f.value !== "") })).filter((g) => g.fields.length > 0);
 }
 function seriesNames(payload) {
   return (payload?.series ?? []).map((s) => (s?.name ?? "").trim()).filter(Boolean);
@@ -108178,11 +108333,13 @@ async function oaSeed(clientId) {
   const addr = p2.principalOfficeAddress ?? {};
   const principalAddress = [addr.address1, addr.address2, [addr.city, addr.state].filter(Boolean).join(", "), addr.zip].filter((x2) => x2 && String(x2).trim()).join(", ");
   const members = (p2.members?.memberList ?? []).map((m2) => ({
-    name: m2.fullLegalName ?? "",
+    name: [m2.firstName, m2.lastName].map((x2) => (x2 ?? "").trim()).filter(Boolean).join(" ") || (m2.fullLegalName ?? ""),
     address: [m2.address1, m2.address2, [m2.city, m2.state].filter(Boolean).join(", "), m2.zip].filter((x2) => x2 && String(x2).trim()).join(", ")
   }));
   const managementStructure = p2.management?.structure ?? "";
-  const managerNames = (p2.management?.managersOrAuthorizedRepresentatives ?? []).filter((e) => (e.role ?? "MGR") === "MGR").map((e) => (e.fullName || e.businessEntityName || "").trim()).filter(Boolean);
+  const managerNames = (p2.management?.managersOrAuthorizedRepresentatives ?? []).filter((e) => (e.role ?? "MGR") === "MGR").map(
+    (e) => ([e.firstName, e.lastName].map((x2) => (x2 ?? "").trim()).filter(Boolean).join(" ") || e.fullName || e.businessEntityName || "").trim()
+  ).filter(Boolean);
   if (managementStructure === "MANAGER_MANAGED" && managerNames.length === 0) {
     throw new Error(
       "This order is manager-managed but lists no Manager. Correct the order before generating an agreement."

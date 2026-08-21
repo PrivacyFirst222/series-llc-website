@@ -103,16 +103,28 @@ export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
 
       {choice === "SELF" ? (
         <>
-          <FieldShell
-            label="Your full legal name"
-            required
-            error={errors.registeredAgentName}
-          >
-            <Input
-              value={data.registeredAgentName ?? ""}
-              onChange={(e) => patch({ registeredAgentName: e.target.value })}
-            />
-          </FieldShell>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FieldShell
+              label="Your first name"
+              required
+              error={errors.registeredAgentFirstName}
+            >
+              <Input
+                value={data.registeredAgentFirstName ?? ""}
+                onChange={(e) => patch({ registeredAgentFirstName: e.target.value })}
+              />
+            </FieldShell>
+            <FieldShell
+              label="Your last name"
+              required
+              error={errors.registeredAgentLastName}
+            >
+              <Input
+                value={data.registeredAgentLastName ?? ""}
+                onChange={(e) => patch({ registeredAgentLastName: e.target.value })}
+              />
+            </FieldShell>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
             <FieldShell

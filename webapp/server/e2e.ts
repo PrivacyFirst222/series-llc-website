@@ -40,7 +40,7 @@ const formData: FloridaLLCFormData = {
   // blank — regression coverage: the server must fill it from principal.
   registeredAgentChoice: "SELF",
   registeredAgentType: "INDIVIDUAL",
-  registeredAgentName: "Casey Member",
+  registeredAgentFirstName: "Casey", registeredAgentLastName: "Member",
   registeredAgentStreetAddress1: "100 Ocean Drive",
   registeredAgentCity: "Miami",
   registeredAgentState: "FL",
@@ -56,7 +56,7 @@ const formData: FloridaLLCFormData = {
   members: [
     {
       ...structuredClone(defaultFormData.members[0]),
-      fullLegalName: "Casey Member",
+      firstName: "Casey", lastName: "Member",
       address1: "100 Ocean Drive",
       city: "Miami",
       state: "FL",
@@ -617,13 +617,13 @@ if (mint.status === 200) {
     includeManagementStatementInArticles: true,
     managers: [
       {
-        id: "mgr1", role: "MGR", personOrEntity: "INDIVIDUAL", fullName: "Casey Member",
+        id: "mgr1", role: "MGR", personOrEntity: "INDIVIDUAL", firstName: "Casey", lastName: "Member",
         streetAddress1: "100 Ocean Drive", city: "Miami", state: "FL", zip: "33139", country: "United States",
       },
     ],
     members: [
-      { ...structuredClone(defaultFormData.members[0]), fullLegalName: "Sam Ortiz", address1: "50 Sunset Blvd", city: "Orlando", state: "FL", zip: "32801" },
-      { ...structuredClone(defaultFormData.members[0]), fullLegalName: "Riley Ortiz", address1: "50 Sunset Blvd", city: "Orlando", state: "FL", zip: "32801" },
+      { ...structuredClone(defaultFormData.members[0]), firstName: "Sam", lastName: "Ortiz", address1: "50 Sunset Blvd", city: "Orlando", state: "FL", zip: "32801" },
+      { ...structuredClone(defaultFormData.members[0]), firstName: "Riley", lastName: "Ortiz", address1: "50 Sunset Blvd", city: "Orlando", state: "FL", zip: "32801" },
     ],
     correspondentEmail: coupleEmail,
     confirmCorrespondentEmail: coupleEmail,
@@ -846,13 +846,13 @@ if (mint.status === 200) {
     includeManagementStatementInArticles: true,
     managers: [],
     members: [
-      { ...structuredClone(defaultFormData.members[0]), fullLegalName: "Dana Reed", address1: "70 Palm Way", city: "Tampa", state: "FL", zip: "33601", ownershipPercentage: 50 },
-      { ...structuredClone(defaultFormData.members[0]), fullLegalName: "Jamie Reed", address1: "70 Palm Way", city: "Tampa", state: "FL", zip: "33601", ownershipPercentage: 50 },
+      { ...structuredClone(defaultFormData.members[0]), firstName: "Dana", lastName: "Reed", address1: "70 Palm Way", city: "Tampa", state: "FL", zip: "33601", ownershipPercentage: 50 },
+      { ...structuredClone(defaultFormData.members[0]), firstName: "Jamie", lastName: "Reed", address1: "70 Palm Way", city: "Tampa", state: "FL", zip: "33601", ownershipPercentage: 50 },
     ],
     correspondentName: "Dana Reed",
     correspondentEmail: mmEmail,
     confirmCorrespondentEmail: mmEmail,
-    registeredAgentName: "Dana Reed",
+    registeredAgentFirstName: "Dana", registeredAgentLastName: "Reed",
     registeredAgentAcceptanceName: "Dana Reed",
     registeredAgentElectronicSignature: "Dana Reed",
     authorizedRepresentativeName: "Dana Reed",
@@ -945,17 +945,17 @@ if (mint.status === 200) {
     includeManagementStatementInArticles: true,
     managers: [
       {
-        id: "mgr1", role: "MGR", personOrEntity: "INDIVIDUAL", fullName: "Robin Vale",
+        id: "mgr1", role: "MGR", personOrEntity: "INDIVIDUAL", firstName: "Robin", lastName: "Vale",
         streetAddress1: "9 Harbor Road", city: "Naples", state: "FL", zip: "34102", country: "United States",
       },
     ],
     members: [
-      { ...structuredClone(defaultFormData.members[0]), fullLegalName: "Alex Vale", address1: "9 Harbor Road", city: "Naples", state: "FL", zip: "34102" },
+      { ...structuredClone(defaultFormData.members[0]), firstName: "Alex", lastName: "Vale", address1: "9 Harbor Road", city: "Naples", state: "FL", zip: "34102" },
     ],
     correspondentName: "Alex Vale",
     correspondentEmail: smEmail,
     confirmCorrespondentEmail: smEmail,
-    registeredAgentName: "Alex Vale",
+    registeredAgentFirstName: "Alex", registeredAgentLastName: "Vale",
     registeredAgentAcceptanceName: "Alex Vale",
     registeredAgentElectronicSignature: "Alex Vale",
     authorizedRepresentativeName: "Alex Vale",

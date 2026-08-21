@@ -14,7 +14,8 @@ const blankAddress = {
 const initialMember = (): MemberEntry => ({
   id: newId(),
   memberType: "INDIVIDUAL",
-  fullLegalName: "",
+  firstName: "",
+  lastName: "",
   entityName: "",
   address1: "",
   address2: "",
@@ -49,7 +50,8 @@ export const defaultFormData: FloridaLLCFormData = {
   mailingAddress: { ...blankAddress },
 
   registeredAgentType: "",
-  registeredAgentName: "",
+  registeredAgentFirstName: "",
+  registeredAgentLastName: "",
   registeredAgentBusinessEntityName: "",
   registeredAgentStreetAddress1: "",
   registeredAgentStreetAddress2: "",

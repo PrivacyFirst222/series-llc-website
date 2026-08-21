@@ -1,6 +1,9 @@
 import { buildFinalLlcName, calculateEstimatedFees } from "./validation";
 import type { FloridaLLCFormData, SubmissionPayload } from "./types";
 
+const joinName = (first?: string, last?: string): string =>
+  [first, last].map((x) => (x ?? "").trim()).filter(Boolean).join(" ");
+
 export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
   const isConversion = data.filingPath === "CONVERT";
   const fees = calculateEstimatedFees({
@@ -36,7 +39,9 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
     registeredAgent: {
       choice: data.registeredAgentChoice ?? "",
       type: data.registeredAgentType || "",
-      name: data.registeredAgentName ?? "",
+      name: joinName(data.registeredAgentFirstName, data.registeredAgentLastName),
+      firstName: data.registeredAgentFirstName ?? "",
+      lastName: data.registeredAgentLastName ?? "",
       businessEntityName: data.registeredAgentBusinessEntityName ?? "",
       address: {
         address1: data.registeredAgentStreetAddress1,

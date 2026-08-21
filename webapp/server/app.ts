@@ -649,9 +649,9 @@ interface SeedPayload {
   principalOfficeAddress?: { address1?: string; address2?: string; city?: string; state?: string; zip?: string };
   management?: {
     structure?: string;
-    managersOrAuthorizedRepresentatives?: { role?: string; fullName?: string; businessEntityName?: string }[];
+    managersOrAuthorizedRepresentatives?: { role?: string; firstName?: string; lastName?: string; fullName?: string; businessEntityName?: string }[];
   };
-  members?: { memberList?: { fullLegalName?: string; address1?: string; address2?: string; city?: string; state?: string; zip?: string }[] };
+  members?: { memberList?: { firstName?: string; lastName?: string; fullLegalName?: string; address1?: string; address2?: string; city?: string; state?: string; zip?: string }[] };
   series?: { id: string; name: string }[];
 }
 
@@ -680,7 +680,9 @@ async function oaSeed(clientId: string): Promise<{
     .filter((x) => x && String(x).trim())
     .join(", ");
   const members = (p.members?.memberList ?? []).map((m) => ({
-    name: m.fullLegalName ?? "",
+    name:
+      [m.firstName, m.lastName].map((x) => (x ?? "").trim()).filter(Boolean).join(" ") ||
+      (m.fullLegalName ?? ""),
     address: [m.address1, m.address2, [m.city, m.state].filter(Boolean).join(", "), m.zip]
       .filter((x) => x && String(x).trim())
       .join(", "),
@@ -692,7 +694,14 @@ async function oaSeed(clientId: string): Promise<{
   // client happened to type first.
   const managerNames = (p.management?.managersOrAuthorizedRepresentatives ?? [])
     .filter((e) => (e.role ?? "MGR") === "MGR")
-    .map((e) => (e.fullName || e.businessEntityName || "").trim())
+    .map((e) =>
+      (
+        [e.firstName, e.lastName].map((x) => (x ?? "").trim()).filter(Boolean).join(" ") ||
+        e.fullName ||
+        e.businessEntityName ||
+        ""
+      ).trim(),
+    )
     .filter(Boolean);
   // No fallback. Naming the first member as Manager because the list was
   // empty appoints someone to an office the client never put them in — the

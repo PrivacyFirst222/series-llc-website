@@ -24,7 +24,8 @@ export const partyEntrySchema = z.object({
   id: z.string(),
   role: z.enum(["MGR", "AR"]),
   personOrEntity: z.enum(["INDIVIDUAL", "ENTITY"]),
-  fullName: z.string().optional().or(z.literal("")),
+  firstName: z.string().optional().or(z.literal("")),
+  lastName: z.string().optional().or(z.literal("")),
   businessEntityName: z.string().optional().or(z.literal("")),
   streetAddress1: z.string().min(1, "Street address is required"),
   streetAddress2: z.string().optional().or(z.literal("")),
@@ -35,10 +36,10 @@ export const partyEntrySchema = z.object({
   phone: z.string().optional().or(z.literal("")),
   email: z.string().email("Enter a valid email").optional().or(z.literal("")),
 }).superRefine((p, ctx) => {
-  if (p.personOrEntity === "INDIVIDUAL" && !p.fullName) {
+  if (p.personOrEntity === "INDIVIDUAL" && (!p.firstName || !p.lastName)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      path: ["fullName"],
+      path: ["lastName"],
       message: "Full name is required",
     });
   }
@@ -54,7 +55,8 @@ export const partyEntrySchema = z.object({
 export const memberEntrySchema = z.object({
   id: z.string(),
   memberType: z.enum(["INDIVIDUAL", "ENTITY"]),
-  fullLegalName: z.string().optional().or(z.literal("")),
+  firstName: z.string().optional().or(z.literal("")),
+  lastName: z.string().optional().or(z.literal("")),
   entityName: z.string().optional().or(z.literal("")),
   address1: z.string().min(1, "Address is required"),
   address2: z.string().optional().or(z.literal("")),
@@ -68,10 +70,10 @@ export const memberEntrySchema = z.object({
   phone: z.string().optional().or(z.literal("")),
   isInitialMember: z.boolean(),
 }).superRefine((m, ctx) => {
-  if (m.memberType === "INDIVIDUAL" && !m.fullLegalName) {
+  if (m.memberType === "INDIVIDUAL" && (!m.firstName || !m.lastName)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      path: ["fullLegalName"],
+      path: ["lastName"],
       message: "Full legal name is required",
     });
   }
@@ -127,7 +129,8 @@ export const formationFormSchema = z.object({
   mailingAddress: addressSchema,
 
   registeredAgentType: z.enum(["INDIVIDUAL", "ENTITY"]),
-  registeredAgentName: z.string().optional().or(z.literal("")),
+  registeredAgentFirstName: z.string().optional().or(z.literal("")),
+  registeredAgentLastName: z.string().optional().or(z.literal("")),
   registeredAgentBusinessEntityName: z.string().optional().or(z.literal("")),
   registeredAgentStreetAddress1: z.string().min(1, "Street address required"),
   registeredAgentStreetAddress2: z.string().optional().or(z.literal("")),

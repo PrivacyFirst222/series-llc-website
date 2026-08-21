@@ -21,12 +21,25 @@ export function StepManagers({ data, patch, errors }: StepProps) {
   const memberManaged = data.managementStructure === "MEMBER_MANAGED";
   const role = memberManaged ? "AR" : "MGR";
   const listed = new Set(
-    data.managers.map((m) => (m.fullName || m.businessEntityName || "").trim().toLowerCase()),
+    data.managers.map((m) =>
+      (m.personOrEntity === "ENTITY"
+        ? m.businessEntityName ?? ""
+        : [m.firstName, m.lastName].filter(Boolean).join(" ")
+      )
+        .trim()
+        .toLowerCase(),
+    ),
   );
   const candidates = data.members
     .map((m) => ({
       member: m,
-      name: (m.memberType === "ENTITY" ? m.entityName : m.fullLegalName)?.trim() ?? "",
+      name:
+        (m.memberType === "ENTITY"
+          ? m.entityName
+          : [m.firstName, m.lastName].filter(Boolean).join(" ")
+        )?.trim() ?? "",
+      firstName: (m.firstName ?? "").trim(),
+      lastName: (m.lastName ?? "").trim(),
     }))
     .filter((c) => c.name && !listed.has(c.name.toLowerCase()));
 
@@ -36,7 +49,8 @@ export function StepManagers({ data, patch, errors }: StepProps) {
       id: Math.random().toString(36).slice(2, 10),
       role,
       personOrEntity: m.memberType,
-      fullName: m.memberType === "ENTITY" ? "" : c.name,
+      firstName: m.memberType === "ENTITY" ? "" : c.firstName,
+      lastName: m.memberType === "ENTITY" ? "" : c.lastName,
       businessEntityName: m.memberType === "ENTITY" ? c.name : "",
       streetAddress1: m.address1,
       streetAddress2: m.address2 ?? "",

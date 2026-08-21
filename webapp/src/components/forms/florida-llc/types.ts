@@ -41,7 +41,10 @@ export interface PartyEntry {
   id: string;
   role: PartyRole;
   personOrEntity: PartyKind;
-  fullName?: string;
+  /** Split at the source: Sunbiz files Last Name and First Name in separate
+   *  boxes, and only the person knows where a multi-word name divides. */
+  firstName?: string;
+  lastName?: string;
   businessEntityName?: string;
   streetAddress1: string;
   streetAddress2?: string;
@@ -56,7 +59,10 @@ export interface PartyEntry {
 export interface MemberEntry {
   id: string;
   memberType: PartyKind;
-  fullLegalName?: string;
+  /** Split at the source — see PartyEntry. Joined as "First Last" wherever a
+   *  full name is needed (agreements, emails). */
+  firstName?: string;
+  lastName?: string;
   entityName?: string;
   address1: string;
   address2?: string;
@@ -109,7 +115,8 @@ export interface FloridaLLCFormData {
   /** SERVICE = our registered agent service; SELF = the customer is the agent. */
   registeredAgentChoice?: "SERVICE" | "SELF";
   registeredAgentType: RegisteredAgentType | "";
-  registeredAgentName?: string;
+  registeredAgentFirstName?: string;
+  registeredAgentLastName?: string;
   registeredAgentBusinessEntityName?: string;
   registeredAgentStreetAddress1: string;
   registeredAgentStreetAddress2?: string;
@@ -211,6 +218,8 @@ export interface SubmissionPayload {
     choice: string;
     type: string;
     name: string;
+    firstName: string;
+    lastName: string;
     businessEntityName: string;
     address: AddressFields;
     email: string;

@@ -21,9 +21,13 @@ export function StepRegisteredAgentAcceptance({
   // Self-agents sign as themselves — carry the name over so they don't
   // retype it, and pin the capacity.
   useEffect(() => {
-    if (!isService && data.registeredAgentName && !data.registeredAgentAcceptanceName) {
+    const raFullName = [data.registeredAgentFirstName, data.registeredAgentLastName]
+      .map((x) => (x ?? "").trim())
+      .filter(Boolean)
+      .join(" ");
+    if (!isService && raFullName && !data.registeredAgentAcceptanceName) {
       patch({
-        registeredAgentAcceptanceName: data.registeredAgentName,
+        registeredAgentAcceptanceName: raFullName,
         registeredAgentAcceptanceCapacity: "INDIVIDUAL_AGENT",
       });
     }

@@ -114,8 +114,10 @@ export function validateStep(
     if (!data.registeredAgentChoice)
       e.registeredAgentChoice = "Choose who will serve as registered agent.";
     if (data.registeredAgentChoice === "SELF") {
-      if (!data.registeredAgentName)
-        e.registeredAgentName = "Your full legal name is required.";
+      if (!data.registeredAgentFirstName)
+        e.registeredAgentFirstName = "First name is required.";
+      if (!data.registeredAgentLastName)
+        e.registeredAgentLastName = "Last name is required.";
       if (!data.registeredAgentStreetAddress1)
         e.registeredAgentStreetAddress1 = "Street address required.";
       if (!data.registeredAgentCity) e.registeredAgentCity = "City required.";
@@ -166,8 +168,10 @@ export function validateStep(
         "At least one Manager (MGR) is required when including a manager-managed statement in the Articles.";
 
     data.managers.forEach((m, i) => {
-      if (m.personOrEntity === "INDIVIDUAL" && !m.fullName)
-        e[`managers.${i}.fullName`] = "Full name required.";
+      if (m.personOrEntity === "INDIVIDUAL" && !m.firstName)
+        e[`managers.${i}.firstName`] = "First name required.";
+      if (m.personOrEntity === "INDIVIDUAL" && !m.lastName)
+        e[`managers.${i}.lastName`] = "Last name required.";
       if (m.personOrEntity === "ENTITY" && !m.businessEntityName)
         e[`managers.${i}.businessEntityName`] = "Entity name required.";
       if (!m.streetAddress1)
@@ -180,8 +184,10 @@ export function validateStep(
       e.members =
         "At least one initial member is required for internal formation records.";
     data.members.forEach((m, i) => {
-      if (m.memberType === "INDIVIDUAL" && !m.fullLegalName)
-        e[`members.${i}.fullLegalName`] = "Full legal name required.";
+      if (m.memberType === "INDIVIDUAL" && !m.firstName)
+        e[`members.${i}.firstName`] = "First name required.";
+      if (m.memberType === "INDIVIDUAL" && !m.lastName)
+        e[`members.${i}.lastName`] = "Last name required.";
       if (m.memberType === "ENTITY" && !m.entityName)
         e[`members.${i}.entityName`] = "Entity name required.";
       if (!m.address1) e[`members.${i}.address1`] = "Address required.";

@@ -16,7 +16,8 @@ const blank = (): PartyEntry => ({
   id: newId(),
   role: "MGR",
   personOrEntity: "INDIVIDUAL",
-  fullName: "",
+  firstName: "",
+  lastName: "",
   businessEntityName: "",
   streetAddress1: "",
   streetAddress2: "",
@@ -96,18 +97,24 @@ export function RepeatablePartyFields({
             </FieldShell>
 
             {entry.personOrEntity === "INDIVIDUAL" ? (
-              <FieldShell
-                label="Full name"
-                required
-                className="md:col-span-2"
-              >
-                <Input
-                  value={entry.fullName ?? ""}
-                  onChange={(e) =>
-                    update(entry.id, { fullName: e.target.value })
-                  }
-                />
-              </FieldShell>
+              <>
+                <FieldShell label="First name" required>
+                  <Input
+                    value={entry.firstName ?? ""}
+                    onChange={(e) =>
+                      update(entry.id, { firstName: e.target.value })
+                    }
+                  />
+                </FieldShell>
+                <FieldShell label="Last name" required>
+                  <Input
+                    value={entry.lastName ?? ""}
+                    onChange={(e) =>
+                      update(entry.id, { lastName: e.target.value })
+                    }
+                  />
+                </FieldShell>
+              </>
             ) : (
               <FieldShell
                 label="Business entity name"

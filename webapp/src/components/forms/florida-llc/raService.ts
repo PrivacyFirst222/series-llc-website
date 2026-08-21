@@ -19,7 +19,8 @@ export function raServicePatch(): Partial<FloridaLLCFormData> {
   return {
     registeredAgentChoice: "SERVICE",
     registeredAgentType: "ENTITY",
-    registeredAgentName: "",
+    registeredAgentFirstName: "",
+    registeredAgentLastName: "",
     registeredAgentBusinessEntityName: RA_SERVICE.name,
     registeredAgentStreetAddress1: RA_SERVICE.address1,
     registeredAgentStreetAddress2: RA_SERVICE.address2,
