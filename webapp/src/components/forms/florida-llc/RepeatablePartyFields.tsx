@@ -97,7 +97,7 @@ export function RepeatablePartyFields({
             </FieldShell>
 
             {entry.personOrEntity === "INDIVIDUAL" ? (
-              <>
+              <div className="grid grid-cols-2 gap-4 md:col-span-2">
                 <FieldShell label="First name" required>
                   <Input
                     value={entry.firstName ?? ""}
@@ -114,7 +114,7 @@ export function RepeatablePartyFields({
                     }
                   />
                 </FieldShell>
-              </>
+              </div>
             ) : (
               <FieldShell
                 label="Business entity name"

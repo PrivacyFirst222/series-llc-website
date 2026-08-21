@@ -103,7 +103,7 @@ export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
 
       {choice === "SELF" ? (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <FieldShell
               label="Your first name"
               required

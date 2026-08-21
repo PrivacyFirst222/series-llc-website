@@ -79,7 +79,7 @@ export function RepeatableMemberFields({
             </FieldShell>
 
             {entry.memberType === "INDIVIDUAL" ? (
-              <>
+              <div className="grid grid-cols-2 gap-4 md:col-span-2">
                 <FieldShell label="First name" required>
                   <Input
                     value={entry.firstName ?? ""}
@@ -96,7 +96,7 @@ export function RepeatableMemberFields({
                     }
                   />
                 </FieldShell>
-              </>
+              </div>
             ) : (
               <FieldShell
                 label="Entity name"

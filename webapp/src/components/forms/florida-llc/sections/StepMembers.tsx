@@ -14,9 +14,10 @@ export function StepMembers({ data, patch, errors }: StepProps) {
         <h2 className="font-display text-3xl">Initial members</h2>
         <p className="text-sm text-muted-foreground max-w-2xl">
           We collect member information for your internal records and operating
-          agreement preparation. Members are not listed in the Articles of
-          Organization. You can add, remove, or change owners later when you
-          build your operating agreement.
+          agreement preparation. In a member-managed company, the members are
+          also listed in the Articles of Organization; in a manager-managed
+          company they are not. You can add, remove, or change owners later
+          when you build your operating agreement.
         </p>
       </header>
 
