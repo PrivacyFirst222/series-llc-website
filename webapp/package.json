@@ -10,7 +10,7 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-    "build:api": "esbuild server/vercel-entry.ts --bundle --platform=node --format=esm --external:@electric-sql/pglite --loader:.md=text --outfile=api/index.mjs --log-level=warning --banner:js=\"import { createRequire } from 'node:module'; const require = createRequire(import.meta.url);\"",
+    "build:api": "esbuild server/vercel-entry.ts --bundle --platform=node --format=esm --external:@electric-sql/pglite --external:ssh2-sftp-client --loader:.md=text --outfile=api/index.mjs --log-level=warning --banner:js=\"import { createRequire } from 'node:module'; const require = createRequire(import.meta.url);\"",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
     "test": "bun run src/components/forms/florida-llc/validation.test.ts",
     "e2e": "bun run server/e2e.ts",
