@@ -76130,6 +76130,7 @@ var formationFormSchema = external_exports.object({
   }),
   alternateName1: external_exports.string().optional().or(external_exports.literal("")),
   alternateName2: external_exports.string().optional().or(external_exports.literal("")),
+  exactNameOnly: external_exports.boolean().optional(),
   nameSearchAcknowledgment: external_exports.literal(true, {
     errorMap: () => ({ message: "Acknowledgment is required." })
   }),
@@ -76349,6 +76350,13 @@ var extendedFormSchema = formationFormSchema.extend({
       message: "The existing LLC's name is required for a conversion."
     });
   }
+  if (!data.exactNameOnly && !(data.alternateName1 ?? "").trim()) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      path: ["alternateName1"],
+      message: "Provide an alternate name, or confirm you want the exact name only."
+    });
+  }
   if (data.registeredAgentChoice === "SELF" && (!data.registeredAgentFirstName?.trim() || !data.registeredAgentLastName?.trim())) {
     ctx.addIssue({
       code: external_exports.ZodIssueCode.custom,
@@ -76448,9 +76456,10 @@ function buildPayload(data) {
       desiredName: data.desiredLlcName,
       designator: data.llcDesignator || "",
       finalName,
-      alternateNames: [data.alternateName1, data.alternateName2].filter(
-        (s) => Boolean(s && s.trim())
-      )
+      // Alternates are entered without the designator, like the main name, and
+      // stored Sunbiz-ready with it applied.
+      alternateNames: [data.alternateName1, data.alternateName2].map((n) => buildFinalLlcName((n ?? "").trim(), data.llcDesignator)).filter((s) => Boolean(s && s.trim())),
+      exactNameOnly: data.exactNameOnly === true
     },
     principalOfficeAddress: data.principalAddress,
     mailingAddress: data.mailingSameAsPrincipal ? data.principalAddress : data.mailingAddress,
@@ -107663,7 +107672,15 @@ function filingGroups(payload) {
         key: `altName${i + 1}`,
         label: `Alternate name ${i + 1} (if the first choice is unavailable)`,
         value: n.trim()
-      }))
+      })),
+      ...p2.llcName?.exactNameOnly ? [
+        {
+          key: "exactNameOnly",
+          label: "If the name is unavailable",
+          value: "Client wants this EXACT name only \u2014 email the client before filing anything else",
+          block: true
+        }
+      ] : []
     ]
   });
   groups.push({

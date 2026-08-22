@@ -39,6 +39,7 @@ export const defaultFormData: FloridaLLCFormData = {
   desiredLlcName: "",
   llcDesignator: "",
   alternateName1: "",
+  exactNameOnly: false,
   alternateName2: "",
   nameSearchAcknowledgment: false,
   governmentAffiliationAcknowledgment: false,

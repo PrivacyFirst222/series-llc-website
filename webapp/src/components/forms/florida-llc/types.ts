@@ -100,6 +100,8 @@ export interface FloridaLLCFormData {
   llcDesignator: LlcDesignator | "";
   alternateName1?: string;
   alternateName2?: string;
+  /** The either/or: a backup name, or an explicit stop-and-ask. */
+  exactNameOnly?: boolean;
   nameSearchAcknowledgment: boolean;
   governmentAffiliationAcknowledgment: boolean;
   lawfulPurposeNameAcknowledgment: boolean;
@@ -211,6 +213,7 @@ export interface SubmissionPayload {
     designator: string;
     finalName: string;
     alternateNames: string[];
+    exactNameOnly: boolean;
   };
   principalOfficeAddress: AddressFields;
   mailingAddress: AddressFields;

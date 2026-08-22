@@ -149,23 +149,64 @@ export function StepName({ data, patch, errors }: StepProps) {
         </p>
       ) : null}
 
+      <div className="rounded-xl border border-border bg-secondary/40 p-4 text-sm text-muted-foreground">
+        You can see if your name is available by{" "}
+        <a
+          href="https://search.sunbiz.org/Inquiry/CorporationSearch/ByName"
+          target="_blank"
+          rel="noreferrer"
+          className="font-medium text-trust underline underline-offset-2"
+        >
+          clicking here
+        </a>
+        . The State of Florida's website does not offer a way for services like
+        ours to check availability automatically. If you provide an alternate
+        name and your first choice is not available, we will use your alternate
+        names in order of preference. This will save you time if your first
+        choice is unavailable. If you check the "I only want this exact name"
+        option and your name is unavailable, we will have to email you
+        (typically within 1 business day) which can potentially slow down the
+        formation process.
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FieldShell
-          label="Alternate name #1 (optional)"
-          helper="Used if your first choice is unavailable."
+          label={data.exactNameOnly ? "Alternate name #1" : "Alternate name #1 (required unless exact-name box is checked)"}
+          helper="Without the designator — your designator above is added automatically."
+          error={errors.alternateName1}
         >
           <Input
             value={data.alternateName1 ?? ""}
-            onChange={(e) => patch({ alternateName1: e.target.value })}
+            disabled={data.exactNameOnly === true}
+            onChange={(e) =>
+              patch({ alternateName1: e.target.value, exactNameOnly: false })
+            }
           />
         </FieldShell>
-        <FieldShell label="Alternate name #2 (optional)">
+        <FieldShell label="Alternate name #2 (optional)" error={errors.alternateName2}>
           <Input
             value={data.alternateName2 ?? ""}
-            onChange={(e) => patch({ alternateName2: e.target.value })}
+            disabled={data.exactNameOnly === true}
+            onChange={(e) =>
+              patch({ alternateName2: e.target.value, exactNameOnly: false })
+            }
           />
         </FieldShell>
       </div>
+
+      <AcknowledgeBox
+        id="exact-name-only"
+        checked={data.exactNameOnly === true}
+        onChange={(v) =>
+          patch(
+            v
+              ? { exactNameOnly: true, alternateName1: "", alternateName2: "" }
+              : { exactNameOnly: false },
+          )
+        }
+        label="I only want this exact name — if it is unavailable, contact me before doing anything else."
+        error={errors.exactNameOnly}
+      />
 
       {finalName ? (
         <div className="rounded-xl border border-border bg-secondary/40 p-4">
@@ -173,6 +214,14 @@ export function StepName({ data, patch, errors }: StepProps) {
             Final name preview
           </div>
           <div className="mt-1 font-display text-xl">{finalName}</div>
+          {[data.alternateName1, data.alternateName2]
+            .map((n) => buildFinalLlcName((n ?? "").trim(), data.llcDesignator))
+            .filter(Boolean)
+            .map((n, i) => (
+              <div key={i} className="mt-1 text-sm text-muted-foreground">
+                Alternate {i + 1}: <span className="font-display text-base text-foreground">{n}</span>
+              </div>
+            ))}
           {!finalNameValid ? (
             <p className="mt-2 text-xs text-destructive">
               Florida LLC name must include LLC, L.L.C., Limited Liability

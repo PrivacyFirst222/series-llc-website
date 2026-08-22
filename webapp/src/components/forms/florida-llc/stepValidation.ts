@@ -50,6 +50,22 @@ export function validateStep(
         e.llcDesignator =
           "Designator not allowed for the selected formation type.";
       }
+      // The either/or: a backup name, or the explicit stop-and-ask.
+      if (!data.exactNameOnly && !(data.alternateName1 ?? "").trim()) {
+        e.alternateName1 =
+          "Give an alternate name, or check the exact-name-only box below.";
+      }
+      // Alternates are entered WITHOUT the designator (it is added
+      // automatically); typing one would double it on the filing.
+      for (const [field, value] of [
+        ["alternateName1", data.alternateName1],
+        ["alternateName2", data.alternateName2],
+      ] as const) {
+        if ((value ?? "").trim() && nameContainsLegalDesignator(value ?? "")) {
+          e[field] =
+            "Leave the designator off — your designator above is added automatically.";
+        }
+      }
       const finalName = buildFinalLlcName(data.desiredLlcName, data.llcDesignator);
       if (finalName && !nameContainsLegalDesignator(finalName)) {
         e.desiredLlcName =

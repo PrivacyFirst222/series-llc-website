@@ -25,6 +25,7 @@ const formData: FloridaLLCFormData = {
   publicRecordNotice: true,
   desiredLlcName: "E2E Coastal Holdings",
   llcDesignator: "LLC",
+  alternateName1: "E2E Coastal Backup",
   nameSearchAcknowledgment: true,
   governmentAffiliationAcknowledgment: true,
   lawfulPurposeNameAcknowledgment: true,

@@ -113,6 +113,7 @@ export const formationFormSchema = z.object({
   }),
   alternateName1: z.string().optional().or(z.literal("")),
   alternateName2: z.string().optional().or(z.literal("")),
+  exactNameOnly: z.boolean().optional(),
   nameSearchAcknowledgment: z.literal(true, {
     errorMap: () => ({ message: "Acknowledgment is required." }),
   }),

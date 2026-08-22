@@ -167,6 +167,17 @@ export function filingGroups(payload: any): FilingGroup[] {
         label: `Alternate name ${i + 1} (if the first choice is unavailable)`,
         value: n.trim(),
       })),
+      ...(p.llcName?.exactNameOnly
+        ? [
+            {
+              key: "exactNameOnly",
+              label: "If the name is unavailable",
+              value:
+                "Client wants this EXACT name only — email the client before filing anything else",
+              block: true,
+            },
+          ]
+        : []),
     ],
   });
 

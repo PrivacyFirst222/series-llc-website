@@ -67,6 +67,14 @@ const extendedFormSchema = formationFormSchema
         message: "The existing LLC's name is required for a conversion.",
       });
     }
+    if (!data.exactNameOnly && !(data.alternateName1 ?? "").trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["alternateName1"],
+        message:
+          "Provide an alternate name, or confirm you want the exact name only.",
+      });
+    }
     if (
       data.registeredAgentChoice === "SELF" &&
       (!data.registeredAgentFirstName?.trim() || !data.registeredAgentLastName?.trim())

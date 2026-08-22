@@ -28,9 +28,12 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
       desiredName: data.desiredLlcName,
       designator: data.llcDesignator || "",
       finalName,
-      alternateNames: [data.alternateName1, data.alternateName2].filter(
-        (s): s is string => Boolean(s && s.trim()),
-      ),
+      // Alternates are entered without the designator, like the main name, and
+      // stored Sunbiz-ready with it applied.
+      alternateNames: [data.alternateName1, data.alternateName2]
+        .map((n) => buildFinalLlcName((n ?? "").trim(), data.llcDesignator))
+        .filter((s): s is string => Boolean(s && s.trim())),
+      exactNameOnly: data.exactNameOnly === true,
     },
     principalOfficeAddress: data.principalAddress,
     mailingAddress: data.mailingSameAsPrincipal
