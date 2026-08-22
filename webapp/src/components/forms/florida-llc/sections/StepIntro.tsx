@@ -14,7 +14,7 @@ export function StepIntro({ data, patch, errors }: StepProps) {
         <h2 className="font-display text-3xl">Eligibility & basics</h2>
         <p className="text-sm text-muted-foreground max-w-2xl">
           This wizard collects the information needed to prepare Florida
-          Articles of Organization for a new domestic LLC. It is not a filing
+          Articles of Organization for a new domestic Florida series LLC. It is not a filing
           and we do not provide legal, tax, or accounting advice.
         </p>
       </header>
@@ -52,7 +52,7 @@ export function StepIntro({ data, patch, errors }: StepProps) {
           id="ack-domestic"
           checked={data.isFloridaDomesticEntityOnly}
           onChange={(v) => patch({ isFloridaDomesticEntityOnly: v })}
-          label="I understand this form is for forming a new domestic Florida LLC only."
+          label="I understand this form is for forming a new domestic Florida series LLC only."
           error={errors.isFloridaDomesticEntityOnly}
         />
         <AcknowledgeBox
