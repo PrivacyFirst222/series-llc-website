@@ -1,3 +1,4 @@
+import { normalizeEntityName } from "./nameSimilarity";
 /**
  * Lightweight unit-style assertions for validation logic.
  * Intentionally framework-free so they can be ported to vitest/jest later.
@@ -136,6 +137,32 @@ if (typeof console !== "undefined") {
       failed,
     );
   }
+}
+
+// --- nameSimilarity: the Division's five published non-distinguishable factors ---
+{
+  const same = (a: string, b: string, label: string) => {
+    if (normalizeEntityName(a) !== normalizeEntityName(b)) {
+      throw new Error(`FAIL ${label}: "${a}" vs "${b}" -> "${normalizeEntityName(a)}" / "${normalizeEntityName(b)}"`);
+    }
+  };
+  const diff = (a: string, b: string, label: string) => {
+    if (normalizeEntityName(a) === normalizeEntityName(b)) {
+      throw new Error(`FAIL ${label}: "${a}" and "${b}" should differ`);
+    }
+  };
+  // the FAQ's own examples, verbatim
+  same("Business Enterprises, Inc.", "Business Enterprises, LLC", "suffixes");
+  same("The Kitchen, Ltd.", "Kitchen, Inc.", "articles-1");
+  same("Kitchen, Inc.", "A Kitchen, LLC", "articles-2");
+  same("Cheese and Crackers, LLC", "Cheese & Crackers, Inc.", "and-ampersand");
+  same("Tallahassee Sport, Inc.", "Tallahassee Sports, LLC", "plural");
+  same("Tallahassee Sports, LLC", "Tallahassee's Sports, LP", "possessive");
+  same("Cookies 'n Cupcakes, Inc.", "Cookies-n-Cupcakes, Inc.", "punctuation-1");
+  same("Cookies-n-Cupcakes, Inc.", "Cookies n Cupcakes! Inc.", "punctuation-2");
+  diff("Sunshine Holdings", "Sunshine Holdings 2019", "real difference kept");
+  diff("Palm Grove Estates", "Palm Grove Estate Partners", "added word kept");
+  console.log("[fl-llc] nameSimilarity: all Division examples normalize correctly.");
 }
 
 // Run directly (bun run validation.test.ts): exit non-zero on failure. Printing

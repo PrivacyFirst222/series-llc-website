@@ -1,3 +1,4 @@
+import { sunbizSearchUrl } from "@/components/forms/florida-llc/nameSimilarity";
 import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, Copy, FileUp, Landmark, Loader2, X } from "lucide-react";
@@ -167,6 +168,16 @@ export default function OrderDetail({
         <div className="sticky top-0 z-10 flex items-start justify-between gap-3 border-b border-border bg-background px-6 py-4">
           <div>
             <h2 className="font-display text-xl">{d?.llcName ?? "Loading…"}</h2>
+            {d?.llcName ? (
+              <a
+                href={sunbizSearchUrl(d.llcName)}
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs font-medium text-trust underline underline-offset-2"
+              >
+                Check name on Sunbiz (Active = taken · INACT/UA = held · INACT = available)
+              </a>
+            ) : null}
             <p className="text-sm text-muted-foreground">
               {d ? `${d.contactName} <${d.contactEmail}>` : ""}
             </p>

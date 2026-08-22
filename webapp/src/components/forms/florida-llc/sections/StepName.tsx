@@ -1,4 +1,5 @@
 import { Input } from "@/components/ui/input";
+import { normalizeEntityName, similarityExamples, sunbizSearchUrl } from "../nameSimilarity";
 import { AcknowledgeBox, FieldShell } from "../FieldShell";
 import {
   buildFinalLlcName,
@@ -193,6 +194,40 @@ export function StepName({ data, patch, errors }: StepProps) {
         Without the designator — it is added automatically. Alternate #1 is
         required unless you check the exact-name box.
       </p>
+
+      {data.desiredLlcName.trim() ? (
+        <div className="rounded-xl border border-border bg-secondary/40 p-4 space-y-3">
+          <a
+            href={sunbizSearchUrl(data.desiredLlcName)}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+          >
+            Search Sunbiz for "{normalizeEntityName(data.desiredLlcName) || data.desiredLlcName.trim()}"
+          </a>
+          <div className="text-xs leading-relaxed text-muted-foreground">
+            <p className="font-medium text-foreground">How to read the results (from the Division's own rules):</p>
+            <ul className="mt-1 list-disc pl-4 space-y-0.5">
+              <li><span className="font-medium">Active</span> — taken.</li>
+              <li><span className="font-medium">INACT/UA</span> — dissolved but the name is still held (one year after administrative dissolution; 120 days after voluntary).</li>
+              <li><span className="font-medium">INACT or Inactive</span> — the company is gone and its name is available again.</li>
+              <li><span className="font-medium">CROSS RF</span> — a cross-reference; click it, and the real record's status decides.</li>
+            </ul>
+            {similarityExamples(data.desiredLlcName).length > 0 ? (
+              <p className="mt-2">
+                Florida treats near-matches as the same name — watch the list for
+                names like{" "}
+                {similarityExamples(data.desiredLlcName).map((s, i, arr) => (
+                  <span key={s}>
+                    <em>{s}</em>
+                    {i < arr.length - 1 ? ", " : "."}
+                  </span>
+                ))}
+              </p>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
 
       <AcknowledgeBox
         id="exact-name-only"
