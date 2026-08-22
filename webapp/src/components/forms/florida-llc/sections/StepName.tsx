@@ -170,11 +170,7 @@ export function StepName({ data, patch, errors }: StepProps) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FieldShell
-          label={data.exactNameOnly ? "Alternate name #1" : "Alternate name #1 (required unless exact-name box is checked)"}
-          helper="Without the designator — your designator above is added automatically."
-          error={errors.alternateName1}
-        >
+        <FieldShell label="Alternate name #1" error={errors.alternateName1}>
           <Input
             value={data.alternateName1 ?? ""}
             disabled={data.exactNameOnly === true}
@@ -193,6 +189,10 @@ export function StepName({ data, patch, errors }: StepProps) {
           />
         </FieldShell>
       </div>
+      <p className="text-xs text-muted-foreground">
+        Without the designator — it is added automatically. Alternate #1 is
+        required unless you check the exact-name box.
+      </p>
 
       <AcknowledgeBox
         id="exact-name-only"
