@@ -1,4 +1,5 @@
 import { isPoBox } from "./schema";
+import { normalizeEntityName } from "./nameSimilarity";
 import {
   buildFinalLlcName,
   designatorAllowedForFormationType,
@@ -54,6 +55,22 @@ export function validateStep(
       if (!data.exactNameOnly && !(data.alternateName1 ?? "").trim()) {
         e.alternateName1 =
           "Give an alternate name, or check the exact-name-only box below.";
+      }
+      // A backup that is the same name under Florida's rules is no backup.
+      const primaryKey = normalizeEntityName(data.desiredLlcName ?? "");
+      const alt1Key = normalizeEntityName(data.alternateName1 ?? "");
+      const alt2Key = normalizeEntityName(data.alternateName2 ?? "");
+      if (alt1Key && primaryKey && alt1Key === primaryKey) {
+        e.alternateName1 =
+          "Under Florida's rules this is the same name as your first choice — a backup must differ in its words, not just suffix, punctuation, or plurals.";
+      }
+      if (alt2Key && primaryKey && alt2Key === primaryKey) {
+        e.alternateName2 =
+          "Under Florida's rules this is the same name as your first choice.";
+      }
+      if (alt1Key && alt2Key && alt1Key === alt2Key) {
+        e.alternateName2 =
+          "Your two alternates are the same name under Florida's rules.";
       }
       // Alternates are entered WITHOUT the designator (it is added
       // automatically); typing one would double it on the filing.

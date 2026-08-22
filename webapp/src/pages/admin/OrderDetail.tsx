@@ -1,4 +1,5 @@
 import { sunbizSearchUrl } from "@/components/forms/florida-llc/nameSimilarity";
+import { NameCheck } from "@/components/forms/florida-llc/NameCheck";
 import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, Copy, FileUp, Landmark, Loader2, X } from "lucide-react";
@@ -20,6 +21,7 @@ interface OrderDetailData {
   id: string;
   clientId: string | null;
   llcName: string;
+  alternateNames: string[];
   status: string;
   contactName: string;
   contactEmail: string;
@@ -177,6 +179,19 @@ export default function OrderDetail({
               >
                 Check name on Sunbiz (Active = taken · INACT/UA = held · INACT = available)
               </a>
+            ) : null}
+            {d?.llcName ? (
+              <div className="mt-2">
+                <NameCheck
+                  names={[
+                    { label: "First choice", value: d.llcName },
+                    ...(d.alternateNames ?? []).map((n, i) => ({
+                      label: `Alternate ${i + 1}`,
+                      value: n,
+                    })),
+                  ]}
+                />
+              </div>
             ) : null}
             <p className="text-sm text-muted-foreground">
               {d ? `${d.contactName} <${d.contactEmail}>` : ""}

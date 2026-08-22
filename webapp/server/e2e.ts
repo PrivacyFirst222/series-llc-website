@@ -1290,5 +1290,70 @@ if (mint.status === 200) {
   check("client signs in with the admin-set address", afterOverride.status === 200);
 }
 
+// --- name availability check (fl_entities mirror) -------------------------
+// Recorded fixtures only — the suite never touches the state's SFTP. Seeds
+// fake entities, saves and restores the real sync state around the calls.
+{
+  const { getDb } = await import("./db");
+  const db = await getDb();
+  const saved = await db.query<{ baseline_label: string | null; last_daily: string | null }>(
+    "SELECT baseline_label, last_daily::text FROM fl_sync_state WHERE id = 1",
+  );
+  const today = new Date().toISOString().slice(0, 10);
+  const oldIso = new Date(Date.now() - 3 * 365 * 86_400_000).toISOString().slice(0, 10);
+  const recentIso = new Date(Date.now() - 30 * 86_400_000).toISOString().slice(0, 10);
+  await db.query(
+    `INSERT INTO fl_sync_state (id, baseline_label, last_daily, updated_at) VALUES (1, 'e2e', $1, now())
+     ON CONFLICT (id) DO UPDATE SET baseline_label = 'e2e', last_daily = $1::date, updated_at = now()`,
+    [today],
+  );
+  await db.query(
+    `INSERT INTO fl_entities (doc_number, name, status, filing_type, file_date, last_txn_date, norm_key) VALUES
+       ('E2ETEST00001', 'E2E SUNSHINE HOLDINGS, INC.', 'A', 'DOMP', '2020-01-01', NULL, 'E2E SUNSHINE HOLDING'),
+       ('E2ETEST00002', 'E2E GATOR GROVES LLC', 'I', 'FLAL', '2019-01-01', $1, 'E2E GATOR GROVE'),
+       ('E2ETEST00003', 'E2E OLD TIMER CORP', 'I', 'DOMP', '2010-01-01', $2, 'E2E OLD TIMER')
+     ON CONFLICT (doc_number) DO NOTHING`,
+    [recentIso, oldIso],
+  );
+  const nc = await api("/api/name-check", {
+    method: "POST",
+    body: JSON.stringify({
+      names: ["E2E Sunshine Holdings, LLC", "E2E Gator Grove", "E2E Old Timers", "E2E Never Existed Ventures"],
+    }),
+  });
+  const r = nc.body?.data;
+  check("name-check responds with data", nc.status === 200 && r?.available === true, nc.body);
+  const [sun, gator, old, never] = r?.results ?? [];
+  check(
+    "suffix/plural variant of an active entity is TAKEN with the conflict listed",
+    sun?.verdict === "taken" &&
+      sun?.conflicts?.[0]?.name === "E2E SUNSHINE HOLDINGS, INC." &&
+      sun?.conflicts?.[0]?.docNumber === "E2ETEST00001" &&
+      sun?.conflicts?.[0]?.status === "Active" &&
+      typeof sun?.conflicts?.[0]?.reason === "string" &&
+      (sun?.conflicts?.[0]?.detailUrl ?? "").includes("search.sunbiz.org"),
+    sun,
+  );
+  check(
+    "recently dissolved entity is HELD (s. 605.0715 window)",
+    gator?.verdict === "held" && gator?.conflicts?.[0]?.status === "Inactive",
+    gator,
+  );
+  check("long-dissolved entity is CLEAR", old?.verdict === "clear" && old?.conflicts?.length === 0, old);
+  check("unknown name is CLEAR with no conflicts", never?.verdict === "clear" && never?.conflicts?.length === 0, never);
+  const empty = await api("/api/name-check", { method: "POST", body: JSON.stringify({ names: [] }) });
+  check("empty name list rejected", empty.status === 400);
+  // restore
+  await db.query("DELETE FROM fl_entities WHERE doc_number LIKE 'E2ETEST%'");
+  if (saved.length > 0) {
+    await db.query(
+      "UPDATE fl_sync_state SET baseline_label = $1, last_daily = $2::date, updated_at = now() WHERE id = 1",
+      [saved[0].baseline_label, saved[0].last_daily],
+    );
+  } else {
+    await db.query("DELETE FROM fl_sync_state WHERE id = 1");
+  }
+}
+
 console.log(failures === 0 ? "\nALL PASS" : `\n${failures} FAILURES`);
 process.exit(failures === 0 ? 0 : 1);

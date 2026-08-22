@@ -30,6 +30,7 @@ import { stampEastern, stampForFilename } from "./datetime";
 import { assembleOa, oaVersion, OA_TEMPLATE_VERSION, type OaInputs } from "./oa";
 import { renderMarkdownPdf, stampExistingPdf } from "./pdf-render";
 import { createSession, getSession, destroySession, rateLimit, clientIp } from "./auth";
+import { checkName, getSyncState, syncDailies } from "./sunbiz";
 import { deleteFile, putFile, readFileStream } from "./storage";
 import {
   sendMail,
@@ -1583,6 +1584,48 @@ app.get("/portal/services", async (c) => {
   });
 });
 
+/** Name-availability check against our mirror of the Division of
+ *  Corporations' public data files (server/sunbiz.ts). Public: the intake
+ *  name step calls it before an order exists. Verdicts say "no conflict
+ *  found", never "available" — the Division makes the final determination. */
+app.post("/name-check", async (c) => {
+  if (!rateLimit(`namecheck:${clientIp(c)}`, 30, 600_000)) {
+    return c.json(err("Too many checks. Try again in a few minutes.", "RATE_LIMITED"), 429);
+  }
+  const body = await c.req.json().catch(() => null);
+  const names = Array.isArray(body?.names)
+    ? (body.names as unknown[]).filter((n): n is string => typeof n === "string" && n.trim().length > 0).slice(0, 5)
+    : [];
+  if (names.length === 0) return c.json(err("No names given.", "BAD_REQUEST"), 400);
+  try {
+    const state = await getSyncState();
+    // No baseline yet, or the mirror has gone stale — say so instead of
+    // returning a verdict the data cannot support. 10 days: dailies are
+    // work-days only, so a long holiday weekend must not trip this.
+    const asOf = state.lastDaily;
+    const stale =
+      !state.baselineLabel || !asOf || Date.now() - new Date(asOf).getTime() > 10 * 86_400_000;
+    if (stale) return c.json({ data: { available: false, results: [] } });
+    const results: Awaited<ReturnType<typeof checkName>>[] = [];
+    for (const name of names) results.push(await checkName(name));
+    return c.json({ data: { available: true, asOf, results } });
+  } catch {
+    return c.json({ data: { available: false, results: [] } });
+  }
+});
+
+/** Nightly top-up of the fl_entities mirror from the Division's SFTP dailies.
+ *  Same auth as /cron/purge. Fetches every YYYYMMDDc.txt newer than the last
+ *  one ingested (work days only — gaps are normal). */
+app.get("/cron/sunbiz-sync", async (c) => {
+  const auth = c.req.header("authorization") ?? "";
+  const secret = env.CRON_SECRET;
+  if (secret && auth !== `Bearer ${secret}`) return c.json(err("Not authorized", "UNAUTHENTICATED"), 401);
+  if (!secret && env.isProd) return c.json(err("Not authorized", "UNAUTHENTICATED"), 401);
+  const report = await syncDailies();
+  return c.json({ data: report });
+});
+
 /** Daily sweep so expired packages are destroyed even if nobody signs in.
  *  Vercel cron calls this; a shared secret keeps it from being public. */
 app.get("/cron/purge", async (c) => {
@@ -2350,6 +2393,9 @@ app.get("/admin/orders/:id", async (c) => {
       filedAt: o.filed_at,
       formedAt: o.formed_at,
       groups: filingGroups(payload),
+      alternateNames: ((payload as { llcName?: { alternateNames?: string[] } }).llcName?.alternateNames ?? []).filter(
+        (n) => (n ?? "").trim() !== "",
+      ),
       copiedFields:
         (typeof o.copied_fields === "string" ? JSON.parse(o.copied_fields) : o.copied_fields) ?? {},
       series: allSeries.map((name) => ({ name, covered: covered.has(name) })),

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { normalizeEntityName } from "../src/components/forms/florida-llc/nameSimilarity";
 import { formationFormSchema } from "../src/components/forms/florida-llc/schema";
 import { hasProtectedSeriesPhrase } from "../src/components/forms/florida-llc/validation";
 import { raServicePatch } from "../src/components/forms/florida-llc/raService";
@@ -66,6 +67,19 @@ const extendedFormSchema = formationFormSchema
         path: ["existingLlcName"],
         message: "The existing LLC's name is required for a conversion.",
       });
+    }
+    {
+      const pk = normalizeEntityName(data.desiredLlcName ?? "");
+      const a1 = normalizeEntityName(data.alternateName1 ?? "");
+      const a2 = normalizeEntityName(data.alternateName2 ?? "");
+      if (a1 && pk && a1 === pk) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["alternateName1"],
+          message: "The alternate is the same name as the first choice under Florida's distinguishability rules." });
+      }
+      if ((a2 && pk && a2 === pk) || (a1 && a2 && a1 === a2)) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["alternateName2"],
+          message: "This alternate duplicates another name on the order under Florida's rules." });
+      }
     }
     if (!data.exactNameOnly && !(data.alternateName1 ?? "").trim()) {
       ctx.addIssue({

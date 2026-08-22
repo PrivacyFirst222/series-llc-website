@@ -1,5 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { normalizeEntityName, similarityExamples, sunbizSearchUrl } from "../nameSimilarity";
+import { NameCheck } from "../NameCheck";
 import { AcknowledgeBox, FieldShell } from "../FieldShell";
 import {
   buildFinalLlcName,
@@ -197,13 +198,20 @@ export function StepName({ data, patch, errors }: StepProps) {
 
       {data.desiredLlcName.trim() ? (
         <div className="rounded-xl border border-border bg-secondary/40 p-4 space-y-3">
+          <NameCheck
+            names={[
+              { label: "First choice", value: data.desiredLlcName },
+              { label: "Alternate 1", value: data.alternateName1 ?? "" },
+              { label: "Alternate 2", value: data.alternateName2 ?? "" },
+            ]}
+          />
           <a
             href={sunbizSearchUrl(data.desiredLlcName)}
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
           >
-            Search Sunbiz for "{normalizeEntityName(data.desiredLlcName) || data.desiredLlcName.trim()}"
+            Confirm on Sunbiz: search "{data.desiredLlcName.trim()}"
           </a>
           <div className="text-xs leading-relaxed text-muted-foreground">
             <p className="font-medium text-foreground">How to read the results (from the Division's own rules):</p>
@@ -215,14 +223,17 @@ export function StepName({ data, patch, errors }: StepProps) {
             </ul>
             {similarityExamples(data.desiredLlcName).length > 0 ? (
               <p className="mt-2">
-                Florida treats near-matches as the same name — watch the list for
-                names like{" "}
+                <span className="font-medium text-foreground">
+                  If the results show any of these, your name is taken:
+                </span>{" "}
                 {similarityExamples(data.desiredLlcName).map((s, i, arr) => (
                   <span key={s}>
                     <em>{s}</em>
-                    {i < arr.length - 1 ? ", " : "."}
+                    {i < arr.length - 1 ? " · " : ""}
                   </span>
-                ))}
+                ))}{" "}
+                — a different ending (Inc., LLC), "the", "&" vs "and", plurals,
+                or punctuation do <span className="font-medium text-foreground">not</span> make a name different in Florida.
               </p>
             ) : null}
           </div>

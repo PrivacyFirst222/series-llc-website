@@ -166,6 +166,28 @@ ALTER TABLE orders ADD COLUMN IF NOT EXISTS copied_fields jsonb NOT NULL DEFAULT
 -- coverage is recorded per document rather than assumed one-to-one.
 ALTER TABLE documents ADD COLUMN IF NOT EXISTS meta jsonb NOT NULL DEFAULT '{}'::jsonb;
 ALTER TABLE documents ADD COLUMN IF NOT EXISTS order_id uuid REFERENCES orders(id);
+
+-- Mirror of the Division of Corporations' public data downloads, kept to the
+-- columns the name-availability check needs. norm_key is the name reduced by
+-- Florida's distinguishability rules (nameSimilarity.normalizeEntityName);
+-- two names conflict when their keys match. Loaded from the quarterly
+-- baseline, topped up nightly from the daily files (server/sunbiz.ts).
+CREATE TABLE IF NOT EXISTS fl_entities (
+  doc_number text PRIMARY KEY,
+  name text NOT NULL,
+  status text NOT NULL,
+  filing_type text NOT NULL DEFAULT '',
+  file_date date,
+  last_txn_date date,
+  norm_key text NOT NULL
+);
+CREATE INDEX IF NOT EXISTS fl_entities_norm_key_idx ON fl_entities (norm_key);
+CREATE TABLE IF NOT EXISTS fl_sync_state (
+  id int PRIMARY KEY,
+  baseline_label text,
+  last_daily date,
+  updated_at timestamptz
+);
 `;
 
 export async function getDb(): Promise<Db> {
