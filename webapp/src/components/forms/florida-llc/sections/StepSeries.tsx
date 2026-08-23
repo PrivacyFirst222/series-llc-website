@@ -16,12 +16,12 @@ const INCLUDED_COUNT = 3;
 const ADDITIONAL_FEE = 50;
 
 function nextDefaultName(existing: SeriesEntry[]): string {
-  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  for (let i = 0; i < letters.length; i++) {
-    const candidate = `PS ${letters[i]}`;
+  // Numbered, matching the portal's add-a-series service (PS-1, PS-2, …);
+  // the lowest unused number fills any gap left by a rename or delete.
+  for (let n = 1; ; n++) {
+    const candidate = `PS ${n}`;
     if (!existing.some((s) => s.name === candidate)) return candidate;
   }
-  return `PS ${existing.length + 1}`;
 }
 
 export function StepSeries({ data, patch, errors }: StepProps) {
