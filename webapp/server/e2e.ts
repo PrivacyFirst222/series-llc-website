@@ -1358,6 +1358,22 @@ if (mint.status === 200) {
     takenOrder.status === 400 && takenOrder.body?.error?.code === "NAME_UNAVAILABLE",
     takenOrder.body,
   );
+  const dupSeries = await api("/api/orders", {
+    method: "POST",
+    headers: NAME_IP,
+    body: JSON.stringify({
+      ...formData,
+      series: [
+        { id: "s1", name: "E2E Coastal Holdings, LLC, PS 2" },
+        { id: "s2", name: "E2E Coastal Holdings, LLC, P.s. 2" },
+      ],
+    }),
+  });
+  check(
+    "series duplicated across prefix/case variants is refused server-side",
+    dupSeries.status === 400,
+    dupSeries.body,
+  );
   const heldOrder = await api("/api/orders", {
     method: "POST",
     headers: NAME_IP,

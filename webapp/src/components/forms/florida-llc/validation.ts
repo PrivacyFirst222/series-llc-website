@@ -213,6 +213,30 @@ export function hasProtectedSeriesPhrase(name: string): boolean {
   return /protected\s+series/i.test(name) || /(^|\s)p\.?s\.?(\s|$)/i.test(name);
 }
 
+/** Adam's rule (23 Aug 2026): the statutory prefix is corrected, not
+ *  rejected — any dotted variant becomes "P.S.", bare "ps" becomes "PS",
+ *  and "protected series" gets initial caps. */
+export function canonicalizeSeriesName(name: string): string {
+  let s = name.trim().replace(/\s+/g, " ");
+  s = s.replace(/protected\s+series/gi, "Protected Series");
+  s = s.replace(/(^|\s)p\.\s?s\.?(?=\s|$)/gi, "$1P.S.");
+  s = s.replace(/(^|\s)ps\.(?=\s|$)/gi, "$1P.S.");
+  s = s.replace(/(^|\s)ps(?=\s|$)/gi, "$1PS");
+  return s;
+}
+
+/** Two series identifiers are the SAME once every prefix occurrence
+ *  ("Protected Series" / "P.S." / "PS") and capitalization are ignored:
+ *  "PS 2" ≡ "P.s. 2", "Protected Series Jimmy" ≡ "PS Jimmy". */
+export function seriesDedupeKey(name: string): string {
+  return name
+    .toUpperCase()
+    .replace(/PROTECTED\s+SERIES/g, " ")
+    .replace(/(^|\s)P\.?S\.?(?=\s|$)/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 /** Same strictness as the server's Zod email rule — no colons, spaces, or
  *  missing domains sneak through to the final submit. */
 const EMAIL_REGEX =

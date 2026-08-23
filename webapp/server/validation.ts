@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { normalizeEntityName } from "../src/components/forms/florida-llc/nameSimilarity";
 import { formationFormSchema } from "../src/components/forms/florida-llc/schema";
-import { hasProtectedSeriesPhrase } from "../src/components/forms/florida-llc/validation";
+import { hasProtectedSeriesPhrase, seriesDedupeKey } from "../src/components/forms/florida-llc/validation";
 import { raServicePatch } from "../src/components/forms/florida-llc/raService";
 
 /**
@@ -53,7 +53,7 @@ const extendedFormSchema = formationFormSchema
         });
       }
     });
-    const names = data.series.map((s) => s.name.trim().toLowerCase());
+    const names = data.series.map((s) => seriesDedupeKey(s.name));
     if (new Set(names).size !== names.length) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,

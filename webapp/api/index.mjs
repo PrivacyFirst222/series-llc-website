@@ -76289,6 +76289,17 @@ function calculateEstimatedFees(opts) {
 function hasProtectedSeriesPhrase(name) {
   return /protected\s+series/i.test(name) || /(^|\s)p\.?s\.?(\s|$)/i.test(name);
 }
+function canonicalizeSeriesName(name) {
+  let s = name.trim().replace(/\s+/g, " ");
+  s = s.replace(/protected\s+series/gi, "Protected Series");
+  s = s.replace(/(^|\s)p\.\s?s\.?(?=\s|$)/gi, "$1P.S.");
+  s = s.replace(/(^|\s)ps\.(?=\s|$)/gi, "$1P.S.");
+  s = s.replace(/(^|\s)ps(?=\s|$)/gi, "$1PS");
+  return s;
+}
+function seriesDedupeKey(name) {
+  return name.toUpperCase().replace(/PROTECTED\s+SERIES/g, " ").replace(/(^|\s)P\.?S\.?(?=\s|$)/g, " ").replace(/\s+/g, " ").trim();
+}
 
 // src/components/forms/florida-llc/raService.ts
 var RA_SERVICE = {
@@ -76366,7 +76377,7 @@ var extendedFormSchema = formationFormSchema.extend({
       });
     }
   });
-  const names = data.series.map((s) => s.name.trim().toLowerCase());
+  const names = data.series.map((s) => seriesDedupeKey(s.name));
   if (new Set(names).size !== names.length) {
     ctx.addIssue({
       code: external_exports.ZodIssueCode.custom,
@@ -76569,7 +76580,7 @@ function buildPayload(data) {
       ein: data.orderEin,
       sElection: data.orderSElection && data.filingPath !== "CONVERT"
     },
-    series: data.series,
+    series: data.series.map((s) => ({ ...s, name: canonicalizeSeriesName(s.name) })),
     estimatedStateFees: fees,
     certifications: {
       articlesSignedBy: data.articlesSignerChoice,

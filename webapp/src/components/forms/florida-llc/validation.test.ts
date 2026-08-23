@@ -11,7 +11,7 @@ import { normalizeEntityName } from "./nameSimilarity";
  * for that migration.
  */
 import { isPoBox } from "./schema";
-import {
+import { canonicalizeSeriesName, seriesDedupeKey,
   buildFinalLlcName,
   calculateEstimatedFees,
   designatorAllowedForFormationType,
@@ -163,6 +163,39 @@ if (typeof console !== "undefined") {
   diff("Sunshine Holdings", "Sunshine Holdings 2019", "real difference kept");
   diff("Palm Grove Estates", "Palm Grove Estate Partners", "added word kept");
   console.log("[fl-llc] nameSimilarity: all Division examples normalize correctly.");
+}
+
+// ---- series identifiers: canonical prefixes + prefix-blind duplicates ----
+{
+  const canon = (input: string, expected: string) => {
+    const got = canonicalizeSeriesName(input);
+    if (got !== expected) throw new Error(`FAIL canon: "${input}" -> "${got}", expected "${expected}"`);
+  };
+  canon("P.s. 2", "P.S. 2");
+  canon("ps 2", "PS 2");
+  canon("pS 2", "PS 2");
+  canon("ps. 2", "P.S. 2");
+  canon("p.s 2", "P.S. 2");
+  // the prefix is corrected; the client's own words are left as typed
+  canon("protected series jimmy", "Protected Series jimmy");
+  canon("PROTECTED  SERIES JIMMY", "Protected Series JIMMY");
+  canon("PS 1", "PS 1");
+  canon("Lakeside ps", "Lakeside PS");
+
+  const sameSeries = (a: string, b: string, label: string) => {
+    if (seriesDedupeKey(a) !== seriesDedupeKey(b)) throw new Error(`FAIL ${label}: "${a}" ≡ "${b}" expected`);
+  };
+  const diffSeries = (a: string, b: string, label: string) => {
+    if (seriesDedupeKey(a) === seriesDedupeKey(b)) throw new Error(`FAIL ${label}: "${a}" and "${b}" should differ`);
+  };
+  // Adam's screenshot pair, verbatim
+  sameSeries("P.s. 2", "PS 2", "screenshot pair");
+  sameSeries("Protected Series Jimmy", "PS Jimmy", "phrase vs abbrev");
+  sameSeries("ps jimmy", "P.S. JIMMY", "case + dots");
+  sameSeries("PS", "P.S.", "bare prefixes");
+  diffSeries("PS 1", "PS 2", "numbers differ");
+  diffSeries("PS Jimmy", "PS Jimmy II", "added word kept");
+  console.log("[fl-llc] series identifiers: canonical prefixes and prefix-blind duplicates hold.");
 }
 
 // Run directly (bun run validation.test.ts): exit non-zero on failure. Printing

@@ -1,6 +1,7 @@
 import { Plus, Trash2, Layers, Info, DollarSign, Network } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AcknowledgeBox, FieldShell } from "../FieldShell";
+import { canonicalizeSeriesName } from "../validation";
 import { buildFinalLlcName } from "../validation";
 import type { FloridaLLCFormData, SeriesEntry } from "../types";
 
@@ -181,6 +182,7 @@ export function StepSeries({ data, patch, errors }: StepProps) {
                   type="text"
                   value={s.name}
                   onChange={(e) => updateName(s.id, e.target.value)}
+                  onBlur={(e) => updateName(s.id, canonicalizeSeriesName(e.target.value))}
                   placeholder="e.g. PS A or PS Real Estate"
                   aria-invalid={!!errors[`series.${i}.name`]}
                   className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-trust/30 focus:border-trust/50"

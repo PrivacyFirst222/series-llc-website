@@ -1,4 +1,4 @@
-import { buildFinalLlcName, calculateEstimatedFees } from "./validation";
+import { canonicalizeSeriesName, buildFinalLlcName, calculateEstimatedFees } from "./validation";
 import type { FloridaLLCFormData, SubmissionPayload } from "./types";
 
 const joinName = (first?: string, last?: string): string =>
@@ -100,7 +100,7 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
       ein: data.orderEin,
       sElection: data.orderSElection && data.filingPath !== "CONVERT",
     },
-    series: data.series,
+    series: data.series.map((s) => ({ ...s, name: canonicalizeSeriesName(s.name) })),
     estimatedStateFees: fees,
     certifications: {
       articlesSignedBy: data.articlesSignerChoice,

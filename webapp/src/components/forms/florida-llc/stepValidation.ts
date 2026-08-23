@@ -1,5 +1,6 @@
 import { isPoBox } from "./schema";
 import { nameCheckKey, normalizeEntityName } from "./nameSimilarity";
+import { seriesDedupeKey } from "./validation";
 import {
   buildFinalLlcName,
   designatorAllowedForFormationType,
@@ -164,10 +165,12 @@ export function validateStep(
           'Include "PS" (or "P.S." / "protected series") — §605.2202 requires it in every series name.';
       }
     });
-    const names = data.series.map((s) => s.name.trim().toLowerCase());
-    names.forEach((n, i) => {
-      if (n && names.indexOf(n) !== i)
-        e[`series.${i}.name`] = "Each series must have a unique name.";
+    const keys = data.series.map((s) => seriesDedupeKey(s.name));
+    keys.forEach((k, i) => {
+      const first = keys.indexOf(k);
+      if (data.series[i].name.trim() && first !== i)
+        e[`series.${i}.name`] =
+          `Same name as series ${first + 1} — "PS", "P.S.", and "Protected Series" count as the same prefix, and capitalization is ignored. Make it distinct.`;
     });
   }
 
