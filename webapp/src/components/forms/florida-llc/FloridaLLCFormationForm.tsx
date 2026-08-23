@@ -138,8 +138,28 @@ export function FloridaLLCFormationForm({
 
   // Soft USPS check state: which step has an unresolved warning. Continuing a
   // second time proceeds — the check advises, it never blocks.
-  const [addressWarning, setAddressWarning] = useState<{ step: string; message: string } | null>(null);
+  const [addressWarning, setAddressWarning] = useState<{
+    step: string;
+    message: string;
+    suggested?: { street: string; unit: string; city: string; state: string; zip: string };
+  } | null>(null);
   const [checkingAddress, setCheckingAddress] = useState<boolean>(false);
+
+  /** USPS returns one street line ("301 N Fern Creek Ave Ste C"); the form
+   *  keeps street and suite apart. Split on the Postal Service's own
+   *  secondary-unit designators — a closed list, unlike human names — and
+   *  when none is present the whole line is the street and the suite field
+   *  is cleared (the line already contains everything USPS wants). */
+  const splitUspsLine = (line: string): { street: string; unit: string } => {
+    const DESIGNATORS = ["APT","BLDG","DEPT","FL","FRNT","HNGR","KEY","LBBY","LOT","LOWR","OFC","PH","PIER","REAR","RM","SIDE","SLIP","SPC","STOP","STE","SUITE","TRLR","UNIT","UPPR","#"];
+    const words = line.trim().split(/\s+/);
+    for (let i = words.length - 2; i > 0; i--) {
+      if (DESIGNATORS.includes(words[i].toUpperCase().replace(/\./g, ""))) {
+        return { street: words.slice(0, i).join(" "), unit: words.slice(i).join(" ") };
+      }
+    }
+    return { street: line.trim(), unit: "" };
+  };
 
   const addressToVerify = (): { address1: string; address2?: string; city: string; state: string; zip: string } | null => {
     if (stepKey === "principal") {
@@ -162,6 +182,24 @@ export function FloridaLLCFormationForm({
       };
     }
     return null;
+  };
+
+  const useSuggestedAddress = () => {
+    const s = addressWarning?.suggested;
+    if (!s) return;
+    if (stepKey === "principal") {
+      patch({ principalAddress: { ...data.principalAddress, address1: s.street, address2: s.unit, city: s.city, state: s.state, zip: s.zip } });
+    } else if (stepKey === "mailing") {
+      patch({ mailingAddress: { ...data.mailingAddress, address1: s.street, address2: s.unit, city: s.city, state: s.state, zip: s.zip } });
+    } else if (stepKey === "agent") {
+      patch({
+        registeredAgentStreetAddress1: s.street,
+        registeredAgentStreetAddress2: s.unit,
+        registeredAgentCity: s.city,
+        registeredAgentZip: s.zip,
+      });
+    }
+    advance();
   };
 
   const advance = () => {
@@ -237,10 +275,18 @@ export function FloridaLLCFormationForm({
           });
           return;
         }
-        if (corrected) {
+        if (corrected && result.normalized) {
+          const { street, unit } = splitUspsLine(result.normalized.address1);
           setAddressWarning({
             step: stepKey,
-            message: `The Postal Service lists this address as: ${corrected}. Update it above to match, or press Continue again to keep what you entered.`,
+            message: `The Postal Service lists this address as: ${corrected}.`,
+            suggested: {
+              street,
+              unit,
+              city: result.normalized.city,
+              state: result.normalized.state,
+              zip: result.normalized.zip,
+            },
           });
           return;
         }
@@ -535,6 +581,17 @@ export function FloridaLLCFormationForm({
             {addressWarning?.step === stepKey ? (
               <div className="mt-6 rounded-xl border border-amber-300/60 bg-amber-50 p-4 text-sm text-amber-900">
                 {addressWarning.message}
+                {addressWarning.suggested ? (
+                  <div className="mt-3">
+                    <Button
+                      type="button"
+                      onClick={useSuggestedAddress}
+                      className="rounded-full"
+                    >
+                      Use this address
+                    </Button>
+                  </div>
+                ) : null}
               </div>
             ) : null}
 

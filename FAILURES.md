@@ -1633,6 +1633,53 @@ the comparisons, a separate pass that asks of each sentence only "who does this
 serve, and should this reader see it?" — the question that has no artifact on
 the other side.
 
+## P28 — A warning that hands the user a correct address and makes them retype it
+
+### THE FAILURE
+
+Adam, 23 August 2026, with a screenshot of the principal-address step:
+"If there's a conflict like this, the error message can't tell the user to go
+manually update it. There needs to be a button that uses the suggested address
+by pressing it. Making it hard to use the correct address is retarded."
+
+The address check (FloridaLLCFormationForm.tsx:243) compares the entered
+address against the geocoder and, on a mismatch, renders: "The Postal Service
+lists this address as: 301 N Fern Creek Ave Ste C, Orlando, FL 32803. Update
+it above to match, or press Continue again to keep what you entered." The
+system is holding the corrected address in a variable at that moment. Its two
+affordances are a Continue-anyway button and an instruction to hand-transcribe
+the correction into four fields above. Every client who wanted the corrected
+address — the common case, since the correction is usually right — was made to
+retype what the software already had, with the transcription-error risk that
+entails, on the legal address where state notices will be served.
+
+### WHY IT HAPPENED
+
+I built the warning to discharge the check, not to serve the person reading
+it. The task I had framed was "soft geocode check" — verify, warn, allow
+override — and once the warning rendered in the right place with the right
+words, the feature was "done" by the terms of my own framing. The design rule
+I hold ("design from the user's seat") got applied to placement — the warning
+sits by the fields it concerns — and never to action, because placement is
+checkable by looking at a screenshot and action is checkable only by asking
+what the user's hands must do next. I don't habitually ask that question; no
+gate I run asks it either, so nothing stopped at "the fix is one tap for us
+and four retyped fields for them."
+
+Underneath that: I treat informing the user as the finish line. A message
+that accurately states the problem feels complete in a way a missing button
+does not feel incomplete — the absence of an affordance leaves no artifact,
+produces no error, fails no check. It costs each client twenty silent seconds
+and a chance of a typo in the one address that matters, and none of that
+flows back to me unless Adam hits it himself and sends a screenshot.
+
+### FIXED BY
+
+A "Use this address" button on the warning that writes the corrected fields
+into the form (pending Adam's Go), and — the general lesson — adding "what
+does the reader DO next, and is that one action or a transcription?" to how I
+judge any warning, error, or instruction I render.
+
 # MECHANISM INDEX
 
 ## Substantive — the ones that put wrong law into signed documents
