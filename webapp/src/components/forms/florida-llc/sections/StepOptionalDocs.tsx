@@ -1,5 +1,6 @@
 import { FieldShell } from "../FieldShell";
 import { FeeEstimate } from "../FeeEstimate";
+import { ServiceFeeEstimate } from "../ServiceFeeEstimate";
 import type { FloridaLLCFormData } from "../types";
 
 interface StepProps {
@@ -90,10 +91,20 @@ export function StepOptionalDocs({ data, patch }: StepProps) {
         </FieldShell>
       </div>
 
-      <FeeEstimate
-              isConversion={data.filingPath === "CONVERT"}
+      <ServiceFeeEstimate
+        seriesCount={data.series.length}
         certificateOfStatus={data.orderCertificateOfStatus}
         certifiedCopy={data.orderCertifiedCopy}
+        ein={data.orderEin === true}
+        sElection={data.orderSElection === true}
+        isConversion={data.filingPath === "CONVERT"}
+      />
+
+      <FeeEstimate
+        isConversion={data.filingPath === "CONVERT"}
+        certificateOfStatus={data.orderCertificateOfStatus}
+        certifiedCopy={data.orderCertifiedCopy}
+        seriesCount={data.series.length}
       />
     </div>
   );

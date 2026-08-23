@@ -1,6 +1,7 @@
 import { Pencil, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FeeEstimate } from "./FeeEstimate";
+import { ServiceFeeEstimate } from "./ServiceFeeEstimate";
 import { buildFinalLlcName } from "./validation";
 import type { StepKey } from "./steps";
 import type {
@@ -277,8 +278,17 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
         </ReviewCard>
       </div>
 
+      <ServiceFeeEstimate
+        seriesCount={data.series.length}
+        certificateOfStatus={data.orderCertificateOfStatus}
+        certifiedCopy={data.orderCertifiedCopy}
+        ein={data.orderEin === true}
+        sElection={data.orderSElection === true}
+        isConversion={data.filingPath === "CONVERT"}
+      />
+
       <FeeEstimate
-              isConversion={data.filingPath === "CONVERT"}
+        isConversion={data.filingPath === "CONVERT"}
         certificateOfStatus={data.orderCertificateOfStatus}
         certifiedCopy={data.orderCertifiedCopy}
         seriesCount={data.series.length}
