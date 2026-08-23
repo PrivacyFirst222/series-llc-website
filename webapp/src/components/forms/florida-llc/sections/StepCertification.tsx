@@ -44,10 +44,15 @@ export function StepCertification({ data, patch, errors }: StepProps) {
         </p>
         <p className="text-foreground/80 leading-relaxed">
           <strong>For almost everyone, that is you</strong> &mdash; an owner
-          signing for the company you are about to create. It does not have to be
-          an owner: you may authorize your attorney, your accountant, or anyone
-          else you trust to sign and file for you. What matters is that whoever
-          signs has an intended owner&rsquo;s authority to do it.
+          signing for the company you are about to create. If you serve as the
+          authorized representative, your name appears as the person forming
+          the company.
+        </p>
+        <p className="text-foreground/80 leading-relaxed">
+          You may authorize someone else to serve as the authorized
+          representative. Below you are given the option to appoint us to serve
+          as the authorized representative. If you do, our name appears on the
+          public record instead of yours.
         </p>
         <p className="text-foreground/80 leading-relaxed">
           <strong>You are signing under penalty of perjury.</strong> Under
