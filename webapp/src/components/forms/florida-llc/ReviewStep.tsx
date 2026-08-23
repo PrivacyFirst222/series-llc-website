@@ -14,11 +14,19 @@ interface ReviewStepProps {
   goToStep: (key: StepKey) => void;
 }
 
-const fmtAddr = (a: AddressType | undefined): string => {
+const fmtAddr = (a: AddressType | undefined): React.ReactNode => {
   if (!a || !a.address1) return "—";
-  const line2 = a.address2 ? `, ${a.address2}` : "";
-  return `${a.address1}${line2}, ${a.city}, ${a.state} ${a.zip} (${a.country})`;
+  return (
+    <span>
+      <span className="block">{a.address1}</span>
+      {a.address2 ? <span className="block">{a.address2}</span> : null}
+      <span className="block">{`${a.city}, ${a.state} ${a.zip} (${a.country})`}</span>
+    </span>
+  );
 };
+
+const COUNT_WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+const countWord = (n: number): string => COUNT_WORDS[n] ?? String(n);
 
 interface CardProps {
   title: string;
@@ -88,7 +96,7 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
           <Row
             label="Formation type"
             value={
-              data.formationType === "PLLC" ? "Professional LLC (PLLC)" : "Domestic LLC"
+              `Florida Series ${data.formationType === "PLLC" ? "PLLC" : "LLC"} with ${countWord(data.series.length)} series`
             }
           />
           <Row label="Final name" value={finalName} />
