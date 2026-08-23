@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { FieldShell } from "../FieldShell";
 import type {
   FloridaLLCFormData,
@@ -27,6 +28,15 @@ const OPTIONS: { v: ManagementStructure; t: string; s: string; recommended?: boo
 ];
 
 export function StepManagement({ data, patch, errors }: StepProps) {
+  // The default is manager-managed, but a draft saved before that default
+  // existed carries an empty value that overrides it on load. An empty
+  // selection is never presented: whatever made it empty, this restores the
+  // recommendation and the client changes it if they disagree.
+  useEffect(() => {
+    if (!data.managementStructure) patch({ managementStructure: "MANAGER_MANAGED" });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div className="space-y-6">
       <header className="space-y-2">
