@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FieldShell } from "./FieldShell";
 import { AddressFieldsBlock, US_STATES } from "./AddressFields";
-import type { PartyEntry, PartyKind, PartyRole } from "./types";
+import type { PartyEntry, PartyKind } from "./types";
 
 interface RepeatablePartyFieldsProps {
   entries: PartyEntry[];
@@ -42,7 +42,7 @@ export function RepeatablePartyFields({
     <div className="space-y-5">
       {entries.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-          No managers or authorized representatives added yet.
+          No managers added yet.
         </div>
       ) : null}
 
@@ -52,9 +52,7 @@ export function RepeatablePartyFields({
           className="rounded-2xl border border-border bg-card p-5 space-y-4"
         >
           <div className="flex items-center justify-between">
-            <div className="text-sm font-medium">
-              {entry.role === "MGR" ? "Manager" : "Authorized Rep"} #{idx + 1}
-            </div>
+            <div className="text-sm font-medium">Manager #{idx + 1}</div>
             <Button
               type="button"
               variant="ghost"
@@ -68,19 +66,6 @@ export function RepeatablePartyFields({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FieldShell label="Role" required>
-              <select
-                value={entry.role}
-                onChange={(e) =>
-                  update(entry.id, { role: e.target.value as PartyRole })
-                }
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-              >
-                <option value="MGR">MGR — Manager</option>
-                <option value="AR">AR — Authorized Representative</option>
-              </select>
-            </FieldShell>
-
             <FieldShell label="Type" required>
               <select
                 value={entry.personOrEntity}
@@ -184,12 +169,12 @@ export function RepeatablePartyFields({
         className="rounded-full"
       >
         <Plus className="mr-1.5 h-4 w-4" />
-        Add manager / authorized representative
+        Add manager
       </Button>
 
       <p className="text-xs text-muted-foreground">
         States available include {US_STATES.length} U.S. states. International
-        managers/AR addresses can use a country-specific state.
+        manager addresses can use a country-specific state.
       </p>
     </div>
   );

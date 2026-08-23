@@ -104,6 +104,16 @@ export function FloridaLLCFormationForm({
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // A draft can be parked on a step that later became hidden (management
+  // switched to member-managed, or the rule shipped after the draft was
+  // saved) — move off it rather than render a step that no longer exists.
+  useEffect(() => {
+    if (stepHidden(stepIndex)) {
+      setStepIndex((i) => Math.min(i + 1, STEPS.length - 1));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stepIndex, data.managementStructure]);
+
   // Auto-save draft (answers + position)
   useEffect(() => {
     try {
@@ -204,11 +214,17 @@ export function FloridaLLCFormationForm({
     setAddressWarning(null);
   };
 
+  // Member-managed companies never see the managers step: the members are
+  // listed automatically (AMBR) and there is nothing to ask.
+  const stepHidden = (i: number): boolean =>
+    STEPS[i]?.key === "managers" && data.managementStructure === "MEMBER_MANAGED";
+
   const advance = () => {
     setErrors({});
     setAddressWarning(null);
     setStepIndex((i) => {
-      const next = Math.min(i + 1, STEPS.length - 1);
+      let next = Math.min(i + 1, STEPS.length - 1);
+      while (stepHidden(next) && next < STEPS.length - 1) next++;
       setMaxStep((m) => Math.max(m, next));
       return next;
     });
@@ -304,7 +320,11 @@ export function FloridaLLCFormationForm({
   const goBack = () => {
     setErrors({});
     setAddressWarning(null);
-    setStepIndex((i) => Math.max(i - 1, 0));
+    setStepIndex((i) => {
+      let prev = Math.max(i - 1, 0);
+      while (stepHidden(prev) && prev > 0) prev--;
+      return prev;
+    });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -464,7 +484,8 @@ export function FloridaLLCFormationForm({
             <div className="mt-2 flex items-baseline gap-2">
               <span className="font-display text-3xl">{progressPct}%</span>
               <span className="text-xs text-muted-foreground">
-                Step {stepIndex + 1} of {STEPS.length}
+                Step {STEPS.slice(0, stepIndex + 1).filter((_, i) => !stepHidden(i)).length} of{" "}
+                {STEPS.filter((_, i) => !stepHidden(i)).length}
               </span>
             </div>
             <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-border">
@@ -477,6 +498,8 @@ export function FloridaLLCFormationForm({
 
           <ol className="hidden lg:block rounded-2xl border border-border bg-card p-3 space-y-1">
             {STEPS.map(({ key, label }, i) => {
+              if (stepHidden(i)) return null;
+              const displayNumber = STEPS.slice(0, i + 1).filter((_, j) => !stepHidden(j)).length;
               // Every step is reachable at any time, in any order. A tick means
               // the customer has BEEN here and nothing on the step is
               // outstanding — never completeness alone, which would tick steps
@@ -515,7 +538,7 @@ export function FloridaLLCFormationForm({
                             : "bg-secondary text-muted-foreground"
                       }`}
                     >
-                      {done ? <Check className="h-3 w-3" /> : i + 1}
+                      {done ? <Check className="h-3 w-3" /> : displayNumber}
                     </span>
                     {label}
                   </button>

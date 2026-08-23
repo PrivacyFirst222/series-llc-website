@@ -1,4 +1,4 @@
-import { UserPlus } from "lucide-react";
+import { UserPlus, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FieldShell } from "../FieldShell";
 import { RepeatablePartyFields } from "../RepeatablePartyFields";
@@ -18,8 +18,7 @@ export function StepManagers({ data, patch, errors }: StepProps) {
   // Managers are nearly always the members themselves. Retyping a name here
   // produces a mismatch between Exhibit A and the signature block of the
   // operating agreement, so offer the members you already entered.
-  const memberManaged = data.managementStructure === "MEMBER_MANAGED";
-  const role = memberManaged ? "AR" : "MGR";
+  const role = "MGR";
   const listed = new Set(
     data.managers.map((m) =>
       (m.personOrEntity === "ENTITY"
@@ -43,9 +42,9 @@ export function StepManagers({ data, patch, errors }: StepProps) {
     }))
     .filter((c) => c.name && !listed.has(c.name.toLowerCase()));
 
-  const addMember = (c: (typeof candidates)[number]) => {
+  const entryFor = (c: (typeof candidates)[number]): PartyEntry => {
     const m = c.member;
-    const entry: PartyEntry = {
+    return {
       id: Math.random().toString(36).slice(2, 10),
       role,
       personOrEntity: m.memberType,
@@ -61,46 +60,41 @@ export function StepManagers({ data, patch, errors }: StepProps) {
       phone: m.phone ?? "",
       email: m.email ?? "",
     };
-    patch({ managers: [...data.managers, entry] });
+  };
+  const addMember = (c: (typeof candidates)[number]) => {
+    patch({ managers: [...data.managers, entryFor(c)] });
+  };
+  // One press: every member not already listed becomes a manager, name and
+  // address copied exactly.
+  const addAllMembers = () => {
+    patch({ managers: [...data.managers, ...candidates.map(entryFor)] });
   };
 
   return (
     <div className="space-y-6">
       <header className="space-y-2">
-        <h2 className="font-display text-3xl">
-          Managers / Authorized Representatives
-        </h2>
+        <h2 className="font-display text-3xl">Managers</h2>
         <p className="text-sm text-muted-foreground max-w-2xl">
-          Add managers (MGR) or authorized representatives (AR). Do not list
-          members here unless they are actually serving as a manager or AR.
+          Add the manager or managers who will run the LLC.
           {required ? (
             <span className="text-foreground"> At least one manager is required because you elected to include a manager-managed statement in the Articles.</span>
           ) : null}
         </p>
       </header>
 
-      {data.managementStructure === "MEMBER_MANAGED" ? (
-        <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
-          <p className="font-semibold">Member-Managed LLC — Use Authorized Representative (AR) Title</p>
-          <p className="mt-1">
-            Because you selected a <strong>member-managed</strong> LLC, any person you list here should be designated as an <strong>Authorized Representative (AR)</strong> — not as a Manager (MGR). In a member-managed LLC, the members themselves run the company, so the "Manager" title is not applicable. Please select <strong>AR</strong> as the role for each person you add below.
-          </p>
-        </div>
-      ) : null}
-
       {candidates.length > 0 ? (
         <div className="rounded-xl border border-border bg-muted/40 p-4">
-          <p className="text-sm font-medium">
-            {memberManaged
-              ? "Add one of your members as the authorized representative"
-              : "Add one of your members as a manager"}
-          </p>
+          <p className="text-sm font-medium">Add one or more of your members as a manager</p>
           <p className="mt-1 text-xs text-muted-foreground">
-            {memberManaged
-              ? "Most member-managed companies have a member sign as authorized representative."
-              : "In most companies the managers are the members. Adding them here copies the name and address exactly, so your operating agreement matches."}
+            In most companies the managers are the members. Adding them here
+            copies the name and address exactly, so your operating agreement
+            matches.
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
+            <Button type="button" size="sm" onClick={addAllMembers}>
+              <Users className="mr-2 h-4 w-4" />
+              All Members will serve as Managers
+            </Button>
             {candidates.map((c) => (
               <Button
                 key={c.member.id}
@@ -117,7 +111,7 @@ export function StepManagers({ data, patch, errors }: StepProps) {
         </div>
       ) : null}
 
-      <FieldShell label="Managers / Authorized Representatives">
+      <FieldShell label="Managers">
         <RepeatablePartyFields
           entries={data.managers}
           onChange={(next) => patch({ managers: next })}

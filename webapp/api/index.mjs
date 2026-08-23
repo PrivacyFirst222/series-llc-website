@@ -76552,7 +76552,9 @@ function buildPayload(data) {
     management: {
       structure: data.managementStructure || "",
       includeManagementStatementInArticles: data.includeManagementStatementInArticles,
-      managersOrAuthorizedRepresentatives: data.managers
+      // Member-managed: the members are listed automatically (AMBR) and the
+      // managers step is never shown — a stray entry must not reach the filing.
+      managersOrAuthorizedRepresentatives: data.managementStructure === "MEMBER_MANAGED" ? [] : data.managers
     },
     members: {
       collectForInternalRecords: data.collectMembersForInternalRecords,

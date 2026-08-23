@@ -221,6 +221,8 @@ export function validateStep(
   }
 
   if (step === "managers") {
+    // Hidden entirely for member-managed companies — nothing to validate.
+    if (data.managementStructure === "MEMBER_MANAGED") return e;
     const needsManager =
       data.managementStructure === "MANAGER_MANAGED" &&
       data.includeManagementStatementInArticles;
