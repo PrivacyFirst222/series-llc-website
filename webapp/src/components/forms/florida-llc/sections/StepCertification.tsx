@@ -134,11 +134,6 @@ export function StepCertification({ data, patch, errors }: StepProps) {
               us no ownership, no management authority, and no continuing role in
               your company.
             </li>
-            <li>
-              <strong>You can still be listed.</strong> Florida&rsquo;s
-              Manager/Authorized Representative block is optional; tell us in the
-              correspondence notes if you want your own name in it.
-            </li>
           </ul>
           <AcknowledgeBox
             id="cert-appoint"
