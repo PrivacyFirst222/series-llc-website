@@ -76023,6 +76023,37 @@ var coerce = {
 };
 var NEVER = INVALID;
 
+// src/components/forms/florida-llc/nameSimilarity.ts
+var SUFFIXES = /* @__PURE__ */ new Set([
+  "LLC",
+  "L.L.C",
+  "PLLC",
+  "P.L.L.C",
+  "INC",
+  "INCORPORATED",
+  "CORP",
+  "CORPORATION",
+  "CO",
+  "COMPANY",
+  "LTD",
+  "LIMITED",
+  "LP",
+  "L.P",
+  "LLP",
+  "LLLP",
+  "PA",
+  "P.A",
+  "PL",
+  "P.L",
+  "PC",
+  "CHARTERED"
+]);
+var ARTICLES = /* @__PURE__ */ new Set(["THE", "A", "AN"]);
+function normalizeEntityName(name) {
+  const tokens = name.toUpperCase().replace(/&/g, " AND ").replace(/['\u2019]/g, "").replace(/[^A-Z0-9 ]+/g, " ").split(/\s+/).filter(Boolean).filter((t) => !SUFFIXES.has(t) && !ARTICLES.has(t) && t !== "AND").map((t) => t.length > 3 && t.endsWith("S") ? t.slice(0, -1) : t);
+  return tokens.join(" ");
+}
+
 // src/components/forms/florida-llc/schema.ts
 var PO_BOX_REGEX = /\b(p\.?\s*o\.?\s*box|post\s*office\s*box)\b/i;
 var isPoBox = (s) => PO_BOX_REGEX.test(s);
@@ -76349,6 +76380,25 @@ var extendedFormSchema = formationFormSchema.extend({
       path: ["existingLlcName"],
       message: "The existing LLC's name is required for a conversion."
     });
+  }
+  {
+    const pk = normalizeEntityName(data.desiredLlcName ?? "");
+    const a1 = normalizeEntityName(data.alternateName1 ?? "");
+    const a2 = normalizeEntityName(data.alternateName2 ?? "");
+    if (a1 && pk && a1 === pk) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        path: ["alternateName1"],
+        message: "The alternate is the same name as the first choice under Florida's distinguishability rules."
+      });
+    }
+    if (a2 && pk && a2 === pk || a1 && a2 && a1 === a2) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        path: ["alternateName2"],
+        message: "This alternate duplicates another name on the order under Florida's rules."
+      });
+    }
   }
   if (!data.exactNameOnly && !(data.alternateName1 ?? "").trim()) {
     ctx.addIssue({
@@ -76724,6 +76774,28 @@ ALTER TABLE orders ADD COLUMN IF NOT EXISTS copied_fields jsonb NOT NULL DEFAULT
 -- coverage is recorded per document rather than assumed one-to-one.
 ALTER TABLE documents ADD COLUMN IF NOT EXISTS meta jsonb NOT NULL DEFAULT '{}'::jsonb;
 ALTER TABLE documents ADD COLUMN IF NOT EXISTS order_id uuid REFERENCES orders(id);
+
+-- Mirror of the Division of Corporations' public data downloads, kept to the
+-- columns the name-availability check needs. norm_key is the name reduced by
+-- Florida's distinguishability rules (nameSimilarity.normalizeEntityName);
+-- two names conflict when their keys match. Loaded from the quarterly
+-- baseline, topped up nightly from the daily files (server/sunbiz.ts).
+CREATE TABLE IF NOT EXISTS fl_entities (
+  doc_number text PRIMARY KEY,
+  name text NOT NULL,
+  status text NOT NULL,
+  filing_type text NOT NULL DEFAULT '',
+  file_date date,
+  last_txn_date date,
+  norm_key text NOT NULL
+);
+CREATE INDEX IF NOT EXISTS fl_entities_norm_key_idx ON fl_entities (norm_key);
+CREATE TABLE IF NOT EXISTS fl_sync_state (
+  id int PRIMARY KEY,
+  baseline_label text,
+  last_daily date,
+  updated_at timestamptz
+);
 `;
 async function getDb() {
   if (!db) db = await createDb();
@@ -107296,6 +107368,185 @@ function clientIp(c) {
   return c.req.header("x-forwarded-for")?.split(",")[0].trim() || c.req.header("x-real-ip") || "local";
 }
 
+// server/sunbiz.ts
+function mmddyyyyToIso(s) {
+  const t = s.trim();
+  if (!/^\d{8}$/.test(t)) return null;
+  const mm = t.slice(0, 2), dd = t.slice(2, 4), yyyy = t.slice(4);
+  if (mm === "00" || dd === "00" || yyyy === "0000") return null;
+  return `${yyyy}-${mm}-${dd}`;
+}
+function parseCorRecord(line) {
+  const l = line.replace(/[\r\n]+$/, "");
+  if (!l.trim()) return null;
+  if (l.length < 500 || l.length > 1440) return null;
+  const r = l.padEnd(1440);
+  const status = r[204];
+  if (status !== "A" && status !== "I") return null;
+  const name = r.slice(12, 204).trim();
+  if (!name) return null;
+  const docNumber = r.slice(0, 12).trim();
+  if (!docNumber) return null;
+  return {
+    docNumber,
+    name,
+    status,
+    filingType: r.slice(205, 220).trim(),
+    fileDate: mmddyyyyToIso(r.slice(472, 480)),
+    lastTxnDate: mmddyyyyToIso(r.slice(495, 503)),
+    normKey: normalizeEntityName(name)
+  };
+}
+function parseCorFile(text) {
+  const entities = [];
+  let skipped = 0;
+  for (const line of text.split("\n")) {
+    if (!line.trim()) continue;
+    const e = parseCorRecord(line);
+    if (e) entities.push(e);
+    else skipped++;
+  }
+  return { entities, skipped };
+}
+function sqlLit(s) {
+  return s === null ? "NULL" : `'${s.replace(/'/g, "''")}'`;
+}
+async function upsertEntities(entities, batchSize = 5e3) {
+  const db2 = await getDb();
+  const byDoc = /* @__PURE__ */ new Map();
+  for (const e of entities) byDoc.set(e.docNumber, e);
+  const deduped = Array.from(byDoc.values());
+  let written = 0;
+  for (let i = 0; i < deduped.length; i += batchSize) {
+    const batch = deduped.slice(i, i + batchSize);
+    const values2 = batch.map(
+      (e) => `(${sqlLit(e.docNumber)},${sqlLit(e.name)},${sqlLit(e.status)},${sqlLit(e.filingType)},${sqlLit(e.fileDate)},${sqlLit(e.lastTxnDate)},${sqlLit(e.normKey)})`
+    ).join(",");
+    await db2.query(
+      `INSERT INTO fl_entities (doc_number, name, status, filing_type, file_date, last_txn_date, norm_key)
+       VALUES ${values2}
+       ON CONFLICT (doc_number) DO UPDATE SET
+         name = EXCLUDED.name, status = EXCLUDED.status, filing_type = EXCLUDED.filing_type,
+         file_date = EXCLUDED.file_date, last_txn_date = EXCLUDED.last_txn_date, norm_key = EXCLUDED.norm_key`
+    );
+    written += batch.length;
+  }
+  return written;
+}
+async function getSyncState() {
+  const db2 = await getDb();
+  const rows = await db2.query(
+    "SELECT baseline_label, last_daily::text, updated_at::text FROM fl_sync_state WHERE id = 1"
+  );
+  const r = rows[0];
+  return {
+    baselineLabel: r?.baseline_label ?? null,
+    lastDaily: r?.last_daily ?? null,
+    updatedAt: r?.updated_at ?? null
+  };
+}
+async function setSyncState(patch) {
+  const db2 = await getDb();
+  await db2.query(
+    `INSERT INTO fl_sync_state (id, baseline_label, last_daily, updated_at)
+     VALUES (1, $1, $2, now())
+     ON CONFLICT (id) DO UPDATE SET
+       baseline_label = COALESCE($1, fl_sync_state.baseline_label),
+       last_daily = COALESCE($2::date, fl_sync_state.last_daily),
+       updated_at = now()`,
+    [patch.baselineLabel ?? null, patch.lastDaily ?? null]
+  );
+}
+var HOLD_DAYS = 366;
+function conflictReason(input, existing) {
+  const a2 = input.trim().toUpperCase().replace(/\s+/g, " ");
+  const b2 = existing.trim().toUpperCase().replace(/\s+/g, " ");
+  if (a2 === b2) return "Identical name";
+  return `Not distinguishable under Florida's rules \u2014 a different ending (Inc., LLC), "the", "&" vs "and", plurals, or punctuation do not make a name different`;
+}
+function detailUrl(existing) {
+  return "https://search.sunbiz.org/Inquiry/CorporationSearch/SearchResults?InquiryType=EntityName&SearchTerm=" + encodeURIComponent(existing);
+}
+async function checkName(input) {
+  const key = normalizeEntityName(input);
+  if (!key) return { input, verdict: "clear", conflicts: [] };
+  const db2 = await getDb();
+  const rows = await db2.query(
+    `SELECT doc_number, name, status, last_txn_date::text, file_date::text
+     FROM fl_entities WHERE norm_key = $1
+     ORDER BY (status = 'A') DESC, last_txn_date DESC NULLS LAST
+     LIMIT 25`,
+    [key]
+  );
+  const now = Date.now();
+  const conflicts = [];
+  let verdict = "clear";
+  for (const r of rows) {
+    const active = r.status === "A";
+    const refDate = r.last_txn_date ?? r.file_date;
+    const withinHold = !active && refDate !== null && now - new Date(refDate).getTime() < HOLD_DAYS * 864e5;
+    if (active || withinHold) {
+      conflicts.push({
+        name: r.name,
+        docNumber: r.doc_number,
+        status: active ? "Active" : "Inactive",
+        reason: active ? conflictReason(input, r.name) : `${conflictReason(input, r.name)}; recently dissolved \u2014 the name may still be protected (s. 605.0715, Fla. Stat.)`,
+        detailUrl: detailUrl(r.name)
+      });
+      if (active) verdict = "taken";
+      else if (verdict === "clear") verdict = "held";
+    }
+  }
+  return { input, verdict, conflicts };
+}
+var SFTP_HOST = "sftp.floridados.gov";
+var SFTP_USER = "Public";
+var SFTP_PASSWORD = "PubAccess1845!";
+var DAILY_DIR = "/Public/doc/cor";
+async function syncDailies(maxFiles = 15) {
+  const state = await getSyncState();
+  if (!state.baselineLabel) {
+    return { filesIngested: [], written: 0, skipped: 0, lastDaily: state.lastDaily };
+  }
+  const lastCompact = (state.lastDaily ?? "1970-01-01").replace(/-/g, "");
+  const { default: SftpClient } = await import("ssh2-sftp-client");
+  const sftp = new SftpClient();
+  await sftp.connect({ host: SFTP_HOST, username: SFTP_USER, password: SFTP_PASSWORD });
+  try {
+    const listing = await sftp.list(DAILY_DIR);
+    const targets = listing.map((f) => f.name).filter((n) => /^\d{8}c\.txt$/.test(n) && n.slice(0, 8) > lastCompact).sort().slice(0, maxFiles);
+    const report = { filesIngested: [], written: 0, skipped: 0, lastDaily: state.lastDaily };
+    for (const name of targets) {
+      const buf = await sftp.get(`${DAILY_DIR}/${name}`);
+      const { entities, skipped } = parseCorFile(buf.toString("latin1"));
+      report.written += await upsertEntities(entities);
+      report.skipped += skipped;
+      const iso = `${name.slice(0, 4)}-${name.slice(4, 6)}-${name.slice(6, 8)}`;
+      await setSyncState({ lastDaily: iso });
+      report.filesIngested.push(name);
+      report.lastDaily = iso;
+    }
+    return report;
+  } finally {
+    await sftp.end();
+  }
+}
+async function unavailableNames(names) {
+  try {
+    const state = await getSyncState();
+    if (!state.baselineLabel || !state.lastDaily) return null;
+    if (Date.now() - new Date(state.lastDaily).getTime() > 10 * 864e5) return null;
+    const out = [];
+    for (const name of names) {
+      const v2 = await checkName(name);
+      if (v2.verdict !== "clear") out.push({ name, verdict: v2.verdict });
+    }
+    return out;
+  } catch {
+    return null;
+  }
+}
+
 // server/storage.ts
 import { randomBytes as randomBytes3 } from "node:crypto";
 async function putFile(filename, data, contentType) {
@@ -107909,6 +108160,22 @@ app.post("/orders", async (c) => {
   if (raError) return c.json(err2(raError, "INVALID_INPUT"), 400);
   if (data.members.length < 1) {
     return c.json(err2("At least one member is required.", "INVALID_INPUT"), 400);
+  }
+  const nameProblems = await unavailableNames(
+    [
+      data.desiredLlcName ?? "",
+      ...data.exactNameOnly === true ? [] : [data.alternateName1 ?? "", data.alternateName2 ?? ""]
+    ].filter((n) => n.trim().length > 0)
+  );
+  if (nameProblems && nameProblems.length > 0) {
+    const p2 = nameProblems[0];
+    return c.json(
+      err2(
+        `The name "${p2.name}" is unavailable \u2014 ${p2.verdict === "taken" ? "an existing Florida company already has it" : "it belongs to a recently dissolved company, and Florida protects it for up to a year"}. Please choose a different name.`,
+        "NAME_UNAVAILABLE"
+      ),
+      400
+    );
   }
   const payload = buildPayload(data);
   const priced = priceOrder({
@@ -109051,6 +109318,33 @@ app.get("/portal/services", async (c) => {
     }
   });
 });
+app.post("/name-check", async (c) => {
+  if (!rateLimit(`namecheck:${clientIp(c)}`, 30, 6e5)) {
+    return c.json(err2("Too many checks. Try again in a few minutes.", "RATE_LIMITED"), 429);
+  }
+  const body = await c.req.json().catch(() => null);
+  const names = Array.isArray(body?.names) ? body.names.filter((n) => typeof n === "string" && n.trim().length > 0).slice(0, 5) : [];
+  if (names.length === 0) return c.json(err2("No names given.", "BAD_REQUEST"), 400);
+  try {
+    const state = await getSyncState();
+    const asOf = state.lastDaily;
+    const stale = !state.baselineLabel || !asOf || Date.now() - new Date(asOf).getTime() > 10 * 864e5;
+    if (stale) return c.json({ data: { available: false, results: [] } });
+    const results = [];
+    for (const name of names) results.push(await checkName(name));
+    return c.json({ data: { available: true, asOf, results } });
+  } catch {
+    return c.json({ data: { available: false, results: [] } });
+  }
+});
+app.get("/cron/sunbiz-sync", async (c) => {
+  const auth = c.req.header("authorization") ?? "";
+  const secret = env.CRON_SECRET;
+  if (secret && auth !== `Bearer ${secret}`) return c.json(err2("Not authorized", "UNAUTHENTICATED"), 401);
+  if (!secret && env.isProd) return c.json(err2("Not authorized", "UNAUTHENTICATED"), 401);
+  const report = await syncDailies();
+  return c.json({ data: report });
+});
 app.get("/cron/purge", async (c) => {
   const auth = c.req.header("authorization") ?? "";
   const secret = env.CRON_SECRET;
@@ -109706,6 +110000,9 @@ app.get("/admin/orders/:id", async (c) => {
       filedAt: o.filed_at,
       formedAt: o.formed_at,
       groups: filingGroups(payload),
+      alternateNames: (payload.llcName?.alternateNames ?? []).filter(
+        (n) => (n ?? "").trim() !== ""
+      ),
       copiedFields: (typeof o.copied_fields === "string" ? JSON.parse(o.copied_fields) : o.copied_fields) ?? {},
       series: allSeries.map((name) => ({ name, covered: covered.has(name) })),
       documents: docs.map((d2) => ({

@@ -1,5 +1,4 @@
 import { Input } from "@/components/ui/input";
-import { normalizeEntityName, similarityExamples, sunbizSearchUrl } from "../nameSimilarity";
 import { NameCheck } from "../NameCheck";
 import { AcknowledgeBox, FieldShell } from "../FieldShell";
 import {
@@ -152,23 +151,17 @@ export function StepName({ data, patch, errors }: StepProps) {
       ) : null}
 
       <div className="rounded-xl border border-border bg-secondary/40 p-4 text-sm text-muted-foreground">
-        You can see if your name is available by{" "}
-        <a
-          href="https://search.sunbiz.org/Inquiry/CorporationSearch/ByName"
-          target="_blank"
-          rel="noreferrer"
-          className="font-medium text-trust underline underline-offset-2"
-        >
-          clicking here
-        </a>
-        . The State of Florida's website does not offer a way for services like
-        ours to check availability automatically. If you provide an alternate
-        name and your first choice is not available, we will use your alternate
-        names in order of preference. This will save you time if your first
-        choice is unavailable. If you check the "I only want this exact name"
-        option and your name is unavailable, we will have to email you
-        (typically within 1 business day) which can potentially slow down the
-        formation process.
+        The State of Florida's website does not offer a way for services like
+        ours to check availability automatically. We have created a tool to
+        check whether a name is unavailable. It does not guarantee that the
+        name will be accepted by the Florida Secretary of State, but it can
+        save you time submitting a name that will be rejected. If you provide
+        an alternate name and your first choice is not available, we will use
+        your alternate names in order of preference. This will also save you
+        time if your first choice is rejected. If you check the "I only want
+        this exact name" option and your name is unavailable, we will have to
+        email you (typically within 1 business day) which can potentially slow
+        down the formation process.
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -197,46 +190,25 @@ export function StepName({ data, patch, errors }: StepProps) {
       </p>
 
       {data.desiredLlcName.trim() ? (
-        <div className="rounded-xl border border-border bg-secondary/40 p-4 space-y-3">
+        <div className="rounded-xl border border-border bg-secondary/40 p-4">
           <NameCheck
             names={[
               { label: "First choice", value: data.desiredLlcName },
-              { label: "Alternate 1", value: data.alternateName1 ?? "" },
-              { label: "Alternate 2", value: data.alternateName2 ?? "" },
+              {
+                label: "Alternate 1",
+                value: data.exactNameOnly === true ? "" : (data.alternateName1 ?? ""),
+              },
+              {
+                label: "Alternate 2",
+                value: data.exactNameOnly === true ? "" : (data.alternateName2 ?? ""),
+              },
             ]}
+            state={data.nameCheck}
+            onState={(s) => patch({ nameCheck: s })}
           />
-          <a
-            href={sunbizSearchUrl(data.desiredLlcName)}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
-          >
-            Confirm on Sunbiz: search "{data.desiredLlcName.trim()}"
-          </a>
-          <div className="text-xs leading-relaxed text-muted-foreground">
-            <p className="font-medium text-foreground">How to read the results (from the Division's own rules):</p>
-            <ul className="mt-1 list-disc pl-4 space-y-0.5">
-              <li><span className="font-medium">Active</span> — taken.</li>
-              <li><span className="font-medium">INACT/UA</span> — dissolved but the name is still held (one year after administrative dissolution; 120 days after voluntary).</li>
-              <li><span className="font-medium">INACT or Inactive</span> — the company is gone and its name is available again.</li>
-              <li><span className="font-medium">CROSS RF</span> — a cross-reference; click it, and the real record's status decides.</li>
-            </ul>
-            {similarityExamples(data.desiredLlcName).length > 0 ? (
-              <p className="mt-2">
-                <span className="font-medium text-foreground">
-                  If the results show any of these, your name is taken:
-                </span>{" "}
-                {similarityExamples(data.desiredLlcName).map((s, i, arr) => (
-                  <span key={s}>
-                    <em>{s}</em>
-                    {i < arr.length - 1 ? " · " : ""}
-                  </span>
-                ))}{" "}
-                — a different ending (Inc., LLC), "the", "&" vs "and", plurals,
-                or punctuation do <span className="font-medium text-foreground">not</span> make a name different in Florida.
-              </p>
-            ) : null}
-          </div>
+          {errors.nameCheck ? (
+            <p className="mt-2 text-sm text-destructive">{errors.nameCheck}</p>
+          ) : null}
         </div>
       ) : null}
 

@@ -1,23 +1,14 @@
+import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { AlertTriangle, CheckCircle2, ExternalLink, Loader2, XCircle } from "lucide-react";
 import { api } from "@/lib/api";
+import { nameCheckKey, sunbizSearchUrl } from "./nameSimilarity";
+import type { NameCheckResult, NameCheckState } from "./types";
 
-interface NameConflict {
-  name: string;
-  docNumber: string;
-  status: "Active" | "Inactive";
-  reason: string;
-  detailUrl: string;
-}
-interface NameVerdict {
-  input: string;
-  verdict: "taken" | "held" | "clear";
-  conflicts: NameConflict[];
-}
 interface CheckResponse {
   available: boolean;
   asOf?: string;
-  results: NameVerdict[];
+  results: NameCheckResult[];
 }
 
 function fmtDate(iso: string): string {
@@ -29,29 +20,29 @@ function fmtDate(iso: string): string {
   });
 }
 
-const CARD: Record<NameVerdict["verdict"], string> = {
+const CARD: Record<NameCheckResult["verdict"], string> = {
   taken: "border-destructive/40 bg-destructive/5",
-  held: "border-amber-500/40 bg-amber-500/5",
+  held: "border-destructive/40 bg-destructive/5",
   clear: "border-trust/40 bg-trust/5",
 };
 
-function VerdictRow({ v, label }: { v: NameVerdict; label: string }) {
+function VerdictRow({ v, label }: { v: NameCheckResult; label: string }) {
   return (
     <div className={`rounded-lg border p-3 ${CARD[v.verdict]}`}>
       <div className="flex items-start gap-2">
         {v.verdict === "taken" ? (
           <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
         ) : v.verdict === "held" ? (
-          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
         ) : (
           <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-trust" />
         )}
         <div className="min-w-0 text-sm">
           <span className="font-medium">{label}:</span>{" "}
           {v.verdict === "taken"
-            ? "Taken — an existing company already has this name."
+            ? "Unavailable — an existing Florida company already has this name. Please choose a different name."
             : v.verdict === "held"
-              ? "Likely unavailable — a recently dissolved company may still hold this name."
+              ? "Unavailable — this name belongs to a recently dissolved company, and Florida protects it for up to a year. Please choose a different name."
               : "No conflict found in the state's records."}
           {v.conflicts.length > 0 ? (
             <ul className="mt-2 space-y-1.5 text-xs leading-relaxed text-muted-foreground">
@@ -59,7 +50,6 @@ function VerdictRow({ v, label }: { v: NameVerdict; label: string }) {
                 <li key={cf.docNumber}>
                   <span className="font-medium text-foreground">{cf.name}</span>{" "}
                   — {cf.status}, document {cf.docNumber}.{" "}
-                  {cf.reason}.{" "}
                   <a
                     href={cf.detailUrl}
                     target="_blank"
@@ -78,63 +68,91 @@ function VerdictRow({ v, label }: { v: NameVerdict; label: string }) {
   );
 }
 
-/** Checks names against our nightly mirror of the Division of Corporations'
- *  public data files, applying Florida's distinguishability rules to the
- *  client's input — so a name that differs only by suffix, articles,
- *  "&"/"and", plurals, or punctuation is flagged without the client having
- *  to know the rules. The Division's determination at filing is final, and
- *  the copy never promises more than "no conflict found." */
-export function NameCheck({ names }: { names: { label: string; value: string }[] }) {
+/** Checks the entered names against our nightly mirror of the Division of
+ *  Corporations' records, applying Florida's distinguishability rules to the
+ *  client's input. Runs by itself when the names settle; the result is stored
+ *  on the form (keyed to the exact names checked) so step validation can
+ *  refuse to continue past a taken or held name. If the mirror is stale or
+ *  unreachable the check reports itself unavailable and the gate is waived —
+ *  the Division makes the final determination either way. */
+export function NameCheck({
+  names,
+  state,
+  onState,
+}: {
+  names: { label: string; value: string }[];
+  state?: NameCheckState;
+  /** Omitted (admin panel): results are kept locally instead of on a form. */
+  onState?: (s: NameCheckState) => void;
+}) {
+  const [localState, setLocalState] = useState<NameCheckState | undefined>(undefined);
+  const effectiveState = onState ? state : localState;
+  const setState = onState ?? setLocalState;
   const list = names.filter((n) => n.value.trim().length > 0);
+  const key = nameCheckKey(list.map((n) => n.value));
+
   const check = useMutation({
-    mutationFn: () =>
-      api.post<CheckResponse>("/api/name-check", { names: list.map((n) => n.value.trim()) }),
+    mutationFn: async (k: string) => {
+      const r = await api.post<CheckResponse>("/api/name-check", {
+        names: list.map((n) => n.value.trim()),
+      });
+      return { k, r };
+    },
+    onSuccess: ({ k, r }) =>
+      setState({ key: k, available: r.available, asOf: r.asOf, results: r.results }),
+    // A failed request must not strand the step: record the check as
+    // unavailable so validation waives it, same as a stale mirror.
+    onError: () => setState({ key, available: false, results: [] }),
   });
 
+  // Auto-run when the names settle on a value we have no result for.
+  const { mutate, isPending } = check;
+  useEffect(() => {
+    if (list.length === 0) return;
+    if (effectiveState?.key === key) return;
+    const t = setTimeout(() => mutate(key), 800);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
+
   if (list.length === 0) return null;
-  const data = check.data;
+  const current = effectiveState?.key === key ? effectiveState : undefined;
 
   return (
-    <div className="space-y-3">
-      <button
-        type="button"
-        onClick={() => check.mutate()}
-        disabled={check.isPending}
-        className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-60"
-      >
-        {check.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-        {check.isPending
-          ? "Checking Florida's records…"
-          : data
-            ? "Check again"
-            : list.length > 1
-              ? "Check these names against Florida's records"
-              : "Check this name against Florida's records"}
-      </button>
-
-      {check.isError ? (
-        <p className="text-xs text-muted-foreground">
-          The check didn't go through — use the Sunbiz search below instead.
+    <div className="space-y-2">
+      {isPending || (!current && list.length > 0) ? (
+        <p className="inline-flex items-center gap-2 text-sm text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          Checking your names against Florida's records…
         </p>
       ) : null}
 
-      {data && !data.available ? (
+      {current && !current.available ? (
         <p className="text-xs text-muted-foreground">
-          Our copy of the state's records isn't current right now — use the
-          Sunbiz search below to check by hand.
+          The automatic check is unavailable right now, so it won't hold up your
+          order — you can still look yourself on{" "}
+          <a
+            href={sunbizSearchUrl(list[0].value)}
+            target="_blank"
+            rel="noreferrer"
+            className="underline underline-offset-2"
+          >
+            Sunbiz
+          </a>
+          .
         </p>
       ) : null}
 
-      {data?.available ? (
+      {current?.available ? (
         <div className="space-y-2">
-          {data.results.map((v, i) => (
+          {current.results.map((v, i) => (
             <VerdictRow key={i} v={v} label={list[i]?.label ?? v.input} />
           ))}
           <p className="text-[11px] leading-relaxed text-muted-foreground">
             Checked against the Division of Corporations' public records as of{" "}
-            {data.asOf ? fmtDate(data.asOf) : "the latest state data file"}. The
-            Division makes the final determination when your Articles are filed
-            — no result here is a guarantee.
+            {current.asOf ? fmtDate(current.asOf) : "the latest state data file"}.
+            The Division makes the final determination when your Articles are
+            filed — no result here is a guarantee.
           </p>
         </div>
       ) : null}

@@ -30,7 +30,7 @@ import { stampEastern, stampForFilename } from "./datetime";
 import { assembleOa, oaVersion, OA_TEMPLATE_VERSION, type OaInputs } from "./oa";
 import { renderMarkdownPdf, stampExistingPdf } from "./pdf-render";
 import { createSession, getSession, destroySession, rateLimit, clientIp } from "./auth";
-import { checkName, getSyncState, syncDailies } from "./sunbiz";
+import { checkName, getSyncState, syncDailies, unavailableNames } from "./sunbiz";
 import { deleteFile, putFile, readFileStream } from "./storage";
 import {
   sendMail,
@@ -109,6 +109,30 @@ app.post("/orders", async (c) => {
   if (raError) return c.json(err(raError, "INVALID_INPUT"), 400);
   if (data.members.length < 1) {
     return c.json(err("At least one member is required.", "INVALID_INPUT"), 400);
+  }
+
+  // Names that our mirror of the state's records says are taken or held are
+  // refused here, not just in the browser — the client cannot buy a filing
+  // the Division will bounce. Waived automatically if the mirror is stale.
+  const nameProblems = await unavailableNames(
+    [
+      data.desiredLlcName ?? "",
+      ...(data.exactNameOnly === true ? [] : [data.alternateName1 ?? "", data.alternateName2 ?? ""]),
+    ].filter((n) => n.trim().length > 0),
+  );
+  if (nameProblems && nameProblems.length > 0) {
+    const p = nameProblems[0];
+    return c.json(
+      err(
+        `The name "${p.name}" is unavailable — ${
+          p.verdict === "taken"
+            ? "an existing Florida company already has it"
+            : "it belongs to a recently dissolved company, and Florida protects it for up to a year"
+        }. Please choose a different name.`,
+        "NAME_UNAVAILABLE",
+      ),
+      400,
+    );
   }
 
   const payload = buildPayload(data);

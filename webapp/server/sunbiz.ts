@@ -287,3 +287,27 @@ export async function syncDailies(maxFiles = 15): Promise<SyncReport> {
     await sftp.end();
   }
 }
+
+/** Order-time enforcement: returns the entered names that are taken or held,
+ *  or null when the mirror cannot answer (missing baseline, stale watermark,
+ *  or query failure) — enforcement is waived then, and the Division decides
+ *  at filing. Adam's rule (22 Aug 2026): held blocks too — the data cannot
+ *  distinguish a 120-day voluntary hold from a one-year administrative one,
+ *  and over-blocking beats emailing clients about rejected filings. */
+export async function unavailableNames(
+  names: string[],
+): Promise<{ name: string; verdict: "taken" | "held" }[] | null> {
+  try {
+    const state = await getSyncState();
+    if (!state.baselineLabel || !state.lastDaily) return null;
+    if (Date.now() - new Date(state.lastDaily).getTime() > 10 * 86_400_000) return null;
+    const out: { name: string; verdict: "taken" | "held" }[] = [];
+    for (const name of names) {
+      const v = await checkName(name);
+      if (v.verdict !== "clear") out.push({ name, verdict: v.verdict });
+    }
+    return out;
+  } catch {
+    return null;
+  }
+}

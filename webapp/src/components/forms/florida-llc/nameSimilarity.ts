@@ -68,3 +68,9 @@ export function similarityExamples(name: string): string[] {
   }
   return out.slice(0, 3);
 }
+
+/** Key identifying a set of names for the availability check: results are
+ *  valid only while the names they were computed for are unchanged. */
+export function nameCheckKey(names: string[]): string {
+  return names.map((n) => n.trim().toUpperCase()).filter(Boolean).join(" | ");
+}

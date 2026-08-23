@@ -1343,6 +1343,31 @@ if (mint.status === 200) {
   check("unknown name is CLEAR with no conflicts", never?.verdict === "clear" && never?.conflicts?.length === 0, never);
   const empty = await api("/api/name-check", { method: "POST", body: JSON.stringify({ names: [] }) });
   check("empty name list rejected", empty.status === 400);
+  // Order-time enforcement: a taken or held name cannot be bought (Adam's
+  // rule — held blocks too, to minimize rejection emails).
+  // Own IP for the two enforcement calls: the suite's real orders have
+  // already spent this run's 10-successful-orders budget.
+  const NAME_IP = { "X-Forwarded-For": `10.99.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}` };
+  const takenOrder = await api("/api/orders", {
+    method: "POST",
+    headers: NAME_IP,
+    body: JSON.stringify({ ...formData, desiredLlcName: "E2E Sunshine Holding", alternateName1: "E2E Coastal Backup" }),
+  });
+  check(
+    "order with a TAKEN name is refused server-side",
+    takenOrder.status === 400 && takenOrder.body?.error?.code === "NAME_UNAVAILABLE",
+    takenOrder.body,
+  );
+  const heldOrder = await api("/api/orders", {
+    method: "POST",
+    headers: NAME_IP,
+    body: JSON.stringify({ ...formData, desiredLlcName: "E2E Coastal Holdings", alternateName1: "E2E Gator Grove" }),
+  });
+  check(
+    "order with a HELD alternate is refused server-side",
+    heldOrder.status === 400 && heldOrder.body?.error?.code === "NAME_UNAVAILABLE",
+    heldOrder.body,
+  );
   // restore
   await db.query("DELETE FROM fl_entities WHERE doc_number LIKE 'E2ETEST%'");
   if (saved.length > 0) {

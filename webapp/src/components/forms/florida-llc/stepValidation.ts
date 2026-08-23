@@ -1,5 +1,5 @@
 import { isPoBox } from "./schema";
-import { normalizeEntityName } from "./nameSimilarity";
+import { nameCheckKey, normalizeEntityName } from "./nameSimilarity";
 import {
   buildFinalLlcName,
   designatorAllowedForFormationType,
@@ -71,6 +71,34 @@ export function validateStep(
       if (alt1Key && alt2Key && alt1Key === alt2Key) {
         e.alternateName2 =
           "Your two alternates are the same name under Florida's rules.";
+      }
+      // The availability check is mandatory: its stored result must cover
+      // exactly the names now on the form, and a taken or held name cannot
+      // continue. If the mirror was unavailable the gate is waived — the
+      // Division decides at filing either way.
+      {
+        const enteredFields = (
+          [
+            ["desiredLlcName", data.desiredLlcName ?? ""],
+            ["alternateName1", data.exactNameOnly === true ? "" : (data.alternateName1 ?? "")],
+            ["alternateName2", data.exactNameOnly === true ? "" : (data.alternateName2 ?? "")],
+          ] as const
+        ).filter(([, v]) => v.trim().length > 0);
+        const key = nameCheckKey(enteredFields.map(([, v]) => v));
+        const nc = data.nameCheck;
+        if (enteredFields.length > 0 && (!nc || nc.key !== key)) {
+          e.nameCheck =
+            "We check your names against Florida's records automatically — give it a moment to finish, then press Continue again.";
+        } else if (nc && nc.key === key && nc.available) {
+          nc.results.forEach((r, i) => {
+            const field = enteredFields[i]?.[0];
+            if (!field || r.verdict === "clear") return;
+            e[field] =
+              r.verdict === "taken"
+                ? "Unavailable — an existing Florida company already has this name. Please choose a different name."
+                : "Unavailable — this name belongs to a recently dissolved company, and Florida protects it for up to a year. Please choose a different name.";
+          });
+        }
       }
       // Alternates are entered WITHOUT the designator (it is added
       // automatically); typing one would double it on the filing.

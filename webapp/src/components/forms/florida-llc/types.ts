@@ -82,7 +82,29 @@ export interface SeriesEntry {
   name: string;
 }
 
+export interface NameCheckConflict {
+  name: string;
+  docNumber: string;
+  status: string;
+  reason: string;
+  detailUrl: string;
+}
+export interface NameCheckResult {
+  input: string;
+  verdict: "taken" | "held" | "clear";
+  conflicts: NameCheckConflict[];
+}
+/** Result of the last name-availability check, keyed to the exact names it
+ *  covered so a stale result never gates (or passes) different names. */
+export interface NameCheckState {
+  key: string;
+  available: boolean;
+  asOf?: string;
+  results: NameCheckResult[];
+}
+
 export interface FloridaLLCFormData {
+  nameCheck?: NameCheckState;
   /** Which service the customer wants. Optional so saved drafts predating
    *  the conversion option still parse; treated as "NEW" when absent. */
   filingPath?: FilingPath;
