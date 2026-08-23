@@ -199,7 +199,9 @@ export function FloridaLLCFormationForm({
         registeredAgentZip: s.zip,
       });
     }
-    advance();
+    // The fields update in place so the client can see what was written;
+    // they continue when they're ready.
+    setAddressWarning(null);
   };
 
   const advance = () => {
