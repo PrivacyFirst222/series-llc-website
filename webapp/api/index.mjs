@@ -76826,6 +76826,7 @@ var SERVICE_FEE_CENTS = 49900;
 var EIN_FEE_CENTS = 5e3;
 var S_ELECTION_FEE_CENTS = 9500;
 var SERIES_ADDON_PREP_CENTS = 2500;
+var OPTIONAL_DOC_PREP_CENTS = 1e3;
 var SERIES_ADDON_STATE_CENTS = 2500;
 var S_ELECTION_WINDOW_DAYS = 65;
 function priceOrder(opts) {
@@ -76845,6 +76846,12 @@ function priceOrder(opts) {
   }
   if (opts.sElection) {
     lineItems.push({ name: "S corporation election package (Form 2553)", amountCents: S_ELECTION_FEE_CENTS });
+  }
+  if (opts.certificateOfStatus) {
+    lineItems.push({ name: "Certificate of Status \u2014 preparation", amountCents: OPTIONAL_DOC_PREP_CENTS });
+  }
+  if (opts.certifiedCopy) {
+    lineItems.push({ name: "Certified copy of the Articles \u2014 preparation", amountCents: OPTIONAL_DOC_PREP_CENTS });
   }
   if (fees.articlesOfOrganization) {
     lineItems.push({ name: "FL state fee \u2014 Articles of Organization", amountCents: fees.articlesOfOrganization * 100 });
@@ -76873,7 +76880,7 @@ function priceOrder(opts) {
   if (fees.certifiedCopy) {
     lineItems.push({ name: "FL state fee \u2014 certified copy", amountCents: fees.certifiedCopy * 100 });
   }
-  const serviceFeeCents = SERVICE_FEE_CENTS + fees.additionalSeriesPrepFee * 100 + (opts.ein ? EIN_FEE_CENTS : 0) + (opts.sElection ? S_ELECTION_FEE_CENTS : 0);
+  const serviceFeeCents = SERVICE_FEE_CENTS + fees.additionalSeriesPrepFee * 100 + (opts.ein ? EIN_FEE_CENTS : 0) + (opts.sElection ? S_ELECTION_FEE_CENTS : 0) + (opts.certificateOfStatus ? OPTIONAL_DOC_PREP_CENTS : 0) + (opts.certifiedCopy ? OPTIONAL_DOC_PREP_CENTS : 0);
   return {
     serviceFeeCents,
     stateFeesCents,

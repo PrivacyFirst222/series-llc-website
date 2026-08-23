@@ -142,8 +142,8 @@ export default function Pricing() {
                 n: "We prepare IRS Form 2553 complete, with a cover letter and filing instructions — you sign and file it. Available for new LLCs we form, ordered within 65 days of formation. The IRS deadline for a first-year election is 2 months and 15 days from formation.",
               },
               { t: "Florida registered agent service (after year one)", p: "$99 / yr" },
-              { t: "Certificate of Status (state fee, at cost)", p: "$5" },
-              { t: "Certified copy of the Articles (state fee, at cost)", p: "$30" },
+              { t: "Certificate of Status ($10 service fee + $5 state fee)", p: "$15" },
+              { t: "Certified copy of the Articles ($10 service fee + $30 state fee)", p: "$40" },
             ].map((a) => (
               <div key={a.t} className="bg-card p-5">
                 <div className="text-sm font-medium">{a.t}</div>

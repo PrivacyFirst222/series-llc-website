@@ -19,7 +19,7 @@ export function StepOptionalDocs({ data, patch }: StepProps) {
       </header>
 
       <div className="grid sm:grid-cols-2 gap-4">
-        <FieldShell label="Certificate of Status (+$5)">
+        <FieldShell label="Certificate of Status (+$15 — $10 service fee + $5 state fee)">
           <label className="flex items-start gap-2 text-sm">
             <input
               type="checkbox"
@@ -35,7 +35,7 @@ export function StepOptionalDocs({ data, patch }: StepProps) {
             </span>
           </label>
         </FieldShell>
-        <FieldShell label="Certified Copy (+$30)">
+        <FieldShell label="Certified Copy (+$40 — $10 service fee + $30 state fee)">
           <label className="flex items-start gap-2 text-sm">
             <input
               type="checkbox"

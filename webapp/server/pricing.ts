@@ -4,6 +4,10 @@ export const SERVICE_FEE_CENTS = 499_00;
 export const EIN_FEE_CENTS = 50_00;
 export const S_ELECTION_FEE_CENTS = 95_00;
 export const SERIES_ADDON_PREP_CENTS = 25_00;
+/** Adam's pricing (23 Aug 2026): each optional document carries a $10
+ *  preparation charge on the service-fee side, plus the state fee at cost
+ *  (Certificate of Status $5, certified copy $30). */
+export const OPTIONAL_DOC_PREP_CENTS = 10_00;
 export const SERIES_ADDON_STATE_CENTS = 25_00;
 /** S election package is purchasable only this many days after the formation
  *  order is paid — leaves ~10 days of buffer inside the IRS's 2-months-and-15-days
@@ -47,6 +51,12 @@ export function priceOrder(opts: {
   if (opts.sElection) {
     lineItems.push({ name: "S corporation election package (Form 2553)", amountCents: S_ELECTION_FEE_CENTS });
   }
+  if (opts.certificateOfStatus) {
+    lineItems.push({ name: "Certificate of Status — preparation", amountCents: OPTIONAL_DOC_PREP_CENTS });
+  }
+  if (opts.certifiedCopy) {
+    lineItems.push({ name: "Certified copy of the Articles — preparation", amountCents: OPTIONAL_DOC_PREP_CENTS });
+  }
   if (fees.articlesOfOrganization) {
     lineItems.push({ name: "FL state fee — Articles of Organization", amountCents: fees.articlesOfOrganization * 100 });
   }
@@ -80,7 +90,9 @@ export function priceOrder(opts: {
     SERVICE_FEE_CENTS +
     fees.additionalSeriesPrepFee * 100 +
     (opts.ein ? EIN_FEE_CENTS : 0) +
-    (opts.sElection ? S_ELECTION_FEE_CENTS : 0);
+    (opts.sElection ? S_ELECTION_FEE_CENTS : 0) +
+    (opts.certificateOfStatus ? OPTIONAL_DOC_PREP_CENTS : 0) +
+    (opts.certifiedCopy ? OPTIONAL_DOC_PREP_CENTS : 0);
   return {
     serviceFeeCents,
     stateFeesCents,

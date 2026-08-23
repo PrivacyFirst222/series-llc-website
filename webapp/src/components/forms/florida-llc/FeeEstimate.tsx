@@ -92,7 +92,9 @@ export function FeeEstimate({
         Government fees are subject to change. Base $499 service fee not
         included. Each series beyond the included three costs $50 — the $25
         shown here is Florida's filing fee; our $25 preparation charge is
-        billed with the service fee.{isConversion && fees.registeredAgentDesignation === 0
+        billed with the service fee. The Certificate of Status and certified copy
+        each carry a $10 preparation charge, also billed with the service fee —
+        the amounts shown here are Florida's fees.{isConversion && fees.registeredAgentDesignation === 0
           ? " If you are changing the registered agent already on file for your"
             + " LLC, Florida charges $25 for that filing."
           : ""}

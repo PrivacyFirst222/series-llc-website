@@ -1358,6 +1358,24 @@ if (mint.status === 200) {
     takenOrder.status === 400 && takenOrder.body?.error?.code === "NAME_UNAVAILABLE",
     takenOrder.body,
   );
+  const optDocs = await api("/api/orders", {
+    method: "POST",
+    headers: NAME_IP,
+    body: JSON.stringify({
+      ...formData,
+      desiredLlcName: "E2E Optional Docs Pricing",
+      alternateName1: "E2E Optional Docs Pricing Backup",
+      orderCertificateOfStatus: true,
+      orderCertifiedCopy: true,
+      orderEin: false,
+      orderSElection: false,
+    }),
+  });
+  check(
+    "optional docs price as $10 prep + state fee each: $499 + $20 + $160 = $679",
+    optDocs.status === 200 && optDocs.body?.data?.totalCents === 679_00,
+    optDocs.body?.data ?? optDocs.body,
+  );
   const dupSeries = await api("/api/orders", {
     method: "POST",
     headers: NAME_IP,
