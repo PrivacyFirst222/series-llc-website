@@ -114,6 +114,18 @@ export function FloridaLLCFormationForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stepIndex, data.managementStructure]);
 
+  // Every step change lands at the top of the page. The smooth scrolls in
+  // the navigation handlers fire before the new step renders, and iPad
+  // Safari abandons a smooth scroll when the page's height changes under
+  // it — this runs after the render and jumps instantly, so it cannot be
+  // cancelled. Also covers the auto-skip path, which never scrolled.
+  useEffect(() => {
+    // "instant" overrides the global `html { scroll-behavior: smooth }`,
+    // which would otherwise animate this too — and iPad Safari abandons an
+    // animated scroll when the page's height changes beneath it.
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [stepIndex]);
+
   // Auto-save draft (answers + position)
   useEffect(() => {
     try {
