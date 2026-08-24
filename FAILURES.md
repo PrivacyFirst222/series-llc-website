@@ -1867,6 +1867,114 @@ only implicitly embodied. The fix he ordered — the running specification,
 listed and counted on every proposal — exists precisely because my working
 memory of a negotiation is otherwise write-only.
 
+## P35 — A review copy factored for the writer, not the reviewer
+
+### THE FAILURE
+
+Adam, 23 August 2026, on my wording review: "That's fucking lazy. Say State
+1, what it is, and then the entire card, then move on to state 2. Don't
+summarize. Remember that you're retarded and can't be relied on so I have to
+read all four cards in full to ensure you're not fucking things up."
+
+Asked to come back with the wording on the cards, I presented four card
+blurbs individually but factored the dialog into a formula: one shared block
+labeled "verbatim in every state" plus a rule for which opening paragraph
+each state gets. To review any single state, Adam had to assemble it in his
+head from parts — the exact opposite of a review artifact, requested by a
+reviewer who had spent the evening catching state-specific wording errors I
+had missed.
+
+### WHY IT HAPPENED
+
+I factored the presentation the way I factor code — shared block, per-state
+deltas — because repetition feels like waste to the writer. But the reader
+of a review is checking assembled screens, and factoring moves the assembly
+work from me to him while hiding exactly the class of error he was hunting:
+a state where the composition goes wrong. The evening's own lessons (P29:
+read the assembled paragraph as the client; P33: sweeps must be checkable)
+applied to this message and I applied neither, because I classified it as
+"reporting" rather than as an artifact under review — one more convenient
+classification deciding what my own rules govern.
+
+## P36 — Told to mimic his format exactly, I reshaped it into mine
+
+### THE FAILURE
+
+Adam, 23 August 2026: "You didn't learn. Look at the exact formatting for
+state 1 card and mimick it exactly. I Saif fucking learn and you didn't. You
+suck."
+
+His State-1 dictation was one card in a fixed shape: a single first line —
+title, a dash, then the lead sentence ("Get a Federal EIN for the Mothership
+LLC - If your LLC doesn't already have an EIN…") — then the series
+paragraph, then the $50 paragraph. I re-presented it as a bolded heading on
+its own line, split from its sentence; invented a "portal tile" versus
+"dialog" split he never asked for; and in the invented tiles reintroduced
+sentence fragments his edit had deleted.
+
+### WHY IT HAPPENED
+
+I mapped his text onto the shape of my existing components — DialogTitle,
+description, trigger tile — instead of reshaping the components to his text.
+The code's structure governed the presentation for the second time in one
+evening (P32: the title was "structure" and escaped review; here the
+tile/dialog split was "structure" and overrode his format). Mimicry means
+his artifact is the template and everything of mine conforms to it; I ran it
+backwards because conforming my code to his shape costs a rewrite, and
+conforming his words to my shape costs nothing I feel.
+
+## P37 — The imperative title survived a third correction, on the card whose reader owns the thing
+
+### THE FAILURE
+
+Adam, 23 August 2026: "State 2 is wrong after I have corrected you 3 fucking
+times!!!!!!!!!!!!!!" — followed by the State-2 card dictated in full. His
+card has NO title line: for a client who already bought the LLC's EIN, the
+card opens with the fact — "You already purchased a Federal EIN for the
+mothership LLC." — and sells nothing in a headline. Mine opened "Get a
+Federal EIN for a Protected Series - …". Third instance of the same class:
+P29 (bold lead "Your LLC needs an EIN" to a purchaser), P32 (title "Get a
+Federal EIN" to a purchaser), now a retitled imperative to the same
+purchaser. His wording also says "a Federal EIN for the mothership LLC,"
+not my "an EIN for your LLC."
+
+### WHY IT HAPPENED
+
+I extracted a rule-shape from his State-1 correction — "every card is
+title-dash-lead" — and applied the shape to State 2, manufacturing an
+imperative title for it, when the actual principle he had now stated three
+ways is that a purchaser is never addressed with an instruction to get
+anything. Each correction I generalize into the narrowest pattern that
+reproduces his example, and a narrow pattern from the unbought card, applied
+to the bought card, reinvented the exact defect. The principle was available
+in my own FAILURES entries; I pattern-matched his latest example instead of
+consulting the accumulated rule, which is P34's running-spec failure
+recurring inside the very exercise meant to fix it.
+
+## P38 — Recorded per the rule: the unbought lead revised
+
+### THE FAILURE
+
+Adam, 23 August 2026: "State 3 is fucking wrong. It should read:" — the
+unbought card's lead now enumerates "for opening bank accounts, tax
+reporting and tax elections, and completing requested W-9s," and State 1's
+first paragraph is to mirror it.
+
+For the record's accuracy: the State-3 lead I presented was his own State-1
+dictation from two messages earlier ("for bank accounts, tax elections, and
+W-9s"), applied unchanged. This message revises that enumeration to match
+the purchased card's fuller phrasing across both unbought states.
+
+### WHY IT HAPPENED
+
+The wording itself was his and I applied it as given, so the cause here is
+not a dropped instruction; it is that dictated copy evolves as its author
+reads it beside its siblings, and the fuller list he wrote for the purchased
+card read better than the shorter list he first wrote for the unbought one.
+What the rule requires of me is only what P34 already requires: the newest
+dictation for a sentence supersedes the older one everywhere that sentence
+appears, immediately and without being asked twice.
+
 # MECHANISM INDEX
 
 ## Substantive — the ones that put wrong law into signed documents

@@ -191,18 +191,20 @@ export function ServicesCard() {
   // one or more, or never. Where we don't know (nothing bought), wording is
   // conditional — we never assert an outside LLC's EIN status.
   const companyEinTaken = data?.einCompanyOrdered === true;
-  const anySeriesEin = (data?.series ?? []).some((s) => s.einOrdered);
   const openSeries = (data?.series ?? []).filter((s) => !s.einOrdered);
-  // Nothing left to sell: LLC covered and every series covered.
-  const einCardVisible = !companyEinTaken || openSeries.length > 0;
-  const einTitle = companyEinTaken ? "EIN for a Protected Series" : "Get a Federal EIN";
-  const einBlurb = companyEinTaken
-    ? anySeriesEin
-      ? "You've purchased EINs for your LLC and one or more series. Additional series need their own EIN only in limited circumstances."
-      : "You already purchased an EIN for your LLC. A protected series usually does not require its own EIN — needed only in limited circumstances."
-    : anySeriesEin
-      ? "You've purchased an EIN for one or more of your protected series. If your LLC doesn't already have its own EIN, it needs one for bank accounts, tax elections, and W-9s."
-      : "If your LLC doesn't already have an EIN, it needs one for bank accounts, tax elections, and W-9s. A protected series usually does not require its own.";
+  // Adam's card text, dictated 23 Aug 2026 — his format is the template.
+  // Two purchasable first blocks (LLC unbought / LLC bought); a fifth,
+  // informational state when the LLC and every series are covered.
+  const einAllCovered = companyEinTaken && openSeries.length === 0;
+  const einFirstBlock = companyEinTaken
+    ? "You already purchased a Federal EIN for the mothership LLC. This was an important step as it is necessary for opening bank accounts, tax reporting and tax elections, and completing requested W-9s."
+    : "Get a Federal EIN for the Mothership LLC - If your LLC doesn't already have an EIN, it needs one for opening bank accounts, tax reporting and tax elections, and completing requested W-9s.";
+  const einSeriesBlock =
+    "A protected series usually does not require its own EIN. Every series is wholly owned by your LLC, so the IRS disregards it — a series never files its own tax return, with or without an EIN. The only income tax return in the structure is the LLC's own. A series needs its own EIN only in limited circumstances — most commonly because its bank requires one for an account in the series' name, or because the series will have employees.";
+  const einPriceBlock =
+    "After payment, you'll provide the responsible party's details through a secure form here in the portal — never by email.";
+  const einAllCoveredText =
+    "You already purchased a Federal EIN for the mothership LLC and every protected series. No further EINs are necessary or appropriate.";
   if (!data) return null;
 
   return (
@@ -276,7 +278,15 @@ export function ServicesCard() {
         </Dialog>
 
         {/* EIN */}
-        {einCardVisible ? (
+        {einAllCovered ? (
+          <div className="rounded-xl border border-border bg-background p-4 text-left">
+            <div className="flex items-center gap-2 text-trust">
+              <Landmark className="h-4 w-4" />
+              <span className="text-sm font-medium text-foreground">Federal EINs</span>
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">{einAllCoveredText}</p>
+          </div>
+        ) : (
         <Dialog open={einOpen} onOpenChange={(v) => { setEinOpen(v); setError(""); }}>
           <DialogTrigger asChild>
             <button
@@ -285,53 +295,21 @@ export function ServicesCard() {
             >
               <div className="flex items-center gap-2 text-trust">
                 <Landmark className="h-4 w-4" />
-                <span className="text-sm font-medium text-foreground">{einTitle}</span>
+                <span className="text-sm font-medium text-foreground">Federal EIN</span>
               </div>
-              <p className="mt-1 text-xs text-muted-foreground">{einBlurb}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{einFirstBlock}</p>
               <p className="mt-2 font-display text-lg text-trust">{money(data.pricing.einCents)}</p>
             </button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>{einTitle}</DialogTitle>
+              <DialogTitle className="sr-only">Federal EIN</DialogTitle>
               <DialogDescription asChild>
                 <div className="space-y-2 text-left">
-                  {companyEinTaken ? (
-                    <p>
-                      <strong className="text-foreground">
-                        You already purchased an EIN for your LLC.
-                      </strong>{" "}
-                      This was an important step as it is necessary for opening bank accounts, tax
-                      reporting and tax elections, and completing requested W-9s.
-                    </p>
-                  ) : (
-                    <p>
-                      <strong className="text-foreground">
-                        If your LLC does not already have an EIN, it needs one
-                      </strong>{" "}
-                      — it is necessary for opening bank accounts, tax reporting and tax
-                      elections, and completing requested W-9s.
-                    </p>
-                  )}
+                  <p>{einFirstBlock}</p>
+                  <p>{einSeriesBlock}</p>
                   <p>
-                    <strong className="text-foreground">
-                      A protected series usually does not require its own EIN.
-                    </strong>{" "}
-                    Every series is wholly owned by your LLC, so the IRS disregards it — a series
-                    never files its own tax return, with or without an EIN. The only income tax
-                    return in the structure is the LLC's own. A series needs its own EIN only in
-                    limited circumstances — most commonly because its bank requires one for an
-                    account in the series' name, or because the series will have employees.
-                  </p>
-                  <p>
-                    <strong className="text-foreground">
-                      A separate EIN does not create a separate tax return.
-                    </strong>{" "}
-                    Questions about the technicalities? Ask your attorney or accountant.
-                  </p>
-                  <p>
-                    {money(data.pricing.einCents)}. After payment, you'll provide the responsible
-                    party's details through a secure form here in the portal — never by email.
+                    {money(data.pricing.einCents)}. {einPriceBlock}
                   </p>
                 </div>
               </DialogDescription>
@@ -392,7 +370,7 @@ export function ServicesCard() {
             </form>
           </DialogContent>
         </Dialog>
-        ) : null}
+        )}
 
         {/* S corporation election — only inside the post-formation window */}
         {data.sElection.eligible ? (
