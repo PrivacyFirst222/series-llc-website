@@ -312,7 +312,7 @@ export function ServicesCard() {
               <p className="mt-2 font-display text-lg text-trust">{money(data.pricing.einCents)}</p>
             </button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
             <DialogHeader>
               <DialogTitle className="sr-only">Federal EIN</DialogTitle>
               <DialogDescription asChild>
@@ -366,17 +366,22 @@ export function ServicesCard() {
                       />
                       For a protected series:
                     </label>
-                    <select
-                      name="seriesName"
-                      defaultValue={openSeries[0]?.name}
-                      className="ml-6 flex h-10 w-[calc(100%-1.5rem)] rounded-md border border-input bg-background px-3 text-sm"
-                    >
-                      {openSeries.map((s) => (
-                        <option key={s.name} value={s.name}>
-                          {s.name}
-                        </option>
+                    {/* A list, not a dropdown: full filed names wrap instead of
+                        truncating — no name of any length is ever clipped. */}
+                    <div className="ml-6 max-h-48 space-y-1.5 overflow-y-auto rounded-md border border-input bg-background p-2">
+                      {openSeries.map((s, i) => (
+                        <label key={s.name} className="flex items-start gap-2 text-sm leading-relaxed">
+                          <input
+                            type="radio"
+                            name="seriesName"
+                            value={s.name}
+                            defaultChecked={i === 0}
+                            className="mt-1 h-4 w-4 shrink-0 accent-trust"
+                          />
+                          <span className="min-w-0 break-words">{s.name}</span>
+                        </label>
                       ))}
-                    </select>
+                    </div>
                   </>
                 ) : null}
               </div>
