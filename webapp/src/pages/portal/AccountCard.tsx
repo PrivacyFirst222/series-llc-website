@@ -119,9 +119,14 @@ export function AccountCard({ email, pendingEmail }: AccountCardProps) {
             onSubmit={(e) => {
               e.preventDefault();
               const fd = new FormData(e.currentTarget);
+              const newPassword = String(fd.get("newPassword") ?? "");
+              if (newPassword !== String(fd.get("confirmPassword") ?? "")) {
+                setError("The new passwords don't match.");
+                return;
+              }
               changePassword.mutate({
                 currentPassword: String(fd.get("currentPassword") ?? ""),
-                newPassword: String(fd.get("newPassword") ?? ""),
+                newPassword,
               });
             }}
           >
@@ -132,6 +137,10 @@ export function AccountCard({ email, pendingEmail }: AccountCardProps) {
             <div className="space-y-1.5">
               <label className="text-sm font-medium">New password</label>
               <Input name="newPassword" type="password" autoComplete="new-password" />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium">Retype new password</label>
+              <Input name="confirmPassword" type="password" autoComplete="new-password" />
             </div>
             {error ? <p className="text-xs text-destructive">{error}</p> : null}
             <DialogFooter>
