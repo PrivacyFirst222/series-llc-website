@@ -109481,6 +109481,25 @@ app.post("/portal/services/ein", async (c) => {
   const target = body.data.target;
   const seriesName = body.data.seriesName?.trim() ?? "";
   const db2 = await getDb();
+  const existingEin = await db2.query(
+    `SELECT details FROM service_orders
+     WHERE client_id = $1 AND type = 'ein' AND status <> 'pending_payment'`,
+    [session.clientId]
+  );
+  const alreadyOrdered = existingEin.some((r) => {
+    const d2 = typeof r.details === "string" ? JSON.parse(r.details) : r.details;
+    if (target === "company") return (d2?.target ?? "company") === "company";
+    return d2?.target === "series" && (d2.seriesName ?? "").trim().toLowerCase() === seriesName.toLowerCase();
+  });
+  if (alreadyOrdered) {
+    return c.json(
+      err2(
+        target === "company" ? "Your LLC's EIN is already ordered \u2014 see your orders below." : "An EIN for that protected series is already ordered \u2014 see your orders below.",
+        "ALREADY_ORDERED"
+      ),
+      400
+    );
+  }
   const rows = await db2.query(
     `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents)
      VALUES ($1, 'ein', $2, $3, $4) RETURNING id`,

@@ -1780,6 +1780,33 @@ app.post("/portal/services/ein", async (c) => {
   const target = body.data.target;
   const seriesName = body.data.seriesName?.trim() ?? "";
   const db = await getDb();
+  // One EIN per entity: a paid order (formation-included or portal) for the
+  // same target refuses a second purchase. Unpaid drafts don't block — an
+  // abandoned checkout must not lock the client out forever.
+  const existingEin = await db.query<{ details: unknown }>(
+    `SELECT details FROM service_orders
+     WHERE client_id = $1 AND type = 'ein' AND status <> 'pending_payment'`,
+    [session.clientId],
+  );
+  const alreadyOrdered = existingEin.some((r) => {
+    const d = (typeof r.details === "string" ? JSON.parse(r.details) : r.details) as {
+      target?: string;
+      seriesName?: string;
+    } | null;
+    if (target === "company") return (d?.target ?? "company") === "company";
+    return d?.target === "series" && (d.seriesName ?? "").trim().toLowerCase() === seriesName.toLowerCase();
+  });
+  if (alreadyOrdered) {
+    return c.json(
+      err(
+        target === "company"
+          ? "Your LLC's EIN is already ordered — see your orders below."
+          : "An EIN for that protected series is already ordered — see your orders below.",
+        "ALREADY_ORDERED",
+      ),
+      400,
+    );
+  }
   const rows = await db.query<{ id: string }>(
     `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents)
      VALUES ($1, 'ein', $2, $3, $4) RETURNING id`,

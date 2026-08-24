@@ -378,6 +378,16 @@ if (mint.status === 200) {
     (o: { type: string; status: string }) => o.type === "ein" && o.status === "awaiting_info",
   );
   check("intake EIN order created awaiting_info", Boolean(intakeEin));
+  // One EIN per entity: the intake purchase blocks a second company-EIN order;
+  // a series target stays open.
+  const dupCompanyEin = await api("/api/portal/services/ein", {
+    method: "POST", cookies: setPw.cookie, body: JSON.stringify({ target: "company" }),
+  });
+  check(
+    "second company EIN refused (ALREADY_ORDERED)",
+    dupCompanyEin.status === 400 && dupCompanyEin.body?.error?.code === "ALREADY_ORDERED",
+    dupCompanyEin.body,
+  );
   const intakeSElection = (svc0.body?.data?.orders ?? []).find(
     (o: { type: string; status: string }) => o.type === "s-election" && o.status === "awaiting_info",
   );
