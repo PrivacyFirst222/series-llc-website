@@ -4,14 +4,21 @@
     {
       "name": "webapp",
       "runtimeExecutable": "bun",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
       "cwd": "webapp",
       "port": 8000
     },
     {
       "name": "api",
       "runtimeExecutable": "bun",
-      "runtimeArgs": ["run", "--hot", "server/dev.ts"],
+      "runtimeArgs": [
+        "run",
+        "--watch",
+        "server/dev.ts"
+      ],
       "cwd": "webapp",
       "port": 3000
     }
