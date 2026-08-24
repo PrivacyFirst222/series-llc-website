@@ -110,6 +110,32 @@ recordable:
 
 When it is unclear whether something was an insult, write the entry.
 
+## A correction joins the spec; it does not replace it
+
+**While an issue is being worked, every instruction Adam gives about it
+accumulates into one running specification. Each new proposal is measured
+against the union of all of them — not against his most recent message.**
+
+The failure this prevents is real and recent: nothing has been agreed yet,
+Adam corrects one part, and the next proposal honors that correction while
+silently dropping — or never applying — an earlier one. Feedback three
+messages old is not "old feedback"; inside the working thread there is no
+such thing.
+
+The rule leaves an artifact, and its absence is the tell: **every proposal in
+a working thread carries the running instruction list, each item marked
+satisfied, with the count stated** ("instructions so far: 8; this proposal
+satisfies 8 of 8"). A proposal without the list has not been checked against
+it. Adam: reject it unread.
+
+This rule exists because of the EIN card, 23 August 2026: the dialog title
+"Get a Federal EIN" survived two consecutive corrections about showing
+purchase language to a purchaser, a dictated second paragraph was dropped
+while its neighbor was applied, and a declared-state design was proposed
+after the two-binary-states instruction had already been given — three
+proposals, each satisfying only the message it answered (FAILURES.md
+P30-P34).
+
 ## Read every document for its substance, not for the thing you came to change
 
 **Before you touch a document, read all of it, and read it for substance and

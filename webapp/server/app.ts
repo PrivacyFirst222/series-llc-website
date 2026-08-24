@@ -1430,6 +1430,50 @@ async function clientLlcName(clientId: string): Promise<string> {
   return rows[0]?.llc_name ?? "";
 }
 
+/** The client's protected series as full filed names ("LLC - PS 1"):
+ *  formation-order series (stored as bare identifiers) plus paid portal
+ *  series orders (stored as full names). The EIN dialog offers exactly this
+ *  list — a client picks a series they actually have instead of typing one. */
+async function clientSeries(clientId: string): Promise<{ name: string; einOrdered: boolean }[]> {
+  const db = await getDb();
+  const llcName = await clientLlcName(clientId);
+  if (!llcName) return [];
+  const names: string[] = [];
+  const formation = await db.query<{ payload: unknown }>(
+    "SELECT payload FROM orders WHERE client_id = $1 AND paid_at IS NOT NULL ORDER BY paid_at ASC",
+    [clientId],
+  );
+  for (const r of formation) {
+    const p = typeof r.payload === "string" ? JSON.parse(r.payload) : r.payload;
+    for (const n of seriesNames(p)) {
+      names.push(n.toLowerCase().startsWith(llcName.toLowerCase()) ? n : `${llcName} - ${n}`);
+    }
+  }
+  const svc = await db.query<{ type: string; details: unknown }>(
+    `SELECT type, details FROM service_orders
+     WHERE client_id = $1 AND type IN ('series', 'ein') AND status <> 'pending_payment'`,
+    [clientId],
+  );
+  const einSeries = new Set<string>();
+  for (const r of svc) {
+    const d = (typeof r.details === "string" ? JSON.parse(r.details) : r.details) as {
+      seriesName?: string;
+      target?: string;
+    } | null;
+    if (r.type === "series" && d?.seriesName) names.push(d.seriesName);
+    if (r.type === "ein" && d?.target === "series" && d.seriesName) einSeries.add(d.seriesName.trim().toLowerCase());
+  }
+  const seen = new Set<string>();
+  const out: { name: string; einOrdered: boolean }[] = [];
+  for (const n of names) {
+    const k = n.trim().toLowerCase();
+    if (!k || seen.has(k)) continue;
+    seen.add(k);
+    out.push({ name: n.trim(), einOrdered: einSeries.has(k) });
+  }
+  return out;
+}
+
 /** S election package gate: NEW formations we filed, purchasable only through
  *  day 65 after the formation order was paid (the IRS election deadline is
  *  2 months + 15 days — the shorter window leaves time to prepare and mail). */
@@ -1580,7 +1624,7 @@ app.get("/portal/services", async (c) => {
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   await purgeExpiredSElections().catch((e) => console.error("[purge] failed:", e));
   const db = await getDb();
-  const orders = await db.query<{ id: string; type: string; details: unknown; fulfilled_at: unknown }>(
+  const orders = await db.query<{ id: string; type: string; status: string; details: unknown; fulfilled_at: unknown }>(
     `SELECT ${SERVICE_SAFE_COLUMNS} FROM service_orders WHERE client_id = $1 ORDER BY created_at DESC`,
     [session.clientId],
   );
@@ -1598,6 +1642,12 @@ app.get("/portal/services", async (c) => {
         sElectionCents: S_ELECTION_FEE_CENTS,
       },
       sElection: await sElectionEligibility(session.clientId),
+      series: await clientSeries(session.clientId),
+      einCompanyOrdered: orders.some((o) => {
+        if (o.type !== "ein" || o.status === "pending_payment") return false;
+        const d = (typeof o.details === "string" ? JSON.parse(o.details) : o.details) as { target?: string } | null;
+        return (d?.target ?? "company") === "company";
+      }),
       orders: orders.map((o) => {
         if (o.type !== "s-election") return o;
         const d = (typeof o.details === "string" ? JSON.parse(o.details) : o.details) as SElectionStoredDetails;
@@ -1806,6 +1856,17 @@ app.post("/portal/services/ein", async (c) => {
       ),
       400,
     );
+  }
+  // A series target must be one of the client's actual series — the dialog
+  // offers only those, and no hand-made request creates an order for a
+  // series that does not exist.
+  if (target === "series") {
+    const mine = await clientSeries(session.clientId);
+    const match = mine.find((s) => s.name.toLowerCase() === seriesName.toLowerCase());
+    if (!match) return c.json(err("That protected series is not on your account.", "UNKNOWN_SERIES"), 400);
+    if (match.einOrdered) {
+      return c.json(err("An EIN for that protected series is already ordered — see your orders below.", "ALREADY_ORDERED"), 400);
+    }
   }
   const rows = await db.query<{ id: string }>(
     `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents)

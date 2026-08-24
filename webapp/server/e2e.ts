@@ -388,6 +388,31 @@ if (mint.status === 200) {
     dupCompanyEin.status === 400 && dupCompanyEin.body?.error?.code === "ALREADY_ORDERED",
     dupCompanyEin.body,
   );
+  // The dialog offers only the client's real series; the server enforces it.
+  const svcSeries = svc0.body?.data?.series ?? [];
+  check(
+    "services payload lists the client's series with EIN coverage",
+    Array.isArray(svcSeries) && svcSeries.length >= 1 && svcSeries[0].einOrdered === false,
+    svcSeries,
+  );
+  const fakeSeriesEin = await api("/api/portal/services/ein", {
+    method: "POST", cookies: setPw.cookie,
+    body: JSON.stringify({ target: "series", seriesName: "E2E Nonexistent Series, LLC - PS 9" }),
+  });
+  check(
+    "EIN for a series not on the account refused (UNKNOWN_SERIES)",
+    fakeSeriesEin.status === 400 && fakeSeriesEin.body?.error?.code === "UNKNOWN_SERIES",
+    fakeSeriesEin.body,
+  );
+  const realSeriesEin = await api("/api/portal/services/ein", {
+    method: "POST", cookies: setPw.cookie,
+    body: JSON.stringify({ target: "series", seriesName: svcSeries[0]?.name ?? "" }),
+  });
+  check(
+    "EIN for a real series accepted with a checkout link",
+    realSeriesEin.status === 200 && typeof realSeriesEin.body?.data?.checkoutUrl === "string",
+    realSeriesEin.body,
+  );
   const intakeSElection = (svc0.body?.data?.orders ?? []).find(
     (o: { type: string; status: string }) => o.type === "s-election" && o.status === "awaiting_info",
   );

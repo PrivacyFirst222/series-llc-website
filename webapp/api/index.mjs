@@ -109203,6 +109203,42 @@ async function clientLlcName(clientId) {
   );
   return rows[0]?.llc_name ?? "";
 }
+async function clientSeries(clientId) {
+  const db2 = await getDb();
+  const llcName = await clientLlcName(clientId);
+  if (!llcName) return [];
+  const names = [];
+  const formation = await db2.query(
+    "SELECT payload FROM orders WHERE client_id = $1 AND paid_at IS NOT NULL ORDER BY paid_at ASC",
+    [clientId]
+  );
+  for (const r of formation) {
+    const p2 = typeof r.payload === "string" ? JSON.parse(r.payload) : r.payload;
+    for (const n of seriesNames(p2)) {
+      names.push(n.toLowerCase().startsWith(llcName.toLowerCase()) ? n : `${llcName} - ${n}`);
+    }
+  }
+  const svc = await db2.query(
+    `SELECT type, details FROM service_orders
+     WHERE client_id = $1 AND type IN ('series', 'ein') AND status <> 'pending_payment'`,
+    [clientId]
+  );
+  const einSeries = /* @__PURE__ */ new Set();
+  for (const r of svc) {
+    const d2 = typeof r.details === "string" ? JSON.parse(r.details) : r.details;
+    if (r.type === "series" && d2?.seriesName) names.push(d2.seriesName);
+    if (r.type === "ein" && d2?.target === "series" && d2.seriesName) einSeries.add(d2.seriesName.trim().toLowerCase());
+  }
+  const seen = /* @__PURE__ */ new Set();
+  const out = [];
+  for (const n of names) {
+    const k = n.trim().toLowerCase();
+    if (!k || seen.has(k)) continue;
+    seen.add(k);
+    out.push({ name: n.trim(), einOrdered: einSeries.has(k) });
+  }
+  return out;
+}
 async function sElectionEligibility(clientId) {
   const db2 = await getDb();
   const formed = await db2.query(
@@ -109329,6 +109365,12 @@ app.get("/portal/services", async (c) => {
         sElectionCents: S_ELECTION_FEE_CENTS
       },
       sElection: await sElectionEligibility(session.clientId),
+      series: await clientSeries(session.clientId),
+      einCompanyOrdered: orders.some((o) => {
+        if (o.type !== "ein" || o.status === "pending_payment") return false;
+        const d2 = typeof o.details === "string" ? JSON.parse(o.details) : o.details;
+        return (d2?.target ?? "company") === "company";
+      }),
       orders: orders.map((o) => {
         if (o.type !== "s-election") return o;
         const d2 = typeof o.details === "string" ? JSON.parse(o.details) : o.details;
@@ -109499,6 +109541,14 @@ app.post("/portal/services/ein", async (c) => {
       ),
       400
     );
+  }
+  if (target === "series") {
+    const mine = await clientSeries(session.clientId);
+    const match2 = mine.find((s) => s.name.toLowerCase() === seriesName.toLowerCase());
+    if (!match2) return c.json(err2("That protected series is not on your account.", "UNKNOWN_SERIES"), 400);
+    if (match2.einOrdered) {
+      return c.json(err2("An EIN for that protected series is already ordered \u2014 see your orders below.", "ALREADY_ORDERED"), 400);
+    }
   }
   const rows = await db2.query(
     `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents)

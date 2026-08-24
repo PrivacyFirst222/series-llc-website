@@ -66,6 +66,8 @@ interface ServicesData {
     orderBy: string | null;
   };
   orders: ServiceOrder[];
+  series: { name: string; einOrdered: boolean }[];
+  einCompanyOrdered: boolean;
 }
 
 interface ShareholderRow {
@@ -184,14 +186,23 @@ export function ServicesCard() {
   });
 
   const data = servicesQuery.data;
-  // One EIN per entity: paid orders (formation-included or portal) remove
-  // their target from the dialog. Series targets are open-ended, so the card
-  // itself always remains.
-  const paidEinOrders = (data?.orders ?? []).filter((o) => o.type === "ein" && o.status !== "pending_payment");
-  const companyEinTaken = paidEinOrders.some((o) => (o.details.target ?? "company") === "company");
-  const seriesEinNames = paidEinOrders
-    .filter((o) => o.details.target === "series")
-    .map((o) => (o.details.seriesName ?? "").trim().toLowerCase());
+  // The card's four states come from two facts we can actually know — what
+  // was bought through us. LLC EIN: bought or not. Series EINs: bought for
+  // one or more, or never. Where we don't know (nothing bought), wording is
+  // conditional — we never assert an outside LLC's EIN status.
+  const companyEinTaken = data?.einCompanyOrdered === true;
+  const anySeriesEin = (data?.series ?? []).some((s) => s.einOrdered);
+  const openSeries = (data?.series ?? []).filter((s) => !s.einOrdered);
+  // Nothing left to sell: LLC covered and every series covered.
+  const einCardVisible = !companyEinTaken || openSeries.length > 0;
+  const einTitle = companyEinTaken ? "EIN for a Protected Series" : "Get a Federal EIN";
+  const einBlurb = companyEinTaken
+    ? anySeriesEin
+      ? "You've purchased EINs for your LLC and one or more series. Additional series need their own EIN only in limited circumstances."
+      : "You already purchased an EIN for your LLC. A protected series usually does not require its own EIN — needed only in limited circumstances."
+    : anySeriesEin
+      ? "You've purchased an EIN for one or more of your protected series. If your LLC doesn't already have its own EIN, it needs one for bank accounts, tax elections, and W-9s."
+      : "If your LLC doesn't already have an EIN, it needs one for bank accounts, tax elections, and W-9s. A protected series usually does not require its own.";
   if (!data) return null;
 
   return (
@@ -265,6 +276,7 @@ export function ServicesCard() {
         </Dialog>
 
         {/* EIN */}
+        {einCardVisible ? (
         <Dialog open={einOpen} onOpenChange={(v) => { setEinOpen(v); setError(""); }}>
           <DialogTrigger asChild>
             <button
@@ -273,28 +285,38 @@ export function ServicesCard() {
             >
               <div className="flex items-center gap-2 text-trust">
                 <Landmark className="h-4 w-4" />
-                <span className="text-sm font-medium text-foreground">Get a Federal EIN</span>
+                <span className="text-sm font-medium text-foreground">{einTitle}</span>
               </div>
-              <p className="mt-1 text-xs text-muted-foreground">
-                {companyEinTaken
-                  ? "Your LLC's EIN is already ordered. Series EINs are needed only in limited circumstances."
-                  : "For the LLC or, in limited circumstances, a protected series. Details are collected through a secure form after checkout."}
-              </p>
+              <p className="mt-1 text-xs text-muted-foreground">{einBlurb}</p>
               <p className="mt-2 font-display text-lg text-trust">{money(data.pricing.einCents)}</p>
             </button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Get a Federal EIN</DialogTitle>
+              <DialogTitle>{einTitle}</DialogTitle>
               <DialogDescription asChild>
                 <div className="space-y-2 text-left">
+                  {companyEinTaken ? (
+                    <p>
+                      <strong className="text-foreground">
+                        You already purchased an EIN for your LLC.
+                      </strong>{" "}
+                      This was an important step as it is necessary for opening bank accounts, tax
+                      reporting and tax elections, and completing requested W-9s.
+                    </p>
+                  ) : (
+                    <p>
+                      <strong className="text-foreground">
+                        If your LLC does not already have an EIN, it needs one
+                      </strong>{" "}
+                      — it is necessary for opening bank accounts, tax reporting and tax
+                      elections, and completing requested W-9s.
+                    </p>
+                  )}
                   <p>
-                    <strong className="text-foreground">Your LLC needs an EIN</strong> — for its
-                    bank account, tax elections, and W-9s.
-                    {companyEinTaken ? " Yours is already ordered." : ""}
-                  </p>
-                  <p>
-                    <strong className="text-foreground">A protected series usually does not.</strong>{" "}
+                    <strong className="text-foreground">
+                      A protected series usually does not require its own EIN.
+                    </strong>{" "}
                     Every series is wholly owned by your LLC, so the IRS disregards it — a series
                     never files its own tax return, with or without an EIN. The only income tax
                     return in the structure is the LLC's own. A series needs its own EIN only in
@@ -319,12 +341,9 @@ export function ServicesCard() {
               onSubmit={(e) => {
                 e.preventDefault();
                 const fd = new FormData(e.currentTarget);
-                const target = String(fd.get("target") ?? "company") as "company" | "series";
-                const sn = String(fd.get("seriesName") ?? "").trim();
-                if (target === "series" && seriesEinNames.includes(sn.toLowerCase())) {
-                  setError("An EIN for that protected series is already ordered — see your orders below.");
-                  return;
-                }
+                const target = companyEinTaken
+                  ? "series"
+                  : (String(fd.get("target") ?? "company") as "company" | "series");
                 orderEin.mutate({
                   target,
                   seriesName: target === "series" ? String(fd.get("seriesName") ?? "") : undefined,
@@ -338,22 +357,31 @@ export function ServicesCard() {
                     For the LLC: {data.llcName || "your LLC"}
                   </label>
                 ) : null}
-                <label className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name="target"
-                    value="series"
-                    defaultChecked={companyEinTaken}
-                    className="accent-trust"
-                  />
-                  For a protected series:
-                </label>
-                <Input
-                  name="seriesName"
-                  placeholder={`${data.llcName} - PS 1`}
-                  className="ml-6 w-[calc(100%-1.5rem)]"
-                  autoComplete="off"
-                />
+                {openSeries.length > 0 ? (
+                  <>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        name="target"
+                        value="series"
+                        defaultChecked={companyEinTaken}
+                        className="accent-trust"
+                      />
+                      For a protected series:
+                    </label>
+                    <select
+                      name="seriesName"
+                      defaultValue={openSeries[0]?.name}
+                      className="ml-6 flex h-10 w-[calc(100%-1.5rem)] rounded-md border border-input bg-background px-3 text-sm"
+                    >
+                      {openSeries.map((s) => (
+                        <option key={s.name} value={s.name}>
+                          {s.name}
+                        </option>
+                      ))}
+                    </select>
+                  </>
+                ) : null}
               </div>
               {error ? <p className="text-xs text-destructive">{error}</p> : null}
               <DialogFooter>
@@ -364,6 +392,7 @@ export function ServicesCard() {
             </form>
           </DialogContent>
         </Dialog>
+        ) : null}
 
         {/* S corporation election — only inside the post-formation window */}
         {data.sElection.eligible ? (
