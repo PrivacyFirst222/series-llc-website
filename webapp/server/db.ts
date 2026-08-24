@@ -172,6 +172,8 @@ ALTER TABLE documents ADD COLUMN IF NOT EXISTS order_id uuid REFERENCES orders(i
 -- Florida's distinguishability rules (nameSimilarity.normalizeEntityName);
 -- two names conflict when their keys match. Loaded from the quarterly
 -- baseline, topped up nightly from the daily files (server/sunbiz.ts).
+ALTER TABLE library_documents ADD COLUMN IF NOT EXISTS meta jsonb NOT NULL DEFAULT '{}'::jsonb;
+
 CREATE TABLE IF NOT EXISTS fl_entities (
   doc_number text PRIMARY KEY,
   name text NOT NULL,

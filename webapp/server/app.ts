@@ -31,6 +31,8 @@ import { assembleOa, oaVersion, OA_TEMPLATE_VERSION, type OaInputs } from "./oa"
 import { renderMarkdownPdf, stampExistingPdf } from "./pdf-render";
 import { createSession, getSession, destroySession, rateLimit, clientIp } from "./auth";
 import { checkName, getSyncState, syncDailies, unavailableNames } from "./sunbiz";
+import { createHash } from "node:crypto";
+import ownersManualMd from "../../docs/owners-manual.md";
 import { deleteFile, putFile, readFileStream } from "./storage";
 import {
   sendMail,
@@ -1358,6 +1360,50 @@ app.get("/portal/library/:key/download", async (c) => {
       "Cache-Control": "private, no-store",
     },
   });
+});
+
+/** Renders the Owner's Manual PDF from the markdown master bundled with
+ *  this deployment and publishes it to the client library. Hash-gated: a
+ *  deployment whose manual is unchanged publishes nothing. This is what
+ *  keeps "always the latest edition" true — the nightly cron calls it, and
+ *  the admin Library section has a button for right-now. */
+async function refreshOwnersManual(force = false): Promise<{ published: boolean; pages?: number; edition?: string }> {
+  const hash = createHash("sha256").update(ownersManualMd).digest("hex").slice(0, 16);
+  const db = await getDb();
+  const rows = await db.query<{ meta: unknown }>(
+    "SELECT meta FROM library_documents WHERE key = 'owners-manual'",
+  );
+  const meta = rows[0] ? ((typeof rows[0].meta === "string" ? JSON.parse(rows[0].meta) : rows[0].meta) as { hash?: string }) : null;
+  if (!force && meta?.hash === hash) return { published: false };
+  const { renderManualPdf } = await import("./manual-pdf");
+  const { pdf, pages, edition } = await renderManualPdf(ownersManualMd);
+  const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength) as ArrayBuffer;
+  const stored = await putFile("owners-manual.pdf", buf, "application/pdf");
+  await db.query(
+    `INSERT INTO library_documents (key, title, edition, storage_key, content_type, size_bytes, meta, updated_at)
+     VALUES ('owners-manual', $1, $2, $3, 'application/pdf', $4, $5, now())
+     ON CONFLICT (key) DO UPDATE SET title = $1, edition = $2, storage_key = $3,
+       content_type = 'application/pdf', size_bytes = $4, meta = $5, updated_at = now()`,
+    ["Series LLC Owner's Manual", edition, stored.storageKey, stored.sizeBytes, JSON.stringify({ hash, pages })],
+  );
+  return { published: true, pages, edition };
+}
+
+app.post("/admin/library/owners-manual/regenerate", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const r = await refreshOwnersManual(true);
+  return c.json({ data: r });
+});
+
+/** Nightly: republish the manual if this deployment carries a newer master. */
+app.get("/cron/library-refresh", async (c) => {
+  const auth = c.req.header("authorization") ?? "";
+  const secret = env.CRON_SECRET;
+  if (secret && auth !== `Bearer ${secret}`) return c.json(err("Not authorized", "UNAUTHENTICATED"), 401);
+  if (!secret && env.isProd) return c.json(err("Not authorized", "UNAUTHENTICATED"), 401);
+  const r = await refreshOwnersManual(false);
+  return c.json({ data: r });
 });
 
 app.post("/admin/library/:key", async (c) => {

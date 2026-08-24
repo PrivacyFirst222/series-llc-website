@@ -611,6 +611,21 @@ if (mint.status === 200) {
   const dl = await fetch(`${BASE}/api/portal/library/owners-manual/download`, { headers: { Cookie: setPw.cookie } });
   const dlBytes = new Uint8Array(await dl.arrayBuffer());
   check("manual downloads stamped as PDF", dl.ok && dlBytes[0] === 0x25 && dlBytes[1] === 0x50, { status: dl.status, len: dlBytes.length });
+  // The stub above just proved upload works — it must never be what clients
+  // see. Regenerating from the master replaces it with the real manual, so
+  // the suite leaves the library HEALED, not clobbered (the defect behind
+  // every client downloading a 199-byte blank since Aug 6).
+  const regen = await api("/api/admin/library/owners-manual/regenerate", {
+    method: "POST", cookies: adminLogin2.cookie,
+  });
+  check("manual regenerates from the master", regen.status === 200 && regen.body?.data?.published === true, regen.body);
+  const realDl = await fetch(`${BASE}/api/portal/library/owners-manual/download`, { headers: { Cookie: setPw.cookie } });
+  const realBytes = new Uint8Array(await realDl.arrayBuffer());
+  check(
+    "client now downloads the real manual (multi-page PDF, not the stub)",
+    realDl.ok && realBytes[0] === 0x25 && realBytes.length > 100_000,
+    { status: realDl.status, len: realBytes.length },
+  );
 
   // 14. EIN fulfillment requires the IRS letter; fulfilling deletes the TIN
   const noLetter = await api(`/api/admin/services/${intakeEin.id}/fulfill`, {

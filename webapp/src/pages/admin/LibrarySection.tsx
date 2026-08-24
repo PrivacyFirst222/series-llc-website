@@ -53,6 +53,21 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
     onError: (e) => setMessage((e as Error).message),
   });
 
+  const regenerate = useMutation({
+    mutationFn: () => api.post<{ published: boolean; pages?: number; edition?: string }>(
+      "/api/admin/library/owners-manual/regenerate", {},
+    ),
+    onSuccess: (r) => {
+      setMessage(
+        r.published
+          ? `Regenerated from the master — ${r.pages} pages, "${r.edition}". Every client's next download is this edition.`
+          : "Already current — the published manual matches the master.",
+      );
+      queryClient.invalidateQueries({ queryKey: ["portal-library"] });
+    },
+    onError: (e) => setMessage((e as Error).message),
+  });
+
   const manual = (libraryQuery.data ?? []).find((d) => d.key === "owners-manual");
 
   return (
@@ -93,6 +108,16 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
             onClick={() => upload.mutate()}
           >
             {upload.isPending ? "Publishing…" : manual ? "Replace edition" : "Publish"}
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="rounded-full"
+            disabled={regenerate.isPending}
+            onClick={() => regenerate.mutate()}
+          >
+            {regenerate.isPending ? "Rendering…" : "Regenerate from the master"}
           </Button>
         </div>
         {message ? <p className="mt-2 text-xs text-muted-foreground">{message}</p> : null}
