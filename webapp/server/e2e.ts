@@ -455,20 +455,57 @@ if (mint.status === 200) {
   const paidSeries = (svc1.body?.data?.orders ?? []).find((o: { id: string }) => o.id === seriesId);
   check("paid series order is in_progress", paidSeries?.status === "in_progress", paidSeries);
 
-  // 13. Submit EIN details securely; verify encryption round-trip via admin
-  const einDetails = await api(`/api/portal/services/${intakeEin.id}/ein-details`, {
-    method: "POST", cookies: setPw.cookie,
-    body: JSON.stringify({ responsibleName: "Casey Member", tin: "123-45-6789", certified: true }),
+  // 13. EIN details: gated until formed, then the full SS-4 ledger payload
+  const einPayload = {
+    responsibleFirst: "Casey",
+    responsibleMiddle: "",
+    responsibleLast: "Member",
+    responsibleSuffix: "",
+    tin: "123-45-6789",
+    phone: "555-555-0100",
+    county: "Orange",
+    activity: "Real estate",
+    activityDetail: "residential rental real estate",
+    employeesExpected: false,
+    closingMonth: "December",
+    exciseApplies: false,
+    certified: true,
+  };
+  const einBeforeFormed = await api(`/api/portal/services/${intakeEin.id}/ein-details`, {
+    method: "POST", cookies: setPw.cookie, body: JSON.stringify(einPayload),
   });
-  check("EIN details accepted", einDetails.status === 200, einDetails.body);
+  check(
+    "EIN details refused before the LLC is formed (NOT_FORMED)",
+    einBeforeFormed.status === 400 && einBeforeFormed.body?.error?.code === "NOT_FORMED",
+    einBeforeFormed.body,
+  );
+  // Mark the order formed the only way the system allows: the formation
+  // documents upload (articles + a designation covering every series).
+  const adminLoginF = await adminSession();
+  const formFd = new FormData();
+  formFd.set("articles", new File([new TextEncoder().encode("%PDF-1.4 e2e articles")], "articles.pdf", { type: "application/pdf" }));
+  formFd.append("psd", new File([new TextEncoder().encode("%PDF-1.4 e2e psd")], "psd.pdf", { type: "application/pdf" }));
+  formFd.append("psdSeries", JSON.stringify(["E2E Coastal Holdings, LLC, PS A"]));
+  const formedRes = await fetch(`${BASE}/api/admin/orders/${orderId}/formation-documents`, {
+    method: "POST", headers: { Cookie: adminLoginF.cookie }, body: formFd,
+  });
+  check("order marked formed via formation documents", formedRes.ok, await formedRes.clone().json().catch(() => null));
+  const einDetails = await api(`/api/portal/services/${intakeEin.id}/ein-details`, {
+    method: "POST", cookies: setPw.cookie, body: JSON.stringify(einPayload),
+  });
+  check("EIN details accepted with the full SS-4 ledger payload", einDetails.status === 200, einDetails.body);
   const einUncertified = await api(`/api/portal/services/${intakeEin.id}/ein-details`, {
     method: "POST", cookies: setPw.cookie,
-    body: JSON.stringify({ responsibleName: "Casey Member", tin: "123-45-6789" }),
+    body: JSON.stringify({ ...einPayload, certified: undefined }),
   });
   check("EIN details without the certification rejected", einUncertified.status === 400, einUncertified.body);
-  const einAgain = await api(`/api/portal/services/${intakeEin.id}/ein-details`, {
+  const einIncomplete = await api(`/api/portal/services/${intakeEin.id}/ein-details`, {
     method: "POST", cookies: setPw.cookie,
-    body: JSON.stringify({ responsibleName: "X", tin: "999999999", certified: true }),
+    body: JSON.stringify({ ...einPayload, county: "" }),
+  });
+  check("EIN details without the county rejected", einIncomplete.status === 400, einIncomplete.body);
+  const einAgain = await api(`/api/portal/services/${intakeEin.id}/ein-details`, {
+    method: "POST", cookies: setPw.cookie, body: JSON.stringify(einPayload),
   });
   check("EIN details cannot be resubmitted", einAgain.status === 400);
 
@@ -704,6 +741,18 @@ if (mint.status === 200) {
     body: JSON.stringify({ token: mMint.body?.data?.token, password: "e2e-password-2" }),
   });
   check("couple client signs in", mPw.status === 200);
+  // The S-election details are gated on formed — form this LLC first.
+  {
+    const adminF2 = await adminSession();
+    const fd2 = new FormData();
+    fd2.set("articles", new File([new TextEncoder().encode("%PDF-1.4 e2e articles couple")], "articles.pdf", { type: "application/pdf" }));
+    fd2.append("psd", new File([new TextEncoder().encode("%PDF-1.4 e2e psd couple")], "psd.pdf", { type: "application/pdf" }));
+    fd2.append("psdSeries", JSON.stringify(["E2E Coastal Holdings, LLC, PS A"]));
+    const formed2 = await fetch(`${BASE}/api/admin/orders/${mOrderId}/formation-documents`, {
+      method: "POST", headers: { Cookie: adminF2.cookie }, body: fd2,
+    });
+    check("couple order marked formed", formed2.ok, await formed2.clone().json().catch(() => null));
+  }
   const mSeed = await api("/api/portal/oa", { cookies: mPw.cookie });
   check("multi OA seed has 2 members", mSeed.body?.data?.version === "multi" && mSeed.body?.data?.multiOwner === true && mSeed.body?.data?.seed?.members?.length === 2, mSeed.body?.data);
   const coupleAnswers = {

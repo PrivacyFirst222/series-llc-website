@@ -68,6 +68,7 @@ interface ServicesData {
   orders: ServiceOrder[];
   series: { name: string; einOrdered: boolean }[];
   einCompanyOrdered: boolean;
+  llcFormed: boolean;
 }
 
 interface ShareholderRow {
@@ -110,6 +111,10 @@ export function ServicesCard() {
   const [einOpen, setEinOpen] = useState(false);
   const [sElectionOpen, setSElectionOpen] = useState(false);
   const [detailsFor, setDetailsFor] = useState<ServiceOrder | null>(null);
+  // Before the LLC is formed, the detail buttons explain instead of collect.
+  const [formedGateFor, setFormedGateFor] = useState<"ein" | "s-election" | null>(null);
+  const [einEmployees, setEinEmployees] = useState(false);
+  const [einExcise, setEinExcise] = useState(false);
   const [einCertified, setEinCertified] = useState(false);
   const [error, setError] = useState<string>("");
 
@@ -147,13 +152,8 @@ export function ServicesCard() {
   });
 
   const submitDetails = useMutation({
-    mutationFn: (args: { id: string; responsibleName: string; tin: string; note?: string }) =>
-      api.post(`/api/portal/services/${args.id}/ein-details`, {
-        responsibleName: args.responsibleName,
-        tin: args.tin,
-        note: args.note,
-        certified: true,
-      }),
+    mutationFn: (args: { id: string; payload: Record<string, unknown> }) =>
+      api.post(`/api/portal/services/${args.id}/ein-details`, { ...args.payload, certified: true }),
     onSuccess: () => {
       setDetailsFor(null);
       refresh();
@@ -500,7 +500,14 @@ export function ServicesCard() {
                     size="sm"
                     variant="outline"
                     className="rounded-full"
-                    onClick={() => { setDetailsFor(o); setError(""); }}
+                    onClick={() => {
+                      if (!data.llcFormed && (o.type === "ein" || o.type === "s-election")) {
+                        setFormedGateFor(o.type);
+                        return;
+                      }
+                      setDetailsFor(o);
+                      setError("");
+                    }}
                   >
                     Edit answers
                   </Button>
@@ -509,7 +516,14 @@ export function ServicesCard() {
                   <Button
                     size="sm"
                     className="rounded-full"
-                    onClick={() => { setDetailsFor(o); setError(""); }}
+                    onClick={() => {
+                      if (!data.llcFormed && (o.type === "ein" || o.type === "s-election")) {
+                        setFormedGateFor(o.type);
+                        return;
+                      }
+                      setDetailsFor(o);
+                      setError("");
+                    }}
                   >
                     <Lock className="mr-1.5 h-3.5 w-3.5" />
                     Provide details securely
@@ -634,19 +648,49 @@ export function ServicesCard() {
         </DialogContent>
       </Dialog>
 
-      {/* Secure EIN details dialog */}
-      <Dialog
-        open={detailsFor !== null && detailsFor.type === "ein"}
-        onOpenChange={(v) => { if (!v) { setDetailsFor(null); setEinCertified(false); } }}
-      >
+      {/* Formed-first gate: the IRS processes don't exist for an unformed LLC */}
+      <Dialog open={formedGateFor !== null} onOpenChange={(v) => { if (!v) setFormedGateFor(null); }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Responsible party details</DialogTitle>
+            <DialogTitle>Your LLC must be formed first.</DialogTitle>
+            <DialogDescription asChild>
+              <div className="space-y-2 text-left">
+                {formedGateFor === "ein" ? (
+                  <p>
+                    An EIN can be obtained only for a company that exists. The IRS application is
+                    built on your filed Articles of Organization. We're preparing your filing now.
+                    You'll get an email when your LLC is formed. You'll be able to complete the EIN
+                    application form at that time.
+                  </p>
+                ) : (
+                  <p>
+                    An S corporation election can be made only for a company that exists and that
+                    has been assigned an EIN. IRS Form 2553 is built on your filed Articles, and
+                    your formation date is what starts the IRS's election window. You'll get an
+                    email when your LLC is formed. You'll be able to complete the S election form
+                    at that time.
+                  </p>
+                )}
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+
+      {/* Secure EIN details dialog — collects everything the IRS application
+          asks that the formation record cannot answer (SS-4 ledger). */}
+      <Dialog
+        open={detailsFor !== null && detailsFor.type === "ein"}
+        onOpenChange={(v) => { if (!v) { setDetailsFor(null); setEinCertified(false); setEinEmployees(false); setEinExcise(false); } }}
+      >
+        <DialogContent className="max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>EIN application details</DialogTitle>
             <DialogDescription>
-              The IRS requires a responsible party for {detailsFor ? summaryOf(detailsFor) : ""}.
-              This form is transmitted over your secure portal session; the identification number
-              is encrypted, used only to prepare IRS Form SS-4, and deleted from our systems when
-              your EIN is issued.
+              We use this to complete the IRS EIN application for{" "}
+              {detailsFor ? summaryOf(detailsFor) : ""}. This form is transmitted over your secure
+              portal session; the identification number is encrypted, used only for the IRS
+              application, and deleted from our systems when your EIN is issued.
             </DialogDescription>
           </DialogHeader>
           <form
@@ -655,26 +699,131 @@ export function ServicesCard() {
               e.preventDefault();
               if (!detailsFor) return;
               const fd = new FormData(e.currentTarget);
+              const num = (k: string) => Number(String(fd.get(k) ?? "0")) || 0;
               submitDetails.mutate({
                 id: detailsFor.id,
-                responsibleName: String(fd.get("responsibleName") ?? ""),
-                tin: String(fd.get("tin") ?? ""),
-                note: String(fd.get("note") ?? "") || undefined,
+                payload: {
+                  responsibleFirst: String(fd.get("responsibleFirst") ?? ""),
+                  responsibleMiddle: String(fd.get("responsibleMiddle") ?? ""),
+                  responsibleLast: String(fd.get("responsibleLast") ?? ""),
+                  responsibleSuffix: String(fd.get("responsibleSuffix") ?? ""),
+                  tin: String(fd.get("tin") ?? ""),
+                  phone: String(fd.get("phone") ?? ""),
+                  county: String(fd.get("county") ?? ""),
+                  activity: String(fd.get("activity") ?? "Real estate"),
+                  activityDetail: String(fd.get("activityDetail") ?? ""),
+                  employeesExpected: einEmployees,
+                  employeeCountOther: num("employeeCountOther"),
+                  employeeCountAg: num("employeeCountAg"),
+                  employeeCountHousehold: num("employeeCountHousehold"),
+                  firstWageDate: String(fd.get("firstWageDate") ?? ""),
+                  form944Annual: fd.get("form944Annual") === "on",
+                  closingMonth: String(fd.get("closingMonth") ?? "December"),
+                  exciseApplies: einExcise,
+                  exciseDetail: String(fd.get("exciseDetail") ?? ""),
+                },
               });
             }}
           >
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">Responsible party's full legal name</label>
-              <Input name="responsibleName" autoComplete="off" />
+            <p className="text-sm font-medium">Responsible party — must match IRS records</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium">First name</label>
+                <Input name="responsibleFirst" autoComplete="off" />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium">Last name</label>
+                <Input name="responsibleLast" autoComplete="off" />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium">Middle name/initial (optional)</label>
+                <Input name="responsibleMiddle" autoComplete="off" />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium">Suffix (optional)</label>
+                <Input name="responsibleSuffix" placeholder="Jr, Sr, III…" autoComplete="off" />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium">SSN or ITIN (9 digits)</label>
+                <Input name="tin" type="password" inputMode="numeric" autoComplete="off" placeholder="•••-••-••••" />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium">Phone for IRS questions</label>
+                <Input name="phone" inputMode="tel" autoComplete="off" />
+              </div>
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium">SSN or ITIN (9 digits)</label>
-              <Input name="tin" type="password" inputMode="numeric" autoComplete="off" placeholder="•••-••-••••" />
+              <label className="text-sm font-medium">County of the LLC's principal address</label>
+              <Input name="county" placeholder="e.g., Orange" autoComplete="off" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium">Principal activity</label>
+                <select name="activity" defaultValue="Real estate" className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
+                  {["Real estate", "Rental & leasing", "Construction", "Retail", "Finance & insurance", "Health care & social assistance", "Accommodation & food service", "Transportation & warehousing", "Manufacturing", "Wholesale", "Other"].map((a) => (
+                    <option key={a} value={a}>{a}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium">Closing month of accounting year</label>
+                <select name="closingMonth" defaultValue="December" className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
+                  {["January","February","March","April","May","June","July","August","September","October","November","December"].map((m) => (
+                    <option key={m} value={m}>{m}</option>
+                  ))}
+                </select>
+              </div>
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium">Note (optional)</label>
-              <Input name="note" autoComplete="off" />
+              <label className="text-sm font-medium">What the business does, in a few words</label>
+              <Input name="activityDetail" placeholder='e.g., "residential rental real estate"' autoComplete="off" />
             </div>
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" checked={einEmployees} onChange={(e) => setEinEmployees(e.target.checked)} className="h-4 w-4 accent-trust" />
+              The LLC expects to have employees in the next 12 months
+            </label>
+            {einEmployees ? (
+              <div className="space-y-3 rounded-lg border border-border bg-secondary/40 p-3">
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium">Employees (general)</label>
+                    <Input name="employeeCountOther" inputMode="numeric" defaultValue="1" autoComplete="off" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium">Agricultural</label>
+                    <Input name="employeeCountAg" inputMode="numeric" defaultValue="0" autoComplete="off" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium">Household</label>
+                    <Input name="employeeCountHousehold" inputMode="numeric" defaultValue="0" autoComplete="off" />
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium">First date wages will be paid</label>
+                  <Input name="firstWageDate" type="date" autoComplete="off" />
+                </div>
+                <label className="flex items-start gap-2 text-xs leading-relaxed">
+                  <input type="checkbox" name="form944Annual" className="mt-0.5 h-4 w-4 shrink-0 accent-trust" />
+                  Expect $1,000 or less in employment tax for a full year (roughly $5,000 or less
+                  in total wages)? Check to ask the IRS for annual filing (Form 944) instead of
+                  quarterly (Form 941).
+                </label>
+              </div>
+            ) : null}
+            <label className="flex items-start gap-2 text-sm leading-relaxed">
+              <input type="checkbox" checked={einExcise} onChange={(e) => setEinExcise(e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-trust" />
+              <span>
+                The business operates heavy highway vehicles (55,000 lbs+), involves gambling,
+                sells or manufactures alcohol, tobacco, or firearms, or expects to file federal
+                excise tax returns
+              </span>
+            </label>
+            {einExcise ? (
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium">Which of those applies?</label>
+                <Input name="exciseDetail" autoComplete="off" />
+              </div>
+            ) : null}
             <label className="flex items-start gap-2.5 rounded-lg border border-border bg-secondary/40 p-3">
               <input
                 type="checkbox"

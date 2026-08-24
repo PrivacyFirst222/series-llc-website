@@ -109898,6 +109898,7 @@ Practical rules:
 **Is each protected series a separate LLC?** No \u2014 one legal entity total. Each series is a legal "person" that acts in its own name, but it cannot exist apart from the company.
 **How many series can I have?** No statutory limit. Each is a $25 online filing plus a Series Exhibit \u2014 and, more importantly, a silo you must actually maintain. Add series for real compartments, not for sport.
 **Can series be added or removed later?** Yes \u2014 designate new ones any time (all members must consent), and dissolve one without touching the rest (Section 26).
+**I sold the rental property in one of my series. I'm buying a new rental \u2014 can I reuse the empty series and title the new property in it?** Don't. Reusing a series is a bad idea, because a series keeps its liability history long after its asset is gone \u2014 nothing in Florida law forbids the reuse; the problem is what comes with it. A tenant injured during your years of ownership, a deposit dispute, a contractor's unpaid claim, a buyer alleging the roof was misrepresented or that termite damage was undisclosed \u2014 claims like these belong to *that series*, they can be filed years after the closing, and a judgment on any of them reaches whatever the series owns **at the time the creditor enforces** (s. 605.2404 tests association at enforcement, not just when the liability arose). Title the new property into the old series and you have staked your new investment against the old property's unknown past \u2014 the clean compartment you paid for is gone exactly where you need it most. A fresh series costs $25 and gives the new property the one thing the structure exists to provide: a silo with no history. The same logic applies to the sale proceeds: don't leave them parked in the old series, where the old property's tail can reach them \u2014 distribute them up to the company, documented, and fund the new purchase into the new series as a recorded contribution (Section 10). Keep the old series alive and empty until you and your advisor are satisfied its exposure has passed, then dissolve it (Section 26) \u2014 and never reuse its name or ledger (the same rule Section 26 already gives you).
 **Does each series need its own registered agent?** No \u2014 the company's agent automatically serves every series. One agent, one fee.
 **Do my series file their own annual reports?** No. The company files one report; the state auto-lists your series on it.
 **Do I really need a separate bank account for every series?** Yes. It is the cheapest, strongest association evidence there is \u2014 and the alternative (commingling) is the most common way the shield dies.
@@ -111584,6 +111585,14 @@ async function clientLlcName(clientId) {
   );
   return rows[0]?.llc_name ?? "";
 }
+async function clientLlcFormed(clientId) {
+  const db2 = await getDb();
+  const rows = await db2.query(
+    "SELECT 1 AS ok FROM orders WHERE client_id = $1 AND formed_at IS NOT NULL LIMIT 1",
+    [clientId]
+  );
+  return rows.length > 0;
+}
 async function clientSeries(clientId) {
   const db2 = await getDb();
   const llcName = await clientLlcName(clientId);
@@ -111747,6 +111756,7 @@ app.get("/portal/services", async (c) => {
       },
       sElection: await sElectionEligibility(session.clientId),
       series: await clientSeries(session.clientId),
+      llcFormed: await clientLlcFormed(session.clientId),
       einCompanyOrdered: orders.some((o) => {
         if (o.type !== "ein" || o.status === "pending_payment") return false;
         const d2 = typeof o.details === "string" ? JSON.parse(o.details) : o.details;
@@ -111959,12 +111969,57 @@ app.post("/portal/services/ein", async (c) => {
   return c.json({ data: { serviceOrderId, checkoutUrl: checkout.url, totalCents: EIN_FEE_CENTS } });
 });
 var einDetailsSchema = external_exports.object({
-  responsibleName: external_exports.string().min(1, "The responsible party's name is required.").max(200),
+  responsibleFirst: external_exports.string().min(1, "The responsible party's first name is required.").max(100),
+  responsibleMiddle: external_exports.string().max(100).optional().default(""),
+  responsibleLast: external_exports.string().min(1, "The responsible party's last name is required.").max(100),
+  responsibleSuffix: external_exports.string().max(10).optional().default(""),
   tin: external_exports.string().transform((s) => s.replace(/[\s-]/g, "")).refine((s) => /^\d{9}$/.test(s), "Enter a 9-digit SSN or ITIN."),
-  note: external_exports.string().max(1e3).optional(),
+  phone: external_exports.string().min(7, "A phone number for IRS questions is required.").max(40),
+  county: external_exports.string().min(2, "The county of the LLC's principal address is required.").max(60),
+  activity: external_exports.enum([
+    "Real estate",
+    "Rental & leasing",
+    "Construction",
+    "Retail",
+    "Finance & insurance",
+    "Health care & social assistance",
+    "Accommodation & food service",
+    "Transportation & warehousing",
+    "Manufacturing",
+    "Wholesale",
+    "Other"
+  ]),
+  activityDetail: external_exports.string().min(3, 'Describe the products or services in a few words \u2014 e.g. "residential rental real estate."').max(200),
+  employeesExpected: external_exports.boolean(),
+  employeeCountOther: external_exports.number().int().min(0).max(9999).optional().default(0),
+  employeeCountAg: external_exports.number().int().min(0).max(9999).optional().default(0),
+  employeeCountHousehold: external_exports.number().int().min(0).max(9999).optional().default(0),
+  firstWageDate: external_exports.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().or(external_exports.literal("")).default(""),
+  form944Annual: external_exports.boolean().optional().default(false),
+  closingMonth: external_exports.enum([
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+  ]),
+  exciseApplies: external_exports.boolean(),
+  exciseDetail: external_exports.string().max(300).optional().default(""),
   certified: external_exports.literal(true, {
     errorMap: () => ({ message: "You must confirm the certification before submitting." })
   })
+}).refine(
+  (d2) => !d2.employeesExpected || d2.firstWageDate !== "" && d2.employeeCountOther + d2.employeeCountAg + d2.employeeCountHousehold > 0,
+  { message: "With employees expected, enter the expected count and the first date wages will be paid." }
+).refine((d2) => !d2.exciseApplies || d2.exciseDetail.trim().length > 0, {
+  message: "Tell us which of the special activities applies."
 });
 app.post("/portal/services/:id/ein-details", async (c) => {
   const session = await getSession(c);
@@ -111985,12 +112040,32 @@ app.post("/portal/services/:id/ein-details", async (c) => {
   if (so2.type !== "ein" || so2.status !== "awaiting_info") {
     return c.json(err2("This order is not awaiting details.", "BAD_STATE"), 400);
   }
+  if (!await clientLlcFormed(session.clientId)) {
+    return c.json(err2("Your LLC must be formed before an EIN can be obtained.", "NOT_FORMED"), 400);
+  }
   const details = typeof so2.details === "string" ? JSON.parse(so2.details) : so2.details;
+  const d2 = body.data;
   const merged = {
     ...details,
-    responsibleName: body.data.responsibleName,
-    tinLast4: body.data.tin.slice(-4),
-    note: body.data.note ?? "",
+    responsibleName: [d2.responsibleFirst, d2.responsibleMiddle, d2.responsibleLast, d2.responsibleSuffix].filter(Boolean).join(" "),
+    responsibleFirst: d2.responsibleFirst,
+    responsibleMiddle: d2.responsibleMiddle,
+    responsibleLast: d2.responsibleLast,
+    responsibleSuffix: d2.responsibleSuffix,
+    phone: d2.phone,
+    county: d2.county,
+    activity: d2.activity,
+    activityDetail: d2.activityDetail,
+    employeesExpected: d2.employeesExpected,
+    employeeCountOther: d2.employeeCountOther,
+    employeeCountAg: d2.employeeCountAg,
+    employeeCountHousehold: d2.employeeCountHousehold,
+    firstWageDate: d2.firstWageDate,
+    form944Annual: d2.form944Annual,
+    closingMonth: d2.closingMonth,
+    exciseApplies: d2.exciseApplies,
+    exciseDetail: d2.exciseDetail,
+    tinLast4: d2.tin.slice(-4),
     certifiedAt: (/* @__PURE__ */ new Date()).toISOString()
   };
   await db2.query(
@@ -112041,6 +112116,9 @@ var sElectionDetailsSchema = external_exports.object({
 app.post("/portal/services/:id/s-election-details", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err2("Not signed in", "UNAUTHENTICATED"), 401);
+  if (!await clientLlcFormed(session.clientId)) {
+    return c.json(err2("Your LLC must be formed before an S election can be made.", "NOT_FORMED"), 400);
+  }
   const body = sElectionDetailsSchema.safeParse(await c.req.json().catch(() => null));
   if (!body.success) {
     return c.json(err2(body.error.issues[0]?.message ?? "Invalid details.", "INVALID_INPUT"), 400);

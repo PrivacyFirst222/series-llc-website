@@ -110,6 +110,31 @@ recordable:
 
 When it is unclear whether something was an insult, write the entry.
 
+## Success is defined by the consumer of the output, never by its producer
+
+**Before building anything whose output feeds a real-world process — a form,
+a filing, a document, an application — open that process's own source and
+write the objective ledger: every requirement the external process imposes,
+mapped line by line to where it is satisfied. The build is measured against
+the ledger; my tests only ever measure the build.**
+
+The failure this prevents: I define success as the artifact passing its
+checks, and I write the checks — so the artifact is always exactly as
+complete as my imagination of the domain. The EIN form encrypted, masked,
+and destroyed an SSN flawlessly and could not obtain an EIN, because the
+IRS application it feeds asks eighteen things and the form collected three
+(FAILURES.md P39-P40). The gap was invisible to every test because every
+test was mine; it was visible in thirty seconds to anyone holding the SS-4.
+
+The ledger's external column comes from the opened source — the application
+walked, the statute read, the bank's checklist in hand — never from memory.
+It is written **before** building and re-verified against the finished
+artifact, with the count stated: "SS-4 imposes 18 requirements; 10 satisfied
+from the formation record, 8 collected by the form — 18 of 18."
+
+**Adam: a feature proposal that does not open with its objective ledger has
+not been checked against reality. Reject it unread.**
+
 ## A correction joins the spec; it does not replace it
 
 **While an issue is being worked, every instruction Adam gives about it

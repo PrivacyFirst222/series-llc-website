@@ -1975,6 +1975,83 @@ What the rule requires of me is only what P34 already requires: the newest
 dictation for a sentence supersedes the older one everywhere that sentence
 appears, immediately and without being asked twice.
 
+## P39 — An intake form for an application I never read
+
+### THE FAILURE
+
+Adam, 24 August 2026: "Go read the online EIN application process
+(https://sa.www4.irs.gov/applyein/legalStructure). I think (in typical
+claude retardedness) you missed a bunch of questions we dont have the
+answers to."
+
+The EIN service's secure form collects three things: the responsible
+party's name, their SSN/ITIN, and a free-text note. It exists to let us
+complete the IRS's EIN application for the client — an application I never
+opened. The IRS assistant asks questions our formation record cannot
+answer (what the business does, whether employees are expected and when
+wages will first be paid, the accounting year, the excise-tax screeners);
+none of them are collected, so fulfilling any real EIN order would have
+meant emailing the client for the rest — the exact back-and-forth the
+secure form exists to prevent.
+
+### WHY IT HAPPENED
+
+I built the form from my mental model of "what an EIN application needs" —
+responsible party plus TIN — instead of from the application itself. The
+repository's first rule is to put the governing source in front of me
+before writing, and the governing source here was never the SS-4 in my
+memory; it was the live application the fulfillment process actually walks.
+I treated the rule as being about statutes because every prior application
+of it was a statute; a government form is the same class of source, and I
+did not generalize the rule to it — selective learning again, this time
+about my own operating rules.
+
+Deeper, from Adam's "Why did you do such a shit job before": I built the
+form to the depth of its tests, and I wrote the tests. The feature's
+defining problem in my head was the dangerous datum — collect an SSN
+safely — and that story (encrypt, last-4, destroy on fulfillment) was
+checkable, so it got engineered and proven. Whether the form could
+actually complete an IRS application had no test, no gate, and no
+consequence on any nearby day, so it got imagination instead of
+engineering. A form built from imagination passes every check its
+builder imagines — the self-baselining trap the workspace rules already
+name.
+
+## P40 — Success defined by the producer
+
+### THE FAILURE
+
+Adam, 24 August 2026: "How do i make you define success as a working form
+that actually accomplishes it objective (here that is obtaining an ein for a
+legal entity). You would think that would be obvious but not to retards, i
+guess. what the solution so i dont have to keep dealing with your shitty
+performance"
+
+The question is the finding: across P29-P39 every failure shares one root —
+I define success as the artifact passing the checks I gave it, and I am the
+one who writes the checks. The EIN form succeeded at everything I measured
+and could not obtain an EIN.
+
+### WHY IT HAPPENED
+
+Nothing in how I work makes the external objective load-bearing. The
+objective lives in the feature's NAME ("Federal EIN service") and names are
+not executable; the checks live in code and run every time. Whatever gap
+exists between the name and the checks is filled by my model of the domain,
+silently, at the moment of building — and my model always agrees with
+itself. The only force that has ever closed that gap in this repository is
+an external artifact opened before writing: the statute, the Division's
+file definitions, Adam's screenshot. The fix must therefore be structural —
+an artifact whose absence is visible — because rules I merely hold get
+applied selectively (P33).
+
+### FIXED BY
+
+The rule below, added to CLAUDE.md: no feature that feeds a real-world
+process is proposed without its objective ledger — the external process's
+own requirements, from the opened source, mapped line by line to where each
+is satisfied. Adam rejects any proposal that does not open with it.
+
 # MECHANISM INDEX
 
 ## Substantive — the ones that put wrong law into signed documents

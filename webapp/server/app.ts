@@ -1476,6 +1476,20 @@ async function clientLlcName(clientId: string): Promise<string> {
   return rows[0]?.llc_name ?? "";
 }
 
+/** Whether the client's LLC is formed — the Articles are in their portal.
+ *  Gates the EIN and S-election detail forms: neither IRS process exists
+ *  for a company that doesn't. */
+async function clientLlcFormed(clientId: string): Promise<boolean> {
+  const db = await getDb();
+  // ANY formed order means the LLC exists — a client can have later paid
+  // orders (services, extra series) that never carry formed_at themselves.
+  const rows = await db.query<{ ok: number }>(
+    "SELECT 1 AS ok FROM orders WHERE client_id = $1 AND formed_at IS NOT NULL LIMIT 1",
+    [clientId],
+  );
+  return rows.length > 0;
+}
+
 /** The client's protected series as full filed names ("LLC - PS 1"):
  *  formation-order series (stored as bare identifiers) plus paid portal
  *  series orders (stored as full names). The EIN dialog offers exactly this
@@ -1689,6 +1703,7 @@ app.get("/portal/services", async (c) => {
       },
       sElection: await sElectionEligibility(session.clientId),
       series: await clientSeries(session.clientId),
+      llcFormed: await clientLlcFormed(session.clientId),
       einCompanyOrdered: orders.some((o) => {
         if (o.type !== "ein" || o.status === "pending_payment") return false;
         const d = (typeof o.details === "string" ? JSON.parse(o.details) : o.details) as { target?: string } | null;
@@ -1942,17 +1957,65 @@ app.post("/portal/services/ein", async (c) => {
   return c.json({ data: { serviceOrderId, checkoutUrl: checkout.url, totalCents: EIN_FEE_CENTS } });
 });
 
-const einDetailsSchema = z.object({
-  responsibleName: z.string().min(1, "The responsible party's name is required.").max(200),
-  tin: z
-    .string()
-    .transform((s) => s.replace(/[\s-]/g, ""))
-    .refine((s) => /^\d{9}$/.test(s), "Enter a 9-digit SSN or ITIN."),
-  note: z.string().max(1000).optional(),
-  certified: z.literal(true, {
-    errorMap: () => ({ message: "You must confirm the certification before submitting." }),
-  }),
-});
+/** Everything the IRS EIN application asks that the formation record cannot
+ *  answer — the objective ledger from the assistant walk + Form SS-4
+ *  (Rev. 12-2025), 24 Aug 2026. The IRS requires the responsible party's
+ *  name SPLIT (first/middle/last/suffix, "must match IRS records"). */
+const einDetailsSchema = z
+  .object({
+    responsibleFirst: z.string().min(1, "The responsible party's first name is required.").max(100),
+    responsibleMiddle: z.string().max(100).optional().default(""),
+    responsibleLast: z.string().min(1, "The responsible party's last name is required.").max(100),
+    responsibleSuffix: z.string().max(10).optional().default(""),
+    tin: z
+      .string()
+      .transform((s) => s.replace(/[\s-]/g, ""))
+      .refine((s) => /^\d{9}$/.test(s), "Enter a 9-digit SSN or ITIN."),
+    phone: z.string().min(7, "A phone number for IRS questions is required.").max(40),
+    county: z.string().min(2, "The county of the LLC's principal address is required.").max(60),
+    activity: z.enum([
+      "Real estate",
+      "Rental & leasing",
+      "Construction",
+      "Retail",
+      "Finance & insurance",
+      "Health care & social assistance",
+      "Accommodation & food service",
+      "Transportation & warehousing",
+      "Manufacturing",
+      "Wholesale",
+      "Other",
+    ]),
+    activityDetail: z
+      .string()
+      .min(3, "Describe the products or services in a few words — e.g. \"residential rental real estate.\"")
+      .max(200),
+    employeesExpected: z.boolean(),
+    employeeCountOther: z.number().int().min(0).max(9999).optional().default(0),
+    employeeCountAg: z.number().int().min(0).max(9999).optional().default(0),
+    employeeCountHousehold: z.number().int().min(0).max(9999).optional().default(0),
+    firstWageDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().or(z.literal("")).default(""),
+    form944Annual: z.boolean().optional().default(false),
+    closingMonth: z.enum([
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December",
+    ]),
+    exciseApplies: z.boolean(),
+    exciseDetail: z.string().max(300).optional().default(""),
+    certified: z.literal(true, {
+      errorMap: () => ({ message: "You must confirm the certification before submitting." }),
+    }),
+  })
+  .refine(
+    (d) =>
+      !d.employeesExpected ||
+      (d.firstWageDate !== "" &&
+        d.employeeCountOther + d.employeeCountAg + d.employeeCountHousehold > 0),
+    { message: "With employees expected, enter the expected count and the first date wages will be paid." },
+  )
+  .refine((d) => !d.exciseApplies || d.exciseDetail.trim().length > 0, {
+    message: "Tell us which of the special activities applies.",
+  });
 
 app.post("/portal/services/:id/ein-details", async (c) => {
   const session = await getSession(c);
@@ -1973,12 +2036,34 @@ app.post("/portal/services/:id/ein-details", async (c) => {
   if (so.type !== "ein" || so.status !== "awaiting_info") {
     return c.json(err("This order is not awaiting details.", "BAD_STATE"), 400);
   }
+  if (!(await clientLlcFormed(session.clientId))) {
+    return c.json(err("Your LLC must be formed before an EIN can be obtained.", "NOT_FORMED"), 400);
+  }
   const details = (typeof so.details === "string" ? JSON.parse(so.details) : so.details) as Record<string, unknown>;
+  const d = body.data;
   const merged = {
     ...details,
-    responsibleName: body.data.responsibleName,
-    tinLast4: body.data.tin.slice(-4),
-    note: body.data.note ?? "",
+    responsibleName: [d.responsibleFirst, d.responsibleMiddle, d.responsibleLast, d.responsibleSuffix]
+      .filter(Boolean)
+      .join(" "),
+    responsibleFirst: d.responsibleFirst,
+    responsibleMiddle: d.responsibleMiddle,
+    responsibleLast: d.responsibleLast,
+    responsibleSuffix: d.responsibleSuffix,
+    phone: d.phone,
+    county: d.county,
+    activity: d.activity,
+    activityDetail: d.activityDetail,
+    employeesExpected: d.employeesExpected,
+    employeeCountOther: d.employeeCountOther,
+    employeeCountAg: d.employeeCountAg,
+    employeeCountHousehold: d.employeeCountHousehold,
+    firstWageDate: d.firstWageDate,
+    form944Annual: d.form944Annual,
+    closingMonth: d.closingMonth,
+    exciseApplies: d.exciseApplies,
+    exciseDetail: d.exciseDetail,
+    tinLast4: d.tin.slice(-4),
     certifiedAt: new Date().toISOString(),
   };
   await db.query(
@@ -2043,6 +2128,9 @@ const sElectionDetailsSchema = z
 app.post("/portal/services/:id/s-election-details", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  if (!(await clientLlcFormed(session.clientId))) {
+    return c.json(err("Your LLC must be formed before an S election can be made.", "NOT_FORMED"), 400);
+  }
   const body = sElectionDetailsSchema.safeParse(await c.req.json().catch(() => null));
   if (!body.success) {
     return c.json(err(body.error.issues[0]?.message ?? "Invalid details.", "INVALID_INPUT"), 400);
