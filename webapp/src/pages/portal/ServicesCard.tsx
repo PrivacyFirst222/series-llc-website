@@ -196,12 +196,20 @@ export function ServicesCard() {
   // Two purchasable first blocks (LLC unbought / LLC bought); a fifth,
   // informational state when the LLC and every series are covered.
   const einAllCovered = companyEinTaken && openSeries.length === 0;
-  const einFirstBlock = companyEinTaken
-    ? "You already purchased a Federal EIN for the mothership LLC. This was an important step as it is necessary for opening bank accounts, tax reporting and tax elections, and completing requested W-9s."
-    : "Get a Federal EIN for the Mothership LLC - If your LLC doesn't already have an EIN, it needs one for opening bank accounts, tax reporting and tax elections, and completing requested W-9s.";
-  const einSeriesBlock =
-    "A protected series usually does not require its own EIN. Every series is wholly owned by your LLC, so the IRS disregards it — a series never files its own tax return, with or without an EIN. The only income tax return in the structure is the LLC's own. A series needs its own EIN only in limited circumstances — most commonly because its bank requires one for an account in the series' name, or because the series will have employees.";
-  const einPriceBlock =
+  // Each paragraph: first sentence bold, remainder plain (Adam, 24 Aug 2026).
+  const einFirstBold = companyEinTaken
+    ? "You already purchased a Federal EIN for the mothership LLC."
+    : "Get a Federal EIN for the Mothership LLC.";
+  const einFirstRest = companyEinTaken
+    ? "This was an important step as it is necessary for opening bank accounts, tax reporting and tax elections, and completing requested W-9s."
+    : "If your LLC doesn't already have an EIN, it needs one for opening bank accounts, tax reporting and tax elections, and completing requested W-9s.";
+  const einSeriesBold = "A protected series usually does not require its own EIN.";
+  const einSeriesRest =
+    "Every series is wholly owned by your LLC, so the IRS disregards it — a series never files its own tax return, with or without an EIN. The only income tax return in the structure is the LLC's own. A series needs its own EIN only in limited circumstances — most commonly because its bank requires one for an account in the series' name, or because the series will have employees.";
+  const einSeparateBold = "A separate EIN does not create a separate tax return.";
+  const einSeparateRest =
+    "Questions about the technicalities? Check the User's Manual and ask your attorney or accountant.";
+  const einPriceRest =
     "After payment, you'll provide the responsible party's details through a secure form here in the portal — never by email.";
   const einAllCoveredText =
     "You already purchased a Federal EIN for the mothership LLC and every protected series. No further EINs are necessary or appropriate.";
@@ -297,7 +305,9 @@ export function ServicesCard() {
                 <Landmark className="h-4 w-4" />
                 <span className="text-sm font-medium text-foreground">Federal EIN</span>
               </div>
-              <p className="mt-1 text-xs text-muted-foreground">{einFirstBlock}</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                <strong className="text-foreground">{einFirstBold}</strong> {einFirstRest}
+              </p>
               <p className="mt-2 font-display text-lg text-trust">{money(data.pricing.einCents)}</p>
             </button>
           </DialogTrigger>
@@ -306,10 +316,18 @@ export function ServicesCard() {
               <DialogTitle className="sr-only">Federal EIN</DialogTitle>
               <DialogDescription asChild>
                 <div className="space-y-2 text-left">
-                  <p>{einFirstBlock}</p>
-                  <p>{einSeriesBlock}</p>
                   <p>
-                    {money(data.pricing.einCents)}. {einPriceBlock}
+                    <strong className="text-foreground">{einFirstBold}</strong> {einFirstRest}
+                  </p>
+                  <p>
+                    <strong className="text-foreground">{einSeriesBold}</strong> {einSeriesRest}
+                  </p>
+                  <p>
+                    <strong className="text-foreground">{einSeparateBold}</strong> {einSeparateRest}
+                  </p>
+                  <p>
+                    <strong className="text-foreground">{money(data.pricing.einCents)}.</strong>{" "}
+                    {einPriceRest}
                   </p>
                 </div>
               </DialogDescription>
