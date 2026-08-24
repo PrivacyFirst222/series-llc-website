@@ -2052,6 +2052,35 @@ process is proposed without its objective ledger — the external process's
 own requirements, from the opened source, mapped line by line to where each
 is satisfied. Adam rejects any proposal that does not open with it.
 
+## P41 — "Create a new card" executed as "rewrite every surface sharing its strings"
+
+### THE FAILURE
+
+Adam, 24 August 2026, with a screenshot of his portal's Order-services grid:
+"You're a fucking retard. I said create a new card. Not change the text in
+the portal. Put the portal text back the way it was."
+
+His five-state dictations specified the card — the dialog that opens when a
+client clicks. In implementing them I also replaced the compact grid tile's
+text with the card's first paragraph, so his portal tile came to read "You
+already purchased a Federal EIN for the mothership LLC…" directly above a
+$50 price on a button that sells something else. He never named the tile in
+any instruction. When he asked why the text was showing, I compounded it by
+proposing NEW tile copy instead of recognizing the instruction's boundary
+and restoring what I had overwritten.
+
+### WHY IT HAPPENED
+
+In the code, the tile and the dialog shared their copy through one set of
+variables, so when his dictation replaced the variables, it silently
+propagated to a surface his instruction never touched. The boundary of his
+instruction was his artifact — the card he could see and dictate; the
+boundary I applied was my component graph — wherever the strings flowed.
+This is P36's failure inverted: there I forced his format into my
+structure's shape; here I let my structure's sharing decide the scope of
+his words. An instruction's scope is defined by what its author pointed at,
+never by what my code happens to connect to it.
+
 # MECHANISM INDEX
 
 ## Substantive — the ones that put wrong law into signed documents

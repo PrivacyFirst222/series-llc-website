@@ -303,10 +303,11 @@ export function ServicesCard() {
             >
               <div className="flex items-center gap-2 text-trust">
                 <Landmark className="h-4 w-4" />
-                <span className="text-sm font-medium text-foreground">Federal EIN</span>
+                <span className="text-sm font-medium text-foreground">Get a Federal EIN</span>
               </div>
               <p className="mt-1 text-xs text-muted-foreground">
-                <strong className="text-foreground">{einFirstBold}</strong> {einFirstRest}
+                For the LLC or any protected series. Details are collected through a secure form
+                after checkout.
               </p>
               <p className="mt-2 font-display text-lg text-trust">{money(data.pricing.einCents)}</p>
             </button>
