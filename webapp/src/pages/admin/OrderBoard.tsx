@@ -1,17 +1,10 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, Building2, Check, ChevronRight, Clock, ShieldCheck } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import OrderDetail from "./OrderDetail";
-import {
-  type AdminServiceOrder,
-  ServiceFulfillDialog,
-  STATUS_STYLE,
-  money,
-  summaryOf,
-} from "./ServiceOrdersSection";
+import { type AdminServiceOrder, ServiceFulfillDialog } from "./ServiceOrdersSection";
 
 export interface BoardOrder {
   id: string;
@@ -56,6 +49,20 @@ function AgeBadge({ createdAt }: { createdAt: string }) {
 
 const serviceIsOpen = (s: AdminServiceOrder) => s.status === "awaiting_info" || s.status === "in_progress";
 
+/** The card line for a service order: the kind, nothing else. The card's title
+ *  already names the LLC, so series names are shortened to their own part —
+ *  "Jimmy Flanagan, LLC - PS 3" reads "PS 3". Never truncated, only wrapped. */
+function serviceLabel(s: AdminServiceOrder, llcName: string): string {
+  const short = (name?: string) => {
+    if (!name) return "";
+    const rest = name.startsWith(llcName) ? name.slice(llcName.length) : name;
+    return rest.replace(/^[\s,–—-]+/, "").trim() || name;
+  };
+  if (s.type === "ein") return s.details.target === "series" ? `EIN — ${short(s.details.seriesName)}` : "EIN";
+  if (s.type === "s-election") return "S Election";
+  return `${short(s.details.seriesName) || "Series"} Designation`;
+}
+
 /** One company: the formation plus its service orders, worked from one place.
  *  The card is not itself a button any more — the title row opens the order,
  *  because the service rows carry their own Fulfill actions. */
@@ -92,43 +99,32 @@ function Card({
           ) : null}
         </div>
       </button>
-      {services.length > 0 ? (
-        <div className="mt-2.5 flex flex-col gap-1.5 border-t border-border pt-2.5">
-          {services.map((s) => (
-            <div key={s.id} className="flex items-center gap-2 text-xs">
-              {s.status === "fulfilled" ? (
-                <Check className="h-3.5 w-3.5 shrink-0 text-trust" />
-              ) : (
-                <span
-                  className={cn(
-                    "shrink-0 rounded-full px-1.5 py-0.5 font-medium",
-                    STATUS_STYLE[s.status] ?? "bg-secondary text-muted-foreground",
-                  )}
-                >
-                  {s.status.replace(/_/g, " ")}
-                </span>
-              )}
-              <span className={cn("min-w-0 flex-1 truncate", s.status === "fulfilled" && "text-muted-foreground")}>
-                {summaryOf(s)}
-              </span>
-              {s.ein_pending && s.status !== "fulfilled" ? (
-                <span className="shrink-0 rounded-full bg-amber-100 px-1.5 py-0.5 font-medium text-amber-900">
-                  waiting on EIN
-                </span>
-              ) : null}
-              <span className="shrink-0 font-mono-feature text-muted-foreground">{money(s.amount_cents)}</span>
-              {serviceIsOpen(s) ? (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="h-6 shrink-0 rounded-full px-2.5 text-xs"
+      {/* Adam's spec: only whether EIN / S corp was ordered and whether each
+          is completed. Everything else lives in the fulfill dialog, opened by
+          clicking an open line. A series designation shows only while open —
+          it has no other admin fulfill surface — and vanishes once done. */}
+      {services.some((s) => s.type !== "series" || serviceIsOpen(s)) ? (
+        <div className="mt-2.5 flex flex-col gap-1 border-t border-border pt-2.5">
+          {services
+            .filter((s) => s.type !== "series" || serviceIsOpen(s))
+            .map((s) =>
+              serviceIsOpen(s) ? (
+                <button
+                  key={s.id}
+                  type="button"
                   onClick={() => onFulfill(s)}
+                  className="flex w-full items-start gap-1.5 text-left text-xs transition hover:text-trust"
                 >
-                  {s.type === "ein" && s.has_secret ? "View & fulfill" : "Fulfill"}
-                </Button>
-              ) : null}
-            </div>
-          ))}
+                  <span className="min-w-0 break-words font-medium">{serviceLabel(s, order.llc_name)}</span>
+                  <span className="shrink-0 text-muted-foreground">— open</span>
+                </button>
+              ) : (
+                <div key={s.id} className="flex items-start gap-1.5 text-xs text-muted-foreground">
+                  <Check className="mt-0.5 h-3 w-3 shrink-0 text-trust" />
+                  <span className="min-w-0 break-words">{serviceLabel(s, order.llc_name)}</span>
+                </div>
+              ),
+            )}
         </div>
       ) : null}
     </div>
