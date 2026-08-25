@@ -23,6 +23,10 @@ export const env = {
 
   /** Shared secret for the daily purge cron. Required in production. */
   CRON_SECRET: process.env.CRON_SECRET ?? "",
+  // Dropbox app-folder credentials for the nightly client-file mirror.
+  DROPBOX_APP_KEY: process.env.DROPBOX_APP_KEY ?? "",
+  DROPBOX_APP_SECRET: process.env.DROPBOX_APP_SECRET ?? "",
+  DROPBOX_REFRESH_TOKEN: process.env.DROPBOX_REFRESH_TOKEN ?? "",
 
   BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN ?? "",
 

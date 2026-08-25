@@ -54,3 +54,20 @@ the loss of Neon itself.
 What is lost in this path: anything written after the dump was taken (up to
 24 hours), and all active sign-in sessions. Client documents live in Blob
 storage, not the database, and are unaffected.
+
+## Client-file mirror (Dropbox)
+
+Separately from the database dumps, every client file (filed Articles,
+designations, EIN letters, legal mail, generated agreements) is mirrored
+nightly at 08:20 UTC into an app-scoped Dropbox folder, organized by LLC
+name. The server's credential reaches only that one folder. Deletions never
+propagate — the mirror only grows — and Dropbox's own version history sits
+underneath it.
+
+The admin Backups card shows mirrored/pending counts and a "Mirror now"
+button. "Not connected" means the three `DROPBOX_*` env vars are unset.
+
+Recovery is direct: the files are ordinary PDFs in Dropbox. To re-attach
+them to a restored database, upload them to the relevant client through the
+admin panel's Upload button (document metadata in the dump names every file
+and its LLC).

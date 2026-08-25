@@ -5,6 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { api } from "@/lib/api";
 
+interface MirrorStatus {
+  configured: boolean;
+  mirrored: number;
+  pending: number;
+  lastMirroredAt: string | null;
+}
+
 interface BackupInfo {
   key: string;
   sizeBytes: number;
@@ -86,6 +93,16 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-backups"] }),
   });
   const newest = (backupsQuery.data ?? [])[0];
+  const mirrorQuery = useQuery({
+    queryKey: ["admin-file-mirror"],
+    queryFn: () => api.get<MirrorStatus>("/api/admin/file-mirror"),
+    enabled,
+  });
+  const runMirror = useMutation({
+    mutationFn: () => api.post<{ mirrored: number; failed: number }>("/api/admin/file-mirror/run", {}),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-file-mirror"] }),
+  });
+  const mirror = mirrorQuery.data;
   // A backup nobody can see failing isn't a backup: flag a stale newest dump.
   const newestAgeDays = newest
     ? Math.floor((Date.now() - new Date(newest.uploadedAt).getTime()) / 86_400_000)
@@ -183,6 +200,33 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
         {runBackup.isError ? (
           <p className="mt-2 text-xs text-destructive">{(runBackup.error as Error).message}</p>
         ) : null}
+
+        <div className="mt-4 border-t border-border pt-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-sm font-medium">Client-file mirror to Dropbox</span>
+            <span className={mirror && !mirror.configured ? "text-xs font-medium text-amber-700" : mirror && mirror.pending > 0 ? "text-xs font-medium text-destructive" : "text-xs text-muted-foreground"}>
+              {mirrorQuery.isLoading || !mirror
+                ? "…"
+                : !mirror.configured
+                  ? "Not connected — Dropbox credentials are not set"
+                  : `${mirror.mirrored} mirrored · ${mirror.pending} pending${mirror.lastMirroredAt ? ` · last ${new Date(mirror.lastMirroredAt).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}` : ""}`}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-full"
+              disabled={runMirror.isPending}
+              onClick={() => runMirror.mutate()}
+            >
+              {runMirror.isPending ? "Mirroring…" : "Mirror now"}
+            </Button>
+          </div>
+          <p className="mt-1.5 text-xs text-muted-foreground">
+            Every client file is copied nightly into the app-scoped Dropbox
+            folder, organized by LLC. Deletions never propagate — the mirror
+            only ever grows.
+          </p>
+        </div>
       </div>
     </>
   );

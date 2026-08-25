@@ -104233,6 +104233,10 @@ var env = {
   ADMIN_PASSWORD: process.env.ADMIN_PASSWORD ?? "",
   /** Shared secret for the daily purge cron. Required in production. */
   CRON_SECRET: process.env.CRON_SECRET ?? "",
+  // Dropbox app-folder credentials for the nightly client-file mirror.
+  DROPBOX_APP_KEY: process.env.DROPBOX_APP_KEY ?? "",
+  DROPBOX_APP_SECRET: process.env.DROPBOX_APP_SECRET ?? "",
+  DROPBOX_REFRESH_TOKEN: process.env.DROPBOX_REFRESH_TOKEN ?? "",
   BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN ?? "",
   SMARTY_AUTH_ID: process.env.SMARTY_AUTH_ID ?? "",
   SMARTY_AUTH_TOKEN: process.env.SMARTY_AUTH_TOKEN ?? "",
@@ -104419,6 +104423,7 @@ ALTER TABLE documents ADD COLUMN IF NOT EXISTS order_id uuid REFERENCES orders(i
 -- two names conflict when their keys match. Loaded from the quarterly
 -- baseline, topped up nightly from the daily files (server/sunbiz.ts).
 ALTER TABLE library_documents ADD COLUMN IF NOT EXISTS meta jsonb NOT NULL DEFAULT '{}'::jsonb;
+ALTER TABLE documents ADD COLUMN IF NOT EXISTS mirrored_at timestamptz;
 
 CREATE TABLE IF NOT EXISTS fl_entities (
   doc_number text PRIMARY KEY,
@@ -104548,6 +104553,159 @@ async function runDbBackup() {
   const all = await listBackups();
   for (const old of all.slice(BACKUP_KEEP)) await deleteBackup(old);
   return { key: name, sizeBytes: data.byteLength, rowCounts };
+}
+
+// server/storage.ts
+import { randomBytes } from "node:crypto";
+async function putFile(filename, data, contentType) {
+  const key = `${randomBytes(12).toString("hex")}-${filename.replace(/[^\w.-]+/g, "_")}`;
+  if (env.BLOB_READ_WRITE_TOKEN) {
+    const { put: put2 } = await Promise.resolve().then(() => (init_dist(), dist_exports));
+    const blob = await put2(`docs/${key}`, data, {
+      access: "private",
+      // store is private; downloads go through the authed API
+      contentType,
+      addRandomSuffix: false
+    });
+    return { storageKey: blob.url, sizeBytes: data.byteLength };
+  }
+  const { mkdir, writeFile } = await import("node:fs/promises");
+  const { fileURLToPath } = await import("node:url");
+  const dir = fileURLToPath(new URL("../.dev-data/blob/", import.meta.url));
+  await mkdir(dir, { recursive: true });
+  await writeFile(dir + key, Buffer.from(data));
+  return { storageKey: `dev:${key}`, sizeBytes: data.byteLength };
+}
+async function deleteFile(storageKey) {
+  try {
+    if (storageKey.startsWith("dev:")) {
+      const { unlink } = await import("node:fs/promises");
+      const { fileURLToPath } = await import("node:url");
+      const dir = fileURLToPath(new URL("../.dev-data/blob/", import.meta.url));
+      await unlink(dir + storageKey.slice(4));
+      return;
+    }
+    const { del: del2 } = await Promise.resolve().then(() => (init_dist(), dist_exports));
+    await del2(storageKey);
+  } catch (e) {
+    console.error("[storage] delete failed:", e);
+  }
+}
+async function readFileStream(storageKey) {
+  if (storageKey.startsWith("dev:")) {
+    const { readFile } = await import("node:fs/promises");
+    const { fileURLToPath } = await import("node:url");
+    const dir = fileURLToPath(new URL("../.dev-data/blob/", import.meta.url));
+    return readFile(dir + storageKey.slice(4));
+  }
+  const res = await fetch(storageKey, {
+    headers: { authorization: `Bearer ${env.BLOB_READ_WRITE_TOKEN}` }
+  });
+  if (!res.ok || !res.body) throw new Error(`blob fetch failed: ${res.status}`);
+  return res.body;
+}
+
+// server/dropbox.ts
+var configured = () => Boolean(env.DROPBOX_APP_KEY && env.DROPBOX_APP_SECRET && env.DROPBOX_REFRESH_TOKEN);
+var cachedToken = null;
+async function accessToken() {
+  if (cachedToken && Date.now() < cachedToken.expiresAt - 6e4) return cachedToken.token;
+  const res = await fetch("https://api.dropboxapi.com/oauth2/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      grant_type: "refresh_token",
+      refresh_token: env.DROPBOX_REFRESH_TOKEN,
+      client_id: env.DROPBOX_APP_KEY,
+      client_secret: env.DROPBOX_APP_SECRET
+    })
+  });
+  if (!res.ok) throw new Error(`Dropbox token refresh failed (${res.status}): ${await res.text()}`);
+  const body = await res.json();
+  cachedToken = { token: body.access_token, expiresAt: Date.now() + body.expires_in * 1e3 };
+  return body.access_token;
+}
+var safePathPart = (s) => s.replace(/[\\/:*?"<>|]+/g, "-").trim() || "unnamed";
+async function uploadToDropbox(path, data) {
+  const token = await accessToken();
+  const res = await fetch("https://content.dropboxapi.com/2/files/upload", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/octet-stream",
+      "Dropbox-API-Arg": JSON.stringify({ path, mode: "overwrite", mute: true })
+    },
+    body: new Uint8Array(data)
+  });
+  if (!res.ok) throw new Error(`Dropbox upload failed (${res.status}): ${await res.text()}`);
+}
+async function uploadDev(path, data) {
+  const { mkdir, writeFile } = await import("node:fs/promises");
+  const { fileURLToPath } = await import("node:url");
+  const { dirname } = await import("node:path");
+  const root = fileURLToPath(new URL("../.dev-data/dropbox-mirror", import.meta.url));
+  await mkdir(dirname(root + path), { recursive: true });
+  await writeFile(root + path, data);
+}
+async function streamToBuffer(body) {
+  if (Buffer.isBuffer(body)) return body;
+  const chunks = [];
+  const reader = body.getReader();
+  for (; ; ) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    if (value) chunks.push(value);
+  }
+  return Buffer.concat(chunks);
+}
+async function mirrorStatus() {
+  const db2 = await getDb();
+  const rows = await db2.query(
+    `SELECT
+       count(*) FILTER (WHERE mirrored_at IS NOT NULL) AS mirrored,
+       count(*) FILTER (WHERE mirrored_at IS NULL) AS pending,
+       max(mirrored_at)::text AS last
+     FROM documents`
+  );
+  return {
+    configured: configured(),
+    mirrored: Number(rows[0]?.mirrored ?? 0),
+    pending: Number(rows[0]?.pending ?? 0),
+    lastMirroredAt: rows[0]?.last ?? null
+  };
+}
+async function runFileMirror() {
+  const db2 = await getDb();
+  const useDropbox = configured();
+  if (!useDropbox && env.isProd) return { mirrored: 0, failed: 0, skipped: true };
+  const docs = await db2.query(
+    `SELECT d.id, d.title, d.kind, d.storage_key,
+            (SELECT o.llc_name FROM orders o WHERE o.client_id = d.client_id AND o.paid_at IS NOT NULL
+              ORDER BY o.paid_at DESC LIMIT 1) AS llc_name,
+            cl.email
+       FROM documents d LEFT JOIN clients cl ON cl.id = d.client_id
+      WHERE d.mirrored_at IS NULL
+      ORDER BY d.created_at
+      LIMIT 200`
+  );
+  let mirrored = 0;
+  let failed = 0;
+  for (const doc of docs) {
+    try {
+      const bytes2 = await streamToBuffer(await readFileStream(doc.storage_key));
+      const folder = safePathPart(doc.llc_name || doc.email || "unassigned");
+      const name = `${doc.id.slice(0, 8)}-${safePathPart(doc.title || doc.kind)}.pdf`;
+      const path = `/${folder}/${name}`;
+      if (useDropbox) await uploadToDropbox(path, bytes2);
+      else await uploadDev(path, bytes2);
+      await db2.query("UPDATE documents SET mirrored_at = now() WHERE id = $1", [doc.id]);
+      mirrored++;
+    } catch (e) {
+      failed++;
+      console.error(`[mirror] ${doc.id} failed:`, e);
+    }
+  }
+  return { mirrored, failed, skipped: false };
 }
 
 // server/pricing.ts
@@ -105201,11 +105359,11 @@ function shareValue(mode, share) {
 }
 
 // server/square.ts
-import { randomBytes as randomBytes2 } from "node:crypto";
+import { randomBytes as randomBytes3 } from "node:crypto";
 
 // server/crypto.ts
 import {
-  randomBytes,
+  randomBytes as randomBytes2,
   scrypt as scryptCb,
   timingSafeEqual,
   createHash,
@@ -105220,7 +105378,7 @@ function scrypt(password, salt) {
   );
 }
 async function hashPassword(password) {
-  const salt = randomBytes(16);
+  const salt = randomBytes2(16);
   const key = await scrypt(password, salt);
   return `s1:${salt.toString("hex")}:${key.toString("hex")}`;
 }
@@ -105232,7 +105390,7 @@ async function verifyPassword(password, stored) {
   return key.length === expected.length && timingSafeEqual(key, expected);
 }
 function newToken() {
-  const token = randomBytes(32).toString("base64url");
+  const token = randomBytes2(32).toString("base64url");
   return { token, tokenHash: hashToken(token) };
 }
 function hashToken(token) {
@@ -105245,7 +105403,7 @@ function secretKey() {
   return Buffer.from(hkdfSync("sha256", env.SESSION_SECRET, "fpsllc-ein-v1", "ein-encryption", 32));
 }
 function encryptSecret(plain) {
-  const iv = randomBytes(12);
+  const iv = randomBytes2(12);
   const cipher = createCipheriv("aes-256-gcm", secretKey(), iv);
   const ct2 = Buffer.concat([cipher.update(plain, "utf8"), cipher.final()]);
   const tag = cipher.getAuthTag();
@@ -105277,7 +105435,7 @@ async function createCheckout(opts) {
       "Square-Version": "2025-01-23"
     },
     body: JSON.stringify({
-      idempotency_key: randomBytes2(16).toString("hex"),
+      idempotency_key: randomBytes3(16).toString("hex"),
       order: {
         location_id: env.SQUARE_LOCATION_ID,
         reference_id: opts.orderId,
@@ -110075,56 +110233,6 @@ MyFloridaSeriesLLC is a document-preparation and registered agent service dedica
 *\xA9 2026 MyFloridaSeriesLLC. This manual may be updated as Florida law and federal rules evolve; the portal always holds the current edition. Statutory citations verified against Official Florida Statutes: ss. 48.062, 605.0503, 605.2101\u2013605.2802 (including 605.2201, 605.2202, 605.2301, 605.2401, 605.2404, 605.2602\u2013605.2604), 711.50\u2013711.512; Ch. 726; Prop. Treas. Reg. \xA7301.7701-1(a)(5); FinCEN interim final rule (Mar. 2025); Florida Division of Corporations series LLC filing guidance.*
 `;
 
-// server/storage.ts
-import { randomBytes as randomBytes3 } from "node:crypto";
-async function putFile(filename, data, contentType) {
-  const key = `${randomBytes3(12).toString("hex")}-${filename.replace(/[^\w.-]+/g, "_")}`;
-  if (env.BLOB_READ_WRITE_TOKEN) {
-    const { put: put2 } = await Promise.resolve().then(() => (init_dist(), dist_exports));
-    const blob = await put2(`docs/${key}`, data, {
-      access: "private",
-      // store is private; downloads go through the authed API
-      contentType,
-      addRandomSuffix: false
-    });
-    return { storageKey: blob.url, sizeBytes: data.byteLength };
-  }
-  const { mkdir, writeFile } = await import("node:fs/promises");
-  const { fileURLToPath } = await import("node:url");
-  const dir = fileURLToPath(new URL("../.dev-data/blob/", import.meta.url));
-  await mkdir(dir, { recursive: true });
-  await writeFile(dir + key, Buffer.from(data));
-  return { storageKey: `dev:${key}`, sizeBytes: data.byteLength };
-}
-async function deleteFile(storageKey) {
-  try {
-    if (storageKey.startsWith("dev:")) {
-      const { unlink } = await import("node:fs/promises");
-      const { fileURLToPath } = await import("node:url");
-      const dir = fileURLToPath(new URL("../.dev-data/blob/", import.meta.url));
-      await unlink(dir + storageKey.slice(4));
-      return;
-    }
-    const { del: del2 } = await Promise.resolve().then(() => (init_dist(), dist_exports));
-    await del2(storageKey);
-  } catch (e) {
-    console.error("[storage] delete failed:", e);
-  }
-}
-async function readFileStream(storageKey) {
-  if (storageKey.startsWith("dev:")) {
-    const { readFile } = await import("node:fs/promises");
-    const { fileURLToPath } = await import("node:url");
-    const dir = fileURLToPath(new URL("../.dev-data/blob/", import.meta.url));
-    return readFile(dir + storageKey.slice(4));
-  }
-  const res = await fetch(storageKey, {
-    headers: { authorization: `Bearer ${env.BLOB_READ_WRITE_TOKEN}` }
-  });
-  if (!res.ok || !res.body) throw new Error(`blob fetch failed: ${res.status}`);
-  return res.body;
-}
-
 // server/email.ts
 async function sendMail(mail) {
   if (!env.RESEND_API_KEY) {
@@ -112039,6 +112147,26 @@ app.get("/cron/db-backup", async (c) => {
   const result = await runDbBackup();
   console.log(`[backup] ${result.key}: ${result.sizeBytes} bytes`, result.rowCounts);
   return c.json({ data: result });
+});
+app.get("/cron/file-mirror", async (c) => {
+  const auth = c.req.header("authorization") ?? "";
+  const secret = env.CRON_SECRET;
+  if (secret && auth !== `Bearer ${secret}`) return c.json(err2("Not authorized", "UNAUTHENTICATED"), 401);
+  if (!secret && env.isProd) return c.json(err2("Not authorized", "UNAUTHENTICATED"), 401);
+  const result = await runFileMirror();
+  console.log(`[mirror] mirrored=${result.mirrored} failed=${result.failed} skipped=${result.skipped}`);
+  return c.json({ data: result });
+});
+app.get("/admin/file-mirror", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json(err2("Not signed in", "UNAUTHENTICATED"), 401);
+  return c.json({ data: await mirrorStatus() });
+});
+app.post("/admin/file-mirror/run", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json(err2("Not signed in", "UNAUTHENTICATED"), 401);
+  const result = await runFileMirror();
+  return c.json({ data: { ...result, status: await mirrorStatus() } });
 });
 app.get("/admin/backups", async (c) => {
   const admin = await requireAdmin(c);

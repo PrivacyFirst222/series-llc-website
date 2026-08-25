@@ -1635,6 +1635,20 @@ if (mint.status === 200) {
   );
   const unauth = await api("/api/admin/backups");
   check("backup list requires admin", unauth.status === 401);
+
+  // File mirror (dev target: .dev-data/dropbox-mirror/). The suite created
+  // plenty of documents above; the sweep must copy them all and be
+  // incremental on a second run.
+  const before = await api("/api/admin/file-mirror", { cookies: adm.cookie });
+  check("mirror status reports pending documents", (before.body?.data?.pending ?? 0) > 0, before.body?.data);
+  const m1 = await api("/api/admin/file-mirror/run", { method: "POST", cookies: adm.cookie, body: "{}" });
+  check(
+    "mirror copies every pending file with no failures",
+    m1.status === 200 && (m1.body?.data?.mirrored ?? 0) > 0 && m1.body?.data?.failed === 0 && m1.body?.data?.status?.pending === 0,
+    m1.body?.data,
+  );
+  const m2 = await api("/api/admin/file-mirror/run", { method: "POST", cookies: adm.cookie, body: "{}" });
+  check("a second mirror run copies nothing (incremental)", m2.body?.data?.mirrored === 0, m2.body?.data);
 }
 
 console.log(failures === 0 ? "\nALL PASS" : `\n${failures} FAILURES`);

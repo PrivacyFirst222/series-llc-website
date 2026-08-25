@@ -7,6 +7,7 @@ import type { FloridaLLCFormData } from "../src/components/forms/florida-llc/typ
 import { getDb } from "./db";
 import { env } from "./env";
 import { listBackups, runDbBackup } from "./backup";
+import { mirrorStatus, runFileMirror } from "./dropbox";
 import {
   priceOrder,
   EIN_FEE_CENTS,
@@ -1872,6 +1873,31 @@ app.get("/cron/db-backup", async (c) => {
   const result = await runDbBackup();
   console.log(`[backup] ${result.key}: ${result.sizeBytes} bytes`, result.rowCounts);
   return c.json({ data: result });
+});
+
+/** Nightly Dropbox mirror of client files — the offsite copy of what
+ *  otherwise exists only in Vercel Blob. Same auth as the other crons. */
+app.get("/cron/file-mirror", async (c) => {
+  const auth = c.req.header("authorization") ?? "";
+  const secret = env.CRON_SECRET;
+  if (secret && auth !== `Bearer ${secret}`) return c.json(err("Not authorized", "UNAUTHENTICATED"), 401);
+  if (!secret && env.isProd) return c.json(err("Not authorized", "UNAUTHENTICATED"), 401);
+  const result = await runFileMirror();
+  console.log(`[mirror] mirrored=${result.mirrored} failed=${result.failed} skipped=${result.skipped}`);
+  return c.json({ data: result });
+});
+
+app.get("/admin/file-mirror", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  return c.json({ data: await mirrorStatus() });
+});
+
+app.post("/admin/file-mirror/run", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const result = await runFileMirror();
+  return c.json({ data: { ...result, status: await mirrorStatus() } });
 });
 
 app.get("/admin/backups", async (c) => {
