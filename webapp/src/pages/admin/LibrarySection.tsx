@@ -5,6 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { api } from "@/lib/api";
 
+interface BackupInfo {
+  key: string;
+  sizeBytes: number;
+  uploadedAt: string;
+}
+
 interface LibraryDoc {
   key: string;
   title: string;
@@ -70,6 +76,21 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
 
   const manual = (libraryQuery.data ?? []).find((d) => d.key === "owners-manual");
 
+  const backupsQuery = useQuery({
+    queryKey: ["admin-backups"],
+    queryFn: () => api.get<BackupInfo[]>("/api/admin/backups"),
+    enabled,
+  });
+  const runBackup = useMutation({
+    mutationFn: () => api.post<{ key: string; sizeBytes: number }>("/api/admin/backups/run", {}),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-backups"] }),
+  });
+  const newest = (backupsQuery.data ?? [])[0];
+  // A backup nobody can see failing isn't a backup: flag a stale newest dump.
+  const newestAgeDays = newest
+    ? Math.floor((Date.now() - new Date(newest.uploadedAt).getTime()) / 86_400_000)
+    : null;
+
   return (
     <>
       <div className="mt-4 rounded-2xl border border-border bg-card p-5">
@@ -120,6 +141,48 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
           </Button>
         </div>
         {message ? <p className="mt-2 text-xs text-muted-foreground">{message}</p> : null}
+      </div>
+
+      <div className="mt-4 rounded-2xl border border-border bg-card p-5">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium">Database backups</span>
+          <span className={newestAgeDays !== null && newestAgeDays > 1 ? "text-xs font-medium text-destructive" : "text-xs text-muted-foreground"}>
+            {backupsQuery.isLoading
+              ? "…"
+              : newest
+                ? `Newest: ${newest.key} · ${(newest.sizeBytes / 1024).toFixed(0)} KB · ${new Date(newest.uploadedAt).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}${newestAgeDays !== null && newestAgeDays > 1 ? " — STALE, the nightly backup has not run" : ""}`
+                : "No backups yet"}
+          </span>
+        </div>
+        <p className="mt-2 text-xs text-muted-foreground">
+          A nightly copy of clients, orders, service orders, and documents,
+          stored privately outside the database's own company. The newest 30
+          are kept. Click a backup to download it; restoring is described in
+          the runbook (docs/db-restore.md).
+        </p>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-full"
+            disabled={runBackup.isPending}
+            onClick={() => runBackup.mutate()}
+          >
+            {runBackup.isPending ? "Backing up…" : "Back up now"}
+          </Button>
+          {(backupsQuery.data ?? []).slice(0, 5).map((b) => (
+            <a
+              key={b.key}
+              href={`/api/admin/backups/${encodeURIComponent(b.key)}/download`}
+              className="text-xs font-medium text-trust underline underline-offset-2"
+            >
+              {b.key}
+            </a>
+          ))}
+        </div>
+        {runBackup.isError ? (
+          <p className="mt-2 text-xs text-destructive">{(runBackup.error as Error).message}</p>
+        ) : null}
       </div>
     </>
   );

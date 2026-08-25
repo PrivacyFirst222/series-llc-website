@@ -1589,5 +1589,53 @@ if (mint.status === 200) {
   );
 }
 
+// === Database backups: dump, list, download, and the runbook's dry-run ====
+{
+  const adm = await adminSession();
+  const run = await api("/api/admin/backups/run", { method: "POST", cookies: adm.cookie, body: "{}" });
+  check(
+    "backup runs and reports client rows",
+    run.status === 200 && (run.body?.data?.rowCounts?.clients ?? 0) > 0,
+    run.body,
+  );
+  const key = run.body?.data?.key as string;
+  const list = await api("/api/admin/backups", { cookies: adm.cookie });
+  check(
+    "backup appears in the admin list",
+    (list.body?.data ?? []).some((b: { key: string }) => b.key === key),
+    list.body?.data,
+  );
+  const dl = await fetch(`${BASE}/api/admin/backups/${encodeURIComponent(key)}/download`, {
+    headers: { Cookie: adm.cookie },
+  });
+  const gz = Buffer.from(await dl.arrayBuffer());
+  let dumpOk = false;
+  let dumpTables: string[] = [];
+  try {
+    const { gunzipSync } = await import("node:zlib");
+    const dump = JSON.parse(gunzipSync(gz).toString());
+    dumpTables = Object.keys(dump.tables ?? {});
+    dumpOk = dump.version === 1 && (dump.tables?.clients?.length ?? 0) > 0 && (dump.tables?.orders?.length ?? 0) > 0;
+  } catch { /* dumpOk stays false */ }
+  check("downloaded dump is valid gzipped JSON with clients and orders", dl.ok && dumpOk, { status: dl.status, tables: dumpTables });
+  check(
+    "dump excludes fl_entities and sessions by design",
+    !dumpTables.includes("fl_entities") && !dumpTables.includes("sessions"),
+    dumpTables,
+  );
+  // The runbook's exact dry-run command must work on a real dump.
+  const tmp = `/tmp/e2e-${key}`;
+  await Bun.write(tmp, gz);
+  const proc = Bun.spawnSync(["bun", "run", "scripts/db-restore.ts", tmp, "--dry-run"]);
+  const out = proc.stdout.toString();
+  check(
+    "restore script dry-run reads the dump and reports rows",
+    proc.exitCode === 0 && out.includes("clients:") && out.includes("nothing written"),
+    { exit: proc.exitCode, out: out.slice(0, 200) },
+  );
+  const unauth = await api("/api/admin/backups");
+  check("backup list requires admin", unauth.status === 401);
+}
+
 console.log(failures === 0 ? "\nALL PASS" : `\n${failures} FAILURES`);
 process.exit(failures === 0 ? 0 : 1);

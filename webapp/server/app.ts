@@ -6,6 +6,7 @@ import { validateRegisteredAgentAddress } from "../src/components/forms/florida-
 import type { FloridaLLCFormData } from "../src/components/forms/florida-llc/types";
 import { getDb } from "./db";
 import { env } from "./env";
+import { listBackups, runDbBackup } from "./backup";
 import {
   priceOrder,
   EIN_FEE_CENTS,
@@ -1858,6 +1859,49 @@ app.get("/cron/purge", async (c) => {
   if (!secret && env.isProd) return c.json(err("Not authorized", "UNAUTHENTICATED"), 401);
   const purged = await purgeExpiredSElections();
   return c.json({ data: { purged } });
+});
+
+/** Nightly logical dump of the irreplaceable tables to private Blob storage —
+ *  the copy that exists OUTSIDE the database's own company. Same auth as the
+ *  other crons. Restore: docs/db-restore.md. */
+app.get("/cron/db-backup", async (c) => {
+  const auth = c.req.header("authorization") ?? "";
+  const secret = env.CRON_SECRET;
+  if (secret && auth !== `Bearer ${secret}`) return c.json(err("Not authorized", "UNAUTHENTICATED"), 401);
+  if (!secret && env.isProd) return c.json(err("Not authorized", "UNAUTHENTICATED"), 401);
+  const result = await runDbBackup();
+  console.log(`[backup] ${result.key}: ${result.sizeBytes} bytes`, result.rowCounts);
+  return c.json({ data: result });
+});
+
+app.get("/admin/backups", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  return c.json({ data: await listBackups() });
+});
+
+app.post("/admin/backups/run", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  return c.json({ data: await runDbBackup() });
+});
+
+// The restore path starts with getting the file — without this route the
+// dump is only reachable with the storage token.
+app.get("/admin/backups/:key/download", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const key = c.req.param("key");
+  const all = await listBackups();
+  const hit = all.find((b) => b.key === key);
+  if (!hit) return c.json(err("Not found", "NOT_FOUND"), 404);
+  const body = await readFileStream(hit.storageKey.startsWith("dev:") ? `dev:backups/${hit.key}` : hit.storageKey);
+  return new Response(body as BodyInit, {
+    headers: {
+      "Content-Type": "application/gzip",
+      "Content-Disposition": `attachment; filename="${hit.key}"`,
+    },
+  });
 });
 
 app.post("/portal/services/s-election", async (c) => {

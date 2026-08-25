@@ -11,6 +11,10 @@
   ],
   "crons": [
     {
+      "path": "/api/cron/db-backup",
+      "schedule": "15 8 * * *"
+    },
+    {
       "path": "/api/cron/purge",
       "schedule": "0 7 * * *"
     },
