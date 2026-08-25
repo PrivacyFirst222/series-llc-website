@@ -1649,6 +1649,19 @@ if (mint.status === 200) {
   );
   const m2 = await api("/api/admin/file-mirror/run", { method: "POST", cookies: adm.cookie, body: "{}" });
   check("a second mirror run copies nothing (incremental)", m2.body?.data?.mirrored === 0, m2.body?.data);
+
+  // Dropbox's upload path travels in an HTTP header, which is ASCII-only —
+  // an em-dashed title crashed production on 25 Aug 2026 while the on-disk
+  // dev double sailed through. The encoder itself is therefore asserted:
+  // all-ASCII out, original characters back after parsing.
+  const { headerSafeJson } = await import("./dropbox");
+  const enc = headerSafeJson({ path: "/A — Title \u00e9\u201c.pdf" });
+  check(
+    "Dropbox header JSON is pure ASCII and round-trips non-ASCII titles",
+    [...enc].every((ch) => ch.charCodeAt(0) < 128) &&
+      JSON.parse(enc).path === "/A — Title \u00e9\u201c.pdf",
+    enc,
+  );
 }
 
 console.log(failures === 0 ? "\nALL PASS" : `\n${failures} FAILURES`);

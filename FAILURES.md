@@ -2134,6 +2134,46 @@ L9
 **S11 · Applying a correction to the instance rather than the class.** The sweep
 inherits the vocabulary of the example that prompted it. — C1, C3
 
+## P42 — Placeholder names that drifted until the reader had to ask
+
+### THE FAILURE
+
+Adam: "You suck at instructions. is the Step 1_Secret the App Secret"
+
+Walking Adam through the Dropbox authorization, I referred to the same
+value — the App secret — by a different placeholder in every message:
+`PASTE_APP_SECRET_HERE`, then `REAL_APP_SECRET_FROM_SHOW`, then
+`PASTE_STEP1_SECRET`. The access code likewise changed labels between
+messages. He executed my instructions faithfully and produced two failed
+curl commands: one with a password he invented (because "app secret" had
+never been anchored to the exact row in Dropbox's UI at the moment he
+needed it), one with the app key pasted as the code and the old code
+pasted as the secret. Each failure burned the short-lived access code and
+forced the authorize step to be redone. After four of my messages he still
+had to ask whether my latest placeholder meant the App Secret.
+
+### WHY IT HAPPENED
+
+I hold every referent of this exchange in context at once, so renaming a
+placeholder costs me nothing and I don't feel it as a change — each
+message I composed fresh, picking whatever label fit that message's
+structure ("step 1" numbering, emphasis, brevity). The reader is executing
+across messages with three look-alike strings and no context window; for
+him every new label is a new unknown to resolve. I optimized each message
+locally for its own prose and never treated the placeholder names as what
+they actually are in a multi-message walkthrough: identifiers, which must
+be chosen once — from the vocabulary the reader's screen shows him — and
+then never vary. The fixed vocabulary existed the whole time: Dropbox's
+own UI labels, "App key," "App secret," "access code." I knew those labels
+— I quoted the UI — but I invented synonyms anyway, because in my own
+frame synonyms are free.
+
+### FIXED BY
+
+Placeholders in any multi-step walkthrough use the exact labels the
+reader's screen shows, verbatim, chosen once and never renamed. One
+authoritative assembled command, not a new variant per message.
+
 ## Process — the ones that let the substantive ones through
 
 **M1 · Verify the proposition you set out to verify, not the one underneath.** A

@@ -104626,6 +104626,10 @@ async function accessToken() {
   return body.access_token;
 }
 var safePathPart = (s) => s.replace(/[\\/:*?"<>|]+/g, "-").trim() || "unnamed";
+var headerSafeJson = (v2) => JSON.stringify(v2).replace(
+  /[\u007f-\uffff]/g,
+  (c) => "\\u" + c.charCodeAt(0).toString(16).padStart(4, "0")
+);
 async function uploadToDropbox(path, data) {
   const token = await accessToken();
   const res = await fetch("https://content.dropboxapi.com/2/files/upload", {
@@ -104633,7 +104637,7 @@ async function uploadToDropbox(path, data) {
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/octet-stream",
-      "Dropbox-API-Arg": JSON.stringify({ path, mode: "overwrite", mute: true })
+      "Dropbox-API-Arg": headerSafeJson({ path, mode: "overwrite", mute: true })
     },
     body: new Uint8Array(data)
   });

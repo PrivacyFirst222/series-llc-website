@@ -38,6 +38,18 @@ async function accessToken(): Promise<string> {
 
 const safePathPart = (s: string) => s.replace(/[\\/:*?"<>|]+/g, "-").trim() || "unnamed";
 
+/** Dropbox passes the upload path in an HTTP header, and headers are
+ *  ASCII-only — an em dash in a document title (char 8212) kills the whole
+ *  request with a ByteString TypeError (seen in production 25 Aug 2026; the
+ *  dev fallback writes to disk and never builds the header, which is why the
+ *  suite's 92 em-dashed files all passed). Dropbox's documented fix: escape
+ *  every non-ASCII character as \uXXXX inside the header JSON. */
+export const headerSafeJson = (v: unknown): string =>
+  JSON.stringify(v).replace(
+    /[\u007f-\uffff]/g,
+    (c) => "\\u" + c.charCodeAt(0).toString(16).padStart(4, "0"),
+  );
+
 async function uploadToDropbox(path: string, data: Buffer): Promise<void> {
   const token = await accessToken();
   const res = await fetch("https://content.dropboxapi.com/2/files/upload", {
@@ -45,7 +57,7 @@ async function uploadToDropbox(path: string, data: Buffer): Promise<void> {
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/octet-stream",
-      "Dropbox-API-Arg": JSON.stringify({ path, mode: "overwrite", mute: true }),
+      "Dropbox-API-Arg": headerSafeJson({ path, mode: "overwrite", mute: true }),
     },
     body: new Uint8Array(data),
   });
