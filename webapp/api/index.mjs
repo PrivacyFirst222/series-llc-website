@@ -111510,6 +111510,13 @@ app.get("/portal/library", async (c) => {
   const rows = await db2.query("SELECT key, title, edition, size_bytes, updated_at FROM library_documents ORDER BY title");
   return c.json({ data: rows });
 });
+app.get("/admin/library", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json(err2("Not signed in", "UNAUTHENTICATED"), 401);
+  const db2 = await getDb();
+  const rows = await db2.query("SELECT key, title, edition, size_bytes, updated_at FROM library_documents ORDER BY title");
+  return c.json({ data: rows });
+});
 app.get("/portal/library/:key/download", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err2("Not signed in", "UNAUTHENTICATED"), 401);
@@ -112746,7 +112753,11 @@ app.get("/admin/clients", async (c) => {
   const rows = await db2.query(
     `SELECT cl.id, cl.email, cl.name, cl.created_at, cl.ra_cancellation_requested_at,
             (cl.password_hash IS NOT NULL) AS has_password,
-            COUNT(d.id)::int AS document_count
+            COUNT(d.id)::int AS document_count,
+            (SELECT COALESCE(jsonb_agg(DISTINCT o.llc_name), '[]'::jsonb)
+               FROM orders o
+              WHERE o.client_id = cl.id AND o.status <> 'pending_payment'
+                AND o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_llcs
      FROM clients cl LEFT JOIN documents d ON d.client_id = cl.id
      GROUP BY cl.id ORDER BY cl.created_at DESC`
   );
@@ -112789,6 +112800,7 @@ app.get("/admin/services", async (c) => {
   await purgeExpiredSElections().catch((e) => console.error("[purge] failed:", e));
   const rows = await db2.query(
     `SELECT so.id, so.type, so.status, so.llc_name, so.details, so.amount_cents,
+            so.client_id, so.formation_order_id,
             so.created_at, so.paid_at, so.fulfilled_at,
             (so.ein_secret IS NOT NULL) AS has_secret,
             (so.type = 's-election' AND EXISTS (

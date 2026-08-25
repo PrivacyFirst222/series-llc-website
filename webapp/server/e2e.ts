@@ -1289,6 +1289,9 @@ if (mint.status === 200) {
     correspondentEmail: acctEmail, confirmCorrespondentEmail: acctEmail,
     series: [{ id: "s1", name: "E2E Account Settings, LLC, PS A" }],
     orderEin: false, orderSElection: false,
+    // Our RA service, so the suite holds one PAID RA order — what the admin
+    // Registered Agent Clients tab (ra_llcs) is asserted against.
+    registeredAgentChoice: "SERVICE" as const,
   };
   const aOrder = await api("/api/orders", { method: "POST", body: JSON.stringify(acctData) });
   check("account-test order accepted", aOrder.status === 200, aOrder.body);
@@ -1523,6 +1526,36 @@ if (mint.status === 200) {
   const none = await api(`/api/admin/orders?q=${encodeURIComponent("zz-no-such-order-zz")}`, { cookies: adm.cookie });
   const nd = none.body?.data as { orders?: unknown[]; total?: number };
   check("admin list search with no match returns zero", nd?.total === 0 && nd?.orders?.length === 0, none.body);
+
+  // Admin tabs' data: the library through an ADMIN session (the portal route
+  // 401s admin-only sessions — that bug rendered "Not yet published" over a
+  // live manual), service orders carrying their card linkage, and the client
+  // roster carrying the RA relationship.
+  const lib = await api("/api/admin/library", { cookies: adm.cookie });
+  check(
+    "admin library lists the owners-manual with an admin-only session",
+    lib.status === 200 && (lib.body?.data as Array<{ key: string }>)?.some((d) => d.key === "owners-manual"),
+    lib.body,
+  );
+  const svc = await api("/api/admin/services", { cookies: adm.cookie });
+  const svcRows = (svc.body?.data ?? []) as Array<{ client_id?: string; formation_order_id?: string | null }>;
+  check(
+    "admin services rows carry client_id and formation_order_id for card attachment",
+    svcRows.length > 0 && svcRows.every((s) => typeof s.client_id === "string" && "formation_order_id" in s),
+    svcRows[0],
+  );
+  const cls = await api("/api/admin/clients", { cookies: adm.cookie });
+  const clRows = (cls.body?.data ?? []) as Array<{ email: string; ra_llcs?: unknown }>;
+  check(
+    "admin clients rows carry ra_llcs arrays",
+    clRows.length > 0 && clRows.every((r) => Array.isArray(r.ra_llcs)),
+    clRows[0],
+  );
+  check(
+    "a client who took our RA service lists the LLC under ra_llcs",
+    clRows.some((r) => Array.isArray(r.ra_llcs) && (r.ra_llcs as string[]).length > 0),
+    clRows.map((r) => ({ email: r.email, ra_llcs: r.ra_llcs })).slice(0, 3),
+  );
 }
 
 console.log(failures === 0 ? "\nALL PASS" : `\n${failures} FAILURES`);

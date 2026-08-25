@@ -22,8 +22,8 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
   const [message, setMessage] = useState("");
 
   const libraryQuery = useQuery({
-    queryKey: ["portal-library"],
-    queryFn: () => api.get<LibraryDoc[]>("/api/portal/library"),
+    queryKey: ["admin-library"],
+    queryFn: () => api.get<LibraryDoc[]>("/api/admin/library"),
     enabled,
   });
 
@@ -48,7 +48,7 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
       setFile(null);
       setEdition("");
       setMessage("Published — every client's next download is this edition.");
-      queryClient.invalidateQueries({ queryKey: ["portal-library"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-library"] });
     },
     onError: (e) => setMessage((e as Error).message),
   });
@@ -63,7 +63,7 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
           ? `Regenerated from the master — ${r.pages} pages, "${r.edition}". Every client's next download is this edition.`
           : "Already current — the published manual matches the master.",
       );
-      queryClient.invalidateQueries({ queryKey: ["portal-library"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-library"] });
     },
     onError: (e) => setMessage((e as Error).message),
   });
@@ -72,7 +72,6 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
 
   return (
     <>
-      <h2 className="mt-12 font-display text-xl">Reference library</h2>
       <div className="mt-4 rounded-2xl border border-border bg-card p-5">
         <div className="flex items-center gap-2">
           <BookOpen className="h-4 w-4 text-trust" />

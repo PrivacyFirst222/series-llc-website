@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
   DialogContent,
@@ -18,20 +19,7 @@ import {
 import { toast } from "@/components/ui/use-toast";
 import { api, ApiError } from "@/lib/api";
 import OrderBoard from "./OrderBoard";
-import { ServiceOrdersSection } from "./ServiceOrdersSection";
 import { LibrarySection } from "./LibrarySection";
-
-interface AdminOrder {
-  id: string;
-  contact_name: string;
-  contact_email: string;
-  package: "NEW" | "CONVERT";
-  llc_name: string;
-  status: string;
-  total_cents: number;
-  created_at: string;
-  paid_at: string | null;
-}
 
 interface AdminClient {
   id: string;
@@ -41,9 +29,9 @@ interface AdminClient {
   ra_cancellation_requested_at: string | null;
   has_password: boolean;
   document_count: number;
+  ra_llcs: string[];
 }
 
-const money = (cents: number) => `$${(cents / 100).toFixed(2)}`;
 const day = (iso: string | null) =>
   iso ? new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—";
 
@@ -215,6 +203,72 @@ function ChangeEmailDialog({ client }: { client: AdminClient }) {
   );
 }
 
+/** The client roster. The RA variant shows the LLCs we serve as registered
+ *  agent for — that is what the relationship attaches to — and keeps a client
+ *  listed after a cancellation request until we are replaced as agent of
+ *  record (the chip carries that state). */
+function ClientsTable({
+  clients,
+  variant,
+  emptyText,
+}: {
+  clients: AdminClient[];
+  variant: "all" | "ra";
+  emptyText: string;
+}) {
+  return (
+    <div className="mt-4 overflow-x-auto rounded-2xl border border-border bg-card">
+      <table className="w-full min-w-[560px] text-sm">
+        <thead>
+          <tr className="border-b border-border bg-secondary/40 text-left text-xs uppercase tracking-[0.14em] text-muted-foreground">
+            <th className="px-4 py-3 font-medium">Client</th>
+            {variant === "ra" ? <th className="px-4 py-3 font-medium">Registered agent for</th> : null}
+            <th className="px-4 py-3 font-medium">Portal account</th>
+            <th className="px-4 py-3 font-medium">Documents</th>
+            <th className="px-4 py-3 font-medium">Since</th>
+            <th className="px-4 py-3 font-medium"></th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-border">
+          {clients.length === 0 ? (
+            <tr>
+              <td colSpan={variant === "ra" ? 6 : 5} className="px-4 py-6 text-muted-foreground">
+                {emptyText}
+              </td>
+            </tr>
+          ) : (
+            clients.map((cl) => (
+              <tr key={cl.id}>
+                <td className="px-4 py-3">
+                  <span className="font-medium">{cl.name || "—"}</span>
+                  {cl.ra_cancellation_requested_at ? (
+                    <span className="ml-2 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-900">
+                      RA cancel requested {day(cl.ra_cancellation_requested_at)}
+                    </span>
+                  ) : null}
+                  <div className="text-xs text-muted-foreground">{cl.email}</div>
+                </td>
+                {variant === "ra" ? (
+                  <td className="px-4 py-3">{(cl.ra_llcs ?? []).join(", ")}</td>
+                ) : null}
+                <td className="px-4 py-3">{cl.has_password ? "Active" : "Invite sent"}</td>
+                <td className="px-4 py-3">{cl.document_count}</td>
+                <td className="px-4 py-3 text-muted-foreground">{day(cl.created_at)}</td>
+                <td className="px-4 py-3 text-right">
+                  <div className="flex justify-end gap-2">
+                    <ChangeEmailDialog client={cl} />
+                    <UploadDialog client={cl} />
+                  </div>
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 export default function AdminDashboard() {
   const navigate = useNavigate();
 
@@ -223,7 +277,6 @@ export default function AdminDashboard() {
     queryFn: () => api.get<{ ok: boolean }>("/api/admin/me"),
     retry: false,
   });
-
 
   const clientsQuery = useQuery({
     queryKey: ["admin-clients"],
@@ -244,64 +297,47 @@ export default function AdminDashboard() {
   }
 
   const clients = clientsQuery.data ?? [];
+  // ra_llcs may be missing on a response cached before the field existed —
+  // never let a stale cache blank the page.
+  const raClients = clients.filter((cl) => (cl.ra_llcs ?? []).length > 0);
 
   return (
     <section className="container-wide section-y">
       <span className="eyebrow">Admin</span>
       <h1 className="display mt-3 text-3xl lg:text-4xl">Orders &amp; clients</h1>
 
-      <OrderBoard enabled={authQuery.isSuccess} />
+      <Tabs defaultValue="formations" className="mt-6">
+        <TabsList className="h-auto flex-wrap">
+          <TabsTrigger value="formations">Formations &amp; Service Orders</TabsTrigger>
+          <TabsTrigger value="library">Reference Library</TabsTrigger>
+          <TabsTrigger value="ra-clients">Registered Agent Clients</TabsTrigger>
+          <TabsTrigger value="clients">Clients</TabsTrigger>
+        </TabsList>
 
-      <ServiceOrdersSection enabled={authQuery.isSuccess} />
+        <TabsContent value="formations">
+          <OrderBoard enabled={authQuery.isSuccess} />
+        </TabsContent>
 
-      <LibrarySection enabled={authQuery.isSuccess} />
+        <TabsContent value="library">
+          <LibrarySection enabled={authQuery.isSuccess} />
+        </TabsContent>
 
-      <h2 className="mt-12 font-display text-xl">Clients</h2>
-      <div className="mt-4 overflow-x-auto rounded-2xl border border-border bg-card">
-        <table className="w-full min-w-[560px] text-sm">
-          <thead>
-            <tr className="border-b border-border bg-secondary/40 text-left text-xs uppercase tracking-[0.14em] text-muted-foreground">
-              <th className="px-4 py-3 font-medium">Client</th>
-              <th className="px-4 py-3 font-medium">Portal account</th>
-              <th className="px-4 py-3 font-medium">Documents</th>
-              <th className="px-4 py-3 font-medium">Since</th>
-              <th className="px-4 py-3 font-medium"></th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {clients.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="px-4 py-6 text-muted-foreground">
-                  Clients appear here after their first paid order.
-                </td>
-              </tr>
-            ) : (
-              clients.map((cl) => (
-                <tr key={cl.id}>
-                  <td className="px-4 py-3">
-                    <span className="font-medium">{cl.name || "—"}</span>
-                    {cl.ra_cancellation_requested_at ? (
-                      <span className="ml-2 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-900">
-                        RA cancel requested {day(cl.ra_cancellation_requested_at)}
-                      </span>
-                    ) : null}
-                    <div className="text-xs text-muted-foreground">{cl.email}</div>
-                  </td>
-                  <td className="px-4 py-3">{cl.has_password ? "Active" : "Invite sent"}</td>
-                  <td className="px-4 py-3">{cl.document_count}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{day(cl.created_at)}</td>
-                  <td className="px-4 py-3 text-right">
-                    <div className="flex justify-end gap-2">
-                      <ChangeEmailDialog client={cl} />
-                      <UploadDialog client={cl} />
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+        <TabsContent value="ra-clients">
+          <ClientsTable
+            clients={raClients}
+            variant="ra"
+            emptyText="No registered agent clients yet — clients appear here when a paid order takes our registered agent service."
+          />
+        </TabsContent>
+
+        <TabsContent value="clients">
+          <ClientsTable
+            clients={clients}
+            variant="all"
+            emptyText="Clients appear here after their first paid order."
+          />
+        </TabsContent>
+      </Tabs>
     </section>
   );
 }

@@ -1395,6 +1395,17 @@ app.get("/portal/library", async (c) => {
   return c.json({ data: rows });
 });
 
+// The admin page's view of the same list. It cannot use /portal/library: that
+// route requires a CLIENT session, and an admin-only session 401s — which
+// rendered the library card as "Not yet published" while the manual was live.
+app.get("/admin/library", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const db = await getDb();
+  const rows = await db.query("SELECT key, title, edition, size_bytes, updated_at FROM library_documents ORDER BY title");
+  return c.json({ data: rows });
+});
+
 app.get("/portal/library/:key/download", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
@@ -2874,10 +2885,18 @@ app.get("/admin/clients", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const db = await getDb();
+  // ra_llcs: the LLCs for which we serve as registered agent — paid orders
+  // that took our RA service. Drives the Registered Agent Clients tab; a
+  // client who requested cancellation stays listed until we are replaced as
+  // agent of record (the cancellation chip carries that state).
   const rows = await db.query(
     `SELECT cl.id, cl.email, cl.name, cl.created_at, cl.ra_cancellation_requested_at,
             (cl.password_hash IS NOT NULL) AS has_password,
-            COUNT(d.id)::int AS document_count
+            COUNT(d.id)::int AS document_count,
+            (SELECT COALESCE(jsonb_agg(DISTINCT o.llc_name), '[]'::jsonb)
+               FROM orders o
+              WHERE o.client_id = cl.id AND o.status <> 'pending_payment'
+                AND o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_llcs
      FROM clients cl LEFT JOIN documents d ON d.client_id = cl.id
      GROUP BY cl.id ORDER BY cl.created_at DESC`,
   );
@@ -2926,6 +2945,7 @@ app.get("/admin/services", async (c) => {
   await purgeExpiredSElections().catch((e) => console.error("[purge] failed:", e));
   const rows = await db.query(
     `SELECT so.id, so.type, so.status, so.llc_name, so.details, so.amount_cents,
+            so.client_id, so.formation_order_id,
             so.created_at, so.paid_at, so.fulfilled_at,
             (so.ein_secret IS NOT NULL) AS has_secret,
             (so.type = 's-election' AND EXISTS (

@@ -1,10 +1,17 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AlertCircle, Building2, ChevronRight, Clock, Landmark, Mail, ShieldCheck } from "lucide-react";
+import { AlertCircle, Building2, Check, ChevronRight, Clock, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import OrderDetail from "./OrderDetail";
+import {
+  type AdminServiceOrder,
+  ServiceFulfillDialog,
+  STATUS_STYLE,
+  money,
+  summaryOf,
+} from "./ServiceOrdersSection";
 
 export interface BoardOrder {
   id: string;
@@ -47,45 +54,84 @@ function AgeBadge({ createdAt }: { createdAt: string }) {
   );
 }
 
-function Card({ order, onOpen }: { order: BoardOrder; onOpen: () => void }) {
+const serviceIsOpen = (s: AdminServiceOrder) => s.status === "awaiting_info" || s.status === "in_progress";
+
+/** One company: the formation plus its service orders, worked from one place.
+ *  The card is not itself a button any more — the title row opens the order,
+ *  because the service rows carry their own Fulfill actions. */
+function Card({
+  order,
+  services,
+  onOpen,
+  onFulfill,
+}: {
+  order: BoardOrder;
+  services: AdminServiceOrder[];
+  onOpen: () => void;
+  onFulfill: (s: AdminServiceOrder) => void;
+}) {
   return (
-    <button
-      type="button"
-      onClick={onOpen}
-      className="w-full rounded-xl border border-border bg-card p-3 text-left transition hover:border-trust/60 hover:shadow-sm"
-    >
-      <div className="flex items-start justify-between gap-2">
-        <span className="font-medium leading-snug">{order.llc_name}</span>
-        <ChevronRight className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
-      </div>
-      <div className="mt-1 text-xs text-muted-foreground">{order.contact_name}</div>
-      <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
-        <AgeBadge createdAt={order.created_at} />
-        <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-xs text-muted-foreground">
-          <Building2 className="h-3 w-3" />
-          {order.series_count} {order.series_count === 1 ? "series" : "series"}
-        </span>
-        {order.ra_service ? (
+    <div className="w-full rounded-xl border border-border bg-card p-3 text-left transition hover:border-trust/60 hover:shadow-sm">
+      <button type="button" onClick={onOpen} className="block w-full text-left">
+        <div className="flex items-start justify-between gap-2">
+          <span className="font-medium leading-snug">{order.llc_name}</span>
+          <ChevronRight className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+        </div>
+        <div className="mt-1 text-xs text-muted-foreground">{order.contact_name}</div>
+        <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+          <AgeBadge createdAt={order.created_at} />
           <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-xs text-muted-foreground">
-            <ShieldCheck className="h-3 w-3" />
-            our RA
+            <Building2 className="h-3 w-3" />
+            {order.series_count} series
           </span>
-        ) : null}
-        {order.ein_purchased ? (
-          <span
-            className={cn(
-              "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs",
-              order.ein_outstanding
-                ? "bg-amber-500/15 text-amber-700 dark:text-amber-400"
-                : "bg-secondary text-muted-foreground",
-            )}
-          >
-            <Landmark className="h-3 w-3" />
-            EIN{order.ein_outstanding ? " outstanding" : ""}
-          </span>
-        ) : null}
-      </div>
-    </button>
+          {order.ra_service ? (
+            <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-xs text-muted-foreground">
+              <ShieldCheck className="h-3 w-3" />
+              our RA
+            </span>
+          ) : null}
+        </div>
+      </button>
+      {services.length > 0 ? (
+        <div className="mt-2.5 flex flex-col gap-1.5 border-t border-border pt-2.5">
+          {services.map((s) => (
+            <div key={s.id} className="flex items-center gap-2 text-xs">
+              {s.status === "fulfilled" ? (
+                <Check className="h-3.5 w-3.5 shrink-0 text-trust" />
+              ) : (
+                <span
+                  className={cn(
+                    "shrink-0 rounded-full px-1.5 py-0.5 font-medium",
+                    STATUS_STYLE[s.status] ?? "bg-secondary text-muted-foreground",
+                  )}
+                >
+                  {s.status.replace(/_/g, " ")}
+                </span>
+              )}
+              <span className={cn("min-w-0 flex-1 truncate", s.status === "fulfilled" && "text-muted-foreground")}>
+                {summaryOf(s)}
+              </span>
+              {s.ein_pending && s.status !== "fulfilled" ? (
+                <span className="shrink-0 rounded-full bg-amber-100 px-1.5 py-0.5 font-medium text-amber-900">
+                  waiting on EIN
+                </span>
+              ) : null}
+              <span className="shrink-0 font-mono-feature text-muted-foreground">{money(s.amount_cents)}</span>
+              {serviceIsOpen(s) ? (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-6 shrink-0 rounded-full px-2.5 text-xs"
+                  onClick={() => onFulfill(s)}
+                >
+                  {s.type === "ein" && s.has_secret ? "View & fulfill" : "Fulfill"}
+                </Button>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      ) : null}
+    </div>
   );
 }
 
@@ -93,12 +139,16 @@ function Column({
   title,
   hint,
   orders,
+  servicesFor,
   onOpen,
+  onFulfill,
 }: {
   title: string;
   hint: string;
   orders: BoardOrder[];
+  servicesFor: (id: string) => AdminServiceOrder[];
   onOpen: (id: string) => void;
+  onFulfill: (s: AdminServiceOrder) => void;
 }) {
   return (
     <div className="flex min-w-[260px] flex-1 flex-col rounded-2xl border border-border bg-secondary/30">
@@ -113,7 +163,15 @@ function Column({
         {orders.length === 0 ? (
           <p className="px-1 py-4 text-xs text-muted-foreground">Nothing here.</p>
         ) : (
-          orders.map((o) => <Card key={o.id} order={o} onOpen={() => onOpen(o.id)} />)
+          orders.map((o) => (
+            <Card
+              key={o.id}
+              order={o}
+              services={servicesFor(o.id)}
+              onOpen={() => onOpen(o.id)}
+              onFulfill={onFulfill}
+            />
+          ))
         )}
       </div>
     </div>
@@ -130,6 +188,7 @@ export default function OrderBoard({ enabled }: { enabled: boolean }) {
   const queryClient = useQueryClient();
   const [openId, setOpenId] = useState<string | null>(null);
   const [showPending, setShowPending] = useState(false);
+  const [viewing, setViewing] = useState<AdminServiceOrder | null>(null);
   const [search, setSearch] = useState("");
   const q = search.trim();
 
@@ -141,6 +200,12 @@ export default function OrderBoard({ enabled }: { enabled: boolean }) {
     placeholderData: (prev) => prev,
   });
 
+  const servicesQuery = useQuery({
+    queryKey: ["admin-services"],
+    queryFn: () => api.get<AdminServiceOrder[]>("/api/admin/services"),
+    enabled,
+  });
+
   const markFiled = useMutation({
     mutationFn: (id: string) => api.post(`/api/admin/orders/${id}/filed`, {}),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin", "orders"] }),
@@ -149,16 +214,38 @@ export default function OrderBoard({ enabled }: { enabled: boolean }) {
   const orders = ordersQuery.data?.orders ?? [];
   const total = ordersQuery.data?.total ?? 0;
   const shown = ordersQuery.data?.shown ?? 0;
+
+  // Attach each service order to a company card: by formation_order_id when
+  // the order was bought with the formation, otherwise (portal purchases) to
+  // the client's newest visible formation. Abandoned service checkouts and
+  // cancellations don't appear on cards.
+  const newestByClient = new Map<string, string>();
+  for (const o of orders) {
+    if (o.client_id && !newestByClient.has(o.client_id)) newestByClient.set(o.client_id, o.id);
+  }
+  const byOrder = new Map<string, AdminServiceOrder[]>();
+  for (const s of servicesQuery.data ?? []) {
+    if (s.status === "pending_payment" || s.status === "cancelled") continue;
+    const target = s.formation_order_id ?? newestByClient.get(s.client_id);
+    if (!target) continue;
+    const list = byOrder.get(target);
+    if (list) list.push(s);
+    else byOrder.set(target, [s]);
+  }
+  const servicesFor = (id: string) => byOrder.get(id) ?? [];
+
   const pending = orders.filter((o) => o.status === "pending_payment");
   const isNew = orders.filter((o) => o.status === "paid");
   const withState = orders.filter((o) => o.status === "filed");
-  const done = orders.filter((o) => o.status === "formed");
+  // A formed company still owing service work sits in Service Orders; it
+  // reaches Complete only when the formation AND every service are done.
+  const formed = orders.filter((o) => o.status === "formed");
+  const serviceWork = formed.filter((o) => servicesFor(o.id).some(serviceIsOpen));
+  const done = formed.filter((o) => !servicesFor(o.id).some(serviceIsOpen));
   const oldestPending = pending.reduce<number>((m, o) => Math.max(m, ageInDays(o.created_at)), 0);
 
   return (
     <>
-      <h2 className="mt-10 font-display text-xl">Formations</h2>
-
       {/* The list caps at 200 rows, so the count and the search reach what the
           board cannot show. The count is always stated — truncation is never
           silent. */}
@@ -219,24 +306,38 @@ export default function OrderBoard({ enabled }: { enabled: boolean }) {
         </div>
       ) : null}
 
-      <div className="mt-4 flex flex-col gap-4 lg:flex-row">
+      <div className="mt-4 flex flex-col gap-4 xl:flex-row">
         <Column
-          title="New"
+          title="New Orders"
           hint="Paid, not yet filed"
           orders={isNew}
+          servicesFor={servicesFor}
           onOpen={setOpenId}
+          onFulfill={setViewing}
         />
         <Column
-          title="With the State"
+          title="With The State"
           hint="Filed, awaiting the Division"
           orders={withState}
+          servicesFor={servicesFor}
           onOpen={setOpenId}
+          onFulfill={setViewing}
         />
         <Column
-          title="Completed"
-          hint="Articles and designations in the client's portal"
-          orders={done}
+          title="Service Orders"
+          hint="Formed — service orders still open"
+          orders={serviceWork}
+          servicesFor={servicesFor}
           onOpen={setOpenId}
+          onFulfill={setViewing}
+        />
+        <Column
+          title="Complete"
+          hint="Formation and services done"
+          orders={done}
+          servicesFor={servicesFor}
+          onOpen={setOpenId}
+          onFulfill={setViewing}
         />
       </div>
 
@@ -252,6 +353,8 @@ export default function OrderBoard({ enabled }: { enabled: boolean }) {
           markingFiled={markFiled.isPending}
         />
       ) : null}
+
+      <ServiceFulfillDialog viewing={viewing} onClose={() => setViewing(null)} />
     </>
   );
 }
