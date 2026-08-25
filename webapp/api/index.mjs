@@ -105146,10 +105146,22 @@ async function createCheckout(opts) {
       description: opts.description ?? `Florida Protected Series LLC formation \u2014 ${opts.llcName}`
     })
   });
-  let res = await request(true);
+  const attemptWithRetry = async (withPrefill) => {
+    let lastError;
+    for (let i = 0; i < 3; i++) {
+      try {
+        return await request(withPrefill);
+      } catch (e) {
+        lastError = e;
+        await new Promise((resolve) => setTimeout(resolve, 400 * (i + 1)));
+      }
+    }
+    throw lastError;
+  };
+  let res = await attemptWithRetry(true);
   let body = await res.json();
   if (!res.ok && body.errors?.some((e) => e.field?.includes("buyer_email"))) {
-    res = await request(false);
+    res = await attemptWithRetry(false);
     body = await res.json();
   }
   if (!res.ok || !body.payment_link) {

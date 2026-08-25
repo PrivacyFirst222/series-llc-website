@@ -60,7 +60,27 @@ export async function createCheckout(opts: {
       }),
     });
 
-  let res = await request(true);
+  // Square occasionally drops the socket mid-call (seen 25 Aug 2026: an
+  // ECONNRESET from the sandbox failed a checkout in the e2e suite). fetch
+  // throws only on network-level failures — HTTP errors return normally — so
+  // the catch below is exactly the dropped-connection case. Retrying is safe
+  // here: a payment link charges nothing until the buyer opens it, each
+  // attempt carries its own idempotency key, and the order keeps only the
+  // link this function returns. Two retries turn a blip into a short delay.
+  const attemptWithRetry = async (withPrefill: boolean): Promise<Response> => {
+    let lastError: unknown;
+    for (let i = 0; i < 3; i++) {
+      try {
+        return await request(withPrefill);
+      } catch (e) {
+        lastError = e;
+        await new Promise((resolve) => setTimeout(resolve, 400 * (i + 1)));
+      }
+    }
+    throw lastError;
+  };
+
+  let res = await attemptWithRetry(true);
   let body = (await res.json()) as {
     payment_link?: { url: string; order_id: string };
     errors?: { field?: string }[];
@@ -68,7 +88,7 @@ export async function createCheckout(opts: {
   // The email prefill is a convenience — if Square dislikes the address,
   // retry without it rather than failing the whole checkout.
   if (!res.ok && body.errors?.some((e) => e.field?.includes("buyer_email"))) {
-    res = await request(false);
+    res = await attemptWithRetry(false);
     body = (await res.json()) as typeof body;
   }
   if (!res.ok || !body.payment_link) {
