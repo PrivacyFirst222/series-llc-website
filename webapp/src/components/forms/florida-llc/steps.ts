@@ -8,6 +8,7 @@
 export type StepKey =
   | "path"
   | "intro"
+  | "client"
   | "name"
   | "principal"
   | "mailing"
@@ -28,6 +29,7 @@ export type StepKey =
 export const STEPS: { key: StepKey; label: string }[] = [
   { key: "path", label: "Getting started" },
   { key: "intro", label: "Eligibility" },
+  { key: "client", label: "Your information" },
   { key: "name", label: "LLC name" },
   { key: "principal", label: "Principal address" },
   { key: "mailing", label: "Mailing address" },
@@ -58,6 +60,12 @@ const FIELD_STEP: Record<string, StepKey> = {
   existingLlcName: "path",
   sunbizDocumentNumber: "path",
   formationType: "intro",
+  clientFirstName: "client",
+  clientLastName: "client",
+  clientAddress: "client",
+  clientEmail: "client",
+  confirmClientEmail: "client",
+  clientPhone: "client",
   isFloridaDomesticEntityOnly: "intro",
   notLegalAdvice: "intro",
   publicRecordNotice: "intro",

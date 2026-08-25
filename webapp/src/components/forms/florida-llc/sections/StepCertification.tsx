@@ -158,6 +158,21 @@ export function StepCertification({ data, patch, errors }: StepProps) {
               patch({ authorizedRepresentativeName: e.target.value })
             }
           />
+          {!data.authorizedRepresentativeName &&
+          [data.clientFirstName, data.clientLastName].every((s) => s.trim()) ? (
+            <button
+              type="button"
+              className="mt-1.5 text-xs font-medium text-trust underline underline-offset-2"
+              onClick={() =>
+                patch({
+                  authorizedRepresentativeName: `${data.clientFirstName.trim()} ${data.clientLastName.trim()}`,
+                  authorizedRepresentativeEmail: data.clientEmail,
+                })
+              }
+            >
+              Use my name ({data.clientFirstName.trim()} {data.clientLastName.trim()})
+            </button>
+          ) : null}
         </FieldShell>
         <FieldShell label="Title (optional)">
           <Input

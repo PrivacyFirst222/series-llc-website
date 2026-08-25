@@ -92,6 +92,16 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <ReviewCard title="Your Information" onEdit={() => goToStep("client")}>
+          <Row
+            label="Name"
+            value={[data.clientFirstName, data.clientLastName].filter(Boolean).join(" ")}
+          />
+          <Row label="Email" value={data.clientEmail} />
+          <Row label="Phone" value={data.clientPhone} />
+          <Row label="Address" value={fmtAddr(data.clientAddress)} />
+        </ReviewCard>
+
         <ReviewCard title="LLC Name" onEdit={() => goToStep("name")}>
           <Row
             label="Formation type"
@@ -174,6 +184,9 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
           />
         </ReviewCard>
 
+        {/* Manager-managed: the members step never ran — ownership is
+            collected in the operating agreement questionnaire. */}
+        {data.managementStructure !== "MANAGER_MANAGED" ? (
         <ReviewCard title="Members / Ownership" onEdit={() => goToStep("members")}>
           <Row
             label="In Articles?"
@@ -200,6 +213,7 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
             }
           />
         </ReviewCard>
+        ) : null}
 
         <ReviewCard title="Business Purpose" onEdit={() => goToStep("purpose")}>
           <Row label="Type" value={data.purposeType} />

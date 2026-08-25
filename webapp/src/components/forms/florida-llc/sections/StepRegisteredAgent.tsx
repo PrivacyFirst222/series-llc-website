@@ -1,5 +1,6 @@
 import { ShieldCheck, UserRound } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { AcknowledgeBox, FieldShell } from "../FieldShell";
 import { AddressAutocomplete } from "../AddressAutocomplete";
 import { isPoBox } from "../schema";
@@ -103,6 +104,28 @@ export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
 
       {choice === "SELF" ? (
         <>
+          {[data.clientFirstName, data.clientLastName].every((s) => s.trim()) ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                patch({
+                  registeredAgentFirstName: data.clientFirstName.trim(),
+                  registeredAgentLastName: data.clientLastName.trim(),
+                  registeredAgentStreetAddress1: data.clientAddress.address1,
+                  registeredAgentStreetAddress2: data.clientAddress.address2 ?? "",
+                  registeredAgentCity: data.clientAddress.city,
+                  registeredAgentState: data.clientAddress.state,
+                  registeredAgentZip: data.clientAddress.zip,
+                  registeredAgentEmail: data.clientEmail,
+                  registeredAgentPhone: data.clientPhone ?? "",
+                })
+              }
+            >
+              Use my information ({data.clientFirstName.trim()} {data.clientLastName.trim()})
+            </Button>
+          ) : null}
           <div className="grid grid-cols-2 gap-4">
             <FieldShell
               label="Your first name"

@@ -117,6 +117,16 @@ export interface FloridaLLCFormData {
   notLegalAdvice: boolean;
   publicRecordNotice: boolean;
 
+  // Section 1.5 — the client: whose LLC this is. Portal account, welcome
+  // email, and the admin's "Client:" line all come from these fields, and the
+  // later person questions offer them as a one-tap fill.
+  clientFirstName: string;
+  clientLastName: string;
+  clientAddress: AddressFields;
+  clientEmail: string;
+  confirmClientEmail: string;
+  clientPhone?: string;
+
   // Section 2
   desiredLlcName: string;
   llcDesignator: LlcDesignator | "";
@@ -274,6 +284,14 @@ export interface SubmissionPayload {
   effectiveDate: {
     option: string;
     requestedEffectiveDate: string | null;
+  };
+  client: {
+    firstName: string;
+    lastName: string;
+    name: string;
+    email: string;
+    phone: string;
+    address: AddressFields;
   };
   correspondence: {
     name: string;

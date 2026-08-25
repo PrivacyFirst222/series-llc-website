@@ -174,13 +174,24 @@ export const formationFormSchema = z.object({
 
   collectMembersForInternalRecords: z.boolean(),
   includeMembersInArticles: z.boolean(),
-  members: z.array(memberEntrySchema).min(1, "At least one initial member is required."),
+  // Required for member-managed companies (they are the AMBRs the Articles
+  // list). Manager-managed intakes never see the members step — ownership is
+  // collected in the operating agreement questionnaire — so the array may be
+  // empty; the conditional floor lives in the server's superRefine.
+  members: z.array(memberEntrySchema),
 
   purposeType: z.enum(["GENERAL", "SPECIFIC", "PROFESSIONAL"]),
   businessPurposeText: z.string(),
 
   effectiveDateOption: z.enum(["FILED_BY_DIVISION", "SPECIFIC"]),
   requestedEffectiveDate: z.string().optional().or(z.literal("")),
+
+  clientFirstName: z.string().min(1, "First name required"),
+  clientLastName: z.string().min(1, "Last name required"),
+  clientAddress: addressSchema,
+  clientEmail: z.string().email("Enter a valid email"),
+  confirmClientEmail: z.string().email("Enter a valid email"),
+  clientPhone: z.string().optional().or(z.literal("")),
 
   correspondentName: z.string().min(1, "Name required"),
   correspondentCompany: z.string().optional().or(z.literal("")),

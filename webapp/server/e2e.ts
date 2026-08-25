@@ -66,6 +66,13 @@ const formData: FloridaLLCFormData = {
   ],
   purposeType: "GENERAL",
   effectiveDateOption: "FILED_BY_DIVISION",
+  clientFirstName: "Casey",
+  clientLastName: "Member",
+  clientAddress: {
+    address1: "100 Ocean Drive", address2: "", city: "Miami", state: "FL", zip: "33139", country: "United States",
+  },
+  clientEmail: testEmail,
+  confirmClientEmail: testEmail,
   correspondentName: "Casey Member",
   correspondentEmail: testEmail,
   confirmCorrespondentEmail: testEmail,
@@ -167,6 +174,7 @@ check("un-acknowledged order creates no order and no checkout link",
     body: JSON.stringify({
       ...formData,
       correspondentEmail: testEmail.replace("@", "+afterrejects@"),
+    clientEmail: testEmail.replace("@", "+afterrejects@"), confirmClientEmail: testEmail.replace("@", "+afterrejects@"),
       confirmCorrespondentEmail: testEmail.replace("@", "+afterrejects@"),
     }),
   });
@@ -188,6 +196,7 @@ const svc = await api("/api/orders", {
     registeredAgentState: "NV",
     registeredAgentZip: "89501",
     correspondentEmail: testEmail.replace("@", "+svc@"),
+    clientEmail: testEmail.replace("@", "+svc@"), confirmClientEmail: testEmail.replace("@", "+svc@"),
     confirmCorrespondentEmail: testEmail.replace("@", "+svc@"),
   }),
 });
@@ -232,6 +241,7 @@ check("service-RA order accepted with canonical details enforced", svc.status ==
       authorizedRepresentativeSignature: "",
       authorizedRepresentativeSignatureCheckbox: false,
       correspondentEmail: testEmail.replace("@", "+appointed@"),
+    clientEmail: testEmail.replace("@", "+appointed@"), confirmClientEmail: testEmail.replace("@", "+appointed@"),
       confirmCorrespondentEmail: testEmail.replace("@", "+appointed@"),
     }),
   });
@@ -708,11 +718,11 @@ if (mint.status === 200) {
         streetAddress1: "100 Ocean Drive", city: "Miami", state: "FL", zip: "33139", country: "United States",
       },
     ],
-    members: [
-      { ...structuredClone(defaultFormData.members[0]), firstName: "Sam", lastName: "Ortiz", address1: "50 Sunset Blvd", city: "Orlando", state: "FL", zip: "32801" },
-      { ...structuredClone(defaultFormData.members[0]), firstName: "Riley", lastName: "Ortiz", address1: "50 Sunset Blvd", city: "Orlando", state: "FL", zip: "32801" },
-    ],
+    // Manager-managed: no members step; the Ortizes are entered in the OA
+    // questionnaire below.
+    members: [],
     correspondentEmail: coupleEmail,
+    clientEmail: coupleEmail, confirmClientEmail: coupleEmail,
     confirmCorrespondentEmail: coupleEmail,
     orderEin: false,
     orderSElection: false, // the couple's S election is purchased from the portal in 15c
@@ -753,12 +763,20 @@ if (mint.status === 200) {
     check("couple order marked formed", formed2.ok, await formed2.clone().json().catch(() => null));
   }
   const mSeed = await api("/api/portal/oa", { cookies: mPw.cookie });
-  check("multi OA seed has 2 members", mSeed.body?.data?.version === "multi" && mSeed.body?.data?.multiOwner === true && mSeed.body?.data?.seed?.members?.length === 2, mSeed.body?.data);
+  check(
+    "manager-managed couple seed starts with no owners",
+    (mSeed.body?.data?.seed?.members?.length ?? 0) === 0,
+    mSeed.body?.data,
+  );
   const coupleAnswers = {
     firstOrAmended: "first",
     effectiveDate: "2026-08-06",
     authorized: true,
-    members: [{}, {}],
+    multiOwner: true,
+    members: [
+      { name: "Sam Ortiz", address: "50 Sunset Blvd, Orlando, FL 32801" },
+      { name: "Riley Ortiz", address: "50 Sunset Blvd, Orlando, FL 32801" },
+    ],
     series: [{}],
     couples: [{ a: 0, b: 1, form: "TBE", percentage: 100, contribution: "$2,000 cash", todBeneficiary: "Ortiz Family Trust" }],
     includeCapitalCalls: false,
@@ -950,6 +968,8 @@ if (mint.status === 200) {
     ],
     correspondentName: "Dana Reed",
     correspondentEmail: mmEmail,
+    clientEmail: mmEmail, confirmClientEmail: mmEmail,
+    clientFirstName: "Dana", clientLastName: "Reed",
     confirmCorrespondentEmail: mmEmail,
     registeredAgentFirstName: "Dana", registeredAgentLastName: "Reed",
     registeredAgentAcceptanceName: "Dana Reed",
@@ -1048,11 +1068,13 @@ if (mint.status === 200) {
         streetAddress1: "9 Harbor Road", city: "Naples", state: "FL", zip: "34102", country: "United States",
       },
     ],
-    members: [
-      { ...structuredClone(defaultFormData.members[0]), firstName: "Alex", lastName: "Vale", address1: "9 Harbor Road", city: "Naples", state: "FL", zip: "34102" },
-    ],
+    // Manager-managed: the members step never runs — ownership is collected
+    // in the operating agreement questionnaire.
+    members: [],
     correspondentName: "Alex Vale",
     correspondentEmail: smEmail,
+    clientEmail: smEmail, confirmClientEmail: smEmail,
+    clientFirstName: "Alex", clientLastName: "Vale",
     confirmCorrespondentEmail: smEmail,
     registeredAgentFirstName: "Alex", registeredAgentLastName: "Vale",
     registeredAgentAcceptanceName: "Alex Vale",
@@ -1098,14 +1120,17 @@ if (mint.status === 200) {
   check("manager-managed sole owner signs in", smPw.status === 200, smPw.body);
   const smSeed = await api("/api/portal/oa", { cookies: smPw.cookie });
   check(
-    "seed reports a sole owner who is NOT member-managed",
-    smSeed.body?.data?.version === "single" && smSeed.body?.data?.multiOwner === false && smSeed.body?.data?.memberManaged === false,
+    "manager-managed seed starts with no owners and is not member-managed",
+    smSeed.body?.data?.memberManaged === false && (smSeed.body?.data?.seed?.members?.length ?? 0) === 0,
     smSeed.body?.data,
   );
 
   const smAnswers = {
     firstOrAmended: "first", effectiveDate: "2026-08-08", authorized: true,
     contributionToCompany: "$2,500 cash", series: [{}],
+    // Ownership is an answer here, not an intake seed.
+    multiOwner: false,
+    members: [{ name: "Alex Vale", address: "9 Harbor Road, Naples, FL 34102" }],
   };
   // The defect this case exists for: without a borrowing limit the agreement
   // used to say $25,000 on nobody's authority. It must now be refused.
@@ -1155,6 +1180,7 @@ if (mint.status === 200) {
   const edData = {
     ...formData,
     correspondentEmail: edEmail,
+    clientEmail: edEmail, confirmClientEmail: edEmail,
     confirmCorrespondentEmail: edEmail,
     desiredLlcName: "E2E Editable Owners",
     series: [{ id: "s1", name: "E2E Editable Owners, LLC, PS A" }],
@@ -1286,7 +1312,12 @@ if (mint.status === 200) {
   const acctData = {
     ...formData,
     desiredLlcName: "E2E Account Settings",
-    correspondentEmail: acctEmail, confirmCorrespondentEmail: acctEmail,
+    // Deliberately DIFFERENT from the client email: the portal account must
+    // belong to the client from the up-front card, never to the
+    // correspondence contact. The sign-in below proves it.
+    correspondentEmail: acctEmail.replace("@", "+updates@"),
+    confirmCorrespondentEmail: acctEmail.replace("@", "+updates@"),
+    clientEmail: acctEmail, confirmClientEmail: acctEmail,
     series: [{ id: "s1", name: "E2E Account Settings, LLC, PS A" }],
     orderEin: false, orderSElection: false,
     // Our RA service, so the suite holds one PAID RA order — what the admin
@@ -1313,7 +1344,7 @@ if (mint.status === 200) {
   const aPw = await api("/api/auth/set-password", {
     method: "POST", body: JSON.stringify({ token: aMint.body?.data?.token, password: "e2e-acct-pass-1" }),
   });
-  check("account-test client signs in", aPw.status === 200);
+  check("the CLIENT (not the correspondence contact) gets the portal account", aPw.status === 200, aPw.body);
 
   // --- change password ---
   const wrongCur = await api("/api/portal/account/password", {

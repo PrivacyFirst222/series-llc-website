@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { FieldShell } from "../FieldShell";
 import { AddressFieldsBlock } from "../AddressFields";
@@ -20,6 +21,25 @@ const blankAddress = () => ({
 });
 
 export function StepCorrespondence({ data, patch, errors }: StepProps) {
+  // Starts as the client — that's who correspondence belongs to unless they
+  // say otherwise. Filled once when the fields are still blank; anything the
+  // client edits afterwards stays edited.
+  useEffect(() => {
+    if (data.correspondentName || data.correspondentEmail) return;
+    const name = [data.clientFirstName, data.clientLastName]
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .join(" ");
+    if (!name && !data.clientEmail) return;
+    patch({
+      correspondentName: name,
+      correspondentEmail: data.clientEmail,
+      confirmCorrespondentEmail: data.clientEmail,
+      correspondentPhone: data.clientPhone ?? "",
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const emailMismatch =
     data.correspondentEmail &&
     data.confirmCorrespondentEmail &&

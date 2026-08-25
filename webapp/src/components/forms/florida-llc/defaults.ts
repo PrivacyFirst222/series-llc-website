@@ -36,6 +36,18 @@ export const defaultFormData: FloridaLLCFormData = {
   notLegalAdvice: false,
   publicRecordNotice: false,
 
+  clientFirstName: "",
+
+  clientLastName: "",
+
+  clientAddress: { address1: "", address2: "", city: "", state: "", zip: "", country: "US" },
+
+  clientEmail: "",
+
+  confirmClientEmail: "",
+
+  clientPhone: "",
+
   desiredLlcName: "",
   llcDesignator: "",
   alternateName1: "",

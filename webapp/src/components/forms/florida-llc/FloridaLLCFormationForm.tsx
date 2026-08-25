@@ -9,6 +9,7 @@ import { buildPayload, flattenForFormspree } from "./buildPayload";
 import { FeeEstimate } from "./FeeEstimate";
 import { ReviewStep } from "./ReviewStep";
 import { StepIntro } from "./sections/StepIntro";
+import { StepClient } from "./sections/StepClient";
 import { StepName } from "./sections/StepName";
 import { StepPrincipalAddress } from "./sections/StepPrincipalAddress";
 import { StepMailingAddress } from "./sections/StepMailingAddress";
@@ -227,9 +228,13 @@ export function FloridaLLCFormationForm({
   };
 
   // Member-managed companies never see the managers step: the members are
-  // listed automatically (AMBR) and there is nothing to ask.
+  // listed automatically (AMBR) and there is nothing to ask. Manager-managed
+  // companies never see the members step: the Articles list only managers,
+  // and ownership is collected once — in the operating agreement
+  // questionnaire, whose first question routes between the masters.
   const stepHidden = (i: number): boolean =>
-    STEPS[i]?.key === "managers" && data.managementStructure === "MEMBER_MANAGED";
+    (STEPS[i]?.key === "managers" && data.managementStructure === "MEMBER_MANAGED") ||
+    (STEPS[i]?.key === "members" && data.managementStructure === "MANAGER_MANAGED");
 
   const advance = () => {
     setErrors({});
@@ -577,6 +582,8 @@ export function FloridaLLCFormationForm({
               <StepFilingPath data={data} patch={patch} errors={errors} />
             ) : stepKey === "intro" ? (
               <StepIntro data={data} patch={patch} errors={errors} />
+            ) : stepKey === "client" ? (
+              <StepClient data={data} patch={patch} errors={errors} />
             ) : stepKey === "name" ? (
               <StepName data={data} patch={patch} errors={errors} />
             ) : stepKey === "principal" ? (

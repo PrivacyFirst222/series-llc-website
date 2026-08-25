@@ -23,12 +23,31 @@ async function createDb(): Promise<Db> {
     throw new Error("DATABASE_URL is not set — the database is required in production.");
   }
   // Local development: embedded Postgres, no account needed.
+  //
+  // Self-healing: --watch restarts kill the process without closing PGlite,
+  // and a kill mid-write can corrupt the data directory — the next boot then
+  // aborts its WASM engine on the FIRST query and every request 500s until
+  // someone deletes .dev-data/pg by hand (which happened three times on
+  // 24-25 Aug 2026). Dev data is disposable by definition, so on a failed
+  // first query the directory is recreated fresh instead.
   const { PGlite } = await import("@electric-sql/pglite");
   const { fileURLToPath } = await import("node:url");
-  const { mkdirSync } = await import("node:fs");
+  const { mkdirSync, rmSync } = await import("node:fs");
   const dir = fileURLToPath(new URL("../.dev-data/pg", import.meta.url));
-  mkdirSync(dir, { recursive: true });
-  const pg = new PGlite(dir);
+  const open = async () => {
+    mkdirSync(dir, { recursive: true });
+    const inst = new PGlite(dir);
+    await inst.query("SELECT 1");
+    return inst;
+  };
+  let pg: InstanceType<typeof PGlite>;
+  try {
+    pg = await open();
+  } catch (e) {
+    console.error(`[db] local PGlite data was unreadable (${(e as Error).message}) — recreating .dev-data/pg fresh; dev data is disposable`);
+    rmSync(dir, { recursive: true, force: true });
+    pg = await open();
+  }
   return {
     async query<T>(text: string, params: unknown[] = []) {
       const res = await pg.query<T>(text, params);

@@ -109,7 +109,10 @@ app.post("/orders", async (c) => {
     data.registeredAgentState,
   );
   if (raError) return c.json(err(raError, "INVALID_INPUT"), 400);
-  if (data.members.length < 1) {
+  // Members are collected at intake only for member-managed companies (they
+  // are the AMBRs the Articles list). Manager-managed intakes never see the
+  // members step — ownership lives in the operating agreement questionnaire.
+  if (data.managementStructure !== "MANAGER_MANAGED" && data.members.length < 1) {
     return c.json(err("At least one member is required.", "INVALID_INPUT"), 400);
   }
 
@@ -158,8 +161,11 @@ app.post("/orders", async (c) => {
     `INSERT INTO orders (contact_name, contact_email, package, llc_name, payload, service_fee_cents, state_fees_cents, total_cents)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
     [
-      data.correspondentName,
-      data.correspondentEmail.toLowerCase(),
+      // The CLIENT owns the order: portal account, welcome email, and the
+      // admin's "Client:" line all come from the up-front card, not from the
+      // correspondence contact (which is only where updates go).
+      `${data.clientFirstName.trim()} ${data.clientLastName.trim()}`.trim(),
+      data.clientEmail.toLowerCase(),
       data.filingPath === "CONVERT" ? "CONVERT" : "NEW",
       llcName,
       JSON.stringify(payload),
@@ -1767,14 +1773,17 @@ app.get("/portal/services", async (c) => {
     `SELECT ${SERVICE_SAFE_COLUMNS} FROM service_orders WHERE client_id = $1 ORDER BY created_at DESC`,
     [session.clientId],
   );
-  // The owner dropdown is built from the members on the formation record, so a
-  // client picks a name instead of retyping one.
+  // The owner dropdown is built from the owners as the client last stated
+  // them: the intake members where those exist (member-managed), overridden
+  // by anything answered in the operating-agreement questionnaire — the only
+  // ownership source a manager-managed company has.
   const seed = await oaSeed(session.clientId);
+  const owners = effectiveOwners(seed?.members ?? [], await savedOaAnswers(session.clientId));
   return c.json({
     data: {
       llcName: await clientLlcName(session.clientId),
       dev: !env.isProd && !env.SQUARE_ACCESS_TOKEN,
-      members: seed?.members ?? [],
+      members: owners,
       pricing: {
         seriesCents: SERIES_ADDON_PREP_CENTS + SERIES_ADDON_STATE_CENTS,
         einCents: EIN_FEE_CENTS,

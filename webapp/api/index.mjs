@@ -103793,11 +103793,21 @@ var formationFormSchema = external_exports.object({
   managers: external_exports.array(partyEntrySchema),
   collectMembersForInternalRecords: external_exports.boolean(),
   includeMembersInArticles: external_exports.boolean(),
-  members: external_exports.array(memberEntrySchema).min(1, "At least one initial member is required."),
+  // Required for member-managed companies (they are the AMBRs the Articles
+  // list). Manager-managed intakes never see the members step — ownership is
+  // collected in the operating agreement questionnaire — so the array may be
+  // empty; the conditional floor lives in the server's superRefine.
+  members: external_exports.array(memberEntrySchema),
   purposeType: external_exports.enum(["GENERAL", "SPECIFIC", "PROFESSIONAL"]),
   businessPurposeText: external_exports.string(),
   effectiveDateOption: external_exports.enum(["FILED_BY_DIVISION", "SPECIFIC"]),
   requestedEffectiveDate: external_exports.string().optional().or(external_exports.literal("")),
+  clientFirstName: external_exports.string().min(1, "First name required"),
+  clientLastName: external_exports.string().min(1, "Last name required"),
+  clientAddress: addressSchema,
+  clientEmail: external_exports.string().email("Enter a valid email"),
+  confirmClientEmail: external_exports.string().email("Enter a valid email"),
+  clientPhone: external_exports.string().optional().or(external_exports.literal("")),
   correspondentName: external_exports.string().min(1, "Name required"),
   correspondentCompany: external_exports.string().optional().or(external_exports.literal("")),
   correspondentEmail: external_exports.string().email("Enter a valid email"),
@@ -103946,6 +103956,20 @@ var extendedFormSchema = formationFormSchema.extend({
   }),
   articlesSignerAppointment: external_exports.boolean().optional().default(false)
 }).superRefine((data, ctx) => {
+  if (data.managementStructure !== "MANAGER_MANAGED" && data.members.length === 0) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      path: ["members"],
+      message: "At least one initial member is required."
+    });
+  }
+  if (data.clientEmail !== data.confirmClientEmail) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      path: ["confirmClientEmail"],
+      message: "The email addresses do not match."
+    });
+  }
   data.series.forEach((s, i) => {
     if (!hasProtectedSeriesPhrase(s.name)) {
       ctx.addIssue({
@@ -104137,7 +104161,10 @@ function buildPayload(data) {
     members: {
       collectForInternalRecords: data.collectMembersForInternalRecords,
       includeMembersInArticles: data.includeMembersInArticles,
-      memberList: data.includeMembersInArticles ? data.members : data.members
+      // Manager-managed: the members step is never shown — ownership lives in
+      // the operating agreement questionnaire, and a stray default row must
+      // not reach the record.
+      memberList: data.managementStructure === "MANAGER_MANAGED" ? [] : data.members
     },
     purpose: {
       purposeType: data.purposeType || "",
@@ -104146,6 +104173,14 @@ function buildPayload(data) {
     effectiveDate: {
       option: data.effectiveDateOption,
       requestedEffectiveDate: data.effectiveDateOption === "SPECIFIC" ? data.requestedEffectiveDate ?? null : null
+    },
+    client: {
+      firstName: data.clientFirstName.trim(),
+      lastName: data.clientLastName.trim(),
+      name: `${data.clientFirstName.trim()} ${data.clientLastName.trim()}`.trim(),
+      email: data.clientEmail,
+      phone: data.clientPhone ?? "",
+      address: data.clientAddress
     },
     correspondence: {
       name: data.correspondentName,
@@ -104225,10 +104260,22 @@ async function createDb() {
   }
   const { PGlite } = await import("@electric-sql/pglite");
   const { fileURLToPath } = await import("node:url");
-  const { mkdirSync } = await import("node:fs");
+  const { mkdirSync, rmSync } = await import("node:fs");
   const dir = fileURLToPath(new URL("../.dev-data/pg", import.meta.url));
-  mkdirSync(dir, { recursive: true });
-  const pg = new PGlite(dir);
+  const open = async () => {
+    mkdirSync(dir, { recursive: true });
+    const inst = new PGlite(dir);
+    await inst.query("SELECT 1");
+    return inst;
+  };
+  let pg;
+  try {
+    pg = await open();
+  } catch (e) {
+    console.error(`[db] local PGlite data was unreadable (${e.message}) \u2014 recreating .dev-data/pg fresh; dev data is disposable`);
+    rmSync(dir, { recursive: true, force: true });
+    pg = await open();
+  }
   return {
     async query(text, params = []) {
       const res = await pg.query(text, params);
@@ -110537,7 +110584,7 @@ app.post("/orders", async (c) => {
     data.registeredAgentState
   );
   if (raError) return c.json(err2(raError, "INVALID_INPUT"), 400);
-  if (data.members.length < 1) {
+  if (data.managementStructure !== "MANAGER_MANAGED" && data.members.length < 1) {
     return c.json(err2("At least one member is required.", "INVALID_INPUT"), 400);
   }
   const nameProblems = await unavailableNames(
@@ -110576,8 +110623,11 @@ app.post("/orders", async (c) => {
     `INSERT INTO orders (contact_name, contact_email, package, llc_name, payload, service_fee_cents, state_fees_cents, total_cents)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
     [
-      data.correspondentName,
-      data.correspondentEmail.toLowerCase(),
+      // The CLIENT owns the order: portal account, welcome email, and the
+      // admin's "Client:" line all come from the up-front card, not from the
+      // correspondence contact (which is only where updates go).
+      `${data.clientFirstName.trim()} ${data.clientLastName.trim()}`.trim(),
+      data.clientEmail.toLowerCase(),
       data.filingPath === "CONVERT" ? "CONVERT" : "NEW",
       llcName,
       JSON.stringify(payload),
@@ -111816,11 +111866,12 @@ app.get("/portal/services", async (c) => {
     [session.clientId]
   );
   const seed = await oaSeed(session.clientId);
+  const owners = effectiveOwners(seed?.members ?? [], await savedOaAnswers(session.clientId));
   return c.json({
     data: {
       llcName: await clientLlcName(session.clientId),
       dev: !env.isProd && !env.SQUARE_ACCESS_TOKEN,
-      members: seed?.members ?? [],
+      members: owners,
       pricing: {
         seriesCents: SERIES_ADDON_PREP_CENTS + SERIES_ADDON_STATE_CENTS,
         einCents: EIN_FEE_CENTS,

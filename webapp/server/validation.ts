@@ -44,6 +44,24 @@ const extendedFormSchema = formationFormSchema
     articlesSignerAppointment: z.boolean().optional().default(false),
   })
   .superRefine((data, ctx) => {
+    // Members are required exactly when the intake collects them: a
+    // member-managed company lists them as AMBR in the Articles. A
+    // manager-managed company collects ownership in the operating agreement
+    // questionnaire instead, so an empty array is correct there.
+    if (data.managementStructure !== "MANAGER_MANAGED" && data.members.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["members"],
+        message: "At least one initial member is required.",
+      });
+    }
+    if (data.clientEmail !== data.confirmClientEmail) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["confirmClientEmail"],
+        message: "The email addresses do not match.",
+      });
+    }
     data.series.forEach((s, i) => {
       if (!hasProtectedSeriesPhrase(s.name)) {
         ctx.addIssue({

@@ -32,6 +32,23 @@ export function validateStep(
       e.publicRecordNotice = "Acknowledgment is required.";
   }
 
+  if (step === "client") {
+    if (!data.clientFirstName.trim()) e.clientFirstName = "First name required.";
+    if (!data.clientLastName.trim()) e.clientLastName = "Last name required.";
+    if (!data.clientEmail) e.clientEmail = "Email required.";
+    else if (!isValidEmail(data.clientEmail))
+      e.clientEmail = "That doesn't look like a valid email address.";
+    if (!data.confirmClientEmail) e.confirmClientEmail = "Please confirm email.";
+    if (
+      data.clientEmail &&
+      data.confirmClientEmail &&
+      data.clientEmail !== data.confirmClientEmail
+    )
+      e.confirmClientEmail = "Emails do not match.";
+    if (!data.clientAddress.address1.trim() || !data.clientAddress.city.trim() || !data.clientAddress.zip.trim())
+      e.clientAddress = "Street address, city, and ZIP are required.";
+  }
+
   if (step === "name") {
     if (data.filingPath === "CONVERT") {
       if (!data.existingLlcName?.trim())
@@ -246,6 +263,9 @@ export function validateStep(
   }
 
   if (step === "members") {
+    // Hidden entirely for manager-managed companies — ownership is collected
+    // in the operating agreement questionnaire, not here.
+    if (data.managementStructure === "MANAGER_MANAGED") return e;
     if (data.members.length === 0)
       e.members =
         "At least one initial member is required for internal formation records.";

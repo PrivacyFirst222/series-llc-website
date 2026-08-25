@@ -15,9 +15,10 @@ export function StepManagers({ data, patch, errors }: StepProps) {
     data.managementStructure === "MANAGER_MANAGED" &&
     data.includeManagementStatementInArticles;
 
-  // Managers are nearly always the members themselves. Retyping a name here
-  // produces a mismatch between Exhibit A and the signature block of the
-  // operating agreement, so offer the members you already entered.
+  // Retyping a name here produces a mismatch between the Articles and the
+  // operating agreement, so offer every person the form already knows: the
+  // client (always), and the members where the members step exists
+  // (member-managed intakes reaching here via NOT_SPECIFIED).
   const role = "MGR";
   const listed = new Set(
     data.managers.map((m) =>
@@ -29,46 +30,94 @@ export function StepManagers({ data, patch, errors }: StepProps) {
         .toLowerCase(),
     ),
   );
-  const candidates = data.members
-    .map((m) => ({
-      member: m,
-      name:
+
+  interface Candidate {
+    id: string;
+    name: string;
+    label: string;
+    entry: () => PartyEntry;
+  }
+  const newId = () => Math.random().toString(36).slice(2, 10);
+
+  const clientName = [data.clientFirstName, data.clientLastName]
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .join(" ");
+  const clientCandidate: Candidate | null = clientName
+    ? {
+        id: "client",
+        name: clientName,
+        label: `${clientName} (you)`,
+        entry: () => ({
+          id: newId(),
+          role,
+          personOrEntity: "INDIVIDUAL",
+          firstName: data.clientFirstName.trim(),
+          lastName: data.clientLastName.trim(),
+          businessEntityName: "",
+          streetAddress1: data.clientAddress.address1,
+          streetAddress2: data.clientAddress.address2 ?? "",
+          city: data.clientAddress.city,
+          state: data.clientAddress.state,
+          zip: data.clientAddress.zip,
+          country: data.clientAddress.country || "United States",
+          phone: data.clientPhone ?? "",
+          email: data.clientEmail,
+        }),
+      }
+    : null;
+
+  const memberCandidates: Candidate[] = data.members
+    .map((m) => {
+      const name =
         (m.memberType === "ENTITY"
           ? m.entityName
           : [m.firstName, m.lastName].filter(Boolean).join(" ")
-        )?.trim() ?? "",
-      firstName: (m.firstName ?? "").trim(),
-      lastName: (m.lastName ?? "").trim(),
-    }))
-    .filter((c) => c.name && !listed.has(c.name.toLowerCase()));
+        )?.trim() ?? "";
+      return {
+        id: m.id,
+        name,
+        label: name,
+        entry: (): PartyEntry => ({
+          id: newId(),
+          role,
+          personOrEntity: m.memberType,
+          firstName: m.memberType === "ENTITY" ? "" : (m.firstName ?? "").trim(),
+          lastName: m.memberType === "ENTITY" ? "" : (m.lastName ?? "").trim(),
+          businessEntityName: m.memberType === "ENTITY" ? name : "",
+          streetAddress1: m.address1,
+          streetAddress2: m.address2 ?? "",
+          city: m.city,
+          state: m.state,
+          zip: m.zip,
+          country: m.country || "United States",
+          phone: m.phone ?? "",
+          email: m.email ?? "",
+        }),
+      };
+    })
+    .filter((c) => c.name);
 
-  const entryFor = (c: (typeof candidates)[number]): PartyEntry => {
-    const m = c.member;
-    return {
-      id: Math.random().toString(36).slice(2, 10),
-      role,
-      personOrEntity: m.memberType,
-      firstName: m.memberType === "ENTITY" ? "" : c.firstName,
-      lastName: m.memberType === "ENTITY" ? "" : c.lastName,
-      businessEntityName: m.memberType === "ENTITY" ? c.name : "",
-      streetAddress1: m.address1,
-      streetAddress2: m.address2 ?? "",
-      city: m.city,
-      state: m.state,
-      zip: m.zip,
-      country: m.country || "United States",
-      phone: m.phone ?? "",
-      email: m.email ?? "",
-    };
-  };
-  const addMember = (c: (typeof candidates)[number]) => {
-    patch({ managers: [...data.managers, entryFor(c)] });
+  const candidates = [
+    ...(clientCandidate ? [clientCandidate] : []),
+    // The client may also be a member — never offer the same name twice.
+    ...memberCandidates.filter(
+      (c) => c.name.toLowerCase() !== clientName.toLowerCase(),
+    ),
+  ].filter((c) => !listed.has(c.name.toLowerCase()));
+
+  const add = (c: Candidate) => {
+    patch({ managers: [...data.managers, c.entry()] });
   };
   // One press: every member not already listed becomes a manager, name and
   // address copied exactly.
   const addAllMembers = () => {
-    patch({ managers: [...data.managers, ...candidates.map(entryFor)] });
+    const fresh = memberCandidates.filter((c) => !listed.has(c.name.toLowerCase()));
+    patch({ managers: [...data.managers, ...fresh.map((c) => c.entry())] });
   };
+  const hasMemberCandidates = memberCandidates.some(
+    (c) => !listed.has(c.name.toLowerCase()),
+  );
 
   return (
     <div className="space-y-6">
@@ -82,29 +131,30 @@ export function StepManagers({ data, patch, errors }: StepProps) {
         </p>
       </header>
 
-      {candidates.length > 0 ? (
+      {candidates.length > 0 || hasMemberCandidates ? (
         <div className="rounded-xl border border-border bg-muted/40 p-4">
-          <p className="text-sm font-medium">Add one or more of your members as a manager</p>
+          <p className="text-sm font-medium">Add a manager without retyping</p>
           <p className="mt-1 text-xs text-muted-foreground">
-            In most companies the managers are the members. Adding them here
-            copies the name and address exactly, so your operating agreement
-            matches.
+            Adding a person here copies their name and address exactly, so your
+            operating agreement matches.
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
-            <Button type="button" size="sm" onClick={addAllMembers}>
-              <Users className="mr-2 h-4 w-4" />
-              All Members will serve as Managers
-            </Button>
+            {hasMemberCandidates ? (
+              <Button type="button" size="sm" onClick={addAllMembers}>
+                <Users className="mr-2 h-4 w-4" />
+                All Members will serve as Managers
+              </Button>
+            ) : null}
             {candidates.map((c) => (
               <Button
-                key={c.member.id}
+                key={c.id}
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => addMember(c)}
+                onClick={() => add(c)}
               >
                 <UserPlus className="mr-2 h-4 w-4" />
-                {c.name}
+                {c.label}
               </Button>
             ))}
           </div>

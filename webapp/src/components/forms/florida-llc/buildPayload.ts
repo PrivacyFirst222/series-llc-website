@@ -77,7 +77,11 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
     members: {
       collectForInternalRecords: data.collectMembersForInternalRecords,
       includeMembersInArticles: data.includeMembersInArticles,
-      memberList: data.includeMembersInArticles ? data.members : data.members,
+      // Manager-managed: the members step is never shown — ownership lives in
+      // the operating agreement questionnaire, and a stray default row must
+      // not reach the record.
+      memberList:
+        data.managementStructure === "MANAGER_MANAGED" ? [] : data.members,
     },
     purpose: {
       purposeType: data.purposeType || "",
@@ -89,6 +93,14 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
         data.effectiveDateOption === "SPECIFIC"
           ? data.requestedEffectiveDate ?? null
           : null,
+    },
+    client: {
+      firstName: data.clientFirstName.trim(),
+      lastName: data.clientLastName.trim(),
+      name: `${data.clientFirstName.trim()} ${data.clientLastName.trim()}`.trim(),
+      email: data.clientEmail,
+      phone: data.clientPhone ?? "",
+      address: data.clientAddress,
     },
     correspondence: {
       name: data.correspondentName,
