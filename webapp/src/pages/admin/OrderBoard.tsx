@@ -120,15 +120,25 @@ function Column({
   );
 }
 
+interface BoardData {
+  orders: BoardOrder[];
+  total: number;
+  shown: number;
+}
+
 export default function OrderBoard({ enabled }: { enabled: boolean }) {
   const queryClient = useQueryClient();
   const [openId, setOpenId] = useState<string | null>(null);
   const [showPending, setShowPending] = useState(false);
+  const [search, setSearch] = useState("");
+  const q = search.trim();
 
   const ordersQuery = useQuery({
-    queryKey: ["admin", "orders"],
-    queryFn: () => api.get<BoardOrder[]>("/api/admin/orders"),
+    queryKey: ["admin", "orders", q],
+    queryFn: () =>
+      api.get<BoardData>(`/api/admin/orders${q ? `?q=${encodeURIComponent(q)}` : ""}`),
     enabled,
+    placeholderData: (prev) => prev,
   });
 
   const markFiled = useMutation({
@@ -136,7 +146,9 @@ export default function OrderBoard({ enabled }: { enabled: boolean }) {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin", "orders"] }),
   });
 
-  const orders = ordersQuery.data ?? [];
+  const orders = ordersQuery.data?.orders ?? [];
+  const total = ordersQuery.data?.total ?? 0;
+  const shown = ordersQuery.data?.shown ?? 0;
   const pending = orders.filter((o) => o.status === "pending_payment");
   const isNew = orders.filter((o) => o.status === "paid");
   const withState = orders.filter((o) => o.status === "filed");
@@ -146,6 +158,28 @@ export default function OrderBoard({ enabled }: { enabled: boolean }) {
   return (
     <>
       <h2 className="mt-10 font-display text-xl">Formations</h2>
+
+      {/* The list caps at 200 rows, so the count and the search reach what the
+          board cannot show. The count is always stated — truncation is never
+          silent. */}
+      <div className="mt-3 flex flex-wrap items-center gap-3">
+        <input
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search by LLC name, client name, or email"
+          className="w-full max-w-sm rounded-lg border border-border bg-card px-3 py-2 text-sm outline-none focus:border-trust/60"
+        />
+        {ordersQuery.data ? (
+          <span className="text-sm text-muted-foreground">
+            {shown < total
+              ? `Showing the ${shown} most recent of ${total} orders${q ? " matching" : ""} — search to reach the rest`
+              : q
+                ? `${total} ${total === 1 ? "order matches" : "orders match"}`
+                : `${total} ${total === 1 ? "order" : "orders"}`}
+          </span>
+        ) : null}
+      </div>
 
       {/* Not a column: an abandoned checkout is not work in progress, and there
           will be far more of them than real orders. But an old one can also be

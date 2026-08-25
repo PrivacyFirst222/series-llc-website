@@ -110749,6 +110749,59 @@ if (!env.SQUARE_ACCESS_TOKEN && !env.isProd) {
   });
 }
 if (!env.isProd) {
+  app.get("/dev/oa-generation-inputs/:id", async (c) => {
+    const db2 = await getDb();
+    const rows = await db2.query(
+      "SELECT inputs FROM oa_generations WHERE id = $1",
+      [c.req.param("id")]
+    );
+    if (rows.length === 0) return c.json(err2("Not found", "NOT_FOUND"), 404);
+    const raw2 = rows[0].inputs;
+    return c.json({ data: { inputs: typeof raw2 === "string" ? JSON.parse(raw2) : raw2 } });
+  });
+  app.get("/dev/sunbiz-sync-state", async (c) => {
+    const db2 = await getDb();
+    const rows = await db2.query(
+      "SELECT baseline_label, last_daily::text AS last_daily FROM fl_sync_state WHERE id = 1"
+    );
+    return c.json({ data: rows.length > 0 ? rows[0] : null });
+  });
+  app.post("/dev/sunbiz-sync-state", async (c) => {
+    const body = await c.req.json();
+    const db2 = await getDb();
+    if (body === null) {
+      await db2.query("DELETE FROM fl_sync_state WHERE id = 1");
+    } else {
+      await db2.query(
+        `INSERT INTO fl_sync_state (id, baseline_label, last_daily, updated_at) VALUES (1, $1, $2::date, now())
+         ON CONFLICT (id) DO UPDATE SET baseline_label = $1, last_daily = $2::date, updated_at = now()`,
+        [body.baseline_label, body.last_daily]
+      );
+    }
+    return c.json({ data: { ok: true } });
+  });
+  app.post("/dev/seed-test-entities", async (c) => {
+    const { rows } = await c.req.json();
+    if (rows.some((r) => !r.docNumber.startsWith("E2ETEST"))) {
+      return c.json(err2("Only E2ETEST fixtures", "BAD_REQUEST"), 400);
+    }
+    const db2 = await getDb();
+    for (const r of rows) {
+      await db2.query(
+        `INSERT INTO fl_entities (doc_number, name, status, filing_type, file_date, last_txn_date, norm_key)
+         VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (doc_number) DO NOTHING`,
+        [r.docNumber, r.name, r.status, r.filingType, r.fileDate, r.lastTxnDate, r.normKey]
+      );
+    }
+    return c.json({ data: { ok: true } });
+  });
+  app.post("/dev/delete-test-entities", async (c) => {
+    const db2 = await getDb();
+    await db2.query("DELETE FROM fl_entities WHERE doc_number LIKE 'E2ETEST%'");
+    return c.json({ data: { ok: true } });
+  });
+}
+if (!env.isProd) {
   app.post("/dev/mint-reset-token", async (c) => {
     const { email } = await c.req.json();
     const db2 = await getDb();
@@ -112434,6 +112487,9 @@ app.get("/admin/orders", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err2("Not signed in", "UNAUTHENTICATED"), 401);
   const db2 = await getDb();
+  const qRaw = (c.req.query("q") ?? "").trim().slice(0, 100);
+  const where = qRaw ? `WHERE o.llc_name ILIKE $1 OR o.contact_email ILIKE $1 OR o.contact_name ILIKE $1` : "";
+  const params = qRaw ? [`%${qRaw}%`] : [];
   const rows = await db2.query(
     `SELECT o.id, o.client_id, o.contact_name, o.contact_email, o.package, o.llc_name,
             o.status, o.service_fee_cents, o.state_fees_cents, o.total_cents,
@@ -112447,9 +112503,15 @@ app.get("/admin/orders", async (c) => {
                  AND s.status <> 'fulfilled'
             ) AS ein_outstanding
        FROM orders o
-      ORDER BY o.created_at DESC LIMIT 200`
+      ${where}
+      ORDER BY o.created_at DESC LIMIT 200`,
+    params
   );
-  return c.json({ data: rows });
+  const total = await db2.query(
+    `SELECT count(*) AS c FROM orders o ${where}`,
+    params
+  );
+  return c.json({ data: { orders: rows, total: Number(total[0].c), shown: rows.length } });
 });
 app.post("/admin/orders/:id/filed", async (c) => {
   const admin = await requireAdmin(c);

@@ -4,7 +4,6 @@
  */
 import { defaultFormData } from "../src/components/forms/florida-llc/defaults";
 import { assembleOa } from "./oa";
-import { getDb } from "./db";
 import type { FloridaLLCFormData } from "../src/components/forms/florida-llc/types";
 
 const BASE = process.env.E2E_BASE_URL || "http://localhost:3000";
@@ -1243,10 +1242,8 @@ if (mint.status === 200) {
   // and it covers the answers-to-inputs mapping, which is where a lost owner
   // would go missing.
   const storedText = async (generationId: string) => {
-    const db = await getDb();
-    const rows = await db.query<{ inputs: unknown }>("SELECT inputs FROM oa_generations WHERE id = $1", [generationId]);
-    const raw = rows[0]?.inputs;
-    return assembleOa((typeof raw === "string" ? JSON.parse(raw) : raw) as Parameters<typeof assembleOa>[0]).markdown;
+    const res = await api(`/api/dev/oa-generation-inputs/${generationId}`);
+    return assembleOa(res.body?.data?.inputs as Parameters<typeof assembleOa>[0]).markdown;
   };
   const twoOwnerText = await storedText(edGen.body?.data?.generationId as string);
   check("the added owner is named in the agreement", twoOwnerText.includes("Jordan Vale"), {
@@ -1393,27 +1390,27 @@ if (mint.status === 200) {
 // Recorded fixtures only — the suite never touches the state's SFTP. Seeds
 // fake entities, saves and restores the real sync state around the calls.
 {
-  const { getDb } = await import("./db");
-  const db = await getDb();
-  const saved = await db.query<{ baseline_label: string | null; last_daily: string | null }>(
-    "SELECT baseline_label, last_daily::text FROM fl_sync_state WHERE id = 1",
-  );
+  // All DB access goes through /api/dev/* routes — the suite must never open
+  // the database itself (PGlite is single-owner; see the routes in app.ts).
+  const savedRes = await api("/api/dev/sunbiz-sync-state");
+  const saved = savedRes.body?.data as { baseline_label: string | null; last_daily: string | null } | null;
   const today = new Date().toISOString().slice(0, 10);
   const oldIso = new Date(Date.now() - 3 * 365 * 86_400_000).toISOString().slice(0, 10);
   const recentIso = new Date(Date.now() - 30 * 86_400_000).toISOString().slice(0, 10);
-  await db.query(
-    `INSERT INTO fl_sync_state (id, baseline_label, last_daily, updated_at) VALUES (1, 'e2e', $1, now())
-     ON CONFLICT (id) DO UPDATE SET baseline_label = 'e2e', last_daily = $1::date, updated_at = now()`,
-    [today],
-  );
-  await db.query(
-    `INSERT INTO fl_entities (doc_number, name, status, filing_type, file_date, last_txn_date, norm_key) VALUES
-       ('E2ETEST00001', 'E2E SUNSHINE HOLDINGS, INC.', 'A', 'DOMP', '2020-01-01', NULL, 'E2E SUNSHINE HOLDING'),
-       ('E2ETEST00002', 'E2E GATOR GROVES LLC', 'I', 'FLAL', '2019-01-01', $1, 'E2E GATOR GROVE'),
-       ('E2ETEST00003', 'E2E OLD TIMER CORP', 'I', 'DOMP', '2010-01-01', $2, 'E2E OLD TIMER')
-     ON CONFLICT (doc_number) DO NOTHING`,
-    [recentIso, oldIso],
-  );
+  await api("/api/dev/sunbiz-sync-state", {
+    method: "POST",
+    body: JSON.stringify({ baseline_label: "e2e", last_daily: today }),
+  });
+  await api("/api/dev/seed-test-entities", {
+    method: "POST",
+    body: JSON.stringify({
+      rows: [
+        { docNumber: "E2ETEST00001", name: "E2E SUNSHINE HOLDINGS, INC.", status: "A", filingType: "DOMP", fileDate: "2020-01-01", lastTxnDate: null, normKey: "E2E SUNSHINE HOLDING" },
+        { docNumber: "E2ETEST00002", name: "E2E GATOR GROVES LLC", status: "I", filingType: "FLAL", fileDate: "2019-01-01", lastTxnDate: recentIso, normKey: "E2E GATOR GROVE" },
+        { docNumber: "E2ETEST00003", name: "E2E OLD TIMER CORP", status: "I", filingType: "DOMP", fileDate: "2010-01-01", lastTxnDate: oldIso, normKey: "E2E OLD TIMER" },
+      ],
+    }),
+  });
   const nc = await api("/api/name-check", {
     method: "POST",
     body: JSON.stringify({
@@ -1502,15 +1499,30 @@ if (mint.status === 200) {
     heldOrder.body,
   );
   // restore
-  await db.query("DELETE FROM fl_entities WHERE doc_number LIKE 'E2ETEST%'");
-  if (saved.length > 0) {
-    await db.query(
-      "UPDATE fl_sync_state SET baseline_label = $1, last_daily = $2::date, updated_at = now() WHERE id = 1",
-      [saved[0].baseline_label, saved[0].last_daily],
-    );
-  } else {
-    await db.query("DELETE FROM fl_sync_state WHERE id = 1");
-  }
+  await api("/api/dev/delete-test-entities", { method: "POST", body: "{}" });
+  await api("/api/dev/sunbiz-sync-state", {
+    method: "POST",
+    body: JSON.stringify(saved),
+  });
+}
+
+// === Admin orders list: honest counts + search ============================
+// The board caps at 200 rows; the response must always say how many exist
+// versus how many were returned, and ?q= must reach orders the cap hides.
+{
+  const adm = await adminSession();
+  const list = await api("/api/admin/orders", { cookies: adm.cookie });
+  const ld = list.body?.data as { orders?: unknown[]; total?: number; shown?: number };
+  check("admin list returns orders + total + shown", Array.isArray(ld?.orders) && typeof ld?.total === "number" && typeof ld?.shown === "number", list.body);
+  check("admin list shown matches array length", ld?.shown === ld?.orders?.length);
+  check("admin list total >= shown", (ld?.total ?? 0) >= (ld?.shown ?? 0));
+  const found = await api(`/api/admin/orders?q=${encodeURIComponent("e2e account settings")}`, { cookies: adm.cookie });
+  const fd = found.body?.data as { orders?: Array<{ llc_name?: string }>; total?: number };
+  check("admin list search finds by LLC name, case-insensitive", (fd?.orders ?? []).some((o) => (o.llc_name ?? "").toLowerCase().includes("e2e account settings")), found.body);
+  check("admin list search filters to matches only", (fd?.total ?? 0) >= 1 && (fd?.orders ?? []).every((o) => (o.llc_name ?? "").toLowerCase().includes("e2e account settings")), found.body);
+  const none = await api(`/api/admin/orders?q=${encodeURIComponent("zz-no-such-order-zz")}`, { cookies: adm.cookie });
+  const nd = none.body?.data as { orders?: unknown[]; total?: number };
+  check("admin list search with no match returns zero", nd?.total === 0 && nd?.orders?.length === 0, none.body);
 }
 
 console.log(failures === 0 ? "\nALL PASS" : `\n${failures} FAILURES`);

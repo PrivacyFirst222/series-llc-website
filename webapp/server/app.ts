@@ -387,6 +387,74 @@ if (!env.SQUARE_ACCESS_TOKEN && !env.isProd) {
   });
 }
 
+// Dev-only: the e2e suite's window into the database. The suite must NEVER
+// open the database itself — with PGlite the server process is the embedded
+// database's single owner, and a second process opening the same data
+// directory aborts the WASM engine. Everything the suite needs to read or
+// seed goes through these routes instead.
+if (!env.isProd) {
+  // The stored inputs of an OA generation — the exact markdown source the PDF
+  // was rendered from, used to assert a named owner actually reached the text.
+  app.get("/dev/oa-generation-inputs/:id", async (c) => {
+    const db = await getDb();
+    const rows = await db.query<{ inputs: unknown }>(
+      "SELECT inputs FROM oa_generations WHERE id = $1",
+      [c.req.param("id")],
+    );
+    if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+    const raw = rows[0].inputs;
+    return c.json({ data: { inputs: typeof raw === "string" ? JSON.parse(raw) : raw } });
+  });
+
+  // Save/seed/restore the Sunbiz sync state around name-check fixtures.
+  app.get("/dev/sunbiz-sync-state", async (c) => {
+    const db = await getDb();
+    const rows = await db.query<{ baseline_label: string | null; last_daily: string | null }>(
+      "SELECT baseline_label, last_daily::text AS last_daily FROM fl_sync_state WHERE id = 1",
+    );
+    return c.json({ data: rows.length > 0 ? rows[0] : null });
+  });
+  app.post("/dev/sunbiz-sync-state", async (c) => {
+    const body = (await c.req.json()) as { baseline_label: string | null; last_daily: string | null } | null;
+    const db = await getDb();
+    if (body === null) {
+      await db.query("DELETE FROM fl_sync_state WHERE id = 1");
+    } else {
+      await db.query(
+        `INSERT INTO fl_sync_state (id, baseline_label, last_daily, updated_at) VALUES (1, $1, $2::date, now())
+         ON CONFLICT (id) DO UPDATE SET baseline_label = $1, last_daily = $2::date, updated_at = now()`,
+        [body.baseline_label, body.last_daily],
+      );
+    }
+    return c.json({ data: { ok: true } });
+  });
+
+  // Seed and remove E2ETEST% name-check fixtures. The delete is hard-scoped to
+  // the E2ETEST prefix so this route cannot touch real mirror rows.
+  app.post("/dev/seed-test-entities", async (c) => {
+    const { rows } = (await c.req.json()) as {
+      rows: Array<{ docNumber: string; name: string; status: string; filingType: string; fileDate: string; lastTxnDate: string | null; normKey: string }>;
+    };
+    if (rows.some((r) => !r.docNumber.startsWith("E2ETEST"))) {
+      return c.json(err("Only E2ETEST fixtures", "BAD_REQUEST"), 400);
+    }
+    const db = await getDb();
+    for (const r of rows) {
+      await db.query(
+        `INSERT INTO fl_entities (doc_number, name, status, filing_type, file_date, last_txn_date, norm_key)
+         VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (doc_number) DO NOTHING`,
+        [r.docNumber, r.name, r.status, r.filingType, r.fileDate, r.lastTxnDate, r.normKey],
+      );
+    }
+    return c.json({ data: { ok: true } });
+  });
+  app.post("/dev/delete-test-entities", async (c) => {
+    const db = await getDb();
+    await db.query("DELETE FROM fl_entities WHERE doc_number LIKE 'E2ETEST%'");
+    return c.json({ data: { ok: true } });
+  });
+}
+
 // Dev-only: mint a set-password token so e2e can walk the portal without
 // reading the emailed link from the API process's stdout.
 if (!env.isProd) {
@@ -2492,6 +2560,12 @@ app.get("/admin/orders", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const db = await getDb();
+  // Optional search: name or email, case-insensitive. Truncation is never
+  // silent — the response always says how many exist versus how many were
+  // returned, and the search reaches everything the list cannot show.
+  const qRaw = (c.req.query("q") ?? "").trim().slice(0, 100);
+  const where = qRaw ? `WHERE o.llc_name ILIKE $1 OR o.contact_email ILIKE $1 OR o.contact_name ILIKE $1` : "";
+  const params = qRaw ? [`%${qRaw}%`] : [];
   // Everything a card on the board shows, in one query. series_count and
   // ein_purchased are on the card because they change what "finished" means:
   // an order can look complete with a series undesignated or an EIN still owed.
@@ -2508,9 +2582,15 @@ app.get("/admin/orders", async (c) => {
                  AND s.status <> 'fulfilled'
             ) AS ein_outstanding
        FROM orders o
+      ${where}
       ORDER BY o.created_at DESC LIMIT 200`,
+    params,
   );
-  return c.json({ data: rows });
+  const total = await db.query<{ c: string }>(
+    `SELECT count(*) AS c FROM orders o ${where}`,
+    params,
+  );
+  return c.json({ data: { orders: rows, total: Number(total[0].c), shown: rows.length } });
 });
 
 /** Sent to the Division. The only transition on the board a person performs —
