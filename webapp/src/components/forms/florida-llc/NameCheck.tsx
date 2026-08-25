@@ -79,11 +79,15 @@ export function NameCheck({
   names,
   state,
   onState,
+  compactDisclaimer = false,
 }: {
   names: { label: string; value: string }[];
   state?: NameCheckState;
   /** Omitted (admin panel): results are kept locally instead of on a form. */
   onState?: (s: NameCheckState) => void;
+  /** Admin panel only: "Verified: [date]" instead of the client-facing
+   *  disclaimer. Clients always get the full final-determination language. */
+  compactDisclaimer?: boolean;
 }) {
   const [localState, setLocalState] = useState<NameCheckState | undefined>(undefined);
   const effectiveState = onState ? state : localState;
@@ -149,10 +153,16 @@ export function NameCheck({
             <VerdictRow key={i} v={v} label={list[i]?.label ?? v.input} />
           ))}
           <p className="text-[11px] leading-relaxed text-muted-foreground">
-            Checked against the Division of Corporations' public records as of{" "}
-            {current.asOf ? fmtDate(current.asOf) : "the latest state data file"}.
-            The Division makes the final determination when your Articles are
-            filed — no result here is a guarantee.
+            {compactDisclaimer ? (
+              <>Verified: {current.asOf ? fmtDate(current.asOf) : "latest state data file"}</>
+            ) : (
+              <>
+                Checked against the Division of Corporations' public records as of{" "}
+                {current.asOf ? fmtDate(current.asOf) : "the latest state data file"}.
+                The Division makes the final determination when your Articles are
+                filed — no result here is a guarantee.
+              </>
+            )}
           </p>
         </div>
       ) : null}

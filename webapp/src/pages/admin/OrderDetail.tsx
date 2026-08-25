@@ -186,6 +186,7 @@ export default function OrderDetail({
             {d?.llcName ? (
               <div className="mt-2">
                 <NameCheck
+                  compactDisclaimer
                   names={[
                     { label: "First choice", value: d.llcName },
                     ...(d.alternateNames ?? []).map((n, i) => ({
@@ -197,8 +198,54 @@ export default function OrderDetail({
               </div>
             ) : null}
             <p className="text-sm text-muted-foreground">
-              {d ? `${d.contactName} <${d.contactEmail}>` : ""}
+              {d ? (
+                <>
+                  <span className="font-medium text-foreground">Client:</span>{" "}
+                  {`${d.contactName} <${d.contactEmail}>`}
+                </>
+              ) : (
+                ""
+              )}
             </p>
+            {/* Adam's spec: the service orders sit right here, first thing
+                after the name verdicts — the extra prose is gone; the
+                fulfill dialog explains the taxpayer-number handling. */}
+            {d && services.length > 0 ? (
+              <section className="mt-3 rounded-xl border border-amber-500/40 bg-amber-500/5 p-4">
+                <div className="flex items-center gap-2">
+                  <Landmark className="h-4 w-4 text-amber-700 dark:text-amber-400" />
+                  <h3 className="font-display text-base">Service orders</h3>
+                </div>
+                <div className="mt-3 flex flex-col gap-2">
+                  {services.map((s) => (
+                    <div key={s.id} className="flex flex-wrap items-center gap-2 text-sm">
+                      <span className="min-w-0 break-words font-medium">
+                        {serviceLabel(s, d.llcName, true)}
+                      </span>
+                      {serviceIsOpen(s) ? (
+                        <>
+                          <span className="text-xs text-muted-foreground">
+                            {s.status.replace(/_/g, " ")}
+                          </span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="ml-auto rounded-full"
+                            onClick={() => onFulfill(s)}
+                          >
+                            {s.type === "ein" && s.has_secret ? "View & fulfill" : "Fulfill"}
+                          </Button>
+                        </>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-xs text-trust">
+                          <Check className="h-3.5 w-3.5" /> fulfilled
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ) : null}
           </div>
           <Button variant="ghost" size="sm" onClick={onClose} aria-label="Close">
             <X className="h-4 w-4" />
@@ -233,52 +280,6 @@ export default function OrderDetail({
                 </div>
               </section>
             ))}
-
-            {/* The work happens HERE — each service order carries its own
-                fulfill button (Adam's spec: no pointers to somewhere else).
-                Taxpayer numbers are decrypted only inside the fulfill dialog
-                and destroyed when the order is fulfilled. */}
-            {services.length > 0 ? (
-              <section className="rounded-xl border border-amber-500/40 bg-amber-500/5 p-4">
-                <div className="flex items-center gap-2">
-                  <Landmark className="h-4 w-4 text-amber-700 dark:text-amber-400" />
-                  <h3 className="font-display text-base">Service orders</h3>
-                </div>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Taxpayer numbers are held encrypted with the service order, not with the filing —
-                  the Articles never ask for one. They are decrypted only inside the fulfill screen
-                  and destroyed when the order is fulfilled.
-                </p>
-                <div className="mt-3 flex flex-col gap-2">
-                  {services.map((s) => (
-                    <div key={s.id} className="flex flex-wrap items-center gap-2 text-sm">
-                      <span className="min-w-0 break-words font-medium">
-                        {serviceLabel(s, d.llcName, true)}
-                      </span>
-                      {serviceIsOpen(s) ? (
-                        <>
-                          <span className="text-xs text-muted-foreground">
-                            {s.status.replace(/_/g, " ")}
-                          </span>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="ml-auto rounded-full"
-                            onClick={() => onFulfill(s)}
-                          >
-                            {s.type === "ein" && s.has_secret ? "View & fulfill" : "Fulfill"}
-                          </Button>
-                        </>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 text-xs text-trust">
-                          <Check className="h-3.5 w-3.5" /> fulfilled
-                        </span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </section>
-            ) : null}
 
             <section>
               <h3 className="font-display text-base">Formation documents</h3>
