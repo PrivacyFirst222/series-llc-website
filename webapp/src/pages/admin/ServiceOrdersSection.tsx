@@ -62,6 +62,22 @@ export const STATUS_STYLE: Record<string, string> = {
   pending_payment: "bg-secondary text-muted-foreground",
 };
 
+export const serviceIsOpen = (s: AdminServiceOrder) => s.status === "awaiting_info" || s.status === "in_progress";
+
+/** The one-line name for a service order. The surrounding card or dialog
+ *  already names the LLC, so series names are shortened to their own part —
+ *  "Jimmy Flanagan, LLC - PS 3" reads "PS 3". Never truncated, only wrapped. */
+export function serviceLabel(s: AdminServiceOrder, llcName: string, long = false): string {
+  const short = (name?: string) => {
+    if (!name) return "";
+    const rest = name.startsWith(llcName) ? name.slice(llcName.length) : name;
+    return rest.replace(/^[\s,–—-]+/, "").trim() || name;
+  };
+  if (s.type === "ein") return s.details.target === "series" ? `EIN — ${short(s.details.seriesName)}` : "EIN";
+  if (s.type === "s-election") return long ? "S Election (2553)" : "S Election";
+  return `${short(s.details.seriesName) || "Series"} Designation`;
+}
+
 export function summaryOf(o: { type: string; details: AdminServiceOrder["details"]; llc_name: string }): string {
   if (o.type === "series") return o.details.seriesName ?? o.llc_name;
   if (o.type === "s-election") return `S Election (2553) — ${o.llc_name}`;

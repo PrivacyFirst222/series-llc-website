@@ -4,7 +4,12 @@ import { AlertCircle, Building2, Check, ChevronRight, Clock, ShieldCheck } from 
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import OrderDetail from "./OrderDetail";
-import { type AdminServiceOrder, ServiceFulfillDialog } from "./ServiceOrdersSection";
+import {
+  type AdminServiceOrder,
+  ServiceFulfillDialog,
+  serviceIsOpen,
+  serviceLabel,
+} from "./ServiceOrdersSection";
 
 export interface BoardOrder {
   id: string;
@@ -45,22 +50,6 @@ function AgeBadge({ createdAt }: { createdAt: string }) {
       {days === 0 ? "today" : days === 1 ? "1 day" : `${days} days`}
     </span>
   );
-}
-
-const serviceIsOpen = (s: AdminServiceOrder) => s.status === "awaiting_info" || s.status === "in_progress";
-
-/** The card line for a service order: the kind, nothing else. The card's title
- *  already names the LLC, so series names are shortened to their own part —
- *  "Jimmy Flanagan, LLC - PS 3" reads "PS 3". Never truncated, only wrapped. */
-function serviceLabel(s: AdminServiceOrder, llcName: string): string {
-  const short = (name?: string) => {
-    if (!name) return "";
-    const rest = name.startsWith(llcName) ? name.slice(llcName.length) : name;
-    return rest.replace(/^[\s,–—-]+/, "").trim() || name;
-  };
-  if (s.type === "ein") return s.details.target === "series" ? `EIN — ${short(s.details.seriesName)}` : "EIN";
-  if (s.type === "s-election") return "S Election";
-  return `${short(s.details.seriesName) || "Series"} Designation`;
 }
 
 /** One company: the formation plus its service orders, worked from one place.
@@ -344,6 +333,8 @@ export default function OrderBoard({ enabled }: { enabled: boolean }) {
       {openId ? (
         <OrderDetail
           orderId={openId}
+          services={servicesFor(openId)}
+          onFulfill={setViewing}
           onClose={() => setOpenId(null)}
           onMarkFiled={() => markFiled.mutate(openId)}
           markingFiled={markFiled.isPending}

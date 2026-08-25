@@ -6,6 +6,7 @@ import { Check, Copy, FileUp, Landmark, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { type AdminServiceOrder, serviceIsOpen, serviceLabel } from "./ServiceOrdersSection";
 
 interface FilingField {
   key: string;
@@ -93,11 +94,15 @@ function Field({
 
 export default function OrderDetail({
   orderId,
+  services,
+  onFulfill,
   onClose,
   onMarkFiled,
   markingFiled,
 }: {
   orderId: string;
+  services: AdminServiceOrder[];
+  onFulfill: (s: AdminServiceOrder) => void;
   onClose: () => void;
   onMarkFiled: () => void;
   markingFiled: boolean;
@@ -108,7 +113,6 @@ export default function OrderDetail({
     { file: null, covers: [] },
   ]);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const [showSsn, setShowSsn] = useState(false);
 
   const detail = useQuery({
     queryKey: ["admin", "order", orderId],
@@ -159,7 +163,6 @@ export default function OrderDetail({
   const canUpload =
     !!articlesRef.current?.files?.length && psdRows.some((r) => r.file) && uncovered.length === 0;
 
-  const einService = d?.services.find((s) => s.type === "ein");
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-black/40" onClick={onClose}>
@@ -231,32 +234,49 @@ export default function OrderDetail({
               </section>
             ))}
 
-            {einService ? (
+            {/* The work happens HERE — each service order carries its own
+                fulfill button (Adam's spec: no pointers to somewhere else).
+                Taxpayer numbers are decrypted only inside the fulfill dialog
+                and destroyed when the order is fulfilled. */}
+            {services.length > 0 ? (
               <section className="rounded-xl border border-amber-500/40 bg-amber-500/5 p-4">
                 <div className="flex items-center gap-2">
                   <Landmark className="h-4 w-4 text-amber-700 dark:text-amber-400" />
-                  <h3 className="font-display text-base">EIN service</h3>
-                  <span className="ml-auto text-xs text-muted-foreground">{einService.status}</span>
+                  <h3 className="font-display text-base">Service orders</h3>
                 </div>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  Taxpayer numbers are held encrypted with the EIN service, not with the filing —
-                  the Articles never ask for one. Open the service to work the SS-4.
+                  Taxpayer numbers are held encrypted with the service order, not with the filing —
+                  the Articles never ask for one. They are decrypted only inside the fulfill screen
+                  and destroyed when the order is fulfilled.
                 </p>
-                {!showSsn ? (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="mt-3 rounded-full"
-                    onClick={() => setShowSsn(true)}
-                  >
-                    Show taxpayer details
-                  </Button>
-                ) : (
-                  <p className="mt-3 text-sm">
-                    Open <span className="font-medium">Services</span> below and select this EIN
-                    order — the numbers are decrypted there, and destroyed when it is fulfilled.
-                  </p>
-                )}
+                <div className="mt-3 flex flex-col gap-2">
+                  {services.map((s) => (
+                    <div key={s.id} className="flex flex-wrap items-center gap-2 text-sm">
+                      <span className="min-w-0 break-words font-medium">
+                        {serviceLabel(s, d.llcName, true)}
+                      </span>
+                      {serviceIsOpen(s) ? (
+                        <>
+                          <span className="text-xs text-muted-foreground">
+                            {s.status.replace(/_/g, " ")}
+                          </span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="ml-auto rounded-full"
+                            onClick={() => onFulfill(s)}
+                          >
+                            {s.type === "ein" && s.has_secret ? "View & fulfill" : "Fulfill"}
+                          </Button>
+                        </>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-xs text-trust">
+                          <Check className="h-3.5 w-3.5" /> fulfilled
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </section>
             ) : null}
 
