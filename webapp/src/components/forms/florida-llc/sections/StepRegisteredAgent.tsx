@@ -5,6 +5,7 @@ import { AcknowledgeBox, FieldShell } from "../FieldShell";
 import { AddressAutocomplete } from "../AddressAutocomplete";
 import { isPoBox } from "../schema";
 import { RA_SERVICE, raServicePatch, raSelfPatch } from "../raService";
+import { fullPersonName } from "../validation";
 import type { FloridaLLCFormData } from "../types";
 
 interface StepProps {
@@ -113,6 +114,7 @@ export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
                 patch({
                   registeredAgentFirstName: data.clientFirstName.trim(),
                   registeredAgentLastName: data.clientLastName.trim(),
+                  registeredAgentSuffix: data.clientSuffix ?? "",
                   registeredAgentStreetAddress1: data.clientAddress.address1,
                   registeredAgentStreetAddress2: data.clientAddress.address2 ?? "",
                   registeredAgentCity: data.clientAddress.city,
@@ -123,10 +125,10 @@ export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
                 })
               }
             >
-              Use my information ({data.clientFirstName.trim()} {data.clientLastName.trim()})
+              Use my information ({fullPersonName(data.clientFirstName, data.clientLastName, data.clientSuffix)})
             </Button>
           ) : null}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
             <FieldShell
               label="Your first name"
               required
@@ -145,6 +147,13 @@ export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
               <Input
                 value={data.registeredAgentLastName ?? ""}
                 onChange={(e) => patch({ registeredAgentLastName: e.target.value })}
+              />
+            </FieldShell>
+            <FieldShell label="Suffix (optional)">
+              <Input
+                value={data.registeredAgentSuffix ?? ""}
+                onChange={(e) => patch({ registeredAgentSuffix: e.target.value })}
+                placeholder="Jr, Sr, III…"
               />
             </FieldShell>
           </div>

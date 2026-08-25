@@ -21,6 +21,7 @@ export const principalAddressSchema = addressSchema.refine(
 );
 
 export const partyEntrySchema = z.object({
+  suffix: z.string().max(20).optional().or(z.literal("")),
   id: z.string(),
   role: z.enum(["MGR", "AR"]),
   personOrEntity: z.enum(["INDIVIDUAL", "ENTITY"]),
@@ -53,6 +54,7 @@ export const partyEntrySchema = z.object({
 });
 
 export const memberEntrySchema = z.object({
+  suffix: z.string().max(20).optional().or(z.literal("")),
   id: z.string(),
   memberType: z.enum(["INDIVIDUAL", "ENTITY"]),
   firstName: z.string().optional().or(z.literal("")),
@@ -132,6 +134,7 @@ export const formationFormSchema = z.object({
   registeredAgentType: z.enum(["INDIVIDUAL", "ENTITY"]),
   registeredAgentFirstName: z.string().optional().or(z.literal("")),
   registeredAgentLastName: z.string().optional().or(z.literal("")),
+  registeredAgentSuffix: z.string().max(20).optional().or(z.literal("")),
   registeredAgentBusinessEntityName: z.string().optional().or(z.literal("")),
   registeredAgentStreetAddress1: z.string().min(1, "Street address required"),
   registeredAgentStreetAddress2: z.string().optional().or(z.literal("")),
@@ -188,6 +191,7 @@ export const formationFormSchema = z.object({
 
   clientFirstName: z.string().min(1, "First name required"),
   clientLastName: z.string().min(1, "Last name required"),
+  clientSuffix: z.string().max(20).optional().or(z.literal("")),
   clientAddress: addressSchema,
   clientEmail: z.string().email("Enter a valid email"),
   confirmClientEmail: z.string().email("Enter a valid email"),

@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { FieldShell } from "../FieldShell";
 import { AddressFieldsBlock } from "../AddressFields";
-import { cleanEmailInput } from "../validation";
+import { cleanEmailInput, fullPersonName } from "../validation";
 import type { FloridaLLCFormData } from "../types";
 
 interface StepProps {
@@ -26,10 +26,7 @@ export function StepCorrespondence({ data, patch, errors }: StepProps) {
   // client edits afterwards stays edited.
   useEffect(() => {
     if (data.correspondentName || data.correspondentEmail) return;
-    const name = [data.clientFirstName, data.clientLastName]
-      .map((s) => s.trim())
-      .filter(Boolean)
-      .join(" ");
+    const name = fullPersonName(data.clientFirstName, data.clientLastName, data.clientSuffix);
     if (!name && !data.clientEmail) return;
     patch({
       correspondentName: name,

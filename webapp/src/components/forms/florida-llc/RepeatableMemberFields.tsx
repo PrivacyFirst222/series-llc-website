@@ -17,6 +17,7 @@ const blank = (): MemberEntry => ({
   memberType: "INDIVIDUAL",
   firstName: "",
   lastName: "",
+  suffix: "",
   entityName: "",
   address1: "",
   address2: "",
@@ -79,7 +80,7 @@ export function RepeatableMemberFields({
             </FieldShell>
 
             {entry.memberType === "INDIVIDUAL" ? (
-              <div className="grid grid-cols-2 gap-4 md:col-span-2">
+              <div className="grid grid-cols-2 gap-4 md:col-span-2 md:grid-cols-3">
                 <FieldShell label="First name" required>
                   <Input
                     value={entry.firstName ?? ""}
@@ -94,6 +95,13 @@ export function RepeatableMemberFields({
                     onChange={(e) =>
                       update(entry.id, { lastName: e.target.value })
                     }
+                  />
+                </FieldShell>
+                <FieldShell label="Suffix (optional)">
+                  <Input
+                    value={entry.suffix ?? ""}
+                    onChange={(e) => update(entry.id, { suffix: e.target.value })}
+                    placeholder="Jr, Sr, III…"
                   />
                 </FieldShell>
               </div>

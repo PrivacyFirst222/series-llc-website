@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { fullPersonName } from "../validation";
 import { Input } from "@/components/ui/input";
 import { AlertTriangle, UserCheck } from "lucide-react";
 import { AcknowledgeBox, FieldShell } from "../FieldShell";
@@ -165,12 +166,16 @@ export function StepCertification({ data, patch, errors }: StepProps) {
               className="mt-1.5 text-xs font-medium text-trust underline underline-offset-2"
               onClick={() =>
                 patch({
-                  authorizedRepresentativeName: `${data.clientFirstName.trim()} ${data.clientLastName.trim()}`,
+                  authorizedRepresentativeName: fullPersonName(
+                    data.clientFirstName,
+                    data.clientLastName,
+                    data.clientSuffix,
+                  ),
                   authorizedRepresentativeEmail: data.clientEmail,
                 })
               }
             >
-              Use my name ({data.clientFirstName.trim()} {data.clientLastName.trim()})
+              Use my name ({fullPersonName(data.clientFirstName, data.clientLastName, data.clientSuffix)})
             </button>
           ) : null}
         </FieldShell>

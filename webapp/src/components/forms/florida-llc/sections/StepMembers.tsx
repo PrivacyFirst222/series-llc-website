@@ -1,6 +1,7 @@
 import { UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RepeatableMemberFields } from "../RepeatableMemberFields";
+import { fullPersonName } from "../validation";
 import type { FloridaLLCFormData, MemberEntry } from "../types";
 
 interface StepProps {
@@ -12,15 +13,11 @@ interface StepProps {
 export function StepMembers({ data, patch, errors }: StepProps) {
   // The client told us who they are at the start — offer that instead of
   // making them retype it. A blank first member row is replaced, not kept.
-  const clientName = [data.clientFirstName, data.clientLastName]
-    .map((s) => s.trim())
-    .filter(Boolean)
-    .join(" ");
+  const clientName = fullPersonName(data.clientFirstName, data.clientLastName, data.clientSuffix);
   const memberName = (m: MemberEntry) =>
-    (m.memberType === "ENTITY"
-      ? m.entityName
-      : [m.firstName, m.lastName].filter(Boolean).join(" ")
-    )?.trim() ?? "";
+    m.memberType === "ENTITY"
+      ? (m.entityName ?? "").trim()
+      : fullPersonName(m.firstName, m.lastName, m.suffix);
   const clientListed = data.members.some(
     (m) => memberName(m).toLowerCase() === clientName.toLowerCase(),
   );
@@ -30,6 +27,7 @@ export function StepMembers({ data, patch, errors }: StepProps) {
       memberType: "INDIVIDUAL",
       firstName: data.clientFirstName.trim(),
       lastName: data.clientLastName.trim(),
+      suffix: data.clientSuffix ?? "",
       entityName: "",
       address1: data.clientAddress.address1,
       address2: data.clientAddress.address2 ?? "",

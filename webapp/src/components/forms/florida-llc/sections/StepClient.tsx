@@ -49,6 +49,14 @@ export function StepClient({ data, patch, errors }: StepProps) {
             autoComplete="family-name"
           />
         </FieldShell>
+        <FieldShell label="Suffix (optional)" error={errors.clientSuffix}>
+          <Input
+            value={data.clientSuffix ?? ""}
+            onChange={(e) => patch({ clientSuffix: e.target.value })}
+            placeholder="Jr, Sr, III…"
+            autoComplete="honorific-suffix"
+          />
+        </FieldShell>
         <FieldShell label="Email" required error={errors.clientEmail}>
           <Input
             type="email"

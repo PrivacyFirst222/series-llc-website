@@ -1,4 +1,5 @@
 import { Pencil, Info } from "lucide-react";
+import { fullPersonName } from "./validation";
 import { Button } from "@/components/ui/button";
 import { FeeEstimate } from "./FeeEstimate";
 import { ServiceFeeEstimate } from "./ServiceFeeEstimate";
@@ -95,7 +96,7 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
         <ReviewCard title="Your Information" onEdit={() => goToStep("client")}>
           <Row
             label="Name"
-            value={[data.clientFirstName, data.clientLastName].filter(Boolean).join(" ")}
+            value={fullPersonName(data.clientFirstName, data.clientLastName, data.clientSuffix)}
           />
           <Row label="Email" value={data.clientEmail} />
           <Row label="Phone" value={data.clientPhone} />
@@ -176,7 +177,7 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
                 : data.managers
                     .map((m) =>
                       m.personOrEntity === "INDIVIDUAL"
-                        ? `${m.role}: ${[m.firstName, m.lastName].filter(Boolean).join(" ")}`
+                        ? `${m.role}: ${fullPersonName(m.firstName, m.lastName, m.suffix)}`
                         : `${m.role}: ${m.businessEntityName}`,
                     )
                     .join("; ")
@@ -201,7 +202,7 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
                     .map((m) => {
                       const name =
                         m.memberType === "INDIVIDUAL"
-                          ? [m.firstName, m.lastName].filter(Boolean).join(" ")
+                          ? fullPersonName(m.firstName, m.lastName, m.suffix)
                           : m.entityName;
                       const pct =
                         m.ownershipPercentage !== undefined

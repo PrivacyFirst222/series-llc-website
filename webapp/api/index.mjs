@@ -103651,6 +103651,7 @@ var principalAddressSchema = addressSchema.refine(
   }
 );
 var partyEntrySchema = external_exports.object({
+  suffix: external_exports.string().max(20).optional().or(external_exports.literal("")),
   id: external_exports.string(),
   role: external_exports.enum(["MGR", "AR"]),
   personOrEntity: external_exports.enum(["INDIVIDUAL", "ENTITY"]),
@@ -103682,6 +103683,7 @@ var partyEntrySchema = external_exports.object({
   }
 });
 var memberEntrySchema = external_exports.object({
+  suffix: external_exports.string().max(20).optional().or(external_exports.literal("")),
   id: external_exports.string(),
   memberType: external_exports.enum(["INDIVIDUAL", "ENTITY"]),
   firstName: external_exports.string().optional().or(external_exports.literal("")),
@@ -103755,6 +103757,7 @@ var formationFormSchema = external_exports.object({
   registeredAgentType: external_exports.enum(["INDIVIDUAL", "ENTITY"]),
   registeredAgentFirstName: external_exports.string().optional().or(external_exports.literal("")),
   registeredAgentLastName: external_exports.string().optional().or(external_exports.literal("")),
+  registeredAgentSuffix: external_exports.string().max(20).optional().or(external_exports.literal("")),
   registeredAgentBusinessEntityName: external_exports.string().optional().or(external_exports.literal("")),
   registeredAgentStreetAddress1: external_exports.string().min(1, "Street address required"),
   registeredAgentStreetAddress2: external_exports.string().optional().or(external_exports.literal("")),
@@ -103804,6 +103807,7 @@ var formationFormSchema = external_exports.object({
   requestedEffectiveDate: external_exports.string().optional().or(external_exports.literal("")),
   clientFirstName: external_exports.string().min(1, "First name required"),
   clientLastName: external_exports.string().min(1, "Last name required"),
+  clientSuffix: external_exports.string().max(20).optional().or(external_exports.literal("")),
   clientAddress: addressSchema,
   clientEmail: external_exports.string().email("Enter a valid email"),
   confirmClientEmail: external_exports.string().email("Enter a valid email"),
@@ -103887,6 +103891,12 @@ function canonicalizeSeriesName(name) {
 }
 function seriesDedupeKey(name) {
   return name.toUpperCase().replace(/PROTECTED\s+SERIES/g, " ").replace(/(^|\s)P\.?S\.?(?=\s|$)/g, " ").replace(/\s+/g, " ").trim();
+}
+function fullPersonName(first, last2, suffix) {
+  const base = [first, last2].map((s) => (s ?? "").trim()).filter(Boolean).join(" ");
+  const sfx = (suffix ?? "").trim().replace(/^,\s*/, "");
+  if (!base) return sfx;
+  return sfx ? `${base}, ${sfx}` : base;
 }
 
 // src/components/forms/florida-llc/raService.ts
@@ -104096,7 +104106,6 @@ var orderFormSchema = external_exports.preprocess((raw2) => {
 }, extendedFormSchema);
 
 // src/components/forms/florida-llc/buildPayload.ts
-var joinName = (first, last2) => [first, last2].map((x2) => (x2 ?? "").trim()).filter(Boolean).join(" ");
 function buildPayload(data) {
   const isConversion = data.filingPath === "CONVERT";
   const fees = calculateEstimatedFees({
@@ -104129,9 +104138,14 @@ function buildPayload(data) {
     registeredAgent: {
       choice: data.registeredAgentChoice ?? "",
       type: data.registeredAgentType || "",
-      name: joinName(data.registeredAgentFirstName, data.registeredAgentLastName),
+      name: fullPersonName(
+        data.registeredAgentFirstName,
+        data.registeredAgentLastName,
+        data.registeredAgentSuffix
+      ),
       firstName: data.registeredAgentFirstName ?? "",
       lastName: data.registeredAgentLastName ?? "",
+      suffix: data.registeredAgentSuffix ?? "",
       businessEntityName: data.registeredAgentBusinessEntityName ?? "",
       address: {
         address1: data.registeredAgentStreetAddress1,
@@ -104177,7 +104191,8 @@ function buildPayload(data) {
     client: {
       firstName: data.clientFirstName.trim(),
       lastName: data.clientLastName.trim(),
-      name: `${data.clientFirstName.trim()} ${data.clientLastName.trim()}`.trim(),
+      suffix: (data.clientSuffix ?? "").trim(),
+      name: fullPersonName(data.clientFirstName, data.clientLastName, data.clientSuffix),
       email: data.clientEmail,
       phone: data.clientPhone ?? "",
       address: data.clientAddress
@@ -110494,11 +110509,15 @@ var addrFields = (prefix, a2) => !a2 ? [] : [
   { key: `${prefix}State`, label: "State", value: (a2.state ?? "").trim() },
   { key: `${prefix}Zip`, label: "Zip code", value: (a2.zip ?? "").trim() }
 ];
-var personName = (m2) => ({
-  first: (m2?.firstName ?? "").trim(),
-  last: (m2?.lastName ?? "").trim(),
-  legacy: (m2?.fullLegalName ?? m2?.fullName ?? m2?.name ?? "").trim()
-});
+var personName = (m2) => {
+  const last2 = (m2?.lastName ?? "").trim();
+  const suffix = (m2?.suffix ?? "").trim().replace(/^,\s*/, "");
+  return {
+    first: (m2?.firstName ?? "").trim(),
+    last: last2 && suffix ? `${last2}, ${suffix}` : last2,
+    legacy: (m2?.fullLegalName ?? m2?.fullName ?? m2?.name ?? "").trim()
+  };
+};
 var personAddr = (m2) => ({
   address1: m2?.streetAddress1 ?? m2?.address1,
   address2: m2?.streetAddress2 ?? m2?.address2,
@@ -110840,7 +110859,7 @@ app.post("/orders", async (c) => {
       // The CLIENT owns the order: portal account, welcome email, and the
       // admin's "Client:" line all come from the up-front card, not from the
       // correspondence contact (which is only where updates go).
-      `${data.clientFirstName.trim()} ${data.clientLastName.trim()}`.trim(),
+      personLegalName(data.clientFirstName, data.clientLastName, data.clientSuffix),
       data.clientEmail.toLowerCase(),
       data.filingPath === "CONVERT" ? "CONVERT" : "NEW",
       llcName,
@@ -111313,12 +111332,12 @@ async function oaSeed(clientId) {
   const addr = p2.principalOfficeAddress ?? {};
   const principalAddress = [addr.address1, addr.address2, [addr.city, addr.state].filter(Boolean).join(", "), addr.zip].filter((x2) => x2 && String(x2).trim()).join(", ");
   const members = (p2.members?.memberList ?? []).map((m2) => ({
-    name: [m2.firstName, m2.lastName].map((x2) => (x2 ?? "").trim()).filter(Boolean).join(" ") || (m2.fullLegalName ?? ""),
+    name: personLegalName(m2.firstName, m2.lastName, m2.suffix) || (m2.fullLegalName ?? ""),
     address: [m2.address1, m2.address2, [m2.city, m2.state].filter(Boolean).join(", "), m2.zip].filter((x2) => x2 && String(x2).trim()).join(", ")
   }));
   const managementStructure = p2.management?.structure ?? "";
   const managerNames = (p2.management?.managersOrAuthorizedRepresentatives ?? []).filter((e) => (e.role ?? "MGR") === "MGR").map(
-    (e) => ([e.firstName, e.lastName].map((x2) => (x2 ?? "").trim()).filter(Boolean).join(" ") || e.fullName || e.businessEntityName || "").trim()
+    (e) => (personLegalName(e.firstName, e.lastName, e.suffix) || e.fullName || e.businessEntityName || "").trim()
   ).filter(Boolean);
   if (managementStructure === "MANAGER_MANAGED" && managerNames.length === 0) {
     throw new Error(
@@ -111398,6 +111417,12 @@ var SPOUSAL_FORM_LABEL = {
   TBE: "tenants by the entirety",
   JTWROS: "joint tenants with right of survivorship"
 };
+function personLegalName(first, last2, suffix) {
+  const base = [first, last2].map((s) => (s ?? "").trim()).filter(Boolean).join(" ");
+  const sfx = (suffix ?? "").trim().replace(/^,\s*/, "");
+  if (!base) return sfx;
+  return sfx ? `${base}, ${sfx}` : base;
+}
 function effectiveOwners(seedMembers, answers) {
   const answered = answers?.members ?? [];
   const edited = answered.some((m2) => (m2.name ?? "").trim() !== "");

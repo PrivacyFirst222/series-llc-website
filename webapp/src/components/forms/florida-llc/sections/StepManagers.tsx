@@ -2,6 +2,7 @@ import { UserPlus, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FieldShell } from "../FieldShell";
 import { RepeatablePartyFields } from "../RepeatablePartyFields";
+import { fullPersonName } from "../validation";
 import type { FloridaLLCFormData, PartyEntry } from "../types";
 
 interface StepProps {
@@ -23,11 +24,9 @@ export function StepManagers({ data, patch, errors }: StepProps) {
   const listed = new Set(
     data.managers.map((m) =>
       (m.personOrEntity === "ENTITY"
-        ? m.businessEntityName ?? ""
-        : [m.firstName, m.lastName].filter(Boolean).join(" ")
-      )
-        .trim()
-        .toLowerCase(),
+        ? (m.businessEntityName ?? "").trim()
+        : fullPersonName(m.firstName, m.lastName, m.suffix)
+      ).toLowerCase(),
     ),
   );
 
@@ -39,10 +38,7 @@ export function StepManagers({ data, patch, errors }: StepProps) {
   }
   const newId = () => Math.random().toString(36).slice(2, 10);
 
-  const clientName = [data.clientFirstName, data.clientLastName]
-    .map((s) => s.trim())
-    .filter(Boolean)
-    .join(" ");
+  const clientName = fullPersonName(data.clientFirstName, data.clientLastName, data.clientSuffix);
   const clientCandidate: Candidate | null = clientName
     ? {
         id: "client",
@@ -54,6 +50,7 @@ export function StepManagers({ data, patch, errors }: StepProps) {
           personOrEntity: "INDIVIDUAL",
           firstName: data.clientFirstName.trim(),
           lastName: data.clientLastName.trim(),
+          suffix: data.clientSuffix ?? "",
           businessEntityName: "",
           streetAddress1: data.clientAddress.address1,
           streetAddress2: data.clientAddress.address2 ?? "",
@@ -70,10 +67,9 @@ export function StepManagers({ data, patch, errors }: StepProps) {
   const memberCandidates: Candidate[] = data.members
     .map((m) => {
       const name =
-        (m.memberType === "ENTITY"
-          ? m.entityName
-          : [m.firstName, m.lastName].filter(Boolean).join(" ")
-        )?.trim() ?? "";
+        m.memberType === "ENTITY"
+          ? (m.entityName ?? "").trim()
+          : fullPersonName(m.firstName, m.lastName, m.suffix);
       return {
         id: m.id,
         name,
@@ -84,6 +80,7 @@ export function StepManagers({ data, patch, errors }: StepProps) {
           personOrEntity: m.memberType,
           firstName: m.memberType === "ENTITY" ? "" : (m.firstName ?? "").trim(),
           lastName: m.memberType === "ENTITY" ? "" : (m.lastName ?? "").trim(),
+          suffix: m.memberType === "ENTITY" ? "" : (m.suffix ?? "").trim(),
           businessEntityName: m.memberType === "ENTITY" ? name : "",
           streetAddress1: m.address1,
           streetAddress2: m.address2 ?? "",

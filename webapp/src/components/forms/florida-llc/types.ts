@@ -45,6 +45,9 @@ export interface PartyEntry {
    *  boxes, and only the person knows where a multi-word name divides. */
   firstName?: string;
   lastName?: string;
+  /** Jr., Sr., III — part of a person's legal name, and the Division's form
+   *  has no box for it, so it travels with the last name on the filing. */
+  suffix?: string;
   businessEntityName?: string;
   streetAddress1: string;
   streetAddress2?: string;
@@ -63,6 +66,7 @@ export interface MemberEntry {
    *  full name is needed (agreements, emails). */
   firstName?: string;
   lastName?: string;
+  suffix?: string;
   entityName?: string;
   address1: string;
   address2?: string;
@@ -122,6 +126,7 @@ export interface FloridaLLCFormData {
   // later person questions offer them as a one-tap fill.
   clientFirstName: string;
   clientLastName: string;
+  clientSuffix?: string;
   clientAddress: AddressFields;
   clientEmail: string;
   confirmClientEmail: string;
@@ -151,6 +156,7 @@ export interface FloridaLLCFormData {
   registeredAgentType: RegisteredAgentType | "";
   registeredAgentFirstName?: string;
   registeredAgentLastName?: string;
+  registeredAgentSuffix?: string;
   registeredAgentBusinessEntityName?: string;
   registeredAgentStreetAddress1: string;
   registeredAgentStreetAddress2?: string;
@@ -255,6 +261,7 @@ export interface SubmissionPayload {
     name: string;
     firstName: string;
     lastName: string;
+    suffix: string;
     businessEntityName: string;
     address: AddressFields;
     email: string;
@@ -288,6 +295,7 @@ export interface SubmissionPayload {
   client: {
     firstName: string;
     lastName: string;
+    suffix: string;
     name: string;
     email: string;
     phone: string;

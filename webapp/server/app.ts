@@ -166,7 +166,7 @@ app.post("/orders", async (c) => {
       // The CLIENT owns the order: portal account, welcome email, and the
       // admin's "Client:" line all come from the up-front card, not from the
       // correspondence contact (which is only where updates go).
-      `${data.clientFirstName.trim()} ${data.clientLastName.trim()}`.trim(),
+      personLegalName(data.clientFirstName, data.clientLastName, data.clientSuffix),
       data.clientEmail.toLowerCase(),
       data.filingPath === "CONVERT" ? "CONVERT" : "NEW",
       llcName,
@@ -752,9 +752,9 @@ interface SeedPayload {
   principalOfficeAddress?: { address1?: string; address2?: string; city?: string; state?: string; zip?: string };
   management?: {
     structure?: string;
-    managersOrAuthorizedRepresentatives?: { role?: string; firstName?: string; lastName?: string; fullName?: string; businessEntityName?: string }[];
+    managersOrAuthorizedRepresentatives?: { role?: string; firstName?: string; lastName?: string; suffix?: string; fullName?: string; businessEntityName?: string }[];
   };
-  members?: { memberList?: { firstName?: string; lastName?: string; fullLegalName?: string; address1?: string; address2?: string; city?: string; state?: string; zip?: string }[] };
+  members?: { memberList?: { firstName?: string; lastName?: string; suffix?: string; fullLegalName?: string; address1?: string; address2?: string; city?: string; state?: string; zip?: string }[] };
   series?: { id: string; name: string }[];
 }
 
@@ -784,8 +784,7 @@ async function oaSeed(clientId: string): Promise<{
     .join(", ");
   const members = (p.members?.memberList ?? []).map((m) => ({
     name:
-      [m.firstName, m.lastName].map((x) => (x ?? "").trim()).filter(Boolean).join(" ") ||
-      (m.fullLegalName ?? ""),
+      personLegalName(m.firstName, m.lastName, m.suffix) || (m.fullLegalName ?? ""),
     address: [m.address1, m.address2, [m.city, m.state].filter(Boolean).join(", "), m.zip]
       .filter((x) => x && String(x).trim())
       .join(", "),
@@ -799,7 +798,7 @@ async function oaSeed(clientId: string): Promise<{
     .filter((e) => (e.role ?? "MGR") === "MGR")
     .map((e) =>
       (
-        [e.firstName, e.lastName].map((x) => (x ?? "").trim()).filter(Boolean).join(" ") ||
+        personLegalName(e.firstName, e.lastName, e.suffix) ||
         e.fullName ||
         e.businessEntityName ||
         ""
@@ -907,6 +906,16 @@ const SPOUSAL_FORM_LABEL: Record<"TBE" | "JTWROS", string> = {
 // untouched draft carries shares but no names, which is how the two are told
 // apart. Every document that names the owners resolves them HERE — otherwise
 // two documents generated the same afternoon disagree about who owns the company.
+/** A person's printed legal name, suffix set off by a comma — the form's
+ *  fullPersonName, server-side. Exhibit A and the signature blocks print
+ *  this verbatim, so "John Smith, Jr." must survive the whole path. */
+export function personLegalName(first?: string, last?: string, suffix?: string): string {
+  const base = [first, last].map((s) => (s ?? "").trim()).filter(Boolean).join(" ");
+  const sfx = (suffix ?? "").trim().replace(/^,\s*/, "");
+  if (!base) return sfx;
+  return sfx ? `${base}, ${sfx}` : base;
+}
+
 export function effectiveOwners(
   seedMembers: { name: string; address: string }[],
   answers: { members?: { name?: string; address?: string }[] } | null | undefined,

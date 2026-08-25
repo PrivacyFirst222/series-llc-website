@@ -1,4 +1,5 @@
 import { canonicalizeSeriesName, buildFinalLlcName, calculateEstimatedFees } from "./validation";
+import { fullPersonName } from "./validation";
 import type { FloridaLLCFormData, SubmissionPayload } from "./types";
 
 const joinName = (first?: string, last?: string): string =>
@@ -42,9 +43,14 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
     registeredAgent: {
       choice: data.registeredAgentChoice ?? "",
       type: data.registeredAgentType || "",
-      name: joinName(data.registeredAgentFirstName, data.registeredAgentLastName),
+      name: fullPersonName(
+        data.registeredAgentFirstName,
+        data.registeredAgentLastName,
+        data.registeredAgentSuffix,
+      ),
       firstName: data.registeredAgentFirstName ?? "",
       lastName: data.registeredAgentLastName ?? "",
+      suffix: data.registeredAgentSuffix ?? "",
       businessEntityName: data.registeredAgentBusinessEntityName ?? "",
       address: {
         address1: data.registeredAgentStreetAddress1,
@@ -97,7 +103,8 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
     client: {
       firstName: data.clientFirstName.trim(),
       lastName: data.clientLastName.trim(),
-      name: `${data.clientFirstName.trim()} ${data.clientLastName.trim()}`.trim(),
+      suffix: (data.clientSuffix ?? "").trim(),
+      name: fullPersonName(data.clientFirstName, data.clientLastName, data.clientSuffix),
       email: data.clientEmail,
       phone: data.clientPhone ?? "",
       address: data.clientAddress,

@@ -250,3 +250,18 @@ export function isValidEmail(s: string): boolean {
 export function cleanEmailInput(s: string): string {
   return s.replace(/^\s*mailto:\s*/i, "").trim();
 }
+
+/** A person's printed legal name. The suffix is set off by a comma —
+ *  "John Smith, Jr." — which is how it appears in the operating agreement's
+ *  signature blocks and Exhibit A. (The EIN form joins with spaces instead,
+ *  matching the SS-4's own separate boxes; that stays as it is.) */
+export function fullPersonName(
+  first?: string,
+  last?: string,
+  suffix?: string,
+): string {
+  const base = [first, last].map((s) => (s ?? "").trim()).filter(Boolean).join(" ");
+  const sfx = (suffix ?? "").trim().replace(/^,\s*/, "");
+  if (!base) return sfx;
+  return sfx ? `${base}, ${sfx}` : base;
+}

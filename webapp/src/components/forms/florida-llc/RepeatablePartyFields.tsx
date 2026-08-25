@@ -18,6 +18,7 @@ const blank = (): PartyEntry => ({
   personOrEntity: "INDIVIDUAL",
   firstName: "",
   lastName: "",
+  suffix: "",
   businessEntityName: "",
   streetAddress1: "",
   streetAddress2: "",
@@ -82,7 +83,7 @@ export function RepeatablePartyFields({
             </FieldShell>
 
             {entry.personOrEntity === "INDIVIDUAL" ? (
-              <div className="grid grid-cols-2 gap-4 md:col-span-2">
+              <div className="grid grid-cols-2 gap-4 md:col-span-2 md:grid-cols-3">
                 <FieldShell label="First name" required>
                   <Input
                     value={entry.firstName ?? ""}
@@ -97,6 +98,13 @@ export function RepeatablePartyFields({
                     onChange={(e) =>
                       update(entry.id, { lastName: e.target.value })
                     }
+                  />
+                </FieldShell>
+                <FieldShell label="Suffix (optional)">
+                  <Input
+                    value={entry.suffix ?? ""}
+                    onChange={(e) => update(entry.id, { suffix: e.target.value })}
+                    placeholder="Jr, Sr, III…"
                   />
                 </FieldShell>
               </div>

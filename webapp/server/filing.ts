@@ -68,11 +68,19 @@ const addrFields = (prefix: string, a: Addr | null | undefined): FilingField[] =
  *  only Maria Luz Dominguez Figaroa knows her surname is "Dominguez Figaroa".
  *  Orders placed before the split carry a single string; those render as one
  *  field marked for manual splitting. */
-const personName = (m: any): { first: string; last: string; legacy: string } => ({
-  first: (m?.firstName ?? "").trim(),
-  last: (m?.lastName ?? "").trim(),
-  legacy: (m?.fullLegalName ?? m?.fullName ?? m?.name ?? "").trim(),
-});
+const personName = (m: any): { first: string; last: string; legacy: string } => {
+  // The Division's Articles form has Title / Last name / First name and no
+  // suffix box (its published instructions, read in full 25 Aug 2026, never
+  // mention one). A suffix the client gave us must not be silently dropped,
+  // so it travels in the last-name box: "Smith, Jr."
+  const last = (m?.lastName ?? "").trim();
+  const suffix = (m?.suffix ?? "").trim().replace(/^,\s*/, "");
+  return {
+    first: (m?.firstName ?? "").trim(),
+    last: last && suffix ? `${last}, ${suffix}` : last,
+    legacy: (m?.fullLegalName ?? m?.fullName ?? m?.name ?? "").trim(),
+  };
+};
 
 /** PartyEntry (managers, ARs) spells its street fields streetAddress1/2;
  *  MemberEntry and the top-level addresses spell them address1/2. */

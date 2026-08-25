@@ -41,6 +41,7 @@ const formData: FloridaLLCFormData = {
   registeredAgentChoice: "SELF",
   registeredAgentType: "INDIVIDUAL",
   registeredAgentFirstName: "Casey", registeredAgentLastName: "Member",
+  registeredAgentSuffix: "Jr.",
   registeredAgentStreetAddress1: "100 Ocean Drive",
   registeredAgentCity: "Miami",
   registeredAgentState: "FL",
@@ -48,15 +49,15 @@ const formData: FloridaLLCFormData = {
   registeredAgentNotSameAsLlc: true,
   registeredAgentPhysicalAddressAcknowledgment: true,
   registeredAgentAcceptanceCheckbox: true,
-  registeredAgentAcceptanceName: "Casey Member",
+  registeredAgentAcceptanceName: "Casey Member, Jr.",
   registeredAgentAcceptanceCapacity: "INDIVIDUAL_AGENT",
-  registeredAgentElectronicSignature: "Casey Member",
+  registeredAgentElectronicSignature: "Casey Member, Jr.",
   registeredAgentSignatureAuthorizationCheckbox: true,
   managementStructure: "MEMBER_MANAGED",
   members: [
     {
       ...structuredClone(defaultFormData.members[0]),
-      firstName: "Casey", lastName: "Member",
+      firstName: "Casey", lastName: "Member", suffix: "Jr.",
       address1: "100 Ocean Drive",
       city: "Miami",
       state: "FL",
@@ -68,18 +69,19 @@ const formData: FloridaLLCFormData = {
   effectiveDateOption: "FILED_BY_DIVISION",
   clientFirstName: "Casey",
   clientLastName: "Member",
+  clientSuffix: "Jr.",
   clientAddress: {
     address1: "100 Ocean Drive", address2: "", city: "Miami", state: "FL", zip: "33139", country: "United States",
   },
   clientEmail: testEmail,
   confirmClientEmail: testEmail,
-  correspondentName: "Casey Member",
+  correspondentName: "Casey Member, Jr.",
   correspondentEmail: testEmail,
   confirmCorrespondentEmail: testEmail,
   series: [{ id: "s1", name: "E2E Coastal Holdings, LLC, PS A" }],
   seriesOwnershipAcknowledgment: true,
-  authorizedRepresentativeName: "Casey Member",
-  authorizedRepresentativeSignature: "Casey Member",
+  authorizedRepresentativeName: "Casey Member, Jr.",
+  authorizedRepresentativeSignature: "Casey Member, Jr.",
   authorizedRepresentativeSignatureCheckbox: true,
   atLeastOneMemberAcknowledgment: true,
   accuracyAcknowledgment: true,
@@ -1661,6 +1663,46 @@ if (mint.status === 200) {
     [...enc].every((ch) => ch.charCodeAt(0) < 128) &&
       JSON.parse(enc).path === "/A — Title \u00e9\u201c.pdf",
     enc,
+  );
+}
+
+// === Name suffixes (Jr., III) survive the whole path =====================
+// The Division's Articles form has no suffix box (its instructions, read in
+// full 25 Aug 2026, never mention one), so the suffix has to ride the last
+// name on the filing while printing as "Casey Member, Jr." everywhere a
+// legal name is shown.
+{
+  const adm = await adminSession();
+  const full = await api(`/api/admin/orders/${orderId}`, { cookies: adm.cookie });
+  const groups = (full.body?.data?.groups ?? []) as Array<{ title: string; fields: Array<{ label: string; value: string }> }>;
+  const flat = groups.flatMap((g) => g.fields);
+  const corrGroup = groups.find((g) => /correspondence/i.test(g.title));
+  const corr = (corrGroup?.fields ?? []).find((f) => f.label === "Name");
+  check(
+    "the client's suffix reaches the order's stored name",
+    (full.body?.data?.contactName ?? "").includes("Jr."),
+    full.body?.data?.contactName,
+  );
+  check(
+    "the filing's correspondence name prints the suffix with a comma",
+    (corr?.value ?? "").includes("Member, Jr."),
+    corr,
+  );
+  // Every last-name box on the filing — the agent's and each authorized
+  // person's — must carry the suffix, since the Division has no box for it.
+  const lastNameFields = flat.filter((f) => /last name/i.test(f.label) && /Member/.test(f.value));
+  check(
+    "every last-name box on the filing carries the suffix, never dropped",
+    lastNameFields.length > 0 && lastNameFields.every((f) => f.value.includes("Jr.")),
+    lastNameFields,
+  );
+  const { personLegalName } = await import("./app");
+  check(
+    "personLegalName sets the suffix off with a comma and tolerates a typed one",
+    personLegalName("Casey", "Member", "Jr.") === "Casey Member, Jr." &&
+      personLegalName("Casey", "Member", ", III") === "Casey Member, III" &&
+      personLegalName("Casey", "Member", "") === "Casey Member",
+    [personLegalName("Casey", "Member", "Jr."), personLegalName("Casey", "Member", ", III")],
   );
 }
 
