@@ -1560,14 +1560,21 @@ app.get("/portal/library/:key/download", async (c) => {
  *  keeps "always the latest edition" true — the nightly cron calls it, and
  *  the admin Library section has a button for right-now. */
 async function refreshOwnersManual(force = false): Promise<{ published: boolean; pages?: number; edition?: string }> {
-  const hash = createHash("sha256").update(ownersManualMd).digest("hex").slice(0, 16);
+  // The hash covers the renderer as well as the text: a layout fix that never
+  // changes a word would otherwise never be published, and clients would keep
+  // downloading the previous PDF.
+  const { renderManualPdf, MANUAL_RENDERER_VERSION } = await import("./manual-pdf");
+  const hash = createHash("sha256")
+    .update(ownersManualMd)
+    .update(`renderer:${MANUAL_RENDERER_VERSION}`)
+    .digest("hex")
+    .slice(0, 16);
   const db = await getDb();
   const rows = await db.query<{ meta: unknown }>(
     "SELECT meta FROM library_documents WHERE key = 'owners-manual'",
   );
   const meta = rows[0] ? ((typeof rows[0].meta === "string" ? JSON.parse(rows[0].meta) : rows[0].meta) as { hash?: string }) : null;
   if (!force && meta?.hash === hash) return { published: false };
-  const { renderManualPdf } = await import("./manual-pdf");
   const { pdf, pages, edition } = await renderManualPdf(ownersManualMd);
   const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength) as ArrayBuffer;
   const stored = await putFile("owners-manual.pdf", buf, "application/pdf");

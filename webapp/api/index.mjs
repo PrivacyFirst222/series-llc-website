@@ -97094,6 +97094,7 @@ var init_es = __esm({
 // server/manual-pdf.ts
 var manual_pdf_exports = {};
 __export(manual_pdf_exports, {
+  MANUAL_RENDERER_VERSION: () => MANUAL_RENDERER_VERSION,
   parseManual: () => parseManual,
   renderManualPdf: () => renderManualPdf
 });
@@ -97280,15 +97281,24 @@ async function renderManualPdf(md) {
   let y = PAGE_H2 - MARGIN2;
   const pageNo = () => doc.getPageCount() - 1 - tocPageCount;
   const newPage = () => {
+    bodyPageLines.push(linesOnPage);
+    linesOnPage = 0;
     page = doc.addPage([PAGE_W2, PAGE_H2]);
     y = PAGE_H2 - MARGIN2;
   };
-  const need = (h) => {
-    if (y - h < MARGIN2 + 14) newPage();
+  const FLOOR = MARGIN2 + 14;
+  const CHAPTER_END_FLOOR = 60;
+  const need = (h, floor = FLOOR) => {
+    if (y - h < floor) newPage();
   };
+  const bodyPageLines = [];
+  let linesOnPage = 0;
   let heIdx = 0;
-  for (const block of manual.blocks) {
-    if (block.kind === "contents") continue;
+  const bodyBlocks = manual.blocks.filter((b2) => b2.kind !== "contents");
+  const startsFreshPage = (b2) => b2 !== void 0 && b2.kind === "heading" && b2.level === 1;
+  for (let bi2 = 0; bi2 < bodyBlocks.length; bi2++) {
+    const block = bodyBlocks[bi2];
+    const nextBreaksAnyway = startsFreshPage(bodyBlocks[bi2 + 1]);
     if (block.kind === "heading") {
       if (block.level === 1) {
         if (y < PAGE_H2 - MARGIN2 - 1) newPage();
@@ -97298,6 +97308,7 @@ async function renderManualPdf(md) {
         for (const ln2 of lines2) {
           const w = ln2.reduce((a2, s) => a2 + segW(s, size2), 0);
           drawLine2(page, ln2, MARGIN2 + (width - w) / 2, y - size2, size2, void 0, NAVY);
+          linesOnPage++;
           y -= size2 + 6;
         }
         page.drawLine({ start: { x: MARGIN2 + width * 0.35, y: y - 2 }, end: { x: MARGIN2 + width * 0.65, y: y - 2 }, color: ACCENT, thickness: 1 });
@@ -97307,10 +97318,12 @@ async function renderManualPdf(md) {
       }
       const size = block.level === 2 ? 13 : 11.5;
       const lines = wrap2([{ text: block.text, bold: true, italic: false }], width, size);
-      need(lines.length * (size + GAP) + 2 * (BODY + GAP) + 12);
-      y -= block.level === 2 ? 12 : 8;
+      const preGap = block.level === 2 ? 12 : 8;
+      need(preGap + lines.length * (size + GAP) + 4 + 2 * (BODY + GAP) + 6);
+      y -= preGap;
       for (const ln2 of lines) {
         drawLine2(page, ln2, MARGIN2, y - size, size, void 0, block.level === 2 ? NAVY : INK);
+        linesOnPage++;
         y -= size + GAP;
       }
       y -= 4;
@@ -97323,12 +97336,13 @@ async function renderManualPdf(md) {
       const indent = block.kind === "quote" ? 24 : block.kind === "item" ? 16 : 0;
       const w = width - indent - (block.kind === "quote" ? 10 : 0);
       const lines = wrap2(block.segs.map((s) => ({ ...s })), w, size);
-      if (lines.length > 2 && y - 2 * lineH < MARGIN2 + 14) newPage();
+      const floor = nextBreaksAnyway ? CHAPTER_END_FLOOR : FLOOR;
+      if (lines.length > 2 && y - 2 * lineH < floor) newPage();
       const leadIn = block.segs.map((s) => s.text).join("").trimEnd().endsWith(":");
       if (leadIn) need(lines.length * lineH + 2 * lineH + 6);
       for (let li = 0; li < lines.length; li++) {
-        if (li === lines.length - 2 && y - 2 * lineH < MARGIN2 + 14) newPage();
-        need(lineH);
+        if (li === lines.length - 2 && y - 2 * lineH < floor) newPage();
+        need(lineH, floor);
         if (block.kind === "item" && li === 0) {
           page.drawText(block.marker, { x: MARGIN2 + 2, y: y - size, size: size - (block.marker === "\u2022" ? 0 : 1.5), font: fonts.regular, color: INK });
         }
@@ -97342,6 +97356,7 @@ async function renderManualPdf(md) {
         }
         const isLast = li === lines.length - 1;
         drawLine2(page, lines[li], MARGIN2 + indent, y - size, size, block.kind === "para" && !isLast ? width : void 0);
+        linesOnPage++;
         y -= lineH;
       }
       y -= block.kind === "item" ? 3 : 6;
@@ -97435,12 +97450,14 @@ async function renderManualPdf(md) {
   doc.setProducer("MyFloridaSeriesLLC document engine");
   doc.setCreationDate(/* @__PURE__ */ new Date());
   const pdf = await doc.save();
-  return { pdf, pages: doc.getPageCount(), edition };
+  bodyPageLines.push(linesOnPage);
+  return { pdf, pages: doc.getPageCount(), edition, bodyPageLines };
 }
-var PAGE_W2, PAGE_H2, MARGIN2, BODY, GAP, INK, GRAY, NAVY, ACCENT;
+var MANUAL_RENDERER_VERSION, PAGE_W2, PAGE_H2, MARGIN2, BODY, GAP, INK, GRAY, NAVY, ACCENT;
 var init_manual_pdf = __esm({
   "server/manual-pdf.ts"() {
     init_es();
+    MANUAL_RENDERER_VERSION = 2;
     PAGE_W2 = 612;
     PAGE_H2 = 792;
     MARGIN2 = 72;
@@ -111927,14 +111944,14 @@ app.get("/portal/library/:key/download", async (c) => {
   });
 });
 async function refreshOwnersManual(force = false) {
-  const hash = createHash2("sha256").update(owners_manual_default).digest("hex").slice(0, 16);
+  const { renderManualPdf: renderManualPdf2, MANUAL_RENDERER_VERSION: MANUAL_RENDERER_VERSION2 } = await Promise.resolve().then(() => (init_manual_pdf(), manual_pdf_exports));
+  const hash = createHash2("sha256").update(owners_manual_default).update(`renderer:${MANUAL_RENDERER_VERSION2}`).digest("hex").slice(0, 16);
   const db2 = await getDb();
   const rows = await db2.query(
     "SELECT meta FROM library_documents WHERE key = 'owners-manual'"
   );
   const meta = rows[0] ? typeof rows[0].meta === "string" ? JSON.parse(rows[0].meta) : rows[0].meta : null;
   if (!force && meta?.hash === hash) return { published: false };
-  const { renderManualPdf: renderManualPdf2 } = await Promise.resolve().then(() => (init_manual_pdf(), manual_pdf_exports));
   const { pdf, pages, edition } = await renderManualPdf2(owners_manual_default);
   const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength);
   const stored = await putFile("owners-manual.pdf", buf, "application/pdf");

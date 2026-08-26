@@ -13,6 +13,12 @@
  */
 import { PDFDocument, PDFFont, PDFPage, StandardFonts, rgb } from "@cantoo/pdf-lib";
 
+/** Bump when a change alters the LAYOUT of the rendered manual. The published
+ *  copy is hash-gated on the master's text, so without this a renderer fix
+ *  never reaches a client — they keep downloading the previous PDF forever.
+ *  v2: keep-with-next for headings, chapter-end floor (26 Aug 2026). */
+export const MANUAL_RENDERER_VERSION = 2;
+
 const PAGE_W = 612;
 const PAGE_H = 792;
 const MARGIN = 72;
@@ -118,7 +124,7 @@ export function parseManual(md: string): ManualDoc {
   return { cover, header, blocks };
 }
 
-export async function renderManualPdf(md: string): Promise<{ pdf: Uint8Array; pages: number; edition: string }> {
+export async function renderManualPdf(md: string): Promise<{ pdf: Uint8Array; pages: number; edition: string; bodyPageLines: number[] }> {
   const manual = parseManual(md);
   const doc = await PDFDocument.create();
   const fonts: Fonts = {
@@ -211,12 +217,38 @@ export async function renderManualPdf(md: string): Promise<{ pdf: Uint8Array; pa
   let page = doc.addPage([PAGE_W, PAGE_H]);
   let y = PAGE_H - MARGIN;
   const pageNo = () => doc.getPageCount() - 1 - tocPageCount; // body page ordinal, 1-based
-  const newPage = () => { page = doc.addPage([PAGE_W, PAGE_H]); y = PAGE_H - MARGIN; };
-  const need = (h: number) => { if (y - h < MARGIN + 14) newPage(); };
+  const newPage = () => {
+    bodyPageLines.push(linesOnPage);
+    linesOnPage = 0;
+    page = doc.addPage([PAGE_W, PAGE_H]);
+    y = PAGE_H - MARGIN;
+  };
+  // Content normally stops a clear band above the page-number footer (drawn at
+  // y=40). The last block before a chapter break may use part of that band: a
+  // slightly long page at a chapter end reads far better than spilling one
+  // line onto a page of its own, which is what produced the near-empty page 12
+  // of the First Edition.
+  const FLOOR = MARGIN + 14;
+  const CHAPTER_END_FLOOR = 60;
+  const need = (h: number, floor: number = FLOOR) => { if (y - h < floor) newPage(); };
+  // How full each body page ended up. A page carrying one or two stray lines
+  // is a layout defect a reader sees immediately, so the count is returned and
+  // asserted by the suite rather than left to whoever happens to open the PDF.
+  const bodyPageLines: number[] = [];
+  let linesOnPage = 0;
   let heIdx = 0;
 
-  for (const block of manual.blocks) {
-    if (block.kind === "contents") continue; // rendered into the reserved pages
+  // Lookahead matters for pagination: a chapter heading always starts a fresh
+  // page, so pulling a paragraph's last lines forward to avoid a widow buys
+  // nothing and strands them alone on a page of their own (page 12 of the
+  // First Edition held two lines and nothing else — audited 26 Aug 2026).
+  const bodyBlocks = manual.blocks.filter((b) => b.kind !== "contents");
+  const startsFreshPage = (b: Block | undefined): boolean =>
+    b !== undefined && b.kind === "heading" && b.level === 1;
+
+  for (let bi = 0; bi < bodyBlocks.length; bi++) {
+    const block = bodyBlocks[bi];
+    const nextBreaksAnyway = startsFreshPage(bodyBlocks[bi + 1]);
     if (block.kind === "heading") {
       if (block.level === 1) {
         if (y < PAGE_H - MARGIN - 1) newPage();
@@ -226,6 +258,7 @@ export async function renderManualPdf(md: string): Promise<{ pdf: Uint8Array; pa
         for (const ln of lines) {
           const w = ln.reduce((a, s) => a + segW(s, size), 0);
           drawLine(page, ln, MARGIN + (width - w) / 2, y - size, size, undefined, NAVY);
+          linesOnPage++;
           y -= size + 6;
         }
         page.drawLine({ start: { x: MARGIN + width * 0.35, y: y - 2 }, end: { x: MARGIN + width * 0.65, y: y - 2 }, color: ACCENT, thickness: 1 });
@@ -235,10 +268,16 @@ export async function renderManualPdf(md: string): Promise<{ pdf: Uint8Array; pa
       }
       const size = block.level === 2 ? 13 : 11.5;
       const lines = wrap([{ text: block.text, bold: true, italic: false }], width, size);
-      need(lines.length * (size + GAP) + 2 * (BODY + GAP) + 12);
-      y -= block.level === 2 ? 12 : 8;
+      // Keep-with-next. The old reserve omitted the heading's own leading and
+      // trailing gaps, so a heading could pass this check by ~4pt and then be
+      // stranded alone at the foot of the page while its text began on the
+      // next one ("30. SAMPLE LANGUAGE…", page 32 of the First Edition).
+      const preGap = block.level === 2 ? 12 : 8;
+      need(preGap + lines.length * (size + GAP) + 4 + 2 * (BODY + GAP) + 6);
+      y -= preGap;
       for (const ln of lines) {
         drawLine(page, ln, MARGIN, y - size, size, undefined, block.level === 2 ? NAVY : INK);
+        linesOnPage++;
         y -= size + GAP;
       }
       y -= 4;
@@ -251,12 +290,13 @@ export async function renderManualPdf(md: string): Promise<{ pdf: Uint8Array; pa
       const indent = block.kind === "quote" ? 24 : block.kind === "item" ? 16 : 0;
       const w = width - indent - (block.kind === "quote" ? 10 : 0);
       const lines = wrap(block.segs.map((s) => ({ ...s })), w, size);
-      if (lines.length > 2 && y - 2 * lineH < MARGIN + 14) newPage();
+      const floor = nextBreaksAnyway ? CHAPTER_END_FLOOR : FLOOR;
+      if (lines.length > 2 && y - 2 * lineH < floor) newPage();
       const leadIn = block.segs.map((s) => s.text).join("").trimEnd().endsWith(":");
       if (leadIn) need(lines.length * lineH + 2 * lineH + 6);
       for (let li = 0; li < lines.length; li++) {
-        if (li === lines.length - 2 && y - 2 * lineH < MARGIN + 14) newPage();
-        need(lineH);
+        if (li === lines.length - 2 && y - 2 * lineH < floor) newPage();
+        need(lineH, floor);
         if (block.kind === "item" && li === 0) {
           page.drawText(block.marker, { x: MARGIN + 2, y: y - size, size: size - (block.marker === "•" ? 0 : 1.5), font: fonts.regular, color: INK });
         }
@@ -271,6 +311,7 @@ export async function renderManualPdf(md: string): Promise<{ pdf: Uint8Array; pa
         }
         const isLast = li === lines.length - 1;
         drawLine(page, lines[li], MARGIN + indent, y - size, size, block.kind === "para" && !isLast ? width : undefined);
+        linesOnPage++;
         y -= lineH;
       }
       y -= block.kind === "item" ? 3 : 6;
@@ -365,5 +406,6 @@ export async function renderManualPdf(md: string): Promise<{ pdf: Uint8Array; pa
   doc.setProducer("MyFloridaSeriesLLC document engine");
   doc.setCreationDate(new Date());
   const pdf = await doc.save();
-  return { pdf, pages: doc.getPageCount(), edition };
+  bodyPageLines.push(linesOnPage);
+  return { pdf, pages: doc.getPageCount(), edition, bodyPageLines };
 }

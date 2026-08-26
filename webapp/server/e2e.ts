@@ -1706,6 +1706,25 @@ if (mint.status === 200) {
   );
 }
 
+// === Owner's Manual pagination (Codex DOC-01 / DOC-02) ====================
+// The First Edition shipped with a page carrying two stray lines and a
+// section heading stranded alone at the foot of another. Both are defects a
+// client sees on the first read, so the layout is asserted, not eyeballed.
+{
+  const { renderManualPdf } = await import("./manual-pdf");
+  const manualMd = await Bun.file(new URL("../../docs/owners-manual.md", import.meta.url)).text();
+  const rendered = await renderManualPdf(manualMd);
+  const sparse = rendered.bodyPageLines
+    .map((n, i) => ({ page: i + 1, lines: n }))
+    .filter((p) => p.lines > 0 && p.lines < 4);
+  check(
+    "no body page of the manual carries only a stray line or two",
+    sparse.length === 0,
+    { sparse, allPages: rendered.bodyPageLines },
+  );
+  check("the manual still renders a full document", rendered.pages > 25, rendered.pages);
+}
+
 // === Webhook money reconciliation (Codex STATIC-PAY-02) ===================
 // A signed event carrying a payment for the WRONG amount must not fulfil the
 // order. Matching only on the Square order id meant the amount Square
