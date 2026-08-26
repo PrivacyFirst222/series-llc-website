@@ -109,6 +109,7 @@ export function OwnershipEditor({
                 min={0}
                 max={100}
                 step="0.01"
+                aria-label={`Ownership percentage for ${row.label}`}
                 value={row.share.percentage ?? ""}
                 onChange={(e) =>
                   onShareChange(row.key, {

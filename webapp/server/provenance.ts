@@ -100,7 +100,7 @@ function normalize(s: string): string {
     // The generator bolds slot values ("The initial Managers are **X** and
     // **Y**"); the master spells the slot plain. Presentation, not prose —
     // strip it around a lone placeholder, on both sides.
-    .replace(/\*\*(\[[A-Z][A-Z ()\/.']*\])\*\*/g, "$1")
+    .replace(/\*\*(\[[A-Z][A-Z ()/.']*\])\*\*/g, "$1")
     // A [MANAGER NAMES]-class slot holds a LIST, formatted "A and B",
     // "A, B, and C", or "A, B". Collapse to one [NAME] to mirror the master's
     // single placeholder. Runs after the bold-strip so bold lists collapse too.

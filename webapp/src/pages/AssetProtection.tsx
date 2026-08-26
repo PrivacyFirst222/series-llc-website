@@ -215,8 +215,13 @@ export default function AssetProtection() {
       <section className="container-wide section-pb">
         <div className="mx-auto max-w-3xl">
           <h2 className="font-display text-3xl mb-8 text-center">Protection at a glance</h2>
-          <div className="overflow-hidden rounded-2xl border border-border">
-            <table className="w-full text-sm">
+          {/* Four columns cannot fit a phone. overflow-hidden silently CLIPPED
+              the fourth ("Inter-asset isolation") — its header read "Isolat…"
+              and its marks were sliced in half at 375px. The table scrolls
+              inside its own box instead, with a floor width that keeps the
+              columns readable rather than crushed. */}
+          <div className="overflow-x-auto rounded-2xl border border-border">
+            <table className="w-full min-w-[560px] text-sm">
               <thead>
                 <tr className="border-b border-border bg-secondary/50">
                   <th className="p-4 text-left font-medium text-muted-foreground">Entity type</th>

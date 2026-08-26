@@ -868,6 +868,7 @@ export default function OAQuestionnaire() {
                   <div key={sr.name} className="flex items-center gap-3">
                     <span className="w-1/2 truncate text-sm">{sr.name}</span>
                     <Input
+                      aria-label={`Contribution to ${sr.name}`}
                       placeholder="Contribution to this series (optional)"
                       value={a.series?.[i]?.contribution ?? ""}
                       onChange={(e) => patchSeries(i, { contribution: e.target.value })}
@@ -882,6 +883,7 @@ export default function OAQuestionnaire() {
                 <div key={sr.name} className="flex items-center gap-3">
                   <span className="w-1/2 truncate text-sm">{sr.name}</span>
                   <Input
+                    aria-label={`Purpose of ${sr.name}`}
                     placeholder='e.g., "own and lease 123 Main Street"'
                     value={a.series?.[i]?.purpose ?? ""}
                     onChange={(e) => patchSeries(i, { purpose: e.target.value })}
@@ -903,6 +905,7 @@ export default function OAQuestionnaire() {
                   <div className="flex items-center gap-3">
                     <span className="w-1/2 truncate text-sm">{u.label}</span>
                     <Input
+                      aria-label={`Transfer-on-death beneficiary for ${u.label}`}
                       placeholder="Beneficiary name (or leave blank)"
                       value={unitTod(u) ?? ""}
                       onChange={(e) => setUnitTod(u, e.target.value)}

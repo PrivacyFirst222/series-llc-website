@@ -109300,7 +109300,7 @@ NOW, THEREFORE,`,
       "Adopted effective [DATE] by the Company, acting through its Manager:",
       `Adopted effective [DATE] by the Company, acting through its ${managerNames.length > 1 ? "Managers" : "Manager"}:`
     ).split("effective [DATE]").join(`effective ${inputs.effectiveDate}`);
-    let sched = ex2.section.replace(
+    const sched = ex2.section.replace(
       "## ASSET SCHEDULE \u2014 ATTACHMENT TO SERIES EXHIBIT PS-[N]",
       `## ASSET SCHEDULE \u2014 ATTACHMENT TO SERIES EXHIBIT ${n} (${ser.name})`
     );
