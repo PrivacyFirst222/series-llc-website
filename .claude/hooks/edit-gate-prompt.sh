@@ -30,7 +30,16 @@ if printf '%s' "$PROMPT" | grep -qE '^\[SYSTEM NOTIFICATION|<task-notification>|
   exit 0
 fi
 
-if printf '%s' "$PROMPT" | grep -qiE '^[[:space:]]*go([[:space:]!.,]|$)'; then
+# Adam opens the gate with "Go". Historically that only counted at the START of
+# a message — but his habit is to quote a passage, answer it, and put the Go
+# last, which failed closed and cost a round trip on 26 Aug 2026. A trailing Go
+# now counts too: the message's final word, ignoring trailing "." "!" and ",",
+# must be "go". Deliberately NOT matched: "go?" (a question is not an
+# instruction) and "no-go" (no word boundary). Known limit: a message that
+# genuinely ends with the word go — "I'd rather not go" — opens the gate.
+LASTWORD=$(printf '%s' "$PROMPT" | tr '\n' ' ' | sed -e 's/[.!,]*[[:space:]]*$//' | awk '{print tolower($NF)}')
+
+if printf '%s' "$PROMPT" | grep -qiE '^[[:space:]]*go([[:space:]!.,]|$)' || [ "$LASTWORD" = "go" ]; then
   logit "OPENED"
   touch "$FLAG"
 else
