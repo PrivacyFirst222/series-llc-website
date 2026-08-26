@@ -205,18 +205,28 @@ app.get("/orders/:id/status", async (c) => {
 /* ------------------------- payment fulfillment ------------------------- */
 
 async function fulfillPaidOrder(orderId: string, squarePaymentId: string | null): Promise<void> {
+  if (failNextFulfillment) {
+    failNextFulfillment = false;
+    throw new Error("injected fulfillment failure (dev test scaffolding)");
+  }
   const db = await getDb();
-  const orders = await db.query<{
-    id: string; status: string; contact_name: string; contact_email: string;
+  // Claim the order atomically. Reading the status and then deciding was a
+  // race with two failure modes, both audited 26 Aug 2026: concurrent events
+  // could fulfil twice, and a late duplicate could drag an order that had
+  // already advanced to `filed`/`formed` back to `paid`. The WHERE clause
+  // does the deciding now, so exactly one caller can ever win, and only from
+  // pending_payment. Zero rows back = somebody already handled it.
+  const claimed = await db.query<{
+    id: string; contact_name: string; contact_email: string;
     llc_name: string; total_cents: number; payload: unknown;
-  }>("SELECT id, status, contact_name, contact_email, llc_name, total_cents, payload FROM orders WHERE id = $1", [orderId]);
-  if (orders.length === 0 || orders[0].status === "paid") return;
-  const order = orders[0];
-
-  await db.query(
-    "UPDATE orders SET status = 'paid', paid_at = now(), square_payment_id = $1 WHERE id = $2",
+  }>(
+    `UPDATE orders SET status = 'paid', paid_at = now(), square_payment_id = $1
+      WHERE id = $2 AND status = 'pending_payment'
+      RETURNING id, contact_name, contact_email, llc_name, total_cents, payload`,
     [squarePaymentId, orderId],
   );
+  if (claimed.length === 0) return;
+  const order = claimed[0];
 
   // Upsert the client account for this email.
   const existing = await db.query<{ id: string; password_hash: string | null }>(
@@ -289,16 +299,23 @@ async function fulfillPaidOrder(orderId: string, squarePaymentId: string | null)
 /** Marks a portal service order paid and routes it to the right next state. */
 async function fulfillPaidServiceOrder(serviceOrderId: string, squarePaymentId: string | null): Promise<void> {
   const db = await getDb();
+  const peek = await db.query<{ type: string }>(
+    "SELECT type FROM service_orders WHERE id = $1",
+    [serviceOrderId],
+  );
+  if (peek.length === 0) return;
+  const nextStatus = peek[0].type === "ein" || peek[0].type === "s-election" ? "awaiting_info" : "in_progress";
+  // Claimed the same way as a formation order — see fulfillPaidOrder.
   const rows = await db.query<{
     id: string; client_id: string; type: string; status: string; llc_name: string; details: unknown; amount_cents: number;
-  }>("SELECT id, client_id, type, status, llc_name, details, amount_cents FROM service_orders WHERE id = $1", [serviceOrderId]);
-  if (rows.length === 0 || rows[0].status !== "pending_payment") return;
-  const so = rows[0];
-  const nextStatus = so.type === "ein" || so.type === "s-election" ? "awaiting_info" : "in_progress";
-  await db.query(
-    "UPDATE service_orders SET status = $1, paid_at = now(), square_payment_id = $2 WHERE id = $3",
-    [nextStatus, squarePaymentId, so.id],
+  }>(
+    `UPDATE service_orders SET status = $1, paid_at = now(), square_payment_id = $2
+      WHERE id = $3 AND status = 'pending_payment'
+      RETURNING id, client_id, type, status, llc_name, details, amount_cents`,
+    [nextStatus, squarePaymentId, serviceOrderId],
   );
+  if (rows.length === 0) return;
+  const so = rows[0];
   const details = (typeof so.details === "string" ? JSON.parse(so.details) : so.details) as {
     seriesName?: string; target?: string;
   };
@@ -354,11 +371,18 @@ app.post("/square/webhook", async (c) => {
 
   const db = await getDb();
   if (event.event_id) {
-    const seen = await db.query(
-      "INSERT INTO webhook_events (event_id) VALUES ($1) ON CONFLICT (event_id) DO NOTHING RETURNING event_id",
+    // Claim the event only if it has never been processed to completion. An
+    // earlier delivery that died mid-fulfillment leaves processed_at NULL and
+    // is therefore retryable — recording the id up front and refusing every
+    // later delivery is exactly how a paid order could vanish.
+    const claimedEvent = await db.query(
+      `INSERT INTO webhook_events (event_id) VALUES ($1)
+       ON CONFLICT (event_id) DO UPDATE SET received_at = now()
+         WHERE webhook_events.processed_at IS NULL
+       RETURNING event_id`,
       [event.event_id],
     );
-    if (seen.length === 0) return c.json({ data: { ok: true, duplicate: true } });
+    if (claimedEvent.length === 0) return c.json({ data: { ok: true, duplicate: true } });
   }
 
   const payment = event.data?.object?.payment;
@@ -377,8 +401,24 @@ app.post("/square/webhook", async (c) => {
       if (svc.length > 0) await fulfillPaidServiceOrder(svc[0].id, payment.id);
     }
   }
+  // Only now is the event genuinely handled. Anything above that throws leaves
+  // processed_at NULL, so Square's retry is accepted rather than dismissed.
+  if (event.event_id) {
+    await db.query("UPDATE webhook_events SET processed_at = now() WHERE event_id = $1", [event.event_id]);
+  }
   return c.json({ data: { ok: true } });
 });
+
+/** Test scaffolding (dev only): makes the next fulfillment throw once, so the
+ *  suite can reproduce a transient failure mid-webhook and prove the retry
+ *  still fulfills. Codex's RUN-PAY-01 reproduction, automated. */
+let failNextFulfillment = false;
+if (!env.isProd) {
+  app.post("/dev/fail-next-fulfillment", async (c) => {
+    failNextFulfillment = true;
+    return c.json({ data: { armed: true } });
+  });
+}
 
 // Dev-only stand-in for the Square webhook while no Square account is connected.
 if (!env.SQUARE_ACCESS_TOKEN && !env.isProd) {

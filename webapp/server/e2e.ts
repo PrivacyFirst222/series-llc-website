@@ -1706,5 +1706,73 @@ if (mint.status === 200) {
   );
 }
 
+// === Payment durability (Codex RUN-PAY-01 and the status-regression twin) ==
+// These reproduce the audited defects directly: a transient failure mid-
+// fulfillment must not consume the retry, and a late duplicate payment must
+// not drag an already-filed order back to "paid".
+{
+  const adm = await adminSession();
+  const mk = async (name: string) => {
+    const email = `e2e-pay-${Math.random().toString(36).slice(2, 8)}@example.com`;
+    const res = await api("/api/orders", {
+      method: "POST",
+      headers: { "X-Forwarded-For": `10.77.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}` },
+      body: JSON.stringify({
+        ...formData, desiredLlcName: name, alternateName1: `${name} Backup`,
+        clientEmail: email, confirmClientEmail: email,
+        correspondentEmail: email, confirmCorrespondentEmail: email,
+        series: [{ id: "s1", name: `${name}, LLC, PS A` }],
+        orderEin: false, orderSElection: false,
+      }),
+    });
+    const id = res.body?.data?.orderId as string;
+    const full = await api(`/api/admin/orders/${id}`, { cookies: adm.cookie });
+    return { id, squareOrderId: full.body?.data?.squareOrderId as string };
+  };
+  const statusOf = async (id: string) =>
+    (await api(`/api/admin/orders/${id}`, { cookies: adm.cookie })).body?.data?.status;
+  const hook = (eventId: string, squareOrderId: string, payId: string) =>
+    api("/api/square/webhook", {
+      method: "POST",
+      body: JSON.stringify({
+        event_id: eventId, type: "payment.updated",
+        data: { object: { payment: { id: payId, status: "COMPLETED", order_id: squareOrderId } } },
+      }),
+    });
+
+  // 1. A transient failure must leave the event retryable.
+  {
+    const o = await mk("E2E Retry After Failure");
+    await api("/api/dev/fail-next-fulfillment", { method: "POST", body: "{}" });
+    const evt = `e2e-retry-${o.id}`;
+    const first = await hook(evt, o.squareOrderId, `pay-${o.id.slice(0, 8)}`);
+    check("a failed fulfillment surfaces as an error, not a silent success", first.status >= 500, first.status);
+    check("the order is still unpaid after the failure", (await statusOf(o.id)) === "pending_payment", await statusOf(o.id));
+    const retry = await hook(evt, o.squareOrderId, `pay-${o.id.slice(0, 8)}`);
+    check("redelivering the SAME event after a failure fulfills the order", retry.status === 200, retry.body);
+    check(
+      "the paid order is fulfilled on retry, not dismissed as a duplicate",
+      (await statusOf(o.id)) === "paid",
+      await statusOf(o.id),
+    );
+  }
+
+  // 2. A late duplicate payment must not regress an advanced order.
+  {
+    const o = await mk("E2E No Status Regression");
+    await hook(`e2e-first-${o.id}`, o.squareOrderId, `pay1-${o.id.slice(0, 8)}`);
+    check("order is paid after the first event", (await statusOf(o.id)) === "paid", await statusOf(o.id));
+    const filed = await api(`/api/admin/orders/${o.id}/filed`, { method: "POST", cookies: adm.cookie, body: "{}" });
+    check("order can be marked filed", filed.status === 200, filed.body);
+    // A DIFFERENT event id, so the dedupe table cannot mask the regression.
+    await hook(`e2e-late-${o.id}`, o.squareOrderId, `pay2-${o.id.slice(0, 8)}`);
+    check(
+      "a late duplicate payment does NOT drag a filed order back to paid",
+      (await statusOf(o.id)) === "filed",
+      await statusOf(o.id),
+    );
+  }
+}
+
 console.log(failures === 0 ? "\nALL PASS" : `\n${failures} FAILURES`);
 process.exit(failures === 0 ? 0 : 1);

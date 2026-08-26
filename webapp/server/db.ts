@@ -110,6 +110,11 @@ CREATE TABLE IF NOT EXISTS webhook_events (
   received_at timestamptz NOT NULL DEFAULT now()
 );
 ALTER TABLE clients ADD COLUMN IF NOT EXISTS ra_cancellation_requested_at timestamptz;
+-- A webhook event is only "handled" once its work SUCCEEDED. Recording the id
+-- up front and treating every later delivery as a duplicate meant a transient
+-- failure permanently swallowed a paid order (audited 26 Aug 2026).
+ALTER TABLE webhook_events ADD COLUMN IF NOT EXISTS processed_at timestamptz;
+UPDATE webhook_events SET processed_at = received_at WHERE processed_at IS NULL;
 -- Email changes are verified before they take effect: the requested address
 -- parks here until the client clicks the link sent to it.
 ALTER TABLE clients ADD COLUMN IF NOT EXISTS pending_email text;

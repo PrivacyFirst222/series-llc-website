@@ -104356,6 +104356,11 @@ CREATE TABLE IF NOT EXISTS webhook_events (
   received_at timestamptz NOT NULL DEFAULT now()
 );
 ALTER TABLE clients ADD COLUMN IF NOT EXISTS ra_cancellation_requested_at timestamptz;
+-- A webhook event is only "handled" once its work SUCCEEDED. Recording the id
+-- up front and treating every later delivery as a duplicate meant a transient
+-- failure permanently swallowed a paid order (audited 26 Aug 2026).
+ALTER TABLE webhook_events ADD COLUMN IF NOT EXISTS processed_at timestamptz;
+UPDATE webhook_events SET processed_at = received_at WHERE processed_at IS NULL;
 -- Email changes are verified before they take effect: the requested address
 -- parks here until the client clicks the link sent to it.
 ALTER TABLE clients ADD COLUMN IF NOT EXISTS pending_email text;
@@ -110892,14 +110897,19 @@ app.get("/orders/:id/status", async (c) => {
   return c.json({ data: { status: rows[0].status, llcName: rows[0].llc_name, totalCents: rows[0].total_cents } });
 });
 async function fulfillPaidOrder(orderId, squarePaymentId) {
+  if (failNextFulfillment) {
+    failNextFulfillment = false;
+    throw new Error("injected fulfillment failure (dev test scaffolding)");
+  }
   const db2 = await getDb();
-  const orders = await db2.query("SELECT id, status, contact_name, contact_email, llc_name, total_cents, payload FROM orders WHERE id = $1", [orderId]);
-  if (orders.length === 0 || orders[0].status === "paid") return;
-  const order = orders[0];
-  await db2.query(
-    "UPDATE orders SET status = 'paid', paid_at = now(), square_payment_id = $1 WHERE id = $2",
+  const claimed = await db2.query(
+    `UPDATE orders SET status = 'paid', paid_at = now(), square_payment_id = $1
+      WHERE id = $2 AND status = 'pending_payment'
+      RETURNING id, contact_name, contact_email, llc_name, total_cents, payload`,
     [squarePaymentId, orderId]
   );
+  if (claimed.length === 0) return;
+  const order = claimed[0];
   const existing = await db2.query(
     "SELECT id, password_hash FROM clients WHERE email = $1",
     [order.contact_email]
@@ -110957,14 +110967,20 @@ async function fulfillPaidOrder(orderId, squarePaymentId) {
 }
 async function fulfillPaidServiceOrder(serviceOrderId, squarePaymentId) {
   const db2 = await getDb();
-  const rows = await db2.query("SELECT id, client_id, type, status, llc_name, details, amount_cents FROM service_orders WHERE id = $1", [serviceOrderId]);
-  if (rows.length === 0 || rows[0].status !== "pending_payment") return;
-  const so2 = rows[0];
-  const nextStatus = so2.type === "ein" || so2.type === "s-election" ? "awaiting_info" : "in_progress";
-  await db2.query(
-    "UPDATE service_orders SET status = $1, paid_at = now(), square_payment_id = $2 WHERE id = $3",
-    [nextStatus, squarePaymentId, so2.id]
+  const peek = await db2.query(
+    "SELECT type FROM service_orders WHERE id = $1",
+    [serviceOrderId]
   );
+  if (peek.length === 0) return;
+  const nextStatus = peek[0].type === "ein" || peek[0].type === "s-election" ? "awaiting_info" : "in_progress";
+  const rows = await db2.query(
+    `UPDATE service_orders SET status = $1, paid_at = now(), square_payment_id = $2
+      WHERE id = $3 AND status = 'pending_payment'
+      RETURNING id, client_id, type, status, llc_name, details, amount_cents`,
+    [nextStatus, squarePaymentId, serviceOrderId]
+  );
+  if (rows.length === 0) return;
+  const so2 = rows[0];
   const details = typeof so2.details === "string" ? JSON.parse(so2.details) : so2.details;
   const summary = so2.type === "series" ? `Protected Series Designation \u2014 ${details.seriesName ?? so2.llc_name}` : so2.type === "s-election" ? `S Corporation Election Package \u2014 ${so2.llc_name}` : `Federal EIN \u2014 ${details.target === "series" ? details.seriesName ?? "series" : so2.llc_name}`;
   const clients = await db2.query(
@@ -111006,11 +111022,14 @@ app.post("/square/webhook", async (c) => {
   const event = JSON.parse(rawBody);
   const db2 = await getDb();
   if (event.event_id) {
-    const seen = await db2.query(
-      "INSERT INTO webhook_events (event_id) VALUES ($1) ON CONFLICT (event_id) DO NOTHING RETURNING event_id",
+    const claimedEvent = await db2.query(
+      `INSERT INTO webhook_events (event_id) VALUES ($1)
+       ON CONFLICT (event_id) DO UPDATE SET received_at = now()
+         WHERE webhook_events.processed_at IS NULL
+       RETURNING event_id`,
       [event.event_id]
     );
-    if (seen.length === 0) return c.json({ data: { ok: true, duplicate: true } });
+    if (claimedEvent.length === 0) return c.json({ data: { ok: true, duplicate: true } });
   }
   const payment = event.data?.object?.payment;
   if (event.type?.startsWith("payment.") && payment?.status === "COMPLETED" && payment.order_id) {
@@ -111028,8 +111047,18 @@ app.post("/square/webhook", async (c) => {
       if (svc.length > 0) await fulfillPaidServiceOrder(svc[0].id, payment.id);
     }
   }
+  if (event.event_id) {
+    await db2.query("UPDATE webhook_events SET processed_at = now() WHERE event_id = $1", [event.event_id]);
+  }
   return c.json({ data: { ok: true } });
 });
+var failNextFulfillment = false;
+if (!env.isProd) {
+  app.post("/dev/fail-next-fulfillment", async (c) => {
+    failNextFulfillment = true;
+    return c.json({ data: { armed: true } });
+  });
+}
 if (!env.SQUARE_ACCESS_TOKEN && !env.isProd) {
   app.post("/dev/simulate-payment", async (c) => {
     const { orderId } = await c.req.json();
