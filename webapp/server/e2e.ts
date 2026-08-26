@@ -1706,6 +1706,65 @@ if (mint.status === 200) {
   );
 }
 
+// === Webhook money reconciliation (Codex STATIC-PAY-02) ===================
+// A signed event carrying a payment for the WRONG amount must not fulfil the
+// order. Matching only on the Square order id meant the amount Square
+// actually captured was never compared with what we charged.
+{
+  const adm = await adminSession();
+  const email = `e2e-money-${Math.random().toString(36).slice(2, 8)}@example.com`;
+  const ord = await api("/api/orders", {
+    method: "POST",
+    headers: { "X-Forwarded-For": `10.91.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}` },
+    body: JSON.stringify({
+      ...formData, desiredLlcName: "E2E Money Check", alternateName1: "E2E Money Check Backup",
+      clientEmail: email, confirmClientEmail: email,
+      correspondentEmail: email, confirmCorrespondentEmail: email,
+      series: [{ id: "s1", name: "E2E Money Check, LLC, PS A" }],
+      orderEin: false, orderSElection: false,
+    }),
+  });
+  const id = ord.body?.data?.orderId as string;
+  const detail = await api(`/api/admin/orders/${id}`, { cookies: adm.cookie });
+  const squareOrderId = detail.body?.data?.squareOrderId as string;
+  const total = detail.body?.data?.totalCents as number;
+  const statusOf = async () =>
+    (await api(`/api/admin/orders/${id}`, { cookies: adm.cookie })).body?.data?.status;
+  const hook = (eventId: string, amount: number | null, currency: string) =>
+    api("/api/square/webhook", {
+      method: "POST",
+      body: JSON.stringify({
+        event_id: eventId, type: "payment.updated",
+        data: { object: { payment: {
+          id: `pay-money-${eventId}`, status: "COMPLETED", order_id: squareOrderId,
+          ...(amount === null ? {} : { amount_money: { amount, currency } }),
+        } } },
+      }),
+    });
+
+  check("the order has a server-computed total to reconcile against", typeof total === "number" && total > 0, total);
+
+  const short = await hook(`e2e-money-short-${id}`, 100, "USD");
+  check("a wrong-amount payment is acknowledged, not errored", short.status === 200, short.body);
+  check(
+    "a wrong-amount payment does NOT fulfil the order",
+    (await statusOf()) === "pending_payment",
+    await statusOf(),
+  );
+
+  const wrongCur = await hook(`e2e-money-cur-${id}`, total, "CAD");
+  check("a wrong-currency payment is acknowledged", wrongCur.status === 200, wrongCur.body);
+  check(
+    "a wrong-currency payment does NOT fulfil the order",
+    (await statusOf()) === "pending_payment",
+    await statusOf(),
+  );
+
+  const right = await hook(`e2e-money-ok-${id}`, total, "USD");
+  check("a correct payment still fulfils the order", right.status === 200, right.body);
+  check("the order is paid once the money matches", (await statusOf()) === "paid", await statusOf());
+}
+
 // === OA autosave ordering (Codex RUN-OA-01) ===============================
 // Every keystroke fires its own save. Whichever response the server handles
 // last used to win, so a slow early request could bury a later answer — in a

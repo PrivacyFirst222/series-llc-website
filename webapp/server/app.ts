@@ -354,6 +354,39 @@ async function fulfillPaidServiceOrder(serviceOrderId: string, squarePaymentId: 
   }
 }
 
+/** Square tells us what it actually captured. If that disagrees with what we
+ *  charged, the safe move is to deliver NOTHING and put a human on it: a
+ *  mismatch is a partial capture, a currency surprise, or a payment attached
+ *  to the wrong order, and none of those should silently create an account and
+ *  a filing. Events carrying no money data (the dev harness) pass through
+ *  unchanged — this reconciles Square's own figures, it is not the
+ *  anti-forgery control; the signature check is. */
+function moneyMismatch(
+  money: { amount?: number | string; currency?: string } | undefined,
+  expectedCents: number,
+): string | null {
+  if (!money || money.amount === undefined || money.amount === null) return null;
+  const amount = Number(money.amount);
+  if (!Number.isFinite(amount)) return `unreadable amount ${String(money.amount)}`;
+  if (amount !== expectedCents) return `captured ${amount} but the order is ${expectedCents}`;
+  const currency = (money.currency ?? "USD").toUpperCase();
+  if (currency !== "USD") return `captured in ${currency}, not USD`;
+  return null;
+}
+
+async function alertMoneyMismatch(reason: string, squareOrderId: string, paymentId: string): Promise<void> {
+  console.error(`[webhook] payment does not match the order — nothing fulfilled: ${reason} (square order ${squareOrderId}, payment ${paymentId})`);
+  if (!env.ADMIN_NOTIFY_EMAIL) return;
+  await sendMail({
+    to: env.ADMIN_NOTIFY_EMAIL,
+    subject: "Payment did not match the order — nothing was delivered",
+    html: `<p>A completed Square payment did not match the order it points at, so no account was created and nothing was delivered.</p>
+           <p><strong>${reason}</strong></p>
+           <p>Square order: ${squareOrderId}<br/>Payment: ${paymentId}</p>
+           <p>Check the payment in Square, then either refund it or fulfil the order by hand from the admin panel.</p>`,
+  }).catch((e) => console.error("[webhook] mismatch alert failed:", e));
+}
+
 app.post("/square/webhook", async (c) => {
   const rawBody = await c.req.text();
   const ok = verifyWebhookSignature({
@@ -366,7 +399,7 @@ app.post("/square/webhook", async (c) => {
   const event = JSON.parse(rawBody) as {
     event_id?: string;
     type?: string;
-    data?: { object?: { payment?: { id: string; status: string; order_id?: string } } };
+    data?: { object?: { payment?: { id: string; status: string; order_id?: string; amount_money?: { amount?: number | string; currency?: string } } } };
   };
 
   const db = await getDb();
@@ -387,18 +420,24 @@ app.post("/square/webhook", async (c) => {
 
   const payment = event.data?.object?.payment;
   if (event.type?.startsWith("payment.") && payment?.status === "COMPLETED" && payment.order_id) {
-    const rows = await db.query<{ id: string }>(
-      "SELECT id FROM orders WHERE square_order_id = $1",
+    const rows = await db.query<{ id: string; total_cents: number }>(
+      "SELECT id, total_cents FROM orders WHERE square_order_id = $1",
       [payment.order_id],
     );
     if (rows.length > 0) {
-      await fulfillPaidOrder(rows[0].id, payment.id);
+      const mismatch = moneyMismatch(payment.amount_money, rows[0].total_cents);
+      if (mismatch) await alertMoneyMismatch(mismatch, payment.order_id, payment.id);
+      else await fulfillPaidOrder(rows[0].id, payment.id);
     } else {
-      const svc = await db.query<{ id: string }>(
-        "SELECT id FROM service_orders WHERE square_order_id = $1",
+      const svc = await db.query<{ id: string; amount_cents: number }>(
+        "SELECT id, amount_cents FROM service_orders WHERE square_order_id = $1",
         [payment.order_id],
       );
-      if (svc.length > 0) await fulfillPaidServiceOrder(svc[0].id, payment.id);
+      if (svc.length > 0) {
+        const mismatch = moneyMismatch(payment.amount_money, svc[0].amount_cents);
+        if (mismatch) await alertMoneyMismatch(mismatch, payment.order_id, payment.id);
+        else await fulfillPaidServiceOrder(svc[0].id, payment.id);
+      }
     }
   }
   // Only now is the event genuinely handled. Anything above that throws leaves

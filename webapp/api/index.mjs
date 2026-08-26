@@ -111016,6 +111016,27 @@ async function fulfillPaidServiceOrder(serviceOrderId, squarePaymentId) {
     }
   }
 }
+function moneyMismatch(money2, expectedCents) {
+  if (!money2 || money2.amount === void 0 || money2.amount === null) return null;
+  const amount = Number(money2.amount);
+  if (!Number.isFinite(amount)) return `unreadable amount ${String(money2.amount)}`;
+  if (amount !== expectedCents) return `captured ${amount} but the order is ${expectedCents}`;
+  const currency = (money2.currency ?? "USD").toUpperCase();
+  if (currency !== "USD") return `captured in ${currency}, not USD`;
+  return null;
+}
+async function alertMoneyMismatch(reason, squareOrderId, paymentId) {
+  console.error(`[webhook] payment does not match the order \u2014 nothing fulfilled: ${reason} (square order ${squareOrderId}, payment ${paymentId})`);
+  if (!env.ADMIN_NOTIFY_EMAIL) return;
+  await sendMail({
+    to: env.ADMIN_NOTIFY_EMAIL,
+    subject: "Payment did not match the order \u2014 nothing was delivered",
+    html: `<p>A completed Square payment did not match the order it points at, so no account was created and nothing was delivered.</p>
+           <p><strong>${reason}</strong></p>
+           <p>Square order: ${squareOrderId}<br/>Payment: ${paymentId}</p>
+           <p>Check the payment in Square, then either refund it or fulfil the order by hand from the admin panel.</p>`
+  }).catch((e) => console.error("[webhook] mismatch alert failed:", e));
+}
 app.post("/square/webhook", async (c) => {
   const rawBody = await c.req.text();
   const ok = verifyWebhookSignature({
@@ -111039,17 +111060,23 @@ app.post("/square/webhook", async (c) => {
   const payment = event.data?.object?.payment;
   if (event.type?.startsWith("payment.") && payment?.status === "COMPLETED" && payment.order_id) {
     const rows = await db2.query(
-      "SELECT id FROM orders WHERE square_order_id = $1",
+      "SELECT id, total_cents FROM orders WHERE square_order_id = $1",
       [payment.order_id]
     );
     if (rows.length > 0) {
-      await fulfillPaidOrder(rows[0].id, payment.id);
+      const mismatch = moneyMismatch(payment.amount_money, rows[0].total_cents);
+      if (mismatch) await alertMoneyMismatch(mismatch, payment.order_id, payment.id);
+      else await fulfillPaidOrder(rows[0].id, payment.id);
     } else {
       const svc = await db2.query(
-        "SELECT id FROM service_orders WHERE square_order_id = $1",
+        "SELECT id, amount_cents FROM service_orders WHERE square_order_id = $1",
         [payment.order_id]
       );
-      if (svc.length > 0) await fulfillPaidServiceOrder(svc[0].id, payment.id);
+      if (svc.length > 0) {
+        const mismatch = moneyMismatch(payment.amount_money, svc[0].amount_cents);
+        if (mismatch) await alertMoneyMismatch(mismatch, payment.order_id, payment.id);
+        else await fulfillPaidServiceOrder(svc[0].id, payment.id);
+      }
     }
   }
   if (event.event_id) {
