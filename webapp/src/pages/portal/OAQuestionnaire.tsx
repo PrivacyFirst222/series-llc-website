@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight, Download, FileText, Heart, HelpCircle, History, Plus, Trash2, X } from "lucide-react";
@@ -155,6 +155,13 @@ export default function OAQuestionnaire() {
   const [a, setA] = useState<Answers>({});
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState("");
+  // Answers must never move backwards. Each edit stamps a higher revision;
+  // the server refuses anything older, so a slow early request can no longer
+  // bury a later answer. The debounce keeps one request per pause instead of
+  // one per keystroke.
+  const revRef = useRef(0);
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [saveFailed, setSaveFailed] = useState(false);
   // Three questions decide which of the eight forms this is. They come first,
   // on their own screen, so the rest of the page is only ever the questions
   // that form actually has.
@@ -212,7 +219,12 @@ export default function OAQuestionnaire() {
   }, [data, loaded]);
 
   const save = useMutation({
-    mutationFn: (answers: Answers) => api.put("/api/portal/oa/answers", answers),
+    mutationFn: ({ answers, rev }: { answers: Answers; rev: number }) =>
+      api.put(`/api/portal/oa/answers?rev=${rev}`, answers),
+    onSuccess: () => setSaveFailed(false),
+    // A save that fails silently is how an answer the client believes is
+    // recorded never reaches the agreement.
+    onError: () => setSaveFailed(true),
   });
 
   const generate = useMutation({
@@ -229,7 +241,9 @@ export default function OAQuestionnaire() {
   const patch = (p: Partial<Answers>) => {
     setA((prev) => {
       const next = { ...prev, ...p };
-      save.mutate(next);
+      const rev = ++revRef.current;
+      if (saveTimer.current) clearTimeout(saveTimer.current);
+      saveTimer.current = setTimeout(() => save.mutate({ answers: next, rev }), 400);
       return next;
     });
   };
@@ -932,6 +946,12 @@ export default function OAQuestionnaire() {
                 <p className="mt-3 text-sm text-destructive">
                   Every owner needs a full legal name and an address — both are printed in Exhibit A
                   and the signature block.
+                </p>
+              ) : null}
+              {saveFailed ? (
+                <p className="mt-3 text-sm text-destructive">
+                  Your last answer could not be saved — check your connection and change it again
+                  before generating, or the agreement may be built without it.
                 </p>
               ) : null}
               {error ? <p className="mt-3 text-sm text-destructive">{error}</p> : null}

@@ -114,6 +114,11 @@ ALTER TABLE clients ADD COLUMN IF NOT EXISTS ra_cancellation_requested_at timest
 -- up front and treating every later delivery as a duplicate meant a transient
 -- failure permanently swallowed a paid order (audited 26 Aug 2026).
 ALTER TABLE webhook_events ADD COLUMN IF NOT EXISTS processed_at timestamptz;
+-- Autosave ordering: every keystroke fires its own request, so responses can
+-- land out of order. The client stamps a monotonic revision and the server
+-- refuses to move backwards (audited 26 Aug 2026 — an older keystroke could
+-- bury a newer answer inside a legal agreement).
+ALTER TABLE oa_profiles ADD COLUMN IF NOT EXISTS rev integer NOT NULL DEFAULT 0;
 UPDATE webhook_events SET processed_at = received_at WHERE processed_at IS NULL;
 -- Email changes are verified before they take effect: the requested address
 -- parks here until the client clicks the link sent to it.

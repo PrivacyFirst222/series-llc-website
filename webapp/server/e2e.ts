@@ -1706,6 +1706,74 @@ if (mint.status === 200) {
   );
 }
 
+// === OA autosave ordering (Codex RUN-OA-01) ===============================
+// Every keystroke fires its own save. Whichever response the server handles
+// last used to win, so a slow early request could bury a later answer — in a
+// document that states ownership, contributions, and succession.
+{
+  const oaEmail = `e2e-oarev-${Math.random().toString(36).slice(2, 8)}@example.com`;
+  const ord = await api("/api/orders", {
+    method: "POST",
+    headers: { "X-Forwarded-For": `10.88.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}` },
+    body: JSON.stringify({
+      ...formData, desiredLlcName: "E2E OA Revision", alternateName1: "E2E OA Revision Backup",
+      clientEmail: oaEmail, confirmClientEmail: oaEmail,
+      correspondentEmail: oaEmail, confirmCorrespondentEmail: oaEmail,
+      series: [{ id: "s1", name: "E2E OA Revision, LLC, PS A" }],
+      orderEin: false, orderSElection: false,
+    }),
+  });
+  const oaOrderId = ord.body?.data?.orderId as string;
+  let pay = await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: oaOrderId }) });
+  if (pay.status === 404) {
+    const adm2 = await adminSession();
+    const full = await api(`/api/admin/orders/${oaOrderId}`, { cookies: adm2.cookie });
+    pay = await api("/api/square/webhook", {
+      method: "POST",
+      body: JSON.stringify({
+        event_id: `e2e-oarev-${oaOrderId}`, type: "payment.updated",
+        data: { object: { payment: { id: `pay-oarev-${oaOrderId.slice(0, 8)}`, status: "COMPLETED", order_id: full.body?.data?.squareOrderId } } },
+      }),
+    });
+  }
+  const mint = await api("/api/dev/mint-reset-token", { method: "POST", body: JSON.stringify({ email: oaEmail }) });
+  const pw = await api("/api/auth/set-password", {
+    method: "POST", body: JSON.stringify({ token: mint.body?.data?.token, password: "e2e-oa-rev-pass" }),
+  });
+  check("OA revision test client signs in", pw.status === 200, pw.body);
+
+  const answers = (purpose: string) => ({
+    firstOrAmended: "first", effectiveDate: "2026-08-26", authorized: true,
+    borrowingThreshold: 30000, series: [{ purpose }],
+  });
+  const put = (rev: number | null, purpose: string) =>
+    api(`/api/portal/oa/answers${rev === null ? "" : `?rev=${rev}`}`, {
+      method: "PUT", cookies: pw.cookie, body: JSON.stringify(answers(purpose)),
+    });
+  const storedPurpose = async () => {
+    const g = await api("/api/portal/oa", { cookies: pw.cookie });
+    return (g.body?.data?.answers?.series ?? [])[0]?.purpose;
+  };
+
+  const newer = await put(5, "NEWER");
+  check("a versioned save is accepted", newer.status === 200, newer.body);
+  check("the newer answer is stored", (await storedPurpose()) === "NEWER", await storedPurpose());
+
+  // The defect: a slow earlier keystroke arriving late must not win.
+  const stale = await put(3, "OLDER");
+  check("a stale save is answered without error", stale.status === 200, stale.body);
+  check(
+    "an OLDER answer does NOT overwrite a newer one",
+    (await storedPurpose()) === "NEWER",
+    await storedPurpose(),
+  );
+  check("the server reports the stale write as ignored", stale.body?.data?.stale === true, stale.body);
+
+  // A newer revision still wins normally.
+  await put(6, "NEWEST");
+  check("a newer revision still saves", (await storedPurpose()) === "NEWEST", await storedPurpose());
+}
+
 // === Payment durability (Codex RUN-PAY-01 and the status-regression twin) ==
 // These reproduce the audited defects directly: a transient failure mid-
 // fulfillment must not consume the retry, and a late duplicate payment must

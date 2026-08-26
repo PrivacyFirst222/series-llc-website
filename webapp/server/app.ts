@@ -1031,6 +1031,23 @@ app.put("/portal/oa/answers", async (c) => {
   const body = oaAnswersSchema.safeParse(await c.req.json().catch(() => null));
   if (!body.success) return c.json(err("Invalid answers.", "INVALID_INPUT"), 400);
   const db = await getDb();
+  // A revision, when the client supplies one, makes the write monotonic: an
+  // earlier keystroke that arrives late is ignored rather than allowed to bury
+  // a newer answer. Callers without a revision keep the old unconditional
+  // behaviour and leave the stored revision untouched.
+  const revRaw = c.req.query("rev");
+  const rev = revRaw !== undefined && revRaw !== "" ? Number(revRaw) : null;
+  if (rev !== null && Number.isFinite(rev)) {
+    const wrote = await db.query<{ rev: number }>(
+      `INSERT INTO oa_profiles (client_id, answers, rev, updated_at) VALUES ($1, $2, $3, now())
+       ON CONFLICT (client_id) DO UPDATE SET answers = $2, rev = $3, updated_at = now()
+         WHERE oa_profiles.rev < $3
+       RETURNING rev`,
+      [session.clientId, JSON.stringify(body.data), rev],
+    );
+    if (wrote.length === 0) return c.json({ data: { ok: true, stale: true } });
+    return c.json({ data: { ok: true, rev } });
+  }
   await db.query(
     `INSERT INTO oa_profiles (client_id, answers, updated_at) VALUES ($1, $2, now())
      ON CONFLICT (client_id) DO UPDATE SET answers = $2, updated_at = now()`,

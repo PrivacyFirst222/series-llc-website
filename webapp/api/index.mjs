@@ -104360,6 +104360,11 @@ ALTER TABLE clients ADD COLUMN IF NOT EXISTS ra_cancellation_requested_at timest
 -- up front and treating every later delivery as a duplicate meant a transient
 -- failure permanently swallowed a paid order (audited 26 Aug 2026).
 ALTER TABLE webhook_events ADD COLUMN IF NOT EXISTS processed_at timestamptz;
+-- Autosave ordering: every keystroke fires its own request, so responses can
+-- land out of order. The client stamps a monotonic revision and the server
+-- refuses to move backwards (audited 26 Aug 2026 \u2014 an older keystroke could
+-- bury a newer answer inside a legal agreement).
+ALTER TABLE oa_profiles ADD COLUMN IF NOT EXISTS rev integer NOT NULL DEFAULT 0;
 UPDATE webhook_events SET processed_at = received_at WHERE processed_at IS NULL;
 -- Email changes are verified before they take effect: the requested address
 -- parks here until the client clicks the link sent to it.
@@ -111510,6 +111515,19 @@ app.put("/portal/oa/answers", async (c) => {
   const body = oaAnswersSchema.safeParse(await c.req.json().catch(() => null));
   if (!body.success) return c.json(err2("Invalid answers.", "INVALID_INPUT"), 400);
   const db2 = await getDb();
+  const revRaw = c.req.query("rev");
+  const rev = revRaw !== void 0 && revRaw !== "" ? Number(revRaw) : null;
+  if (rev !== null && Number.isFinite(rev)) {
+    const wrote = await db2.query(
+      `INSERT INTO oa_profiles (client_id, answers, rev, updated_at) VALUES ($1, $2, $3, now())
+       ON CONFLICT (client_id) DO UPDATE SET answers = $2, rev = $3, updated_at = now()
+         WHERE oa_profiles.rev < $3
+       RETURNING rev`,
+      [session.clientId, JSON.stringify(body.data), rev]
+    );
+    if (wrote.length === 0) return c.json({ data: { ok: true, stale: true } });
+    return c.json({ data: { ok: true, rev } });
+  }
   await db2.query(
     `INSERT INTO oa_profiles (client_id, answers, updated_at) VALUES ($1, $2, now())
      ON CONFLICT (client_id) DO UPDATE SET answers = $2, updated_at = now()`,
