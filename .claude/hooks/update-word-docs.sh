@@ -192,42 +192,13 @@ for entry in "${DOCS[@]}"; do
 done
 echo "regenerated $count Word documents -> docs/word/"
 
-# The redline is derived from two masters rather than one, so it runs after the
-# set is written. A stale redline is worse than none — it would show a
-# difference that no longer exists.
-echo "redlining the forms against each other"
-python3 "$ROOT/docs/redline.py"
-python3 "$ROOT/docs/redline.py" "$ROOT/webapp/server/templates-oa-multi.md" \
-        "$ROOT/webapp/server/templates-oa-member.md" \
-        "FPSLLC Redline - Manager-Managed vs Member-Managed Partnership.docx"
-python3 "$ROOT/docs/redline.py" "$ROOT/webapp/server/templates-oa-s.md" \
-        "$ROOT/webapp/server/templates-oa-member-s.md" \
-        "FPSLLC Redline - Manager-Managed vs Member-Managed S Corporation.docx"
-python3 "$ROOT/docs/redline.py" "$ROOT/webapp/server/templates-oa-member.md" \
-        "$ROOT/webapp/server/templates-oa-member-s.md" \
-        "FPSLLC Redline - Member-Managed Partnership vs S Corporation.docx"
-python3 "$ROOT/docs/redline.py" "$ROOT/webapp/server/templates-oa-multi.md" \
-        "$ROOT/webapp/server/templates-oa-single.md" \
-        "FPSLLC Redline - Manager-Managed Multi-Member vs Single Member.docx"
-python3 "$ROOT/docs/redline.py" "$ROOT/webapp/server/templates-oa-single.md" \
-        "$ROOT/webapp/server/templates-oa-single-s.md" \
-        "SMMMDE vs SMMMS - FPSLLC Redline - Single Member Disregarded vs S Corporation.docx"
-python3 "$ROOT/docs/redline.py" "$ROOT/webapp/server/templates-oa-single.md" \
-        "$ROOT/webapp/server/templates-oa-member-single.md" \
-        "SMMMDE vs SMMEMDE - FPSLLC Redline - Single Member Manager-Managed vs Member-Managed.docx"
-python3 "$ROOT/docs/redline.py" "$ROOT/webapp/server/templates-oa-member-single.md" \
-        "$ROOT/webapp/server/templates-oa-member-single-s.md" \
-        "SMMEMDE vs SMMEMS - FPSLLC Redline - Member-Managed Single Member Disregarded vs S Corporation.docx"
-REDLINES=(
-  "FPSLLC Redline - Manager-Managed Partnership vs S Corporation.docx"
-  "FPSLLC Redline - Manager-Managed vs Member-Managed Partnership.docx"
-  "FPSLLC Redline - Manager-Managed vs Member-Managed S Corporation.docx"
-  "FPSLLC Redline - Member-Managed Partnership vs S Corporation.docx"
-  "FPSLLC Redline - Manager-Managed Multi-Member vs Single Member.docx"
-  "SMMMDE vs SMMMS - FPSLLC Redline - Single Member Disregarded vs S Corporation.docx"
-  "SMMMDE vs SMMEMDE - FPSLLC Redline - Single Member Manager-Managed vs Member-Managed.docx"
-  "SMMEMDE vs SMMEMS - FPSLLC Redline - Member-Managed Single Member Disregarded vs S Corporation.docx"
-)
+# Redlines are no longer generated. They were comparison documents between two
+# masters, used once for review and never updated afterwards — so every run
+# rewrote eight binaries nobody read, and all eight failed the format gate for
+# heading stranding, which kept the one gate that has ever caught a real defect
+# permanently red. Adam's call, 26 August 2026: delete them rather than carry
+# them. docs/redline.py still exists and can be run by hand to compare two
+# masters on demand; nothing regenerates its output automatically.
 
 # Dropbox second, and never fatal. -d is not enough: under a macOS privacy denial
 # the directory tests as present and every write fails.
@@ -236,9 +207,6 @@ if [ -d "$OUT_DROPBOX" ]; then
   for entry in "${DOCS[@]}"; do
     name="${entry##*|}"
     cp "$STAGE/$name" "$OUT_DROPBOX/$name" 2>/dev/null || failed=$((failed + 1))
-  done
-  for name in "${REDLINES[@]}"; do
-    cp "$OUT_REPO/$name" "$OUT_DROPBOX/$name" 2>/dev/null || failed=$((failed + 1))
   done
   if [ "$failed" -eq 0 ]; then
     echo "copied $count Word documents -> Dropbox"

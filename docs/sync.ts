@@ -39,13 +39,6 @@ const GENERATED = new Set([
   "FPSLLC Operating Agreement - Member-Managed Multi-Member (Partnership) - DRAFT.docx",
   "FPSLLC Operating Agreement - Member-Managed (S Corporation) - DRAFT.docx",
   "FPSLLC Operating Agreement Instructions - DRAFT.docx",
-  "FPSLLC Redline - Manager-Managed Partnership vs S Corporation.docx",
-  "FPSLLC Redline - Manager-Managed vs Member-Managed Partnership.docx",
-  "FPSLLC Redline - Manager-Managed vs Member-Managed S Corporation.docx",
-  "FPSLLC Redline - Member-Managed Partnership vs S Corporation.docx",
-  "FPSLLC Redline - Manager-Managed Multi-Member vs Single Member.docx",
-  "SMMMDE vs SMMMS - FPSLLC Redline - Single Member Disregarded vs S Corporation.docx",
-  "SMMMDE vs SMMEMDE - FPSLLC Redline - Single Member Manager-Managed vs Member-Managed.docx",
 ]);
 
 /** Research material deliberately not committed: samples and other people's
