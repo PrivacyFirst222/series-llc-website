@@ -11,6 +11,9 @@ import { normalizeEntityName } from "./nameSimilarity";
  * for that migration.
  */
 import { isPoBox } from "./schema";
+import { nameCheckKey } from "./nameSimilarity";
+import { validateStep } from "./stepValidation";
+import { defaultFormData } from "./defaults";
 import { canonicalizeSeriesName, seriesDedupeKey,
   buildFinalLlcName,
   calculateEstimatedFees,
@@ -196,6 +199,57 @@ if (typeof console !== "undefined") {
   diffSeries("PS 1", "PS 2", "numbers differ");
   diffSeries("PS Jimmy", "PS Jimmy II", "added word kept");
   console.log("[fl-llc] series identifiers: canonical prefixes and prefix-blind duplicates hold.");
+}
+
+// The name-check gate must key its result to the name it actually checked.
+// A stale failure for a superseded name once stamped "unavailable" onto the
+// name on screen, which waived the gate and let a TAKEN name through — the
+// exact thing the mandatory check exists to prevent (audited and reproduced
+// in the browser, 26 Aug 2026).
+{
+  const base = {
+    ...defaultFormData,
+    filingPath: "NEW" as const,
+    desiredLlcName: "Race B Ventures",
+    llcDesignator: "LLC" as const,
+    exactNameOnly: true,
+    nameSearchAcknowledgment: true,
+    governmentAffiliationAcknowledgment: true,
+    lawfulPurposeNameAcknowledgment: true,
+  };
+  const keyFor = (n: string) => nameCheckKey([n]);
+
+  const staleKeyed = validateStep("name", {
+    ...base,
+    // A result belonging to a DIFFERENT name must never satisfy this step.
+    nameCheck: { key: keyFor("Race A Holdings"), available: false, results: [] },
+  } as typeof base);
+  if (!staleKeyed.nameCheck) {
+    throw new Error("FAIL name-check gate: a result keyed to another name satisfied the step");
+  }
+
+  const takenNow = validateStep("name", {
+    ...base,
+    nameCheck: {
+      key: keyFor("Race B Ventures"),
+      available: true,
+      results: [{ input: "Race B Ventures", verdict: "taken", conflicts: [] }],
+    },
+  } as typeof base);
+  if (!takenNow.desiredLlcName) {
+    throw new Error("FAIL name-check gate: a taken verdict for the current name did not block");
+  }
+
+  // Documented, intended behaviour: when the mirror itself is unavailable for
+  // THIS name, the step is waived — the server re-checks at order time.
+  const waived = validateStep("name", {
+    ...base,
+    nameCheck: { key: keyFor("Race B Ventures"), available: false, results: [] },
+  } as typeof base);
+  if (waived.nameCheck || waived.desiredLlcName) {
+    throw new Error("FAIL name-check gate: an unavailable mirror for the current name should waive");
+  }
+  console.log("[fl-llc] name-check gate: results bind to the name they checked.");
 }
 
 // Run directly (bun run validation.test.ts): exit non-zero on failure. Printing

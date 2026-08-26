@@ -106,18 +106,32 @@ export function NameCheck({
       setState({ key: k, available: r.available, asOf: r.asOf, results: r.results }),
     // A failed request must not strand the step: record the check as
     // unavailable so validation waives it, same as a stale mirror.
-    onError: () => setState({ key, available: false, results: [] }),
+    //
+    // The recorded key MUST be the one that was submitted (the mutation's
+    // variable), never the render-time `key`. Using the ambient key meant a
+    // slow failure for name A stamped "unavailable" onto whatever name was on
+    // screen when it landed — discarding name B's successful result and
+    // waiving the gate for a name that was never cleared (audited 26 Aug
+    // 2026, reproduced in the browser).
+    onError: (_err, submittedKey) =>
+      setState({ key: submittedKey, available: false, results: [] }),
   });
 
   // Auto-run when the names settle on a value we have no result for.
+  //
+  // Depends on the RECORDED key as well as the current one. A late failure for
+  // a superseded name now writes that name's key (see onError), which leaves
+  // the current name without a result — and watching only `key` meant nothing
+  // ever re-checked it, stranding the client on "give it a moment" forever.
   const { mutate, isPending } = check;
+  const recordedKey = effectiveState?.key;
   useEffect(() => {
     if (list.length === 0) return;
-    if (effectiveState?.key === key) return;
+    if (recordedKey === key) return;
     const t = setTimeout(() => mutate(key), 800);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key]);
+  }, [key, recordedKey]);
 
   if (list.length === 0) return null;
   const current = effectiveState?.key === key ? effectiveState : undefined;
