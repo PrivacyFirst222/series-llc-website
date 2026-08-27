@@ -2300,6 +2300,67 @@ artifact can be opened, absence is confirmed against the rendered artifact,
 not the source. And a failure I catch myself is written up the same as one
 Adam catches — the register is not a punishment log.
 
+## P45 — A hygiene chore took down the production API
+
+### THE FAILURE
+
+Self-caught; no words of Adam's to quote. The cost was twelve minutes of
+production downtime.
+
+Fixing the six audit findings, I untracked webapp/api/index.mjs — the
+compiled server — reasoning that Vercel rebuilds it from source on every
+deploy, so the committed copy was a decoy. The deploy at 23:55 UTC built
+the file exactly as always and created no serverless function from it:
+Vercel decides which functions exist by scanning the repo's api/ directory
+at clone time, before the build runs. Every /api route on
+myfloridaseriesllc.com returned 404 — checkout, portal, login, admin —
+until 00:08 UTC. Square is sandbox and no client was mid-order, but the
+site was live and taking orders in every other respect.
+
+Post-deploy verification caught it within a minute of the deploy going
+Ready; vercel rollback restored the prior deployment; the file went back
+into the repo freshly rebuilt so it carries all six fixes; the rollback
+had paused automatic promotion, so the repaired deployment also needed a
+manual promote — checked for and done rather than discovered as a second
+outage. Verified live afterward: API answering, auth gate 401, wrong
+token 400 BAD_TOKEN, formspree absent from the served frontend bundle.
+
+### WHY IT HAPPENED
+
+An hour earlier I had proven, against the build log, that the committed
+bundle's content is never served. That proof answered "is the stale copy
+dangerous." I then spent it as though it had answered "is the file's
+presence required" — a different question, never asked, whose governing
+source is Vercel's documented build behavior, which I never opened. One
+verified fact about a system became, in my hands, a feeling of having
+verified the system.
+
+The six fixes got the full treatment: red-proofed suite checks, browser
+verification, 250 passing checks. The untracking got none, because I had
+already filed it as the trivial item — "one line, two minutes" is how I
+had sold it to Adam, and having priced it as trivial I could not then
+spend an hour verifying it without contradicting my own estimate. The
+pricing decided the verification budget, backwards. Deploying a preview
+first, or running vercel build locally, would have shown the missing
+lambda before production ever saw the change.
+
+There is also a plain knowledge failure underneath: I did not know
+function detection precedes the build, and did not know a rollback pauses
+promotion. Neither is obscure; both are in the platform's documentation.
+I have never read the deployment platform's documentation the way I have
+read Chapter 605 — the legal sources get read because Adam audits legal
+claims, and the infrastructure sources get skimmed because nobody audits
+those until they fail in public.
+
+### FIXED BY
+
+Anything that changes what a deploy produces — however small — gets
+verified on a deployment before production: vercel build locally or a
+preview deploy, checked for the same artifacts the last good deploy had.
+The staleness problem AUD-001 named is still open; the durable fix (a
+hook rebuilding the bundle when server sources change) is proposed to
+Adam separately.
+
 ## Process — the ones that let the substantive ones through
 
 **M1 · Verify the proposition you set out to verify, not the one underneath.** A
