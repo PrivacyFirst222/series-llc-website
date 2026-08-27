@@ -5,7 +5,7 @@ import { toast } from "@/components/ui/use-toast";
 import { defaultFormData } from "./defaults";
 import { validateStep } from "./stepValidation";
 import { api, ApiError } from "@/lib/api";
-import { buildPayload, flattenForFormspree } from "./buildPayload";
+import { buildPayload } from "./buildPayload";
 import { FeeEstimate } from "./FeeEstimate";
 import { ReviewStep } from "./ReviewStep";
 import { StepIntro } from "./sections/StepIntro";
@@ -101,7 +101,6 @@ export function FloridaLLCFormationForm({
   const [visited, setVisited] = useState<Set<number>>(
     () => new Set(loadDraft(initialData).visited),
   );
-  const [submitted, setSubmitted] = useState<boolean>(false);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -380,12 +379,6 @@ export function FloridaLLCFormationForm({
       onSubmit?.(data);
       window.location.assign(checkoutUrl);
     } catch (err) {
-      // Until online ordering is enabled in production, fall back to the
-      // legacy Formspree intake so no submission is ever lost.
-      if (err instanceof ApiError && err.status === 503) {
-        await submitViaFormspree();
-        return;
-      }
       console.error("Intake submission failed:", err);
       const issues = (err instanceof ApiError
         ? (err.data as { issues?: { path?: (string | number)[]; message?: string }[] } | undefined)?.issues
@@ -419,44 +412,6 @@ export function FloridaLLCFormationForm({
               : "Please check your connection and try again. Your draft is saved on this device.",
         });
       }
-      setSubmitting(false);
-    }
-  };
-
-  const submitViaFormspree = async () => {
-    try {
-      const payload = buildPayload(data);
-      const res = await fetch("https://formspree.io/f/xjgdeppp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({
-          _subject: `New intake — ${payload.llcName.finalName || payload.llcName.desiredName || "Unnamed LLC"}`,
-          email: payload.correspondence.email,
-          ...flattenForFormspree(payload),
-        }),
-      });
-      if (!res.ok) throw new Error(`Form submission failed (${res.status})`);
-      setSubmitted(true);
-      setStepIndex(STEPS.length - 1);
-      onSubmit?.(data);
-      try {
-        localStorage.removeItem(STORAGE_KEY);
-      } catch {
-        // ignore
-      }
-      toast({
-        title: "Submission received",
-        description:
-          "Your information was sent to the formation team. We'll be in touch shortly.",
-      });
-    } catch (err) {
-      console.error("Intake submission failed:", err);
-      toast({
-        title: "We couldn't submit your form.",
-        description:
-          "Please check your connection and try again. Your draft is saved on this device.",
-      });
-    } finally {
       setSubmitting(false);
     }
   };
@@ -708,14 +663,6 @@ export function FloridaLLCFormationForm({
               </div>
             )}
           </div>
-
-          {submitted && isSubmit ? (
-            <div className="mt-6 rounded-2xl border border-trust/40 bg-trust/5 p-5 text-sm">
-              <strong className="text-trust">Submission received.</strong>{" "}
-              Our team will prepare your documents for filing with the Florida
-              Division of Corporations.
-            </div>
-          ) : null}
 
           <p className="mt-6 text-xs text-muted-foreground leading-relaxed">
             <strong>Disclaimer:</strong> This service prepares documents based

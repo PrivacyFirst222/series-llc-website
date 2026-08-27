@@ -147,33 +147,3 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
     },
   };
 }
-
-// Legacy fallback path: while online ordering is not yet enabled in production,
-// intakes still go to Formspree, whose emails need flat readable keys.
-export function flattenForFormspree(
-  value: unknown,
-  prefix = "",
-  out: Record<string, string> = {},
-): Record<string, string> {
-  if (value === null || value === undefined || value === "") {
-    return out;
-  }
-  if (typeof value === "boolean") {
-    out[prefix] = value ? "Yes" : "No";
-    return out;
-  }
-  if (typeof value === "string" || typeof value === "number") {
-    out[prefix] = String(value);
-    return out;
-  }
-  if (Array.isArray(value)) {
-    value.forEach((item, i) =>
-      flattenForFormspree(item, prefix ? `${prefix} / ${i + 1}` : String(i + 1), out),
-    );
-    return out;
-  }
-  for (const [key, child] of Object.entries(value as Record<string, unknown>)) {
-    flattenForFormspree(child, prefix ? `${prefix} / ${key}` : key, out);
-  }
-  return out;
-}

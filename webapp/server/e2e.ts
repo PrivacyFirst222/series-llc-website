@@ -361,6 +361,23 @@ if (mint.status === 200) {
     body: JSON.stringify({ token: mint.body.data.token, password: "e2e-password-1" }),
   });
   check("set password via minted token", setPw.status === 200);
+
+  // Cross-purpose rejection: a token minted to verify an email address must
+  // not be able to set a password (AUD-002). The wrong-purpose token is left
+  // unconsumed so it still works for its own purpose.
+  const wrongPurpose = await api("/api/dev/mint-reset-token", {
+    method: "POST",
+    body: JSON.stringify({ email: testEmail, purpose: "verify_email" }),
+  });
+  const crossPw = await api("/api/auth/set-password", {
+    method: "POST",
+    body: JSON.stringify({ token: wrongPurpose.body.data.token, password: "e2e-crosspurpose-1" }),
+  });
+  check(
+    "verify_email token cannot set a password",
+    crossPw.status === 400 && crossPw.body?.error?.code === "BAD_TOKEN",
+    crossPw.body,
+  );
   const me = await api("/api/auth/me", { cookies: setPw.cookie });
   check("me shows no RA cancellation yet", me.status === 200 && me.body.data.raCancellationRequestedAt === null);
   const cancel = await api("/api/portal/registered-agent/cancel", {

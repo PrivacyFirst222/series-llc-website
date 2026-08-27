@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Navigate, Link, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FileText, Mail, LogOut, Download, ShieldCheck, Clock, ScrollText, BookOpen, ArrowRight, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -362,8 +362,7 @@ export default function PortalDashboard() {
   }, [oaGenerations.data]);
 
   if (meQuery.isError) {
-    navigate("/portal/login");
-    return null;
+    return <Navigate to={"/portal/login"} replace />;
   }
   if (meQuery.isLoading) {
     return (

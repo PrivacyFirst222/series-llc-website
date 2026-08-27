@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Navigate, Link, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight, Download, FileText, Heart, HelpCircle, History, Plus, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -322,8 +322,7 @@ export default function OAQuestionnaire() {
 
 
   if (meQuery.isError) {
-    navigate("/portal/login");
-    return null;
+    return <Navigate to={"/portal/login"} replace />;
   }
   if (oaQuery.isError) {
     return (

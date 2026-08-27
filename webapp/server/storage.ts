@@ -19,6 +19,15 @@ export async function putFile(filename: string, data: ArrayBuffer, contentType: 
     });
     return { storageKey: blob.url, sizeBytes: data.byteLength };
   }
+  // Local disk is a DEV fallback only. On Vercel the filesystem is ephemeral:
+  // the write would succeed, a documents row would be recorded, and the file
+  // would be gone by the next invocation — a client-visible document that can
+  // never be downloaded. Failing the operation is the recoverable outcome.
+  if (env.isProd) {
+    throw new Error(
+      "BLOB_READ_WRITE_TOKEN is not set in production; refusing to write a client document to ephemeral disk.",
+    );
+  }
   const { mkdir, writeFile } = await import("node:fs/promises");
   const { fileURLToPath } = await import("node:url");
   const dir = fileURLToPath(new URL("../.dev-data/blob/", import.meta.url));

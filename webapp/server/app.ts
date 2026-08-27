@@ -64,7 +64,7 @@ const err = (message: string, code: string) => ({ error: { message, code } });
 /* ------------------------------- orders ------------------------------- */
 
 /** Ordering goes live only when the production integrations are configured;
- *  until then the form falls back to its legacy Formspree submission. */
+ *  until then the form shows a retryable error and keeps the local draft. */
 const orderingEnabled = () =>
   env.isProd ? Boolean(env.DATABASE_URL && env.SQUARE_ACCESS_TOKEN) : true;
 
@@ -546,7 +546,12 @@ if (!env.isProd) {
 // reading the emailed link from the API process's stdout.
 if (!env.isProd) {
   app.post("/dev/mint-reset-token", async (c) => {
-    const { email } = (await c.req.json()) as { email: string };
+    // purpose override is test-only: the suite mints a verify_email token to
+    // prove set-password refuses tokens issued for any other purpose.
+    const { email, purpose = "reset_password" } = (await c.req.json()) as {
+      email: string;
+      purpose?: string;
+    };
     const db = await getDb();
     const rows = await db.query<{ id: string }>("SELECT id FROM clients WHERE email = $1", [
       email.toLowerCase(),
@@ -554,8 +559,8 @@ if (!env.isProd) {
     if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
     const { token, tokenHash } = newToken();
     await db.query(
-      "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at) VALUES ($1, $2, 'reset_password', $3)",
-      [tokenHash, rows[0].id, new Date(Date.now() + 3600_000).toISOString()],
+      "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at) VALUES ($1, $2, $3, $4)",
+      [tokenHash, rows[0].id, purpose, new Date(Date.now() + 3600_000).toISOString()],
     );
     return c.json({ data: { token } });
   });
@@ -767,14 +772,21 @@ app.post("/auth/set-password", async (c) => {
     return c.json(err(body.error?.issues[0]?.message ?? "Invalid request", "INVALID_INPUT"), 400);
   }
   const db = await getDb();
+  // Only tokens issued FOR setting a password may set one. A verify_email
+  // token proves inbox access for verification, not authority to replace the
+  // password; accepting any purpose here would also silently grant that power
+  // to every token type added later. Consuming the token is the same
+  // statement that authorizes the write, so a token can never be spent twice.
   const rows = await db.query<{ token_hash: string; client_id: string }>(
-    "SELECT token_hash, client_id FROM auth_tokens WHERE token_hash = $1 AND expires_at > now() AND used_at IS NULL",
+    `UPDATE auth_tokens SET used_at = now()
+      WHERE token_hash = $1 AND expires_at > now() AND used_at IS NULL
+        AND purpose IN ('set_password', 'reset_password')
+      RETURNING token_hash, client_id`,
     [hashToken(body.data.token)],
   );
   if (rows.length === 0) {
     return c.json(err("This link is invalid or has expired. Use “Forgot password” to get a new one.", "BAD_TOKEN"), 400);
   }
-  await db.query("UPDATE auth_tokens SET used_at = now() WHERE token_hash = $1", [rows[0].token_hash]);
   await db.query("UPDATE clients SET password_hash = $1 WHERE id = $2", [
     await hashPassword(body.data.password),
     rows[0].client_id,

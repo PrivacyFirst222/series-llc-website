@@ -35,6 +35,30 @@ export interface FilingGroup {
   fields: FilingField[];
 }
 
+/** What this module actually reads from a stored order payload. Every field
+ *  is optional because orders persist forever and predate several intake
+ *  changes (the client card, name splitting, suffixes); a field that is
+ *  missing renders as blank or "split manually", never as a crash. */
+type PersonLike = {
+  role?: string;
+  firstName?: string;
+  lastName?: string;
+  suffix?: string;
+  fullLegalName?: string;
+  fullName?: string;
+  name?: string;
+  businessEntityName?: string;
+  entityName?: string;
+  memberType?: string;
+  streetAddress1?: string;
+  streetAddress2?: string;
+  address1?: string;
+  address2?: string;
+  city?: string;
+  state?: string;
+  zip?: string;
+};
+
 type Addr = {
   address1?: string;
   address2?: string;
@@ -68,7 +92,7 @@ const addrFields = (prefix: string, a: Addr | null | undefined): FilingField[] =
  *  only Maria Luz Dominguez Figaroa knows her surname is "Dominguez Figaroa".
  *  Orders placed before the split carry a single string; those render as one
  *  field marked for manual splitting. */
-const personName = (m: any): { first: string; last: string; legacy: string } => {
+const personName = (m: PersonLike): { first: string; last: string; legacy: string } => {
   // The Division's Articles form has Title / Last name / First name and no
   // suffix box (its published instructions, read in full 25 Aug 2026, never
   // mention one). A suffix the client gave us must not be silently dropped,
@@ -84,7 +108,7 @@ const personName = (m: any): { first: string; last: string; legacy: string } => 
 
 /** PartyEntry (managers, ARs) spells its street fields streetAddress1/2;
  *  MemberEntry and the top-level addresses spell them address1/2. */
-const personAddr = (m: any): Addr => ({
+const personAddr = (m: PersonLike): Addr => ({
   address1: m?.streetAddress1 ?? m?.address1,
   address2: m?.streetAddress2 ?? m?.address2,
   city: m?.city,
@@ -113,8 +137,50 @@ const MGMT_PROVISION: Record<string, string> = {
     "Pursuant to Florida Statutes Section 605.0407, the company is or will be member-managed.",
 };
 
-export function filingGroups(payload: any): FilingGroup[] {
-  const p = payload ?? {};
+/** The stored-payload shape this module reads. Structural and all-optional:
+ *  payloads come out of JSON.parse and span every intake version ever shipped. */
+type PayloadLike = {
+  filingPath?: string;
+  existingLlcName?: string;
+  sunbizDocumentNumber?: string;
+  formationType?: string;
+  llcName?: { desiredName?: string; finalName?: string; alternateNames?: string[]; exactNameOnly?: boolean };
+  principalOfficeAddress?: Addr;
+  mailingAddress?: Addr;
+  registeredAgent?: PersonLike & {
+    choice?: string;
+    type?: string;
+    address?: Addr;
+    email?: string;
+    phone?: string;
+    acceptance?: {
+      accepted?: boolean;
+      acceptanceName?: string;
+      capacity?: string;
+      electronicSignature?: string;
+    };
+  };
+  management?: {
+    structure?: string;
+    includeManagementStatementInArticles?: boolean;
+    managersOrAuthorizedRepresentatives?: PersonLike[];
+  };
+  members?: { memberList?: PersonLike[] };
+  purpose?: { purposeType?: string; businessPurposeText?: string };
+  effectiveDate?: { option?: string; requestedEffectiveDate?: string | null };
+  correspondence?: { name?: string; email?: string; phone?: string };
+  optionalDocuments?: { certificateOfStatus?: boolean; certifiedCopy?: boolean };
+  certifications?: {
+    articlesSignedBy?: string;
+    authorizedRepresentativeName?: string;
+    authorizedRepresentativeTitle?: string;
+    authorizedRepresentativeSignature?: string;
+  };
+  series?: { name?: string }[];
+};
+
+export function filingGroups(payload: unknown): FilingGroup[] {
+  const p: PayloadLike = (payload ?? {}) as PayloadLike;
   const ra = p.registeredAgent ?? {};
   const mgmt = p.management ?? {};
   const cert = p.certifications ?? {};
@@ -225,7 +291,7 @@ export function filingGroups(payload: any): FilingGroup[] {
             {
               key: "raBusiness",
               label: "Business to serve as RA",
-              value: ra.businessEntityName.trim(),
+              value: (ra.businessEntityName ?? "").trim(),
             },
           ]
         : raName.last
@@ -251,11 +317,12 @@ export function filingGroups(payload: any): FilingGroup[] {
 
   // ---- 6. Other provisions (the optional 240-character box) ----
   const provisions: string[] = [];
-  if (mgmt.includeManagementStatementInArticles && MGMT_PROVISION[mgmt.structure]) {
+  if (mgmt.includeManagementStatementInArticles && mgmt.structure && MGMT_PROVISION[mgmt.structure]) {
     provisions.push(MGMT_PROVISION[mgmt.structure]);
   }
-  if (p.purpose?.purposeType === "SPECIFIC" && (p.purpose?.businessPurposeText ?? "").trim()) {
-    provisions.push(p.purpose.businessPurposeText.trim());
+  const purposeText = (p.purpose?.businessPurposeText ?? "").trim();
+  if (p.purpose?.purposeType === "SPECIFIC" && purposeText) {
+    provisions.push(purposeText);
   }
   groups.push({
     title: "Any Other Provisions (optional box, 240 characters)",
@@ -301,7 +368,7 @@ export function filingGroups(payload: any): FilingGroup[] {
         key: "arName",
         label: "Authorized representative",
         value: [cert.authorizedRepresentativeName, cert.authorizedRepresentativeTitle]
-          .map((x: string) => (x ?? "").trim())
+          .map((x) => (x ?? "").trim())
           .filter(Boolean)
           .join(" — "),
       },
@@ -318,10 +385,10 @@ export function filingGroups(payload: any): FilingGroup[] {
     {
       key: "structure",
       label: "Management structure",
-      value: MANAGEMENT_LABEL[mgmt.structure] ?? mgmt.structure ?? "",
+      value: (mgmt.structure ? MANAGEMENT_LABEL[mgmt.structure] : undefined) ?? mgmt.structure ?? "",
     },
   ];
-  const people: any[] = mgmt.managersOrAuthorizedRepresentatives ?? [];
+  const people: PersonLike[] = mgmt.managersOrAuthorizedRepresentatives ?? [];
   let slot = 0;
   for (const m of people) {
     const role = m.role ?? "MGR";
@@ -335,14 +402,15 @@ export function filingGroups(payload: any): FilingGroup[] {
       slot++;
       continue;
     }
-    const isEntity = (m.businessEntityName ?? "").trim() !== "";
+    const entityName = (m.businessEntityName ?? "").trim();
+    const isEntity = entityName !== "";
     const nm = personName(m);
     personFields.push({ key: `person${slot}Title`, label: `Person ${slot + 1} — Title`, value: role });
     if (isEntity) {
       personFields.push({
         key: `person${slot}Entity`,
         label: `Person ${slot + 1} — Entity name`,
-        value: m.businessEntityName.trim(),
+        value: entityName,
       });
     } else if (nm.last) {
       personFields.push(
@@ -363,17 +431,18 @@ export function filingGroups(payload: any): FilingGroup[] {
   // its members as AMBR — keyed off the structure, so orders stored before the
   // policy list theirs too. Sunbiz's guidance: the listing is what banks and
   // workers'-comp exemptions rely on, and later changes are paper-only + $25.
-  const memberList: any[] = membersInfo.memberList ?? [];
+  const memberList: PersonLike[] = membersInfo.memberList ?? [];
   if (mgmt.structure === "MEMBER_MANAGED") {
     for (const m of memberList) {
-      const isEntity = (m.entityName ?? "").trim() !== "" && m.memberType === "ENTITY";
+      const entityName = (m.entityName ?? "").trim();
+      const isEntity = entityName !== "" && m.memberType === "ENTITY";
       const nm = personName(m);
       personFields.push({ key: `person${slot}Title`, label: `Person ${slot + 1} — Title`, value: "AMBR" });
       if (isEntity) {
         personFields.push({
           key: `person${slot}Entity`,
           label: `Person ${slot + 1} — Entity name`,
-          value: m.entityName.trim(),
+          value: entityName,
         });
       } else if (nm.last) {
         personFields.push(
@@ -394,7 +463,7 @@ export function filingGroups(payload: any): FilingGroup[] {
   groups.push({ title: "Persons authorized to manage (MGR / AMBR)", fields: personFields });
 
   // ---- 10. The series: separate filings, not part of the Articles ----
-  const series: any[] = p.series ?? [];
+  const series: { name?: string }[] = p.series ?? [];
   groups.push({
     title: `Protected series — filed separately after the Articles ($25 designation each) (${series.length})`,
     fields: series.map((s, i) => ({
@@ -412,6 +481,7 @@ export function filingGroups(payload: any): FilingGroup[] {
 /** Every series this order must end up with a designation for. Used to decide
  *  whether an order can be marked formed: one PSD document may cover several
  *  series, but no series may be left uncovered. */
-export function seriesNames(payload: any): string[] {
-  return ((payload?.series ?? []) as any[]).map((s) => (s?.name ?? "").trim()).filter(Boolean);
+export function seriesNames(payload: unknown): string[] {
+  const series = ((payload as PayloadLike | null | undefined)?.series ?? []) as { name?: string }[];
+  return series.map((s) => (s?.name ?? "").trim()).filter(Boolean);
 }

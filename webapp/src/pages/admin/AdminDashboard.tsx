@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -285,8 +285,7 @@ export default function AdminDashboard() {
   });
 
   if (authQuery.isError) {
-    navigate("/admin/login");
-    return null;
+    return <Navigate to={"/admin/login"} replace />;
   }
   if (authQuery.isLoading) {
     return (
