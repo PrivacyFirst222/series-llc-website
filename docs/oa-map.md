@@ -130,20 +130,20 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | sgm sgms | 4.4 | Other Activities | 3bd43f35 | benefit | — | member manager | — | s. 605.04091(5) |
 | sgl sgs | 4.5 | Other Activities | 42b7c7de | benefit | — | member manager | — | s. 605.04091(5) |
 | mbr mbs mul scp | 4.5 | Limited Liability; No Agency | e2f32855 | benefit | — | members | — | ss. 605.0304, 605.04074(2)(a) |
-| sgm | 4.5 | Transfer on Death Designation | e12bf990 | benefit | company | member third-party | — | ss. 711.50-711.512, Fla. Stat. |
-| sgms | 4.5 | Transfer on Death Designation | f27f2432 | benefit | company | member third-party | — | ss. 711.50-711.512, Fla. Stat.; the beneficiary must be an eligible shareholder under IRC 1361 |
-| sgl | 4.6 | Transfer on Death Designation | 046d5513 | benefit | company | member third-party | — | ss. 711.50-711.512, Fla. Stat. |
+| sgm | 4.5 | Transfer on Death Designation | 14e9e0c9 | benefit | company | member third-party | — | ss. 711.50-711.512, Fla. Stat.; only an individual member may register in beneficiary form (s. 711.502) |
+| sgms | 4.5 | Transfer on Death Designation | 8e8dcb55 | benefit | company | member third-party | — | ss. 711.50-711.512, Fla. Stat.; only an individual member may register in beneficiary form (s. 711.502); the beneficiary must be an eligible shareholder under IRC 1361 |
+| sgl | 4.6 | Transfer on Death Designation | 22e8ac30 | benefit | company | member third-party | — | ss. 711.50-711.512, Fla. Stat.; only an individual member may register in beneficiary form (s. 711.502) |
 | mul scp | 4.6 | Duty to Participate in Governance | 3cfedf2d | covenant | members | members | A member who missed votes breached the agreement, so the company was not run as the document describes. | none; ours, to support the personal-service position in Art. 11 |
 | mbr mbs | 4.6 | Duty to Participate in Governance | dfa66454 | covenant | members | members | A member who missed votes breached the agreement, so the company was not run as the document describes. | none; ours, to support the personal-service position in Art. 11 |
-| sgs | 4.6 | Transfer on Death Designation | 8f83889d | benefit | company | member third-party | — | ss. 711.50-711.512, Fla. Stat. |
+| sgs | 4.6 | Transfer on Death Designation | f0ed25d5 | benefit | company | member third-party | — | ss. 711.50-711.512, Fla. Stat.; only an individual member may register in beneficiary form (s. 711.502) |
 | sgm sgms | 4.6 | Incapacity of the Member | ee8046af | benefit | company manager | member | — | ch. 744, Fla. Stat.; s. 605.0602(6) |
 | sgl sgs | 4.7 | Incapacity of the Member | 0f9e940d | benefit | company manager | member | — | ch. 744, Fla. Stat.; s. 605.0602(6) |
 | mbr mbs mul scp | 4.7 | Competition. [SELECT ONE ALTERNATIVE — see Instructions] | f33c9018 | covenant | members | members | The member competed in breach of the agreement — a claim among the members, not against the company. | s. 605.04091(2)(c) as varied under s. 605.0105(3) |
 | mbr mbs mul scp | 4.8 | Confidentiality | 769fb729 | covenant | members | members company | The member disclosed confidential information in breach of the agreement. | s. 605.04091(2) |
 | mbr mbs mul scp | 4.9 | Non-Disparagement; No Interference | 88367cf9 | covenant | members | members company | The member interfered in breach of the agreement. | none; ours |
 | mbr mbs mul scp | 4.10 | Information Rights | b897a44b | benefit | company | members | — | ss. 605.0410, 605.2305 |
-| mul scp | 4.11 | Transfer on Death Designation | 75c60a34 | benefit | company | members third-party | — | ss. 711.50-711.512, Fla. Stat. |
-| mbr mbs | 4.11 | Transfer on Death Designation | c63e7ddb | benefit | company | members third-party | — | ss. 711.50-711.512, Fla. Stat. |
+| mul scp | 4.11 | Transfer on Death Designation | 9876b403 | benefit | company | members third-party | — | ss. 711.50-711.512, Fla. Stat.; only an individual member may register in beneficiary form, and not joint holders as tenants in common (s. 711.502) |
+| mbr mbs | 4.11 | Transfer on Death Designation | bf0fa033 | benefit | company | members third-party | — | ss. 711.50-711.512, Fla. Stat.; only an individual member may register in beneficiary form, and not joint holders as tenants in common (s. 711.502) |
 | mul scp | 4.12 | Incapacity of a Member | afdee6cc | benefit | company manager members | members | — | ch. 744, Fla. Stat.; s. 605.0602(6) |
 | mbr mbs | 4.12 | Incapacity of a Member | 09d33983 | benefit | company members | members | — | ch. 744, Fla. Stat.; s. 605.0602(6) |
 | sgl sgs | 5.1 | Manager-Managed; the Manager | 0af0229e | authority | manager member | member manager | — | ss. 605.04072, 605.04073(2), 605.04074(2)(b); the appointment sentence moved from oa.ts into the master on 17 August as a singular/plural pair — same operative terms, no substantive change |
