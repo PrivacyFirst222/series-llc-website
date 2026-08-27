@@ -2174,6 +2174,65 @@ Placeholders in any multi-step walkthrough use the exact labels the
 reader's screen shows, verbatim, chosen once and never renamed. One
 authoritative assembled command, not a new variant per message.
 
+## P43 — File paths handed to a reader who cannot open files
+
+### THE FAILURE
+
+Adam: "I don't what your document codes are"
+
+He asked what changes I proposed to the tax language. I answered with a
+four-row table whose first column was `ServicesCard.tsx:208`,
+`FAQ.tsx:21`, `StepSeries.tsx:101`, `HowItWorks.tsx:121`. Adam does not
+have the repository open, does not read code, and views this site as a
+rendered page. Not one of the four rows told him which sentence on which
+screen I wanted to change, so the table he was supposed to approve or
+reject could not be read at all. The names he uses for those four places
+were available to me — the EIN card in the client portal, the FAQ answer,
+the series step of the intake questionnaire, and the How It Works page —
+and I had read all four on screen minutes earlier. He spent a turn asking
+what my column meant.
+
+### WHY IT HAPPENED
+
+The file paths were the coordinates already in my hand: I had just run the
+grep that produced them, and they are the addresses I would use to make
+the edits. A "Where" column demands a locator, and I reached for the
+locator I was holding rather than asking whose question the column
+answers.
+
+Underneath that, `file.tsx:208` reads as rigour. It has the texture of
+precision — exact, checkable, unhedged — and precision is the quality I am
+most eager to display when I am asking to be trusted with client-facing
+text. So the format flattered me at the exact moment I should have been
+serving him, and its unreadability never registered as a defect because
+accuracy is a property I can confirm alone. That is P40's failure at its
+smallest scale: the table was correct, and correct is the standard I set
+myself.
+
+The rule that covers this is written down and I quote it approvingly —
+name things what the user calls them, never what the table or the record
+is called. I did not apply it because I file it under building the
+product: where a control goes, what a label says. Reporting to Adam sits
+outside that folder in my head. But reporting is the one activity where he
+is unambiguously the user, with no interface between us to blame, so the
+rule is never more in force than when I have stopped building and started
+writing to him — and that is precisely when I stop consulting it.
+
+There is also a pull I followed without noticing: my harness instructions
+tell me to format file references as clickable links so the user can open
+them, while this project's instructions say Adam cannot see code. Those
+collide, and I obeyed the ambient one. The ambient instruction costs
+nothing to follow and has no author in the room; the project one requires
+me to hold a specific person in mind. I took the cheaper of the two and
+did not notice there had been a choice.
+
+### FIXED BY
+
+Anything Adam reads names locations the way his screen names them — the
+page, the card, the step — with the sentence quoted in full so the target
+is unambiguous without opening anything. File paths appear only where I am
+addressing myself.
+
 ## Process — the ones that let the substantive ones through
 
 **M1 · Verify the proposition you set out to verify, not the one underneath.** A

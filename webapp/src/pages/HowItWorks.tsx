@@ -118,7 +118,7 @@ export default function HowItWorks() {
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
               <strong className="text-foreground">One note on ownership:</strong> in every structure
               we form, your LLC owns each protected series and you own the LLC. No series has its own
-              separate owners. That keeps the whole structure on a single federal tax return.
+              separate owners. That keeps the whole structure on a single federal income tax return.
             </p>
           </div>
         </div>

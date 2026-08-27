@@ -98,7 +98,7 @@ export function StepSeries({ data, patch, errors }: StepProps) {
         </p>
         <p className="text-foreground/80 leading-relaxed">
           This is deliberate. It keeps the entire structure on{" "}
-          <strong>one federal tax return</strong> no matter how many series you
+          <strong>one federal income tax return</strong> no matter how many series you
           create, and it protects an S corporation election that divergent
           per-series ownership would otherwise break.
         </p>

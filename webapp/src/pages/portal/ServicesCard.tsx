@@ -205,7 +205,7 @@ export function ServicesCard() {
     : "If your LLC doesn't already have an EIN, it needs one for opening bank accounts, tax reporting and tax elections, and completing requested W-9s.";
   const einSeriesBold = "A protected series usually does not require its own EIN.";
   const einSeriesRest =
-    "Every series is wholly owned by your LLC, so the IRS disregards it — a series never files its own tax return, with or without an EIN. The only income tax return in the structure is the LLC's own. A series needs its own EIN only in limited circumstances — most commonly because its bank requires one for an account in the series' name, or because the series will have employees.";
+    "Every series is wholly owned by your LLC, so the IRS disregards it — a series never files its own income tax return, with or without an EIN. The only income tax return in the structure is the LLC's own. A series needs its own EIN only in limited circumstances — most commonly because its bank requires one for an account in the series' name, or because the series will have employees.";
   const einSeparateBold = "A separate EIN does not create a separate tax return.";
   const einSeparateRest =
     "Questions about the technicalities? Check the User's Manual and ask your attorney or accountant.";
