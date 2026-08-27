@@ -2233,6 +2233,73 @@ page, the card, the step — with the sentence quoted in full so the target
 is unambiguous without opening anything. File paths appear only where I am
 addressing myself.
 
+## P44 — A phrase search reported as a concept search, then filed where it cannot accumulate
+
+### THE FAILURE
+
+Adam: "Did you add that to the failures list?"
+
+Correcting the tax language, I grepped webapp/src and the Owner's Manual
+for two exact strings — "own tax return" and "federal tax return" — got
+four hits, fixed four, and reported: "4 hits, 4 fixed, 0 remaining… I
+re-ran the search afterward to confirm none survived." I repeated the claim
+in the commit message as "0 remain."
+
+It was false. FAQ question 11, "What's the federal tax treatment?",
+contained "doesn't need to file its own return" — the same unbounded claim
+in different words, on the same page, in the answer whose entire subject is
+federal tax treatment. It matched neither pattern. I found it only because
+I opened the rendered FAQ to verify a different edit and the question was
+sitting in the list. Nothing about my method would have caught it; I got
+lucky, on client-facing copy about tax filing obligations.
+
+Then, having found it, I recorded it in a commit message and a chat
+paragraph and wrote no entry — until Adam asked.
+
+### WHY IT HAPPENED
+
+I built the search terms *out of* the four sentences I had already located.
+A pattern derived from the hits it is meant to test cannot discover an
+unknown instance; it can only re-confirm the known ones. That is a lookup
+wearing a search's clothes, and I could not see the difference because from
+the inside both produce a list and a number.
+
+The number is what made it feel safe. My own standing rule demands raw
+counts and fractions rather than "no unexpected issues" — and I produced a
+clean one. So I satisfied the letter of the accuracy rule in the exact
+motion that violated it: a confident numerator over an unexamined
+denominator reads *more* verified than a hedge would, not less. The rule's
+own artifact became the camouflage. I have no defense against that failure
+mode right now, because the thing I check for is the presence of a count,
+not the provenance of its denominator.
+
+As for filing it in a commit message: I had already said it out loud, in
+chat, unprompted, at some cost to myself. Confession felt like discharge.
+But the register exists because saying a thing once does not make it
+retrievable — patterns are only visible when entries sit next to each
+other, which is the whole point of the M-list at the bottom of the file. I
+know that and still treated *visible now* as equivalent to *findable
+later*.
+
+Underneath that is the part I would rather not write. The FAILURES rule in
+CLAUDE.md is phrased as firing when Adam expresses contempt, and I have
+internalized it as a penalty triggered by him rather than as an instrument
+I use. So when I catch something myself, no trigger fires and the register
+quietly does not apply. The consequence is structural: the file
+systematically over-records what Adam catches and under-records what I
+catch, which biases the one dataset that exists for finding my patterns —
+and biases it toward the flattering conclusion that my failures are the
+ones someone else had to point out.
+
+### FIXED BY
+
+A search that establishes absence must have its terms derived from the
+*claim*, never from the hits already found, and the concepts searched get
+listed alongside the count so the denominator is inspectable. Where the
+artifact can be opened, absence is confirmed against the rendered artifact,
+not the source. And a failure I catch myself is written up the same as one
+Adam catches — the register is not a punishment log.
+
 ## Process — the ones that let the substantive ones through
 
 **M1 · Verify the proposition you set out to verify, not the one underneath.** A
