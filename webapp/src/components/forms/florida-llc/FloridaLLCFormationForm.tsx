@@ -530,8 +530,10 @@ export function FloridaLLCFormationForm({
           ) : null}
         </aside>
 
-        {/* Form panel */}
-        <main className="min-w-0">
+        {/* Form panel — a div, not <main>: the Layout already provides the
+            page's single main landmark, and two of them make screen-reader
+            landmark navigation ambiguous (Codex A11Y-001). */}
+        <div className="min-w-0">
           <div className="rounded-3xl border border-border bg-card p-6 sm:p-10">
             {stepKey === "path" ? (
               <StepFilingPath data={data} patch={patch} errors={errors} />
@@ -670,7 +672,7 @@ export function FloridaLLCFormationForm({
             legal, tax, or accounting advice. Your use of this form does not
             create an attorney–client relationship.
           </p>
-        </main>
+        </div>
       </div>
     </div>
   );

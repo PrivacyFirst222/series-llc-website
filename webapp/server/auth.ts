@@ -61,7 +61,12 @@ export async function destroySession(c: Context): Promise<void> {
  *  otherwise increment. Fails OPEN on a database error: when the database is
  *  down nothing else works either, and locking every client out is the worse
  *  failure. */
-export async function rateLimit(key: string, max: number, windowMs: number): Promise<boolean> {
+export async function rateLimit(
+  key: string,
+  max: number,
+  windowMs: number,
+  failMode: "open" | "closed" = "open",
+): Promise<boolean> {
   try {
     const db = await getDb();
     const rows = await db.query<{ count: number }>(
@@ -76,8 +81,12 @@ export async function rateLimit(key: string, max: number, windowMs: number): Pro
     );
     return rows[0].count <= max;
   } catch (e) {
-    console.error("[rateLimit] check failed, allowing request:", e);
-    return true;
+    // "closed" exists for the admin login alone: one account, the highest
+    // value brute-force target, and its one legitimate user can wait out a
+    // limiter fault. Everything client-facing stays "open" — a limiter-table
+    // fault must not lock every client out of their documents.
+    console.error(`[rateLimit] check failed, failing ${failMode}:`, e);
+    return failMode === "open";
   }
 }
 

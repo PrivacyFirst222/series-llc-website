@@ -42,7 +42,11 @@ async function putBackup(name: string, data: Buffer): Promise<string> {
       access: "private",
       contentType: "application/gzip",
       addRandomSuffix: false,
-      allowOverwrite: true, // rerunning a day's backup replaces it
+      // Names carry a timestamp, so no write can ever replace an earlier
+      // backup — a later degraded snapshot silently overwrote the day's good
+      // one under the date-only scheme (that is exactly how local test dumps
+      // destroyed the production backups in P48; Codex OPS-001).
+      allowOverwrite: false,
     });
     return blob.url;
   }
@@ -88,26 +92,11 @@ export async function listBackups(): Promise<BackupInfo[]> {
   }
 }
 
-async function deleteBackup(b: BackupInfo): Promise<void> {
-  try {
-    if (b.storageKey.startsWith("dev:")) {
-      const { unlink } = await import("node:fs/promises");
-      const { fileURLToPath } = await import("node:url");
-      const dir = fileURLToPath(new URL("../.dev-data/blob/backups/", import.meta.url));
-      await unlink(dir + b.key);
-      return;
-    }
-    const { del } = await import("@vercel/blob");
-    await del(b.storageKey);
-  } catch (e) {
-    console.error("[backup] prune failed:", e);
-  }
-}
 
-/** Keep the newest `keep` dumps; a backup that silently grows forever is a
- *  bill, and one that silently stops is a disaster — the admin panel shows
- *  the newest dump's date so a stall is visible. */
-export const BACKUP_KEEP = 30;
+/** Backups are never pruned — Adam's ruling, 29 Aug 2026: at ~17 KB per
+ *  nightly dump, years of them cost pennies, and a deleted backup is the one
+ *  you needed. The admin panel shows the newest dump's date so a stall is
+ *  visible. */
 
 export async function runDbBackup(): Promise<{
   key: string;
@@ -115,25 +104,30 @@ export async function runDbBackup(): Promise<{
   rowCounts: Record<string, number>;
 }> {
   const db = await getDb();
-  const tables: Record<string, unknown[]> = {};
+  // ONE statement reads every table, so the whole dump is a single database
+  // instant. The per-table loop it replaces could capture each table at a
+  // different moment — an order without the document written between reads —
+  // and the Neon HTTP driver offers no multi-statement transaction to wrap
+  // them, but per-statement atomicity is exactly enough (Codex BAK-001).
+  // Table names come from the constant list above, never from input.
+  const selects = BACKUP_TABLES.map(
+    (t) => `'${t}', (SELECT coalesce(json_agg(x), '[]'::json) FROM ${t} x)`,
+  ).join(", ");
+  const snap = await db.query<{ dump: Record<string, unknown[]> }>(
+    `SELECT json_build_object(${selects}) AS dump`,
+  );
+  const tables = snap[0].dump;
   const rowCounts: Record<string, number> = {};
-  for (const t of BACKUP_TABLES) {
-    // Table names come from the constant list above, never from input.
-    const rows = await db.query(`SELECT * FROM ${t}`);
-    tables[t] = rows;
-    rowCounts[t] = rows.length;
-  }
+  for (const t of BACKUP_TABLES) rowCounts[t] = (tables[t] ?? []).length;
   const dump = {
     version: 1,
     dumpedAt: new Date().toISOString(),
     tables,
   };
-  const name = `db-${new Date().toISOString().slice(0, 10)}.json.gz`;
+  // Timestamped, immutable: db-YYYY-MM-DD-HHMMSS.json.gz.
+  const iso = dump.dumpedAt;
+  const name = `db-${iso.slice(0, 10)}-${iso.slice(11, 19).replace(/:/g, "")}.json.gz`;
   const data = gzipSync(Buffer.from(JSON.stringify(dump)));
   await putBackup(name, data);
-
-  const all = await listBackups();
-  for (const old of all.slice(BACKUP_KEEP)) await deleteBackup(old);
-
   return { key: name, sizeBytes: data.byteLength, rowCounts };
 }

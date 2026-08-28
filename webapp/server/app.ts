@@ -2802,7 +2802,7 @@ app.post("/portal/registered-agent/cancel", async (c) => {
 /* --------------------------------- admin ------------------------------- */
 
 app.post("/admin/login", async (c) => {
-  if (!(await rateLimit(`admin:${clientIp(c)}`, 10, 900_000))) {
+  if (!(await rateLimit(`admin:${clientIp(c)}`, 10, 900_000, "closed"))) {
     return c.json(err("Too many attempts.", "RATE_LIMITED"), 429);
   }
   const body = z.object({ password: z.string().min(1) }).safeParse(await c.req.json().catch(() => null));

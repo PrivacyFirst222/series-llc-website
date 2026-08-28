@@ -560,7 +560,7 @@ export default function OAQuestionnaire() {
                         type="button"
                         aria-label={`Remove ${m.name?.trim() || `owner ${i + 1}`}`}
                         onClick={() => removeOwner(i)}
-                        className="text-muted-foreground hover:text-destructive"
+                        className="flex h-11 w-11 items-center justify-center rounded-md text-muted-foreground hover:text-destructive"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -614,7 +614,7 @@ export default function OAQuestionnaire() {
                           type="button"
                           aria-label="Remove pairing"
                           onClick={() => patch({ couples: couples.filter((_, i) => i !== ci) })}
-                          className="text-muted-foreground hover:text-foreground"
+                          className="flex h-11 w-11 items-center justify-center rounded-md text-muted-foreground hover:text-foreground"
                         >
                           <X className="h-4 w-4" />
                         </button>
