@@ -189,12 +189,29 @@ async function adminSession() {
   });
   const freshBody = await freshOrder.json().catch(() => null);
   check("fresh database: first valid order accepted", freshOrder.status === 200, freshBody);
+
+  // Rate limits live in the database now (AUTH-002): trip the login limiter,
+  // RESTART the server, and the block must still hold — the in-memory version
+  // this replaced forgot everything on every restart.
+  const LIMIT_IP = "10.99.99.99";
+  const tryLogin = () =>
+    fetch(`http://localhost:${FRESH_PORT}/api/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Forwarded-For": LIMIT_IP },
+      body: JSON.stringify({ email: "nobody@e2e.test", password: "wrong-password" }),
+    });
+  let lastStatus = 0;
+  for (let i = 0; i < 11; i += 1) lastStatus = (await tryLogin()).status;
+  check("login limiter trips on the eleventh attempt", lastStatus === 429, lastStatus);
+
   proc.kill();
   await proc.exited;
   proc = boot();
   check("fresh database: second boot on the same data is clean (idempotent init)", await waitReady());
   const cfg = await fetch(`http://localhost:${FRESH_PORT}/api/config`);
   check("fresh database: API answers after re-init", cfg.ok);
+  const afterRestart = await tryLogin();
+  check("rate limit SURVIVES the server restart", afterRestart.status === 429, afterRestart.status);
   proc.kill();
   await proc.exited;
   rmSync(freshDir, { recursive: true, force: true });

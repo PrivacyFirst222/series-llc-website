@@ -104489,6 +104489,15 @@ CREATE TABLE IF NOT EXISTS fl_entities (
   norm_key text NOT NULL
 );
 CREATE INDEX IF NOT EXISTS fl_entities_norm_key_idx ON fl_entities (norm_key);
+-- Fixed-window rate limiting. In-memory counters reset on every serverless
+-- recycle and are per-instance, so distributed attempts sailed past them
+-- (Codex AUTH-002). The schema runner splits statements on semicolons, so
+-- comments here must never contain one.
+CREATE TABLE IF NOT EXISTS rate_limits (
+  key text PRIMARY KEY,
+  window_start timestamptz NOT NULL,
+  count integer NOT NULL
+);
 CREATE TABLE IF NOT EXISTS fl_sync_state (
   id int PRIMARY KEY,
   baseline_label text,
@@ -105837,6 +105846,8 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 **4.6 Transfer on Death Designation.** The Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50\u2013711.512, Florida Statutes, and reflects the Member's designation, if any, of the person or persons who will become the owner of the Membership Interest upon the Member's death. The Member, if an individual, may designate any person or entity as a beneficiary. The Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, delivered to the Manager; the change is effective upon receipt unless the Manager objects in writing within seven (7) days, and the Manager shall thereafter update Exhibit A (though updating is not required for effectiveness). A beneficiary who becomes the owner of the Membership Interest under this Section succeeds to the Membership Interest subject to this Agreement and is admitted as the Member upon delivery to the Company of a written agreement to be bound by this Agreement.
 
 **4.7 Incapacity of the Member.** While the Member is Incapacitated, the Member's rights under this Agreement \u2014 including the right to vote, to consent, and to sign any instrument \u2014 are exercised by the Member's agent under a durable power of attorney conferring that authority or, if there is none, by the Member's court-appointed guardian. The Company and the Manager may rely on a certified copy of the power of attorney or of the letters of guardianship without further inquiry.
+
+**4.8 Bankruptcy or Insolvency of the Member.** The Member is not dissociated, and the Membership Interest is not forfeited, terminated, or modified, by reason of the Member becoming a debtor in bankruptcy, executing an assignment for the benefit of creditors, or the appointment of a trustee, receiver, or liquidator of the Member or of all or substantially all of the Member's property, and each such event is excluded as an event of dissociation under s. 605.0602, Florida Statutes. The Manager continues in office with the authority stated in this Agreement, and the Company and each Protected Series continue without dissolution or winding up. A person who succeeds to all or any part of the Membership Interest by reason of such an event holds it subject to this Agreement and is admitted as the Member upon delivery to the Company of a written agreement to be bound by this Agreement.
 
 ---
 
@@ -108093,6 +108104,8 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **4.7 Incapacity of the Member.** While the Member is Incapacitated, the Member's rights under this Agreement \u2014 including the right to vote, to consent, and to sign any instrument \u2014 are exercised by the Member's agent under a durable power of attorney conferring that authority or, if there is none, by the Member's court-appointed guardian. The Company and the Manager may rely on a certified copy of the power of attorney or of the letters of guardianship without further inquiry.
 
+**4.8 Bankruptcy or Insolvency of the Member.** The Member is not dissociated, and the Membership Interest is not forfeited, terminated, or modified, by reason of the Member becoming a debtor in bankruptcy, executing an assignment for the benefit of creditors, or the appointment of a trustee, receiver, or liquidator of the Member or of all or substantially all of the Member's property, and each such event is excluded as an event of dissociation under s. 605.0602, Florida Statutes. The Manager continues in office with the authority stated in this Agreement, and the Company and each Protected Series continue without dissolution or winding up. A person who succeeds to all or any part of the Membership Interest by reason of such an event holds it subject to this Agreement and is admitted as the Member upon delivery to the Company of a written agreement to be bound by this Agreement.
+
 ---
 
 ## ARTICLE 5 \u2014 MANAGEMENT
@@ -108483,6 +108496,8 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **4.6 Incapacity of the Member.** While the Member is Incapacitated, the Member's rights under this Agreement \u2014 including the right to vote, to consent, and to sign any instrument \u2014 are exercised by the Member's agent under a durable power of attorney conferring that authority or, if there is none, by the Member's court-appointed guardian. The Company may rely on a certified copy of the power of attorney or of the letters of guardianship without further inquiry.
 
+**4.7 Bankruptcy or Insolvency of the Member.** The Member is not dissociated, and the Membership Interest is not forfeited, terminated, or modified, by reason of the Member becoming a debtor in bankruptcy, executing an assignment for the benefit of creditors, or the appointment of a trustee, receiver, or liquidator of the Member or of all or substantially all of the Member's property, and each such event is excluded as an event of dissociation under s. 605.0602, Florida Statutes. The Company and each Protected Series continue without dissolution or winding up. A person who succeeds to all or any part of the Membership Interest by reason of such an event holds it subject to this Agreement and is admitted as the Member upon delivery to the Company of a written agreement to be bound by this Agreement.
+
 ---
 
 ## ARTICLE 5 \u2014 MANAGEMENT BY THE MEMBER
@@ -108831,6 +108846,8 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 **4.5 Transfer on Death Designation.** The Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50\u2013711.512, Florida Statutes, and reflects the Member's designation, if any, of the person or persons who will become the owner of the Membership Interest upon the Member's death. Subject to Section 9.3(b), the Member, if an individual, may designate any person or entity as a beneficiary. The Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, maintained with the Company's records; the change is effective upon execution, and Exhibit A shall be updated to reflect it (though updating is not required for effectiveness). A beneficiary who becomes the owner of the Membership Interest under this Section succeeds to the Membership Interest subject to this Agreement and is admitted as the Member upon delivery to the Company of a written agreement to be bound by this Agreement.
 
 **4.6 Incapacity of the Member.** While the Member is Incapacitated, the Member's rights under this Agreement \u2014 including the right to vote, to consent, and to sign any instrument \u2014 are exercised by the Member's agent under a durable power of attorney conferring that authority or, if there is none, by the Member's court-appointed guardian. The Company may rely on a certified copy of the power of attorney or of the letters of guardianship without further inquiry.
+
+**4.7 Bankruptcy or Insolvency of the Member.** The Member is not dissociated, and the Membership Interest is not forfeited, terminated, or modified, by reason of the Member becoming a debtor in bankruptcy, executing an assignment for the benefit of creditors, or the appointment of a trustee, receiver, or liquidator of the Member or of all or substantially all of the Member's property, and each such event is excluded as an event of dissociation under s. 605.0602, Florida Statutes. The Company and each Protected Series continue without dissolution or winding up. A person who succeeds to all or any part of the Membership Interest by reason of such an event holds it subject to this Agreement and is admitted as the Member upon delivery to the Company of a written agreement to be bound by this Agreement.
 
 ---
 
@@ -109565,16 +109582,24 @@ async function destroySession(c) {
   }
   deleteCookie(c, SESSION_COOKIE, { path: "/" });
 }
-var hits = /* @__PURE__ */ new Map();
-function rateLimit(key, max, windowMs) {
-  const now = Date.now();
-  const entry = hits.get(key);
-  if (!entry || now - entry.windowStart > windowMs) {
-    hits.set(key, { count: 1, windowStart: now });
+async function rateLimit(key, max, windowMs) {
+  try {
+    const db2 = await getDb();
+    const rows = await db2.query(
+      `INSERT INTO rate_limits (key, window_start, count) VALUES ($1, now(), 1)
+       ON CONFLICT (key) DO UPDATE SET
+         count = CASE WHEN rate_limits.window_start < now() - make_interval(secs => $2)
+                      THEN 1 ELSE rate_limits.count + 1 END,
+         window_start = CASE WHEN rate_limits.window_start < now() - make_interval(secs => $2)
+                             THEN now() ELSE rate_limits.window_start END
+       RETURNING count`,
+      [key, windowMs / 1e3]
+    );
+    return rows[0].count <= max;
+  } catch (e) {
+    console.error("[rateLimit] check failed, allowing request:", e);
     return true;
   }
-  entry.count++;
-  return entry.count <= max;
 }
 function clientIp(c) {
   return c.req.header("x-forwarded-for")?.split(",")[0].trim() || c.req.header("x-real-ip") || "local";
@@ -109882,7 +109907,7 @@ Your operating agreement comes in one of eight versions. Three questions decide 
 | **Multiple owners, manager-managed** | Manager-Managed, Multiple Members | Manager-Managed, S Corporation |
 | **Multiple owners, member-managed** | Member-Managed, Multiple Members | Member-Managed, S Corporation |
 
-All eight share the same skeleton through Article 9. From there the multi-owner forms run to Article 16 \u2014 transfers (10), the bankruptcy provisions (11), admissions (12), dissociation and deadlock (13), dissolution (14), amendments (15), and miscellaneous (16). The single-owner forms need no transfer, bankruptcy, or deadlock articles, so they run to Article 13: admission of an additional member (10), dissolution (11), amendments (12), and miscellaneous (13). Here is the map, so you know where things live when a bank, title company, or lawyer asks:
+All eight share the same skeleton through Article 9. From there the multi-owner forms run to Article 16 \u2014 transfers (10), the bankruptcy provisions (11), admissions (12), dissociation and deadlock (13), dissolution (14), amendments (15), and miscellaneous (16). The single-owner forms need no transfer or deadlock articles (their bankruptcy continuity provision lives in Article 4), so they run to Article 13: admission of an additional member (10), dissolution (11), amendments (12), and miscellaneous (13). Here is the map, so you know where things live when a bank, title company, or lawyer asks:
 
 | **Where** | **What it does** |
 |---|---|
@@ -109908,7 +109933,7 @@ When you completed the questionnaire, you decided several things. Here is what e
 Three practical rules about the agreement itself:
 1. **Sign it, and sign every Series Exhibit.** An unsigned operating agreement is a rumor. Your agreement also makes itself part of the association records (the standing association rules at the end of Article 8) \u2014 it only earns that status executed.
 2. **Amendments are written or they are nothing.** Oral side-deals between members are unenforceable under the agreement and poisonous in litigation.
-3. **When you add a second owner to a single-member company, change agreements.** Your agreement does not require it \u2014 nothing in it does \u2014 but the single-member form is built for one owner: it has no voting rules, no capital-call machinery, no transfer restrictions among owners, and no bankruptcy provisions, and its tax treatment changes the moment a second member is admitted. Move to the multi-member form at the same time, not later. (The portal does this for you: add the new owner in the operating agreement questionnaire, and the regenerated agreement is built on the multi-owner form automatically.)
+3. **When you add a second owner to a single-member company, change agreements.** Your agreement does not require it \u2014 nothing in it does \u2014 but the single-member form is built for one owner: it has no voting rules, no capital-call machinery, no transfer restrictions among owners, and none of the multi-owner bankruptcy armor, and its tax treatment changes the moment a second member is admitted. Move to the multi-member form at the same time, not later. (The portal does this for you: add the new owner in the operating agreement questionnaire, and the regenerated agreement is built on the multi-owner form automatically.)
 ## 8. THE MOTHERSHIP STRATEGY \u2014 KEEP THE PARENT POOR
 The company itself \u2014 the mothership \u2014 should own as little as possible. Two reasons:
 **First, the mothership is a silo too.** Its assets are exposed to *its* creditors \u2014 and the mothership is the silo most likely to attract general liabilities: it files things, signs service contracts, hires the bookkeeper, deals with the registered agent and the state. Anything valuable parked at the company level is exposed to all of that.
@@ -110145,6 +110170,8 @@ The shields in Section 2 protect the structure from the *business's* creditors. 
 **Charging-order exclusivity is not absolute \u2014 know its edges.** Section 605.0503(7) says the section does not limit a creditor's rights under a **consensual security interest** you granted, does not limit **fraudulent transfer** law, and does not limit "the equitable principles of alter ego, equitable lien, or constructive trust." Pledge your interest to a lender and the charging-order rules do not stand between that lender and its collateral. Move an interest to dodge a creditor and Ch. 726 applies. Run the structure as your personal checkbook and equitable doctrines are available. Exclusivity protects a *well-run* company from an *ordinary* judgment creditor; it is not a shield against your own conduct.
 **Involuntary transfers (multi-member).** If a member's interest is seized, passes through bankruptcy, or lands with an ex-spouse, your agreement (\xA710.4) gives the company \u2014 then the other members \u2014 an option to buy that interest at appraised fair value on up-to-five-year terms. A stranger who forces their way in holds only an economic interest (\xA710.3) and faces a structured buyout, not a seat at the table.
 **Bankruptcy armor (multi-member).** Article 11 of the multi-member agreement declares the agreement an executory contract under 11 U.S.C. \xA7365, catalogs each member's material ongoing duties, and \u2014 citing *In re Soderstrom* (M.D. Fla. 2013) \u2014 takes the position that a bankruptcy trustee cannot assume or assign a debtor-member's interest without the other members' consent. Understand it honestly: bankruptcy courts wield broad equitable power, and no drafting guarantees an outcome there. Article 11 gives your side the strongest available argument; combined with charging-order exclusivity, it makes the interest an unappetizing target \u2014 which is the practical goal.
+**Bankruptcy if you own alone.** Florida's statute has a trap for the sole owner of a member-managed company: filing bankruptcy automatically expels you as a member (s. 605.0602(8)), and a company with no members starts a 90-day clock toward dissolution \u2014 your worst financial day would also dissolve the container holding your assets. Your agreement turns that trap off (\xA74.7 of the member-managed single-member forms; \xA74.8 of the manager-managed forms, where the statute does not expel you but the same section keeps management and the series running): filing does not end your membership, the company and every series continue, and whoever ends up holding the interest holds it subject to the agreement. Understand what this section does *not* do: in a single-member company there are no co-members whose rights a bankruptcy court must respect, so the estate steps into your shoes \u2014 federal law makes the interest estate property no matter what any agreement says, and any clause that tried to punish filing would be void. The section's job is continuity, not concealment: the business keeps operating, the walls between series stand, and the estate deals with an intact company instead of a dissolving one. If bankruptcy is a live concern, that is a conversation for a bankruptcy attorney before filing, not after.
+
 **Death \u2014 the TOD designation.** Every form of the agreement lets each member register a transfer-on-death beneficiary \u2014 anyone the member chooses \u2014 on Exhibit A, using Florida's registration-in-beneficiary-form statute (ss. 711.50\u2013711.512). At death the interest passes directly \u2014 no probate \u2014 and the beneficiary takes subject to the operating agreement. In the multi-member agreements, a beneficiary receives the economic interest automatically but becomes a voting member only with the consent of a majority in interest of the other members \u2014 death does not bypass the controls that govern lifetime transfers, and family is treated no differently. In the single-member agreement the beneficiary is admitted as the Member on delivering a signed agreement to be bound, since there is no one else to consent. Keep designations current (the formalities are strict: a signed writing with two witnesses, delivered as your form directs), and coordinate with your estate plan \u2014 for large or complicated estates, a trust may be the better vehicle; ask your estate planner. If no designation is made, the interest passes through your estate, and the agreement's continuation provisions keep the company alive while it does.
 ## 24. WHEN A SERIES GETS SUED \u2014 SERVICE OF PROCESS AND LEGAL MAIL
 A protected series can sue and be sued in its own name. Process against a series is served like process against the LLC (s. 48.062) \u2014 which in practice means **served on the registered agent**, who is the same for the company and every series.
@@ -110838,7 +110865,7 @@ app.post("/orders", async (c) => {
   if (!orderingEnabled()) {
     return c.json(err2("Online ordering is not enabled yet.", "ORDERING_DISABLED"), 503);
   }
-  if (!rateLimit(`orders:req:${clientIp(c)}`, 60, 36e5)) {
+  if (!await rateLimit(`orders:req:${clientIp(c)}`, 60, 36e5)) {
     return c.json(err2("Too many attempts. Try again in an hour.", "RATE_LIMITED"), 429);
   }
   let raw2;
@@ -110854,7 +110881,7 @@ app.post("/orders", async (c) => {
       400
     );
   }
-  if (!rateLimit(`orders:ok:${clientIp(c)}`, 10, 36e5)) {
+  if (!await rateLimit(`orders:ok:${clientIp(c)}`, 10, 36e5)) {
     return c.json(
       err2("Too many submissions. Try again in an hour.", "RATE_LIMITED"),
       429
@@ -111278,7 +111305,7 @@ var verifyAddressSchema = external_exports.object({
   zip: external_exports.string().min(3).max(20)
 });
 app.post("/address/verify", async (c) => {
-  if (!rateLimit(`addr:${clientIp(c)}`, 60, 9e5)) {
+  if (!await rateLimit(`addr:${clientIp(c)}`, 60, 9e5)) {
     return c.json({ data: { status: "skipped" } });
   }
   const body = verifyAddressSchema.safeParse(await c.req.json().catch(() => null));
@@ -111328,7 +111355,7 @@ app.post("/address/verify", async (c) => {
 });
 var loginSchema = external_exports.object({ email: external_exports.string().email(), password: external_exports.string().min(1) });
 app.post("/auth/login", async (c) => {
-  if (!rateLimit(`login:${clientIp(c)}`, 10, 9e5)) {
+  if (!await rateLimit(`login:${clientIp(c)}`, 10, 9e5)) {
     return c.json(err2("Too many attempts. Try again in a few minutes.", "RATE_LIMITED"), 429);
   }
   const body = loginSchema.safeParse(await c.req.json().catch(() => null));
@@ -111366,7 +111393,7 @@ app.get("/auth/me", async (c) => {
   });
 });
 app.post("/auth/forgot", async (c) => {
-  if (!rateLimit(`forgot:${clientIp(c)}`, 5, 36e5)) {
+  if (!await rateLimit(`forgot:${clientIp(c)}`, 5, 36e5)) {
     return c.json(err2("Too many requests. Try again later.", "RATE_LIMITED"), 429);
   }
   const body = external_exports.object({ email: external_exports.string().email() }).safeParse(await c.req.json().catch(() => null));
@@ -111630,7 +111657,7 @@ app.put("/portal/oa/answers", async (c) => {
 app.post("/portal/oa/generate", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err2("Not signed in", "UNAUTHENTICATED"), 401);
-  if (!rateLimit(`oagen:${session.clientId}`, 10, 36e5)) {
+  if (!await rateLimit(`oagen:${session.clientId}`, 10, 36e5)) {
     return c.json(err2("Too many generations. Try again later.", "RATE_LIMITED"), 429);
   }
   const body = oaAnswersSchema.safeParse(await c.req.json().catch(() => null));
@@ -112051,7 +112078,7 @@ app.post("/admin/library/:key", async (c) => {
   return c.json({ data: { ok: true } });
 });
 app.post("/orders/:id/resend-welcome", async (c) => {
-  if (!rateLimit(`resend:${clientIp(c)}`, 5, 36e5)) {
+  if (!await rateLimit(`resend:${clientIp(c)}`, 5, 36e5)) {
     return c.json(err2("Too many requests. Try again later.", "RATE_LIMITED"), 429);
   }
   const db2 = await getDb();
@@ -112276,7 +112303,7 @@ app.get("/portal/services", async (c) => {
   });
 });
 app.post("/name-check", async (c) => {
-  if (!rateLimit(`namecheck:${clientIp(c)}`, 30, 6e5)) {
+  if (!await rateLimit(`namecheck:${clientIp(c)}`, 30, 6e5)) {
     return c.json(err2("Too many checks. Try again in a few minutes.", "RATE_LIMITED"), 429);
   }
   const body = await c.req.json().catch(() => null);
@@ -112308,6 +112335,8 @@ app.get("/cron/purge", async (c) => {
   if (secret && auth !== `Bearer ${secret}`) return c.json(err2("Not authorized", "UNAUTHENTICATED"), 401);
   if (!secret && env.isProd) return c.json(err2("Not authorized", "UNAUTHENTICATED"), 401);
   const purged = await purgeExpiredSElections();
+  const db2 = await getDb();
+  await db2.query("DELETE FROM rate_limits WHERE window_start < now() - interval '2 days'");
   return c.json({ data: { purged } });
 });
 app.get("/cron/db-backup", async (c) => {
@@ -112367,7 +112396,7 @@ app.get("/admin/backups/:key/download", async (c) => {
 app.post("/portal/services/s-election", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err2("Not signed in", "UNAUTHENTICATED"), 401);
-  if (!rateLimit(`svc:${session.clientId}`, 20, 36e5)) {
+  if (!await rateLimit(`svc:${session.clientId}`, 20, 36e5)) {
     return c.json(err2("Too many requests. Try again later.", "RATE_LIMITED"), 429);
   }
   const llcName = await clientLlcName(session.clientId);
@@ -112407,7 +112436,7 @@ app.post("/portal/services/s-election", async (c) => {
 app.post("/portal/services/series", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err2("Not signed in", "UNAUTHENTICATED"), 401);
-  if (!rateLimit(`svc:${session.clientId}`, 20, 36e5)) {
+  if (!await rateLimit(`svc:${session.clientId}`, 20, 36e5)) {
     return c.json(err2("Too many requests. Try again later.", "RATE_LIMITED"), 429);
   }
   const body = external_exports.object({ suffix: external_exports.string().min(1).max(60), purpose: external_exports.string().max(300).optional() }).safeParse(await c.req.json().catch(() => null));
@@ -112459,7 +112488,7 @@ app.post("/portal/services/series", async (c) => {
 app.post("/portal/services/ein", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err2("Not signed in", "UNAUTHENTICATED"), 401);
-  if (!rateLimit(`svc:${session.clientId}`, 20, 36e5)) {
+  if (!await rateLimit(`svc:${session.clientId}`, 20, 36e5)) {
     return c.json(err2("Too many requests. Try again later.", "RATE_LIMITED"), 429);
   }
   const body = external_exports.object({ target: external_exports.enum(["company", "series"]), seriesName: external_exports.string().max(300).optional() }).safeParse(await c.req.json().catch(() => null));
@@ -112828,7 +112857,7 @@ function maskEmail(email) {
 app.post("/portal/account/password", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err2("Not signed in", "UNAUTHENTICATED"), 401);
-  if (!rateLimit(`acct:${session.clientId}`, 10, 36e5)) {
+  if (!await rateLimit(`acct:${session.clientId}`, 10, 36e5)) {
     return c.json(err2("Too many requests. Try again later.", "RATE_LIMITED"), 429);
   }
   const body = external_exports.object({
@@ -112864,7 +112893,7 @@ app.post("/portal/account/password", async (c) => {
 app.post("/portal/account/email", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err2("Not signed in", "UNAUTHENTICATED"), 401);
-  if (!rateLimit(`acct:${session.clientId}`, 10, 36e5)) {
+  if (!await rateLimit(`acct:${session.clientId}`, 10, 36e5)) {
     return c.json(err2("Too many requests. Try again later.", "RATE_LIMITED"), 429);
   }
   const body = external_exports.object({ newEmail: external_exports.string().email("Enter a valid email address."), currentPassword: external_exports.string().min(1) }).safeParse(await c.req.json().catch(() => null));
@@ -112973,7 +113002,7 @@ app.post("/portal/registered-agent/cancel", async (c) => {
   return c.json({ data: { raCancellationRequestedAt: requestedAt } });
 });
 app.post("/admin/login", async (c) => {
-  if (!rateLimit(`admin:${clientIp(c)}`, 10, 9e5)) {
+  if (!await rateLimit(`admin:${clientIp(c)}`, 10, 9e5)) {
     return c.json(err2("Too many attempts.", "RATE_LIMITED"), 429);
   }
   const body = external_exports.object({ password: external_exports.string().min(1) }).safeParse(await c.req.json().catch(() => null));

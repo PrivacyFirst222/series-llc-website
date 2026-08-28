@@ -227,6 +227,15 @@ CREATE TABLE IF NOT EXISTS fl_entities (
   norm_key text NOT NULL
 );
 CREATE INDEX IF NOT EXISTS fl_entities_norm_key_idx ON fl_entities (norm_key);
+-- Fixed-window rate limiting. In-memory counters reset on every serverless
+-- recycle and are per-instance, so distributed attempts sailed past them
+-- (Codex AUTH-002). The schema runner splits statements on semicolons, so
+-- comments here must never contain one.
+CREATE TABLE IF NOT EXISTS rate_limits (
+  key text PRIMARY KEY,
+  window_start timestamptz NOT NULL,
+  count integer NOT NULL
+);
 CREATE TABLE IF NOT EXISTS fl_sync_state (
   id int PRIMARY KEY,
   baseline_label text,

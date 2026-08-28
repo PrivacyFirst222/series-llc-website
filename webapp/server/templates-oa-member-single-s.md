@@ -133,6 +133,8 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **4.6 Incapacity of the Member.** While the Member is Incapacitated, the Member's rights under this Agreement — including the right to vote, to consent, and to sign any instrument — are exercised by the Member's agent under a durable power of attorney conferring that authority or, if there is none, by the Member's court-appointed guardian. The Company may rely on a certified copy of the power of attorney or of the letters of guardianship without further inquiry.
 
+**4.7 Bankruptcy or Insolvency of the Member.** The Member is not dissociated, and the Membership Interest is not forfeited, terminated, or modified, by reason of the Member becoming a debtor in bankruptcy, executing an assignment for the benefit of creditors, or the appointment of a trustee, receiver, or liquidator of the Member or of all or substantially all of the Member's property, and each such event is excluded as an event of dissociation under s. 605.0602, Florida Statutes. The Company and each Protected Series continue without dissolution or winding up. A person who succeeds to all or any part of the Membership Interest by reason of such an event holds it subject to this Agreement and is admitted as the Member upon delivery to the Company of a written agreement to be bound by this Agreement.
+
 ---
 
 ## ARTICLE 5 — MANAGEMENT BY THE MEMBER

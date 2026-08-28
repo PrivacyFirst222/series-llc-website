@@ -2464,6 +2464,47 @@ genuine production backup, restoring it into an empty database as proof,
 and the approved cleanup of the 3,498 orphaned objects once a real
 backup provides the authoritative keep-list.
 
+## P49 — The plain-language rule, applied to file paths and nowhere else
+
+### THE FAILURE
+
+Adam: "i don't understand any of this"
+
+Closing out the storage cleanup, I handed him a status list written
+entirely in my private shorthand: "the two GAP rulings, the §4.11 portal
+proof-read, 'first and only dedicated,' go-live operations,
+keyboard/screen-reader pass, shared rate limiting, code splitting,
+retention pruning." Eight items, none explained. "GAP" is a label from a
+checking script he has never run; "§4.11" assumes he keeps my
+section-number map in his head; "code splitting" and "shared rate
+limiting" are engineering vocabulary; "retention pruning" I coined that
+minute. This is the failure recorded two days earlier as P43, where he
+had to ask what my document codes meant — and P43's FIXED BY promised
+that anything Adam reads names things the way his screen names them.
+
+### WHY IT HAPPENED
+
+I filed P43's lesson as a rule about file paths — its trigger was
+`ServicesCard.tsx:208` — so the fix I internalized was "don't show Adam
+code coordinates," not the actual principle, which was "don't show Adam
+my working vocabulary." The narrow version passed every check while the
+broad version failed: there are no file paths in the offending list, so
+writing it produced no sense of familiar danger.
+
+The list also came from the wrong source. End-of-task summaries are
+compressions of my own running to-do state, and that state is stored in
+my labels because I am its only reader — until the moment I paste it to
+him. Compression preserves the vocabulary of whoever wrote the notes. A
+summary for Adam has to be re-written, not compressed, and rewriting
+costs the one thing I economize at the end of a long task: the
+willingness to spend another paragraph when the work already feels done.
+
+### FIXED BY
+
+Status lists Adam reads describe each item as an action in his world —
+who does what, to what, and why it matters — with my internal label, if
+needed at all, in parentheses after.
+
 ## Process — the ones that let the substantive ones through
 
 **M1 · Verify the proposition you set out to verify, not the one underneath.** A

@@ -81,7 +81,7 @@ app.post("/orders", async (c) => {
   // that validates — the one that creates a checkout and sends mail — is
   // charged against the low limit. The budget is per IP, which an office or a
   // mobile carrier's shared address will share.
-  if (!rateLimit(`orders:req:${clientIp(c)}`, 60, 3600_000)) {
+  if (!(await rateLimit(`orders:req:${clientIp(c)}`, 60, 3600_000))) {
     return c.json(err("Too many attempts. Try again in an hour.", "RATE_LIMITED"), 429);
   }
   let raw: unknown;
@@ -97,7 +97,7 @@ app.post("/orders", async (c) => {
       400,
     );
   }
-  if (!rateLimit(`orders:ok:${clientIp(c)}`, 10, 3600_000)) {
+  if (!(await rateLimit(`orders:ok:${clientIp(c)}`, 10, 3600_000))) {
     return c.json(
       err("Too many submissions. Try again in an hour.", "RATE_LIMITED"),
       429,
@@ -667,7 +667,7 @@ const verifyAddressSchema = z.object({
  *  `normalized` carries Smarty's standardized version, so a typo or wrong
  *  ZIP comes back corrected for the customer to accept. */
 app.post("/address/verify", async (c) => {
-  if (!rateLimit(`addr:${clientIp(c)}`, 60, 900_000)) {
+  if (!(await rateLimit(`addr:${clientIp(c)}`, 60, 900_000))) {
     return c.json({ data: { status: "skipped" } });
   }
   const body = verifyAddressSchema.safeParse(await c.req.json().catch(() => null));
@@ -735,7 +735,7 @@ app.post("/address/verify", async (c) => {
 const loginSchema = z.object({ email: z.string().email(), password: z.string().min(1) });
 
 app.post("/auth/login", async (c) => {
-  if (!rateLimit(`login:${clientIp(c)}`, 10, 900_000)) {
+  if (!(await rateLimit(`login:${clientIp(c)}`, 10, 900_000))) {
     return c.json(err("Too many attempts. Try again in a few minutes.", "RATE_LIMITED"), 429);
   }
   const body = loginSchema.safeParse(await c.req.json().catch(() => null));
@@ -776,7 +776,7 @@ app.get("/auth/me", async (c) => {
 });
 
 app.post("/auth/forgot", async (c) => {
-  if (!rateLimit(`forgot:${clientIp(c)}`, 5, 3600_000)) {
+  if (!(await rateLimit(`forgot:${clientIp(c)}`, 5, 3600_000))) {
     return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
   }
   const body = z.object({ email: z.string().email() }).safeParse(await c.req.json().catch(() => null));
@@ -1144,7 +1144,7 @@ app.put("/portal/oa/answers", async (c) => {
 app.post("/portal/oa/generate", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-  if (!rateLimit(`oagen:${session.clientId}`, 10, 3600_000)) {
+  if (!(await rateLimit(`oagen:${session.clientId}`, 10, 3600_000))) {
     return c.json(err("Too many generations. Try again later.", "RATE_LIMITED"), 429);
   }
   const body = oaAnswersSchema.safeParse(await c.req.json().catch(() => null));
@@ -1679,7 +1679,7 @@ app.post("/admin/library/:key", async (c) => {
 /** Confirmation-page "resend my portal invitation" — only for paid orders
  *  whose client has not yet set a password. */
 app.post("/orders/:id/resend-welcome", async (c) => {
-  if (!rateLimit(`resend:${clientIp(c)}`, 5, 3600_000)) {
+  if (!(await rateLimit(`resend:${clientIp(c)}`, 5, 3600_000))) {
     return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
   }
   const db = await getDb();
@@ -1975,7 +1975,7 @@ app.get("/portal/services", async (c) => {
  *  name step calls it before an order exists. Verdicts say "no conflict
  *  found", never "available" — the Division makes the final determination. */
 app.post("/name-check", async (c) => {
-  if (!rateLimit(`namecheck:${clientIp(c)}`, 30, 600_000)) {
+  if (!(await rateLimit(`namecheck:${clientIp(c)}`, 30, 600_000))) {
     return c.json(err("Too many checks. Try again in a few minutes.", "RATE_LIMITED"), 429);
   }
   const body = await c.req.json().catch(() => null);
@@ -2020,6 +2020,10 @@ app.get("/cron/purge", async (c) => {
   if (secret && auth !== `Bearer ${secret}`) return c.json(err("Not authorized", "UNAUTHENTICATED"), 401);
   if (!secret && env.isProd) return c.json(err("Not authorized", "UNAUTHENTICATED"), 401);
   const purged = await purgeExpiredSElections();
+  // Rate-limit windows are minutes-to-hours; anything older than two days is
+  // inert bookkeeping. Swept here so the table cannot grow without bound.
+  const db = await getDb();
+  await db.query("DELETE FROM rate_limits WHERE window_start < now() - interval '2 days'");
   return c.json({ data: { purged } });
 });
 
@@ -2094,7 +2098,7 @@ app.get("/admin/backups/:key/download", async (c) => {
 app.post("/portal/services/s-election", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-  if (!rateLimit(`svc:${session.clientId}`, 20, 3600_000)) {
+  if (!(await rateLimit(`svc:${session.clientId}`, 20, 3600_000))) {
     return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
   }
   const llcName = await clientLlcName(session.clientId);
@@ -2140,7 +2144,7 @@ app.post("/portal/services/s-election", async (c) => {
 app.post("/portal/services/series", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-  if (!rateLimit(`svc:${session.clientId}`, 20, 3600_000)) {
+  if (!(await rateLimit(`svc:${session.clientId}`, 20, 3600_000))) {
     return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
   }
   const body = z
@@ -2195,7 +2199,7 @@ app.post("/portal/services/series", async (c) => {
 app.post("/portal/services/ein", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-  if (!rateLimit(`svc:${session.clientId}`, 20, 3600_000)) {
+  if (!(await rateLimit(`svc:${session.clientId}`, 20, 3600_000))) {
     return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
   }
   const body = z
@@ -2625,7 +2629,7 @@ function maskEmail(email: string): string {
 app.post("/portal/account/password", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-  if (!rateLimit(`acct:${session.clientId}`, 10, 3600_000)) {
+  if (!(await rateLimit(`acct:${session.clientId}`, 10, 3600_000))) {
     return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
   }
   const body = z
@@ -2665,7 +2669,7 @@ app.post("/portal/account/password", async (c) => {
 app.post("/portal/account/email", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-  if (!rateLimit(`acct:${session.clientId}`, 10, 3600_000)) {
+  if (!(await rateLimit(`acct:${session.clientId}`, 10, 3600_000))) {
     return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
   }
   const body = z
@@ -2798,7 +2802,7 @@ app.post("/portal/registered-agent/cancel", async (c) => {
 /* --------------------------------- admin ------------------------------- */
 
 app.post("/admin/login", async (c) => {
-  if (!rateLimit(`admin:${clientIp(c)}`, 10, 900_000)) {
+  if (!(await rateLimit(`admin:${clientIp(c)}`, 10, 900_000))) {
     return c.json(err("Too many attempts.", "RATE_LIMITED"), 429);
   }
   const body = z.object({ password: z.string().min(1) }).safeParse(await c.req.json().catch(() => null));

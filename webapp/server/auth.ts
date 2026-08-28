@@ -54,17 +54,31 @@ export async function destroySession(c: Context): Promise<void> {
   deleteCookie(c, SESSION_COOKIE, { path: "/" });
 }
 
-/** Small fixed-window rate limiter (per serverless instance — a speed bump, not a wall). */
-const hits = new Map<string, { count: number; windowStart: number }>();
-export function rateLimit(key: string, max: number, windowMs: number): boolean {
-  const now = Date.now();
-  const entry = hits.get(key);
-  if (!entry || now - entry.windowStart > windowMs) {
-    hits.set(key, { count: 1, windowStart: now });
+/** Fixed-window rate limiter backed by the database, so the count survives
+ *  serverless recycling and is shared across instances — the in-memory Map it
+ *  replaces reset to zero on every restart (Codex AUTH-002). One atomic
+ *  upsert does the counting: begin a new window when the old one has lapsed,
+ *  otherwise increment. Fails OPEN on a database error: when the database is
+ *  down nothing else works either, and locking every client out is the worse
+ *  failure. */
+export async function rateLimit(key: string, max: number, windowMs: number): Promise<boolean> {
+  try {
+    const db = await getDb();
+    const rows = await db.query<{ count: number }>(
+      `INSERT INTO rate_limits (key, window_start, count) VALUES ($1, now(), 1)
+       ON CONFLICT (key) DO UPDATE SET
+         count = CASE WHEN rate_limits.window_start < now() - make_interval(secs => $2)
+                      THEN 1 ELSE rate_limits.count + 1 END,
+         window_start = CASE WHEN rate_limits.window_start < now() - make_interval(secs => $2)
+                             THEN now() ELSE rate_limits.window_start END
+       RETURNING count`,
+      [key, windowMs / 1000],
+    );
+    return rows[0].count <= max;
+  } catch (e) {
+    console.error("[rateLimit] check failed, allowing request:", e);
     return true;
   }
-  entry.count++;
-  return entry.count <= max;
 }
 
 export function clientIp(c: Context): string {

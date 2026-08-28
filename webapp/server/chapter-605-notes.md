@@ -421,6 +421,25 @@ penalty as unverified until the Department's schedule is checked.
   then the court "may order the sale of that interest ... pursuant to a
   foreclosure sale." (5) the purchaser takes the entire interest and becomes the
   member.
+- **s. 605.0602 (events of dissociation)** — read in full, all fifteen
+  subsections, 29 Aug 2026, for the single-member bankruptcy provisions.
+  The clause the new ss. 4.7/4.8 vary: "(8) **In a member-managed limited
+  liability company**, the person: (a) Becomes a debtor in bankruptcy;
+  (b) Executes an assignment for the benefit of creditors; or (c) Seeks,
+  consents to, or acquiesces in the appointment of a trustee, receiver, or
+  liquidator of the person or of all or substantially all the person's
+  property." Bankruptcy dissociates ONLY in member-managed companies —
+  manager-managed members are untouched by (8). For a member-managed
+  single-member company, dissociation of the sole member leaves the company
+  with no members and starts s. 605.0701(3)'s 90-day clock. Verified
+  variable: s. 605.0105(3)'s (a)-(p) list of what an operating agreement
+  may not do (read in full the same day) nowhere restricts varying
+  s. 605.0602, so the agreement may exclude these events, and ss. 4.7/4.8
+  do. The design is continuity rather than forfeiture because 11 U.S.C.
+  s. 541(c)(1) (read at the source) voids any provision "conditioned on
+  ... the commencement of a case under this title ... that effects or
+  gives an option to effect a forfeiture, modification, or termination of
+  the debtor's interest in property."
 - **s. 605.0503(6)** — for a multi-member company foreclosure "is not available
   ... and may not be ordered by a court."
 - **s. 605.0503(7)** — the section does not limit consensual security interests,
