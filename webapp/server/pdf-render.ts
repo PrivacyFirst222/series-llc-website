@@ -340,8 +340,7 @@ export async function renderMarkdownPdf(opts: {
     return doc.save();
   }
   stampFooters(doc, fonts.regular, opts.watermark);
-  setMeta(doc, opts.title, opts.watermark);
-  return finishWithPermissions(doc);
+  return finishWithPermissions(doc, opts.title, opts.watermark);
 }
 
 function stampPageNumbers(doc: PDFDocument, font: PDFFont): void {
@@ -384,7 +383,7 @@ function setMeta(doc: PDFDocument, title: string, wm: WatermarkInfo): void {
 
 /** Print allowed; copying/modifying restricted. Falls back to unencrypted if
  *  the encryption path fails — the watermark is the real deterrent. */
-async function finishWithPermissions(doc: PDFDocument): Promise<Uint8Array> {
+async function finishWithPermissions(doc: PDFDocument, title: string, wm: WatermarkInfo): Promise<Uint8Array> {
   try {
     const anyDoc = doc as unknown as {
       encrypt?: (o: {
@@ -393,16 +392,28 @@ async function finishWithPermissions(doc: PDFDocument): Promise<Uint8Array> {
       }) => Promise<void> | void;
     };
     if (typeof anyDoc.encrypt === "function") {
+      // The library's writer encrypts STREAMS only, never strings, so any Info
+      // metadata in an encrypted document is written plaintext into a file
+      // that declares string encryption — and every reader "decrypts" it into
+      // garbage (Codex PDF-001; confirmed against PDFWriter.encrypt, which
+      // tests `object instanceof PDFStream`). No string we set can survive,
+      // so the encrypted document carries NO Info dictionary: viewers then
+      // fall back to the clean filename. The watermark on every page, not the
+      // metadata, is what identifies the licensee.
+      delete (doc.context.trailerInfo as { Info?: unknown }).Info;
       await anyDoc.encrypt({
         ownerPassword: `mfsl-${Math.random().toString(36).slice(2)}${Date.now().toString(36)}`,
         // Clients may print and add their own notes/signatures; the underlying
         // text stays locked against copying and editing.
         permissions: { printing: "highResolution", modifying: false, copying: false, annotating: true },
       });
+      return await doc.save({ useObjectStreams: false });
     }
+    setMeta(doc, title, wm);
     return await doc.save({ useObjectStreams: false });
   } catch (e) {
     console.error("[pdf] permissions encryption failed; serving watermarked-only:", e);
+    setMeta(doc, title, wm);
     return await doc.save({ useObjectStreams: false });
   }
 }
@@ -416,6 +427,5 @@ export async function stampExistingPdf(opts: {
   const doc = await PDFDocument.load(opts.bytes, { ignoreEncryption: true });
   const font = await doc.embedFont(StandardFonts.Helvetica);
   stampFooters(doc, font, opts.watermark);
-  setMeta(doc, opts.title, opts.watermark);
-  return finishWithPermissions(doc);
+  return finishWithPermissions(doc, opts.title, opts.watermark);
 }

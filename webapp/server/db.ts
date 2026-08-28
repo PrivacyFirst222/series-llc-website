@@ -97,8 +97,14 @@ CREATE TABLE IF NOT EXISTS auth_tokens (
   client_id uuid NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
   purpose text NOT NULL,
   expires_at timestamptz NOT NULL,
-  used_at timestamptz
+  used_at timestamptz,
+  -- What the token authorizes, bound at issue time. A verify_email token
+  -- carries the exact address its link was sent to: proving control of inbox
+  -- A must never confirm address B requested later (Codex AUTH-EMAIL-001).
+  payload text
 );
+-- For databases created before payload existed. ALTERs FOLLOW their CREATE (P46).
+ALTER TABLE auth_tokens ADD COLUMN IF NOT EXISTS payload text;
 CREATE TABLE IF NOT EXISTS documents (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   client_id uuid NOT NULL REFERENCES clients(id) ON DELETE CASCADE,

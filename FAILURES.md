@@ -2410,6 +2410,60 @@ boots a server against a freshly created empty database first, proves
 initialization twice over (idempotency), and submits a valid order before
 the main suite runs.
 
+## P48 — The test suite overwrote the production backups it existed to protect
+
+### THE FAILURE
+
+Self-caught while inventorying the Blob store for Codex's OPS-ENV-001.
+
+webapp/.env has carried the production Blob store's write token since the
+backup system was built. Every local e2e run since at least 9 August has
+therefore written its artifacts into the production store: 3,498 of the
+store's 3,524 objects — 835 MB — are test junk. Far worse: the suite's
+backup checks upload a dump of the LOCAL test database to
+backups/db-<date>.json.gz — the exact path the production nightly cron
+writes — so each day's local runs overwrote that day's production backup
+after the cron produced it. The backup dated 28 August is 8.7 KB of e2e
+fixtures. Its "documents" table references E2E Coastal Holdings. As of
+this discovery there may be no stored backup of the production database
+at all; Neon's 7-day point-in-time history is the only recovery layer
+that provably survives. The overwriting is silent, the file names are
+identical to real backups, and every restore dry-run in the suite passed
+against its own junk.
+
+### WHY IT HAPPENED
+
+I put a production write credential into the development environment file
+because the backup feature needed it during development, and I never took
+it out, because nothing distinguished "the store I test against" from
+"the store the business depends on" — one token, one store, one path
+namespace. The dev fallbacks elsewhere (fake checkout, logged email,
+local files) created a feeling that the whole environment was inert, and
+I extended that feeling to an integration whose fallback I had personally
+bypassed by configuring the real token.
+
+The date-keyed backup path made the damage maximal: content-addressed or
+run-scoped names would have made test uploads pile up harmlessly beside
+real ones. I chose the overwrite-by-date scheme for tidiness — one
+backup per day — without asking what else could ever write to that name.
+
+And the suite's own passing checks concealed it. "Backup generation,
+download, and restore dry run" passed 30+ times while destroying the
+thing it described, because the check verifies round-trip integrity, not
+provenance — it never asks WHOSE database it is backing up or WHERE the
+file landed. A check that names a guarantee ("backups work") while
+testing a narrower one (this bytes round-trips) is how the most
+safety-critical failure yet stayed green the longest.
+
+### FIXED BY
+
+E2E_OFFLINE=1 blanks every external credential at the source, the suite
+refuses to run against a server with live integrations, and the fresh-DB
+spawn is forced offline. Still owed: verifying tonight's cron writes a
+genuine production backup, restoring it into an empty database as proof,
+and the approved cleanup of the 3,498 orphaned objects once a real
+backup provides the authoritative keep-list.
+
 ## Process — the ones that let the substantive ones through
 
 **M1 · Verify the proposition you set out to verify, not the one underneath.** A

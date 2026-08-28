@@ -8,7 +8,6 @@ import { api } from "@/lib/api";
 interface OrderStatus {
   status: string;
   llcName: string;
-  totalCents: number;
 }
 
 const DRAFT_KEY = "fl-llc-formation-draft-v1";

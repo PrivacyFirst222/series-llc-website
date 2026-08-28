@@ -126,6 +126,26 @@ async function adminSession() {
   return adminLogin;
 }
 
+// The suite is hermetic by default: it creates orders, documents, backups and
+// mirror copies by the dozen, and a server holding real credentials writes all
+// of that into real external stores (it HAS — fake client documents landed in
+// the live Blob store, Codex OPS-ENV-001). So before anything else, ask the
+// server what it would talk to, and refuse unless the run is explicitly an
+// integration test.
+{
+  const summary = await fetch(BASE + "/api/dev/env-summary").then((r) => r.json()).catch(() => null);
+  const externals = (summary?.data?.externals ?? {}) as Record<string, boolean>;
+  const active = Object.entries(externals).filter(([, on]) => on).map(([k]) => k);
+  if (active.length > 0 && process.env.E2E_EXTERNAL !== "1") {
+    console.error(
+      `e2e: REFUSING to run — the server at ${BASE} has live external integrations: ${active.join(", ")}.\n` +
+        `Restart it offline (E2E_OFFLINE=1 bun run --watch server/dev.ts) or, to deliberately run an\n` +
+        `integration test against real services, set E2E_EXTERNAL=1 for this run.`,
+    );
+    process.exit(1);
+  }
+}
+
 // 0. Fresh-database boot. The init script only ever ran against databases
 // that already had every table, so a broken fresh init was invisible to this
 // whole suite (P46: an ALTER above its CREATE broke every new environment —
@@ -140,7 +160,7 @@ async function adminSession() {
   const FRESH_PORT = 3200 + Math.floor(Math.random() * 800);
   const boot = () =>
     Bun.spawn(["bun", "run", "server/dev.ts"], {
-      env: { ...process.env, DEV_PG_DIR: freshDir, PORT: String(FRESH_PORT) },
+      env: { ...process.env, DEV_PG_DIR: freshDir, PORT: String(FRESH_PORT), E2E_OFFLINE: "1" },
       stdout: "ignore",
       stderr: "pipe",
     });
@@ -620,6 +640,44 @@ if (mint.status === 200) {
     );
     check("the rejected upload left the existing package intact", stillThere.length === 2, stillThere.length);
   }
+
+  // FORM-001 (staged replacement): a storage failure MID-replacement — after
+  // the new Articles stored but before the designation — must leave the
+  // complete prior package downloadable. The first fix deleted the old
+  // package first, which this failure would have turned into a formed order
+  // with an empty portal.
+  {
+    await fetch(`${BASE}/api/dev/fail-formation-put`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ after: 1 }),
+    });
+    const midFd = new FormData();
+    midFd.set("articles", new File([new TextEncoder().encode("%PDF-1.4 replacement articles\n%%EOF")], "articles.pdf", { type: "application/pdf" }));
+    midFd.append("psd", new File([new TextEncoder().encode("%PDF-1.4 replacement psd\n%%EOF")], "psd.pdf", { type: "application/pdf" }));
+    midFd.append("psdSeries", JSON.stringify(["E2E Coastal Holdings, LLC, PS A"]));
+    const midRes = await fetch(`${BASE}/api/admin/orders/${orderId}/formation-documents`, {
+      method: "POST", headers: { Cookie: adminLoginF.cookie }, body: midFd,
+    });
+    check("mid-replacement storage failure surfaces as an error", !midRes.ok, midRes.status);
+    const docsAfterMid = await api("/api/portal/documents", { cookies: setPw.cookie });
+    const survivors = (docsAfterMid.body?.data ?? []).filter(
+      (d: { kind: string }) => d.kind === "articles" || d.kind === "psd",
+    );
+    check("the prior package survives a mid-replacement failure", survivors.length === 2, survivors.length);
+    // And the path still converges: the same request, uninjected, succeeds.
+    const againFd = new FormData();
+    againFd.set("articles", new File([new TextEncoder().encode("%PDF-1.4 replacement articles 2\n%%EOF")], "articles.pdf", { type: "application/pdf" }));
+    againFd.append("psd", new File([new TextEncoder().encode("%PDF-1.4 replacement psd 2\n%%EOF")], "psd.pdf", { type: "application/pdf" }));
+    againFd.append("psdSeries", JSON.stringify(["E2E Coastal Holdings, LLC, PS A"]));
+    const againRes = await fetch(`${BASE}/api/admin/orders/${orderId}/formation-documents`, {
+      method: "POST", headers: { Cookie: adminLoginF.cookie }, body: againFd,
+    });
+    check("replacement succeeds after the failure clears", againRes.ok, againRes.status);
+    const docsFinal = await api("/api/portal/documents", { cookies: setPw.cookie });
+    const finalDocs = (docsFinal.body?.data ?? []).filter(
+      (d: { kind: string }) => d.kind === "articles" || d.kind === "psd",
+    );
+    check("package count converges to one set after recovery", finalDocs.length === 2, finalDocs.length);
+  }
   const einDetails = await api(`/api/portal/services/${intakeEin.id}/ein-details`, {
     method: "POST", cookies: setPw.cookie, body: JSON.stringify(einPayload),
   });
@@ -646,6 +704,28 @@ if (mint.status === 200) {
 
   // 13b. Fulfill the series order WITH an attached document — it must land in
   //      the client's portal documents in the same action.
+  // UPLOAD-002: a fulfillment attachment that is not a real PDF must be
+  // refused BEFORE anything is stored or the order's state moves — the same
+  // action deletes retained taxpayer identifiers on EIN/S orders, so junk
+  // here would replace the deliverable at the moment the data to redo it dies.
+  {
+    const badFd = new FormData();
+    badFd.set("notify", "false");
+    badFd.set("file", new File([new TextEncoder().encode("<svg xmlns='http://www.w3.org/2000/svg'/>")], "designation.pdf", { type: "application/pdf" }));
+    const badFulfill = await fetch(`${BASE}/api/admin/services/${seriesId}/fulfill`, {
+      method: "POST", headers: { Cookie: adminLogin2.cookie }, body: badFd,
+    });
+    const badBody = await badFulfill.json().catch(() => null);
+    check(
+      "non-PDF fulfillment attachment refused (NOT_A_PDF)",
+      badFulfill.status === 400 && (badBody as { error?: { code?: string } })?.error?.code === "NOT_A_PDF",
+      badBody,
+    );
+    const stillOpen = await api(`/api/admin/services`, { cookies: adminLogin2.cookie });
+    const row = (stillOpen.body?.data as { id: string; status: string }[] | undefined)?.find((r) => r.id === seriesId);
+    check("refused fulfillment leaves the order unfulfilled", row?.status !== "fulfilled", row?.status);
+  }
+
   const fulfillFd = new FormData();
   fulfillFd.set("notify", "false");
   fulfillFd.set(
@@ -1514,6 +1594,31 @@ if (mint.status === 200) {
   check("old address still signs in before confirmation", stillOld.status === 200);
   const badToken = await api("/api/auth/verify-email", { method: "POST", body: JSON.stringify({ token: "x".repeat(40) }) });
   check("bogus verification token rejected", badToken.status === 400);
+  // AUTH-EMAIL-001: a verification link proves control of the inbox it was
+  // SENT to. Request A, hold its token, request B — the held token must die,
+  // both because a new request invalidates outstanding tokens and because the
+  // token is bound to the address it carried.
+  {
+    const supersededTok = await api("/api/dev/pending-email-token", { method: "POST", body: JSON.stringify({ email: acctEmail }) });
+    const otherAddr = newEmail.replace("@", "+other@");
+    const reqOther = await api("/api/portal/account/email", {
+      method: "POST", cookies: newLogin.cookie,
+      body: JSON.stringify({ newEmail: otherAddr, currentPassword: "e2e-acct-pass-2" }),
+    });
+    check("second email change accepted", reqOther.status === 200, reqOther.body);
+    const staleUse = await api("/api/auth/verify-email", { method: "POST", body: JSON.stringify({ token: supersededTok.body?.data?.token ?? "" }) });
+    check(
+      "a superseded verification link cannot confirm the newer address",
+      staleUse.status === 400 && staleUse.body?.error?.code === "BAD_TOKEN",
+      staleUse.body,
+    );
+    // Put the pending request back so the confirm below lands on newEmail.
+    const reqBack = await api("/api/portal/account/email", {
+      method: "POST", cookies: newLogin.cookie,
+      body: JSON.stringify({ newEmail, currentPassword: "e2e-acct-pass-2" }),
+    });
+    check("re-request restores the intended pending address", reqBack.status === 200, reqBack.body);
+  }
   const vTok = await api("/api/dev/pending-email-token", { method: "POST", body: JSON.stringify({ email: acctEmail }) });
   if (vTok.status === 200) {
     const verified = await api("/api/auth/verify-email", { method: "POST", body: JSON.stringify({ token: vTok.body.data.token }) });

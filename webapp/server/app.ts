@@ -194,12 +194,16 @@ app.post("/orders", async (c) => {
 
 app.get("/orders/:id/status", async (c) => {
   const db = await getDb();
-  const rows = await db.query<{ status: string; llc_name: string; total_cents: number }>(
-    "SELECT status, llc_name, total_cents FROM orders WHERE id = $1",
+  // Unauthenticated by design — the confirmation page polls it with only the
+  // order id from the Square redirect. It answers with the minimum that page
+  // renders: status and name. The paid amount stayed in this response long
+  // after the page stopped showing it (Codex PRIV-001).
+  const rows = await db.query<{ status: string; llc_name: string }>(
+    "SELECT status, llc_name FROM orders WHERE id = $1",
     [c.req.param("id")],
   );
   if (rows.length === 0) return c.json(err("Order not found", "NOT_FOUND"), 404);
-  return c.json({ data: { status: rows[0].status, llcName: rows[0].llc_name, totalCents: rows[0].total_cents } });
+  return c.json({ data: { status: rows[0].status, llcName: rows[0].llc_name } });
 });
 
 /* ------------------------- payment fulfillment ------------------------- */
@@ -452,7 +456,35 @@ app.post("/square/webhook", async (c) => {
  *  suite can reproduce a transient failure mid-webhook and prove the retry
  *  still fulfills. Codex's RUN-PAY-01 reproduction, automated. */
 let failNextFulfillment = false;
+/** Dev-only failure injection for the formation-replacement path: when >= 0,
+ *  the (N+1)th putFile in the next formation upload throws, so the suite can
+ *  prove a mid-replacement failure leaves the prior package intact. */
+let failFormationPutAfter = -1;
 if (!env.isProd) {
+  // Which external integrations this server would actually talk to. The e2e
+  // suite refuses to run against an online server (OPS-ENV-001).
+  app.get("/dev/env-summary", (c) =>
+    c.json({
+      data: {
+        offline: env.OFFLINE,
+        externals: {
+          database: Boolean(env.DATABASE_URL),
+          square: Boolean(env.SQUARE_ACCESS_TOKEN),
+          blob: Boolean(env.BLOB_READ_WRITE_TOKEN),
+          resend: Boolean(env.RESEND_API_KEY),
+          dropbox: Boolean(env.DROPBOX_APP_KEY || env.DROPBOX_REFRESH_TOKEN),
+          smarty: Boolean(env.SMARTY_AUTH_ID),
+        },
+      },
+    }),
+  );
+
+  app.post("/dev/fail-formation-put", async (c) => {
+    const { after } = (await c.req.json().catch(() => ({}))) as { after?: number };
+    failFormationPutAfter = typeof after === "number" ? after : 0;
+    return c.json({ data: { ok: true, after: failFormationPutAfter } });
+  });
+
   app.post("/dev/fail-next-fulfillment", async (c) => {
     failNextFulfillment = true;
     return c.json({ data: { armed: true } });
@@ -570,15 +602,17 @@ if (!env.isProd) {
   app.post("/dev/pending-email-token", async (c) => {
     const { email } = (await c.req.json()) as { email: string };
     const db = await getDb();
-    const rows = await db.query<{ id: string }>("SELECT id FROM clients WHERE email = $1", [
-      email.toLowerCase(),
-    ]);
+    const rows = await db.query<{ id: string; pending_email: string | null }>(
+      "SELECT id, pending_email FROM clients WHERE email = $1",
+      [email.toLowerCase()],
+    );
     if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
-    // Mint a fresh token rather than reversing the stored hash.
+    // Mint a fresh token rather than reversing the stored hash — bound to the
+    // current pending address exactly as the production request path binds it.
     const { token, tokenHash } = newToken();
     await db.query(
-      "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at) VALUES ($1, $2, 'verify_email', $3)",
-      [tokenHash, rows[0].id, new Date(Date.now() + 3600_000).toISOString()],
+      "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at, payload) VALUES ($1, $2, 'verify_email', $3, $4)",
+      [tokenHash, rows[0].id, new Date(Date.now() + 3600_000).toISOString(), rows[0].pending_email],
     );
     return c.json({ data: { token } });
   });
@@ -2659,9 +2693,16 @@ app.post("/portal/account/email", async (c) => {
   }
   const { token, tokenHash } = newToken();
   await db.query("UPDATE clients SET pending_email = $1 WHERE id = $2", [newEmail, session.clientId]);
+  // A new request supersedes every outstanding verification link: an unused
+  // older token must not survive, or the link sent to inbox A could confirm
+  // the address requested later (AUTH-EMAIL-001).
   await db.query(
-    "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at) VALUES ($1, $2, 'verify_email', $3)",
-    [tokenHash, session.clientId, new Date(Date.now() + 3600_000).toISOString()],
+    "UPDATE auth_tokens SET used_at = now() WHERE client_id = $1 AND purpose = 'verify_email' AND used_at IS NULL",
+    [session.clientId],
+  );
+  await db.query(
+    "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at, payload) VALUES ($1, $2, 'verify_email', $3, $4)",
+    [tokenHash, session.clientId, new Date(Date.now() + 3600_000).toISOString(), newEmail],
   );
   // The link goes to the new address; the old address gets a warning at the
   // same moment, so a hijacker cannot move an account silently.
@@ -2678,8 +2719,12 @@ app.post("/auth/verify-email", async (c) => {
   const body = z.object({ token: z.string().min(10) }).safeParse(await c.req.json().catch(() => null));
   if (!body.success) return c.json(err("Invalid request.", "INVALID_INPUT"), 400);
   const db = await getDb();
-  const rows = await db.query<{ token_hash: string; client_id: string }>(
-    "SELECT token_hash, client_id FROM auth_tokens WHERE token_hash = $1 AND purpose = 'verify_email' AND expires_at > now() AND used_at IS NULL",
+  // Atomic consume: the same UPDATE that authorizes the change spends the
+  // token, so it cannot be used twice, concurrently or otherwise.
+  const rows = await db.query<{ token_hash: string; client_id: string; payload: string | null }>(
+    `UPDATE auth_tokens SET used_at = now()
+      WHERE token_hash = $1 AND purpose = 'verify_email' AND expires_at > now() AND used_at IS NULL
+      RETURNING token_hash, client_id, payload`,
     [hashToken(body.data.token)],
   );
   if (rows.length === 0) {
@@ -2689,9 +2734,13 @@ app.post("/auth/verify-email", async (c) => {
     "SELECT email, pending_email FROM clients WHERE id = $1",
     [rows[0].client_id],
   );
-  const pending = clients[0]?.pending_email;
-  if (!pending) {
-    return c.json(err("There is no pending email change on this account.", "BAD_STATE"), 400);
+  // The link proves control of the inbox it was SENT to — the address bound
+  // into the token — and confirms nothing else. If the account's pending
+  // request has moved on (or a legacy token carries no address), the link is
+  // dead and the client re-requests (AUTH-EMAIL-001).
+  const pending = rows[0].payload;
+  if (!pending || clients[0]?.pending_email !== pending) {
+    return c.json(err("This link is no longer valid \u2014 the email change was updated after it was sent. Request the change again from your portal.", "BAD_TOKEN"), 400);
   }
   // Someone else may have claimed the address between request and confirmation.
   const taken = await db.query("SELECT id FROM clients WHERE email = $1", [pending]);
@@ -2704,7 +2753,6 @@ app.post("/auth/verify-email", async (c) => {
     pending,
     rows[0].client_id,
   ]);
-  await db.query("UPDATE auth_tokens SET used_at = now() WHERE token_hash = $1", [rows[0].token_hash]);
   const mail = emailChangedEmail(pending);
   sendMail({ to: pending, ...mail }).catch((e) => console.error("[account] email-changed (new) failed:", e));
   sendMail({ to: previous, ...mail }).catch((e) => console.error("[account] email-changed (old) failed:", e));
@@ -3027,56 +3075,93 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
     }
   }
 
-  // Retry convergence. The Neon HTTP driver gives no cross-statement
-  // transaction, and file storage interleaves with the inserts anyway, so this
-  // sequence cannot be atomic. Its invariant is ordering: "formed" is set
-  // LAST, so a formed order always has its full package. What ordering alone
-  // did not give is a safe retry — a failure midway left documents inserted,
-  // and running the request again appended a second copy of each (Codex
-  // FORM-001). A retry now REPLACES: prior filing documents for this order
-  // are removed, rows first, then their blobs best-effort.
+  // Retry convergence, staged. No cross-statement transaction exists (Neon
+  // HTTP driver) and storage interleaves with the inserts, so the ordering IS
+  // the safety: (1) store every replacement file, (2) insert the new rows,
+  // (3) only then delete the prior rows and blobs, (4) set formed last. A
+  // failure at any step leaves the COMPLETE prior package in place (the first
+  // version of this fix deleted the old package before writing the new one,
+  // which a mid-replacement failure would have turned into a formed order
+  // with an empty portal — Codex FORM-001, second finding). The worst
+  // surviving state is a brief window where a retry shows both packages;
+  // duplicates beat destruction, and the next retry converges.
   const priorDocs = await db.query<{ id: string; storage_key: string }>(
-    "DELETE FROM documents WHERE order_id = $1 AND kind IN ('articles', 'psd') RETURNING id, storage_key",
+    "SELECT id, storage_key FROM documents WHERE order_id = $1 AND kind IN ('articles', 'psd')",
     [o.id],
   );
-  for (const d of priorDocs) {
-    await deleteFile(d.storage_key);
-  }
+  let formationPuts = 0;
+  const stagedPut = async (name: string, data: ArrayBuffer, type: string) => {
+    if (failFormationPutAfter >= 0 && formationPuts >= failFormationPutAfter) {
+      failFormationPutAfter = -1;
+      throw new Error("dev: injected formation storage failure");
+    }
+    formationPuts += 1;
+    return putFile(name, data, type);
+  };
 
-  const storedArticles = await putFile(
-    articles.name,
-    await articles.arrayBuffer(),
-    articles.type || "application/pdf",
-  );
-  await db.query(
-    `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
-     VALUES ($1, $2, 'articles', $3, $4, $5, $6, '{}'::jsonb)`,
-    [
-      o.client_id,
-      o.id,
-      `Articles of Organization — ${o.llc_name}`,
-      storedArticles.storageKey,
+  // If the new package fails partway, undo whatever of it landed — rows
+  // first, then blobs best-effort — so the client's portal shows exactly the
+  // intact prior package, not a hybrid.
+  const newRows: string[] = [];
+  const newKeys: string[] = [];
+  try {
+    const storedArticles = await stagedPut(
+      articles.name,
+      await articles.arrayBuffer(),
       articles.type || "application/pdf",
-      storedArticles.sizeBytes,
-    ],
-  );
-  for (let i = 0; i < psdFiles.length; i += 1) {
-    const f = psdFiles[i];
-    const names = psdSeries[i];
-    const stored = await putFile(f.name, await f.arrayBuffer(), f.type || "application/pdf");
-    await db.query(
+    );
+    newKeys.push(storedArticles.storageKey);
+    const artRow = await db.query<{ id: string }>(
       `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
-       VALUES ($1, $2, 'psd', $3, $4, $5, $6, $7)`,
+       VALUES ($1, $2, 'articles', $3, $4, $5, $6, '{}'::jsonb) RETURNING id`,
       [
         o.client_id,
         o.id,
-        `Protected Series Designation — ${names.join(", ")}`,
-        stored.storageKey,
-        f.type || "application/pdf",
-        stored.sizeBytes,
-        JSON.stringify({ seriesNames: names }),
+        `Articles of Organization — ${o.llc_name}`,
+        storedArticles.storageKey,
+        articles.type || "application/pdf",
+        storedArticles.sizeBytes,
       ],
     );
+    newRows.push(artRow[0].id);
+    for (let i = 0; i < psdFiles.length; i += 1) {
+      const f = psdFiles[i];
+      const names = psdSeries[i];
+      const stored = await stagedPut(f.name, await f.arrayBuffer(), f.type || "application/pdf");
+      newKeys.push(stored.storageKey);
+      const psdRow = await db.query<{ id: string }>(
+        `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
+         VALUES ($1, $2, 'psd', $3, $4, $5, $6, $7) RETURNING id`,
+        [
+          o.client_id,
+          o.id,
+          `Protected Series Designation — ${names.join(", ")}`,
+          stored.storageKey,
+          f.type || "application/pdf",
+          stored.sizeBytes,
+          JSON.stringify({ seriesNames: names }),
+        ],
+      );
+      newRows.push(psdRow[0].id);
+    }
+  } catch (e) {
+    if (newRows.length > 0) {
+      await db
+        .query("DELETE FROM documents WHERE id = ANY($1::uuid[])", [newRows])
+        .catch((err) => console.error("[formation] compensation delete failed:", err));
+    }
+    for (const k of newKeys) {
+      await deleteFile(k);
+    }
+    throw e;
+  }
+
+  // The new package is fully stored and recorded; retire the old one.
+  if (priorDocs.length > 0) {
+    await db.query("DELETE FROM documents WHERE id = ANY($1::uuid[])", [priorDocs.map((d) => d.id)]);
+    for (const d of priorDocs) {
+      await deleteFile(d.storage_key);
+    }
   }
 
   await db.query(
@@ -3345,6 +3430,15 @@ app.post("/admin/services/:id/fulfill", async (c) => {
         : so.type === "s-election"
           ? `S Corporation Election Package (Form 2553) — ${so.llc_name}`
           : `EIN Confirmation Letter — ${details.target === "series" ? details.seriesName ?? so.llc_name : so.llc_name}`);
+    // Every service deliverable is a PDF (CP 575, the 2553 package, a filed
+    // designation) and lands directly in the client's portal — and for EIN and
+    // S election orders, fulfillment deletes the retained taxpayer identifiers
+    // right after this block. A non-PDF here would replace the client's
+    // deliverable with junk at the same moment the data to redo it is
+    // destroyed (Codex UPLOAD-002). Strict check, not claims-based.
+    if (!(await looksLikePdf(file))) {
+      return c.json(err(`${file.name} is not a readable PDF. The deliverable must be the actual PDF document.`, "NOT_A_PDF"), 400);
+    }
     const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
     const doc = await db.query<{ id: string }>(
       `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)

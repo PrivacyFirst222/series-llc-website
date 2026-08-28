@@ -5933,13 +5933,13 @@ var require_which = __commonJS({
       const subStep = (p2, i, ii2) => new Promise((resolve, reject) => {
         if (ii2 === pathExt.length)
           return resolve(step(i + 1));
-        const ext = pathExt[ii2];
-        isexe(p2 + ext, { pathExt: pathExtExe }, (er, is2) => {
+        const ext2 = pathExt[ii2];
+        isexe(p2 + ext2, { pathExt: pathExtExe }, (er, is2) => {
           if (!er && is2) {
             if (opt.all)
-              found.push(p2 + ext);
+              found.push(p2 + ext2);
             else
-              return resolve(p2 + ext);
+              return resolve(p2 + ext2);
           }
           return resolve(subStep(p2, i, ii2 + 1));
         });
@@ -21389,8 +21389,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
             continue;
           }
           if (params.external) {
-            const ext = params.external.registry.get(entry[0])?.id;
-            if (schema !== entry[0] && ext) {
+            const ext2 = params.external.registry.get(entry[0])?.id;
+            if (schema !== entry[0] && ext2) {
               extractToDef(entry);
               continue;
             }
@@ -104252,26 +104252,29 @@ function buildPayload(data) {
 }
 
 // server/env.ts
+var OFFLINE = process.env.E2E_OFFLINE === "1";
+var ext = (v2) => OFFLINE ? "" : v2 ?? "";
 var env = {
-  DATABASE_URL: process.env.DATABASE_URL ?? "",
+  OFFLINE,
+  DATABASE_URL: ext(process.env.DATABASE_URL),
   SESSION_SECRET: process.env.SESSION_SECRET ?? "dev-only-secret-change-me",
-  SQUARE_ACCESS_TOKEN: process.env.SQUARE_ACCESS_TOKEN ?? "",
-  SQUARE_LOCATION_ID: process.env.SQUARE_LOCATION_ID ?? "",
+  SQUARE_ACCESS_TOKEN: ext(process.env.SQUARE_ACCESS_TOKEN),
+  SQUARE_LOCATION_ID: ext(process.env.SQUARE_LOCATION_ID),
   SQUARE_ENV: process.env.SQUARE_ENV === "production" ? "production" : "sandbox",
-  SQUARE_WEBHOOK_SIGNATURE_KEY: process.env.SQUARE_WEBHOOK_SIGNATURE_KEY ?? "",
-  RESEND_API_KEY: process.env.RESEND_API_KEY ?? "",
+  SQUARE_WEBHOOK_SIGNATURE_KEY: ext(process.env.SQUARE_WEBHOOK_SIGNATURE_KEY),
+  RESEND_API_KEY: ext(process.env.RESEND_API_KEY),
   MAIL_FROM: process.env.MAIL_FROM ?? "MyFloridaSeriesLLC <onboarding@resend.dev>",
   ADMIN_NOTIFY_EMAIL: process.env.ADMIN_NOTIFY_EMAIL ?? "",
   ADMIN_PASSWORD: process.env.ADMIN_PASSWORD ?? "",
   /** Shared secret for the daily purge cron. Required in production. */
   CRON_SECRET: process.env.CRON_SECRET ?? "",
   // Dropbox app-folder credentials for the nightly client-file mirror.
-  DROPBOX_APP_KEY: process.env.DROPBOX_APP_KEY ?? "",
-  DROPBOX_APP_SECRET: process.env.DROPBOX_APP_SECRET ?? "",
-  DROPBOX_REFRESH_TOKEN: process.env.DROPBOX_REFRESH_TOKEN ?? "",
-  BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN ?? "",
-  SMARTY_AUTH_ID: process.env.SMARTY_AUTH_ID ?? "",
-  SMARTY_AUTH_TOKEN: process.env.SMARTY_AUTH_TOKEN ?? "",
+  DROPBOX_APP_KEY: ext(process.env.DROPBOX_APP_KEY),
+  DROPBOX_APP_SECRET: ext(process.env.DROPBOX_APP_SECRET),
+  DROPBOX_REFRESH_TOKEN: ext(process.env.DROPBOX_REFRESH_TOKEN),
+  BLOB_READ_WRITE_TOKEN: ext(process.env.BLOB_READ_WRITE_TOKEN),
+  SMARTY_AUTH_ID: ext(process.env.SMARTY_AUTH_ID),
+  SMARTY_AUTH_TOKEN: ext(process.env.SMARTY_AUTH_TOKEN),
   /** Public origin for links in emails and Square redirects. */
   PUBLIC_BASE_URL: process.env.PUBLIC_BASE_URL ?? (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "http://localhost:8000"),
   isProd: !!process.env.VERCEL
@@ -104356,8 +104359,14 @@ CREATE TABLE IF NOT EXISTS auth_tokens (
   client_id uuid NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
   purpose text NOT NULL,
   expires_at timestamptz NOT NULL,
-  used_at timestamptz
+  used_at timestamptz,
+  -- What the token authorizes, bound at issue time. A verify_email token
+  -- carries the exact address its link was sent to: proving control of inbox
+  -- A must never confirm address B requested later (Codex AUTH-EMAIL-001).
+  payload text
 );
+-- For databases created before payload existed. ALTERs FOLLOW their CREATE (P46).
+ALTER TABLE auth_tokens ADD COLUMN IF NOT EXISTS payload text;
 CREATE TABLE IF NOT EXISTS documents (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   client_id uuid NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
@@ -105084,8 +105093,7 @@ async function renderMarkdownPdf(opts) {
     return doc.save();
   }
   stampFooters(doc, fonts.regular, opts.watermark);
-  setMeta(doc, opts.title, opts.watermark);
-  return finishWithPermissions(doc);
+  return finishWithPermissions(doc, opts.title, opts.watermark);
 }
 function stampPageNumbers(doc, font) {
   const pages = doc.getPages();
@@ -105120,20 +105128,24 @@ function setMeta(doc, title, wm) {
   doc.setProducer("MyFloridaSeriesLLC document engine");
   doc.setCreationDate(/* @__PURE__ */ new Date());
 }
-async function finishWithPermissions(doc) {
+async function finishWithPermissions(doc, title, wm) {
   try {
     const anyDoc = doc;
     if (typeof anyDoc.encrypt === "function") {
+      delete doc.context.trailerInfo.Info;
       await anyDoc.encrypt({
         ownerPassword: `mfsl-${Math.random().toString(36).slice(2)}${Date.now().toString(36)}`,
         // Clients may print and add their own notes/signatures; the underlying
         // text stays locked against copying and editing.
         permissions: { printing: "highResolution", modifying: false, copying: false, annotating: true }
       });
+      return await doc.save({ useObjectStreams: false });
     }
+    setMeta(doc, title, wm);
     return await doc.save({ useObjectStreams: false });
   } catch (e) {
     console.error("[pdf] permissions encryption failed; serving watermarked-only:", e);
+    setMeta(doc, title, wm);
     return await doc.save({ useObjectStreams: false });
   }
 }
@@ -105141,8 +105153,7 @@ async function stampExistingPdf(opts) {
   const doc = await PDFDocument.load(opts.bytes, { ignoreEncryption: true });
   const font = await doc.embedFont(StandardFonts.Helvetica);
   stampFooters(doc, font, opts.watermark);
-  setMeta(doc, opts.title, opts.watermark);
-  return finishWithPermissions(doc);
+  return finishWithPermissions(doc, opts.title, opts.watermark);
 }
 
 // server/s-election.ts
@@ -110924,11 +110935,11 @@ app.post("/orders", async (c) => {
 app.get("/orders/:id/status", async (c) => {
   const db2 = await getDb();
   const rows = await db2.query(
-    "SELECT status, llc_name, total_cents FROM orders WHERE id = $1",
+    "SELECT status, llc_name FROM orders WHERE id = $1",
     [c.req.param("id")]
   );
   if (rows.length === 0) return c.json(err2("Order not found", "NOT_FOUND"), 404);
-  return c.json({ data: { status: rows[0].status, llcName: rows[0].llc_name, totalCents: rows[0].total_cents } });
+  return c.json({ data: { status: rows[0].status, llcName: rows[0].llc_name } });
 });
 async function fulfillPaidOrder(orderId, squarePaymentId) {
   if (failNextFulfillment) {
@@ -111114,7 +111125,29 @@ app.post("/square/webhook", async (c) => {
   return c.json({ data: { ok: true } });
 });
 var failNextFulfillment = false;
+var failFormationPutAfter = -1;
 if (!env.isProd) {
+  app.get(
+    "/dev/env-summary",
+    (c) => c.json({
+      data: {
+        offline: env.OFFLINE,
+        externals: {
+          database: Boolean(env.DATABASE_URL),
+          square: Boolean(env.SQUARE_ACCESS_TOKEN),
+          blob: Boolean(env.BLOB_READ_WRITE_TOKEN),
+          resend: Boolean(env.RESEND_API_KEY),
+          dropbox: Boolean(env.DROPBOX_APP_KEY || env.DROPBOX_REFRESH_TOKEN),
+          smarty: Boolean(env.SMARTY_AUTH_ID)
+        }
+      }
+    })
+  );
+  app.post("/dev/fail-formation-put", async (c) => {
+    const { after } = await c.req.json().catch(() => ({}));
+    failFormationPutAfter = typeof after === "number" ? after : 0;
+    return c.json({ data: { ok: true, after: failFormationPutAfter } });
+  });
   app.post("/dev/fail-next-fulfillment", async (c) => {
     failNextFulfillment = true;
     return c.json({ data: { armed: true } });
@@ -111204,14 +111237,15 @@ if (!env.isProd) {
   app.post("/dev/pending-email-token", async (c) => {
     const { email } = await c.req.json();
     const db2 = await getDb();
-    const rows = await db2.query("SELECT id FROM clients WHERE email = $1", [
-      email.toLowerCase()
-    ]);
+    const rows = await db2.query(
+      "SELECT id, pending_email FROM clients WHERE email = $1",
+      [email.toLowerCase()]
+    );
     if (rows.length === 0) return c.json(err2("Not found", "NOT_FOUND"), 404);
     const { token, tokenHash } = newToken();
     await db2.query(
-      "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at) VALUES ($1, $2, 'verify_email', $3)",
-      [tokenHash, rows[0].id, new Date(Date.now() + 36e5).toISOString()]
+      "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at, payload) VALUES ($1, $2, 'verify_email', $3, $4)",
+      [tokenHash, rows[0].id, new Date(Date.now() + 36e5).toISOString(), rows[0].pending_email]
     );
     return c.json({ data: { token } });
   });
@@ -112857,8 +112891,12 @@ app.post("/portal/account/email", async (c) => {
   const { token, tokenHash } = newToken();
   await db2.query("UPDATE clients SET pending_email = $1 WHERE id = $2", [newEmail, session.clientId]);
   await db2.query(
-    "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at) VALUES ($1, $2, 'verify_email', $3)",
-    [tokenHash, session.clientId, new Date(Date.now() + 36e5).toISOString()]
+    "UPDATE auth_tokens SET used_at = now() WHERE client_id = $1 AND purpose = 'verify_email' AND used_at IS NULL",
+    [session.clientId]
+  );
+  await db2.query(
+    "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at, payload) VALUES ($1, $2, 'verify_email', $3, $4)",
+    [tokenHash, session.clientId, new Date(Date.now() + 36e5).toISOString(), newEmail]
   );
   const verify = verifyNewEmail(`${env.PUBLIC_BASE_URL}/portal/verify-email?token=${token}`);
   sendMail({ to: newEmail, ...verify }).catch((e) => console.error("[account] verify email failed:", e));
@@ -112873,7 +112911,9 @@ app.post("/auth/verify-email", async (c) => {
   if (!body.success) return c.json(err2("Invalid request.", "INVALID_INPUT"), 400);
   const db2 = await getDb();
   const rows = await db2.query(
-    "SELECT token_hash, client_id FROM auth_tokens WHERE token_hash = $1 AND purpose = 'verify_email' AND expires_at > now() AND used_at IS NULL",
+    `UPDATE auth_tokens SET used_at = now()
+      WHERE token_hash = $1 AND purpose = 'verify_email' AND expires_at > now() AND used_at IS NULL
+      RETURNING token_hash, client_id, payload`,
     [hashToken(body.data.token)]
   );
   if (rows.length === 0) {
@@ -112883,9 +112923,9 @@ app.post("/auth/verify-email", async (c) => {
     "SELECT email, pending_email FROM clients WHERE id = $1",
     [rows[0].client_id]
   );
-  const pending = clients[0]?.pending_email;
-  if (!pending) {
-    return c.json(err2("There is no pending email change on this account.", "BAD_STATE"), 400);
+  const pending = rows[0].payload;
+  if (!pending || clients[0]?.pending_email !== pending) {
+    return c.json(err2("This link is no longer valid \u2014 the email change was updated after it was sent. Request the change again from your portal.", "BAD_TOKEN"), 400);
   }
   const taken = await db2.query("SELECT id FROM clients WHERE email = $1", [pending]);
   if (taken.length > 0) {
@@ -112897,7 +112937,6 @@ app.post("/auth/verify-email", async (c) => {
     pending,
     rows[0].client_id
   ]);
-  await db2.query("UPDATE auth_tokens SET used_at = now() WHERE token_hash = $1", [rows[0].token_hash]);
   const mail = emailChangedEmail(pending);
   sendMail({ to: pending, ...mail }).catch((e) => console.error("[account] email-changed (new) failed:", e));
   sendMail({ to: previous, ...mail }).catch((e) => console.error("[account] email-changed (old) failed:", e));
@@ -113154,46 +113193,74 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
     }
   }
   const priorDocs = await db2.query(
-    "DELETE FROM documents WHERE order_id = $1 AND kind IN ('articles', 'psd') RETURNING id, storage_key",
+    "SELECT id, storage_key FROM documents WHERE order_id = $1 AND kind IN ('articles', 'psd')",
     [o.id]
   );
-  for (const d2 of priorDocs) {
-    await deleteFile(d2.storage_key);
-  }
-  const storedArticles = await putFile(
-    articles.name,
-    await articles.arrayBuffer(),
-    articles.type || "application/pdf"
-  );
-  await db2.query(
-    `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
-     VALUES ($1, $2, 'articles', $3, $4, $5, $6, '{}'::jsonb)`,
-    [
-      o.client_id,
-      o.id,
-      `Articles of Organization \u2014 ${o.llc_name}`,
-      storedArticles.storageKey,
-      articles.type || "application/pdf",
-      storedArticles.sizeBytes
-    ]
-  );
-  for (let i = 0; i < psdFiles.length; i += 1) {
-    const f = psdFiles[i];
-    const names = psdSeries[i];
-    const stored = await putFile(f.name, await f.arrayBuffer(), f.type || "application/pdf");
-    await db2.query(
+  let formationPuts = 0;
+  const stagedPut = async (name, data, type) => {
+    if (failFormationPutAfter >= 0 && formationPuts >= failFormationPutAfter) {
+      failFormationPutAfter = -1;
+      throw new Error("dev: injected formation storage failure");
+    }
+    formationPuts += 1;
+    return putFile(name, data, type);
+  };
+  const newRows = [];
+  const newKeys = [];
+  try {
+    const storedArticles = await stagedPut(
+      articles.name,
+      await articles.arrayBuffer(),
+      articles.type || "application/pdf"
+    );
+    newKeys.push(storedArticles.storageKey);
+    const artRow = await db2.query(
       `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
-       VALUES ($1, $2, 'psd', $3, $4, $5, $6, $7)`,
+       VALUES ($1, $2, 'articles', $3, $4, $5, $6, '{}'::jsonb) RETURNING id`,
       [
         o.client_id,
         o.id,
-        `Protected Series Designation \u2014 ${names.join(", ")}`,
-        stored.storageKey,
-        f.type || "application/pdf",
-        stored.sizeBytes,
-        JSON.stringify({ seriesNames: names })
+        `Articles of Organization \u2014 ${o.llc_name}`,
+        storedArticles.storageKey,
+        articles.type || "application/pdf",
+        storedArticles.sizeBytes
       ]
     );
+    newRows.push(artRow[0].id);
+    for (let i = 0; i < psdFiles.length; i += 1) {
+      const f = psdFiles[i];
+      const names = psdSeries[i];
+      const stored = await stagedPut(f.name, await f.arrayBuffer(), f.type || "application/pdf");
+      newKeys.push(stored.storageKey);
+      const psdRow = await db2.query(
+        `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
+         VALUES ($1, $2, 'psd', $3, $4, $5, $6, $7) RETURNING id`,
+        [
+          o.client_id,
+          o.id,
+          `Protected Series Designation \u2014 ${names.join(", ")}`,
+          stored.storageKey,
+          f.type || "application/pdf",
+          stored.sizeBytes,
+          JSON.stringify({ seriesNames: names })
+        ]
+      );
+      newRows.push(psdRow[0].id);
+    }
+  } catch (e) {
+    if (newRows.length > 0) {
+      await db2.query("DELETE FROM documents WHERE id = ANY($1::uuid[])", [newRows]).catch((err3) => console.error("[formation] compensation delete failed:", err3));
+    }
+    for (const k of newKeys) {
+      await deleteFile(k);
+    }
+    throw e;
+  }
+  if (priorDocs.length > 0) {
+    await db2.query("DELETE FROM documents WHERE id = ANY($1::uuid[])", [priorDocs.map((d2) => d2.id)]);
+    for (const d2 of priorDocs) {
+      await deleteFile(d2.storage_key);
+    }
   }
   await db2.query(
     "UPDATE orders SET status = 'formed', formed_at = now(), filed_at = COALESCE(filed_at, now()) WHERE id = $1",
@@ -113411,6 +113478,9 @@ app.post("/admin/services/:id/fulfill", async (c) => {
   let documentId = null;
   if (file) {
     const title = titleOverride || (so2.type === "series" ? `Protected Series Designation \u2014 ${details.seriesName ?? so2.llc_name}` : so2.type === "s-election" ? `S Corporation Election Package (Form 2553) \u2014 ${so2.llc_name}` : `EIN Confirmation Letter \u2014 ${details.target === "series" ? details.seriesName ?? so2.llc_name : so2.llc_name}`);
+    if (!await looksLikePdf(file)) {
+      return c.json(err2(`${file.name} is not a readable PDF. The deliverable must be the actual PDF document.`, "NOT_A_PDF"), 400);
+    }
     const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
     const doc = await db2.query(
       `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)
