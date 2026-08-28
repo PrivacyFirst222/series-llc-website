@@ -275,7 +275,7 @@ export default function OAQuestionnaire() {
     patch({ members, couples: nextCouples });
   };
 
-  const couples = a.couples ?? [];
+  const couples = useMemo(() => a.couples ?? [], [a.couples]);
   const pairedIdx = useMemo(() => new Set(couples.flatMap((c) => [c.a, c.b])), [couples]);
 
   const owners = useMemo(() => a.members ?? [], [a.members]);
