@@ -1628,6 +1628,9 @@ app.post("/admin/library/:key", async (c) => {
     return c.json(err("title and file are required.", "INVALID_INPUT"), 400);
   }
   if (file.size > MAX_UPLOAD_BYTES) return c.json(err("File is too large (20 MB max).", "TOO_LARGE"), 400);
+  if (claimsPdf(file) && !(await looksLikePdf(file))) {
+    return c.json(err(`${file.name} says it is a PDF but is not readable as one.`, "NOT_A_PDF"), 400);
+  }
   const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
   const db = await getDb();
   await db.query(
@@ -3019,6 +3022,25 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
     if (f.size > MAX_UPLOAD_BYTES) {
       return c.json(err(`${f.name} is too large (20 MB max).`, "TOO_LARGE"), 400);
     }
+    if (!(await looksLikePdf(f))) {
+      return c.json(err(`${f.name} is not a readable PDF. Filed Articles and designations must be the PDFs from Sunbiz.`, "NOT_A_PDF"), 400);
+    }
+  }
+
+  // Retry convergence. The Neon HTTP driver gives no cross-statement
+  // transaction, and file storage interleaves with the inserts anyway, so this
+  // sequence cannot be atomic. Its invariant is ordering: "formed" is set
+  // LAST, so a formed order always has its full package. What ordering alone
+  // did not give is a safe retry — a failure midway left documents inserted,
+  // and running the request again appended a second copy of each (Codex
+  // FORM-001). A retry now REPLACES: prior filing documents for this order
+  // are removed, rows first, then their blobs best-effort.
+  const priorDocs = await db.query<{ id: string; storage_key: string }>(
+    "DELETE FROM documents WHERE order_id = $1 AND kind IN ('articles', 'psd') RETURNING id, storage_key",
+    [o.id],
+  );
+  for (const d of priorDocs) {
+    await deleteFile(d.storage_key);
   }
 
   const storedArticles = await putFile(
@@ -3364,6 +3386,24 @@ app.get("/admin/clients/:id/documents", async (c) => {
 
 const MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
 
+/** A client-facing PDF must actually be one: %PDF- header and a %%EOF marker
+ *  in the tail. This is deliberately a structure sniff, not a full parse — the
+ *  uploads come from Adam, and the failure it catches is a mis-clicked file
+ *  (an HTML error page saved as .pdf, a Word doc, a truncated download)
+ *  landing in a client's portal as their filed Articles (Codex UPLOAD-001). */
+const looksLikePdf = async (f: File): Promise<boolean> => {
+  const bytes = new Uint8Array(await f.arrayBuffer());
+  if (bytes.length < 8) return false;
+  const head = new TextDecoder().decode(bytes.slice(0, 8));
+  if (!head.startsWith("%PDF-")) return false;
+  const tail = new TextDecoder().decode(bytes.slice(-1024));
+  return tail.includes("%%EOF");
+};
+
+/** True when the upload claims to be a PDF by type or filename. */
+const claimsPdf = (f: File): boolean =>
+  (f.type || "").toLowerCase().includes("pdf") || f.name.toLowerCase().endsWith(".pdf");
+
 app.post("/admin/documents", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
@@ -3378,6 +3418,9 @@ app.post("/admin/documents", async (c) => {
   }
   if (file.size > MAX_UPLOAD_BYTES) {
     return c.json(err("File is too large (20 MB max).", "TOO_LARGE"), 400);
+  }
+  if (claimsPdf(file) && !(await looksLikePdf(file))) {
+    return c.json(err(`${file.name} says it is a PDF but is not readable as one.`, "NOT_A_PDF"), 400);
   }
   const db = await getDb();
   const clients = await db.query<{ email: string }>("SELECT email FROM clients WHERE id = $1", [clientId]);

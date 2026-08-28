@@ -448,7 +448,7 @@ export function FloridaLLCFormationForm({
     <div className="container-wide pb-12 lg:pb-16">
       <div className="grid gap-8 lg:grid-cols-[260px_1fr] mt-8">
         {/* Sidebar */}
-        <aside className="space-y-4">
+        <aside className="min-w-0 space-y-4">
           <div className="rounded-2xl border border-border bg-card p-5">
             <div className="text-xs uppercase tracking-[0.18em] text-trust font-medium">
               Progress
@@ -531,7 +531,7 @@ export function FloridaLLCFormationForm({
         </aside>
 
         {/* Form panel */}
-        <main>
+        <main className="min-w-0">
           <div className="rounded-3xl border border-border bg-card p-6 sm:p-10">
             {stepKey === "path" ? (
               <StepFilingPath data={data} patch={patch} errors={errors} />
@@ -597,7 +597,7 @@ export function FloridaLLCFormationForm({
             {/* Nav */}
             {!isSubmit ? (
               <div className="mt-10 flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 border-t border-border pt-6">
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   <Button
                     type="button"
                     variant="outline"

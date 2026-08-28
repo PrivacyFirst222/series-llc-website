@@ -33,7 +33,11 @@ async function createDb(): Promise<Db> {
   const { PGlite } = await import("@electric-sql/pglite");
   const { fileURLToPath } = await import("node:url");
   const { mkdirSync, rmSync } = await import("node:fs");
-  const dir = fileURLToPath(new URL("../.dev-data/pg", import.meta.url));
+  // DEV_PG_DIR override exists for one consumer: the e2e fresh-database boot
+  // check, which must point a server at a directory no schema has ever
+  // touched (P46 — the init script only ever ran against databases that
+  // already had every table, so a broken fresh init was invisible).
+  const dir = process.env.DEV_PG_DIR || fileURLToPath(new URL("../.dev-data/pg", import.meta.url));
   const open = async () => {
     mkdirSync(dir, { recursive: true });
     const inst = new PGlite(dir);
@@ -114,11 +118,6 @@ ALTER TABLE clients ADD COLUMN IF NOT EXISTS ra_cancellation_requested_at timest
 -- up front and treating every later delivery as a duplicate meant a transient
 -- failure permanently swallowed a paid order (audited 26 Aug 2026).
 ALTER TABLE webhook_events ADD COLUMN IF NOT EXISTS processed_at timestamptz;
--- Autosave ordering: every keystroke fires its own request, so responses can
--- land out of order. The client stamps a monotonic revision and the server
--- refuses to move backwards (audited 26 Aug 2026 — an older keystroke could
--- bury a newer answer inside a legal agreement).
-ALTER TABLE oa_profiles ADD COLUMN IF NOT EXISTS rev integer NOT NULL DEFAULT 0;
 UPDATE webhook_events SET processed_at = received_at WHERE processed_at IS NULL;
 -- Email changes are verified before they take effect: the requested address
 -- parks here until the client clicks the link sent to it.
@@ -129,8 +128,16 @@ ALTER TABLE clients ADD COLUMN IF NOT EXISTS oa_generation_seq integer NOT NULL 
 CREATE TABLE IF NOT EXISTS oa_profiles (
   client_id uuid PRIMARY KEY REFERENCES clients(id) ON DELETE CASCADE,
   answers jsonb NOT NULL DEFAULT '{}'::jsonb,
+  -- Autosave ordering: every keystroke fires its own request, so responses can
+  -- land out of order. The client stamps a monotonic revision and the server
+  -- refuses to move backwards (audited 26 Aug 2026).
+  rev integer NOT NULL DEFAULT 0,
   updated_at timestamptz NOT NULL DEFAULT now()
 );
+-- For databases created before rev existed. An ALTER must always FOLLOW its
+-- table's CREATE: this one sat above it until 28 Aug 2026, so no fresh
+-- database could initialize at all (P46, found by the third Codex audit).
+ALTER TABLE oa_profiles ADD COLUMN IF NOT EXISTS rev integer NOT NULL DEFAULT 0;
 CREATE TABLE IF NOT EXISTS oa_generations (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   client_id uuid NOT NULL REFERENCES clients(id) ON DELETE CASCADE,

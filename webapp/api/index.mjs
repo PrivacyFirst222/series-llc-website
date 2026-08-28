@@ -104297,7 +104297,7 @@ async function createDb() {
   const { PGlite } = await import("@electric-sql/pglite");
   const { fileURLToPath } = await import("node:url");
   const { mkdirSync, rmSync } = await import("node:fs");
-  const dir = fileURLToPath(new URL("../.dev-data/pg", import.meta.url));
+  const dir = process.env.DEV_PG_DIR || fileURLToPath(new URL("../.dev-data/pg", import.meta.url));
   const open = async () => {
     mkdirSync(dir, { recursive: true });
     const inst = new PGlite(dir);
@@ -104377,11 +104377,6 @@ ALTER TABLE clients ADD COLUMN IF NOT EXISTS ra_cancellation_requested_at timest
 -- up front and treating every later delivery as a duplicate meant a transient
 -- failure permanently swallowed a paid order (audited 26 Aug 2026).
 ALTER TABLE webhook_events ADD COLUMN IF NOT EXISTS processed_at timestamptz;
--- Autosave ordering: every keystroke fires its own request, so responses can
--- land out of order. The client stamps a monotonic revision and the server
--- refuses to move backwards (audited 26 Aug 2026 \u2014 an older keystroke could
--- bury a newer answer inside a legal agreement).
-ALTER TABLE oa_profiles ADD COLUMN IF NOT EXISTS rev integer NOT NULL DEFAULT 0;
 UPDATE webhook_events SET processed_at = received_at WHERE processed_at IS NULL;
 -- Email changes are verified before they take effect: the requested address
 -- parks here until the client clicks the link sent to it.
@@ -104392,8 +104387,16 @@ ALTER TABLE clients ADD COLUMN IF NOT EXISTS oa_generation_seq integer NOT NULL 
 CREATE TABLE IF NOT EXISTS oa_profiles (
   client_id uuid PRIMARY KEY REFERENCES clients(id) ON DELETE CASCADE,
   answers jsonb NOT NULL DEFAULT '{}'::jsonb,
+  -- Autosave ordering: every keystroke fires its own request, so responses can
+  -- land out of order. The client stamps a monotonic revision and the server
+  -- refuses to move backwards (audited 26 Aug 2026).
+  rev integer NOT NULL DEFAULT 0,
   updated_at timestamptz NOT NULL DEFAULT now()
 );
+-- For databases created before rev existed. An ALTER must always FOLLOW its
+-- table's CREATE: this one sat above it until 28 Aug 2026, so no fresh
+-- database could initialize at all (P46, found by the third Codex audit).
+ALTER TABLE oa_profiles ADD COLUMN IF NOT EXISTS rev integer NOT NULL DEFAULT 0;
 CREATE TABLE IF NOT EXISTS oa_generations (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   client_id uuid NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
@@ -112000,6 +112003,9 @@ app.post("/admin/library/:key", async (c) => {
     return c.json(err2("title and file are required.", "INVALID_INPUT"), 400);
   }
   if (file.size > MAX_UPLOAD_BYTES) return c.json(err2("File is too large (20 MB max).", "TOO_LARGE"), 400);
+  if (claimsPdf(file) && !await looksLikePdf(file)) {
+    return c.json(err2(`${file.name} says it is a PDF but is not readable as one.`, "NOT_A_PDF"), 400);
+  }
   const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
   const db2 = await getDb();
   await db2.query(
@@ -113143,6 +113149,16 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
     if (f.size > MAX_UPLOAD_BYTES) {
       return c.json(err2(`${f.name} is too large (20 MB max).`, "TOO_LARGE"), 400);
     }
+    if (!await looksLikePdf(f)) {
+      return c.json(err2(`${f.name} is not a readable PDF. Filed Articles and designations must be the PDFs from Sunbiz.`, "NOT_A_PDF"), 400);
+    }
+  }
+  const priorDocs = await db2.query(
+    "DELETE FROM documents WHERE order_id = $1 AND kind IN ('articles', 'psd') RETURNING id, storage_key",
+    [o.id]
+  );
+  for (const d2 of priorDocs) {
+    await deleteFile(d2.storage_key);
   }
   const storedArticles = await putFile(
     articles.name,
@@ -113429,6 +113445,15 @@ app.get("/admin/clients/:id/documents", async (c) => {
   return c.json({ data: rows });
 });
 var MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
+var looksLikePdf = async (f) => {
+  const bytes2 = new Uint8Array(await f.arrayBuffer());
+  if (bytes2.length < 8) return false;
+  const head2 = new TextDecoder().decode(bytes2.slice(0, 8));
+  if (!head2.startsWith("%PDF-")) return false;
+  const tail = new TextDecoder().decode(bytes2.slice(-1024));
+  return tail.includes("%%EOF");
+};
+var claimsPdf = (f) => (f.type || "").toLowerCase().includes("pdf") || f.name.toLowerCase().endsWith(".pdf");
 app.post("/admin/documents", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err2("Not signed in", "UNAUTHENTICATED"), 401);
@@ -113443,6 +113468,9 @@ app.post("/admin/documents", async (c) => {
   }
   if (file.size > MAX_UPLOAD_BYTES) {
     return c.json(err2("File is too large (20 MB max).", "TOO_LARGE"), 400);
+  }
+  if (claimsPdf(file) && !await looksLikePdf(file)) {
+    return c.json(err2(`${file.name} says it is a PDF but is not readable as one.`, "NOT_A_PDF"), 400);
   }
   const db2 = await getDb();
   const clients = await db2.query("SELECT email FROM clients WHERE id = $1", [clientId]);

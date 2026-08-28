@@ -2361,6 +2361,55 @@ The staleness problem AUD-001 named is still open; the durable fix (a
 hook rebuilding the bundle when server sources change) is proposed to
 Adam separately.
 
+## P46 — A schema change tested only against databases that already had the schema
+
+### THE FAILURE
+
+Caught by the third Codex audit; no words of Adam's to quote.
+
+The 26 August stale-autosave fix added `ALTER TABLE oa_profiles ADD COLUMN
+IF NOT EXISTS rev` to db.ts's initialization block — eight lines ABOVE the
+`CREATE TABLE oa_profiles` statement. On any fresh database the ALTER
+references a table that does not exist yet and initialization dies
+mid-script: order creation returns HTTP 500, the e2e suite cannot run. The
+CREATE itself was never given the rev column, so the defect is doubled —
+reordering alone would build the table without the column the autosave
+guard reads. Production Neon and my dev database both already had the
+table, so the bug was invisible everywhere I tested and is live nowhere —
+its entire blast radius is new environments and disaster recovery. The
+nightly backups I built in the same week restore into exactly the
+environment that cannot initialize.
+
+### WHY IT HAPPENED
+
+I appended the ALTER where the other ALTERs lived, pattern-matching on the
+file's visual shape instead of its execution order. The existing ALTERs
+all follow their CREATEs; mine referenced a table created below it. The
+init block reads as a list of statements and executes as a sequence — I
+read it as the list.
+
+The deeper cause is what my testing could and could not see. Every
+database I ran the suite against — dev PGlite, the e2e environment —
+predated the change, so `IF NOT EXISTS` made the ALTER a silent no-op on
+top of already-correct state. My tests verified the autosave guard
+worked, which was the proposition I was interested in; no test anywhere
+exercised "a database that has never seen this schema," because every
+environment I possess had seen it. The suite's blind spot is structural:
+it inherits schema state from the previous run, so the initialization
+path — the one thing every disaster-recovery scenario depends on — was
+the one path with permanent zero coverage. I built nightly backups the
+same week without ever restoring one into a truly empty database, which
+would have caught this immediately and is the only test that resembles
+the actual recovery it exists for.
+
+### FIXED BY
+
+The rev column lives in the CREATE TABLE itself; the ALTER remains, after
+the CREATE, for databases that predate the column. The e2e suite now
+boots a server against a freshly created empty database first, proves
+initialization twice over (idempotency), and submits a valid order before
+the main suite runs.
+
 ## Process — the ones that let the substantive ones through
 
 **M1 · Verify the proposition you set out to verify, not the one underneath.** A

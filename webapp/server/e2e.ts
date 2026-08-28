@@ -126,6 +126,60 @@ async function adminSession() {
   return adminLogin;
 }
 
+// 0. Fresh-database boot. The init script only ever ran against databases
+// that already had every table, so a broken fresh init was invisible to this
+// whole suite (P46: an ALTER above its CREATE broke every new environment —
+// including the one a backup restores into — while every test stayed green).
+// Boot a second server against a directory no schema has touched, submit a
+// real order, then boot it AGAIN on the same directory to prove idempotency.
+{
+  const { mkdtempSync, rmSync } = await import("node:fs");
+  const { tmpdir } = await import("node:os");
+  const { join } = await import("node:path");
+  const freshDir = mkdtempSync(join(tmpdir(), "e2e-fresh-pg-"));
+  const FRESH_PORT = 3200 + Math.floor(Math.random() * 800);
+  const boot = () =>
+    Bun.spawn(["bun", "run", "server/dev.ts"], {
+      env: { ...process.env, DEV_PG_DIR: freshDir, PORT: String(FRESH_PORT) },
+      stdout: "ignore",
+      stderr: "pipe",
+    });
+  const waitReady = async () => {
+    for (let i = 0; i < 60; i += 1) {
+      try {
+        const r = await fetch(`http://localhost:${FRESH_PORT}/api/config`);
+        if (r.ok) return true;
+      } catch {
+        // not up yet
+      }
+      await new Promise((r) => setTimeout(r, 500));
+    }
+    return false;
+  };
+  let proc = boot();
+  check("fresh database: server boots", await waitReady());
+  const freshOrder = await fetch(`http://localhost:${FRESH_PORT}/api/orders`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      ...formData,
+      clientEmail: "fresh-db@e2e.test", confirmClientEmail: "fresh-db@e2e.test",
+      correspondentEmail: "fresh-db@e2e.test", confirmCorrespondentEmail: "fresh-db@e2e.test",
+    }),
+  });
+  const freshBody = await freshOrder.json().catch(() => null);
+  check("fresh database: first valid order accepted", freshOrder.status === 200, freshBody);
+  proc.kill();
+  await proc.exited;
+  proc = boot();
+  check("fresh database: second boot on the same data is clean (idempotent init)", await waitReady());
+  const cfg = await fetch(`http://localhost:${FRESH_PORT}/api/config`);
+  check("fresh database: API answers after re-init", cfg.ok);
+  proc.kill();
+  await proc.exited;
+  rmSync(freshDir, { recursive: true, force: true });
+}
+
 // 1. Reject garbage
 const bad = await api("/api/orders", { method: "POST", body: JSON.stringify({ nope: true }) });
 check("rejects invalid order payload (400)", bad.status === 400);
@@ -328,7 +382,7 @@ fd.set("clientId", client!.id);
 fd.set("kind", "package");
 fd.set("title", "Operating Agreement");
 fd.set("notify", "true");
-fd.set("file", new File([new TextEncoder().encode("%PDF-1.4 fake pdf for e2e")], "oa.pdf", { type: "application/pdf" }));
+fd.set("file", new File([new TextEncoder().encode("%PDF-1.4 fake pdf for e2e\n%%EOF")], "oa.pdf", { type: "application/pdf" }));
 const uploadRes = await fetch(BASE + "/api/admin/documents", {
   method: "POST",
   headers: { Cookie: admin.cookie },
@@ -511,13 +565,61 @@ if (mint.status === 200) {
   // documents upload (articles + a designation covering every series).
   const adminLoginF = await adminSession();
   const formFd = new FormData();
-  formFd.set("articles", new File([new TextEncoder().encode("%PDF-1.4 e2e articles")], "articles.pdf", { type: "application/pdf" }));
-  formFd.append("psd", new File([new TextEncoder().encode("%PDF-1.4 e2e psd")], "psd.pdf", { type: "application/pdf" }));
+  formFd.set("articles", new File([new TextEncoder().encode("%PDF-1.4 e2e articles\n%%EOF")], "articles.pdf", { type: "application/pdf" }));
+  formFd.append("psd", new File([new TextEncoder().encode("%PDF-1.4 e2e psd\n%%EOF")], "psd.pdf", { type: "application/pdf" }));
   formFd.append("psdSeries", JSON.stringify(["E2E Coastal Holdings, LLC, PS A"]));
   const formedRes = await fetch(`${BASE}/api/admin/orders/${orderId}/formation-documents`, {
     method: "POST", headers: { Cookie: adminLoginF.cookie }, body: formFd,
   });
   check("order marked formed via formation documents", formedRes.ok, await formedRes.clone().json().catch(() => null));
+
+  // Retry convergence (FORM-001): the formation upload cannot be atomic (HTTP
+  // driver, storage interleaved), so a retry must REPLACE the package, never
+  // append a second copy. Submit the identical request again and count.
+  {
+    const formFd2 = new FormData();
+    formFd2.set("articles", new File([new TextEncoder().encode("%PDF-1.4 e2e articles retry\n%%EOF")], "articles.pdf", { type: "application/pdf" }));
+    formFd2.append("psd", new File([new TextEncoder().encode("%PDF-1.4 e2e psd retry\n%%EOF")], "psd.pdf", { type: "application/pdf" }));
+    formFd2.append("psdSeries", JSON.stringify(["E2E Coastal Holdings, LLC, PS A"]));
+    const retryRes = await fetch(`${BASE}/api/admin/orders/${orderId}/formation-documents`, {
+      method: "POST", headers: { Cookie: adminLoginF.cookie }, body: formFd2,
+    });
+    check("formation documents accepted again on retry", retryRes.ok, await retryRes.clone().json().catch(() => null));
+    const docsAfterRetry = await api("/api/portal/documents", { cookies: setPw.cookie });
+    const filingDocs = (docsAfterRetry.body?.data ?? []).filter(
+      (d: { kind: string }) => d.kind === "articles" || d.kind === "psd",
+    );
+    check(
+      "retry replaced the filing package instead of duplicating it",
+      filingDocs.length === 2,
+      { filingCount: filingDocs.length, docs: filingDocs.map((d: { title: string }) => d.title) },
+    );
+  }
+
+  // UPLOAD-001: a file that claims to be a PDF but is not one (an HTML error
+  // page saved as .pdf is the classic mis-click) must be refused — and the
+  // refusal must happen BEFORE the replacement delete, leaving the existing
+  // package untouched.
+  {
+    const badFd = new FormData();
+    badFd.set("articles", new File([new TextEncoder().encode("<html><body>504 Gateway Timeout</body></html>")], "articles.pdf", { type: "application/pdf" }));
+    badFd.append("psd", new File([new TextEncoder().encode("%PDF-1.4 psd fine\n%%EOF")], "psd.pdf", { type: "application/pdf" }));
+    badFd.append("psdSeries", JSON.stringify(["E2E Coastal Holdings, LLC, PS A"]));
+    const badRes = await fetch(`${BASE}/api/admin/orders/${orderId}/formation-documents`, {
+      method: "POST", headers: { Cookie: adminLoginF.cookie }, body: badFd,
+    });
+    const badBody = await badRes.json().catch(() => null);
+    check(
+      "an HTML file dressed as a PDF is refused (NOT_A_PDF)",
+      badRes.status === 400 && badBody?.error?.code === "NOT_A_PDF",
+      badBody,
+    );
+    const docsAfterBad = await api("/api/portal/documents", { cookies: setPw.cookie });
+    const stillThere = (docsAfterBad.body?.data ?? []).filter(
+      (d: { kind: string }) => d.kind === "articles" || d.kind === "psd",
+    );
+    check("the rejected upload left the existing package intact", stillThere.length === 2, stillThere.length);
+  }
   const einDetails = await api(`/api/portal/services/${intakeEin.id}/ein-details`, {
     method: "POST", cookies: setPw.cookie, body: JSON.stringify(einPayload),
   });
@@ -548,7 +650,7 @@ if (mint.status === 200) {
   fulfillFd.set("notify", "false");
   fulfillFd.set(
     "file",
-    new File([new TextEncoder().encode("%PDF-1.4 filed designation for e2e")], "designation.pdf", {
+    new File([new TextEncoder().encode("%PDF-1.4 filed designation for e2e\n%%EOF")], "designation.pdf", {
       type: "application/pdf",
     }),
   );
@@ -701,7 +803,7 @@ if (mint.status === 200) {
   einFd.set("notify", "false");
   einFd.set(
     "file",
-    new File([new TextEncoder().encode("%PDF-1.4 CP 575 letter for e2e")], "cp575.pdf", { type: "application/pdf" }),
+    new File([new TextEncoder().encode("%PDF-1.4 CP 575 letter for e2e\n%%EOF")], "cp575.pdf", { type: "application/pdf" }),
   );
   const fulfillRes = await fetch(`${BASE}/api/admin/services/${intakeEin.id}/fulfill`, {
     method: "POST", headers: { Cookie: adminLogin2.cookie }, body: einFd,
@@ -773,8 +875,8 @@ if (mint.status === 200) {
   {
     const adminF2 = await adminSession();
     const fd2 = new FormData();
-    fd2.set("articles", new File([new TextEncoder().encode("%PDF-1.4 e2e articles couple")], "articles.pdf", { type: "application/pdf" }));
-    fd2.append("psd", new File([new TextEncoder().encode("%PDF-1.4 e2e psd couple")], "psd.pdf", { type: "application/pdf" }));
+    fd2.set("articles", new File([new TextEncoder().encode("%PDF-1.4 e2e articles couple\n%%EOF")], "articles.pdf", { type: "application/pdf" }));
+    fd2.append("psd", new File([new TextEncoder().encode("%PDF-1.4 e2e psd couple\n%%EOF")], "psd.pdf", { type: "application/pdf" }));
     fd2.append("psdSeries", JSON.stringify(["E2E Coastal Holdings, LLC, PS A"]));
     const formed2 = await fetch(`${BASE}/api/admin/orders/${mOrderId}/formation-documents`, {
       method: "POST", headers: { Cookie: adminF2.cookie }, body: fd2,

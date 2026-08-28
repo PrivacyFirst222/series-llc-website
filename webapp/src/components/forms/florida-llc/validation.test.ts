@@ -252,6 +252,34 @@ if (typeof console !== "undefined") {
   console.log("[fl-llc] name-check gate: results bind to the name they checked.");
 }
 
+// Taxation labels: exhaustive over all eight OA versions. Three of eight were
+// mislabeled "Partnership" by a default branch (PORTAL-001) — an S corporation
+// agreement showed the wrong tax status in the client portal. The full table
+// is asserted so a ninth version added without a label fails here, not there.
+{
+  const { taxationLabel } = await import("../../../lib/datetime");
+  const expected: Record<string, string> = {
+    single: "Single-Member",
+    "single-s": "S Corporation",
+    "member-single": "Single-Member",
+    "member-single-s": "S Corporation",
+    multi: "Partnership",
+    s: "S Corporation",
+    member: "Partnership",
+    "member-s": "S Corporation",
+  };
+  for (const [version, label] of Object.entries(expected)) {
+    const got = taxationLabel(version);
+    if (got !== label) {
+      throw new Error(`FAIL taxation label: ${version} shows "${got}", expected "${label}"`);
+    }
+  }
+  if (taxationLabel("unknown-future-version") !== "") {
+    throw new Error("FAIL taxation label: unknown version must show nothing, not a guess");
+  }
+  console.log("[fl-llc] taxation labels: all 8 versions correct, unknown shows nothing.");
+}
+
 // Run directly (bun run validation.test.ts): exit non-zero on failure. Printing
 // a warning and exiting 0 is how a broken fee calculation ships — the run has
 // to fail, not merely say something.

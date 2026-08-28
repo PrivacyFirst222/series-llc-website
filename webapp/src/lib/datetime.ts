@@ -35,9 +35,26 @@ export function formatDate(iso: string): string {
   });
 }
 
-/** How the agreement is taxed, in the words a client would use. */
+/** How the agreement is taxed, in the words a client would use.
+ *
+ *  Exhaustive over all eight OA versions (server/oa.ts's union). The old
+ *  three-branch form defaulted everything unrecognized to "Partnership",
+ *  which printed "Partnership" beside three agreements it does not
+ *  describe — both single-member S corporation forms and the
+ *  member-managed single-member form (Codex audit PORTAL-001, 28 Aug
+ *  2026). An unknown version now shows nothing rather than a guess:
+ *  beside a legal agreement, a wrong tax label is worse than no label. */
+const TAXATION_LABELS: Record<string, string> = {
+  s: "S Corporation",
+  "single-s": "S Corporation",
+  "member-s": "S Corporation",
+
+  "member-single-s": "S Corporation",
+  single: "Single-Member",
+  "member-single": "Single-Member",
+  multi: "Partnership",
+  member: "Partnership",
+};
 export function taxationLabel(version: string): string {
-  if (version === "s" || version === "member-s") return "S Corporation";
-  if (version === "single") return "Single-Member";
-  return "Partnership";
+  return TAXATION_LABELS[version] ?? "";
 }
