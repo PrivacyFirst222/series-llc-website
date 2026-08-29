@@ -862,6 +862,28 @@ if (mint.status === 200) {
     /^(Single-Member|Partnership|S Corporation) Operating Agreement/.test(gen1.body?.data?.title ?? ""),
     gen1.body?.data,
   );
+  // A ch. 621 company's agreement carries exactly three professional
+  // descriptor lines; a standard company's carries none (Adam's dictation,
+  // 29 Aug 2026). Re-assemble the STORED inputs both ways, so the flag's
+  // rendered effect and its default are both pinned to real generation data.
+  {
+    const res = await api(`/api/dev/oa-generation-inputs/${gen1.body?.data?.generationId}`);
+    const stored = res.body?.data?.inputs as Parameters<typeof assembleOa>[0];
+    check("a standard formation stores professional: false", stored?.professional === false, stored?.professional);
+    const std = assembleOa(stored).markdown;
+    check("a standard company's agreement has no professional descriptor",
+      !std.includes("PROFESSIONAL PROTECTED") && !std.includes("professional protected series"));
+    const pro = assembleOa({ ...stored, professional: true }).markdown;
+    check("a professional company's cover names it professional",
+      pro.includes("A FLORIDA PROFESSIONAL PROTECTED SERIES LIMITED LIABILITY COMPANY"));
+    check("a professional company's preamble names it professional",
+      pro.includes('a Florida professional protected series limited liability company (the "Company")'));
+    check("a professional company's Recital B cites Chapter 621",
+      pro.includes("The Company is a **professional protected series limited liability company** within the meaning of ss. 605.2101–605.2802, and Chapter 621, Florida Statutes, having designated,"));
+    check("s. 1.2 keeps the ch. 605 term of art untouched for a professional company",
+      pro.includes("as, a *protected series limited liability company* governed by the Act"));
+  }
+
   const gen2 = await api("/api/portal/oa/generate", {
     method: "POST", cookies: setPw.cookie,
     body: JSON.stringify({ ...oaAnswers, firstOrAmended: "amended" }),

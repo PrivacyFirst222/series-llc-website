@@ -33,6 +33,7 @@ export const loginSchema = z.object({ email: z.string().email(), password: z.str
 
 export interface SeedPayload {
   filingPath?: string;
+  formationType?: string;
   llcName?: { finalName?: string; desiredName?: string };
   principalOfficeAddress?: { address1?: string; address2?: string; city?: string; state?: string; zip?: string };
   management?: {
@@ -46,6 +47,8 @@ export interface SeedPayload {
 export async function oaSeed(clientId: string): Promise<{
   llcName: string;
   filingPath: string;
+  /** "PLLC" when the company was formed professional under ch. 621. */
+  formationType: string;
   managementStructure: string;
   managerNames: string[];
   principalAddress: string;
@@ -116,6 +119,7 @@ export async function oaSeed(clientId: string): Promise<{
   return {
     llcName: p.llcName?.finalName || orders[0].llc_name,
     filingPath: p.filingPath ?? "NEW",
+    formationType: p.formationType ?? "",
     managementStructure,
     managerNames,
     principalAddress,
@@ -1005,6 +1009,8 @@ app.post("/portal/oa/generate", async (c) => {
     includeShotgun: a.includeShotgun ?? (isSCorp && !multiOwner ? false : undefined),
     borrowingThreshold: a.borrowingThreshold,
     contributionToCompany: a.contributionToCompany,
+    // ch. 621 companies get the three professional descriptor lines.
+    professional: seed.formationType === "PLLC",
     generationNumber: nextGenerationNumber,
   };
 
