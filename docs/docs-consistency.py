@@ -128,6 +128,31 @@ def main():
                 if article not in all_articles:
                     problems.append(f"{name}:{i}  Article {article} does not exist in any master")
 
+    # --- Backup policy: the describers must match the implementation --------
+    # The eighth audit found the recovery runbook and the admin panel still
+    # describing the SUPERSEDED backup scheme (date-only names, newest-30
+    # pruning) after the implementation moved to timestamped immutable names
+    # and retention-forever. Documents that describe behavior drift when the
+    # behavior changes; this ties them to the code so drift goes red here.
+    backup_ts = open(os.path.join(ROOT, "webapp", "server", "backup.ts")).read()
+    runbook = open(os.path.join(HERE, "db-restore.md")).read()
+    admin_card = open(os.path.join(ROOT, "webapp", "src", "pages", "admin", "LibrarySection.tsx")).read()
+
+    impl_timestamped = 'iso.slice(11, 19).replace(/:/g, "")' in backup_ts
+    impl_immutable = "allowOverwrite: false" in backup_ts
+    impl_no_prune = "deleteBackup" not in backup_ts and "BACKUP_KEEP" not in backup_ts
+    if not (impl_timestamped and impl_immutable and impl_no_prune):
+        problems.append(
+            "backup.ts no longer implements timestamped/immutable/retain-forever "
+            "backups — update this check AND every document describing the policy")
+    if "db-YYYY-MM-DD-HHMMSS.json.gz" not in runbook:
+        problems.append("db-restore.md does not state the implemented backup filename pattern")
+    for name, text in (("db-restore.md", runbook), ("LibrarySection.tsx", admin_card)):
+        for stale in ("newest 30", "Newest 30", "pruned automatically", "db-YYYY-MM-DD.json.gz"):
+            if stale in text.replace("db-YYYY-MM-DD-HHMMSS", ""):
+                problems.append(f"{name} still describes the superseded backup policy ({stale!r})")
+        checked += 1
+
     for p in problems:
         print("  " + p)
     if problems:

@@ -2,12 +2,18 @@
 
 ## What is backed up, where, and when
 
-Every night at 08:15 UTC (≈4:15 AM ET) a Vercel cron job dumps the
+Every night at 08:15 UTC a Vercel cron job dumps the
 irreplaceable tables — clients, orders, service orders, document metadata,
 operating-agreement profiles and generations, library metadata, webhook
 events, and the Sunbiz sync watermark — as gzipped JSON into **private
-Vercel Blob storage** under `backups/db-YYYY-MM-DD.json.gz`. The newest 30
-dumps are kept; older ones are pruned automatically.
+Vercel Blob storage** under `backups/db-YYYY-MM-DD-HHMMSS.json.gz`. (The
+schedule is fixed in UTC, so the Eastern clock time shifts with daylight
+saving: 4:15 AM EDT in summer, 3:15 AM EST in winter.) Every backup is
+kept forever — filenames are timestamped to the second, overwriting is
+disabled at the storage layer, and nothing prunes them (Adam's ruling,
+29 Aug 2026: at ~17 KB per dump, years of them cost pennies, and a deleted
+backup is the one you needed). Each dump is read in a single database
+statement, so it is one consistent instant.
 
 Deliberately excluded:
 

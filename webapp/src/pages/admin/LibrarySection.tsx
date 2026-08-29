@@ -173,9 +173,10 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
           A nightly copy of clients, orders, service orders, and documents,
-          stored privately outside the database's own company. The newest 30
-          are kept. Click a backup to download it; restoring is described in
-          the runbook (docs/db-restore.md).
+          stored privately outside the database's own company. Every backup
+          is kept — timestamped, never overwritten, never pruned. Click a
+          backup to download it; restoring is described in the runbook
+          (docs/db-restore.md).
         </p>
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <Button
