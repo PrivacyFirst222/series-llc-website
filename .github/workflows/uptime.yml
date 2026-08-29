@@ -16,15 +16,25 @@ on:
         required: false
         default: ""
 
+# The token can read the repo and nothing else — the probe needs no
+# repository access at all, so even a compromised run holds nothing.
+permissions:
+  contents: read
+
 jobs:
   probe:
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
       - name: The site must prove the database answers and ordering is on
+        env:
+          # Dispatch input reaches the shell as an environment VARIABLE, never
+          # as shell SOURCE: the ${{ }} interpolation pastes raw text into the
+          # script before bash parses it, so a URL containing '"; cmd; #'
+          # executed cmd on the runner (OPS-UPTIME-003).
+          PROBE_URL: ${{ github.event.inputs.url }}
         run: |
-          URL="${{ github.event.inputs.url }}"
-          if [ -z "$URL" ]; then URL="https://myfloridaseriesllc.com/api/health"; fi
+          URL="${PROBE_URL:-https://myfloridaseriesllc.com/api/health}"
           # Status captured and required to be EXACTLY 200: -f does not reject
           # 3xx, and --max-redirs is inert without -L, so a redirect carrying
           # a healthy-shaped body would have passed (OPS-UPTIME-002). The JSON
