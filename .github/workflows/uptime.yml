@@ -25,10 +25,14 @@ jobs:
         run: |
           URL="${{ github.event.inputs.url }}"
           if [ -z "$URL" ]; then URL="https://myfloridaseriesllc.com/api/health"; fi
-          # -f fails on the endpoint's 503; no redirects accepted; structural
-          # JSON parse — the old grep for the WORD "ordering" passed on
-          # ordering:false and never touched the database (OPS-UPTIME-001).
-          BODY=$(curl -sf --max-time 20 --max-redirs 0 "$URL") || { echo "SITE UNHEALTHY OR DOWN: $URL"; exit 1; }
+          # Status captured and required to be EXACTLY 200: -f does not reject
+          # 3xx, and --max-redirs is inert without -L, so a redirect carrying
+          # a healthy-shaped body would have passed (OPS-UPTIME-002). The JSON
+          # is still parsed structurally (OPS-UPTIME-001).
+          RESP=$(curl -s --max-time 20 -w "\n%{http_code}" "$URL") || { echo "SITE DID NOT ANSWER: $URL"; exit 1; }
+          CODE=$(echo "$RESP" | tail -1)
+          BODY=$(echo "$RESP" | sed '$d')
+          [ "$CODE" = "200" ] || { echo "SITE UNHEALTHY: HTTP $CODE — $BODY"; exit 1; }
           echo "$BODY" | python3 -c '
           import json, sys
           d = json.load(sys.stdin)["data"]
