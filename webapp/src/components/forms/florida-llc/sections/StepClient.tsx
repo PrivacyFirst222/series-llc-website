@@ -35,30 +35,34 @@ export function StepClient({ data, patch, errors }: StepProps) {
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FieldShell label="First name" required error={errors.clientFirstName}>
+        <FieldShell label="First name" required error={errors.clientFirstName} htmlFor="client-first-name">
           <Input
+            id="client-first-name"
             value={data.clientFirstName}
             onChange={(e) => patch({ clientFirstName: e.target.value })}
             autoComplete="given-name"
           />
         </FieldShell>
-        <FieldShell label="Last name" required error={errors.clientLastName}>
+        <FieldShell label="Last name" required error={errors.clientLastName} htmlFor="client-last-name">
           <Input
+            id="client-last-name"
             value={data.clientLastName}
             onChange={(e) => patch({ clientLastName: e.target.value })}
             autoComplete="family-name"
           />
         </FieldShell>
-        <FieldShell label="Suffix (optional)" error={errors.clientSuffix}>
+        <FieldShell label="Suffix (optional)" error={errors.clientSuffix} htmlFor="client-suffix">
           <Input
+            id="client-suffix"
             value={data.clientSuffix ?? ""}
             onChange={(e) => patch({ clientSuffix: e.target.value })}
             placeholder="Jr, Sr, III…"
             autoComplete="honorific-suffix"
           />
         </FieldShell>
-        <FieldShell label="Email" required error={errors.clientEmail}>
+        <FieldShell label="Email" required error={errors.clientEmail} htmlFor="client-email">
           <Input
+            id="client-email"
             type="email"
             value={data.clientEmail}
             onChange={(e) => patch({ clientEmail: cleanEmailInput(e.target.value) })}
@@ -69,8 +73,10 @@ export function StepClient({ data, patch, errors }: StepProps) {
           label="Confirm email"
           required
           error={emailMismatch ?? errors.confirmClientEmail}
+          htmlFor="client-confirm-email"
         >
           <Input
+            id="client-confirm-email"
             type="email"
             value={data.confirmClientEmail}
             onChange={(e) =>
@@ -79,8 +85,9 @@ export function StepClient({ data, patch, errors }: StepProps) {
             autoComplete="email"
           />
         </FieldShell>
-        <FieldShell label="Phone (optional)" error={errors.clientPhone}>
+        <FieldShell label="Phone (optional)" error={errors.clientPhone} htmlFor="client-phone">
           <Input
+            id="client-phone"
             type="tel"
             value={data.clientPhone ?? ""}
             onChange={(e) => patch({ clientPhone: e.target.value })}

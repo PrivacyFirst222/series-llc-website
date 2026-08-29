@@ -61,14 +61,17 @@ export function StepCorrespondence({ data, patch, errors }: StepProps) {
           label="Contact name"
           required
           error={errors.correspondentName}
+          htmlFor="correspondent-name"
         >
           <Input
+            id="correspondent-name"
             value={data.correspondentName}
             onChange={(e) => patch({ correspondentName: e.target.value })}
           />
         </FieldShell>
-        <FieldShell label="Company (optional)">
+        <FieldShell label="Company (optional)" htmlFor="correspondent-company">
           <Input
+            id="correspondent-company"
             value={data.correspondentCompany ?? ""}
             onChange={(e) =>
               patch({ correspondentCompany: e.target.value })
@@ -80,8 +83,10 @@ export function StepCorrespondence({ data, patch, errors }: StepProps) {
           label="Email"
           required
           error={errors.correspondentEmail}
+          htmlFor="correspondent-email"
         >
           <Input
+            id="correspondent-email"
             type="email"
             value={data.correspondentEmail}
             onChange={(e) => patch({ correspondentEmail: cleanEmailInput(e.target.value) })}
@@ -91,8 +96,10 @@ export function StepCorrespondence({ data, patch, errors }: StepProps) {
           label="Confirm email"
           required
           error={emailMismatch ?? errors.confirmCorrespondentEmail}
+          htmlFor="correspondent-confirm-email"
         >
           <Input
+            id="correspondent-confirm-email"
             type="email"
             value={data.confirmCorrespondentEmail}
             onChange={(e) =>
@@ -100,8 +107,9 @@ export function StepCorrespondence({ data, patch, errors }: StepProps) {
             }
           />
         </FieldShell>
-        <FieldShell label="Phone (optional)">
+        <FieldShell label="Phone (optional)" htmlFor="correspondent-phone">
           <Input
+            id="correspondent-phone"
             value={data.correspondentPhone ?? ""}
             onChange={(e) =>
               patch({ correspondentPhone: e.target.value })

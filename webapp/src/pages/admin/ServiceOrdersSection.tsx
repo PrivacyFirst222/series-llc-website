@@ -204,7 +204,7 @@ export function ServiceFulfillDialog({
           </div>
         ) : null}
         <div className="space-y-2 border-t border-border pt-3">
-          <label className="text-sm font-medium">
+          <label htmlFor="service-attachment-file" className="text-sm font-medium">
             {viewing?.type === "ein"
               ? "Attach the EIN confirmation letter (CP 575)"
               : viewing?.type === "s-election"
@@ -212,6 +212,7 @@ export function ServiceFulfillDialog({
                 : "Attach the filed Designation"}
           </label>
           <input
+            id="service-attachment-file"
             type="file"
             accept="application/pdf,image/*"
             onChange={(e) => setAttachment(e.target.files?.[0] ?? null)}

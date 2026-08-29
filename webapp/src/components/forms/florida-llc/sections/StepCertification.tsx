@@ -152,8 +152,10 @@ export function StepCertification({ data, patch, errors }: StepProps) {
           label="Authorized representative name"
           required
           error={errors.authorizedRepresentativeName}
+          htmlFor="representative-name"
         >
           <Input
+            id="representative-name"
             value={data.authorizedRepresentativeName}
             onChange={(e) =>
               patch({ authorizedRepresentativeName: e.target.value })
@@ -179,8 +181,9 @@ export function StepCertification({ data, patch, errors }: StepProps) {
             </button>
           ) : null}
         </FieldShell>
-        <FieldShell label="Title (optional)">
+        <FieldShell label="Title (optional)" htmlFor="representative-title">
           <Input
+            id="representative-title"
             value={data.authorizedRepresentativeTitle ?? ""}
             onChange={(e) =>
               patch({ authorizedRepresentativeTitle: e.target.value })
@@ -188,8 +191,9 @@ export function StepCertification({ data, patch, errors }: StepProps) {
             placeholder="Member, Manager, etc."
           />
         </FieldShell>
-        <FieldShell label="Email (optional)">
+        <FieldShell label="Email (optional)" htmlFor="representative-email">
           <Input
+            id="representative-email"
             type="email"
             value={data.authorizedRepresentativeEmail ?? ""}
             onChange={(e) =>
@@ -197,8 +201,9 @@ export function StepCertification({ data, patch, errors }: StepProps) {
             }
           />
         </FieldShell>
-        <FieldShell label="Phone (optional)">
+        <FieldShell label="Phone (optional)" htmlFor="representative-phone">
           <Input
+            id="representative-phone"
             value={data.authorizedRepresentativePhone ?? ""}
             onChange={(e) =>
               patch({ authorizedRepresentativePhone: e.target.value })
@@ -214,8 +219,10 @@ export function StepCertification({ data, patch, errors }: StepProps) {
         required
         helper="Type your full legal name. This is your electronic signature."
         error={errors.authorizedRepresentativeSignature}
+        htmlFor="representative-signature"
       >
         <Input
+          id="representative-signature"
           value={data.authorizedRepresentativeSignature}
           onChange={(e) =>
             patch({ authorizedRepresentativeSignature: e.target.value })

@@ -513,6 +513,7 @@ export default function OAQuestionnaire() {
                       <span className="text-sm">Annual per-owner cap: $</span>
                       <Input
                         type="number"
+                        aria-label="Annual per-owner capital call cap in dollars"
                         min={0}
                         value={a.capitalCallCap ?? ""}
                         onChange={(e) =>
@@ -587,6 +588,7 @@ export default function OAQuestionnaire() {
                   <span className="text-sm">Debt above $</span>
                   <Input
                     type="number"
+                    aria-label="Borrowing limit in dollars"
                     min={0}
                     value={a.borrowingThreshold ?? ""}
                     onChange={(e) =>
@@ -625,6 +627,7 @@ export default function OAQuestionnaire() {
             <QuestionCard title="Effective date" learnMore="effectiveDate">
               <Input
                 type="date"
+                aria-label="Effective date"
                 value={a.effectiveDate ?? ""}
                 onChange={(e) => patch({ effectiveDate: e.target.value })}
                 className="w-48"

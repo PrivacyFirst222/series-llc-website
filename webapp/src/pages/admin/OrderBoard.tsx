@@ -234,6 +234,7 @@ export default function OrderBoard({ enabled }: { enabled: boolean }) {
       <div className="mt-3 flex flex-wrap items-center gap-3">
         <input
           type="search"
+          aria-label="Search by LLC name, client name, or email"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by LLC name, client name, or email"

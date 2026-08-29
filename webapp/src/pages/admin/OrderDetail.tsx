@@ -86,7 +86,7 @@ function Field({
           {field.value}
         </div>
       </div>
-      <Button type="button" variant="ghost" size="sm" onClick={copy} className="shrink-0">
+      <Button type="button" variant="ghost" size="sm" aria-label={`Copy ${field.label}`} onClick={copy} className="shrink-0">
         {flash ? <Check className="h-4 w-4 text-trust" /> : <Copy className="h-4 w-4" />}
       </Button>
     </div>
@@ -304,10 +304,11 @@ export default function OrderDetail({
               {d.status !== "formed" ? (
                 <div className="mt-4 space-y-3">
                   <div>
-                    <label className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+                    <label htmlFor="upload-articles" className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
                       Articles of Organization
                     </label>
                     <input
+                      id="upload-articles"
                       ref={articlesRef}
                       type="file"
                       accept="application/pdf"
@@ -318,10 +319,11 @@ export default function OrderDetail({
 
                   {psdRows.map((row, i) => (
                     <div key={i} className="rounded-lg border border-border p-3">
-                      <label className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+                      <label htmlFor={`upload-psd-${i}`} className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
                         Protected Series Designation {psdRows.length > 1 ? i + 1 : ""}
                       </label>
                       <input
+                        id={`upload-psd-${i}`}
                         type="file"
                         accept="application/pdf"
                         className="mt-1 block w-full text-sm"

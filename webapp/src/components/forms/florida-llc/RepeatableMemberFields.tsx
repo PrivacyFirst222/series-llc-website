@@ -64,8 +64,9 @@ export function RepeatableMemberFields({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FieldShell label="Member type" required>
+            <FieldShell label="Member type" required htmlFor={`member-${entry.id}-type`}>
               <select
+                id={`member-${entry.id}-type`}
                 value={entry.memberType}
                 onChange={(e) =>
                   update(entry.id, {
@@ -81,24 +82,27 @@ export function RepeatableMemberFields({
 
             {entry.memberType === "INDIVIDUAL" ? (
               <div className="grid grid-cols-2 gap-4 md:col-span-2 md:grid-cols-3">
-                <FieldShell label="First name" required>
+                <FieldShell label="First name" required htmlFor={`member-${entry.id}-first`}>
                   <Input
+                    id={`member-${entry.id}-first`}
                     value={entry.firstName ?? ""}
                     onChange={(e) =>
                       update(entry.id, { firstName: e.target.value })
                     }
                   />
                 </FieldShell>
-                <FieldShell label="Last name" required>
+                <FieldShell label="Last name" required htmlFor={`member-${entry.id}-last`}>
                   <Input
+                    id={`member-${entry.id}-last`}
                     value={entry.lastName ?? ""}
                     onChange={(e) =>
                       update(entry.id, { lastName: e.target.value })
                     }
                   />
                 </FieldShell>
-                <FieldShell label="Suffix (optional)">
+                <FieldShell label="Suffix (optional)" htmlFor={`member-${entry.id}-suffix`}>
                   <Input
+                    id={`member-${entry.id}-suffix`}
                     value={entry.suffix ?? ""}
                     onChange={(e) => update(entry.id, { suffix: e.target.value })}
                     placeholder="Jr, Sr, III…"
@@ -110,8 +114,10 @@ export function RepeatableMemberFields({
                 label="Entity name"
                 required
                 className="md:col-span-2"
+                htmlFor={`member-${entry.id}-entity-name`}
               >
                 <Input
+                  id={`member-${entry.id}-entity-name`}
                   value={entry.entityName ?? ""}
                   onChange={(e) =>
                     update(entry.id, { entityName: e.target.value })

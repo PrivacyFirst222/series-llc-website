@@ -68,8 +68,9 @@ export function RepeatablePartyFields({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FieldShell label="Type" required>
+            <FieldShell label="Type" required htmlFor={`party-${entry.id}-type`}>
               <select
+                id={`party-${entry.id}-type`}
                 value={entry.personOrEntity}
                 onChange={(e) =>
                   update(entry.id, {
@@ -85,24 +86,27 @@ export function RepeatablePartyFields({
 
             {entry.personOrEntity === "INDIVIDUAL" ? (
               <div className="grid grid-cols-2 gap-4 md:col-span-2 md:grid-cols-3">
-                <FieldShell label="First name" required>
+                <FieldShell label="First name" required htmlFor={`party-${entry.id}-first`}>
                   <Input
+                    id={`party-${entry.id}-first`}
                     value={entry.firstName ?? ""}
                     onChange={(e) =>
                       update(entry.id, { firstName: e.target.value })
                     }
                   />
                 </FieldShell>
-                <FieldShell label="Last name" required>
+                <FieldShell label="Last name" required htmlFor={`party-${entry.id}-last`}>
                   <Input
+                    id={`party-${entry.id}-last`}
                     value={entry.lastName ?? ""}
                     onChange={(e) =>
                       update(entry.id, { lastName: e.target.value })
                     }
                   />
                 </FieldShell>
-                <FieldShell label="Suffix (optional)">
+                <FieldShell label="Suffix (optional)" htmlFor={`party-${entry.id}-suffix`}>
                   <Input
+                    id={`party-${entry.id}-suffix`}
                     value={entry.suffix ?? ""}
                     onChange={(e) => update(entry.id, { suffix: e.target.value })}
                     placeholder="Jr, Sr, III…"
@@ -114,8 +118,10 @@ export function RepeatablePartyFields({
                 label="Business entity name"
                 required
                 className="md:col-span-2"
+                htmlFor={`party-${entry.id}-entity-name`}
               >
                 <Input
+                  id={`party-${entry.id}-entity-name`}
                   value={entry.businessEntityName ?? ""}
                   onChange={(e) =>
                     update(entry.id, {
@@ -150,16 +156,18 @@ export function RepeatablePartyFields({
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FieldShell label="Phone (optional)">
+            <FieldShell label="Phone (optional)" htmlFor={`party-${entry.id}-phone`}>
               <Input
+                id={`party-${entry.id}-phone`}
                 value={entry.phone ?? ""}
                 onChange={(e) =>
                   update(entry.id, { phone: e.target.value })
                 }
               />
             </FieldShell>
-            <FieldShell label="Email (optional)">
+            <FieldShell label="Email (optional)" htmlFor={`party-${entry.id}-email`}>
               <Input
+                id={`party-${entry.id}-email`}
                 type="email"
                 value={entry.email ?? ""}
                 onChange={(e) =>

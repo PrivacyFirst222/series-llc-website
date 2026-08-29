@@ -118,6 +118,7 @@ export function StepName({ data, patch, errors }: StepProps) {
 
       <FieldShell
         label="LLC designator"
+        htmlFor="llc-designator"
         required
         error={errors.llcDesignator}
         helper={
@@ -127,6 +128,7 @@ export function StepName({ data, patch, errors }: StepProps) {
         }
       >
         <select
+          id="llc-designator"
           value={data.llcDesignator}
           onChange={(e) =>
             patch({ llcDesignator: e.target.value as LlcDesignator })
@@ -165,8 +167,9 @@ export function StepName({ data, patch, errors }: StepProps) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FieldShell label="Alternate name #1" error={errors.alternateName1}>
+        <FieldShell label="Alternate name #1" error={errors.alternateName1} htmlFor="alternate-name-1">
           <Input
+            id="alternate-name-1"
             value={data.alternateName1 ?? ""}
             disabled={data.exactNameOnly === true}
             onChange={(e) =>
@@ -174,8 +177,9 @@ export function StepName({ data, patch, errors }: StepProps) {
             }
           />
         </FieldShell>
-        <FieldShell label="Alternate name #2 (optional)" error={errors.alternateName2}>
+        <FieldShell label="Alternate name #2 (optional)" error={errors.alternateName2} htmlFor="alternate-name-2">
           <Input
+            id="alternate-name-2"
             value={data.alternateName2 ?? ""}
             disabled={data.exactNameOnly === true}
             onChange={(e) =>

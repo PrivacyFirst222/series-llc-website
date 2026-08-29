@@ -43,11 +43,13 @@ export function OwnersCard({ owners, isMulti, ownerCountMismatch, patchMember, r
                     ) : null}
                   </div>
                   <Input
+                    aria-label={`Full legal name of owner ${i + 1}`}
                     placeholder="Full legal name"
                     value={m.name ?? ""}
                     onChange={(e) => patchMember(i, { name: e.target.value })}
                   />
                   <Input
+                    aria-label={`Address of owner ${i + 1}`}
                     placeholder="Street address, city, state ZIP"
                     value={m.address ?? ""}
                     onChange={(e) => patchMember(i, { address: e.target.value })}
@@ -122,6 +124,7 @@ export function SpousePairingCard({ owners, couples, unpaired, onPair, onUnpair 
                       <div className="space-y-2 rounded-lg border border-dashed border-border p-3">
                         <div className="flex flex-wrap items-center gap-2 text-sm">
                           <select
+                            aria-label="First spouse"
                             value={pairA}
                             onChange={(e) => setPairA(e.target.value === "" ? "" : Number(e.target.value))}
                             className="rounded-md border border-border bg-background px-2 py-1.5 text-sm"
@@ -135,6 +138,7 @@ export function SpousePairingCard({ owners, couples, unpaired, onPair, onUnpair 
                           </select>
                           <span className="text-muted-foreground">and</span>
                           <select
+                            aria-label="Second spouse"
                             value={pairB}
                             onChange={(e) => setPairB(e.target.value === "" ? "" : Number(e.target.value))}
                             className="rounded-md border border-border bg-background px-2 py-1.5 text-sm"
@@ -223,6 +227,7 @@ export function UnitFieldCards({ units, isMulti, owners, seedSeries, series, con
                     <div key={u.kind === "couple" ? `c${u.ci}` : `m${u.index}`} className="flex items-center gap-3">
                       <span className="w-1/2 truncate text-sm">{u.label}</span>
                       <Input
+                        aria-label={`Contribution to the company by ${u.label}`}
                         placeholder='e.g., "$1,000 cash"'
                         value={unitContribution(u) ?? ""}
                         onChange={(e) => setUnitContribution(u, e.target.value)}
@@ -231,6 +236,7 @@ export function UnitFieldCards({ units, isMulti, owners, seedSeries, series, con
                   ))
                 ) : (
                   <Input
+                    aria-label="Contribution to the company"
                     placeholder='e.g., "$1,000 cash"'
                     value={contributionToCompany ?? ""}
                     onChange={(e) => setContributionToCompany(e.target.value)}

@@ -44,8 +44,10 @@ export function StepPurpose({ data, patch, errors }: StepProps) {
           required
           error={errors.businessPurposeText}
           helper="e.g., 'The practice of law,' 'Accounting services,' 'Practicing medicine.'"
+          htmlFor="professional-purpose"
         >
           <Textarea
+            id="professional-purpose"
             value={data.businessPurposeText}
             onChange={(e) => patch({ businessPurposeText: e.target.value })}
             rows={4}
@@ -102,8 +104,10 @@ export function StepPurpose({ data, patch, errors }: StepProps) {
           required
           error={errors.businessPurposeText}
           helper="This is added alongside the general purpose above — it does not narrow what the LLC may lawfully do."
+          htmlFor="specific-purpose"
         >
           <Textarea
+            id="specific-purpose"
             value={data.businessPurposeText}
             onChange={(e) => patch({ businessPurposeText: e.target.value })}
             rows={4}

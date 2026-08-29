@@ -127,12 +127,14 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
         </p>
         <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
           <input
+            aria-label="Replacement PDF for the manual"
             type="file"
             accept="application/pdf"
             onChange={(e) => setFile(e.target.files?.[0] ?? null)}
             className="block text-sm text-muted-foreground file:mr-3 file:rounded-full file:border file:border-border file:bg-secondary file:px-4 file:py-1.5 file:text-sm file:font-medium"
           />
           <Input
+            aria-label="Edition label"
             placeholder='Edition label, e.g. "Second Edition — January 2027"'
             value={edition}
             onChange={(e) => setEdition(e.target.value)}
