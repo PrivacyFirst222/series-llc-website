@@ -146,6 +146,35 @@ async function adminSession() {
   }
 }
 
+// OFFLINE-001: the Sunbiz SFTP connector needs no credentials (Florida's
+// public anonymous account is hardcoded), so the credential-blanking offline
+// switch never severed it — an "offline" audit with a baseline set would
+// contact sftp.floridados.gov. The sync must refuse before any connection
+// object exists, and the env summary must count Sunbiz among externals.
+{
+  const summary = await fetch(BASE + "/api/dev/env-summary").then((r) => r.json()).catch(() => null);
+  check(
+    "env summary lists the Sunbiz connector",
+    typeof summary?.data?.externals?.sunbiz === "boolean",
+    summary?.data?.externals,
+  );
+  const prior = await fetch(BASE + "/api/dev/sunbiz-sync-state").then((r) => r.json()).catch(() => null);
+  await fetch(BASE + "/api/dev/sunbiz-sync-state", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ baseline_label: "e2e-offline-probe", last_daily: "2026-08-01" }),
+  });
+  const sync = await fetch(BASE + "/api/cron/sunbiz-sync").then((r) => r.json()).catch(() => null);
+  check(
+    "offline sunbiz sync is a no-op before any connection exists",
+    sync?.data?.skippedOffline === true,
+    sync,
+  );
+  await fetch(BASE + "/api/dev/sunbiz-sync-state", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(prior?.data ?? null),
+  });
+}
+
 // 0. Fresh-database boot. The init script only ever ran against databases
 // that already had every table, so a broken fresh init was invisible to this
 // whole suite (P46: an ALTER above its CREATE broke every new environment —

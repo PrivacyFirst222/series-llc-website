@@ -105047,6 +105047,9 @@ var SFTP_USER = "Public";
 var SFTP_PASSWORD = "PubAccess1845!";
 var DAILY_DIR = "/Public/doc/cor";
 async function syncDailies(maxFiles = 15) {
+  if (env.OFFLINE) {
+    return { filesIngested: [], written: 0, skipped: 0, lastDaily: null, skippedOffline: true };
+  }
   const state = await getSyncState();
   if (!state.baselineLabel) {
     return { filesIngested: [], written: 0, skipped: 0, lastDaily: state.lastDaily };
@@ -106471,7 +106474,10 @@ if (!env.isProd) {
           blob: Boolean(env.BLOB_READ_WRITE_TOKEN),
           resend: Boolean(env.RESEND_API_KEY),
           dropbox: Boolean(env.DROPBOX_APP_KEY || env.DROPBOX_REFRESH_TOKEN),
-          smarty: Boolean(env.SMARTY_AUTH_ID)
+          smarty: Boolean(env.SMARTY_AUTH_ID),
+          // Credential-less: the Sunbiz SFTP login is public and hardcoded,
+          // so this connector is external whenever the server is not offline.
+          sunbiz: !env.OFFLINE
         }
       }
     })

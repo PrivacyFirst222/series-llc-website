@@ -28,6 +28,7 @@
  * baseline. That staleness errs in the safe direction: we may call a
  * recently freed name taken, never a taken name clear.
  */
+import { env } from "./env";
 import { getDb } from "./db";
 import { normalizeEntityName } from "../src/components/forms/florida-llc/nameSimilarity";
 
@@ -247,12 +248,21 @@ export interface SyncReport {
   written: number;
   skipped: number;
   lastDaily: string | null;
+  /** True when offline mode refused the sync before any connection existed. */
+  skippedOffline?: boolean;
 }
 
 /** Fetch and ingest every daily file newer than the last one we took.
  *  Bounded per run so a long gap cannot blow the serverless time limit —
  *  the next night's run continues where this one stopped. */
 export async function syncDailies(maxFiles = 15): Promise<SyncReport> {
+  // The SFTP login is Florida's public anonymous account, hardcoded — so the
+  // credential-blanking offline switch never severed this connector, and an
+  // "offline" audit with a baseline set contacted the real host (Codex
+  // OFFLINE-001). Refuse here, before any connection object exists.
+  if (env.OFFLINE) {
+    return { filesIngested: [], written: 0, skipped: 0, lastDaily: null, skippedOffline: true };
+  }
   const state = await getSyncState();
   // No baseline, nothing to top up: without it the mirror answers nothing
   // (the /name-check staleness gate), and starting from 1970 would crawl

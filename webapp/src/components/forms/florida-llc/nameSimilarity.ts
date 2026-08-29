@@ -50,24 +50,6 @@ export function sunbizSearchUrl(name: string): string {
   );
 }
 
-/** Human-readable examples of names Florida would treat as THIS name, for the
- *  "watch for these in the results" hint. */
-export function similarityExamples(name: string): string[] {
-  const base = name.trim();
-  if (!base) return [];
-  const out: string[] = [];
-  out.push(`${base}, Inc.`);
-  out.push(`The ${base}`);
-  if (/\band\b/i.test(base)) out.push(base.replace(/\band\b/i, "&"));
-  else if (/&/.test(base)) out.push(base.replace(/&/g, "and"));
-  const words = base.split(/\s+/);
-  const last = words[words.length - 1];
-  if (last && last.length > 3) {
-    const variant = last.endsWith("s") ? last.slice(0, -1) : last + "s";
-    out.push([...words.slice(0, -1), variant].join(" "));
-  }
-  return out.slice(0, 3);
-}
 
 /** Key identifying a set of names for the availability check: results are
  *  valid only while the names they were computed for are unchanged. */
