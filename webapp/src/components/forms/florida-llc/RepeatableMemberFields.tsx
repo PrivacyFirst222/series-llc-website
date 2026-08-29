@@ -159,4 +159,3 @@ export function RepeatableMemberFields({
   );
 }
 
-export { blank as newMemberEntry };

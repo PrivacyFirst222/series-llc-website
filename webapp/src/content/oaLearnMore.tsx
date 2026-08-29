@@ -4,21 +4,13 @@
  * Format: explanation, then "If you choose X… / If you choose Y…".
  */
 import type { ReactNode } from "react";
+import { P, Choice } from "./oaLearnMoreParts";
 
 export interface LearnMoreScreen {
   title: string;
   body: ReactNode;
 }
 
-const P = ({ children }: { children: ReactNode }) => (
-  <p className="text-sm leading-relaxed text-muted-foreground">{children}</p>
-);
-const Choice = ({ label, children }: { label: string; children: ReactNode }) => (
-  <div className="rounded-lg border border-border bg-secondary/30 p-3">
-    <p className="text-sm font-medium text-foreground">{label}</p>
-    <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{children}</p>
-  </div>
-);
 
 export const LEARN_MORE: Record<string, LearnMoreScreen> = {
   sElection: {

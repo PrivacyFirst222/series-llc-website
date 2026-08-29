@@ -6,7 +6,8 @@ import { Check, Copy, FileUp, Landmark, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
-import { type AdminServiceOrder, serviceIsOpen, serviceLabel } from "./ServiceOrdersSection";
+import { type AdminServiceOrder } from "./ServiceOrdersSection";
+import { serviceIsOpen, serviceLabel } from "./serviceOrders.helpers";
 
 interface FilingField {
   key: string;

@@ -2,7 +2,8 @@ import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FieldShell } from "./FieldShell";
-import { AddressFieldsBlock, US_STATES } from "./AddressFields";
+import { AddressFieldsBlock } from "./AddressFields";
+import { US_STATES } from "./us-states";
 import type { PartyEntry, PartyKind } from "./types";
 
 interface RepeatablePartyFieldsProps {
@@ -188,4 +189,3 @@ export function RepeatablePartyFields({
   );
 }
 
-export { blank as newPartyEntry };

@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { api } from "@/lib/api";
+import { summaryOf } from "./serviceOrders.helpers";
 
 interface SElectionShareholderView {
   name: string;
@@ -51,38 +52,15 @@ interface ServiceDetail {
   ssns: string[] | null;
 }
 
-export const money = (cents: number) => `$${(cents / 100).toFixed(2)}`;
 const day = (iso: string | null) =>
   iso ? new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "—";
 
-export const STATUS_STYLE: Record<string, string> = {
-  fulfilled: "bg-trust/10 text-trust",
-  in_progress: "bg-amber-100 text-amber-900",
-  awaiting_info: "bg-secondary text-muted-foreground",
-  pending_payment: "bg-secondary text-muted-foreground",
-};
 
-export const serviceIsOpen = (s: AdminServiceOrder) => s.status === "awaiting_info" || s.status === "in_progress";
 
 /** The one-line name for a service order. The surrounding card or dialog
  *  already names the LLC, so series names are shortened to their own part —
  *  "Jimmy Flanagan, LLC - PS 3" reads "PS 3". Never truncated, only wrapped. */
-export function serviceLabel(s: AdminServiceOrder, llcName: string, long = false): string {
-  const short = (name?: string) => {
-    if (!name) return "";
-    const rest = name.startsWith(llcName) ? name.slice(llcName.length) : name;
-    return rest.replace(/^[\s,–—-]+/, "").trim() || name;
-  };
-  if (s.type === "ein") return s.details.target === "series" ? `EIN — ${short(s.details.seriesName)}` : "EIN";
-  if (s.type === "s-election") return long ? "S Election (2553)" : "S Election";
-  return `${short(s.details.seriesName) || "Series"} Designation`;
-}
 
-export function summaryOf(o: { type: string; details: AdminServiceOrder["details"]; llc_name: string }): string {
-  if (o.type === "series") return o.details.seriesName ?? o.llc_name;
-  if (o.type === "s-election") return `S Election (2553) — ${o.llc_name}`;
-  return `EIN — ${o.details.target === "series" ? o.details.seriesName ?? "series" : o.llc_name}`;
-}
 
 /** The fulfill flow for one service order, opened from a company card. The
  *  caller owns which order is being viewed; everything else — secret detail

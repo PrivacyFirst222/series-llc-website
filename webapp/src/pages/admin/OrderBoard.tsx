@@ -5,11 +5,8 @@ import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import OrderDetail from "./OrderDetail";
 import {
-  type AdminServiceOrder,
-  ServiceFulfillDialog,
-  serviceIsOpen,
-  serviceLabel,
-} from "./ServiceOrdersSection";
+  type AdminServiceOrder, ServiceFulfillDialog } from "./ServiceOrdersSection";
+import { serviceIsOpen, serviceLabel } from "./serviceOrders.helpers";
 
 export interface BoardOrder {
   id: string;
@@ -31,7 +28,7 @@ export interface BoardOrder {
 
 /** Days since the order was placed — Adam's measure, not days in the column: a
  *  client counts from when they paid, and so should we. Amber at 5, red at 10. */
-export function ageInDays(iso: string): number {
+function ageInDays(iso: string): number {
   const then = new Date(iso).getTime();
   return Math.floor((Date.now() - then) / 86_400_000);
 }
