@@ -1,0 +1,48 @@
+# The doorman: every push and pull request runs the complete verification —
+# typecheck, lint, both test suites (274 e2e checks against a server booted
+# on a virgin database), and all seven document gates — on a clean machine.
+# Before this existed, the suite ran only when one person remembered to run
+# it on one Mac.
+#
+# The server is started with E2E_OFFLINE=1: every external integration is
+# severed at the environment layer, and the suite itself refuses to run
+# against a server with live integrations. No secrets exist in CI, and none
+# are needed.
+name: check
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        working-directory: webapp
+        run: bun install --frozen-lockfile
+
+      - name: Start the API offline on a virgin database
+        working-directory: webapp
+        run: |
+          E2E_OFFLINE=1 bun run server/dev.ts > /tmp/dev-server.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:3000/api/config > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          echo "server never became ready"; cat /tmp/dev-server.log; exit 1
+
+      - name: Run everything
+        working-directory: webapp
+        run: bun run check
+
+      - name: Server log on failure
+        if: failure()
+        run: tail -100 /tmp/dev-server.log
