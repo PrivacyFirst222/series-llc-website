@@ -182,6 +182,19 @@ if (!env.isProd) {
 
   // Dev-only: backdate a client's formation payment so e2e can exercise the
   // S election 65-day ordering window without waiting.
+  // Dev-only: reset a client's OA profile (answers AND revision) so the UI
+  // walkthrough harness can replay deterministically. Added when a reset via
+  // a huge rev poisoned the monotonic guard and every later autosave was
+  // silently ignored as stale — correct server behavior, unusable harness.
+  app.post("/dev/reset-oa", async (c) => {
+    const { email } = (await c.req.json()) as { email: string };
+    const db = await getDb();
+    const rows = await db.query<{ id: string }>("SELECT id FROM clients WHERE email = $1", [email.toLowerCase()]);
+    if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+    await db.query("UPDATE oa_profiles SET answers = '{}'::jsonb, rev = 0 WHERE client_id = $1", [rows[0].id]);
+    return c.json({ data: { ok: true } });
+  });
+
   app.post("/dev/age-formation", async (c) => {
     const { email, days } = (await c.req.json()) as { email: string; days: number };
     const db = await getDb();

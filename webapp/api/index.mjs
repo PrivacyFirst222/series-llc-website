@@ -108945,6 +108945,14 @@ function registerOpsRoutes(app2) {
       );
       return c.json({ data: { token } });
     });
+    app2.post("/dev/reset-oa", async (c) => {
+      const { email } = await c.req.json();
+      const db = await getDb();
+      const rows = await db.query("SELECT id FROM clients WHERE email = $1", [email.toLowerCase()]);
+      if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+      await db.query("UPDATE oa_profiles SET answers = '{}'::jsonb, rev = 0 WHERE client_id = $1", [rows[0].id]);
+      return c.json({ data: { ok: true } });
+    });
     app2.post("/dev/age-formation", async (c) => {
       const { email, days } = await c.req.json();
       const db = await getDb();
