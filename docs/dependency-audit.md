@@ -9,10 +9,20 @@ applying every compatible update — 46 advisories became 31 (19 high,
 12 moderate); the 29 Aug scaffolding removal took it to 28 (18 high, 10
 moderate).
 
-Everything remaining requires a breaking major-version jump (Vite 5→7,
-React Router 6→7, and their toolchains). The pre-launch decision, per the
-audit's own recommendation: update compatibly, document reachability,
-schedule the majors after launch.
+UPDATE, 29 Aug 2026 — the major upgrades ran (Vite 5→8, React Router 6→7,
+their toolchains): 28 advisories became 15, and the runtime advisory count
+is ZERO. Both React Router advisories are fixed by version rather than
+argued unreachable; the esbuild/rollup/postcss/nanoid advisories left with
+Vite 5. The router's v7 runtime was verified in the browser: navigation
+works and the migration warnings are gone.
+
+The remaining 15 (12 high, 3 moderate) live entirely in four glob/cache
+utilities inside the eslint and tailwind toolchains (brace-expansion,
+minimatch, picomatch, flatted) — build-time-only ReDoS, never shipped to
+production. Version-pinning overrides were tried and deliberately reverted:
+different tools need these utilities at different majors, and forcing one
+version risks breaking the toolchain for zero production gain. They will
+clear naturally as eslint/tailwind release. 
 
 ## Remaining advisories, by reachability
 
