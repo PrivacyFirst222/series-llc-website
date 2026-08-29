@@ -60,7 +60,28 @@ async function createDb(): Promise<Db> {
   };
 }
 
-const SCHEMA = `
+/**
+ * Ordered, recorded migrations — the title-chain model.
+ *
+ * Each entry runs once per database, in id order, and is recorded in
+ * schema_migrations when it completes. The old model was one ever-growing
+ * SQL string re-run in full on every cold start: it worked, but a change
+ * appended in the wrong place broke every FRESH database while every
+ * existing one sailed on (P46), and there was no record of what had been
+ * applied when.
+ *
+ * Rules for adding a migration:
+ *  - NEVER edit an existing entry — append a new one with the next id.
+ *  - Keep statements idempotent (IF NOT EXISTS / ADD COLUMN IF NOT EXISTS):
+ *    the Neon HTTP driver cannot wrap a migration in a transaction, so a
+ *    failure mid-migration leaves it unrecorded and it will re-run whole.
+ *  - Statements are split on semicolons AFTER comment lines are stripped,
+ *    so comments may contain semicolons (one already broke the loader).
+ *  - An ALTER must FOLLOW its table's CREATE (P46).
+ * The fresh-database boot check in the e2e suite proves every migration
+ * path from an empty database on every run — and in CI, on every push.
+ */
+const MIGRATION_001_INITIAL = `
 CREATE TABLE IF NOT EXISTS clients (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   email text UNIQUE NOT NULL,
@@ -250,11 +271,50 @@ CREATE TABLE IF NOT EXISTS fl_sync_state (
 );
 `;
 
+const MIGRATIONS: { id: number; name: string; sql: string }[] = [
+  { id: 1, name: "initial-schema", sql: MIGRATION_001_INITIAL },
+  // Append future migrations here with the next id. Never edit an entry.
+];
+
+/** Strip full-line and trailing `--` comments, then split on semicolons.
+ *  Splitting BEFORE stripping once fed half a comment to Postgres because
+ *  the comment contained a semicolon. */
+function statements(sql: string): string[] {
+  const noComments = sql
+    .split("\n")
+    .map((line) => {
+      const i = line.indexOf("--");
+      return i === -1 ? line : line.slice(0, i);
+    })
+    .join("\n");
+  return noComments.split(";").map((s) => s.trim()).filter(Boolean);
+}
+
 export async function getDb(): Promise<Db> {
   if (!db) db = await createDb();
   if (!migrated) {
-    for (const stmt of SCHEMA.split(";").map((s) => s.trim()).filter(Boolean)) {
-      await db.query(stmt);
+    await db.query(
+      `CREATE TABLE IF NOT EXISTS schema_migrations (
+         id int PRIMARY KEY,
+         name text NOT NULL,
+         applied_at timestamptz NOT NULL DEFAULT now()
+       )`,
+    );
+    const done = new Set(
+      (await db.query<{ id: number }>("SELECT id FROM schema_migrations")).map((r) => Number(r.id)),
+    );
+    for (const m of [...MIGRATIONS].sort((a, b) => a.id - b.id)) {
+      if (done.has(m.id)) continue;
+      for (const stmt of statements(m.sql)) {
+        await db.query(stmt);
+      }
+      // Recorded only after every statement succeeded; a mid-migration
+      // failure leaves it unrecorded and the whole migration re-runs, which
+      // idempotent statements make safe.
+      await db.query(
+        "INSERT INTO schema_migrations (id, name) VALUES ($1, $2) ON CONFLICT (id) DO NOTHING",
+        [m.id, m.name],
+      );
     }
     migrated = true;
   }

@@ -99591,7 +99591,7 @@ async function createDb() {
     }
   };
 }
-var SCHEMA = `
+var MIGRATION_001_INITIAL = `
 CREATE TABLE IF NOT EXISTS clients (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   email text UNIQUE NOT NULL,
@@ -99780,11 +99780,39 @@ CREATE TABLE IF NOT EXISTS fl_sync_state (
   updated_at timestamptz
 );
 `;
+var MIGRATIONS = [
+  { id: 1, name: "initial-schema", sql: MIGRATION_001_INITIAL }
+  // Append future migrations here with the next id. Never edit an entry.
+];
+function statements(sql) {
+  const noComments = sql.split("\n").map((line) => {
+    const i = line.indexOf("--");
+    return i === -1 ? line : line.slice(0, i);
+  }).join("\n");
+  return noComments.split(";").map((s) => s.trim()).filter(Boolean);
+}
 async function getDb() {
   if (!db) db = await createDb();
   if (!migrated) {
-    for (const stmt of SCHEMA.split(";").map((s) => s.trim()).filter(Boolean)) {
-      await db.query(stmt);
+    await db.query(
+      `CREATE TABLE IF NOT EXISTS schema_migrations (
+         id int PRIMARY KEY,
+         name text NOT NULL,
+         applied_at timestamptz NOT NULL DEFAULT now()
+       )`
+    );
+    const done = new Set(
+      (await db.query("SELECT id FROM schema_migrations")).map((r) => Number(r.id))
+    );
+    for (const m2 of [...MIGRATIONS].sort((a2, b2) => a2.id - b2.id)) {
+      if (done.has(m2.id)) continue;
+      for (const stmt of statements(m2.sql)) {
+        await db.query(stmt);
+      }
+      await db.query(
+        "INSERT INTO schema_migrations (id, name) VALUES ($1, $2) ON CONFLICT (id) DO NOTHING",
+        [m2.id, m2.name]
+      );
     }
     migrated = true;
   }
