@@ -46,6 +46,17 @@ interface StoredDraft {
   visited?: number[];
 }
 
+/** The pricing page's two "Get started" cards already asked new-vs-convert,
+ *  and every button on the site routes through pricing — so the wizard skips
+ *  its own copy of that question when the card's choice arrives in the URL.
+ *  A direct /form-llc visit carries no param and still gets the question:
+ *  hiding it must never leave filingPath unanswered. Read once at load: the
+ *  choice should not evaporate when React Router touches the query string. */
+const PATH_PRESET: "NEW" | "CONVERT" | null = (() => {
+  const p = new URLSearchParams(window.location.search).get("path");
+  return p === "new" ? "NEW" : p === "convert" ? "CONVERT" : null;
+})();
+
 function loadDraft(initialData?: FloridaLLCFormData): {
   data: FloridaLLCFormData;
   step: number;
@@ -91,14 +102,25 @@ export function FloridaLLCFormationForm({
   initialData,
   onSubmit,
 }: FormProps) {
-  const [data, setData] = useState<FloridaLLCFormData>(() => loadDraft(initialData).data);
-  const [stepIndex, setStepIndex] = useState<number>(() => loadDraft(initialData).step);
-  const [maxStep, setMaxStep] = useState<number>(() => loadDraft(initialData).max);
+  const [data, setData] = useState<FloridaLLCFormData>(() => {
+    const d = loadDraft(initialData).data;
+    // The card the customer just clicked is their latest answer — it wins
+    // over whatever an older draft recorded.
+    return PATH_PRESET ? { ...d, filingPath: PATH_PRESET } : d;
+  });
+  const [stepIndex, setStepIndex] = useState<number>(() => {
+    const s0 = loadDraft(initialData).step;
+    return PATH_PRESET && s0 === 0 ? 1 : s0;
+  });
+  const [maxStep, setMaxStep] = useState<number>(() => {
+    const m0 = loadDraft(initialData).max;
+    return PATH_PRESET ? Math.max(m0, 1) : m0;
+  });
   // A tick means "you have seen this step and nothing on it is outstanding".
   // Completeness alone is not enough: several steps validate at their defaults,
   // so ticking those would claim a question was answered that was never shown.
   const [visited, setVisited] = useState<Set<number>>(
-    () => new Set(loadDraft(initialData).visited),
+    () => new Set([...loadDraft(initialData).visited, ...(PATH_PRESET ? [1] : [])]),
   );
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -231,6 +253,7 @@ export function FloridaLLCFormationForm({
   // and ownership is collected once — in the operating agreement
   // questionnaire, whose first question routes between the masters.
   const stepHidden = (i: number): boolean =>
+    (STEPS[i]?.key === "path" && PATH_PRESET !== null) ||
     (STEPS[i]?.key === "managers" && data.managementStructure === "MEMBER_MANAGED") ||
     (STEPS[i]?.key === "members" && data.managementStructure === "MANAGER_MANAGED");
 
@@ -603,7 +626,7 @@ export function FloridaLLCFormationForm({
                     type="button"
                     variant="outline"
                     onClick={goBack}
-                    disabled={stepIndex === 0}
+                    disabled={STEPS.slice(0, stepIndex).every((_, j) => stepHidden(j))}
                     className="rounded-full"
                   >
                     <ArrowLeft className="mr-1.5 h-4 w-4" />

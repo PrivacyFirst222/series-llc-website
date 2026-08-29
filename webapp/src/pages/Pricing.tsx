@@ -114,7 +114,7 @@ export default function Pricing() {
                       : "bg-primary text-primary-foreground hover:bg-primary/90"
                   }`}
                 >
-                  <Link to="/form-llc">
+                  <Link to={`/form-llc?path=${pkg.key}`}>
                     Get started
                     <ArrowUpRight className="ml-1.5 h-4 w-4" />
                   </Link>
