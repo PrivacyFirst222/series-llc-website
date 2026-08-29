@@ -5,7 +5,6 @@ import { toast } from "@/components/ui/use-toast";
 import { defaultFormData } from "./defaults";
 import { validateStep } from "./stepValidation";
 import { api, ApiError } from "@/lib/api";
-import { buildPayload } from "./buildPayload";
 import { FeeEstimate } from "./FeeEstimate";
 import { ReviewStep } from "./ReviewStep";
 import { StepIntro } from "./sections/StepIntro";

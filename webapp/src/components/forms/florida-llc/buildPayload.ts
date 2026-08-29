@@ -2,9 +2,6 @@ import { canonicalizeSeriesName, buildFinalLlcName, calculateEstimatedFees } fro
 import { fullPersonName } from "./validation";
 import type { FloridaLLCFormData, SubmissionPayload } from "./types";
 
-const joinName = (first?: string, last?: string): string =>
-  [first, last].map((x) => (x ?? "").trim()).filter(Boolean).join(" ");
-
 export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
   const isConversion = data.filingPath === "CONVERT";
   const fees = calculateEstimatedFees({

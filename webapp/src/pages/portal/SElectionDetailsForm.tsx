@@ -2,23 +2,15 @@
 // 29 Aug 2026 (the one mechanical seam in that file; the main card is a
 // single stateful component and stays whole).
 import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { PlusCircle, Landmark, ShoppingBag, Lock, FileCheck2, Trash2, Download, CheckCircle2, FileSignature } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import { PlusCircle, Trash2, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { DialogFooter } from "@/components/ui/dialog";
 import { api, ApiError } from "@/lib/api";
 import { AddressAutocomplete } from "@/components/forms/florida-llc/AddressAutocomplete";
-import { formatDateTime } from "@/lib/datetime";
-import type { ServiceOrder, ShareholderRow, StoredShareholder } from "./ServicesCard";
+
+import type { ServiceOrder, ShareholderRow } from "./ServicesCard";
 
 const EMPTY_ROW: ShareholderRow = { name: "", address: "", percentage: "", dateAcquired: "", ssn: "" };
 

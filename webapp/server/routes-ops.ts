@@ -3,68 +3,20 @@
 // mutable across modules). Routes register inside registerOpsRoutes(app),
 // which app.ts calls after creating the app — no circular imports.
 import { Hono } from "hono";
-import { z } from "zod";
-import { orderFormSchema } from "./validation";
-import { buildPayload } from "../src/components/forms/florida-llc/buildPayload";
-import { validateRegisteredAgentAddress } from "../src/components/forms/florida-llc/validation";
-import type { FloridaLLCFormData } from "../src/components/forms/florida-llc/types";
+
 import { getDb } from "./db";
 import { env } from "./env";
-import { listBackups, runDbBackup } from "./backup";
-import { mirrorStatus, runFileMirror } from "./dropbox";
-import {
-  priceOrder,
-  EIN_FEE_CENTS,
-  S_ELECTION_FEE_CENTS,
-  S_ELECTION_WINDOW_DAYS,
-  SERIES_ADDON_PREP_CENTS,
-  SERIES_ADDON_STATE_CENTS,
-} from "./pricing";
-import { buildSElectionPackage, type SElectionDetails } from "./s-election";
-import {
-  sharesAreComplete,
-  shareLabel,
-  shareValue,
-  type OwnershipMode,
-  type OwnershipShare,
-} from "../src/lib/ownership";
-import { createCheckout, verifyWebhookSignature } from "./square";
-import { hashPassword, verifyPassword, newToken, hashToken, encryptSecret, decryptSecret } from "./crypto";
-import { hasProtectedSeriesPhrase } from "../src/components/forms/florida-llc/validation";
-import { assembleNewSeries } from "./new-series";
-import { stampEastern, stampForFilename } from "./datetime";
-import { assembleOa, oaVersion, OA_TEMPLATE_VERSION, type OaInputs } from "./oa";
-import { renderMarkdownPdf, stampExistingPdf } from "./pdf-render";
-import { createSession, getSession, destroySession, rateLimit, clientIp } from "./auth";
-import { checkName, getSyncState, syncDailies, unavailableNames } from "./sunbiz";
-import { createHash } from "node:crypto";
-import ownersManualMd from "../../docs/owners-manual.md";
-import { deleteFile, putFile, readFileStream } from "./storage";
-import {
-  sendMail,
-  welcomeEmail,
-  resetEmail,
-  newDocumentEmail,
-  orderPaidEmail,
-  raCancellationEmail,
-  raCancellationAdminEmail,
-  serviceOrderClientEmail,
-  serviceOrderAdminEmail,
-  einDetailsSubmittedAdminEmail,
-  passwordChangedEmail,
-  verifyNewEmail,
-  emailChangeRequestedEmail,
-  emailChangedEmail,
-  serviceFulfilledClientEmail,
-  sElectionReadyEmail,
-  llcFormedEmail,
-} from "./email";
-import { filingGroups, seriesNames } from "./filing";
-import { err, testHooks, MAX_UPLOAD_BYTES, looksLikePdf, maskEmail, requireAdmin } from "./shared";
-import { fulfillPaidOrder, fulfillPaidServiceOrder } from "./routes-payments";
-import { oaSeed, purgeExpiredSElections } from "./routes-portal";
-import { refreshOwnersManual } from "./routes-admin";
+import { runDbBackup } from "./backup";
+import { runFileMirror } from "./dropbox";
 
+import { newToken } from "./crypto";
+
+import { syncDailies } from "./sunbiz";
+
+import { err, testHooks } from "./shared";
+import { fulfillPaidOrder, fulfillPaidServiceOrder } from "./routes-payments";
+import { purgeExpiredSElections } from "./routes-portal";
+import { refreshOwnersManual } from "./routes-admin";
 
 export function registerOpsRoutes(app: Hono) {
 
@@ -102,7 +54,6 @@ if (!env.isProd) {
   });
 }
 
-
 // Dev-only stand-in for the Square webhook while no Square account is connected.
 if (!env.SQUARE_ACCESS_TOKEN && !env.isProd) {
   app.post("/dev/simulate-payment", async (c) => {
@@ -117,7 +68,6 @@ if (!env.SQUARE_ACCESS_TOKEN && !env.isProd) {
     return c.json({ data: { ok: true } });
   });
 }
-
 
 // Dev-only: the e2e suite's window into the database. The suite must NEVER
 // open the database itself — with PGlite the server process is the embedded
@@ -186,7 +136,6 @@ if (!env.isProd) {
     return c.json({ data: { ok: true } });
   });
 }
-
 
 // Dev-only: mint a set-password token so e2e can walk the portal without
 // reading the emailed link from the API process's stdout.
@@ -258,7 +207,6 @@ if (!env.isProd) {
   });
 }
 
-
 /** Nightly: republish the manual if this deployment carries a newer master. */
 app.get("/cron/library-refresh", async (c) => {
   const auth = c.req.header("authorization") ?? "";
@@ -268,7 +216,6 @@ app.get("/cron/library-refresh", async (c) => {
   const r = await refreshOwnersManual(false);
   return c.json({ data: r });
 });
-
 
 /** Nightly top-up of the fl_entities mirror from the Division's SFTP dailies.
  *  Same auth as /cron/purge. Fetches every YYYYMMDDc.txt newer than the last
@@ -281,7 +228,6 @@ app.get("/cron/sunbiz-sync", async (c) => {
   const report = await syncDailies();
   return c.json({ data: report });
 });
-
 
 /** Daily sweep so expired packages are destroyed even if nobody signs in.
  *  Vercel cron calls this; a shared secret keeps it from being public. */
@@ -298,7 +244,6 @@ app.get("/cron/purge", async (c) => {
   return c.json({ data: { purged } });
 });
 
-
 /** Nightly logical dump of the irreplaceable tables to private Blob storage —
  *  the copy that exists OUTSIDE the database's own company. Same auth as the
  *  other crons. Restore: docs/db-restore.md. */
@@ -311,7 +256,6 @@ app.get("/cron/db-backup", async (c) => {
   console.log(`[backup] ${result.key}: ${result.sizeBytes} bytes`, result.rowCounts);
   return c.json({ data: result });
 });
-
 
 /** Nightly Dropbox mirror of client files — the offsite copy of what
  *  otherwise exists only in Vercel Blob. Same auth as the other crons. */

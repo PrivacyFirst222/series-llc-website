@@ -10,60 +10,19 @@ import { validateRegisteredAgentAddress } from "../src/components/forms/florida-
 import type { FloridaLLCFormData } from "../src/components/forms/florida-llc/types";
 import { getDb } from "./db";
 import { env } from "./env";
-import { listBackups, runDbBackup } from "./backup";
-import { mirrorStatus, runFileMirror } from "./dropbox";
-import {
-  priceOrder,
-  EIN_FEE_CENTS,
-  S_ELECTION_FEE_CENTS,
-  S_ELECTION_WINDOW_DAYS,
-  SERIES_ADDON_PREP_CENTS,
-  SERIES_ADDON_STATE_CENTS,
-} from "./pricing";
-import { buildSElectionPackage, type SElectionDetails } from "./s-election";
-import {
-  sharesAreComplete,
-  shareLabel,
-  shareValue,
-  type OwnershipMode,
-  type OwnershipShare,
-} from "../src/lib/ownership";
+
+import { priceOrder, EIN_FEE_CENTS, S_ELECTION_FEE_CENTS } from "./pricing";
+
 import { createCheckout, verifyWebhookSignature } from "./square";
-import { hashPassword, verifyPassword, newToken, hashToken, encryptSecret, decryptSecret } from "./crypto";
-import { hasProtectedSeriesPhrase } from "../src/components/forms/florida-llc/validation";
-import { assembleNewSeries } from "./new-series";
-import { stampEastern, stampForFilename } from "./datetime";
-import { assembleOa, oaVersion, OA_TEMPLATE_VERSION, type OaInputs } from "./oa";
-import { renderMarkdownPdf, stampExistingPdf } from "./pdf-render";
-import { createSession, getSession, destroySession, rateLimit, clientIp } from "./auth";
-import { checkName, getSyncState, syncDailies, unavailableNames } from "./sunbiz";
-import { createHash } from "node:crypto";
-import ownersManualMd from "../../docs/owners-manual.md";
-import { deleteFile, putFile, readFileStream } from "./storage";
-import {
-  sendMail,
-  welcomeEmail,
-  resetEmail,
-  newDocumentEmail,
-  orderPaidEmail,
-  raCancellationEmail,
-  raCancellationAdminEmail,
-  serviceOrderClientEmail,
-  serviceOrderAdminEmail,
-  einDetailsSubmittedAdminEmail,
-  passwordChangedEmail,
-  verifyNewEmail,
-  emailChangeRequestedEmail,
-  emailChangedEmail,
-  serviceFulfilledClientEmail,
-  sElectionReadyEmail,
-  llcFormedEmail,
-} from "./email";
-import { filingGroups, seriesNames } from "./filing";
+import { newToken } from "./crypto";
+
+import { rateLimit, clientIp } from "./auth";
+import { checkName, getSyncState, unavailableNames } from "./sunbiz";
+
+import { sendMail, welcomeEmail, orderPaidEmail, serviceOrderClientEmail, serviceOrderAdminEmail } from "./email";
+
 import { personLegalName } from "./routes-portal";
-import { err, testHooks, MAX_UPLOAD_BYTES, looksLikePdf, maskEmail, requireAdmin } from "./shared";
-
-
+import { err, testHooks } from "./shared";
 
 /* ------------------------------- orders ------------------------------- */
 
@@ -71,7 +30,6 @@ import { err, testHooks, MAX_UPLOAD_BYTES, looksLikePdf, maskEmail, requireAdmin
  *  until then the form shows a retryable error and keeps the local draft. */
 export const orderingEnabled = () =>
   env.isProd ? Boolean(env.DATABASE_URL && env.SQUARE_ACCESS_TOKEN) : true;
-
 
 /* ------------------------- payment fulfillment ------------------------- */
 
@@ -167,7 +125,6 @@ export async function fulfillPaidOrder(orderId: string, squarePaymentId: string 
   }
 }
 
-
 /** Marks a portal service order paid and routes it to the right next state. */
 export async function fulfillPaidServiceOrder(serviceOrderId: string, squarePaymentId: string | null): Promise<void> {
   const db = await getDb();
@@ -226,7 +183,6 @@ export async function fulfillPaidServiceOrder(serviceOrderId: string, squarePaym
   }
 }
 
-
 /** Square tells us what it actually captured. If that disagrees with what we
  *  charged, the safe move is to deliver NOTHING and put a human on it: a
  *  mismatch is a partial capture, a currency surprise, or a payment attached
@@ -247,7 +203,6 @@ export function moneyMismatch(
   return null;
 }
 
-
 export async function alertMoneyMismatch(reason: string, squareOrderId: string, paymentId: string): Promise<void> {
   console.error(`[webhook] payment does not match the order — nothing fulfilled: ${reason} (square order ${squareOrderId}, payment ${paymentId})`);
   if (!env.ADMIN_NOTIFY_EMAIL) return;
@@ -261,7 +216,6 @@ export async function alertMoneyMismatch(reason: string, squareOrderId: string, 
   }).catch((e) => console.error("[webhook] mismatch alert failed:", e));
 }
 
-
 /* ---------------------------- address verify ---------------------------- */
 
 export const verifyAddressSchema = z.object({
@@ -274,9 +228,7 @@ export const verifyAddressSchema = z.object({
 
 export function registerPaymentRoutes(app: Hono) {
 
-
 app.get("/config", (c) => c.json({ data: { ordering: orderingEnabled() } }));
-
 
 app.post("/orders", async (c) => {
   if (!orderingEnabled()) {
@@ -400,7 +352,6 @@ app.post("/orders", async (c) => {
   return c.json({ data: { orderId, checkoutUrl: checkout.url, totalCents: priced.totalCents } });
 });
 
-
 app.get("/orders/:id/status", async (c) => {
   const db = await getDb();
   // Unauthenticated by design — the confirmation page polls it with only the
@@ -414,7 +365,6 @@ app.get("/orders/:id/status", async (c) => {
   if (rows.length === 0) return c.json(err("Order not found", "NOT_FOUND"), 404);
   return c.json({ data: { status: rows[0].status, llcName: rows[0].llc_name } });
 });
-
 
 app.post("/square/webhook", async (c) => {
   const rawBody = await c.req.text();
@@ -476,7 +426,6 @@ app.post("/square/webhook", async (c) => {
   }
   return c.json({ data: { ok: true } });
 });
-
 
 /** USPS-certified (CASS) verification via Smarty. Never blocks: with no
  *  credentials, on vendor errors, or on timeouts the answer is "skipped" and
@@ -554,7 +503,6 @@ app.post("/address/verify", async (c) => {
   }
 });
 
-
 /** Confirmation-page "resend my portal invitation" — only for paid orders
  *  whose client has not yet set a password. */
 app.post("/orders/:id/resend-welcome", async (c) => {
@@ -587,7 +535,6 @@ app.post("/orders/:id/resend-welcome", async (c) => {
   }
   return c.json({ data: { ok: true } });
 });
-
 
 /** Name-availability check against our mirror of the Division of
  *  Corporations' public data files (server/sunbiz.ts). Public: the intake

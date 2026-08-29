@@ -220,12 +220,6 @@ function chooseNumber(s: string, key: string, singular: boolean): string {
   return s.replace(drop, "").replace(keep, (_m, inner: string) => inner);
 }
 
-/** Replace a whole `## HEADING` section (through the next ## or end). */
-function replaceSection(s: string, heading: string, replacement: string, label: string): string {
-  const re = new RegExp(`## ${heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[\\s\\S]*?(?=\n## |$)`);
-  must(s, re, label);
-  return s.replace(re, replacement);
-}
 
 function extractSection(s: string, heading: string, label: string): { doc: string; section: string } {
   const re = new RegExp(`## ${heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[\\s\\S]*?(?=\n## |$)`);
@@ -261,7 +255,6 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
     inputs.version === "member-single" || inputs.version === "member-single-s";
   const isMulti = !isSingle;
   /** The S corporation forms hardwire identical ownership across all series. */
-  const isSCorp =
     inputs.version === "s" || inputs.version === "member-s" ||
     inputs.version === "single-s" || inputs.version === "member-single-s";
   /** Member-managed forms have no Manager to name. */

@@ -16,7 +16,10 @@
 
     /* Linting */
     "strict": true,
-    "noUnusedLocals": false,
+    // Locked on 29 Aug 2026: the split left 216 dead imports behind and
+    // nine dead locals had accumulated from earlier fixes (Codex DEAD-010).
+    // Dead code cannot ride along silently anymore.
+    "noUnusedLocals": true,
     "noUnusedParameters": false,
     "noImplicitAny": false,
     "noFallthroughCasesInSwitch": false,

@@ -4,31 +4,14 @@
 // which app.ts calls after creating the app — no circular imports.
 import { Hono } from "hono";
 import { z } from "zod";
-import { orderFormSchema } from "./validation";
-import { buildPayload } from "../src/components/forms/florida-llc/buildPayload";
-import { validateRegisteredAgentAddress } from "../src/components/forms/florida-llc/validation";
-import type { FloridaLLCFormData } from "../src/components/forms/florida-llc/types";
+
 import { getDb } from "./db";
 import { env } from "./env";
-import { listBackups, runDbBackup } from "./backup";
-import { mirrorStatus, runFileMirror } from "./dropbox";
-import {
-  priceOrder,
-  EIN_FEE_CENTS,
-  S_ELECTION_FEE_CENTS,
-  S_ELECTION_WINDOW_DAYS,
-  SERIES_ADDON_PREP_CENTS,
-  SERIES_ADDON_STATE_CENTS,
-} from "./pricing";
-import { buildSElectionPackage, type SElectionDetails } from "./s-election";
-import {
-  sharesAreComplete,
-  shareLabel,
-  shareValue,
-  type OwnershipMode,
-  type OwnershipShare,
-} from "../src/lib/ownership";
-import { createCheckout, verifyWebhookSignature } from "./square";
+
+import { EIN_FEE_CENTS, S_ELECTION_FEE_CENTS, S_ELECTION_WINDOW_DAYS, SERIES_ADDON_PREP_CENTS, SERIES_ADDON_STATE_CENTS } from "./pricing";
+import { buildSElectionPackage } from "./s-election";
+import { sharesAreComplete, shareLabel, shareValue, type OwnershipMode, type OwnershipShare } from "../src/lib/ownership";
+import { createCheckout } from "./square";
 import { hashPassword, verifyPassword, newToken, hashToken, encryptSecret, decryptSecret } from "./crypto";
 import { hasProtectedSeriesPhrase } from "../src/components/forms/florida-llc/validation";
 import { assembleNewSeries } from "./new-series";
@@ -36,38 +19,15 @@ import { stampEastern, stampForFilename } from "./datetime";
 import { assembleOa, oaVersion, OA_TEMPLATE_VERSION, type OaInputs } from "./oa";
 import { renderMarkdownPdf, stampExistingPdf } from "./pdf-render";
 import { createSession, getSession, destroySession, rateLimit, clientIp } from "./auth";
-import { checkName, getSyncState, syncDailies, unavailableNames } from "./sunbiz";
-import { createHash } from "node:crypto";
-import ownersManualMd from "../../docs/owners-manual.md";
+
 import { deleteFile, putFile, readFileStream } from "./storage";
-import {
-  sendMail,
-  welcomeEmail,
-  resetEmail,
-  newDocumentEmail,
-  orderPaidEmail,
-  raCancellationEmail,
-  raCancellationAdminEmail,
-  serviceOrderClientEmail,
-  serviceOrderAdminEmail,
-  einDetailsSubmittedAdminEmail,
-  passwordChangedEmail,
-  verifyNewEmail,
-  emailChangeRequestedEmail,
-  emailChangedEmail,
-  serviceFulfilledClientEmail,
-  sElectionReadyEmail,
-  llcFormedEmail,
-} from "./email";
-import { filingGroups, seriesNames } from "./filing";
-import { err, testHooks, MAX_UPLOAD_BYTES, looksLikePdf, maskEmail, requireAdmin } from "./shared";
-
-
+import { sendMail, resetEmail, raCancellationEmail, raCancellationAdminEmail, einDetailsSubmittedAdminEmail, passwordChangedEmail, verifyNewEmail, emailChangeRequestedEmail, emailChangedEmail, sElectionReadyEmail } from "./email";
+import { seriesNames } from "./filing";
+import { err, maskEmail } from "./shared";
 
 /* --------------------------------- auth -------------------------------- */
 
 export const loginSchema = z.object({ email: z.string().email(), password: z.string().min(1) });
-
 
 /* ------------------------- operating agreement ------------------------- */
 
@@ -82,7 +42,6 @@ export interface SeedPayload {
   members?: { memberList?: { firstName?: string; lastName?: string; suffix?: string; fullLegalName?: string; address1?: string; address2?: string; city?: string; state?: string; zip?: string }[] };
   series?: { id: string; name: string }[];
 }
-
 
 export async function oaSeed(clientId: string): Promise<{
   llcName: string;
@@ -165,7 +124,6 @@ export async function oaSeed(clientId: string): Promise<{
   };
 }
 
-
 export const oaAnswersSchema = z.object({
   firstOrAmended: z.enum(["first", "amended"]).optional(),
   sElection: z.boolean().optional(), // true = build on the S corporation form
@@ -222,12 +180,10 @@ export const oaAnswersSchema = z.object({
     .optional(),
 });
 
-
 export const SPOUSAL_FORM_LABEL: Record<"TBE" | "JTWROS", string> = {
   TBE: "tenants by the entirety",
   JTWROS: "joint tenants with right of survivorship",
 };
-
 
 // Who owns the company, as the client last said. The intake list is only the
 // starting point: members are never filed with the Division (server/filing.ts
@@ -245,7 +201,6 @@ export function personLegalName(first?: string, last?: string, suffix?: string):
   return sfx ? `${base}, ${sfx}` : base;
 }
 
-
 export function effectiveOwners(
   seedMembers: { name: string; address: string }[],
   answers: { members?: { name?: string; address?: string }[] } | null | undefined,
@@ -257,7 +212,6 @@ export function effectiveOwners(
     : seedMembers.map((m) => ({ name: m.name, address: m.address }));
 }
 
-
 export async function savedOaAnswers(clientId: string): Promise<{ members?: { name?: string; address?: string }[] } | null> {
   const db = await getDb();
   const rows = await db.query<{ answers: unknown }>("SELECT answers FROM oa_profiles WHERE client_id = $1", [clientId]);
@@ -265,7 +219,6 @@ export async function savedOaAnswers(clientId: string): Promise<{ members?: { na
   const raw = rows[0].answers;
   return (typeof raw === "string" ? JSON.parse(raw) : raw) as { members?: { name?: string; address?: string }[] };
 }
-
 
 export function fmtDate(iso: string): string {
   const [y, m, d] = iso.split("-").map(Number);
@@ -277,12 +230,10 @@ export function fmtDate(iso: string): string {
   });
 }
 
-
 /* --------------------------- portal services --------------------------- */
 
 export const SERVICE_SAFE_COLUMNS =
   "id, type, status, llc_name, details, amount_cents, created_at, paid_at, fulfilled_at";
-
 
 /** The client's company name comes from their latest paid formation order. */
 export async function clientLlcName(clientId: string): Promise<string> {
@@ -293,7 +244,6 @@ export async function clientLlcName(clientId: string): Promise<string> {
   );
   return rows[0]?.llc_name ?? "";
 }
-
 
 /** Whether the client's LLC is formed — the Articles are in their portal.
  *  Gates the EIN and S-election detail forms: neither IRS process exists
@@ -308,7 +258,6 @@ export async function clientLlcFormed(clientId: string): Promise<boolean> {
   );
   return rows.length > 0;
 }
-
 
 /** The client's protected series as full filed names ("LLC - PS 1"):
  *  formation-order series (stored as bare identifiers) plus paid portal
@@ -354,7 +303,6 @@ export async function clientSeries(clientId: string): Promise<{ name: string; ei
   return out;
 }
 
-
 /** S election package gate: NEW formations we filed, purchasable only through
  *  day 65 after the formation order was paid (the IRS election deadline is
  *  2 months + 15 days — the shorter window leaves time to prepare and mail). */
@@ -387,13 +335,11 @@ export async function sElectionEligibility(clientId: string): Promise<{
   return { eligible: true, reason: "ok", orderBy: orderBy.toISOString(), formationPaidAt: paidAt.toISOString() };
 }
 
-
 /** How long a client may edit and re-download the S election package before we
  *  destroy it. The package IS the clients' copy of Form 2553, complete with
  *  every owner's Social Security number, so it does not live here longer than
  *  it has to. */
 export const S_ELECTION_EDIT_DAYS = 14;
-
 
 export interface SElectionStoredDetails {
   ein?: string;
@@ -409,7 +355,6 @@ export interface SElectionStoredDetails {
   shareholders?: { name: string; address: string; percentage: number; dateAcquired: string; ssnLast4: string }[];
 }
 
-
 /** The edit/download window for one order. Drivers differ: Neon returns ISO
  *  strings, PGlite returns Date objects. */
 export function sElectionWindow(fulfilledAt: unknown): { open: boolean; deleteOn: string | null } {
@@ -419,7 +364,6 @@ export function sElectionWindow(fulfilledAt: unknown): { open: boolean; deleteOn
   const deleteOn = new Date(start + S_ELECTION_EDIT_DAYS * 86400_000);
   return { open: Date.now() < deleteOn.getTime(), deleteOn: deleteOn.toISOString() };
 }
-
 
 /** When the edit window closes, the Social Security numbers are destroyed —
  *  but the client keeps a record of what was prepared. The package is REBUILT
@@ -504,7 +448,6 @@ export async function purgeExpiredSElections(): Promise<number> {
   return rows.length;
 }
 
-
 /** Everything the IRS EIN application asks that the formation record cannot
  *  answer — the objective ledger from the assistant walk + Form SS-4
  *  (Rev. 12-2025), 24 Aug 2026. The IRS requires the responsible party's
@@ -565,7 +508,6 @@ export const einDetailsSchema = z
     message: "Tell us which of the special activities applies.",
   });
 
-
 export const sElectionDetailsSchema = z
   .object({
     ein: z
@@ -608,7 +550,6 @@ export const sElectionDetailsSchema = z
 
 export function registerPortalRoutes(app: Hono) {
 
-
 app.post("/auth/login", async (c) => {
   if (!(await rateLimit(`login:${clientIp(c)}`, 10, 900_000))) {
     return c.json(err("Too many attempts. Try again in a few minutes.", "RATE_LIMITED"), 429);
@@ -627,12 +568,10 @@ app.post("/auth/login", async (c) => {
   return c.json({ data: { ok: true } });
 });
 
-
 app.post("/auth/logout", async (c) => {
   await destroySession(c);
   return c.json({ data: { ok: true } });
 });
-
 
 app.get("/auth/me", async (c) => {
   const session = await getSession(c);
@@ -651,7 +590,6 @@ app.get("/auth/me", async (c) => {
     },
   });
 });
-
 
 app.post("/auth/forgot", async (c) => {
   if (!(await rateLimit(`forgot:${clientIp(c)}`, 5, 3600_000))) {
@@ -675,7 +613,6 @@ app.post("/auth/forgot", async (c) => {
   }
   return c.json({ data: { ok: true } });
 });
-
 
 app.post("/auth/set-password", async (c) => {
   const body = z
@@ -709,7 +646,6 @@ app.post("/auth/set-password", async (c) => {
   return c.json({ data: { ok: true } });
 });
 
-
 /* -------------------------------- portal ------------------------------- */
 
 app.get("/portal/documents", async (c) => {
@@ -724,7 +660,6 @@ app.get("/portal/documents", async (c) => {
   );
   return c.json({ data: docs });
 });
-
 
 app.get("/portal/documents/:id/download", async (c) => {
   const session = await getSession(c);
@@ -749,7 +684,6 @@ app.get("/portal/documents/:id/download", async (c) => {
     },
   });
 });
-
 
 app.get("/portal/oa", async (c) => {
   const session = await getSession(c);
@@ -791,7 +725,6 @@ app.get("/portal/oa", async (c) => {
   });
 });
 
-
 app.put("/portal/oa/answers", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
@@ -822,7 +755,6 @@ app.put("/portal/oa/answers", async (c) => {
   );
   return c.json({ data: { ok: true } });
 });
-
 
 app.post("/portal/oa/generate", async (c) => {
   const session = await getSession(c);
@@ -1108,7 +1040,6 @@ app.post("/portal/oa/generate", async (c) => {
   return c.json({ data: { generationId: gen[0].id, documentId: doc[0].id, title, version } });
 });
 
-
 /** Consent + Series Exhibit for a series established after formation.
  *  Regenerating the whole agreement as Amended & Restated also carries the new
  *  exhibit; this produces just the two documents that actually change hands. */
@@ -1197,7 +1128,6 @@ app.post("/portal/series/consent", async (c) => {
   return c.json({ data: { documentId: doc[0].id, title } });
 });
 
-
 /** A client may remove a draft they generated. Documents WE posted — the
  *  formation package, EIN letter, legal mail, the 2553 package — are not
  *  reachable here, which keeps the download-only rule intact. */
@@ -1229,7 +1159,6 @@ app.delete("/portal/oa/generations/:id", async (c) => {
   return c.json({ data: { ok: true } });
 });
 
-
 /* ----------------------------- library docs ---------------------------- */
 
 app.get("/portal/library", async (c) => {
@@ -1239,7 +1168,6 @@ app.get("/portal/library", async (c) => {
   const rows = await db.query("SELECT key, title, edition, size_bytes, updated_at FROM library_documents ORDER BY title");
   return c.json({ data: rows });
 });
-
 
 app.get("/portal/library/:key/download", async (c) => {
   const session = await getSession(c);
@@ -1275,7 +1203,6 @@ app.get("/portal/library/:key/download", async (c) => {
     },
   });
 });
-
 
 app.get("/portal/services", async (c) => {
   const session = await getSession(c);
@@ -1319,7 +1246,6 @@ app.get("/portal/services", async (c) => {
     },
   });
 });
-
 
 app.post("/portal/services/s-election", async (c) => {
   const session = await getSession(c);
@@ -1366,7 +1292,6 @@ app.post("/portal/services/s-election", async (c) => {
   ]);
   return c.json({ data: { serviceOrderId, checkoutUrl: checkout.url, totalCents: S_ELECTION_FEE_CENTS } });
 });
-
 
 app.post("/portal/services/series", async (c) => {
   const session = await getSession(c);
@@ -1422,7 +1347,6 @@ app.post("/portal/services/series", async (c) => {
   ]);
   return c.json({ data: { serviceOrderId, checkoutUrl: checkout.url, totalCents: amountCents } });
 });
-
 
 app.post("/portal/services/ein", async (c) => {
   const session = await getSession(c);
@@ -1508,7 +1432,6 @@ app.post("/portal/services/ein", async (c) => {
   return c.json({ data: { serviceOrderId, checkoutUrl: checkout.url, totalCents: EIN_FEE_CENTS } });
 });
 
-
 app.post("/portal/services/:id/ein-details", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
@@ -1576,7 +1499,6 @@ app.post("/portal/services/:id/ein-details", async (c) => {
   }
   return c.json({ data: { ok: true } });
 });
-
 
 app.post("/portal/services/:id/s-election-details", async (c) => {
   const session = await getSession(c);
@@ -1748,7 +1670,6 @@ app.post("/portal/services/:id/s-election-details", async (c) => {
   return c.json({ data: { ok: true, documentId: merged.documentId, editableUntil: window.deleteOn } });
 });
 
-
 app.post("/portal/account/password", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
@@ -1788,7 +1709,6 @@ app.post("/portal/account/password", async (c) => {
   );
   return c.json({ data: { ok: true } });
 });
-
 
 app.post("/portal/account/email", async (c) => {
   const session = await getSession(c);
@@ -1843,7 +1763,6 @@ app.post("/portal/account/email", async (c) => {
   return c.json({ data: { ok: true, pendingEmail: newEmail } });
 });
 
-
 app.post("/auth/verify-email", async (c) => {
   const body = z.object({ token: z.string().min(10) }).safeParse(await c.req.json().catch(() => null));
   if (!body.success) return c.json(err("Invalid request.", "INVALID_INPUT"), 400);
@@ -1887,7 +1806,6 @@ app.post("/auth/verify-email", async (c) => {
   sendMail({ to: previous, ...mail }).catch((e) => console.error("[account] email-changed (old) failed:", e));
   return c.json({ data: { ok: true, email: pending } });
 });
-
 
 /** Online cancellation of registered agent service — required by §501.165
  *  because the service is accepted online. Recording the request is the

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -270,7 +270,6 @@ function ClientsTable({
 }
 
 export default function AdminDashboard() {
-  const navigate = useNavigate();
 
   const authQuery = useQuery({
     queryKey: ["admin-me"],

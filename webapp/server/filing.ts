@@ -119,7 +119,6 @@ const personAddr = (m: PersonLike): Addr => ({
 const sameAddr = (a: Addr | null | undefined, b: Addr | null | undefined): boolean =>
   oneLine(a) !== "" && oneLine(a) === oneLine(b);
 
-const yesNo = (v: unknown) => (v ? "Yes" : "No");
 
 const MANAGEMENT_LABEL: Record<string, string> = {
   MEMBER_MANAGED: "Member-managed",

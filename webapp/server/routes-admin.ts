@@ -4,65 +4,25 @@
 // which app.ts calls after creating the app — no circular imports.
 import { Hono } from "hono";
 import { z } from "zod";
-import { orderFormSchema } from "./validation";
-import { buildPayload } from "../src/components/forms/florida-llc/buildPayload";
-import { validateRegisteredAgentAddress } from "../src/components/forms/florida-llc/validation";
-import type { FloridaLLCFormData } from "../src/components/forms/florida-llc/types";
+
 import { getDb } from "./db";
 import { env } from "./env";
 import { listBackups, runDbBackup } from "./backup";
 import { mirrorStatus, runFileMirror } from "./dropbox";
-import {
-  priceOrder,
-  EIN_FEE_CENTS,
-  S_ELECTION_FEE_CENTS,
-  S_ELECTION_WINDOW_DAYS,
-  SERIES_ADDON_PREP_CENTS,
-  SERIES_ADDON_STATE_CENTS,
-} from "./pricing";
+
 import { buildSElectionPackage, type SElectionDetails } from "./s-election";
-import {
-  sharesAreComplete,
-  shareLabel,
-  shareValue,
-  type OwnershipMode,
-  type OwnershipShare,
-} from "../src/lib/ownership";
-import { createCheckout, verifyWebhookSignature } from "./square";
-import { hashPassword, verifyPassword, newToken, hashToken, encryptSecret, decryptSecret } from "./crypto";
-import { hasProtectedSeriesPhrase } from "../src/components/forms/florida-llc/validation";
-import { assembleNewSeries } from "./new-series";
-import { stampEastern, stampForFilename } from "./datetime";
-import { assembleOa, oaVersion, OA_TEMPLATE_VERSION, type OaInputs } from "./oa";
-import { renderMarkdownPdf, stampExistingPdf } from "./pdf-render";
-import { createSession, getSession, destroySession, rateLimit, clientIp } from "./auth";
-import { checkName, getSyncState, syncDailies, unavailableNames } from "./sunbiz";
+
+import { decryptSecret } from "./crypto";
+
+import { createSession, rateLimit, clientIp } from "./auth";
+
 import { createHash } from "node:crypto";
 import ownersManualMd from "../../docs/owners-manual.md";
 import { deleteFile, putFile, readFileStream } from "./storage";
-import {
-  sendMail,
-  welcomeEmail,
-  resetEmail,
-  newDocumentEmail,
-  orderPaidEmail,
-  raCancellationEmail,
-  raCancellationAdminEmail,
-  serviceOrderClientEmail,
-  serviceOrderAdminEmail,
-  einDetailsSubmittedAdminEmail,
-  passwordChangedEmail,
-  verifyNewEmail,
-  emailChangeRequestedEmail,
-  emailChangedEmail,
-  serviceFulfilledClientEmail,
-  sElectionReadyEmail,
-  llcFormedEmail,
-} from "./email";
+import { sendMail, newDocumentEmail, emailChangedEmail, serviceFulfilledClientEmail, llcFormedEmail } from "./email";
 import { filingGroups, seriesNames } from "./filing";
-import { err, testHooks, MAX_UPLOAD_BYTES, looksLikePdf, maskEmail, requireAdmin } from "./shared";
-import { oaSeed, purgeExpiredSElections, sElectionWindow, clientSeries, SPOUSAL_FORM_LABEL, personLegalName, effectiveOwners, S_ELECTION_EDIT_DAYS } from "./routes-portal";
-
+import { err, testHooks, MAX_UPLOAD_BYTES, looksLikePdf, requireAdmin } from "./shared";
+import { oaSeed, purgeExpiredSElections } from "./routes-portal";
 
 /** Renders the Owner's Manual PDF from the markdown master bundled with
  *  this deployment and publishes it to the client library. Hash-gated: a
@@ -100,7 +60,6 @@ export async function refreshOwnersManual(force = false): Promise<{ published: b
 
 export function registerAdminRoutes(app: Hono) {
 
-
 // The admin page's view of the same list. It cannot use /portal/library: that
 // route requires a CLIENT session, and an admin-only session 401s — which
 // rendered the library card as "Not yet published" while the manual was live.
@@ -112,14 +71,12 @@ app.get("/admin/library", async (c) => {
   return c.json({ data: rows });
 });
 
-
 app.post("/admin/library/owners-manual/regenerate", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const r = await refreshOwnersManual(true);
   return c.json({ data: r });
 });
-
 
 app.post("/admin/library/:key", async (c) => {
   const admin = await requireAdmin(c);
@@ -151,13 +108,11 @@ app.post("/admin/library/:key", async (c) => {
   return c.json({ data: { ok: true } });
 });
 
-
 app.get("/admin/file-mirror", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   return c.json({ data: await mirrorStatus() });
 });
-
 
 app.post("/admin/file-mirror/run", async (c) => {
   const admin = await requireAdmin(c);
@@ -166,20 +121,17 @@ app.post("/admin/file-mirror/run", async (c) => {
   return c.json({ data: { ...result, status: await mirrorStatus() } });
 });
 
-
 app.get("/admin/backups", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   return c.json({ data: await listBackups() });
 });
 
-
 app.post("/admin/backups/run", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   return c.json({ data: await runDbBackup() });
 });
-
 
 // The restore path starts with getting the file — without this route the
 // dump is only reachable with the storage token.
@@ -199,7 +151,6 @@ app.get("/admin/backups/:key/download", async (c) => {
   });
 });
 
-
 /* --------------------------------- admin ------------------------------- */
 
 app.post("/admin/login", async (c) => {
@@ -216,12 +167,10 @@ app.post("/admin/login", async (c) => {
   return c.json({ data: { ok: true } });
 });
 
-
 app.get("/admin/me", async (c) => {
   const admin = await requireAdmin(c);
   return admin ? c.json({ data: { ok: true } }) : c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
 });
-
 
 app.get("/admin/orders", async (c) => {
   const admin = await requireAdmin(c);
@@ -260,7 +209,6 @@ app.get("/admin/orders", async (c) => {
   return c.json({ data: { orders: rows, total: Number(total[0].c), shown: rows.length } });
 });
 
-
 /** Sent to the Division. The only transition on the board a person performs —
  *  nothing in this system can observe a filing on sunbiz. */
 app.post("/admin/orders/:id/filed", async (c) => {
@@ -280,7 +228,6 @@ app.post("/admin/orders/:id/filed", async (c) => {
   return c.json({ data: { ok: true } });
 });
 
-
 /** Undo — a misclick should not need a database console. */
 app.post("/admin/orders/:id/unfiled", async (c) => {
   const admin = await requireAdmin(c);
@@ -298,7 +245,6 @@ app.post("/admin/orders/:id/unfiled", async (c) => {
   ]);
   return c.json({ data: { ok: true } });
 });
-
 
 /** Which fields have been copied into the state's form. Stored per order so an
  *  interrupted filing resumes on whatever machine you pick it up on. */
@@ -325,7 +271,6 @@ app.post("/admin/orders/:id/copied", async (c) => {
   ]);
   return c.json({ data: { copiedFields: marks } });
 });
-
 
 app.get("/admin/orders/:id", async (c) => {
   const admin = await requireAdmin(c);
@@ -407,7 +352,6 @@ app.get("/admin/orders/:id", async (c) => {
     },
   });
 });
-
 
 /** The Articles and the Protected Series Designations, in one action.
  *
@@ -621,7 +565,6 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
   }
 });
 
-
 app.get("/admin/clients", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
@@ -643,7 +586,6 @@ app.get("/admin/clients", async (c) => {
   );
   return c.json({ data: rows });
 });
-
 
 /** Support override for the case a client can reach neither address. Both the
  *  old and the new address are notified, so a change is never silent. */
@@ -680,7 +622,6 @@ app.post("/admin/clients/:id/email", async (c) => {
   return c.json({ data: { ok: true, email: newEmail } });
 });
 
-
 app.get("/admin/services", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
@@ -702,7 +643,6 @@ app.get("/admin/services", async (c) => {
   );
   return c.json({ data: rows });
 });
-
 
 app.get("/admin/services/:id", async (c) => {
   const admin = await requireAdmin(c);
@@ -745,7 +685,6 @@ app.get("/admin/services/:id", async (c) => {
     },
   });
 });
-
 
 /** Draft S election package for admin review: instructions + cover letter +
  *  the filled official Form 2553. Generated on demand from the encrypted
@@ -803,7 +742,6 @@ app.get("/admin/services/:id/s-election-draft", async (c) => {
     return c.json(err("Draft generation failed.", "GENERATION_FAILED"), 500);
   }
 });
-
 
 app.post("/admin/services/:id/fulfill", async (c) => {
   const admin = await requireAdmin(c);
@@ -903,7 +841,6 @@ app.post("/admin/services/:id/fulfill", async (c) => {
   return c.json({ data: { ok: true, documentId } });
 });
 
-
 app.get("/admin/clients/:id/documents", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
@@ -914,8 +851,6 @@ app.get("/admin/clients/:id/documents", async (c) => {
   );
   return c.json({ data: rows });
 });
-
-
 
 app.post("/admin/documents", async (c) => {
   const admin = await requireAdmin(c);

@@ -63,32 +63,34 @@ async function createDb(): Promise<Db> {
 /**
  * Ordered, recorded migrations — the title-chain model.
  *
- * Each entry runs once per database, in id order, and is recorded in
- * schema_migrations when it completes. The old model was one ever-growing
- * SQL string re-run in full on every cold start: it worked, but a change
- * appended in the wrong place broke every FRESH database while every
- * existing one sailed on (P46), and there was no record of what had been
- * applied when.
+ * Each migration is an explicit ARRAY of complete SQL statements. There is no
+ * splitter and no comment-stripper: every statement is handed to the database
+ * whole, so quoted semicolons, quoted comment markers, dollar-quoted bodies,
+ * and anything else SQL allows are simply fine (the tenth audit found the
+ * previous string-splitting approach would truncate a statement containing
+ * a quoted "--" — MIG-010; the fix is to have nothing to parse).
  *
- * Rules for adding a migration:
+ * Each migration runs once per database, in id order, and is recorded in
+ * schema_migrations when it completes. Rules for adding one:
  *  - NEVER edit an existing entry — append a new one with the next id.
  *  - Keep statements idempotent (IF NOT EXISTS / ADD COLUMN IF NOT EXISTS):
  *    the Neon HTTP driver cannot wrap a migration in a transaction, so a
  *    failure mid-migration leaves it unrecorded and it will re-run whole.
- *  - Statements are split on semicolons AFTER comment lines are stripped,
- *    so comments may contain semicolons (one already broke the loader).
  *  - An ALTER must FOLLOW its table's CREATE (P46).
+ *  - SQL comments live INSIDE the statement string they document.
  * The fresh-database boot check in the e2e suite proves every migration
  * path from an empty database on every run — and in CI, on every push.
  */
-const MIGRATION_001_INITIAL = `
+const MIGRATION_001_STATEMENTS: string[] = [
+    `
 CREATE TABLE IF NOT EXISTS clients (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   email text UNIQUE NOT NULL,
   name text NOT NULL DEFAULT '',
   password_hash text,
   created_at timestamptz NOT NULL DEFAULT now()
-);
+)`,
+    `
 CREATE TABLE IF NOT EXISTS orders (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   client_id uuid REFERENCES clients(id),
@@ -105,14 +107,16 @@ CREATE TABLE IF NOT EXISTS orders (
   square_payment_id text,
   created_at timestamptz NOT NULL DEFAULT now(),
   paid_at timestamptz
-);
+)`,
+    `
 CREATE TABLE IF NOT EXISTS sessions (
   token_hash text PRIMARY KEY,
   client_id uuid REFERENCES clients(id) ON DELETE CASCADE,
   is_admin boolean NOT NULL DEFAULT false,
   created_at timestamptz NOT NULL DEFAULT now(),
   expires_at timestamptz NOT NULL
-);
+)`,
+    `
 CREATE TABLE IF NOT EXISTS auth_tokens (
   token_hash text PRIMARY KEY,
   client_id uuid NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
@@ -123,9 +127,11 @@ CREATE TABLE IF NOT EXISTS auth_tokens (
   -- carries the exact address its link was sent to: proving control of inbox
   -- A must never confirm address B requested later (Codex AUTH-EMAIL-001).
   payload text
-);
+)`,
+    `
 -- For databases created before payload existed. ALTERs FOLLOW their CREATE (P46).
-ALTER TABLE auth_tokens ADD COLUMN IF NOT EXISTS payload text;
+ALTER TABLE auth_tokens ADD COLUMN IF NOT EXISTS payload text`,
+    `
 CREATE TABLE IF NOT EXISTS documents (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   client_id uuid NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
@@ -135,23 +141,30 @@ CREATE TABLE IF NOT EXISTS documents (
   content_type text NOT NULL DEFAULT 'application/pdf',
   size_bytes int NOT NULL DEFAULT 0,
   created_at timestamptz NOT NULL DEFAULT now()
-);
+)`,
+    `
 CREATE TABLE IF NOT EXISTS webhook_events (
   event_id text PRIMARY KEY,
   received_at timestamptz NOT NULL DEFAULT now()
-);
-ALTER TABLE clients ADD COLUMN IF NOT EXISTS ra_cancellation_requested_at timestamptz;
+)`,
+    `
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS ra_cancellation_requested_at timestamptz`,
+    `
 -- A webhook event is only "handled" once its work SUCCEEDED. Recording the id
 -- up front and treating every later delivery as a duplicate meant a transient
 -- failure permanently swallowed a paid order (audited 26 Aug 2026).
-ALTER TABLE webhook_events ADD COLUMN IF NOT EXISTS processed_at timestamptz;
-UPDATE webhook_events SET processed_at = received_at WHERE processed_at IS NULL;
+ALTER TABLE webhook_events ADD COLUMN IF NOT EXISTS processed_at timestamptz`,
+    `
+UPDATE webhook_events SET processed_at = received_at WHERE processed_at IS NULL`,
+    `
 -- Email changes are verified before they take effect: the requested address
 -- parks here until the client clicks the link sent to it.
-ALTER TABLE clients ADD COLUMN IF NOT EXISTS pending_email text;
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS pending_email text`,
+    `
 -- High-water mark for operating agreement numbering. A number printed on a PDF
 -- is never reused, even if the client deletes that agreement afterwards.
-ALTER TABLE clients ADD COLUMN IF NOT EXISTS oa_generation_seq integer NOT NULL DEFAULT 0;
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS oa_generation_seq integer NOT NULL DEFAULT 0`,
+    `
 CREATE TABLE IF NOT EXISTS oa_profiles (
   client_id uuid PRIMARY KEY REFERENCES clients(id) ON DELETE CASCADE,
   answers jsonb NOT NULL DEFAULT '{}'::jsonb,
@@ -160,11 +173,13 @@ CREATE TABLE IF NOT EXISTS oa_profiles (
   -- refuses to move backwards (audited 26 Aug 2026).
   rev integer NOT NULL DEFAULT 0,
   updated_at timestamptz NOT NULL DEFAULT now()
-);
+)`,
+    `
 -- For databases created before rev existed. An ALTER must always FOLLOW its
 -- table's CREATE: this one sat above it until 28 Aug 2026, so no fresh
 -- database could initialize at all (P46, found by the third Codex audit).
-ALTER TABLE oa_profiles ADD COLUMN IF NOT EXISTS rev integer NOT NULL DEFAULT 0;
+ALTER TABLE oa_profiles ADD COLUMN IF NOT EXISTS rev integer NOT NULL DEFAULT 0`,
+    `
 CREATE TABLE IF NOT EXISTS oa_generations (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   client_id uuid NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
@@ -174,8 +189,10 @@ CREATE TABLE IF NOT EXISTS oa_generations (
   inputs jsonb NOT NULL,
   generation_number integer,
   created_at timestamptz NOT NULL DEFAULT now()
-);
-ALTER TABLE oa_generations ADD COLUMN IF NOT EXISTS generation_number integer;
+)`,
+    `
+ALTER TABLE oa_generations ADD COLUMN IF NOT EXISTS generation_number integer`,
+    `
 -- Backfill agreements generated before the number was stored. Idempotent: it
 -- only touches NULL rows, and starts above any number already assigned.
 UPDATE oa_generations g
@@ -183,10 +200,12 @@ UPDATE oa_generations g
          (SELECT MAX(x.generation_number) FROM oa_generations x WHERE x.client_id = g.client_id), 0)
   FROM (SELECT id, row_number() OVER (PARTITION BY client_id ORDER BY created_at) AS n
           FROM oa_generations WHERE generation_number IS NULL) r
- WHERE g.id = r.id AND g.generation_number IS NULL;
+ WHERE g.id = r.id AND g.generation_number IS NULL`,
+    `
 UPDATE clients c SET oa_generation_seq = sub.n
   FROM (SELECT client_id, MAX(generation_number) AS n FROM oa_generations GROUP BY client_id) sub
- WHERE c.id = sub.client_id AND c.oa_generation_seq < sub.n;
+ WHERE c.id = sub.client_id AND c.oa_generation_seq < sub.n`,
+    `
 CREATE TABLE IF NOT EXISTS library_documents (
   key text PRIMARY KEY,
   title text NOT NULL,
@@ -195,7 +214,8 @@ CREATE TABLE IF NOT EXISTS library_documents (
   content_type text NOT NULL DEFAULT 'application/pdf',
   size_bytes int NOT NULL DEFAULT 0,
   updated_at timestamptz NOT NULL DEFAULT now()
-);
+)`,
+    `
 CREATE TABLE IF NOT EXISTS service_orders (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   client_id uuid NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
@@ -211,39 +231,45 @@ CREATE TABLE IF NOT EXISTS service_orders (
   created_at timestamptz NOT NULL DEFAULT now(),
   paid_at timestamptz,
   fulfilled_at timestamptz
-);
-
+)`,
+    `
 -- Formation pipeline. status runs pending_payment -> paid -> filed -> formed:
 -- "paid" is a new order, "filed" is sent to the Division, "formed" is set by the
 -- upload that puts the Articles and the Protected Series Designations into the
 -- client's portal. formed is never a button on its own — the endpoint that sets
 -- it is the same one that writes the documents, in one transaction, so the board
 -- cannot say an order is complete while the client's portal is empty.
-ALTER TABLE orders ADD COLUMN IF NOT EXISTS filed_at timestamptz;
-ALTER TABLE orders ADD COLUMN IF NOT EXISTS formed_at timestamptz;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS filed_at timestamptz`,
+    `
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS formed_at timestamptz`,
+    `
 -- Which fields have been copied into the state's form, so an interrupted filing
 -- resumes where it left off — on any machine, which is why this is here and not
 -- in the browser.
-ALTER TABLE orders ADD COLUMN IF NOT EXISTS copied_fields jsonb NOT NULL DEFAULT '{}'::jsonb;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS copied_fields jsonb NOT NULL DEFAULT '{}'::jsonb`,
+    `
 -- Serializes formation-package replacement per order. Two concurrent
 -- replacements both succeeded and left a doubled package with doubled
 -- completion emails (Codex FORM-002). The claim is one atomic UPDATE and a
 -- stale claim self-releases after ten minutes so a crashed attempt cannot
 -- wedge the order.
-ALTER TABLE orders ADD COLUMN IF NOT EXISTS replacing_at timestamptz;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS replacing_at timestamptz`,
+    `
 -- One Protected Series Designation document may cover several series, so the
 -- coverage is recorded per document rather than assumed one-to-one.
-ALTER TABLE documents ADD COLUMN IF NOT EXISTS meta jsonb NOT NULL DEFAULT '{}'::jsonb;
-ALTER TABLE documents ADD COLUMN IF NOT EXISTS order_id uuid REFERENCES orders(id);
-
+ALTER TABLE documents ADD COLUMN IF NOT EXISTS meta jsonb NOT NULL DEFAULT '{}'::jsonb`,
+    `
+ALTER TABLE documents ADD COLUMN IF NOT EXISTS order_id uuid REFERENCES orders(id)`,
+    `
 -- Mirror of the Division of Corporations' public data downloads, kept to the
 -- columns the name-availability check needs. norm_key is the name reduced by
 -- Florida's distinguishability rules (nameSimilarity.normalizeEntityName);
 -- two names conflict when their keys match. Loaded from the quarterly
 -- baseline, topped up nightly from the daily files (server/sunbiz.ts).
-ALTER TABLE library_documents ADD COLUMN IF NOT EXISTS meta jsonb NOT NULL DEFAULT '{}'::jsonb;
-ALTER TABLE documents ADD COLUMN IF NOT EXISTS mirrored_at timestamptz;
-
+ALTER TABLE library_documents ADD COLUMN IF NOT EXISTS meta jsonb NOT NULL DEFAULT '{}'::jsonb`,
+    `
+ALTER TABLE documents ADD COLUMN IF NOT EXISTS mirrored_at timestamptz`,
+    `
 CREATE TABLE IF NOT EXISTS fl_entities (
   doc_number text PRIMARY KEY,
   name text NOT NULL,
@@ -252,8 +278,10 @@ CREATE TABLE IF NOT EXISTS fl_entities (
   file_date date,
   last_txn_date date,
   norm_key text NOT NULL
-);
-CREATE INDEX IF NOT EXISTS fl_entities_norm_key_idx ON fl_entities (norm_key);
+)`,
+    `
+CREATE INDEX IF NOT EXISTS fl_entities_norm_key_idx ON fl_entities (norm_key)`,
+    `
 -- Fixed-window rate limiting. In-memory counters reset on every serverless
 -- recycle and are per-instance, so distributed attempts sailed past them
 -- (Codex AUTH-002). The schema runner splits statements on semicolons, so
@@ -262,33 +290,21 @@ CREATE TABLE IF NOT EXISTS rate_limits (
   key text PRIMARY KEY,
   window_start timestamptz NOT NULL,
   count integer NOT NULL
-);
+)`,
+    `
 CREATE TABLE IF NOT EXISTS fl_sync_state (
   id int PRIMARY KEY,
   baseline_label text,
   last_daily date,
   updated_at timestamptz
-);
-`;
+)`,
+];
 
-const MIGRATIONS: { id: number; name: string; sql: string }[] = [
-  { id: 1, name: "initial-schema", sql: MIGRATION_001_INITIAL },
+const MIGRATIONS: { id: number; name: string; statements: string[] }[] = [
+  { id: 1, name: "initial-schema", statements: MIGRATION_001_STATEMENTS },
   // Append future migrations here with the next id. Never edit an entry.
 ];
 
-/** Strip full-line and trailing `--` comments, then split on semicolons.
- *  Splitting BEFORE stripping once fed half a comment to Postgres because
- *  the comment contained a semicolon. */
-function statements(sql: string): string[] {
-  const noComments = sql
-    .split("\n")
-    .map((line) => {
-      const i = line.indexOf("--");
-      return i === -1 ? line : line.slice(0, i);
-    })
-    .join("\n");
-  return noComments.split(";").map((s) => s.trim()).filter(Boolean);
-}
 
 export async function getDb(): Promise<Db> {
   if (!db) db = await createDb();
@@ -305,7 +321,7 @@ export async function getDb(): Promise<Db> {
     );
     for (const m of [...MIGRATIONS].sort((a, b) => a.id - b.id)) {
       if (done.has(m.id)) continue;
-      for (const stmt of statements(m.sql)) {
+      for (const stmt of m.statements) {
         await db.query(stmt);
       }
       // Recorded only after every statement succeeded; a mid-migration

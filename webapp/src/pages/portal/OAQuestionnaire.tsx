@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Navigate, Link, useNavigate } from "react-router-dom";
+import { Navigate, Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight, Download, FileText, Heart, HelpCircle, History, Plus, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,8 +13,8 @@ import {
 import { api, ApiError } from "@/lib/api";
 import { formatDateTime, taxationLabel } from "@/lib/datetime";
 import { LEARN_MORE } from "@/content/oaLearnMore";
-import { OwnershipEditor, type OwnershipRow } from "./OwnershipEditor";
-import { shareValue, type OwnershipMode, type OwnershipShare } from "@/lib/ownership";
+import { OwnershipEditor } from "./OwnershipEditor";
+import { type OwnershipMode, type OwnershipShare } from "@/lib/ownership";
 
 interface OaSeed {
   llcName: string;
@@ -150,7 +150,6 @@ function QuestionCard({
 }
 
 export default function OAQuestionnaire() {
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [a, setA] = useState<Answers>({});
   const [loaded, setLoaded] = useState(false);
