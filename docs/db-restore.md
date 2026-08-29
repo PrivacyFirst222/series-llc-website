@@ -48,9 +48,9 @@ the loss of Neon itself.
    once it's listening).
 4. **Dry-run first** — prints the dump's date and per-table row counts,
    touches nothing:
-   `bun run scripts/db-restore.ts db-2026-08-25.json.gz --dry-run`
+   `bun run scripts/db-restore.ts db-2026-08-28-105735.json.gz --dry-run`
 5. **Restore**:
-   `DATABASE_URL=postgres://<target> bun run scripts/db-restore.ts db-2026-08-25.json.gz`
+   `DATABASE_URL=postgres://<target> bun run scripts/db-restore.ts db-2026-08-28-105735.json.gz`
    The script refuses a target that already contains clients unless
    `--force` is passed.
 6. **Cut over**: change `DATABASE_URL` in Vercel's env settings to the new

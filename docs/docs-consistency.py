@@ -147,6 +147,16 @@ def main():
             "backups — update this check AND every document describing the policy")
     if "db-YYYY-MM-DD-HHMMSS.json.gz" not in runbook:
         problems.append("db-restore.md does not state the implemented backup filename pattern")
+    # Concrete examples drift too: the ninth audit found the policy text fixed
+    # while the two example COMMANDS still showed date-only names the system
+    # no longer produces. Any db-<date>.json.gz without a time component is
+    # the superseded convention.
+    for m in re.finditer(r"db-\d{4}-\d{2}-\d{2}(-\d{6})?\.json\.gz", runbook):
+        if m.group(1) is None:
+            problems.append(
+                f"db-restore.md example {m.group(0)!r} uses the superseded date-only "
+                "backup name — current backups carry a -HHMMSS time component")
+        checked += 1
     for name, text in (("db-restore.md", runbook), ("LibrarySection.tsx", admin_card)):
         for stale in ("newest 30", "Newest 30", "pruned automatically", "db-YYYY-MM-DD.json.gz"):
             if stale in text.replace("db-YYYY-MM-DD-HHMMSS", ""):
