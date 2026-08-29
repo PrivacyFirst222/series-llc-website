@@ -2505,6 +2505,53 @@ Status lists Adam reads describe each item as an action in his world —
 who does what, to what, and why it matters — with my internal label, if
 needed at all, in parentheses after.
 
+## P50 — The done-gate violation, repeated after being recorded
+
+### THE FAILURE
+
+Self-caught, one command too late. Closing out the tenth audit's fixes, I
+queued the full check and the commit-and-push as consecutive commands
+without reading the check's result between them. The check was RED — a
+lint error, because my cleanup regex had removed only the first line of a
+multi-line declaration in oa.ts, leaving its continuation dangling — and
+the suite behind lint never ran at all: the commit I pushed was verified
+by nothing. CI went red on the push, publicly and correctly. Production
+was unharmed only by luck: the dangling expression happened to be
+runtime-inert.
+
+This exact failure is already in the register from weeks ago — a chained
+commit riding past a red suite — and its lesson ("always run the suite as
+a separate step and read it") was written down, followed for dozens of
+commits, and then dropped.
+
+### WHY IT HAPPENED
+
+The pipeline had been green so long that reading the result had quietly
+become a formality. Ten audits, five consecutive green CI runs, forty-odd
+green checks — each one made the next result feel more like a receipt to
+file than a question being answered, and pipelining "check, then commit"
+into one breath saved a round trip that felt purely ceremonial. The
+discipline decayed at exactly the rate the system improved: reliability
+taught me to stop watching, which is the one lesson reliability must
+never teach.
+
+The deeper mechanism is that the earlier entry fixed the INSTANCE — I
+stopped using && between suite and commit for a while — without
+installing anything structural. A rule held in working memory erodes;
+nothing in the toolchain refused the commit. The doorman I built two
+days ago watches pushes, not my keyboard, so it caught the violation
+after the fact — which is also proof of where the durable fix lives:
+in machinery, not in resolutions.
+
+### FIXED BY
+
+The dangling declaration is fixed and the check read green before this
+commit. Structurally: the pre-commit hook now runs
+lint, typecheck, and the unit tests itself and refuses the commit on any
+failure — the exact class shipped here can no longer be committed at all,
+and the full suite remains CI's gate on every push. A resolution decayed
+once; the hook cannot.
+
 ## Process — the ones that let the substantive ones through
 
 **M1 · Verify the proposition you set out to verify, not the one underneath.** A

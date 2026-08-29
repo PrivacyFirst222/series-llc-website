@@ -9,6 +9,24 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 
+# Never commit code that fails the fast checks. A red full-check was once
+# committed and pushed because reading the result had decayed into a
+# formality (P50); machinery does not decay. The full e2e suite stays CI's
+# job on every push — these three run in ~15s.
+echo "pre-commit: lint + typecheck + unit tests"
+if ! (cd "$ROOT/webapp" && bun run lint >/dev/null 2>&1); then
+  echo "pre-commit: LINT FAILED — commit refused. Run: cd webapp && bun run lint" >&2
+  exit 1
+fi
+if ! (cd "$ROOT/webapp" && bun run typecheck >/dev/null 2>&1); then
+  echo "pre-commit: TYPECHECK FAILED — commit refused. Run: cd webapp && bun run typecheck" >&2
+  exit 1
+fi
+if ! (cd "$ROOT/webapp" && bun run test >/dev/null 2>&1); then
+  echo "pre-commit: UNIT TESTS FAILED — commit refused. Run: cd webapp && bun run test" >&2
+  exit 1
+fi
+
 MASTERS=$(git diff --cached --name-only --diff-filter=ACM \
   | grep -E '^(webapp/server/templates-oa-.*\.md|docs/owners-manual\.md|docs/statement-of-authorized-representative\.md)$' || true)
 

@@ -254,9 +254,6 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
     inputs.version === "single" || inputs.version === "single-s" ||
     inputs.version === "member-single" || inputs.version === "member-single-s";
   const isMulti = !isSingle;
-  /** The S corporation forms hardwire identical ownership across all series. */
-    inputs.version === "s" || inputs.version === "member-s" ||
-    inputs.version === "single-s" || inputs.version === "member-single-s";
   /** Member-managed forms have no Manager to name. */
   const isMemberManaged =
     inputs.version === "member" || inputs.version === "member-s" ||
