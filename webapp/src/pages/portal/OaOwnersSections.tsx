@@ -3,7 +3,7 @@
 // OAQuestionnaire.tsx on 29 Aug 2026 so their contracts are explicit props
 // instead of closures over an 880-line component. The pairing pickers own
 // their local selection state; committing a pair goes through onPair.
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Heart, Plus, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -79,6 +79,18 @@ export function SpousePairingCard({ owners, couples, unpaired, onPair, onUnpair 
   const [pairA, setPairA] = useState<number | "">("");
   const [pairB, setPairB] = useState<number | "">("");
   const [pairForm, setPairForm] = useState<"TBE" | "JTWROS">("TBE");
+  // A selection goes stale when its owner is deleted or renumbered before the
+  // pair is committed: the browser blanks the visible option but the numeric
+  // index survives in state, and clicking Pair saved a couple referencing a
+  // nonexistent owner (Codex OA-PAIR-001). Whenever the unpaired list
+  // changes, any selection it no longer contains is cleared.
+  useEffect(() => {
+    if (pairA !== "" && !unpaired.some((m) => m.i === pairA)) setPairA("");
+    if (pairB !== "" && !unpaired.some((m) => m.i === pairB)) setPairB("");
+  }, [unpaired, pairA, pairB]);
+  const pairValid =
+    pairA !== "" && pairB !== "" && pairA !== pairB &&
+    unpaired.some((m) => m.i === pairA) && unpaired.some((m) => m.i === pairB);
   return (
     <QuestionCard title="Do any owners hold their interest together as spouses?" learnMore="spousal">
                     <p className="text-xs text-muted-foreground">
@@ -161,9 +173,13 @@ export function SpousePairingCard({ owners, couples, unpaired, onPair, onUnpair 
                             size="sm"
                             variant="outline"
                             className="rounded-full"
-                            disabled={pairA === "" || pairB === "" || pairA === pairB}
+                            disabled={!pairValid}
                             onClick={() => {
-                              if (pairA === "" || pairB === "") return;
+                              // Belt over the effect's braces: never commit a
+                              // pair whose indexes are not two distinct,
+                              // currently-unpaired owners.
+                              if (!pairValid) return;
+                              if (typeof pairA !== "number" || typeof pairB !== "number") return;
                               onPair(pairA, pairB, pairForm);
                               setPairA("");
                               setPairB("");

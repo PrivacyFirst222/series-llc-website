@@ -2154,6 +2154,22 @@ if (mint.status === 200) {
   // The defect: a slow earlier keystroke arriving late must not win.
   const stale = await put(3, "OLDER");
   check("a stale save is answered without error", stale.status === 200, stale.body);
+
+  // OA-PAIR-001: a couple referencing a nonexistent owner index must be
+  // refused server-side — the client pickers sanitize themselves now, but no
+  // client bug may ever save a ghost couple.
+  {
+    const ghost = await api("/api/portal/oa/answers?rev=999999", {
+      method: "PUT", cookies: pw.cookie,
+      body: JSON.stringify({ members: [{ name: "Only Owner" }, { name: "Second Owner" }], couples: [{ a: 0, b: 2, form: "TBE" }] }),
+    });
+    check("ghost couple (index beyond owners) refused", ghost.status === 400, ghost.body);
+    const dup = await api("/api/portal/oa/answers?rev=999998", {
+      method: "PUT", cookies: pw.cookie,
+      body: JSON.stringify({ members: [{ name: "A" }, { name: "B" }, { name: "C" }], couples: [{ a: 0, b: 1, form: "TBE" }, { a: 1, b: 2, form: "JTWROS" }] }),
+    });
+    check("owner in two couples refused", dup.status === 400, dup.body);
+  }
   check(
     "an OLDER answer does NOT overwrite a newer one",
     (await storedPurpose()) === "NEWER",

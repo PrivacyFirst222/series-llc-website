@@ -105619,6 +105619,23 @@ var oaAnswersSchema = external_exports.object({
       todBeneficiary: external_exports.string().max(300).optional()
     })
   ).max(10).optional()
+}).superRefine((a2, ctx) => {
+  const n = a2.members?.length ?? 0;
+  const seen = /* @__PURE__ */ new Set();
+  for (const [i, cpl] of (a2.couples ?? []).entries()) {
+    for (const idx of [cpl.a, cpl.b]) {
+      if (idx >= n) {
+        ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["couples", i], message: `Couple references owner ${idx + 1}, but only ${n} owners exist.` });
+      }
+      if (seen.has(idx)) {
+        ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["couples", i], message: "An owner can be in at most one couple." });
+      }
+      seen.add(idx);
+    }
+    if (cpl.a === cpl.b) {
+      ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["couples", i], message: "A couple needs two different owners." });
+    }
+  }
 });
 var SPOUSAL_FORM_LABEL = {
   TBE: "tenants by the entirety",
@@ -107131,6 +107148,17 @@ var verifyAddressSchema = external_exports.object({
 });
 function registerPaymentRoutes(app2) {
   app2.get("/config", (c) => c.json({ data: { ordering: orderingEnabled() } }));
+  app2.get("/health", async (c) => {
+    try {
+      const db = await getDb();
+      await db.query("SELECT 1");
+    } catch (e) {
+      console.error("[health] database check failed:", e);
+      return c.json({ data: { ok: false, database: false, ordering: orderingEnabled() } }, 503);
+    }
+    const ordering = orderingEnabled();
+    return c.json({ data: { ok: ordering, database: true, ordering } }, ordering ? 200 : 503);
+  });
   app2.post("/orders", async (c) => {
     if (!orderingEnabled()) {
       return c.json(err("Online ordering is not enabled yet.", "ORDERING_DISABLED"), 503);

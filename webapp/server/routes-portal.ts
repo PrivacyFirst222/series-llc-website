@@ -178,7 +178,30 @@ export const oaAnswersSchema = z.object({
     )
     .max(10)
     .optional(),
-});
+})
+  // A couple must reference two DISTINCT, EXISTING owners, each in at most one
+  // couple. The client-side pickers once let a selection go stale when its
+  // owner was deleted before the pair was committed, and a couple referencing
+  // a nonexistent index autosaved (Codex OA-PAIR-001). The pickers now
+  // sanitize themselves, but no client bug may ever save a ghost couple.
+  .superRefine((a, ctx) => {
+    const n = a.members?.length ?? 0;
+    const seen = new Set<number>();
+    for (const [i, cpl] of (a.couples ?? []).entries()) {
+      for (const idx of [cpl.a, cpl.b]) {
+        if (idx >= n) {
+          ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["couples", i], message: `Couple references owner ${idx + 1}, but only ${n} owners exist.` });
+        }
+        if (seen.has(idx)) {
+          ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["couples", i], message: "An owner can be in at most one couple." });
+        }
+        seen.add(idx);
+      }
+      if (cpl.a === cpl.b) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["couples", i], message: "A couple needs two different owners." });
+      }
+    }
+  });
 
 export const SPOUSAL_FORM_LABEL: Record<"TBE" | "JTWROS", string> = {
   TBE: "tenants by the entirety",

@@ -31,16 +31,12 @@ postcss, picomatch, brace-expansion, minimatch, flatted, nanoid): these
 run on the developer's machine and in Vercel's build container. The
 production site serves their OUTPUT, not the tools. The attack surface
 (dev-server requests, ReDoS on globs during builds) does not exist in
-production. Risk accepted until the post-launch Vite 7 migration.
+production. Risk accepted; these clear as eslint/tailwind release updated chains.
 
-**react-router / react-router-dom (2 moderate, runtime)** — fixes are in
-v7 only:
-- SSR hydration constructor injection (GHSA-337j-9hxr-rhxg): this app has
-  no SSR — it is a static SPA; `deserializeErrors()` never runs.
-- Open redirect via backslash in Link/useNavigate (GHSA-wrjc-x8rr-h8h6):
-  requires user-controlled navigation targets; every Link and navigate()
-  in this app uses hardcoded paths. Grep basis: no navigation call takes
-  its destination from user input or the URL.
+**react-router — RESOLVED 29 Aug 2026** by the v7 upgrade; both advisories
+fixed by version. The reachability arguments that previously stood here are
+retired, not proven wrong.
+
 
 **lodash — RESOLVED 29 Aug 2026.** The earlier note here said lodash was
 "pulled by the document toolchain"; that was wrong (Codex DEP-002 caught

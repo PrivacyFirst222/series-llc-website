@@ -230,6 +230,22 @@ export function registerPaymentRoutes(app: Hono) {
 
 app.get("/config", (c) => c.json({ data: { ordering: orderingEnabled() } }));
 
+  // The uptime monitor's contract. /config never touches the database, so a
+  // dead database — or a migration-checksum refusal — looked healthy while
+  // every order failed (Codex OPS-UPTIME-001). This endpoint proves the parts
+  // an order actually needs: the database answers and ordering is on.
+  app.get("/health", async (c) => {
+    try {
+      const db = await getDb();
+      await db.query("SELECT 1");
+    } catch (e) {
+      console.error("[health] database check failed:", e);
+      return c.json({ data: { ok: false, database: false, ordering: orderingEnabled() } }, 503);
+    }
+    const ordering = orderingEnabled();
+    return c.json({ data: { ok: ordering, database: true, ordering } }, ordering ? 200 : 503);
+  });
+
 app.post("/orders", async (c) => {
   if (!orderingEnabled()) {
     return c.json(err("Online ordering is not enabled yet.", "ORDERING_DISABLED"), 503);
