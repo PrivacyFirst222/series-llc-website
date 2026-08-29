@@ -1,0 +1,30 @@
+# Uptime watch: pings the live site on a schedule; a failed run makes GitHub
+# email the repository owner. Before this, the only outage detector was a
+# client's complaint — the 27 Aug API deletion was caught in one minute only
+# because a deploy happened to be watched (P45). Scheduled granularity is
+# 5-15 minutes at GitHub's discretion; that converts "down silently for a
+# day" into "known within minutes."
+name: uptime
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "Override probe URL (testing the alarm path)"
+        required: false
+        default: ""
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: The site must answer and say ordering is on
+        run: |
+          URL="${{ github.event.inputs.url }}"
+          if [ -z "$URL" ]; then URL="https://myfloridaseriesllc.com/api/config"; fi
+          BODY=$(curl -sf --max-time 20 "$URL") || { echo "SITE DID NOT ANSWER: $URL"; exit 1; }
+          echo "$BODY" | grep -q '"ordering"' || { echo "SITE ANSWERED WRONG: $BODY"; exit 1; }
+          echo "healthy: $BODY"
