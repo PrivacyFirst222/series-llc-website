@@ -1662,8 +1662,13 @@ app.post("/admin/library/:key", async (c) => {
     return c.json(err("title and file are required.", "INVALID_INPUT"), 400);
   }
   if (file.size > MAX_UPLOAD_BYTES) return c.json(err("File is too large (20 MB max).", "TOO_LARGE"), 400);
-  if (claimsPdf(file) && !(await looksLikePdf(file))) {
-    return c.json(err(`${file.name} says it is a PDF but is not readable as one.`, "NOT_A_PDF"), 400);
+  // Strict, not claims-based: the portal download layer stamps ".pdf" and
+  // serves application/pdf on EVERYTHING it delivers, so a text file that
+  // never claimed to be a PDF still reaches the client dressed as one
+  // (Codex UPLOAD-003 — the claims-based version of this check let exactly
+  // that through). If it will be delivered as a PDF, it must be one.
+  if (!(await looksLikePdf(file))) {
+    return c.json(err(`${file.name} is not a readable PDF. Everything delivered through the portal is a PDF.`, "NOT_A_PDF"), 400);
   }
   const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
   const db = await getDb();
@@ -3089,6 +3094,22 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
   // with an empty portal — Codex FORM-001, second finding). The worst
   // surviving state is a brief window where a retry shows both packages;
   // duplicates beat destruction, and the next retry converges.
+  // One replacement at a time per order: two concurrent submissions both
+  // succeeded and produced a doubled package and doubled completion emails
+  // (Codex FORM-002). The claim is a single atomic UPDATE — the same pattern
+  // that serializes payment fulfillment — and a stale claim self-releases
+  // after ten minutes so a crashed attempt cannot wedge the order.
+  const claim = await db.query<{ id: string }>(
+    `UPDATE orders SET replacing_at = now()
+      WHERE id = $1 AND (replacing_at IS NULL OR replacing_at < now() - interval '10 minutes')
+      RETURNING id`,
+    [o.id],
+  );
+  if (claim.length === 0) {
+    return c.json(err("A replacement for this order is already being processed.", "REPLACEMENT_IN_PROGRESS"), 409);
+  }
+  try {
+
   const priorDocs = await db.query<{ id: string; storage_key: string }>(
     "SELECT id, storage_key FROM documents WHERE order_id = $1 AND kind IN ('articles', 'psd')",
     [o.id],
@@ -3193,6 +3214,13 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
     );
   }
   return c.json({ data: { ok: true, notified, documents: files.length } });
+  } finally {
+    // Release the replacement claim on every path — success, compensation,
+    // or throw — so the next attempt is never blocked by a finished one.
+    await db
+      .query("UPDATE orders SET replacing_at = NULL WHERE id = $1", [o.id])
+      .catch((e) => console.error("[formation] claim release failed:", e));
+  }
 });
 
 app.get("/admin/clients", async (c) => {
@@ -3498,9 +3526,6 @@ const looksLikePdf = async (f: File): Promise<boolean> => {
   return tail.includes("%%EOF");
 };
 
-/** True when the upload claims to be a PDF by type or filename. */
-const claimsPdf = (f: File): boolean =>
-  (f.type || "").toLowerCase().includes("pdf") || f.name.toLowerCase().endsWith(".pdf");
 
 app.post("/admin/documents", async (c) => {
   const admin = await requireAdmin(c);
@@ -3517,8 +3542,13 @@ app.post("/admin/documents", async (c) => {
   if (file.size > MAX_UPLOAD_BYTES) {
     return c.json(err("File is too large (20 MB max).", "TOO_LARGE"), 400);
   }
-  if (claimsPdf(file) && !(await looksLikePdf(file))) {
-    return c.json(err(`${file.name} says it is a PDF but is not readable as one.`, "NOT_A_PDF"), 400);
+  // Strict, not claims-based: the portal download layer stamps ".pdf" and
+  // serves application/pdf on EVERYTHING it delivers, so a text file that
+  // never claimed to be a PDF still reaches the client dressed as one
+  // (Codex UPLOAD-003 — the claims-based version of this check let exactly
+  // that through). If it will be delivered as a PDF, it must be one.
+  if (!(await looksLikePdf(file))) {
+    return c.json(err(`${file.name} is not a readable PDF. Everything delivered through the portal is a PDF.`, "NOT_A_PDF"), 400);
   }
   const db = await getDb();
   const clients = await db.query<{ email: string }>("SELECT email FROM clients WHERE id = $1", [clientId]);

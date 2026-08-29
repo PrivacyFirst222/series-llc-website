@@ -215,7 +215,51 @@ export async function renderMarkdownPdf(opts: {
   // Center the title block (everything before the first ARTICLE/RECITALS heading).
   let inTitle = opts.centerTitleBlock !== false;
 
-  for (const block of blocks) {
+  // Keep-tail-together: a forced [[pagebreak]] (the signature page, an
+  // exhibit) can leave the last few lines before it stranded alone on an
+  // otherwise blank page — s. 13.10 of the member-managed single-member form
+  // sat as three lines on its own page (Codex PDF-002). When the remaining
+  // blocks before a nearby pagebreak are one small unit that will not fit on
+  // the current page, break early so the unit lands together with company.
+  const TAIL_MAX_LINES = 16;
+  const tailHeightBeforeBreak = (from: number): number | null => {
+    let h = 0;
+    for (let k = from; k < blocks.length && k < from + 6; k++) {
+      const b = blocks[k];
+      if (b.kind === "para" && b.segs.length === 1 && b.segs[0].text.trim() === "[[pagebreak]]") {
+        return h;
+      }
+      if (b.kind === "para") {
+        const t = b.segs[0]?.text.trim();
+        if (t === "[[left]]") continue;
+        const ls = wrapSegs(fonts, b.segs.map((sg) => ({ ...sg })), width, BODY_SIZE);
+        h += ls.length * (BODY_SIZE + LINE_GAP) + 6;
+        if (h > TAIL_MAX_LINES * (BODY_SIZE + LINE_GAP)) return null;
+      } else if (b.kind === "heading") {
+        h += (b.level === 1 ? 16 : b.level === 2 ? 13 : 12) + LINE_GAP + 8 + 4;
+      } else {
+        return null; // tables are their own problem — never pull those
+      }
+    }
+    return null;
+  };
+  let tailPulled = false;
+
+  for (let bi = 0; bi < blocks.length; bi++) {
+    const block = blocks[bi];
+    if (block.kind === "para" && !tailPulled) {
+      const t0 = block.segs[0]?.text.trim();
+      if (t0 !== "[[pagebreak]]" && t0 !== "[[left]]") {
+        const tail = tailHeightBeforeBreak(bi);
+        if (tail !== null && tail > 0 && y - tail < MARGIN && tail <= TAIL_MAX_LINES * (BODY_SIZE + LINE_GAP)) {
+          newPage();
+          tailPulled = true;
+        }
+      }
+    }
+    if (block.kind === "para" && block.segs.length === 1 && block.segs[0].text.trim() === "[[pagebreak]]") {
+      tailPulled = false;
+    }
     if (block.kind === "heading") {
       const isPart = /^(ARTICLE|RECITALS|SIGNATURES|EXHIBIT|SERIES EXHIBIT|ASSET SCHEDULE)/.test(block.text.trim());
       if (isPart) inTitle = false;

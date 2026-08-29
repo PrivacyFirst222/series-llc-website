@@ -204,6 +204,12 @@ ALTER TABLE orders ADD COLUMN IF NOT EXISTS formed_at timestamptz;
 -- resumes where it left off — on any machine, which is why this is here and not
 -- in the browser.
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS copied_fields jsonb NOT NULL DEFAULT '{}'::jsonb;
+-- Serializes formation-package replacement per order. Two concurrent
+-- replacements both succeeded and left a doubled package with doubled
+-- completion emails (Codex FORM-002). The claim is one atomic UPDATE and a
+-- stale claim self-releases after ten minutes so a crashed attempt cannot
+-- wedge the order.
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS replacing_at timestamptz;
 -- One Protected Series Designation document may cover several series, so the
 -- coverage is recorded per document rather than assumed one-to-one.
 ALTER TABLE documents ADD COLUMN IF NOT EXISTS meta jsonb NOT NULL DEFAULT '{}'::jsonb;

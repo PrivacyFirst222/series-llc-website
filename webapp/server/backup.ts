@@ -61,8 +61,18 @@ async function putBackup(name: string, data: Buffer): Promise<string> {
 export async function listBackups(): Promise<BackupInfo[]> {
   if (env.BLOB_READ_WRITE_TOKEN) {
     const { list } = await import("@vercel/blob");
-    const res = await list({ prefix: PREFIX, limit: 100 });
-    return res.blobs
+    // Paginate to completion: backups are kept forever (Adam's ruling), and a
+    // single page holds 1,000 — the old limit:100 with no cursor meant the
+    // admin panel and its download route could see at most 100 backups ever,
+    // silently orphaning the rest (Codex BAK-002).
+    const blobs: Awaited<ReturnType<typeof list>>["blobs"] = [];
+    let cursor: string | undefined;
+    do {
+      const res = await list({ prefix: PREFIX, limit: 1000, cursor });
+      blobs.push(...res.blobs);
+      cursor = res.hasMore ? res.cursor : undefined;
+    } while (cursor);
+    return blobs
       .map((b) => ({
         key: b.pathname.slice(PREFIX.length),
         storageKey: b.url,

@@ -6,7 +6,8 @@ reachable in THIS application. Re-run `bun audit` and update this file
 whenever dependencies change. Baseline: 29 Aug 2026, after removing three
 unused dependencies (@hookform/resolvers, date-fns, framer-motion) and
 applying every compatible update — 46 advisories became 31 (19 high,
-12 moderate).
+12 moderate); the 29 Aug scaffolding removal took it to 28 (18 high, 10
+moderate).
 
 Everything remaining requires a breaking major-version jump (Vite 5→7,
 React Router 6→7, and their toolchains). The pre-launch decision, per the
@@ -31,9 +32,15 @@ v7 only:
   in this app uses hardcoded paths. Grep basis: no navigation call takes
   its destination from user input or the URL.
 
-**lodash (3, transitive)** — pulled by the document toolchain, used at
-generation time on trusted inputs (our own masters), never on client
-input. No fixed release exists at the vulnerable range's ceiling.
+**lodash — RESOLVED 29 Aug 2026.** The earlier note here said lodash was
+"pulled by the document toolchain"; that was wrong (Codex DEP-002 caught
+it) — it arrived through recharts, a chart library nothing imported.
+The sixth-audit scaffolding removal (35 unreachable UI files, 25
+dependencies, both independently derived from the module graph) removed
+recharts, and every lodash advisory with it. The correction stands here
+because a wrong reachability reason that happens to reach the right
+verdict is still a wrong reason, and this file's authority is the
+reasoning.
 
 ## The rule
 

@@ -99735,6 +99735,12 @@ ALTER TABLE orders ADD COLUMN IF NOT EXISTS formed_at timestamptz;
 -- resumes where it left off \u2014 on any machine, which is why this is here and not
 -- in the browser.
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS copied_fields jsonb NOT NULL DEFAULT '{}'::jsonb;
+-- Serializes formation-package replacement per order. Two concurrent
+-- replacements both succeeded and left a doubled package with doubled
+-- completion emails (Codex FORM-002). The claim is one atomic UPDATE and a
+-- stale claim self-releases after ten minutes so a crashed attempt cannot
+-- wedge the order.
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS replacing_at timestamptz;
 -- One Protected Series Designation document may cover several series, so the
 -- coverage is recorded per document rather than assumed one-to-one.
 ALTER TABLE documents ADD COLUMN IF NOT EXISTS meta jsonb NOT NULL DEFAULT '{}'::jsonb;
@@ -99824,8 +99830,14 @@ async function putBackup(name, data) {
 async function listBackups() {
   if (env.BLOB_READ_WRITE_TOKEN) {
     const { list: list2 } = await Promise.resolve().then(() => (init_dist(), dist_exports));
-    const res = await list2({ prefix: PREFIX, limit: 100 });
-    return res.blobs.map((b2) => ({
+    const blobs = [];
+    let cursor;
+    do {
+      const res = await list2({ prefix: PREFIX, limit: 1e3, cursor });
+      blobs.push(...res.blobs);
+      cursor = res.hasMore ? res.cursor : void 0;
+    } while (cursor);
+    return blobs.map((b2) => ({
       key: b2.pathname.slice(PREFIX.length),
       storageKey: b2.url,
       sizeBytes: b2.size,
@@ -100256,7 +100268,44 @@ async function renderMarkdownPdf(opts) {
     }
   };
   let inTitle = opts.centerTitleBlock !== false;
-  for (const block of blocks) {
+  const TAIL_MAX_LINES = 16;
+  const tailHeightBeforeBreak = (from) => {
+    let h = 0;
+    for (let k = from; k < blocks.length && k < from + 6; k++) {
+      const b2 = blocks[k];
+      if (b2.kind === "para" && b2.segs.length === 1 && b2.segs[0].text.trim() === "[[pagebreak]]") {
+        return h;
+      }
+      if (b2.kind === "para") {
+        const t = b2.segs[0]?.text.trim();
+        if (t === "[[left]]") continue;
+        const ls = wrapSegs(fonts, b2.segs.map((sg) => ({ ...sg })), width, BODY_SIZE);
+        h += ls.length * (BODY_SIZE + LINE_GAP) + 6;
+        if (h > TAIL_MAX_LINES * (BODY_SIZE + LINE_GAP)) return null;
+      } else if (b2.kind === "heading") {
+        h += (b2.level === 1 ? 16 : b2.level === 2 ? 13 : 12) + LINE_GAP + 8 + 4;
+      } else {
+        return null;
+      }
+    }
+    return null;
+  };
+  let tailPulled = false;
+  for (let bi2 = 0; bi2 < blocks.length; bi2++) {
+    const block = blocks[bi2];
+    if (block.kind === "para" && !tailPulled) {
+      const t0 = block.segs[0]?.text.trim();
+      if (t0 !== "[[pagebreak]]" && t0 !== "[[left]]") {
+        const tail = tailHeightBeforeBreak(bi2);
+        if (tail !== null && tail > 0 && y - tail < MARGIN && tail <= TAIL_MAX_LINES * (BODY_SIZE + LINE_GAP)) {
+          newPage();
+          tailPulled = true;
+        }
+      }
+    }
+    if (block.kind === "para" && block.segs.length === 1 && block.segs[0].text.trim() === "[[pagebreak]]") {
+      tailPulled = false;
+    }
     if (block.kind === "heading") {
       const isPart = /^(ARTICLE|RECITALS|SIGNATURES|EXHIBIT|SERIES EXHIBIT|ASSET SCHEDULE)/.test(block.text.trim());
       if (isPart) inTitle = false;
@@ -107321,8 +107370,8 @@ app.post("/admin/library/:key", async (c) => {
     return c.json(err2("title and file are required.", "INVALID_INPUT"), 400);
   }
   if (file.size > MAX_UPLOAD_BYTES) return c.json(err2("File is too large (20 MB max).", "TOO_LARGE"), 400);
-  if (claimsPdf(file) && !await looksLikePdf(file)) {
-    return c.json(err2(`${file.name} says it is a PDF but is not readable as one.`, "NOT_A_PDF"), 400);
+  if (!await looksLikePdf(file)) {
+    return c.json(err2(`${file.name} is not a readable PDF. Everything delivered through the portal is a PDF.`, "NOT_A_PDF"), 400);
   }
   const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
   const db2 = await getDb();
@@ -108478,100 +108527,113 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
       return c.json(err2(`${f.name} is not a readable PDF. Filed Articles and designations must be the PDFs from Sunbiz.`, "NOT_A_PDF"), 400);
     }
   }
-  const priorDocs = await db2.query(
-    "SELECT id, storage_key FROM documents WHERE order_id = $1 AND kind IN ('articles', 'psd')",
+  const claim = await db2.query(
+    `UPDATE orders SET replacing_at = now()
+      WHERE id = $1 AND (replacing_at IS NULL OR replacing_at < now() - interval '10 minutes')
+      RETURNING id`,
     [o.id]
   );
-  let formationPuts = 0;
-  const stagedPut = async (name, data, type) => {
-    if (failFormationPutAfter >= 0 && formationPuts >= failFormationPutAfter) {
-      failFormationPutAfter = -1;
-      throw new Error("dev: injected formation storage failure");
-    }
-    formationPuts += 1;
-    return putFile(name, data, type);
-  };
-  const newRows = [];
-  const newKeys = [];
+  if (claim.length === 0) {
+    return c.json(err2("A replacement for this order is already being processed.", "REPLACEMENT_IN_PROGRESS"), 409);
+  }
   try {
-    const storedArticles = await stagedPut(
-      articles.name,
-      await articles.arrayBuffer(),
-      articles.type || "application/pdf"
+    const priorDocs = await db2.query(
+      "SELECT id, storage_key FROM documents WHERE order_id = $1 AND kind IN ('articles', 'psd')",
+      [o.id]
     );
-    newKeys.push(storedArticles.storageKey);
-    const artRow = await db2.query(
-      `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
-       VALUES ($1, $2, 'articles', $3, $4, $5, $6, '{}'::jsonb) RETURNING id`,
-      [
-        o.client_id,
-        o.id,
-        `Articles of Organization \u2014 ${o.llc_name}`,
-        storedArticles.storageKey,
-        articles.type || "application/pdf",
-        storedArticles.sizeBytes
-      ]
-    );
-    newRows.push(artRow[0].id);
-    for (let i = 0; i < psdFiles.length; i += 1) {
-      const f = psdFiles[i];
-      const names = psdSeries[i];
-      const stored = await stagedPut(f.name, await f.arrayBuffer(), f.type || "application/pdf");
-      newKeys.push(stored.storageKey);
-      const psdRow = await db2.query(
+    let formationPuts = 0;
+    const stagedPut = async (name, data, type) => {
+      if (failFormationPutAfter >= 0 && formationPuts >= failFormationPutAfter) {
+        failFormationPutAfter = -1;
+        throw new Error("dev: injected formation storage failure");
+      }
+      formationPuts += 1;
+      return putFile(name, data, type);
+    };
+    const newRows = [];
+    const newKeys = [];
+    try {
+      const storedArticles = await stagedPut(
+        articles.name,
+        await articles.arrayBuffer(),
+        articles.type || "application/pdf"
+      );
+      newKeys.push(storedArticles.storageKey);
+      const artRow = await db2.query(
         `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
-         VALUES ($1, $2, 'psd', $3, $4, $5, $6, $7) RETURNING id`,
+       VALUES ($1, $2, 'articles', $3, $4, $5, $6, '{}'::jsonb) RETURNING id`,
         [
           o.client_id,
           o.id,
-          `Protected Series Designation \u2014 ${names.join(", ")}`,
-          stored.storageKey,
-          f.type || "application/pdf",
-          stored.sizeBytes,
-          JSON.stringify({ seriesNames: names })
+          `Articles of Organization \u2014 ${o.llc_name}`,
+          storedArticles.storageKey,
+          articles.type || "application/pdf",
+          storedArticles.sizeBytes
         ]
       );
-      newRows.push(psdRow[0].id);
-    }
-  } catch (e) {
-    if (newRows.length > 0) {
-      await db2.query("DELETE FROM documents WHERE id = ANY($1::uuid[])", [newRows]).catch((err3) => console.error("[formation] compensation delete failed:", err3));
-    }
-    for (const k of newKeys) {
-      await deleteFile(k);
-    }
-    throw e;
-  }
-  if (priorDocs.length > 0) {
-    await db2.query("DELETE FROM documents WHERE id = ANY($1::uuid[])", [priorDocs.map((d2) => d2.id)]);
-    for (const d2 of priorDocs) {
-      await deleteFile(d2.storage_key);
-    }
-  }
-  await db2.query(
-    "UPDATE orders SET status = 'formed', formed_at = now(), filed_at = COALESCE(filed_at, now()) WHERE id = $1",
-    [o.id]
-  );
-  const clients = await db2.query(
-    "SELECT email, name FROM clients WHERE id = $1",
-    [o.client_id]
-  );
-  let notified = false;
-  if (clients.length > 0) {
-    const mail = llcFormedEmail({
-      llcName: o.llc_name,
-      seriesNames: required,
-      portalUrl: `${env.PUBLIC_BASE_URL}/portal`
-    });
-    notified = await sendMail({ to: clients[0].email, ...mail }).then(
-      () => true,
-      (e) => {
-        console.error("[admin] formed email failed:", e);
-        return false;
+      newRows.push(artRow[0].id);
+      for (let i = 0; i < psdFiles.length; i += 1) {
+        const f = psdFiles[i];
+        const names = psdSeries[i];
+        const stored = await stagedPut(f.name, await f.arrayBuffer(), f.type || "application/pdf");
+        newKeys.push(stored.storageKey);
+        const psdRow = await db2.query(
+          `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
+         VALUES ($1, $2, 'psd', $3, $4, $5, $6, $7) RETURNING id`,
+          [
+            o.client_id,
+            o.id,
+            `Protected Series Designation \u2014 ${names.join(", ")}`,
+            stored.storageKey,
+            f.type || "application/pdf",
+            stored.sizeBytes,
+            JSON.stringify({ seriesNames: names })
+          ]
+        );
+        newRows.push(psdRow[0].id);
       }
+    } catch (e) {
+      if (newRows.length > 0) {
+        await db2.query("DELETE FROM documents WHERE id = ANY($1::uuid[])", [newRows]).catch((err3) => console.error("[formation] compensation delete failed:", err3));
+      }
+      for (const k of newKeys) {
+        await deleteFile(k);
+      }
+      throw e;
+    }
+    if (priorDocs.length > 0) {
+      await db2.query("DELETE FROM documents WHERE id = ANY($1::uuid[])", [priorDocs.map((d2) => d2.id)]);
+      for (const d2 of priorDocs) {
+        await deleteFile(d2.storage_key);
+      }
+    }
+    await db2.query(
+      "UPDATE orders SET status = 'formed', formed_at = now(), filed_at = COALESCE(filed_at, now()) WHERE id = $1",
+      [o.id]
     );
+    const clients = await db2.query(
+      "SELECT email, name FROM clients WHERE id = $1",
+      [o.client_id]
+    );
+    let notified = false;
+    if (clients.length > 0) {
+      const mail = llcFormedEmail({
+        llcName: o.llc_name,
+        seriesNames: required,
+        portalUrl: `${env.PUBLIC_BASE_URL}/portal`
+      });
+      notified = await sendMail({ to: clients[0].email, ...mail }).then(
+        () => true,
+        (e) => {
+          console.error("[admin] formed email failed:", e);
+          return false;
+        }
+      );
+    }
+    return c.json({ data: { ok: true, notified, documents: files.length } });
+  } finally {
+    await db2.query("UPDATE orders SET replacing_at = NULL WHERE id = $1", [o.id]).catch((e) => console.error("[formation] claim release failed:", e));
   }
-  return c.json({ data: { ok: true, notified, documents: files.length } });
 });
 app.get("/admin/clients", async (c) => {
   const admin = await requireAdmin(c);
@@ -108809,7 +108871,6 @@ var looksLikePdf = async (f) => {
   const tail = new TextDecoder().decode(bytes2.slice(-1024));
   return tail.includes("%%EOF");
 };
-var claimsPdf = (f) => (f.type || "").toLowerCase().includes("pdf") || f.name.toLowerCase().endsWith(".pdf");
 app.post("/admin/documents", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err2("Not signed in", "UNAUTHENTICATED"), 401);
@@ -108825,8 +108886,8 @@ app.post("/admin/documents", async (c) => {
   if (file.size > MAX_UPLOAD_BYTES) {
     return c.json(err2("File is too large (20 MB max).", "TOO_LARGE"), 400);
   }
-  if (claimsPdf(file) && !await looksLikePdf(file)) {
-    return c.json(err2(`${file.name} says it is a PDF but is not readable as one.`, "NOT_A_PDF"), 400);
+  if (!await looksLikePdf(file)) {
+    return c.json(err2(`${file.name} is not a readable PDF. Everything delivered through the portal is a PDF.`, "NOT_A_PDF"), 400);
   }
   const db2 = await getDb();
   const clients = await db2.query("SELECT email FROM clients WHERE id = $1", [clientId]);

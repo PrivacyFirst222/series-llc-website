@@ -427,6 +427,27 @@ const uploadRes = await fetch(BASE + "/api/admin/documents", {
 });
 check("admin uploads document", uploadRes.status === 200, await uploadRes.clone().json().catch(() => null));
 
+// UPLOAD-003: the portal download layer serves EVERYTHING as a PDF, so the
+// upload layer must be strictly PDF — a plain text file that never claimed to
+// be one used to sail through and reach the client dressed as a PDF.
+{
+  const txtFd = new FormData();
+  txtFd.set("clientId", client!.id);
+  txtFd.set("kind", "package");
+  txtFd.set("title", "Not A PDF Probe");
+  txtFd.set("notify", "false");
+  txtFd.set("file", new File([new TextEncoder().encode("plain text, not a pdf")], "probe.txt", { type: "text/plain" }));
+  const txtRes = await fetch(BASE + "/api/admin/documents", {
+    method: "POST", headers: { Cookie: admin.cookie }, body: txtFd,
+  });
+  const txtBody = (await txtRes.json().catch(() => null)) as { error?: { code?: string } } | null;
+  check(
+    "plain text upload refused on the document route (NOT_A_PDF)",
+    txtRes.status === 400 && txtBody?.error?.code === "NOT_A_PDF",
+    txtBody,
+  );
+}
+
 // 8. Client sets password via token (fish the token hash path: use forgot-flow instead — dev email logs the link)
 //    Simplest deterministic path: request a reset, then read the dev log is not machine-readable here,
 //    so exercise set-password with a token minted through the same public flow the email would carry.
@@ -694,6 +715,29 @@ if (mint.status === 200) {
       (d: { kind: string }) => d.kind === "articles" || d.kind === "psd",
     );
     check("package count converges to one set after recovery", finalDocs.length === 2, finalDocs.length);
+  }
+
+  // FORM-002: two concurrent replacements both succeeded and doubled the
+  // package and the completion emails. The per-order claim serializes them:
+  // exactly one 200, the other 409, and the package stays one set.
+  {
+    const mk = (tag: string) => {
+      const fd = new FormData();
+      fd.set("articles", new File([new TextEncoder().encode(`%PDF-1.4 concurrent articles ${tag}\n%%EOF`)], "articles.pdf", { type: "application/pdf" }));
+      fd.append("psd", new File([new TextEncoder().encode(`%PDF-1.4 concurrent psd ${tag}\n%%EOF`)], "psd.pdf", { type: "application/pdf" }));
+      fd.append("psdSeries", JSON.stringify(["E2E Coastal Holdings, LLC, PS A"]));
+      return fetch(`${BASE}/api/admin/orders/${orderId}/formation-documents`, {
+        method: "POST", headers: { Cookie: adminLoginF.cookie }, body: fd,
+      });
+    };
+    const [r1, r2] = await Promise.all([mk("one"), mk("two")]);
+    const statuses = [r1.status, r2.status].sort();
+    check("concurrent replacements: exactly one wins", statuses[0] === 200 && statuses[1] === 409, statuses);
+    const docsConc = await api("/api/portal/documents", { cookies: setPw.cookie });
+    const concDocs = (docsConc.body?.data ?? []).filter(
+      (d: { kind: string }) => d.kind === "articles" || d.kind === "psd",
+    );
+    check("concurrent replacements leave exactly one package", concDocs.length === 2, concDocs.length);
   }
   const einDetails = await api(`/api/portal/services/${intakeEin.id}/ein-details`, {
     method: "POST", cookies: setPw.cookie, body: JSON.stringify(einPayload),
