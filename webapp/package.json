@@ -15,7 +15,8 @@
     "test": "bun run src/components/forms/florida-llc/validation.test.ts",
     "e2e": "bun run server/e2e.ts",
     "docs:sync": "bun run ../docs/sync.ts",
-    "check": "bun run typecheck && bun run lint && bun run test && bun run e2e && cd .. && python3 docs/provision-map.py && python3 docs/coverage-605.py && python3 docs/event-map.py && python3 docs/docs-consistency.py && python3 docs/structure.py && python3 docs/drafting-lint.py webapp/server/templates-oa-*.md && python3 docs/format-check.py docs/word/*.docx"
+    "check": "bun run typecheck && bun run lint && bun run test && bun run e2e && cd .. && python3 docs/provision-map.py && python3 docs/coverage-605.py && python3 docs/event-map.py && python3 docs/docs-consistency.py && python3 docs/structure.py && python3 docs/drafting-lint.py webapp/server/templates-oa-*.md && python3 docs/format-check.py docs/word/*.docx",
+    "prepare": "cd .. && git config core.hooksPath .githooks 2>/dev/null || true"
   },
   "dependencies": {
     "@cantoo/pdf-lib": "^2.9.1",

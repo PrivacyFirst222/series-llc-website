@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { env } from "./env";
 
 export interface Db {
@@ -5,8 +6,12 @@ export interface Db {
   query<T = Record<string, unknown>>(text: string, params?: unknown[]): Promise<T[]>;
 }
 
-let db: Db | null = null;
-let migrated = false;
+/** Single-flight: twenty concurrent cold requests must share ONE
+ *  initialization, not run twenty (Codex DB-INIT-001 measured the stampede
+ *  at 14.5s for what one caller does in 0.7s — and migration 2 would have
+ *  raced its own DDL). The PROMISE is cached, so every caller after the
+ *  first awaits the same work. */
+let ready: Promise<Db> | null = null;
 
 async function createDb(): Promise<Db> {
   if (env.DATABASE_URL) {
@@ -284,8 +289,7 @@ CREATE INDEX IF NOT EXISTS fl_entities_norm_key_idx ON fl_entities (norm_key)`,
     `
 -- Fixed-window rate limiting. In-memory counters reset on every serverless
 -- recycle and are per-instance, so distributed attempts sailed past them
--- (Codex AUTH-002). The schema runner splits statements on semicolons, so
--- comments here must never contain one.
+-- (Codex AUTH-002).
 CREATE TABLE IF NOT EXISTS rate_limits (
   key text PRIMARY KEY,
   window_start timestamptz NOT NULL,
@@ -306,33 +310,73 @@ const MIGRATIONS: { id: number; name: string; statements: string[] }[] = [
 ];
 
 
-export async function getDb(): Promise<Db> {
-  if (!db) db = await createDb();
-  if (!migrated) {
-    await db.query(
-      `CREATE TABLE IF NOT EXISTS schema_migrations (
-         id int PRIMARY KEY,
-         name text NOT NULL,
-         applied_at timestamptz NOT NULL DEFAULT now()
-       )`,
-    );
-    const done = new Set(
-      (await db.query<{ id: number }>("SELECT id FROM schema_migrations")).map((r) => Number(r.id)),
-    );
-    for (const m of [...MIGRATIONS].sort((a, b) => a.id - b.id)) {
-      if (done.has(m.id)) continue;
-      for (const stmt of m.statements) {
-        await db.query(stmt);
+/** Deterministic content hash of a migration's statements. Recorded in the
+ *  ledger and verified on every later boot: "never edit an applied
+ *  migration" was documentation before — an edited one silently diverged
+ *  fresh databases from existing ones (Codex MIG-IMM-001). Now it refuses
+ *  to boot instead. */
+function migrationChecksum(statements: string[]): string {
+  return createHash("sha256").update(statements.join("\n;;\n")).digest("hex");
+}
+
+async function initialize(): Promise<Db> {
+  const database = await createDb();
+  await database.query(
+    `CREATE TABLE IF NOT EXISTS schema_migrations (
+       id int PRIMARY KEY,
+       name text NOT NULL,
+       applied_at timestamptz NOT NULL DEFAULT now()
+     )`,
+  );
+  await database.query("ALTER TABLE schema_migrations ADD COLUMN IF NOT EXISTS checksum text");
+  const recorded = new Map(
+    (await database.query<{ id: number; checksum: string | null }>(
+      "SELECT id, checksum FROM schema_migrations",
+    )).map((r) => [Number(r.id), r.checksum] as const),
+  );
+  for (const m of [...MIGRATIONS].sort((a, b) => a.id - b.id)) {
+    const sum = migrationChecksum(m.statements);
+    if (recorded.has(m.id)) {
+      const prior = recorded.get(m.id);
+      if (prior && prior !== sum) {
+        throw new Error(
+          `migration ${m.id} (${m.name}) has been EDITED after being applied: ` +
+            `recorded checksum ${prior}, current ${sum}. Applied migrations are ` +
+            `immutable — add a new migration instead.`,
+        );
       }
-      // Recorded only after every statement succeeded; a mid-migration
-      // failure leaves it unrecorded and the whole migration re-runs, which
-      // idempotent statements make safe.
-      await db.query(
-        "INSERT INTO schema_migrations (id, name) VALUES ($1, $2) ON CONFLICT (id) DO NOTHING",
-        [m.id, m.name],
-      );
+      if (!prior) {
+        // A ledger row from before checksums existed: adopt the current
+        // content as the recorded truth, once.
+        await database.query(
+          "UPDATE schema_migrations SET checksum = $2 WHERE id = $1 AND checksum IS NULL",
+          [m.id, sum],
+        );
+      }
+      continue;
     }
-    migrated = true;
+    for (const stmt of m.statements) {
+      await database.query(stmt);
+    }
+    // Recorded only after every statement succeeded; a mid-migration failure
+    // leaves it unrecorded and the whole migration re-runs, which idempotent
+    // statements make safe.
+    await database.query(
+      "INSERT INTO schema_migrations (id, name, checksum) VALUES ($1, $2, $3) ON CONFLICT (id) DO NOTHING",
+      [m.id, m.name, sum],
+    );
   }
-  return db;
+  return database;
+}
+
+export async function getDb(): Promise<Db> {
+  if (!ready) {
+    ready = initialize().catch((e) => {
+      // A failed initialization must not be cached as success — the next
+      // caller retries from scratch.
+      ready = null;
+      throw e;
+    });
+  }
+  return ready;
 }

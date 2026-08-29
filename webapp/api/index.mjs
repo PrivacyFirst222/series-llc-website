@@ -95016,6 +95016,9 @@ var deleteCookie = (c, name, opt) => {
   return deletedCookie;
 };
 
+// server/db.ts
+import { createHash } from "node:crypto";
+
 // server/env.ts
 var OFFLINE = process.env.E2E_OFFLINE === "1";
 var ext = (v2) => OFFLINE ? "" : v2 ?? "";
@@ -95046,8 +95049,7 @@ var env = {
 };
 
 // server/db.ts
-var db = null;
-var migrated = false;
+var ready = null;
 async function createDb() {
   if (env.DATABASE_URL) {
     const { neon } = await Promise.resolve().then(() => (init_serverless(), serverless_exports));
@@ -95290,8 +95292,7 @@ CREATE INDEX IF NOT EXISTS fl_entities_norm_key_idx ON fl_entities (norm_key)`,
   `
 -- Fixed-window rate limiting. In-memory counters reset on every serverless
 -- recycle and are per-instance, so distributed attempts sailed past them
--- (Codex AUTH-002). The schema runner splits statements on semicolons, so
--- comments here must never contain one.
+-- (Codex AUTH-002).
 CREATE TABLE IF NOT EXISTS rate_limits (
   key text PRIMARY KEY,
   window_start timestamptz NOT NULL,
@@ -95309,32 +95310,59 @@ var MIGRATIONS = [
   { id: 1, name: "initial-schema", statements: MIGRATION_001_STATEMENTS }
   // Append future migrations here with the next id. Never edit an entry.
 ];
-async function getDb() {
-  if (!db) db = await createDb();
-  if (!migrated) {
-    await db.query(
-      `CREATE TABLE IF NOT EXISTS schema_migrations (
-         id int PRIMARY KEY,
-         name text NOT NULL,
-         applied_at timestamptz NOT NULL DEFAULT now()
-       )`
-    );
-    const done = new Set(
-      (await db.query("SELECT id FROM schema_migrations")).map((r) => Number(r.id))
-    );
-    for (const m2 of [...MIGRATIONS].sort((a2, b2) => a2.id - b2.id)) {
-      if (done.has(m2.id)) continue;
-      for (const stmt of m2.statements) {
-        await db.query(stmt);
+function migrationChecksum(statements) {
+  return createHash("sha256").update(statements.join("\n;;\n")).digest("hex");
+}
+async function initialize() {
+  const database = await createDb();
+  await database.query(
+    `CREATE TABLE IF NOT EXISTS schema_migrations (
+       id int PRIMARY KEY,
+       name text NOT NULL,
+       applied_at timestamptz NOT NULL DEFAULT now()
+     )`
+  );
+  await database.query("ALTER TABLE schema_migrations ADD COLUMN IF NOT EXISTS checksum text");
+  const recorded = new Map(
+    (await database.query(
+      "SELECT id, checksum FROM schema_migrations"
+    )).map((r) => [Number(r.id), r.checksum])
+  );
+  for (const m2 of [...MIGRATIONS].sort((a2, b2) => a2.id - b2.id)) {
+    const sum2 = migrationChecksum(m2.statements);
+    if (recorded.has(m2.id)) {
+      const prior = recorded.get(m2.id);
+      if (prior && prior !== sum2) {
+        throw new Error(
+          `migration ${m2.id} (${m2.name}) has been EDITED after being applied: recorded checksum ${prior}, current ${sum2}. Applied migrations are immutable \u2014 add a new migration instead.`
+        );
       }
-      await db.query(
-        "INSERT INTO schema_migrations (id, name) VALUES ($1, $2) ON CONFLICT (id) DO NOTHING",
-        [m2.id, m2.name]
-      );
+      if (!prior) {
+        await database.query(
+          "UPDATE schema_migrations SET checksum = $2 WHERE id = $1 AND checksum IS NULL",
+          [m2.id, sum2]
+        );
+      }
+      continue;
     }
-    migrated = true;
+    for (const stmt of m2.statements) {
+      await database.query(stmt);
+    }
+    await database.query(
+      "INSERT INTO schema_migrations (id, name, checksum) VALUES ($1, $2, $3) ON CONFLICT (id) DO NOTHING",
+      [m2.id, m2.name, sum2]
+    );
   }
-  return db;
+  return database;
+}
+async function getDb() {
+  if (!ready) {
+    ready = initialize().catch((e) => {
+      ready = null;
+      throw e;
+    });
+  }
+  return ready;
 }
 
 // server/crypto.ts
@@ -95342,7 +95370,7 @@ import {
   randomBytes,
   scrypt as scryptCb,
   timingSafeEqual,
-  createHash,
+  createHash as createHash2,
   createHmac,
   createCipheriv,
   createDecipheriv,
@@ -95370,7 +95398,7 @@ function newToken() {
   return { token, tokenHash: hashToken(token) };
 }
 function hashToken(token) {
-  return createHash("sha256").update(token).digest("hex");
+  return createHash2("sha256").update(token).digest("hex");
 }
 function hmacSha256Base64(key, message) {
   return createHmac("sha256", key).update(message).digest("base64");
@@ -95397,10 +95425,10 @@ function decryptSecret(stored) {
 var SESSION_COOKIE = "fpsllc_session";
 var SESSION_DAYS = 30;
 async function createSession(c, opts) {
-  const db2 = await getDb();
+  const db = await getDb();
   const { token, tokenHash } = newToken();
   const expires = new Date(Date.now() + SESSION_DAYS * 864e5);
-  await db2.query(
+  await db.query(
     "INSERT INTO sessions (token_hash, client_id, is_admin, expires_at) VALUES ($1, $2, $3, $4)",
     [tokenHash, opts.clientId ?? null, opts.isAdmin ?? false, expires.toISOString()]
   );
@@ -95415,9 +95443,9 @@ async function createSession(c, opts) {
 async function getSession(c) {
   const token = getCookie(c, SESSION_COOKIE);
   if (!token) return null;
-  const db2 = await getDb();
+  const db = await getDb();
   const tokenHash = hashToken(token);
-  const rows = await db2.query(
+  const rows = await db.query(
     "SELECT client_id, is_admin FROM sessions WHERE token_hash = $1 AND expires_at > now()",
     [tokenHash]
   );
@@ -95427,15 +95455,15 @@ async function getSession(c) {
 async function destroySession(c) {
   const token = getCookie(c, SESSION_COOKIE);
   if (token) {
-    const db2 = await getDb();
-    await db2.query("DELETE FROM sessions WHERE token_hash = $1", [hashToken(token)]);
+    const db = await getDb();
+    await db.query("DELETE FROM sessions WHERE token_hash = $1", [hashToken(token)]);
   }
   deleteCookie(c, SESSION_COOKIE, { path: "/" });
 }
 async function rateLimit(key, max, windowMs, failMode = "open") {
   try {
-    const db2 = await getDb();
-    const rows = await db2.query(
+    const db = await getDb();
+    const rows = await db.query(
       `INSERT INTO rate_limits (key, window_start, count) VALUES ($1, now(), 1)
        ON CONFLICT (key) DO UPDATE SET
          count = CASE WHEN rate_limits.window_start < now() - make_interval(secs => $2)
@@ -100337,7 +100365,7 @@ function sqlLit(s) {
   return s === null ? "NULL" : `'${s.replace(/'/g, "''")}'`;
 }
 async function upsertEntities(entities, batchSize = 5e3) {
-  const db2 = await getDb();
+  const db = await getDb();
   const byDoc = /* @__PURE__ */ new Map();
   for (const e of entities) byDoc.set(e.docNumber, e);
   const deduped = Array.from(byDoc.values());
@@ -100347,7 +100375,7 @@ async function upsertEntities(entities, batchSize = 5e3) {
     const values2 = batch.map(
       (e) => `(${sqlLit(e.docNumber)},${sqlLit(e.name)},${sqlLit(e.status)},${sqlLit(e.filingType)},${sqlLit(e.fileDate)},${sqlLit(e.lastTxnDate)},${sqlLit(e.normKey)})`
     ).join(",");
-    await db2.query(
+    await db.query(
       `INSERT INTO fl_entities (doc_number, name, status, filing_type, file_date, last_txn_date, norm_key)
        VALUES ${values2}
        ON CONFLICT (doc_number) DO UPDATE SET
@@ -100359,8 +100387,8 @@ async function upsertEntities(entities, batchSize = 5e3) {
   return written;
 }
 async function getSyncState() {
-  const db2 = await getDb();
-  const rows = await db2.query(
+  const db = await getDb();
+  const rows = await db.query(
     "SELECT baseline_label, last_daily::text, updated_at::text FROM fl_sync_state WHERE id = 1"
   );
   const r = rows[0];
@@ -100371,8 +100399,8 @@ async function getSyncState() {
   };
 }
 async function setSyncState(patch) {
-  const db2 = await getDb();
-  await db2.query(
+  const db = await getDb();
+  await db.query(
     `INSERT INTO fl_sync_state (id, baseline_label, last_daily, updated_at)
      VALUES (1, $1, $2, now())
      ON CONFLICT (id) DO UPDATE SET
@@ -100395,8 +100423,8 @@ function detailUrl(existing) {
 async function checkName(input) {
   const key = normalizeEntityName(input);
   if (!key) return { input, verdict: "clear", conflicts: [] };
-  const db2 = await getDb();
-  const rows = await db2.query(
+  const db = await getDb();
+  const rows = await db.query(
     `SELECT doc_number, name, status, last_txn_date::text, file_date::text
      FROM fl_entities WHERE norm_key = $1
      ORDER BY (status = 'A') DESC, last_txn_date DESC NULLS LAST
@@ -105497,8 +105525,8 @@ function seriesNames(payload) {
 // server/routes-portal.ts
 var loginSchema = external_exports.object({ email: external_exports.string().email(), password: external_exports.string().min(1) });
 async function oaSeed(clientId) {
-  const db2 = await getDb();
-  const orders = await db2.query(
+  const db = await getDb();
+  const orders = await db.query(
     // paid_at, not status = 'paid'. "Paid" stopped being the last status on
     // 16 August when filed and formed were added, and every query that asked
     // for the string rather than the fact broke silently — this one by telling
@@ -105523,7 +105551,7 @@ async function oaSeed(clientId) {
       "This order is manager-managed but lists no Manager. Correct the order before generating an agreement."
     );
   }
-  const svcSeries = await db2.query(
+  const svcSeries = await db.query(
     "SELECT details FROM service_orders WHERE client_id = $1 AND type = 'series' AND status IN ('in_progress','fulfilled')",
     [clientId]
   );
@@ -105608,8 +105636,8 @@ function effectiveOwners(seedMembers, answers) {
   return edited ? answered.map((m2) => ({ name: (m2.name ?? "").trim(), address: (m2.address ?? "").trim() })) : seedMembers.map((m2) => ({ name: m2.name, address: m2.address }));
 }
 async function savedOaAnswers(clientId) {
-  const db2 = await getDb();
-  const rows = await db2.query("SELECT answers FROM oa_profiles WHERE client_id = $1", [clientId]);
+  const db = await getDb();
+  const rows = await db.query("SELECT answers FROM oa_profiles WHERE client_id = $1", [clientId]);
   if (rows.length === 0) return null;
   const raw2 = rows[0].answers;
   return typeof raw2 === "string" ? JSON.parse(raw2) : raw2;
@@ -105625,27 +105653,27 @@ function fmtDate2(iso) {
 }
 var SERVICE_SAFE_COLUMNS = "id, type, status, llc_name, details, amount_cents, created_at, paid_at, fulfilled_at";
 async function clientLlcName(clientId) {
-  const db2 = await getDb();
-  const rows = await db2.query(
+  const db = await getDb();
+  const rows = await db.query(
     "SELECT llc_name FROM orders WHERE client_id = $1 AND paid_at IS NOT NULL ORDER BY paid_at DESC NULLS LAST LIMIT 1",
     [clientId]
   );
   return rows[0]?.llc_name ?? "";
 }
 async function clientLlcFormed(clientId) {
-  const db2 = await getDb();
-  const rows = await db2.query(
+  const db = await getDb();
+  const rows = await db.query(
     "SELECT 1 AS ok FROM orders WHERE client_id = $1 AND formed_at IS NOT NULL LIMIT 1",
     [clientId]
   );
   return rows.length > 0;
 }
 async function clientSeries(clientId) {
-  const db2 = await getDb();
+  const db = await getDb();
   const llcName = await clientLlcName(clientId);
   if (!llcName) return [];
   const names = [];
-  const formation = await db2.query(
+  const formation = await db.query(
     "SELECT payload FROM orders WHERE client_id = $1 AND paid_at IS NOT NULL ORDER BY paid_at ASC",
     [clientId]
   );
@@ -105655,7 +105683,7 @@ async function clientSeries(clientId) {
       names.push(n.toLowerCase().startsWith(llcName.toLowerCase()) ? n : `${llcName} - ${n}`);
     }
   }
-  const svc = await db2.query(
+  const svc = await db.query(
     `SELECT type, details FROM service_orders
      WHERE client_id = $1 AND type IN ('series', 'ein') AND status <> 'pending_payment'`,
     [clientId]
@@ -105677,8 +105705,8 @@ async function clientSeries(clientId) {
   return out;
 }
 async function sElectionEligibility(clientId) {
-  const db2 = await getDb();
-  const formed = await db2.query(
+  const db = await getDb();
+  const formed = await db.query(
     "SELECT paid_at FROM orders WHERE client_id = $1 AND paid_at IS NOT NULL AND package = 'NEW' ORDER BY paid_at DESC NULLS LAST LIMIT 1",
     [clientId]
   );
@@ -105687,7 +105715,7 @@ async function sElectionEligibility(clientId) {
   }
   const paidAt = new Date(String(formed[0].paid_at));
   const orderBy = new Date(paidAt.getTime() + S_ELECTION_WINDOW_DAYS * 864e5);
-  const existing = await db2.query(
+  const existing = await db.query(
     "SELECT id FROM service_orders WHERE client_id = $1 AND type = 's-election' AND status <> 'cancelled'",
     [clientId]
   );
@@ -105708,9 +105736,9 @@ function sElectionWindow(fulfilledAt) {
   return { open: Date.now() < deleteOn.getTime(), deleteOn: deleteOn.toISOString() };
 }
 async function purgeExpiredSElections() {
-  const db2 = await getDb();
+  const db = await getDb();
   const cutoff = new Date(Date.now() - S_ELECTION_EDIT_DAYS * 864e5).toISOString();
-  const rows = await db2.query(
+  const rows = await db.query(
     `SELECT id, client_id, llc_name, details FROM service_orders
       WHERE type = 's-election' AND status = 'fulfilled'
         AND fulfilled_at IS NOT NULL AND fulfilled_at < $1
@@ -105741,18 +105769,18 @@ async function purgeExpiredSElections() {
         const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength);
         const stored = await putFile(`${title.replace(/[^\w-]+/g, "_")}.pdf`, buf, "application/pdf");
         if (d2.documentId) {
-          const old = await db2.query(
+          const old = await db.query(
             "SELECT storage_key FROM documents WHERE id = $1",
             [d2.documentId]
           );
-          await db2.query(
+          await db.query(
             `UPDATE documents SET title = $1, storage_key = $2, size_bytes = $3 WHERE id = $4`,
             [title, stored.storageKey, stored.sizeBytes, d2.documentId]
           );
           if (old[0]?.storage_key) await deleteFile(old[0].storage_key).catch(() => {
           });
         } else {
-          const doc = await db2.query(
+          const doc = await db.query(
             `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)
              VALUES ($1, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,
             [row.client_id, title, stored.storageKey, stored.sizeBytes]
@@ -105762,18 +105790,18 @@ async function purgeExpiredSElections() {
       } catch (e) {
         console.error("[purge] record copy rebuild failed; removing the original:", e);
         if (d2.documentId) {
-          const old = await db2.query(
+          const old = await db.query(
             "SELECT storage_key FROM documents WHERE id = $1",
             [d2.documentId]
           );
-          await db2.query("DELETE FROM documents WHERE id = $1", [d2.documentId]);
+          await db.query("DELETE FROM documents WHERE id = $1", [d2.documentId]);
           if (old[0]?.storage_key) await deleteFile(old[0].storage_key).catch(() => {
           });
           kept.documentId = void 0;
         }
       }
     }
-    await db2.query("UPDATE service_orders SET details = $1, ein_secret = NULL WHERE id = $2", [
+    await db.query("UPDATE service_orders SET details = $1, ein_secret = NULL WHERE id = $2", [
       JSON.stringify(kept),
       row.id
     ]);
@@ -105868,8 +105896,8 @@ function registerPortalRoutes(app2) {
     }
     const body = loginSchema.safeParse(await c.req.json().catch(() => null));
     if (!body.success) return c.json(err("Email and password are required.", "INVALID_INPUT"), 400);
-    const db2 = await getDb();
-    const rows = await db2.query(
+    const db = await getDb();
+    const rows = await db.query(
       "SELECT id, password_hash FROM clients WHERE email = $1",
       [body.data.email.toLowerCase()]
     );
@@ -105886,8 +105914,8 @@ function registerPortalRoutes(app2) {
   app2.get("/auth/me", async (c) => {
     const session = await getSession(c);
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    const db2 = await getDb();
-    const rows = await db2.query(
+    const db = await getDb();
+    const rows = await db.query(
       "SELECT email, name, pending_email, ra_cancellation_requested_at FROM clients WHERE id = $1",
       [session.clientId]
     );
@@ -105906,13 +105934,13 @@ function registerPortalRoutes(app2) {
     }
     const body = external_exports.object({ email: external_exports.string().email() }).safeParse(await c.req.json().catch(() => null));
     if (!body.success) return c.json({ data: { ok: true } });
-    const db2 = await getDb();
-    const rows = await db2.query("SELECT id FROM clients WHERE email = $1", [
+    const db = await getDb();
+    const rows = await db.query("SELECT id FROM clients WHERE email = $1", [
       body.data.email.toLowerCase()
     ]);
     if (rows.length > 0) {
       const { token, tokenHash } = newToken();
-      await db2.query(
+      await db.query(
         "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at) VALUES ($1, $2, 'reset_password', $3)",
         [tokenHash, rows[0].id, new Date(Date.now() + 36e5).toISOString()]
       );
@@ -105926,8 +105954,8 @@ function registerPortalRoutes(app2) {
     if (!body.success) {
       return c.json(err(body.error?.issues[0]?.message ?? "Invalid request", "INVALID_INPUT"), 400);
     }
-    const db2 = await getDb();
-    const rows = await db2.query(
+    const db = await getDb();
+    const rows = await db.query(
       `UPDATE auth_tokens SET used_at = now()
       WHERE token_hash = $1 AND expires_at > now() AND used_at IS NULL
         AND purpose IN ('set_password', 'reset_password')
@@ -105937,19 +105965,19 @@ function registerPortalRoutes(app2) {
     if (rows.length === 0) {
       return c.json(err("This link is invalid or has expired. Use \u201CForgot password\u201D to get a new one.", "BAD_TOKEN"), 400);
     }
-    await db2.query("UPDATE clients SET password_hash = $1 WHERE id = $2", [
+    await db.query("UPDATE clients SET password_hash = $1 WHERE id = $2", [
       await hashPassword(body.data.password),
       rows[0].client_id
     ]);
-    await db2.query("DELETE FROM sessions WHERE client_id = $1", [rows[0].client_id]);
+    await db.query("DELETE FROM sessions WHERE client_id = $1", [rows[0].client_id]);
     await createSession(c, { clientId: rows[0].client_id });
     return c.json({ data: { ok: true } });
   });
   app2.get("/portal/documents", async (c) => {
     const session = await getSession(c);
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    const db2 = await getDb();
-    const docs = await db2.query(
+    const db = await getDb();
+    const docs = await db.query(
       "SELECT id, kind, title, size_bytes, created_at FROM documents WHERE client_id = $1 ORDER BY created_at DESC",
       [session.clientId]
     );
@@ -105958,8 +105986,8 @@ function registerPortalRoutes(app2) {
   app2.get("/portal/documents/:id/download", async (c) => {
     const session = await getSession(c);
     if (!session?.clientId && !session?.isAdmin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    const db2 = await getDb();
-    const rows = await db2.query(
+    const db = await getDb();
+    const rows = await db.query(
       "SELECT storage_key, title, content_type, client_id FROM documents WHERE id = $1",
       [c.req.param("id")]
     );
@@ -105983,9 +106011,9 @@ function registerPortalRoutes(app2) {
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
     const seed = await oaSeed(session.clientId);
     if (!seed) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
-    const db2 = await getDb();
-    const saved = await db2.query("SELECT answers FROM oa_profiles WHERE client_id = $1", [session.clientId]);
-    const gens = await db2.query(
+    const db = await getDb();
+    const saved = await db.query("SELECT answers FROM oa_profiles WHERE client_id = $1", [session.clientId]);
+    const gens = await db.query(
       `SELECT id, document_id, template_version, amended_restated, created_at,
             COALESCE(generation_number, 0) AS generation_number,
             inputs->>'version' AS version
@@ -106014,11 +106042,11 @@ function registerPortalRoutes(app2) {
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
     const body = oaAnswersSchema.safeParse(await c.req.json().catch(() => null));
     if (!body.success) return c.json(err("Invalid answers.", "INVALID_INPUT"), 400);
-    const db2 = await getDb();
+    const db = await getDb();
     const revRaw = c.req.query("rev");
     const rev = revRaw !== void 0 && revRaw !== "" ? Number(revRaw) : null;
     if (rev !== null && Number.isFinite(rev)) {
-      const wrote = await db2.query(
+      const wrote = await db.query(
         `INSERT INTO oa_profiles (client_id, answers, rev, updated_at) VALUES ($1, $2, $3, now())
        ON CONFLICT (client_id) DO UPDATE SET answers = $2, rev = $3, updated_at = now()
          WHERE oa_profiles.rev < $3
@@ -106028,7 +106056,7 @@ function registerPortalRoutes(app2) {
       if (wrote.length === 0) return c.json({ data: { ok: true, stale: true } });
       return c.json({ data: { ok: true, rev } });
     }
-    await db2.query(
+    await db.query(
       `INSERT INTO oa_profiles (client_id, answers, updated_at) VALUES ($1, $2, now())
      ON CONFLICT (client_id) DO UPDATE SET answers = $2, updated_at = now()`,
       [session.clientId, JSON.stringify(body.data)]
@@ -106073,8 +106101,8 @@ function registerPortalRoutes(app2) {
     }
     if (!a2.effectiveDate) return c.json(err("An effective date is required.", "INVALID_INPUT"), 400);
     if (!a2.firstOrAmended) return c.json(err("Choose first agreement or amended and restated.", "INVALID_INPUT"), 400);
-    const db2 = await getDb();
-    const priorGens = await db2.query(
+    const db = await getDb();
+    const priorGens = await db.query(
       "SELECT created_at FROM oa_generations WHERE client_id = $1 ORDER BY created_at DESC LIMIT 1",
       [session.clientId]
     );
@@ -106083,7 +106111,7 @@ function registerPortalRoutes(app2) {
       month: "long",
       day: "numeric"
     }) : null;
-    const bumped = await db2.query(
+    const bumped = await db.query(
       "UPDATE clients SET oa_generation_seq = oa_generation_seq + 1 WHERE id = $1 RETURNING oa_generation_seq",
       [session.clientId]
     );
@@ -106203,7 +106231,7 @@ function registerPortalRoutes(app2) {
       contributionToCompany: a2.contributionToCompany,
       generationNumber: nextGenerationNumber
     };
-    const clients = await db2.query("SELECT email, name FROM clients WHERE id = $1", [
+    const clients = await db.query("SELECT email, name FROM clients WHERE id = $1", [
       session.clientId
     ]);
     const client = clients[0];
@@ -106227,7 +106255,7 @@ function registerPortalRoutes(app2) {
       console.error("[oa] generation failed:", e);
       return c.json(err("We could not generate the agreement. Our team has been notified.", "GENERATION_FAILED"), 500);
     }
-    await db2.query(
+    await db.query(
       `INSERT INTO oa_profiles (client_id, answers, updated_at) VALUES ($1, $2, now())
      ON CONFLICT (client_id) DO UPDATE SET answers = $2, updated_at = now()`,
       [session.clientId, JSON.stringify(a2)]
@@ -106238,12 +106266,12 @@ function registerPortalRoutes(app2) {
       buf,
       "application/pdf"
     );
-    const doc = await db2.query(
+    const doc = await db.query(
       `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)
      VALUES ($1, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,
       [session.clientId, title, stored.storageKey, stored.sizeBytes]
     );
-    const gen = await db2.query(
+    const gen = await db.query(
       `INSERT INTO oa_generations (client_id, document_id, template_version, amended_restated, inputs, generation_number)
      VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
       [session.clientId, doc[0].id, OA_TEMPLATE_VERSION, inputs.amendedRestated, JSON.stringify(inputs), nextGenerationNumber]
@@ -106310,14 +106338,14 @@ function registerPortalRoutes(app2) {
       console.error("[new-series] generation failed:", e);
       return c.json(err("We could not generate the documents. Our team has been notified.", "GENERATION_FAILED"), 500);
     }
-    const db2 = await getDb();
+    const db = await getDb();
     const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength);
     const stored = await putFile(
       `${title.replace(/[^\w-]+/g, "_")}_${stampForFilename(generatedOn)}.pdf`,
       buf,
       "application/pdf"
     );
-    const doc = await db2.query(
+    const doc = await db.query(
       `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)
      VALUES ($1, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,
       [session.clientId, title, stored.storageKey, stored.sizeBytes]
@@ -106327,8 +106355,8 @@ function registerPortalRoutes(app2) {
   app2.delete("/portal/oa/generations/:id", async (c) => {
     const session = await getSession(c);
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    const db2 = await getDb();
-    const rows = await db2.query(
+    const db = await getDb();
+    const rows = await db.query(
       "SELECT id, client_id, document_id FROM oa_generations WHERE id = $1",
       [c.req.param("id")]
     );
@@ -106336,38 +106364,38 @@ function registerPortalRoutes(app2) {
       return c.json(err("Not found", "NOT_FOUND"), 404);
     }
     if (rows[0].document_id) {
-      const docs = await db2.query(
+      const docs = await db.query(
         "SELECT storage_key FROM documents WHERE id = $1 AND client_id = $2",
         [rows[0].document_id, session.clientId]
       );
-      await db2.query("DELETE FROM oa_generations WHERE id = $1", [rows[0].id]);
-      await db2.query("DELETE FROM documents WHERE id = $1 AND client_id = $2", [
+      await db.query("DELETE FROM oa_generations WHERE id = $1", [rows[0].id]);
+      await db.query("DELETE FROM documents WHERE id = $1 AND client_id = $2", [
         rows[0].document_id,
         session.clientId
       ]);
       if (docs[0]?.storage_key) await deleteFile(docs[0].storage_key);
     } else {
-      await db2.query("DELETE FROM oa_generations WHERE id = $1", [rows[0].id]);
+      await db.query("DELETE FROM oa_generations WHERE id = $1", [rows[0].id]);
     }
     return c.json({ data: { ok: true } });
   });
   app2.get("/portal/library", async (c) => {
     const session = await getSession(c);
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    const db2 = await getDb();
-    const rows = await db2.query("SELECT key, title, edition, size_bytes, updated_at FROM library_documents ORDER BY title");
+    const db = await getDb();
+    const rows = await db.query("SELECT key, title, edition, size_bytes, updated_at FROM library_documents ORDER BY title");
     return c.json({ data: rows });
   });
   app2.get("/portal/library/:key/download", async (c) => {
     const session = await getSession(c);
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    const db2 = await getDb();
-    const rows = await db2.query(
+    const db = await getDb();
+    const rows = await db.query(
       "SELECT storage_key, title, edition FROM library_documents WHERE key = $1",
       [c.req.param("key")]
     );
     if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
-    const clients = await db2.query("SELECT email, name FROM clients WHERE id = $1", [
+    const clients = await db.query("SELECT email, name FROM clients WHERE id = $1", [
       session.clientId
     ]);
     const src = await readFileStream(rows[0].storage_key);
@@ -106396,8 +106424,8 @@ function registerPortalRoutes(app2) {
     const session = await getSession(c);
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
     await purgeExpiredSElections().catch((e) => console.error("[purge] failed:", e));
-    const db2 = await getDb();
-    const orders = await db2.query(
+    const db = await getDb();
+    const orders = await db.query(
       `SELECT ${SERVICE_SAFE_COLUMNS} FROM service_orders WHERE client_id = $1 ORDER BY created_at DESC`,
       [session.clientId]
     );
@@ -106443,14 +106471,14 @@ function registerPortalRoutes(app2) {
       const msg = gate.reason === "already_ordered" ? "You already have an S election order \u2014 see your orders below." : gate.reason === "window_closed" ? "The ordering window for the S election package has closed. A late election requires IRS relief \u2014 please consult a tax professional." : "The S election package is available only for new LLCs we formed.";
       return c.json(err(msg, gate.reason === "window_closed" ? "WINDOW_CLOSED" : "NOT_ELIGIBLE"), 400);
     }
-    const db2 = await getDb();
-    const rows = await db2.query(
+    const db = await getDb();
+    const rows = await db.query(
       `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents)
      VALUES ($1, 's-election', $2, $3, $4) RETURNING id`,
       [session.clientId, llcName, JSON.stringify({}), S_ELECTION_FEE_CENTS]
     );
     const serviceOrderId = rows[0].id;
-    const clients = await db2.query("SELECT email FROM clients WHERE id = $1", [session.clientId]);
+    const clients = await db.query("SELECT email FROM clients WHERE id = $1", [session.clientId]);
     const checkout = await createCheckout({
       orderId: serviceOrderId,
       llcName,
@@ -106464,7 +106492,7 @@ function registerPortalRoutes(app2) {
       redirectUrl: `${env.PUBLIC_BASE_URL}/portal?paid=${serviceOrderId}`,
       description: `S corporation election package \u2014 ${llcName}`
     });
-    await db2.query("UPDATE service_orders SET square_order_id = $1 WHERE id = $2", [
+    await db.query("UPDATE service_orders SET square_order_id = $1 WHERE id = $2", [
       checkout.squareOrderId,
       serviceOrderId
     ]);
@@ -106492,14 +106520,14 @@ function registerPortalRoutes(app2) {
       );
     }
     const amountCents = SERIES_ADDON_PREP_CENTS + SERIES_ADDON_STATE_CENTS;
-    const db2 = await getDb();
-    const rows = await db2.query(
+    const db = await getDb();
+    const rows = await db.query(
       `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents)
      VALUES ($1, 'series', $2, $3, $4) RETURNING id`,
       [session.clientId, llcName, JSON.stringify({ seriesName, purpose: body.data.purpose ?? "" }), amountCents]
     );
     const serviceOrderId = rows[0].id;
-    const clients = await db2.query("SELECT email FROM clients WHERE id = $1", [session.clientId]);
+    const clients = await db.query("SELECT email FROM clients WHERE id = $1", [session.clientId]);
     const checkout = await createCheckout({
       orderId: serviceOrderId,
       llcName,
@@ -106516,7 +106544,7 @@ function registerPortalRoutes(app2) {
       redirectUrl: `${env.PUBLIC_BASE_URL}/portal?paid=${serviceOrderId}`,
       description: `Protected Series Designation \u2014 ${seriesName}`
     });
-    await db2.query("UPDATE service_orders SET square_order_id = $1 WHERE id = $2", [
+    await db.query("UPDATE service_orders SET square_order_id = $1 WHERE id = $2", [
       checkout.squareOrderId,
       serviceOrderId
     ]);
@@ -106537,8 +106565,8 @@ function registerPortalRoutes(app2) {
     }
     const target = body.data.target;
     const seriesName = body.data.seriesName?.trim() ?? "";
-    const db2 = await getDb();
-    const existingEin = await db2.query(
+    const db = await getDb();
+    const existingEin = await db.query(
       `SELECT details FROM service_orders
      WHERE client_id = $1 AND type = 'ein' AND status <> 'pending_payment'`,
       [session.clientId]
@@ -106565,13 +106593,13 @@ function registerPortalRoutes(app2) {
         return c.json(err("An EIN for that protected series is already ordered \u2014 see your orders below.", "ALREADY_ORDERED"), 400);
       }
     }
-    const rows = await db2.query(
+    const rows = await db.query(
       `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents)
      VALUES ($1, 'ein', $2, $3, $4) RETURNING id`,
       [session.clientId, llcName, JSON.stringify({ target, seriesName }), EIN_FEE_CENTS]
     );
     const serviceOrderId = rows[0].id;
-    const clients = await db2.query("SELECT email FROM clients WHERE id = $1", [session.clientId]);
+    const clients = await db.query("SELECT email FROM clients WHERE id = $1", [session.clientId]);
     const forName = target === "series" ? seriesName : llcName;
     const checkout = await createCheckout({
       orderId: serviceOrderId,
@@ -106586,7 +106614,7 @@ function registerPortalRoutes(app2) {
       redirectUrl: `${env.PUBLIC_BASE_URL}/portal?paid=${serviceOrderId}`,
       description: `Federal EIN service \u2014 ${forName}`
     });
-    await db2.query("UPDATE service_orders SET square_order_id = $1 WHERE id = $2", [
+    await db.query("UPDATE service_orders SET square_order_id = $1 WHERE id = $2", [
       checkout.squareOrderId,
       serviceOrderId
     ]);
@@ -106599,8 +106627,8 @@ function registerPortalRoutes(app2) {
     if (!body.success) {
       return c.json(err(body.error.issues[0]?.message ?? "Invalid details.", "INVALID_INPUT"), 400);
     }
-    const db2 = await getDb();
-    const rows = await db2.query(
+    const db = await getDb();
+    const rows = await db.query(
       "SELECT id, client_id, type, status, details, llc_name FROM service_orders WHERE id = $1",
       [c.req.param("id")]
     );
@@ -106639,12 +106667,12 @@ function registerPortalRoutes(app2) {
       tinLast4: d2.tin.slice(-4),
       certifiedAt: (/* @__PURE__ */ new Date()).toISOString()
     };
-    await db2.query(
+    await db.query(
       "UPDATE service_orders SET details = $1, ein_secret = $2, status = 'in_progress' WHERE id = $3",
       [JSON.stringify(merged), encryptSecret(body.data.tin), so2.id]
     );
     if (env.ADMIN_NOTIFY_EMAIL) {
-      const clients = await db2.query("SELECT email FROM clients WHERE id = $1", [session.clientId]);
+      const clients = await db.query("SELECT email FROM clients WHERE id = $1", [session.clientId]);
       const summary = `Federal EIN \u2014 ${(details.target === "series" ? details.seriesName : so2.llc_name) || so2.llc_name}`;
       const mail = einDetailsSubmittedAdminEmail({
         summary,
@@ -106667,8 +106695,8 @@ function registerPortalRoutes(app2) {
     if (!body.success) {
       return c.json(err(body.error.issues[0]?.message ?? "Invalid details.", "INVALID_INPUT"), 400);
     }
-    const db2 = await getDb();
-    const rows = await db2.query(
+    const db = await getDb();
+    const rows = await db.query(
       "SELECT id, client_id, type, status, llc_name, details, ein_secret, fulfilled_at FROM service_orders WHERE id = $1",
       [c.req.param("id")]
     );
@@ -106726,7 +106754,7 @@ function registerPortalRoutes(app2) {
       }))
     };
     const seed = await oaSeed(session.clientId);
-    const clients = await db2.query(
+    const clients = await db.query(
       "SELECT email, name FROM clients WHERE id = $1",
       [session.clientId]
     );
@@ -106754,11 +106782,11 @@ function registerPortalRoutes(app2) {
       return c.json(err("We could not build the package. Our team has been notified.", "GENERATION_FAILED"), 500);
     }
     if (prior?.documentId) {
-      const old = await db2.query(
+      const old = await db.query(
         "SELECT storage_key FROM documents WHERE id = $1 AND client_id = $2",
         [prior.documentId, session.clientId]
       );
-      await db2.query("DELETE FROM documents WHERE id = $1 AND client_id = $2", [prior.documentId, session.clientId]);
+      await db.query("DELETE FROM documents WHERE id = $1 AND client_id = $2", [prior.documentId, session.clientId]);
       if (old[0]?.storage_key) await deleteFile(old[0].storage_key).catch(() => {
       });
     }
@@ -106769,20 +106797,20 @@ function registerPortalRoutes(app2) {
       buf,
       "application/pdf"
     );
-    const docRows = await db2.query(
+    const docRows = await db.query(
       `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)
      VALUES ($1, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,
       [session.clientId, title, stored.storageKey, stored.sizeBytes]
     );
     merged.documentId = docRows[0].id;
-    await db2.query(
+    await db.query(
       `UPDATE service_orders
         SET details = $1, ein_secret = $2, status = 'fulfilled',
             fulfilled_at = COALESCE(fulfilled_at, now())
       WHERE id = $3`,
       [JSON.stringify(merged), encryptSecret(JSON.stringify(ssns)), so2.id]
     );
-    const after = await db2.query(
+    const after = await db.query(
       "SELECT fulfilled_at FROM service_orders WHERE id = $1",
       [so2.id]
     );
@@ -106820,8 +106848,8 @@ function registerPortalRoutes(app2) {
     if (!body.success) {
       return c.json(err(body.error.issues[0]?.message ?? "Invalid request.", "INVALID_INPUT"), 400);
     }
-    const db2 = await getDb();
-    const rows = await db2.query(
+    const db = await getDb();
+    const rows = await db.query(
       "SELECT email, password_hash FROM clients WHERE id = $1",
       [session.clientId]
     );
@@ -106829,11 +106857,11 @@ function registerPortalRoutes(app2) {
     if (!client?.password_hash || !await verifyPassword(body.data.currentPassword, client.password_hash)) {
       return c.json(err("That current password is not correct.", "BAD_CREDENTIALS"), 401);
     }
-    await db2.query("UPDATE clients SET password_hash = $1 WHERE id = $2", [
+    await db.query("UPDATE clients SET password_hash = $1 WHERE id = $2", [
       await hashPassword(body.data.newPassword),
       session.clientId
     ]);
-    await db2.query("DELETE FROM sessions WHERE client_id = $1 AND token_hash <> $2", [
+    await db.query("DELETE FROM sessions WHERE client_id = $1 AND token_hash <> $2", [
       session.clientId,
       session.tokenHash
     ]);
@@ -106854,8 +106882,8 @@ function registerPortalRoutes(app2) {
       return c.json(err(body.error.issues[0]?.message ?? "Invalid request.", "INVALID_INPUT"), 400);
     }
     const newEmail = body.data.newEmail.toLowerCase();
-    const db2 = await getDb();
-    const rows = await db2.query(
+    const db = await getDb();
+    const rows = await db.query(
       "SELECT email, password_hash FROM clients WHERE id = $1",
       [session.clientId]
     );
@@ -106866,17 +106894,17 @@ function registerPortalRoutes(app2) {
     if (newEmail === client.email) {
       return c.json(err("That is already the address on your account.", "INVALID_INPUT"), 400);
     }
-    const taken = await db2.query("SELECT id FROM clients WHERE email = $1", [newEmail]);
+    const taken = await db.query("SELECT id FROM clients WHERE email = $1", [newEmail]);
     if (taken.length > 0) {
       return c.json(err("That address is already in use on another account.", "EMAIL_TAKEN"), 400);
     }
     const { token, tokenHash } = newToken();
-    await db2.query("UPDATE clients SET pending_email = $1 WHERE id = $2", [newEmail, session.clientId]);
-    await db2.query(
+    await db.query("UPDATE clients SET pending_email = $1 WHERE id = $2", [newEmail, session.clientId]);
+    await db.query(
       "UPDATE auth_tokens SET used_at = now() WHERE client_id = $1 AND purpose = 'verify_email' AND used_at IS NULL",
       [session.clientId]
     );
-    await db2.query(
+    await db.query(
       "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at, payload) VALUES ($1, $2, 'verify_email', $3, $4)",
       [tokenHash, session.clientId, new Date(Date.now() + 36e5).toISOString(), newEmail]
     );
@@ -106891,8 +106919,8 @@ function registerPortalRoutes(app2) {
   app2.post("/auth/verify-email", async (c) => {
     const body = external_exports.object({ token: external_exports.string().min(10) }).safeParse(await c.req.json().catch(() => null));
     if (!body.success) return c.json(err("Invalid request.", "INVALID_INPUT"), 400);
-    const db2 = await getDb();
-    const rows = await db2.query(
+    const db = await getDb();
+    const rows = await db.query(
       `UPDATE auth_tokens SET used_at = now()
       WHERE token_hash = $1 AND purpose = 'verify_email' AND expires_at > now() AND used_at IS NULL
       RETURNING token_hash, client_id, payload`,
@@ -106901,7 +106929,7 @@ function registerPortalRoutes(app2) {
     if (rows.length === 0) {
       return c.json(err("This link is invalid or has expired. Request the change again from your portal.", "BAD_TOKEN"), 400);
     }
-    const clients = await db2.query(
+    const clients = await db.query(
       "SELECT email, pending_email FROM clients WHERE id = $1",
       [rows[0].client_id]
     );
@@ -106909,13 +106937,13 @@ function registerPortalRoutes(app2) {
     if (!pending || clients[0]?.pending_email !== pending) {
       return c.json(err("This link is no longer valid \u2014 the email change was updated after it was sent. Request the change again from your portal.", "BAD_TOKEN"), 400);
     }
-    const taken = await db2.query("SELECT id FROM clients WHERE email = $1", [pending]);
+    const taken = await db.query("SELECT id FROM clients WHERE email = $1", [pending]);
     if (taken.length > 0) {
-      await db2.query("UPDATE clients SET pending_email = NULL WHERE id = $1", [rows[0].client_id]);
+      await db.query("UPDATE clients SET pending_email = NULL WHERE id = $1", [rows[0].client_id]);
       return c.json(err("That address is now in use on another account.", "EMAIL_TAKEN"), 400);
     }
     const previous = clients[0].email;
-    await db2.query("UPDATE clients SET email = $1, pending_email = NULL WHERE id = $2", [
+    await db.query("UPDATE clients SET email = $1, pending_email = NULL WHERE id = $2", [
       pending,
       rows[0].client_id
     ]);
@@ -106927,8 +106955,8 @@ function registerPortalRoutes(app2) {
   app2.post("/portal/registered-agent/cancel", async (c) => {
     const session = await getSession(c);
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    const db2 = await getDb();
-    const rows = await db2.query(
+    const db = await getDb();
+    const rows = await db.query(
       "SELECT email, name, ra_cancellation_requested_at FROM clients WHERE id = $1",
       [session.clientId]
     );
@@ -106937,7 +106965,7 @@ function registerPortalRoutes(app2) {
     if (client.ra_cancellation_requested_at) {
       return c.json({ data: { raCancellationRequestedAt: client.ra_cancellation_requested_at } });
     }
-    const updated = await db2.query(
+    const updated = await db.query(
       "UPDATE clients SET ra_cancellation_requested_at = now() WHERE id = $1 RETURNING ra_cancellation_requested_at",
       [session.clientId]
     );
@@ -106963,8 +106991,8 @@ async function fulfillPaidOrder(orderId, squarePaymentId) {
     testHooks.failNextFulfillment = false;
     throw new Error("injected fulfillment failure (dev test scaffolding)");
   }
-  const db2 = await getDb();
-  const claimed = await db2.query(
+  const db = await getDb();
+  const claimed = await db.query(
     `UPDATE orders SET status = 'paid', paid_at = now(), square_payment_id = $1
       WHERE id = $2 AND status = 'pending_payment'
       RETURNING id, contact_name, contact_email, llc_name, total_cents, payload`,
@@ -106972,7 +107000,7 @@ async function fulfillPaidOrder(orderId, squarePaymentId) {
   );
   if (claimed.length === 0) return;
   const order2 = claimed[0];
-  const existing = await db2.query(
+  const existing = await db.query(
     "SELECT id, password_hash FROM clients WHERE email = $1",
     [order2.contact_email]
   );
@@ -106980,23 +107008,23 @@ async function fulfillPaidOrder(orderId, squarePaymentId) {
   if (existing.length > 0) {
     clientId = existing[0].id;
   } else {
-    const created = await db2.query(
+    const created = await db.query(
       "INSERT INTO clients (email, name) VALUES ($1, $2) RETURNING id",
       [order2.contact_email, order2.contact_name]
     );
     clientId = created[0].id;
   }
-  await db2.query("UPDATE orders SET client_id = $1 WHERE id = $2", [clientId, orderId]);
+  await db.query("UPDATE orders SET client_id = $1 WHERE id = $2", [clientId, orderId]);
   const payload = typeof order2.payload === "string" ? JSON.parse(order2.payload) : order2.payload;
   if (payload?.optionalDocuments?.ein) {
-    await db2.query(
+    await db.query(
       `INSERT INTO service_orders (client_id, type, status, llc_name, details, amount_cents, formation_order_id, paid_at, square_payment_id)
        VALUES ($1, 'ein', 'awaiting_info', $2, $3, $4, $5, now(), $6)`,
       [clientId, order2.llc_name, JSON.stringify({ target: "company" }), EIN_FEE_CENTS, orderId, squarePaymentId]
     );
   }
   if (payload?.optionalDocuments?.sElection && payload?.filingPath !== "CONVERT") {
-    await db2.query(
+    await db.query(
       `INSERT INTO service_orders (client_id, type, status, llc_name, details, amount_cents, formation_order_id, paid_at, square_payment_id)
        VALUES ($1, 's-election', 'awaiting_info', $2, $3, $4, $5, now(), $6)`,
       [clientId, order2.llc_name, JSON.stringify({}), S_ELECTION_FEE_CENTS, orderId, squarePaymentId]
@@ -107004,7 +107032,7 @@ async function fulfillPaidOrder(orderId, squarePaymentId) {
   }
   if (existing.length === 0 || !existing[0].password_hash) {
     const { token, tokenHash } = newToken();
-    await db2.query(
+    await db.query(
       "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at) VALUES ($1, $2, 'set_password', $3)",
       [tokenHash, clientId, new Date(Date.now() + 7 * 864e5).toISOString()]
     );
@@ -107028,14 +107056,14 @@ async function fulfillPaidOrder(orderId, squarePaymentId) {
   }
 }
 async function fulfillPaidServiceOrder(serviceOrderId, squarePaymentId) {
-  const db2 = await getDb();
-  const peek = await db2.query(
+  const db = await getDb();
+  const peek = await db.query(
     "SELECT type FROM service_orders WHERE id = $1",
     [serviceOrderId]
   );
   if (peek.length === 0) return;
   const nextStatus = peek[0].type === "ein" || peek[0].type === "s-election" ? "awaiting_info" : "in_progress";
-  const rows = await db2.query(
+  const rows = await db.query(
     `UPDATE service_orders SET status = $1, paid_at = now(), square_payment_id = $2
       WHERE id = $3 AND status = 'pending_payment'
       RETURNING id, client_id, type, status, llc_name, details, amount_cents`,
@@ -107045,7 +107073,7 @@ async function fulfillPaidServiceOrder(serviceOrderId, squarePaymentId) {
   const so2 = rows[0];
   const details = typeof so2.details === "string" ? JSON.parse(so2.details) : so2.details;
   const summary = so2.type === "series" ? `Protected Series Designation \u2014 ${details.seriesName ?? so2.llc_name}` : so2.type === "s-election" ? `S Corporation Election Package \u2014 ${so2.llc_name}` : `Federal EIN \u2014 ${details.target === "series" ? details.seriesName ?? "series" : so2.llc_name}`;
-  const clients = await db2.query(
+  const clients = await db.query(
     "SELECT email, name FROM clients WHERE id = $1",
     [so2.client_id]
   );
@@ -107170,8 +107198,8 @@ function registerPaymentRoutes(app2) {
       registeredAgentChange: data.registeredAgentChoice === "SERVICE"
     });
     const llcName = payload.llcName.finalName || payload.llcName.desiredName || "Unnamed LLC";
-    const db2 = await getDb();
-    const rows = await db2.query(
+    const db = await getDb();
+    const rows = await db.query(
       `INSERT INTO orders (contact_name, contact_email, package, llc_name, payload, service_fee_cents, state_fees_cents, total_cents)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
       [
@@ -107195,15 +107223,15 @@ function registerPaymentRoutes(app2) {
       priced,
       buyerEmail: data.correspondentEmail
     });
-    await db2.query("UPDATE orders SET square_order_id = $1 WHERE id = $2", [
+    await db.query("UPDATE orders SET square_order_id = $1 WHERE id = $2", [
       checkout.squareOrderId,
       orderId
     ]);
     return c.json({ data: { orderId, checkoutUrl: checkout.url, totalCents: priced.totalCents } });
   });
   app2.get("/orders/:id/status", async (c) => {
-    const db2 = await getDb();
-    const rows = await db2.query(
+    const db = await getDb();
+    const rows = await db.query(
       "SELECT status, llc_name FROM orders WHERE id = $1",
       [c.req.param("id")]
     );
@@ -107219,9 +107247,9 @@ function registerPaymentRoutes(app2) {
     });
     if (!ok) return c.json(err("Bad signature", "BAD_SIGNATURE"), 401);
     const event = JSON.parse(rawBody);
-    const db2 = await getDb();
+    const db = await getDb();
     if (event.event_id) {
-      const claimedEvent = await db2.query(
+      const claimedEvent = await db.query(
         `INSERT INTO webhook_events (event_id) VALUES ($1)
        ON CONFLICT (event_id) DO UPDATE SET received_at = now()
          WHERE webhook_events.processed_at IS NULL
@@ -107232,7 +107260,7 @@ function registerPaymentRoutes(app2) {
     }
     const payment = event.data?.object?.payment;
     if (event.type?.startsWith("payment.") && payment?.status === "COMPLETED" && payment.order_id) {
-      const rows = await db2.query(
+      const rows = await db.query(
         "SELECT id, total_cents FROM orders WHERE square_order_id = $1",
         [payment.order_id]
       );
@@ -107241,7 +107269,7 @@ function registerPaymentRoutes(app2) {
         if (mismatch) await alertMoneyMismatch(mismatch, payment.order_id, payment.id);
         else await fulfillPaidOrder(rows[0].id, payment.id);
       } else {
-        const svc = await db2.query(
+        const svc = await db.query(
           "SELECT id, amount_cents FROM service_orders WHERE square_order_id = $1",
           [payment.order_id]
         );
@@ -107253,7 +107281,7 @@ function registerPaymentRoutes(app2) {
       }
     }
     if (event.event_id) {
-      await db2.query("UPDATE webhook_events SET processed_at = now() WHERE event_id = $1", [event.event_id]);
+      await db.query("UPDATE webhook_events SET processed_at = now() WHERE event_id = $1", [event.event_id]);
     }
     return c.json({ data: { ok: true } });
   });
@@ -107310,21 +107338,21 @@ function registerPaymentRoutes(app2) {
     if (!await rateLimit(`resend:${clientIp(c)}`, 5, 36e5)) {
       return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
     }
-    const db2 = await getDb();
-    const orders = await db2.query(
+    const db = await getDb();
+    const orders = await db.query(
       "SELECT client_id, status, contact_name, contact_email FROM orders WHERE id = $1",
       [c.req.param("id")]
     );
     if (orders.length === 0 || orders[0].status !== "paid" || !orders[0].client_id) {
       return c.json({ data: { ok: true } });
     }
-    const clients = await db2.query(
+    const clients = await db.query(
       "SELECT id, password_hash FROM clients WHERE id = $1",
       [orders[0].client_id]
     );
     if (clients.length > 0 && !clients[0].password_hash) {
       const { token, tokenHash } = newToken();
-      await db2.query(
+      await db.query(
         "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at) VALUES ($1, $2, 'set_password', $3)",
         [tokenHash, clients[0].id, new Date(Date.now() + 7 * 864e5).toISOString()]
       );
@@ -107430,11 +107458,11 @@ async function listBackups() {
   }
 }
 async function runDbBackup() {
-  const db2 = await getDb();
+  const db = await getDb();
   const selects = BACKUP_TABLES.map(
     (t) => `'${t}', (SELECT coalesce(json_agg(x), '[]'::json) FROM ${t} x)`
   ).join(", ");
-  const snap = await db2.query(
+  const snap = await db.query(
     `SELECT json_build_object(${selects}) AS dump`
   );
   const tables = snap[0].dump;
@@ -107510,8 +107538,8 @@ async function streamToBuffer(body) {
   return Buffer.concat(chunks);
 }
 async function mirrorStatus() {
-  const db2 = await getDb();
-  const rows = await db2.query(
+  const db = await getDb();
+  const rows = await db.query(
     `SELECT
        count(*) FILTER (WHERE mirrored_at IS NOT NULL) AS mirrored,
        count(*) FILTER (WHERE mirrored_at IS NULL) AS pending,
@@ -107526,10 +107554,10 @@ async function mirrorStatus() {
   };
 }
 async function runFileMirror() {
-  const db2 = await getDb();
+  const db = await getDb();
   const useDropbox = configured();
   if (!useDropbox && env.isProd) return { mirrored: 0, failed: 0, skipped: true };
-  const docs = await db2.query(
+  const docs = await db.query(
     `SELECT d.id, d.title, d.kind, d.storage_key,
             (SELECT o.llc_name FROM orders o WHERE o.client_id = d.client_id AND o.paid_at IS NOT NULL
               ORDER BY o.paid_at DESC LIMIT 1) AS llc_name,
@@ -107549,7 +107577,7 @@ async function runFileMirror() {
       const path = `/${folder}/${name}`;
       if (useDropbox) await uploadToDropbox(path, bytes2);
       else await uploadDev(path, bytes2);
-      await db2.query("UPDATE documents SET mirrored_at = now() WHERE id = $1", [doc.id]);
+      await db.query("UPDATE documents SET mirrored_at = now() WHERE id = $1", [doc.id]);
       mirrored++;
     } catch (e) {
       failed++;
@@ -107560,7 +107588,7 @@ async function runFileMirror() {
 }
 
 // server/routes-admin.ts
-import { createHash as createHash2 } from "node:crypto";
+import { createHash as createHash3 } from "node:crypto";
 
 // ../docs/owners-manual.md
 var owners_manual_default = `<!-- MASTER. This file is the Owner's Manual. Edit it here.
@@ -108103,9 +108131,9 @@ MyFloridaSeriesLLC is a document-preparation and registered agent service dedica
 // server/routes-admin.ts
 async function refreshOwnersManual(force = false) {
   const { renderManualPdf: renderManualPdf2, MANUAL_RENDERER_VERSION: MANUAL_RENDERER_VERSION2 } = await Promise.resolve().then(() => (init_manual_pdf(), manual_pdf_exports));
-  const hash = createHash2("sha256").update(owners_manual_default).update(`renderer:${MANUAL_RENDERER_VERSION2}`).digest("hex").slice(0, 16);
-  const db2 = await getDb();
-  const rows = await db2.query(
+  const hash = createHash3("sha256").update(owners_manual_default).update(`renderer:${MANUAL_RENDERER_VERSION2}`).digest("hex").slice(0, 16);
+  const db = await getDb();
+  const rows = await db.query(
     "SELECT meta FROM library_documents WHERE key = 'owners-manual'"
   );
   const meta = rows[0] ? typeof rows[0].meta === "string" ? JSON.parse(rows[0].meta) : rows[0].meta : null;
@@ -108113,7 +108141,7 @@ async function refreshOwnersManual(force = false) {
   const { pdf, pages, edition } = await renderManualPdf2(owners_manual_default);
   const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength);
   const stored = await putFile("owners-manual.pdf", buf, "application/pdf");
-  await db2.query(
+  await db.query(
     `INSERT INTO library_documents (key, title, edition, storage_key, content_type, size_bytes, meta, updated_at)
      VALUES ('owners-manual', $1, $2, $3, 'application/pdf', $4, $5, now())
      ON CONFLICT (key) DO UPDATE SET title = $1, edition = $2, storage_key = $3,
@@ -108126,8 +108154,8 @@ function registerAdminRoutes(app2) {
   app2.get("/admin/library", async (c) => {
     const admin = await requireAdmin(c);
     if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    const db2 = await getDb();
-    const rows = await db2.query("SELECT key, title, edition, size_bytes, updated_at FROM library_documents ORDER BY title");
+    const db = await getDb();
+    const rows = await db.query("SELECT key, title, edition, size_bytes, updated_at FROM library_documents ORDER BY title");
     return c.json({ data: rows });
   });
   app2.post("/admin/library/owners-manual/regenerate", async (c) => {
@@ -108151,8 +108179,8 @@ function registerAdminRoutes(app2) {
       return c.json(err(`${file.name} is not a readable PDF. Everything delivered through the portal is a PDF.`, "NOT_A_PDF"), 400);
     }
     const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
-    const db2 = await getDb();
-    await db2.query(
+    const db = await getDb();
+    await db.query(
       `INSERT INTO library_documents (key, title, edition, storage_key, content_type, size_bytes, updated_at)
      VALUES ($1, $2, $3, $4, $5, $6, now())
      ON CONFLICT (key) DO UPDATE SET title = $2, edition = $3, storage_key = $4, content_type = $5, size_bytes = $6, updated_at = now()`,
@@ -108216,11 +108244,11 @@ function registerAdminRoutes(app2) {
   app2.get("/admin/orders", async (c) => {
     const admin = await requireAdmin(c);
     if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    const db2 = await getDb();
+    const db = await getDb();
     const qRaw = (c.req.query("q") ?? "").trim().slice(0, 100);
     const where = qRaw ? `WHERE o.llc_name ILIKE $1 OR o.contact_email ILIKE $1 OR o.contact_name ILIKE $1` : "";
     const params = qRaw ? [`%${qRaw}%`] : [];
-    const rows = await db2.query(
+    const rows = await db.query(
       `SELECT o.id, o.client_id, o.contact_name, o.contact_email, o.package, o.llc_name,
             o.status, o.service_fee_cents, o.state_fees_cents, o.total_cents,
             o.created_at, o.paid_at, o.filed_at, o.formed_at,
@@ -108237,7 +108265,7 @@ function registerAdminRoutes(app2) {
       ORDER BY o.created_at DESC LIMIT 200`,
       params
     );
-    const total = await db2.query(
+    const total = await db.query(
       `SELECT count(*) AS c FROM orders o ${where}`,
       params
     );
@@ -108246,15 +108274,15 @@ function registerAdminRoutes(app2) {
   app2.post("/admin/orders/:id/filed", async (c) => {
     const admin = await requireAdmin(c);
     if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    const db2 = await getDb();
-    const rows = await db2.query("SELECT status FROM orders WHERE id = $1", [
+    const db = await getDb();
+    const rows = await db.query("SELECT status FROM orders WHERE id = $1", [
       c.req.param("id")
     ]);
     if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
     if (rows[0].status !== "paid") {
       return c.json(err(`An order is filed from "paid", not "${rows[0].status}".`, "BAD_STATE"), 400);
     }
-    await db2.query("UPDATE orders SET status = 'filed', filed_at = now() WHERE id = $1", [
+    await db.query("UPDATE orders SET status = 'filed', filed_at = now() WHERE id = $1", [
       c.req.param("id")
     ]);
     return c.json({ data: { ok: true } });
@@ -108262,15 +108290,15 @@ function registerAdminRoutes(app2) {
   app2.post("/admin/orders/:id/unfiled", async (c) => {
     const admin = await requireAdmin(c);
     if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    const db2 = await getDb();
-    const rows = await db2.query("SELECT status FROM orders WHERE id = $1", [
+    const db = await getDb();
+    const rows = await db.query("SELECT status FROM orders WHERE id = $1", [
       c.req.param("id")
     ]);
     if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
     if (rows[0].status !== "filed") {
       return c.json(err("Only an order sitting with the State can be moved back.", "BAD_STATE"), 400);
     }
-    await db2.query("UPDATE orders SET status = 'paid', filed_at = NULL WHERE id = $1", [
+    await db.query("UPDATE orders SET status = 'paid', filed_at = NULL WHERE id = $1", [
       c.req.param("id")
     ]);
     return c.json({ data: { ok: true } });
@@ -108280,8 +108308,8 @@ function registerAdminRoutes(app2) {
     if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
     const body = external_exports.object({ key: external_exports.string().min(1).max(64), copied: external_exports.boolean() }).safeParse(await c.req.json().catch(() => null));
     if (!body.success) return c.json(err("Invalid input.", "INVALID_INPUT"), 400);
-    const db2 = await getDb();
-    const rows = await db2.query(
+    const db = await getDb();
+    const rows = await db.query(
       "SELECT copied_fields FROM orders WHERE id = $1",
       [c.req.param("id")]
     );
@@ -108290,7 +108318,7 @@ function registerAdminRoutes(app2) {
     const marks = typeof raw2 === "string" ? JSON.parse(raw2) : raw2 ?? {};
     if (body.data.copied) marks[body.data.key] = true;
     else delete marks[body.data.key];
-    await db2.query("UPDATE orders SET copied_fields = $1 WHERE id = $2", [
+    await db.query("UPDATE orders SET copied_fields = $1 WHERE id = $2", [
       JSON.stringify(marks),
       c.req.param("id")
     ]);
@@ -108299,17 +108327,17 @@ function registerAdminRoutes(app2) {
   app2.get("/admin/orders/:id", async (c) => {
     const admin = await requireAdmin(c);
     if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    const db2 = await getDb();
-    const rows = await db2.query("SELECT * FROM orders WHERE id = $1", [c.req.param("id")]);
+    const db = await getDb();
+    const rows = await db.query("SELECT * FROM orders WHERE id = $1", [c.req.param("id")]);
     if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
     const o = rows[0];
     const payload = typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload;
-    const docs = o.client_id ? await db2.query(
+    const docs = o.client_id ? await db.query(
       `SELECT id, kind, title, meta, created_at FROM documents
           WHERE client_id = $1 AND order_id = $2 ORDER BY created_at`,
       [o.client_id, o.id]
     ) : [];
-    const services = o.client_id ? await db2.query(
+    const services = o.client_id ? await db.query(
       `SELECT id, type, status, llc_name FROM service_orders
           WHERE formation_order_id = $1 ORDER BY created_at`,
       [o.id]
@@ -108359,8 +108387,8 @@ function registerAdminRoutes(app2) {
   app2.post("/admin/orders/:id/formation-documents", async (c) => {
     const admin = await requireAdmin(c);
     if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    const db2 = await getDb();
-    const rows = await db2.query("SELECT id, client_id, llc_name, status, payload FROM orders WHERE id = $1", [
+    const db = await getDb();
+    const rows = await db.query("SELECT id, client_id, llc_name, status, payload FROM orders WHERE id = $1", [
       c.req.param("id")
     ]);
     if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
@@ -108412,7 +108440,7 @@ function registerAdminRoutes(app2) {
         return c.json(err(`${f.name} is not a readable PDF. Filed Articles and designations must be the PDFs from Sunbiz.`, "NOT_A_PDF"), 400);
       }
     }
-    const claim = await db2.query(
+    const claim = await db.query(
       `UPDATE orders SET replacing_at = now()
       WHERE id = $1 AND (replacing_at IS NULL OR replacing_at < now() - interval '10 minutes')
       RETURNING id`,
@@ -108422,7 +108450,7 @@ function registerAdminRoutes(app2) {
       return c.json(err("A replacement for this order is already being processed.", "REPLACEMENT_IN_PROGRESS"), 409);
     }
     try {
-      const priorDocs = await db2.query(
+      const priorDocs = await db.query(
         "SELECT id, storage_key FROM documents WHERE order_id = $1 AND kind IN ('articles', 'psd')",
         [o.id]
       );
@@ -108444,7 +108472,7 @@ function registerAdminRoutes(app2) {
           articles.type || "application/pdf"
         );
         newKeys.push(storedArticles.storageKey);
-        const artRow = await db2.query(
+        const artRow = await db.query(
           `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
        VALUES ($1, $2, 'articles', $3, $4, $5, $6, '{}'::jsonb) RETURNING id`,
           [
@@ -108462,7 +108490,7 @@ function registerAdminRoutes(app2) {
           const names = psdSeries[i];
           const stored = await stagedPut(f.name, await f.arrayBuffer(), f.type || "application/pdf");
           newKeys.push(stored.storageKey);
-          const psdRow = await db2.query(
+          const psdRow = await db.query(
             `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
          VALUES ($1, $2, 'psd', $3, $4, $5, $6, $7) RETURNING id`,
             [
@@ -108479,7 +108507,7 @@ function registerAdminRoutes(app2) {
         }
       } catch (e) {
         if (newRows.length > 0) {
-          await db2.query("DELETE FROM documents WHERE id = ANY($1::uuid[])", [newRows]).catch((err3) => console.error("[formation] compensation delete failed:", err3));
+          await db.query("DELETE FROM documents WHERE id = ANY($1::uuid[])", [newRows]).catch((err3) => console.error("[formation] compensation delete failed:", err3));
         }
         for (const k of newKeys) {
           await deleteFile(k);
@@ -108487,16 +108515,16 @@ function registerAdminRoutes(app2) {
         throw e;
       }
       if (priorDocs.length > 0) {
-        await db2.query("DELETE FROM documents WHERE id = ANY($1::uuid[])", [priorDocs.map((d2) => d2.id)]);
+        await db.query("DELETE FROM documents WHERE id = ANY($1::uuid[])", [priorDocs.map((d2) => d2.id)]);
         for (const d2 of priorDocs) {
           await deleteFile(d2.storage_key);
         }
       }
-      await db2.query(
+      await db.query(
         "UPDATE orders SET status = 'formed', formed_at = now(), filed_at = COALESCE(filed_at, now()) WHERE id = $1",
         [o.id]
       );
-      const clients = await db2.query(
+      const clients = await db.query(
         "SELECT email, name FROM clients WHERE id = $1",
         [o.client_id]
       );
@@ -108517,14 +108545,14 @@ function registerAdminRoutes(app2) {
       }
       return c.json({ data: { ok: true, notified, documents: files.length } });
     } finally {
-      await db2.query("UPDATE orders SET replacing_at = NULL WHERE id = $1", [o.id]).catch((e) => console.error("[formation] claim release failed:", e));
+      await db.query("UPDATE orders SET replacing_at = NULL WHERE id = $1", [o.id]).catch((e) => console.error("[formation] claim release failed:", e));
     }
   });
   app2.get("/admin/clients", async (c) => {
     const admin = await requireAdmin(c);
     if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    const db2 = await getDb();
-    const rows = await db2.query(
+    const db = await getDb();
+    const rows = await db.query(
       `SELECT cl.id, cl.email, cl.name, cl.created_at, cl.ra_cancellation_requested_at,
             (cl.password_hash IS NOT NULL) AS has_password,
             COUNT(d.id)::int AS document_count,
@@ -108545,8 +108573,8 @@ function registerAdminRoutes(app2) {
       return c.json(err(body.error.issues[0]?.message ?? "Invalid request.", "INVALID_INPUT"), 400);
     }
     const newEmail = body.data.newEmail.toLowerCase();
-    const db2 = await getDb();
-    const rows = await db2.query("SELECT email FROM clients WHERE id = $1", [
+    const db = await getDb();
+    const rows = await db.query("SELECT email FROM clients WHERE id = $1", [
       c.req.param("id")
     ]);
     if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
@@ -108554,11 +108582,11 @@ function registerAdminRoutes(app2) {
     if (previous === newEmail) {
       return c.json(err("That is already the address on this account.", "INVALID_INPUT"), 400);
     }
-    const taken = await db2.query("SELECT id FROM clients WHERE email = $1", [newEmail]);
+    const taken = await db.query("SELECT id FROM clients WHERE email = $1", [newEmail]);
     if (taken.length > 0) {
       return c.json(err("That address is already in use on another account.", "EMAIL_TAKEN"), 400);
     }
-    await db2.query("UPDATE clients SET email = $1, pending_email = NULL WHERE id = $2", [
+    await db.query("UPDATE clients SET email = $1, pending_email = NULL WHERE id = $2", [
       newEmail,
       c.req.param("id")
     ]);
@@ -108570,9 +108598,9 @@ function registerAdminRoutes(app2) {
   app2.get("/admin/services", async (c) => {
     const admin = await requireAdmin(c);
     if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    const db2 = await getDb();
+    const db = await getDb();
     await purgeExpiredSElections().catch((e) => console.error("[purge] failed:", e));
-    const rows = await db2.query(
+    const rows = await db.query(
       `SELECT so.id, so.type, so.status, so.llc_name, so.details, so.amount_cents,
             so.client_id, so.formation_order_id,
             so.created_at, so.paid_at, so.fulfilled_at,
@@ -108591,8 +108619,8 @@ function registerAdminRoutes(app2) {
   app2.get("/admin/services/:id", async (c) => {
     const admin = await requireAdmin(c);
     if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    const db2 = await getDb();
-    const rows = await db2.query(
+    const db = await getDb();
+    const rows = await db.query(
       "SELECT id, type, status, llc_name, details, amount_cents, ein_secret, created_at, paid_at, square_order_id FROM service_orders WHERE id = $1",
       [c.req.param("id")]
     );
@@ -108628,8 +108656,8 @@ function registerAdminRoutes(app2) {
   app2.get("/admin/services/:id/s-election-draft", async (c) => {
     const admin = await requireAdmin(c);
     if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    const db2 = await getDb();
-    const rows = await db2.query(
+    const db = await getDb();
+    const rows = await db.query(
       "SELECT id, client_id, type, status, llc_name, details, ein_secret FROM service_orders WHERE id = $1",
       [c.req.param("id")]
     );
@@ -108690,8 +108718,8 @@ function registerAdminRoutes(app2) {
     if (file && file.size > MAX_UPLOAD_BYTES) {
       return c.json(err("File is too large (20 MB max).", "TOO_LARGE"), 400);
     }
-    const db2 = await getDb();
-    const rows = await db2.query(
+    const db = await getDb();
+    const rows = await db.query(
       "SELECT id, client_id, type, status, llc_name, details FROM service_orders WHERE id = $1",
       [c.req.param("id")]
     );
@@ -108715,19 +108743,19 @@ function registerAdminRoutes(app2) {
         return c.json(err(`${file.name} is not a readable PDF. The deliverable must be the actual PDF document.`, "NOT_A_PDF"), 400);
       }
       const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
-      const doc = await db2.query(
+      const doc = await db.query(
         `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)
        VALUES ($1, 'package', $2, $3, $4, $5) RETURNING id`,
         [so2.client_id, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes]
       );
       documentId = doc[0].id;
     }
-    await db2.query(
+    await db.query(
       "UPDATE service_orders SET status = 'fulfilled', fulfilled_at = now(), ein_secret = NULL WHERE id = $1",
       [so2.id]
     );
     if (notify) {
-      const clients = await db2.query("SELECT email FROM clients WHERE id = $1", [so2.client_id]);
+      const clients = await db.query("SELECT email FROM clients WHERE id = $1", [so2.client_id]);
       if (clients[0]) {
         const mail = serviceFulfilledClientEmail({ summary, portalUrl: `${env.PUBLIC_BASE_URL}/portal` });
         sendMail({ to: clients[0].email, ...mail }).catch(
@@ -108740,8 +108768,8 @@ function registerAdminRoutes(app2) {
   app2.get("/admin/clients/:id/documents", async (c) => {
     const admin = await requireAdmin(c);
     if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    const db2 = await getDb();
-    const rows = await db2.query(
+    const db = await getDb();
+    const rows = await db.query(
       "SELECT id, kind, title, size_bytes, created_at FROM documents WHERE client_id = $1 ORDER BY created_at DESC",
       [c.req.param("id")]
     );
@@ -108765,11 +108793,11 @@ function registerAdminRoutes(app2) {
     if (!await looksLikePdf(file)) {
       return c.json(err(`${file.name} is not a readable PDF. Everything delivered through the portal is a PDF.`, "NOT_A_PDF"), 400);
     }
-    const db2 = await getDb();
-    const clients = await db2.query("SELECT email FROM clients WHERE id = $1", [clientId]);
+    const db = await getDb();
+    const clients = await db.query("SELECT email FROM clients WHERE id = $1", [clientId]);
     if (clients.length === 0) return c.json(err("Client not found.", "NOT_FOUND"), 404);
     const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
-    const rows = await db2.query(
+    const rows = await db.query(
       `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)
      VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
       [clientId, kind, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes]
@@ -108824,8 +108852,8 @@ function registerOpsRoutes(app2) {
   if (!env.SQUARE_ACCESS_TOKEN && !env.isProd) {
     app2.post("/dev/simulate-payment", async (c) => {
       const { orderId } = await c.req.json();
-      const db2 = await getDb();
-      const isFormation = await db2.query("SELECT id FROM orders WHERE id = $1", [orderId]);
+      const db = await getDb();
+      const isFormation = await db.query("SELECT id FROM orders WHERE id = $1", [orderId]);
       if (isFormation.length > 0) {
         await fulfillPaidOrder(orderId, "dev-payment");
       } else {
@@ -108836,8 +108864,8 @@ function registerOpsRoutes(app2) {
   }
   if (!env.isProd) {
     app2.get("/dev/oa-generation-inputs/:id", async (c) => {
-      const db2 = await getDb();
-      const rows = await db2.query(
+      const db = await getDb();
+      const rows = await db.query(
         "SELECT inputs FROM oa_generations WHERE id = $1",
         [c.req.param("id")]
       );
@@ -108846,19 +108874,19 @@ function registerOpsRoutes(app2) {
       return c.json({ data: { inputs: typeof raw2 === "string" ? JSON.parse(raw2) : raw2 } });
     });
     app2.get("/dev/sunbiz-sync-state", async (c) => {
-      const db2 = await getDb();
-      const rows = await db2.query(
+      const db = await getDb();
+      const rows = await db.query(
         "SELECT baseline_label, last_daily::text AS last_daily FROM fl_sync_state WHERE id = 1"
       );
       return c.json({ data: rows.length > 0 ? rows[0] : null });
     });
     app2.post("/dev/sunbiz-sync-state", async (c) => {
       const body = await c.req.json();
-      const db2 = await getDb();
+      const db = await getDb();
       if (body === null) {
-        await db2.query("DELETE FROM fl_sync_state WHERE id = 1");
+        await db.query("DELETE FROM fl_sync_state WHERE id = 1");
       } else {
-        await db2.query(
+        await db.query(
           `INSERT INTO fl_sync_state (id, baseline_label, last_daily, updated_at) VALUES (1, $1, $2::date, now())
          ON CONFLICT (id) DO UPDATE SET baseline_label = $1, last_daily = $2::date, updated_at = now()`,
           [body.baseline_label, body.last_daily]
@@ -108871,9 +108899,9 @@ function registerOpsRoutes(app2) {
       if (rows.some((r) => !r.docNumber.startsWith("E2ETEST"))) {
         return c.json(err("Only E2ETEST fixtures", "BAD_REQUEST"), 400);
       }
-      const db2 = await getDb();
+      const db = await getDb();
       for (const r of rows) {
-        await db2.query(
+        await db.query(
           `INSERT INTO fl_entities (doc_number, name, status, filing_type, file_date, last_txn_date, norm_key)
          VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (doc_number) DO NOTHING`,
           [r.docNumber, r.name, r.status, r.filingType, r.fileDate, r.lastTxnDate, r.normKey]
@@ -108882,21 +108910,21 @@ function registerOpsRoutes(app2) {
       return c.json({ data: { ok: true } });
     });
     app2.post("/dev/delete-test-entities", async (c) => {
-      const db2 = await getDb();
-      await db2.query("DELETE FROM fl_entities WHERE doc_number LIKE 'E2ETEST%'");
+      const db = await getDb();
+      await db.query("DELETE FROM fl_entities WHERE doc_number LIKE 'E2ETEST%'");
       return c.json({ data: { ok: true } });
     });
   }
   if (!env.isProd) {
     app2.post("/dev/mint-reset-token", async (c) => {
       const { email, purpose = "reset_password" } = await c.req.json();
-      const db2 = await getDb();
-      const rows = await db2.query("SELECT id FROM clients WHERE email = $1", [
+      const db = await getDb();
+      const rows = await db.query("SELECT id FROM clients WHERE email = $1", [
         email.toLowerCase()
       ]);
       if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
       const { token, tokenHash } = newToken();
-      await db2.query(
+      await db.query(
         "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at) VALUES ($1, $2, $3, $4)",
         [tokenHash, rows[0].id, purpose, new Date(Date.now() + 36e5).toISOString()]
       );
@@ -108904,14 +108932,14 @@ function registerOpsRoutes(app2) {
     });
     app2.post("/dev/pending-email-token", async (c) => {
       const { email } = await c.req.json();
-      const db2 = await getDb();
-      const rows = await db2.query(
+      const db = await getDb();
+      const rows = await db.query(
         "SELECT id, pending_email FROM clients WHERE email = $1",
         [email.toLowerCase()]
       );
       if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
       const { token, tokenHash } = newToken();
-      await db2.query(
+      await db.query(
         "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at, payload) VALUES ($1, $2, 'verify_email', $3, $4)",
         [tokenHash, rows[0].id, new Date(Date.now() + 36e5).toISOString(), rows[0].pending_email]
       );
@@ -108919,10 +108947,10 @@ function registerOpsRoutes(app2) {
     });
     app2.post("/dev/age-formation", async (c) => {
       const { email, days } = await c.req.json();
-      const db2 = await getDb();
-      const rows = await db2.query("SELECT id FROM clients WHERE email = $1", [email.toLowerCase()]);
+      const db = await getDb();
+      const rows = await db.query("SELECT id FROM clients WHERE email = $1", [email.toLowerCase()]);
       if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
-      await db2.query(
+      await db.query(
         "UPDATE orders SET paid_at = now() - ($1 || ' days')::interval WHERE client_id = $2 AND paid_at IS NOT NULL",
         [String(Math.round(days)), rows[0].id]
       );
@@ -108930,8 +108958,8 @@ function registerOpsRoutes(app2) {
     });
     app2.post("/dev/expire-s-election", async (c) => {
       const { orderId } = await c.req.json();
-      const db2 = await getDb();
-      await db2.query(
+      const db = await getDb();
+      await db.query(
         "UPDATE service_orders SET fulfilled_at = now() - interval '15 days' WHERE id = $1 AND type = 's-election'",
         [orderId]
       );
@@ -108960,8 +108988,8 @@ function registerOpsRoutes(app2) {
     if (secret && auth !== `Bearer ${secret}`) return c.json(err("Not authorized", "UNAUTHENTICATED"), 401);
     if (!secret && env.isProd) return c.json(err("Not authorized", "UNAUTHENTICATED"), 401);
     const purged = await purgeExpiredSElections();
-    const db2 = await getDb();
-    await db2.query("DELETE FROM rate_limits WHERE window_start < now() - interval '2 days'");
+    const db = await getDb();
+    await db.query("DELETE FROM rate_limits WHERE window_start < now() - interval '2 days'");
     return c.json({ data: { purged } });
   });
   app2.get("/cron/db-backup", async (c) => {

@@ -1,0 +1,5 @@
+#!/bin/bash
+# Tracked hook shim — wired by `git config core.hooksPath .githooks`, which
+# the webapp package's `prepare` script sets on every install, so the commit
+# gate follows the repository instead of one machine (Codex OPS-HOOK-001).
+exec "$(git rev-parse --show-toplevel)/.claude/hooks/pre-commit.sh"
