@@ -99937,6 +99937,14 @@ var extendedFormSchema = formationFormSchema.extend({
   // hid it (caught 29 Aug 2026). Requirements re-imposed below, NEW only.
   desiredLlcName: external_exports.string().max(300).optional().or(external_exports.literal("")),
   llcDesignator: external_exports.enum(llcDesignators).optional().or(external_exports.literal("")),
+  // The three name-step acknowledgments live on the NEW-formation branch;
+  // a conversion never shows them, and the base schema's unconditional
+  // literal(true) refused every real conversion at submit — found by the
+  // behavioral gate on its first full run, 30 Aug 2026, after an API-level
+  // "UI-shaped" fixture had copied them as true and hidden it.
+  nameSearchAcknowledgment: external_exports.boolean().optional(),
+  governmentAffiliationAcknowledgment: external_exports.boolean().optional(),
+  lawfulPurposeNameAcknowledgment: external_exports.boolean().optional(),
   orderEin: external_exports.boolean().optional().default(false),
   orderSElection: external_exports.boolean().optional().default(false),
   existingLlcName: external_exports.string().max(300).optional().or(external_exports.literal("")),
@@ -99957,6 +99965,13 @@ var extendedFormSchema = formationFormSchema.extend({
   }),
   articlesSignerAppointment: external_exports.boolean().optional().default(false)
 }).superRefine((data, ctx) => {
+  if (data.filingPath !== "CONVERT") {
+    for (const k of ["nameSearchAcknowledgment", "governmentAffiliationAcknowledgment", "lawfulPurposeNameAcknowledgment"]) {
+      if (data[k] !== true) {
+        ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: [k], message: "Acknowledgment is required." });
+      }
+    }
+  }
   if (data.filingPath !== "CONVERT" && !(data.desiredLlcName ?? "").trim()) {
     ctx.addIssue({
       code: external_exports.ZodIssueCode.custom,
@@ -108509,6 +108524,9 @@ function registerAdminRoutes(app2) {
         filedAt: o.filed_at,
         formedAt: o.formed_at,
         groups: filingGroups(payload),
+        // The stored intake itself — the ground truth the behavioral gate
+        // compares every on-screen choice against (P52).
+        payload,
         alternateNames: (payload.llcName?.alternateNames ?? []).filter(
           (n) => (n ?? "").trim() !== ""
         ),

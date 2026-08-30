@@ -133,8 +133,10 @@ export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
               label="Your first name"
               required
               error={errors.registeredAgentFirstName}
+              htmlFor="ra-first-name"
             >
               <Input
+                id="ra-first-name"
                 value={data.registeredAgentFirstName ?? ""}
                 onChange={(e) => patch({ registeredAgentFirstName: e.target.value })}
               />
@@ -143,14 +145,17 @@ export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
               label="Your last name"
               required
               error={errors.registeredAgentLastName}
+              htmlFor="ra-last-name"
             >
               <Input
+                id="ra-last-name"
                 value={data.registeredAgentLastName ?? ""}
                 onChange={(e) => patch({ registeredAgentLastName: e.target.value })}
               />
             </FieldShell>
-            <FieldShell label="Suffix (optional)">
+            <FieldShell label="Suffix (optional)" htmlFor="ra-suffix">
               <Input
+                id="ra-suffix"
                 value={data.registeredAgentSuffix ?? ""}
                 onChange={(e) => patch({ registeredAgentSuffix: e.target.value })}
                 placeholder="Jr, Sr, III…"
@@ -164,8 +169,10 @@ export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
               required
               className="md:col-span-6"
               error={poBoxError ?? errors.registeredAgentStreetAddress1}
+              htmlFor="ra-street"
             >
               <AddressAutocomplete
+                id="ra-street"
                 value={data.registeredAgentStreetAddress1}
                 onChangeText={(text) =>
                   patch({ registeredAgentStreetAddress1: text })
@@ -181,8 +188,9 @@ export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
               />
             </FieldShell>
 
-            <FieldShell label="Suite / Unit (optional)" className="md:col-span-6">
+            <FieldShell label="Suite / Unit (optional)" className="md:col-span-6" htmlFor="ra-suite">
               <Input
+                id="ra-suite"
                 value={data.registeredAgentStreetAddress2 ?? ""}
                 onChange={(e) =>
                   patch({ registeredAgentStreetAddress2: e.target.value })
@@ -195,15 +203,17 @@ export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
               required
               className="md:col-span-3"
               error={errors.registeredAgentCity}
+              htmlFor="ra-city"
             >
               <Input
+                id="ra-city"
                 value={data.registeredAgentCity}
                 onChange={(e) => patch({ registeredAgentCity: e.target.value })}
               />
             </FieldShell>
 
-            <FieldShell label="State" required className="md:col-span-2">
-              <Input value="FL — Florida" disabled />
+            <FieldShell label="State" required className="md:col-span-2" htmlFor="ra-state">
+              <Input id="ra-state" value="FL — Florida" disabled />
             </FieldShell>
 
             <FieldShell
@@ -211,8 +221,10 @@ export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
               required
               className="md:col-span-1"
               error={errors.registeredAgentZip}
+              htmlFor="ra-zip"
             >
               <Input
+                id="ra-zip"
                 value={data.registeredAgentZip}
                 onChange={(e) => patch({ registeredAgentZip: e.target.value })}
                 inputMode="numeric"

@@ -75,10 +75,12 @@ export function StepRegisteredAgentAcceptance({
 
       <FieldShell
         label="Your name (as registered agent)"
+        htmlFor="ra-accept-name"
         required
         error={errors.registeredAgentAcceptanceName}
       >
         <Input
+          id="ra-accept-name"
           value={data.registeredAgentAcceptanceName}
           onChange={(e) =>
             patch({ registeredAgentAcceptanceName: e.target.value })
@@ -88,11 +90,13 @@ export function StepRegisteredAgentAcceptance({
 
       <FieldShell
         label="Electronic signature"
+        htmlFor="ra-accept-signature"
         required
         helper="Type your full legal name as your electronic signature."
         error={errors.registeredAgentElectronicSignature}
       >
         <Input
+          id="ra-accept-signature"
           value={data.registeredAgentElectronicSignature}
           onChange={(e) =>
             patch({ registeredAgentElectronicSignature: e.target.value })

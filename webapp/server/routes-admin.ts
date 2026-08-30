@@ -335,6 +335,9 @@ app.get("/admin/orders/:id", async (c) => {
       filedAt: o.filed_at,
       formedAt: o.formed_at,
       groups: filingGroups(payload),
+      // The stored intake itself — the ground truth the behavioral gate
+      // compares every on-screen choice against (P52).
+      payload,
       alternateNames: ((payload as { llcName?: { alternateNames?: string[] } }).llcName?.alternateNames ?? []).filter(
         (n) => (n ?? "").trim() !== "",
       ),

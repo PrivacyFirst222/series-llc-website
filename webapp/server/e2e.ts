@@ -445,6 +445,9 @@ check("client account auto-created on payment", !!client && !client.has_password
   const uc = (addr: string) => testEmail.replace("@", `+${addr}@`);
   const conv = await api("/api/orders", { method: "POST", body: JSON.stringify({
     ...formData, filingPath: "CONVERT", desiredLlcName: "", llcDesignator: "", alternateName1: "",
+    // The name-step acknowledgments are never shown to a conversion — the
+    // fixture carrying them as true hid a real submit blocker (30 Aug 2026).
+    nameSearchAcknowledgment: false, governmentAffiliationAcknowledgment: false, lawfulPurposeNameAcknowledgment: false,
     existingLlcName: "E2E Converted Holdings, LLC", sunbizDocumentNumber: "L24000999888",
     series: [{ id: "s1", name: "E2E Converted Holdings, LLC, PS A" }],
     clientEmail: uc("uiconv"), confirmClientEmail: uc("uiconv"),

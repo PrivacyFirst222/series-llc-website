@@ -28,6 +28,14 @@ const extendedFormSchema = formationFormSchema
     // hid it (caught 29 Aug 2026). Requirements re-imposed below, NEW only.
     desiredLlcName: z.string().max(300).optional().or(z.literal("")),
     llcDesignator: z.enum(llcDesignators).optional().or(z.literal("")),
+    // The three name-step acknowledgments live on the NEW-formation branch;
+    // a conversion never shows them, and the base schema's unconditional
+    // literal(true) refused every real conversion at submit — found by the
+    // behavioral gate on its first full run, 30 Aug 2026, after an API-level
+    // "UI-shaped" fixture had copied them as true and hidden it.
+    nameSearchAcknowledgment: z.boolean().optional(),
+    governmentAffiliationAcknowledgment: z.boolean().optional(),
+    lawfulPurposeNameAcknowledgment: z.boolean().optional(),
     orderEin: z.boolean().optional().default(false),
     orderSElection: z.boolean().optional().default(false),
     existingLlcName: z.string().max(300).optional().or(z.literal("")),
@@ -52,6 +60,13 @@ const extendedFormSchema = formationFormSchema
     articlesSignerAppointment: z.boolean().optional().default(false),
   })
   .superRefine((data, ctx) => {
+    if (data.filingPath !== "CONVERT") {
+      for (const k of ["nameSearchAcknowledgment", "governmentAffiliationAcknowledgment", "lawfulPurposeNameAcknowledgment"] as const) {
+        if (data[k] !== true) {
+          ctx.addIssue({ code: z.ZodIssueCode.custom, path: [k], message: "Acknowledgment is required." });
+        }
+      }
+    }
     if (data.filingPath !== "CONVERT" && !(data.desiredLlcName ?? "").trim()) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,

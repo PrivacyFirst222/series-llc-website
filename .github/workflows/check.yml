@@ -43,6 +43,20 @@ jobs:
         working-directory: webapp
         run: bun run check
 
+      # The behavioral gate (P52): a real Chromium buys every entity variation
+      # the site sells — new + conversion, LLC + PLLC, member- + manager-
+      # managed, our agent + self agent — and the run passes only when each
+      # STORED order matches, field for field, what was chosen on screen.
+      # Green means a customer can buy the product, not that our checks agree
+      # with our checks.
+      - name: Install Chromium for the behavioral gate
+        working-directory: webapp
+        run: bunx playwright install --with-deps chromium
+
+      - name: A customer buys every product variant
+        working-directory: webapp
+        run: bun run behavioral
+
       - name: Server log on failure
         if: failure()
         run: tail -100 /tmp/dev-server.log

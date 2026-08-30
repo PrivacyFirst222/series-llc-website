@@ -171,6 +171,7 @@ export function StepSeries({ data, patch, errors }: StepProps) {
             <div className="flex-1">
               <FieldShell
                 label="Series identifier"
+                htmlFor={`series-${s.id}-name`}
                 error={errors[`series.${i}.name`]}
                 helper={
                   s.name.trim()
@@ -179,6 +180,7 @@ export function StepSeries({ data, patch, errors }: StepProps) {
                 }
               >
                 <input
+                  id={`series-${s.id}-name`}
                   type="text"
                   value={s.name}
                   onChange={(e) => updateName(s.id, e.target.value)}
