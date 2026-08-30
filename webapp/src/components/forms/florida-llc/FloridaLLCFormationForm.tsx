@@ -133,7 +133,7 @@ export function FloridaLLCFormationForm({
       setStepIndex((i) => Math.min(i + 1, STEPS.length - 1));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stepIndex, data.managementStructure]);
+  }, [stepIndex, data.managementStructure, data.registeredAgentChoice]);
 
   // Every step change lands at the top of the page. The smooth scrolls in
   // the navigation handlers fire before the new step renders, and iPad
@@ -254,6 +254,11 @@ export function FloridaLLCFormationForm({
   // questionnaire, whose first question routes between the masters.
   const stepHidden = (i: number): boolean =>
     (STEPS[i]?.key === "path" && PATH_PRESET !== null) ||
+    // Our service signs its own acceptance — the step exists only for a
+    // customer serving as their own agent (Adam, 29 Aug 2026). The agent
+    // step already told the service chooser "nothing to sign", and the
+    // server fills the canonical acceptance regardless of the browser.
+    (STEPS[i]?.key === "acceptance" && data.registeredAgentChoice === "SERVICE") ||
     (STEPS[i]?.key === "managers" && data.managementStructure === "MEMBER_MANAGED") ||
     (STEPS[i]?.key === "members" && data.managementStructure === "MANAGER_MANAGED");
 
