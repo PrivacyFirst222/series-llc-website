@@ -128,7 +128,7 @@ export function StepName({ data, patch, errors }: StepProps) {
         }
       >
         <Select
-          value={data.llcDesignator || undefined}
+          value={data.llcDesignator}
           onValueChange={(v) => patch({ llcDesignator: v as LlcDesignator })}
         >
           <SelectTrigger id="llc-designator">

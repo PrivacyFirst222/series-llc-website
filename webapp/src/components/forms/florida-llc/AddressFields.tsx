@@ -90,7 +90,7 @@ export function AddressFieldsBlock({
         className="md:col-span-2"
       >
         <Select
-          value={value.state || undefined}
+          value={value.state}
           onValueChange={(v) => set("state", v)}
           disabled={Boolean(lockState)}
         >

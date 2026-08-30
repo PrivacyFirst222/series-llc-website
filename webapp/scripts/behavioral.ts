@@ -47,7 +47,7 @@ type RunConfig = {
 
 const RUNS: RunConfig[] = [
   { key: "A", label: "new LLC, member-managed, our RA", path: "new", formationType: "DOMESTIC_LLC", management: "MEMBER_MANAGED", ra: "SERVICE", llcName: "Gate Run Alpha", designator: "LLC" },
-  { key: "B", label: "new LLC, manager-managed, self RA, entity member", path: "new", formationType: "DOMESTIC_LLC", management: "MANAGER_MANAGED", ra: "SELF", llcName: "Gate Run Bravo", designator: "L.L.C.", memberEntity: true },
+  { key: "B", label: "new LLC, member-managed, self RA, entity member", path: "new", formationType: "DOMESTIC_LLC", management: "MEMBER_MANAGED", ra: "SELF", llcName: "Gate Run Bravo", designator: "L.L.C.", memberEntity: true },
   { key: "C", label: "new PLLC, member-managed, self RA", path: "new", formationType: "PLLC", management: "MEMBER_MANAGED", ra: "SELF", llcName: "Gate Run Charlie", designator: "P.L.L.C." },
   { key: "D", label: "new PLLC, manager-managed, our RA, EIN + S election", path: "new", formationType: "PLLC", management: "MANAGER_MANAGED", ra: "SERVICE", llcName: "Gate Run Delta", designator: "PLLC", addons: { ein: true, sElection: true } },
   { key: "E", label: "conversion, member-managed, our RA", path: "convert", formationType: "DOMESTIC_LLC", management: "MEMBER_MANAGED", ra: "SERVICE", llcName: "Gate Run Echo, LLC", designator: "" },
@@ -55,6 +55,14 @@ const RUNS: RunConfig[] = [
   { key: "G", label: "new LLC, exact name only, dated, certificates, 4 series", path: "new", formationType: "DOMESTIC_LLC", management: "MEMBER_MANAGED", ra: "SERVICE", llcName: "Gate Run Golf", designator: "Limited Liability Company", exactNameOnly: true, requestedEffectiveDate: "2026-10-01", addons: { certificate: true, certifiedCopy: true }, extraSeries: 3 },
   { key: "H", label: "new LLC, entity manager, separate mailing, we sign", path: "new", formationType: "DOMESTIC_LLC", management: "MANAGER_MANAGED", ra: "SERVICE", llcName: "Gate Run Hotel", designator: "LLC", managerEntity: true, separateMailing: true, weSign: true },
 ];
+
+// A config may only claim attributes its flow can exercise — a run that
+// names an untestable attribute is a silent cap wearing a label (audit 16
+// P2 caught exactly that on the original Run B).
+for (const r of RUNS) {
+  if (r.memberEntity && r.management !== "MEMBER_MANAGED") throw new Error(`${r.key}: entity member requires member-managed (ownership is collected in the OA questionnaire — Adam's design)`);
+  if (r.managerEntity && r.management !== "MANAGER_MANAGED") throw new Error(`${r.key}: entity manager requires manager-managed`);
+}
 
 const failures: string[] = [];
 let checks = 0;
@@ -382,7 +390,10 @@ async function main(): Promise<void> {
   // 1) Fresh, hermetic backend: empty database, offline integrations.
   const freshDir = mkdtempSync(join(tmpdir(), "behavioral-pg-"));
   const api: Subprocess = spawn(["bun", "server/dev.ts"], {
-    env: { ...process.env, DEV_PG_DIR: freshDir, PORT: String(API_PORT), E2E_OFFLINE: "1" },
+    // PUBLIC_BASE_URL: the fake checkout's return origin is THIS run's web
+    // server, never a hard-coded port that may belong to another local
+    // instance (audit 16 DEV-ORIGIN-001).
+    env: { ...process.env, DEV_PG_DIR: freshDir, PORT: String(API_PORT), E2E_OFFLINE: "1", PUBLIC_BASE_URL: `http://localhost:${WEB_PORT}` },
     stdout: "ignore",
     stderr: "pipe",
   });
@@ -423,8 +434,13 @@ async function main(): Promise<void> {
   for (const run of RUNS.filter((r) => !only || only.includes(r.key))) {
     console.log(`\n▶ Run ${run.key}: ${run.label}`);
     const page = await browser.newPage();
+    const reactWarnings: string[] = [];
+    page.on("console", (m) => {
+      if (/controlled|uncontrolled/i.test(m.text())) reactWarnings.push(m.text().slice(0, 120));
+    });
     try {
       const { orderId, totalCents } = await driveRun(page, run);
+      expect(reactWarnings.length === 0, `${run.key}: no controlled/uncontrolled React warnings`, reactWarnings[0]);
 
       // Ground truth: the stored order, read through the admin API.
       await fetch(`${API}/api/dev/simulate-payment`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ orderId }) });
