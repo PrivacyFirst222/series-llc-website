@@ -36,6 +36,9 @@ export interface FilingField {
 export interface FilingGroup {
   title: string;
   fields: FilingField[];
+  /** The Protected Series Designations, filed separately AFTER the base LLC
+   *  is formed — shown at the With-The-State stage, not with the Articles. */
+  series?: boolean;
 }
 
 /** What this module actually reads from a stored order payload. Every field
@@ -472,6 +475,7 @@ export function filingGroups(payload: unknown): FilingGroup[] {
   const series: { name?: string }[] = p.series ?? [];
   groups.push({
     title: `Protected series — filed separately after the Articles ($25 designation each) (${series.length})`,
+    series: true,
     fields: series.map((s, i) => ({
       key: `series${i}`,
       label: `Series ${i + 1}`,

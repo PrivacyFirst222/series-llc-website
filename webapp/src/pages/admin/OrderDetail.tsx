@@ -19,6 +19,7 @@ interface FilingField {
 interface FilingGroup {
   title: string;
   fields: FilingField[];
+  series?: boolean;
 }
 interface OrderDetailData {
   id: string;
@@ -32,6 +33,7 @@ interface OrderDetailData {
   filedAt: string | null;
   formedAt: string | null;
   groups: FilingGroup[];
+  seriesFiledAt: string | null;
   copiedFields: Record<string, boolean>;
   series: { name: string; covered: boolean }[];
   documents: { id: string; kind: string; title: string; createdAt: string }[];
@@ -127,6 +129,13 @@ export default function OrderDetail({
     { file: null, covers: [] },
   ]);
   const [uploadError, setUploadError] = useState<string | null>(null);
+
+  const seriesFiled = useMutation({
+    mutationFn: () => api.post(`/api/admin/orders/${orderId}/series-filed`, {}),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "order", orderId] });
+    },
+  });
 
   const detail = useQuery({
     queryKey: ["admin", "order", orderId],
@@ -224,7 +233,9 @@ export default function OrderDetail({
             {/* Adam's spec: the service orders sit right here, first thing
                 after the name verdicts — the extra prose is gone; the
                 fulfill dialog explains the taxpayer-number handling. */}
-            {d && services.length > 0 ? (
+            {/* Ancillary services wait their turn: nothing to fulfill while
+                the base LLC is not even sent (Adam, 30 Aug 2026). */}
+            {d && d.status !== "paid" && services.length > 0 ? (
               <section className="mt-3 rounded-xl border border-amber-500/40 bg-amber-500/5 p-4">
                 <div className="flex items-center gap-2">
                   <Landmark className="h-4 w-4 text-amber-700 dark:text-amber-400" />
@@ -279,7 +290,27 @@ export default function OrderDetail({
               </Button>
             ) : null}
 
-            {d.groups.map((g) => (
+            {/* The panel follows Adam's filing sequence (30 Aug 2026):
+                New Orders shows the base Articles' fields alone — series
+                designations cannot be filed until the LLC exists. With The
+                State swaps to the series section and its own done-button;
+                the base fields are finished business. Formed shows neither. */}
+            {d.status === "filed" && !d.seriesFiledAt ? (
+              <Button onClick={() => seriesFiled.mutate()} disabled={seriesFiled.isPending} className="w-full rounded-full">
+                {seriesFiled.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                All series designations filed
+              </Button>
+            ) : null}
+            {d.seriesFiledAt ? (
+              <p className="flex items-center gap-2 text-sm text-trust">
+                <Check className="h-4 w-4" />
+                Series designations filed {new Date(d.seriesFiledAt).toLocaleDateString()}
+              </p>
+            ) : null}
+
+            {d.groups.filter((g) =>
+              d.status === "paid" ? !g.series : d.status === "filed" && !d.seriesFiledAt ? !!g.series : false,
+            ).map((g) => (
               <section key={g.title}>
                 <h3 className="font-display text-base">{g.title}</h3>
                 <div className="mt-2 space-y-1.5">

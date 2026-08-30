@@ -2354,6 +2354,20 @@ if (mint.status === 200) {
       (await statusOf(o.id)) === "filed",
       await statusOf(o.id),
     );
+
+    // 3. The second check-off: series designations are filed after the base
+    //    LLC (Adam's sequence, 30 Aug 2026). Admin-only and idempotent.
+    const noAuth = await api(`/api/admin/orders/${o.id}/series-filed`, { method: "POST", body: "{}" });
+    check("series-filed requires the admin session", noAuth.status === 401, noAuth.status);
+    const sf = await api(`/api/admin/orders/${o.id}/series-filed`, { method: "POST", cookies: adm.cookie, body: "{}" });
+    check("series designations can be marked filed", sf.status === 200, sf.body);
+    const det1 = await api(`/api/admin/orders/${o.id}`, { cookies: adm.cookie });
+    const t1 = (det1.body?.data as { seriesFiledAt?: string | null })?.seriesFiledAt;
+    check("the series-filed timestamp is recorded", !!t1, det1.body?.data);
+    await api(`/api/admin/orders/${o.id}/series-filed`, { method: "POST", cookies: adm.cookie, body: "{}" });
+    const det2 = await api(`/api/admin/orders/${o.id}`, { cookies: adm.cookie });
+    check("marking again keeps the ORIGINAL timestamp (idempotent)",
+      (det2.body?.data as { seriesFiledAt?: string | null })?.seriesFiledAt === t1, det2.body?.data);
   }
 }
 

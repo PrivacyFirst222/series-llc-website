@@ -317,9 +317,17 @@ const MIGRATION_002_STATEMENTS: string[] = [
   )`,
 ];
 
+const MIGRATION_003_STATEMENTS: string[] = [
+  // Series designations are filed with the Division only AFTER the base LLC
+  // is formed. This timestamp is Adam's second check-off (30 Aug 2026): the
+  // base filing is marked sent, then — later — the designations marked filed.
+  `ALTER TABLE orders ADD COLUMN IF NOT EXISTS series_filed_at TIMESTAMPTZ`,
+];
+
 const MIGRATIONS: { id: number; name: string; statements: string[] }[] = [
   { id: 1, name: "initial-schema", statements: MIGRATION_001_STATEMENTS },
   { id: 2, name: "contact-messages", statements: MIGRATION_002_STATEMENTS },
+  { id: 3, name: "series-filed-at", statements: MIGRATION_003_STATEMENTS },
   // Append future migrations here with the next id. Never edit an entry.
 ];
 

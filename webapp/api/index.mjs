@@ -95318,9 +95318,16 @@ var MIGRATION_002_STATEMENTS = [
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
   )`
 ];
+var MIGRATION_003_STATEMENTS = [
+  // Series designations are filed with the Division only AFTER the base LLC
+  // is formed. This timestamp is Adam's second check-off (30 Aug 2026): the
+  // base filing is marked sent, then — later — the designations marked filed.
+  `ALTER TABLE orders ADD COLUMN IF NOT EXISTS series_filed_at TIMESTAMPTZ`
+];
 var MIGRATIONS = [
   { id: 1, name: "initial-schema", statements: MIGRATION_001_STATEMENTS },
-  { id: 2, name: "contact-messages", statements: MIGRATION_002_STATEMENTS }
+  { id: 2, name: "contact-messages", statements: MIGRATION_002_STATEMENTS },
+  { id: 3, name: "series-filed-at", statements: MIGRATION_003_STATEMENTS }
   // Append future migrations here with the next id. Never edit an entry.
 ];
 function migrationChecksum(statements) {
@@ -105607,6 +105614,7 @@ function filingGroups(payload) {
   const series = p2.series ?? [];
   groups.push({
     title: `Protected series \u2014 filed separately after the Articles ($25 designation each) (${series.length})`,
+    series: true,
     fields: series.map((s, i) => ({
       key: `series${i}`,
       label: `Series ${i + 1}`,
@@ -108463,6 +108471,15 @@ function registerAdminRoutes(app2) {
     ]);
     return c.json({ data: { ok: true } });
   });
+  app2.post("/admin/orders/:id/series-filed", async (c) => {
+    const admin = await requireAdmin(c);
+    if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+    const db = await getDb();
+    const rows = await db.query("SELECT id FROM orders WHERE id = $1", [c.req.param("id")]);
+    if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+    await db.query("UPDATE orders SET series_filed_at = COALESCE(series_filed_at, now()) WHERE id = $1", [c.req.param("id")]);
+    return c.json({ data: { ok: true } });
+  });
   app2.post("/admin/orders/:id/copied", async (c) => {
     const admin = await requireAdmin(c);
     if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
@@ -108527,6 +108544,7 @@ function registerAdminRoutes(app2) {
         paidAt: o.paid_at,
         filedAt: o.filed_at,
         formedAt: o.formed_at,
+        seriesFiledAt: o.series_filed_at,
         groups: filingGroups(payload),
         // The stored intake itself — the ground truth the behavioral gate
         // compares every on-screen choice against (P52).

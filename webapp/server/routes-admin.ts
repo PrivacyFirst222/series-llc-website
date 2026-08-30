@@ -248,6 +248,18 @@ app.post("/admin/orders/:id/unfiled", async (c) => {
 
 /** Which fields have been copied into the state's form. Stored per order so an
  *  interrupted filing resumes on whatever machine you pick it up on. */
+// The second check-off: the Protected Series Designations are filed only
+// after the Division forms the base LLC (Adam, 30 Aug 2026). Idempotent.
+app.post("/admin/orders/:id/series-filed", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const db = await getDb();
+  const rows = await db.query<{ id: string }>("SELECT id FROM orders WHERE id = $1", [c.req.param("id")]);
+  if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+  await db.query("UPDATE orders SET series_filed_at = COALESCE(series_filed_at, now()) WHERE id = $1", [c.req.param("id")]);
+  return c.json({ data: { ok: true } });
+});
+
 app.post("/admin/orders/:id/copied", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
@@ -334,6 +346,7 @@ app.get("/admin/orders/:id", async (c) => {
       paidAt: o.paid_at,
       filedAt: o.filed_at,
       formedAt: o.formed_at,
+      seriesFiledAt: (o as unknown as { series_filed_at: string | null }).series_filed_at,
       groups: filingGroups(payload),
       // The stored intake itself — the ground truth the behavioral gate
       // compares every on-screen choice against (P52).
