@@ -436,6 +436,42 @@ const client = (clients.body?.data as { id: string; email: string; has_password:
 );
 check("client account auto-created on payment", !!client && !client.has_password, clients.body);
 
+// 5b. A conversion the way the UI actually sends it: the new-name questions
+//     are never shown, so desiredLlcName and llcDesignator arrive empty. This
+//     exact shape was refused "LLC name is required" until 29 Aug 2026 —
+//     every fixture carried a name, so thirteen audits never saw it. The
+//     order is named by the company being converted, not "Unnamed LLC".
+{
+  const uc = (addr: string) => testEmail.replace("@", `+${addr}@`);
+  const conv = await api("/api/orders", { method: "POST", body: JSON.stringify({
+    ...formData, filingPath: "CONVERT", desiredLlcName: "", llcDesignator: "", alternateName1: "",
+    existingLlcName: "E2E Converted Holdings, LLC", sunbizDocumentNumber: "L24000999888",
+    series: [{ id: "s1", name: "E2E Converted Holdings, LLC, PS A" }],
+    clientEmail: uc("uiconv"), confirmClientEmail: uc("uiconv"),
+    correspondentEmail: uc("uiconv"), confirmCorrespondentEmail: uc("uiconv"),
+  })});
+  check("a UI-shaped conversion (no new-name fields) is accepted", conv.status === 200, conv.body);
+  const fullC = await api(`/api/admin/orders/${conv.body?.data?.orderId}`, { cookies: admin.cookie });
+  check("a conversion order is named by the company being converted",
+    (fullC.body?.data as { llcName?: string })?.llcName === "E2E Converted Holdings, LLC",
+    fullC.body?.data);
+  // s. 621.12(2)(b)3: a PLLC's designator comes IN LIEU OF the standard ones,
+  // so both cross-pairings are refused server-side, past the filtered dropdown.
+  const wrongPro = await api("/api/orders", { method: "POST", body: JSON.stringify({
+    ...formData, formationType: "PLLC", llcDesignator: "LLC",
+    purposeType: "PROFESSIONAL", businessPurposeText: "The practice of law",
+    clientEmail: uc("pllcwrong"), confirmClientEmail: uc("pllcwrong"),
+    correspondentEmail: uc("pllcwrong"), confirmCorrespondentEmail: uc("pllcwrong"),
+  })});
+  check("a PLLC with a standard designator is refused (s. 621.12)", wrongPro.status === 400, wrongPro.body);
+  const wrongStd = await api("/api/orders", { method: "POST", body: JSON.stringify({
+    ...formData, llcDesignator: "PLLC",
+    clientEmail: uc("stdwrong"), confirmClientEmail: uc("stdwrong"),
+    correspondentEmail: uc("stdwrong"), confirmCorrespondentEmail: uc("stdwrong"),
+  })});
+  check("a standard LLC with a professional designator is refused", wrongStd.status === 400, wrongStd.body);
+}
+
 // 6. Duplicate fulfillment is a no-op (idempotency)
 await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId }) });
 const clients2 = await api("/api/admin/clients", { cookies: admin.cookie });

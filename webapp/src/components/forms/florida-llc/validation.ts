@@ -55,9 +55,9 @@ export function designatorAllowedForFormationType(
   if (formationType === "DOMESTIC_LLC") {
     return STANDARD_DESIGNATORS.includes(designator as LlcDesignator);
   }
-  return [...STANDARD_DESIGNATORS, ...PLLC_DESIGNATORS].includes(
-    designator as LlcDesignator,
-  );
+  // s. 621.12(2)(b)3: a PLLC formed on or after 1 Jan 2014 uses a professional
+  // designator IN LIEU OF the s. 605.0112 ones — plain "LLC" is not allowed.
+  return PLLC_DESIGNATORS.includes(designator as LlcDesignator);
 }
 
 export function totalOwnershipPct(members: FloridaLLCFormData["members"]): number {

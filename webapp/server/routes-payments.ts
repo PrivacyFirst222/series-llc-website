@@ -332,7 +332,11 @@ app.post("/orders", async (c) => {
     // on file — s. 605.0213(7).
     registeredAgentChange: data.registeredAgentChoice === "SERVICE",
   });
-  const llcName = payload.llcName.finalName || payload.llcName.desiredName || "Unnamed LLC";
+  // A conversion has no new-name fields — the order is named by the company
+  // being converted, not "Unnamed LLC".
+  const llcName =
+    (payload.filingPath === "CONVERT" ? payload.existingLlcName : "") ||
+    payload.llcName.finalName || payload.llcName.desiredName || "Unnamed LLC";
 
   const db = await getDb();
   const rows = await db.query<{ id: string }>(

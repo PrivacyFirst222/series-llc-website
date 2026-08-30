@@ -23,10 +23,9 @@ const PROFESSIONAL: LlcDesignator[] = [
 
 export function StepName({ data, patch, errors }: StepProps) {
   const isConversion = data.filingPath === "CONVERT";
-  const opts =
-    data.formationType === "PLLC"
-      ? [...STANDARD, ...PROFESSIONAL]
-      : STANDARD;
+  // Only the designators that are legal for the chosen formation type are
+  // offered at all (s. 621.12(2)(b)3: professional in lieu of standard).
+  const opts = data.formationType === "PLLC" ? PROFESSIONAL : STANDARD;
 
   const finalName = buildFinalLlcName(data.desiredLlcName, data.llcDesignator);
   const finalNameValid = !finalName || nameContainsLegalDesignator(finalName);
@@ -123,7 +122,7 @@ export function StepName({ data, patch, errors }: StepProps) {
         error={errors.llcDesignator}
         helper={
           data.formationType === "PLLC"
-            ? "PLLC, P.L.L.C., or Professional Limited Liability Company is recommended for a professional LLC."
+            ? "A professional LLC's name must use PLLC, P.L.L.C., or Professional Limited Liability Company."
             : "Standard designators only — switch to PLLC formation type if you need a professional designator."
         }
       >
@@ -148,7 +147,7 @@ export function StepName({ data, patch, errors }: StepProps) {
         <p className="text-xs text-destructive">
           {data.formationType === "DOMESTIC_LLC"
             ? "PLLC designators are not allowed for a standard LLC. Switch to PLLC formation type to use them."
-            : "Designator not valid for this formation type."}
+            : "A professional LLC must use a professional designator — PLLC, P.L.L.C., or Professional Limited Liability Company."}
         </p>
       ) : null}
 

@@ -99792,6 +99792,16 @@ var formationFormSchema = external_exports.object({
 });
 
 // src/components/forms/florida-llc/validation.ts
+var PLLC_DESIGNATORS = [
+  "PLLC",
+  "P.L.L.C.",
+  "Professional Limited Liability Company"
+];
+var STANDARD_DESIGNATORS = [
+  "LLC",
+  "L.L.C.",
+  "Limited Liability Company"
+];
 function buildFinalLlcName(desired, designator) {
   const cleaned = desired.trim();
   if (!cleaned || !designator) return cleaned;
@@ -99799,6 +99809,13 @@ function buildFinalLlcName(desired, designator) {
   const hasIt = lower.endsWith("llc") || lower.endsWith("l.l.c.") || lower.endsWith("limited liability company") || lower.endsWith("pllc") || lower.endsWith("p.l.l.c.") || lower.endsWith("professional limited liability company");
   if (hasIt) return cleaned;
   return `${cleaned}, ${designator}`;
+}
+function designatorAllowedForFormationType(designator, formationType) {
+  if (!designator) return false;
+  if (formationType === "DOMESTIC_LLC") {
+    return STANDARD_DESIGNATORS.includes(designator);
+  }
+  return PLLC_DESIGNATORS.includes(designator);
 }
 function validateRegisteredAgentAddress(street1, street2, state) {
   if (state !== "FL") {
@@ -99895,6 +99912,13 @@ var extendedFormSchema = formationFormSchema.extend({
     errorMap: () => ({ message: "You must agree to the Terms of Service to continue." })
   }),
   filingPath: external_exports.enum(["NEW", "CONVERT"]).optional(),
+  // A conversion enters the existing company's name (designator included)
+  // in existingLlcName; the wizard never shows the new-name questions. The
+  // base schema's unconditional requirements rejected every UI conversion
+  // with "LLC name is required" — the fixtures that always carried a name
+  // hid it (caught 29 Aug 2026). Requirements re-imposed below, NEW only.
+  desiredLlcName: external_exports.string().max(300).optional().or(external_exports.literal("")),
+  llcDesignator: external_exports.enum(llcDesignators).optional().or(external_exports.literal("")),
   orderEin: external_exports.boolean().optional().default(false),
   orderSElection: external_exports.boolean().optional().default(false),
   existingLlcName: external_exports.string().max(300).optional().or(external_exports.literal("")),
@@ -99915,6 +99939,20 @@ var extendedFormSchema = formationFormSchema.extend({
   }),
   articlesSignerAppointment: external_exports.boolean().optional().default(false)
 }).superRefine((data, ctx) => {
+  if (data.filingPath !== "CONVERT" && !(data.desiredLlcName ?? "").trim()) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      path: ["desiredLlcName"],
+      message: "LLC name is required"
+    });
+  }
+  if (data.filingPath !== "CONVERT" && !designatorAllowedForFormationType(data.llcDesignator ?? "", data.formationType)) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      path: ["llcDesignator"],
+      message: !data.llcDesignator ? "Choose an LLC designator." : data.formationType === "PLLC" ? "A professional LLC must use a professional designator (PLLC, P.L.L.C., or Professional Limited Liability Company)." : "A standard LLC must use a standard designator (LLC, L.L.C., or Limited Liability Company)."
+    });
+  }
   if (data.managementStructure !== "MANAGER_MANAGED" && data.members.length === 0) {
     ctx.addIssue({
       code: external_exports.ZodIssueCode.custom,
@@ -99972,7 +100010,7 @@ var extendedFormSchema = formationFormSchema.extend({
       });
     }
   }
-  if (!data.exactNameOnly && !(data.alternateName1 ?? "").trim()) {
+  if (data.filingPath !== "CONVERT" && !data.exactNameOnly && !(data.alternateName1 ?? "").trim()) {
     ctx.addIssue({
       code: external_exports.ZodIssueCode.custom,
       path: ["alternateName1"],
@@ -107248,7 +107286,7 @@ function registerPaymentRoutes(app2) {
       // on file — s. 605.0213(7).
       registeredAgentChange: data.registeredAgentChoice === "SERVICE"
     });
-    const llcName = payload.llcName.finalName || payload.llcName.desiredName || "Unnamed LLC";
+    const llcName = (payload.filingPath === "CONVERT" ? payload.existingLlcName : "") || payload.llcName.finalName || payload.llcName.desiredName || "Unnamed LLC";
     const db = await getDb();
     const rows = await db.query(
       `INSERT INTO orders (contact_name, contact_email, package, llc_name, payload, service_fee_cents, state_fees_cents, total_cents)

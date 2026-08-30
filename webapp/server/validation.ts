@@ -1,7 +1,8 @@
 import { z } from "zod";
 import { normalizeEntityName } from "../src/components/forms/florida-llc/nameSimilarity";
 import { formationFormSchema } from "../src/components/forms/florida-llc/schema";
-import { hasProtectedSeriesPhrase, seriesDedupeKey } from "../src/components/forms/florida-llc/validation";
+import { designatorAllowedForFormationType, hasProtectedSeriesPhrase, seriesDedupeKey } from "../src/components/forms/florida-llc/validation";
+import { llcDesignators } from "../src/components/forms/florida-llc/schema";
 import { raServicePatch } from "../src/components/forms/florida-llc/raService";
 
 /**
@@ -20,6 +21,13 @@ const extendedFormSchema = formationFormSchema
       errorMap: () => ({ message: "You must agree to the Terms of Service to continue." }),
     }),
     filingPath: z.enum(["NEW", "CONVERT"]).optional(),
+    // A conversion enters the existing company's name (designator included)
+    // in existingLlcName; the wizard never shows the new-name questions. The
+    // base schema's unconditional requirements rejected every UI conversion
+    // with "LLC name is required" — the fixtures that always carried a name
+    // hid it (caught 29 Aug 2026). Requirements re-imposed below, NEW only.
+    desiredLlcName: z.string().max(300).optional().or(z.literal("")),
+    llcDesignator: z.enum(llcDesignators).optional().or(z.literal("")),
     orderEin: z.boolean().optional().default(false),
     orderSElection: z.boolean().optional().default(false),
     existingLlcName: z.string().max(300).optional().or(z.literal("")),
@@ -44,6 +52,30 @@ const extendedFormSchema = formationFormSchema
     articlesSignerAppointment: z.boolean().optional().default(false),
   })
   .superRefine((data, ctx) => {
+    if (data.filingPath !== "CONVERT" && !(data.desiredLlcName ?? "").trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["desiredLlcName"],
+        message: "LLC name is required",
+      });
+    }
+    // The designator must match the formation type — s. 621.12(2)(b)3 puts a
+    // professional designator IN LIEU OF the s. 605.0112 ones, so a PLLC named
+    // "X, LLC" (or a standard LLC named "X, PLLC") is refused even when the
+    // browser's filtered dropdown is bypassed. Conversions choose no
+    // designator: the existing company's name already carries its own.
+    if (data.filingPath !== "CONVERT" &&
+        !designatorAllowedForFormationType(data.llcDesignator ?? "", data.formationType)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["llcDesignator"],
+        message: !data.llcDesignator
+          ? "Choose an LLC designator."
+          : data.formationType === "PLLC"
+            ? "A professional LLC must use a professional designator (PLLC, P.L.L.C., or Professional Limited Liability Company)."
+            : "A standard LLC must use a standard designator (LLC, L.L.C., or Limited Liability Company).",
+      });
+    }
     // Members are required exactly when the intake collects them: a
     // member-managed company lists them as AMBR in the Articles. A
     // manager-managed company collects ownership in the operating agreement
@@ -99,7 +131,7 @@ const extendedFormSchema = formationFormSchema
           message: "This alternate duplicates another name on the order under Florida's rules." });
       }
     }
-    if (!data.exactNameOnly && !(data.alternateName1 ?? "").trim()) {
+    if (data.filingPath !== "CONVERT" && !data.exactNameOnly && !(data.alternateName1 ?? "").trim()) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["alternateName1"],
