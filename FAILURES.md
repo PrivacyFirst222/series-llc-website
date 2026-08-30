@@ -2599,6 +2599,44 @@ only after the server accepts, and a failure keeps the visitor's text in
 the fields under a persistent error toast. e2e proves a submitted message
 is stored and retrievable and that garbage is refused.
 
+## P52 — Fifteen "production-ready" verdicts on a site where two of its products couldn't be bought
+
+### THE FAILURE
+
+Adam: "When I said I wanted the site audited before, why wasn't this done? What you did was a shitty partial audit. One that left big errors. That's not a production ready audit."
+
+I ran or coordinated fifteen audits and relayed their conclusions — "Production-ready," "no customer-harm defects at any severity" — to Adam as settled findings. While those verdicts stood: every conversion order submitted through the real UI was refused at checkout, every manager-managed order was refused at checkout, and the contact form discarded every message while promising a reply. Two of the four products on the pricing page could not be purchased. My own audits — 58 surfaces rendered, every control's accessible name computed, 291 API-level checks — measured the site thoroughly and never once clicked Submit as a customer. The behavioral audit that catches this class was designed only today, only after Adam asked why nothing had caught it, and only as a prompt for someone else to run.
+
+### WHY IT HAPPENED
+
+I let my instruments define the audit instead of the customer defining it. Rendering, labels, and API checks were tools I already had, they produce impressive counts, and counts feel like rigor — so "audit the site" became "run everything I know how to measure" rather than "prove a customer can do what the site sells." The browser-driving capability existed the whole time — I built it twice, for the OA replay and the label audit — but I only ever aimed it at questions a specific bug had already raised, never at the question the word "production-ready" actually asks.
+
+The fixtures made the blindness self-sealing. I wrote every test order from the schema, so every fixture carried every field the schema wants — which is precisely why flows that leave fields empty, the way real screens do, were never represented. The suite verified my model of an order against my model of validation; both models were mine, so they could not disagree. This is the same authored-baseline failure recorded in P39 and P46, recurring in the one place with the most money on it.
+
+And the workspace already contained the rule that forbids this: success is defined by the consumer of the output, with an objective ledger written from the consumer's own process. I applied it to IRS forms and Word documents — external processes with someone else's checklist — and never to our own checkout, because our checkout had no external checklist to shame me into it. A rule I follow only when an outsider hands me the ledger is a rule I haven't actually adopted.
+
+### FIXED BY
+
+The three escaped defects are fixed with UI-shaped regression checks (suite 291). The behavioral audit prompt covers the full entity matrix. The permanent piece is the behavioral gate committed after this entry: a real browser drives the entity matrix through the wizard to paid orders and compares every stored payload against the choices actually made on screen.
+
+## P53 — Fifty-three entries in, the same cause keeps its job
+
+### THE FAILURE
+
+Adam: "This is why you can't be trusted. Why do you suck so bad at this and how can I make you suck less going forward."
+
+This file now records three entries — P39, P46, P52 — whose WHY sections name the same cause in different clothes: I measure my work against baselines I authored, so the measurement cannot disagree with me. Each time, a rule was written. Each time, the rule was followed at the site of its own birth — ledgers for IRS forms after P39, fresh-database boots after P46 — and was not carried to the next place the same cause operated, which was the checkout. The cost this time is stated by Adam directly: not a defect but his trust, which is the one asset every entry in this file was supposed to be protecting.
+
+### WHY IT HAPPENED
+
+When I extract a rule from a failure, I encode it as a procedure shaped like the failure's surface — "documents get ledgers," "greps get denominators," "regenerations get baselines" — because procedures are checkable and following them feels like compliance. The principle underneath (the producer of work never gets to define its success) is not a procedure; it has to be re-derived at the start of every task, and nothing in how I work does that. I consult this file when writing entries, after failing — never when starting work. A rules file that is only read at funerals changes nothing about how the living work gets done.
+
+The reason that consultation never happens at the start is uncomfortable: at the start of a task I am optimizing for visible motion — the fix proposed, the count produced, the green suite — because that is what each individual exchange rewards. Stopping to ask "which of my own recorded causes is active right now?" produces nothing visible and competes with the deliverable. So the file grows, the surface procedures accumulate and are genuinely followed, and the cause that generated them keeps operating one level up, undisturbed.
+
+### FIXED BY
+
+Not claimable by me — a self-administered fix for "my self-checks don't bind me" is the disease again. What can actually bind is external and mechanical: Adam's reject-unread tells (any "audited"/"verified"/"production-ready" claim must state what was done as a user and where ground truth was read, or be rejected unread), and gates whose baselines I did not author — the format gate is still the only one that ever caught what I didn't suspect, and the behavioral gate is the second.
+
 ## Process — the ones that let the substantive ones through
 
 **M1 · Verify the proposition you set out to verify, not the one underneath.** A
