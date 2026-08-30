@@ -2345,8 +2345,20 @@ if (mint.status === 200) {
     const o = await mk("E2E No Status Regression");
     await hook(`e2e-first-${o.id}`, o.squareOrderId, `pay1-${o.id.slice(0, 8)}`);
     check("order is paid after the first event", (await statusOf(o.id)) === "paid", await statusOf(o.id));
+    // The order cannot leave New Orders before the filed Articles are on
+    // file (Adam's sequence, 30 Aug 2026) — red first, then green.
+    const early = await api(`/api/admin/orders/${o.id}/filed`, { method: "POST", cookies: adm.cookie, body: "{}" });
+    check("marking sent WITHOUT the Articles is refused", early.status === 400 && early.body?.error?.code === "ARTICLES_REQUIRED", early.body);
+    const artFd = new FormData();
+    artFd.set("articles", new File([new TextEncoder().encode("%PDF-1.4 fake articles for e2e\n%%EOF")], "articles.pdf", { type: "application/pdf" }));
+    const artUp = await fetch(`${BASE}/api/admin/orders/${o.id}/articles`, { method: "POST", body: artFd, headers: { Cookie: adm.cookie, "X-Forwarded-For": RUN_IP } });
+    check("the filed Articles upload is accepted at the New-Orders stage", artUp.status === 200, await artUp.json().catch(() => null));
+    const artDup = new FormData();
+    artDup.set("articles", new File([new TextEncoder().encode("%PDF-1.4 dup\n%%EOF")], "dup.pdf", { type: "application/pdf" }));
+    const dupUp = await fetch(`${BASE}/api/admin/orders/${o.id}/articles`, { method: "POST", body: artDup, headers: { Cookie: adm.cookie, "X-Forwarded-For": RUN_IP } });
+    check("a second Articles upload is refused (replace happens at the formed step)", dupUp.status === 409, dupUp.status);
     const filed = await api(`/api/admin/orders/${o.id}/filed`, { method: "POST", cookies: adm.cookie, body: "{}" });
-    check("order can be marked filed", filed.status === 200, filed.body);
+    check("order can be marked filed once the Articles are on file", filed.status === 200, filed.body);
     // A DIFFERENT event id, so the dedupe table cannot mask the regression.
     await hook(`e2e-late-${o.id}`, o.squareOrderId, `pay2-${o.id.slice(0, 8)}`);
     check(

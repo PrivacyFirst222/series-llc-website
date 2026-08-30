@@ -108450,6 +108450,13 @@ function registerAdminRoutes(app2) {
     if (rows[0].status !== "paid") {
       return c.json(err(`An order is filed from "paid", not "${rows[0].status}".`, "BAD_STATE"), 400);
     }
+    const arts = await db.query(
+      "SELECT id FROM documents WHERE order_id = $1 AND kind = 'articles'",
+      [c.req.param("id")]
+    );
+    if (arts.length === 0) {
+      return c.json(err("Upload the filed Articles of Organization first.", "ARTICLES_REQUIRED"), 400);
+    }
     await db.query("UPDATE orders SET status = 'filed', filed_at = now() WHERE id = $1", [
       c.req.param("id")
     ]);
@@ -108565,6 +108572,41 @@ function registerAdminRoutes(app2) {
       }
     });
   });
+  app2.post("/admin/orders/:id/articles", async (c) => {
+    const admin = await requireAdmin(c);
+    if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+    const db = await getDb();
+    const rows = await db.query(
+      "SELECT id, client_id, llc_name FROM orders WHERE id = $1",
+      [c.req.param("id")]
+    );
+    if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+    const o = rows[0];
+    if (!o.client_id) return c.json(err("This order has no client account yet.", "NO_CLIENT"), 400);
+    const existing = await db.query(
+      "SELECT id FROM documents WHERE order_id = $1 AND kind = 'articles'",
+      [o.id]
+    );
+    if (existing.length > 0) {
+      return c.json(err("Articles are already uploaded for this order.", "ALREADY_UPLOADED"), 409);
+    }
+    const form = await c.req.parseBody();
+    const articles = form.articles;
+    if (!(articles instanceof File)) {
+      return c.json(err("The Articles of Organization PDF is required.", "INVALID_INPUT"), 400);
+    }
+    if (articles.size > MAX_UPLOAD_BYTES) return c.json(err("The file is too large (20 MB max).", "TOO_LARGE"), 400);
+    if (!await looksLikePdf(articles)) {
+      return c.json(err("This is not a readable PDF. Upload the filed Articles from Sunbiz.", "NOT_A_PDF"), 400);
+    }
+    const stored = await putFile(articles.name, await articles.arrayBuffer(), articles.type || "application/pdf");
+    await db.query(
+      `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
+     VALUES ($1, $2, 'articles', $3, $4, $5, $6, '{}'::jsonb)`,
+      [o.client_id, o.id, `Articles of Organization \u2014 ${o.llc_name}`, stored.storageKey, articles.type || "application/pdf", stored.sizeBytes]
+    );
+    return c.json({ data: { ok: true } });
+  });
   app2.post("/admin/orders/:id/formation-documents", async (c) => {
     const admin = await requireAdmin(c);
     if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
@@ -108579,9 +108621,16 @@ function registerAdminRoutes(app2) {
       return c.json(err("This order has not been paid.", "BAD_STATE"), 400);
     }
     const form = await c.req.parseBody({ all: true });
-    const articles = form.articles;
-    if (!(articles instanceof File)) {
-      return c.json(err("The Articles of Organization PDF is required.", "INVALID_INPUT"), 400);
+    const maybeArticles = form.articles;
+    const articles = maybeArticles instanceof File ? maybeArticles : null;
+    if (!articles) {
+      const already = await db.query(
+        "SELECT id FROM documents WHERE order_id = $1 AND kind = 'articles'",
+        [o.id]
+      );
+      if (already.length === 0) {
+        return c.json(err("The Articles of Organization PDF is required.", "INVALID_INPUT"), 400);
+      }
     }
     const psdFiles = (Array.isArray(form["psd"]) ? form["psd"] : [form["psd"]]).filter(
       (f) => f instanceof File
@@ -108612,7 +108661,7 @@ function registerAdminRoutes(app2) {
         400
       );
     }
-    const files = [articles, ...psdFiles];
+    const files = articles ? [articles, ...psdFiles] : psdFiles;
     for (const f of files) {
       if (f.size > MAX_UPLOAD_BYTES) {
         return c.json(err(`${f.name} is too large (20 MB max).`, "TOO_LARGE"), 400);
@@ -108631,8 +108680,11 @@ function registerAdminRoutes(app2) {
       return c.json(err("A replacement for this order is already being processed.", "REPLACEMENT_IN_PROGRESS"), 409);
     }
     try {
-      const priorDocs = await db.query(
+      const priorDocs = articles ? await db.query(
         "SELECT id, storage_key FROM documents WHERE order_id = $1 AND kind IN ('articles', 'psd')",
+        [o.id]
+      ) : await db.query(
+        "SELECT id, storage_key FROM documents WHERE order_id = $1 AND kind = 'psd'",
         [o.id]
       );
       let formationPuts = 0;
@@ -108647,25 +108699,27 @@ function registerAdminRoutes(app2) {
       const newRows = [];
       const newKeys = [];
       try {
-        const storedArticles = await stagedPut(
-          articles.name,
-          await articles.arrayBuffer(),
-          articles.type || "application/pdf"
-        );
-        newKeys.push(storedArticles.storageKey);
-        const artRow = await db.query(
-          `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
-       VALUES ($1, $2, 'articles', $3, $4, $5, $6, '{}'::jsonb) RETURNING id`,
-          [
-            o.client_id,
-            o.id,
-            `Articles of Organization \u2014 ${o.llc_name}`,
-            storedArticles.storageKey,
-            articles.type || "application/pdf",
-            storedArticles.sizeBytes
-          ]
-        );
-        newRows.push(artRow[0].id);
+        if (articles) {
+          const storedArticles = await stagedPut(
+            articles.name,
+            await articles.arrayBuffer(),
+            articles.type || "application/pdf"
+          );
+          newKeys.push(storedArticles.storageKey);
+          const artRow = await db.query(
+            `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
+         VALUES ($1, $2, 'articles', $3, $4, $5, $6, '{}'::jsonb) RETURNING id`,
+            [
+              o.client_id,
+              o.id,
+              `Articles of Organization \u2014 ${o.llc_name}`,
+              storedArticles.storageKey,
+              articles.type || "application/pdf",
+              storedArticles.sizeBytes
+            ]
+          );
+          newRows.push(artRow[0].id);
+        }
         for (let i = 0; i < psdFiles.length; i += 1) {
           const f = psdFiles[i];
           const names = psdSeries[i];

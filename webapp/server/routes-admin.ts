@@ -222,6 +222,13 @@ app.post("/admin/orders/:id/filed", async (c) => {
   if (rows[0].status !== "paid") {
     return c.json(err(`An order is filed from "paid", not "${rows[0].status}".`, "BAD_STATE"), 400);
   }
+  // The order moves to With The State only after the filed Articles are
+  // uploaded (Adam, 30 Aug 2026) — enforced here, not only by the button.
+  const arts = await db.query<{ id: string }>(
+    "SELECT id FROM documents WHERE order_id = $1 AND kind = 'articles'", [c.req.param("id")]);
+  if (arts.length === 0) {
+    return c.json(err("Upload the filed Articles of Organization first.", "ARTICLES_REQUIRED"), 400);
+  }
   await db.query("UPDATE orders SET status = 'filed', filed_at = now() WHERE id = $1", [
     c.req.param("id"),
   ]);
@@ -376,6 +383,43 @@ app.get("/admin/orders/:id", async (c) => {
  *  show a completed order whose client has an empty portal. One PSD document may
  *  cover several series — Florida allows it — so coverage is declared per file
  *  and checked against the order's own series list. Miss one and this refuses. */
+// The filed Articles, uploaded at the New-Orders stage BEFORE marking sent
+// (Adam's sequence, 30 Aug 2026): the PDF is stored against the order, the
+// status does not move, and the client is not emailed — they hear once, at
+// formed. A wrong file is replaced later by the formed-step package upload,
+// which retires priors.
+app.post("/admin/orders/:id/articles", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const db = await getDb();
+  const rows = await db.query<{ id: string; client_id: string | null; llc_name: string }>(
+    "SELECT id, client_id, llc_name FROM orders WHERE id = $1", [c.req.param("id")]);
+  if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+  const o = rows[0];
+  if (!o.client_id) return c.json(err("This order has no client account yet.", "NO_CLIENT"), 400);
+  const existing = await db.query<{ id: string }>(
+    "SELECT id FROM documents WHERE order_id = $1 AND kind = 'articles'", [o.id]);
+  if (existing.length > 0) {
+    return c.json(err("Articles are already uploaded for this order.", "ALREADY_UPLOADED"), 409);
+  }
+  const form = await c.req.parseBody();
+  const articles = form.articles;
+  if (!(articles instanceof File)) {
+    return c.json(err("The Articles of Organization PDF is required.", "INVALID_INPUT"), 400);
+  }
+  if (articles.size > MAX_UPLOAD_BYTES) return c.json(err("The file is too large (20 MB max).", "TOO_LARGE"), 400);
+  if (!(await looksLikePdf(articles))) {
+    return c.json(err("This is not a readable PDF. Upload the filed Articles from Sunbiz.", "NOT_A_PDF"), 400);
+  }
+  const stored = await putFile(articles.name, await articles.arrayBuffer(), articles.type || "application/pdf");
+  await db.query(
+    `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
+     VALUES ($1, $2, 'articles', $3, $4, $5, $6, '{}'::jsonb)`,
+    [o.client_id, o.id, `Articles of Organization — ${o.llc_name}`, stored.storageKey, articles.type || "application/pdf", stored.sizeBytes],
+  );
+  return c.json({ data: { ok: true } });
+});
+
 app.post("/admin/orders/:id/formation-documents", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
@@ -393,9 +437,16 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
   }
 
   const form = await c.req.parseBody({ all: true });
-  const articles = form.articles;
-  if (!(articles instanceof File)) {
-    return c.json(err("The Articles of Organization PDF is required.", "INVALID_INPUT"), 400);
+  const maybeArticles = form.articles;
+  const articles = maybeArticles instanceof File ? maybeArticles : null;
+  if (!articles) {
+    // The staged flow uploads the Articles at the New-Orders step; here only
+    // the designations arrive. Without either, nothing can be formed.
+    const already = await db.query<{ id: string }>(
+      "SELECT id FROM documents WHERE order_id = $1 AND kind = 'articles'", [o.id]);
+    if (already.length === 0) {
+      return c.json(err("The Articles of Organization PDF is required.", "INVALID_INPUT"), 400);
+    }
   }
   // psd[] files, each with a matching psdSeries[] entry: a JSON array of the
   // series names that file designates.
@@ -432,7 +483,7 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
     );
   }
 
-  const files = [articles, ...psdFiles];
+  const files = articles ? [articles, ...psdFiles] : psdFiles;
   for (const f of files) {
     if (f.size > MAX_UPLOAD_BYTES) {
       return c.json(err(`${f.name} is too large (20 MB max).`, "TOO_LARGE"), 400);
@@ -468,10 +519,18 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
   }
   try {
 
-  const priorDocs = await db.query<{ id: string; storage_key: string }>(
-    "SELECT id, storage_key FROM documents WHERE order_id = $1 AND kind IN ('articles', 'psd')",
-    [o.id],
-  );
+  // When no new Articles arrive, the existing Articles document survives the
+  // retirement of the prior package — deleting it would form an order whose
+  // portal has no Articles.
+  const priorDocs = articles
+    ? await db.query<{ id: string; storage_key: string }>(
+        "SELECT id, storage_key FROM documents WHERE order_id = $1 AND kind IN ('articles', 'psd')",
+        [o.id],
+      )
+    : await db.query<{ id: string; storage_key: string }>(
+        "SELECT id, storage_key FROM documents WHERE order_id = $1 AND kind = 'psd'",
+        [o.id],
+      );
   let formationPuts = 0;
   const stagedPut = async (name: string, data: ArrayBuffer, type: string) => {
     if (testHooks.failFormationPutAfter >= 0 && formationPuts >= testHooks.failFormationPutAfter) {
@@ -488,25 +547,27 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
   const newRows: string[] = [];
   const newKeys: string[] = [];
   try {
-    const storedArticles = await stagedPut(
-      articles.name,
-      await articles.arrayBuffer(),
-      articles.type || "application/pdf",
-    );
-    newKeys.push(storedArticles.storageKey);
-    const artRow = await db.query<{ id: string }>(
-      `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
-       VALUES ($1, $2, 'articles', $3, $4, $5, $6, '{}'::jsonb) RETURNING id`,
-      [
-        o.client_id,
-        o.id,
-        `Articles of Organization — ${o.llc_name}`,
-        storedArticles.storageKey,
+    if (articles) {
+      const storedArticles = await stagedPut(
+        articles.name,
+        await articles.arrayBuffer(),
         articles.type || "application/pdf",
-        storedArticles.sizeBytes,
-      ],
-    );
-    newRows.push(artRow[0].id);
+      );
+      newKeys.push(storedArticles.storageKey);
+      const artRow = await db.query<{ id: string }>(
+        `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
+         VALUES ($1, $2, 'articles', $3, $4, $5, $6, '{}'::jsonb) RETURNING id`,
+        [
+          o.client_id,
+          o.id,
+          `Articles of Organization — ${o.llc_name}`,
+          storedArticles.storageKey,
+          articles.type || "application/pdf",
+          storedArticles.sizeBytes,
+        ],
+      );
+      newRows.push(artRow[0].id);
+    }
     for (let i = 0; i < psdFiles.length; i += 1) {
       const f = psdFiles[i];
       const names = psdSeries[i];

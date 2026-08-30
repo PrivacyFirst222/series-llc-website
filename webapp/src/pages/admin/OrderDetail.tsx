@@ -130,6 +130,24 @@ export default function OrderDetail({
   ]);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
+  const uploadArticles = useMutation({
+    mutationFn: async () => {
+      const f = articlesRef.current?.files?.[0];
+      if (!f) throw new Error("Choose the filed Articles PDF.");
+      const fd = new FormData();
+      fd.append("articles", f);
+      const res = await fetch(`/api/admin/orders/${orderId}/articles`, { method: "POST", body: fd, credentials: "include" });
+      const body = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
+      if (!res.ok) throw new Error(body?.error?.message ?? "Upload failed.");
+      return body;
+    },
+    onSuccess: () => {
+      setUploadError(null);
+      queryClient.invalidateQueries({ queryKey: ["admin", "order", orderId] });
+    },
+    onError: (e: Error) => setUploadError(e.message),
+  });
+
   const seriesFiled = useMutation({
     mutationFn: () => api.post(`/api/admin/orders/${orderId}/series-filed`, {}),
     onSuccess: () => {
@@ -154,8 +172,7 @@ export default function OrderDetail({
     mutationFn: async () => {
       const fd = new FormData();
       const articles = articlesRef.current?.files?.[0];
-      if (!articles) throw new Error("Choose the Articles of Organization PDF.");
-      fd.append("articles", articles);
+      if (articles) fd.append("articles", articles);
       for (const row of psdRows) {
         if (!row.file) continue;
         fd.append("psd", row.file);
@@ -184,7 +201,8 @@ export default function OrderDetail({
   const claimed = new Set(psdRows.flatMap((r) => (r.file ? r.covers : [])));
   const uncovered = (d?.series ?? []).filter((s) => !s.covered && !claimed.has(s.name));
   const canUpload =
-    !!articlesRef.current?.files?.length && psdRows.some((r) => r.file) && uncovered.length === 0;
+    (d?.hasArticles || !!articlesRef.current?.files?.length) &&
+    psdRows.some((r) => r.file) && uncovered.length === 0;
 
 
   return (
@@ -284,10 +302,47 @@ export default function OrderDetail({
         ) : (
           <div className="space-y-8 px-6 py-6">
             {d.status === "paid" ? (
-              <Button onClick={onMarkFiled} disabled={markingFiled} className="w-full rounded-full">
-                {markingFiled ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                Mark sent to the Division
-              </Button>
+              <div className="space-y-3">
+                {!d.hasArticles ? (
+                  <div className="rounded-lg border border-border p-3">
+                    <label htmlFor="upload-articles-first" className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+                      Filed Articles of Organization
+                    </label>
+                    <input
+                      id="upload-articles-first"
+                      ref={articlesRef}
+                      type="file"
+                      accept="application/pdf"
+                      className="mt-1 block w-full text-sm"
+                      onChange={() => setUploadError(null)}
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="mt-2 rounded-full"
+                      disabled={uploadArticles.isPending}
+                      onClick={() => uploadArticles.mutate()}
+                    >
+                      {uploadArticles.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileUp className="mr-2 h-4 w-4" />}
+                      Upload Articles
+                    </Button>
+                    {uploadError ? <p className="mt-2 text-sm text-destructive">{uploadError}</p> : null}
+                  </div>
+                ) : (
+                  <p className="flex items-center gap-2 text-sm text-trust">
+                    <Check className="h-4 w-4" /> Filed Articles uploaded
+                  </p>
+                )}
+                <Button onClick={onMarkFiled} disabled={markingFiled || !d.hasArticles} className="w-full rounded-full">
+                  {markingFiled ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                  Mark sent to the Division
+                </Button>
+                {!d.hasArticles ? (
+                  <p className="text-xs text-muted-foreground">
+                    Upload the filed Articles first — the order moves to With The State only once they are on file.
+                  </p>
+                ) : null}
+              </div>
             ) : null}
 
             {/* The panel follows Adam's filing sequence (30 Aug 2026):
@@ -326,12 +381,13 @@ export default function OrderDetail({
               </section>
             ))}
 
+            {d.status !== "paid" ? (
             <section>
               <h3 className="font-display text-base">Formation documents</h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                Upload the filed Articles and the Protected Series Designations. One designation may
-                cover several series — tick the ones each file covers. This marks the order formed
-                and emails the client.
+                {d.hasArticles
+                  ? "Upload the Protected Series Designations. One designation may cover several series — tick the ones each file covers. This marks the order formed and emails the client."
+                  : "Upload the filed Articles and the Protected Series Designations. One designation may cover several series — tick the ones each file covers. This marks the order formed and emails the client."}
               </p>
 
               {d.documents.length > 0 ? (
@@ -347,6 +403,7 @@ export default function OrderDetail({
 
               {d.status !== "formed" ? (
                 <div className="mt-4 space-y-3">
+                  {!d.hasArticles ? (
                   <div>
                     <label htmlFor="upload-articles" className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
                       Articles of Organization
@@ -360,6 +417,7 @@ export default function OrderDetail({
                       onChange={() => setUploadError(null)}
                     />
                   </div>
+                  ) : null}
 
                   {psdRows.map((row, i) => (
                     <div key={i} className="rounded-lg border border-border p-3">
@@ -442,7 +500,7 @@ export default function OrderDetail({
                     ) : (
                       <FileUp className="mr-2 h-4 w-4" />
                     )}
-                    Upload and mark formed
+                    {d.hasArticles ? "Upload designations and mark formed" : "Upload and mark formed"}
                   </Button>
                 </div>
               ) : (
@@ -452,6 +510,7 @@ export default function OrderDetail({
                 </p>
               )}
             </section>
+            ) : null}
           </div>
         )}
       </div>
