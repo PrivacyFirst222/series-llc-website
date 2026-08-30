@@ -43,18 +43,36 @@ type RunConfig = {
   extraSeries?: number; // beyond the first
   separateMailing?: boolean;
   weSign?: boolean;
+  /** A specific stated purpose on a standard LLC (PLLC purpose is separate). */
+  specificPurpose?: string;
+  /** Drive this run at phone size. */
+  mobile?: boolean;
+  /** Clear three required fields, prove the errors name them, then recover. */
+  probeValidation?: boolean;
+  /** Distinct client email — the OA journey seeds from A's member-managed
+   *  order, and oaSeed reads the client's LATEST paid order, so A must not
+   *  share a client with the runs that pay after it. */
+  email?: string;
+  /** From Certify, walk Back to the first step and replay Forward unfilled. */
+  backWalk?: boolean;
 };
 
 const RUNS: RunConfig[] = [
-  { key: "A", label: "new LLC, member-managed, our RA", path: "new", formationType: "DOMESTIC_LLC", management: "MEMBER_MANAGED", ra: "SERVICE", llcName: "Gate Run Alpha", designator: "LLC" },
+  { key: "A", label: "new LLC, member-managed, our RA, probes + back-walk", path: "new", formationType: "DOMESTIC_LLC", management: "MEMBER_MANAGED", ra: "SERVICE", llcName: "Gate Run Alpha", designator: "LLC", probeValidation: true, backWalk: true, email: "gate-oa@e2e.test" },
   { key: "B", label: "new LLC, member-managed, self RA, entity member", path: "new", formationType: "DOMESTIC_LLC", management: "MEMBER_MANAGED", ra: "SELF", llcName: "Gate Run Bravo", designator: "L.L.C.", memberEntity: true },
-  { key: "C", label: "new PLLC, member-managed, self RA", path: "new", formationType: "PLLC", management: "MEMBER_MANAGED", ra: "SELF", llcName: "Gate Run Charlie", designator: "P.L.L.C." },
+  { key: "C", label: "new PLLC, member-managed, self RA, phone-sized", path: "new", formationType: "PLLC", management: "MEMBER_MANAGED", ra: "SELF", llcName: "Gate Run Charlie", designator: "Professional Limited Liability Company", mobile: true },
   { key: "D", label: "new PLLC, manager-managed, our RA, EIN + S election", path: "new", formationType: "PLLC", management: "MANAGER_MANAGED", ra: "SERVICE", llcName: "Gate Run Delta", designator: "PLLC", addons: { ein: true, sElection: true } },
   { key: "E", label: "conversion, member-managed, our RA", path: "convert", formationType: "DOMESTIC_LLC", management: "MEMBER_MANAGED", ra: "SERVICE", llcName: "Gate Run Echo, LLC", designator: "" },
   { key: "F", label: "conversion, manager-managed, self RA", path: "convert", formationType: "DOMESTIC_LLC", management: "MANAGER_MANAGED", ra: "SELF", llcName: "Gate Run Foxtrot, LLC", designator: "" },
-  { key: "G", label: "new LLC, exact name only, dated, certificates, 4 series", path: "new", formationType: "DOMESTIC_LLC", management: "MEMBER_MANAGED", ra: "SERVICE", llcName: "Gate Run Golf", designator: "Limited Liability Company", exactNameOnly: true, requestedEffectiveDate: "2026-10-01", addons: { certificate: true, certifiedCopy: true }, extraSeries: 3 },
+  { key: "G", label: "new LLC, exact name only, dated, certificates, 4 series", path: "new", formationType: "DOMESTIC_LLC", management: "MEMBER_MANAGED", ra: "SERVICE", llcName: "Gate Run Golf", designator: "Limited Liability Company", exactNameOnly: true, requestedEffectiveDate: "2026-10-01", addons: { certificate: true, certifiedCopy: true }, extraSeries: 3, specificPurpose: "Holding and leasing residential real estate" },
   { key: "H", label: "new LLC, entity manager, separate mailing, we sign", path: "new", formationType: "DOMESTIC_LLC", management: "MANAGER_MANAGED", ra: "SERVICE", llcName: "Gate Run Hotel", designator: "LLC", managerEntity: true, separateMailing: true, weSign: true },
+  { key: "I", label: "new PLLC, manager-managed, self RA (P.L.L.C.)", path: "new", formationType: "PLLC", management: "MANAGER_MANAGED", ra: "SELF", llcName: "Gate Run India", designator: "P.L.L.C." },
 ];
+// Every designator the product offers is exercised: LLC (A, H), L.L.C. (B),
+// Limited Liability Company (G), PLLC (D), P.L.L.C. (I), Professional
+// Limited Liability Company (C). An ENTITY registered agent is deliberately
+// not sold — the agent step's own copy says "the agent must be our service
+// or you" — so no run fakes one (the P2 lesson).
 
 // A config may only claim attributes its flow can exercise — a run that
 // names an untestable attribute is a silent cap wearing a label (audit 16
@@ -129,7 +147,8 @@ async function choose(page: Page, triggerSelector: string, optionText: string): 
     if (shown.includes(optionText.slice(0, 6))) return;
     await page.waitForTimeout(300);
   }
-  throw new Error(`select ${triggerSelector} refused option ${optionText}`);
+  const avail = await page.getByRole("option").allTextContents().catch(() => []);
+  throw new Error(`select ${triggerSelector} refused option ${optionText}; options seen: [${avail.join(", ").slice(0, 200)}]`);
 }
 
 /** Choice cards are labels wrapping hidden radios; some are buttons. */
@@ -186,10 +205,20 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
   await advance(page);
 
   // Your information.
+  if (run.probeValidation) {
+    // Submit the step empty first: each error must NAME its field, inline,
+    // where the customer is looking.
+    await page.locator("main button").filter({ hasText: /^Continue/ }).first().click();
+    await page.waitForTimeout(600);
+    const errs = (await page.locator("main .text-destructive, main [role='alert']").allTextContents()).filter(Boolean).join(" | ");
+    expect(/first name/i.test(errs), `${run.key}: empty first name error names the field`, errs.slice(0, 120));
+    expect(/last name/i.test(errs), `${run.key}: empty last name error names the field`, errs.slice(0, 120));
+    expect(/email/i.test(errs), `${run.key}: empty email error names the field`, errs.slice(0, 120));
+  }
   await fill(page, "First name", "Casey");
   await fill(page, "Last name", "Gatecheck");
-  await fill(page, "Email", "gate@e2e.test");
-  await fill(page, "Confirm email", "gate@e2e.test");
+  await fill(page, "Email", run.email ?? "gate@e2e.test");
+  await fill(page, "Confirm email", run.email ?? "gate@e2e.test");
   await fill(page, "Street address", "100 Ocean Drive");
   await fill(page, "City", "Miami");
   await choose(page, "#client-state, [id$='-state']", "FL — Florida");
@@ -317,9 +346,14 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
   }
   await advance(page);
 
-  // Purpose. A PLLC must state its professional purpose.
+  // Purpose. A PLLC must state its professional purpose; a standard LLC may
+  // add a specific one alongside the general clause.
   if (run.formationType === "PLLC") {
     await page.locator("main textarea").first().fill("The practice of law");
+  } else if (run.specificPurpose) {
+    await clickCard(page, /Also list a specific purpose/i);
+    await page.waitForTimeout(300);
+    await page.locator("main textarea").first().fill(run.specificPurpose);
   }
   await advance(page);
 
@@ -332,8 +366,8 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
 
   // Correspondence.
   await fill(page, "Contact name", "Casey Gatecheck");
-  await fill(page, "Email", "gate@e2e.test");
-  await fill(page, "Confirm email", "gate@e2e.test");
+  await fill(page, "Email", run.email ?? "gate@e2e.test");
+  await fill(page, "Confirm email", run.email ?? "gate@e2e.test");
   await advance(page);
 
   // Optional docs and add-ons.
@@ -357,6 +391,24 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
 
   // Review → certify.
   await advance(page, "Continue");
+
+  // Back-walk: from Certify, walk Back to the first visible step, then replay
+  // Forward WITHOUT refilling anything — every step must still validate, so a
+  // single lost answer stops the replay cold.
+  if (run.backWalk) {
+    let hops = 0;
+    while (hops++ < 25) {
+      const back = page.locator("main button").filter({ hasText: /^Back$/ }).first();
+      if (await back.isDisabled()) break;
+      await back.click();
+      await page.waitForTimeout(350);
+    }
+    expect((await stepHeading(page)).includes("Eligibility"), `${run.key}: back-walk reaches the first step`, await stepHeading(page));
+    expect((await page.locator("#client-first-name").inputValue().catch(() => "").then((v) => v)) !== "GONE", `${run.key}: placeholder`, null);
+    let fwd = 0;
+    while (!(await stepHeading(page)).includes("Certification") && fwd++ < 25) await advance(page);
+    expect((await stepHeading(page)).includes("Certification"), `${run.key}: forward replay reaches Certify with every answer intact`, await stepHeading(page));
+  }
 
   // Certify & sign.
   if (run.weSign) {
@@ -433,7 +485,7 @@ async function main(): Promise<void> {
   const only = process.env.RUN?.split(",");
   for (const run of RUNS.filter((r) => !only || only.includes(r.key))) {
     console.log(`\n▶ Run ${run.key}: ${run.label}`);
-    const page = await browser.newPage();
+    const page = await browser.newPage(run.mobile ? { viewport: { width: 375, height: 812 } } : {});
     const reactWarnings: string[] = [];
     page.on("console", (m) => {
       if (/controlled|uncontrolled/i.test(m.text())) reactWarnings.push(m.text().slice(0, 120));
@@ -486,6 +538,9 @@ async function main(): Promise<void> {
       expect(!!payload.optionalDocuments?.sElection === !!run.addons?.sElection, `${run.key}: S-election stored as chosen`, payload.optionalDocuments);
       expect(!!payload.optionalDocuments?.certificateOfStatus === !!run.addons?.certificate, `${run.key}: certificate of status stored as chosen`, payload.optionalDocuments);
       expect(!!payload.optionalDocuments?.certifiedCopy === !!run.addons?.certifiedCopy, `${run.key}: certified copy stored as chosen`, payload.optionalDocuments);
+      if (run.specificPurpose) {
+        expect(JSON.stringify(payload).includes(run.specificPurpose), `${run.key}: the specific purpose typed on screen is stored`, payload.purpose ?? payload.purposeType);
+      }
       if (run.requestedEffectiveDate) {
         expect(JSON.stringify(payload).includes(run.requestedEffectiveDate), `${run.key}: requested effective date stored`, payload.effectiveDate ?? payload.effectiveDateOption);
       }
@@ -497,6 +552,153 @@ async function main(): Promise<void> {
       console.log(`  ✓ ${run.key} stored payload matches every on-screen choice (total $${(totalCents / 100).toFixed(2)})`);
     } catch (e) {
       expect(false, `${run.key}: ${String(e).slice(0, 300)}`);
+    } finally {
+      await page.close();
+    }
+  }
+
+  // ---- The OA questionnaire journey: the flagship deliverable gets the
+  // same treatment as checkout. Sign in through the real portal UI, answer
+  // as a client — second owner, spouse pairing, contribution, dates — and
+  // the generated agreement's STORED inputs must contain every answer.
+  console.log("\n▶ OA questionnaire journey (multi-owner, spouses)");
+  {
+    const page = await browser.newPage();
+    try {
+      const email = "gate-oa@e2e.test"; // run A's client: member-managed, named member
+      const mint = await fetch(`${API}/api/dev/mint-reset-token`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) }).then((r) => r.json()) as { data?: { token?: string } };
+      if (!mint.data?.token) throw new Error("no reset token — did the runs create the client?");
+      await fetch(`${API}/api/auth/set-password`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: mint.data.token, password: "gate-pass-12345" }) });
+
+      let genCaptured: { generationId?: string; version?: string } | null = null;
+      await page.route("**/api/**", async (route) => {
+        const url = new URL(route.request().url());
+        const resp = await fetch(`${API}${url.pathname}${url.search}`, {
+          method: route.request().method(),
+          headers: { "Content-Type": "application/json", cookie: route.request().headers()["cookie"] ?? "" },
+          body: route.request().postData() ?? undefined,
+        });
+        const body = await resp.text();
+        const setCookie = resp.headers.get("set-cookie");
+        if (url.pathname === "/api/portal/oa/generate" && resp.status === 200) {
+          genCaptured = (JSON.parse(body) as { data?: { generationId?: string; version?: string } }).data ?? null;
+        }
+        await route.fulfill({ status: resp.status, contentType: resp.headers.get("content-type") ?? "application/json", body, headers: setCookie ? { "set-cookie": setCookie } : undefined });
+      });
+
+      // Sign in as a customer does — through the login page.
+      await page.goto(`http://localhost:${WEB_PORT}/portal/login`);
+      await page.getByLabel("Email").fill(email);
+      await page.getByLabel("Password").fill("gate-pass-12345");
+      await page.locator("main button").filter({ hasText: /^Sign in/ }).first().click();
+      await page.waitForURL(/\/portal(?!\/login)/, { timeout: 10000 });
+
+      await page.goto(`http://localhost:${WEB_PORT}/portal/agreement`);
+      await page.waitForSelector("main h2, main h1");
+      // Intro: more than one owner.
+      await clickCard(page, /More than one owner/i);
+      await page.locator("main button").filter({ hasText: /^Continue/ }).first().click();
+      await page.waitForTimeout(1200);
+
+      // Second owner. Choosing multi-owner already seeds an empty second row —
+      // only add one if it did not (an extra empty row correctly blocks
+      // Generate as an incomplete owner).
+      if ((await page.locator('main input[aria-label="Full legal name of owner 2"]').count()) === 0) {
+        await page.locator("main button").filter({ hasText: /^Add owner/ }).first().click();
+        await page.waitForTimeout(400);
+      }
+      await page.getByLabel("Full legal name of owner 2").fill("Blair Gatecheck");
+      await page.getByLabel("Address of owner 2").fill("100 Ocean Drive, Miami, FL 33139");
+      await page.waitForTimeout(300);
+
+      // Pair the two as spouses (tenancy by the entirety is the first form).
+      await choose(page, '[aria-label="First spouse"]', "Casey Gatecheck");
+      await choose(page, '[aria-label="Second spouse"]', "Blair Gatecheck");
+      await page.locator("main button").filter({ hasText: /^Pair as spouses/ }).first().click();
+      await page.waitForTimeout(600);
+
+      // Required multi-owner choices: first option of every radio group.
+      const radios = page.locator('main input[type="radio"]');
+      const seenGroups = new Set<string>();
+      for (let i = 0; i < (await radios.count()); i++) {
+        const r = radios.nth(i);
+        const name = (await r.getAttribute("name")) ?? String(i);
+        if (seenGroups.has(name) || !(await r.isVisible().catch(() => false))) continue;
+        seenGroups.add(name);
+        if (!(await r.isChecked())) await r.check({ force: true }).catch(() => r.dispatchEvent("click"));
+        await page.waitForTimeout(100);
+      }
+      const borrow = page.getByLabel(/Borrowing limit/i).first();
+      if (await borrow.isVisible().catch(() => false)) await borrow.fill("25000");
+      const capCap = page.getByLabel(/capital call cap/i).first();
+      if (await capCap.isVisible().catch(() => false)) await capCap.fill("10000");
+      const contrib = page.locator('main input[aria-label^="Contribution to the company"]').first();
+      await contrib.fill("$1,000 cash");
+      await page.getByLabel("Effective date").fill("2026-09-15");
+      await checkAllBoxes(page);
+      await page.waitForTimeout(1000);
+
+      const gen = page.locator("main button").filter({ hasText: /^Generate/ }).first();
+      try {
+        await gen.click({ timeout: 15000 });
+      } catch {
+        const boxes = await page.locator("main input[type=checkbox]").evaluateAll((els) => (els as HTMLInputElement[]).map((e) => ({ id: e.id, checked: e.checked, label: e.closest("label")?.textContent?.trim()?.slice(0, 50) })));
+        const owners = await page.locator('main input[aria-label^="Full legal name"]').evaluateAll((els) => (els as HTMLInputElement[]).map((e) => e.value));
+        throw new Error(`Generate stayed disabled; owners=${JSON.stringify(owners)}; checkboxes=${JSON.stringify(boxes).slice(0, 500)}`);
+      }
+      for (let i = 0; i < 40 && !genCaptured; i++) await page.waitForTimeout(500);
+      if (!genCaptured) {
+        const errs = await page.locator('main [role="alert"], main .text-destructive').allTextContents();
+        throw new Error(`generate produced nothing — errors: ${errs.filter(Boolean).slice(0, 5).join(" | ")}`);
+      }
+      const cap = genCaptured as { generationId?: string; version?: string };
+      expect(cap.version === "member", "OA: two member-managed owners get the multi-member member-managed master", cap.version);
+
+      // Ground truth: re-assemble from the STORED inputs, exactly as e2e does.
+      const inputsRes = await fetch(`${API}/api/dev/oa-generation-inputs/${cap.generationId}`).then((r) => r.json()) as { data?: { inputs?: unknown } };
+      const { assembleOa } = await import("../server/oa");
+      const md = assembleOa(inputsRes.data?.inputs as Parameters<typeof assembleOa>[0]).markdown;
+      expect(md.includes("Casey Gatecheck"), "OA: first owner is in the assembled agreement");
+      expect(md.includes("Blair Gatecheck"), "OA: the owner added on screen is in the assembled agreement");
+      expect(/tenants by the entirety/i.test(md), "OA: the spouse pairing chosen on screen reached the text (tenants by the entirety)");
+      expect(md.includes("Casey Gatecheck and Blair Gatecheck"), "OA: the couple is named together as one unit", null);
+      expect(!/tenancies by the entireties|by the entireties/i.test(md), "OA: the singular form, always (Adam's rule)");
+      expect(md.includes("$1,000 cash"), "OA: the contribution typed on screen is in Exhibit A");
+      expect(md.includes("September 15, 2026"), "OA: the effective date chosen on screen is in the agreement");
+      console.log("  ✓ OA journey: every on-screen answer survived into the assembled agreement");
+    } catch (e) {
+      expect(false, `OA journey: ${String(e).slice(0, 300)}`);
+    } finally {
+      await page.close();
+    }
+  }
+
+  // ---- Persistent error toast, behaviorally: it must outlive five seconds
+  // and die only by its always-visible X.
+  console.log("\n▶ Persistent toast journey (contact form)");
+  {
+    const page = await browser.newPage();
+    try {
+      await page.route("**/api/**", async (route) => {
+        const url = new URL(route.request().url());
+        const resp = await fetch(`${API}${url.pathname}${url.search}`, { method: route.request().method(), headers: { "Content-Type": "application/json" }, body: route.request().postData() ?? undefined });
+        await route.fulfill({ status: resp.status, contentType: "application/json", body: await resp.text() });
+      });
+      await page.goto(`http://localhost:${WEB_PORT}/contact`);
+      await page.locator("main button").filter({ hasText: /send|submit/i }).first().click();
+      await page.waitForTimeout(500);
+      const toast = page.locator("li").filter({ hasText: /Missing details/ }).first();
+      expect(await toast.isVisible(), "toast: the error appears");
+      await page.waitForTimeout(5500);
+      expect(await toast.isVisible(), "toast: still present after 5.5 seconds — no auto-dismiss");
+      const x = toast.locator("[toast-close]").first();
+      expect(await x.isVisible(), "toast: the X is visible without hover");
+      await x.click();
+      await page.waitForTimeout(600);
+      expect(!(await toast.isVisible().catch(() => false)), "toast: the X dismisses it");
+      console.log("  ✓ error toast persists and dies only by its X");
+    } catch (e) {
+      expect(false, `toast journey: ${String(e).slice(0, 200)}`);
     } finally {
       await page.close();
     }
