@@ -20,7 +20,7 @@ export interface StoredShareholder {
 
 export interface ServiceOrder {
   id: string;
-  type: "series" | "ein" | "s-election";
+  type: "series" | "ein" | "s-election" | "certificate-of-status" | "certified-copy";
   status: "pending_payment" | "awaiting_info" | "in_progress" | "fulfilled" | "cancelled";
   llc_name: string;
   details: {
@@ -53,7 +53,7 @@ interface ServicesData {
   llcName: string;
   dev: boolean;
   members: { name: string; address: string }[];
-  pricing: { seriesCents: number; einCents: number; sElectionCents: number };
+  pricing: { seriesCents: number; einCents: number; sElectionCents: number; certStatusCents: number; certifiedCopyCents: number };
   sElection: {
     eligible: boolean;
     reason: "ok" | "no_new_formation" | "window_closed" | "already_ordered";
@@ -93,6 +93,8 @@ function money(cents: number): string {
 function summaryOf(o: ServiceOrder): string {
   if (o.type === "series") return `Protected Series Designation — ${o.details.seriesName ?? o.llc_name}`;
   if (o.type === "s-election") return `S Corporation Election Package — ${o.llc_name}`;
+  if (o.type === "certificate-of-status") return `Certificate of Status — ${o.llc_name}`;
+  if (o.type === "certified-copy") return `Certified Copy of the Articles — ${o.llc_name}`;
   return `Federal EIN — ${o.details.target === "series" ? o.details.seriesName ?? "series" : o.llc_name}`;
 }
 
@@ -104,6 +106,7 @@ export function ServicesCard() {
   const [seriesOpen, setSeriesOpen] = useState(false);
   const [einOpen, setEinOpen] = useState(false);
   const [sElectionOpen, setSElectionOpen] = useState(false);
+  const [certKind, setCertKind] = useState<"certificate-of-status" | "certified-copy" | null>(null);
   const [detailsFor, setDetailsFor] = useState<ServiceOrder | null>(null);
   // Before the LLC is formed, the detail buttons explain instead of collect.
   const [formedGateFor, setFormedGateFor] = useState<"ein" | "s-election" | null>(null);
@@ -131,6 +134,14 @@ export function ServicesCard() {
   const orderEin = useMutation({
     mutationFn: (body: { target: "company" | "series"; seriesName?: string }) =>
       api.post<{ checkoutUrl: string }>("/api/portal/services/ein", body),
+    onSuccess: (res) => {
+      window.location.href = res.checkoutUrl;
+    },
+    onError: (e) => setError(e instanceof ApiError ? e.message : "Something went wrong."),
+  });
+
+  const orderCertificate = useMutation({
+    mutationFn: (kind: string) => api.post<{ checkoutUrl: string }>("/api/portal/services/certificate", { kind }),
     onSuccess: (res) => {
       window.location.href = res.checkoutUrl;
     },
@@ -444,6 +455,66 @@ export function ServicesCard() {
             </DialogContent>
           </Dialog>
         ) : null}
+
+          {/* State certificates — the typical time to buy is AFTER formation,
+              when a bank or lender asks (Adam, 30 Aug 2026). */}
+          {data.llcFormed ? (
+            <>
+              <button
+                type="button"
+                onClick={() => { setCertKind("certificate-of-status"); setError(""); }}
+                className="rounded-xl border border-border bg-background p-4 text-left transition-all hover:border-accent hover:shadow-md"
+              >
+                <div className="flex items-center gap-2 text-trust">
+                  <FileCheck2 className="h-4 w-4" />
+                  <span className="text-sm font-medium text-foreground">Certificate of Status</span>
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  The state's certificate that your LLC is active and in good standing — banks and
+                  lenders often ask for a recent one.
+                </p>
+                <p className="mt-2 font-display text-lg text-trust">{money(data.pricing.certStatusCents)}</p>
+              </button>
+              <button
+                type="button"
+                onClick={() => { setCertKind("certified-copy"); setError(""); }}
+                className="rounded-xl border border-border bg-background p-4 text-left transition-all hover:border-accent hover:shadow-md"
+              >
+                <div className="flex items-center gap-2 text-trust">
+                  <FileCheck2 className="h-4 w-4" />
+                  <span className="text-sm font-medium text-foreground">Certified Copy of the Articles</span>
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  A state-certified copy of your filed Articles of Organization.
+                </p>
+                <p className="mt-2 font-display text-lg text-trust">{money(data.pricing.certifiedCopyCents)}</p>
+              </button>
+              <Dialog open={certKind !== null} onOpenChange={(v) => { if (!v) setCertKind(null); setError(""); }}>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>
+                      {certKind === "certified-copy" ? "Certified Copy of the Articles" : "Certificate of Status"}
+                    </DialogTitle>
+                    <DialogDescription>
+                      {certKind === "certified-copy"
+                        ? `${money(data.pricing.certifiedCopyCents)} — includes the state's fee. We order the certified copy from the Florida Division of Corporations and deliver the PDF to your portal.`
+                        : `${money(data.pricing.certStatusCents)} — includes the state's fee. We order the certificate from the Florida Division of Corporations and deliver the PDF to your portal.`}
+                    </DialogDescription>
+                  </DialogHeader>
+                  {error ? <p className="text-xs text-destructive">{error}</p> : null}
+                  <DialogFooter>
+                    <Button
+                      className="rounded-full"
+                      disabled={orderCertificate.isPending}
+                      onClick={() => certKind && orderCertificate.mutate(certKind)}
+                    >
+                      {orderCertificate.isPending ? "Preparing checkout…" : "Continue to payment"}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </>
+          ) : null}
       </div>
 
       {data.orders.length > 0 ? (

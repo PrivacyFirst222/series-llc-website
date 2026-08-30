@@ -8,7 +8,7 @@ import { z } from "zod";
 import { getDb } from "./db";
 import { env } from "./env";
 
-import { EIN_FEE_CENTS, S_ELECTION_FEE_CENTS, S_ELECTION_WINDOW_DAYS, SERIES_ADDON_PREP_CENTS, SERIES_ADDON_STATE_CENTS } from "./pricing";
+import { CERT_STATUS_FEE_CENTS, CERTIFIED_COPY_FEE_CENTS, EIN_FEE_CENTS, S_ELECTION_FEE_CENTS, S_ELECTION_WINDOW_DAYS, SERIES_ADDON_PREP_CENTS, SERIES_ADDON_STATE_CENTS } from "./pricing";
 import { buildSElectionPackage } from "./s-election";
 import { sharesAreComplete, shareLabel, shareValue, type OwnershipMode, type OwnershipShare } from "../src/lib/ownership";
 import { createCheckout } from "./square";
@@ -1257,6 +1257,8 @@ app.get("/portal/services", async (c) => {
         seriesCents: SERIES_ADDON_PREP_CENTS + SERIES_ADDON_STATE_CENTS,
         einCents: EIN_FEE_CENTS,
         sElectionCents: S_ELECTION_FEE_CENTS,
+        certStatusCents: CERT_STATUS_FEE_CENTS,
+        certifiedCopyCents: CERTIFIED_COPY_FEE_CENTS,
       },
       sElection: await sElectionEligibility(session.clientId),
       series: await clientSeries(session.clientId),
@@ -1375,6 +1377,64 @@ app.post("/portal/services/series", async (c) => {
     serviceOrderId,
   ]);
   return c.json({ data: { serviceOrderId, checkoutUrl: checkout.url, totalCents: amountCents } });
+});
+
+// State certificates, ordered AFTER formation — the typical time (Adam,
+// 30 Aug 2026): a bank or lender asks for a Certificate of Status or a
+// Certified Copy once the company exists. Same checkout as every service.
+const CERT_TYPES: Record<string, { fee: number; name: string }> = {
+  "certificate-of-status": { fee: CERT_STATUS_FEE_CENTS, name: "Certificate of Status" },
+  "certified-copy": { fee: CERTIFIED_COPY_FEE_CENTS, name: "Certified Copy of the Articles" },
+};
+app.post("/portal/services/certificate", async (c) => {
+  const session = await getSession(c);
+  if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  if (!(await rateLimit(`svc:${session.clientId}`, 20, 3600_000))) {
+    return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
+  }
+  const body = z
+    .object({ kind: z.enum(["certificate-of-status", "certified-copy"]) })
+    .safeParse(await c.req.json().catch(() => null));
+  if (!body.success) return c.json(err("Choose which document you need.", "INVALID_INPUT"), 400);
+  const spec = CERT_TYPES[body.data.kind];
+  const llcName = await clientLlcName(session.clientId);
+  if (!llcName) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
+  const db = await getDb();
+  // One OPEN order per kind: a pending fulfillment refuses a duplicate; a
+  // fulfilled one may be re-ordered (banks lose paperwork).
+  const open = await db.query<{ id: string }>(
+    `SELECT id FROM service_orders
+      WHERE client_id = $1 AND type = $2 AND status IN ('in_progress', 'awaiting_info')`,
+    [session.clientId, body.data.kind],
+  );
+  if (open.length > 0) {
+    return c.json(err(`A ${spec.name.toLowerCase()} is already on order — see your orders below.`, "ALREADY_ORDERED"), 400);
+  }
+  const rows = await db.query<{ id: string }>(
+    `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents)
+     VALUES ($1, $2, $3, '{}'::jsonb, $4) RETURNING id`,
+    [session.clientId, body.data.kind, llcName, spec.fee],
+  );
+  const serviceOrderId = rows[0].id;
+  const clients = await db.query<{ email: string }>("SELECT email FROM clients WHERE id = $1", [session.clientId]);
+  const checkout = await createCheckout({
+    orderId: serviceOrderId,
+    llcName,
+    priced: {
+      serviceFeeCents: spec.fee,
+      stateFeesCents: 0,
+      totalCents: spec.fee,
+      lineItems: [{ name: `${spec.name} — ${llcName}`, amountCents: spec.fee }],
+    },
+    buyerEmail: clients[0]?.email ?? "",
+    redirectUrl: `${env.PUBLIC_BASE_URL}/portal?paid=${serviceOrderId}`,
+    description: `${spec.name} — ${llcName}`,
+  });
+  await db.query("UPDATE service_orders SET square_order_id = $1 WHERE id = $2", [
+    checkout.squareOrderId,
+    serviceOrderId,
+  ]);
+  return c.json({ data: { serviceOrderId, checkoutUrl: checkout.url, totalCents: spec.fee } });
 });
 
 app.post("/portal/services/ein", async (c) => {

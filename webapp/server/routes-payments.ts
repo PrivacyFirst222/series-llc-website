@@ -153,7 +153,11 @@ export async function fulfillPaidServiceOrder(serviceOrderId: string, squarePaym
       ? `Protected Series Designation — ${details.seriesName ?? so.llc_name}`
       : so.type === "s-election"
         ? `S Corporation Election Package — ${so.llc_name}`
-        : `Federal EIN — ${details.target === "series" ? details.seriesName ?? "series" : so.llc_name}`;
+        : so.type === "certificate-of-status"
+          ? `Certificate of Status — ${so.llc_name}`
+          : so.type === "certified-copy"
+            ? `Certified Copy of the Articles — ${so.llc_name}`
+            : `Federal EIN — ${details.target === "series" ? details.seriesName ?? "series" : so.llc_name}`;
   const clients = await db.query<{ email: string; name: string }>(
     "SELECT email, name FROM clients WHERE id = $1",
     [so.client_id],

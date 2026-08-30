@@ -100268,6 +100268,8 @@ function buildPayload(data) {
 var SERVICE_FEE_CENTS = 49900;
 var EIN_FEE_CENTS = 5e3;
 var S_ELECTION_FEE_CENTS = 9500;
+var CERT_STATUS_FEE_CENTS = 1500;
+var CERTIFIED_COPY_FEE_CENTS = 4e3;
 var SERIES_ADDON_PREP_CENTS = 2500;
 var OPTIONAL_DOC_PREP_CENTS = 1e3;
 var SERIES_ADDON_STATE_CENTS = 2500;
@@ -106565,7 +106567,9 @@ function registerPortalRoutes(app2) {
         pricing: {
           seriesCents: SERIES_ADDON_PREP_CENTS + SERIES_ADDON_STATE_CENTS,
           einCents: EIN_FEE_CENTS,
-          sElectionCents: S_ELECTION_FEE_CENTS
+          sElectionCents: S_ELECTION_FEE_CENTS,
+          certStatusCents: CERT_STATUS_FEE_CENTS,
+          certifiedCopyCents: CERTIFIED_COPY_FEE_CENTS
         },
         sElection: await sElectionEligibility(session.clientId),
         series: await clientSeries(session.clientId),
@@ -106675,6 +106679,56 @@ function registerPortalRoutes(app2) {
       serviceOrderId
     ]);
     return c.json({ data: { serviceOrderId, checkoutUrl: checkout.url, totalCents: amountCents } });
+  });
+  const CERT_TYPES = {
+    "certificate-of-status": { fee: CERT_STATUS_FEE_CENTS, name: "Certificate of Status" },
+    "certified-copy": { fee: CERTIFIED_COPY_FEE_CENTS, name: "Certified Copy of the Articles" }
+  };
+  app2.post("/portal/services/certificate", async (c) => {
+    const session = await getSession(c);
+    if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+    if (!await rateLimit(`svc:${session.clientId}`, 20, 36e5)) {
+      return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
+    }
+    const body = external_exports.object({ kind: external_exports.enum(["certificate-of-status", "certified-copy"]) }).safeParse(await c.req.json().catch(() => null));
+    if (!body.success) return c.json(err("Choose which document you need.", "INVALID_INPUT"), 400);
+    const spec = CERT_TYPES[body.data.kind];
+    const llcName = await clientLlcName(session.clientId);
+    if (!llcName) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
+    const db = await getDb();
+    const open = await db.query(
+      `SELECT id FROM service_orders
+      WHERE client_id = $1 AND type = $2 AND status IN ('in_progress', 'awaiting_info')`,
+      [session.clientId, body.data.kind]
+    );
+    if (open.length > 0) {
+      return c.json(err(`A ${spec.name.toLowerCase()} is already on order \u2014 see your orders below.`, "ALREADY_ORDERED"), 400);
+    }
+    const rows = await db.query(
+      `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents)
+     VALUES ($1, $2, $3, '{}'::jsonb, $4) RETURNING id`,
+      [session.clientId, body.data.kind, llcName, spec.fee]
+    );
+    const serviceOrderId = rows[0].id;
+    const clients = await db.query("SELECT email FROM clients WHERE id = $1", [session.clientId]);
+    const checkout = await createCheckout({
+      orderId: serviceOrderId,
+      llcName,
+      priced: {
+        serviceFeeCents: spec.fee,
+        stateFeesCents: 0,
+        totalCents: spec.fee,
+        lineItems: [{ name: `${spec.name} \u2014 ${llcName}`, amountCents: spec.fee }]
+      },
+      buyerEmail: clients[0]?.email ?? "",
+      redirectUrl: `${env.PUBLIC_BASE_URL}/portal?paid=${serviceOrderId}`,
+      description: `${spec.name} \u2014 ${llcName}`
+    });
+    await db.query("UPDATE service_orders SET square_order_id = $1 WHERE id = $2", [
+      checkout.squareOrderId,
+      serviceOrderId
+    ]);
+    return c.json({ data: { serviceOrderId, checkoutUrl: checkout.url, totalCents: spec.fee } });
   });
   app2.post("/portal/services/ein", async (c) => {
     const session = await getSession(c);
@@ -107198,7 +107252,7 @@ async function fulfillPaidServiceOrder(serviceOrderId, squarePaymentId) {
   if (rows.length === 0) return;
   const so2 = rows[0];
   const details = typeof so2.details === "string" ? JSON.parse(so2.details) : so2.details;
-  const summary = so2.type === "series" ? `Protected Series Designation \u2014 ${details.seriesName ?? so2.llc_name}` : so2.type === "s-election" ? `S Corporation Election Package \u2014 ${so2.llc_name}` : `Federal EIN \u2014 ${details.target === "series" ? details.seriesName ?? "series" : so2.llc_name}`;
+  const summary = so2.type === "series" ? `Protected Series Designation \u2014 ${details.seriesName ?? so2.llc_name}` : so2.type === "s-election" ? `S Corporation Election Package \u2014 ${so2.llc_name}` : so2.type === "certificate-of-status" ? `Certificate of Status \u2014 ${so2.llc_name}` : so2.type === "certified-copy" ? `Certified Copy of the Articles \u2014 ${so2.llc_name}` : `Federal EIN \u2014 ${details.target === "series" ? details.seriesName ?? "series" : so2.llc_name}`;
   const clients = await db.query(
     "SELECT email, name FROM clients WHERE id = $1",
     [so2.client_id]
@@ -108422,6 +108476,10 @@ function registerAdminRoutes(app2) {
             o.created_at, o.paid_at, o.filed_at, o.formed_at,
             COALESCE(jsonb_array_length(o.payload->'series'), 0) AS series_count,
             COALESCE((o.payload->'optionalDocuments'->>'ein')::boolean, false) AS ein_purchased,
+            COALESCE((o.payload->'optionalDocuments'->>'certificateOfStatus')::boolean, false) AS cert_status_purchased,
+            COALESCE((o.payload->'optionalDocuments'->>'certifiedCopy')::boolean, false) AS certified_copy_purchased,
+            EXISTS (SELECT 1 FROM documents d WHERE d.order_id = o.id AND d.kind = 'certificate-of-status') AS cert_status_uploaded,
+            EXISTS (SELECT 1 FROM documents d WHERE d.order_id = o.id AND d.kind = 'certified-copy') AS certified_copy_uploaded,
             (o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_service,
             EXISTS (
               SELECT 1 FROM service_orders s
@@ -108450,13 +108508,6 @@ function registerAdminRoutes(app2) {
     if (rows[0].status !== "paid") {
       return c.json(err(`An order is filed from "paid", not "${rows[0].status}".`, "BAD_STATE"), 400);
     }
-    const arts = await db.query(
-      "SELECT id FROM documents WHERE order_id = $1 AND kind = 'articles'",
-      [c.req.param("id")]
-    );
-    if (arts.length === 0) {
-      return c.json(err("Upload the filed Articles of Organization first.", "ARTICLES_REQUIRED"), 400);
-    }
     await db.query("UPDATE orders SET status = 'filed', filed_at = now() WHERE id = $1", [
       c.req.param("id")
     ]);
@@ -108473,7 +108524,7 @@ function registerAdminRoutes(app2) {
     if (rows[0].status !== "filed") {
       return c.json(err("Only an order sitting with the State can be moved back.", "BAD_STATE"), 400);
     }
-    await db.query("UPDATE orders SET status = 'paid', filed_at = NULL WHERE id = $1", [
+    await db.query("UPDATE orders SET status = 'paid', filed_at = NULL, series_filed_at = NULL, copied_fields = '{}'::jsonb WHERE id = $1", [
       c.req.param("id")
     ]);
     return c.json({ data: { ok: true } });
@@ -108568,7 +108619,11 @@ function registerAdminRoutes(app2) {
           createdAt: d2.created_at
         })),
         services,
-        hasArticles: docs.some((d2) => d2.kind === "articles")
+        hasArticles: docs.some((d2) => d2.kind === "articles"),
+        certStatusPurchased: !!payload.optionalDocuments?.certificateOfStatus,
+        certifiedCopyPurchased: !!payload.optionalDocuments?.certifiedCopy,
+        hasCertStatus: docs.some((d2) => d2.kind === "certificate-of-status"),
+        hasCertifiedCopy: docs.some((d2) => d2.kind === "certified-copy")
       }
     });
   });
@@ -108604,6 +108659,50 @@ function registerAdminRoutes(app2) {
       `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
      VALUES ($1, $2, 'articles', $3, $4, $5, $6, '{}'::jsonb)`,
       [o.client_id, o.id, `Articles of Organization \u2014 ${o.llc_name}`, stored.storageKey, articles.type || "application/pdf", stored.sizeBytes]
+    );
+    return c.json({ data: { ok: true } });
+  });
+  const ANCILLARY_KINDS = {
+    "certificate-of-status": { payloadKey: "certificateOfStatus", title: "Certificate of Status" },
+    "certified-copy": { payloadKey: "certifiedCopy", title: "Certified Copy of the Articles" }
+  };
+  app2.post("/admin/orders/:id/ancillary/:kind", async (c) => {
+    const admin = await requireAdmin(c);
+    if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+    const kind = c.req.param("kind");
+    const spec = ANCILLARY_KINDS[kind];
+    if (!spec) return c.json(err("Unknown document kind.", "INVALID_INPUT"), 400);
+    const db = await getDb();
+    const rows = await db.query(
+      "SELECT id, client_id, llc_name, payload FROM orders WHERE id = $1",
+      [c.req.param("id")]
+    );
+    if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+    const o = rows[0];
+    if (!o.client_id) return c.json(err("This order has no client account yet.", "NO_CLIENT"), 400);
+    const payload = typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload;
+    if (!payload.optionalDocuments?.[spec.payloadKey]) {
+      return c.json(err(`The client did not purchase a ${spec.title.toLowerCase()} with this order.`, "NOT_PURCHASED"), 400);
+    }
+    const existing = await db.query(
+      "SELECT id FROM documents WHERE order_id = $1 AND kind = $2",
+      [o.id, kind]
+    );
+    if (existing.length > 0) {
+      return c.json(err(`The ${spec.title.toLowerCase()} is already uploaded.`, "ALREADY_UPLOADED"), 409);
+    }
+    const form = await c.req.parseBody();
+    const file = form.file;
+    if (!(file instanceof File)) return c.json(err("The PDF is required.", "INVALID_INPUT"), 400);
+    if (file.size > MAX_UPLOAD_BYTES) return c.json(err("The file is too large (20 MB max).", "TOO_LARGE"), 400);
+    if (!await looksLikePdf(file)) {
+      return c.json(err("This is not a readable PDF. Upload the document from Sunbiz.", "NOT_A_PDF"), 400);
+    }
+    const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
+    await db.query(
+      `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, '{}'::jsonb)`,
+      [o.client_id, o.id, kind, `${spec.title} \u2014 ${o.llc_name}`, stored.storageKey, file.type || "application/pdf", stored.sizeBytes]
     );
     return c.json({ data: { ok: true } });
   });
@@ -108978,11 +109077,14 @@ function registerAdminRoutes(app2) {
     if (so2.type === "s-election" && !file) {
       return c.json(err("Attach the election package PDF to fulfill an S election order.", "PACKAGE_REQUIRED"), 400);
     }
+    if ((so2.type === "certificate-of-status" || so2.type === "certified-copy") && !file) {
+      return c.json(err("Attach the document from the Division to fulfill this order.", "DOCUMENT_REQUIRED"), 400);
+    }
     const details = typeof so2.details === "string" ? JSON.parse(so2.details) : so2.details;
-    const summary = so2.type === "series" ? `Protected Series Designation \u2014 ${details.seriesName ?? so2.llc_name}` : so2.type === "s-election" ? `S Corporation Election Package \u2014 ${so2.llc_name}` : `Federal EIN \u2014 ${details.target === "series" ? details.seriesName ?? "series" : so2.llc_name}`;
+    const summary = so2.type === "series" ? `Protected Series Designation \u2014 ${details.seriesName ?? so2.llc_name}` : so2.type === "s-election" ? `S Corporation Election Package \u2014 ${so2.llc_name}` : so2.type === "certificate-of-status" ? `Certificate of Status \u2014 ${so2.llc_name}` : so2.type === "certified-copy" ? `Certified Copy of the Articles \u2014 ${so2.llc_name}` : `Federal EIN \u2014 ${details.target === "series" ? details.seriesName ?? "series" : so2.llc_name}`;
     let documentId = null;
     if (file) {
-      const title = titleOverride || (so2.type === "series" ? `Protected Series Designation \u2014 ${details.seriesName ?? so2.llc_name}` : so2.type === "s-election" ? `S Corporation Election Package (Form 2553) \u2014 ${so2.llc_name}` : `EIN Confirmation Letter \u2014 ${details.target === "series" ? details.seriesName ?? so2.llc_name : so2.llc_name}`);
+      const title = titleOverride || (so2.type === "series" ? `Protected Series Designation \u2014 ${details.seriesName ?? so2.llc_name}` : so2.type === "s-election" ? `S Corporation Election Package (Form 2553) \u2014 ${so2.llc_name}` : so2.type === "certificate-of-status" ? `Certificate of Status \u2014 ${so2.llc_name}` : so2.type === "certified-copy" ? `Certified Copy of the Articles \u2014 ${so2.llc_name}` : `EIN Confirmation Letter \u2014 ${details.target === "series" ? details.seriesName ?? so2.llc_name : so2.llc_name}`);
       if (!await looksLikePdf(file)) {
         return c.json(err(`${file.name} is not a readable PDF. The deliverable must be the actual PDF document.`, "NOT_A_PDF"), 400);
       }

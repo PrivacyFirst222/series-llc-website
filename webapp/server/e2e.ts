@@ -673,6 +673,32 @@ if (mint.status === 200) {
   check("intake S election order created awaiting_info", Boolean(intakeSElection));
 
   // 12. Order an additional series from the portal, pay, and check state
+  // State certificates are typically bought AFTER formation (Adam,
+  // 30 Aug 2026): purchase, duplicate-refusal, and fulfillment-by-upload.
+  {
+    const buyCert = await api("/api/portal/services/certificate", {
+      method: "POST", cookies: setPw.cookie, body: JSON.stringify({ kind: "certificate-of-status" }),
+    });
+    check("a Certificate of Status can be ordered post-formation", buyCert.status === 200 && !!buyCert.body?.data?.checkoutUrl, buyCert.body);
+    check("the certificate is priced at the published $15", buyCert.body?.data?.totalCents === 15_00, buyCert.body?.data?.totalCents);
+    const certId = buyCert.body?.data?.serviceOrderId as string;
+    await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: certId }) });
+    const dupCert = await api("/api/portal/services/certificate", {
+      method: "POST", cookies: setPw.cookie, body: JSON.stringify({ kind: "certificate-of-status" }),
+    });
+    check("a second certificate is refused while one is on order", dupCert.status === 400 && dupCert.body?.error?.code === "ALREADY_ORDERED", dupCert.body);
+    const admCert = await adminSession();
+    const noFile = await api(`/api/admin/services/${certId}/fulfill`, { method: "POST", cookies: admCert.cookie, body: "{}" });
+    check("fulfilling a certificate without the document is refused", noFile.status === 400 && noFile.body?.error?.code === "DOCUMENT_REQUIRED", noFile.body);
+    const certFd = new FormData();
+    certFd.set("file", new File([new TextEncoder().encode("%PDF-1.4 cert of status\n%%EOF")], "cert.pdf", { type: "application/pdf" }));
+    const certUp = await fetch(`${BASE}/api/admin/services/${certId}/fulfill`, { method: "POST", body: certFd, headers: { Cookie: admCert.cookie, "X-Forwarded-For": RUN_IP } });
+    check("uploading the certificate fulfills the order", certUp.status === 200, await certUp.json().catch(() => null));
+    const afterDocs = await api("/api/portal/documents", { cookies: setPw.cookie });
+    const certDoc = (afterDocs.body?.data as { title: string }[] | undefined)?.find((doc) => doc.title.startsWith("Certificate of Status"));
+    check("the certificate lands in the client's portal documents", !!certDoc, afterDocs.body?.data?.length);
+  }
+
   const badSeries = await api("/api/portal/services/series", {
     method: "POST", cookies: setPw.cookie, body: JSON.stringify({ suffix: "Tower Nine" }),
   });
@@ -2345,20 +2371,20 @@ if (mint.status === 200) {
     const o = await mk("E2E No Status Regression");
     await hook(`e2e-first-${o.id}`, o.squareOrderId, `pay1-${o.id.slice(0, 8)}`);
     check("order is paid after the first event", (await statusOf(o.id)) === "paid", await statusOf(o.id));
-    // The order cannot leave New Orders before the filed Articles are on
-    // file (Adam's sequence, 30 Aug 2026) — red first, then green.
-    const early = await api(`/api/admin/orders/${o.id}/filed`, { method: "POST", cookies: adm.cookie, body: "{}" });
-    check("marking sent WITHOUT the Articles is refused", early.status === 400 && early.body?.error?.code === "ARTICLES_REQUIRED", early.body);
+    // Submission precedes the stamped Articles (Adam's corrected sequence,
+    // 30 Aug 2026): Mark sent works with nothing uploaded; the Articles
+    // upload happens at the With-The-State stage when the Division returns
+    // them; a duplicate upload is refused.
+    const filed = await api(`/api/admin/orders/${o.id}/filed`, { method: "POST", cookies: adm.cookie, body: "{}" });
+    check("order can be marked filed with nothing uploaded (submission comes first)", filed.status === 200, filed.body);
     const artFd = new FormData();
     artFd.set("articles", new File([new TextEncoder().encode("%PDF-1.4 fake articles for e2e\n%%EOF")], "articles.pdf", { type: "application/pdf" }));
     const artUp = await fetch(`${BASE}/api/admin/orders/${o.id}/articles`, { method: "POST", body: artFd, headers: { Cookie: adm.cookie, "X-Forwarded-For": RUN_IP } });
-    check("the filed Articles upload is accepted at the New-Orders stage", artUp.status === 200, await artUp.json().catch(() => null));
+    check("the returned Articles upload is accepted at the With-The-State stage", artUp.status === 200, await artUp.json().catch(() => null));
     const artDup = new FormData();
     artDup.set("articles", new File([new TextEncoder().encode("%PDF-1.4 dup\n%%EOF")], "dup.pdf", { type: "application/pdf" }));
     const dupUp = await fetch(`${BASE}/api/admin/orders/${o.id}/articles`, { method: "POST", body: artDup, headers: { Cookie: adm.cookie, "X-Forwarded-For": RUN_IP } });
     check("a second Articles upload is refused (replace happens at the formed step)", dupUp.status === 409, dupUp.status);
-    const filed = await api(`/api/admin/orders/${o.id}/filed`, { method: "POST", cookies: adm.cookie, body: "{}" });
-    check("order can be marked filed once the Articles are on file", filed.status === 200, filed.body);
     // A DIFFERENT event id, so the dedupe table cannot mask the regression.
     await hook(`e2e-late-${o.id}`, o.squareOrderId, `pay2-${o.id.slice(0, 8)}`);
     check(
@@ -2380,6 +2406,36 @@ if (mint.status === 200) {
     const det2 = await api(`/api/admin/orders/${o.id}`, { cookies: adm.cookie });
     check("marking again keeps the ORIGINAL timestamp (idempotent)",
       (det2.body?.data as { seriesFiledAt?: string | null })?.seriesFiledAt === t1, det2.body?.data);
+
+    // 4. A Division rejection resets for resubmission: back to New Orders
+    //    with every copied tick cleared and the series check-off undone.
+    await api(`/api/admin/orders/${o.id}/copied`, { method: "POST", cookies: adm.cookie, body: JSON.stringify({ key: "llcName", copied: true }) });
+    const unfiled = await api(`/api/admin/orders/${o.id}/unfiled`, { method: "POST", cookies: adm.cookie, body: "{}" });
+    check("a rejected filing can be sent back to New Orders", unfiled.status === 200, unfiled.body);
+    const det3 = await api(`/api/admin/orders/${o.id}`, { cookies: adm.cookie });
+    const d3 = det3.body?.data as { status?: string; copiedFields?: Record<string, boolean>; seriesFiledAt?: string | null };
+    check("the reset order is back in New Orders", d3?.status === "paid", d3?.status);
+    check("every copied tick is cleared for the resubmission", Object.keys(d3?.copiedFields ?? { x: 1 }).length === 0, d3?.copiedFields);
+    check("the series check-off is reset too", d3?.seriesFiledAt === null, d3?.seriesFiledAt);
+
+    // 5. Formation-time certificates upload through their own links — refused
+    //    when never purchased, accepted when bought, duplicate refused.
+    const certPdf = () => { const fd = new FormData(); fd.set("file", new File([new TextEncoder().encode("%PDF-1.4 anc\n%%EOF")], "c.pdf", { type: "application/pdf" })); return fd; };
+    const notBought = await fetch(`${BASE}/api/admin/orders/${o.id}/ancillary/certificate-of-status`, { method: "POST", body: certPdf(), headers: { Cookie: adm.cookie, "X-Forwarded-For": RUN_IP } });
+    check("an ancillary upload for a certificate the client never bought is refused", notBought.status === 400, notBought.status);
+    const certIp = { "X-Forwarded-For": `10.66.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}` };
+    const certOrderRes = await api("/api/orders", { method: "POST", headers: certIp, body: JSON.stringify({
+      ...formData, orderCertificateOfStatus: true, orderCertifiedCopy: true,
+      clientEmail: testEmail.replace("@", "+certs@"), confirmClientEmail: testEmail.replace("@", "+certs@"),
+      correspondentEmail: testEmail.replace("@", "+certs@"), confirmCorrespondentEmail: testEmail.replace("@", "+certs@"),
+    })});
+    check("an order carrying both certificates is accepted", certOrderRes.status === 200, certOrderRes.body?.error);
+    const certOrderId = certOrderRes.body?.data?.orderId as string;
+    await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: certOrderId }) });
+    const bought = await fetch(`${BASE}/api/admin/orders/${certOrderId}/ancillary/certificate-of-status`, { method: "POST", body: certPdf(), headers: { Cookie: adm.cookie, "X-Forwarded-For": RUN_IP } });
+    check("the purchased certificate uploads through its own link", bought.status === 200, await bought.json().catch(() => null));
+    const dupAnc = await fetch(`${BASE}/api/admin/orders/${certOrderId}/ancillary/certificate-of-status`, { method: "POST", body: certPdf(), headers: { Cookie: adm.cookie, "X-Forwarded-For": RUN_IP } });
+    check("a duplicate certificate upload is refused", dupAnc.status === 409, dupAnc.status);
   }
 }
 

@@ -22,7 +22,7 @@ interface SElectionShareholderView {
 
 export interface AdminServiceOrder {
   id: string;
-  type: "series" | "ein" | "s-election";
+  type: "series" | "ein" | "s-election" | "certificate-of-status" | "certified-copy";
   status: string;
   llc_name: string;
   details: {
@@ -209,7 +209,11 @@ export function ServiceFulfillDialog({
               ? "Attach the EIN confirmation letter (CP 575)"
               : viewing?.type === "s-election"
                 ? "Attach the final election package PDF"
-                : "Attach the filed Designation"}
+                : viewing?.type === "certificate-of-status"
+                  ? "Attach the Certificate of Status from the Division"
+                  : viewing?.type === "certified-copy"
+                    ? "Attach the certified copy from the Division"
+                    : "Attach the filed Designation"}
           </label>
           <input
             id="service-attachment-file"

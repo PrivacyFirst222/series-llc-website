@@ -191,6 +191,10 @@ app.get("/admin/orders", async (c) => {
             o.created_at, o.paid_at, o.filed_at, o.formed_at,
             COALESCE(jsonb_array_length(o.payload->'series'), 0) AS series_count,
             COALESCE((o.payload->'optionalDocuments'->>'ein')::boolean, false) AS ein_purchased,
+            COALESCE((o.payload->'optionalDocuments'->>'certificateOfStatus')::boolean, false) AS cert_status_purchased,
+            COALESCE((o.payload->'optionalDocuments'->>'certifiedCopy')::boolean, false) AS certified_copy_purchased,
+            EXISTS (SELECT 1 FROM documents d WHERE d.order_id = o.id AND d.kind = 'certificate-of-status') AS cert_status_uploaded,
+            EXISTS (SELECT 1 FROM documents d WHERE d.order_id = o.id AND d.kind = 'certified-copy') AS certified_copy_uploaded,
             (o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_service,
             EXISTS (
               SELECT 1 FROM service_orders s
@@ -222,13 +226,9 @@ app.post("/admin/orders/:id/filed", async (c) => {
   if (rows[0].status !== "paid") {
     return c.json(err(`An order is filed from "paid", not "${rows[0].status}".`, "BAD_STATE"), 400);
   }
-  // The order moves to With The State only after the filed Articles are
-  // uploaded (Adam, 30 Aug 2026) — enforced here, not only by the button.
-  const arts = await db.query<{ id: string }>(
-    "SELECT id FROM documents WHERE order_id = $1 AND kind = 'articles'", [c.req.param("id")]);
-  if (arts.length === 0) {
-    return c.json(err("Upload the filed Articles of Organization first.", "ARTICLES_REQUIRED"), 400);
-  }
+  // Submission precedes the stamped Articles: the state returns them days
+  // later, so nothing is uploaded before Mark sent (Adam's correction,
+  // 30 Aug 2026 — reversing the same-day gate the other way).
   await db.query("UPDATE orders SET status = 'filed', filed_at = now() WHERE id = $1", [
     c.req.param("id"),
   ]);
@@ -247,7 +247,10 @@ app.post("/admin/orders/:id/unfiled", async (c) => {
   if (rows[0].status !== "filed") {
     return c.json(err("Only an order sitting with the State can be moved back.", "BAD_STATE"), 400);
   }
-  await db.query("UPDATE orders SET status = 'paid', filed_at = NULL WHERE id = $1", [
+  // A Division rejection means refiling, usually under the alternate name:
+  // every copied-field tick is cleared so the re-copy starts honest, and the
+  // series check-off resets with it (Adam, 30 Aug 2026).
+  await db.query("UPDATE orders SET status = 'paid', filed_at = NULL, series_filed_at = NULL, copied_fields = '{}'::jsonb WHERE id = $1", [
     c.req.param("id"),
   ]);
   return c.json({ data: { ok: true } });
@@ -372,6 +375,10 @@ app.get("/admin/orders/:id", async (c) => {
       })),
       services,
       hasArticles: docs.some((d) => d.kind === "articles"),
+      certStatusPurchased: !!(payload as { optionalDocuments?: { certificateOfStatus?: boolean } }).optionalDocuments?.certificateOfStatus,
+      certifiedCopyPurchased: !!(payload as { optionalDocuments?: { certifiedCopy?: boolean } }).optionalDocuments?.certifiedCopy,
+      hasCertStatus: docs.some((d) => d.kind === "certificate-of-status"),
+      hasCertifiedCopy: docs.some((d) => d.kind === "certified-copy"),
     },
   });
 });
@@ -416,6 +423,53 @@ app.post("/admin/orders/:id/articles", async (c) => {
     `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
      VALUES ($1, $2, 'articles', $3, $4, $5, $6, '{}'::jsonb)`,
     [o.client_id, o.id, `Articles of Organization — ${o.llc_name}`, stored.storageKey, articles.type || "application/pdf", stored.sizeBytes],
+  );
+  return c.json({ data: { ok: true } });
+});
+
+// Ancillary state documents bought WITH the formation — Certificate of
+// Status, Certified Copy — each uploaded through its own link once the
+// Division returns it, straight into the client's portal (Adam,
+// 30 Aug 2026). Post-formation purchases travel as service orders instead.
+const ANCILLARY_KINDS: Record<string, { payloadKey: "certificateOfStatus" | "certifiedCopy"; title: string }> = {
+  "certificate-of-status": { payloadKey: "certificateOfStatus", title: "Certificate of Status" },
+  "certified-copy": { payloadKey: "certifiedCopy", title: "Certified Copy of the Articles" },
+};
+app.post("/admin/orders/:id/ancillary/:kind", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const kind = c.req.param("kind");
+  const spec = ANCILLARY_KINDS[kind];
+  if (!spec) return c.json(err("Unknown document kind.", "INVALID_INPUT"), 400);
+  const db = await getDb();
+  const rows = await db.query<{ id: string; client_id: string | null; llc_name: string; payload: unknown }>(
+    "SELECT id, client_id, llc_name, payload FROM orders WHERE id = $1", [c.req.param("id")]);
+  if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+  const o = rows[0];
+  if (!o.client_id) return c.json(err("This order has no client account yet.", "NO_CLIENT"), 400);
+  const payload = (typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload) as {
+    optionalDocuments?: { certificateOfStatus?: boolean; certifiedCopy?: boolean };
+  };
+  if (!payload.optionalDocuments?.[spec.payloadKey]) {
+    return c.json(err(`The client did not purchase a ${spec.title.toLowerCase()} with this order.`, "NOT_PURCHASED"), 400);
+  }
+  const existing = await db.query<{ id: string }>(
+    "SELECT id FROM documents WHERE order_id = $1 AND kind = $2", [o.id, kind]);
+  if (existing.length > 0) {
+    return c.json(err(`The ${spec.title.toLowerCase()} is already uploaded.`, "ALREADY_UPLOADED"), 409);
+  }
+  const form = await c.req.parseBody();
+  const file = form.file;
+  if (!(file instanceof File)) return c.json(err("The PDF is required.", "INVALID_INPUT"), 400);
+  if (file.size > MAX_UPLOAD_BYTES) return c.json(err("The file is too large (20 MB max).", "TOO_LARGE"), 400);
+  if (!(await looksLikePdf(file))) {
+    return c.json(err("This is not a readable PDF. Upload the document from Sunbiz.", "NOT_A_PDF"), 400);
+  }
+  const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
+  await db.query(
+    `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, '{}'::jsonb)`,
+    [o.client_id, o.id, kind, `${spec.title} — ${o.llc_name}`, stored.storageKey, file.type || "application/pdf", stored.sizeBytes],
   );
   return c.json({ data: { ok: true } });
 });
@@ -874,6 +928,10 @@ app.post("/admin/services/:id/fulfill", async (c) => {
   if (so.type === "s-election" && !file) {
     return c.json(err("Attach the election package PDF to fulfill an S election order.", "PACKAGE_REQUIRED"), 400);
   }
+  // A certificate order's deliverable IS the state document.
+  if ((so.type === "certificate-of-status" || so.type === "certified-copy") && !file) {
+    return c.json(err("Attach the document from the Division to fulfill this order.", "DOCUMENT_REQUIRED"), 400);
+  }
   const details = (typeof so.details === "string" ? JSON.parse(so.details) : so.details) as {
     seriesName?: string; target?: string;
   };
@@ -882,7 +940,11 @@ app.post("/admin/services/:id/fulfill", async (c) => {
       ? `Protected Series Designation — ${details.seriesName ?? so.llc_name}`
       : so.type === "s-election"
         ? `S Corporation Election Package — ${so.llc_name}`
-        : `Federal EIN — ${details.target === "series" ? details.seriesName ?? "series" : so.llc_name}`;
+        : so.type === "certificate-of-status"
+          ? `Certificate of Status — ${so.llc_name}`
+          : so.type === "certified-copy"
+            ? `Certified Copy of the Articles — ${so.llc_name}`
+            : `Federal EIN — ${details.target === "series" ? details.seriesName ?? "series" : so.llc_name}`;
 
   let documentId: string | null = null;
   if (file) {
@@ -892,7 +954,11 @@ app.post("/admin/services/:id/fulfill", async (c) => {
         ? `Protected Series Designation — ${details.seriesName ?? so.llc_name}`
         : so.type === "s-election"
           ? `S Corporation Election Package (Form 2553) — ${so.llc_name}`
-          : `EIN Confirmation Letter — ${details.target === "series" ? details.seriesName ?? so.llc_name : so.llc_name}`);
+          : so.type === "certificate-of-status"
+            ? `Certificate of Status — ${so.llc_name}`
+            : so.type === "certified-copy"
+              ? `Certified Copy of the Articles — ${so.llc_name}`
+              : `EIN Confirmation Letter — ${details.target === "series" ? details.seriesName ?? so.llc_name : so.llc_name}`);
     // Every service deliverable is a PDF (CP 575, the 2553 package, a filed
     // designation) and lands directly in the client's portal — and for EIN and
     // S election orders, fulfillment deletes the retained taxpayer identifiers

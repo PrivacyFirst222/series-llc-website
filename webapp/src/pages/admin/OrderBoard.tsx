@@ -24,6 +24,10 @@ export interface BoardOrder {
   ein_purchased: boolean;
   ra_service: boolean;
   ein_outstanding: boolean;
+  cert_status_purchased: boolean;
+  certified_copy_purchased: boolean;
+  cert_status_uploaded: boolean;
+  certified_copy_uploaded: boolean;
 }
 
 /** Days since the order was placed — Adam's measure, not days in the column: a
@@ -72,7 +76,7 @@ function Card({
         </div>
         <div className="mt-1 text-xs text-muted-foreground">{order.contact_name}</div>
         <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
-          <AgeBadge createdAt={order.created_at} />
+          <AgeBadge createdAt={order.status === "filed" && order.filed_at ? order.filed_at : order.created_at} />
           <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-xs text-muted-foreground">
             <Building2 className="h-3 w-3" />
             {order.series_count} series
@@ -218,12 +222,17 @@ export default function OrderBoard({ enabled }: { enabled: boolean }) {
 
   const pending = orders.filter((o) => o.status === "pending_payment");
   const isNew = orders.filter((o) => o.status === "paid");
-  const withState = orders.filter((o) => o.status === "filed");
-  // A formed company still owing service work sits in Service Orders; it
-  // reaches Complete only when the formation AND every service are done.
-  const formed = orders.filter((o) => o.status === "formed");
-  const serviceWork = formed.filter((o) => servicesFor(o.id).some(serviceIsOpen));
-  const done = formed.filter((o) => !servicesFor(o.id).some(serviceIsOpen));
+  // Complete means COMPLETE (Adam, 30 Aug 2026): the Articles are back, every
+  // purchased certificate is uploaded, and no service order is open. A formed
+  // order still owing any of that stays in column two — and a later portal
+  // purchase pulls a Complete card straight back there.
+  const certOwed = (o: BoardOrder) =>
+    (o.cert_status_purchased && !o.cert_status_uploaded) ||
+    (o.certified_copy_purchased && !o.certified_copy_uploaded);
+  const everythingDone = (o: BoardOrder) =>
+    o.status === "formed" && !certOwed(o) && !servicesFor(o.id).some(serviceIsOpen);
+  const withState = orders.filter((o) => o.status === "filed" || (o.status === "formed" && !everythingDone(o)));
+  const done = orders.filter(everythingDone);
   const oldestPending = pending.reduce<number>((m, o) => Math.max(m, ageInDays(o.created_at)), 0);
 
   return (
@@ -307,16 +316,8 @@ export default function OrderBoard({ enabled }: { enabled: boolean }) {
           onFulfill={setViewing}
         />
         <Column
-          title="Service Orders"
-          hint="Formed — service orders still open"
-          orders={serviceWork}
-          servicesFor={servicesFor}
-          onOpen={setOpenId}
-          onFulfill={setViewing}
-        />
-        <Column
           title="Complete"
-          hint="Formation and services done"
+          hint="Everything delivered — documents and services"
           orders={done}
           servicesFor={servicesFor}
           onOpen={setOpenId}

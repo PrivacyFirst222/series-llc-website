@@ -3,6 +3,13 @@ import { calculateEstimatedFees } from "../src/components/forms/florida-llc/vali
 export const SERVICE_FEE_CENTS = 499_00;
 export const EIN_FEE_CENTS = 50_00;
 export const S_ELECTION_FEE_CENTS = 95_00;
+
+/** Post-formation state certificates, at the pricing page's published rates:
+ *  Certificate of Status $15 ($10 service + $5 state), Certified Copy $40
+ *  ($10 service + $30 state). The state fee is paid by us at ordering, so
+ *  the client is charged the full amount here. */
+export const CERT_STATUS_FEE_CENTS = 15_00;
+export const CERTIFIED_COPY_FEE_CENTS = 40_00;
 export const SERIES_ADDON_PREP_CENTS = 25_00;
 /** Adam's pricing (23 Aug 2026): each optional document carries a $10
  *  preparation charge on the service-fee side, plus the state fee at cost

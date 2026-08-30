@@ -39,6 +39,58 @@ interface OrderDetailData {
   documents: { id: string; kind: string; title: string; createdAt: string }[];
   services: { id: string; type: string; status: string; llc_name: string }[];
   hasArticles: boolean;
+  certStatusPurchased: boolean;
+  certifiedCopyPurchased: boolean;
+  hasCertStatus: boolean;
+  hasCertifiedCopy: boolean;
+}
+
+/** One purchased state certificate on the Service-orders card: its own
+ *  upload link while owed, a delivered check once up (Adam, 30 Aug 2026). */
+function CertificateRow({ orderId, kind, label, uploaded }: {
+  orderId: string; kind: string; label: string; uploaded: boolean;
+}) {
+  const queryClient = useQueryClient();
+  const ref = useRef<HTMLInputElement>(null);
+  const [error, setError] = useState<string | null>(null);
+  const up = useMutation({
+    mutationFn: async () => {
+      const f = ref.current?.files?.[0];
+      if (!f) throw new Error("Choose the PDF first.");
+      const fd = new FormData();
+      fd.append("file", f);
+      const res = await fetch(`/api/admin/orders/${orderId}/ancillary/${kind}`, { method: "POST", body: fd, credentials: "include" });
+      const body = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
+      if (!res.ok) throw new Error(body?.error?.message ?? "Upload failed.");
+      return body;
+    },
+    onSuccess: () => {
+      setError(null);
+      queryClient.invalidateQueries({ queryKey: ["admin", "order", orderId] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "orders"] });
+    },
+    onError: (e: Error) => setError(e.message),
+  });
+  if (uploaded) {
+    return (
+      <div className="flex items-center gap-2 text-sm">
+        <Check className="h-3.5 w-3.5 text-trust" />
+        <span className="font-medium">{label}</span>
+        <span className="text-xs text-muted-foreground">delivered to the portal</span>
+      </div>
+    );
+  }
+  return (
+    <div className="flex flex-wrap items-center gap-2 text-sm">
+      <span className="min-w-0 break-words font-medium">{label}</span>
+      <input ref={ref} aria-label={`${label} PDF`} type="file" accept="application/pdf" className="block text-sm text-muted-foreground file:mr-2 file:rounded-full file:border file:border-border file:bg-secondary file:px-3 file:py-1 file:text-xs" onChange={() => setError(null)} />
+      <Button variant="outline" size="sm" className="rounded-full" disabled={up.isPending} onClick={() => up.mutate()}>
+        {up.isPending ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <FileUp className="mr-1.5 h-3.5 w-3.5" />}
+        Upload
+      </Button>
+      {error ? <span className="text-xs text-destructive">{error}</span> : null}
+    </div>
+  );
 }
 
 /** A field and its copy button. The check is not a UI flourish — it is the
@@ -130,9 +182,19 @@ export default function OrderDetail({
   ]);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
+  const articlesFirstRef = useRef<HTMLInputElement>(null);
+  const [confirmReset, setConfirmReset] = useState(false);
+  const unfile = useMutation({
+    mutationFn: () => api.post(`/api/admin/orders/${orderId}/unfiled`, {}),
+    onSuccess: () => {
+      setConfirmReset(false);
+      queryClient.invalidateQueries({ queryKey: ["admin", "orders"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "order", orderId] });
+    },
+  });
   const uploadArticles = useMutation({
     mutationFn: async () => {
-      const f = articlesRef.current?.files?.[0];
+      const f = articlesFirstRef.current?.files?.[0];
       if (!f) throw new Error("Choose the filed Articles PDF.");
       const fd = new FormData();
       fd.append("articles", f);
@@ -253,13 +315,19 @@ export default function OrderDetail({
                 fulfill dialog explains the taxpayer-number handling. */}
             {/* Ancillary services wait their turn: nothing to fulfill while
                 the base LLC is not even sent (Adam, 30 Aug 2026). */}
-            {d && d.status !== "paid" && services.length > 0 ? (
+            {d && d.status !== "paid" && (services.length > 0 || d.certStatusPurchased || d.certifiedCopyPurchased) ? (
               <section className="mt-3 rounded-xl border border-amber-500/40 bg-amber-500/5 p-4">
                 <div className="flex items-center gap-2">
                   <Landmark className="h-4 w-4 text-amber-700 dark:text-amber-400" />
                   <h3 className="font-display text-base">Service orders</h3>
                 </div>
                 <div className="mt-3 flex flex-col gap-2">
+                  {d.certStatusPurchased ? (
+                    <CertificateRow orderId={orderId} kind="certificate-of-status" label="Certificate of Status" uploaded={d.hasCertStatus} />
+                  ) : null}
+                  {d.certifiedCopyPurchased ? (
+                    <CertificateRow orderId={orderId} kind="certified-copy" label="Certified Copy of the Articles" uploaded={d.hasCertifiedCopy} />
+                  ) : null}
                   {services.map((s) => (
                     <div key={s.id} className="flex flex-wrap items-center gap-2 text-sm">
                       <span className="min-w-0 break-words font-medium">
@@ -302,47 +370,45 @@ export default function OrderDetail({
         ) : (
           <div className="space-y-8 px-6 py-6">
             {d.status === "paid" ? (
-              <div className="space-y-3">
-                {!d.hasArticles ? (
-                  <div className="rounded-lg border border-border p-3">
-                    <label htmlFor="upload-articles-first" className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
-                      Filed Articles of Organization
-                    </label>
-                    <input
-                      id="upload-articles-first"
-                      ref={articlesRef}
-                      type="file"
-                      accept="application/pdf"
-                      className="mt-1 block w-full text-sm"
-                      onChange={() => setUploadError(null)}
-                    />
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="mt-2 rounded-full"
-                      disabled={uploadArticles.isPending}
-                      onClick={() => uploadArticles.mutate()}
-                    >
-                      {uploadArticles.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileUp className="mr-2 h-4 w-4" />}
-                      Upload Articles
-                    </Button>
-                    {uploadError ? <p className="mt-2 text-sm text-destructive">{uploadError}</p> : null}
-                  </div>
-                ) : (
-                  <p className="flex items-center gap-2 text-sm text-trust">
-                    <Check className="h-4 w-4" /> Filed Articles uploaded
-                  </p>
-                )}
-                <Button onClick={onMarkFiled} disabled={markingFiled || !d.hasArticles} className="w-full rounded-full">
-                  {markingFiled ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                  Mark sent to the Division
-                </Button>
-                {!d.hasArticles ? (
-                  <p className="text-xs text-muted-foreground">
-                    Upload the filed Articles first — the order moves to With The State only once they are on file.
-                  </p>
-                ) : null}
-              </div>
+              <Button onClick={onMarkFiled} disabled={markingFiled} className="w-full rounded-full">
+                {markingFiled ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                Mark sent to the Division
+              </Button>
+            ) : null}
+
+            {/* With The State: the stamped Articles come back from the
+                Division days after submission — this is where they go up,
+                straight into the client's portal (Adam, 30 Aug 2026). */}
+            {d.status === "filed" ? (
+              !d.hasArticles ? (
+                <div className="rounded-lg border border-border p-3">
+                  <label htmlFor="upload-articles-first" className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+                    Filed Articles of Organization (from the Division)
+                  </label>
+                  <input
+                    id="upload-articles-first"
+                    ref={articlesFirstRef}
+                    type="file"
+                    accept="application/pdf"
+                    className="mt-1 block w-full text-sm"
+                    onChange={() => setUploadError(null)}
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-2 rounded-full"
+                    disabled={uploadArticles.isPending}
+                    onClick={() => uploadArticles.mutate()}
+                  >
+                    {uploadArticles.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileUp className="mr-2 h-4 w-4" />}
+                    Upload Articles
+                  </Button>
+                </div>
+              ) : (
+                <p className="flex items-center gap-2 text-sm text-trust">
+                  <Check className="h-4 w-4" /> Filed Articles uploaded — in the client's portal
+                </p>
+              )
             ) : null}
 
             {/* The panel follows Adam's filing sequence (30 Aug 2026):
@@ -356,6 +422,33 @@ export default function OrderDetail({
                 All series designations filed
               </Button>
             ) : null}
+            {d.status === "filed" ? (
+              <div>
+                {!confirmReset ? (
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive" onClick={() => setConfirmReset(true)}>
+                    Division rejected the filing…
+                  </Button>
+                ) : (
+                  <div className="rounded-lg border border-destructive/40 p-3 text-sm">
+                    <p>
+                      Send this order back to New Orders for resubmission? Every
+                      copied-field tick is cleared so the re-copy — usually under
+                      the alternate name — starts fresh.
+                    </p>
+                    <div className="mt-2 flex gap-2">
+                      <Button variant="outline" size="sm" className="rounded-full" onClick={() => setConfirmReset(false)}>
+                        Keep as is
+                      </Button>
+                      <Button size="sm" className="rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90" disabled={unfile.isPending} onClick={() => unfile.mutate()}>
+                        {unfile.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                        Back to New Orders
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : null}
+
             {d.seriesFiledAt ? (
               <p className="flex items-center gap-2 text-sm text-trust">
                 <Check className="h-4 w-4" />
@@ -363,9 +456,15 @@ export default function OrderDetail({
               </p>
             ) : null}
 
-            {d.groups.filter((g) =>
-              d.status === "paid" ? !g.series : d.status === "filed" && !d.seriesFiledAt ? !!g.series : false,
-            ).map((g) => (
+            {d.groups.filter((g) => {
+              if (d.status === "paid") return !g.series;
+              if (d.status === "filed") return !d.seriesFiledAt && !!g.series;
+              // Formed: while anything is still owed the panel shows only the
+              // work; once truly complete, the whole record is displayed.
+              const certsOwed = (d.certStatusPurchased && !d.hasCertStatus) || (d.certifiedCopyPurchased && !d.hasCertifiedCopy);
+              const openServices = services.some((sv) => serviceIsOpen(sv));
+              return !certsOwed && !openServices;
+            }).map((g) => (
               <section key={g.title}>
                 <h3 className="font-display text-base">{g.title}</h3>
                 <div className="mt-2 space-y-1.5">

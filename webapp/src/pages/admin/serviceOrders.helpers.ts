@@ -18,10 +18,14 @@ export function serviceLabel(s: AdminServiceOrder, llcName: string, long = false
   };
   if (s.type === "ein") return s.details.target === "series" ? `EIN — ${short(s.details.seriesName)}` : "EIN";
   if (s.type === "s-election") return long ? "S Election (2553)" : "S Election";
+  if (s.type === "certificate-of-status") return long ? "Certificate of Status" : "Cert. of Status";
+  if (s.type === "certified-copy") return long ? "Certified Copy of the Articles" : "Certified Copy";
   return `${short(s.details.seriesName) || "Series"} Designation`;
 }
 export function summaryOf(o: { type: string; details: AdminServiceOrder["details"]; llc_name: string }): string {
   if (o.type === "series") return o.details.seriesName ?? o.llc_name;
   if (o.type === "s-election") return `S Election (2553) — ${o.llc_name}`;
+  if (o.type === "certificate-of-status") return `Certificate of Status — ${o.llc_name}`;
+  if (o.type === "certified-copy") return `Certified Copy — ${o.llc_name}`;
   return `EIN — ${o.details.target === "series" ? o.details.seriesName ?? "series" : o.llc_name}`;
 }
