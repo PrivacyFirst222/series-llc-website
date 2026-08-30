@@ -16,6 +16,12 @@ argued unreachable; the esbuild/rollup/postcss/nanoid advisories left with
 Vite 5. The router's v7 runtime was verified in the browser: navigation
 works and the migration warnings are gone.
 
+UPDATE, 29 Aug 2026 (later) — @radix-ui/react-select added (the native
+select popup is drawn by the OS and truncates long options on iPadOS;
+every dropdown now renders through Radix, same family as the ten Radix
+packages already shipped). `bun audit` re-run: still 15 (12 high,
+3 moderate) — the addition carries no advisories.
+
 The remaining 15 (12 high, 3 moderate) live entirely in four glob/cache
 utilities inside the eslint and tailwind toolchains (brace-expansion,
 minimatch, picomatch, flatted) — build-time-only ReDoS, never shipped to

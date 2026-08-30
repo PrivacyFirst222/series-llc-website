@@ -1,4 +1,5 @@
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { NameCheck } from "../NameCheck";
 import { AcknowledgeBox, FieldShell } from "../FieldShell";
 import {
@@ -126,21 +127,21 @@ export function StepName({ data, patch, errors }: StepProps) {
             : "Standard designators only — switch to PLLC formation type if you need a professional designator."
         }
       >
-        <select
-          id="llc-designator"
-          value={data.llcDesignator}
-          onChange={(e) =>
-            patch({ llcDesignator: e.target.value as LlcDesignator })
-          }
-          className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+        <Select
+          value={data.llcDesignator || undefined}
+          onValueChange={(v) => patch({ llcDesignator: v as LlcDesignator })}
         >
-          <option value="">Select designator…</option>
-          {opts.map((d) => (
-            <option key={d} value={d}>
-              {d}
-            </option>
-          ))}
-        </select>
+          <SelectTrigger id="llc-designator">
+            <SelectValue placeholder="Select designator…" />
+          </SelectTrigger>
+          <SelectContent>
+            {opts.map((d) => (
+              <SelectItem key={d} value={d}>
+                {d}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </FieldShell>
 
       {designatorMismatch ? (

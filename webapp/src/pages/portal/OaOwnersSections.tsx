@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { Heart, Plus, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { QuestionCard } from "./OaQuestionCard";
 import { FORM_LABEL, type CoupleAnswer, type MemberAnswer, type SeriesAnswer, type Unit } from "./oaTypes";
 
@@ -123,33 +124,37 @@ export function SpousePairingCard({ owners, couples, unpaired, onPair, onUnpair 
                     {unpaired.length >= 2 ? (
                       <div className="space-y-2 rounded-lg border border-dashed border-border p-3">
                         <div className="flex flex-wrap items-center gap-2 text-sm">
-                          <select
-                            aria-label="First spouse"
-                            value={pairA}
-                            onChange={(e) => setPairA(e.target.value === "" ? "" : Number(e.target.value))}
-                            className="rounded-md border border-border bg-background px-2 py-1.5 text-sm"
+                          <Select
+                            value={pairA === "" ? "" : String(pairA)}
+                            onValueChange={(v) => setPairA(Number(v))}
                           >
-                            <option value="">Select spouse…</option>
-                            {unpaired.map((m) => (
-                              <option key={m.i} value={m.i} disabled={pairB === m.i}>
-                                {m.name}
-                              </option>
-                            ))}
-                          </select>
+                            <SelectTrigger aria-label="First spouse" className="h-9 w-auto min-w-[11rem]">
+                              <SelectValue placeholder="Select spouse…" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {unpaired.map((m) => (
+                                <SelectItem key={m.i} value={String(m.i)} disabled={pairB === m.i}>
+                                  {m.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                           <span className="text-muted-foreground">and</span>
-                          <select
-                            aria-label="Second spouse"
-                            value={pairB}
-                            onChange={(e) => setPairB(e.target.value === "" ? "" : Number(e.target.value))}
-                            className="rounded-md border border-border bg-background px-2 py-1.5 text-sm"
+                          <Select
+                            value={pairB === "" ? "" : String(pairB)}
+                            onValueChange={(v) => setPairB(Number(v))}
                           >
-                            <option value="">Select spouse…</option>
-                            {unpaired.map((m) => (
-                              <option key={m.i} value={m.i} disabled={pairA === m.i}>
-                                {m.name}
-                              </option>
-                            ))}
-                          </select>
+                            <SelectTrigger aria-label="Second spouse" className="h-9 w-auto min-w-[11rem]">
+                              <SelectValue placeholder="Select spouse…" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {unpaired.map((m) => (
+                                <SelectItem key={m.i} value={String(m.i)} disabled={pairA === m.i}>
+                                  {m.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </div>
                         <div className="flex flex-wrap items-center gap-4 text-sm">
                           <label className="flex items-center gap-1.5">

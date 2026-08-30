@@ -1,6 +1,7 @@
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FieldShell } from "./FieldShell";
 import { AddressFieldsBlock } from "./AddressFields";
 import { US_STATES } from "./us-states";
@@ -69,19 +70,20 @@ export function RepeatablePartyFields({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FieldShell label="Type" required htmlFor={`party-${entry.id}-type`}>
-              <select
-                id={`party-${entry.id}-type`}
+              <Select
                 value={entry.personOrEntity}
-                onChange={(e) =>
-                  update(entry.id, {
-                    personOrEntity: e.target.value as PartyKind,
-                  })
+                onValueChange={(v) =>
+                  update(entry.id, { personOrEntity: v as PartyKind })
                 }
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
               >
-                <option value="INDIVIDUAL">Individual</option>
-                <option value="ENTITY">Business Entity</option>
-              </select>
+                <SelectTrigger id={`party-${entry.id}-type`}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="INDIVIDUAL">Individual</SelectItem>
+                  <SelectItem value="ENTITY">Business Entity</SelectItem>
+                </SelectContent>
+              </Select>
             </FieldShell>
 
             {entry.personOrEntity === "INDIVIDUAL" ? (

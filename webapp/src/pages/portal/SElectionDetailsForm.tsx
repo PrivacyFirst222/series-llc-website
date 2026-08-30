@@ -6,6 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 import { PlusCircle, Trash2, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DialogFooter } from "@/components/ui/dialog";
 import { api, ApiError } from "@/lib/api";
 import { AddressAutocomplete } from "@/components/forms/florida-llc/AddressAutocomplete";
@@ -159,11 +160,9 @@ export function SElectionDetailsForm({
               {/* Owners are usually the members on the formation record —
                   choosing one fills in the address we already verified. */}
               <div className="space-y-1.5">
-                <select
-                  aria-label="Owner"
+                <Select
                   value={members.some((m) => m.name === r.name) ? r.name : r.name === "" ? "" : OTHER}
-                  onChange={(e) => {
-                    const v = e.target.value;
+                  onValueChange={(v) => {
                     if (v === OTHER) {
                       patchRow(i, { name: " ", address: r.address, verified: false });
                       return;
@@ -171,16 +170,19 @@ export function SElectionDetailsForm({
                     const m = members.find((mm) => mm.name === v);
                     patchRow(i, { name: v, address: m?.address ?? r.address, verified: Boolean(m?.address) });
                   }}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                 >
-                  <option value="">Select an owner…</option>
-                  {members.map((m) => (
-                    <option key={m.name} value={m.name}>
-                      {m.name}
-                    </option>
-                  ))}
-                  <option value={OTHER}>Other — enter a name</option>
-                </select>
+                  <SelectTrigger aria-label="Owner">
+                    <SelectValue placeholder="Select an owner…" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {members.map((m) => (
+                      <SelectItem key={m.name} value={m.name}>
+                        {m.name}
+                      </SelectItem>
+                    ))}
+                    <SelectItem value={OTHER}>Other — enter a name</SelectItem>
+                  </SelectContent>
+                </Select>
                 {r.name !== "" && !members.some((m) => m.name === r.name) ? (
                   <Input
                     placeholder="Owner's full legal name"

@@ -1,4 +1,5 @@
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FieldShell } from "./FieldShell";
 import { US_STATES } from "./us-states";
 import { AddressAutocomplete } from "./AddressAutocomplete";
@@ -88,20 +89,22 @@ export function AddressFieldsBlock({
         error={errors?.state}
         className="md:col-span-2"
       >
-        <select
-          id={`${prefix}-state`}
-          value={value.state}
-          onChange={(e) => set("state", e.target.value)}
+        <Select
+          value={value.state || undefined}
+          onValueChange={(v) => set("state", v)}
           disabled={Boolean(lockState)}
-          className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-70"
         >
-          <option value="">Select…</option>
-          {US_STATES.map((s) => (
-            <option key={s.code} value={s.code}>
-              {s.code} — {s.name}
-            </option>
-          ))}
-        </select>
+          <SelectTrigger id={`${prefix}-state`}>
+            <SelectValue placeholder="Select…" />
+          </SelectTrigger>
+          <SelectContent>
+            {US_STATES.map((s) => (
+              <SelectItem key={s.code} value={s.code}>
+                {s.code} — {s.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </FieldShell>
 
       <FieldShell

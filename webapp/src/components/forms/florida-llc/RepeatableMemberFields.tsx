@@ -1,6 +1,7 @@
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FieldShell } from "./FieldShell";
 import { AddressFieldsBlock } from "./AddressFields";
 import type { MemberEntry, PartyKind } from "./types";
@@ -65,19 +66,20 @@ export function RepeatableMemberFields({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FieldShell label="Member type" required htmlFor={`member-${entry.id}-type`}>
-              <select
-                id={`member-${entry.id}-type`}
+              <Select
                 value={entry.memberType}
-                onChange={(e) =>
-                  update(entry.id, {
-                    memberType: e.target.value as PartyKind,
-                  })
+                onValueChange={(v) =>
+                  update(entry.id, { memberType: v as PartyKind })
                 }
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
               >
-                <option value="INDIVIDUAL">Individual</option>
-                <option value="ENTITY">Entity</option>
-              </select>
+                <SelectTrigger id={`member-${entry.id}-type`}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="INDIVIDUAL">Individual</SelectItem>
+                  <SelectItem value="ENTITY">Entity</SelectItem>
+                </SelectContent>
+              </Select>
             </FieldShell>
 
             {entry.memberType === "INDIVIDUAL" ? (

@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { PlusCircle, Landmark, ShoppingBag, Lock, FileCheck2, Download, FileSignature } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { api, ApiError } from "@/lib/api";
 
@@ -757,20 +758,30 @@ export function ServicesCard() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Principal activity</label>
-                <select name="activity" defaultValue="Real estate" className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
-                  {["Real estate", "Rental & leasing", "Construction", "Retail", "Finance & insurance", "Health care & social assistance", "Accommodation & food service", "Transportation & warehousing", "Manufacturing", "Wholesale", "Other"].map((a) => (
-                    <option key={a} value={a}>{a}</option>
-                  ))}
-                </select>
+                <label htmlFor="ein-activity" className="text-sm font-medium">Principal activity</label>
+                <Select name="activity" defaultValue="Real estate">
+                  <SelectTrigger id="ein-activity">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {["Real estate", "Rental & leasing", "Construction", "Retail", "Finance & insurance", "Health care & social assistance", "Accommodation & food service", "Transportation & warehousing", "Manufacturing", "Wholesale", "Other"].map((a) => (
+                      <SelectItem key={a} value={a}>{a}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Closing month of accounting year</label>
-                <select name="closingMonth" defaultValue="December" className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
-                  {["January","February","March","April","May","June","July","August","September","October","November","December"].map((m) => (
-                    <option key={m} value={m}>{m}</option>
-                  ))}
-                </select>
+                <label htmlFor="ein-closing-month" className="text-sm font-medium">Closing month of accounting year</label>
+                <Select name="closingMonth" defaultValue="December">
+                  <SelectTrigger id="ein-closing-month">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {["January","February","March","April","May","June","July","August","September","October","November","December"].map((m) => (
+                      <SelectItem key={m} value={m}>{m}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             <div className="space-y-1.5">
