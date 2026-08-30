@@ -310,53 +310,6 @@ export default function OrderDetail({
                 ""
               )}
             </p>
-            {/* Adam's spec: the service orders sit right here, first thing
-                after the name verdicts — the extra prose is gone; the
-                fulfill dialog explains the taxpayer-number handling. */}
-            {/* Ancillary services wait their turn: nothing to fulfill while
-                the base LLC is not even sent (Adam, 30 Aug 2026). */}
-            {d && d.status !== "paid" && (services.length > 0 || d.certStatusPurchased || d.certifiedCopyPurchased) ? (
-              <section className="mt-3 rounded-xl border border-amber-500/40 bg-amber-500/5 p-4">
-                <div className="flex items-center gap-2">
-                  <Landmark className="h-4 w-4 text-amber-700 dark:text-amber-400" />
-                  <h3 className="font-display text-base">Service orders</h3>
-                </div>
-                <div className="mt-3 flex flex-col gap-2">
-                  {d.certStatusPurchased ? (
-                    <CertificateRow orderId={orderId} kind="certificate-of-status" label="Certificate of Status" uploaded={d.hasCertStatus} />
-                  ) : null}
-                  {d.certifiedCopyPurchased ? (
-                    <CertificateRow orderId={orderId} kind="certified-copy" label="Certified Copy of the Articles" uploaded={d.hasCertifiedCopy} />
-                  ) : null}
-                  {services.map((s) => (
-                    <div key={s.id} className="flex flex-wrap items-center gap-2 text-sm">
-                      <span className="min-w-0 break-words font-medium">
-                        {serviceLabel(s, d.llcName, true)}
-                      </span>
-                      {serviceIsOpen(s) ? (
-                        <>
-                          <span className="text-xs text-muted-foreground">
-                            {s.status.replace(/_/g, " ")}
-                          </span>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="ml-auto rounded-full"
-                            onClick={() => onFulfill(s)}
-                          >
-                            {s.type === "ein" && s.has_secret ? "View & fulfill" : "Fulfill"}
-                          </Button>
-                        </>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 text-xs text-trust">
-                          <Check className="h-3.5 w-3.5" /> fulfilled
-                        </span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </section>
-            ) : null}
           </div>
           <Button variant="ghost" size="sm" onClick={onClose} aria-label="Close">
             <X className="h-4 w-4" />
@@ -411,82 +364,13 @@ export default function OrderDetail({
               )
             ) : null}
 
-            {/* The panel follows Adam's filing sequence (30 Aug 2026):
-                New Orders shows the base Articles' fields alone — series
-                designations cannot be filed until the LLC exists. With The
-                State swaps to the series section and its own done-button;
-                the base fields are finished business. Formed shows neither. */}
-            {d.status === "filed" && !d.seriesFiledAt ? (
-              <Button onClick={() => seriesFiled.mutate()} disabled={seriesFiled.isPending} className="w-full rounded-full">
-                {seriesFiled.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                All series designations filed
-              </Button>
-            ) : null}
-            {d.status === "filed" ? (
-              <div>
-                {!confirmReset ? (
-                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive" onClick={() => setConfirmReset(true)}>
-                    Division rejected the filing…
-                  </Button>
-                ) : (
-                  <div className="rounded-lg border border-destructive/40 p-3 text-sm">
-                    <p>
-                      Send this order back to New Orders for resubmission? Every
-                      copied-field tick is cleared so the re-copy — usually under
-                      the alternate name — starts fresh.
-                    </p>
-                    <div className="mt-2 flex gap-2">
-                      <Button variant="outline" size="sm" className="rounded-full" onClick={() => setConfirmReset(false)}>
-                        Keep as is
-                      </Button>
-                      <Button size="sm" className="rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90" disabled={unfile.isPending} onClick={() => unfile.mutate()}>
-                        {unfile.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                        Back to New Orders
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : null}
-
-            {d.seriesFiledAt ? (
-              <p className="flex items-center gap-2 text-sm text-trust">
-                <Check className="h-4 w-4" />
-                Series designations filed {new Date(d.seriesFiledAt).toLocaleDateString()}
-              </p>
-            ) : null}
-
-            {d.groups.filter((g) => {
-              if (d.status === "paid") return !g.series;
-              if (d.status === "filed") return !d.seriesFiledAt && !!g.series;
-              // Formed: while anything is still owed the panel shows only the
-              // work; once truly complete, the whole record is displayed.
-              const certsOwed = (d.certStatusPurchased && !d.hasCertStatus) || (d.certifiedCopyPurchased && !d.hasCertifiedCopy);
-              const openServices = services.some((sv) => serviceIsOpen(sv));
-              return !certsOwed && !openServices;
-            }).map((g) => (
-              <section key={g.title}>
-                <h3 className="font-display text-base">{g.title}</h3>
-                <div className="mt-2 space-y-1.5">
-                  {g.fields.map((f) => (
-                    <Field
-                      key={f.key}
-                      field={f}
-                      copied={!!d.copiedFields[f.key]}
-                      onCopied={(key, copied) => setCopied.mutate({ key, copied })}
-                    />
-                  ))}
-                </div>
-              </section>
-            ))}
-
             {d.status !== "paid" ? (
             <section>
               <h3 className="font-display text-base">Formation documents</h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                {d.hasArticles
-                  ? "Upload the Protected Series Designations. One designation may cover several series — tick the ones each file covers. This marks the order formed and emails the client."
-                  : "Upload the filed Articles and the Protected Series Designations. One designation may cover several series — tick the ones each file covers. This marks the order formed and emails the client."}
+                Upload the Protected Series Designations. One designation may
+                cover several series — tick the ones each file covers. This
+                marks the order formed and emails the client.
               </p>
 
               {d.documents.length > 0 ? (
@@ -502,21 +386,6 @@ export default function OrderDetail({
 
               {d.status !== "formed" ? (
                 <div className="mt-4 space-y-3">
-                  {!d.hasArticles ? (
-                  <div>
-                    <label htmlFor="upload-articles" className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
-                      Articles of Organization
-                    </label>
-                    <input
-                      id="upload-articles"
-                      ref={articlesRef}
-                      type="file"
-                      accept="application/pdf"
-                      className="mt-1 block w-full text-sm"
-                      onChange={() => setUploadError(null)}
-                    />
-                  </div>
-                  ) : null}
 
                   {psdRows.map((row, i) => (
                     <div key={i} className="rounded-lg border border-border p-3">
@@ -599,7 +468,7 @@ export default function OrderDetail({
                     ) : (
                       <FileUp className="mr-2 h-4 w-4" />
                     )}
-                    {d.hasArticles ? "Upload designations and mark formed" : "Upload and mark formed"}
+                    Upload designations and mark formed
                   </Button>
                 </div>
               ) : (
@@ -610,6 +479,122 @@ export default function OrderDetail({
               )}
             </section>
             ) : null}
+
+            {/* The filing sequence, top to bottom: Articles first, the
+                designation uploads right under them, and only then the
+                ancillary services (Adam, 30 Aug 2026). */}
+            {d && d.status !== "paid" && (services.length > 0 || d.certStatusPurchased || d.certifiedCopyPurchased) ? (
+              <section className="mt-3 rounded-xl border border-amber-500/40 bg-amber-500/5 p-4">
+                <div className="flex items-center gap-2">
+                  <Landmark className="h-4 w-4 text-amber-700 dark:text-amber-400" />
+                  <h3 className="font-display text-base">Service orders</h3>
+                </div>
+                <div className="mt-3 flex flex-col gap-2">
+                  {d.certStatusPurchased ? (
+                    <CertificateRow orderId={orderId} kind="certificate-of-status" label="Certificate of Status" uploaded={d.hasCertStatus} />
+                  ) : null}
+                  {d.certifiedCopyPurchased ? (
+                    <CertificateRow orderId={orderId} kind="certified-copy" label="Certified Copy of the Articles" uploaded={d.hasCertifiedCopy} />
+                  ) : null}
+                  {services.map((s) => (
+                    <div key={s.id} className="flex flex-wrap items-center gap-2 text-sm">
+                      <span className="min-w-0 break-words font-medium">
+                        {serviceLabel(s, d.llcName, true)}
+                      </span>
+                      {serviceIsOpen(s) ? (
+                        <>
+                          <span className="text-xs text-muted-foreground">
+                            {s.status.replace(/_/g, " ")}
+                          </span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="ml-auto rounded-full"
+                            onClick={() => onFulfill(s)}
+                          >
+                            {s.type === "ein" && s.has_secret ? "View & fulfill" : "Fulfill"}
+                          </Button>
+                        </>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-xs text-trust">
+                          <Check className="h-3.5 w-3.5" /> fulfilled
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ) : null}
+
+            {/* The panel follows Adam's filing sequence (30 Aug 2026):
+                New Orders shows the base Articles' fields alone — series
+                designations cannot be filed until the LLC exists. With The
+                State swaps to the series section and its own done-button;
+                the base fields are finished business. Formed shows neither. */}
+            {d.status === "filed" && !d.seriesFiledAt ? (
+              <Button onClick={() => seriesFiled.mutate()} disabled={seriesFiled.isPending} className="w-full rounded-full">
+                {seriesFiled.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                All series designations filed
+              </Button>
+            ) : null}
+            {d.status === "filed" ? (
+              <div>
+                {!confirmReset ? (
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive" onClick={() => setConfirmReset(true)}>
+                    Division rejected the filing…
+                  </Button>
+                ) : (
+                  <div className="rounded-lg border border-destructive/40 p-3 text-sm">
+                    <p>
+                      Send this order back to New Orders for resubmission? Every
+                      copied-field tick is cleared so the re-copy — usually under
+                      the alternate name — starts fresh.
+                    </p>
+                    <div className="mt-2 flex gap-2">
+                      <Button variant="outline" size="sm" className="rounded-full" onClick={() => setConfirmReset(false)}>
+                        Keep as is
+                      </Button>
+                      <Button size="sm" className="rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90" disabled={unfile.isPending} onClick={() => unfile.mutate()}>
+                        {unfile.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                        Back to New Orders
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : null}
+
+            {d.seriesFiledAt ? (
+              <p className="flex items-center gap-2 text-sm text-trust">
+                <Check className="h-4 w-4" />
+                Series designations filed {new Date(d.seriesFiledAt).toLocaleDateString()}
+              </p>
+            ) : null}
+
+            {d.groups.filter((g) => {
+              if (d.status === "paid") return !g.series;
+              if (d.status === "filed") return !d.seriesFiledAt && !!g.series;
+              // Formed: while anything is still owed the panel shows only the
+              // work; once truly complete, the whole record is displayed.
+              const certsOwed = (d.certStatusPurchased && !d.hasCertStatus) || (d.certifiedCopyPurchased && !d.hasCertifiedCopy);
+              const openServices = services.some((sv) => serviceIsOpen(sv));
+              return !certsOwed && !openServices;
+            }).map((g) => (
+              <section key={g.title}>
+                <h3 className="font-display text-base">{g.title}</h3>
+                <div className="mt-2 space-y-1.5">
+                  {g.fields.map((f) => (
+                    <Field
+                      key={f.key}
+                      field={f}
+                      copied={!!d.copiedFields[f.key]}
+                      onCopied={(key, copied) => setCopied.mutate({ key, copied })}
+                    />
+                  ))}
+                </div>
+              </section>
+            ))}
+
           </div>
         )}
       </div>
