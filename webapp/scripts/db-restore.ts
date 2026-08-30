@@ -47,6 +47,7 @@ const ORDER = [
   "library_documents",
   "webhook_events",
   "fl_sync_state",
+  "contact_messages",
 ];
 const tableNames = ORDER.filter((t) => t in dump.tables);
 

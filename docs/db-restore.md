@@ -5,7 +5,7 @@
 Every night at 08:15 UTC a Vercel cron job dumps the
 irreplaceable tables — clients, orders, service orders, document metadata,
 operating-agreement profiles and generations, library metadata, webhook
-events, and the Sunbiz sync watermark — as gzipped JSON into **private
+events, contact-form messages, and the Sunbiz sync watermark — as gzipped JSON into **private
 Vercel Blob storage** under `backups/db-YYYY-MM-DD-HHMMSS.json.gz`. (The
 schedule is fixed in UTC, so the Eastern clock time shifts with daylight
 saving: 4:15 AM EDT in summer, 3:15 AM EST in winter.) Every backup is

@@ -95306,8 +95306,21 @@ CREATE TABLE IF NOT EXISTS fl_sync_state (
   updated_at timestamptz
 )`
 ];
+var MIGRATION_002_STATEMENTS = [
+  // Messages from the public contact form. Until 30 Aug 2026 the form sent
+  // nothing anywhere while telling the visitor a specialist would reply
+  // (P51) — every message now lands here AND in Adam's inbox.
+  `CREATE TABLE IF NOT EXISTS contact_messages (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )`
+];
 var MIGRATIONS = [
-  { id: 1, name: "initial-schema", statements: MIGRATION_001_STATEMENTS }
+  { id: 1, name: "initial-schema", statements: MIGRATION_001_STATEMENTS },
+  { id: 2, name: "contact-messages", statements: MIGRATION_002_STATEMENTS }
   // Append future migrations here with the next id. Never edit an entry.
 ];
 function migrationChecksum(statements) {
@@ -107460,6 +107473,36 @@ function registerPaymentRoutes(app2) {
     }
     return c.json({ data: { ok: true } });
   });
+  const contactSchema = external_exports.object({
+    name: external_exports.string().trim().min(1).max(200),
+    email: external_exports.string().trim().email().max(320),
+    message: external_exports.string().trim().min(1).max(5e3)
+  });
+  app2.post("/contact", async (c) => {
+    if (!await rateLimit(`contact:${clientIp(c)}`, 5, 36e5)) {
+      return c.json(err("Too many messages. Please try again in an hour.", "RATE_LIMITED"), 429);
+    }
+    const body = contactSchema.safeParse(await c.req.json().catch(() => null));
+    if (!body.success) {
+      return c.json(err("Please provide your name, a valid email, and a message.", "INVALID_INPUT"), 400);
+    }
+    const { name, email, message } = body.data;
+    const db = await getDb();
+    await db.query(
+      "INSERT INTO contact_messages (name, email, message) VALUES ($1, $2, $3)",
+      [name, email, message]
+    );
+    if (env.ADMIN_NOTIFY_EMAIL) {
+      const esc = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      await sendMail({
+        to: env.ADMIN_NOTIFY_EMAIL,
+        subject: `Contact form: ${name}`,
+        replyTo: email,
+        html: `<p><strong>${esc(name)}</strong> &lt;${esc(email)}&gt; wrote:</p><p>${esc(message).replace(/\n/g, "<br>")}</p>`
+      });
+    }
+    return c.json({ data: { ok: true } });
+  });
   app2.post("/name-check", async (c) => {
     if (!await rateLimit(`namecheck:${clientIp(c)}`, 30, 6e5)) {
       return c.json(err("Too many checks. Try again in a few minutes.", "RATE_LIMITED"), 429);
@@ -107492,7 +107535,8 @@ var BACKUP_TABLES = [
   "oa_generations",
   "library_documents",
   "webhook_events",
-  "fl_sync_state"
+  "fl_sync_state",
+  "contact_messages"
 ];
 var PREFIX = "backups/";
 async function putBackup(name, data) {
@@ -108644,6 +108688,15 @@ function registerAdminRoutes(app2) {
     } finally {
       await db.query("UPDATE orders SET replacing_at = NULL WHERE id = $1", [o.id]).catch((e) => console.error("[formation] claim release failed:", e));
     }
+  });
+  app2.get("/admin/contact-messages", async (c) => {
+    const admin = await requireAdmin(c);
+    if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+    const db = await getDb();
+    const rows = await db.query(
+      "SELECT id, name, email, message, created_at FROM contact_messages ORDER BY created_at DESC LIMIT 200"
+    );
+    return c.json({ data: rows });
   });
   app2.get("/admin/clients", async (c) => {
     const admin = await requireAdmin(c);

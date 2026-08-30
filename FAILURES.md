@@ -2552,6 +2552,53 @@ failure — the exact class shipped here can no longer be committed at all,
 and the full suite remains CI's gate on every push. A resolution decayed
 once; the hook cannot.
 
+## P51 — The contact form lied to every prospect, through fifteen audits
+
+### THE FAILURE
+
+Adam: "Why wasn't this caught earlier? It's a pretty serious error."
+
+The Contact page's form validates the visitor's name and email, waits 700
+milliseconds for effect, then reports "Got it — we'll be in touch! A
+formation specialist will reply by email within one business day" and
+clears the fields. It sends nothing: no API call, no email, no stored
+record. Every message typed into it since the page shipped has been
+discarded while its author was being promised a reply. The site went live
+and took orders with this form on it. Fifteen external audits, my own
+full-site label audit, rendering sweeps at two widths, and a 288-check
+e2e suite all passed over it. It was found on 30 August 2026 only because
+Adam's toast rule happened to require editing the adjacent lines.
+
+### WHY IT HAPPENED
+
+Every gate I built or ran defines coverage as the union of what its
+instrument can see. The e2e suite exercises the API — the contact form
+calls no API, so the suite had literally no thread to pull. The browser
+audits measured what pages ARE (rendered, labeled, unclipped), never what
+controls DO when used. The external audits inherited the same shape:
+render every route, submit nothing. A form whose failure mode is a
+convincing success message is invisible to every instrument that trusts
+success signals — and all of mine do.
+
+The deeper cause is that no inventory of the site's PROMISES exists. The
+coverage maps I maintain enumerate statutes and provisions because Adam
+demanded those ledgers; nobody — including me, fifteen times — wrote the
+one-page ledger that says "every interactive control, what it claims to
+do, and where that claim is proven." I audited the contact form's labels
+this week and read the file's toast calls yesterday, and both times I
+read it for the thing I came to change, not for what it does — the exact
+failure the read-for-substance rule describes, committed inside the file
+where committing it was cheapest.
+
+### FIXED BY
+
+A real /api/contact endpoint: validated, rate-limited, the message stored
+in contact_messages (backed up nightly with everything else) and emailed
+to Adam through the same delivery as order mail; the form reports success
+only after the server accepts, and a failure keeps the visitor's text in
+the fields under a persistent error toast. e2e proves a submitted message
+is stored and retrievable and that garbage is refused.
+
 ## Process — the ones that let the substantive ones through
 
 **M1 · Verify the proposition you set out to verify, not the one underneath.** A

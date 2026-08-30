@@ -24,6 +24,7 @@ export const BACKUP_TABLES = [
   "library_documents",
   "webhook_events",
   "fl_sync_state",
+  "contact_messages",
 ] as const;
 
 const PREFIX = "backups/";

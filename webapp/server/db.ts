@@ -304,8 +304,22 @@ CREATE TABLE IF NOT EXISTS fl_sync_state (
 )`,
 ];
 
+const MIGRATION_002_STATEMENTS: string[] = [
+  // Messages from the public contact form. Until 30 Aug 2026 the form sent
+  // nothing anywhere while telling the visitor a specialist would reply
+  // (P51) — every message now lands here AND in Adam's inbox.
+  `CREATE TABLE IF NOT EXISTS contact_messages (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )`,
+];
+
 const MIGRATIONS: { id: number; name: string; statements: string[] }[] = [
   { id: 1, name: "initial-schema", statements: MIGRATION_001_STATEMENTS },
+  { id: 2, name: "contact-messages", statements: MIGRATION_002_STATEMENTS },
   // Append future migrations here with the next id. Never edit an entry.
 ];
 

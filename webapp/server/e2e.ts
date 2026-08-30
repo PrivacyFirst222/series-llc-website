@@ -501,6 +501,23 @@ check("client account auto-created on payment", !!client && !client.has_password
     memBlank.body);
 }
 
+// 5d. The contact form's promise is real now: a message is stored, listed
+//     for the admin, and garbage is refused. Until 30 Aug 2026 the form sent
+//     NOTHING while promising a reply within a business day (P51) — no check
+//     could fail because no API existed to check.
+{
+  const sent = await api("/api/contact", { method: "POST", body: JSON.stringify({
+    name: "E2E Prospect", email: "prospect@e2e.test", message: "Is a series LLC right for four rentals?",
+  })});
+  check("a contact message is accepted", sent.status === 200, sent.body);
+  const inbox = await api("/api/admin/contact-messages", { cookies: admin.cookie });
+  const mine = (inbox.body?.data as { email: string; message: string }[] | undefined)?.find((m) => m.email === "prospect@e2e.test");
+  check("the contact message is stored and retrievable by the admin",
+    !!mine && mine.message.includes("four rentals"), inbox.body?.data?.length);
+  const garbage = await api("/api/contact", { method: "POST", body: JSON.stringify({ name: "", email: "not-an-email", message: "" }) });
+  check("a garbage contact submission is refused", garbage.status === 400, garbage.status);
+}
+
 // 6. Duplicate fulfillment is a no-op (idempotency)
 await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId }) });
 const clients2 = await api("/api/admin/clients", { cookies: admin.cookie });

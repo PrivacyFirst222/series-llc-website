@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { api, ApiError } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -39,14 +40,30 @@ export default function Contact() {
       return;
     }
     setSubmitting(true);
-    setTimeout(() => {
-      setSubmitting(false);
-      toast({
-        title: "Got it — we'll be in touch!",
-        description: "A formation specialist will reply by email within one business day.",
-      });
-      setForm(INITIAL);
-    }, 700);
+    // The acknowledgment is earned, not staged: until 30 Aug 2026 this
+    // handler sent nothing anywhere and told the visitor we would reply
+    // (P51). Success clears the form only after the server has stored and
+    // forwarded the message; failure keeps their text right here.
+    api
+      .post("/api/contact", { name: form.name, email: form.email, message: form.message })
+      .then(() => {
+        toast({
+          title: "Got it — we'll be in touch!",
+          description: "A formation specialist will reply by email within one business day.",
+        });
+        setForm(INITIAL);
+      })
+      .catch((err: unknown) => {
+        toast({
+          duration: Infinity,
+          title: "Your message was not sent.",
+          description:
+            err instanceof ApiError && err.message
+              ? err.message
+              : "Please try again, or email us directly. Your text is still below.",
+        });
+      })
+      .finally(() => setSubmitting(false));
   };
 
   return (

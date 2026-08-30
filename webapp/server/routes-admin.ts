@@ -565,6 +565,18 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
   }
 });
 
+// Contact-form messages, newest first. The email to the notify address is
+// the primary channel; this is the durable record behind it (P51).
+app.get("/admin/contact-messages", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const db = await getDb();
+  const rows = await db.query(
+    "SELECT id, name, email, message, created_at FROM contact_messages ORDER BY created_at DESC LIMIT 200",
+  );
+  return c.json({ data: rows });
+});
+
 app.get("/admin/clients", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);

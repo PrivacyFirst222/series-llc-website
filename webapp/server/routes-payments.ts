@@ -560,6 +560,41 @@ app.post("/orders/:id/resend-welcome", async (c) => {
  *  Corporations' public data files (server/sunbiz.ts). Public: the intake
  *  name step calls it before an order exists. Verdicts say "no conflict
  *  found", never "available" — the Division makes the final determination. */
+// The public contact form. Until 30 Aug 2026 this form SENT NOTHING — it
+// told the visitor a specialist would reply within a business day, then
+// discarded the message (P51). Now: stored (and so backed up nightly),
+// emailed to the notify address, and acknowledged only after both.
+const contactSchema = z.object({
+  name: z.string().trim().min(1).max(200),
+  email: z.string().trim().email().max(320),
+  message: z.string().trim().min(1).max(5000),
+});
+app.post("/contact", async (c) => {
+  if (!(await rateLimit(`contact:${clientIp(c)}`, 5, 3600_000))) {
+    return c.json(err("Too many messages. Please try again in an hour.", "RATE_LIMITED"), 429);
+  }
+  const body = contactSchema.safeParse(await c.req.json().catch(() => null));
+  if (!body.success) {
+    return c.json(err("Please provide your name, a valid email, and a message.", "INVALID_INPUT"), 400);
+  }
+  const { name, email, message } = body.data;
+  const db = await getDb();
+  await db.query(
+    "INSERT INTO contact_messages (name, email, message) VALUES ($1, $2, $3)",
+    [name, email, message],
+  );
+  if (env.ADMIN_NOTIFY_EMAIL) {
+    const esc = (t: string) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    await sendMail({
+      to: env.ADMIN_NOTIFY_EMAIL,
+      subject: `Contact form: ${name}`,
+      replyTo: email,
+      html: `<p><strong>${esc(name)}</strong> &lt;${esc(email)}&gt; wrote:</p><p>${esc(message).replace(/\n/g, "<br>")}</p>`,
+    });
+  }
+  return c.json({ data: { ok: true } });
+});
+
 app.post("/name-check", async (c) => {
   if (!(await rateLimit(`namecheck:${clientIp(c)}`, 30, 600_000))) {
     return c.json(err("Too many checks. Try again in a few minutes.", "RATE_LIMITED"), 429);
