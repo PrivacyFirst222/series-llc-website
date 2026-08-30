@@ -14,6 +14,7 @@ interface FilingField {
   label: string;
   value: string;
   block?: boolean;
+  statement?: boolean;
 }
 interface FilingGroup {
   title: string;
@@ -62,6 +63,18 @@ function Field({
     setTimeout(() => setFlash(false), 900);
     onCopied(field.key, true);
   };
+  // Context rows (filing type, the fee, leave-blank advice) are statements:
+  // nothing to enter on Sunbiz, so no tick to track and nothing to copy.
+  if (field.statement) {
+    return (
+      <div className="rounded-lg border border-border bg-secondary/30 px-3 py-2">
+        <div className="text-xs uppercase tracking-[0.12em] text-muted-foreground">{field.label}</div>
+        <div className={cn("mt-0.5 text-sm", field.block ? "leading-relaxed" : "truncate")}>
+          {field.value}
+        </div>
+      </div>
+    );
+  }
   return (
     <div
       className={cn(

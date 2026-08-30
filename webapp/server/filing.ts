@@ -28,6 +28,9 @@ export interface FilingField {
   value: string;
   /** Long values (addresses, purpose text) render as a block, not a line. */
   block?: boolean;
+  /** Context, not a value to enter on Sunbiz — rendered as a plain statement
+   *  with no copied-tick and no copy button (Adam, 30 Aug 2026). */
+  statement?: boolean;
 }
 
 export interface FilingGroup {
@@ -194,6 +197,7 @@ export function filingGroups(payload: unknown): FilingGroup[] {
         key: "filingPath",
         label: "Filing",
         value: p.filingPath === "CONVERT" ? "Conversion of an existing entity" : "New Florida LLC",
+        statement: true,
       },
       ...(p.filingPath === "CONVERT"
         ? [
@@ -208,8 +212,11 @@ export function filingGroups(payload: unknown): FilingGroup[] {
           p.effectiveDate?.option === "SPECIFIC"
             ? p.effectiveDate?.requestedEffectiveDate ?? ""
             : "Leave blank — effective on the date of filing",
+        // A requested date is a VALUE to enter on Sunbiz and keeps its copy
+        // button; the leave-blank default is only advice.
+        statement: p.effectiveDate?.option !== "SPECIFIC",
       },
-      { key: "filingFee", label: "Required filing fee", value: "$125.00" },
+      { key: "filingFee", label: "Required filing fee", value: "$125.00", statement: true },
       {
         key: "certStatus",
         label: "Certificate of Status ($5.00)",

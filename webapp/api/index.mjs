@@ -105380,7 +105380,8 @@ function filingGroups(payload) {
       {
         key: "filingPath",
         label: "Filing",
-        value: p2.filingPath === "CONVERT" ? "Conversion of an existing entity" : "New Florida LLC"
+        value: p2.filingPath === "CONVERT" ? "Conversion of an existing entity" : "New Florida LLC",
+        statement: true
       },
       ...p2.filingPath === "CONVERT" ? [
         { key: "existingName", label: "Existing entity name", value: p2.existingLlcName ?? "" },
@@ -105389,9 +105390,12 @@ function filingGroups(payload) {
       {
         key: "effectiveDate",
         label: "Effective date",
-        value: p2.effectiveDate?.option === "SPECIFIC" ? p2.effectiveDate?.requestedEffectiveDate ?? "" : "Leave blank \u2014 effective on the date of filing"
+        value: p2.effectiveDate?.option === "SPECIFIC" ? p2.effectiveDate?.requestedEffectiveDate ?? "" : "Leave blank \u2014 effective on the date of filing",
+        // A requested date is a VALUE to enter on Sunbiz and keeps its copy
+        // button; the leave-blank default is only advice.
+        statement: p2.effectiveDate?.option !== "SPECIFIC"
       },
-      { key: "filingFee", label: "Required filing fee", value: "$125.00" },
+      { key: "filingFee", label: "Required filing fee", value: "$125.00", statement: true },
       {
         key: "certStatus",
         label: "Certificate of Status ($5.00)",
