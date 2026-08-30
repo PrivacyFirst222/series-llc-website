@@ -69,7 +69,7 @@ function UploadDialog({ client }: { client: AdminClient }) {
       setTitle("");
       setFile(null);
     },
-    onError: (e: Error) => toast({ title: "Upload failed", description: e.message }),
+    onError: (e: Error) => toast({ duration: Infinity, title: "Upload failed", description: e.message }),
   });
 
   return (

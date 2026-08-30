@@ -32,6 +32,7 @@ export default function Contact() {
     e.preventDefault();
     if (!form.name || !form.email) {
       toast({
+        duration: Infinity,
         title: "Missing details",
         description: "Please add your name and email so we can reach you.",
       });

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { defaultFormData } from "./defaults";
 import { validateStep } from "./stepValidation";
+import { memberRowIsBlank } from "./validation";
 import { api, ApiError } from "@/lib/api";
 import { FeeEstimate } from "./FeeEstimate";
 import { ReviewStep } from "./ReviewStep";
@@ -386,6 +387,7 @@ export function FloridaLLCFormationForm({
         setStepIndex(i);
         setErrors(e);
         toast({
+          duration: Infinity,
           title: "Please fix the highlighted fields before submitting.",
           description: `Step "${STEPS[i].label}" needs attention.`,
         });
@@ -401,7 +403,9 @@ export function FloridaLLCFormationForm({
       // until payment is confirmed, in case the customer backs out of checkout.
       const { checkoutUrl } = await api.post<{ orderId: string; checkoutUrl: string }>(
         "/api/orders",
-        data,
+        // The untouched scaffold member row is not an answer — a
+        // manager-managed flow never shows the members step at all.
+        { ...data, members: data.members.filter((m) => !memberRowIsBlank(m as unknown as Record<string, unknown>)) },
       );
       onSubmit?.(data);
       window.location.assign(checkoutUrl);
@@ -427,11 +431,13 @@ export function FloridaLLCFormationForm({
         setErrors(fieldErrors);
         window.scrollTo({ top: 0, behavior: "smooth" });
         toast({
+          duration: Infinity,
           title: "Almost there — one of your answers needs attention.",
           description: `We've taken you to the "${STEPS[target >= 0 ? target : 0].label}" step and highlighted what to fix.`,
         });
       } else {
         toast({
+          duration: Infinity,
           title: "We couldn't submit your form.",
           description:
             err instanceof ApiError && err.message
@@ -453,6 +459,7 @@ export function FloridaLLCFormationForm({
       });
     } catch {
       toast({
+        duration: Infinity,
         title: "Could not save draft",
         description: "Storage may be unavailable.",
       });

@@ -472,6 +472,35 @@ check("client account auto-created on payment", !!client && !client.has_password
   check("a standard LLC with a professional designator is refused", wrongStd.status === 400, wrongStd.body);
 }
 
+// 5c. The scaffolded blank member row is not an answer: a manager-managed
+//     flow never shows the members step, so the untouched scaffold reached
+//     validation and made every manager-managed order unsubmittable
+//     (30 Aug 2026). Stripped before validation; a member-managed order
+//     still needs at least one REAL member.
+{
+  const uc2 = (a: string) => testEmail.replace("@", `+${a}@`);
+  const blankRow = { id: "sc1", memberType: "INDIVIDUAL", firstName: "", lastName: "", entityName: "", address1: "", address2: "", city: "", state: "", zip: "", country: "United States", email: "", phone: "" };
+  // Its own caller identity: the run's shared IP has a 10-accepted-orders
+  // budget that the suite's earlier orders already spend.
+  const scaffoldIp = { "X-Forwarded-For": `10.77.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}` };
+  const mgrOrder = await api("/api/orders", { method: "POST", headers: scaffoldIp, body: JSON.stringify({
+    ...formData, managementStructure: "MANAGER_MANAGED",
+    managers: [{ id: "p1", role: "MGR", personOrEntity: "INDIVIDUAL", firstName: "Morgan", lastName: "Manager", suffix: "", businessEntityName: "", streetAddress1: "100 Ocean Drive", streetAddress2: "", city: "Miami", state: "FL", zip: "33139", country: "United States", phone: "", email: "" }],
+    members: [blankRow],
+    clientEmail: uc2("mgrscaffold"), confirmClientEmail: uc2("mgrscaffold"),
+    correspondentEmail: uc2("mgrscaffold"), confirmCorrespondentEmail: uc2("mgrscaffold"),
+  })});
+  check("a manager-managed order with the untouched scaffold member row is accepted", mgrOrder.status === 200, mgrOrder.body);
+  const memBlank = await api("/api/orders", { method: "POST", headers: scaffoldIp, body: JSON.stringify({
+    ...formData, members: [blankRow],
+    clientEmail: uc2("memblank"), confirmClientEmail: uc2("memblank"),
+    correspondentEmail: uc2("memblank"), confirmCorrespondentEmail: uc2("memblank"),
+  })});
+  check("a member-managed order with only a blank member row is still refused",
+    memBlank.status === 400 && JSON.stringify(memBlank.body).includes("At least one initial member"),
+    memBlank.body);
+}
+
 // 6. Duplicate fulfillment is a no-op (idempotency)
 await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId }) });
 const clients2 = await api("/api/admin/clients", { cookies: admin.cookie });

@@ -99810,6 +99810,11 @@ function buildFinalLlcName(desired, designator) {
   if (hasIt) return cleaned;
   return `${cleaned}, ${designator}`;
 }
+function memberRowIsBlank(m2) {
+  return ["firstName", "lastName", "entityName", "address1", "city", "zip"].every(
+    (k) => typeof m2[k] !== "string" || m2[k].trim() === ""
+  );
+}
 function designatorAllowedForFormationType(designator, formationType) {
   if (!designator) return false;
   if (formationType === "DOMESTIC_LLC") {
@@ -100073,6 +100078,9 @@ var extendedFormSchema = formationFormSchema.extend({
 var orderFormSchema = external_exports.preprocess((raw2) => {
   if (raw2 && typeof raw2 === "object") {
     let d2 = raw2;
+    if (Array.isArray(d2.members)) {
+      d2 = { ...d2, members: d2.members.filter((m2) => m2 && typeof m2 === "object" && !memberRowIsBlank(m2)) };
+    }
     if (d2.mailingSameAsPrincipal && d2.principalAddress) {
       d2 = { ...d2, mailingAddress: d2.principalAddress };
     }

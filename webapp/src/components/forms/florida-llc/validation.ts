@@ -47,6 +47,17 @@ export function nameContainsLegalDesignator(name: string): boolean {
   ].some((d) => lower.includes(d));
 }
 
+/** The wizard scaffolds one empty member row; a manager-managed flow hides
+ *  the members step, so that scaffold reaches the server untouched — and was
+ *  validated as a real member, making manager-managed orders unsubmittable
+ *  (caught 30 Aug 2026). A row with no name, no entity, and no address is
+ *  scaffolding, never information. */
+export function memberRowIsBlank(m: Record<string, unknown>): boolean {
+  return ["firstName", "lastName", "entityName", "address1", "city", "zip"].every(
+    (k) => typeof m[k] !== "string" || (m[k] as string).trim() === "",
+  );
+}
+
 export function designatorAllowedForFormationType(
   designator: LlcDesignator | "",
   formationType: FormationType,

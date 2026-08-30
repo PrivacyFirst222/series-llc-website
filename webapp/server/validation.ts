@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { normalizeEntityName } from "../src/components/forms/florida-llc/nameSimilarity";
 import { formationFormSchema } from "../src/components/forms/florida-llc/schema";
-import { designatorAllowedForFormationType, hasProtectedSeriesPhrase, seriesDedupeKey } from "../src/components/forms/florida-llc/validation";
+import { designatorAllowedForFormationType, hasProtectedSeriesPhrase, memberRowIsBlank, seriesDedupeKey } from "../src/components/forms/florida-llc/validation";
 import { llcDesignators } from "../src/components/forms/florida-llc/schema";
 import { raServicePatch } from "../src/components/forms/florida-llc/raService";
 
@@ -218,6 +218,12 @@ const extendedFormSchema = formationFormSchema
 export const orderFormSchema = z.preprocess((raw) => {
   if (raw && typeof raw === "object") {
     let d = raw as Record<string, unknown>;
+    if (Array.isArray(d.members)) {
+      // Scaffold rows are stripped BEFORE validation: a manager-managed order
+      // arrives with the untouched blank row from a step it never showed, and
+      // validating it demanded an address from a member who does not exist.
+      d = { ...d, members: (d.members as Record<string, unknown>[]).filter((m) => m && typeof m === "object" && !memberRowIsBlank(m)) };
+    }
     if (d.mailingSameAsPrincipal && d.principalAddress) {
       d = { ...d, mailingAddress: d.principalAddress };
     }
