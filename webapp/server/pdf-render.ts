@@ -400,7 +400,7 @@ function stampPageNumbers(doc: PDFDocument, font: PDFFont): void {
 function stampFooters(doc: PDFDocument, font: PDFFont, wm: WatermarkInfo): void {
   const pages = doc.getPages();
   const total = pages.length;
-  const text = sanitize(`Licensed to ${wm.name} (${wm.email}) - MyFloridaSeriesLLC${wm.note ? " - " + wm.note : ""}`);
+  const text = sanitize(`Copyright FLORIDA PROTECTED SERIES, LLC - PS 1${wm.note ? ", " + wm.note.replace(/\s+\u2014\s+/g, ", ") : ""}`);
   const stamp = wm.generatedAt ? sanitize(`Generated ${wm.generatedAt}`) : "";
   const grey = rgb(0.55, 0.57, 0.6);
   pages.forEach((p, i) => {
@@ -420,7 +420,7 @@ function stampFooters(doc: PDFDocument, font: PDFFont, wm: WatermarkInfo): void 
 function setMeta(doc: PDFDocument, title: string, wm: WatermarkInfo): void {
   doc.setTitle(title);
   doc.setAuthor("MyFloridaSeriesLLC");
-  doc.setSubject(`Licensed to ${wm.name} <${wm.email}>${wm.note ? " — " + wm.note : ""}`);
+  doc.setSubject(`Copyright FLORIDA PROTECTED SERIES, LLC - PS 1${wm.note ? ", " + wm.note.replace(/\s+\u2014\s+/g, ", ") : ""}`);
   doc.setProducer("MyFloridaSeriesLLC document engine");
   doc.setCreationDate(new Date());
 }

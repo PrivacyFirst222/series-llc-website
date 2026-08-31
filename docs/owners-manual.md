@@ -9,7 +9,7 @@
 30|OWNER'S MANUAL|after=360|accent
 13|A Plain-English Guide to Understanding, Operating, and
 13|Protecting Your Florida Protected Series LLC|after=1200
-16|MyFloridaSeriesLLC|after=40|accent
+16|MyFloridaSeriesLLC.com|after=40|accent
 10|A service of FLORIDA PROTECTED SERIES, LLC - PS 1|after=800
 11|First Edition — August 2026|after=40
 10|Written for the Florida Uniform Protected Series Act

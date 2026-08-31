@@ -101149,7 +101149,7 @@ function stampPageNumbers(doc, font) {
 function stampFooters(doc, font, wm) {
   const pages = doc.getPages();
   const total = pages.length;
-  const text = sanitize(`Licensed to ${wm.name} (${wm.email}) - MyFloridaSeriesLLC${wm.note ? " - " + wm.note : ""}`);
+  const text = sanitize(`Copyright FLORIDA PROTECTED SERIES, LLC - PS 1${wm.note ? ", " + wm.note.replace(/\s+\u2014\s+/g, ", ") : ""}`);
   const stamp = wm.generatedAt ? sanitize(`Generated ${wm.generatedAt}`) : "";
   const grey = rgb(0.55, 0.57, 0.6);
   pages.forEach((p2, i) => {
@@ -101166,7 +101166,7 @@ function stampFooters(doc, font, wm) {
 function setMeta(doc, title, wm) {
   doc.setTitle(title);
   doc.setAuthor("MyFloridaSeriesLLC");
-  doc.setSubject(`Licensed to ${wm.name} <${wm.email}>${wm.note ? " \u2014 " + wm.note : ""}`);
+  doc.setSubject(`Copyright FLORIDA PROTECTED SERIES, LLC - PS 1${wm.note ? ", " + wm.note.replace(/\s+\u2014\s+/g, ", ") : ""}`);
   doc.setProducer("MyFloridaSeriesLLC document engine");
   doc.setCreationDate(/* @__PURE__ */ new Date());
 }
@@ -107834,7 +107834,7 @@ var owners_manual_default = `<!-- MASTER. This file is the Owner's Manual. Edit 
 30|OWNER'S MANUAL|after=360|accent
 13|A Plain-English Guide to Understanding, Operating, and
 13|Protecting Your Florida Protected Series LLC|after=1200
-16|MyFloridaSeriesLLC|after=40|accent
+16|MyFloridaSeriesLLC.com|after=40|accent
 10|A service of FLORIDA PROTECTED SERIES, LLC - PS 1|after=800
 11|First Edition \u2014 August 2026|after=40
 10|Written for the Florida Uniform Protected Series Act
