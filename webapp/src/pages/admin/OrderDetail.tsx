@@ -346,16 +346,47 @@ export default function OrderDetail({
                     className="mt-1 block w-full text-sm"
                     onChange={() => setUploadError(null)}
                   />
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="mt-2 rounded-full"
-                    disabled={uploadArticles.isPending}
-                    onClick={() => uploadArticles.mutate()}
-                  >
-                    {uploadArticles.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileUp className="mr-2 h-4 w-4" />}
-                    Upload Articles
-                  </Button>
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="rounded-full"
+                      disabled={uploadArticles.isPending}
+                      onClick={() => uploadArticles.mutate()}
+                    >
+                      {uploadArticles.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileUp className="mr-2 h-4 w-4" />}
+                      Upload Articles
+                    </Button>
+                    {/* The Division's other possible answer, side by side
+                        (Adam, 30 Aug 2026): orange, and it resets the order
+                        for the alternate-name resubmission. */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="rounded-full border-amber-500/60 bg-amber-500/10 text-amber-700 hover:bg-amber-500/20 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-300"
+                      onClick={() => setConfirmReset(true)}
+                    >
+                      Division rejected the filing…
+                    </Button>
+                  </div>
+                  {confirmReset ? (
+                    <div className="mt-3 rounded-lg border border-destructive/40 p-3 text-sm">
+                      <p>
+                        Send this order back to New Orders for resubmission? Every
+                        copied-field tick is cleared so the re-copy — usually under
+                        the alternate name — starts fresh.
+                      </p>
+                      <div className="mt-2 flex gap-2">
+                        <Button variant="outline" size="sm" className="rounded-full" onClick={() => setConfirmReset(false)}>
+                          Keep as is
+                        </Button>
+                        <Button size="sm" className="rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90" disabled={unfile.isPending} onClick={() => unfile.mutate()}>
+                          {unfile.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                          Back to New Orders
+                        </Button>
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
               ) : (
                 <p className="flex items-center gap-2 text-sm text-trust">
@@ -536,32 +567,6 @@ export default function OrderDetail({
                 {seriesFiled.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 All series designations filed
               </Button>
-            ) : null}
-            {d.status === "filed" ? (
-              <div>
-                {!confirmReset ? (
-                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive" onClick={() => setConfirmReset(true)}>
-                    Division rejected the filing…
-                  </Button>
-                ) : (
-                  <div className="rounded-lg border border-destructive/40 p-3 text-sm">
-                    <p>
-                      Send this order back to New Orders for resubmission? Every
-                      copied-field tick is cleared so the re-copy — usually under
-                      the alternate name — starts fresh.
-                    </p>
-                    <div className="mt-2 flex gap-2">
-                      <Button variant="outline" size="sm" className="rounded-full" onClick={() => setConfirmReset(false)}>
-                        Keep as is
-                      </Button>
-                      <Button size="sm" className="rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90" disabled={unfile.isPending} onClick={() => unfile.mutate()}>
-                        {unfile.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                        Back to New Orders
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </div>
             ) : null}
 
             {d.seriesFiledAt ? (
