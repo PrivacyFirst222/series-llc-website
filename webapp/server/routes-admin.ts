@@ -905,8 +905,8 @@ app.post("/admin/services/:id/fulfill", async (c) => {
   }
 
   const db = await getDb();
-  const rows = await db.query<{ id: string; client_id: string; type: string; status: string; llc_name: string; details: unknown }>(
-    "SELECT id, client_id, type, status, llc_name, details FROM service_orders WHERE id = $1",
+  const rows = await db.query<{ id: string; client_id: string; type: string; status: string; llc_name: string; details: unknown; formation_order_id: string | null }>(
+    "SELECT id, client_id, type, status, llc_name, details, formation_order_id FROM service_orders WHERE id = $1",
     [c.req.param("id")],
   );
   if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
@@ -965,9 +965,9 @@ app.post("/admin/services/:id/fulfill", async (c) => {
     }
     const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
     const doc = await db.query<{ id: string }>(
-      `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)
-       VALUES ($1, 'package', $2, $3, $4, $5) RETURNING id`,
-      [so.client_id, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes],
+      `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes)
+       VALUES ($1, $6, 'package', $2, $3, $4, $5) RETURNING id`,
+      [so.client_id, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes, so.formation_order_id],
     );
     documentId = doc[0].id;
   }

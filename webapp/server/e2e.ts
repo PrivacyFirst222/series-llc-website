@@ -673,31 +673,7 @@ if (mint.status === 200) {
   check("intake S election order created awaiting_info", Boolean(intakeSElection));
 
   // 12. Order an additional series from the portal, pay, and check state
-  // State certificates are typically bought AFTER formation (Adam,
-  // 30 Aug 2026): purchase, duplicate-refusal, and fulfillment-by-upload.
-  {
-    const buyCert = await api("/api/portal/services/certificate", {
-      method: "POST", cookies: setPw.cookie, body: JSON.stringify({ kind: "certificate-of-status" }),
-    });
-    check("a Certificate of Status can be ordered post-formation", buyCert.status === 200 && !!buyCert.body?.data?.checkoutUrl, buyCert.body);
-    check("the certificate is priced at the published $15", buyCert.body?.data?.totalCents === 15_00, buyCert.body?.data?.totalCents);
-    const certId = buyCert.body?.data?.serviceOrderId as string;
-    await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: certId }) });
-    const dupCert = await api("/api/portal/services/certificate", {
-      method: "POST", cookies: setPw.cookie, body: JSON.stringify({ kind: "certificate-of-status" }),
-    });
-    check("a second certificate is refused while one is on order", dupCert.status === 400 && dupCert.body?.error?.code === "ALREADY_ORDERED", dupCert.body);
-    const admCert = await adminSession();
-    const noFile = await api(`/api/admin/services/${certId}/fulfill`, { method: "POST", cookies: admCert.cookie, body: "{}" });
-    check("fulfilling a certificate without the document is refused", noFile.status === 400 && noFile.body?.error?.code === "DOCUMENT_REQUIRED", noFile.body);
-    const certFd = new FormData();
-    certFd.set("file", new File([new TextEncoder().encode("%PDF-1.4 cert of status\n%%EOF")], "cert.pdf", { type: "application/pdf" }));
-    const certUp = await fetch(`${BASE}/api/admin/services/${certId}/fulfill`, { method: "POST", body: certFd, headers: { Cookie: admCert.cookie, "X-Forwarded-For": RUN_IP } });
-    check("uploading the certificate fulfills the order", certUp.status === 200, await certUp.json().catch(() => null));
-    const afterDocs = await api("/api/portal/documents", { cookies: setPw.cookie });
-    const certDoc = (afterDocs.body?.data as { title: string }[] | undefined)?.find((doc) => doc.title.startsWith("Certificate of Status"));
-    check("the certificate lands in the client's portal documents", !!certDoc, afterDocs.body?.data?.length);
-  }
+
 
   const badSeries = await api("/api/portal/services/series", {
     method: "POST", cookies: setPw.cookie, body: JSON.stringify({ suffix: "Tower Nine" }),
@@ -878,6 +854,31 @@ if (mint.status === 200) {
       (d: { kind: string }) => d.kind === "articles" || d.kind === "psd",
     );
     check("concurrent replacements leave exactly one package", concDocs.length === 2, concDocs.length);
+  }
+  // State certificates are typically bought AFTER formation (Adam,
+  // 30 Aug 2026): purchase, duplicate-refusal, and fulfillment-by-upload.
+  {
+    const buyCert = await api("/api/portal/services/certificate", {
+      method: "POST", cookies: setPw.cookie, body: JSON.stringify({ kind: "certificate-of-status" }),
+    });
+    check("a Certificate of Status can be ordered post-formation", buyCert.status === 200 && !!buyCert.body?.data?.checkoutUrl, buyCert.body);
+    check("the certificate is priced at the published $15", buyCert.body?.data?.totalCents === 15_00, buyCert.body?.data?.totalCents);
+    const certId = buyCert.body?.data?.serviceOrderId as string;
+    await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: certId }) });
+    const dupCert = await api("/api/portal/services/certificate", {
+      method: "POST", cookies: setPw.cookie, body: JSON.stringify({ kind: "certificate-of-status" }),
+    });
+    check("a second certificate is refused while one is on order", dupCert.status === 400 && dupCert.body?.error?.code === "ALREADY_ORDERED", dupCert.body);
+    const admCert = await adminSession();
+    const noFile = await api(`/api/admin/services/${certId}/fulfill`, { method: "POST", cookies: admCert.cookie, body: "{}" });
+    check("fulfilling a certificate without the document is refused", noFile.status === 400 && noFile.body?.error?.code === "DOCUMENT_REQUIRED", noFile.body);
+    const certFd = new FormData();
+    certFd.set("file", new File([new TextEncoder().encode("%PDF-1.4 cert of status\n%%EOF")], "cert.pdf", { type: "application/pdf" }));
+    const certUp = await fetch(`${BASE}/api/admin/services/${certId}/fulfill`, { method: "POST", body: certFd, headers: { Cookie: admCert.cookie, "X-Forwarded-For": RUN_IP } });
+    check("uploading the certificate fulfills the order", certUp.status === 200, await certUp.json().catch(() => null));
+    const afterDocs = await api("/api/portal/documents", { cookies: setPw.cookie });
+    const certDoc = (afterDocs.body?.data as { title: string }[] | undefined)?.find((doc) => doc.title.startsWith("Certificate of Status"));
+    check("the certificate lands in the client's portal documents", !!certDoc, afterDocs.body?.data?.length);
   }
   const einDetails = await api(`/api/portal/services/${intakeEin.id}/ein-details`, {
     method: "POST", cookies: setPw.cookie, body: JSON.stringify(einPayload),
@@ -1125,9 +1126,64 @@ if (mint.status === 200) {
     afterFulfill.body?.data?.status === "fulfilled" && afterFulfill.body?.data?.tin === null,
     afterFulfill.body?.data,
   );
+  // One account, several companies (Adam, 31 Aug 2026): a second formation
+  // for the same email joins the portal, each company keeps its own
+  // operating-agreement answers, and the tabs' data source lists both.
+  {
+    const secondIp = { "X-Forwarded-For": `10.55.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}` };
+    const second = await api("/api/orders", { method: "POST", headers: secondIp, body: JSON.stringify({
+      ...formData, desiredLlcName: "E2E Second Company", alternateName1: "E2E Second Company Backup",
+      series: [{ id: "s1", name: "E2E Second Company, LLC, PS A" }],
+    })});
+    check("a second formation for the same email is accepted", second.status === 200, second.body?.error);
+    const secondId = second.body?.data?.orderId as string;
+    await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: secondId }) });
+    const companies = await api("/api/portal/companies", { cookies: setPw.cookie });
+    const list = (companies.body?.data ?? []) as { orderId: string; llcName: string }[];
+    check("the companies list holds both formations", list.length >= 2, list.length);
+    check("the newest company leads (it is the default tab)", list[0]?.llcName === "E2E Second Company, LLC", list[0]);
+    const firstCo = list.find((x) => x.llcName === "E2E Coastal Holdings, LLC");
+    check("the original company is still listed", !!firstCo, list.map((x) => x.llcName));
+    // Answers isolation: write to the SECOND company, read both.
+    const save2 = await api(`/api/portal/oa/answers?company=${secondId}`, {
+      method: "PUT", cookies: setPw.cookie,
+      body: JSON.stringify({ firstOrAmended: "first", effectiveDate: "2026-10-01", contributionToCompany: "$777 cash", members: [{}], series: [] }),
+    });
+    check("answers save against the chosen company", save2.status === 200, save2.body);
+    const oa2 = await api(`/api/portal/oa?company=${secondId}`, { cookies: setPw.cookie });
+    check("the second company reads back its own answers",
+      JSON.stringify(oa2.body?.data).includes("$777 cash"), oa2.body?.data?.answers);
+    const oa1 = await api(`/api/portal/oa?company=${firstCo?.orderId}`, { cookies: setPw.cookie });
+    check("the first company's answers are untouched by the second's",
+      !JSON.stringify(oa1.body?.data).includes("$777 cash"), null);
+    check("the first company's seed is ITS company, not the newest",
+      JSON.stringify(oa1.body?.data).includes("E2E Coastal Holdings"), oa1.body?.data?.seed?.llcName);
+    // Service scoping: each tab's Order Services card shows only that
+    // company's orders and gates on THAT company being formed.
+    const svc1 = await api(`/api/portal/services?company=${firstCo?.orderId}`, { cookies: setPw.cookie });
+    const svc2 = await api(`/api/portal/services?company=${secondId}`, { cookies: setPw.cookie });
+    check("the formed company's tab says formed", svc1.body?.data?.llcFormed === true, svc1.body?.data?.llcFormed);
+    check("the unformed company's tab says not formed", svc2.body?.data?.llcFormed === false, svc2.body?.data?.llcFormed);
+    const o1 = (svc1.body?.data?.orders ?? []) as { type: string; llc_name: string }[];
+    const o2 = (svc2.body?.data?.orders ?? []) as { type: string; llc_name: string }[];
+    check("the first company's service orders stay on its own tab", o1.length > 0, o1.length);
+    check("no second-company order leaks into the first tab",
+      o1.every((o) => o.llc_name !== "E2E Second Company, LLC"), o1.map((o) => o.llc_name));
+    check("no first-company order leaks into the second tab",
+      o2.every((o) => o.llc_name !== "E2E Coastal Holdings, LLC"), o2.map((o) => o.llc_name));
+    check("the second tab is named for its own company",
+      svc2.body?.data?.llcName === "E2E Second Company, LLC", svc2.body?.data?.llcName);
+    const certUnformed = await api(`/api/portal/services/certificate?company=${secondId}`, {
+      method: "POST", cookies: setPw.cookie, body: JSON.stringify({ kind: "certificate-of-status" }),
+    });
+    check("a certificate for an unformed company is refused",
+      certUnformed.status === 400 && certUnformed.body?.error?.code === "NOT_FORMED", certUnformed.body);
+  }
 } else {
   check("dev mint-reset-token available (dev only)", false);
 }
+
+
 
 // 15. Multi-member order with a TBE spousal couple → generated agreement
 {

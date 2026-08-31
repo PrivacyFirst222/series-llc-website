@@ -324,10 +324,42 @@ const MIGRATION_003_STATEMENTS: string[] = [
   `ALTER TABLE orders ADD COLUMN IF NOT EXISTS series_filed_at TIMESTAMPTZ`,
 ];
 
+const MIGRATION_004_STATEMENTS: string[] = [
+  // One portal account can hold several companies (Adam, 31 Aug 2026), so
+  // operating-agreement answers and generations key on the FORMATION, not the
+  // client. Existing single-company rows are re-keyed to the client's latest
+  // paid order — exactly the order the old code always used.
+  `ALTER TABLE oa_profiles ADD COLUMN IF NOT EXISTS order_id UUID`,
+  `UPDATE oa_profiles SET order_id = (
+     SELECT o.id FROM orders o
+      WHERE o.client_id = oa_profiles.client_id AND o.paid_at IS NOT NULL
+      ORDER BY o.paid_at DESC NULLS LAST LIMIT 1
+   ) WHERE order_id IS NULL`,
+  // A profile with no paid order was unreachable through every code path.
+  `DELETE FROM oa_profiles WHERE order_id IS NULL`,
+  `DO $$ BEGIN
+     IF EXISTS (
+       SELECT 1 FROM pg_constraint c JOIN pg_class t ON c.conrelid = t.oid
+        WHERE t.relname = 'oa_profiles' AND c.contype = 'p'
+          AND (SELECT count(*) FROM unnest(c.conkey)) = 1
+     ) THEN
+       ALTER TABLE oa_profiles DROP CONSTRAINT oa_profiles_pkey;
+       ALTER TABLE oa_profiles ADD PRIMARY KEY (client_id, order_id);
+     END IF;
+   END $$`,
+  `ALTER TABLE oa_generations ADD COLUMN IF NOT EXISTS order_id UUID`,
+  `UPDATE oa_generations SET order_id = (
+     SELECT o.id FROM orders o
+      WHERE o.client_id = oa_generations.client_id AND o.paid_at IS NOT NULL
+      ORDER BY o.paid_at DESC NULLS LAST LIMIT 1
+   ) WHERE order_id IS NULL`,
+];
+
 const MIGRATIONS: { id: number; name: string; statements: string[] }[] = [
   { id: 1, name: "initial-schema", statements: MIGRATION_001_STATEMENTS },
   { id: 2, name: "contact-messages", statements: MIGRATION_002_STATEMENTS },
   { id: 3, name: "series-filed-at", statements: MIGRATION_003_STATEMENTS },
+  { id: 4, name: "oa-per-company", statements: MIGRATION_004_STATEMENTS },
   // Append future migrations here with the next id. Never edit an entry.
 ];
 

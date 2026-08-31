@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Navigate, Link } from "react-router-dom";
+import { Navigate, Link, useSearchParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight, Download, FileText, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -53,6 +53,9 @@ function todayIso(): string {
 
 
 export default function OAQuestionnaire() {
+  const [oaSearchParams] = useSearchParams();
+  const oaCompany = oaSearchParams.get("company");
+  const oaCq = oaCompany ? `?company=${oaCompany}` : "";
   const queryClient = useQueryClient();
   const [a, setA] = useState<Answers>({});
   const [loaded, setLoaded] = useState(false);
@@ -76,7 +79,7 @@ export default function OAQuestionnaire() {
   });
   const oaQuery = useQuery({
     queryKey: ["portal-oa"],
-    queryFn: () => api.get<OaData>("/api/portal/oa"),
+    queryFn: () => api.get<OaData>(`/api/portal/oa${oaCq}`),
     enabled: meQuery.isSuccess,
     retry: false,
   });
@@ -119,7 +122,7 @@ export default function OAQuestionnaire() {
 
   const save = useMutation({
     mutationFn: ({ answers, rev }: { answers: Answers; rev: number }) =>
-      api.put(`/api/portal/oa/answers?rev=${rev}`, answers),
+      api.put(`/api/portal/oa/answers?rev=${rev}${oaCompany ? `&company=${oaCompany}` : ""}`, answers),
     onSuccess: () => setSaveFailed(false),
     // A save that fails silently is how an answer the client believes is
     // recorded never reaches the agreement.
@@ -128,7 +131,7 @@ export default function OAQuestionnaire() {
 
   const generate = useMutation({
     mutationFn: (answers: Answers) =>
-      api.post<{ documentId: string; title: string }>("/api/portal/oa/generate", answers),
+      api.post<{ documentId: string; title: string }>(`/api/portal/oa/generate${oaCq}`, answers),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["portal-oa"] });
       queryClient.invalidateQueries({ queryKey: ["portal-documents"] });

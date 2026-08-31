@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Navigate, Link, useNavigate } from "react-router-dom";
+import { Navigate, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FileText, Mail, LogOut, Download, ShieldCheck, Clock, ScrollText, BookOpen, ArrowRight, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,7 @@ interface PortalDoc {
   title: string;
   size_bytes: number;
   created_at: string;
+  order_id: string | null;
 }
 
 interface Me {
@@ -133,10 +134,10 @@ interface OaStatus {
   memberManaged: boolean;
 }
 
-function AgreementAndLibraryRow() {
+function AgreementAndLibraryRow({ company }: { company: string | null }) {
   const oaQuery = useQuery({
-    queryKey: ["portal-oa-status"],
-    queryFn: () => api.get<OaStatus>("/api/portal/oa"),
+    queryKey: ["portal-oa-status", company],
+    queryFn: () => api.get<OaStatus>(`/api/portal/oa${company ? `?company=${company}` : ""}`),
     retry: false,
   });
   const libraryQuery = useQuery({
@@ -167,7 +168,7 @@ function AgreementAndLibraryRow() {
                   : "Answer a short questionnaire and we'll generate your operating agreement as a signed-ready PDF."}
               </p>
               <Button asChild size="sm" className="shrink-0 self-start rounded-full sm:self-auto">
-                <Link to="/portal/agreement">
+                <Link to={company ? `/portal/agreement?company=${company}` : "/portal/agreement"}>
                   {hasGeneration ? "Update / regenerate" : "Complete questionnaire"}
                   <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
                 </Link>
@@ -312,12 +313,23 @@ function RegisteredAgentCard({ me }: { me: Me | null }) {
 export default function PortalDashboard() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const meQuery = useQuery({
     queryKey: ["portal-me"],
     queryFn: () => api.get<Me>("/api/auth/me"),
     retry: false,
   });
+
+  // One tab per company — shown only when the client has more than one
+  // (Adam, 31 Aug 2026). A single-company client sees the portal unchanged.
+  const companiesQuery = useQuery({
+    queryKey: ["portal-companies"],
+    queryFn: () => api.get<{ orderId: string; llcName: string; formed: boolean }[]>("/api/portal/companies"),
+    enabled: meQuery.isSuccess,
+  });
+  const companies = companiesQuery.data ?? [];
+  const company = searchParams.get("company") ?? companies[0]?.orderId ?? null;
 
   const docsQuery = useQuery({
     queryKey: ["portal-documents"],
@@ -327,10 +339,10 @@ export default function PortalDashboard() {
 
   // Same key as the agreement card, so React Query serves one request.
   const oaGenerations = useQuery({
-    queryKey: ["portal-oa"],
+    queryKey: ["portal-oa", company],
     queryFn: () =>
       api.get<{ generations: { id: string; document_id: string | null; version: string | null }[] }>(
-        "/api/portal/oa",
+        `/api/portal/oa${company ? `?company=${company}` : ""}`,
       ),
     enabled: meQuery.isSuccess,
     retry: false,
@@ -377,8 +389,13 @@ export default function PortalDashboard() {
   // formed. They belong with the formation package rather than in a section of
   // their own — and they must be listed explicitly, because a filter that names
   // only the kinds it knows drops silently the day a new one is added.
-  const FORMATION_KINDS = ["articles", "psd", "package"];
-  const packageDocs = docs.filter((d) => FORMATION_KINDS.includes(d.kind));
+  const FORMATION_KINDS = ["articles", "psd", "package", "certificate-of-status", "certified-copy"];
+  const multiCompany = companies.length > 1;
+  const packageDocs = docs.filter(
+    (d) =>
+      FORMATION_KINDS.includes(d.kind) &&
+      (!multiCompany || d.order_id === null || d.order_id === company),
+  );
 
   const legalMail = docs.filter((d) => d.kind === "legal_mail");
   // Anything whose kind no section claims. Better a plainly labelled leftover
@@ -408,6 +425,27 @@ export default function PortalDashboard() {
           Sign out
         </Button>
       </div>
+
+      {companies.length > 1 ? (
+        <div className="mt-8 flex flex-wrap gap-2" role="tablist" aria-label="Your companies">
+          {companies.map((co) => (
+            <button
+              key={co.orderId}
+              type="button"
+              role="tab"
+              aria-selected={co.orderId === company}
+              onClick={() => setSearchParams(co.orderId === companies[0]?.orderId ? {} : { company: co.orderId }, { replace: true })}
+              className={
+                co.orderId === company
+                  ? "rounded-full border border-trust bg-trust/10 px-4 py-2 text-sm font-medium text-trust"
+                  : "rounded-full border border-border bg-card px-4 py-2 text-sm text-muted-foreground hover:border-foreground/30"
+              }
+            >
+              {co.llcName}
+            </button>
+          ))}
+        </div>
+      ) : null}
 
       <div className="mt-10 grid gap-6 lg:grid-cols-2">
         <div className="overflow-hidden rounded-2xl border border-border bg-card">
@@ -453,9 +491,9 @@ export default function PortalDashboard() {
         </div>
       ) : null}
 
-      <AgreementAndLibraryRow />
+      <AgreementAndLibraryRow company={company} />
 
-      <ServicesCard />
+      <ServicesCard company={company} />
 
       <RegisteredAgentCard me={meQuery.data ?? null} />
 

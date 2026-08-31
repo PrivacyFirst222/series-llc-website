@@ -95324,10 +95324,41 @@ var MIGRATION_003_STATEMENTS = [
   // base filing is marked sent, then — later — the designations marked filed.
   `ALTER TABLE orders ADD COLUMN IF NOT EXISTS series_filed_at TIMESTAMPTZ`
 ];
+var MIGRATION_004_STATEMENTS = [
+  // One portal account can hold several companies (Adam, 31 Aug 2026), so
+  // operating-agreement answers and generations key on the FORMATION, not the
+  // client. Existing single-company rows are re-keyed to the client's latest
+  // paid order — exactly the order the old code always used.
+  `ALTER TABLE oa_profiles ADD COLUMN IF NOT EXISTS order_id UUID`,
+  `UPDATE oa_profiles SET order_id = (
+     SELECT o.id FROM orders o
+      WHERE o.client_id = oa_profiles.client_id AND o.paid_at IS NOT NULL
+      ORDER BY o.paid_at DESC NULLS LAST LIMIT 1
+   ) WHERE order_id IS NULL`,
+  // A profile with no paid order was unreachable through every code path.
+  `DELETE FROM oa_profiles WHERE order_id IS NULL`,
+  `DO $$ BEGIN
+     IF EXISTS (
+       SELECT 1 FROM pg_constraint c JOIN pg_class t ON c.conrelid = t.oid
+        WHERE t.relname = 'oa_profiles' AND c.contype = 'p'
+          AND (SELECT count(*) FROM unnest(c.conkey)) = 1
+     ) THEN
+       ALTER TABLE oa_profiles DROP CONSTRAINT oa_profiles_pkey;
+       ALTER TABLE oa_profiles ADD PRIMARY KEY (client_id, order_id);
+     END IF;
+   END $$`,
+  `ALTER TABLE oa_generations ADD COLUMN IF NOT EXISTS order_id UUID`,
+  `UPDATE oa_generations SET order_id = (
+     SELECT o.id FROM orders o
+      WHERE o.client_id = oa_generations.client_id AND o.paid_at IS NOT NULL
+      ORDER BY o.paid_at DESC NULLS LAST LIMIT 1
+   ) WHERE order_id IS NULL`
+];
 var MIGRATIONS = [
   { id: 1, name: "initial-schema", statements: MIGRATION_001_STATEMENTS },
   { id: 2, name: "contact-messages", statements: MIGRATION_002_STATEMENTS },
-  { id: 3, name: "series-filed-at", statements: MIGRATION_003_STATEMENTS }
+  { id: 3, name: "series-filed-at", statements: MIGRATION_003_STATEMENTS },
+  { id: 4, name: "oa-per-company", statements: MIGRATION_004_STATEMENTS }
   // Append future migrations here with the next id. Never edit an entry.
 ];
 function migrationChecksum(statements) {
@@ -105642,14 +105673,17 @@ function seriesNames(payload) {
 
 // server/routes-portal.ts
 var loginSchema = external_exports.object({ email: external_exports.string().email(), password: external_exports.string().min(1) });
-async function oaSeed(clientId) {
+async function oaSeed(clientId, orderId) {
   const db = await getDb();
-  const orders = await db.query(
+  const orders = orderId ? await db.query(
+    "SELECT id, payload, llc_name FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+    [clientId, orderId]
+  ) : await db.query(
     // paid_at, not status = 'paid'. "Paid" stopped being the last status on
     // 16 August when filed and formed were added, and every query that asked
     // for the string rather than the fact broke silently — this one by telling
     // a client whose LLC had just been formed that they had no formed LLC.
-    "SELECT payload, llc_name FROM orders WHERE client_id = $1 AND paid_at IS NOT NULL ORDER BY paid_at DESC NULLS LAST LIMIT 1",
+    "SELECT id, payload, llc_name FROM orders WHERE client_id = $1 AND paid_at IS NOT NULL ORDER BY paid_at DESC NULLS LAST LIMIT 1",
     [clientId]
   );
   if (orders.length === 0) return null;
@@ -105681,6 +105715,7 @@ async function oaSeed(clientId) {
     }
   }
   return {
+    orderId: orders[0].id,
     llcName: p2.llcName?.finalName || orders[0].llc_name,
     filingPath: p2.filingPath ?? "NEW",
     formationType: p2.formationType ?? "",
@@ -105771,9 +105806,9 @@ function effectiveOwners(seedMembers, answers) {
   const edited = answered.some((m2) => (m2.name ?? "").trim() !== "");
   return edited ? answered.map((m2) => ({ name: (m2.name ?? "").trim(), address: (m2.address ?? "").trim() })) : seedMembers.map((m2) => ({ name: m2.name, address: m2.address }));
 }
-async function savedOaAnswers(clientId) {
+async function savedOaAnswers(clientId, orderId) {
   const db = await getDb();
-  const rows = await db.query("SELECT answers FROM oa_profiles WHERE client_id = $1", [clientId]);
+  const rows = orderId ? await db.query("SELECT answers FROM oa_profiles WHERE client_id = $1 AND order_id = $2", [clientId, orderId]) : await db.query("SELECT answers FROM oa_profiles WHERE client_id = $1 ORDER BY updated_at DESC LIMIT 1", [clientId]);
   if (rows.length === 0) return null;
   const raw2 = rows[0].answers;
   return typeof raw2 === "string" ? JSON.parse(raw2) : raw2;
@@ -105788,28 +105823,48 @@ function fmtDate2(iso) {
   });
 }
 var SERVICE_SAFE_COLUMNS = "id, type, status, llc_name, details, amount_cents, created_at, paid_at, fulfilled_at";
-async function clientLlcName(clientId) {
+async function clientLlcName(clientId, orderId) {
   const db = await getDb();
-  const rows = await db.query(
+  const rows = orderId ? await db.query(
+    "SELECT llc_name FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+    [clientId, orderId]
+  ) : await db.query(
     "SELECT llc_name FROM orders WHERE client_id = $1 AND paid_at IS NOT NULL ORDER BY paid_at DESC NULLS LAST LIMIT 1",
     [clientId]
   );
   return rows[0]?.llc_name ?? "";
 }
-async function clientLlcFormed(clientId) {
+async function resolveCompanyOrder(clientId, requested) {
   const db = await getDb();
-  const rows = await db.query(
+  const rows = requested ? await db.query(
+    "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+    [clientId, requested]
+  ) : await db.query(
+    "SELECT id FROM orders WHERE client_id = $1 AND paid_at IS NOT NULL ORDER BY paid_at DESC NULLS LAST LIMIT 1",
+    [clientId]
+  );
+  return rows[0]?.id ?? null;
+}
+async function clientLlcFormed(clientId, orderId) {
+  const db = await getDb();
+  const rows = orderId ? await db.query(
+    "SELECT 1 AS ok FROM orders WHERE client_id = $1 AND id = $2 AND formed_at IS NOT NULL LIMIT 1",
+    [clientId, orderId]
+  ) : await db.query(
     "SELECT 1 AS ok FROM orders WHERE client_id = $1 AND formed_at IS NOT NULL LIMIT 1",
     [clientId]
   );
   return rows.length > 0;
 }
-async function clientSeries(clientId) {
+async function clientSeries(clientId, orderId) {
   const db = await getDb();
-  const llcName = await clientLlcName(clientId);
+  const llcName = await clientLlcName(clientId, orderId ?? void 0);
   if (!llcName) return [];
   const names = [];
-  const formation = await db.query(
+  const formation = orderId ? await db.query(
+    "SELECT payload FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL ORDER BY paid_at ASC",
+    [clientId, orderId]
+  ) : await db.query(
     "SELECT payload FROM orders WHERE client_id = $1 AND paid_at IS NOT NULL ORDER BY paid_at ASC",
     [clientId]
   );
@@ -105819,9 +105874,14 @@ async function clientSeries(clientId) {
       names.push(n.toLowerCase().startsWith(llcName.toLowerCase()) ? n : `${llcName} - ${n}`);
     }
   }
-  const svc = await db.query(
+  const svc = orderId ? await db.query(
     `SELECT type, details FROM service_orders
-     WHERE client_id = $1 AND type IN ('series', 'ein') AND status <> 'pending_payment'`,
+         WHERE client_id = $1 AND type IN ('series', 'ein') AND status <> 'pending_payment'
+           AND (formation_order_id IS NULL OR formation_order_id = $2)`,
+    [clientId, orderId]
+  ) : await db.query(
+    `SELECT type, details FROM service_orders
+         WHERE client_id = $1 AND type IN ('series', 'ein') AND status <> 'pending_payment'`,
     [clientId]
   );
   const einSeries = /* @__PURE__ */ new Set();
@@ -105840,9 +105900,12 @@ async function clientSeries(clientId) {
   }
   return out;
 }
-async function sElectionEligibility(clientId) {
+async function sElectionEligibility(clientId, orderId) {
   const db = await getDb();
-  const formed = await db.query(
+  const formed = orderId ? await db.query(
+    "SELECT paid_at FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL AND package = 'NEW' LIMIT 1",
+    [clientId, orderId]
+  ) : await db.query(
     "SELECT paid_at FROM orders WHERE client_id = $1 AND paid_at IS NOT NULL AND package = 'NEW' ORDER BY paid_at DESC NULLS LAST LIMIT 1",
     [clientId]
   );
@@ -105851,7 +105914,11 @@ async function sElectionEligibility(clientId) {
   }
   const paidAt = new Date(String(formed[0].paid_at));
   const orderBy = new Date(paidAt.getTime() + S_ELECTION_WINDOW_DAYS * 864e5);
-  const existing = await db.query(
+  const existing = orderId ? await db.query(
+    `SELECT id FROM service_orders WHERE client_id = $1 AND type = 's-election' AND status <> 'cancelled'
+           AND (formation_order_id IS NULL OR formation_order_id = $2)`,
+    [clientId, orderId]
+  ) : await db.query(
     "SELECT id FROM service_orders WHERE client_id = $1 AND type = 's-election' AND status <> 'cancelled'",
     [clientId]
   );
@@ -106109,12 +106176,24 @@ function registerPortalRoutes(app2) {
     await createSession(c, { clientId: rows[0].client_id });
     return c.json({ data: { ok: true } });
   });
+  app2.get("/portal/companies", async (c) => {
+    const session = await getSession(c);
+    if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+    const db = await getDb();
+    const rows = await db.query(
+      `SELECT id, llc_name, formed_at, payload->>'filingPath' AS filing_path
+       FROM orders WHERE client_id = $1 AND paid_at IS NOT NULL
+      ORDER BY paid_at DESC NULLS LAST`,
+      [session.clientId]
+    );
+    return c.json({ data: rows.map((r) => ({ orderId: r.id, llcName: r.llc_name, formed: !!r.formed_at })) });
+  });
   app2.get("/portal/documents", async (c) => {
     const session = await getSession(c);
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
     const db = await getDb();
     const docs = await db.query(
-      "SELECT id, kind, title, size_bytes, created_at FROM documents WHERE client_id = $1 ORDER BY created_at DESC",
+      "SELECT id, kind, title, size_bytes, created_at, order_id FROM documents WHERE client_id = $1 ORDER BY created_at DESC",
       [session.clientId]
     );
     return c.json({ data: docs });
@@ -106145,16 +106224,17 @@ function registerPortalRoutes(app2) {
   app2.get("/portal/oa", async (c) => {
     const session = await getSession(c);
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    const seed = await oaSeed(session.clientId);
+    const companyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
+    const seed = await oaSeed(session.clientId, companyId);
     if (!seed) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
     const db = await getDb();
-    const saved = await db.query("SELECT answers FROM oa_profiles WHERE client_id = $1", [session.clientId]);
+    const saved = await db.query("SELECT answers FROM oa_profiles WHERE client_id = $1 AND order_id = $2", [session.clientId, seed.orderId]);
     const gens = await db.query(
       `SELECT id, document_id, template_version, amended_restated, created_at,
             COALESCE(generation_number, 0) AS generation_number,
             inputs->>'version' AS version
-       FROM oa_generations WHERE client_id = $1 ORDER BY created_at DESC`,
-      [session.clientId]
+       FROM oa_generations WHERE client_id = $1 AND (order_id = $2 OR order_id IS NULL) ORDER BY created_at DESC`,
+      [session.clientId, seed.orderId]
     );
     const savedAnswers = saved.length > 0 ? typeof saved[0].answers === "string" ? JSON.parse(saved[0].answers) : saved[0].answers : {};
     const memberManaged = seed.managementStructure === "MEMBER_MANAGED";
@@ -106178,24 +106258,26 @@ function registerPortalRoutes(app2) {
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
     const body = oaAnswersSchema.safeParse(await c.req.json().catch(() => null));
     if (!body.success) return c.json(err("Invalid answers.", "INVALID_INPUT"), 400);
+    const answersCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
+    if (!answersCompanyId) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
     const db = await getDb();
     const revRaw = c.req.query("rev");
     const rev = revRaw !== void 0 && revRaw !== "" ? Number(revRaw) : null;
     if (rev !== null && Number.isFinite(rev)) {
       const wrote = await db.query(
-        `INSERT INTO oa_profiles (client_id, answers, rev, updated_at) VALUES ($1, $2, $3, now())
-       ON CONFLICT (client_id) DO UPDATE SET answers = $2, rev = $3, updated_at = now()
+        `INSERT INTO oa_profiles (client_id, order_id, answers, rev, updated_at) VALUES ($1, $4, $2, $3, now())
+       ON CONFLICT (client_id, order_id) DO UPDATE SET answers = $2, rev = $3, updated_at = now()
          WHERE oa_profiles.rev < $3
        RETURNING rev`,
-        [session.clientId, JSON.stringify(body.data), rev]
+        [session.clientId, JSON.stringify(body.data), rev, answersCompanyId]
       );
       if (wrote.length === 0) return c.json({ data: { ok: true, stale: true } });
       return c.json({ data: { ok: true, rev } });
     }
     await db.query(
-      `INSERT INTO oa_profiles (client_id, answers, updated_at) VALUES ($1, $2, now())
-     ON CONFLICT (client_id) DO UPDATE SET answers = $2, updated_at = now()`,
-      [session.clientId, JSON.stringify(body.data)]
+      `INSERT INTO oa_profiles (client_id, order_id, answers, updated_at) VALUES ($1, $3, $2, now())
+     ON CONFLICT (client_id, order_id) DO UPDATE SET answers = $2, updated_at = now()`,
+      [session.clientId, JSON.stringify(body.data), answersCompanyId]
     );
     return c.json({ data: { ok: true } });
   });
@@ -106208,7 +106290,8 @@ function registerPortalRoutes(app2) {
     const body = oaAnswersSchema.safeParse(await c.req.json().catch(() => null));
     if (!body.success) return c.json(err("Invalid answers.", "INVALID_INPUT"), 400);
     const a2 = body.data;
-    const seed = await oaSeed(session.clientId);
+    const genCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
+    const seed = await oaSeed(session.clientId, genCompanyId);
     if (!seed) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
     const owners = effectiveOwners(seed.members, a2);
     if (owners.length === 0) {
@@ -106394,9 +106477,9 @@ function registerPortalRoutes(app2) {
       return c.json(err("We could not generate the agreement. Our team has been notified.", "GENERATION_FAILED"), 500);
     }
     await db.query(
-      `INSERT INTO oa_profiles (client_id, answers, updated_at) VALUES ($1, $2, now())
-     ON CONFLICT (client_id) DO UPDATE SET answers = $2, updated_at = now()`,
-      [session.clientId, JSON.stringify(a2)]
+      `INSERT INTO oa_profiles (client_id, order_id, answers, updated_at) VALUES ($1, $3, $2, now())
+     ON CONFLICT (client_id, order_id) DO UPDATE SET answers = $2, updated_at = now()`,
+      [session.clientId, JSON.stringify(a2), seed.orderId]
     );
     const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength);
     const stored = await putFile(
@@ -106405,14 +106488,14 @@ function registerPortalRoutes(app2) {
       "application/pdf"
     );
     const doc = await db.query(
-      `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)
-     VALUES ($1, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,
-      [session.clientId, title, stored.storageKey, stored.sizeBytes]
+      `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes)
+     VALUES ($1, $5, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,
+      [session.clientId, title, stored.storageKey, stored.sizeBytes, seed.orderId]
     );
     const gen = await db.query(
-      `INSERT INTO oa_generations (client_id, document_id, template_version, amended_restated, inputs, generation_number)
-     VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
-      [session.clientId, doc[0].id, OA_TEMPLATE_VERSION, inputs.amendedRestated, JSON.stringify(inputs), nextGenerationNumber]
+      `INSERT INTO oa_generations (client_id, order_id, document_id, template_version, amended_restated, inputs, generation_number)
+     VALUES ($1, $7, $2, $3, $4, $5, $6) RETURNING id`,
+      [session.clientId, doc[0].id, OA_TEMPLATE_VERSION, inputs.amendedRestated, JSON.stringify(inputs), nextGenerationNumber, seed.orderId]
     );
     return c.json({ data: { generationId: gen[0].id, documentId: doc[0].id, title, version } });
   });
@@ -106563,15 +106646,20 @@ function registerPortalRoutes(app2) {
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
     await purgeExpiredSElections().catch((e) => console.error("[purge] failed:", e));
     const db = await getDb();
-    const orders = await db.query(
+    const svcCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
+    const orders = svcCompanyId ? await db.query(
+      `SELECT ${SERVICE_SAFE_COLUMNS} FROM service_orders WHERE client_id = $1
+           AND (formation_order_id IS NULL OR formation_order_id = $2) ORDER BY created_at DESC`,
+      [session.clientId, svcCompanyId]
+    ) : await db.query(
       `SELECT ${SERVICE_SAFE_COLUMNS} FROM service_orders WHERE client_id = $1 ORDER BY created_at DESC`,
       [session.clientId]
     );
-    const seed = await oaSeed(session.clientId);
-    const owners = effectiveOwners(seed?.members ?? [], await savedOaAnswers(session.clientId));
+    const seed = await oaSeed(session.clientId, svcCompanyId);
+    const owners = effectiveOwners(seed?.members ?? [], await savedOaAnswers(session.clientId, svcCompanyId));
     return c.json({
       data: {
-        llcName: await clientLlcName(session.clientId),
+        llcName: await clientLlcName(session.clientId, svcCompanyId),
         dev: !env.isProd && !env.SQUARE_ACCESS_TOKEN,
         members: owners,
         pricing: {
@@ -106581,9 +106669,9 @@ function registerPortalRoutes(app2) {
           certStatusCents: CERT_STATUS_FEE_CENTS,
           certifiedCopyCents: CERTIFIED_COPY_FEE_CENTS
         },
-        sElection: await sElectionEligibility(session.clientId),
-        series: await clientSeries(session.clientId),
-        llcFormed: await clientLlcFormed(session.clientId),
+        sElection: await sElectionEligibility(session.clientId, svcCompanyId),
+        series: await clientSeries(session.clientId, svcCompanyId),
+        llcFormed: await clientLlcFormed(session.clientId, svcCompanyId),
         einCompanyOrdered: orders.some((o) => {
           if (o.type !== "ein" || o.status === "pending_payment") return false;
           const d2 = typeof o.details === "string" ? JSON.parse(o.details) : o.details;
@@ -106604,18 +106692,19 @@ function registerPortalRoutes(app2) {
     if (!await rateLimit(`svc:${session.clientId}`, 20, 36e5)) {
       return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
     }
-    const llcName = await clientLlcName(session.clientId);
+    const purchaseCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
+    const llcName = await clientLlcName(session.clientId, purchaseCompanyId);
     if (!llcName) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
-    const gate = await sElectionEligibility(session.clientId);
+    const gate = await sElectionEligibility(session.clientId, purchaseCompanyId);
     if (!gate.eligible) {
       const msg = gate.reason === "already_ordered" ? "You already have an S election order \u2014 see your orders below." : gate.reason === "window_closed" ? "The ordering window for the S election package has closed. A late election requires IRS relief \u2014 please consult a tax professional." : "The S election package is available only for new LLCs we formed.";
       return c.json(err(msg, gate.reason === "window_closed" ? "WINDOW_CLOSED" : "NOT_ELIGIBLE"), 400);
     }
     const db = await getDb();
     const rows = await db.query(
-      `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents)
-     VALUES ($1, 's-election', $2, $3, $4) RETURNING id`,
-      [session.clientId, llcName, JSON.stringify({}), S_ELECTION_FEE_CENTS]
+      `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents, formation_order_id)
+     VALUES ($1, 's-election', $2, $3, $4, $5) RETURNING id`,
+      [session.clientId, llcName, JSON.stringify({}), S_ELECTION_FEE_CENTS, purchaseCompanyId]
     );
     const serviceOrderId = rows[0].id;
     const clients = await db.query("SELECT email FROM clients WHERE id = $1", [session.clientId]);
@@ -106646,7 +106735,8 @@ function registerPortalRoutes(app2) {
     }
     const body = external_exports.object({ suffix: external_exports.string().min(1).max(60), purpose: external_exports.string().max(300).optional() }).safeParse(await c.req.json().catch(() => null));
     if (!body.success) return c.json(err("A series identifier is required.", "INVALID_INPUT"), 400);
-    const llcName = await clientLlcName(session.clientId);
+    const purchaseCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
+    const llcName = await clientLlcName(session.clientId, purchaseCompanyId);
     if (!llcName) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
     const suffix = body.data.suffix.trim().replace(/\s+/g, " ");
     if (!/^[\w .,'&-]+$/.test(suffix)) {
@@ -106662,9 +106752,9 @@ function registerPortalRoutes(app2) {
     const amountCents = SERIES_ADDON_PREP_CENTS + SERIES_ADDON_STATE_CENTS;
     const db = await getDb();
     const rows = await db.query(
-      `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents)
-     VALUES ($1, 'series', $2, $3, $4) RETURNING id`,
-      [session.clientId, llcName, JSON.stringify({ seriesName, purpose: body.data.purpose ?? "" }), amountCents]
+      `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents, formation_order_id)
+     VALUES ($1, 'series', $2, $3, $4, $5) RETURNING id`,
+      [session.clientId, llcName, JSON.stringify({ seriesName, purpose: body.data.purpose ?? "" }), amountCents, purchaseCompanyId]
     );
     const serviceOrderId = rows[0].id;
     const clients = await db.query("SELECT email FROM clients WHERE id = $1", [session.clientId]);
@@ -106703,21 +106793,26 @@ function registerPortalRoutes(app2) {
     const body = external_exports.object({ kind: external_exports.enum(["certificate-of-status", "certified-copy"]) }).safeParse(await c.req.json().catch(() => null));
     if (!body.success) return c.json(err("Choose which document you need.", "INVALID_INPUT"), 400);
     const spec = CERT_TYPES[body.data.kind];
-    const llcName = await clientLlcName(session.clientId);
+    const purchaseCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
+    const llcName = await clientLlcName(session.clientId, purchaseCompanyId);
     if (!llcName) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
+    if (!await clientLlcFormed(session.clientId, purchaseCompanyId)) {
+      return c.json(err("The state issues these only for a formed LLC \u2014 yours is still in progress.", "NOT_FORMED"), 400);
+    }
     const db = await getDb();
     const open = await db.query(
       `SELECT id FROM service_orders
-      WHERE client_id = $1 AND type = $2 AND status IN ('in_progress', 'awaiting_info')`,
-      [session.clientId, body.data.kind]
+      WHERE client_id = $1 AND type = $2 AND status IN ('in_progress', 'awaiting_info')
+        AND (formation_order_id IS NULL OR formation_order_id = $3)`,
+      [session.clientId, body.data.kind, purchaseCompanyId]
     );
     if (open.length > 0) {
       return c.json(err(`A ${spec.name.toLowerCase()} is already on order \u2014 see your orders below.`, "ALREADY_ORDERED"), 400);
     }
     const rows = await db.query(
-      `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents)
-     VALUES ($1, $2, $3, '{}'::jsonb, $4) RETURNING id`,
-      [session.clientId, body.data.kind, llcName, spec.fee]
+      `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents, formation_order_id)
+     VALUES ($1, $2, $3, '{}'::jsonb, $4, $5) RETURNING id`,
+      [session.clientId, body.data.kind, llcName, spec.fee, purchaseCompanyId]
     );
     const serviceOrderId = rows[0].id;
     const clients = await db.query("SELECT email FROM clients WHERE id = $1", [session.clientId]);
@@ -106748,7 +106843,8 @@ function registerPortalRoutes(app2) {
     }
     const body = external_exports.object({ target: external_exports.enum(["company", "series"]), seriesName: external_exports.string().max(300).optional() }).safeParse(await c.req.json().catch(() => null));
     if (!body.success) return c.json(err("Choose what the EIN is for.", "INVALID_INPUT"), 400);
-    const llcName = await clientLlcName(session.clientId);
+    const purchaseCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
+    const llcName = await clientLlcName(session.clientId, purchaseCompanyId);
     if (!llcName) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
     if (body.data.target === "series" && !body.data.seriesName?.trim()) {
       return c.json(err("Name the protected series the EIN is for.", "INVALID_INPUT"), 400);
@@ -106776,7 +106872,7 @@ function registerPortalRoutes(app2) {
       );
     }
     if (target === "series") {
-      const mine = await clientSeries(session.clientId);
+      const mine = await clientSeries(session.clientId, purchaseCompanyId);
       const match2 = mine.find((s) => s.name.toLowerCase() === seriesName.toLowerCase());
       if (!match2) return c.json(err("That protected series is not on your account.", "UNKNOWN_SERIES"), 400);
       if (match2.einOrdered) {
@@ -106784,9 +106880,9 @@ function registerPortalRoutes(app2) {
       }
     }
     const rows = await db.query(
-      `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents)
-     VALUES ($1, 'ein', $2, $3, $4) RETURNING id`,
-      [session.clientId, llcName, JSON.stringify({ target, seriesName }), EIN_FEE_CENTS]
+      `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents, formation_order_id)
+     VALUES ($1, 'ein', $2, $3, $4, $5) RETURNING id`,
+      [session.clientId, llcName, JSON.stringify({ target, seriesName }), EIN_FEE_CENTS, purchaseCompanyId]
     );
     const serviceOrderId = rows[0].id;
     const clients = await db.query("SELECT email FROM clients WHERE id = $1", [session.clientId]);
@@ -106819,7 +106915,7 @@ function registerPortalRoutes(app2) {
     }
     const db = await getDb();
     const rows = await db.query(
-      "SELECT id, client_id, type, status, details, llc_name FROM service_orders WHERE id = $1",
+      "SELECT id, client_id, type, status, details, llc_name, formation_order_id FROM service_orders WHERE id = $1",
       [c.req.param("id")]
     );
     if (rows.length === 0 || rows[0].client_id !== session.clientId) {
@@ -106829,7 +106925,7 @@ function registerPortalRoutes(app2) {
     if (so2.type !== "ein" || so2.status !== "awaiting_info") {
       return c.json(err("This order is not awaiting details.", "BAD_STATE"), 400);
     }
-    if (!await clientLlcFormed(session.clientId)) {
+    if (!await clientLlcFormed(session.clientId, so2.formation_order_id)) {
       return c.json(err("Your LLC must be formed before an EIN can be obtained.", "NOT_FORMED"), 400);
     }
     const details = typeof so2.details === "string" ? JSON.parse(so2.details) : so2.details;
@@ -106878,16 +106974,13 @@ function registerPortalRoutes(app2) {
   app2.post("/portal/services/:id/s-election-details", async (c) => {
     const session = await getSession(c);
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    if (!await clientLlcFormed(session.clientId)) {
-      return c.json(err("Your LLC must be formed before an S election can be made.", "NOT_FORMED"), 400);
-    }
     const body = sElectionDetailsSchema.safeParse(await c.req.json().catch(() => null));
     if (!body.success) {
       return c.json(err(body.error.issues[0]?.message ?? "Invalid details.", "INVALID_INPUT"), 400);
     }
     const db = await getDb();
     const rows = await db.query(
-      "SELECT id, client_id, type, status, llc_name, details, ein_secret, fulfilled_at FROM service_orders WHERE id = $1",
+      "SELECT id, client_id, type, status, llc_name, details, ein_secret, fulfilled_at, formation_order_id FROM service_orders WHERE id = $1",
       [c.req.param("id")]
     );
     if (rows.length === 0 || rows[0].client_id !== session.clientId) {
@@ -106895,6 +106988,9 @@ function registerPortalRoutes(app2) {
     }
     const so2 = rows[0];
     if (so2.type !== "s-election") return c.json(err("Not found", "NOT_FOUND"), 404);
+    if (!await clientLlcFormed(session.clientId, so2.formation_order_id)) {
+      return c.json(err("Your LLC must be formed before an S election can be made.", "NOT_FORMED"), 400);
+    }
     const prior = typeof so2.details === "string" ? JSON.parse(so2.details) : so2.details;
     const editable = so2.status === "awaiting_info" || sElectionWindow(so2.fulfilled_at).open;
     if (!editable) {
@@ -109067,7 +109163,7 @@ function registerAdminRoutes(app2) {
     }
     const db = await getDb();
     const rows = await db.query(
-      "SELECT id, client_id, type, status, llc_name, details FROM service_orders WHERE id = $1",
+      "SELECT id, client_id, type, status, llc_name, details, formation_order_id FROM service_orders WHERE id = $1",
       [c.req.param("id")]
     );
     if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
@@ -109094,9 +109190,9 @@ function registerAdminRoutes(app2) {
       }
       const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
       const doc = await db.query(
-        `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)
-       VALUES ($1, 'package', $2, $3, $4, $5) RETURNING id`,
-        [so2.client_id, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes]
+        `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes)
+       VALUES ($1, $6, 'package', $2, $3, $4, $5) RETURNING id`,
+        [so2.client_id, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes, so2.formation_order_id]
       );
       documentId = doc[0].id;
     }

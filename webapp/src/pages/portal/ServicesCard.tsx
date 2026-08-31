@@ -101,7 +101,10 @@ function summaryOf(o: ServiceOrder): string {
 const fmtDay = (iso: string) =>
   new Date(iso).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
 
-export function ServicesCard() {
+export function ServicesCard({ company }: { company?: string | null }) {
+  // Every read and purchase carries the selected company (Adam, 31 Aug 2026);
+  // absent, the server defaults to the latest formation — the old behavior.
+  const cq = company ? `?company=${company}` : "";
   const queryClient = useQueryClient();
   const [seriesOpen, setSeriesOpen] = useState(false);
   const [einOpen, setEinOpen] = useState(false);
@@ -116,15 +119,15 @@ export function ServicesCard() {
   const [error, setError] = useState<string>("");
 
   const servicesQuery = useQuery({
-    queryKey: ["portal-services"],
-    queryFn: () => api.get<ServicesData>("/api/portal/services"),
+    queryKey: ["portal-services", company ?? null],
+    queryFn: () => api.get<ServicesData>(`/api/portal/services${cq}`),
   });
 
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["portal-services"] });
 
   const orderSeries = useMutation({
     mutationFn: (body: { suffix: string; purpose?: string }) =>
-      api.post<{ checkoutUrl: string }>("/api/portal/services/series", body),
+      api.post<{ checkoutUrl: string }>(`/api/portal/services/series${cq}`, body),
     onSuccess: (res) => {
       window.location.href = res.checkoutUrl;
     },
@@ -133,7 +136,7 @@ export function ServicesCard() {
 
   const orderEin = useMutation({
     mutationFn: (body: { target: "company" | "series"; seriesName?: string }) =>
-      api.post<{ checkoutUrl: string }>("/api/portal/services/ein", body),
+      api.post<{ checkoutUrl: string }>(`/api/portal/services/ein${cq}`, body),
     onSuccess: (res) => {
       window.location.href = res.checkoutUrl;
     },
@@ -141,7 +144,7 @@ export function ServicesCard() {
   });
 
   const orderCertificate = useMutation({
-    mutationFn: (kind: string) => api.post<{ checkoutUrl: string }>("/api/portal/services/certificate", { kind }),
+    mutationFn: (kind: string) => api.post<{ checkoutUrl: string }>(`/api/portal/services/certificate${cq}`, { kind }),
     onSuccess: (res) => {
       window.location.href = res.checkoutUrl;
     },
@@ -149,7 +152,7 @@ export function ServicesCard() {
   });
 
   const orderSElection = useMutation({
-    mutationFn: () => api.post<{ checkoutUrl: string }>("/api/portal/services/s-election", {}),
+    mutationFn: () => api.post<{ checkoutUrl: string }>(`/api/portal/services/s-election${cq}`, {}),
     onSuccess: (res) => {
       window.location.href = res.checkoutUrl;
     },
@@ -455,6 +458,36 @@ export function ServicesCard() {
             </DialogContent>
           </Dialog>
         ) : null}
+
+          {/* Another company entirely: the wizard handles it, and the new
+              order joins this same portal account by email (Adam,
+              31 Aug 2026). */}
+          <a
+            href="/form-llc?path=new"
+            className="rounded-xl border border-border bg-background p-4 text-left transition-all hover:border-accent hover:shadow-md"
+          >
+            <div className="flex items-center gap-2 text-trust">
+              <FileCheck2 className="h-4 w-4" />
+              <span className="text-sm font-medium text-foreground">Form another Protected Series LLC</span>
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">
+              A brand-new company, filed the same way as your first. It appears in
+              this portal when it's paid for.
+            </p>
+          </a>
+          <a
+            href="/form-llc?path=convert"
+            className="rounded-xl border border-border bg-background p-4 text-left transition-all hover:border-accent hover:shadow-md"
+          >
+            <div className="flex items-center gap-2 text-trust">
+              <FileCheck2 className="h-4 w-4" />
+              <span className="text-sm font-medium text-foreground">Convert an existing Florida LLC</span>
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Already have another Florida LLC? We file its Protected Series
+              Designations — no Articles fee.
+            </p>
+          </a>
 
           {/* State certificates — the typical time to buy is AFTER formation,
               when a bank or lender asks (Adam, 30 Aug 2026). */}

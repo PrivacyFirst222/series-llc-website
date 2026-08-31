@@ -67,11 +67,20 @@ function Card({
   onOpen: () => void;
   onFulfill: (s: AdminServiceOrder) => void;
 }) {
+  const freshWork = order.status === "formed" && services.some(serviceIsOpen);
   return (
-    <div className="w-full rounded-xl border border-border bg-card p-3 text-left transition hover:border-trust/60 hover:shadow-sm">
+    <div
+      className={cn(
+        "w-full rounded-xl border bg-card p-3 text-left transition hover:shadow-sm",
+        freshWork ? "border-trust ring-1 ring-trust hover:border-trust" : "border-border hover:border-trust/60",
+      )}
+    >
       <button type="button" onClick={onOpen} className="block w-full text-left">
         <div className="flex items-start justify-between gap-2">
           <span className="font-medium leading-snug">{order.llc_name}</span>
+          {freshWork ? (
+            <span className="rounded-full bg-trust/10 px-2 py-0.5 text-xs font-medium text-trust">new order</span>
+          ) : null}
           <ChevronRight className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
         </div>
         <div className="mt-1 text-xs text-muted-foreground">{order.contact_name}</div>
@@ -231,7 +240,13 @@ export default function OrderBoard({ enabled }: { enabled: boolean }) {
     (o.certified_copy_purchased && !o.certified_copy_uploaded);
   const everythingDone = (o: BoardOrder) =>
     o.status === "formed" && !certOwed(o) && !servicesFor(o.id).some(serviceIsOpen);
-  const withState = orders.filter((o) => o.status === "filed" || (o.status === "formed" && !everythingDone(o)));
+  // A formed company whose client just bought something is NEW WORK: it goes
+  // back to the first column with a green outline (Adam, 31 Aug 2026). A
+  // formed order owing only certificates is still formation work, column two.
+  const newWork = orders.filter((o) => o.status === "formed" && servicesFor(o.id).some(serviceIsOpen));
+  const withState = orders.filter(
+    (o) => o.status === "filed" || (o.status === "formed" && !everythingDone(o) && !newWork.includes(o)),
+  );
   const done = orders.filter(everythingDone);
   const oldestPending = pending.reduce<number>((m, o) => Math.max(m, ageInDays(o.created_at)), 0);
 
@@ -301,8 +316,8 @@ export default function OrderBoard({ enabled }: { enabled: boolean }) {
       <div className="mt-4 flex flex-col gap-4 xl:flex-row">
         <Column
           title="New Orders"
-          hint="Paid, not yet filed"
-          orders={isNew}
+          hint="Paid, not yet filed — green: new order from an existing client"
+          orders={[...newWork, ...isNew]}
           servicesFor={servicesFor}
           onOpen={setOpenId}
           onFulfill={setViewing}
