@@ -100812,21 +100812,31 @@ function orderPaidEmail(opts) {
 }
 function llcFormedEmail(opts) {
   const series = opts.seriesNames.map((n) => `<li>${escapeHtml(n)}</li>`).join("");
+  const others = opts.otherDocuments.map((n) => `<li>Your <strong>${escapeHtml(n)}</strong>, as issued</li>`).join("");
+  const waiting = opts.otherDocuments.length > 0 ? "Your documents are waiting in your portal, ready to download:" : "Two things are waiting in your portal, ready to download:";
+  const svc = opts.einOrdered && opts.sElectionOrdered ? " Your Federal EIN and S election package orders are in your portal as well \u2014 that's our next step." : opts.einOrdered ? " Your Federal EIN order is in your portal as well \u2014 that's our next step." : opts.sElectionOrdered ? " Your S election package order is in your portal as well \u2014 that's our next step." : "";
   return {
     subject: `${opts.llcName} is formed`,
     html: wrap(`
-      <p><strong>${escapeHtml(opts.llcName)}</strong> has been formed with the Florida
-      Division of Corporations.</p>
-      <p>Two things are waiting in your portal, ready to download:</p>
+      <p>Dear ${escapeHtml(opts.clientName)};</p>
+      <p>Congratulations, your Florida Protected Series LLC,
+      <strong>${escapeHtml(opts.llcName)}</strong>, has been officially formed
+      with the Florida Division of Corporations!</p>
+      <p>${waiting}</p>
       <ul>
         <li>Your <strong>Articles of Organization</strong>, as filed</li>
         <li>Your <strong>Protected Series Designation</strong>${opts.seriesNames.length > 1 ? "s" : ""},
-            as filed, covering:</li>
+            as filed, covering:
+          <ul>${series}</ul>
+        </li>
+        ${others}
       </ul>
-      <ul>${series}</ul>
-      <p>Keep both with your company records \u2014 a bank, a title company, or a
+      <p>Keep these with your company records \u2014 a bank, a title company, or a
       closing agent will ask for them.</p>
-      <p><a href="${opts.portalUrl}">Open your portal</a></p>
+      <p>The next step is to create your operating agreement. You can do that
+      in your personal portal (<a href="${opts.portalUrl}">Click here to open</a>).${svc}</p>
+      <p>Thank you for doing business with MyFloridaSeriesLLC!</p>
+      <p>support@myfloridaseriesllc.com</p>
     `)
   };
 }
@@ -108662,50 +108672,6 @@ function registerAdminRoutes(app2) {
     );
     return c.json({ data: { ok: true } });
   });
-  const ANCILLARY_KINDS = {
-    "certificate-of-status": { payloadKey: "certificateOfStatus", title: "Certificate of Status" },
-    "certified-copy": { payloadKey: "certifiedCopy", title: "Certified Copy of the Articles" }
-  };
-  app2.post("/admin/orders/:id/ancillary/:kind", async (c) => {
-    const admin = await requireAdmin(c);
-    if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    const kind = c.req.param("kind");
-    const spec = ANCILLARY_KINDS[kind];
-    if (!spec) return c.json(err("Unknown document kind.", "INVALID_INPUT"), 400);
-    const db = await getDb();
-    const rows = await db.query(
-      "SELECT id, client_id, llc_name, payload FROM orders WHERE id = $1",
-      [c.req.param("id")]
-    );
-    if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
-    const o = rows[0];
-    if (!o.client_id) return c.json(err("This order has no client account yet.", "NO_CLIENT"), 400);
-    const payload = typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload;
-    if (!payload.optionalDocuments?.[spec.payloadKey]) {
-      return c.json(err(`The client did not purchase a ${spec.title.toLowerCase()} with this order.`, "NOT_PURCHASED"), 400);
-    }
-    const existing = await db.query(
-      "SELECT id FROM documents WHERE order_id = $1 AND kind = $2",
-      [o.id, kind]
-    );
-    if (existing.length > 0) {
-      return c.json(err(`The ${spec.title.toLowerCase()} is already uploaded.`, "ALREADY_UPLOADED"), 409);
-    }
-    const form = await c.req.parseBody();
-    const file = form.file;
-    if (!(file instanceof File)) return c.json(err("The PDF is required.", "INVALID_INPUT"), 400);
-    if (file.size > MAX_UPLOAD_BYTES) return c.json(err("The file is too large (20 MB max).", "TOO_LARGE"), 400);
-    if (!await looksLikePdf(file)) {
-      return c.json(err("This is not a readable PDF. Upload the document from Sunbiz.", "NOT_A_PDF"), 400);
-    }
-    const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
-    await db.query(
-      `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, '{}'::jsonb)`,
-      [o.client_id, o.id, kind, `${spec.title} \u2014 ${o.llc_name}`, stored.storageKey, file.type || "application/pdf", stored.sizeBytes]
-    );
-    return c.json({ data: { ok: true } });
-  });
   app2.post("/admin/orders/:id/formation-documents", async (c) => {
     const admin = await requireAdmin(c);
     if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
@@ -108734,6 +108700,20 @@ function registerAdminRoutes(app2) {
     const psdFiles = (Array.isArray(form["psd"]) ? form["psd"] : [form["psd"]]).filter(
       (f) => f instanceof File
     );
+    const certFiles = [];
+    const payloadOpts = (typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload).optionalDocuments;
+    for (const [field, kind, key, title] of [
+      ["certStatus", "certificate-of-status", "certificateOfStatus", "Certificate of Status"],
+      ["certifiedCopy", "certified-copy", "certifiedCopy", "Certified Copy of the Articles"]
+    ]) {
+      const f = form[field];
+      if (f instanceof File && f.size > 0) {
+        if (!payloadOpts?.[key]) {
+          return c.json(err(`The client did not purchase a ${title.toLowerCase()} with this order.`, "NOT_PURCHASED"), 400);
+        }
+        certFiles.push({ kind, title: `${title} \u2014 ${o.llc_name}`, file: f });
+      }
+    }
     const psdSeriesRaw = (Array.isArray(form["psdSeries"]) ? form["psdSeries"] : [form["psdSeries"]]).filter((v2) => typeof v2 === "string");
     if (psdFiles.length === 0) {
       return c.json(err("At least one Protected Series Designation is required.", "INVALID_INPUT"), 400);
@@ -108760,7 +108740,7 @@ function registerAdminRoutes(app2) {
         400
       );
     }
-    const files = articles ? [articles, ...psdFiles] : psdFiles;
+    const files = [...articles ? [articles] : [], ...psdFiles, ...certFiles.map((cf) => cf.file)];
     for (const f of files) {
       if (f.size > MAX_UPLOAD_BYTES) {
         return c.json(err(`${f.name} is too large (20 MB max).`, "TOO_LARGE"), 400);
@@ -108779,12 +108759,10 @@ function registerAdminRoutes(app2) {
       return c.json(err("A replacement for this order is already being processed.", "REPLACEMENT_IN_PROGRESS"), 409);
     }
     try {
-      const priorDocs = articles ? await db.query(
-        "SELECT id, storage_key FROM documents WHERE order_id = $1 AND kind IN ('articles', 'psd')",
-        [o.id]
-      ) : await db.query(
-        "SELECT id, storage_key FROM documents WHERE order_id = $1 AND kind = 'psd'",
-        [o.id]
+      const retiredKinds = ["psd", ...articles ? ["articles"] : [], ...certFiles.map((cf) => cf.kind)];
+      const priorDocs = await db.query(
+        "SELECT id, storage_key FROM documents WHERE order_id = $1 AND kind = ANY($2::text[])",
+        [o.id, retiredKinds]
       );
       let formationPuts = 0;
       const stagedPut = async (name, data, type) => {
@@ -108818,6 +108796,16 @@ function registerAdminRoutes(app2) {
             ]
           );
           newRows.push(artRow[0].id);
+        }
+        for (const cf of certFiles) {
+          const storedCert = await stagedPut(cf.file.name, await cf.file.arrayBuffer(), cf.file.type || "application/pdf");
+          newKeys.push(storedCert.storageKey);
+          const certRow = await db.query(
+            `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, '{}'::jsonb) RETURNING id`,
+            [o.client_id, o.id, cf.kind, cf.title, storedCert.storageKey, cf.file.type || "application/pdf", storedCert.sizeBytes]
+          );
+          newRows.push(certRow[0].id);
         }
         for (let i = 0; i < psdFiles.length; i += 1) {
           const f = psdFiles[i];
@@ -108864,9 +108852,25 @@ function registerAdminRoutes(app2) {
       );
       let notified = false;
       if (clients.length > 0) {
+        const certDocs = await db.query(
+          "SELECT kind FROM documents WHERE order_id = $1 AND kind IN ('certificate-of-status', 'certified-copy')",
+          [o.id]
+        );
+        const openSvc = await db.query(
+          `SELECT type FROM service_orders WHERE client_id = $1
+        AND type IN ('ein', 's-election') AND status IN ('awaiting_info', 'in_progress')`,
+          [o.client_id]
+        );
         const mail = llcFormedEmail({
+          clientName: clients[0].name,
           llcName: o.llc_name,
           seriesNames: required,
+          otherDocuments: [
+            ...certDocs.some((d2) => d2.kind === "certificate-of-status") ? ["Certificate of Status"] : [],
+            ...certDocs.some((d2) => d2.kind === "certified-copy") ? ["Certified Copy of the Articles"] : []
+          ],
+          einOrdered: openSvc.some((r) => r.type === "ein"),
+          sElectionOrdered: openSvc.some((r) => r.type === "s-election"),
           portalUrl: `${env.PUBLIC_BASE_URL}/portal`
         });
         notified = await sendMail({ to: clients[0].email, ...mail }).then(

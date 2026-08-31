@@ -2418,11 +2418,21 @@ if (mint.status === 200) {
     check("every copied tick is cleared for the resubmission", Object.keys(d3?.copiedFields ?? { x: 1 }).length === 0, d3?.copiedFields);
     check("the series check-off is reset too", d3?.seriesFiledAt === null, d3?.seriesFiledAt);
 
-    // 5. Formation-time certificates upload through their own links — refused
-    //    when never purchased, accepted when bought, duplicate refused.
-    const certPdf = () => { const fd = new FormData(); fd.set("file", new File([new TextEncoder().encode("%PDF-1.4 anc\n%%EOF")], "c.pdf", { type: "application/pdf" })); return fd; };
-    const notBought = await fetch(`${BASE}/api/admin/orders/${o.id}/ancillary/certificate-of-status`, { method: "POST", body: certPdf(), headers: { Cookie: adm.cookie, "X-Forwarded-For": RUN_IP } });
-    check("an ancillary upload for a certificate the client never bought is refused", notBought.status === 400, notBought.status);
+    // 5. The state certificates ride the formation package upload (Adam,
+    //    30 Aug 2026): refused for a client who never bought them, stored
+    //    with their own kinds when bought, and named in the formed email.
+    const pdf = (label: string) => new File([new TextEncoder().encode(`%PDF-1.4 ${label}\n%%EOF`)], `${label}.pdf`, { type: "application/pdf" });
+    const packageFd = (withCerts: boolean, series: string[]) => {
+      const fd = new FormData();
+      fd.set("articles", pdf("arts"));
+      fd.append("psd", pdf("psd"));
+      fd.append("psdSeries", JSON.stringify(series));
+      if (withCerts) { fd.set("certStatus", pdf("certstatus")); fd.set("certifiedCopy", pdf("certcopy")); }
+      return fd;
+    };
+    const oSeries = ((await api(`/api/admin/orders/${o.id}`, { cookies: adm.cookie })).body?.data as { series: { name: string }[] }).series.map((x) => x.name);
+    const notBought = await fetch(`${BASE}/api/admin/orders/${o.id}/formation-documents`, { method: "POST", body: packageFd(true, oSeries), headers: { Cookie: adm.cookie, "X-Forwarded-For": RUN_IP } });
+    check("a certificate file for a client who never bought one is refused", notBought.status === 400, notBought.status);
     const certIp = { "X-Forwarded-For": `10.66.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}` };
     const certOrderRes = await api("/api/orders", { method: "POST", headers: certIp, body: JSON.stringify({
       ...formData, orderCertificateOfStatus: true, orderCertifiedCopy: true,
@@ -2432,10 +2442,13 @@ if (mint.status === 200) {
     check("an order carrying both certificates is accepted", certOrderRes.status === 200, certOrderRes.body?.error);
     const certOrderId = certOrderRes.body?.data?.orderId as string;
     await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: certOrderId }) });
-    const bought = await fetch(`${BASE}/api/admin/orders/${certOrderId}/ancillary/certificate-of-status`, { method: "POST", body: certPdf(), headers: { Cookie: adm.cookie, "X-Forwarded-For": RUN_IP } });
-    check("the purchased certificate uploads through its own link", bought.status === 200, await bought.json().catch(() => null));
-    const dupAnc = await fetch(`${BASE}/api/admin/orders/${certOrderId}/ancillary/certificate-of-status`, { method: "POST", body: certPdf(), headers: { Cookie: adm.cookie, "X-Forwarded-For": RUN_IP } });
-    check("a duplicate certificate upload is refused", dupAnc.status === 409, dupAnc.status);
+    const cSeries = ((await api(`/api/admin/orders/${certOrderId}`, { cookies: adm.cookie })).body?.data as { series: { name: string }[] }).series.map((x) => x.name);
+    const packUp = await fetch(`${BASE}/api/admin/orders/${certOrderId}/formation-documents`, { method: "POST", body: packageFd(true, cSeries), headers: { Cookie: adm.cookie, "X-Forwarded-For": RUN_IP } });
+    check("the package upload with both certificates is accepted and forms the order", packUp.status === 200, await packUp.json().catch(() => null));
+    const detC = await api(`/api/admin/orders/${certOrderId}`, { cookies: adm.cookie });
+    const dC = detC.body?.data as { hasCertStatus?: boolean; hasCertifiedCopy?: boolean; status?: string };
+    check("both certificates are stored with their own kinds", dC?.hasCertStatus === true && dC?.hasCertifiedCopy === true, dC);
+    check("the certificate order is formed", dC?.status === "formed", dC?.status);
   }
 }
 

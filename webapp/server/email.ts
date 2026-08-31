@@ -294,27 +294,55 @@ export function orderPaidEmail(opts: {
 /** The company exists. This is the message the whole formation was for, so it
  *  names the company and lists what is now in the client's portal rather than
  *  saying "a new document is available" like every other upload. */
+/** The formed announcement, in Adam's own words (30 Aug 2026). Two truthful
+ *  adaptations, both his-approved: "Two things are waiting" only when it IS
+ *  two things (extra documents switch to a count-free line), and an ordered
+ *  EIN / S election is announced as an ORDER in the portal — the document
+ *  itself does not exist yet at formation. */
 export function llcFormedEmail(opts: {
+  clientName: string;
   llcName: string;
   seriesNames: string[];
+  otherDocuments: string[];
+  einOrdered: boolean;
+  sElectionOrdered: boolean;
   portalUrl: string;
 }): { subject: string; html: string } {
   const series = opts.seriesNames.map((n) => `<li>${escapeHtml(n)}</li>`).join("");
+  const others = opts.otherDocuments.map((n) => `<li>Your <strong>${escapeHtml(n)}</strong>, as issued</li>`).join("");
+  const waiting = opts.otherDocuments.length > 0
+    ? "Your documents are waiting in your portal, ready to download:"
+    : "Two things are waiting in your portal, ready to download:";
+  const svc =
+    opts.einOrdered && opts.sElectionOrdered
+      ? " Your Federal EIN and S election package orders are in your portal as well — that's our next step."
+      : opts.einOrdered
+        ? " Your Federal EIN order is in your portal as well — that's our next step."
+        : opts.sElectionOrdered
+          ? " Your S election package order is in your portal as well — that's our next step."
+          : "";
   return {
     subject: `${opts.llcName} is formed`,
     html: wrap(`
-      <p><strong>${escapeHtml(opts.llcName)}</strong> has been formed with the Florida
-      Division of Corporations.</p>
-      <p>Two things are waiting in your portal, ready to download:</p>
+      <p>Dear ${escapeHtml(opts.clientName)};</p>
+      <p>Congratulations, your Florida Protected Series LLC,
+      <strong>${escapeHtml(opts.llcName)}</strong>, has been officially formed
+      with the Florida Division of Corporations!</p>
+      <p>${waiting}</p>
       <ul>
         <li>Your <strong>Articles of Organization</strong>, as filed</li>
         <li>Your <strong>Protected Series Designation</strong>${opts.seriesNames.length > 1 ? "s" : ""},
-            as filed, covering:</li>
+            as filed, covering:
+          <ul>${series}</ul>
+        </li>
+        ${others}
       </ul>
-      <ul>${series}</ul>
-      <p>Keep both with your company records — a bank, a title company, or a
+      <p>Keep these with your company records — a bank, a title company, or a
       closing agent will ask for them.</p>
-      <p><a href="${opts.portalUrl}">Open your portal</a></p>
+      <p>The next step is to create your operating agreement. You can do that
+      in your personal portal (<a href="${opts.portalUrl}">Click here to open</a>).${svc}</p>
+      <p>Thank you for doing business with MyFloridaSeriesLLC!</p>
+      <p>support@myfloridaseriesllc.com</p>
     `),
   };
 }

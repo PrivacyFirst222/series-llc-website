@@ -45,54 +45,6 @@ interface OrderDetailData {
   hasCertifiedCopy: boolean;
 }
 
-/** One purchased state certificate on the Service-orders card: its own
- *  upload link while owed, a delivered check once up (Adam, 30 Aug 2026). */
-function CertificateRow({ orderId, kind, label, uploaded }: {
-  orderId: string; kind: string; label: string; uploaded: boolean;
-}) {
-  const queryClient = useQueryClient();
-  const ref = useRef<HTMLInputElement>(null);
-  const [error, setError] = useState<string | null>(null);
-  const up = useMutation({
-    mutationFn: async () => {
-      const f = ref.current?.files?.[0];
-      if (!f) throw new Error("Choose the PDF first.");
-      const fd = new FormData();
-      fd.append("file", f);
-      const res = await fetch(`/api/admin/orders/${orderId}/ancillary/${kind}`, { method: "POST", body: fd, credentials: "include" });
-      const body = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
-      if (!res.ok) throw new Error(body?.error?.message ?? "Upload failed.");
-      return body;
-    },
-    onSuccess: () => {
-      setError(null);
-      queryClient.invalidateQueries({ queryKey: ["admin", "order", orderId] });
-      queryClient.invalidateQueries({ queryKey: ["admin", "orders"] });
-    },
-    onError: (e: Error) => setError(e.message),
-  });
-  if (uploaded) {
-    return (
-      <div className="flex items-center gap-2 text-sm">
-        <Check className="h-3.5 w-3.5 text-trust" />
-        <span className="font-medium">{label}</span>
-        <span className="text-xs text-muted-foreground">delivered to the portal</span>
-      </div>
-    );
-  }
-  return (
-    <div className="flex flex-wrap items-center gap-2 text-sm">
-      <span className="min-w-0 break-words font-medium">{label}</span>
-      <input ref={ref} aria-label={`${label} PDF`} type="file" accept="application/pdf" className="block text-sm text-muted-foreground file:mr-2 file:rounded-full file:border file:border-border file:bg-secondary file:px-3 file:py-1 file:text-xs" onChange={() => setError(null)} />
-      <Button variant="outline" size="sm" className="rounded-full" disabled={up.isPending} onClick={() => up.mutate()}>
-        {up.isPending ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <FileUp className="mr-1.5 h-3.5 w-3.5" />}
-        Upload
-      </Button>
-      {error ? <span className="text-xs text-destructive">{error}</span> : null}
-    </div>
-  );
-}
-
 /** A field and its copy button. The check is not a UI flourish — it is the
  *  record of which values have already been typed into the Division's form, so
  *  a filing interrupted halfway resumes without re-reading everything. It is
@@ -184,6 +136,8 @@ export default function OrderDetail({
 
   const articlesFirstRef = useRef<HTMLInputElement>(null);
   const [confirmReset, setConfirmReset] = useState(false);
+  const certStatusRef = useRef<HTMLInputElement>(null);
+  const certifiedCopyRef = useRef<HTMLInputElement>(null);
   const unfile = useMutation({
     mutationFn: () => api.post(`/api/admin/orders/${orderId}/unfiled`, {}),
     onSuccess: () => {
@@ -235,6 +189,10 @@ export default function OrderDetail({
       const fd = new FormData();
       const articles = articlesRef.current?.files?.[0];
       if (articles) fd.append("articles", articles);
+      const certStatus = certStatusRef.current?.files?.[0];
+      if (certStatus) fd.append("certStatus", certStatus);
+      const certifiedCopy = certifiedCopyRef.current?.files?.[0];
+      if (certifiedCopy) fd.append("certifiedCopy", certifiedCopy);
       for (const row of psdRows) {
         if (!row.file) continue;
         fd.append("psd", row.file);
@@ -418,6 +376,36 @@ export default function OrderDetail({
               {d.status !== "formed" ? (
                 <div className="mt-4 space-y-3">
 
+                  {d.certStatusPurchased && !d.hasCertStatus ? (
+                    <div>
+                      <label htmlFor="upload-cert-status" className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+                        Certificate of Status (purchased)
+                      </label>
+                      <input
+                        id="upload-cert-status"
+                        ref={certStatusRef}
+                        type="file"
+                        accept="application/pdf"
+                        className="mt-1 block w-full text-sm"
+                        onChange={() => setUploadError(null)}
+                      />
+                    </div>
+                  ) : null}
+                  {d.certifiedCopyPurchased && !d.hasCertifiedCopy ? (
+                    <div>
+                      <label htmlFor="upload-certified-copy" className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+                        Certified Copy of the Articles (purchased)
+                      </label>
+                      <input
+                        id="upload-certified-copy"
+                        ref={certifiedCopyRef}
+                        type="file"
+                        accept="application/pdf"
+                        className="mt-1 block w-full text-sm"
+                        onChange={() => setUploadError(null)}
+                      />
+                    </div>
+                  ) : null}
                   {psdRows.map((row, i) => (
                     <div key={i} className="rounded-lg border border-border p-3">
                       <label htmlFor={`upload-psd-${i}`} className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
@@ -514,19 +502,13 @@ export default function OrderDetail({
             {/* The filing sequence, top to bottom: Articles first, the
                 designation uploads right under them, and only then the
                 ancillary services (Adam, 30 Aug 2026). */}
-            {d && d.status !== "paid" && (services.length > 0 || d.certStatusPurchased || d.certifiedCopyPurchased) ? (
+            {d && d.status !== "paid" && services.length > 0 ? (
               <section className="mt-3 rounded-xl border border-amber-500/40 bg-amber-500/5 p-4">
                 <div className="flex items-center gap-2">
                   <Landmark className="h-4 w-4 text-amber-700 dark:text-amber-400" />
                   <h3 className="font-display text-base">Service orders</h3>
                 </div>
                 <div className="mt-3 flex flex-col gap-2">
-                  {d.certStatusPurchased ? (
-                    <CertificateRow orderId={orderId} kind="certificate-of-status" label="Certificate of Status" uploaded={d.hasCertStatus} />
-                  ) : null}
-                  {d.certifiedCopyPurchased ? (
-                    <CertificateRow orderId={orderId} kind="certified-copy" label="Certified Copy of the Articles" uploaded={d.hasCertifiedCopy} />
-                  ) : null}
                   {services.map((s) => (
                     <div key={s.id} className="flex flex-wrap items-center gap-2 text-sm">
                       <span className="min-w-0 break-words font-medium">
