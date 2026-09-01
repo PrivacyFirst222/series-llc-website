@@ -107415,6 +107415,9 @@ var verifyAddressSchema = external_exports.object({
   state: external_exports.string().min(2).max(2),
   zip: external_exports.string().min(3).max(20)
 });
+var verifyAddressFreeformSchema = external_exports.object({
+  line: external_exports.string().trim().min(1).max(300)
+});
 function registerPaymentRoutes(app2) {
   app2.get("/config", (c) => c.json({ data: { ordering: orderingEnabled() } }));
   app2.get("/health", async (c) => {
@@ -107586,20 +107589,26 @@ function registerPaymentRoutes(app2) {
     if (!await rateLimit(`addr:${clientIp(c)}`, 60, 9e5)) {
       return c.json({ data: { status: "skipped" } });
     }
-    const body = verifyAddressSchema.safeParse(await c.req.json().catch(() => null));
-    if (!body.success) return c.json(err("Invalid address payload", "INVALID_INPUT"), 400);
+    const raw2 = await c.req.json().catch(() => null);
+    const structured = verifyAddressSchema.safeParse(raw2);
+    const freeform = verifyAddressFreeformSchema.safeParse(raw2);
+    if (!structured.success && !freeform.success) {
+      return c.json(err("Invalid address payload", "INVALID_INPUT"), 400);
+    }
     if (!env.SMARTY_AUTH_ID || !env.SMARTY_AUTH_TOKEN) {
       return c.json({ data: { status: "skipped" } });
     }
-    const a2 = body.data;
+    const address = structured.success ? {
+      street: structured.data.address1,
+      ...structured.data.address2 ? { secondary: structured.data.address2 } : {},
+      city: structured.data.city,
+      state: structured.data.state,
+      zipcode: structured.data.zip
+    } : { street: freeform.data.line };
     const params = new URLSearchParams({
       "auth-id": env.SMARTY_AUTH_ID,
       "auth-token": env.SMARTY_AUTH_TOKEN,
-      street: a2.address1,
-      ...a2.address2 ? { secondary: a2.address2 } : {},
-      city: a2.city,
-      state: a2.state,
-      zipcode: a2.zip,
+      ...address,
       candidates: "1",
       match: "strict"
     });

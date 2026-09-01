@@ -571,8 +571,18 @@ async function main(): Promise<void> {
       await fetch(`${API}/api/auth/set-password`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: mint.data.token, password: "gate-pass-12345" }) });
 
       let genCaptured: { generationId?: string; version?: string } | null = null;
+      let genPostBody: string | null = null;
       await page.route("**/api/**", async (route) => {
         const url = new URL(route.request().url());
+        // Deterministic USPS answer: the journey must see the advisory strip
+        // whether or not the offline API holds Smarty credentials.
+        if (url.pathname === "/api/address/verify") {
+          return route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            body: JSON.stringify({ data: { status: "verified", normalized: { address1: "100 Ocean Dr", city: "Miami", state: "FL", zip: "33139" } } }),
+          });
+        }
         const resp = await fetch(`${API}${url.pathname}${url.search}`, {
           method: route.request().method(),
           headers: { "Content-Type": "application/json", cookie: route.request().headers()["cookie"] ?? "" },
@@ -582,6 +592,7 @@ async function main(): Promise<void> {
         const setCookie = resp.headers.get("set-cookie");
         if (url.pathname === "/api/portal/oa/generate" && resp.status === 200) {
           genCaptured = (JSON.parse(body) as { data?: { generationId?: string; version?: string } }).data ?? null;
+          genPostBody = route.request().postData() ?? null;
         }
         await route.fulfill({ status: resp.status, contentType: resp.headers.get("content-type") ?? "application/json", body, headers: setCookie ? { "set-cookie": setCookie } : undefined });
       });
@@ -609,6 +620,22 @@ async function main(): Promise<void> {
       }
       await page.getByLabel("Full legal name of owner 2").fill("Blair Gatecheck");
       await page.getByLabel("Address of owner 2").fill("100 Ocean Drive, Miami, FL 33139");
+      // Leaving the field runs the soft USPS check (Adam, 1 Sep 2026); the
+      // canned answer differs from what was typed, so the advisory strip and
+      // its correction button must appear — and never block anything.
+      await page.getByLabel("Address of owner 2").blur();
+      await page.waitForTimeout(800);
+      expect(
+        await page.getByText(/Postal Service lists this address as/i).first().isVisible().catch(() => false),
+        "OA: the address advisory appears after leaving the field",
+      );
+      await page.locator("main button").filter({ hasText: /^Use this address/ }).first().click();
+      await page.waitForTimeout(600);
+      expect(
+        (await page.getByLabel("Address of owner 2").inputValue()) === "100 Ocean Dr, Miami, FL 33139",
+        "OA: accepting the correction rewrites the field",
+        await page.getByLabel("Address of owner 2").inputValue(),
+      );
       await page.waitForTimeout(300);
 
       // Pair the two as spouses (tenancy by the entirety is the first form).
@@ -662,6 +689,15 @@ async function main(): Promise<void> {
       expect(md.includes("Blair Gatecheck"), "OA: the owner added on screen is in the assembled agreement");
       expect(/tenants by the entirety/i.test(md), "OA: the spouse pairing chosen on screen reached the text (tenants by the entirety)");
       expect(md.includes("Casey Gatecheck and Blair Gatecheck"), "OA: the couple is named together as one unit", null);
+      // A couple's Exhibit A row prints the FIRST spouse's address by design;
+      // the corrected second-spouse address is asserted in the answers the
+      // page actually submitted to generate.
+      const genAnswers = genPostBody ? (JSON.parse(genPostBody) as { members?: { address?: string }[] }) : null;
+      expect(
+        genAnswers?.members?.[1]?.address === "100 Ocean Dr, Miami, FL 33139",
+        "OA: the accepted USPS correction is what the page submitted",
+        genAnswers?.members?.map((m) => m.address),
+      );
       expect(!/tenancies by the entireties|by the entireties/i.test(md), "OA: the singular form, always (Adam's rule)");
       expect(md.includes("$1,000 cash"), "OA: the contribution typed on screen is in Exhibit A");
       expect(md.includes("September 15, 2026"), "OA: the effective date chosen on screen is in the agreement");

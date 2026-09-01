@@ -230,6 +230,13 @@ export const verifyAddressSchema = z.object({
   zip: z.string().min(3).max(20),
 });
 
+/** The OA questionnaire keeps an owner's address as ONE line ("301 N Fern
+ *  Creek Ave, Orlando, FL 32803"); Smarty accepts the entire address in its
+ *  street field and parses it itself, so the checker takes the line whole. */
+export const verifyAddressFreeformSchema = z.object({
+  line: z.string().trim().min(1).max(300),
+});
+
 export function registerPaymentRoutes(app: Hono) {
 
 app.get("/config", (c) => c.json({ data: { ordering: orderingEnabled() } }));
@@ -467,21 +474,29 @@ app.post("/address/verify", async (c) => {
   if (!(await rateLimit(`addr:${clientIp(c)}`, 60, 900_000))) {
     return c.json({ data: { status: "skipped" } });
   }
-  const body = verifyAddressSchema.safeParse(await c.req.json().catch(() => null));
-  if (!body.success) return c.json(err("Invalid address payload", "INVALID_INPUT"), 400);
+  const raw = await c.req.json().catch(() => null);
+  const structured = verifyAddressSchema.safeParse(raw);
+  const freeform = verifyAddressFreeformSchema.safeParse(raw);
+  if (!structured.success && !freeform.success) {
+    return c.json(err("Invalid address payload", "INVALID_INPUT"), 400);
+  }
   if (!env.SMARTY_AUTH_ID || !env.SMARTY_AUTH_TOKEN) {
     return c.json({ data: { status: "skipped" } });
   }
 
-  const a = body.data;
+  const address = structured.success
+    ? {
+        street: structured.data.address1,
+        ...(structured.data.address2 ? { secondary: structured.data.address2 } : {}),
+        city: structured.data.city,
+        state: structured.data.state,
+        zipcode: structured.data.zip,
+      }
+    : { street: freeform.data!.line };
   const params = new URLSearchParams({
     "auth-id": env.SMARTY_AUTH_ID,
     "auth-token": env.SMARTY_AUTH_TOKEN,
-    street: a.address1,
-    ...(a.address2 ? { secondary: a.address2 } : {}),
-    city: a.city,
-    state: a.state,
-    zipcode: a.zip,
+    ...address,
     candidates: "1",
     match: "strict",
   });

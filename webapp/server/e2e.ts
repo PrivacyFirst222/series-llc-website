@@ -521,6 +521,23 @@ check("client account auto-created on payment", !!client && !client.has_password
   check("a garbage contact submission is refused", garbage.status === 400, garbage.status);
 }
 
+// 5e. The address checker serves the OA questionnaire too (Adam,
+//     1 Sep 2026): an owner's address there is ONE line, and the endpoint
+//     takes it whole alongside the wizard's split form. Offline (no Smarty
+//     credentials) the answer is "skipped" — the contract is the shape.
+{
+  const bad = await api("/api/address/verify", { method: "POST", body: "{}" });
+  check("address verify refuses an empty payload", bad.status === 400 && bad.body?.error?.code === "INVALID_INPUT", bad.body);
+  const free = await api("/api/address/verify", { method: "POST",
+    body: JSON.stringify({ line: "301 N Fern Creek Ave, Orlando, FL 32803" }) });
+  check("address verify accepts the questionnaire's single line",
+    free.status === 200 && typeof free.body?.data?.status === "string", free.body);
+  const split = await api("/api/address/verify", { method: "POST",
+    body: JSON.stringify({ address1: "301 N Fern Creek Ave", city: "Orlando", state: "FL", zip: "32803" }) });
+  check("address verify still accepts the wizard's split form",
+    split.status === 200 && typeof split.body?.data?.status === "string", split.body);
+}
+
 // 6. Duplicate fulfillment is a no-op (idempotency)
 await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId }) });
 const clients2 = await api("/api/admin/clients", { cookies: admin.cookie });

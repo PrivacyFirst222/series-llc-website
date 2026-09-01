@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { QuestionCard } from "./OaQuestionCard";
 import { FORM_LABEL, type CoupleAnswer, type MemberAnswer, type SeriesAnswer, type Unit } from "./oaTypes";
+import { api } from "@/lib/api";
 
 export function OwnersCard({ owners, isMulti, ownerCountMismatch, patchMember, removeOwner, addOwner }: {
   owners: MemberAnswer[];
@@ -19,6 +20,68 @@ export function OwnersCard({ owners, isMulti, ownerCountMismatch, patchMember, r
   removeOwner: (i: number) => void;
   addOwner: () => void;
 }) {
+  // The same soft USPS check the wizard runs on Continue, run here when the
+  // client leaves an address field (Adam, 1 Sep 2026) — the whole line is
+  // what prints in Exhibit A, so a missing city or wrong ZIP prints too.
+  // Advisory only: it suggests, it never blocks.
+  const [addrWarnings, setAddrWarnings] = useState<Record<number, { message: string; suggestedLine?: string }>>({});
+  const [checkedLines, setCheckedLines] = useState<Record<number, string>>({});
+  const clearAddrState = () => {
+    setAddrWarnings({});
+    setCheckedLines({});
+  };
+  const checkAddress = async (i: number) => {
+    const line = (owners[i]?.address ?? "").trim();
+    if (!line || checkedLines[i] === line) return;
+    setCheckedLines((prev) => ({ ...prev, [i]: line }));
+    try {
+      const r = await api.post<{
+        status: string;
+        normalized: { address1: string; city: string; state: string; zip: string } | null;
+      }>("/api/address/verify", { line });
+      const norm = (v: string) => v.toLowerCase().replace(/[.,]/g, "").replace(/\s+/g, " ").trim();
+      const suggested = r.normalized
+        ? `${r.normalized.address1}, ${r.normalized.city}, ${r.normalized.state} ${r.normalized.zip}`
+        : "";
+      let warning: { message: string; suggestedLine?: string } | null = null;
+      if (r.status === "unverified") {
+        warning = {
+          message:
+            "The Postal Service doesn't recognize this address. Make sure it has the street, city, state, and ZIP — it prints in the agreement exactly as typed.",
+        };
+      } else if (r.status === "missing_unit") {
+        warning = {
+          message: "This building requires a suite or unit number — add it, or keep the address exactly as typed.",
+        };
+      } else if (r.status === "invalid_unit") {
+        warning = {
+          message:
+            "The Postal Service doesn't recognize that suite or unit number at this building. Please check it, or keep the address exactly as typed.",
+        };
+      } else if (r.status === "verified" && suggested && norm(suggested) !== norm(line)) {
+        warning = { message: `The Postal Service lists this address as: ${suggested}.`, suggestedLine: suggested };
+      }
+      setAddrWarnings((prev) => {
+        const next = { ...prev };
+        if (warning) next[i] = warning;
+        else delete next[i];
+        return next;
+      });
+    } catch {
+      // Best-effort — a checker outage never surfaces here.
+    }
+  };
+  const applySuggested = (i: number) => {
+    const suggestedLine = addrWarnings[i]?.suggestedLine;
+    if (!suggestedLine) return;
+    patchMember(i, { address: suggestedLine });
+    setCheckedLines((prev) => ({ ...prev, [i]: suggestedLine }));
+    setAddrWarnings((prev) => {
+      const next = { ...prev };
+      delete next[i];
+      return next;
+    });
+  };
   return (
     <QuestionCard title={isMulti ? "Owners" : "Owner"}>
               <p className="text-xs text-muted-foreground">
@@ -36,7 +99,12 @@ export function OwnersCard({ owners, isMulti, ownerCountMismatch, patchMember, r
                       <button
                         type="button"
                         aria-label={`Remove ${m.name?.trim() || `owner ${i + 1}`}`}
-                        onClick={() => removeOwner(i)}
+                        onClick={() => {
+                          // Warnings are keyed by row index; a removal
+                          // renumbers the rows, so they all reset.
+                          clearAddrState();
+                          removeOwner(i);
+                        }}
                         className="flex h-11 w-11 items-center justify-center rounded-md text-muted-foreground hover:text-destructive"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -53,8 +121,29 @@ export function OwnersCard({ owners, isMulti, ownerCountMismatch, patchMember, r
                     aria-label={`Address of owner ${i + 1}`}
                     placeholder="Street address, city, state ZIP"
                     value={m.address ?? ""}
-                    onChange={(e) => patchMember(i, { address: e.target.value })}
+                    onChange={(e) => {
+                      patchMember(i, { address: e.target.value });
+                      setAddrWarnings((prev) => {
+                        if (!(i in prev)) return prev;
+                        const next = { ...prev };
+                        delete next[i];
+                        return next;
+                      });
+                    }}
+                    onBlur={() => void checkAddress(i)}
                   />
+                  {addrWarnings[i] ? (
+                    <div className="rounded-xl border border-amber-300/60 bg-amber-50 p-3 text-sm text-amber-900">
+                      {addrWarnings[i].message}
+                      {addrWarnings[i].suggestedLine ? (
+                        <div className="mt-2">
+                          <Button type="button" size="sm" className="rounded-full" onClick={() => applySuggested(i)}>
+                            Use this address
+                          </Button>
+                        </div>
+                      ) : null}
+                    </div>
+                  ) : null}
                 </div>
               ))}
               {isMulti ? (
