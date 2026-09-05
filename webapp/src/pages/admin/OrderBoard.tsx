@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import OrderDetail from "./OrderDetail";
 import {
   type AdminServiceOrder, ServiceFulfillDialog } from "./ServiceOrdersSection";
-import { serviceIsOpen, serviceLabel } from "./serviceOrders.helpers";
+import { boughtAfterFormation, serviceIsOpen, serviceLabel } from "./serviceOrders.helpers";
 
 export interface BoardOrder {
   id: string;
@@ -67,7 +67,15 @@ function Card({
   onOpen: () => void;
   onFulfill: (s: AdminServiceOrder) => void;
 }) {
-  const freshWork = order.status === "formed" && services.some(serviceIsOpen);
+  // Green only for a purchase made after formation; the age pill then counts
+  // from that purchase, since the formation itself is old news.
+  const newPurchases = order.status === "formed" ? services.filter((s) => boughtAfterFormation(s, order.formed_at)) : [];
+  const freshWork = newPurchases.length > 0;
+  const ageFrom = freshWork
+    ? newPurchases.reduce((latest, s) => (s.created_at > latest ? s.created_at : latest), newPurchases[0].created_at)
+    : order.status === "filed" && order.filed_at
+      ? order.filed_at
+      : order.created_at;
   return (
     <div
       className={cn(
@@ -85,7 +93,7 @@ function Card({
         </div>
         <div className="mt-1 text-xs text-muted-foreground">{order.contact_name}</div>
         <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
-          <AgeBadge createdAt={order.status === "filed" && order.filed_at ? order.filed_at : order.created_at} />
+          <AgeBadge createdAt={ageFrom} />
           <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-xs text-muted-foreground">
             <Building2 className="h-3 w-3" />
             {order.series_count} series
@@ -240,10 +248,14 @@ export default function OrderBoard({ enabled }: { enabled: boolean }) {
     (o.certified_copy_purchased && !o.certified_copy_uploaded);
   const everythingDone = (o: BoardOrder) =>
     o.status === "formed" && !certOwed(o) && !servicesFor(o.id).some(serviceIsOpen);
-  // A formed company whose client just bought something is NEW WORK: it goes
-  // back to the first column with a green outline (Adam, 31 Aug 2026). A
-  // formed order owing only certificates is still formation work, column two.
-  const newWork = orders.filter((o) => o.status === "formed" && servicesFor(o.id).some(serviceIsOpen));
+  // A formed company whose client bought something AFTER formation is NEW
+  // WORK: it goes back to the first column with a green outline (Adam,
+  // 31 Aug 2026). Open intake add-ons do not count (5 Sep 2026): a formed
+  // order still owing its intake EIN, S election, or certificates is
+  // formation work and stays in column two.
+  const newWork = orders.filter(
+    (o) => o.status === "formed" && servicesFor(o.id).some((s) => boughtAfterFormation(s, o.formed_at)),
+  );
   const withState = orders.filter(
     (o) => o.status === "filed" || (o.status === "formed" && !everythingDone(o) && !newWork.includes(o)),
   );

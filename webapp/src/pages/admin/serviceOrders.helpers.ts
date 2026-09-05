@@ -10,6 +10,14 @@ export const STATUS_STYLE: Record<string, string> = {
   pending_payment: "bg-secondary text-muted-foreground",
 };
 export const serviceIsOpen = (s: AdminServiceOrder) => s.status === "awaiting_info" || s.status === "in_progress";
+
+/** A service order bought AFTER the company was formed — a new order from an
+ *  existing client (Adam, 5 Sep 2026). Intake add-ons (EIN, S election,
+ *  certificates chosen on the wizard) are created at payment, before
+ *  formation, so they are formation work, not new work: a formed company
+ *  still owing them stays in column two. */
+export const boughtAfterFormation = (s: AdminServiceOrder, formedAt: string | null) =>
+  !!formedAt && serviceIsOpen(s) && new Date(s.created_at).getTime() > new Date(formedAt).getTime();
 export function serviceLabel(s: AdminServiceOrder, llcName: string, long = false): string {
   const short = (name?: string) => {
     if (!name) return "";

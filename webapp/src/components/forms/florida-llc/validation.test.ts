@@ -280,6 +280,28 @@ if (typeof console !== "undefined") {
   console.log("[fl-llc] taxation labels: all 8 versions correct, unknown shows nothing.");
 }
 
+// Admin board: "new order from an existing client" means a service bought
+// AFTER formation (Adam, 5 Sep 2026). Jimmy Flanagan, LLC — formed 12 days
+// earlier, intake EIN and S election still open — went green under the old
+// rule ("formed + any open service"); intake add-ons are created at payment,
+// before formation, and must not count.
+{
+  const { boughtAfterFormation } = await import("../../../pages/admin/serviceOrders.helpers");
+  const svc = (status: string, created_at: string) =>
+    ({ id: "x", type: "ein", status, created_at } as unknown as Parameters<typeof boughtAfterFormation>[0]);
+  const formedAt = "2026-08-24T12:00:00.000Z";
+  const cases: [boolean, string, boolean][] = [
+    [boughtAfterFormation(svc("awaiting_info", "2026-08-20T12:00:00.000Z"), formedAt), "intake add-on (before formation) is not new work", false],
+    [boughtAfterFormation(svc("awaiting_info", "2026-09-04T12:00:00.000Z"), formedAt), "post-formation purchase is new work", true],
+    [boughtAfterFormation(svc("fulfilled", "2026-09-04T12:00:00.000Z"), formedAt), "a fulfilled post-formation order is not open work", false],
+    [boughtAfterFormation(svc("awaiting_info", "2026-09-04T12:00:00.000Z"), null), "an unformed company can have no post-formation work", false],
+  ];
+  for (const [got, label, want] of cases) {
+    if (got !== want) throw new Error(`FAIL board new-work rule: ${label} (got ${got})`);
+  }
+  console.log("[admin] board new-work rule: 4 cases correct.");
+}
+
 // Run directly (bun run validation.test.ts): exit non-zero on failure. Printing
 // a warning and exiting 0 is how a broken fee calculation ships — the run has
 // to fail, not merely say something.
