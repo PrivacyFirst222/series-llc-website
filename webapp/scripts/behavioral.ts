@@ -61,7 +61,7 @@ const RUNS: RunConfig[] = [
   { key: "A", label: "new LLC, member-managed, our RA, probes + back-walk", path: "new", formationType: "DOMESTIC_LLC", management: "MEMBER_MANAGED", ra: "SERVICE", llcName: "Gate Run Alpha", designator: "LLC", probeValidation: true, backWalk: true, email: "gate-oa@e2e.test" },
   { key: "B", label: "new LLC, member-managed, self RA, entity member", path: "new", formationType: "DOMESTIC_LLC", management: "MEMBER_MANAGED", ra: "SELF", llcName: "Gate Run Bravo", designator: "L.L.C.", memberEntity: true },
   { key: "C", label: "new PLLC, member-managed, self RA, phone-sized", path: "new", formationType: "PLLC", management: "MEMBER_MANAGED", ra: "SELF", llcName: "Gate Run Charlie", designator: "Professional Limited Liability Company", mobile: true },
-  { key: "D", label: "new PLLC, manager-managed, our RA, EIN + S election", path: "new", formationType: "PLLC", management: "MANAGER_MANAGED", ra: "SERVICE", llcName: "Gate Run Delta", designator: "PLLC", addons: { ein: true, sElection: true } },
+  { key: "D", label: "new PLLC, manager-managed, our RA, EIN + S election", path: "new", formationType: "PLLC", management: "MANAGER_MANAGED", ra: "SERVICE", llcName: "Gate Run Delta", designator: "PLLC", addons: { ein: true, sElection: true }, email: "gate-actions@e2e.test" },
   { key: "E", label: "conversion, member-managed, our RA", path: "convert", formationType: "DOMESTIC_LLC", management: "MEMBER_MANAGED", ra: "SERVICE", llcName: "Gate Run Echo, LLC", designator: "" },
   { key: "F", label: "conversion, manager-managed, self RA", path: "convert", formationType: "DOMESTIC_LLC", management: "MANAGER_MANAGED", ra: "SELF", llcName: "Gate Run Foxtrot, LLC", designator: "" },
   { key: "G", label: "new LLC, exact name only, dated, certificates, 4 series", path: "new", formationType: "DOMESTIC_LLC", management: "MEMBER_MANAGED", ra: "SERVICE", llcName: "Gate Run Golf", designator: "Limited Liability Company", exactNameOnly: true, requestedEffectiveDate: "2026-10-01", addons: { certificate: true, certifiedCopy: true }, extraSeries: 3, specificPurpose: "Holding and leasing residential real estate" },
@@ -483,6 +483,7 @@ async function main(): Promise<void> {
   const adminCookie = (adminLogin.headers.get("set-cookie") ?? "").split(";")[0];
 
   const only = process.env.RUN?.split(",");
+  const orderIds = new Map<string, string>();
   for (const run of RUNS.filter((r) => !only || only.includes(r.key))) {
     console.log(`\n▶ Run ${run.key}: ${run.label}`);
     const page = await browser.newPage(run.mobile ? { viewport: { width: 375, height: 812 } } : {});
@@ -492,6 +493,7 @@ async function main(): Promise<void> {
     });
     try {
       const { orderId, totalCents } = await driveRun(page, run);
+      orderIds.set(run.key, orderId);
       expect(reactWarnings.length === 0, `${run.key}: no controlled/uncontrolled React warnings`, reactWarnings[0]);
 
       // Ground truth: the stored order, read through the admin API.
@@ -557,6 +559,72 @@ async function main(): Promise<void> {
     }
   }
 
+  // ---- Action-needed journey (Adam, 5 Sep 2026): a formed company whose
+  // client still owes the questionnaire AND the details for an intake EIN
+  // and S election sees all three named in a sticky toast, each item's card
+  // or row outlined red, and the toast leaves only by its X.
+  console.log("\n▶ Action-needed journey (formed company, intake EIN + S election)");
+  if (orderIds.has("D")) {
+    const page = await browser.newPage();
+    try {
+      const dOrderId = orderIds.get("D")!;
+      // Form the company through the admin API, as the office would.
+      const detail = await fetch(`${API}/api/admin/orders/${dOrderId}`, { headers: { Cookie: adminCookie } }).then((r) => r.json()) as { data?: { series?: { name: string }[] } };
+      const seriesNames = (detail.data?.series ?? []).map((x) => x.name);
+      const pdf = (tag: string) => new File([new TextEncoder().encode(`%PDF-1.4 ${tag}\n%%EOF`)], `${tag}.pdf`, { type: "application/pdf" });
+      const fd = new FormData();
+      fd.set("articles", pdf("articles"));
+      fd.append("psd", pdf("psd"));
+      fd.append("psdSeries", JSON.stringify(seriesNames));
+      const formed = await fetch(`${API}/api/admin/orders/${dOrderId}/formation-documents`, { method: "POST", headers: { Cookie: adminCookie }, body: fd });
+      expect(formed.status === 200, "actions: run D's company is formed through the admin API", await formed.text().catch(() => ""));
+
+      const email = "gate-actions@e2e.test";
+      const mint = await fetch(`${API}/api/dev/mint-reset-token`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) }).then((r) => r.json()) as { data?: { token?: string } };
+      if (!mint.data?.token) throw new Error("no reset token for the action-needed client");
+      await fetch(`${API}/api/auth/set-password`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: mint.data.token, password: "gate-pass-12345" }) });
+
+      await page.route("**/api/**", async (route) => {
+        const url = new URL(route.request().url());
+        const resp = await fetch(`${API}${url.pathname}${url.search}`, {
+          method: route.request().method(),
+          headers: { "Content-Type": "application/json", cookie: route.request().headers()["cookie"] ?? "" },
+          body: route.request().postData() ?? undefined,
+        });
+        const body = await resp.text();
+        const setCookie = resp.headers.get("set-cookie");
+        await route.fulfill({ status: resp.status, contentType: resp.headers.get("content-type") ?? "application/json", body, headers: setCookie ? { "set-cookie": setCookie } : undefined });
+      });
+      await page.goto(`http://localhost:${WEB_PORT}/portal/login`);
+      await page.getByLabel("Email").fill(email);
+      await page.getByLabel("Password").fill("gate-pass-12345");
+      await page.locator("main button").filter({ hasText: /^Sign in/ }).first().click();
+      await page.waitForURL(/\/portal(?!\/login)/, { timeout: 10000 });
+      await page.waitForTimeout(2000);
+
+      const toastText = await page.locator('[data-testid="action-needed-list"]').first().innerText().catch(() => "");
+      expect(/operating agreement questionnaire/i.test(toastText), "actions: toast names the questionnaire", toastText);
+      expect(/S Corporation Election Package — Gate Run Delta, PLLC/.test(toastText), "actions: toast names the S election awaiting details", toastText);
+      expect(/Federal EIN — Gate Run Delta, PLLC/.test(toastText), "actions: toast names the EIN awaiting details", toastText);
+      const outlined = await page.locator('[data-needs-action="true"]').allInnerTexts();
+      expect(outlined.length === 3, "actions: the agreement card and both service rows are outlined red", outlined.map((t) => t.split("\n")[0]));
+      const redBorders = await page.locator('[data-needs-action="true"]').evaluateAll((els) => els.map((e) => getComputedStyle(e).borderTopWidth));
+      expect(redBorders.every((w) => w === "2px"), "actions: every outlined element carries the 2px destructive border", redBorders);
+
+      // The X is the only way out: the toast is still there after 6 s, and gone after the click.
+      await page.waitForTimeout(6000);
+      expect((await page.locator('[data-testid="action-needed-list"]').count()) === 1, "actions: the toast does not time out on its own");
+      await page.locator("[toast-close]").first().click();
+      await page.waitForTimeout(800);
+      const state = await page.locator('[data-testid="action-needed-list"]').first().locator("xpath=ancestor::li[1]").getAttribute("data-state").catch(() => null);
+      expect(state === "closed" || state === null, "actions: the X closes the toast", state);
+    } finally {
+      await page.close();
+    }
+  } else {
+    console.log("  (skipped — run D not in this RUN filter)");
+  }
+
   // ---- The OA questionnaire journey: the flagship deliverable gets the
   // same treatment as checkout. Sign in through the real portal UI, answer
   // as a client — second owner, spouse pairing, contribution, dates — and
@@ -603,6 +671,15 @@ async function main(): Promise<void> {
       await page.getByLabel("Password").fill("gate-pass-12345");
       await page.locator("main button").filter({ hasText: /^Sign in/ }).first().click();
       await page.waitForURL(/\/portal(?!\/login)/, { timeout: 10000 });
+
+      // Arrival: the questionnaire is owed, so the portal says so — a sticky
+      // toast naming it and a red outline on the card (Adam, 5 Sep 2026).
+      // The company is not formed, so no service order can be listed yet.
+      await page.waitForTimeout(1500);
+      const arrivalToast = await page.locator('[data-testid="action-needed-list"]').first().innerText().catch(() => "");
+      expect(/operating agreement questionnaire/i.test(arrivalToast), "OA: arrival toast names the unfinished questionnaire", arrivalToast);
+      expect(!/Provide details/i.test(arrivalToast), "OA: an unformed company's EIN/S election are not demanded yet", arrivalToast);
+      expect((await page.locator('[data-needs-action="true"]').count()) === 1, "OA: exactly the agreement card is outlined red", await page.locator('[data-needs-action="true"]').count());
 
       await page.goto(`http://localhost:${WEB_PORT}/portal/agreement`);
       await page.waitForSelector("main h2, main h1");
@@ -699,6 +776,13 @@ async function main(): Promise<void> {
         genAnswers?.members?.map((m) => m.address),
       );
       expect(!/tenancies by the entireties|by the entireties/i.test(md), "OA: the singular form, always (Adam's rule)");
+
+      // With the agreement generated and nothing else owed, the portal is
+      // quiet: no toast, no red outline.
+      await page.goto(`http://localhost:${WEB_PORT}/portal`);
+      await page.waitForTimeout(1500);
+      expect((await page.locator('[data-testid="action-needed-list"]').count()) === 0, "OA: no action-needed toast once the agreement exists");
+      expect((await page.locator('[data-needs-action="true"]').count()) === 0, "OA: no red outlines once nothing is owed");
       expect(md.includes("$1,000 cash"), "OA: the contribution typed on screen is in Exhibit A");
       expect(md.includes("September 15, 2026"), "OA: the effective date chosen on screen is in the agreement");
       console.log("  ✓ OA journey: every on-screen answer survived into the assembled agreement");

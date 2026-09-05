@@ -9,6 +9,7 @@ import { api, ApiError } from "@/lib/api";
 
 import { formatDateTime } from "@/lib/datetime";
 import { SElectionDetailsForm, EIN_CERTIFICATION } from "./SElectionDetailsForm";
+import { clientMustAct, summaryOf } from "./services.helpers";
 
 export interface StoredShareholder {
   name: string;
@@ -90,13 +91,6 @@ function money(cents: number): string {
   return `$${(cents / 100).toFixed(0)}`;
 }
 
-function summaryOf(o: ServiceOrder): string {
-  if (o.type === "series") return `Protected Series Designation — ${o.details.seriesName ?? o.llc_name}`;
-  if (o.type === "s-election") return `S Corporation Election Package — ${o.llc_name}`;
-  if (o.type === "certificate-of-status") return `Certificate of Status — ${o.llc_name}`;
-  if (o.type === "certified-copy") return `Certified Copy of the Articles — ${o.llc_name}`;
-  return `Federal EIN — ${o.details.target === "series" ? o.details.seriesName ?? "series" : o.llc_name}`;
-}
 
 const fmtDay = (iso: string) =>
   new Date(iso).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
@@ -551,9 +545,20 @@ export function ServicesCard({ company }: { company?: string | null }) {
       </div>
 
       {data.orders.length > 0 ? (
-        <ul className="divide-y divide-border border-t border-border">
-          {data.orders.map((o) => (
-            <li key={o.id} className="flex flex-col gap-2 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <ul className="border-t border-border">
+          {/* Separators are drawn per row, not with divide-y: that utility's
+              child selector outranks a row's own border-2 and left the second
+              outlined row with a 1px edge (caught by the behavioral gate). */}
+          {data.orders.map((o, i) => (
+            <li
+              key={o.id}
+              data-needs-action={clientMustAct(o, data.llcFormed) ? "true" : undefined}
+              className={
+                clientMustAct(o, data.llcFormed)
+                  ? "m-2 flex flex-col gap-2 rounded-xl border-2 border-destructive px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
+                  : `flex flex-col gap-2 px-5 py-4 sm:flex-row sm:items-center sm:justify-between${i > 0 ? " border-t border-border" : ""}`
+              }
+            >
               <div className="min-w-0">
                 <div className="text-sm font-medium">{summaryOf(o)}</div>
                 <div className="text-xs text-muted-foreground">

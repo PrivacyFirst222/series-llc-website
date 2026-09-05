@@ -1,8 +1,11 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Navigate, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FileText, Mail, LogOut, Download, ShieldCheck, Clock, ScrollText, BookOpen, ArrowRight, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { ServicesCard, type ServiceOrder } from "./ServicesCard";
+import { clientActionLabel, clientMustAct } from "./services.helpers";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,7 +19,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { api } from "@/lib/api";
 import { formatDate, formatDateTime, taxationLabel } from "@/lib/datetime";
-import { ServicesCard } from "./ServicesCard";
 import { AccountCard } from "./AccountCard";
 
 interface PortalDoc {
@@ -147,10 +149,20 @@ function AgreementAndLibraryRow({ company }: { company: string | null }) {
 
   const hasGeneration = (oaQuery.data?.generations?.length ?? 0) > 0;
   const library = libraryQuery.data ?? [];
+  // The questionnaire is the client's to do: outline the card in red until
+  // an agreement exists (Adam, 5 Sep 2026).
+  const oaOwed = !hasGeneration && oaQuery.isSuccess;
 
   return (
     <div className="mt-6 grid gap-6 lg:grid-cols-2">
-      <div className="overflow-hidden rounded-2xl border border-border bg-card">
+      <div
+        data-needs-action={oaOwed ? "true" : undefined}
+        className={
+          oaOwed
+            ? "overflow-hidden rounded-2xl border-2 border-destructive bg-card"
+            : "overflow-hidden rounded-2xl border border-border bg-card"
+        }
+      >
         <div className="flex items-center gap-2.5 border-b border-border bg-secondary/40 px-5 py-4">
           <ScrollText className="h-4 w-4 text-trust" />
           <h2 className="font-display text-lg">Operating agreement</h2>
@@ -331,6 +343,19 @@ export default function PortalDashboard() {
   const companies = companiesQuery.data ?? [];
   const company = searchParams.get("company") ?? companies[0]?.orderId ?? null;
 
+  // What the client still has to do for THIS company (Adam, 5 Sep 2026):
+  // the agreement questionnaire until an agreement exists, and every service
+  // order waiting on their details. Same query keys as the cards below, so
+  // React Query serves one request each.
+  const servicesForActions = useQuery({
+    queryKey: ["portal-services", company ?? null],
+    queryFn: () =>
+      api.get<{ orders: ServiceOrder[]; llcFormed: boolean }>(
+        `/api/portal/services${company ? `?company=${company}` : ""}`,
+      ),
+    enabled: meQuery.isSuccess,
+  });
+
   const docsQuery = useQuery({
     queryKey: ["portal-documents"],
     queryFn: () => api.get<PortalDoc[]>("/api/portal/documents"),
@@ -372,6 +397,45 @@ export default function PortalDashboard() {
     });
     return map;
   }, [oaGenerations.data]);
+
+  const outstanding = useMemo(() => {
+    const items: string[] = [];
+    if (oaGenerations.isSuccess && (oaGenerations.data?.generations?.length ?? 0) === 0) {
+      items.push("Complete the operating agreement questionnaire");
+    }
+    const svc = servicesForActions.data;
+    if (svc) {
+      for (const o of svc.orders) if (clientMustAct(o, svc.llcFormed)) items.push(clientActionLabel(o));
+    }
+    return items;
+  }, [oaGenerations.isSuccess, oaGenerations.data, servicesForActions.data]);
+
+  // One sticky toast per visit naming every outstanding item; it goes away
+  // only when the client closes it or when nothing is outstanding any more.
+  const { toast, dismiss } = useToast();
+  const outstandingKey = outstanding.join("|");
+  useEffect(() => {
+    if (!outstandingKey) {
+      dismiss();
+      return;
+    }
+    const items = outstandingKey.split("|");
+    const t = toast({
+      duration: Infinity,
+      title: "Action needed",
+      description: (
+        <ul className="mt-1 list-disc space-y-1 pl-4" data-testid="action-needed-list">
+          {items.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      ),
+    });
+    return () => t.dismiss();
+    // toast/dismiss are stable module-level dispatchers.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [outstandingKey]);
+
 
   if (meQuery.isError) {
     return <Navigate to={"/portal/login"} replace />;

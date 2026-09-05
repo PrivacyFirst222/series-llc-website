@@ -13,8 +13,10 @@
     },
     {
       "name": "api",
-      "runtimeExecutable": "bun",
+      "runtimeExecutable": "env",
       "runtimeArgs": [
+        "E2E_OFFLINE=1",
+        "bun",
         "run",
         "--watch",
         "server/dev.ts"
