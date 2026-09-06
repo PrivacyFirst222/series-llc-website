@@ -123,7 +123,11 @@ function Card({
                   className="flex w-full items-start gap-1.5 text-left text-xs transition hover:text-trust"
                 >
                   <span className="min-w-0 break-words font-medium">{serviceLabel(s, order.llc_name)}</span>
-                  <span className="shrink-0 text-muted-foreground">— open</span>
+                  <span className="shrink-0 text-muted-foreground">
+                    {s.status === "awaiting_info" && (s.type === "ein" || s.type === "s-election")
+                      ? "— waiting on client"
+                      : "— in progress"}
+                  </span>
                 </button>
               ) : (
                 <div key={s.id} className="flex items-start gap-1.5 text-xs text-muted-foreground">

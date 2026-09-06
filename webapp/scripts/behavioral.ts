@@ -623,6 +623,27 @@ async function main(): Promise<void> {
       expect(idx("Orders in progress") > idx("Your documents") && idx("Orders in progress") < idx("Operating agreement"), "actions: orders in progress sit beneath the documents and above the agreement", order.heads);
       expect(order.serviceRows === 0, "actions: Order services lists no orders beneath its tiles", order.serviceRows);
 
+      // The admin's side of the same order (Adam, 6 Sep 2026: "I can't upload
+      // the pdf"): the board row says whose move it is, and the fulfill
+      // dialog says why there is nothing to upload yet.
+      await page.goto(`http://localhost:${WEB_PORT}/admin/login`);
+      await page.getByLabel("Password").fill("dev-admin");
+      await page.locator("main button").filter({ hasText: /^Sign in/ }).first().click();
+      await page.waitForURL(/\/admin(?!\/login)/, { timeout: 10000 });
+      await page.getByLabel("Search by LLC name, client name, or email").fill("Gate Run Delta");
+      await page.waitForTimeout(1500);
+      const sRow = page.locator("main button").filter({ hasText: /^S Election/ }).first();
+      expect(/waiting on client/i.test(await sRow.innerText().catch(() => "")), "admin: the board row says the S election is waiting on the client", await sRow.innerText().catch(() => ""));
+      await sRow.click();
+      await page.waitForTimeout(800);
+      const dialog = page.locator('[role="dialog"]').first();
+      expect((await dialog.locator('[data-testid="waiting-on-client"]').count()) === 1, "admin: the fulfill dialog says it is waiting on the client");
+      expect((await dialog.locator("button").filter({ hasText: /fulfill/i }).count()) === 0, "admin: no fulfill button while the client's details are missing");
+      expect((await dialog.locator('input[type="file"]').count()) === 0, "admin: no attach control while the client's details are missing");
+      await page.keyboard.press("Escape");
+      await page.goto(`http://localhost:${WEB_PORT}/portal`);
+      await page.waitForTimeout(1500);
+
       // The X is the only way out: the toast is still there after 6 s, and gone after the click.
       await page.waitForTimeout(6000);
       expect((await page.locator('[data-testid="action-needed-list"]').count()) === 1, "actions: the toast does not time out on its own");

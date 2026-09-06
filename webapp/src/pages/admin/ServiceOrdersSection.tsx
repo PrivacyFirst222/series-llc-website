@@ -203,6 +203,20 @@ export function ServiceFulfillDialog({
             )}
           </div>
         ) : null}
+        {/* An EIN or S election waiting on the client's details cannot be
+            fulfilled — the IRS forms are built from those details, and
+            fulfilling deletes them. Say so instead of greying out a button
+            (Adam, 6 Sep 2026: "I can't upload the pdf"). */}
+        {(viewing?.type === "ein" || viewing?.type === "s-election") && viewing?.status === "awaiting_info" ? (
+          <div className="rounded-xl border border-amber-300/60 bg-amber-50 p-4 text-sm text-amber-900" data-testid="waiting-on-client">
+            <p className="font-medium">Waiting on the client.</p>
+            <p className="mt-1">
+              {viewing.type === "ein"
+                ? "They haven't provided the responsible party's details yet. The EIN application can't be prepared or fulfilled until they do — the portal is asking them for it."
+                : "They haven't provided the S election details yet. The Form 2553 package can't be prepared or fulfilled until they do — the portal is asking them for it."}
+            </p>
+          </div>
+        ) : (
         <div className="space-y-2 border-t border-border pt-3">
           <label htmlFor="service-attachment-file" className="text-sm font-medium">
             {viewing?.type === "ein"
@@ -243,22 +257,21 @@ export function ServiceFulfillDialog({
             </label>
           ) : null}
         </div>
+        )}
         {fulfill.isError ? (
           <p className="text-xs text-destructive">{(fulfill.error as Error).message}</p>
         ) : null}
-        <DialogFooter>
-          <Button
-            className="rounded-full"
-            disabled={
-              fulfill.isPending ||
-              ((viewing?.type === "ein" || viewing?.type === "s-election") && viewing?.status === "awaiting_info") ||
-              (!attachment && !skipDocument)
-            }
-            onClick={() => viewing && fulfill.mutate({ id: viewing.id, file: attachment })}
-          >
-            {fulfill.isPending ? "Fulfilling…" : attachment ? "Upload & fulfill" : "Mark fulfilled"}
-          </Button>
-        </DialogFooter>
+        {(viewing?.type === "ein" || viewing?.type === "s-election") && viewing?.status === "awaiting_info" ? null : (
+          <DialogFooter>
+            <Button
+              className="rounded-full"
+              disabled={fulfill.isPending || (!attachment && !skipDocument)}
+              onClick={() => viewing && fulfill.mutate({ id: viewing.id, file: attachment })}
+            >
+              {fulfill.isPending ? "Fulfilling…" : attachment ? "Upload & fulfill" : "Mark fulfilled"}
+            </Button>
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   );
