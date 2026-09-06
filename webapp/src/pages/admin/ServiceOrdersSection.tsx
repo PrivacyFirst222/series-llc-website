@@ -29,6 +29,7 @@ export interface AdminServiceOrder {
     seriesName?: string; target?: string; responsibleName?: string; tinLast4?: string; purpose?: string; note?: string;
     ein?: string; einPending?: boolean; dateIncorporated?: string; effectiveDate?: string;
     officerName?: string; officerTitle?: string; phone?: string; shareholders?: SElectionShareholderView[];
+    fulfilledByOverride?: boolean; overrideAt?: string;
   };
   amount_cents: number;
   client_id: string;
@@ -75,6 +76,9 @@ export function ServiceFulfillDialog({
   const queryClient = useQueryClient();
   const [attachment, setAttachment] = useState<File | null>(null);
   const [skipDocument, setSkipDocument] = useState(false);
+  // Adam's override (6 Sep 2026): the details were obtained outside the
+  // portal, so fulfill anyway. The deliverable is still required.
+  const [override, setOverride] = useState(false);
 
   const detailQuery = useQuery({
     queryKey: ["admin-service-detail", viewing?.id],
@@ -100,6 +104,7 @@ export function ServiceFulfillDialog({
     onSuccess: () => {
       setAttachment(null);
       setSkipDocument(false);
+      setOverride(false);
       onClose();
       queryClient.invalidateQueries({ queryKey: ["admin-services"] });
       queryClient.invalidateQueries({ queryKey: ["admin", "orders"] });
@@ -113,6 +118,7 @@ export function ServiceFulfillDialog({
         if (!v) {
           setAttachment(null);
           setSkipDocument(false);
+          setOverride(false);
           onClose();
         }
       }}
@@ -133,6 +139,12 @@ export function ServiceFulfillDialog({
             <div><span className="text-muted-foreground">Client:</span> {viewing.client_name} ({viewing.client_email})</div>
             <div><span className="text-muted-foreground">LLC:</span> {viewing.llc_name}</div>
             <div><span className="text-muted-foreground">Placed:</span> {day(viewing.created_at)}</div>
+            {viewing.details.fulfilledByOverride ? (
+              <div className="font-medium text-amber-800">
+                Fulfilled by override — details obtained outside the portal
+                {viewing.details.overrideAt ? ` (${day(viewing.details.overrideAt)})` : ""}.
+              </div>
+            ) : null}
             {viewing.type === "series" ? (
               <>
                 <div><span className="text-muted-foreground">Series name:</span> {viewing.details.seriesName}</div>
@@ -215,8 +227,19 @@ export function ServiceFulfillDialog({
                 ? "They haven't provided the responsible party's details yet. The EIN application can't be prepared or fulfilled until they do — the portal is asking them for it."
                 : "They haven't provided the S election details yet. The Form 2553 package can't be prepared or fulfilled until they do — the portal is asking them for it."}
             </p>
+            <label className="mt-3 flex items-start gap-2 text-sm">
+              <input
+                type="checkbox"
+                data-testid="override-fulfill"
+                checked={override}
+                onChange={(e) => setOverride(e.target.checked)}
+                className="mt-0.5 h-4 w-4 shrink-0 accent-trust"
+              />
+              <span>I have the details from outside the portal — fulfill anyway.</span>
+            </label>
           </div>
-        ) : (
+        ) : null}
+        {(viewing?.type === "ein" || viewing?.type === "s-election") && viewing?.status === "awaiting_info" && !override ? null : (
         <div className="space-y-2 border-t border-border pt-3">
           <label htmlFor="service-attachment-file" className="text-sm font-medium">
             {viewing?.type === "ein"
@@ -261,7 +284,7 @@ export function ServiceFulfillDialog({
         {fulfill.isError ? (
           <p className="text-xs text-destructive">{(fulfill.error as Error).message}</p>
         ) : null}
-        {(viewing?.type === "ein" || viewing?.type === "s-election") && viewing?.status === "awaiting_info" ? null : (
+        {(viewing?.type === "ein" || viewing?.type === "s-election") && viewing?.status === "awaiting_info" && !override ? null : (
           <DialogFooter>
             <Button
               className="rounded-full"

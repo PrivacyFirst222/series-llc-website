@@ -640,6 +640,11 @@ async function main(): Promise<void> {
       expect((await dialog.locator('[data-testid="waiting-on-client"]').count()) === 1, "admin: the fulfill dialog says it is waiting on the client");
       expect((await dialog.locator("button").filter({ hasText: /fulfill/i }).count()) === 0, "admin: no fulfill button while the client's details are missing");
       expect((await dialog.locator('input[type="file"]').count()) === 0, "admin: no attach control while the client's details are missing");
+      // The override: tick it and the attach control and fulfill button appear.
+      await dialog.locator('[data-testid="override-fulfill"]').check({ force: true });
+      await page.waitForTimeout(300);
+      expect((await dialog.locator('input[type="file"]').count()) === 1, "admin: the override reveals the attach control");
+      expect((await dialog.locator("button").filter({ hasText: /fulfill/i }).count()) === 1, "admin: the override reveals the fulfill button");
       await page.keyboard.press("Escape");
       await page.goto(`http://localhost:${WEB_PORT}/portal`);
       await page.waitForTimeout(1500);

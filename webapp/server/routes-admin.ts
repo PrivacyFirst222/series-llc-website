@@ -978,6 +978,16 @@ app.post("/admin/services/:id/fulfill", async (c) => {
     "UPDATE service_orders SET status = 'fulfilled', fulfilled_at = now(), ein_secret = NULL WHERE id = $1",
     [so.id],
   );
+  // Fulfilled while still waiting on the client's details: the office
+  // obtained them outside the portal (Adam's override, 6 Sep 2026). Record
+  // it on the order so the detail view never reads as if the client
+  // submitted them.
+  if (so.status === "awaiting_info" && (so.type === "ein" || so.type === "s-election")) {
+    await db.query(
+      "UPDATE service_orders SET details = COALESCE(details, '{}'::jsonb) || $2::jsonb WHERE id = $1",
+      [so.id, JSON.stringify({ fulfilledByOverride: true, overrideAt: new Date().toISOString() })],
+    );
+  }
 
   if (notify) {
     const clients = await db.query<{ email: string }>("SELECT email FROM clients WHERE id = $1", [so.client_id]);

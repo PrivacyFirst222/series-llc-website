@@ -109219,6 +109219,12 @@ function registerAdminRoutes(app2) {
       "UPDATE service_orders SET status = 'fulfilled', fulfilled_at = now(), ein_secret = NULL WHERE id = $1",
       [so2.id]
     );
+    if (so2.status === "awaiting_info" && (so2.type === "ein" || so2.type === "s-election")) {
+      await db.query(
+        "UPDATE service_orders SET details = COALESCE(details, '{}'::jsonb) || $2::jsonb WHERE id = $1",
+        [so2.id, JSON.stringify({ fulfilledByOverride: true, overrideAt: (/* @__PURE__ */ new Date()).toISOString() })]
+      );
+    }
     if (notify) {
       const clients = await db.query("SELECT email FROM clients WHERE id = $1", [so2.client_id]);
       if (clients[0]) {

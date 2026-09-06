@@ -1217,6 +1217,32 @@ if (mint.status === 200) {
     });
     check("a certificate for an unformed company is refused",
       certUnformed.status === 400 && certUnformed.body?.error?.code === "NOT_FORMED", certUnformed.body);
+
+    // Adam's override (6 Sep 2026): an S election still waiting on the
+    // client's details can be fulfilled from details obtained outside the
+    // portal — with the package, and recorded as an override.
+    const secSvc = await api(`/api/portal/services?company=${secondId}`, { cookies: setPw.cookie });
+    const secSel = ((secSvc.body?.data?.orders ?? []) as { id: string; type: string; status: string }[])
+      .find((o) => o.type === "s-election" && o.status === "awaiting_info");
+    check("the second company's intake S election is awaiting details", !!secSel, secSvc.body?.data?.orders?.length);
+    if (secSel) {
+      const admO = await adminSession();
+      const noPkg = await api(`/api/admin/services/${secSel.id}/fulfill`, { method: "POST", cookies: admO.cookie, body: "{}" });
+      check("override still requires the package", noPkg.status === 400 && noPkg.body?.error?.code === "PACKAGE_REQUIRED", noPkg.body);
+      const pkg = new FormData();
+      pkg.set("file", new File([new TextEncoder().encode("%PDF-1.4 override 2553\n%%EOF")], "2553.pdf", { type: "application/pdf" }));
+      const over = await fetch(`${BASE}/api/admin/services/${secSel.id}/fulfill`, { method: "POST", body: pkg, headers: { Cookie: admO.cookie, "X-Forwarded-For": RUN_IP } });
+      check("an awaiting-details S election fulfills by override with the package", over.status === 200, await over.json().catch(() => null));
+      const overDetail = await api(`/api/admin/services/${secSel.id}`, { cookies: admO.cookie });
+      check("the override is recorded on the order", overDetail.body?.data?.details?.fulfilledByOverride === true, overDetail.body?.data?.details);
+      const secAfter = await api(`/api/portal/services?company=${secondId}`, { cookies: setPw.cookie });
+      const nowSel = ((secAfter.body?.data?.orders ?? []) as { id: string; status: string }[]).find((o) => o.id === secSel.id);
+      check("the client's order is fulfilled — nothing left for them to provide", nowSel?.status === "fulfilled", nowSel);
+      const secDocs = await api("/api/portal/documents", { cookies: setPw.cookie });
+      check("the package lands in the client's documents",
+        ((secDocs.body?.data ?? []) as { title: string }[]).some((d) => d.title.startsWith("S Corporation Election Package") && d.title.includes("E2E Second Company")),
+        secDocs.body?.data?.length);
+    }
   }
 } else {
   check("dev mint-reset-token available (dev only)", false);
