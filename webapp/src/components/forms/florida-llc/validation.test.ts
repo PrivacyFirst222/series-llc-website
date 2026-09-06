@@ -302,6 +302,27 @@ if (typeof console !== "undefined") {
   console.log("[admin] board new-work rule: 4 cases correct.");
 }
 
+// S election form: optional dates are typed as MM/DD/YYYY and stored as
+// YYYY-MM-DD; blank stays blank; nonsense is refused (Adam, 6 Sep 2026 —
+// the iPad's date picker filled in today's date on a tap).
+{
+  const { typedDateToIso, isoToTypedDate } = await import("../../../pages/portal/typedDate");
+  const cases: [string | null, string | null, string][] = [
+    [typedDateToIso(""), "", "blank stays blank"],
+    [typedDateToIso("09/06/2026"), "2026-09-06", "MM/DD/YYYY converts"],
+    [typedDateToIso("9/6/2026"), "2026-09-06", "M/D/YYYY converts"],
+    [typedDateToIso("2026-09-06"), "2026-09-06", "an ISO date passes through"],
+    [typedDateToIso("13/40/2026"), null, "an impossible date is refused"],
+    [typedDateToIso("Sept 6"), null, "words are refused"],
+    [isoToTypedDate("2026-09-06"), "09/06/2026", "stored dates display as MM/DD/YYYY"],
+    [isoToTypedDate(undefined), "", "no stored date displays blank"],
+  ];
+  for (const [got, want, label] of cases) {
+    if (got !== want) throw new Error(`FAIL typed date: ${label} (got ${JSON.stringify(got)})`);
+  }
+  console.log("[portal] S election typed dates: 8 cases correct.");
+}
+
 // Run directly (bun run validation.test.ts): exit non-zero on failure. Printing
 // a warning and exiting 0 is how a broken fee calculation ships — the run has
 // to fail, not merely say something.

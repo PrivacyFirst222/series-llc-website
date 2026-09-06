@@ -12,8 +12,10 @@ import { api, ApiError } from "@/lib/api";
 import { AddressAutocomplete } from "@/components/forms/florida-llc/AddressAutocomplete";
 
 import type { ServiceOrder, ShareholderRow } from "./ServicesCard";
+import { isoToTypedDate, typedDateToIso } from "./typedDate";
 
 const EMPTY_ROW: ShareholderRow = { name: "", address: "", percentage: "", dateAcquired: "", ssn: "" };
+
 
 /** The certification a client gives before we build the form. They sign the
  *  finished Form 2553 under penalties of perjury and mail it themselves — we
@@ -50,7 +52,7 @@ export function SElectionDetailsForm({
   const prior = order.details;
   const [ein, setEin] = useState(prior.ein ?? "");
   const [einPending, setEinPending] = useState(Boolean(prior.einPending));
-  const [effectiveDate, setEffectiveDate] = useState(prior.effectiveDate ?? "");
+  const [effectiveDate, setEffectiveDate] = useState(isoToTypedDate(prior.effectiveDate));
   const [officerName, setOfficerName] = useState(prior.officerName ?? "");
   const [officerTitle, setOfficerTitle] = useState(prior.officerTitle ?? "Manager");
   const [phone, setPhone] = useState(prior.phone ?? "");
@@ -60,7 +62,7 @@ export function SElectionDetailsForm({
           name: s.name,
           address: s.address,
           percentage: String(s.percentage),
-          dateAcquired: s.dateAcquired,
+          dateAcquired: isoToTypedDate(s.dateAcquired),
           ssn: "",
           ssnLast4: s.ssnLast4,
           verified: true,
@@ -78,7 +80,7 @@ export function SElectionDetailsForm({
       api.post<{ documentId: string }>(`/api/portal/services/${order.id}/s-election-details`, {
         ein,
         einPending,
-        effectiveDate,
+        effectiveDate: typedDateToIso(effectiveDate) ?? "",
         officerName,
         officerTitle,
         phone,
@@ -87,7 +89,7 @@ export function SElectionDetailsForm({
           name: r.name,
           address: r.address,
           percentage: Number(r.percentage),
-          dateAcquired: r.dateAcquired,
+          dateAcquired: typedDateToIso(r.dateAcquired) ?? "",
           ssn: r.ssn,
         })),
       }),
@@ -103,6 +105,14 @@ export function SElectionDetailsForm({
       onSubmit={(e) => {
         e.preventDefault();
         setFormError("");
+        if (typedDateToIso(effectiveDate) === null) {
+          setFormError("Enter the election effective date as MM/DD/YYYY, or leave it blank.");
+          return;
+        }
+        if (rows.some((r) => typedDateToIso(r.dateAcquired) === null)) {
+          setFormError("Enter each owner's date acquired as MM/DD/YYYY, or leave it blank.");
+          return;
+        }
         submit.mutate();
       }}
     >
@@ -128,7 +138,13 @@ export function SElectionDetailsForm({
         </div>
         <div className="space-y-1.5">
           <label className="text-sm font-medium">Election effective date</label>
-          <Input type="date" value={effectiveDate} onChange={(e) => setEffectiveDate(e.target.value)} />
+          <Input
+            value={effectiveDate}
+            onChange={(e) => setEffectiveDate(e.target.value)}
+            placeholder="MM/DD/YYYY"
+            inputMode="numeric"
+            autoComplete="off"
+          />
           <p className="text-xs text-muted-foreground">
             Usually your formation date. Leave blank and we'll use the date on your filed Articles.
           </p>
@@ -225,11 +241,14 @@ export function SElectionDetailsForm({
                 <span className="text-sm text-muted-foreground">%</span>
               </div>
               <Input
-                type="date"
                 title="Date the interest was acquired"
+                aria-label="Date the interest was acquired"
+                placeholder="Acquired MM/DD/YYYY"
+                inputMode="numeric"
+                autoComplete="off"
                 value={r.dateAcquired}
                 onChange={(e) => patchRow(i, { dateAcquired: e.target.value })}
-                className="w-40"
+                className="w-44"
               />
               <Input
                 type="password"
