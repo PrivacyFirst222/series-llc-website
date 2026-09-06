@@ -660,6 +660,21 @@ async function main(): Promise<void> {
       await choose(page, '[aria-label="Signing officer"]', "Someone else");
       await page.waitForTimeout(300);
       expect((await selDialog.locator('input[aria-label="Signing officer\'s full legal name"]').count()) === 1, "S election: Someone else… reveals the name box");
+      // Nothing typed is lost (Adam, 6 Sep 2026): an outside tap does not
+      // close the form; closing with Escape and reopening brings it all back.
+      await selDialog.locator('input[aria-label="Signing officer\'s full legal name"]').fill("Pat Gatecheck");
+      await selDialog.locator("input").filter({ has: page.locator('xpath=self::input[contains(@placeholder,"MM/DD/YYYY") and not(contains(@placeholder,"Acquired"))]') }).first().fill("10/01/2026");
+      await page.mouse.click(5, 5);
+      await page.waitForTimeout(500);
+      expect((await page.locator('[role="dialog"]').count()) === 1, "S election: a tap outside the form does not close it");
+      await page.keyboard.press("Escape");
+      await page.waitForTimeout(500);
+      expect((await page.locator('[role="dialog"]').count()) === 0, "S election: Escape closes it");
+      await selRow.locator("button").filter({ hasText: /Provide details/ }).first().click();
+      await page.waitForTimeout(800);
+      const reopened = page.locator('[role="dialog"]').first();
+      expect((await reopened.locator('input[aria-label="Signing officer\'s full legal name"]').inputValue()) === "Pat Gatecheck", "S election: the typed officer survives closing and reopening");
+      expect((await reopened.locator('input[placeholder="MM/DD/YYYY"]').first().inputValue()) === "10/01/2026", "S election: the typed effective date survives closing and reopening");
       await page.keyboard.press("Escape");
       await page.waitForTimeout(400);
 

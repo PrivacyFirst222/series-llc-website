@@ -6,7 +6,7 @@
 // the documents. The detail dialogs an order can need live here too, and
 // a fulfilled S election or series document reaches them through
 // `external`.
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ClipboardList, Lock, FileSignature } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { api, ApiError } from "@/lib/api";
-import { SElectionDetailsForm, EIN_CERTIFICATION } from "./SElectionDetailsForm";
+import { SElectionDetailsForm, EIN_CERTIFICATION, type SElectionDraft } from "./SElectionDetailsForm";
 import { STATUS_LABEL, clientMustAct, money, summaryOf } from "./services.helpers";
 import type { ServiceOrder, ServicesData } from "./ServicesCard";
 
@@ -43,6 +43,19 @@ export function OrdersInProgress({
   const [einExcise, setEinExcise] = useState(false);
   const [einCertified, setEinCertified] = useState(false);
   const [error, setError] = useState<string>("");
+  // What the client has typed into either secure form, per order, kept in
+  // page memory so that closing the dialog loses nothing (Adam, 6 Sep 2026).
+  // Never written to storage — these carry Social Security numbers.
+  const [selDrafts, setSelDrafts] = useState<Record<string, SElectionDraft>>({});
+  const [einDrafts, setEinDrafts] = useState<Record<string, Record<string, string>>>({});
+  const einFormRef = useRef<HTMLFormElement>(null);
+  const snapshotEinDraft = () => {
+    const form = einFormRef.current;
+    if (!form || !detailsFor) return;
+    const out: Record<string, string> = {};
+    new FormData(form).forEach((v, k) => { out[k] = String(v); });
+    setEinDrafts((prev) => ({ ...prev, [detailsFor.id]: out }));
+  };
 
   // The client's own name, for the signing-officer choices — same key as
   // the dashboard, so no extra request.
@@ -61,7 +74,9 @@ export function OrdersInProgress({
   const submitDetails = useMutation({
     mutationFn: (args: { id: string; payload: Record<string, unknown> }) =>
       api.post(`/api/portal/services/${args.id}/ein-details`, { ...args.payload, certified: true }),
-    onSuccess: () => {
+    onSuccess: (_res, args) => {
+      setEinDrafts((prev) => { const next = { ...prev }; delete next[args.id]; return next; });
+      setEinCertified(false); setEinEmployees(false); setEinExcise(false);
       setDetailsFor(null);
       refresh();
     },
@@ -204,7 +219,9 @@ export function OrdersInProgress({
         open={detailsFor !== null && detailsFor.type === "s-election"}
         onOpenChange={(v) => { if (!v) setDetailsFor(null); }}
       >
-        <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
+        {/* An outside tap does nothing — only the X or Escape closes it, and
+            what was typed survives the close. */}
+        <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl" onInteractOutside={(e) => e.preventDefault()}>
           <DialogHeader>
             <DialogTitle>S corporation election details</DialogTitle>
             <DialogDescription>
@@ -220,7 +237,12 @@ export function OrdersInProgress({
               order={detailsFor}
               members={data.members ?? []}
               clientName={meQuery.data?.name}
-              onDone={() => { setDetailsFor(null); refresh(); queryClient.invalidateQueries({ queryKey: ["portal-documents"] }); }}
+              draft={selDrafts[detailsFor.id]}
+              onDraftChange={(d) => setSelDrafts((prev) => ({ ...prev, [detailsFor.id]: d }))}
+              onDone={() => {
+                setSelDrafts((prev) => { const next = { ...prev }; delete next[detailsFor.id]; return next; });
+                setDetailsFor(null); refresh(); queryClient.invalidateQueries({ queryKey: ["portal-documents"] });
+              }}
             />
           ) : null}
         </DialogContent>
@@ -335,9 +357,9 @@ export function OrdersInProgress({
           asks that the formation record cannot answer (SS-4 ledger). */}
       <Dialog
         open={detailsFor !== null && detailsFor.type === "ein"}
-        onOpenChange={(v) => { if (!v) { setDetailsFor(null); setEinCertified(false); setEinEmployees(false); setEinExcise(false); } }}
+        onOpenChange={(v) => { if (!v) { snapshotEinDraft(); setDetailsFor(null); } }}
       >
-        <DialogContent className="max-h-[85vh] overflow-y-auto">
+        <DialogContent className="max-h-[85vh] overflow-y-auto" onInteractOutside={(e) => e.preventDefault()}>
           <DialogHeader>
             <DialogTitle>EIN application details</DialogTitle>
             <DialogDescription>
@@ -348,6 +370,7 @@ export function OrdersInProgress({
             </DialogDescription>
           </DialogHeader>
           <form
+            ref={einFormRef}
             className="space-y-3"
             onSubmit={(e) => {
               e.preventDefault();
@@ -383,37 +406,37 @@ export function OrdersInProgress({
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <label className="text-sm font-medium">First name</label>
-                <Input name="responsibleFirst" autoComplete="off" />
+                <Input name="responsibleFirst" autoComplete="off" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.responsibleFirst ?? ""} />
               </div>
               <div className="space-y-1.5">
                 <label className="text-sm font-medium">Last name</label>
-                <Input name="responsibleLast" autoComplete="off" />
+                <Input name="responsibleLast" autoComplete="off" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.responsibleLast ?? ""} />
               </div>
               <div className="space-y-1.5">
                 <label className="text-sm font-medium">Middle name/initial (optional)</label>
-                <Input name="responsibleMiddle" autoComplete="off" />
+                <Input name="responsibleMiddle" autoComplete="off" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.responsibleMiddle ?? ""} />
               </div>
               <div className="space-y-1.5">
                 <label className="text-sm font-medium">Suffix (optional)</label>
-                <Input name="responsibleSuffix" placeholder="Jr, Sr, III…" autoComplete="off" />
+                <Input name="responsibleSuffix" placeholder="Jr, Sr, III…" autoComplete="off" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.responsibleSuffix ?? ""} />
               </div>
               <div className="space-y-1.5">
                 <label className="text-sm font-medium">SSN or ITIN (9 digits)</label>
-                <Input name="tin" type="password" inputMode="numeric" autoComplete="off" placeholder="•••-••-••••" />
+                <Input name="tin" type="password" inputMode="numeric" autoComplete="off" placeholder="•••-••-••••" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.tin ?? ""} />
               </div>
               <div className="space-y-1.5">
                 <label className="text-sm font-medium">Phone for IRS questions</label>
-                <Input name="phone" inputMode="tel" autoComplete="off" />
+                <Input name="phone" inputMode="tel" autoComplete="off" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.phone ?? ""} />
               </div>
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium">County of the LLC's principal address</label>
-              <Input name="county" placeholder="e.g., Orange" autoComplete="off" />
+              <Input name="county" placeholder="e.g., Orange" autoComplete="off" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.county ?? ""} />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <label htmlFor="ein-activity" className="text-sm font-medium">Principal activity</label>
-                <Select name="activity" defaultValue="Real estate">
+                <Select name="activity" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.activity ?? "Real estate"}>
                   <SelectTrigger id="ein-activity">
                     <SelectValue />
                   </SelectTrigger>
@@ -426,7 +449,7 @@ export function OrdersInProgress({
               </div>
               <div className="space-y-1.5">
                 <label htmlFor="ein-closing-month" className="text-sm font-medium">Closing month of accounting year</label>
-                <Select name="closingMonth" defaultValue="December">
+                <Select name="closingMonth" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.closingMonth ?? "December"}>
                   <SelectTrigger id="ein-closing-month">
                     <SelectValue />
                   </SelectTrigger>
@@ -440,7 +463,7 @@ export function OrdersInProgress({
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium">What the business does, in a few words</label>
-              <Input name="activityDetail" placeholder='e.g., "residential rental real estate"' autoComplete="off" />
+              <Input name="activityDetail" placeholder='e.g., "residential rental real estate"' autoComplete="off" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.activityDetail ?? ""} />
             </div>
             <label className="flex items-center gap-2 text-sm">
               <input type="checkbox" checked={einEmployees} onChange={(e) => setEinEmployees(e.target.checked)} className="h-4 w-4 accent-trust" />
@@ -451,23 +474,23 @@ export function OrdersInProgress({
                 <div className="grid grid-cols-3 gap-3">
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium">Employees (general)</label>
-                    <Input name="employeeCountOther" inputMode="numeric" defaultValue="1" autoComplete="off" />
+                    <Input name="employeeCountOther" inputMode="numeric" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.employeeCountOther ?? "1"} autoComplete="off" />
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium">Agricultural</label>
-                    <Input name="employeeCountAg" inputMode="numeric" defaultValue="0" autoComplete="off" />
+                    <Input name="employeeCountAg" inputMode="numeric" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.employeeCountAg ?? "0"} autoComplete="off" />
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium">Household</label>
-                    <Input name="employeeCountHousehold" inputMode="numeric" defaultValue="0" autoComplete="off" />
+                    <Input name="employeeCountHousehold" inputMode="numeric" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.employeeCountHousehold ?? "0"} autoComplete="off" />
                   </div>
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium">First date wages will be paid</label>
-                  <Input name="firstWageDate" type="date" autoComplete="off" />
+                  <Input name="firstWageDate" type="date" autoComplete="off" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.firstWageDate ?? ""} />
                 </div>
                 <label className="flex items-start gap-2 text-xs leading-relaxed">
-                  <input type="checkbox" name="form944Annual" className="mt-0.5 h-4 w-4 shrink-0 accent-trust" />
+                  <input type="checkbox" name="form944Annual" defaultChecked={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.form944Annual === "on"} className="mt-0.5 h-4 w-4 shrink-0 accent-trust" />
                   Expect $1,000 or less in employment tax for a full year (roughly $5,000 or less
                   in total wages)? Check to ask the IRS for annual filing (Form 944) instead of
                   quarterly (Form 941).
@@ -485,7 +508,7 @@ export function OrdersInProgress({
             {einExcise ? (
               <div className="space-y-1.5">
                 <label className="text-sm font-medium">Which of those applies?</label>
-                <Input name="exciseDetail" autoComplete="off" />
+                <Input name="exciseDetail" autoComplete="off" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.exciseDetail ?? ""} />
               </div>
             ) : null}
             <label className="flex items-start gap-2.5 rounded-lg border border-border bg-secondary/40 p-3">

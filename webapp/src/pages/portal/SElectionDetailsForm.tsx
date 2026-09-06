@@ -1,7 +1,7 @@
 // The S corporation election details form — split from ServicesCard.tsx on
 // 29 Aug 2026 (the one mechanical seam in that file; the main card is a
 // single stateful component and stays whole).
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { PlusCircle, Trash2, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -40,16 +40,36 @@ export const EIN_CERTIFICATION =
   "in civil penalties and criminal prosecution. I declare that the information I am submitting is " +
   "true, correct, and complete to the best of my knowledge and belief.";
 
+/** Everything typed into the form, held by the parent so that closing the
+ *  dialog loses nothing (Adam, 6 Sep 2026: "If you accidentally tap outside
+ *  the form, it closes and you lose all your information"). Page memory
+ *  only — never storage: the rows carry Social Security numbers. */
+export interface SElectionDraft {
+  ein: string;
+  einPending: boolean;
+  effectiveDate: string;
+  officerName: string;
+  officerOther: boolean;
+  officerTitle: string;
+  phone: string;
+  rows: ShareholderRow[];
+  certified: boolean;
+}
+
 export function SElectionDetailsForm({
   order,
   members,
   clientName,
+  draft,
+  onDraftChange,
   onDone,
 }: {
   order: ServiceOrder;
   members: { name: string; address: string }[];
   /** The signed-in client's own name — the usual signing officer. */
   clientName?: string;
+  draft?: SElectionDraft;
+  onDraftChange?: (d: SElectionDraft) => void;
   onDone: () => void;
 }) {
   // The signing officer is chosen from the people we already know — the
@@ -59,18 +79,19 @@ export function SElectionDetailsForm({
     new Set([clientName?.trim() ?? "", ...members.map((m) => m.name.trim())].filter(Boolean)),
   );
   const prior = order.details;
-  const [ein, setEin] = useState(prior.ein ?? "");
-  const [einPending, setEinPending] = useState(Boolean(prior.einPending));
-  const [effectiveDate, setEffectiveDate] = useState(isoToTypedDate(prior.effectiveDate));
-  const [officerName, setOfficerName] = useState(prior.officerName ?? knownSigners[0] ?? "");
+  const [ein, setEin] = useState(draft?.ein ?? prior.ein ?? "");
+  const [einPending, setEinPending] = useState(draft ? draft.einPending : Boolean(prior.einPending));
+  const [effectiveDate, setEffectiveDate] = useState(draft?.effectiveDate ?? isoToTypedDate(prior.effectiveDate));
+  const [officerName, setOfficerName] = useState(draft?.officerName ?? prior.officerName ?? knownSigners[0] ?? "");
   // "Someone else…" stays selected while the typed name is not a known one.
   const [officerOther, setOfficerOther] = useState(
-    Boolean(prior.officerName) && !knownSigners.includes(prior.officerName ?? ""),
+    draft ? draft.officerOther : Boolean(prior.officerName) && !knownSigners.includes(prior.officerName ?? ""),
   );
-  const [officerTitle, setOfficerTitle] = useState(prior.officerTitle ?? "Manager");
-  const [phone, setPhone] = useState(prior.phone ?? "");
+  const [officerTitle, setOfficerTitle] = useState(draft?.officerTitle ?? prior.officerTitle ?? "Manager");
+  const [phone, setPhone] = useState(draft?.phone ?? prior.phone ?? "");
   const [rows, setRows] = useState<ShareholderRow[]>(
-    prior.shareholders?.length
+    draft?.rows ??
+    (prior.shareholders?.length
       ? prior.shareholders.map((s) => ({
           name: s.name,
           address: s.address,
@@ -81,9 +102,14 @@ export function SElectionDetailsForm({
           ssnLast4: s.ssnLast4,
           verified: true,
         }))
-      : [{ ...EMPTY_ROW }],
+      : [{ ...EMPTY_ROW }]),
   );
-  const [certified, setCertified] = useState(false);
+  const [certified, setCertified] = useState(draft?.certified ?? false);
+  useEffect(() => {
+    onDraftChange?.({ ein, einPending, effectiveDate, officerName, officerOther, officerTitle, phone, rows, certified });
+    // onDraftChange is a stable setter from the dialog.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ein, einPending, effectiveDate, officerName, officerOther, officerTitle, phone, rows, certified]);
   const [formError, setFormError] = useState("");
 
   const patchRow = (i: number, p: Partial<ShareholderRow>) =>
