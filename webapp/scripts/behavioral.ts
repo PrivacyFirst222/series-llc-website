@@ -646,6 +646,20 @@ async function main(): Promise<void> {
       await atFormation.uncheck({ force: true });
       await page.waitForTimeout(200);
       expect((await selDialog.locator('input[aria-label="Date the interest was acquired"]').count()) === 1, "S election: unticking reveals the MM/DD/YYYY box");
+      // The signing officer is a dropdown of known people (Adam, 6 Sep 2026):
+      // it opens on a real click, lists the client (and the owners) plus
+      // "Someone else…", and that choice reveals the name box.
+      const signer = selDialog.locator('[aria-label="Signing officer"]').first();
+      expect((await signer.count()) === 1 && /\S/.test(await signer.innerText()), "S election: the signing officer is a dropdown with a default person", await signer.innerText());
+      await signer.click();
+      await page.waitForTimeout(400);
+      const signerOptions = await page.getByRole("option").allInnerTexts();
+      expect(signerOptions.some((t) => /Someone else/.test(t)) && signerOptions.length >= 2, "S election: the dropdown offers the known people and Someone else…", signerOptions);
+      await page.keyboard.press("Escape");
+      await page.waitForTimeout(300);
+      await choose(page, '[aria-label="Signing officer"]', "Someone else");
+      await page.waitForTimeout(300);
+      expect((await selDialog.locator('input[aria-label="Signing officer\'s full legal name"]').count()) === 1, "S election: Someone else… reveals the name box");
       await page.keyboard.press("Escape");
       await page.waitForTimeout(400);
 

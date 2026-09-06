@@ -44,6 +44,14 @@ export function OrdersInProgress({
   const [einCertified, setEinCertified] = useState(false);
   const [error, setError] = useState<string>("");
 
+  // The client's own name, for the signing-officer choices — same key as
+  // the dashboard, so no extra request.
+  const meQuery = useQuery({
+    queryKey: ["portal-me"],
+    queryFn: () => api.get<{ name: string }>("/api/auth/me"),
+    retry: false,
+  });
+
   const servicesQuery = useQuery({
     queryKey: ["portal-services", company ?? null],
     queryFn: () => api.get<ServicesData>(`/api/portal/services${cq}`),
@@ -211,6 +219,7 @@ export function OrdersInProgress({
             <SElectionDetailsForm
               order={detailsFor}
               members={data.members ?? []}
+              clientName={meQuery.data?.name}
               onDone={() => { setDetailsFor(null); refresh(); queryClient.invalidateQueries({ queryKey: ["portal-documents"] }); }}
             />
           ) : null}

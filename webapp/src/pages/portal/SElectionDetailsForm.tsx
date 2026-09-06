@@ -43,17 +43,30 @@ export const EIN_CERTIFICATION =
 export function SElectionDetailsForm({
   order,
   members,
+  clientName,
   onDone,
 }: {
   order: ServiceOrder;
   members: { name: string; address: string }[];
+  /** The signed-in client's own name — the usual signing officer. */
+  clientName?: string;
   onDone: () => void;
 }) {
+  // The signing officer is chosen from the people we already know — the
+  // client and the company's owners — with "Someone else…" revealing a box
+  // (Adam, 6 Sep 2026). The first known person is the default.
+  const knownSigners = Array.from(
+    new Set([clientName?.trim() ?? "", ...members.map((m) => m.name.trim())].filter(Boolean)),
+  );
   const prior = order.details;
   const [ein, setEin] = useState(prior.ein ?? "");
   const [einPending, setEinPending] = useState(Boolean(prior.einPending));
   const [effectiveDate, setEffectiveDate] = useState(isoToTypedDate(prior.effectiveDate));
-  const [officerName, setOfficerName] = useState(prior.officerName ?? "");
+  const [officerName, setOfficerName] = useState(prior.officerName ?? knownSigners[0] ?? "");
+  // "Someone else…" stays selected while the typed name is not a known one.
+  const [officerOther, setOfficerOther] = useState(
+    Boolean(prior.officerName) && !knownSigners.includes(prior.officerName ?? ""),
+  );
   const [officerTitle, setOfficerTitle] = useState(prior.officerTitle ?? "Manager");
   const [phone, setPhone] = useState(prior.phone ?? "");
   const [rows, setRows] = useState<ShareholderRow[]>(
@@ -154,7 +167,39 @@ export function SElectionDetailsForm({
             the phone sits alone beneath them. */}
         <div className="space-y-1.5">
           <label className="text-sm font-medium">Signing officer</label>
-          <Input value={officerName} onChange={(e) => setOfficerName(e.target.value)} placeholder="Full legal name" autoComplete="off" />
+          <Select
+            value={officerOther ? OTHER : officerName}
+            onValueChange={(v) => {
+              if (v === OTHER) {
+                setOfficerOther(true);
+                setOfficerName("");
+                return;
+              }
+              setOfficerOther(false);
+              setOfficerName(v);
+            }}
+          >
+            <SelectTrigger aria-label="Signing officer">
+              <SelectValue placeholder="Choose who signs…" />
+            </SelectTrigger>
+            <SelectContent>
+              {knownSigners.map((name) => (
+                <SelectItem key={name} value={name}>
+                  {name}
+                </SelectItem>
+              ))}
+              <SelectItem value={OTHER}>Someone else…</SelectItem>
+            </SelectContent>
+          </Select>
+          {officerOther ? (
+            <Input
+              value={officerName}
+              onChange={(e) => setOfficerName(e.target.value)}
+              placeholder="Full legal name"
+              aria-label="Signing officer's full legal name"
+              autoComplete="off"
+            />
+          ) : null}
         </div>
         <div className="space-y-1.5">
           <label className="text-sm font-medium">Officer title</label>
