@@ -630,6 +630,25 @@ async function main(): Promise<void> {
       expect(idx("Orders in progress") > idx("Your documents") && idx("Orders in progress") < idx("Operating agreement"), "actions: orders in progress sit beneath the documents and above the agreement", order.heads);
       expect(order.serviceRows === 0, "actions: Order services lists no orders beneath its tiles", order.serviceRows);
 
+      // The S election form itself (Adam, 6 Sep 2026): the optional dates are
+      // typed boxes that stay empty — an iPad's date picker filled in today —
+      // and each owner row offers "Acquired at formation", ticked by default,
+      // which hides the date box; unticking reveals it.
+      const selRow = page.locator('[data-testid="orders-in-progress"] li').filter({ hasText: /S Corporation Election/ }).first();
+      await selRow.locator("button").filter({ hasText: /Provide details/ }).first().click();
+      await page.waitForTimeout(800);
+      const selDialog = page.locator('[role="dialog"]').first();
+      const eff = selDialog.locator('input[placeholder="MM/DD/YYYY"]').first();
+      expect((await eff.getAttribute("type")) !== "date" && (await eff.inputValue()) === "", "S election: the effective date is a typed box that starts empty", await eff.inputValue());
+      const atFormation = selDialog.locator('input[aria-label="Acquired at formation"]').first();
+      expect(await atFormation.isChecked(), "S election: an owner row is 'acquired at formation' by default");
+      expect((await selDialog.locator('input[aria-label="Date the interest was acquired"]').count()) === 0, "S election: no date box while acquired at formation");
+      await atFormation.uncheck({ force: true });
+      await page.waitForTimeout(200);
+      expect((await selDialog.locator('input[aria-label="Date the interest was acquired"]').count()) === 1, "S election: unticking reveals the MM/DD/YYYY box");
+      await page.keyboard.press("Escape");
+      await page.waitForTimeout(400);
+
       // The admin's side of the same order (Adam, 6 Sep 2026: "I can't upload
       // the pdf"): the board row says whose move it is, and the fulfill
       // dialog says why there is nothing to upload yet.

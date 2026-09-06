@@ -14,7 +14,7 @@ import { AddressAutocomplete } from "@/components/forms/florida-llc/AddressAutoc
 import type { ServiceOrder, ShareholderRow } from "./ServicesCard";
 import { isoToTypedDate, typedDateToIso } from "./typedDate";
 
-const EMPTY_ROW: ShareholderRow = { name: "", address: "", percentage: "", dateAcquired: "", ssn: "" };
+const EMPTY_ROW: ShareholderRow = { name: "", address: "", percentage: "", dateAcquired: "", atFormation: true, ssn: "" };
 
 
 /** The certification a client gives before we build the form. They sign the
@@ -63,6 +63,7 @@ export function SElectionDetailsForm({
           address: s.address,
           percentage: String(s.percentage),
           dateAcquired: isoToTypedDate(s.dateAcquired),
+          atFormation: !s.dateAcquired || s.dateAcquired === prior.dateIncorporated,
           ssn: "",
           ssnLast4: s.ssnLast4,
           verified: true,
@@ -89,7 +90,7 @@ export function SElectionDetailsForm({
           name: r.name,
           address: r.address,
           percentage: Number(r.percentage),
-          dateAcquired: typedDateToIso(r.dateAcquired) ?? "",
+          dateAcquired: r.atFormation ? "" : (typedDateToIso(r.dateAcquired) ?? ""),
           ssn: r.ssn,
         })),
       }),
@@ -109,7 +110,7 @@ export function SElectionDetailsForm({
           setFormError("Enter the election effective date as MM/DD/YYYY, or leave it blank.");
           return;
         }
-        if (rows.some((r) => typedDateToIso(r.dateAcquired) === null)) {
+        if (rows.some((r) => !r.atFormation && typedDateToIso(r.dateAcquired) === null)) {
           setFormError("Enter each owner's date acquired as MM/DD/YYYY, or leave it blank.");
           return;
         }
@@ -240,16 +241,28 @@ export function SElectionDetailsForm({
                 />
                 <span className="text-sm text-muted-foreground">%</span>
               </div>
-              <Input
-                title="Date the interest was acquired"
-                aria-label="Date the interest was acquired"
-                placeholder="Acquired MM/DD/YYYY"
-                inputMode="numeric"
-                autoComplete="off"
-                value={r.dateAcquired}
-                onChange={(e) => patchRow(i, { dateAcquired: e.target.value })}
-                className="w-44"
-              />
+              <label className="flex items-center gap-1.5 whitespace-nowrap text-xs text-muted-foreground">
+                <input
+                  type="checkbox"
+                  aria-label="Acquired at formation"
+                  checked={r.atFormation !== false}
+                  onChange={(e) => patchRow(i, { atFormation: e.target.checked })}
+                  className="h-4 w-4 accent-trust"
+                />
+                Acquired at formation
+              </label>
+              {r.atFormation === false ? (
+                <Input
+                  title="Date the interest was acquired"
+                  aria-label="Date the interest was acquired"
+                  placeholder="Acquired MM/DD/YYYY"
+                  inputMode="numeric"
+                  autoComplete="off"
+                  value={r.dateAcquired}
+                  onChange={(e) => patchRow(i, { dateAcquired: e.target.value })}
+                  className="w-44"
+                />
+              ) : null}
               <Input
                 type="password"
                 inputMode="numeric"

@@ -68,6 +68,10 @@ export interface ShareholderRow {
   address: string;
   percentage: string;
   dateAcquired: string;
+  /** "Acquired at formation" (Adam, 6 Sep 2026): the usual case, ticked by
+   *  default. While ticked the date box is hidden and the row is sent blank,
+   *  which means "use the date the office enters from the filed Articles." */
+  atFormation?: boolean;
   ssn: string;
   /** Set when the number is already on file: the field stays blank and the
    *  server keeps what it has, so an edit never means retyping SSNs. */
