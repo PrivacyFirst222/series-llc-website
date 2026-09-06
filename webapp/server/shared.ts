@@ -1,7 +1,7 @@
 // Helpers shared by every route module (split from app.ts, 29 Aug 2026).
 // testHooks replaces two module-level `let` flags: exported let bindings are
 // read-only for importers in ESM, and the dev routes must assign them.
-import { getSession } from "./auth";
+import { getSession, getAdminSession } from "./auth";
 
 export const testHooks = {
   /** Makes the next fulfillment throw once (dev suite scaffolding). */
@@ -24,8 +24,7 @@ export function maskEmail(email: string): string {
 
 
 export async function requireAdmin(c: Parameters<typeof getSession>[0]) {
-  const session = await getSession(c);
-  return session?.isAdmin ? session : null;
+  return getAdminSession(c);
 }
 
 

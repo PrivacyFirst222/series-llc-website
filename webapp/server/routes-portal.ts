@@ -18,7 +18,7 @@ import { assembleNewSeries } from "./new-series";
 import { stampEastern, stampForFilename } from "./datetime";
 import { assembleOa, oaVersion, OA_TEMPLATE_VERSION, type OaInputs } from "./oa";
 import { renderMarkdownPdf, stampExistingPdf } from "./pdf-render";
-import { createSession, getSession, destroySession, rateLimit, clientIp } from "./auth";
+import { createSession, getSession, getAdminSession, destroySession, rateLimit, clientIp } from "./auth";
 
 import { deleteFile, putFile, readFileStream } from "./storage";
 import { sendMail, resetEmail, raCancellationEmail, raCancellationAdminEmail, einDetailsSubmittedAdminEmail, passwordChangedEmail, verifyNewEmail, emailChangeRequestedEmail, emailChangedEmail, sElectionReadyEmail } from "./email";
@@ -767,7 +767,8 @@ app.get("/portal/documents", async (c) => {
 
 app.get("/portal/documents/:id/download", async (c) => {
   const session = await getSession(c);
-  if (!session?.clientId && !session?.isAdmin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const admin = await getAdminSession(c);
+  if (!session?.clientId && !admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const db = await getDb();
   const rows = await db.query<{ storage_key: string; title: string; content_type: string; client_id: string }>(
     "SELECT storage_key, title, content_type, client_id FROM documents WHERE id = $1",
@@ -775,7 +776,7 @@ app.get("/portal/documents/:id/download", async (c) => {
   );
   if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
   const doc = rows[0];
-  if (!session.isAdmin && doc.client_id !== session.clientId) {
+  if (!admin && doc.client_id !== session?.clientId) {
     return c.json(err("Not found", "NOT_FOUND"), 404);
   }
   const stream = await readFileStream(doc.storage_key);

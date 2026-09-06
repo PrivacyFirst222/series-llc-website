@@ -223,8 +223,21 @@ export default function OAQuestionnaire() {
   }, [loaded, units.length]);
 
 
+  // Only a 401 means signed out. Any other failure — a dropped request when
+  // a tablet's tab comes back from the background — used to bounce the client
+  // to the login page as if their session had ended (Adam, 6 Sep 2026).
   if (meQuery.isError) {
-    return <Navigate to={"/portal/login"} replace />;
+    if (meQuery.error instanceof ApiError && meQuery.error.status === 401) {
+      return <Navigate to={"/portal/login"} replace />;
+    }
+    return (
+      <section className="container-wide section-y">
+        <p className="text-sm text-muted-foreground">We couldn't reach your agreement just now.</p>
+        <Button size="sm" className="mt-3 rounded-full" onClick={() => meQuery.refetch()}>
+          Try again
+        </Button>
+      </section>
+    );
   }
   if (oaQuery.isError) {
     return (

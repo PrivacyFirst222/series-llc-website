@@ -5288,13 +5288,13 @@ var init_serverless = __esm({
 });
 
 // node_modules/@cantoo/pdf-lib/es/utils/base64.js
-var chars, lookup, encodeToBase64, decodeFromBase64, DATA_URI_PREFIX_REGEX, decodeFromBase64DataUri;
+var chars, lookup2, encodeToBase64, decodeFromBase64, DATA_URI_PREFIX_REGEX, decodeFromBase64DataUri;
 var init_base64 = __esm({
   "node_modules/@cantoo/pdf-lib/es/utils/base64.js"() {
     chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    lookup = new Uint8Array(256);
+    lookup2 = new Uint8Array(256);
     for (let i = 0; i < chars.length; i++) {
-      lookup[chars.charCodeAt(i)] = i;
+      lookup2[chars.charCodeAt(i)] = i;
     }
     encodeToBase64 = (bytes2) => {
       let base64 = "";
@@ -5329,10 +5329,10 @@ var init_base64 = __esm({
       }
       const bytes2 = new Uint8Array(bufferLength);
       for (i = 0; i < len; i += 4) {
-        encoded1 = lookup[base64.charCodeAt(i)];
-        encoded2 = lookup[base64.charCodeAt(i + 1)];
-        encoded3 = lookup[base64.charCodeAt(i + 2)];
-        encoded4 = lookup[base64.charCodeAt(i + 3)];
+        encoded1 = lookup2[base64.charCodeAt(i)];
+        encoded2 = lookup2[base64.charCodeAt(i + 1)];
+        encoded3 = lookup2[base64.charCodeAt(i + 2)];
+        encoded4 = lookup2[base64.charCodeAt(i + 3)];
         bytes2[p2++] = encoded1 << 2 | encoded2 >> 4;
         bytes2[p2++] = (encoded2 & 15) << 4 | encoded3 >> 2;
         bytes2[p2++] = (encoded3 & 3) << 6 | encoded4 & 63;
@@ -10033,9 +10033,9 @@ var require_utils = __commonJS({
     Object.defineProperty(exports, "__esModule", { value: true });
     var pako_1 = __importDefault(require_pako());
     var chars2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    var lookup2 = new Uint8Array(256);
+    var lookup3 = new Uint8Array(256);
     for (i = 0; i < chars2.length; i++) {
-      lookup2[chars2.charCodeAt(i)] = i;
+      lookup3[chars2.charCodeAt(i)] = i;
     }
     var i;
     exports.decodeFromBase64 = function(base64) {
@@ -10055,10 +10055,10 @@ var require_utils = __commonJS({
       }
       var bytes2 = new Uint8Array(bufferLength);
       for (i2 = 0; i2 < len; i2 += 4) {
-        encoded1 = lookup2[base64.charCodeAt(i2)];
-        encoded2 = lookup2[base64.charCodeAt(i2 + 1)];
-        encoded3 = lookup2[base64.charCodeAt(i2 + 2)];
-        encoded4 = lookup2[base64.charCodeAt(i2 + 3)];
+        encoded1 = lookup3[base64.charCodeAt(i2)];
+        encoded2 = lookup3[base64.charCodeAt(i2 + 1)];
+        encoded3 = lookup3[base64.charCodeAt(i2 + 2)];
+        encoded4 = lookup3[base64.charCodeAt(i2 + 3)];
         bytes2[p2++] = encoded1 << 2 | encoded2 >> 4;
         bytes2[p2++] = (encoded2 & 15) << 4 | encoded3 >> 2;
         bytes2[p2++] = (encoded3 & 3) << 6 | encoded4 & 63;
@@ -82511,7 +82511,7 @@ var require_dns = __commonJS({
   "node_modules/undici/lib/interceptor/dns.js"(exports, module) {
     "use strict";
     var { isIP } = __require("node:net");
-    var { lookup: lookup2 } = __require("node:dns");
+    var { lookup: lookup3 } = __require("node:dns");
     var DecoratorHandler = require_decorator_handler();
     var { InvalidArgumentError, InformationalError } = require_errors5();
     var maxInt = Math.pow(2, 31) - 1;
@@ -82601,7 +82601,7 @@ var require_dns = __commonJS({
         }
       }
       #defaultLookup(origin, opts, cb) {
-        lookup2(
+        lookup3(
           origin.hostname,
           {
             all: true,
@@ -95473,7 +95473,8 @@ function decryptSecret(stored) {
 }
 
 // server/auth.ts
-var SESSION_COOKIE = "fpsllc_session";
+var CLIENT_COOKIE = "fpsllc_session";
+var ADMIN_COOKIE = "fpsllc_admin";
 var SESSION_DAYS = 30;
 async function createSession(c, opts) {
   const db = await getDb();
@@ -95483,7 +95484,7 @@ async function createSession(c, opts) {
     "INSERT INTO sessions (token_hash, client_id, is_admin, expires_at) VALUES ($1, $2, $3, $4)",
     [tokenHash, opts.clientId ?? null, opts.isAdmin ?? false, expires.toISOString()]
   );
-  setCookie(c, SESSION_COOKIE, token, {
+  setCookie(c, opts.isAdmin ? ADMIN_COOKIE : CLIENT_COOKIE, token, {
     httpOnly: true,
     secure: env.isProd,
     sameSite: "Lax",
@@ -95491,8 +95492,8 @@ async function createSession(c, opts) {
     expires
   });
 }
-async function getSession(c) {
-  const token = getCookie(c, SESSION_COOKIE);
+async function lookup(c, cookieName) {
+  const token = getCookie(c, cookieName);
   if (!token) return null;
   const db = await getDb();
   const tokenHash = hashToken(token);
@@ -95503,13 +95504,22 @@ async function getSession(c) {
   if (rows.length === 0) return null;
   return { clientId: rows[0].client_id, isAdmin: rows[0].is_admin, tokenHash };
 }
-async function destroySession(c) {
-  const token = getCookie(c, SESSION_COOKIE);
+async function getSession(c) {
+  const s = await lookup(c, CLIENT_COOKIE);
+  return s?.clientId ? s : null;
+}
+async function getAdminSession(c) {
+  const s = await lookup(c, ADMIN_COOKIE);
+  return s?.isAdmin ? s : null;
+}
+async function destroySession(c, role = "client") {
+  const cookieName = role === "admin" ? ADMIN_COOKIE : CLIENT_COOKIE;
+  const token = getCookie(c, cookieName);
   if (token) {
     const db = await getDb();
     await db.query("DELETE FROM sessions WHERE token_hash = $1", [hashToken(token)]);
   }
-  deleteCookie(c, SESSION_COOKIE, { path: "/" });
+  deleteCookie(c, cookieName, { path: "/" });
 }
 async function rateLimit(key, max, windowMs, failMode = "open") {
   try {
@@ -95547,8 +95557,7 @@ function maskEmail(email) {
   return `${local.slice(0, 1)}${"\u2022".repeat(Math.max(2, local.length - 1))}@${domain ?? ""}`;
 }
 async function requireAdmin(c) {
-  const session = await getSession(c);
-  return session?.isAdmin ? session : null;
+  return getAdminSession(c);
 }
 var MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
 var looksLikePdf = async (f) => {
@@ -106200,7 +106209,8 @@ function registerPortalRoutes(app2) {
   });
   app2.get("/portal/documents/:id/download", async (c) => {
     const session = await getSession(c);
-    if (!session?.clientId && !session?.isAdmin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+    const admin = await getAdminSession(c);
+    if (!session?.clientId && !admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
     const db = await getDb();
     const rows = await db.query(
       "SELECT storage_key, title, content_type, client_id FROM documents WHERE id = $1",
@@ -106208,7 +106218,7 @@ function registerPortalRoutes(app2) {
     );
     if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
     const doc = rows[0];
-    if (!session.isAdmin && doc.client_id !== session.clientId) {
+    if (!admin && doc.client_id !== session?.clientId) {
       return c.json(err("Not found", "NOT_FOUND"), 404);
     }
     const stream2 = await readFileStream(doc.storage_key);

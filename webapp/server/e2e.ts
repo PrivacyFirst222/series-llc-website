@@ -593,6 +593,18 @@ check("portal requires sign-in", docsNoAuth.status === 401);
 const cancelNoAuth = await api("/api/portal/registered-agent/cancel", { method: "POST", body: "{}" });
 check("RA cancel requires sign-in", cancelNoAuth.status === 401);
 
+// 9b. Admin and client sessions coexist in one browser (Adam, 6 Sep 2026:
+//     "I keep getting logged out of the client portal"). They used to share
+//     one cookie, so signing into the admin evicted the client and vice
+//     versa. Each role now keeps its own cookie; a jar holding both answers
+//     both /me routes, and neither cookie stands in for the other.
+{
+  const adminJar = await adminSession();
+  check("admin sign-in sets its own cookie", adminJar.cookie.startsWith("fpsllc_admin="), adminJar.cookie.split("=")[0]);
+  const clientMe = await api("/api/auth/me", { cookies: adminJar.cookie });
+  check("an admin cookie is not a client session", clientMe.status === 401, clientMe.status);
+}
+
 // 10. Full portal walk via dev-minted token: set password, sign in, cancel RA
 const mint = await api("/api/dev/mint-reset-token", {
   method: "POST",
@@ -622,6 +634,16 @@ if (mint.status === 200) {
     crossPw.body,
   );
   const me = await api("/api/auth/me", { cookies: setPw.cookie });
+  {
+    // Both roles in one jar, as Adam's browser holds them: each /me answers.
+    const jar = `${setPw.cookie}; ${(await adminSession()).cookie}`;
+    const bothClient = await api("/api/auth/me", { cookies: jar });
+    const bothAdmin = await api("/api/admin/me", { cookies: jar });
+    check("a jar holding both cookies is still a signed-in client", bothClient.status === 200, bothClient.status);
+    check("a jar holding both cookies is still a signed-in admin", bothAdmin.status === 200, bothAdmin.status);
+    const clientOnlyAdmin = await api("/api/admin/me", { cookies: setPw.cookie });
+    check("a client cookie is not an admin session", clientOnlyAdmin.status === 401, clientOnlyAdmin.status);
+  }
   check("me shows no RA cancellation yet", me.status === 200 && me.body.data.raCancellationRequestedAt === null);
   const cancel = await api("/api/portal/registered-agent/cancel", {
     method: "POST",

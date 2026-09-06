@@ -4,7 +4,12 @@ import { getDb } from "./db";
 import { newToken, hashToken } from "./crypto";
 import { env } from "./env";
 
-const SESSION_COOKIE = "fpsllc_session";
+// Two cookies, one table. Admin and client sign-ins used to share ONE cookie,
+// so signing into the admin in another tab of the same browser replaced the
+// client's session and the portal "kept logging out" (Adam, 6 Sep 2026).
+// Each role now owns its cookie and neither evicts the other.
+const CLIENT_COOKIE = "fpsllc_session";
+const ADMIN_COOKIE = "fpsllc_admin";
 const SESSION_DAYS = 30;
 
 export interface SessionInfo {
@@ -23,7 +28,7 @@ export async function createSession(c: Context, opts: { clientId?: string; isAdm
     "INSERT INTO sessions (token_hash, client_id, is_admin, expires_at) VALUES ($1, $2, $3, $4)",
     [tokenHash, opts.clientId ?? null, opts.isAdmin ?? false, expires.toISOString()],
   );
-  setCookie(c, SESSION_COOKIE, token, {
+  setCookie(c, opts.isAdmin ? ADMIN_COOKIE : CLIENT_COOKIE, token, {
     httpOnly: true,
     secure: env.isProd,
     sameSite: "Lax",
@@ -32,8 +37,8 @@ export async function createSession(c: Context, opts: { clientId?: string; isAdm
   });
 }
 
-export async function getSession(c: Context): Promise<SessionInfo | null> {
-  const token = getCookie(c, SESSION_COOKIE);
+async function lookup(c: Context, cookieName: string): Promise<SessionInfo | null> {
+  const token = getCookie(c, cookieName);
   if (!token) return null;
   const db = await getDb();
   const tokenHash = hashToken(token);
@@ -45,13 +50,27 @@ export async function getSession(c: Context): Promise<SessionInfo | null> {
   return { clientId: rows[0].client_id, isAdmin: rows[0].is_admin, tokenHash };
 }
 
-export async function destroySession(c: Context): Promise<void> {
-  const token = getCookie(c, SESSION_COOKIE);
+/** The CLIENT's session — the portal's identity. An admin cookie never
+ *  stands in for it: a signed-in admin is not a client. */
+export async function getSession(c: Context): Promise<SessionInfo | null> {
+  const s = await lookup(c, CLIENT_COOKIE);
+  return s?.clientId ? s : null;
+}
+
+/** The ADMIN's session, from its own cookie. */
+export async function getAdminSession(c: Context): Promise<SessionInfo | null> {
+  const s = await lookup(c, ADMIN_COOKIE);
+  return s?.isAdmin ? s : null;
+}
+
+export async function destroySession(c: Context, role: "client" | "admin" = "client"): Promise<void> {
+  const cookieName = role === "admin" ? ADMIN_COOKIE : CLIENT_COOKIE;
+  const token = getCookie(c, cookieName);
   if (token) {
     const db = await getDb();
     await db.query("DELETE FROM sessions WHERE token_hash = $1", [hashToken(token)]);
   }
-  deleteCookie(c, SESSION_COOKIE, { path: "/" });
+  deleteCookie(c, cookieName, { path: "/" });
 }
 
 /** Fixed-window rate limiter backed by the database, so the count survives
