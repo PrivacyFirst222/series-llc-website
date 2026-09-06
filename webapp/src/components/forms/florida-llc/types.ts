@@ -209,6 +209,9 @@ export interface FloridaLLCFormData {
   orderCertifiedCopy: boolean;
   orderEin: boolean;
   orderSElection: boolean;
+  /** Adam's checkout acknowledgment (6 Sep 2026): the client files Form
+   *  2553 within 2 months and 15 days; no refund if they miss it. */
+  sElectionFilingAcknowledgment: boolean;
 
   // Section 13.5 – Series
   series: SeriesEntry[];

@@ -9,6 +9,7 @@
  *   Department of the Treasury, Internal Revenue Service Center, Ogden, UT 84201
  *   Fax: 855-214-7520. There is no IRS filing fee.
  */
+import { form2553Deadline } from "../src/lib/form2553Timing";
 import { PDFDocument, StandardFonts, degrees, rgb } from "@cantoo/pdf-lib";
 import f2553Base64 from "./assets/f2553-b64";
 import { renderMarkdownPdf } from "./pdf-render";
@@ -62,19 +63,21 @@ function fmtDateLong(iso: string): string {
   });
 }
 
+/** Item A. The IRS instructions: "If the corporation (entity) hasn't
+ *  received its EIN by the time the return is due, enter 'Applied For' and
+ *  the date the EIN was applied in the space for the EIN." We know only that
+ *  it is pending, so the form says "Applied For". */
 function fmtEin(ein: string): string {
-  return ein ? `${ein.slice(0, 2)}-${ein.slice(2)}` : "";
+  return ein ? `${ein.slice(0, 2)}-${ein.slice(2)}` : "Applied For";
 }
 
-/** Filing deadline: 2 months and 15 days after the start of the first tax
- *  year — the numerically corresponding day two months out, plus 14 days
- *  (the 2-month period ends the day BEFORE the corresponding day). */
+/** Filing deadline: 2 months and 15 days after the election's effective
+ *  date, by the IRS's own rule (Instructions for Form 2553, "When To Make
+ *  the Election"). The earlier version here added two months by calendar
+ *  overflow and 14 days, which put a December 31 formation at March 17; the
+ *  IRS says March 15. One rule now, shared with the portal's timing gate. */
 export function electionDeadline(startIso: string): string {
-  const [y, m, d] = startIso.split("-").map(Number);
-  const dt = new Date(Date.UTC(y, m - 1, d));
-  dt.setUTCMonth(dt.getUTCMonth() + 2);
-  dt.setUTCDate(dt.getUTCDate() + 14);
-  return dt.toISOString().slice(0, 10);
+  return form2553Deadline(startIso);
 }
 
 /** Split "street, city, ST zip" into the form's two address lines as best we
@@ -94,6 +97,10 @@ async function fillForm2553(d: SElectionDetails): Promise<PDFDocument> {
   const setText = (name: string, value: string) => {
     if (!value) return;
     const field = form.getTextField(name);
+    // The EIN boxes are combed to ten characters; the IRS's own phrase for
+    // a pending number, "Applied For", is eleven. Lift the limit for it.
+    const max = field.getMaxLength();
+    if (max !== undefined && value.length > max) field.setMaxLength(undefined);
     field.setText(value);
   };
   const addr = splitAddress(d.principalAddress);

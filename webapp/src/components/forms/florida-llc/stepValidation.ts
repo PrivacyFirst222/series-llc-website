@@ -321,7 +321,12 @@ export function validateStep(
       e.confirmCorrespondentEmail = "Emails do not match.";
   }
 
-  // "optional" step has no required validation
+  // "optional": the S election add-on carries a required acknowledgment
+  // (Adam, 6 Sep 2026) — the client files it, within 2 months and 15 days,
+  // and there is no refund for missing that.
+  if (step === "optional" && data.orderSElection && !data.sElectionFilingAcknowledgment) {
+    e.sElectionFilingAcknowledgment = "Please acknowledge the Form 2553 filing deadline to add the S election package.";
+  }
 
   // "review" step has no required validation
   if (step === "certify") {

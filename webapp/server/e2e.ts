@@ -5,6 +5,7 @@
 import { defaultFormData } from "../src/components/forms/florida-llc/defaults";
 import { assembleOa } from "./oa";
 import type { FloridaLLCFormData } from "../src/components/forms/florida-llc/types";
+import { evaluate2553Timing } from "../src/lib/form2553Timing";
 
 const BASE = process.env.E2E_BASE_URL || "http://localhost:3000";
 let failures = 0;
@@ -89,8 +90,21 @@ const formData: FloridaLLCFormData = {
   termsOfServiceAcknowledgment: true,
   orderEin: true,
   orderSElection: true,
+  sElectionFilingAcknowledgment: true,
   publicRecordAcknowledgment: true,
   legalAdviceAcknowledgment: true,
+};
+
+// Today in Florida, and a formation date N days before it, as YYYY-MM-DD —
+// the Form 2553 timing checks must hold on any day the suite runs.
+const easternToday = (): string => {
+  const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
+  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
+  return `${get("year")}-${get("month")}-${get("day")}`;
+};
+const daysAgo = (n: number): string => {
+  const [y, m, d] = easternToday().split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d) - n * 86400000).toISOString().slice(0, 10);
 };
 
 /** The order endpoint allows 10 submissions per hour per IP. Without a distinct
@@ -401,6 +415,13 @@ check("price recomputed server-side, client's claimed total ignored: $499 + $50 
   check("conversion keeping its agent owes nothing", convKeep.stateFeesCents === 0, convKeep.stateFeesCents);
 }
 check("returns checkout URL", typeof order.body?.data?.checkoutUrl === "string");
+
+// 2b. The S election add-on needs Adam's checkout acknowledgment (6 Sep 2026).
+{
+  const noAckIp = { "X-Forwarded-For": `10.77.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}` };
+  const noAck = await api("/api/orders", { method: "POST", headers: noAckIp, body: JSON.stringify({ ...formData, sElectionFilingAcknowledgment: false }) });
+  check("an S election add-on without the filing acknowledgment is refused", noAck.status === 400, noAck.body);
+}
 
 // 3. Status is pending before payment
 const pre = await api(`/api/orders/${orderId}/status`);
@@ -1424,21 +1445,48 @@ if (mint.status === 200) {
   const sDetails = await api(`/api/portal/services/${sId}/s-election-details`, {
     method: "POST", cookies: mPw.cookie, body: JSON.stringify(goodDetails),
   });
-  check("S election details accepted", sDetails.status === 200, sDetails.body);
-  check("no package until the office enters the formation date", sDetails.body?.data?.documentId === null && sDetails.body?.data?.awaitingFormationDate === true, sDetails.body?.data);
-  const waiting = (await api("/api/portal/services", { cookies: mPw.cookie })).body?.data?.orders?.find((o: { id: string }) => o.id === sId);
-  check("the client's order shows in progress while we prepare it", waiting?.status === "in_progress", waiting?.status);
-  const draftEarly = await fetch(`${BASE}/api/admin/services/${sId}/s-election-draft`, { headers: { Cookie: adminS.cookie } });
-  check("the draft cannot be built before the formation date", draftEarly.status === 400, draftEarly.status);
+  // The Form 2553 timing gate (Adam, 6 Sep 2026). The office enters the
+  // formation date first; the form does not open before it. Then the IRS
+  // deadline rule decides: late and too-close are refused, the acknowledgment
+  // is required, and only then is the package built.
+  check("S election details are refused before the office enters the formation date",
+    sDetails.status === 400 && sDetails.body?.error?.code === "FORMATION_DATE_REQUIRED", sDetails.body);
   const badDate = await api(`/api/admin/services/${sId}/s-election-formation-date`, { method: "POST", cookies: adminS.cookie, body: JSON.stringify({ date: "8/1/2026" }) });
   check("a malformed formation date is refused", badDate.status === 400, badDate.body);
-  const entered = await api(`/api/admin/services/${sId}/s-election-formation-date`, { method: "POST", cookies: adminS.cookie, body: JSON.stringify({ date: "2026-08-01" }) });
-  check("the office enters the formation date and the package is built", entered.status === 200 && Boolean(entered.body?.data?.documentId), entered.body);
+  const lateDate = daysAgo(120);
+  const lateEntered = await api(`/api/admin/services/${sId}/s-election-formation-date`, { method: "POST", cookies: adminS.cookie, body: JSON.stringify({ date: lateDate }) });
+  check("the office can enter a formation date before the client's details", lateEntered.status === 200 && lateEntered.body?.data?.timing?.status === "late", lateEntered.body);
+  const lateTry = await api(`/api/portal/services/${sId}/s-election-details`, { method: "POST", cookies: mPw.cookie, body: JSON.stringify({ ...goodDetails, timingAcknowledged: true }) });
+  check("a late election is refused with the Rev. Proc. message",
+    lateTry.status === 400 && lateTry.body?.error?.code === "TIMING_LATE" && /Rev\. Proc\. 2013-30/.test(lateTry.body?.error?.message ?? ""), lateTry.body);
+  let tightDate = "";
+  for (let n = 50; n <= 80; n++) {
+    if (evaluate2553Timing({ formationDate: daysAgo(n), today: easternToday() }).status === "insufficient") { tightDate = daysAgo(n); break; }
+  }
+  check("a formation date inside the five-day runway exists to test", tightDate !== "", tightDate);
+  await api(`/api/admin/services/${sId}/s-election-formation-date`, { method: "POST", cookies: adminS.cookie, body: JSON.stringify({ date: tightDate }) });
+  const tightTry = await api(`/api/portal/services/${sId}/s-election-details`, { method: "POST", cookies: mPw.cookie, body: JSON.stringify({ ...goodDetails, timingAcknowledged: true }) });
+  check("too little runway is refused", tightTry.status === 400 && tightTry.body?.error?.code === "TIMING_INSUFFICIENT", tightTry.body);
+  const okDate = daysAgo(10);
+  const entered = await api(`/api/admin/services/${sId}/s-election-formation-date`, { method: "POST", cookies: adminS.cookie, body: JSON.stringify({ date: okDate }) });
+  check("the office enters a workable formation date", entered.status === 200 && entered.body?.data?.timing?.status === "ok", entered.body);
+  const earlyEff = await api(`/api/portal/services/${sId}/s-election-details`, { method: "POST", cookies: mPw.cookie, body: JSON.stringify({ ...goodDetails, effectiveDate: daysAgo(11), timingAcknowledged: true }) });
+  check("an effective date before the Articles is refused", earlyEff.status === 400 && earlyEff.body?.error?.code === "TIMING_INVALID", earlyEff.body);
+  const noAck = await api(`/api/portal/services/${sId}/s-election-details`, { method: "POST", cookies: mPw.cookie, body: JSON.stringify(goodDetails) });
+  check("the deadline acknowledgment is required", noAck.status === 400 && noAck.body?.error?.code === "TIMING_ACK_REQUIRED", noAck.body);
+  const noElig = await api(`/api/portal/services/${sId}/s-election-details`, { method: "POST", cookies: mPw.cookie, body: JSON.stringify({ ...goodDetails, timingAcknowledged: true }) });
+  check("the shareholder-eligibility acknowledgment is required", noElig.status === 400 && noElig.body?.error?.code === "ELIGIBILITY_ACK_REQUIRED", noElig.body);
+  const draftEarly = await fetch(`${BASE}/api/admin/services/${sId}/s-election-draft`, { headers: { Cookie: adminS.cookie } });
+  check("the draft cannot be built before the client's details", draftEarly.status === 400, draftEarly.status);
+  const okDetails = { ...goodDetails, timingAcknowledged: true, eligibilityAcknowledged: true };
+  const sDetails2 = await api(`/api/portal/services/${sId}/s-election-details`, { method: "POST", cookies: mPw.cookie, body: JSON.stringify(okDetails) });
+  check("S election details accepted and the package built at once", sDetails2.status === 200 && Boolean(sDetails2.body?.data?.documentId), sDetails2.body);
   const storedDates = await api(`/api/admin/services/${sId}`, { cookies: adminS.cookie });
-  check("the stored formation date is the office's, not the client's", storedDates.body?.data?.details?.dateIncorporated === "2026-08-01", storedDates.body?.data?.details?.dateIncorporated);
-  check("a blank effective date defaults to the formation date", storedDates.body?.data?.details?.effectiveDate === "2026-08-01", storedDates.body?.data?.details?.effectiveDate);
-  check("a blank acquisition date defaults to the formation date", storedDates.body?.data?.details?.shareholders?.[0]?.dateAcquired === "2026-08-01", storedDates.body?.data?.details?.shareholders?.[0]);
-  const readyDoc = await fetch(`${BASE}/api/portal/documents/${entered.body?.data?.documentId}/download`, {
+  check("the stored formation date is the office's, not the client's", storedDates.body?.data?.details?.dateIncorporated === okDate, storedDates.body?.data?.details?.dateIncorporated);
+  check("a blank effective date defaults to the formation date", storedDates.body?.data?.details?.effectiveDate === okDate, storedDates.body?.data?.details?.effectiveDate);
+  check("a blank acquisition date defaults to the formation date", storedDates.body?.data?.details?.shareholders?.[0]?.dateAcquired === okDate, storedDates.body?.data?.details?.shareholders?.[0]);
+  check("the filing deadline is stored with the details", storedDates.body?.data?.details?.filingDeadline === evaluate2553Timing({ formationDate: okDate, today: easternToday() }).deadline, storedDates.body?.data?.details?.filingDeadline);
+  const readyDoc = await fetch(`${BASE}/api/portal/documents/${sDetails2.body?.data?.documentId}/download`, {
     headers: { Cookie: mPw.cookie },
   });
   const readyBytes = new Uint8Array(await readyDoc.arrayBuffer());
@@ -1455,7 +1503,7 @@ if (mint.status === 200) {
   const edited = await api(`/api/portal/services/${sId}/s-election-details`, {
     method: "POST", cookies: mPw.cookie,
     body: JSON.stringify({
-      ...goodDetails,
+      ...okDetails,
       phone: "(305) 555-0199",
       shareholders: [{ ...goodDetails.shareholders[0], ssn: "" }],
     }),

@@ -16,6 +16,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { api, ApiError } from "@/lib/api";
 import { SElectionDetailsForm, EIN_CERTIFICATION, type SElectionDraft } from "./SElectionDetailsForm";
 import { STATUS_LABEL, clientMustAct, money, summaryOf } from "./services.helpers";
+import { clearDraft, loadDrafts, saveDraft } from "./drafts";
 import type { ServiceOrder, ServicesData } from "./ServicesCard";
 
 export interface ExternalOrderRequest {
@@ -46,8 +47,13 @@ export function OrdersInProgress({
   // What the client has typed into either secure form, per order, kept in
   // page memory so that closing the dialog loses nothing (Adam, 6 Sep 2026).
   // Never written to storage — these carry Social Security numbers.
-  const [selDrafts, setSelDrafts] = useState<Record<string, SElectionDraft>>({});
-  const [einDrafts, setEinDrafts] = useState<Record<string, Record<string, string>>>({});
+  // Adam (6 Sep 2026): "The form should retain all information except for
+  // SS#s." Drafts also go to the browser's storage per order, with every
+  // Social Security number (and the EIN form's taxpayer number) stripped
+  // before they are written, so a reload or a closed tab brings everything
+  // else back. Cleared when the package is built and on sign-out.
+  const [selDrafts, setSelDrafts] = useState<Record<string, SElectionDraft>>(() => loadDrafts<SElectionDraft>("sel"));
+  const [einDrafts, setEinDrafts] = useState<Record<string, Record<string, string>>>(() => loadDrafts<Record<string, string>>("ein"));
   const einFormRef = useRef<HTMLFormElement>(null);
   const snapshotEinDraft = () => {
     const form = einFormRef.current;
@@ -55,6 +61,7 @@ export function OrdersInProgress({
     const out: Record<string, string> = {};
     new FormData(form).forEach((v, k) => { out[k] = String(v); });
     setEinDrafts((prev) => ({ ...prev, [detailsFor.id]: out }));
+    saveDraft("ein", detailsFor.id, { ...out, tin: "" });
   };
 
   // The client's own name, for the signing-officer choices — same key as
@@ -76,6 +83,7 @@ export function OrdersInProgress({
       api.post(`/api/portal/services/${args.id}/ein-details`, { ...args.payload, certified: true }),
     onSuccess: (_res, args) => {
       setEinDrafts((prev) => { const next = { ...prev }; delete next[args.id]; return next; });
+      clearDraft("ein", args.id);
       setEinCertified(false); setEinEmployees(false); setEinExcise(false);
       setDetailsFor(null);
       refresh();
@@ -164,6 +172,12 @@ export function OrdersInProgress({
                     email the moment it's ready to download.
                   </p>
                 ) : null}
+                {o.type === "s-election" && o.status === "awaiting_info" && !o.details.dateIncorporated ? (
+                  <p className="mt-1 text-xs text-muted-foreground" data-testid="awaiting-formation-date">
+                    We're confirming your formation date from your filed Articles — you'll get an
+                    email when the form is ready to complete.
+                  </p>
+                ) : null}
               </div>
               <div className="flex shrink-0 flex-wrap items-center gap-2">
                 {o.type === "series" && o.status !== "pending_payment" && o.status !== "cancelled" ? (
@@ -177,7 +191,7 @@ export function OrdersInProgress({
                     Consent &amp; Series Exhibit
                   </Button>
                 ) : null}
-                {o.status === "awaiting_info" ? (
+                {o.status === "awaiting_info" && !(o.type === "s-election" && !o.details.dateIncorporated) ? (
                   <Button
                     size="sm"
                     className="rounded-full"
@@ -237,10 +251,16 @@ export function OrdersInProgress({
               order={detailsFor}
               members={data.members ?? []}
               clientName={meQuery.data?.name}
+              formationDate={detailsFor.details.dateIncorporated}
+              todayEastern={data.todayEastern}
               draft={selDrafts[detailsFor.id]}
-              onDraftChange={(d) => setSelDrafts((prev) => ({ ...prev, [detailsFor.id]: d }))}
+              onDraftChange={(d) => {
+                setSelDrafts((prev) => ({ ...prev, [detailsFor.id]: d }));
+                saveDraft("sel", detailsFor.id, { ...d, rows: d.rows.map((r) => ({ ...r, ssn: "" })) });
+              }}
               onDone={() => {
                 setSelDrafts((prev) => { const next = { ...prev }; delete next[detailsFor.id]; return next; });
+                clearDraft("sel", detailsFor.id);
                 setDetailsFor(null); refresh(); queryClient.invalidateQueries({ queryKey: ["portal-documents"] });
               }}
             />

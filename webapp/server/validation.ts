@@ -38,6 +38,7 @@ const extendedFormSchema = formationFormSchema
     lawfulPurposeNameAcknowledgment: z.boolean().optional(),
     orderEin: z.boolean().optional().default(false),
     orderSElection: z.boolean().optional().default(false),
+    sElectionFilingAcknowledgment: z.boolean().optional().default(false),
     existingLlcName: z.string().max(300).optional().or(z.literal("")),
     sunbizDocumentNumber: z.string().max(50).optional().or(z.literal("")),
     series: z
@@ -60,6 +61,10 @@ const extendedFormSchema = formationFormSchema
     articlesSignerAppointment: z.boolean().optional().default(false),
   })
   .superRefine((data, ctx) => {
+    // The S election add-on needs its acknowledgment (Adam, 6 Sep 2026).
+    if (data.orderSElection && data.sElectionFilingAcknowledgment !== true) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["sElectionFilingAcknowledgment"], message: "Please acknowledge the Form 2553 filing deadline to add the S election package." });
+    }
     if (data.filingPath !== "CONVERT") {
       for (const k of ["nameSearchAcknowledgment", "governmentAffiliationAcknowledgment", "lawfulPurposeNameAcknowledgment"] as const) {
         if (data[k] !== true) {

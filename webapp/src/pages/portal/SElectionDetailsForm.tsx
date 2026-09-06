@@ -12,7 +12,9 @@ import { api, ApiError } from "@/lib/api";
 import { AddressAutocomplete } from "@/components/forms/florida-llc/AddressAutocomplete";
 
 import type { ServiceOrder, ShareholderRow } from "./ServicesCard";
-import { isoToTypedDate, typedDateToIso } from "./typedDate";
+import { formatPhone, isoToTypedDate, typedDateToIso } from "./typedDate";
+import { ELIGIBILITY_ACKNOWLEDGMENT, evaluate2553Timing, type TimingResult } from "@/lib/form2553Timing";
+
 
 const EMPTY_ROW: ShareholderRow = { name: "", address: "", percentage: "", dateAcquired: "", atFormation: true, ssn: "" };
 
@@ -54,12 +56,16 @@ export interface SElectionDraft {
   phone: string;
   rows: ShareholderRow[];
   certified: boolean;
+  timingAcknowledged: boolean;
+  eligibilityAcknowledged: boolean;
 }
 
 export function SElectionDetailsForm({
   order,
   members,
   clientName,
+  formationDate,
+  todayEastern,
   draft,
   onDraftChange,
   onDone,
@@ -68,6 +74,11 @@ export function SElectionDetailsForm({
   members: { name: string; address: string }[];
   /** The signed-in client's own name — the usual signing officer. */
   clientName?: string;
+  /** The date on the filed Articles, entered by the office; the form does
+   *  not open without it. */
+  formationDate?: string;
+  /** Florida's date, from our server — the gate never uses the device clock. */
+  todayEastern?: string;
   draft?: SElectionDraft;
   onDraftChange?: (d: SElectionDraft) => void;
   onDone: () => void;
@@ -88,7 +99,7 @@ export function SElectionDetailsForm({
     draft ? draft.officerOther : Boolean(prior.officerName) && !knownSigners.includes(prior.officerName ?? ""),
   );
   const [officerTitle, setOfficerTitle] = useState(draft?.officerTitle ?? prior.officerTitle ?? "Manager");
-  const [phone, setPhone] = useState(draft?.phone ?? prior.phone ?? "");
+  const [phone, setPhone] = useState(formatPhone(draft?.phone ?? prior.phone ?? ""));
   const [rows, setRows] = useState<ShareholderRow[]>(
     draft?.rows ??
     (prior.shareholders?.length
@@ -105,11 +116,37 @@ export function SElectionDetailsForm({
       : [{ ...EMPTY_ROW }]),
   );
   const [certified, setCertified] = useState(draft?.certified ?? false);
+  const [timingAcknowledged, setTimingAcknowledged] = useState(draft?.timingAcknowledged ?? false);
+  const [eligibilityAcknowledged, setEligibilityAcknowledged] = useState(draft?.eligibilityAcknowledged ?? false);
   useEffect(() => {
-    onDraftChange?.({ ein, einPending, effectiveDate, officerName, officerOther, officerTitle, phone, rows, certified });
+    onDraftChange?.({ ein, einPending, effectiveDate, officerName, officerOther, officerTitle, phone, rows, certified, timingAcknowledged, eligibilityAcknowledged });
     // onDraftChange is a stable setter from the dialog.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ein, einPending, effectiveDate, officerName, officerOther, officerTitle, phone, rows, certified]);
+  }, [ein, einPending, effectiveDate, officerName, officerOther, officerTitle, phone, rows, certified, timingAcknowledged, eligibilityAcknowledged]);
+
+  // The Form 2553 timing gate (Adam, 6 Sep 2026): run on load and again
+  // whenever the effective date changes. Late, too close, or an effective
+  // date before the Articles blocks the form; "ok" shows the deadline and a
+  // required acknowledgment. Our server runs the same gate on submission.
+  const typedEffective = typedDateToIso(effectiveDate);
+  let timing: TimingResult | null = null;
+  if (formationDate && todayEastern && typedEffective !== null) {
+    try {
+      timing = evaluate2553Timing({ formationDate, effectiveDate: typedEffective || undefined, today: todayEastern });
+    } catch {
+      timing = null;
+    }
+  }
+  // Beyond the IRS's window to elect at all: "at any time during the tax
+  // year preceding the tax year it is to take effect."
+  const premature = Boolean(typedEffective && todayEastern && Number(typedEffective.slice(0, 4)) > Number(todayEastern.slice(0, 4)) + 1);
+  const acquiredTooEarly = rows.some((r) => !r.atFormation && formationDate && (typedDateToIso(r.dateAcquired) ?? "") !== "" && (typedDateToIso(r.dateAcquired) as string) < formationDate);
+  const timingOk = timing?.status === "ok" && !premature && !acquiredTooEarly;
+  useEffect(() => {
+    // A changed effective date changes the deadline: the acknowledgment
+    // names it, so it must be given again.
+    setTimingAcknowledged(false);
+  }, [timing?.deadline]);
   const [formError, setFormError] = useState("");
 
   const patchRow = (i: number, p: Partial<ShareholderRow>) =>
@@ -123,8 +160,10 @@ export function SElectionDetailsForm({
         effectiveDate: typedDateToIso(effectiveDate) ?? "",
         officerName,
         officerTitle,
-        phone,
+        phone: phone.replace(/\D/g, ""),
         certified,
+        timingAcknowledged,
+        eligibilityAcknowledged,
         shareholders: rows.map((r) => ({
           name: r.name,
           address: r.address,
@@ -189,6 +228,41 @@ export function SElectionDetailsForm({
             Usually your formation date. Leave blank and we'll use the date on your filed Articles.
           </p>
         </div>
+        {premature ? (
+          <p className="text-sm font-medium text-destructive sm:col-span-2" data-testid="timing-premature">
+            An election effective {effectiveDate} can't be made yet — the IRS accepts it only during the
+            tax year before it takes effect.
+          </p>
+        ) : null}
+        {acquiredTooEarly ? (
+          <p className="text-sm font-medium text-destructive sm:col-span-2">
+            An owner's date acquired is earlier than the date on your filed Articles.
+          </p>
+        ) : null}
+        {timing ? (
+          <div
+            className={
+              timing.status === "ok"
+                ? "rounded-xl border border-trust/40 bg-trust/5 p-3 text-sm sm:col-span-2"
+                : "rounded-xl border-2 border-destructive bg-destructive/5 p-3 text-sm sm:col-span-2"
+            }
+            data-testid={`timing-${timing.status}`}
+          >
+            <p className={timing.status === "ok" ? "font-medium" : "font-medium text-destructive"}>{timing.message}</p>
+            {timing.status === "ok" && timing.acknowledgment ? (
+              <label className="mt-2 flex items-start gap-2.5">
+                <input
+                  type="checkbox"
+                  checked={timingAcknowledged}
+                  onChange={(e) => setTimingAcknowledged(e.target.checked)}
+                  aria-label="Deadline acknowledgment"
+                  className="mt-0.5 h-4 w-4 shrink-0 accent-trust"
+                />
+                <span className="text-xs leading-relaxed">{timing.acknowledgment}</span>
+              </label>
+            ) : null}
+          </div>
+        ) : null}
         {/* The officer's name and title share a line (Adam, 6 Sep 2026);
             the phone sits alone beneath them. */}
         <div className="space-y-1.5">
@@ -233,11 +307,30 @@ export function SElectionDetailsForm({
         </div>
         <div className="space-y-1.5 sm:col-span-2">
           <label className="text-sm font-medium">Phone for IRS questions</label>
-          <Input value={phone} onChange={(e) => setPhone(e.target.value)} autoComplete="off" />
+          <Input
+            value={phone}
+            onChange={(e) => setPhone(formatPhone(e.target.value))}
+            onPaste={(e) => { e.preventDefault(); setPhone(formatPhone(e.clipboardData.getData("text"))); }}
+            inputMode="tel"
+            placeholder="(xxx) yyy-yyyy"
+            autoComplete="off"
+          />
         </div>
       </div>
 
       <div className="space-y-2">
+        {/* Who may be a shareholder — the IRS's tests, in Adam's words, and
+            the liability line (6 Sep 2026). Required before building. */}
+        <label className="flex items-start gap-2.5 rounded-lg border border-amber-300/60 bg-amber-50 p-3 text-amber-900">
+          <input
+            type="checkbox"
+            checked={eligibilityAcknowledged}
+            onChange={(e) => setEligibilityAcknowledged(e.target.checked)}
+            aria-label="Shareholder eligibility acknowledgment"
+            className="mt-0.5 h-4 w-4 shrink-0 accent-trust"
+          />
+          <span className="text-xs leading-relaxed">{ELIGIBILITY_ACKNOWLEDGMENT}</span>
+        </label>
         <p className="text-sm font-medium">Owners (every owner must be listed and will sign the form)</p>
         {rows.map((r, i) => (
           <div key={i} className="space-y-2 rounded-lg border border-border p-3">
@@ -391,7 +484,11 @@ export function SElectionDetailsForm({
         <p className="text-xs text-muted-foreground sm:mr-auto">
           We build your package immediately — you'll be able to download it here.
         </p>
-        <Button type="submit" disabled={submit.isPending || !certified} className="rounded-full">
+        <Button
+          type="submit"
+          disabled={submit.isPending || !certified || !timingOk || !timingAcknowledged || !eligibilityAcknowledged || Math.abs(pctTotal - 100) > 0.01}
+          className="rounded-full"
+        >
           {submit.isPending ? "Building your package…" : "Certify and build my package"}
         </Button>
       </DialogFooter>

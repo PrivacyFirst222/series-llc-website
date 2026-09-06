@@ -99994,6 +99994,7 @@ var extendedFormSchema = formationFormSchema.extend({
   lawfulPurposeNameAcknowledgment: external_exports.boolean().optional(),
   orderEin: external_exports.boolean().optional().default(false),
   orderSElection: external_exports.boolean().optional().default(false),
+  sElectionFilingAcknowledgment: external_exports.boolean().optional().default(false),
   existingLlcName: external_exports.string().max(300).optional().or(external_exports.literal("")),
   sunbizDocumentNumber: external_exports.string().max(50).optional().or(external_exports.literal("")),
   series: external_exports.array(
@@ -100012,6 +100013,9 @@ var extendedFormSchema = formationFormSchema.extend({
   }),
   articlesSignerAppointment: external_exports.boolean().optional().default(false)
 }).superRefine((data, ctx) => {
+  if (data.orderSElection && data.sElectionFilingAcknowledgment !== true) {
+    ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["sElectionFilingAcknowledgment"], message: "Please acknowledge the Form 2553 filing deadline to add the S election package." });
+  }
   if (data.filingPath !== "CONVERT") {
     for (const k of ["nameSearchAcknowledgment", "governmentAffiliationAcknowledgment", "lawfulPurposeNameAcknowledgment"]) {
       if (data[k] !== true) {
@@ -100883,6 +100887,116 @@ function llcFormedEmail(opts) {
 function escapeHtml(s) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
+function sElectionFormReadyEmail(opts) {
+  return {
+    subject: `Your S election form is ready to complete \u2014 ${opts.llcName}`,
+    html: wrap(`
+      <p>Your S corporation election form for <strong>${escapeHtml(opts.llcName)}</strong> is
+      ready to complete in your portal. Sign in, open <strong>Orders in progress</strong>, and choose
+      <strong>Provide details securely</strong>.</p>
+      <p>IRS Form 2553 must be filed (postmarked or faxed) by
+      <strong>${escapeHtml(opts.deadlineDisplay)}</strong>. We prepare the form; you file it.
+      Please complete the form soon so there is time to sign and send it.</p>
+      <p><a href="${opts.portalUrl}">Open your portal</a></p>
+    `)
+  };
+}
+
+// src/lib/form2553Timing.ts
+var DEFAULT_MIN_DAYS = 5;
+function parseISODate(s) {
+  const m2 = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+  if (!m2) throw new Error(`Expected YYYY-MM-DD, got: ${s}`);
+  const y = +m2[1], mo = +m2[2], d2 = +m2[3];
+  const dt = new Date(Date.UTC(y, mo - 1, d2));
+  if (dt.getUTCFullYear() !== y || dt.getUTCMonth() !== mo - 1 || dt.getUTCDate() !== d2) {
+    throw new Error(`Invalid calendar date: ${s}`);
+  }
+  return dt;
+}
+function toISO(dt) {
+  return dt.toISOString().slice(0, 10);
+}
+function toDisplay(iso) {
+  const [y, m2, d2] = iso.split("-");
+  return `${m2}/${d2}/${y}`;
+}
+function addDays(dt, n) {
+  return new Date(dt.getTime() + n * 864e5);
+}
+function daysBetween(a2, b2) {
+  return Math.round((b2.getTime() - a2.getTime()) / 864e5);
+}
+function lastDayOfMonth(y, mZeroBased) {
+  return new Date(Date.UTC(y, mZeroBased + 1, 0));
+}
+function form2553Deadline(effectiveDateISO) {
+  const eff = parseISODate(effectiveDateISO);
+  const y = eff.getUTCFullYear(), m2 = eff.getUTCMonth(), d2 = eff.getUTCDate();
+  const corresponding = new Date(Date.UTC(y, m2 + 2, d2));
+  const noCorrespondingDay = corresponding.getUTCMonth() !== (m2 + 2) % 12;
+  const endOfTwoMonths = noCorrespondingDay ? lastDayOfMonth(y, m2 + 2) : addDays(corresponding, -1);
+  return toISO(addDays(endOfTwoMonths, 15));
+}
+function businessDaysBetween(a2, b2) {
+  let count = 0;
+  for (let cur = addDays(a2, 1); cur.getTime() <= b2.getTime(); cur = addDays(cur, 1)) {
+    const dow = cur.getUTCDay();
+    if (dow !== 0 && dow !== 6) count++;
+  }
+  return count;
+}
+function evaluate2553Timing(opts) {
+  const { formationDate, today, minDays = DEFAULT_MIN_DAYS, businessDays = false } = opts;
+  const effectiveDate = opts.effectiveDate || formationDate;
+  if (!effectiveDate) throw new Error("effectiveDate or formationDate is required");
+  if (!today) throw new Error("today is required");
+  const eff = parseISODate(effectiveDate);
+  const now = parseISODate(today);
+  if (formationDate && eff.getTime() < parseISODate(formationDate).getTime()) {
+    return {
+      status: "invalid",
+      deadline: null,
+      deadlineDisplay: null,
+      daysRemaining: null,
+      message: "The election effective date cannot be earlier than the date on your filed Articles of Organization.",
+      acknowledgment: null
+    };
+  }
+  const deadlineISO = form2553Deadline(effectiveDate);
+  const deadline = parseISODate(deadlineISO);
+  const deadlineDisplay = toDisplay(deadlineISO);
+  const calendarDaysRemaining = daysBetween(now, deadline);
+  const runway = businessDays ? businessDaysBetween(now, deadline) : calendarDaysRemaining;
+  if (calendarDaysRemaining < 0) {
+    return {
+      status: "late",
+      deadline: deadlineISO,
+      deadlineDisplay,
+      daysRemaining: calendarDaysRemaining,
+      message: `Your Form 2553 filing deadline was ${deadlineDisplay}. We do not prepare late S-election packages. A late election requires relief under Rev. Proc. 2013-30 \u2014 please consult a tax professional.`,
+      acknowledgment: null
+    };
+  }
+  if (runway < minDays) {
+    return {
+      status: "insufficient",
+      deadline: deadlineISO,
+      deadlineDisplay,
+      daysRemaining: calendarDaysRemaining,
+      message: `Your Form 2553 filing deadline is ${deadlineDisplay}. That leaves insufficient time for us to prepare your package and for you to sign and file it. We do not prepare packages inside this window.`,
+      acknowledgment: null
+    };
+  }
+  return {
+    status: "ok",
+    deadline: deadlineISO,
+    deadlineDisplay,
+    daysRemaining: calendarDaysRemaining,
+    message: `Your Form 2553 must be filed (postmarked or faxed) by ${deadlineDisplay}.`,
+    acknowledgment: `I understand that Form 2553 must be filed (postmarked or faxed) by ${deadlineDisplay}, and that MyFloridaSeriesLLC prepares the form but does not file it for me.`
+  };
+}
 
 // server/s-election.ts
 init_es();
@@ -101258,14 +101372,10 @@ function fmtDateLong(iso) {
   });
 }
 function fmtEin(ein) {
-  return ein ? `${ein.slice(0, 2)}-${ein.slice(2)}` : "";
+  return ein ? `${ein.slice(0, 2)}-${ein.slice(2)}` : "Applied For";
 }
 function electionDeadline(startIso) {
-  const [y, m2, d2] = startIso.split("-").map(Number);
-  const dt = new Date(Date.UTC(y, m2 - 1, d2));
-  dt.setUTCMonth(dt.getUTCMonth() + 2);
-  dt.setUTCDate(dt.getUTCDate() + 14);
-  return dt.toISOString().slice(0, 10);
+  return form2553Deadline(startIso);
 }
 function splitAddress(addr) {
   const parts = addr.split(",").map((s) => s.trim()).filter(Boolean);
@@ -101281,6 +101391,8 @@ async function fillForm2553(d2) {
   const setText = (name, value) => {
     if (!value) return;
     const field = form.getTextField(name);
+    const max = field.getMaxLength();
+    if (max !== void 0 && value.length > max) field.setMaxLength(void 0);
     field.setText(value);
   };
   const addr = splitAddress(d2.principalAddress);
@@ -101649,6 +101761,11 @@ function taxationLabel(version) {
   if (version === "member-single") return "Single-Member";
   if (version === "single") return "Single-Member";
   return "Partnership";
+}
+function easternDateIso(d2 = /* @__PURE__ */ new Date()) {
+  const parts = new Intl.DateTimeFormat("en-CA", { timeZone: ZONE, year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(d2);
+  const get2 = (t) => parts.find((p2) => p2.type === t)?.value ?? "";
+  return `${get2("year")}-${get2("month")}-${get2("day")}`;
 }
 
 // server/oa.ts
@@ -106074,8 +106191,11 @@ var einDetailsSchema = external_exports.object({
 ).refine((d2) => !d2.exciseApplies || d2.exciseDetail.trim().length > 0, {
   message: "Tell us which of the special activities applies."
 });
+var VALID_EIN_PREFIXES = new Set(
+  "10 12 60 67 50 53 01 02 03 04 05 06 11 13 14 16 21 22 23 25 34 51 52 54 55 56 57 58 59 65 30 32 35 36 37 38 61 15 24 40 44 94 95 80 90 33 39 41 42 43 46 48 62 63 64 66 68 71 72 73 74 75 76 77 85 86 87 88 91 92 93 98 99 20 26 27 45 47 81 82 83 84 31".split(" ")
+);
 var sElectionDetailsSchema = external_exports.object({
-  ein: external_exports.string().transform((s) => s.replace(/[\s-]/g, "")).refine((s) => s === "" || /^\d{9}$/.test(s), "Enter the 9-digit EIN, or leave it blank if we're obtaining it."),
+  ein: external_exports.string().transform((s) => s.replace(/[\s-]/g, "")).refine((s) => s === "" || /^\d{9}$/.test(s), "Enter the 9-digit EIN, or leave it blank if we're obtaining it.").refine((s) => s === "" || VALID_EIN_PREFIXES.has(s.slice(0, 2)), "That is not a valid EIN \u2014 check the first two digits."),
   einPending: external_exports.boolean().optional().default(false),
   // The formation date is entered by the office from the filed Articles
   // when the package is prepared (Adam, 6 Sep 2026) — never by the client.
@@ -106084,7 +106204,19 @@ var sElectionDetailsSchema = external_exports.object({
   effectiveDate: external_exports.string().regex(/^\d{4}-\d{2}-\d{2}$/).or(external_exports.literal("")).optional().default(""),
   officerName: external_exports.string().min(1, "The signing officer's name is required.").max(200),
   officerTitle: external_exports.string().min(1).max(100),
-  phone: external_exports.string().max(40).optional().default(""),
+  // The deadline acknowledgment the form shows once the timing gate says
+  // "ok" (Adam, 6 Sep 2026). Required to build.
+  timingAcknowledged: external_exports.boolean().optional().default(false),
+  eligibilityAcknowledged: external_exports.boolean().optional().default(false),
+  // Ten digits, or eleven with a leading 1 (as pasted from a contact card).
+  phone: external_exports.string().max(40).optional().default("").refine((s) => {
+    if (s.trim() === "") return true;
+    const digits = s.replace(/\D/g, "");
+    return /^\d{10}$/.test(digits) || /^1\d{10}$/.test(digits);
+  }, "Enter a 10-digit phone number for IRS questions.").transform((s) => {
+    const digits = s.replace(/\D/g, "");
+    return digits.length === 11 && digits.startsWith("1") ? digits.slice(1) : digits;
+  }),
   shareholders: external_exports.array(
     external_exports.object({
       name: external_exports.string().min(1).max(200),
@@ -106093,7 +106225,10 @@ var sElectionDetailsSchema = external_exports.object({
       dateAcquired: external_exports.string().regex(/^\d{4}-\d{2}-\d{2}$/).or(external_exports.literal("")).optional().default(""),
       // Blank means "keep the number already on file" when re-editing; a
       // first submission is rejected below if any are blank.
-      ssn: external_exports.string().transform((s) => s.replace(/[\s-]/g, "")).refine((s) => s === "" || /^\d{9}$/.test(s), "Each owner's SSN must be 9 digits.")
+      // The Social Security Administration never issues area numbers
+      // 000, 666 or 900-999 (ssa.gov, "Social Security Number
+      // Randomization": "excluding area numbers 000, 666 and 900-999").
+      ssn: external_exports.string().transform((s) => s.replace(/[\s-]/g, "")).refine((s) => s === "" || /^\d{9}$/.test(s), "Each owner's SSN must be 9 digits.").refine((s) => s === "" || !/^(000|666|9\d\d)/.test(s), "That is not a valid Social Security number \u2014 check the first three digits.")
     })
   ).min(1, "At least one owner is required.").max(7, "The IRS form holds 7 owners \u2014 contact us for more."),
   certified: external_exports.literal(true, {
@@ -106763,6 +106898,8 @@ function registerPortalRoutes(app2) {
         sElection: await sElectionEligibility(session.clientId, svcCompanyId),
         series: await clientSeries(session.clientId, svcCompanyId),
         llcFormed: await clientLlcFormed(session.clientId, svcCompanyId),
+        // Florida's date, for the Form 2553 timing gate the form runs on load.
+        todayEastern: easternDateIso(),
         einCompanyOrdered: orders.some((o) => {
           if (o.type !== "ein" || o.status === "pending_payment") return false;
           const d2 = typeof o.details === "string" ? JSON.parse(o.details) : o.details;
@@ -107094,6 +107231,37 @@ function registerPortalRoutes(app2) {
       );
     }
     const d2 = body.data;
+    if (!prior?.dateIncorporated) {
+      return c.json(err("We're confirming your formation date from your filed Articles \u2014 you'll get an email when the form is ready.", "FORMATION_DATE_REQUIRED"), 400);
+    }
+    const timing = evaluate2553Timing({
+      formationDate: prior.dateIncorporated,
+      effectiveDate: d2.effectiveDate || void 0,
+      today: easternDateIso()
+    });
+    if (timing.status !== "ok") {
+      return c.json(err(timing.message, `TIMING_${timing.status.toUpperCase()}`), 400);
+    }
+    if (!d2.timingAcknowledged) {
+      return c.json(err("Please acknowledge the filing deadline before building the package.", "TIMING_ACK_REQUIRED"), 400);
+    }
+    if (!d2.eligibilityAcknowledged) {
+      return c.json(err("Please acknowledge who may be an S corporation shareholder before building the package.", "ELIGIBILITY_ACK_REQUIRED"), 400);
+    }
+    if (d2.effectiveDate && Number(d2.effectiveDate.slice(0, 4)) > Number(easternDateIso().slice(0, 4)) + 1) {
+      return c.json(err(`An election effective ${d2.effectiveDate.slice(5, 7)}/${d2.effectiveDate.slice(8, 10)}/${d2.effectiveDate.slice(0, 4)} can't be made yet \u2014 the IRS accepts it only during the tax year before it takes effect.`, "TIMING_PREMATURE"), 400);
+    }
+    for (const sh of d2.shareholders) {
+      if (sh.dateAcquired && sh.dateAcquired < prior.dateIncorporated) {
+        return c.json(err(`${sh.name || "An owner"}'s date acquired is earlier than the date on your filed Articles.`, "INVALID_INPUT"), 400);
+      }
+    }
+    const seenNames = /* @__PURE__ */ new Set();
+    for (const sh of d2.shareholders) {
+      const k = sh.name.trim().toLowerCase();
+      if (seenNames.has(k)) return c.json(err(`${sh.name} is listed more than once. Each owner appears on one row; spouses who own together share one row.`, "INVALID_INPUT"), 400);
+      seenNames.add(k);
+    }
     let onFile = [];
     if (so2.ein_secret) {
       try {
@@ -107113,7 +107281,7 @@ function registerPortalRoutes(app2) {
       ssns.push(use);
     }
     const merged = {
-      ein: d2.ein,
+      ein: d2.einPending ? "" : d2.ein,
       einPending: d2.einPending,
       dateIncorporated: prior?.dateIncorporated,
       effectiveDate: d2.effectiveDate,
@@ -107121,6 +107289,9 @@ function registerPortalRoutes(app2) {
       officerTitle: d2.officerTitle,
       phone: d2.phone,
       certifiedAt: (/* @__PURE__ */ new Date()).toISOString(),
+      timingAcknowledgedAt: (/* @__PURE__ */ new Date()).toISOString(),
+      eligibilityAcknowledgedAt: (/* @__PURE__ */ new Date()).toISOString(),
+      filingDeadline: timing.deadline ?? void 0,
       documentId: prior?.documentId,
       shareholders: d2.shareholders.map((s, i) => ({
         name: s.name,
@@ -109150,10 +109321,19 @@ function registerAdminRoutes(app2) {
     );
     if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
     const so2 = rows[0];
-    if (so2.type !== "s-election" || !so2.ein_secret) {
-      return c.json(err("The client has not provided the S election details yet.", "BAD_STATE"), 400);
+    if (so2.type !== "s-election") return c.json(err("Not found", "NOT_FOUND"), 404);
+    const merged = (typeof so2.details === "string" ? JSON.parse(so2.details) : so2.details) ?? {};
+    if (!so2.ein_secret) {
+      merged.dateIncorporated = body.data.date;
+      await db.query("UPDATE service_orders SET details = $1 WHERE id = $2", [JSON.stringify(merged), so2.id]);
+      const preview = evaluate2553Timing({ formationDate: body.data.date, today: easternDateIso() });
+      const clients = await db.query("SELECT email FROM clients WHERE id = $1", [so2.client_id]);
+      if (preview.status === "ok") {
+        const mail = sElectionFormReadyEmail({ llcName: so2.llc_name, deadlineDisplay: preview.deadlineDisplay ?? "", portalUrl: `${env.PUBLIC_BASE_URL}/portal` });
+        sendMail({ to: clients[0]?.email ?? "", ...mail }).catch((e) => console.error("[admin] s-election form-ready email failed:", e));
+      }
+      return c.json({ data: { ok: true, documentId: null, editableUntil: null, timing: preview } });
     }
-    const merged = typeof so2.details === "string" ? JSON.parse(so2.details) : so2.details;
     let ssns;
     try {
       ssns = JSON.parse(decryptSecret(so2.ein_secret));
@@ -109163,6 +109343,11 @@ function registerAdminRoutes(app2) {
     }
     const priorDocumentId = merged.documentId;
     merged.dateIncorporated = body.data.date;
+    const gate = evaluate2553Timing({ formationDate: body.data.date, effectiveDate: merged.effectiveDate || void 0, today: easternDateIso() });
+    if (gate.status !== "ok") {
+      await db.query("UPDATE service_orders SET details = $1 WHERE id = $2", [JSON.stringify(merged), so2.id]);
+      return c.json(err(gate.message, `TIMING_${gate.status.toUpperCase()}`), 400);
+    }
     const built = await postSElectionPackage({ so: { id: so2.id, client_id: so2.client_id, llc_name: so2.llc_name }, merged, ssns, priorDocumentId });
     if (!built.ok) return c.json(err("The package could not be built.", "GENERATION_FAILED"), 500);
     return c.json({ data: { ok: true, documentId: built.documentId, editableUntil: built.editableUntil } });

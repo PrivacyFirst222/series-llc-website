@@ -15,7 +15,8 @@ import { createCheckout } from "./square";
 import { hashPassword, verifyPassword, newToken, hashToken, encryptSecret, decryptSecret } from "./crypto";
 import { hasProtectedSeriesPhrase } from "../src/components/forms/florida-llc/validation";
 import { assembleNewSeries } from "./new-series";
-import { stampEastern, stampForFilename } from "./datetime";
+import { easternDateIso, stampEastern, stampForFilename } from "./datetime";
+import { evaluate2553Timing } from "../src/lib/form2553Timing";
 import { assembleOa, oaVersion, OA_TEMPLATE_VERSION, type OaInputs } from "./oa";
 import { renderMarkdownPdf, stampExistingPdf } from "./pdf-render";
 import { createSession, getSession, getAdminSession, destroySession, rateLimit, clientIp } from "./auth";
@@ -439,6 +440,9 @@ export interface SElectionStoredDetails {
   officerTitle?: string;
   phone?: string;
   certifiedAt?: string;
+  timingAcknowledgedAt?: string;
+  eligibilityAcknowledgedAt?: string;
+  filingDeadline?: string;
   documentId?: string;
   purgedAt?: string;
   shareholders?: { name: string; address: string; percentage: number; dateAcquired: string; ssnLast4: string }[];
@@ -597,12 +601,23 @@ export const einDetailsSchema = z
     message: "Tell us which of the special activities applies.",
   });
 
+/** irs.gov, "Valid EINs": every prefix an IRS campus, the online
+ *  application, or the SBA has ever assigned. Anything else is a typo. */
+const VALID_EIN_PREFIXES = new Set(
+  ("10 12 60 67 50 53 01 02 03 04 05 06 11 13 14 16 21 22 23 25 34 51 52 54 55 56 57 58 59 65 " +
+   "30 32 35 36 37 38 61 15 24 40 44 94 95 80 90 33 39 41 42 43 46 48 62 63 64 66 68 71 72 73 74 75 76 77 85 86 87 88 91 92 93 98 99 " +
+   "20 26 27 45 47 81 82 83 84 31").split(" "),
+);
+
 export const sElectionDetailsSchema = z
   .object({
     ein: z
       .string()
       .transform((s) => s.replace(/[\s-]/g, ""))
-      .refine((s) => s === "" || /^\d{9}$/.test(s), "Enter the 9-digit EIN, or leave it blank if we're obtaining it."),
+      .refine((s) => s === "" || /^\d{9}$/.test(s), "Enter the 9-digit EIN, or leave it blank if we're obtaining it.")
+      // The first two digits are the IRS campus that issued it; the IRS
+      // publishes the valid list ("Valid EINs", irs.gov, reviewed 9 Apr 2026).
+      .refine((s) => s === "" || VALID_EIN_PREFIXES.has(s.slice(0, 2)), "That is not a valid EIN — check the first two digits."),
     einPending: z.boolean().optional().default(false),
     // The formation date is entered by the office from the filed Articles
     // when the package is prepared (Adam, 6 Sep 2026) — never by the client.
@@ -611,7 +626,19 @@ export const sElectionDetailsSchema = z
     effectiveDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).or(z.literal("")).optional().default(""),
     officerName: z.string().min(1, "The signing officer's name is required.").max(200),
     officerTitle: z.string().min(1).max(100),
-    phone: z.string().max(40).optional().default(""),
+    // The deadline acknowledgment the form shows once the timing gate says
+    // "ok" (Adam, 6 Sep 2026). Required to build.
+    timingAcknowledged: z.boolean().optional().default(false),
+    eligibilityAcknowledged: z.boolean().optional().default(false),
+    // Ten digits, or eleven with a leading 1 (as pasted from a contact card).
+    phone: z
+      .string()
+      .max(40)
+      .optional()
+      .default("")
+      // Letters or a short number are a typo, not a blank.
+      .refine((s) => { if (s.trim() === "") return true; const digits = s.replace(/\D/g, ""); return /^\d{10}$/.test(digits) || /^1\d{10}$/.test(digits); }, "Enter a 10-digit phone number for IRS questions.")
+      .transform((s) => { const digits = s.replace(/\D/g, ""); return digits.length === 11 && digits.startsWith("1") ? digits.slice(1) : digits; }),
     shareholders: z
       .array(
         z.object({
@@ -621,10 +648,14 @@ export const sElectionDetailsSchema = z
           dateAcquired: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).or(z.literal("")).optional().default(""),
           // Blank means "keep the number already on file" when re-editing; a
           // first submission is rejected below if any are blank.
+          // The Social Security Administration never issues area numbers
+          // 000, 666 or 900-999 (ssa.gov, "Social Security Number
+          // Randomization": "excluding area numbers 000, 666 and 900-999").
           ssn: z
             .string()
             .transform((s) => s.replace(/[\s-]/g, ""))
-            .refine((s) => s === "" || /^\d{9}$/.test(s), "Each owner's SSN must be 9 digits."),
+            .refine((s) => s === "" || /^\d{9}$/.test(s), "Each owner's SSN must be 9 digits.")
+            .refine((s) => s === "" || !(/^(000|666|9\d\d)/.test(s)), "That is not a valid Social Security number — check the first three digits."),
         }),
       )
       .min(1, "At least one owner is required.")
@@ -1452,6 +1483,8 @@ app.get("/portal/services", async (c) => {
       sElection: await sElectionEligibility(session.clientId, svcCompanyId),
       series: await clientSeries(session.clientId, svcCompanyId),
       llcFormed: await clientLlcFormed(session.clientId, svcCompanyId),
+      // Florida's date, for the Form 2553 timing gate the form runs on load.
+      todayEastern: easternDateIso(),
       einCompanyOrdered: orders.some((o) => {
         if (o.type !== "ein" || o.status === "pending_payment") return false;
         const d = (typeof o.details === "string" ? JSON.parse(o.details) : o.details) as { target?: string } | null;
@@ -1822,6 +1855,49 @@ app.post("/portal/services/:id/s-election-details", async (c) => {
   }
   const d = body.data;
 
+  // The Form 2553 timing gate (Adam, 6 Sep 2026). The formation date is the
+  // office's, entered from the filed Articles; without it the form cannot
+  // open, and with it the deadline is the IRS's rule. Late, too close, or an
+  // effective date before the Articles: refused, with the reason. "Today" is
+  // Florida's date, not the host's.
+  if (!prior?.dateIncorporated) {
+    return c.json(err("We're confirming your formation date from your filed Articles — you'll get an email when the form is ready.", "FORMATION_DATE_REQUIRED"), 400);
+  }
+  const timing = evaluate2553Timing({
+    formationDate: prior.dateIncorporated,
+    effectiveDate: d.effectiveDate || undefined,
+    today: easternDateIso(),
+  });
+  if (timing.status !== "ok") {
+    return c.json(err(timing.message, `TIMING_${timing.status.toUpperCase()}`), 400);
+  }
+  if (!d.timingAcknowledged) {
+    return c.json(err("Please acknowledge the filing deadline before building the package.", "TIMING_ACK_REQUIRED"), 400);
+  }
+  if (!d.eligibilityAcknowledged) {
+    return c.json(err("Please acknowledge who may be an S corporation shareholder before building the package.", "ELIGIBILITY_ACK_REQUIRED"), 400);
+  }
+  // The IRS accepts the election "at any time during the tax year preceding
+  // the tax year it is to take effect" (Instructions for Form 2553, When To
+  // Make the Election). A calendar-year company cannot elect for a year
+  // after next.
+  if (d.effectiveDate && Number(d.effectiveDate.slice(0, 4)) > Number(easternDateIso().slice(0, 4)) + 1) {
+    return c.json(err(`An election effective ${d.effectiveDate.slice(5, 7)}/${d.effectiveDate.slice(8, 10)}/${d.effectiveDate.slice(0, 4)} can't be made yet — the IRS accepts it only during the tax year before it takes effect.`, "TIMING_PREMATURE"), 400);
+  }
+  // Nobody acquires an interest before the company exists.
+  for (const sh of d.shareholders) {
+    if (sh.dateAcquired && sh.dateAcquired < prior.dateIncorporated) {
+      return c.json(err(`${sh.name || "An owner"}'s date acquired is earlier than the date on your filed Articles.`, "INVALID_INPUT"), 400);
+    }
+  }
+  // The same person listed twice would sign twice and double-count a share.
+  const seenNames = new Set<string>();
+  for (const sh of d.shareholders) {
+    const k = sh.name.trim().toLowerCase();
+    if (seenNames.has(k)) return c.json(err(`${sh.name} is listed more than once. Each owner appears on one row; spouses who own together share one row.`, "INVALID_INPUT"), 400);
+    seenNames.add(k);
+  }
+
   // A blank SSN means "keep the one already on file" — the browser is never
   // sent a Social Security number back, so an edit does not require retyping
   // them. Position is the only link, so the row count must not have changed.
@@ -1846,8 +1922,11 @@ app.post("/portal/services/:id/s-election-details", async (c) => {
 
   // SSNs live only in the encrypted secret; the visible record keeps the last
   // four digits so a row is identifiable without exposing the number.
+  // "You're obtaining our EIN" wins over a typed number, on our side as in
+  // the form (which clears the box when it is ticked): the IRS form then
+  // says "Applied For" (Adam's item 6, 6 Sep 2026).
   const merged: SElectionStoredDetails = {
-    ein: d.ein,
+    ein: d.einPending ? "" : d.ein,
     einPending: d.einPending,
     dateIncorporated: prior?.dateIncorporated,
     effectiveDate: d.effectiveDate,
@@ -1855,6 +1934,9 @@ app.post("/portal/services/:id/s-election-details", async (c) => {
     officerTitle: d.officerTitle,
     phone: d.phone,
     certifiedAt: new Date().toISOString(),
+    timingAcknowledgedAt: new Date().toISOString(),
+    eligibilityAcknowledgedAt: new Date().toISOString(),
+    filingDeadline: timing.deadline ?? undefined,
     documentId: prior?.documentId,
     shareholders: d.shareholders.map((s, i) => ({
       name: s.name,

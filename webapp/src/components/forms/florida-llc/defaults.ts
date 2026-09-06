@@ -110,6 +110,7 @@ export const defaultFormData: FloridaLLCFormData = {
   orderCertifiedCopy: false,
   orderEin: false,
   orderSElection: false,
+  sElectionFilingAcknowledgment: false,
 
   series: [],
   seriesOwnershipAcknowledgment: false,

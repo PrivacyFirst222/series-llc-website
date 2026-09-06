@@ -61,6 +61,8 @@ export interface ServicesData {
   series: { name: string; einOrdered: boolean }[];
   einCompanyOrdered: boolean;
   llcFormed: boolean;
+  /** Florida's date, YYYY-MM-DD — "today" for the Form 2553 timing gate. */
+  todayEastern: string;
 }
 
 export interface ShareholderRow {

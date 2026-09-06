@@ -46,3 +46,12 @@ export function taxationLabel(version: string): string {
   if (version === "single") return "Single-Member";
   return "Partnership";
 }
+
+/** Today as a YYYY-MM-DD in Florida time — what the Form 2553 timing gate
+ *  is handed as "today". Never the host clock's date: Vercel runs UTC, and
+ *  an evening in Florida is already tomorrow there. */
+export function easternDateIso(d: Date = new Date()): string {
+  const parts = new Intl.DateTimeFormat("en-CA", { timeZone: ZONE, year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(d);
+  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
+  return `${get("year")}-${get("month")}-${get("day")}`;
+}

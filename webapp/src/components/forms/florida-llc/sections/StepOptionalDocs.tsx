@@ -2,13 +2,15 @@ import { FieldShell } from "../FieldShell";
 import { FeeEstimate } from "../FeeEstimate";
 import { ServiceFeeEstimate } from "../ServiceFeeEstimate";
 import type { FloridaLLCFormData } from "../types";
+import { ORDER_TIME_ACKNOWLEDGMENT } from "@/lib/form2553Timing";
 
 interface StepProps {
   data: FloridaLLCFormData;
   patch: (p: Partial<FloridaLLCFormData>) => void;
+  errors?: Record<string, string>;
 }
 
-export function StepOptionalDocs({ data, patch }: StepProps) {
+export function StepOptionalDocs({ data, patch, errors }: StepProps) {
   return (
     <div className="space-y-6">
       <header className="space-y-2">
@@ -71,6 +73,22 @@ export function StepOptionalDocs({ data, patch }: StepProps) {
                 <strong className="text-foreground">If we complete the S election form, we will elect a calendar tax year. If you need to elect a fiscal year, do not purchase this service from us — seek the advice of your attorney or CPA.</strong>
               </span>
             </label>
+            {data.orderSElection ? (
+              <label className="mt-3 flex items-start gap-2 rounded-lg border border-border bg-secondary/40 p-3 text-sm">
+                <input
+                  type="checkbox"
+                  id="s-election-filing-acknowledgment"
+                  checked={data.sElectionFilingAcknowledgment}
+                  onChange={(e) => patch({ sElectionFilingAcknowledgment: e.target.checked })}
+                  aria-invalid={errors?.sElectionFilingAcknowledgment ? true : undefined}
+                  className="mt-0.5 h-4 w-4 shrink-0 accent-trust"
+                />
+                <span className="text-xs leading-relaxed">{ORDER_TIME_ACKNOWLEDGMENT}</span>
+              </label>
+            ) : null}
+            {data.orderSElection && errors?.sElectionFilingAcknowledgment ? (
+              <p className="mt-1 text-xs text-destructive" role="alert">{errors.sElectionFilingAcknowledgment}</p>
+            ) : null}
           </FieldShell>
         ) : null}
         <FieldShell label="Federal EIN (+$50 service fee)">

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { ServicesCard, type ServiceOrder } from "./ServicesCard";
 import { OrdersInProgress, type ExternalOrderRequest } from "./OrdersInProgress";
+import { clearAllDrafts } from "./drafts";
 import { clientActionLabel, clientMustAct } from "./services.helpers";
 import {
   AlertDialog,
@@ -538,6 +539,7 @@ export default function PortalDashboard() {
 
   const logout = async () => {
     await api.post("/api/auth/logout", {});
+    clearAllDrafts();
     queryClient.clear();
     navigate("/portal/login");
   };

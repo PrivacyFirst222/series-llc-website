@@ -604,7 +604,7 @@ export function FloridaLLCFormationForm({
             ) : stepKey === "correspondence" ? (
               <StepCorrespondence data={data} patch={patch} errors={errors} />
             ) : stepKey === "optional" ? (
-              <StepOptionalDocs data={data} patch={patch} />
+              <StepOptionalDocs data={data} patch={patch} errors={errors} />
             ) : isReview ? (
               <ReviewStep data={data} goToStep={(k) => goToStep(stepIndexOf(k))} />
             ) : isCertify ? (

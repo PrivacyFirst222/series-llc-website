@@ -19,10 +19,12 @@ import { createSession, rateLimit, clientIp } from "./auth";
 import { createHash } from "node:crypto";
 import ownersManualMd from "../../docs/owners-manual.md";
 import { deleteFile, putFile, readFileStream } from "./storage";
-import { sendMail, newDocumentEmail, emailChangedEmail, serviceFulfilledClientEmail, llcFormedEmail } from "./email";
+import { sendMail, newDocumentEmail, emailChangedEmail, serviceFulfilledClientEmail, llcFormedEmail, sElectionFormReadyEmail } from "./email";
 import { filingGroups, seriesNames } from "./filing";
 import { err, testHooks, MAX_UPLOAD_BYTES, looksLikePdf, requireAdmin } from "./shared";
 import { oaSeed, purgeExpiredSElections, postSElectionPackage, type SElectionStoredDetails } from "./routes-portal";
+import { evaluate2553Timing } from "../src/lib/form2553Timing";
+import { easternDateIso } from "./datetime";
 
 /** Renders the Owner's Manual PDF from the markdown master bundled with
  *  this deployment and publishes it to the client library. Hash-gated: a
@@ -844,10 +846,24 @@ app.post("/admin/services/:id/s-election-formation-date", async (c) => {
   );
   if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
   const so = rows[0];
-  if (so.type !== "s-election" || !so.ein_secret) {
-    return c.json(err("The client has not provided the S election details yet.", "BAD_STATE"), 400);
+  if (so.type !== "s-election") return c.json(err("Not found", "NOT_FOUND"), 404);
+  const merged = ((typeof so.details === "string" ? JSON.parse(so.details) : so.details) ?? {}) as SElectionStoredDetails;
+
+  // Before the client's details: store the date and open their form. The
+  // timing gate the form will show is checked here too, so the office sees
+  // a late election the moment it enters the date.
+  if (!so.ein_secret) {
+    merged.dateIncorporated = body.data.date;
+    await db.query("UPDATE service_orders SET details = $1 WHERE id = $2", [JSON.stringify(merged), so.id]);
+    const preview = evaluate2553Timing({ formationDate: body.data.date, today: easternDateIso() });
+    const clients = await db.query<{ email: string }>("SELECT email FROM clients WHERE id = $1", [so.client_id]);
+    if (preview.status === "ok") {
+      const mail = sElectionFormReadyEmail({ llcName: so.llc_name, deadlineDisplay: preview.deadlineDisplay ?? "", portalUrl: `${env.PUBLIC_BASE_URL}/portal` });
+      sendMail({ to: clients[0]?.email ?? "", ...mail }).catch((e) => console.error("[admin] s-election form-ready email failed:", e));
+    }
+    return c.json({ data: { ok: true, documentId: null, editableUntil: null, timing: preview } });
   }
-  const merged = (typeof so.details === "string" ? JSON.parse(so.details) : so.details) as SElectionStoredDetails;
+
   let ssns: string[];
   try {
     ssns = JSON.parse(decryptSecret(so.ein_secret)) as string[];
@@ -857,6 +873,13 @@ app.post("/admin/services/:id/s-election-formation-date", async (c) => {
   }
   const priorDocumentId = merged.documentId;
   merged.dateIncorporated = body.data.date;
+  // Details are in: the gate runs against them before anything is built.
+  // The date is kept either way, so the client's form shows the reason.
+  const gate = evaluate2553Timing({ formationDate: body.data.date, effectiveDate: merged.effectiveDate || undefined, today: easternDateIso() });
+  if (gate.status !== "ok") {
+    await db.query("UPDATE service_orders SET details = $1 WHERE id = $2", [JSON.stringify(merged), so.id]);
+    return c.json(err(gate.message, `TIMING_${gate.status.toUpperCase()}`), 400);
+  }
   const built = await postSElectionPackage({ so: { id: so.id, client_id: so.client_id, llc_name: so.llc_name }, merged, ssns, priorDocumentId });
   if (!built.ok) return c.json(err("The package could not be built.", "GENERATION_FAILED"), 500);
   return c.json({ data: { ok: true, documentId: built.documentId, editableUntil: built.editableUntil } });

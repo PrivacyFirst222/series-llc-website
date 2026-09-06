@@ -355,3 +355,24 @@ export function escapeHtml(s: string): string {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
 }
+
+/** The office entered the formation date: the client's S election form is
+ *  open, and the IRS deadline is known (Adam, 6 Sep 2026). */
+export function sElectionFormReadyEmail(opts: {
+  llcName: string;
+  deadlineDisplay: string;
+  portalUrl: string;
+}): { subject: string; html: string } {
+  return {
+    subject: `Your S election form is ready to complete — ${opts.llcName}`,
+    html: wrap(`
+      <p>Your S corporation election form for <strong>${escapeHtml(opts.llcName)}</strong> is
+      ready to complete in your portal. Sign in, open <strong>Orders in progress</strong>, and choose
+      <strong>Provide details securely</strong>.</p>
+      <p>IRS Form 2553 must be filed (postmarked or faxed) by
+      <strong>${escapeHtml(opts.deadlineDisplay)}</strong>. We prepare the form; you file it.
+      Please complete the form soon so there is time to sign and send it.</p>
+      <p><a href="${opts.portalUrl}">Open your portal</a></p>
+    `),
+  };
+}

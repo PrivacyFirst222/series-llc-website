@@ -18,3 +18,11 @@ export function isoToTypedDate(iso: string | undefined): string {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso ?? "");
   return m ? `${m[2]}/${m[3]}/${m[1]}` : (iso ?? "");
 }
+
+/** (xxx) yyy-yyyy as typed; the stored value is the ten digits. */
+export const formatPhone = (value: string): string => {
+  const d = value.replace(/\D/g, "").slice(0, 10);
+  if (d.length < 4) return d;
+  if (d.length < 7) return `(${d.slice(0, 3)}) ${d.slice(3)}`;
+  return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`;
+};
