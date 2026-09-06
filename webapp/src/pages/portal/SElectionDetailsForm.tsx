@@ -133,10 +133,8 @@ export function SElectionDetailsForm({
             Usually your formation date. Leave blank and we'll use the date on your filed Articles.
           </p>
         </div>
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium">Phone for IRS questions</label>
-          <Input value={phone} onChange={(e) => setPhone(e.target.value)} autoComplete="off" />
-        </div>
+        {/* The officer's name and title share a line (Adam, 6 Sep 2026);
+            the phone sits alone beneath them. */}
         <div className="space-y-1.5">
           <label className="text-sm font-medium">Signing officer</label>
           <Input value={officerName} onChange={(e) => setOfficerName(e.target.value)} placeholder="Full legal name" autoComplete="off" />
@@ -144,6 +142,10 @@ export function SElectionDetailsForm({
         <div className="space-y-1.5">
           <label className="text-sm font-medium">Officer title</label>
           <Input value={officerTitle} onChange={(e) => setOfficerTitle(e.target.value)} autoComplete="off" />
+        </div>
+        <div className="space-y-1.5 sm:col-span-2">
+          <label className="text-sm font-medium">Phone for IRS questions</label>
+          <Input value={phone} onChange={(e) => setPhone(e.target.value)} autoComplete="off" />
         </div>
       </div>
 
