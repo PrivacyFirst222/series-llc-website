@@ -217,6 +217,27 @@ When a question or control is hidden or skipped conditionally, confirm the
 underlying value is still set. A question removed from the screen is not a
 value removed from the system.
 
+**The seat is a person doing a step, weighted by how often they do it.** Three
+things this rule requires, added 6 Sep 2026 after P57 — a date needed on a few
+S elections, proposed twice as a field on every Articles upload:
+
+4. **Every proposal that adds a step, field, or control for a person opens
+   with one line: who does it, at what moment, holding what, how many times a
+   year, and what it costs the people who don't need it.** "The admin, at the
+   Articles upload, every formation (hundreds a year), to serve the few S
+   elections" is wrong on its face before anyone reads further. **Adam: a
+   proposal without that line has not been designed from anyone's seat.
+   Reject it unread.**
+5. **A correction is a source.** When Adam corrects a design, quote his
+   sentence back and state the actor and the moment it names before
+   proposing anything. The next proposal is derived from that sentence, not
+   patched from the previous proposal — "required" becoming "optional" while
+   the placement stays is patching.
+6. **Frequency is part of the seat.** Designing for the rare case that makes
+   the system complete, at a cost paid on every common case, is designing
+   from the data model. Completeness is free to whoever is not doing the
+   typing.
+
 ## Never trade accuracy for convenience
 
 This rule is not optional. It is not waived by deadline, by output length,

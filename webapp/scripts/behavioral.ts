@@ -370,7 +370,14 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
   await fill(page, "Confirm email", run.email ?? "gate@e2e.test");
   await advance(page);
 
-  // Optional docs and add-ons.
+  // Optional docs and add-ons. The S election add-on carries Adam's calendar
+  // tax year notice (6 Sep 2026) at the point of purchase.
+  // The add-on exists only for NEW formations (a conversion cannot elect
+  // through us), so the notice is asserted only where the add-on is offered.
+  if (run.path === "new") {
+    const addonText = await page.locator("main").innerText();
+    expect(/we will elect a calendar tax year/i.test(addonText), `${run.key}: the S election add-on states the calendar tax year`, addonText.slice(0, 80));
+  }
   const wants: Array<[RegExp, boolean]> = [
     [/certificate of status/i, !!run.addons?.certificate],
     [/certified copy/i, !!run.addons?.certifiedCopy],

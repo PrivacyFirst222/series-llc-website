@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -86,6 +87,21 @@ export function ServiceFulfillDialog({
     enabled: viewing !== null,
   });
 
+  // The formation date is entered here, from the filed Articles, when the
+  // S election is prepared (Adam, 6 Sep 2026). Entering it builds the
+  // package and posts it to the client.
+  const [formationDate, setFormationDate] = useState<string>("");
+  const enterFormationDate = useMutation({
+    mutationFn: (args: { id: string; date: string }) =>
+      api.post<{ documentId: string }>(`/api/admin/services/${args.id}/s-election-formation-date`, { date: args.date }),
+    onSuccess: () => {
+      setFormationDate("");
+      queryClient.invalidateQueries({ queryKey: ["admin-service-detail"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-services"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "orders"] });
+    },
+  });
+
   const fulfill = useMutation({
     mutationFn: async (args: { id: string; file: File | null }) => {
       const fd = new FormData();
@@ -160,10 +176,41 @@ export function ServiceFulfillDialog({
                     ? "pending — we're obtaining it"
                     : detailQuery.data?.details.ein || "— not yet provided —"}
                 </div>
-                <div>
-                  <span className="text-muted-foreground">Formed / effective:</span>{" "}
-                  {detailQuery.data?.details.dateIncorporated ?? "—"} / {detailQuery.data?.details.effectiveDate ?? "—"}
-                </div>
+                {detailQuery.data?.details.dateIncorporated ? (
+                  <div>
+                    <span className="text-muted-foreground">Filed by the Division / election effective:</span>{" "}
+                    {detailQuery.data.details.dateIncorporated} / {detailQuery.data.details.effectiveDate || detailQuery.data.details.dateIncorporated}
+                  </div>
+                ) : viewing.has_secret ? (
+                  <div className="space-y-2 rounded-xl border border-amber-300/60 bg-amber-50 p-3 text-amber-900" data-testid="formation-date-entry">
+                    <p className="text-sm font-medium">Enter the date the Division filed the Articles.</p>
+                    <p className="text-xs">
+                      From the filed Articles. It goes on Form 2553 as the date of incorporation, sets the
+                      election's effective date where the client left it blank, and starts their two-week
+                      download window. Entering it builds the package and emails the client.
+                    </p>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Input
+                        type="date"
+                        aria-label="Date filed by the Division"
+                        value={formationDate}
+                        onChange={(e) => setFormationDate(e.target.value)}
+                        className="w-48"
+                      />
+                      <Button
+                        size="sm"
+                        className="rounded-full"
+                        disabled={!formationDate || enterFormationDate.isPending}
+                        onClick={() => enterFormationDate.mutate({ id: viewing.id, date: formationDate })}
+                      >
+                        {enterFormationDate.isPending ? "Building the package…" : "Enter date & build the package"}
+                      </Button>
+                    </div>
+                    {enterFormationDate.isError ? (
+                      <p className="text-xs text-destructive">{(enterFormationDate.error as Error).message}</p>
+                    ) : null}
+                  </div>
+                ) : null}
                 <div>
                   <span className="text-muted-foreground">Officer:</span>{" "}
                   {detailQuery.data?.details.officerName
@@ -183,7 +230,7 @@ export function ServiceFulfillDialog({
                     </div>
                   </div>
                 ))}
-                {viewing.has_secret ? (
+                {viewing.has_secret && detailQuery.data?.details.dateIncorporated ? (
                   <a
                     href={`/api/admin/services/${viewing.id}/s-election-draft`}
                     className="inline-block rounded-full border border-border px-4 py-1.5 text-sm font-medium hover:border-accent"

@@ -67,7 +67,8 @@ export function StepOptionalDocs({ data, patch }: StepProps) {
                 IRS filing fee. The IRS deadline is strict (2 months and 15
                 days from formation), so this is available only at formation
                 and for a limited time afterward in your portal. Choose this
-                only if your tax professional recommends the election.
+                only if your tax professional recommends the election.{" "}
+                <strong className="text-foreground">If we complete the S election form, we will elect a calendar tax year. If you need to elect a fiscal year, do not purchase this service from us — seek the advice of your attorney or CPA.</strong>
               </span>
             </label>
           </FieldShell>

@@ -22,7 +22,7 @@ import { deleteFile, putFile, readFileStream } from "./storage";
 import { sendMail, newDocumentEmail, emailChangedEmail, serviceFulfilledClientEmail, llcFormedEmail } from "./email";
 import { filingGroups, seriesNames } from "./filing";
 import { err, testHooks, MAX_UPLOAD_BYTES, looksLikePdf, requireAdmin } from "./shared";
-import { oaSeed, purgeExpiredSElections } from "./routes-portal";
+import { oaSeed, purgeExpiredSElections, postSElectionPackage, type SElectionStoredDetails } from "./routes-portal";
 
 /** Renders the Owner's Manual PDF from the markdown master bundled with
  *  this deployment and publishes it to the client library. Hash-gated: a
@@ -827,6 +827,41 @@ app.get("/admin/services/:id", async (c) => {
 /** Draft S election package for admin review: instructions + cover letter +
  *  the filled official Form 2553. Generated on demand from the encrypted
  *  details; nothing is stored — Adam reviews and attaches it at fulfillment. */
+// The office enters the formation date from the filed Articles when it
+// prepares the S election (Adam, 6 Sep 2026: "We will manually enter it when
+// the S-election form is created"). Entering it builds the package, posts it
+// to the client, and starts their two-week window.
+app.post("/admin/services/:id/s-election-formation-date", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const body = z.object({ date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Enter the date as YYYY-MM-DD.") })
+    .safeParse(await c.req.json().catch(() => null));
+  if (!body.success) return c.json(err(body.error.issues[0]?.message ?? "Invalid date.", "INVALID_INPUT"), 400);
+  const db = await getDb();
+  const rows = await db.query<{ id: string; client_id: string; type: string; status: string; llc_name: string; details: unknown; ein_secret: string | null }>(
+    "SELECT id, client_id, type, status, llc_name, details, ein_secret FROM service_orders WHERE id = $1",
+    [c.req.param("id")],
+  );
+  if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+  const so = rows[0];
+  if (so.type !== "s-election" || !so.ein_secret) {
+    return c.json(err("The client has not provided the S election details yet.", "BAD_STATE"), 400);
+  }
+  const merged = (typeof so.details === "string" ? JSON.parse(so.details) : so.details) as SElectionStoredDetails;
+  let ssns: string[];
+  try {
+    ssns = JSON.parse(decryptSecret(so.ein_secret)) as string[];
+  } catch (e) {
+    console.error("[admin] s-election secret decrypt failed:", e);
+    return c.json(err("Could not decrypt the shareholder details.", "DECRYPT_FAILED"), 500);
+  }
+  const priorDocumentId = merged.documentId;
+  merged.dateIncorporated = body.data.date;
+  const built = await postSElectionPackage({ so: { id: so.id, client_id: so.client_id, llc_name: so.llc_name }, merged, ssns, priorDocumentId });
+  if (!built.ok) return c.json(err("The package could not be built.", "GENERATION_FAILED"), 500);
+  return c.json({ data: { ok: true, documentId: built.documentId, editableUntil: built.editableUntil } });
+});
+
 app.get("/admin/services/:id/s-election-draft", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
@@ -844,10 +879,13 @@ app.get("/admin/services/:id/s-election-draft", async (c) => {
     return c.json(err("This order has no S election details yet.", "BAD_STATE"), 400);
   }
   const details = (typeof so.details === "string" ? JSON.parse(so.details) : so.details) as {
-    ein: string; dateIncorporated: string; effectiveDate: string;
+    ein: string; dateIncorporated?: string; effectiveDate: string;
     officerName: string; officerTitle: string; phone: string;
     shareholders: { name: string; address: string; percentage: number; dateAcquired: string }[];
   };
+  if (!details.dateIncorporated) {
+    return c.json(err("Enter the date the Division filed the Articles first — the form is built from it.", "FORMATION_DATE_REQUIRED"), 400);
+  }
   let ssns: string[];
   try {
     ssns = JSON.parse(decryptSecret(so.ein_secret)) as string[];
@@ -861,7 +899,7 @@ app.get("/admin/services/:id/s-election-draft", async (c) => {
     principalAddress: seed?.principalAddress ?? "",
     ein: details.ein ?? "",
     dateIncorporated: details.dateIncorporated,
-    effectiveDate: details.effectiveDate,
+    effectiveDate: details.effectiveDate || details.dateIncorporated,
     officerName: details.officerName,
     officerTitle: details.officerTitle,
     phone: details.phone ?? "",

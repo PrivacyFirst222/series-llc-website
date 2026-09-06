@@ -1397,20 +1397,23 @@ if (mint.status === 200) {
   const badPct = await api(`/api/portal/services/${sId}/s-election-details`, {
     method: "POST", cookies: mPw.cookie,
     body: JSON.stringify({
-      ein: "", einPending: true, dateIncorporated: "2026-08-01", effectiveDate: "2026-08-01",
+      ein: "", einPending: true, effectiveDate: "",
       officerName: "Maria Ortiz", officerTitle: "Manager", phone: "(305) 555-0100",
       shareholders: [
-        { name: "Maria Ortiz and Carlos Ortiz, as tenants by the entirety", address: "500 Bay Street, Miami, FL 33131", percentage: 60, dateAcquired: "2026-08-01", ssn: "123456789" },
+        { name: "Maria Ortiz and Carlos Ortiz, as tenants by the entirety", address: "500 Bay Street, Miami, FL 33131", percentage: 60, dateAcquired: "", ssn: "123456789" },
       ],
     }),
   });
   check("S election details with bad percentages rejected", badPct.status === 400);
+  // The client never supplies the formation date; a stray one is ignored
+  // (Adam, 6 Sep 2026: the office enters it from the filed Articles when the
+  // form is prepared). Blank effective and acquisition dates default to it.
   const goodDetails = {
-    ein: "88-1234567", einPending: false, dateIncorporated: "2026-08-01", effectiveDate: "2026-08-01",
+    ein: "88-1234567", einPending: false, dateIncorporated: "1999-01-01", effectiveDate: "",
     officerName: "Maria Ortiz", officerTitle: "Manager", phone: "(305) 555-0100",
     certified: true as const,
     shareholders: [
-      { name: "Maria Ortiz and Carlos Ortiz, as tenants by the entirety", address: "500 Bay Street, Miami, FL 33131", percentage: 100, dateAcquired: "2026-08-01", ssn: "123-45-6789" },
+      { name: "Maria Ortiz and Carlos Ortiz, as tenants by the entirety", address: "500 Bay Street, Miami, FL 33131", percentage: 100, dateAcquired: "", ssn: "123-45-6789" },
     ],
   };
   const uncertified = await api(`/api/portal/services/${sId}/s-election-details`, {
@@ -1422,8 +1425,20 @@ if (mint.status === 200) {
     method: "POST", cookies: mPw.cookie, body: JSON.stringify(goodDetails),
   });
   check("S election details accepted", sDetails.status === 200, sDetails.body);
-  check("package built and returned immediately", Boolean(sDetails.body?.data?.documentId), sDetails.body?.data);
-  const readyDoc = await fetch(`${BASE}/api/portal/documents/${sDetails.body?.data?.documentId}/download`, {
+  check("no package until the office enters the formation date", sDetails.body?.data?.documentId === null && sDetails.body?.data?.awaitingFormationDate === true, sDetails.body?.data);
+  const waiting = (await api("/api/portal/services", { cookies: mPw.cookie })).body?.data?.orders?.find((o: { id: string }) => o.id === sId);
+  check("the client's order shows in progress while we prepare it", waiting?.status === "in_progress", waiting?.status);
+  const draftEarly = await fetch(`${BASE}/api/admin/services/${sId}/s-election-draft`, { headers: { Cookie: adminS.cookie } });
+  check("the draft cannot be built before the formation date", draftEarly.status === 400, draftEarly.status);
+  const badDate = await api(`/api/admin/services/${sId}/s-election-formation-date`, { method: "POST", cookies: adminS.cookie, body: JSON.stringify({ date: "8/1/2026" }) });
+  check("a malformed formation date is refused", badDate.status === 400, badDate.body);
+  const entered = await api(`/api/admin/services/${sId}/s-election-formation-date`, { method: "POST", cookies: adminS.cookie, body: JSON.stringify({ date: "2026-08-01" }) });
+  check("the office enters the formation date and the package is built", entered.status === 200 && Boolean(entered.body?.data?.documentId), entered.body);
+  const storedDates = await api(`/api/admin/services/${sId}`, { cookies: adminS.cookie });
+  check("the stored formation date is the office's, not the client's", storedDates.body?.data?.details?.dateIncorporated === "2026-08-01", storedDates.body?.data?.details?.dateIncorporated);
+  check("a blank effective date defaults to the formation date", storedDates.body?.data?.details?.effectiveDate === "2026-08-01", storedDates.body?.data?.details?.effectiveDate);
+  check("a blank acquisition date defaults to the formation date", storedDates.body?.data?.details?.shareholders?.[0]?.dateAcquired === "2026-08-01", storedDates.body?.data?.details?.shareholders?.[0]);
+  const readyDoc = await fetch(`${BASE}/api/portal/documents/${entered.body?.data?.documentId}/download`, {
     headers: { Cookie: mPw.cookie },
   });
   const readyBytes = new Uint8Array(await readyDoc.arrayBuffer());

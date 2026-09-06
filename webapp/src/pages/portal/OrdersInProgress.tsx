@@ -135,6 +135,12 @@ export function OrdersInProgress({
                     {STATUS_LABEL[o.status]}
                   </span>
                 </div>
+                {o.type === "s-election" && o.status === "in_progress" ? (
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    We're preparing your Form 2553 package from your filed Articles — you'll get an
+                    email the moment it's ready to download.
+                  </p>
+                ) : null}
               </div>
               <div className="flex shrink-0 flex-wrap items-center gap-2">
                 {o.type === "series" && o.status !== "pending_payment" && o.status !== "cancelled" ? (

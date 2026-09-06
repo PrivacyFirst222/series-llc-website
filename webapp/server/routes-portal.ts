@@ -604,8 +604,11 @@ export const sElectionDetailsSchema = z
       .transform((s) => s.replace(/[\s-]/g, ""))
       .refine((s) => s === "" || /^\d{9}$/.test(s), "Enter the 9-digit EIN, or leave it blank if we're obtaining it."),
     einPending: z.boolean().optional().default(false),
-    dateIncorporated: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-    effectiveDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    // The formation date is entered by the office from the filed Articles
+    // when the package is prepared (Adam, 6 Sep 2026) — never by the client.
+    // The effective date and each owner's acquisition date may be left blank
+    // and default to it.
+    effectiveDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).or(z.literal("")).optional().default(""),
     officerName: z.string().min(1, "The signing officer's name is required.").max(200),
     officerTitle: z.string().min(1).max(100),
     phone: z.string().max(40).optional().default(""),
@@ -615,7 +618,7 @@ export const sElectionDetailsSchema = z
           name: z.string().min(1).max(200),
           address: z.string().min(1).max(300),
           percentage: z.number().min(0).max(100),
-          dateAcquired: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+          dateAcquired: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).or(z.literal("")).optional().default(""),
           // Blank means "keep the number already on file" when re-editing; a
           // first submission is rejected below if any are blank.
           ssn: z
@@ -636,6 +639,103 @@ export const sElectionDetailsSchema = z
   .refine((d) => Math.abs(d.shareholders.reduce((a, s) => a + s.percentage, 0) - 100) < 0.01, {
     message: "Ownership percentages must total exactly 100%.",
   });
+
+/** Build the Form 2553 package from the stored details and the office's
+ *  formation date, post it to the client's documents (replacing an earlier
+ *  copy), mark the order fulfilled — which starts the two-week clock — and
+ *  tell the client it is ready. Shared by the client's submission (when the
+ *  date is already on file, i.e. an edit inside the window) and by the
+ *  office entering the date. */
+export async function postSElectionPackage(args: {
+  so: { id: string; client_id: string; llc_name: string };
+  merged: SElectionStoredDetails;
+  ssns: string[];
+  priorDocumentId?: string;
+}): Promise<{ ok: true; documentId: string; editableUntil: string | null } | { ok: false }> {
+  const { so, merged, ssns } = args;
+  const db = await getDb();
+  const formation = merged.dateIncorporated ?? "";
+  // The office's date is the default for the election's effective date and
+  // for each owner's acquisition date wherever the client left them blank.
+  merged.effectiveDate = merged.effectiveDate || formation;
+  merged.shareholders = (merged.shareholders ?? []).map((sh) => ({ ...sh, dateAcquired: sh.dateAcquired || formation }));
+  const seed = await oaSeed(so.client_id);
+  const clients = await db.query<{ email: string; name: string }>(
+    "SELECT email, name FROM clients WHERE id = $1",
+    [so.client_id],
+  );
+  let pdf: Uint8Array;
+  try {
+    pdf = await buildSElectionPackage({
+      llcName: so.llc_name,
+      principalAddress: seed?.principalAddress ?? "",
+      ein: merged.ein ?? "",
+      dateIncorporated: formation,
+      effectiveDate: merged.effectiveDate,
+      officerName: merged.officerName ?? "",
+      officerTitle: merged.officerTitle ?? "",
+      phone: merged.phone ?? "",
+      shareholders: merged.shareholders.map((sh, i) => ({
+        name: sh.name,
+        address: sh.address,
+        percentage: sh.percentage,
+        dateAcquired: sh.dateAcquired,
+        ssn: ssns[i],
+      })),
+    });
+  } catch (e) {
+    console.error("[service] s-election package build failed:", e);
+    return { ok: false };
+  }
+
+  // Regenerating replaces the earlier PDF rather than stacking copies of the
+  // same form, each carrying the owners' Social Security numbers.
+  if (args.priorDocumentId) {
+    const old = await db.query<{ storage_key: string }>(
+      "SELECT storage_key FROM documents WHERE id = $1 AND client_id = $2",
+      [args.priorDocumentId, so.client_id],
+    );
+    await db.query("DELETE FROM documents WHERE id = $1 AND client_id = $2", [args.priorDocumentId, so.client_id]);
+    if (old[0]?.storage_key) await deleteFile(old[0].storage_key).catch(() => {});
+  }
+  const title = `S Corporation Election Package (Form 2553) — ${so.llc_name}`;
+  const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength) as ArrayBuffer;
+  const stored = await putFile(
+    `${title.replace(/[^\w-]+/g, "_")}_${stampForFilename()}.pdf`,
+    buf,
+    "application/pdf",
+  );
+  const docRows = await db.query<{ id: string }>(
+    `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)
+     VALUES ($1, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,
+    [so.client_id, title, stored.storageKey, stored.sizeBytes],
+  );
+  merged.documentId = docRows[0].id;
+
+  // fulfilled_at starts the two-week clock, and a re-edit must not extend it.
+  await db.query(
+    `UPDATE service_orders
+        SET details = $1, ein_secret = $2, status = 'fulfilled',
+            fulfilled_at = COALESCE(fulfilled_at, now())
+      WHERE id = $3`,
+    [JSON.stringify(merged), encryptSecret(JSON.stringify(ssns)), so.id],
+  );
+  const after = await db.query<{ fulfilled_at: unknown }>(
+    "SELECT fulfilled_at FROM service_orders WHERE id = $1",
+    [so.id],
+  );
+  const window = sElectionWindow(after[0]?.fulfilled_at ?? null);
+
+  const mail = sElectionReadyEmail({
+    llcName: so.llc_name,
+    editableUntil: window.deleteOn ? stampEastern(new Date(window.deleteOn)) : "",
+    portalUrl: `${env.PUBLIC_BASE_URL}/portal`,
+  });
+  sendMail({ to: clients[0]?.email ?? "", ...mail }).catch((e) =>
+    console.error("[service] s-election ready email failed:", e),
+  );
+  return { ok: true, documentId: merged.documentId, editableUntil: window.deleteOn };
+}
 
 export function registerPortalRoutes(app: Hono) {
 
@@ -1749,7 +1849,7 @@ app.post("/portal/services/:id/s-election-details", async (c) => {
   const merged: SElectionStoredDetails = {
     ein: d.ein,
     einPending: d.einPending,
-    dateIncorporated: d.dateIncorporated,
+    dateIncorporated: prior?.dateIncorporated,
     effectiveDate: d.effectiveDate,
     officerName: d.officerName,
     officerTitle: d.officerTitle,
@@ -1765,96 +1865,36 @@ app.post("/portal/services/:id/s-election-details", async (c) => {
     })),
   };
 
-  // Build the package now — the client downloads it themselves; we file
-  // nothing. A failure here must not record a submission that produced no
-  // document, so it happens before anything is written.
-  const seed = await oaSeed(session.clientId);
-  const clients = await db.query<{ email: string; name: string }>(
-    "SELECT email, name FROM clients WHERE id = $1",
-    [session.clientId],
-  );
-  let pdf: Uint8Array;
-  try {
-    pdf = await buildSElectionPackage({
-      llcName: so.llc_name,
-      principalAddress: seed?.principalAddress ?? "",
-      ein: d.ein,
-      dateIncorporated: d.dateIncorporated,
-      effectiveDate: d.effectiveDate,
-      officerName: d.officerName,
-      officerTitle: d.officerTitle,
-      phone: d.phone,
-      shareholders: d.shareholders.map((s, i) => ({
-        name: s.name,
-        address: s.address,
-        percentage: s.percentage,
-        dateAcquired: s.dateAcquired,
-        ssn: ssns[i],
-      })),
-    });
-  } catch (e) {
-    console.error("[service] s-election package build failed:", e);
+  // Without the formation date the package cannot be built: the office
+  // enters it from the filed Articles when it prepares the form. The details
+  // and the encrypted numbers are kept, the order waits, and the client is
+  // told so.
+  if (!merged.dateIncorporated) {
+    await db.query(
+      "UPDATE service_orders SET details = $1, ein_secret = $2, status = 'in_progress' WHERE id = $3",
+      [JSON.stringify(merged), encryptSecret(JSON.stringify(ssns)), so.id],
+    );
+    if (env.ADMIN_NOTIFY_EMAIL) {
+      const clientsN = await db.query<{ email: string }>("SELECT email FROM clients WHERE id = $1", [session.clientId]);
+      const adminMail = einDetailsSubmittedAdminEmail({
+        summary: `S Corporation Election Package — ${so.llc_name} (enter the formation date to build it)`,
+        clientEmail: clientsN[0]?.email ?? "",
+        adminUrl: `${env.PUBLIC_BASE_URL}/admin`,
+      });
+      sendMail({ to: env.ADMIN_NOTIFY_EMAIL, ...adminMail }).catch((e) =>
+        console.error("[service] s-election-details admin email failed:", e),
+      );
+    }
+    return c.json({ data: { ok: true, documentId: null, editableUntil: null, awaitingFormationDate: true } });
+  }
+
+  const built = await postSElectionPackage({ so: { id: so.id, client_id: so.client_id, llc_name: so.llc_name }, merged, ssns, priorDocumentId: prior?.documentId });
+  if (!built.ok) {
     return c.json(err("We could not build the package. Our team has been notified.", "GENERATION_FAILED"), 500);
   }
-
-  // Regenerating replaces the earlier PDF rather than stacking copies of the
-  // same form, each carrying the owners' Social Security numbers.
-  if (prior?.documentId) {
-    const old = await db.query<{ storage_key: string }>(
-      "SELECT storage_key FROM documents WHERE id = $1 AND client_id = $2",
-      [prior.documentId, session.clientId],
-    );
-    await db.query("DELETE FROM documents WHERE id = $1 AND client_id = $2", [prior.documentId, session.clientId]);
-    if (old[0]?.storage_key) await deleteFile(old[0].storage_key).catch(() => {});
-  }
-  const title = `S Corporation Election Package (Form 2553) — ${so.llc_name}`;
-  const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength) as ArrayBuffer;
-  const stored = await putFile(
-    `${title.replace(/[^\w-]+/g, "_")}_${stampForFilename()}.pdf`,
-    buf,
-    "application/pdf",
-  );
-  const docRows = await db.query<{ id: string }>(
-    `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)
-     VALUES ($1, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,
-    [session.clientId, title, stored.storageKey, stored.sizeBytes],
-  );
-  merged.documentId = docRows[0].id;
-
-  // fulfilled_at starts the two-week clock, and a re-edit must not extend it.
-  await db.query(
-    `UPDATE service_orders
-        SET details = $1, ein_secret = $2, status = 'fulfilled',
-            fulfilled_at = COALESCE(fulfilled_at, now())
-      WHERE id = $3`,
-    [JSON.stringify(merged), encryptSecret(JSON.stringify(ssns)), so.id],
-  );
-  const after = await db.query<{ fulfilled_at: unknown }>(
-    "SELECT fulfilled_at FROM service_orders WHERE id = $1",
-    [so.id],
-  );
-  const window = sElectionWindow(after[0]?.fulfilled_at ?? null);
-
-  const mail = sElectionReadyEmail({
-    llcName: so.llc_name,
-    editableUntil: window.deleteOn ? stampEastern(new Date(window.deleteOn)) : "",
-    portalUrl: `${env.PUBLIC_BASE_URL}/portal`,
-  });
-  sendMail({ to: clients[0]?.email ?? "", ...mail }).catch((e) =>
-    console.error("[service] s-election ready email failed:", e),
-  );
-  if (env.ADMIN_NOTIFY_EMAIL) {
-    const adminMail = einDetailsSubmittedAdminEmail({
-      summary: `S Corporation Election Package — ${so.llc_name}`,
-      clientEmail: clients[0]?.email ?? "",
-      adminUrl: `${env.PUBLIC_BASE_URL}/admin`,
-    });
-    sendMail({ to: env.ADMIN_NOTIFY_EMAIL, ...adminMail }).catch((e) =>
-      console.error("[service] s-election-details admin email failed:", e),
-    );
-  }
-  return c.json({ data: { ok: true, documentId: merged.documentId, editableUntil: window.deleteOn } });
+  return c.json({ data: { ok: true, documentId: built.documentId, editableUntil: built.editableUntil } });
 });
+
 
 app.post("/portal/account/password", async (c) => {
   const session = await getSession(c);

@@ -2681,6 +2681,20 @@ The rows went where the data was fetched. The services card fetches the orders, 
 
 Unfulfilled orders move to where he pointed: a section at the top of the portal, above the agreement row, carrying the same rows, actions, and outlines; fulfilled orders stay below as downloads.
 
+## P57 — A date needed on a few S elections, proposed as a field on every Articles upload
+
+### THE FAILURE
+
+Adam, 6 Sep 2026: "No. We will manually enter it when the S-election form is created. The vast majority of people will not be electing S. So your retarded solution is to make uploading every fucking Articles to save manual entry of the date on a few s election forms." The sequence: he asked for the client's "Date the LLC was formed" field to be deleted because "we have this information." I proposed taking it from the company's record; he corrected me — "There is no company record for the formation date in our code. The admin will enter it manually from the articles." I turned that sentence into a required date field on every Articles upload. He asked why the upload should be refused without it. I answered by making the same field optional on every upload, with a board reminder for the few S elections — a softer version of the same placement. Two proposals in a row put a step on every formation, hundreds a year, to serve the handful of S elections, when the sentence he gave me said where the entry belongs: at the S election, when its form is prepared.
+
+### WHY IT HAPPENED
+
+I placed the entry where the data lives in my code, not where the work happens in his office. "From the articles" resolved, for me, to the Articles upload — the one screen in the codebase where an object called the Articles exists — and the field went there without my asking when he would actually be holding the Articles for this purpose, which is when an S election is being prepared. Frequency never entered the design: I optimised for completeness (every company carries the date, so the S election can never lack it) and completeness is free to whoever is not doing the typing. Then, corrected, I bargained instead of re-deriving — "required" became "optional", the placement stayed — because a proposal I have already made feels like a position to defend by degrees, and each degree reads as responsiveness while the premise goes untouched. The tell I missed was in his own words: "when the S-election form is created" names a moment, and I answered with a location.
+
+### FIXED BY
+
+The formation date is entered by the admin on the S election itself, when the form is prepared. Nothing is asked at the Articles upload.
+
 ## Process — the ones that let the substantive ones through
 
 **M1 · Verify the proposition you set out to verify, not the one underneath.** A

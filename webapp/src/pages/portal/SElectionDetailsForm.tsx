@@ -50,7 +50,6 @@ export function SElectionDetailsForm({
   const prior = order.details;
   const [ein, setEin] = useState(prior.ein ?? "");
   const [einPending, setEinPending] = useState(Boolean(prior.einPending));
-  const [dateIncorporated, setDateIncorporated] = useState(prior.dateIncorporated ?? "");
   const [effectiveDate, setEffectiveDate] = useState(prior.effectiveDate ?? "");
   const [officerName, setOfficerName] = useState(prior.officerName ?? "");
   const [officerTitle, setOfficerTitle] = useState(prior.officerTitle ?? "Manager");
@@ -79,8 +78,7 @@ export function SElectionDetailsForm({
       api.post<{ documentId: string }>(`/api/portal/services/${order.id}/s-election-details`, {
         ein,
         einPending,
-        dateIncorporated,
-        effectiveDate: effectiveDate || dateIncorporated,
+        effectiveDate,
         officerName,
         officerTitle,
         phone,
@@ -89,7 +87,7 @@ export function SElectionDetailsForm({
           name: r.name,
           address: r.address,
           percentage: Number(r.percentage),
-          dateAcquired: r.dateAcquired || dateIncorporated,
+          dateAcquired: r.dateAcquired,
           ssn: r.ssn,
         })),
       }),
@@ -129,14 +127,11 @@ export function SElectionDetailsForm({
           </label>
         </div>
         <div className="space-y-1.5">
-          <label className="text-sm font-medium">Date the LLC was formed</label>
-          <Input type="date" value={dateIncorporated} onChange={(e) => setDateIncorporated(e.target.value)} />
-          <p className="text-xs text-muted-foreground">From your filed Articles of Organization.</p>
-        </div>
-        <div className="space-y-1.5">
           <label className="text-sm font-medium">Election effective date</label>
           <Input type="date" value={effectiveDate} onChange={(e) => setEffectiveDate(e.target.value)} />
-          <p className="text-xs text-muted-foreground">Usually the formation date. Leave blank to use it.</p>
+          <p className="text-xs text-muted-foreground">
+            Usually your formation date. Leave blank and we'll use the date on your filed Articles.
+          </p>
         </div>
         <div className="space-y-1.5">
           <label className="text-sm font-medium">Phone for IRS questions</label>

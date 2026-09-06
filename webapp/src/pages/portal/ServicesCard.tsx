@@ -354,7 +354,7 @@ export function ServicesCard({ company }: { company?: string | null }) {
                 </div>
                 <p className="mt-1 text-xs text-muted-foreground">
                   Completed IRS Form 2553 with a cover letter and filing instructions — you sign
-                  and mail it.
+                  and mail it. If we complete the S election form, we will elect a calendar tax year. If you need to elect a fiscal year, do not purchase this service from us — seek the advice of your attorney or CPA.
                   {data.sElection.orderBy ? (
                     <span className="font-medium text-amber-700">
                       {" "}Available until {fmtDay(data.sElection.orderBy)}.
@@ -372,7 +372,8 @@ export function ServicesCard({ company }: { company?: string | null }) {
                   {data.llcName || "your LLC"} — completed and ready to sign — plus a cover letter
                   and step-by-step filing instructions. You review, sign, and mail or fax it to the
                   IRS yourself; there is no IRS filing fee. After payment, you'll provide the
-                  owners' details through a secure form here in the portal.
+                  owners' details through a secure form here in the portal.{" "}
+                  <strong className="text-foreground">If we complete the S election form, we will elect a calendar tax year. If you need to elect a fiscal year, do not purchase this service from us — seek the advice of your attorney or CPA.</strong>
                 </DialogDescription>
               </DialogHeader>
               <p className="text-xs text-muted-foreground">
