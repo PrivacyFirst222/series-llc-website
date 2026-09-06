@@ -1,10 +1,11 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Navigate, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { FileText, Mail, LogOut, Download, ShieldCheck, Clock, ScrollText, BookOpen, ArrowRight, Trash2 } from "lucide-react";
+import { FileText, Mail, LogOut, Download, ShieldCheck, Clock, ScrollText, BookOpen, ArrowRight, Trash2, FileSignature } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { ServicesCard, type ServiceOrder } from "./ServicesCard";
+import { OrdersInProgress, type ExternalOrderRequest } from "./OrdersInProgress";
 import { clientActionLabel, clientMustAct } from "./services.helpers";
 import {
   AlertDialog,
@@ -54,12 +55,16 @@ function DocList({
   own,
   onDelete,
   deleting,
+  extra,
 }: {
   docs: PortalDoc[];
   empty: string;
   own?: Map<string, OwnAgreement>;
   onDelete?: (generationId: string, isCurrent: boolean) => void;
   deleting?: boolean;
+  /** A fulfilled order's remaining actions and notes sit on its document —
+   *  the S election's edit window, a filed series' consent (Adam, 6 Sep 2026). */
+  extra?: (d: PortalDoc) => { note?: ReactNode; actions?: ReactNode } | null;
 }) {
   if (docs.length === 0) {
     return <p className="px-5 py-6 text-sm text-muted-foreground">{empty}</p>;
@@ -95,8 +100,10 @@ function DocList({
                 ) : null}
               </div>
               <div className="text-xs text-muted-foreground">{formatDateTime(d.created_at)}</div>
+              {extra?.(d)?.note ?? null}
             </div>
-            <div className="flex shrink-0 items-center gap-2">
+            <div className="flex shrink-0 flex-wrap items-center gap-2">
+              {extra?.(d)?.actions ?? null}
               <Button asChild variant="outline" size="sm" className="rounded-full">
                 <a href={`/api/portal/documents/${d.id}/download`}>
                   <Download className="mr-1.5 h-3.5 w-3.5" />
@@ -398,6 +405,54 @@ export default function PortalDashboard() {
     return map;
   }, [oaGenerations.data]);
 
+  // Fulfilled orders are documents (Adam, 6 Sep 2026); the two that still
+  // have something to do — an S election inside its edit window, a filed
+  // series without its consent yet — carry that on their document row and
+  // open the dialogs OrdersInProgress hosts.
+  const [external, setExternal] = useState<ExternalOrderRequest | null>(null);
+  const request = (kind: ExternalOrderRequest["kind"], orderId: string) =>
+    setExternal({ kind, orderId, nonce: Date.now() });
+  const docExtras = (d: PortalDoc): { note?: ReactNode; actions?: ReactNode } | null => {
+    const orders = servicesForActions.data?.orders ?? [];
+    const sel = orders.find((o) => o.type === "s-election" && o.documentId === d.id);
+    if (sel) {
+      return {
+        note:
+          sel.editable && sel.editableUntil ? (
+            <p className="mt-1 text-xs text-amber-700">
+              Editable until {formatDateTime(sel.editableUntil)} — after that we delete the package
+              and the Social Security numbers. Download and keep a copy.
+            </p>
+          ) : sel.details.purgedAt ? (
+            <p className="mt-1 text-xs text-muted-foreground">
+              Deleted on {formatDateTime(sel.details.purgedAt)} as promised — the package and every
+              Social Security number are gone from our systems.
+            </p>
+          ) : undefined,
+        actions:
+          sel.status === "fulfilled" && sel.editable ? (
+            <Button size="sm" variant="outline" className="rounded-full" onClick={() => request("edit-s-election", sel.id)}>
+              Edit answers
+            </Button>
+          ) : undefined,
+      };
+    }
+    const filed = orders.find(
+      (o) => o.type === "series" && o.status === "fulfilled" && !!o.details.seriesName && d.title.endsWith(o.details.seriesName),
+    );
+    if (filed) {
+      return {
+        actions: (
+          <Button size="sm" variant="outline" className="rounded-full" onClick={() => request("consent", filed.id)}>
+            <FileSignature className="mr-1.5 h-3.5 w-3.5" />
+            Consent &amp; Series Exhibit
+          </Button>
+        ),
+      };
+    }
+    return null;
+  };
+
   const outstanding = useMemo(() => {
     const items: string[] = [];
     if (oaGenerations.isSuccess && (oaGenerations.data?.generations?.length ?? 0) === 0) {
@@ -515,12 +570,13 @@ export default function PortalDashboard() {
         <div className="overflow-hidden rounded-2xl border border-border bg-card">
           <div className="flex items-center gap-2.5 border-b border-border bg-secondary/40 px-5 py-4">
             <FileText className="h-4 w-4 text-trust" />
-            <h2 className="font-display text-lg">Your formation package</h2>
+            <h2 className="font-display text-lg">Your documents</h2>
           </div>
           <DocList
             docs={packageDocs}
             empty="Your documents will appear here once your formation is prepared."
             own={ownAgreements}
+            extra={docExtras}
             deleting={deleteGeneration.isPending}
             onDelete={(generationId, isCurrent) => {
               const ok = window.confirm(
@@ -544,6 +600,8 @@ export default function PortalDashboard() {
           />
         </div>
       </div>
+
+      <OrdersInProgress company={company} external={external} onExternalHandled={() => setExternal(null)} />
 
       {otherDocs.length > 0 ? (
         <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card">

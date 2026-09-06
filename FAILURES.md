@@ -2667,6 +2667,20 @@ The hermetic discipline got attached to the TEST SUITE instead of to the credent
 
 The verification was redone hermetically (E2E_OFFLINE=1, its own DEV_PG_DIR) and proved the footer from the artifact. The orphan's deletion awaits Adam's say-so, per the P48 protocol. The durable rule, stated here where the next one-off will find it: NO `bun -e` that imports server code runs without `E2E_OFFLINE=1` and its own `DEV_PG_DIR` — the suite is not the only process that can reach production through `.env`.
 
+## P56 — Unfulfilled orders placed where the data lived, at the bottom of the page
+
+### THE FAILURE
+
+Adam, 6 Sep 2026, over a screenshot of the portal with an arrow drawn from the S election and EIN rows — at the foot of the Order services card, beneath six purchase tiles — up to the top of the page: "Why didn't you do this?" And when I misread that as a complaint about the toast: "The idea is to keep any ordered but unfulfilled services where I indicated. Where they are presently placed is too far down the page and could get missed." The rows have sat at the bottom of the services card since it was built in August, because that card owns the services query and its list of orders was appended after its tiles. The night before, I had added red outlines and a toast to those same rows — and left them at the bottom. My first reading of his question was wrong as well: I wrote the entry above about failing to surface the state at all, when what he had drawn was a placement.
+
+### WHY IT HAPPENED
+
+The rows went where the data was fetched. The services card fetches the orders, so the orders rendered inside the services card, under the things that card was built to sell; that is placement by component ownership, and the user's-seat rule names it exactly — "not where the existing code made it convenient to add." When the outlines were added the next night, the placement was never reopened, because the request was read as "decorate these rows" and decorating is done where the rows are. Then, shown the arrow, I read the screenshot for the feature I had just shipped rather than for what the arrow pointed at — the same attention filter as reading a document for the defect I came to fix — and answered a question he had not asked.
+
+### FIXED BY
+
+Unfulfilled orders move to where he pointed: a section at the top of the portal, above the agreement row, carrying the same rows, actions, and outlines; fulfilled orders stay below as downloads.
+
 ## Process — the ones that let the substantive ones through
 
 **M1 · Verify the proposition you set out to verify, not the one underneath.** A

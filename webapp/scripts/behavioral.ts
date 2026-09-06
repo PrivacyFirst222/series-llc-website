@@ -611,6 +611,18 @@ async function main(): Promise<void> {
       const redBorders = await page.locator('[data-needs-action="true"]').evaluateAll((els) => els.map((e) => getComputedStyle(e).borderTopWidth));
       expect(redBorders.every((w) => w === "2px"), "actions: every outlined element carries the 2px destructive border", redBorders);
 
+      // Placement (Adam, 6 Sep 2026): unfulfilled orders sit near the top,
+      // beneath the documents and ABOVE the agreement card — not at the foot
+      // of Order services, which lists nothing but its purchase tiles.
+      const order = await page.evaluate(() => {
+        const heads = [...document.querySelectorAll("main h2")].map((h) => h.textContent?.trim() ?? "");
+        const services = [...document.querySelectorAll("main h2")].find((h) => h.textContent?.trim() === "Order services")?.closest("div.rounded-2xl");
+        return { heads, serviceRows: services ? services.querySelectorAll("ul li").length : -1 };
+      });
+      const idx = (t: string) => order.heads.indexOf(t);
+      expect(idx("Orders in progress") > idx("Your documents") && idx("Orders in progress") < idx("Operating agreement"), "actions: orders in progress sit beneath the documents and above the agreement", order.heads);
+      expect(order.serviceRows === 0, "actions: Order services lists no orders beneath its tiles", order.serviceRows);
+
       // The X is the only way out: the toast is still there after 6 s, and gone after the click.
       await page.waitForTimeout(6000);
       expect((await page.locator('[data-testid="action-needed-list"]').count()) === 1, "actions: the toast does not time out on its own");

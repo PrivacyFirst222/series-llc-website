@@ -4,6 +4,18 @@
 // the same rule as the card's own rows (Adam, 5 Sep 2026).
 import type { ServiceOrder } from "./ServicesCard";
 
+export const STATUS_LABEL: Record<ServiceOrder["status"], string> = {
+  pending_payment: "Awaiting payment",
+  awaiting_info: "Action needed",
+  in_progress: "In progress",
+  fulfilled: "Complete",
+  cancelled: "Cancelled",
+};
+
+export function money(cents: number): string {
+  return `$${(cents / 100).toFixed(0)}`;
+}
+
 export function summaryOf(o: ServiceOrder): string {
   if (o.type === "series") return `Protected Series Designation — ${o.details.seriesName ?? o.llc_name}`;
   if (o.type === "s-election") return `S Corporation Election Package — ${o.llc_name}`;
