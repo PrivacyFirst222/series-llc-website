@@ -23,6 +23,7 @@ interface SElectionShareholderView {
   joint?: "" | "tbe" | "jtwros";
   name2?: string;
   ssnLast4Second?: string;
+  address2?: string;
 }
 
 export interface AdminServiceOrder {
@@ -223,7 +224,9 @@ export function ServiceFulfillDialog({
                 {(detailQuery.data?.details.shareholders ?? []).map((sh, i) => (
                   <div key={i} className="rounded-md border border-border px-3 py-2">
                     <div className="font-medium">{jointDisplayName(sh.name, sh.name2, sh.joint)} — {sh.percentage}%</div>
-                    <div className="text-xs text-muted-foreground">{sh.address}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {sh.address2 && sh.address2 !== sh.address ? `${sh.name}: ${sh.address} · ${sh.name2}: ${sh.address2}` : sh.address}
+                    </div>
                     <div className="text-xs">
                       SSN:{" "}
                       <span className="font-mono-feature">

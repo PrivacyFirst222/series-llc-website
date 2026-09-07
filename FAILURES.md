@@ -2757,6 +2757,26 @@ I built the hook around the failure I had just had, not around the rule's purpos
 
 The hook demands a walk-through in the proposal: for each person the change touches, what they open, what they tap, what they type, what they see, and what result they reasonably expect — and blocks every edit until the proposal Adam approved contains it.
 
+## P62 — A joint-owner row laid out in the order I coded it, with one address because my sample had one
+
+### THE FAILURE
+
+Adam, 7 Sep 2026, from the iPad, with the joint row boxed in red: "This whole thing is messy and confusing. You need to place a clear demarcation between owners. The subtle lines for each owner's card isn't enough. Also the joint ownership indication should be to the right of the name, not below it. Joint owners may not share the same address. Your logic and ability to understand how people use this in the real world is really poor."
+
+What I shipped, the evening before, to production: on the S election form each owner card is a thin grey border with no heading, so two owners read as one run of boxes; the "how the interest is held" dropdown sits on its own line under the owner's name, so a joint row reads name, then kind, then a second name floating to the right of the kind, then two SSN boxes wrapped onto two lines; and a joint row has one address box, so two co-owners who live apart cannot both be listed with their own address — which the IRS instructions I quoted that same hour require: "Enter the name and address of each shareholder." I wrote a USER WALK for this feature that said "On row 2 chooses 'Jointly with spouse, tenants by the entirety', picks Bob Jones, then picks Susan Jones on the second line, types 51, and both SSNs" and passed it. I sent Adam a screenshot of the built PDF and none of the form with a joint row on it.
+
+### WHY IT HAPPENED
+
+The layout is the order I added fields to the code. The joint dropdown went under the name because that is where the two-column grid had an empty cell after I inserted it; the co-owner went beside the dropdown because that was the other cell; the second SSN went after the first because that is where the SSN box already was. At no point did I draw the card and ask what a person reads first. I could have — the rule says design from the user's seat — but the walk I wrote satisfied the hook while describing only which fields get filled, not what the screen looks like when they are filled, and a walk that names fields without picturing them passes for any arrangement of those fields. The hook can only demand that a walk exists; I supplied the minimum that exists.
+
+One address per row came from Adam's sample, where the Smiths share 123 Maple Lane. One example became the rule because it was the only example in front of me, and because the row object already had one address field, so keeping one was free and adding a second was work. I know that spouses can live apart and that joint tenants need not be spouses at all; that knowledge did not surface because I was extending a data structure, not imagining two people filling in the form.
+
+I looked at a rendered joint row exactly never before shipping. The walk's screenshots are taken before the joint row is added, and I chose to show Adam the PDF — the part I was proud of — instead of the form he would use. The check that would have caught this is the cheapest one available: open the form with a joint row and look at it. I skipped it because the automated walk passed, and the automated walk checks that boxes exist, not that a person can tell whose they are.
+
+### FIXED BY
+
+Proposed in the same message: a clear heading and separation per owner; the "how held" choice to the right of the owner's name on the same line; the co-owner as a labeled block of their own with their own name, address (starting as the first owner's, changeable), and SSN; and column J of the form carrying each co-owner's address when they differ. The proposal's walk describes what the screen shows at each step, and I open the form with a joint row on it and send the picture before I report.
+
 ## Process — the ones that let the substantive ones through
 
 **M1 · Verify the proposition you set out to verify, not the one underneath.** A

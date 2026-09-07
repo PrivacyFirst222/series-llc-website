@@ -446,7 +446,7 @@ export interface SElectionStoredDetails {
   filingDeadline?: string;
   documentId?: string;
   purgedAt?: string;
-  shareholders?: { name: string; address: string; percentage: number; dateAcquired: string; ssnLast4: string; joint?: JointKind; name2?: string; ssnLast4Second?: string }[];
+  shareholders?: { name: string; address: string; percentage: number; dateAcquired: string; ssnLast4: string; joint?: JointKind; name2?: string; ssnLast4Second?: string; address2?: string }[];
 }
 
 /** The edit/download window for one order. Drivers differ: Neon returns ISO
@@ -664,6 +664,9 @@ export const sElectionDetailsSchema = z
           // and Social Security number ride on the same row.
           joint: z.enum(["", "tbe", "jtwros"]).optional().default(""),
           name2: z.string().max(200).optional().default(""),
+          // The co-owner's own address when they live apart (Adam, 7 Sep
+          // 2026); blank means the same address as the first owner.
+          address2: z.string().max(300).optional().default(""),
           ssn2: z
             .string()
             .optional()
@@ -737,6 +740,7 @@ export async function postSElectionPackage(args: {
         dateAcquired: sh.dateAcquired,
         joint: sh.joint,
         name2: sh.name2,
+        address2: sh.address2,
         ...unpackSsns(ssns[i]),
       })),
     });
@@ -1990,6 +1994,7 @@ app.post("/portal/services/:id/s-election-details", async (c) => {
         ssnLast4: parts.ssn.slice(-4),
         joint: s.joint,
         name2: isJoint(s.joint) ? s.name2 : "",
+        address2: isJoint(s.joint) && s.address2.trim() && s.address2.trim() !== s.address.trim() ? s.address2.trim() : "",
         ssnLast4Second: parts.ssn2 ? parts.ssn2.slice(-4) : "",
       };
     }),

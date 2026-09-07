@@ -17,7 +17,7 @@ import { JOINT_KINDS, isJoint, type JointKind } from "@/lib/jointOwner";
 import { ELIGIBILITY_ACKNOWLEDGMENT, evaluate2553Timing, type TimingResult } from "@/lib/form2553Timing";
 
 
-const EMPTY_ROW: ShareholderRow = { name: "", address: "", percentage: "", dateAcquired: "", atFormation: true, ssn: "", joint: "", name2: "", ssn2: "" };
+const EMPTY_ROW: ShareholderRow = { name: "", address: "", percentage: "", dateAcquired: "", atFormation: true, ssn: "", joint: "", name2: "", ssn2: "", address2: "", sameAddress: true };
 
 
 /** The certification a client gives before we build the form. They sign the
@@ -122,6 +122,9 @@ export function SElectionDetailsForm({
           name2: s.name2 ?? "",
           ssn2: "",
           ssnLast4Second: s.ssnLast4Second,
+          address2: s.address2 ?? "",
+          sameAddress: !s.address2,
+          verified2: true,
         }))
       : [{ ...EMPTY_ROW }]),
   );
@@ -184,6 +187,7 @@ export function SElectionDetailsForm({
           joint: r.joint ?? "",
           name2: isJoint(r.joint) ? (r.name2 ?? "") : "",
           ssn2: isJoint(r.joint) ? (r.ssn2 ?? "") : "",
+          address2: isJoint(r.joint) && r.sameAddress === false ? (r.address2 ?? "") : "",
         })),
       }),
     onSuccess: onDone,
@@ -210,6 +214,7 @@ export function SElectionDetailsForm({
     if (!r.name.trim()) stillNeeded.push(`${who}: choose or enter the name`);
     if (isJoint(r.joint) && !(r.name2 ?? "").trim()) stillNeeded.push(`${who}: choose or enter the co-owner's name`);
     if (!r.address.trim()) stillNeeded.push(`${who}: enter the home address`);
+    if (isJoint(r.joint) && r.sameAddress === false && !(r.address2 ?? "").trim()) stillNeeded.push(`${who}: enter the co-owner's home address, or tick "Same address"`);
     if (!(Number(r.percentage) > 0)) stillNeeded.push(`${who}: enter the ownership percentage`);
     if (r.atFormation === false && (r.dateAcquired.trim() === "" || typedDateToIso(r.dateAcquired) === null)) stillNeeded.push(`${who}: enter the date acquired as MM/DD/YYYY, or tick "Acquired at formation"`);
     if (!r.ssn && !r.ssnLast4) stillNeeded.push(`${who}: enter the SSN${r.name.trim() ? ` for ${r.name.trim()}` : ""}`);
@@ -402,28 +407,55 @@ export function SElectionDetailsForm({
           <span className="text-xs leading-relaxed">{ELIGIBILITY_ACKNOWLEDGMENT}</span>
         </label>
         <p className="text-sm font-medium">Owners (every owner must be listed and will sign the form)</p>
-        {rows.map((r, i) => (
-          <div key={i} className="space-y-2 rounded-lg border border-border p-3">
-            <div className="grid gap-2 sm:grid-cols-2">
-              {/* Owners are usually the members on the formation record —
-                  choosing one fills in the address we already verified. */}
+        {rows.map((r, i) => {
+          const ownerLabel = r.name.trim() || `Owner ${i + 1}`;
+          const coLabel = (r.name2 ?? "").trim() || "co-owner";
+          const ssnBox = (who: "first" | "second") => (
+            <Input
+              type="password"
+              inputMode="numeric"
+              placeholder={
+                who === "first"
+                  ? r.ssnLast4 ? `SSN on file •••-••-${r.ssnLast4}` : isJoint(r.joint) ? `SSN — ${ownerLabel}` : "SSN •••-••-••••"
+                  : r.ssnLast4Second ? `SSN on file •••-••-${r.ssnLast4Second}` : `SSN — ${coLabel}`
+              }
+              title={
+                who === "first"
+                  ? r.ssnLast4 ? "Leave blank to keep the number already on file" : `${ownerLabel}'s Social Security number`
+                  : r.ssnLast4Second ? "Leave blank to keep the number already on file" : `${coLabel}'s Social Security number`
+              }
+              aria-label={who === "first" ? (isJoint(r.joint) ? `SSN — ${ownerLabel}` : "SSN") : `SSN — ${coLabel}`}
+              value={who === "first" ? r.ssn : (r.ssn2 ?? "")}
+              onChange={(e) => patchRow(i, who === "first" ? { ssn: e.target.value } : { ssn2: e.target.value })}
+              className="w-48"
+              autoComplete="off"
+            />
+          );
+          const nameChooser = (who: "first" | "second") => {
+            const current = who === "first" ? r.name : (r.name2 ?? "");
+            const others = who === "first" ? members : members.filter((m) => m.name !== r.name);
+            return (
               <div className="space-y-1.5">
                 <Select
-                  value={members.some((m) => m.name === r.name) ? r.name : r.name === "" ? "" : OTHER}
+                  value={members.some((m) => m.name === current) ? current : current === "" ? "" : OTHER}
                   onValueChange={(v) => {
-                    if (v === OTHER) {
-                      patchRow(i, { name: " ", address: r.address, verified: false, ssnLast4: undefined });
-                      return;
+                    if (who === "first") {
+                      if (v === OTHER) {
+                        patchRow(i, { name: " ", verified: false, ssnLast4: undefined });
+                        return;
+                      }
+                      const m = members.find((mm) => mm.name === v);
+                      patchRow(i, { name: v, address: m?.address ?? r.address, verified: Boolean(m?.address), ssnLast4: undefined });
+                    } else {
+                      patchRow(i, { name2: v === OTHER ? " " : v, ssnLast4Second: undefined });
                     }
-                    const m = members.find((mm) => mm.name === v);
-                    patchRow(i, { name: v, address: m?.address ?? r.address, verified: Boolean(m?.address), ssnLast4: undefined });
                   }}
                 >
-                  <SelectTrigger aria-label="Owner">
-                    <SelectValue placeholder="Select an owner…" />
+                  <SelectTrigger aria-label={who === "first" ? "Owner" : "Co-owner"}>
+                    <SelectValue placeholder={who === "first" ? "Select an owner…" : "Select the co-owner…"} />
                   </SelectTrigger>
                   <SelectContent>
-                    {members.map((m) => (
+                    {others.map((m) => (
                       <SelectItem key={m.name} value={m.name}>
                         {m.name}
                       </SelectItem>
@@ -431,29 +463,34 @@ export function SElectionDetailsForm({
                     <SelectItem value={OTHER}>Other — enter a name</SelectItem>
                   </SelectContent>
                 </Select>
-                {r.name !== "" && !members.some((m) => m.name === r.name) ? (
+                {current !== "" && !members.some((m) => m.name === current) ? (
                   <Input
-                    placeholder="Owner's full legal name"
-                    value={r.name.trim() === "" ? "" : r.name}
-                    onChange={(e) => patchRow(i, { name: e.target.value, ssnLast4: undefined })}
+                    placeholder={who === "first" ? "Owner's full legal name" : "Co-owner's full legal name"}
+                    aria-label={who === "first" ? "Owner's full legal name" : "Co-owner's full legal name"}
+                    value={current.trim() === "" ? "" : current}
+                    onChange={(e) => patchRow(i, who === "first" ? { name: e.target.value, ssnLast4: undefined } : { name2: e.target.value, ssnLast4Second: undefined })}
                     autoComplete="off"
                   />
                 ) : null}
               </div>
+            );
+          };
+          const addressBox = (who: "first" | "second") => {
+            const value = who === "first" ? r.address : (r.address2 ?? "");
+            const verified = who === "first" ? r.verified : r.verified2;
+            return (
               <div className="space-y-1">
                 <AddressAutocomplete
-                  value={r.address}
-                  placeholder="Home address"
-                  onChangeText={(text) => patchRow(i, { address: text, verified: false })}
-                  onSelect={(s) =>
-                    patchRow(i, {
-                      address: `${s.address1}, ${s.city} ${s.state} ${s.zip}`,
-                      verified: true,
-                    })
-                  }
+                  value={value}
+                  placeholder={who === "first" ? "Home address" : "Co-owner's home address"}
+                  onChangeText={(text) => patchRow(i, who === "first" ? { address: text, verified: false } : { address2: text, verified2: false })}
+                  onSelect={(sug) => {
+                    const full = `${sug.address1}, ${sug.city} ${sug.state} ${sug.zip}`;
+                    patchRow(i, who === "first" ? { address: full, verified: true } : { address2: full, verified2: true });
+                  }}
                 />
-                {r.address ? (
-                  r.verified ? (
+                {value ? (
+                  verified ? (
                     <p className="flex items-center gap-1 text-xs text-trust">
                       <CheckCircle2 className="h-3 w-3" /> Verified address
                     </p>
@@ -464,125 +501,111 @@ export function SElectionDetailsForm({
                   )
                 ) : null}
               </div>
-            </div>
-            {/* Jointly held (Adam, 6 Sep 2026): the co-owner's name and number
-                ride on the same row; the form names both in column J and
-                lists both numbers in column M. */}
-            <div className="grid gap-2 sm:grid-cols-2">
-              <Select
-                value={r.joint ?? ""}
-                onValueChange={(v) => patchRow(i, { joint: v as JointKind, ...(v === "" ? { name2: "", ssn2: "" } : {}) })}
-              >
-                <SelectTrigger aria-label="How the interest is held">
-                  <SelectValue placeholder="Owned individually" />
-                </SelectTrigger>
-                <SelectContent>
-                  {JOINT_KINDS.map((k) => (
-                    <SelectItem key={k.value || "solo"} value={k.value}>
-                      {k.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {isJoint(r.joint) ? (
-                <div className="space-y-1.5">
-                  <Select
-                    value={members.some((m) => m.name === r.name2) ? (r.name2 ?? "") : (r.name2 ?? "") === "" ? "" : OTHER}
-                    onValueChange={(v) => patchRow(i, { name2: v === OTHER ? " " : v, ssnLast4Second: undefined })}
+            );
+          };
+          return (
+            /* One clearly headed card per owner (Adam, 7 Sep 2026: "place a
+               clear demarcation between owners"). The joint choice sits to
+               the right of the name; a co-owner gets their own block with
+               their own name, address and number. */
+            <div key={i} className="overflow-hidden rounded-xl border-2 border-foreground/60" data-testid="owner-card">
+              <div className="flex items-center justify-between bg-foreground px-3 py-1.5 text-background">
+                <span className="text-xs font-semibold uppercase tracking-wider" data-testid="owner-heading">Owner {i + 1}</span>
+                {rows.length > 1 ? (
+                  <button
+                    type="button"
+                    aria-label="Remove owner"
+                    onClick={() => setRows((prev) => prev.filter((_, ri) => ri !== i))}
+                    className="flex items-center gap-1 text-xs text-background/80 hover:text-background"
                   >
-                    <SelectTrigger aria-label="Co-owner">
-                      <SelectValue placeholder="Select the co-owner…" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {members.filter((m) => m.name !== r.name).map((m) => (
-                        <SelectItem key={m.name} value={m.name}>
-                          {m.name}
-                        </SelectItem>
-                      ))}
-                      <SelectItem value={OTHER}>Other — enter a name</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {(r.name2 ?? "") !== "" && !members.some((m) => m.name === r.name2) ? (
+                    <Trash2 className="h-3.5 w-3.5" /> Remove
+                  </button>
+                ) : null}
+              </div>
+              <div className="space-y-2 p-3">
+                <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]" data-testid="owner-name-line">
+                  {nameChooser("first")}
+                  <div className="flex items-center gap-2">
+                    <span className="whitespace-nowrap text-xs text-muted-foreground">How held</span>
+                    <Select
+                      value={r.joint ?? ""}
+                      onValueChange={(v) => patchRow(i, { joint: v as JointKind, ...(v === "" ? { name2: "", ssn2: "", address2: "", sameAddress: true } : {}) })}
+                    >
+                      <SelectTrigger aria-label="How the interest is held" className="w-full sm:w-72">
+                        <SelectValue placeholder="Owned individually" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {JOINT_KINDS.map((k) => (
+                          <SelectItem key={k.value || "solo"} value={k.value}>
+                            {k.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                {addressBox("first")}
+                {isJoint(r.joint) ? (
+                  <>
+                    <div className="flex flex-wrap items-center gap-2">{ssnBox("first")}</div>
+                    <div className="ml-2 space-y-2 border-l-4 border-trust/60 pl-3" data-testid="co-owner-block">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-trust">Co-owner</p>
+                      {nameChooser("second")}
+                      <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                        <input
+                          type="checkbox"
+                          aria-label="Same address"
+                          checked={r.sameAddress !== false}
+                          onChange={(e) => patchRow(i, { sameAddress: e.target.checked, ...(e.target.checked ? { address2: "", verified2: false } : {}) })}
+                          className="h-4 w-4 accent-trust"
+                        />
+                        Same address as {ownerLabel}
+                      </label>
+                      {r.sameAddress === false ? addressBox("second") : null}
+                      <div className="flex flex-wrap items-center gap-2">{ssnBox("second")}</div>
+                    </div>
+                  </>
+                ) : null}
+                <div className="flex flex-wrap items-center gap-2 border-t border-border pt-2">
+                  <span className="text-xs text-muted-foreground">{isJoint(r.joint) ? "Combined ownership" : "Ownership"}</span>
+                  <div className="flex items-center gap-1">
                     <Input
-                      placeholder="Co-owner's full legal name"
-                      aria-label="Co-owner's full legal name"
-                      value={(r.name2 ?? "").trim() === "" ? "" : r.name2}
-                      onChange={(e) => patchRow(i, { name2: e.target.value, ssnLast4Second: undefined })}
+                      type="number" min={0} max={100} step="0.01" placeholder="%"
+                      aria-label={isJoint(r.joint) ? "Combined ownership percentage" : "Ownership percentage"}
+                      value={r.percentage}
+                      onChange={(e) => patchRow(i, { percentage: e.target.value })}
+                      className="w-24"
+                    />
+                    <span className="text-sm text-muted-foreground">%</span>
+                  </div>
+                  <label className="flex items-center gap-1.5 whitespace-nowrap text-xs text-muted-foreground">
+                    <input
+                      type="checkbox"
+                      aria-label="Acquired at formation"
+                      checked={r.atFormation !== false}
+                      onChange={(e) => patchRow(i, { atFormation: e.target.checked })}
+                      className="h-4 w-4 accent-trust"
+                    />
+                    Acquired at formation
+                  </label>
+                  {r.atFormation === false ? (
+                    <Input
+                      title="Date the interest was acquired"
+                      aria-label="Date the interest was acquired"
+                      placeholder="Acquired MM/DD/YYYY"
+                      inputMode="numeric"
                       autoComplete="off"
+                      value={r.dateAcquired}
+                      onChange={(e) => patchRow(i, { dateAcquired: formatTypedDate(e.target.value) })}
+                      className="w-44"
                     />
                   ) : null}
+                  {!isJoint(r.joint) ? ssnBox("first") : null}
                 </div>
-              ) : null}
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="flex items-center gap-1">
-                <Input
-                  type="number" min={0} max={100} step="0.01" placeholder="%"
-                  value={r.percentage}
-                  onChange={(e) => patchRow(i, { percentage: e.target.value })}
-                  className="w-24"
-                />
-                <span className="text-sm text-muted-foreground">%</span>
               </div>
-              <label className="flex items-center gap-1.5 whitespace-nowrap text-xs text-muted-foreground">
-                <input
-                  type="checkbox"
-                  aria-label="Acquired at formation"
-                  checked={r.atFormation !== false}
-                  onChange={(e) => patchRow(i, { atFormation: e.target.checked })}
-                  className="h-4 w-4 accent-trust"
-                />
-                Acquired at formation
-              </label>
-              {r.atFormation === false ? (
-                <Input
-                  title="Date the interest was acquired"
-                  aria-label="Date the interest was acquired"
-                  placeholder="Acquired MM/DD/YYYY"
-                  inputMode="numeric"
-                  autoComplete="off"
-                  value={r.dateAcquired}
-                  onChange={(e) => patchRow(i, { dateAcquired: formatTypedDate(e.target.value) })}
-                  className="w-44"
-                />
-              ) : null}
-              <Input
-                type="password"
-                inputMode="numeric"
-                placeholder={r.ssnLast4 ? `SSN on file •••-••-${r.ssnLast4}` : isJoint(r.joint) && r.name.trim() ? `SSN — ${r.name.trim()}` : "SSN •••-••-••••"}
-                title={r.ssnLast4 ? "Leave blank to keep the number already on file" : isJoint(r.joint) && r.name.trim() ? `${r.name.trim()}'s Social Security number` : "Social Security number"}
-                aria-label={isJoint(r.joint) && r.name.trim() ? `SSN — ${r.name.trim()}` : "SSN"}
-                value={r.ssn}
-                onChange={(e) => patchRow(i, { ssn: e.target.value })}
-                className="w-44"
-                autoComplete="off"
-              />
-              {isJoint(r.joint) ? (
-                <Input
-                  type="password"
-                  inputMode="numeric"
-                  placeholder={r.ssnLast4Second ? `SSN on file •••-••-${r.ssnLast4Second}` : `SSN — ${(r.name2 ?? "").trim() || "co-owner"}`}
-                  title={r.ssnLast4Second ? "Leave blank to keep the number already on file" : `${(r.name2 ?? "").trim() || "The co-owner"}'s Social Security number`}
-                  aria-label={`SSN — ${(r.name2 ?? "").trim() || "co-owner"}`}
-                  value={r.ssn2 ?? ""}
-                  onChange={(e) => patchRow(i, { ssn2: e.target.value })}
-                  className="w-44"
-                  autoComplete="off"
-                />
-              ) : null}
-              {rows.length > 1 ? (
-                <button
-                  type="button"
-                  aria-label="Remove owner"
-                  onClick={() => setRows((prev) => prev.filter((_, ri) => ri !== i))}
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              ) : null}
             </div>
-          </div>
-        ))}
+          );
+        })}
         <div className="flex items-center justify-between">
           {rows.length < 7 ? (
             <Button type="button" size="sm" variant="outline" className="rounded-full" onClick={() => setRows((prev) => [...prev, { ...EMPTY_ROW }])}>

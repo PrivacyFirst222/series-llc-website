@@ -100996,6 +100996,17 @@ function jointDisplayName(name, name2, joint) {
   const suffix = JOINT_KINDS.find((k) => k.value === joint)?.suffix ?? "";
   return `${name} and ${name2 ?? ""} ${suffix}`.replace(/\s+/g, " ").trim();
 }
+function columnJText(sh) {
+  const names = jointDisplayName(sh.name, sh.name2, sh.joint);
+  const second = (sh.address2 ?? "").trim();
+  if (isJoint(sh.joint) && second && second !== sh.address.trim()) {
+    return `${names}
+${sh.name}: ${sh.address}
+${sh.name2 ?? ""}: ${second}`;
+  }
+  return `${names}
+${sh.address}`;
+}
 var fmtSsn = (ssn, recordCopy) => recordCopy ? `XXX-XX-${ssn.slice(-4)}` : `${ssn.slice(0, 3)}-${ssn.slice(3, 5)}-${ssn.slice(5)}`;
 function ssnColumnText(ssn, ssn2, joint, recordCopy = false) {
   const first = fmtSsn(ssn, recordCopy);
@@ -101424,8 +101435,7 @@ async function fillForm2553(d2) {
     const base = i * 7;
     const fieldNum = (col) => String(ROW_FIELDS[col] + base).padStart(2, "0");
     const row = `${P2}.Table_Part1[0].Row${i + 1}[0]`;
-    setText(`${row}.f2_${fieldNum(0)}[0]`, `${jointDisplayName(sh.name, sh.name2, sh.joint)}
-${sh.address}`);
+    setText(`${row}.f2_${fieldNum(0)}[0]`, columnJText(sh));
     setText(`${row}.f2_${fieldNum(3)}[0]`, `${sh.percentage}%`);
     setText(`${row}.f2_${fieldNum(4)}[0]`, fmtDate(sh.dateAcquired));
     const mField = `${row}.f2_${fieldNum(5)}[0]`;
@@ -106254,6 +106264,9 @@ var sElectionDetailsSchema = external_exports.object({
       // and Social Security number ride on the same row.
       joint: external_exports.enum(["", "tbe", "jtwros"]).optional().default(""),
       name2: external_exports.string().max(200).optional().default(""),
+      // The co-owner's own address when they live apart (Adam, 7 Sep
+      // 2026); blank means the same address as the first owner.
+      address2: external_exports.string().max(300).optional().default(""),
       ssn2: external_exports.string().optional().default("").transform((s) => s.replace(/[\s-]/g, "")).refine((s) => s === "" || /^\d{9}$/.test(s), "Each co-owner's SSN must be 9 digits.").refine((s) => s === "" || !/^(000|666|9\d\d)/.test(s), "That is not a valid Social Security number \u2014 check the first three digits.")
     }).refine((sh) => !isJoint(sh.joint) || sh.name2.trim() !== "", { message: "Enter the co-owner's name on each jointly held row." })
   ).min(1, "At least one owner is required.").max(7, "The IRS form holds 7 owners \u2014 contact us for more."),
@@ -106300,6 +106313,7 @@ async function postSElectionPackage(args) {
         dateAcquired: sh.dateAcquired,
         joint: sh.joint,
         name2: sh.name2,
+        address2: sh.address2,
         ...unpackSsns(ssns[i])
       }))
     });
@@ -107348,6 +107362,7 @@ function registerPortalRoutes(app2) {
           ssnLast4: parts.ssn.slice(-4),
           joint: s.joint,
           name2: isJoint(s.joint) ? s.name2 : "",
+          address2: isJoint(s.joint) && s.address2.trim() && s.address2.trim() !== s.address.trim() ? s.address2.trim() : "",
           ssnLast4Second: parts.ssn2 ? parts.ssn2.slice(-4) : ""
         };
       })

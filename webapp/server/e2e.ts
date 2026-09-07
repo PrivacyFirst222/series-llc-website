@@ -1537,6 +1537,11 @@ if (mint.status === 200) {
     check("a jointly held row with both SSNs is accepted and built", jointOk.status === 200 && Boolean(jointOk.body?.data?.documentId), jointOk.body);
     const jointStored = await api(`/api/admin/services/${sId}`, { cookies: adminS.cookie });
     const sh0 = jointStored.body?.data?.details?.shareholders?.[0];
+    check("a shared address is stored once", sh0?.address2 === "", sh0);
+    const apart = await api(`/api/portal/services/${sId}/s-election-details`, { method: "POST", cookies: mPw.cookie, body: JSON.stringify({ ...okDetails, shareholders: [{ ...jointRow, ssn: "", ssn2: "", address2: "456 Park Lake St, Orlando, FL 32803" }] }) });
+    check("co-owners living apart are accepted", apart.status === 200, apart.body);
+    const apartStored = await api(`/api/admin/services/${sId}`, { cookies: adminS.cookie });
+    check("the co-owner's own address is kept", apartStored.body?.data?.details?.shareholders?.[0]?.address2 === "456 Park Lake St, Orlando, FL 32803", apartStored.body?.data?.details?.shareholders?.[0]);
     check("the joint row keeps the co-owner's name and kind", sh0?.name2 === "Carlos Ortiz" && sh0?.joint === "tbe", sh0);
     check("the joint row keeps both last-fours", sh0?.ssnLast4 === "6789" && sh0?.ssnLast4Second === "7890", sh0);
     check("the office sees both numbers on the joint row", jointStored.body?.data?.ssns?.[0] === "123456789|234567890", jointStored.body?.data?.ssns);

@@ -702,16 +702,43 @@ async function main(): Promise<void> {
       // add the co-owner, and both SSN boxes appear with their names.
       await selDialog.locator("button").filter({ hasText: /Add owner/ }).click();
       await page.waitForTimeout(300);
-      const row2 = selDialog.locator("div.rounded-lg.border").filter({ has: page.locator('[aria-label="Owner"]') }).nth(1);
+      // Each owner is a clearly headed card (Adam, 7 Sep 2026: "place a clear
+      // demarcation between owners"), and "How held" sits on the name line.
+      const headings = await selDialog.locator('[data-testid="owner-heading"]').allInnerTexts();
+      expect(headings.length === 2 && /Owner 1/i.test(headings[0]) && /Owner 2/i.test(headings[1]), "S election: every owner card carries its own heading", headings);
+      const cards = selDialog.locator('[data-testid="owner-card"]');
+      const gap = await cards.evaluateAll((els) => els.length === 2 ? els[1].getBoundingClientRect().top - els[0].getBoundingClientRect().bottom : -1);
+      expect(gap >= 8, "S election: owner cards are separated by clear space", gap);
+      const row2 = cards.nth(1);
+      const nameBox = await row2.locator('[aria-label="Owner"]').boundingBox();
+      const heldBox = await row2.locator('[aria-label="How the interest is held"]').boundingBox();
+      expect(!!nameBox && !!heldBox && heldBox.x > nameBox.x + nameBox.width - 1 && Math.abs(heldBox.y - nameBox.y) < 8, "S election: 'How held' sits to the right of the name on the same line", { nameBox, heldBox });
       await choose(page, '[aria-label="How the interest is held"] >> nth=1', "tenants by the entirety");
       await page.waitForTimeout(300);
-      expect((await row2.locator('[aria-label="Co-owner"]').count()) === 1, "S election: a joint row reveals the co-owner choice");
+      expect((await row2.locator('[data-testid="co-owner-block"]').count()) === 1 && (await row2.locator('[aria-label="Co-owner"]').count()) === 1, "S election: a joint card grows a co-owner block with its own name choice");
       await choose(page, '[aria-label="Owner"] >> nth=1', "Other");
       await row2.locator('input[placeholder="Owner\'s full legal name"]').fill("Bob Jones");
       await choose(page, '[aria-label="Co-owner"]', "Other");
       await row2.locator('input[aria-label="Co-owner\'s full legal name"]').fill("Susan Jones");
       await page.waitForTimeout(300);
-      expect((await row2.locator('input[aria-label="SSN — Bob Jones"]').count()) === 1 && (await row2.locator('input[aria-label="SSN — Susan Jones"]').count()) === 1, "S election: a joint row has an SSN box for each co-owner, by name");
+      expect((await row2.locator('input[aria-label="SSN — Bob Jones"]').count()) === 1 && (await row2.locator('input[aria-label="SSN — Susan Jones"]').count()) === 1, "S election: a joint card has an SSN box for each co-owner, by name");
+      // Co-owners may live apart (Adam, 7 Sep 2026): "Same address" starts
+      // ticked; unticking it reveals the co-owner's own address box.
+      const same = row2.locator('input[aria-label="Same address"]');
+      expect(await same.isChecked(), "S election: the co-owner starts at the same address");
+      expect((await row2.locator('input[placeholder="Co-owner\'s home address"]').count()) === 0, "S election: no second address box while the address is shared");
+      await same.uncheck({ force: true });
+      await page.waitForTimeout(300);
+      expect((await row2.locator('input[placeholder="Co-owner\'s home address"]').count()) === 1, "S election: unticking Same address reveals the co-owner's own address box");
+      await row2.locator('input[placeholder="Home address"]').fill("123 N Hyer Ave, Orlando FL 32801");
+      await row2.locator('input[placeholder="Co-owner\'s home address"]').fill("456 Park Lake St, Orlando FL 32803");
+      await page.waitForTimeout(300);
+      await selDialog.locator('[data-testid="owner-heading"]').first().evaluate((el) => el.scrollIntoView({ block: "start" }));
+      await page.waitForTimeout(300);
+      await shot(page, "s-election-owner-cards");
+      await row2.locator('[data-testid="co-owner-block"]').evaluate((el) => el.scrollIntoView({ block: "end" }));
+      await page.waitForTimeout(300);
+      await shot(page, "s-election-joint-card");
       await selDialog.locator('input[placeholder="%"]').nth(0).fill("50");
       await selDialog.locator('input[placeholder="%"]').nth(1).fill("51");
       await page.waitForTimeout(300);

@@ -18,6 +18,7 @@ export interface StoredShareholder {
   joint?: JointKind;
   name2?: string;
   ssnLast4Second?: string;
+  address2?: string;
 }
 
 export interface ServiceOrder {
@@ -91,6 +92,11 @@ export interface ShareholderRow {
   name2?: string;
   ssn2?: string;
   ssnLast4Second?: string;
+  /** The co-owner's own address; "sameAddress" (the default) copies the
+   *  first owner's. */
+  address2?: string;
+  sameAddress?: boolean;
+  verified2?: boolean;
 }
 
 

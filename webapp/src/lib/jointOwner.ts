@@ -25,6 +25,19 @@ export function jointDisplayName(name: string, name2: string | undefined, joint:
   return `${name} and ${name2 ?? ""} ${suffix}`.replace(/\s+/g, " ").trim();
 }
 
+/** Column J: the name line over the address — or, when co-owners live apart
+ *  (Adam, 7 Sep 2026: "Joint owners may not share the same address"), each
+ *  co-owner's address on its own line under their name, as the IRS asks for
+ *  "the name and address of each shareholder". */
+export function columnJText(sh: { name: string; address: string; joint?: JointKind; name2?: string; address2?: string }): string {
+  const names = jointDisplayName(sh.name, sh.name2, sh.joint);
+  const second = (sh.address2 ?? "").trim();
+  if (isJoint(sh.joint) && second && second !== sh.address.trim()) {
+    return `${names}\n${sh.name}: ${sh.address}\n${sh.name2 ?? ""}: ${second}`;
+  }
+  return `${names}\n${sh.address}`;
+}
+
 const fmtSsn = (ssn: string, recordCopy: boolean): string =>
   recordCopy ? `XXX-XX-${ssn.slice(-4)}` : `${ssn.slice(0, 3)}-${ssn.slice(3, 5)}-${ssn.slice(5)}`;
 

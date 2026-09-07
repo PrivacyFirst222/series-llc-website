@@ -10,7 +10,7 @@
  *   Fax: 855-214-7520. There is no IRS filing fee.
  */
 import { form2553Deadline } from "../src/lib/form2553Timing";
-import { type JointKind, isJoint, jointDisplayName, ssnColumnText } from "../src/lib/jointOwner";
+import { type JointKind, columnJText, isJoint, jointDisplayName, ssnColumnText } from "../src/lib/jointOwner";
 import { PDFDocument, StandardFonts, degrees, rgb } from "@cantoo/pdf-lib";
 import f2553Base64 from "./assets/f2553-b64";
 import { renderMarkdownPdf } from "./pdf-render";
@@ -30,6 +30,8 @@ export interface SElectionShareholder {
   joint?: JointKind;
   name2?: string;
   ssn2?: string;
+  /** The co-owner's own address when they live apart. */
+  address2?: string;
 }
 
 export interface SElectionDetails {
@@ -131,7 +133,7 @@ async function fillForm2553(d: SElectionDetails): Promise<PDFDocument> {
     const base = i * 7;
     const fieldNum = (col: number) => String(ROW_FIELDS[col] + base).padStart(2, "0");
     const row = `${P2}.Table_Part1[0].Row${i + 1}[0]`;
-    setText(`${row}.f2_${fieldNum(0)}[0]`, `${jointDisplayName(sh.name, sh.name2, sh.joint)}\n${sh.address}`); // J
+    setText(`${row}.f2_${fieldNum(0)}[0]`, columnJText(sh)); // J
     // K signature + date stay blank — each shareholder signs by hand
     setText(`${row}.f2_${fieldNum(3)}[0]`, `${sh.percentage}%`); // L — percentage of ownership
     setText(`${row}.f2_${fieldNum(4)}[0]`, fmtDate(sh.dateAcquired)); // L — date(s) acquired

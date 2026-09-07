@@ -349,8 +349,11 @@ if (typeof console !== "undefined") {
 // Jointly held interests on Form 2553 (Adam, 6 Sep 2026): both names with the
 // joint kind in column J, both Social Security numbers in column M.
 {
-  const { jointDisplayName, ssnColumnText, packSsns, unpackSsns } = await import("../../../lib/jointOwner");
+  const { jointDisplayName, ssnColumnText, packSsns, unpackSsns, columnJText } = await import("../../../lib/jointOwner");
   const cases: [string, string, string][] = [
+    [columnJText({ name: "John Jones", address: "305 N Lakeland Ave, Orlando, FL 32805" }), "John Jones\n305 N Lakeland Ave, Orlando, FL 32805", "column J: an individual's name over the address"],
+    [columnJText({ name: "Bob Jones", address: "123 N Hyer Ave, Orlando, FL 32801", joint: "tbe", name2: "Mary Jones", address2: "123 N Hyer Ave, Orlando, FL 32801" }), "Bob Jones and Mary Jones as Tenants by the Entirety\n123 N Hyer Ave, Orlando, FL 32801", "column J: co-owners at one address share the line"],
+    [columnJText({ name: "Bob Jones", address: "123 N Hyer Ave, Orlando, FL 32801", joint: "tbe", name2: "Mary Jones", address2: "456 Park Lake St, Orlando, FL 32803" }), "Bob Jones and Mary Jones as Tenants by the Entirety\nBob Jones: 123 N Hyer Ave, Orlando, FL 32801\nMary Jones: 456 Park Lake St, Orlando, FL 32803", "column J: co-owners living apart each get their address"],
     [jointDisplayName("John A. Smith", "", ""), "John A. Smith", "an individual owner is named alone"],
     [jointDisplayName("John A. Smith", "Jane B. Smith", "tbe"), "John A. Smith and Jane B. Smith as Tenants by the Entirety", "tenants by the entirety are named together"],
     [jointDisplayName("John A. Smith", "Jane B. Smith", "jtwros"), "John A. Smith and Jane B. Smith as Joint Tenants with Right of Survivorship", "joint tenants are named together"],
@@ -365,7 +368,7 @@ if (typeof console !== "undefined") {
   for (const [got, want, label] of cases) {
     if (got !== want) throw new Error(`FAIL joint owner: ${label} (got ${JSON.stringify(got)})`);
   }
-  console.log("[2553] joint owners: 10 cases correct.");
+  console.log("[2553] joint owners: 13 cases correct.");
 }
 
 // Run directly (bun run validation.test.ts): exit non-zero on failure. Printing
