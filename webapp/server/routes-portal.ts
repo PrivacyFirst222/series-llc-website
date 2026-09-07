@@ -550,7 +550,9 @@ export async function purgeExpiredSElections(): Promise<number> {
 /** Everything the IRS EIN application asks that the formation record cannot
  *  answer — the objective ledger from the assistant walk + Form SS-4
  *  (Rev. 12-2025), 24 Aug 2026. The IRS requires the responsible party's
- *  name SPLIT (first/middle/last/suffix, "must match IRS records"). */
+ *  name SPLIT (first/middle/last/suffix) — the responsible party is the
+ *  person who owns or controls the LLC, typically its manager (SS-4
+ *  instructions, "Responsible party defined"). */
 export const einDetailsSchema = z
   .object({
     responsibleFirst: z.string().min(1, "The responsible party's first name is required.").max(100),

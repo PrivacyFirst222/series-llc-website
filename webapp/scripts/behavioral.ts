@@ -670,6 +670,18 @@ async function main(): Promise<void> {
       // typed boxes that stay empty — an iPad's date picker filled in today —
       // and each owner row offers "Acquired at formation", ticked by default,
       // which hides the date box; unticking reveals it.
+      // The EIN form's responsible party heading (Adam, 7 Sep 2026): it says
+      // who the person usually is, and no longer speaks of IRS records.
+      const einRowClient = page.locator('[data-testid="orders-in-progress"] li').filter({ hasText: /Federal EIN/ }).first();
+      await einRowClient.locator("button").filter({ hasText: /Provide details/ }).first().click();
+      await page.waitForTimeout(800);
+      const einForm = page.locator('[role="dialog"]').first();
+      const rpHeading = await einForm.locator('[data-testid="responsible-party-heading"]').innerText().catch(() => "");
+      expect(/typically the LLC's manager/.test(rpHeading), "EIN form: the responsible party heading says it is typically the manager", rpHeading);
+      expect(!/IRS records/.test(await einForm.innerText()), "EIN form: no 'must match IRS records' anywhere on the form");
+      await page.keyboard.press("Escape");
+      await page.locator('[role="dialog"]').first().waitFor({ state: "detached", timeout: 5000 }).catch(() => {});
+      await page.waitForTimeout(400);
       const selRow = page.locator('[data-testid="orders-in-progress"] li').filter({ hasText: /S Corporation Election/ }).first();
       // The Form 2553 timing gate (Adam, 6 Sep 2026): the client types the
       // date the Division filed their Articles — from the Articles one card
