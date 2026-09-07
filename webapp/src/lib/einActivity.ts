@@ -62,10 +62,30 @@ export function followUpOk(category: string, answer: string): boolean {
 }
 
 /** The four special-activity questions, asked separately as the assistant asks them. */
+/** Each question carries the assistant's own help box, shown as a hint so
+ *  the client reads what the IRS means before answering (Adam, 7 Sep 2026). */
 export const EIN_SPECIAL_QUESTIONS = [
-  { key: "highwayVehicle", question: "Does your business own a highway motor vehicle with a taxable gross weight of 55,000 pounds or more?" },
-  { key: "gambling", question: "Does your business involve gambling/wagering?" },
-  { key: "form720", question: "Does your business need to file Form 720 (Quarterly Federal Excise Tax Return)?" },
-  { key: "alcoholTobaccoFirearms", question: "Does your business sell or manufacture alcohol, tobacco, or firearms?" },
+  { key: "highwayVehicle", question: "Does your business own a highway motor vehicle with a taxable gross weight of 55,000 pounds or more?", help: "A highway motor vehicle is any self-propelled vehicle designed to carry a load over public highways — trucks, truck tractors, and buses, for example." },
+  { key: "gambling", question: "Does your business involve gambling/wagering?", help: "Gambling or wagering means accepting wagers, conducting a wagering pool or lottery, or receiving wagers for or on behalf of another person." },
+  { key: "form720", question: "Does your business need to file Form 720 (Quarterly Federal Excise Tax Return)?", help: "Form 720 is the quarterly federal excise tax return." },
+  // No help box was walked for this question; it carries none rather than words the IRS did not say.
+  { key: "alcoholTobaccoFirearms", question: "Does your business sell or manufacture alcohol, tobacco, or firearms?", help: "" },
 ] as const;
+
+export const EIN_EMPLOYEE_HELP = {
+  w2: "Employers must file Form W-2 for wages paid to each employee from whom income, Social Security, or Medicare tax was withheld, or from whom income tax would have been withheld had the employee claimed no more than one withholding allowance.",
+  firstWageDate: "The date the entity began, or will begin, paying wages to its employees.",
+  highest: "This information helps the IRS anticipate your employment tax obligations, but it doesn't represent a maximum employee limit. Total number of employees must be at least 1.",
+  agricultural: "Agricultural employees include any person who works on a farm producing crops or raising livestock — stock, dairy, poultry, fruit, fur-bearing animal, and truck farms, orchards, ranches, nurseries, and greenhouses.",
+  other: "A general rule is that anyone who performs services for you is your employee if you can control what work will be done and how it will be done. These employees will be issued a W-2 form at the end of the year.",
+  form944: "For most employers, you are likely to pay $1,000 or less in employment taxes if you expect to pay $4,000 or less in total wages in a full calendar year.",
+  form944Yes: "By selecting \"yes\", you are electing to file an annual employment tax return, Form 944.",
+  form944No: "Select \"no\" if you prefer to file a quarterly return, Form 941.",
+} as const;
+
+export const MONTHS = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+] as const;
+
 export type EinSpecialKey = (typeof EIN_SPECIAL_QUESTIONS)[number]["key"];

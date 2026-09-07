@@ -974,10 +974,22 @@ if (mint.status === 200) {
   check("an old merged category is refused", oldCategory.status === 400, oldCategory.body);
   const warehousing = await api(`/api/portal/services/${intakeEin.id}/ein-details`, { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ ...einPayload, activity: "Warehousing", activityFollowUp: "", certified: undefined }) });
   check("Warehousing needs no follow-up (refused here only for the missing certification)", warehousing.status === 400 && /certif/i.test(warehousing.body?.error?.message ?? ""), warehousing.body);
+  // The assistant's "Describe your employees" screen (walked 7 Sep 2026):
+  // month and year of first wages, at least one employee between the two
+  // counts, and the $1,000 question answered — each refused when missing.
+  const withEmployees = { ...einPayload, employeesExpected: true, firstWageDate: "2027-03", employeeCountAg: 0, employeeCountOther: 2, form944Annual: false };
+  const noWageDate = await api(`/api/portal/services/${intakeEin.id}/ein-details`, { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ ...withEmployees, firstWageDate: "" }) });
+  check("employees without the month and year of first wages are refused", noWageDate.status === 400, noWageDate.body);
+  const fullDate = await api(`/api/portal/services/${intakeEin.id}/ein-details`, { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ ...withEmployees, firstWageDate: "2027-03-15" }) });
+  check("the first-wage date is month and year only, as the assistant asks", fullDate.status === 400, fullDate.body);
+  const noCount = await api(`/api/portal/services/${intakeEin.id}/ein-details`, { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ ...withEmployees, employeeCountOther: 0 }) });
+  check("employees with no count in either box are refused (total must be at least 1)", noCount.status === 400, noCount.body);
+  const no944 = await api(`/api/portal/services/${intakeEin.id}/ein-details`, { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ ...withEmployees, form944Annual: undefined }) });
+  check("employees without an answer to the $1,000 question are refused", no944.status === 400, no944.body);
   const einDetails = await api(`/api/portal/services/${intakeEin.id}/ein-details`, {
-    method: "POST", cookies: setPw.cookie, body: JSON.stringify(einPayload),
+    method: "POST", cookies: setPw.cookie, body: JSON.stringify({ ...withEmployees, employeeCountHousehold: 3 }),
   });
-  check("EIN details accepted with the full SS-4 ledger payload", einDetails.status === 200, einDetails.body);
+  check("EIN details accepted with the assistant's three employee answers", einDetails.status === 200, einDetails.body);
   const einUncertified = await api(`/api/portal/services/${intakeEin.id}/ein-details`, {
     method: "POST", cookies: setPw.cookie,
     body: JSON.stringify({ ...einPayload, certified: undefined }),
@@ -1001,6 +1013,11 @@ if (mint.status === 200) {
     adminDetail.body?.data?.details?.reason === "Started a new business" && adminDetail.body?.data?.details?.memberCount === 1
       && adminDetail.body?.data?.details?.activity === "Real Estate" && adminDetail.body?.data?.details?.activityFollowUp === "I rent or lease property that I own"
       && adminDetail.body?.data?.details?.highwayVehicle === false && adminDetail.body?.data?.details?.alcoholTobaccoFirearms === false,
+    adminDetail.body?.data?.details);
+  check("the office sees the employee answers as the assistant asks them: month and year, two counts, the $1,000 answer — and no household count",
+    adminDetail.body?.data?.details?.employeesExpected === true && adminDetail.body?.data?.details?.firstWageDate === "2027-03"
+      && adminDetail.body?.data?.details?.employeeCountAg === 0 && adminDetail.body?.data?.details?.employeeCountOther === 2
+      && adminDetail.body?.data?.details?.form944Annual === false && !("employeeCountHousehold" in (adminDetail.body?.data?.details ?? {})),
     adminDetail.body?.data?.details);
 
   // 13b. Fulfill the series order WITH an attached document — it must land in

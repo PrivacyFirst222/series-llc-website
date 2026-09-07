@@ -713,6 +713,26 @@ async function main(): Promise<void> {
       await choose(page, '[aria-label="Business category"]', "Warehousing");
       await page.waitForTimeout(300);
       expect((await einForm.locator('[data-testid="activity-follow-up"]').count()) === 0, "EIN form: Warehousing asks no follow-up");
+      // The IRS help boxes sit under the questions (Adam, 7 Sep 2026), and the
+      // employees branch is the assistant's own three questions.
+      expect(/\$4,000 or less|55,000 pounds|Form 720 is the quarterly/.test(await einForm.locator('[data-testid="special-questions"]').innerText()), "EIN form: the special questions carry the IRS's own explanations");
+      await einForm.locator('[data-testid="special-questions"]').scrollIntoViewIfNeeded();
+      await shot(page, "ein-form-special-questions");
+      expect((await einForm.locator('[data-testid="employees-block"]').count()) === 0, "EIN form: no employee questions until the W-2 question is Yes");
+      await einForm.locator('label:has-text("Forms W-2") input[type="checkbox"]').check({ force: true });
+      await page.waitForTimeout(300);
+      const empBlock = einForm.locator('[data-testid="employees-block"]');
+      expect((await empBlock.count()) === 1, "EIN form: Yes to W-2 employees opens the assistant's employee questions");
+      const empText = await empBlock.innerText();
+      expect(/first date wages or annuities/.test(empText) && /Number of agricultural employees/.test(empText) && /Number of other employees/.test(empText) && /\$1,000 or less in a full calendar year/.test(empText) && /\$4,000 or less/.test(empText), "EIN form: the three employee questions read as the assistant asks them, with its help", empText);
+      expect(!/[Hh]ousehold/.test(empText), "EIN form: no household box — the assistant has none");
+      expect((await empBlock.locator('[aria-label="Month"]').count()) === 1 && (await empBlock.locator('input[name="firstWageYear"]').count()) === 1, "EIN form: first wages are asked as month and year, not a full date");
+      expect((await empBlock.locator('[aria-label="Number of other employees"]').inputValue()) === "", "EIN form: the counts start blank, not guessed");
+      expect((await empBlock.locator('[data-testid="form944-question"] input[type="radio"]').count()) === 2, "EIN form: the $1,000 question is Yes or No");
+      await empBlock.scrollIntoViewIfNeeded();
+      await shot(page, "ein-form-employees");
+      await einForm.locator('label:has-text("Forms W-2") input[type="checkbox"]').uncheck({ force: true });
+      await page.waitForTimeout(300);
       await einForm.locator('input[name="hasExistingEin"][value="Yes"]').check({ force: true });
       await page.waitForTimeout(300);
       expect((await einForm.locator('[data-testid="existing-ein"]').count()) === 1 && (await einForm.locator('[data-testid="special-questions"]').count()) === 0, "EIN form: saying the LLC already has an EIN hides the application questions and asks for the number");

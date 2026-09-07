@@ -37,7 +37,7 @@ export interface AdminServiceOrder {
     hasExistingEin?: boolean; existingEin?: string; reason?: string; tradeName?: string; memberCount?: number;
     activity?: string; activityFollowUp?: string; activityDetail?: string; county?: string;
     highwayVehicle?: boolean; gambling?: boolean; form720?: boolean; alcoholTobaccoFirearms?: boolean;
-    employeesExpected?: boolean; employeeCountOther?: number; employeeCountAg?: number; employeeCountHousehold?: number;
+    employeesExpected?: boolean; employeeCountOther?: number; employeeCountAg?: number;
     firstWageDate?: string; form944Annual?: boolean; closingMonth?: string;
     ein?: string; einPending?: boolean; einSource?: "letter"; assignedEin?: string; dateIncorporated?: string; effectiveDate?: string;
     officerName?: string; officerTitle?: string; phone?: string; shareholders?: SElectionShareholderView[];
@@ -293,6 +293,13 @@ export function ServiceFulfillDialog({
                     {(() => {
                       const d = detailQuery.data.details;
                       const yn = (v?: boolean) => (v ? "Yes" : "No");
+                      // "2027-03" reads as "March 2027", the way the assistant asks it.
+                      const monthYear = (v?: string) => {
+                        const m = /^(\d{4})-(\d{2})/.exec(v ?? "");
+                        if (!m) return v || "—";
+                        const name = new Date(Number(m[1]), Number(m[2]) - 1, 1).toLocaleString("en-US", { month: "long" });
+                        return `${name} ${m[1]}`;
+                      };
                       const rows: [string, string][] = [
                         ["Legal structure", "Limited Liability Company (LLC)"],
                         ["Number of members", String(d.memberCount ?? "—")],
@@ -309,7 +316,7 @@ export function ServiceFulfillDialog({
                         ["Gambling / wagering", yn(d.gambling)],
                         ["Form 720 excise returns", yn(d.form720)],
                         ["Alcohol, tobacco, or firearms", yn(d.alcoholTobaccoFirearms)],
-                        ["Employees expected (W-2, next 12 months)", d.employeesExpected ? `Yes — ${d.employeeCountOther ?? 0} general, ${d.employeeCountAg ?? 0} agricultural, ${d.employeeCountHousehold ?? 0} household; first wages ${d.firstWageDate || "—"}; Form 944 ${yn(d.form944Annual)}` : "No"],
+                        ["Employees expected (W-2, next 12 months)", d.employeesExpected ? `Yes — first wages ${monthYear(d.firstWageDate)}; ${d.employeeCountAg ?? 0} agricultural, ${d.employeeCountOther ?? 0} other; $1,000 or less: ${d.form944Annual ? "Yes (Form 944)" : "No (Form 941)"}` : "No"],
                         ["Business category", d.activity ?? "—"],
                         ["Category follow-up", d.activityFollowUp || "— none asked —"],
                         ["Anything else", d.activityDetail || "—"],

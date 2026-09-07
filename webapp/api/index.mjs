@@ -106315,9 +106315,11 @@ var einDetailsSchema = external_exports.object({
   employeesExpected: external_exports.boolean(),
   employeeCountOther: external_exports.number().int().min(0).max(9999).optional().default(0),
   employeeCountAg: external_exports.number().int().min(0).max(9999).optional().default(0),
-  employeeCountHousehold: external_exports.number().int().min(0).max(9999).optional().default(0),
-  firstWageDate: external_exports.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().or(external_exports.literal("")).default(""),
-  form944Annual: external_exports.boolean().optional().default(false),
+  // The assistant's "Describe your employees" screen (walked 7 Sep 2026):
+  // month and year of first wages, agricultural and other counts, and the
+  // $1,000 question — a required Yes/No, so undefined is "not answered".
+  firstWageDate: external_exports.string().regex(/^(19|20)\d{2}-(0[1-9]|1[0-2])$/).optional().or(external_exports.literal("")).default(""),
+  form944Annual: external_exports.boolean().optional(),
   closingMonth: external_exports.enum([
     "January",
     "February",
@@ -106341,8 +106343,8 @@ var einDetailsSchema = external_exports.object({
   message: "Answer the follow-up question under the category you chose \u2014 the IRS asks it.",
   path: ["activityFollowUp"]
 }).refine(
-  (d2) => !d2.employeesExpected || d2.firstWageDate !== "" && d2.employeeCountOther + d2.employeeCountAg + d2.employeeCountHousehold > 0,
-  { message: "With employees expected, enter the expected count and the first date wages will be paid." }
+  (d2) => !d2.employeesExpected || d2.firstWageDate !== "" && d2.employeeCountOther + d2.employeeCountAg > 0 && typeof d2.form944Annual === "boolean",
+  { message: "With employees expected, enter the month and year wages will first be paid, at least one employee, and answer the $1,000 question." }
 ).refine((d2) => !d2.exciseApplies || d2.exciseDetail.trim().length > 0, {
   message: "Tell us which of the special activities applies."
 });
@@ -107401,9 +107403,8 @@ function registerPortalRoutes(app2) {
       employeesExpected: d2.employeesExpected,
       employeeCountOther: d2.employeeCountOther,
       employeeCountAg: d2.employeeCountAg,
-      employeeCountHousehold: d2.employeeCountHousehold,
       firstWageDate: d2.firstWageDate,
-      form944Annual: d2.form944Annual,
+      form944Annual: d2.employeesExpected ? d2.form944Annual : false,
       closingMonth: d2.closingMonth,
       exciseApplies: d2.exciseApplies,
       exciseDetail: d2.exciseDetail,

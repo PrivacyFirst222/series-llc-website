@@ -8,7 +8,7 @@
 // `external`.
 import { useEffect, useRef, useState } from "react";
 import { PHONE_HINT, formatPhone } from "@/lib/phone";
-import { EIN_CATEGORIES, EIN_REASONS, EIN_SPECIAL_QUESTIONS, einCategory } from "@/lib/einActivity";
+import { EIN_CATEGORIES, EIN_EMPLOYEE_HELP, EIN_REASONS, EIN_SPECIAL_QUESTIONS, MONTHS, einCategory } from "@/lib/einActivity";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ClipboardList, Lock, FileSignature } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -54,6 +54,7 @@ export function OrdersInProgress({
   // follow-up the assistant asks next.
   const [einHasExisting, setEinHasExisting] = useState(false);
   const [einActivity, setEinActivity] = useState<string>("Real Estate");
+  const [einWageMonth, setEinWageMonth] = useState<string>("");
   // Opening the EIN form brings back what the draft held for the two answers
   // that are React state rather than form fields.
   useEffect(() => {
@@ -62,6 +63,7 @@ export function OrdersInProgress({
     setEinActivity(d?.activity && einCategory(d.activity) ? d.activity : "Real Estate");
     setEinHasExisting(d?.hasExistingEin === "Yes");
     setEinEmployees(d?.employeesExpected === "Yes");
+    setEinWageMonth(d?.firstWageMonth ?? "");
     // einDrafts is read once per opening; the draft is what was there then.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [detailsFor?.id]);
@@ -455,9 +457,8 @@ export function OrdersInProgress({
                   employeesExpected: einEmployees,
                   employeeCountOther: num("employeeCountOther"),
                   employeeCountAg: num("employeeCountAg"),
-                  employeeCountHousehold: num("employeeCountHousehold"),
-                  firstWageDate: String(fd.get("firstWageDate") ?? ""),
-                  form944Annual: fd.get("form944Annual") === "on",
+                  firstWageDate: einEmployees && einWageMonth ? `${String(fd.get("firstWageYear") ?? "").trim()}-${einWageMonth}` : "",
+                  form944Annual: einEmployees ? (fd.get("form944Annual") === "Yes" ? true : fd.get("form944Annual") === "No" ? false : undefined) : undefined,
                   closingMonth: String(fd.get("closingMonth") ?? "December"),
                 },
               });
@@ -556,7 +557,10 @@ export function OrdersInProgress({
             <div className="space-y-2 rounded-lg border border-border p-3" data-testid="special-questions">
               {EIN_SPECIAL_QUESTIONS.map((q) => (
                 <div key={q.key} className="flex flex-wrap items-center justify-between gap-2 text-sm">
-                  <span className="min-w-0 flex-1">{q.question}</span>
+                  <span className="min-w-0 flex-1">
+                    {q.question}
+                    {q.help ? <span className="mt-0.5 block text-xs text-muted-foreground">{q.help}</span> : null}
+                  </span>
                   <span className="flex gap-3">
                     <label className="flex items-center gap-1.5"><input type="radio" name={q.key} value="Yes" defaultChecked={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.[q.key] === "Yes"} className="h-4 w-4 accent-trust" /> Yes</label>
                     <label className="flex items-center gap-1.5"><input type="radio" name={q.key} value="No" defaultChecked={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.[q.key] !== "Yes"} className="h-4 w-4 accent-trust" /> No</label>
@@ -564,42 +568,67 @@ export function OrdersInProgress({
                 </div>
               ))}
             </div>
-            <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" checked={einEmployees} onChange={(e) => setEinEmployees(e.target.checked)} className="h-4 w-4 accent-trust" />
-              Do you have, or do you expect to have, any employees who will receive Forms W-2 in the next 12 months?
-            </label>
+            <div className="space-y-1">
+              <label className="flex items-center gap-2 text-sm">
+                <input type="checkbox" checked={einEmployees} onChange={(e) => setEinEmployees(e.target.checked)} className="h-4 w-4 accent-trust" />
+                Do you have, or do you expect to have, any employees who will receive Forms W-2 in the next 12 months?
+              </label>
+              <p className="pl-6 text-xs text-muted-foreground">{EIN_EMPLOYEE_HELP.w2}</p>
+            </div>
             {einEmployees ? (
-              <div className="space-y-3 rounded-lg border border-border bg-secondary/40 p-3">
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-medium">Employees (general)</label>
-                    <Input name="employeeCountOther" inputMode="numeric" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.employeeCountOther ?? "1"} autoComplete="off" />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-medium">Agricultural</label>
-                    <Input name="employeeCountAg" inputMode="numeric" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.employeeCountAg ?? "0"} autoComplete="off" />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-medium">Household</label>
-                    <Input name="employeeCountHousehold" inputMode="numeric" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.employeeCountHousehold ?? "0"} autoComplete="off" />
+              /* The assistant's "Describe your employees" screen, walked 7 Sep
+                 2026: month and year of first wages, agricultural and other
+                 counts (no household box), and the $1,000 question as a
+                 required Yes/No. */
+              <div className="space-y-4 rounded-lg border border-border bg-secondary/40 p-3" data-testid="employees-block">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium">What is the first date wages or annuities were or will be paid?</label>
+                  <p className="text-xs text-muted-foreground">{EIN_EMPLOYEE_HELP.firstWageDate}</p>
+                  <div className="flex gap-3">
+                    <Select value={einWageMonth} onValueChange={setEinWageMonth}>
+                      <SelectTrigger aria-label="Month" className="w-40"><SelectValue placeholder="Month" /></SelectTrigger>
+                      <SelectContent>
+                        {MONTHS.map((m, i) => (<SelectItem key={m} value={String(i + 1).padStart(2, "0")}>{m}</SelectItem>))}
+                      </SelectContent>
+                    </Select>
+                    <Input name="firstWageYear" inputMode="numeric" placeholder="Year" aria-label="Year" className="w-28" maxLength={4} autoComplete="off" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.firstWageYear ?? ""} />
                   </div>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium">First date wages will be paid</label>
-                  <Input name="firstWageDate" type="date" autoComplete="off" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.firstWageDate ?? ""} />
+                  <p className="text-sm font-medium">What is the highest number of employees expected in the next 12 months?</p>
+                  <p className="text-xs text-muted-foreground">{EIN_EMPLOYEE_HELP.highest}</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label className="text-xs font-medium">Number of agricultural employees</label>
+                      <Input name="employeeCountAg" inputMode="numeric" aria-label="Number of agricultural employees" autoComplete="off" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.employeeCountAg ?? ""} />
+                      <p className="text-xs text-muted-foreground">{EIN_EMPLOYEE_HELP.agricultural}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-xs font-medium">Number of other employees</label>
+                      <Input name="employeeCountOther" inputMode="numeric" aria-label="Number of other employees" autoComplete="off" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.employeeCountOther ?? ""} />
+                      <p className="text-xs text-muted-foreground">{EIN_EMPLOYEE_HELP.other}</p>
+                    </div>
+                  </div>
                 </div>
-                <label className="flex items-start gap-2 text-xs leading-relaxed">
-                  <input type="checkbox" name="form944Annual" defaultChecked={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.form944Annual === "on"} className="mt-0.5 h-4 w-4 shrink-0 accent-trust" />
-                  Expect $1,000 or less in employment tax for a full year (roughly $5,000 or less
-                  in total wages)? Check to ask the IRS for annual filing (Form 944) instead of
-                  quarterly (Form 941).
-                </label>
+                <div className="space-y-1.5" data-testid="form944-question">
+                  <p className="text-sm font-medium">Do you expect your employment tax liability to be $1,000 or less in a full calendar year (January–December)?</p>
+                  <p className="text-xs text-muted-foreground">{EIN_EMPLOYEE_HELP.form944}</p>
+                  <label className="flex items-start gap-2 text-sm">
+                    <input type="radio" name="form944Annual" value="Yes" required defaultChecked={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.form944Annual === "Yes"} className="mt-0.5 h-4 w-4 accent-trust" />
+                    <span>Yes<span className="block text-xs text-muted-foreground">{EIN_EMPLOYEE_HELP.form944Yes}</span></span>
+                  </label>
+                  <label className="flex items-start gap-2 text-sm">
+                    <input type="radio" name="form944Annual" value="No" required defaultChecked={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.form944Annual === "No"} className="mt-0.5 h-4 w-4 accent-trust" />
+                    <span>No<span className="block text-xs text-muted-foreground">{EIN_EMPLOYEE_HELP.form944No}</span></span>
+                  </label>
+                </div>
               </div>
             ) : null}
             <div className="space-y-2 rounded-lg border border-border p-3" data-testid="activity-block">
               <label htmlFor="ein-activity" className="text-sm font-medium">What does your business or organization do?</label>
               <input type="hidden" name="activity" value={einActivity} />
               <input type="hidden" name="employeesExpected" value={einEmployees ? "Yes" : "No"} />
+              <input type="hidden" name="firstWageMonth" value={einWageMonth} />
               <Select value={einActivity} onValueChange={setEinActivity}>
                 <SelectTrigger id="ein-activity" aria-label="Business category"><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -651,7 +680,7 @@ export function OrdersInProgress({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {["January","February","March","April","May","June","July","August","September","October","November","December"].map((m) => (
+                  {MONTHS.map((m) => (
                     <SelectItem key={m} value={m}>{m}</SelectItem>
                   ))}
                 </SelectContent>
