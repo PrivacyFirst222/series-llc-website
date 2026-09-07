@@ -145,6 +145,8 @@ export function ServiceFulfillDialog({
           <DialogDescription>
             {viewing?.type === "ein"
               ? "The identification number below is shown for SS-4 preparation and is permanently deleted when you mark the order fulfilled."
+              : viewing?.type === "s-election" && viewing.status === "fulfilled"
+                ? "The client built this package from their own details and has it in their portal. The SSNs below are deleted two weeks after the build. If their Articles show a different filing date, correct it below and the package is rebuilt."
               : viewing?.type === "s-election"
                 ? "Download the draft package, review the filled Form 2553, and attach the final PDF to fulfill. The SSNs below are permanently deleted when you mark the order fulfilled."
                 : "Mark fulfilled once the designation is filed and the confirmation is uploaded to the client's documents."}
@@ -177,33 +179,30 @@ export function ServiceFulfillDialog({
                     : detailQuery.data?.details.ein || "— not yet provided —"}
                 </div>
                 {detailQuery.data?.details.dateIncorporated ? (
-                  <div>
-                    <span className="text-muted-foreground">Filed by the Division / election effective:</span>{" "}
-                    {detailQuery.data.details.dateIncorporated} / {detailQuery.data.details.effectiveDate || detailQuery.data.details.dateIncorporated}
-                  </div>
-                ) : viewing.has_secret ? (
-                  <div className="space-y-2 rounded-xl border border-amber-300/60 bg-amber-50 p-3 text-amber-900" data-testid="formation-date-entry">
-                    <p className="text-sm font-medium">Enter the date the Division filed the Articles.</p>
-                    <p className="text-xs">
-                      From the filed Articles. It goes on Form 2553 as the date of incorporation, sets the
-                      election's effective date where the client left it blank, and starts their two-week
-                      download window. Entering it builds the package and emails the client.
-                    </p>
-                    <div className="flex flex-wrap items-center gap-2">
+                  <div className="space-y-1">
+                    <div>
+                      <span className="text-muted-foreground">Filed by the Division (entered by the client) / election effective:</span>{" "}
+                      {detailQuery.data.details.dateIncorporated} / {detailQuery.data.details.effectiveDate || detailQuery.data.details.dateIncorporated}
+                    </div>
+                    {/* The client typed it from their Articles; correct it here only
+                        when the Articles say otherwise — the package is rebuilt. */}
+                    <div className="flex flex-wrap items-center gap-2 text-xs">
+                      <span className="text-muted-foreground">Correct it if the Articles differ:</span>
                       <Input
                         type="date"
-                        aria-label="Date filed by the Division"
+                        aria-label="Corrected date filed by the Division"
                         value={formationDate}
                         onChange={(e) => setFormationDate(e.target.value)}
-                        className="w-48"
+                        className="h-8 w-44 text-xs"
                       />
                       <Button
                         size="sm"
+                        variant="outline"
                         className="rounded-full"
                         disabled={!formationDate || enterFormationDate.isPending}
                         onClick={() => enterFormationDate.mutate({ id: viewing.id, date: formationDate })}
                       >
-                        {enterFormationDate.isPending ? "Building the package…" : "Enter date & build the package"}
+                        {enterFormationDate.isPending ? "Rebuilding…" : "Correct date & rebuild"}
                       </Button>
                     </div>
                     {enterFormationDate.isError ? (
@@ -226,7 +225,7 @@ export function ServiceFulfillDialog({
                       <span className="font-mono-feature">
                         {detailQuery.data?.ssns?.[i] ?? `•••-••-${sh.ssnLast4}`}
                       </span>{" "}
-                      · acquired {sh.dateAcquired}
+                      · acquired {sh.dateAcquired || "at formation"}
                     </div>
                   </div>
                 ))}
@@ -286,7 +285,7 @@ export function ServiceFulfillDialog({
             </label>
           </div>
         ) : null}
-        {(viewing?.type === "ein" || viewing?.type === "s-election") && viewing?.status === "awaiting_info" && !override ? null : (
+        {viewing?.status === "fulfilled" || ((viewing?.type === "ein" || viewing?.type === "s-election") && viewing?.status === "awaiting_info" && !override) ? null : (
         <div className="space-y-2 border-t border-border pt-3">
           <label htmlFor="service-attachment-file" className="text-sm font-medium">
             {viewing?.type === "ein"
@@ -331,7 +330,7 @@ export function ServiceFulfillDialog({
         {fulfill.isError ? (
           <p className="text-xs text-destructive">{(fulfill.error as Error).message}</p>
         ) : null}
-        {(viewing?.type === "ein" || viewing?.type === "s-election") && viewing?.status === "awaiting_info" && !override ? null : (
+        {viewing?.status === "fulfilled" || ((viewing?.type === "ein" || viewing?.type === "s-election") && viewing?.status === "awaiting_info" && !override) ? null : (
           <DialogFooter>
             <Button
               className="rounded-full"

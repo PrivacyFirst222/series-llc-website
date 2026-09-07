@@ -217,26 +217,46 @@ When a question or control is hidden or skipped conditionally, confirm the
 underlying value is still set. A question removed from the screen is not a
 value removed from the system.
 
-**The seat is a person doing a step, weighted by how often they do it.** Three
-things this rule requires, added 6 Sep 2026 after P57 — a date needed on a few
-S elections, proposed twice as a field on every Articles upload:
+**Walk the feature as the user, before anything is built — enforced by a hook.**
+Adam, 6 Sep 2026, after P58–P61: "The hook should ask the question how will
+this change affect the user's ability to use the feature in question in the
+real world? It should walk through what buttons the user would click, what
+fields they would complete, and what results they would reasonably expect to
+get." `.claude/hooks/user-walk-pretool.sh` blocks every file change until the
+proposal Adam approved with "Go" contains, for each person the change
+touches, a block in this shape:
 
-4. **Every proposal that adds a step, field, or control for a person opens
-   with one line: who does it, at what moment, holding what, how many times a
-   year, and what it costs the people who don't need it.** "The admin, at the
-   Articles upload, every formation (hundreds a year), to serve the few S
-   elections" is wrong on its face before anyone reads further. **Adam: a
-   proposal without that line has not been designed from anyone's seat.
-   Reject it unread.**
-5. **A correction is a source.** When Adam corrects a design, quote his
+```
+USER WALK — <who, in what real situation>:
+1. Opens … and sees …
+2. Taps … / types … into …
+3. …
+Expects: <the result they would reasonably expect>
+```
+
+Three or more numbered steps and an "Expects:" line. A change nobody uses
+still needs the block, saying so. The hook can only demand that the walk
+exists; whether it is honest is Adam's judgment from the proposal — which is
+the point: it is in front of him before Go. The walk is written from the
+person's actual situation (the client who just got the formed email, holding
+their Articles; the office opening a card from the board), never from the
+data model. P58 — a form the client could not open, waiting on a box the
+office could not see — fails such a walk at step 2: "taps Provide details —
+there is no button."
+
+4. **A correction is a source.** When Adam corrects a design, quote his
    sentence back and state the actor and the moment it names before
    proposing anything. The next proposal is derived from that sentence, not
    patched from the previous proposal — "required" becoming "optional" while
    the placement stays is patching.
-6. **Frequency is part of the seat.** Designing for the rare case that makes
+5. **Frequency is part of the seat.** Designing for the rare case that makes
    the system complete, at a cost paid on every common case, is designing
    from the data model. Completeness is free to whoever is not doing the
-   typing.
+   typing (P57).
+6. **A claim about a screen is made from the screen.** "The date box appears
+   as soon as the order exists" was true of a design and false of the code
+   (P58). Before reporting what a screen does, open the file or the page and
+   read the condition it is actually behind.
 
 ## Never trade accuracy for convenience
 

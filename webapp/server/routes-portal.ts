@@ -478,22 +478,23 @@ export async function purgeExpiredSElections(): Promise<number> {
     const d = (typeof row.details === "string" ? JSON.parse(row.details) : row.details) as SElectionStoredDetails;
     const kept: SElectionStoredDetails = { ...d, purgedAt: new Date().toISOString() };
 
-    if (d?.shareholders?.length && d.dateIncorporated && d.effectiveDate) {
+    if (d?.shareholders?.length && d.dateIncorporated) {
       const seed = await oaSeed(row.client_id);
+      const filled = withFormationDefaults(d);
       try {
         const pdf = await buildSElectionPackage({
           llcName: row.llc_name,
           principalAddress: seed?.principalAddress ?? "",
           ein: d.ein ?? "",
           dateIncorporated: d.dateIncorporated,
-          effectiveDate: d.effectiveDate,
+          effectiveDate: filled.effectiveDate,
           officerName: d.officerName ?? "",
           officerTitle: d.officerTitle ?? "",
           phone: d.phone ?? "",
           recordCopy: true,
           // Only the last four survive in the stored record — that is all the
           // record copy can show, and all it needs to.
-          shareholders: d.shareholders.map((s) => ({ ...s, ssn: s.ssnLast4 })),
+          shareholders: filled.shareholders.map((s) => ({ ...s, ssn: s.ssnLast4 })),
         });
         const title = `S Corporation Election Package — Record Copy — ${row.llc_name}`;
         const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength) as ArrayBuffer;
@@ -619,10 +620,12 @@ export const sElectionDetailsSchema = z
       // publishes the valid list ("Valid EINs", irs.gov, reviewed 9 Apr 2026).
       .refine((s) => s === "" || VALID_EIN_PREFIXES.has(s.slice(0, 2)), "That is not a valid EIN — check the first two digits."),
     einPending: z.boolean().optional().default(false),
-    // The formation date is entered by the office from the filed Articles
-    // when the package is prepared (Adam, 6 Sep 2026) — never by the client.
-    // The effective date and each owner's acquisition date may be left blank
-    // and default to it.
+    // The date the Division filed the Articles, typed by the client from the
+    // Articles in their portal (Adam, 6 Sep 2026: "Why wouldn't the effective
+    // date just be asked for in the form?"). The Form 2553 deadline runs from
+    // it. The effective date and each owner's acquisition date may be left
+    // blank and default to it.
+    formationDate: z.string({ required_error: "Enter the date the Division filed your Articles as MM/DD/YYYY." }).regex(/^\d{4}-\d{2}-\d{2}$/, "Enter the date the Division filed your Articles as MM/DD/YYYY."),
     effectiveDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).or(z.literal("")).optional().default(""),
     officerName: z.string().min(1, "The signing officer's name is required.").max(200),
     officerTitle: z.string().min(1).max(100),
@@ -677,6 +680,18 @@ export const sElectionDetailsSchema = z
  *  tell the client it is ready. Shared by the client's submission (when the
  *  date is already on file, i.e. an edit inside the window) and by the
  *  office entering the date. */
+/** The formation date is the default for the election's effective date and
+ *  for each owner's acquisition date wherever the client left them blank.
+ *  The blanks stay blank in what is stored, so a later correction of the
+ *  formation date carries them along instead of fighting a filled-in copy. */
+export function withFormationDefaults(d: SElectionStoredDetails): { effectiveDate: string; shareholders: NonNullable<SElectionStoredDetails["shareholders"]> } {
+  const formation = d.dateIncorporated ?? "";
+  return {
+    effectiveDate: d.effectiveDate || formation,
+    shareholders: (d.shareholders ?? []).map((sh) => ({ ...sh, dateAcquired: sh.dateAcquired || formation })),
+  };
+}
+
 export async function postSElectionPackage(args: {
   so: { id: string; client_id: string; llc_name: string };
   merged: SElectionStoredDetails;
@@ -686,10 +701,7 @@ export async function postSElectionPackage(args: {
   const { so, merged, ssns } = args;
   const db = await getDb();
   const formation = merged.dateIncorporated ?? "";
-  // The office's date is the default for the election's effective date and
-  // for each owner's acquisition date wherever the client left them blank.
-  merged.effectiveDate = merged.effectiveDate || formation;
-  merged.shareholders = (merged.shareholders ?? []).map((sh) => ({ ...sh, dateAcquired: sh.dateAcquired || formation }));
+  const { effectiveDate, shareholders } = withFormationDefaults(merged);
   const seed = await oaSeed(so.client_id);
   const clients = await db.query<{ email: string; name: string }>(
     "SELECT email, name FROM clients WHERE id = $1",
@@ -702,11 +714,11 @@ export async function postSElectionPackage(args: {
       principalAddress: seed?.principalAddress ?? "",
       ein: merged.ein ?? "",
       dateIncorporated: formation,
-      effectiveDate: merged.effectiveDate,
+      effectiveDate,
       officerName: merged.officerName ?? "",
       officerTitle: merged.officerTitle ?? "",
       phone: merged.phone ?? "",
-      shareholders: merged.shareholders.map((sh, i) => ({
+      shareholders: shareholders.map((sh, i) => ({
         name: sh.name,
         address: sh.address,
         percentage: sh.percentage,
@@ -1860,11 +1872,9 @@ app.post("/portal/services/:id/s-election-details", async (c) => {
   // open, and with it the deadline is the IRS's rule. Late, too close, or an
   // effective date before the Articles: refused, with the reason. "Today" is
   // Florida's date, not the host's.
-  if (!prior?.dateIncorporated) {
-    return c.json(err("We're confirming your formation date from your filed Articles — you'll get an email when the form is ready.", "FORMATION_DATE_REQUIRED"), 400);
-  }
+  const formationDate = d.formationDate;
   const timing = evaluate2553Timing({
-    formationDate: prior.dateIncorporated,
+    formationDate,
     effectiveDate: d.effectiveDate || undefined,
     today: easternDateIso(),
   });
@@ -1886,7 +1896,7 @@ app.post("/portal/services/:id/s-election-details", async (c) => {
   }
   // Nobody acquires an interest before the company exists.
   for (const sh of d.shareholders) {
-    if (sh.dateAcquired && sh.dateAcquired < prior.dateIncorporated) {
+    if (sh.dateAcquired && sh.dateAcquired < formationDate) {
       return c.json(err(`${sh.name || "An owner"}'s date acquired is earlier than the date on your filed Articles.`, "INVALID_INPUT"), 400);
     }
   }
@@ -1928,7 +1938,7 @@ app.post("/portal/services/:id/s-election-details", async (c) => {
   const merged: SElectionStoredDetails = {
     ein: d.einPending ? "" : d.ein,
     einPending: d.einPending,
-    dateIncorporated: prior?.dateIncorporated,
+    dateIncorporated: formationDate,
     effectiveDate: d.effectiveDate,
     officerName: d.officerName,
     officerTitle: d.officerTitle,

@@ -129,6 +129,22 @@ function Card({
                       : "— in progress"}
                   </span>
                 </button>
+              ) : s.type === "s-election" && s.has_secret ? (
+                // The client built this package from their own details. The
+                // office can still open it while those details are on file —
+                // to see the date they typed and correct it if the Articles
+                // say otherwise.
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => onFulfill(s)}
+                  data-testid="view-built-s-election"
+                  className="flex w-full items-start gap-1.5 text-left text-xs text-muted-foreground transition hover:text-trust"
+                >
+                  <Check className="mt-0.5 h-3 w-3 shrink-0 text-trust" />
+                  <span className="min-w-0 break-words">{serviceLabel(s, order.llc_name)}</span>
+                  <span className="shrink-0">— built by the client · view</span>
+                </button>
               ) : (
                 <div key={s.id} className="flex items-start gap-1.5 text-xs text-muted-foreground">
                   <Check className="mt-0.5 h-3 w-3 shrink-0 text-trust" />

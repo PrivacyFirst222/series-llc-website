@@ -529,9 +529,21 @@ export default function OrderDetail({
                           </Button>
                         </>
                       ) : (
-                        <span className="inline-flex items-center gap-1 text-xs text-trust">
-                          <Check className="h-3.5 w-3.5" /> fulfilled
-                        </span>
+                        <>
+                          <span className="inline-flex items-center gap-1 text-xs text-trust">
+                            <Check className="h-3.5 w-3.5" /> fulfilled
+                          </span>
+                          {s.type === "s-election" && s.has_secret ? (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="ml-auto rounded-full"
+                              onClick={() => onFulfill(s)}
+                            >
+                              View
+                            </Button>
+                          ) : null}
+                        </>
                       )}
                     </div>
                   ))}

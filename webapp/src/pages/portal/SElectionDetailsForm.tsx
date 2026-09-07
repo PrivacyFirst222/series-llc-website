@@ -58,13 +58,14 @@ export interface SElectionDraft {
   certified: boolean;
   timingAcknowledged: boolean;
   eligibilityAcknowledged: boolean;
+  formationDateTyped: string;
 }
 
 export function SElectionDetailsForm({
   order,
   members,
   clientName,
-  formationDate,
+  priorFormationDate,
   todayEastern,
   draft,
   onDraftChange,
@@ -74,9 +75,9 @@ export function SElectionDetailsForm({
   members: { name: string; address: string }[];
   /** The signed-in client's own name — the usual signing officer. */
   clientName?: string;
-  /** The date on the filed Articles, entered by the office; the form does
-   *  not open without it. */
-  formationDate?: string;
+  /** A date already on the order (an earlier build, or the office's
+   *  correction) — the box starts from it. */
+  priorFormationDate?: string;
   /** Florida's date, from our server — the gate never uses the device clock. */
   todayEastern?: string;
   draft?: SElectionDraft;
@@ -90,6 +91,10 @@ export function SElectionDetailsForm({
     new Set([clientName?.trim() ?? "", ...members.map((m) => m.name.trim())].filter(Boolean)),
   );
   const prior = order.details;
+  // The client reads this off their filed Articles, one card above the form
+  // (Adam, 6 Sep 2026). Everything about the deadline runs from it.
+  const [formationDateTyped, setFormationDateTyped] = useState(draft?.formationDateTyped ?? isoToTypedDate(priorFormationDate));
+  const formationDate = typedDateToIso(formationDateTyped) || undefined;
   const [ein, setEin] = useState(draft?.ein ?? prior.ein ?? "");
   const [einPending, setEinPending] = useState(draft ? draft.einPending : Boolean(prior.einPending));
   const [effectiveDate, setEffectiveDate] = useState(draft?.effectiveDate ?? isoToTypedDate(prior.effectiveDate));
@@ -119,10 +124,10 @@ export function SElectionDetailsForm({
   const [timingAcknowledged, setTimingAcknowledged] = useState(draft?.timingAcknowledged ?? false);
   const [eligibilityAcknowledged, setEligibilityAcknowledged] = useState(draft?.eligibilityAcknowledged ?? false);
   useEffect(() => {
-    onDraftChange?.({ ein, einPending, effectiveDate, officerName, officerOther, officerTitle, phone, rows, certified, timingAcknowledged, eligibilityAcknowledged });
+    onDraftChange?.({ ein, einPending, effectiveDate, officerName, officerOther, officerTitle, phone, rows, certified, timingAcknowledged, eligibilityAcknowledged, formationDateTyped });
     // onDraftChange is a stable setter from the dialog.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ein, einPending, effectiveDate, officerName, officerOther, officerTitle, phone, rows, certified, timingAcknowledged, eligibilityAcknowledged]);
+  }, [ein, einPending, effectiveDate, officerName, officerOther, officerTitle, phone, rows, certified, timingAcknowledged, eligibilityAcknowledged, formationDateTyped]);
 
   // The Form 2553 timing gate (Adam, 6 Sep 2026): run on load and again
   // whenever the effective date changes. Late, too close, or an effective
@@ -141,7 +146,8 @@ export function SElectionDetailsForm({
   // year preceding the tax year it is to take effect."
   const premature = Boolean(typedEffective && todayEastern && Number(typedEffective.slice(0, 4)) > Number(todayEastern.slice(0, 4)) + 1);
   const acquiredTooEarly = rows.some((r) => !r.atFormation && formationDate && (typedDateToIso(r.dateAcquired) ?? "") !== "" && (typedDateToIso(r.dateAcquired) as string) < formationDate);
-  const timingOk = timing?.status === "ok" && !premature && !acquiredTooEarly;
+  const formationDateBad = formationDateTyped.trim() !== "" && typedDateToIso(formationDateTyped) === null;
+  const timingOk = timing?.status === "ok" && !premature && !acquiredTooEarly && !formationDateBad;
   useEffect(() => {
     // A changed effective date changes the deadline: the acknowledgment
     // names it, so it must be given again.
@@ -155,6 +161,7 @@ export function SElectionDetailsForm({
   const submit = useMutation({
     mutationFn: () =>
       api.post<{ documentId: string }>(`/api/portal/services/${order.id}/s-election-details`, {
+        formationDate,
         ein,
         einPending,
         effectiveDate: typedDateToIso(effectiveDate) ?? "",
@@ -184,6 +191,10 @@ export function SElectionDetailsForm({
       onSubmit={(e) => {
         e.preventDefault();
         setFormError("");
+        if (!formationDate) {
+          setFormError("Enter the date the Division filed your Articles as MM/DD/YYYY — it's on your Articles of Organization, in your documents above.");
+          return;
+        }
         if (typedDateToIso(effectiveDate) === null) {
           setFormError("Enter the election effective date as MM/DD/YYYY, or leave it blank.");
           return;
@@ -196,6 +207,25 @@ export function SElectionDetailsForm({
       }}
     >
       <div className="grid gap-3 sm:grid-cols-2">
+        <div className="space-y-1.5 sm:col-span-2">
+          <label className="text-sm font-medium">Date the Division filed your Articles</label>
+          <Input
+            value={formationDateTyped}
+            onChange={(e) => setFormationDateTyped(e.target.value)}
+            placeholder="MM/DD/YYYY"
+            inputMode="numeric"
+            autoComplete="off"
+            aria-label="Date the Division filed your Articles"
+            className="w-48"
+          />
+          <p className="text-xs text-muted-foreground">
+            It's on your Articles of Organization, in your documents above. Your Form 2553 deadline
+            runs from this date.
+          </p>
+          {formationDateBad ? (
+            <p className="text-xs text-destructive">Enter the date as MM/DD/YYYY.</p>
+          ) : null}
+        </div>
         <div className="space-y-1.5">
           <label className="text-sm font-medium">EIN (9 digits)</label>
           <Input
@@ -223,6 +253,7 @@ export function SElectionDetailsForm({
             placeholder="MM/DD/YYYY"
             inputMode="numeric"
             autoComplete="off"
+            aria-label="Election effective date"
           />
           <p className="text-xs text-muted-foreground">
             Usually your formation date. Leave blank and we'll use the date on your filed Articles.

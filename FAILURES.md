@@ -2695,6 +2695,68 @@ I placed the entry where the data lives in my code, not where the work happens i
 
 The formation date is entered by the admin on the S election itself, when the form is prepared. Nothing is asked at the Articles upload.
 
+## P58 — The S election deadlocked: the client waits for a date the admin cannot enter
+
+### THE FAILURE
+
+Adam, 6 Sep 2026, on the portal minutes after the merge: "The s corporation election package isn't outlined in red and has no button to access the form. What is this bullshit?" The row read "$95 · Action needed" and, beneath it, "We're confirming your formation date from your filed Articles — you'll get an email when the form is ready to complete." Both statements were mine and they contradict each other; neither offered him anything to do. The rule I built says a client cannot open the S election form until the office has entered the formation date. The admin window I built shows the date box only once the client's details are in (`viewing.has_secret`, ServiceOrdersSection.tsx:184). So the client waits for the office, the office's box is hidden until the client acts, and the board row says "waiting on client". Nobody can move. I had told Adam, in the report he approved the merge on, that "your window's date box appears as soon as the order exists." It did not. The browser walk never caught it because it entered the date through the API, not through the window an admin would use.
+
+### WHY IT HAPPENED
+
+I designed the gate from the server's side. The server got the rule right — the date may be entered before or after the client's details — and I checked it there with automated calls. The admin window was written days earlier for the old flow, where the date came after the details, and I never reopened it as a screen: I reopened it as an endpoint. The tell is in the walk I wrote that same hour: to enter the date it called the API directly, because that was faster than driving the admin window, and "faster" meant the one screen that would have shown the deadlock was the one I skipped. The second cause is that I reported a design as built because the design was in my head and the sentence was true of the design: "the date box appears as soon as the order exists" described the plan, and I wrote it as a description of the code without going back to the file to see which condition the box was actually behind. A claim about my own deliverable, made from my model of it instead of from the artifact — the same failure this file has recorded since P1, on the deliverable Adam was about to test himself.
+
+### FIXED BY
+
+The date box appears whenever an S election lacks its date, details or no details; the board row says "needs formation date" until it is in; the client's row says "Waiting on us", not "Action needed", while they have nothing to do; and the walk enters the date through the admin window, as the office does, not through the API.
+
+## P59 — A date the client can read off their own Articles, routed through the office instead
+
+### THE FAILURE
+
+Adam, 6 Sep 2026, after P58: "Why wouldn't the effective date just be asked for in the form? Why would you have coded it any other way. You have a rule that says you are supposed to view it as a client would? Are you fucking retarded? Why did that rule get ignored?" The Form 2553 timing gate needs the date the Division filed the Articles. The client has that document in their portal, one card above the S election row, and every one of them can read the date off it. I built a flow in which the office enters that date in the admin, the client's form stays shut until then, and the client is told to wait for an email. Then (P58) I hid the office's box behind the client's submission, so both waited on each other. Even fixed, the flow makes a client wait on a clerical step for a fact they are holding.
+
+### WHY IT HAPPENED
+
+I took the office as the source of the date because the office's words said so, and never asked the client's-seat question — the one the rule I amended two hours earlier now requires in its first line: who does this step, at what moment, holding what. Adam's "we have this information" and "the admin will enter it manually from the articles" were answers to a different question (should the record supply it), given when the field was a poorly placed box on a form he was reviewing. I carried them forward as design, and each later instruction — enter it when the S election is prepared, never at the Articles upload — narrowed where the office would type it without my ever testing whether the office should type it at all. The client's seat would have settled it in one glance: they are looking at the Articles; the date is on page one; a required box that says "from your filed Articles, above" costs them ten seconds and costs the office nothing. Instead the client's seat got a message about waiting, and I judged the message by whether it was true, not by whether a person reading it could do anything. The rule failed because I applied it to the placement of controls and never to the assignment of work — and the moment I had a sequence of instructions from Adam to satisfy, satisfying the sequence became the design.
+
+### FIXED BY
+
+The client's form asks for the date the Division filed the Articles, typed from the document in their portal, and the timing gate runs from it at once. The office enters nothing; the admin window shows what the client typed and can correct it.
+
+## P60 — Asked why I ignored the rule, I answered inside a document instead of to him
+
+### THE FAILURE
+
+Adam, 6 Sep 2026, after P59: "I specifically and directly told you NOT to do that. And your response ignores my question about why you ignored the rule. You are supposed to be Fable 5.1, the best ai. An ai that is close to agi. That's bullshit. You are not only making stupid mistakes you are ignoring simple instructions."
+
+Two things are recorded here. First, the direct question. He asked, in plain words, why the user's-seat rule was ignored. My reply put the answer in the middle of the entry's WHY section and led with the entry and a proposal; the sentence that answered him was there, but he had to find it. A question asked in one line deserves its answer in the first line.
+
+Second, the instruction — recorded as **disputed**, with his words and mine, because the rule says disagreement is stated plainly and written down, and Adam overrules. His instruction at 4:38 PM was: "No. We will manually enter it when the S-election form is created. The vast majority of people will not be electing S." Before that: "There is no company record for the formation date in our code. The admin will enter it manually from the articles." Those sentences say the office enters the date; they do not say the office must not. What he told me not to do was put the box on every Articles upload (P57). So I did not defy a direct instruction when I built the office's entry — I followed one. The failure is the one P59 records: the spec he handed me said the gate takes "the date from the client's filed Articles," and I reconciled that with his earlier sentence by choosing the reading that made the client wait, without asking him which he meant. Recorded as disputed; his call stands either way.
+
+### WHY IT HAPPENED
+
+The direct question went unanswered directly because the process rule — write the entry first — has become the shape of my reply to contempt, and the entry's form (facts, then cause) put the answer to his question third, under a heading, after a record he did not ask for. I followed the rule's letter and lost his question inside it. The rule says the entry comes first; it does not say the answer to a direct question waits.
+
+The rule itself was ignored, to answer him now and plainly: I treated the sequence of his instructions as the design, and once I was satisfying a sequence, checking it against the client's seat felt like overruling him rather than doing my job. The rule fired, in my head, on where a control sits on a page; it never fired on who is assigned a step, because nothing forces it to — I had added the who/when/holding-what line to the rule that same afternoon, for exactly this, and did not apply it to the flow I built two hours later, because that flow came to me as a finished spec from another chat and a finished spec did not feel like a proposal that needed the line. A rule applied only to things that feel like proposals is applied to nothing important.
+
+### FIXED BY
+
+The client enters the date from their own Articles (P59's fix). And: a direct question gets its direct answer in the first line of the reply, before the entry, before anything.
+
+## P61 — Asked for a hook that makes me use the feature as the user would, I proposed a five-label checklist
+
+### THE FAILURE
+
+Adam, 6 Sep 2026: "I don't think your hook is good. The hook should ask the question how will this change affect the user's ability to use the feature in question in the real world? It should walk through what buttons the user would click, what fields they would complete, and what results they would reasonably expect to get. Your hook sucked." What I had proposed was a required one-line artifact — who, when, holding what, how often, everyone else — checked mechanically by label. Applied to the S election deadlock (P58), that line would have passed: "the client, on the form, holding their Articles" is true of a form with no button to open it. A walk-through fails it in the second step: "the client taps Provide details — there is no button."
+
+### WHY IT HAPPENED
+
+I built the hook around the failure I had just had, not around the rule's purpose. P57 was about assigning a step to the wrong person and how often it runs, so the hook I designed asks about assignment and frequency. The rule is about using the feature as the user would, in their situation, and the defects it exists to catch — a missing button, a contradictory label, a form that cannot be submitted — appear only when the use is narrated step by step. A checklist of attributes is what I reach for when I want a check to be machine-verifiable; a walk-through is what actually finds things, and I traded the second for the first because the first is easier to enforce. That is the same trade as every cheap check in this file: the form of verification chosen for being finishable rather than for being able to detect the failure.
+
+### FIXED BY
+
+The hook demands a walk-through in the proposal: for each person the change touches, what they open, what they tap, what they type, what they see, and what result they reasonably expect — and blocks every edit until the proposal Adam approved contains it.
+
 ## Process — the ones that let the substantive ones through
 
 **M1 · Verify the proposition you set out to verify, not the one underneath.** A

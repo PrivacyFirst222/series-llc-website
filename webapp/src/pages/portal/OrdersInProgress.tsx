@@ -172,12 +172,7 @@ export function OrdersInProgress({
                     email the moment it's ready to download.
                   </p>
                 ) : null}
-                {o.type === "s-election" && o.status === "awaiting_info" && !o.details.dateIncorporated ? (
-                  <p className="mt-1 text-xs text-muted-foreground" data-testid="awaiting-formation-date">
-                    We're confirming your formation date from your filed Articles — you'll get an
-                    email when the form is ready to complete.
-                  </p>
-                ) : null}
+
               </div>
               <div className="flex shrink-0 flex-wrap items-center gap-2">
                 {o.type === "series" && o.status !== "pending_payment" && o.status !== "cancelled" ? (
@@ -191,7 +186,7 @@ export function OrdersInProgress({
                     Consent &amp; Series Exhibit
                   </Button>
                 ) : null}
-                {o.status === "awaiting_info" && !(o.type === "s-election" && !o.details.dateIncorporated) ? (
+                {o.status === "awaiting_info" ? (
                   <Button
                     size="sm"
                     className="rounded-full"
@@ -251,7 +246,7 @@ export function OrdersInProgress({
               order={detailsFor}
               members={data.members ?? []}
               clientName={meQuery.data?.name}
-              formationDate={detailsFor.details.dateIncorporated}
+              priorFormationDate={detailsFor.details.dateIncorporated}
               todayEastern={data.todayEastern}
               draft={selDrafts[detailsFor.id]}
               onDraftChange={(d) => {

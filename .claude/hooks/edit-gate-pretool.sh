@@ -42,6 +42,9 @@ TOOL=$(printf '%s' "$INPUT" | python3 -c "import json,sys; print(json.load(sys.s
 case "$TOOL" in
   Edit|Write|MultiEdit|NotebookEdit)
     FILE=$(printf '%s' "$INPUT" | python3 -c "import json,sys; print(json.load(sys.stdin).get('tool_input',{}).get('file_path',''))" 2>/dev/null)
+    # The failure record never waits for a Go: an entry is written before
+    # anything else, by rule. This is the ONLY file exempt.
+    case "$FILE" in */FAILURES.md|FAILURES.md) exit 0 ;; esac
     notify "$TOOL" "$FILE"
     echo "BLOCKED by Adam's edit gate: no authorization for file changes. Explain to Adam exactly what you plan to change and list every assumption, then WAIT for him to reply with a message starting with 'Go'. His 'Go' opens the gate; any other message from him closes it." >&2
     exit 2
@@ -67,7 +70,7 @@ case "$TOOL" in
     # First strip redirects that cannot write a file — fd dups (2>&1) and
     # /dev/null — so silencing noise on a read-only command doesn't block it.
     CMD_SCAN=$(printf '%s' "$CMD" | sed -E 's/[0-9]*>&[0-9]+//g; s/[0-9]*>[[:space:]]*\/dev\/null//g')
-    if printf '%s' "$CMD_SCAN" | grep -qE '(>>|[^-=]>[^&]|\btee\b|\bsed\b[^|]*-i|\bcp\b|\bmv\b|\brm\b|\bmkdir\b|\btouch\b|\bchmod\b|\bln\b|python[0-9.]* -c|python[0-9.]* <<|<<[[:space:]]*'\''?(EOF|PYEOF|CHUNK)|git[[:space:]]+(add|commit|push|checkout|reset|rm|mv|restore|clean)|bunx? (install|add|remove)|npm (install|i|add|remove))'; then
+    if printf '%s' "$CMD_SCAN" | grep -qE '(>>|[^-=]>[^&]|\btee\b|\bsed\b[^|]*-i|\bcp\b|\bmv\b|\brm\b|\bmkdir\b|\btouch\b|\bchmod\b|\bln\b|python[0-9.]* -c|python[0-9.]* <<|<<-?[[:space:]]*['\''"]?[A-Za-z_]+|git[[:space:]]+(add|commit|push|checkout|reset|rm|mv|restore|clean|merge)|bunx? (install|add|remove)|npm (install|i|add|remove))'; then
       notify "Bash" "$CMD"
       echo "BLOCKED by Adam's edit gate: this shell command can modify files or repo state. Explain the exact planned changes and every assumption, then WAIT for Adam to reply with a message starting with 'Go'." >&2
       exit 2

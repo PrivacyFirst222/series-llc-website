@@ -100887,20 +100887,6 @@ function llcFormedEmail(opts) {
 function escapeHtml(s) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
-function sElectionFormReadyEmail(opts) {
-  return {
-    subject: `Your S election form is ready to complete \u2014 ${opts.llcName}`,
-    html: wrap(`
-      <p>Your S corporation election form for <strong>${escapeHtml(opts.llcName)}</strong> is
-      ready to complete in your portal. Sign in, open <strong>Orders in progress</strong>, and choose
-      <strong>Provide details securely</strong>.</p>
-      <p>IRS Form 2553 must be filed (postmarked or faxed) by
-      <strong>${escapeHtml(opts.deadlineDisplay)}</strong>. We prepare the form; you file it.
-      Please complete the form soon so there is time to sign and send it.</p>
-      <p><a href="${opts.portalUrl}">Open your portal</a></p>
-    `)
-  };
-}
 
 // src/lib/form2553Timing.ts
 var DEFAULT_MIN_DAYS = 5;
@@ -106077,22 +106063,23 @@ async function purgeExpiredSElections() {
   for (const row of rows) {
     const d2 = typeof row.details === "string" ? JSON.parse(row.details) : row.details;
     const kept = { ...d2, purgedAt: (/* @__PURE__ */ new Date()).toISOString() };
-    if (d2?.shareholders?.length && d2.dateIncorporated && d2.effectiveDate) {
+    if (d2?.shareholders?.length && d2.dateIncorporated) {
       const seed = await oaSeed(row.client_id);
+      const filled = withFormationDefaults(d2);
       try {
         const pdf = await buildSElectionPackage({
           llcName: row.llc_name,
           principalAddress: seed?.principalAddress ?? "",
           ein: d2.ein ?? "",
           dateIncorporated: d2.dateIncorporated,
-          effectiveDate: d2.effectiveDate,
+          effectiveDate: filled.effectiveDate,
           officerName: d2.officerName ?? "",
           officerTitle: d2.officerTitle ?? "",
           phone: d2.phone ?? "",
           recordCopy: true,
           // Only the last four survive in the stored record — that is all the
           // record copy can show, and all it needs to.
-          shareholders: d2.shareholders.map((s) => ({ ...s, ssn: s.ssnLast4 }))
+          shareholders: filled.shareholders.map((s) => ({ ...s, ssn: s.ssnLast4 }))
         });
         const title = `S Corporation Election Package \u2014 Record Copy \u2014 ${row.llc_name}`;
         const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength);
@@ -106197,10 +106184,12 @@ var VALID_EIN_PREFIXES = new Set(
 var sElectionDetailsSchema = external_exports.object({
   ein: external_exports.string().transform((s) => s.replace(/[\s-]/g, "")).refine((s) => s === "" || /^\d{9}$/.test(s), "Enter the 9-digit EIN, or leave it blank if we're obtaining it.").refine((s) => s === "" || VALID_EIN_PREFIXES.has(s.slice(0, 2)), "That is not a valid EIN \u2014 check the first two digits."),
   einPending: external_exports.boolean().optional().default(false),
-  // The formation date is entered by the office from the filed Articles
-  // when the package is prepared (Adam, 6 Sep 2026) — never by the client.
-  // The effective date and each owner's acquisition date may be left blank
-  // and default to it.
+  // The date the Division filed the Articles, typed by the client from the
+  // Articles in their portal (Adam, 6 Sep 2026: "Why wouldn't the effective
+  // date just be asked for in the form?"). The Form 2553 deadline runs from
+  // it. The effective date and each owner's acquisition date may be left
+  // blank and default to it.
+  formationDate: external_exports.string({ required_error: "Enter the date the Division filed your Articles as MM/DD/YYYY." }).regex(/^\d{4}-\d{2}-\d{2}$/, "Enter the date the Division filed your Articles as MM/DD/YYYY."),
   effectiveDate: external_exports.string().regex(/^\d{4}-\d{2}-\d{2}$/).or(external_exports.literal("")).optional().default(""),
   officerName: external_exports.string().min(1, "The signing officer's name is required.").max(200),
   officerTitle: external_exports.string().min(1).max(100),
@@ -106239,12 +106228,18 @@ var sElectionDetailsSchema = external_exports.object({
 }).refine((d2) => Math.abs(d2.shareholders.reduce((a2, s) => a2 + s.percentage, 0) - 100) < 0.01, {
   message: "Ownership percentages must total exactly 100%."
 });
+function withFormationDefaults(d2) {
+  const formation = d2.dateIncorporated ?? "";
+  return {
+    effectiveDate: d2.effectiveDate || formation,
+    shareholders: (d2.shareholders ?? []).map((sh) => ({ ...sh, dateAcquired: sh.dateAcquired || formation }))
+  };
+}
 async function postSElectionPackage(args) {
   const { so: so2, merged, ssns } = args;
   const db = await getDb();
   const formation = merged.dateIncorporated ?? "";
-  merged.effectiveDate = merged.effectiveDate || formation;
-  merged.shareholders = (merged.shareholders ?? []).map((sh) => ({ ...sh, dateAcquired: sh.dateAcquired || formation }));
+  const { effectiveDate, shareholders } = withFormationDefaults(merged);
   const seed = await oaSeed(so2.client_id);
   const clients = await db.query(
     "SELECT email, name FROM clients WHERE id = $1",
@@ -106257,11 +106252,11 @@ async function postSElectionPackage(args) {
       principalAddress: seed?.principalAddress ?? "",
       ein: merged.ein ?? "",
       dateIncorporated: formation,
-      effectiveDate: merged.effectiveDate,
+      effectiveDate,
       officerName: merged.officerName ?? "",
       officerTitle: merged.officerTitle ?? "",
       phone: merged.phone ?? "",
-      shareholders: merged.shareholders.map((sh, i) => ({
+      shareholders: shareholders.map((sh, i) => ({
         name: sh.name,
         address: sh.address,
         percentage: sh.percentage,
@@ -107231,11 +107226,9 @@ function registerPortalRoutes(app2) {
       );
     }
     const d2 = body.data;
-    if (!prior?.dateIncorporated) {
-      return c.json(err("We're confirming your formation date from your filed Articles \u2014 you'll get an email when the form is ready.", "FORMATION_DATE_REQUIRED"), 400);
-    }
+    const formationDate = d2.formationDate;
     const timing = evaluate2553Timing({
-      formationDate: prior.dateIncorporated,
+      formationDate,
       effectiveDate: d2.effectiveDate || void 0,
       today: easternDateIso()
     });
@@ -107252,7 +107245,7 @@ function registerPortalRoutes(app2) {
       return c.json(err(`An election effective ${d2.effectiveDate.slice(5, 7)}/${d2.effectiveDate.slice(8, 10)}/${d2.effectiveDate.slice(0, 4)} can't be made yet \u2014 the IRS accepts it only during the tax year before it takes effect.`, "TIMING_PREMATURE"), 400);
     }
     for (const sh of d2.shareholders) {
-      if (sh.dateAcquired && sh.dateAcquired < prior.dateIncorporated) {
+      if (sh.dateAcquired && sh.dateAcquired < formationDate) {
         return c.json(err(`${sh.name || "An owner"}'s date acquired is earlier than the date on your filed Articles.`, "INVALID_INPUT"), 400);
       }
     }
@@ -107283,7 +107276,7 @@ function registerPortalRoutes(app2) {
     const merged = {
       ein: d2.einPending ? "" : d2.ein,
       einPending: d2.einPending,
-      dateIncorporated: prior?.dateIncorporated,
+      dateIncorporated: formationDate,
       effectiveDate: d2.effectiveDate,
       officerName: d2.officerName,
       officerTitle: d2.officerTitle,
@@ -109324,15 +109317,7 @@ function registerAdminRoutes(app2) {
     if (so2.type !== "s-election") return c.json(err("Not found", "NOT_FOUND"), 404);
     const merged = (typeof so2.details === "string" ? JSON.parse(so2.details) : so2.details) ?? {};
     if (!so2.ein_secret) {
-      merged.dateIncorporated = body.data.date;
-      await db.query("UPDATE service_orders SET details = $1 WHERE id = $2", [JSON.stringify(merged), so2.id]);
-      const preview = evaluate2553Timing({ formationDate: body.data.date, today: easternDateIso() });
-      const clients = await db.query("SELECT email FROM clients WHERE id = $1", [so2.client_id]);
-      if (preview.status === "ok") {
-        const mail = sElectionFormReadyEmail({ llcName: so2.llc_name, deadlineDisplay: preview.deadlineDisplay ?? "", portalUrl: `${env.PUBLIC_BASE_URL}/portal` });
-        sendMail({ to: clients[0]?.email ?? "", ...mail }).catch((e) => console.error("[admin] s-election form-ready email failed:", e));
-      }
-      return c.json({ data: { ok: true, documentId: null, editableUntil: null, timing: preview } });
+      return c.json(err("The client has not provided the S election details yet \u2014 they enter the formation date on the form.", "BAD_STATE"), 400);
     }
     let ssns;
     try {
@@ -109342,12 +109327,11 @@ function registerAdminRoutes(app2) {
       return c.json(err("Could not decrypt the shareholder details.", "DECRYPT_FAILED"), 500);
     }
     const priorDocumentId = merged.documentId;
-    merged.dateIncorporated = body.data.date;
     const gate = evaluate2553Timing({ formationDate: body.data.date, effectiveDate: merged.effectiveDate || void 0, today: easternDateIso() });
     if (gate.status !== "ok") {
-      await db.query("UPDATE service_orders SET details = $1 WHERE id = $2", [JSON.stringify(merged), so2.id]);
       return c.json(err(gate.message, `TIMING_${gate.status.toUpperCase()}`), 400);
     }
+    merged.dateIncorporated = body.data.date;
     const built = await postSElectionPackage({ so: { id: so2.id, client_id: so2.client_id, llc_name: so2.llc_name }, merged, ssns, priorDocumentId });
     if (!built.ok) return c.json(err("The package could not be built.", "GENERATION_FAILED"), 500);
     return c.json({ data: { ok: true, documentId: built.documentId, editableUntil: built.editableUntil } });

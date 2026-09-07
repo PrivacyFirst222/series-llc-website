@@ -1449,14 +1449,14 @@ if (mint.status === 200) {
   // formation date first; the form does not open before it. Then the IRS
   // deadline rule decides: late and too-close are refused, the acknowledgment
   // is required, and only then is the package built.
-  check("S election details are refused before the office enters the formation date",
-    sDetails.status === 400 && sDetails.body?.error?.code === "FORMATION_DATE_REQUIRED", sDetails.body);
-  const badDate = await api(`/api/admin/services/${sId}/s-election-formation-date`, { method: "POST", cookies: adminS.cookie, body: JSON.stringify({ date: "8/1/2026" }) });
-  check("a malformed formation date is refused", badDate.status === 400, badDate.body);
+  // The client types the date the Division filed their Articles, from the
+  // Articles in their portal (Adam, 6 Sep 2026); the deadline runs from it.
+  check("S election details are refused without the formation date",
+    sDetails.status === 400 && /filed your Articles/.test(sDetails.body?.error?.message ?? ""), sDetails.body);
+  const badTyped = await api(`/api/portal/services/${sId}/s-election-details`, { method: "POST", cookies: mPw.cookie, body: JSON.stringify({ ...goodDetails, formationDate: "8/1/2026", timingAcknowledged: true }) });
+  check("a malformed formation date is refused", badTyped.status === 400, badTyped.body);
   const lateDate = daysAgo(120);
-  const lateEntered = await api(`/api/admin/services/${sId}/s-election-formation-date`, { method: "POST", cookies: adminS.cookie, body: JSON.stringify({ date: lateDate }) });
-  check("the office can enter a formation date before the client's details", lateEntered.status === 200 && lateEntered.body?.data?.timing?.status === "late", lateEntered.body);
-  const lateTry = await api(`/api/portal/services/${sId}/s-election-details`, { method: "POST", cookies: mPw.cookie, body: JSON.stringify({ ...goodDetails, timingAcknowledged: true }) });
+  const lateTry = await api(`/api/portal/services/${sId}/s-election-details`, { method: "POST", cookies: mPw.cookie, body: JSON.stringify({ ...goodDetails, formationDate: lateDate, timingAcknowledged: true }) });
   check("a late election is refused with the Rev. Proc. message",
     lateTry.status === 400 && lateTry.body?.error?.code === "TIMING_LATE" && /Rev\. Proc\. 2013-30/.test(lateTry.body?.error?.message ?? ""), lateTry.body);
   let tightDate = "";
@@ -1464,29 +1464,37 @@ if (mint.status === 200) {
     if (evaluate2553Timing({ formationDate: daysAgo(n), today: easternToday() }).status === "insufficient") { tightDate = daysAgo(n); break; }
   }
   check("a formation date inside the five-day runway exists to test", tightDate !== "", tightDate);
-  await api(`/api/admin/services/${sId}/s-election-formation-date`, { method: "POST", cookies: adminS.cookie, body: JSON.stringify({ date: tightDate }) });
-  const tightTry = await api(`/api/portal/services/${sId}/s-election-details`, { method: "POST", cookies: mPw.cookie, body: JSON.stringify({ ...goodDetails, timingAcknowledged: true }) });
+  const tightTry = await api(`/api/portal/services/${sId}/s-election-details`, { method: "POST", cookies: mPw.cookie, body: JSON.stringify({ ...goodDetails, formationDate: tightDate, timingAcknowledged: true }) });
   check("too little runway is refused", tightTry.status === 400 && tightTry.body?.error?.code === "TIMING_INSUFFICIENT", tightTry.body);
   const okDate = daysAgo(10);
-  const entered = await api(`/api/admin/services/${sId}/s-election-formation-date`, { method: "POST", cookies: adminS.cookie, body: JSON.stringify({ date: okDate }) });
-  check("the office enters a workable formation date", entered.status === 200 && entered.body?.data?.timing?.status === "ok", entered.body);
-  const earlyEff = await api(`/api/portal/services/${sId}/s-election-details`, { method: "POST", cookies: mPw.cookie, body: JSON.stringify({ ...goodDetails, effectiveDate: daysAgo(11), timingAcknowledged: true }) });
+  const notYet = await api(`/api/admin/services/${sId}/s-election-formation-date`, { method: "POST", cookies: adminS.cookie, body: JSON.stringify({ date: okDate }) });
+  check("the office has nothing to enter before the client's details", notYet.status === 400 && notYet.body?.error?.code === "BAD_STATE", notYet.body);
+  const earlyEff = await api(`/api/portal/services/${sId}/s-election-details`, { method: "POST", cookies: mPw.cookie, body: JSON.stringify({ ...goodDetails, formationDate: okDate, effectiveDate: daysAgo(11), timingAcknowledged: true }) });
   check("an effective date before the Articles is refused", earlyEff.status === 400 && earlyEff.body?.error?.code === "TIMING_INVALID", earlyEff.body);
-  const noAck = await api(`/api/portal/services/${sId}/s-election-details`, { method: "POST", cookies: mPw.cookie, body: JSON.stringify(goodDetails) });
+  const noAck = await api(`/api/portal/services/${sId}/s-election-details`, { method: "POST", cookies: mPw.cookie, body: JSON.stringify({ ...goodDetails, formationDate: okDate }) });
   check("the deadline acknowledgment is required", noAck.status === 400 && noAck.body?.error?.code === "TIMING_ACK_REQUIRED", noAck.body);
-  const noElig = await api(`/api/portal/services/${sId}/s-election-details`, { method: "POST", cookies: mPw.cookie, body: JSON.stringify({ ...goodDetails, timingAcknowledged: true }) });
+  const noElig = await api(`/api/portal/services/${sId}/s-election-details`, { method: "POST", cookies: mPw.cookie, body: JSON.stringify({ ...goodDetails, formationDate: okDate, timingAcknowledged: true }) });
   check("the shareholder-eligibility acknowledgment is required", noElig.status === 400 && noElig.body?.error?.code === "ELIGIBILITY_ACK_REQUIRED", noElig.body);
   const draftEarly = await fetch(`${BASE}/api/admin/services/${sId}/s-election-draft`, { headers: { Cookie: adminS.cookie } });
   check("the draft cannot be built before the client's details", draftEarly.status === 400, draftEarly.status);
-  const okDetails = { ...goodDetails, timingAcknowledged: true, eligibilityAcknowledged: true };
+  const okDetails = { ...goodDetails, formationDate: okDate, timingAcknowledged: true, eligibilityAcknowledged: true };
   const sDetails2 = await api(`/api/portal/services/${sId}/s-election-details`, { method: "POST", cookies: mPw.cookie, body: JSON.stringify(okDetails) });
   check("S election details accepted and the package built at once", sDetails2.status === 200 && Boolean(sDetails2.body?.data?.documentId), sDetails2.body);
   const storedDates = await api(`/api/admin/services/${sId}`, { cookies: adminS.cookie });
-  check("the stored formation date is the office's, not the client's", storedDates.body?.data?.details?.dateIncorporated === okDate, storedDates.body?.data?.details?.dateIncorporated);
-  check("a blank effective date defaults to the formation date", storedDates.body?.data?.details?.effectiveDate === okDate, storedDates.body?.data?.details?.effectiveDate);
-  check("a blank acquisition date defaults to the formation date", storedDates.body?.data?.details?.shareholders?.[0]?.dateAcquired === okDate, storedDates.body?.data?.details?.shareholders?.[0]);
+  check("the stored formation date is the one the client typed (a stray dateIncorporated is ignored)", storedDates.body?.data?.details?.dateIncorporated === okDate, storedDates.body?.data?.details?.dateIncorporated);
+  // Blanks stay blank on file (the package fills them from the formation
+  // date), so a correction of that date carries them along.
+  check("a blank effective date stays blank on file", !storedDates.body?.data?.details?.effectiveDate, storedDates.body?.data?.details?.effectiveDate);
+  check("a blank acquisition date stays blank on file", !storedDates.body?.data?.details?.shareholders?.[0]?.dateAcquired, storedDates.body?.data?.details?.shareholders?.[0]);
   check("the filing deadline is stored with the details", storedDates.body?.data?.details?.filingDeadline === evaluate2553Timing({ formationDate: okDate, today: easternToday() }).deadline, storedDates.body?.data?.details?.filingDeadline);
-  const readyDoc = await fetch(`${BASE}/api/portal/documents/${sDetails2.body?.data?.documentId}/download`, {
+  // The office can correct the date the client typed; the package is rebuilt.
+  const corrected = await api(`/api/admin/services/${sId}/s-election-formation-date`, { method: "POST", cookies: adminS.cookie, body: JSON.stringify({ date: daysAgo(9) }) });
+  check("the office can correct the client's formation date and rebuild", corrected.status === 200 && Boolean(corrected.body?.data?.documentId), corrected.body);
+  const refusedCorrection = await api(`/api/admin/services/${sId}/s-election-formation-date`, { method: "POST", cookies: adminS.cookie, body: JSON.stringify({ date: daysAgo(120) }) });
+  check("a correction that would make the election late is refused", refusedCorrection.status === 400 && refusedCorrection.body?.error?.code === "TIMING_LATE", refusedCorrection.body);
+  const afterCorrection = await api(`/api/admin/services/${sId}`, { cookies: adminS.cookie });
+  check("the corrected date is the one on file", afterCorrection.body?.data?.details?.dateIncorporated === daysAgo(9), afterCorrection.body?.data?.details?.dateIncorporated);
+  const readyDoc = await fetch(`${BASE}/api/portal/documents/${corrected.body?.data?.documentId}/download`, {
     headers: { Cookie: mPw.cookie },
   });
   const readyBytes = new Uint8Array(await readyDoc.arrayBuffer());

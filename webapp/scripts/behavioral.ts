@@ -23,6 +23,11 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 const API_PORT = 3300 + Math.floor(Math.random() * 500);
+/** When set, the walk saves screenshots of the screens it checks there. */
+const SHOT_DIR = process.env.SHOT_DIR;
+const shot = async (page: { screenshot: (o: { path: string; fullPage?: boolean }) => Promise<unknown> }, name: string) => {
+  if (SHOT_DIR) await page.screenshot({ path: `${SHOT_DIR}/${name}.png`, fullPage: false });
+};
 const WEB_PORT = 3900 + Math.floor(Math.random() * 500);
 const API = `http://localhost:${API_PORT}`;
 
@@ -628,10 +633,10 @@ async function main(): Promise<void> {
       // entered the formation date (Form 2553 timing gate, 6 Sep 2026): the
       // toast and the outlines leave it out, and pick it up once the date
       // is in — asserted further down.
-      expect(!/S Corporation Election Package/.test(toastText), "actions: the toast leaves out the S election until the formation date is entered", toastText);
+      expect(/S Corporation Election Package — Gate Run Delta, PLLC/.test(toastText), "actions: toast names the S election awaiting details", toastText);
       expect(/Federal EIN — Gate Run Delta, PLLC/.test(toastText), "actions: toast names the EIN awaiting details", toastText);
       const outlined = await page.locator('[data-needs-action="true"]').allInnerTexts();
-      expect(outlined.length === 2, "actions: the agreement card and the EIN row are outlined red", outlined.map((t) => t.split("\n")[0]));
+      expect(outlined.length === 3, "actions: the agreement card and both service rows are outlined red", outlined.map((t) => t.split("\n")[0]));
       const redBorders = await page.locator('[data-needs-action="true"]').evaluateAll((els) => els.map((e) => getComputedStyle(e).borderTopWidth));
       expect(redBorders.every((w) => w === "2px"), "actions: every outlined element carries the 2px destructive border", redBorders);
 
@@ -652,32 +657,26 @@ async function main(): Promise<void> {
       // and each owner row offers "Acquired at formation", ticked by default,
       // which hides the date box; unticking reveals it.
       const selRow = page.locator('[data-testid="orders-in-progress"] li').filter({ hasText: /S Corporation Election/ }).first();
-      // The Form 2553 timing gate (Adam, 6 Sep 2026): no form until the
-      // office enters the formation date; then the deadline and its
-      // acknowledgment appear on the form.
-      expect((await selRow.locator('[data-testid="awaiting-formation-date"]').count()) === 1, "S election: the row says we are confirming the formation date");
-      expect((await selRow.locator("button").filter({ hasText: /Provide details/ }).count()) === 0, "S election: no form until the formation date is entered");
-      const dSvc = await fetch(`${API}/api/admin/services`, { headers: { Cookie: adminCookie } }).then((r) => r.json()) as { data?: { id: string; type: string; formation_order_id: string | null }[] };
-      const dSel = (dSvc.data ?? []).find((s) => s.type === "s-election" && s.formation_order_id === dOrderId);
-      expect(!!dSel, "S election: run D's order is found for the office");
-      const todayEt = new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
-      const dateRes = await fetch(`${API}/api/admin/services/${dSel?.id}/s-election-formation-date`, { method: "POST", headers: { "Content-Type": "application/json", Cookie: adminCookie }, body: JSON.stringify({ date: todayEt }) }).then((r) => r.json()) as { data?: { timing?: { status?: string } } };
-      expect(dateRes.data?.timing?.status === "ok", "S election: the office enters today's date and the gate says ok", dateRes);
-      await page.reload();
-      await page.waitForTimeout(1500);
-      const toastAfterDate = await page.locator('[data-testid="action-needed-list"]').first().innerText().catch(() => "");
-      expect(/S Corporation Election Package — Gate Run Delta, PLLC/.test(toastAfterDate), "actions: once the date is in, the toast names the S election", toastAfterDate);
-      expect((await page.locator('[data-needs-action="true"]').count()) === 3, "actions: once the date is in, the S election row is outlined too");
+      // The Form 2553 timing gate (Adam, 6 Sep 2026): the client types the
+      // date the Division filed their Articles — from the Articles one card
+      // above — and the deadline and its acknowledgment appear at once.
       await page.locator('[toast-close]').first().click().catch(() => {});
       await selRow.locator("button").filter({ hasText: /Provide details/ }).first().click();
       await page.waitForTimeout(800);
       const selDialog = page.locator('[role="dialog"]').first();
-      expect((await selDialog.locator('[data-testid="timing-ok"]').count()) === 1, "S election: the form shows the deadline and its acknowledgment");
+      await shot(page, "s-election-form-before-date");
+      expect((await selDialog.locator('[data-testid="timing-ok"]').count()) === 0, "S election: no deadline until the client types the formation date");
+      const todayEt = new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+      const [ty, tm, td] = todayEt.split("-");
+      await selDialog.locator('input[aria-label="Date the Division filed your Articles"]').fill(`${tm}/${td}/${ty}`);
+      await page.waitForTimeout(400);
+      expect((await selDialog.locator('[data-testid="timing-ok"]').count()) === 1, "S election: typing the formation date shows the deadline and its acknowledgment");
+      await shot(page, "s-election-form-after-date");
       expect((await selDialog.locator('input[aria-label="Shareholder eligibility acknowledgment"]').count()) === 1, "S election: the shareholder eligibility acknowledgment is on the form");
       expect(/no refund will be given/.test(await selDialog.innerText()), "S election: the eligibility box carries the no-liability, no-refund line");
       const buildBtn = selDialog.locator("button").filter({ hasText: /Certify and build/ }).first();
       expect(await buildBtn.isDisabled(), "S election: the build button is disabled until both acknowledgments are ticked");
-      const eff = selDialog.locator('input[placeholder="MM/DD/YYYY"]').first();
+      const eff = selDialog.locator('input[aria-label="Election effective date"]').first();
       expect((await eff.getAttribute("type")) !== "date" && (await eff.inputValue()) === "", "S election: the effective date is a typed box that starts empty", await eff.inputValue());
       const atFormation = selDialog.locator('input[aria-label="Acquired at formation"]').first();
       expect(await atFormation.isChecked(), "S election: an owner row is 'acquired at formation' by default");
@@ -702,7 +701,7 @@ async function main(): Promise<void> {
       // Nothing typed is lost (Adam, 6 Sep 2026): an outside tap does not
       // close the form; closing with Escape and reopening brings it all back.
       await selDialog.locator('input[aria-label="Signing officer\'s full legal name"]').fill("Pat Gatecheck");
-      await selDialog.locator("input").filter({ has: page.locator('xpath=self::input[contains(@placeholder,"MM/DD/YYYY") and not(contains(@placeholder,"Acquired"))]') }).first().fill("10/01/2026");
+      await selDialog.locator('input[aria-label="Election effective date"]').first().fill("10/01/2026");
       await page.mouse.click(5, 5);
       await page.waitForTimeout(500);
       expect((await page.locator('[role="dialog"]').count()) === 1, "S election: a tap outside the form does not close it");
@@ -713,7 +712,8 @@ async function main(): Promise<void> {
       await page.waitForTimeout(800);
       const reopened = page.locator('[role="dialog"]').first();
       expect((await reopened.locator('input[aria-label="Signing officer\'s full legal name"]').inputValue()) === "Pat Gatecheck", "S election: the typed officer survives closing and reopening");
-      expect((await reopened.locator('input[placeholder="MM/DD/YYYY"]').first().inputValue()) === "10/01/2026", "S election: the typed effective date survives closing and reopening");
+      expect((await reopened.locator('input[aria-label="Election effective date"]').first().inputValue()) === "10/01/2026", "S election: the typed effective date survives closing and reopening");
+      expect((await reopened.locator('input[aria-label="Date the Division filed your Articles"]').first().inputValue()) !== "", "S election: the typed formation date survives closing and reopening");
       // …and a reload of the page (Adam, 6 Sep 2026: retain everything except
       // the Social Security numbers).
       await reopened.locator('input[placeholder="SSN"], input[placeholder^="SSN"]').first().fill("123456789").catch(() => {});
@@ -725,7 +725,8 @@ async function main(): Promise<void> {
       await page.waitForTimeout(800);
       const afterReload = page.locator('[role="dialog"]').first();
       expect((await afterReload.locator('input[aria-label="Signing officer\'s full legal name"]').inputValue()) === "Pat Gatecheck", "S election: the typed officer survives a page reload");
-      expect((await afterReload.locator('input[placeholder="MM/DD/YYYY"]').first().inputValue()) === "10/01/2026", "S election: the typed effective date survives a page reload");
+      expect((await afterReload.locator('input[aria-label="Election effective date"]').first().inputValue()) === "10/01/2026", "S election: the typed effective date survives a page reload");
+      expect((await afterReload.locator('input[aria-label="Date the Division filed your Articles"]').first().inputValue()) !== "", "S election: the typed formation date survives a page reload");
       const ssnAfter = await afterReload.locator('input[placeholder^="SSN"]').first().inputValue().catch(() => "");
       expect(ssnAfter === "", "S election: the Social Security number does NOT survive a page reload", ssnAfter);
       await page.keyboard.press("Escape");
@@ -748,6 +749,7 @@ async function main(): Promise<void> {
       await page.waitForTimeout(800);
       const dialog = page.locator('[role="dialog"]').first();
       expect((await dialog.locator('[data-testid="waiting-on-client"]').count()) === 1, "admin: the fulfill dialog says it is waiting on the client");
+      await shot(page, "admin-window-waiting-on-client");
       expect((await dialog.locator("button").filter({ hasText: /fulfill/i }).count()) === 0, "admin: no fulfill button while the client's details are missing");
       expect((await dialog.locator('input[type="file"]').count()) === 0, "admin: no attach control while the client's details are missing");
       // The override: tick it and the attach control and fulfill button appear.

@@ -32,10 +32,6 @@ export function summaryOf(o: ServiceOrder): string {
 export function clientMustAct(o: ServiceOrder, llcFormed: boolean): boolean {
   if (o.status !== "awaiting_info") return false;
   if ((o.type === "ein" || o.type === "s-election") && !llcFormed) return false;
-  // An S election form opens only once the office has entered the formation
-  // date from the filed Articles — the Form 2553 deadline is computed from
-  // it (Adam, 6 Sep 2026). Until then there is nothing for the client to do.
-  if (o.type === "s-election" && !o.details.dateIncorporated) return false;
   return true;
 }
 
