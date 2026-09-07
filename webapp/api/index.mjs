@@ -101870,6 +101870,51 @@ function isValidEin(raw2) {
 }
 var fmtEinDisplay = (digits) => /^\d{9}$/.test(digits) ? `${digits.slice(0, 2)}-${digits.slice(2)}` : digits;
 
+// src/lib/einActivity.ts
+var EIN_REASONS = [
+  "Started a new business",
+  "Hired employee(s)",
+  "Banking purposes",
+  "Changed type of organization",
+  "Purchased active business"
+];
+var choose = (options, question = "Please choose one of the following:") => ({ kind: "choice", question, options });
+var PRIMARY = "Please choose one of the following that best describes your primary business activity:";
+var EIN_CATEGORIES = [
+  { name: "Accommodations", description: "Casino hotel, hotel, or motel", followUp: choose(["Casino hotel", "Hotel", "Motel", "Other"]) },
+  { name: "Construction", description: "Building houses/residential structures, building industrial/commercial structures, specialty trade contractors, remodelers, heavy construction contractors, land subdivision contractors, or site preparation contractors", followUp: { kind: "yesno", question: "Do you focus on a single construction trade (concrete, framing, glass, roofing, siding, electrical, plumbing, HVAC, flooring, etc.)?" } },
+  { name: "Finance", description: "Banks, sales financing, credit card issuing, mortgage company, mortgage company/broker, securities broker, investment advice, or trust administration", followUp: choose(["Commodities broker", "Credit card issuing", "Investment advice", "Investment club", "Investment holding", "Mortgage broker - agent for selling mortgages", "Mortgage company - lending funds with real estate as collateral", "Portfolio management", "Sales financing", "Securities broker", "Trust administration", "Venture capital company", "Other"], PRIMARY) },
+  { name: "Food Service", description: "Retail fast food, restaurant, bar, coffee shop, catering, or mobile food service", followUp: choose(["Bar", "Bar and restaurant", "Catering service", "Coffee shop", "Fast food restaurant", "Full service restaurant", "Ice cream shop", "Mobile food service", "Other"], PRIMARY) },
+  { name: "Health Care", description: "Doctor, mental health specialist, hospital, or outpatient care center", followUp: { kind: "yesno", question: "Does your establishment include medical practitioners having the degree of M.D. (Doctor of medicine) or D.O. (Doctor of osteopathy)?" } },
+  { name: "Insurance", description: "Insurance company or broker", followUp: choose(["I am an insurance carrier.", "I am an insurance agent or broker.", "Other"], PRIMARY) },
+  { name: "Manufacturing", description: "Mechanical, physical, or chemical transformation of materials/substances/components into new products, including the assembly of components", followUp: { kind: "text", question: 'Please specify the type of goods that you manufacture and the primary materials used (such as "wood furniture"):' } },
+  { name: "Real Estate", description: "Renting or leasing real estate, managing real estate, real estate agent/broker, selling, buying, or renting real estate for others", followUp: choose(["I rent or lease property that I own", "I use capital to build property", "I sell property for others", "I manage real estate for others", "Other"]) },
+  { name: "Rental & Leasing", description: "Rent/lease automobiles, consumer goods, commercial goods, or industrial goods", followUp: choose(["I rent, lease, or sell real estate.", "I rent or lease goods.", "I manage real estate for others."]) },
+  { name: "Retail", description: "Retail store, internet sales (exclusively), direct sales (catalogue, mail-order, door to door), auction house, or selling goods on auction sites", followUp: choose(["Selling goods exclusively over the Internet (including independently selling on auction sites).", "Sales from a storefront.", "Direct sales", "Auction house", "Other"]) },
+  { name: "Social Assistance", description: "Youth services, residential care facility, services for the disabled, or community food/housing/relief services", followUp: choose(["Nursing home", "Shelter", "Youth services", "Other"], PRIMARY) },
+  { name: "Transportation", description: "Air transportation, rail transportation, water transportation, trucking, passenger transportation, support activity for transportation, or delivery/courier service", followUp: choose(["Cargo", "Passengers", "I provide a support activity for transportation"], "Do you primarily transport cargo or passengers?") },
+  { name: "Warehousing", description: "Operating warehousing or storage facilities for general merchandise, refrigerated goods, or other warehouse products; establishments that provide facilities to store goods but do not sell the goods they handle", followUp: { kind: "none" } },
+  { name: "Wholesale", description: "Wholesale agent/broker, importer, exporter, manufacturers' representative, merchant, distributor, or jobber", followUp: { kind: "yesno", question: "Do you own or take title to the goods that you sell?" } },
+  { name: "Other", description: "", followUp: choose(["Consulting", "Manufacturing", "Organization (such as religious, environmental, social or civic, athletic, etc.)", "Rental", "Repair", "Sell goods", "Service", "Other"], PRIMARY) }
+];
+var EIN_CATEGORY_NAMES = EIN_CATEGORIES.map((c) => c.name);
+var einCategory = (name) => EIN_CATEGORIES.find((c) => c.name === name);
+function followUpOk(category, answer) {
+  const c = einCategory(category);
+  if (!c) return false;
+  const a2 = answer.trim();
+  switch (c.followUp.kind) {
+    case "none":
+      return true;
+    case "yesno":
+      return a2 === "Yes" || a2 === "No";
+    case "text":
+      return a2.length >= 2;
+    case "choice":
+      return c.followUp.options.includes(a2);
+  }
+}
+
 // server/oa.ts
 import { readFileSync } from "node:fs";
 
@@ -106241,6 +106286,11 @@ async function purgeExpiredSElections() {
   if (rows.length > 0) console.log(`[purge] redacted ${rows.length} expired S election package(s)`);
   return rows.length;
 }
+var existingEinSchema = external_exports.object({
+  hasExistingEin: external_exports.literal(true),
+  existingEin: external_exports.string().transform((s) => einDigits(s)).refine((s) => isValidEin(s), "Enter the 9-digit EIN the LLC already has."),
+  certified: external_exports.literal(true)
+});
 var einDetailsSchema = external_exports.object({
   responsibleFirst: external_exports.string().min(1, "The responsible party's first name is required.").max(100),
   responsibleMiddle: external_exports.string().max(100).optional().default(""),
@@ -106249,20 +106299,19 @@ var einDetailsSchema = external_exports.object({
   tin: external_exports.string().transform((s) => s.replace(/[\s-]/g, "")).refine((s) => /^\d{9}$/.test(s), "Enter a 9-digit SSN or ITIN."),
   phone: external_exports.string().min(7, "A phone number for IRS questions is required.").max(40),
   county: external_exports.string().min(2, "The county of the LLC's principal address is required.").max(60),
-  activity: external_exports.enum([
-    "Real estate",
-    "Rental & leasing",
-    "Construction",
-    "Retail",
-    "Finance & insurance",
-    "Health care & social assistance",
-    "Accommodation & food service",
-    "Transportation & warehousing",
-    "Manufacturing",
-    "Wholesale",
-    "Other"
-  ]),
-  activityDetail: external_exports.string().min(3, 'Describe the products or services in a few words \u2014 e.g. "residential rental real estate."').max(200),
+  // The assistant's own questions (walked 7 Sep 2026): reason, trade name,
+  // member count, the 15 categories with each one's follow-up, and the
+  // four special-activity questions asked separately.
+  reason: external_exports.enum(EIN_REASONS).optional().default("Started a new business"),
+  tradeName: external_exports.string().max(200).optional().default(""),
+  memberCount: external_exports.number().int().min(1).max(9999).optional(),
+  activity: external_exports.enum(EIN_CATEGORY_NAMES, { errorMap: () => ({ message: "Choose the category that best describes the business." }) }),
+  activityFollowUp: external_exports.string().max(300).optional().default(""),
+  activityDetail: external_exports.string().max(200).optional().default(""),
+  highwayVehicle: external_exports.boolean().optional().default(false),
+  gambling: external_exports.boolean().optional().default(false),
+  form720: external_exports.boolean().optional().default(false),
+  alcoholTobaccoFirearms: external_exports.boolean().optional().default(false),
   employeesExpected: external_exports.boolean(),
   employeeCountOther: external_exports.number().int().min(0).max(9999).optional().default(0),
   employeeCountAg: external_exports.number().int().min(0).max(9999).optional().default(0),
@@ -106283,11 +106332,14 @@ var einDetailsSchema = external_exports.object({
     "November",
     "December"
   ]),
-  exciseApplies: external_exports.boolean(),
+  exciseApplies: external_exports.boolean().optional().default(false),
   exciseDetail: external_exports.string().max(300).optional().default(""),
   certified: external_exports.literal(true, {
     errorMap: () => ({ message: "You must confirm the certification before submitting." })
   })
+}).refine((d2) => followUpOk(d2.activity, d2.activityFollowUp), {
+  message: "Answer the follow-up question under the category you chose \u2014 the IRS asks it.",
+  path: ["activityFollowUp"]
 }).refine(
   (d2) => !d2.employeesExpected || d2.firstWageDate !== "" && d2.employeeCountOther + d2.employeeCountAg + d2.employeeCountHousehold > 0,
   { message: "With employees expected, enter the expected count and the first date wages will be paid." }
@@ -107281,7 +107333,32 @@ function registerPortalRoutes(app2) {
   app2.post("/portal/services/:id/ein-details", async (c) => {
     const session = await getSession(c);
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    const body = einDetailsSchema.safeParse(await c.req.json().catch(() => null));
+    const raw2 = await c.req.json().catch(() => null);
+    const existing = existingEinSchema.safeParse(raw2);
+    if (existing.success) {
+      const dbX = await getDb();
+      const rowsX = await dbX.query(
+        "SELECT id, client_id, type, status, details, llc_name FROM service_orders WHERE id = $1",
+        [c.req.param("id")]
+      );
+      if (rowsX.length === 0 || rowsX[0].client_id !== session.clientId) return c.json(err("Not found", "NOT_FOUND"), 404);
+      const soX = rowsX[0];
+      if (soX.type !== "ein" || soX.status !== "awaiting_info") return c.json(err("This order is not awaiting details.", "BAD_STATE"), 400);
+      const priorX = (typeof soX.details === "string" ? JSON.parse(soX.details) : soX.details) ?? {};
+      const mergedX = { ...priorX, hasExistingEin: true, existingEin: existing.data.existingEin, certifiedAt: (/* @__PURE__ */ new Date()).toISOString() };
+      await dbX.query("UPDATE service_orders SET details = $1, status = 'in_progress' WHERE id = $2", [JSON.stringify(mergedX), soX.id]);
+      if (env.ADMIN_NOTIFY_EMAIL) {
+        const clientsX = await dbX.query("SELECT email FROM clients WHERE id = $1", [session.clientId]);
+        const mail = einDetailsSubmittedAdminEmail({
+          summary: `Federal EIN \u2014 ${soX.llc_name} \u2014 the client says the LLC already has EIN ${fmtEinDisplay(existing.data.existingEin)}; no application, handle the fee`,
+          clientEmail: clientsX[0]?.email ?? "",
+          adminUrl: `${env.PUBLIC_BASE_URL}/admin`
+        });
+        sendMail({ to: env.ADMIN_NOTIFY_EMAIL, ...mail }).catch((e) => console.error("[service] admin notify failed:", e));
+      }
+      return c.json({ data: { ok: true, existingEin: true } });
+    }
+    const body = einDetailsSchema.safeParse(raw2);
     if (!body.success) {
       return c.json(err(body.error.issues[0]?.message ?? "Invalid details.", "INVALID_INPUT"), 400);
     }
@@ -107311,8 +107388,16 @@ function registerPortalRoutes(app2) {
       responsibleSuffix: d2.responsibleSuffix,
       phone: d2.phone,
       county: d2.county,
+      reason: d2.reason,
+      tradeName: d2.tradeName,
+      memberCount: d2.memberCount,
       activity: d2.activity,
+      activityFollowUp: d2.activityFollowUp,
       activityDetail: d2.activityDetail,
+      highwayVehicle: d2.highwayVehicle,
+      gambling: d2.gambling,
+      form720: d2.form720,
+      alcoholTobaccoFirearms: d2.alcoholTobaccoFirearms,
       employeesExpected: d2.employeesExpected,
       employeeCountOther: d2.employeeCountOther,
       employeeCountAg: d2.employeeCountAg,

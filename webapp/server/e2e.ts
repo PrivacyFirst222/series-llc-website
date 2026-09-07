@@ -791,11 +791,19 @@ if (mint.status === 200) {
     tin: "123-45-6789",
     phone: "555-555-0100",
     county: "Orange",
-    activity: "Real estate",
+    // The IRS assistant's own questions (walked 7 Sep 2026).
+    reason: "Started a new business",
+    tradeName: "",
+    memberCount: 1,
+    activity: "Real Estate",
+    activityFollowUp: "I rent or lease property that I own",
     activityDetail: "residential rental real estate",
+    highwayVehicle: false,
+    gambling: false,
+    form720: false,
+    alcoholTobaccoFirearms: false,
     employeesExpected: false,
     closingMonth: "December",
-    exciseApplies: false,
     certified: true,
   };
   const einBeforeFormed = await api(`/api/portal/services/${intakeEin.id}/ein-details`, {
@@ -951,6 +959,21 @@ if (mint.status === 200) {
     const certDoc = (afterDocs.body?.data as { title: string }[] | undefined)?.find((doc) => doc.title.startsWith("Certificate of Status"));
     check("the certificate lands in the client's portal documents", !!certDoc, afterDocs.body?.data?.length);
   }
+  // The assistant's questions are enforced: a category's follow-up must be
+  // one of the assistant's own answers, a reason must be one of its five, and
+  // an old merged category is no longer accepted.
+  const noFollowUp = await api(`/api/portal/services/${intakeEin.id}/ein-details`, { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ ...einPayload, activityFollowUp: "" }) });
+  check("EIN details without the category's follow-up are refused", noFollowUp.status === 400 && /follow-up/.test(noFollowUp.body?.error?.message ?? ""), noFollowUp.body);
+  const wrongFollowUp = await api(`/api/portal/services/${intakeEin.id}/ein-details`, { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ ...einPayload, activityFollowUp: "I fix roofs" }) });
+  check("EIN details with a follow-up the assistant does not offer are refused", wrongFollowUp.status === 400, wrongFollowUp.body);
+  const wholesaleOk = await api(`/api/portal/services/${intakeEin.id}/ein-details`, { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ ...einPayload, activity: "Wholesale", activityFollowUp: "Maybe" }) });
+  check("a yes-or-no follow-up takes only Yes or No", wholesaleOk.status === 400, wholesaleOk.body);
+  const badReason = await api(`/api/portal/services/${intakeEin.id}/ein-details`, { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ ...einPayload, reason: "Because" }) });
+  check("a reason the assistant does not offer is refused", badReason.status === 400, badReason.body);
+  const oldCategory = await api(`/api/portal/services/${intakeEin.id}/ein-details`, { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ ...einPayload, activity: "Finance & insurance" }) });
+  check("an old merged category is refused", oldCategory.status === 400, oldCategory.body);
+  const warehousing = await api(`/api/portal/services/${intakeEin.id}/ein-details`, { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ ...einPayload, activity: "Warehousing", activityFollowUp: "", certified: undefined }) });
+  check("Warehousing needs no follow-up (refused here only for the missing certification)", warehousing.status === 400 && /certif/i.test(warehousing.body?.error?.message ?? ""), warehousing.body);
   const einDetails = await api(`/api/portal/services/${intakeEin.id}/ein-details`, {
     method: "POST", cookies: setPw.cookie, body: JSON.stringify(einPayload),
   });
@@ -974,6 +997,11 @@ if (mint.status === 200) {
   const adminDetail = await api(`/api/admin/services/${intakeEin.id}`, { cookies: adminLogin2.cookie });
   check("admin decrypts TIN for SS-4", adminDetail.body?.data?.tin === "123456789", adminDetail.body?.data);
   check("client-facing record keeps only last 4", adminDetail.body?.data?.details?.tinLast4 === "6789");
+  check("the office sees the assistant's answers: reason, members, category and its follow-up, the four special questions",
+    adminDetail.body?.data?.details?.reason === "Started a new business" && adminDetail.body?.data?.details?.memberCount === 1
+      && adminDetail.body?.data?.details?.activity === "Real Estate" && adminDetail.body?.data?.details?.activityFollowUp === "I rent or lease property that I own"
+      && adminDetail.body?.data?.details?.highwayVehicle === false && adminDetail.body?.data?.details?.alcoholTobaccoFirearms === false,
+    adminDetail.body?.data?.details);
 
   // 13b. Fulfill the series order WITH an attached document — it must land in
   //      the client's portal documents in the same action.
@@ -1300,6 +1328,24 @@ if (mint.status === 200) {
     const secSel = ((secSvc.body?.data?.orders ?? []) as { id: string; type: string; status: string }[])
       .find((o) => o.type === "s-election" && o.status === "awaiting_info");
     check("the second company's intake S election is awaiting details", !!secSel, secSvc.body?.data?.orders?.length);
+    // An LLC that already has an EIN keeps it (Adam, 7 Sep 2026): the client
+    // says so, the order stops waiting on them, and the office is told.
+    {
+      const secEin = ((secSvc.body?.data?.orders ?? []) as { id: string; type: string; status: string }[]).find((o) => o.type === "ein" && o.status === "awaiting_info");
+      check("the second company has an EIN order awaiting details", !!secEin, secSvc.body?.data?.orders);
+      if (secEin) {
+        const badExisting = await api(`/api/portal/services/${secEin.id}/ein-details`, { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ hasExistingEin: true, existingEin: "00-1234567", certified: true }) });
+        check("an invalid existing EIN is refused", badExisting.status === 400, badExisting.body);
+        const existingRes = await api(`/api/portal/services/${secEin.id}/ein-details`, { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ hasExistingEin: true, existingEin: "88-7654321", certified: true }) });
+        check("a client can say the LLC already has an EIN", existingRes.status === 200 && existingRes.body?.data?.existingEin === true, existingRes.body);
+        const afterExisting = ((await api(`/api/portal/services?company=${secondId}`, { cookies: setPw.cookie })).body?.data?.orders ?? []) as { id: string; status: string; details?: { hasExistingEin?: boolean; existingEin?: string } }[];
+        const row = afterExisting.find((o) => o.id === secEin.id);
+        check("the order stops waiting on the client and keeps the number", row?.status === "in_progress" && row?.details?.hasExistingEin === true && row?.details?.existingEin === "887654321", row);
+        const admE = await adminSession();
+        const officeView = await api(`/api/admin/services/${secEin.id}`, { cookies: admE.cookie });
+        check("the office sees the existing EIN flag", officeView.body?.data?.details?.hasExistingEin === true && officeView.body?.data?.tin === null, officeView.body?.data);
+      }
+    }
     // Every document names its company (Adam, 7 Sep 2026: a package with no
     // company showed under every tab). The first company's S election
     // package and series consent carry the first company; a hand upload for

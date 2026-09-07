@@ -34,6 +34,11 @@ export interface AdminServiceOrder {
   llc_name: string;
   details: {
     seriesName?: string; target?: string; responsibleName?: string; tinLast4?: string; purpose?: string; note?: string;
+    hasExistingEin?: boolean; existingEin?: string; reason?: string; tradeName?: string; memberCount?: number;
+    activity?: string; activityFollowUp?: string; activityDetail?: string; county?: string;
+    highwayVehicle?: boolean; gambling?: boolean; form720?: boolean; alcoholTobaccoFirearms?: boolean;
+    employeesExpected?: boolean; employeeCountOther?: number; employeeCountAg?: number; employeeCountHousehold?: number;
+    firstWageDate?: string; form944Annual?: boolean; closingMonth?: string;
     ein?: string; einPending?: boolean; einSource?: "letter"; assignedEin?: string; dateIncorporated?: string; effectiveDate?: string;
     officerName?: string; officerTitle?: string; phone?: string; shareholders?: SElectionShareholderView[];
     fulfilledByOverride?: boolean; overrideAt?: string;
@@ -274,6 +279,47 @@ export function ServiceFulfillDialog({
                 </div>
                 {detailQuery.data?.details.note ? (
                   <div><span className="text-muted-foreground">Note:</span> {detailQuery.data.details.note}</div>
+                ) : null}
+                {detailQuery.data?.details.hasExistingEin ? (
+                  <div className="rounded-xl border border-amber-300/60 bg-amber-50 p-3 text-amber-900" data-testid="existing-ein-flag">
+                    <p className="font-medium">The client says the LLC already has an EIN: {fmtEinDisplay(detailQuery.data.details.existingEin ?? "")}.</p>
+                    <p className="mt-1 text-xs">An LLC keeps its EIN — make no application. Handle the fee and close this order.</p>
+                  </div>
+                ) : null}
+                {detailQuery.data?.details.responsibleName && !detailQuery.data.details.hasExistingEin ? (
+                  /* Every answer, in the order the IRS assistant asks for it
+                     (walked 7 Sep 2026), so the office types straight down. */
+                  <ol className="list-decimal space-y-0.5 pl-5 text-xs" data-testid="assistant-order">
+                    {(() => {
+                      const d = detailQuery.data.details;
+                      const yn = (v?: boolean) => (v ? "Yes" : "No");
+                      const rows: [string, string][] = [
+                        ["Legal structure", "Limited Liability Company (LLC)"],
+                        ["Number of members", String(d.memberCount ?? "—")],
+                        ["State located", "Florida"],
+                        ["Reason for applying", d.reason ?? "Started a new business"],
+                        ["Responsible party", `${d.responsibleName ?? ""} · SSN/ITIN ${detailQuery.data.tin ?? "—"}`],
+                        ["Role", "Third party applying on behalf of this LLC"],
+                        ["Phone (digits only)", (d.phone ?? "").replace(/\D/g, "")],
+                        ["Legal name", viewing.llc_name],
+                        ["Trade name / DBA", d.tradeName || "— none —"],
+                        ["County", d.county ?? "—"],
+                        ["State located / Articles filed", "Florida / Florida"],
+                        ["Highway vehicle 55,000 lbs or more", yn(d.highwayVehicle)],
+                        ["Gambling / wagering", yn(d.gambling)],
+                        ["Form 720 excise returns", yn(d.form720)],
+                        ["Alcohol, tobacco, or firearms", yn(d.alcoholTobaccoFirearms)],
+                        ["Employees expected (W-2, next 12 months)", d.employeesExpected ? `Yes — ${d.employeeCountOther ?? 0} general, ${d.employeeCountAg ?? 0} agricultural, ${d.employeeCountHousehold ?? 0} household; first wages ${d.firstWageDate || "—"}; Form 944 ${yn(d.form944Annual)}` : "No"],
+                        ["Business category", d.activity ?? "—"],
+                        ["Category follow-up", d.activityFollowUp || "— none asked —"],
+                        ["Anything else", d.activityDetail || "—"],
+                        ["Closing month (SS-4 only)", d.closingMonth ?? "December"],
+                      ];
+                      return rows.map(([k, v]) => (
+                        <li key={k}><span className="text-muted-foreground">{k}:</span> {v}</li>
+                      ));
+                    })()}
+                  </ol>
                 ) : null}
               </>
             )}

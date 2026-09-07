@@ -8,6 +8,7 @@
 // `external`.
 import { useEffect, useRef, useState } from "react";
 import { PHONE_HINT, formatPhone } from "@/lib/phone";
+import { EIN_CATEGORIES, EIN_REASONS, EIN_SPECIAL_QUESTIONS, einCategory } from "@/lib/einActivity";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ClipboardList, Lock, FileSignature } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -47,8 +48,23 @@ export function OrdersInProgress({
   // Before the LLC is formed, the detail buttons explain instead of collect.
   const [formedGateFor, setFormedGateFor] = useState<"ein" | "s-election" | null>(null);
   const [einEmployees, setEinEmployees] = useState(false);
-  const [einExcise, setEinExcise] = useState(false);
   const [einCertified, setEinCertified] = useState(false);
+  // The IRS assistant's own questions (walked 7 Sep 2026): an LLC that
+  // already has an EIN keeps it, and the activity category decides which
+  // follow-up the assistant asks next.
+  const [einHasExisting, setEinHasExisting] = useState(false);
+  const [einActivity, setEinActivity] = useState<string>("Real Estate");
+  // Opening the EIN form brings back what the draft held for the two answers
+  // that are React state rather than form fields.
+  useEffect(() => {
+    if (!detailsFor || detailsFor.type !== "ein") return;
+    const d = einDrafts[detailsFor.id];
+    setEinActivity(d?.activity && einCategory(d.activity) ? d.activity : "Real Estate");
+    setEinHasExisting(d?.hasExistingEin === "Yes");
+    setEinEmployees(d?.employeesExpected === "Yes");
+    // einDrafts is read once per opening; the draft is what was there then.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [detailsFor?.id]);
   const [error, setError] = useState<string>("");
   // What the client has typed into either secure form, per order, kept in
   // page memory so that closing the dialog loses nothing (Adam, 6 Sep 2026).
@@ -90,7 +106,7 @@ export function OrdersInProgress({
     onSuccess: (_res, args) => {
       setEinDrafts((prev) => { const next = { ...prev }; delete next[args.id]; return next; });
       clearDraft("ein", args.id);
-      setEinCertified(false); setEinEmployees(false); setEinExcise(false);
+      setEinCertified(false); setEinEmployees(false); setEinHasExisting(false);
       setDetailsFor(null);
       refresh();
     },
@@ -197,6 +213,12 @@ export function OrdersInProgress({
                     <FileSignature className="mr-1.5 h-3.5 w-3.5" />
                     Consent &amp; Series Exhibit
                   </Button>
+                ) : null}
+                {o.type === "ein" && o.details.hasExistingEin ? (
+                  <p className="mt-1 text-xs text-muted-foreground" data-testid="existing-ein-note">
+                    You told us the LLC already has an EIN, so no application will be made. The
+                    office will be in touch about the fee.
+                  </p>
                 ) : null}
                 {o.status === "awaiting_info" ? (
                   <Button
@@ -405,6 +427,11 @@ export function OrdersInProgress({
               if (!detailsFor) return;
               const fd = new FormData(e.currentTarget);
               const num = (k: string) => Number(String(fd.get(k) ?? "0")) || 0;
+              const yes = (k: string) => fd.get(k) === "Yes";
+              if (einHasExisting) {
+                submitDetails.mutate({ id: detailsFor.id, payload: { hasExistingEin: true, existingEin: String(fd.get("existingEin") ?? "") } });
+                return;
+              }
               submitDetails.mutate({
                 id: detailsFor.id,
                 payload: {
@@ -415,8 +442,16 @@ export function OrdersInProgress({
                   tin: String(fd.get("tin") ?? ""),
                   phone: String(fd.get("phone") ?? ""),
                   county: String(fd.get("county") ?? ""),
-                  activity: String(fd.get("activity") ?? "Real estate"),
+                  reason: String(fd.get("reason") ?? "Started a new business"),
+                  tradeName: String(fd.get("tradeName") ?? ""),
+                  memberCount: num("memberCount") || undefined,
+                  activity: einActivity,
+                  activityFollowUp: String(fd.get("activityFollowUp") ?? ""),
                   activityDetail: String(fd.get("activityDetail") ?? ""),
+                  highwayVehicle: yes("highwayVehicle"),
+                  gambling: yes("gambling"),
+                  form720: yes("form720"),
+                  alcoholTobaccoFirearms: yes("alcoholTobaccoFirearms"),
                   employeesExpected: einEmployees,
                   employeeCountOther: num("employeeCountOther"),
                   employeeCountAg: num("employeeCountAg"),
@@ -424,8 +459,6 @@ export function OrdersInProgress({
                   firstWageDate: String(fd.get("firstWageDate") ?? ""),
                   form944Annual: fd.get("form944Annual") === "on",
                   closingMonth: String(fd.get("closingMonth") ?? "December"),
-                  exciseApplies: einExcise,
-                  exciseDetail: String(fd.get("exciseDetail") ?? ""),
                 },
               });
             }}
@@ -472,45 +505,68 @@ export function OrdersInProgress({
                 />
               </div>
             </div>
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">County of the LLC's principal address</label>
-              <Input name="county" placeholder="e.g., Orange" autoComplete="off" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.county ?? ""} />
+            {/* The assistant's own questions, in its order (walked 7 Sep 2026). */}
+            <div className="space-y-1.5 rounded-lg border border-border p-3">
+              <p className="text-sm font-medium">Has this LLC ever been assigned an EIN?</p>
+              <div className="flex gap-4 text-sm">
+                <label className="flex items-center gap-1.5"><input type="radio" name="hasExistingEin" value="No" checked={!einHasExisting} onChange={() => setEinHasExisting(false)} className="h-4 w-4 accent-trust" /> No</label>
+                <label className="flex items-center gap-1.5"><input type="radio" name="hasExistingEin" value="Yes" checked={einHasExisting} onChange={() => setEinHasExisting(true)} className="h-4 w-4 accent-trust" /> Yes</label>
+              </div>
+              {einHasExisting ? (
+                <div className="space-y-2 pt-1" data-testid="existing-ein">
+                  <Input name="existingEin" placeholder="XX-XXXXXXX" aria-label="The LLC's existing EIN" autoComplete="off" className="w-48" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.existingEin ?? ""} />
+                  <p className="text-xs text-amber-800">
+                    An LLC keeps its EIN, so we will not apply for another. Submit this and we'll let
+                    the office know and be in touch about the fee.
+                  </p>
+                </div>
+              ) : null}
+            </div>
+            {!einHasExisting ? (<>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium">Number of members</label>
+                <Input name="memberCount" inputMode="numeric" autoComplete="off" aria-label="Number of members" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.memberCount ?? String(Math.max(1, data.members.length))} />
+                <p className="text-xs text-muted-foreground">
+                  {(Number((detailsFor ? einDrafts[detailsFor.id] : undefined)?.memberCount) || data.members.length || 1) > 1
+                    ? (data.sElection.reason === "already_ordered" ? "We will report it as an S corporation, since the Form 2553 package is on the order." : "We will report it as a partnership, the IRS's default for several members.")
+                    : (data.sElection.reason === "already_ordered" ? "We will report it as an S corporation, since the Form 2553 package is on the order." : "We will report it as a disregarded entity, the IRS's default for one member.")}
+                </p>
+              </div>
+              <div className="space-y-1.5">
+                <label htmlFor="ein-reason" className="text-sm font-medium">Why the LLC needs an EIN</label>
+                <Select name="reason" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.reason ?? "Started a new business"}>
+                  <SelectTrigger id="ein-reason" aria-label="Why the LLC needs an EIN"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {EIN_REASONS.map((r) => (<SelectItem key={r} value={r}>{r}</SelectItem>))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <label htmlFor="ein-activity" className="text-sm font-medium">Principal activity</label>
-                <Select name="activity" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.activity ?? "Real estate"}>
-                  <SelectTrigger id="ein-activity">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {["Real estate", "Rental & leasing", "Construction", "Retail", "Finance & insurance", "Health care & social assistance", "Accommodation & food service", "Transportation & warehousing", "Manufacturing", "Wholesale", "Other"].map((a) => (
-                      <SelectItem key={a} value={a}>{a}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <label className="text-sm font-medium">Trade name (only if different from the legal name)</label>
+                <Input name="tradeName" autoComplete="off" aria-label="Trade name" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.tradeName ?? ""} />
               </div>
               <div className="space-y-1.5">
-                <label htmlFor="ein-closing-month" className="text-sm font-medium">Closing month of accounting year</label>
-                <Select name="closingMonth" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.closingMonth ?? "December"}>
-                  <SelectTrigger id="ein-closing-month">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {["January","February","March","April","May","June","July","August","September","October","November","December"].map((m) => (
-                      <SelectItem key={m} value={m}>{m}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <label className="text-sm font-medium">County of the LLC's principal address</label>
+                <Input name="county" placeholder="e.g., Orange" autoComplete="off" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.county ?? ""} />
               </div>
             </div>
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">What the business does, in a few words</label>
-              <Input name="activityDetail" placeholder='e.g., "residential rental real estate"' autoComplete="off" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.activityDetail ?? ""} />
+            <div className="space-y-2 rounded-lg border border-border p-3" data-testid="special-questions">
+              {EIN_SPECIAL_QUESTIONS.map((q) => (
+                <div key={q.key} className="flex flex-wrap items-center justify-between gap-2 text-sm">
+                  <span className="min-w-0 flex-1">{q.question}</span>
+                  <span className="flex gap-3">
+                    <label className="flex items-center gap-1.5"><input type="radio" name={q.key} value="Yes" defaultChecked={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.[q.key] === "Yes"} className="h-4 w-4 accent-trust" /> Yes</label>
+                    <label className="flex items-center gap-1.5"><input type="radio" name={q.key} value="No" defaultChecked={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.[q.key] !== "Yes"} className="h-4 w-4 accent-trust" /> No</label>
+                  </span>
+                </div>
+              ))}
             </div>
             <label className="flex items-center gap-2 text-sm">
               <input type="checkbox" checked={einEmployees} onChange={(e) => setEinEmployees(e.target.checked)} className="h-4 w-4 accent-trust" />
-              The LLC expects to have employees in the next 12 months
+              Do you have, or do you expect to have, any employees who will receive Forms W-2 in the next 12 months?
             </label>
             {einEmployees ? (
               <div className="space-y-3 rounded-lg border border-border bg-secondary/40 p-3">
@@ -540,20 +596,68 @@ export function OrdersInProgress({
                 </label>
               </div>
             ) : null}
-            <label className="flex items-start gap-2 text-sm leading-relaxed">
-              <input type="checkbox" checked={einExcise} onChange={(e) => setEinExcise(e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-trust" />
-              <span>
-                The business operates heavy highway vehicles (55,000 lbs+), involves gambling,
-                sells or manufactures alcohol, tobacco, or firearms, or expects to file federal
-                excise tax returns
-              </span>
-            </label>
-            {einExcise ? (
+            <div className="space-y-2 rounded-lg border border-border p-3" data-testid="activity-block">
+              <label htmlFor="ein-activity" className="text-sm font-medium">What does your business or organization do?</label>
+              <input type="hidden" name="activity" value={einActivity} />
+              <input type="hidden" name="employeesExpected" value={einEmployees ? "Yes" : "No"} />
+              <Select value={einActivity} onValueChange={setEinActivity}>
+                <SelectTrigger id="ein-activity" aria-label="Business category"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {EIN_CATEGORIES.map((c) => (<SelectItem key={c.name} value={c.name}>{c.name}</SelectItem>))}
+                </SelectContent>
+              </Select>
+              {einCategory(einActivity)?.description ? (
+                <p className="text-xs text-muted-foreground">{einCategory(einActivity)?.description}</p>
+              ) : null}
+              {(() => {
+                const fu = einCategory(einActivity)?.followUp;
+                if (!fu || fu.kind === "none") return null;
+                if (fu.kind === "choice") return (
+                  <div className="space-y-1.5" data-testid="activity-follow-up">
+                    <label htmlFor="ein-follow-up" className="text-sm font-medium">{fu.question}</label>
+                    <Select name="activityFollowUp" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.activityFollowUp && fu.options.includes((detailsFor ? einDrafts[detailsFor.id] : undefined)?.activityFollowUp ?? "") ? (detailsFor ? einDrafts[detailsFor.id] : undefined)?.activityFollowUp : fu.options[0]}>
+                      <SelectTrigger id="ein-follow-up" aria-label="Activity follow-up"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {fu.options.map((o) => (<SelectItem key={o} value={o}>{o}</SelectItem>))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                );
+                if (fu.kind === "yesno") return (
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-sm" data-testid="activity-follow-up">
+                    <span className="min-w-0 flex-1">{fu.question}</span>
+                    <span className="flex gap-3">
+                      <label className="flex items-center gap-1.5"><input type="radio" name="activityFollowUp" value="Yes" defaultChecked={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.activityFollowUp === "Yes"} className="h-4 w-4 accent-trust" /> Yes</label>
+                      <label className="flex items-center gap-1.5"><input type="radio" name="activityFollowUp" value="No" defaultChecked={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.activityFollowUp !== "Yes"} className="h-4 w-4 accent-trust" /> No</label>
+                    </span>
+                  </div>
+                );
+                return (
+                  <div className="space-y-1.5" data-testid="activity-follow-up">
+                    <label className="text-sm font-medium">{fu.question}</label>
+                    <Input name="activityFollowUp" autoComplete="off" aria-label="Activity follow-up" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.activityFollowUp ?? ""} />
+                  </div>
+                );
+              })()}
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Which of those applies?</label>
-                <Input name="exciseDetail" autoComplete="off" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.exciseDetail ?? ""} />
+                <label className="text-xs font-medium text-muted-foreground">Anything else about what the business does (optional)</label>
+                <Input name="activityDetail" placeholder='e.g., "residential rental real estate"' autoComplete="off" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.activityDetail ?? ""} />
               </div>
-            ) : null}
+            </div>
+            <div className="space-y-1.5">
+              <label htmlFor="ein-closing-month" className="text-sm font-medium">Closing month of accounting year</label>
+              <Select name="closingMonth" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.closingMonth ?? "December"}>
+                <SelectTrigger id="ein-closing-month" className="w-48">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {["January","February","March","April","May","June","July","August","September","October","November","December"].map((m) => (
+                    <SelectItem key={m} value={m}>{m}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            </>) : null}
             <label className="flex items-start gap-2.5 rounded-lg border border-border bg-secondary/40 p-3">
               <input
                 type="checkbox"

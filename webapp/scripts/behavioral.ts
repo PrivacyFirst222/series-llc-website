@@ -370,7 +370,14 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
   await advance(page);
 
   // Correspondence. A one-word name is refused at the box (Adam, 7 Sep 2026).
-  await fill(page, "Contact name", "Casey");
+  // The step prefills the contact name from the client a moment after it
+  // mounts; on the phone-sized run that can land after our typing. Fill
+  // until the box holds exactly what was typed.
+  for (let attempt = 0; attempt < 5; attempt++) {
+    await fill(page, "Contact name", "Casey");
+    await page.waitForTimeout(400);
+    if ((await page.getByLabel("Contact name", { exact: false }).first().inputValue()) === "Casey") break;
+  }
   await fill(page, "Email", run.email ?? "gate@e2e.test");
   await fill(page, "Confirm email", run.email ?? "gate@e2e.test");
   // The intake's phone boxes take the shape as typed (Adam, 7 Sep 2026).
@@ -691,6 +698,26 @@ async function main(): Promise<void> {
       expect(!/[a-z]/i.test(einPhoneHint) && /\(\s+\)\s+-\s+/.test(einPhoneHint), "EIN form: the phone hint shows the shape only, no letters", einPhoneHint);
       await einPhone.pressSequentially("4072106622", { delay: 20 });
       expect((await einPhone.inputValue()) === "(407) 210-6622", "EIN form: digits take the phone shape as typed", await einPhone.inputValue());
+      // The IRS assistant's own questions (walked 7 Sep 2026): the EIN
+      // question, members prefilled, the reason, the four special questions,
+      // the 15 categories and each one's follow-up.
+      expect((await einForm.locator('input[name="hasExistingEin"][value="No"]').isChecked()), "EIN form: 'ever been assigned an EIN' starts at No");
+      expect((await einForm.locator('input[aria-label="Number of members"]').inputValue()) !== "", "EIN form: the number of members is prefilled");
+      expect(/Started a new business/.test(await einForm.locator('[aria-label="Why the LLC needs an EIN"]').innerText()), "EIN form: the reason starts at Started a new business");
+      expect((await einForm.locator('[data-testid="special-questions"] input[type="radio"]').count()) === 8, "EIN form: the four special questions are asked separately, yes or no each");
+      expect((await einForm.locator('[aria-label="Business category"]').innerText()).includes("Real Estate"), "EIN form: the category starts at Real Estate");
+      expect(/I rent or lease property that I own/.test(await einForm.locator('[data-testid="activity-follow-up"]').innerText()), "EIN form: Real Estate shows the assistant's follow-up choices");
+      await choose(page, '[aria-label="Business category"]', "Wholesale");
+      await page.waitForTimeout(300);
+      expect(/take title to the goods/.test(await einForm.locator('[data-testid="activity-follow-up"]').innerText()), "EIN form: Wholesale shows its yes-or-no follow-up");
+      await choose(page, '[aria-label="Business category"]', "Warehousing");
+      await page.waitForTimeout(300);
+      expect((await einForm.locator('[data-testid="activity-follow-up"]').count()) === 0, "EIN form: Warehousing asks no follow-up");
+      await einForm.locator('input[name="hasExistingEin"][value="Yes"]').check({ force: true });
+      await page.waitForTimeout(300);
+      expect((await einForm.locator('[data-testid="existing-ein"]').count()) === 1 && (await einForm.locator('[data-testid="special-questions"]').count()) === 0, "EIN form: saying the LLC already has an EIN hides the application questions and asks for the number");
+      await einForm.locator('input[name="hasExistingEin"][value="No"]').check({ force: true });
+      await page.waitForTimeout(300);
       await page.keyboard.press("Escape");
       await page.locator('[role="dialog"]').first().waitFor({ state: "detached", timeout: 5000 }).catch(() => {});
       await page.waitForTimeout(400);

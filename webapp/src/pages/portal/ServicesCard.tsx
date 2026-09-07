@@ -31,6 +31,8 @@ export interface ServiceOrder {
     purpose?: string;
     target?: string;
     responsibleName?: string;
+    hasExistingEin?: boolean;
+    existingEin?: string;
     tinLast4?: string;
     ein?: string;
     einPending?: boolean;

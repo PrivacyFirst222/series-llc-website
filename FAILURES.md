@@ -2797,6 +2797,24 @@ Underneath both: I was answering fast. A question in chat feels like it wants a 
 
 The operating agreement questionnaire's owner name boxes read before this entry is posted, and the complete answer given in the same message. Standing rule for me: a question about "any" or "all" is answered only after every instance is read, and the answer states the count of what was read.
 
+## P64 — The EIN form was revised twice today without once opening the application it feeds
+
+### THE FAILURE
+
+Adam, 7 Sep 2026: "Your ein form is missing important questions. Go to https://sa.www4.irs.gov/applyein/activityAndServices and go through all of the options for obtaining an EIN so your form is retarded like the one you built."
+
+Today I changed the EIN form twice — its responsible-party heading, then its phone box — and shipped both without opening the IRS online EIN application or the SS-4 to see what it asks. The form's own questions are: responsible party name and number, phone, county, principal activity, closing month, a description, employees expected, and an excise-tax tick. Whether that is what the IRS asks, I did not check either time. The "Success is defined by the consumer" rule in CLAUDE.md exists because of this exact form (P39–P40: "the IRS application it feeds asks eighteen things and the form collected three"), and it says to write the objective ledger from the opened source before building. I wrote none.
+
+### WHY IT HAPPENED
+
+The ledger rule lives in my head under "building a feature." Both of today's changes felt like label edits — a heading, a placeholder — so the rule never fired, and each time I read only the part of the form the change touched. But the rule is about the artifact's fitness for the process it feeds, and a form that is short of questions is unfit whether I am changing its heading or its guts. Reading the SS-4 instructions this morning to answer one question about the responsible party did not become a reading of the whole application, because I opened it for that one answer and closed it when I had it.
+
+Underneath: I inherited the belief that the EIN form had been fixed after P39–P40 and never verified it. A record of a past fix is not a count against the current source. I treated it as one because checking would have cost a walk through a multi-screen IRS application and believing cost nothing.
+
+### FIXED BY
+
+The IRS online application walked screen by screen in the browser, every option on every screen recorded, then the ledger: what the IRS asks, what the form collects, what is missing — with the count — and a proposal to close the gap, before any change to the form.
+
 ## Process — the ones that let the substantive ones through
 
 **M1 · Verify the proposition you set out to verify, not the one underneath.** A
