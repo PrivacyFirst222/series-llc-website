@@ -1,3 +1,4 @@
+import { FIRST_AND_LAST, hasFirstAndLast } from "@/lib/personName";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { api, ApiError } from "@/lib/api";
@@ -37,6 +38,10 @@ export default function Contact() {
         title: "Missing details",
         description: "Please add your name and email so we can reach you.",
       });
+      return;
+    }
+    if (!hasFirstAndLast(form.name)) {
+      toast({ duration: Infinity, title: "Your name", description: FIRST_AND_LAST });
       return;
     }
     setSubmitting(true);

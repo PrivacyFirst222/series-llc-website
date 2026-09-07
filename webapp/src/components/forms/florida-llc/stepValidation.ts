@@ -1,3 +1,4 @@
+import { FIRST_AND_LAST, hasFirstAndLast } from "@/lib/personName";
 import { isPoBox } from "./schema";
 import { nameCheckKey, normalizeEntityName } from "./nameSimilarity";
 import { seriesDedupeKey } from "./validation";
@@ -195,9 +196,9 @@ export function validateStep(
     if (!data.registeredAgentChoice)
       e.registeredAgentChoice = "Choose who will serve as registered agent.";
     if (data.registeredAgentChoice === "SELF") {
-      if (!data.registeredAgentFirstName)
+      if (!(data.registeredAgentFirstName ?? "").trim())
         e.registeredAgentFirstName = "First name is required.";
-      if (!data.registeredAgentLastName)
+      if (!(data.registeredAgentLastName ?? "").trim())
         e.registeredAgentLastName = "Last name is required.";
       if (!data.registeredAgentStreetAddress1)
         e.registeredAgentStreetAddress1 = "Street address required.";
@@ -218,8 +219,10 @@ export function validateStep(
   }
 
   if (step === "acceptance" && data.registeredAgentChoice !== "SERVICE") {
-    if (!data.registeredAgentAcceptanceName)
+    if (!data.registeredAgentAcceptanceName.trim())
       e.registeredAgentAcceptanceName = "Your name is required.";
+    else if (!hasFirstAndLast(data.registeredAgentAcceptanceName))
+      e.registeredAgentAcceptanceName = FIRST_AND_LAST;
     if (!data.registeredAgentElectronicSignature)
       e.registeredAgentElectronicSignature = "Electronic signature required.";
     if (!data.registeredAgentAcceptanceCheckbox)
@@ -251,9 +254,9 @@ export function validateStep(
         "At least one Manager (MGR) is required when including a manager-managed statement in the Articles.";
 
     data.managers.forEach((m, i) => {
-      if (m.personOrEntity === "INDIVIDUAL" && !m.firstName)
+      if (m.personOrEntity === "INDIVIDUAL" && !(m.firstName ?? "").trim())
         e[`managers.${i}.firstName`] = "First name required.";
-      if (m.personOrEntity === "INDIVIDUAL" && !m.lastName)
+      if (m.personOrEntity === "INDIVIDUAL" && !(m.lastName ?? "").trim())
         e[`managers.${i}.lastName`] = "Last name required.";
       if (m.personOrEntity === "ENTITY" && !m.businessEntityName)
         e[`managers.${i}.businessEntityName`] = "Entity name required.";
@@ -270,9 +273,9 @@ export function validateStep(
       e.members =
         "At least one initial member is required for internal formation records.";
     data.members.forEach((m, i) => {
-      if (m.memberType === "INDIVIDUAL" && !m.firstName)
+      if (m.memberType === "INDIVIDUAL" && !(m.firstName ?? "").trim())
         e[`members.${i}.firstName`] = "First name required.";
-      if (m.memberType === "INDIVIDUAL" && !m.lastName)
+      if (m.memberType === "INDIVIDUAL" && !(m.lastName ?? "").trim())
         e[`members.${i}.lastName`] = "Last name required.";
       if (m.memberType === "ENTITY" && !m.entityName)
         e[`members.${i}.entityName`] = "Entity name required.";
@@ -307,7 +310,8 @@ export function validateStep(
   }
 
   if (step === "correspondence") {
-    if (!data.correspondentName) e.correspondentName = "Name required.";
+    if (!data.correspondentName.trim()) e.correspondentName = "Name required.";
+    else if (!hasFirstAndLast(data.correspondentName)) e.correspondentName = FIRST_AND_LAST;
     if (!data.correspondentEmail) e.correspondentEmail = "Email required.";
     else if (!isValidEmail(data.correspondentEmail))
       e.correspondentEmail = "That doesn't look like a valid email address.";
@@ -338,8 +342,10 @@ export function validateStep(
         e.articlesSignerAppointment =
           "Please appoint us as your authorized representative, or choose to sign yourself.";
     } else {
-      if (!data.authorizedRepresentativeName)
+      if (!data.authorizedRepresentativeName.trim())
         e.authorizedRepresentativeName = "Authorized representative name required.";
+      else if (!hasFirstAndLast(data.authorizedRepresentativeName))
+        e.authorizedRepresentativeName = FIRST_AND_LAST;
       if (!data.authorizedRepresentativeSignature)
         e.authorizedRepresentativeSignature = "Electronic signature required.";
       if (!data.authorizedRepresentativeSignatureCheckbox)

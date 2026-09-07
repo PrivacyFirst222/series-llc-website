@@ -99610,6 +99610,13 @@ var coerce = {
 };
 var NEVER = INVALID;
 
+// src/lib/personName.ts
+var FIRST_AND_LAST = "Enter first and last name.";
+function hasFirstAndLast(name) {
+  const words = (name ?? "").trim().split(/\s+/).filter((w) => /\p{L}/u.test(w));
+  return words.length >= 2;
+}
+
 // src/components/forms/florida-llc/nameSimilarity.ts
 var SUFFIXES = /* @__PURE__ */ new Set([
   "LLC",
@@ -99676,7 +99683,7 @@ var partyEntrySchema = external_exports.object({
   phone: external_exports.string().optional().or(external_exports.literal("")),
   email: external_exports.string().email("Enter a valid email").optional().or(external_exports.literal(""))
 }).superRefine((p2, ctx) => {
-  if (p2.personOrEntity === "INDIVIDUAL" && (!p2.firstName || !p2.lastName)) {
+  if (p2.personOrEntity === "INDIVIDUAL" && (!p2.firstName?.trim() || !p2.lastName?.trim())) {
     ctx.addIssue({
       code: external_exports.ZodIssueCode.custom,
       path: ["lastName"],
@@ -99710,7 +99717,7 @@ var memberEntrySchema = external_exports.object({
   phone: external_exports.string().optional().or(external_exports.literal("")),
   isInitialMember: external_exports.boolean()
 }).superRefine((m2, ctx) => {
-  if (m2.memberType === "INDIVIDUAL" && (!m2.firstName || !m2.lastName)) {
+  if (m2.memberType === "INDIVIDUAL" && (!m2.firstName?.trim() || !m2.lastName?.trim())) {
     ctx.addIssue({
       code: external_exports.ZodIssueCode.custom,
       path: ["lastName"],
@@ -99784,7 +99791,7 @@ var formationFormSchema = external_exports.object({
   registeredAgentPhysicalAddressAcknowledgment: external_exports.literal(true, {
     errorMap: () => ({ message: "Acknowledgment is required." })
   }),
-  registeredAgentAcceptanceName: external_exports.string().min(1, "Name required"),
+  registeredAgentAcceptanceName: external_exports.string().trim().min(1, "Name required").refine(hasFirstAndLast, FIRST_AND_LAST),
   registeredAgentAcceptanceCapacity: external_exports.enum([
     "INDIVIDUAL_AGENT",
     "PRINCIPAL_OF_ENTITY"
@@ -99814,14 +99821,14 @@ var formationFormSchema = external_exports.object({
   businessPurposeText: external_exports.string(),
   effectiveDateOption: external_exports.enum(["FILED_BY_DIVISION", "SPECIFIC"]),
   requestedEffectiveDate: external_exports.string().optional().or(external_exports.literal("")),
-  clientFirstName: external_exports.string().min(1, "First name required"),
-  clientLastName: external_exports.string().min(1, "Last name required"),
+  clientFirstName: external_exports.string().trim().min(1, "First name required"),
+  clientLastName: external_exports.string().trim().min(1, "Last name required"),
   clientSuffix: external_exports.string().max(20).optional().or(external_exports.literal("")),
   clientAddress: addressSchema,
   clientEmail: external_exports.string().email("Enter a valid email"),
   confirmClientEmail: external_exports.string().email("Enter a valid email"),
   clientPhone: external_exports.string().optional().or(external_exports.literal("")),
-  correspondentName: external_exports.string().min(1, "Name required"),
+  correspondentName: external_exports.string().trim().min(1, "Name required").refine(hasFirstAndLast, FIRST_AND_LAST),
   correspondentCompany: external_exports.string().optional().or(external_exports.literal("")),
   correspondentEmail: external_exports.string().email("Enter a valid email"),
   confirmCorrespondentEmail: external_exports.string().email("Enter a valid email"),
@@ -99831,7 +99838,7 @@ var formationFormSchema = external_exports.object({
   // Required only when the client signs. When the client appoints us instead,
   // our own representative signs, so these stay empty — the conditional rule
   // lives in the server's superRefine so neither path can be skipped.
-  authorizedRepresentativeName: external_exports.string().optional().or(external_exports.literal("")),
+  authorizedRepresentativeName: external_exports.string().optional().or(external_exports.literal("")).refine((s) => !(s ?? "").trim() || hasFirstAndLast(s), FIRST_AND_LAST),
   authorizedRepresentativeTitle: external_exports.string().optional().or(external_exports.literal("")),
   authorizedRepresentativeEmail: external_exports.string().email().optional().or(external_exports.literal("")),
   authorizedRepresentativePhone: external_exports.string().optional().or(external_exports.literal("")),
@@ -100123,6 +100130,8 @@ var extendedFormSchema = formationFormSchema.extend({
         path: ["authorizedRepresentativeName"],
         message: "The authorized representative's name is required."
       });
+    } else if (!hasFirstAndLast(data.authorizedRepresentativeName)) {
+      ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["authorizedRepresentativeName"], message: FIRST_AND_LAST });
     }
     if (!data.authorizedRepresentativeSignature?.trim()) {
       ctx.addIssue({
@@ -101380,6 +101389,10 @@ var IRS_FAX = "855-214-7520";
 var F = "topmostSubform[0].Page1[0]";
 var P2 = "topmostSubform[0].Page2[0]";
 var ROW_FIELDS = [3, 4, 5, 6, 7, 8, 9];
+function fmtPhone(digits) {
+  const d2 = (digits ?? "").replace(/\D/g, "");
+  return d2.length === 10 ? `(${d2.slice(0, 3)}) ${d2.slice(3, 6)}-${d2.slice(6)}` : digits;
+}
 function fmtDate(iso) {
   const [y, m2, d2] = iso.split("-").map(Number);
   return `${String(m2).padStart(2, "0")}/${String(d2).padStart(2, "0")}/${y}`;
@@ -101427,7 +101440,7 @@ async function fillForm2553(d2) {
   setText(`${F}.f1_07[0]`, fmtDate(d2.effectiveDate));
   form.getCheckBox(`${F}.c1_3[0]`).check();
   setText(`${F}.f1_10[0]`, `${d2.officerName}, ${d2.officerTitle}`);
-  setText(`${F}.f1_11[0]`, d2.phone);
+  setText(`${F}.f1_11[0]`, fmtPhone(d2.phone));
   setText(`${F}.f1_21[0]`, d2.officerTitle);
   setText(`${P2}.f2_01[0]`, d2.llcName);
   setText(`${P2}.f2_02[0]`, fmtEin(d2.ein));
@@ -101546,7 +101559,7 @@ To whom it may concern:
 
 Enclosed for filing is Form 2553, electing S corporation status for ${d2.llcName}, a Florida limited liability company, effective for the tax year beginning ${fmtDateLong(d2.effectiveDate)}. The form has been signed by an officer of the company, and every shareholder has signed the consent statement in Part I.
 
-Please direct any questions regarding this election to ${d2.officerName}, ${d2.officerTitle}${d2.phone ? `, at ${d2.phone}` : ""}.
+Please direct any questions regarding this election to ${d2.officerName}, ${d2.officerTitle}${d2.phone ? `, at ${fmtPhone(d2.phone)}` : ""}.
 
 Respectfully,
 
@@ -105901,7 +105914,7 @@ var oaAnswersSchema = external_exports.object({
       numerator: external_exports.number().int().min(0).max(1e5).optional(),
       denominator: external_exports.number().int().min(1).max(1e5).optional(),
       contribution: external_exports.string().max(300).optional(),
-      todBeneficiary: external_exports.string().max(300).optional()
+      todBeneficiary: external_exports.string().max(300).optional().refine((v2) => !(v2 ?? "").trim() || hasFirstAndLast(v2), `Beneficiary: ${FIRST_AND_LAST}`)
     })
   ).max(20).optional(),
   series: external_exports.array(
@@ -105924,7 +105937,7 @@ var oaAnswersSchema = external_exports.object({
       numerator: external_exports.number().int().min(0).max(1e5).optional(),
       denominator: external_exports.number().int().min(1).max(1e5).optional(),
       contribution: external_exports.string().max(300).optional(),
-      todBeneficiary: external_exports.string().max(300).optional()
+      todBeneficiary: external_exports.string().max(300).optional().refine((v2) => !(v2 ?? "").trim() || hasFirstAndLast(v2), `Beneficiary: ${FIRST_AND_LAST}`)
     })
   ).max(10).optional()
 }).superRefine((a2, ctx) => {
@@ -106233,7 +106246,7 @@ var sElectionDetailsSchema = external_exports.object({
   // blank and default to it.
   formationDate: external_exports.string({ required_error: "Enter the date the Division filed your Articles as MM/DD/YYYY." }).regex(/^\d{4}-\d{2}-\d{2}$/, "Enter the date the Division filed your Articles as MM/DD/YYYY."),
   effectiveDate: external_exports.string().regex(/^\d{4}-\d{2}-\d{2}$/).or(external_exports.literal("")).optional().default(""),
-  officerName: external_exports.string().min(1, "The signing officer's name is required.").max(200),
+  officerName: external_exports.string().trim().min(1, "The signing officer's name is required.").max(200).refine(hasFirstAndLast, `Signing officer: ${FIRST_AND_LAST}`),
   officerTitle: external_exports.string().min(1).max(100),
   // The deadline acknowledgment the form shows once the timing gate says
   // "ok" (Adam, 6 Sep 2026). Required to build.
@@ -106250,7 +106263,7 @@ var sElectionDetailsSchema = external_exports.object({
   }),
   shareholders: external_exports.array(
     external_exports.object({
-      name: external_exports.string().min(1).max(200),
+      name: external_exports.string().trim().min(1).max(200).refine(hasFirstAndLast, `Owner: ${FIRST_AND_LAST}`),
       address: external_exports.string().min(1).max(300),
       percentage: external_exports.number().min(0).max(100),
       dateAcquired: external_exports.string().regex(/^\d{4}-\d{2}-\d{2}$/).or(external_exports.literal("")).optional().default(""),
@@ -106268,7 +106281,7 @@ var sElectionDetailsSchema = external_exports.object({
       // 2026); blank means the same address as the first owner.
       address2: external_exports.string().max(300).optional().default(""),
       ssn2: external_exports.string().optional().default("").transform((s) => s.replace(/[\s-]/g, "")).refine((s) => s === "" || /^\d{9}$/.test(s), "Each co-owner's SSN must be 9 digits.").refine((s) => s === "" || !/^(000|666|9\d\d)/.test(s), "That is not a valid Social Security number \u2014 check the first three digits.")
-    }).refine((sh) => !isJoint(sh.joint) || sh.name2.trim() !== "", { message: "Enter the co-owner's name on each jointly held row." })
+    }).refine((sh) => !isJoint(sh.joint) || sh.name2.trim() !== "", { message: "Enter the co-owner's name on each jointly held row." }).refine((sh) => !isJoint(sh.joint) || hasFirstAndLast(sh.name2), { message: `Co-owner: ${FIRST_AND_LAST}` })
   ).min(1, "At least one owner is required.").max(7, "The IRS form holds 7 owners \u2014 contact us for more."),
   certified: external_exports.literal(true, {
     errorMap: () => ({ message: "You must confirm the certification before submitting." })
@@ -106576,6 +106589,10 @@ function registerPortalRoutes(app2) {
         err("Every owner needs a full legal name and an address \u2014 both are printed in Exhibit A and the signature block.", "INVALID_INPUT"),
         400
       );
+    }
+    const halfNamed = owners.find((o) => !hasFirstAndLast(o.name));
+    if (halfNamed) {
+      return c.json(err(`${halfNamed.name}: ${FIRST_AND_LAST} Every owner's full legal name is printed in Exhibit A and the signature block.`, "INVALID_INPUT"), 400);
     }
     const multiOwner = owners.length > 1;
     if (a2.multiOwner !== void 0 && a2.multiOwner !== multiOwner) {
@@ -107940,7 +107957,7 @@ function registerPaymentRoutes(app2) {
     return c.json({ data: { ok: true } });
   });
   const contactSchema = external_exports.object({
-    name: external_exports.string().trim().min(1).max(200),
+    name: external_exports.string().trim().min(1).max(200).refine(hasFirstAndLast, FIRST_AND_LAST),
     email: external_exports.string().trim().email().max(320),
     message: external_exports.string().trim().min(1).max(5e3)
   });
@@ -107950,7 +107967,8 @@ function registerPaymentRoutes(app2) {
     }
     const body = contactSchema.safeParse(await c.req.json().catch(() => null));
     if (!body.success) {
-      return c.json(err("Please provide your name, a valid email, and a message.", "INVALID_INPUT"), 400);
+      const nameIssue = body.error.issues.find((i) => i.path[0] === "name" && i.message === FIRST_AND_LAST);
+      return c.json(err(nameIssue ? FIRST_AND_LAST : "Please provide your name, a valid email, and a message.", "INVALID_INPUT"), 400);
     }
     const { name, email, message } = body.data;
     const db = await getDb();

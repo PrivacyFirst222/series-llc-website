@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { FIRST_AND_LAST, hasFirstAndLast } from "../src/lib/personName";
 import { normalizeEntityName } from "../src/components/forms/florida-llc/nameSimilarity";
 import { formationFormSchema } from "../src/components/forms/florida-llc/schema";
 import { designatorAllowedForFormationType, hasProtectedSeriesPhrase, memberRowIsBlank, seriesDedupeKey } from "../src/components/forms/florida-llc/validation";
@@ -187,6 +188,8 @@ const extendedFormSchema = formationFormSchema
           path: ["authorizedRepresentativeName"],
           message: "The authorized representative's name is required.",
         });
+      } else if (!hasFirstAndLast(data.authorizedRepresentativeName)) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["authorizedRepresentativeName"], message: FIRST_AND_LAST });
       }
       if (!data.authorizedRepresentativeSignature?.trim()) {
         ctx.addIssue({

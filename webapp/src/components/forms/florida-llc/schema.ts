@@ -1,3 +1,4 @@
+import { FIRST_AND_LAST, hasFirstAndLast } from "@/lib/personName";
 import { z } from "zod";
 
 const PO_BOX_REGEX = /\b(p\.?\s*o\.?\s*box|post\s*office\s*box)\b/i;
@@ -37,7 +38,7 @@ export const partyEntrySchema = z.object({
   phone: z.string().optional().or(z.literal("")),
   email: z.string().email("Enter a valid email").optional().or(z.literal("")),
 }).superRefine((p, ctx) => {
-  if (p.personOrEntity === "INDIVIDUAL" && (!p.firstName || !p.lastName)) {
+  if (p.personOrEntity === "INDIVIDUAL" && (!p.firstName?.trim() || !p.lastName?.trim())) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ["lastName"],
@@ -72,7 +73,7 @@ export const memberEntrySchema = z.object({
   phone: z.string().optional().or(z.literal("")),
   isInitialMember: z.boolean(),
 }).superRefine((m, ctx) => {
-  if (m.memberType === "INDIVIDUAL" && (!m.firstName || !m.lastName)) {
+  if (m.memberType === "INDIVIDUAL" && (!m.firstName?.trim() || !m.lastName?.trim())) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ["lastName"],
@@ -153,7 +154,7 @@ export const formationFormSchema = z.object({
     errorMap: () => ({ message: "Acknowledgment is required." }),
   }),
 
-  registeredAgentAcceptanceName: z.string().min(1, "Name required"),
+  registeredAgentAcceptanceName: z.string().trim().min(1, "Name required").refine(hasFirstAndLast, FIRST_AND_LAST),
   registeredAgentAcceptanceCapacity: z.enum([
     "INDIVIDUAL_AGENT",
     "PRINCIPAL_OF_ENTITY",
@@ -189,15 +190,15 @@ export const formationFormSchema = z.object({
   effectiveDateOption: z.enum(["FILED_BY_DIVISION", "SPECIFIC"]),
   requestedEffectiveDate: z.string().optional().or(z.literal("")),
 
-  clientFirstName: z.string().min(1, "First name required"),
-  clientLastName: z.string().min(1, "Last name required"),
+  clientFirstName: z.string().trim().min(1, "First name required"),
+  clientLastName: z.string().trim().min(1, "Last name required"),
   clientSuffix: z.string().max(20).optional().or(z.literal("")),
   clientAddress: addressSchema,
   clientEmail: z.string().email("Enter a valid email"),
   confirmClientEmail: z.string().email("Enter a valid email"),
   clientPhone: z.string().optional().or(z.literal("")),
 
-  correspondentName: z.string().min(1, "Name required"),
+  correspondentName: z.string().trim().min(1, "Name required").refine(hasFirstAndLast, FIRST_AND_LAST),
   correspondentCompany: z.string().optional().or(z.literal("")),
   correspondentEmail: z.string().email("Enter a valid email"),
   confirmCorrespondentEmail: z.string().email("Enter a valid email"),
@@ -209,7 +210,7 @@ export const formationFormSchema = z.object({
   // Required only when the client signs. When the client appoints us instead,
   // our own representative signs, so these stay empty — the conditional rule
   // lives in the server's superRefine so neither path can be skipped.
-  authorizedRepresentativeName: z.string().optional().or(z.literal("")),
+  authorizedRepresentativeName: z.string().optional().or(z.literal("")).refine((s) => !(s ?? "").trim() || hasFirstAndLast(s), FIRST_AND_LAST),
   authorizedRepresentativeTitle: z.string().optional().or(z.literal("")),
   authorizedRepresentativeEmail: z.string().email().optional().or(z.literal("")),
   authorizedRepresentativePhone: z.string().optional().or(z.literal("")),

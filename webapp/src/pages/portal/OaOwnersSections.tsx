@@ -1,3 +1,4 @@
+import { FIRST_AND_LAST, hasFirstAndLast } from "@/lib/personName";
 // The owner-identity, spousal-pairing, and per-unit-field cards — the
 // questionnaire sections that edit the members/couples state web. Split from
 // OAQuestionnaire.tsx on 29 Aug 2026 so their contracts are explicit props
@@ -383,6 +384,9 @@ export function UnitFieldCards({ units, isMulti, owners, seedSeries, series, con
                       onChange={(e) => setUnitTod(u, e.target.value)}
                     />
                   </div>
+                  {(unitTod(u) ?? "").trim() && !hasFirstAndLast(unitTod(u)) ? (
+                    <p className="pl-[50%] text-xs text-destructive">{FIRST_AND_LAST}</p>
+                  ) : null}
                   {u.kind === "couple" ? (
                     <p className="pl-[50%] text-xs text-muted-foreground">
                       Takes effect at the death of the last surviving spouse.

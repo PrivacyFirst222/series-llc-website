@@ -263,6 +263,15 @@ async function adminSession() {
 // 1. Reject garbage
 const bad = await api("/api/orders", { method: "POST", body: JSON.stringify({ nope: true }) });
 check("rejects invalid order payload (400)", bad.status === 400);
+// A first and last name at every intake name box (Adam, 7 Sep 2026).
+{
+  const oneWord = async (patch: Record<string, unknown>) => (await api("/api/orders", { method: "POST", body: JSON.stringify({ ...formData, ...patch }) })).status;
+  check("intake: a one-word correspondence contact name is refused", (await oneWord({ correspondentName: "Adam" })) === 400);
+  check("intake: a one-word registered agent acceptance name is refused", (await oneWord({ registeredAgentAcceptanceName: "Adam" })) === 400);
+  check("intake: a one-word authorized representative name is refused", (await oneWord({ authorizedRepresentativeName: "Adam" })) === 400);
+  check("intake: a client last name made of spaces is refused", (await oneWord({ clientLastName: "   " })) === 400);
+  check("intake: a member with a blank last name is refused", (await oneWord({ members: [{ ...formData.members[0], lastName: " " }] })) === 400);
+}
 check("rejected payload creates no order and no checkout link",
   bad.status === 400 && !bad.body?.data?.orderId && !bad.body?.data?.checkoutUrl, bad.body);
 
@@ -540,6 +549,8 @@ check("client account auto-created on payment", !!client && !client.has_password
     !!mine && mine.message.includes("four rentals"), inbox.body?.data?.length);
   const garbage = await api("/api/contact", { method: "POST", body: JSON.stringify({ name: "", email: "not-an-email", message: "" }) });
   check("a garbage contact submission is refused", garbage.status === 400, garbage.status);
+  const oneWordContact = await api("/api/contact", { method: "POST", body: JSON.stringify({ name: "Adam", email: "adam@example.com", message: "Hello there" }) });
+  check("a one-word name on the contact page is refused, and told why", oneWordContact.status === 400 && /first and last name/.test(oneWordContact.body?.error?.message ?? ""), oneWordContact.body);
 }
 
 // 5e. The address checker serves the OA questionnaire too (Adam,
@@ -1026,6 +1037,11 @@ if (mint.status === 200) {
   };
   const saveAns = await api("/api/portal/oa/answers", { method: "PUT", cookies: setPw.cookie, body: JSON.stringify(oaAnswers) });
   check("OA answers save", saveAns.status === 200);
+  // A first and last name for every owner and beneficiary (Adam, 7 Sep 2026).
+  const halfOwner = await api("/api/portal/oa/generate", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ ...oaAnswers, members: [{ name: "Maria", address: "500 Bay Street, Miami, FL 33131", todBeneficiary: "Jordan Member" }] }) });
+  check("agreement: a one-word owner name is refused", halfOwner.status === 400 && /first and last name/.test(halfOwner.body?.error?.message ?? ""), halfOwner.body);
+  const halfBeneficiary = await api("/api/portal/oa/generate", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ ...oaAnswers, members: [{ todBeneficiary: "Jordan" }] }) });
+  check("agreement: a one-word beneficiary is refused", halfBeneficiary.status === 400, halfBeneficiary.body);
   const gen1 = await api("/api/portal/oa/generate", { method: "POST", cookies: setPw.cookie, body: JSON.stringify(oaAnswers) });
   check("OA generates", gen1.status === 200, gen1.body);
   check("a sole owner who is member-managed gets the member-single master", gen1.body?.data?.version === "member-single", gen1.body?.data);
@@ -1480,6 +1496,14 @@ if (mint.status === 200) {
   const okDetails = { ...goodDetails, formationDate: okDate, timingAcknowledged: true, eligibilityAcknowledged: true };
   const sDetails2 = await api(`/api/portal/services/${sId}/s-election-details`, { method: "POST", cookies: mPw.cookie, body: JSON.stringify(okDetails) });
   check("S election details accepted and the package built at once", sDetails2.status === 200 && Boolean(sDetails2.body?.data?.documentId), sDetails2.body);
+  {
+    const oneWordOwner = await api(`/api/portal/services/${sId}/s-election-details`, { method: "POST", cookies: mPw.cookie, body: JSON.stringify({ ...okDetails, shareholders: [{ ...goodDetails.shareholders[0], name: "Maria" }] }) });
+    check("S election: a one-word owner name is refused", oneWordOwner.status === 400, oneWordOwner.body);
+    const oneWordOfficer = await api(`/api/portal/services/${sId}/s-election-details`, { method: "POST", cookies: mPw.cookie, body: JSON.stringify({ ...okDetails, officerName: "Maria" }) });
+    check("S election: a one-word signing officer is refused", oneWordOfficer.status === 400, oneWordOfficer.body);
+    const oneWordCo = await api(`/api/portal/services/${sId}/s-election-details`, { method: "POST", cookies: mPw.cookie, body: JSON.stringify({ ...okDetails, shareholders: [{ ...goodDetails.shareholders[0], name: "Maria Ortiz", joint: "tbe", name2: "Carlos", ssn2: "234-56-7890" }] }) });
+    check("S election: a one-word co-owner name is refused", oneWordCo.status === 400, oneWordCo.body);
+  }
   const storedDates = await api(`/api/admin/services/${sId}`, { cookies: adminS.cookie });
   check("the stored formation date is the one the client typed (a stray dateIncorporated is ignored)", storedDates.body?.data?.details?.dateIncorporated === okDate, storedDates.body?.data?.details?.dateIncorporated);
   // Blanks stay blank on file (the package fills them from the formation

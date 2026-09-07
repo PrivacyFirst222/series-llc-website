@@ -1,3 +1,4 @@
+import { hasFirstAndLast } from "@/lib/personName";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Navigate, Link, useSearchParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -281,7 +282,7 @@ export default function OAQuestionnaire() {
       : isMulti
         ? "You answered that the LLC has more than one owner. Add the other owners here."
         : "You answered that the LLC has one owner, but more than one is listed. Remove the others here.";
-  const incompleteOwner = owners.some((o) => !(o.name ?? "").trim() || !(o.address ?? "").trim());
+  const incompleteOwner = owners.some((o) => !hasFirstAndLast(o.name) || !(o.address ?? "").trim());
 
   // Answering "more than one owner" with one name on file would otherwise dead-end
   // — there would be nowhere to type the second owner.
@@ -668,7 +669,7 @@ export default function OAQuestionnaire() {
               ) : null}
               {incompleteOwner ? (
                 <p className="mt-3 text-sm text-destructive">
-                  Every owner needs a full legal name and an address — both are printed in Exhibit A
+                  Every owner needs a first and last name and an address — both are printed in Exhibit A
                   and the signature block.
                 </p>
               ) : null}

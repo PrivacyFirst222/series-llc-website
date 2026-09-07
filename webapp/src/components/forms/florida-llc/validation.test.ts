@@ -371,6 +371,45 @@ if (typeof console !== "undefined") {
   console.log("[2553] joint owners: 13 cases correct.");
 }
 
+// A first and last name everywhere a name is typed (Adam, 7 Sep 2026).
+{
+  const { hasFirstAndLast } = await import("../../../lib/personName");
+  const cases: [boolean, boolean, string][] = [
+    [hasFirstAndLast("Adam"), false, "one word is refused"],
+    [hasFirstAndLast("  Adam  "), false, "one word with spaces is refused"],
+    [hasFirstAndLast(""), false, "blank is refused"],
+    [hasFirstAndLast("Adam Kirwan"), true, "first and last pass"],
+    [hasFirstAndLast("Casey Member, Jr."), true, "a suffix passes"],
+    [hasFirstAndLast("Bob Jones and Susan Jones, as tenants by the entirety"), true, "a couple's line passes"],
+    [hasFirstAndLast("Adam 2"), false, "a digit is not a name"],
+    [hasFirstAndLast("José Núñez"), true, "accented letters count"],
+  ];
+  for (const [got, want, label] of cases) {
+    if (got !== want) throw new Error(`FAIL first and last: ${label} (got ${got})`);
+  }
+  console.log("[names] first and last: 8 cases correct.");
+}
+
+// The 2553's phone box and the documents order (Adam, 7 Sep 2026).
+{
+  const { fmtPhone } = await import("../../../../server/s-election");
+  const { sortDocuments } = await import("../../../pages/portal/documentOrder");
+  if (fmtPhone("5672109988") !== "(567) 210-9988") throw new Error(`FAIL phone shape: ${fmtPhone("5672109988")}`);
+  if (fmtPhone("") !== "") throw new Error("FAIL phone shape: blank stays blank");
+  const docs = [
+    { kind: "package", title: "S Corporation Election Package (Form 2553) — X", created_at: "2026-09-07" },
+    { kind: "package", title: "Partnership Operating Agreement (No. 1) — X", created_at: "2026-09-06" },
+    { kind: "package", title: "EIN Confirmation Letter — X", created_at: "2026-09-06" },
+    { kind: "psd", title: "Protected Series Designation — PS 1", created_at: "2026-09-05" },
+    { kind: "articles", title: "Articles of Organization — X", created_at: "2026-09-05" },
+    { kind: "certificate-of-status", title: "Certificate of Status — X", created_at: "2026-09-08" },
+  ];
+  const order = sortDocuments(docs).map((d) => d.title.split(" ")[0]);
+  const want = ["Articles", "Protected", "EIN", "Partnership", "Certificate", "S"];
+  if (order.join(",") !== want.join(",")) throw new Error(`FAIL documents order: ${order.join(",")}`);
+  console.log("[portal] documents order: Articles, PS Designation, EIN, Operating Agreement, then newest first.");
+}
+
 // Run directly (bun run validation.test.ts): exit non-zero on failure. Printing
 // a warning and exiting 0 is how a broken fee calculation ships — the run has
 // to fail, not merely say something.

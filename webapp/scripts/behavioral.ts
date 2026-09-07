@@ -369,7 +369,13 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
   }
   await advance(page);
 
-  // Correspondence.
+  // Correspondence. A one-word name is refused at the box (Adam, 7 Sep 2026).
+  await fill(page, "Contact name", "Casey");
+  await fill(page, "Email", run.email ?? "gate@e2e.test");
+  await fill(page, "Confirm email", run.email ?? "gate@e2e.test");
+  await page.locator("main button").filter({ hasText: /^Continue/ }).first().click();
+  await page.waitForTimeout(400);
+  expect(/Enter first and last name/.test(await page.locator("main").innerText()), `${run.key}: a one-word contact name is refused at the box`);
   await fill(page, "Contact name", "Casey Gatecheck");
   await fill(page, "Email", run.email ?? "gate@e2e.test");
   await fill(page, "Confirm email", run.email ?? "gate@e2e.test");
@@ -717,6 +723,9 @@ async function main(): Promise<void> {
       await page.waitForTimeout(300);
       expect((await row2.locator('[data-testid="co-owner-block"]').count()) === 1 && (await row2.locator('[aria-label="Co-owner"]').count()) === 1, "S election: a joint card grows a co-owner block with its own name choice");
       await choose(page, '[aria-label="Owner"] >> nth=1', "Other");
+      await row2.locator('input[placeholder="Owner\'s full legal name"]').fill("Bob");
+      await page.waitForTimeout(300);
+      expect(/Owner 2: enter first and last name/.test(await stillNeeded()), "S election: a one-word owner name is named in the Still needed list", await stillNeeded());
       await row2.locator('input[placeholder="Owner\'s full legal name"]').fill("Bob Jones");
       await choose(page, '[aria-label="Co-owner"]', "Other");
       await row2.locator('input[aria-label="Co-owner\'s full legal name"]').fill("Susan Jones");

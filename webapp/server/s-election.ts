@@ -56,6 +56,12 @@ const P2 = "topmostSubform[0].Page2[0]";
 /** Row field-number offsets: J name/address, K sig, K date, L shares/%, L date acquired, M SSN, N year end. */
 const ROW_FIELDS = [3, 4, 5, 6, 7, 8, 9] as const;
 
+/** Ten stored digits as (xxx) xxx-xxxx; anything else as given. */
+export function fmtPhone(digits: string): string {
+  const d = (digits ?? "").replace(/\D/g, "");
+  return d.length === 10 ? `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}` : digits;
+}
+
 function fmtDate(iso: string): string {
   const [y, m, d] = iso.split("-").map(Number);
   return `${String(m).padStart(2, "0")}/${String(d).padStart(2, "0")}/${y}`;
@@ -123,7 +129,7 @@ async function fillForm2553(d: SElectionDetails): Promise<PDFDocument> {
   setText(`${F}.f1_07[0]`, fmtDate(d.effectiveDate)); // E — effective date
   form.getCheckBox(`${F}.c1_3[0]`).check(); // F(1) — calendar year
   setText(`${F}.f1_10[0]`, `${d.officerName}, ${d.officerTitle}`); // H — contact
-  setText(`${F}.f1_11[0]`, d.phone);
+  setText(`${F}.f1_11[0]`, fmtPhone(d.phone)); // H — telephone as (xxx) xxx-xxxx (Adam, 7 Sep 2026)
   setText(`${F}.f1_21[0]`, d.officerTitle); // Sign Here — title (signature + date are handwritten)
 
   // Page 2 header + Part I consent table (7 rows on the official form)
@@ -252,7 +258,7 @@ To whom it may concern:
 
 Enclosed for filing is Form 2553, electing S corporation status for ${d.llcName}, a Florida limited liability company, effective for the tax year beginning ${fmtDateLong(d.effectiveDate)}. The form has been signed by an officer of the company, and every shareholder has signed the consent statement in Part I.
 
-Please direct any questions regarding this election to ${d.officerName}, ${d.officerTitle}${d.phone ? `, at ${d.phone}` : ""}.
+Please direct any questions regarding this election to ${d.officerName}, ${d.officerTitle}${d.phone ? `, at ${fmtPhone(d.phone)}` : ""}.
 
 Respectfully,
 

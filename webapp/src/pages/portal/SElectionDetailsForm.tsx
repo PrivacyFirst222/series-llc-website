@@ -14,6 +14,7 @@ import { AddressAutocomplete } from "@/components/forms/florida-llc/AddressAutoc
 import type { ServiceOrder, ShareholderRow } from "./ServicesCard";
 import { formatPhone, isoToTypedDate, typedDateToIso, formatTypedDate } from "./typedDate";
 import { JOINT_KINDS, isJoint, type JointKind } from "@/lib/jointOwner";
+import { hasFirstAndLast } from "@/lib/personName";
 import { ELIGIBILITY_ACKNOWLEDGMENT, evaluate2553Timing, type TimingResult } from "@/lib/form2553Timing";
 
 
@@ -208,11 +209,14 @@ export function SElectionDetailsForm({
   if (premature) stillNeeded.push("Choose an effective date no later than next year");
   if (acquiredTooEarly) stillNeeded.push("No owner can acquire an interest before the date on your Articles");
   if (!officerName.trim()) stillNeeded.push(officerOther ? "Enter the signing officer's full legal name" : "Choose the signing officer");
+  else if (officerOther && !hasFirstAndLast(officerName)) stillNeeded.push("Signing officer: enter first and last name");
   if (!officerTitle.trim()) stillNeeded.push("Enter the officer's title");
   rows.forEach((r, i) => {
     const who = `Owner ${i + 1}`;
     if (!r.name.trim()) stillNeeded.push(`${who}: choose or enter the name`);
+    else if (!hasFirstAndLast(r.name)) stillNeeded.push(`${who}: enter first and last name`);
     if (isJoint(r.joint) && !(r.name2 ?? "").trim()) stillNeeded.push(`${who}: choose or enter the co-owner's name`);
+    else if (isJoint(r.joint) && !hasFirstAndLast(r.name2)) stillNeeded.push(`${who}: enter the co-owner's first and last name`);
     if (!r.address.trim()) stillNeeded.push(`${who}: enter the home address`);
     if (isJoint(r.joint) && r.sameAddress === false && !(r.address2 ?? "").trim()) stillNeeded.push(`${who}: enter the co-owner's home address, or tick "Same address"`);
     if (!(Number(r.percentage) > 0)) stillNeeded.push(`${who}: enter the ownership percentage`);

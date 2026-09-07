@@ -18,6 +18,7 @@ import { assembleNewSeries } from "./new-series";
 import { easternDateIso, stampEastern, stampForFilename } from "./datetime";
 import { evaluate2553Timing } from "../src/lib/form2553Timing";
 import { type JointKind, isJoint, packSsns, unpackSsns } from "../src/lib/jointOwner";
+import { FIRST_AND_LAST, hasFirstAndLast } from "../src/lib/personName";
 import { assembleOa, oaVersion, OA_TEMPLATE_VERSION, type OaInputs } from "./oa";
 import { renderMarkdownPdf, stampExistingPdf } from "./pdf-render";
 import { createSession, getSession, getAdminSession, destroySession, rateLimit, clientIp } from "./auth";
@@ -158,7 +159,7 @@ export const oaAnswersSchema = z.object({
         numerator: z.number().int().min(0).max(100_000).optional(),
         denominator: z.number().int().min(1).max(100_000).optional(),
         contribution: z.string().max(300).optional(),
-        todBeneficiary: z.string().max(300).optional(),
+        todBeneficiary: z.string().max(300).optional().refine((v) => !(v ?? "").trim() || hasFirstAndLast(v), `Beneficiary: ${FIRST_AND_LAST}`),
       }),
     )
     .max(20)
@@ -186,7 +187,7 @@ export const oaAnswersSchema = z.object({
         numerator: z.number().int().min(0).max(100_000).optional(),
         denominator: z.number().int().min(1).max(100_000).optional(),
         contribution: z.string().max(300).optional(),
-        todBeneficiary: z.string().max(300).optional(),
+        todBeneficiary: z.string().max(300).optional().refine((v) => !(v ?? "").trim() || hasFirstAndLast(v), `Beneficiary: ${FIRST_AND_LAST}`),
       }),
     )
     .max(10)
@@ -628,7 +629,7 @@ export const sElectionDetailsSchema = z
     // blank and default to it.
     formationDate: z.string({ required_error: "Enter the date the Division filed your Articles as MM/DD/YYYY." }).regex(/^\d{4}-\d{2}-\d{2}$/, "Enter the date the Division filed your Articles as MM/DD/YYYY."),
     effectiveDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).or(z.literal("")).optional().default(""),
-    officerName: z.string().min(1, "The signing officer's name is required.").max(200),
+    officerName: z.string().trim().min(1, "The signing officer's name is required.").max(200).refine(hasFirstAndLast, `Signing officer: ${FIRST_AND_LAST}`),
     officerTitle: z.string().min(1).max(100),
     // The deadline acknowledgment the form shows once the timing gate says
     // "ok" (Adam, 6 Sep 2026). Required to build.
@@ -646,7 +647,7 @@ export const sElectionDetailsSchema = z
     shareholders: z
       .array(
         z.object({
-          name: z.string().min(1).max(200),
+          name: z.string().trim().min(1).max(200).refine(hasFirstAndLast, `Owner: ${FIRST_AND_LAST}`),
           address: z.string().min(1).max(300),
           percentage: z.number().min(0).max(100),
           dateAcquired: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).or(z.literal("")).optional().default(""),
@@ -674,7 +675,8 @@ export const sElectionDetailsSchema = z
             .transform((s) => s.replace(/[\s-]/g, ""))
             .refine((s) => s === "" || /^\d{9}$/.test(s), "Each co-owner's SSN must be 9 digits.")
             .refine((s) => s === "" || !(/^(000|666|9\d\d)/.test(s)), "That is not a valid Social Security number — check the first three digits."),
-        }).refine((sh) => !isJoint(sh.joint) || sh.name2.trim() !== "", { message: "Enter the co-owner's name on each jointly held row." }),
+        }).refine((sh) => !isJoint(sh.joint) || sh.name2.trim() !== "", { message: "Enter the co-owner's name on each jointly held row." })
+          .refine((sh) => !isJoint(sh.joint) || hasFirstAndLast(sh.name2), { message: `Co-owner: ${FIRST_AND_LAST}` }),
       )
       .min(1, "At least one owner is required.")
       .max(7, "The IRS form holds 7 owners — contact us for more."),
@@ -1050,6 +1052,11 @@ app.post("/portal/oa/generate", async (c) => {
       err("Every owner needs a full legal name and an address — both are printed in Exhibit A and the signature block.", "INVALID_INPUT"),
       400,
     );
+  }
+  // A first and last name for every owner (Adam, 7 Sep 2026).
+  const halfNamed = owners.find((o) => !hasFirstAndLast(o.name));
+  if (halfNamed) {
+    return c.json(err(`${halfNamed.name}: ${FIRST_AND_LAST} Every owner's full legal name is printed in Exhibit A and the signature block.`, "INVALID_INPUT"), 400);
   }
   const multiOwner = owners.length > 1;
   // The answer to "more than one owner?" and the list itself must agree, or one

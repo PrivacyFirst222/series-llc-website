@@ -4,6 +4,7 @@
 // which app.ts calls after creating the app — no circular imports.
 import { Hono } from "hono";
 import { z } from "zod";
+import { FIRST_AND_LAST, hasFirstAndLast } from "../src/lib/personName";
 import { orderFormSchema } from "./validation";
 import { buildPayload } from "../src/components/forms/florida-llc/buildPayload";
 import { validateRegisteredAgentAddress } from "../src/components/forms/florida-llc/validation";
@@ -584,7 +585,7 @@ app.post("/orders/:id/resend-welcome", async (c) => {
 // discarded the message (P51). Now: stored (and so backed up nightly),
 // emailed to the notify address, and acknowledged only after both.
 const contactSchema = z.object({
-  name: z.string().trim().min(1).max(200),
+  name: z.string().trim().min(1).max(200).refine(hasFirstAndLast, FIRST_AND_LAST),
   email: z.string().trim().email().max(320),
   message: z.string().trim().min(1).max(5000),
 });
@@ -594,7 +595,8 @@ app.post("/contact", async (c) => {
   }
   const body = contactSchema.safeParse(await c.req.json().catch(() => null));
   if (!body.success) {
-    return c.json(err("Please provide your name, a valid email, and a message.", "INVALID_INPUT"), 400);
+    const nameIssue = body.error.issues.find((i) => i.path[0] === "name" && i.message === FIRST_AND_LAST);
+    return c.json(err(nameIssue ? FIRST_AND_LAST : "Please provide your name, a valid email, and a message.", "INVALID_INPUT"), 400);
   }
   const { name, email, message } = body.data;
   const db = await getDb();

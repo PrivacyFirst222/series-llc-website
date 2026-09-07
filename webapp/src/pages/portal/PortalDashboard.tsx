@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { ServicesCard, type ServiceOrder } from "./ServicesCard";
 import { OrdersInProgress, type ExternalOrderRequest } from "./OrdersInProgress";
+import { sortDocuments } from "./documentOrder";
 import { clearAllDrafts } from "./drafts";
 import { clientActionLabel, clientMustAct } from "./services.helpers";
 import {
@@ -543,11 +544,11 @@ export default function PortalDashboard() {
   // only the kinds it knows drops silently the day a new one is added.
   const FORMATION_KINDS = ["articles", "psd", "package", "certificate-of-status", "certified-copy"];
   const multiCompany = companies.length > 1;
-  const packageDocs = docs.filter(
+  const packageDocs = sortDocuments(docs.filter(
     (d) =>
       FORMATION_KINDS.includes(d.kind) &&
       (!multiCompany || d.order_id === null || d.order_id === company),
-  );
+  ));
 
   const legalMail = docs.filter((d) => d.kind === "legal_mail");
   // Anything whose kind no section claims. Better a plainly labelled leftover

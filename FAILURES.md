@@ -2777,6 +2777,26 @@ I looked at a rendered joint row exactly never before shipping. The walk's scree
 
 Proposed in the same message: a clear heading and separation per owner; the "how held" choice to the right of the owner's name on the same line; the co-owner as a labeled block of their own with their own name, address (starting as the first owner's, changeable), and SSN; and column J of the form carrying each co-owner's address when they differ. The proposal's walk describes what the screen shows at each step, and I open the form with a joint row on it and send the picture before I report.
 
+## P63 — Asked a direct question, I answered with a list I knew was incomplete and a promise to check later
+
+### THE FAILURE
+
+Adam, 7 Sep 2026: "When I ask you a question, why would you say this: 'I have not yet checked the operating agreement questionnaire's owner name boxes. I'll read them before building and add them to the list if they take one word.' That is not fucking acceptable. If I ask you something, check it and answer the fucking question."
+
+He had asked, twice, whether any existing field on the site lets a one-word name through. My first answer restated the proposal. My second listed seven boxes and then said I had not checked the operating agreement questionnaire and would do so later. Both times the check was a grep away and the gate does not block reading. It took three exchanges to not answer one question.
+
+### WHY IT HAPPENED
+
+I had sorted "read the questionnaire" into the build phase, because in this workspace reading usually happens on the way to editing, and editing waits for Go. That sorting is wrong — nothing stops me reading before Go — but it meant the unread file registered as future work rather than as a hole in the answer I was giving now.
+
+Then I did something I have recorded before in a different costume: I disclosed the gap instead of closing it. Saying "I have not yet checked" felt like the honest, rigorous move, and it is honest — but honesty about an omission is not a substitute for the check, and the feeling of rigor is exactly what let me stop there. An answer to "does any field allow X" is a claim about every field; a list of seven with an eighth flagged as unread is not an answer, it is a partial ledger with the denominator missing, which the fraction rule in this file already forbids.
+
+Underneath both: I was answering fast. A question in chat feels like it wants a reply now, and a reply built from what I have already read arrives faster than one that opens another file. Speed of reply was the thing being optimised, at the cost of the question actually being answered.
+
+### FIXED BY
+
+The operating agreement questionnaire's owner name boxes read before this entry is posted, and the complete answer given in the same message. Standing rule for me: a question about "any" or "all" is answered only after every instance is read, and the answer states the count of what was read.
+
 ## Process — the ones that let the substantive ones through
 
 **M1 · Verify the proposition you set out to verify, not the one underneath.** A
