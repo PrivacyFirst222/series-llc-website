@@ -376,3 +376,38 @@ export function sElectionFormReadyEmail(opts: {
     `),
   };
 }
+
+/** The EIN arrived and the client's Form 2553 package was rebuilt with it
+ *  (Adam, 7 Sep 2026). */
+export function sElectionEinAddedEmail(opts: { llcName: string; einDisplay: string; portalUrl: string }): { subject: string; html: string } {
+  return {
+    subject: `Your EIN has been added to your Form 2553 package — ${opts.llcName}`,
+    html: wrap(`
+      <p>The IRS has issued the EIN for <strong>${escapeHtml(opts.llcName)}</strong>:
+      <strong>${escapeHtml(opts.einDisplay)}</strong>. The confirmation letter is in your portal.</p>
+      <p>Your S corporation election package has been rebuilt so that Form 2553 now carries the
+      EIN in item A instead of "Applied For." <strong>Download the new copy before signing and
+      mailing</strong> — an earlier copy marked "Applied For" should not be filed now that the
+      number exists.</p>
+      <p><a href="${opts.portalUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Open your portal</a></p>
+    `),
+  };
+}
+
+/** The EIN arrived after the package's two-week window closed: the numbers
+ *  are gone and it cannot be rebuilt. */
+export function sElectionEinArrivedLateEmail(opts: { llcName: string; einDisplay: string; portalUrl: string; supportEmail: string }): { subject: string; html: string } {
+  return {
+    subject: `Your EIN has arrived — your Form 2553 package needs attention — ${opts.llcName}`,
+    html: wrap(`
+      <p>The IRS has issued the EIN for <strong>${escapeHtml(opts.llcName)}</strong>:
+      <strong>${escapeHtml(opts.einDisplay)}</strong>. The confirmation letter is in your portal.</p>
+      <p>Your S corporation election package was built with "Applied For" in item A, and its
+      two-week editing window has closed, so we no longer hold the details needed to rebuild it.
+      If you have not yet filed Form 2553, write the EIN in item A by hand on your filing copy
+      before signing and mailing, or contact us at
+      <a href="mailto:${escapeHtml(opts.supportEmail)}">${escapeHtml(opts.supportEmail)}</a>.</p>
+      <p><a href="${opts.portalUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Open your portal</a></p>
+    `),
+  };
+}

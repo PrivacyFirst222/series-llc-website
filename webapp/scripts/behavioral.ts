@@ -373,9 +373,14 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
   await fill(page, "Contact name", "Casey");
   await fill(page, "Email", run.email ?? "gate@e2e.test");
   await fill(page, "Confirm email", run.email ?? "gate@e2e.test");
+  // The phone-sized run types slower than the page settles: read the boxes
+  // back before tapping Continue, so the tap tests the one-word name and
+  // nothing else.
+  const nameNow = await page.getByLabel("Contact name", { exact: false }).first().inputValue();
+  expect(nameNow === "Casey", `${run.key}: the one-word name is in the box before Continue`, nameNow);
   await page.locator("main button").filter({ hasText: /^Continue/ }).first().click();
-  await page.waitForTimeout(400);
-  expect(/Enter first and last name/.test(await page.locator("main").innerText()), `${run.key}: a one-word contact name is refused at the box`);
+  const refused = await page.locator("main").getByText("Enter first and last name").first().waitFor({ state: "visible", timeout: 4000 }).then(() => true).catch(() => false);
+  expect(refused, `${run.key}: a one-word contact name is refused at the box`, await stepHeading(page));
   await fill(page, "Contact name", "Casey Gatecheck");
   await fill(page, "Email", run.email ?? "gate@e2e.test");
   await fill(page, "Confirm email", run.email ?? "gate@e2e.test");
@@ -619,8 +624,11 @@ async function main(): Promise<void> {
         const url = new URL(route.request().url());
         const resp = await fetch(`${API}${url.pathname}${url.search}`, {
           method: route.request().method(),
-          headers: { "Content-Type": "application/json", cookie: route.request().headers()["cookie"] ?? "" },
-          body: route.request().postData() ?? undefined,
+          // Pass the request through as sent: an upload is multipart, and
+          // its body is binary — a JSON content type or a text body would
+          // strip the file before it reaches the server.
+          headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "" },
+          body: route.request().postDataBuffer() ?? undefined,
         });
         const body = await resp.text();
         const setCookie = resp.headers.get("set-cookie");
@@ -858,7 +866,44 @@ async function main(): Promise<void> {
       expect((await dialog.locator('input[type="file"]').count()) === 1, "admin: the override reveals the attach control");
       expect((await dialog.locator("button").filter({ hasText: /fulfill/i }).count()) === 1, "admin: the override reveals the fulfill button");
       await page.keyboard.press("Escape");
+      // The closing window lingers in the page for its fade-out; a locator
+      // for "the first dialog" would land on it instead of the next one.
+      await page.locator('[role="dialog"]').first().waitFor({ state: "detached", timeout: 5000 }).catch(() => {});
+      await page.waitForTimeout(400);
+      // The EIN as issued is entered with the letter (Adam, 7 Sep 2026): the
+      // box sits beside the attach control, the number is required, and the
+      // client's S election form then shows it read-only.
+      const einRow = page.locator("main button").filter({ hasText: /^EIN/ }).first();
+      await einRow.click();
+      await page.waitForTimeout(800);
+      const einDialog = page.locator('[role="dialog"]').first();
+      await einDialog.locator('[data-testid="override-fulfill"]').check({ force: true });
+      await page.waitForTimeout(300);
+      expect((await einDialog.locator('[data-testid="assigned-ein"]').count()) === 1, "admin: the EIN window has a box for the number beside the letter");
+      await einDialog.locator('input[type="file"]').setInputFiles({ name: "cp575.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.4 CP 575 letter for the walk\n%%EOF") });
+      const fulfillBtn = einDialog.locator("button").filter({ hasText: /fulfill/i }).first();
+      expect(await fulfillBtn.isDisabled(), "admin: fulfill stays off until the number is typed");
+      await einDialog.locator('input[aria-label="EIN as issued"]').fill("88-12345");
+      await page.waitForTimeout(200);
+      expect(/Enter the 9-digit EIN/.test(await einDialog.innerText()), "admin: a short number is called out");
+      await einDialog.locator('input[aria-label="EIN as issued"]').fill("88-1234567");
+      await page.waitForTimeout(200);
+      expect(!(await fulfillBtn.isDisabled()), "admin: the full number enables fulfill");
+      await fulfillBtn.click();
+      await page.waitForTimeout(1500);
+      if ((await page.locator('[role="dialog"]').count()) !== 0) console.log("    EIN window still open:", (await einDialog.innerText().catch(() => "")).replace(/\n/g, " | ").slice(-500));
+      expect((await page.locator('[role="dialog"]').count()) === 0, "admin: the EIN order fulfills with the letter and the number");
       await page.goto(`http://localhost:${WEB_PORT}/portal`);
+      await page.waitForTimeout(1500);
+      await page.locator("[toast-close]").first().click().catch(() => {});
+      await selRow.locator("button").filter({ hasText: /Provide details/ }).first().click();
+      await page.waitForTimeout(800);
+      const withEin = page.locator('[role="dialog"]').first();
+      expect((await withEin.locator('[data-testid="ein-from-letter"]').inputValue()) === "88-1234567", "client: the S election form shows the EIN from the letter, read-only", await withEin.locator('[data-testid="ein-from-letter"]').inputValue().catch(() => ""));
+      expect((await withEin.locator("text=You're obtaining our EIN").count()) === 0, "client: no 'obtaining our EIN' tick once we have the number");
+      await page.keyboard.press("Escape");
+      await page.waitForTimeout(400);
+      await page.reload();
       await page.waitForTimeout(1500);
 
       // The X is the only way out: the toast is still there after 6 s, and gone after the click.
@@ -903,8 +948,11 @@ async function main(): Promise<void> {
         }
         const resp = await fetch(`${API}${url.pathname}${url.search}`, {
           method: route.request().method(),
-          headers: { "Content-Type": "application/json", cookie: route.request().headers()["cookie"] ?? "" },
-          body: route.request().postData() ?? undefined,
+          // Pass the request through as sent: an upload is multipart, and
+          // its body is binary — a JSON content type or a text body would
+          // strip the file before it reaches the server.
+          headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "" },
+          body: route.request().postDataBuffer() ?? undefined,
         });
         const body = await resp.text();
         const setCookie = resp.headers.get("set-cookie");

@@ -1174,22 +1174,60 @@ if (mint.status === 200) {
     { status: realDl.status, len: realBytes.length },
   );
 
-  // 14. EIN fulfillment requires the IRS letter; fulfilling deletes the TIN
+  // The intake S election, built before the EIN exists: item A says
+  // "Applied For" until the office uploads the letter with the number
+  // (Adam, 7 Sep 2026).
+  const intakeSelDetails = {
+    formationDate: easternToday(), ein: "", einPending: true, effectiveDate: "",
+    officerName: "Casey Member, Jr.", officerTitle: "Manager", phone: "(305) 555-0100",
+    certified: true, timingAcknowledged: true, eligibilityAcknowledged: true,
+    shareholders: [{ name: "Casey Member, Jr.", address: "100 Ocean Drive, Miami, FL 33139", percentage: 100, dateAcquired: "", ssn: "123-45-6789" }],
+  };
+  const appliedFor = await api(`/api/portal/services/${intakeSElection?.id}/s-election-details`, { method: "POST", cookies: setPw.cookie, body: JSON.stringify(intakeSelDetails) });
+  check("an S election builds as Applied For before the EIN exists", appliedFor.status === 200 && Boolean(appliedFor.body?.data?.documentId), appliedFor.body);
+  const appliedForDoc = appliedFor.body?.data?.documentId as string;
+  const beforeEin = await api("/api/portal/services", { cookies: setPw.cookie });
+  check("no company EIN is known before the letter is uploaded", beforeEin.body?.data?.companyEin === null, beforeEin.body?.data?.companyEin);
+
+  // 14. EIN fulfillment requires the IRS letter AND the number; fulfilling deletes the TIN
   const noLetter = await api(`/api/admin/services/${intakeEin.id}/fulfill`, {
     method: "POST", cookies: adminLogin2.cookie, body: JSON.stringify({ notify: false }),
   });
   check("EIN fulfill without letter rejected", noLetter.status === 400, noLetter.body);
+  const letter = () => new File([new TextEncoder().encode("%PDF-1.4 CP 575 letter for e2e\n%%EOF")], "cp575.pdf", { type: "application/pdf" });
+  const noNumberFd = new FormData();
+  noNumberFd.set("notify", "false");
+  noNumberFd.set("file", letter());
+  const noNumber = await fetch(`${BASE}/api/admin/services/${intakeEin.id}/fulfill`, { method: "POST", headers: { Cookie: adminLogin2.cookie }, body: noNumberFd });
+  check("EIN fulfill without the number is refused", noNumber.status === 400 && ((await noNumber.json().catch(() => null)) as { error?: { code?: string } } | null)?.error?.code === "EIN_REQUIRED");
+  const badNumberFd = new FormData();
+  badNumberFd.set("notify", "false");
+  badNumberFd.set("file", letter());
+  badNumberFd.set("ein", "00-1234567");
+  const badNumber = await fetch(`${BASE}/api/admin/services/${intakeEin.id}/fulfill`, { method: "POST", headers: { Cookie: adminLogin2.cookie }, body: badNumberFd });
+  check("EIN fulfill with an invalid number is refused", badNumber.status === 400);
   const einFd = new FormData();
   einFd.set("notify", "false");
-  einFd.set(
-    "file",
-    new File([new TextEncoder().encode("%PDF-1.4 CP 575 letter for e2e\n%%EOF")], "cp575.pdf", { type: "application/pdf" }),
-  );
+  einFd.set("file", letter());
+  einFd.set("ein", "88-1234567");
   const fulfillRes = await fetch(`${BASE}/api/admin/services/${intakeEin.id}/fulfill`, {
     method: "POST", headers: { Cookie: adminLogin2.cookie }, body: einFd,
   });
-  const fulfill = { status: fulfillRes.status, body: await fulfillRes.json().catch(() => null) as unknown };
-  check("admin fulfills EIN order with letter", fulfill.status === 200, fulfill.body);
+  const fulfill = { status: fulfillRes.status, body: await fulfillRes.json().catch(() => null) as { data?: { rebuiltSElections?: number } } | null };
+  check("admin fulfills EIN order with letter and number", fulfill.status === 200, fulfill.body);
+  check("the waiting S election package was rebuilt with the EIN", fulfill.body?.data?.rebuiltSElections === 1, fulfill.body);
+  const afterEin = await api("/api/portal/services", { cookies: setPw.cookie });
+  check("the company's EIN is now known to the portal", afterEin.body?.data?.companyEin === "881234567", afterEin.body?.data?.companyEin);
+  const rebuiltSel = (afterEin.body?.data?.orders ?? []).find((o: { id: string }) => o.id === intakeSElection?.id);
+  check("the rebuilt package carries the EIN from the letter", rebuiltSel?.details?.ein === "881234567" && rebuiltSel?.details?.einPending === false && rebuiltSel?.details?.einSource === "letter", rebuiltSel?.details);
+  check("the rebuilt package replaced the Applied For one", Boolean(rebuiltSel?.details?.documentId) && rebuiltSel?.details?.documentId !== appliedForDoc, { before: appliedForDoc, after: rebuiltSel?.details?.documentId });
+  const einAdmin = await api(`/api/admin/services/${intakeEin.id}`, { cookies: adminLogin2.cookie });
+  check("the number is kept on the EIN order", einAdmin.body?.data?.details?.assignedEin === "881234567", einAdmin.body?.data?.details);
+  // A later build for the same company gets the number whatever the client sends.
+  const retyped = await api(`/api/portal/services/${intakeSElection?.id}/s-election-details`, { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ ...intakeSelDetails, ein: "12-3456789", einPending: false, shareholders: [{ ...intakeSelDetails.shareholders[0], ssn: "" }] }) });
+  check("a rebuild after the letter uses the letter's EIN, not a typed one", retyped.status === 200, retyped.body);
+  const retypedSel = ((await api("/api/portal/services", { cookies: setPw.cookie })).body?.data?.orders ?? []).find((o: { id: string }) => o.id === intakeSElection?.id);
+  check("the letter's EIN stands", retypedSel?.details?.ein === "881234567", retypedSel?.details?.ein);
   const einDocs = await api("/api/portal/documents", { cookies: setPw.cookie });
   check(
     "EIN letter appears in client portal documents",

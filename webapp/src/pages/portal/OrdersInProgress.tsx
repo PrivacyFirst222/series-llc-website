@@ -259,6 +259,7 @@ export function OrdersInProgress({
               clientName={meQuery.data?.name}
               priorFormationDate={detailsFor.details.dateIncorporated}
               todayEastern={data.todayEastern}
+              companyEin={data.companyEin ?? undefined}
               draft={selDrafts[detailsFor.id]}
               onDraftChange={(d) => {
                 setSelDrafts((prev) => ({ ...prev, [detailsFor.id]: d }));

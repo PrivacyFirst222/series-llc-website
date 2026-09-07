@@ -19,6 +19,7 @@ import { easternDateIso, stampEastern, stampForFilename } from "./datetime";
 import { evaluate2553Timing } from "../src/lib/form2553Timing";
 import { type JointKind, isJoint, packSsns, unpackSsns } from "../src/lib/jointOwner";
 import { FIRST_AND_LAST, hasFirstAndLast } from "../src/lib/personName";
+import { VALID_EIN_PREFIXES } from "../src/lib/ein";
 import { assembleOa, oaVersion, OA_TEMPLATE_VERSION, type OaInputs } from "./oa";
 import { renderMarkdownPdf, stampExistingPdf } from "./pdf-render";
 import { createSession, getSession, getAdminSession, destroySession, rateLimit, clientIp } from "./auth";
@@ -436,6 +437,8 @@ export const S_ELECTION_EDIT_DAYS = 14;
 export interface SElectionStoredDetails {
   ein?: string;
   einPending?: boolean;
+  /** "letter": the number came from the CP 575 the office uploaded. */
+  einSource?: "letter";
   dateIncorporated?: string;
   effectiveDate?: string;
   officerName?: string;
@@ -606,11 +609,23 @@ export const einDetailsSchema = z
 
 /** irs.gov, "Valid EINs": every prefix an IRS campus, the online
  *  application, or the SBA has ever assigned. Anything else is a typo. */
-const VALID_EIN_PREFIXES = new Set(
-  ("10 12 60 67 50 53 01 02 03 04 05 06 11 13 14 16 21 22 23 25 34 51 52 54 55 56 57 58 59 65 " +
-   "30 32 35 36 37 38 61 15 24 40 44 94 95 80 90 33 39 41 42 43 46 48 62 63 64 66 68 71 72 73 74 75 76 77 85 86 87 88 91 92 93 98 99 " +
-   "20 26 27 45 47 81 82 83 84 31").split(" "),
-);
+/** The EIN we obtained for the company, typed by the office with the CP 575
+ *  letter (Adam, 7 Sep 2026: "there should be a field to enter it so it gets
+ *  added to the 2553"). Null until an EIN order for the company itself is
+ *  fulfilled with a number. */
+export async function companyEinFor(clientId: string, companyOrderId: string | null): Promise<string | null> {
+  const db = await getDb();
+  const rows = await db.query<{ details: unknown }>(
+    `SELECT details FROM service_orders WHERE client_id = $1 AND type = 'ein' AND status = 'fulfilled'
+       AND (formation_order_id IS NULL OR $2::text IS NULL OR formation_order_id::text = $2::text) ORDER BY fulfilled_at DESC`,
+    [clientId, companyOrderId],
+  );
+  for (const r of rows) {
+    const d = (typeof r.details === "string" ? JSON.parse(r.details) : r.details) as { target?: string; assignedEin?: string } | null;
+    if ((d?.target ?? "company") === "company" && d?.assignedEin && /^\d{9}$/.test(d.assignedEin)) return d.assignedEin;
+  }
+  return null;
+}
 
 export const sElectionDetailsSchema = z
   .object({
@@ -1522,6 +1537,9 @@ app.get("/portal/services", async (c) => {
       llcFormed: await clientLlcFormed(session.clientId, svcCompanyId),
       // Florida's date, for the Form 2553 timing gate the form runs on load.
       todayEastern: easternDateIso(),
+      // The EIN we obtained, if we have: the S election form shows it
+      // read-only instead of asking (Adam, 7 Sep 2026).
+      companyEin: await companyEinFor(session.clientId, svcCompanyId),
       einCompanyOrdered: orders.some((o) => {
         if (o.type !== "ein" || o.status === "pending_payment") return false;
         const d = (typeof o.details === "string" ? JSON.parse(o.details) : o.details) as { target?: string } | null;
@@ -1978,9 +1996,13 @@ app.post("/portal/services/:id/s-election-details", async (c) => {
   // "You're obtaining our EIN" wins over a typed number, on our side as in
   // the form (which clears the box when it is ticked): the IRS form then
   // says "Applied For" (Adam's item 6, 6 Sep 2026).
+  // The number from the CP 575 we uploaded outranks anything typed: it is
+  // the one the IRS issued (Adam, 7 Sep 2026).
+  const knownEin = await companyEinFor(so.client_id, so.formation_order_id);
   const merged: SElectionStoredDetails = {
-    ein: d.einPending ? "" : d.ein,
-    einPending: d.einPending,
+    ein: knownEin ?? (d.einPending ? "" : d.ein),
+    einPending: knownEin ? false : d.einPending,
+    einSource: knownEin ? "letter" : undefined,
     dateIncorporated: formationDate,
     effectiveDate: d.effectiveDate,
     officerName: d.officerName,

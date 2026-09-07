@@ -65,6 +65,8 @@ export interface ServicesData {
   orders: ServiceOrder[];
   series: { name: string; einOrdered: boolean }[];
   einCompanyOrdered: boolean;
+  /** The EIN we obtained for the company, from the CP 575 the office uploaded. */
+  companyEin?: string | null;
   llcFormed: boolean;
   /** Florida's date, YYYY-MM-DD — "today" for the Form 2553 timing gate. */
   todayEastern: string;

@@ -15,6 +15,7 @@ import type { ServiceOrder, ShareholderRow } from "./ServicesCard";
 import { formatPhone, isoToTypedDate, typedDateToIso, formatTypedDate } from "./typedDate";
 import { JOINT_KINDS, isJoint, type JointKind } from "@/lib/jointOwner";
 import { hasFirstAndLast } from "@/lib/personName";
+import { fmtEinDisplay } from "@/lib/ein";
 import { ELIGIBILITY_ACKNOWLEDGMENT, evaluate2553Timing, type TimingResult } from "@/lib/form2553Timing";
 
 
@@ -69,6 +70,7 @@ export function SElectionDetailsForm({
   clientName,
   priorFormationDate,
   todayEastern,
+  companyEin,
   draft,
   onDraftChange,
   onDone,
@@ -80,6 +82,9 @@ export function SElectionDetailsForm({
   /** A date already on the order (an earlier build, or the office's
    *  correction) — the box starts from it. */
   priorFormationDate?: string;
+  /** The EIN we obtained, from the CP 575 in the client's documents: shown
+   *  read-only instead of asked (Adam, 7 Sep 2026). */
+  companyEin?: string;
   /** Florida's date, from our server — the gate never uses the device clock. */
   todayEastern?: string;
   draft?: SElectionDraft;
@@ -97,8 +102,8 @@ export function SElectionDetailsForm({
   // (Adam, 6 Sep 2026). Everything about the deadline runs from it.
   const [formationDateTyped, setFormationDateTyped] = useState(draft?.formationDateTyped ?? isoToTypedDate(priorFormationDate));
   const formationDate = typedDateToIso(formationDateTyped) || undefined;
-  const [ein, setEin] = useState(draft?.ein ?? prior.ein ?? "");
-  const [einPending, setEinPending] = useState(draft ? draft.einPending : Boolean(prior.einPending));
+  const [ein, setEin] = useState(companyEin ?? draft?.ein ?? prior.ein ?? "");
+  const [einPending, setEinPending] = useState(companyEin ? false : draft ? draft.einPending : Boolean(prior.einPending));
   const [effectiveDate, setEffectiveDate] = useState(draft?.effectiveDate ?? isoToTypedDate(prior.effectiveDate));
   const [officerName, setOfficerName] = useState(draft?.officerName ?? prior.officerName ?? knownSigners[0] ?? "");
   // "Someone else…" stays selected while the typed name is not a known one.
@@ -276,22 +281,34 @@ export function SElectionDetailsForm({
         </div>
         <div className="space-y-1.5">
           <label className="text-sm font-medium">EIN (9 digits)</label>
-          <Input
-            value={ein}
-            onChange={(e) => setEin(e.target.value)}
-            placeholder="XX-XXXXXXX"
-            autoComplete="off"
-            disabled={einPending}
-          />
-          <label className="flex items-center gap-2 text-xs text-muted-foreground">
-            <input
-              type="checkbox"
-              checked={einPending}
-              onChange={(e) => { setEinPending(e.target.checked); if (e.target.checked) setEin(""); }}
-              className="h-3.5 w-3.5 accent-trust"
-            />
-            You're obtaining our EIN — use it when issued
-          </label>
+          {companyEin ? (
+            <>
+              <Input value={fmtEinDisplay(companyEin)} readOnly aria-label="EIN" data-testid="ein-from-letter" className="bg-secondary/40" />
+              <p className="text-xs text-muted-foreground">
+                From your EIN confirmation letter, in your documents above.
+              </p>
+            </>
+          ) : (
+            <>
+              <Input
+                value={ein}
+                onChange={(e) => setEin(e.target.value)}
+                placeholder="XX-XXXXXXX"
+                autoComplete="off"
+                aria-label="EIN"
+                disabled={einPending}
+              />
+              <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                <input
+                  type="checkbox"
+                  checked={einPending}
+                  onChange={(e) => { setEinPending(e.target.checked); if (e.target.checked) setEin(""); }}
+                  className="h-3.5 w-3.5 accent-trust"
+                />
+                You're obtaining our EIN — use it when issued
+              </label>
+            </>
+          )}
         </div>
         <div className="space-y-1.5">
           <label className="text-sm font-medium">Election effective date</label>

@@ -19,7 +19,8 @@ import { createSession, rateLimit, clientIp } from "./auth";
 import { createHash } from "node:crypto";
 import ownersManualMd from "../../docs/owners-manual.md";
 import { deleteFile, putFile, readFileStream } from "./storage";
-import { sendMail, newDocumentEmail, emailChangedEmail, serviceFulfilledClientEmail, llcFormedEmail } from "./email";
+import { sendMail, newDocumentEmail, emailChangedEmail, serviceFulfilledClientEmail, llcFormedEmail, sElectionEinAddedEmail, sElectionEinArrivedLateEmail } from "./email";
+import { einDigits, fmtEinDisplay, isValidEin } from "../src/lib/ein";
 import { filingGroups, seriesNames } from "./filing";
 import { err, testHooks, MAX_UPLOAD_BYTES, looksLikePdf, requireAdmin } from "./shared";
 import { oaSeed, purgeExpiredSElections, postSElectionPackage, type SElectionStoredDetails } from "./routes-portal";
@@ -944,11 +945,13 @@ app.post("/admin/services/:id/fulfill", async (c) => {
   let notify = true;
   let file: File | null = null;
   let titleOverride = "";
+  let assignedEin = "";
   if (contentType.includes("multipart/form-data")) {
     const form = await c.req.parseBody();
     if (form.file instanceof File && form.file.size > 0) file = form.file;
     notify = form.notify !== "false";
     if (typeof form.title === "string") titleOverride = form.title.trim();
+    if (typeof form.ein === "string") assignedEin = einDigits(form.ein);
   } else {
     const body = (await c.req.json().catch(() => ({}))) as { notify?: boolean };
     notify = body.notify !== false;
@@ -972,6 +975,11 @@ app.post("/admin/services/:id/fulfill", async (c) => {
   // Same for the S election package: fulfilling deletes the shareholder SSNs.
   if (so.type === "ein" && !file) {
     return c.json(err("Attach the EIN confirmation letter (CP 575) to fulfill an EIN order.", "LETTER_REQUIRED"), 400);
+  }
+  // The number is entered with the letter so the 2553 can carry it (Adam,
+  // 7 Sep 2026). Checked the way the S election form checks one.
+  if (so.type === "ein" && !isValidEin(assignedEin)) {
+    return c.json(err("Enter the 9-digit EIN from the letter — it goes on the client's Form 2553.", "EIN_REQUIRED"), 400);
   }
   if (so.type === "s-election" && !file) {
     return c.json(err("Attach the election package PDF to fulfill an S election order.", "PACKAGE_REQUIRED"), 400);
@@ -1051,8 +1059,65 @@ app.post("/admin/services/:id/fulfill", async (c) => {
       );
     }
   }
-  return c.json({ data: { ok: true, documentId } });
+  let rebuiltSElections = 0;
+  if (so.type === "ein") {
+    await db.query(
+      "UPDATE service_orders SET details = COALESCE(details, '{}'::jsonb) || $2::jsonb WHERE id = $1",
+      [so.id, JSON.stringify({ assignedEin })],
+    );
+    if ((details.target ?? "company") === "company") {
+      rebuiltSElections = await carryEinIntoSElections({ clientId: so.client_id, companyOrderId: so.formation_order_id, llcName: so.llc_name, ein: assignedEin });
+    }
+  }
+  return c.json({ data: { ok: true, documentId, rebuiltSElections } });
 });
+
+/** The EIN just arrived: every S election package for the company that was
+ *  built as "Applied For" is rebuilt with it while its window is open, and
+ *  the client is told. Past the window the numbers are gone, so the client
+ *  is told that instead. Returns how many were rebuilt. */
+async function carryEinIntoSElections(args: { clientId: string; companyOrderId: string | null; llcName: string; ein: string }): Promise<number> {
+  const db = await getDb();
+  const rows = await db.query<{ id: string; client_id: string; llc_name: string; status: string; details: unknown; ein_secret: string | null }>(
+    `SELECT id, client_id, llc_name, status, details, ein_secret FROM service_orders
+      WHERE client_id = $1 AND type = 's-election' AND status <> 'pending_payment'
+        AND (formation_order_id IS NULL OR $2::text IS NULL OR formation_order_id::text = $2::text)`,
+    [args.clientId, args.companyOrderId],
+  );
+  const clients = await db.query<{ email: string }>("SELECT email FROM clients WHERE id = $1", [args.clientId]);
+  const to = clients[0]?.email ?? "";
+  const einDisplay = fmtEinDisplay(args.ein);
+  let rebuilt = 0;
+  for (const row of rows) {
+    const d = ((typeof row.details === "string" ? JSON.parse(row.details) : row.details) ?? {}) as SElectionStoredDetails;
+    const appliedFor = Boolean(d.einPending) || !d.ein;
+    if (!appliedFor || !d.shareholders?.length) continue; // nothing built yet, or the number was already on it
+    if (!row.ein_secret) {
+      if (d.documentId || d.purgedAt) {
+        const mail = sElectionEinArrivedLateEmail({ llcName: row.llc_name, einDisplay, portalUrl: `${env.PUBLIC_BASE_URL}/portal`, supportEmail: "support@myfloridaseriesllc.com" });
+        sendMail({ to, ...mail }).catch((e) => console.error("[admin] ein-late email failed:", e));
+      }
+      continue;
+    }
+    let ssns: string[];
+    try {
+      ssns = JSON.parse(decryptSecret(row.ein_secret)) as string[];
+    } catch (e) {
+      console.error("[admin] s-election secret decrypt failed:", e);
+      continue;
+    }
+    const merged: SElectionStoredDetails = { ...d, ein: args.ein, einPending: false, einSource: "letter" };
+    const built = await postSElectionPackage({ so: { id: row.id, client_id: row.client_id, llc_name: row.llc_name }, merged, ssns, priorDocumentId: d.documentId });
+    if (!built.ok) {
+      console.error("[admin] s-election rebuild with EIN failed:", row.id);
+      continue;
+    }
+    rebuilt++;
+    const mail = sElectionEinAddedEmail({ llcName: row.llc_name, einDisplay, portalUrl: `${env.PUBLIC_BASE_URL}/portal` });
+    sendMail({ to, ...mail }).catch((e) => console.error("[admin] ein-added email failed:", e));
+  }
+  return rebuilt;
+}
 
 app.get("/admin/clients/:id/documents", async (c) => {
   const admin = await requireAdmin(c);

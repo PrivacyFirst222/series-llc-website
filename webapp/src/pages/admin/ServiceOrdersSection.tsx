@@ -1,4 +1,5 @@
 import { jointDisplayName } from "@/lib/jointOwner";
+import { fmtEinDisplay, isValidEin } from "@/lib/ein";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -33,7 +34,7 @@ export interface AdminServiceOrder {
   llc_name: string;
   details: {
     seriesName?: string; target?: string; responsibleName?: string; tinLast4?: string; purpose?: string; note?: string;
-    ein?: string; einPending?: boolean; dateIncorporated?: string; effectiveDate?: string;
+    ein?: string; einPending?: boolean; einSource?: "letter"; assignedEin?: string; dateIncorporated?: string; effectiveDate?: string;
     officerName?: string; officerTitle?: string; phone?: string; shareholders?: SElectionShareholderView[];
     fulfilledByOverride?: boolean; overrideAt?: string;
   };
@@ -85,6 +86,10 @@ export function ServiceFulfillDialog({
   // Adam's override (6 Sep 2026): the details were obtained outside the
   // portal, so fulfill anyway. The deliverable is still required.
   const [override, setOverride] = useState(false);
+  // The EIN as issued, typed with the CP 575 so the 2553 can carry it
+  // (Adam, 7 Sep 2026).
+  const [assignedEin, setAssignedEin] = useState("");
+  const einOk = isValidEin(assignedEin);
 
   const detailQuery = useQuery({
     queryKey: ["admin-service-detail", viewing?.id],
@@ -108,9 +113,10 @@ export function ServiceFulfillDialog({
   });
 
   const fulfill = useMutation({
-    mutationFn: async (args: { id: string; file: File | null }) => {
+    mutationFn: async (args: { id: string; file: File | null; ein?: string }) => {
       const fd = new FormData();
       if (args.file) fd.set("file", args.file);
+      if (args.ein) fd.set("ein", args.ein);
       const res = await fetch(`/api/admin/services/${args.id}/fulfill`, {
         method: "POST",
         body: fd,
@@ -126,6 +132,7 @@ export function ServiceFulfillDialog({
       setAttachment(null);
       setSkipDocument(false);
       setOverride(false);
+      setAssignedEin("");
       onClose();
       queryClient.invalidateQueries({ queryKey: ["admin-services"] });
       queryClient.invalidateQueries({ queryKey: ["admin", "orders"] });
@@ -181,7 +188,9 @@ export function ServiceFulfillDialog({
                   <span className="text-muted-foreground">EIN:</span>{" "}
                   {detailQuery.data?.details.einPending
                     ? "pending — we're obtaining it"
-                    : detailQuery.data?.details.ein || "— not yet provided —"}
+                    : detailQuery.data?.details.ein
+                      ? `${fmtEinDisplay(detailQuery.data.details.ein)}${detailQuery.data.details.einSource === "letter" ? " (from the EIN letter we uploaded)" : ""}`
+                      : "— not yet provided —"}
                 </div>
                 {detailQuery.data?.details.dateIncorporated ? (
                   <div className="space-y-1">
@@ -314,6 +323,26 @@ export function ServiceFulfillDialog({
             onChange={(e) => setAttachment(e.target.files?.[0] ?? null)}
             className="block w-full text-sm text-muted-foreground file:mr-3 file:rounded-full file:border file:border-border file:bg-secondary file:px-4 file:py-1.5 file:text-sm file:font-medium"
           />
+          {viewing?.type === "ein" ? (
+            <div className="space-y-1" data-testid="assigned-ein">
+              <label htmlFor="assigned-ein" className="text-sm font-medium">EIN as issued (9 digits)</label>
+              <Input
+                id="assigned-ein"
+                aria-label="EIN as issued"
+                inputMode="numeric"
+                placeholder="XX-XXXXXXX"
+                value={assignedEin}
+                onChange={(e) => setAssignedEin(e.target.value)}
+                className="w-48"
+                autoComplete="off"
+              />
+              <p className="text-xs text-muted-foreground">
+                From the letter. It goes on the client's Form 2553: any S election package built
+                as "Applied For" is rebuilt with it and the client is emailed.
+                {assignedEin && !einOk ? <span className="text-destructive"> Enter the 9-digit EIN from the letter.</span> : null}
+              </p>
+            </div>
+          ) : null}
           <p className="text-xs text-muted-foreground">
             Posted to the client's portal documents in the same action, so "documents have been
             posted" in their completion email is true.
@@ -343,8 +372,8 @@ export function ServiceFulfillDialog({
           <DialogFooter>
             <Button
               className="rounded-full"
-              disabled={fulfill.isPending || (!attachment && !skipDocument)}
-              onClick={() => viewing && fulfill.mutate({ id: viewing.id, file: attachment })}
+              disabled={fulfill.isPending || (!attachment && !skipDocument) || (viewing?.type === "ein" && !einOk)}
+              onClick={() => viewing && fulfill.mutate({ id: viewing.id, file: attachment, ein: viewing.type === "ein" ? assignedEin : undefined })}
             >
               {fulfill.isPending ? "Fulfilling…" : attachment ? "Upload & fulfill" : "Mark fulfilled"}
             </Button>

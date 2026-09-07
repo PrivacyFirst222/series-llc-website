@@ -100896,6 +100896,35 @@ function llcFormedEmail(opts) {
 function escapeHtml(s) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
+function sElectionEinAddedEmail(opts) {
+  return {
+    subject: `Your EIN has been added to your Form 2553 package \u2014 ${opts.llcName}`,
+    html: wrap(`
+      <p>The IRS has issued the EIN for <strong>${escapeHtml(opts.llcName)}</strong>:
+      <strong>${escapeHtml(opts.einDisplay)}</strong>. The confirmation letter is in your portal.</p>
+      <p>Your S corporation election package has been rebuilt so that Form 2553 now carries the
+      EIN in item A instead of "Applied For." <strong>Download the new copy before signing and
+      mailing</strong> \u2014 an earlier copy marked "Applied For" should not be filed now that the
+      number exists.</p>
+      <p><a href="${opts.portalUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Open your portal</a></p>
+    `)
+  };
+}
+function sElectionEinArrivedLateEmail(opts) {
+  return {
+    subject: `Your EIN has arrived \u2014 your Form 2553 package needs attention \u2014 ${opts.llcName}`,
+    html: wrap(`
+      <p>The IRS has issued the EIN for <strong>${escapeHtml(opts.llcName)}</strong>:
+      <strong>${escapeHtml(opts.einDisplay)}</strong>. The confirmation letter is in your portal.</p>
+      <p>Your S corporation election package was built with "Applied For" in item A, and its
+      two-week editing window has closed, so we no longer hold the details needed to rebuild it.
+      If you have not yet filed Form 2553, write the EIN in item A by hand on your filing copy
+      before signing and mailing, or contact us at
+      <a href="mailto:${escapeHtml(opts.supportEmail)}">${escapeHtml(opts.supportEmail)}</a>.</p>
+      <p><a href="${opts.portalUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Open your portal</a></p>
+    `)
+  };
+}
 
 // src/lib/form2553Timing.ts
 var DEFAULT_MIN_DAYS = 5;
@@ -101808,6 +101837,19 @@ function easternDateIso(d2 = /* @__PURE__ */ new Date()) {
   const get2 = (t) => parts.find((p2) => p2.type === t)?.value ?? "";
   return `${get2("year")}-${get2("month")}-${get2("day")}`;
 }
+
+// src/lib/ein.ts
+var VALID_EIN_PREFIXES = new Set(
+  "10 12 60 67 50 53 01 02 03 04 05 06 11 13 14 16 21 22 23 25 34 51 52 54 55 56 57 58 59 65 30 32 35 36 37 38 61 15 24 40 44 94 95 80 90 33 39 41 42 43 46 48 62 63 64 66 68 71 72 73 74 75 76 77 85 86 87 88 91 92 93 98 99 20 26 27 45 47 81 82 83 84 31".split(" ")
+);
+function einDigits(raw2) {
+  return (raw2 ?? "").replace(/[\s-]/g, "");
+}
+function isValidEin(raw2) {
+  const d2 = einDigits(raw2);
+  return /^\d{9}$/.test(d2) && VALID_EIN_PREFIXES.has(d2.slice(0, 2));
+}
+var fmtEinDisplay = (digits) => /^\d{9}$/.test(digits) ? `${digits.slice(0, 2)}-${digits.slice(2)}` : digits;
 
 // server/oa.ts
 import { readFileSync } from "node:fs";
@@ -106233,9 +106275,19 @@ var einDetailsSchema = external_exports.object({
 ).refine((d2) => !d2.exciseApplies || d2.exciseDetail.trim().length > 0, {
   message: "Tell us which of the special activities applies."
 });
-var VALID_EIN_PREFIXES = new Set(
-  "10 12 60 67 50 53 01 02 03 04 05 06 11 13 14 16 21 22 23 25 34 51 52 54 55 56 57 58 59 65 30 32 35 36 37 38 61 15 24 40 44 94 95 80 90 33 39 41 42 43 46 48 62 63 64 66 68 71 72 73 74 75 76 77 85 86 87 88 91 92 93 98 99 20 26 27 45 47 81 82 83 84 31".split(" ")
-);
+async function companyEinFor(clientId, companyOrderId) {
+  const db = await getDb();
+  const rows = await db.query(
+    `SELECT details FROM service_orders WHERE client_id = $1 AND type = 'ein' AND status = 'fulfilled'
+       AND (formation_order_id IS NULL OR $2::text IS NULL OR formation_order_id::text = $2::text) ORDER BY fulfilled_at DESC`,
+    [clientId, companyOrderId]
+  );
+  for (const r of rows) {
+    const d2 = typeof r.details === "string" ? JSON.parse(r.details) : r.details;
+    if ((d2?.target ?? "company") === "company" && d2?.assignedEin && /^\d{9}$/.test(d2.assignedEin)) return d2.assignedEin;
+  }
+  return null;
+}
 var sElectionDetailsSchema = external_exports.object({
   ein: external_exports.string().transform((s) => s.replace(/[\s-]/g, "")).refine((s) => s === "" || /^\d{9}$/.test(s), "Enter the 9-digit EIN, or leave it blank if we're obtaining it.").refine((s) => s === "" || VALID_EIN_PREFIXES.has(s.slice(0, 2)), "That is not a valid EIN \u2014 check the first two digits."),
   einPending: external_exports.boolean().optional().default(false),
@@ -106965,6 +107017,9 @@ function registerPortalRoutes(app2) {
         llcFormed: await clientLlcFormed(session.clientId, svcCompanyId),
         // Florida's date, for the Form 2553 timing gate the form runs on load.
         todayEastern: easternDateIso(),
+        // The EIN we obtained, if we have: the S election form shows it
+        // read-only instead of asking (Adam, 7 Sep 2026).
+        companyEin: await companyEinFor(session.clientId, svcCompanyId),
         einCompanyOrdered: orders.some((o) => {
           if (o.type !== "ein" || o.status === "pending_payment") return false;
           const d2 = typeof o.details === "string" ? JSON.parse(o.details) : o.details;
@@ -107356,9 +107411,11 @@ function registerPortalRoutes(app2) {
       }
       ssns.push(packSsns(use, use2));
     }
+    const knownEin = await companyEinFor(so2.client_id, so2.formation_order_id);
     const merged = {
-      ein: d2.einPending ? "" : d2.ein,
-      einPending: d2.einPending,
+      ein: knownEin ?? (d2.einPending ? "" : d2.ein),
+      einPending: knownEin ? false : d2.einPending,
+      einSource: knownEin ? "letter" : void 0,
       dateIncorporated: formationDate,
       effectiveDate: d2.effectiveDate,
       officerName: d2.officerName,
@@ -109483,11 +109540,13 @@ function registerAdminRoutes(app2) {
     let notify = true;
     let file = null;
     let titleOverride = "";
+    let assignedEin = "";
     if (contentType.includes("multipart/form-data")) {
       const form = await c.req.parseBody();
       if (form.file instanceof File && form.file.size > 0) file = form.file;
       notify = form.notify !== "false";
       if (typeof form.title === "string") titleOverride = form.title.trim();
+      if (typeof form.ein === "string") assignedEin = einDigits(form.ein);
     } else {
       const body = await c.req.json().catch(() => ({}));
       notify = body.notify !== false;
@@ -109507,6 +109566,9 @@ function registerAdminRoutes(app2) {
     }
     if (so2.type === "ein" && !file) {
       return c.json(err("Attach the EIN confirmation letter (CP 575) to fulfill an EIN order.", "LETTER_REQUIRED"), 400);
+    }
+    if (so2.type === "ein" && !isValidEin(assignedEin)) {
+      return c.json(err("Enter the 9-digit EIN from the letter \u2014 it goes on the client's Form 2553.", "EIN_REQUIRED"), 400);
     }
     if (so2.type === "s-election" && !file) {
       return c.json(err("Attach the election package PDF to fulfill an S election order.", "PACKAGE_REQUIRED"), 400);
@@ -109549,8 +109611,60 @@ function registerAdminRoutes(app2) {
         );
       }
     }
-    return c.json({ data: { ok: true, documentId } });
+    let rebuiltSElections = 0;
+    if (so2.type === "ein") {
+      await db.query(
+        "UPDATE service_orders SET details = COALESCE(details, '{}'::jsonb) || $2::jsonb WHERE id = $1",
+        [so2.id, JSON.stringify({ assignedEin })]
+      );
+      if ((details.target ?? "company") === "company") {
+        rebuiltSElections = await carryEinIntoSElections({ clientId: so2.client_id, companyOrderId: so2.formation_order_id, llcName: so2.llc_name, ein: assignedEin });
+      }
+    }
+    return c.json({ data: { ok: true, documentId, rebuiltSElections } });
   });
+  async function carryEinIntoSElections(args) {
+    const db = await getDb();
+    const rows = await db.query(
+      `SELECT id, client_id, llc_name, status, details, ein_secret FROM service_orders
+      WHERE client_id = $1 AND type = 's-election' AND status <> 'pending_payment'
+        AND (formation_order_id IS NULL OR $2::text IS NULL OR formation_order_id::text = $2::text)`,
+      [args.clientId, args.companyOrderId]
+    );
+    const clients = await db.query("SELECT email FROM clients WHERE id = $1", [args.clientId]);
+    const to = clients[0]?.email ?? "";
+    const einDisplay = fmtEinDisplay(args.ein);
+    let rebuilt = 0;
+    for (const row of rows) {
+      const d2 = (typeof row.details === "string" ? JSON.parse(row.details) : row.details) ?? {};
+      const appliedFor = Boolean(d2.einPending) || !d2.ein;
+      if (!appliedFor || !d2.shareholders?.length) continue;
+      if (!row.ein_secret) {
+        if (d2.documentId || d2.purgedAt) {
+          const mail2 = sElectionEinArrivedLateEmail({ llcName: row.llc_name, einDisplay, portalUrl: `${env.PUBLIC_BASE_URL}/portal`, supportEmail: "support@myfloridaseriesllc.com" });
+          sendMail({ to, ...mail2 }).catch((e) => console.error("[admin] ein-late email failed:", e));
+        }
+        continue;
+      }
+      let ssns;
+      try {
+        ssns = JSON.parse(decryptSecret(row.ein_secret));
+      } catch (e) {
+        console.error("[admin] s-election secret decrypt failed:", e);
+        continue;
+      }
+      const merged = { ...d2, ein: args.ein, einPending: false, einSource: "letter" };
+      const built = await postSElectionPackage({ so: { id: row.id, client_id: row.client_id, llc_name: row.llc_name }, merged, ssns, priorDocumentId: d2.documentId });
+      if (!built.ok) {
+        console.error("[admin] s-election rebuild with EIN failed:", row.id);
+        continue;
+      }
+      rebuilt++;
+      const mail = sElectionEinAddedEmail({ llcName: row.llc_name, einDisplay, portalUrl: `${env.PUBLIC_BASE_URL}/portal` });
+      sendMail({ to, ...mail }).catch((e) => console.error("[admin] ein-added email failed:", e));
+    }
+    return rebuilt;
+  }
   app2.get("/admin/clients/:id/documents", async (c) => {
     const admin = await requireAdmin(c);
     if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
