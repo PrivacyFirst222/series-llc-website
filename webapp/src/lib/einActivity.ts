@@ -63,11 +63,14 @@ export function followUpOk(category: string, answer: string): boolean {
 
 /** The four special-activity questions, asked separately as the assistant asks them. */
 /** Each question carries the assistant's own help box, shown as a hint so
- *  the client reads what the IRS means before answering (Adam, 7 Sep 2026). */
+ *  the client reads what the IRS means before answering (Adam, 7 Sep 2026).
+ *  Form 720's is written for lay people from the Instructions for Form 720
+ *  (06/2026), Parts I and II, at Adam's direction: "The IRS's explanation
+ *  is shit." */
 export const EIN_SPECIAL_QUESTIONS = [
   { key: "highwayVehicle", question: "Does your business own a highway motor vehicle with a taxable gross weight of 55,000 pounds or more?", help: "A highway motor vehicle is any self-propelled vehicle designed to carry a load over public highways — trucks, truck tractors, and buses, for example." },
   { key: "gambling", question: "Does your business involve gambling/wagering?", help: "Gambling or wagering means accepting wagers, conducting a wagering pool or lottery, or receiving wagers for or on behalf of another person." },
-  { key: "form720", question: "Does your business need to file Form 720 (Quarterly Federal Excise Tax Return)?", help: "Form 720 is the quarterly federal excise tax return." },
+  { key: "form720", question: "Does your business need to file Form 720 (Quarterly Federal Excise Tax Return)?", help: "Excise taxes are federal taxes on particular goods and services, not on income. Form 720 is the quarterly return for them. It is filed by businesses that sell fuel, provide phone service, fly passengers or freight, sell heavy trucks or trailers, carry passengers by ship, manufacture tires, run indoor tanning salons, or sponsor their own health plan, among others. If none of that describes your business, the answer is No." },
   // No help box was walked for this question; it carries none rather than words the IRS did not say.
   { key: "alcoholTobaccoFirearms", question: "Does your business sell or manufacture alcohol, tobacco, or firearms?", help: "" },
 ] as const;

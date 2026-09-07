@@ -715,7 +715,10 @@ async function main(): Promise<void> {
       expect((await einForm.locator('[data-testid="activity-follow-up"]').count()) === 0, "EIN form: Warehousing asks no follow-up");
       // The IRS help boxes sit under the questions (Adam, 7 Sep 2026), and the
       // employees branch is the assistant's own three questions.
-      expect(/\$4,000 or less|55,000 pounds|Form 720 is the quarterly/.test(await einForm.locator('[data-testid="special-questions"]').innerText()), "EIN form: the special questions carry the IRS's own explanations");
+      const specialText = await einForm.locator('[data-testid="special-questions"]').innerText();
+      expect(/self-propelled vehicle/.test(specialText) && /accepting wagers/.test(specialText), "EIN form: the special questions carry the IRS's own explanations", specialText);
+      expect(/Excise taxes are federal taxes on particular goods and services/.test(specialText) && /the answer is No/.test(specialText), "EIN form: Form 720 is explained for lay people (Adam, 7 Sep 2026)", specialText);
+      expect(/Forms W-2 require additional filings with the IRS/.test(await einForm.innerText()), "EIN form: the W-2 question carries the assistant's parenthetical");
       await einForm.locator('[data-testid="special-questions"]').scrollIntoViewIfNeeded();
       await shot(page, "ein-form-special-questions");
       expect((await einForm.locator('[data-testid="employees-block"]').count()) === 0, "EIN form: no employee questions until the W-2 question is Yes");

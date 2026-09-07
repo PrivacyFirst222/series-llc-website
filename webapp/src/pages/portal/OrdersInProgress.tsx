@@ -571,7 +571,7 @@ export function OrdersInProgress({
             <div className="space-y-1">
               <label className="flex items-center gap-2 text-sm">
                 <input type="checkbox" checked={einEmployees} onChange={(e) => setEinEmployees(e.target.checked)} className="h-4 w-4 accent-trust" />
-                Do you have, or do you expect to have, any employees who will receive Forms W-2 in the next 12 months?
+                Do you have, or do you expect to have, any employees who will receive Forms W-2 in the next 12 months? (Forms W-2 require additional filings with the IRS.)
               </label>
               <p className="pl-6 text-xs text-muted-foreground">{EIN_EMPLOYEE_HELP.w2}</p>
             </div>
