@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { PHONE_HINT, formatPhone } from "@/lib/phone";
 import { fullPersonName } from "../validation";
 import { Input } from "@/components/ui/input";
 import { AlertTriangle, UserCheck } from "lucide-react";
@@ -204,9 +205,11 @@ export function StepCertification({ data, patch, errors }: StepProps) {
         <FieldShell label="Phone (optional)" htmlFor="representative-phone">
           <Input
             id="representative-phone"
+            type="tel"
+            placeholder={PHONE_HINT}
             value={data.authorizedRepresentativePhone ?? ""}
             onChange={(e) =>
-              patch({ authorizedRepresentativePhone: e.target.value })
+              patch({ authorizedRepresentativePhone: formatPhone(e.target.value) })
             }
           />
         </FieldShell>

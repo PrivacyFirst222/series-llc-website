@@ -1,4 +1,5 @@
 import { Input } from "@/components/ui/input";
+import { PHONE_HINT, formatPhone } from "@/lib/phone";
 import { FieldShell } from "../FieldShell";
 import { AddressFieldsBlock } from "../AddressFields";
 import { cleanEmailInput } from "../validation";
@@ -89,8 +90,9 @@ export function StepClient({ data, patch, errors }: StepProps) {
           <Input
             id="client-phone"
             type="tel"
+            placeholder={PHONE_HINT}
             value={data.clientPhone ?? ""}
-            onChange={(e) => patch({ clientPhone: e.target.value })}
+            onChange={(e) => patch({ clientPhone: formatPhone(e.target.value) })}
             autoComplete="tel"
           />
         </FieldShell>

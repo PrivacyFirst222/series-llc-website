@@ -373,6 +373,11 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
   await fill(page, "Contact name", "Casey");
   await fill(page, "Email", run.email ?? "gate@e2e.test");
   await fill(page, "Confirm email", run.email ?? "gate@e2e.test");
+  // The intake's phone boxes take the shape as typed (Adam, 7 Sep 2026).
+  const corrPhone = page.locator("#correspondent-phone");
+  expect(!/[a-z]/i.test((await corrPhone.getAttribute("placeholder")) ?? ""), `${run.key}: the correspondence phone hint has no letters`);
+  await corrPhone.pressSequentially("4072106622", { delay: 20 });
+  expect((await corrPhone.inputValue()) === "(407) 210-6622", `${run.key}: the correspondence phone takes the shape as typed`, await corrPhone.inputValue());
   // The phone-sized run types slower than the page settles: read the boxes
   // back before tapping Continue, so the tap tests the one-word name and
   // nothing else.
@@ -679,6 +684,13 @@ async function main(): Promise<void> {
       const rpHeading = await einForm.locator('[data-testid="responsible-party-heading"]').innerText().catch(() => "");
       expect(/typically the LLC's manager/.test(rpHeading), "EIN form: the responsible party heading says it is typically the manager", rpHeading);
       expect(!/IRS records/.test(await einForm.innerText()), "EIN form: no 'must match IRS records' anywhere on the form");
+      // Every phone box takes the shape as typed and hints it without
+      // letters (Adam, 7 Sep 2026).
+      const einPhone = einForm.locator('input[aria-label="Phone for IRS questions"]');
+      const einPhoneHint = (await einPhone.getAttribute("placeholder")) ?? "";
+      expect(!/[a-z]/i.test(einPhoneHint) && /\(\s+\)\s+-\s+/.test(einPhoneHint), "EIN form: the phone hint shows the shape only, no letters", einPhoneHint);
+      await einPhone.pressSequentially("4072106622", { delay: 20 });
+      expect((await einPhone.inputValue()) === "(407) 210-6622", "EIN form: digits take the phone shape as typed", await einPhone.inputValue());
       await page.keyboard.press("Escape");
       await page.locator('[role="dialog"]').first().waitFor({ state: "detached", timeout: 5000 }).catch(() => {});
       await page.waitForTimeout(400);

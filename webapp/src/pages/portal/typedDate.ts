@@ -40,11 +40,5 @@ export function formatTypedDate(raw: string): string {
   return groups.slice(0, g + 1).join("/");
 }
 
-/** (305) 555-0100 as typed; the stored value is the ten digits. The box's
- *  hint is the bare shape "(   )    -    " — no letters (Adam, 6 Sep 2026). */
-export const formatPhone = (value: string): string => {
-  const d = value.replace(/\D/g, "").slice(0, 10);
-  if (d.length < 4) return d;
-  if (d.length < 7) return `(${d.slice(0, 3)}) ${d.slice(3)}`;
-  return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`;
-};
+/** The one formatter every phone box shares (Adam, 7 Sep 2026). */
+export { formatPhone } from "@/lib/phone";

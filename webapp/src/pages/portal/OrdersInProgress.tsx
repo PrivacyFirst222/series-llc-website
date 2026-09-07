@@ -7,6 +7,7 @@
 // a fulfilled S election or series document reaches them through
 // `external`.
 import { useEffect, useRef, useState } from "react";
+import { PHONE_HINT, formatPhone } from "@/lib/phone";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ClipboardList, Lock, FileSignature } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -460,7 +461,15 @@ export function OrdersInProgress({
               </div>
               <div className="space-y-1.5">
                 <label className="text-sm font-medium">Phone for IRS questions</label>
-                <Input name="phone" inputMode="tel" autoComplete="off" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.phone ?? ""} />
+                <Input
+                  name="phone"
+                  inputMode="tel"
+                  autoComplete="off"
+                  placeholder={PHONE_HINT}
+                  aria-label="Phone for IRS questions"
+                  defaultValue={formatPhone((detailsFor ? einDrafts[detailsFor.id] : undefined)?.phone ?? "")}
+                  onChange={(e) => { e.target.value = formatPhone(e.target.value); }}
+                />
               </div>
             </div>
             <div className="space-y-1.5">

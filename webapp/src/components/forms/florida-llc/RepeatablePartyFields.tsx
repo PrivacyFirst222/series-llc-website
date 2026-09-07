@@ -1,4 +1,5 @@
 import { Plus, Trash2 } from "lucide-react";
+import { PHONE_HINT, formatPhone } from "@/lib/phone";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -161,9 +162,11 @@ export function RepeatablePartyFields({
             <FieldShell label="Phone (optional)" htmlFor={`party-${entry.id}-phone`}>
               <Input
                 id={`party-${entry.id}-phone`}
+                type="tel"
+                placeholder={PHONE_HINT}
                 value={entry.phone ?? ""}
                 onChange={(e) =>
-                  update(entry.id, { phone: e.target.value })
+                  update(entry.id, { phone: formatPhone(e.target.value) })
                 }
               />
             </FieldShell>

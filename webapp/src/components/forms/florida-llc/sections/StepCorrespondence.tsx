@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { PHONE_HINT, formatPhone } from "@/lib/phone";
 import { Input } from "@/components/ui/input";
 import { FieldShell } from "../FieldShell";
 import { AddressFieldsBlock } from "../AddressFields";
@@ -110,9 +111,11 @@ export function StepCorrespondence({ data, patch, errors }: StepProps) {
         <FieldShell label="Phone (optional)" htmlFor="correspondent-phone">
           <Input
             id="correspondent-phone"
+            type="tel"
+            placeholder={PHONE_HINT}
             value={data.correspondentPhone ?? ""}
             onChange={(e) =>
-              patch({ correspondentPhone: e.target.value })
+              patch({ correspondentPhone: formatPhone(e.target.value) })
             }
           />
         </FieldShell>
