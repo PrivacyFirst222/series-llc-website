@@ -4,7 +4,7 @@
 // which app.ts calls after creating the app — no circular imports.
 import { Hono } from "hono";
 
-import { getDb } from "./db";
+import { getDb , DOCUMENT_COMPANY_BACKFILL_STATEMENTS } from "./db";
 import { env } from "./env";
 import { runDbBackup } from "./backup";
 import { runFileMirror } from "./dropbox";
@@ -130,6 +130,16 @@ if (!env.isProd) {
     }
     return c.json({ data: { ok: true } });
   });
+  // Runs the documents-carry-company backfill again and reports how many
+  // package documents still have no company (Adam, 7 Sep 2026).
+  app.post("/dev/backfill-document-companies", async (c) => {
+    const db = await getDb();
+    const before = await db.query<{ n: number }>("SELECT COUNT(*)::int AS n FROM documents WHERE order_id IS NULL AND kind = 'package'");
+    for (const stmt of DOCUMENT_COMPANY_BACKFILL_STATEMENTS) await db.query(stmt);
+    const after = await db.query<{ n: number }>("SELECT COUNT(*)::int AS n FROM documents WHERE order_id IS NULL AND kind = 'package'");
+    return c.json({ data: { before: before[0].n, after: after[0].n, filled: before[0].n - after[0].n } });
+  });
+
   app.post("/dev/delete-test-entities", async (c) => {
     const db = await getDb();
     await db.query("DELETE FROM fl_entities WHERE doc_number LIKE 'E2ETEST%'");

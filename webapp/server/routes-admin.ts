@@ -722,7 +722,10 @@ app.get("/admin/clients", async (c) => {
             (SELECT COALESCE(jsonb_agg(DISTINCT o.llc_name), '[]'::jsonb)
                FROM orders o
               WHERE o.client_id = cl.id AND o.status <> 'pending_payment'
-                AND o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_llcs
+                AND o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_llcs,
+            (SELECT COALESCE(jsonb_agg(jsonb_build_object('id', o.id, 'llc_name', o.llc_name) ORDER BY o.paid_at DESC), '[]'::jsonb)
+               FROM orders o
+              WHERE o.client_id = cl.id AND o.paid_at IS NOT NULL) AS companies
      FROM clients cl LEFT JOIN documents d ON d.client_id = cl.id
      GROUP BY cl.id ORDER BY cl.created_at DESC`,
   );
@@ -1119,6 +1122,21 @@ async function carryEinIntoSElections(args: { clientId: string; companyOrderId: 
   return rebuilt;
 }
 
+/** Package documents still carrying no company after the backfill — hand
+ *  uploads whose titles name no company. Adam opens this in his admin
+ *  session to see what is left (7 Sep 2026). */
+app.get("/admin/documents/unscoped", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const db = await getDb();
+  const rows = await db.query(
+    `SELECT d.id, d.title, d.kind, d.created_at, cl.email AS client_email
+       FROM documents d JOIN clients cl ON cl.id = d.client_id
+      WHERE d.order_id IS NULL AND d.kind = 'package' ORDER BY d.created_at DESC`,
+  );
+  return c.json({ data: { count: rows.length, documents: rows } });
+});
+
 app.get("/admin/clients/:id/documents", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
@@ -1157,11 +1175,28 @@ app.post("/admin/documents", async (c) => {
   const clients = await db.query<{ email: string }>("SELECT email FROM clients WHERE id = $1", [clientId]);
   if (clients.length === 0) return c.json(err("Client not found.", "NOT_FOUND"), 404);
 
+  // A package belongs to one of the client's companies (Adam, 7 Sep 2026).
+  // One company: filled in silently. Several: the office must say which.
+  // Legal mail stays one shared section and carries no company.
+  const requestedOrderId = typeof form.orderId === "string" ? form.orderId.trim() : "";
+  let orderId: string | null = null;
+  if (kind === "package") {
+    const companies = await db.query<{ id: string }>("SELECT id FROM orders WHERE client_id = $1 AND paid_at IS NOT NULL ORDER BY paid_at DESC", [clientId]);
+    if (requestedOrderId) {
+      if (!companies.some((o) => o.id === requestedOrderId)) return c.json(err("That company is not on this client's account.", "INVALID_INPUT"), 400);
+      orderId = requestedOrderId;
+    } else if (companies.length === 1) {
+      orderId = companies[0].id;
+    } else if (companies.length > 1) {
+      return c.json(err("This client has more than one company — choose which one the document belongs to.", "COMPANY_REQUIRED"), 400);
+    }
+  }
+
   const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
   const rows = await db.query<{ id: string }>(
-    `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)
-     VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
-    [clientId, kind, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes],
+    `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes)
+     VALUES ($1, $7, $2, $3, $4, $5, $6) RETURNING id`,
+    [clientId, kind, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes, orderId],
   );
 
   let notified = false;

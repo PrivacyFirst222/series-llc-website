@@ -115,7 +115,7 @@ export function OrdersInProgress({
   }, [formOpen]);
   const makeConsent = useMutation({
     mutationFn: (body: { seriesName: string; seriesNumber: string; purpose: string; effectiveDate: string }) =>
-      api.post<{ documentId: string; title: string }>("/api/portal/series/consent", body),
+      api.post<{ documentId: string; title: string }>("/api/portal/series/consent", { ...body, company: company ?? undefined }),
     onSuccess: (res) => {
       setConsentFor(null);
       // The document card reads a separate query; without this the client

@@ -30,6 +30,7 @@ interface AdminClient {
   has_password: boolean;
   document_count: number;
   ra_llcs: string[];
+  companies: { id: string; llc_name: string }[];
 }
 
 const day = (iso: string | null) =>
@@ -42,6 +43,11 @@ function UploadDialog({ client }: { client: AdminClient }) {
   const [kind, setKind] = useState<"package" | "legal_mail">("package");
   const [notify, setNotify] = useState<boolean>(true);
   const [file, setFile] = useState<File | null>(null);
+  // A package belongs to one company (Adam, 7 Sep 2026); the choice appears
+  // only when the client has more than one.
+  const companies = client.companies ?? [];
+  const [orderId, setOrderId] = useState<string>(companies.length === 1 ? companies[0].id : "");
+  const needsCompany = kind === "package" && companies.length > 1;
 
   const upload = useMutation({
     mutationFn: async () => {
@@ -51,6 +57,7 @@ function UploadDialog({ client }: { client: AdminClient }) {
       form.set("kind", kind);
       form.set("title", title);
       form.set("notify", String(notify));
+      if (kind === "package" && orderId) form.set("orderId", orderId);
       form.set("file", file);
       const res = await fetch("/api/admin/documents", {
         method: "POST",
@@ -117,6 +124,24 @@ function UploadDialog({ client }: { client: AdminClient }) {
               </Button>
             </div>
           </div>
+          {needsCompany ? (
+            <div className="space-y-2">
+              <Label htmlFor="doc-company">Company</Label>
+              <select
+                id="doc-company"
+                aria-label="Company"
+                value={orderId}
+                onChange={(e) => setOrderId(e.target.value)}
+                className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+              >
+                <option value="">Choose the company…</option>
+                {companies.map((co) => (
+                  <option key={co.id} value={co.id}>{co.llc_name}</option>
+                ))}
+              </select>
+              <p className="text-xs text-muted-foreground">The document shows under this company's tab in the client's portal.</p>
+            </div>
+          ) : null}
           <div className="space-y-2">
             <Label htmlFor="doc-file">File</Label>
             <Input
@@ -132,7 +157,7 @@ function UploadDialog({ client }: { client: AdminClient }) {
           </label>
           <Button
             className="w-full rounded-full"
-            disabled={!file || !title.trim() || upload.isPending}
+            disabled={!file || !title.trim() || upload.isPending || (needsCompany && !orderId)}
             onClick={() => upload.mutate()}
           >
             {upload.isPending ? "Uploading…" : "Upload document"}

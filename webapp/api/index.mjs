@@ -95354,11 +95354,30 @@ var MIGRATION_004_STATEMENTS = [
       ORDER BY o.paid_at DESC NULLS LAST LIMIT 1
    ) WHERE order_id IS NULL`
 ];
+var DOCUMENT_COMPANY_BACKFILL_STATEMENTS = [
+  `UPDATE documents d SET order_id = so.formation_order_id
+     FROM service_orders so
+    WHERE d.order_id IS NULL AND d.kind = 'package'
+      AND so.client_id = d.client_id AND so.formation_order_id IS NOT NULL
+      AND so.details->>'documentId' = d.id::text`,
+  `UPDATE documents d SET order_id = m.id
+     FROM (
+       SELECT d2.id AS doc_id, MIN(o.id::text)::uuid AS id, COUNT(DISTINCT o.id) AS n
+         FROM documents d2
+         JOIN orders o ON o.client_id = d2.client_id AND o.paid_at IS NOT NULL
+        WHERE d2.order_id IS NULL AND d2.kind = 'package'
+          AND o.llc_name <> '' AND position(o.llc_name IN d2.title) > 0
+        GROUP BY d2.id
+     ) m
+    WHERE d.id = m.doc_id AND m.n = 1`
+];
+var MIGRATION_005_STATEMENTS = DOCUMENT_COMPANY_BACKFILL_STATEMENTS;
 var MIGRATIONS = [
   { id: 1, name: "initial-schema", statements: MIGRATION_001_STATEMENTS },
   { id: 2, name: "contact-messages", statements: MIGRATION_002_STATEMENTS },
   { id: 3, name: "series-filed-at", statements: MIGRATION_003_STATEMENTS },
-  { id: 4, name: "oa-per-company", statements: MIGRATION_004_STATEMENTS }
+  { id: 4, name: "oa-per-company", statements: MIGRATION_004_STATEMENTS },
+  { id: 5, name: "documents-carry-company", statements: MIGRATION_005_STATEMENTS }
   // Append future migrations here with the next id. Never edit an entry.
 ];
 function migrationChecksum(statements) {
@@ -106151,7 +106170,7 @@ async function purgeExpiredSElections() {
   const db = await getDb();
   const cutoff = new Date(Date.now() - S_ELECTION_EDIT_DAYS * 864e5).toISOString();
   const rows = await db.query(
-    `SELECT id, client_id, llc_name, details FROM service_orders
+    `SELECT id, client_id, llc_name, details, formation_order_id FROM service_orders
       WHERE type = 's-election' AND status = 'fulfilled'
         AND fulfilled_at IS NOT NULL AND fulfilled_at < $1
         AND (ein_secret IS NOT NULL OR details->>'purgedAt' IS NULL)`,
@@ -106194,9 +106213,9 @@ async function purgeExpiredSElections() {
           });
         } else {
           const doc = await db.query(
-            `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)
-             VALUES ($1, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,
-            [row.client_id, title, stored.storageKey, stored.sizeBytes]
+            `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes)
+             VALUES ($1, $5, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,
+            [row.client_id, title, stored.storageKey, stored.sizeBytes, row.formation_order_id]
           );
           kept.documentId = doc[0].id;
         }
@@ -106402,10 +106421,11 @@ async function postSElectionPackage(args) {
     buf,
     "application/pdf"
   );
+  const companyRow = await db.query("SELECT formation_order_id FROM service_orders WHERE id = $1", [so2.id]);
   const docRows = await db.query(
-    `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)
-     VALUES ($1, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,
-    [so2.client_id, title, stored.storageKey, stored.sizeBytes]
+    `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes)
+     VALUES ($1, $5, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,
+    [so2.client_id, title, stored.storageKey, stored.sizeBytes, companyRow[0]?.formation_order_id ?? null]
   );
   merged.documentId = docRows[0].id;
   await db.query(
@@ -106849,10 +106869,14 @@ function registerPortalRoutes(app2) {
       seriesName: external_exports.string().min(1).max(300),
       seriesNumber: external_exports.string().min(1).max(40),
       purpose: external_exports.string().max(600).optional().default(""),
-      effectiveDate: external_exports.string().regex(/^\d{4}-\d{2}-\d{2}$/)
+      effectiveDate: external_exports.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+      // The company the series joins (Adam, 31 Aug 2026: one account, several
+      // companies); the consent document is filed under it.
+      company: external_exports.string().uuid().optional()
     }).safeParse(await c.req.json().catch(() => null));
     if (!body.success) return c.json(err("Series name, identifier, and date are required.", "INVALID_INPUT"), 400);
-    const seed = await oaSeed(session.clientId);
+    const consentCompanyId = await resolveCompanyOrder(session.clientId, body.data.company);
+    const seed = await oaSeed(session.clientId, consentCompanyId);
     if (!seed) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
     if (!body.data.seriesName.trim().toLowerCase().startsWith(seed.llcName.trim().toLowerCase())) {
       return c.json(
@@ -106910,9 +106934,9 @@ function registerPortalRoutes(app2) {
       "application/pdf"
     );
     const doc = await db.query(
-      `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)
-     VALUES ($1, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,
-      [session.clientId, title, stored.storageKey, stored.sizeBytes]
+      `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes)
+     VALUES ($1, $5, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,
+      [session.clientId, title, stored.storageKey, stored.sizeBytes, consentCompanyId]
     );
     return c.json({ data: { documentId: doc[0].id, title } });
   });
@@ -109356,7 +109380,10 @@ function registerAdminRoutes(app2) {
             (SELECT COALESCE(jsonb_agg(DISTINCT o.llc_name), '[]'::jsonb)
                FROM orders o
               WHERE o.client_id = cl.id AND o.status <> 'pending_payment'
-                AND o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_llcs
+                AND o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_llcs,
+            (SELECT COALESCE(jsonb_agg(jsonb_build_object('id', o.id, 'llc_name', o.llc_name) ORDER BY o.paid_at DESC), '[]'::jsonb)
+               FROM orders o
+              WHERE o.client_id = cl.id AND o.paid_at IS NOT NULL) AS companies
      FROM clients cl LEFT JOIN documents d ON d.client_id = cl.id
      GROUP BY cl.id ORDER BY cl.created_at DESC`
     );
@@ -109665,6 +109692,17 @@ function registerAdminRoutes(app2) {
     }
     return rebuilt;
   }
+  app2.get("/admin/documents/unscoped", async (c) => {
+    const admin = await requireAdmin(c);
+    if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+    const db = await getDb();
+    const rows = await db.query(
+      `SELECT d.id, d.title, d.kind, d.created_at, cl.email AS client_email
+       FROM documents d JOIN clients cl ON cl.id = d.client_id
+      WHERE d.order_id IS NULL AND d.kind = 'package' ORDER BY d.created_at DESC`
+    );
+    return c.json({ data: { count: rows.length, documents: rows } });
+  });
   app2.get("/admin/clients/:id/documents", async (c) => {
     const admin = await requireAdmin(c);
     if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
@@ -109696,11 +109734,24 @@ function registerAdminRoutes(app2) {
     const db = await getDb();
     const clients = await db.query("SELECT email FROM clients WHERE id = $1", [clientId]);
     if (clients.length === 0) return c.json(err("Client not found.", "NOT_FOUND"), 404);
+    const requestedOrderId = typeof form.orderId === "string" ? form.orderId.trim() : "";
+    let orderId = null;
+    if (kind === "package") {
+      const companies = await db.query("SELECT id FROM orders WHERE client_id = $1 AND paid_at IS NOT NULL ORDER BY paid_at DESC", [clientId]);
+      if (requestedOrderId) {
+        if (!companies.some((o) => o.id === requestedOrderId)) return c.json(err("That company is not on this client's account.", "INVALID_INPUT"), 400);
+        orderId = requestedOrderId;
+      } else if (companies.length === 1) {
+        orderId = companies[0].id;
+      } else if (companies.length > 1) {
+        return c.json(err("This client has more than one company \u2014 choose which one the document belongs to.", "COMPANY_REQUIRED"), 400);
+      }
+    }
     const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
     const rows = await db.query(
-      `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)
-     VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
-      [clientId, kind, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes]
+      `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes)
+     VALUES ($1, $7, $2, $3, $4, $5, $6) RETURNING id`,
+      [clientId, kind, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes, orderId]
     );
     let notified = false;
     if (notify) {
@@ -109808,6 +109859,13 @@ function registerOpsRoutes(app2) {
         );
       }
       return c.json({ data: { ok: true } });
+    });
+    app2.post("/dev/backfill-document-companies", async (c) => {
+      const db = await getDb();
+      const before = await db.query("SELECT COUNT(*)::int AS n FROM documents WHERE order_id IS NULL AND kind = 'package'");
+      for (const stmt of DOCUMENT_COMPANY_BACKFILL_STATEMENTS) await db.query(stmt);
+      const after = await db.query("SELECT COUNT(*)::int AS n FROM documents WHERE order_id IS NULL AND kind = 'package'");
+      return c.json({ data: { before: before[0].n, after: after[0].n, filled: before[0].n - after[0].n } });
     });
     app2.post("/dev/delete-test-entities", async (c) => {
       const db = await getDb();

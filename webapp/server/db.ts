@@ -355,11 +355,36 @@ const MIGRATION_004_STATEMENTS: string[] = [
    ) WHERE order_id IS NULL`,
 ];
 
+/** Documents written without their company (S election packages and record
+ *  copies, series consents, hand uploads) showed under every tab of a
+ *  two-company account (Adam, 7 Sep 2026: "Why is this here"). The company
+ *  is recovered from the service order that produced the document, then from
+ *  a title naming exactly one of the client's companies. Idempotent. */
+export const DOCUMENT_COMPANY_BACKFILL_STATEMENTS: string[] = [
+  `UPDATE documents d SET order_id = so.formation_order_id
+     FROM service_orders so
+    WHERE d.order_id IS NULL AND d.kind = 'package'
+      AND so.client_id = d.client_id AND so.formation_order_id IS NOT NULL
+      AND so.details->>'documentId' = d.id::text`,
+  `UPDATE documents d SET order_id = m.id
+     FROM (
+       SELECT d2.id AS doc_id, MIN(o.id::text)::uuid AS id, COUNT(DISTINCT o.id) AS n
+         FROM documents d2
+         JOIN orders o ON o.client_id = d2.client_id AND o.paid_at IS NOT NULL
+        WHERE d2.order_id IS NULL AND d2.kind = 'package'
+          AND o.llc_name <> '' AND position(o.llc_name IN d2.title) > 0
+        GROUP BY d2.id
+     ) m
+    WHERE d.id = m.doc_id AND m.n = 1`,
+];
+const MIGRATION_005_STATEMENTS: string[] = DOCUMENT_COMPANY_BACKFILL_STATEMENTS;
+
 const MIGRATIONS: { id: number; name: string; statements: string[] }[] = [
   { id: 1, name: "initial-schema", statements: MIGRATION_001_STATEMENTS },
   { id: 2, name: "contact-messages", statements: MIGRATION_002_STATEMENTS },
   { id: 3, name: "series-filed-at", statements: MIGRATION_003_STATEMENTS },
   { id: 4, name: "oa-per-company", statements: MIGRATION_004_STATEMENTS },
+  { id: 5, name: "documents-carry-company", statements: MIGRATION_005_STATEMENTS },
   // Append future migrations here with the next id. Never edit an entry.
 ];
 

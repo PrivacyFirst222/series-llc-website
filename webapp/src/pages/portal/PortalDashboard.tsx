@@ -544,10 +544,12 @@ export default function PortalDashboard() {
   // only the kinds it knows drops silently the day a new one is added.
   const FORMATION_KINDS = ["articles", "psd", "package", "certificate-of-status", "certified-copy"];
   const multiCompany = companies.length > 1;
+  // With several companies a document must name its company to be shown
+  // (Adam, 7 Sep 2026: a package with no company appeared under every tab).
   const packageDocs = sortDocuments(docs.filter(
     (d) =>
       FORMATION_KINDS.includes(d.kind) &&
-      (!multiCompany || d.order_id === null || d.order_id === company),
+      (!multiCompany || d.order_id === company),
   ));
 
   const legalMail = docs.filter((d) => d.kind === "legal_mail");

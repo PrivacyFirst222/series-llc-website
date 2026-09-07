@@ -1300,6 +1300,57 @@ if (mint.status === 200) {
     const secSel = ((secSvc.body?.data?.orders ?? []) as { id: string; type: string; status: string }[])
       .find((o) => o.type === "s-election" && o.status === "awaiting_info");
     check("the second company's intake S election is awaiting details", !!secSel, secSvc.body?.data?.orders?.length);
+    // Every document names its company (Adam, 7 Sep 2026: a package with no
+    // company showed under every tab). The first company's S election
+    // package and series consent carry the first company; a hand upload for
+    // a two-company client must say which company, or be legal mail.
+    {
+      const docsNow = (await api("/api/portal/documents", { cookies: setPw.cookie })).body?.data as { id: string; title: string; order_id: string | null }[];
+      const selDoc = docsNow.find((d) => /S Corporation Election Package/.test(d.title) && /Coastal/.test(d.title));
+      check("the S election package carries its company", selDoc?.order_id === orderId, selDoc);
+      const consentDoc = docsNow.find((d) => d.id === consent.body?.data?.documentId);
+      check("the series consent carries its company", consentDoc?.order_id === orderId, consentDoc);
+      const admU = await adminSession();
+      const noCompany = new FormData();
+      noCompany.set("clientId", client!.id);
+      noCompany.set("kind", "package");
+      noCompany.set("title", "Hand-uploaded package");
+      noCompany.set("notify", "false");
+      noCompany.set("file", new File([new TextEncoder().encode("%PDF-1.4 hand upload\n%%EOF")], "hand.pdf", { type: "application/pdf" }));
+      const noCompanyRes = await fetch(`${BASE}/api/admin/documents`, { method: "POST", body: noCompany, headers: { Cookie: admU.cookie, "X-Forwarded-For": RUN_IP } });
+      check("a hand-uploaded package for a two-company client must name the company", noCompanyRes.status === 400 && ((await noCompanyRes.json().catch(() => null)) as { error?: { code?: string } } | null)?.error?.code === "COMPANY_REQUIRED");
+      const withCompany = new FormData();
+      withCompany.set("clientId", client!.id);
+      withCompany.set("kind", "package");
+      withCompany.set("title", "Hand-uploaded package");
+      withCompany.set("notify", "false");
+      withCompany.set("orderId", secondId);
+      withCompany.set("file", new File([new TextEncoder().encode("%PDF-1.4 hand upload\n%%EOF")], "hand.pdf", { type: "application/pdf" }));
+      const withCompanyRes = await fetch(`${BASE}/api/admin/documents`, { method: "POST", body: withCompany, headers: { Cookie: admU.cookie, "X-Forwarded-For": RUN_IP } });
+      const withCompanyBody = (await withCompanyRes.json().catch(() => null)) as { data?: { id?: string; documentId?: string } } | null;
+      check("a hand-uploaded package with the company chosen is accepted", withCompanyRes.status === 200, withCompanyBody);
+      const docsAfterHand = (await api("/api/portal/documents", { cookies: setPw.cookie })).body?.data as { title: string; order_id: string | null }[];
+      const handDoc = docsAfterHand.find((d) => d.title === "Hand-uploaded package");
+      check("the hand-uploaded package carries the chosen company", handDoc?.order_id === secondId, handDoc);
+      const mail = new FormData();
+      mail.set("clientId", client!.id);
+      mail.set("kind", "legal_mail");
+      mail.set("title", "Hand-uploaded legal mail");
+      mail.set("notify", "false");
+      mail.set("file", new File([new TextEncoder().encode("%PDF-1.4 legal mail\n%%EOF")], "mail.pdf", { type: "application/pdf" }));
+      const mailRes = await fetch(`${BASE}/api/admin/documents`, { method: "POST", body: mail, headers: { Cookie: admU.cookie, "X-Forwarded-For": RUN_IP } });
+      check("legal mail needs no company", mailRes.status === 200, await mailRes.json().catch(() => null));
+      const backfill = await api("/api/dev/backfill-document-companies", { method: "POST" });
+      // The shared local database carries hand uploads from earlier runs whose
+      // titles name no company; those cannot be filled and are listed for the
+      // office instead. The backfill runs and reports, and nothing this run
+      // wrote is among the unscoped.
+      check("the company backfill runs and reports", backfill.status === 200 && typeof backfill.body?.data?.after === "number", backfill.body);
+      const unscoped = await api("/api/admin/documents/unscoped", { cookies: admU.cookie });
+      const unscopedTitles = ((unscoped.body?.data?.documents ?? []) as { title: string }[]).map((d) => d.title);
+      check("the office can list what is still unscoped", unscoped.status === 200 && Array.isArray(unscopedTitles), unscoped.body);
+      check("nothing this run wrote is unscoped", !unscopedTitles.some((t) => /Coastal|Second Company|Hand-uploaded package/.test(t)), unscopedTitles.filter((t) => /Coastal|Second Company|Hand-uploaded/.test(t)));
+    }
     if (secSel) {
       const admO = await adminSession();
       const noPkg = await api(`/api/admin/services/${secSel.id}/fulfill`, { method: "POST", cookies: admO.cookie, body: "{}" });

@@ -472,8 +472,8 @@ export function sElectionWindow(fulfilledAt: unknown): { open: boolean; deleteOn
 export async function purgeExpiredSElections(): Promise<number> {
   const db = await getDb();
   const cutoff = new Date(Date.now() - S_ELECTION_EDIT_DAYS * 86400_000).toISOString();
-  const rows = await db.query<{ id: string; client_id: string; llc_name: string; details: unknown }>(
-    `SELECT id, client_id, llc_name, details FROM service_orders
+  const rows = await db.query<{ id: string; client_id: string; llc_name: string; details: unknown; formation_order_id: string | null }>(
+    `SELECT id, client_id, llc_name, details, formation_order_id FROM service_orders
       WHERE type = 's-election' AND status = 'fulfilled'
         AND fulfilled_at IS NOT NULL AND fulfilled_at < $1
         AND (ein_secret IS NOT NULL OR details->>'purgedAt' IS NULL)`,
@@ -516,9 +516,9 @@ export async function purgeExpiredSElections(): Promise<number> {
           if (old[0]?.storage_key) await deleteFile(old[0].storage_key).catch(() => {});
         } else {
           const doc = await db.query<{ id: string }>(
-            `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)
-             VALUES ($1, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,
-            [row.client_id, title, stored.storageKey, stored.sizeBytes],
+            `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes)
+             VALUES ($1, $5, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,
+            [row.client_id, title, stored.storageKey, stored.sizeBytes, row.formation_order_id],
           );
           kept.documentId = doc[0].id;
         }
@@ -783,10 +783,13 @@ export async function postSElectionPackage(args: {
     buf,
     "application/pdf",
   );
+  // The package belongs to the company the order was placed for (Adam,
+  // 7 Sep 2026): without it, it showed under every tab of the account.
+  const companyRow = await db.query<{ formation_order_id: string | null }>("SELECT formation_order_id FROM service_orders WHERE id = $1", [so.id]);
   const docRows = await db.query<{ id: string }>(
-    `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)
-     VALUES ($1, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,
-    [so.client_id, title, stored.storageKey, stored.sizeBytes],
+    `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes)
+     VALUES ($1, $5, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,
+    [so.client_id, title, stored.storageKey, stored.sizeBytes, companyRow[0]?.formation_order_id ?? null],
   );
   merged.documentId = docRows[0].id;
 
@@ -1346,11 +1349,15 @@ app.post("/portal/series/consent", async (c) => {
       seriesNumber: z.string().min(1).max(40),
       purpose: z.string().max(600).optional().default(""),
       effectiveDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+      // The company the series joins (Adam, 31 Aug 2026: one account, several
+      // companies); the consent document is filed under it.
+      company: z.string().uuid().optional(),
     })
     .safeParse(await c.req.json().catch(() => null));
   if (!body.success) return c.json(err("Series name, identifier, and date are required.", "INVALID_INPUT"), 400);
 
-  const seed = await oaSeed(session.clientId);
+  const consentCompanyId = await resolveCompanyOrder(session.clientId, body.data.company);
+  const seed = await oaSeed(session.clientId, consentCompanyId);
   if (!seed) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
 
   // s. 605.2202 requires every protected series name to begin with the
@@ -1415,9 +1422,9 @@ app.post("/portal/series/consent", async (c) => {
     "application/pdf",
   );
   const doc = await db.query<{ id: string }>(
-    `INSERT INTO documents (client_id, kind, title, storage_key, content_type, size_bytes)
-     VALUES ($1, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,
-    [session.clientId, title, stored.storageKey, stored.sizeBytes],
+    `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes)
+     VALUES ($1, $5, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,
+    [session.clientId, title, stored.storageKey, stored.sizeBytes, consentCompanyId],
   );
   return c.json({ data: { documentId: doc[0].id, title } });
 });
