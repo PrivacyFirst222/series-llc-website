@@ -2815,6 +2815,24 @@ Underneath: I inherited the belief that the EIN form had been fixed after P39–
 
 The IRS online application walked screen by screen in the browser, every option on every screen recorded, then the ledger: what the IRS asks, what the form collects, what is missing — with the count — and a proposal to close the gap, before any change to the form.
 
+## P65 — "A reload brings everything back" was written in a comment and never made true
+
+### THE FAILURE
+
+Adam, 7 Sep 2026: "The ein form closed and I lost my data. I thought this was fixed before."
+
+On 6 Sep 2026 Adam said the form should retain all information except Social Security numbers, and I reported it fixed. What I built: the EIN form's answers are written to the browser's storage by `snapshotEinDraft` in `OrdersInProgress.tsx`, and that function is called from exactly one place — the dialog's `onOpenChange`, when the client closes it. Nothing is written while the client types. The comment I wrote above the drafts says "so a reload or a closed tab brings everything else back." It does not: a page that reloads with the form open — an iPad discarding a background tab while the client is over on the IRS site, a tab closed by hand, a crash — takes every answer with it, because the close that writes the draft never happens. The browser walk checks closing with Escape and reopening, which is the one path that works. Tonight Adam was typing into the live form while switching between it and the IRS assistant; the form went away and the answers went with it.
+
+### WHY IT HAPPENED
+
+I built "retain the information" as a feature of the dialog, because the dialog was the thing in front of me: its close event was the obvious hook, storage was the obvious sink, and once both were wired the requirement read as satisfied. The comment about reloads was written from the design — storage survives reloads, so reloads are covered — and I never asked when the write to storage actually happens. The write happens on close; a reload is not a close. I proved the property of the sink and reported it as a property of the system.
+
+The walk then tested the path I had built rather than the way the answers can be lost, because I wrote the test from the same picture: close, reopen, still there. A client who loses a form does not lose it by pressing Escape. Adam's sentence was about what a person keeps, and I answered it with what a component does.
+
+### FIXED BY
+
+Every answer written to storage as it is typed, not on close; the walk reloads the page with the form open and mid-typed, then reopens the form and reads the answers back.
+
 ## Process — the ones that let the substantive ones through
 
 **M1 · Verify the proposition you set out to verify, not the one underneath.** A

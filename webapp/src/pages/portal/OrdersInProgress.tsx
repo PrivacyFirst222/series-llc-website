@@ -72,10 +72,12 @@ export function OrdersInProgress({
   // page memory so that closing the dialog loses nothing (Adam, 6 Sep 2026).
   // Never written to storage — these carry Social Security numbers.
   // Adam (6 Sep 2026): "The form should retain all information except for
-  // SS#s." Drafts also go to the browser's storage per order, with every
-  // Social Security number (and the EIN form's taxpayer number) stripped
-  // before they are written, so a reload or a closed tab brings everything
-  // else back. Cleared when the package is built and on sign-out.
+  // SS#s." Drafts also go to the browser's storage per order AS THEY ARE
+  // TYPED — not on close — with every Social Security number (and the EIN
+  // form's taxpayer number) stripped before they are written. P65, 7 Sep
+  // 2026: the EIN draft was written only when the dialog closed, so a page
+  // that reloaded with the form open (an iPad discarding the tab) lost every
+  // answer. Cleared when the package is built and on sign-out.
   const [selDrafts, setSelDrafts] = useState<Record<string, SElectionDraft>>(() => loadDrafts<SElectionDraft>("sel"));
   const [einDrafts, setEinDrafts] = useState<Record<string, Record<string, string>>>(() => loadDrafts<Record<string, string>>("ein"));
   const einFormRef = useRef<HTMLFormElement>(null);
@@ -87,6 +89,13 @@ export function OrdersInProgress({
     setEinDrafts((prev) => ({ ...prev, [detailsFor.id]: out }));
     saveDraft("ein", detailsFor.id, { ...out, tin: "" });
   };
+  // The choices held in React state reach the form as hidden inputs on the
+  // next render, so they are snapshotted after it.
+  useEffect(() => {
+    if (detailsFor?.type === "ein") snapshotEinDraft();
+    // snapshotEinDraft reads the live form; it needs no dependency.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [einActivity, einEmployees, einWageMonth, einHasExisting, detailsFor?.id]);
 
   // The client's own name, for the signing-officer choices — same key as
   // the dashboard, so no extra request.
@@ -424,6 +433,7 @@ export function OrdersInProgress({
           <form
             ref={einFormRef}
             className="space-y-3"
+            onChange={snapshotEinDraft}
             onSubmit={(e) => {
               e.preventDefault();
               if (!detailsFor) return;

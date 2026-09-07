@@ -741,6 +741,22 @@ async function main(): Promise<void> {
       expect((await einForm.locator('[data-testid="existing-ein"]').count()) === 1 && (await einForm.locator('[data-testid="special-questions"]').count()) === 0, "EIN form: saying the LLC already has an EIN hides the application questions and asks for the number");
       await einForm.locator('input[name="hasExistingEin"][value="No"]').check({ force: true });
       await page.waitForTimeout(300);
+      // P65 (Adam, 7 Sep 2026: "The ein form closed and I lost my data"): the
+      // answers are saved as they are typed, so a page that reloads with the
+      // form open — never closed — brings every answer back but the
+      // taxpayer number.
+      await einForm.locator('input[name="county"]').fill("Orange");
+      await einForm.locator('input[name="tin"]').fill("123456789");
+      await page.waitForTimeout(300);
+      await page.reload();
+      await page.waitForTimeout(1500);
+      await einRowClient.locator("button").filter({ hasText: /Provide details/ }).first().click();
+      await page.waitForTimeout(800);
+      const einAfterReload = page.locator('[role="dialog"]').first();
+      expect((await einAfterReload.locator('input[name="county"]').inputValue()) === "Orange", "EIN form: the typed county survives a reload with the form open", await einAfterReload.locator('input[name="county"]').inputValue());
+      expect((await einAfterReload.locator('input[aria-label="Phone for IRS questions"]').inputValue()) === "(407) 210-6622", "EIN form: the typed phone survives a reload with the form open");
+      expect((await einAfterReload.locator('[aria-label="Business category"]').innerText()).includes("Warehousing"), "EIN form: the chosen category survives a reload with the form open");
+      expect((await einAfterReload.locator('input[name="tin"]').inputValue()) === "", "EIN form: the taxpayer number does NOT survive a reload");
       await page.keyboard.press("Escape");
       await page.locator('[role="dialog"]').first().waitFor({ state: "detached", timeout: 5000 }).catch(() => {});
       await page.waitForTimeout(400);
