@@ -12,7 +12,7 @@ import { api, ApiError } from "@/lib/api";
 import { AddressAutocomplete } from "@/components/forms/florida-llc/AddressAutocomplete";
 
 import type { ServiceOrder, ShareholderRow } from "./ServicesCard";
-import { formatPhone, isoToTypedDate, typedDateToIso } from "./typedDate";
+import { formatPhone, isoToTypedDate, typedDateToIso, formatTypedDate } from "./typedDate";
 import { ELIGIBILITY_ACKNOWLEDGMENT, evaluate2553Timing, type TimingResult } from "@/lib/form2553Timing";
 
 
@@ -211,7 +211,7 @@ export function SElectionDetailsForm({
           <label className="text-sm font-medium">Date the Division filed your Articles</label>
           <Input
             value={formationDateTyped}
-            onChange={(e) => setFormationDateTyped(e.target.value)}
+            onChange={(e) => setFormationDateTyped(formatTypedDate(e.target.value))}
             placeholder="MM/DD/YYYY"
             inputMode="numeric"
             autoComplete="off"
@@ -249,7 +249,7 @@ export function SElectionDetailsForm({
           <label className="text-sm font-medium">Election effective date</label>
           <Input
             value={effectiveDate}
-            onChange={(e) => setEffectiveDate(e.target.value)}
+            onChange={(e) => setEffectiveDate(formatTypedDate(e.target.value))}
             placeholder="MM/DD/YYYY"
             inputMode="numeric"
             autoComplete="off"
@@ -454,7 +454,7 @@ export function SElectionDetailsForm({
                   inputMode="numeric"
                   autoComplete="off"
                   value={r.dateAcquired}
-                  onChange={(e) => patchRow(i, { dateAcquired: e.target.value })}
+                  onChange={(e) => patchRow(i, { dateAcquired: formatTypedDate(e.target.value) })}
                   className="w-44"
                 />
               ) : null}

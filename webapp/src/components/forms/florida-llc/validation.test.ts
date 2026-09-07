@@ -323,6 +323,29 @@ if (typeof console !== "undefined") {
   console.log("[portal] S election typed dates: 8 cases correct.");
 }
 
+// The slashes are added as the digits arrive (Adam, 6 Sep 2026: "The date
+// field should add the '/' symbols if missing"), typed slashes are kept, and
+// a backspace never gets stuck on a slash.
+{
+  const { formatTypedDate } = await import("../../../pages/portal/typedDate");
+  const cases: [string, string, string][] = [
+    [formatTypedDate("09012026"), "09/01/2026", "eight bare digits get both slashes"],
+    [formatTypedDate("09"), "09", "two digits: no slash yet"],
+    [formatTypedDate("090"), "09/0", "the third digit brings the first slash"],
+    [formatTypedDate("09012"), "09/01/2", "the fifth digit brings the second slash"],
+    [formatTypedDate("9/1/2026"), "9/1/2026", "typed slashes are kept"],
+    [formatTypedDate("9/"), "9/", "a typed trailing slash is kept"],
+    [formatTypedDate("09/"), "09/", "backspacing 09/0 to 09/ keeps the slash"],
+    [formatTypedDate("09/01/"), "09/01/", "backspacing 09/01/2 to 09/01/ keeps the slash"],
+    [formatTypedDate("0901202699"), "09/01/2026", "extra digits are dropped"],
+    [formatTypedDate("ab09cd"), "09", "letters are ignored"],
+  ];
+  for (const [got, want, label] of cases) {
+    if (got !== want) throw new Error(`FAIL date slashes: ${label} (got ${JSON.stringify(got)})`);
+  }
+  console.log("[portal] S election date slashes: 10 cases correct.");
+}
+
 // Run directly (bun run validation.test.ts): exit non-zero on failure. Printing
 // a warning and exiting 0 is how a broken fee calculation ships — the run has
 // to fail, not merely say something.

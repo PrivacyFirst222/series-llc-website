@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { Navigate, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FileText, Mail, LogOut, Download, ShieldCheck, Clock, ScrollText, BookOpen, ArrowRight, Trash2, FileSignature } from "lucide-react";
@@ -468,13 +468,22 @@ export default function PortalDashboard() {
 
   // One sticky toast per visit naming every outstanding item; it goes away
   // only when the client closes it or when nothing is outstanding any more.
+  // While a form window is open it steps aside (Adam, 6 Sep 2026: it sat on
+  // top of the form and could not be closed) and returns when the window
+  // closes — unless the client had already closed it with its X.
   const { toast, dismiss } = useToast();
+  const [formOpen, setFormOpen] = useState(false);
+  const closedByClient = useRef(false);
   const outstandingKey = outstanding.join("|");
+  useEffect(() => {
+    closedByClient.current = false;
+  }, [outstandingKey]);
   useEffect(() => {
     if (!outstandingKey) {
       dismiss();
       return;
     }
+    if (formOpen || closedByClient.current) return;
     const items = outstandingKey.split("|");
     const t = toast({
       duration: Infinity,
@@ -487,10 +496,20 @@ export default function PortalDashboard() {
         </ul>
       ),
     });
+    // The toast's own close handler is installed by toast(); replace it so a
+    // close by the client's X is remembered and the toast stays away.
+    t.update({
+      id: t.id,
+      onOpenChange: (open) => {
+        if (open) return;
+        closedByClient.current = true;
+        t.dismiss();
+      },
+    });
     return () => t.dismiss();
     // toast/dismiss are stable module-level dispatchers.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [outstandingKey]);
+  }, [outstandingKey, formOpen]);
 
 
   // Only a 401 means signed out. Any other failure — a dropped request when
@@ -616,7 +635,7 @@ export default function PortalDashboard() {
         </div>
       </div>
 
-      <OrdersInProgress company={company} external={external} onExternalHandled={() => setExternal(null)} />
+      <OrdersInProgress company={company} external={external} onExternalHandled={() => setExternal(null)} onFormOpenChange={setFormOpen} />
 
       {otherDocs.length > 0 ? (
         <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card">

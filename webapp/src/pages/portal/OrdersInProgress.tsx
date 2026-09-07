@@ -30,10 +30,15 @@ export function OrdersInProgress({
   company,
   external,
   onExternalHandled,
+  onFormOpenChange,
 }: {
   company?: string | null;
   external: ExternalOrderRequest | null;
   onExternalHandled: () => void;
+  /** Whether one of this section's windows (details, consent, formed gate)
+   *  is open — the dashboard's "Action needed" toast steps aside while one
+   *  is (Adam, 6 Sep 2026: it sat on top of the form and could not be closed). */
+  onFormOpenChange?: (open: boolean) => void;
 }) {
   const cq = company ? `?company=${company}` : "";
   const queryClient = useQueryClient();
@@ -102,6 +107,12 @@ export function OrdersInProgress({
   // This is the only document that does, and it carries the Series Exhibit
   // Section 3.1 requires adopted at or before the filing.
   const [consentFor, setConsentFor] = useState<ServiceOrder | null>(null);
+  const formOpen = detailsFor !== null || consentFor !== null || formedGateFor !== null;
+  useEffect(() => {
+    onFormOpenChange?.(formOpen);
+    // onFormOpenChange is a stable setter from the dashboard.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formOpen]);
   const makeConsent = useMutation({
     mutationFn: (body: { seriesName: string; seriesNumber: string; purpose: string; effectiveDate: string }) =>
       api.post<{ documentId: string; title: string }>("/api/portal/series/consent", body),

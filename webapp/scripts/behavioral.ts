@@ -660,15 +660,27 @@ async function main(): Promise<void> {
       // The Form 2553 timing gate (Adam, 6 Sep 2026): the client types the
       // date the Division filed their Articles — from the Articles one card
       // above — and the deadline and its acknowledgment appear at once.
-      await page.locator('[toast-close]').first().click().catch(() => {});
+      // The "Action needed" toast steps aside while the form is open (Adam,
+      // 6 Sep 2026: it sat on top of the form and could not be closed).
+      expect((await page.locator('[data-testid="action-needed-list"]').count()) === 1, "actions: the toast is showing before the form opens");
       await selRow.locator("button").filter({ hasText: /Provide details/ }).first().click();
       await page.waitForTimeout(800);
+      expect((await page.locator('[data-testid="action-needed-list"]').count()) === 0, "actions: the toast steps aside while the form is open");
       const selDialog = page.locator('[role="dialog"]').first();
       await shot(page, "s-election-form-before-date");
       expect((await selDialog.locator('[data-testid="timing-ok"]').count()) === 0, "S election: no deadline until the client types the formation date");
       const todayEt = new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
       const [ty, tm, td] = todayEt.split("-");
-      await selDialog.locator('input[aria-label="Date the Division filed your Articles"]').fill(`${tm}/${td}/${ty}`);
+      // Typed as bare digits, the way a client types on an iPad: the slashes
+      // appear on their own (Adam, 6 Sep 2026).
+      const formationBox = selDialog.locator('input[aria-label="Date the Division filed your Articles"]');
+      await formationBox.pressSequentially(`${tm}${td}${ty}`, { delay: 30 });
+      await page.waitForTimeout(400);
+      expect((await formationBox.inputValue()) === `${tm}/${td}/${ty}`, "S election: bare digits get their slashes as typed", await formationBox.inputValue());
+      await formationBox.press("Backspace");
+      await formationBox.press("Backspace");
+      expect((await formationBox.inputValue()) === `${tm}/${td}/${ty.slice(0, 2)}`, "S election: backspace takes digits off one at a time", await formationBox.inputValue());
+      await formationBox.pressSequentially(ty.slice(2), { delay: 30 });
       await page.waitForTimeout(400);
       expect((await selDialog.locator('[data-testid="timing-ok"]').count()) === 1, "S election: typing the formation date shows the deadline and its acknowledgment");
       await shot(page, "s-election-form-after-date");
@@ -708,12 +720,24 @@ async function main(): Promise<void> {
       await page.keyboard.press("Escape");
       await page.waitForTimeout(500);
       expect((await page.locator('[role="dialog"]').count()) === 0, "S election: Escape closes it");
+      // The form closed: the toast is back, and its X closes it.
+      await page.waitForTimeout(600);
+      expect((await page.locator('[data-testid="action-needed-list"]').count()) === 1, "actions: the toast returns when the form closes");
+      await page.locator('[toast-close]').first().click();
+      await page.waitForTimeout(800);
+      expect((await page.locator('[data-testid="action-needed-list"]').count()) === 0, "actions: the toast's X closes it after the form was used");
       await selRow.locator("button").filter({ hasText: /Provide details/ }).first().click();
       await page.waitForTimeout(800);
       const reopened = page.locator('[role="dialog"]').first();
       expect((await reopened.locator('input[aria-label="Signing officer\'s full legal name"]').inputValue()) === "Pat Gatecheck", "S election: the typed officer survives closing and reopening");
       expect((await reopened.locator('input[aria-label="Election effective date"]').first().inputValue()) === "10/01/2026", "S election: the typed effective date survives closing and reopening");
       expect((await reopened.locator('input[aria-label="Date the Division filed your Articles"]').first().inputValue()) !== "", "S election: the typed formation date survives closing and reopening");
+      // Closed by the client before the form opened: it stays away after.
+      await page.keyboard.press("Escape");
+      await page.waitForTimeout(800);
+      expect((await page.locator('[data-testid="action-needed-list"]').count()) === 0, "actions: a toast the client closed stays closed after another form visit");
+      await selRow.locator("button").filter({ hasText: /Provide details/ }).first().click();
+      await page.waitForTimeout(800);
       // …and a reload of the page (Adam, 6 Sep 2026: retain everything except
       // the Social Security numbers).
       await reopened.locator('input[placeholder="SSN"], input[placeholder^="SSN"]').first().fill("123456789").catch(() => {});

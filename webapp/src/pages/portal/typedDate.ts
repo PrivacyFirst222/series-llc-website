@@ -19,6 +19,27 @@ export function isoToTypedDate(iso: string | undefined): string {
   return m ? `${m[2]}/${m[3]}/${m[1]}` : (iso ?? "");
 }
 
+/** MM/DD/YYYY as typed, the slashes added when missing (Adam, 6 Sep 2026:
+ *  "The date field should add the '/' symbols if missing"). Bare digits
+ *  09012026 become 09/01/2026 as they arrive; slashes the client types are
+ *  kept, so 9/1/2026 stays 9/1/2026; a slash is never re-added after a
+ *  backspace removes it; letters are ignored. */
+export function formatTypedDate(raw: string): string {
+  if (raw.includes("-")) return raw; // a stored YYYY-MM-DD pasted in — leave it to the parser
+  const groups = ["", "", ""];
+  let g = 0;
+  for (const ch of raw) {
+    if (/\d/.test(ch)) {
+      if (g < 2 && groups[g].length === 2) g++;
+      if (g === 2 && groups[2].length === 4) continue;
+      groups[g] += ch;
+    } else if (ch === "/" && g < 2 && groups[g] !== "") {
+      g++;
+    }
+  }
+  return groups.slice(0, g + 1).join("/");
+}
+
 /** (xxx) yyy-yyyy as typed; the stored value is the ten digits. */
 export const formatPhone = (value: string): string => {
   const d = value.replace(/\D/g, "").slice(0, 10);
