@@ -343,7 +343,7 @@ export function SElectionDetailsForm({
             onChange={(e) => setPhone(formatPhone(e.target.value))}
             onPaste={(e) => { e.preventDefault(); setPhone(formatPhone(e.clipboardData.getData("text"))); }}
             inputMode="tel"
-            placeholder="(xxx) yyy-yyyy"
+            placeholder="(   )    -    "
             autoComplete="off"
           />
         </div>

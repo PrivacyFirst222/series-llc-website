@@ -686,6 +686,9 @@ async function main(): Promise<void> {
       await shot(page, "s-election-form-after-date");
       expect((await selDialog.locator('input[aria-label="Shareholder eligibility acknowledgment"]').count()) === 1, "S election: the shareholder eligibility acknowledgment is on the form");
       expect(/no refund will be given/.test(await selDialog.innerText()), "S election: the eligibility box carries the no-liability, no-refund line");
+      // The phone box's hint is the bare shape, no letters (Adam, 6 Sep 2026).
+      const phoneHint = await selDialog.locator('input[inputmode="tel"], input[type="tel"]').first().getAttribute("placeholder").catch(() => null);
+      expect(phoneHint !== null && !/[a-z]/i.test(phoneHint) && /\(\s+\)\s+-\s+/.test(phoneHint), "S election: the phone hint shows the shape only, no letters", phoneHint);
       const buildBtn = selDialog.locator("button").filter({ hasText: /Certify and build/ }).first();
       expect(await buildBtn.isDisabled(), "S election: the build button is disabled until both acknowledgments are ticked");
       const eff = selDialog.locator('input[aria-label="Election effective date"]').first();

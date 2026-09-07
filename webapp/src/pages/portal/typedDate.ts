@@ -40,7 +40,8 @@ export function formatTypedDate(raw: string): string {
   return groups.slice(0, g + 1).join("/");
 }
 
-/** (xxx) yyy-yyyy as typed; the stored value is the ten digits. */
+/** (305) 555-0100 as typed; the stored value is the ten digits. The box's
+ *  hint is the bare shape "(   )    -    " — no letters (Adam, 6 Sep 2026). */
 export const formatPhone = (value: string): string => {
   const d = value.replace(/\D/g, "").slice(0, 10);
   if (d.length < 4) return d;
