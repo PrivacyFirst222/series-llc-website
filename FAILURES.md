@@ -2833,6 +2833,24 @@ The walk then tested the path I had built rather than the way the answers can be
 
 Every answer written to storage as it is typed, not on close; the walk reloads the page with the form open and mid-typed, then reopens the form and reads the answers back.
 
+## P66 — The P65 fix was reported as working on Adam's iPad from a pass on my desktop Chromium
+
+### THE FAILURE
+
+Adam, 7 Sep 2026, after the P65 fix was reported live: "The data wasn't saved."
+
+What I did: shipped the save-as-typed change, ran the browser walk (desktop Chromium, Playwright), watched it pass the reload check, and wrote to Adam: "From this deploy on, reopen the form after any reload and everything but the Social Security number will be there." I never ran the change on the browser he uses — Chrome on an iPad, which is WebKit — and I never told him that a portal tab already open keeps the old code until it is reloaded, so typing into the tab he had open at 6:45 PM was typing into the old form. Then he lost the data a second time, an hour after being told it was fixed. Which of the two it was — the old code in an unreloaded tab, or the new code failing on WebKit — I do not know as I write this, and the entry says so.
+
+### WHY IT HAPPENED
+
+The walk is my proof of a screen, and it is a desktop Chromium screen. Adam's rule — "What will the user actually see? Verify by opening the artifact" — I satisfied by opening *an* artifact, on the device I have, and the question "which device does he open it on" never came up because the walk's pass arrived with the feeling of the matter being closed. A gate that passes is the end of a check; it should have been the end of one check on one browser.
+
+The "from this deploy on" sentence was written from the deploy's point of view: the code is on the server, so the fix is live. From Adam's seat the fix is live when his tab loads it, and his tab was already open. I described the state of the server as the state of his screen, which is the P58 mistake — a claim about a screen made from somewhere other than the screen — one day after recording it.
+
+### FIXED BY
+
+Recorded before the cause was known. Then the check: Playwright WebKit with an iPad profile against the local portal — sign in, open the EIN form, type a name, county, phone, and taxpayer number, reload without closing, reopen. Storage held the draft before and after the reload; the form came back with name, county, and phone, and the taxpayer number empty. The new code works on WebKit. What remains is the unreloaded tab: the live bundle was confirmed to carry the save-on-change code, and the portal page is served must-revalidate, so a tab loaded before the P65 deploy ran the old form until reloaded. Adam was told to reload before testing. The browser walk itself cannot run on WebKit yet — its request forwarder's sign-in cookie is not honored there — so the WebKit check lives as a standalone script for now, which is a gap to close.
+
 ## Process — the ones that let the substantive ones through
 
 **M1 · Verify the proposition you set out to verify, not the one underneath.** A
