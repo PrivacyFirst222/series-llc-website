@@ -34,7 +34,7 @@ export interface AdminServiceOrder {
   llc_name: string;
   details: {
     seriesName?: string; target?: string; responsibleName?: string; tinLast4?: string; purpose?: string; note?: string;
-    hasExistingEin?: boolean; existingEin?: string; reason?: string; tradeName?: string; memberCount?: number;
+    reason?: string; tradeName?: string; memberCount?: number; activityOtherDetail?: string;
     activity?: string; activityFollowUp?: string; activityDetail?: string; county?: string;
     highwayVehicle?: boolean; gambling?: boolean; form720?: boolean; alcoholTobaccoFirearms?: boolean;
     employeesExpected?: boolean; employeeCountOther?: number; employeeCountAg?: number;
@@ -280,13 +280,7 @@ export function ServiceFulfillDialog({
                 {detailQuery.data?.details.note ? (
                   <div><span className="text-muted-foreground">Note:</span> {detailQuery.data.details.note}</div>
                 ) : null}
-                {detailQuery.data?.details.hasExistingEin ? (
-                  <div className="rounded-xl border border-amber-300/60 bg-amber-50 p-3 text-amber-900" data-testid="existing-ein-flag">
-                    <p className="font-medium">The client says the LLC already has an EIN: {fmtEinDisplay(detailQuery.data.details.existingEin ?? "")}.</p>
-                    <p className="mt-1 text-xs">An LLC keeps its EIN — make no application. Handle the fee and close this order.</p>
-                  </div>
-                ) : null}
-                {detailQuery.data?.details.responsibleName && !detailQuery.data.details.hasExistingEin ? (
+                {detailQuery.data?.details.responsibleName ? (
                   /* Every answer, in the order the IRS assistant asks for it
                      (walked 7 Sep 2026), so the office types straight down. */
                   <ol className="list-decimal space-y-0.5 pl-5 text-xs" data-testid="assistant-order">
@@ -318,7 +312,7 @@ export function ServiceFulfillDialog({
                         ["Alcohol, tobacco, or firearms", yn(d.alcoholTobaccoFirearms)],
                         ["Employees expected (W-2, next 12 months)", d.employeesExpected ? `Yes — first wages ${monthYear(d.firstWageDate)}; ${d.employeeCountAg ?? 0} agricultural, ${d.employeeCountOther ?? 0} other; $1,000 or less: ${d.form944Annual ? "Yes (Form 944)" : "No (Form 941)"}` : "No"],
                         ["Business category", d.activity ?? "—"],
-                        ["Category follow-up", d.activityFollowUp || "— none asked —"],
+                        ["Category follow-up", d.activityFollowUp ? `${d.activityFollowUp}${d.activityFollowUp === "Other" && d.activityOtherDetail ? ` — ${d.activityOtherDetail}` : ""}` : "— none asked —"],
                         ["Anything else", d.activityDetail || "—"],
                         ["Closing month (SS-4 only)", d.closingMonth ?? "December"],
                       ];

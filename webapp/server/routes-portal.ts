@@ -19,7 +19,7 @@ import { easternDateIso, stampEastern, stampForFilename } from "./datetime";
 import { evaluate2553Timing } from "../src/lib/form2553Timing";
 import { type JointKind, isJoint, packSsns, unpackSsns } from "../src/lib/jointOwner";
 import { FIRST_AND_LAST, hasFirstAndLast } from "../src/lib/personName";
-import { VALID_EIN_PREFIXES, einDigits, fmtEinDisplay, isValidEin } from "../src/lib/ein";
+import { VALID_EIN_PREFIXES } from "../src/lib/ein";
 import { EIN_CATEGORY_NAMES, EIN_REASONS, followUpOk } from "../src/lib/einActivity";
 import { assembleOa, oaVersion, OA_TEMPLATE_VERSION, type OaInputs } from "./oa";
 import { renderMarkdownPdf, stampExistingPdf } from "./pdf-render";
@@ -556,12 +556,6 @@ export async function purgeExpiredSElections(): Promise<number> {
  *  instructions, "Responsible party defined"). */
 /** The client's answer that the LLC already has an EIN: nothing else is
  *  needed, and no application is made. */
-const existingEinSchema = z.object({
-  hasExistingEin: z.literal(true),
-  existingEin: z.string().transform((s) => einDigits(s)).refine((s) => isValidEin(s), "Enter the 9-digit EIN the LLC already has."),
-  certified: z.literal(true),
-});
-
 export const einDetailsSchema = z
   .object({
     responsibleFirst: z.string().min(1, "The responsible party's first name is required.").max(100),
@@ -583,6 +577,8 @@ export const einDetailsSchema = z
     activity: z.enum(EIN_CATEGORY_NAMES, { errorMap: () => ({ message: "Choose the category that best describes the business." }) }),
     activityFollowUp: z.string().max(300).optional().default(""),
     activityDetail: z.string().max(200).optional().default(""),
+    // Adam, 7 Sep 2026: an "Other" follow-up needs a description.
+    activityOtherDetail: z.string().max(200).optional().default(""),
     highwayVehicle: z.boolean().optional().default(false),
     gambling: z.boolean().optional().default(false),
     form720: z.boolean().optional().default(false),
@@ -608,6 +604,10 @@ export const einDetailsSchema = z
   .refine((d) => followUpOk(d.activity, d.activityFollowUp), {
     message: "Answer the follow-up question under the category you chose — the IRS asks it.",
     path: ["activityFollowUp"],
+  })
+  .refine((d) => d.activityFollowUp !== "Other" || d.activityOtherDetail.trim().length > 0, {
+    message: "You chose Other — describe what the business does.",
+    path: ["activityOtherDetail"],
   })
   .refine(
     (d) =>
@@ -1831,32 +1831,6 @@ app.post("/portal/services/:id/ein-details", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const raw = await c.req.json().catch(() => null);
-  // An LLC that already has an EIN keeps it (Adam, 7 Sep 2026): the client
-  // says so, no application is made, and the office is told to handle the fee.
-  const existing = existingEinSchema.safeParse(raw);
-  if (existing.success) {
-    const dbX = await getDb();
-    const rowsX = await dbX.query<{ id: string; client_id: string; type: string; status: string; details: unknown; llc_name: string }>(
-      "SELECT id, client_id, type, status, details, llc_name FROM service_orders WHERE id = $1",
-      [c.req.param("id")],
-    );
-    if (rowsX.length === 0 || rowsX[0].client_id !== session.clientId) return c.json(err("Not found", "NOT_FOUND"), 404);
-    const soX = rowsX[0];
-    if (soX.type !== "ein" || soX.status !== "awaiting_info") return c.json(err("This order is not awaiting details.", "BAD_STATE"), 400);
-    const priorX = ((typeof soX.details === "string" ? JSON.parse(soX.details) : soX.details) ?? {}) as Record<string, unknown>;
-    const mergedX = { ...priorX, hasExistingEin: true, existingEin: existing.data.existingEin, certifiedAt: new Date().toISOString() };
-    await dbX.query("UPDATE service_orders SET details = $1, status = 'in_progress' WHERE id = $2", [JSON.stringify(mergedX), soX.id]);
-    if (env.ADMIN_NOTIFY_EMAIL) {
-      const clientsX = await dbX.query<{ email: string }>("SELECT email FROM clients WHERE id = $1", [session.clientId]);
-      const mail = einDetailsSubmittedAdminEmail({
-        summary: `Federal EIN — ${soX.llc_name} — the client says the LLC already has EIN ${fmtEinDisplay(existing.data.existingEin)}; no application, handle the fee`,
-        clientEmail: clientsX[0]?.email ?? "",
-        adminUrl: `${env.PUBLIC_BASE_URL}/admin`,
-      });
-      sendMail({ to: env.ADMIN_NOTIFY_EMAIL, ...mail }).catch((e) => console.error("[service] admin notify failed:", e));
-    }
-    return c.json({ data: { ok: true, existingEin: true } });
-  }
   const body = einDetailsSchema.safeParse(raw);
   if (!body.success) {
     return c.json(err(body.error.issues[0]?.message ?? "Invalid details.", "INVALID_INPUT"), 400);
@@ -1895,6 +1869,7 @@ app.post("/portal/services/:id/ein-details", async (c) => {
     activity: d.activity,
     activityFollowUp: d.activityFollowUp,
     activityDetail: d.activityDetail,
+    activityOtherDetail: d.activityFollowUp === "Other" ? d.activityOtherDetail : "",
     highwayVehicle: d.highwayVehicle,
     gambling: d.gambling,
     form720: d.form720,

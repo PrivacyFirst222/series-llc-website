@@ -52,16 +52,16 @@ export function OrdersInProgress({
   // The IRS assistant's own questions (walked 7 Sep 2026): an LLC that
   // already has an EIN keeps it, and the activity category decides which
   // follow-up the assistant asks next.
-  const [einHasExisting, setEinHasExisting] = useState(false);
   const [einActivity, setEinActivity] = useState<string>("Real Estate");
   const [einWageMonth, setEinWageMonth] = useState<string>("");
+  const [einFollowUp, setEinFollowUp] = useState<string>("");
   // Opening the EIN form brings back what the draft held for the two answers
   // that are React state rather than form fields.
   useEffect(() => {
     if (!detailsFor || detailsFor.type !== "ein") return;
     const d = einDrafts[detailsFor.id];
     setEinActivity(d?.activity && einCategory(d.activity) ? d.activity : "Real Estate");
-    setEinHasExisting(d?.hasExistingEin === "Yes");
+    setEinFollowUp(d?.activityFollowUp ?? "");
     setEinEmployees(d?.employeesExpected === "Yes");
     setEinWageMonth(d?.firstWageMonth ?? "");
     // einDrafts is read once per opening; the draft is what was there then.
@@ -95,7 +95,7 @@ export function OrdersInProgress({
     if (detailsFor?.type === "ein") snapshotEinDraft();
     // snapshotEinDraft reads the live form; it needs no dependency.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [einActivity, einEmployees, einWageMonth, einHasExisting, detailsFor?.id]);
+  }, [einActivity, einEmployees, einWageMonth, einFollowUp, detailsFor?.id]);
 
   // The client's own name, for the signing-officer choices — same key as
   // the dashboard, so no extra request.
@@ -117,7 +117,7 @@ export function OrdersInProgress({
     onSuccess: (_res, args) => {
       setEinDrafts((prev) => { const next = { ...prev }; delete next[args.id]; return next; });
       clearDraft("ein", args.id);
-      setEinCertified(false); setEinEmployees(false); setEinHasExisting(false);
+      setEinCertified(false); setEinEmployees(false); setEinFollowUp("");
       setDetailsFor(null);
       refresh();
     },
@@ -224,12 +224,6 @@ export function OrdersInProgress({
                     <FileSignature className="mr-1.5 h-3.5 w-3.5" />
                     Consent &amp; Series Exhibit
                   </Button>
-                ) : null}
-                {o.type === "ein" && o.details.hasExistingEin ? (
-                  <p className="mt-1 text-xs text-muted-foreground" data-testid="existing-ein-note">
-                    You told us the LLC already has an EIN, so no application will be made. The
-                    office will be in touch about the fee.
-                  </p>
                 ) : null}
                 {o.status === "awaiting_info" ? (
                   <Button
@@ -440,10 +434,6 @@ export function OrdersInProgress({
               const fd = new FormData(e.currentTarget);
               const num = (k: string) => Number(String(fd.get(k) ?? "0")) || 0;
               const yes = (k: string) => fd.get(k) === "Yes";
-              if (einHasExisting) {
-                submitDetails.mutate({ id: detailsFor.id, payload: { hasExistingEin: true, existingEin: String(fd.get("existingEin") ?? "") } });
-                return;
-              }
               submitDetails.mutate({
                 id: detailsFor.id,
                 payload: {
@@ -459,6 +449,7 @@ export function OrdersInProgress({
                   memberCount: num("memberCount") || undefined,
                   activity: einActivity,
                   activityFollowUp: String(fd.get("activityFollowUp") ?? ""),
+                  activityOtherDetail: String(fd.get("activityOtherDetail") ?? ""),
                   activityDetail: String(fd.get("activityDetail") ?? ""),
                   highwayVehicle: yes("highwayVehicle"),
                   gambling: yes("gambling"),
@@ -516,24 +507,9 @@ export function OrdersInProgress({
                 />
               </div>
             </div>
-            {/* The assistant's own questions, in its order (walked 7 Sep 2026). */}
-            <div className="space-y-1.5 rounded-lg border border-border p-3">
-              <p className="text-sm font-medium">Has this LLC ever been assigned an EIN?</p>
-              <div className="flex gap-4 text-sm">
-                <label className="flex items-center gap-1.5"><input type="radio" name="hasExistingEin" value="No" checked={!einHasExisting} onChange={() => setEinHasExisting(false)} className="h-4 w-4 accent-trust" /> No</label>
-                <label className="flex items-center gap-1.5"><input type="radio" name="hasExistingEin" value="Yes" checked={einHasExisting} onChange={() => setEinHasExisting(true)} className="h-4 w-4 accent-trust" /> Yes</label>
-              </div>
-              {einHasExisting ? (
-                <div className="space-y-2 pt-1" data-testid="existing-ein">
-                  <Input name="existingEin" placeholder="XX-XXXXXXX" aria-label="The LLC's existing EIN" autoComplete="off" className="w-48" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.existingEin ?? ""} />
-                  <p className="text-xs text-amber-800">
-                    An LLC keeps its EIN, so we will not apply for another. Submit this and we'll let
-                    the office know and be in touch about the fee.
-                  </p>
-                </div>
-              ) : null}
-            </div>
-            {!einHasExisting ? (<>
+            {/* The assistant's own questions, in its order (walked 7 Sep 2026).
+                Adam, 7 Sep 2026: "We don't need the question about an existing
+                EIN" — the office answers No for a company it just formed. */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <label className="text-sm font-medium">Number of members</label>
@@ -577,13 +553,19 @@ export function OrdersInProgress({
                   </span>
                 </div>
               ))}
-            </div>
-            <div className="space-y-1">
-              <label className="flex items-center gap-2 text-sm">
-                <input type="checkbox" checked={einEmployees} onChange={(e) => setEinEmployees(e.target.checked)} className="h-4 w-4 accent-trust" />
-                Do you have, or do you expect to have, any employees who will receive Forms W-2 in the next 12 months? (Forms W-2 require additional filings with the IRS.)
-              </label>
-              <p className="pl-6 text-xs text-muted-foreground">{EIN_EMPLOYEE_HELP.w2}</p>
+              {/* Adam, 7 Sep 2026: "There should be a Yes No radio button
+                  choice, not a check box" — the W-2 question reads like the
+                  four above it. */}
+              <div className="flex flex-wrap items-center justify-between gap-2 text-sm" data-testid="w2-question">
+                <span className="min-w-0 flex-1">
+                  Do you have, or do you expect to have, any employees who will receive Forms W-2 in the next 12 months? (Forms W-2 require additional filings with the IRS.)
+                  <span className="mt-0.5 block text-xs text-muted-foreground">{EIN_EMPLOYEE_HELP.w2}</span>
+                </span>
+                <span className="flex gap-3">
+                  <label className="flex items-center gap-1.5"><input type="radio" name="employeesExpected" value="Yes" checked={einEmployees} onChange={() => setEinEmployees(true)} className="h-4 w-4 accent-trust" /> Yes</label>
+                  <label className="flex items-center gap-1.5"><input type="radio" name="employeesExpected" value="No" checked={!einEmployees} onChange={() => setEinEmployees(false)} className="h-4 w-4 accent-trust" /> No</label>
+                </span>
+              </div>
             </div>
             {einEmployees ? (
               /* The assistant's "Describe your employees" screen, walked 7 Sep
@@ -592,7 +574,7 @@ export function OrdersInProgress({
                  required Yes/No. */
               <div className="space-y-4 rounded-lg border border-border bg-secondary/40 p-3" data-testid="employees-block">
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium">What is the first date wages or annuities were or will be paid?</label>
+                  <label className="text-sm font-medium">What is the first date wages were or will be paid?</label>
                   <p className="text-xs text-muted-foreground">{EIN_EMPLOYEE_HELP.firstWageDate}</p>
                   <div className="flex gap-3">
                     <Select value={einWageMonth} onValueChange={setEinWageMonth}>
@@ -637,9 +619,8 @@ export function OrdersInProgress({
             <div className="space-y-2 rounded-lg border border-border p-3" data-testid="activity-block">
               <label htmlFor="ein-activity" className="text-sm font-medium">What does your business or organization do?</label>
               <input type="hidden" name="activity" value={einActivity} />
-              <input type="hidden" name="employeesExpected" value={einEmployees ? "Yes" : "No"} />
               <input type="hidden" name="firstWageMonth" value={einWageMonth} />
-              <Select value={einActivity} onValueChange={setEinActivity}>
+              <Select value={einActivity} onValueChange={(v) => { setEinActivity(v); setEinFollowUp(""); }}>
                 <SelectTrigger id="ein-activity" aria-label="Business category"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {EIN_CATEGORIES.map((c) => (<SelectItem key={c.name} value={c.name}>{c.name}</SelectItem>))}
@@ -654,12 +635,20 @@ export function OrdersInProgress({
                 if (fu.kind === "choice") return (
                   <div className="space-y-1.5" data-testid="activity-follow-up">
                     <label htmlFor="ein-follow-up" className="text-sm font-medium">{fu.question}</label>
-                    <Select name="activityFollowUp" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.activityFollowUp && fu.options.includes((detailsFor ? einDrafts[detailsFor.id] : undefined)?.activityFollowUp ?? "") ? (detailsFor ? einDrafts[detailsFor.id] : undefined)?.activityFollowUp : fu.options[0]}>
+                    <Select name="activityFollowUp" value={fu.options.includes(einFollowUp) ? einFollowUp : fu.options[0]} onValueChange={setEinFollowUp}>
                       <SelectTrigger id="ein-follow-up" aria-label="Activity follow-up"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         {fu.options.map((o) => (<SelectItem key={o} value={o}>{o}</SelectItem>))}
                       </SelectContent>
                     </Select>
+                    {/* Adam, 7 Sep 2026: "If the Other choice is selected, there
+                        needs to be a text box to describe what the other is." */}
+                    {(fu.options.includes(einFollowUp) ? einFollowUp : fu.options[0]) === "Other" ? (
+                      <div className="space-y-1 pt-1" data-testid="activity-other">
+                        <label htmlFor="ein-other-detail" className="text-sm font-medium">Describe what the business does</label>
+                        <Input id="ein-other-detail" name="activityOtherDetail" required autoComplete="off" aria-label="Describe what the business does" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.activityOtherDetail ?? ""} />
+                      </div>
+                    ) : null}
                   </div>
                 );
                 if (fu.kind === "yesno") return (
@@ -696,7 +685,6 @@ export function OrdersInProgress({
                 </SelectContent>
               </Select>
             </div>
-            </>) : null}
             <label className="flex items-start gap-2.5 rounded-lg border border-border bg-secondary/40 p-3">
               <input
                 type="checkbox"

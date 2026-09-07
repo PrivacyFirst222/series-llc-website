@@ -138,7 +138,9 @@ async function choose(page: Page, triggerSelector: string, optionText: string): 
   const trigger = page.locator(triggerSelector).first();
   for (let attempt = 0; attempt < 4; attempt++) {
     await trigger.click();
-    const opt = page.getByRole("option", { name: optionText, exact: false }).first();
+    // An exact match first: "Other" must not land on "I sell property for others".
+    const exact = page.getByRole("option", { name: optionText, exact: true });
+    const opt = ((await exact.count().catch(() => 0)) > 0 ? exact : page.getByRole("option", { name: optionText, exact: false })).first();
     try {
       await opt.click({ timeout: 3000 });
     } catch {
@@ -153,7 +155,12 @@ async function choose(page: Page, triggerSelector: string, optionText: string): 
     await page.waitForTimeout(300);
   }
   const avail = await page.getByRole("option").allTextContents().catch(() => []);
-  throw new Error(`select ${triggerSelector} refused option ${optionText}; options seen: [${avail.join(", ").slice(0, 200)}]`);
+  const triggers = await page.locator(triggerSelector).count();
+  const shownNow = ((await trigger.textContent().catch(() => "")) ?? "").trim();
+  await trigger.click().catch(() => {});
+  await page.waitForTimeout(300);
+  const opened = await page.getByRole("option").allTextContents().catch(() => []);
+  throw new Error(`select ${triggerSelector} refused option ${optionText}; options seen: [${avail.join(", ").slice(0, 200)}]; triggers matched: ${triggers}; trigger shows "${shownNow}"; after one more click the list shows: [${opened.join(", ").slice(0, 300)}]`);
 }
 
 /** Choice cards are labels wrapping hidden radios; some are buttons. */
@@ -701,10 +708,11 @@ async function main(): Promise<void> {
       // The IRS assistant's own questions (walked 7 Sep 2026): the EIN
       // question, members prefilled, the reason, the four special questions,
       // the 15 categories and each one's follow-up.
-      expect((await einForm.locator('input[name="hasExistingEin"][value="No"]').isChecked()), "EIN form: 'ever been assigned an EIN' starts at No");
+      expect((await einForm.locator('input[name="hasExistingEin"]').count()) === 0 && !/ever been assigned an EIN/.test(await einForm.innerText()), "EIN form: no question about an existing EIN (Adam, 7 Sep 2026)");
       expect((await einForm.locator('input[aria-label="Number of members"]').inputValue()) !== "", "EIN form: the number of members is prefilled");
       expect(/Started a new business/.test(await einForm.locator('[aria-label="Why the LLC needs an EIN"]').innerText()), "EIN form: the reason starts at Started a new business");
-      expect((await einForm.locator('[data-testid="special-questions"] input[type="radio"]').count()) === 8, "EIN form: the four special questions are asked separately, yes or no each");
+      expect((await einForm.locator('[data-testid="special-questions"] input[type="radio"]').count()) === 10, "EIN form: the four special questions and the W-2 question are asked separately, yes or no each");
+      expect((await einForm.locator('input[name="employeesExpected"][value="No"]').isChecked()) && (await einForm.locator('[data-testid="w2-question"] input[type="checkbox"]').count()) === 0, "EIN form: the W-2 question is Yes or No radios starting at No, not a checkbox");
       expect((await einForm.locator('[aria-label="Business category"]').innerText()).includes("Real Estate"), "EIN form: the category starts at Real Estate");
       expect(/I rent or lease property that I own/.test(await einForm.locator('[data-testid="activity-follow-up"]').innerText()), "EIN form: Real Estate shows the assistant's follow-up choices");
       await choose(page, '[aria-label="Business category"]', "Wholesale");
@@ -722,24 +730,30 @@ async function main(): Promise<void> {
       await einForm.locator('[data-testid="special-questions"]').scrollIntoViewIfNeeded();
       await shot(page, "ein-form-special-questions");
       expect((await einForm.locator('[data-testid="employees-block"]').count()) === 0, "EIN form: no employee questions until the W-2 question is Yes");
-      await einForm.locator('label:has-text("Forms W-2") input[type="checkbox"]').check({ force: true });
+      await einForm.locator('input[name="employeesExpected"][value="Yes"]').check({ force: true });
       await page.waitForTimeout(300);
       const empBlock = einForm.locator('[data-testid="employees-block"]');
       expect((await empBlock.count()) === 1, "EIN form: Yes to W-2 employees opens the assistant's employee questions");
       const empText = await empBlock.innerText();
-      expect(/first date wages or annuities/.test(empText) && /Number of agricultural employees/.test(empText) && /Number of other employees/.test(empText) && /\$1,000 or less in a full calendar year/.test(empText) && /\$4,000 or less/.test(empText), "EIN form: the three employee questions read as the assistant asks them, with its help", empText);
+      expect(/first date wages were or will be paid/.test(empText) && !/annuities/.test(empText) && /Number of agricultural employees/.test(empText) && /Number of other employees/.test(empText) && /\$1,000 or less in a full calendar year/.test(empText) && /\$4,000 or less/.test(empText), "EIN form: the three employee questions read as the assistant asks them, with its help", empText);
       expect(!/[Hh]ousehold/.test(empText), "EIN form: no household box — the assistant has none");
       expect((await empBlock.locator('[aria-label="Month"]').count()) === 1 && (await empBlock.locator('input[name="firstWageYear"]').count()) === 1, "EIN form: first wages are asked as month and year, not a full date");
       expect((await empBlock.locator('[aria-label="Number of other employees"]').inputValue()) === "", "EIN form: the counts start blank, not guessed");
       expect((await empBlock.locator('[data-testid="form944-question"] input[type="radio"]').count()) === 2, "EIN form: the $1,000 question is Yes or No");
       await empBlock.scrollIntoViewIfNeeded();
       await shot(page, "ein-form-employees");
-      await einForm.locator('label:has-text("Forms W-2") input[type="checkbox"]').uncheck({ force: true });
+      await einForm.locator('input[name="employeesExpected"][value="No"]').check({ force: true });
       await page.waitForTimeout(300);
-      await einForm.locator('input[name="hasExistingEin"][value="Yes"]').check({ force: true });
+      // Other under a category opens a required description box (Adam, 7 Sep 2026).
+      await choose(page, '[aria-label="Business category"]', "Real Estate");
       await page.waitForTimeout(300);
-      expect((await einForm.locator('[data-testid="existing-ein"]').count()) === 1 && (await einForm.locator('[data-testid="special-questions"]').count()) === 0, "EIN form: saying the LLC already has an EIN hides the application questions and asks for the number");
-      await einForm.locator('input[name="hasExistingEin"][value="No"]').check({ force: true });
+      expect((await einForm.locator('[data-testid="activity-other"]').count()) === 0, "EIN form: a listed follow-up choice shows no description box");
+      await choose(page, '[aria-label="Activity follow-up"]', "Other");
+      await page.waitForTimeout(300);
+      expect((await einForm.locator('[data-testid="activity-other"] input[required]').count()) === 1 && /Describe what the business does/.test(await einForm.locator('[data-testid="activity-other"]').innerText()), "EIN form: choosing Other opens a required 'Describe what the business does' box");
+      await einForm.locator('input[name="activityOtherDetail"]').fill("I flip houses I buy at auction");
+      await shot(page, "ein-form-other");
+      await choose(page, '[aria-label="Business category"]', "Warehousing");
       await page.waitForTimeout(300);
       // P65 (Adam, 7 Sep 2026: "The ein form closed and I lost my data"): the
       // answers are saved as they are typed, so a page that reloads with the

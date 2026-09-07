@@ -106286,11 +106286,6 @@ async function purgeExpiredSElections() {
   if (rows.length > 0) console.log(`[purge] redacted ${rows.length} expired S election package(s)`);
   return rows.length;
 }
-var existingEinSchema = external_exports.object({
-  hasExistingEin: external_exports.literal(true),
-  existingEin: external_exports.string().transform((s) => einDigits(s)).refine((s) => isValidEin(s), "Enter the 9-digit EIN the LLC already has."),
-  certified: external_exports.literal(true)
-});
 var einDetailsSchema = external_exports.object({
   responsibleFirst: external_exports.string().min(1, "The responsible party's first name is required.").max(100),
   responsibleMiddle: external_exports.string().max(100).optional().default(""),
@@ -106308,6 +106303,8 @@ var einDetailsSchema = external_exports.object({
   activity: external_exports.enum(EIN_CATEGORY_NAMES, { errorMap: () => ({ message: "Choose the category that best describes the business." }) }),
   activityFollowUp: external_exports.string().max(300).optional().default(""),
   activityDetail: external_exports.string().max(200).optional().default(""),
+  // Adam, 7 Sep 2026: an "Other" follow-up needs a description.
+  activityOtherDetail: external_exports.string().max(200).optional().default(""),
   highwayVehicle: external_exports.boolean().optional().default(false),
   gambling: external_exports.boolean().optional().default(false),
   form720: external_exports.boolean().optional().default(false),
@@ -106342,6 +106339,9 @@ var einDetailsSchema = external_exports.object({
 }).refine((d2) => followUpOk(d2.activity, d2.activityFollowUp), {
   message: "Answer the follow-up question under the category you chose \u2014 the IRS asks it.",
   path: ["activityFollowUp"]
+}).refine((d2) => d2.activityFollowUp !== "Other" || d2.activityOtherDetail.trim().length > 0, {
+  message: "You chose Other \u2014 describe what the business does.",
+  path: ["activityOtherDetail"]
 }).refine(
   (d2) => !d2.employeesExpected || d2.firstWageDate !== "" && d2.employeeCountOther + d2.employeeCountAg > 0 && typeof d2.form944Annual === "boolean",
   { message: "With employees expected, enter the month and year wages will first be paid, at least one employee, and answer the $1,000 question." }
@@ -107336,30 +107336,6 @@ function registerPortalRoutes(app2) {
     const session = await getSession(c);
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
     const raw2 = await c.req.json().catch(() => null);
-    const existing = existingEinSchema.safeParse(raw2);
-    if (existing.success) {
-      const dbX = await getDb();
-      const rowsX = await dbX.query(
-        "SELECT id, client_id, type, status, details, llc_name FROM service_orders WHERE id = $1",
-        [c.req.param("id")]
-      );
-      if (rowsX.length === 0 || rowsX[0].client_id !== session.clientId) return c.json(err("Not found", "NOT_FOUND"), 404);
-      const soX = rowsX[0];
-      if (soX.type !== "ein" || soX.status !== "awaiting_info") return c.json(err("This order is not awaiting details.", "BAD_STATE"), 400);
-      const priorX = (typeof soX.details === "string" ? JSON.parse(soX.details) : soX.details) ?? {};
-      const mergedX = { ...priorX, hasExistingEin: true, existingEin: existing.data.existingEin, certifiedAt: (/* @__PURE__ */ new Date()).toISOString() };
-      await dbX.query("UPDATE service_orders SET details = $1, status = 'in_progress' WHERE id = $2", [JSON.stringify(mergedX), soX.id]);
-      if (env.ADMIN_NOTIFY_EMAIL) {
-        const clientsX = await dbX.query("SELECT email FROM clients WHERE id = $1", [session.clientId]);
-        const mail = einDetailsSubmittedAdminEmail({
-          summary: `Federal EIN \u2014 ${soX.llc_name} \u2014 the client says the LLC already has EIN ${fmtEinDisplay(existing.data.existingEin)}; no application, handle the fee`,
-          clientEmail: clientsX[0]?.email ?? "",
-          adminUrl: `${env.PUBLIC_BASE_URL}/admin`
-        });
-        sendMail({ to: env.ADMIN_NOTIFY_EMAIL, ...mail }).catch((e) => console.error("[service] admin notify failed:", e));
-      }
-      return c.json({ data: { ok: true, existingEin: true } });
-    }
     const body = einDetailsSchema.safeParse(raw2);
     if (!body.success) {
       return c.json(err(body.error.issues[0]?.message ?? "Invalid details.", "INVALID_INPUT"), 400);
@@ -107396,6 +107372,7 @@ function registerPortalRoutes(app2) {
       activity: d2.activity,
       activityFollowUp: d2.activityFollowUp,
       activityDetail: d2.activityDetail,
+      activityOtherDetail: d2.activityFollowUp === "Other" ? d2.activityOtherDetail : "",
       highwayVehicle: d2.highwayVehicle,
       gambling: d2.gambling,
       form720: d2.form720,

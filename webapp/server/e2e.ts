@@ -968,6 +968,14 @@ if (mint.status === 200) {
   check("EIN details with a follow-up the assistant does not offer are refused", wrongFollowUp.status === 400, wrongFollowUp.body);
   const wholesaleOk = await api(`/api/portal/services/${intakeEin.id}/ein-details`, { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ ...einPayload, activity: "Wholesale", activityFollowUp: "Maybe" }) });
   check("a yes-or-no follow-up takes only Yes or No", wholesaleOk.status === 400, wholesaleOk.body);
+  // Adam, 7 Sep 2026: "If the Other choice is selected, there needs to be a
+  // text box to describe what the other is."
+  const otherBare = await api(`/api/portal/services/${intakeEin.id}/ein-details`, { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ ...einPayload, activityFollowUp: "Other" }) });
+  check("an Other follow-up with no description is refused", otherBare.status === 400 && /describe/i.test(otherBare.body?.error?.message ?? ""), otherBare.body);
+  const otherDescribed = await api(`/api/portal/services/${intakeEin.id}/ein-details`, { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ ...einPayload, activityFollowUp: "Other", activityOtherDetail: "I flip houses I buy at auction", certified: undefined }) });
+  check("an Other follow-up with a description passes that rule (refused here only for the missing certification)", otherDescribed.status === 400 && /certif/i.test(otherDescribed.body?.error?.message ?? ""), otherDescribed.body);
+  const noExisting = await api(`/api/portal/services/${intakeEin.id}/ein-details`, { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ hasExistingEin: true, existingEin: "88-7654321", certified: true }) });
+  check("the existing-EIN shortcut is gone (Adam, 7 Sep 2026: we don't need the question)", noExisting.status === 400, noExisting.body);
   const badReason = await api(`/api/portal/services/${intakeEin.id}/ein-details`, { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ ...einPayload, reason: "Because" }) });
   check("a reason the assistant does not offer is refused", badReason.status === 400, badReason.body);
   const oldCategory = await api(`/api/portal/services/${intakeEin.id}/ein-details`, { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ ...einPayload, activity: "Finance & insurance" }) });
@@ -1345,24 +1353,6 @@ if (mint.status === 200) {
     const secSel = ((secSvc.body?.data?.orders ?? []) as { id: string; type: string; status: string }[])
       .find((o) => o.type === "s-election" && o.status === "awaiting_info");
     check("the second company's intake S election is awaiting details", !!secSel, secSvc.body?.data?.orders?.length);
-    // An LLC that already has an EIN keeps it (Adam, 7 Sep 2026): the client
-    // says so, the order stops waiting on them, and the office is told.
-    {
-      const secEin = ((secSvc.body?.data?.orders ?? []) as { id: string; type: string; status: string }[]).find((o) => o.type === "ein" && o.status === "awaiting_info");
-      check("the second company has an EIN order awaiting details", !!secEin, secSvc.body?.data?.orders);
-      if (secEin) {
-        const badExisting = await api(`/api/portal/services/${secEin.id}/ein-details`, { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ hasExistingEin: true, existingEin: "00-1234567", certified: true }) });
-        check("an invalid existing EIN is refused", badExisting.status === 400, badExisting.body);
-        const existingRes = await api(`/api/portal/services/${secEin.id}/ein-details`, { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ hasExistingEin: true, existingEin: "88-7654321", certified: true }) });
-        check("a client can say the LLC already has an EIN", existingRes.status === 200 && existingRes.body?.data?.existingEin === true, existingRes.body);
-        const afterExisting = ((await api(`/api/portal/services?company=${secondId}`, { cookies: setPw.cookie })).body?.data?.orders ?? []) as { id: string; status: string; details?: { hasExistingEin?: boolean; existingEin?: string } }[];
-        const row = afterExisting.find((o) => o.id === secEin.id);
-        check("the order stops waiting on the client and keeps the number", row?.status === "in_progress" && row?.details?.hasExistingEin === true && row?.details?.existingEin === "887654321", row);
-        const admE = await adminSession();
-        const officeView = await api(`/api/admin/services/${secEin.id}`, { cookies: admE.cookie });
-        check("the office sees the existing EIN flag", officeView.body?.data?.details?.hasExistingEin === true && officeView.body?.data?.tin === null, officeView.body?.data);
-      }
-    }
     // Every document names its company (Adam, 7 Sep 2026: a package with no
     // company showed under every tab). The first company's S election
     // package and series consent carry the first company; a hand upload for
