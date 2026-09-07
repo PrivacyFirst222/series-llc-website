@@ -2782,6 +2782,36 @@ if (mint.status === 200) {
     const certOrderId = certOrderRes.body?.data?.orderId as string;
     await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: certOrderId }) });
     const cSeries = ((await api(`/api/admin/orders/${certOrderId}`, { cookies: adm.cookie })).body?.data as { series: { name: string }[] }).series.map((x) => x.name);
+    // The certificates on their own, before the designations (Adam, 7 Sep
+    // 2026): accepted, stored under the company, replaced on a second
+    // upload, refused for a client who did not buy one, and the order is
+    // not formed by them.
+    {
+      const certPdf = () => new File([new TextEncoder().encode("%PDF-1.4 certificate of status\n%%EOF")], "cos.pdf", { type: "application/pdf" });
+      const alone = new FormData();
+      alone.set("certStatus", certPdf());
+      alone.set("notify", "false");
+      const aloneRes = await fetch(`${BASE}/api/admin/orders/${certOrderId}/certificates`, { method: "POST", body: alone, headers: { Cookie: adm.cookie, "X-Forwarded-For": RUN_IP } });
+      check("a certificate uploads on its own before the designations", aloneRes.status === 200, await aloneRes.json().catch(() => null));
+      const afterAlone = (await api(`/api/admin/orders/${certOrderId}`, { cookies: adm.cookie })).body?.data as { hasCertStatus?: boolean; hasCertifiedCopy?: boolean; status?: string; documents?: { kind: string; title: string }[] };
+      check("the certificate is on file and the order is not formed by it", afterAlone?.hasCertStatus === true && afterAlone?.hasCertifiedCopy !== true && afterAlone?.status !== "formed", afterAlone);
+      const again = new FormData();
+      again.set("certStatus", certPdf());
+      again.set("notify", "false");
+      const againRes = await fetch(`${BASE}/api/admin/orders/${certOrderId}/certificates`, { method: "POST", body: again, headers: { Cookie: adm.cookie, "X-Forwarded-For": RUN_IP } });
+      check("a second certificate upload replaces the first", againRes.status === 200);
+      const afterAgain = (await api(`/api/admin/orders/${certOrderId}`, { cookies: adm.cookie })).body?.data as { documents?: { kind: string }[] };
+      check("one certificate of status remains after the replacement", (afterAgain?.documents ?? []).filter((d) => d.kind === "certificate-of-status").length === 1, afterAgain?.documents);
+      const empty = new FormData();
+      empty.set("notify", "false");
+      const emptyRes = await fetch(`${BASE}/api/admin/orders/${certOrderId}/certificates`, { method: "POST", body: empty, headers: { Cookie: adm.cookie, "X-Forwarded-For": RUN_IP } });
+      check("a certificate upload with no file is refused", emptyRes.status === 400);
+      const notBought = new FormData();
+      notBought.set("certStatus", certPdf());
+      notBought.set("notify", "false");
+      const notBoughtRes = await fetch(`${BASE}/api/admin/orders/${orderId}/certificates`, { method: "POST", body: notBought, headers: { Cookie: adm.cookie, "X-Forwarded-For": RUN_IP } });
+      check("a certificate the client did not buy is refused", notBoughtRes.status === 400 && ((await notBoughtRes.json().catch(() => null)) as { error?: { code?: string } } | null)?.error?.code === "NOT_PURCHASED");
+    }
     const packUp = await fetch(`${BASE}/api/admin/orders/${certOrderId}/formation-documents`, { method: "POST", body: packageFd(true, cSeries), headers: { Cookie: adm.cookie, "X-Forwarded-For": RUN_IP } });
     check("the package upload with both certificates is accepted and forms the order", packUp.status === 200, await packUp.json().catch(() => null));
     const detC = await api(`/api/admin/orders/${certOrderId}`, { cookies: adm.cookie });

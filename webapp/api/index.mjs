@@ -109146,6 +109146,65 @@ function registerAdminRoutes(app2) {
     );
     return c.json({ data: { ok: true } });
   });
+  app2.post("/admin/orders/:id/certificates", async (c) => {
+    const admin = await requireAdmin(c);
+    if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+    const db = await getDb();
+    const rows = await db.query(
+      "SELECT id, client_id, llc_name, status, payload FROM orders WHERE id = $1",
+      [c.req.param("id")]
+    );
+    if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+    const o = rows[0];
+    if (!o.client_id) return c.json(err("This order has no client account yet.", "NO_CLIENT"), 400);
+    if (o.status === "pending_payment") return c.json(err("This order has not been paid.", "BAD_STATE"), 400);
+    const form = await c.req.parseBody();
+    const notify = form.notify !== "false";
+    const payloadOpts = (typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload).optionalDocuments;
+    const files = [];
+    for (const [field, kind, key, title] of [
+      ["certStatus", "certificate-of-status", "certificateOfStatus", "Certificate of Status"],
+      ["certifiedCopy", "certified-copy", "certifiedCopy", "Certified Copy of the Articles"]
+    ]) {
+      const f = form[field];
+      if (f instanceof File && f.size > 0) {
+        if (!payloadOpts?.[key]) {
+          return c.json(err(`The client did not purchase a ${title.toLowerCase()} with this order.`, "NOT_PURCHASED"), 400);
+        }
+        if (f.size > MAX_UPLOAD_BYTES) return c.json(err("File is too large (20 MB max).", "TOO_LARGE"), 400);
+        if (!await looksLikePdf(f)) return c.json(err(`${f.name} is not a readable PDF.`, "NOT_A_PDF"), 400);
+        files.push({ kind, title: `${title} \u2014 ${o.llc_name}`, file: f });
+      }
+    }
+    if (files.length === 0) return c.json(err("Choose a certificate file to upload.", "INVALID_INPUT"), 400);
+    const uploaded = [];
+    for (const cf of files) {
+      const prior = await db.query(
+        "SELECT id, storage_key FROM documents WHERE order_id = $1 AND kind = $2",
+        [o.id, cf.kind]
+      );
+      const stored = await putFile(cf.file.name, await cf.file.arrayBuffer(), cf.file.type || "application/pdf");
+      await db.query(
+        `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, '{}'::jsonb)`,
+        [o.client_id, o.id, cf.kind, cf.title, stored.storageKey, cf.file.type || "application/pdf", stored.sizeBytes]
+      );
+      for (const p2 of prior) {
+        await db.query("DELETE FROM documents WHERE id = $1", [p2.id]);
+        await deleteFile(p2.storage_key).catch(() => {
+        });
+      }
+      uploaded.push(cf.kind);
+    }
+    if (notify) {
+      const clients = await db.query("SELECT email FROM clients WHERE id = $1", [o.client_id]);
+      if (clients[0]) {
+        const mail = newDocumentEmail(`${env.PUBLIC_BASE_URL}/portal`);
+        sendMail({ to: clients[0].email, ...mail }).catch((e) => console.error("[admin] certificate email failed:", e));
+      }
+    }
+    return c.json({ data: { uploaded } });
+  });
   app2.post("/admin/orders/:id/formation-documents", async (c) => {
     const admin = await requireAdmin(c);
     if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);

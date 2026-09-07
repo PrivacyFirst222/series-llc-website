@@ -184,6 +184,34 @@ export default function OrderDetail({
 
   const d = detail.data;
 
+  // The state's certificates on their own (Adam, 7 Sep 2026): they often
+  // arrive before the designations, so they no longer wait for formation.
+  const [certChosen, setCertChosen] = useState(false);
+  const noteCertChosen = () => {
+    setUploadError(null);
+    setCertChosen(Boolean(certStatusRef.current?.files?.length || certifiedCopyRef.current?.files?.length));
+  };
+  const uploadCerts = useMutation({
+    mutationFn: async () => {
+      const fd = new FormData();
+      const certStatus = certStatusRef.current?.files?.[0];
+      if (certStatus) fd.append("certStatus", certStatus);
+      const certifiedCopy = certifiedCopyRef.current?.files?.[0];
+      if (certifiedCopy) fd.append("certifiedCopy", certifiedCopy);
+      const res = await fetch(`/api/admin/orders/${orderId}/certificates`, { method: "POST", body: fd, credentials: "include" });
+      const body = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
+      if (!res.ok) throw new Error(body?.error?.message ?? `Upload failed (${res.status})`);
+    },
+    onSuccess: () => {
+      if (certStatusRef.current) certStatusRef.current.value = "";
+      if (certifiedCopyRef.current) certifiedCopyRef.current.value = "";
+      setCertChosen(false);
+      queryClient.invalidateQueries({ queryKey: ["admin", "order", orderId] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "orders"] });
+    },
+    onError: (e: Error) => setUploadError(e.message),
+  });
+
   const upload = useMutation({
     mutationFn: async () => {
       const fd = new FormData();
@@ -387,7 +415,7 @@ export default function OrderDetail({
                         type="file"
                         accept="application/pdf"
                         className="mt-1 block w-full text-sm"
-                        onChange={() => setUploadError(null)}
+                        onChange={noteCertChosen}
                       />
                     </div>
                   ) : null}
@@ -402,9 +430,21 @@ export default function OrderDetail({
                         type="file"
                         accept="application/pdf"
                         className="mt-1 block w-full text-sm"
-                        onChange={() => setUploadError(null)}
+                        onChange={noteCertChosen}
                       />
                     </div>
+                  ) : null}
+                  {certChosen ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full rounded-full"
+                      data-testid="upload-certificates"
+                      disabled={uploadCerts.isPending}
+                      onClick={() => uploadCerts.mutate()}
+                    >
+                      {uploadCerts.isPending ? "Uploading…" : "Upload certificates"}
+                    </Button>
                   ) : null}
                   {psdRows.map((row, i) => (
                     <div key={i} className="rounded-lg border border-border p-3">

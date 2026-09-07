@@ -431,6 +431,71 @@ app.post("/admin/orders/:id/articles", async (c) => {
   return c.json({ data: { ok: true } });
 });
 
+/** The state's certificates on their own (Adam, 7 Sep 2026: "I uploaded the
+ *  files for the certificate of status and certified copies but there's no
+ *  upload document button"). They often arrive before the designations, so
+ *  they no longer have to wait for the formation upload. Each replaces an
+ *  earlier copy of its kind, lands under the company, and the client is
+ *  told a document was posted. Nothing else about the order changes. */
+app.post("/admin/orders/:id/certificates", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const db = await getDb();
+  const rows = await db.query<{ id: string; client_id: string | null; llc_name: string; status: string; payload: unknown }>(
+    "SELECT id, client_id, llc_name, status, payload FROM orders WHERE id = $1",
+    [c.req.param("id")],
+  );
+  if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+  const o = rows[0];
+  if (!o.client_id) return c.json(err("This order has no client account yet.", "NO_CLIENT"), 400);
+  if (o.status === "pending_payment") return c.json(err("This order has not been paid.", "BAD_STATE"), 400);
+  const form = await c.req.parseBody();
+  const notify = form.notify !== "false";
+  const payloadOpts = ((typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload) as {
+    optionalDocuments?: { certificateOfStatus?: boolean; certifiedCopy?: boolean };
+  }).optionalDocuments;
+  const files: { kind: string; title: string; file: File }[] = [];
+  for (const [field, kind, key, title] of [
+    ["certStatus", "certificate-of-status", "certificateOfStatus", "Certificate of Status"],
+    ["certifiedCopy", "certified-copy", "certifiedCopy", "Certified Copy of the Articles"],
+  ] as const) {
+    const f = form[field];
+    if (f instanceof File && f.size > 0) {
+      if (!payloadOpts?.[key]) {
+        return c.json(err(`The client did not purchase a ${title.toLowerCase()} with this order.`, "NOT_PURCHASED"), 400);
+      }
+      if (f.size > MAX_UPLOAD_BYTES) return c.json(err("File is too large (20 MB max).", "TOO_LARGE"), 400);
+      if (!(await looksLikePdf(f))) return c.json(err(`${f.name} is not a readable PDF.`, "NOT_A_PDF"), 400);
+      files.push({ kind, title: `${title} — ${o.llc_name}`, file: f });
+    }
+  }
+  if (files.length === 0) return c.json(err("Choose a certificate file to upload.", "INVALID_INPUT"), 400);
+  const uploaded: string[] = [];
+  for (const cf of files) {
+    const prior = await db.query<{ id: string; storage_key: string }>(
+      "SELECT id, storage_key FROM documents WHERE order_id = $1 AND kind = $2", [o.id, cf.kind]);
+    const stored = await putFile(cf.file.name, await cf.file.arrayBuffer(), cf.file.type || "application/pdf");
+    await db.query(
+      `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, '{}'::jsonb)`,
+      [o.client_id, o.id, cf.kind, cf.title, stored.storageKey, cf.file.type || "application/pdf", stored.sizeBytes],
+    );
+    for (const p of prior) {
+      await db.query("DELETE FROM documents WHERE id = $1", [p.id]);
+      await deleteFile(p.storage_key).catch(() => {});
+    }
+    uploaded.push(cf.kind);
+  }
+  if (notify) {
+    const clients = await db.query<{ email: string }>("SELECT email FROM clients WHERE id = $1", [o.client_id]);
+    if (clients[0]) {
+      const mail = newDocumentEmail(`${env.PUBLIC_BASE_URL}/portal`);
+      sendMail({ to: clients[0].email, ...mail }).catch((e) => console.error("[admin] certificate email failed:", e));
+    }
+  }
+  return c.json({ data: { uploaded } });
+});
+
 app.post("/admin/orders/:id/formation-documents", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
