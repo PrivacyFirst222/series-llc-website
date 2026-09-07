@@ -24,6 +24,7 @@ import { filingGroups, seriesNames } from "./filing";
 import { err, testHooks, MAX_UPLOAD_BYTES, looksLikePdf, requireAdmin } from "./shared";
 import { oaSeed, purgeExpiredSElections, postSElectionPackage, type SElectionStoredDetails } from "./routes-portal";
 import { evaluate2553Timing } from "../src/lib/form2553Timing";
+import { unpackSsns } from "../src/lib/jointOwner";
 import { easternDateIso } from "./datetime";
 
 /** Renders the Owner's Manual PDF from the markdown master bundled with
@@ -917,7 +918,7 @@ app.get("/admin/services/:id/s-election-draft", async (c) => {
     officerName: details.officerName,
     officerTitle: details.officerTitle,
     phone: details.phone ?? "",
-    shareholders: details.shareholders.map((s, i) => ({ ...s, ssn: ssns[i] ?? "" })),
+    shareholders: details.shareholders.map((s, i) => ({ ...s, ...unpackSsns(ssns[i]) })),
   };
   try {
     const pdf = await buildSElectionPackage(input);

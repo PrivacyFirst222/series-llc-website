@@ -10,6 +10,7 @@
  *   Fax: 855-214-7520. There is no IRS filing fee.
  */
 import { form2553Deadline } from "../src/lib/form2553Timing";
+import { type JointKind, isJoint, jointDisplayName, ssnColumnText } from "../src/lib/jointOwner";
 import { PDFDocument, StandardFonts, degrees, rgb } from "@cantoo/pdf-lib";
 import f2553Base64 from "./assets/f2553-b64";
 import { renderMarkdownPdf } from "./pdf-render";
@@ -24,6 +25,11 @@ export interface SElectionShareholder {
   dateAcquired: string; // YYYY-MM-DD
   /** 9 digits, or the last 4 alone on a record copy. */
   ssn: string;
+  /** A jointly held interest (Adam, 6 Sep 2026): the co-owner's name and
+   *  number; column J names both, column M lists both. */
+  joint?: JointKind;
+  name2?: string;
+  ssn2?: string;
 }
 
 export interface SElectionDetails {
@@ -125,14 +131,19 @@ async function fillForm2553(d: SElectionDetails): Promise<PDFDocument> {
     const base = i * 7;
     const fieldNum = (col: number) => String(ROW_FIELDS[col] + base).padStart(2, "0");
     const row = `${P2}.Table_Part1[0].Row${i + 1}[0]`;
-    setText(`${row}.f2_${fieldNum(0)}[0]`, `${sh.name}\n${sh.address}`); // J
+    setText(`${row}.f2_${fieldNum(0)}[0]`, `${jointDisplayName(sh.name, sh.name2, sh.joint)}\n${sh.address}`); // J
     // K signature + date stay blank — each shareholder signs by hand
     setText(`${row}.f2_${fieldNum(3)}[0]`, `${sh.percentage}%`); // L — percentage of ownership
     setText(`${row}.f2_${fieldNum(4)}[0]`, fmtDate(sh.dateAcquired)); // L — date(s) acquired
-    const ssnText = d.recordCopy
-      ? `XXX-XX-${sh.ssn.slice(-4)}`
-      : `${sh.ssn.slice(0, 3)}-${sh.ssn.slice(3, 5)}-${sh.ssn.slice(5)}`;
-    setText(`${row}.f2_${fieldNum(5)}[0]`, ssnText); // M
+    // M — a joint row stacks both numbers on two lines, as on Adam's sample;
+    // the cell is single-line and narrow, so it is opened up and set smaller.
+    const mField = `${row}.f2_${fieldNum(5)}[0]`;
+    if (isJoint(sh.joint) && sh.ssn2) {
+      const f = form.getTextField(mField);
+      f.enableMultiline();
+      f.setFontSize(7);
+    }
+    setText(mField, ssnColumnText(sh.ssn, sh.ssn2, sh.joint, Boolean(d.recordCopy)));
     setText(`${row}.f2_${fieldNum(6)}[0]`, "12/31"); // N — shareholder tax year end
   });
 
@@ -190,7 +201,7 @@ Review every entry, especially the company name and address, the EIN, the effect
 ## STEP 2 — SIGN
 
 - **Officer signature (page 1, bottom):** ${d.officerName}, ${d.officerTitle}, signs and dates the "Sign Here" line. The title is already filled in.
-- **Every owner signs page 2:** each shareholder listed in column J must sign and date column K. For an interest held jointly by spouses, **both spouses sign** — each spouse counts as a shareholder who must consent.
+- **Every owner signs page 2:** each shareholder listed in column J must sign and date column K. For an interest held jointly — tenants by the entirety or joint tenants with right of survivorship — **both co-owners sign** that row's line; both are named in column J and both Social Security numbers appear in column M, because each is a shareholder who must consent.${d.shareholders.some((s) => isJoint(s.joint)) ? `\n\n  Jointly held on this form: ${d.shareholders.filter((s) => isJoint(s.joint)).map((s) => jointDisplayName(s.name, s.name2, s.joint)).join("; ")}.` : ""}
 
 An election without every required signature is invalid. Do not leave any consent line blank.
 

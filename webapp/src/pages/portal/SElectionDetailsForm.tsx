@@ -13,10 +13,11 @@ import { AddressAutocomplete } from "@/components/forms/florida-llc/AddressAutoc
 
 import type { ServiceOrder, ShareholderRow } from "./ServicesCard";
 import { formatPhone, isoToTypedDate, typedDateToIso, formatTypedDate } from "./typedDate";
+import { JOINT_KINDS, isJoint, type JointKind } from "@/lib/jointOwner";
 import { ELIGIBILITY_ACKNOWLEDGMENT, evaluate2553Timing, type TimingResult } from "@/lib/form2553Timing";
 
 
-const EMPTY_ROW: ShareholderRow = { name: "", address: "", percentage: "", dateAcquired: "", atFormation: true, ssn: "" };
+const EMPTY_ROW: ShareholderRow = { name: "", address: "", percentage: "", dateAcquired: "", atFormation: true, ssn: "", joint: "", name2: "", ssn2: "" };
 
 
 /** The certification a client gives before we build the form. They sign the
@@ -117,6 +118,10 @@ export function SElectionDetailsForm({
           ssn: "",
           ssnLast4: s.ssnLast4,
           verified: true,
+          joint: s.joint ?? "",
+          name2: s.name2 ?? "",
+          ssn2: "",
+          ssnLast4Second: s.ssnLast4Second,
         }))
       : [{ ...EMPTY_ROW }]),
   );
@@ -147,7 +152,6 @@ export function SElectionDetailsForm({
   const premature = Boolean(typedEffective && todayEastern && Number(typedEffective.slice(0, 4)) > Number(todayEastern.slice(0, 4)) + 1);
   const acquiredTooEarly = rows.some((r) => !r.atFormation && formationDate && (typedDateToIso(r.dateAcquired) ?? "") !== "" && (typedDateToIso(r.dateAcquired) as string) < formationDate);
   const formationDateBad = formationDateTyped.trim() !== "" && typedDateToIso(formationDateTyped) === null;
-  const timingOk = timing?.status === "ok" && !premature && !acquiredTooEarly && !formationDateBad;
   useEffect(() => {
     // A changed effective date changes the deadline: the acknowledgment
     // names it, so it must be given again.
@@ -177,6 +181,9 @@ export function SElectionDetailsForm({
           percentage: Number(r.percentage),
           dateAcquired: r.atFormation ? "" : (typedDateToIso(r.dateAcquired) ?? ""),
           ssn: r.ssn,
+          joint: r.joint ?? "",
+          name2: isJoint(r.joint) ? (r.name2 ?? "") : "",
+          ssn2: isJoint(r.joint) ? (r.ssn2 ?? "") : "",
         })),
       }),
     onSuccess: onDone,
@@ -184,6 +191,38 @@ export function SElectionDetailsForm({
   });
 
   const pctTotal = rows.reduce((a, r) => a + (Number(r.percentage) || 0), 0);
+
+  // Everything still standing between the client and the build, in the
+  // form's own words (Adam, 6 Sep 2026: "there is no error message or other
+  // method of telling the user exactly what is blocking"). The button stays
+  // off while this list has anything on it.
+  const stillNeeded: string[] = [];
+  if (!formationDate) stillNeeded.push(formationDateBad ? "Enter the date the Division filed your Articles as MM/DD/YYYY" : "Enter the date the Division filed your Articles");
+  if (!einPending && !/^\d{9}$/.test(ein.replace(/\D/g, ""))) stillNeeded.push("Enter the 9-digit EIN, or tick that you're obtaining ours");
+  if (effectiveDate.trim() !== "" && typedDateToIso(effectiveDate) === null) stillNeeded.push("Enter the election effective date as MM/DD/YYYY, or leave it blank");
+  if (formationDate && timing && timing.status !== "ok") stillNeeded.push("Resolve the deadline notice above — the election can't be built as dated");
+  if (premature) stillNeeded.push("Choose an effective date no later than next year");
+  if (acquiredTooEarly) stillNeeded.push("No owner can acquire an interest before the date on your Articles");
+  if (!officerName.trim()) stillNeeded.push(officerOther ? "Enter the signing officer's full legal name" : "Choose the signing officer");
+  if (!officerTitle.trim()) stillNeeded.push("Enter the officer's title");
+  rows.forEach((r, i) => {
+    const who = `Owner ${i + 1}`;
+    if (!r.name.trim()) stillNeeded.push(`${who}: choose or enter the name`);
+    if (isJoint(r.joint) && !(r.name2 ?? "").trim()) stillNeeded.push(`${who}: choose or enter the co-owner's name`);
+    if (!r.address.trim()) stillNeeded.push(`${who}: enter the home address`);
+    if (!(Number(r.percentage) > 0)) stillNeeded.push(`${who}: enter the ownership percentage`);
+    if (r.atFormation === false && (r.dateAcquired.trim() === "" || typedDateToIso(r.dateAcquired) === null)) stillNeeded.push(`${who}: enter the date acquired as MM/DD/YYYY, or tick "Acquired at formation"`);
+    if (!r.ssn && !r.ssnLast4) stillNeeded.push(`${who}: enter the SSN${r.name.trim() ? ` for ${r.name.trim()}` : ""}`);
+    else if (r.ssn && r.ssn.replace(/\D/g, "").length !== 9) stillNeeded.push(`${who}: the SSN needs 9 digits`);
+    if (isJoint(r.joint)) {
+      if (!r.ssn2 && !r.ssnLast4Second) stillNeeded.push(`${who}: enter the SSN${(r.name2 ?? "").trim() ? ` for ${(r.name2 ?? "").trim()}` : " for the co-owner"}`);
+      else if (r.ssn2 && r.ssn2.replace(/\D/g, "").length !== 9) stillNeeded.push(`${who}: the co-owner's SSN needs 9 digits`);
+    }
+  });
+  if (Math.abs(pctTotal - 100) > 0.01) stillNeeded.push(`Ownership adds up to ${pctTotal}%, not 100%`);
+  if (formationDate && timing?.status === "ok" && !timingAcknowledged) stillNeeded.push("Tick the deadline acknowledgment");
+  if (!eligibilityAcknowledged) stillNeeded.push("Tick the shareholder eligibility acknowledgment");
+  if (!certified) stillNeeded.push("Tick the certification");
 
   return (
     <form
@@ -373,11 +412,11 @@ export function SElectionDetailsForm({
                   value={members.some((m) => m.name === r.name) ? r.name : r.name === "" ? "" : OTHER}
                   onValueChange={(v) => {
                     if (v === OTHER) {
-                      patchRow(i, { name: " ", address: r.address, verified: false });
+                      patchRow(i, { name: " ", address: r.address, verified: false, ssnLast4: undefined });
                       return;
                     }
                     const m = members.find((mm) => mm.name === v);
-                    patchRow(i, { name: v, address: m?.address ?? r.address, verified: Boolean(m?.address) });
+                    patchRow(i, { name: v, address: m?.address ?? r.address, verified: Boolean(m?.address), ssnLast4: undefined });
                   }}
                 >
                   <SelectTrigger aria-label="Owner">
@@ -396,7 +435,7 @@ export function SElectionDetailsForm({
                   <Input
                     placeholder="Owner's full legal name"
                     value={r.name.trim() === "" ? "" : r.name}
-                    onChange={(e) => patchRow(i, { name: e.target.value })}
+                    onChange={(e) => patchRow(i, { name: e.target.value, ssnLast4: undefined })}
                     autoComplete="off"
                   />
                 ) : null}
@@ -425,6 +464,55 @@ export function SElectionDetailsForm({
                   )
                 ) : null}
               </div>
+            </div>
+            {/* Jointly held (Adam, 6 Sep 2026): the co-owner's name and number
+                ride on the same row; the form names both in column J and
+                lists both numbers in column M. */}
+            <div className="grid gap-2 sm:grid-cols-2">
+              <Select
+                value={r.joint ?? ""}
+                onValueChange={(v) => patchRow(i, { joint: v as JointKind, ...(v === "" ? { name2: "", ssn2: "" } : {}) })}
+              >
+                <SelectTrigger aria-label="How the interest is held">
+                  <SelectValue placeholder="Owned individually" />
+                </SelectTrigger>
+                <SelectContent>
+                  {JOINT_KINDS.map((k) => (
+                    <SelectItem key={k.value || "solo"} value={k.value}>
+                      {k.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {isJoint(r.joint) ? (
+                <div className="space-y-1.5">
+                  <Select
+                    value={members.some((m) => m.name === r.name2) ? (r.name2 ?? "") : (r.name2 ?? "") === "" ? "" : OTHER}
+                    onValueChange={(v) => patchRow(i, { name2: v === OTHER ? " " : v, ssnLast4Second: undefined })}
+                  >
+                    <SelectTrigger aria-label="Co-owner">
+                      <SelectValue placeholder="Select the co-owner…" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {members.filter((m) => m.name !== r.name).map((m) => (
+                        <SelectItem key={m.name} value={m.name}>
+                          {m.name}
+                        </SelectItem>
+                      ))}
+                      <SelectItem value={OTHER}>Other — enter a name</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {(r.name2 ?? "") !== "" && !members.some((m) => m.name === r.name2) ? (
+                    <Input
+                      placeholder="Co-owner's full legal name"
+                      aria-label="Co-owner's full legal name"
+                      value={(r.name2 ?? "").trim() === "" ? "" : r.name2}
+                      onChange={(e) => patchRow(i, { name2: e.target.value, ssnLast4Second: undefined })}
+                      autoComplete="off"
+                    />
+                  ) : null}
+                </div>
+              ) : null}
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <div className="flex items-center gap-1">
@@ -461,13 +549,27 @@ export function SElectionDetailsForm({
               <Input
                 type="password"
                 inputMode="numeric"
-                placeholder={r.ssnLast4 ? `SSN on file •••-••-${r.ssnLast4}` : "SSN •••-••-••••"}
-                title={r.ssnLast4 ? "Leave blank to keep the number already on file" : "Social Security number"}
+                placeholder={r.ssnLast4 ? `SSN on file •••-••-${r.ssnLast4}` : isJoint(r.joint) && r.name.trim() ? `SSN — ${r.name.trim()}` : "SSN •••-••-••••"}
+                title={r.ssnLast4 ? "Leave blank to keep the number already on file" : isJoint(r.joint) && r.name.trim() ? `${r.name.trim()}'s Social Security number` : "Social Security number"}
+                aria-label={isJoint(r.joint) && r.name.trim() ? `SSN — ${r.name.trim()}` : "SSN"}
                 value={r.ssn}
                 onChange={(e) => patchRow(i, { ssn: e.target.value })}
                 className="w-44"
                 autoComplete="off"
               />
+              {isJoint(r.joint) ? (
+                <Input
+                  type="password"
+                  inputMode="numeric"
+                  placeholder={r.ssnLast4Second ? `SSN on file •••-••-${r.ssnLast4Second}` : `SSN — ${(r.name2 ?? "").trim() || "co-owner"}`}
+                  title={r.ssnLast4Second ? "Leave blank to keep the number already on file" : `${(r.name2 ?? "").trim() || "The co-owner"}'s Social Security number`}
+                  aria-label={`SSN — ${(r.name2 ?? "").trim() || "co-owner"}`}
+                  value={r.ssn2 ?? ""}
+                  onChange={(e) => patchRow(i, { ssn2: e.target.value })}
+                  className="w-44"
+                  autoComplete="off"
+                />
+              ) : null}
               {rows.length > 1 ? (
                 <button
                   type="button"
@@ -493,10 +595,11 @@ export function SElectionDetailsForm({
           </p>
         </div>
         <p className="text-xs text-muted-foreground">
-          Spouses who own an interest together (tenants by the entirety or joint tenants):
-          enter one row with both names — e.g., "Sam Lee and Alex Lee, as tenants by the
-          entirety" — their combined percentage, and either spouse's SSN. The instruction
-          sheet will direct <em>both</em> spouses to sign that row's consent line.
+          Spouses or co-owners who hold an interest jointly (tenants by the entirety or joint
+          tenants with right of survivorship): pick the joint kind on that owner's row and add
+          the co-owner. The form lists both names and both Social Security numbers on one line
+          with their combined percentage, and the instruction sheet directs <em>both</em> to
+          sign that row's consent line.
         </p>
       </div>
 
@@ -511,13 +614,23 @@ export function SElectionDetailsForm({
       </label>
 
       {formError ? <p className="text-xs text-destructive">{formError}</p> : null}
+      {stillNeeded.length > 0 ? (
+        <div className="rounded-lg border border-amber-300/60 bg-amber-50 px-3 py-2 text-xs text-amber-900" data-testid="still-needed">
+          <p className="font-medium">Still needed before we can build your package:</p>
+          <ul className="mt-1 list-disc space-y-0.5 pl-4">
+            {stillNeeded.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
       <DialogFooter className="flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:justify-end">
         <p className="text-xs text-muted-foreground sm:mr-auto">
           We build your package immediately — you'll be able to download it here.
         </p>
         <Button
           type="submit"
-          disabled={submit.isPending || !certified || !timingOk || !timingAcknowledged || !eligibilityAcknowledged || Math.abs(pctTotal - 100) > 0.01}
+          disabled={submit.isPending || stillNeeded.length > 0}
           className="rounded-full"
         >
           {submit.isPending ? "Building your package…" : "Certify and build my package"}

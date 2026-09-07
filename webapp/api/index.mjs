@@ -100984,6 +100984,31 @@ function evaluate2553Timing(opts) {
   };
 }
 
+// src/lib/jointOwner.ts
+var JOINT_KINDS = [
+  { value: "", label: "Owned individually", suffix: "" },
+  { value: "tbe", label: "Jointly with spouse \u2014 tenants by the entirety", suffix: "as Tenants by the Entirety" },
+  { value: "jtwros", label: "Jointly \u2014 joint tenants with right of survivorship", suffix: "as Joint Tenants with Right of Survivorship" }
+];
+var isJoint = (joint) => joint === "tbe" || joint === "jtwros";
+function jointDisplayName(name, name2, joint) {
+  if (!isJoint(joint)) return name;
+  const suffix = JOINT_KINDS.find((k) => k.value === joint)?.suffix ?? "";
+  return `${name} and ${name2 ?? ""} ${suffix}`.replace(/\s+/g, " ").trim();
+}
+var fmtSsn = (ssn, recordCopy) => recordCopy ? `XXX-XX-${ssn.slice(-4)}` : `${ssn.slice(0, 3)}-${ssn.slice(3, 5)}-${ssn.slice(5)}`;
+function ssnColumnText(ssn, ssn2, joint, recordCopy = false) {
+  const first = fmtSsn(ssn, recordCopy);
+  if (!isJoint(joint) || !ssn2) return first;
+  return `${first} /
+${fmtSsn(ssn2, recordCopy)}`;
+}
+var packSsns = (ssn, ssn2) => ssn2 ? `${ssn}|${ssn2}` : ssn;
+var unpackSsns = (packed) => {
+  const [ssn = "", ssn2 = ""] = (packed ?? "").split("|");
+  return { ssn, ssn2 };
+};
+
 // server/s-election.ts
 init_es();
 
@@ -101399,12 +101424,17 @@ async function fillForm2553(d2) {
     const base = i * 7;
     const fieldNum = (col) => String(ROW_FIELDS[col] + base).padStart(2, "0");
     const row = `${P2}.Table_Part1[0].Row${i + 1}[0]`;
-    setText(`${row}.f2_${fieldNum(0)}[0]`, `${sh.name}
+    setText(`${row}.f2_${fieldNum(0)}[0]`, `${jointDisplayName(sh.name, sh.name2, sh.joint)}
 ${sh.address}`);
     setText(`${row}.f2_${fieldNum(3)}[0]`, `${sh.percentage}%`);
     setText(`${row}.f2_${fieldNum(4)}[0]`, fmtDate(sh.dateAcquired));
-    const ssnText = d2.recordCopy ? `XXX-XX-${sh.ssn.slice(-4)}` : `${sh.ssn.slice(0, 3)}-${sh.ssn.slice(3, 5)}-${sh.ssn.slice(5)}`;
-    setText(`${row}.f2_${fieldNum(5)}[0]`, ssnText);
+    const mField = `${row}.f2_${fieldNum(5)}[0]`;
+    if (isJoint(sh.joint) && sh.ssn2) {
+      const f = form.getTextField(mField);
+      f.enableMultiline();
+      f.setFontSize(7);
+    }
+    setText(mField, ssnColumnText(sh.ssn, sh.ssn2, sh.joint, Boolean(d2.recordCopy)));
     setText(`${row}.f2_${fieldNum(6)}[0]`, "12/31");
   });
   form.updateFieldAppearances();
@@ -101456,7 +101486,9 @@ Review every entry, especially the company name and address, the EIN, the effect
 ## STEP 2 \u2014 SIGN
 
 - **Officer signature (page 1, bottom):** ${d2.officerName}, ${d2.officerTitle}, signs and dates the "Sign Here" line. The title is already filled in.
-- **Every owner signs page 2:** each shareholder listed in column J must sign and date column K. For an interest held jointly by spouses, **both spouses sign** \u2014 each spouse counts as a shareholder who must consent.
+- **Every owner signs page 2:** each shareholder listed in column J must sign and date column K. For an interest held jointly \u2014 tenants by the entirety or joint tenants with right of survivorship \u2014 **both co-owners sign** that row's line; both are named in column J and both Social Security numbers appear in column M, because each is a shareholder who must consent.${d2.shareholders.some((s) => isJoint(s.joint)) ? `
+
+  Jointly held on this form: ${d2.shareholders.filter((s) => isJoint(s.joint)).map((s) => jointDisplayName(s.name, s.name2, s.joint)).join("; ")}.` : ""}
 
 An election without every required signature is invalid. Do not leave any consent line blank.
 
@@ -106079,7 +106111,7 @@ async function purgeExpiredSElections() {
           recordCopy: true,
           // Only the last four survive in the stored record — that is all the
           // record copy can show, and all it needs to.
-          shareholders: filled.shareholders.map((s) => ({ ...s, ssn: s.ssnLast4 }))
+          shareholders: filled.shareholders.map((s) => ({ ...s, ssn: s.ssnLast4, ssn2: s.ssnLast4Second || void 0 }))
         });
         const title = `S Corporation Election Package \u2014 Record Copy \u2014 ${row.llc_name}`;
         const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength);
@@ -106217,8 +106249,13 @@ var sElectionDetailsSchema = external_exports.object({
       // The Social Security Administration never issues area numbers
       // 000, 666 or 900-999 (ssa.gov, "Social Security Number
       // Randomization": "excluding area numbers 000, 666 and 900-999").
-      ssn: external_exports.string().transform((s) => s.replace(/[\s-]/g, "")).refine((s) => s === "" || /^\d{9}$/.test(s), "Each owner's SSN must be 9 digits.").refine((s) => s === "" || !/^(000|666|9\d\d)/.test(s), "That is not a valid Social Security number \u2014 check the first three digits.")
-    })
+      ssn: external_exports.string().transform((s) => s.replace(/[\s-]/g, "")).refine((s) => s === "" || /^\d{9}$/.test(s), "Each owner's SSN must be 9 digits.").refine((s) => s === "" || !/^(000|666|9\d\d)/.test(s), "That is not a valid Social Security number \u2014 check the first three digits."),
+      // A jointly held interest (Adam, 6 Sep 2026): the co-owner's name
+      // and Social Security number ride on the same row.
+      joint: external_exports.enum(["", "tbe", "jtwros"]).optional().default(""),
+      name2: external_exports.string().max(200).optional().default(""),
+      ssn2: external_exports.string().optional().default("").transform((s) => s.replace(/[\s-]/g, "")).refine((s) => s === "" || /^\d{9}$/.test(s), "Each co-owner's SSN must be 9 digits.").refine((s) => s === "" || !/^(000|666|9\d\d)/.test(s), "That is not a valid Social Security number \u2014 check the first three digits.")
+    }).refine((sh) => !isJoint(sh.joint) || sh.name2.trim() !== "", { message: "Enter the co-owner's name on each jointly held row." })
   ).min(1, "At least one owner is required.").max(7, "The IRS form holds 7 owners \u2014 contact us for more."),
   certified: external_exports.literal(true, {
     errorMap: () => ({ message: "You must confirm the certification before submitting." })
@@ -106261,7 +106298,9 @@ async function postSElectionPackage(args) {
         address: sh.address,
         percentage: sh.percentage,
         dateAcquired: sh.dateAcquired,
-        ssn: ssns[i]
+        joint: sh.joint,
+        name2: sh.name2,
+        ...unpackSsns(ssns[i])
       }))
     });
   } catch (e) {
@@ -107251,9 +107290,12 @@ function registerPortalRoutes(app2) {
     }
     const seenNames = /* @__PURE__ */ new Set();
     for (const sh of d2.shareholders) {
-      const k = sh.name.trim().toLowerCase();
-      if (seenNames.has(k)) return c.json(err(`${sh.name} is listed more than once. Each owner appears on one row; spouses who own together share one row.`, "INVALID_INPUT"), 400);
-      seenNames.add(k);
+      const names = isJoint(sh.joint) ? [sh.name, sh.name2] : [sh.name];
+      for (const n of names) {
+        const k = n.trim().toLowerCase();
+        if (seenNames.has(k)) return c.json(err(`${n} is listed more than once. Each owner appears on one row; co-owners who hold an interest jointly share one row.`, "INVALID_INPUT"), 400);
+        seenNames.add(k);
+      }
     }
     let onFile = [];
     if (so2.ein_secret) {
@@ -107263,15 +107305,25 @@ function registerPortalRoutes(app2) {
         console.error("[service] s-election secret decrypt failed:", e);
       }
     }
+    const same = (a2, b2) => (a2 ?? "").trim().toLowerCase() === (b2 ?? "").trim().toLowerCase() && (a2 ?? "").trim() !== "";
     const ssns = [];
     for (let i = 0; i < d2.shareholders.length; i++) {
-      const typed = d2.shareholders[i].ssn;
-      const kept = d2.shareholders.length === onFile.length ? onFile[i] : "";
-      const use = typed || kept;
+      const sh = d2.shareholders[i];
+      const priorRow = prior?.shareholders?.[i];
+      const onFileRow = d2.shareholders.length === onFile.length ? unpackSsns(onFile[i]) : { ssn: "", ssn2: "" };
+      const kept = {
+        ssn: same(priorRow?.name, sh.name) ? onFileRow.ssn : "",
+        ssn2: same(priorRow?.name2, sh.name2) ? onFileRow.ssn2 : ""
+      };
+      const use = sh.ssn || kept.ssn;
       if (!/^\d{9}$/.test(use)) {
         return c.json(err("Each owner's SSN must be 9 digits.", "INVALID_INPUT"), 400);
       }
-      ssns.push(use);
+      const use2 = isJoint(sh.joint) ? sh.ssn2 || kept.ssn2 : "";
+      if (isJoint(sh.joint) && !/^\d{9}$/.test(use2)) {
+        return c.json(err(`Enter ${sh.name2 || "the co-owner"}'s Social Security number \u2014 every co-owner of a jointly held interest is a shareholder.`, "INVALID_INPUT"), 400);
+      }
+      ssns.push(packSsns(use, use2));
     }
     const merged = {
       ein: d2.einPending ? "" : d2.ein,
@@ -107286,13 +107338,19 @@ function registerPortalRoutes(app2) {
       eligibilityAcknowledgedAt: (/* @__PURE__ */ new Date()).toISOString(),
       filingDeadline: timing.deadline ?? void 0,
       documentId: prior?.documentId,
-      shareholders: d2.shareholders.map((s, i) => ({
-        name: s.name,
-        address: s.address,
-        percentage: s.percentage,
-        dateAcquired: s.dateAcquired,
-        ssnLast4: ssns[i].slice(-4)
-      }))
+      shareholders: d2.shareholders.map((s, i) => {
+        const parts = unpackSsns(ssns[i]);
+        return {
+          name: s.name,
+          address: s.address,
+          percentage: s.percentage,
+          dateAcquired: s.dateAcquired,
+          ssnLast4: parts.ssn.slice(-4),
+          joint: s.joint,
+          name2: isJoint(s.joint) ? s.name2 : "",
+          ssnLast4Second: parts.ssn2 ? parts.ssn2.slice(-4) : ""
+        };
+      })
     };
     if (!merged.dateIncorporated) {
       await db.query(
@@ -109370,7 +109428,7 @@ function registerAdminRoutes(app2) {
       officerName: details.officerName,
       officerTitle: details.officerTitle,
       phone: details.phone ?? "",
-      shareholders: details.shareholders.map((s, i) => ({ ...s, ssn: ssns[i] ?? "" }))
+      shareholders: details.shareholders.map((s, i) => ({ ...s, ...unpackSsns(ssns[i]) }))
     };
     try {
       const pdf = await buildSElectionPackage(input);

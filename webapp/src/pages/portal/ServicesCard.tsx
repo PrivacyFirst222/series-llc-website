@@ -1,3 +1,4 @@
+import type { JointKind } from "@/lib/jointOwner";
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { PlusCircle, Landmark, ShoppingBag, FileCheck2 } from "lucide-react";
@@ -14,6 +15,9 @@ export interface StoredShareholder {
   percentage: number;
   dateAcquired: string;
   ssnLast4: string;
+  joint?: JointKind;
+  name2?: string;
+  ssnLast4Second?: string;
 }
 
 export interface ServiceOrder {
@@ -80,6 +84,13 @@ export interface ShareholderRow {
   ssnLast4?: string;
   /** True once the address came from a verified suggestion. */
   verified?: boolean;
+  /** A jointly held interest (Adam, 6 Sep 2026): tenants by the entirety or
+   *  joint tenants with right of survivorship — the co-owner's name and
+   *  Social Security number ride on the same row. */
+  joint?: JointKind;
+  name2?: string;
+  ssn2?: string;
+  ssnLast4Second?: string;
 }
 
 

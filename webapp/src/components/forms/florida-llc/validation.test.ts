@@ -346,6 +346,28 @@ if (typeof console !== "undefined") {
   console.log("[portal] S election date slashes: 10 cases correct.");
 }
 
+// Jointly held interests on Form 2553 (Adam, 6 Sep 2026): both names with the
+// joint kind in column J, both Social Security numbers in column M.
+{
+  const { jointDisplayName, ssnColumnText, packSsns, unpackSsns } = await import("../../../lib/jointOwner");
+  const cases: [string, string, string][] = [
+    [jointDisplayName("John A. Smith", "", ""), "John A. Smith", "an individual owner is named alone"],
+    [jointDisplayName("John A. Smith", "Jane B. Smith", "tbe"), "John A. Smith and Jane B. Smith as Tenants by the Entirety", "tenants by the entirety are named together"],
+    [jointDisplayName("John A. Smith", "Jane B. Smith", "jtwros"), "John A. Smith and Jane B. Smith as Joint Tenants with Right of Survivorship", "joint tenants are named together"],
+    [ssnColumnText("123456789", "", ""), "123-45-6789", "one number for an individual"],
+    [ssnColumnText("123456789", "987654321", "tbe"), "123-45-6789 /\n987-65-4321", "both numbers for a joint row, stacked"],
+    [ssnColumnText("123456789", "987654321", "tbe", true), "XXX-XX-6789 /\nXXX-XX-4321", "the record copy masks both"],
+    [ssnColumnText("123456789", "987654321", ""), "123-45-6789", "a stray second number is ignored on an individual row"],
+    [packSsns("123456789", "987654321"), "123456789|987654321", "both numbers pack into one stored string"],
+    [unpackSsns("123456789|987654321").ssn2, "987654321", "the second number unpacks"],
+    [unpackSsns("123456789").ssn2, "", "an individual row unpacks with no second number"],
+  ];
+  for (const [got, want, label] of cases) {
+    if (got !== want) throw new Error(`FAIL joint owner: ${label} (got ${JSON.stringify(got)})`);
+  }
+  console.log("[2553] joint owners: 10 cases correct.");
+}
+
 // Run directly (bun run validation.test.ts): exit non-zero on failure. Printing
 // a warning and exiting 0 is how a broken fee calculation ships — the run has
 // to fail, not merely say something.

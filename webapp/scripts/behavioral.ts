@@ -691,6 +691,43 @@ async function main(): Promise<void> {
       expect(phoneHint !== null && !/[a-z]/i.test(phoneHint) && /\(\s+\)\s+-\s+/.test(phoneHint), "S election: the phone hint shows the shape only, no letters", phoneHint);
       const buildBtn = selDialog.locator("button").filter({ hasText: /Certify and build/ }).first();
       expect(await buildBtn.isDisabled(), "S election: the build button is disabled until both acknowledgments are ticked");
+      // What is blocking the build is spelled out above the button (Adam,
+      // 6 Sep 2026: "no error message or other method of telling the user
+      // exactly what is blocking").
+      const stillNeeded = () => selDialog.locator('[data-testid="still-needed"]').innerText().catch(() => "");
+      let needed = await stillNeeded();
+      expect(/Still needed/.test(needed) && !/filed your Articles/.test(needed), "S election: the list no longer names the date once it is typed", needed);
+      expect(/Owner 1: choose or enter the name/.test(needed) && /Tick the certification/.test(needed) && /Tick the deadline acknowledgment/.test(needed), "S election: the list names the owner, the acknowledgment and the certification", needed);
+      // A jointly held interest (Adam, 6 Sep 2026): pick the kind on the row,
+      // add the co-owner, and both SSN boxes appear with their names.
+      await selDialog.locator("button").filter({ hasText: /Add owner/ }).click();
+      await page.waitForTimeout(300);
+      const row2 = selDialog.locator("div.rounded-lg.border").filter({ has: page.locator('[aria-label="Owner"]') }).nth(1);
+      await choose(page, '[aria-label="How the interest is held"] >> nth=1', "tenants by the entirety");
+      await page.waitForTimeout(300);
+      expect((await row2.locator('[aria-label="Co-owner"]').count()) === 1, "S election: a joint row reveals the co-owner choice");
+      await choose(page, '[aria-label="Owner"] >> nth=1', "Other");
+      await row2.locator('input[placeholder="Owner\'s full legal name"]').fill("Bob Jones");
+      await choose(page, '[aria-label="Co-owner"]', "Other");
+      await row2.locator('input[aria-label="Co-owner\'s full legal name"]').fill("Susan Jones");
+      await page.waitForTimeout(300);
+      expect((await row2.locator('input[aria-label="SSN — Bob Jones"]').count()) === 1 && (await row2.locator('input[aria-label="SSN — Susan Jones"]').count()) === 1, "S election: a joint row has an SSN box for each co-owner, by name");
+      await selDialog.locator('input[placeholder="%"]').nth(0).fill("50");
+      await selDialog.locator('input[placeholder="%"]').nth(1).fill("51");
+      await page.waitForTimeout(300);
+      needed = await stillNeeded();
+      expect(/Ownership adds up to 101%, not 100%/.test(needed), "S election: the list says the percentages total 101%", needed);
+      expect(/Owner 2: enter the SSN for Susan Jones/.test(needed), "S election: the list asks for the co-owner's SSN by name", needed);
+      await selDialog.locator('input[placeholder="%"]').nth(1).fill("50");
+      await page.waitForTimeout(300);
+      needed = await stillNeeded();
+      expect(!/adds up to/.test(needed), "S election: fixing the percentages clears that line", needed);
+      await row2.locator('input[aria-label="SSN — Susan Jones"]').fill("234567890");
+      await page.waitForTimeout(300);
+      needed = await stillNeeded();
+      expect(!/SSN for Susan Jones/.test(needed), "S election: typing the co-owner's SSN clears that line", needed);
+      await row2.locator('[aria-label="Remove owner"]').click();
+      await page.waitForTimeout(300);
       const eff = selDialog.locator('input[aria-label="Election effective date"]').first();
       expect((await eff.getAttribute("type")) !== "date" && (await eff.inputValue()) === "", "S election: the effective date is a typed box that starts empty", await eff.inputValue());
       const atFormation = selDialog.locator('input[aria-label="Acquired at formation"]').first();

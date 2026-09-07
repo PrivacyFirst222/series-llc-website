@@ -262,7 +262,7 @@ export function OrdersInProgress({
               draft={selDrafts[detailsFor.id]}
               onDraftChange={(d) => {
                 setSelDrafts((prev) => ({ ...prev, [detailsFor.id]: d }));
-                saveDraft("sel", detailsFor.id, { ...d, rows: d.rows.map((r) => ({ ...r, ssn: "" })) });
+                saveDraft("sel", detailsFor.id, { ...d, rows: d.rows.map((r) => ({ ...r, ssn: "", ssn2: "" })) });
               }}
               onDone={() => {
                 setSelDrafts((prev) => { const next = { ...prev }; delete next[detailsFor.id]; return next; });

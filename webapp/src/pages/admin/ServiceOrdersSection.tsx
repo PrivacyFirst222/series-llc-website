@@ -1,3 +1,4 @@
+import { jointDisplayName } from "@/lib/jointOwner";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,9 @@ interface SElectionShareholderView {
   percentage: number;
   dateAcquired: string;
   ssnLast4: string;
+  joint?: "" | "tbe" | "jtwros";
+  name2?: string;
+  ssnLast4Second?: string;
 }
 
 export interface AdminServiceOrder {
@@ -218,12 +222,14 @@ export function ServiceFulfillDialog({
                 </div>
                 {(detailQuery.data?.details.shareholders ?? []).map((sh, i) => (
                   <div key={i} className="rounded-md border border-border px-3 py-2">
-                    <div className="font-medium">{sh.name} — {sh.percentage}%</div>
+                    <div className="font-medium">{jointDisplayName(sh.name, sh.name2, sh.joint)} — {sh.percentage}%</div>
                     <div className="text-xs text-muted-foreground">{sh.address}</div>
                     <div className="text-xs">
                       SSN:{" "}
                       <span className="font-mono-feature">
-                        {detailQuery.data?.ssns?.[i] ?? `•••-••-${sh.ssnLast4}`}
+                        {detailQuery.data?.ssns?.[i]
+                          ? detailQuery.data.ssns[i].replace("|", " / ")
+                          : `•••-••-${sh.ssnLast4}${sh.ssnLast4Second ? ` / •••-••-${sh.ssnLast4Second}` : ""}`}
                       </span>{" "}
                       · acquired {sh.dateAcquired || "at formation"}
                     </div>

@@ -17,6 +17,7 @@ import { hasProtectedSeriesPhrase } from "../src/components/forms/florida-llc/va
 import { assembleNewSeries } from "./new-series";
 import { easternDateIso, stampEastern, stampForFilename } from "./datetime";
 import { evaluate2553Timing } from "../src/lib/form2553Timing";
+import { type JointKind, isJoint, packSsns, unpackSsns } from "../src/lib/jointOwner";
 import { assembleOa, oaVersion, OA_TEMPLATE_VERSION, type OaInputs } from "./oa";
 import { renderMarkdownPdf, stampExistingPdf } from "./pdf-render";
 import { createSession, getSession, getAdminSession, destroySession, rateLimit, clientIp } from "./auth";
@@ -445,7 +446,7 @@ export interface SElectionStoredDetails {
   filingDeadline?: string;
   documentId?: string;
   purgedAt?: string;
-  shareholders?: { name: string; address: string; percentage: number; dateAcquired: string; ssnLast4: string }[];
+  shareholders?: { name: string; address: string; percentage: number; dateAcquired: string; ssnLast4: string; joint?: JointKind; name2?: string; ssnLast4Second?: string }[];
 }
 
 /** The edit/download window for one order. Drivers differ: Neon returns ISO
@@ -494,7 +495,7 @@ export async function purgeExpiredSElections(): Promise<number> {
           recordCopy: true,
           // Only the last four survive in the stored record — that is all the
           // record copy can show, and all it needs to.
-          shareholders: filled.shareholders.map((s) => ({ ...s, ssn: s.ssnLast4 })),
+          shareholders: filled.shareholders.map((s) => ({ ...s, ssn: s.ssnLast4, ssn2: s.ssnLast4Second || undefined })),
         });
         const title = `S Corporation Election Package — Record Copy — ${row.llc_name}`;
         const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength) as ArrayBuffer;
@@ -659,7 +660,18 @@ export const sElectionDetailsSchema = z
             .transform((s) => s.replace(/[\s-]/g, ""))
             .refine((s) => s === "" || /^\d{9}$/.test(s), "Each owner's SSN must be 9 digits.")
             .refine((s) => s === "" || !(/^(000|666|9\d\d)/.test(s)), "That is not a valid Social Security number — check the first three digits."),
-        }),
+          // A jointly held interest (Adam, 6 Sep 2026): the co-owner's name
+          // and Social Security number ride on the same row.
+          joint: z.enum(["", "tbe", "jtwros"]).optional().default(""),
+          name2: z.string().max(200).optional().default(""),
+          ssn2: z
+            .string()
+            .optional()
+            .default("")
+            .transform((s) => s.replace(/[\s-]/g, ""))
+            .refine((s) => s === "" || /^\d{9}$/.test(s), "Each co-owner's SSN must be 9 digits.")
+            .refine((s) => s === "" || !(/^(000|666|9\d\d)/.test(s)), "That is not a valid Social Security number — check the first three digits."),
+        }).refine((sh) => !isJoint(sh.joint) || sh.name2.trim() !== "", { message: "Enter the co-owner's name on each jointly held row." }),
       )
       .min(1, "At least one owner is required.")
       .max(7, "The IRS form holds 7 owners — contact us for more."),
@@ -723,7 +735,9 @@ export async function postSElectionPackage(args: {
         address: sh.address,
         percentage: sh.percentage,
         dateAcquired: sh.dateAcquired,
-        ssn: ssns[i],
+        joint: sh.joint,
+        name2: sh.name2,
+        ...unpackSsns(ssns[i]),
       })),
     });
   } catch (e) {
@@ -1901,11 +1915,15 @@ app.post("/portal/services/:id/s-election-details", async (c) => {
     }
   }
   // The same person listed twice would sign twice and double-count a share.
+  // A co-owner on a joint row counts as listed.
   const seenNames = new Set<string>();
   for (const sh of d.shareholders) {
-    const k = sh.name.trim().toLowerCase();
-    if (seenNames.has(k)) return c.json(err(`${sh.name} is listed more than once. Each owner appears on one row; spouses who own together share one row.`, "INVALID_INPUT"), 400);
-    seenNames.add(k);
+    const names = isJoint(sh.joint) ? [sh.name, sh.name2] : [sh.name];
+    for (const n of names) {
+      const k = n.trim().toLowerCase();
+      if (seenNames.has(k)) return c.json(err(`${n} is listed more than once. Each owner appears on one row; co-owners who hold an interest jointly share one row.`, "INVALID_INPUT"), 400);
+      seenNames.add(k);
+    }
   }
 
   // A blank SSN means "keep the one already on file" — the browser is never
@@ -1919,15 +1937,29 @@ app.post("/portal/services/:id/s-election-details", async (c) => {
       console.error("[service] s-election secret decrypt failed:", e);
     }
   }
+  // A number on file is kept only for the same person: a renamed owner (or
+  // co-owner) on the same row must supply their own number.
+  const same = (a: string | undefined, b: string | undefined) => (a ?? "").trim().toLowerCase() === (b ?? "").trim().toLowerCase() && (a ?? "").trim() !== "";
   const ssns: string[] = [];
   for (let i = 0; i < d.shareholders.length; i++) {
-    const typed = d.shareholders[i].ssn;
-    const kept = d.shareholders.length === onFile.length ? onFile[i] : "";
-    const use = typed || kept;
+    const sh = d.shareholders[i];
+    const priorRow = prior?.shareholders?.[i];
+    const onFileRow = d.shareholders.length === onFile.length ? unpackSsns(onFile[i]) : { ssn: "", ssn2: "" };
+    const kept = {
+      ssn: same(priorRow?.name, sh.name) ? onFileRow.ssn : "",
+      ssn2: same(priorRow?.name2, sh.name2) ? onFileRow.ssn2 : "",
+    };
+    const use = sh.ssn || kept.ssn;
     if (!/^\d{9}$/.test(use)) {
       return c.json(err("Each owner's SSN must be 9 digits.", "INVALID_INPUT"), 400);
     }
-    ssns.push(use);
+    // A joint row carries the co-owner's number too (Adam, 6 Sep 2026:
+    // "collect the SS# of all of them").
+    const use2 = isJoint(sh.joint) ? sh.ssn2 || kept.ssn2 : "";
+    if (isJoint(sh.joint) && !/^\d{9}$/.test(use2)) {
+      return c.json(err(`Enter ${sh.name2 || "the co-owner"}'s Social Security number — every co-owner of a jointly held interest is a shareholder.`, "INVALID_INPUT"), 400);
+    }
+    ssns.push(packSsns(use, use2));
   }
 
   // SSNs live only in the encrypted secret; the visible record keeps the last
@@ -1948,13 +1980,19 @@ app.post("/portal/services/:id/s-election-details", async (c) => {
     eligibilityAcknowledgedAt: new Date().toISOString(),
     filingDeadline: timing.deadline ?? undefined,
     documentId: prior?.documentId,
-    shareholders: d.shareholders.map((s, i) => ({
-      name: s.name,
-      address: s.address,
-      percentage: s.percentage,
-      dateAcquired: s.dateAcquired,
-      ssnLast4: ssns[i].slice(-4),
-    })),
+    shareholders: d.shareholders.map((s, i) => {
+      const parts = unpackSsns(ssns[i]);
+      return {
+        name: s.name,
+        address: s.address,
+        percentage: s.percentage,
+        dateAcquired: s.dateAcquired,
+        ssnLast4: parts.ssn.slice(-4),
+        joint: s.joint,
+        name2: isJoint(s.joint) ? s.name2 : "",
+        ssnLast4Second: parts.ssn2 ? parts.ssn2.slice(-4) : "",
+      };
+    }),
   };
 
   // Without the formation date the package cannot be built: the office

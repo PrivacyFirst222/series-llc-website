@@ -1527,6 +1527,35 @@ if (mint.status === 200) {
   );
   const sAdminDetail = await api(`/api/admin/services/${sId}`, { cookies: adminS.cookie });
   check("admin decrypts shareholder SSNs", sAdminDetail.body?.data?.ssns?.[0] === "123456789", sAdminDetail.body?.data);
+  // Jointly held interests (Adam, 6 Sep 2026): one row, both names, both
+  // Social Security numbers; a joint row without the co-owner's name or
+  // number is refused; a blank re-edit keeps both; a co-owner who is also
+  // listed on their own row is refused.
+  {
+    const jointRow = { name: "Maria Ortiz", address: "500 Bay Street, Miami, FL 33131", percentage: 100, dateAcquired: "", ssn: "123-45-6789", joint: "tbe", name2: "Carlos Ortiz", ssn2: "234-56-7890" };
+    const jointOk = await api(`/api/portal/services/${sId}/s-election-details`, { method: "POST", cookies: mPw.cookie, body: JSON.stringify({ ...okDetails, shareholders: [jointRow] }) });
+    check("a jointly held row with both SSNs is accepted and built", jointOk.status === 200 && Boolean(jointOk.body?.data?.documentId), jointOk.body);
+    const jointStored = await api(`/api/admin/services/${sId}`, { cookies: adminS.cookie });
+    const sh0 = jointStored.body?.data?.details?.shareholders?.[0];
+    check("the joint row keeps the co-owner's name and kind", sh0?.name2 === "Carlos Ortiz" && sh0?.joint === "tbe", sh0);
+    check("the joint row keeps both last-fours", sh0?.ssnLast4 === "6789" && sh0?.ssnLast4Second === "7890", sh0);
+    check("the office sees both numbers on the joint row", jointStored.body?.data?.ssns?.[0] === "123456789|234567890", jointStored.body?.data?.ssns);
+    const noName2 = await api(`/api/portal/services/${sId}/s-election-details`, { method: "POST", cookies: mPw.cookie, body: JSON.stringify({ ...okDetails, shareholders: [{ ...jointRow, name2: "" }] }) });
+    check("a joint row without the co-owner's name is refused", noName2.status === 400, noName2.body);
+    const noSsn2 = await api(`/api/portal/services/${sId}/s-election-details`, { method: "POST", cookies: mPw.cookie, body: JSON.stringify({ ...okDetails, shareholders: [{ ...jointRow, name2: "Ana Ortiz", ssn2: "" }] }) });
+    check("a joint row with a new co-owner but no second SSN is refused", noSsn2.status === 400 && /Ana Ortiz/.test(noSsn2.body?.error?.message ?? ""), noSsn2.body);
+    const renamedBlank = await api(`/api/portal/services/${sId}/s-election-details`, { method: "POST", cookies: mPw.cookie, body: JSON.stringify({ ...okDetails, shareholders: [{ ...jointRow, name: "Lucia Ortiz", ssn: "" }] }) });
+    check("a renamed owner with a blank SSN is refused — the number on file was someone else's", renamedBlank.status === 400, renamedBlank.body);
+    const keptBoth = await api(`/api/portal/services/${sId}/s-election-details`, { method: "POST", cookies: mPw.cookie, body: JSON.stringify({ ...okDetails, shareholders: [{ ...jointRow, ssn: "", ssn2: "" }] }) });
+    check("a blank re-edit keeps both numbers on a joint row", keptBoth.status === 200, keptBoth.body);
+    const keptStored = await api(`/api/admin/services/${sId}`, { cookies: adminS.cookie });
+    check("both numbers survive the blank re-edit", keptStored.body?.data?.ssns?.[0] === "123456789|234567890", keptStored.body?.data?.ssns);
+    const dupCo = await api(`/api/portal/services/${sId}/s-election-details`, { method: "POST", cookies: mPw.cookie, body: JSON.stringify({ ...okDetails, shareholders: [{ ...jointRow, percentage: 60 }, { name: "Carlos Ortiz", address: "500 Bay Street, Miami, FL 33131", percentage: 40, dateAcquired: "", ssn: "345-67-8901" }] }) });
+    check("a co-owner listed again on their own row is refused", dupCo.status === 400 && /Carlos Ortiz is listed more than once/.test(dupCo.body?.error?.message ?? ""), dupCo.body);
+    // Back to the single individual row the rest of this section expects.
+    const back = await api(`/api/portal/services/${sId}/s-election-details`, { method: "POST", cookies: mPw.cookie, body: JSON.stringify(okDetails) });
+    check("the row can go back to an individual owner", back.status === 200, back.body);
+  }
   check(
     "client-facing record keeps only SSN last 4",
     sAdminDetail.body?.data?.details?.shareholders?.[0]?.ssnLast4 === "6789",
