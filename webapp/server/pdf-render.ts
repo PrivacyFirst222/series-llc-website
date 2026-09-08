@@ -233,6 +233,12 @@ export async function renderMarkdownPdf(opts: {
 
   // Center the title block (everything before the first ARTICLE/RECITALS heading).
   let inTitle = opts.centerTitleBlock !== false;
+  // Whether a paragraph has been drawn inside the title block. A heading that
+  // comes AFTER one is a section heading, not a title line — "WHAT IS IN THIS
+  // PACKAGE" on the S election instruction sheet — and ends the block. The
+  // agreements' own title headings (OF, the company, its type) all come
+  // before their first paragraph, so they stay centered.
+  let titleSawParagraph = false;
 
   // Keep-tail-together: a forced [[pagebreak]] (the signature page, an
   // exhibit) can leave the last few lines before it stranded alone on an
@@ -281,7 +287,7 @@ export async function renderMarkdownPdf(opts: {
     }
     if (block.kind === "heading") {
       const isPart = /^(ARTICLE|RECITALS|SIGNATURES|EXHIBIT|SERIES EXHIBIT|ASSET SCHEDULE)/.test(block.text.trim());
-      if (isPart) inTitle = false;
+      if (isPart || titleSawParagraph) inTitle = false;
       const size = block.level === 1 ? 16 : block.level === 2 ? 13 : 12;
       const lineH = size + LINE_GAP;
       const lines = wrapSegs(fonts, [{ text: block.text, bold: true, italic: false }], width, size);
@@ -311,10 +317,20 @@ export async function renderMarkdownPdf(opts: {
         newPage();
         continue;
       }
-      const centered = inTitle;
       const size = BODY_SIZE;
       const lineH = size + LINE_GAP;
       const lines = wrapSegs(fonts, block.segs.map((s) => ({ ...s })), width, size);
+      // The title block is the short centered lines at the top — the title,
+      // "OF", the company, its type, the management line. It ends at the
+      // preamble ("THIS OPERATING AGREEMENT…"), which every master begins with
+      // THIS, or at any paragraph that runs past two lines; those are body
+      // copy and set full-width, justified (Adam, 8 Sep 2026: the first
+      // paragraph was centered because RECITALS, the first part heading, sits
+      // after it).
+      const paraText = block.segs.map((s) => s.text).join("");
+      if (inTitle && (/^THIS\b/.test(paraText.trim()) || lines.length > 2)) inTitle = false;
+      const centered = inTitle;
+      if (centered) titleSawParagraph = true;
       // Orphan control: never leave a single line of a multi-line paragraph
       // stranded at the foot of a page.
       if (lines.length > 2 && y - 2 * lineH < MARGIN) newPage();

@@ -47296,6 +47296,7 @@ async function renderMarkdownPdf(opts) {
     }
   };
   let inTitle = opts.centerTitleBlock !== false;
+  let titleSawParagraph = false;
   const TAIL_MAX_LINES = 16;
   const tailHeightBeforeBreak = (from) => {
     let h = 0;
@@ -47336,7 +47337,7 @@ async function renderMarkdownPdf(opts) {
     }
     if (block.kind === "heading") {
       const isPart = /^(ARTICLE|RECITALS|SIGNATURES|EXHIBIT|SERIES EXHIBIT|ASSET SCHEDULE)/.test(block.text.trim());
-      if (isPart) inTitle = false;
+      if (isPart || titleSawParagraph) inTitle = false;
       const size = block.level === 1 ? 16 : block.level === 2 ? 13 : 12;
       const lineH = size + LINE_GAP;
       const lines = wrapSegs(fonts, [{ text: block.text, bold: true, italic: false }], width, size);
@@ -47360,10 +47361,13 @@ async function renderMarkdownPdf(opts) {
         newPage();
         continue;
       }
-      const centered = inTitle;
       const size = BODY_SIZE;
       const lineH = size + LINE_GAP;
       const lines = wrapSegs(fonts, block.segs.map((s) => ({ ...s })), width, size);
+      const paraText = block.segs.map((s) => s.text).join("");
+      if (inTitle && (/^THIS\b/.test(paraText.trim()) || lines.length > 2)) inTitle = false;
+      const centered = inTitle;
+      if (centered) titleSawParagraph = true;
       if (lines.length > 2 && y - 2 * lineH < MARGIN) newPage();
       const leadIn = block.segs.map((s) => s.text).join("").trimEnd().endsWith(":");
       const isLabel = lines.length === 1 && isLabelParagraph(block.segs);

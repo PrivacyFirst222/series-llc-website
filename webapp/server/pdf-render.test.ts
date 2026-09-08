@@ -7,6 +7,8 @@
  *    with the text that follows it.
  *  - Every one of the sixteen agreement variants — eight masters, each as a
  *    standard and as a professional company — renders to a real PDF.
+ *  - The preamble is body copy, full-width and justified, while the title
+ *    lines above it stay centered (Adam, 8 Sep 2026).
  *
  * Where `pdftotext` is installed (it is on Adam's Mac; not on the CI runner)
  * the rendered pages are read back: the preamble's "of E2E" join, no
@@ -104,6 +106,16 @@ for (const version of versions) {
       const text = execSync(`pdftotext -layout "${file}" -`).toString();
       check(`read back: ${version}${professional ? " (professional)" : ""} preamble reads "of E2E Coastal"`, /\) of E2E Coastal/.test(text), text.split("\n").find((l) => l.includes('"Agreement")'))?.trim().slice(0, 120));
       check(`read back: ${version}${professional ? " (professional)" : ""} has no template marker`, !/\[\[|\*\*|\[COMPANY NAME\]/.test(text));
+      // Alignment on page 1, from the layout text: a centered line is indented
+      // from the left margin; a justified body line starts at it. The preamble
+      // must start where Recital A starts, and the title lines must not.
+      const page1 = text.split("\f")[0].split("\n");
+      const indent = (l: string) => l.length - l.trimStart().length;
+      const preambleLine = page1.find((l) => /THIS (AMENDED AND RESTATED )?OPERATING AGREEMENT/.test(l)) ?? "";
+      const recitalA = page1.find((l) => /^\s*A\. The Company was formed/.test(l)) ?? "";
+      const titleLine = page1.find((l) => /OPERATING AGREEMENT\s*$/.test(l) && !/THIS/.test(l)) ?? "";
+      check(`read back: ${version}${professional ? " (professional)" : ""} preamble starts at the body margin, like Recital A`, preambleLine !== "" && recitalA !== "" && indent(preambleLine) === indent(recitalA), { preamble: indent(preambleLine), recital: indent(recitalA) });
+      check(`read back: ${version}${professional ? " (professional)" : ""} title line stays centered`, titleLine !== "" && indent(titleLine) > indent(recitalA) + 10, { title: indent(titleLine), recital: indent(recitalA) });
       // A page that ends on a bare subsection label has stranded it.
       const label = /^\d+\.\d+ [A-Z][^.]*\.$/;
       const stranded = text.split("\f").map((p, i) => {
@@ -119,6 +131,25 @@ for (const version of versions) {
   }
 }
 check("all 16 variants rendered", rendered === 16, rendered);
+
+// 5. The S election instruction sheet's shape: a title, a bold name, an italic
+// line, then section headings and body. Only the first three are title.
+if (hasPdftotext) {
+  const sheet = "# S CORPORATION ELECTION PACKAGE\n\n**E2E Coastal Holdings, LLC**\n\n*Prepared by MyFloridaSeriesLLC — please read this page before signing anything.*\n\n## WHAT IS IN THIS PACKAGE\n\n1. This instruction sheet — keep it.\n\n2. A cover letter to the IRS — mail it with the form.\n\n## STEP 1 — CHECK THE FORM\n\nRead every line of the form against your records before you sign it, and tell us at once about anything that is wrong.";
+  const bytes = await renderMarkdownPdf({ markdown: sheet, watermark: null, title: "sheet" });
+  const file = join(outDir, "sheet.pdf");
+  writeFileSync(file, bytes);
+  const lines = execSync(`pdftotext -layout "${file}" -`).toString().split("\n");
+  const indent = (l: string) => l.length - l.trimStart().length;
+  const title = lines.find((l) => /S CORPORATION ELECTION PACKAGE/.test(l)) ?? "";
+  const name = lines.find((l) => /E2E Coastal Holdings, LLC/.test(l)) ?? "";
+  const section = lines.find((l) => /WHAT IS IN THIS PACKAGE/.test(l)) ?? "";
+  const item = lines.find((l) => /This instruction sheet/.test(l)) ?? "";
+  const body = lines.find((l) => /Read every line of the form/.test(l)) ?? "";
+  check("instruction sheet: the title and the company name are centered", indent(title) > 10 && indent(name) > 10, { title: indent(title), name: indent(name) });
+  check("instruction sheet: the first section heading is at the margin, not centered", section !== "" && indent(section) === indent(body), { section: indent(section), body: indent(body) });
+  check("instruction sheet: list items and body are at the margin", item !== "" && indent(item) === indent(body), { item: indent(item), body: indent(body) });
+}
 if (!hasPdftotext) console.log("(pdftotext not installed here — the read-back checks ran 0 of 48; they run on a machine with poppler)");
 
 console.log(`\n${checks} checks, ${failures} failures${hasPdftotext ? "" : " (read-back skipped)"}`);
