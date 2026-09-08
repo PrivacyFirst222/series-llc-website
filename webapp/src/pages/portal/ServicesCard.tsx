@@ -286,7 +286,7 @@ export function ServicesCard({ company }: { company?: string | null }) {
               <p className="mt-2 font-display text-lg text-trust">{money(data.pricing.einCents)}</p>
             </button>
           </DialogTrigger>
-          <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
+          <DialogContent className="sm:max-w-2xl">
             <DialogHeader>
               <DialogTitle className="sr-only">Federal EIN</DialogTitle>
               <DialogDescription asChild>

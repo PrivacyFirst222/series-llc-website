@@ -269,7 +269,7 @@ export function OrdersInProgress({
       >
         {/* An outside tap does nothing — only the X or Escape closes it, and
             what was typed survives the close. */}
-        <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl" onInteractOutside={(e) => e.preventDefault()}>
+        <DialogContent className="sm:max-w-2xl" onInteractOutside={(e) => e.preventDefault()}>
           <DialogHeader>
             <DialogTitle>S corporation election details</DialogTitle>
             <DialogDescription>
@@ -414,7 +414,7 @@ export function OrdersInProgress({
         open={detailsFor !== null && detailsFor.type === "ein"}
         onOpenChange={(v) => { if (!v) { snapshotEinDraft(); setDetailsFor(null); } }}
       >
-        <DialogContent className="max-h-[85vh] overflow-y-auto" onInteractOutside={(e) => e.preventDefault()}>
+        <DialogContent onInteractOutside={(e) => e.preventDefault()}>
           <DialogHeader>
             <DialogTitle>EIN application details</DialogTitle>
             <DialogDescription>

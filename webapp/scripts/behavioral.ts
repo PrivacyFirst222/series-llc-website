@@ -789,9 +789,16 @@ async function main(): Promise<void> {
       expect((await einAfterReload.locator('input[aria-label="Phone for IRS questions"]').inputValue()) === "(407) 210-6622", "EIN form: the typed phone survives a reload with the form open");
       expect((await einAfterReload.locator('[aria-label="Business category"]').innerText()).includes("Warehousing"), "EIN form: the chosen category survives a reload with the form open");
       expect((await einAfterReload.locator('input[name="tin"]').inputValue()) === "", "EIN form: the taxpayer number does NOT survive a reload");
-      await page.keyboard.press("Escape");
-      await page.locator('[role="dialog"]').first().waitFor({ state: "detached", timeout: 5000 }).catch(() => {});
-      await page.waitForTimeout(400);
+      // The client finishes and submits, so the office window later carries
+      // the assistant-order list (Adam, 7 Sep 2026: check boxes on it).
+      await einAfterReload.locator('input[name="responsibleFirst"]').fill("Casey");
+      await einAfterReload.locator('input[name="responsibleLast"]').fill("Gatecheck");
+      await einAfterReload.locator('input[name="tin"]').fill("123456789");
+      await einAfterReload.locator('label:has-text("I am authorized") input[type="checkbox"]').check({ force: true });
+      await einAfterReload.locator("button").filter({ hasText: /Certify and submit/ }).first().click();
+      await page.locator('[role="dialog"]').first().waitFor({ state: "detached", timeout: 8000 }).catch(() => {});
+      await page.waitForTimeout(600);
+      expect(/Federal EIN[\s\S]{0,200}(Submitted|In progress|Details received|received)/i.test(await page.locator('[data-testid="orders-in-progress"]').innerText()) || !/Provide details securely[\s\S]{0,40}Federal EIN/.test(await page.locator('[data-testid="orders-in-progress"]').innerText()), "EIN form: submitted, the row stops asking for details");
       const selRow = page.locator('[data-testid="orders-in-progress"] li').filter({ hasText: /S Corporation Election/ }).first();
       // The Form 2553 timing gate (Adam, 6 Sep 2026): the client types the
       // date the Division filed their Articles — from the Articles one card
@@ -999,7 +1006,25 @@ async function main(): Promise<void> {
       await einRow.click();
       await page.waitForTimeout(800);
       const einDialog = page.locator('[role="dialog"]').first();
-      await einDialog.locator('[data-testid="override-fulfill"]').check({ force: true });
+      // Adam, 7 Sep 2026: the window scrolls when taller than the screen, and
+      // each assistant-order row has a check box whose tick survives a reload.
+      const dialogBox = await einDialog.evaluate((el) => ({ scrollable: el.scrollHeight > el.clientHeight, overflow: getComputedStyle(el).overflowY, maxH: getComputedStyle(el).maxHeight }));
+      expect(dialogBox.overflow === "auto" && dialogBox.maxH !== "none", "admin: the EIN window can scroll when taller than the screen", dialogBox);
+      const tickBoxes = einDialog.locator('[data-testid="assistant-order"] input[type="checkbox"]');
+      expect((await tickBoxes.count()) >= 19, "admin: every assistant-order row has a check box", await tickBoxes.count());
+      await tickBoxes.nth(0).check({ force: true });
+      await tickBoxes.nth(3).check({ force: true });
+      await page.waitForTimeout(200);
+      await page.reload();
+      await page.waitForTimeout(1500);
+      await page.locator("main button").filter({ hasText: /^EIN/ }).first().click();
+      await page.waitForTimeout(800);
+      const ticksAfter = page.locator('[role="dialog"]').first().locator('[data-testid="assistant-order"] input[type="checkbox"]');
+      expect((await ticksAfter.nth(0).isChecked()) && (await ticksAfter.nth(3).isChecked()) && !(await ticksAfter.nth(1).isChecked()), "admin: ticks on the assistant-order rows survive a reload");
+      await shot(page, "admin-ein-window-ticks");
+      // With the client's details in, no override is needed; the box is only
+      // offered when the details are missing.
+      if ((await einDialog.locator('[data-testid="override-fulfill"]').count()) > 0) await einDialog.locator('[data-testid="override-fulfill"]').check({ force: true });
       await page.waitForTimeout(300);
       expect((await einDialog.locator('[data-testid="assigned-ein"]').count()) === 1, "admin: the EIN window has a box for the number beside the letter");
       await einDialog.locator('input[type="file"]').setInputFiles({ name: "cp575.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.4 CP 575 letter for the walk\n%%EOF") });

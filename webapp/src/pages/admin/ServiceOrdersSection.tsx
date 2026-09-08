@@ -1,6 +1,6 @@
 import { jointDisplayName } from "@/lib/jointOwner";
 import { fmtEinDisplay, isValidEin } from "@/lib/ein";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -94,6 +94,22 @@ export function ServiceFulfillDialog({
   // The EIN as issued, typed with the CP 575 so the 2553 can carry it
   // (Adam, 7 Sep 2026).
   const [assignedEin, setAssignedEin] = useState("");
+  // Adam, 7 Sep 2026: "check boxes to mark off the data entered." Ticks are
+  // kept on this browser per order, so closing the window or reloading
+  // keeps the office's place in the assistant.
+  const ticksKey = viewing ? `fpsllc-office-ticks:${viewing.id}` : "";
+  const [ticks, setTicks] = useState<Record<string, boolean>>({});
+  useEffect(() => {
+    if (!ticksKey) return;
+    try { setTicks(JSON.parse(localStorage.getItem(ticksKey) ?? "{}") as Record<string, boolean>); } catch { setTicks({}); }
+  }, [ticksKey]);
+  const toggleTick = (row: string) => {
+    setTicks((prev) => {
+      const next = { ...prev, [row]: !prev[row] };
+      try { localStorage.setItem(ticksKey, JSON.stringify(next)); } catch { /* memory only */ }
+      return next;
+    });
+  };
   const einOk = isValidEin(assignedEin);
 
   const detailQuery = useQuery({
@@ -283,7 +299,7 @@ export function ServiceFulfillDialog({
                 {detailQuery.data?.details.responsibleName ? (
                   /* Every answer, in the order the IRS assistant asks for it
                      (walked 7 Sep 2026), so the office types straight down. */
-                  <ol className="list-decimal space-y-0.5 pl-5 text-xs" data-testid="assistant-order">
+                  <ol className="list-decimal space-y-1 pl-5 text-xs" data-testid="assistant-order">
                     {(() => {
                       const d = detailQuery.data.details;
                       const yn = (v?: boolean) => (v ? "Yes" : "No");
@@ -316,7 +332,12 @@ export function ServiceFulfillDialog({
                         ["Anything else", d.activityDetail || "—"],
                       ];
                       return rows.map(([k, v]) => (
-                        <li key={k}><span className="text-muted-foreground">{k}:</span> {v}</li>
+                        <li key={k} className={ticks[k] ? "opacity-50" : ""}>
+                          <label className="flex cursor-pointer items-start gap-2">
+                            <input type="checkbox" checked={Boolean(ticks[k])} onChange={() => toggleTick(k)} aria-label={`Entered: ${k}`} className="mt-0.5 h-3.5 w-3.5 shrink-0 accent-trust" />
+                            <span className={ticks[k] ? "line-through" : ""}><span className="text-muted-foreground">{k}:</span> {v}</span>
+                          </label>
+                        </li>
                       ));
                     })()}
                   </ol>
