@@ -8,6 +8,7 @@
 // `external`.
 import { useEffect, useRef, useState } from "react";
 import { PHONE_HINT, formatPhone } from "@/lib/phone";
+import { tinProblem } from "@/lib/ssn";
 import { EIN_CATEGORIES, EIN_EMPLOYEE_HELP, EIN_REASONS, EIN_SPECIAL_QUESTIONS, MONTHS, einCategory } from "@/lib/einActivity";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ClipboardList, Lock, FileSignature } from "lucide-react";
@@ -55,6 +56,8 @@ export function OrdersInProgress({
   const [einActivity, setEinActivity] = useState<string>("Real Estate");
   const [einWageMonth, setEinWageMonth] = useState<string>("");
   const [einFollowUp, setEinFollowUp] = useState<string>("");
+  // The taxpayer box says what is wrong as it is typed (Adam, 7 Sep 2026).
+  const [einTinProblem, setEinTinProblem] = useState<string>("");
   // Opening the EIN form brings back what the draft held for the two answers
   // that are React state rather than form fields.
   useEffect(() => {
@@ -64,6 +67,7 @@ export function OrdersInProgress({
     setEinFollowUp(d?.activityFollowUp ?? "");
     setEinEmployees(d?.employeesExpected === "Yes");
     setEinWageMonth(d?.firstWageMonth ?? "");
+    setEinTinProblem("");
     // einDrafts is read once per opening; the draft is what was there then.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [detailsFor?.id]);
@@ -434,6 +438,13 @@ export function OrdersInProgress({
               const fd = new FormData(e.currentTarget);
               const num = (k: string) => Number(String(fd.get(k) ?? "0")) || 0;
               const yes = (k: string) => fd.get(k) === "Yes";
+              const tinNow = tinProblem(String(fd.get("tin") ?? ""), true) || (String(fd.get("tin") ?? "").replace(/\D/g, "") === "" ? "Enter the 9-digit SSN or ITIN." : "");
+              if (tinNow) {
+                setEinTinProblem(tinNow);
+                setError(tinNow);
+                (e.currentTarget.elements.namedItem("tin") as HTMLInputElement | null)?.focus();
+                return;
+              }
               submitDetails.mutate({
                 id: detailsFor.id,
                 payload: {
@@ -491,7 +502,12 @@ export function OrdersInProgress({
               </div>
               <div className="space-y-1.5">
                 <label className="text-sm font-medium">SSN or ITIN (9 digits)</label>
-                <Input name="tin" type="password" inputMode="numeric" autoComplete="off" placeholder="•••-••-••••" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.tin ?? ""} />
+                <Input name="tin" type="password" inputMode="numeric" autoComplete="off" placeholder="•••-••-••••" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.tin ?? ""}
+                  aria-invalid={einTinProblem ? true : undefined}
+                  className={einTinProblem ? "border-destructive focus-visible:ring-destructive" : undefined}
+                  onChange={(e) => setEinTinProblem(tinProblem(e.target.value, false))}
+                  onBlur={(e) => setEinTinProblem(tinProblem(e.target.value, true))} />
+                {einTinProblem ? <p className="text-xs text-destructive" data-testid="tin-problem">{einTinProblem}</p> : null}
               </div>
               <div className="space-y-1.5">
                 <label className="text-sm font-medium">Phone for IRS questions</label>

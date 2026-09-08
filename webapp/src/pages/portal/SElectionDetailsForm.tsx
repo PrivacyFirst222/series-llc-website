@@ -14,6 +14,7 @@ import { AddressAutocomplete } from "@/components/forms/florida-llc/AddressAutoc
 import type { ServiceOrder, ShareholderRow } from "./ServicesCard";
 import { formatPhone, isoToTypedDate, typedDateToIso, formatTypedDate } from "./typedDate";
 import { JOINT_KINDS, isJoint, type JointKind } from "@/lib/jointOwner";
+import { ssnProblem, ssnTypingProblem } from "@/lib/ssn";
 import { hasFirstAndLast } from "@/lib/personName";
 import { fmtEinDisplay } from "@/lib/ein";
 import { ELIGIBILITY_ACKNOWLEDGMENT, evaluate2553Timing, type TimingResult } from "@/lib/form2553Timing";
@@ -201,6 +202,11 @@ export function SElectionDetailsForm({
   });
 
   const pctTotal = rows.reduce((a, r) => a + (Number(r.percentage) || 0), 0);
+  // Which Social Security boxes the client has left, so a short number is
+  // called out on leaving and a bad area number the moment it is typed.
+  const [ssnLeft, setSsnLeft] = useState<Record<string, boolean>>({});
+  const ssnBoxProblem = (i: number, who: "first" | "second", value: string): string =>
+    ssnLeft[`${i}-${who}`] ? ssnProblem(value) : ssnTypingProblem(value);
 
   // Everything still standing between the client and the build, in the
   // form's own words (Adam, 6 Sep 2026: "there is no error message or other
@@ -227,9 +233,11 @@ export function SElectionDetailsForm({
     if (!(Number(r.percentage) > 0)) stillNeeded.push(`${who}: enter the ownership percentage`);
     if (r.atFormation === false && (r.dateAcquired.trim() === "" || typedDateToIso(r.dateAcquired) === null)) stillNeeded.push(`${who}: enter the date acquired as MM/DD/YYYY, or tick "Acquired at formation"`);
     if (!r.ssn && !r.ssnLast4) stillNeeded.push(`${who}: enter the SSN${r.name.trim() ? ` for ${r.name.trim()}` : ""}`);
+    else if (r.ssn && ssnTypingProblem(r.ssn)) stillNeeded.push(`${who}${r.name.trim() ? `, ${r.name.trim()}` : ""}: check the first three digits of the SSN`);
     else if (r.ssn && r.ssn.replace(/\D/g, "").length !== 9) stillNeeded.push(`${who}: the SSN needs 9 digits`);
     if (isJoint(r.joint)) {
       if (!r.ssn2 && !r.ssnLast4Second) stillNeeded.push(`${who}: enter the SSN${(r.name2 ?? "").trim() ? ` for ${(r.name2 ?? "").trim()}` : " for the co-owner"}`);
+      else if (r.ssn2 && ssnTypingProblem(r.ssn2)) stillNeeded.push(`${who}, co-owner ${(r.name2 ?? "").trim() || ""}: check the first three digits of the SSN`);
       else if (r.ssn2 && r.ssn2.replace(/\D/g, "").length !== 9) stillNeeded.push(`${who}: the co-owner's SSN needs 9 digits`);
     }
   });
@@ -431,10 +439,16 @@ export function SElectionDetailsForm({
         {rows.map((r, i) => {
           const ownerLabel = r.name.trim() || `Owner ${i + 1}`;
           const coLabel = (r.name2 ?? "").trim() || "co-owner";
-          const ssnBox = (who: "first" | "second") => (
+          const ssnBox = (who: "first" | "second") => {
+            const value = who === "first" ? r.ssn : (r.ssn2 ?? "");
+            const problem = ssnBoxProblem(i, who, value);
+            return (
+            <div className="space-y-1" data-testid="ssn-box">
             <Input
               type="password"
               inputMode="numeric"
+              aria-invalid={problem ? true : undefined}
+              onBlur={() => setSsnLeft((prev) => ({ ...prev, [`${i}-${who}`]: true }))}
               placeholder={
                 who === "first"
                   ? r.ssnLast4 ? `SSN on file •••-••-${r.ssnLast4}` : isJoint(r.joint) ? `SSN — ${ownerLabel}` : "SSN •••-••-••••"
@@ -446,12 +460,15 @@ export function SElectionDetailsForm({
                   : r.ssnLast4Second ? "Leave blank to keep the number already on file" : `${coLabel}'s Social Security number`
               }
               aria-label={who === "first" ? (isJoint(r.joint) ? `SSN — ${ownerLabel}` : "SSN") : `SSN — ${coLabel}`}
-              value={who === "first" ? r.ssn : (r.ssn2 ?? "")}
+              value={value}
               onChange={(e) => patchRow(i, who === "first" ? { ssn: e.target.value } : { ssn2: e.target.value })}
-              className="w-48"
+              className={problem ? "w-48 border-destructive focus-visible:ring-destructive" : "w-48"}
               autoComplete="off"
             />
-          );
+            {problem ? <p className="text-xs text-destructive" data-testid="ssn-problem">{problem}</p> : null}
+            </div>
+            );
+          };
           const nameChooser = (who: "first" | "second") => {
             const current = who === "first" ? r.name : (r.name2 ?? "");
             const others = who === "first" ? members : members.filter((m) => m.name !== r.name);

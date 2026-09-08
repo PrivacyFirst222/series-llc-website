@@ -778,7 +778,17 @@ async function main(): Promise<void> {
       await einForm.locator('label:has-text("I am authorized")').scrollIntoViewIfNeeded().catch(() => {});
       await shot(page, "ein-form-end");
       await einForm.locator('input[name="county"]').fill("Orange");
+      // The taxpayer box says what is wrong as it is left (Adam, 7 Sep 2026).
+      await einForm.locator('input[name="tin"]').fill("12345");
+      await einForm.locator('input[name="county"]').focus();
+      await page.waitForTimeout(200);
+      expect(/9 digits/.test(await einForm.locator('[data-testid="tin-problem"]').innerText().catch(() => "")) && (await einForm.locator('input[name="tin"][aria-invalid="true"]').count()) === 1, "EIN form: a short taxpayer number is called out under its own box, in red, on leaving it");
+      await einForm.locator('input[name="tin"]').scrollIntoViewIfNeeded().catch(() => {});
+      await shot(page, "ein-form-tin-problem");
       await einForm.locator('input[name="tin"]').fill("123456789");
+      await einForm.locator('input[name="county"]').focus();
+      await page.waitForTimeout(200);
+      expect((await einForm.locator('[data-testid="tin-problem"]').count()) === 0, "EIN form: the message clears once the number is right");
       await page.waitForTimeout(300);
       await page.reload();
       await page.waitForTimeout(1500);
@@ -895,7 +905,17 @@ async function main(): Promise<void> {
       await page.waitForTimeout(300);
       needed = await stillNeeded();
       expect(!/adds up to/.test(needed), "S election: fixing the percentages clears that line", needed);
+      // A bad area number is called out under the box the moment three digits
+      // are typed (Adam, 7 Sep 2026), and clears when corrected.
+      await row2.locator('input[aria-label="SSN — Susan Jones"]').pressSequentially("666", { delay: 20 });
+      await page.waitForTimeout(200);
+      expect(/check the first three digits/.test(await row2.locator('[data-testid="ssn-problem"]').first().innerText().catch(() => "")) && (await row2.locator('input[aria-label="SSN — Susan Jones"][aria-invalid="true"]').count()) === 1, "S election: 666 is called out under the box before the number is finished");
+      expect(/Susan Jones: check the first three digits/.test(await selDialog.innerText()), "S election: the still-needed list names the owner whose number is wrong");
+      await row2.locator('input[aria-label="SSN — Susan Jones"]').scrollIntoViewIfNeeded().catch(() => {});
+      await shot(page, "s-election-ssn-problem");
       await row2.locator('input[aria-label="SSN — Susan Jones"]').fill("234567890");
+      await page.waitForTimeout(200);
+      expect((await row2.locator('[data-testid="ssn-problem"]').count()) === 0, "S election: the message clears once the number is right");
       await page.waitForTimeout(300);
       needed = await stillNeeded();
       expect(!/SSN for Susan Jones/.test(needed), "S election: typing the co-owner's SSN clears that line", needed);
