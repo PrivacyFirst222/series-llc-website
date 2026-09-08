@@ -460,7 +460,6 @@ export function OrdersInProgress({
                   employeeCountAg: num("employeeCountAg"),
                   firstWageDate: einEmployees && einWageMonth ? `${String(fd.get("firstWageYear") ?? "").trim()}-${einWageMonth}` : "",
                   form944Annual: einEmployees ? (fd.get("form944Annual") === "Yes" ? true : fd.get("form944Annual") === "No" ? false : undefined) : undefined,
-                  closingMonth: String(fd.get("closingMonth") ?? "December"),
                 },
               });
             }}
@@ -671,19 +670,6 @@ export function OrdersInProgress({
                 <label className="text-xs font-medium text-muted-foreground">Anything else about what the business does (optional)</label>
                 <Input name="activityDetail" placeholder='e.g., "residential rental real estate"' autoComplete="off" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.activityDetail ?? ""} />
               </div>
-            </div>
-            <div className="space-y-1.5">
-              <label htmlFor="ein-closing-month" className="text-sm font-medium">Closing month of accounting year</label>
-              <Select name="closingMonth" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.closingMonth ?? "December"}>
-                <SelectTrigger id="ein-closing-month" className="w-48">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {MONTHS.map((m) => (
-                    <SelectItem key={m} value={m}>{m}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
             </div>
             <label className="flex items-start gap-2.5 rounded-lg border border-border bg-secondary/40 p-3">
               <input

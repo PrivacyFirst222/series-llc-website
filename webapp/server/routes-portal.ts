@@ -591,10 +591,6 @@ export const einDetailsSchema = z
     // $1,000 question — a required Yes/No, so undefined is "not answered".
     firstWageDate: z.string().regex(/^(19|20)\d{2}-(0[1-9]|1[0-2])$/).optional().or(z.literal("")).default(""),
     form944Annual: z.boolean().optional(),
-    closingMonth: z.enum([
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December",
-    ]),
     exciseApplies: z.boolean().optional().default(false),
     exciseDetail: z.string().max(300).optional().default(""),
     certified: z.literal(true, {
@@ -1879,7 +1875,9 @@ app.post("/portal/services/:id/ein-details", async (c) => {
     employeeCountAg: d.employeeCountAg,
     firstWageDate: d.firstWageDate,
     form944Annual: d.employeesExpected ? d.form944Annual : false,
-    closingMonth: d.closingMonth,
+    // Adam, 7 Sep 2026: the site tells EIN purchasers the year is the calendar
+    // year; the client is not asked, and the record carries December (P68).
+    closingMonth: "December",
     exciseApplies: d.exciseApplies,
     exciseDetail: d.exciseDetail,
     tinLast4: d.tin.slice(-4),

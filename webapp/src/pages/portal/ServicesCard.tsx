@@ -182,6 +182,9 @@ export function ServicesCard({ company }: { company?: string | null }) {
     "Questions about the technicalities? Check the User's Manual and ask your attorney or accountant.";
   const einPriceRest =
     "After payment, you'll provide the responsible party's details through a secure form here in the portal — never by email.";
+  // Adam, 7 Sep 2026: the calendar-year warning applies to the EIN as it does
+  // to the S election, at every point of purchase.
+  const einCalendarYear = "If we obtain the EIN, we will report a calendar tax year. If you need a fiscal year, do not purchase this service from us — seek the advice of your attorney or CPA.";
   const einAllCoveredText =
     "You already purchased a Federal EIN for the mothership LLC and every protected series. No further EINs are necessary or appropriate.";
   if (!data) return null;
@@ -278,7 +281,7 @@ export function ServicesCard({ company }: { company?: string | null }) {
               </div>
               <p className="mt-1 text-xs text-muted-foreground">
                 For the LLC or any protected series. Details are collected through a secure form
-                after checkout.
+                after checkout. <strong className="text-foreground">{einCalendarYear}</strong>
               </p>
               <p className="mt-2 font-display text-lg text-trust">{money(data.pricing.einCents)}</p>
             </button>
@@ -299,7 +302,8 @@ export function ServicesCard({ company }: { company?: string | null }) {
                   </p>
                   <p>
                     <strong className="text-foreground">{money(data.pricing.einCents)}.</strong>{" "}
-                    {einPriceRest}
+                    {einPriceRest}{" "}
+                    <strong className="text-foreground">{einCalendarYear}</strong>
                   </p>
                 </div>
               </DialogDescription>

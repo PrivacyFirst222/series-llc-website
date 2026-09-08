@@ -803,7 +803,6 @@ if (mint.status === 200) {
     form720: false,
     alcoholTobaccoFirearms: false,
     employeesExpected: false,
-    closingMonth: "December",
     certified: true,
   };
   const einBeforeFormed = await api(`/api/portal/services/${intakeEin.id}/ein-details`, {

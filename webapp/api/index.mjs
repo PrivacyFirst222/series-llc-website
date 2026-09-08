@@ -106317,20 +106317,6 @@ var einDetailsSchema = external_exports.object({
   // $1,000 question — a required Yes/No, so undefined is "not answered".
   firstWageDate: external_exports.string().regex(/^(19|20)\d{2}-(0[1-9]|1[0-2])$/).optional().or(external_exports.literal("")).default(""),
   form944Annual: external_exports.boolean().optional(),
-  closingMonth: external_exports.enum([
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December"
-  ]),
   exciseApplies: external_exports.boolean().optional().default(false),
   exciseDetail: external_exports.string().max(300).optional().default(""),
   certified: external_exports.literal(true, {
@@ -107382,7 +107368,9 @@ function registerPortalRoutes(app2) {
       employeeCountAg: d2.employeeCountAg,
       firstWageDate: d2.firstWageDate,
       form944Annual: d2.employeesExpected ? d2.form944Annual : false,
-      closingMonth: d2.closingMonth,
+      // Adam, 7 Sep 2026: the site tells EIN purchasers the year is the calendar
+      // year; the client is not asked, and the record carries December (P68).
+      closingMonth: "December",
       exciseApplies: d2.exciseApplies,
       exciseDetail: d2.exciseDetail,
       tinLast4: d2.tin.slice(-4),

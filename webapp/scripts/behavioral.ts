@@ -412,6 +412,10 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
   if (run.path === "new") {
     const addonText = await page.locator("main").innerText();
     expect(/we will elect a calendar tax year/i.test(addonText), `${run.key}: the S election add-on states the calendar tax year`, addonText.slice(0, 80));
+    // Adam, 7 Sep 2026: the same warning on the EIN add-on (P68).
+    expect(/If we obtain the EIN, we will report a calendar tax year/.test(addonText), `${run.key}: the EIN add-on states the calendar tax year`, addonText.slice(0, 80));
+    await page.locator("main").getByText(/Federal EIN \(\+\$50/).first().scrollIntoViewIfNeeded().catch(() => {});
+    await shot(page, `intake-addons-${run.key}`);
   }
   const wants: Array<[RegExp, boolean]> = [
     [/certificate of status/i, !!run.addons?.certificate],
@@ -684,6 +688,17 @@ async function main(): Promise<void> {
       const idx = (t: string) => order.heads.indexOf(t);
       expect(idx("Orders in progress") > idx("Your documents") && idx("Orders in progress") < idx("Operating agreement"), "actions: orders in progress sit beneath the documents and above the agreement", order.heads);
       expect(order.serviceRows === 0, "actions: Order services lists no orders beneath its tiles", order.serviceRows);
+      expect(/If we obtain the EIN, we will report a calendar tax year/.test(await page.locator("main").innerText()), "actions: the portal's Get a Federal EIN tile states the calendar tax year (P68)");
+      await page.locator("main").getByText(/Get a Federal EIN/).first().scrollIntoViewIfNeeded().catch(() => {});
+      await shot(page, "portal-ein-tile");
+      await page.locator("main button").filter({ hasText: /Get a Federal EIN/ }).first().click();
+      await page.waitForTimeout(600);
+      const einTileDialog = page.locator('[role="dialog"]').first();
+      expect(/If we obtain the EIN, we will report a calendar tax year/.test(await einTileDialog.innerText()), "actions: the Get a Federal EIN dialog states the calendar tax year beside the price (P68)");
+      await shot(page, "portal-ein-dialog");
+      await page.keyboard.press("Escape");
+      await page.locator('[role="dialog"]').first().waitFor({ state: "detached", timeout: 5000 }).catch(() => {});
+      await page.waitForTimeout(400);
 
       // The S election form itself (Adam, 6 Sep 2026): the optional dates are
       // typed boxes that stay empty — an iPad's date picker filled in today —
@@ -759,6 +774,9 @@ async function main(): Promise<void> {
       // answers are saved as they are typed, so a page that reloads with the
       // form open — never closed — brings every answer back but the
       // taxpayer number.
+      expect(!/Closing month/.test(await einForm.innerText()) && (await einForm.locator('#ein-closing-month').count()) === 0, "EIN form: no closing-month picker — the site promised a calendar year (P68)");
+      await einForm.locator('label:has-text("I am authorized")').scrollIntoViewIfNeeded().catch(() => {});
+      await shot(page, "ein-form-end");
       await einForm.locator('input[name="county"]').fill("Orange");
       await einForm.locator('input[name="tin"]').fill("123456789");
       await page.waitForTimeout(300);

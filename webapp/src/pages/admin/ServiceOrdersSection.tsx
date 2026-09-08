@@ -38,7 +38,7 @@ export interface AdminServiceOrder {
     activity?: string; activityFollowUp?: string; activityDetail?: string; county?: string;
     highwayVehicle?: boolean; gambling?: boolean; form720?: boolean; alcoholTobaccoFirearms?: boolean;
     employeesExpected?: boolean; employeeCountOther?: number; employeeCountAg?: number;
-    firstWageDate?: string; form944Annual?: boolean; closingMonth?: string;
+    firstWageDate?: string; form944Annual?: boolean;
     ein?: string; einPending?: boolean; einSource?: "letter"; assignedEin?: string; dateIncorporated?: string; effectiveDate?: string;
     officerName?: string; officerTitle?: string; phone?: string; shareholders?: SElectionShareholderView[];
     fulfilledByOverride?: boolean; overrideAt?: string;
@@ -314,7 +314,6 @@ export function ServiceFulfillDialog({
                         ["Business category", d.activity ?? "—"],
                         ["Category follow-up", d.activityFollowUp ? `${d.activityFollowUp}${d.activityFollowUp === "Other" && d.activityOtherDetail ? ` — ${d.activityOtherDetail}` : ""}` : "— none asked —"],
                         ["Anything else", d.activityDetail || "—"],
-                        ["Closing month (SS-4 only)", d.closingMonth ?? "December"],
                       ];
                       return rows.map(([k, v]) => (
                         <li key={k}><span className="text-muted-foreground">{k}:</span> {v}</li>

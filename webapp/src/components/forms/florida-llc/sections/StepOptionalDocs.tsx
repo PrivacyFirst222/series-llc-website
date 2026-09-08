@@ -104,7 +104,8 @@ export function StepOptionalDocs({ data, patch, errors }: StepProps) {
               the IRS. After checkout, you'll provide the responsible party's
               details through a secure form in your client portal — never enter
               a Social Security number on this page or in email. EINs for
-              individual series can be ordered from your portal at any time.
+              individual series can be ordered from your portal at any time.{" "}
+              <strong className="text-foreground">If we obtain the EIN, we will report a calendar tax year. If you need a fiscal year, do not purchase this service from us — seek the advice of your attorney or CPA.</strong>
             </span>
           </label>
         </FieldShell>
