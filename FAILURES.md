@@ -2905,6 +2905,24 @@ And the two halves were merged because separating them would have shown the firs
 
 The public step verified on the live site in the browser now. The three portal screens need a client session on production that I cannot create; Adam is asked for a way to see them, and the report says exactly which screens are seen on production and which are not.
 
+## P70 — The per-field error shipped, and the report again did not say to reload
+
+### THE FAILURE
+
+Adam, 7 Sep 2026, 9:45 PM, with a screenshot of the S election form: "I said I wanted an immediately indication that bad information was entered into a field and all you did was make the error message at the end more specific you fuckhead. When someone enters bad information into a field, when the leave the field it should be outlined in red with an error message shown."
+
+His screenshot: a co-owner's Social Security box holding eight digits, no red outline, no message beneath it, and the still-needed list at the bottom saying "Owner 2: the co-owner's SSN needs 9 digits." That is the form as it was before tonight's change. The change I shipped at 311dd7c does what he describes — a red outline and a message under the box on leaving it short, and at once on a bad area number — and the walk read both on the local build. What the report did not say, for the second time tonight after P66 recorded the omission, was that an open portal tab keeps the old build until reloaded. Whether his tab was old or the live form fails on his iPad I cannot see from here; the entry records that I do not know.
+
+### WHY IT HAPPENED
+
+Each report is composed from what changed, and the reload line is not about what changed, so it is not in the material I compose from. P66 recorded it as a thing to say; it did not become a thing the report contains, because nothing in how I write a report reaches back into the register — the register is where failures go, not where reports come from. So the lesson was learned in the sense of being written down and not in the sense of changing the next report.
+
+Underneath: the report is written at the moment the deploy shows success, and the deploy's success is the feeling I write from. In that feeling the site is updated. That the site is updated and his screen is not is exactly the seam P66 describes, and I am on the wrong side of it every time I write from the deploy.
+
+### FIXED BY
+
+The reload line is the first line of every report of a portal or admin change from now on, before the description of the change. The live behavior verified on WebKit locally with the scratchpad script; the live bundle checked for the per-field code.
+
 ## Process — the ones that let the substantive ones through
 
 **M1 · Verify the proposition you set out to verify, not the one underneath.** A
