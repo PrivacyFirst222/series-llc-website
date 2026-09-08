@@ -323,6 +323,15 @@ export function validateStep(
       data.correspondentEmail !== data.confirmCorrespondentEmail
     )
       e.confirmCorrespondentEmail = "Emails do not match.";
+    // A ticked mailing address must be a whole one, caught here at the box
+    // rather than by the server after Submit.
+    if (data.correspondentAddress) {
+      const a = data.correspondentAddress;
+      if (!a.address1) e["correspondentAddress.address1"] = "Street address required.";
+      if (!a.city) e["correspondentAddress.city"] = "City required.";
+      if (!a.state) e["correspondentAddress.state"] = "State required.";
+      if (!a.zip) e["correspondentAddress.zip"] = "ZIP required.";
+    }
   }
 
   // "optional": the S election add-on carries a required acknowledgment

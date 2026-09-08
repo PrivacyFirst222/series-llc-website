@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Check, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
@@ -49,14 +50,21 @@ interface StoredDraft {
 
 /** The pricing page's two "Get started" cards already asked new-vs-convert,
  *  and every button on the site routes through pricing — so the wizard skips
- *  its own copy of that question when the card's choice arrives in the URL.
- *  A direct /form-llc visit carries no param and still gets the question:
- *  hiding it must never leave filingPath unanswered. Read once at load: the
- *  choice should not evaporate when React Router touches the query string. */
-const PATH_PRESET: "NEW" | "CONVERT" | null = (() => {
-  const p = new URLSearchParams(window.location.search).get("path");
+ *  its own copy of that question when the card's choice arrives with the
+ *  navigation. A direct /form-llc visit carries no choice and still gets the
+ *  question: hiding it must never leave filingPath unanswered.
+ *
+ *  Read from the ROUTE when the form mounts — never once at module load. The
+ *  module loads with the app shell while the browser is still on /pricing,
+ *  where there is no query string, so a load-time read saw nothing and every
+ *  customer who clicked a card was asked the question again (audit,
+ *  8 Sep 2026, FORM-NAV-001). The card passes its choice both ways: as the
+ *  query string (survives a reload) and as navigation state. */
+function pathPresetFrom(search: string, state: unknown): "NEW" | "CONVERT" | null {
+  const fromState = (state as { path?: unknown } | null)?.path;
+  const p = new URLSearchParams(search).get("path") ?? (typeof fromState === "string" ? fromState : null);
   return p === "new" ? "NEW" : p === "convert" ? "CONVERT" : null;
-})();
+}
 
 function loadDraft(initialData?: FloridaLLCFormData): {
   data: FloridaLLCFormData;
@@ -103,6 +111,8 @@ export function FloridaLLCFormationForm({
   initialData,
   onSubmit,
 }: FormProps) {
+  const location = useLocation();
+  const PATH_PRESET = pathPresetFrom(location.search, location.state);
   const [data, setData] = useState<FloridaLLCFormData>(() => {
     const d = loadDraft(initialData).data;
     // The card the customer just clicked is their latest answer — it wins

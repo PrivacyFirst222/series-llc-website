@@ -144,6 +144,12 @@ export function StepCorrespondence({ data, patch, errors }: StepProps) {
           prefix="corres"
           value={data.correspondentAddress}
           onChange={(v) => patch({ correspondentAddress: v })}
+          errors={{
+            address1: errors["correspondentAddress.address1"],
+            city: errors["correspondentAddress.city"],
+            state: errors["correspondentAddress.state"],
+            zip: errors["correspondentAddress.zip"],
+          }}
         />
       ) : null}
     </div>

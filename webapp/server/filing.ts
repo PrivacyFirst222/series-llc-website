@@ -173,7 +173,7 @@ type PayloadLike = {
   members?: { memberList?: PersonLike[] };
   purpose?: { purposeType?: string; businessPurposeText?: string };
   effectiveDate?: { option?: string; requestedEffectiveDate?: string | null };
-  correspondence?: { name?: string; email?: string; phone?: string };
+  correspondence?: { name?: string; email?: string; phone?: string; address?: { address1?: string; address2?: string; city?: string; state?: string; zip?: string } | null };
   optionalDocuments?: { certificateOfStatus?: boolean; certifiedCopy?: boolean };
   certifications?: {
     articlesSignedBy?: string;
@@ -358,6 +358,10 @@ export function filingGroups(payload: unknown): FilingGroup[] {
     fields: [
       { key: "corrName", label: "Name", value: p.correspondence?.name ?? "" },
       { key: "corrEmail", label: "E-mail address (entered twice)", value: p.correspondence?.email ?? "" },
+      // Not a Sunbiz field: where the client asked us to send paper.
+      ...(p.correspondence?.address?.address1
+        ? [{ key: "corrMailing", label: "Mailing address for paper correspondence (ours, not Sunbiz's)", value: [p.correspondence.address.address1, p.correspondence.address.address2, `${p.correspondence.address.city}, ${p.correspondence.address.state} ${p.correspondence.address.zip}`].filter(Boolean).join(", ") }]
+        : []),
     ],
   });
 

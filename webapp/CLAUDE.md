@@ -1,10 +1,10 @@
 <stack>
   React 18 with Vite
   Use bun (not npm).
-  React Router v6 for routing.
+  React Router v7 for routing.
   React Query for server/async state.
   Tailwind v3 + shadcn/ui for styling and components.
-  Framer Motion for animations.
+  Tailwind transitions for animation (no animation library is installed).
   lucide-react for icons.
   Pre-installed shadcn/ui components.
 </stack>
@@ -49,7 +49,7 @@
 </bootstrapping>
 
 <routing>
-  React Router v6 for routing. Routes are manually registered in `src/App.tsx`.
+  React Router v7 for routing. Routes are manually registered in `src/App.tsx`.
   <adding_routes>
     1. Create a new page component in `src/pages/` (e.g., `src/pages/Settings.tsx`)
     2. Import it in `src/App.tsx`
@@ -171,8 +171,8 @@
   </ux>
 
   <animations>
-    Use Tailwind's built-in transitions for simple animations (hover, focus states).
-    Use Framer Motion for complex animations (page transitions, staggered reveals).
+    Use Tailwind's built-in transitions for animations (hover, focus states).
+    No animation library is installed; do not add one for a transition.
     Don't over-animate — subtle is usually better.
   </animations>
 </styling>

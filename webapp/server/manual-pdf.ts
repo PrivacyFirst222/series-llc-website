@@ -12,6 +12,7 @@
  * Typography follows the operating-agreement PDFs (Times, justified body).
  */
 import { PDFDocument, PDFFont, PDFPage, StandardFonts, rgb } from "@cantoo/pdf-lib";
+import { drawnWidth } from "./pdf-render";
 
 /** Bump when a change alters the LAYOUT of the rendered manual. The published
  *  copy is hash-gated on the master's text, so without this a renderer fix
@@ -135,7 +136,8 @@ export async function renderManualPdf(md: string): Promise<{ pdf: Uint8Array; pa
   };
   const width = PAGE_W - 2 * MARGIN;
   const fontFor = (s: Seg) => (s.bold && s.italic ? fonts.boldItalic : s.bold ? fonts.bold : s.italic ? fonts.italic : fonts.regular);
-  const segW = (s: Seg, size: number) => { try { return fontFor(s).widthOfTextAtSize(s.text, size); } catch { return s.text.length * size * 0.5; } };
+  // Glyph-by-glyph, as drawn — see drawnWidth in pdf-render.ts (DOC-SPACING-001).
+  const segW = (s: Seg, size: number) => drawnWidth(fontFor(s), s.text, size);
 
   const wrap = (segs: Seg[], w: number, size: number): Seg[][] => {
     const out: Seg[][] = [];

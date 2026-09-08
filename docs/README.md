@@ -63,7 +63,7 @@ catches the recurrence rather than the intention:
 | citation | an `s. 605.xxxx` that `chapter-605-notes.md` has no entry for, so an invented cite cannot pass silently |
 
 The consistency gate runs beside it: `docs-consistency.py` resolves every
-section the Owner's Manual and the Instructions cite against the five masters
+section the Owner's Manual and the Instructions cite against the eight masters
 and refuses a dangling reference. It reads numbers, not meaning — CLAUDE.md's
 rule about reading a document for its substance is the half no script can do.
 

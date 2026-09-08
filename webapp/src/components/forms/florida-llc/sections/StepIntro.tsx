@@ -8,14 +8,19 @@ interface StepProps {
 }
 
 export function StepIntro({ data, patch, errors }: StepProps) {
+  // A conversion customer's company already exists: the description and the
+  // mandatory acknowledgment say so, instead of asking them to affirm a
+  // new-formation statement that is false for them (audit, 8 Sep 2026,
+  // FORM-CONSENT-001).
+  const converting = data.filingPath === "CONVERT";
   return (
     <div className="space-y-6">
       <header className="space-y-2">
         <h2 className="font-display text-3xl">Eligibility & basics</h2>
         <p className="text-sm text-muted-foreground max-w-2xl">
-          This wizard collects the information needed to prepare Florida
-          Articles of Organization for a new domestic Florida series LLC. It is not a filing
-          and we do not provide legal, tax, or accounting advice.
+          {converting
+            ? "This wizard collects the information needed to prepare Protected Series Designations for an existing Florida LLC already on file with the Division of Corporations. It is not a filing and we do not provide legal, tax, or accounting advice."
+            : "This wizard collects the information needed to prepare Florida Articles of Organization for a new domestic Florida series LLC. It is not a filing and we do not provide legal, tax, or accounting advice."}
         </p>
       </header>
 
@@ -52,7 +57,9 @@ export function StepIntro({ data, patch, errors }: StepProps) {
           id="ack-domestic"
           checked={data.isFloridaDomesticEntityOnly}
           onChange={(v) => patch({ isFloridaDomesticEntityOnly: v })}
-          label="I understand this form is for forming a new domestic Florida series LLC only."
+          label={converting
+            ? "I understand this form is for an existing Florida LLC that is already on file with the Division of Corporations, and that it adds protected series to that company."
+            : "I understand this form is for forming a new domestic Florida series LLC only."}
           error={errors.isFloridaDomesticEntityOnly}
         />
         <AcknowledgeBox

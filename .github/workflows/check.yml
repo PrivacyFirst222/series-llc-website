@@ -1,6 +1,7 @@
 # The doorman: every push and pull request runs the complete verification —
-# typecheck, lint, both test suites (274 e2e checks against a server booted
-# on a virgin database), and all seven document gates — on a clean machine.
+# typecheck, lint, both test suites (the e2e run's several hundred checks
+# against a server booted on a virgin database), and all seven document
+# gates — on a clean machine.
 # Before this existed, the suite ran only when one person remembered to run
 # it on one Mac.
 #

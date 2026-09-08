@@ -176,7 +176,7 @@ the sentence sounds authoritative and is read as advice.
 
 The tell is the same as the fraction rule below. Say what you read and what you
 checked it against: "read all 71 lines of `oa-instructions.md`; checked every
-statement about the agreement against the five masters" is verifiable. "Updated
+statement about the agreement against the eight masters" is verifiable. "Updated
 the stale references" is not. **Adam: if a change to a document arrives without a
 statement of what was read in full and what it was checked against, reject it.**
 
@@ -409,15 +409,16 @@ This workspace contains a mobile app and backend server.
 
 <coordination>
   When a feature needs both frontend and backend:
-  1. Define Zod schemas for request/response in backend/src/types.ts (shared contracts)
-  2. Implement backend route using the schemas
-  3. Test backend with cURL (use $BACKEND_URL, never localhost)
-  4. Implement frontend, importing schemas from backend/src/types.ts to parse responses
+  1. Define Zod schemas for request/response beside the route in webapp/server/ (shared contracts)
+  2. Implement the route using the schemas
+  3. Test the route with cURL against the local API (port 3000)
+  4. Implement the frontend, importing the schema from webapp/server/ to parse responses
   5. Test the integration
 
   <shared_types>
-    All API contracts live in backend/src/types.ts as Zod schemas.
-    Both backend and frontend can import from this file — single source of truth.
+    API contracts live as Zod schemas in webapp/server/ beside their routes
+    (there is no separate types file; the old backend/ tree was deleted 2026-08-02).
+    Both server and frontend import from there — single source of truth.
   </shared_types>
 </coordination>
 

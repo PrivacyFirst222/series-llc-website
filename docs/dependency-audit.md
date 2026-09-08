@@ -11,7 +11,9 @@ moderate).
 
 UPDATE, 29 Aug 2026 — the major upgrades ran (Vite 5→8, React Router 6→7,
 their toolchains): 28 advisories became 15, and the runtime advisory count
-is ZERO. Both React Router advisories are fixed by version rather than
+is ZERO. (Recount, 8 Sep 2026: `bun audit` reports 17 — 12 high, 4 moderate,
+1 low — all in the ESLint, Tailwind, and Vite toolchains; no production
+runtime path reaches any of them.) Both React Router advisories are fixed by version rather than
 argued unreachable; the esbuild/rollup/postcss/nanoid advisories left with
 Vite 5. The router's v7 runtime was verified in the browser: navigation
 works and the migration warnings are gone.

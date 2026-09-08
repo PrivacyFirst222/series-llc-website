@@ -17,6 +17,9 @@
  * truth, not on toasts.
  */
 import { chromium, type Page } from "playwright";
+import { buildPayload } from "../src/components/forms/florida-llc/buildPayload";
+import { memberRowIsBlank } from "../src/components/forms/florida-llc/validation";
+import type { FloridaLLCFormData } from "../src/components/forms/florida-llc/types";
 import { spawn, type Subprocess } from "bun";
 import { mkdtempSync, rmSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -60,18 +63,37 @@ type RunConfig = {
   email?: string;
   /** From Certify, walk Back to the first step and replay Forward unfilled. */
   backWalk?: boolean;
+  /** Start on /pricing and click the card, as a customer does — no full-page
+   *  load of /form-llc (audit, 8 Sep 2026, FORM-NAV-001). */
+  viaPricing?: boolean;
+  /** A second alternate name. */
+  alternate2?: boolean;
+  /** A mailing address for the correspondence contact. */
+  correspondentMailing?: boolean;
+  /** Managers beyond the first (manager-managed only). */
+  extraManagers?: number;
+  /** Every optional field left blank; unused scaffold rows untouched. */
+  minimal?: boolean;
 };
 
 const RUNS: RunConfig[] = [
-  { key: "A", label: "new LLC, member-managed, our RA, probes + back-walk", path: "new", formationType: "DOMESTIC_LLC", management: "MEMBER_MANAGED", ra: "SERVICE", llcName: "Gate Run Alpha", designator: "LLC", probeValidation: true, backWalk: true, email: "gate-oa@e2e.test" },
+  { key: "A", label: "new LLC, member-managed, our RA, probes + back-walk, from the pricing card", path: "new", formationType: "DOMESTIC_LLC", management: "MEMBER_MANAGED", ra: "SERVICE", llcName: "Gate Run Alpha", designator: "LLC", probeValidation: true, backWalk: true, email: "gate-oa@e2e.test", viaPricing: true },
   { key: "B", label: "new LLC, member-managed, self RA, entity member", path: "new", formationType: "DOMESTIC_LLC", management: "MEMBER_MANAGED", ra: "SELF", llcName: "Gate Run Bravo", designator: "L.L.C.", memberEntity: true },
   { key: "C", label: "new PLLC, member-managed, self RA, phone-sized", path: "new", formationType: "PLLC", management: "MEMBER_MANAGED", ra: "SELF", llcName: "Gate Run Charlie", designator: "Professional Limited Liability Company", mobile: true },
   { key: "D", label: "new PLLC, manager-managed, our RA, EIN + S election", path: "new", formationType: "PLLC", management: "MANAGER_MANAGED", ra: "SERVICE", llcName: "Gate Run Delta", designator: "PLLC", addons: { ein: true, sElection: true }, email: "gate-actions@e2e.test" },
-  { key: "E", label: "conversion, member-managed, our RA", path: "convert", formationType: "DOMESTIC_LLC", management: "MEMBER_MANAGED", ra: "SERVICE", llcName: "Gate Run Echo, LLC", designator: "" },
+  { key: "E", label: "conversion, member-managed, our RA, from the pricing card", path: "convert", formationType: "DOMESTIC_LLC", management: "MEMBER_MANAGED", ra: "SERVICE", llcName: "Gate Run Echo, LLC", designator: "", viaPricing: true },
   { key: "F", label: "conversion, manager-managed, self RA", path: "convert", formationType: "DOMESTIC_LLC", management: "MANAGER_MANAGED", ra: "SELF", llcName: "Gate Run Foxtrot, LLC", designator: "" },
   { key: "G", label: "new LLC, exact name only, dated, certificates, 4 series", path: "new", formationType: "DOMESTIC_LLC", management: "MEMBER_MANAGED", ra: "SERVICE", llcName: "Gate Run Golf", designator: "Limited Liability Company", exactNameOnly: true, requestedEffectiveDate: "2026-10-01", addons: { certificate: true, certifiedCopy: true }, extraSeries: 3, specificPurpose: "Holding and leasing residential real estate" },
-  { key: "H", label: "new LLC, entity manager, separate mailing, we sign", path: "new", formationType: "DOMESTIC_LLC", management: "MANAGER_MANAGED", ra: "SERVICE", llcName: "Gate Run Hotel", designator: "LLC", managerEntity: true, separateMailing: true, weSign: true },
+  { key: "H", label: "new LLC, entity manager, separate mailing, correspondent mailing, we sign (audit H)", path: "new", formationType: "DOMESTIC_LLC", management: "MANAGER_MANAGED", ra: "SERVICE", llcName: "Gate Run Hotel", designator: "LLC", managerEntity: true, separateMailing: true, correspondentMailing: true, weSign: true },
   { key: "I", label: "new PLLC, manager-managed, self RA (P.L.L.C.)", path: "new", formationType: "PLLC", management: "MANAGER_MANAGED", ra: "SELF", llcName: "Gate Run India", designator: "P.L.L.C." },
+  // The audit's remaining scenarios (8 Sep 2026). Its "B" asked for an entity
+  // member on a manager-managed company, which this product never collects
+  // (ownership is the questionnaire's) — so L carries the rest of it.
+  { key: "J", label: "minimum: every optional field blank, exact name only (audit J)", path: "new", formationType: "DOMESTIC_LLC", management: "MEMBER_MANAGED", ra: "SERVICE", llcName: "Gate Run Juliet", designator: "LLC", exactNameOnly: true, minimal: true, email: "gate-min@e2e.test" },
+  { key: "K", label: "maximum: two alternates, five series, three managers, both mailings, every add-on, dated, we sign (audit K)", path: "new", formationType: "DOMESTIC_LLC", management: "MANAGER_MANAGED", ra: "SERVICE", llcName: "Gate Run Kilo", designator: "LLC", alternate2: true, extraSeries: 4, extraManagers: 2, separateMailing: true, correspondentMailing: true, addons: { ein: true, sElection: true, certificate: true, certifiedCopy: true }, requestedEffectiveDate: "2026-11-02", specificPurpose: "Holding and leasing residential real estate in Orange County", weSign: true, email: "gate-max@e2e.test" },
+  { key: "L", label: "new LLC, manager-managed, self RA, individual manager (audit B)", path: "new", formationType: "DOMESTIC_LLC", management: "MANAGER_MANAGED", ra: "SELF", llcName: "Gate Run Lima", designator: "LLC" },
+  { key: "M", label: "conversion, member-managed, keeps its own agent (audit E)", path: "convert", formationType: "DOMESTIC_LLC", management: "MEMBER_MANAGED", ra: "SELF", llcName: "Gate Run Mike, LLC", designator: "" },
+  { key: "N", label: "conversion to PLLC, manager-managed, switches to our RA (audit F)", path: "convert", formationType: "PLLC", management: "MANAGER_MANAGED", ra: "SERVICE", llcName: "Gate Run November, PLLC", designator: "" },
 ];
 // Every designator the product offers is exercised: LLC (A, H), L.L.C. (B),
 // Limited Liability Company (G), PLLC (D), P.L.L.C. (I), Professional
@@ -205,13 +227,35 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
     await route.fulfill({ status: resp.status, contentType: resp.headers.get("content-type") ?? "application/json", body });
   });
 
-  await page.goto(`http://localhost:${WEB_PORT}/form-llc?path=${run.path}`);
-  await page.evaluate(() => localStorage.clear());
-  await page.goto(`http://localhost:${WEB_PORT}/form-llc?path=${run.path}`);
-  await page.waitForSelector("main h2");
+  if (run.viaPricing) {
+    // As a customer arrives: the pricing page, then the card's link — an
+    // in-app navigation, never a full-page load of the form (FORM-NAV-001).
+    await page.goto(`http://localhost:${WEB_PORT}/pricing`);
+    await page.evaluate(() => localStorage.clear());
+    await page.goto(`http://localhost:${WEB_PORT}/pricing`);
+    await page.waitForSelector(`main a[href="/form-llc?path=${run.path}"]`);
+    await page.locator(`main a[href="/form-llc?path=${run.path}"]`).first().click();
+    await page.waitForURL(new RegExp(`/form-llc\\?path=${run.path}`), { timeout: 10000 });
+    // The pricing page's own h2s linger for a render; wait for a step heading.
+    await page.locator("main h2").filter({ hasText: /Eligibility|Getting started/ }).first().waitFor({ timeout: 10000 });
+    expect(!/forming a new LLC or converting/i.test(await page.locator("main").innerText()), `${run.key}: the card's choice is kept — the new-or-convert question is not asked again`, await stepHeading(page));
+  } else {
+    await page.goto(`http://localhost:${WEB_PORT}/form-llc?path=${run.path}`);
+    await page.evaluate(() => localStorage.clear());
+    await page.goto(`http://localhost:${WEB_PORT}/form-llc?path=${run.path}`);
+    await page.waitForSelector("main h2");
+  }
 
-  // Eligibility: formation type card + acknowledgments.
+  // Eligibility: formation type card + acknowledgments. A conversion reads
+  // its own wording — no "forming a new" statement to affirm (FORM-CONSENT-001).
   expect((await stepHeading(page)).includes("Eligibility"), `${run.key}: starts on Eligibility (path preset skipped step 1)`, await stepHeading(page));
+  const eligibilityText = await page.locator("main").innerText();
+  await shot(page, `eligibility-${run.key}`);
+  if (run.path === "convert") {
+    expect(/existing Florida LLC/i.test(eligibilityText) && !/forming a new domestic Florida series LLC only/.test(eligibilityText), `${run.key}: the conversion eligibility step speaks of the existing LLC, not a new formation`, eligibilityText.slice(0, 200));
+  } else {
+    expect(/forming a new domestic Florida series LLC only/.test(eligibilityText), `${run.key}: the new-formation eligibility step keeps its wording`, eligibilityText.slice(0, 200));
+  }
   await clickCard(page, run.formationType === "PLLC" ? "Domestic Florida PLLC" : "Domestic Florida LLC");
   await checkAllBoxes(page);
   await advance(page);
@@ -246,6 +290,7 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
       await page.waitForFunction(() => (document.getElementById("exact-name-only") as HTMLInputElement | null)?.checked === true, undefined, { timeout: 3000 });
     } else {
       await fill(page, "Alternate name #1", `${run.llcName} Backup`);
+      if (run.alternate2) await fill(page, "Alternate name #2", `${run.llcName} Reserve`);
     }
     await checkAllBoxes(page, ["exact-name-only"]);
     await advance(page);
@@ -283,7 +328,7 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
       await page.locator("main button").filter({ hasText: /^Add\b/ }).first().click();
       await page.waitForTimeout(300);
     }
-    await rows.nth(i).fill(`PS ${["Alpha", "Beta", "Gamma", "Delta"][i]}`);
+    await rows.nth(i).fill(`PS ${["Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta"][i]}`);
     await rows.nth(i).blur();
   }
   await advance(page);
@@ -340,6 +385,19 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
     await fill(page, "City", "Miami");
     await choose(page, "[id$='-state']", "FL — Florida");
     await fill(page, "ZIP", "33131");
+    for (let m = 1; m <= (run.extraManagers ?? 0); m++) {
+      await page.locator("main button", { hasText: /add manager/i }).first().click();
+      await page.waitForTimeout(300);
+      const names = ["Riley", "Jordan", "Avery"];
+      await page.getByLabel("First name", { exact: false }).nth(m).fill(names[m - 1] ?? `Manager${m}`);
+      await page.getByLabel("Last name", { exact: false }).nth(m).fill(`Manager${m + 1}`);
+      await page.getByLabel("Street address", { exact: false }).nth(m).fill(`${300 + m} Brickell Ave`);
+      await page.getByLabel("City", { exact: false }).nth(m).fill("Miami");
+      const stateTriggers = page.locator("main [id$='-state']");
+      await stateTriggers.nth(m).click();
+      await page.getByRole("option", { name: "FL — Florida", exact: true }).first().click();
+      await page.getByLabel("ZIP", { exact: false }).nth(m).fill("33131");
+    }
   } else {
     expect(/member/i.test(peopleHeading), `${run.key}: member-managed collects members`, peopleHeading);
     if (run.memberEntity) {
@@ -354,7 +412,7 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
     await choose(page, "[id$='-state']", "FL — Florida");
     await fill(page, "ZIP", "33139");
     const pct = page.getByLabel(/ownership/i).first();
-    if (await pct.isVisible().catch(() => false)) await pct.fill("100");
+    if (!run.minimal && (await pct.isVisible().catch(() => false))) await pct.fill("100");
   }
   await advance(page);
 
@@ -403,6 +461,15 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
   await fill(page, "Contact name", "Casey Gatecheck");
   await fill(page, "Email", run.email ?? "gate@e2e.test");
   await fill(page, "Confirm email", run.email ?? "gate@e2e.test");
+  if (run.correspondentMailing) {
+    await page.locator("main label", { hasText: /mailing address for paper correspondence/i }).locator('input[type="checkbox"]').first().check({ force: true });
+    await page.waitForTimeout(300);
+    await page.locator("#corres-address1").fill("PO Box 9090");
+    await page.locator("#corres-city").fill("Winter Park");
+    await page.locator("#corres-state").click();
+    await page.getByRole("option", { name: "FL — Florida", exact: true }).first().click();
+    await page.locator("#corres-zip").fill("32790");
+  }
   await advance(page);
 
   // Optional docs and add-ons. The S election add-on carries Adam's calendar
@@ -482,6 +549,14 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
   }
   await checkAllBoxes(page);
 
+  // What the form holds at the moment of submission, from its own autosave —
+  // the stored order is compared to THIS, field by field (TEST-GROUNDTRUTH-001).
+  const draftAtSubmit = await page.evaluate(() => {
+    const raw = localStorage.getItem("fl-llc-formation-draft-v1");
+    return raw ? (JSON.parse(raw) as { data?: unknown }).data ?? null : null;
+  }) as FloridaLLCFormData | null;
+  expect(draftAtSubmit !== null, `${run.key}: the form's autosaved draft exists at submission`);
+
   // Submit navigates to the (fake) checkout, so the page leaves the SPA —
   // success is the CAPTURED accepted POST, not any heading. A submit that
   // instead bounces to an earlier step is a real finding: dump its errors.
@@ -494,7 +569,20 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
     throw new Error(`${run.key}: submit did not produce an accepted order — landed on "${where}"; errors: ${errs.filter(Boolean).slice(0, 5).join(" | ")}; toast: ${toast.join(" ").slice(0, 200)}`);
   }
   await page.unroute("**/api/**");
-  return captured;
+  return { ...captured, draftAtSubmit };
+}
+
+/** Every path where two JSON values differ, for a field-by-field comparison. */
+function jsonDiff(expected: unknown, actual: unknown, path = ""): string[] {
+  if (expected === actual) return [];
+  if (typeof expected !== typeof actual || expected === null || actual === null || typeof expected !== "object") {
+    return [`${path || "(root)"}: expected ${JSON.stringify(expected)?.slice(0, 80)}, stored ${JSON.stringify(actual)?.slice(0, 80)}`];
+  }
+  if (Array.isArray(expected) !== Array.isArray(actual)) return [`${path}: array/object mismatch`];
+  const out: string[] = [];
+  const keys = new Set([...Object.keys(expected as object), ...Object.keys(actual as object)]);
+  for (const k of keys) out.push(...jsonDiff((expected as Record<string, unknown>)[k], (actual as Record<string, unknown>)[k], path ? `${path}.${k}` : k));
+  return out;
 }
 
 async function main(): Promise<void> {
@@ -551,7 +639,7 @@ async function main(): Promise<void> {
       if (/controlled|uncontrolled/i.test(m.text())) reactWarnings.push(m.text().slice(0, 120));
     });
     try {
-      const { orderId, totalCents } = await driveRun(page, run);
+      const { orderId, totalCents, draftAtSubmit } = await driveRun(page, run);
       orderIds.set(run.key, orderId);
       expect(reactWarnings.length === 0, `${run.key}: no controlled/uncontrolled React warnings`, reactWarnings[0]);
 
@@ -564,6 +652,38 @@ async function main(): Promise<void> {
       expect(payload, `${run.key}: stored order has a payload`);
       if (!payload) continue;
 
+      // The whole stored payload against what the form held at submission,
+      // built through the same builder the server runs (buildPayload). Any
+      // field dropped, changed, or invented shows up as a path.
+      if (draftAtSubmit) {
+        const expected = buildPayload({ ...draftAtSubmit, members: draftAtSubmit.members.filter((m) => !memberRowIsBlank(m as unknown as Record<string, unknown>)) });
+        // Two fields the server sets itself, by rule, not from the browser:
+        // the submission clock, and the members-in-Articles flag, which
+        // server/validation.ts fixes to "member-managed lists its members"
+        // (AMBR) whatever the browser sent.
+        expected.metadata = { ...expected.metadata, submittedAt: payload.metadata?.submittedAt };
+        expected.members = { ...expected.members, includeMembersInArticles: run.management === "MEMBER_MANAGED" };
+        const diffs = jsonDiff(expected, payload);
+        expect(diffs.length === 0, `${run.key}: stored payload equals the form's draft at submission, field by field (${Object.keys(expected).length} top-level fields)`, diffs.slice(0, 8));
+        // Hidden steps leave nothing behind: an acceptance the service signs
+        // itself, managers on a member-managed company, members on a
+        // manager-managed one.
+        if (run.ra === "SERVICE") expect(/FLORIDA PROTECTED SERIES/i.test(String(payload.registeredAgent?.acceptance?.acceptanceName ?? "")) && !/Gatecheck/.test(String(payload.registeredAgent?.acceptance?.acceptanceName ?? "")), `${run.key}: the hidden acceptance step carries the service's own acceptance, never the customer's`, payload.registeredAgent?.acceptance);
+        if (run.management === "MEMBER_MANAGED") expect((payload.management?.managersOrAuthorizedRepresentatives ?? []).filter((m: { role?: string }) => (m.role ?? "MGR") === "MGR").length === 0, `${run.key}: no manager leaked from the hidden managers step`, payload.management);
+        if (run.path === "new") expect(!draftAtSubmit.existingLlcName && !draftAtSubmit.sunbizDocumentNumber, `${run.key}: no conversion answers on a new formation`, { existing: draftAtSubmit.existingLlcName, doc: draftAtSubmit.sunbizDocumentNumber });
+        if (run.path === "convert") expect(!draftAtSubmit.desiredLlcName && !draftAtSubmit.alternateName1, `${run.key}: no new-name answers on a conversion`, { desired: draftAtSubmit.desiredLlcName, alt: draftAtSubmit.alternateName1 });
+        if (run.minimal) {
+          expect(payload.mailingAddress?.address1 === payload.principalOfficeAddress?.address1, `${run.key}: minimal — the mailing address is the principal address`, { mailing: payload.mailingAddress, principal: payload.principalOfficeAddress });
+          expect((payload.llcName?.alternateNames ?? []).length === 0, `${run.key}: minimal — no alternate names`, payload.llcName);
+          expect(!payload.optionalDocuments?.ein && !payload.optionalDocuments?.sElection && !payload.optionalDocuments?.certificateOfStatus && !payload.optionalDocuments?.certifiedCopy, `${run.key}: minimal — no add-ons`, payload.optionalDocuments);
+        }
+        if (run.alternate2) expect((payload.llcName?.alternateNames ?? []).some((n: string) => n.includes("Reserve")), `${run.key}: the second alternate name is stored`, payload.llcName);
+        if (run.correspondentMailing) expect(JSON.stringify(payload).includes("PO Box 9090"), `${run.key}: the correspondent's mailing address is stored`, payload.correspondent ?? payload.correspondence);
+        if (run.extraManagers) {
+          const mgrs = (payload.management?.managersOrAuthorizedRepresentatives ?? []).filter((m: { role?: string }) => (m.role ?? "MGR") === "MGR");
+          expect(mgrs.length === 1 + run.extraManagers, `${run.key}: every manager row added on screen is stored`, mgrs.length);
+        }
+      }
       expect(payload.filingPath === (run.path === "new" ? "NEW" : "CONVERT"), `${run.key}: stored filingPath matches the pricing card used`, payload.filingPath);
       expect(payload.formationType === run.formationType, `${run.key}: stored formationType matches the card clicked`, payload.formationType);
       expect(payload.management?.structure === run.management, `${run.key}: stored management structure matches`, payload.management?.structure);
@@ -1022,7 +1142,10 @@ async function main(): Promise<void> {
       // The EIN as issued is entered with the letter (Adam, 7 Sep 2026): the
       // box sits beside the attach control, the number is required, and the
       // client's S election form then shows it read-only.
-      const einRow = page.locator("main button").filter({ hasText: /^EIN/ }).first();
+      // Run D's card, by its company name: other runs now carry EIN orders
+      // too, and "the first EIN button" would be one of theirs.
+      const deltaCard = page.locator("main div.rounded-xl").filter({ hasText: /Gate Run Delta/ }).first();
+      const einRow = deltaCard.locator("button").filter({ hasText: /^EIN/ }).first();
       await einRow.click();
       await page.waitForTimeout(800);
       const einDialog = page.locator('[role="dialog"]').first();
@@ -1037,7 +1160,7 @@ async function main(): Promise<void> {
       await page.waitForTimeout(200);
       await page.reload();
       await page.waitForTimeout(1500);
-      await page.locator("main button").filter({ hasText: /^EIN/ }).first().click();
+      await page.locator("main div.rounded-xl").filter({ hasText: /Gate Run Delta/ }).first().locator("button").filter({ hasText: /^EIN/ }).first().click();
       await page.waitForTimeout(800);
       const ticksAfter = page.locator('[role="dialog"]').first().locator('[data-testid="assistant-order"] input[type="checkbox"]');
       expect((await ticksAfter.nth(0).isChecked()) && (await ticksAfter.nth(3).isChecked()) && !(await ticksAfter.nth(1).isChecked()), "admin: ticks on the assistant-order rows survive a reload");
@@ -1251,6 +1374,78 @@ async function main(): Promise<void> {
       expect(md.includes("$1,000 cash"), "OA: the contribution typed on screen is in Exhibit A");
       expect(md.includes("September 15, 2026"), "OA: the effective date chosen on screen is in the agreement");
       console.log("  ✓ OA journey: every on-screen answer survived into the assembled agreement");
+
+      // The audit's scenario I (8 Sep 2026): the couple plus a solo owner,
+      // fractional ownership, a transfer-on-death beneficiary, then the
+      // couple unpaired — each generation's stored inputs checked.
+      await page.goto(`http://localhost:${WEB_PORT}/portal/agreement`);
+      await page.waitForSelector("main h2, main h1");
+      await page.waitForTimeout(800);
+      await clickCard(page, /More than one owner/i);
+      await page.locator("main button").filter({ hasText: /^Continue/ }).first().click();
+      await page.waitForTimeout(1200);
+      await page.locator("main button").filter({ hasText: /^Add owner/ }).first().click();
+      await page.waitForTimeout(400);
+      await page.getByLabel("Full legal name of owner 3").fill("Drew Solo");
+      await page.getByLabel("Address of owner 3").fill("500 Brickell Ave, Miami, FL 33131");
+      await page.getByLabel("Address of owner 3").blur();
+      await page.waitForTimeout(600);
+      await page.locator("main button").filter({ hasText: /^Use this address/ }).first().click().catch(() => {});
+      await page.waitForTimeout(300);
+      // Fractions: the couple holds 2/3 as one unit, the solo owner 1/3.
+      await page.locator("main button").filter({ hasText: /^Fractions$/ }).first().click();
+      await page.waitForTimeout(300);
+      const numerators = page.locator('main input[aria-label$=" numerator"]');
+      const denominators = page.locator('main input[aria-label$=" denominator"]');
+      expect((await numerators.count()) === 2, "OA-I: a couple and a solo owner are two ownership units", await numerators.count());
+      await numerators.nth(0).fill("2"); await denominators.nth(0).fill("3");
+      await numerators.nth(1).fill("1"); await denominators.nth(1).fill("3");
+      const contribs = page.locator('main input[aria-label^="Contribution to the company"]');
+      for (let i = 0; i < (await contribs.count()); i++) if (!(await contribs.nth(i).inputValue())) await contribs.nth(i).fill(`$${(i + 1) * 500} cash`);
+      const tod = page.locator('main input[aria-label^="Transfer-on-death beneficiary for"]');
+      expect((await tod.count()) >= 1, "OA-I: a transfer-on-death box per ownership unit", await tod.count());
+      await tod.last().fill("Jordan Heir");
+      await checkAllBoxes(page);
+      genCaptured = null;
+      await page.locator("main button").filter({ hasText: /^Generate|^Regenerate/ }).first().click({ timeout: 15000 });
+      for (let i = 0; i < 40 && !genCaptured; i++) await page.waitForTimeout(500);
+      expect(!!genCaptured, "OA-I: three owners with fractions generate");
+      if (genCaptured) {
+        const cap2 = genCaptured as { generationId?: string };
+        const in2 = await fetch(`${API}/api/dev/oa-generation-inputs/${cap2.generationId}`).then((r) => r.json()) as { data?: { inputs?: Parameters<typeof assembleOa>[0] } };
+        const md2 = assembleOa(in2.data!.inputs!).markdown;
+        expect(md2.includes("Drew Solo"), "OA-I: the third owner is in the agreement");
+        expect(/2\/3/.test(md2) && /1\/3/.test(md2), "OA-I: the fractions typed on screen are in the agreement", md2.match(/\d\/\d/g)?.slice(0, 6));
+        expect(md2.includes("Jordan Heir"), "OA-I: the transfer-on-death beneficiary is in the agreement");
+        expect(/tenants by the entirety/i.test(md2), "OA-I: the couple is still paired");
+        // A couple is one ownership unit in the agreement's inputs: the pair
+        // named together, plus the solo owner.
+        const stored2 = in2.data!.inputs!.members.map((m) => m.name);
+        expect(stored2.length === 2 && stored2.some((n) => /Casey Gatecheck and Blair Gatecheck/.test(n)) && stored2.includes("Drew Solo"), "OA-I: the couple is one unit and the solo owner another in the stored inputs", stored2);
+      }
+      // Unpair the couple: three units, equal thirds, no entirety language.
+      await page.locator('main button[aria-label="Remove pairing"]').first().click();
+      await page.waitForTimeout(400);
+      page.once("dialog", (d) => d.accept());
+      await page.locator("main button").filter({ hasText: /^Equal ownership/ }).first().click();
+      await page.waitForTimeout(400);
+      expect((await page.locator('main input[aria-label$=" numerator"]').count()) === 3, "OA-I: unpaired, three ownership units", await page.locator('main input[aria-label$=" numerator"]').count());
+      await checkAllBoxes(page);
+      genCaptured = null;
+      await page.locator("main button").filter({ hasText: /^Generate|^Regenerate/ }).first().click({ timeout: 15000 });
+      for (let i = 0; i < 40 && !genCaptured; i++) await page.waitForTimeout(500);
+      expect(!!genCaptured, "OA-I: unpaired owners generate");
+      if (genCaptured) {
+        const cap3 = genCaptured as { generationId?: string };
+        const in3 = await fetch(`${API}/api/dev/oa-generation-inputs/${cap3.generationId}`).then((r) => r.json()) as { data?: { inputs?: Parameters<typeof assembleOa>[0] } };
+        const md3 = assembleOa(in3.data!.inputs!).markdown;
+        const stored3 = in3.data!.inputs!.members.map((m) => m.name);
+        expect(stored3.length === 3 && !stored3.some((n) => / and /.test(n)), "OA-I: after unpairing, three separate owners are stored", stored3);
+        expect(!md3.includes("Casey Gatecheck and Blair Gatecheck"), "OA-I: after unpairing, the couple is no longer named as one unit");
+        expect(md3.includes("Casey Gatecheck") && md3.includes("Blair Gatecheck") && md3.includes("Drew Solo"), "OA-I: all three owners named after unpairing");
+        expect((md3.match(/1\/3/g) ?? []).length >= 3, "OA-I: equal thirds after unpairing", md3.match(/\d\/\d/g)?.slice(0, 6));
+      }
+      console.log("  ✓ OA-I: couple plus solo owner, fractions, transfer on death, unpairing");
     } catch (e) {
       expect(false, `OA journey: ${String(e).slice(0, 300)}`);
     } finally {
@@ -1260,6 +1455,24 @@ async function main(): Promise<void> {
 
   // ---- Persistent error toast, behaviorally: it must outlive five seconds
   // and die only by its always-visible X.
+  // A confirmation link with no order reference says so (audit ORDER-REF-001).
+  console.log("\n▶ Confirmation page without a reference");
+  {
+    const page = await browser.newPage();
+    try {
+      await page.goto(`http://localhost:${WEB_PORT}/order/confirmed`);
+      await page.waitForTimeout(800);
+      const text = await page.locator("main").innerText();
+      expect(/This link has no order reference/.test(text) && !/waiting for your payment confirmation/i.test(text), "confirmation: a link with no reference says so instead of waiting forever", text.slice(0, 160));
+      expect((await page.locator('main a[href="/portal/login"]').count()) >= 1, "confirmation: the no-reference page links to the portal");
+      await shot(page, "order-confirmed-no-ref");
+    } catch (e) {
+      expect(false, `confirmation journey: ${String(e).slice(0, 200)}`);
+    } finally {
+      await page.close();
+    }
+  }
+
   console.log("\n▶ Persistent toast journey (contact form)");
   {
     const page = await browser.newPage();

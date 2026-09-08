@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { CheckCircle2, Clock, KeyRound, ScrollText } from "lucide-react";
+import { AlertCircle, CheckCircle2, Clock, KeyRound, ScrollText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 
@@ -65,7 +65,21 @@ export default function OrderConfirmed() {
   return (
     <section className="container-wide section-y">
       <div className="mx-auto max-w-xl rounded-3xl border border-border bg-card p-8 text-center lg:p-12">
-        {paid ? (
+        {!ref ? (
+          /* A link with no order reference can never resolve — say so instead
+             of waiting forever (audit, 8 Sep 2026, ORDER-REF-001). */
+          <>
+            <AlertCircle className="mx-auto h-12 w-12 text-muted-foreground" />
+            <h1 className="display mt-5 text-3xl lg:text-4xl">This link has no order reference.</h1>
+            <p className="mt-4 text-sm leading-relaxed text-muted-foreground" data-testid="no-ref">
+              If you just paid, the email we sent you carries the link to your portal. Otherwise
+              sign in to your portal to see your orders.
+            </p>
+            <Button asChild size="lg" className="mt-8 rounded-full">
+              <Link to="/portal/login">Sign in to your portal</Link>
+            </Button>
+          </>
+        ) : paid ? (
           <>
             <CheckCircle2 className="mx-auto h-12 w-12 text-trust" />
             <h1 className="display mt-5 text-3xl lg:text-4xl">Payment received.</h1>

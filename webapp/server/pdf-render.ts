@@ -23,7 +23,7 @@ export interface WatermarkInfo {
   generatedAt?: string;
 }
 
-interface Seg {
+export interface Seg {
   text: string;
   bold: boolean;
   italic: boolean;
@@ -90,11 +90,35 @@ export function parseMarkdown(md: string): Block[] {
   return blocks;
 }
 
-interface Fonts {
+export interface Fonts {
   regular: PDFFont;
   bold: PDFFont;
   italic: PDFFont;
   boldItalic: PDFFont;
+}
+
+/** Width of `text` as pdf-lib DRAWS it: one Tj operator advances by the sum
+ *  of the glyph widths and applies no kerning. `widthOfTextAtSize` on a whole
+ *  string applies the font's kerning pairs ("AV", "Te"), so it comes out
+ *  short — by 1.8pt over one preamble line — and every segment drawn after a
+ *  measured one landed early. That is how "of " and a bold company name
+ *  became "ofE2E" on the amended agreement's first page (audit, 8 Sep 2026,
+ *  DOC-SPACING-001). Measuring glyph by glyph makes measured == drawn, so
+ *  wrapping, justification, and segment joins all agree with the page. */
+const glyphWidthCache = new Map<PDFFont, Map<string, number>>();
+export function drawnWidth(font: PDFFont, text: string, size: number): number {
+  let cache = glyphWidthCache.get(font);
+  if (!cache) { cache = new Map(); glyphWidthCache.set(font, cache); }
+  let total = 0;
+  for (const ch of text) {
+    let w = cache.get(ch);
+    if (w === undefined) {
+      try { w = font.widthOfTextAtSize(ch, 1000); } catch { w = 500; }
+      cache.set(ch, w);
+    }
+    total += w;
+  }
+  return (total * size) / 1000;
 }
 
 function fontFor(f: Fonts, seg: Seg): PDFFont {
@@ -104,8 +128,14 @@ function fontFor(f: Fonts, seg: Seg): PDFFont {
   return f.regular;
 }
 
+/** A subsection label standing as its own paragraph: one bold run such as
+ *  "3.6 Company as Owner." — a heading in all but markup. */
+export function isLabelParagraph(segs: Seg[]): boolean {
+  return segs.length === 1 && segs[0].bold && !segs[0].italic && /^\d+\.\d+ .*\.$/.test(segs[0].text.trim());
+}
+
 /** Wrap inline segments into lines that fit `width` at `size`. */
-function wrapSegs(f: Fonts, segs: Seg[], width: number, size: number): Seg[][] {
+export function wrapSegs(f: Fonts, segs: Seg[], width: number, size: number): Seg[][] {
   const lines: Seg[][] = [];
   let cur: Seg[] = [];
   let curW = 0;
@@ -113,12 +143,7 @@ function wrapSegs(f: Fonts, segs: Seg[], width: number, size: number): Seg[][] {
     const words = seg.text.split(/(\s+)/).filter((w) => w.length > 0);
     for (const word of words) {
       const font = fontFor(f, seg);
-      let w: number;
-      try {
-        w = font.widthOfTextAtSize(word, size);
-      } catch {
-        w = word.length * size * 0.5;
-      }
+      const w = drawnWidth(font, word, size);
       if (curW + w > width && cur.length > 0 && word.trim() !== "") {
         lines.push(cur);
         cur = [];
@@ -171,13 +196,7 @@ export async function renderMarkdownPdf(opts: {
     if (y - h < MARGIN) newPage();
   };
 
-  const segWidth = (seg: Seg, size: number): number => {
-    try {
-      return fontFor(fonts, seg).widthOfTextAtSize(seg.text, size);
-    } catch {
-      return seg.text.length * size * 0.5;
-    }
-  };
+  const segWidth = (seg: Seg, size: number): number => drawnWidth(fontFor(fonts, seg), seg.text, size);
 
   /** `justifyTo` stretches inter-word gaps to that width (full justification).
    *  Omitted, the line is drawn at its natural width. */
@@ -270,7 +289,7 @@ export async function renderMarkdownPdf(opts: {
       need(lines.length * lineH + 2 * (BODY_SIZE + LINE_GAP) + 10);
       y -= 8;
       for (const ln of lines) {
-        const textW = ln.reduce((acc, s) => acc + fonts.bold.widthOfTextAtSize(s.text, size), 0);
+        const textW = ln.reduce((acc, s) => acc + drawnWidth(fonts.bold, s.text, size), 0);
         const x = inTitle ? MARGIN + (width - textW) / 2 : MARGIN;
         drawSegLine(page, ln, x, y - size, size);
         y -= lineH;
@@ -309,7 +328,12 @@ export async function renderMarkdownPdf(opts: {
         .join("")
         .trimEnd()
         .endsWith(":");
-      if (leadIn) need(lines.length * lineH + 2 * lineH + 6);
+      // Label control: a subsection label that stands as its own paragraph
+      // ("**3.6 Company as Owner.**") is a heading in all but markup, so it is
+      // kept with two lines of what follows, as headings are. Three of eight
+      // agreements had it alone at a page foot (audit, 8 Sep 2026, DOC-PAG-001).
+      const isLabel = lines.length === 1 && isLabelParagraph(block.segs);
+      if (leadIn || isLabel) need(lines.length * lineH + 2 * lineH + 6);
       for (let li = 0; li < lines.length; li++) {
         const ln = lines[li];
         // Widow control: if breaking here would strand the final line alone on
@@ -392,7 +416,7 @@ function stampPageNumbers(doc: PDFDocument, font: PDFFont): void {
   pages.forEach((p, i) => {
     const { width } = p.getSize();
     const pn = `Page ${i + 1} of ${pages.length}`;
-    const w = font.widthOfTextAtSize(pn, 7.5);
+    const w = drawnWidth(font, pn, 7.5);
     p.drawText(pn, { x: width - MARGIN - w, y: FOOTER_Y, size: 7.5, font, color: rgb(0.55, 0.57, 0.6) });
   });
 }
@@ -412,7 +436,7 @@ function stampFooters(doc: PDFDocument, font: PDFFont, wm: WatermarkInfo): void 
     }
     p.drawText(text, { x: MARGIN, y: FOOTER_Y, size: 7.5, font, color: grey });
     const pn = `Page ${i + 1} of ${total}`;
-    const w = font.widthOfTextAtSize(pn, 7.5);
+    const w = drawnWidth(font, pn, 7.5);
     p.drawText(pn, { x: width - MARGIN - w, y: FOOTER_Y, size: 7.5, font, color: grey });
   });
 }

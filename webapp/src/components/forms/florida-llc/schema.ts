@@ -203,6 +203,10 @@ export const formationFormSchema = z.object({
   correspondentEmail: z.string().email("Enter a valid email"),
   confirmCorrespondentEmail: z.string().email("Enter a valid email"),
   correspondentPhone: z.string().optional().or(z.literal("")),
+  // "Add a mailing address for paper correspondence" — optional, and when
+  // given it must be a whole address. Absent from this schema until 8 Sep
+  // 2026, so the server's parse silently dropped what the client typed.
+  correspondentAddress: addressSchema.optional(),
 
   orderCertificateOfStatus: z.boolean(),
   orderCertifiedCopy: z.boolean(),
