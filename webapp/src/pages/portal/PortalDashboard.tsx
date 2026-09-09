@@ -78,6 +78,7 @@ function DocList({
         return (
           <li
             key={d.id}
+            data-testid="document-row"
             className="flex flex-col items-start gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
           >
             <div className="min-w-0">

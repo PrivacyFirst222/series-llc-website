@@ -1473,6 +1473,59 @@ async function main(): Promise<void> {
     }
   }
 
+  // The order of "Your documents" on a portal that holds both certificates
+  // (Adam, 9 Sep 2026: the certified copy sits just under the Articles).
+  if (orderIds.has("G")) {
+    console.log("\n▶ Documents order journey (run G, with both certificates)");
+    const page = await browser.newPage();
+    try {
+      const gOrderId = orderIds.get("G")!;
+      const detail = await fetch(`${API}/api/admin/orders/${gOrderId}`, { headers: { Cookie: adminCookie } }).then((r) => r.json()) as { data?: { series?: { name: string }[] } };
+      const pdf = (tag: string) => new File([new TextEncoder().encode(`%PDF-1.4 ${tag}\n%%EOF`)], `${tag}.pdf`, { type: "application/pdf" });
+      const fd = new FormData();
+      fd.set("articles", pdf("articles"));
+      fd.append("psd", pdf("psd"));
+      fd.append("psdSeries", JSON.stringify((detail.data?.series ?? []).map((x) => x.name)));
+      fd.set("certStatus", pdf("certstatus"));
+      fd.set("certifiedCopy", pdf("certcopy"));
+      const formed = await fetch(`${API}/api/admin/orders/${gOrderId}/formation-documents`, { method: "POST", headers: { Cookie: adminCookie }, body: fd });
+      expect(formed.status === 200, "documents: run G's company is formed with both certificates", await formed.text().catch(() => ""));
+      const email = "gate@e2e.test";
+      const mint = await fetch(`${API}/api/dev/mint-reset-token`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) }).then((r) => r.json()) as { data?: { token?: string } };
+      if (!mint.data?.token) throw new Error("no reset token for run G's client");
+      await fetch(`${API}/api/auth/set-password`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: mint.data.token, password: "gate-pass-12345" }) });
+      await page.route("**/api/**", async (route) => {
+        const url = new URL(route.request().url());
+        const resp = await fetch(`${API}${url.pathname}${url.search}`, {
+          method: route.request().method(),
+          headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "" },
+          body: route.request().postDataBuffer() ?? undefined,
+        });
+        const body = await resp.text();
+        const setCookie = resp.headers.get("set-cookie");
+        await route.fulfill({ status: resp.status, contentType: resp.headers.get("content-type") ?? "application/json", body, headers: setCookie ? { "set-cookie": setCookie } : undefined });
+      });
+      await page.goto(`http://localhost:${WEB_PORT}/portal/login`);
+      await page.getByLabel("Email").fill(email);
+      await page.getByLabel("Password").fill("gate-pass-12345");
+      await page.locator("main button").filter({ hasText: /^Sign in/ }).first().click();
+      await page.waitForURL(/\/portal(?!\/login)/, { timeout: 10000 });
+      await page.goto(`http://localhost:${WEB_PORT}/portal?company=${gOrderId}`);
+      await page.waitForTimeout(1500);
+      await page.locator('[toast-close]').first().click().catch(() => {});
+      const titles = await page.locator('[data-testid="document-row"]').allInnerTexts();
+      const firstLines = titles.map((t) => t.split("\n")[0].trim());
+      expect(/^Articles of Organization/.test(firstLines[0] ?? ""), "documents: the Articles are first", firstLines);
+      expect(/^Certified Copy of the Articles/.test(firstLines[1] ?? ""), "documents: the certified copy sits directly under the Articles", firstLines);
+      expect(/^Protected Series Designation/.test(firstLines[2] ?? ""), "documents: the Designation follows the certified copy", firstLines);
+      await shot(page, "portal-documents-certified-copy");
+    } catch (e) {
+      expect(false, `documents order journey: ${String(e).slice(0, 300)}`);
+    } finally {
+      await page.close();
+    }
+  }
+
   console.log("\n▶ Persistent toast journey (contact form)");
   {
     const page = await browser.newPage();
