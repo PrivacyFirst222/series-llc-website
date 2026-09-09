@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { QuestionCard } from "./OaQuestionCard";
+import { AddressAutocomplete } from "@/components/forms/florida-llc/AddressAutocomplete";
 import { FORM_LABEL, type CoupleAnswer, type MemberAnswer, type SeriesAnswer, type Unit } from "./oaTypes";
 import { api } from "@/lib/api";
 
@@ -118,12 +119,26 @@ export function OwnersCard({ owners, isMulti, ownerCountMismatch, patchMember, r
                     value={m.name ?? ""}
                     onChange={(e) => patchMember(i, { name: e.target.value })}
                   />
-                  <Input
+                  {/* The same type-ahead box the S election form and the
+                      intake use (Adam, 9 Sep 2026: "This address form isn't
+                      showing address suggestions"). Choosing a suggestion
+                      fills the whole address; a typed one still gets the
+                      Postal Service check on leaving the box. */}
+                  <AddressAutocomplete
                     aria-label={`Address of owner ${i + 1}`}
                     placeholder="Street address, city, state ZIP"
                     value={m.address ?? ""}
-                    onChange={(e) => {
-                      patchMember(i, { address: e.target.value });
+                    onChangeText={(text) => {
+                      patchMember(i, { address: text });
+                      setAddrWarnings((prev) => {
+                        if (!(i in prev)) return prev;
+                        const next = { ...prev };
+                        delete next[i];
+                        return next;
+                      });
+                    }}
+                    onSelect={(sug) => {
+                      patchMember(i, { address: `${sug.address1}, ${sug.city}, ${sug.state} ${sug.zip}` });
                       setAddrWarnings((prev) => {
                         if (!(i in prev)) return prev;
                         const next = { ...prev };

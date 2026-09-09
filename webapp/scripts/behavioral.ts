@@ -1321,9 +1321,16 @@ async function main(): Promise<void> {
         await page.waitForTimeout(100);
       }
       const borrow = page.getByLabel(/Borrowing limit/i).first();
-      if (await borrow.isVisible().catch(() => false)) await borrow.fill("25000");
+      if (await borrow.isVisible().catch(() => false)) {
+        await borrow.fill("25000");
+        // Dollar boxes show commas as typed (Adam, 9 Sep 2026).
+        expect((await borrow.inputValue()) === "25,000", "OA: the borrowing limit shows commas as typed", await borrow.inputValue());
+      }
       const capCap = page.getByLabel(/capital call cap/i).first();
-      if (await capCap.isVisible().catch(() => false)) await capCap.fill("10000");
+      if (await capCap.isVisible().catch(() => false)) {
+        await capCap.fill("10000");
+        expect((await capCap.inputValue()) === "10,000", "OA: the capital call cap shows commas as typed", await capCap.inputValue());
+      }
       const contrib = page.locator('main input[aria-label^="Contribution to the company"]').first();
       await contrib.fill("$1,000 cash");
       await page.getByLabel("Effective date").fill("2026-09-15");
@@ -1345,6 +1352,14 @@ async function main(): Promise<void> {
       }
       const cap = genCaptured as { generationId?: string; version?: string };
       expect(cap.version === "member", "OA: two member-managed owners get the multi-member member-managed master", cap.version);
+      // Generating returns the client to the portal, where the agreement is
+      // in Your documents (Adam, 9 Sep 2026).
+      await page.waitForURL(/\/portal(\?|$)/, { timeout: 10000 }).catch(() => {});
+      await page.waitForTimeout(1200);
+      expect(/\/portal(\?|$)/.test(page.url()), "OA: generating returns the client to the portal", page.url());
+      const docRows = (await page.locator('[data-testid="document-row"]').allInnerTexts()).map((t) => t.split("\n")[0].trim());
+      expect(docRows.some((t) => /Operating Agreement/.test(t)), "OA: the generated agreement is listed in Your documents", docRows);
+      await shot(page, "portal-after-generate");
 
       // Ground truth: re-assemble from the STORED inputs, exactly as e2e does.
       const inputsRes = await fetch(`${API}/api/dev/oa-generation-inputs/${cap.generationId}`).then((r) => r.json()) as { data?: { inputs?: unknown } };
@@ -1424,6 +1439,13 @@ async function main(): Promise<void> {
         expect(stored2.length === 2 && stored2.some((n) => /Casey Gatecheck and Blair Gatecheck/.test(n)) && stored2.includes("Drew Solo"), "OA-I: the couple is one unit and the solo owner another in the stored inputs", stored2);
       }
       // Unpair the couple: three units, equal thirds, no entirety language.
+      // Generating went back to the portal; reopen the questionnaire.
+      await page.goto(`http://localhost:${WEB_PORT}/portal/agreement`);
+      await page.waitForSelector("main h2, main h1");
+      await page.waitForTimeout(800);
+      await clickCard(page, /More than one owner/i);
+      await page.locator("main button").filter({ hasText: /^Continue/ }).first().click();
+      await page.waitForTimeout(1200);
       await page.locator('main button[aria-label="Remove pairing"]').first().click();
       await page.waitForTimeout(400);
       page.once("dialog", (d) => d.accept());

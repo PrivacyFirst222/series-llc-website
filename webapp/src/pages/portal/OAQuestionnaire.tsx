@@ -1,6 +1,6 @@
 import { hasFirstAndLast } from "@/lib/personName";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Navigate, Link, useSearchParams } from "react-router-dom";
+import { Navigate, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight, Download, FileText, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -53,11 +53,20 @@ function todayIso(): string {
 
 
 
+/** Dollar boxes show commas as typed (Adam, 9 Sep 2026); the answer stays a
+ *  plain number, which the agreement prints as "$20,000". */
+const withCommas = (n: number | undefined): string => (n === undefined || Number.isNaN(n) ? "" : Math.round(n).toLocaleString("en-US"));
+const dollarsFrom = (typed: string): number | undefined => {
+  const digits = typed.replace(/\D/g, "");
+  return digits === "" ? undefined : Number(digits);
+};
+
 export default function OAQuestionnaire() {
   const [oaSearchParams] = useSearchParams();
   const oaCompany = oaSearchParams.get("company");
   const oaCq = oaCompany ? `?company=${oaCompany}` : "";
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [a, setA] = useState<Answers>({});
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState("");
@@ -137,6 +146,10 @@ export default function OAQuestionnaire() {
       queryClient.invalidateQueries({ queryKey: ["portal-oa"] });
       queryClient.invalidateQueries({ queryKey: ["portal-documents"] });
       setError("");
+      // The finished agreement is in Your documents — take the client there
+      // (Adam, 9 Sep 2026: "it should take you back to the portal with the
+      // operating agreement shown in the document list").
+      navigate(`/portal${oaCq}`);
     },
     onError: (e) => setError(e instanceof ApiError ? e.message : "Something went wrong."),
   });
@@ -529,13 +542,10 @@ export default function OAQuestionnaire() {
                     <div className="flex items-center gap-2 pl-6">
                       <span className="text-sm">Annual per-owner cap: $</span>
                       <Input
-                        type="number"
+                        inputMode="numeric"
                         aria-label="Annual per-owner capital call cap in dollars"
-                        min={0}
-                        value={a.capitalCallCap ?? ""}
-                        onChange={(e) =>
-                          patch({ capitalCallCap: e.target.value === "" ? undefined : Number(e.target.value) })
-                        }
+                        value={withCommas(a.capitalCallCap)}
+                        onChange={(e) => patch({ capitalCallCap: dollarsFrom(e.target.value) })}
                         className="w-32"
                       />
                     </div>
@@ -604,13 +614,10 @@ export default function OAQuestionnaire() {
                 <div className="flex items-center gap-2">
                   <span className="text-sm">Debt above $</span>
                   <Input
-                    type="number"
+                    inputMode="numeric"
                     aria-label="Borrowing limit in dollars"
-                    min={0}
-                    value={a.borrowingThreshold ?? ""}
-                    onChange={(e) =>
-                      patch({ borrowingThreshold: e.target.value === "" ? undefined : Number(e.target.value) })
-                    }
+                    value={withCommas(a.borrowingThreshold)}
+                    onChange={(e) => patch({ borrowingThreshold: dollarsFrom(e.target.value) })}
                     className="w-32"
                   />
                   <span className="text-sm">

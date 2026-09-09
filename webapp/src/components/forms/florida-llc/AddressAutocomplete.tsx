@@ -17,6 +17,9 @@ interface AddressAutocompleteProps {
   value: string;
   placeholder?: string;
   "aria-invalid"?: boolean;
+  "aria-label"?: string;
+  /** Runs when the client leaves the box — a typed address gets its check then. */
+  onBlur?: () => void;
   onChangeText: (text: string) => void;
   onSelect: (s: AddressSuggestion) => void;
 }
