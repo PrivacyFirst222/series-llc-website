@@ -2330,6 +2330,15 @@ if (mint.status === 200) {
   );
   check("long-dissolved entity is CLEAR", old?.verdict === "clear" && old?.conflicts?.length === 0, old);
   check("unknown name is CLEAR with no conflicts", never?.verdict === "clear" && never?.conflicts?.length === 0, never);
+  // The conversion step's lookup (Adam, 9 Sep 2026): the company on file
+  // under a name comes back with its document number; a stranger comes back
+  // as no match while the lookup is still available.
+  const found = await api("/api/entity-lookup", { method: "POST", body: JSON.stringify({ name: "E2E Gator Groves LLC" }) });
+  check("entity lookup returns the company on file with its document number", found.status === 200 && found.body?.data?.available === true && found.body?.data?.matches?.[0]?.docNumber === "E2ETEST00002" && found.body?.data?.matches?.[0]?.name === "E2E GATOR GROVES LLC", found.body);
+  const none = await api("/api/entity-lookup", { method: "POST", body: JSON.stringify({ name: "E2E Never Existed Ventures" }) });
+  check("entity lookup reports no match for a name not on file", none.status === 200 && none.body?.data?.available === true && Array.isArray(none.body?.data?.matches) && none.body.data.matches.length === 0, none.body);
+  const short = await api("/api/entity-lookup", { method: "POST", body: JSON.stringify({ name: "ab" }) });
+  check("entity lookup refuses a name shorter than three characters", short.status === 400, short.body);
   const empty = await api("/api/name-check", { method: "POST", body: JSON.stringify({ names: [] }) });
   check("empty name list rejected", empty.status === 400);
   // Order-time enforcement: a taken or held name cannot be bought (Adam's

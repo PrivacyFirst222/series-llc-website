@@ -101042,6 +101042,19 @@ function conflictReason(input, existing) {
 function detailUrl(existing) {
   return "https://search.sunbiz.org/Inquiry/CorporationSearch/SearchResults?InquiryType=EntityName&SearchTerm=" + encodeURIComponent(existing);
 }
+async function lookupEntities(input) {
+  const key = normalizeEntityName(input);
+  if (!key) return [];
+  const db = await getDb();
+  const rows = await db.query(
+    `SELECT doc_number, name, status, filing_type
+     FROM fl_entities WHERE norm_key = $1
+     ORDER BY (status = 'A') DESC, last_txn_date DESC NULLS LAST
+     LIMIT 10`,
+    [key]
+  );
+  return rows.map((r) => ({ docNumber: r.doc_number, name: r.name, status: r.status === "A" ? "Active" : "Inactive", filingType: r.filing_type }));
+}
 async function checkName(input) {
   const key = normalizeEntityName(input);
   if (!key) return { input, verdict: "clear", conflicts: [] };
@@ -108299,6 +108312,23 @@ function registerPaymentRoutes(app2) {
       });
     }
     return c.json({ data: { ok: true } });
+  });
+  app2.post("/entity-lookup", async (c) => {
+    if (!await rateLimit(`entitylookup:${clientIp(c)}`, 60, 6e5)) {
+      return c.json(err("Too many lookups. Try again in a few minutes.", "RATE_LIMITED"), 429);
+    }
+    const body = await c.req.json().catch(() => null);
+    const name = typeof body?.name === "string" ? body.name.trim() : "";
+    if (name.length < 3) return c.json(err("Type the company's name first.", "BAD_REQUEST"), 400);
+    try {
+      const state = await getSyncState();
+      const asOf = state.lastDaily;
+      const stale = !state.baselineLabel || !asOf || Date.now() - new Date(asOf).getTime() > 10 * 864e5;
+      if (stale) return c.json({ data: { available: false, matches: [] } });
+      return c.json({ data: { available: true, asOf, matches: await lookupEntities(name) } });
+    } catch {
+      return c.json({ data: { available: false, matches: [] } });
+    }
   });
   app2.post("/name-check", async (c) => {
     if (!await rateLimit(`namecheck:${clientIp(c)}`, 30, 6e5)) {

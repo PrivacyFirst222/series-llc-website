@@ -18,7 +18,7 @@ import { createCheckout, verifyWebhookSignature } from "./square";
 import { newToken } from "./crypto";
 
 import { rateLimit, clientIp } from "./auth";
-import { checkName, getSyncState, unavailableNames } from "./sunbiz";
+import { checkName, getSyncState, lookupEntities, unavailableNames } from "./sunbiz";
 
 import { sendMail, welcomeEmail, orderPaidEmail, serviceOrderClientEmail, serviceOrderAdminEmail } from "./email";
 
@@ -614,6 +614,27 @@ app.post("/contact", async (c) => {
     });
   }
   return c.json({ data: { ok: true } });
+});
+
+/** The conversion step's lookup: the companies on file under a name, with
+ *  their document numbers. "available: false" when the mirror is missing or
+ *  stale, so the client types the number by hand and is never blocked. */
+app.post("/entity-lookup", async (c) => {
+  if (!(await rateLimit(`entitylookup:${clientIp(c)}`, 60, 600_000))) {
+    return c.json(err("Too many lookups. Try again in a few minutes.", "RATE_LIMITED"), 429);
+  }
+  const body = await c.req.json().catch(() => null);
+  const name = typeof body?.name === "string" ? body.name.trim() : "";
+  if (name.length < 3) return c.json(err("Type the company's name first.", "BAD_REQUEST"), 400);
+  try {
+    const state = await getSyncState();
+    const asOf = state.lastDaily;
+    const stale = !state.baselineLabel || !asOf || Date.now() - new Date(asOf).getTime() > 10 * 86_400_000;
+    if (stale) return c.json({ data: { available: false, matches: [] } });
+    return c.json({ data: { available: true, asOf, matches: await lookupEntities(name) } });
+  } catch {
+    return c.json({ data: { available: false, matches: [] } });
+  }
 });
 
 app.post("/name-check", async (c) => {

@@ -20,6 +20,7 @@ import { chromium, type Page } from "playwright";
 import { buildPayload } from "../src/components/forms/florida-llc/buildPayload";
 import { memberRowIsBlank } from "../src/components/forms/florida-llc/validation";
 import type { FloridaLLCFormData } from "../src/components/forms/florida-llc/types";
+import { normalizeEntityName } from "../src/components/forms/florida-llc/nameSimilarity";
 import { spawn, type Subprocess } from "bun";
 import { mkdtempSync, rmSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -295,8 +296,21 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
     await checkAllBoxes(page, ["exact-name-only"]);
     await advance(page);
   } else {
+    // The company is on the Sunbiz mirror (seeded as a fixture for this run):
+    // typing its name lists it, and tapping it fills the name as filed and
+    // the document number (Adam, 9 Sep 2026).
+    const docNumber = `E2ETEST${run.key}0001`;
+    await fetch(`${API}/api/dev/sunbiz-sync-state`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ baseline_label: "walk", last_daily: new Date().toISOString().slice(0, 10) }) });
+    await fetch(`${API}/api/dev/seed-test-entities`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ rows: [{ docNumber, name: run.llcName, status: "A", filingType: "FLAL", fileDate: "2021-03-01", lastTxnDate: null, normKey: normalizeEntityName(run.llcName) }] }) });
     await fill(page, "Existing LLC name", run.llcName);
-    await fill(page, "Sunbiz document number", "L24000123456");
+    const match = page.locator('[data-testid="entity-match"]').filter({ hasText: run.llcName }).first();
+    await match.waitFor({ timeout: 8000 });
+    expect(new RegExp(docNumber).test(await match.innerText()), `${run.key}: the lookup lists the company with its document number`, await match.innerText());
+    await match.click();
+    await page.waitForTimeout(300);
+    expect((await page.getByLabel("Sunbiz document number", { exact: false }).first().inputValue()) === docNumber, `${run.key}: tapping the match fills the document number`, await page.getByLabel("Sunbiz document number", { exact: false }).first().inputValue());
+    expect((await page.locator("#sunbiz-doc-number").getAttribute("placeholder")) === "L00000000000", `${run.key}: the document number placeholder is a shape, not a number`);
+    await shot(page, `conversion-lookup-${run.key}`);
     await advance(page);
   }
 
@@ -701,6 +715,7 @@ async function main(): Promise<void> {
       } else {
         expect(payload.existingLlcName === run.llcName, `${run.key}: stored existing-LLC name matches`, payload.existingLlcName);
         expect(order?.llcName === run.llcName, `${run.key}: conversion order is NAMED by the converted company`, order?.llcName);
+        expect(payload.sunbizDocumentNumber === `E2ETEST${run.key}0001`, `${run.key}: the document number taken from the lookup is stored`, payload.sunbizDocumentNumber);
       }
       if (run.management === "MANAGER_MANAGED") {
         const members = payload.members?.memberList ?? [];

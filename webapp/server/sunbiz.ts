@@ -192,6 +192,24 @@ function detailUrl(existing: string): string {
   );
 }
 
+/** Every Florida entity on file under a name — for the conversion step, so a
+ *  client can pick their company and take its document number from the
+ *  mirror instead of hunting for it on Sunbiz (Adam, 9 Sep 2026). Active
+ *  companies first. */
+export async function lookupEntities(input: string): Promise<Array<{ docNumber: string; name: string; status: "Active" | "Inactive"; filingType: string }>> {
+  const key = normalizeEntityName(input);
+  if (!key) return [];
+  const db = await getDb();
+  const rows = await db.query<{ doc_number: string; name: string; status: string; filing_type: string }>(
+    `SELECT doc_number, name, status, filing_type
+     FROM fl_entities WHERE norm_key = $1
+     ORDER BY (status = 'A') DESC, last_txn_date DESC NULLS LAST
+     LIMIT 10`,
+    [key],
+  );
+  return rows.map((r) => ({ docNumber: r.doc_number, name: r.name, status: r.status === "A" ? "Active" : "Inactive", filingType: r.filing_type }));
+}
+
 export async function checkName(input: string): Promise<NameVerdict> {
   const key = normalizeEntityName(input);
   if (!key) return { input, verdict: "clear", conflicts: [] };

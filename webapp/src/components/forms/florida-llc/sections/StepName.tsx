@@ -1,4 +1,6 @@
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
+import { api } from "@/lib/api";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { NameCheck } from "../NameCheck";
 import { AcknowledgeBox, FieldShell } from "../FieldShell";
@@ -22,23 +24,46 @@ const PROFESSIONAL: LlcDesignator[] = [
   "Professional Limited Liability Company",
 ];
 
+/** One company on file under the typed name, from the Sunbiz mirror. */
+interface EntityMatch { docNumber: string; name: string; status: "Active" | "Inactive"; filingType: string }
+
 export function StepName({ data, patch, errors }: StepProps) {
   const isConversion = data.filingPath === "CONVERT";
-  // Only the designators that are legal for the chosen formation type are
-  // offered at all (s. 621.12(2)(b)3: professional in lieu of standard).
-  const opts = data.formationType === "PLLC" ? PROFESSIONAL : STANDARD;
-
-  const finalName = buildFinalLlcName(data.desiredLlcName, data.llcDesignator);
-  const finalNameValid = !finalName || nameContainsLegalDesignator(finalName);
-
-  const designatorMismatch =
-    data.llcDesignator &&
-    !designatorAllowedForFormationType(
-      data.llcDesignator as LlcDesignator,
-      data.formationType,
-    );
-
   if (isConversion) {
+    return <ConversionName data={data} patch={patch} errors={errors} />;
+  }
+  return <NewName data={data} patch={patch} errors={errors} />;
+}
+
+/** The conversion branch: the existing company, looked up on the Sunbiz
+ *  mirror as it is typed so the client picks it and its document number
+ *  comes along (Adam, 9 Sep 2026: "Is there a way to look up the document
+ *  number"). */
+function ConversionName({ data, patch, errors }: StepProps) {
+  const [lookup, setLookup] = useState<{ forName: string; available: boolean; matches: EntityMatch[] } | null>(null);
+  const [looking, setLooking] = useState(false);
+  const typed = (data.existingLlcName ?? "").trim();
+  useEffect(() => {
+    if (typed.length < 3) { setLookup(null); return; }
+    if (lookup?.forName === typed) return;
+    const t = setTimeout(async () => {
+      setLooking(true);
+      try {
+        const r = await api.post<{ available: boolean; matches: EntityMatch[] }>("/api/entity-lookup", { name: typed });
+        setLookup({ forName: typed, available: r.available, matches: r.matches });
+      } catch {
+        setLookup({ forName: typed, available: false, matches: [] });
+      } finally {
+        setLooking(false);
+      }
+    }, 700);
+    return () => clearTimeout(t);
+    // The recorded name guards re-running; the effect keys on what was typed.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [typed]);
+  const current = lookup?.forName === typed ? lookup : null;
+  const chosen = current?.matches.find((m) => m.name === data.existingLlcName && m.docNumber === data.sunbizDocumentNumber);
+  {
     return (
       <div className="space-y-6">
         <header className="space-y-2">
@@ -64,6 +89,31 @@ export function StepName({ data, patch, errors }: StepProps) {
             placeholder="Sunshine Holdings, LLC"
             aria-invalid={!!errors.existingLlcName}
           />
+          {looking ? (
+            <p className="mt-2 text-xs text-muted-foreground">Looking up the company on Florida's records…</p>
+          ) : current && current.available && !chosen ? (
+            current.matches.length > 0 ? (
+              <div className="mt-2 space-y-1" data-testid="entity-matches">
+                <p className="text-xs text-muted-foreground">On file with the Division of Corporations — tap yours to fill in the name as filed and its document number:</p>
+                {current.matches.map((m) => (
+                  <button
+                    key={m.docNumber}
+                    type="button"
+                    data-testid="entity-match"
+                    onClick={() => patch({ existingLlcName: m.name, sunbizDocumentNumber: m.docNumber })}
+                    className="flex w-full items-center justify-between gap-3 rounded-lg border border-border bg-background px-3 py-2 text-left text-sm transition hover:border-trust"
+                  >
+                    <span className="min-w-0 break-words font-medium">{m.name}</span>
+                    <span className="shrink-0 text-xs text-muted-foreground">{m.status} · {m.docNumber}</span>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-2 text-xs text-muted-foreground" data-testid="entity-no-match">
+                No Florida company by that name is on file. Check the spelling, or type the document number from your Sunbiz record below.
+              </p>
+            )
+          ) : null}
         </FieldShell>
 
         <FieldShell
@@ -77,7 +127,7 @@ export function StepName({ data, patch, errors }: StepProps) {
             id="sunbiz-doc-number"
             value={data.sunbizDocumentNumber ?? ""}
             onChange={(e) => patch({ sunbizDocumentNumber: e.target.value })}
-            placeholder="L24000123456"
+            placeholder="L00000000000"
             aria-invalid={!!errors.sunbizDocumentNumber}
           />
         </FieldShell>
@@ -89,6 +139,22 @@ export function StepName({ data, patch, errors }: StepProps) {
       </div>
     );
   }
+}
+
+function NewName({ data, patch, errors }: StepProps) {
+  // Only the designators that are legal for the chosen formation type are
+  // offered at all (s. 621.12(2)(b)3: professional in lieu of standard).
+  const opts = data.formationType === "PLLC" ? PROFESSIONAL : STANDARD;
+
+  const finalName = buildFinalLlcName(data.desiredLlcName, data.llcDesignator);
+  const finalNameValid = !finalName || nameContainsLegalDesignator(finalName);
+
+  const designatorMismatch =
+    data.llcDesignator &&
+    !designatorAllowedForFormationType(
+      data.llcDesignator as LlcDesignator,
+      data.formationType,
+    );
 
   return (
     <div className="space-y-6">
