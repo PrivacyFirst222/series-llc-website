@@ -131,7 +131,11 @@ function unwind(s: string): string {
     // The document title is chosen between two wordings the generator owns;
     // the master's footer line spells the slot.
     .replace(/\b(?:AMENDED AND RESTATED )?OPERATING AGREEMENT(?= of \[COMPANY NAME\])/g, "[TITLE]")
-    .replace(/\$25,000/g, "[MONEY]");
+    .replace(/\$25,000/g, "[MONEY]")
+    // Exhibit A's series-contribution slot holds a LIST, "series: amount; …",
+    // one item per series with a contribution (9 Sep 2026). Collapse it to
+    // the master's single placeholder, as the name lists are collapsed above.
+    .replace(/\[SERIES\]: \[SERCONTRIB\](?:; \[SERIES\]: \[SERCONTRIB\])*/g, "[SERIES CONTRIBUTIONS]");
 }
 
 /** The master's own placeholder spellings, reduced to the shared vocabulary.

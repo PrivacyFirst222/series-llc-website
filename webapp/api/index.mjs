@@ -47376,6 +47376,11 @@ async function renderMarkdownPdf(opts) {
       const size = BODY_SIZE;
       const lineH = size + LINE_GAP;
       const lines = wrapSegs(fonts, block.segs.map((s) => ({ ...s })), width, size);
+      const plainText = block.segs.map((s) => s.text).join("").trim();
+      const isSignatureLine = /^_{5,}$/.test(plainText);
+      const nextBlock = blocks[bi2 + 1];
+      const nextIsDate = nextBlock?.kind === "para" && /^Date:/.test(nextBlock.segs.map((s) => s.text).join("").trim());
+      if (isSignatureLine) y -= 10;
       const paraText = block.segs.map((s) => s.text).join("");
       if (inTitle && (/^THIS\b/.test(paraText.trim()) || lines.length > 2)) inTitle = false;
       const centered = inTitle;
@@ -47398,7 +47403,7 @@ async function renderMarkdownPdf(opts) {
         drawSegLine(page, ln2, x2, y - size, size, !centered && !isLastLine ? width : void 0);
         y -= lineH;
       }
-      y -= 6;
+      y -= isSignatureLine || nextIsDate ? 0 : 6;
       if (!centered) inTitle = false;
       continue;
     }
@@ -102323,18 +102328,20 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 ## SIGNATURES
 
-IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of the Effective Date.
+IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of the date(s) set forth below.
 
 **MEMBER:**
 
 _____________________________
 [MEMBER NAME]
+Date: _____________________________
 
 <!-- one:manager -->**ACKNOWLEDGED AND AGREED BY MANAGER:**<!-- /one --><!-- many:manager -->**ACKNOWLEDGED AND AGREED BY MANAGERS:**<!-- /many -->
 
 <!-- repeat:manager -->
 _____________________________
 [MANAGER NAME], Manager
+Date: _____________________________
 
 <!-- /repeat -->
 
@@ -102351,6 +102358,7 @@ _____________________________
 | Membership Interest | 100% (single class) |
 | Initial contribution to the Company | $[AMOUNT] [and/or described property] |
 | Date of contribution | [DATE] |
+| Initial contributions to Protected Series (treated as contributed first to the Company and then by the Company to the series) | [SERIES CONTRIBUTIONS] |
 
 **Transfer on Death designation (ss. 711.50\u2013711.512, Fla. Stat.):**
 
@@ -102782,13 +102790,17 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 ## SIGNATURES
 
-IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of the Effective Date.
+IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of the date(s) set forth below.
 
 **MEMBERS:**
 
 <!-- repeat:signatory -->
-_____________________________
+<!-- if:unit -->**[UNIT]**
+[HOLDING]
+
+<!-- /if -->_____________________________
 [SIGNATORY NAME]
+Date: _____________________________
 
 <!-- /repeat -->
 
@@ -102797,6 +102809,7 @@ _____________________________
 <!-- repeat:manager -->
 _____________________________
 [MANAGER NAME], Manager
+Date: _____________________________
 
 <!-- /repeat -->
 
@@ -102812,6 +102825,8 @@ _____________________________
 | [MEMBER NAME]<!-- if:holding --> as [HOLDING]<!-- /if --> | [MEMBER ADDRESS] | [MEMBER SHARE] | [MEMBER CONTRIBUTION] | [MEMBER DATE] |
 <!-- /repeat -->
 | **Total** | | **100%** | | |
+
+**Initial contributions to Protected Series, treated as contributed first to the Company by the Members in proportion to their Percentage Interests and then by the Company to the series:** [SERIES CONTRIBUTIONS]
 
 **Transfer on Death designations (ss. 711.50\u2013711.512, Fla. Stat.):**
 
@@ -103263,13 +103278,17 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 ## SIGNATURES
 
-IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of the Effective Date.
+IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of the date(s) set forth below.
 
 **MEMBERS:**
 
 <!-- repeat:signatory -->
-_____________________________
+<!-- if:unit -->**[UNIT]**
+[HOLDING]
+
+<!-- /if -->_____________________________
 [SIGNATORY NAME]
+Date: _____________________________
 
 <!-- /repeat -->
 
@@ -103278,6 +103297,7 @@ _____________________________
 <!-- repeat:manager -->
 _____________________________
 [MANAGER NAME], Manager
+Date: _____________________________
 
 <!-- /repeat -->
 
@@ -103293,6 +103313,8 @@ _____________________________
 | [MEMBER NAME]<!-- if:holding --> as [HOLDING]<!-- /if --> | [MEMBER ADDRESS] | [MEMBER SHARE] | [MEMBER CONTRIBUTION] | [MEMBER DATE] |
 <!-- /repeat -->
 | **Total** | | **100%** | | |
+
+**Initial contributions to Protected Series, treated as contributed first to the Company by the Members in proportion to their Percentage Interests and then by the Company to the series:** [SERIES CONTRIBUTIONS]
 
 **Transfer on Death designations (ss. 711.50\u2013711.512, Fla. Stat.):**
 
@@ -103732,13 +103754,17 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 ## SIGNATURES
 
-IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of the Effective Date.
+IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of the date(s) set forth below.
 
 **MEMBERS:**
 
 <!-- repeat:signatory -->
-_____________________________
+<!-- if:unit -->**[UNIT]**
+[HOLDING]
+
+<!-- /if -->_____________________________
 [SIGNATORY NAME]
+Date: _____________________________
 
 <!-- /repeat -->
 
@@ -103754,6 +103780,8 @@ _____________________________
 | [MEMBER NAME]<!-- if:holding --> as [HOLDING]<!-- /if --> | [MEMBER ADDRESS] | [MEMBER SHARE] | [MEMBER CONTRIBUTION] | [MEMBER DATE] |
 <!-- /repeat -->
 | **Total** | | **100%** | | |
+
+**Initial contributions to Protected Series, treated as contributed first to the Company by the Members in proportion to their Percentage Interests and then by the Company to the series:** [SERIES CONTRIBUTIONS]
 
 **Transfer on Death designations (ss. 711.50\u2013711.512, Fla. Stat.):**
 
@@ -104207,13 +104235,17 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 ## SIGNATURES
 
-IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of the Effective Date.
+IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of the date(s) set forth below.
 
 **MEMBERS:**
 
 <!-- repeat:signatory -->
-_____________________________
+<!-- if:unit -->**[UNIT]**
+[HOLDING]
+
+<!-- /if -->_____________________________
 [SIGNATORY NAME]
+Date: _____________________________
 
 <!-- /repeat -->
 
@@ -104229,6 +104261,8 @@ _____________________________
 | [MEMBER NAME]<!-- if:holding --> as [HOLDING]<!-- /if --> | [MEMBER ADDRESS] | [MEMBER SHARE] | [MEMBER CONTRIBUTION] | [MEMBER DATE] |
 <!-- /repeat -->
 | **Total** | | **100%** | | |
+
+**Initial contributions to Protected Series, treated as contributed first to the Company by the Members in proportion to their Percentage Interests and then by the Company to the series:** [SERIES CONTRIBUTIONS]
 
 **Transfer on Death designations (ss. 711.50\u2013711.512, Fla. Stat.):**
 
@@ -104609,18 +104643,20 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 ## SIGNATURES
 
-IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of the Effective Date.
+IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of the date(s) set forth below.
 
 **MEMBER:**
 
 _____________________________
 [MEMBER NAME]
+Date: _____________________________
 
 <!-- one:manager -->**ACKNOWLEDGED AND AGREED BY MANAGER:**<!-- /one --><!-- many:manager -->**ACKNOWLEDGED AND AGREED BY MANAGERS:**<!-- /many -->
 
 <!-- repeat:manager -->
 _____________________________
 [MANAGER NAME], Manager
+Date: _____________________________
 
 <!-- /repeat -->
 
@@ -104637,6 +104673,7 @@ _____________________________
 | Membership Interest | 100% (single class of ownership) |
 | Initial contribution to the Company | $[AMOUNT] [and/or described property] |
 | Date of contribution | [DATE] |
+| Initial contributions to Protected Series (treated as contributed first to the Company and then by the Company to the series) | [SERIES CONTRIBUTIONS] |
 
 **Transfer on Death designation (ss. 711.50\u2013711.512, Fla. Stat.):**
 
@@ -104964,12 +105001,13 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 ## SIGNATURES
 
-IN WITNESS WHEREOF, the undersigned has executed this Agreement effective as of the Effective Date.
+IN WITNESS WHEREOF, the undersigned has executed this Agreement effective as of the date set forth below.
 
 **MEMBER:**
 
 _____________________________
 [MEMBER NAME]
+Date: _____________________________
 
 [[pagebreak]]
 
@@ -104984,6 +105022,7 @@ _____________________________
 | Membership Interest | 100% (single class) |
 | Initial contribution to the Company | $[AMOUNT] [and/or described property] |
 | Date of contribution | [DATE] |
+| Initial contributions to Protected Series (treated as contributed first to the Company and then by the Company to the series) | [SERIES CONTRIBUTIONS] |
 
 **Transfer on Death designation (ss. 711.50\u2013711.512, Fla. Stat.):**
 
@@ -105341,12 +105380,13 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 ## SIGNATURES
 
-IN WITNESS WHEREOF, the undersigned has executed this Agreement effective as of the Effective Date.
+IN WITNESS WHEREOF, the undersigned has executed this Agreement effective as of the date set forth below.
 
 **MEMBER:**
 
 _____________________________
 [MEMBER NAME]
+Date: _____________________________
 
 [[pagebreak]]
 
@@ -105361,6 +105401,7 @@ _____________________________
 | Membership Interest | 100% (single class of ownership) |
 | Initial contribution to the Company | $[AMOUNT] [and/or described property] |
 | Date of contribution | [DATE] |
+| Initial contributions to Protected Series (treated as contributed first to the Company and then by the Company to the series) | [SERIES CONTRIBUTIONS] |
 
 **Transfer on Death designation (ss. 711.50\u2013711.512, Fla. Stat.):**
 
@@ -105429,8 +105470,13 @@ function oaVersion(opts) {
   const { multiOwner, memberManaged, sElection } = opts;
   return multiOwner ? sElection ? memberManaged ? "member-s" : "s" : memberManaged ? "member" : "multi" : sElection ? memberManaged ? "member-single-s" : "single-s" : memberManaged ? "member-single" : "single";
 }
-function seriesContributionPhrases(series) {
-  return series.filter((sr) => (sr.contribution ?? "").trim() !== "").map((sr) => `${sr.contribution.trim()} contributed to the Company and by the Company to ${sr.name}`);
+function seriesContributionList(series) {
+  const items = series.filter((sr) => (sr.contribution ?? "").trim() !== "").map((sr) => `${sr.name}: ${sr.contribution.trim()}`);
+  return items.length > 0 ? items.join("; ") : "None";
+}
+function titleCaseHolding(holding) {
+  const small = /* @__PURE__ */ new Set(["by", "the", "with", "of"]);
+  return holding.split(" ").map((w, i) => i > 0 && small.has(w.toLowerCase()) ? w.toLowerCase() : w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
 }
 function must2(haystack, needle, label) {
   const found = typeof needle === "string" ? haystack.includes(needle) : needle.test(haystack);
@@ -105627,10 +105673,11 @@ NOW, THEREFORE,`,
       s,
       "EXHIBIT A \u2014 MEMBER; CONTRIBUTIONS; TOD DESIGNATION",
       {
+        "$[AMOUNT] [and/or described property]": inputs.contributionToCompany || m2.contribution || "\u2014",
         // Adam, 9 Sep 2026: every initial series contribution is treated as
-        // made first to the Company, then by the Company to the series, so it
-        // is listed here too — the chain s. 6.1 describes, on one exhibit.
-        "$[AMOUNT] [and/or described property]": [inputs.contributionToCompany || m2.contribution || "\u2014", ...seriesContributionPhrases(inputs.series)].join("; and "),
+        // made first to the Company, then by the Company to the series, so
+        // Exhibit A lists it too — in the master's own row, this fills the slot.
+        "[SERIES CONTRIBUTIONS]": seriesContributionList(inputs.series),
         "[DATE]": inputs.effectiveDate,
         // The master's own sentence carries the fallback: "…shall pass to:
         // **X**, or if none is designated or the designation fails, the
@@ -105655,17 +105702,7 @@ NOW, THEREFORE,`,
       "[HOLDING]": m2.jointHolding ?? ""
     }));
     s = expandRepeat(s, "member", rows, "Exhibit A multi");
-    const chain = seriesContributionPhrases(inputs.series);
-    if (chain.length > 0) {
-      s = replaceOnce(
-        s,
-        "**Transfer on Death designations (ss. 711.50\u2013711.512, Fla. Stat.):**",
-        `**Initial contributions to Protected Series, treated as contributed first to the Company by the Members in proportion to their Percentage Interests and then by the Company to the series:** ${chain.join("; ")}.
-
-**Transfer on Death designations (ss. 711.50\u2013711.512, Fla. Stat.):**`,
-        "Exhibit A multi series contributions"
-      );
-    }
+    s = s.split("[SERIES CONTRIBUTIONS]").join(seriesContributionList(inputs.series));
   }
   const ex1 = extractSection(s, "SERIES EXHIBIT PS-[N]", "series exhibit template");
   s = ex1.doc;
@@ -105709,7 +105746,14 @@ NOW, THEREFORE,`,
     s = expandRepeat(
       s,
       "signatory",
-      inputs.members.flatMap((m2) => (m2.signatories ?? [m2.name]).map((n) => ({ "[SIGNATORY NAME]": n }))),
+      inputs.members.flatMap((m2) => {
+        const signers = m2.signatories ?? [m2.name];
+        return signers.map((n, i) => ({
+          "[UNIT]": signers.length > 1 && i === 0 ? m2.name : "",
+          "[HOLDING]": signers.length > 1 && i === 0 && m2.jointHolding ? `as ${titleCaseHolding(m2.jointHolding)}` : "",
+          "[SIGNATORY NAME]": n
+        }));
+      }),
       "member signatures"
     );
   }

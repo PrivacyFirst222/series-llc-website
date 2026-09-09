@@ -287,18 +287,20 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 ## SIGNATURES
 
-IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of the Effective Date.
+IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of the date(s) set forth below.
 
 **MEMBER:**
 
 _____________________________
 [MEMBER NAME]
+Date: _____________________________
 
 <!-- one:manager -->**ACKNOWLEDGED AND AGREED BY MANAGER:**<!-- /one --><!-- many:manager -->**ACKNOWLEDGED AND AGREED BY MANAGERS:**<!-- /many -->
 
 <!-- repeat:manager -->
 _____________________________
 [MANAGER NAME], Manager
+Date: _____________________________
 
 <!-- /repeat -->
 
@@ -315,6 +317,7 @@ _____________________________
 | Membership Interest | 100% (single class) |
 | Initial contribution to the Company | $[AMOUNT] [and/or described property] |
 | Date of contribution | [DATE] |
+| Initial contributions to Protected Series (treated as contributed first to the Company and then by the Company to the series) | [SERIES CONTRIBUTIONS] |
 
 **Transfer on Death designation (ss. 711.50–711.512, Fla. Stat.):**
 

@@ -377,13 +377,17 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 ## SIGNATURES
 
-IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of the Effective Date.
+IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of the date(s) set forth below.
 
 **MEMBERS:**
 
 <!-- repeat:signatory -->
-_____________________________
+<!-- if:unit -->**[UNIT]**
+[HOLDING]
+
+<!-- /if -->_____________________________
 [SIGNATORY NAME]
+Date: _____________________________
 
 <!-- /repeat -->
 
@@ -392,6 +396,7 @@ _____________________________
 <!-- repeat:manager -->
 _____________________________
 [MANAGER NAME], Manager
+Date: _____________________________
 
 <!-- /repeat -->
 
@@ -407,6 +412,8 @@ _____________________________
 | [MEMBER NAME]<!-- if:holding --> as [HOLDING]<!-- /if --> | [MEMBER ADDRESS] | [MEMBER SHARE] | [MEMBER CONTRIBUTION] | [MEMBER DATE] |
 <!-- /repeat -->
 | **Total** | | **100%** | | |
+
+**Initial contributions to Protected Series, treated as contributed first to the Company by the Members in proportion to their Percentage Interests and then by the Company to the series:** [SERIES CONTRIBUTIONS]
 
 **Transfer on Death designations (ss. 711.50–711.512, Fla. Stat.):**
 

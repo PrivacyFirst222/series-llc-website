@@ -342,6 +342,15 @@ export async function renderMarkdownPdf(opts: {
       const size = BODY_SIZE;
       const lineH = size + LINE_GAP;
       const lines = wrapSegs(fonts, block.segs.map((s) => ({ ...s })), width, size);
+      // Signature blocks (Adam, 9 Sep 2026): a line of underscores is a
+      // signature line, and the name beneath it and the "Date:" line beneath
+      // that sit tight, with no paragraph gap between them; the gap goes
+      // before the signature line instead, so signers are set apart.
+      const plainText = block.segs.map((s) => s.text).join("").trim();
+      const isSignatureLine = /^_{5,}$/.test(plainText);
+      const nextBlock = blocks[bi + 1];
+      const nextIsDate = nextBlock?.kind === "para" && /^Date:/.test(nextBlock.segs.map((s) => s.text).join("").trim());
+      if (isSignatureLine) y -= 10;
       // The title block is the short centered lines at the top — the title,
       // "OF", the company, its type, the management line. It ends at the
       // preamble ("THIS OPERATING AGREEMENT…"), which every master begins with
@@ -389,7 +398,7 @@ export async function renderMarkdownPdf(opts: {
         drawSegLine(page, ln, x, y - size, size, !centered && !isLastLine ? width : undefined);
         y -= lineH;
       }
-      y -= 6;
+      y -= isSignatureLine || nextIsDate ? 0 : 6;
       if (!centered) inTitle = false;
       continue;
     }

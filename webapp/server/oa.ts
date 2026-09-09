@@ -114,12 +114,23 @@ export function oaVersion(opts: {
       : memberManaged ? "member-single" : "single";
 }
 
-/** "$2,000 contributed to the Company and by the Company to PS 1" — one
- *  phrase per series that has an initial contribution. */
-function seriesContributionPhrases(series: OaSeriesInput[]): string[] {
-  return series
+/** "E2E Coastal Holdings, LLC - PS 1: $2,000; … - PS 2: $500", or "None" —
+ *  the value for the master's series-contributions slot on Exhibit A. */
+function seriesContributionList(series: OaSeriesInput[]): string {
+  const items = series
     .filter((sr) => (sr.contribution ?? "").trim() !== "")
-    .map((sr) => `${sr.contribution.trim()} contributed to the Company and by the Company to ${sr.name}`);
+    .map((sr) => `${sr.name}: ${sr.contribution.trim()}`);
+  return items.length > 0 ? items.join("; ") : "None";
+}
+
+/** "tenants by the entirety" → "Tenants by the Entirety": the holding as a
+ *  heading, with the small words left small. */
+function titleCaseHolding(holding: string): string {
+  const small = new Set(["by", "the", "with", "of"]);
+  return holding
+    .split(" ")
+    .map((w, i) => (i > 0 && small.has(w.toLowerCase()) ? w.toLowerCase() : w.charAt(0).toUpperCase() + w.slice(1)))
+    .join(" ");
 }
 
 function must(haystack: string, needle: string | RegExp, label: string): void {
@@ -444,11 +455,12 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
       s,
       "EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION",
       {
-        // Adam, 9 Sep 2026: every initial series contribution is treated as
-        // made first to the Company, then by the Company to the series, so it
-        // is listed here too — the chain s. 6.1 describes, on one exhibit.
         "$[AMOUNT] [and/or described property]":
-          [inputs.contributionToCompany || m.contribution || "—", ...seriesContributionPhrases(inputs.series)].join("; and "),
+          inputs.contributionToCompany || m.contribution || "—",
+        // Adam, 9 Sep 2026: every initial series contribution is treated as
+        // made first to the Company, then by the Company to the series, so
+        // Exhibit A lists it too — in the master's own row, this fills the slot.
+        "[SERIES CONTRIBUTIONS]": seriesContributionList(inputs.series),
         "[DATE]": inputs.effectiveDate,
         // The master's own sentence carries the fallback: "…shall pass to:
         // **X**, or if none is designated or the designation fails, the
@@ -478,21 +490,11 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
       "[HOLDING]": m.jointHolding ?? "",
     }));
     s = expandRepeat(s, "member", rows, "Exhibit A multi");
-    // The same chain for several members: the series contributions are
-    // listed beneath the table as contributed first to the Company by the
-    // Members in proportion to their Percentage Interests, then by the
-    // Company to each series (Adam, 9 Sep 2026; the proportion is the
-    // generator's assumption, since the questionnaire takes a series
-    // contribution at the company level).
-    const chain = seriesContributionPhrases(inputs.series);
-    if (chain.length > 0) {
-      s = replaceOnce(
-        s,
-        "**Transfer on Death designations (ss. 711.50–711.512, Fla. Stat.):**",
-        `**Initial contributions to Protected Series, treated as contributed first to the Company by the Members in proportion to their Percentage Interests and then by the Company to the series:** ${chain.join("; ")}.\n\n**Transfer on Death designations (ss. 711.50–711.512, Fla. Stat.):**`,
-        "Exhibit A multi series contributions",
-      );
-    }
+    // The same chain for several members, in the master's own sentence
+    // beneath the table (Adam, 9 Sep 2026; the proportion is the master's
+    // rule, since the questionnaire takes a series contribution at the
+    // company level).
+    s = s.split("[SERIES CONTRIBUTIONS]").join(seriesContributionList(inputs.series));
   }
 
   // ---- Series Exhibits + Asset Schedules ----
@@ -557,10 +559,21 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
     // ("**A and B, husband and wife, as tenants by the entirety:**"), which was
     // prose composed in TypeScript AND a second statement of a fact Exhibit A
     // already carries in the member-name cell. Deleted on both counts.
+    // Adam, 9 Sep 2026: every signer gets a line, the name beneath it, and a
+    // date line; a couple is headed by both names and its holding, then each
+    // spouse signs on their own line. (This restores a heading his earlier
+    // ruling had removed as a second statement of Exhibit A's fact.)
     s = expandRepeat(
       s,
       "signatory",
-      inputs.members.flatMap((m) => (m.signatories ?? [m.name]).map((n) => ({ "[SIGNATORY NAME]": n }))),
+      inputs.members.flatMap((m) => {
+        const signers = m.signatories ?? [m.name];
+        return signers.map((n, i) => ({
+          "[UNIT]": signers.length > 1 && i === 0 ? m.name : "",
+          "[HOLDING]": signers.length > 1 && i === 0 && m.jointHolding ? `as ${titleCaseHolding(m.jointHolding)}` : "",
+          "[SIGNATORY NAME]": n,
+        }));
+      }),
       "member signatures",
     );
   }

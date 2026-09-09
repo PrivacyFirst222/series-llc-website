@@ -132,6 +132,36 @@ for (const version of versions) {
 }
 check("all 16 variants rendered", rendered === 16, rendered);
 
+// 4b. The signature page for a couple and a solo owner (Adam, 9 Sep 2026):
+// preamble to the dates below; each signer a line, name, and Date; the
+// couple headed by both names and their holding, each spouse on their own.
+if (hasPdftotext) {
+  const inputs = {
+    ...base,
+    version: "member",
+    professional: false,
+    members: [
+      { name: "Casey Gatecheck", address: "100 Ocean Dr, Miami, FL 33139", share: { kind: "percent", value: 51 }, todBeneficiary: "", contribution: "$1,000" },
+      { name: "Blair Gatecheck and Drew Gatecheck", address: "100 Ocean Dr, Miami, FL 33139", share: { kind: "percent", value: 49 }, todBeneficiary: "", contribution: "$1,000", jointHolding: "tenants by the entirety", signatories: ["Blair Gatecheck", "Drew Gatecheck"] },
+    ],
+  } as unknown as OaInputs;
+  const { markdown, title } = assembleOa(inputs);
+  const bytes = await renderMarkdownPdf({ markdown, watermark: null, title });
+  const file = join(outDir, "signatures.pdf");
+  writeFileSync(file, bytes);
+  const text = execSync(`pdftotext -layout "${file}" -`).toString();
+  const sig = text.slice(text.indexOf("SIGNATURES"), text.indexOf("EXHIBIT A"));
+  const lines = sig.split("\n").map((l) => l.trim()).filter(Boolean);
+  const at = (re: RegExp) => lines.findIndex((l) => re.test(l));
+  check("signatures: the preamble refers to the dates set forth below", /effective as of the date\(s\)\s+set\s+forth\s+below/.test(sig), sig.slice(0, 200));
+  const soloLine = at(/^_{5,}$/);
+  check("signatures: a signature line, then the solo owner's name, then Date", soloLine >= 0 && lines[soloLine + 1] === "Casey Gatecheck" && /^Date: _+$/.test(lines[soloLine + 2] ?? ""), lines.slice(soloLine, soloLine + 3));
+  const heading = at(/^Blair Gatecheck and Drew Gatecheck$/);
+  check("signatures: the couple is headed by both names and their holding", heading >= 0 && lines[heading + 1] === "as Tenants by the Entirety", lines.slice(heading, heading + 2));
+  check("signatures: each spouse then signs on their own line with a Date", lines[heading + 3] === "Blair Gatecheck" && /^Date:/.test(lines[heading + 4] ?? "") && lines[heading + 6] === "Drew Gatecheck" && /^Date:/.test(lines[heading + 7] ?? ""), lines.slice(heading + 2, heading + 8));
+  check("signatures: no 'entireties'", !/entireties/i.test(sig));
+}
+
 // 6. The licensed (encrypted) agreement with one series: the blank-space
 // notice, the Asset Schedule's typeable fields, and — read back the way a
 // compliant reader reads it — field names, appearance settings, and the
@@ -146,7 +176,7 @@ check("all 16 variants rendered", rendered === 16, rendered);
     series: [{ name: "E2E Coastal Holdings, LLC - PS 1", purpose: "Rental real estate", contribution: "$2,000" }],
   } as OaInputs;
   const { markdown, title } = assembleOa(inputs);
-  check("Exhibit A lists the series contribution as a contribution to the Company", /\$2,000 contributed to the Company and by the Company to E2E Coastal Holdings, LLC - PS 1/.test(markdown), markdown.match(/Initial contribution to the Company[^\n]*/)?.[0]);
+  check("Exhibit A lists the series contribution as contributed first to the Company", /\| Initial contributions to Protected Series \(treated as contributed first to the Company and then by the Company to the series\) \| E2E Coastal Holdings, LLC - PS 1: \$2,000 \|/.test(markdown), markdown.match(/Initial contributions to Protected Series[^\n]*/)?.[0]);
   const bytes = await renderMarkdownPdf({ markdown, watermark: { name: "Casey Gatecheck", email: "casey@example.com" }, title });
   check("licensed agreement renders", new TextDecoder().decode(bytes.slice(0, 5)) === "%PDF-");
   const file = join(outDir, "licensed-with-series.pdf");
