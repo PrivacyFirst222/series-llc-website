@@ -299,7 +299,10 @@ export const LEARN_MORE: Record<string, LearnMoreScreen> = {
           for a future creditor to attack as an empty shell, and your contributions establish
           your investment for tax and accounting purposes. Contributions to a specific series
           belong to that series alone — deposit the money into that series' own bank account so
-          the records match the agreement.
+          the records match the agreement. A series contribution reaches the series through the
+          company: it is treated as contributed by you to the company first, then by the company
+          to the series, so it is listed on Exhibit A as a contribution to the company and on the
+          Series Exhibit as the company's contribution to that series.
         </P>
         <Choice label="If you enter amounts now:">
           They're printed in Exhibit A and the Series Exhibits, and the agreement is complete on

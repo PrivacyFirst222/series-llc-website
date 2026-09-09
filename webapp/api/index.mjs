@@ -47173,7 +47173,7 @@ function parseMarkdown(md) {
         tbl.push(lines[i].trim());
         i++;
       }
-      const rows = tbl.filter((t) => !/^\|[\s\-|]+\|?$/.test(t)).map((t) => t.replace(/^\||\|$/g, "").split("|").map((c) => c.trim()));
+      const rows = tbl.filter((t) => !/^\|[\s|]*-[\s\-|]*\|?$/.test(t)).map((t) => t.replace(/^\||\|$/g, "").split("|").map((c) => c.trim()));
       if (rows.length > 0) blocks.push({ kind: "table", rows });
       continue;
     }
@@ -47267,6 +47267,16 @@ async function renderMarkdownPdf(opts) {
   const need = (h) => {
     if (y - h < MARGIN) newPage();
   };
+  const TEXT_H = PAGE_H - 2 * MARGIN;
+  const BLANK_NOTICE = "[INTENTIONALLY LEFT BLANK]";
+  const markBlankSpace = () => {
+    const remaining = y - MARGIN;
+    if (remaining <= TEXT_H / 3) return;
+    const size = BODY_SIZE;
+    const w = drawnWidth(fonts.regular, BLANK_NOTICE, size);
+    page.drawText(BLANK_NOTICE, { x: MARGIN + (width - w) / 2, y: MARGIN + remaining / 2 - size / 2, size, font: fonts.regular, color: rgb(0.1, 0.12, 0.16) });
+    y = MARGIN;
+  };
   const segWidth = (seg, size) => drawnWidth(fontFor(fonts, seg), seg.text, size);
   const drawSegLine = (p2, segs, x2, yy, size, justifyTo) => {
     let extraPerGap = 0;
@@ -47297,6 +47307,7 @@ async function renderMarkdownPdf(opts) {
   };
   let inTitle = opts.centerTitleBlock !== false;
   let titleSawParagraph = false;
+  let assetScheduleNo = 0;
   const TAIL_MAX_LINES = 16;
   const tailHeightBeforeBreak = (from) => {
     let h = 0;
@@ -47358,6 +47369,7 @@ async function renderMarkdownPdf(opts) {
         continue;
       }
       if (block.segs.length === 1 && block.segs[0].text.trim() === "[[pagebreak]]") {
+        markBlankSpace();
         newPage();
         continue;
       }
@@ -47396,13 +47408,33 @@ async function renderMarkdownPdf(opts) {
       const size = 9.5;
       const lineH = size + 2.5;
       const pad = 4;
+      const isAssetSchedule = /^Asset description/i.test(block.rows[0]?.[0] ?? "");
+      const FILL_LINES = 4;
+      if (isAssetSchedule) assetScheduleNo++;
       for (let ri = 0; ri < block.rows.length; ri++) {
         const row = block.rows[ri];
+        const fillable = isAssetSchedule && ri > 0 && row.every((c) => c.trim() === "");
         const cellLines = row.map(
           (cell) => wrapSegs(fonts, parseInline(cell).map((s) => ri === 0 ? { ...s, bold: true } : s), colW - 2 * pad, size)
         );
-        const rowH = Math.max(1, ...cellLines.map((c) => c.length)) * lineH + 2 * pad;
+        const rowH = (fillable ? FILL_LINES : Math.max(1, ...cellLines.map((c) => c.length))) * lineH + 2 * pad;
         need(rowH);
+        if (fillable) {
+          const form = doc.getForm();
+          for (let ci = 0; ci < cols; ci++) {
+            const field = form.createTextField(`asset-schedule.${assetScheduleNo}.row${ri}.col${ci + 1}`);
+            field.enableMultiline();
+            field.addToPage(page, {
+              x: MARGIN + ci * colW + 1,
+              y: y - rowH + 1,
+              width: colW - 2,
+              height: rowH - 2,
+              borderWidth: 0,
+              font: fonts.regular
+            });
+            field.setFontSize(0);
+          }
+        }
         page.drawRectangle({
           x: MARGIN,
           y: y - rowH,
@@ -47441,7 +47473,7 @@ async function renderMarkdownPdf(opts) {
     return doc.save();
   }
   stampFooters(doc, fonts.regular, opts.watermark);
-  return finishWithPermissions(doc, opts.title, opts.watermark);
+  return finishWithPermissions(doc, opts.title, opts.watermark, fonts.regular);
 }
 function stampPageNumbers(doc, font) {
   const pages = doc.getPages();
@@ -47476,18 +47508,77 @@ function setMeta(doc, title, wm) {
   doc.setProducer("MyFloridaSeriesLLC document engine");
   doc.setCreationDate(/* @__PURE__ */ new Date());
 }
-async function finishWithPermissions(doc, title, wm) {
+function encryptStrings(doc) {
+  const encryptRef = doc.context.trailerInfo.Encrypt;
+  const done = /* @__PURE__ */ new WeakSet();
+  for (const [ref, object] of doc.context.enumerateIndirectObjects()) {
+    if (encryptRef instanceof PDFRef_default && ref === encryptRef) continue;
+    encryptStringsIn(doc, ref, object, done);
+  }
+}
+function encryptStringsIn(doc, ref, object, done = /* @__PURE__ */ new WeakSet()) {
+  if (!(ref instanceof PDFRef_default)) return;
+  const security = doc.context.security;
+  if (!security) return;
+  const target = object ?? doc.context.lookup(ref);
+  if (!target) return;
+  const fn = security.getEncryptFn(ref.objectNumber, ref.generationNumber);
+  const toHex = (b2) => Array.from(b2, (x2) => x2.toString(16).padStart(2, "0")).join("");
+  const enc = (s) => {
+    const out = PDFHexString_default.of(toHex(fn(s.asBytes())));
+    done.add(out);
+    return out;
+  };
+  const walk = (o) => {
+    if (done.has(o)) return o;
+    if (o instanceof PDFString_default || o instanceof PDFHexString_default) return enc(o);
+    if (o instanceof PDFStream_default) {
+      walkDict(o.dict);
+      return o;
+    }
+    if (o instanceof PDFDict_default) {
+      walkDict(o);
+      return o;
+    }
+    if (o instanceof PDFArray_default) {
+      done.add(o);
+      for (let i = 0; i < o.size(); i++) o.set(i, walk(o.get(i)));
+      return o;
+    }
+    return o;
+  };
+  const walkDict = (d2) => {
+    if (done.has(d2)) return;
+    done.add(d2);
+    for (const [k, v2] of d2.entries()) d2.set(k, walk(v2));
+  };
+  walk(target);
+}
+function finishFields(doc, font) {
+  const form = doc.getForm();
+  const cells = form.getFields().filter((f) => f instanceof PDFTextField);
+  if (cells.length === 0) return;
+  form.updateFieldAppearances(font);
+  for (const cell of cells) cell.setFontSize(0);
+  const dr3 = doc.context.obj({ Font: doc.context.obj({ [font.name]: font.ref }) });
+  form.acroForm.dict.set(PDFName_default.of("DR"), dr3);
+  form.acroForm.dict.set(PDFName_default.of("DA"), PDFString_default.of(`/${font.name} 0 Tf 0 g`));
+}
+async function finishWithPermissions(doc, title, wm, font) {
   try {
     const anyDoc = doc;
     if (typeof anyDoc.encrypt === "function") {
-      delete doc.context.trailerInfo.Info;
       await anyDoc.encrypt({
         ownerPassword: `mfsl-${Math.random().toString(36).slice(2)}${Date.now().toString(36)}`,
         // Clients may print and add their own notes/signatures; the underlying
         // text stays locked against copying and editing.
-        permissions: { printing: "highResolution", modifying: false, copying: false, annotating: true }
+        permissions: { printing: "highResolution", modifying: false, copying: false, annotating: true, fillingForms: true }
       });
-      return await doc.save({ useObjectStreams: false });
+      await doc.flush();
+      finishFields(doc, font);
+      setMeta(doc, title, wm);
+      encryptStrings(doc);
+      return await doc.save({ useObjectStreams: false, updateFieldAppearances: false });
     }
     setMeta(doc, title, wm);
     return await doc.save({ useObjectStreams: false });
@@ -47501,7 +47592,7 @@ async function stampExistingPdf(opts) {
   const doc = await PDFDocument.load(opts.bytes, { ignoreEncryption: true });
   const font = await doc.embedFont(StandardFonts.Helvetica);
   stampFooters(doc, font, opts.watermark);
-  return finishWithPermissions(doc, opts.title, opts.watermark);
+  return finishWithPermissions(doc, opts.title, opts.watermark, font);
 }
 var PAGE_W, PAGE_H, MARGIN, BODY_SIZE, LINE_GAP, FOOTER_Y, glyphWidthCache;
 var init_pdf_render = __esm({
@@ -105338,6 +105429,9 @@ function oaVersion(opts) {
   const { multiOwner, memberManaged, sElection } = opts;
   return multiOwner ? sElection ? memberManaged ? "member-s" : "s" : memberManaged ? "member" : "multi" : sElection ? memberManaged ? "member-single-s" : "single-s" : memberManaged ? "member-single" : "single";
 }
+function seriesContributionPhrases(series) {
+  return series.filter((sr) => (sr.contribution ?? "").trim() !== "").map((sr) => `${sr.contribution.trim()} contributed to the Company and by the Company to ${sr.name}`);
+}
 function must2(haystack, needle, label) {
   const found = typeof needle === "string" ? haystack.includes(needle) : needle.test(haystack);
   if (!found) throw new Error(`OA template marker missing: ${label}`);
@@ -105533,7 +105627,10 @@ NOW, THEREFORE,`,
       s,
       "EXHIBIT A \u2014 MEMBER; CONTRIBUTIONS; TOD DESIGNATION",
       {
-        "$[AMOUNT] [and/or described property]": inputs.contributionToCompany || m2.contribution || "\u2014",
+        // Adam, 9 Sep 2026: every initial series contribution is treated as
+        // made first to the Company, then by the Company to the series, so it
+        // is listed here too — the chain s. 6.1 describes, on one exhibit.
+        "$[AMOUNT] [and/or described property]": [inputs.contributionToCompany || m2.contribution || "\u2014", ...seriesContributionPhrases(inputs.series)].join("; and "),
         "[DATE]": inputs.effectiveDate,
         // The master's own sentence carries the fallback: "…shall pass to:
         // **X**, or if none is designated or the designation fails, the
@@ -105558,6 +105655,17 @@ NOW, THEREFORE,`,
       "[HOLDING]": m2.jointHolding ?? ""
     }));
     s = expandRepeat(s, "member", rows, "Exhibit A multi");
+    const chain = seriesContributionPhrases(inputs.series);
+    if (chain.length > 0) {
+      s = replaceOnce(
+        s,
+        "**Transfer on Death designations (ss. 711.50\u2013711.512, Fla. Stat.):**",
+        `**Initial contributions to Protected Series, treated as contributed first to the Company by the Members in proportion to their Percentage Interests and then by the Company to the series:** ${chain.join("; ")}.
+
+**Transfer on Death designations (ss. 711.50\u2013711.512, Fla. Stat.):**`,
+        "Exhibit A multi series contributions"
+      );
+    }
   }
   const ex1 = extractSection(s, "SERIES EXHIBIT PS-[N]", "series exhibit template");
   s = ex1.doc;

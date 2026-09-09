@@ -5,7 +5,7 @@
  * @cantoo/pdf-lib is an API-compatible pdf-lib fork that adds encryption, so
  * the output can allow printing while restricting copy/edit.
  */
-import { PDFDocument, StandardFonts, rgb, PDFFont, PDFPage } from "@cantoo/pdf-lib";
+import { PDFDocument, StandardFonts, rgb, PDFFont, PDFPage, PDFArray, PDFDict, PDFHexString, PDFName, PDFRef, PDFStream, PDFString, PDFTextField, type PDFObject } from "@cantoo/pdf-lib";
 
 const PAGE_W = 612; // Letter
 const PAGE_H = 792;
@@ -72,8 +72,11 @@ export function parseMarkdown(md: string): Block[] {
         tbl.push(lines[i].trim());
         i++;
       }
+      // Drop the |---|---| separator only. A row of empty cells (| | | |) is
+      // a real row — the Asset Schedule's blank lines — and was being
+      // dropped with it, so the schedule rendered as a header alone.
       const rows = tbl
-        .filter((t) => !/^\|[\s\-|]+\|?$/.test(t))
+        .filter((t) => !/^\|[\s|]*-[\s\-|]*\|?$/.test(t))
         .map((t) => t.replace(/^\||\|$/g, "").split("|").map((c) => c.trim()));
       if (rows.length > 0) blocks.push({ kind: "table", rows });
       continue;
@@ -195,6 +198,18 @@ export async function renderMarkdownPdf(opts: {
   const need = (h: number) => {
     if (y - h < MARGIN) newPage();
   };
+  const TEXT_H = PAGE_H - 2 * MARGIN;
+  const BLANK_NOTICE = "[INTENTIONALLY LEFT BLANK]";
+  /** Called just before a forced page break: if the rest of this page is a
+   *  large blank, print the notice in the middle of it. */
+  const markBlankSpace = () => {
+    const remaining = y - MARGIN;
+    if (remaining <= TEXT_H / 3) return;
+    const size = BODY_SIZE;
+    const w = drawnWidth(fonts.regular, BLANK_NOTICE, size);
+    page.drawText(BLANK_NOTICE, { x: MARGIN + (width - w) / 2, y: MARGIN + remaining / 2 - size / 2, size, font: fonts.regular, color: rgb(0.1, 0.12, 0.16) });
+    y = MARGIN; // the space is spoken for
+  };
 
   const segWidth = (seg: Seg, size: number): number => drawnWidth(fontFor(fonts, seg), seg.text, size);
 
@@ -239,6 +254,8 @@ export async function renderMarkdownPdf(opts: {
   // agreements' own title headings (OF, the company, its type) all come
   // before their first paragraph, so they stay centered.
   let titleSawParagraph = false;
+  // Which Asset Schedule the fields belong to, so names are unique per series.
+  let assetScheduleNo = 0;
 
   // Keep-tail-together: a forced [[pagebreak]] (the signature page, an
   // exhibit) can leave the last few lines before it stranded alone on an
@@ -313,7 +330,12 @@ export async function renderMarkdownPdf(opts: {
       }
       // Sentinel: force the next content onto a fresh page. Exhibits and
       // asset schedules get detached and handed to banks, so they start clean.
+      // A break that leaves more than a third of the page's text area empty
+      // says so, centered in the space, so a reader knows nothing is missing
+      // (Adam, 9 Sep 2026: "[INTENTIONALLY LEFT BLANK] … centered in the
+      // middle of the blank space").
       if (block.segs.length === 1 && block.segs[0].text.trim() === "[[pagebreak]]") {
+        markBlankSpace();
         newPage();
         continue;
       }
@@ -377,13 +399,37 @@ export async function renderMarkdownPdf(opts: {
       const size = 9.5;
       const lineH = size + 2.5;
       const pad = 4;
+      // The Asset Schedule's empty rows are the client's to fill in the PDF
+      // itself (Adam, 9 Sep 2026): each empty cell is a typeable field that
+      // wraps and auto-sizes its text — the PDF's own "0 Tf" rule, which
+      // readers apply as "as large as fits, shrinking as the text grows".
+      const isAssetSchedule = /^Asset description/i.test(block.rows[0]?.[0] ?? "");
+      const FILL_LINES = 4;
+      if (isAssetSchedule) assetScheduleNo++;
       for (let ri = 0; ri < block.rows.length; ri++) {
         const row = block.rows[ri];
+        const fillable = isAssetSchedule && ri > 0 && row.every((c) => c.trim() === "");
         const cellLines = row.map((cell) =>
           wrapSegs(fonts, parseInline(cell).map((s) => (ri === 0 ? { ...s, bold: true } : s)), colW - 2 * pad, size),
         );
-        const rowH = Math.max(1, ...cellLines.map((c) => c.length)) * lineH + 2 * pad;
+        const rowH = (fillable ? FILL_LINES : Math.max(1, ...cellLines.map((c) => c.length))) * lineH + 2 * pad;
         need(rowH);
+        if (fillable) {
+          const form = doc.getForm();
+          for (let ci = 0; ci < cols; ci++) {
+            const field = form.createTextField(`asset-schedule.${assetScheduleNo}.row${ri}.col${ci + 1}`);
+            field.enableMultiline();
+            field.addToPage(page, {
+              x: MARGIN + ci * colW + 1,
+              y: y - rowH + 1,
+              width: colW - 2,
+              height: rowH - 2,
+              borderWidth: 0,
+              font: fonts.regular,
+            });
+            field.setFontSize(0);
+          }
+        }
         // grid
         page.drawRectangle({
           x: MARGIN,
@@ -424,7 +470,7 @@ export async function renderMarkdownPdf(opts: {
     return doc.save();
   }
   stampFooters(doc, fonts.regular, opts.watermark);
-  return finishWithPermissions(doc, opts.title, opts.watermark);
+  return finishWithPermissions(doc, opts.title, opts.watermark, fonts.regular);
 }
 
 function stampPageNumbers(doc: PDFDocument, font: PDFFont): void {
@@ -465,14 +511,81 @@ function setMeta(doc: PDFDocument, title: string, wm: WatermarkInfo): void {
   doc.setCreationDate(new Date());
 }
 
+/** PDF 32000-1 s. 7.6.1: in an encrypted document every string is encrypted
+ *  with the key of the indirect object that holds it (the Encrypt dictionary
+ *  excepted). The library leaves strings alone, so this walks every indirect
+ *  object after encryption is set up and replaces each string with its
+ *  encrypted hex form. Streams are the writer's own job and are not touched. */
+function encryptStrings(doc: PDFDocument): void {
+  const encryptRef = doc.context.trailerInfo.Encrypt;
+  const done = new WeakSet<object>();
+  for (const [ref, object] of doc.context.enumerateIndirectObjects()) {
+    if (encryptRef instanceof PDFRef && ref === encryptRef) continue;
+    encryptStringsIn(doc, ref, object, done);
+  }
+}
+
+/** `done` remembers every container and every string already handled: a
+ *  dictionary the library shares between two indirect objects, or a string
+ *  reached twice, must not be encrypted twice — the second pass turns it to
+ *  garbage. */
+function encryptStringsIn(doc: PDFDocument, ref: unknown, object?: PDFObject, done: WeakSet<object> = new WeakSet()): void {
+  if (!(ref instanceof PDFRef)) return;
+  const security = (doc.context as unknown as { security?: { getEncryptFn: (obj: number, gen: number) => (b: Uint8Array) => Uint8Array } }).security;
+  if (!security) return;
+  const target = object ?? doc.context.lookup(ref);
+  if (!target) return;
+  const fn = security.getEncryptFn(ref.objectNumber, ref.generationNumber);
+  const toHex = (b: Uint8Array) => Array.from(b, (x) => x.toString(16).padStart(2, "0")).join("");
+  const enc = (s: PDFString | PDFHexString) => {
+    const out = PDFHexString.of(toHex(fn(s.asBytes())));
+    done.add(out);
+    return out;
+  };
+  const walk = (o: PDFObject): PDFObject => {
+    if (done.has(o)) return o;
+    if (o instanceof PDFString || o instanceof PDFHexString) return enc(o);
+    if (o instanceof PDFStream) { walkDict(o.dict); return o; }
+    if (o instanceof PDFDict) { walkDict(o); return o; }
+    if (o instanceof PDFArray) {
+      done.add(o);
+      for (let i = 0; i < o.size(); i++) o.set(i, walk(o.get(i)));
+      return o;
+    }
+    return o;
+  };
+  const walkDict = (d: PDFDict) => {
+    if (done.has(d)) return;
+    done.add(d);
+    for (const [k, v] of d.entries()) d.set(k, walk(v));
+  };
+  walk(target);
+}
+
 /** Print allowed; copying/modifying restricted. Falls back to unencrypted if
  *  the encryption path fails — the watermark is the real deterrent. */
-async function finishWithPermissions(doc: PDFDocument, title: string, wm: WatermarkInfo): Promise<Uint8Array> {
+/** The typeable cells, made ready for a reader: appearance streams built
+ *  once, every cell set back to auto-size (the library's appearance pass
+ *  picks a size of its own), and the font registered where readers look for
+ *  a field's font — the AcroForm's default resources — with a document-level
+ *  default appearance as the fallback. */
+function finishFields(doc: PDFDocument, font: PDFFont): void {
+  const form = doc.getForm();
+  const cells = form.getFields().filter((f): f is PDFTextField => f instanceof PDFTextField);
+  if (cells.length === 0) return;
+  form.updateFieldAppearances(font);
+  for (const cell of cells) cell.setFontSize(0);
+  const dr = doc.context.obj({ Font: doc.context.obj({ [font.name]: font.ref }) });
+  form.acroForm.dict.set(PDFName.of("DR"), dr);
+  form.acroForm.dict.set(PDFName.of("DA"), PDFString.of(`/${font.name} 0 Tf 0 g`));
+}
+
+async function finishWithPermissions(doc: PDFDocument, title: string, wm: WatermarkInfo, font: PDFFont): Promise<Uint8Array> {
   try {
     const anyDoc = doc as unknown as {
       encrypt?: (o: {
         ownerPassword: string;
-        permissions: { printing?: string; modifying?: boolean; copying?: boolean; annotating?: boolean };
+        permissions: { printing?: string; modifying?: boolean; copying?: boolean; annotating?: boolean; fillingForms?: boolean };
       }) => Promise<void> | void;
     };
     if (typeof anyDoc.encrypt === "function") {
@@ -484,14 +597,27 @@ async function finishWithPermissions(doc: PDFDocument, title: string, wm: Waterm
       // so the encrypted document carries NO Info dictionary: viewers then
       // fall back to the clean filename. The watermark on every page, not the
       // metadata, is what identifies the licensee.
-      delete (doc.context.trailerInfo as { Info?: unknown }).Info;
       await anyDoc.encrypt({
         ownerPassword: `mfsl-${Math.random().toString(36).slice(2)}${Date.now().toString(36)}`,
         // Clients may print and add their own notes/signatures; the underlying
         // text stays locked against copying and editing.
-        permissions: { printing: "highResolution", modifying: false, copying: false, annotating: true },
+        permissions: { printing: "highResolution", modifying: false, copying: false, annotating: true, fillingForms: true },
       });
-      return await doc.save({ useObjectStreams: false });
+      // The library encrypts streams only. Every STRING — field names, the
+      // fields' appearance settings, typed values, the title — would be
+      // written in the clear into a file that declares string encryption,
+      // and a compliant reader "decrypts" each into garbage (pypdf read the
+      // field names back as "", ".", ".." — 9 Sep 2026). Encrypt the strings
+      // ourselves with the same per-object keys, and the document may carry
+      // its Info dictionary again.
+      await doc.flush();
+      finishFields(doc, font);
+      setMeta(doc, title, wm);
+      encryptStrings(doc);
+      // The library would rebuild every field's appearance during save — with
+      // fresh, unencrypted strings and its own font size. The fields are
+      // finished above; save must leave them alone.
+      return await doc.save({ useObjectStreams: false, updateFieldAppearances: false });
     }
     setMeta(doc, title, wm);
     return await doc.save({ useObjectStreams: false });
@@ -511,5 +637,5 @@ export async function stampExistingPdf(opts: {
   const doc = await PDFDocument.load(opts.bytes, { ignoreEncryption: true });
   const font = await doc.embedFont(StandardFonts.Helvetica);
   stampFooters(doc, font, opts.watermark);
-  return finishWithPermissions(doc, opts.title, opts.watermark);
+  return finishWithPermissions(doc, opts.title, opts.watermark, font);
 }

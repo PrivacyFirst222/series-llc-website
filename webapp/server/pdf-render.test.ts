@@ -132,6 +132,70 @@ for (const version of versions) {
 }
 check("all 16 variants rendered", rendered === 16, rendered);
 
+// 6. The licensed (encrypted) agreement with one series: the blank-space
+// notice, the Asset Schedule's typeable fields, and — read back the way a
+// compliant reader reads it — field names, appearance settings, and the
+// title all decrypt cleanly (9 Sep 2026: the library left strings in the
+// clear, so readers turned them to garbage).
+{
+  const inputs = {
+    ...base,
+    members: base.members.slice(0, 1),
+    version: "member-single",
+    professional: false,
+    series: [{ name: "E2E Coastal Holdings, LLC - PS 1", purpose: "Rental real estate", contribution: "$2,000" }],
+  } as OaInputs;
+  const { markdown, title } = assembleOa(inputs);
+  check("Exhibit A lists the series contribution as a contribution to the Company", /\$2,000 contributed to the Company and by the Company to E2E Coastal Holdings, LLC - PS 1/.test(markdown), markdown.match(/Initial contribution to the Company[^\n]*/)?.[0]);
+  const bytes = await renderMarkdownPdf({ markdown, watermark: { name: "Casey Gatecheck", email: "casey@example.com" }, title });
+  check("licensed agreement renders", new TextDecoder().decode(bytes.slice(0, 5)) === "%PDF-");
+  const file = join(outDir, "licensed-with-series.pdf");
+  writeFileSync(file, bytes);
+  if (hasPdftotext) {
+    const text = execSync(`pdftotext -layout "${file}" -`).toString();
+    check("the blank space before a forced break carries the notice", /\[INTENTIONALLY LEFT BLANK\]/.test(text), (text.match(/INTENTIONALLY LEFT BLANK/g) ?? []).length);
+    check("the encrypted text still reads (streams decrypt)", /Asset description/.test(text) && /Company as Owner/.test(text));
+  }
+  const hasPypdf = (() => { try { execSync("python3 -c 'import pypdf, cryptography'", { stdio: "ignore" }); return true; } catch { return false; } })();
+  if (hasPypdf) {
+    // The field tree is walked by hand: pypdf's flattened listing drops a
+    // leaf's own /DA, which is where the auto-size setting lives.
+    const py = `
+import json, sys
+from pypdf import PdfReader
+r = PdfReader(sys.argv[1])
+r.decrypt("")
+fields = {}
+def walk(node, prefix):
+    o = node.get_object()
+    t = o.get("/T")
+    name = (prefix + "." if prefix else "") + str(t) if t is not None else prefix
+    kids = o.get("/Kids")
+    if kids and any(k.get_object().get("/T") is not None for k in kids):
+        for k in kids: walk(k, name)
+    else:
+        fields[name] = {"DA": str(o.get("/DA")), "Ff": o.get("/Ff")}
+af = r.trailer["/Root"].get("/AcroForm")
+for f in (af["/Fields"] if af else []): walk(f, "")
+out = {"encrypted": r.is_encrypted, "title": (r.metadata or {}).get("/Title"), "fields": fields, "acroDA": str(af.get("/DA")) if af else None, "drFonts": list(af["/DR"]["/Font"].keys()) if af and "/DR" in af else []}
+print(json.dumps(out))
+`;
+    const raw = execSync(`python3 -c '${py.replace(/'/g, "'\\''")}' "${file}"`, { stdio: ["ignore", "pipe", "ignore"] }).toString();
+    const parsed = JSON.parse(raw) as { encrypted: boolean; title: string | null; fields: Record<string, { DA: string; Ff: number | null }>; acroDA: string | null; drFonts: string[] };
+    check("the form declares its font where readers look (DR) and a document default appearance", parsed.drFonts.includes("/Times-Roman") && /0 Tf/.test(parsed.acroDA ?? ""), { dr: parsed.drFonts, da: parsed.acroDA });
+    // The reader lists the field tree: asset-schedule → 1 → rowN → colN.
+    // The twenty leaves are the cells; their parents carry no appearance.
+    const leaves = Object.keys(parsed.fields).filter((n) => /^asset-schedule\.1\.row\d\.col\d$/.test(n));
+    check("the licensed agreement is encrypted", parsed.encrypted === true);
+    check("the title decrypts cleanly for a compliant reader", parsed.title === title, parsed.title);
+    check("the Asset Schedule has 20 typeable fields for one series (5 rows × 4 columns)", leaves.length === 20, Object.keys(parsed.fields).slice(0, 6));
+    check("every cell's appearance string decrypts and auto-sizes (0 Tf)", leaves.length > 0 && leaves.every((n) => /\b0 Tf\b/.test(parsed.fields[n].DA)), leaves.map((n) => parsed.fields[n].DA).slice(0, 3));
+    check("every cell is multiline (wraps)", leaves.length > 0 && leaves.every((n) => ((parsed.fields[n].Ff ?? 0) & 4096) === 4096), leaves.map((n) => parsed.fields[n].Ff).slice(0, 3));
+  } else {
+    console.log("(pypdf not installed here — the encrypted read-back checks ran 0 of 5)");
+  }
+}
+
 // 5. The S election instruction sheet's shape: a title, a bold name, an italic
 // line, then section headings and body. Only the first three are title.
 if (hasPdftotext) {

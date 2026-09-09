@@ -314,6 +314,15 @@ export function UnitFieldCards({ units, isMulti, owners, seedSeries, series, con
     <>
       <QuestionCard title="Initial contributions" learnMore="contributions">
               <div className="space-y-2">
+                {/* Adam, 9 Sep 2026: the chain of contribution, stated where the
+                    client types the numbers, so Exhibit A and the Series
+                    Exhibits agree with each other and with s. 6.1. */}
+                <p className="text-sm text-muted-foreground" data-testid="contribution-chain">
+                  All initial series contributions are treated as first contributed to the company
+                  and then contributed by the company to the series. Every initial contribution to
+                  a series is therefore also listed on Exhibit A as an initial contribution to the
+                  company.
+                </p>
                 <label className="text-sm">
                   Contribution to the company{isMulti ? " (per owner below)" : ""}
                 </label>
