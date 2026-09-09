@@ -1563,6 +1563,47 @@ async function main(): Promise<void> {
     }
   }
 
+  // "Start over" on the intake (Adam, 9 Sep 2026): a confirmation that names
+  // what is deleted; Cancel keeps everything; proceeding empties the form and
+  // the browser's saved draft.
+  console.log("\n▶ Start-over journey (intake)");
+  {
+    const page = await browser.newPage();
+    try {
+      await page.goto(`http://localhost:${WEB_PORT}/form-llc?path=new`);
+      await page.evaluate(() => localStorage.clear());
+      await page.goto(`http://localhost:${WEB_PORT}/form-llc?path=new`);
+      await page.waitForSelector("main h2");
+      await clickCard(page, "Domestic Florida LLC");
+      await checkAllBoxes(page);
+      await advance(page);
+      await fill(page, "First name", "Casey");
+      await fill(page, "Last name", "Restart");
+      await page.waitForTimeout(400);
+      await page.locator('[data-testid="start-over"]').click();
+      await page.waitForTimeout(400);
+      const dialog = page.locator('[role="alertdialog"]').first();
+      expect(/delete everything you have entered on this form/i.test(await dialog.innerText()), "start over: the warning says everything on the form will be deleted", await dialog.innerText());
+      await dialog.locator("button").filter({ hasText: /^Cancel$/ }).first().click();
+      await page.waitForTimeout(400);
+      expect((await page.getByLabel("First name", { exact: false }).first().inputValue()) === "Casey", "start over: Cancel keeps every answer");
+      await page.locator('[data-testid="start-over"]').click();
+      await page.waitForTimeout(400);
+      await shot(page, "intake-start-over");
+      await page.locator('[role="alertdialog"]').first().locator("button").filter({ hasText: /Delete and start over/ }).first().click();
+      await page.waitForTimeout(800);
+      expect((await stepHeading(page)).includes("Eligibility"), "start over: the form returns to its first step", await stepHeading(page));
+      const draft = await page.evaluate(() => { const raw = localStorage.getItem("fl-llc-formation-draft-v1"); return raw ? (JSON.parse(raw) as { data?: { clientFirstName?: string } }).data?.clientFirstName ?? "" : null; });
+      expect(!draft, "start over: the saved draft no longer holds the typed name", draft);
+      await advance(page).catch(() => {});
+      expect((await page.getByLabel("First name", { exact: false }).first().inputValue().catch(() => "")) === "", "start over: the name box is empty afterward");
+    } catch (e) {
+      expect(false, `start-over journey: ${String(e).slice(0, 300)}`);
+    } finally {
+      await page.close();
+    }
+  }
+
   console.log("\n▶ Persistent toast journey (contact form)");
   {
     const page = await browser.newPage();

@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { ArrowLeft, ArrowRight, Check, Save } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, RotateCcw, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "@/components/ui/use-toast";
 import { defaultFormData } from "./defaults";
 import { validateStep } from "./stepValidation";
@@ -135,6 +136,20 @@ export function FloridaLLCFormationForm({
   );
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  // "Start over" (Adam, 9 Sep 2026): the form keeps its answers on this
+  // browser, so there is a way to wipe them — behind a confirmation that says
+  // what will be deleted and offers proceed or cancel.
+  const [confirmStartOver, setConfirmStartOver] = useState<boolean>(false);
+  const startOver = () => {
+    try { localStorage.removeItem(STORAGE_KEY); } catch { /* nothing saved */ }
+    setData(PATH_PRESET ? { ...defaultFormData, filingPath: PATH_PRESET } : defaultFormData);
+    setStepIndex(PATH_PRESET ? 1 : 0);
+    setMaxStep(PATH_PRESET ? 1 : 0);
+    setVisited(new Set(PATH_PRESET ? [0, 1] : [0]));
+    setErrors({});
+    setConfirmStartOver(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   // A draft can be parked on a step that later became hidden (management
   // switched to member-managed, or the rule shipped after the draft was
@@ -572,6 +587,34 @@ export function FloridaLLCFormationForm({
               compact
             />
           ) : null}
+
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => setConfirmStartOver(true)}
+            className="w-full justify-start rounded-full text-muted-foreground"
+            data-testid="start-over"
+          >
+            <RotateCcw className="mr-1.5 h-4 w-4" />
+            Start over
+          </Button>
+          <AlertDialog open={confirmStartOver} onOpenChange={setConfirmStartOver}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete everything on this form?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will delete everything you have entered on this form and take you back to the
+                  first step. Are you sure?
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={startOver} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                  Delete and start over
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </aside>
 
         {/* Form panel — a div, not <main>: the Layout already provides the
