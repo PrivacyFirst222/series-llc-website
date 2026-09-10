@@ -3009,6 +3009,24 @@ When he asked whether I had read it, I treated the question as a pointer to a se
 
 Reading everything the site says about converting an existing LLC, in full, with the fraction stated, and everything the conversion order form collects step by step in conversion mode, before writing another word about what the office should do with a conversion.
 
+## P76 — Production's database down for twelve minutes: a migration edited after it was applied
+
+### THE FAILURE
+
+No words from Adam; this one I found myself. Commit 4431b18 deployed at 10:59 PM on 9 Sep 2026. The health check afterwards answered `"database":false`, and the public entity lookup answered "unavailable" — every database-backed route on the live site was dead until commit 4ca2132 deployed at 11:09 PM. Twelve minutes with the site unable to take an order or sign anyone in.
+
+The cause: the admin's view-as sign-in needed a new column on the sessions table, and I pasted the `ALTER TABLE` into migration 1's statement list in `server/db.ts`. Every migration is checksummed and recorded when applied; the file says, in the line directly under the list, "Append future migrations here with the next id. Never edit an entry." Production had migration 1 recorded with the original checksum, so the runner refused to start with "migration 1 has been EDITED after being applied". The local checks never saw it: every check runs on a fresh database where nothing is recorded yet, so an edited migration applies like a new one. The full walk (673 checks) and the server checks (all pass) were both green on a change that took the live site down.
+
+### WHY IT HAPPENED
+
+I added the column where the table is defined, because that is where a column belongs when you are reading a schema, and I did not read the file's own rules for changing it — the migration model, the checksum, the "never edit an entry" line — because I opened `db.ts` to find one `CREATE TABLE` and closed it once I had. The file is 430 lines; I read 10. The rule about reading a document for its substance and not for the thing I came to change (P12, P14, L8) is written for legal documents; it applies to this file exactly, and I did not apply it because a schema file did not feel like a document with a rule in it.
+
+Underneath: the checks I trust are fresh-database checks, and I knew that — it is why the rate-limit workaround uses a fresh database — and I did not ask what a fresh database cannot catch. A change to how the database boots is precisely the class of change a fresh database cannot test, and the moment I touched the migrations was the moment to ask what production has that the checks do not: a recorded history. The health check after the deploy caught it in under a minute; nothing before the deploy could have, given how I checked.
+
+### FIXED BY
+
+The column moved to migration 6, appended; migration 1 diffed against the previous commit and confirmed byte-identical; a fresh database booted twice on the same files, the second boot with all six migrations recorded, health ok both times; deployed; production health polled until `"database":true`. From now on, any change to `db.ts` is read against its own rules at the top of the file, and a change to migrations is booted twice locally — once fresh, once against the recorded state — before it is pushed.
+
 ## Process — the ones that let the substantive ones through
 
 **M1 · Verify the proposition you set out to verify, not the one underneath.** A
