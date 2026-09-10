@@ -1720,6 +1720,9 @@ async function main(): Promise<void> {
         return els.map((el) => { const r = el.getBoundingClientRect(); return card ? r.right <= card.right + 1 && r.left >= card.left - 1 : false; });
       });
       expect(clipped.length >= 4 && clipped.every(Boolean), "clients tab: every action button is inside the card, none cut off", clipped);
+      // Two buttons on each of two lines (Adam, 10 Sep 2026), not spread over three.
+      const rowsUsed = await row.locator('[data-testid="client-actions"] > *').evaluateAll((els) => new Set(els.map((el) => Math.round(el.getBoundingClientRect().top))).size);
+      expect(rowsUsed === 2, "clients tab: the four buttons sit two to a line on two lines", rowsUsed);
       await shot(page, "admin-clients-companies");
       // The Order Summary (Adam, 10 Sep 2026): one company opens its PDF at
       // once; the office reads it as it was when the order was placed.

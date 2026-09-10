@@ -375,7 +375,7 @@ function ClientsTable({
                   {/* Four buttons no longer fit on one line at every width;
                       they wrap inside the cell instead of running off the
                       card's edge (Adam, 10 Sep 2026). */}
-                  <div className="flex max-w-[340px] flex-wrap justify-end gap-2" data-testid="client-actions">
+                  <div className="ml-auto grid w-max grid-cols-2 gap-2" data-testid="client-actions">
                     <OrderSummaryButton client={cl} />
                     <ViewPortalButton client={cl} />
                     <ChangeEmailDialog client={cl} />
