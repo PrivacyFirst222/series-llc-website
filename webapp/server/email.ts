@@ -8,9 +8,16 @@ interface Mail {
 }
 
 /** Sends via Resend; without an API key, logs instead (dev). */
+/** Dev only: the last mails that would have been sent, newest last, so the
+ *  server checks can read what a client would receive (10 Sep 2026). Never
+ *  filled when a real mail key is configured. */
+export const devOutbox: Mail[] = [];
+
 export async function sendMail(mail: Mail): Promise<void> {
   if (!env.RESEND_API_KEY) {
     console.log(`[email:dev] to=${mail.to} subject="${mail.subject}"\n${mail.html}`);
+    devOutbox.push(mail);
+    if (devOutbox.length > 50) devOutbox.splice(0, devOutbox.length - 50);
     return;
   }
   const res = await fetch("https://api.resend.com/emails", {
@@ -126,6 +133,28 @@ export function emailChangedEmail(newEmail: string): { subject: string; html: st
       <p>The email address on your MyFloridaSeriesLLC portal account is now
       <strong>${escapeHtml(newEmail)}</strong>. Sign in with that address from now on.</p>
       <p>If you did not authorize this, email support@myfloridaseriesllc.com immediately.</p>
+    `),
+  };
+}
+
+/** Legal mail received as registered agent (Adam, 10 Sep 2026). The Owner's
+ *  Manual tells the client the response clock runs from service whether or
+ *  not the papers are read; this email says so, the day the mail arrives. */
+export function legalMailEmail(opts: { clientName: string; title: string; portalUrl: string }): { subject: string; html: string } {
+  return {
+    subject: `Legal mail received for ${opts.title}`,
+    html: wrap(`
+      <p>Dear ${escapeHtml(opts.clientName || "client")};</p>
+      <p>We received legal mail today as your registered agent:
+      <strong>${escapeHtml(opts.title)}</strong>. It is in the Legal mail section of your
+      client portal now.</p>
+      <p>Please sign in and download it today. Papers served on a company usually carry a
+      deadline that runs from the day they were served, whether or not they have been read.
+      In Florida a lawsuit typically allows 20 days to respond. Get the papers to your
+      attorney the same day.</p>
+      <p><a href="${opts.portalUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Sign in to your portal</a></p>
+      <p style="color:#555;font-size:13px">This email is a notice that mail arrived. We do not
+      review what it says and cannot advise you about it.</p>
     `),
   };
 }

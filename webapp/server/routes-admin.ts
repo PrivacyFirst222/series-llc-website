@@ -19,7 +19,7 @@ import { createSession, rateLimit, clientIp } from "./auth";
 import { createHash } from "node:crypto";
 import ownersManualMd from "../../docs/owners-manual.md";
 import { deleteFile, putFile, readFileStream } from "./storage";
-import { sendMail, newDocumentEmail, emailChangedEmail, serviceFulfilledClientEmail, llcFormedEmail, sElectionEinAddedEmail, sElectionEinArrivedLateEmail } from "./email";
+import { sendMail, newDocumentEmail, legalMailEmail, emailChangedEmail, serviceFulfilledClientEmail, llcFormedEmail, sElectionEinAddedEmail, sElectionEinArrivedLateEmail } from "./email";
 import { einDigits, fmtEinDisplay, isValidEin } from "../src/lib/ein";
 import { filingGroups, seriesNames } from "./filing";
 import { err, testHooks, MAX_UPLOAD_BYTES, looksLikePdf, requireAdmin } from "./shared";
@@ -1268,7 +1268,7 @@ app.post("/admin/documents", async (c) => {
     return c.json(err(`${file.name} is not a readable PDF. Everything delivered through the portal is a PDF.`, "NOT_A_PDF"), 400);
   }
   const db = await getDb();
-  const clients = await db.query<{ email: string }>("SELECT email FROM clients WHERE id = $1", [clientId]);
+  const clients = await db.query<{ email: string; name: string }>("SELECT email, name FROM clients WHERE id = $1", [clientId]);
   if (clients.length === 0) return c.json(err("Client not found.", "NOT_FOUND"), 404);
 
   // A package belongs to one of the client's companies (Adam, 7 Sep 2026).
@@ -1297,7 +1297,12 @@ app.post("/admin/documents", async (c) => {
 
   let notified = false;
   if (notify) {
-    const mail = newDocumentEmail(`${env.PUBLIC_BASE_URL}/portal`);
+    // Legal mail says what arrived and that the clock is running; a package
+    // keeps the plain new-document notice (Adam, 10 Sep 2026).
+    const mail =
+      kind === "legal_mail"
+        ? legalMailEmail({ clientName: clients[0].name, title, portalUrl: `${env.PUBLIC_BASE_URL}/portal` })
+        : newDocumentEmail(`${env.PUBLIC_BASE_URL}/portal`);
     notified = await sendMail({ to: clients[0].email, ...mail }).then(
       () => true,
       (e) => {

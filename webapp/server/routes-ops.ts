@@ -14,6 +14,7 @@ import { newToken } from "./crypto";
 import { syncDailies } from "./sunbiz";
 
 import { err, testHooks } from "./shared";
+import { devOutbox } from "./email";
 import { fulfillPaidOrder, fulfillPaidServiceOrder } from "./routes-payments";
 import { purgeExpiredSElections } from "./routes-portal";
 import { refreshOwnersManual } from "./routes-admin";
@@ -52,6 +53,12 @@ if (!env.isProd) {
     testHooks.failNextFulfillment = true;
     return c.json({ data: { armed: true } });
   });
+}
+
+// Dev-only: the mails that would have been sent, so the checks can read what
+// a client receives (10 Sep 2026). Empty whenever a real mail key is set.
+if (!env.isProd) {
+  app.get("/dev/outbox", (c) => c.json({ data: devOutbox.map((m) => ({ to: m.to, subject: m.subject, html: m.html })) }));
 }
 
 // Dev-only stand-in for the Square webhook while no Square account is connected.

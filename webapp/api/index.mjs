@@ -101169,10 +101169,13 @@ async function unavailableNames(names) {
 }
 
 // server/email.ts
+var devOutbox = [];
 async function sendMail(mail) {
   if (!env.RESEND_API_KEY) {
     console.log(`[email:dev] to=${mail.to} subject="${mail.subject}"
 ${mail.html}`);
+    devOutbox.push(mail);
+    if (devOutbox.length > 50) devOutbox.splice(0, devOutbox.length - 50);
     return;
   }
   const res = await fetch("https://api.resend.com/emails", {
@@ -101275,6 +101278,24 @@ function emailChangedEmail(newEmail) {
       <p>The email address on your MyFloridaSeriesLLC portal account is now
       <strong>${escapeHtml(newEmail)}</strong>. Sign in with that address from now on.</p>
       <p>If you did not authorize this, email support@myfloridaseriesllc.com immediately.</p>
+    `)
+  };
+}
+function legalMailEmail(opts) {
+  return {
+    subject: `Legal mail received for ${opts.title}`,
+    html: wrap(`
+      <p>Dear ${escapeHtml(opts.clientName || "client")};</p>
+      <p>We received legal mail today as your registered agent:
+      <strong>${escapeHtml(opts.title)}</strong>. It is in the Legal mail section of your
+      client portal now.</p>
+      <p>Please sign in and download it today. Papers served on a company usually carry a
+      deadline that runs from the day they were served, whether or not they have been read.
+      In Florida a lawsuit typically allows 20 days to respond. Get the papers to your
+      attorney the same day.</p>
+      <p><a href="${opts.portalUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Sign in to your portal</a></p>
+      <p style="color:#555;font-size:13px">This email is a notice that mail arrived. We do not
+      review what it says and cannot advise you about it.</p>
     `)
   };
 }
@@ -110156,7 +110177,7 @@ function registerAdminRoutes(app2) {
       return c.json(err(`${file.name} is not a readable PDF. Everything delivered through the portal is a PDF.`, "NOT_A_PDF"), 400);
     }
     const db = await getDb();
-    const clients = await db.query("SELECT email FROM clients WHERE id = $1", [clientId]);
+    const clients = await db.query("SELECT email, name FROM clients WHERE id = $1", [clientId]);
     if (clients.length === 0) return c.json(err("Client not found.", "NOT_FOUND"), 404);
     const requestedOrderId = typeof form.orderId === "string" ? form.orderId.trim() : "";
     let orderId = null;
@@ -110179,7 +110200,7 @@ function registerAdminRoutes(app2) {
     );
     let notified = false;
     if (notify) {
-      const mail = newDocumentEmail(`${env.PUBLIC_BASE_URL}/portal`);
+      const mail = kind === "legal_mail" ? legalMailEmail({ clientName: clients[0].name, title, portalUrl: `${env.PUBLIC_BASE_URL}/portal` }) : newDocumentEmail(`${env.PUBLIC_BASE_URL}/portal`);
       notified = await sendMail({ to: clients[0].email, ...mail }).then(
         () => true,
         (e) => {
@@ -110223,6 +110244,9 @@ function registerOpsRoutes(app2) {
       testHooks.failNextFulfillment = true;
       return c.json({ data: { armed: true } });
     });
+  }
+  if (!env.isProd) {
+    app2.get("/dev/outbox", (c) => c.json({ data: devOutbox.map((m2) => ({ to: m2.to, subject: m2.subject, html: m2.html })) }));
   }
   if (!env.SQUARE_ACCESS_TOKEN && !env.isProd) {
     app2.post("/dev/simulate-payment", async (c) => {

@@ -688,6 +688,27 @@ const uploadRes = await fetch(BASE + "/api/admin/documents", {
   body: fd,
 });
 check("admin uploads document", uploadRes.status === 200, await uploadRes.clone().json().catch(() => null));
+// The two upload types send different emails (Adam, 10 Sep 2026): a package
+// the plain new-document notice, legal mail a notice that names the document
+// and says the response clock is running.
+{
+  const outbox = () => api("/api/dev/outbox").then((r) => (r.body?.data ?? []) as { to: string; subject: string; html: string }[]);
+  const afterPackage = (await outbox()).filter((m) => m.to === testEmail).at(-1);
+  check("a formation package sends the plain new-document notice", afterPackage?.subject === "A new document is available in your portal", afterPackage?.subject);
+  const lm = new FormData();
+  lm.set("clientId", client!.id);
+  lm.set("kind", "legal_mail");
+  lm.set("title", "Summons — Coastal v. E2E Coastal Holdings");
+  lm.set("notify", "true");
+  lm.set("file", new File([new TextEncoder().encode("%PDF-1.4 summons\n%%EOF")], "summons.pdf", { type: "application/pdf" }));
+  const lmRes = await fetch(BASE + "/api/admin/documents", { method: "POST", headers: { Cookie: admin.cookie }, body: lm });
+  check("admin uploads legal mail", lmRes.status === 200, await lmRes.clone().json().catch(() => null));
+  const afterLegal = (await outbox()).filter((m) => m.to === testEmail).at(-1);
+  check("legal mail sends a notice naming the document", afterLegal?.subject === "Legal mail received for Summons — Coastal v. E2E Coastal Holdings", afterLegal?.subject);
+  check("the legal-mail notice says the clock runs from service and names the 20 days",
+    /runs from the day they were served, whether or not they have been read/.test(afterLegal?.html ?? "") && /20 days to respond/.test(afterLegal?.html ?? "") && /Sign in to your portal/.test(afterLegal?.html ?? ""),
+    afterLegal?.html?.slice(0, 200));
+}
 
 // UPLOAD-003: the portal download layer serves EVERYTHING as a PDF, so the
 // upload layer must be strictly PDF — a plain text file that never claimed to
