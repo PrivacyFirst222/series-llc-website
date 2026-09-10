@@ -376,8 +376,25 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
     expect(!(await stepHeading(page)).toLowerCase().includes("acceptance"), `${run.key}: our service skips the acceptance step`, await stepHeading(page));
   }
 
+  // The management question and the Articles card (Adam, 10 Sep 2026): a
+  // conversion asks how the client would like the LLC managed and shows no
+  // card; a new formation reads exactly as before.
+  {
+    const mgmtText = await page.locator("main").innerText();
+    if (run.path === "convert") {
+      expect(/How would you like your LLC to be managed\?/.test(mgmtText) && !/How will the LLC be managed\?/.test(mgmtText), `${run.key}: a conversion asks how the client would like the LLC managed`, mgmtText.slice(0, 200));
+    } else {
+      expect(/How will the LLC be managed\?/.test(mgmtText), `${run.key}: a new formation keeps its management question`, mgmtText.slice(0, 200));
+    }
+  }
   // Management structure.
   await clickCard(page, run.management === "MEMBER_MANAGED" ? /^member-managed|member-managed —|members run/i : /manager-managed/i);
+  if (run.management === "MANAGER_MANAGED") {
+    await page.waitForTimeout(300);
+    const afterChoice = await page.locator("main").innerText();
+    const cardShown = /Your Articles will state that the LLC is manager-managed/.test(afterChoice);
+    expect(cardShown === (run.path === "new"), `${run.key}: the Articles card ${run.path === "new" ? "appears for a new formation" : "does not appear for a conversion"}`, afterChoice.slice(0, 200));
+  }
   await advance(page);
 
   // Managers or members — whichever the structure shows.

@@ -49,7 +49,7 @@ export function StepManagement({ data, patch, errors }: StepProps) {
       </header>
 
       <FieldShell
-        label="How will the LLC be managed?"
+        label={data.filingPath === "CONVERT" ? "How would you like your LLC to be managed?" : "How will the LLC be managed?"}
         required
         error={errors.managementStructure}
       >
@@ -138,7 +138,9 @@ export function StepManagement({ data, patch, errors }: StepProps) {
         </div>
       </details>
 
-      {data.managementStructure === "MANAGER_MANAGED" ? (
+      {/* A conversion files no Articles, so the card does not appear
+          (Adam, 10 Sep 2026). */}
+      {data.managementStructure === "MANAGER_MANAGED" && data.filingPath !== "CONVERT" ? (
         <div className="rounded-xl border border-trust/30 bg-trust/5 p-4 text-sm">
           <p className="font-medium">
             Your Articles will state that the LLC is manager-managed.
