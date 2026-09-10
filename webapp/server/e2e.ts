@@ -483,6 +483,18 @@ const client = (clients.body?.data as { id: string; email: string; has_password:
   (c) => c.email === testEmail,
 );
 check("client account auto-created on payment", !!client && !client.has_password, clients.body);
+// The email record (Adam, 10 Sep 2026): the welcome email is on file with
+// its body, readable by the admin only.
+{
+  const listed = await api(`/api/admin/emails?to=${encodeURIComponent(testEmail)}`, { cookies: admin.cookie });
+  const rows = (listed.body?.data ?? []) as { id: string; subject: string; ok: boolean; provider_id: string | null }[];
+  const welcome = rows.find((r) => r.subject === "Your MyFloridaSeriesLLC client portal");
+  check("the welcome email is in the record as delivered", listed.status === 200 && !!welcome && welcome.ok === true, rows.map((r) => r.subject));
+  const full = await api(`/api/admin/emails/${welcome?.id}`, { cookies: admin.cookie });
+  check("the record holds the email's body as sent", full.status === 200 && /Set your password/.test(String(full.body?.data?.html ?? "")), full.body?.data?.subject);
+  const denied = await api(`/api/admin/emails?to=${encodeURIComponent(testEmail)}`);
+  check("the email record needs the admin's sign-in", denied.status === 401, denied.status);
+}
 // The Clients tab lists every paid company under the account, with the name
 // given on the order (Adam, 9 Sep 2026: KLF's order was invisible there).
 {

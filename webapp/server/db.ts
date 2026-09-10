@@ -399,6 +399,23 @@ const MIGRATION_007_STATEMENTS: string[] = [
   `ALTER TABLE orders ADD COLUMN IF NOT EXISTS submitted_user_agent text`,
 ];
 
+// The email record (Adam, 10 Sep 2026: "if they ever claim that we didn't
+// send them something"): every send, from every place, with its body and
+// the provider's answer.
+const MIGRATION_008_STATEMENTS: string[] = [
+  `CREATE TABLE IF NOT EXISTS email_log (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  to_address text NOT NULL,
+  subject text NOT NULL,
+  html text NOT NULL,
+  sent_at timestamptz NOT NULL DEFAULT now(),
+  ok boolean NOT NULL,
+  provider_id text,
+  error text
+)`,
+  `CREATE INDEX IF NOT EXISTS email_log_to_idx ON email_log (to_address, sent_at DESC)`,
+];
+
 const MIGRATIONS: { id: number; name: string; statements: string[] }[] = [
   { id: 1, name: "initial-schema", statements: MIGRATION_001_STATEMENTS },
   { id: 2, name: "contact-messages", statements: MIGRATION_002_STATEMENTS },
@@ -407,6 +424,7 @@ const MIGRATIONS: { id: number; name: string; statements: string[] }[] = [
   { id: 5, name: "documents-carry-company", statements: MIGRATION_005_STATEMENTS },
   { id: 6, name: "sessions-viewing-as-admin", statements: MIGRATION_006_STATEMENTS },
   { id: 7, name: "order-summary", statements: MIGRATION_007_STATEMENTS },
+  { id: 8, name: "email-log", statements: MIGRATION_008_STATEMENTS },
   // Append future migrations here with the next id. Never edit an entry.
 ];
 

@@ -1,4 +1,5 @@
 import { env } from "./env";
+import { getDb } from "./db";
 
 interface Mail {
   to: string;
@@ -13,11 +14,26 @@ interface Mail {
  *  filled when a real mail key is configured. */
 export const devOutbox: Mail[] = [];
 
+/** The record of every send (Adam, 10 Sep 2026). A failure to record never
+ *  fails the send: the email is the client's; the record is ours. */
+async function recordMail(mail: Mail, ok: boolean, providerId: string | null, error: string | null): Promise<void> {
+  try {
+    const db = await getDb();
+    await db.query(
+      "INSERT INTO email_log (to_address, subject, html, ok, provider_id, error) VALUES ($1, $2, $3, $4, $5, $6)",
+      [mail.to.toLowerCase(), mail.subject, mail.html, ok, providerId, error],
+    );
+  } catch (e) {
+    console.error("[email] record failed:", e);
+  }
+}
+
 export async function sendMail(mail: Mail): Promise<void> {
   if (!env.RESEND_API_KEY) {
     console.log(`[email:dev] to=${mail.to} subject="${mail.subject}"\n${mail.html}`);
     devOutbox.push(mail);
     if (devOutbox.length > 50) devOutbox.splice(0, devOutbox.length - 50);
+    await recordMail(mail, true, "dev", null);
     return;
   }
   const res = await fetch("https://api.resend.com/emails", {
@@ -36,8 +52,11 @@ export async function sendMail(mail: Mail): Promise<void> {
   });
   if (!res.ok) {
     const body = await res.text();
+    await recordMail(mail, false, null, `Resend ${res.status}: ${body}`.slice(0, 2000));
     throw new Error(`Resend ${res.status}: ${body}`);
   }
+  const accepted = (await res.json().catch(() => null)) as { id?: string } | null;
+  await recordMail(mail, true, accepted?.id ?? null, null);
 }
 
 const wrap = (inner: string) => `

@@ -815,6 +815,33 @@ app.get("/admin/clients", async (c) => {
   return c.json({ data: rows });
 });
 
+/** The email record (Adam, 10 Sep 2026): everything sent to an address,
+ *  newest first, and any one of them in full. */
+app.get("/admin/emails", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const to = (c.req.query("to") ?? "").trim().toLowerCase();
+  if (!to) return c.json(err("An address is required.", "INVALID_INPUT"), 400);
+  const db = await getDb();
+  const rows = await db.query(
+    `SELECT id, to_address, subject, sent_at, ok, provider_id, error
+       FROM email_log WHERE to_address = $1 ORDER BY sent_at DESC LIMIT 500`,
+    [to],
+  );
+  return c.json({ data: rows });
+});
+app.get("/admin/emails/:id", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const db = await getDb();
+  const rows = await db.query(
+    "SELECT id, to_address, subject, html, sent_at, ok, provider_id, error FROM email_log WHERE id = $1",
+    [c.req.param("id")],
+  );
+  if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+  return c.json({ data: rows[0] });
+});
+
 /** The Order Summary PDF (Adam, 10 Sep 2026), and its markdown for the
  *  checks. Office only. Orders placed before summaries existed have none. */
 app.get("/admin/orders/:id/summary.pdf", async (c) => {

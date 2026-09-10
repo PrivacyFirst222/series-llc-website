@@ -95845,6 +95845,19 @@ var MIGRATION_007_STATEMENTS = [
   `ALTER TABLE orders ADD COLUMN IF NOT EXISTS submitted_ip text`,
   `ALTER TABLE orders ADD COLUMN IF NOT EXISTS submitted_user_agent text`
 ];
+var MIGRATION_008_STATEMENTS = [
+  `CREATE TABLE IF NOT EXISTS email_log (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  to_address text NOT NULL,
+  subject text NOT NULL,
+  html text NOT NULL,
+  sent_at timestamptz NOT NULL DEFAULT now(),
+  ok boolean NOT NULL,
+  provider_id text,
+  error text
+)`,
+  `CREATE INDEX IF NOT EXISTS email_log_to_idx ON email_log (to_address, sent_at DESC)`
+];
 var MIGRATIONS = [
   { id: 1, name: "initial-schema", statements: MIGRATION_001_STATEMENTS },
   { id: 2, name: "contact-messages", statements: MIGRATION_002_STATEMENTS },
@@ -95852,7 +95865,8 @@ var MIGRATIONS = [
   { id: 4, name: "oa-per-company", statements: MIGRATION_004_STATEMENTS },
   { id: 5, name: "documents-carry-company", statements: MIGRATION_005_STATEMENTS },
   { id: 6, name: "sessions-viewing-as-admin", statements: MIGRATION_006_STATEMENTS },
-  { id: 7, name: "order-summary", statements: MIGRATION_007_STATEMENTS }
+  { id: 7, name: "order-summary", statements: MIGRATION_007_STATEMENTS },
+  { id: 8, name: "email-log", statements: MIGRATION_008_STATEMENTS }
   // Append future migrations here with the next id. Never edit an entry.
 ];
 function migrationChecksum(statements) {
@@ -101203,12 +101217,24 @@ async function unavailableNames(names) {
 
 // server/email.ts
 var devOutbox = [];
+async function recordMail(mail, ok, providerId, error2) {
+  try {
+    const db = await getDb();
+    await db.query(
+      "INSERT INTO email_log (to_address, subject, html, ok, provider_id, error) VALUES ($1, $2, $3, $4, $5, $6)",
+      [mail.to.toLowerCase(), mail.subject, mail.html, ok, providerId, error2]
+    );
+  } catch (e) {
+    console.error("[email] record failed:", e);
+  }
+}
 async function sendMail(mail) {
   if (!env.RESEND_API_KEY) {
     console.log(`[email:dev] to=${mail.to} subject="${mail.subject}"
 ${mail.html}`);
     devOutbox.push(mail);
     if (devOutbox.length > 50) devOutbox.splice(0, devOutbox.length - 50);
+    await recordMail(mail, true, "dev", null);
     return;
   }
   const res = await fetch("https://api.resend.com/emails", {
@@ -101227,8 +101253,11 @@ ${mail.html}`);
   });
   if (!res.ok) {
     const body = await res.text();
+    await recordMail(mail, false, null, `Resend ${res.status}: ${body}`.slice(0, 2e3));
     throw new Error(`Resend ${res.status}: ${body}`);
   }
+  const accepted = await res.json().catch(() => null);
+  await recordMail(mail, true, accepted?.id ?? null, null);
 }
 var wrap = (inner) => `
 <div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#1c2530;max-width:560px;margin:0 auto;padding:24px">
@@ -110075,6 +110104,30 @@ function registerAdminRoutes(app2) {
      GROUP BY cl.id ORDER BY cl.created_at DESC`
     );
     return c.json({ data: rows });
+  });
+  app2.get("/admin/emails", async (c) => {
+    const admin = await requireAdmin(c);
+    if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+    const to = (c.req.query("to") ?? "").trim().toLowerCase();
+    if (!to) return c.json(err("An address is required.", "INVALID_INPUT"), 400);
+    const db = await getDb();
+    const rows = await db.query(
+      `SELECT id, to_address, subject, sent_at, ok, provider_id, error
+       FROM email_log WHERE to_address = $1 ORDER BY sent_at DESC LIMIT 500`,
+      [to]
+    );
+    return c.json({ data: rows });
+  });
+  app2.get("/admin/emails/:id", async (c) => {
+    const admin = await requireAdmin(c);
+    if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+    const db = await getDb();
+    const rows = await db.query(
+      "SELECT id, to_address, subject, html, sent_at, ok, provider_id, error FROM email_log WHERE id = $1",
+      [c.req.param("id")]
+    );
+    if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+    return c.json({ data: rows[0] });
   });
   app2.get("/admin/orders/:id/summary.pdf", async (c) => {
     const admin = await requireAdmin(c);

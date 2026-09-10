@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Upload, Eye, FileText, ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
+import { Upload, Eye, FileText, ArrowDown, ArrowUp, ArrowUpDown, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,6 +34,95 @@ interface AdminClient {
   document_count: number;
   ra_llcs: string[];
   companies: { id: string; llc_name: string; contact_name?: string; has_summary?: boolean }[];
+}
+
+interface EmailRow {
+  id: string;
+  to_address: string;
+  subject: string;
+  sent_at: string;
+  ok: boolean;
+  provider_id: string | null;
+  error: string | null;
+  html?: string;
+}
+
+/** Everything sent to the client's address, newest first, and each one in
+ *  full (Adam, 10 Sep 2026: "if they ever claim that we didn't send them
+ *  something"). */
+function EmailsDialog({ client }: { client: AdminClient }) {
+  const [open, setOpen] = useState<boolean>(false);
+  const [selected, setSelected] = useState<string | null>(null);
+  const list = useQuery({
+    queryKey: ["admin-emails", client.email],
+    queryFn: () => api.get<EmailRow[]>(`/api/admin/emails?to=${encodeURIComponent(client.email)}`),
+    enabled: open,
+  });
+  const one = useQuery({
+    queryKey: ["admin-email", selected],
+    queryFn: () => api.get<EmailRow>(`/api/admin/emails/${selected}`),
+    enabled: !!selected,
+  });
+  const whenSent = (iso: string) => new Date(iso).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" });
+  return (
+    <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) setSelected(null); }}>
+      <DialogTrigger asChild>
+        <Button type="button" variant="outline" size="sm" className="rounded-full" data-testid="client-emails">
+          <Mail className="mr-1.5 h-3.5 w-3.5" />
+          Emails
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-3xl">
+        <DialogHeader>
+          <DialogTitle>Emails sent to {client.email}</DialogTitle>
+          <DialogDescription>Every email the site sent to this address, newest first, and whether the mail provider accepted it.</DialogDescription>
+        </DialogHeader>
+        {selected ? (
+          <div className="space-y-3">
+            <Button type="button" variant="ghost" size="sm" className="rounded-full" onClick={() => setSelected(null)}>
+              ← Back to the list
+            </Button>
+            {one.data ? (
+              <>
+                <div className="text-sm">
+                  <div className="font-medium">{one.data.subject}</div>
+                  <div className="text-muted-foreground">
+                    {whenSent(one.data.sent_at)} — {one.data.ok ? `delivered to the mail provider${one.data.provider_id ? ` (id ${one.data.provider_id})` : ""}` : `failed: ${one.data.error ?? "unknown error"}`}
+                  </div>
+                </div>
+                <iframe
+                  title={one.data.subject}
+                  sandbox=""
+                  srcDoc={one.data.html ?? ""}
+                  className="h-[60vh] w-full rounded-lg border border-border bg-white"
+                  data-testid="email-body"
+                />
+              </>
+            ) : (
+              <p className="text-sm text-muted-foreground">Loading…</p>
+            )}
+          </div>
+        ) : list.isPending ? (
+          <p className="text-sm text-muted-foreground">Loading…</p>
+        ) : (list.data ?? []).length === 0 ? (
+          <p className="text-sm text-muted-foreground" data-testid="emails-empty">Nothing has been sent to this address since the record began.</p>
+        ) : (
+          <ul className="max-h-[60vh] divide-y divide-border overflow-y-auto text-sm" data-testid="emails-list">
+            {(list.data ?? []).map((m) => (
+              <li key={m.id}>
+                <button type="button" onClick={() => setSelected(m.id)} className="flex w-full flex-wrap items-center justify-between gap-2 px-1 py-2 text-left hover:bg-secondary/40">
+                  <span className="font-medium">{m.subject}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {whenSent(m.sent_at)} — {m.ok ? "delivered" : "failed"}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 /** The Order Summary (Adam, 10 Sep 2026): one company opens its PDF at once;
@@ -449,6 +538,7 @@ function ClientsTable({
                   <div className="ml-auto grid w-max grid-cols-2 gap-2" data-testid="client-actions">
                     <OrderSummaryButton client={cl} />
                     <ViewPortalButton client={cl} />
+                    <EmailsDialog client={cl} />
                     <ChangeEmailDialog client={cl} />
                     <UploadDialog client={cl} />
                   </div>
