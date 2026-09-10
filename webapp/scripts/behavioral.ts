@@ -1562,10 +1562,48 @@ async function main(): Promise<void> {
       fd.set("articles", pdf("articles"));
       fd.append("psd", pdf("psd"));
       fd.append("psdSeries", JSON.stringify((detail.data?.series ?? []).map((x) => x.name)));
-      fd.set("certStatus", pdf("certstatus"));
-      fd.set("certifiedCopy", pdf("certcopy"));
+      // Formed WITHOUT the certificates: they arrive after the Designations
+      // and must still be uploadable from the formed drawer (Adam, 10 Sep 2026).
       const formed = await fetch(`${API}/api/admin/orders/${gOrderId}/formation-documents`, { method: "POST", headers: { Cookie: adminCookie }, body: fd });
-      expect(formed.status === 200, "documents: run G's company is formed with both certificates", await formed.text().catch(() => ""));
+      expect(formed.status === 200, "documents: run G's company is formed before its certificates arrive", await formed.text().catch(() => ""));
+      {
+        await page.route("**/api/**", async (route) => {
+          const url = new URL(route.request().url());
+          const resp = await fetch(`${API}${url.pathname}${url.search}`, {
+            method: route.request().method(),
+            headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "" },
+            body: route.request().postDataBuffer() ?? undefined,
+          });
+          const body = await resp.text();
+          const setCookie = resp.headers.get("set-cookie");
+          await route.fulfill({ status: resp.status, contentType: resp.headers.get("content-type") ?? "application/json", body, headers: setCookie ? { "set-cookie": setCookie } : undefined });
+        });
+        await page.goto(`http://localhost:${WEB_PORT}/admin/login`);
+        await page.getByLabel("Password").fill("dev-admin");
+        await page.locator("main button").filter({ hasText: /^Sign in/ }).first().click();
+        await page.waitForURL(/\/admin(?!\/login)/, { timeout: 10000 });
+        await page.getByLabel("Search by LLC name, client name, or email").fill("Gate Run Golf");
+        await page.waitForTimeout(1500);
+        const card = page.locator("main div.rounded-xl").filter({ hasText: /Gate Run Golf/ }).first();
+        expect((await card.locator('[data-testid="certs-owed-chip"]').count()) === 1, "certificates: the formed card says certificates are owed");
+        await card.locator("button").first().click();
+        await page.waitForTimeout(2000);
+        const drawer = page.locator("div.fixed.inset-0 div.max-w-2xl").first();
+        const owedText = await drawer.locator('[data-testid="still-owed"]').innerText().catch(() => "");
+        expect(/Still owed: Certificate of Status, Certified Copy/.test(owedText), "certificates: the formed drawer says what is still owed", owedText);
+        expect((await drawer.locator("#upload-cert-status").count()) === 1 && (await drawer.locator("#upload-certified-copy").count()) === 1, "certificates: both upload slots are offered on a formed order");
+        await shot(page, "admin-formed-certificates-owed");
+        const asFile = (tag: string) => ({ name: `${tag}.pdf`, mimeType: "application/pdf", buffer: Buffer.from(`%PDF-1.4 ${tag}\n%%EOF`) });
+        await drawer.locator("#upload-cert-status").setInputFiles(asFile("certstatus"));
+        await drawer.locator("#upload-certified-copy").setInputFiles(asFile("certcopy"));
+        await page.waitForTimeout(300);
+        await drawer.locator('[data-testid="upload-certificates"]').click();
+        await page.waitForTimeout(2500);
+        const afterText = await drawer.innerText();
+        expect(!/Still owed/.test(afterText) && (await drawer.locator("#upload-cert-status").count()) === 0, "certificates: once uploaded, nothing is owed and the slots are gone", afterText.slice(0, 300));
+        expect(/Certificate of Status/.test(afterText) && /Certified Copy/.test(afterText), "certificates: both are listed among the order's documents", afterText.slice(0, 300));
+        await page.unroute("**/api/**");
+      }
       const email = "gate@e2e.test";
       const mint = await fetch(`${API}/api/dev/mint-reset-token`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) }).then((r) => r.json()) as { data?: { token?: string } };
       if (!mint.data?.token) throw new Error("no reset token for run G's client");

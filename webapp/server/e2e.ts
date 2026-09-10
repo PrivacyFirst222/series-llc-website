@@ -2980,6 +2980,25 @@ if (mint.status === 200) {
       notBought.set("notify", "false");
       const notBoughtRes = await fetch(`${BASE}/api/admin/orders/${orderId}/certificates`, { method: "POST", body: notBought, headers: { Cookie: adm.cookie, "X-Forwarded-For": RUN_IP } });
       check("a certificate the client did not buy is refused", notBoughtRes.status === 400 && ((await notBoughtRes.json().catch(() => null)) as { error?: { code?: string } } | null)?.error?.code === "NOT_PURCHASED");
+    // The certificates after formation (Adam, 10 Sep 2026): an order formed
+    // by its Articles and Designations alone still takes its bought
+    // certificates afterwards, and the detail then shows both delivered.
+    {
+      const lateFd = packageFd(false, cSeries);
+      const lateFormed = await fetch(`${BASE}/api/admin/orders/${certOrderId}/formation-documents`, { method: "POST", body: lateFd, headers: { Cookie: adm.cookie, "X-Forwarded-For": RUN_IP } });
+      check("an order with certificates bought is formed without them", lateFormed.ok, await lateFormed.clone().json().catch(() => null));
+      const before = (await api(`/api/admin/orders/${certOrderId}`, { cookies: adm.cookie })).body?.data as { status?: string; hasCertStatus?: boolean; hasCertifiedCopy?: boolean };
+      // The certificate of status went up on its own above; the certified copy is still owed.
+      check("formed, the detail still says the certified copy is owed", before?.status === "formed" && before?.hasCertStatus === true && !before?.hasCertifiedCopy, before && { status: before.status, hasCertStatus: before.hasCertStatus, hasCertifiedCopy: before.hasCertifiedCopy });
+      const late = new FormData();
+      late.set("certStatus", new File([new TextEncoder().encode("%PDF-1.4 late cos\n%%EOF")], "cos.pdf", { type: "application/pdf" }));
+      late.set("certifiedCopy", new File([new TextEncoder().encode("%PDF-1.4 late copy\n%%EOF")], "copy.pdf", { type: "application/pdf" }));
+      late.set("notify", "false");
+      const lateRes = await fetch(`${BASE}/api/admin/orders/${certOrderId}/certificates`, { method: "POST", body: late, headers: { Cookie: adm.cookie, "X-Forwarded-For": RUN_IP } });
+      check("both certificates upload after formation", lateRes.ok, await lateRes.clone().json().catch(() => null));
+      const after = (await api(`/api/admin/orders/${certOrderId}`, { cookies: adm.cookie })).body?.data as { hasCertStatus?: boolean; hasCertifiedCopy?: boolean };
+      check("after the late upload, nothing is owed", after?.hasCertStatus === true && after?.hasCertifiedCopy === true, after);
+    }
     }
     const packUp = await fetch(`${BASE}/api/admin/orders/${certOrderId}/formation-documents`, { method: "POST", body: packageFd(true, cSeries), headers: { Cookie: adm.cookie, "X-Forwarded-For": RUN_IP } });
     check("the package upload with both certificates is accepted and forms the order", packUp.status === 200, await packUp.json().catch(() => null));

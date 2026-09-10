@@ -502,9 +502,11 @@ export default function OrderDetail({
                 </ul>
               ) : null}
 
-              {d.status !== "formed" ? (
-                <div className="mt-4 space-y-3">
-
+              {/* The state's certificates are owed until delivered, formed or
+                  not (Adam, 10 Sep 2026: ACME went formed in one step and both
+                  slots vanished with the certificates still owed). */}
+              {(d.certStatusPurchased && !d.hasCertStatus) || (d.certifiedCopyPurchased && !d.hasCertifiedCopy) ? (
+                <div className="mt-4 space-y-3" data-testid="certificates-owed">
                   {d.certStatusPurchased && !d.hasCertStatus ? (
                     <div>
                       <label htmlFor="upload-cert-status" className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
@@ -547,6 +549,12 @@ export default function OrderDetail({
                       {uploadCerts.isPending ? "Uploading…" : "Upload certificates"}
                     </Button>
                   ) : null}
+                </div>
+              ) : null}
+
+              {d.status !== "formed" ? (
+                <div className="mt-4 space-y-3">
+
                   {psdRows.map((row, i) => (
                     <div key={i} className="rounded-lg border border-border p-3">
                       <label htmlFor={`upload-psd-${i}`} className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
@@ -635,6 +643,14 @@ export default function OrderDetail({
                 <p className="mt-3 text-sm text-trust">
                   Formed{d.formedAt ? ` on ${new Date(d.formedAt).toLocaleDateString()}` : ""} — the
                   client has been emailed.
+                  {(d.certStatusPurchased && !d.hasCertStatus) || (d.certifiedCopyPurchased && !d.hasCertifiedCopy) ? (
+                    <span className="block text-amber-700 dark:text-amber-400" data-testid="still-owed">
+                      Still owed: {[
+                        ...(d.certStatusPurchased && !d.hasCertStatus ? ["Certificate of Status"] : []),
+                        ...(d.certifiedCopyPurchased && !d.hasCertifiedCopy ? ["Certified Copy"] : []),
+                      ].join(", ")}
+                    </span>
+                  ) : null}
                 </p>
               )}
             </section>

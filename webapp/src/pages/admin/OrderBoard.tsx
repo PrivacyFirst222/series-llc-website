@@ -104,6 +104,11 @@ function Card({
               our RA
             </span>
           ) : null}
+          {(order.cert_status_purchased && !order.cert_status_uploaded) || (order.certified_copy_purchased && !order.certified_copy_uploaded) ? (
+            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900" data-testid="certs-owed-chip">
+              certificates owed
+            </span>
+          ) : null}
         </div>
       </button>
       {/* Adam's spec: only whether EIN / S corp was ordered and whether each
