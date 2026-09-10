@@ -2977,6 +2977,8 @@ I check the screens I changed. The site is one application, and a deploy replace
 
 Not yet found, and recorded as such. Checked at 9:00 PM in a Chromium browser against the live site: a fresh load of /pricing renders the full page (3,416 characters of main text, footer present); the path in his screenshot — form open at Correspondence, scrolled down, Pricing tapped in the nav — renders the full page with no console errors; the site has one bundle and no lazily loaded pages, no service worker, no error boundary (so a crash would have blanked the header too, and it did not); the pricing page has no data fetch to wait on; the header is sticky, so the screenshot is consistent with a page scrolled below content that WebKit had not repainted. His iPad runs WebKit; a WebKit probe of the same path is proposed. From now on the live check after every deploy opens the home page, pricing, and the form, whatever the diff touched.
 
+Amended 10 Sep 2026: Adam reloaded the tab and "the pricing page loads." The blank screen was that one open tab, not the site; the cause on the iPad's side is not known and no code was changed for it. The probe is not needed.
+
 ## P74 — A proposal on conversions that treated a purchase on the order as an open question
 
 ### THE FAILURE

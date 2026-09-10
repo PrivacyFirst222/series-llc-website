@@ -535,6 +535,17 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
   }
   await advance(page);
 
+  // The estimate on the review step, read from the sidebar. The stored order's
+  // state fees must equal it (Adam, 10 Sep 2026: a conversion with our agent
+  // showed $0 and would have been charged $25).
+  const estimateText = await page.locator("aside").innerText();
+  const estimateMatch = estimateText.match(/Estimated total\s*\$([\d,]+)/);
+  const estimatedStateDollars = estimateMatch ? Number(estimateMatch[1].replace(/,/g, "")) : NaN;
+  expect(!Number.isNaN(estimatedStateDollars), `${run.key}: the review step shows an estimated state-fee total`, estimateText.slice(0, 200));
+  if (run.path === "convert") {
+    expect((run.ra === "SERVICE") === /Change of Registered Agent/.test(estimateText), `${run.key}: a conversion shows the $25 agent change exactly when it takes our agent`, estimateText.slice(0, 300));
+  }
+
   // Review → certify.
   await advance(page, "Continue");
 
@@ -593,7 +604,7 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
     throw new Error(`${run.key}: submit did not produce an accepted order — landed on "${where}"; errors: ${errs.filter(Boolean).slice(0, 5).join(" | ")}; toast: ${toast.join(" ").slice(0, 200)}`);
   }
   await page.unroute("**/api/**");
-  return { ...captured, draftAtSubmit };
+  return { ...captured, draftAtSubmit, estimatedStateDollars };
 }
 
 /** Every path where two JSON values differ, for a field-by-field comparison. */
@@ -663,14 +674,15 @@ async function main(): Promise<void> {
       if (/controlled|uncontrolled/i.test(m.text())) reactWarnings.push(m.text().slice(0, 120));
     });
     try {
-      const { orderId, totalCents, draftAtSubmit } = await driveRun(page, run);
+      const { orderId, totalCents, draftAtSubmit, estimatedStateDollars } = await driveRun(page, run);
       orderIds.set(run.key, orderId);
       expect(reactWarnings.length === 0, `${run.key}: no controlled/uncontrolled React warnings`, reactWarnings[0]);
 
       // Ground truth: the stored order, read through the admin API.
       await fetch(`${API}/api/dev/simulate-payment`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ orderId }) });
       const full = await fetch(`${API}/api/admin/orders/${orderId}`, { headers: { Cookie: adminCookie } }).then((r) => r.json()) as { data?: Record<string, unknown> };
-      const order = full.data as { status?: string; payload?: unknown; llcName?: string; totalCents?: number } | undefined;
+      const order = full.data as { status?: string; payload?: unknown; llcName?: string; totalCents?: number; stateFeesCents?: number } | undefined;
+      expect(order?.stateFeesCents === estimatedStateDollars * 100, `${run.key}: the state fees charged equal the estimate the client saw`, { charged: order?.stateFeesCents, shown: estimatedStateDollars });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const payload = (typeof order?.payload === "string" ? JSON.parse(order.payload) : order?.payload) as Record<string, any>;
       expect(payload, `${run.key}: stored order has a payload`);

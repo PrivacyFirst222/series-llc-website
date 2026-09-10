@@ -109431,6 +109431,7 @@ function registerAdminRoutes(app2) {
         contactName: o.contact_name,
         contactEmail: o.contact_email,
         totalCents: o.total_cents,
+        stateFeesCents: o.state_fees_cents,
         createdAt: o.created_at,
         paidAt: o.paid_at,
         filedAt: o.filed_at,

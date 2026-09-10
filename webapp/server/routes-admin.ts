@@ -361,6 +361,7 @@ app.get("/admin/orders/:id", async (c) => {
       contactName: o.contact_name,
       contactEmail: o.contact_email,
       totalCents: o.total_cents,
+      stateFeesCents: (o as unknown as { state_fees_cents: number }).state_fees_cents,
       createdAt: o.created_at,
       paidAt: o.paid_at,
       filedAt: o.filed_at,

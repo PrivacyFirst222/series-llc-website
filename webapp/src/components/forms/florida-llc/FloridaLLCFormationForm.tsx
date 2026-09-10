@@ -607,6 +607,7 @@ export function FloridaLLCFormationForm({
           {stepIndex >= 4 ? (
             <FeeEstimate
               isConversion={data.filingPath === "CONVERT"}
+              registeredAgentChange={data.registeredAgentChoice === "SERVICE"}
               certificateOfStatus={data.orderCertificateOfStatus}
               certifiedCopy={data.orderCertifiedCopy}
               seriesCount={data.series.length}

@@ -122,6 +122,7 @@ export function StepOptionalDocs({ data, patch, errors }: StepProps) {
 
       <FeeEstimate
         isConversion={data.filingPath === "CONVERT"}
+        registeredAgentChange={data.registeredAgentChoice === "SERVICE"}
         certificateOfStatus={data.orderCertificateOfStatus}
         certifiedCopy={data.orderCertifiedCopy}
         seriesCount={data.series.length}

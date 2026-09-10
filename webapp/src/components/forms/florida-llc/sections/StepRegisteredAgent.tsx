@@ -56,6 +56,9 @@ export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
             <div className="text-xs text-muted-foreground mt-1">
               First year included in your service fee ($99/yr after). We accept
               the appointment and handle legal mail for you.
+              {data.filingPath === "CONVERT"
+                ? " Florida charges $25 to change the agent on file for your LLC."
+                : ""}
             </div>
           </label>
           <label
