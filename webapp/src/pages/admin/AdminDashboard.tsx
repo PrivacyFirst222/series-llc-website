@@ -329,7 +329,7 @@ function displayName(cl: AdminClient): string {
   return `${p.last}${p.first ? `, ${p.first}` : ""}${p.suffix ? ` ${p.suffix}` : ""}`;
 }
 
-type SortKey = "client" | "companies" | "account" | "documents" | "since";
+type SortKey = "client" | "ra" | "companies" | "account" | "documents" | "since";
 const firstCompany = (cl: AdminClient) => [...(cl.companies ?? [])].map((c) => c.llc_name).sort((a, b) => a.localeCompare(b))[0] ?? "";
 const SORTERS: Record<SortKey, (a: AdminClient, b: AdminClient) => number> = {
   client: (a, b) => {
@@ -337,6 +337,7 @@ const SORTERS: Record<SortKey, (a: AdminClient, b: AdminClient) => number> = {
     return pa.last.localeCompare(pb.last, undefined, { sensitivity: "base" }) || pa.first.localeCompare(pb.first, undefined, { sensitivity: "base" });
   },
   companies: (a, b) => firstCompany(a).localeCompare(firstCompany(b), undefined, { sensitivity: "base" }),
+  ra: (a, b) => ([...(a.ra_llcs ?? [])].sort()[0] ?? "").localeCompare([...(b.ra_llcs ?? [])].sort()[0] ?? "", undefined, { sensitivity: "base" }),
   account: (a, b) => Number(b.has_password) - Number(a.has_password),
   documents: (a, b) => a.document_count - b.document_count,
   since: (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
@@ -351,14 +352,14 @@ function ClientsTable({
   variant: "all" | "ra";
   emptyText: string;
 }) {
-  // Search and sortable headings, on the Clients tab (Adam, 10 Sep 2026).
+  // Search and sortable headings, on both client tabs (Adam, 10 Sep 2026).
   // Until a heading is tapped the rows stay newest first.
   const [query, setQuery] = useState<string>("");
   const [sort, setSort] = useState<{ key: SortKey; dir: "asc" | "desc" } | null>(null);
-  const sortable = variant === "all";
+  const sortable = true;
   const q = query.trim().toLowerCase();
   const shown = clients
-    .filter((cl) => !q || [cl.name, cl.email, displayName(cl), ...(cl.companies ?? []).map((c) => c.llc_name)].some((s) => (s ?? "").toLowerCase().includes(q)))
+    .filter((cl) => !q || [cl.name, cl.email, displayName(cl), ...(cl.companies ?? []).map((c) => c.llc_name), ...(cl.ra_llcs ?? [])].some((s) => (s ?? "").toLowerCase().includes(q)))
     .sort((a, b) => (sort ? SORTERS[sort.key](a, b) * (sort.dir === "asc" ? 1 : -1) : 0));
   const toggle = (key: SortKey) => setSort((s) => (s?.key === key ? { key, dir: s.dir === "asc" ? "desc" : "asc" } : { key, dir: "asc" }));
   const Head = ({ k, label }: { k: SortKey; label: string }) =>
@@ -389,7 +390,7 @@ function ClientsTable({
         <thead>
           <tr className="border-b border-border bg-secondary/40 text-left text-xs uppercase tracking-[0.14em] text-muted-foreground">
             <Head k="client" label="Client" />
-            {variant === "ra" ? <th className="px-4 py-3 font-medium">Registered agent for</th> : null}
+            {variant === "ra" ? <Head k="ra" label="Registered agent for" /> : null}
             <Head k="companies" label="Companies" />
             <Head k="account" label="Portal account" />
             <Head k="documents" label="Documents" />
@@ -408,7 +409,7 @@ function ClientsTable({
             shown.map((cl) => (
               <tr key={cl.id} data-testid="client-row">
                 <td className="px-4 py-3">
-                  <span className="font-medium" data-testid="client-name">{sortable ? displayName(cl) : cl.name || "—"}</span>
+                  <span className="font-medium" data-testid="client-name">{displayName(cl)}</span>
                   {cl.ra_cancellation_requested_at ? (
                     <span className="ml-2 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-900">
                       RA cancel requested {day(cl.ra_cancellation_requested_at)}

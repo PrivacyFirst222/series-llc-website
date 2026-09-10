@@ -1749,6 +1749,31 @@ async function main(): Promise<void> {
         const dates = (await page.locator('[data-testid="client-row"] td:nth-child(5)').allInnerTexts()).map((t) => new Date(t.replace(/\s+/g, " ")).getTime());
         expect(dates.every((v, i) => i === 0 || v <= dates[i - 1]), "clients tab: Since sorts newest first on the second tap", dates);
       }
+      // The Registered Agent Clients tab has the same search and sorting
+      // (Adam, 10 Sep 2026), plus its own heading.
+      {
+        await page.getByRole("tab", { name: "Registered Agent Clients", exact: true }).click();
+        await page.waitForTimeout(800);
+        const names = async () => page.locator('[data-testid="client-row"] [data-testid="client-name"]').allInnerTexts();
+        expect(/^[^,]+, [^,]+/.test((await names())[0] ?? ""), "RA tab: names read Last, First", (await names())[0]);
+        await page.locator('[data-testid="client-search"]').fill("gate-oa");
+        await page.waitForTimeout(300);
+        const matched = await names();
+        expect(matched.length === 1 && /Gatecheck/.test(matched[0]), "RA tab: the search narrows the rows to the match", matched);
+        await page.locator('[data-testid="client-search"]').fill("");
+        await page.waitForTimeout(300);
+        const ras = async () => (await page.locator('[data-testid="client-row"] td:nth-child(2)').allInnerTexts()).map((t) => t.split(",")[0].trim());
+        await page.locator('[data-testid="sort-ra"]').click();
+        await page.waitForTimeout(300);
+        const rAsc = await ras();
+        expect(rAsc.length >= 2 && rAsc.every((v, i) => i === 0 || v.localeCompare(rAsc[i - 1], undefined, { sensitivity: "base" }) >= 0), "RA tab: Registered agent for sorts A to Z", rAsc);
+        await page.locator('[data-testid="sort-ra"]').click();
+        await page.waitForTimeout(300);
+        const rDesc = await ras();
+        expect(rDesc.every((v, i) => i === 0 || v.localeCompare(rDesc[i - 1], undefined, { sensitivity: "base" }) <= 0), "RA tab: a second tap sorts Z to A", rDesc);
+        await page.getByRole("tab", { name: "Clients", exact: true }).click();
+        await page.waitForTimeout(800);
+      }
       const row = page.locator("main tr").filter({ hasText: "gate-oa@e2e.test" }).first();
       const companies = await row.locator('[data-testid="client-companies"]').innerText();
       expect(/Gate Run Alpha/.test(companies), "clients tab: the Companies column lists the account's paid company", companies);
