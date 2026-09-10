@@ -2961,6 +2961,54 @@ The confirmation page's clearing was written from the data model: the order has 
 
 The draft is removed the moment the confirmation page opens with an order reference — the only way to reach that page is Square's redirect after a successful payment — not when a poll happens to say "paid". The page shows "Payment received" for paid, filed, and formed orders. The walk completes an order, opens the confirmation page with its reference, and confirms the draft is gone and the form opens empty.
 
+## P73 — The pricing page blank on Adam's iPad eleven minutes after the deploy
+
+### THE FAILURE
+
+Adam, 9 Sep 2026, 8:51 PM, with a screenshot of Chrome on his iPad at myfloridaseriesllc.com/pricing: the header and nothing else, the whole page white below it. "I think that last change fucked up the website."
+
+Commit 92fb560 deployed at about 8:40 PM. It changed the intake form's sidebar and the confirmation page, and nothing in the pricing page. My live check after the deploy opened the form and the no-reference confirmation page and read them; it did not open the pricing page or any other page. Cause not yet known at the time of writing; this entry is amended below once it is.
+
+### WHY IT HAPPENED
+
+I check the screens I changed. The site is one application, and a deploy replaces every file in it at once, so any page can break on a deploy that touched none of its code — a build file it needs may no longer exist, or a shared piece may have shifted. My live check is built from the diff, so it reaches exactly the pages the diff names and no other, and the pages the diff does not name are the ones I never look at. The home page, pricing, and the portal login are the pages a client meets first, and none of them is on the list a diff produces.
+
+### FIXED BY
+
+Not yet found, and recorded as such. Checked at 9:00 PM in a Chromium browser against the live site: a fresh load of /pricing renders the full page (3,416 characters of main text, footer present); the path in his screenshot — form open at Correspondence, scrolled down, Pricing tapped in the nav — renders the full page with no console errors; the site has one bundle and no lazily loaded pages, no service worker, no error boundary (so a crash would have blanked the header too, and it did not); the pricing page has no data fetch to wait on; the header is sticky, so the screenshot is consistent with a page scrolled below content that WebKit had not repainted. His iPad runs WebKit; a WebKit probe of the same path is proposed. From now on the live check after every deploy opens the home page, pricing, and the form, whatever the diff touched.
+
+## P74 — A proposal on conversions that treated a purchase on the order as an open question
+
+### THE FAILURE
+
+Adam, 9 Sep 2026, 10:40 PM, answering the conversion proposal: "You retard. This is something they order on our site. Did you even fucking read it?"
+
+His screenshot of the KLF order, sent at 10:11 PM, shows under Filing information: "CERTIFICATE OF STATUS ($5.00) Yes — tick the box (client paid for it)" and "CERTIFIED COPY ($30.00) Yes — tick the box (client paid for it)". The order form sells both, on the Optional docs step, to new formations and conversions alike; the pricing code charges a $10 preparation fee for each and the state's fee. My proposal's assumptions paragraph said: "a converting client's own Articles are not something we deliver, so the 'Certified Copy of the Articles' the client can buy is a certified copy of the Articles already on file, which Sunbiz sells for the same $30; I am leaving that purchase as is." That sentence treats a paid item on the order in front of him as something whose delivery was in doubt, and the proposal's office walk for a conversion did not say where the two certificates come from or when they are uploaded. He read it as not having read the order. If he means a different sentence, the entry is amended.
+
+### WHY IT HAPPENED
+
+I built the conversion proposal from the statute and the code, and read the order screenshot for the one thing I had gone there for — the "Mark sent to the Division" button — not for what the order contained. The two certificate rows were in the screenshot and in the copy-sheet code I quoted, and I still wrote about the certified copy as a thing I was deciding whether to keep, because the sentence was written from my uncertainty about how Sunbiz handles a certified copy for an existing entity, and I put my uncertainty into the proposal as if it were a design choice. What the client bought is not a choice of mine. The right form was to say plainly that the client bought both certificates, that the office obtains them from the Division when filing the Designations, and that they go up through the same upload as today — and if I did not know how the Division sells a certified copy of an existing entity's Articles alongside a Designation filing, to open Sunbiz and find out before writing.
+
+### FIXED BY
+
+The conversion proposal restated with the two purchased certificates as fixed deliverables: obtained by the office from the Division with the Designation filing, uploaded through the existing certificate slots, and the order not Complete until both are in the portal — the same rule as a new formation.
+
+## P75 — Guessing what "it" was, twice, instead of reading the product the client orders
+
+### THE FAILURE
+
+Adam, 9 Sep 2026, 10:44 PM, answering P74: "God you are fucking stupid."
+
+At 10:40 PM he had written "This is something they order on our site. Did you even fucking read it?" I answered by picking the sentence of my proposal I thought he meant — the certified copy — writing P74 about that sentence, and asking him to tell me if it was a different one. I had not read what the site sells as a conversion: the pages a client reads before choosing the "Convert your existing Florida LLC" card, the order form as a converting client actually walks it, and the pages after. I had read the pricing card's forty lines, the first screen of the form, the statute, and the admin code. I also asserted in the proposal that a converting client "sees every step" of the intake from a search of one file for the word CONVERT, without having opened the steps themselves; read afterwards, that claim held — the name step appears in a conversion form asking for the existing company and its document number — but it was a claim made before the reading, and the steps it covers tell a converting client, on the certify step, "Who will sign the Articles of Organization?"
+
+### WHY IT HAPPENED
+
+When he asked whether I had read it, I treated the question as a pointer to a sentence and went looking for the sentence, because finding the one wrong line is cheaper than reading the product and lets me answer in the same breath. Reading the product as the client meets it — home page, what-is page, how-it-works, FAQ, pricing, the form step by step in conversion mode, the emails — is an hour, and nothing in how I answer a rebuke makes room for an hour; the rebuke arrives shaped as a question and I produce an answer. P74 was that answer: an entry written about a guess, which is a second failure dressed as accountability. The order and the site were both in front of me and neither was read as a whole; the parts I read were the parts my proposal already touched.
+
+### FIXED BY
+
+Reading everything the site says about converting an existing LLC, in full, with the fraction stated, and everything the conversion order form collects step by step in conversion mode, before writing another word about what the office should do with a conversion.
+
 ## Process — the ones that let the substantive ones through
 
 **M1 · Verify the proposition you set out to verify, not the one underneath.** A

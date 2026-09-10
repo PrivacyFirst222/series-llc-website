@@ -1,3 +1,4 @@
+import { ViewingAsBanner } from "./ViewingAsBanner";
 import { hasFirstAndLast } from "@/lib/personName";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Navigate, Link, useNavigate, useSearchParams } from "react-router-dom";
@@ -333,6 +334,7 @@ export default function OAQuestionnaire() {
   return (
     <section className="container-wide section-y">
       <div className="mx-auto max-w-3xl">
+        <ViewingAsBanner />
         <Link to="/portal" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4" />
           Back to portal

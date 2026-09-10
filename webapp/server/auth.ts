@@ -18,15 +18,20 @@ export interface SessionInfo {
   /** Hash of this request's session token — lets a caller sign out every
    *  OTHER device without logging the current one out. */
   tokenHash: string;
+  /** A client session the admin started to see the client's portal. */
+  viewingAsAdmin: boolean;
 }
 
-export async function createSession(c: Context, opts: { clientId?: string; isAdmin?: boolean }): Promise<void> {
+export async function createSession(
+  c: Context,
+  opts: { clientId?: string; isAdmin?: boolean; viewingAsAdmin?: boolean; hours?: number },
+): Promise<void> {
   const db = await getDb();
   const { token, tokenHash } = newToken();
-  const expires = new Date(Date.now() + SESSION_DAYS * 86400_000);
+  const expires = new Date(Date.now() + (opts.hours ? opts.hours * 3600_000 : SESSION_DAYS * 86400_000));
   await db.query(
-    "INSERT INTO sessions (token_hash, client_id, is_admin, expires_at) VALUES ($1, $2, $3, $4)",
-    [tokenHash, opts.clientId ?? null, opts.isAdmin ?? false, expires.toISOString()],
+    "INSERT INTO sessions (token_hash, client_id, is_admin, viewing_as_admin, expires_at) VALUES ($1, $2, $3, $4, $5)",
+    [tokenHash, opts.clientId ?? null, opts.isAdmin ?? false, opts.viewingAsAdmin ?? false, expires.toISOString()],
   );
   setCookie(c, opts.isAdmin ? ADMIN_COOKIE : CLIENT_COOKIE, token, {
     httpOnly: true,
@@ -42,12 +47,12 @@ async function lookup(c: Context, cookieName: string): Promise<SessionInfo | nul
   if (!token) return null;
   const db = await getDb();
   const tokenHash = hashToken(token);
-  const rows = await db.query<{ client_id: string | null; is_admin: boolean }>(
-    "SELECT client_id, is_admin FROM sessions WHERE token_hash = $1 AND expires_at > now()",
+  const rows = await db.query<{ client_id: string | null; is_admin: boolean; viewing_as_admin: boolean }>(
+    "SELECT client_id, is_admin, viewing_as_admin FROM sessions WHERE token_hash = $1 AND expires_at > now()",
     [tokenHash],
   );
   if (rows.length === 0) return null;
-  return { clientId: rows[0].client_id, isAdmin: rows[0].is_admin, tokenHash };
+  return { clientId: rows[0].client_id, isAdmin: rows[0].is_admin, tokenHash, viewingAsAdmin: rows[0].viewing_as_admin };
 }
 
 /** The CLIENT's session — the portal's identity. An admin cookie never

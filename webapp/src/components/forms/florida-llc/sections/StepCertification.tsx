@@ -13,7 +13,118 @@ interface StepProps {
   errors: Record<string, string>;
 }
 
+/** The acknowledgments every order makes, whichever filing it is. */
+function SharedAcknowledgments({ data, patch, errors }: StepProps) {
+  return (
+    <>
+        <AcknowledgeBox
+          id="cert-accuracy"
+          checked={data.accuracyAcknowledgment}
+          onChange={(v) => patch({ accuracyAcknowledgment: v })}
+          label="I certify that the information provided is true and accurate to the best of my knowledge."
+          error={errors.accuracyAcknowledgment}
+        />
+        <AcknowledgeBox
+          id="cert-address-accuracy"
+          checked={data.addressAccuracyAcknowledgment}
+          onChange={(v) => patch({ addressAccuracyAcknowledgment: v })}
+          label="I am solely responsible for the accuracy of all addresses I have provided. I understand that state filings, legal notices, and official correspondence will be directed to these addresses exactly as entered, and that MyFloridaSeriesLLC does not verify the accuracy or deliverability of any address. Any address-suggestion or address-checking feature in this form is a convenience only and is not a verification, warranty, or guarantee of any kind."
+          error={errors.addressAccuracyAcknowledgment}
+        />
+        <AcknowledgeBox
+          id="cert-terms"
+          checked={data.termsOfServiceAcknowledgment}
+          onChange={(v) => patch({ termsOfServiceAcknowledgment: v })}
+          label={
+            <>
+              I agree to all terms and conditions set forth in the{" "}
+              <Link
+                to="/terms"
+                target="_blank"
+                rel="noopener"
+                className="underline underline-offset-2 font-medium"
+              >
+                Terms of Service
+              </Link>
+              , including its binding individual arbitration provision and class action waiver.
+            </>
+          }
+          error={errors.termsOfServiceAcknowledgment}
+        />
+        <AcknowledgeBox
+          id="cert-public"
+          checked={data.publicRecordAcknowledgment}
+          onChange={(v) => patch({ publicRecordAcknowledgment: v })}
+          label="I understand that filed information may become part of the public record."
+          error={errors.publicRecordAcknowledgment}
+        />
+        <AcknowledgeBox
+          id="cert-legal"
+          checked={data.legalAdviceAcknowledgment}
+          onChange={(v) => patch({ legalAdviceAcknowledgment: v })}
+          label="I understand this service does not provide legal, tax, or accounting advice."
+          error={errors.legalAdviceAcknowledgment}
+        />
+    </>
+  );
+}
+
+/** A conversion has no Articles to sign. The company is on file already, and
+ *  what the Division needs is a designation "signed by the company" with the
+ *  consent of all members (s. 605.2201(1)-(2)) — so the client certifies
+ *  authority for the company and authorizes the filings (Adam, 9 Sep 2026). */
+function ConversionCertification({ data, patch, errors }: StepProps) {
+  const company = (data.existingLlcName ?? "").trim() || "the company";
+  return (
+    <div className="space-y-6">
+      <header className="space-y-2">
+        <h2 className="font-display text-3xl">Certification</h2>
+        <p className="text-sm text-muted-foreground max-w-2xl">
+          Florida establishes a protected series when the company files a
+          Protected Series Designation with the Division of Corporations, with
+          the consent of all of its members (&sect;605.2201). There are no
+          Articles to sign: your company already exists.
+        </p>
+      </header>
+
+      <div className="rounded-xl border border-border bg-card p-4 space-y-3 text-sm">
+        <div className="flex items-center gap-2 font-semibold">
+          <UserCheck className="h-4 w-4 shrink-0 text-trust" />
+          What you are certifying
+        </div>
+        <p className="text-foreground/80 leading-relaxed">
+          That you are authorized to act for <strong>{company}</strong>, that
+          its members have consented to establishing the protected series on
+          this order, and that you authorize MyFloridaSeriesLLC to prepare and
+          file the Protected Series Designations
+          {data.registeredAgentChoice === "SERVICE" ? " and the change of registered agent" : ""} with
+          the Florida Division of Corporations.
+        </p>
+        <p className="text-foreground/80 leading-relaxed">
+          <strong>You are signing under penalty of perjury.</strong> Under
+          &sect;605.0205(3), the person who signs &ldquo;affirms under penalty of
+          perjury that the information stated in the record is accurate.&rdquo;
+          If you have not read the Review step, go back and read it before you
+          sign.
+        </p>
+      </div>
+
+      <div className="space-y-3">
+        <AcknowledgeBox
+          id="cert-conversion-authority"
+          checked={data.conversionAuthorityAcknowledgment === true}
+          onChange={(v) => patch({ conversionAuthorityAcknowledgment: v })}
+          label={`I am authorized to act for ${company}, its members have consented to establishing the protected series on this order, and I authorize MyFloridaSeriesLLC to prepare and file the Protected Series Designations with the Florida Division of Corporations.`}
+          error={errors.conversionAuthorityAcknowledgment}
+        />
+        <SharedAcknowledgments data={data} patch={patch} errors={errors} />
+      </div>
+    </div>
+  );
+}
+
 export function StepCertification({ data, patch, errors }: StepProps) {
+  if (data.filingPath === "CONVERT") return <ConversionCertification data={data} patch={patch} errors={errors} />;
   const sigMismatch =
     data.authorizedRepresentativeSignature &&
     data.authorizedRepresentativeName &&
@@ -262,54 +373,7 @@ export function StepCertification({ data, patch, errors }: StepProps) {
           label="I affirm that the LLC has or will have at least one member when the Articles of Organization become effective."
           error={errors.atLeastOneMemberAcknowledgment}
         />
-        <AcknowledgeBox
-          id="cert-accuracy"
-          checked={data.accuracyAcknowledgment}
-          onChange={(v) => patch({ accuracyAcknowledgment: v })}
-          label="I certify that the information provided is true and accurate to the best of my knowledge."
-          error={errors.accuracyAcknowledgment}
-        />
-        <AcknowledgeBox
-          id="cert-address-accuracy"
-          checked={data.addressAccuracyAcknowledgment}
-          onChange={(v) => patch({ addressAccuracyAcknowledgment: v })}
-          label="I am solely responsible for the accuracy of all addresses I have provided. I understand that state filings, legal notices, and official correspondence will be directed to these addresses exactly as entered, and that MyFloridaSeriesLLC does not verify the accuracy or deliverability of any address. Any address-suggestion or address-checking feature in this form is a convenience only and is not a verification, warranty, or guarantee of any kind."
-          error={errors.addressAccuracyAcknowledgment}
-        />
-        <AcknowledgeBox
-          id="cert-terms"
-          checked={data.termsOfServiceAcknowledgment}
-          onChange={(v) => patch({ termsOfServiceAcknowledgment: v })}
-          label={
-            <>
-              I agree to all terms and conditions set forth in the{" "}
-              <Link
-                to="/terms"
-                target="_blank"
-                rel="noopener"
-                className="underline underline-offset-2 font-medium"
-              >
-                Terms of Service
-              </Link>
-              , including its binding individual arbitration provision and class action waiver.
-            </>
-          }
-          error={errors.termsOfServiceAcknowledgment}
-        />
-        <AcknowledgeBox
-          id="cert-public"
-          checked={data.publicRecordAcknowledgment}
-          onChange={(v) => patch({ publicRecordAcknowledgment: v })}
-          label="I understand that filed information may become part of the public record."
-          error={errors.publicRecordAcknowledgment}
-        />
-        <AcknowledgeBox
-          id="cert-legal"
-          checked={data.legalAdviceAcknowledgment}
-          onChange={(v) => patch({ legalAdviceAcknowledgment: v })}
-          label="I understand this service does not provide legal, tax, or accounting advice."
-          error={errors.legalAdviceAcknowledgment}
-        />
+        <SharedAcknowledgments data={data} patch={patch} errors={errors} />
       </div>
     </div>
   );

@@ -40,14 +40,21 @@ const wrap = (inner: string) => `
   <p style="color:#8a8f98;font-size:12px;margin-top:28px">MyFloridaSeriesLLC — support@myfloridaseriesllc.com</p>
 </div>`;
 
-export function welcomeEmail(name: string, setPasswordUrl: string): { subject: string; html: string } {
+export function welcomeEmail(name: string, setPasswordUrl: string, isConversion = false): { subject: string; html: string } {
+  // A converting client already owns the company: what we prepare is its
+  // Protected Series Designations, never Articles (Adam, 9 Sep 2026).
+  const preparing = isConversion
+    ? `<p>Thanks for your order. We're preparing the Protected Series Designations for your
+      existing company now and will file them with the Florida Division of Corporations —
+      you'll get an email here when your protected series are established.</p>`
+    : `<p>Thanks for your order. We're preparing your Articles of Organization now and will
+      file them with the Florida Division of Corporations — you'll get an email here when
+      your LLC is formed.</p>`;
   return {
     subject: "Your MyFloridaSeriesLLC client portal",
     html: wrap(`
       <p>Hi ${escapeHtml(name || "there")},</p>
-      <p>Thanks for your order. We're preparing your Articles of Organization now and will
-      file them with the Florida Division of Corporations — you'll get an email here when
-      your LLC is formed.</p>
+      ${preparing}
       <p>Your client portal is ready — it's where your formation documents will be posted,
       and where any legal mail we receive as your registered agent will be available to
       download. Your Owner's Manual — the plain-English guide to running your protected
@@ -302,6 +309,8 @@ export function orderPaidEmail(opts: {
 export function llcFormedEmail(opts: {
   clientName: string;
   llcName: string;
+  /** A conversion: the company existed already; only Designations were filed. */
+  isConversion?: boolean;
   seriesNames: string[];
   otherDocuments: string[];
   einOrdered: boolean;
@@ -310,9 +319,16 @@ export function llcFormedEmail(opts: {
 }): { subject: string; html: string } {
   const series = opts.seriesNames.map((n) => `<li>${escapeHtml(n)}</li>`).join("");
   const others = opts.otherDocuments.map((n) => `<li>Your <strong>${escapeHtml(n)}</strong>, as issued</li>`).join("");
-  const waiting = opts.otherDocuments.length > 0
+  const waiting = opts.otherDocuments.length > 0 || opts.isConversion
     ? "Your documents are waiting in your portal, ready to download:"
     : "Two things are waiting in your portal, ready to download:";
+  const headline = opts.isConversion
+    ? `<p>Congratulations, the protected series of your Florida LLC,
+      <strong>${escapeHtml(opts.llcName)}</strong>, are now established with the
+      Florida Division of Corporations!</p>`
+    : `<p>Congratulations, your Florida Protected Series LLC,
+      <strong>${escapeHtml(opts.llcName)}</strong>, has been officially formed
+      with the Florida Division of Corporations!</p>`;
   const svc =
     opts.einOrdered && opts.sElectionOrdered
       ? " Your Federal EIN and S election package orders are in your portal as well — that's our next step."
@@ -322,15 +338,13 @@ export function llcFormedEmail(opts: {
           ? " Your S election package order is in your portal as well — that's our next step."
           : "";
   return {
-    subject: `${opts.llcName} is formed`,
+    subject: opts.isConversion ? `${opts.llcName} — protected series established` : `${opts.llcName} is formed`,
     html: wrap(`
       <p>Dear ${escapeHtml(opts.clientName)};</p>
-      <p>Congratulations, your Florida Protected Series LLC,
-      <strong>${escapeHtml(opts.llcName)}</strong>, has been officially formed
-      with the Florida Division of Corporations!</p>
+      ${headline}
       <p>${waiting}</p>
       <ul>
-        <li>Your <strong>Articles of Organization</strong>, as filed</li>
+        ${opts.isConversion ? "" : "<li>Your <strong>Articles of Organization</strong>, as filed</li>"}
         <li>Your <strong>Protected Series Designation</strong>${opts.seriesNames.length > 1 ? "s" : ""},
             as filed, covering:
           <ul>${series}</ul>

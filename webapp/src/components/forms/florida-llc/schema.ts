@@ -223,6 +223,7 @@ export const formationFormSchema = z.object({
   atLeastOneMemberAcknowledgment: z.literal(true, {
     errorMap: () => ({ message: "Acknowledgment is required." }),
   }),
+  conversionAuthorityAcknowledgment: z.boolean().optional(),
   accuracyAcknowledgment: z.literal(true, {
     errorMap: () => ({ message: "Acknowledgment is required." }),
   }),

@@ -184,8 +184,106 @@ type PayloadLike = {
   series?: { name?: string }[];
 };
 
+/** The registered agent's rows, shared by the Articles sheet and the
+ *  conversion sheet's change-of-agent filing. */
+function raFields(ra: NonNullable<PayloadLike["registeredAgent"]>): FilingField[] {
+  const raIsBusiness = (ra.businessEntityName ?? "").trim() !== "";
+  const raName = personName(ra);
+  return [
+    {
+      key: "raChoice",
+      label: "Agent",
+      value: ra.choice === "SERVICE" ? "Our registered agent service" : "Client's own agent",
+    },
+    ...(raIsBusiness
+      ? [
+          {
+            key: "raBusiness",
+            label: "Business to serve as RA",
+            value: (ra.businessEntityName ?? "").trim(),
+          },
+        ]
+      : raName.last
+        ? [
+            { key: "raLast", label: "RA last name", value: raName.last },
+            { key: "raFirst", label: "RA first name", value: raName.first },
+          ]
+        : [
+            {
+              key: "raFull",
+              label: "RA full name (legacy order — split manually)",
+              value: raName.legacy,
+            },
+          ]),
+    ...addrFields("ra", ra.address),
+    {
+      key: "raSignature",
+      label: "Registered Agent Signature (must be an individual's name)",
+      value: ra.acceptance?.electronicSignature ?? ra.acceptance?.acceptanceName ?? "",
+    },
+  ];
+}
+
+/** A conversion's sheet. The company is already on file, so nothing
+ *  Articles-shaped belongs here. The Division's own page (dos.fl.gov, "About
+ *  Florida Series LLCs"): "Any existing, active Florida LLC, may file a
+ *  Designation of Protected Series online … $25 per protected series and may
+ *  only be filed online. You will need to know the record/document number of
+ *  the Florida LLC that will be doing the filing and the name you want to
+ *  use." A change of registered agent is its own $25 filing (s. 605.0213(7))
+ *  and appears only when the client took our service (Adam, 9 Sep 2026). */
+function conversionGroups(p: PayloadLike): FilingGroup[] {
+  const ra = p.registeredAgent ?? {};
+  const series: { name?: string }[] = p.series ?? [];
+  const groups: FilingGroup[] = [
+    {
+      title: "Filing information",
+      fields: [
+        {
+          key: "filingPath",
+          label: "Filing",
+          value: "Protected Series Designations for an existing Florida LLC — filed online at the Division, $25 each; no Articles, no $125 fee",
+          statement: true,
+          block: true,
+        },
+        { key: "existingName", label: "Existing entity name", value: p.existingLlcName ?? "" },
+        { key: "sunbizDoc", label: "Existing document number", value: p.sunbizDocumentNumber ?? "" },
+        {
+          key: "certStatus",
+          label: "Certificate of Status ($5.00)",
+          value: p.optionalDocuments?.certificateOfStatus
+            ? "Yes — add it to the designation filing (client paid for it)"
+            : "No — leave unticked",
+        },
+        {
+          key: "certifiedCopy",
+          label: "Certified Copy ($30.00)",
+          value: p.optionalDocuments?.certifiedCopy
+            ? "Yes — order a certified copy of the company's Articles on file (client paid for it)"
+            : "No — not ordered",
+        },
+      ],
+    },
+    {
+      title: `Protected Series Designations — file online, $25 each (${series.length})`,
+      fields: series.map((s, i) => ({
+        key: `series${i}`,
+        label: `Series ${i + 1}`,
+        value: s.name ?? "",
+      })),
+    },
+  ];
+  if (ra.choice === "SERVICE") {
+    groups.push({ title: "Change of registered agent ($25) — Statement of Change", fields: raFields(ra) });
+  }
+  return groups
+    .map((g) => ({ ...g, fields: g.fields.filter((f) => f.value !== "") }))
+    .filter((g) => g.fields.length > 0);
+}
+
 export function filingGroups(payload: unknown): FilingGroup[] {
   const p: PayloadLike = (payload ?? {}) as PayloadLike;
+  if (p.filingPath === "CONVERT") return conversionGroups(p);
   const ra = p.registeredAgent ?? {};
   const mgmt = p.management ?? {};
   const cert = p.certifications ?? {};
@@ -285,44 +383,7 @@ export function filingGroups(payload: unknown): FilingGroup[] {
   });
 
   // ---- 5. Registered agent ----
-  const raIsBusiness = (ra.businessEntityName ?? "").trim() !== "";
-  const raName = personName(ra);
-  groups.push({
-    title: "Registered agent",
-    fields: [
-      {
-        key: "raChoice",
-        label: "Agent",
-        value: ra.choice === "SERVICE" ? "Our registered agent service" : "Client's own agent",
-      },
-      ...(raIsBusiness
-        ? [
-            {
-              key: "raBusiness",
-              label: "Business to serve as RA",
-              value: (ra.businessEntityName ?? "").trim(),
-            },
-          ]
-        : raName.last
-          ? [
-              { key: "raLast", label: "RA last name", value: raName.last },
-              { key: "raFirst", label: "RA first name", value: raName.first },
-            ]
-          : [
-              {
-                key: "raFull",
-                label: "RA full name (legacy order — split manually)",
-                value: raName.legacy,
-              },
-            ]),
-      ...addrFields("ra", ra.address),
-      {
-        key: "raSignature",
-        label: "Registered Agent Signature (must be an individual's name)",
-        value: ra.acceptance?.electronicSignature ?? ra.acceptance?.acceptanceName ?? "",
-      },
-    ],
-  });
+  groups.push({ title: "Registered agent", fields: raFields(ra) });
 
   // ---- 6. Other provisions (the optional 240-character box) ----
   const provisions: string[] = [];

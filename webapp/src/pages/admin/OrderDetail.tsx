@@ -2,7 +2,7 @@ import { sunbizSearchUrl } from "@/components/forms/florida-llc/nameSimilarity";
 import { NameCheck } from "@/components/forms/florida-llc/NameCheck";
 import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Check, Copy, FileUp, Landmark, Loader2, X } from "lucide-react";
+import { AlertTriangle, Check, CheckCircle2, Copy, FileUp, Landmark, Loader2, X, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
@@ -24,6 +24,10 @@ interface FilingGroup {
 interface OrderDetailData {
   id: string;
   clientId: string | null;
+  /** A conversion designates series for a company already on file. */
+  filingPath: "NEW" | "CONVERT";
+  existingLlcName: string;
+  sunbizDocumentNumber: string;
   llcName: string;
   alternateNames: string[];
   status: string;
@@ -112,6 +116,63 @@ function Field({
   );
 }
 
+/** A conversion's company, confirmed against the Sunbiz mirror by the
+ *  document number the client gave (Adam, 9 Sep 2026: the name check had been
+ *  calling the client's own company a conflict). */
+function EntityOnFile({ name, docNumber }: { name: string; docNumber: string }) {
+  const lookup = useQuery({
+    queryKey: ["admin", "entity-on-file", name],
+    queryFn: () =>
+      api.post<{ available: boolean; asOf?: string; matches: { docNumber: string; name: string; status: string }[] }>(
+        "/api/entity-lookup",
+        { name },
+      ),
+    enabled: name.trim().length >= 3,
+  });
+  if (lookup.isPending) {
+    return (
+      <p className="inline-flex items-center gap-2 text-sm text-muted-foreground">
+        <Loader2 className="h-4 w-4 animate-spin" /> Checking the company against Florida's records…
+      </p>
+    );
+  }
+  const r = lookup.data;
+  if (!r || !r.available) {
+    return <p className="text-xs text-muted-foreground">The automatic check is unavailable right now — confirm the company on Sunbiz before filing.</p>;
+  }
+  const wanted = docNumber.trim().toUpperCase();
+  const match = r.matches.find((m) => m.docNumber.toUpperCase() === wanted);
+  const tone = !match ? "bad" : match.status === "Active" ? "good" : "warn";
+  const cls = tone === "good" ? "border-trust/40 bg-trust/5" : "border-destructive/40 bg-destructive/5";
+  return (
+    <div className={`rounded-lg border p-3 text-sm ${cls}`} data-testid="entity-on-file" data-tone={tone}>
+      <div className="flex items-start gap-2">
+        {tone === "good" ? (
+          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-trust" />
+        ) : tone === "warn" ? (
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
+        ) : (
+          <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
+        )}
+        <div className="min-w-0">
+          {match ? (
+            <>
+              <span className="font-medium">On file:</span> {match.name} — {match.status}, document {match.docNumber}.
+              {tone === "warn" ? " The company is not active; the Division designates series only for an active LLC." : ""}
+            </>
+          ) : (
+            <>
+              <span className="font-medium">Not confirmed:</span> no Florida company named &ldquo;{name}&rdquo; carries document {docNumber || "(none given)"}.
+              {r.matches.length > 0 ? ` On file under that name: ${r.matches.map((m) => `${m.docNumber} (${m.status})`).join(", ")}.` : " No company by that name is on file."}
+            </>
+          )}
+        </div>
+      </div>
+      <p className="mt-1 text-[11px] text-muted-foreground">Verified: {r.asOf ?? "latest state data file"}</p>
+    </div>
+  );
+}
+
 export default function OrderDetail({
   orderId,
   services,
@@ -183,6 +244,40 @@ export default function OrderDetail({
   });
 
   const d = detail.data;
+  // A conversion: no Articles, no waiting stage. The Division files an online
+  // designation "within an hour or two" (dos.fl.gov), so the drawer goes
+  // straight from the sheet to the uploads (Adam, 9 Sep 2026).
+  const isConversion = d?.filingPath === "CONVERT";
+  // The copy sheet. For a conversion it sits ABOVE the uploads — the office
+  // files first, then uploads what came back — and below them otherwise.
+  const sheet = d ? (
+    <>
+      {d.groups.filter((g) => {
+              if (isConversion) return d.status === "paid";
+              if (d.status === "paid") return !g.series;
+              if (d.status === "filed") return !d.seriesFiledAt && !!g.series;
+              // Formed: while anything is still owed the panel shows only the
+              // work; once truly complete, the whole record is displayed.
+              const certsOwed = (d.certStatusPurchased && !d.hasCertStatus) || (d.certifiedCopyPurchased && !d.hasCertifiedCopy);
+              const openServices = services.some((sv) => serviceIsOpen(sv));
+              return !certsOwed && !openServices;
+            }).map((g) => (
+              <section key={g.title}>
+                <h3 className="font-display text-base">{g.title}</h3>
+                <div className="mt-2 space-y-1.5">
+                  {g.fields.map((f) => (
+                    <Field
+                      key={f.key}
+                      field={f}
+                      copied={!!d.copiedFields[f.key]}
+                      onCopied={(key, copied) => setCopied.mutate({ key, copied })}
+                    />
+                  ))}
+                </div>
+              </section>
+            ))}
+    </>
+  ) : null;
 
   // The state's certificates on their own (Adam, 7 Sep 2026): they often
   // arrive before the designations, so they no longer wait for formation.
@@ -249,7 +344,7 @@ export default function OrderDetail({
   const claimed = new Set(psdRows.flatMap((r) => (r.file ? r.covers : [])));
   const uncovered = (d?.series ?? []).filter((s) => !s.covered && !claimed.has(s.name));
   const canUpload =
-    (d?.hasArticles || !!articlesRef.current?.files?.length) &&
+    (isConversion || d?.hasArticles || !!articlesRef.current?.files?.length) &&
     psdRows.some((r) => r.file) && uncovered.length === 0;
 
 
@@ -269,10 +364,14 @@ export default function OrderDetail({
                 rel="noreferrer"
                 className="text-xs font-medium text-trust underline underline-offset-2"
               >
-                Check name on Sunbiz (Active = taken · INACT/UA = held · INACT = available)
+                {isConversion ? "Open the company on Sunbiz" : "Check name on Sunbiz (Active = taken · INACT/UA = held · INACT = available)"}
               </a>
             ) : null}
-            {d?.llcName ? (
+            {d?.llcName && isConversion ? (
+              <div className="mt-2">
+                <EntityOnFile name={d.existingLlcName || d.llcName} docNumber={d.sunbizDocumentNumber} />
+              </div>
+            ) : d?.llcName ? (
               <div className="mt-2">
                 <NameCheck
                   compactDisclaimer
@@ -308,7 +407,7 @@ export default function OrderDetail({
           <p className="px-6 py-8 text-sm text-destructive">Could not load this order.</p>
         ) : (
           <div className="space-y-8 px-6 py-6">
-            {d.status === "paid" ? (
+            {d.status === "paid" && !isConversion ? (
               <Button onClick={onMarkFiled} disabled={markingFiled} className="w-full rounded-full">
                 {markingFiled ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 Mark sent to the Division
@@ -318,7 +417,7 @@ export default function OrderDetail({
             {/* With The State: the stamped Articles come back from the
                 Division days after submission — this is where they go up,
                 straight into the client's portal (Adam, 30 Aug 2026). */}
-            {d.status === "filed" ? (
+            {d.status === "filed" && !isConversion ? (
               !d.hasArticles ? (
                 <div className="rounded-lg border border-border p-3">
                   <label htmlFor="upload-articles-first" className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
@@ -381,13 +480,15 @@ export default function OrderDetail({
               )
             ) : null}
 
-            {d.status !== "paid" ? (
-            <section>
-              <h3 className="font-display text-base">Formation documents</h3>
+            {isConversion ? sheet : null}
+
+            {d.status !== "paid" || isConversion ? (
+            <section data-testid="formation-documents">
+              <h3 className="font-display text-base">{isConversion ? "Protected Series Designations" : "Formation documents"}</h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                Upload the Protected Series Designations. One designation may
-                cover several series — tick the ones each file covers. This
-                marks the order formed and emails the client.
+                {isConversion
+                  ? "File the Designations online at the Division, then upload the filed PDFs here. One designation may cover several series — tick the ones each file covers. This marks the order complete and emails the client."
+                  : "Upload the Protected Series Designations. One designation may cover several series — tick the ones each file covers. This marks the order formed and emails the client."}
               </p>
 
               {d.documents.length > 0 ? (
@@ -527,7 +628,7 @@ export default function OrderDetail({
                     ) : (
                       <FileUp className="mr-2 h-4 w-4" />
                     )}
-                    Upload designations and mark formed
+                    {isConversion ? "Upload designations and mark complete" : "Upload designations and mark formed"}
                   </Button>
                 </div>
               ) : (
@@ -610,29 +711,7 @@ export default function OrderDetail({
               </p>
             ) : null}
 
-            {d.groups.filter((g) => {
-              if (d.status === "paid") return !g.series;
-              if (d.status === "filed") return !d.seriesFiledAt && !!g.series;
-              // Formed: while anything is still owed the panel shows only the
-              // work; once truly complete, the whole record is displayed.
-              const certsOwed = (d.certStatusPurchased && !d.hasCertStatus) || (d.certifiedCopyPurchased && !d.hasCertifiedCopy);
-              const openServices = services.some((sv) => serviceIsOpen(sv));
-              return !certsOwed && !openServices;
-            }).map((g) => (
-              <section key={g.title}>
-                <h3 className="font-display text-base">{g.title}</h3>
-                <div className="mt-2 space-y-1.5">
-                  {g.fields.map((f) => (
-                    <Field
-                      key={f.key}
-                      field={f}
-                      copied={!!d.copiedFields[f.key]}
-                      onCopied={(key, copied) => setCopied.mutate({ key, copied })}
-                    />
-                  ))}
-                </div>
-              </section>
-            ))}
+            {isConversion ? null : sheet}
 
           </div>
         )}

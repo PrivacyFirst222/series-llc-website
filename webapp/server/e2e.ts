@@ -465,6 +465,27 @@ const client = (clients.body?.data as { id: string; email: string; has_password:
   (c) => c.email === testEmail,
 );
 check("client account auto-created on payment", !!client && !client.has_password, clients.body);
+// The Clients tab lists every paid company under the account, with the name
+// given on the order (Adam, 9 Sep 2026: KLF's order was invisible there).
+{
+  const row = (clients.body?.data as { email: string; companies?: { llc_name: string; contact_name?: string }[] }[])?.find((c) => c.email === testEmail);
+  check("the clients list carries each account's companies with the order's contact name",
+    !!row?.companies?.some((co) => co.llc_name === formData.desiredLlcName + " " + formData.llcDesignator || /E2E/.test(co.llc_name)) && !!row?.companies?.every((co) => typeof co.contact_name === "string"),
+    row?.companies);
+}
+// The admin views a client's portal as the client (Adam, 9 Sep 2026).
+{
+  const denied = await api(`/api/admin/clients/${client!.id}/view-as`, { method: "POST" });
+  check("view-as needs the admin's sign-in", denied.status === 401, denied.body);
+  const viewAs = await api(`/api/admin/clients/${client!.id}/view-as`, { method: "POST", cookies: admin.cookie });
+  check("the admin can start a view of a client's portal", viewAs.status === 200 && viewAs.cookie.startsWith("fpsllc_session="), viewAs.body);
+  const asClient = await api("/api/auth/me", { cookies: viewAs.cookie });
+  check("the view answers as the client and says the admin is looking",
+    asClient.status === 200 && asClient.body?.data?.email === testEmail && asClient.body?.data?.viewingAsAdmin === true, asClient.body);
+  const out = await api("/api/auth/logout", { method: "POST", cookies: viewAs.cookie });
+  const after = await api("/api/auth/me", { cookies: viewAs.cookie });
+  check("Exit ends the view", out.status === 200 && after.status === 401, after.body);
+}
 
 // 5b. A conversion the way the UI actually sends it: the new-name questions
 //     are never shown, so desiredLlcName and llcDesignator arrive empty. This
@@ -480,6 +501,10 @@ check("client account auto-created on payment", !!client && !client.has_password
     nameSearchAcknowledgment: false, governmentAffiliationAcknowledgment: false, lawfulPurposeNameAcknowledgment: false,
     existingLlcName: "E2E Converted Holdings, LLC", sunbizDocumentNumber: "L24000999888",
     series: [{ id: "s1", name: "E2E Converted Holdings, LLC, PS A" }],
+    // A conversion certifies authority for the company instead of choosing an
+    // Articles signer, and never answers purpose or effective date
+    // (Adam, 9 Sep 2026).
+    conversionAuthorityAcknowledgment: true, purposeType: "", atLeastOneMemberAcknowledgment: false,
     clientEmail: uc("uiconv"), confirmClientEmail: uc("uiconv"),
     correspondentEmail: uc("uiconv"), confirmCorrespondentEmail: uc("uiconv"),
   })});
@@ -488,6 +513,70 @@ check("client account auto-created on payment", !!client && !client.has_password
   check("a conversion order is named by the company being converted",
     (fullC.body?.data as { llcName?: string })?.llcName === "E2E Converted Holdings, LLC",
     fullC.body?.data);
+  // Extra orders ride their own addresses: the order limit is 10 an hour per
+  // address, and the suite spends most of that on itself.
+  const sideIp = () => ({ "X-Forwarded-For": `10.78.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}` });
+  const noAuthority = await api("/api/orders", { method: "POST", headers: sideIp(), body: JSON.stringify({
+    ...formData, filingPath: "CONVERT", desiredLlcName: "", llcDesignator: "", alternateName1: "",
+    nameSearchAcknowledgment: false, governmentAffiliationAcknowledgment: false, lawfulPurposeNameAcknowledgment: false,
+    existingLlcName: "E2E Converted Holdings, LLC", sunbizDocumentNumber: "L24000999888",
+    series: [{ id: "s1", name: "E2E Converted Holdings, LLC, PS A" }],
+    conversionAuthorityAcknowledgment: false,
+    clientEmail: uc("uiconv2"), confirmClientEmail: uc("uiconv2"),
+    correspondentEmail: uc("uiconv2"), confirmCorrespondentEmail: uc("uiconv2"),
+  })});
+  check("a conversion without the authority certification is refused", noAuthority.status === 400, noAuthority.body);
+
+  // The conversion carried through the office (Adam, 9 Sep 2026): the drawer
+  // knows it is one, the sheet holds no Articles fields and no $125, and the
+  // Designations mark it formed with no Articles PDF — the Division files a
+  // designation online for an existing LLC, and there are no new Articles.
+  {
+    const convId = conv.body?.data?.orderId as string;
+    await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: convId }) });
+    const cd = (await api(`/api/admin/orders/${convId}`, { cookies: admin.cookie })).body?.data as {
+      filingPath?: string; existingLlcName?: string; sunbizDocumentNumber?: string; status?: string;
+      groups?: { title: string; fields: { label: string; value: string }[] }[];
+    } | undefined;
+    check("a paid conversion's detail says it is a conversion, with the company and document number",
+      cd?.filingPath === "CONVERT" && cd?.existingLlcName === "E2E Converted Holdings, LLC" && cd?.sunbizDocumentNumber === "L24000999888",
+      cd && { filingPath: cd.filingPath, existingLlcName: cd.existingLlcName, sunbizDocumentNumber: cd.sunbizDocumentNumber });
+    const titles = (cd?.groups ?? []).map((g) => g.title);
+    const labels = (cd?.groups ?? []).flatMap((g) => g.fields.map((f) => f.label));
+    const values = (cd?.groups ?? []).flatMap((g) => g.fields.map((f) => `${f.label}: ${f.value}`));
+    check("a conversion's sheet has no Articles fields and no $125 fee",
+      !titles.some((t) => /Company name|Principal place|Persons authorized|Other provisions|Mailing/i.test(t)) && !labels.some((l) => /Required filing fee|Effective date|Purpose|Limited Liability Company Name/.test(l)),
+      { titles, labels });
+    // The fixture keeps its own agent, so no change-of-agent filing appears;
+    // the walk's run E (our agent) asserts the opposite in the browser.
+    check("a conversion's sheet lists the Designations and the document number, and no agent change for a client keeping its agent",
+      titles.some((t) => /^Protected Series Designations — file online/.test(t)) && values.some((v) => /L24000999888/.test(v)) && (titles.some((t) => /Change of registered agent/.test(t)) === (formData.registeredAgentChoice === "SERVICE")),
+      { titles, ra: formData.registeredAgentChoice });
+    const cfd = new FormData();
+    cfd.append("psd", new File([new TextEncoder().encode("%PDF-1.4 e2e conversion psd\n%%EOF")], "psd.pdf", { type: "application/pdf" }));
+    cfd.append("psdSeries", JSON.stringify(["E2E Converted Holdings, LLC, PS A"]));
+    const cRes = await fetch(`${BASE}/api/admin/orders/${convId}/formation-documents`, { method: "POST", headers: { Cookie: admin.cookie }, body: cfd });
+    check("a conversion is marked formed by its Designations alone, with no Articles PDF", cRes.ok, await cRes.clone().json().catch(() => null));
+    const cStatus = await api(`/api/orders/${convId}/status`);
+    check("the conversion's status is formed afterward", cStatus.body?.data?.status === "formed", cStatus.body);
+  }
+  // A new formation still cannot be formed without its Articles.
+  {
+    const fresh = await api("/api/orders", { method: "POST", headers: sideIp(), body: JSON.stringify({
+      ...formData,
+      clientEmail: uc("noarticles"), confirmClientEmail: uc("noarticles"),
+      correspondentEmail: uc("noarticles"), confirmCorrespondentEmail: uc("noarticles"),
+    })});
+    const freshId = fresh.body?.data?.orderId as string;
+    check("a new formation for the Articles check is accepted", fresh.status === 200, fresh.body);
+    await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: freshId }) });
+    const nfd = new FormData();
+    nfd.append("psd", new File([new TextEncoder().encode("%PDF-1.4 e2e psd only\n%%EOF")], "psd.pdf", { type: "application/pdf" }));
+    nfd.append("psdSeries", JSON.stringify(formData.series.map((s) => s.name)));
+    const nRes = await fetch(`${BASE}/api/admin/orders/${freshId}/formation-documents`, { method: "POST", headers: { Cookie: admin.cookie }, body: nfd });
+    const nBody = (await nRes.json().catch(() => null)) as { error?: { message?: string } } | null;
+    check("a new formation without an Articles PDF is still refused", nRes.status === 400 && /Articles of Organization PDF is required/.test(nBody?.error?.message ?? ""), nBody);
+  }
   // s. 621.12(2)(b)3: a PLLC's designator comes IN LIEU OF the standard ones,
   // so both cross-pairings are refused server-side, past the filtered dropdown.
   const wrongPro = await api("/api/orders", { method: "POST", body: JSON.stringify({

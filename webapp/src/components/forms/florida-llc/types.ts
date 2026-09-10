@@ -115,6 +115,9 @@ export interface FloridaLLCFormData {
   /** CONVERT path only: the LLC already on file with the state. */
   existingLlcName?: string;
   sunbizDocumentNumber?: string;
+  /** CONVERT path only: the client is authorized to act for that company and
+   *  authorizes the Designation filings (stands in for the Articles signer). */
+  conversionAuthorityAcknowledgment?: boolean;
   // Section 1
   formationType: FormationType;
   isFloridaDomesticEntityOnly: boolean;
@@ -337,6 +340,7 @@ export interface SubmissionPayload {
     publicRecordAcknowledged: boolean;
     notLegalAdviceAcknowledged: boolean;
     seriesOwnershipAcknowledged: boolean;
+    conversionAuthorityAcknowledged: boolean;
   };
   metadata: {
     submittedAt: string;

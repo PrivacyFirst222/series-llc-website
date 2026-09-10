@@ -430,23 +430,29 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
   }
   await advance(page);
 
-  // Purpose. A PLLC must state its professional purpose; a standard LLC may
-  // add a specific one alongside the general clause.
-  if (run.formationType === "PLLC") {
-    await page.locator("main textarea").first().fill("The practice of law");
-  } else if (run.specificPurpose) {
-    await clickCard(page, /Also list a specific purpose/i);
-    await page.waitForTimeout(300);
-    await page.locator("main textarea").first().fill(run.specificPurpose);
-  }
-  await advance(page);
+  // Purpose and effective date are Articles questions: a conversion never
+  // sees them (Adam, 9 Sep 2026) — asserted by heading, not assumed.
+  if (run.path === "convert") {
+    expect(/Correspondence/i.test(await stepHeading(page)), `${run.key}: a conversion skips purpose and effective date`, await stepHeading(page));
+  } else {
+    // Purpose. A PLLC must state its professional purpose; a standard LLC may
+    // add a specific one alongside the general clause.
+    if (run.formationType === "PLLC") {
+      await page.locator("main textarea").first().fill("The practice of law");
+    } else if (run.specificPurpose) {
+      await clickCard(page, /Also list a specific purpose/i);
+      await page.waitForTimeout(300);
+      await page.locator("main textarea").first().fill(run.specificPurpose);
+    }
+    await advance(page);
 
-  // Effective date.
-  if (run.requestedEffectiveDate) {
-    await page.locator("main label", { hasText: /specific|requested|choose/i }).first().click();
-    await page.locator('main input[type="date"]').first().fill(run.requestedEffectiveDate);
+    // Effective date.
+    if (run.requestedEffectiveDate) {
+      await page.locator("main label", { hasText: /specific|requested|choose/i }).first().click();
+      await page.locator('main input[type="date"]').first().fill(run.requestedEffectiveDate);
+    }
+    await advance(page);
   }
-  await advance(page);
 
   // Correspondence. A one-word name is refused at the box (Adam, 7 Sep 2026).
   // The step prefills the contact name from the client a moment after it
@@ -550,8 +556,12 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
     expect((await stepHeading(page)).includes("Certification"), `${run.key}: forward replay reaches Certify with every answer intact`, await stepHeading(page));
   }
 
-  // Certify & sign.
-  if (run.weSign) {
+  // Certify & sign. A conversion has no Articles to sign: it certifies
+  // authority for the company on file instead (Adam, 9 Sep 2026).
+  if (run.path === "convert") {
+    const certText = await page.locator("main").innerText();
+    expect(!/Who will sign the Articles/.test(certText) && /authorized to act for/.test(certText), `${run.key}: a conversion certifies authority instead of an Articles signer`, certText.slice(0, 160));
+  } else if (run.weSign) {
     await clickCard(page, /signs for me/i);
   } else {
     await clickCard(page, /I will sign/i);
@@ -1560,6 +1570,102 @@ async function main(): Promise<void> {
       expect(false, `documents order journey: ${String(e).slice(0, 300)}`);
     } finally {
       await page.close();
+    }
+  }
+
+  // A conversion at the office (Adam, 9 Sep 2026): the drawer confirms the
+  // company on file by document number, shows a Designations sheet with no
+  // Articles fields and no Mark-sent button, and offers the uploads at once.
+  if (orderIds.has("E")) {
+    console.log("\n▶ Conversion at the office (run E)");
+    const page = await browser.newPage();
+    try {
+      await page.route("**/api/**", async (route) => {
+        const url = new URL(route.request().url());
+        const resp = await fetch(`${API}${url.pathname}${url.search}`, {
+          method: route.request().method(),
+          headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "" },
+          body: route.request().postDataBuffer() ?? undefined,
+        });
+        const body = await resp.text();
+        const setCookie = resp.headers.get("set-cookie");
+        await route.fulfill({ status: resp.status, contentType: resp.headers.get("content-type") ?? "application/json", body, headers: setCookie ? { "set-cookie": setCookie } : undefined });
+      });
+      await page.goto(`http://localhost:${WEB_PORT}/admin/login`);
+      await page.getByLabel("Password").fill("dev-admin");
+      await page.locator("main button").filter({ hasText: /^Sign in/ }).first().click();
+      await page.waitForURL(/\/admin(?!\/login)/, { timeout: 10000 });
+      await page.getByLabel("Search by LLC name, client name, or email").fill("Gate Run Echo");
+      await page.waitForTimeout(1500);
+      const card = page.locator("main div.rounded-xl").filter({ hasText: /Gate Run Echo/ }).first();
+      await card.locator("button").first().click();
+      await page.waitForTimeout(2000);
+      const drawer = page.locator("div.fixed.inset-0 div.max-w-2xl").first();
+      const text = await drawer.innerText();
+      expect(!/Mark sent to the Division/.test(text), "conversion office: no Mark-sent button — the Division files a designation online within hours");
+      expect(/On file:/.test(text) && /Gate Run Echo, LLC/.test(text) && /E2ETESTE0001/.test(text), "conversion office: the panel confirms the company on file by its document number", text.slice(0, 300));
+      expect((await drawer.locator('[data-testid="entity-on-file"]').getAttribute("data-tone")) === "good", "conversion office: the confirmation is green");
+      expect(!/Required filing fee|\$125\.00|Company name|Principal place of business|Persons authorized|Filed Articles of Organization/.test(text), "conversion office: the sheet has no Articles fields, fee, or Articles upload", text.slice(0, 400));
+      expect(/Protected Series Designations — file online/.test(text) && /PS Alpha/.test(text), "conversion office: the sheet lists the Designations to file", text.slice(0, 400));
+      expect(/Change of registered agent/.test(text), "conversion office: our agent means a change-of-agent filing on the sheet");
+      expect((await drawer.locator('[data-testid="formation-documents"]').count()) === 1 && /Upload designations and mark complete/.test(text), "conversion office: the Designation uploads are offered at once");
+      await shot(page, "admin-conversion-drawer");
+    } catch (e) {
+      expect(false, `conversion office journey: ${String(e).slice(0, 300)}`);
+    } finally {
+      await page.close();
+    }
+  }
+
+  // The Clients tab (Adam, 9 Sep 2026): every paid company under the account,
+  // and View portal opens the client's portal as the client with a banner and
+  // an Exit that ends the view.
+  if (orderIds.has("A")) {
+    console.log("\n▶ Clients tab: companies and View portal");
+    const ctx = await browser.newContext();
+    try {
+      await ctx.route("**/api/**", async (route) => {
+        const url = new URL(route.request().url());
+        const resp = await fetch(`${API}${url.pathname}${url.search}`, {
+          method: route.request().method(),
+          headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "" },
+          body: route.request().postDataBuffer() ?? undefined,
+        });
+        const body = await resp.text();
+        const setCookie = resp.headers.get("set-cookie");
+        await route.fulfill({ status: resp.status, contentType: resp.headers.get("content-type") ?? "application/json", body, headers: setCookie ? { "set-cookie": setCookie } : undefined });
+      });
+      const page = await ctx.newPage();
+      await page.goto(`http://localhost:${WEB_PORT}/admin/login`);
+      await page.getByLabel("Password").fill("dev-admin");
+      await page.locator("main button").filter({ hasText: /^Sign in/ }).first().click();
+      await page.waitForURL(/\/admin(?!\/login)/, { timeout: 10000 });
+      await page.getByRole("tab", { name: "Clients", exact: true }).click();
+      await page.waitForTimeout(1500);
+      const row = page.locator("main tr").filter({ hasText: "gate-oa@e2e.test" }).first();
+      const companies = await row.locator('[data-testid="client-companies"]').innerText();
+      expect(/Gate Run Alpha/.test(companies), "clients tab: the Companies column lists the account's paid company", companies);
+      await shot(page, "admin-clients-companies");
+      const [popup] = await Promise.all([
+        ctx.waitForEvent("page"),
+        row.locator('[data-testid="view-portal"]').click(),
+      ]);
+      await popup.waitForURL(/\/portal/, { timeout: 10000 });
+      const banner = popup.locator('[data-testid="viewing-as-banner"]');
+      await banner.waitFor({ state: "visible", timeout: 10000 });
+      const bannerText = await banner.innerText();
+      expect(/gate-oa@e2e.test/.test(bannerText) && /happens as the client/.test(bannerText), "view portal: the banner names the client and says actions are theirs", bannerText);
+      expect(/Signed in as gate-oa@e2e.test/.test(await popup.locator("main").innerText()), "view portal: the portal is the client's");
+      await shot(popup, "portal-viewing-as-client");
+      await banner.locator("button").filter({ hasText: /^Exit$/ }).click();
+      await popup.waitForURL(/\/admin/, { timeout: 10000 });
+      await popup.goto(`http://localhost:${WEB_PORT}/portal`);
+      await popup.waitForTimeout(2000);
+      expect(/\/portal\/login/.test(popup.url()), "view portal: Exit ends the client sign-in", popup.url());
+    } catch (e) {
+      expect(false, `clients tab journey: ${String(e).slice(0, 300)}`);
+    } finally {
+      await ctx.close();
     }
   }
 

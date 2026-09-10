@@ -42,6 +42,13 @@ const extendedFormSchema = formationFormSchema
     sElectionFilingAcknowledgment: z.boolean().optional().default(false),
     existingLlcName: z.string().max(300).optional().or(z.literal("")),
     sunbizDocumentNumber: z.string().max(50).optional().or(z.literal("")),
+    // A conversion never sees the purpose, effective-date, or Articles-signer
+    // questions (Adam, 9 Sep 2026): the company is already on file and only
+    // Designations are filed. Those requirements are re-imposed below, NEW
+    // only; the conversion instead certifies authority for the company.
+    purposeType: z.enum(["GENERAL", "SPECIFIC", "PROFESSIONAL"]).optional().or(z.literal("")),
+    atLeastOneMemberAcknowledgment: z.boolean().optional(),
+    conversionAuthorityAcknowledgment: z.boolean().optional(),
     series: z
       .array(
         z.object({
@@ -170,9 +177,27 @@ const extendedFormSchema = formationFormSchema
         message: "The registered agent's first and last name are required.",
       });
     }
+    if (data.filingPath === "CONVERT") {
+      if (data.conversionAuthorityAcknowledgment !== true) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["conversionAuthorityAcknowledgment"],
+          message: "Please confirm that you are authorized to act for the company.",
+        });
+      }
+    } else {
+      if (!data.purposeType) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["purposeType"], message: "Choose a purpose type." });
+      }
+      if (data.atLeastOneMemberAcknowledgment !== true) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["atLeastOneMemberAcknowledgment"], message: "Acknowledgment is required." });
+      }
+    }
     // Exactly one of the two signing paths must be complete. Relaxing the base
     // schema to allow an empty signature block is only safe because of this.
-    if (data.articlesSignerChoice === "SERVICE") {
+    if (data.filingPath === "CONVERT") {
+      // No Articles to sign: the authority certification above stands in.
+    } else if (data.articlesSignerChoice === "SERVICE") {
       if (!data.articlesSignerAppointment) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,

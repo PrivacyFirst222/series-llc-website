@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Upload } from "lucide-react";
+import { Upload, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,7 +30,32 @@ interface AdminClient {
   has_password: boolean;
   document_count: number;
   ra_llcs: string[];
-  companies: { id: string; llc_name: string }[];
+  companies: { id: string; llc_name: string; contact_name?: string }[];
+}
+
+/** The admin opens the client's portal as the client (Adam, 9 Sep 2026). The
+ *  tab is opened first, synchronously, so the browser does not block it as a
+ *  popup; the sign-in lands, then the tab is pointed at the portal. */
+function ViewPortalButton({ client }: { client: AdminClient }) {
+  const view = useMutation({
+    mutationFn: () => api.post<{ ok: boolean }>(`/api/admin/clients/${client.id}/view-as`, {}),
+  });
+  const open = async () => {
+    const tab = window.open("about:blank", "_blank");
+    try {
+      await view.mutateAsync();
+      if (tab) tab.location.href = "/portal";
+      else window.location.assign("/portal");
+    } catch {
+      tab?.close();
+    }
+  };
+  return (
+    <Button type="button" variant="outline" size="sm" className="rounded-full" onClick={open} disabled={view.isPending} data-testid="view-portal">
+      <Eye className="mr-1.5 h-3.5 w-3.5" />
+      {view.isPending ? "Opening…" : "View portal"}
+    </Button>
+  );
 }
 
 const day = (iso: string | null) =>
@@ -248,6 +273,7 @@ function ClientsTable({
           <tr className="border-b border-border bg-secondary/40 text-left text-xs uppercase tracking-[0.14em] text-muted-foreground">
             <th className="px-4 py-3 font-medium">Client</th>
             {variant === "ra" ? <th className="px-4 py-3 font-medium">Registered agent for</th> : null}
+            <th className="px-4 py-3 font-medium">Companies</th>
             <th className="px-4 py-3 font-medium">Portal account</th>
             <th className="px-4 py-3 font-medium">Documents</th>
             <th className="px-4 py-3 font-medium">Since</th>
@@ -257,7 +283,7 @@ function ClientsTable({
         <tbody className="divide-y divide-border">
           {clients.length === 0 ? (
             <tr>
-              <td colSpan={variant === "ra" ? 6 : 5} className="px-4 py-6 text-muted-foreground">
+              <td colSpan={variant === "ra" ? 7 : 6} className="px-4 py-6 text-muted-foreground">
                 {emptyText}
               </td>
             </tr>
@@ -276,11 +302,31 @@ function ClientsTable({
                 {variant === "ra" ? (
                   <td className="px-4 py-3">{(cl.ra_llcs ?? []).join(", ")}</td>
                 ) : null}
+                {/* Every paid company under this account, with the name given
+                    on the order when it differs from the account's (Adam,
+                    9 Sep 2026: KLF's order was invisible here). */}
+                <td className="px-4 py-3" data-testid="client-companies">
+                  {(cl.companies ?? []).length === 0 ? (
+                    <span className="text-muted-foreground">—</span>
+                  ) : (
+                    <ul className="space-y-0.5">
+                      {(cl.companies ?? []).map((co) => (
+                        <li key={co.id}>
+                          {co.llc_name}
+                          {co.contact_name && co.contact_name.trim() !== (cl.name ?? "").trim() ? (
+                            <span className="text-muted-foreground"> ({co.contact_name})</span>
+                          ) : null}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </td>
                 <td className="px-4 py-3">{cl.has_password ? "Active" : "Invite sent"}</td>
                 <td className="px-4 py-3">{cl.document_count}</td>
                 <td className="px-4 py-3 text-muted-foreground">{day(cl.created_at)}</td>
                 <td className="px-4 py-3 text-right">
                   <div className="flex justify-end gap-2">
+                    <ViewPortalButton client={cl} />
                     <ChangeEmailDialog client={cl} />
                     <UploadDialog client={cl} />
                   </div>

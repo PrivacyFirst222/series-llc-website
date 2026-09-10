@@ -95588,6 +95588,10 @@ CREATE TABLE IF NOT EXISTS sessions (
   expires_at timestamptz NOT NULL
 )`,
   `
+-- An admin's view of a client's portal (Adam, 9 Sep 2026): a client session
+-- started from the admin, marked so the portal can say so and offer Exit.
+ALTER TABLE sessions ADD COLUMN IF NOT EXISTS viewing_as_admin boolean NOT NULL DEFAULT false`,
+  `
 CREATE TABLE IF NOT EXISTS auth_tokens (
   token_hash text PRIMARY KEY,
   client_id uuid NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
@@ -95961,10 +95965,10 @@ var SESSION_DAYS = 30;
 async function createSession(c, opts) {
   const db = await getDb();
   const { token, tokenHash } = newToken();
-  const expires = new Date(Date.now() + SESSION_DAYS * 864e5);
+  const expires = new Date(Date.now() + (opts.hours ? opts.hours * 36e5 : SESSION_DAYS * 864e5));
   await db.query(
-    "INSERT INTO sessions (token_hash, client_id, is_admin, expires_at) VALUES ($1, $2, $3, $4)",
-    [tokenHash, opts.clientId ?? null, opts.isAdmin ?? false, expires.toISOString()]
+    "INSERT INTO sessions (token_hash, client_id, is_admin, viewing_as_admin, expires_at) VALUES ($1, $2, $3, $4, $5)",
+    [tokenHash, opts.clientId ?? null, opts.isAdmin ?? false, opts.viewingAsAdmin ?? false, expires.toISOString()]
   );
   setCookie(c, opts.isAdmin ? ADMIN_COOKIE : CLIENT_COOKIE, token, {
     httpOnly: true,
@@ -95980,11 +95984,11 @@ async function lookup(c, cookieName) {
   const db = await getDb();
   const tokenHash = hashToken(token);
   const rows = await db.query(
-    "SELECT client_id, is_admin FROM sessions WHERE token_hash = $1 AND expires_at > now()",
+    "SELECT client_id, is_admin, viewing_as_admin FROM sessions WHERE token_hash = $1 AND expires_at > now()",
     [tokenHash]
   );
   if (rows.length === 0) return null;
-  return { clientId: rows[0].client_id, isAdmin: rows[0].is_admin, tokenHash };
+  return { clientId: rows[0].client_id, isAdmin: rows[0].is_admin, tokenHash, viewingAsAdmin: rows[0].viewing_as_admin };
 }
 async function getSession(c) {
   const s = await lookup(c, CLIENT_COOKIE);
@@ -100333,6 +100337,7 @@ var formationFormSchema = external_exports.object({
   atLeastOneMemberAcknowledgment: external_exports.literal(true, {
     errorMap: () => ({ message: "Acknowledgment is required." })
   }),
+  conversionAuthorityAcknowledgment: external_exports.boolean().optional(),
   accuracyAcknowledgment: external_exports.literal(true, {
     errorMap: () => ({ message: "Acknowledgment is required." })
   }),
@@ -100490,6 +100495,13 @@ var extendedFormSchema = formationFormSchema.extend({
   sElectionFilingAcknowledgment: external_exports.boolean().optional().default(false),
   existingLlcName: external_exports.string().max(300).optional().or(external_exports.literal("")),
   sunbizDocumentNumber: external_exports.string().max(50).optional().or(external_exports.literal("")),
+  // A conversion never sees the purpose, effective-date, or Articles-signer
+  // questions (Adam, 9 Sep 2026): the company is already on file and only
+  // Designations are filed. Those requirements are re-imposed below, NEW
+  // only; the conversion instead certifies authority for the company.
+  purposeType: external_exports.enum(["GENERAL", "SPECIFIC", "PROFESSIONAL"]).optional().or(external_exports.literal("")),
+  atLeastOneMemberAcknowledgment: external_exports.boolean().optional(),
+  conversionAuthorityAcknowledgment: external_exports.boolean().optional(),
   series: external_exports.array(
     external_exports.object({
       id: external_exports.string().max(64),
@@ -100601,7 +100613,24 @@ var extendedFormSchema = formationFormSchema.extend({
       message: "The registered agent's first and last name are required."
     });
   }
-  if (data.articlesSignerChoice === "SERVICE") {
+  if (data.filingPath === "CONVERT") {
+    if (data.conversionAuthorityAcknowledgment !== true) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        path: ["conversionAuthorityAcknowledgment"],
+        message: "Please confirm that you are authorized to act for the company."
+      });
+    }
+  } else {
+    if (!data.purposeType) {
+      ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["purposeType"], message: "Choose a purpose type." });
+    }
+    if (data.atLeastOneMemberAcknowledgment !== true) {
+      ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["atLeastOneMemberAcknowledgment"], message: "Acknowledgment is required." });
+    }
+  }
+  if (data.filingPath === "CONVERT") {
+  } else if (data.articlesSignerChoice === "SERVICE") {
     if (!data.articlesSignerAppointment) {
       ctx.addIssue({
         code: external_exports.ZodIssueCode.custom,
@@ -100791,7 +100820,8 @@ function buildPayload(data) {
       accuracyAcknowledged: data.accuracyAcknowledgment,
       publicRecordAcknowledged: data.publicRecordAcknowledgment,
       notLegalAdviceAcknowledged: data.legalAdviceAcknowledgment,
-      seriesOwnershipAcknowledged: data.seriesOwnershipAcknowledgment
+      seriesOwnershipAcknowledged: data.seriesOwnershipAcknowledgment,
+      conversionAuthorityAcknowledged: data.conversionAuthorityAcknowledgment === true
     },
     metadata: {
       submittedAt: (/* @__PURE__ */ new Date()).toISOString(),
@@ -101170,14 +101200,17 @@ var wrap = (inner) => `
   ${inner}
   <p style="color:#8a8f98;font-size:12px;margin-top:28px">MyFloridaSeriesLLC \u2014 support@myfloridaseriesllc.com</p>
 </div>`;
-function welcomeEmail(name, setPasswordUrl) {
+function welcomeEmail(name, setPasswordUrl, isConversion = false) {
+  const preparing = isConversion ? `<p>Thanks for your order. We're preparing the Protected Series Designations for your
+      existing company now and will file them with the Florida Division of Corporations \u2014
+      you'll get an email here when your protected series are established.</p>` : `<p>Thanks for your order. We're preparing your Articles of Organization now and will
+      file them with the Florida Division of Corporations \u2014 you'll get an email here when
+      your LLC is formed.</p>`;
   return {
     subject: "Your MyFloridaSeriesLLC client portal",
     html: wrap(`
       <p>Hi ${escapeHtml(name || "there")},</p>
-      <p>Thanks for your order. We're preparing your Articles of Organization now and will
-      file them with the Florida Division of Corporations \u2014 you'll get an email here when
-      your LLC is formed.</p>
+      ${preparing}
       <p>Your client portal is ready \u2014 it's where your formation documents will be posted,
       and where any legal mail we receive as your registered agent will be available to
       download. Your Owner's Manual \u2014 the plain-English guide to running your protected
@@ -101365,18 +101398,21 @@ function orderPaidEmail(opts) {
 function llcFormedEmail(opts) {
   const series = opts.seriesNames.map((n) => `<li>${escapeHtml(n)}</li>`).join("");
   const others = opts.otherDocuments.map((n) => `<li>Your <strong>${escapeHtml(n)}</strong>, as issued</li>`).join("");
-  const waiting = opts.otherDocuments.length > 0 ? "Your documents are waiting in your portal, ready to download:" : "Two things are waiting in your portal, ready to download:";
+  const waiting = opts.otherDocuments.length > 0 || opts.isConversion ? "Your documents are waiting in your portal, ready to download:" : "Two things are waiting in your portal, ready to download:";
+  const headline = opts.isConversion ? `<p>Congratulations, the protected series of your Florida LLC,
+      <strong>${escapeHtml(opts.llcName)}</strong>, are now established with the
+      Florida Division of Corporations!</p>` : `<p>Congratulations, your Florida Protected Series LLC,
+      <strong>${escapeHtml(opts.llcName)}</strong>, has been officially formed
+      with the Florida Division of Corporations!</p>`;
   const svc = opts.einOrdered && opts.sElectionOrdered ? " Your Federal EIN and S election package orders are in your portal as well \u2014 that's our next step." : opts.einOrdered ? " Your Federal EIN order is in your portal as well \u2014 that's our next step." : opts.sElectionOrdered ? " Your S election package order is in your portal as well \u2014 that's our next step." : "";
   return {
-    subject: `${opts.llcName} is formed`,
+    subject: opts.isConversion ? `${opts.llcName} \u2014 protected series established` : `${opts.llcName} is formed`,
     html: wrap(`
       <p>Dear ${escapeHtml(opts.clientName)};</p>
-      <p>Congratulations, your Florida Protected Series LLC,
-      <strong>${escapeHtml(opts.llcName)}</strong>, has been officially formed
-      with the Florida Division of Corporations!</p>
+      ${headline}
       <p>${waiting}</p>
       <ul>
-        <li>Your <strong>Articles of Organization</strong>, as filed</li>
+        ${opts.isConversion ? "" : "<li>Your <strong>Articles of Organization</strong>, as filed</li>"}
         <li>Your <strong>Protected Series Designation</strong>${opts.seriesNames.length > 1 ? "s" : ""},
             as filed, covering:
           <ul>${series}</ul>
@@ -105882,8 +105918,84 @@ var MGMT_PROVISION = {
   MANAGER_MANAGED: "Pursuant to Florida Statutes Section 605.0407, the company is or will be manager-managed.",
   MEMBER_MANAGED: "Pursuant to Florida Statutes Section 605.0407, the company is or will be member-managed."
 };
+function raFields(ra) {
+  const raIsBusiness = (ra.businessEntityName ?? "").trim() !== "";
+  const raName = personName(ra);
+  return [
+    {
+      key: "raChoice",
+      label: "Agent",
+      value: ra.choice === "SERVICE" ? "Our registered agent service" : "Client's own agent"
+    },
+    ...raIsBusiness ? [
+      {
+        key: "raBusiness",
+        label: "Business to serve as RA",
+        value: (ra.businessEntityName ?? "").trim()
+      }
+    ] : raName.last ? [
+      { key: "raLast", label: "RA last name", value: raName.last },
+      { key: "raFirst", label: "RA first name", value: raName.first }
+    ] : [
+      {
+        key: "raFull",
+        label: "RA full name (legacy order \u2014 split manually)",
+        value: raName.legacy
+      }
+    ],
+    ...addrFields("ra", ra.address),
+    {
+      key: "raSignature",
+      label: "Registered Agent Signature (must be an individual's name)",
+      value: ra.acceptance?.electronicSignature ?? ra.acceptance?.acceptanceName ?? ""
+    }
+  ];
+}
+function conversionGroups(p2) {
+  const ra = p2.registeredAgent ?? {};
+  const series = p2.series ?? [];
+  const groups = [
+    {
+      title: "Filing information",
+      fields: [
+        {
+          key: "filingPath",
+          label: "Filing",
+          value: "Protected Series Designations for an existing Florida LLC \u2014 filed online at the Division, $25 each; no Articles, no $125 fee",
+          statement: true,
+          block: true
+        },
+        { key: "existingName", label: "Existing entity name", value: p2.existingLlcName ?? "" },
+        { key: "sunbizDoc", label: "Existing document number", value: p2.sunbizDocumentNumber ?? "" },
+        {
+          key: "certStatus",
+          label: "Certificate of Status ($5.00)",
+          value: p2.optionalDocuments?.certificateOfStatus ? "Yes \u2014 add it to the designation filing (client paid for it)" : "No \u2014 leave unticked"
+        },
+        {
+          key: "certifiedCopy",
+          label: "Certified Copy ($30.00)",
+          value: p2.optionalDocuments?.certifiedCopy ? "Yes \u2014 order a certified copy of the company's Articles on file (client paid for it)" : "No \u2014 not ordered"
+        }
+      ]
+    },
+    {
+      title: `Protected Series Designations \u2014 file online, $25 each (${series.length})`,
+      fields: series.map((s, i) => ({
+        key: `series${i}`,
+        label: `Series ${i + 1}`,
+        value: s.name ?? ""
+      }))
+    }
+  ];
+  if (ra.choice === "SERVICE") {
+    groups.push({ title: "Change of registered agent ($25) \u2014 Statement of Change", fields: raFields(ra) });
+  }
+  return groups.map((g) => ({ ...g, fields: g.fields.filter((f) => f.value !== "") })).filter((g) => g.fields.length > 0);
+}
 function filingGroups(payload) {
   const p2 = payload ?? {};
+  if (p2.filingPath === "CONVERT") return conversionGroups(p2);
   const ra = p2.registeredAgent ?? {};
   const mgmt = p2.management ?? {};
   const cert = p2.certifications ?? {};
@@ -105959,40 +106071,7 @@ function filingGroups(payload) {
       }
     ] : addrFields("mailing", p2.mailingAddress)
   });
-  const raIsBusiness = (ra.businessEntityName ?? "").trim() !== "";
-  const raName = personName(ra);
-  groups.push({
-    title: "Registered agent",
-    fields: [
-      {
-        key: "raChoice",
-        label: "Agent",
-        value: ra.choice === "SERVICE" ? "Our registered agent service" : "Client's own agent"
-      },
-      ...raIsBusiness ? [
-        {
-          key: "raBusiness",
-          label: "Business to serve as RA",
-          value: (ra.businessEntityName ?? "").trim()
-        }
-      ] : raName.last ? [
-        { key: "raLast", label: "RA last name", value: raName.last },
-        { key: "raFirst", label: "RA first name", value: raName.first }
-      ] : [
-        {
-          key: "raFull",
-          label: "RA full name (legacy order \u2014 split manually)",
-          value: raName.legacy
-        }
-      ],
-      ...addrFields("ra", ra.address),
-      {
-        key: "raSignature",
-        label: "Registered Agent Signature (must be an individual's name)",
-        value: ra.acceptance?.electronicSignature ?? ra.acceptance?.acceptanceName ?? ""
-      }
-    ]
-  });
+  groups.push({ title: "Registered agent", fields: raFields(ra) });
   const provisions = [];
   if (mgmt.includeManagementStatementInArticles && mgmt.structure && MGMT_PROVISION[mgmt.structure]) {
     provisions.push(MGMT_PROVISION[mgmt.structure]);
@@ -106719,7 +106798,9 @@ function registerPortalRoutes(app2) {
         email: rows[0]?.email ?? "",
         name: rows[0]?.name ?? "",
         pendingEmail: rows[0]?.pending_email ?? null,
-        raCancellationRequestedAt: rows[0]?.ra_cancellation_requested_at ?? null
+        raCancellationRequestedAt: rows[0]?.ra_cancellation_requested_at ?? null,
+        // The portal shows a banner and an Exit when the admin is looking.
+        viewingAsAdmin: session.viewingAsAdmin
       }
     });
   });
@@ -107935,7 +108016,7 @@ async function fulfillPaidOrder(orderId, squarePaymentId) {
       "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at) VALUES ($1, $2, 'set_password', $3)",
       [tokenHash, clientId, new Date(Date.now() + 7 * 864e5).toISOString()]
     );
-    const mail = welcomeEmail(order2.contact_name, `${env.PUBLIC_BASE_URL}/portal/set-password?token=${token}`);
+    const mail = welcomeEmail(order2.contact_name, `${env.PUBLIC_BASE_URL}/portal/set-password?token=${token}`, payload?.filingPath === "CONVERT");
     await sendMail({ to: order2.contact_email, ...mail }).catch(
       (e) => console.error("[fulfill] welcome email failed:", e)
     );
@@ -108259,7 +108340,7 @@ function registerPaymentRoutes(app2) {
     }
     const db = await getDb();
     const orders = await db.query(
-      "SELECT client_id, status, contact_name, contact_email FROM orders WHERE id = $1",
+      "SELECT client_id, status, contact_name, contact_email, payload FROM orders WHERE id = $1",
       [c.req.param("id")]
     );
     if (orders.length === 0 || orders[0].status !== "paid" || !orders[0].client_id) {
@@ -108275,7 +108356,8 @@ function registerPaymentRoutes(app2) {
         "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at) VALUES ($1, $2, 'set_password', $3)",
         [tokenHash, clients[0].id, new Date(Date.now() + 7 * 864e5).toISOString()]
       );
-      const mail = welcomeEmail(orders[0].contact_name, `${env.PUBLIC_BASE_URL}/portal/set-password?token=${token}`);
+      const resendPayload = typeof orders[0].payload === "string" ? JSON.parse(orders[0].payload) : orders[0].payload;
+      const mail = welcomeEmail(orders[0].contact_name, `${env.PUBLIC_BASE_URL}/portal/set-password?token=${token}`, resendPayload?.filingPath === "CONVERT");
       await sendMail({ to: orders[0].contact_email, ...mail }).catch(
         (e) => console.error("[resend-welcome] failed:", e)
       );
@@ -109336,6 +109418,11 @@ function registerAdminRoutes(app2) {
         clientId: o.client_id,
         llcName: o.llc_name,
         status: o.status,
+        // A conversion files Designations for a company already on file — the
+        // drawer confirms that company and skips everything Articles-shaped.
+        filingPath: payload?.filingPath === "CONVERT" ? "CONVERT" : "NEW",
+        existingLlcName: payload?.existingLlcName ?? "",
+        sunbizDocumentNumber: payload?.sunbizDocumentNumber ?? "",
         // Kept because this endpoint used to return the raw row: reshaping it
         // silently dropped square_order_id, the e2e webhook was posted with an
         // undefined order id, and three payment assertions failed. A response
@@ -109483,7 +109570,8 @@ function registerAdminRoutes(app2) {
     const form = await c.req.parseBody({ all: true });
     const maybeArticles = form.articles;
     const articles = maybeArticles instanceof File ? maybeArticles : null;
-    if (!articles) {
+    const isConversion = (typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload)?.filingPath === "CONVERT";
+    if (!articles && !isConversion) {
       const already = await db.query(
         "SELECT id FROM documents WHERE order_id = $1 AND kind = 'articles'",
         [o.id]
@@ -109659,6 +109747,7 @@ function registerAdminRoutes(app2) {
         const mail = llcFormedEmail({
           clientName: clients[0].name,
           llcName: o.llc_name,
+          isConversion,
           seriesNames: required,
           otherDocuments: [
             ...certDocs.some((d2) => d2.kind === "certificate-of-status") ? ["Certificate of Status"] : [],
@@ -109702,13 +109791,26 @@ function registerAdminRoutes(app2) {
                FROM orders o
               WHERE o.client_id = cl.id AND o.status <> 'pending_payment'
                 AND o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_llcs,
-            (SELECT COALESCE(jsonb_agg(jsonb_build_object('id', o.id, 'llc_name', o.llc_name) ORDER BY o.paid_at DESC), '[]'::jsonb)
+            (SELECT COALESCE(jsonb_agg(jsonb_build_object('id', o.id, 'llc_name', o.llc_name, 'contact_name', o.contact_name) ORDER BY o.paid_at DESC), '[]'::jsonb)
                FROM orders o
               WHERE o.client_id = cl.id AND o.paid_at IS NOT NULL) AS companies
      FROM clients cl LEFT JOIN documents d ON d.client_id = cl.id
      GROUP BY cl.id ORDER BY cl.created_at DESC`
     );
     return c.json({ data: rows });
+  });
+  app2.post("/admin/clients/:id/view-as", async (c) => {
+    const admin = await requireAdmin(c);
+    if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+    const db = await getDb();
+    const rows = await db.query(
+      "SELECT id, email, name FROM clients WHERE id = $1",
+      [c.req.param("id")]
+    );
+    if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+    await createSession(c, { clientId: rows[0].id, viewingAsAdmin: true, hours: 2 });
+    console.log(`[admin] viewing the portal as client ${rows[0].id} <${rows[0].email}>`);
+    return c.json({ data: { ok: true, name: rows[0].name, email: rows[0].email } });
   });
   app2.post("/admin/clients/:id/email", async (c) => {
     const admin = await requireAdmin(c);

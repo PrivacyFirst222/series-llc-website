@@ -867,6 +867,8 @@ app.get("/auth/me", async (c) => {
       name: rows[0]?.name ?? "",
       pendingEmail: rows[0]?.pending_email ?? null,
       raCancellationRequestedAt: rows[0]?.ra_cancellation_requested_at ?? null,
+      // The portal shows a banner and an Exit when the admin is looking.
+      viewingAsAdmin: session.viewingAsAdmin,
     },
   });
 });

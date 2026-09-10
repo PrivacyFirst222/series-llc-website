@@ -348,6 +348,11 @@ app.get("/admin/orders/:id", async (c) => {
       clientId: o.client_id,
       llcName: o.llc_name,
       status: o.status,
+      // A conversion files Designations for a company already on file — the
+      // drawer confirms that company and skips everything Articles-shaped.
+      filingPath: (payload as { filingPath?: string })?.filingPath === "CONVERT" ? "CONVERT" : "NEW",
+      existingLlcName: (payload as { existingLlcName?: string })?.existingLlcName ?? "",
+      sunbizDocumentNumber: (payload as { sunbizDocumentNumber?: string })?.sunbizDocumentNumber ?? "",
       // Kept because this endpoint used to return the raw row: reshaping it
       // silently dropped square_order_id, the e2e webhook was posted with an
       // undefined order id, and three payment assertions failed. A response
@@ -515,7 +520,12 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
   const form = await c.req.parseBody({ all: true });
   const maybeArticles = form.articles;
   const articles = maybeArticles instanceof File ? maybeArticles : null;
-  if (!articles) {
+  // A conversion designates series for a company already on file: there are
+  // no new Articles, and the Division's online designation filing is all
+  // there is (dos.fl.gov, "About Florida Series LLCs"; Adam, 9 Sep 2026).
+  const isConversion =
+    ((typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload) as { filingPath?: string } | null)?.filingPath === "CONVERT";
+  if (!articles && !isConversion) {
     // The staged flow uploads the Articles at the New-Orders step; here only
     // the designations arrive. Without either, nothing can be formed.
     const already = await db.query<{ id: string }>(
@@ -733,6 +743,7 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
     const mail = llcFormedEmail({
       clientName: clients[0].name,
       llcName: o.llc_name,
+      isConversion,
       seriesNames: required,
       otherDocuments: [
         ...(certDocs.some((d) => d.kind === "certificate-of-status") ? ["Certificate of Status"] : []),
@@ -788,13 +799,32 @@ app.get("/admin/clients", async (c) => {
                FROM orders o
               WHERE o.client_id = cl.id AND o.status <> 'pending_payment'
                 AND o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_llcs,
-            (SELECT COALESCE(jsonb_agg(jsonb_build_object('id', o.id, 'llc_name', o.llc_name) ORDER BY o.paid_at DESC), '[]'::jsonb)
+            (SELECT COALESCE(jsonb_agg(jsonb_build_object('id', o.id, 'llc_name', o.llc_name, 'contact_name', o.contact_name) ORDER BY o.paid_at DESC), '[]'::jsonb)
                FROM orders o
               WHERE o.client_id = cl.id AND o.paid_at IS NOT NULL) AS companies
      FROM clients cl LEFT JOIN documents d ON d.client_id = cl.id
      GROUP BY cl.id ORDER BY cl.created_at DESC`,
   );
   return c.json({ data: rows });
+});
+
+/** The admin sees a client's portal as the client (Adam, 9 Sep 2026: "I need
+ *  the ability to log into a client's portal to be able to see what they see
+ *  and test a problem"). A real client session, two hours long, marked so the
+ *  portal shows who is looking and offers Exit. Anything done in it happens
+ *  as the client. */
+app.post("/admin/clients/:id/view-as", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const db = await getDb();
+  const rows = await db.query<{ id: string; email: string; name: string }>(
+    "SELECT id, email, name FROM clients WHERE id = $1",
+    [c.req.param("id")],
+  );
+  if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+  await createSession(c, { clientId: rows[0].id, viewingAsAdmin: true, hours: 2 });
+  console.log(`[admin] viewing the portal as client ${rows[0].id} <${rows[0].email}>`);
+  return c.json({ data: { ok: true, name: rows[0].name, email: rows[0].email } });
 });
 
 /** Support override for the case a client can reach neither address. Both the

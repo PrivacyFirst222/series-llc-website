@@ -23,6 +23,7 @@ import {
 import { api, ApiError } from "@/lib/api";
 import { formatDate, formatDateTime, taxationLabel } from "@/lib/datetime";
 import { AccountCard } from "./AccountCard";
+import { ViewingAsBanner } from "./ViewingAsBanner";
 
 interface PortalDoc {
   id: string;
@@ -38,6 +39,7 @@ interface Me {
   name: string;
   pendingEmail: string | null;
   raCancellationRequestedAt: string | null;
+  viewingAsAdmin?: boolean;
 }
 
 /** Agreements the client generated themselves, keyed by document, so the list
@@ -569,6 +571,7 @@ export default function PortalDashboard() {
 
   return (
     <section className="container-wide section-y">
+      <ViewingAsBanner />
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <span className="eyebrow">Client portal</span>

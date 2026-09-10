@@ -122,6 +122,10 @@ CREATE TABLE IF NOT EXISTS sessions (
   expires_at timestamptz NOT NULL
 )`,
     `
+-- An admin's view of a client's portal (Adam, 9 Sep 2026): a client session
+-- started from the admin, marked so the portal can say so and offer Exit.
+ALTER TABLE sessions ADD COLUMN IF NOT EXISTS viewing_as_admin boolean NOT NULL DEFAULT false`,
+    `
 CREATE TABLE IF NOT EXISTS auth_tokens (
   token_hash text PRIMARY KEY,
   client_id uuid NOT NULL REFERENCES clients(id) ON DELETE CASCADE,

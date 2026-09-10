@@ -292,7 +292,11 @@ export function FloridaLLCFormationForm({
     // server fills the canonical acceptance regardless of the browser.
     (STEPS[i]?.key === "acceptance" && data.registeredAgentChoice === "SERVICE") ||
     (STEPS[i]?.key === "managers" && data.managementStructure === "MEMBER_MANAGED") ||
-    (STEPS[i]?.key === "members" && data.managementStructure === "MANAGER_MANAGED");
+    (STEPS[i]?.key === "members" && data.managementStructure === "MANAGER_MANAGED") ||
+    // A conversion files Designations for a company already on file: purpose
+    // and effective date are Articles questions and never apply to it
+    // (Adam, 9 Sep 2026).
+    ((STEPS[i]?.key === "purpose" || STEPS[i]?.key === "effective") && data.filingPath === "CONVERT");
 
   const advance = () => {
     setErrors({});

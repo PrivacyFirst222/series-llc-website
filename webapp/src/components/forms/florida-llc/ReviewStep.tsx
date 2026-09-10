@@ -76,9 +76,9 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
       <header className="space-y-2">
         <h2 className="font-display text-3xl">Review your information</h2>
         <p className="text-sm text-muted-foreground max-w-2xl">
-          Review carefully. Once submitted to the Florida Division of
-          Corporations, Articles of Organization may not be changed, removed,
-          canceled, or refunded through this form.
+          {data.filingPath === "CONVERT"
+            ? "Review carefully. Once filed with the Florida Division of Corporations, a Protected Series Designation may not be changed, removed, canceled, or refunded through this form."
+            : "Review carefully. Once submitted to the Florida Division of Corporations, Articles of Organization may not be changed, removed, canceled, or refunded through this form."}
         </p>
       </header>
 
@@ -103,6 +103,13 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
           <Row label="Address" value={fmtAddr(data.clientAddress)} />
         </ReviewCard>
 
+        {data.filingPath === "CONVERT" ? (
+          <ReviewCard title="Your existing LLC" onEdit={() => goToStep("name")}>
+            <Row label="Company" value={data.existingLlcName ?? ""} />
+            <Row label="Document number" value={data.sunbizDocumentNumber ?? ""} />
+            <Row label="Filing" value={`Protected Series Designations for ${countWord(data.series.length)} series — no Articles`} />
+          </ReviewCard>
+        ) : (
         <ReviewCard title="LLC Name" onEdit={() => goToStep("name")}>
           <Row
             label="Formation type"
@@ -115,6 +122,7 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
           <Row label="Alt #1" value={data.alternateName1} />
           <Row label="Alt #2" value={data.alternateName2} />
         </ReviewCard>
+        )}
 
         <ReviewCard title="Principal Office Address" onEdit={() => goToStep("principal")}>
           <Row label="Address" value={fmtAddr(data.principalAddress)} />
@@ -216,11 +224,14 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
         </ReviewCard>
         ) : null}
 
+        {data.filingPath !== "CONVERT" ? (
         <ReviewCard title="Business Purpose" onEdit={() => goToStep("purpose")}>
           <Row label="Type" value={data.purposeType} />
           <Row label="Description" value={data.businessPurposeText} />
         </ReviewCard>
+        ) : null}
 
+        {data.filingPath !== "CONVERT" ? (
         <ReviewCard title="Effective Date" onEdit={() => goToStep("effective")}>
           <Row
             label="Option"
@@ -234,6 +245,7 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
             <Row label="Date" value={data.requestedEffectiveDate} />
           ) : null}
         </ReviewCard>
+        ) : null}
 
         <ReviewCard title="Correspondence" onEdit={() => goToStep("correspondence")}>
           <Row label="Name" value={data.correspondentName} />
@@ -279,6 +291,18 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
           />
         </ReviewCard>
 
+        {data.filingPath === "CONVERT" ? (
+          <ReviewCard title="Authorization" onEdit={() => goToStep("certify")}>
+            <Row
+              label="Certified"
+              value={
+                data.conversionAuthorityAcknowledgment
+                  ? `You are authorized to act for ${data.existingLlcName ?? "the company"} and authorize the Designation filings`
+                  : "Not yet certified"
+              }
+            />
+          </ReviewCard>
+        ) : (
         <ReviewCard title="Signing the Articles" onEdit={() => goToStep("certify")}>
           <Row
             label="Signed by"
@@ -299,6 +323,7 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
             />
           ) : null}
         </ReviewCard>
+        )}
       </div>
 
       <ServiceFeeEstimate

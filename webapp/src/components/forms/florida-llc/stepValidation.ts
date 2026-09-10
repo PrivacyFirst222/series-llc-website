@@ -283,7 +283,9 @@ export function validateStep(
     });
   }
 
-  if (step === "purpose") {
+  // Purpose and effective date are Articles questions; a conversion never
+  // sees them and files none.
+  if (step === "purpose" && data.filingPath !== "CONVERT") {
     if (!data.purposeType) e.purposeType = "Choose a purpose type.";
     if (data.formationType === "PLLC") {
       if (data.purposeType !== "PROFESSIONAL")
@@ -298,7 +300,7 @@ export function validateStep(
     }
   }
 
-  if (step === "effective") {
+  if (step === "effective" && data.filingPath !== "CONVERT") {
     if (data.effectiveDateOption === "SPECIFIC") {
       if (!data.requestedEffectiveDate)
         e.requestedEffectiveDate = "Please select a date.";
@@ -343,26 +345,33 @@ export function validateStep(
 
   // "review" step has no required validation
   if (step === "certify") {
-    // Only the person actually signing supplies a name and signature: when the
-    // client appoints us, our own representative types their name into Sunbiz,
-    // and what we need from the client is the appointment.
-    if (data.articlesSignerChoice === "SERVICE") {
-      if (!data.articlesSignerAppointment)
-        e.articlesSignerAppointment =
-          "Please appoint us as your authorized representative, or choose to sign yourself.";
+    if (data.filingPath === "CONVERT") {
+      // No Articles to sign: the client certifies authority for the company
+      // already on file and authorizes the Designation filings.
+      if (!data.conversionAuthorityAcknowledgment)
+        e.conversionAuthorityAcknowledgment = "Please confirm that you are authorized to act for the company.";
     } else {
-      if (!data.authorizedRepresentativeName.trim())
-        e.authorizedRepresentativeName = "Authorized representative name required.";
-      else if (!hasFirstAndLast(data.authorizedRepresentativeName))
-        e.authorizedRepresentativeName = FIRST_AND_LAST;
-      if (!data.authorizedRepresentativeSignature)
-        e.authorizedRepresentativeSignature = "Electronic signature required.";
-      if (!data.authorizedRepresentativeSignatureCheckbox)
-        e.authorizedRepresentativeSignatureCheckbox =
-          "Acknowledgment is required.";
+      // Only the person actually signing supplies a name and signature: when the
+      // client appoints us, our own representative types their name into Sunbiz,
+      // and what we need from the client is the appointment.
+      if (data.articlesSignerChoice === "SERVICE") {
+        if (!data.articlesSignerAppointment)
+          e.articlesSignerAppointment =
+            "Please appoint us as your authorized representative, or choose to sign yourself.";
+      } else {
+        if (!data.authorizedRepresentativeName.trim())
+          e.authorizedRepresentativeName = "Authorized representative name required.";
+        else if (!hasFirstAndLast(data.authorizedRepresentativeName))
+          e.authorizedRepresentativeName = FIRST_AND_LAST;
+        if (!data.authorizedRepresentativeSignature)
+          e.authorizedRepresentativeSignature = "Electronic signature required.";
+        if (!data.authorizedRepresentativeSignatureCheckbox)
+          e.authorizedRepresentativeSignatureCheckbox =
+            "Acknowledgment is required.";
+      }
+      if (!data.atLeastOneMemberAcknowledgment)
+        e.atLeastOneMemberAcknowledgment = "Acknowledgment is required.";
     }
-    if (!data.atLeastOneMemberAcknowledgment)
-      e.atLeastOneMemberAcknowledgment = "Acknowledgment is required.";
     if (!data.accuracyAcknowledgment)
       e.accuracyAcknowledgment = "Acknowledgment is required.";
     if (!data.addressAccuracyAcknowledgment)
