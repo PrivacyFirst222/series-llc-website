@@ -122,10 +122,6 @@ CREATE TABLE IF NOT EXISTS sessions (
   expires_at timestamptz NOT NULL
 )`,
     `
--- An admin's view of a client's portal (Adam, 9 Sep 2026): a client session
--- started from the admin, marked so the portal can say so and offer Exit.
-ALTER TABLE sessions ADD COLUMN IF NOT EXISTS viewing_as_admin boolean NOT NULL DEFAULT false`,
-    `
 CREATE TABLE IF NOT EXISTS auth_tokens (
   token_hash text PRIMARY KEY,
   client_id uuid NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
@@ -383,12 +379,21 @@ export const DOCUMENT_COMPANY_BACKFILL_STATEMENTS: string[] = [
 ];
 const MIGRATION_005_STATEMENTS: string[] = DOCUMENT_COMPANY_BACKFILL_STATEMENTS;
 
+// An admin's view of a client's portal (Adam, 9 Sep 2026): a client session
+// started from the admin, marked so the portal can say so and offer Exit.
+// (Its first version was pasted into migration 1, which changed that
+// migration's checksum and stopped production's database cold — P76.)
+const MIGRATION_006_STATEMENTS: string[] = [
+  `ALTER TABLE sessions ADD COLUMN IF NOT EXISTS viewing_as_admin boolean NOT NULL DEFAULT false`,
+];
+
 const MIGRATIONS: { id: number; name: string; statements: string[] }[] = [
   { id: 1, name: "initial-schema", statements: MIGRATION_001_STATEMENTS },
   { id: 2, name: "contact-messages", statements: MIGRATION_002_STATEMENTS },
   { id: 3, name: "series-filed-at", statements: MIGRATION_003_STATEMENTS },
   { id: 4, name: "oa-per-company", statements: MIGRATION_004_STATEMENTS },
   { id: 5, name: "documents-carry-company", statements: MIGRATION_005_STATEMENTS },
+  { id: 6, name: "sessions-viewing-as-admin", statements: MIGRATION_006_STATEMENTS },
   // Append future migrations here with the next id. Never edit an entry.
 ];
 
