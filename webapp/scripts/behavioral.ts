@@ -1711,6 +1711,44 @@ async function main(): Promise<void> {
       await page.waitForURL(/\/admin(?!\/login)/, { timeout: 10000 }).catch((e) => { throw new Error(`admin sign-in: ${e}`); });
       await page.getByRole("tab", { name: "Clients", exact: true }).click();
       await page.waitForTimeout(1500);
+      // Search and sortable headings (Adam, 10 Sep 2026): the name reads
+      // "Last, First"; a search narrows the rows; every heading orders them
+      // both ways.
+      {
+        const names = async () => page.locator('[data-testid="client-row"] [data-testid="client-name"]').allInnerTexts();
+        const first = (await names())[0] ?? "";
+        expect(/^[^,]+, [^,]+/.test(first), "clients tab: names read Last, First", first);
+        await page.locator('[data-testid="client-search"]').fill("gate-oa");
+        await page.waitForTimeout(300);
+        const matched = await names();
+        expect(matched.length === 1 && /Gatecheck/.test(matched[0]), "clients tab: the search narrows the rows to the match", matched);
+        await page.locator('[data-testid="client-search"]').fill("");
+        await page.waitForTimeout(300);
+        const sortedBy = (arr: string[]) => [...arr].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+        await page.locator('[data-testid="sort-client"]').click();
+        await page.waitForTimeout(300);
+        const asc = await names();
+        expect(asc.length >= 2 && JSON.stringify(asc) === JSON.stringify(sortedBy(asc)), "clients tab: Client sorts A to Z by last name", asc);
+        await page.locator('[data-testid="sort-client"]').click();
+        await page.waitForTimeout(300);
+        const desc = await names();
+        expect(JSON.stringify(desc) === JSON.stringify(sortedBy(desc).reverse()), "clients tab: a second tap sorts Z to A", desc);
+        const counts = async () => (await page.locator('[data-testid="client-row"] td:nth-child(4)').allInnerTexts()).map(Number);
+        await page.locator('[data-testid="sort-documents"]').click();
+        await page.waitForTimeout(300);
+        const dAsc = await counts();
+        expect(dAsc.every((v, i) => i === 0 || v >= dAsc[i - 1]), "clients tab: Documents sorts fewest first", dAsc);
+        await page.locator('[data-testid="sort-documents"]').click();
+        await page.waitForTimeout(300);
+        const dDesc = await counts();
+        expect(dDesc.every((v, i) => i === 0 || v <= dDesc[i - 1]), "clients tab: Documents sorts most first on the second tap", dDesc);
+        await page.locator('[data-testid="sort-since"]').click();
+        await page.waitForTimeout(300);
+        await page.locator('[data-testid="sort-since"]').click();
+        await page.waitForTimeout(300);
+        const dates = (await page.locator('[data-testid="client-row"] td:nth-child(5)').allInnerTexts()).map((t) => new Date(t.replace(/\s+/g, " ")).getTime());
+        expect(dates.every((v, i) => i === 0 || v <= dates[i - 1]), "clients tab: Since sorts newest first on the second tap", dates);
+      }
       const row = page.locator("main tr").filter({ hasText: "gate-oa@e2e.test" }).first();
       const companies = await row.locator('[data-testid="client-companies"]').innerText();
       expect(/Gate Run Alpha/.test(companies), "clients tab: the Companies column lists the account's paid company", companies);

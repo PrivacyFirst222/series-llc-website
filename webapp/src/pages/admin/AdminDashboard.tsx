@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Upload, Eye, FileText } from "lucide-react";
+import { Upload, Eye, FileText, ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,6 +28,9 @@ interface AdminClient {
   created_at: string;
   ra_cancellation_requested_at: string | null;
   has_password: boolean;
+  first_name?: string | null;
+  last_name?: string | null;
+  suffix?: string | null;
   document_count: number;
   ra_llcs: string[];
   companies: { id: string; llc_name: string; contact_name?: string; has_summary?: boolean }[];
@@ -304,6 +307,41 @@ function ChangeEmailDialog({ client }: { client: AdminClient }) {
  *  agent for — that is what the relationship attaches to — and keeps a client
  *  listed after a cancellation request until we are replaced as agent of
  *  record (the chip carries that state). */
+/** The client's name in parts. Accounts carry one string built as "First
+ *  Last, Suffix"; the earliest paid order has the parts, and the string is
+ *  split for the few accounts that predate that. */
+function nameParts(cl: AdminClient): { first: string; last: string; suffix: string } {
+  if ((cl.last_name ?? "").trim()) {
+    return { first: (cl.first_name ?? "").trim(), last: (cl.last_name ?? "").trim(), suffix: (cl.suffix ?? "").trim() };
+  }
+  const raw = (cl.name ?? "").trim();
+  const comma = raw.indexOf(",");
+  const base = comma >= 0 ? raw.slice(0, comma).trim() : raw;
+  const suffix = comma >= 0 ? raw.slice(comma + 1).trim() : "";
+  const words = base.split(/\s+/).filter(Boolean);
+  if (words.length <= 1) return { first: "", last: base, suffix };
+  return { first: words.slice(0, -1).join(" "), last: words[words.length - 1], suffix };
+}
+/** "Last, First Suffix" (Adam, 10 Sep 2026). */
+function displayName(cl: AdminClient): string {
+  const p = nameParts(cl);
+  if (!p.last) return cl.name || "—";
+  return `${p.last}${p.first ? `, ${p.first}` : ""}${p.suffix ? ` ${p.suffix}` : ""}`;
+}
+
+type SortKey = "client" | "companies" | "account" | "documents" | "since";
+const firstCompany = (cl: AdminClient) => [...(cl.companies ?? [])].map((c) => c.llc_name).sort((a, b) => a.localeCompare(b))[0] ?? "";
+const SORTERS: Record<SortKey, (a: AdminClient, b: AdminClient) => number> = {
+  client: (a, b) => {
+    const pa = nameParts(a); const pb = nameParts(b);
+    return pa.last.localeCompare(pb.last, undefined, { sensitivity: "base" }) || pa.first.localeCompare(pb.first, undefined, { sensitivity: "base" });
+  },
+  companies: (a, b) => firstCompany(a).localeCompare(firstCompany(b), undefined, { sensitivity: "base" }),
+  account: (a, b) => Number(b.has_password) - Number(a.has_password),
+  documents: (a, b) => a.document_count - b.document_count,
+  since: (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+};
+
 function ClientsTable({
   clients,
   variant,
@@ -313,32 +351,64 @@ function ClientsTable({
   variant: "all" | "ra";
   emptyText: string;
 }) {
+  // Search and sortable headings, on the Clients tab (Adam, 10 Sep 2026).
+  // Until a heading is tapped the rows stay newest first.
+  const [query, setQuery] = useState<string>("");
+  const [sort, setSort] = useState<{ key: SortKey; dir: "asc" | "desc" } | null>(null);
+  const sortable = variant === "all";
+  const q = query.trim().toLowerCase();
+  const shown = clients
+    .filter((cl) => !q || [cl.name, cl.email, displayName(cl), ...(cl.companies ?? []).map((c) => c.llc_name)].some((s) => (s ?? "").toLowerCase().includes(q)))
+    .sort((a, b) => (sort ? SORTERS[sort.key](a, b) * (sort.dir === "asc" ? 1 : -1) : 0));
+  const toggle = (key: SortKey) => setSort((s) => (s?.key === key ? { key, dir: s.dir === "asc" ? "desc" : "asc" } : { key, dir: "asc" }));
+  const Head = ({ k, label }: { k: SortKey; label: string }) =>
+    sortable ? (
+      <th className="px-4 py-3 font-medium">
+        <button type="button" onClick={() => toggle(k)} className="inline-flex items-center gap-1 uppercase tracking-[0.14em] hover:text-foreground" data-testid={`sort-${k}`} aria-sort={sort?.key === k ? (sort.dir === "asc" ? "ascending" : "descending") : "none"}>
+          {label}
+          {sort?.key === k ? (sort.dir === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />) : <ArrowUpDown className="h-3 w-3 opacity-40" />}
+        </button>
+      </th>
+    ) : (
+      <th className="px-4 py-3 font-medium">{label}</th>
+    );
   return (
+    <div className="mt-4">
+      {sortable ? (
+        <Input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search by name, email, or company"
+          aria-label="Search clients"
+          className="max-w-md rounded-full"
+          data-testid="client-search"
+        />
+      ) : null}
     <div className="mt-4 overflow-x-auto rounded-2xl border border-border bg-card">
       <table className="w-full min-w-[560px] text-sm">
         <thead>
           <tr className="border-b border-border bg-secondary/40 text-left text-xs uppercase tracking-[0.14em] text-muted-foreground">
-            <th className="px-4 py-3 font-medium">Client</th>
+            <Head k="client" label="Client" />
             {variant === "ra" ? <th className="px-4 py-3 font-medium">Registered agent for</th> : null}
-            <th className="px-4 py-3 font-medium">Companies</th>
-            <th className="px-4 py-3 font-medium">Portal account</th>
-            <th className="px-4 py-3 font-medium">Documents</th>
-            <th className="px-4 py-3 font-medium">Since</th>
+            <Head k="companies" label="Companies" />
+            <Head k="account" label="Portal account" />
+            <Head k="documents" label="Documents" />
+            <Head k="since" label="Since" />
             <th className="px-4 py-3 font-medium"></th>
           </tr>
         </thead>
         <tbody className="divide-y divide-border">
-          {clients.length === 0 ? (
+          {shown.length === 0 ? (
             <tr>
               <td colSpan={variant === "ra" ? 7 : 6} className="px-4 py-6 text-muted-foreground">
-                {emptyText}
+                {q ? "No client matches that search." : emptyText}
               </td>
             </tr>
           ) : (
-            clients.map((cl) => (
-              <tr key={cl.id}>
+            shown.map((cl) => (
+              <tr key={cl.id} data-testid="client-row">
                 <td className="px-4 py-3">
-                  <span className="font-medium">{cl.name || "—"}</span>
+                  <span className="font-medium" data-testid="client-name">{sortable ? displayName(cl) : cl.name || "—"}</span>
                   {cl.ra_cancellation_requested_at ? (
                     <span className="ml-2 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-900">
                       RA cancel requested {day(cl.ra_cancellation_requested_at)}
@@ -387,6 +457,7 @@ function ClientsTable({
           )}
         </tbody>
       </table>
+    </div>
     </div>
   );
 }

@@ -796,6 +796,11 @@ app.get("/admin/clients", async (c) => {
   const rows = await db.query(
     `SELECT cl.id, cl.email, cl.name, cl.created_at, cl.ra_cancellation_requested_at,
             (cl.password_hash IS NOT NULL) AS has_password,
+            -- The name in parts, from the account's earliest paid order (the
+            -- Clients tab shows and sorts by last name — Adam, 10 Sep 2026).
+            (SELECT o.payload->'client'->>'firstName' FROM orders o WHERE o.client_id = cl.id AND o.paid_at IS NOT NULL ORDER BY o.paid_at ASC LIMIT 1) AS first_name,
+            (SELECT o.payload->'client'->>'lastName' FROM orders o WHERE o.client_id = cl.id AND o.paid_at IS NOT NULL ORDER BY o.paid_at ASC LIMIT 1) AS last_name,
+            (SELECT o.payload->'client'->>'suffix' FROM orders o WHERE o.client_id = cl.id AND o.paid_at IS NOT NULL ORDER BY o.paid_at ASC LIMIT 1) AS suffix,
             COUNT(d.id)::int AS document_count,
             (SELECT COALESCE(jsonb_agg(DISTINCT o.llc_name), '[]'::jsonb)
                FROM orders o
