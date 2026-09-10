@@ -342,6 +342,26 @@ export interface SubmissionPayload {
     seriesOwnershipAcknowledged: boolean;
     conversionAuthorityAcknowledged: boolean;
   };
+  /** Every acknowledgment box on the form, as ticked (Order Summary,
+   *  10 Sep 2026): the record of what the client agreed to. */
+  acknowledgments: {
+    isFloridaDomesticEntityOnly: boolean;
+    notLegalAdvice: boolean;
+    publicRecordNotice: boolean;
+    nameSearchAcknowledgment: boolean;
+    governmentAffiliationAcknowledgment: boolean;
+    lawfulPurposeNameAcknowledgment: boolean;
+    exactNameOnly: boolean;
+    registeredAgentNotSameAsLlc: boolean;
+    registeredAgentPhysicalAddressAcknowledgment: boolean;
+    registeredAgentAcceptanceCheckbox: boolean;
+    registeredAgentSignatureAuthorizationCheckbox: boolean;
+    authorizedRepresentativeSignatureCheckbox: boolean;
+    addressAccuracyAcknowledgment: boolean;
+    termsOfServiceAcknowledgment: boolean;
+  };
+  /** The name-availability result the client saw, if the check ran. */
+  nameCheck: { available: boolean; asOf?: string; results: { input: string; verdict: "taken" | "held" | "clear" }[] } | null;
   metadata: {
     submittedAt: string;
     ipAddress: string;

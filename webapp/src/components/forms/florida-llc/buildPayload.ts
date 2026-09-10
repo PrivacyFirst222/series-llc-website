@@ -136,6 +136,25 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
       seriesOwnershipAcknowledged: data.seriesOwnershipAcknowledgment,
       conversionAuthorityAcknowledged: data.conversionAuthorityAcknowledgment === true,
     },
+    acknowledgments: {
+      isFloridaDomesticEntityOnly: data.isFloridaDomesticEntityOnly === true,
+      notLegalAdvice: data.notLegalAdvice === true,
+      publicRecordNotice: data.publicRecordNotice === true,
+      nameSearchAcknowledgment: data.nameSearchAcknowledgment === true,
+      governmentAffiliationAcknowledgment: data.governmentAffiliationAcknowledgment === true,
+      lawfulPurposeNameAcknowledgment: data.lawfulPurposeNameAcknowledgment === true,
+      exactNameOnly: data.exactNameOnly === true,
+      registeredAgentNotSameAsLlc: data.registeredAgentNotSameAsLlc === true,
+      registeredAgentPhysicalAddressAcknowledgment: data.registeredAgentPhysicalAddressAcknowledgment === true,
+      registeredAgentAcceptanceCheckbox: data.registeredAgentAcceptanceCheckbox === true,
+      registeredAgentSignatureAuthorizationCheckbox: data.registeredAgentSignatureAuthorizationCheckbox === true,
+      authorizedRepresentativeSignatureCheckbox: data.authorizedRepresentativeSignatureCheckbox === true,
+      addressAccuracyAcknowledgment: data.addressAccuracyAcknowledgment === true,
+      termsOfServiceAcknowledgment: data.termsOfServiceAcknowledgment === true,
+    },
+    nameCheck: data.nameCheck
+      ? { available: data.nameCheck.available, asOf: data.nameCheck.asOf, results: data.nameCheck.results.map((r) => ({ input: r.input, verdict: r.verdict })) }
+      : null,
     metadata: {
       submittedAt: new Date().toISOString(),
       ipAddress: "", // TODO(server): fill from request context

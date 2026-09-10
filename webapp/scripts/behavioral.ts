@@ -714,7 +714,9 @@ async function main(): Promise<void> {
         // the submission clock, and the members-in-Articles flag, which
         // server/validation.ts fixes to "member-managed lists its members"
         // (AMBR) whatever the browser sent.
-        expected.metadata = { ...expected.metadata, submittedAt: payload.metadata?.submittedAt };
+        // The server also records the submitter's address and browser for
+        // the Order Summary (10 Sep 2026); the browser's own slots are blank.
+        expected.metadata = { ...expected.metadata, submittedAt: payload.metadata?.submittedAt, ipAddress: payload.metadata?.ipAddress, userAgent: payload.metadata?.userAgent };
         expected.members = { ...expected.members, includeMembersInArticles: run.management === "MEMBER_MANAGED" };
         const diffs = jsonDiff(expected, payload);
         expect(diffs.length === 0, `${run.key}: stored payload equals the form's draft at submission, field by field (${Object.keys(expected).length} top-level fields)`, diffs.slice(0, 8));
@@ -1698,7 +1700,7 @@ async function main(): Promise<void> {
           headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "" },
           body: route.request().postDataBuffer() ?? undefined,
         });
-        const body = await resp.text();
+        const body = Buffer.from(await resp.arrayBuffer());
         const setCookie = resp.headers.get("set-cookie");
         await route.fulfill({ status: resp.status, contentType: resp.headers.get("content-type") ?? "application/json", body, headers: setCookie ? { "set-cookie": setCookie } : undefined });
       });
@@ -1706,18 +1708,30 @@ async function main(): Promise<void> {
       await page.goto(`http://localhost:${WEB_PORT}/admin/login`);
       await page.getByLabel("Password").fill("dev-admin");
       await page.locator("main button").filter({ hasText: /^Sign in/ }).first().click();
-      await page.waitForURL(/\/admin(?!\/login)/, { timeout: 10000 });
+      await page.waitForURL(/\/admin(?!\/login)/, { timeout: 10000 }).catch((e) => { throw new Error(`admin sign-in: ${e}`); });
       await page.getByRole("tab", { name: "Clients", exact: true }).click();
       await page.waitForTimeout(1500);
       const row = page.locator("main tr").filter({ hasText: "gate-oa@e2e.test" }).first();
       const companies = await row.locator('[data-testid="client-companies"]').innerText();
       expect(/Gate Run Alpha/.test(companies), "clients tab: the Companies column lists the account's paid company", companies);
       await shot(page, "admin-clients-companies");
+      // The Order Summary (Adam, 10 Sep 2026): one company opens its PDF at
+      // once; the office reads it as it was when the order was placed.
+      {
+        const [summaryResp] = await Promise.all([
+          ctx.waitForEvent("response", (r) => /\/summary\.pdf$/.test(r.url())),
+          row.locator('[data-testid="order-summary"]').click(),
+        ]);
+        expect(summaryResp.status() === 200 && /application\/pdf/.test(summaryResp.headers()["content-type"] ?? ""), "order summary: the button opens the order's PDF", { status: summaryResp.status(), type: summaryResp.headers()["content-type"] });
+        const md = await fetch(`${API}/api/admin/orders/${orderIds.get("A")}/summary.md`, { headers: { Cookie: adminCookie } }).then((r) => r.text());
+        expect(/Gate Run Alpha, LLC/.test(md) && /Casey Gatecheck/.test(md) && /Total charged/.test(md) && /- I certify that the information provided is true and accurate/.test(md), "order summary: it holds the company, the client, the total, and the acknowledgments", md.slice(0, 200));
+        for (const p of ctx.pages()) if (p !== page) await p.close().catch(() => {});
+      }
       const [popup] = await Promise.all([
         ctx.waitForEvent("page"),
         row.locator('[data-testid="view-portal"]').click(),
       ]);
-      await popup.waitForURL(/\/portal/, { timeout: 10000 });
+      await popup.waitForURL(/\/portal/, { timeout: 10000 }).catch((e) => { throw new Error(`view-portal popup (url ${popup.url()}): ${e}`); });
       const banner = popup.locator('[data-testid="viewing-as-banner"]');
       await banner.waitFor({ state: "visible", timeout: 10000 });
       const bannerText = await banner.innerText();
@@ -1725,7 +1739,7 @@ async function main(): Promise<void> {
       expect(/Signed in as gate-oa@e2e.test/.test(await popup.locator("main").innerText()), "view portal: the portal is the client's");
       await shot(popup, "portal-viewing-as-client");
       await banner.locator("button").filter({ hasText: /^Exit$/ }).click();
-      await popup.waitForURL(/\/admin/, { timeout: 10000 });
+      await popup.waitForURL(/\/admin/, { timeout: 10000 }).catch((e) => { throw new Error(`exit to admin (url ${popup.url()}): ${e}`); });
       await popup.goto(`http://localhost:${WEB_PORT}/portal`);
       await popup.waitForTimeout(2000);
       expect(/\/portal\/login/.test(popup.url()), "view portal: Exit ends the client sign-in", popup.url());

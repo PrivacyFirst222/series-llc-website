@@ -23,6 +23,7 @@ import { checkName, getSyncState, lookupEntities, unavailableNames } from "./sun
 import { sendMail, welcomeEmail, orderPaidEmail, serviceOrderClientEmail, serviceOrderAdminEmail } from "./email";
 
 import { personLegalName } from "./routes-portal";
+import { writeOrderSummary } from "./order-summary";
 import { err, testHooks } from "./shared";
 
 /* ------------------------------- orders ------------------------------- */
@@ -74,6 +75,7 @@ export async function fulfillPaidOrder(orderId: string, squarePaymentId: string 
     clientId = created[0].id;
   }
   await db.query("UPDATE orders SET client_id = $1 WHERE id = $2", [clientId, orderId]);
+  await writeOrderSummary(orderId).catch((e) => console.error("[fulfill] summary rewrite failed:", e));
 
   // An EIN purchased with the formation becomes a paid service order awaiting
   // the responsible party's details, provided through the portal's secure form.
@@ -331,6 +333,10 @@ app.post("/orders", async (c) => {
   }
 
   const payload = buildPayload(data);
+  // The submitter's address and browser, recorded server-side for the Order
+  // Summary (10 Sep 2026): the browser's slots for these were never filled.
+  payload.metadata.ipAddress = clientIp(c);
+  payload.metadata.userAgent = c.req.header("user-agent") ?? payload.metadata.userAgent ?? "";
   const priced = priceOrder({
     isConversion: data.filingPath === "CONVERT",
     seriesCount: data.series.length,
@@ -352,8 +358,8 @@ app.post("/orders", async (c) => {
 
   const db = await getDb();
   const rows = await db.query<{ id: string }>(
-    `INSERT INTO orders (contact_name, contact_email, package, llc_name, payload, service_fee_cents, state_fees_cents, total_cents)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
+    `INSERT INTO orders (contact_name, contact_email, package, llc_name, payload, service_fee_cents, state_fees_cents, total_cents, line_items, submitted_ip, submitted_user_agent)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id`,
     [
       // The CLIENT owns the order: portal account, welcome email, and the
       // admin's "Client:" line all come from the up-front card, not from the
@@ -366,6 +372,9 @@ app.post("/orders", async (c) => {
       priced.serviceFeeCents,
       priced.stateFeesCents,
       priced.totalCents,
+      JSON.stringify(priced.lineItems),
+      payload.metadata.ipAddress,
+      payload.metadata.userAgent,
     ],
   );
   const orderId = rows[0].id;
@@ -380,6 +389,10 @@ app.post("/orders", async (c) => {
     checkout.squareOrderId,
     orderId,
   ]);
+  // The Order Summary, written the moment the order exists; rewritten at
+  // payment with the payment's time and id. Its failure never blocks the
+  // order.
+  await writeOrderSummary(orderId).catch((e) => console.error("[orders] summary failed:", e));
 
   return c.json({ data: { orderId, checkoutUrl: checkout.url, totalCents: priced.totalCents } });
 });

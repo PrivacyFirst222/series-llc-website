@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Upload, Eye } from "lucide-react";
+import { Upload, Eye, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,7 +30,54 @@ interface AdminClient {
   has_password: boolean;
   document_count: number;
   ra_llcs: string[];
-  companies: { id: string; llc_name: string; contact_name?: string }[];
+  companies: { id: string; llc_name: string; contact_name?: string; has_summary?: boolean }[];
+}
+
+/** The Order Summary (Adam, 10 Sep 2026): one company opens its PDF at once;
+ *  several ask which; an order from before summaries existed says so. */
+function OrderSummaryButton({ client }: { client: AdminClient }) {
+  const [open, setOpen] = useState<boolean>(false);
+  const companies = client.companies ?? [];
+  const url = (id: string) => `/api/admin/orders/${id}/summary.pdf`;
+  const onClick = () => {
+    if (companies.length === 1 && companies[0].has_summary) {
+      window.open(url(companies[0].id), "_blank");
+      return;
+    }
+    setOpen(true);
+  };
+  return (
+    <>
+      <Button type="button" variant="outline" size="sm" className="rounded-full" onClick={onClick} data-testid="order-summary">
+        <FileText className="mr-1.5 h-3.5 w-3.5" />
+        Order summary
+      </Button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Order summary for {client.name || client.email}</DialogTitle>
+            <DialogDescription>
+              {companies.length === 0 ? "This account has no paid order." : "Each paid order has its own summary, written when the order was placed."}
+            </DialogDescription>
+          </DialogHeader>
+          <ul className="space-y-2 text-sm" data-testid="order-summary-list">
+            {companies.map((co) => (
+              <li key={co.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border px-3 py-2">
+                <span className="font-medium">{co.llc_name}</span>
+                {co.has_summary ? (
+                  <a href={url(co.id)} target="_blank" rel="noreferrer" className="font-medium text-trust underline underline-offset-2">
+                    Open summary
+                  </a>
+                ) : (
+                  <span className="text-muted-foreground">No summary — placed before summaries existed.</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
 }
 
 /** The admin opens the client's portal as the client (Adam, 9 Sep 2026). The
@@ -326,6 +373,7 @@ function ClientsTable({
                 <td className="px-4 py-3 text-muted-foreground">{day(cl.created_at)}</td>
                 <td className="px-4 py-3 text-right">
                   <div className="flex justify-end gap-2">
+                    <OrderSummaryButton client={cl} />
                     <ViewPortalButton client={cl} />
                     <ChangeEmailDialog client={cl} />
                     <UploadDialog client={cl} />

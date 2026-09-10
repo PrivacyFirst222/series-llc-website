@@ -387,6 +387,18 @@ const MIGRATION_006_STATEMENTS: string[] = [
   `ALTER TABLE sessions ADD COLUMN IF NOT EXISTS viewing_as_admin boolean NOT NULL DEFAULT false`,
 ];
 
+// The Order Summary (Adam, 10 Sep 2026): a PDF written when the order is
+// placed and again when it is paid, its markdown kept for the checks, the
+// price lines as priced at that moment, and the submitter's address and
+// browser.
+const MIGRATION_007_STATEMENTS: string[] = [
+  `ALTER TABLE orders ADD COLUMN IF NOT EXISTS summary_storage_key text`,
+  `ALTER TABLE orders ADD COLUMN IF NOT EXISTS summary_markdown text`,
+  `ALTER TABLE orders ADD COLUMN IF NOT EXISTS line_items jsonb`,
+  `ALTER TABLE orders ADD COLUMN IF NOT EXISTS submitted_ip text`,
+  `ALTER TABLE orders ADD COLUMN IF NOT EXISTS submitted_user_agent text`,
+];
+
 const MIGRATIONS: { id: number; name: string; statements: string[] }[] = [
   { id: 1, name: "initial-schema", statements: MIGRATION_001_STATEMENTS },
   { id: 2, name: "contact-messages", statements: MIGRATION_002_STATEMENTS },
@@ -394,6 +406,7 @@ const MIGRATIONS: { id: number; name: string; statements: string[] }[] = [
   { id: 4, name: "oa-per-company", statements: MIGRATION_004_STATEMENTS },
   { id: 5, name: "documents-carry-company", statements: MIGRATION_005_STATEMENTS },
   { id: 6, name: "sessions-viewing-as-admin", statements: MIGRATION_006_STATEMENTS },
+  { id: 7, name: "order-summary", statements: MIGRATION_007_STATEMENTS },
   // Append future migrations here with the next id. Never edit an entry.
 ];
 

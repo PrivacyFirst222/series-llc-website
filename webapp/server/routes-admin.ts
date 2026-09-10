@@ -23,6 +23,7 @@ import { sendMail, newDocumentEmail, legalMailEmail, emailChangedEmail, serviceF
 import { einDigits, fmtEinDisplay, isValidEin } from "../src/lib/ein";
 import { filingGroups, seriesNames } from "./filing";
 import { err, testHooks, MAX_UPLOAD_BYTES, looksLikePdf, requireAdmin } from "./shared";
+import { loadSummaryRow } from "./order-summary";
 import { oaSeed, purgeExpiredSElections, postSElectionPackage, type SElectionStoredDetails } from "./routes-portal";
 import { evaluate2553Timing } from "../src/lib/form2553Timing";
 import { unpackSsns } from "../src/lib/jointOwner";
@@ -800,13 +801,46 @@ app.get("/admin/clients", async (c) => {
                FROM orders o
               WHERE o.client_id = cl.id AND o.status <> 'pending_payment'
                 AND o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_llcs,
-            (SELECT COALESCE(jsonb_agg(jsonb_build_object('id', o.id, 'llc_name', o.llc_name, 'contact_name', o.contact_name) ORDER BY o.paid_at DESC), '[]'::jsonb)
+            (SELECT COALESCE(jsonb_agg(jsonb_build_object('id', o.id, 'llc_name', o.llc_name, 'contact_name', o.contact_name, 'has_summary', o.summary_storage_key IS NOT NULL) ORDER BY o.paid_at DESC), '[]'::jsonb)
                FROM orders o
               WHERE o.client_id = cl.id AND o.paid_at IS NOT NULL) AS companies
      FROM clients cl LEFT JOIN documents d ON d.client_id = cl.id
      GROUP BY cl.id ORDER BY cl.created_at DESC`,
   );
   return c.json({ data: rows });
+});
+
+/** The Order Summary PDF (Adam, 10 Sep 2026), and its markdown for the
+ *  checks. Office only. Orders placed before summaries existed have none. */
+app.get("/admin/orders/:id/summary.pdf", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const db = await getDb();
+  const rows = await db.query<{ summary_storage_key: string | null; llc_name: string }>(
+    "SELECT summary_storage_key, llc_name FROM orders WHERE id = $1",
+    [c.req.param("id")],
+  );
+  if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+  if (!rows[0].summary_storage_key) return c.json(err("No summary — placed before summaries existed.", "NO_SUMMARY"), 404);
+  const stream = await readFileStream(rows[0].summary_storage_key);
+  const filename = `Order Summary - ${rows[0].llc_name}`.replace(/[^\w.-]+/g, "_");
+  return new Response(stream as BodyInit, {
+    headers: {
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `inline; filename="${filename}.pdf"`,
+      "Cache-Control": "private, no-store",
+    },
+  });
+});
+app.get("/admin/orders/:id/summary.md", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const o = await loadSummaryRow(c.req.param("id"));
+  if (!o) return c.json(err("Not found", "NOT_FOUND"), 404);
+  const db = await getDb();
+  const rows = await db.query<{ summary_markdown: string | null }>("SELECT summary_markdown FROM orders WHERE id = $1", [o.id]);
+  if (!rows[0]?.summary_markdown) return c.json(err("No summary — placed before summaries existed.", "NO_SUMMARY"), 404);
+  return c.text(rows[0].summary_markdown);
 });
 
 /** The admin sees a client's portal as the client (Adam, 9 Sep 2026: "I need

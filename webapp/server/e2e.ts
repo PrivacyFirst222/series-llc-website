@@ -456,6 +456,24 @@ if (sim.status === 404) {
 check("payment fulfillment runs", sim.status === 200, sim.body);
 const post = await api(`/api/orders/${orderId}/status`);
 check("status flips to paid", post.body?.data?.status === "paid");
+// The Order Summary (Adam, 10 Sep 2026): written at placement, rewritten at
+// payment, office only.
+{
+  const adm0 = await adminSession();
+  const md = await fetch(`${BASE}/api/admin/orders/${orderId}/summary.md`, { headers: { Cookie: adm0.cookie } });
+  const text = await md.text();
+  check("the paid order has a summary", md.status === 200 && /# Order Summary/.test(text), text.slice(0, 120));
+  check("the summary names the company, the payment, and the total", /E2E Coastal Holdings, LLC/.test(text) && /\*\*Square payment:\*\* dev-payment/.test(text) && /Total charged\*\* \| \*\*\$/.test(text), text.match(/Square payment[^\n]*/)?.[0]);
+  check("the summary lists the price lines", /Formation service fee \| \$499\.00/.test(text) && /FL state fee — Articles of Organization \| \$100\.00/.test(text), text.match(/\| [^\n]*\$[^\n]*/g)?.slice(0, 4));
+  check("the summary carries the questionnaire as typed", /100 Ocean Drive/.test(text) && /Casey Member/.test(text));
+  check("the summary quotes the acknowledgments and the signature", /- I certify that the information provided is true and accurate/.test(text) && /Electronic signature typed:\*\*/.test(text));
+  check("the summary records the submitter's address", text.includes(`**From IP address:** ${RUN_IP}`), text.match(/From IP address[^\n]*/)?.[0]);
+  const pdf = await fetch(`${BASE}/api/admin/orders/${orderId}/summary.pdf`, { headers: { Cookie: adm0.cookie } });
+  const bytes = new Uint8Array(await pdf.arrayBuffer());
+  check("the summary PDF is served to the admin", pdf.status === 200 && (pdf.headers.get("content-type") ?? "").includes("application/pdf") && bytes.length > 2000 && String.fromCharCode(...bytes.slice(0, 5)) === "%PDF-", { status: pdf.status, size: bytes.length });
+  const noAuth = await fetch(`${BASE}/api/admin/orders/${orderId}/summary.pdf`);
+  check("the summary is not served without the admin's sign-in", noAuth.status === 401, noAuth.status);
+}
 
 // 5. Welcome email was "sent" (dev log) with a set-password link — grab the token from the DB instead
 const admin = await adminSession();

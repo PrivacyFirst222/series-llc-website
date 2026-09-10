@@ -42,6 +42,16 @@ const extendedFormSchema = formationFormSchema
     sElectionFilingAcknowledgment: z.boolean().optional().default(false),
     existingLlcName: z.string().max(300).optional().or(z.literal("")),
     sunbizDocumentNumber: z.string().max(50).optional().or(z.literal("")),
+    // The name-availability result the client saw, kept for the Order
+    // Summary (10 Sep 2026). Not trusted for anything: the server re-checks.
+    nameCheck: z
+      .object({
+        key: z.string().max(2000),
+        available: z.boolean(),
+        asOf: z.string().max(20).optional(),
+        results: z.array(z.object({ input: z.string().max(300), verdict: z.enum(["taken", "held", "clear"]), conflicts: z.array(z.object({}).passthrough()).optional() })).max(10),
+      })
+      .optional(),
     // A conversion never sees the purpose, effective-date, or Articles-signer
     // questions (Adam, 9 Sep 2026): the company is already on file and only
     // Designations are filed. Those requirements are re-imposed below, NEW

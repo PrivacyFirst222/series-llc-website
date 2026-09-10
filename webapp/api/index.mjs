@@ -36558,12 +36558,12 @@ var init_operations = __esm({
       });
       const highlights = [];
       for (let idx = 0, len = options.selectedLines.length; idx < len; idx++) {
-        const line = options.textLines[options.selectedLines[idx]];
+        const line2 = options.textLines[options.selectedLines[idx]];
         highlights.push(...drawRectangle({
-          x: line.x - padding,
-          y: line.y - (lineHeight - line.height) / 2,
+          x: line2.x - padding,
+          y: line2.y - (lineHeight - line2.height) / 2,
           width: width - borderWidth,
-          height: line.height + (lineHeight - line.height) / 2,
+          height: line2.height + (lineHeight - line2.height) / 2,
           borderWidth: 0,
           color: options.selectedColor,
           borderColor: void 0,
@@ -36718,8 +36718,8 @@ var init_layout = __esm({
         let linesUsed = 0;
         for (let lineIdx = 0, lineLen = lines.length; lineIdx < lineLen; lineIdx++) {
           linesUsed += 1;
-          const line = lines[lineIdx];
-          const words = line.split(" ");
+          const line2 = lines[lineIdx];
+          const words = line2.split(" ");
           let spaceInLineRemaining = bounds.width;
           for (let idx = 0, len = words.length; idx < len; idx++) {
             const isLastWord = idx === len - 1;
@@ -36743,11 +36743,11 @@ var init_layout = __esm({
       }
       return fontSize;
     };
-    computeCombedFontSize = (line, font, bounds, cellCount) => {
+    computeCombedFontSize = (line2, font, bounds, cellCount) => {
       const cellWidth = bounds.width / cellCount;
       const cellHeight = bounds.height;
       let fontSize = MIN_FONT_SIZE;
-      const chars2 = charSplit(line);
+      const chars2 = charSplit(line2);
       while (fontSize < MAX_FONT_SIZE) {
         for (let idx = 0, len = chars2.length; idx < len; idx++) {
           const c = chars2[idx];
@@ -36762,9 +36762,9 @@ var init_layout = __esm({
       }
       return fontSize;
     };
-    lastIndexOfWhitespace = (line) => {
-      for (let idx = line.length; idx > 0; idx--) {
-        if (/\s/.test(line[idx]))
+    lastIndexOfWhitespace = (line2) => {
+      for (let idx = line2.length; idx > 0; idx--) {
+        if (/\s/.test(line2[idx]))
           return idx;
       }
       return void 0;
@@ -36773,14 +36773,14 @@ var init_layout = __esm({
       var _a3;
       let lastWhitespaceIdx = input.length;
       while (lastWhitespaceIdx > 0) {
-        const line = input.substring(0, lastWhitespaceIdx);
-        const encoded = font.encodeText(line);
-        const width = font.widthOfTextAtSize(line, fontSize);
+        const line2 = input.substring(0, lastWhitespaceIdx);
+        const encoded = font.encodeText(line2);
+        const width = font.widthOfTextAtSize(line2, fontSize);
         if (width < maxWidth) {
           const remainder = input.substring(lastWhitespaceIdx) || void 0;
-          return { line, encoded, width, remainder };
+          return { line: line2, encoded, width, remainder };
         }
-        lastWhitespaceIdx = (_a3 = lastIndexOfWhitespace(line)) !== null && _a3 !== void 0 ? _a3 : 0;
+        lastWhitespaceIdx = (_a3 = lastIndexOfWhitespace(line2)) !== null && _a3 !== void 0 ? _a3 : 0;
       }
       return {
         line: input,
@@ -36805,7 +36805,7 @@ var init_layout = __esm({
       for (let idx = 0, len = lines.length; idx < len; idx++) {
         let prevRemainder = lines[idx];
         while (prevRemainder !== void 0) {
-          const { line, encoded, width, remainder } = splitOutLines(prevRemainder, bounds.width, font, fontSize);
+          const { line: line2, encoded, width, remainder } = splitOutLines(prevRemainder, bounds.width, font, fontSize);
           const x2 = alignment === TextAlignment.Left ? bounds.x : alignment === TextAlignment.Center ? bounds.x + bounds.width / 2 - width / 2 : alignment === TextAlignment.Right ? bounds.x + bounds.width - width : bounds.x;
           y -= lineHeight;
           if (x2 < minX)
@@ -36816,7 +36816,7 @@ var init_layout = __esm({
             maxX = x2 + width;
           if (y + height > maxY)
             maxY = y + height;
-          textLines.push({ text: line, encoded, width, height, x: x2, y });
+          textLines.push({ text: line2, encoded, width, height, x: x2, y });
           prevRemainder = remainder === null || remainder === void 0 ? void 0 : remainder.trim();
         }
       }
@@ -36833,12 +36833,12 @@ var init_layout = __esm({
       };
     };
     layoutCombedText = (text, { fontSize, font, bounds, cellCount }) => {
-      const line = mergeLines(cleanText(text));
-      if (line.length > cellCount) {
-        throw new CombedTextLayoutError(line.length, cellCount);
+      const line2 = mergeLines(cleanText(text));
+      if (line2.length > cellCount) {
+        throw new CombedTextLayoutError(line2.length, cellCount);
       }
       if (fontSize === void 0 || fontSize === 0) {
-        fontSize = computeCombedFontSize(line, font, bounds, cellCount);
+        fontSize = computeCombedFontSize(line2, font, bounds, cellCount);
       }
       const cellWidth = bounds.width / cellCount;
       const height = font.heightAtSize(fontSize, { descender: false });
@@ -36851,7 +36851,7 @@ var init_layout = __esm({
       let cellOffset = 0;
       let charOffset = 0;
       while (cellOffset < cellCount) {
-        const [char, charLength] = charAtIndex(line, charOffset);
+        const [char, charLength] = charAtIndex(line2, charOffset);
         const encoded = font.encodeText(char);
         const width = font.widthOfTextAtSize(char, fontSize);
         const cellCenter = bounds.x + (cellWidth * cellOffset + cellWidth / 2);
@@ -36864,7 +36864,7 @@ var init_layout = __esm({
           maxX = x2 + width;
         if (y + height > maxY)
           maxY = y + height;
-        cells.push({ text: line, encoded, width, height, x: x2, y });
+        cells.push({ text: line2, encoded, width, height, x: x2, y });
         cellOffset += 1;
         charOffset += charLength;
       }
@@ -36880,18 +36880,18 @@ var init_layout = __esm({
       };
     };
     layoutSinglelineText = (text, { alignment, fontSize, font, bounds }) => {
-      const line = mergeLines(cleanText(text));
+      const line2 = mergeLines(cleanText(text));
       if (fontSize === void 0 || fontSize === 0) {
-        fontSize = computeFontSize([line], font, bounds);
+        fontSize = computeFontSize([line2], font, bounds);
       }
-      const encoded = font.encodeText(line);
-      const width = font.widthOfTextAtSize(line, fontSize);
+      const encoded = font.encodeText(line2);
+      const width = font.widthOfTextAtSize(line2, fontSize);
       const height = font.heightAtSize(fontSize, { descender: false });
       const x2 = alignment === TextAlignment.Left ? bounds.x : alignment === TextAlignment.Center ? bounds.x + bounds.width / 2 - width / 2 : alignment === TextAlignment.Right ? bounds.x + bounds.width - width : bounds.x;
       const y = bounds.y + (bounds.height / 2 - height / 2);
       return {
         fontSize,
-        line: { text: line, encoded, width, height, x: x2, y },
+        line: { text: line2, encoded, width, height, x: x2, y },
         bounds: { x: x2, y, width, height }
       };
     };
@@ -37221,7 +37221,7 @@ var init_appearances = __esm({
         width: width - (borderWidth + padding) * 2,
         height: height - (borderWidth + padding) * 2
       };
-      const { line, fontSize } = layoutSinglelineText(text, {
+      const { line: line2, fontSize } = layoutSinglelineText(text, {
         alignment: TextAlignment.Left,
         fontSize: widgetFontSize !== null && widgetFontSize !== void 0 ? widgetFontSize : fieldFontSize,
         font,
@@ -37244,7 +37244,7 @@ var init_appearances = __esm({
         font: font.name,
         fontSize,
         color: normalBackgroundColor,
-        textLines: [line],
+        textLines: [line2],
         padding
       };
       return [...rotate, ...drawTextField(options)];
@@ -37290,8 +37290,8 @@ var init_appearances = __esm({
       });
       const selectedLines = [];
       for (let idx = 0, len = lines.length; idx < len; idx++) {
-        const line = lines[idx];
-        if (selected.includes(line.text))
+        const line2 = lines[idx];
+        if (selected.includes(line2.text))
           selectedLines.push(idx);
       }
       const blue = rgb(153 / 255, 193 / 255, 218 / 255);
@@ -47149,8 +47149,8 @@ var init_es = __esm({
 function sanitize(s) {
   return s.replace(/—/g, "\u2014").replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/→/g, "->").replace(/✓|✔/g, "*").replace(/☐/g, "[ ]").replace(/[^\x20-\x7E\xA0-\xFF–—•]/g, "?");
 }
-function parseInline(line) {
-  const parts = line.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/).filter(Boolean);
+function parseInline(line2) {
+  const parts = line2.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/).filter(Boolean);
   return parts.map((p2) => {
     if (p2.startsWith("**") && p2.endsWith("**")) return { text: sanitize(p2.slice(2, -2)), bold: true, italic: false };
     if (p2.startsWith("*") && p2.endsWith("*") && p2.length > 2) return { text: sanitize(p2.slice(1, -1)), bold: false, italic: true };
@@ -47162,12 +47162,12 @@ function parseMarkdown(md) {
   const blocks = [];
   let i = 0;
   while (i < lines.length) {
-    const line = lines[i].trimEnd();
-    if (!line.trim() || line.trim() === "---") {
+    const line2 = lines[i].trimEnd();
+    if (!line2.trim() || line2.trim() === "---") {
       i++;
       continue;
     }
-    if (line.startsWith("|")) {
+    if (line2.startsWith("|")) {
       const tbl = [];
       while (i < lines.length && lines[i].trim().startsWith("|")) {
         tbl.push(lines[i].trim());
@@ -47177,13 +47177,13 @@ function parseMarkdown(md) {
       if (rows.length > 0) blocks.push({ kind: "table", rows });
       continue;
     }
-    const m2 = line.match(/^(#{1,3})\s+(.*)$/);
+    const m2 = line2.match(/^(#{1,3})\s+(.*)$/);
     if (m2) {
       blocks.push({ kind: "heading", level: m2[1].length, text: sanitize(m2[2].replace(/\*\*/g, "")) });
       i++;
       continue;
     }
-    blocks.push({ kind: "para", segs: parseInline(line.trim()) });
+    blocks.push({ kind: "para", segs: parseInline(line2.trim()) });
     i++;
   }
   return blocks;
@@ -47420,7 +47420,7 @@ async function renderMarkdownPdf(opts) {
         const row = block.rows[ri];
         const fillable = isAssetSchedule && ri > 0 && row.every((c) => c.trim() === "");
         const cellLines = row.map(
-          (cell) => wrapSegs(fonts, parseInline(cell).map((s) => ri === 0 ? { ...s, bold: true } : s), colW - 2 * pad, size)
+          (cell2) => wrapSegs(fonts, parseInline(cell2).map((s) => ri === 0 ? { ...s, bold: true } : s), colW - 2 * pad, size)
         );
         const rowH = (fillable ? FILL_LINES : Math.max(1, ...cellLines.map((c) => c.length))) * lineH + 2 * pad;
         need(rowH);
@@ -47564,7 +47564,7 @@ function finishFields(doc, font) {
   const cells = form.getFields().filter((f) => f instanceof PDFTextField);
   if (cells.length === 0) return;
   form.updateFieldAppearances(font);
-  for (const cell of cells) cell.setFontSize(0);
+  for (const cell2 of cells) cell2.setFontSize(0);
   const dr3 = doc.context.obj({ Font: doc.context.obj({ [font.name]: font.ref }) });
   form.acroForm.dict.set(PDFName_default.of("DR"), dr3);
   form.acroForm.dict.set(PDFName_default.of("DA"), PDFString_default.of(`/${font.name} 0 Tf 0 g`));
@@ -52803,8 +52803,8 @@ var require_doc = __commonJS({
         const lines = content.split("\n").filter((x2) => x2);
         const minIndent = Math.min(...lines.map((x2) => x2.length - x2.trimStart().length));
         const dedented = lines.map((x2) => x2.slice(minIndent)).map((x2) => " ".repeat(this.indent * 2) + x2);
-        for (const line of dedented) {
-          this.content.push(line);
+        for (const line2 of dedented) {
+          this.content.push(line2);
         }
       }
       compile() {
@@ -83081,8 +83081,8 @@ var require_dns = __commonJS({
               return cb(err3);
             }
             const results = /* @__PURE__ */ new Map();
-            for (const addr of addresses) {
-              results.set(`${addr.address}:${addr.family}`, addr);
+            for (const addr2 of addresses) {
+              results.set(`${addr2.address}:${addr2.family}`, addr2);
             }
             cb(null, results.values());
           }
@@ -89778,25 +89778,25 @@ var require_eventsource_stream = __commonJS({
        * @param {Buffer} line
        * @param {EventStreamEvent} event
        */
-      parseLine(line, event) {
-        if (line.length === 0) {
+      parseLine(line2, event) {
+        if (line2.length === 0) {
           return;
         }
-        const colonPosition = line.indexOf(COLON);
+        const colonPosition = line2.indexOf(COLON);
         if (colonPosition === 0) {
           return;
         }
         let field = "";
         let value = "";
         if (colonPosition !== -1) {
-          field = line.subarray(0, colonPosition).toString("utf8");
+          field = line2.subarray(0, colonPosition).toString("utf8");
           let valueStart = colonPosition + 1;
-          if (line[valueStart] === SPACE) {
+          if (line2[valueStart] === SPACE) {
             ++valueStart;
           }
-          value = line.subarray(valueStart).toString("utf8");
+          value = line2.subarray(valueStart).toString("utf8");
         } else {
-          field = line.toString("utf8");
+          field = line2.toString("utf8");
           value = "";
         }
         switch (field) {
@@ -92169,8 +92169,8 @@ var init_chunk_YYMLUMXS = __esm({
           }
           const headers = new Headers();
           const rawHeaders = xhr.getAllResponseHeaders().trim().split(/[\r\n]+/);
-          rawHeaders.forEach((line) => {
-            const parts = line.split(": ");
+          rawHeaders.forEach((line2) => {
+            const parts = line2.split(": ");
             const key = parts.shift();
             const value = parts.join(": ");
             if (key) headers.set(key.toLowerCase(), value);
@@ -92886,8 +92886,8 @@ __export(manual_pdf_exports, {
 function sanitize2(s) {
   return s.replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/→/g, "->").replace(/✓|✔/g, "*").replace(/☐/g, "[ ]").replace(/…/g, "...").replace(/[^\x20-\x7E\xA0-\xFF–—•]/g, "?");
 }
-function parseInline2(line) {
-  const parts = line.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/).filter(Boolean);
+function parseInline2(line2) {
+  const parts = line2.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/).filter(Boolean);
   return parts.map((p2) => {
     if (p2.startsWith("**") && p2.endsWith("**")) return { text: sanitize2(p2.slice(2, -2)), bold: true, italic: false };
     if (p2.startsWith("*") && p2.endsWith("*") && p2.length > 2) return { text: sanitize2(p2.slice(1, -1)), bold: false, italic: true };
@@ -92900,9 +92900,9 @@ function parseManual(md) {
   const tp = md.match(/<!--\s*titlepage\n([\s\S]*?)-->/);
   if (tp) {
     for (const raw2 of tp[1].split("\n")) {
-      const line = raw2.trim();
-      if (!line) continue;
-      const parts = line.split("|");
+      const line2 = raw2.trim();
+      if (!line2) continue;
+      const parts = line2.split("|");
       const size = Number(parts[0]);
       if (!Number.isFinite(size)) continue;
       const text = sanitize2(parts[1] ?? "");
@@ -92923,8 +92923,8 @@ function parseManual(md) {
   const lines = body.split("\n");
   let i = 0;
   while (i < lines.length) {
-    const line = lines[i].trimEnd();
-    const t = line.trim();
+    const line2 = lines[i].trimEnd();
+    const t = line2.trim();
     if (!t || t === "---") {
       i++;
       continue;
@@ -93035,14 +93035,14 @@ async function renderManualPdf(md) {
   };
   const coverPage = doc.addPage([PAGE_W2, PAGE_H2]);
   let cy2 = PAGE_H2 - 160;
-  for (const line of manual.cover) {
-    const seg = { text: line.text, bold: line.size >= 14, italic: false };
-    for (const ln2 of wrap2([seg], width, line.size)) {
-      const w = ln2.reduce((a2, s) => a2 + segW(s, line.size), 0);
-      drawLine2(coverPage, ln2, MARGIN2 + (width - w) / 2, cy2 - line.size, line.size, void 0, line.accent ? NAVY : INK);
-      cy2 -= line.size * 1.25;
+  for (const line2 of manual.cover) {
+    const seg = { text: line2.text, bold: line2.size >= 14, italic: false };
+    for (const ln2 of wrap2([seg], width, line2.size)) {
+      const w = ln2.reduce((a2, s) => a2 + segW(s, line2.size), 0);
+      drawLine2(coverPage, ln2, MARGIN2 + (width - w) / 2, cy2 - line2.size, line2.size, void 0, line2.accent ? NAVY : INK);
+      cy2 -= line2.size * 1.25;
     }
-    cy2 -= line.after;
+    cy2 -= line2.after;
   }
   coverPage.drawLine({
     start: { x: MARGIN2 + width * 0.25, y: 120 },
@@ -93150,7 +93150,7 @@ async function renderManualPdf(md) {
       for (let ri = 0; ri < block.rows.length; ri++) {
         const row = block.rows[ri];
         const cellLines = row.map(
-          (cell) => wrap2(parseInline2(cell).map((s) => ri === 0 ? { ...s, bold: true } : s), colW - 2 * pad, size)
+          (cell2) => wrap2(parseInline2(cell2).map((s) => ri === 0 ? { ...s, bold: true } : s), colW - 2 * pad, size)
         );
         const rowH = Math.max(1, ...cellLines.map((c) => c.length)) * lineH + 2 * pad;
         need(rowH);
@@ -95838,13 +95838,21 @@ var MIGRATION_005_STATEMENTS = DOCUMENT_COMPANY_BACKFILL_STATEMENTS;
 var MIGRATION_006_STATEMENTS = [
   `ALTER TABLE sessions ADD COLUMN IF NOT EXISTS viewing_as_admin boolean NOT NULL DEFAULT false`
 ];
+var MIGRATION_007_STATEMENTS = [
+  `ALTER TABLE orders ADD COLUMN IF NOT EXISTS summary_storage_key text`,
+  `ALTER TABLE orders ADD COLUMN IF NOT EXISTS summary_markdown text`,
+  `ALTER TABLE orders ADD COLUMN IF NOT EXISTS line_items jsonb`,
+  `ALTER TABLE orders ADD COLUMN IF NOT EXISTS submitted_ip text`,
+  `ALTER TABLE orders ADD COLUMN IF NOT EXISTS submitted_user_agent text`
+];
 var MIGRATIONS = [
   { id: 1, name: "initial-schema", statements: MIGRATION_001_STATEMENTS },
   { id: 2, name: "contact-messages", statements: MIGRATION_002_STATEMENTS },
   { id: 3, name: "series-filed-at", statements: MIGRATION_003_STATEMENTS },
   { id: 4, name: "oa-per-company", statements: MIGRATION_004_STATEMENTS },
   { id: 5, name: "documents-carry-company", statements: MIGRATION_005_STATEMENTS },
-  { id: 6, name: "sessions-viewing-as-admin", statements: MIGRATION_006_STATEMENTS }
+  { id: 6, name: "sessions-viewing-as-admin", statements: MIGRATION_006_STATEMENTS },
+  { id: 7, name: "order-summary", statements: MIGRATION_007_STATEMENTS }
   // Append future migrations here with the next id. Never edit an entry.
 ];
 function migrationChecksum(statements) {
@@ -100495,6 +100503,14 @@ var extendedFormSchema = formationFormSchema.extend({
   sElectionFilingAcknowledgment: external_exports.boolean().optional().default(false),
   existingLlcName: external_exports.string().max(300).optional().or(external_exports.literal("")),
   sunbizDocumentNumber: external_exports.string().max(50).optional().or(external_exports.literal("")),
+  // The name-availability result the client saw, kept for the Order
+  // Summary (10 Sep 2026). Not trusted for anything: the server re-checks.
+  nameCheck: external_exports.object({
+    key: external_exports.string().max(2e3),
+    available: external_exports.boolean(),
+    asOf: external_exports.string().max(20).optional(),
+    results: external_exports.array(external_exports.object({ input: external_exports.string().max(300), verdict: external_exports.enum(["taken", "held", "clear"]), conflicts: external_exports.array(external_exports.object({}).passthrough()).optional() })).max(10)
+  }).optional(),
   // A conversion never sees the purpose, effective-date, or Articles-signer
   // questions (Adam, 9 Sep 2026): the company is already on file and only
   // Designations are filed. Those requirements are re-imposed below, NEW
@@ -100823,6 +100839,23 @@ function buildPayload(data) {
       seriesOwnershipAcknowledged: data.seriesOwnershipAcknowledgment,
       conversionAuthorityAcknowledged: data.conversionAuthorityAcknowledgment === true
     },
+    acknowledgments: {
+      isFloridaDomesticEntityOnly: data.isFloridaDomesticEntityOnly === true,
+      notLegalAdvice: data.notLegalAdvice === true,
+      publicRecordNotice: data.publicRecordNotice === true,
+      nameSearchAcknowledgment: data.nameSearchAcknowledgment === true,
+      governmentAffiliationAcknowledgment: data.governmentAffiliationAcknowledgment === true,
+      lawfulPurposeNameAcknowledgment: data.lawfulPurposeNameAcknowledgment === true,
+      exactNameOnly: data.exactNameOnly === true,
+      registeredAgentNotSameAsLlc: data.registeredAgentNotSameAsLlc === true,
+      registeredAgentPhysicalAddressAcknowledgment: data.registeredAgentPhysicalAddressAcknowledgment === true,
+      registeredAgentAcceptanceCheckbox: data.registeredAgentAcceptanceCheckbox === true,
+      registeredAgentSignatureAuthorizationCheckbox: data.registeredAgentSignatureAuthorizationCheckbox === true,
+      authorizedRepresentativeSignatureCheckbox: data.authorizedRepresentativeSignatureCheckbox === true,
+      addressAccuracyAcknowledgment: data.addressAccuracyAcknowledgment === true,
+      termsOfServiceAcknowledgment: data.termsOfServiceAcknowledgment === true
+    },
+    nameCheck: data.nameCheck ? { available: data.nameCheck.available, asOf: data.nameCheck.asOf, results: data.nameCheck.results.map((r) => ({ input: r.input, verdict: r.verdict })) } : null,
     metadata: {
       submittedAt: (/* @__PURE__ */ new Date()).toISOString(),
       ipAddress: "",
@@ -100981,8 +101014,8 @@ function mmddyyyyToIso(s) {
   if (mm === "00" || dd === "00" || yyyy === "0000") return null;
   return `${yyyy}-${mm}-${dd}`;
 }
-function parseCorRecord(line) {
-  const l = line.replace(/[\r\n]+$/, "");
+function parseCorRecord(line2) {
+  const l = line2.replace(/[\r\n]+$/, "");
   if (!l.trim()) return null;
   if (l.length < 500 || l.length > 1440) return null;
   const r = l.padEnd(1440);
@@ -101005,9 +101038,9 @@ function parseCorRecord(line) {
 function parseCorFile(text) {
   const entities = [];
   let skipped = 0;
-  for (const line of text.split("\n")) {
-    if (!line.trim()) continue;
-    const e = parseCorRecord(line);
+  for (const line2 of text.split("\n")) {
+    if (!line2.trim()) continue;
+    const e = parseCorRecord(line2);
     if (e) entities.push(e);
     else skipped++;
   }
@@ -101650,12 +101683,12 @@ function fmtEin(ein) {
 function electionDeadline(startIso) {
   return form2553Deadline(startIso);
 }
-function splitAddress(addr) {
-  const parts = addr.split(",").map((s) => s.trim()).filter(Boolean);
+function splitAddress(addr2) {
+  const parts = addr2.split(",").map((s) => s.trim()).filter(Boolean);
   if (parts.length >= 2) {
     return { street: parts.slice(0, parts.length - 2).join(", ") || parts[0], cityStateZip: parts.slice(-2).join(", ") };
   }
-  return { street: addr, cityStateZip: "" };
+  return { street: addr2, cityStateZip: "" };
 }
 async function fillForm2553(d2) {
   const bytes2 = Uint8Array.from(atob(f2553_b64_default), (ch) => ch.charCodeAt(0));
@@ -101668,10 +101701,10 @@ async function fillForm2553(d2) {
     if (max !== void 0 && value.length > max) field.setMaxLength(void 0);
     field.setText(value);
   };
-  const addr = splitAddress(d2.principalAddress);
+  const addr2 = splitAddress(d2.principalAddress);
   setText(`${F}.NameAddress[0].f1_01[0]`, d2.llcName);
-  setText(`${F}.NameAddress[0].f1_02[0]`, addr.street);
-  setText(`${F}.NameAddress[0].f1_03[0]`, addr.cityStateZip);
+  setText(`${F}.NameAddress[0].f1_02[0]`, addr2.street);
+  setText(`${F}.NameAddress[0].f1_03[0]`, addr2.cityStateZip);
   setText(`${F}.f1_04[0]`, fmtEin(d2.ein));
   setText(`${F}.f1_05[0]`, fmtDate(d2.dateIncorporated));
   setText(`${F}.f1_06[0]`, "Florida");
@@ -101776,12 +101809,12 @@ The IRS normally mails an acceptance letter (Notice CP261) within about 60 days.
 `;
 }
 function coverLetterMarkdown(d2) {
-  const addr = splitAddress(d2.principalAddress);
+  const addr2 = splitAddress(d2.principalAddress);
   return `# ${d2.llcName.toUpperCase()}
 
-${addr.street}
+${addr2.street}
 
-${addr.cityStateZip}
+${addr2.cityStateZip}
 
 [[left]]
 
@@ -106255,8 +106288,8 @@ async function oaSeed(clientId, orderId) {
   );
   if (orders.length === 0) return null;
   const p2 = typeof orders[0].payload === "string" ? JSON.parse(orders[0].payload) : orders[0].payload;
-  const addr = p2.principalOfficeAddress ?? {};
-  const principalAddress = [addr.address1, addr.address2, [addr.city, addr.state].filter(Boolean).join(", "), addr.zip].filter((x2) => x2 && String(x2).trim()).join(", ");
+  const addr2 = p2.principalOfficeAddress ?? {};
+  const principalAddress = [addr2.address1, addr2.address2, [addr2.city, addr2.state].filter(Boolean).join(", "), addr2.zip].filter((x2) => x2 && String(x2).trim()).join(", ");
   const members = (p2.members?.memberList ?? []).map((m2) => ({
     name: personLegalName(m2.firstName, m2.lastName, m2.suffix) || (m2.fullLegalName ?? ""),
     address: [m2.address1, m2.address2, [m2.city, m2.state].filter(Boolean).join(", "), m2.zip].filter((x2) => x2 && String(x2).trim()).join(", ")
@@ -107985,6 +108018,216 @@ function registerPortalRoutes(app2) {
   });
 }
 
+// server/order-summary.ts
+init_pdf_render();
+var ACKNOWLEDGMENTS = [
+  { field: "isFloridaDomesticEntityOnly", text: (p2) => p2.filingPath === "CONVERT" ? "I understand this form is for an existing Florida LLC that is already on file with the Division of Corporations, and that it adds protected series to that company." : "I understand this form is for forming a new domestic Florida series LLC only." },
+  { field: "notLegalAdvice", text: "I understand that this service does not provide legal, tax, or accounting advice." },
+  { field: "publicRecordNotice", text: "I understand that information submitted to the Florida Division of Corporations may become part of the public record." },
+  { field: "nameSearchAcknowledgment", text: "I understand that availability is not guaranteed until accepted by the Florida Division of Corporations." },
+  { field: "governmentAffiliationAcknowledgment", text: "I confirm the name does not imply affiliation with a state or federal government agency." },
+  { field: "lawfulPurposeNameAcknowledgment", text: "I confirm the name does not imply a purpose unauthorized for this LLC." },
+  { field: "exactNameOnly", text: "I only want this exact name \u2014 if it is unavailable, contact me before doing anything else." },
+  { field: "seriesOwnershipAcknowledged", text: "I understand that every protected series will be owned by my LLC, and that no series will have its own separate owners." },
+  { field: "registeredAgentNotSameAsLlc", text: "I understand that the LLC itself cannot serve as its own registered agent \u2014 I am accepting this role personally." },
+  { field: "registeredAgentPhysicalAddressAcknowledgment", text: "I confirm this is my physical street address in Florida and not a P.O. Box." },
+  { field: "registeredAgentAcceptanceCheckbox", text: "I accept the appointment and acknowledge the obligations of serving as registered agent for this Florida LLC." },
+  { field: "registeredAgentSignatureAuthorizationCheckbox", text: "I certify that I am signing for myself as the registered agent." },
+  { field: "articlesSignerAppointed", text: "I appoint MyFloridaSeriesLLC as my authorized representative to sign and file my Articles of Organization, and I certify that the information I have provided is true, accurate, and complete." },
+  { field: "authorizedRepresentativeSignatureCheckbox", text: "I certify that I am authorized to sign and submit information for this LLC." },
+  { field: "atLeastOneMemberAcknowledged", text: "I affirm that the LLC has or will have at least one member when the Articles of Organization become effective." },
+  { field: "conversionAuthorityAcknowledged", text: (p2) => `I am authorized to act for ${(p2.existingLlcName ?? "").trim() || "the company"}, its members have consented to establishing the protected series on this order, and I authorize MyFloridaSeriesLLC to prepare and file the Protected Series Designations with the Florida Division of Corporations.` },
+  { field: "accuracyAcknowledged", text: "I certify that the information provided is true and accurate to the best of my knowledge." },
+  { field: "addressAccuracyAcknowledgment", text: "I am solely responsible for the accuracy of all addresses I have provided. I understand that state filings, legal notices, and official correspondence will be directed to these addresses exactly as entered, and that MyFloridaSeriesLLC does not verify the accuracy or deliverability of any address. Any address-suggestion or address-checking feature in this form is a convenience only and is not a verification, warranty, or guarantee of any kind." },
+  { field: "termsOfServiceAcknowledgment", text: "I agree to all terms and conditions set forth in the Terms of Service, including its binding individual arbitration provision and class action waiver." },
+  { field: "publicRecordAcknowledged", text: "I understand that filed information may become part of the public record." },
+  { field: "notLegalAdviceAcknowledged", text: "I understand this service does not provide legal, tax, or accounting advice." }
+];
+var dollars = (cents) => `$${(cents / 100).toFixed(2)}`;
+var when = (iso) => iso ? new Date(iso).toLocaleString("en-US", { timeZone: "America/New_York", dateStyle: "long", timeStyle: "short" }) + " ET" : "";
+var cell = (v2) => String(v2 ?? "").replace(/\|/g, "/").replace(/\s+/g, " ").trim();
+var line = (label, value) => {
+  const v2 = cell(value);
+  return v2 ? `**${label}:** ${v2}` : `**${label}:** \u2014`;
+};
+var addr = (a2) => a2 && a2.address1 ? [a2.address1, a2.address2, `${a2.city ?? ""}, ${a2.state ?? ""} ${a2.zip ?? ""}`.trim(), a2.country].filter((s) => s && s.trim()).join(", ") : "";
+function ticked(p2) {
+  const flags = {
+    ...p2.acknowledgments ?? {},
+    seriesOwnershipAcknowledged: p2.certifications?.seriesOwnershipAcknowledged === true,
+    articlesSignerAppointed: p2.certifications?.articlesSignerAppointed === true,
+    atLeastOneMemberAcknowledged: p2.certifications?.atLeastOneMemberAcknowledged === true,
+    conversionAuthorityAcknowledged: p2.certifications?.conversionAuthorityAcknowledged === true,
+    accuracyAcknowledged: p2.certifications?.accuracyAcknowledged === true,
+    publicRecordAcknowledged: p2.certifications?.publicRecordAcknowledged === true,
+    notLegalAdviceAcknowledged: p2.certifications?.notLegalAdviceAcknowledged === true
+  };
+  return ACKNOWLEDGMENTS.filter((a2) => flags[a2.field] === true).map((a2) => ({ field: a2.field, text: typeof a2.text === "function" ? a2.text(p2) : a2.text }));
+}
+function summaryMarkdown(o) {
+  const p2 = typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload;
+  const items = typeof o.line_items === "string" ? JSON.parse(o.line_items) : o.line_items;
+  const conversion = p2.filingPath === "CONVERT";
+  const out = [];
+  out.push(`# Order Summary`);
+  out.push(`## ${o.llc_name}`);
+  out.push(`This summary records the order as it was placed and, once received, as it was paid. It is kept for the office and does not appear in the client's portal.`);
+  out.push(`## The order`);
+  out.push(line("Company", o.llc_name));
+  out.push(line("Filing", conversion ? `Conversion of an existing Florida LLC (document ${p2.sunbizDocumentNumber || "not given"})` : "New Florida LLC"));
+  out.push(line("Client", `${o.contact_name} <${o.contact_email}>`));
+  out.push(line("Placed", when(o.created_at)));
+  out.push(line("Paid", o.paid_at ? when(o.paid_at) : "not yet received at the time of this summary"));
+  out.push(line("Square payment", o.square_payment_id ?? "\u2014"));
+  out.push(line("Square checkout", o.square_order_id ?? "\u2014"));
+  out.push(line("Order", o.id));
+  out.push(``);
+  out.push(`## Items ordered`);
+  out.push(line("Package", conversion ? "Protected Series Designations for an existing Florida LLC" : "New Protected Series LLC formation"));
+  out.push(line("Formation type", p2.formationType === "PLLC" ? "Professional LLC" : "LLC"));
+  out.push(line("Protected series", (p2.series ?? []).map((s) => s.name).join("; ")));
+  out.push(line("Registered agent", p2.registeredAgent?.choice === "SERVICE" ? "Our registered agent service" : "Client's own agent"));
+  out.push(line("Certificate of Status", p2.optionalDocuments?.certificateOfStatus ? "Yes" : "No"));
+  out.push(line("Certified Copy", p2.optionalDocuments?.certifiedCopy ? "Yes" : "No"));
+  out.push(line("Federal EIN service", p2.optionalDocuments?.ein ? "Yes" : "No"));
+  out.push(line("S election package", p2.optionalDocuments?.sElection ? "Yes" : "No"));
+  out.push(``);
+  out.push(`## Price`);
+  out.push([
+    `| Item | Amount |`,
+    `|---|---|`,
+    ...(items ?? []).map((it2) => `| ${cell(it2.name)} | ${dollars(it2.amountCents)} |`),
+    `| Service subtotal | ${dollars(o.service_fee_cents)} |`,
+    `| State fees subtotal | ${dollars(o.state_fees_cents)} |`,
+    `| **Total charged** | **${dollars(o.total_cents)}** |`
+  ].join("\n"));
+  const shown = p2.estimatedStateFees?.estimatedTotal;
+  out.push(line("State fees shown to the client on the review step", typeof shown === "number" ? `$${shown.toFixed(2)}` : "\u2014"));
+  out.push(line("State fees charged", dollars(o.state_fees_cents)));
+  out.push(``);
+  out.push(`## The questionnaire, as typed`);
+  out.push(`### Your information`);
+  out.push(line("Name", p2.client?.name));
+  out.push(line("Email", p2.client?.email));
+  out.push(line("Phone", p2.client?.phone));
+  out.push(line("Address", addr(p2.client?.address)));
+  out.push(conversion ? `### Your existing LLC` : `### LLC name`);
+  if (conversion) {
+    out.push(line("Existing LLC name", p2.existingLlcName));
+    out.push(line("Sunbiz document number", p2.sunbizDocumentNumber));
+  } else {
+    out.push(line("Desired name", p2.llcName?.desiredName));
+    out.push(line("Designator", p2.llcName?.designator));
+    out.push(line("Final name", p2.llcName?.finalName));
+    out.push(line("Alternate names", (p2.llcName?.alternateNames ?? []).join("; ")));
+    out.push(line("Exact name only", p2.llcName?.exactNameOnly ? "Yes" : "No"));
+    if (p2.nameCheck) {
+      out.push(line("Availability check the client saw", p2.nameCheck.available ? `${p2.nameCheck.results.map((r) => `${r.input}: ${r.verdict}`).join("; ")} (state data as of ${p2.nameCheck.asOf ?? "unknown"})` : "the automatic check was unavailable"));
+    } else {
+      out.push(line("Availability check the client saw", "none recorded"));
+    }
+  }
+  out.push(`### Principal address`);
+  out.push(line("Address", addr(p2.principalOfficeAddress)));
+  out.push(`### Mailing address`);
+  out.push(line("Address", addr(p2.mailingAddress)));
+  out.push(`### Series`);
+  (p2.series ?? []).forEach((s, i) => out.push(line(`Series ${i + 1}`, s.name)));
+  out.push(`### Registered agent`);
+  const ra = p2.registeredAgent;
+  out.push(line("Choice", ra?.choice === "SERVICE" ? "Our registered agent service" : "Client's own agent"));
+  if (ra?.choice !== "SERVICE") {
+    out.push(line("Type", ra?.type));
+    out.push(line("Name", ra?.businessEntityName || ra?.name));
+    out.push(line("Address", addr(ra?.address)));
+    out.push(line("Email", ra?.email));
+    out.push(line("Phone", ra?.phone));
+    out.push(`### Agent acceptance`);
+    out.push(line("Accepted by", ra?.acceptance?.acceptanceName));
+    out.push(line("Capacity", ra?.acceptance?.capacity));
+    out.push(line("Electronic signature", ra?.acceptance?.electronicSignature));
+  }
+  out.push(`### Management`);
+  out.push(line("Structure", p2.management?.structure === "MANAGER_MANAGED" ? "Manager-managed" : p2.management?.structure === "MEMBER_MANAGED" ? "Member-managed" : p2.management?.structure));
+  if (!conversion) out.push(line("Statement in the Articles", p2.management?.includeManagementStatementInArticles ? "Yes" : "No"));
+  const managers = p2.management?.managersOrAuthorizedRepresentatives ?? [];
+  if (managers.length > 0) {
+    out.push(`### Managers`);
+    managers.forEach((m2, i) => {
+      const mm = m2;
+      const name = mm.businessEntityName || mm.entityName || [mm.firstName, mm.lastName, mm.suffix].filter(Boolean).join(" ");
+      out.push(line(`Manager ${i + 1}`, `${name}; ${addr({ address1: mm.streetAddress1 ?? mm.address1, city: mm.city, state: mm.state, zip: mm.zip })}`));
+    });
+  }
+  const members = p2.members?.memberList ?? [];
+  if (members.length > 0) {
+    out.push(`### Initial members`);
+    members.forEach((m2, i) => {
+      const mm = m2;
+      const name = mm.memberType === "ENTITY" ? mm.entityName ?? "" : [mm.firstName, mm.lastName, mm.suffix].filter(Boolean).join(" ");
+      const pct = mm.ownershipPercentage !== void 0 && mm.ownershipPercentage !== "" ? `; ${mm.ownershipPercentage}%` : "";
+      out.push(line(`Member ${i + 1}`, `${name}; ${addr({ address1: mm.address1, city: mm.city, state: mm.state, zip: mm.zip })}${pct}`));
+    });
+  }
+  if (!conversion) {
+    out.push(`### Purpose`);
+    out.push(line("Purpose type", p2.purpose?.purposeType));
+    out.push(line("Specific purpose", p2.purpose?.businessPurposeText));
+    out.push(`### Effective date`);
+    out.push(line("Option", p2.effectiveDate?.option === "SPECIFIC" ? `Specific date: ${p2.effectiveDate?.requestedEffectiveDate ?? ""}` : "Date filed by the Division"));
+  }
+  out.push(`### Correspondence`);
+  out.push(line("Name", p2.correspondence?.name));
+  out.push(line("Company", p2.correspondence?.company));
+  out.push(line("Email", p2.correspondence?.email));
+  out.push(line("Phone", p2.correspondence?.phone));
+  out.push(line("Mailing address", addr(p2.correspondence?.address)));
+  out.push(`### Optional documents`);
+  out.push(line("Certificate of Status", p2.optionalDocuments?.certificateOfStatus ? "Yes" : "No"));
+  out.push(line("Certified Copy", p2.optionalDocuments?.certifiedCopy ? "Yes" : "No"));
+  out.push(line("Federal EIN", p2.optionalDocuments?.ein ? "Yes" : "No"));
+  out.push(line("S election package", p2.optionalDocuments?.sElection ? "Yes" : "No"));
+  out.push(`### Certification`);
+  const c = p2.certifications;
+  if (!conversion) {
+    out.push(line("Articles signed by", c?.articlesSignedBy === "SERVICE" ? "MyFloridaSeriesLLC, as appointed authorized representative" : "The client"));
+    out.push(line("Authorized representative", c?.authorizedRepresentativeName));
+    out.push(line("Title", c?.authorizedRepresentativeTitle));
+  }
+  out.push(line("Electronic signature typed", c?.authorizedRepresentativeSignature));
+  out.push(line("Signed at", when(p2.metadata?.submittedAt ?? o.created_at)));
+  out.push(``);
+  out.push(`## Acknowledgments ticked`);
+  out.push(`Each box below was ticked by the client, in these words, at ${when(p2.metadata?.submittedAt ?? o.created_at)}.`);
+  for (const t of ticked(p2)) out.push(`- ${t.text}`);
+  out.push(``);
+  out.push(`## Submission record`);
+  out.push(line("Submitted at", when(p2.metadata?.submittedAt ?? o.created_at)));
+  out.push(line("From IP address", o.submitted_ip || p2.metadata?.ipAddress || "not recorded"));
+  out.push(line("Browser", o.submitted_user_agent || p2.metadata?.userAgent || "not recorded"));
+  out.push(line("Form version", p2.metadata?.formVersion));
+  return out.join("\n\n");
+}
+async function loadSummaryRow(orderId) {
+  const db = await getDb();
+  const rows = await db.query(
+    `SELECT id, llc_name, package, contact_name, contact_email, payload, service_fee_cents, state_fees_cents, total_cents,
+            status, square_order_id, square_payment_id, created_at, paid_at, line_items, submitted_ip, submitted_user_agent
+       FROM orders WHERE id = $1`,
+    [orderId]
+  );
+  return rows[0] ?? null;
+}
+async function writeOrderSummary(orderId) {
+  const o = await loadSummaryRow(orderId);
+  if (!o) return;
+  const markdown = summaryMarkdown(o);
+  const pdf = await renderMarkdownPdf({ markdown, watermark: null, title: `Order Summary \u2014 ${o.llc_name}` });
+  const stored = await putFile(`order-summary-${o.id}.pdf`, pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength), "application/pdf");
+  const db = await getDb();
+  await db.query("UPDATE orders SET summary_storage_key = $1, summary_markdown = $2 WHERE id = $3", [stored.storageKey, markdown, o.id]);
+}
+
 // server/routes-payments.ts
 var orderingEnabled = () => env.isProd ? Boolean(env.DATABASE_URL && env.SQUARE_ACCESS_TOKEN) : true;
 async function fulfillPaidOrder(orderId, squarePaymentId) {
@@ -108016,6 +108259,7 @@ async function fulfillPaidOrder(orderId, squarePaymentId) {
     clientId = created[0].id;
   }
   await db.query("UPDATE orders SET client_id = $1 WHERE id = $2", [clientId, orderId]);
+  await writeOrderSummary(orderId).catch((e) => console.error("[fulfill] summary rewrite failed:", e));
   const payload = typeof order2.payload === "string" ? JSON.parse(order2.payload) : order2.payload;
   if (payload?.optionalDocuments?.ein) {
     await db.query(
@@ -108199,6 +108443,8 @@ function registerPaymentRoutes(app2) {
       );
     }
     const payload = buildPayload(data);
+    payload.metadata.ipAddress = clientIp(c);
+    payload.metadata.userAgent = c.req.header("user-agent") ?? payload.metadata.userAgent ?? "";
     const priced = priceOrder({
       isConversion: data.filingPath === "CONVERT",
       seriesCount: data.series.length,
@@ -108215,8 +108461,8 @@ function registerPaymentRoutes(app2) {
     const llcName = (payload.filingPath === "CONVERT" ? payload.existingLlcName : "") || payload.llcName.finalName || payload.llcName.desiredName || "Unnamed LLC";
     const db = await getDb();
     const rows = await db.query(
-      `INSERT INTO orders (contact_name, contact_email, package, llc_name, payload, service_fee_cents, state_fees_cents, total_cents)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
+      `INSERT INTO orders (contact_name, contact_email, package, llc_name, payload, service_fee_cents, state_fees_cents, total_cents, line_items, submitted_ip, submitted_user_agent)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id`,
       [
         // The CLIENT owns the order: portal account, welcome email, and the
         // admin's "Client:" line all come from the up-front card, not from the
@@ -108228,7 +108474,10 @@ function registerPaymentRoutes(app2) {
         JSON.stringify(payload),
         priced.serviceFeeCents,
         priced.stateFeesCents,
-        priced.totalCents
+        priced.totalCents,
+        JSON.stringify(priced.lineItems),
+        payload.metadata.ipAddress,
+        payload.metadata.userAgent
       ]
     );
     const orderId = rows[0].id;
@@ -108242,6 +108491,7 @@ function registerPaymentRoutes(app2) {
       checkout.squareOrderId,
       orderId
     ]);
+    await writeOrderSummary(orderId).catch((e) => console.error("[orders] summary failed:", e));
     return c.json({ data: { orderId, checkoutUrl: checkout.url, totalCents: priced.totalCents } });
   });
   app2.get("/orders/:id/status", async (c) => {
@@ -109813,13 +110063,43 @@ function registerAdminRoutes(app2) {
                FROM orders o
               WHERE o.client_id = cl.id AND o.status <> 'pending_payment'
                 AND o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_llcs,
-            (SELECT COALESCE(jsonb_agg(jsonb_build_object('id', o.id, 'llc_name', o.llc_name, 'contact_name', o.contact_name) ORDER BY o.paid_at DESC), '[]'::jsonb)
+            (SELECT COALESCE(jsonb_agg(jsonb_build_object('id', o.id, 'llc_name', o.llc_name, 'contact_name', o.contact_name, 'has_summary', o.summary_storage_key IS NOT NULL) ORDER BY o.paid_at DESC), '[]'::jsonb)
                FROM orders o
               WHERE o.client_id = cl.id AND o.paid_at IS NOT NULL) AS companies
      FROM clients cl LEFT JOIN documents d ON d.client_id = cl.id
      GROUP BY cl.id ORDER BY cl.created_at DESC`
     );
     return c.json({ data: rows });
+  });
+  app2.get("/admin/orders/:id/summary.pdf", async (c) => {
+    const admin = await requireAdmin(c);
+    if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+    const db = await getDb();
+    const rows = await db.query(
+      "SELECT summary_storage_key, llc_name FROM orders WHERE id = $1",
+      [c.req.param("id")]
+    );
+    if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+    if (!rows[0].summary_storage_key) return c.json(err("No summary \u2014 placed before summaries existed.", "NO_SUMMARY"), 404);
+    const stream2 = await readFileStream(rows[0].summary_storage_key);
+    const filename = `Order Summary - ${rows[0].llc_name}`.replace(/[^\w.-]+/g, "_");
+    return new Response(stream2, {
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `inline; filename="${filename}.pdf"`,
+        "Cache-Control": "private, no-store"
+      }
+    });
+  });
+  app2.get("/admin/orders/:id/summary.md", async (c) => {
+    const admin = await requireAdmin(c);
+    if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+    const o = await loadSummaryRow(c.req.param("id"));
+    if (!o) return c.json(err("Not found", "NOT_FOUND"), 404);
+    const db = await getDb();
+    const rows = await db.query("SELECT summary_markdown FROM orders WHERE id = $1", [o.id]);
+    if (!rows[0]?.summary_markdown) return c.json(err("No summary \u2014 placed before summaries existed.", "NO_SUMMARY"), 404);
+    return c.text(rows[0].summary_markdown);
   });
   app2.post("/admin/clients/:id/view-as", async (c) => {
     const admin = await requireAdmin(c);
