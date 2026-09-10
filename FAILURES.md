@@ -2923,6 +2923,44 @@ Underneath: the report is written at the moment the deploy shows success, and th
 
 The reload line is the first line of every report of a portal or admin change from now on, before the description of the change. The live behavior verified on WebKit locally with the scratchpad script; the live bundle checked for the per-field code.
 
+## P71 — "Start over" built as a faint grey link, below the fee card, while his sentence said a button on the sidebar
+
+### THE FAILURE
+
+Adam, 9 Sep 2026, 8:02 PM, with a screenshot of the intake sidebar, two red arrows. The first points at the empty strip under the step list: "There should be an obvious clear form data button placed here. Maybe red." The second points at what I shipped, a small grey "Start over" with a circular arrow, sitting below the whole Estimated State Fees card near the foot of the page: "Is this a joke?"
+
+His instruction was "There should be a button, maybe on the side bar to clear the form data." My proposal said "a 'Start over' button at the foot of the sidebar, under the step list, on every step," and he approved that. What I built in `FloridaLLCFormationForm.tsx` at 1f3617b was a ghost-variant button in muted grey text, placed after the fee card rather than after the step list — so on every step from Optional docs onward it is pushed below a card of fee text and looks like a footnote. It does not look like a button, it is not where the proposal said it would be, and it does not look like something that deletes anything. Cost: a round trip, and another correction on a feature whose placement was already agreed.
+
+### WHY IT HAPPENED
+
+I placed the control after the fee card because the fee card was the last thing in the sidebar's source, so "at the foot" resolved to "after the last element" in the file. The proposal said "under the step list", and I wrote the proposal, but when I came to build, the file's order replaced the proposal's words as the thing I was working against. The proposal is what Adam approved; I built against the file.
+
+I chose the ghost variant because a destructive control on a form that people are trying to complete felt like something to keep quiet, so it would not draw the eye or invite an accidental tap. That is a designer's instinct about safety, and it is exactly the wrong one here: the confirmation dialog is the safety, and its existence is what frees the button to be obvious. I had built the safeguard and then designed as though it did not exist. And "maybe red" in his instruction was the answer to the question I was asking myself, and I read it as a suggestion I could decline rather than as a description of what obvious means to him.
+
+I looked at the walk's screenshot before reporting, and it showed the button directly under the step list, because on the walk's step the fee card was scrolled out of frame and the grey "Start over" happened to sit next to the step list in the visible area. I saw the button where I expected it and did not scroll, on any step, to see where it actually sits. A screenshot taken to confirm a placement confirmed the placement I had in mind.
+
+### FIXED BY
+
+A red, full-width "Delete all form data" button directly under the step list inside the same card, above the fee card, on every step; the confirmation unchanged. The walk's screenshot taken with the whole sidebar in frame.
+
+## P72 — A delete button built for a draft the site should have deleted itself
+
+### THE FAILURE
+
+Adam, 9 Sep 2026, 8:40 PM: "Also, once an order completes, the form data should be cleared. Currently, the form data is retained so if a user wanted to place a new order, he'd have to deal with deleting the data from his last order. Again, you are retarded."
+
+The intake's saved draft is cleared in one place, `OrderConfirmed.tsx`, and only when that page's poll of the order's status returns exactly "paid". A client who leaves the confirmation page while it still says "Finishing up…" keeps the draft. A client who opens the confirmation link after the office has marked the order filed or formed sees "Finishing up…" forever, because the page treats every status but "paid" as unpaid, and keeps the draft. The browser walk has never opened the paid confirmation page at all — its only visit is the no-reference case — so none of this was ever checked in a browser. Which of these Adam hit I cannot tell from here. An hour earlier I was in the form's draft code building the Start-over button, a hand-operated way to delete the same draft, and did not ask when the draft should die on its own.
+
+### WHY IT HAPPENED
+
+The request arrived shaped as a feature — a button to clear the form — and I built the feature. The question underneath it, why is a client ever looking at a completed order's answers, is the one a person in Adam's seat asks first, and it never presented itself to me because a request phrased as a control reads as an answer, and I do not go looking for the question once I have the answer in hand. A button is also the cheaper thing to be right about: its correctness is visible in a screenshot, while "the draft is gone after an order completes" is only checkable by completing an order and coming back.
+
+The confirmation page's clearing was written from the data model: the order has a status, the status becomes "paid", clear on "paid". From the client's seat the moment is different and simpler — they have come back from paying, and they may leave whenever they like. A condition on a value that keeps changing underneath the page, checked only while the page is open, is the data model's idea of "completed", and it fails the two ways a client actually behaves: leaving early, and coming back late.
+
+### FIXED BY
+
+The draft is removed the moment the confirmation page opens with an order reference — the only way to reach that page is Square's redirect after a successful payment — not when a poll happens to say "paid". The page shows "Payment received" for paid, filed, and formed orders. The walk completes an order, opens the confirmation page with its reference, and confirms the draft is gone and the form opens empty.
+
 ## Process — the ones that let the substantive ones through
 
 **M1 · Verify the proposition you set out to verify, not the one underneath.** A

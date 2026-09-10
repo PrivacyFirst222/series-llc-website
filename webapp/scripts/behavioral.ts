@@ -1563,10 +1563,64 @@ async function main(): Promise<void> {
     }
   }
 
-  // "Start over" on the intake (Adam, 9 Sep 2026): a confirmation that names
-  // what is deleted; Cancel keeps everything; proceeding empties the form and
-  // the browser's saved draft.
-  console.log("\n▶ Start-over journey (intake)");
+  // Once an order completes, the form data is cleared (Adam, 9 Sep 2026).
+  // A draft is typed in a fresh browser, the confirmation page is opened with
+  // run A's paid order, and the form must come back empty — also after the
+  // office marks the order filed, the confirmation page still says paid.
+  if (orderIds.has("A")) {
+    console.log("\n▶ Completed-order journey (draft cleared)");
+    const page = await browser.newPage();
+    try {
+      const aId = orderIds.get("A")!;
+      await page.route("**/api/**", async (route) => {
+        const url = new URL(route.request().url());
+        const resp = await fetch(`${API}${url.pathname}${url.search}`, { method: route.request().method(), headers: { "Content-Type": "application/json" }, body: route.request().postDataBuffer() ?? undefined });
+        await route.fulfill({ status: resp.status, contentType: "application/json", body: await resp.text() });
+      });
+      await page.goto(`http://localhost:${WEB_PORT}/form-llc?path=new`);
+      await page.evaluate(() => localStorage.clear());
+      await page.goto(`http://localhost:${WEB_PORT}/form-llc?path=new`);
+      await page.waitForSelector("main h2");
+      await clickCard(page, "Domestic Florida LLC");
+      await checkAllBoxes(page);
+      await advance(page);
+      await fill(page, "First name", "Casey");
+      await fill(page, "Last name", "Completed");
+      await page.waitForTimeout(500);
+      const before = await page.evaluate(() => (localStorage.getItem("fl-llc-formation-draft-v1") ?? "").includes("Completed"));
+      expect(before, "completed order: the draft holds the typed name before the order confirms");
+      await page.goto(`http://localhost:${WEB_PORT}/order/confirmed?ref=${aId}`);
+      await page.waitForSelector("main h1");
+      for (let i = 0; i < 20 && !/Payment received/.test(await page.locator("main h1").innerText()); i++) await page.waitForTimeout(500);
+      expect(/Payment received/.test(await page.locator("main h1").innerText()), "completed order: the confirmation page says payment received", await page.locator("main h1").innerText());
+      const after = await page.evaluate(() => localStorage.getItem("fl-llc-formation-draft-v1"));
+      expect(after === null, "completed order: the saved draft is gone once the confirmation page opens", after?.slice(0, 80));
+      await page.goto(`http://localhost:${WEB_PORT}/form-llc?path=new`);
+      await page.waitForSelector("main h2");
+      expect((await stepHeading(page)).includes("Eligibility"), "completed order: the form opens at its first step afterward", await stepHeading(page));
+      await clickCard(page, "Domestic Florida LLC");
+      await checkAllBoxes(page);
+      await advance(page);
+      expect((await page.getByLabel("First name", { exact: false }).first().inputValue()) === "", "completed order: the name box is empty afterward");
+      // The office files the order; the confirmation link still says paid.
+      const filed = await fetch(`${API}/api/admin/orders/${aId}/filed`, { method: "POST", headers: { Cookie: adminCookie } });
+      expect(filed.ok, "completed order: the office can mark run A filed", filed.status);
+      await page.goto(`http://localhost:${WEB_PORT}/order/confirmed?ref=${aId}`);
+      await page.waitForSelector("main h1");
+      for (let i = 0; i < 20 && !/Payment received/.test(await page.locator("main h1").innerText()); i++) await page.waitForTimeout(500);
+      expect(/Payment received/.test(await page.locator("main h1").innerText()), "completed order: a filed order's confirmation link still says payment received", await page.locator("main h1").innerText());
+      await shot(page, "order-confirmed-filed");
+    } catch (e) {
+      expect(false, `completed-order journey: ${String(e).slice(0, 300)}`);
+    } finally {
+      await page.close();
+    }
+  }
+
+  // "Clear form data" on the intake (Adam, 9 Sep 2026): a red button directly
+  // under the step list; a confirmation that names what is deleted; Cancel
+  // keeps everything; proceeding empties the form and the browser's saved draft.
+  console.log("\n▶ Clear-form-data journey (intake)");
   {
     const page = await browser.newPage();
     try {
@@ -1580,25 +1634,44 @@ async function main(): Promise<void> {
       await fill(page, "First name", "Casey");
       await fill(page, "Last name", "Restart");
       await page.waitForTimeout(400);
-      await page.locator('[data-testid="start-over"]').click();
+      const clearBtn = page.locator('[data-testid="start-over"]');
+      expect(/Clear form data/.test(await clearBtn.innerText()), "clear form: the button says Clear form data", await clearBtn.innerText());
+      const placement = await page.evaluate(() => {
+        const btn = document.querySelector('[data-testid="start-over"]') as HTMLElement;
+        const list = btn.closest("aside")?.querySelector("ol") as HTMLElement | null;
+        const bg = getComputedStyle(btn).backgroundColor;
+        return { sameCard: !!list && btn.parentElement === list.parentElement, belowList: !!list && btn.getBoundingClientRect().top >= list.getBoundingClientRect().bottom, bg };
+      });
+      expect(placement.sameCard && placement.belowList, "clear form: the button sits in the step-list card, directly under the list", placement);
+      const [r, g, b] = (placement.bg.match(/\d+/g) ?? []).map(Number);
+      expect(r > 150 && g < 100 && b < 100, "clear form: the button is red", placement.bg);
+      // The Correspondence step, where the fee card also shows: the whole
+      // sidebar in one frame.
+      await page.locator("aside ol button").filter({ hasText: /Correspondence/ }).first().click();
+      await page.waitForTimeout(500);
+      if (SHOT_DIR) await page.screenshot({ path: `${SHOT_DIR}/intake-clear-form-data-sidebar.png`, fullPage: true });
+      await clearBtn.click();
       await page.waitForTimeout(400);
       const dialog = page.locator('[role="alertdialog"]').first();
-      expect(/delete everything you have entered on this form/i.test(await dialog.innerText()), "start over: the warning says everything on the form will be deleted", await dialog.innerText());
+      expect(/delete everything you have entered on this form/i.test(await dialog.innerText()), "clear form: the warning says everything on the form will be deleted", await dialog.innerText());
+      await shot(page, "intake-clear-form-data");
       await dialog.locator("button").filter({ hasText: /^Cancel$/ }).first().click();
       await page.waitForTimeout(400);
-      expect((await page.getByLabel("First name", { exact: false }).first().inputValue()) === "Casey", "start over: Cancel keeps every answer");
-      await page.locator('[data-testid="start-over"]').click();
+      const kept = await page.evaluate(() => (localStorage.getItem("fl-llc-formation-draft-v1") ?? "").includes("Restart"));
+      expect(kept, "clear form: Cancel keeps every answer");
+      await clearBtn.click();
       await page.waitForTimeout(400);
-      await shot(page, "intake-start-over");
       await page.locator('[role="alertdialog"]').first().locator("button").filter({ hasText: /Delete and start over/ }).first().click();
       await page.waitForTimeout(800);
-      expect((await stepHeading(page)).includes("Eligibility"), "start over: the form returns to its first step", await stepHeading(page));
+      expect((await stepHeading(page)).includes("Eligibility"), "clear form: the form returns to its first step", await stepHeading(page));
       const draft = await page.evaluate(() => { const raw = localStorage.getItem("fl-llc-formation-draft-v1"); return raw ? (JSON.parse(raw) as { data?: { clientFirstName?: string } }).data?.clientFirstName ?? "" : null; });
-      expect(!draft, "start over: the saved draft no longer holds the typed name", draft);
-      await advance(page).catch(() => {});
-      expect((await page.getByLabel("First name", { exact: false }).first().inputValue().catch(() => "")) === "", "start over: the name box is empty afterward");
+      expect(!draft, "clear form: the saved draft no longer holds the typed name", draft);
+      await clickCard(page, "Domestic Florida LLC");
+      await checkAllBoxes(page);
+      await advance(page);
+      expect((await page.getByLabel("First name", { exact: false }).first().inputValue()) === "", "clear form: the name box is empty afterward");
     } catch (e) {
-      expect(false, `start-over journey: ${String(e).slice(0, 300)}`);
+      expect(false, `clear-form-data journey: ${String(e).slice(0, 300)}`);
     } finally {
       await page.close();
     }

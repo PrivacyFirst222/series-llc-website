@@ -50,17 +50,23 @@ export default function OrderConfirmed() {
     refetchInterval: (query) => (query.state.data?.status === "paid" ? false : 4000),
   });
 
-  const paid = statusQuery.data?.status === "paid";
+  // The pipeline runs paid -> filed -> formed (server/db.ts). A client opening
+  // this link after the office has filed is still a paid client.
+  const paid = ["paid", "filed", "formed"].includes(statusQuery.data?.status ?? "");
 
+  // The intake's saved draft dies the moment this page opens with an order
+  // reference: the only way here is Square's redirect after a successful
+  // payment, and the client may leave before any poll answers (Adam, 9 Sep
+  // 2026: "once an order completes, the form data should be cleared").
   useEffect(() => {
-    if (paid) {
+    if (ref) {
       try {
         localStorage.removeItem(DRAFT_KEY);
       } catch {
         // ignore
       }
     }
-  }, [paid]);
+  }, [ref]);
 
   return (
     <section className="container-wide section-y">

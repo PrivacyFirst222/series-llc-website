@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { ArrowLeft, ArrowRight, Check, RotateCcw, Save } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "@/components/ui/use-toast";
@@ -140,6 +140,11 @@ export function FloridaLLCFormationForm({
   // browser, so there is a way to wipe them — behind a confirmation that says
   // what will be deleted and offers proceed or cancel.
   const [confirmStartOver, setConfirmStartOver] = useState<boolean>(false);
+  // Set once the order is accepted and the browser is leaving for checkout:
+  // from then on nothing re-saves the draft on the way out. The confirmation
+  // page removes it (Adam, 9 Sep 2026: "once an order completes, the form
+  // data should be cleared").
+  const leavingForCheckout = useRef<boolean>(false);
   const startOver = () => {
     try { localStorage.removeItem(STORAGE_KEY); } catch { /* nothing saved */ }
     setData(PATH_PRESET ? { ...defaultFormData, filingPath: PATH_PRESET } : defaultFormData);
@@ -175,6 +180,7 @@ export function FloridaLLCFormationForm({
 
   // Auto-save draft (answers + position)
   useEffect(() => {
+    if (leavingForCheckout.current) return;
     try {
       const draft: StoredDraft = {
         __draft: 2,
@@ -433,6 +439,7 @@ export function FloridaLLCFormationForm({
         { ...data, members: data.members.filter((m) => !memberRowIsBlank(m as unknown as Record<string, unknown>)) },
       );
       onSubmit?.(data);
+      leavingForCheckout.current = true;
       window.location.assign(checkoutUrl);
     } catch (err) {
       console.error("Intake submission failed:", err);
@@ -527,7 +534,8 @@ export function FloridaLLCFormationForm({
             </div>
           </div>
 
-          <ol className="hidden lg:block rounded-2xl border border-border bg-card p-3 space-y-1">
+          <div className="rounded-2xl border border-border bg-card p-3">
+          <ol className="hidden lg:block space-y-1">
             {STEPS.map(({ key, label }, i) => {
               if (stepHidden(i)) return null;
               const displayNumber = STEPS.slice(0, i + 1).filter((_, j) => !stepHidden(j)).length;
@@ -577,6 +585,20 @@ export function FloridaLLCFormationForm({
               );
             })}
           </ol>
+          {/* Adam, 9 Sep 2026: "an obvious clear form data button placed
+              here. Maybe red." Directly under the step list, on every step;
+              the confirmation below is the safeguard. */}
+          <Button
+            type="button"
+            variant="destructive"
+            onClick={() => setConfirmStartOver(true)}
+            className="w-full rounded-full lg:mt-3"
+            data-testid="start-over"
+          >
+            <Trash2 className="mr-1.5 h-4 w-4" />
+            Clear form data
+          </Button>
+          </div>
 
           {stepIndex >= 4 ? (
             <FeeEstimate
@@ -588,16 +610,6 @@ export function FloridaLLCFormationForm({
             />
           ) : null}
 
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => setConfirmStartOver(true)}
-            className="w-full justify-start rounded-full text-muted-foreground"
-            data-testid="start-over"
-          >
-            <RotateCcw className="mr-1.5 h-4 w-4" />
-            Start over
-          </Button>
           <AlertDialog open={confirmStartOver} onOpenChange={setConfirmStartOver}>
             <AlertDialogContent>
               <AlertDialogHeader>
