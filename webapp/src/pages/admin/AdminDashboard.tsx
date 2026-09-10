@@ -372,7 +372,10 @@ function ClientsTable({
                 <td className="px-4 py-3">{cl.document_count}</td>
                 <td className="px-4 py-3 text-muted-foreground">{day(cl.created_at)}</td>
                 <td className="px-4 py-3 text-right">
-                  <div className="flex justify-end gap-2">
+                  {/* Four buttons no longer fit on one line at every width;
+                      they wrap inside the cell instead of running off the
+                      card's edge (Adam, 10 Sep 2026). */}
+                  <div className="flex max-w-[340px] flex-wrap justify-end gap-2" data-testid="client-actions">
                     <OrderSummaryButton client={cl} />
                     <ViewPortalButton client={cl} />
                     <ChangeEmailDialog client={cl} />

@@ -1714,6 +1714,12 @@ async function main(): Promise<void> {
       const row = page.locator("main tr").filter({ hasText: "gate-oa@e2e.test" }).first();
       const companies = await row.locator('[data-testid="client-companies"]').innerText();
       expect(/Gate Run Alpha/.test(companies), "clients tab: the Companies column lists the account's paid company", companies);
+      // Every action button sits inside the card, none clipped (Adam, 10 Sep 2026).
+      const clipped = await row.locator('[data-testid="client-actions"] button, [data-testid="client-actions"] a').evaluateAll((els) => {
+        const card = els[0]?.closest("table")?.parentElement?.getBoundingClientRect();
+        return els.map((el) => { const r = el.getBoundingClientRect(); return card ? r.right <= card.right + 1 && r.left >= card.left - 1 : false; });
+      });
+      expect(clipped.length >= 4 && clipped.every(Boolean), "clients tab: every action button is inside the card, none cut off", clipped);
       await shot(page, "admin-clients-companies");
       // The Order Summary (Adam, 10 Sep 2026): one company opens its PDF at
       // once; the office reads it as it was when the order was placed.
