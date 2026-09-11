@@ -106503,6 +106503,7 @@ var SPOUSAL_FORM_LABEL = {
   TBE: "tenants by the entirety",
   JTWROS: "joint tenants with right of survivorship"
 };
+var OA_KEEP_MAX = 5;
 function personLegalName(first, last2, suffix) {
   const base = [first, last2].map((s) => (s ?? "").trim()).filter(Boolean).join(" ");
   const sfx = (suffix ?? "").trim().replace(/^,\s*/, "");
@@ -107161,6 +107162,13 @@ function registerPortalRoutes(app2) {
     if (!a2.effectiveDate) return c.json(err("An effective date is required.", "INVALID_INPUT"), 400);
     if (!a2.firstOrAmended) return c.json(err("Choose first agreement or amended and restated.", "INVALID_INPUT"), 400);
     const db = await getDb();
+    const kept = await db.query(
+      "SELECT count(*) AS n FROM oa_generations WHERE client_id = $1 AND (order_id = $2 OR order_id IS NULL)",
+      [session.clientId, seed.orderId]
+    );
+    if (Number(kept[0]?.n ?? 0) >= OA_KEEP_MAX) {
+      return c.json(err(`This company already has ${OA_KEEP_MAX} operating agreements on file. Delete one from your documents to generate another.`, "AGREEMENT_CAP"), 400);
+    }
     const priorGens = await db.query(
       "SELECT created_at FROM oa_generations WHERE client_id = $1 ORDER BY created_at DESC LIMIT 1",
       [session.clientId]

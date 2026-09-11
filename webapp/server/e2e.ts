@@ -1343,21 +1343,6 @@ if (mint.status === 200) {
   check("generation history now has 1 entry", (oaAfterDel.body?.data?.generations ?? []).length === 1);
   const goneDoc = await fetch(`${BASE}/api/portal/documents/${oldest.document_id}/download`, { headers: { Cookie: setPw.cookie } });
   check("the deleted draft's PDF is gone", goneDoc.status === 404, { status: goneDoc.status });
-  // The company cannot allocate more to its series than its owners contributed
-  // (Adam, 10 Sep 2026); words instead of figures are not judged. The one
-  // agreement this makes is deleted again so the history counts below hold.
-  {
-    const seedSeries = (oaSeed.body?.data?.seed?.series ?? []) as { name: string }[];
-    const allocTo = (amount: string) => seedSeries.map((_, i) => ({ contribution: i === 0 ? amount : "" }));
-    const over = await api("/api/portal/oa/generate", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ ...oaAnswers, contributionToCompany: "$1,000 cash", series: allocTo("$5,000") }) });
-    check("allocating more than was contributed is refused", over.status === 400 && over.body?.error?.code === "OVER_ALLOCATED", over.body);
-    const words = await api("/api/portal/oa/generate", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ ...oaAnswers, contributionToCompany: "the Main Street property", series: allocTo("$5,000") }) });
-    check("a contribution described in words is not measured against allocations", words.status === 200, words.body);
-    if (words.body?.data?.generationId) await api(`/api/portal/oa/generations/${words.body.data.generationId}`, { method: "DELETE", cookies: setPw.cookie });
-    const withRoom = await api("/api/portal/oa/generate", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ ...oaAnswers, contributionToCompany: "$1,000 cash", series: allocTo("$400") }) });
-    check("an allocation within the contribution is accepted", withRoom.status === 200, withRoom.body);
-    if (withRoom.body?.data?.generationId) await api(`/api/portal/oa/generations/${withRoom.body.data.generationId}`, { method: "DELETE", cookies: setPw.cookie });
-  }
 
   // 13c-2. Sole owner on the S corporation form (option defaults applied server-side)
   const genS = await api("/api/portal/oa/generate", {
@@ -2035,6 +2020,34 @@ if (mint.status === 200) {
   });
   check("member-managed S corp agreement generates", mmSGen.status === 200, mmSGen.body);
   check("...and the member-s master once the S election is on", mmSGen.body?.data?.version === "member-s", mmSGen.body?.data);
+  // The company cannot allocate more to its series than its owners contributed
+  // (Adam, 10 Sep 2026); words instead of figures are not judged. Then five
+  // agreements per company (11 Sep 2026): the sixth is refused until one is
+  // deleted. This client's generation budget (ten an hour) covers it all;
+  // everything made here is deleted again.
+  {
+    const countNow = async () => ((await api("/api/portal/oa", { cookies: mmPw.cookie })).body?.data?.generations ?? []).length as number;
+    const over = await api("/api/portal/oa/generate", { method: "POST", cookies: mmPw.cookie, body: JSON.stringify({ ...mmAnswers, series: [{ contribution: "$5,000" }] }) });
+    check("allocating more than was contributed is refused", over.status === 400 && over.body?.error?.code === "OVER_ALLOCATED", over.body);
+    const words = await api("/api/portal/oa/generate", { method: "POST", cookies: mmPw.cookie, body: JSON.stringify({ ...mmAnswers, members: [{ percentage: 50, contribution: "the Main Street property" }, { percentage: 50, contribution: "$500 cash" }], series: [{ contribution: "$5,000" }] }) });
+    check("a contribution described in words is not measured against allocations", words.status === 200, words.body);
+    if (words.body?.data?.generationId) await api(`/api/portal/oa/generations/${words.body.data.generationId}`, { method: "DELETE", cookies: mmPw.cookie });
+    const made: string[] = [];
+    while ((await countNow()) < 5) {
+      const g = await api("/api/portal/oa/generate", { method: "POST", cookies: mmPw.cookie, body: JSON.stringify(mmAnswers) });
+      if (g.status !== 200) break;
+      made.push(g.body?.data?.generationId as string);
+    }
+    check("five agreements can be kept for a company", (await countNow()) === 5, await countNow());
+    const sixth = await api("/api/portal/oa/generate", { method: "POST", cookies: mmPw.cookie, body: JSON.stringify(mmAnswers) });
+    check("a sixth agreement is refused until one is deleted", sixth.status === 400 && sixth.body?.error?.code === "AGREEMENT_CAP", sixth.body);
+    const victim = made.pop();
+    if (victim) await api(`/api/portal/oa/generations/${victim}`, { method: "DELETE", cookies: mmPw.cookie });
+    const again = await api("/api/portal/oa/generate", { method: "POST", cookies: mmPw.cookie, body: JSON.stringify(mmAnswers) });
+    check("after deleting one, the next agreement goes through", again.status === 200, again.body);
+    if (again.body?.data?.generationId) made.push(again.body.data.generationId as string);
+    for (const id of made) await api(`/api/portal/oa/generations/${id}`, { method: "DELETE", cookies: mmPw.cookie });
+  }
 }
 
 // 16b. Manager-managed SOLE owner — the two forms nothing else exercised.

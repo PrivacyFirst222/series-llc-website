@@ -257,6 +257,9 @@ export const SPOUSAL_FORM_LABEL: Record<"TBE" | "JTWROS", string> = {
 /** A person's printed legal name, suffix set off by a comma — the form's
  *  fullPersonName, server-side. Exhibit A and the signature blocks print
  *  this verbatim, so "John Smith, Jr." must survive the whole path. */
+/** Operating agreements a company may keep in its documents list. */
+export const OA_KEEP_MAX = 5;
+
 export function personLegalName(first?: string, last?: string, suffix?: string): string {
   const base = [first, last].map((s) => (s ?? "").trim()).filter(Boolean).join(" ");
   const sfx = (suffix ?? "").trim().replace(/^,\s*/, "");
@@ -1142,6 +1145,15 @@ app.post("/portal/oa/generate", async (c) => {
   if (!a.firstOrAmended) return c.json(err("Choose first agreement or amended and restated.", "INVALID_INPUT"), 400);
 
   const db = await getDb();
+  // Five agreements per company, and the client chooses which go (Adam,
+  // 11 Sep 2026): the sixth is refused until one is deleted.
+  const kept = await db.query<{ n: string }>(
+    "SELECT count(*) AS n FROM oa_generations WHERE client_id = $1 AND (order_id = $2 OR order_id IS NULL)",
+    [session.clientId, seed.orderId],
+  );
+  if (Number(kept[0]?.n ?? 0) >= OA_KEEP_MAX) {
+    return c.json(err(`This company already has ${OA_KEEP_MAX} operating agreements on file. Delete one from your documents to generate another.`, "AGREEMENT_CAP"), 400);
+  }
   const priorGens = await db.query<{ created_at: unknown }>(
     "SELECT created_at FROM oa_generations WHERE client_id = $1 ORDER BY created_at DESC LIMIT 1",
     [session.clientId],

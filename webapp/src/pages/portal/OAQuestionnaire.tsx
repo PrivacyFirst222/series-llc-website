@@ -181,6 +181,8 @@ export default function OAQuestionnaire() {
     patch({ couples });
   };
 
+  // Five agreements per company (Adam, 11 Sep 2026); the server refuses the same.
+  const atCap = (data?.generations?.length ?? 0) >= 5;
   const addOwner = () => patch({ members: [...(a.members ?? []), { name: "", address: "" }] });
   // A suggested owner fills the first blank row, or a new one (Adam, 10 Sep 2026).
   const addOwnerWith = (s: { name: string; address: string }) => {
@@ -700,10 +702,16 @@ export default function OAQuestionnaire() {
                 </p>
               ) : null}
               {error ? <p className="mt-3 text-sm text-destructive">{error}</p> : null}
+              {atCap ? (
+                <p className="mt-3 rounded-lg border border-amber-300/60 bg-amber-50 p-3 text-sm text-amber-900" data-testid="agreement-cap">
+                  This company already has five operating agreements on file. Delete one from your
+                  documents to generate another.
+                </p>
+              ) : null}
               <Button
                 className="mt-4 w-full rounded-full"
                 size="lg"
-                disabled={generate.isPending || a.authorized !== true || ownerCountMismatch !== "" || incompleteOwner}
+                disabled={generate.isPending || a.authorized !== true || ownerCountMismatch !== "" || incompleteOwner || atCap}
                 onClick={() => generate.mutate(a)}
               >
                 <FileText className="mr-2 h-4 w-4" />
