@@ -1228,6 +1228,14 @@ if (mint.status === 200) {
   // 13c. Operating agreement: seed, answers, generate, regenerate as A&R
   const oaSeed = await api("/api/portal/oa", { cookies: setPw.cookie });
   check("OA seed loads with LLC + member", oaSeed.status === 200 && oaSeed.body?.data?.seed?.members?.length === 1, oaSeed.body?.data?.seed);
+  // Suggested owners (Adam, 10 Sep 2026): the client who placed the order and
+  // every Manager, each with an address, none duplicating another.
+  {
+    const s = (oaSeed.body?.data?.seed?.suggestedOwners ?? []) as { name: string; address: string }[];
+    check("the seed offers the client as a suggested owner, with an address",
+      s.some((o) => o.name === "Casey Member, Jr." && /100 Ocean Drive/.test(o.address)), s);
+    check("suggested owners carry no duplicates", new Set(s.map((o) => o.name.toLowerCase())).size === s.length, s);
+  }
   check("OA seed includes portal-added series", (oaSeed.body?.data?.seed?.series ?? []).some((sr: { name: string }) => sr.name.endsWith("PS 9")), oaSeed.body?.data?.seed?.series);
   const oaAnswers = {
     firstOrAmended: "first",
@@ -1636,10 +1644,12 @@ if (mint.status === 200) {
     check("couple order marked formed", formed2.ok, await formed2.clone().json().catch(() => null));
   }
   const mSeed = await api("/api/portal/oa", { cookies: mPw.cookie });
+  // A manager-managed company gives no owners at intake; its first owner
+  // now starts as the client who placed the order (Adam, 10 Sep 2026).
   check(
-    "manager-managed couple seed starts with no owners",
-    (mSeed.body?.data?.seed?.members?.length ?? 0) === 0,
-    mSeed.body?.data,
+    "manager-managed couple seed starts with the client as its one owner",
+    (mSeed.body?.data?.seed?.members?.length ?? 0) === 1 && mSeed.body?.data?.seed?.members?.[0]?.name === "Casey Member, Jr.",
+    mSeed.body?.data?.seed?.members,
   );
   const coupleAnswers = {
     firstOrAmended: "first",
@@ -2085,9 +2095,9 @@ if (mint.status === 200) {
   check("manager-managed sole owner signs in", smPw.status === 200, smPw.body);
   const smSeed = await api("/api/portal/oa", { cookies: smPw.cookie });
   check(
-    "manager-managed seed starts with no owners and is not member-managed",
-    smSeed.body?.data?.memberManaged === false && (smSeed.body?.data?.seed?.members?.length ?? 0) === 0,
-    smSeed.body?.data,
+    "manager-managed seed starts with the client as its one owner and is not member-managed",
+    smSeed.body?.data?.memberManaged === false && (smSeed.body?.data?.seed?.members?.length ?? 0) === 1 && smSeed.body?.data?.seed?.members?.[0]?.name === "Alex Vale, Jr." && /100 Ocean Drive/.test(smSeed.body?.data?.seed?.members?.[0]?.address ?? ""),
+    smSeed.body?.data?.seed?.members,
   );
 
   const smAnswers = {

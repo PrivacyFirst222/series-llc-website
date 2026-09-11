@@ -106319,10 +106319,21 @@ async function oaSeed(clientId, orderId) {
   const p2 = typeof orders[0].payload === "string" ? JSON.parse(orders[0].payload) : orders[0].payload;
   const addr2 = p2.principalOfficeAddress ?? {};
   const principalAddress = [addr2.address1, addr2.address2, [addr2.city, addr2.state].filter(Boolean).join(", "), addr2.zip].filter((x2) => x2 && String(x2).trim()).join(", ");
-  const members = (p2.members?.memberList ?? []).map((m2) => ({
+  const joinAddr = (a2) => [a2?.address1, a2?.address2, [a2?.city, a2?.state].filter(Boolean).join(", "), a2?.zip].filter((x2) => x2 && String(x2).trim()).join(", ");
+  let members = (p2.members?.memberList ?? []).map((m2) => ({
     name: personLegalName(m2.firstName, m2.lastName, m2.suffix) || (m2.fullLegalName ?? ""),
-    address: [m2.address1, m2.address2, [m2.city, m2.state].filter(Boolean).join(", "), m2.zip].filter((x2) => x2 && String(x2).trim()).join(", ")
+    address: joinAddr(m2)
   }));
+  const clientOwner = (p2.client?.name ?? "").trim() ? { name: (p2.client?.name ?? "").trim(), address: joinAddr(p2.client?.address) } : null;
+  const managerOwners = (p2.management?.managersOrAuthorizedRepresentatives ?? []).filter((e) => (e.role ?? "MGR") === "MGR").map((e) => ({
+    name: (personLegalName(e.firstName, e.lastName, e.suffix) || e.fullName || e.businessEntityName || "").trim(),
+    address: joinAddr({ address1: e.streetAddress1, address2: e.streetAddress2, city: e.city, state: e.state, zip: e.zip })
+  })).filter((o) => o.name);
+  const suggestedOwners = [];
+  for (const o of [...clientOwner ? [clientOwner] : [], ...managerOwners]) {
+    if (!suggestedOwners.some((s) => s.name.toLowerCase() === o.name.toLowerCase())) suggestedOwners.push(o);
+  }
+  if (members.length === 0 && clientOwner) members = [clientOwner];
   const managementStructure = p2.management?.structure ?? "";
   const managerNames = (p2.management?.managersOrAuthorizedRepresentatives ?? []).filter((e) => (e.role ?? "MGR") === "MGR").map(
     (e) => (personLegalName(e.firstName, e.lastName, e.suffix) || e.fullName || e.businessEntityName || "").trim()
@@ -106350,6 +106361,7 @@ async function oaSeed(clientId, orderId) {
     formationType: p2.formationType ?? "",
     managementStructure,
     managerNames,
+    suggestedOwners,
     principalAddress,
     members,
     series

@@ -14,14 +14,21 @@ import { AddressAutocomplete } from "@/components/forms/florida-llc/AddressAutoc
 import { FORM_LABEL, type CoupleAnswer, type MemberAnswer, type SeriesAnswer, type Unit } from "./oaTypes";
 import { api } from "@/lib/api";
 
-export function OwnersCard({ owners, isMulti, ownerCountMismatch, patchMember, removeOwner, addOwner }: {
+export function OwnersCard({ owners, isMulti, ownerCountMismatch, patchMember, removeOwner, addOwner, suggestions = [], addOwnerWith }: {
   owners: MemberAnswer[];
   isMulti: boolean;
   ownerCountMismatch: string | null;
   patchMember: (i: number, p: Partial<MemberAnswer>) => void;
   removeOwner: (i: number) => void;
   addOwner: () => void;
+  /** People the order already names, not yet listed as owners. */
+  suggestions?: { name: string; address: string }[];
+  addOwnerWith?: (s: { name: string; address: string }) => void;
 }) {
+  // Suggestions show while another owner can still be added: any time the
+  // company has more than one owner, or while the only row is blank.
+  const noNamedOwner = !owners.some((m) => (m.name ?? "").trim());
+  const showSuggestions = suggestions.length > 0 && !!addOwnerWith && (isMulti || noNamedOwner);
   // The same soft USPS check the wizard runs on Continue, run here when the
   // client leaves an address field (Adam, 1 Sep 2026) — the whole line is
   // what prints in Exhibit A, so a missing city or wrong ZIP prints too.
@@ -162,6 +169,17 @@ export function OwnersCard({ owners, isMulti, ownerCountMismatch, patchMember, r
                   ) : null}
                 </div>
               ))}
+              {showSuggestions ? (
+                <div className="flex flex-wrap items-center gap-2" data-testid="suggested-owners">
+                  <span className="text-xs text-muted-foreground">From your order:</span>
+                  {suggestions.map((s) => (
+                    <Button key={s.name} type="button" variant="outline" size="sm" className="rounded-full" onClick={() => addOwnerWith?.(s)}>
+                      <Plus className="mr-1.5 h-3.5 w-3.5" />
+                      Add {s.name}
+                    </Button>
+                  ))}
+                </div>
+              ) : null}
               {isMulti ? (
                 <Button type="button" variant="outline" size="sm" className="rounded-full" onClick={addOwner}>
                   <Plus className="mr-1.5 h-3.5 w-3.5" />

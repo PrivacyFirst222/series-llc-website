@@ -19,6 +19,7 @@ interface OaSeed {
   filingPath: string;
   managementStructure: string;
   managerNames: string[];
+  suggestedOwners?: { name: string; address: string }[];
   principalAddress: string;
   members: { name: string; address: string }[];
   series: { name: string; purpose: string }[];
@@ -181,6 +182,16 @@ export default function OAQuestionnaire() {
   };
 
   const addOwner = () => patch({ members: [...(a.members ?? []), { name: "", address: "" }] });
+  // A suggested owner fills the first blank row, or a new one (Adam, 10 Sep 2026).
+  const addOwnerWith = (s: { name: string; address: string }) => {
+    const current = a.members ?? [];
+    const blank = current.findIndex((m) => !(m.name ?? "").trim() && !(m.address ?? "").trim());
+    const next = blank >= 0 ? current.map((m, i) => (i === blank ? { ...m, name: s.name, address: s.address } : m)) : [...current, { name: s.name, address: s.address }];
+    patch({ members: next });
+  };
+  const suggestions = (data?.seed.suggestedOwners ?? []).filter(
+    (s) => !(a.members ?? []).some((m) => (m.name ?? "").trim().toLowerCase() === s.name.toLowerCase()),
+  );
   // Deleting an owner renumbers everyone after them. A spousal pairing holds
   // positions, not names, so the indexes have to move with the list or the
   // pairing quietly re-marries two different people.
@@ -474,7 +485,7 @@ export default function OAQuestionnaire() {
               Change those three answers
             </button>
 
-            <OwnersCard owners={owners} isMulti={isMulti} ownerCountMismatch={ownerCountMismatch} patchMember={patchMember} removeOwner={removeOwner} addOwner={addOwner} />
+            <OwnersCard owners={owners} isMulti={isMulti} ownerCountMismatch={ownerCountMismatch} patchMember={patchMember} removeOwner={removeOwner} addOwner={addOwner} suggestions={suggestions} addOwnerWith={addOwnerWith} />
 
             {isMulti ? (
               <>

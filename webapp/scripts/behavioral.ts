@@ -794,6 +794,57 @@ async function main(): Promise<void> {
     }
   }
 
+  // Suggested owners (Adam, 10 Sep 2026): a manager-managed company gives no
+  // owners at intake, so Owner 1 starts as the client and each Manager is one
+  // tap away. Run D: client Casey Gatecheck, manager Morgan Manager.
+  if (orderIds.has("D")) {
+    console.log("\n▶ Suggested owners journey (run D, manager-managed)");
+    const page = await browser.newPage();
+    try {
+      const email = "gate-actions@e2e.test";
+      const mint = await fetch(`${API}/api/dev/mint-reset-token`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) }).then((r) => r.json()) as { data?: { token?: string } };
+      if (!mint.data?.token) throw new Error("no reset token for run D's client");
+      await fetch(`${API}/api/auth/set-password`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: mint.data.token, password: "gate-pass-12345" }) });
+      await page.route("**/api/**", async (route) => {
+        const url = new URL(route.request().url());
+        const resp = await fetch(`${API}${url.pathname}${url.search}`, {
+          method: route.request().method(),
+          headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "" },
+          body: route.request().postDataBuffer() ?? undefined,
+        });
+        const body = await resp.text();
+        const setCookie = resp.headers.get("set-cookie");
+        await route.fulfill({ status: resp.status, contentType: resp.headers.get("content-type") ?? "application/json", body, headers: setCookie ? { "set-cookie": setCookie } : undefined });
+      });
+      await page.goto(`http://localhost:${WEB_PORT}/portal/login`);
+      await page.getByLabel("Email").fill(email);
+      await page.getByLabel("Password").fill("gate-pass-12345");
+      await page.locator("main button").filter({ hasText: /^Sign in/ }).first().click();
+      await page.waitForURL(/\/portal(?!\/login)/, { timeout: 10000 });
+      await page.goto(`http://localhost:${WEB_PORT}/portal/agreement`);
+      await page.waitForSelector("main h2, main h1");
+      await clickCard(page, /More than one owner/i);
+      await page.locator("main button").filter({ hasText: /^Continue/ }).first().click();
+      await page.waitForTimeout(1200);
+      const owner1 = await page.locator('main input[aria-label="Full legal name of owner 1"]').inputValue();
+      expect(owner1 === "Casey Gatecheck", "suggested owners: Owner 1 starts as the client who placed the order", owner1);
+      const chip = page.locator('[data-testid="suggested-owners"] button').filter({ hasText: /Morgan Manager/ }).first();
+      expect((await chip.count()) === 1, "suggested owners: the Manager named at intake is one tap away");
+      expect((await page.locator('[data-testid="suggested-owners"] button').filter({ hasText: /Casey Gatecheck/ }).count()) === 0, "suggested owners: someone already listed is not offered again");
+      await chip.click();
+      await page.waitForTimeout(500);
+      const owner2 = await page.locator('main input[aria-label="Full legal name of owner 2"]').inputValue().catch(() => "");
+      const addr2 = await page.locator('main input[aria-label="Address of owner 2"]').inputValue().catch(() => "");
+      expect(owner2 === "Morgan Manager" && /300 Brickell Ave/.test(addr2), "suggested owners: the tap fills the next owner's name and address", { owner2, addr2 });
+      expect((await page.locator('[data-testid="suggested-owners"] button').filter({ hasText: /Morgan Manager/ }).count()) === 0, "suggested owners: the button goes once the person is listed");
+      await shot(page, "oa-suggested-owners");
+    } catch (e) {
+      expect(false, `suggested owners journey: ${String(e).slice(0, 300)}`);
+    } finally {
+      await page.close();
+    }
+  }
+
   // ---- Action-needed journey (Adam, 5 Sep 2026): a formed company whose
   // client still owes the questionnaire AND the details for an intake EIN
   // and S election sees all three named in a sticky toast, each item's card
@@ -1817,11 +1868,16 @@ async function main(): Promise<void> {
         expect(/Gate Run Alpha, LLC/.test(md) && /Casey Gatecheck/.test(md) && /Total charged/.test(md) && /- I certify that the information provided is true and accurate/.test(md), "order summary: it holds the company, the client, the total, and the acknowledgments", md.slice(0, 200));
         for (const p of ctx.pages()) if (p !== page) await p.close().catch(() => {});
       }
-      const [popup] = await Promise.all([
-        ctx.waitForEvent("page"),
-        row.locator('[data-testid="view-portal"]').click(),
-      ]);
-      await popup.waitForURL(/\/portal/, { timeout: 10000 }).catch((e) => { throw new Error(`view-portal popup (url ${popup.url()}): ${e}`); });
+      // The button opens a blank tab first and points it at the portal once
+      // the sign-in lands; wait for whichever tab reaches the portal.
+      await row.locator('[data-testid="view-portal"]').click();
+      let popup = ctx.pages().find((p) => /\/portal/.test(p.url()));
+      for (let i = 0; i < 60 && !popup; i++) {
+        await page.waitForTimeout(250);
+        popup = ctx.pages().find((p) => p !== page && /\/portal/.test(p.url()));
+      }
+      if (!popup) throw new Error(`view-portal: no tab reached the portal (tabs: ${ctx.pages().map((p) => p.url()).join(", ")})`);
+      await popup.waitForLoadState("load").catch(() => {});
       const banner = popup.locator('[data-testid="viewing-as-banner"]');
       await banner.waitFor({ state: "visible", timeout: 10000 });
       const bannerText = await banner.innerText();

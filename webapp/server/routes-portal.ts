@@ -41,9 +41,10 @@ export interface SeedPayload {
   formationType?: string;
   llcName?: { finalName?: string; desiredName?: string };
   principalOfficeAddress?: { address1?: string; address2?: string; city?: string; state?: string; zip?: string };
+  client?: { name?: string; address?: { address1?: string; address2?: string; city?: string; state?: string; zip?: string } };
   management?: {
     structure?: string;
-    managersOrAuthorizedRepresentatives?: { role?: string; firstName?: string; lastName?: string; suffix?: string; fullName?: string; businessEntityName?: string }[];
+    managersOrAuthorizedRepresentatives?: { role?: string; firstName?: string; lastName?: string; suffix?: string; fullName?: string; businessEntityName?: string; streetAddress1?: string; streetAddress2?: string; city?: string; state?: string; zip?: string }[];
   };
   members?: { memberList?: { firstName?: string; lastName?: string; suffix?: string; fullLegalName?: string; address1?: string; address2?: string; city?: string; state?: string; zip?: string }[] };
   series?: { id: string; name: string }[];
@@ -57,6 +58,9 @@ export async function oaSeed(clientId: string, orderId?: string | null): Promise
   formationType: string;
   managementStructure: string;
   managerNames: string[];
+  /** People the order already names, offered as owners one tap each
+   *  (Adam, 10 Sep 2026): the client who placed it and every Manager. */
+  suggestedOwners: { name: string; address: string }[];
   principalAddress: string;
   members: { name: string; address: string }[];
   series: { name: string; purpose: string }[];
@@ -81,13 +85,32 @@ export async function oaSeed(clientId: string, orderId?: string | null): Promise
   const principalAddress = [addr.address1, addr.address2, [addr.city, addr.state].filter(Boolean).join(", "), addr.zip]
     .filter((x) => x && String(x).trim())
     .join(", ");
-  const members = (p.members?.memberList ?? []).map((m) => ({
+  const joinAddr = (a: { address1?: string; address2?: string; city?: string; state?: string; zip?: string } | undefined) =>
+    [a?.address1, a?.address2, [a?.city, a?.state].filter(Boolean).join(", "), a?.zip].filter((x) => x && String(x).trim()).join(", ");
+  let members = (p.members?.memberList ?? []).map((m) => ({
     name:
       personLegalName(m.firstName, m.lastName, m.suffix) || (m.fullLegalName ?? ""),
-    address: [m.address1, m.address2, [m.city, m.state].filter(Boolean).join(", "), m.zip]
-      .filter((x) => x && String(x).trim())
-      .join(", "),
+    address: joinAddr(m),
   }));
+  // The order names people the questionnaire can offer as owners with one
+  // tap: the client who placed it and every Manager. A manager-managed
+  // company gives no owners at intake, so its first owner starts as the
+  // client (Adam, 10 Sep 2026).
+  const clientOwner = (p.client?.name ?? "").trim()
+    ? { name: (p.client?.name ?? "").trim(), address: joinAddr(p.client?.address) }
+    : null;
+  const managerOwners = (p.management?.managersOrAuthorizedRepresentatives ?? [])
+    .filter((e) => (e.role ?? "MGR") === "MGR")
+    .map((e) => ({
+      name: (personLegalName(e.firstName, e.lastName, e.suffix) || e.fullName || e.businessEntityName || "").trim(),
+      address: joinAddr({ address1: e.streetAddress1, address2: e.streetAddress2, city: e.city, state: e.state, zip: e.zip }),
+    }))
+    .filter((o) => o.name);
+  const suggestedOwners: { name: string; address: string }[] = [];
+  for (const o of [...(clientOwner ? [clientOwner] : []), ...managerOwners]) {
+    if (!suggestedOwners.some((s) => s.name.toLowerCase() === o.name.toLowerCase())) suggestedOwners.push(o);
+  }
+  if (members.length === 0 && clientOwner) members = [clientOwner];
   const managementStructure = p.management?.structure ?? "";
   // Every MGR entry becomes a Manager. Authorized representatives sign the
   // Articles and manage nothing, so a listed AR must never be named Manager —
@@ -134,6 +157,7 @@ export async function oaSeed(clientId: string, orderId?: string | null): Promise
     formationType: p.formationType ?? "",
     managementStructure,
     managerNames,
+    suggestedOwners,
     principalAddress,
     members,
     series,
