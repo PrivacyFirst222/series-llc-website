@@ -317,7 +317,8 @@ Date: _____________________________
 | Membership Interest | 100% (single class) |
 | Initial contribution to the Company | $[AMOUNT] [and/or described property] |
 | Date of contribution | [DATE] |
-| Initial contributions to Protected Series (treated as contributed first to the Company and then by the Company to the series) | [SERIES CONTRIBUTIONS] |
+| Capital allocated by the Company to Protected Series | [SERIES CONTRIBUTIONS] |
+| Retained by the Company | [RETAINED] |
 
 **Transfer on Death designation (ss. 711.50–711.512, Fla. Stat.):**
 

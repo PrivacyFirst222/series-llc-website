@@ -123,6 +123,26 @@ function seriesContributionList(series: OaSeriesInput[]): string {
   return items.length > 0 ? items.join("; ") : "None";
 }
 
+/** The first dollar figure in a free-text contribution ("$1,000 cash" → 1000),
+ *  or null when there is none — text like "the Main Street property" carries
+ *  no number, and nothing is invented for it. */
+export function moneyOf(text: string | undefined): number | null {
+  const m = (text ?? "").replace(/,/g, "").match(/\$?\s*(\d+(?:\.\d+)?)/);
+  return m ? Number(m[1]) : null;
+}
+
+/** What the Company keeps after allocating capital to its series (Adam,
+ *  10 Sep 2026): contributions less allocations, when both sides are figures;
+ *  "—" when either side is words rather than money. */
+export function retainedByCompany(memberContributions: string[], series: OaSeriesInput[]): string {
+  const contributed = memberContributions.map(moneyOf);
+  if (contributed.length === 0 || contributed.some((v) => v === null)) return "—";
+  const allocated = series.map((sr) => ((sr.contribution ?? "").trim() ? moneyOf(sr.contribution) : 0));
+  if (allocated.some((v) => v === null)) return "—";
+  const left = contributed.reduce<number>((a, b) => a + (b ?? 0), 0) - allocated.reduce<number>((a, b) => a + (b ?? 0), 0);
+  return `$${left.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+}
+
 /** "tenants by the entirety" → "Tenants by the Entirety": the holding as a
  *  heading, with the small words left small. */
 function titleCaseHolding(holding: string): string {
@@ -461,6 +481,7 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
         // made first to the Company, then by the Company to the series, so
         // Exhibit A lists it too — in the master's own row, this fills the slot.
         "[SERIES CONTRIBUTIONS]": seriesContributionList(inputs.series),
+        "[RETAINED]": retainedByCompany([inputs.contributionToCompany || m.contribution || ""], inputs.series),
         "[DATE]": inputs.effectiveDate,
         // The master's own sentence carries the fallback: "…shall pass to:
         // **X**, or if none is designated or the designation fails, the
@@ -490,11 +511,17 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
       "[HOLDING]": m.jointHolding ?? "",
     }));
     s = expandRepeat(s, "member", rows, "Exhibit A multi");
-    // The same chain for several members, in the master's own sentence
-    // beneath the table (Adam, 9 Sep 2026; the proportion is the master's
-    // rule, since the questionnaire takes a series contribution at the
-    // company level).
-    s = s.split("[SERIES CONTRIBUTIONS]").join(seriesContributionList(inputs.series));
+    // The allocation of the Company's capital to its series, one master row
+    // per series, and what the Company keeps (Adam, 10 Sep 2026: "how much
+    // and by whom the capital contributions were made to the company and
+    // then how that capital was allocated among the series").
+    s = expandRepeat(
+      s,
+      "seriesalloc",
+      inputs.series.map((sr) => ({ "[SERIES]": sr.name, "[CONTRIBUTION]": (sr.contribution ?? "").trim() || "None" })),
+      "Exhibit A allocation",
+    );
+    s = s.split("[RETAINED]").join(retainedByCompany(inputs.members.map((m) => m.contribution ?? ""), inputs.series));
   }
 
   // ---- Series Exhibits + Asset Schedules ----

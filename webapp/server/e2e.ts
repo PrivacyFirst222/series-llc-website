@@ -1343,6 +1343,21 @@ if (mint.status === 200) {
   check("generation history now has 1 entry", (oaAfterDel.body?.data?.generations ?? []).length === 1);
   const goneDoc = await fetch(`${BASE}/api/portal/documents/${oldest.document_id}/download`, { headers: { Cookie: setPw.cookie } });
   check("the deleted draft's PDF is gone", goneDoc.status === 404, { status: goneDoc.status });
+  // The company cannot allocate more to its series than its owners contributed
+  // (Adam, 10 Sep 2026); words instead of figures are not judged. The one
+  // agreement this makes is deleted again so the history counts below hold.
+  {
+    const seedSeries = (oaSeed.body?.data?.seed?.series ?? []) as { name: string }[];
+    const allocTo = (amount: string) => seedSeries.map((_, i) => ({ contribution: i === 0 ? amount : "" }));
+    const over = await api("/api/portal/oa/generate", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ ...oaAnswers, contributionToCompany: "$1,000 cash", series: allocTo("$5,000") }) });
+    check("allocating more than was contributed is refused", over.status === 400 && over.body?.error?.code === "OVER_ALLOCATED", over.body);
+    const words = await api("/api/portal/oa/generate", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ ...oaAnswers, contributionToCompany: "the Main Street property", series: allocTo("$5,000") }) });
+    check("a contribution described in words is not measured against allocations", words.status === 200, words.body);
+    if (words.body?.data?.generationId) await api(`/api/portal/oa/generations/${words.body.data.generationId}`, { method: "DELETE", cookies: setPw.cookie });
+    const withRoom = await api("/api/portal/oa/generate", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ ...oaAnswers, contributionToCompany: "$1,000 cash", series: allocTo("$400") }) });
+    check("an allocation within the contribution is accepted", withRoom.status === 200, withRoom.body);
+    if (withRoom.body?.data?.generationId) await api(`/api/portal/oa/generations/${withRoom.body.data.generationId}`, { method: "DELETE", cookies: setPw.cookie });
+  }
 
   // 13c-2. Sole owner on the S corporation form (option defaults applied server-side)
   const genS = await api("/api/portal/oa/generate", {

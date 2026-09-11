@@ -47381,6 +47381,21 @@ async function renderMarkdownPdf(opts) {
       const nextBlock = blocks[bi2 + 1];
       const nextIsDate = nextBlock?.kind === "para" && /^Date:/.test(nextBlock.segs.map((s) => s.text).join("").trim());
       if (isSignatureLine) y -= 10;
+      const isDateLine = /^Date:\s*_{3,}$/.test(plainText);
+      if (isSignatureLine || isDateLine) {
+        need(lineH);
+        const right = MARGIN + SIG_W;
+        let from = MARGIN;
+        if (isDateLine) {
+          const label = { text: "Date: ", bold: false, italic: false };
+          drawSegLine(page, [label], MARGIN, y - size, size);
+          from = MARGIN + segWidth(label, size);
+        }
+        page.drawLine({ start: { x: from, y: y - size }, end: { x: right, y: y - size }, thickness: 0.8, color: rgb(0, 0, 0) });
+        y -= lineH;
+        y -= isSignatureLine || nextIsDate ? 0 : 6;
+        continue;
+      }
       const paraText = block.segs.map((s) => s.text).join("");
       if (inTitle && (/^THIS\b/.test(paraText.trim()) || lines.length > 2)) inTitle = false;
       const centered = inTitle;
@@ -47599,13 +47614,14 @@ async function stampExistingPdf(opts) {
   stampFooters(doc, font, opts.watermark);
   return finishWithPermissions(doc, opts.title, opts.watermark, font);
 }
-var PAGE_W, PAGE_H, MARGIN, BODY_SIZE, LINE_GAP, FOOTER_Y, glyphWidthCache;
+var PAGE_W, PAGE_H, MARGIN, SIG_W, BODY_SIZE, LINE_GAP, FOOTER_Y, glyphWidthCache;
 var init_pdf_render = __esm({
   "server/pdf-render.ts"() {
     init_es();
     PAGE_W = 612;
     PAGE_H = 792;
     MARGIN = 72;
+    SIG_W = 252;
     BODY_SIZE = 11;
     LINE_GAP = 3.2;
     FOOTER_Y = 40;
@@ -102490,7 +102506,8 @@ Date: _____________________________
 | Membership Interest | 100% (single class) |
 | Initial contribution to the Company | $[AMOUNT] [and/or described property] |
 | Date of contribution | [DATE] |
-| Initial contributions to Protected Series (treated as contributed first to the Company and then by the Company to the series) | [SERIES CONTRIBUTIONS] |
+| Capital allocated by the Company to Protected Series | [SERIES CONTRIBUTIONS] |
+| Retained by the Company | [RETAINED] |
 
 **Transfer on Death designation (ss. 711.50\u2013711.512, Fla. Stat.):**
 
@@ -102958,7 +102975,14 @@ Date: _____________________________
 <!-- /repeat -->
 | **Total** | | **100%** | | |
 
-**Initial contributions to Protected Series, treated as contributed first to the Company by the Members in proportion to their Percentage Interests and then by the Company to the series:** [SERIES CONTRIBUTIONS]
+**Allocation of the Company's capital to the Protected Series:**
+
+| Protected Series | Capital allocated by the Company |
+|---|---|
+<!-- repeat:seriesalloc -->
+| [SERIES] | [CONTRIBUTION] |
+<!-- /repeat -->
+| **Retained by the Company** | [RETAINED] |
 
 **Transfer on Death designations (ss. 711.50\u2013711.512, Fla. Stat.):**
 
@@ -103446,7 +103470,14 @@ Date: _____________________________
 <!-- /repeat -->
 | **Total** | | **100%** | | |
 
-**Initial contributions to Protected Series, treated as contributed first to the Company by the Members in proportion to their Percentage Interests and then by the Company to the series:** [SERIES CONTRIBUTIONS]
+**Allocation of the Company's capital to the Protected Series:**
+
+| Protected Series | Capital allocated by the Company |
+|---|---|
+<!-- repeat:seriesalloc -->
+| [SERIES] | [CONTRIBUTION] |
+<!-- /repeat -->
+| **Retained by the Company** | [RETAINED] |
 
 **Transfer on Death designations (ss. 711.50\u2013711.512, Fla. Stat.):**
 
@@ -103913,7 +103944,14 @@ Date: _____________________________
 <!-- /repeat -->
 | **Total** | | **100%** | | |
 
-**Initial contributions to Protected Series, treated as contributed first to the Company by the Members in proportion to their Percentage Interests and then by the Company to the series:** [SERIES CONTRIBUTIONS]
+**Allocation of the Company's capital to the Protected Series:**
+
+| Protected Series | Capital allocated by the Company |
+|---|---|
+<!-- repeat:seriesalloc -->
+| [SERIES] | [CONTRIBUTION] |
+<!-- /repeat -->
+| **Retained by the Company** | [RETAINED] |
 
 **Transfer on Death designations (ss. 711.50\u2013711.512, Fla. Stat.):**
 
@@ -104394,7 +104432,14 @@ Date: _____________________________
 <!-- /repeat -->
 | **Total** | | **100%** | | |
 
-**Initial contributions to Protected Series, treated as contributed first to the Company by the Members in proportion to their Percentage Interests and then by the Company to the series:** [SERIES CONTRIBUTIONS]
+**Allocation of the Company's capital to the Protected Series:**
+
+| Protected Series | Capital allocated by the Company |
+|---|---|
+<!-- repeat:seriesalloc -->
+| [SERIES] | [CONTRIBUTION] |
+<!-- /repeat -->
+| **Retained by the Company** | [RETAINED] |
 
 **Transfer on Death designations (ss. 711.50\u2013711.512, Fla. Stat.):**
 
@@ -104805,7 +104850,8 @@ Date: _____________________________
 | Membership Interest | 100% (single class of ownership) |
 | Initial contribution to the Company | $[AMOUNT] [and/or described property] |
 | Date of contribution | [DATE] |
-| Initial contributions to Protected Series (treated as contributed first to the Company and then by the Company to the series) | [SERIES CONTRIBUTIONS] |
+| Capital allocated by the Company to Protected Series | [SERIES CONTRIBUTIONS] |
+| Retained by the Company | [RETAINED] |
 
 **Transfer on Death designation (ss. 711.50\u2013711.512, Fla. Stat.):**
 
@@ -105154,7 +105200,8 @@ Date: _____________________________
 | Membership Interest | 100% (single class) |
 | Initial contribution to the Company | $[AMOUNT] [and/or described property] |
 | Date of contribution | [DATE] |
-| Initial contributions to Protected Series (treated as contributed first to the Company and then by the Company to the series) | [SERIES CONTRIBUTIONS] |
+| Capital allocated by the Company to Protected Series | [SERIES CONTRIBUTIONS] |
+| Retained by the Company | [RETAINED] |
 
 **Transfer on Death designation (ss. 711.50\u2013711.512, Fla. Stat.):**
 
@@ -105533,7 +105580,8 @@ Date: _____________________________
 | Membership Interest | 100% (single class of ownership) |
 | Initial contribution to the Company | $[AMOUNT] [and/or described property] |
 | Date of contribution | [DATE] |
-| Initial contributions to Protected Series (treated as contributed first to the Company and then by the Company to the series) | [SERIES CONTRIBUTIONS] |
+| Capital allocated by the Company to Protected Series | [SERIES CONTRIBUTIONS] |
+| Retained by the Company | [RETAINED] |
 
 **Transfer on Death designation (ss. 711.50\u2013711.512, Fla. Stat.):**
 
@@ -105605,6 +105653,18 @@ function oaVersion(opts) {
 function seriesContributionList(series) {
   const items = series.filter((sr) => (sr.contribution ?? "").trim() !== "").map((sr) => `${sr.name}: ${sr.contribution.trim()}`);
   return items.length > 0 ? items.join("; ") : "None";
+}
+function moneyOf(text) {
+  const m2 = (text ?? "").replace(/,/g, "").match(/\$?\s*(\d+(?:\.\d+)?)/);
+  return m2 ? Number(m2[1]) : null;
+}
+function retainedByCompany(memberContributions, series) {
+  const contributed = memberContributions.map(moneyOf);
+  if (contributed.length === 0 || contributed.some((v2) => v2 === null)) return "\u2014";
+  const allocated = series.map((sr) => (sr.contribution ?? "").trim() ? moneyOf(sr.contribution) : 0);
+  if (allocated.some((v2) => v2 === null)) return "\u2014";
+  const left = contributed.reduce((a2, b2) => a2 + (b2 ?? 0), 0) - allocated.reduce((a2, b2) => a2 + (b2 ?? 0), 0);
+  return `$${left.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
 }
 function titleCaseHolding(holding) {
   const small = /* @__PURE__ */ new Set(["by", "the", "with", "of"]);
@@ -105810,6 +105870,7 @@ NOW, THEREFORE,`,
         // made first to the Company, then by the Company to the series, so
         // Exhibit A lists it too — in the master's own row, this fills the slot.
         "[SERIES CONTRIBUTIONS]": seriesContributionList(inputs.series),
+        "[RETAINED]": retainedByCompany([inputs.contributionToCompany || m2.contribution || ""], inputs.series),
         "[DATE]": inputs.effectiveDate,
         // The master's own sentence carries the fallback: "…shall pass to:
         // **X**, or if none is designated or the designation fails, the
@@ -105834,7 +105895,13 @@ NOW, THEREFORE,`,
       "[HOLDING]": m2.jointHolding ?? ""
     }));
     s = expandRepeat(s, "member", rows, "Exhibit A multi");
-    s = s.split("[SERIES CONTRIBUTIONS]").join(seriesContributionList(inputs.series));
+    s = expandRepeat(
+      s,
+      "seriesalloc",
+      inputs.series.map((sr) => ({ "[SERIES]": sr.name, "[CONTRIBUTION]": (sr.contribution ?? "").trim() || "None" })),
+      "Exhibit A allocation"
+    );
+    s = s.split("[RETAINED]").join(retainedByCompany(inputs.members.map((m2) => m2.contribution ?? ""), inputs.series));
   }
   const ex1 = extractSection(s, "SERIES EXHIBIT PS-[N]", "series exhibit template");
   s = ex1.doc;
@@ -107203,6 +107270,17 @@ function registerPortalRoutes(app2) {
       purpose: a2.series?.[i]?.purpose ?? sr.purpose ?? "",
       contribution: a2.series?.[i]?.contribution ?? ""
     }));
+    {
+      const contributed = (multiOwner ? members.map((m2) => m2.contribution ?? "") : [a2.contributionToCompany || members[0]?.contribution || ""]).map(moneyOf);
+      const allocated = series.map((sr) => sr.contribution.trim() ? moneyOf(sr.contribution) : 0);
+      if (contributed.length > 0 && contributed.every((v2) => v2 !== null) && allocated.every((v2) => v2 !== null)) {
+        const inTotal = contributed.reduce((x2, y) => x2 + (y ?? 0), 0);
+        const outTotal = allocated.reduce((x2, y) => x2 + (y ?? 0), 0);
+        if (outTotal > inTotal) {
+          return c.json(err("The company cannot allocate more to its series than its owners contributed.", "OVER_ALLOCATED"), 400);
+        }
+      }
+    }
     const inputs = {
       version,
       companyName: seed.llcName,

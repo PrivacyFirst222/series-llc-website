@@ -427,7 +427,14 @@ Date: _____________________________
 <!-- /repeat -->
 | **Total** | | **100%** | | |
 
-**Initial contributions to Protected Series, treated as contributed first to the Company by the Members in proportion to their Percentage Interests and then by the Company to the series:** [SERIES CONTRIBUTIONS]
+**Allocation of the Company's capital to the Protected Series:**
+
+| Protected Series | Capital allocated by the Company |
+|---|---|
+<!-- repeat:seriesalloc -->
+| [SERIES] | [CONTRIBUTION] |
+<!-- /repeat -->
+| **Retained by the Company** | [RETAINED] |
 
 **Transfer on Death designations (ss. 711.50–711.512, Fla. Stat.):**
 

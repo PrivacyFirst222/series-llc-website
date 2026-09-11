@@ -21,7 +21,7 @@ import { type JointKind, isJoint, packSsns, unpackSsns } from "../src/lib/jointO
 import { FIRST_AND_LAST, hasFirstAndLast } from "../src/lib/personName";
 import { VALID_EIN_PREFIXES } from "../src/lib/ein";
 import { EIN_CATEGORY_NAMES, EIN_REASONS, followUpOk } from "../src/lib/einActivity";
-import { assembleOa, oaVersion, OA_TEMPLATE_VERSION, type OaInputs } from "./oa";
+import { assembleOa, oaVersion, OA_TEMPLATE_VERSION, type OaInputs, moneyOf } from "./oa";
 import { renderMarkdownPdf, stampExistingPdf } from "./pdf-render";
 import { createSession, getSession, getAdminSession, destroySession, rateLimit, clientIp } from "./auth";
 
@@ -1294,6 +1294,19 @@ app.post("/portal/oa/generate", async (c) => {
     purpose: a.series?.[i]?.purpose ?? sr.purpose ?? "",
     contribution: a.series?.[i]?.contribution ?? "",
   }));
+  // The Company cannot allocate more capital to its series than its owners
+  // put in (Adam, 10 Sep 2026) — checked only when both sides are figures.
+  {
+    const contributed = (multiOwner ? members.map((m) => m.contribution ?? "") : [a.contributionToCompany || members[0]?.contribution || ""]).map(moneyOf);
+    const allocated = series.map((sr) => (sr.contribution.trim() ? moneyOf(sr.contribution) : 0));
+    if (contributed.length > 0 && contributed.every((v) => v !== null) && allocated.every((v) => v !== null)) {
+      const inTotal = contributed.reduce((x, y) => x + (y ?? 0), 0);
+      const outTotal = allocated.reduce((x, y) => x + (y ?? 0), 0);
+      if (outTotal > inTotal) {
+        return c.json(err("The company cannot allocate more to its series than its owners contributed.", "OVER_ALLOCATED"), 400);
+      }
+    }
+  }
 
   const inputs: OaInputs = {
     version,

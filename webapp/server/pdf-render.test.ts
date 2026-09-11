@@ -88,6 +88,7 @@ const base = {
   includeShotgun: false,
 } as unknown as Omit<OaInputs, "version" | "professional">;
 const hasPdftotext = (() => { try { execSync("pdftotext -v", { stdio: "ignore" }); return true; } catch { return false; } })();
+const hasPypdfRules = (() => { try { execSync("python3 -c \"import pypdf\"", { stdio: "ignore" }); return true; } catch { return false; } })();
 const outDir = mkdtempSync(join(tmpdir(), "pdf-render-test-"));
 let rendered = 0;
 for (const version of versions) {
@@ -154,12 +155,40 @@ if (hasPdftotext) {
   const lines = sig.split("\n").map((l) => l.trim()).filter(Boolean);
   const at = (re: RegExp) => lines.findIndex((l) => re.test(l));
   check("signatures: the preamble refers to the dates set forth below", /effective as of the date\(s\)\s+set\s+forth\s+below/.test(sig), sig.slice(0, 200));
-  const soloLine = at(/^_{5,}$/);
-  check("signatures: a signature line, then the solo owner's name, then Date", soloLine >= 0 && lines[soloLine + 1] === "Casey Gatecheck" && /^Date: _+$/.test(lines[soloLine + 2] ?? ""), lines.slice(soloLine, soloLine + 3));
+  // The rules are drawn, so the text holds no underscores: name, then "Date:".
+  const solo = at(/^Casey Gatecheck$/);
+  check("signatures: the solo owner's name, then Date", solo >= 0 && /^Date:$/.test(lines[solo + 1] ?? ""), lines.slice(solo, solo + 2));
+  check("signatures: no typed underscores remain", !/_{3,}/.test(sig));
   const heading = at(/^Blair Gatecheck and Drew Gatecheck$/);
   check("signatures: the couple is headed by both names and their holding", heading >= 0 && lines[heading + 1] === "as Tenants by the Entirety", lines.slice(heading, heading + 2));
-  check("signatures: each spouse then signs on their own line with a Date", lines[heading + 3] === "Blair Gatecheck" && /^Date:/.test(lines[heading + 4] ?? "") && lines[heading + 6] === "Drew Gatecheck" && /^Date:/.test(lines[heading + 7] ?? ""), lines.slice(heading + 2, heading + 8));
+  check("signatures: each spouse then signs on their own line with a Date", lines[heading + 2] === "Blair Gatecheck" && /^Date:$/.test(lines[heading + 3] ?? "") && lines[heading + 4] === "Drew Gatecheck" && /^Date:$/.test(lines[heading + 5] ?? ""), lines.slice(heading + 2, heading + 6));
   check("signatures: no 'entireties'", !/entireties/i.test(sig));
+  // The rules themselves, measured from the page's drawing: every signature
+  // rule is SIG_W long from the margin, and every rule — signature or date —
+  // ends at the same right edge (Adam, 10 Sep 2026).
+  if (hasPypdfRules) {
+    const rules = execSync(`python3 - "${file}" <<'PY'
+import re, sys
+from pypdf import PdfReader
+r = PdfReader(sys.argv[1])
+out = []
+for p in r.pages:
+    if "SIGNATURES" not in p.extract_text():
+        continue
+    c = p.get_contents()
+    data = c.get_data().decode("latin1") if c is not None else ""
+    for m in re.finditer(r"([\\d.]+)\\s+([\\d.]+)\\s+m\\s+([\\d.]+)\\s+([\\d.]+)\\s+l", data):
+        x1, y1, x2, y2 = map(float, m.groups())
+        if abs(y1 - y2) < 0.01 and x2 > x1:
+            out.append((round(x1, 1), round(x2, 1)))
+print(";".join(f"{a},{b}" for a, b in out))
+PY`).toString().trim();
+    const segs = rules ? rules.split(";").map((s) => s.split(",").map(Number) as [number, number]) : [];
+    const horizontal = segs.filter(([a, b]) => b - a > 100);
+    const rightEdges = new Set(horizontal.map(([, b]) => b));
+    check("signatures: every rule ends at one right edge", horizontal.length >= 6 && rightEdges.size === 1 && [...rightEdges][0] === 72 + 252, { count: horizontal.length, edges: [...rightEdges] });
+    check("signatures: every signature rule is three and a half inches from the margin", horizontal.filter(([a]) => a === 72).every(([a, b]) => b - a === 252) && horizontal.some(([a]) => a === 72), horizontal.slice(0, 6));
+  }
 }
 
 // 6. The licensed (encrypted) agreement with one series: the blank-space
@@ -176,7 +205,7 @@ if (hasPdftotext) {
     series: [{ name: "E2E Coastal Holdings, LLC - PS 1", purpose: "Rental real estate", contribution: "$2,000" }],
   } as OaInputs;
   const { markdown, title } = assembleOa(inputs);
-  check("Exhibit A lists the series contribution as contributed first to the Company", /\| Initial contributions to Protected Series \(treated as contributed first to the Company and then by the Company to the series\) \| E2E Coastal Holdings, LLC - PS 1: \$2,000 \|/.test(markdown), markdown.match(/Initial contributions to Protected Series[^\n]*/)?.[0]);
+  check("Exhibit A lists the capital the Company allocated to the series and what it kept", /\| Capital allocated by the Company to Protected Series \| E2E Coastal Holdings, LLC - PS 1: \$2,000 \|/.test(markdown) && /\| Retained by the Company \| [^|\n]+\|/.test(markdown), markdown.match(/Retained by the Company[^\n]*/)?.[0]);
   const bytes = await renderMarkdownPdf({ markdown, watermark: { name: "Casey Gatecheck", email: "casey@example.com" }, title });
   check("licensed agreement renders", new TextDecoder().decode(bytes.slice(0, 5)) === "%PDF-");
   const file = join(outDir, "licensed-with-series.pdf");

@@ -1440,6 +1440,16 @@ async function main(): Promise<void> {
       }
       const contrib = page.locator('main input[aria-label^="Contribution to the company"]').first();
       await contrib.fill("$1,000 cash");
+      // Allocation of the company's capital to a series (Adam, 10 Sep 2026):
+      // more than was contributed is flagged at the box; a proper amount
+      // reaches Exhibit A with what the company retained.
+      const alloc = page.locator('main input[aria-label^="Capital allocated to"]').first();
+      await alloc.fill("$5,000");
+      await page.waitForTimeout(300);
+      expect((await page.locator('[data-testid="over-allocated"]').count()) === 1, "OA: allocating more than was contributed is flagged at the box");
+      await alloc.fill("$400");
+      await page.waitForTimeout(300);
+      expect((await page.locator('[data-testid="over-allocated"]').count()) === 0, "OA: a proper allocation clears the flag");
       await page.getByLabel("Effective date").fill("2026-09-15");
       await checkAllBoxes(page);
       await page.waitForTimeout(1000);
@@ -1494,6 +1504,9 @@ async function main(): Promise<void> {
       expect((await page.locator('[data-testid="action-needed-list"]').count()) === 0, "OA: no action-needed toast once the agreement exists");
       expect((await page.locator('[data-needs-action="true"]').count()) === 0, "OA: no red outlines once nothing is owed");
       expect(md.includes("$1,000 cash"), "OA: the contribution typed on screen is in Exhibit A");
+      // The journey answered "more than one owner", so Exhibit A carries the
+      // multi form's allocation table; the single form's rows are accepted too.
+      expect((/\| [^|\n]*PS Alpha \| \$400 \|/.test(md) || /PS Alpha: \$400 \|/.test(md)) && /Retained by the Company\*{0,2} \| \$600 \|/.test(md), "OA: Exhibit A shows the allocation to the series and what the company retained", md.match(/(PS Alpha[^\n]*\$400|Retained by the Company)[^\n]*/g));
       expect(md.includes("September 15, 2026"), "OA: the effective date chosen on screen is in the agreement");
       console.log("  ✓ OA journey: every on-screen answer survived into the assembled agreement");
 

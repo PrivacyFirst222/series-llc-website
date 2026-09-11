@@ -10,6 +10,8 @@ import { PDFDocument, StandardFonts, rgb, PDFFont, PDFPage, PDFArray, PDFDict, P
 const PAGE_W = 612; // Letter
 const PAGE_H = 792;
 const MARGIN = 72;
+/** Signature and date rules: three and a half inches, one right edge. */
+const SIG_W = 252;
 const BODY_SIZE = 11;
 const LINE_GAP = 3.2;
 const FOOTER_Y = 40;
@@ -351,6 +353,25 @@ export async function renderMarkdownPdf(opts: {
       const nextBlock = blocks[bi + 1];
       const nextIsDate = nextBlock?.kind === "para" && /^Date:/.test(nextBlock.segs.map((s) => s.text).join("").trim());
       if (isSignatureLine) y -= 10;
+      // Signature and date rules are drawn, not typed (Adam, 10 Sep 2026:
+      // underscores of different lengths "look sloppy"). Every signature rule
+      // runs from the margin to SIG_W; every "Date:" rule ends at that same
+      // edge, so the right edges line up down the page.
+      const isDateLine = /^Date:\s*_{3,}$/.test(plainText);
+      if (isSignatureLine || isDateLine) {
+        need(lineH);
+        const right = MARGIN + SIG_W;
+        let from = MARGIN;
+        if (isDateLine) {
+          const label: Seg = { text: "Date: ", bold: false, italic: false };
+          drawSegLine(page, [label], MARGIN, y - size, size);
+          from = MARGIN + segWidth(label, size);
+        }
+        page.drawLine({ start: { x: from, y: y - size }, end: { x: right, y: y - size }, thickness: 0.8, color: rgb(0, 0, 0) });
+        y -= lineH;
+        y -= isSignatureLine || nextIsDate ? 0 : 6;
+        continue;
+      }
       // The title block is the short centered lines at the top — the title,
       // "OF", the company, its type, the management line. It ends at the
       // preamble ("THIS OPERATING AGREEMENT…"), which every master begins with

@@ -169,6 +169,9 @@ function masterKey(s: string): string {
       .replace(/\[MEMBER ADDRESS\]|\[ADDRESS\]/g, "[ADDRESS]")
       .replace(/\[MEMBER CONTRIBUTION\]|\$\[AMOUNT\] \[and\/or described property\]|\$\[AMOUNT\]/g, "[AMOUNT]")
       .replace(/\[CONTRIBUTION\]/g, "[SERCONTRIB]")
+      // Retained capital is arithmetic on the sentinels, which are words, so
+      // the generator prints the master's own dash for it.
+      .replace(/\[RETAINED\]/g, "—")
       .replace(/\[MEMBER DATE\]|\[DATE\]/g, "[DATE]")
       .replace(/\[MEMBER TOD\]|\[TOD BENEFICIARY NAME\(S\)\]|\[NAME\(S\) \/ None\]/g, "[TOD]")
       .replace(/\[MEMBER SHARE\]|\[___\]%/g, "[PCT]")

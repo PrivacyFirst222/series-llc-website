@@ -343,6 +343,18 @@ export function UnitFieldCards({ units, isMulti, owners, seedSeries, series, con
   setContributionToCompany: (v: string) => void;
   ownerLabel: (m: MemberAnswer | undefined, i: number) => string;
 }) {
+  // Allocations against contributions, when both are figures (the server
+  // refuses the same case at Generate).
+  const money = (t: string | undefined): number | null => {
+    const mm = (t ?? "").replace(/,/g, "").match(/\$?\s*(\d+(?:\.\d+)?)/);
+    return mm ? Number(mm[1]) : null;
+  };
+  const contributedList = isMulti ? units.map((u) => unitContribution(u) ?? "") : [contributionToCompany ?? ""];
+  const contributedNums = contributedList.map(money);
+  const allocatedNums = seedSeries.map((_, i) => ((series?.[i]?.contribution ?? "").trim() ? money(series?.[i]?.contribution) : 0));
+  const overAllocated =
+    contributedNums.length > 0 && contributedNums.every((v) => v !== null) && allocatedNums.every((v) => v !== null) &&
+    allocatedNums.reduce((x, y) => x + (y ?? 0), 0) > contributedNums.reduce((x, y) => x + (y ?? 0), 0);
   return (
     <>
       <QuestionCard title="Initial contributions" learnMore="contributions">
@@ -351,10 +363,8 @@ export function UnitFieldCards({ units, isMulti, owners, seedSeries, series, con
                     client types the numbers, so Exhibit A and the Series
                     Exhibits agree with each other and with s. 6.1. */}
                 <p className="text-sm text-muted-foreground" data-testid="contribution-chain">
-                  All initial series contributions are treated as first contributed to the company
-                  and then contributed by the company to the series. Every initial contribution to
-                  a series is therefore also listed on Exhibit A as an initial contribution to the
-                  company.
+                  Enter what each owner contributed to the company. Then say how much of that capital
+                  the company allocates to each series. Anything not allocated stays with the company.
                 </p>
                 <label className="text-sm">
                   Contribution to the company{isMulti ? " (per owner below)" : ""}
@@ -379,17 +389,23 @@ export function UnitFieldCards({ units, isMulti, owners, seedSeries, series, con
                     onChange={(e) => setContributionToCompany(e.target.value)}
                   />
                 )}
+                <label className="mt-2 block text-sm">Capital the company allocates to each series</label>
                 {seedSeries.map((sr, i) => (
                   <div key={sr.name} className="flex items-center gap-3">
                     <span className="w-1/2 truncate text-sm">{sr.name}</span>
                     <Input
-                      aria-label={`Contribution to ${sr.name}`}
-                      placeholder="Contribution to this series (optional)"
+                      aria-label={`Capital allocated to ${sr.name}`}
+                      placeholder="Amount allocated to this series (optional)"
                       value={series?.[i]?.contribution ?? ""}
                       onChange={(e) => patchSeries(i, { contribution: e.target.value })}
                     />
                   </div>
                 ))}
+                {overAllocated ? (
+                  <p className="rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-xs text-destructive" data-testid="over-allocated">
+                    The company cannot allocate more to its series than its owners contributed.
+                  </p>
+                ) : null}
               </div>
             </QuestionCard>
 
