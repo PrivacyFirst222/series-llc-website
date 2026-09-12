@@ -196,6 +196,7 @@ export const oaAnswersSchema = z.object({
       z.object({
         purpose: z.string().max(300).optional(),
         contribution: z.string().max(300).optional(),
+        specialTerms: z.string().max(2000).optional(),
       }),
     )
     .optional(),
@@ -1324,6 +1325,7 @@ app.post("/portal/oa/generate", async (c) => {
     name: sr.name,
     purpose: a.series?.[i]?.purpose ?? sr.purpose ?? "",
     contribution: capital.seriesCells[i] ?? "None",
+    specialTerms: a.series?.[i]?.specialTerms ?? "",
   }));
 
   const inputs: OaInputs = {

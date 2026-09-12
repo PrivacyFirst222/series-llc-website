@@ -1458,6 +1458,10 @@ async function main(): Promise<void> {
       await cashBox.fill("10000");
       await page.waitForTimeout(300);
       expect((await page.locator('[data-testid="asset-1-problems"]').count()) === 0 && /Retained by the company: \$40,000/.test(await page.locator('[data-testid="asset-1-retained"]').innerText()), "OA: a proper allocation clears the flag and shows what the company retains");
+      // Special terms for a series (Adam, 12 Sep 2026): typed here, printed
+      // in that Series Exhibit, with the attachment title shown for long ones.
+      expect(/Special Terms for [^\n]*PS Alpha/.test(await page.locator("main").innerText()), "OA: the special-terms card shows the attachment title for the series");
+      await page.locator('main textarea[aria-label^="Special terms for"]').first().fill("The Manager may not sell 123 Main Street without the consent of all Members.");
       await page.getByLabel("Effective date").fill("2026-09-15");
       await checkAllBoxes(page);
       await page.waitForTimeout(1000);
@@ -1516,6 +1520,7 @@ async function main(): Promise<void> {
       expect(/\| 123 Main Street, Orlando \| \$200,000 \| Casey Gatecheck and [^|]* \| [^|]*PS Alpha \|/.test(md) && /\| Cash \| \$50,000 \| Casey Gatecheck and [^|]* \| [^|]*PS Alpha: \$10,000; the Company: \$40,000 \|/.test(md), "OA: Exhibit A lists the assets, who contributed them, and where they went", md.match(/\| (?:123 Main|Cash) [^\n]*/g));
       expect(/\$210,000 \|/.test(md) && /Retained by the Company\*{0,2} \| Cash \(\$40,000\) \| \$40,000 \|/.test(md), "OA: Exhibit A totals the series and what the company retained", md.match(/Retained by the Company[^\n]*/)?.[0]);
       expect(/\| [^|]* \| [^|]* \| [^|]* \| \$250,000 \|/.test(md), "OA: the couple's contribution on Exhibit A is the whole of the assets", md.match(/\$250,000[^\n]*/)?.[0]);
+      expect(/\| Special terms \(if any\) \| The Manager may not sell 123 Main Street without the consent of all Members\. \|/.test(md) && !/Dissolution events specific/.test(md), "OA: the special terms typed are in the Series Exhibit and the dissolution row is gone", md.match(/Special terms[^\n]*/)?.[0]);
       expect(md.includes("September 15, 2026"), "OA: the effective date chosen on screen is in the agreement");
       console.log("  ✓ OA journey: every on-screen answer survived into the assembled agreement");
 

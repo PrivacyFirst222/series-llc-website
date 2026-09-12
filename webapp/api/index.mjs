@@ -102629,7 +102629,6 @@ Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENE
 | Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
 | Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the Member(s), together with the records maintained under Article 8. |
 | Special terms (if any) | [None / variations from the base Agreement \u2014 may not vary Article 8 or non-variable provisions of the Act] |
-| Dissolution events specific to this Protected Series (if any) | [None / describe] |
 
 <!-- one:manager -->**Adopted effective [DATE] by the Company, acting through its Manager:**<!-- /one --><!-- many:manager -->**Adopted effective [DATE] by the Company, acting through its Managers:**<!-- /many -->
 
@@ -103118,7 +103117,6 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
 | Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
 | Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the Member(s), together with the records maintained under Article 8. |
 | Special terms (if any) | [None / variations from the base Agreement \u2014 may not vary Article 8 or non-variable provisions of the Act] |
-| Dissolution events specific to this Protected Series (if any) | [None / describe] |
 
 <!-- one:manager -->**Adopted effective [DATE] by the Company, acting through its Manager:**<!-- /one --><!-- many:manager -->**Adopted effective [DATE] by the Company, acting through its Managers:**<!-- /many -->
 
@@ -103621,7 +103619,6 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
 | Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
 | Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the Member(s), together with the records maintained under Article 8. |
 | Special terms (if any) | [None / variations from the base Agreement \u2014 may not vary Article 8 or non-variable provisions of the Act] |
-| Dissolution events specific to this Protected Series (if any) | [None / describe] |
 
 <!-- one:manager -->**Adopted effective [DATE] by the Company, acting through its Manager:**<!-- /one --><!-- many:manager -->**Adopted effective [DATE] by the Company, acting through its Managers:**<!-- /many -->
 
@@ -104103,7 +104100,6 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
 | Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
 | Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the Member(s), together with the records maintained under Article 8. |
 | Special terms (if any) | [None / variations from the base Agreement \u2014 may not vary Article 8 or non-variable provisions of the Act] |
-| Dissolution events specific to this Protected Series (if any) | [None / describe] |
 
 **Adopted effective [DATE] by the Company, acting through a Majority in Interest of its Members:**
 
@@ -104599,7 +104595,6 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
 | Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
 | Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the Member(s), together with the records maintained under Article 8. |
 | Special terms (if any) | [None / variations from the base Agreement \u2014 may not vary Article 8 or non-variable provisions of the Act] |
-| Dissolution events specific to this Protected Series (if any) | [None / describe] |
 
 **Adopted effective [DATE] by the Company, acting through a Majority in Interest of its Members:**
 
@@ -105013,7 +105008,6 @@ Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENE
 | Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
 | Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the Member, together with the records maintained under Article 8. |
 | Special terms (if any) | [None / variations from the base Agreement \u2014 may not vary Article 8, Article 9, or non-variable provisions of the Act] |
-| Dissolution events specific to this Protected Series (if any) | [None / describe] |
 
 <!-- one:manager -->**Adopted effective [DATE] by the Company, acting through its Manager:**<!-- /one --><!-- many:manager -->**Adopted effective [DATE] by the Company, acting through its Managers:**<!-- /many -->
 
@@ -105371,7 +105365,6 @@ Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENE
 | Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
 | Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the Member, together with the records maintained under Article 8. |
 | Special terms (if any) | [None / variations from the base Agreement \u2014 may not vary Article 8 or non-variable provisions of the Act] |
-| Dissolution events specific to this Protected Series (if any) | [None / describe] |
 
 **Adopted effective [DATE] by the Company, acting through the Member:**
 
@@ -105759,7 +105752,6 @@ Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENE
 | Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
 | Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the Member, together with the records maintained under Article 8. |
 | Special terms (if any) | [None / variations from the base Agreement \u2014 may not vary Article 8, Article 9, or non-variable provisions of the Act] |
-| Dissolution events specific to this Protected Series (if any) | [None / describe] |
 
 **Adopted effective [DATE] by the Company, acting through the Member:**
 
@@ -106076,8 +106068,7 @@ NOW, THEREFORE,`,
       ex = ex.replace(/\| Protected Series Manager \|[^\n]*\|/, `| Protected Series Manager | ${managerList} |`);
     }
     ex = ex.replace("[CONTRIBUTION]", ser.contribution || "\u2014");
-    ex = ex.replace(/\| Special terms \(if any\) \|[^\n]*\|/, "| Special terms (if any) | None |");
-    ex = ex.replace(/\| Dissolution events[^\n]*\|[^\n]*\|/, "| Dissolution events specific to this Protected Series (if any) | None |");
+    ex = ex.replace(/\| Special terms \(if any\) \|[^\n]*\|/, `| Special terms (if any) | ${(ser.specialTerms ?? "").trim().replace(/\|/g, "/").replace(/\s*\n\s*/g, " ") || "None"} |`);
     const adopters = isMemberManaged ? inputs.members.flatMap((m2) => m2.signatories ?? [m2.name]) : managerNames;
     ex = expandRepeat(
       ex,
@@ -106618,7 +106609,8 @@ var oaAnswersSchema = external_exports.object({
   series: external_exports.array(
     external_exports.object({
       purpose: external_exports.string().max(300).optional(),
-      contribution: external_exports.string().max(300).optional()
+      contribution: external_exports.string().max(300).optional(),
+      specialTerms: external_exports.string().max(2e3).optional()
     })
   ).optional(),
   includeCapitalCalls: external_exports.boolean().optional(),
@@ -107448,7 +107440,8 @@ function registerPortalRoutes(app2) {
     const series = seed.series.map((sr, i) => ({
       name: sr.name,
       purpose: a2.series?.[i]?.purpose ?? sr.purpose ?? "",
-      contribution: capital.seriesCells[i] ?? "None"
+      contribution: capital.seriesCells[i] ?? "None",
+      specialTerms: a2.series?.[i]?.specialTerms ?? ""
     }));
     const inputs = {
       version,

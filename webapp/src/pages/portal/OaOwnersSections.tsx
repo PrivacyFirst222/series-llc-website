@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { Heart, Plus, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { QuestionCard } from "./OaQuestionCard";
 import { AddressAutocomplete } from "@/components/forms/florida-llc/AddressAutocomplete";
@@ -351,6 +352,35 @@ export function UnitFieldCards({ units, isMulti, owners, seedSeries, series, sEl
                     value={series?.[i]?.purpose ?? ""}
                     onChange={(e) => patchSeries(i, { purpose: e.target.value })}
                   />
+                </div>
+              ))}
+            </QuestionCard>
+
+            {/* Special terms per series (Adam, 12 Sep 2026): short ones here,
+                long ones by attachment under a title the card supplies. */}
+            <QuestionCard title="Special terms for each series (optional)">
+              <p className="text-sm text-muted-foreground" data-testid="special-terms-explanation">
+                Special terms are rules for this series alone that differ from the agreement's
+                defaults, such as a different manager, a limit on what the series may do, or an
+                event that dissolves this series. If they are short, spell them out here. If they
+                are long, type &ldquo;See attached&rdquo; and attach to the signed agreement a
+                document titled as shown under the box. Special terms may not vary Article 8 or
+                the provisions of the Act that cannot be varied.
+              </p>
+              {seedSeries.map((sr, i) => (
+                <div key={sr.name} className="space-y-1">
+                  <label className="text-sm" htmlFor={`special-terms-${i}`}>{sr.name}</label>
+                  <Textarea
+                    id={`special-terms-${i}`}
+                    aria-label={`Special terms for ${sr.name}`}
+                    placeholder='Spell them out, or type "See attached"'
+                    value={series?.[i]?.specialTerms ?? ""}
+                    onChange={(e) => patchSeries(i, { specialTerms: e.target.value })}
+                    rows={2}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Attachment title, if attached: &ldquo;Special Terms for {sr.name}&rdquo;
+                  </p>
                 </div>
               ))}
             </QuestionCard>

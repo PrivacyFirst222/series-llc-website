@@ -354,7 +354,6 @@ Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENE
 | Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
 | Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the Member, together with the records maintained under Article 8. |
 | Special terms (if any) | [None / variations from the base Agreement — may not vary Article 8, Article 9, or non-variable provisions of the Act] |
-| Dissolution events specific to this Protected Series (if any) | [None / describe] |
 
 **Adopted effective [DATE] by the Company, acting through the Member:**
 

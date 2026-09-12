@@ -54,6 +54,9 @@ export interface OaSeriesInput {
    *  by the Company (ss. 605.2302(1), 605.2303(2), Fla. Stat.), so no member
    *  holds a series-level interest. */
   contribution: string;
+  /** Rules for this series alone, in the client's words, or "See attached"
+   *  (Adam, 12 Sep 2026). Empty prints "None". */
+  specialTerms?: string;
 }
 
 export interface OaInputs {
@@ -560,8 +563,10 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
     // (ss. 605.2302(1), 605.2303(2), Fla. Stat.) — and the client's text fills
     // the [CONTRIBUTION] slot after it.
     ex = ex.replace("[CONTRIBUTION]", ser.contribution || "—");
-    ex = ex.replace(/\| Special terms \(if any\) \|[^\n]*\|/, "| Special terms (if any) | None |");
-    ex = ex.replace(/\| Dissolution events[^\n]*\|[^\n]*\|/, "| Dissolution events specific to this Protected Series (if any) | None |");
+    // The client's special terms for this series, or None; the dissolution
+    // row is gone (Adam, 12 Sep 2026) — such an event is a special term, and
+    // s. 14.1(b) reaches it there.
+    ex = ex.replace(/\| Special terms \(if any\) \|[^\n]*\|/, `| Special terms (if any) | ${(ser.specialTerms ?? "").trim().replace(/\|/g, "/").replace(/\s*\n\s*/g, " ") || "None"} |`);
     // Each Protected Series is owned by the Company, so the Series Exhibit is
     // adopted by whoever acts for the Company — the Manager, or all Members in
     // a member-managed company.

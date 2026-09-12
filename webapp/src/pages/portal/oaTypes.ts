@@ -17,6 +17,7 @@ export interface MemberAnswer {
 export interface SeriesAnswer {
   purpose?: string;
   contribution?: string;
+  specialTerms?: string;
 
 }
 export interface CoupleAnswer {

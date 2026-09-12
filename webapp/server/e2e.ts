@@ -2037,7 +2037,7 @@ if (mint.status === 200) {
     check("cash allocated beyond the amount contributed is refused", over.status === 400 && over.body?.error?.code === "CAPITAL" && /exceed the cash contributed/.test(over.body?.error?.message ?? ""), over.body);
     const badShares = await api("/api/portal/oa/generate", { method: "POST", cookies: mmPw.cookie, body: JSON.stringify({ ...mmAnswers, assets: [{ ...example[0], contributedBy: { mode: "shares", shares: [60, 50] } }] }) });
     check("shares that do not total 100 are refused", badShares.status === 400 && /shares must total 100/.test(badShares.body?.error?.message ?? ""), badShares.body);
-    const withAssets = await api("/api/portal/oa/generate", { method: "POST", cookies: mmPw.cookie, body: JSON.stringify({ ...mmAnswers, assets: example }) });
+    const withAssets = await api("/api/portal/oa/generate", { method: "POST", cookies: mmPw.cookie, body: JSON.stringify({ ...mmAnswers, assets: example, series: [{ specialTerms: "The Manager may not sell 123 Main Street without the consent of all Members." }] }) });
     check("an agreement with the asset list generates", withAssets.status === 200, withAssets.body);
     if (withAssets.body?.data?.generationId) {
       const inputsRes = await api(`/api/dev/oa-generation-inputs/${withAssets.body.data.generationId}`);
@@ -2049,6 +2049,8 @@ if (mint.status === 200) {
       check("Exhibit A totals the series and what the company retained",
         /\| E2E Member Managed Holdings, LLC, PS A \| 123 Main Street, Tampa \(\$200,000\); Cash \(\$10,000\) \| \$210,000 \|/.test(md) && /\| \*\*Retained by the Company\*\* \| Cash \(\$40,000\) \| \$40,000 \|/.test(md), md.match(/(PS A \| 123|Retained by the Company)[^\n]*/g));
       check("the Series Exhibit shows what the Company contributed to the series", /By the Company: 123 Main Street, Tampa \(\$200,000\); Cash \(\$10,000\)/.test(md), md.match(/By the Company:[^\n]*/)?.[0]);
+      check("the Series Exhibit carries the special terms typed, and no dissolution row (Adam, 12 Sep 2026)",
+        /\| Special terms \(if any\) \| The Manager may not sell 123 Main Street without the consent of all Members\. \|/.test(md) && !/Dissolution events specific/.test(md), md.match(/Special terms[^\n]*/)?.[0]);
     }
     // This agreement counts toward the five below and is deleted with them;
     // the client's ten-an-hour generation budget is the reason.

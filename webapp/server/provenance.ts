@@ -56,6 +56,7 @@ const S = {
   purpose1: "ZQPURPOSEONEQZ",
   purpose2: "ZQPURPOSETWOQZ",
   serContrib: "ZQSERCONTRIBQZ",
+  special: "ZQSPECIALQZ",
   asset1: "ZQASSETONEQZ",
   asset2: "ZQASSETTWOQZ",
 };
@@ -80,8 +81,8 @@ function inputsFor(v: OaInputs["version"]): OaInputs {
           { name: S.m2, address: S.addr2, percentage: 40, contribution: "$600", todBeneficiary: S.tod2 },
         ],
     series: [
-      { name: S.ser1, purpose: S.purpose1, contribution: `${S.asset1} ($1,000)` },
-      { name: S.ser2, purpose: S.purpose2, contribution: `${S.asset2} ($500)` },
+      { name: S.ser1, purpose: S.purpose1, contribution: `${S.asset1} ($1,000)`, specialTerms: S.special },
+      { name: S.ser2, purpose: S.purpose2, contribution: `${S.asset2} ($500)`, specialTerms: S.special },
     ],
     assets: [
       { description: S.asset1, value: "$1,000", by: single ? S.m1 : `${S.m1} and ${S.m2}, equally`, to: S.ser1 },
@@ -137,6 +138,7 @@ function unwind(s: string): string {
     .split(S.purpose2).join("[PURPOSE]")
     .split(S.serContrib).join("[SERCONTRIB]")
     .split(S.asset1).join("[ASSET]").split(S.asset2).join("[ASSET]")
+    .split(S.special).join("[SPECIAL]")
     // Every dollar figure is a value: a contribution, an agreed value, a
     // total, the threshold, the cap.
     .replace(/\$[\d,]+(?:\.\d+)?/g, "[MONEY]")
@@ -204,8 +206,7 @@ function masterKey(s: string): string {
       // the master offers inside the bracket. The chosen wording traces; a
       // wording from anywhere else still fails.
       .replace(/\[Same as Company Manager \/ NAME\]/g, "[NAME]")
-      .replace(/\[None \/ variations from the base Agreement — may not vary [^\]]*\]/g, "None")
-      .replace(/\[None \/ describe\]/g, "None")
+      .replace(/\[None \/ variations from the base Agreement — may not vary [^\]]*\]/g, "[SPECIAL]")
       .replace(/<!--[^>]*-->/g, "")
   );
 }
