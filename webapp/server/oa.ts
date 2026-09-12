@@ -40,6 +40,9 @@ export interface OaMemberInput {
   percentageLabel?: string;
   contribution: string; // free text, may be ""
   todBeneficiary: string; // "" = none
+  /** Takes if the first beneficiary does not survive the Member (Adam,
+   *  12 Sep 2026; s. 711.51(1), Fla. Stat.). "" = none. */
+  todBackup?: string;
   /** Humans who sign for this interest — both spouses for a marital unit. */
   signatories?: string[];
   /** The tenancy alone when this interest is held jointly — "tenants by the
@@ -489,6 +492,7 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
         // Membership Interest passes as provided by law." So an absent
         // beneficiary is a value, not a different sentence.
         "[TOD BENEFICIARY NAME(S)]": m.todBeneficiary || "None",
+        "[TOD BACKUP NAME(S)]": m.todBackup || "None",
       },
       "Exhibit A single",
     );
@@ -506,6 +510,7 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
       "[MEMBER CONTRIBUTION]": m.contribution || "—",
       "[MEMBER DATE]": inputs.effectiveDate,
       "[MEMBER TOD]": m.todBeneficiary || "None",
+      "[MEMBER TOD BACKUP]": m.todBackup || "None",
       // Empty for an individual, which drops the master's " as […]" fragment.
       // The name matches the marker that guards it — <!-- if:holding --> looks
       // up [HOLDING] — so a renamed slot cannot silently stop guarding.

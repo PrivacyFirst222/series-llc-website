@@ -102413,7 +102413,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **4.5 Other Activities.** The Member and the Manager may engage in or possess interests in other business ventures of any nature, independently or with others, and neither the Company nor any Protected Series shall have any right in such ventures by virtue of this Agreement.
 
-**4.6 Transfer on Death Designation.** The Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50\u2013711.512, Florida Statutes, and reflects the Member's designation, if any, of the person or persons who will become the owner of the Membership Interest upon the Member's death. The Member, if an individual, may designate any person or entity as a beneficiary. The Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, delivered to the Manager; the change is effective upon receipt unless the Manager objects in writing within seven (7) days, and the Manager shall thereafter update Exhibit A (though updating is not required for effectiveness). A beneficiary who becomes the owner of the Membership Interest under this Section succeeds to the Membership Interest subject to this Agreement and is admitted as the Member upon delivery to the Company of a written agreement to be bound by this Agreement.
+**4.6 Transfer on Death Designation.** The Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50\u2013711.512, Florida Statutes, and reflects the Member's designation, if any, of the person or persons who will become the owner of the Membership Interest upon the Member's death. The Member, if an individual, may designate any person or entity as a beneficiary. A designation may name a backup beneficiary to take if the first beneficiary does not survive the Member. The Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, delivered to the Manager; the change is effective upon receipt unless the Manager objects in writing within seven (7) days, and the Manager shall thereafter update Exhibit A (though updating is not required for effectiveness). A beneficiary who becomes the owner of the Membership Interest under this Section succeeds to the Membership Interest subject to this Agreement and is admitted as the Member upon delivery to the Company of a written agreement to be bound by this Agreement.
 
 **4.7 Incapacity of the Member.** While the Member is Incapacitated, the Member's rights under this Agreement \u2014 including the right to vote, to consent, and to sign any instrument \u2014 are exercised by the Member's agent under a durable power of attorney conferring that authority or, if there is none, by the Member's court-appointed guardian. The Company and the Manager may rely on a certified copy of the power of attorney or of the letters of guardianship without further inquiry.
 
@@ -102612,7 +102612,7 @@ Date: _____________________________
 
 **Transfer on Death designation (ss. 711.50\u2013711.512, Fla. Stat.):**
 
-Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENEFICIARY NAME(S)]**, or if none is designated or the designation fails, the Membership Interest passes as provided by law.
+Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENEFICIARY NAME(S)]**, or if that beneficiary does not survive the Member, to **[TOD BACKUP NAME(S)]**, or if none is designated or the designation fails, the Membership Interest passes as provided by law.
 
 [[pagebreak]]
 
@@ -102813,7 +102813,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **4.10 Information Rights.** Each Member has the information and inspection rights provided by the Act with respect to the Company. The records of the Company that each Member may inspect include the records maintained under Article 8 for every Protected Series.
 
-**4.11 Transfer on Death Designation.** Each Member's Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50\u2013711.512, Florida Statutes, and reflects each Member's designation, if any, of the person or persons who will become the owner of that Member's Membership Interest upon that Member's death. A Member who is an individual may designate any person or entity as a beneficiary. Members who hold a Membership Interest jointly as tenants in common may not designate a TOD beneficiary. A Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, delivered to the Manager; the change is effective upon receipt unless the Manager objects in writing within seven (7) days, and the Manager shall thereafter update Exhibit A (though updating is not required for effectiveness). Upon the designating Member's death, the designated beneficiary automatically succeeds to the deceased Member's transferable interest \u2014 including the economic rights of the deceased Member's Percentage Interest \u2014 taking subject to this Agreement, and holds the rights of a transferee described in Section 10.3 until admitted as a Member. A beneficiary is admitted as a Member upon delivery to the Company of a written agreement to be bound by this Agreement and the written consent of a Majority in Interest of the Members other than the deceased Member.
+**4.11 Transfer on Death Designation.** Each Member's Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50\u2013711.512, Florida Statutes, and reflects each Member's designation, if any, of the person or persons who will become the owner of that Member's Membership Interest upon that Member's death. A Member who is an individual may designate any person or entity as a beneficiary. A designation may name a backup beneficiary to take if the first beneficiary does not survive the Member. Members who hold a Membership Interest jointly as tenants in common may not designate a TOD beneficiary. A Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, delivered to the Manager; the change is effective upon receipt unless the Manager objects in writing within seven (7) days, and the Manager shall thereafter update Exhibit A (though updating is not required for effectiveness). Upon the designating Member's death, the designated beneficiary automatically succeeds to the deceased Member's transferable interest \u2014 including the economic rights of the deceased Member's Percentage Interest \u2014 taking subject to this Agreement, and holds the rights of a transferee described in Section 10.3 until admitted as a Member. A beneficiary is admitted as a Member upon delivery to the Company of a written agreement to be bound by this Agreement and the written consent of a Majority in Interest of the Members other than the deceased Member.
 
 **4.12 Incapacity of a Member.** While a Member is Incapacitated, that Member's rights under this Agreement \u2014 including the right to vote, to consent, and to sign any instrument \u2014 are exercised by the Member's agent under a durable power of attorney conferring that authority or, if there is none, by the Member's court-appointed guardian. The Company, the Manager, and the other Members may rely on a certified copy of the power of attorney or of the letters of guardianship without further inquiry.
 
@@ -103094,10 +103094,10 @@ Date: _____________________________
 
 **Transfer on Death designations (ss. 711.50\u2013711.512, Fla. Stat.):**
 
-| Designating Member | TOD beneficiary (any person or entity) |
-|---|---|
+| Designating Member | TOD beneficiary (any person or entity) | If that beneficiary does not survive the Member |
+|---|---|---|
 <!-- repeat:member -->
-| [MEMBER NAME] | [MEMBER TOD] |
+| [MEMBER NAME] | [MEMBER TOD] | [MEMBER TOD BACKUP] |
 <!-- /repeat -->
 
 If no beneficiary is designated, or a designation fails, the Member's interest passes as provided by law, subject to this Agreement.
@@ -103301,7 +103301,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **4.10 Information Rights.** Each Member has the information and inspection rights provided by the Act with respect to the Company. The records of the Company that each Member may inspect include the records maintained under Article 8 for every Protected Series.
 
-**4.11 Transfer on Death Designation.** Each Member's Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50\u2013711.512, Florida Statutes, and reflects each Member's designation, if any, of the person or persons who will become the owner of that Member's Membership Interest upon that Member's death. A Member who is an individual may designate any person or entity as a beneficiary. Members who hold a Membership Interest jointly as tenants in common may not designate a TOD beneficiary. A Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, delivered to the Manager; the change is effective upon receipt unless the Manager objects in writing within seven (7) days, and the Manager shall thereafter update Exhibit A (though updating is not required for effectiveness). Upon the designating Member's death, the designated beneficiary automatically succeeds to the deceased Member's transferable interest \u2014 including the economic rights of the deceased Member's Percentage Interest \u2014 taking subject to this Agreement, and holds the rights of a transferee described in Section 10.3 until admitted as a Member. A beneficiary is admitted as a Member upon delivery to the Company of a written agreement to be bound by this Agreement and the written consent of a Majority in Interest of the Members other than the deceased Member.
+**4.11 Transfer on Death Designation.** Each Member's Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50\u2013711.512, Florida Statutes, and reflects each Member's designation, if any, of the person or persons who will become the owner of that Member's Membership Interest upon that Member's death. A Member who is an individual may designate any person or entity as a beneficiary. A designation may name a backup beneficiary to take if the first beneficiary does not survive the Member. Members who hold a Membership Interest jointly as tenants in common may not designate a TOD beneficiary. A Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, delivered to the Manager; the change is effective upon receipt unless the Manager objects in writing within seven (7) days, and the Manager shall thereafter update Exhibit A (though updating is not required for effectiveness). Upon the designating Member's death, the designated beneficiary automatically succeeds to the deceased Member's transferable interest \u2014 including the economic rights of the deceased Member's Percentage Interest \u2014 taking subject to this Agreement, and holds the rights of a transferee described in Section 10.3 until admitted as a Member. A beneficiary is admitted as a Member upon delivery to the Company of a written agreement to be bound by this Agreement and the written consent of a Majority in Interest of the Members other than the deceased Member.
 
 **4.12 Incapacity of a Member.** While a Member is Incapacitated, that Member's rights under this Agreement \u2014 including the right to vote, to consent, and to sign any instrument \u2014 are exercised by the Member's agent under a durable power of attorney conferring that authority or, if there is none, by the Member's court-appointed guardian. The Company, the Manager, and the other Members may rely on a certified copy of the power of attorney or of the letters of guardianship without further inquiry.
 
@@ -103596,10 +103596,10 @@ Date: _____________________________
 
 **Transfer on Death designations (ss. 711.50\u2013711.512, Fla. Stat.):**
 
-| Designating Member | TOD beneficiary (any person or entity) |
-|---|---|
+| Designating Member | TOD beneficiary (any person or entity) | If that beneficiary does not survive the Member |
+|---|---|---|
 <!-- repeat:member -->
-| [MEMBER NAME] | [MEMBER TOD] |
+| [MEMBER NAME] | [MEMBER TOD] | [MEMBER TOD BACKUP] |
 <!-- /repeat -->
 
 If no beneficiary is designated, or a designation fails, the Member's interest passes as provided by law, subject to this Agreement.
@@ -103801,7 +103801,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **4.10 Information Rights.** Each Member has the information and inspection rights provided by the Act with respect to the Company. The records of the Company that each Member may inspect include the records maintained under Article 8 for every Protected Series.
 
-**4.11 Transfer on Death Designation.** Each Member's Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50\u2013711.512, Florida Statutes, and reflects each Member's designation, if any, of the person or persons who will become the owner of that Member's Membership Interest upon that Member's death. A Member who is an individual may designate any person or entity as a beneficiary. Members who hold a Membership Interest jointly as tenants in common may not designate a TOD beneficiary. A Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, delivered to the Administrative Member; the change is effective upon receipt unless the Administrative Member objects in writing within seven (7) days, and the Administrative Member shall thereafter update Exhibit A (though updating is not required for effectiveness). Upon the designating Member's death, the designated beneficiary automatically succeeds to the deceased Member's transferable interest \u2014 including the economic rights of the deceased Member's Percentage Interest \u2014 taking subject to this Agreement, and holds the rights of a transferee described in Section 10.3 until admitted as a Member. A beneficiary is admitted as a Member upon delivery to the Company of a written agreement to be bound by this Agreement and the written consent of a Majority in Interest of the Members other than the deceased Member.
+**4.11 Transfer on Death Designation.** Each Member's Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50\u2013711.512, Florida Statutes, and reflects each Member's designation, if any, of the person or persons who will become the owner of that Member's Membership Interest upon that Member's death. A Member who is an individual may designate any person or entity as a beneficiary. A designation may name a backup beneficiary to take if the first beneficiary does not survive the Member. Members who hold a Membership Interest jointly as tenants in common may not designate a TOD beneficiary. A Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, delivered to the Administrative Member; the change is effective upon receipt unless the Administrative Member objects in writing within seven (7) days, and the Administrative Member shall thereafter update Exhibit A (though updating is not required for effectiveness). Upon the designating Member's death, the designated beneficiary automatically succeeds to the deceased Member's transferable interest \u2014 including the economic rights of the deceased Member's Percentage Interest \u2014 taking subject to this Agreement, and holds the rights of a transferee described in Section 10.3 until admitted as a Member. A beneficiary is admitted as a Member upon delivery to the Company of a written agreement to be bound by this Agreement and the written consent of a Majority in Interest of the Members other than the deceased Member.
 
 **4.12 Incapacity of a Member.** While a Member is Incapacitated, that Member's rights under this Agreement \u2014 including the right to vote, to consent, and to sign any instrument \u2014 are exercised by the Member's agent under a durable power of attorney conferring that authority or, if there is none, by the Member's court-appointed guardian. The Company and the other Members may rely on a certified copy of the power of attorney or of the letters of guardianship without further inquiry.
 
@@ -104077,10 +104077,10 @@ Date: _____________________________
 
 **Transfer on Death designations (ss. 711.50\u2013711.512, Fla. Stat.):**
 
-| Designating Member | TOD beneficiary (any person or entity) |
-|---|---|
+| Designating Member | TOD beneficiary (any person or entity) | If that beneficiary does not survive the Member |
+|---|---|---|
 <!-- repeat:member -->
-| [MEMBER NAME] | [MEMBER TOD] |
+| [MEMBER NAME] | [MEMBER TOD] | [MEMBER TOD BACKUP] |
 <!-- /repeat -->
 
 If no beneficiary is designated, or a designation fails, the Member's interest passes as provided by law, subject to this Agreement.
@@ -104282,7 +104282,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **4.10 Information Rights.** Each Member has the information and inspection rights provided by the Act with respect to the Company. The records of the Company that each Member may inspect include the records maintained under Article 8 for every Protected Series.
 
-**4.11 Transfer on Death Designation.** Each Member's Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50\u2013711.512, Florida Statutes, and reflects each Member's designation, if any, of the person or persons who will become the owner of that Member's Membership Interest upon that Member's death. A Member who is an individual may designate any person or entity as a beneficiary. Members who hold a Membership Interest jointly as tenants in common may not designate a TOD beneficiary. A Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, delivered to the Administrative Member; the change is effective upon receipt unless the Administrative Member objects in writing within seven (7) days, and the Administrative Member shall thereafter update Exhibit A (though updating is not required for effectiveness). Upon the designating Member's death, the designated beneficiary automatically succeeds to the deceased Member's transferable interest \u2014 including the economic rights of the deceased Member's Percentage Interest \u2014 taking subject to this Agreement, and holds the rights of a transferee described in Section 10.3 until admitted as a Member. A beneficiary is admitted as a Member upon delivery to the Company of a written agreement to be bound by this Agreement and the written consent of a Majority in Interest of the Members other than the deceased Member.
+**4.11 Transfer on Death Designation.** Each Member's Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50\u2013711.512, Florida Statutes, and reflects each Member's designation, if any, of the person or persons who will become the owner of that Member's Membership Interest upon that Member's death. A Member who is an individual may designate any person or entity as a beneficiary. A designation may name a backup beneficiary to take if the first beneficiary does not survive the Member. Members who hold a Membership Interest jointly as tenants in common may not designate a TOD beneficiary. A Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, delivered to the Administrative Member; the change is effective upon receipt unless the Administrative Member objects in writing within seven (7) days, and the Administrative Member shall thereafter update Exhibit A (though updating is not required for effectiveness). Upon the designating Member's death, the designated beneficiary automatically succeeds to the deceased Member's transferable interest \u2014 including the economic rights of the deceased Member's Percentage Interest \u2014 taking subject to this Agreement, and holds the rights of a transferee described in Section 10.3 until admitted as a Member. A beneficiary is admitted as a Member upon delivery to the Company of a written agreement to be bound by this Agreement and the written consent of a Majority in Interest of the Members other than the deceased Member.
 
 **4.12 Incapacity of a Member.** While a Member is Incapacitated, that Member's rights under this Agreement \u2014 including the right to vote, to consent, and to sign any instrument \u2014 are exercised by the Member's agent under a durable power of attorney conferring that authority or, if there is none, by the Member's court-appointed guardian. The Company and the other Members may rely on a certified copy of the power of attorney or of the letters of guardianship without further inquiry.
 
@@ -104572,10 +104572,10 @@ Date: _____________________________
 
 **Transfer on Death designations (ss. 711.50\u2013711.512, Fla. Stat.):**
 
-| Designating Member | TOD beneficiary (any person or entity) |
-|---|---|
+| Designating Member | TOD beneficiary (any person or entity) | If that beneficiary does not survive the Member |
+|---|---|---|
 <!-- repeat:member -->
-| [MEMBER NAME] | [MEMBER TOD] |
+| [MEMBER NAME] | [MEMBER TOD] | [MEMBER TOD BACKUP] |
 <!-- /repeat -->
 
 If no beneficiary is designated, or a designation fails, the Member's interest passes as provided by law, subject to this Agreement.
@@ -104763,7 +104763,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **4.5 Other Activities.** The Member and the Manager may engage in or possess interests in other business ventures of any nature, independently or with others, and neither the Company nor any Protected Series shall have any right in such ventures by virtue of this Agreement.
 
-**4.6 Transfer on Death Designation.** The Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50\u2013711.512, Florida Statutes, and reflects the Member's designation, if any, of the person or persons who will become the owner of the Membership Interest upon the Member's death. Subject to Section 9.3(b), the Member, if an individual, may designate any person or entity as a beneficiary. The Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, delivered to the Manager; the change is effective upon receipt unless the Manager objects in writing within seven (7) days, and the Manager shall thereafter update Exhibit A (though updating is not required for effectiveness). A beneficiary who becomes the owner of the Membership Interest under this Section succeeds to the Membership Interest subject to this Agreement and is admitted as the Member upon delivery to the Company of a written agreement to be bound by this Agreement.
+**4.6 Transfer on Death Designation.** The Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50\u2013711.512, Florida Statutes, and reflects the Member's designation, if any, of the person or persons who will become the owner of the Membership Interest upon the Member's death. Subject to Section 9.3(b), the Member, if an individual, may designate any person or entity as a beneficiary. A designation may name a backup beneficiary to take if the first beneficiary does not survive the Member. The Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, delivered to the Manager; the change is effective upon receipt unless the Manager objects in writing within seven (7) days, and the Manager shall thereafter update Exhibit A (though updating is not required for effectiveness). A beneficiary who becomes the owner of the Membership Interest under this Section succeeds to the Membership Interest subject to this Agreement and is admitted as the Member upon delivery to the Company of a written agreement to be bound by this Agreement.
 
 **4.7 Incapacity of the Member.** While the Member is Incapacitated, the Member's rights under this Agreement \u2014 including the right to vote, to consent, and to sign any instrument \u2014 are exercised by the Member's agent under a durable power of attorney conferring that authority or, if there is none, by the Member's court-appointed guardian. The Company and the Manager may rely on a certified copy of the power of attorney or of the letters of guardianship without further inquiry.
 
@@ -104991,7 +104991,7 @@ Date: _____________________________
 
 **Transfer on Death designation (ss. 711.50\u2013711.512, Fla. Stat.):**
 
-Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENEFICIARY NAME(S)]**, or if none is designated or the designation fails, the Membership Interest passes as provided by law. A designation is effective only in favor of a beneficiary that is an eligible S corporation shareholder (Section 9.3(b)).
+Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENEFICIARY NAME(S)]**, or if that beneficiary does not survive the Member, to **[TOD BACKUP NAME(S)]**, or if none is designated or the designation fails, the Membership Interest passes as provided by law. A designation is effective only in favor of a beneficiary that is an eligible S corporation shareholder (Section 9.3(b)).
 
 [[pagebreak]]
 
@@ -105166,7 +105166,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **4.4 Other Activities.** The Member may engage in or possess interests in other business ventures of any nature, independently or with others, and neither the Company nor any Protected Series shall have any right in such ventures by virtue of this Agreement.
 
-**4.5 Transfer on Death Designation.** The Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50\u2013711.512, Florida Statutes, and reflects the Member's designation, if any, of the person or persons who will become the owner of the Membership Interest upon the Member's death. The Member, if an individual, may designate any person or entity as a beneficiary. The Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, maintained with the Company's records; the change is effective upon execution, and Exhibit A shall be updated to reflect it (though updating is not required for effectiveness). A beneficiary who becomes the owner of the Membership Interest under this Section succeeds to the Membership Interest subject to this Agreement and is admitted as the Member upon delivery to the Company of a written agreement to be bound by this Agreement.
+**4.5 Transfer on Death Designation.** The Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50\u2013711.512, Florida Statutes, and reflects the Member's designation, if any, of the person or persons who will become the owner of the Membership Interest upon the Member's death. The Member, if an individual, may designate any person or entity as a beneficiary. A designation may name a backup beneficiary to take if the first beneficiary does not survive the Member. The Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, maintained with the Company's records; the change is effective upon execution, and Exhibit A shall be updated to reflect it (though updating is not required for effectiveness). A beneficiary who becomes the owner of the Membership Interest under this Section succeeds to the Membership Interest subject to this Agreement and is admitted as the Member upon delivery to the Company of a written agreement to be bound by this Agreement.
 
 **4.6 Incapacity of the Member.** While the Member is Incapacitated, the Member's rights under this Agreement \u2014 including the right to vote, to consent, and to sign any instrument \u2014 are exercised by the Member's agent under a durable power of attorney conferring that authority or, if there is none, by the Member's court-appointed guardian. The Company may rely on a certified copy of the power of attorney or of the letters of guardianship without further inquiry.
 
@@ -105348,7 +105348,7 @@ Date: _____________________________
 
 **Transfer on Death designation (ss. 711.50\u2013711.512, Fla. Stat.):**
 
-Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENEFICIARY NAME(S)]**, or if none is designated or the designation fails, the Membership Interest passes as provided by law.
+Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENEFICIARY NAME(S)]**, or if that beneficiary does not survive the Member, to **[TOD BACKUP NAME(S)]**, or if none is designated or the designation fails, the Membership Interest passes as provided by law.
 
 [[pagebreak]]
 
@@ -105527,7 +105527,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **4.4 Other Activities.** The Member may engage in or possess interests in other business ventures of any nature, independently or with others, and neither the Company nor any Protected Series shall have any right in such ventures by virtue of this Agreement.
 
-**4.5 Transfer on Death Designation.** The Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50\u2013711.512, Florida Statutes, and reflects the Member's designation, if any, of the person or persons who will become the owner of the Membership Interest upon the Member's death. Subject to Section 9.3(b), the Member, if an individual, may designate any person or entity as a beneficiary. The Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, maintained with the Company's records; the change is effective upon execution, and Exhibit A shall be updated to reflect it (though updating is not required for effectiveness). A beneficiary who becomes the owner of the Membership Interest under this Section succeeds to the Membership Interest subject to this Agreement and is admitted as the Member upon delivery to the Company of a written agreement to be bound by this Agreement.
+**4.5 Transfer on Death Designation.** The Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50\u2013711.512, Florida Statutes, and reflects the Member's designation, if any, of the person or persons who will become the owner of the Membership Interest upon the Member's death. Subject to Section 9.3(b), the Member, if an individual, may designate any person or entity as a beneficiary. A designation may name a backup beneficiary to take if the first beneficiary does not survive the Member. The Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, maintained with the Company's records; the change is effective upon execution, and Exhibit A shall be updated to reflect it (though updating is not required for effectiveness). A beneficiary who becomes the owner of the Membership Interest under this Section succeeds to the Membership Interest subject to this Agreement and is admitted as the Member upon delivery to the Company of a written agreement to be bound by this Agreement.
 
 **4.6 Incapacity of the Member.** While the Member is Incapacitated, the Member's rights under this Agreement \u2014 including the right to vote, to consent, and to sign any instrument \u2014 are exercised by the Member's agent under a durable power of attorney conferring that authority or, if there is none, by the Member's court-appointed guardian. The Company may rely on a certified copy of the power of attorney or of the letters of guardianship without further inquiry.
 
@@ -105735,7 +105735,7 @@ Date: _____________________________
 
 **Transfer on Death designation (ss. 711.50\u2013711.512, Fla. Stat.):**
 
-Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENEFICIARY NAME(S)]**, or if none is designated or the designation fails, the Membership Interest passes as provided by law. A designation is effective only in favor of a beneficiary that is an eligible S corporation shareholder (Section 9.3(b)).
+Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENEFICIARY NAME(S)]**, or if that beneficiary does not survive the Member, to **[TOD BACKUP NAME(S)]**, or if none is designated or the designation fails, the Membership Interest passes as provided by law. A designation is effective only in favor of a beneficiary that is an eligible S corporation shareholder (Section 9.3(b)).
 
 [[pagebreak]]
 
@@ -106013,7 +106013,8 @@ NOW, THEREFORE,`,
         // **X**, or if none is designated or the designation fails, the
         // Membership Interest passes as provided by law." So an absent
         // beneficiary is a value, not a different sentence.
-        "[TOD BENEFICIARY NAME(S)]": m2.todBeneficiary || "None"
+        "[TOD BENEFICIARY NAME(S)]": m2.todBeneficiary || "None",
+        "[TOD BACKUP NAME(S)]": m2.todBackup || "None"
       },
       "Exhibit A single"
     );
@@ -106026,6 +106027,7 @@ NOW, THEREFORE,`,
       "[MEMBER CONTRIBUTION]": m2.contribution || "\u2014",
       "[MEMBER DATE]": inputs.effectiveDate,
       "[MEMBER TOD]": m2.todBeneficiary || "None",
+      "[MEMBER TOD BACKUP]": m2.todBackup || "None",
       // Empty for an individual, which drops the master's " as […]" fragment.
       // The name matches the marker that guards it — <!-- if:holding --> looks
       // up [HOLDING] — so a renamed slot cannot silently stop guarding.
@@ -106603,7 +106605,9 @@ var oaAnswersSchema = external_exports.object({
       numerator: external_exports.number().int().min(0).max(1e5).optional(),
       denominator: external_exports.number().int().min(1).max(1e5).optional(),
       contribution: external_exports.string().max(300).optional(),
-      todBeneficiary: external_exports.string().max(300).optional().refine((v2) => !(v2 ?? "").trim() || hasFirstAndLast(v2), `Beneficiary: ${FIRST_AND_LAST}`)
+      todBeneficiary: external_exports.string().max(300).optional().refine((v2) => !(v2 ?? "").trim() || hasFirstAndLast(v2), `Beneficiary: ${FIRST_AND_LAST}`),
+      // A backup may be a class ("my children in equal shares"), so no name rule.
+      todBackup: external_exports.string().max(300).optional()
     })
   ).max(20).optional(),
   series: external_exports.array(
@@ -106638,7 +106642,9 @@ var oaAnswersSchema = external_exports.object({
       numerator: external_exports.number().int().min(0).max(1e5).optional(),
       denominator: external_exports.number().int().min(1).max(1e5).optional(),
       contribution: external_exports.string().max(300).optional(),
-      todBeneficiary: external_exports.string().max(300).optional().refine((v2) => !(v2 ?? "").trim() || hasFirstAndLast(v2), `Beneficiary: ${FIRST_AND_LAST}`)
+      todBeneficiary: external_exports.string().max(300).optional().refine((v2) => !(v2 ?? "").trim() || hasFirstAndLast(v2), `Beneficiary: ${FIRST_AND_LAST}`),
+      // A backup may be a class ("my children in equal shares"), so no name rule.
+      todBackup: external_exports.string().max(300).optional()
     })
   ).max(10).optional()
 }).superRefine((a2, ctx) => {
@@ -107371,6 +107377,7 @@ function registerPortalRoutes(app2) {
           jointHolding: SPOUSAL_FORM_LABEL[cpl.form],
           contribution: cpl.contribution ?? "",
           todBeneficiary: cpl.todBeneficiary ? `${cpl.todBeneficiary} (effective at the death of the last surviving spouse)` : "",
+          todBackup: cpl.todBackup ?? "",
           signatories: [owners[cpl.a].name, owners[cpl.b].name]
         });
       } else {
@@ -107381,7 +107388,8 @@ function registerPortalRoutes(app2) {
           percentage: shareValue(multiOwner ? ownershipMode : "percent", mShare),
           percentageLabel: shareLabel(multiOwner ? ownershipMode : "percent", mShare),
           contribution: a2.members?.[i]?.contribution ?? "",
-          todBeneficiary: a2.members?.[i]?.todBeneficiary ?? ""
+          todBeneficiary: a2.members?.[i]?.todBeneficiary ?? "",
+          todBackup: a2.members?.[i]?.todBackup ?? ""
         });
       }
     });

@@ -13,6 +13,7 @@ export interface MemberAnswer {
   denominator?: number;
   contribution?: string;
   todBeneficiary?: string;
+  todBackup?: string;
 }
 export interface SeriesAnswer {
   purpose?: string;
@@ -29,6 +30,7 @@ export interface CoupleAnswer {
   denominator?: number;
   contribution?: string;
   todBeneficiary?: string;
+  todBackup?: string;
 }
 /** One contributed asset (Adam, 12 Sep 2026): its agreed value, who
  *  contributed it, and where the company allocates it. */

@@ -51,6 +51,8 @@ const S = {
   contrib2: "ZQCONTRIBTWOQZ",
   tod1: "ZQTODONEQZ",
   tod2: "ZQTODTWOQZ",
+  todb1: "ZQTODBONEQZ",
+  todb2: "ZQTODBTWOQZ",
   ser1: "ZQSERIESONEQZ",
   ser2: "ZQSERIESTWOQZ",
   purpose1: "ZQPURPOSEONEQZ",
@@ -75,10 +77,10 @@ function inputsFor(v: OaInputs["version"]): OaInputs {
     // Contributions are money now, computed from the asset list; the money
     // regex in unwind() reduces every figure to one token.
     members: single
-      ? [{ name: S.m1, address: S.addr1, percentage: 100, contribution: "$1,500", todBeneficiary: S.tod1 }]
+      ? [{ name: S.m1, address: S.addr1, percentage: 100, contribution: "$1,500", todBeneficiary: S.tod1, todBackup: S.todb1 }]
       : [
-          { name: S.m1, address: S.addr1, percentage: 60, contribution: "$900", todBeneficiary: S.tod1 },
-          { name: S.m2, address: S.addr2, percentage: 40, contribution: "$600", todBeneficiary: S.tod2 },
+          { name: S.m1, address: S.addr1, percentage: 60, contribution: "$900", todBeneficiary: S.tod1, todBackup: S.todb1 },
+          { name: S.m2, address: S.addr2, percentage: 40, contribution: "$600", todBeneficiary: S.tod2, todBackup: S.todb2 },
         ],
     series: [
       { name: S.ser1, purpose: S.purpose1, contribution: `${S.asset1} ($1,000)`, specialTerms: S.special },
@@ -150,6 +152,7 @@ function unwind(s: string): string {
     .split(S.addr1).join("[ADDRESS]").split(S.addr2).join("[ADDRESS]")
     .split(S.contrib1).join("[AMOUNT]").split(S.contrib2).join("[AMOUNT]")
     .split(S.tod1).join("[TOD]").split(S.tod2).join("[TOD]")
+    .split(S.todb1).join("[TOD]").split(S.todb2).join("[TOD]")
     .split(OA_TEMPLATE_VERSION).join("[EDITION]")
     // The document title is chosen between two wordings the generator owns;
     // the master's footer line spells the slot.
@@ -198,7 +201,7 @@ function masterKey(s: string): string {
       .replace(/\[NAME\](?: \(\d+(?:\.\d+)?%\))?(?:(?:, \[NAME\](?: \(\d+(?:\.\d+)?%\))?)*,? and \[NAME\](?: \(\d+(?:\.\d+)?%\))?)?(?:, equally)?(?= \| (?:\[SERIES\]|the Company|\[ASSET TO\]) \|)/g, "[ASSET BY]")
       .replace(/(\| (?:\[ASSET BY\]|\[MONEY\]) \| )(?:\[SERIES\]|the Company)( \|)/g, "$1[ASSET TO]$2")
       .replace(/\[MEMBER DATE\]|\[DATE\]/g, "[DATE]")
-      .replace(/\[MEMBER TOD\]|\[TOD BENEFICIARY NAME\(S\)\]|\[NAME\(S\) \/ None\]/g, "[TOD]")
+      .replace(/\[MEMBER TOD BACKUP\]|\[TOD BACKUP NAME\(S\)\]|\[MEMBER TOD\]|\[TOD BENEFICIARY NAME\(S\)\]|\[NAME\(S\) \/ None\]/g, "[TOD]")
       .replace(/\[MEMBER SHARE\]|\[___\]%/g, "[PCT]")
       .replace(/\$\[THRESHOLD\]|\$\[CAP\]/g, "[MONEY]")
       .replace(/\[PURPOSE[^\]]*\]/g, "[PURPOSE]")

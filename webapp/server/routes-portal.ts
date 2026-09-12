@@ -187,6 +187,8 @@ export const oaAnswersSchema = z.object({
         denominator: z.number().int().min(1).max(100_000).optional(),
         contribution: z.string().max(300).optional(),
         todBeneficiary: z.string().max(300).optional().refine((v) => !(v ?? "").trim() || hasFirstAndLast(v), `Beneficiary: ${FIRST_AND_LAST}`),
+        // A backup may be a class ("my children in equal shares"), so no name rule.
+        todBackup: z.string().max(300).optional(),
       }),
     )
     .max(20)
@@ -230,6 +232,8 @@ export const oaAnswersSchema = z.object({
         denominator: z.number().int().min(1).max(100_000).optional(),
         contribution: z.string().max(300).optional(),
         todBeneficiary: z.string().max(300).optional().refine((v) => !(v ?? "").trim() || hasFirstAndLast(v), `Beneficiary: ${FIRST_AND_LAST}`),
+        // A backup may be a class ("my children in equal shares"), so no name rule.
+        todBackup: z.string().max(300).optional(),
       }),
     )
     .max(10)
@@ -1236,6 +1240,7 @@ app.post("/portal/oa/generate", async (c) => {
         todBeneficiary: cpl.todBeneficiary
           ? `${cpl.todBeneficiary} (effective at the death of the last surviving spouse)`
           : "",
+        todBackup: cpl.todBackup ?? "",
         signatories: [owners[cpl.a].name, owners[cpl.b].name],
       });
     } else {
@@ -1249,6 +1254,7 @@ app.post("/portal/oa/generate", async (c) => {
         percentageLabel: shareLabel(multiOwner ? ownershipMode : "percent", mShare),
         contribution: a.members?.[i]?.contribution ?? "",
         todBeneficiary: a.members?.[i]?.todBeneficiary ?? "",
+        todBackup: a.members?.[i]?.todBackup ?? "",
       });
     }
   });

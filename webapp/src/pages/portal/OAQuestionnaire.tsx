@@ -341,6 +341,12 @@ export default function OAQuestionnaire() {
     if (u.kind === "couple") patchCouple(u.ci, { todBeneficiary: v });
     else patchMember(u.index, { todBeneficiary: v });
   };
+  const unitTodBackup = (u: Unit) =>
+    u.kind === "couple" ? couples[u.ci]?.todBackup : a.members?.[u.index]?.todBackup;
+  const setUnitTodBackup = (u: Unit, v: string) => {
+    if (u.kind === "couple") patchCouple(u.ci, { todBackup: v });
+    else patchMember(u.index, { todBackup: v });
+  };
 
   return (
     <section className="container-wide section-y">
@@ -661,6 +667,8 @@ export default function OAQuestionnaire() {
               sElection={a.sElection}
               unitTod={unitTod}
               setUnitTod={setUnitTod}
+              unitTodBackup={unitTodBackup}
+              setUnitTodBackup={setUnitTodBackup}
               patchSeries={patchSeries}
               ownerLabel={ownerLabel}
             />

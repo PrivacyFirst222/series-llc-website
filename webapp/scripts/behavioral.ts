@@ -1552,6 +1552,8 @@ async function main(): Promise<void> {
       const tod = page.locator('main input[aria-label^="Transfer-on-death beneficiary for"]');
       expect((await tod.count()) >= 1, "OA-I: a transfer-on-death box per ownership unit", await tod.count());
       await tod.last().fill("Jordan Heir");
+      // A backup beneficiary, a class in the owner's words (Adam, 12 Sep 2026).
+      await page.locator('main input[aria-label^="Backup beneficiary for"]').last().fill("my children in equal shares");
       await checkAllBoxes(page);
       genCaptured = null;
       await page.locator("main button").filter({ hasText: /^Generate|^Regenerate/ }).first().click({ timeout: 15000 });
@@ -1564,6 +1566,7 @@ async function main(): Promise<void> {
         expect(md2.includes("Drew Solo"), "OA-I: the third owner is in the agreement");
         expect(/2\/3/.test(md2) && /1\/3/.test(md2), "OA-I: the fractions typed on screen are in the agreement", md2.match(/\d\/\d/g)?.slice(0, 6));
         expect(md2.includes("Jordan Heir"), "OA-I: the transfer-on-death beneficiary is in the agreement");
+        expect(/\| Jordan Heir[^|]*\| my children in equal shares \|/.test(md2), "OA-I: the backup beneficiary sits beside the first on Exhibit A", md2.match(/Jordan Heir[^\n]*/)?.[0]);
         expect(/tenants by the entirety/i.test(md2), "OA-I: the couple is still paired");
         // A couple is one ownership unit in the agreement's inputs: the pair
         // named together, plus the solo owner.

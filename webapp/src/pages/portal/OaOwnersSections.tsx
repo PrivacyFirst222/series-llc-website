@@ -328,7 +328,7 @@ export function SpousePairingCard({ owners, couples, unpaired, onPair, onUnpair 
 }
 
 export function UnitFieldCards({ units, isMulti, owners, seedSeries, series, sElection,
-  unitTod, setUnitTod, patchSeries, ownerLabel }: {
+  unitTod, setUnitTod, unitTodBackup, setUnitTodBackup, patchSeries, ownerLabel }: {
   units: Unit[];
   isMulti: boolean;
   owners: MemberAnswer[];
@@ -337,6 +337,8 @@ export function UnitFieldCards({ units, isMulti, owners, seedSeries, series, sEl
   sElection: boolean | undefined;
   unitTod: (u: Unit) => string | undefined;
   setUnitTod: (u: Unit, v: string) => void;
+  unitTodBackup: (u: Unit) => string | undefined;
+  setUnitTodBackup: (u: Unit, v: string) => void;
   patchSeries: (i: number, p: Partial<SeriesAnswer>) => void;
   ownerLabel: (m: MemberAnswer | undefined, i: number) => string;
 }) {
@@ -407,6 +409,17 @@ export function UnitFieldCards({ units, isMulti, owners, seedSeries, series, sEl
                   {(unitTod(u) ?? "").trim() && !hasFirstAndLast(unitTod(u)) ? (
                     <p className="pl-[50%] text-xs text-destructive">{FIRST_AND_LAST}</p>
                   ) : null}
+                  {/* A backup takes if the first beneficiary does not survive
+                      (Adam, 12 Sep 2026); it may be a class of people. */}
+                  <div className="flex items-center gap-3">
+                    <span className="w-1/2 truncate text-xs text-muted-foreground">Backup, if that beneficiary does not survive</span>
+                    <Input
+                      aria-label={`Backup beneficiary for ${u.label}`}
+                      placeholder='e.g., "my children in equal shares" (or leave blank)'
+                      value={unitTodBackup(u) ?? ""}
+                      onChange={(e) => setUnitTodBackup(u, e.target.value)}
+                    />
+                  </div>
                   {u.kind === "couple" ? (
                     <p className="pl-[50%] text-xs text-muted-foreground">
                       Takes effect at the death of the last surviving spouse.

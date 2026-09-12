@@ -1242,7 +1242,7 @@ if (mint.status === 200) {
     effectiveDate: "2026-08-05",
     authorized: true,
     contributionToCompany: "$1,000 cash",
-    members: [{ todBeneficiary: "Jordan Member" }],
+    members: [{ todBeneficiary: "Jordan Member", todBackup: "my children in equal shares" }],
     series: [],
   };
   const saveAns = await api("/api/portal/oa/answers", { method: "PUT", cookies: setPw.cookie, body: JSON.stringify(oaAnswers) });
