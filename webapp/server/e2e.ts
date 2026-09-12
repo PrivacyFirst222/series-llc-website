@@ -3,7 +3,7 @@
  * Requires the dev API on :3000. Uses the same defaults + validation the form uses.
  */
 import { defaultFormData } from "../src/components/forms/florida-llc/defaults";
-import { assembleOa } from "./oa";
+import { assembleOa, type OaInputs } from "./oa";
 import type { FloridaLLCFormData } from "../src/components/forms/florida-llc/types";
 import { evaluate2553Timing } from "../src/lib/form2553Timing";
 
@@ -2027,12 +2027,32 @@ if (mint.status === 200) {
   // everything made here is deleted again.
   {
     const countNow = async () => ((await api("/api/portal/oa", { cookies: mmPw.cookie })).body?.data?.generations ?? []).length as number;
-    const over = await api("/api/portal/oa/generate", { method: "POST", cookies: mmPw.cookie, body: JSON.stringify({ ...mmAnswers, series: [{ contribution: "$5,000" }] }) });
-    check("allocating more than was contributed is refused", over.status === 400 && over.body?.error?.code === "OVER_ALLOCATED", over.body);
-    const words = await api("/api/portal/oa/generate", { method: "POST", cookies: mmPw.cookie, body: JSON.stringify({ ...mmAnswers, members: [{ percentage: 50, contribution: "the Main Street property" }, { percentage: 50, contribution: "$500 cash" }], series: [{ contribution: "$5,000" }] }) });
-    check("a contribution described in words is not measured against allocations", words.status === 200, words.body);
-    if (words.body?.data?.generationId) await api(`/api/portal/oa/generations/${words.body.data.generationId}`, { method: "DELETE", cookies: mmPw.cookie });
-    const made: string[] = [];
+    // Adam's example (12 Sep 2026), cut to this company's one series: a
+    // property and cash, contributed equally, allocated to the series.
+    const example = [
+      { description: "123 Main Street, Tampa", kind: "other", value: 200000, contributedBy: { mode: "equal" }, allocatedTo: 0 },
+      { description: "Cash", kind: "cash", value: 50000, contributedBy: { mode: "equal" }, cashAllocations: [10000] },
+    ];
+    const over = await api("/api/portal/oa/generate", { method: "POST", cookies: mmPw.cookie, body: JSON.stringify({ ...mmAnswers, assets: [{ ...example[1], cashAllocations: [60000] }] }) });
+    check("cash allocated beyond the amount contributed is refused", over.status === 400 && over.body?.error?.code === "CAPITAL" && /exceed the cash contributed/.test(over.body?.error?.message ?? ""), over.body);
+    const badShares = await api("/api/portal/oa/generate", { method: "POST", cookies: mmPw.cookie, body: JSON.stringify({ ...mmAnswers, assets: [{ ...example[0], contributedBy: { mode: "shares", shares: [60, 50] } }] }) });
+    check("shares that do not total 100 are refused", badShares.status === 400 && /shares must total 100/.test(badShares.body?.error?.message ?? ""), badShares.body);
+    const withAssets = await api("/api/portal/oa/generate", { method: "POST", cookies: mmPw.cookie, body: JSON.stringify({ ...mmAnswers, assets: example }) });
+    check("an agreement with the asset list generates", withAssets.status === 200, withAssets.body);
+    if (withAssets.body?.data?.generationId) {
+      const inputsRes = await api(`/api/dev/oa-generation-inputs/${withAssets.body.data.generationId}`);
+      const md = inputsRes.status === 200 ? assembleOa(inputsRes.body?.data?.inputs as OaInputs).markdown : "";
+      check("Exhibit A shows each owner's computed contribution",
+        inputsRes.status === 200 && /\| Dana Reed \| [^|]*\| 50% \| \$125,000 \|/.test(md) && /\| Jamie Reed \| [^|]*\| 50% \| \$125,000 \|/.test(md), md.match(/\| (?:Dana|Jamie) Reed[^\n]*/g));
+      check("Exhibit A lists the assets with who contributed them and where they went",
+        /\| 123 Main Street, Tampa \| \$200,000 \| Dana Reed and Jamie Reed, equally \| E2E Member Managed Holdings, LLC, PS A \|/.test(md) && /\| Cash \| \$50,000 \| Dana Reed and Jamie Reed, equally \| E2E Member Managed Holdings, LLC, PS A: \$10,000; the Company: \$40,000 \|/.test(md), md.match(/\| (?:123 Main|Cash) [^\n]*/g));
+      check("Exhibit A totals the series and what the company retained",
+        /\| E2E Member Managed Holdings, LLC, PS A \| 123 Main Street, Tampa \(\$200,000\); Cash \(\$10,000\) \| \$210,000 \|/.test(md) && /\| \*\*Retained by the Company\*\* \| Cash \(\$40,000\) \| \$40,000 \|/.test(md), md.match(/(PS A \| 123|Retained by the Company)[^\n]*/g));
+      check("the Series Exhibit shows what the Company contributed to the series", /By the Company: 123 Main Street, Tampa \(\$200,000\); Cash \(\$10,000\)/.test(md), md.match(/By the Company:[^\n]*/)?.[0]);
+    }
+    // This agreement counts toward the five below and is deleted with them;
+    // the client's ten-an-hour generation budget is the reason.
+    const made: string[] = withAssets.body?.data?.generationId ? [withAssets.body.data.generationId as string] : [];
     while ((await countNow()) < 5) {
       const g = await api("/api/portal/oa/generate", { method: "POST", cookies: mmPw.cookie, body: JSON.stringify(mmAnswers) });
       if (g.status !== 200) break;

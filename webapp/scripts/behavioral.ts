@@ -1438,18 +1438,26 @@ async function main(): Promise<void> {
         await capCap.fill("10000");
         expect((await capCap.inputValue()) === "10,000", "OA: the capital call cap shows commas as typed", await capCap.inputValue());
       }
-      const contrib = page.locator('main input[aria-label^="Contribution to the company"]').first();
-      await contrib.fill("$1,000 cash");
-      // Allocation of the company's capital to a series (Adam, 10 Sep 2026):
-      // more than was contributed is flagged at the box; a proper amount
-      // reaches Exhibit A with what the company retained.
-      const alloc = page.locator('main input[aria-label^="Capital allocated to"]').first();
-      await alloc.fill("$5,000");
+      // Capital as a list of assets (Adam, 12 Sep 2026): a property to the
+      // series and cash split between the series and the company; cash
+      // allocated beyond its amount is flagged at the asset.
+      expect(/three rental properties and \$50,000/.test(await page.locator('[data-testid="contribution-explanation"]').innerText()), "OA: the contributions card opens with the example");
+      await page.locator('[data-testid="add-asset"]').click();
+      await page.locator('main input[aria-label="Description of asset 1"]').fill("123 Main Street, Orlando");
+      await page.locator('main input[aria-label="Agreed value of asset 1"]').fill("200000");
+      await page.locator('main [aria-label="Where asset 1 is allocated"]').click();
+      await page.getByRole("option", { name: /PS Alpha/ }).first().click();
+      await page.locator('[data-testid="add-asset"]').click();
+      await page.locator('main input[aria-label="Description of asset 2"]').fill("Cash");
+      await page.locator('main input[name="asset-kind-1"]').nth(1).check({ force: true });
+      await page.locator('main input[aria-label="Agreed value of asset 2"]').fill("50000");
+      const cashBox = page.locator('main input[aria-label^="Amount of asset 2 allocated to"]').first();
+      await cashBox.fill("60000");
       await page.waitForTimeout(300);
-      expect((await page.locator('[data-testid="over-allocated"]').count()) === 1, "OA: allocating more than was contributed is flagged at the box");
-      await alloc.fill("$400");
+      expect(/exceed the cash contributed/.test(await page.locator('[data-testid="asset-1-problems"]').innerText().catch(() => "")), "OA: cash allocated beyond its amount is flagged at the asset");
+      await cashBox.fill("10000");
       await page.waitForTimeout(300);
-      expect((await page.locator('[data-testid="over-allocated"]').count()) === 0, "OA: a proper allocation clears the flag");
+      expect((await page.locator('[data-testid="asset-1-problems"]').count()) === 0 && /Retained by the company: \$40,000/.test(await page.locator('[data-testid="asset-1-retained"]').innerText()), "OA: a proper allocation clears the flag and shows what the company retains");
       await page.getByLabel("Effective date").fill("2026-09-15");
       await checkAllBoxes(page);
       await page.waitForTimeout(1000);
@@ -1503,10 +1511,11 @@ async function main(): Promise<void> {
       await page.waitForTimeout(1500);
       expect((await page.locator('[data-testid="action-needed-list"]').count()) === 0, "OA: no action-needed toast once the agreement exists");
       expect((await page.locator('[data-needs-action="true"]').count()) === 0, "OA: no red outlines once nothing is owed");
-      expect(md.includes("$1,000 cash"), "OA: the contribution typed on screen is in Exhibit A");
-      // The journey answered "more than one owner", so Exhibit A carries the
-      // multi form's allocation table; the single form's rows are accepted too.
-      expect((/\| [^|\n]*PS Alpha \| \$400 \|/.test(md) || /PS Alpha: \$400 \|/.test(md)) && /Retained by the Company\*{0,2} \| \$600 \|/.test(md), "OA: Exhibit A shows the allocation to the series and what the company retained", md.match(/(PS Alpha[^\n]*\$400|Retained by the Company)[^\n]*/g));
+      // The two owners are paired as spouses by now, so they contribute as
+      // one unit and the cell names them both without a share.
+      expect(/\| 123 Main Street, Orlando \| \$200,000 \| Casey Gatecheck and [^|]* \| [^|]*PS Alpha \|/.test(md) && /\| Cash \| \$50,000 \| Casey Gatecheck and [^|]* \| [^|]*PS Alpha: \$10,000; the Company: \$40,000 \|/.test(md), "OA: Exhibit A lists the assets, who contributed them, and where they went", md.match(/\| (?:123 Main|Cash) [^\n]*/g));
+      expect(/\$210,000 \|/.test(md) && /Retained by the Company\*{0,2} \| Cash \(\$40,000\) \| \$40,000 \|/.test(md), "OA: Exhibit A totals the series and what the company retained", md.match(/Retained by the Company[^\n]*/)?.[0]);
+      expect(/\| [^|]* \| [^|]* \| [^|]* \| \$250,000 \|/.test(md), "OA: the couple's contribution on Exhibit A is the whole of the assets", md.match(/\$250,000[^\n]*/)?.[0]);
       expect(md.includes("September 15, 2026"), "OA: the effective date chosen on screen is in the agreement");
       console.log("  ✓ OA journey: every on-screen answer survived into the assembled agreement");
 
@@ -1535,8 +1544,6 @@ async function main(): Promise<void> {
       expect((await numerators.count()) === 2, "OA-I: a couple and a solo owner are two ownership units", await numerators.count());
       await numerators.nth(0).fill("2"); await denominators.nth(0).fill("3");
       await numerators.nth(1).fill("1"); await denominators.nth(1).fill("3");
-      const contribs = page.locator('main input[aria-label^="Contribution to the company"]');
-      for (let i = 0; i < (await contribs.count()); i++) if (!(await contribs.nth(i).inputValue())) await contribs.nth(i).fill(`$${(i + 1) * 500} cash`);
       const tod = page.locator('main input[aria-label^="Transfer-on-death beneficiary for"]');
       expect((await tod.count()) >= 1, "OA-I: a transfer-on-death box per ownership unit", await tod.count());
       await tod.last().fill("Jordan Heir");

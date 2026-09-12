@@ -56,6 +56,8 @@ const S = {
   purpose1: "ZQPURPOSEONEQZ",
   purpose2: "ZQPURPOSETWOQZ",
   serContrib: "ZQSERCONTRIBQZ",
+  asset1: "ZQASSETONEQZ",
+  asset2: "ZQASSETTWOQZ",
 };
 
 function inputsFor(v: OaInputs["version"]): OaInputs {
@@ -69,22 +71,34 @@ function inputsFor(v: OaInputs["version"]): OaInputs {
     effectiveDate: S.date,
     amendedRestated: false,
     priorAgreementDate: null,
+    // Contributions are money now, computed from the asset list; the money
+    // regex in unwind() reduces every figure to one token.
     members: single
-      ? [{ name: S.m1, address: S.addr1, percentage: 100, contribution: S.contrib1, todBeneficiary: S.tod1 }]
+      ? [{ name: S.m1, address: S.addr1, percentage: 100, contribution: "$1,500", todBeneficiary: S.tod1 }]
       : [
-          { name: S.m1, address: S.addr1, percentage: 60, contribution: S.contrib1, todBeneficiary: S.tod1 },
-          { name: S.m2, address: S.addr2, percentage: 40, contribution: S.contrib2, todBeneficiary: S.tod2 },
+          { name: S.m1, address: S.addr1, percentage: 60, contribution: "$900", todBeneficiary: S.tod1 },
+          { name: S.m2, address: S.addr2, percentage: 40, contribution: "$600", todBeneficiary: S.tod2 },
         ],
     series: [
-      { name: S.ser1, purpose: S.purpose1, contribution: S.serContrib },
-      { name: S.ser2, purpose: S.purpose2, contribution: S.serContrib },
+      { name: S.ser1, purpose: S.purpose1, contribution: `${S.asset1} ($1,000)` },
+      { name: S.ser2, purpose: S.purpose2, contribution: `${S.asset2} ($500)` },
     ],
+    assets: [
+      { description: S.asset1, value: "$1,000", by: single ? S.m1 : `${S.m1} and ${S.m2}, equally`, to: S.ser1 },
+      { description: S.asset2, value: "$500", by: single ? S.m1 : `${S.m1} (60%) and ${S.m2} (40%)`, to: S.ser2 },
+    ],
+    seriesAllocations: [
+      { name: S.ser1, items: `${S.asset1} ($1,000)`, total: "$1,000" },
+      { name: S.ser2, items: `${S.asset2} ($500)`, total: "$500" },
+    ],
+    retainedItems: `${S.asset1} ($0)`,
+    retained: "$0",
     competition: "A",
     includeCapitalCalls: true,
     capitalCallCap: 25000,
     includeShotgun: true,
     borrowingThreshold: 25000,
-    contributionToCompany: S.contrib1,
+    contributionToCompany: "$1,500",
   };
 }
 
@@ -122,6 +136,13 @@ function unwind(s: string): string {
     .split(S.purpose1).join("[PURPOSE]")
     .split(S.purpose2).join("[PURPOSE]")
     .split(S.serContrib).join("[SERCONTRIB]")
+    .split(S.asset1).join("[ASSET]").split(S.asset2).join("[ASSET]")
+    // Every dollar figure is a value: a contribution, an agreed value, a
+    // total, the threshold, the cap.
+    .replace(/\$[\d,]+(?:\.\d+)?/g, "[MONEY]")
+    // An allocation cell lists assets with their figures; collapse the list
+    // to the master's one slot, as name lists are collapsed.
+    .replace(/\[ASSET\] \(\[MONEY\]\)(?:; \[ASSET\] \(\[MONEY\]\))*/g, "[SERCONTRIB]")
     .split(S.mgr1).join("[NAME]").split(S.mgr2).join("[NAME]")
     .split(S.m1).join("[NAME]").split(S.m2).join("[NAME]")
     .split(S.addr1).join("[ADDRESS]").split(S.addr2).join("[ADDRESS]")
@@ -131,7 +152,6 @@ function unwind(s: string): string {
     // The document title is chosen between two wordings the generator owns;
     // the master's footer line spells the slot.
     .replace(/\b(?:AMENDED AND RESTATED )?OPERATING AGREEMENT(?= of \[COMPANY NAME\])/g, "[TITLE]")
-    .replace(/\$25,000/g, "[MONEY]")
     // Exhibit A's series-contribution slot holds a LIST, "series: amount; …",
     // one item per series with a contribution (9 Sep 2026). Collapse it to
     // the master's single placeholder, as the name lists are collapsed above.
@@ -167,11 +187,14 @@ function masterKey(s: string): string {
       .replace(/\[MEMBER \d+(?: NAME)?(?:, if any)?\]/g, "[NAME]")
       .replace(/\[MEMBER NAME\]|\[SIGNATORY NAME\]|\[ADOPTER NAME\]|\[MANAGER NAME\]|\[MANAGER NAMES\]|\[NAME\]/g, "[NAME]")
       .replace(/\[MEMBER ADDRESS\]|\[ADDRESS\]/g, "[ADDRESS]")
-      .replace(/\[MEMBER CONTRIBUTION\]|\$\[AMOUNT\] \[and\/or described property\]|\$\[AMOUNT\]/g, "[AMOUNT]")
-      .replace(/\[CONTRIBUTION\]/g, "[SERCONTRIB]")
-      // Retained capital is arithmetic on the sentinels, which are words, so
-      // the generator prints the master's own dash for it.
-      .replace(/\[RETAINED\]/g, "—")
+      .replace(/\[MEMBER CONTRIBUTION\]|\$\[AMOUNT\] \[and\/or described property\]|\$\[AMOUNT\]|\[ASSET VALUE\]|\[SERIES TOTAL\]|\[RETAINED\]/g, "[MONEY]")
+      .replace(/\[CONTRIBUTION\]|\[RETAINED ASSETS\]/g, "[SERCONTRIB]")
+      // The contributed-by cell holds a name list — "A and B, equally" or
+      // "A (60%) and B (40%)"; the allocated-to cell a series or the Company.
+      // Both sides reduce to the master's slots. Runs after the name slots
+      // above have become [NAME], so it applies to master and output alike.
+      .replace(/\[NAME\](?: \(\d+(?:\.\d+)?%\))?(?:(?:, \[NAME\](?: \(\d+(?:\.\d+)?%\))?)*,? and \[NAME\](?: \(\d+(?:\.\d+)?%\))?)?(?:, equally)?(?= \| (?:\[SERIES\]|the Company|\[ASSET TO\]) \|)/g, "[ASSET BY]")
+      .replace(/(\| (?:\[ASSET BY\]|\[MONEY\]) \| )(?:\[SERIES\]|the Company)( \|)/g, "$1[ASSET TO]$2")
       .replace(/\[MEMBER DATE\]|\[DATE\]/g, "[DATE]")
       .replace(/\[MEMBER TOD\]|\[TOD BENEFICIARY NAME\(S\)\]|\[NAME\(S\) \/ None\]/g, "[TOD]")
       .replace(/\[MEMBER SHARE\]|\[___\]%/g, "[PCT]")

@@ -291,26 +291,26 @@ export const LEARN_MORE: Record<string, LearnMoreScreen> = {
     body: (
       <div className="space-y-3">
         <P>
-          Your contribution is what you're putting into the company or a series to start it —
-          cash, property, or both. It gets recorded in the agreement's exhibits.
+          Your contributions are the assets the owners put into the company to start it — cash,
+          real property, vehicles, equipment, contracts. Each one is listed with an agreed value,
+          who contributed it, and where the company allocates it.
         </P>
         <P>
           <strong className="text-foreground">Why it matters:</strong> a funded company is harder
           for a future creditor to attack as an empty shell, and your contributions establish
-          your investment for tax and accounting purposes. Contributions to a specific series
-          belong to that series alone — deposit the money into that series' own bank account so
-          the records match the agreement. A series contribution reaches the series through the
-          company: it is treated as contributed by you to the company first, then by the company
-          to the series, so it is listed on Exhibit A as a contribution to the company and on the
-          Series Exhibit as the company's contribution to that series.
+          your investment for tax and accounting purposes. An asset the company allocates to a
+          series belongs to that series alone — deposit that money into the series' own bank
+          account, and title that property in the series' name, so the records match the
+          agreement. Exhibit A lists what each owner contributed to the company and what the
+          company allocated to each series; each Series Exhibit shows what that series received.
         </P>
-        <Choice label="If you enter amounts now:">
+        <Choice label="If you list the assets now:">
           They're printed in Exhibit A and the Series Exhibits, and the agreement is complete on
           signing.
         </Choice>
         <Choice label="If you're not sure yet:">
-          Enter what you plan to contribute — the exhibits can be updated when amounts change.
-          What matters most is that money actually moved matches what the records say.
+          List what you plan to contribute — the exhibits can be regenerated when the list
+          changes. What matters most is that what actually moved matches what the records say.
         </Choice>
       </div>
     ),

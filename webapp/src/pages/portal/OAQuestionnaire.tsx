@@ -1,4 +1,6 @@
 import { ViewingAsBanner } from "./ViewingAsBanner";
+import { OaAssetsCard } from "./OaAssetsCard";
+import { assetProblems } from "./oaAssets";
 import { hasFirstAndLast } from "@/lib/personName";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Navigate, Link, useNavigate, useSearchParams } from "react-router-dom";
@@ -291,6 +293,8 @@ export default function OAQuestionnaire() {
   // would have read as multi-owner and shown a sole owner the whole
   // multi-member block.
   const isMulti = a.multiOwner ?? data.multiOwner;
+  // Generate waits while any listed asset has a problem (Adam, 12 Sep 2026).
+  const assetProblemCount = assetProblems(a.assets ?? [], isMulti ? units.length : 1, data?.seed.series.length ?? 0).length;
   // s. 5.4 exists in every form EXCEPT the member-managed single-owner ones,
   // where the owner manages and a gate would be the owner consenting to
   // themselves. Sole owners on the manager-managed forms were never shown this
@@ -331,12 +335,6 @@ export default function OAQuestionnaire() {
   const unitKey = (u: Unit) => (u.kind === "couple" ? `c${u.ci}` : `m${u.index}`);
   const unitByKey = (key: string) =>
     units.find((u) => unitKey(u) === key) ?? units[0];
-  const unitContribution = (u: Unit) =>
-    u.kind === "couple" ? couples[u.ci]?.contribution : a.members?.[u.index]?.contribution;
-  const setUnitContribution = (u: Unit, v: string) => {
-    if (u.kind === "couple") patchCouple(u.ci, { contribution: v });
-    else patchMember(u.index, { contribution: v });
-  };
   const unitTod = (u: Unit) =>
     u.kind === "couple" ? couples[u.ci]?.todBeneficiary : a.members?.[u.index]?.todBeneficiary;
   const setUnitTod = (u: Unit, v: string) => {
@@ -646,20 +644,24 @@ export default function OAQuestionnaire() {
               </QuestionCard>
             ) : null}
 
+            <OaAssetsCard
+              units={isMulti ? units : [{ kind: "member", index: 0, label: ownerLabel(owners[0], 0) } as Unit]}
+              isMulti={isMulti}
+              seedSeries={data.seed.series}
+              assets={a.assets ?? []}
+              setAssets={(next) => patch({ assets: next })}
+            />
+
             <UnitFieldCards
               units={isMulti ? units : [{ kind: "member", index: 0, label: ownerLabel(owners[0], 0) } as Unit]}
               isMulti={isMulti}
               owners={owners}
               seedSeries={data.seed.series}
               series={a.series}
-              contributionToCompany={a.contributionToCompany}
               sElection={a.sElection}
-              unitContribution={unitContribution}
-              setUnitContribution={setUnitContribution}
               unitTod={unitTod}
               setUnitTod={setUnitTod}
               patchSeries={patchSeries}
-              setContributionToCompany={(v) => patch({ contributionToCompany: v })}
               ownerLabel={ownerLabel}
             />
 
@@ -711,7 +713,7 @@ export default function OAQuestionnaire() {
               <Button
                 className="mt-4 w-full rounded-full"
                 size="lg"
-                disabled={generate.isPending || a.authorized !== true || ownerCountMismatch !== "" || incompleteOwner || atCap}
+                disabled={generate.isPending || a.authorized !== true || ownerCountMismatch !== "" || incompleteOwner || atCap || assetProblemCount > 0}
                 onClick={() => generate.mutate(a)}
               >
                 <FileText className="mr-2 h-4 w-4" />

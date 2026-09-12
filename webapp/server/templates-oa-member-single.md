@@ -297,6 +297,14 @@ Date: _____________________________
 | Capital allocated by the Company to Protected Series | [SERIES CONTRIBUTIONS] |
 | Retained by the Company | [RETAINED] |
 
+**Contributed assets:**
+
+| Asset | Agreed value | Allocated to |
+|---|---|---|
+<!-- repeat:asset -->
+| [ASSET] | [ASSET VALUE] | [ASSET TO] |
+<!-- /repeat -->
+
 **Transfer on Death designation (ss. 711.50–711.512, Fla. Stat.):**
 
 Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENEFICIARY NAME(S)]**, or if none is designated or the designation fails, the Membership Interest passes as provided by law.

@@ -2,6 +2,7 @@
 // verbatim (the two dev test flags became shared.testHooks so they stay
 // mutable across modules). Routes register inside registerPortalRoutes(app),
 // which app.ts calls after creating the app — no circular imports.
+import { computeCapital } from "./oa-capital";
 import { Hono } from "hono";
 import { z } from "zod";
 
@@ -21,7 +22,7 @@ import { type JointKind, isJoint, packSsns, unpackSsns } from "../src/lib/jointO
 import { FIRST_AND_LAST, hasFirstAndLast } from "../src/lib/personName";
 import { VALID_EIN_PREFIXES } from "../src/lib/ein";
 import { EIN_CATEGORY_NAMES, EIN_REASONS, followUpOk } from "../src/lib/einActivity";
-import { assembleOa, oaVersion, OA_TEMPLATE_VERSION, type OaInputs, moneyOf } from "./oa";
+import { assembleOa, oaVersion, OA_TEMPLATE_VERSION, type OaInputs } from "./oa";
 import { renderMarkdownPdf, stampExistingPdf } from "./pdf-render";
 import { createSession, getSession, getAdminSession, destroySession, rateLimit, clientIp } from "./auth";
 
@@ -203,6 +204,20 @@ export const oaAnswersSchema = z.object({
   competition: z.enum(["A", "B"]).optional(),
   includeShotgun: z.boolean().optional(),
   borrowingThreshold: z.number().min(0).max(100_000_000).optional(),
+  // Capital as a list of assets (Adam, 12 Sep 2026).
+  assets: z
+    .array(
+      z.object({
+        description: z.string().max(400).optional(),
+        kind: z.enum(["cash", "other"]).optional(),
+        value: z.number().min(0).max(1_000_000_000_000).optional(),
+        contributedBy: z.object({ mode: z.enum(["equal", "shares"]).optional(), shares: z.array(z.number().min(0).max(100)).max(20).optional() }).optional(),
+        allocatedTo: z.union([z.literal("company"), z.number().int().min(0).max(200)]).optional(),
+        cashAllocations: z.array(z.number().min(0).max(1_000_000_000_000)).max(200).optional(),
+      }),
+    )
+    .max(50)
+    .optional(),
   couples: z
     .array(
       z.object({
@@ -1239,10 +1254,6 @@ app.post("/portal/oa/generate", async (c) => {
   const isSCorp =
     version === "s" || version === "member-s" ||
     version === "single-s" || version === "member-single-s";
-  if (isSCorp && !multiOwner && !members[0].contribution) {
-    // sole owner on the S form: the single flow collects the contribution as contributionToCompany
-    members[0].contribution = a.contributionToCompany ?? "";
-  }
   // One ownership unit — a couple holding jointly with no third owner — owns
   // the whole company by definition. The questionnaire doesn't ask, so nothing
   // is stored; fill it in rather than failing a total check against nothing.
@@ -1301,24 +1312,19 @@ app.post("/portal/oa/generate", async (c) => {
 
   // Every Protected Series is wholly owned by the Company (ss. 605.2302(1),
   // 605.2303(2), Fla. Stat.), so a series carries no member-level ownership.
+  // Capital as a list of assets (Adam, 12 Sep 2026): what each owner
+  // contributed and what each series holds are computed from the list, once,
+  // and the same errors the questionnaire shows are refused here.
+  const capital = computeCapital(a.assets, members.map((m) => m.name), seed.series.map((sr) => sr.name));
+  if (capital.errors.length > 0) {
+    return c.json(err(capital.errors[0], "CAPITAL"), 400);
+  }
+  members.forEach((m, i) => { m.contribution = capital.memberContributions[i] ?? "$0"; });
   const series = seed.series.map((sr, i) => ({
     name: sr.name,
     purpose: a.series?.[i]?.purpose ?? sr.purpose ?? "",
-    contribution: a.series?.[i]?.contribution ?? "",
+    contribution: capital.seriesCells[i] ?? "None",
   }));
-  // The Company cannot allocate more capital to its series than its owners
-  // put in (Adam, 10 Sep 2026) — checked only when both sides are figures.
-  {
-    const contributed = (multiOwner ? members.map((m) => m.contribution ?? "") : [a.contributionToCompany || members[0]?.contribution || ""]).map(moneyOf);
-    const allocated = series.map((sr) => (sr.contribution.trim() ? moneyOf(sr.contribution) : 0));
-    if (contributed.length > 0 && contributed.every((v) => v !== null) && allocated.every((v) => v !== null)) {
-      const inTotal = contributed.reduce((x, y) => x + (y ?? 0), 0);
-      const outTotal = allocated.reduce((x, y) => x + (y ?? 0), 0);
-      if (outTotal > inTotal) {
-        return c.json(err("The company cannot allocate more to its series than its owners contributed.", "OVER_ALLOCATED"), 400);
-      }
-    }
-  }
 
   const inputs: OaInputs = {
     version,
@@ -1337,7 +1343,11 @@ app.post("/portal/oa/generate", async (c) => {
     competition: a.competition ?? (isSCorp && !multiOwner ? "B" : undefined),
     includeShotgun: a.includeShotgun ?? (isSCorp && !multiOwner ? false : undefined),
     borrowingThreshold: a.borrowingThreshold,
-    contributionToCompany: a.contributionToCompany,
+    contributionToCompany: capital.memberContributions[0] ?? "$0",
+    assets: capital.assetRows,
+    seriesAllocations: capital.seriesRows,
+    retainedItems: capital.retainedItems,
+    retained: capital.retained,
     // ch. 621 companies get the three professional descriptor lines.
     professional: seed.formationType === "PLLC",
     generationNumber: nextGenerationNumber,

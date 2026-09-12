@@ -420,14 +420,22 @@ Date: _____________________________
 <!-- /repeat -->
 | **Total** | | **100%** | | |
 
+**Contributed assets:**
+
+| Asset | Agreed value | Contributed by | Allocated to |
+|---|---|---|---|
+<!-- repeat:asset -->
+| [ASSET] | [ASSET VALUE] | [ASSET BY] | [ASSET TO] |
+<!-- /repeat -->
+
 **Allocation of the Company's capital to the Protected Series:**
 
-| Protected Series | Capital allocated by the Company |
-|---|---|
+| Protected Series | Assets allocated by the Company | Total |
+|---|---|---|
 <!-- repeat:seriesalloc -->
-| [SERIES] | [CONTRIBUTION] |
+| [SERIES] | [CONTRIBUTION] | [SERIES TOTAL] |
 <!-- /repeat -->
-| **Retained by the Company** | [RETAINED] |
+| **Retained by the Company** | [RETAINED ASSETS] | [RETAINED] |
 
 **Transfer on Death designations (ss. 711.50–711.512, Fla. Stat.):**
 

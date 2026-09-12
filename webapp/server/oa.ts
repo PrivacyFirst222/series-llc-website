@@ -85,6 +85,13 @@ export interface OaInputs {
   contributionToCompany?: string; // single-member Exhibit A line
   /** 1-based sequence for this client, so successive drafts are tellable apart. */
   generationNumber?: number;
+  /** Capital as a list of assets (Adam, 12 Sep 2026), computed in
+   *  oa-capital.ts: Exhibit A's contributed-assets rows, its allocation rows,
+   *  and what the Company retained. */
+  assets?: { description: string; value: string; by: string; to: string }[];
+  seriesAllocations?: { name: string; items: string; total: string }[];
+  retainedItems?: string;
+  retained?: string;
 }
 
 /** Which of the eight forms a client gets: management structure × tax posture.
@@ -131,17 +138,6 @@ export function moneyOf(text: string | undefined): number | null {
   return m ? Number(m[1]) : null;
 }
 
-/** What the Company keeps after allocating capital to its series (Adam,
- *  10 Sep 2026): contributions less allocations, when both sides are figures;
- *  "—" when either side is words rather than money. */
-export function retainedByCompany(memberContributions: string[], series: OaSeriesInput[]): string {
-  const contributed = memberContributions.map(moneyOf);
-  if (contributed.length === 0 || contributed.some((v) => v === null)) return "—";
-  const allocated = series.map((sr) => ((sr.contribution ?? "").trim() ? moneyOf(sr.contribution) : 0));
-  if (allocated.some((v) => v === null)) return "—";
-  const left = contributed.reduce<number>((a, b) => a + (b ?? 0), 0) - allocated.reduce<number>((a, b) => a + (b ?? 0), 0);
-  return `$${left.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
-}
 
 /** "tenants by the entirety" → "Tenants by the Entirety": the holding as a
  *  heading, with the small words left small. */
@@ -480,8 +476,10 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
         // Adam, 9 Sep 2026: every initial series contribution is treated as
         // made first to the Company, then by the Company to the series, so
         // Exhibit A lists it too — in the master's own row, this fills the slot.
-        "[SERIES CONTRIBUTIONS]": seriesContributionList(inputs.series),
-        "[RETAINED]": retainedByCompany([inputs.contributionToCompany || m.contribution || ""], inputs.series),
+        "[SERIES CONTRIBUTIONS]": inputs.seriesAllocations
+          ? (inputs.seriesAllocations.filter((r) => r.items !== "None").map((r) => `${r.name}: ${r.items}`).join("; ") || "None")
+          : seriesContributionList(inputs.series),
+        "[RETAINED]": inputs.retained ?? "—",
         "[DATE]": inputs.effectiveDate,
         // The master's own sentence carries the fallback: "…shall pass to:
         // **X**, or if none is designated or the designation fails, the
@@ -518,11 +516,27 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
     s = expandRepeat(
       s,
       "seriesalloc",
-      inputs.series.map((sr) => ({ "[SERIES]": sr.name, "[CONTRIBUTION]": (sr.contribution ?? "").trim() || "None" })),
+      (inputs.seriesAllocations ?? inputs.series.map((sr) => ({ name: sr.name, items: (sr.contribution ?? "").trim() || "None", total: "—" }))).map((r) => ({
+        "[SERIES]": r.name,
+        "[CONTRIBUTION]": r.items,
+        "[SERIES TOTAL]": r.total,
+      })),
       "Exhibit A allocation",
     );
-    s = s.split("[RETAINED]").join(retainedByCompany(inputs.members.map((m) => m.contribution ?? ""), inputs.series));
+    s = s.split("[RETAINED ASSETS]").join(inputs.retainedItems ?? "None");
+    s = s.split("[RETAINED]").join(inputs.retained ?? "—");
   }
+
+  // ---- Exhibit A: the contributed assets, both forms ----
+  // One master row per asset. An agreement with no assets listed keeps one
+  // row that says so, rather than a table with nothing under its headings.
+  const assetRows = (inputs.assets && inputs.assets.length > 0 ? inputs.assets : [{ description: "None", value: "—", by: "—", to: "—" }]).map((a) => ({
+    "[ASSET]": a.description,
+    "[ASSET VALUE]": a.value,
+    "[ASSET BY]": a.by,
+    "[ASSET TO]": a.to,
+  }));
+  s = expandRepeat(s, "asset", assetRows, "Exhibit A assets");
 
   // ---- Series Exhibits + Asset Schedules ----
   const ex1 = extractSection(s, "SERIES EXHIBIT PS-[N]", "series exhibit template");

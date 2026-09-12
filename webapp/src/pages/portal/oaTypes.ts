@@ -29,8 +29,19 @@ export interface CoupleAnswer {
   contribution?: string;
   todBeneficiary?: string;
 }
+/** One contributed asset (Adam, 12 Sep 2026): its agreed value, who
+ *  contributed it, and where the company allocates it. */
+export interface AssetAnswer {
+  description?: string;
+  kind?: "cash" | "other";
+  value?: number;
+  contributedBy?: { mode?: "equal" | "shares"; shares?: number[] };
+  allocatedTo?: "company" | number;
+  cashAllocations?: number[];
+}
 export interface Answers {
   firstOrAmended?: "first" | "amended";
+  assets?: AssetAnswer[];
   sElection?: boolean;
   multiOwner?: boolean;
   effectiveDate?: string;

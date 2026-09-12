@@ -5359,8 +5359,8 @@ var init_strings = __esm({
   "node_modules/@cantoo/pdf-lib/es/utils/strings.js"() {
     toCharCode = (character) => character.charCodeAt(0);
     toCodePoint = (character) => character.codePointAt(0);
-    toHexStringOfMinLength = (num, minLength) => padStart(num.toString(16), minLength, "0").toUpperCase();
-    toHexString = (num) => toHexStringOfMinLength(num, 2);
+    toHexStringOfMinLength = (num2, minLength) => padStart(num2.toString(16), minLength, "0").toUpperCase();
+    toHexString = (num2) => toHexStringOfMinLength(num2, 2);
     charFromCode = (code) => String.fromCharCode(code);
     charFromHexCode = (hex) => charFromCode(parseInt(hex, 16));
     padStart = (value, length, padChar) => {
@@ -5756,25 +5756,25 @@ var init_unicode = __esm({
 var numberToString, sizeInBytes, bytesFor;
 var init_numbers = __esm({
   "node_modules/@cantoo/pdf-lib/es/utils/numbers.js"() {
-    numberToString = (num) => {
-      let numStr = String(num);
-      if (Math.abs(num) < 1) {
-        const e = parseInt(num.toString().split("e-")[1]);
+    numberToString = (num2) => {
+      let numStr = String(num2);
+      if (Math.abs(num2) < 1) {
+        const e = parseInt(num2.toString().split("e-")[1]);
         if (e) {
-          const negative = num < 0;
+          const negative = num2 < 0;
           if (negative)
-            num *= -1;
-          num *= Math.pow(10, e - 1);
-          numStr = "0." + new Array(e).join("0") + num.toString().substring(2);
+            num2 *= -1;
+          num2 *= Math.pow(10, e - 1);
+          numStr = "0." + new Array(e).join("0") + num2.toString().substring(2);
           if (negative)
             numStr = "-" + numStr;
         }
       } else {
-        let e = parseInt(num.toString().split("+")[1]);
+        let e = parseInt(num2.toString().split("+")[1]);
         if (e > 20) {
           e -= 20;
-          num /= Math.pow(10, e);
-          numStr = num.toString() + new Array(e + 1).join("0");
+          num2 /= Math.pow(10, e);
+          numStr = num2.toString() + new Array(e + 1).join("0");
         }
       }
       return numStr;
@@ -31460,12 +31460,12 @@ var init_crypto = __esm({
           this.eff = dict.get(PDFName_default.of("EFF")) || this.stmf;
         }
       }
-      createCipherTransform(num, gen) {
+      createCipherTransform(num2, gen) {
         if (this.algorithm === 4 || this.algorithm === 5) {
-          return new CipherTransform(this.buildCipherConstructor(this.cf, this.strf, num, gen, this.encryptionKey), this.buildCipherConstructor(this.cf, this.stmf, num, gen, this.encryptionKey));
+          return new CipherTransform(this.buildCipherConstructor(this.cf, this.strf, num2, gen, this.encryptionKey), this.buildCipherConstructor(this.cf, this.stmf, num2, gen, this.encryptionKey));
         }
         const key = this.buildObjectKey(
-          num,
+          num2,
           gen,
           this.encryptionKey,
           /* isAes = */
@@ -31604,16 +31604,16 @@ var init_crypto = __esm({
         }
         return userPassword;
       }
-      buildObjectKey(num, gen, encryptionKey, isAes = false) {
+      buildObjectKey(num2, gen, encryptionKey, isAes = false) {
         const key = new Uint8Array(encryptionKey.length + 9);
         const n = encryptionKey.length;
         let i;
         for (i = 0; i < n; ++i) {
           key[i] = encryptionKey[i];
         }
-        key[i++] = num & 255;
-        key[i++] = num >> 8 & 255;
-        key[i++] = num >> 16 & 255;
+        key[i++] = num2 & 255;
+        key[i++] = num2 >> 8 & 255;
+        key[i++] = num2 >> 16 & 255;
         key[i++] = gen & 255;
         key[i++] = gen >> 8 & 255;
         if (isAes) {
@@ -31625,7 +31625,7 @@ var init_crypto = __esm({
         const hash = calculateMD5(key, 0, i);
         return hash.subarray(0, Math.min(encryptionKey.length + 5, 16));
       }
-      buildCipherConstructor(cf, name, num, gen, key) {
+      buildCipherConstructor(cf, name, num2, gen, key) {
         if (!(name instanceof PDFName_default)) {
           throw new Error("Invalid crypt filter name.");
         }
@@ -31641,7 +31641,7 @@ var init_crypto = __esm({
         }
         if (cfm.asString() === "/V2") {
           return () => new ARCFourCipher(this.buildObjectKey(
-            num,
+            num2,
             gen,
             key,
             /* isAes = */
@@ -31650,7 +31650,7 @@ var init_crypto = __esm({
         }
         if (cfm.asString() === "/AESV2") {
           return () => new AES128Cipher(this.buildObjectKey(
-            num,
+            num2,
             gen,
             key,
             /* isAes = */
@@ -32164,8 +32164,8 @@ var init_objects2 = __esm({
   "node_modules/@cantoo/pdf-lib/es/api/objects.js"() {
     init_core();
     asPDFName = (name) => name instanceof PDFName_default ? name : PDFName_default.of(name);
-    asPDFNumber = (num) => num instanceof PDFNumber_default ? num : PDFNumber_default.of(num);
-    asNumber = (num) => num instanceof PDFNumber_default ? num.asNumber() : num;
+    asPDFNumber = (num2) => num2 instanceof PDFNumber_default ? num2 : PDFNumber_default.of(num2);
+    asNumber = (num2) => num2 instanceof PDFNumber_default ? num2.asNumber() : num2;
   }
 });
 
@@ -32715,11 +32715,11 @@ var require_color_string = __commonJS({
     cs2.to.keyword = function(rgb2) {
       return reverseNames[rgb2.slice(0, 3)];
     };
-    function clamp(num, min, max) {
-      return Math.min(Math.max(min, num), max);
+    function clamp(num2, min, max) {
+      return Math.min(Math.max(min, num2), max);
     }
-    function hexDouble(num) {
-      var str = Math.round(num).toString(16).toUpperCase();
+    function hexDouble(num2) {
+      var str = Math.round(num2).toString(16).toUpperCase();
       return str.length < 2 ? "0" + str : str;
     }
   }
@@ -45052,7 +45052,7 @@ var init_extractPageContents = __esm({
           getSvg: () => svg
         });
       };
-      const num = (args, i) => typeof args[i] === "number" ? args[i] : 0;
+      const num2 = (args, i) => typeof args[i] === "number" ? args[i] : 0;
       for (const op of operations) {
         switch (op.name) {
           case "q":
@@ -45080,46 +45080,46 @@ var init_extractPageContents = __esm({
             break;
           }
           case "w":
-            gs.lineWidth = num(op.args, 0);
+            gs.lineWidth = num2(op.args, 0);
             break;
           case "rg":
-            gs.fill = rgbCss(num(op.args, 0), num(op.args, 1), num(op.args, 2));
+            gs.fill = rgbCss(num2(op.args, 0), num2(op.args, 1), num2(op.args, 2));
             break;
           case "RG":
-            gs.stroke = rgbCss(num(op.args, 0), num(op.args, 1), num(op.args, 2));
+            gs.stroke = rgbCss(num2(op.args, 0), num2(op.args, 1), num2(op.args, 2));
             break;
           case "g":
-            gs.fill = grayCss(num(op.args, 0));
+            gs.fill = grayCss(num2(op.args, 0));
             break;
           case "G":
-            gs.stroke = grayCss(num(op.args, 0));
+            gs.stroke = grayCss(num2(op.args, 0));
             break;
           case "k":
-            gs.fill = cmykCss(num(op.args, 0), num(op.args, 1), num(op.args, 2), num(op.args, 3));
+            gs.fill = cmykCss(num2(op.args, 0), num2(op.args, 1), num2(op.args, 2), num2(op.args, 3));
             break;
           case "K":
-            gs.stroke = cmykCss(num(op.args, 0), num(op.args, 1), num(op.args, 2), num(op.args, 3));
+            gs.stroke = cmykCss(num2(op.args, 0), num2(op.args, 1), num2(op.args, 2), num2(op.args, 3));
             break;
           case "m":
-            path.moveTo(num(op.args, 0), num(op.args, 1));
+            path.moveTo(num2(op.args, 0), num2(op.args, 1));
             break;
           case "l":
-            path.lineTo(num(op.args, 0), num(op.args, 1));
+            path.lineTo(num2(op.args, 0), num2(op.args, 1));
             break;
           case "c":
-            path.curveTo(num(op.args, 0), num(op.args, 1), num(op.args, 2), num(op.args, 3), num(op.args, 4), num(op.args, 5));
+            path.curveTo(num2(op.args, 0), num2(op.args, 1), num2(op.args, 2), num2(op.args, 3), num2(op.args, 4), num2(op.args, 5));
             break;
           case "v":
-            path.curveV(num(op.args, 0), num(op.args, 1), num(op.args, 2), num(op.args, 3));
+            path.curveV(num2(op.args, 0), num2(op.args, 1), num2(op.args, 2), num2(op.args, 3));
             break;
           case "y":
-            path.curveY(num(op.args, 0), num(op.args, 1), num(op.args, 2), num(op.args, 3));
+            path.curveY(num2(op.args, 0), num2(op.args, 1), num2(op.args, 2), num2(op.args, 3));
             break;
           case "h":
             path.closePath();
             break;
           case "re":
-            path.rectangle(num(op.args, 0), num(op.args, 1), num(op.args, 2), num(op.args, 3));
+            path.rectangle(num2(op.args, 0), num2(op.args, 1), num2(op.args, 2), num2(op.args, 3));
             break;
           case "W":
           case "W*":
@@ -71724,7 +71724,7 @@ var require_lib5 = __commonJS({
         function bail(err3) {
           reject(err3 || new Error("Aborted"));
         }
-        function onError(err3, num) {
+        function onError(err3, num2) {
           if (err3.bail) {
             bail(err3);
             return;
@@ -71732,19 +71732,19 @@ var require_lib5 = __commonJS({
           if (!op.retry(err3)) {
             reject(op.mainError());
           } else if (options.onRetry) {
-            options.onRetry(err3, num);
+            options.onRetry(err3, num2);
           }
         }
-        function runAttempt(num) {
+        function runAttempt(num2) {
           var val;
           try {
-            val = fn(bail, num);
+            val = fn(bail, num2);
           } catch (err3) {
-            onError(err3, num);
+            onError(err3, num2);
             return;
           }
           Promise.resolve(val).then(resolve).catch(function catchIt(err3) {
-            onError(err3, num);
+            onError(err3, num2);
           });
         }
         op.attempt(runAttempt);
@@ -88401,8 +88401,8 @@ var require_util8 = __commonJS({
           return false;
         }
       }
-      const num = Number.parseInt(value, 10);
-      return num >= 8 && num <= 15;
+      const num2 = Number.parseInt(value, 10);
+      return num2 >= 8 && num2 <= 15;
     }
     var hasIntl = typeof process.versions.icu === "string";
     var fatalDecoder = hasIntl ? new TextDecoder("utf-8", { fatal: true }) : void 0;
@@ -93199,8 +93199,8 @@ async function renderManualPdf(md) {
     const size = entry.level === 1 ? 10.5 : 9.5;
     const font = entry.level === 1 ? fonts.bold : fonts.regular;
     const x2 = MARGIN2 + (entry.level === 1 ? 0 : 14);
-    const num = String(entry.page);
-    const numW = fonts.regular.widthOfTextAtSize(num, size);
+    const num2 = String(entry.page);
+    const numW = fonts.regular.widthOfTextAtSize(num2, size);
     const maxLabelW = PAGE_W2 - MARGIN2 - numW - 24 - x2;
     let label = entry.text;
     while (label.length > 8 && font.widthOfTextAtSize(label + "...", size) > maxLabelW) {
@@ -93222,7 +93222,7 @@ async function renderManualPdf(md) {
       }
       p2.drawText(dots, { x: dotsStart, y: ty, size, font: fonts.regular, color: GRAY });
     }
-    p2.drawText(num, { x: PAGE_W2 - MARGIN2 - numW, y: ty, size, font: fonts.regular, color: INK });
+    p2.drawText(num2, { x: PAGE_W2 - MARGIN2 - numW, y: ty, size, font: fonts.regular, color: INK });
     ty -= tocLineH;
   }
   const pages = doc.getPages();
@@ -101560,6 +101560,99 @@ function sElectionEinArrivedLateEmail(opts) {
   };
 }
 
+// server/oa-capital.ts
+var money = (n) => `$${n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+var joinNames = (names) => names.length <= 1 ? names.join("") : names.length === 2 ? `${names[0]} and ${names[1]}` : `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]}`;
+var num = (v2) => typeof v2 === "number" && Number.isFinite(v2) ? v2 : null;
+function computeCapital(assets, unitNames, seriesNames2) {
+  const list2 = assets ?? [];
+  const errors = [];
+  const units = Math.max(1, unitNames.length);
+  const perUnit = new Array(units).fill(0);
+  const perSeriesItems = seriesNames2.map(() => []);
+  const perSeriesTotal = seriesNames2.map(() => 0);
+  const retainedList = [];
+  let retainedTotal = 0;
+  let totalContributed = 0;
+  const assetRows = [];
+  list2.forEach((asset, ai) => {
+    const label = `Asset ${ai + 1}`;
+    const description = (asset.description ?? "").trim();
+    if (!description) errors.push(`${label}: describe the asset.`);
+    const value = num(asset.value);
+    if (value === null || value <= 0) errors.push(`${label}: give an agreed value in dollars.`);
+    const v2 = value !== null && value > 0 ? value : 0;
+    let shares;
+    if (units === 1) {
+      shares = [100];
+    } else if (asset.contributedBy?.mode === "shares") {
+      shares = unitNames.map((_, i) => num(asset.contributedBy?.shares?.[i]) ?? 0);
+      const sum2 = shares.reduce((a2, b2) => a2 + b2, 0);
+      if (shares.some((s) => s < 0 || s > 100) || Math.abs(sum2 - 100) > 0.01) errors.push(`${label}: the shares must total 100.`);
+    } else {
+      shares = unitNames.map(() => 100 / units);
+    }
+    shares.forEach((s, i) => {
+      perUnit[i] += v2 * s / 100;
+    });
+    totalContributed += v2;
+    const by = units === 1 ? unitNames[0] ?? "" : asset.contributedBy?.mode === "shares" ? joinNames(unitNames.map((n, i) => ({ n, s: shares[i] })).filter((x2) => x2.s > 0).map((x2) => `${x2.n} (${Number(x2.s.toFixed(2))}%)`)) : `${joinNames(unitNames)}, equally`;
+    let to = "";
+    if (asset.kind === "cash") {
+      const amounts = seriesNames2.map((_, i) => num(asset.cashAllocations?.[i]) ?? 0);
+      if (amounts.some((x2) => x2 < 0)) errors.push(`${label}: an amount cannot be negative.`);
+      const allocated = amounts.reduce((a2, b2) => a2 + b2, 0);
+      if (allocated > v2 + 5e-3) errors.push(`${label}: the amounts allocated to the series exceed the cash contributed.`);
+      const parts = [];
+      amounts.forEach((amt, i) => {
+        if (amt > 0) {
+          parts.push(`${seriesNames2[i]}: ${money(amt)}`);
+          perSeriesItems[i].push(`${description} (${money(amt)})`);
+          perSeriesTotal[i] += amt;
+        }
+      });
+      const rest = Math.max(0, v2 - allocated);
+      if (rest > 0) {
+        parts.push(`the Company: ${money(rest)}`);
+        retainedList.push(`${description} (${money(rest)})`);
+        retainedTotal += rest;
+      }
+      to = parts.length > 0 ? parts.join("; ") : "the Company";
+    } else {
+      const dest = asset.allocatedTo;
+      if (dest === "company") {
+        to = "the Company";
+        retainedList.push(`${description} (${money(v2)})`);
+        retainedTotal += v2;
+      } else if (typeof dest === "number" && Number.isInteger(dest) && dest >= 0 && dest < seriesNames2.length) {
+        to = seriesNames2[dest];
+        perSeriesItems[dest].push(`${description} (${money(v2)})`);
+        perSeriesTotal[dest] += v2;
+      } else {
+        errors.push(`${label}: say where the Company allocates it.`);
+      }
+    }
+    assetRows.push({ description, value: money(v2), by, to });
+  });
+  const seriesRows = seriesNames2.map((name, i) => ({
+    name,
+    items: perSeriesItems[i].length > 0 ? perSeriesItems[i].join("; ") : "None",
+    total: money(perSeriesTotal[i])
+  }));
+  const withItems = seriesRows.filter((r) => r.items !== "None");
+  return {
+    errors,
+    memberContributions: perUnit.map((v2) => money(v2)),
+    assetRows,
+    seriesRows,
+    retainedItems: retainedList.length > 0 ? retainedList.join("; ") : "None",
+    retained: money(retainedTotal),
+    seriesCells: seriesRows.map((r) => r.items),
+    singleAllocationList: withItems.length > 0 ? withItems.map((r) => `${r.name}: ${r.items}`).join("; ") : "None",
+    totalContributed
+  };
+}
+
 // src/lib/form2553Timing.ts
 var DEFAULT_MIN_DAYS = 5;
 function parseISODate(s) {
@@ -101949,16 +102042,16 @@ function sharesAreComplete(mode, shares) {
     const total = shares.reduce((acc, s) => acc + Math.round((s.percentage ?? 0) * 100), 0);
     return total === 1e4;
   }
-  let num = 0;
+  let num2 = 0;
   let den = 1;
   for (const s of shares) {
     const n = s.numerator ?? 0;
     const d2 = s.denominator ?? 0;
     if (d2 <= 0 || n < 0) return false;
-    num = num * d2 + n * den;
+    num2 = num2 * d2 + n * den;
     den = den * d2;
   }
-  return num === den;
+  return num2 === den;
 }
 function shareLabel(mode, share) {
   if (mode === "percent") {
@@ -102509,6 +102602,14 @@ Date: _____________________________
 | Capital allocated by the Company to Protected Series | [SERIES CONTRIBUTIONS] |
 | Retained by the Company | [RETAINED] |
 
+**Contributed assets:**
+
+| Asset | Agreed value | Allocated to |
+|---|---|---|
+<!-- repeat:asset -->
+| [ASSET] | [ASSET VALUE] | [ASSET TO] |
+<!-- /repeat -->
+
 **Transfer on Death designation (ss. 711.50\u2013711.512, Fla. Stat.):**
 
 Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENEFICIARY NAME(S)]**, or if none is designated or the designation fails, the Membership Interest passes as provided by law.
@@ -102975,14 +103076,22 @@ Date: _____________________________
 <!-- /repeat -->
 | **Total** | | **100%** | | |
 
+**Contributed assets:**
+
+| Asset | Agreed value | Contributed by | Allocated to |
+|---|---|---|---|
+<!-- repeat:asset -->
+| [ASSET] | [ASSET VALUE] | [ASSET BY] | [ASSET TO] |
+<!-- /repeat -->
+
 **Allocation of the Company's capital to the Protected Series:**
 
-| Protected Series | Capital allocated by the Company |
-|---|---|
+| Protected Series | Assets allocated by the Company | Total |
+|---|---|---|
 <!-- repeat:seriesalloc -->
-| [SERIES] | [CONTRIBUTION] |
+| [SERIES] | [CONTRIBUTION] | [SERIES TOTAL] |
 <!-- /repeat -->
-| **Retained by the Company** | [RETAINED] |
+| **Retained by the Company** | [RETAINED ASSETS] | [RETAINED] |
 
 **Transfer on Death designations (ss. 711.50\u2013711.512, Fla. Stat.):**
 
@@ -103470,14 +103579,22 @@ Date: _____________________________
 <!-- /repeat -->
 | **Total** | | **100%** | | |
 
+**Contributed assets:**
+
+| Asset | Agreed value | Contributed by | Allocated to |
+|---|---|---|---|
+<!-- repeat:asset -->
+| [ASSET] | [ASSET VALUE] | [ASSET BY] | [ASSET TO] |
+<!-- /repeat -->
+
 **Allocation of the Company's capital to the Protected Series:**
 
-| Protected Series | Capital allocated by the Company |
-|---|---|
+| Protected Series | Assets allocated by the Company | Total |
+|---|---|---|
 <!-- repeat:seriesalloc -->
-| [SERIES] | [CONTRIBUTION] |
+| [SERIES] | [CONTRIBUTION] | [SERIES TOTAL] |
 <!-- /repeat -->
-| **Retained by the Company** | [RETAINED] |
+| **Retained by the Company** | [RETAINED ASSETS] | [RETAINED] |
 
 **Transfer on Death designations (ss. 711.50\u2013711.512, Fla. Stat.):**
 
@@ -103944,14 +104061,22 @@ Date: _____________________________
 <!-- /repeat -->
 | **Total** | | **100%** | | |
 
+**Contributed assets:**
+
+| Asset | Agreed value | Contributed by | Allocated to |
+|---|---|---|---|
+<!-- repeat:asset -->
+| [ASSET] | [ASSET VALUE] | [ASSET BY] | [ASSET TO] |
+<!-- /repeat -->
+
 **Allocation of the Company's capital to the Protected Series:**
 
-| Protected Series | Capital allocated by the Company |
-|---|---|
+| Protected Series | Assets allocated by the Company | Total |
+|---|---|---|
 <!-- repeat:seriesalloc -->
-| [SERIES] | [CONTRIBUTION] |
+| [SERIES] | [CONTRIBUTION] | [SERIES TOTAL] |
 <!-- /repeat -->
-| **Retained by the Company** | [RETAINED] |
+| **Retained by the Company** | [RETAINED ASSETS] | [RETAINED] |
 
 **Transfer on Death designations (ss. 711.50\u2013711.512, Fla. Stat.):**
 
@@ -104432,14 +104557,22 @@ Date: _____________________________
 <!-- /repeat -->
 | **Total** | | **100%** | | |
 
+**Contributed assets:**
+
+| Asset | Agreed value | Contributed by | Allocated to |
+|---|---|---|---|
+<!-- repeat:asset -->
+| [ASSET] | [ASSET VALUE] | [ASSET BY] | [ASSET TO] |
+<!-- /repeat -->
+
 **Allocation of the Company's capital to the Protected Series:**
 
-| Protected Series | Capital allocated by the Company |
-|---|---|
+| Protected Series | Assets allocated by the Company | Total |
+|---|---|---|
 <!-- repeat:seriesalloc -->
-| [SERIES] | [CONTRIBUTION] |
+| [SERIES] | [CONTRIBUTION] | [SERIES TOTAL] |
 <!-- /repeat -->
-| **Retained by the Company** | [RETAINED] |
+| **Retained by the Company** | [RETAINED ASSETS] | [RETAINED] |
 
 **Transfer on Death designations (ss. 711.50\u2013711.512, Fla. Stat.):**
 
@@ -104853,6 +104986,14 @@ Date: _____________________________
 | Capital allocated by the Company to Protected Series | [SERIES CONTRIBUTIONS] |
 | Retained by the Company | [RETAINED] |
 
+**Contributed assets:**
+
+| Asset | Agreed value | Allocated to |
+|---|---|---|
+<!-- repeat:asset -->
+| [ASSET] | [ASSET VALUE] | [ASSET TO] |
+<!-- /repeat -->
+
 **Transfer on Death designation (ss. 711.50\u2013711.512, Fla. Stat.):**
 
 Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENEFICIARY NAME(S)]**, or if none is designated or the designation fails, the Membership Interest passes as provided by law. A designation is effective only in favor of a beneficiary that is an eligible S corporation shareholder (Section 9.3(b)).
@@ -105202,6 +105343,14 @@ Date: _____________________________
 | Date of contribution | [DATE] |
 | Capital allocated by the Company to Protected Series | [SERIES CONTRIBUTIONS] |
 | Retained by the Company | [RETAINED] |
+
+**Contributed assets:**
+
+| Asset | Agreed value | Allocated to |
+|---|---|---|
+<!-- repeat:asset -->
+| [ASSET] | [ASSET VALUE] | [ASSET TO] |
+<!-- /repeat -->
 
 **Transfer on Death designation (ss. 711.50\u2013711.512, Fla. Stat.):**
 
@@ -105583,6 +105732,14 @@ Date: _____________________________
 | Capital allocated by the Company to Protected Series | [SERIES CONTRIBUTIONS] |
 | Retained by the Company | [RETAINED] |
 
+**Contributed assets:**
+
+| Asset | Agreed value | Allocated to |
+|---|---|---|
+<!-- repeat:asset -->
+| [ASSET] | [ASSET VALUE] | [ASSET TO] |
+<!-- /repeat -->
+
 **Transfer on Death designation (ss. 711.50\u2013711.512, Fla. Stat.):**
 
 Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENEFICIARY NAME(S)]**, or if none is designated or the designation fails, the Membership Interest passes as provided by law. A designation is effective only in favor of a beneficiary that is an eligible S corporation shareholder (Section 9.3(b)).
@@ -105654,18 +105811,6 @@ function seriesContributionList(series) {
   const items = series.filter((sr) => (sr.contribution ?? "").trim() !== "").map((sr) => `${sr.name}: ${sr.contribution.trim()}`);
   return items.length > 0 ? items.join("; ") : "None";
 }
-function moneyOf(text) {
-  const m2 = (text ?? "").replace(/,/g, "").match(/\$?\s*(\d+(?:\.\d+)?)/);
-  return m2 ? Number(m2[1]) : null;
-}
-function retainedByCompany(memberContributions, series) {
-  const contributed = memberContributions.map(moneyOf);
-  if (contributed.length === 0 || contributed.some((v2) => v2 === null)) return "\u2014";
-  const allocated = series.map((sr) => (sr.contribution ?? "").trim() ? moneyOf(sr.contribution) : 0);
-  if (allocated.some((v2) => v2 === null)) return "\u2014";
-  const left = contributed.reduce((a2, b2) => a2 + (b2 ?? 0), 0) - allocated.reduce((a2, b2) => a2 + (b2 ?? 0), 0);
-  return `$${left.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
-}
 function titleCaseHolding(holding) {
   const small = /* @__PURE__ */ new Set(["by", "the", "with", "of"]);
   return holding.split(" ").map((w, i) => i > 0 && small.has(w.toLowerCase()) ? w.toLowerCase() : w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
@@ -105678,7 +105823,7 @@ function replaceOnce(s, from, to, label) {
   must2(s, from, label);
   return typeof from === "string" ? s.replace(from, to) : s.replace(from, to);
 }
-var money = (n) => `$${Math.round(n).toLocaleString("en-US")}`;
+var money2 = (n) => `$${Math.round(n).toLocaleString("en-US")}`;
 function fillSection(s, heading, slots, label) {
   const re = new RegExp(`## ${heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[\\s\\S]*?(?=
 ## |$)`);
@@ -105798,14 +105943,14 @@ function assembleOa(inputs) {
     if (inputs.borrowingThreshold === void 0) {
       throw new Error("OA: this form has a Section 5.4 approval gate and no borrowing limit was given");
     }
-    s = s.split("$[THRESHOLD]").join(money(inputs.borrowingThreshold));
+    s = s.split("$[THRESHOLD]").join(money2(inputs.borrowingThreshold));
   }
   if (isMulti) {
     if (inputs.includeCapitalCalls) {
       if (inputs.capitalCallCap === void 0) {
         throw new Error("OA: capital calls are included but no annual cap was given");
       }
-      s = s.split("$[CAP]").join(money(inputs.capitalCallCap));
+      s = s.split("$[CAP]").join(money2(inputs.capitalCallCap));
     } else {
       s = replaceSectionBody(s, /\*\*6\.2 Additional Capital Contributions\.[^\n]*\n[\s\S]*?(?=\n\*\*6\.3)/, "**6.2 Additional Capital Contributions.** [Reserved.]\n\n", "6.2 omit");
       s = replaceSectionBody(s, /\*\*6\.3 Failure to Contribute\.\*\*[\s\S]*?(?=\n\*\*6\.4)/, "**6.3 Failure to Contribute.** [Reserved.]\n\n", "6.3 omit");
@@ -105869,8 +106014,8 @@ NOW, THEREFORE,`,
         // Adam, 9 Sep 2026: every initial series contribution is treated as
         // made first to the Company, then by the Company to the series, so
         // Exhibit A lists it too — in the master's own row, this fills the slot.
-        "[SERIES CONTRIBUTIONS]": seriesContributionList(inputs.series),
-        "[RETAINED]": retainedByCompany([inputs.contributionToCompany || m2.contribution || ""], inputs.series),
+        "[SERIES CONTRIBUTIONS]": inputs.seriesAllocations ? inputs.seriesAllocations.filter((r) => r.items !== "None").map((r) => `${r.name}: ${r.items}`).join("; ") || "None" : seriesContributionList(inputs.series),
+        "[RETAINED]": inputs.retained ?? "\u2014",
         "[DATE]": inputs.effectiveDate,
         // The master's own sentence carries the fallback: "…shall pass to:
         // **X**, or if none is designated or the designation fails, the
@@ -105898,11 +106043,23 @@ NOW, THEREFORE,`,
     s = expandRepeat(
       s,
       "seriesalloc",
-      inputs.series.map((sr) => ({ "[SERIES]": sr.name, "[CONTRIBUTION]": (sr.contribution ?? "").trim() || "None" })),
+      (inputs.seriesAllocations ?? inputs.series.map((sr) => ({ name: sr.name, items: (sr.contribution ?? "").trim() || "None", total: "\u2014" }))).map((r) => ({
+        "[SERIES]": r.name,
+        "[CONTRIBUTION]": r.items,
+        "[SERIES TOTAL]": r.total
+      })),
       "Exhibit A allocation"
     );
-    s = s.split("[RETAINED]").join(retainedByCompany(inputs.members.map((m2) => m2.contribution ?? ""), inputs.series));
+    s = s.split("[RETAINED ASSETS]").join(inputs.retainedItems ?? "None");
+    s = s.split("[RETAINED]").join(inputs.retained ?? "\u2014");
   }
+  const assetRows = (inputs.assets && inputs.assets.length > 0 ? inputs.assets : [{ description: "None", value: "\u2014", by: "\u2014", to: "\u2014" }]).map((a2) => ({
+    "[ASSET]": a2.description,
+    "[ASSET VALUE]": a2.value,
+    "[ASSET BY]": a2.by,
+    "[ASSET TO]": a2.to
+  }));
+  s = expandRepeat(s, "asset", assetRows, "Exhibit A assets");
   const ex1 = extractSection(s, "SERIES EXHIBIT PS-[N]", "series exhibit template");
   s = ex1.doc;
   const ex2 = extractSection(s, "ASSET SCHEDULE \u2014 ATTACHMENT TO SERIES EXHIBIT PS-[N]", "asset schedule template");
@@ -106469,6 +106626,17 @@ var oaAnswersSchema = external_exports.object({
   competition: external_exports.enum(["A", "B"]).optional(),
   includeShotgun: external_exports.boolean().optional(),
   borrowingThreshold: external_exports.number().min(0).max(1e8).optional(),
+  // Capital as a list of assets (Adam, 12 Sep 2026).
+  assets: external_exports.array(
+    external_exports.object({
+      description: external_exports.string().max(400).optional(),
+      kind: external_exports.enum(["cash", "other"]).optional(),
+      value: external_exports.number().min(0).max(1e12).optional(),
+      contributedBy: external_exports.object({ mode: external_exports.enum(["equal", "shares"]).optional(), shares: external_exports.array(external_exports.number().min(0).max(100)).max(20).optional() }).optional(),
+      allocatedTo: external_exports.union([external_exports.literal("company"), external_exports.number().int().min(0).max(200)]).optional(),
+      cashAllocations: external_exports.array(external_exports.number().min(0).max(1e12)).max(200).optional()
+    })
+  ).max(50).optional(),
   couples: external_exports.array(
     external_exports.object({
       a: external_exports.number().int().min(0),
@@ -107226,9 +107394,6 @@ function registerPortalRoutes(app2) {
       }
     });
     const isSCorp = version === "s" || version === "member-s" || version === "single-s" || version === "member-single-s";
-    if (isSCorp && !multiOwner && !members[0].contribution) {
-      members[0].contribution = a2.contributionToCompany ?? "";
-    }
     if (members.length === 1) {
       members[0].percentage = 100;
       members[0].percentageLabel = "100%";
@@ -107273,22 +107438,18 @@ function registerPortalRoutes(app2) {
     if (hasApprovalGate && !a2.borrowingThreshold) {
       return c.json(err("Set the manager's borrowing limit.", "INVALID_INPUT"), 400);
     }
+    const capital = computeCapital(a2.assets, members.map((m2) => m2.name), seed.series.map((sr) => sr.name));
+    if (capital.errors.length > 0) {
+      return c.json(err(capital.errors[0], "CAPITAL"), 400);
+    }
+    members.forEach((m2, i) => {
+      m2.contribution = capital.memberContributions[i] ?? "$0";
+    });
     const series = seed.series.map((sr, i) => ({
       name: sr.name,
       purpose: a2.series?.[i]?.purpose ?? sr.purpose ?? "",
-      contribution: a2.series?.[i]?.contribution ?? ""
+      contribution: capital.seriesCells[i] ?? "None"
     }));
-    {
-      const contributed = (multiOwner ? members.map((m2) => m2.contribution ?? "") : [a2.contributionToCompany || members[0]?.contribution || ""]).map(moneyOf);
-      const allocated = series.map((sr) => sr.contribution.trim() ? moneyOf(sr.contribution) : 0);
-      if (contributed.length > 0 && contributed.every((v2) => v2 !== null) && allocated.every((v2) => v2 !== null)) {
-        const inTotal = contributed.reduce((x2, y) => x2 + (y ?? 0), 0);
-        const outTotal = allocated.reduce((x2, y) => x2 + (y ?? 0), 0);
-        if (outTotal > inTotal) {
-          return c.json(err("The company cannot allocate more to its series than its owners contributed.", "OVER_ALLOCATED"), 400);
-        }
-      }
-    }
     const inputs = {
       version,
       companyName: seed.llcName,
@@ -107306,7 +107467,11 @@ function registerPortalRoutes(app2) {
       competition: a2.competition ?? (isSCorp && !multiOwner ? "B" : void 0),
       includeShotgun: a2.includeShotgun ?? (isSCorp && !multiOwner ? false : void 0),
       borrowingThreshold: a2.borrowingThreshold,
-      contributionToCompany: a2.contributionToCompany,
+      contributionToCompany: capital.memberContributions[0] ?? "$0",
+      assets: capital.assetRows,
+      seriesAllocations: capital.seriesRows,
+      retainedItems: capital.retainedItems,
+      retained: capital.retained,
       // ch. 621 companies get the three professional descriptor lines.
       professional: seed.formationType === "PLLC",
       generationNumber: nextGenerationNumber
@@ -108473,12 +108638,12 @@ async function fulfillPaidServiceOrder(serviceOrderId, squarePaymentId) {
     }
   }
 }
-function moneyMismatch(money2, expectedCents) {
-  if (!money2 || money2.amount === void 0 || money2.amount === null) return null;
-  const amount = Number(money2.amount);
-  if (!Number.isFinite(amount)) return `unreadable amount ${String(money2.amount)}`;
+function moneyMismatch(money3, expectedCents) {
+  if (!money3 || money3.amount === void 0 || money3.amount === null) return null;
+  const amount = Number(money3.amount);
+  if (!Number.isFinite(amount)) return `unreadable amount ${String(money3.amount)}`;
   if (amount !== expectedCents) return `captured ${amount} but the order is ${expectedCents}`;
-  const currency = (money2.currency ?? "USD").toUpperCase();
+  const currency = (money3.currency ?? "USD").toUpperCase();
   if (currency !== "USD") return `captured in ${currency}, not USD`;
   return null;
 }
