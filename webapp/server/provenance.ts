@@ -22,6 +22,7 @@
  */
 import { assembleOa, OA_TEMPLATE_VERSION, type OaInputs } from "./oa";
 import { readFileSync } from "node:fs";
+import { assembleAmendment } from "./oa-amendment";
 
 const MASTERS: Record<OaInputs["version"], string> = {
   single: "templates-oa-single.md",
@@ -61,7 +62,11 @@ const S = {
   special: "ZQSPECIALQZ",
   asset1: "ZQASSETONEQZ",
   asset2: "ZQASSETTWOQZ",
+  amDate: "ZQAMDATEQZ",
+  amText: "ZQAMTEXTQZ",
 };
+/** Distinctive, so no other figure in the document can be mistaken for it. */
+const AM_NUMBER = 7419;
 
 function inputsFor(v: OaInputs["version"]): OaInputs {
   const single = v.includes("single");
@@ -80,7 +85,9 @@ function inputsFor(v: OaInputs["version"]): OaInputs {
       ? [{ name: S.m1, address: S.addr1, percentage: 100, contribution: "$1,500", todBeneficiary: S.tod1, todBackup: S.todb1 }]
       : [
           { name: S.m1, address: S.addr1, percentage: 60, contribution: "$900", todBeneficiary: S.tod1, todBackup: S.todb1 },
-          { name: S.m2, address: S.addr2, percentage: 40, contribution: "$600", todBeneficiary: S.tod2, todBackup: S.todb2 },
+          // A marital unit: both spouses sign, under a heading of both names
+          // and the tenancy (Adam, 9 Sep 2026).
+          { name: S.m2, address: S.addr2, percentage: 40, contribution: "$600", todBeneficiary: S.tod2, todBackup: S.todb2, signatories: [S.m2, S.mgr2], jointHolding: "tenants by the entirety" },
         ],
     series: [
       { name: S.ser1, purpose: S.purpose1, contribution: `${S.asset1} ($1,000)`, specialTerms: S.special },
@@ -134,6 +141,14 @@ function unwind(s: string): string {
     .split(S.company).join("[COMPANY NAME]")
     .split(S.principal).join("[PRINCIPAL ADDRESS]")
     .split(S.date).join("[DATE]")
+    .split(S.amDate).join("[DATE]")
+    .split(S.amText).join("[AMENDMENT TEXT]")
+    // A marital unit's tenancy in the signature heading: the master's line is
+    // [HOLDING] alone; the generator prefixes "as" and title-cases the value.
+    .replace(/^as Tenants by the Entirety$/gm, "[HOLDING]")
+    .split(String(AM_NUMBER)).join("[NUM]")
+    // The amendment cites the agreement's own amendment Section: 15.1 or 12.1.
+    .replace(/Section 1[25]\.1 of the Agreement/g, "Section [SECTION] of the Agreement")
     .split(S.ser1).join("[SERIES]")
     .split(S.ser2).join("[SERIES]")
     .split(S.purpose1).join("[PURPOSE]")
@@ -157,10 +172,15 @@ function unwind(s: string): string {
     // The document title is chosen between two wordings the generator owns;
     // the master's footer line spells the slot.
     .replace(/\b(?:AMENDED AND RESTATED )?OPERATING AGREEMENT(?= of \[COMPANY NAME\])/g, "[TITLE]")
+    .replace(/\bAmendment No\. \[NUM\] to Operating Agreement(?= of \[COMPANY NAME\])/g, "[TITLE]")
     // Exhibit A's series-contribution slot holds a LIST, "series: amount; …",
     // one item per series with a contribution (9 Sep 2026). Collapse it to
     // the master's single placeholder, as the name lists are collapsed above.
-    .replace(/\[SERIES\]: \[SERCONTRIB\](?:; \[SERIES\]: \[SERCONTRIB\])*/g, "[SERIES CONTRIBUTIONS]");
+    .replace(/\[SERIES\]: \[SERCONTRIB\](?:; \[SERIES\]: \[SERCONTRIB\])*/g, "[SERIES CONTRIBUTIONS]")
+    // The same tenancy in Exhibit A's member cell, where the master reads
+    // "[MEMBER NAME] as [HOLDING]" and the value is plain. Only the cell: s. 4.3
+    // says "tenants by the entirety" in prose, and prose must stay as written.
+    .replace(/(?<=^\| \[NAME\] as )tenants by the entirety(?= \|)/gm, "[HOLDING]");
 }
 
 /** The master's own placeholder spellings, reduced to the shared vocabulary.
@@ -190,7 +210,7 @@ function masterKey(s: string): string {
       // Exhibits are renumbered per series — a transform, not composition.
       .replace(/SERIES EXHIBIT (?:PS-)?(?:\[N\]|\d+)( \([^)]*\))?/g, "SERIES EXHIBIT [N]")
       .replace(/\[MEMBER \d+(?: NAME)?(?:, if any)?\]/g, "[NAME]")
-      .replace(/\[MEMBER NAME\]|\[SIGNATORY NAME\]|\[ADOPTER NAME\]|\[MANAGER NAME\]|\[MANAGER NAMES\]|\[NAME\]/g, "[NAME]")
+      .replace(/\[MEMBER NAME\]|\[SIGNATORY NAME\]|\[ADOPTER NAME\]|\[MANAGER NAME\]|\[MANAGER NAMES\]|\[UNIT\]|\[NAME\]/g, "[NAME]")
       .replace(/\[MEMBER ADDRESS\]|\[ADDRESS\]/g, "[ADDRESS]")
       .replace(/\[MEMBER CONTRIBUTION\]|\$\[AMOUNT\] \[and\/or described property\]|\$\[AMOUNT\]|\[ASSET VALUE\]|\[SERIES TOTAL\]|\[RETAINED\]/g, "[MONEY]")
       .replace(/\[CONTRIBUTION\]|\[RETAINED ASSETS\]/g, "[SERCONTRIB]")
@@ -200,7 +220,9 @@ function masterKey(s: string): string {
       // above have become [NAME], so it applies to master and output alike.
       .replace(/\[NAME\](?: \(\d+(?:\.\d+)?%\))?(?:(?:, \[NAME\](?: \(\d+(?:\.\d+)?%\))?)*,? and \[NAME\](?: \(\d+(?:\.\d+)?%\))?)?(?:, equally)?(?= \| (?:\[SERIES\]|the Company|\[ASSET TO\]) \|)/g, "[ASSET BY]")
       .replace(/(\| (?:\[ASSET BY\]|\[MONEY\]) \| )(?:\[SERIES\]|the Company)( \|)/g, "$1[ASSET TO]$2")
-      .replace(/\[MEMBER DATE\]|\[DATE\]/g, "[DATE]")
+      .replace(/\[MEMBER DATE\]|\[AMENDMENT DATE\]|\[AGREEMENT DATE\]|\[DATE\]/g, "[DATE]")
+      .replace(/\[AMENDMENT NUMBER\]/g, "[NUM]")
+      .replace(/\[AMENDMENT SECTION\]/g, "[SECTION]")
       .replace(/\[MEMBER TOD BACKUP\]|\[TOD BACKUP NAME\(S\)\]|\[MEMBER TOD\]|\[TOD BENEFICIARY NAME\(S\)\]|\[NAME\(S\) \/ None\]/g, "[TOD]")
       .replace(/\[MEMBER SHARE\]|\[___\]%/g, "[PCT]")
       .replace(/\$\[THRESHOLD\]|\$\[CAP\]/g, "[MONEY]")
@@ -223,8 +245,9 @@ const blocks = (s: string): string[] =>
   s.split(/\n\s*\n/).map((b) => b.trim()).filter(Boolean);
 
 let violations = 0;
-for (const [version, file] of Object.entries(MASTERS) as [OaInputs["version"], string][]) {
-  const raw = readFileSync(`${import.meta.dir}/${file}`, "utf8");
+
+/** Every paragraph and line of a master, in all its resolved variants. */
+function knownOf(raw: string): Set<string> {
   // A master paragraph carrying <!-- one:… --> / <!-- many:… --> holds BOTH
   // wordings; the delivered document holds one. Resolve it both ways so the
   // chosen wording traces, and the unchosen one does not go missing.
@@ -252,7 +275,11 @@ for (const [version, file] of Object.entries(MASTERS) as [OaInputs["version"], s
       if (k) known.add(k);
     }
   }
+  return known;
+}
 
+function report(label: string, file: string, markdown: string): void {
+  const known = knownOf(readFileSync(`${import.meta.dir}/${file}`, "utf8"));
   const traces = (block: string): boolean => {
     const k = keyOutput(block);
     if (!k || known.has(k)) return true;
@@ -267,15 +294,27 @@ for (const [version, file] of Object.entries(MASTERS) as [OaInputs["version"], s
     if (m && known.has(m[1]) && known.has(m[2])) return true;
     return false;
   };
-
-  const { markdown } = assembleOa(inputsFor(version));
   const orphans: string[] = [];
   for (const b of blocks(markdown)) {
     if (!traces(b)) orphans.push(keyOutput(b));
   }
-  console.log(`\n=== ${version} — ${orphans.length} paragraph(s) not traceable to the master ===`);
+  console.log(`\n=== ${label} — ${orphans.length} paragraph(s) not traceable to the master ===`);
   for (const o of orphans) console.log("   " + (o.length > 200 ? o.slice(0, 200) + " …" : o));
   violations += orphans.length;
 }
-console.log(`\n${violations} untraceable paragraph(s) across the eight forms.`);
+
+for (const [version, file] of Object.entries(MASTERS) as [OaInputs["version"], string][]) {
+  report(version, file, assembleOa(inputsFor(version)).markdown);
+}
+
+// The amendment master, filled from each kind of agreement it can amend:
+// manager-managed with two managers and a marital unit (typed changes),
+// member-managed sole member of an amended and restated agreement (attached).
+const AMENDMENT_MASTER = "templates-oa-amendment.md";
+{
+  report("amendment (multi, typed)", AMENDMENT_MASTER, assembleAmendment(inputsFor("multi"), { number: AM_NUMBER, effectiveDate: S.amDate, mode: "typed", text: S.amText }).markdown);
+  report("amendment (member-single, attached)", AMENDMENT_MASTER, assembleAmendment({ ...inputsFor("member-single"), amendedRestated: true }, { number: AM_NUMBER, effectiveDate: S.amDate, mode: "attached" }).markdown);
+  report("amendment (single-s, attached)", AMENDMENT_MASTER, assembleAmendment(inputsFor("single-s"), { number: AM_NUMBER, effectiveDate: S.amDate, mode: "attached" }).markdown);
+}
+console.log(`\n${violations} untraceable paragraph(s) across the eight forms and the amendment.`);
 process.exit(violations > 0 ? 1 : 0);

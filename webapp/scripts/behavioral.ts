@@ -22,7 +22,8 @@ import { memberRowIsBlank } from "../src/components/forms/florida-llc/validation
 import type { FloridaLLCFormData } from "../src/components/forms/florida-llc/types";
 import { normalizeEntityName } from "../src/components/forms/florida-llc/nameSimilarity";
 import { spawn, type Subprocess } from "bun";
-import { mkdtempSync, rmSync, existsSync } from "node:fs";
+import { mkdtempSync, rmSync, existsSync, writeFileSync } from "node:fs";
+import { execSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -1332,6 +1333,8 @@ async function main(): Promise<void> {
 
       let genCaptured: { generationId?: string; version?: string } | null = null;
       let genPostBody: string | null = null;
+      let amendCaptured: { documentId?: string; title?: string; number?: number } | null = null;
+      let amendCookie = "";
       await page.route("**/api/**", async (route) => {
         const url = new URL(route.request().url());
         // Deterministic USPS answer: the journey must see the advisory strip
@@ -1356,6 +1359,10 @@ async function main(): Promise<void> {
         if (url.pathname === "/api/portal/oa/generate" && resp.status === 200) {
           genCaptured = (JSON.parse(body) as { data?: { generationId?: string; version?: string } }).data ?? null;
           genPostBody = route.request().postData() ?? null;
+        }
+        if (url.pathname === "/api/portal/oa/amend" && resp.status === 200) {
+          amendCaptured = (JSON.parse(body) as { data?: { documentId?: string; title?: string; number?: number } }).data ?? null;
+          amendCookie = route.request().headers()["cookie"] ?? "";
         }
         await route.fulfill({ status: resp.status, contentType: resp.headers.get("content-type") ?? "application/json", body, headers: setCookie ? { "set-cookie": setCookie } : undefined });
       });
@@ -1603,6 +1610,64 @@ async function main(): Promise<void> {
         expect((md3.match(/1\/3/g) ?? []).length >= 3, "OA-I: equal thirds after unpairing", md3.match(/\d\/\d/g)?.slice(0, 6));
       }
       console.log("  ✓ OA-I: couple plus solo owner, fractions, transfer on death, unpairing");
+
+      // ---- Amendment to Operating Agreement (Adam, 12 Sep 2026): from the
+      // current agreement in the questionnaire's list, the client opens the
+      // amendment page, reads the attorney notice, types the changes, and
+      // finds the PDF in Your documents directly under the agreement.
+      await page.goto(`http://localhost:${WEB_PORT}/portal/agreement`);
+      await page.waitForSelector("main h2, main h1");
+      await page.waitForTimeout(800);
+      // The list of agreements is on the questionnaire's second screen.
+      await clickCard(page, /More than one owner/i);
+      await page.locator("main button").filter({ hasText: /^Continue/ }).first().click();
+      await page.waitForTimeout(1200);
+      const amendLinks = page.locator("main a").filter({ hasText: /^Amend this agreement$/ });
+      expect((await amendLinks.count()) === 1, "AMEND: the current agreement, and only it, offers Amend this agreement", await amendLinks.count());
+      await amendLinks.first().click();
+      await page.waitForURL(/\/portal\/amend/, { timeout: 10000 });
+      await page.waitForTimeout(800);
+      const notice = await page.locator('[data-testid="amendment-notice"]').innerText().catch(() => "");
+      expect(/legal consequences you do not intend/.test(notice) && /reviewed by an attorney before it is signed/.test(notice), "AMEND: the page warns of unintended legal consequences and urges attorney review", notice);
+      expect(/This amends your current agreement/.test(await page.locator("main").innerText()), "AMEND: the page names the agreement it amends");
+      await shot(page, "amend-page");
+      const createBtn = page.locator("main button").filter({ hasText: /^Create amendment/ }).first();
+      expect(await createBtn.isDisabled(), "AMEND: Create waits until changes are typed");
+      await page.locator('main textarea[aria-label="Changes to the agreement"]').fill("Section 4.2 is amended to read: \"Each Member votes in proportion to the Member's Percentage Interest.\"\nSection 9.4 is deleted.");
+      await page.waitForTimeout(200);
+      expect(!(await createBtn.isDisabled()), "AMEND: Create enables once changes are typed");
+      await createBtn.click();
+      for (let i = 0; i < 40 && !amendCaptured; i++) await page.waitForTimeout(500);
+      expect(!!amendCaptured, "AMEND: the amendment generates");
+      await page.waitForURL(/\/portal(\?|$)/, { timeout: 10000 }).catch(() => {});
+      await page.waitForTimeout(1200);
+      expect(/\/portal(\?|$)/.test(page.url()), "AMEND: creating returns the client to the portal", page.url());
+      const rowsAfter = (await page.locator('[data-testid="document-row"]').allInnerTexts()).map((r) => r.split("\n")[0].trim());
+      const oaAt = rowsAfter.findIndex((r) => /Operating Agreement/.test(r) && !/^Amendment/.test(r));
+      const amAt = rowsAfter.findIndex((r) => /^Amendment No\. 1 to Operating Agreement — /.test(r));
+      expect(amAt >= 0 && amAt === oaAt + 1, "AMEND: Amendment No. 1 is listed directly under the current agreement in Your documents", rowsAfter);
+      await shot(page, "portal-after-amend");
+      // Read it: the words on the delivered PDF, when pdftotext is installed.
+      if (amendCaptured) {
+        const cap = amendCaptured as { documentId?: string; title?: string };
+        const bytes = new Uint8Array(await (await fetch(`${API}/api/portal/documents/${cap.documentId}/download`, { headers: { cookie: amendCookie } })).arrayBuffer());
+        expect(bytes[0] === 0x25 && bytes[1] === 0x50, "AMEND: the amendment downloads as a PDF", bytes.length);
+        let hasPdftotext = false;
+        try { execSync("pdftotext -v", { stdio: "ignore" }); hasPdftotext = true; } catch { /* not installed here */ }
+        if (hasPdftotext) {
+          const f = join(tmpdir(), `walk-amend-${Date.now()}.pdf`);
+          writeFileSync(f, bytes);
+          const flat = execSync(`pdftotext -layout "${f}" -`).toString().replace(/\s+/g, " ");
+          expect(/AMENDMENT NO\. 1 TO OPERATING AGREEMENT/.test(flat), "AMEND: read off the PDF — the heading", flat.slice(0, 160));
+          expect(/Section 15\.1 of the Agreement provides that the Agreement may be amended only by a written instrument signed by all Members\./.test(flat), "AMEND: read off the PDF — recital cites s. 15.1 and all Members on the multi-member form", flat.match(/Section 15\.1[^.]*\./)?.[0]);
+          expect(/Section 4\.2 is amended to read:/.test(flat) && /Section 9\.4 is deleted\./.test(flat), "AMEND: read off the PDF — the changes typed on screen", flat.match(/Section (4\.2|9\.4)[^.]*\./g));
+          expect(/MEMBERS:/.test(flat) && /Casey Gatecheck Date:/.test(flat) && /Blair Gatecheck Date:/.test(flat) && /Drew Solo Date:/.test(flat), "AMEND: read off the PDF — all three owners sign", flat.slice(-500));
+          expect(!/ACKNOWLEDGED/.test(flat), "AMEND: read off the PDF — no manager block on a member-managed company");
+        } else {
+          console.log("   (pdftotext not installed — the amendment's words are checked by the unit tests and the server checks, not read off this PDF)");
+        }
+      }
+      console.log("  ✓ AMEND: amendment page, notice, typed changes, listed under the agreement, read off the PDF");
     } catch (e) {
       expect(false, `OA journey: ${String(e).slice(0, 300)}`);
     } finally {

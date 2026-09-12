@@ -5,7 +5,7 @@ import { hasFirstAndLast } from "@/lib/personName";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Navigate, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, ArrowRight, Download, FileText, History } from "lucide-react";
+import { ArrowLeft, ArrowRight, Download, FilePen, FileText, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { api, ApiError } from "@/lib/api";
@@ -778,6 +778,14 @@ export default function OAQuestionnaire() {
                                 <Download className="mr-1.5 h-3.5 w-3.5" />
                                 Download
                               </a>
+                            </Button>
+                          ) : null}
+                          {isCurrent ? (
+                            <Button asChild variant="outline" size="sm" className="rounded-full">
+                              <Link to={`/portal/amend${oaCq}`}>
+                                <FilePen className="mr-1.5 h-3.5 w-3.5" />
+                                Amend this agreement
+                              </Link>
                             </Button>
                           ) : null}
                         </div>

@@ -21,13 +21,14 @@ That is why the masters live here.
 | `webapp/server/templates-oa-single-s.md` | SMMMS - FPSLLC Operating Agreement - Manager-Managed Single Member (S Corporation) - DRAFT.docx |
 | `webapp/server/templates-oa-member-single.md` | SMMEMDE - FPSLLC Operating Agreement - Member-Managed Single Member (Disregarded) - DRAFT.docx |
 | `webapp/server/templates-oa-member-single-s.md` | SMMEMS - FPSLLC Operating Agreement - Member-Managed Single Member (S Corporation) - DRAFT.docx |
+| `webapp/server/templates-oa-amendment.md` | FPSLLC Amendment to Operating Agreement - FORM.docx |
 | `docs/owners-manual.md` | Series LLC Owners Manual - REVISED DRAFT.docx |
 | `docs/statement-of-authorized-representative.md` | FPSLLC Statement of Authorized Representative - FORM.docx |
 | `docs/oa-instructions.md` | FPSLLC Operating Agreement Instructions - DRAFT.docx |
 
-The eight operating agreement masters are also what the portal uses to generate a
-client's agreement, so the Word file and the client's PDF always come from the
-same text.
+The eight operating agreement masters and the amendment master are also what the
+portal uses to generate a client's agreement and any amendment to it, so the Word
+file and the client's PDF always come from the same text.
 
 The Statement of Authorized Representative is furnished when a client appoints
 us to sign and file their Articles under s. 605.0102(8)(a), so a bank looking at

@@ -23,6 +23,7 @@ import { FIRST_AND_LAST, hasFirstAndLast } from "../src/lib/personName";
 import { VALID_EIN_PREFIXES } from "../src/lib/ein";
 import { EIN_CATEGORY_NAMES, EIN_REASONS, followUpOk } from "../src/lib/einActivity";
 import { assembleOa, oaVersion, OA_TEMPLATE_VERSION, type OaInputs } from "./oa";
+import { assembleAmendment } from "./oa-amendment";
 import { renderMarkdownPdf, stampExistingPdf } from "./pdf-render";
 import { createSession, getSession, getAdminSession, destroySession, rateLimit, clientIp } from "./auth";
 
@@ -1537,6 +1538,84 @@ app.delete("/portal/oa/generations/:id", async (c) => {
     await db.query("DELETE FROM oa_generations WHERE id = $1", [rows[0].id]);
   }
   return c.json({ data: { ok: true } });
+});
+
+/** Amendment to Operating Agreement (Adam, 12 Sep 2026). Filled from the
+ *  STORED inputs of the company's current agreement, so the parties who sign
+ *  the amendment are the parties who signed the agreement, and numbered per
+ *  company from 1. The PDF lands in Your documents beside the agreement. */
+const amendSchema = z.object({
+  effectiveDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  mode: z.enum(["typed", "attached"]),
+  text: z.string().max(20000).optional(),
+});
+app.post("/portal/oa/amend", async (c) => {
+  const session = await getSession(c);
+  if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  if (!(await rateLimit(`oaamend:${session.clientId}`, 10, 3600_000))) {
+    return c.json(err("Too many amendments. Try again later.", "RATE_LIMITED"), 429);
+  }
+  const body = amendSchema.safeParse(await c.req.json().catch(() => null));
+  if (!body.success) return c.json(err("Invalid amendment.", "INVALID_INPUT"), 400);
+  const a = body.data;
+  if (a.mode === "typed" && !(a.text ?? "").trim()) {
+    return c.json(err("Type the changes, or choose to attach them as Exhibit A.", "INVALID_INPUT"), 400);
+  }
+  const amendCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
+  const seed = await oaSeed(session.clientId, amendCompanyId);
+  if (!seed) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
+  const db = await getDb();
+  const current = await db.query<{ inputs: unknown }>(
+    `SELECT inputs FROM oa_generations WHERE client_id = $1 AND (order_id = $2 OR order_id IS NULL) ORDER BY created_at DESC LIMIT 1`,
+    [session.clientId, seed.orderId],
+  );
+  if (current.length === 0) {
+    return c.json(err("Generate an operating agreement first. An amendment amends the agreement on file.", "NO_AGREEMENT"), 400);
+  }
+  const rawInputs = current[0].inputs;
+  const oa = (typeof rawInputs === "string" ? JSON.parse(rawInputs) : rawInputs) as OaInputs;
+  // The next number after the highest on file for this company. A number is
+  // printed on the PDF, so it is never reused while a later one exists.
+  const prior = await db.query<{ title: string }>(
+    "SELECT title FROM documents WHERE client_id = $1 AND kind = 'amendment' AND (order_id = $2 OR order_id IS NULL)",
+    [session.clientId, seed.orderId],
+  );
+  const number = prior.reduce((max, r) => Math.max(max, Number(r.title.match(/^Amendment No\. (\d+)/)?.[1] ?? 0)), 0) + 1;
+
+  const clients = await db.query<{ email: string; name: string }>("SELECT email, name FROM clients WHERE id = $1", [session.clientId]);
+  const client = clients[0];
+  const generatedOn = new Date();
+  let pdf: Uint8Array;
+  let title: string;
+  try {
+    const assembled = assembleAmendment(oa, { number, effectiveDate: fmtDate(a.effectiveDate), mode: a.mode, text: a.text });
+    title = assembled.title;
+    pdf = await renderMarkdownPdf({
+      markdown: assembled.markdown,
+      watermark: {
+        name: client?.name || oa.members[0]?.name || "",
+        email: client?.email ?? "",
+        note: OA_TEMPLATE_VERSION,
+        generatedAt: stampEastern(generatedOn),
+      },
+      title,
+    });
+  } catch (e) {
+    console.error("[oa] amendment failed:", e);
+    return c.json(err("We could not generate the amendment. Our team has been notified.", "GENERATION_FAILED"), 500);
+  }
+  const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength) as ArrayBuffer;
+  const stored = await putFile(
+    `${title.replace(/[^\w-]+/g, "_")}_${stampForFilename(generatedOn)}.pdf`,
+    buf,
+    "application/pdf",
+  );
+  const doc = await db.query<{ id: string }>(
+    `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes)
+     VALUES ($1, $5, 'amendment', $2, $3, 'application/pdf', $4) RETURNING id`,
+    [session.clientId, title, stored.storageKey, stored.sizeBytes, seed.orderId],
+  );
+  return c.json({ data: { documentId: doc[0].id, title, number } });
 });
 
 /* ----------------------------- library docs ---------------------------- */

@@ -4,6 +4,21 @@
  */
 import { defaultFormData } from "../src/components/forms/florida-llc/defaults";
 import { assembleOa, type OaInputs } from "./oa";
+import { execSync } from "node:child_process";
+import { writeFileSync } from "node:fs";
+import { tmpdir as osTmpdir } from "node:os";
+import { join as joinPath } from "node:path";
+
+/** The words on a delivered PDF, read back with pdftotext when it is installed
+ *  (it is on Adam's machine; the CI runner may lack it, and then the text
+ *  checks are skipped and say so). */
+const hasPdftotext = (() => { try { execSync("pdftotext -v", { stdio: "ignore" }); return true; } catch { return false; } })();
+function pdfText(bytes: Uint8Array): string | null {
+  if (!hasPdftotext) return null;
+  const f = joinPath(osTmpdir(), `e2e-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.pdf`);
+  writeFileSync(f, bytes);
+  return execSync(`pdftotext -layout "${f}" -`).toString();
+}
 import type { FloridaLLCFormData } from "../src/components/forms/florida-llc/types";
 import { evaluate2553Timing } from "../src/lib/form2553Timing";
 
@@ -1247,6 +1262,10 @@ if (mint.status === 200) {
   };
   const saveAns = await api("/api/portal/oa/answers", { method: "PUT", cookies: setPw.cookie, body: JSON.stringify(oaAnswers) });
   check("OA answers save", saveAns.status === 200);
+  // An amendment amends the agreement on file; with none, it is refused
+  // (Adam, 12 Sep 2026).
+  const amendTooSoon = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ effectiveDate: "2026-09-12", mode: "attached" }) });
+  check("amendment: refused before any agreement exists", amendTooSoon.status === 400 && amendTooSoon.body?.error?.code === "NO_AGREEMENT", amendTooSoon.body);
   // A first and last name for every owner and beneficiary (Adam, 7 Sep 2026).
   const halfOwner = await api("/api/portal/oa/generate", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ ...oaAnswers, members: [{ name: "Maria", address: "500 Bay Street, Miami, FL 33131", todBeneficiary: "Jordan Member" }] }) });
   check("agreement: a one-word owner name is refused", halfOwner.status === 400 && /first and last name/.test(halfOwner.body?.error?.message ?? ""), halfOwner.body);
@@ -1300,6 +1319,53 @@ if (mint.status === 200) {
   const oaPdf = await fetch(`${BASE}/api/portal/documents/${oaDocId}/download`, { headers: { Cookie: setPw.cookie } });
   const oaBytes = new Uint8Array(await oaPdf.arrayBuffer());
   check("generated OA downloads as PDF", oaPdf.ok && oaBytes[0] === 0x25 && oaBytes[1] === 0x50, { status: oaPdf.status, len: oaBytes.length });
+
+  // --- Amendment to Operating Agreement (Adam, 12 Sep 2026) ---
+  // Filled from the current agreement's stored inputs: this client's is the
+  // Amended & Restated one on the member-managed single-member form, so the
+  // recital names that agreement, cites s. 12.1, and nobody but the Member
+  // signs. Numbered per company; the PDF lands in Your documents.
+  {
+    const storedRes = await api(`/api/dev/oa-generation-inputs/${gen2.body?.data?.generationId}`);
+    const stored = storedRes.body?.data?.inputs as OaInputs;
+    const owner = stored?.members?.[0]?.name ?? "";
+    const blank = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ effectiveDate: "2026-09-12", mode: "typed", text: "   " }) });
+    check("amendment: typed changes left blank are refused", blank.status === 400 && blank.body?.error?.code === "INVALID_INPUT", blank.body);
+    const badDate = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ effectiveDate: "next week", mode: "attached" }) });
+    check("amendment: a date that is not a date is refused", badDate.status === 400, badDate.body);
+    const typed = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ effectiveDate: "2026-09-12", mode: "typed", text: "Section 3.2 is amended to read: \"The Company may designate up to four Protected Series.\"\nSection 9.4 is deleted." }) });
+    check("amendment with typed changes generates", typed.status === 200, typed.body);
+    check("the first amendment is No. 1, titled for the company", typed.body?.data?.number === 1 && typed.body?.data?.title === "Amendment No. 1 to Operating Agreement — E2E Coastal Holdings, LLC", typed.body?.data);
+    const amPdf = await fetch(`${BASE}/api/portal/documents/${typed.body?.data?.documentId}/download`, { headers: { Cookie: setPw.cookie } });
+    const amBytes = new Uint8Array(await amPdf.arrayBuffer());
+    check("the amendment downloads as a PDF", amPdf.ok && amBytes[0] === 0x25 && amBytes[1] === 0x50, { status: amPdf.status, len: amBytes.length });
+    const text = pdfText(amBytes);
+    if (text === null) {
+      console.log("   (pdftotext not installed — the amendment's words are checked by the unit tests and the paragraph trace, not read off this PDF)");
+    } else {
+      const flat = text.replace(/\s+/g, " ");
+      check("read off the PDF: the heading numbers the amendment", /AMENDMENT NO\. 1 TO OPERATING AGREEMENT OF E2E Coastal Holdings, LLC/.test(flat), flat.slice(0, 200));
+      check("read off the PDF: the recital names the Amended and Restated agreement and its date", /governed by the Amended and Restated Operating Agreement of the Company effective as of August 5, 2026/.test(flat), flat.match(/governed by[^.]*/)?.[0]);
+      check("read off the PDF: the recital cites s. 12.1 and the Member", /Section 12\.1 of the Agreement provides that the Agreement may be amended only by a written instrument signed by the Member\./.test(flat), flat.match(/Section 12\.1[^.]*\./)?.[0]);
+      check("read off the PDF: the typed changes are printed", /Section 3\.2 is amended to read: "The Company may designate up to four Protected Series\."/.test(flat) && /Section 9\.4 is deleted\./.test(flat), flat.match(/Section (3\.2|9\.4)[^.]*\./g));
+      check("read off the PDF: the effect clause", /Except as amended by this Amendment, the Agreement remains in full force and effect\./.test(flat));
+      check("read off the PDF: the Member signs, and nobody else", owner !== "" && new RegExp(`MEMBER: ${owner.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")} Date:`).test(flat) && !/ACKNOWLEDGED/.test(flat) && !/MEMBERS:/.test(flat), { owner, tail: flat.slice(-400) });
+      check("read off the PDF: the effective date typed is the one printed", /effective as of September 12, 2026, by the undersigned sole member/.test(flat), flat.match(/effective as of [^,]*, by[^.]*/)?.[0]);
+    }
+    const attached = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ effectiveDate: "2026-10-01", mode: "attached" }) });
+    check("a second amendment, with the changes attached as Exhibit A, is No. 2", attached.status === 200 && attached.body?.data?.number === 2 && /^Amendment No\. 2 /.test(attached.body?.data?.title ?? ""), attached.body?.data);
+    const atBytes = new Uint8Array(await (await fetch(`${BASE}/api/portal/documents/${attached.body?.data?.documentId}/download`, { headers: { Cookie: setPw.cookie } })).arrayBuffer());
+    const atText = pdfText(atBytes);
+    if (atText !== null) {
+      const flat = atText.replace(/\s+/g, " ");
+      check("read off the PDF: the attached choice prints the Exhibit A sentence", /The Agreement is amended as set forth in Exhibit A attached to this Amendment\./.test(flat) && !/Section 3\.2/.test(flat), flat.match(/amended as follows:[^.]*\./)?.[0]);
+    }
+    const docsNow = await api("/api/portal/documents", { cookies: setPw.cookie });
+    const amDocs = ((docsNow.body?.data ?? []) as { kind: string; title: string }[]).filter((d) => d.kind === "amendment").map((d) => d.title);
+    check("both amendments are in the client's documents as amendments", amDocs.length === 2 && amDocs.some((x) => x.startsWith("Amendment No. 1 ")) && amDocs.some((x) => x.startsWith("Amendment No. 2 ")), amDocs);
+    const noSession = await api("/api/portal/oa/amend", { method: "POST", body: JSON.stringify({ effectiveDate: "2026-09-12", mode: "attached" }) });
+    check("amendment requires a signed-in client", noSession.status === 401);
+  }
 
   // --- consent + Series Exhibit for a series added after formation ---
   const badName = await api("/api/portal/series/consent", {
@@ -2192,6 +2258,18 @@ if (mint.status === 200) {
     smSAfter.body?.data?.generations?.[0]?.version === "single-s",
     smSAfter.body?.data?.generations?.[0],
   );
+  // On a manager-managed form the amendment carries the Manager's
+  // acknowledgment — s. 12.1(b) bars new obligations on the Manager without
+  // the Manager's written consent — beneath the Member's signature.
+  const smAmend = await api("/api/portal/oa/amend", { method: "POST", cookies: smPw.cookie, body: JSON.stringify({ effectiveDate: "2026-09-12", mode: "attached" }) });
+  check("manager-managed sole owner: amendment generates", smAmend.status === 200 && smAmend.body?.data?.number === 1, smAmend.body);
+  const smAmText = pdfText(new Uint8Array(await (await fetch(`${BASE}/api/portal/documents/${smAmend.body?.data?.documentId}/download`, { headers: { Cookie: smPw.cookie } })).arrayBuffer()));
+  if (smAmText !== null) {
+    const flat = smAmText.replace(/\s+/g, " ");
+    check("read off the PDF: the Member signs and the Manager acknowledges", /MEMBER: Alex Vale Date:/.test(flat) && /ACKNOWLEDGED AND AGREED BY MANAGER: Robin Vale, Manager Date:/.test(flat), flat.slice(-500));
+    check("read off the PDF: the preamble says the Manager acknowledges it", /by the undersigned sole member \(the "Member"\), and is acknowledged by the undersigned Manager\./.test(flat), flat.match(/by the undersigned sole member[^.]*\./)?.[0]);
+    check("read off the PDF: s. 12.1 is the section cited on the single form", /Section 12\.1 of the Agreement/.test(flat));
+  }
 }
 
 // 16c. Owners are editable after formation.

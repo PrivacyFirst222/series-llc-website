@@ -147,7 +147,7 @@ export function moneyOf(text: string | undefined): number | null {
 
 /** "tenants by the entirety" → "Tenants by the Entirety": the holding as a
  *  heading, with the small words left small. */
-function titleCaseHolding(holding: string): string {
+export function titleCaseHolding(holding: string): string {
   const small = new Set(["by", "the", "with", "of"]);
   return holding
     .split(" ")
@@ -203,7 +203,7 @@ function fillSection(
  *  carries ONE specimen row inside the marker and this repeats it, so the row a
  *  client sees is the row that was drafted and reviewed. md-to-docx.py strips
  *  HTML comments, so the markers leave no trace in the Word masters. */
-function expandRepeat(
+export function expandRepeat(
   s: string,
   key: string,
   rows: Array<Record<string, string>>,
@@ -256,7 +256,7 @@ function expandRepeat(
  *  Throws when a key appears with no pair — a master and a generator that
  *  disagree about which wordings exist should fail the build, not ship whichever
  *  half happens to be present. */
-function chooseNumber(s: string, key: string, singular: boolean): string {
+export function chooseNumber(s: string, key: string, singular: boolean): string {
   const keep = new RegExp(`<!--\\s*${singular ? "one" : "many"}:${key}\\s*-->([\\s\\S]*?)<!--\\s*/${singular ? "one" : "many"}\\s*-->`, "g");
   const drop = new RegExp(`<!--\\s*${singular ? "many" : "one"}:${key}\\s*-->[\\s\\S]*?<!--\\s*/${singular ? "many" : "one"}\\s*-->`, "g");
   if (!keep.test(s) || !drop.test(s)) {

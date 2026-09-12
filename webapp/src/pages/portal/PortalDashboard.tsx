@@ -545,7 +545,7 @@ export default function PortalDashboard() {
   // formed. They belong with the formation package rather than in a section of
   // their own — and they must be listed explicitly, because a filter that names
   // only the kinds it knows drops silently the day a new one is added.
-  const FORMATION_KINDS = ["articles", "psd", "package", "certificate-of-status", "certified-copy"];
+  const FORMATION_KINDS = ["articles", "psd", "package", "certificate-of-status", "certified-copy", "amendment"];
   const multiCompany = companies.length > 1;
   // With several companies a document must name its company to be shown
   // (Adam, 7 Sep 2026: a package with no company appeared under every tab).
