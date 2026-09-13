@@ -27,6 +27,7 @@ check("the signature is conformed on the master's line", md.includes("**FLORIDA 
 check("the editing note and draft colophon are gone", !md.includes("<!--") && !/Form document/.test(md) && !/MASTER\. Edit this file/.test(md));
 check("no slot is left unfilled", !/\[[A-Z][A-Z ()/.']*\]/.test(md), md.match(/\[[A-Z][A-Z ()/.']*\]/g));
 check("the statute cited is s. 605.0102(8)(a)", md.includes("s. 605.0102(8)(a), Florida Statutes"));
+check("paragraph 6 says the Filer is not the agent and names PS 2 as a separate series (Adam, 13 Sep 2026)", md.includes("**6. Registered agent service.** The Filer is not the Company's registered agent. If the Company has engaged **FLORIDA PROTECTED SERIES, LLC - PS 2**, a separate protected series of the same limited liability company, as its registered agent, that engagement is a distinct service governed by its own terms and by s. 605.0113, Florida Statutes, and nothing in this Statement affects it.") && !md.includes("or its affiliate"), md.match(/\*\*6\.[^\n]*/)?.[0]);
 
 let threw = "";
 try { assembleStatement({ companyName: "ACME Holdings, LLC", documentNumber: " ", signerName: "A", signerTitle: "B", date: "C" }); } catch (e) { threw = String(e); }

@@ -1789,6 +1789,10 @@ async function main(): Promise<void> {
       await card.locator("button").first().click();
       await page.waitForTimeout(2000);
       const drawer = page.locator("div.fixed.inset-0 div.max-w-2xl").first();
+      // The button, once pressed, reads "Sent to the Division on [date]"
+      // (Adam, 13 Sep 2026) and the button itself is gone.
+      const sent = await drawer.locator('[data-testid="sent-to-division"]').innerText().catch(() => "");
+      expect(/^Sent to the Division on \d{1,2}\/\d{1,2}\/\d{4}$/.test(sent.trim()) && (await drawer.locator("button").filter({ hasText: /^Mark sent to the Division/ }).count()) === 0, "sent: after Mark sent, the card reads 'Sent to the Division on [date]' and the button is gone", sent);
       const numBox = drawer.locator("#articles-document-number");
       expect((await numBox.count()) === 1 && /required: we signed these Articles/i.test(await drawer.innerText()), "statement: the card asks for the Florida document number and says it is required because we signed", (await drawer.innerText()).slice(0, 400));
       const asFile = (tag: string) => ({ name: `${tag}.pdf`, mimeType: "application/pdf", buffer: Buffer.from(`%PDF-1.4 ${tag}\n%%EOF`) });

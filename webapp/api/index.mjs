@@ -109188,7 +109188,7 @@ The undersigned, on behalf of **FLORIDA PROTECTED SERIES, LLC - PS 1**, doing bu
 
 **5. Where authority resides.** All ownership of the Company, and all authority to manage its activities and affairs and to act for it, rest with its members, as provided in its operating agreement and in chapter 605, Florida Statutes.
 
-**6. Registered agent service.** If the Company has separately engaged the Filer or its affiliate as registered agent, that engagement is a distinct service governed by its own terms and by s. 605.0113, Florida Statutes, and nothing in this Statement affects it.
+**6. Registered agent service.** The Filer is not the Company's registered agent. If the Company has engaged **FLORIDA PROTECTED SERIES, LLC - PS 2**, a separate protected series of the same limited liability company, as its registered agent, that engagement is a distinct service governed by its own terms and by s. 605.0113, Florida Statutes, and nothing in this Statement affects it.
 
 **7. Purpose.** This Statement is furnished so that a financial institution, taxing authority, title company, or other person examining the Company's public formation record may understand why the name appearing on the Articles of Organization is not the name of a member of the Company.
 

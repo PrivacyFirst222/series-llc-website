@@ -420,6 +420,14 @@ export default function OrderDetail({
                 Mark sent to the Division
               </Button>
             ) : null}
+            {/* Once pressed, the card says so and when (Adam, 13 Sep 2026:
+                "After this button is pushed it should read 'Sent to the
+                Division on [DATE]'"). */}
+            {d.status !== "paid" && !isConversion && d.filedAt ? (
+              <p className="flex items-center gap-2 text-sm text-trust" data-testid="sent-to-division">
+                <Check className="h-4 w-4" /> Sent to the Division on {new Date(d.filedAt).toLocaleDateString()}
+              </p>
+            ) : null}
 
             {/* With The State: the stamped Articles come back from the
                 Division days after submission — this is where they go up,
