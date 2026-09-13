@@ -152,11 +152,22 @@ export function StepSeries({ data, patch, errors }: StepProps) {
       ) : null}
 
       <div className="space-y-3">
+        {/* The loudest thing on the step while nothing exists (Adam, 13 Sep
+            2026: "make it obvious that they need to create their series. The
+            one little add series button is barely noticeable"). The "$499"
+            and "first three" facts are the Series pricing box's, above. */}
         {data.series.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-border p-8 text-center text-muted-foreground">
-            <Layers className="h-8 w-8 mx-auto mb-2 opacity-30" />
-            <p className="text-sm">No series defined yet.</p>
-            <p className="text-xs mt-1">Add at least one series to proceed.</p>
+          <div className="rounded-xl border-2 border-trust bg-trust/5 p-8 text-center" data-testid="series-empty">
+            <Layers className="h-9 w-9 mx-auto mb-3 text-trust" />
+            <h3 className="font-display text-2xl">Create your protected series</h3>
+            <p className="mx-auto mt-2 max-w-xl text-sm text-muted-foreground">
+              Your LLC needs at least one protected series before you can continue. The first three
+              are included in the $499 service fee.
+            </p>
+            <Button type="button" size="lg" onClick={addSeries} className="mt-5 rounded-full px-8">
+              <Plus className="h-4 w-4 mr-1.5" />
+              Add a series
+            </Button>
           </div>
         ) : null}
 
@@ -204,15 +215,17 @@ export function StepSeries({ data, patch, errors }: StepProps) {
         ))}
       </div>
 
-      <Button
-        type="button"
-        variant="outline"
-        onClick={addSeries}
-        className="rounded-full"
-      >
-        <Plus className="h-4 w-4 mr-1.5" />
-        Add a series
-      </Button>
+      {data.series.length > 0 ? (
+        <Button
+          type="button"
+          variant="outline"
+          onClick={addSeries}
+          className="rounded-full"
+        >
+          <Plus className="h-4 w-4 mr-1.5" />
+          Add a series
+        </Button>
+      ) : null}
     </div>
   );
 }

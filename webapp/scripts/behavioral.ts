@@ -337,6 +337,19 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
   await checkAllBoxes(page);
   const seriesCount = 1 + (run.extraSeries ?? 0);
   const rows = page.getByLabel("Series identifier", { exact: false });
+  // With no series yet, the step shouts it (Adam, 13 Sep 2026): a headed box
+  // with the Add button inside it, and no second Add button under it.
+  if ((await rows.count()) === 0) {
+    const empty = page.locator('[data-testid="series-empty"]');
+    expect((await empty.count()) === 1 && /Create your protected series/.test(await empty.innerText()) && /at least one protected series before you can continue/.test(await empty.innerText()), `${run.key}: the empty series step is headed "Create your protected series"`, await empty.innerText().catch(() => ""));
+    expect((await empty.locator("button").filter({ hasText: /^Add a series$/ }).count()) === 1, `${run.key}: the Add a series button sits inside the box`);
+    expect((await page.locator("main button").filter({ hasText: /^Add a series$/ }).count()) === 1, `${run.key}: only one Add a series button while the box shows`);
+    await shot(page, `${run.key}-series-empty`);
+    await empty.locator("button").filter({ hasText: /^Add a series$/ }).first().click();
+    await page.waitForTimeout(300);
+    expect((await empty.count()) === 0 && (await rows.count()) === 1, `${run.key}: pressing it adds the first series and the box goes`, await rows.count());
+    expect((await page.locator("main button").filter({ hasText: /^Add a series$/ }).count()) === 1, `${run.key}: the outline Add a series button is back under the list`);
+  }
   for (let i = 0; i < seriesCount; i++) {
     if ((await rows.count()) <= i) {
       // Anchored ^Add — /add/i also matches the sidebar's "Principal ADDress".
