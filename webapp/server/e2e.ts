@@ -2287,18 +2287,21 @@ if (mint.status === 200) {
     multiOwner: false,
     members: [{ name: "Alex Vale", address: "9 Harbor Road, Naples, FL 34102" }],
   };
-  // The defect this case exists for: without a borrowing limit the agreement
-  // used to say $25,000 on nobody's authority. It must now be refused.
-  const noThreshold = await api("/api/portal/oa/generate", {
+  // A sole owner is not asked for a borrowing limit (Adam, 13 Sep 2026: the
+  // clause "should only exist in multiple member LLCs"): s. 5.4(b) is gone
+  // from the single-member forms, and generating needs no number.
+  const smGen = await api("/api/portal/oa/generate", {
     method: "POST", cookies: smPw.cookie, body: JSON.stringify(smAnswers),
   });
-  check("sole owner on a manager-managed form must set the borrowing limit", noThreshold.status === 400, noThreshold.body);
-
-  const smGen = await api("/api/portal/oa/generate", {
-    method: "POST", cookies: smPw.cookie, body: JSON.stringify({ ...smAnswers, borrowingThreshold: 60000 }),
-  });
-  check("manager-managed sole-owner agreement generates (single)", smGen.status === 200, smGen.body);
+  check("manager-managed sole-owner agreement generates (single) with no borrowing limit asked", smGen.status === 200, smGen.body);
   check("a sole owner who is manager-managed gets the single master", smGen.body?.data?.version === "single", smGen.body?.data);
+  {
+    const res = await api(`/api/dev/oa-generation-inputs/${smGen.body?.data?.generationId}`);
+    const md = res.status === 200 ? assembleOa(res.body?.data?.inputs as OaInputs).markdown : "";
+    check("the sole owner's s. 5.4 has no borrowing clause and no dollar limit", md.includes("**5.4 Actions Requiring Member Approval.**") && !/indebtedness in excess of/.test(md) && !/\[THRESHOLD\]/.test(md), md.match(/\*\*5\.4[\s\S]{0,900}/)?.[0]);
+    check("the sole owner's s. 5.4 reletters: (a) then (b) the statement of authority", /\(a\) sell, exchange, or otherwise dispose[^\n]*; or\n\n\(b\) file, amend, or cancel a statement of authority/.test(md), md.match(/\(a\) sell[\s\S]{0,400}/)?.[0]);
+    check("the sole owner's s. 5.8 points at the relettered consent, Section 5.4(b)", md.includes("With the consent of the Member required by Section 5.4(b), the Manager may cause the Company to file"), md.match(/With the consent of the Member required by Section 5\.4\([a-d]\)/)?.[0]);
+  }
   const smAfter = await api("/api/portal/oa", { cookies: smPw.cookie });
   check(
     "it was built on the 'single' master",
@@ -2312,9 +2315,14 @@ if (mint.status === 200) {
 
   const smSGen = await api("/api/portal/oa/generate", {
     method: "POST", cookies: smPw.cookie,
-    body: JSON.stringify({ ...smAnswers, borrowingThreshold: 60000, sElection: true, series: [{}] }),
+    body: JSON.stringify({ ...smAnswers, sElection: true, series: [{}] }),
   });
-  check("manager-managed sole-owner S corp agreement generates (single-s)", smSGen.status === 200, smSGen.body);
+  check("manager-managed sole-owner S corp agreement generates (single-s), no borrowing limit asked", smSGen.status === 200, smSGen.body);
+  {
+    const res = await api(`/api/dev/oa-generation-inputs/${smSGen.body?.data?.generationId}`);
+    const md = res.status === 200 ? assembleOa(res.body?.data?.inputs as OaInputs).markdown : "";
+    check("the S corporation sole owner's s. 5.4 reletters to (a), (b) statement of authority, (c) elections", !/indebtedness in excess of/.test(md) && /\(b\) file, amend, or cancel a statement of authority[^\n]*; or\n\n\(c\) make, change, or revoke any election/.test(md) && md.includes("required by Section 5.4(b), the Manager"), md.match(/\(b\) file[\s\S]{0,300}/)?.[0]);
+  }
   check("...and single-s once the S election is on", smSGen.body?.data?.version === "single-s", smSGen.body?.data);
   const smSAfter = await api("/api/portal/oa", { cookies: smPw.cookie });
   check(

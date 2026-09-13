@@ -371,7 +371,11 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
   // wrong the moment a form without the gate was added. Derived from the two
   // predicates rather than listed by name, so the next member-managed
   // single-member form is covered without anyone remembering to add it.
-  const hasBorrowingThreshold = !(isMemberManaged && isSingle);
+  // Adam, 13 Sep 2026: the borrowing limit "should only exist in multiple
+  // member LLCs" — s. 5.4(b) is gone from the two single-member
+  // manager-managed forms too, so the slot exists in the multi-member forms
+  // alone.
+  const hasBorrowingThreshold = isMulti;
   if (hasBorrowingThreshold) {
     must(s, "$[THRESHOLD]", "threshold");
     // No default. A number governing when the Manager needs the Member's

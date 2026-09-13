@@ -159,10 +159,10 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mul scp sgl sgs | 5.3 | Authority of the Manager | e6c44bc9 | authority | manager | members manager | — | s. 605.04073(2) |
 | mbr mbs | 5.3 | Voting; Decisions | 0b631d8f | authority | members | members | — | s. 605.04073 |
 | sgm sgms | 5.3 | Authority to Act | 088acca7 | authority | member | member third-party | — | ss. 605.04074(1), 605.0301 |
-| sgl | 5.4 | Actions Requiring Member Approval | 40922d7a | authority | manager | members | the Manager moved the building into another series without the members' consent | ss. 605.04073(2)(d), 605.0302, 605.2301 |
+| sgl | 5.4 | Actions Requiring Member Approval | 1ab566f9 | authority | manager | members | the Manager moved the building into another series without the members' consent | ss. 605.04073(2)(d), 605.0302, 605.2301; the borrowing limit (former (b)) is a multi-member provision only (Adam, 13 Sep 2026) |
 | mul scp | 5.4 | Actions Requiring Member Approval | dcfcd3e4 | authority | manager | members | the Manager moved the building into another series without the members' consent | ss. 605.04073(2)(d), 605.0302, 605.2301 |
 | mbr mbs | 5.4 | Authority to Act; Limits on Authority | be68b5c7 | authority | members | members | — | s. 605.04074(1) |
-| sgs | 5.4 | Actions Requiring Member Approval | a36d5790 | authority | manager | members | the Manager moved the building into another series without the members' consent | ss. 605.04073(2)(d), 605.0302, 605.2301 |
+| sgs | 5.4 | Actions Requiring Member Approval | 3554999a | authority | manager | members | the Manager moved the building into another series without the members' consent | ss. 605.04073(2)(d), 605.0302, 605.2301; the borrowing limit (former (b)) is a multi-member provision only (Adam, 13 Sep 2026) |
 | sgm sgms | 5.4 | Standard of Conduct; Exculpation | 048c8e4a | benefit | manager member | manager member | — | ss. 605.04091, 605.0105(3) |
 | sgl sgs | 5.5 | Standard of Conduct; Exculpation | cce8e03a | benefit | manager member | manager member | — | ss. 605.04091, 605.0105(3) |
 | mul scp | 5.5 | Standard of Conduct; Exculpation | db5f385a | benefit | manager members | manager members | — | ss. 605.04091, 605.0105(3) |
@@ -175,7 +175,7 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mul scp | 5.7 | Compensation; Reimbursement; Shared Expenses | 95dfa725 | benefit | company | manager members | — | s. 605.04091(1) |
 | mbr mbs | 5.7 | Indemnification | b6c395f8 | benefit | company series | manager members | — | s. 605.0408 |
 | sgm sgms | 5.7 | Statement of Authority | c16a3718 | authority | company | members manager third-party | — | s. 605.0302 |
-| sgl sgs | 5.8 | Statement of Authority | 05628a3d | authority | company | members manager third-party | — | s. 605.0302 |
+| sgl sgs | 5.8 | Statement of Authority | 99712aba | authority | company | members manager third-party | — | s. 605.0302 |
 | mul scp | 5.8 | Statement of Authority | df63a96d | authority | company | members manager third-party | — | s. 605.0302 |
 | mbr mbs | 5.8 | Administrative Member | 8a779b5a | authority | members | members | — | drafting convention |
 | mul scp | 5.9 | Competition; Other Activities of the Manager. [SELECT THE SAME ALTERNATIVE AS SECTION 4.7] | b206cf04 | covenant | members | members | The member competed in breach of the agreement — a claim among the members, not against the company. | s. 605.04091(2)(c) as varied under s. 605.0105(3) |

@@ -1327,7 +1327,9 @@ app.post("/portal/oa/generate", async (c) => {
   // the same predicate oa.ts uses to decide whether to fill $[THRESHOLD]. Until
   // 17 August this check sat inside the multi-owner block, so a sole owner was
   // never asked and the agreement said $25,000 on nobody's authority.
-  const hasApprovalGate = !(memberManaged && !multiOwner);
+  // Since 13 Sep 2026 (Adam: the clause "should only exist in multiple
+  // member LLCs") the limit is a multi-member question only.
+  const hasApprovalGate = multiOwner;
   if (hasApprovalGate && !a.borrowingThreshold) {
     return c.json(err("Set the manager's borrowing limit.", "INVALID_INPUT"), 400);
   }

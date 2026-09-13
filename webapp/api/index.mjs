@@ -102432,11 +102432,9 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **5.4 Actions Requiring Member Approval.** Notwithstanding Section 5.3, neither the Manager nor any Protected Series Manager shall do any of the following without the written consent of the Member:
 
-(a) sell, exchange, or otherwise dispose of all or substantially all of the Associated Assets of the Company or of any Protected Series, other than in the ordinary course of business;
+(a) sell, exchange, or otherwise dispose of all or substantially all of the Associated Assets of the Company or of any Protected Series, other than in the ordinary course of business; or
 
-(b) incur, on behalf of the Company or any Protected Series, indebtedness in excess of $[THRESHOLD] in a single transaction or series of related transactions, or guarantee the obligation of any person (and no guarantee of the obligations of one Protected Series by another or by the Company shall be made except by an express written instrument approved under this Section); or
-
-(c) file, amend, or cancel a statement of authority under s. 605.0302, Florida Statutes, or record a certified copy of one.
+(b) file, amend, or cancel a statement of authority under s. 605.0302, Florida Statutes, or record a certified copy of one.
 
 **5.5 Standard of Conduct; Exculpation.** The Manager and each Protected Series Manager shall discharge their duties consistent with the Act, including the duties applicable to managers and protected-series managers. No Manager or Protected Series Manager shall be liable to the Company, any Protected Series, or the Member for any act or omission performed or omitted in good faith and in a manner reasonably believed to be within the scope of authority conferred by this Agreement, except for conduct for which exoneration is prohibited by the Act.
 
@@ -102444,7 +102442,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **5.7 Compensation; Reimbursement; Shared Expenses.** The Manager shall serve without salary unless the Member consents in writing to compensation. The Manager and each Protected Series Manager shall be reimbursed for reasonable expenses properly incurred on behalf of the Company or the applicable Protected Series. Costs and expenses that benefit the Company and one or more Protected Series (including formation and filing fees, registered agent fees, accounting, insurance, and administrative overhead) shall be allocated among the Company and the Protected Series benefited on a reasonable and consistent basis determined by the Manager \u2014 by specific attribution where practicable and otherwise pro rata or by such other reasonable formula as the Manager adopts \u2014 and the allocation shall be recorded in the records maintained under Article 8.
 
-**5.8 Statement of Authority.** With the consent of the Member required by Section 5.4(c), the Manager may cause the Company to file with the Department a statement of authority under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Manager, of any Protected Series Manager, or of any person holding a specified position, to transfer or encumber real property held in the name of the Company or of a Protected Series, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate. The limitations in Section 5.4 apply to the Manager whether or not a statement of authority is filed or recorded.
+**5.8 Statement of Authority.** With the consent of the Member required by Section 5.4(b), the Manager may cause the Company to file with the Department a statement of authority under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Manager, of any Protected Series Manager, or of any person holding a specified position, to transfer or encumber real property held in the name of the Company or of a Protected Series, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate. The limitations in Section 5.4 apply to the Manager whether or not a statement of authority is filed or recorded.
 
 ---
 
@@ -104784,11 +104782,9 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 (a) sell, exchange, or otherwise dispose of all or substantially all of the Associated Assets of the Company or of any Protected Series, other than in the ordinary course of business;
 
-(b) incur, on behalf of the Company or any Protected Series, indebtedness in excess of $[THRESHOLD] in a single transaction or series of related transactions, or guarantee the obligation of any person (and no guarantee of the obligations of one Protected Series by another or by the Company shall be made except by an express written instrument approved under this Section);
+(b) file, amend, or cancel a statement of authority under s. 605.0302, Florida Statutes, or record a certified copy of one; or
 
-(c) file, amend, or cancel a statement of authority under s. 605.0302, Florida Statutes, or record a certified copy of one; or
-
-(d) make, change, or revoke any election under the Code affecting the classification of the Company or of any Protected Series, or take any action described in Section 9.3.
+(c) make, change, or revoke any election under the Code affecting the classification of the Company or of any Protected Series, or take any action described in Section 9.3.
 
 **5.5 Standard of Conduct; Exculpation.** The Manager and each Protected Series Manager shall discharge their duties consistent with the Act, including the duties applicable to managers and protected-series managers. No Manager or Protected Series Manager shall be liable to the Company, any Protected Series, or the Member for any act or omission performed or omitted in good faith and in a manner reasonably believed to be within the scope of authority conferred by this Agreement, except for conduct for which exoneration is prohibited by the Act.
 
@@ -104796,7 +104792,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **5.7 Compensation; Reimbursement; Shared Expenses.** The Manager shall serve without salary unless the Member consents in writing to compensation. The Manager and each Protected Series Manager shall be reimbursed for reasonable expenses properly incurred on behalf of the Company or the applicable Protected Series. Costs and expenses that benefit the Company and one or more Protected Series (including formation and filing fees, registered agent fees, accounting, insurance, and administrative overhead) shall be allocated among the Company and the Protected Series benefited on a reasonable and consistent basis determined by the Manager \u2014 by specific attribution where practicable and otherwise pro rata or by such other reasonable formula as the Manager adopts \u2014 and the allocation shall be recorded in the records maintained under Article 8.
 
-**5.8 Statement of Authority.** With the consent of the Member required by Section 5.4(c), the Manager may cause the Company to file with the Department a statement of authority under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Manager, of any Protected Series Manager, or of any person holding a specified position, to transfer or encumber real property held in the name of the Company or of a Protected Series, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate. The limitations in Section 5.4 apply to the Manager whether or not a statement of authority is filed or recorded.
+**5.8 Statement of Authority.** With the consent of the Member required by Section 5.4(b), the Manager may cause the Company to file with the Department a statement of authority under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Manager, of any Protected Series Manager, or of any person holding a specified position, to transfer or encumber real property held in the name of the Company or of a Protected Series, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate. The limitations in Section 5.4 apply to the Manager whether or not a statement of authority is filed or recorded.
 
 ---
 
@@ -105930,7 +105926,7 @@ function assembleOa(inputs) {
       "manager signatures"
     );
   }
-  const hasBorrowingThreshold = !(isMemberManaged && isSingle);
+  const hasBorrowingThreshold = isMulti;
   if (hasBorrowingThreshold) {
     must2(s, "$[THRESHOLD]", "threshold");
     if (inputs.borrowingThreshold === void 0) {
@@ -107529,7 +107525,7 @@ function registerPortalRoutes(app2) {
         return c.json(err("Set the annual capital-call cap.", "INVALID_INPUT"), 400);
       }
     }
-    const hasApprovalGate = !(memberManaged && !multiOwner);
+    const hasApprovalGate = multiOwner;
     if (hasApprovalGate && !a2.borrowingThreshold) {
       return c.json(err("Set the manager's borrowing limit.", "INVALID_INPUT"), 400);
     }
@@ -109586,7 +109582,7 @@ All eight share the same skeleton through Article 9. From there the multi-owner 
 
 ### The choices you made
 When you completed the questionnaire, you decided several things. Here is what each one does.
-**The borrowing limit (\xA75.4 / \xA75.5).** Every form except the single-owner member-managed one asks for a dollar figure: above it, no debt may be incurred and no guarantee given for anyone, without the owners' written consent. There is no default \u2014 you chose the number, and it is printed in your agreement. Set it where a borrowing would be big enough that you would want to be asked first.
+**The borrowing limit (\xA75.4 / \xA75.5).** The multi-member forms ask for a dollar figure: above it, no debt may be incurred and no guarantee given for anyone, without the owners' written consent. There is no default \u2014 you chose the number, and it is printed in your agreement. Set it where a borrowing would be big enough that you would want to be asked first.
 **Additional capital calls (\xA76.2).** If you included it, a majority of owners can require everyone to contribute more money, in proportion to ownership, up to the annual per-owner cap you set. The cap is what protects a minority owner from being bled by repeated calls. If you omitted it, no owner can ever be forced to put in another dollar \u2014 friendlier to passive investors, but the company must then fund shortfalls through loans or new members. Including it also strengthens Article 11 (see Section 23), which is built on the owners owing each other ongoing obligations.
 **Competition (\xA74.7).** *Alternative A* bars you from competing with the company or your own series while you are an owner \u2014 right for active partners who are each other's only allies. *Alternative B* permits competition \u2014 right for passive co-investors, family arrangements, and anyone who invests in several ventures. Real-estate investors who own other rentals personally usually need Alternative B, or they would breach the agreement simply by owning what they already own. In a **member-managed** company this choice matters more: Florida imposes a noncompetition duty on members by default, and Alternative B operates as an express waiver of it.
 **Deadlock buy-sell, the "shotgun" (\xA713.2).** For a company that can split evenly, a deadlock otherwise has no exit short of suing to dissolve. If you included it: after a 60-day deadlock, one substantial owner names a single price for the whole company, and the *other* side chooses whether to buy or sell at that price. Naming the price honestly is self-enforcing \u2014 too low and you get bought out cheap, too high and you overpay. Two cautions: it favors whoever has more cash, and it prices the company and all of its series as one unit. If ownership is not evenly split, or the owners' finances are badly mismatched, you were better off omitting it.

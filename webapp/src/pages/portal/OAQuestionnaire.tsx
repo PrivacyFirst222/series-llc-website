@@ -300,7 +300,9 @@ export default function OAQuestionnaire() {
   // themselves. Sole owners on the manager-managed forms were never shown this
   // and received $25,000 by default — the number deciding when their Manager
   // needs written consent to borrow, chosen by nobody.
-  const hasApprovalGate = !(data.memberManaged && !isMulti);
+  // The borrowing limit is a multi-member question only (Adam, 13 Sep 2026:
+  // "This is not a question that belongs with respect to a single member LLC").
+  const hasApprovalGate = isMulti;
   const unpaired = owners
     .map((m, i) => ({ name: ownerLabel(m, i), i }))
     .filter((x) => !pairedIdx.has(x.i));
