@@ -219,11 +219,14 @@ function AgreementAndLibraryRow({ company }: { company: string | null }) {
             <h2 className="font-display text-lg">Amendment to Operating Agreement</h2>
           </div>
           <div className="px-5 py-4">
+            {/* Adam's words, 13 Sep 2026. */}
             <p className="text-sm text-muted-foreground">
               To add or remove members or managers, change ownership percentages, or change an option
-              you chose in the questionnaire, update your answers and regenerate. The new agreement is
-              an Amended and Restated Operating Agreement and replaces the old one. Use an amendment
-              only to change a term of the operating agreement that the questionnaire cannot change.
+              you chose in the questionnaire, do not use this amendment form. Instead, update your
+              answers and regenerate the operating agreement using the Update/regenerate button under
+              Operating Agreement. The new agreement is an Amended and Restated Operating Agreement and
+              replaces the old one. Use this amendment form only to change a term of the operating
+              agreement that the questionnaire cannot change.
             </p>
             <p className="mt-3 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950">
               Any change to your agreement can have legal consequences you do not intend, including

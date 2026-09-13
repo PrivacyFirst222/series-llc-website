@@ -1639,7 +1639,7 @@ async function main(): Promise<void> {
       const amH = headings.findIndex((h) => /^Amendment to Operating Agreement$/.test(h.trim()));
       expect(oaH >= 0 && amH === oaH + 1, "AMEND: the Amendment card sits directly under the Operating agreement card", headings);
       const cardText = await page.locator('[data-testid="amendment-card"]').innerText().catch(() => "");
-      expect(/update your answers and regenerate\. The new agreement is an Amended and Restated Operating Agreement and replaces the old one\. Use an amendment only to change a term of the operating agreement that the questionnaire cannot change\./.test(cardText) && /reviewed by an attorney before it is signed/.test(cardText), "AMEND: the card says which changes regenerate and which amend, with the warning", cardText);
+      expect(/do not use this amendment form\. Instead, update your answers and regenerate the operating agreement using the Update\/regenerate button under Operating Agreement\. The new agreement is an Amended and Restated Operating Agreement and replaces the old one\. Use this amendment form only to change a term of the operating agreement that the questionnaire cannot change\./.test(cardText) && /reviewed by an attorney before it is signed/.test(cardText), "AMEND: the card says which changes regenerate and which amend, in Adam's words, with the warning", cardText);
       await shot(page, "portal-amendment-card");
       await page.locator('[data-testid="amendment-card"] a').filter({ hasText: /^Create an amendment/ }).first().click();
       await page.waitForURL(/\/portal\/amend/, { timeout: 10000 });
