@@ -348,7 +348,7 @@ Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENE
 
 | Item | Terms |
 |---|---|
-| Purpose of this Protected Series | [PURPOSE — e.g., "to acquire, own, lease, and manage the real property located at ___" or "any lawful business"] |
+| Purpose of this Protected Series | Any lawful purpose<!-- if:purpose -->, including, without limitation, [PURPOSE]<!-- /if --> |
 | Owner of this Protected Series | The Company. This Protected Series has no Associated Members (ss. 605.2302(1), 605.2303(2), Fla. Stat.). |
 | Managed by | The Member, as protected-series manager (ss. 605.2304(1)-(2), 605.2107(1)(n), Fla. Stat.) |
 | Contributions to this Protected Series | By the Company: [CONTRIBUTION] |

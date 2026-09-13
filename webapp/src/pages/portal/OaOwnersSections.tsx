@@ -345,6 +345,13 @@ export function UnitFieldCards({ units, isMulti, owners, seedSeries, series, sEl
   return (
     <>
             <QuestionCard title="Purpose of each series (optional)">
+              {/* Adam, 13 Sep 2026: a stated purpose must never read as a
+                  limit; the exhibit says "Any lawful purpose, including,
+                  without limitation, …". */}
+              <p className="text-xs text-muted-foreground" data-testid="purpose-note">
+                Every series may pursue any lawful purpose. What you type here is added to that,
+                without limiting it.
+              </p>
               {seedSeries.map((sr, i) => (
                 <div key={sr.name} className="flex items-center gap-3">
                   <span className="w-1/2 truncate text-sm">{sr.name}</span>

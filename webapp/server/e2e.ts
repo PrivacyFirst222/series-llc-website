@@ -1344,6 +1344,7 @@ if (mint.status === 200) {
     const stored = res.body?.data?.inputs as Parameters<typeof assembleOa>[0];
     check("a standard formation stores professional: false", stored?.professional === false, stored?.professional);
     const std = assembleOa(stored).markdown;
+    check("a series with no stated purpose reads 'Any lawful purpose' on its exhibit (Adam, 13 Sep 2026)", /\| Purpose of this Protected Series \| Any lawful purpose \|/.test(std) && !/Any lawful business, purpose, or activity/.test(std), std.match(/\| Purpose of this Protected Series \|[^\n]*/)?.[0]);
     check("a standard company's agreement has no professional descriptor",
       !std.includes("PROFESSIONAL PROTECTED") && !std.includes("professional protected series"));
     const pro = assembleOa({ ...stored, professional: true }).markdown;
@@ -1458,6 +1459,27 @@ if (mint.status === 200) {
   const consentBytes = new Uint8Array(await consentPdf.arrayBuffer());
   check("consent downloads as PDF", consentPdf.ok && consentBytes[0] === 0x25 && consentBytes[1] === 0x50,
     { status: consentPdf.status, len: consentBytes.length });
+  {
+    const text = pdfText(consentBytes);
+    if (text !== null) {
+      const flat = text.replace(/\s+/g, " ");
+      check("read off the consent PDF: the new series' purpose is any lawful purpose, including the phrase typed", /The purpose of the new Protected Series is any lawful purpose, including, without limitation, to acquire, own, and lease the real property at 400 Bay Court\./.test(flat), flat.match(/The purpose of the new Protected Series[^.]*\./)?.[0]);
+      check("read off the consent PDF: its Series Exhibit row says the same", /Purpose of this Protected Series Any lawful purpose, including, without limitation, to acquire, own, and lease the real property at 400 Bay Court/.test(flat), flat.match(/Purpose of this Protected Series[^O]{0,200}/)?.[0]);
+    }
+  }
+  const consentBlank = await api("/api/portal/series/consent", {
+    method: "POST", cookies: setPw.cookie,
+    body: JSON.stringify({ seriesName: "E2E Coastal Holdings, LLC, PS E", seriesNumber: "E", purpose: "", effectiveDate: "2026-09-02" }),
+  });
+  check("consent with no stated purpose generates", consentBlank.status === 200, consentBlank.body);
+  {
+    const bytes = new Uint8Array(await (await fetch(`${BASE}/api/portal/documents/${consentBlank.body?.data?.documentId}/download`, { headers: { Cookie: setPw.cookie } })).arrayBuffer());
+    const text = pdfText(bytes);
+    if (text !== null) {
+      const flat = text.replace(/\s+/g, " ");
+      check("read off the consent PDF: with no phrase typed, the purpose is any lawful purpose, full stop", /The purpose of the new Protected Series is any lawful purpose\./.test(flat) && /Purpose of this Protected Series Any lawful purpose Owner of this Protected Series/.test(flat), flat.match(/The purpose of the new Protected Series[^.]*\./)?.[0]);
+    }
+  }
   check("consent appears in the client's documents",
     ((await api("/api/portal/documents", { cookies: setPw.cookie })).body?.data ?? [])
       .some((d: { title: string }) => d.title.includes("PS D")));
@@ -2167,7 +2189,7 @@ if (mint.status === 200) {
     check("cash allocated beyond the amount contributed is refused", over.status === 400 && over.body?.error?.code === "CAPITAL" && /exceed the cash contributed/.test(over.body?.error?.message ?? ""), over.body);
     const badShares = await api("/api/portal/oa/generate", { method: "POST", cookies: mmPw.cookie, body: JSON.stringify({ ...mmAnswers, assets: [{ ...example[0], contributedBy: { mode: "shares", shares: [60, 50] } }] }) });
     check("shares that do not total 100 are refused", badShares.status === 400 && /shares must total 100/.test(badShares.body?.error?.message ?? ""), badShares.body);
-    const withAssets = await api("/api/portal/oa/generate", { method: "POST", cookies: mmPw.cookie, body: JSON.stringify({ ...mmAnswers, assets: example, series: [{ specialTerms: "The Manager may not sell 123 Main Street without the consent of all Members." }] }) });
+    const withAssets = await api("/api/portal/oa/generate", { method: "POST", cookies: mmPw.cookie, body: JSON.stringify({ ...mmAnswers, assets: example, series: [{ purpose: "Rental real estate", specialTerms: "The Manager may not sell 123 Main Street without the consent of all Members." }] }) });
     check("an agreement with the asset list generates", withAssets.status === 200, withAssets.body);
     if (withAssets.body?.data?.generationId) {
       const inputsRes = await api(`/api/dev/oa-generation-inputs/${withAssets.body.data.generationId}`);
@@ -2179,6 +2201,7 @@ if (mint.status === 200) {
       check("Exhibit A totals the series and what the company retained",
         /\| E2E Member Managed Holdings, LLC, PS A \| 123 Main Street, Tampa \(\$200,000\); Cash \(\$10,000\) \| \$210,000 \|/.test(md) && /\| \*\*Retained by the Company\*\* \| Cash \(\$40,000\) \| \$40,000 \|/.test(md), md.match(/(PS A \| 123|Retained by the Company)[^\n]*/g));
       check("the Series Exhibit shows what the Company contributed to the series", /By the Company: 123 Main Street, Tampa \(\$200,000\); Cash \(\$10,000\)/.test(md), md.match(/By the Company:[^\n]*/)?.[0]);
+      check("a stated purpose is added to any lawful purpose, never in place of it (Adam, 13 Sep 2026)", /\| Purpose of this Protected Series \| Any lawful purpose, including, without limitation, Rental real estate \|/.test(md), md.match(/\| Purpose of this Protected Series \|[^\n]*/)?.[0]);
       check("the Series Exhibit carries the special terms typed, and no dissolution row (Adam, 12 Sep 2026)",
         /\| Special terms \(if any\) \| The Manager may not sell 123 Main Street without the consent of all Members\. \|/.test(md) && !/Dissolution events specific/.test(md), md.match(/Special terms[^\n]*/)?.[0]);
     }

@@ -456,7 +456,7 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
 
 | Item | Terms |
 |---|---|
-| Purpose of this Protected Series | [PURPOSE — e.g., "to acquire, own, lease, and manage the real property located at ___" or "any lawful business"] |
+| Purpose of this Protected Series | Any lawful purpose<!-- if:purpose -->, including, without limitation, [PURPOSE]<!-- /if --> |
 | Owner of this Protected Series | The Company. This Protected Series has no Associated Members (ss. 605.2302(1), 605.2303(2), Fla. Stat.). |
 | Managed by | The Members, as protected-series managers (s. 605.2304, Fla. Stat., as varied by Section 5.2 of the Agreement), acting by a Majority in Interest |
 | Contributions to this Protected Series | By the Company: [CONTRIBUTION] |

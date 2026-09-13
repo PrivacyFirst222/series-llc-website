@@ -102083,7 +102083,7 @@ The undersigned, being **all** of the members of **[COMPANY NAME], LLC**, a Flor
 
 > **[SERIES NAME]**
 
-**2. Purpose.** The purpose of the new Protected Series is [SERIES PURPOSE].
+**2. Purpose.** The purpose of the new Protected Series is any lawful purpose<!-- if:purpose -->, including, without limitation, [SERIES PURPOSE]<!-- /if -->.
 
 **3. Ownership.** The new Protected Series is established without associated members. The Company owns all of its protected-series transferable interests, and no member of the Company holds any interest in it except indirectly, through that member's interest in the Company (ss. 605.2302(1), 605.2303(2), Fla. Stat.).
 
@@ -102108,7 +102108,7 @@ The undersigned, being **all** of the members of **[COMPANY NAME], LLC**, a Flor
 
 | Item | Terms |
 |---|---|
-| Purpose of this Protected Series | [SERIES PURPOSE] |
+| Purpose of this Protected Series | Any lawful purpose<!-- if:purpose -->, including, without limitation, [SERIES PURPOSE]<!-- /if --> |
 | Owner of this Protected Series | The Company. This Protected Series has no Associated Members (ss. 605.2302(1), 605.2303(2), Fla. Stat.). |
 | Protected Series Manager | [PS MANAGER] |
 | Contributions to this Protected Series | By the Company: $[AMOUNT] on [DATE] [and/or described property] |
@@ -102138,144 +102138,6 @@ _____________________________
 
 *Form document \u2014 prepared for [COMPANY NAME], LLC. Statutory citations: ss. 605.0207, 605.2201, 605.2301, 605.2302(1), 605.2303(2), Florida Statutes.*
 `;
-
-// server/new-series.ts
-function must(haystack, needle, label) {
-  if (!haystack.includes(needle)) throw new Error(`new-series template marker missing: ${label}`);
-}
-function assembleNewSeries(input) {
-  let s = templates_new_series_default;
-  const purpose = input.purpose.trim() || "any lawful business, purpose, or activity for which the Company may be organized under the Act";
-  const authority = input.memberManaged ? "The Members authorize the Administrative Member, or any Member the Members designate, to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement." : `The Members authorize the Manager to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.`;
-  const managers = input.managerNames.map((n) => n.trim()).filter(Boolean);
-  const psManager = input.memberManaged ? "The Company, as protected-series manager (s. 605.2304(2), Fla. Stat.), acting through a Majority in Interest of the Members" : managers.join(", ") || "[MANAGER NAME]";
-  const psSignature = input.memberManaged ? `${input.memberNames[0] ?? "[MEMBER NAME]"}, Member, for the Company` : managers.length ? managers.map((n) => `${n}, Manager`).join("\n\n_____________________________\n") : "[MANAGER NAME], Manager";
-  const blocks = input.memberNames.length ? input.memberNames.map((n) => `_____________________________
-${n}`).join("\n\n") : "_____________________________\n[MEMBER NAME]";
-  must(s, "[COMPANY NAME], LLC", "company name");
-  s = s.split("[COMPANY NAME], LLC").join(input.companyName);
-  s = s.split("[COMPANY NAME]").join(input.companyName);
-  must(s, "[SERIES NAME]", "series name");
-  s = s.split("[SERIES NAME]").join(input.seriesName);
-  must(s, "PS-[N]", "series number");
-  s = s.split("PS-[N]").join(`PS-${input.seriesNumber}`);
-  must(s, "[SERIES PURPOSE]", "series purpose");
-  s = s.split("[SERIES PURPOSE]").join(purpose);
-  must(s, "[EFFECTIVE DATE]", "effective date");
-  s = s.split("[EFFECTIVE DATE]").join(input.effectiveDate);
-  must(s, "[SIGNER ROLE SENTENCE]", "authority sentence");
-  s = s.split("[SIGNER ROLE SENTENCE]").join(authority);
-  must(s, "[PS MANAGER SIGNATURE LINE]", "ps manager signature");
-  s = s.split("[PS MANAGER SIGNATURE LINE]").join(psSignature);
-  must(s, "[PS MANAGER]", "ps manager");
-  s = s.split("[PS MANAGER]").join(psManager);
-  must(s, "[MEMBER SIGNATURE BLOCKS]", "member signature blocks");
-  s = s.split("[MEMBER SIGNATURE BLOCKS]").join(blocks);
-  const leftovers = s.match(/\[(COMPANY NAME|SERIES NAME|SERIES PURPOSE|EFFECTIVE DATE|PS MANAGER|MEMBER SIGNATURE BLOCKS|SIGNER ROLE SENTENCE)[^\]]*\]/g);
-  if (leftovers) throw new Error(`new-series template left unfilled: ${leftovers.join(", ")}`);
-  return { markdown: s, title: `New Protected Series \u2014 ${input.seriesName}` };
-}
-
-// server/datetime.ts
-var ZONE = "America/New_York";
-function stampEastern(d2 = /* @__PURE__ */ new Date()) {
-  const date = d2.toLocaleDateString("en-US", {
-    timeZone: ZONE,
-    year: "numeric",
-    month: "long",
-    day: "numeric"
-  });
-  const time = d2.toLocaleTimeString("en-US", {
-    timeZone: ZONE,
-    hour: "numeric",
-    minute: "2-digit"
-  });
-  return `${date} at ${time} ET`;
-}
-function stampForFilename(d2 = /* @__PURE__ */ new Date()) {
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone: ZONE,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false
-  }).formatToParts(d2);
-  const get2 = (t) => parts.find((p2) => p2.type === t)?.value ?? "";
-  const hour = get2("hour") === "24" ? "00" : get2("hour");
-  return `${get2("year")}-${get2("month")}-${get2("day")}-${hour}${get2("minute")}ET`;
-}
-function taxationLabel(version) {
-  if (version === "s" || version === "member-s") return "S Corporation";
-  if (version === "single-s" || version === "member-single-s") return "Single-Member S Corporation";
-  if (version === "member-single") return "Single-Member";
-  if (version === "single") return "Single-Member";
-  return "Partnership";
-}
-function easternDateIso(d2 = /* @__PURE__ */ new Date()) {
-  const parts = new Intl.DateTimeFormat("en-CA", { timeZone: ZONE, year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(d2);
-  const get2 = (t) => parts.find((p2) => p2.type === t)?.value ?? "";
-  return `${get2("year")}-${get2("month")}-${get2("day")}`;
-}
-
-// src/lib/ein.ts
-var VALID_EIN_PREFIXES = new Set(
-  "10 12 60 67 50 53 01 02 03 04 05 06 11 13 14 16 21 22 23 25 34 51 52 54 55 56 57 58 59 65 30 32 35 36 37 38 61 15 24 40 44 94 95 80 90 33 39 41 42 43 46 48 62 63 64 66 68 71 72 73 74 75 76 77 85 86 87 88 91 92 93 98 99 20 26 27 45 47 81 82 83 84 31".split(" ")
-);
-function einDigits(raw2) {
-  return (raw2 ?? "").replace(/[\s-]/g, "");
-}
-function isValidEin(raw2) {
-  const d2 = einDigits(raw2);
-  return /^\d{9}$/.test(d2) && VALID_EIN_PREFIXES.has(d2.slice(0, 2));
-}
-var fmtEinDisplay = (digits) => /^\d{9}$/.test(digits) ? `${digits.slice(0, 2)}-${digits.slice(2)}` : digits;
-
-// src/lib/einActivity.ts
-var EIN_REASONS = [
-  "Started a new business",
-  "Hired employee(s)",
-  "Banking purposes",
-  "Changed type of organization",
-  "Purchased active business"
-];
-var choose = (options, question = "Please choose one of the following:") => ({ kind: "choice", question, options });
-var PRIMARY = "Please choose one of the following that best describes your primary business activity:";
-var EIN_CATEGORIES = [
-  { name: "Accommodations", description: "Casino hotel, hotel, or motel", followUp: choose(["Casino hotel", "Hotel", "Motel", "Other"]) },
-  { name: "Construction", description: "Building houses/residential structures, building industrial/commercial structures, specialty trade contractors, remodelers, heavy construction contractors, land subdivision contractors, or site preparation contractors", followUp: { kind: "yesno", question: "Do you focus on a single construction trade (concrete, framing, glass, roofing, siding, electrical, plumbing, HVAC, flooring, etc.)?" } },
-  { name: "Finance", description: "Banks, sales financing, credit card issuing, mortgage company, mortgage company/broker, securities broker, investment advice, or trust administration", followUp: choose(["Commodities broker", "Credit card issuing", "Investment advice", "Investment club", "Investment holding", "Mortgage broker - agent for selling mortgages", "Mortgage company - lending funds with real estate as collateral", "Portfolio management", "Sales financing", "Securities broker", "Trust administration", "Venture capital company", "Other"], PRIMARY) },
-  { name: "Food Service", description: "Retail fast food, restaurant, bar, coffee shop, catering, or mobile food service", followUp: choose(["Bar", "Bar and restaurant", "Catering service", "Coffee shop", "Fast food restaurant", "Full service restaurant", "Ice cream shop", "Mobile food service", "Other"], PRIMARY) },
-  { name: "Health Care", description: "Doctor, mental health specialist, hospital, or outpatient care center", followUp: { kind: "yesno", question: "Does your establishment include medical practitioners having the degree of M.D. (Doctor of medicine) or D.O. (Doctor of osteopathy)?" } },
-  { name: "Insurance", description: "Insurance company or broker", followUp: choose(["I am an insurance carrier.", "I am an insurance agent or broker.", "Other"], PRIMARY) },
-  { name: "Manufacturing", description: "Mechanical, physical, or chemical transformation of materials/substances/components into new products, including the assembly of components", followUp: { kind: "text", question: 'Please specify the type of goods that you manufacture and the primary materials used (such as "wood furniture"):' } },
-  { name: "Real Estate", description: "Renting or leasing real estate, managing real estate, real estate agent/broker, selling, buying, or renting real estate for others", followUp: choose(["I rent or lease property that I own", "I use capital to build property", "I sell property for others", "I manage real estate for others", "Other"]) },
-  { name: "Rental & Leasing", description: "Rent/lease automobiles, consumer goods, commercial goods, or industrial goods", followUp: choose(["I rent, lease, or sell real estate.", "I rent or lease goods.", "I manage real estate for others."]) },
-  { name: "Retail", description: "Retail store, internet sales (exclusively), direct sales (catalogue, mail-order, door to door), auction house, or selling goods on auction sites", followUp: choose(["Selling goods exclusively over the Internet (including independently selling on auction sites).", "Sales from a storefront.", "Direct sales", "Auction house", "Other"]) },
-  { name: "Social Assistance", description: "Youth services, residential care facility, services for the disabled, or community food/housing/relief services", followUp: choose(["Nursing home", "Shelter", "Youth services", "Other"], PRIMARY) },
-  { name: "Transportation", description: "Air transportation, rail transportation, water transportation, trucking, passenger transportation, support activity for transportation, or delivery/courier service", followUp: choose(["Cargo", "Passengers", "I provide a support activity for transportation"], "Do you primarily transport cargo or passengers?") },
-  { name: "Warehousing", description: "Operating warehousing or storage facilities for general merchandise, refrigerated goods, or other warehouse products; establishments that provide facilities to store goods but do not sell the goods they handle", followUp: { kind: "none" } },
-  { name: "Wholesale", description: "Wholesale agent/broker, importer, exporter, manufacturers' representative, merchant, distributor, or jobber", followUp: { kind: "yesno", question: "Do you own or take title to the goods that you sell?" } },
-  { name: "Other", description: "", followUp: choose(["Consulting", "Manufacturing", "Organization (such as religious, environmental, social or civic, athletic, etc.)", "Rental", "Repair", "Sell goods", "Service", "Other"], PRIMARY) }
-];
-var EIN_CATEGORY_NAMES = EIN_CATEGORIES.map((c) => c.name);
-var einCategory = (name) => EIN_CATEGORIES.find((c) => c.name === name);
-function followUpOk(category, answer) {
-  const c = einCategory(category);
-  if (!c) return false;
-  const a2 = answer.trim();
-  switch (c.followUp.kind) {
-    case "none":
-      return true;
-    case "yesno":
-      return a2 === "Yes" || a2 === "No";
-    case "text":
-      return a2.length >= 2;
-    case "choice":
-      return c.followUp.options.includes(a2);
-  }
-}
 
 // server/oa.ts
 import { readFileSync } from "node:fs";
@@ -102622,7 +102484,7 @@ Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENE
 
 | Item | Terms |
 |---|---|
-| Purpose of this Protected Series | [PURPOSE \u2014 e.g., "to acquire, own, lease, and manage the real property located at ___" or "any lawful business"] |
+| Purpose of this Protected Series | Any lawful purpose<!-- if:purpose -->, including, without limitation, [PURPOSE]<!-- /if --> |
 | Owner of this Protected Series | The Company. This Protected Series has no Associated Members (ss. 605.2302(1), 605.2303(2), Fla. Stat.). |
 | Protected Series Manager | [Same as Company Manager / NAME] |
 | Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
@@ -103110,7 +102972,7 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
 
 | Item | Terms |
 |---|---|
-| Purpose of this Protected Series | [PURPOSE \u2014 e.g., "to acquire, own, lease, and manage the real property located at ___" or "any lawful business"] |
+| Purpose of this Protected Series | Any lawful purpose<!-- if:purpose -->, including, without limitation, [PURPOSE]<!-- /if --> |
 | Owner of this Protected Series | The Company. This Protected Series has no Associated Members (ss. 605.2302(1), 605.2303(2), Fla. Stat.). |
 | Protected Series Manager | [Same as Company Manager / NAME] |
 | Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
@@ -103612,7 +103474,7 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
 
 | Item | Terms |
 |---|---|
-| Purpose of this Protected Series | [PURPOSE \u2014 e.g., "to acquire, own, lease, and manage the real property located at ___" or "any lawful business"] |
+| Purpose of this Protected Series | Any lawful purpose<!-- if:purpose -->, including, without limitation, [PURPOSE]<!-- /if --> |
 | Owner of this Protected Series | The Company. This Protected Series has no Associated Members (ss. 605.2302(1), 605.2303(2), Fla. Stat.). |
 | Protected Series Manager | [Same as Company Manager / NAME] |
 | Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
@@ -104093,7 +103955,7 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
 
 | Item | Terms |
 |---|---|
-| Purpose of this Protected Series | [PURPOSE \u2014 e.g., "to acquire, own, lease, and manage the real property located at ___" or "any lawful business"] |
+| Purpose of this Protected Series | Any lawful purpose<!-- if:purpose -->, including, without limitation, [PURPOSE]<!-- /if --> |
 | Owner of this Protected Series | The Company. This Protected Series has no Associated Members (ss. 605.2302(1), 605.2303(2), Fla. Stat.). |
 | Managed by | The Members, as protected-series managers (s. 605.2304, Fla. Stat., as varied by Section 5.2 of the Agreement), acting by a Majority in Interest |
 | Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
@@ -104588,7 +104450,7 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
 
 | Item | Terms |
 |---|---|
-| Purpose of this Protected Series | [PURPOSE \u2014 e.g., "to acquire, own, lease, and manage the real property located at ___" or "any lawful business"] |
+| Purpose of this Protected Series | Any lawful purpose<!-- if:purpose -->, including, without limitation, [PURPOSE]<!-- /if --> |
 | Owner of this Protected Series | The Company. This Protected Series has no Associated Members (ss. 605.2302(1), 605.2303(2), Fla. Stat.). |
 | Managed by | The Members, as protected-series managers (s. 605.2304, Fla. Stat., as varied by Section 5.2 of the Agreement), acting by a Majority in Interest |
 | Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
@@ -104999,7 +104861,7 @@ Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENE
 
 | Item | Terms |
 |---|---|
-| Purpose of this Protected Series | [PURPOSE \u2014 e.g., "to acquire, own, lease, and manage the real property located at ___" or "any lawful business"] |
+| Purpose of this Protected Series | Any lawful purpose<!-- if:purpose -->, including, without limitation, [PURPOSE]<!-- /if --> |
 | Owner of this Protected Series | The Company. This Protected Series has no Associated Members (ss. 605.2302(1), 605.2303(2), Fla. Stat.). |
 | Protected Series Manager | [Same as Company Manager / NAME] |
 | Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
@@ -105356,7 +105218,7 @@ Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENE
 
 | Item | Terms |
 |---|---|
-| Purpose of this Protected Series | [PURPOSE \u2014 e.g., "to acquire, own, lease, and manage the real property located at ___" or "any lawful business"] |
+| Purpose of this Protected Series | Any lawful purpose<!-- if:purpose -->, including, without limitation, [PURPOSE]<!-- /if --> |
 | Owner of this Protected Series | The Company. This Protected Series has no Associated Members (ss. 605.2302(1), 605.2303(2), Fla. Stat.). |
 | Managed by | The Member, as protected-series manager (ss. 605.2304(1)-(2), 605.2107(1)(n), Fla. Stat.) |
 | Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
@@ -105743,7 +105605,7 @@ Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENE
 
 | Item | Terms |
 |---|---|
-| Purpose of this Protected Series | [PURPOSE \u2014 e.g., "to acquire, own, lease, and manage the real property located at ___" or "any lawful business"] |
+| Purpose of this Protected Series | Any lawful purpose<!-- if:purpose -->, including, without limitation, [PURPOSE]<!-- /if --> |
 | Owner of this Protected Series | The Company. This Protected Series has no Associated Members (ss. 605.2302(1), 605.2303(2), Fla. Stat.). |
 | Managed by | The Member, as protected-series manager (ss. 605.2304(1)-(2), 605.2107(1)(n), Fla. Stat.) |
 | Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
@@ -105779,6 +105641,49 @@ _____________________________
 *[TITLE] of [COMPANY NAME], LLC \u2014 generated by MyFloridaSeriesLLC \xB7 Master [EDITION]*
 `;
 
+// server/datetime.ts
+var ZONE = "America/New_York";
+function stampEastern(d2 = /* @__PURE__ */ new Date()) {
+  const date = d2.toLocaleDateString("en-US", {
+    timeZone: ZONE,
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  });
+  const time = d2.toLocaleTimeString("en-US", {
+    timeZone: ZONE,
+    hour: "numeric",
+    minute: "2-digit"
+  });
+  return `${date} at ${time} ET`;
+}
+function stampForFilename(d2 = /* @__PURE__ */ new Date()) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  }).formatToParts(d2);
+  const get2 = (t) => parts.find((p2) => p2.type === t)?.value ?? "";
+  const hour = get2("hour") === "24" ? "00" : get2("hour");
+  return `${get2("year")}-${get2("month")}-${get2("day")}-${hour}${get2("minute")}ET`;
+}
+function taxationLabel(version) {
+  if (version === "s" || version === "member-s") return "S Corporation";
+  if (version === "single-s" || version === "member-single-s") return "Single-Member S Corporation";
+  if (version === "member-single") return "Single-Member";
+  if (version === "single") return "Single-Member";
+  return "Partnership";
+}
+function easternDateIso(d2 = /* @__PURE__ */ new Date()) {
+  const parts = new Intl.DateTimeFormat("en-CA", { timeZone: ZONE, year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(d2);
+  const get2 = (t) => parts.find((p2) => p2.type === t)?.value ?? "";
+  return `${get2("year")}-${get2("month")}-${get2("day")}`;
+}
+
 // server/oa.ts
 function loadTemplate(v2) {
   return v2.includes("OPERATING AGREEMENT") ? v2 : readFileSync(v2, "utf8");
@@ -105804,12 +105709,12 @@ function titleCaseHolding(holding) {
   const small = /* @__PURE__ */ new Set(["by", "the", "with", "of"]);
   return holding.split(" ").map((w, i) => i > 0 && small.has(w.toLowerCase()) ? w.toLowerCase() : w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
 }
-function must2(haystack, needle, label) {
+function must(haystack, needle, label) {
   const found = typeof needle === "string" ? haystack.includes(needle) : needle.test(haystack);
   if (!found) throw new Error(`OA template marker missing: ${label}`);
 }
 function replaceOnce(s, from, to, label) {
-  must2(s, from, label);
+  must(s, from, label);
   return typeof from === "string" ? s.replace(from, to) : s.replace(from, to);
 }
 var money2 = (n) => `$${Math.round(n).toLocaleString("en-US")}`;
@@ -105847,6 +105752,11 @@ function expandRepeat(s, key, rows, label) {
   if (count === 0) throw new Error(`OA template marker missing: repeat:${key} (${label})`);
   return s;
 }
+function resolveIf(s, key, keep) {
+  const re = new RegExp(`<!--\\s*if:${key}\\s*-->([\\s\\S]*?)<!--\\s*/if\\s*-->`, "g");
+  if (!re.test(s)) throw new Error(`OA template marker missing: if:${key}`);
+  return s.replace(re, (_m, inner) => keep ? inner : "");
+}
 function chooseNumber(s, key, singular) {
   const keep = new RegExp(`<!--\\s*${singular ? "one" : "many"}:${key}\\s*-->([\\s\\S]*?)<!--\\s*/${singular ? "one" : "many"}\\s*-->`, "g");
   const drop = new RegExp(`<!--\\s*${singular ? "many" : "one"}:${key}\\s*-->[\\s\\S]*?<!--\\s*/${singular ? "many" : "one"}\\s*-->`, "g");
@@ -105883,7 +105793,7 @@ function assembleOa(inputs) {
   const isMemberManaged = inputs.version === "member" || inputs.version === "member-s" || inputs.version === "member-single" || inputs.version === "member-single-s";
   const co = inputs.companyName;
   const FOOTER_LINE = "*[TITLE] of [COMPANY NAME], LLC \u2014 generated by MyFloridaSeriesLLC \xB7 Master [EDITION]*";
-  must2(s, FOOTER_LINE, "master footer line");
+  must(s, FOOTER_LINE, "master footer line");
   s = s.replace(FOOTER_LINE, "").trimEnd() + "\n";
   if (inputs.professional) {
     s = replaceOnce(
@@ -105905,7 +105815,7 @@ function assembleOa(inputs) {
       "professional recital B"
     );
   }
-  must2(s, "[COMPANY NAME], LLC", "company name");
+  must(s, "[COMPANY NAME], LLC", "company name");
   s = s.split("[COMPANY NAME], LLC").join(co);
   s = s.split("[COMPANY NAME]").join(co);
   s = replaceOnce(s, 'effective as of [DATE] (the "Effective Date")', `effective as of ${inputs.effectiveDate} (the "Effective Date")`, "effective date");
@@ -105928,7 +105838,7 @@ function assembleOa(inputs) {
   }
   const hasBorrowingThreshold = isMulti;
   if (hasBorrowingThreshold) {
-    must2(s, "$[THRESHOLD]", "threshold");
+    must(s, "$[THRESHOLD]", "threshold");
     if (inputs.borrowingThreshold === void 0) {
       throw new Error("OA: this form has a Section 5.4 approval gate and no borrowing limit was given");
     }
@@ -106062,7 +105972,8 @@ NOW, THEREFORE,`,
     ex = ex.replace("## SERIES EXHIBIT PS-[N]", `## SERIES EXHIBIT ${n}`);
     ex = ex.replace(/\*\*Protected Series name \(exactly as filed with the Department\):\*\*\n\*\*[^\n]+\*\*/, `**Protected Series name (exactly as filed with the Department):**
 **${ser.name}**`);
-    ex = ex.replace(/\| Purpose of this Protected Series \|[^\n]*\|/, `| Purpose of this Protected Series | ${ser.purpose || "Any lawful business, purpose, or activity"} |`);
+    ex = resolveIf(ex, "purpose", ser.purpose.trim() !== "");
+    ex = ex.split("[PURPOSE]").join(ser.purpose.trim());
     if (!isMemberManaged) {
       ex = ex.replace(/\| Protected Series Manager \|[^\n]*\|/, `| Protected Series Manager | ${managerList} |`);
     }
@@ -106123,6 +106034,102 @@ function replaceSectionBody(s, re, replacement, label) {
   return s.replace(re, replacement);
 }
 
+// server/new-series.ts
+function must2(haystack, needle, label) {
+  if (!haystack.includes(needle)) throw new Error(`new-series template marker missing: ${label}`);
+}
+function assembleNewSeries(input) {
+  let s = templates_new_series_default;
+  const purpose = input.purpose.trim();
+  const authority = input.memberManaged ? "The Members authorize the Administrative Member, or any Member the Members designate, to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement." : `The Members authorize the Manager to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.`;
+  const managers = input.managerNames.map((n) => n.trim()).filter(Boolean);
+  const psManager = input.memberManaged ? "The Company, as protected-series manager (s. 605.2304(2), Fla. Stat.), acting through a Majority in Interest of the Members" : managers.join(", ") || "[MANAGER NAME]";
+  const psSignature = input.memberManaged ? `${input.memberNames[0] ?? "[MEMBER NAME]"}, Member, for the Company` : managers.length ? managers.map((n) => `${n}, Manager`).join("\n\n_____________________________\n") : "[MANAGER NAME], Manager";
+  const blocks = input.memberNames.length ? input.memberNames.map((n) => `_____________________________
+${n}`).join("\n\n") : "_____________________________\n[MEMBER NAME]";
+  must2(s, "[COMPANY NAME], LLC", "company name");
+  s = s.split("[COMPANY NAME], LLC").join(input.companyName);
+  s = s.split("[COMPANY NAME]").join(input.companyName);
+  must2(s, "[SERIES NAME]", "series name");
+  s = s.split("[SERIES NAME]").join(input.seriesName);
+  must2(s, "PS-[N]", "series number");
+  s = s.split("PS-[N]").join(`PS-${input.seriesNumber}`);
+  must2(s, "[SERIES PURPOSE]", "series purpose");
+  s = resolveIf(s, "purpose", purpose !== "");
+  s = s.split("[SERIES PURPOSE]").join(purpose);
+  must2(s, "[EFFECTIVE DATE]", "effective date");
+  s = s.split("[EFFECTIVE DATE]").join(input.effectiveDate);
+  must2(s, "[SIGNER ROLE SENTENCE]", "authority sentence");
+  s = s.split("[SIGNER ROLE SENTENCE]").join(authority);
+  must2(s, "[PS MANAGER SIGNATURE LINE]", "ps manager signature");
+  s = s.split("[PS MANAGER SIGNATURE LINE]").join(psSignature);
+  must2(s, "[PS MANAGER]", "ps manager");
+  s = s.split("[PS MANAGER]").join(psManager);
+  must2(s, "[MEMBER SIGNATURE BLOCKS]", "member signature blocks");
+  s = s.split("[MEMBER SIGNATURE BLOCKS]").join(blocks);
+  const leftovers = s.match(/\[(COMPANY NAME|SERIES NAME|SERIES PURPOSE|EFFECTIVE DATE|PS MANAGER|MEMBER SIGNATURE BLOCKS|SIGNER ROLE SENTENCE)[^\]]*\]/g);
+  if (leftovers) throw new Error(`new-series template left unfilled: ${leftovers.join(", ")}`);
+  return { markdown: s, title: `New Protected Series \u2014 ${input.seriesName}` };
+}
+
+// src/lib/ein.ts
+var VALID_EIN_PREFIXES = new Set(
+  "10 12 60 67 50 53 01 02 03 04 05 06 11 13 14 16 21 22 23 25 34 51 52 54 55 56 57 58 59 65 30 32 35 36 37 38 61 15 24 40 44 94 95 80 90 33 39 41 42 43 46 48 62 63 64 66 68 71 72 73 74 75 76 77 85 86 87 88 91 92 93 98 99 20 26 27 45 47 81 82 83 84 31".split(" ")
+);
+function einDigits(raw2) {
+  return (raw2 ?? "").replace(/[\s-]/g, "");
+}
+function isValidEin(raw2) {
+  const d2 = einDigits(raw2);
+  return /^\d{9}$/.test(d2) && VALID_EIN_PREFIXES.has(d2.slice(0, 2));
+}
+var fmtEinDisplay = (digits) => /^\d{9}$/.test(digits) ? `${digits.slice(0, 2)}-${digits.slice(2)}` : digits;
+
+// src/lib/einActivity.ts
+var EIN_REASONS = [
+  "Started a new business",
+  "Hired employee(s)",
+  "Banking purposes",
+  "Changed type of organization",
+  "Purchased active business"
+];
+var choose = (options, question = "Please choose one of the following:") => ({ kind: "choice", question, options });
+var PRIMARY = "Please choose one of the following that best describes your primary business activity:";
+var EIN_CATEGORIES = [
+  { name: "Accommodations", description: "Casino hotel, hotel, or motel", followUp: choose(["Casino hotel", "Hotel", "Motel", "Other"]) },
+  { name: "Construction", description: "Building houses/residential structures, building industrial/commercial structures, specialty trade contractors, remodelers, heavy construction contractors, land subdivision contractors, or site preparation contractors", followUp: { kind: "yesno", question: "Do you focus on a single construction trade (concrete, framing, glass, roofing, siding, electrical, plumbing, HVAC, flooring, etc.)?" } },
+  { name: "Finance", description: "Banks, sales financing, credit card issuing, mortgage company, mortgage company/broker, securities broker, investment advice, or trust administration", followUp: choose(["Commodities broker", "Credit card issuing", "Investment advice", "Investment club", "Investment holding", "Mortgage broker - agent for selling mortgages", "Mortgage company - lending funds with real estate as collateral", "Portfolio management", "Sales financing", "Securities broker", "Trust administration", "Venture capital company", "Other"], PRIMARY) },
+  { name: "Food Service", description: "Retail fast food, restaurant, bar, coffee shop, catering, or mobile food service", followUp: choose(["Bar", "Bar and restaurant", "Catering service", "Coffee shop", "Fast food restaurant", "Full service restaurant", "Ice cream shop", "Mobile food service", "Other"], PRIMARY) },
+  { name: "Health Care", description: "Doctor, mental health specialist, hospital, or outpatient care center", followUp: { kind: "yesno", question: "Does your establishment include medical practitioners having the degree of M.D. (Doctor of medicine) or D.O. (Doctor of osteopathy)?" } },
+  { name: "Insurance", description: "Insurance company or broker", followUp: choose(["I am an insurance carrier.", "I am an insurance agent or broker.", "Other"], PRIMARY) },
+  { name: "Manufacturing", description: "Mechanical, physical, or chemical transformation of materials/substances/components into new products, including the assembly of components", followUp: { kind: "text", question: 'Please specify the type of goods that you manufacture and the primary materials used (such as "wood furniture"):' } },
+  { name: "Real Estate", description: "Renting or leasing real estate, managing real estate, real estate agent/broker, selling, buying, or renting real estate for others", followUp: choose(["I rent or lease property that I own", "I use capital to build property", "I sell property for others", "I manage real estate for others", "Other"]) },
+  { name: "Rental & Leasing", description: "Rent/lease automobiles, consumer goods, commercial goods, or industrial goods", followUp: choose(["I rent, lease, or sell real estate.", "I rent or lease goods.", "I manage real estate for others."]) },
+  { name: "Retail", description: "Retail store, internet sales (exclusively), direct sales (catalogue, mail-order, door to door), auction house, or selling goods on auction sites", followUp: choose(["Selling goods exclusively over the Internet (including independently selling on auction sites).", "Sales from a storefront.", "Direct sales", "Auction house", "Other"]) },
+  { name: "Social Assistance", description: "Youth services, residential care facility, services for the disabled, or community food/housing/relief services", followUp: choose(["Nursing home", "Shelter", "Youth services", "Other"], PRIMARY) },
+  { name: "Transportation", description: "Air transportation, rail transportation, water transportation, trucking, passenger transportation, support activity for transportation, or delivery/courier service", followUp: choose(["Cargo", "Passengers", "I provide a support activity for transportation"], "Do you primarily transport cargo or passengers?") },
+  { name: "Warehousing", description: "Operating warehousing or storage facilities for general merchandise, refrigerated goods, or other warehouse products; establishments that provide facilities to store goods but do not sell the goods they handle", followUp: { kind: "none" } },
+  { name: "Wholesale", description: "Wholesale agent/broker, importer, exporter, manufacturers' representative, merchant, distributor, or jobber", followUp: { kind: "yesno", question: "Do you own or take title to the goods that you sell?" } },
+  { name: "Other", description: "", followUp: choose(["Consulting", "Manufacturing", "Organization (such as religious, environmental, social or civic, athletic, etc.)", "Rental", "Repair", "Sell goods", "Service", "Other"], PRIMARY) }
+];
+var EIN_CATEGORY_NAMES = EIN_CATEGORIES.map((c) => c.name);
+var einCategory = (name) => EIN_CATEGORIES.find((c) => c.name === name);
+function followUpOk(category, answer) {
+  const c = einCategory(category);
+  if (!c) return false;
+  const a2 = answer.trim();
+  switch (c.followUp.kind) {
+    case "none":
+      return true;
+    case "yesno":
+      return a2 === "Yes" || a2 === "No";
+    case "text":
+      return a2.length >= 2;
+    case "choice":
+      return c.followUp.options.includes(a2);
+  }
+}
+
 // server/oa-amendment.ts
 import { readFileSync as readFileSync2 } from "node:fs";
 
@@ -106134,11 +106141,6 @@ function loadTemplate2(v2) {
   return v2.includes("AMENDMENT NO.") ? v2 : readFileSync2(v2, "utf8");
 }
 var amendmentTemplate = loadTemplate2(templates_oa_amendment_default);
-function resolveIf(s, key, keep) {
-  const re = new RegExp(`<!--\\s*if:${key}\\s*-->([\\s\\S]*?)<!--\\s*/if\\s*-->`, "g");
-  if (!re.test(s)) throw new Error(`Amendment template marker missing: if:${key}`);
-  return s.replace(re, (_m, inner) => keep ? inner : "");
-}
 function must3(haystack, needle, label) {
   if (!haystack.includes(needle)) throw new Error(`Amendment template marker missing: ${label}`);
 }

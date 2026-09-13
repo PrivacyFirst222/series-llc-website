@@ -1648,6 +1648,7 @@ async function main(): Promise<void> {
       expect((await page.locator("main a, main button").filter({ hasText: /Amend this agreement/ }).count()) === 0, "AMEND: the questionnaire's agreement list offers no amend button");
       // The closing paragraph under Generate (Adam, 12 Sep 2026): ordinary
       // changes regenerate; the amendment is for the rest; the warning repeats.
+      expect(/Every series may pursue any lawful purpose\. What you type here is added to that, without limiting it\./.test(await page.locator('[data-testid="purpose-note"]').innerText().catch(() => "")), "OA: the purpose card says a stated purpose is added to any lawful purpose, not a limit");
       const pointer = await page.locator('[data-testid="amendment-pointer"]').innerText().catch(() => "");
       expect(/To add or remove members or managers, change ownership percentages, or change an option you chose here, update your answers and regenerate\./.test(pointer) && /that the questionnaire cannot change, use the amendment feature\./.test(pointer) && /reviewed by an attorney before it is signed/.test(pointer), "AMEND: the questionnaire ends by sending ordinary changes to regenerate, the rest to the amendment feature, with the warning", pointer);
       await page.locator('[data-testid="amendment-pointer"] a').first().click();

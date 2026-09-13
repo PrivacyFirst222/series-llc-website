@@ -246,6 +246,15 @@ export function expandRepeat(
   return s;
 }
 
+/** `<!-- if:KEY -->…<!-- /if -->` outside a repeat block: kept when the
+ *  condition holds, dropped otherwise. Inside a repeat block expandRepeat
+ *  resolves the same marker per row. */
+export function resolveIf(s: string, key: string, keep: boolean): string {
+  const re = new RegExp(`<!--\\s*if:${key}\\s*-->([\\s\\S]*?)<!--\\s*/if\\s*-->`, "g");
+  if (!re.test(s)) throw new Error(`OA template marker missing: if:${key}`);
+  return s.replace(re, (_m, inner: string) => (keep ? inner : ""));
+}
+
 /** Choose between the singular and plural wordings the master spells out.
  *
  *  `<!-- one:KEY -->…<!-- /one -->` and `<!-- many:KEY -->…<!-- /many -->` are a
@@ -562,7 +571,12 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
     let ex = ex1.section;
     ex = ex.replace("## SERIES EXHIBIT PS-[N]", `## SERIES EXHIBIT ${n}`);
     ex = ex.replace(/\*\*Protected Series name \(exactly as filed with the Department\):\*\*\n\*\*[^\n]+\*\*/, `**Protected Series name (exactly as filed with the Department):**\n**${ser.name}**`);
-    ex = ex.replace(/\| Purpose of this Protected Series \|[^\n]*\|/, `| Purpose of this Protected Series | ${ser.purpose || "Any lawful business, purpose, or activity"} |`);
+    // The purpose row is the master's: "Any lawful purpose", and, when the
+    // client stated one, ", including, without limitation, [PURPOSE]" (Adam,
+    // 13 Sep 2026: "We do not want a specific purpose to be construed as
+    // limiting what the series can do").
+    ex = resolveIf(ex, "purpose", ser.purpose.trim() !== "");
+    ex = ex.split("[PURPOSE]").join(ser.purpose.trim());
     // Member-managed Series Exhibits carry a fixed "Managed by" row instead.
     if (!isMemberManaged) {
       ex = ex.replace(/\| Protected Series Manager \|[^\n]*\|/, `| Protected Series Manager | ${managerList} |`);

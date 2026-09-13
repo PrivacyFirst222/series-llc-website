@@ -20,6 +20,7 @@
  * what an owner — or their bank — actually wants.
  */
 import template from "./templates-new-series.md";
+import { resolveIf } from "./oa";
 
 export interface NewSeriesInput {
   companyName: string;
@@ -43,7 +44,10 @@ function must(haystack: string, needle: string, label: string): void {
 export function assembleNewSeries(input: NewSeriesInput): { markdown: string; title: string } {
   let s = template as unknown as string;
 
-  const purpose = input.purpose.trim() || "any lawful business, purpose, or activity for which the Company may be organized under the Act";
+  // The purpose is the master's "any lawful purpose"; the client's phrase
+  // follows ", including, without limitation," only when one was given (Adam,
+  // 13 Sep 2026: a stated purpose must never read as a limit).
+  const purpose = input.purpose.trim();
 
   // Who signs and files differs by management form; the member-managed masters
   // name no manager at all.
@@ -76,6 +80,7 @@ export function assembleNewSeries(input: NewSeriesInput): { markdown: string; ti
   must(s, "PS-[N]", "series number");
   s = s.split("PS-[N]").join(`PS-${input.seriesNumber}`);
   must(s, "[SERIES PURPOSE]", "series purpose");
+  s = resolveIf(s, "purpose", purpose !== "");
   s = s.split("[SERIES PURPOSE]").join(purpose);
   must(s, "[EFFECTIVE DATE]", "effective date");
   s = s.split("[EFFECTIVE DATE]").join(input.effectiveDate);

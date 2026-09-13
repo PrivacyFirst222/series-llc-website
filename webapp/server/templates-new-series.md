@@ -12,7 +12,7 @@ The undersigned, being **all** of the members of **[COMPANY NAME], LLC**, a Flor
 
 > **[SERIES NAME]**
 
-**2. Purpose.** The purpose of the new Protected Series is [SERIES PURPOSE].
+**2. Purpose.** The purpose of the new Protected Series is any lawful purpose<!-- if:purpose -->, including, without limitation, [SERIES PURPOSE]<!-- /if -->.
 
 **3. Ownership.** The new Protected Series is established without associated members. The Company owns all of its protected-series transferable interests, and no member of the Company holds any interest in it except indirectly, through that member's interest in the Company (ss. 605.2302(1), 605.2303(2), Fla. Stat.).
 
@@ -37,7 +37,7 @@ The undersigned, being **all** of the members of **[COMPANY NAME], LLC**, a Flor
 
 | Item | Terms |
 |---|---|
-| Purpose of this Protected Series | [SERIES PURPOSE] |
+| Purpose of this Protected Series | Any lawful purpose<!-- if:purpose -->, including, without limitation, [SERIES PURPOSE]<!-- /if --> |
 | Owner of this Protected Series | The Company. This Protected Series has no Associated Members (ss. 605.2302(1), 605.2303(2), Fla. Stat.). |
 | Protected Series Manager | [PS MANAGER] |
 | Contributions to this Protected Series | By the Company: $[AMOUNT] on [DATE] [and/or described property] |

@@ -15,7 +15,7 @@
  */
 import { readFileSync } from "node:fs";
 import amendmentTemplateRaw from "./templates-oa-amendment.md";
-import { chooseNumber, expandRepeat, titleCaseHolding, OA_TEMPLATE_VERSION, type OaInputs } from "./oa";
+import { chooseNumber, expandRepeat, resolveIf, titleCaseHolding, OA_TEMPLATE_VERSION, type OaInputs } from "./oa";
 
 function loadTemplate(v: string): string {
   return v.includes("AMENDMENT NO.") ? v : readFileSync(v, "utf8");
@@ -36,15 +36,6 @@ export interface AmendmentInputs {
    *  attaches to the printed amendment. */
   mode: "typed" | "attached";
   text?: string;
-}
-
-/** `<!-- if:KEY -->…<!-- /if -->` outside a repeat block: kept when the
- *  condition holds, dropped otherwise. Inside a repeat block expandRepeat
- *  resolves the same marker per row. */
-function resolveIf(s: string, key: string, keep: boolean): string {
-  const re = new RegExp(`<!--\\s*if:${key}\\s*-->([\\s\\S]*?)<!--\\s*/if\\s*-->`, "g");
-  if (!re.test(s)) throw new Error(`Amendment template marker missing: if:${key}`);
-  return s.replace(re, (_m, inner: string) => (keep ? inner : ""));
 }
 
 function must(haystack: string, needle: string, label: string): void {
