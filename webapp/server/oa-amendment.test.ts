@@ -39,7 +39,7 @@ const base: OaInputs = {
 };
 
 // ---- multi-member, manager-managed, typed changes ----
-const typed = assembleAmendment(base, { number: 1, effectiveDate: "September 12, 2026", mode: "typed", text: "Section 4.7 is deleted.\nSection 6.2 is amended to read: \"Capital calls require the consent of all Members.\"" });
+const typed = assembleAmendment(base, { number: 1, agreementDate: "August 5, 2026", effectiveDate: "September 12, 2026", mode: "typed", text: "Section 4.7 is deleted.\nSection 6.2 is amended to read: \"Capital calls require the consent of all Members.\"" });
 const md = typed.markdown;
 check("title names the number and the company", typed.title === "Amendment No. 1 to Operating Agreement — ACME Holdings, LLC", typed.title);
 check("heading carries the number", md.includes("# AMENDMENT NO. 1\n# TO OPERATING AGREEMENT\n## OF\n## ACME Holdings, LLC"), md.slice(0, 120));
@@ -59,7 +59,7 @@ check("footer names the amendment, the company, and the edition", /\*Amendment N
 check("no slot or marker is left", !/\[[A-Z][A-Z ()/.']*\]/.test(md) && !md.includes("<!--"), md.match(/\[[A-Z][A-Z ()/.']*\]|<!--[^>]*-->/g));
 
 // ---- two managers, attached exhibit ----
-const two = assembleAmendment({ ...base, managerNames: ["Adam Kirwan", "Tom Jones"] }, { number: 2, effectiveDate: "October 1, 2026", mode: "attached" });
+const two = assembleAmendment({ ...base, managerNames: ["Adam Kirwan", "Tom Jones"] }, { number: 2, agreementDate: "August 5, 2026", effectiveDate: "October 1, 2026", mode: "attached" });
 check("attached: the exhibit sentence stands in for the typed changes", two.markdown.includes("**1. Amendments to the Agreement.** The Agreement is amended as follows:\n\nThe Agreement is amended as set forth in Exhibit A attached to this Amendment.\n\n**2. Effect of Amendment.**"), two.markdown.match(/\*\*1\. Amendments[\s\S]*?\*\*2\./)?.[0]);
 check("two managers acknowledge under the plural heading", two.markdown.includes("**ACKNOWLEDGED AND AGREED BY MANAGERS:**\n\n_____________________________\nAdam Kirwan, Manager\nDate: _____________________________\n\n_____________________________\nTom Jones, Manager"), two.markdown.match(/ACKNOWLEDGED[\s\S]*$/)?.[0]);
 check("attached: the number is 2 throughout", two.title.startsWith("Amendment No. 2 ") && two.markdown.includes("# AMENDMENT NO. 2\n") && two.markdown.includes("THIS AMENDMENT NO. 2 TO OPERATING AGREEMENT"));
@@ -72,7 +72,7 @@ const single: OaInputs = {
   amendedRestated: true,
   members: [{ name: "Maria Lopez", address: "500 Bay Street, Miami, FL 33131", percentage: 100, contribution: "$1,000", todBeneficiary: "" }],
 };
-const sm = assembleAmendment(single, { number: 1, effectiveDate: "September 12, 2026", mode: "typed", text: "Section 3.1 is amended to add a second Protected Series." }).markdown;
+const sm = assembleAmendment(single, { number: 1, agreementDate: "August 5, 2026", effectiveDate: "September 12, 2026", mode: "typed", text: "Section 3.1 is amended to add a second Protected Series." }).markdown;
 check("single: preamble names the sole member and no manager", sm.includes('by the undersigned sole member (the "Member").') && !sm.includes("acknowledged by"), sm.match(/is made effective[^\n]*/)?.[0]);
 check("single: recital A names the Amended and Restated agreement", sm.includes('A. The Company is governed by the Amended and Restated Operating Agreement of the Company effective as of August 5, 2026 (the "Agreement").'), sm.match(/A\. The Company[^\n]*/)?.[0]);
 check("single: recital B cites s. 12.1 and the Member", sm.includes("B. Section 12.1 of the Agreement provides that the Agreement may be amended only by a written instrument signed by the Member."), sm.match(/B\. Section[^\n]*/)?.[0]);
@@ -82,7 +82,7 @@ check("single member-managed: no manager block", !sm.includes("ACKNOWLEDGED") &&
 check("single: no slot or marker is left", !/\[[A-Z][A-Z ()/.']*\]/.test(sm) && !sm.includes("<!--"), sm.match(/\[[A-Z][A-Z ()/.']*\]|<!--[^>]*-->/g));
 
 // ---- single member, manager-managed: the manager still acknowledges ----
-const smm = assembleAmendment({ ...single, version: "single-s", managerNames: ["Maria Lopez"], amendedRestated: false }, { number: 3, effectiveDate: "September 12, 2026", mode: "attached" }).markdown;
+const smm = assembleAmendment({ ...single, version: "single-s", managerNames: ["Maria Lopez"], amendedRestated: false }, { number: 3, agreementDate: "August 5, 2026", effectiveDate: "September 12, 2026", mode: "attached" }).markdown;
 check("single manager-managed: s. 12.1 and the manager's acknowledgment", smm.includes("B. Section 12.1 of the Agreement") && smm.includes("and is acknowledged by the undersigned Manager.") && smm.includes("**ACKNOWLEDGED AND AGREED BY MANAGER:**\n\n_____________________________\nMaria Lopez, Manager"));
 check("single manager-managed: recital A names the Operating Agreement, not restated", smm.includes("governed by the Operating Agreement of the Company effective"));
 
@@ -91,15 +91,22 @@ check("sections: the four multi-member forms cite 15.1", (["multi", "s", "member
 check("sections: the four single-member forms cite 12.1", (["single", "single-s", "member-single", "member-single-s"] as const).every((v) => amendmentSection(v) === "12.1"));
 
 // ---- the client's bracketed words do not fail the slot check ----
-const brackets = assembleAmendment(base, { number: 1, effectiveDate: "September 12, 2026", mode: "typed", text: "Section 13.2 is replaced with [RESERVED]." }).markdown;
+const brackets = assembleAmendment(base, { number: 1, agreementDate: "August 5, 2026", effectiveDate: "September 12, 2026", mode: "typed", text: "Section 13.2 is replaced with [RESERVED]." }).markdown;
 check("a client's own bracketed phrase is printed as typed", brackets.includes("Section 13.2 is replaced with [RESERVED]."));
+
+// ---- the agreement is identified by the date the client confirmed, not the stored one ----
+const confirmed = assembleAmendment(base, { number: 1, agreementDate: "March 3, 2025", effectiveDate: "September 12, 2026", mode: "attached" }).markdown;
+check("recital A names the agreement by the date confirmed on the form", confirmed.includes('governed by the Operating Agreement of the Company effective as of March 3, 2025 (the "Agreement")') && !confirmed.includes("August 5, 2026"), confirmed.match(/A\. The Company[^\n]*/)?.[0]);
+let noDate = "";
+try { assembleAmendment(base, { number: 1, agreementDate: " ", effectiveDate: "September 12, 2026", mode: "attached" }); } catch (e) { noDate = String(e); }
+check("an amendment without the agreement's date is refused", /effective date is required/.test(noDate), noDate);
 
 // ---- refusals ----
 let threw = "";
-try { assembleAmendment(base, { number: 1, effectiveDate: "September 12, 2026", mode: "typed", text: "   " }); } catch (e) { threw = String(e); }
+try { assembleAmendment(base, { number: 1, agreementDate: "August 5, 2026", effectiveDate: "September 12, 2026", mode: "typed", text: "   " }); } catch (e) { threw = String(e); }
 check("typed changes that are blank are refused", /typed changes are empty/.test(threw), threw);
 threw = "";
-try { assembleAmendment({ ...base, managerNames: [] }, { number: 1, effectiveDate: "September 12, 2026", mode: "attached" }); } catch (e) { threw = String(e); }
+try { assembleAmendment({ ...base, managerNames: [] }, { number: 1, agreementDate: "August 5, 2026", effectiveDate: "September 12, 2026", mode: "attached" }); } catch (e) { threw = String(e); }
 check("a manager-managed agreement with no manager is refused", /at least one manager/.test(threw), threw);
 check("paragraphsOf: Windows line endings and blank lines", paragraphsOf("a\r\n\r\n  b \nc") === "a\n\nb\n\nc", paragraphsOf("a\r\n\r\n  b \nc"));
 

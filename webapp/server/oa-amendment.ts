@@ -25,6 +25,11 @@ const amendmentTemplate = loadTemplate(amendmentTemplateRaw as string);
 export interface AmendmentInputs {
   /** Per company, counting up from 1; printed in the title and the preamble. */
   number: number;
+  /** The effective date of the agreement being amended, as the client
+   *  confirmed it on the form — "August 5, 2026". Recital A names the
+   *  agreement by it (Adam, 12 Sep 2026: "That date needs to be referenced
+   *  in the amendment form to identify the OA being amended"). */
+  agreementDate: string;
   /** Human format, "September 12, 2026". */
   effectiveDate: string;
   /** The changes typed in the portal, or set forth in an exhibit the client
@@ -104,7 +109,8 @@ export function assembleAmendment(oa: OaInputs, am: AmendmentInputs): { markdown
   must(s, "[AMENDMENT DATE]", "amendment date");
   s = s.split("[AMENDMENT DATE]").join(am.effectiveDate);
   must(s, "[AGREEMENT DATE]", "agreement date");
-  s = s.split("[AGREEMENT DATE]").join(oa.effectiveDate);
+  if (!am.agreementDate.trim()) throw new Error("Amendment: the agreement's effective date is required");
+  s = s.split("[AGREEMENT DATE]").join(am.agreementDate);
   must(s, "[AMENDMENT SECTION]", "amendment section");
   s = s.split("[AMENDMENT SECTION]").join(amendmentSection(oa.version));
   // ---- signatures: the same blocks the agreement uses ----

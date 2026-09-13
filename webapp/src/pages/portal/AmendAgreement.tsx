@@ -19,7 +19,7 @@ import { ViewingAsBanner } from "./ViewingAsBanner";
 
 interface AmendData {
   seed: { llcName: string };
-  generations: { id: string; created_at: string; amended_restated: boolean; generation_number: number }[];
+  generations: { id: string; created_at: string; amended_restated: boolean; generation_number: number; effective_date: string | null; effective_date_iso: string | null }[];
 }
 
 function todayIso(): string {
@@ -33,6 +33,10 @@ export default function AmendAgreement() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [effectiveDate, setEffectiveDate] = useState<string>(todayIso());
+  // The agreement being amended, by its effective date: prefilled from the
+  // current agreement on file, confirmed or corrected by the client, printed
+  // in Recital A (Adam, 12 Sep 2026).
+  const [agreementDate, setAgreementDate] = useState<string | null>(null);
   const [mode, setMode] = useState<"typed" | "attached">("typed");
   const [text, setText] = useState<string>("");
   const [error, setError] = useState<string>("");
@@ -53,6 +57,7 @@ export default function AmendAgreement() {
   const amend = useMutation({
     mutationFn: () =>
       api.post<{ documentId: string; title: string; number: number }>(`/api/portal/oa/amend${cq}`, {
+        agreementDate,
         effectiveDate,
         mode,
         text: mode === "typed" ? text : undefined,
@@ -98,7 +103,8 @@ export default function AmendAgreement() {
   }
 
   const current = data.generations[0];
-  const canCreate = !amend.isPending && !!effectiveDate && (mode === "attached" || text.trim() !== "");
+  const agreementDateValue = agreementDate ?? current?.effective_date_iso ?? "";
+  const canCreate = !amend.isPending && !!agreementDateValue && !!effectiveDate && (mode === "attached" || text.trim() !== "");
 
   return (
     <section className="container-wide section-y">
@@ -141,14 +147,26 @@ export default function AmendAgreement() {
               signed.
             </div>
 
-            <div className="rounded-2xl border border-border bg-secondary/30 p-4 text-sm text-muted-foreground">
-              This amends your current agreement:{" "}
-              <strong className="text-foreground">
-                {current.amended_restated ? "Amended & Restated" : "Operating Agreement"} (No. {current.generation_number})
-              </strong>
-              . It is signed by every member, as the agreement requires, and acknowledged by the
-              manager where the agreement names one. The signature blocks come from the agreement.
-            </div>
+            <QuestionCard title="Which operating agreement is being amended?">
+              <label className="text-sm" htmlFor="agreement-date">Effective date of the operating agreement</label>
+              <Input
+                id="agreement-date"
+                type="date"
+                aria-label="Effective date of the operating agreement"
+                value={agreementDateValue}
+                onChange={(e) => setAgreementDate(e.target.value)}
+                className="max-w-xs"
+              />
+              <p className="text-xs text-muted-foreground" data-testid="agreement-on-file">
+                Your current agreement on file:{" "}
+                <strong className="text-foreground">
+                  {current.amended_restated ? "Amended & Restated" : "Operating Agreement"} (No. {current.generation_number})
+                </strong>
+                {current.effective_date ? `, effective ${current.effective_date}` : ""}. The amendment names the
+                agreement by the date above. It is signed by every member, as the agreement requires,
+                and acknowledged by the manager where the agreement names one.
+              </p>
+            </QuestionCard>
 
             <QuestionCard title="When does the amendment take effect?">
               <Input

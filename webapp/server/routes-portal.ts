@@ -309,6 +309,15 @@ export async function savedOaAnswers(clientId: string, orderId?: string | null):
   return (typeof raw === "string" ? JSON.parse(raw) : raw) as { members?: { name?: string; address?: string }[] };
 }
 
+/** "August 5, 2026" → "2026-08-05"; "" when the text is not a date. */
+export function isoFromPrinted(printed: string): string | null {
+  const m = printed.trim().match(/^([A-Za-z]+) (\d{1,2}), (\d{4})$/);
+  if (!m) return null;
+  const month = ["january","february","march","april","may","june","july","august","september","october","november","december"].indexOf(m[1].toLowerCase());
+  if (month < 0) return null;
+  return `${m[3]}-${String(month + 1).padStart(2, "0")}-${m[2].padStart(2, "0")}`;
+}
+
 export function fmtDate(iso: string): string {
   const [y, m, d] = iso.split("-").map(Number);
   return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString("en-US", {
@@ -1042,10 +1051,15 @@ app.get("/portal/oa", async (c) => {
   const gens = await db.query(
     `SELECT id, document_id, template_version, amended_restated, created_at,
             COALESCE(generation_number, 0) AS generation_number,
-            inputs->>'version' AS version
+            inputs->>'version' AS version,
+            inputs->>'effectiveDate' AS effective_date
        FROM oa_generations WHERE client_id = $1 AND (order_id = $2 OR order_id IS NULL) ORDER BY created_at DESC`,
     [session.clientId, seed.orderId],
   );
+  // The agreement's effective date, as printed ("August 5, 2026") and as a
+  // date box needs it ("2026-08-05"): the amendment form asks the client to
+  // confirm which agreement is being amended by its date (Adam, 12 Sep 2026).
+  const generations = gens.map((g) => ({ ...g, effective_date_iso: isoFromPrinted(String((g as { effective_date?: unknown }).effective_date ?? "")) }));
   const savedAnswers =
     saved.length > 0
       ? ((typeof saved[0].answers === "string" ? JSON.parse(saved[0].answers as string) : saved[0].answers) as Record<string, unknown>)
@@ -1067,7 +1081,7 @@ app.get("/portal/oa", async (c) => {
       blocked: false,
       templateVersion: OA_TEMPLATE_VERSION,
       answers: savedAnswers,
-      generations: gens,
+      generations,
     },
   });
 });
@@ -1545,6 +1559,9 @@ app.delete("/portal/oa/generations/:id", async (c) => {
  *  the amendment are the parties who signed the agreement, and numbered per
  *  company from 1. The PDF lands in Your documents beside the agreement. */
 const amendSchema = z.object({
+  /** The effective date of the agreement being amended, confirmed by the
+   *  client on the form; Recital A names the agreement by it. */
+  agreementDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   effectiveDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   mode: z.enum(["typed", "attached"]),
   text: z.string().max(20000).optional(),
@@ -1588,7 +1605,7 @@ app.post("/portal/oa/amend", async (c) => {
   let pdf: Uint8Array;
   let title: string;
   try {
-    const assembled = assembleAmendment(oa, { number, effectiveDate: fmtDate(a.effectiveDate), mode: a.mode, text: a.text });
+    const assembled = assembleAmendment(oa, { number, agreementDate: fmtDate(a.agreementDate), effectiveDate: fmtDate(a.effectiveDate), mode: a.mode, text: a.text });
     title = assembled.title;
     pdf = await renderMarkdownPdf({
       markdown: assembled.markdown,

@@ -106175,7 +106175,8 @@ function assembleAmendment(oa, am) {
   must3(s, "[AMENDMENT DATE]", "amendment date");
   s = s.split("[AMENDMENT DATE]").join(am.effectiveDate);
   must3(s, "[AGREEMENT DATE]", "agreement date");
-  s = s.split("[AGREEMENT DATE]").join(oa.effectiveDate);
+  if (!am.agreementDate.trim()) throw new Error("Amendment: the agreement's effective date is required");
+  s = s.split("[AGREEMENT DATE]").join(am.agreementDate);
   must3(s, "[AMENDMENT SECTION]", "amendment section");
   s = s.split("[AMENDMENT SECTION]").join(amendmentSection(oa.version));
   s = expandRepeat(
@@ -106772,6 +106773,13 @@ async function savedOaAnswers(clientId, orderId) {
   const raw2 = rows[0].answers;
   return typeof raw2 === "string" ? JSON.parse(raw2) : raw2;
 }
+function isoFromPrinted(printed) {
+  const m2 = printed.trim().match(/^([A-Za-z]+) (\d{1,2}), (\d{4})$/);
+  if (!m2) return null;
+  const month = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"].indexOf(m2[1].toLowerCase());
+  if (month < 0) return null;
+  return `${m2[3]}-${String(month + 1).padStart(2, "0")}-${m2[2].padStart(2, "0")}`;
+}
 function fmtDate2(iso) {
   const [y, m2, d2] = iso.split("-").map(Number);
   return new Date(Date.UTC(y, m2 - 1, d2)).toLocaleDateString("en-US", {
@@ -107319,10 +107327,12 @@ function registerPortalRoutes(app2) {
     const gens = await db.query(
       `SELECT id, document_id, template_version, amended_restated, created_at,
             COALESCE(generation_number, 0) AS generation_number,
-            inputs->>'version' AS version
+            inputs->>'version' AS version,
+            inputs->>'effectiveDate' AS effective_date
        FROM oa_generations WHERE client_id = $1 AND (order_id = $2 OR order_id IS NULL) ORDER BY created_at DESC`,
       [session.clientId, seed.orderId]
     );
+    const generations = gens.map((g) => ({ ...g, effective_date_iso: isoFromPrinted(String(g.effective_date ?? "")) }));
     const savedAnswers = saved.length > 0 ? typeof saved[0].answers === "string" ? JSON.parse(saved[0].answers) : saved[0].answers : {};
     const memberManaged = seed.managementStructure === "MEMBER_MANAGED";
     const multiOwner = effectiveOwners(seed.members, savedAnswers).length > 1;
@@ -107336,7 +107346,7 @@ function registerPortalRoutes(app2) {
         blocked: false,
         templateVersion: OA_TEMPLATE_VERSION,
         answers: savedAnswers,
-        generations: gens
+        generations
       }
     });
   });
@@ -107714,6 +107724,9 @@ function registerPortalRoutes(app2) {
     return c.json({ data: { ok: true } });
   });
   const amendSchema = external_exports.object({
+    /** The effective date of the agreement being amended, confirmed by the
+     *  client on the form; Recital A names the agreement by it. */
+    agreementDate: external_exports.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     effectiveDate: external_exports.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     mode: external_exports.enum(["typed", "attached"]),
     text: external_exports.string().max(2e4).optional()
@@ -107754,7 +107767,7 @@ function registerPortalRoutes(app2) {
     let pdf;
     let title;
     try {
-      const assembled = assembleAmendment(oa, { number, effectiveDate: fmtDate2(a2.effectiveDate), mode: a2.mode, text: a2.text });
+      const assembled = assembleAmendment(oa, { number, agreementDate: fmtDate2(a2.agreementDate), effectiveDate: fmtDate2(a2.effectiveDate), mode: a2.mode, text: a2.text });
       title = assembled.title;
       pdf = await renderMarkdownPdf({
         markdown: assembled.markdown,

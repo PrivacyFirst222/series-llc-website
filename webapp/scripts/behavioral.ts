@@ -1647,11 +1647,26 @@ async function main(): Promise<void> {
       const guidance = await page.locator('[data-testid="amendment-guidance"]').innerText().catch(() => "");
       expect(/update your answers and regenerate/.test(guidance) && /that the questionnaire cannot change/.test(guidance), "AMEND: the amendment page repeats the guidance and links back to the questionnaire", guidance);
       const notice = await page.locator('[data-testid="amendment-notice"]').innerText().catch(() => "");
+      // The agreement being amended is identified by its effective date,
+      // prefilled from the one on file and confirmed by the client (Adam,
+      // 12 Sep 2026).
+      const dateBox = page.locator('main input[aria-label="Effective date of the operating agreement"]');
+      const prefilled = await dateBox.inputValue().catch(() => "");
+      const onFile = await page.locator('[data-testid="agreement-on-file"]').innerText().catch(() => "");
+      expect(/^\d{4}-\d{2}-\d{2}$/.test(prefilled), "AMEND: the agreement's effective date is prefilled from the agreement on file", prefilled);
+      expect(/Your current agreement on file: Operating Agreement \(No\. \d+\), effective [A-Z][a-z]+ \d{1,2}, \d{4}\./.test(onFile), "AMEND: the line beneath names the agreement on file and its date", onFile);
       expect(/legal consequences you do not intend/.test(notice) && /reviewed by an attorney before it is signed/.test(notice), "AMEND: the page warns of unintended legal consequences and urges attorney review", notice);
-      expect(/This amends your current agreement/.test(await page.locator("main").innerText()), "AMEND: the page names the agreement it amends");
+      expect(/Your current agreement on file:/.test(await page.locator("main").innerText()), "AMEND: the page names the agreement it amends");
       await shot(page, "amend-page");
       const createBtn = page.locator("main button").filter({ hasText: /^Create amendment/ }).first();
       expect(await createBtn.isDisabled(), "AMEND: Create waits until changes are typed");
+      await dateBox.fill("");
+      await page.locator('main textarea[aria-label="Changes to the agreement"]').fill("x");
+      await page.waitForTimeout(200);
+      expect(await createBtn.isDisabled(), "AMEND: Create waits while the agreement's date is blank");
+      await dateBox.fill(prefilled);
+      await page.locator('main textarea[aria-label="Changes to the agreement"]').fill("");
+      await page.waitForTimeout(200);
       await page.locator('main textarea[aria-label="Changes to the agreement"]').fill("Section 4.2 is amended to read: \"Each Member votes in proportion to the Member's Percentage Interest.\"\nSection 9.4 is deleted.");
       await page.waitForTimeout(200);
       expect(!(await createBtn.isDisabled()), "AMEND: Create enables once changes are typed");
@@ -1678,6 +1693,7 @@ async function main(): Promise<void> {
           writeFileSync(f, bytes);
           const flat = execSync(`pdftotext -layout "${f}" -`).toString().replace(/\s+/g, " ");
           expect(/AMENDMENT NO\. 1 TO OPERATING AGREEMENT/.test(flat), "AMEND: read off the PDF — the heading", flat.slice(0, 160));
+          expect(new RegExp(`governed by the Operating Agreement of the Company effective as of ${onFile.match(/effective ([A-Z][a-z]+ \d{1,2}, \d{4})\./)?.[1] ?? "NEVER"}`).test(flat), "AMEND: read off the PDF — recital A names the agreement by the confirmed date", flat.match(/governed by[^.]*/)?.[0]);
           expect(/Section 15\.1 of the Agreement provides that the Agreement may be amended only by a written instrument signed by all Members\./.test(flat), "AMEND: read off the PDF — recital cites s. 15.1 and all Members on the multi-member form", flat.match(/Section 15\.1[^.]*\./)?.[0]);
           expect(/Section 4\.2 is amended to read:/.test(flat) && /Section 9\.4 is deleted\./.test(flat), "AMEND: read off the PDF — the changes typed on screen", flat.match(/Section (4\.2|9\.4)[^.]*\./g));
           expect(/MEMBERS:/.test(flat) && /Casey Gatecheck Date:/.test(flat) && /Blair Gatecheck Date:/.test(flat) && /Drew Solo Date:/.test(flat), "AMEND: read off the PDF — all three owners sign", flat.slice(-500));

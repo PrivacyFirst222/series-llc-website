@@ -312,9 +312,9 @@ for (const [version, file] of Object.entries(MASTERS) as [OaInputs["version"], s
 // member-managed sole member of an amended and restated agreement (attached).
 const AMENDMENT_MASTER = "templates-oa-amendment.md";
 {
-  report("amendment (multi, typed)", AMENDMENT_MASTER, assembleAmendment(inputsFor("multi"), { number: AM_NUMBER, effectiveDate: S.amDate, mode: "typed", text: S.amText }).markdown);
-  report("amendment (member-single, attached)", AMENDMENT_MASTER, assembleAmendment({ ...inputsFor("member-single"), amendedRestated: true }, { number: AM_NUMBER, effectiveDate: S.amDate, mode: "attached" }).markdown);
-  report("amendment (single-s, attached)", AMENDMENT_MASTER, assembleAmendment(inputsFor("single-s"), { number: AM_NUMBER, effectiveDate: S.amDate, mode: "attached" }).markdown);
+  report("amendment (multi, typed)", AMENDMENT_MASTER, assembleAmendment(inputsFor("multi"), { number: AM_NUMBER, agreementDate: S.date, effectiveDate: S.amDate, mode: "typed", text: S.amText }).markdown);
+  report("amendment (member-single, attached)", AMENDMENT_MASTER, assembleAmendment({ ...inputsFor("member-single"), amendedRestated: true }, { number: AM_NUMBER, agreementDate: S.date, effectiveDate: S.amDate, mode: "attached" }).markdown);
+  report("amendment (single-s, attached)", AMENDMENT_MASTER, assembleAmendment(inputsFor("single-s"), { number: AM_NUMBER, agreementDate: S.date, effectiveDate: S.amDate, mode: "attached" }).markdown);
 }
 console.log(`\n${violations} untraceable paragraph(s) across the eight forms and the amendment.`);
 process.exit(violations > 0 ? 1 : 0);

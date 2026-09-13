@@ -1264,7 +1264,7 @@ if (mint.status === 200) {
   check("OA answers save", saveAns.status === 200);
   // An amendment amends the agreement on file; with none, it is refused
   // (Adam, 12 Sep 2026).
-  const amendTooSoon = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ effectiveDate: "2026-09-12", mode: "attached" }) });
+  const amendTooSoon = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ agreementDate: "2026-08-05", effectiveDate: "2026-09-12", mode: "attached" }) });
   check("amendment: refused before any agreement exists", amendTooSoon.status === 400 && amendTooSoon.body?.error?.code === "NO_AGREEMENT", amendTooSoon.body);
   // A first and last name for every owner and beneficiary (Adam, 7 Sep 2026).
   const halfOwner = await api("/api/portal/oa/generate", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ ...oaAnswers, members: [{ name: "Maria", address: "500 Bay Street, Miami, FL 33131", todBeneficiary: "Jordan Member" }] }) });
@@ -1329,11 +1329,15 @@ if (mint.status === 200) {
     const storedRes = await api(`/api/dev/oa-generation-inputs/${gen2.body?.data?.generationId}`);
     const stored = storedRes.body?.data?.inputs as OaInputs;
     const owner = stored?.members?.[0]?.name ?? "";
-    const blank = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ effectiveDate: "2026-09-12", mode: "typed", text: "   " }) });
+    const blank = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ agreementDate: "2026-08-05", effectiveDate: "2026-09-12", mode: "typed", text: "   " }) });
     check("amendment: typed changes left blank are refused", blank.status === 400 && blank.body?.error?.code === "INVALID_INPUT", blank.body);
-    const badDate = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ effectiveDate: "next week", mode: "attached" }) });
+    const noAgreementDate = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ effectiveDate: "2026-09-12", mode: "attached" }) });
+    check("amendment: refused without the agreement's effective date", noAgreementDate.status === 400, noAgreementDate.body);
+    const history = await api("/api/portal/oa", { cookies: setPw.cookie });
+    check("the agreement list carries each agreement's effective date, printed and as a date box needs it", history.body?.data?.generations?.[0]?.effective_date === "August 5, 2026" && history.body?.data?.generations?.[0]?.effective_date_iso === "2026-08-05", history.body?.data?.generations?.[0]);
+    const badDate = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ agreementDate: "2026-08-05", effectiveDate: "next week", mode: "attached" }) });
     check("amendment: a date that is not a date is refused", badDate.status === 400, badDate.body);
-    const typed = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ effectiveDate: "2026-09-12", mode: "typed", text: "Section 3.2 is amended to read: \"The Company may designate up to four Protected Series.\"\nSection 9.4 is deleted." }) });
+    const typed = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ agreementDate: "2026-08-05", effectiveDate: "2026-09-12", mode: "typed", text: "Section 3.2 is amended to read: \"The Company may designate up to four Protected Series.\"\nSection 9.4 is deleted." }) });
     check("amendment with typed changes generates", typed.status === 200, typed.body);
     check("the first amendment is No. 1, titled for the company", typed.body?.data?.number === 1 && typed.body?.data?.title === "Amendment No. 1 to Operating Agreement — E2E Coastal Holdings, LLC", typed.body?.data);
     const amPdf = await fetch(`${BASE}/api/portal/documents/${typed.body?.data?.documentId}/download`, { headers: { Cookie: setPw.cookie } });
@@ -1352,18 +1356,19 @@ if (mint.status === 200) {
       check("read off the PDF: the Member signs, and nobody else", owner !== "" && new RegExp(`MEMBER: ${owner.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")} Date:`).test(flat) && !/ACKNOWLEDGED/.test(flat) && !/MEMBERS:/.test(flat), { owner, tail: flat.slice(-400) });
       check("read off the PDF: the effective date typed is the one printed", /effective as of September 12, 2026, by the undersigned sole member/.test(flat), flat.match(/effective as of [^,]*, by[^.]*/)?.[0]);
     }
-    const attached = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ effectiveDate: "2026-10-01", mode: "attached" }) });
+    const attached = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ agreementDate: "2025-03-03", effectiveDate: "2026-10-01", mode: "attached" }) });
     check("a second amendment, with the changes attached as Exhibit A, is No. 2", attached.status === 200 && attached.body?.data?.number === 2 && /^Amendment No\. 2 /.test(attached.body?.data?.title ?? ""), attached.body?.data);
     const atBytes = new Uint8Array(await (await fetch(`${BASE}/api/portal/documents/${attached.body?.data?.documentId}/download`, { headers: { Cookie: setPw.cookie } })).arrayBuffer());
     const atText = pdfText(atBytes);
     if (atText !== null) {
       const flat = atText.replace(/\s+/g, " ");
       check("read off the PDF: the attached choice prints the Exhibit A sentence", /The Agreement is amended as set forth in Exhibit A attached to this Amendment\./.test(flat) && !/Section 3\.2/.test(flat), flat.match(/amended as follows:[^.]*\./)?.[0]);
+      check("read off the PDF: recital A names the agreement by the date the client entered, not the stored one", /governed by the Amended and Restated Operating Agreement of the Company effective as of March 3, 2025/.test(flat) && !/August 5, 2026/.test(flat), flat.match(/governed by[^.]*/)?.[0]);
     }
     const docsNow = await api("/api/portal/documents", { cookies: setPw.cookie });
     const amDocs = ((docsNow.body?.data ?? []) as { kind: string; title: string }[]).filter((d) => d.kind === "amendment").map((d) => d.title);
     check("both amendments are in the client's documents as amendments", amDocs.length === 2 && amDocs.some((x) => x.startsWith("Amendment No. 1 ")) && amDocs.some((x) => x.startsWith("Amendment No. 2 ")), amDocs);
-    const noSession = await api("/api/portal/oa/amend", { method: "POST", body: JSON.stringify({ effectiveDate: "2026-09-12", mode: "attached" }) });
+    const noSession = await api("/api/portal/oa/amend", { method: "POST", body: JSON.stringify({ agreementDate: "2026-08-05", effectiveDate: "2026-09-12", mode: "attached" }) });
     check("amendment requires a signed-in client", noSession.status === 401);
   }
 
@@ -2261,7 +2266,7 @@ if (mint.status === 200) {
   // On a manager-managed form the amendment carries the Manager's
   // acknowledgment — s. 12.1(b) bars new obligations on the Manager without
   // the Manager's written consent — beneath the Member's signature.
-  const smAmend = await api("/api/portal/oa/amend", { method: "POST", cookies: smPw.cookie, body: JSON.stringify({ effectiveDate: "2026-09-12", mode: "attached" }) });
+  const smAmend = await api("/api/portal/oa/amend", { method: "POST", cookies: smPw.cookie, body: JSON.stringify({ agreementDate: "2026-08-08", effectiveDate: "2026-09-12", mode: "attached" }) });
   check("manager-managed sole owner: amendment generates", smAmend.status === 200 && smAmend.body?.data?.number === 1, smAmend.body);
   const smAmText = pdfText(new Uint8Array(await (await fetch(`${BASE}/api/portal/documents/${smAmend.body?.data?.documentId}/download`, { headers: { Cookie: smPw.cookie } })).arrayBuffer()));
   if (smAmText !== null) {
