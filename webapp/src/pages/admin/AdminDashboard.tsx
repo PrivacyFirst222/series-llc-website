@@ -453,14 +453,14 @@ function ClientsTable({
   const toggle = (key: SortKey) => setSort((s) => (s?.key === key ? { key, dir: s.dir === "asc" ? "desc" : "asc" } : { key, dir: "asc" }));
   const Head = ({ k, label }: { k: SortKey; label: string }) =>
     sortable ? (
-      <th className="px-4 py-3 font-medium">
+      <th className="px-3 py-3 font-medium">
         <button type="button" onClick={() => toggle(k)} className="inline-flex items-center gap-1 uppercase tracking-[0.14em] hover:text-foreground" data-testid={`sort-${k}`} aria-sort={sort?.key === k ? (sort.dir === "asc" ? "ascending" : "descending") : "none"}>
           {label}
           {sort?.key === k ? (sort.dir === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />) : <ArrowUpDown className="h-3 w-3 opacity-40" />}
         </button>
       </th>
     ) : (
-      <th className="px-4 py-3 font-medium">{label}</th>
+      <th className="px-3 py-3 font-medium">{label}</th>
     );
   return (
     <div className="mt-4">
@@ -484,7 +484,7 @@ function ClientsTable({
             <Head k="account" label="Portal account" />
             <Head k="documents" label="Documents" />
             <Head k="since" label="Since" />
-            <th className="px-4 py-3 font-medium"></th>
+            <th className="px-3 py-3 font-medium"></th>
           </tr>
         </thead>
         <tbody className="divide-y divide-border">
@@ -497,7 +497,7 @@ function ClientsTable({
           ) : (
             shown.map((cl) => (
               <tr key={cl.id} data-testid="client-row">
-                <td className="px-4 py-3">
+                <td className="px-3 py-3">
                   <span className="font-medium" data-testid="client-name">{displayName(cl)}</span>
                   {cl.ra_cancellation_requested_at ? (
                     <span className="ml-2 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-900">
@@ -507,12 +507,12 @@ function ClientsTable({
                   <div className="text-xs text-muted-foreground">{cl.email}</div>
                 </td>
                 {variant === "ra" ? (
-                  <td className="px-4 py-3">{(cl.ra_llcs ?? []).join(", ")}</td>
+                  <td className="px-3 py-3">{(cl.ra_llcs ?? []).join(", ")}</td>
                 ) : null}
                 {/* Every paid company under this account, with the name given
                     on the order when it differs from the account's (Adam,
                     9 Sep 2026: KLF's order was invisible here). */}
-                <td className="px-4 py-3" data-testid="client-companies">
+                <td className="px-3 py-3" data-testid="client-companies">
                   {(cl.companies ?? []).length === 0 ? (
                     <span className="text-muted-foreground">—</span>
                   ) : (
@@ -528,14 +528,16 @@ function ClientsTable({
                     </ul>
                   )}
                 </td>
-                <td className="px-4 py-3">{cl.has_password ? "Active" : "Invite sent"}</td>
-                <td className="px-4 py-3">{cl.document_count}</td>
-                <td className="px-4 py-3 text-muted-foreground">{day(cl.created_at)}</td>
-                <td className="px-4 py-3 text-right">
-                  {/* Four buttons no longer fit on one line at every width;
-                      they wrap inside the cell instead of running off the
-                      card's edge (Adam, 10 Sep 2026). */}
-                  <div className="ml-auto grid w-max grid-cols-2 gap-2" data-testid="client-actions">
+                <td className="px-3 py-3">{cl.has_password ? "Active" : "Invite sent"}</td>
+                <td className="px-3 py-3">{cl.document_count}</td>
+                <td className="px-3 py-3 text-muted-foreground">{day(cl.created_at)}</td>
+                <td className="px-3 py-3 text-right">
+                  {/* Four buttons, two to a line (Adam, 10 Sep 2026) — at
+                      desktop width. On an iPad the seven columns cannot fit
+                      beside a 2×2 block, and the table clipped at the card's
+                      edge (13 Sep 2026); below xl the buttons stack in one
+                      column so the row fits with no sideways scroll. */}
+                  <div className="ml-auto grid w-max grid-cols-1 gap-2 xl:grid-cols-2 [&>*]:w-full" data-testid="client-actions">
                     <OrderSummaryButton client={cl} />
                     <ViewPortalButton client={cl} />
                     <EmailsDialog client={cl} />

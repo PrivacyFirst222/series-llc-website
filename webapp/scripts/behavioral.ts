@@ -1993,6 +1993,32 @@ async function main(): Promise<void> {
       const layout = await row.locator('[data-testid="client-actions"] > *').evaluateAll((els) => ({ count: els.length, lines: new Set(els.map((el) => Math.round(el.getBoundingClientRect().top))).size }));
       expect(layout.lines === Math.ceil(layout.count / 2), "clients tab: the action buttons sit two to a line", layout);
       await shot(page, "admin-clients-companies");
+      // On an iPad (13 Sep 2026) the row must fit the card with no sideways
+      // scroll: the buttons stack in one column; at desktop width, two a line.
+      {
+        const fit = async (width: number) => {
+          await page.setViewportSize({ width, height: 800 });
+          await page.waitForTimeout(600);
+          return row.locator('[data-testid="client-actions"]').evaluate((el) => {
+            const scroller = el.closest("table")!.parentElement!;
+            const card = scroller.getBoundingClientRect();
+            const kids = Array.from(el.children) as HTMLElement[];
+            return {
+              scrollWidth: scroller.scrollWidth, clientWidth: scroller.clientWidth,
+              inside: kids.every((k) => { const r = k.getBoundingClientRect(); return r.right <= card.right + 1 && r.left >= card.left - 1; }),
+              lines: new Set(kids.map((k) => Math.round(k.getBoundingClientRect().top))).size, count: kids.length,
+            };
+          });
+        };
+        const ipad = await fit(1024);
+        expect(ipad.scrollWidth <= ipad.clientWidth + 1 && ipad.inside, "clients tab (iPad width): the table fits the card with no sideways scroll and no button cut off", ipad);
+        expect(ipad.lines === ipad.count, "clients tab (iPad width): the buttons stack in one column", ipad);
+        await shot(page, "admin-clients-ipad");
+        const desk = await fit(1440);
+        expect(desk.lines === Math.ceil(desk.count / 2) && desk.inside, "clients tab (desktop width): two buttons to a line, all inside the card", desk);
+        await page.setViewportSize({ width: 1280, height: 720 });
+        await page.waitForTimeout(400);
+      }
       // The Order Summary (Adam, 10 Sep 2026): one company opens its PDF at
       // once; the office reads it as it was when the order was placed.
       {
