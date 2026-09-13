@@ -485,11 +485,18 @@ export default function OrderDetail({
             {d.status !== "paid" || isConversion ? (
             <section data-testid="formation-documents">
               <h3 className="font-display text-base">{isConversion ? "Protected Series Designations" : "Formation documents"}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {isConversion
-                  ? "File the Designations online at the Division, then upload the filed PDFs here. One designation may cover several series — tick the ones each file covers. This marks the order complete and emails the client."
-                  : "Upload the Protected Series Designations. One designation may cover several series — tick the ones each file covers. This marks the order formed and emails the client."}
-              </p>
+              {/* The instruction lives with the upload slots it describes:
+                  once the order is formed the slots are gone, and so is the
+                  sentence telling the office to use them (Adam, 12 Sep 2026:
+                  "Why does it say this if the PS Designations have already
+                  been uploaded"). */}
+              {d.status !== "formed" ? (
+                <p className="mt-1 text-sm text-muted-foreground" data-testid="designations-instruction">
+                  {isConversion
+                    ? "File the Designations online at the Division, then upload the filed PDFs here. One designation may cover several series — tick the ones each file covers. This marks the order complete and emails the client."
+                    : "Upload the Protected Series Designations. One designation may cover several series — tick the ones each file covers. This marks the order formed and emails the client."}
+                </p>
+              ) : null}
 
               {d.documents.length > 0 ? (
                 <ul className="mt-3 space-y-1 text-sm">

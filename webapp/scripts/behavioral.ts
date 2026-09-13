@@ -1738,6 +1738,9 @@ async function main(): Promise<void> {
         const owedText = await drawer.locator('[data-testid="still-owed"]').innerText().catch(() => "");
         expect(/Still owed: Certificate of Status, Certified Copy/.test(owedText), "certificates: the formed drawer says what is still owed", owedText);
         expect((await drawer.locator("#upload-cert-status").count()) === 1 && (await drawer.locator("#upload-certified-copy").count()) === 1, "certificates: both upload slots are offered on a formed order");
+        // A formed order has nothing left to upload, so the instruction to
+        // upload the Designations is gone with the slots (Adam, 12 Sep 2026).
+        expect((await drawer.locator('[data-testid="designations-instruction"]').count()) === 0 && !/Upload the Protected Series Designations|File the Designations online/.test(await drawer.innerText()), "formed order: no instruction to upload the Designations once they are on file");
         await shot(page, "admin-formed-certificates-owed");
         const asFile = (tag: string) => ({ name: `${tag}.pdf`, mimeType: "application/pdf", buffer: Buffer.from(`%PDF-1.4 ${tag}\n%%EOF`) });
         await drawer.locator("#upload-cert-status").setInputFiles(asFile("certstatus"));
@@ -1822,6 +1825,7 @@ async function main(): Promise<void> {
       expect(/Protected Series Designations — file online/.test(text) && /PS Alpha/.test(text), "conversion office: the sheet lists the Designations to file", text.slice(0, 400));
       expect(/Change of registered agent/.test(text), "conversion office: our agent means a change-of-agent filing on the sheet");
       expect((await drawer.locator('[data-testid="formation-documents"]').count()) === 1 && /Upload designations and mark complete/.test(text), "conversion office: the Designation uploads are offered at once");
+      expect(/File the Designations online at the Division, then upload the filed PDFs here/.test(text), "conversion office: the instruction to file and upload the Designations shows while the order is pending", text.slice(0, 400));
       await shot(page, "admin-conversion-drawer");
     } catch (e) {
       expect(false, `conversion office journey: ${String(e).slice(0, 300)}`);
