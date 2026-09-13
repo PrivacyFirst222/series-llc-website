@@ -407,6 +407,57 @@ check("service-RA order accepted with canonical details enforced", svc.status ==
   });
   check("'we sign' with the appointment is accepted, with no client signature",
     appointed.status === 200, { status: appointed.status, body: appointed.body });
+
+  // The Statement of Authorized Representative (Adam, 13 Sep 2026): made the
+  // moment the filed Articles go up for an order whose client appointed us,
+  // named by the Florida document number the office types, signed "/s/".
+  {
+    const apId = appointed.body?.data?.orderId as string;
+    const apEmail = testEmail.replace("@", "+appointed@");
+    await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: apId }) });
+    const adm = await adminSession();
+    const filed = await api(`/api/admin/orders/${apId}/filed`, { method: "POST", cookies: adm.cookie });
+    check("statement: the appointed order is marked sent to the Division", filed.status === 200, filed.body);
+    const detail = await api(`/api/admin/orders/${apId}`, { cookies: adm.cookie });
+    check("statement: the order card knows we signed the Articles", detail.body?.data?.articlesSignedByUs === true, detail.body?.data?.articlesSignedByUs);
+    const llcName = detail.body?.data?.llcName as string;
+    const pdfFile = () => new File([new TextEncoder().encode("%PDF-1.4 e2e articles\n%%EOF")], "articles.pdf", { type: "application/pdf" });
+    const noNum = new FormData(); noNum.set("articles", pdfFile());
+    const noNumRes = await fetch(`${BASE}/api/admin/orders/${apId}/articles`, { method: "POST", headers: { Cookie: adm.cookie }, body: noNum });
+    const noNumBody = await noNumRes.json().catch(() => null) as { error?: { code?: string; message?: string } } | null;
+    check("statement: Articles for an appointed order are refused without the document number", noNumRes.status === 400 && noNumBody?.error?.code === "DOCUMENT_NUMBER_REQUIRED" && /Enter the Florida document number so the Statement of Authorized Representative can name the company/.test(noNumBody?.error?.message ?? ""), noNumBody);
+    const withNum = new FormData(); withNum.set("articles", pdfFile()); withNum.set("documentNumber", "L26000123456");
+    const withNumRes = await fetch(`${BASE}/api/admin/orders/${apId}/articles`, { method: "POST", headers: { Cookie: adm.cookie }, body: withNum });
+    const withNumBody = await withNumRes.json().catch(() => null) as { data?: { statement?: boolean } } | null;
+    check("statement: with the number, the Articles go up and the Statement is made", withNumRes.status === 200 && withNumBody?.data?.statement === true, withNumBody);
+    const apDocs = await api(`/api/admin/orders/${apId}`, { cookies: adm.cookie });
+    const apList = (apDocs.body?.data?.documents ?? []) as { kind: string; title: string; id: string }[];
+    const stmt = apList.find((d) => d.kind === "statement");
+    check("statement: the order's documents carry it, titled for the company", !!stmt && stmt.title === `Statement of Authorized Representative — ${llcName}`, apList.map((d) => d.title));
+    // As the client sees it.
+    const apMint = await api("/api/dev/mint-reset-token", { method: "POST", body: JSON.stringify({ email: apEmail }) });
+    const apPw = await api("/api/auth/set-password", { method: "POST", body: JSON.stringify({ token: apMint.body?.data?.token, password: "e2e-password-ap" }) });
+    check("statement: the appointed client signs in", apPw.status === 200, apPw.body);
+    const clientDocs = await api("/api/portal/documents", { cookies: apPw.cookie });
+    const clientList = (clientDocs.body?.data ?? []) as { id: string; kind: string; title: string }[];
+    const clientStmt = clientList.find((d) => d.kind === "statement");
+    check("statement: it is in the client's documents", !!clientStmt, clientList.map((d) => d.kind));
+    if (clientStmt) {
+      const bytes = new Uint8Array(await (await fetch(`${BASE}/api/portal/documents/${clientStmt.id}/download`, { headers: { Cookie: apPw.cookie } })).arrayBuffer());
+      check("statement: it downloads as a PDF", bytes[0] === 0x25 && bytes[1] === 0x50, bytes.length);
+      const text = pdfText(bytes);
+      if (text !== null) {
+        const flat = text.replace(/\s+/g, " ");
+        check("read off the PDF: the Statement names the company and its document number", flat.includes(`states as follows with respect to ${llcName}, a Florida limited liability company (the "Company"), Florida document number L26000123456:`), flat.match(/states as follows[^:]*:/)?.[0]);
+        check("read off the PDF: all seven paragraphs", ["1. Capacity.","2. Authorization.","3. No ownership or management interest.","4. Authority exhausted on filing.","5. Where authority resides.","6. Registered agent service.","7. Purpose."].every((h) => flat.includes(h)));
+        check("read off the PDF: a conformed signature by the named signer, with title and date", /\/s\/ (.+?) By: \1 Title: .+? Date: [A-Z][a-z]+ \d{1,2}, \d{4}/.test(flat), flat.slice(-300));
+        check("read off the PDF: no editing note, no draft colophon, no license footer", !/Form document/.test(flat) && !/MASTER\. Edit/.test(flat) && !/Copyright FLORIDA PROTECTED SERIES/.test(flat) && /Page 1 of/.test(flat), flat.slice(-200));
+      }
+    }
+    const again = new FormData(); again.set("articles", pdfFile()); again.set("documentNumber", "L26000123456");
+    const againRes = await fetch(`${BASE}/api/admin/orders/${apId}/articles`, { method: "POST", headers: { Cookie: adm.cookie }, body: again });
+    check("statement: a second Articles upload at this step is still refused as before", againRes.status === 409);
+  }
 }
 
 // 2. Place a valid order. The bogus price fields ride along deliberately: the
@@ -989,6 +1040,10 @@ if (mint.status === 200) {
     method: "POST", headers: { Cookie: adminLoginF.cookie }, body: formFd,
   });
   check("order marked formed via formation documents", formedRes.ok, await formedRes.clone().json().catch(() => null));
+  {
+    const selfDocs = await api("/api/portal/documents", { cookies: setPw.cookie });
+    check("statement: a client who signed the Articles themselves gets no Statement", !((selfDocs.body?.data ?? []) as { kind: string }[]).some((d) => d.kind === "statement"));
+  }
 
   // Retry convergence (FORM-001): the formation upload cannot be atomic (HTTP
   // driver, storage interleaved), so a retry must REPLACE the package, never

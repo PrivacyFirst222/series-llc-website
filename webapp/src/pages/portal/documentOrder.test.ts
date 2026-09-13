@@ -26,19 +26,21 @@ const docs = [
   { kind: "legal_mail", title: "Legal mail — service of process", created_at: "2026-09-08T10:00:00Z" },
   { kind: "amendment", title: "Amendment No. 1 to Operating Agreement — Coral Gate, LLC", created_at: "2026-09-09T10:00:00Z" },
   { kind: "package", title: "Operating Agreement No. 2 — Coral Gate, LLC", created_at: "2026-09-08T12:00:00Z" },
+  { kind: "statement", title: "Statement of Authorized Representative — Coral Gate, LLC", created_at: "2026-09-07T12:02:30Z" },
 ];
 const order = sortDocuments(docs).map((d) => d.kind === "package" || d.kind === "amendment" ? d.title.split(" — ")[0] : d.kind);
 check("Articles come first", order[0] === "articles", order);
 check("the certified copy sits directly under the Articles", order[1] === "certified-copy", order);
-check("the Protected Series Designation follows", order[2] === "psd", order);
-check("the EIN letter follows", order[3] === "EIN Confirmation Letter", order);
-check("the current operating agreement follows", order[4] === "Operating Agreement No. 2", order);
-check("the amendment sits just under the agreement it amends", order[5] === "Amendment No. 1 to Operating Agreement", order);
-check("a superseded agreement comes after the amendment", order[6] === "Operating Agreement No. 1", order);
-check("the rest come after, newest first", order.slice(7).join(",") === "legal_mail,S Corporation Election Package (Form 2553),certificate-of-status", order.slice(7));
+check("the Statement of Authorized Representative sits with the Articles, before the Designation", order[2] === "statement", order);
+check("the Protected Series Designation follows", order[3] === "psd", order);
+check("the EIN letter follows", order[4] === "EIN Confirmation Letter", order);
+check("the current operating agreement follows", order[5] === "Operating Agreement No. 2", order);
+check("the amendment sits just under the agreement it amends", order[6] === "Amendment No. 1 to Operating Agreement", order);
+check("a superseded agreement comes after the amendment", order[7] === "Operating Agreement No. 1", order);
+check("the rest come after, newest first", order.slice(8).join(",") === "legal_mail,S Corporation Election Package (Form 2553),certificate-of-status", order.slice(8));
 
 const withoutCopy = sortDocuments(docs.filter((d) => d.kind !== "certified-copy")).map((d) => d.kind);
-check("without a certified copy, the Designation is second", withoutCopy[0] === "articles" && withoutCopy[1] === "psd", withoutCopy);
+check("without a certified copy, the Statement is second and the Designation third", withoutCopy[0] === "articles" && withoutCopy[1] === "statement" && withoutCopy[2] === "psd", withoutCopy);
 
 console.log(`\n${checks} checks, ${failures} failures`);
 if (failures > 0) process.exit(1);

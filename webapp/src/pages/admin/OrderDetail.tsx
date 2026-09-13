@@ -43,6 +43,10 @@ interface OrderDetailData {
   documents: { id: string; kind: string; title: string; createdAt: string }[];
   services: { id: string; type: string; status: string; llc_name: string }[];
   hasArticles: boolean;
+  /** The client appointed us to sign the Articles: the Statement of
+   *  Authorized Representative is made when the Articles go up, and the
+   *  upload needs the Florida document number to name the company. */
+  articlesSignedByUs: boolean;
   certStatusPurchased: boolean;
   certifiedCopyPurchased: boolean;
   hasCertStatus: boolean;
@@ -190,6 +194,7 @@ export default function OrderDetail({
 }) {
   const queryClient = useQueryClient();
   const articlesRef = useRef<HTMLInputElement>(null);
+  const [docNumber, setDocNumber] = useState<string>("");
   const [psdRows, setPsdRows] = useState<{ file: File | null; covers: string[] }[]>([
     { file: null, covers: [] },
   ]);
@@ -213,6 +218,7 @@ export default function OrderDetail({
       if (!f) throw new Error("Choose the filed Articles PDF.");
       const fd = new FormData();
       fd.append("articles", f);
+      fd.append("documentNumber", docNumber.trim());
       const res = await fetch(`/api/admin/orders/${orderId}/articles`, { method: "POST", body: fd, credentials: "include" });
       const body = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
       if (!res.ok) throw new Error(body?.error?.message ?? "Upload failed.");
@@ -312,6 +318,7 @@ export default function OrderDetail({
       const fd = new FormData();
       const articles = articlesRef.current?.files?.[0];
       if (articles) fd.append("articles", articles);
+      fd.append("documentNumber", docNumber.trim());
       const certStatus = certStatusRef.current?.files?.[0];
       if (certStatus) fd.append("certStatus", certStatus);
       const certifiedCopy = certifiedCopyRef.current?.files?.[0];
@@ -420,6 +427,20 @@ export default function OrderDetail({
             {d.status === "filed" && !isConversion ? (
               !d.hasArticles ? (
                 <div className="rounded-lg border border-border p-3">
+                  {/* The Statement of Authorized Representative names the
+                      company by its Florida document number, which is on the
+                      stamped Articles in the office's hand (Adam, 13 Sep 2026). */}
+                  <label htmlFor="articles-document-number" className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+                    Florida document number (from the stamped Articles){d.articlesSignedByUs ? " — required: we signed these Articles" : " — optional"}
+                  </label>
+                  <input
+                    id="articles-document-number"
+                    type="text"
+                    value={docNumber}
+                    onChange={(e) => { setDocNumber(e.target.value); setUploadError(null); }}
+                    placeholder="L26000123456"
+                    className="mt-1 mb-3 block w-full max-w-xs rounded-md border border-border bg-background px-3 py-2 text-sm"
+                  />
                   <label htmlFor="upload-articles-first" className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
                     Filed Articles of Organization (from the Division)
                   </label>
@@ -442,6 +463,7 @@ export default function OrderDetail({
                       {uploadArticles.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileUp className="mr-2 h-4 w-4" />}
                       Upload Articles
                     </Button>
+                    {uploadError ? <p className="basis-full text-sm text-destructive" data-testid="articles-upload-error">{uploadError}</p> : null}
                     {/* The Division's other possible answer, side by side
                         (Adam, 30 Aug 2026): orange, and it resets the order
                         for the alternate-name resubmission. */}

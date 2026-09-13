@@ -6,6 +6,8 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { getDb } from "./db";
+import { assembleStatement } from "./statement";
+import { renderMarkdownPdf } from "./pdf-render";
 import { env } from "./env";
 import { listBackups, runDbBackup } from "./backup";
 import { mirrorStatus, runFileMirror } from "./dropbox";
@@ -354,6 +356,10 @@ app.get("/admin/orders/:id", async (c) => {
       filingPath: (payload as { filingPath?: string })?.filingPath === "CONVERT" ? "CONVERT" : "NEW",
       existingLlcName: (payload as { existingLlcName?: string })?.existingLlcName ?? "",
       sunbizDocumentNumber: (payload as { sunbizDocumentNumber?: string })?.sunbizDocumentNumber ?? "",
+      /** The client appointed us to sign the Articles: the Statement of
+       *  Authorized Representative is owed, and the Articles upload needs the
+       *  Florida document number to name the company. */
+      articlesSignedByUs: appointedUs(payload),
       // Kept because this endpoint used to return the raw row: reshaping it
       // silently dropped square_order_id, the e2e webhook was posted with an
       // undefined order id, and three payment assertions failed. A response
@@ -406,12 +412,53 @@ app.get("/admin/orders/:id", async (c) => {
 // status does not move, and the client is not emailed — they hear once, at
 // formed. A wrong file is replaced later by the formed-step package upload,
 // which retires priors.
+/** Statement of Authorized Representative (Adam, 13 Sep 2026): made the
+ *  moment the filed Articles go up, for an order whose client appointed us to
+ *  sign them, and stored under the company beside the Articles. A later
+ *  Articles upload replaces it. Returns the message to refuse with when the
+ *  document number the Statement needs is missing. */
+function appointedUs(payload: unknown): boolean {
+  const p = (typeof payload === "string" ? JSON.parse(payload) : payload) as { certifications?: { articlesSignedBy?: string } } | null;
+  return p?.certifications?.articlesSignedBy === "SERVICE";
+}
+const DOC_NUMBER_NEEDED = "This client appointed us to sign. Enter the Florida document number so the Statement of Authorized Representative can name the company.";
+async function issueStatement(
+  db: Awaited<ReturnType<typeof getDb>>,
+  o: { id: string; client_id: string | null; llc_name: string },
+  documentNumber: string,
+  put: (name: string, data: ArrayBuffer, type: string) => Promise<{ storageKey: string; sizeBytes: number }> = putFile,
+): Promise<{ id: string; storageKey: string }> {
+  const { markdown, title } = assembleStatement({
+    companyName: o.llc_name,
+    documentNumber: documentNumber.trim(),
+    signerName: env.AR_SIGNER_NAME,
+    signerTitle: env.AR_SIGNER_TITLE,
+    date: new Date().toLocaleDateString("en-US", { timeZone: "America/New_York", year: "numeric", month: "long", day: "numeric" }),
+  });
+  // Our own statement, not a licensed deliverable: page numbers only.
+  const pdf = await renderMarkdownPdf({ markdown, watermark: null, title });
+  const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength) as ArrayBuffer;
+  const stored = await put(`${title.replace(/[^\w-]+/g, "_")}.pdf`, buf, "application/pdf");
+  const prior = await db.query<{ id: string; storage_key: string }>(
+    "SELECT id, storage_key FROM documents WHERE order_id = $1 AND kind = 'statement'", [o.id]);
+  const row = await db.query<{ id: string }>(
+    `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
+     VALUES ($1, $2, 'statement', $3, $4, 'application/pdf', $5, $6) RETURNING id`,
+    [o.client_id, o.id, title, stored.storageKey, stored.sizeBytes, JSON.stringify({ documentNumber: documentNumber.trim() })],
+  );
+  for (const pr of prior) {
+    await db.query("DELETE FROM documents WHERE id = $1", [pr.id]);
+    await deleteFile(pr.storage_key).catch(() => undefined);
+  }
+  return { id: row[0].id, storageKey: stored.storageKey };
+}
+
 app.post("/admin/orders/:id/articles", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const db = await getDb();
-  const rows = await db.query<{ id: string; client_id: string | null; llc_name: string }>(
-    "SELECT id, client_id, llc_name FROM orders WHERE id = $1", [c.req.param("id")]);
+  const rows = await db.query<{ id: string; client_id: string | null; llc_name: string; payload: unknown }>(
+    "SELECT id, client_id, llc_name, payload FROM orders WHERE id = $1", [c.req.param("id")]);
   if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
   const o = rows[0];
   if (!o.client_id) return c.json(err("This order has no client account yet.", "NO_CLIENT"), 400);
@@ -425,6 +472,9 @@ app.post("/admin/orders/:id/articles", async (c) => {
   if (!(articles instanceof File)) {
     return c.json(err("The Articles of Organization PDF is required.", "INVALID_INPUT"), 400);
   }
+  const documentNumber = typeof form.documentNumber === "string" ? form.documentNumber.trim() : "";
+  const weSigned = appointedUs(o.payload);
+  if (weSigned && !documentNumber) return c.json(err(DOC_NUMBER_NEEDED, "DOCUMENT_NUMBER_REQUIRED"), 400);
   if (articles.size > MAX_UPLOAD_BYTES) return c.json(err("The file is too large (20 MB max).", "TOO_LARGE"), 400);
   if (!(await looksLikePdf(articles))) {
     return c.json(err("This is not a readable PDF. Upload the filed Articles from Sunbiz.", "NOT_A_PDF"), 400);
@@ -435,7 +485,8 @@ app.post("/admin/orders/:id/articles", async (c) => {
      VALUES ($1, $2, 'articles', $3, $4, $5, $6, '{}'::jsonb)`,
     [o.client_id, o.id, `Articles of Organization — ${o.llc_name}`, stored.storageKey, articles.type || "application/pdf", stored.sizeBytes],
   );
-  return c.json({ data: { ok: true } });
+  if (weSigned) await issueStatement(db, o, documentNumber);
+  return c.json({ data: { ok: true, statement: weSigned } });
 });
 
 /** The state's certificates on their own (Adam, 7 Sep 2026: "I uploaded the
@@ -522,6 +573,11 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
   const form = await c.req.parseBody({ all: true });
   const maybeArticles = form.articles;
   const articles = maybeArticles instanceof File ? maybeArticles : null;
+  const formedDocNumber = typeof form.documentNumber === "string" ? form.documentNumber.trim() : "";
+  const formedWeSigned = appointedUs(o.payload);
+  if (articles && formedWeSigned && !formedDocNumber) {
+    return c.json(err(DOC_NUMBER_NEEDED, "DOCUMENT_NUMBER_REQUIRED"), 400);
+  }
   // A conversion designates series for a company already on file: there are
   // no new Articles, and the Division's online designation filing is all
   // there is (dos.fl.gov, "About Florida Series LLCs"; Adam, 9 Sep 2026).
@@ -669,6 +725,11 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
         ],
       );
       newRows.push(artRow[0].id);
+      if (formedWeSigned) {
+        const st = await issueStatement(db, o, formedDocNumber, stagedPut);
+        newRows.push(st.id);
+        newKeys.push(st.storageKey);
+      }
     }
     for (const cf of certFiles) {
       const storedCert = await stagedPut(cf.file.name, await cf.file.arrayBuffer(), cf.file.type || "application/pdf");

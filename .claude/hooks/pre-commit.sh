@@ -28,7 +28,7 @@ if ! (cd "$ROOT/webapp" && bun run test >/dev/null 2>&1); then
 fi
 
 MASTERS=$(git diff --cached --name-only --diff-filter=ACM \
-  | grep -E '^(webapp/server/templates-oa-.*\.md|docs/owners-manual\.md|docs/statement-of-authorized-representative\.md)$' || true)
+  | grep -E '^(webapp/server/templates-oa-.*\.md|docs/owners-manual\.md|webapp/server/templates-statement-of-authorized-representative\.md)$' || true)
 
 if [ -n "$MASTERS" ]; then
   echo "pre-commit: master document changed, regenerating Word files"

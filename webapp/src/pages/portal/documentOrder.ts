@@ -14,11 +14,14 @@ const isAgreement = (doc: { kind: string; title: string }) => doc.kind !== "amen
 export function documentRank(doc: { kind: string; title: string }, current?: { kind: string; title: string; created_at: string } | null): number {
   if (doc.kind === "articles") return 0;
   if (doc.kind === "certified-copy") return 1;
-  if (doc.kind === "psd") return 2;
-  if (/^EIN Confirmation Letter/i.test(doc.title)) return 3;
-  if (isAgreement(doc)) return current && doc !== current ? 6 : 4;
-  if (doc.kind === "amendment") return 5;
-  return 7;
+  // The Statement of Authorized Representative explains the name on the
+  // Articles (13 Sep 2026): it sits with them, before the Designation.
+  if (doc.kind === "statement") return 2;
+  if (doc.kind === "psd") return 3;
+  if (/^EIN Confirmation Letter/i.test(doc.title)) return 4;
+  if (isAgreement(doc)) return current && doc !== current ? 7 : 5;
+  if (doc.kind === "amendment") return 6;
+  return 8;
 }
 
 export function sortDocuments<T extends { kind: string; title: string; created_at: string }>(docs: T[]): T[] {

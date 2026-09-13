@@ -95509,6 +95509,11 @@ var env = {
   MAIL_FROM: process.env.MAIL_FROM ?? "MyFloridaSeriesLLC <onboarding@resend.dev>",
   ADMIN_NOTIFY_EMAIL: process.env.ADMIN_NOTIFY_EMAIL ?? "",
   ADMIN_PASSWORD: process.env.ADMIN_PASSWORD ?? "",
+  /** Who signs the Statement of Authorized Representative for FLORIDA
+   *  PROTECTED SERIES, LLC - PS 1 (Adam, 13 Sep 2026). Set both in Vercel
+   *  before go-live; dev prints placeholders so the build never guesses. */
+  AR_SIGNER_NAME: process.env.AR_SIGNER_NAME ?? "Signer name (set AR_SIGNER_NAME)",
+  AR_SIGNER_TITLE: process.env.AR_SIGNER_TITLE ?? "Title (set AR_SIGNER_TITLE)",
   /** Shared secret for the daily purge cron. Required in production. */
   CRON_SECRET: process.env.CRON_SECRET ?? "",
   // Dropbox app-folder credentials for the nightly client-file mirror.
@@ -109157,6 +109162,86 @@ function registerPaymentRoutes(app2) {
   });
 }
 
+// server/statement.ts
+import { readFileSync as readFileSync3 } from "node:fs";
+
+// server/templates-statement-of-authorized-representative.md
+var templates_statement_of_authorized_representative_default = `<!-- MASTER. Edit this file. The Word version is generated from it by
+     .claude/hooks/update-word-docs.sh and is overwritten on every change \u2014
+     never edit the .docx. See docs/README.md. -->
+
+# STATEMENT OF AUTHORIZED REPRESENTATIVE
+
+## [COMPANY NAME], LLC
+
+---
+
+The undersigned, on behalf of **FLORIDA PROTECTED SERIES, LLC - PS 1**, doing business as **MyFloridaSeriesLLC** (the "Filer"), states as follows with respect to **[COMPANY NAME], LLC**, a Florida limited liability company (the "Company"), Florida document number **[DOCUMENT NUMBER]**:
+
+**1. Capacity.** The Filer executed and filed the Company's Articles of Organization with the Florida Department of State, Division of Corporations, solely in the capacity of an **authorized representative** within the meaning of s. 605.0102(8)(a), Florida Statutes \u2014 a person authorized by a prospective member of the Company to form the Company by executing and filing its articles of organization with the Department.
+
+**2. Authorization.** The Filer was so authorized by a prospective member of the Company, who appointed the Filer for that purpose and who certified to the Filer that the information stated in the Articles of Organization was true, accurate, and complete.
+
+**3. No ownership or management interest.** The Filer is not, and has never been, a member, manager, owner, beneficial owner, officer, employee, or holder of any transferable interest in the Company. Signing and filing the Articles of Organization conferred no such interest and no management authority of any kind.
+
+**4. Authority exhausted on filing.** The Filer's authority was limited to executing and filing the Articles of Organization. That authority terminated upon the filing, and the Filer has no continuing right, power, or duty with respect to the Company arising from having done so.
+
+**5. Where authority resides.** All ownership of the Company, and all authority to manage its activities and affairs and to act for it, rest with its members, as provided in its operating agreement and in chapter 605, Florida Statutes.
+
+**6. Registered agent service.** If the Company has separately engaged the Filer or its affiliate as registered agent, that engagement is a distinct service governed by its own terms and by s. 605.0113, Florida Statutes, and nothing in this Statement affects it.
+
+**7. Purpose.** This Statement is furnished so that a financial institution, taxing authority, title company, or other person examining the Company's public formation record may understand why the name appearing on the Articles of Organization is not the name of a member of the Company.
+
+---
+
+**FLORIDA PROTECTED SERIES, LLC - PS 1**
+d/b/a MyFloridaSeriesLLC
+
+_____________________________
+By: [SIGNER NAME]
+Title: [SIGNER TITLE]
+Date: [DATE]
+
+---
+
+*Form document. Statutory citations: ss. 605.0102(8)(a), 605.0113, 605.0203(1)(b), 605.0205(3), Florida Statutes.*
+`;
+
+// server/statement.ts
+function loadTemplate3(v2) {
+  return v2.includes("STATEMENT OF AUTHORIZED REPRESENTATIVE") ? v2 : readFileSync3(v2, "utf8");
+}
+var statementTemplate = loadTemplate3(templates_statement_of_authorized_representative_default);
+function must4(haystack, needle, label) {
+  if (!haystack.includes(needle)) throw new Error(`Statement template marker missing: ${label}`);
+}
+function assembleStatement(inp) {
+  for (const [k, v2] of Object.entries(inp)) {
+    if (!String(v2 ?? "").trim()) throw new Error(`Statement: ${k} is required`);
+  }
+  let s = statementTemplate;
+  s = s.replace(/<!--[\s\S]*?-->\s*/g, "");
+  s = s.replace(/\n---\n\n\*Form document\.[^\n]*\*\s*$/, "\n");
+  must4(s, "[COMPANY NAME], LLC", "company name");
+  s = s.split("[COMPANY NAME], LLC").join(inp.companyName);
+  must4(s, "[DOCUMENT NUMBER]", "document number");
+  s = s.split("[DOCUMENT NUMBER]").join(inp.documentNumber);
+  must4(s, "_____________________________\nBy: [SIGNER NAME]", "signature block");
+  s = s.replace("_____________________________\nBy: [SIGNER NAME]", `/s/ ${inp.signerName}
+By: ${inp.signerName}`);
+  must4(s, "[SIGNER TITLE]", "signer title");
+  s = s.split("[SIGNER TITLE]").join(inp.signerTitle);
+  must4(s, "[DATE]", "date");
+  s = s.split("[DATE]").join(inp.date);
+  const leftover = s.match(/\[[A-Z][A-Z ()/.']*\]/g);
+  if (leftover) throw new Error(`Statement: unfilled slot(s): ${[...new Set(leftover)].join(", ")}`);
+  if (/Form document/.test(s)) throw new Error("Statement: draft colophon left in the document");
+  return { markdown: s.trimEnd() + "\n", title: `Statement of Authorized Representative \u2014 ${inp.companyName}` };
+}
+
+// server/routes-admin.ts
+init_pdf_render();
+
 // server/backup.ts
 import { gzipSync } from "node:zlib";
 var BACKUP_TABLES = [
@@ -110147,6 +110232,10 @@ function registerAdminRoutes(app2) {
         filingPath: payload?.filingPath === "CONVERT" ? "CONVERT" : "NEW",
         existingLlcName: payload?.existingLlcName ?? "",
         sunbizDocumentNumber: payload?.sunbizDocumentNumber ?? "",
+        /** The client appointed us to sign the Articles: the Statement of
+         *  Authorized Representative is owed, and the Articles upload needs the
+         *  Florida document number to name the company. */
+        articlesSignedByUs: appointedUs(payload),
         // Kept because this endpoint used to return the raw row: reshaping it
         // silently dropped square_order_id, the e2e webhook was posted with an
         // undefined order id, and three payment assertions failed. A response
@@ -110185,12 +110274,43 @@ function registerAdminRoutes(app2) {
       }
     });
   });
+  function appointedUs(payload) {
+    const p2 = typeof payload === "string" ? JSON.parse(payload) : payload;
+    return p2?.certifications?.articlesSignedBy === "SERVICE";
+  }
+  const DOC_NUMBER_NEEDED = "This client appointed us to sign. Enter the Florida document number so the Statement of Authorized Representative can name the company.";
+  async function issueStatement(db, o, documentNumber, put2 = putFile) {
+    const { markdown, title } = assembleStatement({
+      companyName: o.llc_name,
+      documentNumber: documentNumber.trim(),
+      signerName: env.AR_SIGNER_NAME,
+      signerTitle: env.AR_SIGNER_TITLE,
+      date: (/* @__PURE__ */ new Date()).toLocaleDateString("en-US", { timeZone: "America/New_York", year: "numeric", month: "long", day: "numeric" })
+    });
+    const pdf = await renderMarkdownPdf({ markdown, watermark: null, title });
+    const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength);
+    const stored = await put2(`${title.replace(/[^\w-]+/g, "_")}.pdf`, buf, "application/pdf");
+    const prior = await db.query(
+      "SELECT id, storage_key FROM documents WHERE order_id = $1 AND kind = 'statement'",
+      [o.id]
+    );
+    const row = await db.query(
+      `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
+     VALUES ($1, $2, 'statement', $3, $4, 'application/pdf', $5, $6) RETURNING id`,
+      [o.client_id, o.id, title, stored.storageKey, stored.sizeBytes, JSON.stringify({ documentNumber: documentNumber.trim() })]
+    );
+    for (const pr of prior) {
+      await db.query("DELETE FROM documents WHERE id = $1", [pr.id]);
+      await deleteFile(pr.storage_key).catch(() => void 0);
+    }
+    return { id: row[0].id, storageKey: stored.storageKey };
+  }
   app2.post("/admin/orders/:id/articles", async (c) => {
     const admin = await requireAdmin(c);
     if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
     const db = await getDb();
     const rows = await db.query(
-      "SELECT id, client_id, llc_name FROM orders WHERE id = $1",
+      "SELECT id, client_id, llc_name, payload FROM orders WHERE id = $1",
       [c.req.param("id")]
     );
     if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
@@ -110208,6 +110328,9 @@ function registerAdminRoutes(app2) {
     if (!(articles instanceof File)) {
       return c.json(err("The Articles of Organization PDF is required.", "INVALID_INPUT"), 400);
     }
+    const documentNumber = typeof form.documentNumber === "string" ? form.documentNumber.trim() : "";
+    const weSigned = appointedUs(o.payload);
+    if (weSigned && !documentNumber) return c.json(err(DOC_NUMBER_NEEDED, "DOCUMENT_NUMBER_REQUIRED"), 400);
     if (articles.size > MAX_UPLOAD_BYTES) return c.json(err("The file is too large (20 MB max).", "TOO_LARGE"), 400);
     if (!await looksLikePdf(articles)) {
       return c.json(err("This is not a readable PDF. Upload the filed Articles from Sunbiz.", "NOT_A_PDF"), 400);
@@ -110218,7 +110341,8 @@ function registerAdminRoutes(app2) {
      VALUES ($1, $2, 'articles', $3, $4, $5, $6, '{}'::jsonb)`,
       [o.client_id, o.id, `Articles of Organization \u2014 ${o.llc_name}`, stored.storageKey, articles.type || "application/pdf", stored.sizeBytes]
     );
-    return c.json({ data: { ok: true } });
+    if (weSigned) await issueStatement(db, o, documentNumber);
+    return c.json({ data: { ok: true, statement: weSigned } });
   });
   app2.post("/admin/orders/:id/certificates", async (c) => {
     const admin = await requireAdmin(c);
@@ -110295,6 +110419,11 @@ function registerAdminRoutes(app2) {
     const form = await c.req.parseBody({ all: true });
     const maybeArticles = form.articles;
     const articles = maybeArticles instanceof File ? maybeArticles : null;
+    const formedDocNumber = typeof form.documentNumber === "string" ? form.documentNumber.trim() : "";
+    const formedWeSigned = appointedUs(o.payload);
+    if (articles && formedWeSigned && !formedDocNumber) {
+      return c.json(err(DOC_NUMBER_NEEDED, "DOCUMENT_NUMBER_REQUIRED"), 400);
+    }
     const isConversion = (typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload)?.filingPath === "CONVERT";
     if (!articles && !isConversion) {
       const already = await db.query(
@@ -110404,6 +110533,11 @@ function registerAdminRoutes(app2) {
             ]
           );
           newRows.push(artRow[0].id);
+          if (formedWeSigned) {
+            const st = await issueStatement(db, o, formedDocNumber, stagedPut);
+            newRows.push(st.id);
+            newKeys.push(st.storageKey);
+          }
         }
         for (const cf of certFiles) {
           const storedCert = await stagedPut(cf.file.name, await cf.file.arrayBuffer(), cf.file.type || "application/pdf");

@@ -1757,6 +1757,92 @@ async function main(): Promise<void> {
     }
   }
 
+  // The Statement of Authorized Representative (Adam, 13 Sep 2026): run H
+  // appointed us to sign. The office types the document number beside the
+  // Articles upload; the Statement appears at once and sits under the
+  // Articles in the client's portal.
+  if (orderIds.has("H")) {
+    console.log("\n▶ Statement of Authorized Representative (run H, we sign)");
+    const page = await browser.newPage();
+    try {
+      const hOrderId = orderIds.get("H")!;
+      const filedRes = await fetch(`${API}/api/admin/orders/${hOrderId}/filed`, { method: "POST", headers: { Cookie: adminCookie } });
+      expect(filedRes.ok, "statement: run H is marked sent to the Division", filedRes.status);
+      await page.route("**/api/**", async (route) => {
+        const url = new URL(route.request().url());
+        const resp = await fetch(`${API}${url.pathname}${url.search}`, {
+          method: route.request().method(),
+          headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "" },
+          body: route.request().postDataBuffer() ?? undefined,
+        });
+        const body = await resp.text();
+        const setCookie = resp.headers.get("set-cookie");
+        await route.fulfill({ status: resp.status, contentType: resp.headers.get("content-type") ?? "application/json", body, headers: setCookie ? { "set-cookie": setCookie } : undefined });
+      });
+      await page.goto(`http://localhost:${WEB_PORT}/admin/login`);
+      await page.getByLabel("Password").fill("dev-admin");
+      await page.locator("main button").filter({ hasText: /^Sign in/ }).first().click();
+      await page.waitForURL(/\/admin(?!\/login)/, { timeout: 10000 });
+      await page.getByLabel("Search by LLC name, client name, or email").fill("Gate Run Hotel");
+      await page.waitForTimeout(1500);
+      const card = page.locator("main div.rounded-xl").filter({ hasText: /Gate Run Hotel/ }).first();
+      await card.locator("button").first().click();
+      await page.waitForTimeout(2000);
+      const drawer = page.locator("div.fixed.inset-0 div.max-w-2xl").first();
+      const numBox = drawer.locator("#articles-document-number");
+      expect((await numBox.count()) === 1 && /required: we signed these Articles/i.test(await drawer.innerText()), "statement: the card asks for the Florida document number and says it is required because we signed", (await drawer.innerText()).slice(0, 400));
+      const asFile = (tag: string) => ({ name: `${tag}.pdf`, mimeType: "application/pdf", buffer: Buffer.from(`%PDF-1.4 ${tag}\n%%EOF`) });
+      await drawer.locator("#upload-articles-first").setInputFiles(asFile("articles"));
+      await drawer.locator("button").filter({ hasText: /^Upload Articles/ }).first().click();
+      await page.waitForTimeout(1500);
+      const errText = await drawer.locator('[data-testid="articles-upload-error"]').innerText().catch(() => "");
+      expect(/This client appointed us to sign\. Enter the Florida document number so the Statement of Authorized Representative can name the company\./.test(errText), "statement: uploading without the number is refused with the reason", errText);
+      await shot(page, "admin-statement-number-missing");
+      await numBox.fill("L26000123456");
+      await drawer.locator("#upload-articles-first").setInputFiles(asFile("articles"));
+      await drawer.locator("button").filter({ hasText: /^Upload Articles/ }).first().click();
+      await page.waitForTimeout(3000);
+      const after = await drawer.innerText();
+      expect(/Articles of Organization — Gate Run Hotel/.test(after) && /Statement of Authorized Representative — Gate Run Hotel/.test(after), "statement: after the upload the card lists the Articles and the Statement", after.slice(0, 500));
+      await shot(page, "admin-statement-made");
+      await page.unroute("**/api/**");
+
+      // The client's portal: the Statement directly under the Articles.
+      const email = "gate@e2e.test";
+      const mint = await fetch(`${API}/api/dev/mint-reset-token`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) }).then((r) => r.json()) as { data?: { token?: string } };
+      if (!mint.data?.token) throw new Error("no reset token for run H's client");
+      await fetch(`${API}/api/auth/set-password`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: mint.data.token, password: "gate-pass-12345" }) });
+      await page.route("**/api/**", async (route) => {
+        const url = new URL(route.request().url());
+        const resp = await fetch(`${API}${url.pathname}${url.search}`, {
+          method: route.request().method(),
+          headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "" },
+          body: route.request().postDataBuffer() ?? undefined,
+        });
+        const body = await resp.text();
+        const setCookie = resp.headers.get("set-cookie");
+        await route.fulfill({ status: resp.status, contentType: resp.headers.get("content-type") ?? "application/json", body, headers: setCookie ? { "set-cookie": setCookie } : undefined });
+      });
+      await page.goto(`http://localhost:${WEB_PORT}/portal/login`);
+      await page.getByLabel("Email").fill(email);
+      await page.getByLabel("Password").fill("gate-pass-12345");
+      await page.locator("main button").filter({ hasText: /^Sign in/ }).first().click();
+      await page.waitForURL(/\/portal(?!\/login)/, { timeout: 10000 });
+      await page.goto(`http://localhost:${WEB_PORT}/portal?company=${hOrderId}`);
+      await page.waitForTimeout(1500);
+      const titles = (await page.locator('[data-testid="document-row"]').allInnerTexts()).map((r) => r.split("\n")[0].trim());
+      const artAt = titles.findIndex((r) => /^Articles of Organization — Gate Run Hotel/.test(r));
+      const stAt = titles.findIndex((r) => /^Statement of Authorized Representative — Gate Run Hotel/.test(r));
+      expect(artAt === 0 && stAt === 1, "statement: in the client's portal the Statement sits directly under the Articles", titles);
+      await shot(page, "portal-statement-under-articles");
+      console.log("  ✓ statement: number required, made on upload, listed under the Articles");
+    } catch (e) {
+      expect(false, `statement journey: ${String(e).slice(0, 300)}`);
+    } finally {
+      await page.close();
+    }
+  }
+
   // The order of "Your documents" on a portal that holds both certificates
   // (Adam, 9 Sep 2026: the certified copy sits just under the Articles).
   if (orderIds.has("G")) {

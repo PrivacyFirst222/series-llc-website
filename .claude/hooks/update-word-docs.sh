@@ -43,7 +43,7 @@ DOCS=(
   "webapp/server/templates-oa-member-single-s.md|SMMEMS - FPSLLC Operating Agreement - Member-Managed Single Member (S Corporation) - DRAFT.docx"
   "webapp/server/templates-oa-amendment.md|FPSLLC Amendment to Operating Agreement - FORM.docx"
   "docs/owners-manual.md|Series LLC Owners Manual - REVISED DRAFT.docx"
-  "docs/statement-of-authorized-representative.md|FPSLLC Statement of Authorized Representative - FORM.docx"
+  "webapp/server/templates-statement-of-authorized-representative.md|FPSLLC Statement of Authorized Representative - FORM.docx"
   "docs/oa-instructions.md|FPSLLC Operating Agreement Instructions - DRAFT.docx"
 )
 

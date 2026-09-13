@@ -23,7 +23,7 @@ That is why the masters live here.
 | `webapp/server/templates-oa-member-single-s.md` | SMMEMS - FPSLLC Operating Agreement - Member-Managed Single Member (S Corporation) - DRAFT.docx |
 | `webapp/server/templates-oa-amendment.md` | FPSLLC Amendment to Operating Agreement - FORM.docx |
 | `docs/owners-manual.md` | Series LLC Owners Manual - REVISED DRAFT.docx |
-| `docs/statement-of-authorized-representative.md` | FPSLLC Statement of Authorized Representative - FORM.docx |
+| `webapp/server/templates-statement-of-authorized-representative.md` | FPSLLC Statement of Authorized Representative - FORM.docx |
 | `docs/oa-instructions.md` | FPSLLC Operating Agreement Instructions - DRAFT.docx |
 
 The eight operating agreement masters and the amendment master are also what the
@@ -34,8 +34,12 @@ The Statement of Authorized Representative is furnished when a client appoints
 us to sign and file their Articles under s. 605.0102(8)(a), so a bank looking at
 the public record can see why the name on the Articles is not a member's. It has
 **no baseline in `source/`** — it is new, not a reconstruction — so the format
-check reports SKIP for it, which is correct. It is **not yet generated
-automatically** on fulfilment: today it is completed from this form by hand.
+check reports SKIP for it, which is correct. Since 13 September 2026 the server
+generates it from this master the moment the office uploads the filed Articles
+for such an order (`webapp/server/statement.ts`), naming the company by the
+Florida document number the office types beside the upload and signed "/s/" by
+the signer named in the `AR_SIGNER_NAME` and `AR_SIGNER_TITLE` settings. It lands
+in the client's documents directly under the Articles.
 
 ### How the Word files stay current
 
