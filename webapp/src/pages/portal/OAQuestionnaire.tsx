@@ -5,7 +5,7 @@ import { hasFirstAndLast } from "@/lib/personName";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Navigate, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, ArrowRight, Download, FilePen, FileText, History } from "lucide-react";
+import { ArrowLeft, ArrowRight, Download, FileText, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { api, ApiError } from "@/lib/api";
@@ -735,6 +735,22 @@ export default function OAQuestionnaire() {
                 The finished PDF appears in your portal documents, ready to download, print, and
                 sign. This is document assembly from your answers — not legal advice.
               </p>
+              {/* Adam, 12 Sep 2026: ordinary changes are made by regenerating;
+                  the amendment is for terms the questionnaire cannot change,
+                  and the warning is repeated here. */}
+              <p className="mt-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950" data-testid="amendment-pointer">
+                To add or remove members or managers, change ownership percentages, or change an
+                option you chose here, update your answers and regenerate. If there are any portions
+                of the operating agreement you want to change that the questionnaire cannot change,
+                use{" "}
+                <Link to={`/portal/amend${oaCq}`} className="font-medium underline underline-offset-2">
+                  the amendment feature
+                </Link>
+                . Any change to your agreement can have legal consequences you do not intend,
+                including for your protected series, your taxes, and the protection the agreement
+                gives. We strongly encourage you to have any amendment reviewed by an attorney
+                before it is signed.
+              </p>
             </div>
 
             {data.generations.length > 0 ? (
@@ -778,14 +794,6 @@ export default function OAQuestionnaire() {
                                 <Download className="mr-1.5 h-3.5 w-3.5" />
                                 Download
                               </a>
-                            </Button>
-                          ) : null}
-                          {isCurrent ? (
-                            <Button asChild variant="outline" size="sm" className="rounded-full">
-                              <Link to={`/portal/amend${oaCq}`}>
-                                <FilePen className="mr-1.5 h-3.5 w-3.5" />
-                                Amend this agreement
-                              </Link>
                             </Button>
                           ) : null}
                         </div>

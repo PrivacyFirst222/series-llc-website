@@ -1,7 +1,7 @@
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { Navigate, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { FileText, Mail, LogOut, Download, ShieldCheck, Clock, ScrollText, BookOpen, ArrowRight, Trash2, FileSignature } from "lucide-react";
+import { FileText, Mail, LogOut, Download, ShieldCheck, Clock, ScrollText, BookOpen, ArrowRight, Trash2, FileSignature, FilePen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { ServicesCard, type ServiceOrder } from "./ServicesCard";
@@ -204,6 +204,46 @@ function AgreementAndLibraryRow({ company }: { company: string | null }) {
           ) : null}
         </div>
       </div>
+
+      {/* The amendment is its own document with its own place, under the
+          agreement it amends (Adam, 12 Sep 2026: "Amend the operating
+          agreement should be a different document. Not just an amend your
+          operating agreement button."). Ordinary changes — members, managers,
+          percentages, chosen options — go to the questionnaire and come back
+          as an Amended and Restated agreement; the amendment is for terms the
+          questionnaire cannot change. */}
+      {!oaQuery.isError ? (
+        <div className="overflow-hidden rounded-2xl border border-border bg-card" data-testid="amendment-card">
+          <div className="flex items-center gap-2.5 border-b border-border bg-secondary/40 px-5 py-4">
+            <FilePen className="h-4 w-4 text-trust" />
+            <h2 className="font-display text-lg">Amendment to Operating Agreement</h2>
+          </div>
+          <div className="px-5 py-4">
+            <p className="text-sm text-muted-foreground">
+              To add or remove members or managers, change ownership percentages, or change an option
+              you chose in the questionnaire, update your answers and regenerate. The new agreement is
+              an Amended and Restated Operating Agreement and replaces the old one. Use an amendment
+              only to change a term of the operating agreement that the questionnaire cannot change.
+            </p>
+            <p className="mt-3 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950">
+              Any change to your agreement can have legal consequences you do not intend, including
+              for your protected series, your taxes, and the protection the agreement gives. We
+              strongly encourage you to have any amendment reviewed by an attorney before it is
+              signed.
+            </p>
+            {hasGeneration ? (
+              <Button asChild size="sm" className="mt-4 rounded-full">
+                <Link to={company ? `/portal/amend?company=${company}` : "/portal/amend"}>
+                  Create an amendment
+                  <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+                </Link>
+              </Button>
+            ) : (
+              <p className="mt-3 text-xs text-muted-foreground">Generate your operating agreement first.</p>
+            )}
+          </div>
+        </div>
+      ) : null}
 
       <div className="overflow-hidden rounded-2xl border border-border bg-card">
         <div className="flex items-center gap-2.5 border-b border-border bg-secondary/40 px-5 py-4">

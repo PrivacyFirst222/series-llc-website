@@ -1618,15 +1618,34 @@ async function main(): Promise<void> {
       await page.goto(`http://localhost:${WEB_PORT}/portal/agreement`);
       await page.waitForSelector("main h2, main h1");
       await page.waitForTimeout(800);
-      // The list of agreements is on the questionnaire's second screen.
+      // The list of agreements is on the questionnaire's second screen. It
+      // no longer carries an amend button: the amendment has its own card.
       await clickCard(page, /More than one owner/i);
       await page.locator("main button").filter({ hasText: /^Continue/ }).first().click();
       await page.waitForTimeout(1200);
-      const amendLinks = page.locator("main a").filter({ hasText: /^Amend this agreement$/ });
-      expect((await amendLinks.count()) === 1, "AMEND: the current agreement, and only it, offers Amend this agreement", await amendLinks.count());
-      await amendLinks.first().click();
+      expect((await page.locator("main a, main button").filter({ hasText: /Amend this agreement/ }).count()) === 0, "AMEND: the questionnaire's agreement list offers no amend button");
+      // The closing paragraph under Generate (Adam, 12 Sep 2026): ordinary
+      // changes regenerate; the amendment is for the rest; the warning repeats.
+      const pointer = await page.locator('[data-testid="amendment-pointer"]').innerText().catch(() => "");
+      expect(/To add or remove members or managers, change ownership percentages, or change an option you chose here, update your answers and regenerate\./.test(pointer) && /that the questionnaire cannot change, use the amendment feature\./.test(pointer) && /reviewed by an attorney before it is signed/.test(pointer), "AMEND: the questionnaire ends by sending ordinary changes to regenerate, the rest to the amendment feature, with the warning", pointer);
+      await page.locator('[data-testid="amendment-pointer"] a').first().click();
+      await page.waitForURL(/\/portal\/amend/, { timeout: 10000 });
+      expect(/\/portal\/amend/.test(page.url()), "AMEND: the questionnaire's link opens the amendment page", page.url());
+      // And from the portal: a card of its own, directly under the agreement's.
+      await page.goto(`http://localhost:${WEB_PORT}/portal`);
+      await page.waitForTimeout(1500);
+      const headings = await page.locator("main h2").allInnerTexts();
+      const oaH = headings.findIndex((h) => /^Operating agreement$/.test(h.trim()));
+      const amH = headings.findIndex((h) => /^Amendment to Operating Agreement$/.test(h.trim()));
+      expect(oaH >= 0 && amH === oaH + 1, "AMEND: the Amendment card sits directly under the Operating agreement card", headings);
+      const cardText = await page.locator('[data-testid="amendment-card"]').innerText().catch(() => "");
+      expect(/update your answers and regenerate\. The new agreement is an Amended and Restated Operating Agreement and replaces the old one\. Use an amendment only to change a term of the operating agreement that the questionnaire cannot change\./.test(cardText) && /reviewed by an attorney before it is signed/.test(cardText), "AMEND: the card says which changes regenerate and which amend, with the warning", cardText);
+      await shot(page, "portal-amendment-card");
+      await page.locator('[data-testid="amendment-card"] a').filter({ hasText: /^Create an amendment/ }).first().click();
       await page.waitForURL(/\/portal\/amend/, { timeout: 10000 });
       await page.waitForTimeout(800);
+      const guidance = await page.locator('[data-testid="amendment-guidance"]').innerText().catch(() => "");
+      expect(/update your answers and regenerate/.test(guidance) && /that the questionnaire cannot change/.test(guidance), "AMEND: the amendment page repeats the guidance and links back to the questionnaire", guidance);
       const notice = await page.locator('[data-testid="amendment-notice"]').innerText().catch(() => "");
       expect(/legal consequences you do not intend/.test(notice) && /reviewed by an attorney before it is signed/.test(notice), "AMEND: the page warns of unintended legal consequences and urges attorney review", notice);
       expect(/This amends your current agreement/.test(await page.locator("main").innerText()), "AMEND: the page names the agreement it amends");

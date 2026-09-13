@@ -124,6 +124,16 @@ export default function AmendAgreement() {
           </div>
         ) : (
           <div className="mt-6 space-y-5">
+            <div className="rounded-2xl border border-border bg-secondary/30 p-4 text-sm text-muted-foreground" data-testid="amendment-guidance">
+              To add or remove members or managers, change ownership percentages, or change an option
+              you chose in the questionnaire,{" "}
+              <Link to={`/portal/agreement${cq}`} className="font-medium text-foreground underline underline-offset-2">
+                update your answers and regenerate
+              </Link>
+              . The new agreement is an Amended and Restated Operating Agreement and replaces the
+              old one. Use an amendment only to change a term of the operating agreement that the
+              questionnaire cannot change.
+            </div>
             <div className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950" data-testid="amendment-notice">
               Any change to your agreement can have legal consequences you do not intend, including
               for your protected series, your taxes, and the protection the agreement gives. We
