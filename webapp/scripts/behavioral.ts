@@ -580,6 +580,12 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
     expect((run.ra === "SERVICE") === /Change of Registered Agent/.test(estimateText), `${run.key}: a conversion shows the $25 agent change exactly when it takes our agent`, estimateText.slice(0, 300));
   }
 
+  // The Review step reports nothing about the step after it (Adam, 13 Sep
+  // 2026): no "Signing the Articles" or "Authorization" card.
+  {
+    const review = await page.locator("main").innerText();
+    expect(!/Signing the Articles|name not yet entered|Not yet certified|^\s*Authorization\s*$/m.test(review), `${run.key}: the Review step has no card for the Certify & sign step still ahead`, review.match(/Signing the Articles|name not yet entered|Not yet certified/g));
+  }
   // Review → certify.
   await advance(page, "Continue");
 

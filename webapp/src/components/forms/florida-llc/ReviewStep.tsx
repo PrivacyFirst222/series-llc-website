@@ -291,39 +291,9 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
           />
         </ReviewCard>
 
-        {data.filingPath === "CONVERT" ? (
-          <ReviewCard title="Authorization" onEdit={() => goToStep("certify")}>
-            <Row
-              label="Certified"
-              value={
-                data.conversionAuthorityAcknowledgment
-                  ? `You are authorized to act for ${data.existingLlcName ?? "the company"} and authorize the Designation filings`
-                  : "Not yet certified"
-              }
-            />
-          </ReviewCard>
-        ) : (
-        <ReviewCard title="Signing the Articles" onEdit={() => goToStep("certify")}>
-          <Row
-            label="Signed by"
-            value={
-              data.articlesSignerChoice === "SERVICE"
-                ? "MyFloridaSeriesLLC, as your appointed authorized representative"
-                : data.authorizedRepresentativeName || "You (name not yet entered)"
-            }
-          />
-          {data.articlesSignerChoice === "SERVICE" ? (
-            <Row
-              label="Appointment"
-              value={
-                data.articlesSignerAppointment
-                  ? "Appointed — your name stays off the filed Articles"
-                  : "Not yet appointed"
-              }
-            />
-          ) : null}
-        </ReviewCard>
-        )}
+        {/* No card for the Certify & sign step: it comes AFTER Review, so it
+            could only ever read "not yet entered" (Adam, 13 Sep 2026: "Remove
+            this. This is not reviewable"). */}
       </div>
 
       <ServiceFeeEstimate
