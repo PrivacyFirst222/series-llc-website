@@ -55,9 +55,12 @@ export default function AmendAgreement() {
   const data = oaQuery.data;
 
   const amend = useMutation({
-    mutationFn: () =>
+    // The request carries what the box SHOWS — prefilled or typed. Sending the
+    // typed state alone left the prefilled date behind, and the server refused
+    // the request as malformed (Adam, 13 Sep 2026: "Invalid amendment.").
+    mutationFn: (payload: { agreementDate: string }) =>
       api.post<{ documentId: string; title: string; number: number }>(`/api/portal/oa/amend${cq}`, {
-        agreementDate,
+        agreementDate: payload.agreementDate,
         effectiveDate,
         mode,
         text: mode === "typed" ? text : undefined,
@@ -227,7 +230,7 @@ export default function AmendAgreement() {
               </p>
             ) : null}
 
-            <Button className="w-full rounded-full" size="lg" disabled={!canCreate} onClick={() => amend.mutate()}>
+            <Button className="w-full rounded-full" size="lg" disabled={!canCreate} onClick={() => amend.mutate({ agreementDate: agreementDateValue })}>
               <FilePen className="mr-2 h-4 w-4" />
               {amend.isPending ? "Creating…" : "Create amendment"}
             </Button>

@@ -1664,15 +1664,19 @@ async function main(): Promise<void> {
       await page.locator('main textarea[aria-label="Changes to the agreement"]').fill("x");
       await page.waitForTimeout(200);
       expect(await createBtn.isDisabled(), "AMEND: Create waits while the agreement's date is blank");
-      await dateBox.fill(prefilled);
-      await page.locator('main textarea[aria-label="Changes to the agreement"]').fill("");
-      await page.waitForTimeout(200);
+      // Leave the prefilled date UNTOUCHED from here on: reload the page so
+      // the box holds the prefill and nothing typed (13 Sep 2026: the request
+      // sent the typed state, and an untouched prefill was refused as invalid).
+      await page.reload();
+      await page.waitForSelector('main input[aria-label="Effective date of the operating agreement"]');
+      await page.waitForTimeout(800);
+      expect((await dateBox.inputValue()) === prefilled, "AMEND: after a reload the agreement's date is prefilled again and left untouched", await dateBox.inputValue());
       await page.locator('main textarea[aria-label="Changes to the agreement"]').fill("Section 4.2 is amended to read: \"Each Member votes in proportion to the Member's Percentage Interest.\"\nSection 9.4 is deleted.");
       await page.waitForTimeout(200);
       expect(!(await createBtn.isDisabled()), "AMEND: Create enables once changes are typed");
       await createBtn.click();
       for (let i = 0; i < 40 && !amendCaptured; i++) await page.waitForTimeout(500);
-      expect(!!amendCaptured, "AMEND: the amendment generates");
+      expect(!!amendCaptured, "AMEND: the amendment generates with the prefilled date left untouched", await page.locator("main [role=alert]").innerText().catch(() => ""));
       await page.waitForURL(/\/portal(\?|$)/, { timeout: 10000 }).catch(() => {});
       await page.waitForTimeout(1200);
       expect(/\/portal(\?|$)/.test(page.url()), "AMEND: creating returns the client to the portal", page.url());
