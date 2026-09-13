@@ -1395,7 +1395,6 @@ app.post("/portal/oa/generate", async (c) => {
         name: client?.name || members[0].name,
         email: client?.email ?? "",
         note: OA_TEMPLATE_VERSION,
-        generatedAt: stampEastern(generatedOn),
       },
       title,
     });
@@ -1499,7 +1498,6 @@ app.post("/portal/series/consent", async (c) => {
         name: clients[0]?.name || seed.members[0]?.name || "",
         email: clients[0]?.email ?? "",
         note: OA_TEMPLATE_VERSION,
-        generatedAt: stampEastern(generatedOn),
       },
       title,
     });
@@ -1613,7 +1611,6 @@ app.post("/portal/oa/amend", async (c) => {
         name: client?.name || oa.members[0]?.name || "",
         email: client?.email ?? "",
         note: OA_TEMPLATE_VERSION,
-        generatedAt: stampEastern(generatedOn),
       },
       title,
     });

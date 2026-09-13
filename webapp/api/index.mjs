@@ -47508,13 +47508,9 @@ function stampFooters(doc, font, wm) {
   const pages = doc.getPages();
   const total = pages.length;
   const text = sanitize(`Copyright FLORIDA PROTECTED SERIES, LLC - PS 1${wm.note ? ", " + wm.note.replace(/\s+\u2014\s+/g, ", ") : ""}`);
-  const stamp = wm.generatedAt ? sanitize(`Generated ${wm.generatedAt}`) : "";
   const grey = rgb(0.55, 0.57, 0.6);
   pages.forEach((p2, i) => {
     const { width } = p2.getSize();
-    if (stamp) {
-      p2.drawText(stamp, { x: MARGIN, y: FOOTER_Y + 10, size: 7.5, font, color: grey });
-    }
     p2.drawText(text, { x: MARGIN, y: FOOTER_Y, size: 7.5, font, color: grey });
     const pn = `Page ${i + 1} of ${total}`;
     const w = drawnWidth(font, pn, 7.5);
@@ -107586,8 +107582,7 @@ function registerPortalRoutes(app2) {
         watermark: {
           name: client?.name || members[0].name,
           email: client?.email ?? "",
-          note: OA_TEMPLATE_VERSION,
-          generatedAt: stampEastern(generatedOn)
+          note: OA_TEMPLATE_VERSION
         },
         title
       });
@@ -107673,8 +107668,7 @@ function registerPortalRoutes(app2) {
         watermark: {
           name: clients[0]?.name || seed.members[0]?.name || "",
           email: clients[0]?.email ?? "",
-          note: OA_TEMPLATE_VERSION,
-          generatedAt: stampEastern(generatedOn)
+          note: OA_TEMPLATE_VERSION
         },
         title
       });
@@ -107774,8 +107768,7 @@ function registerPortalRoutes(app2) {
         watermark: {
           name: client?.name || oa.members[0]?.name || "",
           email: client?.email ?? "",
-          note: OA_TEMPLATE_VERSION,
-          generatedAt: stampEastern(generatedOn)
+          note: OA_TEMPLATE_VERSION
         },
         title
       });

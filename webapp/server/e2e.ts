@@ -1353,6 +1353,9 @@ if (mint.status === 200) {
       check("read off the PDF: the recital cites s. 12.1 and the Member", /Section 12\.1 of the Agreement provides that the Agreement may be amended only by a written instrument signed by the Member\./.test(flat), flat.match(/Section 12\.1[^.]*\./)?.[0]);
       check("read off the PDF: the typed changes are printed", /Section 3\.2 is amended to read: "The Company may designate up to four Protected Series\."/.test(flat) && /Section 9\.4 is deleted\./.test(flat), flat.match(/Section (3\.2|9\.4)[^.]*\./g));
       check("read off the PDF: the effect clause", /Except as amended by this Amendment, the Agreement remains in full force and effect\./.test(flat));
+      check("read off the PDF: no generation timestamp in the footer (Adam, 13 Sep 2026)", !/Generated [A-Z][a-z]+ \d{1,2}, \d{4}/.test(flat) && /Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026/.test(flat) && /Page 1 of/.test(flat), flat.match(/Generated[^\n]{0,40}|Copyright[^\n]{0,60}/g));
+      const oaText = pdfText(oaBytes);
+      check("read off the agreement PDF: no generation timestamp in its footer either", oaText !== null && !/Generated [A-Z][a-z]+ \d{1,2}, \d{4}/.test(oaText) && /Copyright FLORIDA PROTECTED SERIES, LLC - PS 1/.test(oaText), oaText?.match(/Generated[^\n]{0,40}/g));
       check("read off the PDF: the Member signs, and nobody else", owner !== "" && new RegExp(`MEMBER: ${owner.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")} Date:`).test(flat) && !/ACKNOWLEDGED/.test(flat) && !/MEMBERS:/.test(flat), { owner, tail: flat.slice(-400) });
       check("read off the PDF: the effective date typed is the one printed", /effective as of September 12, 2026, by the undersigned sole member/.test(flat), flat.match(/effective as of [^,]*, by[^.]*/)?.[0]);
     }

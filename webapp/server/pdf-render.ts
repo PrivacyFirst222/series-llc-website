@@ -20,9 +20,6 @@ export interface WatermarkInfo {
   name: string;
   email: string;
   note?: string;
-  /** "August 9, 2026 at 4:12 PM ET" — printed on every page, so a paper copy
-   *  identifies which generation it is without the portal. */
-  generatedAt?: string;
 }
 
 export interface Seg {
@@ -517,15 +514,12 @@ function stampFooters(doc: PDFDocument, font: PDFFont, wm: WatermarkInfo): void 
   const pages = doc.getPages();
   const total = pages.length;
   const text = sanitize(`Copyright FLORIDA PROTECTED SERIES, LLC - PS 1${wm.note ? ", " + wm.note.replace(/\s+\u2014\s+/g, ", ") : ""}`);
-  const stamp = wm.generatedAt ? sanitize(`Generated ${wm.generatedAt}`) : "";
+  // No "Generated …" stamp (Adam, 13 Sep 2026: "Don't put the date it was
+  // generated"): the portal row carries the time, and the number in the
+  // title tells one generation from another.
   const grey = rgb(0.55, 0.57, 0.6);
   pages.forEach((p, i) => {
     const { width } = p.getSize();
-    // The generated stamp sits on its own line above the license line so it
-    // can never collide with the page number on the right.
-    if (stamp) {
-      p.drawText(stamp, { x: MARGIN, y: FOOTER_Y + 10, size: 7.5, font, color: grey });
-    }
     p.drawText(text, { x: MARGIN, y: FOOTER_Y, size: 7.5, font, color: grey });
     const pn = `Page ${i + 1} of ${total}`;
     const w = drawnWidth(font, pn, 7.5);

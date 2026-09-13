@@ -1702,6 +1702,7 @@ async function main(): Promise<void> {
           expect(/Section 4\.2 is amended to read:/.test(flat) && /Section 9\.4 is deleted\./.test(flat), "AMEND: read off the PDF — the changes typed on screen", flat.match(/Section (4\.2|9\.4)[^.]*\./g));
           expect(/MEMBERS:/.test(flat) && /Casey Gatecheck Date:/.test(flat) && /Blair Gatecheck Date:/.test(flat) && /Drew Solo Date:/.test(flat), "AMEND: read off the PDF — all three owners sign", flat.slice(-500));
           expect(!/ACKNOWLEDGED/.test(flat), "AMEND: read off the PDF — no manager block on a member-managed company");
+          expect(!/Generated [A-Z][a-z]+ \d{1,2}, \d{4}/.test(flat) && /Page 1 of/.test(flat), "AMEND: read off the PDF — no generation timestamp in the footer", flat.match(/Generated[^\n]{0,40}/g));
         } else {
           console.log("   (pdftotext not installed — the amendment's words are checked by the unit tests and the server checks, not read off this PDF)");
         }
