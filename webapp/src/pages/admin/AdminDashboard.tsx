@@ -179,21 +179,28 @@ function ViewPortalButton({ client }: { client: AdminClient }) {
   const view = useMutation({
     mutationFn: () => api.post<{ ok: boolean }>(`/api/admin/clients/${client.id}/view-as`, {}),
   });
+  const [failure, setFailure] = useState<string>("");
   const open = async () => {
     const tab = window.open("about:blank", "_blank");
+    setFailure("");
     try {
       await view.mutateAsync();
       if (tab) tab.location.href = "/portal";
       else window.location.assign("/portal");
-    } catch {
+    } catch (e) {
+      // Say why the portal did not open (14 Sep 2026: it failed silently).
       tab?.close();
+      setFailure(e instanceof Error && e.message ? e.message : "The portal could not be opened. Try again.");
     }
   };
   return (
-    <Button type="button" variant="outline" size="sm" className="rounded-full" onClick={open} disabled={view.isPending} data-testid="view-portal">
-      <Eye className="mr-1.5 h-3.5 w-3.5" />
-      {view.isPending ? "Opening…" : "View portal"}
-    </Button>
+    <>
+      <Button type="button" variant="outline" size="sm" className="rounded-full" onClick={open} disabled={view.isPending} data-testid="view-portal">
+        <Eye className="mr-1.5 h-3.5 w-3.5" />
+        {view.isPending ? "Opening…" : "View portal"}
+      </Button>
+      {failure ? <span className="ml-2 text-xs text-destructive">{failure}</span> : null}
+    </>
   );
 }
 

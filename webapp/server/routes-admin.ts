@@ -224,7 +224,7 @@ app.get("/admin/orders", async (c) => {
 /** Sent to the Division. The only transition on the board a person performs —
  *  nothing in this system can observe a filing on sunbiz. */
 /** The board's own words for a status, for messages the office reads. */
-const BOARD_LABEL: Record<string, string> = { pending_payment: "Pending payment", paid: "New Orders", filed: "With The State", formed: "Formed" };
+const BOARD_LABEL: Record<string, string> = { pending_payment: "Pending payment", paid: "New Orders", filed: "With The State", formed: "Complete" };
 const isConversionPayload = (payload: unknown): boolean =>
   ((typeof payload === "string" ? JSON.parse(payload) : payload) as { filingPath?: string } | null)?.filingPath === "CONVERT";
 
@@ -427,11 +427,12 @@ app.get("/admin/orders/:id", async (c) => {
  *  show a completed order whose client has an empty portal. One PSD document may
  *  cover several series — Florida allows it — so coverage is declared per file
  *  and checked against the order's own series list. Miss one and this refuses. */
-// The filed Articles, uploaded at the New-Orders stage BEFORE marking sent
-// (Adam's sequence, 30 Aug 2026): the PDF is stored against the order, the
-// status does not move, and the client is not emailed — they hear once, at
-// formed. A wrong file is replaced later by the formed-step package upload,
-// which retires priors.
+// The filed Articles come back from the Division while the order is With The
+// State, and go up here (Adam's sequence, 30 Aug 2026; the card offers the
+// upload at that stage only, 14 Sep 2026): the PDF is stored against the
+// order, the status does not move, and the client is not emailed — they hear
+// once, at formed. A wrong file is replaced later by the formed-step package
+// upload, which retires priors.
 /** Statement of Authorized Representative (Adam, 13 Sep 2026): made the
  *  moment the filed Articles go up, for an order whose client appointed us to
  *  sign them, and stored under the company beside the Articles. A later
@@ -477,8 +478,8 @@ app.post("/admin/orders/:id/articles", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const db = await getDb();
-  const rows = await db.query<{ id: string; client_id: string | null; llc_name: string; payload: unknown }>(
-    "SELECT id, client_id, llc_name, payload FROM orders WHERE id = $1", [c.req.param("id")]);
+  const rows = await db.query<{ id: string; client_id: string | null; llc_name: string; payload: unknown; status: string }>(
+    "SELECT id, client_id, llc_name, payload, status FROM orders WHERE id = $1", [c.req.param("id")]);
   if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
   const o = rows[0];
   if (!o.client_id) return c.json(err("This order has no client account yet.", "NO_CLIENT"), 400);
@@ -486,6 +487,10 @@ app.post("/admin/orders/:id/articles", async (c) => {
   // it (14 Sep 2026), so no Statement can be issued for a company we never formed.
   if (isConversionPayload(o.payload)) {
     return c.json(err("A conversion has no Articles of Organization: the company already exists.", "BAD_STATE"), 400);
+  }
+  // The card offers the upload only while the order is With The State.
+  if (o.status !== "filed") {
+    return c.json(err(`The filed Articles are uploaded while the order is With The State; this one is in ${BOARD_LABEL[o.status] ?? o.status}.`, "BAD_STATE"), 400);
   }
   const existing = await db.query<{ id: string }>(
     "SELECT id FROM documents WHERE order_id = $1 AND kind = 'articles'", [o.id]);
@@ -500,6 +505,10 @@ app.post("/admin/orders/:id/articles", async (c) => {
   const documentNumber = typeof form.documentNumber === "string" ? form.documentNumber.trim() : "";
   const weSigned = appointedUs(o.payload);
   if (weSigned && !documentNumber) return c.json(err(DOC_NUMBER_NEEDED, "DOCUMENT_NUMBER_REQUIRED"), 400);
+  // Sunbiz's own numbers are the letter L and eleven digits, and its search
+  // page warns: "use the number zero for all document numbers. The letter o
+  // is not acceptable." (14 Sep 2026)
+  if (weSigned && !/^L\d{11}$/.test(documentNumber)) return c.json(err("A Florida LLC document number is the letter L followed by eleven digits, like L26000123456. Use the digit zero, not the letter o.", "DOCUMENT_NUMBER_SHAPE"), 400);
   if (articles.size > MAX_UPLOAD_BYTES) return c.json(err("The file is too large (20 MB max).", "TOO_LARGE"), 400);
   if (!(await looksLikePdf(articles))) {
     return c.json(err("This is not a readable PDF. Upload the filed Articles from Sunbiz.", "NOT_A_PDF"), 400);
@@ -609,8 +618,8 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
   const isConversion =
     ((typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload) as { filingPath?: string } | null)?.filingPath === "CONVERT";
   if (!articles && !isConversion) {
-    // The staged flow uploads the Articles at the New-Orders step; here only
-    // the designations arrive. Without either, nothing can be formed.
+    // The Articles went up at the With-The-State step; here only the
+    // designations arrive. Without the Articles on file, nothing can be formed.
     const already = await db.query<{ id: string }>(
       "SELECT id FROM documents WHERE order_id = $1 AND kind = 'articles'", [o.id]);
     if (already.length === 0) {
@@ -1292,10 +1301,13 @@ app.post("/admin/services/:id/fulfill", async (c) => {
     // A designation delivered through a series order is a designation: stored
     // as one, covering its series, so the card counts it (14 Sep 2026).
     const isDesignation = so.type === "series" && !!details.seriesName;
+    // A certificate bought from the portal is stored under its own kind, so
+    // it sorts under the Articles like one delivered at formation (14 Sep 2026).
+    const storedKind = so.type === "certificate-of-status" || so.type === "certified-copy" ? so.type : isDesignation ? "psd" : "package";
     const doc = await db.query<{ id: string }>(
       `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
        VALUES ($1, $6, $7, $2, $3, $4, $5, $8) RETURNING id`,
-      [so.client_id, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes, so.formation_order_id, isDesignation ? "psd" : "package", JSON.stringify(isDesignation ? { seriesNames: [details.seriesName] } : {})],
+      [so.client_id, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes, so.formation_order_id, storedKind, JSON.stringify(isDesignation ? { seriesNames: [details.seriesName] } : {})],
     );
     documentId = doc[0].id;
   }

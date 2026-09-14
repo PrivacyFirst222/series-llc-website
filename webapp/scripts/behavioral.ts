@@ -1969,6 +1969,24 @@ async function main(): Promise<void> {
       await page.waitForTimeout(1500);
       const sent = await drawer.locator('[data-testid="sent-to-division"]').innerText().catch(() => "");
       expect(/^Sent to the Division on \d{1,2}\/\d{1,2}\/\d{4}$/.test(sent.trim()) && (await drawer.locator("button").filter({ hasText: /^Mark sent to the Division/ }).count()) === 0, "sent: after Mark sent, the card reads 'Sent to the Division on [date]' and the button is gone", sent);
+      {
+        // A rejection leaves its date on the card, and the card refreshes at
+        // once (14 Sep 2026); then it is sent again for the steps below.
+        await drawer.locator("button").filter({ hasText: /^Division rejected the filing/ }).first().click();
+        await page.waitForTimeout(400);
+        await drawer.locator("button").filter({ hasText: /^Back to New Orders/ }).first().click();
+        await page.waitForTimeout(1500);
+        const note = await drawer.locator('[data-testid="rejected-note"]').innerText().catch(() => "");
+        expect(/^Division rejected the filing on \d{1,2}\/\d{1,2}\/\d{4}; back in New Orders\.$/.test(note.trim()), "rejection: the card says the Division rejected the filing and when", note);
+        // Pressing the series button now is refused, and the card says why.
+        await drawer.locator("button").filter({ hasText: /^All series designations filed/ }).first().click().catch(() => {});
+        await page.waitForTimeout(800);
+        const why = await drawer.locator('[data-testid="action-error"]').innerText().catch(() => "");
+        expect(/Series designations are marked filed while the order is With The State; this one is in New Orders\./.test(why) || (await drawer.locator("button").filter({ hasText: /^All series designations filed/ }).count()) === 0, "refusal: a refused button press shows the server's reason on the card", why);
+        await drawer.locator("button").filter({ hasText: /^Mark sent to the Division/ }).first().click();
+        await page.waitForTimeout(1500);
+        expect((await drawer.locator('[data-testid="rejected-note"]').count()) === 0, "rejection: once sent again, the rejection note is gone");
+      }
       const numBox = drawer.locator("#articles-document-number");
       expect((await numBox.count()) === 1 && /required: we signed these Articles/i.test(await drawer.innerText()), "statement: the card asks for the Florida document number and says it is required because we signed", (await drawer.innerText()).slice(0, 400));
       const asFile = (tag: string) => ({ name: `${tag}.pdf`, mimeType: "application/pdf", buffer: Buffer.from(`%PDF-1.4 ${tag}\n%%EOF`) });
@@ -1977,6 +1995,12 @@ async function main(): Promise<void> {
       await page.waitForTimeout(1500);
       const errText = await drawer.locator('[data-testid="articles-upload-error"]').innerText().catch(() => "");
       expect(/This client appointed us to sign\. Enter the Florida document number so the Statement of Authorized Representative can name the company\./.test(errText), "statement: uploading without the number is refused with the reason", errText);
+      await numBox.fill("L26OOO123456");
+      await drawer.locator("#upload-articles-first").setInputFiles(asFile("articles"));
+      await drawer.locator("button").filter({ hasText: /^Upload Articles/ }).first().click();
+      await page.waitForTimeout(800);
+      const shapeText = await drawer.locator('[data-testid="articles-upload-error"]').innerText().catch(() => "");
+      expect(/letter L followed by eleven digits/.test(shapeText) && /digit zero, not the letter o/.test(shapeText), "statement: a number with the letter o is refused on the card, naming the shape (14 Sep 2026)", shapeText);
       await shot(page, "admin-statement-number-missing");
       await numBox.fill("L26000123456");
       await drawer.locator("#upload-articles-first").setInputFiles(asFile("articles"));
@@ -2170,6 +2194,18 @@ async function main(): Promise<void> {
         expect((await drawer.locator('[data-testid="designations-instruction"]').count()) === 0 && !/Upload the Protected Series Designations|File the Designations online/.test(await drawer.innerText()), "formed order: no instruction to upload the Designations once they are on file");
         await shot(page, "admin-formed-certificates-owed");
         const asFile = (tag: string) => ({ name: `${tag}.pdf`, mimeType: "application/pdf", buffer: Buffer.from(`%PDF-1.4 ${tag}\n%%EOF`) });
+        {
+          // A file that is not a PDF: the refusal is shown under the slots on
+          // a formed order (14 Sep 2026: nothing was said).
+          await drawer.locator("#upload-cert-status").setInputFiles({ name: "scan.pdf", mimeType: "application/pdf", buffer: Buffer.from("not a pdf at all") });
+          await page.waitForTimeout(300);
+          await drawer.locator('[data-testid="upload-certificates"]').click();
+          await page.waitForTimeout(1500);
+          const refused = await drawer.locator('[data-testid="certificate-upload-error"]').innerText().catch(() => "");
+          expect(/not a readable PDF/i.test(refused), "certificates: a refused upload on a formed order says why", refused);
+          const formedLine = await drawer.locator('[data-testid="formed-line"]').innerText().catch(() => "");
+          expect(/^Formed on \d{1,2}\/\d{1,2}\/\d{4}\./.test(formedLine.trim()) && !/has been emailed/.test(formedLine), "formed: the line claims no email this session did not send", formedLine);
+        }
         await drawer.locator("#upload-cert-status").setInputFiles(asFile("certstatus"));
         await drawer.locator("#upload-certified-copy").setInputFiles(asFile("certcopy"));
         await page.waitForTimeout(300);
@@ -2178,6 +2214,7 @@ async function main(): Promise<void> {
         const afterText = await drawer.innerText();
         expect(!/Still owed/.test(afterText) && (await drawer.locator("#upload-cert-status").count()) === 0, "certificates: once uploaded, nothing is owed and the slots are gone", afterText.slice(0, 300));
         expect(/Certificate of Status/.test(afterText) && /Certified Copy/.test(afterText), "certificates: both are listed among the order's documents", afterText.slice(0, 300));
+        expect((afterText.match(/uploaded \d{1,2}\/\d{1,2}\/\d{4}/g) ?? []).length >= 2, "documents: each listed document shows the day it went up (14 Sep 2026)", afterText.match(/uploaded [^\n]{0,20}/g));
         await page.unroute("**/api/**");
       }
       const email = "gate@e2e.test";

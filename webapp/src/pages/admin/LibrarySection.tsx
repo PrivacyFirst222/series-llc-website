@@ -99,7 +99,7 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
     enabled,
   });
   const runMirror = useMutation({
-    mutationFn: () => api.post<{ mirrored: number; failed: number }>("/api/admin/file-mirror/run", {}),
+    mutationFn: () => api.post<{ mirrored: number; failed: number; skipped: boolean }>("/api/admin/file-mirror/run", {}),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-file-mirror"] }),
   });
   const mirror = mirrorQuery.data;
@@ -204,7 +204,7 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
           ))}
         </div>
         {runBackup.isSuccess ? (
-          <p className="mt-2 text-xs text-trust">Backed up at {new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}.</p>
+          <p className="mt-2 text-xs text-trust" data-testid="backup-result">Backed up: {runBackup.data.key} ({Math.max(1, Math.round(runBackup.data.sizeBytes / 1024))} KB).</p>
         ) : null}
         {runBackup.isError ? (
           <p className="mt-2 text-xs text-destructive">{(runBackup.error as Error).message}</p>
@@ -230,7 +230,14 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
               {runMirror.isPending ? "Mirroring…" : "Mirror now"}
             </Button>
             {runMirror.isSuccess ? (
-              <span className="text-xs text-trust">Mirrored at {new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}.</span>
+              <span className={runMirror.data.skipped || runMirror.data.failed > 0 ? "text-xs text-amber-700" : "text-xs text-trust"} data-testid="mirror-result">
+                {runMirror.data.skipped
+                  ? "Mirror skipped: Dropbox is not connected."
+                  : `Mirrored ${runMirror.data.mirrored} file${runMirror.data.mirrored === 1 ? "" : "s"}, ${runMirror.data.failed} failed.`}
+              </span>
+            ) : null}
+            {runMirror.isError ? (
+              <span className="text-xs text-destructive" data-testid="mirror-result">{(runMirror.error as Error).message}</span>
             ) : null}
           </div>
           <p className="mt-1.5 text-xs text-muted-foreground">

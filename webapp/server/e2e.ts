@@ -489,6 +489,10 @@ check("service-RA order accepted with canonical details enforced", svc.status ==
     const noNumRes = await fetch(`${BASE}/api/admin/orders/${apId}/articles`, { method: "POST", headers: { Cookie: adm.cookie }, body: noNum });
     const noNumBody = await noNumRes.json().catch(() => null) as { error?: { code?: string; message?: string } } | null;
     check("statement: Articles for an appointed order are refused without the document number", noNumRes.status === 400 && noNumBody?.error?.code === "DOCUMENT_NUMBER_REQUIRED" && /Enter the Florida document number so the Statement of Authorized Representative can name the company/.test(noNumBody?.error?.message ?? ""), noNumBody);
+    const badNum = new FormData(); badNum.set("articles", pdfFile()); badNum.set("documentNumber", "L26OOO123456");
+    const badNumRes = await fetch(`${BASE}/api/admin/orders/${apId}/articles`, { method: "POST", headers: { Cookie: adm.cookie }, body: badNum });
+    const badNumBody = await badNumRes.json().catch(() => null) as { error?: { code?: string; message?: string } } | null;
+    check("statement: a document number with letters o instead of zeros is refused, naming the shape (14 Sep 2026)", badNumRes.status === 400 && badNumBody?.error?.code === "DOCUMENT_NUMBER_SHAPE" && /letter L followed by eleven digits/.test(badNumBody?.error?.message ?? "") && /digit zero, not the letter o/.test(badNumBody?.error?.message ?? ""), badNumBody);
     const withNum = new FormData(); withNum.set("articles", pdfFile()); withNum.set("documentNumber", "L26000123456");
     const withNumRes = await fetch(`${BASE}/api/admin/orders/${apId}/articles`, { method: "POST", headers: { Cookie: adm.cookie }, body: withNum });
     const withNumBody = await withNumRes.json().catch(() => null) as { data?: { statement?: boolean } } | null;
@@ -598,6 +602,15 @@ if (sim.status === 404) {
 check("payment fulfillment runs", sim.status === 200, sim.body);
 const post = await api(`/api/orders/${orderId}/status`);
 check("status flips to paid", post.body?.data?.status === "paid");
+{
+  // The Articles upload belongs to the With-The-State stage; a New Orders
+  // card does not offer it and the route refuses it (14 Sep 2026).
+  const admA = await adminSession();
+  const early = new FormData(); early.set("articles", new File([new TextEncoder().encode("%PDF-1.4 early\n%%EOF")], "early.pdf", { type: "application/pdf" }));
+  const earlyRes = await fetch(`${BASE}/api/admin/orders/${orderId}/articles`, { method: "POST", headers: { Cookie: admA.cookie }, body: early });
+  const earlyBody = await earlyRes.json().catch(() => null) as { error?: { message?: string } } | null;
+  check("the Articles upload is refused while the order is still in New Orders, naming the column", earlyRes.status === 400 && /this one is in New Orders\./.test(earlyBody?.error?.message ?? ""), earlyBody);
+}
 // The Order Summary (Adam, 10 Sep 2026): written at placement, rewritten at
 // payment, office only.
 {
@@ -1279,8 +1292,9 @@ if (mint.status === 200) {
     const certUp = await fetch(`${BASE}/api/admin/services/${certId}/fulfill`, { method: "POST", body: certFd, headers: { Cookie: admCert.cookie, "X-Forwarded-For": RUN_IP } });
     check("uploading the certificate fulfills the order", certUp.status === 200, await certUp.json().catch(() => null));
     const afterDocs = await api("/api/portal/documents", { cookies: setPw.cookie });
-    const certDoc = (afterDocs.body?.data as { title: string }[] | undefined)?.find((doc) => doc.title.startsWith("Certificate of Status"));
+    const certDoc = (afterDocs.body?.data as { title: string; kind: string }[] | undefined)?.find((doc) => doc.title.startsWith("Certificate of Status"));
     check("the certificate lands in the client's portal documents", !!certDoc, afterDocs.body?.data?.length);
+    check("a portal-bought certificate is stored under its own kind, so it sorts with the Articles (14 Sep 2026)", certDoc?.kind === "certificate-of-status", certDoc);
   }
   // The assistant's questions are enforced: a category's follow-up must be
   // one of the assistant's own answers, a reason must be one of its five, and
@@ -3506,6 +3520,8 @@ if (mint.status === 200) {
     const dC = detC.body?.data as { hasCertStatus?: boolean; hasCertifiedCopy?: boolean; status?: string };
     check("both certificates are stored with their own kinds", dC?.hasCertStatus === true && dC?.hasCertifiedCopy === true, dC);
     check("the certificate order is formed", dC?.status === "formed", dC?.status);
+    const lateSeries = await api(`/api/admin/orders/${certOrderId}/series-filed`, { method: "POST", cookies: adm.cookie, body: "{}" });
+    check("a refusal names the board's own column, Complete, not 'formed' (14 Sep 2026)", lateSeries.status === 400 && /this one is in Complete\./.test(lateSeries.body?.error?.message ?? ""), lateSeries.body);
   }
 }
 

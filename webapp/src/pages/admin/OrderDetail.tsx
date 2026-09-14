@@ -36,6 +36,7 @@ interface OrderDetailData {
   createdAt: string;
   filedAt: string | null;
   formedAt: string | null;
+  rejectedAt: string | null;
   groups: FilingGroup[];
   seriesFiledAt: string | null;
   copiedFields: Record<string, boolean>;
@@ -57,6 +58,8 @@ interface OrderDetailData {
  *  record of which values have already been typed into the Division's form, so
  *  a filing interrupted halfway resumes without re-reading everything. It is
  *  stored on the order, not in this browser, so the machine can change. */
+const DOC_NUMBER_SHAPE = "A Florida LLC document number is the letter L followed by eleven digits, like L26000123456. Use the digit zero, not the letter o.";
+
 function Field({
   field,
   copied,
@@ -67,11 +70,15 @@ function Field({
   onCopied: (key: string, next: boolean) => void;
 }) {
   const [flash, setFlash] = useState(false);
+  const [copyFailed, setCopyFailed] = useState(false);
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(field.value);
     } catch {
-      /* clipboard refused — the tick still records that you dealt with it */
+      // A refused copy is not a copy: say so and leave the tick alone (14 Sep 2026).
+      setCopyFailed(true);
+      setTimeout(() => setCopyFailed(false), 2500);
+      return;
     }
     setFlash(true);
     setTimeout(() => setFlash(false), 900);
@@ -114,7 +121,8 @@ function Field({
         </div>
       </div>
       <Button type="button" variant="ghost" size="sm" aria-label={`Copy ${field.label}`} onClick={copy} className="shrink-0">
-        {flash ? <Check className="h-4 w-4 text-trust" /> : <Copy className="h-4 w-4" />}
+        {copyFailed ? <span className="text-xs text-destructive" data-testid="copy-failed">Copy failed — select the text and copy it by hand</span> : null}
+      {flash ? <Check className="h-4 w-4 text-trust" /> : <Copy className="h-4 w-4" />}
       </Button>
     </div>
   );
@@ -193,8 +201,12 @@ export default function OrderDetail({
   markingFiled: boolean;
 }) {
   const queryClient = useQueryClient();
-  const articlesRef = useRef<HTMLInputElement>(null);
   const [docNumber, setDocNumber] = useState<string>("");
+  /** Whether the formed email actually left, from the route's own report. */
+  const [formedNotified, setFormedNotified] = useState<boolean | null>(null);
+  /** The server's reason when a button press is refused (14 Sep 2026: five
+   *  buttons failed silently). */
+  const [actionError, setActionError] = useState<string | null>(null);
   const [psdRows, setPsdRows] = useState<{ file: File | null; covers: string[] }[]>([
     { file: null, covers: [] },
   ]);
@@ -208,20 +220,25 @@ export default function OrderDetail({
     mutationFn: () => api.post(`/api/admin/orders/${orderId}/unfiled`, {}),
     onSuccess: () => {
       setConfirmReset(false);
+      setActionError(null);
       queryClient.invalidateQueries({ queryKey: ["admin", "orders"] });
       queryClient.invalidateQueries({ queryKey: ["admin", "order", orderId] });
     },
+    onError: (e: Error) => { setConfirmReset(false); setActionError(e.message); },
   });
   const uploadArticles = useMutation({
     mutationFn: async () => {
       const f = articlesFirstRef.current?.files?.[0];
       if (!f) throw new Error("Choose the filed Articles PDF.");
+      // Sunbiz's own numbers: the letter L and eleven digits (14 Sep 2026).
+      // An empty box is the server's "required" message, which says why.
+      if (detail.data?.articlesSignedByUs && docNumber.trim() && !/^L\d{11}$/.test(docNumber.trim())) throw new Error(DOC_NUMBER_SHAPE);
       const fd = new FormData();
       fd.append("articles", f);
       fd.append("documentNumber", docNumber.trim());
       const res = await fetch(`/api/admin/orders/${orderId}/articles`, { method: "POST", body: fd, credentials: "include" });
       const body = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
-      if (!res.ok) throw new Error(body?.error?.message ?? "Upload failed.");
+      if (!res.ok) throw new Error(body?.error?.message ?? "The upload did not go through. Try again.");
       return body;
     },
     onSuccess: () => {
@@ -234,8 +251,10 @@ export default function OrderDetail({
   const seriesFiled = useMutation({
     mutationFn: () => api.post(`/api/admin/orders/${orderId}/series-filed`, {}),
     onSuccess: () => {
+      setActionError(null);
       queryClient.invalidateQueries({ queryKey: ["admin", "order", orderId] });
     },
+    onError: (e: Error) => setActionError(e.message),
   });
 
   const detail = useQuery({
@@ -246,7 +265,8 @@ export default function OrderDetail({
   const setCopied = useMutation({
     mutationFn: (v: { key: string; copied: boolean }) =>
       api.post(`/api/admin/orders/${orderId}/copied`, v),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin", "order", orderId] }),
+    onSuccess: () => { setActionError(null); queryClient.invalidateQueries({ queryKey: ["admin", "order", orderId] }); },
+    onError: (e: Error) => setActionError(e.message),
   });
 
   const d = detail.data;
@@ -301,7 +321,7 @@ export default function OrderDetail({
       if (certifiedCopy) fd.append("certifiedCopy", certifiedCopy);
       const res = await fetch(`/api/admin/orders/${orderId}/certificates`, { method: "POST", body: fd, credentials: "include" });
       const body = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
-      if (!res.ok) throw new Error(body?.error?.message ?? `Upload failed (${res.status})`);
+      if (!res.ok) throw new Error(body?.error?.message ?? "The upload did not go through. Try again.");
     },
     onSuccess: () => {
       if (certStatusRef.current) certStatusRef.current.value = "";
@@ -316,9 +336,6 @@ export default function OrderDetail({
   const upload = useMutation({
     mutationFn: async () => {
       const fd = new FormData();
-      const articles = articlesRef.current?.files?.[0];
-      if (articles) fd.append("articles", articles);
-      fd.append("documentNumber", docNumber.trim());
       const certStatus = certStatusRef.current?.files?.[0];
       if (certStatus) fd.append("certStatus", certStatus);
       const certifiedCopy = certifiedCopyRef.current?.files?.[0];
@@ -334,9 +351,11 @@ export default function OrderDetail({
         credentials: "include",
       });
       const body = (await res.json().catch(() => null)) as
-        | { error?: { message?: string } }
+        | { error?: { message?: string }; data?: { notified?: boolean } }
         | null;
-      if (!res.ok) throw new Error(body?.error?.message ?? "Upload failed.");
+      if (!res.ok) throw new Error(body?.error?.message ?? "The upload did not go through. Try again.");
+      // The route's own report of the email, not a claim (14 Sep 2026).
+      setFormedNotified(body?.data?.notified ?? null);
       return body;
     },
     onSuccess: () => {
@@ -351,7 +370,7 @@ export default function OrderDetail({
   const claimed = new Set(psdRows.flatMap((r) => (r.file ? r.covers : [])));
   const uncovered = (d?.series ?? []).filter((s) => !s.covered && !claimed.has(s.name));
   const canUpload =
-    (isConversion || d?.hasArticles || !!articlesRef.current?.files?.length) &&
+    (isConversion || d?.hasArticles) &&
     psdRows.some((r) => r.file) && uncovered.length === 0;
 
 
@@ -427,6 +446,16 @@ export default function OrderDetail({
               <p className="flex items-center gap-2 text-sm text-trust" data-testid="sent-to-division">
                 <Check className="h-4 w-4" /> Sent to the Division on {new Date(d.filedAt).toLocaleDateString()}
               </p>
+            ) : null}
+            {/* A rejection leaves its date on the card until the order is sent
+                again (14 Sep 2026). */}
+            {d.status === "paid" && d.rejectedAt ? (
+              <p className="text-sm text-amber-700" data-testid="rejected-note">
+                Division rejected the filing on {new Date(d.rejectedAt).toLocaleDateString()}; back in New Orders.
+              </p>
+            ) : null}
+            {actionError ? (
+              <p className="text-sm text-destructive" data-testid="action-error">{actionError}</p>
             ) : null}
 
             {/* With The State: the stamped Articles come back from the
@@ -534,6 +563,7 @@ export default function OrderDetail({
                     <li key={doc.id} className="flex items-center gap-2 text-muted-foreground">
                       <Check className="h-3.5 w-3.5 text-trust" />
                       {doc.title}
+                      <span className="text-xs">· uploaded {new Date(doc.createdAt).toLocaleDateString()}</span>
                     </li>
                   ))}
                 </ul>
@@ -573,6 +603,9 @@ export default function OrderDetail({
                         onChange={noteCertChosen}
                       />
                     </div>
+                  ) : null}
+                  {uploadError && d.status === "formed" ? (
+                    <p className="text-sm text-destructive" data-testid="certificate-upload-error">{uploadError}</p>
                   ) : null}
                   {certChosen ? (
                     <Button
@@ -677,9 +710,9 @@ export default function OrderDetail({
                   </Button>
                 </div>
               ) : (
-                <p className="mt-3 text-sm text-trust">
-                  Formed{d.formedAt ? ` on ${new Date(d.formedAt).toLocaleDateString()}` : ""} — the
-                  client has been emailed.
+                <p className="mt-3 text-sm text-trust" data-testid="formed-line">
+                  {isConversion ? "Designations filed and complete" : "Formed"}{d.formedAt ? ` on ${new Date(d.formedAt).toLocaleDateString()}` : ""}
+                  {formedNotified === null ? "." : formedNotified ? " — the client was emailed." : " — the email to the client could not be sent."}
                   {(d.certStatusPurchased && !d.hasCertStatus) || (d.certifiedCopyPurchased && !d.hasCertifiedCopy) ? (
                     <span className="block text-amber-700 dark:text-amber-400" data-testid="still-owed">
                       Still owed: {[

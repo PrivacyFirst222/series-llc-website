@@ -110569,7 +110569,7 @@ function registerAdminRoutes(app2) {
     );
     return c.json({ data: { orders: rows, total: Number(total[0].c), shown: rows.length } });
   });
-  const BOARD_LABEL = { pending_payment: "Pending payment", paid: "New Orders", filed: "With The State", formed: "Formed" };
+  const BOARD_LABEL = { pending_payment: "Pending payment", paid: "New Orders", filed: "With The State", formed: "Complete" };
   const isConversionPayload = (payload) => (typeof payload === "string" ? JSON.parse(payload) : payload)?.filingPath === "CONVERT";
   app2.post("/admin/orders/:id/filed", async (c) => {
     const admin = await requireAdmin(c);
@@ -110757,7 +110757,7 @@ function registerAdminRoutes(app2) {
     if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
     const db = await getDb();
     const rows = await db.query(
-      "SELECT id, client_id, llc_name, payload FROM orders WHERE id = $1",
+      "SELECT id, client_id, llc_name, payload, status FROM orders WHERE id = $1",
       [c.req.param("id")]
     );
     if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
@@ -110765,6 +110765,9 @@ function registerAdminRoutes(app2) {
     if (!o.client_id) return c.json(err("This order has no client account yet.", "NO_CLIENT"), 400);
     if (isConversionPayload(o.payload)) {
       return c.json(err("A conversion has no Articles of Organization: the company already exists.", "BAD_STATE"), 400);
+    }
+    if (o.status !== "filed") {
+      return c.json(err(`The filed Articles are uploaded while the order is With The State; this one is in ${BOARD_LABEL[o.status] ?? o.status}.`, "BAD_STATE"), 400);
     }
     const existing = await db.query(
       "SELECT id FROM documents WHERE order_id = $1 AND kind = 'articles'",
@@ -110781,6 +110784,7 @@ function registerAdminRoutes(app2) {
     const documentNumber = typeof form.documentNumber === "string" ? form.documentNumber.trim() : "";
     const weSigned = appointedUs(o.payload);
     if (weSigned && !documentNumber) return c.json(err(DOC_NUMBER_NEEDED, "DOCUMENT_NUMBER_REQUIRED"), 400);
+    if (weSigned && !/^L\d{11}$/.test(documentNumber)) return c.json(err("A Florida LLC document number is the letter L followed by eleven digits, like L26000123456. Use the digit zero, not the letter o.", "DOCUMENT_NUMBER_SHAPE"), 400);
     if (articles.size > MAX_UPLOAD_BYTES) return c.json(err("The file is too large (20 MB max).", "TOO_LARGE"), 400);
     if (!await looksLikePdf(articles)) {
       return c.json(err("This is not a readable PDF. Upload the filed Articles from Sunbiz.", "NOT_A_PDF"), 400);
@@ -111410,10 +111414,11 @@ function registerAdminRoutes(app2) {
       }
       const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
       const isDesignation = so2.type === "series" && !!details.seriesName;
+      const storedKind = so2.type === "certificate-of-status" || so2.type === "certified-copy" ? so2.type : isDesignation ? "psd" : "package";
       const doc = await db.query(
         `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
        VALUES ($1, $6, $7, $2, $3, $4, $5, $8) RETURNING id`,
-        [so2.client_id, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes, so2.formation_order_id, isDesignation ? "psd" : "package", JSON.stringify(isDesignation ? { seriesNames: [details.seriesName] } : {})]
+        [so2.client_id, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes, so2.formation_order_id, storedKind, JSON.stringify(isDesignation ? { seriesNames: [details.seriesName] } : {})]
       );
       documentId = doc[0].id;
     }

@@ -146,7 +146,7 @@ export function ServiceFulfillDialog({
       });
       if (!res.ok) {
         const body = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
-        throw new Error(body?.error?.message ?? "Fulfill failed");
+        throw new Error(body?.error?.message ?? "The order could not be fulfilled. Try again.");
       }
       return res.json();
     },
@@ -158,8 +158,12 @@ export function ServiceFulfillDialog({
       onClose();
       queryClient.invalidateQueries({ queryKey: ["admin-services"] });
       queryClient.invalidateQueries({ queryKey: ["admin", "orders"] });
+      // The open card reads its own key (14 Sep 2026: it did not change
+      // until closed and reopened).
+      queryClient.invalidateQueries({ queryKey: ["admin", "order"] });
     },
   });
+  const isCertificate = viewing?.type === "certificate-of-status" || viewing?.type === "certified-copy";
 
   return (
     <Dialog
@@ -181,6 +185,8 @@ export function ServiceFulfillDialog({
               ? "The identification number below is shown for SS-4 preparation and is permanently deleted when you mark the order fulfilled."
               : viewing?.type === "s-election" && viewing.status === "fulfilled"
                 ? "The client built this package from their own details and has it in their portal. The SSNs below are deleted two weeks after the build. If their Articles show a different filing date, correct it below and the package is rebuilt."
+              : isCertificate
+                ? `Attach the ${viewing?.type === "certificate-of-status" ? "Certificate of Status" : "Certified Copy of the Articles"} from the Division and mark fulfilled; it is posted to the client's documents.`
               : viewing?.type === "s-election"
                 ? "Download the draft package, review the filled Form 2553, and attach the final PDF to fulfill. The SSNs below are permanently deleted when you mark the order fulfilled."
                 : "Mark fulfilled once the designation is filed and the confirmation is uploaded to the client's documents."}
@@ -278,6 +284,8 @@ export function ServiceFulfillDialog({
                   </a>
                 ) : null}
               </>
+            ) : isCertificate ? (
+              <div><span className="text-muted-foreground">Document:</span> {viewing.type === "certificate-of-status" ? "Certificate of Status" : "Certified Copy of the Articles"} for {viewing.llc_name}</div>
             ) : (
               <>
                 <div><span className="text-muted-foreground">EIN for:</span>{" "}
@@ -415,15 +423,16 @@ export function ServiceFulfillDialog({
             </div>
           ) : null}
           <p className="text-xs text-muted-foreground">
-            Posted to the client's portal documents in the same action, so "documents have been
-            posted" in their completion email is true.
+            {skipDocument
+              ? "The client is emailed that the order is complete; nothing is posted to their documents."
+              : "Posted to the client's portal documents in the same action, so \"documents have been posted\" in their completion email is true."}
             {viewing?.type === "ein"
               ? " The letter is required — fulfilling deletes the TIN, so an EIN order can't complete without it."
               : viewing?.type === "s-election"
                 ? " The package is required — fulfilling deletes the shareholder SSNs, so an S election order can't complete without it."
                 : ""}
           </p>
-          {viewing?.type !== "ein" && viewing?.type !== "s-election" ? (
+          {viewing?.type !== "ein" && viewing?.type !== "s-election" && !isCertificate ? (
             <label className="flex items-center gap-2 text-xs text-muted-foreground">
               <input
                 type="checkbox"
