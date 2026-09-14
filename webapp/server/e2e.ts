@@ -984,6 +984,7 @@ if (mint.status === 200) {
     check("a client cookie is not an admin session", clientOnlyAdmin.status === 401, clientOnlyAdmin.status);
   }
   check("me shows no RA cancellation yet", me.status === 200 && me.body.data.raCancellationRequestedAt === null);
+  check("a client who is their own agent is told so, so the portal shows no agent card (14 Sep 2026)", me.body?.data?.raService === false, me.body?.data?.raService);
   const cancel = await api("/api/portal/registered-agent/cancel", {
     method: "POST",
     body: "{}",
@@ -1753,6 +1754,20 @@ if (mint.status === 200) {
     const oa2 = await api(`/api/portal/oa?company=${secondId}`, { cookies: setPw.cookie });
     check("the second company reads back its own answers",
       JSON.stringify(oa2.body?.data).includes("$777 cash"), oa2.body?.data?.answers);
+    {
+      // The consent for the second company signs with the second company's
+      // members (14 Sep 2026: it took whichever company was edited last).
+      const named = await api(`/api/portal/oa/answers?company=${secondId}`, { method: "PUT", cookies: setPw.cookie, body: JSON.stringify({ firstOrAmended: "first", effectiveDate: "2026-10-01", members: [{ name: "Sydney Secondowner", address: "9 Second Street, Tampa, FL 33602" }], series: [] }) });
+      check("the second company's owner is saved", named.status === 200, named.body);
+      const secondName = ((await api(`/api/admin/orders/${secondId}`, { cookies: (await adminSession()).cookie })).body?.data as { llcName?: string })?.llcName ?? "";
+      const consent2 = await api("/api/portal/series/consent", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ company: secondId, seriesName: `${secondName}, PS B`, seriesNumber: "B", purpose: "", effectiveDate: "2026-10-02" }) });
+      check("a consent for the second company generates", consent2.status === 200, consent2.body);
+      if (consent2.status === 200 && hasPdftotext) {
+        const bytes = new Uint8Array(await (await fetch(`${BASE}/api/portal/documents/${consent2.body?.data?.documentId}/download`, { headers: { Cookie: setPw.cookie } })).arrayBuffer());
+        const text = (pdfText(bytes) ?? "").replace(/\s+/g, " ");
+        check("read off the second company's consent: signed by its own owner, not the first company's", /Sydney Secondowner/.test(text) && !/Casey Member, Jr\./.test(text), text.match(/MEMBERS:[\s\S]{0,160}/)?.[0]);
+      }
+    }
     const oa1 = await api(`/api/portal/oa?company=${firstCo?.orderId}`, { cookies: setPw.cookie });
     check("the first company's answers are untouched by the second's",
       !JSON.stringify(oa1.body?.data).includes("$777 cash"), null);
@@ -1963,6 +1978,10 @@ if (mint.status === 200) {
   const noPctGen = await api("/api/portal/oa/generate", { method: "POST", cookies: mPw.cookie, body: JSON.stringify(noPctAnswers) });
   check("couple-only company generates without any ownership answer", noPctGen.status === 200, noPctGen.body);
 
+  {
+    const noLimitM = await api("/api/portal/oa/generate", { method: "POST", cookies: mPw.cookie, body: JSON.stringify({ ...coupleAnswers, borrowingThreshold: undefined }) });
+    check("a manager-managed company is told to set the Manager's borrowing limit", noLimitM.status === 400 && noLimitM.body?.error?.message === "Set the Manager's borrowing limit.", noLimitM.body);
+  }
   const mGen = await api("/api/portal/oa/generate", { method: "POST", cookies: mPw.cookie, body: JSON.stringify(coupleAnswers) });
   check("TBE couple agreement generates", mGen.status === 200, mGen.body);
   check("two owners, manager-managed, gets the multi master", mGen.body?.data?.version === "multi", mGen.body?.data);
@@ -2132,6 +2151,22 @@ if (mint.status === 200) {
   );
   const sAdminDetail = await api(`/api/admin/services/${sId}`, { cookies: adminS.cookie });
   check("admin decrypts shareholder SSNs", sAdminDetail.body?.data?.ssns?.[0] === "123456789", sAdminDetail.body?.data);
+  check("the office's EIN checklist can say the EIN is reported as an S corporation: the paid package is on the account (14 Sep 2026)", sAdminDetail.body?.data?.sElectionPaid === true, sAdminDetail.body?.data?.sElectionPaid);
+  {
+    // Owners eight onward go on a continuation sheet in the package (Adam,
+    // 14 Sep 2026: no limit, or 100).
+    const eight = Array.from({ length: 8 }, (_, i) => ({ name: `Owner Number${i + 1}`, address: `${i + 1} Bay Street, Miami, FL 33131`, percentage: 12.5, dateAcquired: "", ssn: `12${i}-45-678${i}` }));
+    const many = await api(`/api/portal/services/${sId}/s-election-details`, { method: "POST", cookies: mPw.cookie, body: JSON.stringify({ ...okDetails, shareholders: eight }) });
+    check("eight owners are accepted on the S election form", many.status === 200, many.body);
+    const manyDoc = ((await api("/api/portal/documents", { cookies: mPw.cookie })).body?.data ?? []).find((d: { title: string }) => d.title.includes("S Corporation Election Package")) as { id: string } | undefined;
+    if (manyDoc && hasPdftotext) {
+      const bytes = new Uint8Array(await (await fetch(`${BASE}/api/portal/documents/${manyDoc.id}/download`, { headers: { Cookie: mPw.cookie } })).arrayBuffer());
+      const text = (pdfText(bytes) ?? "").replace(/\s+/g, " ");
+      check("read off the package PDF: owner eight is on the continuation sheet and the instructions say to sign it", /CONTINUATION OF PART I/.test(text) && /Owner Number8/.test(text) && /Owners eight onward sign the continuation sheet/.test(text) && /1 owner is listed there/.test(text), text.match(/CONTINUATION OF PART I[^|]{0,120}|Owners eight onward[^.]*\./g));
+    }
+    const back = await api(`/api/portal/services/${sId}/s-election-details`, { method: "POST", cookies: mPw.cookie, body: JSON.stringify(okDetails) });
+    check("the single-owner details are restored for the checks that follow", back.status === 200, back.body);
+  }
   // Jointly held interests (Adam, 6 Sep 2026): one row, both names, both
   // Social Security numbers; a joint row without the co-owner's name or
   // number is refused; a blank re-edit keeps both; a co-owner who is also
@@ -2332,6 +2367,7 @@ if (mint.status === 200) {
       check("a stated purpose is added to any lawful purpose, never in place of it (Adam, 13 Sep 2026)", /\| Purpose of this Protected Series \| Any lawful purpose, including, without limitation, Rental real estate \|/.test(md), md.match(/\| Purpose of this Protected Series \|[^\n]*/)?.[0]);
       check("the Series Exhibit carries the special terms typed, and no dissolution row (Adam, 12 Sep 2026)",
         /\| Special terms \(if any\) \| The Manager may not sell 123 Main Street without the consent of all Members\. \|/.test(md) && !/Dissolution events specific/.test(md), md.match(/Special terms[^\n]*/)?.[0]);
+      check("the Series Exhibit is headed PS-1, as the definition, Instructions, Manual, and consent say (14 Sep 2026)", /## SERIES EXHIBIT PS-1\n/.test(md) && /## ASSET SCHEDULE — ATTACHMENT TO SERIES EXHIBIT PS-1 \(/.test(md) && !/## SERIES EXHIBIT 1\n/.test(md), md.match(/## SERIES EXHIBIT[^\n]*/g));
     }
     // This agreement counts toward the five below and is deleted with them;
     // the client's ten-an-hour generation budget is the reason.
@@ -2572,6 +2608,14 @@ if (mint.status === 200) {
     { name: "Jordan Vale", address: "22 Bay Street, Miami, FL 33130", percentage: 40, contribution: "$400 cash" },
   ];
 
+  {
+    // The refusal speaks the form's own words: no Manager here (14 Sep 2026).
+    const noLimit = await api("/api/portal/oa/generate", { method: "POST", cookies: edPw.cookie, body: JSON.stringify({ ...base, multiOwner: true, members: twoOwners, borrowingThreshold: undefined }) });
+    check("a member-managed company is told to set 'the borrowing limit', not the manager's", noLimit.status === 400 && noLimit.body?.error?.message === "Set the borrowing limit.", noLimit.body);
+    // A company or trust cannot hold as a spouse (14 Sep 2026).
+    const trustSpouse = await api("/api/portal/oa/generate", { method: "POST", cookies: edPw.cookie, body: JSON.stringify({ ...base, multiOwner: true, members: [{ ...twoOwners[0], name: "Vale Family Trust", isEntity: true, signerName: "Alex Vale", signerTitle: "Trustee" }, twoOwners[1]], couples: [{ a: 0, b: 1, form: "TBE" }] }) });
+    check("a trust paired as a spouse is refused with the reason", trustSpouse.status === 400 && /cannot hold its interest as a spouse/.test(trustSpouse.body?.error?.message ?? ""), trustSpouse.body);
+  }
   // An owner with no address would print a blank line in Exhibit A.
   const noAddr = await api("/api/portal/oa/generate", {
     method: "POST", cookies: edPw.cookie,
@@ -3490,6 +3534,7 @@ if (mint.status === 200) {
   check("the company serving as Manager is suggested as a company owner, not a person", seed?.suggestedOwners?.some((o) => o.name === "Harbor Managers, LLC" && o.isEntity === true) === true, seed?.suggestedOwners);
   const beforeMe = (await api("/api/auth/me", { cookies: raPw.cookie })).body?.data as { raRenewalDate?: string | null };
   check("before formation there is no renewal date", beforeMe?.raRenewalDate === null, beforeMe);
+  check("a client who took our service is told so", (beforeMe as { raService?: boolean })?.raService === true, beforeMe);
   const fd = new FormData();
   fd.set("articles", new File([new TextEncoder().encode("%PDF-1.4 renewal arts\n%%EOF")], "arts.pdf", { type: "application/pdf" }));
   fd.append("psd", new File([new TextEncoder().encode("%PDF-1.4 renewal psd\n%%EOF")], "psd.pdf", { type: "application/pdf" }));
@@ -3508,6 +3553,31 @@ if (mint.status === 200) {
   const cancelMail = mails.filter((m) => m.to === raEmail && /cancel/i.test(m.subject)).at(-1);
   const year = String(new Date().getFullYear() + 1);
   check("the cancellation email names the renewal date", !!cancelMail && cancelMail.html.includes(year) && /renew/i.test(cancelMail.html), cancelMail && { subject: cancelMail.subject, snippet: cancelMail.html.replace(/<[^>]+>/g, " ").match(/[^.]*renew[^.]*\./i)?.[0] });
+}
+
+// An abandoned S election checkout does not lock the client out, and refused
+// purchases do not spend the allowance (Adam, 14 Sep 2026).
+{
+  const email = testEmail.replace("@", "+abandon@");
+  const ip = { "X-Forwarded-For": `10.68.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}` };
+  const res = await api("/api/orders", { method: "POST", headers: ip, body: JSON.stringify({ ...formData, orderSElection: false, sElectionFilingAcknowledgment: false, orderEin: false, clientEmail: email, confirmClientEmail: email, correspondentEmail: email, confirmCorrespondentEmail: email }) });
+  check("an order without the S election package is accepted", res.status === 200, res.body);
+  const id = res.body?.data?.orderId as string;
+  await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: id }) });
+  const mint = await api("/api/dev/mint-reset-token", { method: "POST", body: JSON.stringify({ email }) });
+  const pw = await api("/api/auth/set-password", { method: "POST", body: JSON.stringify({ token: mint.body?.data?.token, password: "e2e-abandon-pass-1" }) });
+  check("the client signs in", pw.status === 200, pw.body);
+  const first = await api("/api/portal/services/s-election", { method: "POST", cookies: pw.cookie, body: "{}" });
+  check("an S election checkout is started", first.status === 200, first.body);
+  const svc = await api("/api/portal/services", { cookies: pw.cookie });
+  check("with the checkout abandoned, the package is still offered", svc.body?.data?.sElection?.eligible === true, svc.body?.data?.sElection);
+  const again = await api("/api/portal/services/s-election", { method: "POST", cookies: pw.cookie, body: "{}" });
+  check("the client can start the purchase again", again.status === 200, again.body);
+  const refusals: number[] = [];
+  for (let i = 0; i < 25; i++) refusals.push((await api("/api/portal/services/series", { method: "POST", cookies: pw.cookie, body: JSON.stringify({ suffix: "Tower Nine" }) })).status);
+  check("twenty-five refused series purchases are all refusals, never a lockout", refusals.every((s) => s === 400), refusals);
+  const good = await api("/api/portal/services/series", { method: "POST", cookies: pw.cookie, body: JSON.stringify({ suffix: "PS 7" }) });
+  check("a good purchase still goes through after the refusals", good.status === 200, good.body);
 }
 
 console.log(failures === 0 ? "\nALL PASS" : `\n${failures} FAILURES`);

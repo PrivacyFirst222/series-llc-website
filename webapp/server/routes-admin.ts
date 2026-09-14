@@ -1068,6 +1068,12 @@ app.get("/admin/services/:id", async (c) => {
       console.error("[admin] EIN secret decrypt failed:", e);
     }
   }
+  // Whether a paid S election package is on the client's account: the EIN
+  // is reported as an S corporation then (14 Sep 2026).
+  const sElectionPaid = (await db.query<{ id: string }>(
+    "SELECT id FROM service_orders WHERE client_id = (SELECT client_id FROM service_orders WHERE id = $1) AND type = 's-election' AND status NOT IN ('pending_payment', 'cancelled') LIMIT 1",
+    [so.id],
+  )).length > 0;
   return c.json({
     data: {
       id: so.id,
@@ -1075,6 +1081,7 @@ app.get("/admin/services/:id", async (c) => {
       status: so.status,
       llc_name: so.llc_name,
       details: so.details,
+      sElectionPaid,
       amount_cents: so.amount_cents,
       created_at: so.created_at,
       paid_at: so.paid_at,

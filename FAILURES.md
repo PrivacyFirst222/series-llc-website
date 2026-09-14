@@ -3125,6 +3125,22 @@ The file and line were what I had used to verify the claim, and pasting them fel
 
 Answering with the page name, the section, and the words as they appear on screen. When he asks where something is on the site, the answer is a place on the site, never a file.
 
+## P83 — A finding written in the document's own labels, not in words
+
+### THE FAILURE
+
+Adam, 14 Sep 2026: "What the fuck is Article 9?"
+
+In the audit report I wrote: "The special-terms note omits Article 9 for the two single-member S corporation forms." Article 9 is the Tax Matters article of the S corporation agreements, the part that protects the S election. I never said so. The finding was correct and unreadable: to act on it he would have had to open the agreement and find Article 9 himself. He had told me on 13 Sep, "Say it in plain English", and P82 was written the same day for a file-and-line answer. This is the same failure with a section number in place of a line number.
+
+### WHY IT HAPPENED
+
+The report condensed sixty findings, and condensing pushed every sentence toward the shortest unique label. "Article 9" is unique and short; "the tax article that protects the S election" is longer and, to me, redundant, because I had the master open and the label already meant something. I judged the sentence by whether I could decode it, not by whether Adam could without the file in front of him. The plain-English rule was in force the whole time. What switched it off was volume: a rule that says "explain" costs more to obey per item as the item count grows, and I paid it on the first items and quietly stopped paying it by the fortieth.
+
+### FIXED BY
+
+Every reference to a section or article in a report carries what it is about in words, the first time it appears: "Article 9, the tax article that protects the S election". Long reports do not earn shorter sentences; if the report is too long to explain each item, it is too long, and the fix is fewer items per message, not fewer words per item.
+
 ## Process — the ones that let the substantive ones through
 
 **M1 · Verify the proposition you set out to verify, not the one underneath.** A

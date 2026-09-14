@@ -62,6 +62,7 @@ interface ServiceDetail {
   llc_name: string;
   details: AdminServiceOrder["details"];
   tin: string | null;
+  sElectionPaid?: boolean;
   ssns: string[] | null;
 }
 
@@ -313,6 +314,9 @@ export function ServiceFulfillDialog({
                       const rows: [string, string][] = [
                         ["Legal structure", "Limited Liability Company (LLC)"],
                         ["Number of members", String(d.memberCount ?? "—")],
+                        // What the client was promised on the tile and the form (14 Sep 2026).
+                        ["Tax classification", detailQuery.data?.sElectionPaid ? "S corporation (Form 2553 package on the account)" : Number(d.memberCount) > 1 ? "Partnership" : "Disregarded entity"],
+                        ["Closing month of accounting year", "December"],
                         ["State located", "Florida"],
                         ["Reason for applying", d.reason ?? "Started a new business"],
                         ["Responsible party", `${d.responsibleName ?? ""} · SSN/ITIN ${detailQuery.data.tin ?? "—"}`],

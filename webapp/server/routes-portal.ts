@@ -491,12 +491,14 @@ export async function sElectionEligibility(clientId: string, orderId?: string | 
   const orderBy = new Date(paidAt.getTime() + S_ELECTION_WINDOW_DAYS * 86400_000);
   const existing = orderId
     ? await db.query(
-        `SELECT id FROM service_orders WHERE client_id = $1 AND type = 's-election' AND status <> 'cancelled'
+        `SELECT id FROM service_orders WHERE client_id = $1 AND type = 's-election' AND status NOT IN ('cancelled', 'pending_payment')
            AND (formation_order_id IS NULL OR formation_order_id = $2)`,
         [clientId, orderId],
       )
     : await db.query(
-        "SELECT id FROM service_orders WHERE client_id = $1 AND type = 's-election' AND status <> 'cancelled'",
+        // An abandoned checkout must not lock the client out (14 Sep 2026), as
+        // the EIN and series purchases already allow.
+        "SELECT id FROM service_orders WHERE client_id = $1 AND type = 's-election' AND status NOT IN ('cancelled', 'pending_payment')",
         [clientId],
       );
   if (existing.length > 0) {
@@ -783,7 +785,7 @@ export const sElectionDetailsSchema = z
           .refine((sh) => !isJoint(sh.joint) || hasFirstAndLast(sh.name2), { message: `Co-owner: ${FIRST_AND_LAST}` }),
       )
       .min(1, "At least one owner is required.")
-      .max(7, "The IRS form holds 7 owners — contact us for more."),
+      .max(100, "An S corporation may have no more than 100 shareholders."),
     certified: z.literal(true, {
       errorMap: () => ({ message: "You must confirm the certification before submitting." }),
     }),
@@ -951,6 +953,11 @@ app.get("/auth/me", async (c) => {
       raRenewalDate: await db
         .query<{ ra_renewal_date: unknown }>("SELECT ra_renewal_date FROM orders WHERE client_id = $1 AND ra_renewal_date IS NOT NULL ORDER BY formed_at DESC NULLS LAST LIMIT 1", [session.clientId])
         .then((r) => (r[0]?.ra_renewal_date ? isoDate(r[0].ra_renewal_date) : null)),
+      // Whether any paid order took our registered agent service: the agent
+      // card is shown only then (14 Sep 2026: every client saw it).
+      raService: await db
+        .query<{ payload: unknown }>("SELECT payload FROM orders WHERE client_id = $1 AND status <> 'pending_payment'", [session.clientId])
+        .then((rows) => rows.some((r) => ((typeof r.payload === "string" ? JSON.parse(r.payload) : r.payload) as { registeredAgent?: { choice?: string } } | null)?.registeredAgent?.choice === "SERVICE")),
       // The portal shows a banner and an Exit when the admin is looking.
       viewingAsAdmin: session.viewingAsAdmin,
     },
@@ -1158,9 +1165,6 @@ app.put("/portal/oa/answers", async (c) => {
 app.post("/portal/oa/generate", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-  if (!(await rateLimit(`oagen:${session.clientId}`, 10, 3600_000))) {
-    return c.json(err("Too many generations. Try again later.", "RATE_LIMITED"), 429);
-  }
   const body = oaAnswersSchema.safeParse(await c.req.json().catch(() => null));
   if (!body.success) return c.json(err(answersProblem(body.error), "INVALID_INPUT"), 400);
   const a = body.data;
@@ -1261,6 +1265,10 @@ app.post("/portal/oa/generate", async (c) => {
       pairedIdx.has(cpl.b)
     ) {
       return c.json(err("Invalid spousal pairing.", "INVALID_INPUT"), 400);
+    }
+    const entityAt = (i: number) => a.members?.[i]?.isEntity ?? seed.members[i]?.isEntity ?? false;
+    if (entityAt(cpl.a) || entityAt(cpl.b)) {
+      return c.json(err("A company or trust cannot hold its interest as a spouse. Remove the pairing.", "INVALID_INPUT"), 400);
     }
     pairedIdx.add(cpl.a);
     pairedIdx.add(cpl.b);
@@ -1394,7 +1402,7 @@ app.post("/portal/oa/generate", async (c) => {
   // member LLCs") the limit is a multi-member question only.
   const hasApprovalGate = multiOwner;
   if (hasApprovalGate && !a.borrowingThreshold) {
-    return c.json(err("Set the manager's borrowing limit.", "INVALID_INPUT"), 400);
+    return c.json(err(memberManaged ? "Set the borrowing limit." : "Set the Manager's borrowing limit.", "INVALID_INPUT"), 400);
   }
 
   // Every Protected Series is wholly owned by the Company (ss. 605.2302(1),
@@ -1442,6 +1450,11 @@ app.post("/portal/oa/generate", async (c) => {
     generationNumber: nextGenerationNumber,
   };
 
+  // Only a request that passed every check spends the allowance (Adam,
+  // 14 Sep 2026: refusals do not count). 
+  if (!(await rateLimit(`oagen:${session.clientId}`, 10, 3600_000))) {
+    return c.json(err("Too many generations. Try again later.", "RATE_LIMITED"), 429);
+  }
   const clients = await db.query<{ email: string; name: string }>("SELECT email, name FROM clients WHERE id = $1", [
     session.clientId,
   ]);
@@ -1537,7 +1550,7 @@ app.post("/portal/series/consent", async (c) => {
   const memberManaged = seed.managementStructure === "MEMBER_MANAGED";
   // Same owners the operating agreement uses — a client who added or removed an
   // owner must not get a series document that names the intake list.
-  const savedForSeries = await savedOaAnswers(session.clientId);
+  const savedForSeries = await savedOaAnswers(session.clientId, consentCompanyId);
   const seriesOwners = effectiveOwners(seed.members, savedForSeries);
   // Entity owners and Managers sign through the people the questionnaire
   // named (Adam, 13 Sep 2026).
@@ -1648,9 +1661,6 @@ const amendSchema = z.object({
 app.post("/portal/oa/amend", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-  if (!(await rateLimit(`oaamend:${session.clientId}`, 10, 3600_000))) {
-    return c.json(err("Too many amendments. Try again later.", "RATE_LIMITED"), 429);
-  }
   const body = amendSchema.safeParse(await c.req.json().catch(() => null));
   if (!body.success) {
     const field = String(body.error.issues[0]?.path?.[0] ?? "");
@@ -1682,6 +1692,11 @@ app.post("/portal/oa/amend", async (c) => {
   );
   const number = prior.reduce((max, r) => Math.max(max, Number(r.title.match(/^Amendment No\. (\d+)/)?.[1] ?? 0)), 0) + 1;
 
+  // Only a request that passed every check spends the allowance (Adam,
+  // 14 Sep 2026: refusals do not count). 
+  if (!(await rateLimit(`oaamend:${session.clientId}`, 10, 3600_000))) {
+    return c.json(err("Too many amendments. Try again later.", "RATE_LIMITED"), 429);
+  }
   const clients = await db.query<{ email: string; name: string }>("SELECT email, name FROM clients WHERE id = $1", [session.clientId]);
   const client = clients[0];
   const generatedOn = new Date();
@@ -1822,9 +1837,6 @@ app.get("/portal/services", async (c) => {
 app.post("/portal/services/s-election", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-  if (!(await rateLimit(`svc:${session.clientId}`, 20, 3600_000))) {
-    return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
-  }
   const purchaseCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
   const llcName = await clientLlcName(session.clientId, purchaseCompanyId);
   if (!llcName) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
@@ -1839,6 +1851,17 @@ app.post("/portal/services/s-election", async (c) => {
     return c.json(err(msg, gate.reason === "window_closed" ? "WINDOW_CLOSED" : "NOT_ELIGIBLE"), 400);
   }
   const db = await getDb();
+  // Only a purchase that passed every check spends the allowance (Adam,
+  // 14 Sep 2026: refusals do not count).
+  // Only a purchase that passed every check spends the allowance (Adam,
+  // 14 Sep 2026: refusals do not count).
+  // Only a purchase that passed every check spends the allowance (Adam,
+  // 14 Sep 2026: refusals do not count).
+  // Only a purchase that passed every check spends the allowance (Adam,
+  // 14 Sep 2026: refusals do not count).
+  if (!(await rateLimit(`svc:${session.clientId}`, 20, 3600_000))) {
+    return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
+  }
   const rows = await db.query<{ id: string }>(
     `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents, formation_order_id)
      VALUES ($1, 's-election', $2, $3, $4, $5) RETURNING id`,
@@ -1869,9 +1892,6 @@ app.post("/portal/services/s-election", async (c) => {
 app.post("/portal/services/series", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-  if (!(await rateLimit(`svc:${session.clientId}`, 20, 3600_000))) {
-    return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
-  }
   const body = z
     .object({ suffix: z.string().min(1).max(60), purpose: z.string().max(300).optional() })
     .safeParse(await c.req.json().catch(() => null));
@@ -1892,6 +1912,11 @@ app.post("/portal/services/series", async (c) => {
   }
   const amountCents = SERIES_ADDON_PREP_CENTS + SERIES_ADDON_STATE_CENTS;
   const db = await getDb();
+  // Only a purchase that passed every check spends the allowance (Adam,
+  // 14 Sep 2026: refusals do not count).
+  if (!(await rateLimit(`svc:${session.clientId}`, 20, 3600_000))) {
+    return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
+  }
   const rows = await db.query<{ id: string }>(
     `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents, formation_order_id)
      VALUES ($1, 'series', $2, $3, $4, $5) RETURNING id`,
@@ -1932,9 +1957,6 @@ const CERT_TYPES: Record<string, { fee: number; name: string }> = {
 app.post("/portal/services/certificate", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-  if (!(await rateLimit(`svc:${session.clientId}`, 20, 3600_000))) {
-    return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
-  }
   const body = z
     .object({ kind: z.enum(["certificate-of-status", "certified-copy"]) })
     .safeParse(await c.req.json().catch(() => null));
@@ -1957,6 +1979,11 @@ app.post("/portal/services/certificate", async (c) => {
   );
   if (open.length > 0) {
     return c.json(err(`A ${spec.name.toLowerCase()} is already on order — see your orders below.`, "ALREADY_ORDERED"), 400);
+  }
+  // Only a purchase that passed every check spends the allowance (Adam,
+  // 14 Sep 2026: refusals do not count).
+  if (!(await rateLimit(`svc:${session.clientId}`, 20, 3600_000))) {
+    return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
   }
   const rows = await db.query<{ id: string }>(
     `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents, formation_order_id)
@@ -1988,9 +2015,6 @@ app.post("/portal/services/certificate", async (c) => {
 app.post("/portal/services/ein", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-  if (!(await rateLimit(`svc:${session.clientId}`, 20, 3600_000))) {
-    return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
-  }
   const body = z
     .object({ target: z.enum(["company", "series"]), seriesName: z.string().max(300).optional() })
     .safeParse(await c.req.json().catch(() => null));
@@ -2041,6 +2065,11 @@ app.post("/portal/services/ein", async (c) => {
     if (match.einOrdered) {
       return c.json(err("An EIN for that protected series is already ordered — see your orders below.", "ALREADY_ORDERED"), 400);
     }
+  }
+  // Only a purchase that passed every check spends the allowance (Adam,
+  // 14 Sep 2026: refusals do not count).
+  if (!(await rateLimit(`svc:${session.clientId}`, 20, 3600_000))) {
+    return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
   }
   const rows = await db.query<{ id: string }>(
     `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents, formation_order_id)
@@ -2338,9 +2367,6 @@ app.post("/portal/services/:id/s-election-details", async (c) => {
 app.post("/portal/account/password", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-  if (!(await rateLimit(`acct:${session.clientId}`, 10, 3600_000))) {
-    return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
-  }
   const body = z
     .object({
       currentPassword: z.string().min(1),
@@ -2349,6 +2375,13 @@ app.post("/portal/account/password", async (c) => {
     .safeParse(await c.req.json().catch(() => null));
   if (!body.success) {
     return c.json(err(body.error.issues[0]?.message ?? "Invalid request.", "INVALID_INPUT"), 400);
+  }
+  // Charged after the shape check, before the password check: a wrong
+  // current password is still an attempt to limit (14 Sep 2026).
+  // Charged after the shape check, before the password check: a wrong
+  // current password is still an attempt to limit (14 Sep 2026).
+  if (!(await rateLimit(`acct:${session.clientId}`, 10, 3600_000))) {
+    return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
   }
   const db = await getDb();
   const rows = await db.query<{ email: string; password_hash: string | null }>(

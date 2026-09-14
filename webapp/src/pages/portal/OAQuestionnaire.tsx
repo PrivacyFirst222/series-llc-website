@@ -177,7 +177,10 @@ export default function OAQuestionnaire() {
   const patchMember = (i: number, p: Partial<MemberAnswer>) => {
     const members = [...(a.members ?? [])];
     members[i] = { ...members[i], ...p };
-    patch({ members });
+    // A company or trust cannot hold as a spouse: ticking one dissolves its
+    // pairing (14 Sep 2026: the pairing survived and the signer was lost).
+    const couples = p.isEntity === true ? (a.couples ?? []).filter((c) => c.a !== i && c.b !== i) : a.couples;
+    patch(couples === a.couples ? { members } : { members, couples });
   };
   const patchSeries = (i: number, p: Partial<SeriesAnswer>) => {
     const series = [...(a.series ?? [])];
@@ -697,8 +700,8 @@ export default function OAQuestionnaire() {
                 </div>
                 <p className="mt-2 text-xs text-muted-foreground" data-testid="threshold-note">
                   {data.memberManaged
-                    ? "Above this amount no Member may borrow on the company's behalf, or guarantee anyone's debt, without the consent of all Members (Section 5.5). There is no default — choose the number."
-                    : "Above this amount your Manager cannot borrow, or guarantee anyone's debt, without the consent of all Members (Section 5.4). There is no default — choose the number."}
+                    ? "Above this amount no Member may borrow on the company's behalf without the consent of all Members. Guaranteeing anyone else's debt always needs that consent, whatever the amount (Section 5.5). There is no default — choose the number."
+                    : "Above this amount your Manager cannot borrow without the consent of all Members. Guaranteeing anyone else's debt always needs that consent, whatever the amount (Section 5.4). There is no default — choose the number."}
                 </p>
               </QuestionCard>
             ) : null}

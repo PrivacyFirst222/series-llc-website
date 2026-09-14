@@ -162,6 +162,22 @@ async function fillForm2553(d: SElectionDetails): Promise<PDFDocument> {
   return doc;
 }
 
+/** Part I's consent columns, continued past the form's seven rows. */
+function continuationMarkdown(d: SElectionDetails, extra: SElectionShareholder[]): string {
+  const cell = (s: string) => s.replace(/\s*\n\s*/g, "; ").replace(/\|/g, "/");
+  const rows = extra.map((sh, i) => `| ${i + 8} | ${cell(columnJText(sh))} | | ${sh.percentage}%; ${fmtDate(sh.dateAcquired)} | ${cell(ssnColumnText(sh.ssn, sh.ssn2, sh.joint, Boolean(d.recordCopy)))} | 12/31 |`).join("\n");
+  return `# FORM 2553 — CONTINUATION OF PART I, SHAREHOLDERS' CONSENT STATEMENT
+
+**${d.llcName}**${d.ein ? ` · EIN ${fmtEin(d.ein)}` : ""}
+
+The official form lists seven shareholders on page 2. The shareholders below are listed in the same columns and each must sign and date column K here, exactly as on page 2.
+
+| | J — Name and address of each shareholder | K — Signature and date | L — Stock owned or percentage; date(s) acquired | M — Social security number | N — Tax year ends |
+|---|---|---|---|---|---|
+${rows}
+`;
+}
+
 function instructionsMarkdown(d: SElectionDetails, deadlineIso: string): string {
   const einLine = d.ein
     ? `The form is completed with your EIN, **${fmtEin(d.ein)}**.`
@@ -211,7 +227,7 @@ Review every entry, especially the company name and address, the EIN, the effect
 - **Officer signature (page 1, bottom):** ${d.officerName}, ${d.officerTitle}, signs and dates the "Sign Here" line. The title is already filled in.
 - **Every owner signs page 2:** each shareholder listed in column J must sign and date column K. For an interest held jointly — tenants by the entirety or joint tenants with right of survivorship — **both co-owners sign** that row's line; both are named in column J and both Social Security numbers appear in column M, because each is a shareholder who must consent.${d.shareholders.some((s) => isJoint(s.joint)) ? `\n\n  Jointly held on this form: ${d.shareholders.filter((s) => isJoint(s.joint)).map((s) => jointDisplayName(s.name, s.name2, s.joint)).join("; ")}.` : ""}
 
-An election without every required signature is invalid. Do not leave any consent line blank.
+${d.shareholders.length > 7 ? `- **Owners eight onward sign the continuation sheet** at the back of this package: the form holds seven, so ${d.shareholders.length - 7} owner${d.shareholders.length - 7 === 1 ? " is" : "s are"} listed there in the same columns, and each signs and dates column K on that sheet. File it with the form.\n\n` : ""}An election without every required signature is invalid. Do not leave any consent line blank.
 
 ## STEP 3 — FILE IT (DEADLINE: ${fmtDateLong(deadlineIso).toUpperCase()})
 
@@ -310,9 +326,16 @@ export async function buildSElectionPackage(d: SElectionDetails): Promise<Uint8A
     // in the markdown then switches the body to flush left
   });
   const filled = await fillForm2553(d);
+  // The IRS form's page 2 holds seven consent rows; owners eight onward go on
+  // a continuation sheet in the same columns (Adam, 14 Sep 2026: up to the
+  // 100 the IRS allows).
+  const extra = d.shareholders.slice(7);
+  const continuation = extra.length > 0
+    ? await PDFDocument.load(await renderMarkdownPdf({ markdown: continuationMarkdown(d, extra), watermark: null, title: `Form 2553 continuation — ${d.llcName}` }))
+    : null;
 
   const out = await PDFDocument.create();
-  for (const part of [await PDFDocument.load(instructions), await PDFDocument.load(letter), filled]) {
+  for (const part of [await PDFDocument.load(instructions), await PDFDocument.load(letter), filled, ...(continuation ? [continuation] : [])]) {
     for (const p of await out.copyPages(part, part.getPageIndices())) out.addPage(p);
   }
   if (d.recordCopy) await stampRecordCopy(out);

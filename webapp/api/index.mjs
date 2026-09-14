@@ -101976,6 +101976,20 @@ async function fillForm2553(d2) {
   form.flatten();
   return doc;
 }
+function continuationMarkdown(d2, extra) {
+  const cell2 = (s) => s.replace(/\s*\n\s*/g, "; ").replace(/\|/g, "/");
+  const rows = extra.map((sh, i) => `| ${i + 8} | ${cell2(columnJText(sh))} | | ${sh.percentage}%; ${fmtDate(sh.dateAcquired)} | ${cell2(ssnColumnText(sh.ssn, sh.ssn2, sh.joint, Boolean(d2.recordCopy)))} | 12/31 |`).join("\n");
+  return `# FORM 2553 \u2014 CONTINUATION OF PART I, SHAREHOLDERS' CONSENT STATEMENT
+
+**${d2.llcName}**${d2.ein ? ` \xB7 EIN ${fmtEin(d2.ein)}` : ""}
+
+The official form lists seven shareholders on page 2. The shareholders below are listed in the same columns and each must sign and date column K here, exactly as on page 2.
+
+| | J \u2014 Name and address of each shareholder | K \u2014 Signature and date | L \u2014 Stock owned or percentage; date(s) acquired | M \u2014 Social security number | N \u2014 Tax year ends |
+|---|---|---|---|---|---|
+${rows}
+`;
+}
 function instructionsMarkdown(d2, deadlineIso) {
   const einLine = d2.ein ? `The form is completed with your EIN, **${fmtEin(d2.ein)}**.` : `**Your EIN was not yet available when this package was prepared.** Write it in item A on page 1 (and the box at the top of page 2) before filing \u2014 the IRS will not process the form without it.`;
   if (d2.recordCopy) {
@@ -102025,7 +102039,9 @@ Review every entry, especially the company name and address, the EIN, the effect
 
   Jointly held on this form: ${d2.shareholders.filter((s) => isJoint(s.joint)).map((s) => jointDisplayName(s.name, s.name2, s.joint)).join("; ")}.` : ""}
 
-An election without every required signature is invalid. Do not leave any consent line blank.
+${d2.shareholders.length > 7 ? `- **Owners eight onward sign the continuation sheet** at the back of this package: the form holds seven, so ${d2.shareholders.length - 7} owner${d2.shareholders.length - 7 === 1 ? " is" : "s are"} listed there in the same columns, and each signs and dates column K on that sheet. File it with the form.
+
+` : ""}An election without every required signature is invalid. Do not leave any consent line blank.
 
 ## STEP 3 \u2014 FILE IT (DEADLINE: ${fmtDateLong(deadlineIso).toUpperCase()})
 
@@ -102116,8 +102132,10 @@ async function buildSElectionPackage(d2) {
     // in the markdown then switches the body to flush left
   });
   const filled = await fillForm2553(d2);
+  const extra = d2.shareholders.slice(7);
+  const continuation = extra.length > 0 ? await PDFDocument.load(await renderMarkdownPdf({ markdown: continuationMarkdown(d2, extra), watermark: null, title: `Form 2553 continuation \u2014 ${d2.llcName}` })) : null;
   const out = await PDFDocument.create();
-  for (const part of [await PDFDocument.load(instructions), await PDFDocument.load(letter), filled]) {
+  for (const part of [await PDFDocument.load(instructions), await PDFDocument.load(letter), filled, ...continuation ? [continuation] : []]) {
     for (const p2 of await out.copyPages(part, part.getPageIndices())) out.addPage(p2);
   }
   if (d2.recordCopy) await stampRecordCopy(out);
@@ -102770,7 +102788,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **4.2 No Series-Level Ownership.** No Member is an Associated Member of any Protected Series, and no Member holds a protected-series transferable interest. Each Protected Series is wholly owned by the Company as provided in Section 3.6. Every Member's economic rights in every Protected Series arise solely through the Member's Percentage Interest in the Company, so that all Members participate in every Protected Series identically and in proportion to their Percentage Interests at all times.
 
-**4.3 Voting.** Each Member votes in proportion to the Member's Percentage Interest on matters as to which Members are entitled to vote or consent at the Company level. Except where this Agreement or a non-variable provision of the Act requires a greater vote, the act of a Majority in Interest constitutes the act of the Members. A Membership Interest owned by spouses as tenants by the entirety shall be voted only by the consensus of both spouses; neither spouse acting alone may vote the interest except as the other spouse's attorney-in-fact under a duly executed power of attorney.
+**4.3 Voting.** Each Member votes in proportion to the Member's Percentage Interest on matters as to which Members are entitled to vote or consent at the Company level. Except where this Agreement or a non-variable provision of the Act requires a greater vote, the act of a Majority in Interest constitutes the act of the Members. A Membership Interest owned by spouses as tenants by the entirety or as joint tenants with right of survivorship shall be voted only by the consensus of both spouses; neither spouse acting alone may vote the interest except as the other spouse's attorney-in-fact under a duly executed power of attorney.
 
 **4.4 Meetings; Written Consents.** No regular meetings are required. Any Member or the Manager may call a meeting of the Members on at least five (5) days' written notice stating the purpose. Members may participate by any means of remote communication by which all participants can hear one another. Any action that may be taken at a meeting may be taken without a meeting by a written consent signed by Members holding the Percentage Interests required to approve the action, delivered to the Company and maintained with its records, with prompt notice to any non-consenting Member.
 
@@ -103278,7 +103296,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **4.2 No Series-Level Ownership.** No Member is an Associated Member of any Protected Series, and no Member holds a protected-series transferable interest. Each Protected Series is wholly owned by the Company as provided in Section 3.6. Every Member's economic rights in every Protected Series arise solely through the Member's Percentage Interest in the Company, so that all Members participate in every Protected Series identically and in proportion to their Percentage Interests at all times.
 
-**4.3 Voting.** Each Member votes in proportion to the Member's Percentage Interest on matters as to which Members are entitled to vote or consent at the Company level. Except where this Agreement or a non-variable provision of the Act requires a greater vote, the act of a Majority in Interest constitutes the act of the Members. A Membership Interest owned by spouses as tenants by the entirety shall be voted only by the consensus of both spouses; neither spouse acting alone may vote the interest except as the other spouse's attorney-in-fact under a duly executed power of attorney.
+**4.3 Voting.** Each Member votes in proportion to the Member's Percentage Interest on matters as to which Members are entitled to vote or consent at the Company level. Except where this Agreement or a non-variable provision of the Act requires a greater vote, the act of a Majority in Interest constitutes the act of the Members. A Membership Interest owned by spouses as tenants by the entirety or as joint tenants with right of survivorship shall be voted only by the consensus of both spouses; neither spouse acting alone may vote the interest except as the other spouse's attorney-in-fact under a duly executed power of attorney.
 
 **4.4 Meetings; Written Consents.** No regular meetings are required. Any Member or the Manager may call a meeting of the Members on at least five (5) days' written notice stating the purpose. Members may participate by any means of remote communication by which all participants can hear one another. Any action that may be taken at a meeting may be taken without a meeting by a written consent signed by Members holding the Percentage Interests required to approve the action, delivered to the Company and maintained with its records, with prompt notice to any non-consenting Member.
 
@@ -103800,7 +103818,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **4.2 No Series-Level Ownership.** No Member is an Associated Member of any Protected Series, and no Member holds a protected-series transferable interest. Each Protected Series is wholly owned by the Company as provided in Section 3.6. Every Member's economic rights in every Protected Series arise solely through the Member's Percentage Interest in the Company, so that all Members participate in every Protected Series identically and in proportion to their Percentage Interests at all times.
 
-**4.3 Voting.** Each Member votes in proportion to the Member's Percentage Interest on matters as to which Members are entitled to vote or consent at the Company level. Except where this Agreement or a non-variable provision of the Act requires a greater vote, the act of a Majority in Interest constitutes the act of the Members. A Membership Interest owned by spouses as tenants by the entirety shall be voted only by the consensus of both spouses; neither spouse acting alone may vote the interest except as the other spouse's attorney-in-fact under a duly executed power of attorney.
+**4.3 Voting.** Each Member votes in proportion to the Member's Percentage Interest on matters as to which Members are entitled to vote or consent at the Company level. Except where this Agreement or a non-variable provision of the Act requires a greater vote, the act of a Majority in Interest constitutes the act of the Members. A Membership Interest owned by spouses as tenants by the entirety or as joint tenants with right of survivorship shall be voted only by the consensus of both spouses; neither spouse acting alone may vote the interest except as the other spouse's attorney-in-fact under a duly executed power of attorney.
 
 **4.4 Meetings; Written Consents.** No regular meetings are required. Any Member may call a meeting of the Members on at least five (5) days' written notice stating the purpose. Members may participate by any means of remote communication by which all participants can hear one another. Any action that may be taken at a meeting may be taken without a meeting by a written consent signed by Members holding the Percentage Interests required to approve the action, delivered to the Company and maintained with its records, with prompt notice to any non-consenting Member.
 
@@ -104294,7 +104312,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **4.2 No Series-Level Ownership.** No Member is an Associated Member of any Protected Series, and no Member holds a protected-series transferable interest. Each Protected Series is wholly owned by the Company as provided in Section 3.6. Every Member's economic rights in every Protected Series arise solely through the Member's Percentage Interest in the Company, so that all Members participate in every Protected Series identically and in proportion to their Percentage Interests at all times.
 
-**4.3 Voting.** Each Member votes in proportion to the Member's Percentage Interest on matters as to which Members are entitled to vote or consent at the Company level. Except where this Agreement or a non-variable provision of the Act requires a greater vote, the act of a Majority in Interest constitutes the act of the Members. A Membership Interest owned by spouses as tenants by the entirety shall be voted only by the consensus of both spouses; neither spouse acting alone may vote the interest except as the other spouse's attorney-in-fact under a duly executed power of attorney.
+**4.3 Voting.** Each Member votes in proportion to the Member's Percentage Interest on matters as to which Members are entitled to vote or consent at the Company level. Except where this Agreement or a non-variable provision of the Act requires a greater vote, the act of a Majority in Interest constitutes the act of the Members. A Membership Interest owned by spouses as tenants by the entirety or as joint tenants with right of survivorship shall be voted only by the consensus of both spouses; neither spouse acting alone may vote the interest except as the other spouse's attorney-in-fact under a duly executed power of attorney.
 
 **4.4 Meetings; Written Consents.** No regular meetings are required. Any Member may call a meeting of the Members on at least five (5) days' written notice stating the purpose. Members may participate by any means of remote communication by which all participants can hear one another. Any action that may be taken at a meeting may be taken without a meeting by a written consent signed by Members holding the Percentage Interests required to approve the action, delivered to the Company and maintained with its records, with prompt notice to any non-consenting Member.
 
@@ -106243,7 +106261,7 @@ NOW, THEREFORE,`,
   inputs.series.forEach((ser, idx) => {
     const n = idx + 1;
     let ex = ex1.section;
-    ex = ex.replace("## SERIES EXHIBIT PS-[N]", `## SERIES EXHIBIT ${n}`);
+    ex = ex.replace("## SERIES EXHIBIT PS-[N]", `## SERIES EXHIBIT PS-${n}`);
     ex = ex.replace(/\*\*Protected Series name \(exactly as filed with the Department\):\*\*\n\*\*[^\n]+\*\*/, `**Protected Series name (exactly as filed with the Department):**
 **${ser.name}**`);
     ex = resolveIf(ex, "purpose", ser.purpose.trim() !== "");
@@ -106263,7 +106281,7 @@ NOW, THEREFORE,`,
     ).split("effective [DATE]").join(`effective ${inputs.effectiveDate}`);
     const sched = ex2.section.replace(
       "## ASSET SCHEDULE \u2014 ATTACHMENT TO SERIES EXHIBIT PS-[N]",
-      `## ASSET SCHEDULE \u2014 ATTACHMENT TO SERIES EXHIBIT ${n} (${ser.name})`
+      `## ASSET SCHEDULE \u2014 ATTACHMENT TO SERIES EXHIBIT PS-${n} (${ser.name})`
     );
     exhibits.push("[[pagebreak]]\n\n" + ex.trim() + "\n\n[[pagebreak]]\n\n" + sched.trim());
   });
@@ -107215,11 +107233,13 @@ async function sElectionEligibility(clientId, orderId) {
   const paidAt = new Date(String(formed[0].paid_at));
   const orderBy = new Date(paidAt.getTime() + S_ELECTION_WINDOW_DAYS * 864e5);
   const existing = orderId ? await db.query(
-    `SELECT id FROM service_orders WHERE client_id = $1 AND type = 's-election' AND status <> 'cancelled'
+    `SELECT id FROM service_orders WHERE client_id = $1 AND type = 's-election' AND status NOT IN ('cancelled', 'pending_payment')
            AND (formation_order_id IS NULL OR formation_order_id = $2)`,
     [clientId, orderId]
   ) : await db.query(
-    "SELECT id FROM service_orders WHERE client_id = $1 AND type = 's-election' AND status <> 'cancelled'",
+    // An abandoned checkout must not lock the client out (14 Sep 2026), as
+    // the EIN and series purchases already allow.
+    "SELECT id FROM service_orders WHERE client_id = $1 AND type = 's-election' AND status NOT IN ('cancelled', 'pending_payment')",
     [clientId]
   );
   if (existing.length > 0) {
@@ -107420,7 +107440,7 @@ var sElectionDetailsSchema = external_exports.object({
       address2: external_exports.string().max(300).optional().default(""),
       ssn2: external_exports.string().optional().default("").transform((s) => s.replace(/[\s-]/g, "")).refine((s) => s === "" || /^\d{9}$/.test(s), "Each co-owner's SSN must be 9 digits.").refine((s) => s === "" || !/^(000|666|9\d\d)/.test(s), "That is not a valid Social Security number \u2014 check the first three digits.")
     }).refine((sh) => !isJoint(sh.joint) || sh.name2.trim() !== "", { message: "Enter the co-owner's name on each jointly held row." }).refine((sh) => !isJoint(sh.joint) || hasFirstAndLast(sh.name2), { message: `Co-owner: ${FIRST_AND_LAST}` })
-  ).min(1, "At least one owner is required.").max(7, "The IRS form holds 7 owners \u2014 contact us for more."),
+  ).min(1, "At least one owner is required.").max(100, "An S corporation may have no more than 100 shareholders."),
   certified: external_exports.literal(true, {
     errorMap: () => ({ message: "You must confirm the certification before submitting." })
   })
@@ -107556,6 +107576,9 @@ function registerPortalRoutes(app2) {
         // The registered-agent renewal date, from the newest formed order that
         // took our service (14 Sep 2026).
         raRenewalDate: await db.query("SELECT ra_renewal_date FROM orders WHERE client_id = $1 AND ra_renewal_date IS NOT NULL ORDER BY formed_at DESC NULLS LAST LIMIT 1", [session.clientId]).then((r) => r[0]?.ra_renewal_date ? isoDate(r[0].ra_renewal_date) : null),
+        // Whether any paid order took our registered agent service: the agent
+        // card is shown only then (14 Sep 2026: every client saw it).
+        raService: await db.query("SELECT payload FROM orders WHERE client_id = $1 AND status <> 'pending_payment'", [session.clientId]).then((rows2) => rows2.some((r) => (typeof r.payload === "string" ? JSON.parse(r.payload) : r.payload)?.registeredAgent?.choice === "SERVICE")),
         // The portal shows a banner and an Exit when the admin is looking.
         viewingAsAdmin: session.viewingAsAdmin
       }
@@ -107721,9 +107744,6 @@ function registerPortalRoutes(app2) {
   app2.post("/portal/oa/generate", async (c) => {
     const session = await getSession(c);
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    if (!await rateLimit(`oagen:${session.clientId}`, 10, 36e5)) {
-      return c.json(err("Too many generations. Try again later.", "RATE_LIMITED"), 429);
-    }
     const body = oaAnswersSchema.safeParse(await c.req.json().catch(() => null));
     if (!body.success) return c.json(err(answersProblem(body.error), "INVALID_INPUT"), 400);
     const a2 = body.data;
@@ -107789,6 +107809,10 @@ function registerPortalRoutes(app2) {
     for (const cpl of couples) {
       if (cpl.a === cpl.b || !owners[cpl.a] || !owners[cpl.b] || pairedIdx.has(cpl.a) || pairedIdx.has(cpl.b)) {
         return c.json(err("Invalid spousal pairing.", "INVALID_INPUT"), 400);
+      }
+      const entityAt = (i) => a2.members?.[i]?.isEntity ?? seed.members[i]?.isEntity ?? false;
+      if (entityAt(cpl.a) || entityAt(cpl.b)) {
+        return c.json(err("A company or trust cannot hold its interest as a spouse. Remove the pairing.", "INVALID_INPUT"), 400);
       }
       pairedIdx.add(cpl.a);
       pairedIdx.add(cpl.b);
@@ -107897,7 +107921,7 @@ function registerPortalRoutes(app2) {
     }
     const hasApprovalGate = multiOwner;
     if (hasApprovalGate && !a2.borrowingThreshold) {
-      return c.json(err("Set the manager's borrowing limit.", "INVALID_INPUT"), 400);
+      return c.json(err(memberManaged ? "Set the borrowing limit." : "Set the Manager's borrowing limit.", "INVALID_INPUT"), 400);
     }
     const capital = computeCapital(a2.assets, members.map((m2) => m2.name), seed.series.map((sr) => sr.name));
     if (capital.errors.length > 0) {
@@ -107939,6 +107963,9 @@ function registerPortalRoutes(app2) {
       professional: seed.formationType === "PLLC",
       generationNumber: nextGenerationNumber
     };
+    if (!await rateLimit(`oagen:${session.clientId}`, 10, 36e5)) {
+      return c.json(err("Too many generations. Try again later.", "RATE_LIMITED"), 429);
+    }
     const clients = await db.query("SELECT email, name FROM clients WHERE id = $1", [
       session.clientId
     ]);
@@ -108014,7 +108041,7 @@ function registerPortalRoutes(app2) {
       );
     }
     const memberManaged = seed.managementStructure === "MEMBER_MANAGED";
-    const savedForSeries = await savedOaAnswers(session.clientId);
+    const savedForSeries = await savedOaAnswers(session.clientId, consentCompanyId);
     const seriesOwners = effectiveOwners(seed.members, savedForSeries);
     const entitySigners = [];
     (savedForSeries?.members ?? []).forEach((m2, i) => {
@@ -108113,9 +108140,6 @@ function registerPortalRoutes(app2) {
   app2.post("/portal/oa/amend", async (c) => {
     const session = await getSession(c);
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    if (!await rateLimit(`oaamend:${session.clientId}`, 10, 36e5)) {
-      return c.json(err("Too many amendments. Try again later.", "RATE_LIMITED"), 429);
-    }
     const body = amendSchema.safeParse(await c.req.json().catch(() => null));
     if (!body.success) {
       const field = String(body.error.issues[0]?.path?.[0] ?? "");
@@ -108144,6 +108168,9 @@ function registerPortalRoutes(app2) {
       [session.clientId, seed.orderId]
     );
     const number = prior.reduce((max, r) => Math.max(max, Number(r.title.match(/^Amendment No\. (\d+)/)?.[1] ?? 0)), 0) + 1;
+    if (!await rateLimit(`oaamend:${session.clientId}`, 10, 36e5)) {
+      return c.json(err("Too many amendments. Try again later.", "RATE_LIMITED"), 429);
+    }
     const clients = await db.query("SELECT email, name FROM clients WHERE id = $1", [session.clientId]);
     const client = clients[0];
     const generatedOn = /* @__PURE__ */ new Date();
@@ -108272,9 +108299,6 @@ function registerPortalRoutes(app2) {
   app2.post("/portal/services/s-election", async (c) => {
     const session = await getSession(c);
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    if (!await rateLimit(`svc:${session.clientId}`, 20, 36e5)) {
-      return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
-    }
     const purchaseCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
     const llcName = await clientLlcName(session.clientId, purchaseCompanyId);
     if (!llcName) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
@@ -108284,6 +108308,9 @@ function registerPortalRoutes(app2) {
       return c.json(err(msg, gate.reason === "window_closed" ? "WINDOW_CLOSED" : "NOT_ELIGIBLE"), 400);
     }
     const db = await getDb();
+    if (!await rateLimit(`svc:${session.clientId}`, 20, 36e5)) {
+      return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
+    }
     const rows = await db.query(
       `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents, formation_order_id)
      VALUES ($1, 's-election', $2, $3, $4, $5) RETURNING id`,
@@ -108313,9 +108340,6 @@ function registerPortalRoutes(app2) {
   app2.post("/portal/services/series", async (c) => {
     const session = await getSession(c);
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    if (!await rateLimit(`svc:${session.clientId}`, 20, 36e5)) {
-      return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
-    }
     const body = external_exports.object({ suffix: external_exports.string().min(1).max(60), purpose: external_exports.string().max(300).optional() }).safeParse(await c.req.json().catch(() => null));
     if (!body.success) return c.json(err("A series identifier is required.", "INVALID_INPUT"), 400);
     const purchaseCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
@@ -108334,6 +108358,9 @@ function registerPortalRoutes(app2) {
     }
     const amountCents = SERIES_ADDON_PREP_CENTS + SERIES_ADDON_STATE_CENTS;
     const db = await getDb();
+    if (!await rateLimit(`svc:${session.clientId}`, 20, 36e5)) {
+      return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
+    }
     const rows = await db.query(
       `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents, formation_order_id)
      VALUES ($1, 'series', $2, $3, $4, $5) RETURNING id`,
@@ -108370,9 +108397,6 @@ function registerPortalRoutes(app2) {
   app2.post("/portal/services/certificate", async (c) => {
     const session = await getSession(c);
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    if (!await rateLimit(`svc:${session.clientId}`, 20, 36e5)) {
-      return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
-    }
     const body = external_exports.object({ kind: external_exports.enum(["certificate-of-status", "certified-copy"]) }).safeParse(await c.req.json().catch(() => null));
     if (!body.success) return c.json(err("Choose which document you need.", "INVALID_INPUT"), 400);
     const spec = CERT_TYPES[body.data.kind];
@@ -108391,6 +108415,9 @@ function registerPortalRoutes(app2) {
     );
     if (open.length > 0) {
       return c.json(err(`A ${spec.name.toLowerCase()} is already on order \u2014 see your orders below.`, "ALREADY_ORDERED"), 400);
+    }
+    if (!await rateLimit(`svc:${session.clientId}`, 20, 36e5)) {
+      return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
     }
     const rows = await db.query(
       `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents, formation_order_id)
@@ -108421,9 +108448,6 @@ function registerPortalRoutes(app2) {
   app2.post("/portal/services/ein", async (c) => {
     const session = await getSession(c);
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    if (!await rateLimit(`svc:${session.clientId}`, 20, 36e5)) {
-      return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
-    }
     const body = external_exports.object({ target: external_exports.enum(["company", "series"]), seriesName: external_exports.string().max(300).optional() }).safeParse(await c.req.json().catch(() => null));
     if (!body.success) return c.json(err("Choose what the EIN is for.", "INVALID_INPUT"), 400);
     const purchaseCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
@@ -108461,6 +108485,9 @@ function registerPortalRoutes(app2) {
       if (match2.einOrdered) {
         return c.json(err("An EIN for that protected series is already ordered \u2014 see your orders below.", "ALREADY_ORDERED"), 400);
       }
+    }
+    if (!await rateLimit(`svc:${session.clientId}`, 20, 36e5)) {
+      return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
     }
     const rows = await db.query(
       `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents, formation_order_id)
@@ -108714,15 +108741,15 @@ function registerPortalRoutes(app2) {
   app2.post("/portal/account/password", async (c) => {
     const session = await getSession(c);
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    if (!await rateLimit(`acct:${session.clientId}`, 10, 36e5)) {
-      return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
-    }
     const body = external_exports.object({
       currentPassword: external_exports.string().min(1),
       newPassword: external_exports.string().min(8, "Use at least 8 characters.")
     }).safeParse(await c.req.json().catch(() => null));
     if (!body.success) {
       return c.json(err(body.error.issues[0]?.message ?? "Invalid request.", "INVALID_INPUT"), 400);
+    }
+    if (!await rateLimit(`acct:${session.clientId}`, 10, 36e5)) {
+      return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
     }
     const db = await getDb();
     const rows = await db.query(
@@ -111226,6 +111253,10 @@ function registerAdminRoutes(app2) {
         console.error("[admin] EIN secret decrypt failed:", e);
       }
     }
+    const sElectionPaid = (await db.query(
+      "SELECT id FROM service_orders WHERE client_id = (SELECT client_id FROM service_orders WHERE id = $1) AND type = 's-election' AND status NOT IN ('pending_payment', 'cancelled') LIMIT 1",
+      [so2.id]
+    )).length > 0;
     return c.json({
       data: {
         id: so2.id,
@@ -111233,6 +111264,7 @@ function registerAdminRoutes(app2) {
         status: so2.status,
         llc_name: so2.llc_name,
         details: so2.details,
+        sElectionPaid,
         amount_cents: so2.amount_cents,
         created_at: so2.created_at,
         paid_at: so2.paid_at,

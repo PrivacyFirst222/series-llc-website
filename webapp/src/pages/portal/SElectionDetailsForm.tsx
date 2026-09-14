@@ -645,7 +645,7 @@ export function SElectionDetailsForm({
           );
         })}
         <div className="flex items-center justify-between">
-          {rows.length < 7 ? (
+          {rows.length < 100 ? (
             <Button type="button" size="sm" variant="outline" className="rounded-full" onClick={() => setRows((prev) => [...prev, { ...EMPTY_ROW }])}>
               <PlusCircle className="mr-1.5 h-3.5 w-3.5" />
               Add owner

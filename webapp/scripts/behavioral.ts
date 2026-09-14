@@ -93,7 +93,9 @@ const RUNS: RunConfig[] = [
   // (ownership is the questionnaire's) — so L carries the rest of it.
   { key: "J", label: "minimum: every optional field blank, exact name only (audit J)", path: "new", formationType: "DOMESTIC_LLC", management: "MEMBER_MANAGED", ra: "SERVICE", llcName: "Gate Run Juliet", designator: "LLC", exactNameOnly: true, minimal: true, email: "gate-min@e2e.test" },
   { key: "K", label: "maximum: two alternates, five series, three managers, both mailings, every add-on, dated, we sign (audit K)", path: "new", formationType: "DOMESTIC_LLC", management: "MANAGER_MANAGED", ra: "SERVICE", llcName: "Gate Run Kilo", designator: "LLC", alternate2: true, extraSeries: 4, extraManagers: 2, separateMailing: true, correspondentMailing: true, addons: { ein: true, sElection: true, certificate: true, certifiedCopy: true }, requestedEffectiveDate: "2026-11-02", specificPurpose: "Holding and leasing residential real estate in Orange County", weSign: true, email: "gate-max@e2e.test" },
-  { key: "L", label: "new LLC, manager-managed, self RA, individual manager (audit B)", path: "new", formationType: "DOMESTIC_LLC", management: "MANAGER_MANAGED", ra: "SELF", llcName: "Gate Run Lima", designator: "LLC" },
+  // Its own account, so the self-agent portal journey is not muddied by a
+  // run that took our service under the shared address.
+  { key: "L", label: "new LLC, manager-managed, self RA, individual manager (audit B)", path: "new", formationType: "DOMESTIC_LLC", management: "MANAGER_MANAGED", ra: "SELF", llcName: "Gate Run Lima", designator: "LLC", email: "gate-self@e2e.test" },
   { key: "M", label: "conversion, member-managed, keeps its own agent (audit E)", path: "convert", formationType: "DOMESTIC_LLC", management: "MEMBER_MANAGED", ra: "SELF", llcName: "Gate Run Mike, LLC", designator: "" },
   { key: "N", label: "conversion to PLLC, manager-managed, switches to our RA (audit F)", path: "convert", formationType: "PLLC", management: "MANAGER_MANAGED", ra: "SERVICE", llcName: "Gate Run November, PLLC", designator: "" },
 ];
@@ -1728,7 +1730,7 @@ async function main(): Promise<void> {
       // Run A is member-managed: the borrowing card speaks of Members and
       // s. 5.5, never of a Manager (13 Sep 2026).
       const thresholdNote = await page.locator('[data-testid="threshold-note"]').innerText().catch(() => "");
-      expect(/no Member may borrow on the company's behalf[^.]*consent of all Members \(Section 5\.5\)/.test(thresholdNote) && !/Manager/.test(thresholdNote) && /Borrowing limit/.test(await page.locator("main").innerText()) && !/Manager's borrowing limit/.test(await page.locator("main").innerText()) && /requires the consent of all Members/.test(await page.locator("main").innerText()), "OA: a member-managed company's borrowing card names the Members and Section 5.5, not a Manager", thresholdNote);
+      expect(/no Member may borrow on the company's behalf without the consent of all Members\. Guaranteeing anyone else's debt always needs that consent, whatever the amount \(Section 5\.5\)\./.test(thresholdNote) && !/Manager/.test(thresholdNote) && /Borrowing limit/.test(await page.locator("main").innerText()) && !/Manager's borrowing limit/.test(await page.locator("main").innerText()) && /requires the consent of all Members/.test(await page.locator("main").innerText()), "OA: a member-managed company's borrowing card names the Members and Section 5.5, not a Manager", thresholdNote);
       const pointer = await page.locator('[data-testid="amendment-pointer"]').innerText().catch(() => "");
       expect(/To add or remove members or managers, change ownership percentages, or change an option you chose here, update your answers and regenerate\./.test(pointer) && /that the questionnaire cannot change, use the amendment feature\./.test(pointer) && /reviewed by an attorney before it is signed/.test(pointer), "AMEND: the questionnaire ends by sending ordinary changes to regenerate, the rest to the amendment feature, with the warning", pointer);
       await page.locator('[data-testid="amendment-pointer"] a').first().click();
@@ -2016,6 +2018,43 @@ async function main(): Promise<void> {
       console.log("  ✓ statement: number required, made on upload, listed under the Articles");
     } catch (e) {
       expect(false, `statement journey: ${String(e).slice(0, 300)}`);
+    } finally {
+      await page.close();
+    }
+  }
+
+  // A client who is their own registered agent sees no agent card and no
+  // cancel button (14 Sep 2026: every client saw one).
+  if (orderIds.has("L")) {
+    const page = await browser.newPage();
+    try {
+      const lId = orderIds.get("L")!;
+      const email = "gate-self@e2e.test";
+      const mint = await fetch(`${API}/api/dev/mint-reset-token`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) }).then((r) => r.json()) as { data?: { token?: string } };
+      if (!mint.data?.token) throw new Error("no reset token for the self-agent client");
+      await fetch(`${API}/api/auth/set-password`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: mint.data.token, password: "gate-pass-12345" }) });
+      await page.route("**/api/**", async (route) => {
+        const url = new URL(route.request().url());
+        const resp = await fetch(`${API}${url.pathname}${url.search}`, {
+          method: route.request().method(),
+          headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "" },
+          body: route.request().postDataBuffer() ?? undefined,
+        });
+        const body = await resp.text();
+        const setCookie = resp.headers.get("set-cookie");
+        await route.fulfill({ status: resp.status, contentType: resp.headers.get("content-type") ?? "application/json", body, headers: setCookie ? { "set-cookie": setCookie } : undefined });
+      });
+      await page.goto(`http://localhost:${WEB_PORT}/portal/login`);
+      await page.getByLabel("Email").fill(email);
+      await page.getByLabel("Password").fill("gate-pass-12345");
+      await page.locator("main button").filter({ hasText: /^Sign in/ }).first().click();
+      await page.waitForURL(/\/portal(?!\/login)/, { timeout: 10000 });
+      await page.waitForTimeout(1500);
+      const text = await page.locator("main").innerText();
+      expect(!/Registered agent service/i.test(text) && !/registered agent service is active/.test(text), `self-agent portal: no agent card for a client who is their own agent (order ${lId.slice(0, 8)})`, text.match(/[Rr]egistered agent[^\n]{0,80}/g));
+      console.log("  ✓ self-agent portal: no agent card");
+    } catch (e) {
+      expect(false, `self-agent portal journey: ${String(e).slice(0, 300)}`);
     } finally {
       await page.close();
     }

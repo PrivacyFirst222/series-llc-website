@@ -40,6 +40,8 @@ interface Me {
   pendingEmail: string | null;
   raCancellationRequestedAt: string | null;
   raRenewalDate?: string | null;
+  /** True when a paid order took our registered agent service. */
+  raService?: boolean;
   viewingAsAdmin?: boolean;
 }
 
@@ -151,7 +153,9 @@ interface OaStatus {
 
 function AgreementAndLibraryRow({ company }: { company: string | null }) {
   const oaQuery = useQuery({
-    queryKey: ["portal-oa-status", company],
+    // One key for the one request (14 Sep 2026: a second key meant a deleted
+    // agreement left this card saying one existed).
+    queryKey: ["portal-oa", company],
     queryFn: () => api.get<OaStatus>(`/api/portal/oa${company ? `?company=${company}` : ""}`),
     retry: false,
   });
@@ -474,8 +478,8 @@ export default function PortalDashboard() {
             </p>
           ) : sel.details.purgedAt ? (
             <p className="mt-1 text-xs text-muted-foreground">
-              Deleted on {formatDateTime(sel.details.purgedAt)} as promised — the package and every
-              Social Security number are gone from our systems.
+              On {formatDateTime(sel.details.purgedAt)} we destroyed the Social Security numbers and
+              replaced the package with this record copy, which shows only the last four digits.
             </p>
           ) : undefined,
         actions:
@@ -702,7 +706,7 @@ export default function PortalDashboard() {
 
       <ServicesCard company={company} />
 
-      <RegisteredAgentCard me={meQuery.data ?? null} />
+      {meQuery.data?.raService ? <RegisteredAgentCard me={meQuery.data} /> : null}
 
       <AccountCard
         email={meQuery.data?.email ?? ""}

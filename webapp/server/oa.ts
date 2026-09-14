@@ -631,7 +631,9 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
   inputs.series.forEach((ser, idx) => {
     const n = idx + 1;
     let ex = ex1.section;
-    ex = ex.replace("## SERIES EXHIBIT PS-[N]", `## SERIES EXHIBIT ${n}`);
+    // Headed as the definition, the Instructions, the Manual, and the series
+    // consent all say: PS-1, PS-2, and so on (14 Sep 2026).
+    ex = ex.replace("## SERIES EXHIBIT PS-[N]", `## SERIES EXHIBIT PS-${n}`);
     ex = ex.replace(/\*\*Protected Series name \(exactly as filed with the Department\):\*\*\n\*\*[^\n]+\*\*/, `**Protected Series name (exactly as filed with the Department):**\n**${ser.name}**`);
     // The purpose row is the master's: "Any lawful purpose", and, when the
     // client stated one, ", including, without limitation, [PURPOSE]" (Adam,
@@ -672,7 +674,7 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
       .split("effective [DATE]").join(`effective ${inputs.effectiveDate}`);
     const sched = ex2.section.replace(
       "## ASSET SCHEDULE — ATTACHMENT TO SERIES EXHIBIT PS-[N]",
-      `## ASSET SCHEDULE — ATTACHMENT TO SERIES EXHIBIT ${n} (${ser.name})`,
+      `## ASSET SCHEDULE — ATTACHMENT TO SERIES EXHIBIT PS-${n} (${ser.name})`,
     );
     exhibits.push("[[pagebreak]]\n\n" + ex.trim() + "\n\n[[pagebreak]]\n\n" + sched.trim());
   });

@@ -253,7 +253,8 @@ export function SpousePairingCard({ owners, couples, unpaired, onPair, onUnpair 
                       Married couples can hold one combined interest together — as tenants by the
                       entirety (Florida's strongest form for spouses) or as joint tenants with
                       right of survivorship. The couple owns equal, undivided shares of a single
-                      interest and votes as one unit.
+                      interest and votes as one unit. A company or trust cannot hold as a spouse;
+                      ticking an owner as one removes its pairing.
                     </p>
                     {couples.map((c, ci) => (
                       <div key={ci} className="flex items-center justify-between gap-3 rounded-lg border border-border bg-secondary/30 p-3">
@@ -402,8 +403,9 @@ export function UnitFieldCards({ units, isMulti, owners, seedSeries, series, sEl
                 defaults, such as a different manager, a limit on what the series may do, or an
                 event that dissolves this series. If they are short, spell them out here. If they
                 are long, type &ldquo;See attached&rdquo; and attach to the signed agreement a
-                document titled as shown under the box. Special terms may not vary Article 8 or
-                the provisions of the Act that cannot be varied.
+                document titled as shown under the box. Special terms may not vary Article 8
+                (records){sElection ? ", Article 9 (the tax rules that protect the S election)," : " or"}{sElection ? " or" : ""} the
+                provisions of the Act that cannot be varied.
               </p>
               {seedSeries.map((sr, i) => (
                 <div key={sr.name} className="space-y-1">
