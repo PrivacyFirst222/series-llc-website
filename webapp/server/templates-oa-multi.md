@@ -449,7 +449,7 @@ Date: _____________________________
 | Designating Member | TOD beneficiary (any person or entity) | If that beneficiary does not survive the Member |
 |---|---|---|
 <!-- repeat:member -->
-| [MEMBER NAME] | [MEMBER TOD] | [MEMBER TOD BACKUP] |
+| [MEMBER NAME] | [MEMBER TOD]<!-- if:couple --> (effective at the death of the last surviving spouse)<!-- /if --> | [MEMBER TOD BACKUP] |
 <!-- /repeat -->
 
 If no beneficiary is designated, or a designation fails, the Member's interest passes as provided by law, subject to this Agreement.

@@ -4,6 +4,7 @@
  */
 import { defaultFormData } from "../src/components/forms/florida-llc/defaults";
 import { assembleOa, type OaInputs } from "./oa";
+import { serviceOrderClientEmail } from "./email";
 import { execSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
 import { tmpdir as osTmpdir } from "node:os";
@@ -476,6 +477,13 @@ check("service-RA order accepted with canonical details enforced", svc.status ==
   }
 }
 
+// 1f. Every service order's confirmation email is titled for what was bought
+//     (13 Sep 2026: certificates were titled "Your EIN order is confirmed").
+{
+  const subj = (type: Parameters<typeof serviceOrderClientEmail>[0]["type"]) => serviceOrderClientEmail({ type, summary: "x", needsInfo: false, portalUrl: "http://x" }).subject;
+  check("service emails: five order types, five subjects", subj("certificate-of-status") === "Your Certificate of Status order is confirmed" && subj("certified-copy") === "Your certified copy order is confirmed" && subj("ein") === "Your EIN order is confirmed" && subj("series") === "Your Protected Series order is confirmed" && subj("s-election") === "Your S corporation election order is confirmed", [subj("certificate-of-status"), subj("certified-copy")]);
+}
+
 // 2. Place a valid order. The bogus price fields ride along deliberately: the
 //    server must price the order from the answers and ignore anything the
 //    client claims the total is.
@@ -646,6 +654,8 @@ check("client account auto-created on payment", !!client && !client.has_password
   {
     const convId = conv.body?.data?.orderId as string;
     await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: convId }) });
+    const convStatus = await api(`/api/orders/${convId}/status`);
+    check("the confirmation page can tell a conversion from a formation (13 Sep 2026)", convStatus.body?.data?.isConversion === true && (await api(`/api/orders/${orderId}/status`)).body?.data?.isConversion === false, convStatus.body);
     const cd = (await api(`/api/admin/orders/${convId}`, { cookies: admin.cookie })).body?.data as {
       filingPath?: string; existingLlcName?: string; sunbizDocumentNumber?: string; status?: string;
       groups?: { title: string; fields: { label: string; value: string }[] }[];
@@ -1179,6 +1189,11 @@ if (mint.status === 200) {
     check("the certificate is priced at the published $15", buyCert.body?.data?.totalCents === 15_00, buyCert.body?.data?.totalCents);
     const certId = buyCert.body?.data?.serviceOrderId as string;
     await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: certId }) });
+    {
+      const sent = (await api("/api/dev/outbox")).body?.data as { to: string; subject: string; html: string }[] ?? [];
+      const certMail = sent.filter((m) => m.to === testEmail && /Certificate of Status order is confirmed/.test(m.subject));
+      check("the certificate order's confirmation email is titled for a certificate, not an EIN (13 Sep 2026)", certMail.length >= 1 && !sent.some((m) => m.to === testEmail && /EIN order is confirmed/.test(m.subject) && /Certificate of Status/.test(m.html)), sent.filter((m) => m.to === testEmail).map((m) => m.subject).slice(-4));
+    }
     const dupCert = await api("/api/portal/services/certificate", {
       method: "POST", cookies: setPw.cookie, body: JSON.stringify({ kind: "certificate-of-status" }),
     });
@@ -1340,8 +1355,12 @@ if (mint.status === 200) {
   // A first and last name for every owner and beneficiary (Adam, 7 Sep 2026).
   const halfOwner = await api("/api/portal/oa/generate", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ ...oaAnswers, members: [{ name: "Maria", address: "500 Bay Street, Miami, FL 33131", todBeneficiary: "Jordan Member" }] }) });
   check("agreement: a one-word owner name is refused", halfOwner.status === 400 && /first and last name/.test(halfOwner.body?.error?.message ?? ""), halfOwner.body);
-  const halfBeneficiary = await api("/api/portal/oa/generate", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ ...oaAnswers, members: [{ todBeneficiary: "Jordan" }] }) });
-  check("agreement: a one-word beneficiary is refused", halfBeneficiary.status === 400, halfBeneficiary.body);
+  // A beneficiary may be any person or entity (s. 4.11; 13 Sep 2026): a
+  // trust's name and a one-word name are both accepted.
+  const trustBeneficiary = await api("/api/portal/oa/answers", { method: "PUT", cookies: setPw.cookie, body: JSON.stringify({ ...oaAnswers, members: [{ todBeneficiary: "Doe Family Trust" }] }) });
+  check("agreement: a trust may be named as beneficiary", trustBeneficiary.status === 200, trustBeneficiary.body);
+  const restoreAns = await api("/api/portal/oa/answers", { method: "PUT", cookies: setPw.cookie, body: JSON.stringify(oaAnswers) });
+  check("agreement: answers restored", restoreAns.status === 200);
   const gen1 = await api("/api/portal/oa/generate", { method: "POST", cookies: setPw.cookie, body: JSON.stringify(oaAnswers) });
   check("OA generates", gen1.status === 200, gen1.body);
   check("a sole owner who is member-managed gets the member-single master", gen1.body?.data?.version === "member-single", gen1.body?.data);
@@ -1480,6 +1499,9 @@ if (mint.status === 200) {
       const flat = text.replace(/\s+/g, " ");
       check("read off the consent PDF: the new series' purpose is any lawful purpose, including the phrase typed", /The purpose of the new Protected Series is any lawful purpose, including, without limitation, to acquire, own, and lease the real property at 400 Bay Court\./.test(flat), flat.match(/The purpose of the new Protected Series[^.]*\./)?.[0]);
       check("read off the consent PDF: its Series Exhibit row says the same", /Purpose of this Protected Series Any lawful purpose, including, without limitation, to acquire, own, and lease the real property at 400 Bay Court/.test(flat), flat.match(/Purpose of this Protected Series[^O]{0,200}/)?.[0]);
+      check("read off the consent PDF: no fill-in brackets and no form-document footer (13 Sep 2026)", !/\[[A-Z]/.test(flat.replace(/\[INTENTIONALLY LEFT BLANK\]/g, "")) && !/Form document/.test(flat) && !/Dissolution events/.test(flat), flat.match(/\[[A-Z][^\]]{0,40}\]|Form document[^.]{0,60}/g));
+      check("read off the consent PDF: a member-managed company's series is managed by the Members, as the agreement's s. 5.2 provides", /Managed by The Members, as protected-series managers \(s\. 605\.2304, Fla\. Stat\., as varied by Section 5\.2 of the Agreement\)/.test(flat) && !/The Company, as protected-series manager/.test(flat), flat.match(/Managed by[^|]{0,160}/)?.[0]);
+      check("read off the consent PDF: the contributions and special-terms rows read as the master writes them", /By the Company: as recorded on the Asset Schedule attached to this Series Exhibit/.test(flat) && /Special terms \(if any\) None/.test(flat), flat.match(/Contributions to this Protected Series[^A]{0,120}/)?.[0]);
     }
   }
   const consentBlank = await api("/api/portal/series/consent", {
@@ -2370,7 +2392,7 @@ if (mint.status === 200) {
   );
   // A trust as sole owner signs through its trustee (Adam, 13 Sep 2026); the
   // signer's name and title are required before the agreement generates.
-  const trustOwner = { name: "Vale Family Trust", address: "9 Harbor Road, Naples, FL 34102", isEntity: true, signerName: "Alex Vale", signerTitle: "Trustee" };
+  const trustOwner = { name: "Vale Family Trust", address: "9 Harbor Road, Naples, FL 34102", isEntity: true, signerName: "Alex Vale", signerTitle: "Trustee", todBeneficiary: "Should Be Ignored" };
   const noSigner = await api("/api/portal/oa/generate", { method: "POST", cookies: smPw.cookie, body: JSON.stringify({ ...smAnswers, members: [{ ...trustOwner, signerName: "" }] }) });
   check("entity: an owner marked as a company or trust with no signer is refused, naming the owner", noSigner.status === 400 && /Name the person who signs for Vale Family Trust/.test(noSigner.body?.error?.message ?? ""), noSigner.body);
   const entityGen = await api("/api/portal/oa/generate", { method: "POST", cookies: smPw.cookie, body: JSON.stringify({ ...smAnswers, members: [trustOwner] }) });
@@ -2381,6 +2403,7 @@ if (mint.status === 200) {
     check("entity: the sole member's block is the trust's name, By: over the rule, and the trustee's name and title beneath", md.includes("**MEMBER:**\n\nVale Family Trust\n\nBy: _____________________________\n[[indent]]Alex Vale\n[[indent]]Trustee\nDate: _____________________________"), md.match(/\*\*MEMBER:\*\*[\s\S]{0,200}/)?.[0]);
     check("entity: the Manager, a person, still signs on a plain line", md.includes("_____________________________\nRobin Vale, Manager\nDate: _____________________________"));
     check("entity: Exhibit A names the trust as the member", /Vale Family Trust/.test(md.slice(md.indexOf("EXHIBIT A"))));
+    check("entity: a trust makes no death designation — Exhibit A says None whatever was typed (s. 4.11: only an individual may designate)", /shall pass to: \*\*None\*\*/.test(md) && !/Should Be Ignored/.test(md), md.match(/shall pass to:[^\n]{0,80}/)?.[0]);
     const entityPdf = await fetch(`${BASE}/api/portal/documents/${entityGen.body.data.documentId}/download`, { headers: { Cookie: smPw.cookie } });
     const entityText = pdfText(new Uint8Array(await entityPdf.arrayBuffer()));
     if (entityText !== null) {

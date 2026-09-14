@@ -225,7 +225,7 @@ export function raCancellationAdminEmail(opts: {
 }
 
 export function serviceOrderClientEmail(opts: {
-  type: "series" | "ein" | "s-election";
+  type: "series" | "ein" | "s-election" | "certificate-of-status" | "certified-copy";
   summary: string;
   needsInfo: boolean;
   portalUrl: string;
@@ -235,7 +235,11 @@ export function serviceOrderClientEmail(opts: {
       ? "Your Protected Series order is confirmed"
       : opts.type === "s-election"
         ? "Your S corporation election order is confirmed"
-        : "Your EIN order is confirmed";
+        : opts.type === "certificate-of-status"
+          ? "Your Certificate of Status order is confirmed"
+          : opts.type === "certified-copy"
+            ? "Your certified copy order is confirmed"
+            : "Your EIN order is confirmed";
   const action = opts.needsInfo
     ? opts.type === "s-election"
       ? `<p><strong>One step is needed from you:</strong> sign in to your portal and provide the

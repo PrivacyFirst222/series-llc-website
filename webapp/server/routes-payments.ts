@@ -168,7 +168,7 @@ export async function fulfillPaidServiceOrder(serviceOrderId: string, squarePaym
   const client = clients[0];
   if (client) {
     const mail = serviceOrderClientEmail({
-      type: so.type as "series" | "ein" | "s-election",
+      type: so.type as "series" | "ein" | "s-election" | "certificate-of-status" | "certified-copy",
       summary,
       needsInfo: so.type === "ein" || so.type === "s-election",
       portalUrl: `${env.PUBLIC_BASE_URL}/portal`,
@@ -403,12 +403,14 @@ app.get("/orders/:id/status", async (c) => {
   // order id from the Square redirect. It answers with the minimum that page
   // renders: status and name. The paid amount stayed in this response long
   // after the page stopped showing it (Codex PRIV-001).
-  const rows = await db.query<{ status: string; llc_name: string }>(
-    "SELECT status, llc_name FROM orders WHERE id = $1",
+  const rows = await db.query<{ status: string; llc_name: string; payload: unknown }>(
+    "SELECT status, llc_name, payload FROM orders WHERE id = $1",
     [c.req.param("id")],
   );
   if (rows.length === 0) return c.json(err("Order not found", "NOT_FOUND"), 404);
-  return c.json({ data: { status: rows[0].status, llcName: rows[0].llc_name } });
+  // A conversion's company already exists; the page's wording follows.
+  const payload = (typeof rows[0].payload === "string" ? JSON.parse(rows[0].payload) : rows[0].payload) as { filingPath?: string } | null;
+  return c.json({ data: { status: rows[0].status, llcName: rows[0].llc_name, isConversion: payload?.filingPath === "CONVERT" } });
 });
 
 app.post("/square/webhook", async (c) => {

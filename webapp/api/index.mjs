@@ -101438,7 +101438,7 @@ function raCancellationAdminEmail(opts) {
   };
 }
 function serviceOrderClientEmail(opts) {
-  const subject = opts.type === "series" ? "Your Protected Series order is confirmed" : opts.type === "s-election" ? "Your S corporation election order is confirmed" : "Your EIN order is confirmed";
+  const subject = opts.type === "series" ? "Your Protected Series order is confirmed" : opts.type === "s-election" ? "Your S corporation election order is confirmed" : opts.type === "certificate-of-status" ? "Your Certificate of Status order is confirmed" : opts.type === "certified-copy" ? "Your certified copy order is confirmed" : "Your EIN order is confirmed";
   const action = opts.needsInfo ? opts.type === "s-election" ? `<p><strong>One step is needed from you:</strong> sign in to your portal and provide the
          election details (owners, ownership percentages, and identification numbers) through the
          secure form. We cannot prepare Form 2553 until you do. The election has a strict IRS
@@ -102106,7 +102106,7 @@ The undersigned, being **all** of the members of **[COMPANY NAME], LLC**, a Flor
 
 **3. Ownership.** The new Protected Series is established without associated members. The Company owns all of its protected-series transferable interests, and no member of the Company holds any interest in it except indirectly, through that member's interest in the Company (ss. 605.2302(1), 605.2303(2), Fla. Stat.).
 
-**4. Authority to file.** [SIGNER ROLE SENTENCE] The protected series is established when its Protected Series Designation takes effect under s. 605.0207, Florida Statutes.
+**4. Authority to file.** <!-- if:membermanaged -->The Members authorize the Administrative Member, or any Member the Members designate, to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.<!-- /if --><!-- if:managermanaged -->The Members authorize the Manager to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.<!-- /if --> The protected series is established when its Protected Series Designation takes effect under s. 605.0207, Florida Statutes.
 
 **5. Series Exhibit.** The Series Exhibit set forth below is adopted as part of the Agreement for the new Protected Series, as Section 3.1 of the Agreement requires at or before the filing of the Protected Series Designation.
 
@@ -102129,11 +102129,11 @@ The undersigned, being **all** of the members of **[COMPANY NAME], LLC**, a Flor
 |---|---|
 | Purpose of this Protected Series | Any lawful purpose<!-- if:purpose -->, including, without limitation, [SERIES PURPOSE]<!-- /if --> |
 | Owner of this Protected Series | The Company. This Protected Series has no Associated Members (ss. 605.2302(1), 605.2303(2), Fla. Stat.). |
-| Protected Series Manager | [PS MANAGER] |
-| Contributions to this Protected Series | By the Company: $[AMOUNT] on [DATE] [and/or described property] |
+<!-- if:managermanaged -->| Protected Series Manager | [PS MANAGER] |
+<!-- /if --><!-- if:membermanaged -->| Managed by | The Members, as protected-series managers (s. 605.2304, Fla. Stat., as varied by Section 5.2 of the Agreement) |
+<!-- /if -->| Contributions to this Protected Series | By the Company: as recorded on the Asset Schedule attached to this Series Exhibit |
 | Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit, together with the records maintained under Article 8. |
-| Special terms (if any) | [None / variations from the base Agreement \u2014 may not vary Article 8 or non-variable provisions of the Act] |
-| Dissolution events specific to this Protected Series (if any) | [None / describe] |
+| Special terms (if any) | None |
 
 **Adopted effective [EFFECTIVE DATE] by the Company:**
 
@@ -102152,9 +102152,6 @@ The undersigned, being **all** of the members of **[COMPANY NAME], LLC**, a Flor
 | | | | |
 | | | | |
 
----
-
-*Form document \u2014 prepared for [COMPANY NAME], LLC. Statutory citations: ss. 605.0207, 605.2201, 605.2301, 605.2302(1), 605.2303(2), Florida Statutes.*
 `;
 
 // server/oa.ts
@@ -102518,7 +102515,7 @@ Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENE
 | Owner of this Protected Series | The Company. This Protected Series has no Associated Members (ss. 605.2302(1), 605.2303(2), Fla. Stat.). |
 | Protected Series Manager | [Same as Company Manager / NAME] |
 | Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
-| Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the Member(s), together with the records maintained under Article 8. |
+| Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the Member, together with the records maintained under Article 8. |
 | Special terms (if any) | [None / variations from the base Agreement \u2014 may not vary Article 8 or non-variable provisions of the Act] |
 
 <!-- one:manager -->**Adopted effective [DATE] by the Company, acting through its Manager:**<!-- /one --><!-- many:manager -->**Adopted effective [DATE] by the Company, acting through its Managers:**<!-- /many -->
@@ -103008,7 +103005,7 @@ Date: _____________________________
 | Designating Member | TOD beneficiary (any person or entity) | If that beneficiary does not survive the Member |
 |---|---|---|
 <!-- repeat:member -->
-| [MEMBER NAME] | [MEMBER TOD] | [MEMBER TOD BACKUP] |
+| [MEMBER NAME] | [MEMBER TOD]<!-- if:couple --> (effective at the death of the last surviving spouse)<!-- /if --> | [MEMBER TOD BACKUP] |
 <!-- /repeat -->
 
 If no beneficiary is designated, or a designation fails, the Member's interest passes as provided by law, subject to this Agreement.
@@ -103218,7 +103215,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **4.10 Information Rights.** Each Member has the information and inspection rights provided by the Act with respect to the Company. The records of the Company that each Member may inspect include the records maintained under Article 8 for every Protected Series.
 
-**4.11 Transfer on Death Designation.** Each Member's Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50\u2013711.512, Florida Statutes, and reflects each Member's designation, if any, of the person or persons who will become the owner of that Member's Membership Interest upon that Member's death. A Member who is an individual may designate any person or entity as a beneficiary. A designation may name a backup beneficiary to take if the first beneficiary does not survive the Member. Members who hold a Membership Interest jointly as tenants in common may not designate a TOD beneficiary. A Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, delivered to the Manager; the change is effective upon receipt unless the Manager objects in writing within seven (7) days, and the Manager shall thereafter update Exhibit A (though updating is not required for effectiveness). Upon the designating Member's death, the designated beneficiary automatically succeeds to the deceased Member's transferable interest \u2014 including the economic rights of the deceased Member's Percentage Interest \u2014 taking subject to this Agreement, and holds the rights of a transferee described in Section 10.3 until admitted as a Member. A beneficiary is admitted as a Member upon delivery to the Company of a written agreement to be bound by this Agreement and the written consent of a Majority in Interest of the Members other than the deceased Member.
+**4.11 Transfer on Death Designation.** Each Member's Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50\u2013711.512, Florida Statutes, and reflects each Member's designation, if any, of the person or persons who will become the owner of that Member's Membership Interest upon that Member's death. Subject to Section 9.3(b), a Member who is an individual may designate any person or entity as a beneficiary. A designation may name a backup beneficiary to take if the first beneficiary does not survive the Member. Members who hold a Membership Interest jointly as tenants in common may not designate a TOD beneficiary. A Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, delivered to the Manager; the change is effective upon receipt unless the Manager objects in writing within seven (7) days, and the Manager shall thereafter update Exhibit A (though updating is not required for effectiveness). Upon the designating Member's death, the designated beneficiary automatically succeeds to the deceased Member's transferable interest \u2014 including the economic rights of the deceased Member's Percentage Interest \u2014 taking subject to this Agreement, and holds the rights of a transferee described in Section 10.3 until admitted as a Member. A beneficiary is admitted as a Member upon delivery to the Company of a written agreement to be bound by this Agreement and the written consent of a Majority in Interest of the Members other than the deceased Member.
 
 **4.12 Incapacity of a Member.** While a Member is Incapacitated, that Member's rights under this Agreement \u2014 including the right to vote, to consent, and to sign any instrument \u2014 are exercised by the Member's agent under a durable power of attorney conferring that authority or, if there is none, by the Member's court-appointed guardian. The Company, the Manager, and the other Members may rely on a certified copy of the power of attorney or of the letters of guardianship without further inquiry.
 
@@ -103382,7 +103379,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 ## ARTICLE 12 \u2014 ADMISSION OF MEMBERS; ASSOCIATION WITH PROTECTED SERIES
 
-**12.1 Admission of Members.** A person may be admitted as a Member of the Company only with the written consent of **all** Members and upon the person's delivery of a signed agreement to be bound by this Agreement, except that (a) a TOD beneficiary is admitted as provided in Section 4.11, and (b) a permitted family transferee under Section 10.2 may be admitted with the written consent of a Majority in Interest of the Members other than the transferor.
+**12.1 Admission of Members.** A person may be admitted as a Member of the Company only with the written consent of **all** Members and upon the person's delivery of a signed agreement to be bound by this Agreement, and only if that person is an eligible S corporation shareholder under section 1361 of the Code and the admission would not cause the number of shareholders to exceed the limit of that section, except that (a) a TOD beneficiary is admitted as provided in Section 4.11, and (b) a permitted family transferee under Section 10.2 may be admitted with the written consent of a Majority in Interest of the Members other than the transferor. Any purported admission in violation of this Section is null and void ab initio and shall be given no force or effect for any purpose.
 
 **12.2 No Association with a Protected Series.** No Member may be associated with a Protected Series. A Protected Series may not be established with, and may not admit, an Associated Member.
 
@@ -103530,8 +103527,10 @@ Date: _____________________________
 | Designating Member | TOD beneficiary (any person or entity) | If that beneficiary does not survive the Member |
 |---|---|---|
 <!-- repeat:member -->
-| [MEMBER NAME] | [MEMBER TOD] | [MEMBER TOD BACKUP] |
+| [MEMBER NAME] | [MEMBER TOD]<!-- if:couple --> (effective at the death of the last surviving spouse)<!-- /if --> | [MEMBER TOD BACKUP] |
 <!-- /repeat -->
+
+A designation is effective only in favor of a beneficiary that is an eligible S corporation shareholder (Section 9.3(b)).
 
 If no beneficiary is designated, or a designation fails, the Member's interest passes as provided by law, subject to this Agreement.
 
@@ -103696,7 +103695,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 (c) No Protected Series is liable for, and the Associated Assets of a Protected Series are not available to satisfy, any debt, obligation, or liability of the Company or of any other Protected Series; and the Company is not liable for, and the Associated Assets of the Company are not available to satisfy, any debt, obligation, or liability of any Protected Series; and
 
-(d) No Member is personally liable, directly or indirectly, by way of contribution or otherwise, for any debt, obligation, or liability of the Company or of any Protected Series solely by reason of being or acting as a member, manager, or protected-series manager.
+(d) No Member is personally liable, directly or indirectly, by way of contribution or otherwise, for any debt, obligation, or liability of the Company or of any Protected Series solely by reason of being or acting as a member or protected-series manager.
 
 **3.4 Dissolution of a Protected Series Distinguished.** The dissolution and winding up of a Protected Series does not, by itself, cause the dissolution of the Company or of any other Protected Series. The dissolution of the Company causes the dissolution of every Protected Series, and the winding up of the Company is not complete until each Protected Series is wound up.
 
@@ -104024,7 +104023,7 @@ Date: _____________________________
 | Designating Member | TOD beneficiary (any person or entity) | If that beneficiary does not survive the Member |
 |---|---|---|
 <!-- repeat:member -->
-| [MEMBER NAME] | [MEMBER TOD] | [MEMBER TOD BACKUP] |
+| [MEMBER NAME] | [MEMBER TOD]<!-- if:couple --> (effective at the death of the last surviving spouse)<!-- /if --> | [MEMBER TOD BACKUP] |
 <!-- /repeat -->
 
 If no beneficiary is designated, or a designation fails, the Member's interest passes as provided by law, subject to this Agreement.
@@ -104190,7 +104189,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 (c) No Protected Series is liable for, and the Associated Assets of a Protected Series are not available to satisfy, any debt, obligation, or liability of the Company or of any other Protected Series; and the Company is not liable for, and the Associated Assets of the Company are not available to satisfy, any debt, obligation, or liability of any Protected Series; and
 
-(d) No Member is personally liable, directly or indirectly, by way of contribution or otherwise, for any debt, obligation, or liability of the Company or of any Protected Series solely by reason of being or acting as a member, manager, or protected-series manager.
+(d) No Member is personally liable, directly or indirectly, by way of contribution or otherwise, for any debt, obligation, or liability of the Company or of any Protected Series solely by reason of being or acting as a member or protected-series manager.
 
 **3.4 Dissolution of a Protected Series Distinguished.** The dissolution and winding up of a Protected Series does not, by itself, cause the dissolution of the Company or of any other Protected Series. The dissolution of the Company causes the dissolution of every Protected Series, and the winding up of the Company is not complete until each Protected Series is wound up.
 
@@ -104232,7 +104231,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **4.10 Information Rights.** Each Member has the information and inspection rights provided by the Act with respect to the Company. The records of the Company that each Member may inspect include the records maintained under Article 8 for every Protected Series.
 
-**4.11 Transfer on Death Designation.** Each Member's Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50\u2013711.512, Florida Statutes, and reflects each Member's designation, if any, of the person or persons who will become the owner of that Member's Membership Interest upon that Member's death. A Member who is an individual may designate any person or entity as a beneficiary. A designation may name a backup beneficiary to take if the first beneficiary does not survive the Member. Members who hold a Membership Interest jointly as tenants in common may not designate a TOD beneficiary. A Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, delivered to the Administrative Member; the change is effective upon receipt unless the Administrative Member objects in writing within seven (7) days, and the Administrative Member shall thereafter update Exhibit A (though updating is not required for effectiveness). Upon the designating Member's death, the designated beneficiary automatically succeeds to the deceased Member's transferable interest \u2014 including the economic rights of the deceased Member's Percentage Interest \u2014 taking subject to this Agreement, and holds the rights of a transferee described in Section 10.3 until admitted as a Member. A beneficiary is admitted as a Member upon delivery to the Company of a written agreement to be bound by this Agreement and the written consent of a Majority in Interest of the Members other than the deceased Member.
+**4.11 Transfer on Death Designation.** Each Member's Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50\u2013711.512, Florida Statutes, and reflects each Member's designation, if any, of the person or persons who will become the owner of that Member's Membership Interest upon that Member's death. Subject to Section 9.3(b), a Member who is an individual may designate any person or entity as a beneficiary. A designation may name a backup beneficiary to take if the first beneficiary does not survive the Member. Members who hold a Membership Interest jointly as tenants in common may not designate a TOD beneficiary. A Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, delivered to the Administrative Member; the change is effective upon receipt unless the Administrative Member objects in writing within seven (7) days, and the Administrative Member shall thereafter update Exhibit A (though updating is not required for effectiveness). Upon the designating Member's death, the designated beneficiary automatically succeeds to the deceased Member's transferable interest \u2014 including the economic rights of the deceased Member's Percentage Interest \u2014 taking subject to this Agreement, and holds the rights of a transferee described in Section 10.3 until admitted as a Member. A beneficiary is admitted as a Member upon delivery to the Company of a written agreement to be bound by this Agreement and the written consent of a Majority in Interest of the Members other than the deceased Member.
 
 **4.12 Incapacity of a Member.** While a Member is Incapacitated, that Member's rights under this Agreement \u2014 including the right to vote, to consent, and to sign any instrument \u2014 are exercised by the Member's agent under a durable power of attorney conferring that authority or, if there is none, by the Member's court-appointed guardian. The Company and the other Members may rely on a certified copy of the power of attorney or of the letters of guardianship without further inquiry.
 
@@ -104400,7 +104399,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 ## ARTICLE 12 \u2014 ADMISSION OF MEMBERS; ASSOCIATION WITH PROTECTED SERIES
 
-**12.1 Admission of Members.** A person may be admitted as a Member of the Company only with the written consent of **all** Members and upon the person's delivery of a signed agreement to be bound by this Agreement, except that (a) a TOD beneficiary is admitted as provided in Section 4.11, and (b) a permitted family transferee under Section 10.2 may be admitted with the written consent of a Majority in Interest of the Members other than the transferor.
+**12.1 Admission of Members.** A person may be admitted as a Member of the Company only with the written consent of **all** Members and upon the person's delivery of a signed agreement to be bound by this Agreement, and only if that person is an eligible S corporation shareholder under section 1361 of the Code and the admission would not cause the number of shareholders to exceed the limit of that section, except that (a) a TOD beneficiary is admitted as provided in Section 4.11, and (b) a permitted family transferee under Section 10.2 may be admitted with the written consent of a Majority in Interest of the Members other than the transferor. Any purported admission in violation of this Section is null and void ab initio and shall be given no force or effect for any purpose.
 
 **12.2 No Association with a Protected Series.** No Member may be associated with a Protected Series. A Protected Series may not be established with, and may not admit, an Associated Member.
 
@@ -104532,8 +104531,10 @@ Date: _____________________________
 | Designating Member | TOD beneficiary (any person or entity) | If that beneficiary does not survive the Member |
 |---|---|---|
 <!-- repeat:member -->
-| [MEMBER NAME] | [MEMBER TOD] | [MEMBER TOD BACKUP] |
+| [MEMBER NAME] | [MEMBER TOD]<!-- if:couple --> (effective at the death of the last surviving spouse)<!-- /if --> | [MEMBER TOD BACKUP] |
 <!-- /repeat -->
+
+A designation is effective only in favor of a beneficiary that is an eligible S corporation shareholder (Section 9.3(b)).
 
 If no beneficiary is designated, or a designation fails, the Member's interest passes as provided by law, subject to this Agreement.
 
@@ -106122,6 +106123,9 @@ NOW, THEREFORE,`,
       "[MEMBER DATE]": inputs.effectiveDate,
       "[MEMBER TOD]": m2.todBeneficiary || "None",
       "[MEMBER TOD BACKUP]": m2.todBackup || "None",
+      // A marital unit's designation takes effect at the death of the last
+      // surviving spouse; the words are the master's row (Adam, 13 Sep 2026).
+      "[COUPLE]": m2.jointHolding && m2.todBeneficiary ? "x" : "",
       // Empty for an individual, which drops the master's " as […]" fragment.
       // The name matches the marker that guards it — <!-- if:holding --> looks
       // up [HOLDING] — so a renamed slot cannot silently stop guarding.
@@ -106236,9 +106240,11 @@ function must2(haystack, needle, label) {
 function assembleNewSeries(input) {
   let s = templates_new_series_default;
   const purpose = input.purpose.trim();
-  const authority = input.memberManaged ? "The Members authorize the Administrative Member, or any Member the Members designate, to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement." : `The Members authorize the Manager to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.`;
+  s = resolveIf(s, "membermanaged", input.memberManaged);
+  s = resolveIf(s, "managermanaged", !input.memberManaged);
   const managers = input.managerNames.map((n) => n.trim()).filter(Boolean);
-  const psManager = input.memberManaged ? "The Company, as protected-series manager (s. 605.2304(2), Fla. Stat.), acting through a Majority in Interest of the Members" : managers.join(", ") || "[MANAGER NAME]";
+  if (!input.memberManaged && managers.length === 0) throw new Error("new-series: a manager-managed company needs at least one Manager");
+  const psManager = managers.join(", ");
   const signerOf = (entity) => (input.entitySigners ?? []).find((x2) => x2.entity.trim() === entity.trim());
   const block = (n, suffix) => {
     const sg = signerOf(n);
@@ -106249,8 +106255,9 @@ By: _____________________________
 [[indent]]${sg.title}` : `_____________________________
 ${n}${suffix}`;
   };
-  const psSignature = input.memberManaged ? block(input.memberNames[0] ?? "[MEMBER NAME]", ", Member, for the Company") : managers.length ? managers.map((n) => block(n, ", Manager")).join("\n\n") : "_____________________________\n[MANAGER NAME], Manager";
-  const blocks = input.memberNames.length ? input.memberNames.map((n) => block(n, "")).join("\n\n") : "_____________________________\n[MEMBER NAME]";
+  if (input.memberNames.length === 0) throw new Error("new-series: at least one member is required");
+  const psSignature = input.memberManaged ? block(input.memberNames[0], ", Member, for the Company") : managers.map((n) => block(n, ", Manager")).join("\n\n");
+  const blocks = input.memberNames.map((n) => block(n, "")).join("\n\n");
   must2(s, "[COMPANY NAME], LLC", "company name");
   s = s.split("[COMPANY NAME], LLC").join(input.companyName);
   s = s.split("[COMPANY NAME]").join(input.companyName);
@@ -106263,16 +106270,19 @@ ${n}${suffix}`;
   s = s.split("[SERIES PURPOSE]").join(purpose);
   must2(s, "[EFFECTIVE DATE]", "effective date");
   s = s.split("[EFFECTIVE DATE]").join(input.effectiveDate);
-  must2(s, "[SIGNER ROLE SENTENCE]", "authority sentence");
-  s = s.split("[SIGNER ROLE SENTENCE]").join(authority);
   must2(s, "[PS MANAGER SIGNATURE LINE]", "ps manager signature");
   s = s.split("[PS MANAGER SIGNATURE LINE]").join(psSignature);
-  must2(s, "[PS MANAGER]", "ps manager");
-  s = s.split("[PS MANAGER]").join(psManager);
+  if (!input.memberManaged) {
+    must2(s, "[PS MANAGER]", "ps manager");
+    s = s.split("[PS MANAGER]").join(psManager);
+  }
   must2(s, "[MEMBER SIGNATURE BLOCKS]", "member signature blocks");
   s = s.split("[MEMBER SIGNATURE BLOCKS]").join(blocks);
-  const leftovers = s.match(/\[(COMPANY NAME|SERIES NAME|SERIES PURPOSE|EFFECTIVE DATE|PS MANAGER|MEMBER SIGNATURE BLOCKS|SIGNER ROLE SENTENCE)[^\]]*\]/g);
+  s = s.replace(/\n{3,}/g, "\n\n");
+  const leftovers = s.match(/\[[A-Z][A-Za-z ()/.'—-]*\]/g);
   if (leftovers) throw new Error(`new-series template left unfilled: ${leftovers.join(", ")}`);
+  if (/<!--/.test(s)) throw new Error("new-series: template marker left in the document");
+  if (/Form document/.test(s)) throw new Error("new-series: draft colophon left in the document");
   return { markdown: s, title: `New Protected Series \u2014 ${input.seriesName}` };
 }
 
@@ -106669,7 +106679,7 @@ function filingGroups(payload) {
     provisions.push(MGMT_PROVISION[mgmt.structure]);
   }
   const purposeText = (p2.purpose?.businessPurposeText ?? "").trim();
-  if (p2.purpose?.purposeType === "SPECIFIC" && purposeText) {
+  if ((p2.purpose?.purposeType === "SPECIFIC" || p2.purpose?.purposeType === "PROFESSIONAL") && purposeText) {
     provisions.push(purposeText);
   }
   groups.push({
@@ -106731,7 +106741,10 @@ function filingGroups(payload) {
       personFields.push({
         key: `person${slot}Ar`,
         label: "Authorized representative",
-        value: `${(m2.fullName || m2.businessEntityName || "").trim()} \u2014 signs only, do NOT list in this section`,
+        // An individual is first/last/suffix, an entity its name — the same
+        // builder the manager rows use (13 Sep 2026: an individual printed
+        // with no name at all).
+        value: `${([personName(m2).first, personName(m2).last].filter(Boolean).join(" ") || personName(m2).legacy || m2.businessEntityName || "").trim()} \u2014 signs only, do NOT list in this section`,
         block: true
       });
       slot++;
@@ -106904,7 +106917,8 @@ var oaAnswersSchema = external_exports.object({
       numerator: external_exports.number().int().min(0).max(1e5).optional(),
       denominator: external_exports.number().int().min(1).max(1e5).optional(),
       contribution: external_exports.string().max(300).optional(),
-      todBeneficiary: external_exports.string().max(300).optional().refine((v2) => !(v2 ?? "").trim() || hasFirstAndLast(v2), `Beneficiary: ${FIRST_AND_LAST}`),
+      // Any person or entity (s. 4.11), so no person-name rule (13 Sep 2026).
+      todBeneficiary: external_exports.string().max(300).optional(),
       // A backup may be a class ("my children in equal shares"), so no name rule.
       todBackup: external_exports.string().max(300).optional(),
       // A company or trust as owner: who signs for it and their title
@@ -106948,7 +106962,8 @@ var oaAnswersSchema = external_exports.object({
       numerator: external_exports.number().int().min(0).max(1e5).optional(),
       denominator: external_exports.number().int().min(1).max(1e5).optional(),
       contribution: external_exports.string().max(300).optional(),
-      todBeneficiary: external_exports.string().max(300).optional().refine((v2) => !(v2 ?? "").trim() || hasFirstAndLast(v2), `Beneficiary: ${FIRST_AND_LAST}`),
+      // Any person or entity (s. 4.11), so no person-name rule (13 Sep 2026).
+      todBeneficiary: external_exports.string().max(300).optional(),
       // A backup may be a class ("my children in equal shares"), so no name rule.
       todBackup: external_exports.string().max(300).optional()
     })
@@ -107692,7 +107707,8 @@ function registerPortalRoutes(app2) {
           percentageLabel: shareLabel(ownershipMode, cplShare),
           jointHolding: SPOUSAL_FORM_LABEL[cpl.form],
           contribution: cpl.contribution ?? "",
-          todBeneficiary: cpl.todBeneficiary ? `${cpl.todBeneficiary} (effective at the death of the last surviving spouse)` : "",
+          // The "last surviving spouse" words are Exhibit A's own row now.
+          todBeneficiary: cpl.todBeneficiary ?? "",
           todBackup: cpl.todBackup ?? "",
           signatories: [owners[cpl.a].name, owners[cpl.b].name]
         });
@@ -107715,8 +107731,10 @@ function registerPortalRoutes(app2) {
           percentage: shareValue(multiOwner ? ownershipMode : "percent", mShare),
           percentageLabel: shareLabel(multiOwner ? ownershipMode : "percent", mShare),
           contribution: ans?.contribution ?? "",
-          todBeneficiary: ans?.todBeneficiary ?? "",
-          todBackup: ans?.todBackup ?? "",
+          // Only an individual may designate (s. 4.11): a company or trust
+          // prints None whatever was typed.
+          todBeneficiary: isEntity ? "" : ans?.todBeneficiary ?? "",
+          todBackup: isEntity ? "" : ans?.todBackup ?? "",
           ...entitySigner ? { entitySigner } : {}
         });
       }
@@ -109213,11 +109231,12 @@ function registerPaymentRoutes(app2) {
   app2.get("/orders/:id/status", async (c) => {
     const db = await getDb();
     const rows = await db.query(
-      "SELECT status, llc_name FROM orders WHERE id = $1",
+      "SELECT status, llc_name, payload FROM orders WHERE id = $1",
       [c.req.param("id")]
     );
     if (rows.length === 0) return c.json(err("Order not found", "NOT_FOUND"), 404);
-    return c.json({ data: { status: rows[0].status, llcName: rows[0].llc_name } });
+    const payload = typeof rows[0].payload === "string" ? JSON.parse(rows[0].payload) : rows[0].payload;
+    return c.json({ data: { status: rows[0].status, llcName: rows[0].llc_name, isConversion: payload?.filingPath === "CONVERT" } });
   });
   app2.post("/square/webhook", async (c) => {
     const rawBody = await c.req.text();
@@ -110166,7 +110185,7 @@ Practical rules:
 **B. New-series checklist (every time)**
 \u2610 All-member consent (documented) \u2192 \u2610 File designation online ($25) \u2192 \u2610 Adopt and sign the Series Exhibit (name exactly as filed; purpose; manager; capital \u2014 no associated members; the company owns it) \u2192 \u2610 EIN if needed \u2192 \u2610 Open the series' bank account \u2192 \u2610 Fund it (recorded contribution) \u2192 \u2610 First asset onto the asset schedule \u2192 \u2610 Insurance in the series' name \u2192 \u2610 Add the series to the app.
 **C. Asset-into-series checklist (every asset)**
-\u2610 Confirm which series (and that its exhibit's purpose covers it) \u2192 \u2610 Approvals per agreement (multi-member: \xA75.4 as applicable) \u2192 \u2610 Transfer document (deed / bill of sale / assignment) naming the series' full filed name \u2192 \u2610 Consideration documented \u2014 price, payor, payee (if from you: recorded contribution; if from another silo: transfer memo + bank movement) \u2192 \u2610 Re-title / record \u2192 \u2610 Asset schedule + ledger updated \u2192 \u2610 Insurance moved \u2192 \u2610 Related contracts and deposits assigned.
+\u2610 Confirm which series (and that its exhibit's purpose covers it) \u2192 \u2610 Approvals per agreement (multi-member: \xA75.4 manager-managed, \xA75.5 member-managed, as applicable) \u2192 \u2610 Transfer document (deed / bill of sale / assignment) naming the series' full filed name \u2192 \u2610 Consideration documented \u2014 price, payor, payee (if from you: recorded contribution; if from another silo: transfer memo + bank movement) \u2192 \u2610 Re-title / record \u2192 \u2610 Asset schedule + ledger updated \u2192 \u2610 Insurance moved \u2192 \u2610 Related contracts and deposits assigned.
 **D. Real-estate-specific additions**
 \u2610 Mortgage consent / due-on-sale cleared in writing \u2192 \u2610 Documentary stamp treatment confirmed with closing agent \u2192 \u2610 Title insurance addressed (endorsement or new policy) \u2192 \u2610 NOT homestead \u2192 \u2610 Deed grantee = full filed series name; recorded \u2192 \u2610 Landlord policy re-issued; flood/wind reviewed \u2192 \u2610 Leases assigned; deposits moved to series account; tenants notified \u2192 \u2610 Property appraiser mailing address updated \u2192 \u2610 Out-of-state property: Section 25 advice first.
 ## 30. SAMPLE LANGUAGE (COPY CAREFULLY \u2014 NAMES EXACTLY AS FILED)
@@ -110192,7 +110211,7 @@ Practical rules:
 > Date: ______  |  Asset: ______________________
 > From: Sunshine Holdings, LLC[ - PS __]   To: Sunshine Holdings, LLC - PS __
 > Consideration: $______  |  Payor: ______  |  Payee: ______
-> Approvals (multi-member; \xA75.4(b)): ______
+> Approvals (multi-member; \xA75.4(b) manager-managed, \xA75.5(b) member-managed): ______
 > Bank transfer reference: ______  |  Ledger entries posted (both silos): \u2610
 
 **Asset schedule entry (the app formats this for you):**

@@ -124,8 +124,8 @@ export const LEARN_MORE: Record<string, LearnMoreScreen> = {
           owners are allowed to compete with the company or its series while they're members.
         </P>
         <Choice label="If you choose Alternative A (no competition):">
-          While a member of the company, no owner may compete with the company or with any series
-          that owner is associated with. An owner who starts or joins a competing venture
+          While a member of the company, no owner may compete with the company or with any
+          series. An owner who starts or joins a competing venture
           breaches the agreement. The restriction ends when the company dissolves and imposes
           nothing after an owner exits. This suits active business partners who expect each
           other's full loyalty.
@@ -165,6 +165,33 @@ export const LEARN_MORE: Record<string, LearnMoreScreen> = {
           Owners with unequal percentages rarely need this provision — a majority can simply
           outvote a deadlock.
         </Choice>
+      </div>
+    ),
+  },
+  // Member-managed companies have no manager: the same limit, in s. 5.5,
+  // binds each Member acting for the company (13 Sep 2026).
+  thresholdMember: {
+    title: "Borrowing Limit",
+    body: (
+      <div className="space-y-3">
+        <P>
+          Any owner may act for the company in its ordinary business. This number sets the
+          ceiling: debt above it requires the consent of every owner.
+        </P>
+        <Choice label="If you set a lower amount:">
+          Owners keep tighter control — whoever is acting must come back to everyone before
+          borrowing anything significant, and any one owner can say no. More protection, more
+          friction.
+        </Choice>
+        <Choice label="If you set a higher amount:">
+          An owner can act quickly — financing a repair or closing a time-sensitive deal without
+          waiting on the others. More flexibility, more trust placed in each other.
+        </Choice>
+        <P>
+          Common choices for small companies run from $10,000 to $50,000. The limit applies per
+          transaction (or related series of transactions), and guarantees of anyone else's debt
+          always require every owner's consent regardless of amount.
+        </P>
       </div>
     ),
   },
@@ -208,10 +235,9 @@ export const LEARN_MORE: Record<string, LearnMoreScreen> = {
           shares." At your death, your interest passes to them automatically, subject to the
           operating agreement. In multi-member companies: your
           beneficiary immediately receives the economic rights — your share of distributions —
-          from day one. If your beneficiary is close family (as the agreement defines it), they
-          become a full voting member once they sign on to the agreement; anyone else becomes a
-          voting member only if the other owners consent, the same rule that applies to lifetime
-          transfers. Either way, the money flows to your chosen person without probate.
+          from day one. Your beneficiary becomes a voting member only if the other owners
+          consent, the same rule that applies to lifetime transfers. Either way, the money flows
+          to your chosen person without probate.
         </Choice>
         <Choice label="If you skip it:">
           Your interest passes through your estate — your will, or Florida's default rules if you
@@ -220,7 +246,10 @@ export const LEARN_MORE: Record<string, LearnMoreScreen> = {
         </Choice>
         <P>
           <strong className="text-foreground">Worth knowing:</strong> you can change or remove
-          the designation later (a signed writing with two witnesses, delivered to the manager).
+          the designation later (a signed writing with two witnesses, delivered as your form
+          directs: to the manager in the manager-managed forms, to the administrative member in
+          the member-managed forms, or kept with the company's records when you are the only
+          member).
           A will does <em>not</em> override this designation. If you have a trust or a larger
           estate plan, tell your estate planner about this designation so the pieces work
           together.

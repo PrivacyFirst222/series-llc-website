@@ -583,6 +583,9 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
       "[MEMBER DATE]": inputs.effectiveDate,
       "[MEMBER TOD]": m.todBeneficiary || "None",
       "[MEMBER TOD BACKUP]": m.todBackup || "None",
+      // A marital unit's designation takes effect at the death of the last
+      // surviving spouse; the words are the master's row (Adam, 13 Sep 2026).
+      "[COUPLE]": m.jointHolding && m.todBeneficiary ? "x" : "",
       // Empty for an individual, which drops the master's " as […]" fragment.
       // The name matches the marker that guards it — <!-- if:holding --> looks
       // up [HOLDING] — so a renamed slot cannot silently stop guarding.

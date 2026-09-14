@@ -107,7 +107,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 (c) No Protected Series is liable for, and the Associated Assets of a Protected Series are not available to satisfy, any debt, obligation, or liability of the Company or of any other Protected Series; and the Company is not liable for, and the Associated Assets of the Company are not available to satisfy, any debt, obligation, or liability of any Protected Series; and
 
-(d) No Member is personally liable, directly or indirectly, by way of contribution or otherwise, for any debt, obligation, or liability of the Company or of any Protected Series solely by reason of being or acting as a member, manager, or protected-series manager.
+(d) No Member is personally liable, directly or indirectly, by way of contribution or otherwise, for any debt, obligation, or liability of the Company or of any Protected Series solely by reason of being or acting as a member or protected-series manager.
 
 **3.4 Dissolution of a Protected Series Distinguished.** The dissolution and winding up of a Protected Series does not, by itself, cause the dissolution of the Company or of any other Protected Series. The dissolution of the Company causes the dissolution of every Protected Series, and the winding up of the Company is not complete until each Protected Series is wound up.
 
@@ -435,7 +435,7 @@ Date: _____________________________
 | Designating Member | TOD beneficiary (any person or entity) | If that beneficiary does not survive the Member |
 |---|---|---|
 <!-- repeat:member -->
-| [MEMBER NAME] | [MEMBER TOD] | [MEMBER TOD BACKUP] |
+| [MEMBER NAME] | [MEMBER TOD]<!-- if:couple --> (effective at the death of the last surviving spouse)<!-- /if --> | [MEMBER TOD BACKUP] |
 <!-- /repeat -->
 
 If no beneficiary is designated, or a designation fails, the Member's interest passes as provided by law, subject to this Agreement.

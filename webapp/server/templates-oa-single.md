@@ -355,7 +355,7 @@ Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENE
 | Owner of this Protected Series | The Company. This Protected Series has no Associated Members (ss. 605.2302(1), 605.2303(2), Fla. Stat.). |
 | Protected Series Manager | [Same as Company Manager / NAME] |
 | Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
-| Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the Member(s), together with the records maintained under Article 8. |
+| Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the Member, together with the records maintained under Article 8. |
 | Special terms (if any) | [None / variations from the base Agreement — may not vary Article 8 or non-variable provisions of the Act] |
 
 <!-- one:manager -->**Adopted effective [DATE] by the Company, acting through its Manager:**<!-- /one --><!-- many:manager -->**Adopted effective [DATE] by the Company, acting through its Managers:**<!-- /many -->

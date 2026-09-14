@@ -3077,6 +3077,54 @@ A defect stated as a defect felt thin; stated as harm already done to real peopl
 
 The memory file now says in its first line that there are no customers, every client is a test client, and Adam will say when the business goes live. Defects are reported as defects; no consequence to a customer is asserted until he says there are customers.
 
+## P80 — Sixteen fixes in a day, every one of them found by Adam
+
+### THE FAILURE
+
+Adam, 13 Sep 2026: "Today we have fixed a lot of sloppy mistakes that you should have caught."
+
+Sixteen commits between 12 Sep evening and 13 Sep evening, each correcting something he found by using the site: an office instruction to upload the Designations still showing after they were uploaded; a Review card reporting a step that comes after Review; a "Mark sent" button that vanished leaving no record; a Certify bullet promising a "signed Statement of Authorized Representative" that nothing generated; a "you may proceed, but confirm" notice with no confirmation behind it and no match enforced; a generation timestamp printed on legal documents; a borrowing-limit question and clause on the sole-owner forms; a series purpose printed as if it limited the series; signature blocks that printed an entity's name where a person had to sign, with nothing collected about who; the amendment page sending an empty date behind a prefilled box; client tables clipped on an iPad; an "Add a series" button too small to notice; an amendment button placed two screens deep. Every one was visible by opening the screen or the document and reading it as its user would.
+
+### WHY IT HAPPENED
+
+Each build was checked against the change I had just made, never against the screen the change sits on or the document it lands in read whole. I verified that the new thing appeared and did what the proposal said; I did not read the rest of the page for what the new thing made stale, or the rest of the document for what already contradicted it. The walk and the server checks are built from the same proposal as the code, so they pass whenever the proposal was incomplete in the same way. What Adam does — open the card after the step, read the whole exhibit, try the wrong signature — is the reading I skip because the change felt finished once its own assertion went green. A second pattern underneath: rules enforced only where I happened to be working (the signature match in the browser, the Statement promised in copy) because I checked the surface in front of me and not the counterpart that has to agree with it.
+
+### FIXED BY
+
+An audit, this same day, of every surface for the same classes of defect — copy that reports a step still ahead or already done, promises the code does not keep, browser-only rules, questions asked of the wrong form, documents read whole for what the fills leave wrong — reported with file and line before any of it is built.
+
+## P81 — Starting the audit without proposing it
+
+### THE FAILURE
+
+Adam, 13 Sep 2026: "You didn't come back and explain what you were going to do and wait for go."
+
+He asked me to look over the day's fixes and run through the whole process for similar mistakes. I wrote the P80 entry, then immediately launched five background readers over the intake form, the portal, the admin, the server, and the documents, and started reading pages myself, without first telling him what the audit would cover, how, and what he would get back, and without waiting for his Go.
+
+### WHY IT HAPPENED
+
+I treated the ritual as a gate on file changes, because that is what the hooks enforce: nothing was going to be edited, so nothing needed approval. But the ritual is not about edits. It is how Adam decides what I spend the next hour on and sees the plan before the work exists, so he can redirect it while redirecting is cheap. A five-reader audit is exactly that kind of decision, and I made it for him because the request read as urgent and the work read as harmless. "Harmless" is my judgment of the cost; the judgment is his.
+
+### FIXED BY
+
+Stopping to state the audit's scope, method, and deliverable, and waiting for Go before continuing. The readers already launched are read-only and are left running so their work is not wasted; nothing is reported or acted on until he says so.
+
+## P82 — Asked where on the website, answered with a file and a line of code
+
+### THE FAILURE
+
+Adam, 13 Sep 2026: "Where on the website? Don't show me fucking code."
+
+He asked where the site says "one filing covers unlimited series". I answered with a file path, a line number, and a pasted line of code, then described what it "renders as". He wanted the page and the place on it that a visitor would open: the Benefits page, the comparison table. He had already told me on 12 Sep to quit using terms like e2e and describe things in plain words, and the instructions say to name things what the user calls them.
+
+### WHY IT HAPPENED
+
+The file and line were what I had used to verify the claim, and pasting them felt like handing over the proof. But proof for me is not the answer for him: he is not going to open a source file, he is going to open the site. I let "quote the source verbatim" mean quote the code, when for a sentence on a public page the source he can check is the page itself. Underneath that, citing code is faster for me than working out what the page looks like to a reader, and I took the faster path on a question that was entirely about what the reader sees.
+
+### FIXED BY
+
+Answering with the page name, the section, and the words as they appear on screen. When he asks where something is on the site, the answer is a place on the site, never a file.
+
 ## Process — the ones that let the substantive ones through
 
 **M1 · Verify the proposition you set out to verify, not the one underneath.** A

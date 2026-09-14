@@ -8,6 +8,8 @@ import { api } from "@/lib/api";
 interface OrderStatus {
   status: string;
   llcName: string;
+  /** A conversion: the company exists; the Designations are what we file. */
+  isConversion?: boolean;
 }
 
 const DRAFT_KEY = "fl-llc-formation-draft-v1";
@@ -47,7 +49,8 @@ export default function OrderConfirmed() {
     queryKey: ["order-status", ref],
     queryFn: () => api.get<OrderStatus>(`/api/orders/${ref}/status`),
     enabled: !!ref,
-    refetchInterval: (query) => (query.state.data?.status === "paid" ? false : 4000),
+    // Stop once the order has passed payment, whatever stage it has reached.
+    refetchInterval: (query) => (["paid", "filed", "formed"].includes(query.state.data?.status ?? "") ? false : 4000),
   });
 
   // The pipeline runs paid -> filed -> formed (server/db.ts). A client opening
@@ -91,7 +94,7 @@ export default function OrderConfirmed() {
             <h1 className="display mt-5 text-3xl lg:text-4xl">Payment received.</h1>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
               Thank you{statusQuery.data?.llcName ? ` — we have everything we need to begin on ${statusQuery.data.llcName}` : ""}. We're
-              preparing your filing now — you'll get an email when your LLC is formed. Two
+              preparing your filing now — you'll get an email when {statusQuery.data?.isConversion ? "your protected series are established" : "your LLC is formed"}. Two
               steps to finish setting up:
             </p>
 

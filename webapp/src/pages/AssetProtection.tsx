@@ -176,7 +176,7 @@ export default function AssetProtection() {
               <h4 className="font-medium text-sm">Important: single-member LLCs do not get this protection</h4>
             </div>
             <p className="text-sm text-foreground/70 leading-relaxed">
-              Charging order protection only applies to LLCs with two or more members. If you own a single-member LLC, a creditor can seize your entire ownership interest just as easily as corporate stock — negating the outside liability shield entirely. This is true regardless of how the LLC is taxed (disregarded entity, S-corp election, or otherwise).
+              Charging order protection only applies to LLCs with two or more members. If you own a single-member LLC, Florida law lets a judgment creditor foreclose on your entire interest if distributions will not satisfy the judgment in a reasonable time (s. 605.0503(4)), so the outside liability shield is much weaker. This is true regardless of how the LLC is taxed (disregarded entity, S-corp election, or otherwise).
             </p>
           </div>
 
@@ -192,17 +192,17 @@ export default function AssetProtection() {
           <div className="grid gap-px overflow-hidden rounded-2xl border border-border bg-border md:grid-cols-2 lg:grid-cols-3">
             {[
               { entity: "Corporation", verdict: "bad", note: "Stock can be seized directly — creditors become your business partner instantly" },
-              { entity: "Single-Member LLC", verdict: "bad", note: "Charging order protection does not apply — interest can be seized like corporate stock" },
-              { entity: "Single-Member FL Protected Series LLC", verdict: "bad", note: "Same weakness applies — single-member status negates charging order protection regardless of the series structure" },
+              { entity: "Single-Member LLC", verdict: "limited", note: "Charging order protection does not apply — a creditor can foreclose on the whole interest if distributions will not satisfy the judgment in a reasonable time" },
+              { entity: "Single-Member FL Protected Series LLC", verdict: "limited", note: "Same weakness applies — single-member status forfeits charging order protection regardless of the series structure" },
               { entity: "Multi-Member LLC", verdict: "ok", note: "Charging order protection under §605.0503, but all LLC assets sit behind a single shield" },
               { entity: "Multi-Member FL Protected Series LLC", verdict: "best", note: "Charging order protection at the company level under §605.0503, with each series' assets separately held and separately shielded under §605.2401" },
             ].map((row) => (
               <div key={row.entity} className={`bg-card p-6 space-y-2 ${row.entity === "Multi-Member FL Protected Series LLC" ? "md:col-span-2 lg:col-span-1" : ""}`}>
                 <div className={`font-medium text-sm ${row.entity === "Multi-Member FL Protected Series LLC" ? "text-trust" : ""}`}>{row.entity}</div>
                 <div className={`text-xs font-mono-feature uppercase tracking-widest ${
-                  row.verdict === "best" ? "text-trust" : row.verdict === "ok" ? "text-yellow-500" : "text-destructive"
+                  row.verdict === "best" ? "text-trust" : row.verdict === "ok" || row.verdict === "limited" ? "text-yellow-500" : "text-destructive"
                 }`}>
-                  {row.verdict === "best" ? "Maximum protection" : row.verdict === "ok" ? "Good protection" : "No protection"}
+                  {row.verdict === "best" ? "Maximum protection" : row.verdict === "ok" ? "Good protection" : row.verdict === "limited" ? "Limited protection" : "No protection"}
                 </div>
                 <p className="text-xs text-muted-foreground leading-relaxed">{row.note}</p>
               </div>

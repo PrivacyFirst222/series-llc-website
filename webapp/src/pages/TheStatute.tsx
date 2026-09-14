@@ -55,7 +55,7 @@ export default function TheStatute() {
                     "What makes an asset a series' own is your records, not the name on the title: they must let a disinterested, reasonable person identify the asset, determine when and from whom it was acquired, and — if it came from the company or another series — the consideration, payor, and payee (§605.2301(2)).",
                     "Those records may be kept by listing, category, type, quantity, or formula, or in any other reasonable manner (§605.2301(4)).",
                     "An asset may be held directly or indirectly, through a representative, nominee, or similar arrangement — but a protected series may never hold one in the LLC's name or another series' name, and the LLC may never hold one in a series' name (§605.2301(5)).",
-                    "Each series' own name must begin with the LLC's name and include \"protected series\" or \"P.S.\" (§605.2202).",
+                    "Each series' own name must begin with the LLC's name and include \"protected series,\" \"P.S.,\" or \"PS\" (§605.2202).",
                     "Titling real property in the series' name is what earns you the safe harbor: a recorded instrument naming the series is conclusive of the signer's authority and is itself a record of association (§605.2301(2)(b)).",
                     "Property not properly associated with its series can be reached by a judgment against the company or another series (§605.2404).",
                     "If it is ever disputed, the burden of proof is on the party asserting that an asset is an associated asset — the owner, not the creditor (§605.2404(4)).",

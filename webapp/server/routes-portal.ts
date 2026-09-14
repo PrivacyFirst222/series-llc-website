@@ -191,7 +191,8 @@ export const oaAnswersSchema = z.object({
         numerator: z.number().int().min(0).max(100_000).optional(),
         denominator: z.number().int().min(1).max(100_000).optional(),
         contribution: z.string().max(300).optional(),
-        todBeneficiary: z.string().max(300).optional().refine((v) => !(v ?? "").trim() || hasFirstAndLast(v), `Beneficiary: ${FIRST_AND_LAST}`),
+        // Any person or entity (s. 4.11), so no person-name rule (13 Sep 2026).
+        todBeneficiary: z.string().max(300).optional(),
         // A backup may be a class ("my children in equal shares"), so no name rule.
         todBackup: z.string().max(300).optional(),
         // A company or trust as owner: who signs for it and their title
@@ -243,7 +244,8 @@ export const oaAnswersSchema = z.object({
         numerator: z.number().int().min(0).max(100_000).optional(),
         denominator: z.number().int().min(1).max(100_000).optional(),
         contribution: z.string().max(300).optional(),
-        todBeneficiary: z.string().max(300).optional().refine((v) => !(v ?? "").trim() || hasFirstAndLast(v), `Beneficiary: ${FIRST_AND_LAST}`),
+        // Any person or entity (s. 4.11), so no person-name rule (13 Sep 2026).
+        todBeneficiary: z.string().max(300).optional(),
         // A backup may be a class ("my children in equal shares"), so no name rule.
         todBackup: z.string().max(300).optional(),
       }),
@@ -1264,9 +1266,8 @@ app.post("/portal/oa/generate", async (c) => {
         percentageLabel: shareLabel(ownershipMode, cplShare),
         jointHolding: SPOUSAL_FORM_LABEL[cpl.form],
         contribution: cpl.contribution ?? "",
-        todBeneficiary: cpl.todBeneficiary
-          ? `${cpl.todBeneficiary} (effective at the death of the last surviving spouse)`
-          : "",
+        // The "last surviving spouse" words are Exhibit A's own row now.
+        todBeneficiary: cpl.todBeneficiary ?? "",
         todBackup: cpl.todBackup ?? "",
         signatories: [owners[cpl.a].name, owners[cpl.b].name],
       });
@@ -1292,8 +1293,10 @@ app.post("/portal/oa/generate", async (c) => {
         percentage: shareValue(multiOwner ? ownershipMode : "percent", mShare),
         percentageLabel: shareLabel(multiOwner ? ownershipMode : "percent", mShare),
         contribution: ans?.contribution ?? "",
-        todBeneficiary: ans?.todBeneficiary ?? "",
-        todBackup: ans?.todBackup ?? "",
+        // Only an individual may designate (s. 4.11): a company or trust
+        // prints None whatever was typed.
+        todBeneficiary: isEntity ? "" : ans?.todBeneficiary ?? "",
+        todBackup: isEntity ? "" : ans?.todBackup ?? "",
         ...(entitySigner ? { entitySigner } : {}),
       });
     }

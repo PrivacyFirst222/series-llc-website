@@ -1,4 +1,3 @@
-import { FIRST_AND_LAST, hasFirstAndLast } from "@/lib/personName";
 // The owner-identity, spousal-pairing, and per-unit-field cards — the
 // questionnaire sections that edit the members/couples state web. Split from
 // OAQuestionnaire.tsx on 29 Aug 2026 so their contracts are explicit props
@@ -432,7 +431,9 @@ export function UnitFieldCards({ units, isMulti, owners, seedSeries, series, sEl
                   of an ineligible beneficiary has no effect while the election is in place.
                 </p>
               ) : null}
-              {(isMulti ? units : [{ kind: "member", index: 0, label: ownerLabel(owners[0], 0) } as Unit]).map((u) => (
+              {/* Only an individual may designate (s. 4.11): an owner ticked
+                  as a company or trust has no beneficiary boxes. */}
+              {(isMulti ? units : [{ kind: "member", index: 0, label: ownerLabel(owners[0], 0) } as Unit]).filter((u) => !(u.kind === "member" && owners[u.index]?.isEntity)).map((u) => (
                 <div key={u.kind === "couple" ? `c${u.ci}` : `m${u.index}`} className="space-y-1">
                   <div className="flex items-center gap-3">
                     <span className="w-1/2 truncate text-sm">{u.label}</span>
@@ -443,9 +444,6 @@ export function UnitFieldCards({ units, isMulti, owners, seedSeries, series, sEl
                       onChange={(e) => setUnitTod(u, e.target.value)}
                     />
                   </div>
-                  {(unitTod(u) ?? "").trim() && !hasFirstAndLast(unitTod(u)) ? (
-                    <p className="pl-[50%] text-xs text-destructive">{FIRST_AND_LAST}</p>
-                  ) : null}
                   {/* A backup takes if the first beneficiary does not survive
                       (Adam, 12 Sep 2026); it may be a class of people. */}
                   <div className="flex items-center gap-3">

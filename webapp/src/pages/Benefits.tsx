@@ -7,7 +7,7 @@ import { Check, X, TrendingDown } from "lucide-react";
 type Cell = "yes" | "no" | string;
 
 const STRUCTURE: { feature: string; series: Cell; many: Cell }[] = [
-  { feature: "One state filing covers unlimited series", series: "yes", many: "no" },
+  { feature: "One state filing covers 10 series", series: "yes", many: "no" },
   { feature: "Liability separation between assets", series: "yes", many: "yes" },
   { feature: "Property titled in the holding entity's own name", series: "yes", many: "yes" },
   { feature: "Annual reports to file", series: "1 report", many: "10 reports" },

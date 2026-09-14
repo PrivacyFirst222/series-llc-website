@@ -16,7 +16,7 @@ The undersigned, being **all** of the members of **[COMPANY NAME], LLC**, a Flor
 
 **3. Ownership.** The new Protected Series is established without associated members. The Company owns all of its protected-series transferable interests, and no member of the Company holds any interest in it except indirectly, through that member's interest in the Company (ss. 605.2302(1), 605.2303(2), Fla. Stat.).
 
-**4. Authority to file.** [SIGNER ROLE SENTENCE] The protected series is established when its Protected Series Designation takes effect under s. 605.0207, Florida Statutes.
+**4. Authority to file.** <!-- if:membermanaged -->The Members authorize the Administrative Member, or any Member the Members designate, to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.<!-- /if --><!-- if:managermanaged -->The Members authorize the Manager to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.<!-- /if --> The protected series is established when its Protected Series Designation takes effect under s. 605.0207, Florida Statutes.
 
 **5. Series Exhibit.** The Series Exhibit set forth below is adopted as part of the Agreement for the new Protected Series, as Section 3.1 of the Agreement requires at or before the filing of the Protected Series Designation.
 
@@ -39,11 +39,11 @@ The undersigned, being **all** of the members of **[COMPANY NAME], LLC**, a Flor
 |---|---|
 | Purpose of this Protected Series | Any lawful purpose<!-- if:purpose -->, including, without limitation, [SERIES PURPOSE]<!-- /if --> |
 | Owner of this Protected Series | The Company. This Protected Series has no Associated Members (ss. 605.2302(1), 605.2303(2), Fla. Stat.). |
-| Protected Series Manager | [PS MANAGER] |
-| Contributions to this Protected Series | By the Company: $[AMOUNT] on [DATE] [and/or described property] |
+<!-- if:managermanaged -->| Protected Series Manager | [PS MANAGER] |
+<!-- /if --><!-- if:membermanaged -->| Managed by | The Members, as protected-series managers (s. 605.2304, Fla. Stat., as varied by Section 5.2 of the Agreement) |
+<!-- /if -->| Contributions to this Protected Series | By the Company: as recorded on the Asset Schedule attached to this Series Exhibit |
 | Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit, together with the records maintained under Article 8. |
-| Special terms (if any) | [None / variations from the base Agreement — may not vary Article 8 or non-variable provisions of the Act] |
-| Dissolution events specific to this Protected Series (if any) | [None / describe] |
+| Special terms (if any) | None |
 
 **Adopted effective [EFFECTIVE DATE] by the Company:**
 
@@ -62,6 +62,3 @@ The undersigned, being **all** of the members of **[COMPANY NAME], LLC**, a Flor
 | | | | |
 | | | | |
 
----
-
-*Form document — prepared for [COMPANY NAME], LLC. Statutory citations: ss. 605.0207, 605.2201, 605.2301, 605.2302(1), 605.2303(2), Florida Statutes.*

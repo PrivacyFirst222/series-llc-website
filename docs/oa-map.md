@@ -106,7 +106,7 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | sgm sgms | 3.2 | Status of Each Protected Series | a9b565eb | statutory-route | — | members series | — | ss. 605.2104, 605.2201 |
 | sgl sgs | 3.3 | Limitation of Liability Among Series (Statutory Shields) | eadcbd5b | statutory-route | — | members series company | — | s. 605.2401 |
 | mul scp | 3.3 | Limitation of Liability Among Series (Statutory Shields) | d197829d | statutory-route | — | members series company | — | s. 605.2401 |
-| mbr mbs | 3.3 | Limitation of Liability Among Series (Statutory Shields) | 762530e8 | statutory-route | — | members series company | — | s. 605.2401 |
+| mbr mbs | 3.3 | Limitation of Liability Among Series (Statutory Shields) | 50adbb11 | statutory-route | — | members series company | — | s. 605.2401; no manager exists in these forms (s. 5.1), so the shield names member and protected-series manager only (13 Sep 2026) |
 | sgm sgms | 3.3 | Limitation of Liability Among Series (Statutory Shields) | b41afb07 | benefit | — | member series company | — | s. 605.2401; the Member now holds the protected-series manager office, so the shield names that capacity |
 | mbr mbs mul scp sgl sgm sgms sgs | 3.4 | Dissolution of a Protected Series Distinguished | ab68ccd0 | statutory-route | — | members | — | s. 605.2501 |
 | mul scp sgl | 3.5 | Series Exhibits Control Series Terms | 70d3c7b8 | mechanic | company | members | — | drafting convention |
@@ -144,8 +144,10 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbr mbs mul scp | 4.8 | Confidentiality | 769fb729 | covenant | members | members company | The member disclosed confidential information in breach of the agreement. | s. 605.04091(2) |
 | mbr mbs mul scp | 4.9 | Non-Disparagement; No Interference | 88367cf9 | covenant | members | members company | The member interfered in breach of the agreement. | none; ours |
 | mbr mbs mul scp | 4.10 | Information Rights | b897a44b | benefit | company | members | — | ss. 605.0410, 605.2305 |
-| mul scp | 4.11 | Transfer on Death Designation | 23bc2d20 | benefit | company | members third-party | — | ss. 711.50-711.512, Fla. Stat.; only an individual member may register in beneficiary form, and not joint holders as tenants in common (s. 711.502) |
-| mbr mbs | 4.11 | Transfer on Death Designation | afa9a3b0 | benefit | company | members third-party | — | ss. 711.50-711.512, Fla. Stat.; only an individual member may register in beneficiary form, and not joint holders as tenants in common (s. 711.502) |
+| mul | 4.11 | Transfer on Death Designation | 23bc2d20 | benefit | company | members third-party | — | ss. 711.50-711.512, Fla. Stat.; only an individual member may register in beneficiary form, and not joint holders as tenants in common (s. 711.502) |
+| scp | 4.11 | Transfer on Death Designation | 78eec00a | benefit | company | members third-party | — | ss. 711.50-711.512, Fla. Stat.; only an individual member may register in beneficiary form, and not joint holders as tenants in common (s. 711.502); subject to s. 9.3(b), the beneficiary must be an eligible shareholder under IRC 1361 (13 Sep 2026) |
+| mbr | 4.11 | Transfer on Death Designation | afa9a3b0 | benefit | company | members third-party | — | ss. 711.50-711.512, Fla. Stat.; only an individual member may register in beneficiary form, and not joint holders as tenants in common (s. 711.502) |
+| mbs | 4.11 | Transfer on Death Designation | 99366a03 | benefit | company | members third-party | — | ss. 711.50-711.512, Fla. Stat.; only an individual member may register in beneficiary form, and not joint holders as tenants in common (s. 711.502); subject to s. 9.3(b), the beneficiary must be an eligible shareholder under IRC 1361 (13 Sep 2026) |
 | mul scp | 4.12 | Incapacity of a Member | afdee6cc | benefit | company manager members | members | — | ch. 744, Fla. Stat.; s. 605.0602(6) |
 | mbr mbs | 4.12 | Incapacity of a Member | 09d33983 | benefit | company members | members | — | ch. 744, Fla. Stat.; s. 605.0602(6) |
 | sgl sgs | 5.1 | Manager-Managed; the Manager | 0af0229e | authority | manager member | member manager | — | ss. 605.04072, 605.04073(2), 605.04074(2)(b); the appointment sentence moved from oa.ts into the master on 17 August as a singular/plural pair — same operative terms, no substantive change |
@@ -285,7 +287,8 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | sgm sgms | 11.4 | Winding Up the Company | dfb0f7ba | mechanic | manager member | member | — | ss. 605.0709, 605.0710 |
 | sgl sgm sgms sgs | 11.5 | Recourse Limited | a5f259ef | benefit | — | member | — | s. 605.0405; the single-member form carries no capital accounts, so deficit-restoration language was removed 2026-08-16, as it was from the S corporation forms on 2026-08-14 |
 | sgl sgs | 12.1 | Amendments | 95c1e577 | authority | member | member | — | s. 605.04073(1)(d), (2)(e) |
-| mbr mbs mul scp | 12.1 | Admission of Members | fc6d8b94 | authority | members | members | — | s. 605.0401(3) |
+| mbr mul | 12.1 | Admission of Members | fc6d8b94 | authority | members | members | — | s. 605.0401(3) |
+| mbs scp | 12.1 | Admission of Members | 31339f7d | authority | members | members | — | s. 605.0401(3); an admission is void unless the person is an eligible shareholder under IRC 1361, as the single-member S forms already provide (13 Sep 2026) |
 | sgm sgms | 12.1 | Amendments | cdcc7c0d | authority | member | member | — | s. 605.04073(1)(d), (2)(e) |
 | sgl sgm sgms sgs | 12.2 | Action by Written Consent | 57614354 | mechanic | members | members | — | s. 605.04073(4) |
 | mbr mbs mul scp | 12.2 | No Association with a Protected Series | aa036b65 | covenant | company members | members | The company associated a member with a series in breach of its own agreement. | s. 605.2302; preserves the disregarded/partnership design |

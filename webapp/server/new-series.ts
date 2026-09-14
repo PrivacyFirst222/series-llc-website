@@ -52,18 +52,14 @@ export function assembleNewSeries(input: NewSeriesInput): { markdown: string; ti
   // 13 Sep 2026: a stated purpose must never read as a limit).
   const purpose = input.purpose.trim();
 
-  // Who signs and files differs by management form; the member-managed masters
-  // name no manager at all.
-  const authority = input.memberManaged
-    ? "The Members authorize the Administrative Member, or any Member the Members designate, to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement."
-    : `The Members authorize the Manager to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.`;
+  // Who files, and who manages the series, are the master's own sentences,
+  // one pair per management form (13 Sep 2026: the code said the Company was
+  // the series manager, the opposite of the member-managed agreement's s. 5.2).
+  s = resolveIf(s, "membermanaged", input.memberManaged);
+  s = resolveIf(s, "managermanaged", !input.memberManaged);
   const managers = input.managerNames.map((n) => n.trim()).filter(Boolean);
-  // The table row is already labelled "Protected Series Manager"; it takes the
-  // names alone. The member-managed row states who acts, because the statutory
-  // protected-series manager there is the Company itself.
-  const psManager = input.memberManaged
-    ? "The Company, as protected-series manager (s. 605.2304(2), Fla. Stat.), acting through a Majority in Interest of the Members"
-    : managers.join(", ") || "[MANAGER NAME]";
+  if (!input.memberManaged && managers.length === 0) throw new Error("new-series: a manager-managed company needs at least one Manager");
+  const psManager = managers.join(", ");
   // Manager-managed: one signature line per Manager, matching the Agreement.
   const signerOf = (entity: string) => (input.entitySigners ?? []).find((x) => x.entity.trim() === entity.trim());
   // A person's block is the rule then the name; an entity's is its name,
@@ -75,15 +71,12 @@ export function assembleNewSeries(input: NewSeriesInput): { markdown: string; ti
       ? `${n}${suffix}\n\nBy: _____________________________\n[[indent]]${sg.name}\n[[indent]]${sg.title}`
       : `_____________________________\n${n}${suffix}`;
   };
+  if (input.memberNames.length === 0) throw new Error("new-series: at least one member is required");
   const psSignature = input.memberManaged
-    ? block(input.memberNames[0] ?? "[MEMBER NAME]", ", Member, for the Company")
-    : managers.length
-      ? managers.map((n) => block(n, ", Manager")).join("\n\n")
-      : "_____________________________\n[MANAGER NAME], Manager";
+    ? block(input.memberNames[0], ", Member, for the Company")
+    : managers.map((n) => block(n, ", Manager")).join("\n\n");
 
-  const blocks = input.memberNames.length
-    ? input.memberNames.map((n) => block(n, "")).join("\n\n")
-    : "_____________________________\n[MEMBER NAME]";
+  const blocks = input.memberNames.map((n) => block(n, "")).join("\n\n");
 
   must(s, "[COMPANY NAME], LLC", "company name");
   s = s.split("[COMPANY NAME], LLC").join(input.companyName);
@@ -97,17 +90,22 @@ export function assembleNewSeries(input: NewSeriesInput): { markdown: string; ti
   s = s.split("[SERIES PURPOSE]").join(purpose);
   must(s, "[EFFECTIVE DATE]", "effective date");
   s = s.split("[EFFECTIVE DATE]").join(input.effectiveDate);
-  must(s, "[SIGNER ROLE SENTENCE]", "authority sentence");
-  s = s.split("[SIGNER ROLE SENTENCE]").join(authority);
   must(s, "[PS MANAGER SIGNATURE LINE]", "ps manager signature");
   s = s.split("[PS MANAGER SIGNATURE LINE]").join(psSignature);
-  must(s, "[PS MANAGER]", "ps manager");
-  s = s.split("[PS MANAGER]").join(psManager);
+  if (!input.memberManaged) {
+    must(s, "[PS MANAGER]", "ps manager");
+    s = s.split("[PS MANAGER]").join(psManager);
+  }
   must(s, "[MEMBER SIGNATURE BLOCKS]", "member signature blocks");
   s = s.split("[MEMBER SIGNATURE BLOCKS]").join(blocks);
+  s = s.replace(/\n{3,}/g, "\n\n");
 
-  const leftovers = s.match(/\[(COMPANY NAME|SERIES NAME|SERIES PURPOSE|EFFECTIVE DATE|PS MANAGER|MEMBER SIGNATURE BLOCKS|SIGNER ROLE SENTENCE)[^\]]*\]/g);
+  // Nothing bracketed and no marker may reach the client (13 Sep 2026: the
+  // consent shipped "$[AMOUNT] on [DATE]" and "[None / describe]").
+  const leftovers = s.match(/\[[A-Z][A-Za-z ()/.'—-]*\]/g);
   if (leftovers) throw new Error(`new-series template left unfilled: ${leftovers.join(", ")}`);
+  if (/<!--/.test(s)) throw new Error("new-series: template marker left in the document");
+  if (/Form document/.test(s)) throw new Error("new-series: draft colophon left in the document");
 
   return { markdown: s, title: `New Protected Series — ${input.seriesName}` };
 }

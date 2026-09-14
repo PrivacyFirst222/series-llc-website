@@ -391,7 +391,9 @@ export function filingGroups(payload: unknown): FilingGroup[] {
     provisions.push(MGMT_PROVISION[mgmt.structure]);
   }
   const purposeText = (p.purpose?.businessPurposeText ?? "").trim();
-  if (p.purpose?.purposeType === "SPECIFIC" && purposeText) {
+  // A PLLC's professional purpose is required and goes in the same box as a
+  // specific purpose (13 Sep 2026: it never reached the sheet).
+  if ((p.purpose?.purposeType === "SPECIFIC" || p.purpose?.purposeType === "PROFESSIONAL") && purposeText) {
     provisions.push(purposeText);
   }
   groups.push({
@@ -470,7 +472,10 @@ export function filingGroups(payload: unknown): FilingGroup[] {
       personFields.push({
         key: `person${slot}Ar`,
         label: "Authorized representative",
-        value: `${(m.fullName || m.businessEntityName || "").trim()} — signs only, do NOT list in this section`,
+        // An individual is first/last/suffix, an entity its name — the same
+        // builder the manager rows use (13 Sep 2026: an individual printed
+        // with no name at all).
+        value: `${([personName(m).first, personName(m).last].filter(Boolean).join(" ") || personName(m).legacy || m.businessEntityName || "").trim()} — signs only, do NOT list in this section`,
         block: true,
       });
       slot++;

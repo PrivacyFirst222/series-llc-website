@@ -1603,6 +1603,7 @@ async function main(): Promise<void> {
       await numerators.nth(1).fill("1"); await denominators.nth(1).fill("3");
       const tod = page.locator('main input[aria-label^="Transfer-on-death beneficiary for"]');
       expect((await tod.count()) >= 1, "OA-I: a transfer-on-death box per ownership unit", await tod.count());
+      await tod.first().fill("Pat Couple");
       await tod.last().fill("Jordan Heir");
       // A backup beneficiary, a class in the owner's words (Adam, 12 Sep 2026).
       await page.locator('main input[aria-label^="Backup beneficiary for"]').last().fill("my children in equal shares");
@@ -1619,6 +1620,7 @@ async function main(): Promise<void> {
         expect(/2\/3/.test(md2) && /1\/3/.test(md2), "OA-I: the fractions typed on screen are in the agreement", md2.match(/\d\/\d/g)?.slice(0, 6));
         expect(md2.includes("Jordan Heir"), "OA-I: the transfer-on-death beneficiary is in the agreement");
         expect(/\| Jordan Heir[^|]*\| my children in equal shares \|/.test(md2), "OA-I: the backup beneficiary sits beside the first on Exhibit A", md2.match(/Jordan Heir[^\n]*/)?.[0]);
+        expect(/\| Casey Gatecheck and Blair Gatecheck \| Pat Couple \(effective at the death of the last surviving spouse\) \|/.test(md2), "OA-I: the couple's designation carries the master's own 'last surviving spouse' words", md2.match(/Pat Couple[^\n]*/)?.[0]);
         expect(/tenants by the entirety/i.test(md2), "OA-I: the couple is still paired");
         // A couple is one ownership unit in the agreement's inputs: the pair
         // named together, plus the solo owner.
@@ -1672,6 +1674,10 @@ async function main(): Promise<void> {
       // The closing paragraph under Generate (Adam, 12 Sep 2026): ordinary
       // changes regenerate; the amendment is for the rest; the warning repeats.
       expect(/Every series may pursue any lawful purpose\. What you type here is added to that, without limiting it\./.test(await page.locator('[data-testid="purpose-note"]').innerText().catch(() => "")), "OA: the purpose card says a stated purpose is added to any lawful purpose, not a limit");
+      // Run A is member-managed: the borrowing card speaks of Members and
+      // s. 5.5, never of a Manager (13 Sep 2026).
+      const thresholdNote = await page.locator('[data-testid="threshold-note"]').innerText().catch(() => "");
+      expect(/no Member may borrow on the company's behalf[^.]*consent of all Members \(Section 5\.5\)/.test(thresholdNote) && !/Manager/.test(thresholdNote) && /Borrowing limit/.test(await page.locator("main").innerText()) && !/Manager's borrowing limit/.test(await page.locator("main").innerText()) && /requires the consent of all Members/.test(await page.locator("main").innerText()), "OA: a member-managed company's borrowing card names the Members and Section 5.5, not a Manager", thresholdNote);
       const pointer = await page.locator('[data-testid="amendment-pointer"]').innerText().catch(() => "");
       expect(/To add or remove members or managers, change ownership percentages, or change an option you chose here, update your answers and regenerate\./.test(pointer) && /that the questionnaire cannot change, use the amendment feature\./.test(pointer) && /reviewed by an attorney before it is signed/.test(pointer), "AMEND: the questionnaire ends by sending ordinary changes to regenerate, the rest to the amendment feature, with the warning", pointer);
       await page.locator('[data-testid="amendment-pointer"] a').first().click();
@@ -1938,6 +1944,53 @@ async function main(): Promise<void> {
       console.log("  ✓ statement: number required, made on upload, listed under the Articles");
     } catch (e) {
       expect(false, `statement journey: ${String(e).slice(0, 300)}`);
+    } finally {
+      await page.close();
+    }
+  }
+
+  // Words that must match the product (13 Sep 2026 audit): the payment page
+  // for a conversion, the public pages, and a PLLC's filing sheet.
+  console.log("\n▶ Words that match the product (audit, 13 Sep 2026)");
+  {
+    const page = await browser.newPage();
+    try {
+      await page.route("**/api/**", async (route) => {
+        const url = new URL(route.request().url());
+        const resp = await fetch(`${API}${url.pathname}${url.search}`, {
+          method: route.request().method(),
+          headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "" },
+          body: route.request().postDataBuffer() ?? undefined,
+        });
+        const body = await resp.text();
+        await route.fulfill({ status: resp.status, contentType: resp.headers.get("content-type") ?? "application/json", body });
+      });
+      if (orderIds.has("E")) {
+        await page.goto(`http://localhost:${WEB_PORT}/order/confirmed?ref=${orderIds.get("E")}`);
+        await page.waitForSelector("main h1");
+        for (let i = 0; i < 20 && !/Payment received/.test(await page.locator("main h1").innerText()); i++) await page.waitForTimeout(500);
+        const t = await page.locator("main").innerText();
+        expect(/when your protected series are established/.test(t) && !/when your LLC is formed/.test(t), "words: a conversion's payment page does not promise a formed LLC", t.slice(0, 400));
+      }
+      if (orderIds.has("D")) {
+        const detail = await fetch(`${API}/api/admin/orders/${orderIds.get("D")}`, { headers: { Cookie: adminCookie } }).then((r) => r.json()) as { data?: { groups?: { title: string; fields: { key: string; value: string }[] }[] } };
+        const prov = (detail.data?.groups ?? []).find((g) => /Any Other Provisions/.test(g.title));
+        expect(!!prov && prov.fields.some((f) => /The practice of law/.test(f.value)) && !prov.fields.some((f) => /Leave blank/.test(f.value)), "words: a PLLC's professional purpose is on the filing sheet, not 'Leave blank'", prov?.fields.map((f) => f.value.slice(0, 60)));
+      }
+      const read = async (path: string) => { await page.goto(`http://localhost:${WEB_PORT}${path}`); await page.waitForSelector("main"); await page.waitForTimeout(400); return page.locator("main").innerText(); };
+      const benefits = await read("/benefits");
+      expect(/One state filing covers 10 series/.test(benefits) && !/unlimited series/.test(benefits), "words: Benefits says one filing covers 10 series");
+      const how = await read("/how-it-works");
+      expect(/completed from your questionnaire answers/.test(how) && !/to adapt to your own situation/.test(how) && /when it is released, expected by the end of the year/.test(how), "words: How It Works no longer offers an agreement to adapt or an app that is not out", how.match(/form Operating Agreement[^.]*\./)?.[0]);
+      const pricing = await read("/pricing");
+      expect(/completed from your questionnaire answers/.test(pricing) && !/review and adapt/.test(pricing), "words: Pricing no longer offers an agreement to adapt");
+      const statute = await read("/the-statute");
+      expect(/"protected series," "P\.S\.," or "PS"/.test(statute), "words: the statute page names all three series-name forms", statute.match(/Each series' own name[^.]*\./)?.[0]);
+      const ap = await read("/asset-protection");
+      expect(/foreclose on your entire interest if distributions will not satisfy the judgment in a reasonable time/.test(ap) && !/just as easily as corporate stock/.test(ap) && /Limited protection/i.test(ap), "words: Asset Protection states s. 605.0503(4) as the Manual does, and rates the single member Limited, not None", { sentence: /foreclose on your entire interest if distributions will not satisfy the judgment in a reasonable time/.test(ap), old: /just as easily as corporate stock/.test(ap), limited: /Limited protection/i.test(ap) });
+      console.log("  ✓ words: payment page, filing sheet, and public pages match the product");
+    } catch (e) {
+      expect(false, `words journey: ${String(e).slice(0, 300)}`);
     } finally {
       await page.close();
     }

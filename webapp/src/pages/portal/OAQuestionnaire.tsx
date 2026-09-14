@@ -678,7 +678,7 @@ export default function OAQuestionnaire() {
             ) : null}
 
             {hasApprovalGate ? (
-              <QuestionCard title="Manager's borrowing limit" learnMore="threshold">
+              <QuestionCard title={data.memberManaged ? "Borrowing limit" : "Manager's borrowing limit"} learnMore={data.memberManaged ? "thresholdMember" : "threshold"}>
                 <div className="flex items-center gap-2">
                   <span className="text-sm">Debt above $</span>
                   <Input
@@ -688,13 +688,12 @@ export default function OAQuestionnaire() {
                     onChange={(e) => patch({ borrowingThreshold: dollarsFrom(e.target.value) })}
                     className="w-32"
                   />
-                  <span className="text-sm">
-                    requires {isMulti ? "an owner vote" : "your written consent"}
-                  </span>
+                  <span className="text-sm">requires the consent of all Members</span>
                 </div>
-                <p className="mt-2 text-xs text-muted-foreground">
-                  Above this amount your Manager cannot borrow, or guarantee anyone's debt, without
-                  your written consent (Section 5.4). There is no default — choose the number.
+                <p className="mt-2 text-xs text-muted-foreground" data-testid="threshold-note">
+                  {data.memberManaged
+                    ? "Above this amount no Member may borrow on the company's behalf, or guarantee anyone's debt, without the consent of all Members (Section 5.5). There is no default — choose the number."
+                    : "Above this amount your Manager cannot borrow, or guarantee anyone's debt, without the consent of all Members (Section 5.4). There is no default — choose the number."}
                 </p>
               </QuestionCard>
             ) : null}

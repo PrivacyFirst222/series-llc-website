@@ -456,7 +456,7 @@ Practical rules:
 **B. New-series checklist (every time)**
 ☐ All-member consent (documented) → ☐ File designation online ($25) → ☐ Adopt and sign the Series Exhibit (name exactly as filed; purpose; manager; capital — no associated members; the company owns it) → ☐ EIN if needed → ☐ Open the series' bank account → ☐ Fund it (recorded contribution) → ☐ First asset onto the asset schedule → ☐ Insurance in the series' name → ☐ Add the series to the app.
 **C. Asset-into-series checklist (every asset)**
-☐ Confirm which series (and that its exhibit's purpose covers it) → ☐ Approvals per agreement (multi-member: §5.4 as applicable) → ☐ Transfer document (deed / bill of sale / assignment) naming the series' full filed name → ☐ Consideration documented — price, payor, payee (if from you: recorded contribution; if from another silo: transfer memo + bank movement) → ☐ Re-title / record → ☐ Asset schedule + ledger updated → ☐ Insurance moved → ☐ Related contracts and deposits assigned.
+☐ Confirm which series (and that its exhibit's purpose covers it) → ☐ Approvals per agreement (multi-member: §5.4 manager-managed, §5.5 member-managed, as applicable) → ☐ Transfer document (deed / bill of sale / assignment) naming the series' full filed name → ☐ Consideration documented — price, payor, payee (if from you: recorded contribution; if from another silo: transfer memo + bank movement) → ☐ Re-title / record → ☐ Asset schedule + ledger updated → ☐ Insurance moved → ☐ Related contracts and deposits assigned.
 **D. Real-estate-specific additions**
 ☐ Mortgage consent / due-on-sale cleared in writing → ☐ Documentary stamp treatment confirmed with closing agent → ☐ Title insurance addressed (endorsement or new policy) → ☐ NOT homestead → ☐ Deed grantee = full filed series name; recorded → ☐ Landlord policy re-issued; flood/wind reviewed → ☐ Leases assigned; deposits moved to series account; tenants notified → ☐ Property appraiser mailing address updated → ☐ Out-of-state property: Section 25 advice first.
 ## 30. SAMPLE LANGUAGE (COPY CAREFULLY — NAMES EXACTLY AS FILED)
@@ -482,7 +482,7 @@ Practical rules:
 > Date: ______  |  Asset: ______________________
 > From: Sunshine Holdings, LLC[ - PS __]   To: Sunshine Holdings, LLC - PS __
 > Consideration: $______  |  Payor: ______  |  Payee: ______
-> Approvals (multi-member; §5.4(b)): ______
+> Approvals (multi-member; §5.4(b) manager-managed, §5.5(b) member-managed): ______
 > Bank transfer reference: ______  |  Ledger entries posted (both silos): ☐
 
 **Asset schedule entry (the app formats this for you):**
