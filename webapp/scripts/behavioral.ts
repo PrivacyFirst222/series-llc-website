@@ -623,9 +623,29 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
     const rep = page.getByLabel(/representative name/i).first();
     if (await rep.isVisible().catch(() => false)) await rep.fill("Casey Gatecheck");
     const sig2 = page.getByLabel(/electronic signature/i).first();
-    if (await sig2.isVisible().catch(() => false)) await sig2.fill("Casey Gatecheck");
+    if (await sig2.isVisible().catch(() => false)) {
+      // A signature that is not the exact name is refused with the text
+      // required (Adam, 13 Sep 2026); the old yellow notice is gone.
+      await sig2.fill("casey gatecheck");
+      await page.waitForTimeout(300);
+      const certNow = await page.locator("main").innerText();
+      expect(/must match the authorized representative name exactly: Casey Gatecheck/.test(certNow) && !/You may proceed, but please confirm/.test(certNow), `${run.key}: a mismatched signature shows the exact text required and no 'you may proceed' notice`, certNow.match(/must match[^\n]*|You may proceed[^\n]*/g));
+    }
   }
   await checkAllBoxes(page);
+  if (run.path !== "convert" && !run.weSign) {
+    // With every box ticked and the signature still wrong, submitting is
+    // refused and the step stays; the exact name clears it.
+    const sig3 = page.getByLabel(/electronic signature/i).first();
+    if (await sig3.isVisible().catch(() => false)) {
+      await page.locator("main button").filter({ hasText: /^Submit intake/ }).first().click();
+      await page.waitForTimeout(1500);
+      expect(!captured && /Certif/i.test(await stepHeading(page).catch(() => "")), `${run.key}: submitting is refused while the signature does not match the name`, await stepHeading(page).catch(() => "(navigated)"));
+      await sig3.fill("Casey Gatecheck");
+      await page.waitForTimeout(300);
+      expect(!/must match the authorized representative name exactly/.test(await page.locator("main").innerText()), `${run.key}: the exact name clears the error`);
+    }
+  }
 
   // What the form holds at the moment of submission, from its own autosave —
   // the stored order is compared to THIS, field by field (TEST-GROUNDTRUTH-001).

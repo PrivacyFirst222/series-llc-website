@@ -100714,6 +100714,12 @@ var extendedFormSchema = formationFormSchema.extend({
         path: ["authorizedRepresentativeSignature"],
         message: "An electronic signature is required."
       });
+    } else if (data.authorizedRepresentativeSignature.trim() !== (data.authorizedRepresentativeName ?? "").trim()) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        path: ["authorizedRepresentativeSignature"],
+        message: `Your electronic signature must match the authorized representative name exactly: ${(data.authorizedRepresentativeName ?? "").trim()}`
+      });
     }
     if (data.authorizedRepresentativeSignatureCheckbox !== true) {
       ctx.addIssue({

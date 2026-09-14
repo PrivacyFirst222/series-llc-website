@@ -365,6 +365,8 @@ export function validateStep(
           e.authorizedRepresentativeName = FIRST_AND_LAST;
         if (!data.authorizedRepresentativeSignature)
           e.authorizedRepresentativeSignature = "Electronic signature required.";
+        else if (data.authorizedRepresentativeSignature.trim() !== data.authorizedRepresentativeName.trim())
+          e.authorizedRepresentativeSignature = `Your electronic signature must match the authorized representative name exactly: ${data.authorizedRepresentativeName.trim()}`;
         if (!data.authorizedRepresentativeSignatureCheckbox)
           e.authorizedRepresentativeSignatureCheckbox =
             "Acknowledgment is required.";

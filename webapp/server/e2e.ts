@@ -391,6 +391,21 @@ check("service-RA order accepted with canonical details enforced", svc.status ==
   check("'I sign' without a signature is rejected", noSignature.status === 400,
     noSignature.body);
 
+  // The signature must be the representative's name exactly (Adam, 13 Sep 2026).
+  // Placed from a side address: every order from one address counts against
+  // its hourly allowance, refused or not.
+  const sideAddr = () => ({ "X-Forwarded-For": `10.79.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}` });
+  const wrongSig = await api("/api/orders", {
+    method: "POST", headers: sideAddr(),
+    body: JSON.stringify({ ...formData, articlesSignerChoice: "SELF", authorizedRepresentativeSignature: "casey member, jr." }),
+  });
+  check("'I sign' with a signature that is not the exact name is refused, naming the text required", wrongSig.status === 400 && /must match the authorized representative name exactly: Casey Member, Jr\./.test(JSON.stringify(wrongSig.body)), wrongSig.body);
+  const paddedSig = await api("/api/orders", {
+    method: "POST", headers: sideAddr(),
+    body: JSON.stringify({ ...formData, articlesSignerChoice: "SELF", authorizedRepresentativeSignature: "  Casey Member, Jr.  ", correspondentEmail: testEmail.replace("@", "+padded@"), clientEmail: testEmail.replace("@", "+padded@"), confirmClientEmail: testEmail.replace("@", "+padded@"), confirmCorrespondentEmail: testEmail.replace("@", "+padded@") }),
+  });
+  check("'I sign' with the exact name, spaces at the ends aside, is accepted", paddedSig.status === 200, paddedSig.body);
+
   const appointed = await api("/api/orders", {
     method: "POST",
     body: JSON.stringify({

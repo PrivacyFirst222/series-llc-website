@@ -125,12 +125,14 @@ function ConversionCertification({ data, patch, errors }: StepProps) {
 
 export function StepCertification({ data, patch, errors }: StepProps) {
   if (data.filingPath === "CONVERT") return <ConversionCertification data={data} patch={patch} errors={errors} />;
+  // The signature must be the authorized representative's name exactly —
+  // capitals and punctuation included, spaces at the ends aside (Adam,
+  // 13 Sep 2026: "an exact match needs to be a requirement"). The step's
+  // validation refuses Continue; this only shows the text required.
   const sigMismatch =
     data.authorizedRepresentativeSignature &&
     data.authorizedRepresentativeName &&
-    data.authorizedRepresentativeSignature
-      .trim()
-      .toLowerCase() !== data.authorizedRepresentativeName.trim().toLowerCase();
+    data.authorizedRepresentativeSignature.trim() !== data.authorizedRepresentativeName.trim();
 
   return (
     <div className="space-y-6">
@@ -340,7 +342,12 @@ export function StepCertification({ data, patch, errors }: StepProps) {
         label="Electronic signature"
         required
         helper="Type your full legal name. This is your electronic signature."
-        error={errors.authorizedRepresentativeSignature}
+        error={
+          errors.authorizedRepresentativeSignature ??
+          (sigMismatch && data.articlesSignerChoice === "SELF"
+            ? `Your electronic signature must match the authorized representative name exactly: ${data.authorizedRepresentativeName.trim()}`
+            : undefined)
+        }
         htmlFor="representative-signature"
       >
         <Input
@@ -354,13 +361,6 @@ export function StepCertification({ data, patch, errors }: StepProps) {
       </FieldShell>
       ) : null}
 
-      {sigMismatch && data.articlesSignerChoice === "SELF" ? (
-        <div className="rounded-lg border border-amber-300/60 bg-amber-50 p-3 flex gap-2 text-amber-900 text-xs">
-          <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
-          Your signature does not match the authorized representative name. You
-          may proceed, but please confirm that this is intentional.
-        </div>
-      ) : null}
 
       <div className="space-y-3">
         {data.articlesSignerChoice === "SELF" ? (
