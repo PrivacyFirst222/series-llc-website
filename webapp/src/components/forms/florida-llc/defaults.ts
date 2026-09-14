@@ -39,7 +39,7 @@ export const defaultFormData: FloridaLLCFormData = {
   clientFirstName: "",
   clientLastName: "",
   clientSuffix: "",
-  clientAddress: { address1: "", address2: "", city: "", state: "", zip: "", country: "US" },
+  clientAddress: { address1: "", address2: "", city: "", state: "", zip: "", country: "United States" },
   clientEmail: "",
   confirmClientEmail: "",
   clientPhone: "",

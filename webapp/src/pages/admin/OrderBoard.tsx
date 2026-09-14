@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, Building2, Check, ChevronRight, Clock, ShieldCheck } from "lucide-react";
 import { api } from "@/lib/api";
@@ -214,6 +215,7 @@ interface BoardData {
 
 export default function OrderBoard({ enabled }: { enabled: boolean }) {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   const [openId, setOpenId] = useState<string | null>(null);
   const [showPending, setShowPending] = useState(false);
   const [viewing, setViewing] = useState<AdminServiceOrder | null>(null);
@@ -236,7 +238,13 @@ export default function OrderBoard({ enabled }: { enabled: boolean }) {
 
   const markFiled = useMutation({
     mutationFn: (id: string) => api.post(`/api/admin/orders/${id}/filed`, {}),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin", "orders"] }),
+    // The open card reads its own key; refresh both so the card changes at
+    // once (14 Sep 2026: it did not until closed and reopened).
+    onSuccess: (_d, id) => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "orders"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "order", id] });
+    },
+    onError: (e: Error) => toast({ duration: Infinity, title: "Could not mark sent", description: e.message }),
   });
 
   const orders = ordersQuery.data?.orders ?? [];

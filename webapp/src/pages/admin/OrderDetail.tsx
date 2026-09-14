@@ -725,7 +725,7 @@ export default function OrderDetail({
                       ) : (
                         <>
                           <span className="inline-flex items-center gap-1 text-xs text-trust">
-                            <Check className="h-3.5 w-3.5" /> fulfilled
+                            <Check className="h-3.5 w-3.5" /> fulfilled{s.fulfilled_at ? ` ${new Date(s.fulfilled_at).toLocaleDateString()}` : ""}
                           </span>
                           {s.type === "s-election" && s.has_secret ? (
                             <Button

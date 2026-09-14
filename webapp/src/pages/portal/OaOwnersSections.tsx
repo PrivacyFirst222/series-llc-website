@@ -383,7 +383,7 @@ export function UnitFieldCards({ units, isMulti, owners, seedSeries, series, sEl
               </p>
               {seedSeries.map((sr, i) => (
                 <div key={sr.name} className="flex items-center gap-3">
-                  <span className="w-1/2 truncate text-sm">{sr.name}</span>
+                  <span className="w-1/2 break-words text-sm">{sr.name}</span>
                   <Input
                     aria-label={`Purpose of ${sr.name}`}
                     placeholder='e.g., "own and lease 123 Main Street"'
@@ -436,7 +436,7 @@ export function UnitFieldCards({ units, isMulti, owners, seedSeries, series, sEl
               {(isMulti ? units : [{ kind: "member", index: 0, label: ownerLabel(owners[0], 0) } as Unit]).filter((u) => !(u.kind === "member" && owners[u.index]?.isEntity)).map((u) => (
                 <div key={u.kind === "couple" ? `c${u.ci}` : `m${u.index}`} className="space-y-1">
                   <div className="flex items-center gap-3">
-                    <span className="w-1/2 truncate text-sm">{u.label}</span>
+                    <span className="w-1/2 break-words text-sm">{u.label}</span>
                     <Input
                       aria-label={`Transfer-on-death beneficiary for ${u.label}`}
                       placeholder="Beneficiary name (or leave blank)"
@@ -447,7 +447,7 @@ export function UnitFieldCards({ units, isMulti, owners, seedSeries, series, sEl
                   {/* A backup takes if the first beneficiary does not survive
                       (Adam, 12 Sep 2026); it may be a class of people. */}
                   <div className="flex items-center gap-3">
-                    <span className="w-1/2 truncate text-xs text-muted-foreground">Backup, if that beneficiary does not survive</span>
+                    <span className="w-1/2 break-words text-xs text-muted-foreground">Backup, if that beneficiary does not survive</span>
                     <Input
                       aria-label={`Backup beneficiary for ${u.label}`}
                       placeholder='e.g., "my children in equal shares" (or leave blank)'

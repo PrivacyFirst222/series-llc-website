@@ -230,11 +230,15 @@ function UploadDialog({ client }: { client: AdminClient }) {
       });
       if (!res.ok) {
         const body = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
-        throw new Error(body?.error?.message ?? `Upload failed (${res.status})`);
+        throw new Error(body?.error?.message ?? "The upload did not go through. Try again.");
       }
+      return (await res.json().catch(() => null)) as { data?: { notified?: boolean } } | null;
     },
-    onSuccess: () => {
-      toast({ title: "Document uploaded", description: notify ? "The client was emailed." : undefined });
+    onSuccess: (body) => {
+      // What the route reports, not what the box said (14 Sep 2026).
+      const sent = body?.data?.notified === true;
+      const wanted = notify || kind === "legal_mail";
+      toast({ title: "Document uploaded", description: wanted ? (sent ? "The client was emailed." : "The email to the client could not be sent.") : undefined });
       queryClient.invalidateQueries({ queryKey: ["admin-clients"] });
       setOpen(false);
       setTitle("");
@@ -311,14 +315,18 @@ function UploadDialog({ client }: { client: AdminClient }) {
             <Input
               id="doc-file"
               type="file"
-              accept="application/pdf,.pdf,.doc,.docx"
+              accept="application/pdf,.pdf"
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
             />
           </div>
-          <label className="flex items-center gap-2 text-sm">
-            <Checkbox checked={notify} onCheckedChange={(v) => setNotify(v === true)} />
-            Email the client that a new document is available
-          </label>
+          {kind === "legal_mail" ? (
+            <p className="text-xs text-muted-foreground">The client is emailed the moment legal mail is posted.</p>
+          ) : (
+            <label className="flex items-center gap-2 text-sm">
+              <Checkbox checked={notify} onCheckedChange={(v) => setNotify(v === true)} />
+              Email the client that a new document is available
+            </label>
+          )}
           <Button
             className="w-full rounded-full"
             disabled={!file || !title.trim() || upload.isPending || (needsCompany && !orderId)}

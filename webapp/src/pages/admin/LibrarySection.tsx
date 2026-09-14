@@ -54,7 +54,7 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
       });
       if (!res.ok) {
         const body = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
-        throw new Error(body?.error?.message ?? "Upload failed");
+        throw new Error(body?.error?.message ?? "The upload did not go through. Try again.");
       }
     },
     onSuccess: () => {
@@ -190,6 +190,9 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
           >
             {runBackup.isPending ? "Backing up…" : "Back up now"}
           </Button>
+          {(backupsQuery.data ?? []).length > 5 ? (
+            <span className="text-xs text-muted-foreground">newest 5 of {(backupsQuery.data ?? []).length}:</span>
+          ) : null}
           {(backupsQuery.data ?? []).slice(0, 5).map((b) => (
             <a
               key={b.key}
@@ -200,6 +203,9 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
             </a>
           ))}
         </div>
+        {runBackup.isSuccess ? (
+          <p className="mt-2 text-xs text-trust">Backed up at {new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}.</p>
+        ) : null}
         {runBackup.isError ? (
           <p className="mt-2 text-xs text-destructive">{(runBackup.error as Error).message}</p>
         ) : null}
@@ -223,6 +229,9 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
             >
               {runMirror.isPending ? "Mirroring…" : "Mirror now"}
             </Button>
+            {runMirror.isSuccess ? (
+              <span className="text-xs text-trust">Mirrored at {new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}.</span>
+            ) : null}
           </div>
           <p className="mt-1.5 text-xs text-muted-foreground">
             Every client file is copied nightly into the app-scoped Dropbox

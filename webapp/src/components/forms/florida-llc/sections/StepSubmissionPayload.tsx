@@ -10,7 +10,9 @@ export function StepSubmissionPayload({ data }: StepProps) {
   const llcName =
     buildFinalLlcName(data.desiredLlcName, data.llcDesignator) || "your LLC";
   const seriesCount = data.series.length;
-  const email = data.correspondentEmail?.trim();
+  // Our emails go to the client (the account holder), not the correspondence
+  // contact, which is the Division's address (14 Sep 2026).
+  const email = data.clientEmail?.trim();
 
   return (
     <div className="space-y-6">
@@ -30,12 +32,11 @@ export function StepSubmissionPayload({ data }: StepProps) {
           <li className="flex gap-3">
             <span className="font-mono-feature text-xs text-trust mt-0.5">01</span>
             <span>
-              Our team reviews your intake and prepares your Articles of
-              Organization
+              Our team reviews your intake and prepares
+              {data.filingPath === "CONVERT" ? "" : " your Articles of Organization"}
               {seriesCount > 0 ? (
                 <>
-                  {" "}
-                  and {seriesCount} Protected Series Designation
+                  {data.filingPath === "CONVERT" ? " your" : " and"} {seriesCount} Protected Series Designation
                   {seriesCount === 1 ? "" : "s"}
                 </>
               ) : null}
@@ -53,8 +54,8 @@ export function StepSubmissionPayload({ data }: StepProps) {
             <span className="font-mono-feature text-xs text-trust mt-0.5">03</span>
             <span>
               Once the state accepts the filing, we send you the filed documents
-              along with your form Operating Agreement, property titling manual,
-              ledger forms, and maintenance guide.
+              along with your form Operating Agreement and a comprehensive
+              Owner&rsquo;s Manual.
             </span>
           </li>
         </ol>

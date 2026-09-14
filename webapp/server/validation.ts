@@ -2,7 +2,7 @@ import { z } from "zod";
 import { FIRST_AND_LAST, hasFirstAndLast } from "../src/lib/personName";
 import { normalizeEntityName } from "../src/components/forms/florida-llc/nameSimilarity";
 import { formationFormSchema } from "../src/components/forms/florida-llc/schema";
-import { designatorAllowedForFormationType, hasProtectedSeriesPhrase, memberRowIsBlank, seriesDedupeKey } from "../src/components/forms/florida-llc/validation";
+import { designatorAllowedForFormationType, hasProtectedSeriesPhrase, memberRowIsBlank, nameContainsLegalDesignator, seriesDedupeKey, validateEffectiveDate } from "../src/components/forms/florida-llc/validation";
 import { llcDesignators } from "../src/components/forms/florida-llc/schema";
 import { raServicePatch } from "../src/components/forms/florida-llc/raService";
 
@@ -131,6 +131,37 @@ const extendedFormSchema = formationFormSchema
         path: ["confirmClientEmail"],
         message: "The email addresses do not match.",
       });
+    }
+    // The rules the form enforces and the server did not (14 Sep 2026).
+    if (data.filingPath !== "NEW" && data.filingPath !== "CONVERT") {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["filingPath"], message: "Choose whether this is a new LLC or an existing one." });
+    }
+    if ((data.correspondentEmail ?? "") !== (data.confirmCorrespondentEmail ?? "")) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["confirmCorrespondentEmail"], message: "The correspondence email addresses do not match." });
+    }
+    if (data.filingPath === "CONVERT" && !(data.sunbizDocumentNumber ?? "").trim()) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["sunbizDocumentNumber"], message: "Sunbiz document number is required." });
+    }
+    if (data.filingPath !== "CONVERT") {
+      for (const field of ["alternateName1", "alternateName2"] as const) {
+        const v = (data[field] ?? "").trim();
+        if (v && nameContainsLegalDesignator(v)) {
+          ctx.addIssue({ code: z.ZodIssueCode.custom, path: [field], message: "Leave the designator off — your designator above is added automatically." });
+        }
+      }
+      if (data.effectiveDateOption === "SPECIFIC") {
+        const dateErr = validateEffectiveDate(data.requestedEffectiveDate ?? "");
+        if (dateErr) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["requestedEffectiveDate"], message: dateErr });
+      }
+      if (data.formationType === "PLLC") {
+        if (data.purposeType !== "PROFESSIONAL") {
+          ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["purposeType"], message: "A Professional LLC must select a professional purpose." });
+        } else if (!(data.businessPurposeText ?? "").trim()) {
+          ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["businessPurposeText"], message: "A Professional LLC must provide a specific professional purpose." });
+        }
+      } else if (data.purposeType === "SPECIFIC" && !(data.businessPurposeText ?? "").trim()) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["businessPurposeText"], message: "Specific purpose is required." });
+      }
     }
     data.series.forEach((s, i) => {
       if (!hasProtectedSeriesPhrase(s.name)) {

@@ -110,9 +110,11 @@ export async function oaSeed(clientId: string, orderId?: string | null): Promise
     .map((e) => ({
       name: (personLegalName(e.firstName, e.lastName, e.suffix) || e.fullName || e.businessEntityName || "").trim(),
       address: joinAddr({ address1: e.streetAddress1, address2: e.streetAddress2, city: e.city, state: e.state, zip: e.zip }),
+      // A company as Manager arrives as a company owner (14 Sep 2026).
+      isEntity: !personLegalName(e.firstName, e.lastName, e.suffix) && !(e.fullName ?? "").trim() && !!(e.businessEntityName ?? "").trim(),
     }))
     .filter((o) => o.name);
-  const suggestedOwners: { name: string; address: string }[] = [];
+  const suggestedOwners: { name: string; address: string; isEntity?: boolean }[] = [];
   for (const o of [...(clientOwner ? [clientOwner] : []), ...managerOwners]) {
     if (!suggestedOwners.some((s) => s.name.toLowerCase() === o.name.toLowerCase())) suggestedOwners.push(o);
   }
@@ -329,6 +331,13 @@ export function isoFromPrinted(printed: string): string | null {
   const month = ["january","february","march","april","may","june","july","august","september","october","november","december"].indexOf(m[1].toLowerCase());
   if (month < 0) return null;
   return `${m[3]}-${String(month + 1).padStart(2, "0")}-${m[2].padStart(2, "0")}`;
+}
+
+/** A date column as "YYYY-MM-DD" whichever driver returned it (PGlite gives
+ *  a Date, Neon a string). */
+export function isoDate(v: unknown): string {
+  if (v instanceof Date) return v.toISOString().slice(0, 10);
+  return String(v).slice(0, 10);
 }
 
 export function fmtDate(iso: string): string {
@@ -937,6 +946,11 @@ app.get("/auth/me", async (c) => {
       name: rows[0]?.name ?? "",
       pendingEmail: rows[0]?.pending_email ?? null,
       raCancellationRequestedAt: rows[0]?.ra_cancellation_requested_at ?? null,
+      // The registered-agent renewal date, from the newest formed order that
+      // took our service (14 Sep 2026).
+      raRenewalDate: await db
+        .query<{ ra_renewal_date: unknown }>("SELECT ra_renewal_date FROM orders WHERE client_id = $1 AND ra_renewal_date IS NOT NULL ORDER BY formed_at DESC NULLS LAST LIMIT 1", [session.clientId])
+        .then((r) => (r[0]?.ra_renewal_date ? isoDate(r[0].ra_renewal_date) : null)),
       // The portal shows a banner and an Exit when the admin is looking.
       viewingAsAdmin: session.viewingAsAdmin,
     },
@@ -1099,11 +1113,20 @@ app.get("/portal/oa", async (c) => {
   });
 });
 
+/** The first problem with a set of answers, in the client's words: a rule's
+ *  own sentence when a rule refused it, otherwise "Please check your
+ *  answers." (14 Sep 2026: a wrong shape used to answer "Invalid request" or
+ *  Zod's "Expected array, received string"). */
+function answersProblem(error: z.ZodError): string {
+  const first = error.issues[0];
+  return first?.code === "custom" && first.message ? first.message : "Please check your answers.";
+}
+
 app.put("/portal/oa/answers", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const body = oaAnswersSchema.safeParse(await c.req.json().catch(() => null));
-  if (!body.success) return c.json(err("Invalid answers.", "INVALID_INPUT"), 400);
+  if (!body.success) return c.json(err(answersProblem(body.error), "INVALID_INPUT"), 400);
   const answersCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
   if (!answersCompanyId) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
   const db = await getDb();
@@ -1139,7 +1162,7 @@ app.post("/portal/oa/generate", async (c) => {
     return c.json(err("Too many generations. Try again later.", "RATE_LIMITED"), 429);
   }
   const body = oaAnswersSchema.safeParse(await c.req.json().catch(() => null));
-  if (!body.success) return c.json(err("Invalid answers.", "INVALID_INPUT"), 400);
+  if (!body.success) return c.json(err(answersProblem(body.error), "INVALID_INPUT"), 400);
   const a = body.data;
   const genCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
   const seed = await oaSeed(session.clientId, genCompanyId);
@@ -1629,7 +1652,11 @@ app.post("/portal/oa/amend", async (c) => {
     return c.json(err("Too many amendments. Try again later.", "RATE_LIMITED"), 429);
   }
   const body = amendSchema.safeParse(await c.req.json().catch(() => null));
-  if (!body.success) return c.json(err("Invalid amendment.", "INVALID_INPUT"), 400);
+  if (!body.success) {
+    const field = String(body.error.issues[0]?.path?.[0] ?? "");
+    const named = field === "agreementDate" ? "the effective date of the operating agreement" : field === "effectiveDate" ? "the amendment's effective date" : field === "mode" ? "how the changes are stated" : field === "text" ? "the typed changes" : "the amendment";
+    return c.json(err(`Please check ${named}.`, "INVALID_INPUT"), 400);
+  }
   const a = body.data;
   if (a.mode === "typed" && !(a.text ?? "").trim()) {
     return c.json(err("Type the changes, or choose to attach them as Exhibit A.", "INVALID_INPUT"), 400);
@@ -2468,7 +2495,11 @@ app.post("/portal/registered-agent/cancel", async (c) => {
   );
   const requestedAt = updated[0]?.ra_cancellation_requested_at ?? new Date().toISOString();
   // Confirmation + admin notice must not unwind the recorded request.
-  const confirmation = raCancellationEmail(client.name);
+  const renewalRow = await db.query<{ ra_renewal_date: unknown }>(
+    "SELECT ra_renewal_date FROM orders WHERE client_id = $1 AND ra_renewal_date IS NOT NULL ORDER BY formed_at DESC NULLS LAST LIMIT 1",
+    [session.clientId],
+  );
+  const confirmation = raCancellationEmail(client.name, renewalRow[0]?.ra_renewal_date ? fmtDate(isoDate(renewalRow[0].ra_renewal_date)) : null);
   sendMail({ to: client.email, ...confirmation }).catch((e) =>
     console.error("ra-cancel confirmation email failed", e),
   );

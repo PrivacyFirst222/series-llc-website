@@ -288,6 +288,12 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
 
   // Name step: new formations choose a name; conversions identify the company.
   if (run.path === "new") {
+    {
+      // The two Sunbiz-search sentences are gone; the State's-website
+      // paragraph stays (Adam, 14 Sep 2026).
+      const nameText = await page.locator("main").innerText();
+      expect(!/Run a free Sunbiz name search|Search the public Sunbiz business records/.test(nameText) && /The State of Florida's website does not offer a way for services like ours to check availability automatically/.test(nameText), `${run.key}: the name step no longer tells the client to search Sunbiz, and keeps the State's-website paragraph`, nameText.match(/Sunbiz[^.]*\./g));
+    }
     await fill(page, "Desired LLC name", run.llcName);
     await choose(page, "#llc-designator", run.designator);
     if (run.exactNameOnly) {
@@ -588,6 +594,15 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
   {
     const review = await page.locator("main").innerText();
     expect(!/Signing the Articles|name not yet entered|Not yet certified|^\s*Authorization\s*$/m.test(review), `${run.key}: the Review step has no card for the Certify & sign step still ahead`, review.match(/Signing the Articles|name not yet entered|Not yet certified/g));
+    // The Review step in the client's words, listing every purchase at its
+    // price (14 Sep 2026): no MEMBER_MANAGED, no $5 certificate, no
+    // acceptance card for an agent the client never appointed.
+    // Labels are set in small capitals by the stylesheet, so the text is
+    // read case-blind; the codes carry underscores, which no label does.
+    expect(!/\b(MEMBER_MANAGED|MANAGER_MANAGED|INDIVIDUAL_AGENT|PRINCIPAL_OF_ENTITY)\b/.test(review) && /Structure\s+(Member-managed|Manager-managed)/i.test(review) && (run.path === "convert" || /Type\s+(General purpose|General purpose plus a specific purpose|Professional purpose)/i.test(review)), `${run.key}: the Review step uses words, not codes`, review.match(/\b\w+_\w+\b|Structure\s+[^\n]+|Type\s+[^\n]+/gi));
+    expect(/Certificate of Status\s+(Yes \(\+\$15\)|No)/i.test(review) && /Certified Copy\s+(Yes \(\+\$40\)|No)/i.test(review) && /Federal EIN\s+(Yes \(\+\$50\)|No)/i.test(review) && (run.path === "convert" ? !/S election package/i.test(review) : /S election package\s+(Yes \(\+\$95\)|No)/i.test(review)), `${run.key}: the Review step lists every optional purchase at the price charged`, review.match(/Optional Documents[\s\S]{0,300}/i)?.[0]);
+    expect((run.ra === "SELF") === /Registered Agent Acceptance/.test(review), `${run.key}: the acceptance card appears only when the client is their own agent`, review.match(/Registered Agent[\s\S]{0,200}/)?.[0]);
+    if (run.ra === "SERVICE") expect(/Our registered agent service/.test(review), `${run.key}: the Review step names our agent service in words`, review.match(/Registered Agent[\s\S]{0,200}/)?.[0]);
   }
   // Review → certify.
   await advance(page, "Continue");
@@ -939,6 +954,13 @@ async function main(): Promise<void> {
 
       const toastText = await page.locator('[data-testid="action-needed-list"]').first().innerText().catch(() => "");
       expect(/operating agreement questionnaire/i.test(toastText), "actions: toast names the questionnaire", toastText);
+      {
+        // A formed company on our agent service shows its renewal date
+        // (Adam, 14 Sep 2026: "stored and shown in the portal").
+        const dash = await page.locator("main").innerText();
+        const nextYear = String(new Date().getFullYear() + 1);
+        expect(new RegExp(`renews on [A-Z][a-z]+ \\d{1,2}, ${nextYear}`).test(dash) && !/renews annually/.test(dash), "renewal: the portal's agent card names the renewal date a year from formation", dash.match(/registered agent service is active[^.]*\./)?.[0]);
+      }
       // The S election is not the client's to act on until the office has
       // entered the formation date (Form 2553 timing gate, 6 Sep 2026): the
       // toast and the outlines leave it out, and pick it up once the date
@@ -1823,6 +1845,24 @@ async function main(): Promise<void> {
       await page.goto(`http://localhost:${WEB_PORT}/portal/agreement?company=${hOrderId}`);
       await page.waitForSelector("main h2, main h1");
       await page.waitForTimeout(800);
+      {
+        // With more than one owner, tapping the company named at intake adds
+        // it as a company, so the signer question appears without a second
+        // tap (14 Sep 2026). The extra owner is removed again before the
+        // one-owner journey below.
+        await clickCard(page, /More than one owner/i);
+        await page.locator("main button").filter({ hasText: /^Continue/ }).first().click();
+        await page.waitForTimeout(1200);
+        const chip = page.locator('[data-testid="suggested-owners"] button').filter({ hasText: /Gate Managers of Florida, Inc\./ }).first();
+        expect((await chip.count()) === 1, "entity: the company named as Manager is offered as a suggested owner", await page.locator('[data-testid="suggested-owners"]').innerText().catch(() => "no suggestions"));
+        await chip.click();
+        await page.waitForTimeout(600);
+        expect(await page.locator("#owner-entity-2").isChecked() && (await page.locator('main input[aria-label="Who signs for owner 2"]').count()) === 1, "entity: the suggested company arrives ticked as a company, and its signer boxes appear", await page.locator("main").innerText().then((x) => x.match(/Who signs for owner 2[\s\S]{0,80}/)?.[0]));
+        await page.locator('main button[aria-label="Remove Gate Managers of Florida, Inc."]').first().click();
+        await page.waitForTimeout(600);
+        await page.locator("main button").filter({ hasText: /^Change those three answers/ }).first().click();
+        await page.waitForTimeout(600);
+      }
       await clickCard(page, /^One owner/i);
       await page.locator("main button").filter({ hasText: /^Continue/ }).first().click();
       await page.waitForTimeout(1200);
@@ -1868,8 +1908,6 @@ async function main(): Promise<void> {
     const page = await browser.newPage();
     try {
       const hOrderId = orderIds.get("H")!;
-      const filedRes = await fetch(`${API}/api/admin/orders/${hOrderId}/filed`, { method: "POST", headers: { Cookie: adminCookie } });
-      expect(filedRes.ok, "statement: run H is marked sent to the Division", filedRes.status);
       await page.route("**/api/**", async (route) => {
         const url = new URL(route.request().url());
         const resp = await fetch(`${API}${url.pathname}${url.search}`, {
@@ -1891,8 +1929,13 @@ async function main(): Promise<void> {
       await card.locator("button").first().click();
       await page.waitForTimeout(2000);
       const drawer = page.locator("div.fixed.inset-0 div.max-w-2xl").first();
-      // The button, once pressed, reads "Sent to the Division on [date]"
-      // (Adam, 13 Sep 2026) and the button itself is gone.
+      // Pressed on the card itself (14 Sep 2026: the card did not change
+      // until closed and reopened). Once pressed, the line reads "Sent to
+      // the Division on [date]" (Adam, 13 Sep 2026) and the button is gone.
+      const markBtn = drawer.locator("button").filter({ hasText: /^Mark sent to the Division/ }).first();
+      expect((await markBtn.count()) === 1, "sent: a paid order's card offers Mark sent to the Division", (await drawer.innerText()).slice(0, 300));
+      await markBtn.click();
+      await page.waitForTimeout(1500);
       const sent = await drawer.locator('[data-testid="sent-to-division"]').innerText().catch(() => "");
       expect(/^Sent to the Division on \d{1,2}\/\d{1,2}\/\d{4}$/.test(sent.trim()) && (await drawer.locator("button").filter({ hasText: /^Mark sent to the Division/ }).count()) === 0, "sent: after Mark sent, the card reads 'Sent to the Division on [date]' and the button is gone", sent);
       const numBox = drawer.locator("#articles-document-number");

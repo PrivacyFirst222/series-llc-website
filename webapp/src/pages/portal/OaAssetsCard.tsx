@@ -112,7 +112,7 @@ export function OaAssetsCard({ units, isMulti, seedSeries, assets, setAssets }: 
                     <div className="space-y-1">
                       {units.map((u, k) => (
                         <div key={u.kind === "couple" ? `c${u.ci}` : `m${u.index}`} className="flex items-center gap-2">
-                          <span className="w-1/2 truncate">{u.label}</span>
+                          <span className="w-1/2 break-words">{u.label}</span>
                           <Input
                             inputMode="decimal"
                             aria-label={`Share of asset ${i + 1} contributed by ${u.label}`}
@@ -141,7 +141,7 @@ export function OaAssetsCard({ units, isMulti, seedSeries, assets, setAssets }: 
                   <div className="space-y-1">
                     {seedSeries.map((sr, k) => (
                       <div key={sr.name} className="flex items-center gap-2">
-                        <span className="w-1/2 truncate">{sr.name}</span>
+                        <span className="w-1/2 break-words">{sr.name}</span>
                         <span>$</span>
                         <Input
                           inputMode="numeric"

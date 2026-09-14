@@ -72,8 +72,11 @@ export function assembleNewSeries(input: NewSeriesInput): { markdown: string; ti
       : `_____________________________\n${n}${suffix}`;
   };
   if (input.memberNames.length === 0) throw new Error("new-series: at least one member is required");
+  // Every member adopts the exhibit in a member-managed company, as the
+  // agreement's exhibits are adopted (Adam, 14 Sep 2026: "Every member should
+  // sign it"); every Manager otherwise.
   const psSignature = input.memberManaged
-    ? block(input.memberNames[0], ", Member, for the Company")
+    ? input.memberNames.map((n) => block(n, ", Member, for the Company")).join("\n\n")
     : managers.map((n) => block(n, ", Manager")).join("\n\n");
 
   const blocks = input.memberNames.map((n) => block(n, "")).join("\n\n");

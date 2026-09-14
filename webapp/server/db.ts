@@ -416,6 +416,14 @@ const MIGRATION_008_STATEMENTS: string[] = [
   `CREATE INDEX IF NOT EXISTS email_log_to_idx ON email_log (to_address, sent_at DESC)`,
 ];
 
+// 9 (14 Sep 2026): the office's "Division rejected the filing" leaves a dated
+// record, and the registered-agent renewal date is stored when the company is
+// formed so the portal and the cancellation email can show it.
+const MIGRATION_009_STATEMENTS: string[] = [
+  `ALTER TABLE orders ADD COLUMN IF NOT EXISTS rejected_at timestamptz`,
+  `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_renewal_date date`,
+];
+
 const MIGRATIONS: { id: number; name: string; statements: string[] }[] = [
   { id: 1, name: "initial-schema", statements: MIGRATION_001_STATEMENTS },
   { id: 2, name: "contact-messages", statements: MIGRATION_002_STATEMENTS },
@@ -425,6 +433,7 @@ const MIGRATIONS: { id: number; name: string; statements: string[] }[] = [
   { id: 6, name: "sessions-viewing-as-admin", statements: MIGRATION_006_STATEMENTS },
   { id: 7, name: "order-summary", statements: MIGRATION_007_STATEMENTS },
   { id: 8, name: "email-log", statements: MIGRATION_008_STATEMENTS },
+  { id: 9, name: "rejection-and-ra-renewal", statements: MIGRATION_009_STATEMENTS },
   // Append future migrations here with the next id. Never edit an entry.
 ];
 

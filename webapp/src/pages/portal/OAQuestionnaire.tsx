@@ -23,7 +23,7 @@ interface OaSeed {
   managerNames: string[];
   /** Per manager: a company rather than a person (Adam, 13 Sep 2026). */
   managerEntities?: boolean[];
-  suggestedOwners?: { name: string; address: string }[];
+  suggestedOwners?: { name: string; address: string; isEntity?: boolean }[];
   principalAddress: string;
   members: { name: string; address: string; isEntity?: boolean }[];
   series: { name: string; purpose: string }[];
@@ -82,7 +82,7 @@ export default function OAQuestionnaire() {
   // one per keystroke.
   const revRef = useRef(0);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [saveFailed, setSaveFailed] = useState(false);
+  const [saveFailed, setSaveFailed] = useState<boolean | string>(false);
   // Three questions decide which of the eight forms this is. They come first,
   // on their own screen, so the rest of the page is only ever the questions
   // that form actually has.
@@ -94,7 +94,7 @@ export default function OAQuestionnaire() {
     retry: false,
   });
   const oaQuery = useQuery({
-    queryKey: ["portal-oa"],
+    queryKey: ["portal-oa", oaCompany],
     queryFn: () => api.get<OaData>(`/api/portal/oa${oaCq}`),
     enabled: meQuery.isSuccess,
     retry: false,
@@ -116,8 +116,10 @@ export default function OAQuestionnaire() {
         multiOwner: saved.multiOwner ?? data.multiOwner,
         // Once the client has edited the owners, the draft IS the list — it may
         // be longer or shorter than the one captured at formation.
+        // A saved list keeps the intake's company flag for the owners that
+        // came from it (14 Sep 2026: the flag was dropped once a name was saved).
         members: saved.members?.some((m) => (m?.name ?? "").trim() !== "")
-          ? saved.members
+          ? saved.members.map((m, i) => (m.isEntity === undefined && data.seed.members[i]?.isEntity && (m.name ?? "").trim() === data.seed.members[i]?.name ? { ...m, isEntity: true } : m))
           : data.seed.members.map((m, i) => ({
               ...(saved.members?.[i] ?? {}),
               name: m.name,
@@ -144,7 +146,8 @@ export default function OAQuestionnaire() {
     onSuccess: () => setSaveFailed(false),
     // A save that fails silently is how an answer the client believes is
     // recorded never reaches the agreement.
-    onError: () => setSaveFailed(true),
+    // The server's reason when it gave one (14 Sep 2026), not "check your connection".
+    onError: (e) => setSaveFailed(e instanceof ApiError && e.status === 400 ? e.message : true),
   });
 
   const generate = useMutation({
@@ -191,10 +194,11 @@ export default function OAQuestionnaire() {
   const atCap = (data?.generations?.length ?? 0) >= 5;
   const addOwner = () => patch({ members: [...(a.members ?? []), { name: "", address: "" }] });
   // A suggested owner fills the first blank row, or a new one (Adam, 10 Sep 2026).
-  const addOwnerWith = (s: { name: string; address: string }) => {
+  const addOwnerWith = (s: { name: string; address: string; isEntity?: boolean }) => {
     const current = a.members ?? [];
     const blank = current.findIndex((m) => !(m.name ?? "").trim() && !(m.address ?? "").trim());
-    const next = blank >= 0 ? current.map((m, i) => (i === blank ? { ...m, name: s.name, address: s.address } : m)) : [...current, { name: s.name, address: s.address }];
+    const filled = { name: s.name, address: s.address, ...(s.isEntity ? { isEntity: true } : {}) };
+    const next = blank >= 0 ? current.map((m, i) => (i === blank ? { ...m, ...filled } : m)) : [...current, filled];
     patch({ members: next });
   };
   const suggestions = (data?.seed.suggestedOwners ?? []).filter(
@@ -307,9 +311,10 @@ export default function OAQuestionnaire() {
   // The borrowing limit is a multi-member question only (Adam, 13 Sep 2026:
   // "This is not a question that belongs with respect to a single member LLC").
   const hasApprovalGate = isMulti;
+  // A company or trust has no spouse (14 Sep 2026).
   const unpaired = owners
     .map((m, i) => ({ name: ownerLabel(m, i), i }))
-    .filter((x) => !pairedIdx.has(x.i));
+    .filter((x) => !pairedIdx.has(x.i) && !owners[x.i]?.isEntity);
 
   // The answer and the list can disagree, and neither one silently wins: we
   // cannot know which the client meant, so we say so and refuse to generate.
@@ -760,15 +765,16 @@ export default function OAQuestionnaire() {
               ) : null}
               {saveFailed ? (
                 <p className="mt-3 text-sm text-destructive">
-                  Your last answer could not be saved — check your connection and change it again
-                  before generating, or the agreement may be built without it.
+                  {saveFailed === true
+                    ? "Your last answer could not be saved — check your connection and change it again before generating, or the agreement may be built without it."
+                    : `Your last answer was not saved: ${saveFailed}`}
                 </p>
               ) : null}
               {error ? <p className="mt-3 text-sm text-destructive">{error}</p> : null}
               {atCap ? (
                 <p className="mt-3 rounded-lg border border-amber-300/60 bg-amber-50 p-3 text-sm text-amber-900" data-testid="agreement-cap">
-                  This company already has five operating agreements on file. Delete one from your
-                  documents to generate another.
+                  This company already has five operating agreements on file. To generate another,
+                  delete one in the Your documents section of the portal page.
                 </p>
               ) : null}
               <Button

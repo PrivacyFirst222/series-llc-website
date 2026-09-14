@@ -98,7 +98,7 @@ export function OwnershipEditor({
 
       {rows.map((row) => (
         <div key={row.key} className="flex items-center gap-3">
-          <span className="w-1/2 truncate text-sm">
+          <span className="w-1/2 break-words text-sm">
             {row.label}
             {row.note ? <span className="ml-1 text-xs text-muted-foreground">({row.note})</span> : null}
           </span>

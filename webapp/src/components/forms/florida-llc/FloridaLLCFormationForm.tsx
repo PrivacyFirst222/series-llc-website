@@ -215,6 +215,8 @@ export function FloridaLLCFormationForm({
   // second time proceeds — the check advises, it never blocks.
   const [addressWarning, setAddressWarning] = useState<{
     step: string;
+    /** The address as it was when warned; an edited address is checked again. */
+    line?: string;
     message: string;
     suggested?: { street: string; unit: string; city: string; state: string; zip: string };
   } | null>(null);
@@ -320,13 +322,14 @@ export function FloridaLLCFormationForm({
       return;
     }
 
-    // Second click after a warning: the customer has confirmed their address.
-    if (addressWarning?.step === stepKey) {
+    // Second click after a warning confirms the address AS WARNED: an edited
+    // address is checked afresh (14 Sep 2026).
+    const candidate = addressToVerify();
+    if (addressWarning?.step === stepKey && addressWarning.line === (candidate ? JSON.stringify(candidate) : "")) {
       advance();
       return;
     }
 
-    const candidate = addressToVerify();
     if (candidate && !checkingAddress) {
       setCheckingAddress(true);
       try {
@@ -351,6 +354,7 @@ export function FloridaLLCFormationForm({
         if (result.status === "unverified") {
           setAddressWarning({
             step: stepKey,
+            line: JSON.stringify(candidate),
             message:
               "The Postal Service doesn't recognize this address. Please double-check the street number, spelling, city, and ZIP — or press Continue again to use it exactly as entered.",
           });
@@ -359,6 +363,7 @@ export function FloridaLLCFormationForm({
         if (result.status === "missing_unit") {
           setAddressWarning({
             step: stepKey,
+            line: JSON.stringify(candidate),
             message:
               "This building requires a suite or unit number — mail sent without one may not be delivered. Add it above, or press Continue again to use the address exactly as entered.",
           });
@@ -367,6 +372,7 @@ export function FloridaLLCFormationForm({
         if (result.status === "invalid_unit") {
           setAddressWarning({
             step: stepKey,
+            line: JSON.stringify(candidate),
             message:
               "The Postal Service doesn't recognize that suite or unit number at this building. Please check it — or press Continue again to use the address exactly as entered.",
           });
@@ -376,6 +382,7 @@ export function FloridaLLCFormationForm({
           const { street, unit } = splitUspsLine(result.normalized.address1);
           setAddressWarning({
             step: stepKey,
+            line: JSON.stringify(candidate),
             message: `The Postal Service lists this address as: ${corrected}.`,
             suggested: {
               street,
@@ -487,7 +494,9 @@ export function FloridaLLCFormationForm({
 
   const handleSaveAndExit = () => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      // The same shape the autosave writes, so the position is kept too.
+      const draft: StoredDraft = { __draft: 2, data, stepIndex, maxStep, visited: Array.from(visited) };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
       toast({
         title: "Draft saved",
         description:
@@ -604,7 +613,7 @@ export function FloridaLLCFormationForm({
           </Button>
           </div>
 
-          {stepIndex >= 4 ? (
+          {STEPS.findIndex((s) => s.key === stepKey) >= STEPS.findIndex((s) => s.key === "principal") ? (
             <FeeEstimate
               isConversion={data.filingPath === "CONVERT"}
               registeredAgentChange={data.registeredAgentChoice === "SERVICE"}

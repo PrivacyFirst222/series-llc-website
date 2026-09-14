@@ -19,8 +19,10 @@ export default function AdminLogin() {
     try {
       await api.post("/api/admin/login", { password });
       navigate("/admin");
-    } catch {
-      setError("Incorrect password.");
+    } catch (e) {
+      // A lockout and a lost connection are not a wrong password (14 Sep 2026).
+      const status = (e as { status?: number })?.status;
+      setError(status === 429 ? "Too many attempts. Try again in a few minutes." : status ? "Incorrect password." : "We could not reach the server. Check your connection and try again.");
     } finally {
       setBusy(false);
     }

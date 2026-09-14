@@ -162,13 +162,13 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbr mbs | 5.3 | Voting; Decisions | 0b631d8f | authority | members | members | — | s. 605.04073 |
 | sgm sgms | 5.3 | Authority to Act | 088acca7 | authority | member | member third-party | — | ss. 605.04074(1), 605.0301 |
 | sgl | 5.4 | Actions Requiring Member Approval | 1ab566f9 | authority | manager | members | the Manager moved the building into another series without the members' consent | ss. 605.04073(2)(d), 605.0302, 605.2301; the borrowing limit (former (b)) is a multi-member provision only (Adam, 13 Sep 2026) |
-| mul scp | 5.4 | Actions Requiring Member Approval | dcfcd3e4 | authority | manager | members | the Manager moved the building into another series without the members' consent | ss. 605.04073(2)(d), 605.0302, 605.2301 |
+| mul scp | 5.4 | Actions Requiring Member Approval | 08256f46 | authority | manager | members | the Manager moved the building into another series without the members' consent | ss. 605.04073(2)(d), 605.0302, 605.2301 |
 | mbr mbs | 5.4 | Authority to Act; Limits on Authority | be68b5c7 | authority | members | members | — | s. 605.04074(1) |
 | sgs | 5.4 | Actions Requiring Member Approval | 3554999a | authority | manager | members | the Manager moved the building into another series without the members' consent | ss. 605.04073(2)(d), 605.0302, 605.2301; the borrowing limit (former (b)) is a multi-member provision only (Adam, 13 Sep 2026) |
 | sgm sgms | 5.4 | Standard of Conduct; Exculpation | 048c8e4a | benefit | manager member | manager member | — | ss. 605.04091, 605.0105(3) |
 | sgl sgs | 5.5 | Standard of Conduct; Exculpation | cce8e03a | benefit | manager member | manager member | — | ss. 605.04091, 605.0105(3) |
 | mul scp | 5.5 | Standard of Conduct; Exculpation | db5f385a | benefit | manager members | manager members | — | ss. 605.04091, 605.0105(3) |
-| mbr mbs | 5.5 | Actions Requiring Member Approval | f455ec6e | authority | members | members | the Member moved the building into another series without the other members' consent | ss. 605.04073(1)(c), 605.0302, 605.2301 |
+| mbr mbs | 5.5 | Actions Requiring Member Approval | 1e2fa70c | authority | members | members | the Member moved the building into another series without the other members' consent | ss. 605.04073(1)(c), 605.0302, 605.2301 |
 | sgm sgms | 5.5 | Indemnification | 789d7df9 | benefit | company series | member | — | s. 605.0408 |
 | mul scp sgl sgs | 5.6 | Indemnification | 88f2b141 | benefit | company series | manager members | — | s. 605.0408 |
 | mbr mbs | 5.6 | Standard of Conduct; Exculpation | dfa8cbf5 | benefit | manager members | manager members | — | ss. 605.04091, 605.0105(3) |

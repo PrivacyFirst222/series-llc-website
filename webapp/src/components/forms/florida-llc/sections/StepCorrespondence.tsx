@@ -52,8 +52,9 @@ export function StepCorrespondence({ data, patch, errors }: StepProps) {
       <header className="space-y-2">
         <h2 className="font-display text-3xl">Correspondence contact</h2>
         <p className="text-sm text-muted-foreground max-w-2xl">
-          The filing acknowledgment and future email communications may be
-          sent to this email address.
+          The Division of Corporations sends its filing acknowledgment and its
+          notices to this address. Our own emails go to the client email you
+          gave at the start.
         </p>
       </header>
 

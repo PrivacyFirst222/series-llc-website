@@ -47,7 +47,7 @@ export default function AmendAgreement() {
     retry: false,
   });
   const oaQuery = useQuery({
-    queryKey: ["portal-oa"],
+    queryKey: ["portal-oa", company],
     queryFn: () => api.get<AmendData>(`/api/portal/oa${cq}`),
     enabled: meQuery.isSuccess,
     retry: false,

@@ -386,7 +386,7 @@ export function ServiceFulfillDialog({
           <input
             id="service-attachment-file"
             type="file"
-            accept="application/pdf,image/*"
+            accept="application/pdf,.pdf"
             onChange={(e) => setAttachment(e.target.files?.[0] ?? null)}
             className="block w-full text-sm text-muted-foreground file:mr-3 file:rounded-full file:border file:border-border file:bg-secondary file:px-4 file:py-1.5 file:text-sm file:font-medium"
           />

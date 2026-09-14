@@ -236,7 +236,7 @@ export function ServicesCard({ company }: { company?: string | null }) {
               <div className="space-y-1.5">
                 <label className="text-sm font-medium">Series identifier</label>
                 <div className="flex items-center gap-2">
-                  <span className="max-w-[55%] truncate text-sm text-muted-foreground">
+                  <span className="max-w-[55%] break-words text-sm text-muted-foreground">
                     {data.llcName} -
                   </span>
                   <Input name="suffix" defaultValue="PS " className="flex-1" autoComplete="off" />

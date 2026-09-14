@@ -95888,6 +95888,10 @@ var MIGRATION_008_STATEMENTS = [
 )`,
   `CREATE INDEX IF NOT EXISTS email_log_to_idx ON email_log (to_address, sent_at DESC)`
 ];
+var MIGRATION_009_STATEMENTS = [
+  `ALTER TABLE orders ADD COLUMN IF NOT EXISTS rejected_at timestamptz`,
+  `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_renewal_date date`
+];
 var MIGRATIONS = [
   { id: 1, name: "initial-schema", statements: MIGRATION_001_STATEMENTS },
   { id: 2, name: "contact-messages", statements: MIGRATION_002_STATEMENTS },
@@ -95896,7 +95900,8 @@ var MIGRATIONS = [
   { id: 5, name: "documents-carry-company", statements: MIGRATION_005_STATEMENTS },
   { id: 6, name: "sessions-viewing-as-admin", statements: MIGRATION_006_STATEMENTS },
   { id: 7, name: "order-summary", statements: MIGRATION_007_STATEMENTS },
-  { id: 8, name: "email-log", statements: MIGRATION_008_STATEMENTS }
+  { id: 8, name: "email-log", statements: MIGRATION_008_STATEMENTS },
+  { id: 9, name: "rejection-and-ra-renewal", statements: MIGRATION_009_STATEMENTS }
   // Append future migrations here with the next id. Never edit an entry.
 ];
 function migrationChecksum(statements) {
@@ -100420,6 +100425,17 @@ function buildFinalLlcName(desired, designator) {
   if (hasIt) return cleaned;
   return `${cleaned}, ${designator}`;
 }
+function nameContainsLegalDesignator(name) {
+  const lower = name.toLowerCase();
+  return [
+    "limited liability company",
+    "professional limited liability company",
+    "llc",
+    "l.l.c.",
+    "pllc",
+    "p.l.l.c."
+  ].some((d2) => lower.includes(d2));
+}
 function memberRowIsBlank(m2) {
   return ["firstName", "lastName", "entityName", "address1", "city", "zip"].every(
     (k) => typeof m2[k] !== "string" || m2[k].trim() === ""
@@ -100438,6 +100454,38 @@ function validateRegisteredAgentAddress(street1, street2, state) {
   }
   if (isPoBox(street1) || isPoBox(street2 ?? "")) {
     return "A P.O. Box cannot be used for the registered agent address.";
+  }
+  return null;
+}
+function isBusinessDay(d2) {
+  const day = d2.getDay();
+  return day !== 0 && day !== 6;
+}
+function addBusinessDays(start, n) {
+  const d2 = new Date(start);
+  let added = 0;
+  const dir = n >= 0 ? 1 : -1;
+  while (added < Math.abs(n)) {
+    d2.setDate(d2.getDate() + dir);
+    if (isBusinessDay(d2)) added++;
+  }
+  return d2;
+}
+function validateEffectiveDate(isoDate2, anticipatedFilingDate = /* @__PURE__ */ new Date()) {
+  if (!isoDate2) return "Effective date is required.";
+  const target = new Date(isoDate2);
+  if (isNaN(target.getTime())) return "Invalid effective date.";
+  const earliest = addBusinessDays(anticipatedFilingDate, -5);
+  const latest = new Date(anticipatedFilingDate);
+  latest.setDate(latest.getDate() + 90);
+  earliest.setHours(0, 0, 0, 0);
+  latest.setHours(23, 59, 59, 999);
+  target.setHours(12, 0, 0, 0);
+  if (target < earliest) {
+    return "Effective date cannot be more than 5 business days before the filing date.";
+  }
+  if (target > latest) {
+    return "Effective date cannot be more than 90 days after the filing date.";
   }
   return null;
 }
@@ -100615,6 +100663,36 @@ var extendedFormSchema = formationFormSchema.extend({
       path: ["confirmClientEmail"],
       message: "The email addresses do not match."
     });
+  }
+  if (data.filingPath !== "NEW" && data.filingPath !== "CONVERT") {
+    ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["filingPath"], message: "Choose whether this is a new LLC or an existing one." });
+  }
+  if ((data.correspondentEmail ?? "") !== (data.confirmCorrespondentEmail ?? "")) {
+    ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["confirmCorrespondentEmail"], message: "The correspondence email addresses do not match." });
+  }
+  if (data.filingPath === "CONVERT" && !(data.sunbizDocumentNumber ?? "").trim()) {
+    ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["sunbizDocumentNumber"], message: "Sunbiz document number is required." });
+  }
+  if (data.filingPath !== "CONVERT") {
+    for (const field of ["alternateName1", "alternateName2"]) {
+      const v2 = (data[field] ?? "").trim();
+      if (v2 && nameContainsLegalDesignator(v2)) {
+        ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: [field], message: "Leave the designator off \u2014 your designator above is added automatically." });
+      }
+    }
+    if (data.effectiveDateOption === "SPECIFIC") {
+      const dateErr = validateEffectiveDate(data.requestedEffectiveDate ?? "");
+      if (dateErr) ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["requestedEffectiveDate"], message: dateErr });
+    }
+    if (data.formationType === "PLLC") {
+      if (data.purposeType !== "PROFESSIONAL") {
+        ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["purposeType"], message: "A Professional LLC must select a professional purpose." });
+      } else if (!(data.businessPurposeText ?? "").trim()) {
+        ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["businessPurposeText"], message: "A Professional LLC must provide a specific professional purpose." });
+      }
+    } else if (data.purposeType === "SPECIFIC" && !(data.businessPurposeText ?? "").trim()) {
+      ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["businessPurposeText"], message: "Specific purpose is required." });
+    }
   }
   data.series.forEach((s, i) => {
     if (!hasProtectedSeriesPhrase(s.name)) {
@@ -101406,7 +101484,7 @@ function newDocumentEmail(portalUrl) {
     `)
   };
 }
-function raCancellationEmail(name) {
+function raCancellationEmail(name, renewalDate = null) {
   return {
     subject: "Your registered agent cancellation request",
     html: wrap(`
@@ -101414,7 +101492,7 @@ function raCancellationEmail(name) {
       <p>We received your request to cancel registered agent service. Two things determine
       what happens next:</p>
       <p><strong>1. The renewal charge.</strong> Because you gave notice through your portal,
-      your service will not renew at the next renewal date \u2014 as long as your notice was given
+      your service will not renew at the next renewal date${renewalDate ? `, ${escapeHtml(renewalDate)},` : ""} \u2014 as long as your notice was given
       at least 30 days before that date.</p>
       <p><strong>2. Removing us as agent of record.</strong> Florida requires your LLC to have
       a registered agent at all times, so you must designate a successor registered agent with
@@ -102735,7 +102813,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 (f) incur, on behalf of the Company or any Protected Series, indebtedness in excess of $[THRESHOLD] in a single transaction or series of related transactions, or guarantee the obligation of any person (and no guarantee of the obligations of one Protected Series by another or by the Company shall be made except by an express written instrument approved under this Section) \u2014 the consent of **all Members**;
 
-(g) lend money of the Company or of a Protected Series to, or borrow from, a Member, the Manager, or their affiliates, other than loans under Section 6.5 \u2014 the consent of a Majority in Interest of the disinterested Members; or
+(g) lend money of the Company or of a Protected Series to, or borrow from, a Member, the Manager, or their affiliates, other than loans under Section 6.5 \u2014 the consent of a Majority in Interest of the disinterested Members;
 
 (h) amend this Agreement or any Series Exhibit \u2014 the approval required by Section 15.1; or
 
@@ -103243,7 +103321,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 (f) incur, on behalf of the Company or any Protected Series, indebtedness in excess of $[THRESHOLD] in a single transaction or series of related transactions, or guarantee the obligation of any person (and no guarantee of the obligations of one Protected Series by another or by the Company shall be made except by an express written instrument approved under this Section) \u2014 the consent of **all Members**;
 
-(g) lend money of the Company or of a Protected Series to, or borrow from, a Member, the Manager, or their affiliates, other than loans under Section 6.5 \u2014 the consent of a Majority in Interest of the disinterested Members; or
+(g) lend money of the Company or of a Protected Series to, or borrow from, a Member, the Manager, or their affiliates, other than loans under Section 6.5 \u2014 the consent of a Majority in Interest of the disinterested Members;
 
 (h) amend this Agreement or any Series Exhibit \u2014 the approval required by Section 15.1; or
 
@@ -103773,7 +103851,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 (f) incur, on behalf of the Company or any Protected Series, indebtedness in excess of $[THRESHOLD] in a single transaction or series of related transactions, or guarantee the obligation of any person (and no guarantee of the obligations of one Protected Series by another or by the Company shall be made except by an express written instrument approved under this Section) \u2014 the consent of **all Members**;
 
-(g) lend money of the Company or of a Protected Series to, or borrow from, a Member or an affiliate of a Member, other than loans under Section 6.5 \u2014 the consent of a Majority in Interest of the disinterested Members; or
+(g) lend money of the Company or of a Protected Series to, or borrow from, a Member or an affiliate of a Member, other than loans under Section 6.5 \u2014 the consent of a Majority in Interest of the disinterested Members;
 
 (h) amend this Agreement or any Series Exhibit \u2014 the approval required by Section 15.1; or
 
@@ -104267,7 +104345,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 (f) incur, on behalf of the Company or any Protected Series, indebtedness in excess of $[THRESHOLD] in a single transaction or series of related transactions, or guarantee the obligation of any person (and no guarantee of the obligations of one Protected Series by another or by the Company shall be made except by an express written instrument approved under this Section) \u2014 the consent of **all Members**;
 
-(g) lend money of the Company or of a Protected Series to, or borrow from, a Member or an affiliate of a Member, other than loans under Section 6.5 \u2014 the consent of a Majority in Interest of the disinterested Members; or
+(g) lend money of the Company or of a Protected Series to, or borrow from, a Member or an affiliate of a Member, other than loans under Section 6.5 \u2014 the consent of a Majority in Interest of the disinterested Members;
 
 (h) amend this Agreement or any Series Exhibit \u2014 the approval required by Section 15.1; or
 
@@ -106256,7 +106334,7 @@ By: _____________________________
 ${n}${suffix}`;
   };
   if (input.memberNames.length === 0) throw new Error("new-series: at least one member is required");
-  const psSignature = input.memberManaged ? block(input.memberNames[0], ", Member, for the Company") : managers.map((n) => block(n, ", Manager")).join("\n\n");
+  const psSignature = input.memberManaged ? input.memberNames.map((n) => block(n, ", Member, for the Company")).join("\n\n") : managers.map((n) => block(n, ", Manager")).join("\n\n");
   const blocks = input.memberNames.map((n) => block(n, "")).join("\n\n");
   must2(s, "[COMPANY NAME], LLC", "company name");
   s = s.split("[COMPANY NAME], LLC").join(input.companyName);
@@ -106690,12 +106768,16 @@ function filingGroups(payload) {
         label: "Other provisions",
         value: "Leave blank \u2014 the client chose a general purpose and no statement"
       }
-    ] : provisions.map((text, i) => ({
-      key: `provision${i}`,
-      label: i === 0 && provisions.length > 1 ? "Paste both, this first" : "Paste into the box",
-      value: text,
-      block: true
-    }))
+    ] : [
+      ...provisions.map((text, i) => ({
+        key: `provision${i}`,
+        label: i === 0 && provisions.length > 1 ? "Paste both, this first" : "Paste into the box",
+        value: text,
+        block: true
+      })),
+      // The box takes 240 characters; say so before the paste fails.
+      ...provisions.join("\n\n").length > 240 ? [{ key: "provisionLength", label: "Length", value: `${provisions.join("\n\n").length} characters \u2014 over the Division's 240-character limit; shorten before pasting`, block: true }] : []
+    ]
   });
   groups.push({
     title: "Correspondence name and e-mail",
@@ -106778,8 +106860,8 @@ function filingGroups(payload) {
   const memberList = membersInfo.memberList ?? [];
   if (mgmt.structure === "MEMBER_MANAGED") {
     for (const m2 of memberList) {
-      const entityName = (m2.entityName ?? "").trim();
-      const isEntity = entityName !== "" && m2.memberType === "ENTITY";
+      const entityName = (m2.entityName ?? m2.businessEntityName ?? "").trim();
+      const isEntity = entityName !== "" && (m2.memberType === "ENTITY" || !!(m2.businessEntityName ?? "").trim());
       const nm = personName(m2);
       personFields.push({ key: `person${slot}Title`, label: `Person ${slot + 1} \u2014 Title`, value: "AMBR" });
       if (isEntity) {
@@ -106851,7 +106933,9 @@ async function oaSeed(clientId, orderId) {
   const clientOwner = (p2.client?.name ?? "").trim() ? { name: (p2.client?.name ?? "").trim(), address: joinAddr(p2.client?.address) } : null;
   const managerOwners = (p2.management?.managersOrAuthorizedRepresentatives ?? []).filter((e) => (e.role ?? "MGR") === "MGR").map((e) => ({
     name: (personLegalName(e.firstName, e.lastName, e.suffix) || e.fullName || e.businessEntityName || "").trim(),
-    address: joinAddr({ address1: e.streetAddress1, address2: e.streetAddress2, city: e.city, state: e.state, zip: e.zip })
+    address: joinAddr({ address1: e.streetAddress1, address2: e.streetAddress2, city: e.city, state: e.state, zip: e.zip }),
+    // A company as Manager arrives as a company owner (14 Sep 2026).
+    isEntity: !personLegalName(e.firstName, e.lastName, e.suffix) && !(e.fullName ?? "").trim() && !!(e.businessEntityName ?? "").trim()
   })).filter((o) => o.name);
   const suggestedOwners = [];
   for (const o of [...clientOwner ? [clientOwner] : [], ...managerOwners]) {
@@ -107015,6 +107099,10 @@ function isoFromPrinted(printed) {
   const month = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"].indexOf(m2[1].toLowerCase());
   if (month < 0) return null;
   return `${m2[3]}-${String(month + 1).padStart(2, "0")}-${m2[2].padStart(2, "0")}`;
+}
+function isoDate(v2) {
+  if (v2 instanceof Date) return v2.toISOString().slice(0, 10);
+  return String(v2).slice(0, 10);
 }
 function fmtDate2(iso) {
   const [y, m2, d2] = iso.split("-").map(Number);
@@ -107456,6 +107544,9 @@ function registerPortalRoutes(app2) {
         name: rows[0]?.name ?? "",
         pendingEmail: rows[0]?.pending_email ?? null,
         raCancellationRequestedAt: rows[0]?.ra_cancellation_requested_at ?? null,
+        // The registered-agent renewal date, from the newest formed order that
+        // took our service (14 Sep 2026).
+        raRenewalDate: await db.query("SELECT ra_renewal_date FROM orders WHERE client_id = $1 AND ra_renewal_date IS NOT NULL ORDER BY formed_at DESC NULLS LAST LIMIT 1", [session.clientId]).then((r) => r[0]?.ra_renewal_date ? isoDate(r[0].ra_renewal_date) : null),
         // The portal shows a banner and an Exit when the admin is looking.
         viewingAsAdmin: session.viewingAsAdmin
       }
@@ -107586,11 +107677,15 @@ function registerPortalRoutes(app2) {
       }
     });
   });
+  function answersProblem(error2) {
+    const first = error2.issues[0];
+    return first?.code === "custom" && first.message ? first.message : "Please check your answers.";
+  }
   app2.put("/portal/oa/answers", async (c) => {
     const session = await getSession(c);
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
     const body = oaAnswersSchema.safeParse(await c.req.json().catch(() => null));
-    if (!body.success) return c.json(err("Invalid answers.", "INVALID_INPUT"), 400);
+    if (!body.success) return c.json(err(answersProblem(body.error), "INVALID_INPUT"), 400);
     const answersCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
     if (!answersCompanyId) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
     const db = await getDb();
@@ -107621,7 +107716,7 @@ function registerPortalRoutes(app2) {
       return c.json(err("Too many generations. Try again later.", "RATE_LIMITED"), 429);
     }
     const body = oaAnswersSchema.safeParse(await c.req.json().catch(() => null));
-    if (!body.success) return c.json(err("Invalid answers.", "INVALID_INPUT"), 400);
+    if (!body.success) return c.json(err(answersProblem(body.error), "INVALID_INPUT"), 400);
     const a2 = body.data;
     const genCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
     const seed = await oaSeed(session.clientId, genCompanyId);
@@ -108013,7 +108108,11 @@ function registerPortalRoutes(app2) {
       return c.json(err("Too many amendments. Try again later.", "RATE_LIMITED"), 429);
     }
     const body = amendSchema.safeParse(await c.req.json().catch(() => null));
-    if (!body.success) return c.json(err("Invalid amendment.", "INVALID_INPUT"), 400);
+    if (!body.success) {
+      const field = String(body.error.issues[0]?.path?.[0] ?? "");
+      const named = field === "agreementDate" ? "the effective date of the operating agreement" : field === "effectiveDate" ? "the amendment's effective date" : field === "mode" ? "how the changes are stated" : field === "text" ? "the typed changes" : "the amendment";
+      return c.json(err(`Please check ${named}.`, "INVALID_INPUT"), 400);
+    }
     const a2 = body.data;
     if (a2.mode === "typed" && !(a2.text ?? "").trim()) {
       return c.json(err("Type the changes, or choose to attach them as Exhibit A.", "INVALID_INPUT"), 400);
@@ -108738,7 +108837,11 @@ function registerPortalRoutes(app2) {
       [session.clientId]
     );
     const requestedAt = updated[0]?.ra_cancellation_requested_at ?? (/* @__PURE__ */ new Date()).toISOString();
-    const confirmation = raCancellationEmail(client.name);
+    const renewalRow = await db.query(
+      "SELECT ra_renewal_date FROM orders WHERE client_id = $1 AND ra_renewal_date IS NOT NULL ORDER BY formed_at DESC NULLS LAST LIMIT 1",
+      [session.clientId]
+    );
+    const confirmation = raCancellationEmail(client.name, renewalRow[0]?.ra_renewal_date ? fmtDate2(isoDate(renewalRow[0].ra_renewal_date)) : null);
     sendMail({ to: client.email, ...confirmation }).catch(
       (e) => console.error("ra-cancel confirmation email failed", e)
     );
@@ -108796,7 +108899,9 @@ function ticked(p2) {
     publicRecordAcknowledged: p2.certifications?.publicRecordAcknowledged === true,
     notLegalAdviceAcknowledged: p2.certifications?.notLegalAdviceAcknowledged === true
   };
-  return ACKNOWLEDGMENTS.filter((a2) => flags[a2.field] === true).map((a2) => ({ field: a2.field, text: typeof a2.text === "function" ? a2.text(p2) : a2.text }));
+  const raBoxes = /* @__PURE__ */ new Set(["registeredAgentNotSameAsLlc", "registeredAgentPhysicalAddressAcknowledgment", "registeredAgentAcceptanceCheckbox", "registeredAgentSignatureAuthorizationCheckbox"]);
+  const ourAgent = p2.registeredAgent?.choice === "SERVICE";
+  return ACKNOWLEDGMENTS.filter((a2) => flags[a2.field] === true && !(ourAgent && raBoxes.has(a2.field))).map((a2) => ({ field: a2.field, text: typeof a2.text === "function" ? a2.text(p2) : a2.text }));
 }
 function summaryMarkdown(o) {
   const p2 = typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload;
@@ -109051,7 +109156,7 @@ async function fulfillPaidServiceOrder(serviceOrderId, squarePaymentId) {
   if (rows.length === 0) return;
   const so2 = rows[0];
   const details = typeof so2.details === "string" ? JSON.parse(so2.details) : so2.details;
-  const summary = so2.type === "series" ? `Protected Series Designation \u2014 ${details.seriesName ?? so2.llc_name}` : so2.type === "s-election" ? `S Corporation Election Package \u2014 ${so2.llc_name}` : so2.type === "certificate-of-status" ? `Certificate of Status \u2014 ${so2.llc_name}` : so2.type === "certified-copy" ? `Certified Copy of the Articles \u2014 ${so2.llc_name}` : `Federal EIN \u2014 ${details.target === "series" ? details.seriesName ?? "series" : so2.llc_name}`;
+  const summary = so2.type === "series" ? `Protected Series Designation \u2014 ${details.seriesName ?? so2.llc_name}` : so2.type === "s-election" ? `S Corporation Election Package \u2014 ${so2.llc_name}` : so2.type === "certificate-of-status" ? `Certificate of Status \u2014 ${so2.llc_name}` : so2.type === "certified-copy" ? `Certified Copy of the Articles \u2014 ${so2.llc_name}` : `Federal EIN \u2014 ${details.target === "series" ? details.seriesName ?? so2.llc_name : so2.llc_name}`;
   const clients = await db.query(
     "SELECT email, name FROM clients WHERE id = $1",
     [so2.client_id]
@@ -109144,12 +109249,6 @@ function registerPaymentRoutes(app2) {
         400
       );
     }
-    if (!await rateLimit(`orders:ok:${clientIp(c)}`, 10, 36e5)) {
-      return c.json(
-        err("Too many submissions. Try again in an hour.", "RATE_LIMITED"),
-        429
-      );
-    }
     const data = parsed.data;
     const raError = validateRegisteredAgentAddress(
       data.registeredAgentStreetAddress1,
@@ -109175,6 +109274,9 @@ function registerPaymentRoutes(app2) {
         ),
         400
       );
+    }
+    if (!await rateLimit(`orders:ok:${clientIp(c)}`, 10, 36e5)) {
+      return c.json(err("Too many submissions. Try again in an hour.", "RATE_LIMITED"), 429);
     }
     const payload = buildPayload(data);
     payload.metadata.ipAddress = clientIp(c);
@@ -109437,6 +109539,23 @@ function registerPaymentRoutes(app2) {
       return c.json({ data: { available: false, results: [] } });
     }
   });
+}
+
+// src/pages/portal/documentOrder.ts
+var isAgreement = (doc) => doc.kind !== "amendment" && /Operating Agreement/i.test(doc.title);
+function documentRank(doc, current) {
+  if (doc.kind === "articles") return 0;
+  if (doc.kind === "certified-copy") return 1;
+  if (doc.kind === "statement") return 2;
+  if (doc.kind === "psd") return 3;
+  if (/^EIN Confirmation Letter/i.test(doc.title)) return 4;
+  if (isAgreement(doc)) return current && doc !== current ? 7 : 5;
+  if (doc.kind === "amendment") return 6;
+  return 8;
+}
+function sortDocuments(docs) {
+  const current = docs.filter(isAgreement).sort((a2, b2) => a2.created_at < b2.created_at ? 1 : a2.created_at > b2.created_at ? -1 : 0)[0] ?? null;
+  return [...docs].sort((a2, b2) => documentRank(a2, current) - documentRank(b2, current) || (a2.created_at < b2.created_at ? 1 : a2.created_at > b2.created_at ? -1 : 0));
 }
 
 // server/statement.ts
@@ -110111,7 +110230,7 @@ The shields in Section 2 protect the structure from the *business's* creditors. 
 **Bankruptcy armor (multi-member).** Article 11 of the multi-member agreement declares the agreement an executory contract under 11 U.S.C. \xA7365, catalogs each member's material ongoing duties, and \u2014 citing *In re Soderstrom* (M.D. Fla. 2013) \u2014 takes the position that a bankruptcy trustee cannot assume or assign a debtor-member's interest without the other members' consent. Understand it honestly: bankruptcy courts wield broad equitable power, and no drafting guarantees an outcome there. Article 11 gives your side the strongest available argument; combined with charging-order exclusivity, it makes the interest an unappetizing target \u2014 which is the practical goal.
 **Bankruptcy if you own alone.** Florida's statute has a trap for the sole owner of a member-managed company: filing bankruptcy automatically expels you as a member (s. 605.0602(8)), and a company with no members starts a 90-day clock toward dissolution \u2014 your worst financial day would also dissolve the container holding your assets. Your agreement turns that trap off (\xA74.7 of the member-managed single-member forms; \xA74.8 of the manager-managed forms, where the statute does not expel you but the same section keeps management and the series running): filing does not end your membership, the company and every series continue, and whoever ends up holding the interest holds it subject to the agreement. Understand what this section does *not* do: in a single-member company there are no co-members whose rights a bankruptcy court must respect, so the estate steps into your shoes \u2014 federal law makes the interest estate property no matter what any agreement says, and any clause that tried to punish filing would be void. The section's job is continuity, not concealment: the business keeps operating, the walls between series stand, and the estate deals with an intact company instead of a dissolving one. If bankruptcy is a live concern, that is a conversation for a bankruptcy attorney before filing, not after.
 
-**Death \u2014 the TOD designation.** Every form of the agreement lets each member register a transfer-on-death beneficiary \u2014 anyone the member chooses \u2014 on Exhibit A, using Florida's registration-in-beneficiary-form statute (ss. 711.50\u2013711.512). At death the interest passes directly \u2014 no probate \u2014 and the beneficiary takes subject to the operating agreement. In the multi-member agreements, a beneficiary receives the economic interest automatically but becomes a voting member only with the consent of a majority in interest of the other members \u2014 death does not bypass the controls that govern lifetime transfers, and family is treated no differently. In the single-member agreement the beneficiary is admitted as the Member on delivering a signed agreement to be bound, since there is no one else to consent. Keep designations current (the formalities are strict: a signed writing with two witnesses, delivered as your form directs), and coordinate with your estate plan \u2014 for large or complicated estates, a trust may be the better vehicle; ask your estate planner. If no designation is made, the interest passes through your estate, and the agreement's continuation provisions keep the company alive while it does.
+**Death \u2014 the TOD designation.** Every form of the agreement lets each member register a transfer-on-death beneficiary \u2014 anyone the member chooses, subject on the S corporation forms to the eligible-shareholder rule \u2014 on Exhibit A, using Florida's registration-in-beneficiary-form statute (ss. 711.50\u2013711.512). At death the interest passes directly \u2014 no probate \u2014 and the beneficiary takes subject to the operating agreement. In the multi-member agreements, a beneficiary receives the economic interest automatically but becomes a voting member only with the consent of a majority in interest of the other members \u2014 death does not bypass the controls that govern lifetime transfers, and family is treated no differently. In the single-member agreement the beneficiary is admitted as the Member on delivering a signed agreement to be bound, since there is no one else to consent. Keep designations current (the formalities are strict: a signed writing with two witnesses, delivered as your form directs), and coordinate with your estate plan \u2014 for large or complicated estates, a trust may be the better vehicle; ask your estate planner. If no designation is made, the interest passes through your estate, and the agreement's continuation provisions keep the company alive while it does.
 ## 24. WHEN A SERIES GETS SUED \u2014 SERVICE OF PROCESS AND LEGAL MAIL
 A protected series can sue and be sued in its own name. Process against a series is served like process against the LLC (s. 48.062) \u2014 which in practice means **served on the registered agent**, who is the same for the company and every series.
 If MyFloridaSeriesLLC is your registered agent: anything served or officially delivered for any of your silos is scanned to your client portal the day we receive it, and you get an email alert immediately. Then the clock is yours to respect: **a lawsuit has a response deadline (typically 20 days in Florida) that runs whether or not you read it.** Sign in, download, and get the papers to your attorney the same day. A default judgment converts a defensible claim into a fixed debt of that series \u2014 and tests your records under \xA7605.2404 at their worst moment. The alert email is not the last step; it is the first.
@@ -110411,16 +110530,21 @@ function registerAdminRoutes(app2) {
     );
     return c.json({ data: { orders: rows, total: Number(total[0].c), shown: rows.length } });
   });
+  const BOARD_LABEL = { pending_payment: "Pending payment", paid: "New Orders", filed: "With The State", formed: "Formed" };
+  const isConversionPayload = (payload) => (typeof payload === "string" ? JSON.parse(payload) : payload)?.filingPath === "CONVERT";
   app2.post("/admin/orders/:id/filed", async (c) => {
     const admin = await requireAdmin(c);
     if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
     const db = await getDb();
-    const rows = await db.query("SELECT status FROM orders WHERE id = $1", [
+    const rows = await db.query("SELECT status, payload FROM orders WHERE id = $1", [
       c.req.param("id")
     ]);
     if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+    if (isConversionPayload(rows[0].payload)) {
+      return c.json(err("A conversion has nothing to send to the Division: its Designations are filed online.", "BAD_STATE"), 400);
+    }
     if (rows[0].status !== "paid") {
-      return c.json(err(`An order is filed from "paid", not "${rows[0].status}".`, "BAD_STATE"), 400);
+      return c.json(err(`Only an order in New Orders can be marked sent; this one is in ${BOARD_LABEL[rows[0].status] ?? rows[0].status}.`, "BAD_STATE"), 400);
     }
     await db.query("UPDATE orders SET status = 'filed', filed_at = now() WHERE id = $1", [
       c.req.param("id")
@@ -110438,7 +110562,7 @@ function registerAdminRoutes(app2) {
     if (rows[0].status !== "filed") {
       return c.json(err("Only an order sitting with the State can be moved back.", "BAD_STATE"), 400);
     }
-    await db.query("UPDATE orders SET status = 'paid', filed_at = NULL, series_filed_at = NULL, copied_fields = '{}'::jsonb WHERE id = $1", [
+    await db.query("UPDATE orders SET status = 'paid', filed_at = NULL, series_filed_at = NULL, rejected_at = now(), copied_fields = '{}'::jsonb WHERE id = $1", [
       c.req.param("id")
     ]);
     return c.json({ data: { ok: true } });
@@ -110447,8 +110571,11 @@ function registerAdminRoutes(app2) {
     const admin = await requireAdmin(c);
     if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
     const db = await getDb();
-    const rows = await db.query("SELECT id FROM orders WHERE id = $1", [c.req.param("id")]);
+    const rows = await db.query("SELECT id, status FROM orders WHERE id = $1", [c.req.param("id")]);
     if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+    if (rows[0].status !== "filed") {
+      return c.json(err(`Series designations are marked filed while the order is With The State; this one is in ${BOARD_LABEL[rows[0].status] ?? rows[0].status}.`, "BAD_STATE"), 400);
+    }
     await db.query("UPDATE orders SET series_filed_at = COALESCE(series_filed_at, now()) WHERE id = $1", [c.req.param("id")]);
     return c.json({ data: { ok: true } });
   });
@@ -110477,7 +110604,7 @@ function registerAdminRoutes(app2) {
     const admin = await requireAdmin(c);
     if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
     const db = await getDb();
-    const rows = await db.query("SELECT * FROM orders WHERE id = $1", [c.req.param("id")]);
+    const rows = await db.query("SELECT *, rejected_at, ra_renewal_date FROM orders WHERE id = $1", [c.req.param("id")]);
     if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
     const o = rows[0];
     const payload = typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload;
@@ -110526,6 +110653,9 @@ function registerAdminRoutes(app2) {
         paidAt: o.paid_at,
         filedAt: o.filed_at,
         formedAt: o.formed_at,
+        rejectedAt: o.rejected_at ?? null,
+        // A date, not a midnight timestamp — the same form the portal shows.
+        raRenewalDate: o.ra_renewal_date ? isoDate(o.ra_renewal_date) : null,
         seriesFiledAt: o.series_filed_at,
         groups: filingGroups(payload),
         // The stored intake itself — the ground truth the behavioral gate
@@ -110536,7 +110666,8 @@ function registerAdminRoutes(app2) {
         ),
         copiedFields: (typeof o.copied_fields === "string" ? JSON.parse(o.copied_fields) : o.copied_fields) ?? {},
         series: allSeries.map((name) => ({ name, covered: covered.has(name) })),
-        documents: docs.map((d2) => ({
+        // In the order the client sees them (14 Sep 2026).
+        documents: sortDocuments(docs.map((d2) => ({ id: d2.id, kind: d2.kind, title: d2.title, created_at: String(d2.created_at) }))).map((d2) => ({
           id: d2.id,
           kind: d2.kind,
           title: d2.title,
@@ -110593,6 +110724,9 @@ function registerAdminRoutes(app2) {
     if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
     const o = rows[0];
     if (!o.client_id) return c.json(err("This order has no client account yet.", "NO_CLIENT"), 400);
+    if (isConversionPayload(o.payload)) {
+      return c.json(err("A conversion has no Articles of Organization: the company already exists.", "BAD_STATE"), 400);
+    }
     const existing = await db.query(
       "SELECT id FROM documents WHERE order_id = $1 AND kind = 'articles'",
       [o.id]
@@ -110837,7 +110971,7 @@ function registerAdminRoutes(app2) {
             [
               o.client_id,
               o.id,
-              `Protected Series Designation \u2014 ${names.join(", ")}`,
+              `Protected Series Designation \u2014 ${names.join(", ")} \u2014 ${o.llc_name}`,
               stored.storageKey,
               f.type || "application/pdf",
               stored.sizeBytes,
@@ -110861,8 +110995,9 @@ function registerAdminRoutes(app2) {
           await deleteFile(d2.storage_key);
         }
       }
+      const raService = (typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload)?.registeredAgent?.choice === "SERVICE";
       await db.query(
-        "UPDATE orders SET status = 'formed', formed_at = now(), filed_at = COALESCE(filed_at, now()) WHERE id = $1",
+        raService ? "UPDATE orders SET status = 'formed', formed_at = now(), ra_renewal_date = (now() + interval '1 year')::date WHERE id = $1" : "UPDATE orders SET status = 'formed', formed_at = now() WHERE id = $1",
         [o.id]
       );
       const clients = await db.query(
@@ -111222,18 +111357,19 @@ function registerAdminRoutes(app2) {
       return c.json(err("Attach the document from the Division to fulfill this order.", "DOCUMENT_REQUIRED"), 400);
     }
     const details = typeof so2.details === "string" ? JSON.parse(so2.details) : so2.details;
-    const summary = so2.type === "series" ? `Protected Series Designation \u2014 ${details.seriesName ?? so2.llc_name}` : so2.type === "s-election" ? `S Corporation Election Package \u2014 ${so2.llc_name}` : so2.type === "certificate-of-status" ? `Certificate of Status \u2014 ${so2.llc_name}` : so2.type === "certified-copy" ? `Certified Copy of the Articles \u2014 ${so2.llc_name}` : `Federal EIN \u2014 ${details.target === "series" ? details.seriesName ?? "series" : so2.llc_name}`;
+    const summary = so2.type === "series" ? `Protected Series Designation \u2014 ${details.seriesName ?? so2.llc_name}` : so2.type === "s-election" ? `S Corporation Election Package \u2014 ${so2.llc_name}` : so2.type === "certificate-of-status" ? `Certificate of Status \u2014 ${so2.llc_name}` : so2.type === "certified-copy" ? `Certified Copy of the Articles \u2014 ${so2.llc_name}` : `Federal EIN \u2014 ${details.target === "series" ? details.seriesName ?? so2.llc_name : so2.llc_name}`;
     let documentId = null;
     if (file) {
-      const title = titleOverride || (so2.type === "series" ? `Protected Series Designation \u2014 ${details.seriesName ?? so2.llc_name}` : so2.type === "s-election" ? `S Corporation Election Package (Form 2553) \u2014 ${so2.llc_name}` : so2.type === "certificate-of-status" ? `Certificate of Status \u2014 ${so2.llc_name}` : so2.type === "certified-copy" ? `Certified Copy of the Articles \u2014 ${so2.llc_name}` : `EIN Confirmation Letter \u2014 ${details.target === "series" ? details.seriesName ?? so2.llc_name : so2.llc_name}`);
+      const title = titleOverride || (so2.type === "series" ? `Protected Series Designation \u2014 ${details.seriesName ?? so2.llc_name} \u2014 ${so2.llc_name}` : so2.type === "s-election" ? `S Corporation Election Package (Form 2553) \u2014 ${so2.llc_name}` : so2.type === "certificate-of-status" ? `Certificate of Status \u2014 ${so2.llc_name}` : so2.type === "certified-copy" ? `Certified Copy of the Articles \u2014 ${so2.llc_name}` : `EIN Confirmation Letter \u2014 ${details.target === "series" ? details.seriesName ?? so2.llc_name : so2.llc_name}`);
       if (!await looksLikePdf(file)) {
         return c.json(err(`${file.name} is not a readable PDF. The deliverable must be the actual PDF document.`, "NOT_A_PDF"), 400);
       }
       const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
+      const isDesignation = so2.type === "series" && !!details.seriesName;
       const doc = await db.query(
-        `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes)
-       VALUES ($1, $6, 'package', $2, $3, $4, $5) RETURNING id`,
-        [so2.client_id, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes, so2.formation_order_id]
+        `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
+       VALUES ($1, $6, $7, $2, $3, $4, $5, $8) RETURNING id`,
+        [so2.client_id, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes, so2.formation_order_id, isDesignation ? "psd" : "package", JSON.stringify(isDesignation ? { seriesNames: [details.seriesName] } : {})]
       );
       documentId = doc[0].id;
     }
@@ -111339,7 +111475,7 @@ function registerAdminRoutes(app2) {
     const clientId = typeof form.clientId === "string" ? form.clientId : "";
     const kind = form.kind === "legal_mail" ? "legal_mail" : "package";
     const title = typeof form.title === "string" ? form.title.trim() : "";
-    const notify = form.notify === "true";
+    const notify = kind === "legal_mail" || form.notify === "true";
     if (!(file instanceof File) || !clientId || !title) {
       return c.json(err("clientId, title, and file are required.", "INVALID_INPUT"), 400);
     }

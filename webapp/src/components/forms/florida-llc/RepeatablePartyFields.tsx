@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FieldShell } from "./FieldShell";
 import { AddressFieldsBlock } from "./AddressFields";
-import { US_STATES } from "./us-states";
 import type { PartyEntry, PartyKind } from "./types";
 
 interface RepeatablePartyFieldsProps {
@@ -195,8 +194,7 @@ export function RepeatablePartyFields({
       </Button>
 
       <p className="text-xs text-muted-foreground">
-        States available include {US_STATES.length} U.S. states. International
-        manager addresses can use a country-specific state.
+        The 50 states and the District of Columbia are available.
       </p>
     </div>
   );

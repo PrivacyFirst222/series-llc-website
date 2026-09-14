@@ -134,7 +134,7 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
         </ReviewCard>
 
         <ReviewCard title="Registered Agent" onEdit={() => goToStep("agent")}>
-          <Row label="Type" value={data.registeredAgentType} />
+          <Row label="Type" value={data.registeredAgentChoice === "SERVICE" ? "Our registered agent service" : data.registeredAgentType === "ENTITY" ? "Business entity" : "Individual"} />
           <Row
             label="Name"
             value={
@@ -158,9 +158,12 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
           <Row label="Phone" value={data.registeredAgentPhone} />
         </ReviewCard>
 
+        {/* When we are the agent the acceptance is ours, not the client's:
+            no card, and no Edit to a step the form never shows (14 Sep 2026). */}
+        {data.registeredAgentChoice !== "SERVICE" ? (
         <ReviewCard title="Registered Agent Acceptance" onEdit={() => goToStep("acceptance")}>
           <Row label="Acceptance signer" value={data.registeredAgentAcceptanceName} />
-          <Row label="Capacity" value={data.registeredAgentAcceptanceCapacity} />
+          <Row label="Capacity" value={data.registeredAgentAcceptanceCapacity === "INDIVIDUAL_AGENT" ? "The registered agent, an individual" : data.registeredAgentAcceptanceCapacity} />
           <Row
             label="Signature"
             value={
@@ -170,9 +173,10 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
             }
           />
         </ReviewCard>
+        ) : null}
 
         <ReviewCard title="Management" onEdit={() => goToStep("management")}>
-          <Row label="Structure" value={data.managementStructure} />
+          <Row label="Structure" value={data.managementStructure === "MANAGER_MANAGED" ? "Manager-managed" : data.managementStructure === "MEMBER_MANAGED" ? "Member-managed" : data.managementStructure} />
           <Row
             label="Statement in Articles?"
             value={data.includeManagementStatementInArticles ? "Yes" : "No"}
@@ -226,7 +230,7 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
 
         {data.filingPath !== "CONVERT" ? (
         <ReviewCard title="Business Purpose" onEdit={() => goToStep("purpose")}>
-          <Row label="Type" value={data.purposeType} />
+          <Row label="Type" value={data.purposeType === "GENERAL" ? "General purpose" : data.purposeType === "SPECIFIC" ? "General purpose plus a specific purpose" : data.purposeType === "PROFESSIONAL" ? "Professional purpose" : data.purposeType} />
           <Row label="Description" value={data.businessPurposeText} />
         </ReviewCard>
         ) : null}
@@ -257,15 +261,12 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
           ) : null}
         </ReviewCard>
 
+        {/* Every purchase on that step, at the price charged (14 Sep 2026). */}
         <ReviewCard title="Optional Documents" onEdit={() => goToStep("optional")}>
-          <Row
-            label="Cert of Status"
-            value={data.orderCertificateOfStatus ? "Yes (+$5)" : "No"}
-          />
-          <Row
-            label="Certified Copy"
-            value={data.orderCertifiedCopy ? "Yes (+$30)" : "No"}
-          />
+          <Row label="Certificate of Status" value={data.orderCertificateOfStatus ? "Yes (+$15)" : "No"} />
+          <Row label="Certified Copy" value={data.orderCertifiedCopy ? "Yes (+$40)" : "No"} />
+          <Row label="Federal EIN" value={data.orderEin ? "Yes (+$50)" : "No"} />
+          {data.filingPath !== "CONVERT" ? <Row label="S election package" value={data.orderSElection ? "Yes (+$95)" : "No"} /> : null}
         </ReviewCard>
 
         <ReviewCard title="Protected Series" onEdit={() => goToStep("series")}>

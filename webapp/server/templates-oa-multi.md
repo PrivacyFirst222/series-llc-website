@@ -179,7 +179,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 (f) incur, on behalf of the Company or any Protected Series, indebtedness in excess of $[THRESHOLD] in a single transaction or series of related transactions, or guarantee the obligation of any person (and no guarantee of the obligations of one Protected Series by another or by the Company shall be made except by an express written instrument approved under this Section) — the consent of **all Members**;
 
-(g) lend money of the Company or of a Protected Series to, or borrow from, a Member, the Manager, or their affiliates, other than loans under Section 6.5 — the consent of a Majority in Interest of the disinterested Members; or
+(g) lend money of the Company or of a Protected Series to, or borrow from, a Member, the Manager, or their affiliates, other than loans under Section 6.5 — the consent of a Majority in Interest of the disinterested Members;
 
 (h) amend this Agreement or any Series Exhibit — the approval required by Section 15.1; or
 

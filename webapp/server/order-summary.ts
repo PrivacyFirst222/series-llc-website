@@ -84,7 +84,11 @@ function ticked(p: SubmissionPayload): { text: string; field: string }[] {
     publicRecordAcknowledged: p.certifications?.publicRecordAcknowledged === true,
     notLegalAdviceAcknowledged: p.certifications?.notLegalAdviceAcknowledged === true,
   };
-  return ACKNOWLEDGMENTS.filter((a) => flags[a.field] === true).map((a) => ({ field: a.field, text: typeof a.text === "function" ? a.text(p) : a.text }));
+  // When we are the agent, the four agent boxes are filled in by the program,
+  // never shown to the client: not "ticked by the client" (14 Sep 2026).
+  const raBoxes = new Set(["registeredAgentNotSameAsLlc", "registeredAgentPhysicalAddressAcknowledgment", "registeredAgentAcceptanceCheckbox", "registeredAgentSignatureAuthorizationCheckbox"]);
+  const ourAgent = p.registeredAgent?.choice === "SERVICE";
+  return ACKNOWLEDGMENTS.filter((a) => flags[a.field] === true && !(ourAgent && raBoxes.has(a.field))).map((a) => ({ field: a.field, text: typeof a.text === "function" ? a.text(p) : a.text }));
 }
 
 /** The summary as markdown, from the stored order row. */

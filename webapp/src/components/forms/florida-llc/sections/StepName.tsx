@@ -162,8 +162,7 @@ function NewName({ data, patch, errors }: StepProps) {
         <h2 className="font-display text-3xl">LLC name</h2>
         <p className="text-sm text-muted-foreground max-w-2xl">
           Choose the legal name for your LLC. Florida requires the name to
-          include an LLC-style designator. Run a free Sunbiz name search before
-          submitting — availability isn't guaranteed.
+          include an LLC-style designator.
         </p>
       </header>
 
@@ -346,10 +345,6 @@ function NewName({ data, patch, errors }: StepProps) {
         />
       </div>
 
-      <p className="text-xs text-muted-foreground">
-        Tip: Search the public Sunbiz business records before submitting. We
-        cannot guarantee availability.
-      </p>
     </div>
   );
 }

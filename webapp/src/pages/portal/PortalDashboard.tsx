@@ -39,6 +39,7 @@ interface Me {
   name: string;
   pendingEmail: string | null;
   raCancellationRequestedAt: string | null;
+  raRenewalDate?: string | null;
   viewingAsAdmin?: boolean;
 }
 
@@ -182,7 +183,7 @@ function AgreementAndLibraryRow({ company }: { company: string | null }) {
         <div className="px-5 py-4">
           {oaQuery.isError ? (
             <p className="text-sm text-muted-foreground">
-              Your agreement questionnaire unlocks once your formation order is complete.
+              Your agreement questionnaire unlocks once your order is paid.
             </p>
           ) : (
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -199,7 +200,7 @@ function AgreementAndLibraryRow({ company }: { company: string | null }) {
               </Button>
             </div>
           )}
-          {!hasGeneration && !oaQuery.isError ? (
+          {oaOwed ? (
             <p className="mt-2 text-xs font-medium text-amber-700">Action needed</p>
           ) : null}
         </div>
@@ -323,7 +324,7 @@ function RegisteredAgentCard({ me }: { me: Me | null }) {
         ) : (
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-muted-foreground">
-              Your registered agent service is active and renews annually. You can cancel
+              Your registered agent service is active{me?.raRenewalDate ? ` and renews on ${new Date(`${me.raRenewalDate}T12:00:00`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}` : " and renews annually"}. You can cancel
               here at any time.
             </p>
             <AlertDialog>
@@ -344,7 +345,7 @@ function RegisteredAgentCard({ me }: { me: Me | null }) {
                     <div className="space-y-2 text-sm">
                       <p>
                         This records your cancellation notice today. If your notice is at
-                        least 30 days before your renewal date, your service will not renew.
+                        least 30 days before your renewal date{me?.raRenewalDate ? ` (${new Date(`${me.raRenewalDate}T12:00:00`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })})` : ""}, your service will not renew.
                       </p>
                       <p>
                         Florida law requires your LLC to have a registered agent at all

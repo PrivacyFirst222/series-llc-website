@@ -407,12 +407,18 @@ export function filingGroups(payload: unknown): FilingGroup[] {
               value: "Leave blank — the client chose a general purpose and no statement",
             },
           ]
-        : provisions.map((text, i) => ({
-            key: `provision${i}`,
-            label: i === 0 && provisions.length > 1 ? "Paste both, this first" : "Paste into the box",
-            value: text,
-            block: true,
-          })),
+        : [
+            ...provisions.map((text, i) => ({
+              key: `provision${i}`,
+              label: i === 0 && provisions.length > 1 ? "Paste both, this first" : "Paste into the box",
+              value: text,
+              block: true,
+            })),
+            // The box takes 240 characters; say so before the paste fails.
+            ...(provisions.join("\n\n").length > 240
+              ? [{ key: "provisionLength", label: "Length", value: `${provisions.join("\n\n").length} characters — over the Division's 240-character limit; shorten before pasting`, block: true }]
+              : []),
+          ],
   });
 
   // ---- 7. Correspondence ----
@@ -513,8 +519,8 @@ export function filingGroups(payload: unknown): FilingGroup[] {
   const memberList: PersonLike[] = membersInfo.memberList ?? [];
   if (mgmt.structure === "MEMBER_MANAGED") {
     for (const m of memberList) {
-      const entityName = (m.entityName ?? "").trim();
-      const isEntity = entityName !== "" && m.memberType === "ENTITY";
+      const entityName = (m.entityName ?? m.businessEntityName ?? "").trim();
+      const isEntity = entityName !== "" && (m.memberType === "ENTITY" || !!(m.businessEntityName ?? "").trim());
       const nm = personName(m);
       personFields.push({ key: `person${slot}Title`, label: `Person ${slot + 1} — Title`, value: "AMBR" });
       if (isEntity) {

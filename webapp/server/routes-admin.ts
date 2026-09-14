@@ -6,6 +6,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { getDb } from "./db";
+import { sortDocuments } from "../src/pages/portal/documentOrder";
 import { assembleStatement } from "./statement";
 import { renderMarkdownPdf } from "./pdf-render";
 import { env } from "./env";
@@ -26,7 +27,7 @@ import { einDigits, fmtEinDisplay, isValidEin } from "../src/lib/ein";
 import { filingGroups, seriesNames } from "./filing";
 import { err, testHooks, MAX_UPLOAD_BYTES, looksLikePdf, requireAdmin } from "./shared";
 import { loadSummaryRow } from "./order-summary";
-import { oaSeed, purgeExpiredSElections, postSElectionPackage, type SElectionStoredDetails } from "./routes-portal";
+import { oaSeed, purgeExpiredSElections, postSElectionPackage, isoDate, type SElectionStoredDetails } from "./routes-portal";
 import { evaluate2553Timing } from "../src/lib/form2553Timing";
 import { unpackSsns } from "../src/lib/jointOwner";
 import { easternDateIso } from "./datetime";
@@ -222,16 +223,26 @@ app.get("/admin/orders", async (c) => {
 
 /** Sent to the Division. The only transition on the board a person performs —
  *  nothing in this system can observe a filing on sunbiz. */
+/** The board's own words for a status, for messages the office reads. */
+const BOARD_LABEL: Record<string, string> = { pending_payment: "Pending payment", paid: "New Orders", filed: "With The State", formed: "Formed" };
+const isConversionPayload = (payload: unknown): boolean =>
+  ((typeof payload === "string" ? JSON.parse(payload) : payload) as { filingPath?: string } | null)?.filingPath === "CONVERT";
+
 app.post("/admin/orders/:id/filed", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const db = await getDb();
-  const rows = await db.query<{ status: string }>("SELECT status FROM orders WHERE id = $1", [
+  const rows = await db.query<{ status: string; payload: unknown }>("SELECT status, payload FROM orders WHERE id = $1", [
     c.req.param("id"),
   ]);
   if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+  // The card hides the button for a conversion; the server refuses too
+  // (14 Sep 2026): a conversion has no Articles to send.
+  if (isConversionPayload(rows[0].payload)) {
+    return c.json(err("A conversion has nothing to send to the Division: its Designations are filed online.", "BAD_STATE"), 400);
+  }
   if (rows[0].status !== "paid") {
-    return c.json(err(`An order is filed from "paid", not "${rows[0].status}".`, "BAD_STATE"), 400);
+    return c.json(err(`Only an order in New Orders can be marked sent; this one is in ${BOARD_LABEL[rows[0].status] ?? rows[0].status}.`, "BAD_STATE"), 400);
   }
   // Submission precedes the stamped Articles: the state returns them days
   // later, so nothing is uploaded before Mark sent (Adam's correction,
@@ -257,7 +268,8 @@ app.post("/admin/orders/:id/unfiled", async (c) => {
   // A Division rejection means refiling, usually under the alternate name:
   // every copied-field tick is cleared so the re-copy starts honest, and the
   // series check-off resets with it (Adam, 30 Aug 2026).
-  await db.query("UPDATE orders SET status = 'paid', filed_at = NULL, series_filed_at = NULL, copied_fields = '{}'::jsonb WHERE id = $1", [
+  // The rejection leaves a dated record the card shows (14 Sep 2026).
+  await db.query("UPDATE orders SET status = 'paid', filed_at = NULL, series_filed_at = NULL, rejected_at = now(), copied_fields = '{}'::jsonb WHERE id = $1", [
     c.req.param("id"),
   ]);
   return c.json({ data: { ok: true } });
@@ -271,8 +283,12 @@ app.post("/admin/orders/:id/series-filed", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const db = await getDb();
-  const rows = await db.query<{ id: string }>("SELECT id FROM orders WHERE id = $1", [c.req.param("id")]);
+  const rows = await db.query<{ id: string; status: string }>("SELECT id, status FROM orders WHERE id = $1", [c.req.param("id")]);
   if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+  // Only while the order is with the State, as the card offers it (14 Sep 2026).
+  if (rows[0].status !== "filed") {
+    return c.json(err(`Series designations are marked filed while the order is With The State; this one is in ${BOARD_LABEL[rows[0].status] ?? rows[0].status}.`, "BAD_STATE"), 400);
+  }
   await db.query("UPDATE orders SET series_filed_at = COALESCE(series_filed_at, now()) WHERE id = $1", [c.req.param("id")]);
   return c.json({ data: { ok: true } });
 });
@@ -310,7 +326,7 @@ app.get("/admin/orders/:id", async (c) => {
     payload: unknown; copied_fields: unknown; created_at: string;
     paid_at: string | null; filed_at: string | null; formed_at: string | null;
     contact_name: string; contact_email: string; total_cents: number;
-  }>("SELECT * FROM orders WHERE id = $1", [c.req.param("id")]);
+  }>("SELECT *, rejected_at, ra_renewal_date FROM orders WHERE id = $1", [c.req.param("id")]);
   if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
   const o = rows[0];
   const payload = typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload;
@@ -373,6 +389,9 @@ app.get("/admin/orders/:id", async (c) => {
       paidAt: o.paid_at,
       filedAt: o.filed_at,
       formedAt: o.formed_at,
+      rejectedAt: (o as unknown as { rejected_at: string | null }).rejected_at ?? null,
+      // A date, not a midnight timestamp — the same form the portal shows.
+      raRenewalDate: (o as unknown as { ra_renewal_date: unknown }).ra_renewal_date ? isoDate((o as unknown as { ra_renewal_date: unknown }).ra_renewal_date) : null,
       seriesFiledAt: (o as unknown as { series_filed_at: string | null }).series_filed_at,
       groups: filingGroups(payload),
       // The stored intake itself — the ground truth the behavioral gate
@@ -384,7 +403,8 @@ app.get("/admin/orders/:id", async (c) => {
       copiedFields:
         (typeof o.copied_fields === "string" ? JSON.parse(o.copied_fields) : o.copied_fields) ?? {},
       series: allSeries.map((name) => ({ name, covered: covered.has(name) })),
-      documents: docs.map((d) => ({
+      // In the order the client sees them (14 Sep 2026).
+      documents: sortDocuments(docs.map((d) => ({ id: d.id, kind: d.kind, title: d.title, created_at: String(d.created_at) }))).map((d) => ({
         id: d.id,
         kind: d.kind,
         title: d.title,
@@ -462,6 +482,11 @@ app.post("/admin/orders/:id/articles", async (c) => {
   if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
   const o = rows[0];
   if (!o.client_id) return c.json(err("This order has no client account yet.", "NO_CLIENT"), 400);
+  // A conversion has no Articles: refused here as the card refuses to offer
+  // it (14 Sep 2026), so no Statement can be issued for a company we never formed.
+  if (isConversionPayload(o.payload)) {
+    return c.json(err("A conversion has no Articles of Organization: the company already exists.", "BAD_STATE"), 400);
+  }
   const existing = await db.query<{ id: string }>(
     "SELECT id FROM documents WHERE order_id = $1 AND kind = 'articles'", [o.id]);
   if (existing.length > 0) {
@@ -752,7 +777,7 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
         [
           o.client_id,
           o.id,
-          `Protected Series Designation — ${names.join(", ")}`,
+          `Protected Series Designation — ${names.join(", ")} — ${o.llc_name}`,
           stored.storageKey,
           f.type || "application/pdf",
           stored.sizeBytes,
@@ -781,8 +806,14 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
     }
   }
 
+  // No invented "sent" date: filed_at is set only by the button (14 Sep 2026).
+  // The registered-agent service renews on the anniversary of formation; the
+  // date is stored here so the portal and the cancellation email can show it.
+  const raService = ((typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload) as { registeredAgent?: { choice?: string } } | null)?.registeredAgent?.choice === "SERVICE";
   await db.query(
-    "UPDATE orders SET status = 'formed', formed_at = now(), filed_at = COALESCE(filed_at, now()) WHERE id = $1",
+    raService
+      ? "UPDATE orders SET status = 'formed', formed_at = now(), ra_renewal_date = (now() + interval '1 year')::date WHERE id = $1"
+      : "UPDATE orders SET status = 'formed', formed_at = now() WHERE id = $1",
     [o.id],
   );
 
@@ -1226,14 +1257,14 @@ app.post("/admin/services/:id/fulfill", async (c) => {
           ? `Certificate of Status — ${so.llc_name}`
           : so.type === "certified-copy"
             ? `Certified Copy of the Articles — ${so.llc_name}`
-            : `Federal EIN — ${details.target === "series" ? details.seriesName ?? "series" : so.llc_name}`;
+            : `Federal EIN — ${details.target === "series" ? details.seriesName ?? so.llc_name : so.llc_name}`;
 
   let documentId: string | null = null;
   if (file) {
     const title =
       titleOverride ||
       (so.type === "series"
-        ? `Protected Series Designation — ${details.seriesName ?? so.llc_name}`
+        ? `Protected Series Designation — ${details.seriesName ?? so.llc_name} — ${so.llc_name}`
         : so.type === "s-election"
           ? `S Corporation Election Package (Form 2553) — ${so.llc_name}`
           : so.type === "certificate-of-status"
@@ -1251,10 +1282,13 @@ app.post("/admin/services/:id/fulfill", async (c) => {
       return c.json(err(`${file.name} is not a readable PDF. The deliverable must be the actual PDF document.`, "NOT_A_PDF"), 400);
     }
     const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
+    // A designation delivered through a series order is a designation: stored
+    // as one, covering its series, so the card counts it (14 Sep 2026).
+    const isDesignation = so.type === "series" && !!details.seriesName;
     const doc = await db.query<{ id: string }>(
-      `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes)
-       VALUES ($1, $6, 'package', $2, $3, $4, $5) RETURNING id`,
-      [so.client_id, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes, so.formation_order_id],
+      `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
+       VALUES ($1, $6, $7, $2, $3, $4, $5, $8) RETURNING id`,
+      [so.client_id, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes, so.formation_order_id, isDesignation ? "psd" : "package", JSON.stringify(isDesignation ? { seriesNames: [details.seriesName] } : {})],
     );
     documentId = doc[0].id;
   }
@@ -1379,7 +1413,9 @@ app.post("/admin/documents", async (c) => {
   const clientId = typeof form.clientId === "string" ? form.clientId : "";
   const kind = form.kind === "legal_mail" ? "legal_mail" : "package";
   const title = typeof form.title === "string" ? form.title.trim() : "";
-  const notify = form.notify === "true";
+  // Legal mail always emails the client (Adam, 14 Sep 2026: "The email should
+  // be sent when the item is uploaded"); a package emails when the box is ticked.
+  const notify = kind === "legal_mail" || form.notify === "true";
   if (!(file instanceof File) || !clientId || !title) {
     return c.json(err("clientId, title, and file are required.", "INVALID_INPUT"), 400);
   }

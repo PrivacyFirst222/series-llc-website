@@ -160,7 +160,7 @@ export async function fulfillPaidServiceOrder(serviceOrderId: string, squarePaym
           ? `Certificate of Status — ${so.llc_name}`
           : so.type === "certified-copy"
             ? `Certified Copy of the Articles — ${so.llc_name}`
-            : `Federal EIN — ${details.target === "series" ? details.seriesName ?? "series" : so.llc_name}`;
+            : `Federal EIN — ${details.target === "series" ? details.seriesName ?? so.llc_name : so.llc_name}`;
   const clients = await db.query<{ email: string; name: string }>(
     "SELECT email, name FROM clients WHERE id = $1",
     [so.client_id],
@@ -287,12 +287,6 @@ app.post("/orders", async (c) => {
       400,
     );
   }
-  if (!(await rateLimit(`orders:ok:${clientIp(c)}`, 10, 3600_000))) {
-    return c.json(
-      err("Too many submissions. Try again in an hour.", "RATE_LIMITED"),
-      429,
-    );
-  }
   const data = parsed.data as FloridaLLCFormData;
 
   const raError = validateRegisteredAgentAddress(
@@ -332,6 +326,11 @@ app.post("/orders", async (c) => {
     );
   }
 
+  // Only an order that has passed every refusal counts against the hourly
+  // allowance (Adam, 14 Sep 2026: "Refusals should not count").
+  if (!(await rateLimit(`orders:ok:${clientIp(c)}`, 10, 3600_000))) {
+    return c.json(err("Too many submissions. Try again in an hour.", "RATE_LIMITED"), 429);
+  }
   const payload = buildPayload(data);
   // The submitter's address and browser, recorded server-side for the Order
   // Summary (10 Sep 2026): the browser's slots for these were never filled.

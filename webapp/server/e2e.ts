@@ -393,9 +393,41 @@ check("service-RA order accepted with canonical details enforced", svc.status ==
     noSignature.body);
 
   // The signature must be the representative's name exactly (Adam, 13 Sep 2026).
-  // Placed from a side address: every order from one address counts against
-  // its hourly allowance, refused or not.
+  // Placed from a side address so the suite's own allowance is not spent.
   const sideAddr = () => ({ "X-Forwarded-For": `10.79.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}` });
+  {
+    // A refusal spends nothing (Adam, 14 Sep 2026: "Refusals should not count
+    // against the order limit"): eleven refused orders from one address, then
+    // a good one from the same address goes through.
+    const oneAddr = sideAddr();
+    const refusals: number[] = [];
+    for (let i = 0; i < 11; i++) {
+      refusals.push((await api("/api/orders", { method: "POST", headers: oneAddr, body: JSON.stringify({ ...formData, articlesSignerChoice: "SELF", authorizedRepresentativeSignature: "wrong name" }) })).status);
+    }
+    check("eleven refused orders from one address are all refusals, never a lockout", refusals.every((s) => s === 400), refusals);
+    const afterRefusals = await api("/api/orders", { method: "POST", headers: oneAddr, body: JSON.stringify({ ...formData, correspondentEmail: testEmail.replace("@", "+afterrefusals@"), confirmCorrespondentEmail: testEmail.replace("@", "+afterrefusals@"), clientEmail: testEmail.replace("@", "+afterrefusals@"), confirmClientEmail: testEmail.replace("@", "+afterrefusals@") }) });
+    check("a good order from that address still goes through", afterRefusals.status === 200, afterRefusals.body);
+  }
+  {
+    // The rules the form enforces are enforced by the server too (14 Sep 2026).
+    const rule = async (label: string, body: Record<string, unknown>, expect: RegExp) => {
+      const r = await api("/api/orders", { method: "POST", headers: sideAddr(), body: JSON.stringify({ ...formData, ...body }) });
+      check(`refused by the server: ${label}`, r.status === 400 && expect.test(JSON.stringify(r.body)), r.body);
+    };
+    await rule("no filing path chosen", { filingPath: "" }, /"filingPath"/);
+    await rule("correspondence emails differ", { confirmCorrespondentEmail: "other@example.com" }, /correspondence email addresses do not match/);
+    await rule("an alternate name carrying its own designator", { alternateName1: "E2E Coastal Backup LLC" }, /Leave the designator off/);
+    await rule("an effective date outside the window", { effectiveDateOption: "SPECIFIC", requestedEffectiveDate: "2020-01-01" }, /effective date|Effective date/i);
+    await rule("a PLLC without a professional purpose", { formationType: "PLLC", purposeType: "GENERAL" }, /Professional LLC must select a professional purpose/);
+    await rule("a specific purpose with no text", { purposeType: "SPECIFIC", businessPurposeText: "" }, /Specific purpose is required/);
+    const convNoNumber = await api("/api/orders", { method: "POST", headers: sideAddr(), body: JSON.stringify({
+      ...formData, filingPath: "CONVERT", desiredLlcName: "", llcDesignator: "", alternateName1: "",
+      nameSearchAcknowledgment: false, governmentAffiliationAcknowledgment: false, lawfulPurposeNameAcknowledgment: false,
+      existingLlcName: "E2E Converted Holdings, LLC", sunbizDocumentNumber: "", conversionAuthorityAcknowledgment: true,
+      series: [{ id: "s1", name: "E2E Converted Holdings, LLC, PS A" }],
+    }) });
+    check("refused by the server: a conversion without its Sunbiz document number", convNoNumber.status === 400 && /Sunbiz document number is required/.test(JSON.stringify(convNoNumber.body)), convNoNumber.body);
+  }
   const wrongSig = await api("/api/orders", {
     method: "POST", headers: sideAddr(),
     body: JSON.stringify({ ...formData, articlesSignerChoice: "SELF", authorizedRepresentativeSignature: "casey member, jr." }),
@@ -654,6 +686,14 @@ check("client account auto-created on payment", !!client && !client.has_password
   {
     const convId = conv.body?.data?.orderId as string;
     await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: convId }) });
+    const convSent = await api(`/api/admin/orders/${convId}/filed`, { method: "POST", cookies: admin.cookie, body: "{}" });
+    check("a conversion cannot be marked sent to the Division: its Designations are filed online (14 Sep 2026)", convSent.status === 400 && /nothing to send/.test(convSent.body?.error?.message ?? ""), convSent.body);
+    const convArtFd = new FormData();
+    convArtFd.set("articles", new File([new TextEncoder().encode("%PDF-1.4 no arts\n%%EOF")], "arts.pdf", { type: "application/pdf" }));
+    const convArt = await fetch(`${BASE}/api/admin/orders/${convId}/articles`, { method: "POST", body: convArtFd, headers: { Cookie: admin.cookie, "X-Forwarded-For": RUN_IP } });
+    check("a conversion takes no Articles upload", convArt.status === 400, convArt.status);
+    const convSeries = await api(`/api/admin/orders/${convId}/series-filed`, { method: "POST", cookies: admin.cookie, body: "{}" });
+    check("series designations cannot be marked filed on an order still in New Orders, and the refusal names the board", convSeries.status === 400 && /New Orders/.test(convSeries.body?.error?.message ?? ""), convSeries.body);
     const convStatus = await api(`/api/orders/${convId}/status`);
     check("the confirmation page can tell a conversion from a formation (13 Sep 2026)", convStatus.body?.data?.isConversion === true && (await api(`/api/orders/${orderId}/status`)).body?.data?.isConversion === false, convStatus.body);
     const cd = (await api(`/api/admin/orders/${convId}`, { cookies: admin.cookie })).body?.data as {
@@ -1067,6 +1107,13 @@ if (mint.status === 200) {
   });
   check("order marked formed via formation documents", formedRes.ok, await formedRes.clone().json().catch(() => null));
   {
+    const fDet = (await api(`/api/admin/orders/${orderId}`, { cookies: adminLoginF.cookie })).body?.data as { filedAt: string | null; formedAt: string | null; raRenewalDate: string | null; documents: { kind: string; title: string; createdAt: string }[] } | undefined;
+    check("an order formed without the Sent button carries no sent date (14 Sep 2026: one was invented)", fDet?.filedAt === null && !!fDet?.formedAt, fDet && { filedAt: fDet.filedAt, formedAt: fDet.formedAt });
+    check("a client who is their own agent gets no renewal date", fDet?.raRenewalDate === null, fDet?.raRenewalDate);
+    check("the formation designation is titled by its series and the company", fDet?.documents.some((d) => d.kind === "psd" && d.title === "Protected Series Designation — E2E Coastal Holdings, LLC, PS A — E2E Coastal Holdings, LLC") === true, fDet?.documents.map((d) => d.title));
+    check("the office sees when each document went up", fDet?.documents.every((d) => !!d.createdAt) === true, fDet?.documents);
+  }
+  {
     const selfDocs = await api("/api/portal/documents", { cookies: setPw.cookie });
     check("statement: a client who signed the Articles themselves gets no Statement", !((selfDocs.body?.data ?? []) as { kind: string }[]).some((d) => d.kind === "statement"));
   }
@@ -1321,6 +1368,16 @@ if (mint.status === 200) {
   check("series fulfill with attachment succeeds", fulfillSeries.ok, fulfillSeriesBody);
   check("fulfill returns a document id", Boolean(fulfillSeriesBody?.data?.documentId));
   const docsAfter = await api("/api/portal/documents", { cookies: setPw.cookie });
+  {
+    // The filed designation for a portal-bought series is stored as a
+    // designation naming its series, so the order card counts the series
+    // as covered (14 Sep 2026: it was stored as a plain package).
+    const psd9 = ((docsAfter.body?.data ?? []) as { title: string; kind: string }[]).find((d) => d.title.includes("PS 9"));
+    check("a fulfilled series order's designation is stored as a designation naming the series and the company", psd9?.kind === "psd" && /^Protected Series Designation — E2E Coastal Holdings, LLC(,| -) PS 9 — E2E Coastal Holdings, LLC$/.test(psd9.title), psd9);
+    const admSvc = await api(`/api/admin/services`, { cookies: adminLogin2.cookie });
+    const row9 = (admSvc.body?.data as { id: string; fulfilled_at: string | null }[] | undefined)?.find((r) => r.id === seriesId);
+    check("the fulfilled series order carries its fulfilment date for the office", !!row9?.fulfilled_at, row9);
+  }
   const attached = (docsAfter.body?.data as { title: string }[] | undefined)?.find((d) =>
     d.title.includes("Protected Series Designation"),
   );
@@ -1346,6 +1403,10 @@ if (mint.status === 200) {
     members: [{ todBeneficiary: "Jordan Member", todBackup: "my children in equal shares" }],
     series: [],
   };
+  {
+    const badAns = await api("/api/portal/oa/answers", { method: "PUT", cookies: setPw.cookie, body: JSON.stringify({ members: "nope" }) });
+    check("a malformed answer is refused with a plain-words reason, not 'Invalid request' (14 Sep 2026)", badAns.status === 400 && /^Please check/.test(badAns.body?.error?.message ?? ""), badAns.body);
+  }
   const saveAns = await api("/api/portal/oa/answers", { method: "PUT", cookies: setPw.cookie, body: JSON.stringify(oaAnswers) });
   check("OA answers save", saveAns.status === 200);
   // An amendment amends the agreement on file; with none, it is refused
@@ -1501,6 +1562,7 @@ if (mint.status === 200) {
       check("read off the consent PDF: its Series Exhibit row says the same", /Purpose of this Protected Series Any lawful purpose, including, without limitation, to acquire, own, and lease the real property at 400 Bay Court/.test(flat), flat.match(/Purpose of this Protected Series[^O]{0,200}/)?.[0]);
       check("read off the consent PDF: no fill-in brackets and no form-document footer (13 Sep 2026)", !/\[[A-Z]/.test(flat.replace(/\[INTENTIONALLY LEFT BLANK\]/g, "")) && !/Form document/.test(flat) && !/Dissolution events/.test(flat), flat.match(/\[[A-Z][^\]]{0,40}\]|Form document[^.]{0,60}/g));
       check("read off the consent PDF: a member-managed company's series is managed by the Members, as the agreement's s. 5.2 provides", /Managed by The Members, as protected-series managers \(s\. 605\.2304, Fla\. Stat\., as varied by Section 5\.2 of the Agreement\)/.test(flat) && !/The Company, as protected-series manager/.test(flat), flat.match(/Managed by[^|]{0,160}/)?.[0]);
+      check("read off the consent PDF: the Series Exhibit is adopted over every member's signature (Adam, 14 Sep 2026)", (flat.match(/Casey Member, Jr\., Member, for the Company/g) ?? []).length === 1 && !/The Company, as protected-series manager/.test(flat), flat.match(/Adopted effective[^A]{0,200}/)?.[0]);
       check("read off the consent PDF: the contributions and special-terms rows read as the master writes them", /By the Company: as recorded on the Asset Schedule attached to this Series Exhibit/.test(flat) && /Special terms \(if any\) None/.test(flat), flat.match(/Contributions to this Protected Series[^A]{0,120}/)?.[0]);
     }
   }
@@ -1739,6 +1801,10 @@ if (mint.status === 200) {
       mail.set("file", new File([new TextEncoder().encode("%PDF-1.4 legal mail\n%%EOF")], "mail.pdf", { type: "application/pdf" }));
       const mailRes = await fetch(`${BASE}/api/admin/documents`, { method: "POST", body: mail, headers: { Cookie: admU.cookie, "X-Forwarded-For": RUN_IP } });
       check("legal mail needs no company", mailRes.status === 200, await mailRes.json().catch(() => null));
+      // Legal mail is emailed whether or not the box was ticked (14 Sep 2026:
+      // the office could post a summons silently).
+      const lmMail = ((await api("/api/dev/outbox")).body?.data ?? []) as { to: string; subject: string }[];
+      check("legal mail posted with the email box unticked still emails the client", lmMail.some((m) => m.to === testEmail && m.subject === "Legal mail received for Hand-uploaded legal mail"), lmMail.filter((m) => m.to === testEmail).map((m) => m.subject).slice(-3));
       const backfill = await api("/api/dev/backfill-document-companies", { method: "POST" });
       // The shared local database carries hand uploads from earlier runs whose
       // titles name no company; those cannot be filled and are listed for the
@@ -3269,6 +3335,8 @@ if (mint.status === 200) {
     check("the reset order is back in New Orders", d3?.status === "paid", d3?.status);
     check("every copied tick is cleared for the resubmission", Object.keys(d3?.copiedFields ?? { x: 1 }).length === 0, d3?.copiedFields);
     check("the series check-off is reset too", d3?.seriesFiledAt === null, d3?.seriesFiledAt);
+    const d3r = det3.body?.data as { rejectedAt?: string | null; filedAt?: string | null };
+    check("the rejection leaves its date on the order (14 Sep 2026)", !!d3r?.rejectedAt && d3r?.filedAt === null, d3r && { rejectedAt: d3r.rejectedAt, filedAt: d3r.filedAt });
 
     // 5. The state certificates ride the formation package upload (Adam,
     //    30 Aug 2026): refused for a client who never bought them, stored
@@ -3351,6 +3419,51 @@ if (mint.status === 200) {
     check("both certificates are stored with their own kinds", dC?.hasCertStatus === true && dC?.hasCertifiedCopy === true, dC);
     check("the certificate order is formed", dC?.status === "formed", dC?.status);
   }
+}
+
+// The registered-agent renewal date is set at formation for a client who
+// took our service, shown to the client, and named in the cancellation
+// email (Adam, 14 Sep 2026: "The date should be stored and shown in the
+// portal"). A company serving as Manager is offered to the questionnaire
+// as a company, so the signer question appears for it.
+{
+  const adm = await adminSession();
+  const raEmail = testEmail.replace("@", "+renewal@");
+  const raIp = { "X-Forwarded-For": `10.67.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}` };
+  const raRes = await api("/api/orders", { method: "POST", headers: raIp, body: JSON.stringify({
+    ...formData, registeredAgentChoice: "SERVICE",
+    managementStructure: "MANAGER_MANAGED",
+    managers: [{ id: "p1", role: "MGR", personOrEntity: "ENTITY", firstName: "", lastName: "", suffix: "", businessEntityName: "Harbor Managers, LLC", streetAddress1: "100 Ocean Drive", streetAddress2: "", city: "Miami", state: "FL", zip: "33139", country: "United States", phone: "", email: "" }],
+    clientEmail: raEmail, confirmClientEmail: raEmail, correspondentEmail: raEmail, confirmCorrespondentEmail: raEmail,
+  }) });
+  check("an order taking our registered agent service, with a company as Manager, is accepted", raRes.status === 200, raRes.body);
+  const raId = raRes.body?.data?.orderId as string;
+  await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: raId }) });
+  const raMint = await api("/api/dev/mint-reset-token", { method: "POST", body: JSON.stringify({ email: raEmail }) });
+  const raPw = await api("/api/auth/set-password", { method: "POST", body: JSON.stringify({ token: raMint.body?.data?.token, password: "e2e-renewal-pass-1" }) });
+  check("the renewal client signs in", raPw.status === 200, raPw.body);
+  const seed = (await api("/api/portal/oa", { cookies: raPw.cookie })).body?.data?.seed as { suggestedOwners?: { name: string; isEntity?: boolean }[]; managerEntities?: boolean[] } | undefined;
+  check("the company serving as Manager is suggested as a company owner, not a person", seed?.suggestedOwners?.some((o) => o.name === "Harbor Managers, LLC" && o.isEntity === true) === true, seed?.suggestedOwners);
+  const beforeMe = (await api("/api/auth/me", { cookies: raPw.cookie })).body?.data as { raRenewalDate?: string | null };
+  check("before formation there is no renewal date", beforeMe?.raRenewalDate === null, beforeMe);
+  const fd = new FormData();
+  fd.set("articles", new File([new TextEncoder().encode("%PDF-1.4 renewal arts\n%%EOF")], "arts.pdf", { type: "application/pdf" }));
+  fd.append("psd", new File([new TextEncoder().encode("%PDF-1.4 renewal psd\n%%EOF")], "psd.pdf", { type: "application/pdf" }));
+  fd.append("psdSeries", JSON.stringify(formData.series.map((s) => s.name)));
+  const formed = await fetch(`${BASE}/api/admin/orders/${raId}/formation-documents`, { method: "POST", body: fd, headers: { Cookie: adm.cookie, "X-Forwarded-For": RUN_IP } });
+  check("the renewal order is formed", formed.ok, await formed.clone().json().catch(() => null));
+  const det = (await api(`/api/admin/orders/${raId}`, { cookies: adm.cookie })).body?.data as { raRenewalDate?: string | null; formedAt?: string | null } | undefined;
+  const expected = (() => { const d = new Date(); d.setUTCFullYear(d.getUTCFullYear() + 1); return d.toISOString().slice(0, 10); })();
+  const expectedLocal = (() => { const d = new Date(); d.setFullYear(d.getFullYear() + 1); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; })();
+  check("formation sets the renewal date one year out", det?.raRenewalDate === expected || det?.raRenewalDate === expectedLocal, { got: det?.raRenewalDate, expected, expectedLocal });
+  const afterMe = (await api("/api/auth/me", { cookies: raPw.cookie })).body?.data as { raRenewalDate?: string | null };
+  check("the client is shown the same renewal date", afterMe?.raRenewalDate === det?.raRenewalDate, afterMe);
+  const cancel = await api("/api/portal/registered-agent/cancel", { method: "POST", body: "{}", cookies: raPw.cookie });
+  check("the renewal client can give cancellation notice", cancel.status === 200, cancel.body);
+  const mails = ((await api("/api/dev/outbox")).body?.data ?? []) as { to: string; subject: string; html: string }[];
+  const cancelMail = mails.filter((m) => m.to === raEmail && /cancel/i.test(m.subject)).at(-1);
+  const year = String(new Date().getFullYear() + 1);
+  check("the cancellation email names the renewal date", !!cancelMail && cancelMail.html.includes(year) && /renew/i.test(cancelMail.html), cancelMail && { subject: cancelMail.subject, snippet: cancelMail.html.replace(/<[^>]+>/g, " ").match(/[^.]*renew[^.]*\./i)?.[0] });
 }
 
 console.log(failures === 0 ? "\nALL PASS" : `\n${failures} FAILURES`);
