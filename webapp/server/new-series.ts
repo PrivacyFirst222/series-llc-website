@@ -32,6 +32,9 @@ export interface NewSeriesInput {
   /** Human format, e.g. "August 11, 2026". */
   effectiveDate: string;
   memberNames: string[];
+  /** A member or Manager that is a company signs through a person (Adam,
+   *  13 Sep 2026), keyed by the entity's name. */
+  entitySigners?: { entity: string; name: string; title: string }[];
   /** Every person serving as Manager; s. 5.1 makes them act by majority. */
   managerNames: string[];
   memberManaged: boolean;
@@ -62,14 +65,24 @@ export function assembleNewSeries(input: NewSeriesInput): { markdown: string; ti
     ? "The Company, as protected-series manager (s. 605.2304(2), Fla. Stat.), acting through a Majority in Interest of the Members"
     : managers.join(", ") || "[MANAGER NAME]";
   // Manager-managed: one signature line per Manager, matching the Agreement.
+  const signerOf = (entity: string) => (input.entitySigners ?? []).find((x) => x.entity.trim() === entity.trim());
+  // A person's block is the rule then the name; an entity's is its name,
+  // "By:" over the rule, and the printed name and title beneath (Adam,
+  // 13 Sep 2026). The template's own rule precedes the first block.
+  const block = (n: string, suffix: string) => {
+    const sg = signerOf(n);
+    return sg
+      ? `${n}${suffix}\n\nBy: _____________________________\n[[indent]]${sg.name}\n[[indent]]${sg.title}`
+      : `_____________________________\n${n}${suffix}`;
+  };
   const psSignature = input.memberManaged
-    ? `${input.memberNames[0] ?? "[MEMBER NAME]"}, Member, for the Company`
+    ? block(input.memberNames[0] ?? "[MEMBER NAME]", ", Member, for the Company")
     : managers.length
-      ? managers.map((n) => `${n}, Manager`).join("\n\n_____________________________\n")
-      : "[MANAGER NAME], Manager";
+      ? managers.map((n) => block(n, ", Manager")).join("\n\n")
+      : "_____________________________\n[MANAGER NAME], Manager";
 
   const blocks = input.memberNames.length
-    ? input.memberNames.map((n) => `_____________________________\n${n}`).join("\n\n")
+    ? input.memberNames.map((n) => block(n, "")).join("\n\n")
     : "_____________________________\n[MEMBER NAME]";
 
   must(s, "[COMPANY NAME], LLC", "company name");

@@ -191,6 +191,71 @@ PY`).toString().trim();
   }
 }
 
+// 5b. An entity's block (Adam, 13 Sep 2026): the entity's name, "By:" over a
+// rule that ends at the shared right edge, and the printed name and title
+// beneath, flush with the rule's left end.
+if (hasPdftotext) {
+  const inputs = {
+    ...base,
+    version: "multi",
+    professional: false,
+    managerNames: ["KLF Management Services, LLC"],
+    managerEntitySigners: [{ manager: "KLF Management Services, LLC", name: "Tony Bologna, III", title: "Manager" }],
+    members: [
+      { name: "Casey Gatecheck", address: "100 Ocean Dr, Miami, FL 33139", percentage: 50, todBeneficiary: "", contribution: "$1,000" },
+      { name: "Gatecheck Family Trust", address: "100 Ocean Dr, Miami, FL 33139", percentage: 50, todBeneficiary: "", contribution: "$1,000", entitySigner: { name: "Blair Gatecheck", title: "Trustee" } },
+    ],
+  } as unknown as OaInputs;
+  const { markdown, title } = assembleOa(inputs);
+  check("entity: the trust's block in the markdown", markdown.includes("Gatecheck Family Trust\n\nBy: _____________________________\n[[indent]]Blair Gatecheck\n[[indent]]Trustee\nDate: _____________________________"), markdown.match(/Gatecheck Family Trust\n[\s\S]{0,160}/)?.[0]);
+  check("entity: the Manager's block in the markdown", markdown.includes("KLF Management Services, LLC, Manager\n\nBy: _____________________________\n[[indent]]Tony Bologna, III\n[[indent]]Manager\nDate: _____________________________"));
+  const bytes = await renderMarkdownPdf({ markdown, watermark: null, title });
+  const file = join(outDir, "entity-signatures.pdf");
+  writeFileSync(file, bytes);
+  const text = execSync(`pdftotext -layout "${file}" -`).toString();
+  const sig = text.slice(text.indexOf("SIGNATURES"), text.indexOf("EXHIBIT A"));
+  const lines = sig.split("\n").map((l) => l.trim()).filter(Boolean);
+  const at = (re: RegExp) => lines.findIndex((l) => re.test(l));
+  const trust = at(/^Gatecheck Family Trust$/);
+  check("entity: read back — the trust's name, then By:, the trustee's name, title, Date", trust >= 0 && lines[trust + 1] === "By:" && lines[trust + 2] === "Blair Gatecheck" && lines[trust + 3] === "Trustee" && /^Date:$/.test(lines[trust + 4] ?? ""), lines.slice(trust, trust + 5));
+  const mgr = at(/^KLF Management Services, LLC, Manager$/);
+  check("entity: read back — the Manager's name, then By:, the signer's name, title, Date", mgr >= 0 && lines[mgr + 1] === "By:" && lines[mgr + 2] === "Tony Bologna, III" && lines[mgr + 3] === "Manager" && /^Date:$/.test(lines[mgr + 4] ?? ""), lines.slice(mgr, mgr + 5));
+  check("entity: no [[indent]] marker or underscores in the text", !/\[\[indent\]\]|_{3,}/.test(sig));
+  if (hasPypdfRules) {
+    const out = execSync(`python3 - "${file}" <<'PY'
+import re, sys, json
+from pypdf import PdfReader
+r = PdfReader(sys.argv[1])
+rules, texts = [], []
+for p in r.pages:
+    t = p.extract_text()
+    if "SIGNATURES" not in t:
+        continue
+    c = p.get_contents()
+    data = c.get_data().decode("latin1") if c is not None else ""
+    for m in re.finditer(r"([\\d.]+)\\s+([\\d.]+)\\s+m\\s+([\\d.]+)\\s+([\\d.]+)\\s+l", data):
+        x1, y1, x2, y2 = map(float, m.groups())
+        if abs(y1 - y2) < 0.01 and x2 > x1:
+            rules.append((round(x1, 2), round(x2, 2)))
+    def visit(text, cm, tm, fd, fs):
+        s = text.strip()
+        if s in ("Blair Gatecheck", "Trustee", "Tony Bologna, III", "By:") or s.startswith("Manager"):
+            texts.append((s, round(tm[4], 2)))
+    p.extract_text(visitor_text=visit)
+print(json.dumps({"rules": rules, "texts": texts}))
+PY`).toString().trim();
+    const { rules, texts } = JSON.parse(out) as { rules: [number, number][]; texts: [string, number][] };
+    const xOf = (s: string) => texts.filter(([t2]) => t2 === s).map(([, x]) => x);
+    const nameX = xOf("Blair Gatecheck"), titleX = xOf("Trustee"), signerX = xOf("Tony Bologna, III");
+    const printed = [...nameX, ...titleX, ...signerX];
+    // The By: rule is the one that starts where the printed name starts —
+    // matched, not guessed from position (a Date: rule also starts inboard).
+    const byRules = rules.filter(([a, b]) => b - a > 100 && printed.some((x) => Math.abs(x - a) < 0.6));
+    check("entity: the printed name and title start flush with the left end of a By: rule that ends at the shared right edge", printed.length >= 3 && printed.every((x) => Math.abs(x - printed[0]) < 0.6) && byRules.length >= 2 && byRules.every(([, b]) => b === 324) && printed[0] > 72, { nameX, titleX, signerX, byRules });
+    check("entity: the By: label sits at the margin", xOf("By:").length >= 2 && xOf("By:").every((x) => Math.abs(x - 72) < 0.6), xOf("By:"));
+  }
+}
+
 // 6. The licensed (encrypted) agreement with one series: the blank-space
 // notice, the Asset Schedule's typeable fields, and — read back the way a
 // compliant reader reads it — field names, appearance settings, and the

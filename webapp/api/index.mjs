@@ -47378,22 +47378,35 @@ async function renderMarkdownPdf(opts) {
       const lines = wrapSegs(fonts, block.segs.map((s) => ({ ...s })), width, size);
       const plainText = block.segs.map((s) => s.text).join("").trim();
       const isSignatureLine = /^_{5,}$/.test(plainText);
+      const isByLine = /^By:\s*_{3,}$/.test(plainText);
+      const isIndented = plainText.startsWith("[[indent]]");
       const nextBlock = blocks[bi2 + 1];
-      const nextIsDate = nextBlock?.kind === "para" && /^Date:/.test(nextBlock.segs.map((s) => s.text).join("").trim());
-      if (isSignatureLine) y -= 10;
+      const nextPlain = nextBlock?.kind === "para" ? nextBlock.segs.map((s) => s.text).join("").trim() : "";
+      const nextIsDate = /^Date:/.test(nextPlain);
+      const nextIsIndented = nextPlain.startsWith("[[indent]]");
+      if (isSignatureLine || isByLine) y -= 10;
       const isDateLine = /^Date:\s*_{3,}$/.test(plainText);
-      if (isSignatureLine || isDateLine) {
+      if (isSignatureLine || isDateLine || isByLine) {
         need(lineH);
         const right = MARGIN + SIG_W;
         let from = MARGIN;
-        if (isDateLine) {
-          const label = { text: "Date: ", bold: false, italic: false };
+        if (isDateLine || isByLine) {
+          const label = { text: isDateLine ? "Date: " : "By: ", bold: false, italic: false };
           drawSegLine(page, [label], MARGIN, y - size, size);
           from = MARGIN + segWidth(label, size);
         }
         page.drawLine({ start: { x: from, y: y - size }, end: { x: right, y: y - size }, thickness: 0.8, color: rgb(0, 0, 0) });
         y -= lineH;
-        y -= isSignatureLine || nextIsDate ? 0 : 6;
+        y -= isSignatureLine || isByLine || nextIsDate || nextIsIndented ? 0 : 6;
+        continue;
+      }
+      if (isIndented) {
+        need(lineH);
+        const byLabel = { text: "By: ", bold: false, italic: false };
+        const segs = block.segs.map((s, i) => i === 0 ? { ...s, text: s.text.replace(/^\s*\[\[indent\]\]/, "") } : s);
+        drawSegLine(page, segs, MARGIN + segWidth(byLabel, size), y - size, size);
+        y -= lineH;
+        y -= nextIsDate || nextIsIndented ? 0 : 6;
         continue;
       }
       const paraText = block.segs.map((s) => s.text).join("");
@@ -102118,7 +102131,6 @@ The undersigned, being **all** of the members of **[COMPANY NAME], LLC**, a Flor
 
 **Adopted effective [EFFECTIVE DATE] by the Company:**
 
-_____________________________
 [PS MANAGER SIGNATURE LINE]
 
 [[pagebreak]]
@@ -102434,18 +102446,30 @@ IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of
 
 **MEMBER:**
 
-_____________________________
+<!-- if:memberperson -->_____________________________
 [MEMBER NAME]
-Date: _____________________________
+Date: _____________________________<!-- /if --><!-- if:memberentity -->[MEMBER NAME]
+
+By: _____________________________
+[[indent]][PRINTED NAME]
+[[indent]][TITLE]
+Date: _____________________________<!-- /if -->
 
 <!-- one:manager -->**ACKNOWLEDGED AND AGREED BY MANAGER:**<!-- /one --><!-- many:manager -->**ACKNOWLEDGED AND AGREED BY MANAGERS:**<!-- /many -->
 
 <!-- repeat:manager -->
-_____________________________
+<!-- if:person -->_____________________________
 [MANAGER NAME], Manager
 Date: _____________________________
 
-<!-- /repeat -->
+<!-- /if --><!-- if:entity -->[MANAGER NAME], Manager
+
+By: _____________________________
+[[indent]][PRINTED NAME]
+[[indent]][TITLE]
+Date: _____________________________
+
+<!-- /if --><!-- /repeat -->
 
 [[pagebreak]]
 
@@ -102494,10 +102518,16 @@ Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENE
 <!-- one:manager -->**Adopted effective [DATE] by the Company, acting through its Manager:**<!-- /one --><!-- many:manager -->**Adopted effective [DATE] by the Company, acting through its Managers:**<!-- /many -->
 
 <!-- repeat:adopter -->
-_____________________________
+<!-- if:person -->_____________________________
 [ADOPTER NAME], Protected Series Manager
 
-<!-- /repeat -->
+<!-- /if --><!-- if:entity -->[ADOPTER NAME], Protected Series Manager
+
+By: _____________________________
+[[indent]][PRINTED NAME]
+[[indent]][TITLE]
+
+<!-- /if --><!-- /repeat -->
 
 [[pagebreak]]
 
@@ -102908,20 +102938,34 @@ IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of
 <!-- if:unit -->**[UNIT]**
 [HOLDING]
 
-<!-- /if -->_____________________________
+<!-- /if --><!-- if:person -->_____________________________
 [SIGNATORY NAME]
 Date: _____________________________
 
-<!-- /repeat -->
+<!-- /if --><!-- if:entity -->[SIGNATORY NAME]
+
+By: _____________________________
+[[indent]][PRINTED NAME]
+[[indent]][TITLE]
+Date: _____________________________
+
+<!-- /if --><!-- /repeat -->
 
 <!-- one:manager -->**ACKNOWLEDGED AND AGREED BY MANAGER:**<!-- /one --><!-- many:manager -->**ACKNOWLEDGED AND AGREED BY MANAGERS:**<!-- /many -->
 
 <!-- repeat:manager -->
-_____________________________
+<!-- if:person -->_____________________________
 [MANAGER NAME], Manager
 Date: _____________________________
 
-<!-- /repeat -->
+<!-- /if --><!-- if:entity -->[MANAGER NAME], Manager
+
+By: _____________________________
+[[indent]][PRINTED NAME]
+[[indent]][TITLE]
+Date: _____________________________
+
+<!-- /if --><!-- /repeat -->
 
 [[pagebreak]]
 
@@ -102982,10 +103026,16 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
 <!-- one:manager -->**Adopted effective [DATE] by the Company, acting through its Manager:**<!-- /one --><!-- many:manager -->**Adopted effective [DATE] by the Company, acting through its Managers:**<!-- /many -->
 
 <!-- repeat:adopter -->
-_____________________________
+<!-- if:person -->_____________________________
 [ADOPTER NAME], Protected Series Manager
 
-<!-- /repeat -->
+<!-- /if --><!-- if:entity -->[ADOPTER NAME], Protected Series Manager
+
+By: _____________________________
+[[indent]][PRINTED NAME]
+[[indent]][TITLE]
+
+<!-- /if --><!-- /repeat -->
 
 [[pagebreak]]
 
@@ -103410,20 +103460,34 @@ IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of
 <!-- if:unit -->**[UNIT]**
 [HOLDING]
 
-<!-- /if -->_____________________________
+<!-- /if --><!-- if:person -->_____________________________
 [SIGNATORY NAME]
 Date: _____________________________
 
-<!-- /repeat -->
+<!-- /if --><!-- if:entity -->[SIGNATORY NAME]
+
+By: _____________________________
+[[indent]][PRINTED NAME]
+[[indent]][TITLE]
+Date: _____________________________
+
+<!-- /if --><!-- /repeat -->
 
 <!-- one:manager -->**ACKNOWLEDGED AND AGREED BY MANAGER:**<!-- /one --><!-- many:manager -->**ACKNOWLEDGED AND AGREED BY MANAGERS:**<!-- /many -->
 
 <!-- repeat:manager -->
-_____________________________
+<!-- if:person -->_____________________________
 [MANAGER NAME], Manager
 Date: _____________________________
 
-<!-- /repeat -->
+<!-- /if --><!-- if:entity -->[MANAGER NAME], Manager
+
+By: _____________________________
+[[indent]][PRINTED NAME]
+[[indent]][TITLE]
+Date: _____________________________
+
+<!-- /if --><!-- /repeat -->
 
 [[pagebreak]]
 
@@ -103484,10 +103548,16 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
 <!-- one:manager -->**Adopted effective [DATE] by the Company, acting through its Manager:**<!-- /one --><!-- many:manager -->**Adopted effective [DATE] by the Company, acting through its Managers:**<!-- /many -->
 
 <!-- repeat:adopter -->
-_____________________________
+<!-- if:person -->_____________________________
 [ADOPTER NAME], Protected Series Manager
 
-<!-- /repeat -->
+<!-- /if --><!-- if:entity -->[ADOPTER NAME], Protected Series Manager
+
+By: _____________________________
+[[indent]][PRINTED NAME]
+[[indent]][TITLE]
+
+<!-- /if --><!-- /repeat -->
 
 [[pagebreak]]
 
@@ -103900,11 +103970,18 @@ IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of
 <!-- if:unit -->**[UNIT]**
 [HOLDING]
 
-<!-- /if -->_____________________________
+<!-- /if --><!-- if:person -->_____________________________
 [SIGNATORY NAME]
 Date: _____________________________
 
-<!-- /repeat -->
+<!-- /if --><!-- if:entity -->[SIGNATORY NAME]
+
+By: _____________________________
+[[indent]][PRINTED NAME]
+[[indent]][TITLE]
+Date: _____________________________
+
+<!-- /if --><!-- /repeat -->
 
 [[pagebreak]]
 
@@ -103965,10 +104042,16 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
 **Adopted effective [DATE] by the Company, acting through a Majority in Interest of its Members:**
 
 <!-- repeat:adopter -->
-_____________________________
+<!-- if:person -->_____________________________
 [ADOPTER NAME], Member
 
-<!-- /repeat -->
+<!-- /if --><!-- if:entity -->[ADOPTER NAME], Member
+
+By: _____________________________
+[[indent]][PRINTED NAME]
+[[indent]][TITLE]
+
+<!-- /if --><!-- /repeat -->
 
 [[pagebreak]]
 
@@ -104395,11 +104478,18 @@ IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of
 <!-- if:unit -->**[UNIT]**
 [HOLDING]
 
-<!-- /if -->_____________________________
+<!-- /if --><!-- if:person -->_____________________________
 [SIGNATORY NAME]
 Date: _____________________________
 
-<!-- /repeat -->
+<!-- /if --><!-- if:entity -->[SIGNATORY NAME]
+
+By: _____________________________
+[[indent]][PRINTED NAME]
+[[indent]][TITLE]
+Date: _____________________________
+
+<!-- /if --><!-- /repeat -->
 
 [[pagebreak]]
 
@@ -104460,10 +104550,16 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
 **Adopted effective [DATE] by the Company, acting through a Majority in Interest of its Members:**
 
 <!-- repeat:adopter -->
-_____________________________
+<!-- if:person -->_____________________________
 [ADOPTER NAME], Member
 
-<!-- /repeat -->
+<!-- /if --><!-- if:entity -->[ADOPTER NAME], Member
+
+By: _____________________________
+[[indent]][PRINTED NAME]
+[[indent]][TITLE]
+
+<!-- /if --><!-- /repeat -->
 
 [[pagebreak]]
 
@@ -104811,18 +104907,30 @@ IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of
 
 **MEMBER:**
 
-_____________________________
+<!-- if:memberperson -->_____________________________
 [MEMBER NAME]
-Date: _____________________________
+Date: _____________________________<!-- /if --><!-- if:memberentity -->[MEMBER NAME]
+
+By: _____________________________
+[[indent]][PRINTED NAME]
+[[indent]][TITLE]
+Date: _____________________________<!-- /if -->
 
 <!-- one:manager -->**ACKNOWLEDGED AND AGREED BY MANAGER:**<!-- /one --><!-- many:manager -->**ACKNOWLEDGED AND AGREED BY MANAGERS:**<!-- /many -->
 
 <!-- repeat:manager -->
-_____________________________
+<!-- if:person -->_____________________________
 [MANAGER NAME], Manager
 Date: _____________________________
 
-<!-- /repeat -->
+<!-- /if --><!-- if:entity -->[MANAGER NAME], Manager
+
+By: _____________________________
+[[indent]][PRINTED NAME]
+[[indent]][TITLE]
+Date: _____________________________
+
+<!-- /if --><!-- /repeat -->
 
 [[pagebreak]]
 
@@ -104871,10 +104979,16 @@ Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENE
 <!-- one:manager -->**Adopted effective [DATE] by the Company, acting through its Manager:**<!-- /one --><!-- many:manager -->**Adopted effective [DATE] by the Company, acting through its Managers:**<!-- /many -->
 
 <!-- repeat:adopter -->
-_____________________________
+<!-- if:person -->_____________________________
 [ADOPTER NAME], Protected Series Manager
 
-<!-- /repeat -->
+<!-- /if --><!-- if:entity -->[ADOPTER NAME], Protected Series Manager
+
+By: _____________________________
+[[indent]][PRINTED NAME]
+[[indent]][TITLE]
+
+<!-- /if --><!-- /repeat -->
 
 [[pagebreak]]
 
@@ -105177,9 +105291,14 @@ IN WITNESS WHEREOF, the undersigned has executed this Agreement effective as of 
 
 **MEMBER:**
 
-_____________________________
+<!-- if:memberperson -->_____________________________
 [MEMBER NAME]
-Date: _____________________________
+Date: _____________________________<!-- /if --><!-- if:memberentity -->[MEMBER NAME]
+
+By: _____________________________
+[[indent]][PRINTED NAME]
+[[indent]][TITLE]
+Date: _____________________________<!-- /if -->
 
 [[pagebreak]]
 
@@ -105228,10 +105347,16 @@ Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENE
 **Adopted effective [DATE] by the Company, acting through the Member:**
 
 <!-- repeat:adopter -->
-_____________________________
+<!-- if:person -->_____________________________
 [ADOPTER NAME], Member
 
-<!-- /repeat -->
+<!-- /if --><!-- if:entity -->[ADOPTER NAME], Member
+
+By: _____________________________
+[[indent]][PRINTED NAME]
+[[indent]][TITLE]
+
+<!-- /if --><!-- /repeat -->
 
 [[pagebreak]]
 
@@ -105564,9 +105689,14 @@ IN WITNESS WHEREOF, the undersigned has executed this Agreement effective as of 
 
 **MEMBER:**
 
-_____________________________
+<!-- if:memberperson -->_____________________________
 [MEMBER NAME]
-Date: _____________________________
+Date: _____________________________<!-- /if --><!-- if:memberentity -->[MEMBER NAME]
+
+By: _____________________________
+[[indent]][PRINTED NAME]
+[[indent]][TITLE]
+Date: _____________________________<!-- /if -->
 
 [[pagebreak]]
 
@@ -105615,10 +105745,16 @@ Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENE
 **Adopted effective [DATE] by the Company, acting through the Member:**
 
 <!-- repeat:adopter -->
-_____________________________
+<!-- if:person -->_____________________________
 [ADOPTER NAME], Member
 
-<!-- /repeat -->
+<!-- /if --><!-- if:entity -->[ADOPTER NAME], Member
+
+By: _____________________________
+[[indent]][PRINTED NAME]
+[[indent]][TITLE]
+
+<!-- /if --><!-- /repeat -->
 
 [[pagebreak]]
 
@@ -105752,10 +105888,55 @@ function expandRepeat(s, key, rows, label) {
   if (count === 0) throw new Error(`OA template marker missing: repeat:${key} (${label})`);
   return s;
 }
+function managerSignerOf(inputs, manager) {
+  const hit = (inputs.managerEntitySigners ?? []).find((x2) => x2.manager.trim() === manager.trim());
+  return hit ? { name: hit.name, title: hit.title } : null;
+}
+function signerRows(nameSlot, signers) {
+  return signers.map((s) => ({
+    [nameSlot]: s.name,
+    "[PERSON]": s.entity ? "" : "x",
+    "[ENTITY]": s.entity ? "x" : "",
+    "[PRINTED NAME]": s.entity?.name ?? "",
+    "[TITLE]": s.entity?.title ?? "",
+    ...s.extra ?? {}
+  }));
+}
 function resolveIf(s, key, keep) {
-  const re = new RegExp(`<!--\\s*if:${key}\\s*-->([\\s\\S]*?)<!--\\s*/if\\s*-->`, "g");
-  if (!re.test(s)) throw new Error(`OA template marker missing: if:${key}`);
-  return s.replace(re, (_m, inner) => keep ? inner : "");
+  const open = new RegExp(`<!--\\s*if:${key}\\s*-->`);
+  const anyOpen = /<!--\s*if:[A-Za-z]+\s*-->/g;
+  const anyClose = /<!--\s*\/if\s*-->/g;
+  let found = false;
+  for (; ; ) {
+    const m2 = open.exec(s);
+    if (!m2) break;
+    found = true;
+    const start = m2.index;
+    let pos = start + m2[0].length;
+    let depth = 1;
+    let end = -1;
+    let closeLen = 0;
+    while (depth > 0) {
+      anyOpen.lastIndex = pos;
+      anyClose.lastIndex = pos;
+      const o = anyOpen.exec(s);
+      const c = anyClose.exec(s);
+      if (!c) throw new Error(`OA template marker unclosed: if:${key}`);
+      if (o && o.index < c.index) {
+        depth += 1;
+        pos = o.index + o[0].length;
+      } else {
+        depth -= 1;
+        pos = c.index + c[0].length;
+        end = c.index;
+        closeLen = c[0].length;
+      }
+    }
+    const inner = s.slice(start + m2[0].length, end);
+    s = s.slice(0, start) + (keep ? inner : "") + s.slice(end + closeLen);
+  }
+  if (!found) throw new Error(`OA template marker missing: if:${key}`);
+  return s;
 }
 function chooseNumber(s, key, singular) {
   const keep = new RegExp(`<!--\\s*${singular ? "one" : "many"}:${key}\\s*-->([\\s\\S]*?)<!--\\s*/${singular ? "one" : "many"}\\s*-->`, "g");
@@ -105832,7 +106013,7 @@ function assembleOa(inputs) {
     s = expandRepeat(
       s,
       "manager",
-      managerNames.map((n) => ({ "[MANAGER NAME]": n })),
+      signerRows("[MANAGER NAME]", managerNames.map((n) => ({ name: n, entity: managerSignerOf(inputs, n) }))),
       "manager signatures"
     );
   }
@@ -105979,13 +106160,10 @@ NOW, THEREFORE,`,
     }
     ex = ex.replace("[CONTRIBUTION]", ser.contribution || "\u2014");
     ex = ex.replace(/\| Special terms \(if any\) \|[^\n]*\|/, `| Special terms (if any) | ${(ser.specialTerms ?? "").trim().replace(/\|/g, "/").replace(/\s*\n\s*/g, " ") || "None"} |`);
-    const adopters = isMemberManaged ? inputs.members.flatMap((m2) => m2.signatories ?? [m2.name]) : managerNames;
-    ex = expandRepeat(
-      ex,
-      "adopter",
-      adopters.map((n2) => ({ "[ADOPTER NAME]": n2 })),
-      "series exhibit adoption"
-    );
+    const adopters = isMemberManaged ? inputs.members.flatMap(
+      (m2) => m2.entitySigner ? [{ name: m2.name, entity: m2.entitySigner }] : (m2.signatories ?? [m2.name]).map((n2) => ({ name: n2, entity: null }))
+    ) : managerNames.map((n2) => ({ name: n2, entity: managerSignerOf(inputs, n2) }));
+    ex = expandRepeat(ex, "adopter", signerRows("[ADOPTER NAME]", adopters), "series exhibit adoption");
     ex = ex.replace(
       "Adopted effective [DATE] by the Company, acting through its Manager:",
       `Adopted effective [DATE] by the Company, acting through its ${managerNames.length > 1 ? "Managers" : "Manager"}:`
@@ -105997,20 +106175,31 @@ NOW, THEREFORE,`,
     exhibits.push("[[pagebreak]]\n\n" + ex.trim() + "\n\n[[pagebreak]]\n\n" + sched.trim());
   });
   if (isSingle) {
-    s = s.split("[MEMBER NAME]").join(inputs.members[0].name);
-    s = s.split("[ADDRESS]").join(inputs.members[0].address);
+    const sole = inputs.members[0];
+    s = resolveIf(s, "memberperson", !sole.entitySigner);
+    s = resolveIf(s, "memberentity", !!sole.entitySigner);
+    if (sole.entitySigner) {
+      s = s.split("[PRINTED NAME]").join(sole.entitySigner.name);
+      s = s.split("[TITLE]").join(sole.entitySigner.title);
+    }
+    s = s.split("[MEMBER NAME]").join(sole.name);
+    s = s.split("[ADDRESS]").join(sole.address);
   } else {
     s = expandRepeat(
       s,
       "signatory",
-      inputs.members.flatMap((m2) => {
+      signerRows("[SIGNATORY NAME]", inputs.members.flatMap((m2) => {
+        if (m2.entitySigner) return [{ name: m2.name, entity: m2.entitySigner, extra: { "[UNIT]": "", "[HOLDING]": "" } }];
         const signers = m2.signatories ?? [m2.name];
         return signers.map((n, i) => ({
-          "[UNIT]": signers.length > 1 && i === 0 ? m2.name : "",
-          "[HOLDING]": signers.length > 1 && i === 0 && m2.jointHolding ? `as ${titleCaseHolding(m2.jointHolding)}` : "",
-          "[SIGNATORY NAME]": n
+          name: n,
+          entity: null,
+          extra: {
+            "[UNIT]": signers.length > 1 && i === 0 ? m2.name : "",
+            "[HOLDING]": signers.length > 1 && i === 0 && m2.jointHolding ? `as ${titleCaseHolding(m2.jointHolding)}` : ""
+          }
         }));
-      }),
+      })),
       "member signatures"
     );
   }
@@ -106044,9 +106233,18 @@ function assembleNewSeries(input) {
   const authority = input.memberManaged ? "The Members authorize the Administrative Member, or any Member the Members designate, to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement." : `The Members authorize the Manager to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.`;
   const managers = input.managerNames.map((n) => n.trim()).filter(Boolean);
   const psManager = input.memberManaged ? "The Company, as protected-series manager (s. 605.2304(2), Fla. Stat.), acting through a Majority in Interest of the Members" : managers.join(", ") || "[MANAGER NAME]";
-  const psSignature = input.memberManaged ? `${input.memberNames[0] ?? "[MEMBER NAME]"}, Member, for the Company` : managers.length ? managers.map((n) => `${n}, Manager`).join("\n\n_____________________________\n") : "[MANAGER NAME], Manager";
-  const blocks = input.memberNames.length ? input.memberNames.map((n) => `_____________________________
-${n}`).join("\n\n") : "_____________________________\n[MEMBER NAME]";
+  const signerOf = (entity) => (input.entitySigners ?? []).find((x2) => x2.entity.trim() === entity.trim());
+  const block = (n, suffix) => {
+    const sg = signerOf(n);
+    return sg ? `${n}${suffix}
+
+By: _____________________________
+[[indent]]${sg.name}
+[[indent]]${sg.title}` : `_____________________________
+${n}${suffix}`;
+  };
+  const psSignature = input.memberManaged ? block(input.memberNames[0] ?? "[MEMBER NAME]", ", Member, for the Company") : managers.length ? managers.map((n) => block(n, ", Manager")).join("\n\n") : "_____________________________\n[MANAGER NAME], Manager";
+  const blocks = input.memberNames.length ? input.memberNames.map((n) => block(n, "")).join("\n\n") : "_____________________________\n[MEMBER NAME]";
   must2(s, "[COMPANY NAME], LLC", "company name");
   s = s.split("[COMPANY NAME], LLC").join(input.companyName);
   s = s.split("[COMPANY NAME]").join(input.companyName);
@@ -106134,7 +106332,7 @@ function followUpOk(category, answer) {
 import { readFileSync as readFileSync2 } from "node:fs";
 
 // server/templates-oa-amendment.md
-var templates_oa_amendment_default = '# AMENDMENT NO. [AMENDMENT NUMBER]\n# TO OPERATING AGREEMENT\n## OF\n## [COMPANY NAME], LLC\n### A FLORIDA PROTECTED SERIES LIMITED LIABILITY COMPANY\n\n---\n\nTHIS AMENDMENT NO. [AMENDMENT NUMBER] TO OPERATING AGREEMENT (this "Amendment") of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the "Company"), is made effective as of [AMENDMENT DATE], by <!-- one:member -->the undersigned sole member (the "Member")<!-- /one --><!-- many:member -->the undersigned members (each a "Member" and collectively the "Members")<!-- /many --><!-- if:managed -->, and is acknowledged by the undersigned Manager<!-- /if -->.\n\n### RECITALS\n\nA. The Company is governed by the <!-- if:restated -->Amended and Restated <!-- /if -->Operating Agreement of the Company effective as of [AGREEMENT DATE] (the "Agreement").\n\nB. Section [AMENDMENT SECTION] of the Agreement provides that the Agreement may be amended only by a written instrument signed by <!-- one:member -->the Member<!-- /one --><!-- many:member -->all Members<!-- /many -->.\n\nC. <!-- one:member -->The Member wishes<!-- /one --><!-- many:member -->The Members wish<!-- /many --> to amend the Agreement as set forth in this Amendment.\n\nNOW, THEREFORE, <!-- one:member -->the Member amends<!-- /one --><!-- many:member -->the Members amend<!-- /many --> the Agreement as follows:\n\n---\n\n## AMENDMENT\n\n**1. Amendments to the Agreement.** The Agreement is amended as follows:\n\n<!-- if:typed -->[AMENDMENT TEXT]<!-- /if -->\n<!-- if:attached -->The Agreement is amended as set forth in Exhibit A attached to this Amendment.<!-- /if -->\n\n**2. Effect of Amendment.** Except as amended by this Amendment, the Agreement remains in full force and effect. Capitalized terms have the meanings given in the Agreement. This Amendment is effective on the date stated above.\n\n[[pagebreak]]\n\n## SIGNATURES\n\nIN WITNESS WHEREOF, the undersigned <!-- one:member -->has<!-- /one --><!-- many:member -->have<!-- /many --> executed this Amendment effective as of the date(s) set forth below.\n\n<!-- one:member -->**MEMBER:**<!-- /one --><!-- many:member -->**MEMBERS:**<!-- /many -->\n\n<!-- repeat:signatory -->\n<!-- if:unit -->**[UNIT]**\n[HOLDING]\n\n<!-- /if -->_____________________________\n[SIGNATORY NAME]\nDate: _____________________________\n\n<!-- /repeat -->\n\n<!-- if:managed --><!-- one:manager -->**ACKNOWLEDGED AND AGREED BY MANAGER:**<!-- /one --><!-- many:manager -->**ACKNOWLEDGED AND AGREED BY MANAGERS:**<!-- /many -->\n\n<!-- repeat:manager -->\n_____________________________\n[MANAGER NAME], Manager\nDate: _____________________________\n\n<!-- /repeat -->\n<!-- /if -->\n\n*[TITLE] of [COMPANY NAME], LLC \u2014 generated by MyFloridaSeriesLLC \xB7 Master [EDITION]*\n';
+var templates_oa_amendment_default = '# AMENDMENT NO. [AMENDMENT NUMBER]\n# TO OPERATING AGREEMENT\n## OF\n## [COMPANY NAME], LLC\n### A FLORIDA PROTECTED SERIES LIMITED LIABILITY COMPANY\n\n---\n\nTHIS AMENDMENT NO. [AMENDMENT NUMBER] TO OPERATING AGREEMENT (this "Amendment") of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the "Company"), is made effective as of [AMENDMENT DATE], by <!-- one:member -->the undersigned sole member (the "Member")<!-- /one --><!-- many:member -->the undersigned members (each a "Member" and collectively the "Members")<!-- /many --><!-- if:managed -->, and is acknowledged by the undersigned Manager<!-- /if -->.\n\n### RECITALS\n\nA. The Company is governed by the <!-- if:restated -->Amended and Restated <!-- /if -->Operating Agreement of the Company effective as of [AGREEMENT DATE] (the "Agreement").\n\nB. Section [AMENDMENT SECTION] of the Agreement provides that the Agreement may be amended only by a written instrument signed by <!-- one:member -->the Member<!-- /one --><!-- many:member -->all Members<!-- /many -->.\n\nC. <!-- one:member -->The Member wishes<!-- /one --><!-- many:member -->The Members wish<!-- /many --> to amend the Agreement as set forth in this Amendment.\n\nNOW, THEREFORE, <!-- one:member -->the Member amends<!-- /one --><!-- many:member -->the Members amend<!-- /many --> the Agreement as follows:\n\n---\n\n## AMENDMENT\n\n**1. Amendments to the Agreement.** The Agreement is amended as follows:\n\n<!-- if:typed -->[AMENDMENT TEXT]<!-- /if -->\n<!-- if:attached -->The Agreement is amended as set forth in Exhibit A attached to this Amendment.<!-- /if -->\n\n**2. Effect of Amendment.** Except as amended by this Amendment, the Agreement remains in full force and effect. Capitalized terms have the meanings given in the Agreement. This Amendment is effective on the date stated above.\n\n[[pagebreak]]\n\n## SIGNATURES\n\nIN WITNESS WHEREOF, the undersigned <!-- one:member -->has<!-- /one --><!-- many:member -->have<!-- /many --> executed this Amendment effective as of the date(s) set forth below.\n\n<!-- one:member -->**MEMBER:**<!-- /one --><!-- many:member -->**MEMBERS:**<!-- /many -->\n\n<!-- repeat:signatory -->\n<!-- if:unit -->**[UNIT]**\n[HOLDING]\n\n<!-- /if --><!-- if:person -->_____________________________\n[SIGNATORY NAME]\nDate: _____________________________\n\n<!-- /if --><!-- if:entity -->[SIGNATORY NAME]\n\nBy: _____________________________\n[[indent]][PRINTED NAME]\n[[indent]][TITLE]\nDate: _____________________________\n\n<!-- /if --><!-- /repeat -->\n\n<!-- if:managed --><!-- one:manager -->**ACKNOWLEDGED AND AGREED BY MANAGER:**<!-- /one --><!-- many:manager -->**ACKNOWLEDGED AND AGREED BY MANAGERS:**<!-- /many -->\n\n<!-- repeat:manager -->\n<!-- if:person -->_____________________________\n[MANAGER NAME], Manager\nDate: _____________________________\n\n<!-- /if --><!-- if:entity -->[MANAGER NAME], Manager\n\nBy: _____________________________\n[[indent]][PRINTED NAME]\n[[indent]][TITLE]\nDate: _____________________________\n\n<!-- /if --><!-- /repeat -->\n<!-- /if -->\n\n*[TITLE] of [COMPANY NAME], LLC \u2014 generated by MyFloridaSeriesLLC \xB7 Master [EDITION]*\n';
 
 // server/oa-amendment.ts
 function loadTemplate2(v2) {
@@ -106181,21 +106379,25 @@ function assembleAmendment(oa, am) {
   s = expandRepeat(
     s,
     "signatory",
-    oa.members.flatMap((m2) => {
+    signerRows("[SIGNATORY NAME]", oa.members.flatMap((m2) => {
+      if (m2.entitySigner) return [{ name: m2.name, entity: m2.entitySigner, extra: { "[UNIT]": "", "[HOLDING]": "" } }];
       const signers = m2.signatories ?? [m2.name];
       return signers.map((n, i) => ({
-        "[UNIT]": signers.length > 1 && i === 0 ? m2.name : "",
-        "[HOLDING]": signers.length > 1 && i === 0 && m2.jointHolding ? `as ${titleCaseHolding(m2.jointHolding)}` : "",
-        "[SIGNATORY NAME]": n
+        name: n,
+        entity: null,
+        extra: {
+          "[UNIT]": signers.length > 1 && i === 0 ? m2.name : "",
+          "[HOLDING]": signers.length > 1 && i === 0 && m2.jointHolding ? `as ${titleCaseHolding(m2.jointHolding)}` : ""
+        }
       }));
-    }),
+    })),
     "amendment member signatures"
   );
   if (!isMemberManaged) {
     const managerNames = (oa.managerNames ?? []).map((n) => n.trim()).filter(Boolean);
     if (managerNames.length === 0) throw new Error("Amendment: at least one manager is required");
     s = chooseNumber(s, "manager", managerNames.length === 1);
-    s = expandRepeat(s, "manager", managerNames.map((n) => ({ "[MANAGER NAME]": n })), "amendment manager signatures");
+    s = expandRepeat(s, "manager", signerRows("[MANAGER NAME]", managerNames.map((n) => ({ name: n, entity: managerSignerOf(oa, n) }))), "amendment manager signatures");
   }
   const footer = FOOTER_LINE.replace("[TITLE]", title).replace("[COMPANY NAME], LLC", co).replace("[EDITION]", OA_TEMPLATE_VERSION);
   s = s.trimEnd() + "\n\n" + footer + "\n";
@@ -106622,8 +106824,10 @@ async function oaSeed(clientId, orderId) {
   const principalAddress = [addr2.address1, addr2.address2, [addr2.city, addr2.state].filter(Boolean).join(", "), addr2.zip].filter((x2) => x2 && String(x2).trim()).join(", ");
   const joinAddr = (a2) => [a2?.address1, a2?.address2, [a2?.city, a2?.state].filter(Boolean).join(", "), a2?.zip].filter((x2) => x2 && String(x2).trim()).join(", ");
   let members = (p2.members?.memberList ?? []).map((m2) => ({
-    name: personLegalName(m2.firstName, m2.lastName, m2.suffix) || (m2.fullLegalName ?? ""),
-    address: joinAddr(m2)
+    name: personLegalName(m2.firstName, m2.lastName, m2.suffix) || (m2.fullLegalName ?? "") || (m2.entityName ?? "").trim(),
+    address: joinAddr(m2),
+    // A company or trust as owner signs through a person (Adam, 13 Sep 2026).
+    isEntity: !!(m2.entityName ?? "").trim() && !personLegalName(m2.firstName, m2.lastName, m2.suffix)
   }));
   const clientOwner = (p2.client?.name ?? "").trim() ? { name: (p2.client?.name ?? "").trim(), address: joinAddr(p2.client?.address) } : null;
   const managerOwners = (p2.management?.managersOrAuthorizedRepresentatives ?? []).filter((e) => (e.role ?? "MGR") === "MGR").map((e) => ({
@@ -106636,9 +106840,13 @@ async function oaSeed(clientId, orderId) {
   }
   if (members.length === 0 && clientOwner) members = [clientOwner];
   const managementStructure = p2.management?.structure ?? "";
-  const managerNames = (p2.management?.managersOrAuthorizedRepresentatives ?? []).filter((e) => (e.role ?? "MGR") === "MGR").map(
-    (e) => (personLegalName(e.firstName, e.lastName, e.suffix) || e.fullName || e.businessEntityName || "").trim()
-  ).filter(Boolean);
+  const managerEntries = (p2.management?.managersOrAuthorizedRepresentatives ?? []).filter((e) => (e.role ?? "MGR") === "MGR").map((e) => ({
+    name: (personLegalName(e.firstName, e.lastName, e.suffix) || e.fullName || e.businessEntityName || "").trim(),
+    // A Manager that is a company signs through a person (Adam, 13 Sep 2026).
+    isEntity: !personLegalName(e.firstName, e.lastName, e.suffix) && !(e.fullName ?? "").trim() && !!(e.businessEntityName ?? "").trim()
+  })).filter((m2) => m2.name);
+  const managerNames = managerEntries.map((m2) => m2.name);
+  const managerEntities = managerEntries.map((m2) => m2.isEntity);
   if (managementStructure === "MANAGER_MANAGED" && managerNames.length === 0) {
     throw new Error(
       "This order is manager-managed but lists no Manager. Correct the order before generating an agreement."
@@ -106662,6 +106870,7 @@ async function oaSeed(clientId, orderId) {
     formationType: p2.formationType ?? "",
     managementStructure,
     managerNames,
+    managerEntities,
     suggestedOwners,
     principalAddress,
     members,
@@ -106691,9 +106900,16 @@ var oaAnswersSchema = external_exports.object({
       contribution: external_exports.string().max(300).optional(),
       todBeneficiary: external_exports.string().max(300).optional().refine((v2) => !(v2 ?? "").trim() || hasFirstAndLast(v2), `Beneficiary: ${FIRST_AND_LAST}`),
       // A backup may be a class ("my children in equal shares"), so no name rule.
-      todBackup: external_exports.string().max(300).optional()
+      todBackup: external_exports.string().max(300).optional(),
+      // A company or trust as owner: who signs for it and their title
+      // (Adam, 13 Sep 2026).
+      isEntity: external_exports.boolean().optional(),
+      signerName: external_exports.string().max(200).optional(),
+      signerTitle: external_exports.string().max(120).optional()
     })
   ).max(20).optional(),
+  // Who signs for each Manager that is a company, in managerNames order.
+  managerSigners: external_exports.array(external_exports.object({ name: external_exports.string().max(200).optional(), title: external_exports.string().max(120).optional() })).max(20).optional(),
   series: external_exports.array(
     external_exports.object({
       purpose: external_exports.string().max(300).optional(),
@@ -107455,6 +107671,7 @@ function registerPortalRoutes(app2) {
     const coupleAt = (i) => couples.find((cpl) => cpl.a === i || cpl.b === i);
     const coupleName = (cpl) => `${owners[cpl.a].name} and ${owners[cpl.b].name}`;
     const members = [];
+    let entityGap = "";
     const emittedCouples = /* @__PURE__ */ new Set();
     owners.forEach((m2, i) => {
       const cpl = coupleAt(i);
@@ -107475,17 +107692,40 @@ function registerPortalRoutes(app2) {
         });
       } else {
         const mShare = multiOwner ? { percentage: a2.members?.[i]?.percentage, numerator: a2.members?.[i]?.numerator, denominator: a2.members?.[i]?.denominator } : { percentage: 100 };
+        const ans = a2.members?.[i];
+        const isEntity = ans?.isEntity ?? seed.members[i]?.isEntity ?? false;
+        let entitySigner;
+        if (isEntity) {
+          const sn = (ans?.signerName ?? "").trim();
+          const st = (ans?.signerTitle ?? "").trim();
+          if (!hasFirstAndLast(sn) || !st) {
+            entityGap = `Name the person who signs for ${m2.name || `owner ${i + 1}`} \u2014 first and last name \u2014 and their title.`;
+          }
+          entitySigner = { name: sn, title: st };
+        }
         members.push({
           name: m2.name,
           address: m2.address,
           percentage: shareValue(multiOwner ? ownershipMode : "percent", mShare),
           percentageLabel: shareLabel(multiOwner ? ownershipMode : "percent", mShare),
-          contribution: a2.members?.[i]?.contribution ?? "",
-          todBeneficiary: a2.members?.[i]?.todBeneficiary ?? "",
-          todBackup: a2.members?.[i]?.todBackup ?? ""
+          contribution: ans?.contribution ?? "",
+          todBeneficiary: ans?.todBeneficiary ?? "",
+          todBackup: ans?.todBackup ?? "",
+          ...entitySigner ? { entitySigner } : {}
         });
       }
     });
+    if (entityGap) return c.json(err(entityGap, "INVALID_INPUT"), 400);
+    const managerEntitySigners = [];
+    for (let i = 0; i < seed.managerNames.length; i += 1) {
+      if (!seed.managerEntities?.[i]) continue;
+      const sn = (a2.managerSigners?.[i]?.name ?? "").trim();
+      const st = (a2.managerSigners?.[i]?.title ?? "").trim();
+      if (!hasFirstAndLast(sn) || !st) {
+        return c.json(err(`Name the person who signs for ${seed.managerNames[i]} \u2014 first and last name \u2014 and their title.`, "INVALID_INPUT"), 400);
+      }
+      managerEntitySigners.push({ manager: seed.managerNames[i], name: sn, title: st });
+    }
     const isSCorp = version === "s" || version === "member-s" || version === "single-s" || version === "member-single-s";
     if (members.length === 1) {
       members[0].percentage = 100;
@@ -107549,6 +107789,7 @@ function registerPortalRoutes(app2) {
       companyName: seed.llcName,
       principalAddress: seed.principalAddress,
       managerNames: seed.managerNames,
+      managerEntitySigners,
       effectiveDate: fmtDate2(a2.effectiveDate),
       amendedRestated: a2.firstOrAmended === "amended",
       priorAgreementDate: priorDate,
@@ -107645,7 +107886,19 @@ function registerPortalRoutes(app2) {
       );
     }
     const memberManaged = seed.managementStructure === "MEMBER_MANAGED";
-    const seriesOwners = effectiveOwners(seed.members, await savedOaAnswers(session.clientId));
+    const savedForSeries = await savedOaAnswers(session.clientId);
+    const seriesOwners = effectiveOwners(seed.members, savedForSeries);
+    const entitySigners = [];
+    (savedForSeries?.members ?? []).forEach((m2, i) => {
+      const owner = seriesOwners[i];
+      if (owner && (m2.isEntity ?? seed.members[i]?.isEntity) && (m2.signerName ?? "").trim()) {
+        entitySigners.push({ entity: owner.name, name: (m2.signerName ?? "").trim(), title: (m2.signerTitle ?? "").trim() });
+      }
+    });
+    seed.managerNames.forEach((n, i) => {
+      const sg = savedForSeries?.managerSigners?.[i];
+      if (seed.managerEntities?.[i] && (sg?.name ?? "").trim()) entitySigners.push({ entity: n, name: (sg?.name ?? "").trim(), title: (sg?.title ?? "").trim() });
+    });
     const generatedOn = /* @__PURE__ */ new Date();
     let pdf;
     let title;
@@ -107658,7 +107911,8 @@ function registerPortalRoutes(app2) {
         effectiveDate: fmtDate2(body.data.effectiveDate),
         memberNames: seriesOwners.map((m2) => m2.name),
         managerNames: seed.managerNames,
-        memberManaged
+        memberManaged,
+        entitySigners
       });
       title = assembled.title;
       const dbc = await getDb();

@@ -277,9 +277,14 @@ IN WITNESS WHEREOF, the undersigned has executed this Agreement effective as of 
 
 **MEMBER:**
 
-_____________________________
+<!-- if:memberperson -->_____________________________
 [MEMBER NAME]
-Date: _____________________________
+Date: _____________________________<!-- /if --><!-- if:memberentity -->[MEMBER NAME]
+
+By: _____________________________
+[[indent]][PRINTED NAME]
+[[indent]][TITLE]
+Date: _____________________________<!-- /if -->
 
 [[pagebreak]]
 
@@ -328,10 +333,16 @@ Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENE
 **Adopted effective [DATE] by the Company, acting through the Member:**
 
 <!-- repeat:adopter -->
-_____________________________
+<!-- if:person -->_____________________________
 [ADOPTER NAME], Member
 
-<!-- /repeat -->
+<!-- /if --><!-- if:entity -->[ADOPTER NAME], Member
+
+By: _____________________________
+[[indent]][PRINTED NAME]
+[[indent]][TITLE]
+
+<!-- /if --><!-- /repeat -->
 
 [[pagebreak]]
 

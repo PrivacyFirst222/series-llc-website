@@ -399,20 +399,34 @@ IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of
 <!-- if:unit -->**[UNIT]**
 [HOLDING]
 
-<!-- /if -->_____________________________
+<!-- /if --><!-- if:person -->_____________________________
 [SIGNATORY NAME]
 Date: _____________________________
 
-<!-- /repeat -->
+<!-- /if --><!-- if:entity -->[SIGNATORY NAME]
+
+By: _____________________________
+[[indent]][PRINTED NAME]
+[[indent]][TITLE]
+Date: _____________________________
+
+<!-- /if --><!-- /repeat -->
 
 <!-- one:manager -->**ACKNOWLEDGED AND AGREED BY MANAGER:**<!-- /one --><!-- many:manager -->**ACKNOWLEDGED AND AGREED BY MANAGERS:**<!-- /many -->
 
 <!-- repeat:manager -->
-_____________________________
+<!-- if:person -->_____________________________
 [MANAGER NAME], Manager
 Date: _____________________________
 
-<!-- /repeat -->
+<!-- /if --><!-- if:entity -->[MANAGER NAME], Manager
+
+By: _____________________________
+[[indent]][PRINTED NAME]
+[[indent]][TITLE]
+Date: _____________________________
+
+<!-- /if --><!-- /repeat -->
 
 [[pagebreak]]
 
@@ -473,10 +487,16 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
 <!-- one:manager -->**Adopted effective [DATE] by the Company, acting through its Manager:**<!-- /one --><!-- many:manager -->**Adopted effective [DATE] by the Company, acting through its Managers:**<!-- /many -->
 
 <!-- repeat:adopter -->
-_____________________________
+<!-- if:person -->_____________________________
 [ADOPTER NAME], Protected Series Manager
 
-<!-- /repeat -->
+<!-- /if --><!-- if:entity -->[ADOPTER NAME], Protected Series Manager
+
+By: _____________________________
+[[indent]][PRINTED NAME]
+[[indent]][TITLE]
+
+<!-- /if --><!-- /repeat -->
 
 [[pagebreak]]
 

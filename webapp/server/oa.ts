@@ -45,6 +45,10 @@ export interface OaMemberInput {
   todBackup?: string;
   /** Humans who sign for this interest — both spouses for a marital unit. */
   signatories?: string[];
+  /** Set when the member is a company or trust: the person who signs for it
+   *  and their title (Adam, 13 Sep 2026). The block then reads the entity's
+   *  name, "By:" over a rule, and the printed name and title beneath. */
+  entitySigner?: { name: string; title: string };
   /** The tenancy alone when this interest is held jointly — "tenants by the
    *  entirety". The master's Exhibit A row supplies the words around it. */
   jointHolding?: string;
@@ -72,6 +76,9 @@ export interface OaInputs {
   principalAddress: string;
   /** Every person serving as Manager. s. 5.1 makes them act by majority. */
   managerNames: string[];
+  /** A Manager that is a company: who signs for it and their title (Adam,
+   *  13 Sep 2026), matched to managerNames by the entity's name. */
+  managerEntitySigners?: { manager: string; name: string; title: string }[];
   effectiveDate: string; // human format e.g. "August 5, 2026"
   amendedRestated: boolean;
   priorAgreementDate: string | null; // known prior generation date, else null
@@ -246,13 +253,65 @@ export function expandRepeat(
   return s;
 }
 
+/** One signature-block row per signer. A person's row keeps the master's
+ *  line-name-date block; an entity's keeps the block headed by its name with
+ *  "By:" over the rule and the printed name and title beneath (Adam,
+ *  13 Sep 2026). `nameSlot` is the master's slot for the signer's name. */
+export function managerSignerOf(inputs: Pick<OaInputs, "managerEntitySigners">, manager: string): { name: string; title: string } | null {
+  const hit = (inputs.managerEntitySigners ?? []).find((x) => x.manager.trim() === manager.trim());
+  return hit ? { name: hit.name, title: hit.title } : null;
+}
+
+export interface SignerSpec {
+  name: string;
+  entity?: { name: string; title: string } | null;
+  extra?: Record<string, string>;
+}
+export function signerRows(nameSlot: string, signers: SignerSpec[]): Array<Record<string, string>> {
+  return signers.map((s) => ({
+    [nameSlot]: s.name,
+    "[PERSON]": s.entity ? "" : "x",
+    "[ENTITY]": s.entity ? "x" : "",
+    "[PRINTED NAME]": s.entity?.name ?? "",
+    "[TITLE]": s.entity?.title ?? "",
+    ...(s.extra ?? {}),
+  }));
+}
+
 /** `<!-- if:KEY -->…<!-- /if -->` outside a repeat block: kept when the
  *  condition holds, dropped otherwise. Inside a repeat block expandRepeat
  *  resolves the same marker per row. */
 export function resolveIf(s: string, key: string, keep: boolean): string {
-  const re = new RegExp(`<!--\\s*if:${key}\\s*-->([\\s\\S]*?)<!--\\s*/if\\s*-->`, "g");
-  if (!re.test(s)) throw new Error(`OA template marker missing: if:${key}`);
-  return s.replace(re, (_m, inner: string) => (keep ? inner : ""));
+  // The closer is matched by depth, not by the first "/if" in sight: an
+  // amendment's manager block sits inside <!-- if:managed --> and itself
+  // holds the person/entity blocks (13 Sep 2026).
+  const open = new RegExp(`<!--\\s*if:${key}\\s*-->`);
+  const anyOpen = /<!--\s*if:[A-Za-z]+\s*-->/g;
+  const anyClose = /<!--\s*\/if\s*-->/g;
+  let found = false;
+  for (;;) {
+    const m = open.exec(s);
+    if (!m) break;
+    found = true;
+    const start = m.index;
+    let pos = start + m[0].length;
+    let depth = 1;
+    let end = -1;
+    let closeLen = 0;
+    while (depth > 0) {
+      anyOpen.lastIndex = pos;
+      anyClose.lastIndex = pos;
+      const o = anyOpen.exec(s);
+      const c = anyClose.exec(s);
+      if (!c) throw new Error(`OA template marker unclosed: if:${key}`);
+      if (o && o.index < c.index) { depth += 1; pos = o.index + o[0].length; }
+      else { depth -= 1; pos = c.index + c[0].length; end = c.index; closeLen = c[0].length; }
+    }
+    const inner = s.slice(start + m[0].length, end);
+    s = s.slice(0, start) + (keep ? inner : "") + s.slice(end + closeLen);
+  }
+  if (!found) throw new Error(`OA template marker missing: if:${key}`);
+  return s;
 }
 
 /** Choose between the singular and plural wordings the master spells out.
@@ -367,7 +426,7 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
     s = expandRepeat(
       s,
       "manager",
-      managerNames.map((n) => ({ "[MANAGER NAME]": n })),
+      signerRows("[MANAGER NAME]", managerNames.map((n) => ({ name: n, entity: managerSignerOf(inputs, n) }))),
       "manager signatures",
     );
   }
@@ -597,14 +656,11 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
     // member-managed company, every Manager otherwise. The line, its rule and
     // its ", Member" / ", Protected Series Manager" suffix are all the master's.
     const adopters = isMemberManaged
-      ? inputs.members.flatMap((m) => m.signatories ?? [m.name])
-      : managerNames;
-    ex = expandRepeat(
-      ex,
-      "adopter",
-      adopters.map((n) => ({ "[ADOPTER NAME]": n })),
-      "series exhibit adoption",
-    );
+      ? inputs.members.flatMap((m): SignerSpec[] =>
+          m.entitySigner ? [{ name: m.name, entity: m.entitySigner }] : (m.signatories ?? [m.name]).map((n) => ({ name: n, entity: null })),
+        )
+      : managerNames.map((n) => ({ name: n, entity: managerSignerOf(inputs, n) }));
+    ex = expandRepeat(ex, "adopter", signerRows("[ADOPTER NAME]", adopters), "series exhibit adoption");
     ex = ex
       .replace(
         "Adopted effective [DATE] by the Company, acting through its Manager:",
@@ -620,8 +676,17 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
 
   // ---- signatures ----
   if (isSingle) {
-    s = s.split("[MEMBER NAME]").join(inputs.members[0].name);
-    s = s.split("[ADDRESS]").join(inputs.members[0].address);
+    // A sole member that is a company or trust signs through a person
+    // (Adam, 13 Sep 2026): the master's entity block, or its person block.
+    const sole = inputs.members[0];
+    s = resolveIf(s, "memberperson", !sole.entitySigner);
+    s = resolveIf(s, "memberentity", !!sole.entitySigner);
+    if (sole.entitySigner) {
+      s = s.split("[PRINTED NAME]").join(sole.entitySigner.name);
+      s = s.split("[TITLE]").join(sole.entitySigner.title);
+    }
+    s = s.split("[MEMBER NAME]").join(sole.name);
+    s = s.split("[ADDRESS]").join(sole.address);
   } else {
     // One line per human who signs — both spouses for a marital unit — and the
     // line is the master's own. signatureBlock() used to build a heading here
@@ -635,14 +700,18 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
     s = expandRepeat(
       s,
       "signatory",
-      inputs.members.flatMap((m) => {
+      signerRows("[SIGNATORY NAME]", inputs.members.flatMap((m): SignerSpec[] => {
+        if (m.entitySigner) return [{ name: m.name, entity: m.entitySigner, extra: { "[UNIT]": "", "[HOLDING]": "" } }];
         const signers = m.signatories ?? [m.name];
         return signers.map((n, i) => ({
-          "[UNIT]": signers.length > 1 && i === 0 ? m.name : "",
-          "[HOLDING]": signers.length > 1 && i === 0 && m.jointHolding ? `as ${titleCaseHolding(m.jointHolding)}` : "",
-          "[SIGNATORY NAME]": n,
+          name: n,
+          entity: null,
+          extra: {
+            "[UNIT]": signers.length > 1 && i === 0 ? m.name : "",
+            "[HOLDING]": signers.length > 1 && i === 0 && m.jointHolding ? `as ${titleCaseHolding(m.jointHolding)}` : "",
+          },
         }));
-      }),
+      })),
       "member signatures",
     );
   }

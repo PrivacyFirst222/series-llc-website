@@ -387,11 +387,18 @@ IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of
 <!-- if:unit -->**[UNIT]**
 [HOLDING]
 
-<!-- /if -->_____________________________
+<!-- /if --><!-- if:person -->_____________________________
 [SIGNATORY NAME]
 Date: _____________________________
 
-<!-- /repeat -->
+<!-- /if --><!-- if:entity -->[SIGNATORY NAME]
+
+By: _____________________________
+[[indent]][PRINTED NAME]
+[[indent]][TITLE]
+Date: _____________________________
+
+<!-- /if --><!-- /repeat -->
 
 [[pagebreak]]
 
@@ -452,10 +459,16 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
 **Adopted effective [DATE] by the Company, acting through a Majority in Interest of its Members:**
 
 <!-- repeat:adopter -->
-_____________________________
+<!-- if:person -->_____________________________
 [ADOPTER NAME], Member
 
-<!-- /repeat -->
+<!-- /if --><!-- if:entity -->[ADOPTER NAME], Member
+
+By: _____________________________
+[[indent]][PRINTED NAME]
+[[indent]][TITLE]
+
+<!-- /if --><!-- /repeat -->
 
 [[pagebreak]]
 

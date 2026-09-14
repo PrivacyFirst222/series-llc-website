@@ -14,6 +14,10 @@ export interface MemberAnswer {
   contribution?: string;
   todBeneficiary?: string;
   todBackup?: string;
+  /** A company or trust as owner signs through a person (Adam, 13 Sep 2026). */
+  isEntity?: boolean;
+  signerName?: string;
+  signerTitle?: string;
 }
 export interface SeriesAnswer {
   purpose?: string;
@@ -51,6 +55,8 @@ export interface Answers {
   authorized?: boolean;
   contributionToCompany?: string;
   members?: MemberAnswer[];
+  /** Who signs for each Manager that is a company, in the seed's manager order. */
+  managerSigners?: { name?: string; title?: string }[];
   series?: SeriesAnswer[];
   couples?: CoupleAnswer[];
   ownershipMode?: OwnershipMode;

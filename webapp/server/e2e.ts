@@ -2353,6 +2353,26 @@ if (mint.status === 200) {
     smSAfter.body?.data?.generations?.[0]?.version === "single-s",
     smSAfter.body?.data?.generations?.[0],
   );
+  // A trust as sole owner signs through its trustee (Adam, 13 Sep 2026); the
+  // signer's name and title are required before the agreement generates.
+  const trustOwner = { name: "Vale Family Trust", address: "9 Harbor Road, Naples, FL 34102", isEntity: true, signerName: "Alex Vale", signerTitle: "Trustee" };
+  const noSigner = await api("/api/portal/oa/generate", { method: "POST", cookies: smPw.cookie, body: JSON.stringify({ ...smAnswers, members: [{ ...trustOwner, signerName: "" }] }) });
+  check("entity: an owner marked as a company or trust with no signer is refused, naming the owner", noSigner.status === 400 && /Name the person who signs for Vale Family Trust/.test(noSigner.body?.error?.message ?? ""), noSigner.body);
+  const entityGen = await api("/api/portal/oa/generate", { method: "POST", cookies: smPw.cookie, body: JSON.stringify({ ...smAnswers, members: [trustOwner] }) });
+  check("entity: with the trustee named, the agreement generates", entityGen.status === 200, entityGen.body);
+  if (entityGen.body?.data?.generationId) {
+    const r = await api(`/api/dev/oa-generation-inputs/${entityGen.body.data.generationId}`);
+    const md = r.status === 200 ? assembleOa(r.body?.data?.inputs as OaInputs).markdown : "";
+    check("entity: the sole member's block is the trust's name, By: over the rule, and the trustee's name and title beneath", md.includes("**MEMBER:**\n\nVale Family Trust\n\nBy: _____________________________\n[[indent]]Alex Vale\n[[indent]]Trustee\nDate: _____________________________"), md.match(/\*\*MEMBER:\*\*[\s\S]{0,200}/)?.[0]);
+    check("entity: the Manager, a person, still signs on a plain line", md.includes("_____________________________\nRobin Vale, Manager\nDate: _____________________________"));
+    check("entity: Exhibit A names the trust as the member", /Vale Family Trust/.test(md.slice(md.indexOf("EXHIBIT A"))));
+    const entityPdf = await fetch(`${BASE}/api/portal/documents/${entityGen.body.data.documentId}/download`, { headers: { Cookie: smPw.cookie } });
+    const entityText = pdfText(new Uint8Array(await entityPdf.arrayBuffer()));
+    if (entityText !== null) {
+      const flat = entityText.replace(/\s+/g, " ");
+      check("read off the PDF: the trust's block reads name, By:, trustee, title, Date", /MEMBER: Vale Family Trust By: Alex Vale Trustee Date:/.test(flat), flat.match(/MEMBER: [^A]{0,80}Date:/)?.[0]);
+    }
+  }
   // On a manager-managed form the amendment carries the Manager's
   // acknowledgment — s. 12.1(b) bars new obligations on the Manager without
   // the Manager's written consent — beneath the Member's signature.
@@ -2361,7 +2381,9 @@ if (mint.status === 200) {
   const smAmText = pdfText(new Uint8Array(await (await fetch(`${BASE}/api/portal/documents/${smAmend.body?.data?.documentId}/download`, { headers: { Cookie: smPw.cookie } })).arrayBuffer()));
   if (smAmText !== null) {
     const flat = smAmText.replace(/\s+/g, " ");
-    check("read off the PDF: the Member signs and the Manager acknowledges", /MEMBER: Alex Vale Date:/.test(flat) && /ACKNOWLEDGED AND AGREED BY MANAGER: Robin Vale, Manager Date:/.test(flat), flat.slice(-500));
+    // The current agreement's sole member is the trust, so the amendment's
+    // block is the entity block (13 Sep 2026).
+    check("read off the PDF: the Member — a trust — signs through its trustee and the Manager acknowledges", /MEMBER: Vale Family Trust By: Alex Vale Trustee Date:/.test(flat) && /ACKNOWLEDGED AND AGREED BY MANAGER: Robin Vale, Manager Date:/.test(flat), flat.slice(-500));
     check("read off the PDF: the preamble says the Manager acknowledges it", /by the undersigned sole member \(the "Member"\), and is acknowledged by the undersigned Manager\./.test(flat), flat.match(/by the undersigned sole member[^.]*\./)?.[0]);
     check("read off the PDF: s. 12.1 is the section cited on the single form", /Section 12\.1 of the Agreement/.test(flat));
   }

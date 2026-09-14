@@ -212,11 +212,18 @@ def check(paths):
             continue
         r, br = ratios(m), b["ratios"]
         problems = []
-        for key in ("justified_pct", "keep_lines_pct", "headings_pct"):
+        for key in ("justified_pct", "keep_lines_pct"):
             if br[key] > 0 and r[key] < br[key] * TOLERANCE:
                 problems.append(
                     f"{key}: {r[key]:.0%} of paragraphs, baseline {br[key]:.0%}"
                 )
+        # Headings are compared as a COUNT, not a share of paragraphs: the
+        # defect this catches (34 chapter headings turned to body text) is a
+        # collapse in the count, while a master that grows — the entity
+        # signature blocks of 13 Sep 2026 added a dozen paragraphs to the
+        # single-member forms — dilutes the share without losing a heading.
+        if b.get("headings", 0) and m["headings"] < b["headings"] * TOLERANCE:
+            problems.append(f"headings: {m['headings']}, baseline {b['headings']}")
         if b["primary_font"] and m["primary_font"] != b["primary_font"]:
             problems.append(f"font: {m['primary_font']}, baseline {b['primary_font']}")
         if b.get("body_size") and m["body_size"] != b["body_size"]:

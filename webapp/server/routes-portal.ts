@@ -48,7 +48,7 @@ export interface SeedPayload {
     structure?: string;
     managersOrAuthorizedRepresentatives?: { role?: string; firstName?: string; lastName?: string; suffix?: string; fullName?: string; businessEntityName?: string; streetAddress1?: string; streetAddress2?: string; city?: string; state?: string; zip?: string }[];
   };
-  members?: { memberList?: { firstName?: string; lastName?: string; suffix?: string; fullLegalName?: string; address1?: string; address2?: string; city?: string; state?: string; zip?: string }[] };
+  members?: { memberList?: { memberType?: string; entityName?: string; firstName?: string; lastName?: string; suffix?: string; fullLegalName?: string; address1?: string; address2?: string; city?: string; state?: string; zip?: string }[] };
   series?: { id: string; name: string }[];
 }
 
@@ -60,11 +60,13 @@ export async function oaSeed(clientId: string, orderId?: string | null): Promise
   formationType: string;
   managementStructure: string;
   managerNames: string[];
+  /** Per manager: a company rather than a person (Adam, 13 Sep 2026). */
+  managerEntities?: boolean[];
   /** People the order already names, offered as owners one tap each
    *  (Adam, 10 Sep 2026): the client who placed it and every Manager. */
   suggestedOwners: { name: string; address: string }[];
   principalAddress: string;
-  members: { name: string; address: string }[];
+  members: { name: string; address: string; isEntity?: boolean }[];
   series: { name: string; purpose: string }[];
 } | null> {
   const db = await getDb();
@@ -89,10 +91,12 @@ export async function oaSeed(clientId: string, orderId?: string | null): Promise
     .join(", ");
   const joinAddr = (a: { address1?: string; address2?: string; city?: string; state?: string; zip?: string } | undefined) =>
     [a?.address1, a?.address2, [a?.city, a?.state].filter(Boolean).join(", "), a?.zip].filter((x) => x && String(x).trim()).join(", ");
-  let members = (p.members?.memberList ?? []).map((m) => ({
+  let members: { name: string; address: string; isEntity?: boolean }[] = (p.members?.memberList ?? []).map((m) => ({
     name:
-      personLegalName(m.firstName, m.lastName, m.suffix) || (m.fullLegalName ?? ""),
+      personLegalName(m.firstName, m.lastName, m.suffix) || (m.fullLegalName ?? "") || (m.entityName ?? "").trim(),
     address: joinAddr(m),
+    // A company or trust as owner signs through a person (Adam, 13 Sep 2026).
+    isEntity: !!(m.entityName ?? "").trim() && !personLegalName(m.firstName, m.lastName, m.suffix),
   }));
   // The order names people the questionnaire can offer as owners with one
   // tap: the client who placed it and every Manager. A manager-managed
@@ -118,17 +122,16 @@ export async function oaSeed(clientId: string, orderId?: string | null): Promise
   // Articles and manage nothing, so a listed AR must never be named Manager —
   // and the list is not ordered, so taking the first entry named whoever the
   // client happened to type first.
-  const managerNames = (p.management?.managersOrAuthorizedRepresentatives ?? [])
+  const managerEntries = (p.management?.managersOrAuthorizedRepresentatives ?? [])
     .filter((e) => (e.role ?? "MGR") === "MGR")
-    .map((e) =>
-      (
-        personLegalName(e.firstName, e.lastName, e.suffix) ||
-        e.fullName ||
-        e.businessEntityName ||
-        ""
-      ).trim(),
-    )
-    .filter(Boolean);
+    .map((e) => ({
+      name: (personLegalName(e.firstName, e.lastName, e.suffix) || e.fullName || e.businessEntityName || "").trim(),
+      // A Manager that is a company signs through a person (Adam, 13 Sep 2026).
+      isEntity: !personLegalName(e.firstName, e.lastName, e.suffix) && !(e.fullName ?? "").trim() && !!(e.businessEntityName ?? "").trim(),
+    }))
+    .filter((m) => m.name);
+  const managerNames = managerEntries.map((m) => m.name);
+  const managerEntities = managerEntries.map((m) => m.isEntity);
   // No fallback. Naming the first member as Manager because the list was
   // empty appoints someone to an office the client never put them in — the
   // same fault as the comment above warns about for authorized
@@ -159,6 +162,7 @@ export async function oaSeed(clientId: string, orderId?: string | null): Promise
     formationType: p.formationType ?? "",
     managementStructure,
     managerNames,
+    managerEntities,
     suggestedOwners,
     principalAddress,
     members,
@@ -190,10 +194,17 @@ export const oaAnswersSchema = z.object({
         todBeneficiary: z.string().max(300).optional().refine((v) => !(v ?? "").trim() || hasFirstAndLast(v), `Beneficiary: ${FIRST_AND_LAST}`),
         // A backup may be a class ("my children in equal shares"), so no name rule.
         todBackup: z.string().max(300).optional(),
+        // A company or trust as owner: who signs for it and their title
+        // (Adam, 13 Sep 2026).
+        isEntity: z.boolean().optional(),
+        signerName: z.string().max(200).optional(),
+        signerTitle: z.string().max(120).optional(),
       }),
     )
     .max(20)
     .optional(),
+  // Who signs for each Manager that is a company, in managerNames order.
+  managerSigners: z.array(z.object({ name: z.string().max(200).optional(), title: z.string().max(120).optional() })).max(20).optional(),
   series: z
     .array(
       z.object({
@@ -299,7 +310,7 @@ export function effectiveOwners(
     : seedMembers.map((m) => ({ name: m.name, address: m.address }));
 }
 
-export async function savedOaAnswers(clientId: string, orderId?: string | null): Promise<{ members?: { name?: string; address?: string }[] } | null> {
+export async function savedOaAnswers(clientId: string, orderId?: string | null): Promise<{ members?: { name?: string; address?: string; isEntity?: boolean; signerName?: string; signerTitle?: string }[]; managerSigners?: { name?: string; title?: string }[] } | null> {
   const db = await getDb();
   const rows = orderId
     ? await db.query<{ answers: unknown }>("SELECT answers FROM oa_profiles WHERE client_id = $1 AND order_id = $2", [clientId, orderId])
@@ -1238,6 +1249,7 @@ app.post("/portal/oa/generate", async (c) => {
     `${owners[cpl.a].name} and ${owners[cpl.b].name}`;
 
   const members: OaInputs["members"] = [];
+  let entityGap = "";
   const emittedCouples = new Set<(typeof couples)[number]>();
   owners.forEach((m, i) => {
     const cpl = coupleAt(i);
@@ -1262,17 +1274,42 @@ app.post("/portal/oa/generate", async (c) => {
       const mShare: OwnershipShare = multiOwner
         ? { percentage: a.members?.[i]?.percentage, numerator: a.members?.[i]?.numerator, denominator: a.members?.[i]?.denominator }
         : { percentage: 100 };
+      // A company or trust signs through a person (Adam, 13 Sep 2026).
+      const ans = a.members?.[i];
+      const isEntity = ans?.isEntity ?? seed.members[i]?.isEntity ?? false;
+      let entitySigner: { name: string; title: string } | undefined;
+      if (isEntity) {
+        const sn = (ans?.signerName ?? "").trim();
+        const st = (ans?.signerTitle ?? "").trim();
+        if (!hasFirstAndLast(sn) || !st) {
+          entityGap = `Name the person who signs for ${m.name || `owner ${i + 1}`} — first and last name — and their title.`;
+        }
+        entitySigner = { name: sn, title: st };
+      }
       members.push({
         name: m.name,
         address: m.address,
         percentage: shareValue(multiOwner ? ownershipMode : "percent", mShare),
         percentageLabel: shareLabel(multiOwner ? ownershipMode : "percent", mShare),
-        contribution: a.members?.[i]?.contribution ?? "",
-        todBeneficiary: a.members?.[i]?.todBeneficiary ?? "",
-        todBackup: a.members?.[i]?.todBackup ?? "",
+        contribution: ans?.contribution ?? "",
+        todBeneficiary: ans?.todBeneficiary ?? "",
+        todBackup: ans?.todBackup ?? "",
+        ...(entitySigner ? { entitySigner } : {}),
       });
     }
   });
+  if (entityGap) return c.json(err(entityGap, "INVALID_INPUT"), 400);
+  // A Manager that is a company signs through a person (Adam, 13 Sep 2026).
+  const managerEntitySigners: NonNullable<OaInputs["managerEntitySigners"]> = [];
+  for (let i = 0; i < seed.managerNames.length; i += 1) {
+    if (!seed.managerEntities?.[i]) continue;
+    const sn = (a.managerSigners?.[i]?.name ?? "").trim();
+    const st = (a.managerSigners?.[i]?.title ?? "").trim();
+    if (!hasFirstAndLast(sn) || !st) {
+      return c.json(err(`Name the person who signs for ${seed.managerNames[i]} — first and last name — and their title.`, "INVALID_INPUT"), 400);
+    }
+    managerEntitySigners.push({ manager: seed.managerNames[i], name: sn, title: st });
+  }
   const isSCorp =
     version === "s" || version === "member-s" ||
     version === "single-s" || version === "member-single-s";
@@ -1356,6 +1393,7 @@ app.post("/portal/oa/generate", async (c) => {
     companyName: seed.llcName,
     principalAddress: seed.principalAddress,
     managerNames: seed.managerNames,
+    managerEntitySigners,
     effectiveDate: fmtDate(a.effectiveDate),
     amendedRestated: a.firstOrAmended === "amended",
     priorAgreementDate: priorDate,
@@ -1473,7 +1511,21 @@ app.post("/portal/series/consent", async (c) => {
   const memberManaged = seed.managementStructure === "MEMBER_MANAGED";
   // Same owners the operating agreement uses — a client who added or removed an
   // owner must not get a series document that names the intake list.
-  const seriesOwners = effectiveOwners(seed.members, await savedOaAnswers(session.clientId));
+  const savedForSeries = await savedOaAnswers(session.clientId);
+  const seriesOwners = effectiveOwners(seed.members, savedForSeries);
+  // Entity owners and Managers sign through the people the questionnaire
+  // named (Adam, 13 Sep 2026).
+  const entitySigners: { entity: string; name: string; title: string }[] = [];
+  (savedForSeries?.members ?? []).forEach((m, i) => {
+    const owner = seriesOwners[i];
+    if (owner && (m.isEntity ?? seed.members[i]?.isEntity) && (m.signerName ?? "").trim()) {
+      entitySigners.push({ entity: owner.name, name: (m.signerName ?? "").trim(), title: (m.signerTitle ?? "").trim() });
+    }
+  });
+  seed.managerNames.forEach((n, i) => {
+    const sg = savedForSeries?.managerSigners?.[i];
+    if (seed.managerEntities?.[i] && (sg?.name ?? "").trim()) entitySigners.push({ entity: n, name: (sg?.name ?? "").trim(), title: (sg?.title ?? "").trim() });
+  });
   const generatedOn = new Date();
   let pdf: Uint8Array;
   let title: string;
@@ -1487,6 +1539,7 @@ app.post("/portal/series/consent", async (c) => {
       memberNames: seriesOwners.map((m) => m.name),
       managerNames: seed.managerNames,
       memberManaged,
+      entitySigners,
     });
     title = assembled.title;
     const dbc = await getDb();

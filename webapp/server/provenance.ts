@@ -63,6 +63,10 @@ const S = {
   asset1: "ZQASSETONEQZ",
   asset2: "ZQASSETTWOQZ",
   amDate: "ZQAMDATEQZ",
+  signer1: "ZQSIGNERONEQZ",
+  signer2: "ZQSIGNERTWOQZ",
+  title1: "ZQTITLEONEQZ",
+  title2: "ZQTITLETWOQZ",
   amText: "ZQAMTEXTQZ",
 };
 /** Distinctive, so no other figure in the document can be mistaken for it. */
@@ -76,15 +80,19 @@ function inputsFor(v: OaInputs["version"]): OaInputs {
     companyName: S.company,
     principalAddress: S.principal,
     managerNames: memberManaged ? [] : [S.mgr1, S.mgr2],
+    // The second Manager is a company that signs through a person.
+    managerEntitySigners: memberManaged ? [] : [{ manager: S.mgr2, name: S.signer2, title: S.title2 }],
     effectiveDate: S.date,
     amendedRestated: false,
     priorAgreementDate: null,
     // Contributions are money now, computed from the asset list; the money
     // regex in unwind() reduces every figure to one token.
+    // The sole member is a trust that signs through a person; in the
+    // multi-member forms the first member is one and the second a couple.
     members: single
-      ? [{ name: S.m1, address: S.addr1, percentage: 100, contribution: "$1,500", todBeneficiary: S.tod1, todBackup: S.todb1 }]
+      ? [{ name: S.m1, address: S.addr1, percentage: 100, contribution: "$1,500", todBeneficiary: S.tod1, todBackup: S.todb1, entitySigner: { name: S.signer1, title: S.title1 } }]
       : [
-          { name: S.m1, address: S.addr1, percentage: 60, contribution: "$900", todBeneficiary: S.tod1, todBackup: S.todb1 },
+          { name: S.m1, address: S.addr1, percentage: 60, contribution: "$900", todBeneficiary: S.tod1, todBackup: S.todb1, entitySigner: { name: S.signer1, title: S.title1 } },
           // A marital unit: both spouses sign, under a heading of both names
           // and the tenancy (Adam, 9 Sep 2026).
           { name: S.m2, address: S.addr2, percentage: 40, contribution: "$600", todBeneficiary: S.tod2, todBackup: S.todb2, signatories: [S.m2, S.mgr2], jointHolding: "tenants by the entirety" },
@@ -166,6 +174,8 @@ function unwind(s: string): string {
     .split(S.m1).join("[NAME]").split(S.m2).join("[NAME]")
     .split(S.addr1).join("[ADDRESS]").split(S.addr2).join("[ADDRESS]")
     .split(S.contrib1).join("[AMOUNT]").split(S.contrib2).join("[AMOUNT]")
+    .split(S.signer1).join("[NAME]").split(S.signer2).join("[NAME]")
+    .split(S.title1).join("[TITLE]").split(S.title2).join("[TITLE]")
     .split(S.tod1).join("[TOD]").split(S.tod2).join("[TOD]")
     .split(S.todb1).join("[TOD]").split(S.todb2).join("[TOD]")
     .split(OA_TEMPLATE_VERSION).join("[EDITION]")
@@ -210,7 +220,7 @@ function masterKey(s: string): string {
       // Exhibits are renumbered per series — a transform, not composition.
       .replace(/SERIES EXHIBIT (?:PS-)?(?:\[N\]|\d+)( \([^)]*\))?/g, "SERIES EXHIBIT [N]")
       .replace(/\[MEMBER \d+(?: NAME)?(?:, if any)?\]/g, "[NAME]")
-      .replace(/\[MEMBER NAME\]|\[SIGNATORY NAME\]|\[ADOPTER NAME\]|\[MANAGER NAME\]|\[MANAGER NAMES\]|\[UNIT\]|\[NAME\]/g, "[NAME]")
+      .replace(/\[MEMBER NAME\]|\[SIGNATORY NAME\]|\[ADOPTER NAME\]|\[MANAGER NAME\]|\[MANAGER NAMES\]|\[UNIT\]|\[PRINTED NAME\]|\[NAME\]/g, "[NAME]")
       .replace(/\[MEMBER ADDRESS\]|\[ADDRESS\]/g, "[ADDRESS]")
       .replace(/\[MEMBER CONTRIBUTION\]|\$\[AMOUNT\] \[and\/or described property\]|\$\[AMOUNT\]|\[ASSET VALUE\]|\[SERIES TOTAL\]|\[RETAINED\]/g, "[MONEY]")
       .replace(/\[CONTRIBUTION\]|\[RETAINED ASSETS\]/g, "[SERCONTRIB]")

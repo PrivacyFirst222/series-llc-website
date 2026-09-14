@@ -347,26 +347,42 @@ export async function renderMarkdownPdf(opts: {
       // before the signature line instead, so signers are set apart.
       const plainText = block.segs.map((s) => s.text).join("").trim();
       const isSignatureLine = /^_{5,}$/.test(plainText);
+      // An entity's block (Adam, 13 Sep 2026): "By:" over a rule, and the
+      // printed name and title beneath, flush with the rule's left end. The
+      // master marks those two lines [[indent]].
+      const isByLine = /^By:\s*_{3,}$/.test(plainText);
+      const isIndented = plainText.startsWith("[[indent]]");
       const nextBlock = blocks[bi + 1];
-      const nextIsDate = nextBlock?.kind === "para" && /^Date:/.test(nextBlock.segs.map((s) => s.text).join("").trim());
-      if (isSignatureLine) y -= 10;
+      const nextPlain = nextBlock?.kind === "para" ? nextBlock.segs.map((s) => s.text).join("").trim() : "";
+      const nextIsDate = /^Date:/.test(nextPlain);
+      const nextIsIndented = nextPlain.startsWith("[[indent]]");
+      if (isSignatureLine || isByLine) y -= 10;
       // Signature and date rules are drawn, not typed (Adam, 10 Sep 2026:
       // underscores of different lengths "look sloppy"). Every signature rule
       // runs from the margin to SIG_W; every "Date:" rule ends at that same
       // edge, so the right edges line up down the page.
       const isDateLine = /^Date:\s*_{3,}$/.test(plainText);
-      if (isSignatureLine || isDateLine) {
+      if (isSignatureLine || isDateLine || isByLine) {
         need(lineH);
         const right = MARGIN + SIG_W;
         let from = MARGIN;
-        if (isDateLine) {
-          const label: Seg = { text: "Date: ", bold: false, italic: false };
+        if (isDateLine || isByLine) {
+          const label: Seg = { text: isDateLine ? "Date: " : "By: ", bold: false, italic: false };
           drawSegLine(page, [label], MARGIN, y - size, size);
           from = MARGIN + segWidth(label, size);
         }
         page.drawLine({ start: { x: from, y: y - size }, end: { x: right, y: y - size }, thickness: 0.8, color: rgb(0, 0, 0) });
         y -= lineH;
-        y -= isSignatureLine || nextIsDate ? 0 : 6;
+        y -= isSignatureLine || isByLine || nextIsDate || nextIsIndented ? 0 : 6;
+        continue;
+      }
+      if (isIndented) {
+        need(lineH);
+        const byLabel: Seg = { text: "By: ", bold: false, italic: false };
+        const segs = block.segs.map((s, i) => (i === 0 ? { ...s, text: s.text.replace(/^\s*\[\[indent\]\]/, "") } : s));
+        drawSegLine(page, segs, MARGIN + segWidth(byLabel, size), y - size, size);
+        y -= lineH;
+        y -= nextIsDate || nextIsIndented ? 0 : 6;
         continue;
       }
       // The title block is the short centered lines at the top — the title,

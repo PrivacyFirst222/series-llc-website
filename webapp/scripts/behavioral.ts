@@ -197,7 +197,10 @@ async function checkAllBoxes(page: Page, excludeIds: string[] = []): Promise<voi
   const n = await boxes.count();
   for (let i = 0; i < n; i++) {
     const box = boxes.nth(i);
-    if ((await box.isVisible().catch(() => false)) && !excludeIds.includes((await box.getAttribute("id")) ?? "")) {
+    const id = (await box.getAttribute("id")) ?? "";
+    // "This owner is a company or trust" is a fact, not a consent: never
+    // ticked wholesale (13 Sep 2026).
+    if ((await box.isVisible().catch(() => false)) && !excludeIds.includes(id) && !id.startsWith("owner-entity-")) {
       if (!(await box.isChecked())) {
         // The name step re-renders as its availability check answers, which
         // can destabilize a mid-click element — fall back to a DOM click.
@@ -1762,6 +1765,78 @@ async function main(): Promise<void> {
   // appointed us to sign. The office types the document number beside the
   // Articles upload; the Statement appears at once and sits under the
   // Articles in the client's portal.
+  // A company as Manager and a trust as owner sign through people (Adam,
+  // 13 Sep 2026): run H's manager is Gate Managers of Florida, Inc.
+  if (orderIds.has("H")) {
+    console.log("\n▶ Entity signers journey (run H: company as Manager, trust as owner)");
+    const page = await browser.newPage();
+    try {
+      const hOrderId = orderIds.get("H")!;
+      const email = "gate@e2e.test";
+      const mint = await fetch(`${API}/api/dev/mint-reset-token`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) }).then((r) => r.json()) as { data?: { token?: string } };
+      if (!mint.data?.token) throw new Error("no reset token for run H's client");
+      await fetch(`${API}/api/auth/set-password`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: mint.data.token, password: "gate-pass-12345" }) });
+      let hGen: { generationId?: string } | null = null;
+      await page.route("**/api/**", async (route) => {
+        const url = new URL(route.request().url());
+        const resp = await fetch(`${API}${url.pathname}${url.search}`, {
+          method: route.request().method(),
+          headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "" },
+          body: route.request().postDataBuffer() ?? undefined,
+        });
+        const body = await resp.text();
+        const setCookie = resp.headers.get("set-cookie");
+        if (url.pathname === "/api/portal/oa/generate" && resp.status === 200) hGen = (JSON.parse(body) as { data?: { generationId?: string } }).data ?? null;
+        await route.fulfill({ status: resp.status, contentType: resp.headers.get("content-type") ?? "application/json", body, headers: setCookie ? { "set-cookie": setCookie } : undefined });
+      });
+      await page.goto(`http://localhost:${WEB_PORT}/portal/login`);
+      await page.getByLabel("Email").fill(email);
+      await page.getByLabel("Password").fill("gate-pass-12345");
+      await page.locator("main button").filter({ hasText: /^Sign in/ }).first().click();
+      await page.waitForURL(/\/portal(?!\/login)/, { timeout: 10000 });
+      await page.goto(`http://localhost:${WEB_PORT}/portal/agreement?company=${hOrderId}`);
+      await page.waitForSelector("main h2, main h1");
+      await page.waitForTimeout(800);
+      await clickCard(page, /^One owner/i);
+      await page.locator("main button").filter({ hasText: /^Continue/ }).first().click();
+      await page.waitForTimeout(1200);
+      const signerBox = page.locator('main input[aria-label="Who signs for Gate Managers of Florida, Inc."]');
+      expect((await signerBox.count()) === 1 && /Who signs for Gate Managers of Florida, Inc\.\?/.test(await page.locator("main").innerText()), "entity: the questionnaire asks who signs for the company that is Manager");
+      const genBtn = page.locator("main button").filter({ hasText: /^Generate|^Regenerate/ }).first();
+      await checkAllBoxes(page);
+      expect(await genBtn.isDisabled() && (await page.locator('[data-testid="signer-incomplete"]').count()) === 1, "entity: Generate waits, and says why, until the signer is named");
+      await signerBox.fill("Tony Bologna, III");
+      await page.locator('main input[aria-label="Title of the signer for Gate Managers of Florida, Inc."]').fill("President");
+      // The sole owner is a trust that signs through its trustee.
+      await page.locator("#owner-entity-1").check({ force: true });
+      await page.getByLabel("Full legal name of owner 1").fill("Gatecheck Family Trust");
+      await page.locator('main input[aria-label="Who signs for owner 1"]').fill("Casey Gatecheck");
+      await page.locator('main input[aria-label="Title of the signer for owner 1"]').fill("Trustee");
+      await page.waitForTimeout(600);
+      expect(!(await genBtn.isDisabled()), "entity: Generate enables once both signers are named", await page.locator("main").innerText().then((x) => x.slice(-400)));
+      await genBtn.click({ timeout: 15000 });
+      for (let i = 0; i < 40 && !hGen; i++) await page.waitForTimeout(500);
+      expect(!!hGen, "entity: the agreement generates");
+      if (hGen) {
+        const cap = hGen as { generationId?: string };
+        const { assembleOa } = await import("../server/oa");
+        const inp = await fetch(`${API}/api/dev/oa-generation-inputs/${cap.generationId}`).then((r) => r.json()) as { data?: { inputs?: Parameters<typeof assembleOa>[0] } };
+        const md = assembleOa(inp.data!.inputs!).markdown;
+        expect(md.includes("Gate Managers of Florida, Inc., Manager\n\nBy: _____________________________\n[[indent]]Tony Bologna, III\n[[indent]]President\nDate: _____________________________"), "entity: the Manager's block is the company, By: over the rule, and the signer's name and title beneath", md.match(/Gate Managers of Florida, Inc\., Manager[\s\S]{0,160}/)?.[0]);
+        expect(md.includes("**MEMBER:**\n\nGatecheck Family Trust\n\nBy: _____________________________\n[[indent]]Casey Gatecheck\n[[indent]]Trustee\nDate: _____________________________"), "entity: the trust's block is its name, By: over the rule, and the trustee's name and title beneath", md.match(/\*\*MEMBER:\*\*[\s\S]{0,200}/)?.[0]);
+        expect(md.includes("Gate Managers of Florida, Inc., Protected Series Manager\n\nBy: _____________________________\n[[indent]]Tony Bologna, III\n[[indent]]President"), "entity: the Series Exhibit adoption uses the same block", md.match(/Protected Series Manager[\s\S]{0,160}/)?.[0]);
+        expect(!/\[PRINTED NAME\]|\[TITLE\]|<!--/.test(md), "entity: no slot or marker left behind", md.match(/\[PRINTED NAME\]|\[TITLE\]|<!--[^>]*-->/g));
+      }
+      await page.waitForURL(/\/portal(\?|$)/, { timeout: 10000 }).catch(() => {});
+      await shot(page, "portal-after-entity-generate");
+      console.log("  ✓ entity signers: asked, required, and printed as dictated");
+    } catch (e) {
+      expect(false, `entity signers journey: ${String(e).slice(0, 300)}`);
+    } finally {
+      await page.close();
+    }
+  }
+
   if (orderIds.has("H")) {
     console.log("\n▶ Statement of Authorized Representative (run H, we sign)");
     const page = await browser.newPage();

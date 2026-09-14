@@ -21,9 +21,11 @@ interface OaSeed {
   filingPath: string;
   managementStructure: string;
   managerNames: string[];
+  /** Per manager: a company rather than a person (Adam, 13 Sep 2026). */
+  managerEntities?: boolean[];
   suggestedOwners?: { name: string; address: string }[];
   principalAddress: string;
-  members: { name: string; address: string }[];
+  members: { name: string; address: string; isEntity?: boolean }[];
   series: { name: string; purpose: string }[];
 }
 
@@ -120,7 +122,9 @@ export default function OAQuestionnaire() {
               ...(saved.members?.[i] ?? {}),
               name: m.name,
               address: m.address,
+              ...(m.isEntity ? { isEntity: true } : {}),
             })),
+        managerSigners: saved.managerSigners ?? [],
         series: data.seed.series.map((_, i) => saved.series?.[i] ?? {}),
         couples: saved.couples ?? [],
         ownershipMode: saved.ownershipMode ?? "percent",
@@ -316,6 +320,12 @@ export default function OAQuestionnaire() {
         ? "You answered that the LLC has more than one owner. Add the other owners here."
         : "You answered that the LLC has one owner, but more than one is listed. Remove the others here.";
   const incompleteOwner = owners.some((o) => !hasFirstAndLast(o.name) || !(o.address ?? "").trim());
+  // Every company or trust — owner or Manager — needs the person who signs
+  // for it, first and last name, and their title (Adam, 13 Sep 2026).
+  const entityManagers = (data?.seed.managerNames ?? []).map((name, i) => ({ name, i })).filter(({ i }) => data?.seed.managerEntities?.[i]);
+  const incompleteSigner =
+    owners.some((o) => o.isEntity && (!hasFirstAndLast(o.signerName) || !(o.signerTitle ?? "").trim())) ||
+    entityManagers.some(({ i }) => !hasFirstAndLast(a.managerSigners?.[i]?.name) || !(a.managerSigners?.[i]?.title ?? "").trim());
 
   // Answering "more than one owner" with one name on file would otherwise dead-end
   // — there would be nowhere to type the second owner.
@@ -494,6 +504,43 @@ export default function OAQuestionnaire() {
             </button>
 
             <OwnersCard owners={owners} isMulti={isMulti} ownerCountMismatch={ownerCountMismatch} patchMember={patchMember} removeOwner={removeOwner} addOwner={addOwner} suggestions={suggestions} addOwnerWith={addOwnerWith} />
+
+            {entityManagers.length > 0 ? (
+              <QuestionCard title={entityManagers.length === 1 ? `Who signs for ${entityManagers[0].name}?` : "Who signs for each company that is a Manager?"}>
+                <p className="text-xs text-muted-foreground">
+                  A company that serves as Manager signs through a person. The agreement prints the
+                  company's name, then "By:" over the signature line, with this person's name and
+                  title beneath it.
+                </p>
+                {entityManagers.map(({ name, i }) => (
+                  <div key={i} className="space-y-2 rounded-lg border border-border bg-secondary/30 p-3">
+                    <span className="text-xs font-medium text-muted-foreground">{name}</span>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      <Input
+                        aria-label={`Who signs for ${name}`}
+                        placeholder="Who signs for it — first and last name"
+                        value={a.managerSigners?.[i]?.name ?? ""}
+                        onChange={(e) => {
+                          const next = [...(a.managerSigners ?? [])];
+                          next[i] = { ...(next[i] ?? {}), name: e.target.value };
+                          patch({ managerSigners: next });
+                        }}
+                      />
+                      <Input
+                        aria-label={`Title of the signer for ${name}`}
+                        placeholder="Their title, e.g. Manager or President"
+                        value={a.managerSigners?.[i]?.title ?? ""}
+                        onChange={(e) => {
+                          const next = [...(a.managerSigners ?? [])];
+                          next[i] = { ...(next[i] ?? {}), title: e.target.value };
+                          patch({ managerSigners: next });
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </QuestionCard>
+            ) : null}
 
             {isMulti ? (
               <>
@@ -701,6 +748,11 @@ export default function OAQuestionnaire() {
               {ownerCountMismatch ? (
                 <p className="mt-3 text-sm text-destructive">{ownerCountMismatch}</p>
               ) : null}
+              {incompleteSigner ? (
+                <p className="mt-3 rounded-lg border border-amber-300/60 bg-amber-50 p-3 text-sm text-amber-900" data-testid="signer-incomplete">
+                  Name the person who signs for each company or trust — first and last name — and their title.
+                </p>
+              ) : null}
               {incompleteOwner ? (
                 <p className="mt-3 text-sm text-destructive">
                   Every owner needs a first and last name and an address — both are printed in Exhibit A
@@ -723,7 +775,7 @@ export default function OAQuestionnaire() {
               <Button
                 className="mt-4 w-full rounded-full"
                 size="lg"
-                disabled={generate.isPending || a.authorized !== true || ownerCountMismatch !== "" || incompleteOwner || atCap || assetProblemCount > 0}
+                disabled={generate.isPending || a.authorized !== true || ownerCountMismatch !== "" || incompleteOwner || incompleteSigner || atCap || assetProblemCount > 0}
                 onClick={() => generate.mutate(a)}
               >
                 <FileText className="mr-2 h-4 w-4" />

@@ -15,7 +15,7 @@
  */
 import { readFileSync } from "node:fs";
 import amendmentTemplateRaw from "./templates-oa-amendment.md";
-import { chooseNumber, expandRepeat, resolveIf, titleCaseHolding, OA_TEMPLATE_VERSION, type OaInputs } from "./oa";
+import { chooseNumber, expandRepeat, managerSignerOf, resolveIf, signerRows, titleCaseHolding, OA_TEMPLATE_VERSION, type OaInputs, type SignerSpec } from "./oa";
 
 function loadTemplate(v: string): string {
   return v.includes("AMENDMENT NO.") ? v : readFileSync(v, "utf8");
@@ -108,21 +108,25 @@ export function assembleAmendment(oa: OaInputs, am: AmendmentInputs): { markdown
   s = expandRepeat(
     s,
     "signatory",
-    oa.members.flatMap((m) => {
+    signerRows("[SIGNATORY NAME]", oa.members.flatMap((m): SignerSpec[] => {
+      if (m.entitySigner) return [{ name: m.name, entity: m.entitySigner, extra: { "[UNIT]": "", "[HOLDING]": "" } }];
       const signers = m.signatories ?? [m.name];
       return signers.map((n, i) => ({
-        "[UNIT]": signers.length > 1 && i === 0 ? m.name : "",
-        "[HOLDING]": signers.length > 1 && i === 0 && m.jointHolding ? `as ${titleCaseHolding(m.jointHolding)}` : "",
-        "[SIGNATORY NAME]": n,
+        name: n,
+        entity: null,
+        extra: {
+          "[UNIT]": signers.length > 1 && i === 0 ? m.name : "",
+          "[HOLDING]": signers.length > 1 && i === 0 && m.jointHolding ? `as ${titleCaseHolding(m.jointHolding)}` : "",
+        },
       }));
-    }),
+    })),
     "amendment member signatures",
   );
   if (!isMemberManaged) {
     const managerNames = (oa.managerNames ?? []).map((n) => n.trim()).filter(Boolean);
     if (managerNames.length === 0) throw new Error("Amendment: at least one manager is required");
     s = chooseNumber(s, "manager", managerNames.length === 1);
-    s = expandRepeat(s, "manager", managerNames.map((n) => ({ "[MANAGER NAME]": n })), "amendment manager signatures");
+    s = expandRepeat(s, "manager", signerRows("[MANAGER NAME]", managerNames.map((n) => ({ name: n, entity: managerSignerOf(oa, n) }))), "amendment manager signatures");
   }
 
   const footer = FOOTER_LINE

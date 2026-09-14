@@ -47,7 +47,6 @@ The undersigned, being **all** of the members of **[COMPANY NAME], LLC**, a Flor
 
 **Adopted effective [EFFECTIVE DATE] by the Company:**
 
-_____________________________
 [PS MANAGER SIGNATURE LINE]
 
 [[pagebreak]]

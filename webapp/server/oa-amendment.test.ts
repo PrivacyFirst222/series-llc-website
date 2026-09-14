@@ -101,6 +101,20 @@ let noDate = "";
 try { assembleAmendment(base, { number: 1, agreementDate: " ", effectiveDate: "September 12, 2026", mode: "attached" }); } catch (e) { noDate = String(e); }
 check("an amendment without the agreement's date is refused", /effective date is required/.test(noDate), noDate);
 
+// ---- a company as Manager and a trust as member sign through people ----
+const ent = assembleAmendment({
+  ...base,
+  managerNames: ["KLF Management Services, LLC"],
+  managerEntitySigners: [{ manager: "KLF Management Services, LLC", name: "Tony Bologna, III", title: "President" }],
+  members: [
+    base.members[0],
+    { name: "Gatecheck Family Trust", address: "200 Bay St, Miami, FL 33131", percentage: 50, contribution: "$500", todBeneficiary: "", entitySigner: { name: "Blair Gatecheck", title: "Trustee" } },
+  ],
+}, { number: 1, agreementDate: "August 5, 2026", effectiveDate: "September 13, 2026", mode: "attached" }).markdown;
+check("entity: the trust signs through its trustee on the amendment", ent.includes("Gatecheck Family Trust\n\nBy: _____________________________\n[[indent]]Blair Gatecheck\n[[indent]]Trustee\nDate: _____________________________"), ent.match(/Gatecheck Family Trust[\s\S]{0,160}/)?.[0]);
+check("entity: the company Manager acknowledges through its president", ent.includes("**ACKNOWLEDGED AND AGREED BY MANAGER:**\n\nKLF Management Services, LLC, Manager\n\nBy: _____________________________\n[[indent]]Tony Bologna, III\n[[indent]]President\nDate: _____________________________"), ent.match(/ACKNOWLEDGED[\s\S]{0,220}/)?.[0]);
+check("entity: no marker or slot left", !/<!--|\[PRINTED NAME\]|\[TITLE\]|\[PERSON\]|\[ENTITY\]/.test(ent));
+
 // ---- refusals ----
 let threw = "";
 try { assembleAmendment(base, { number: 1, agreementDate: "August 5, 2026", effectiveDate: "September 12, 2026", mode: "typed", text: "   " }); } catch (e) { threw = String(e); }

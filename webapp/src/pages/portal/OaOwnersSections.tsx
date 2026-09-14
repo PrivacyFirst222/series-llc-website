@@ -127,6 +127,36 @@ export function OwnersCard({ owners, isMulti, ownerCountMismatch, patchMember, r
                     value={m.name ?? ""}
                     onChange={(e) => patchMember(i, { name: e.target.value })}
                   />
+                  {/* A company or trust signs through a person (Adam, 13 Sep
+                      2026): its block reads the entity's name, "By:" over the
+                      rule, and the printed name and title beneath. */}
+                  <label className="flex items-center gap-2 text-sm">
+                    <input
+                      id={`owner-entity-${i + 1}`}
+                      type="checkbox"
+                      aria-label={`Owner ${i + 1} is a company or trust`}
+                      checked={m.isEntity === true}
+                      onChange={(e) => patchMember(i, { isEntity: e.target.checked })}
+                      className="h-4 w-4 accent-trust"
+                    />
+                    <span>This owner is a company or trust</span>
+                  </label>
+                  {m.isEntity ? (
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      <Input
+                        aria-label={`Who signs for owner ${i + 1}`}
+                        placeholder="Who signs for it — first and last name"
+                        value={m.signerName ?? ""}
+                        onChange={(e) => patchMember(i, { signerName: e.target.value })}
+                      />
+                      <Input
+                        aria-label={`Title of the signer for owner ${i + 1}`}
+                        placeholder="Their title, e.g. Manager or Trustee"
+                        value={m.signerTitle ?? ""}
+                        onChange={(e) => patchMember(i, { signerTitle: e.target.value })}
+                      />
+                    </div>
+                  ) : null}
                   {/* The same type-ahead box the S election form and the
                       intake use (Adam, 9 Sep 2026: "This address form isn't
                       showing address suggestions"). Choosing a suggestion

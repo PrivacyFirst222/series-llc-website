@@ -289,18 +289,30 @@ IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of
 
 **MEMBER:**
 
-_____________________________
+<!-- if:memberperson -->_____________________________
 [MEMBER NAME]
-Date: _____________________________
+Date: _____________________________<!-- /if --><!-- if:memberentity -->[MEMBER NAME]
+
+By: _____________________________
+[[indent]][PRINTED NAME]
+[[indent]][TITLE]
+Date: _____________________________<!-- /if -->
 
 <!-- one:manager -->**ACKNOWLEDGED AND AGREED BY MANAGER:**<!-- /one --><!-- many:manager -->**ACKNOWLEDGED AND AGREED BY MANAGERS:**<!-- /many -->
 
 <!-- repeat:manager -->
-_____________________________
+<!-- if:person -->_____________________________
 [MANAGER NAME], Manager
 Date: _____________________________
 
-<!-- /repeat -->
+<!-- /if --><!-- if:entity -->[MANAGER NAME], Manager
+
+By: _____________________________
+[[indent]][PRINTED NAME]
+[[indent]][TITLE]
+Date: _____________________________
+
+<!-- /if --><!-- /repeat -->
 
 [[pagebreak]]
 
@@ -349,10 +361,16 @@ Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENE
 <!-- one:manager -->**Adopted effective [DATE] by the Company, acting through its Manager:**<!-- /one --><!-- many:manager -->**Adopted effective [DATE] by the Company, acting through its Managers:**<!-- /many -->
 
 <!-- repeat:adopter -->
-_____________________________
+<!-- if:person -->_____________________________
 [ADOPTER NAME], Protected Series Manager
 
-<!-- /repeat -->
+<!-- /if --><!-- if:entity -->[ADOPTER NAME], Protected Series Manager
+
+By: _____________________________
+[[indent]][PRINTED NAME]
+[[indent]][TITLE]
+
+<!-- /if --><!-- /repeat -->
 
 [[pagebreak]]
 
