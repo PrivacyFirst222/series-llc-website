@@ -19,7 +19,9 @@ function check(name: string, ok: boolean, got?: unknown): void {
 }
 const norm = (s: string) => s.replace(/\s+/g, " ").replace(/&mdash;/g, "—").trim();
 const dir = new URL("../src/components/forms/florida-llc/sections/", import.meta.url);
-const sources = norm(readdirSync(dir).filter((f) => f.endsWith(".tsx")).map((f) => readFileSync(new URL(f, dir), "utf8")).join("\n"));
+// The S election deadline box's words live beside the 2553 timing rule,
+// not in a section file (14 Sep 2026).
+const sources = norm([...readdirSync(dir).filter((f) => f.endsWith(".tsx")).map((f) => readFileSync(new URL(f, dir), "utf8")), readFileSync(new URL("../src/lib/form2553Timing.ts", import.meta.url), "utf8")].join("\n"));
 const sampleNew = { filingPath: "NEW", existingLlcName: "" } as SubmissionPayload;
 const sampleConv = { filingPath: "CONVERT", existingLlcName: "ACME LLC" } as SubmissionPayload;
 for (const a of ACKNOWLEDGMENTS) {

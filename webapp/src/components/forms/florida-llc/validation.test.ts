@@ -219,6 +219,13 @@ if (typeof console !== "undefined") {
   };
   const keyFor = (n: string) => nameCheckKey([n]);
 
+  {
+    // The agent step stops a non-Florida agent address (14 Sep 2026).
+    const ohio = validateStep("agent", { ...defaultFormData, registeredAgentChoice: "SELF", registeredAgentFirstName: "A", registeredAgentLastName: "B", registeredAgentStreetAddress1: "1 Main St", registeredAgentCity: "Columbus", registeredAgentState: "OH", registeredAgentZip: "43004", registeredAgentNotSameAsLlc: true, registeredAgentPhysicalAddressAcknowledgment: true });
+    assert(ohio.registeredAgentState === "The registered agent's address must be in Florida.", "agent step refuses a non-Florida agent state");
+    const fla = validateStep("agent", { ...defaultFormData, registeredAgentChoice: "SELF", registeredAgentFirstName: "A", registeredAgentLastName: "B", registeredAgentStreetAddress1: "1 Main St", registeredAgentCity: "Miami", registeredAgentState: "FL", registeredAgentZip: "33131", registeredAgentNotSameAsLlc: true, registeredAgentPhysicalAddressAcknowledgment: true });
+    assert(!fla.registeredAgentState, "agent step accepts a Florida agent state");
+  }
   const staleKeyed = validateStep("name", {
     ...base,
     // A result belonging to a DIFFERENT name must never satisfy this step.

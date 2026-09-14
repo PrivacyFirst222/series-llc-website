@@ -162,6 +162,7 @@ export function StepManagers({ data, patch, errors }: StepProps) {
         <RepeatablePartyFields
           entries={data.managers}
           onChange={(next) => patch({ managers: next })}
+          errors={errors}
         />
       </FieldShell>
 

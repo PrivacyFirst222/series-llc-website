@@ -37,7 +37,8 @@ export function StepFilingPath({ data, patch, errors }: StepProps) {
         <h2 className="font-display text-3xl">Getting started</h2>
         <p className="text-sm text-muted-foreground max-w-2xl">
           The service fee is the same either way. Converting skips the $125
-          Articles filing fee, because your company is already on file.
+          filing fee for the Articles and Registered Agent (if you keep your
+          existing Registered Agent).
         </p>
       </header>
 

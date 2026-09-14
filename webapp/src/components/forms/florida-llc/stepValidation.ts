@@ -203,6 +203,8 @@ export function validateStep(
       if (!data.registeredAgentStreetAddress1)
         e.registeredAgentStreetAddress1 = "Street address required.";
       if (!data.registeredAgentCity) e.registeredAgentCity = "City required.";
+      if (data.registeredAgentState !== "FL")
+        e.registeredAgentState = "The registered agent's address must be in Florida.";
       if (!data.registeredAgentZip) e.registeredAgentZip = "ZIP required.";
       if (
         isPoBox(data.registeredAgentStreetAddress1) ||

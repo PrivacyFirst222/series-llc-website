@@ -37,6 +37,7 @@ export const ACKNOWLEDGMENTS: { field: string; text: string | ((p: SubmissionPay
   { field: "accuracyAcknowledged", text: "I certify that the information provided is true and accurate to the best of my knowledge." },
   { field: "addressAccuracyAcknowledgment", text: "I am solely responsible for the accuracy of all addresses I have provided. I understand that state filings, legal notices, and official correspondence will be directed to these addresses exactly as entered, and that MyFloridaSeriesLLC does not verify the accuracy or deliverability of any address. Any address-suggestion or address-checking feature in this form is a convenience only and is not a verification, warranty, or guarantee of any kind." },
   { field: "termsOfServiceAcknowledgment", text: "I agree to all terms and conditions set forth in the Terms of Service, including its binding individual arbitration provision and class action waiver." },
+  { field: "sElectionFilingAcknowledgment", text: "I understand that MyFloridaSeriesLLC prepares Form 2553 but does not file it, that I am responsible for filing it within 2 months and 15 days after my LLC's effective date, and that no refund is provided if I miss that deadline. MyFloridaSeriesLLC does not prepare late-election packages." },
   { field: "publicRecordAcknowledged", text: "I understand that filed information may become part of the public record." },
   { field: "notLegalAdviceAcknowledged", text: "I understand this service does not provide legal, tax, or accounting advice." },
 ];
@@ -168,14 +169,14 @@ export function summaryMarkdown(o: SummaryOrderRow): string {
   const ra = p.registeredAgent;
   out.push(line("Choice", ra?.choice === "SERVICE" ? "Our registered agent service" : "Client's own agent"));
   if (ra?.choice !== "SERVICE") {
-    out.push(line("Type", ra?.type));
+    out.push(line("Type", ra?.type === "ENTITY" ? "Business entity" : ra?.type === "INDIVIDUAL" ? "Individual" : ra?.type));
     out.push(line("Name", ra?.businessEntityName || ra?.name));
     out.push(line("Address", addr(ra?.address)));
     out.push(line("Email", ra?.email));
     out.push(line("Phone", ra?.phone));
     out.push(`### Agent acceptance`);
     out.push(line("Accepted by", ra?.acceptance?.acceptanceName));
-    out.push(line("Capacity", ra?.acceptance?.capacity));
+    out.push(line("Capacity", ra?.acceptance?.capacity === "INDIVIDUAL_AGENT" ? "The registered agent, an individual" : ra?.acceptance?.capacity === "PRINCIPAL_OF_ENTITY" ? "Principal of the entity serving as agent" : ra?.acceptance?.capacity));
     out.push(line("Electronic signature", ra?.acceptance?.electronicSignature));
   }
   out.push(`### Management`);
@@ -202,7 +203,7 @@ export function summaryMarkdown(o: SummaryOrderRow): string {
   }
   if (!conversion) {
     out.push(`### Purpose`);
-    out.push(line("Purpose type", p.purpose?.purposeType));
+    out.push(line("Purpose type", p.purpose?.purposeType === "GENERAL" ? "General purpose" : p.purpose?.purposeType === "SPECIFIC" ? "General purpose plus a specific purpose" : p.purpose?.purposeType === "PROFESSIONAL" ? "Professional purpose" : p.purpose?.purposeType));
     out.push(line("Specific purpose", p.purpose?.businessPurposeText));
     out.push(`### Effective date`);
     out.push(line("Option", p.effectiveDate?.option === "SPECIFIC" ? `Specific date: ${p.effectiveDate?.requestedEffectiveDate ?? ""}` : "Date filed by the Division"));

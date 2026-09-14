@@ -190,6 +190,11 @@ type PayloadLike = {
  *  service (Adam, 14 Sep 2026). */
 export const RA_SERVICE_SIGNER = "Caitlin Kirwan";
 
+/** Who signs the Articles, and the Statement of Authorized Representative,
+ *  when the client appoints us (Adam, 14 Sep 2026: "Caitlin signs for the
+ *  company as authorized representative as manager of FPS, LLC - PS 1"). */
+export const AR_SIGNER = { name: "Caitlin Kirwan", title: "Manager", company: "FLORIDA PROTECTED SERIES, LLC - PS 1" } as const;
+
 function raFields(ra: NonNullable<PayloadLike["registeredAgent"]>): FilingField[] {
   const raIsBusiness = (ra.businessEntityName ?? "").trim() !== "";
   const raName = personName(ra);
@@ -248,7 +253,7 @@ function conversionGroups(p: PayloadLike): FilingGroup[] {
         {
           key: "filingPath",
           label: "Filing",
-          value: "Protected Series Designations for an existing Florida LLC — filed online at the Division, $25 each; no Articles, no $125 fee",
+          value: "Protected Series Designations for an existing Florida LLC — filed online at the Division, $25 each; no Articles; the $125 Articles-and-agent fee is skipped unless the agent changes",
           statement: true,
           block: true,
         },
@@ -455,7 +460,9 @@ export function filingGroups(payload: unknown): FilingGroup[] {
       {
         key: "arName",
         label: "Authorized representative",
-        value: [cert.authorizedRepresentativeName, cert.authorizedRepresentativeTitle]
+        value: cert.articlesSignedBy === "SERVICE"
+          ? `${AR_SIGNER.name} — ${AR_SIGNER.title}, ${AR_SIGNER.company}`
+          : [cert.authorizedRepresentativeName, cert.authorizedRepresentativeTitle]
           .map((x) => (x ?? "").trim())
           .filter(Boolean)
           .join(" — "),
@@ -463,7 +470,7 @@ export function filingGroups(payload: unknown): FilingGroup[] {
       {
         key: "arSignature",
         label: "Electronic Signature (type exactly)",
-        value: (cert.authorizedRepresentativeSignature ?? "").trim(),
+        value: cert.articlesSignedBy === "SERVICE" ? AR_SIGNER.name : (cert.authorizedRepresentativeSignature ?? "").trim(),
       },
     ],
   });

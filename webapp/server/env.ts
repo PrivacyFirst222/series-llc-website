@@ -35,8 +35,6 @@ export const env = {
   /** Who signs the Statement of Authorized Representative for FLORIDA
    *  PROTECTED SERIES, LLC - PS 1 (Adam, 13 Sep 2026). Set both in Vercel
    *  before go-live; dev prints placeholders so the build never guesses. */
-  AR_SIGNER_NAME: process.env.AR_SIGNER_NAME ?? "Signer name (set AR_SIGNER_NAME)",
-  AR_SIGNER_TITLE: process.env.AR_SIGNER_TITLE ?? "Title (set AR_SIGNER_TITLE)",
 
   /** Shared secret for the daily purge cron. Required in production. */
   CRON_SECRET: process.env.CRON_SECRET ?? "",

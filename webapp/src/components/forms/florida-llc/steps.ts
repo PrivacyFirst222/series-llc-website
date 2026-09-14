@@ -57,8 +57,13 @@ export const stepIndexOf = (key: StepKey): number =>
  *  the right screen when server-side validation flags something. */
 const FIELD_STEP: Record<string, StepKey> = {
   filingPath: "path",
-  existingLlcName: "path",
-  sunbizDocumentNumber: "path",
+  // The conversion's name and number are typed on the LLC name step; the
+  // "path" step is hidden when the client came from a pricing card
+  // (14 Sep 2026: a refusal pointed at a screen that was not there).
+  existingLlcName: "name",
+  sunbizDocumentNumber: "name",
+  sElectionFilingAcknowledgment: "optional",
+  seriesOwnershipAcknowledgment: "series",
   formationType: "intro",
   clientFirstName: "client",
   clientLastName: "client",

@@ -9,6 +9,9 @@ import type { MemberEntry, PartyKind } from "./types";
 interface RepeatableMemberFieldsProps {
   members: MemberEntry[];
   onChange: (next: MemberEntry[]) => void;
+  /** Step errors keyed "members.<index>.<field>" (14 Sep 2026: they were
+   *  computed and never shown, so Continue silently did nothing). */
+  errors?: Record<string, string>;
 }
 
 const newId = () => Math.random().toString(36).slice(2, 10);
@@ -36,7 +39,9 @@ const blank = (): MemberEntry => ({
 export function RepeatableMemberFields({
   members,
   onChange,
+  errors = {},
 }: RepeatableMemberFieldsProps) {
+  const rowError = (i: number, field: string) => errors[`members.${i}.${field}`];
   const update = (id: string, patch: Partial<MemberEntry>) =>
     onChange(members.map((m) => (m.id === id ? { ...m, ...patch } : m)));
   const remove = (id: string) => onChange(members.filter((m) => m.id !== id));
@@ -84,18 +89,20 @@ export function RepeatableMemberFields({
 
             {entry.memberType === "INDIVIDUAL" ? (
               <div className="grid grid-cols-2 gap-4 md:col-span-2 md:grid-cols-3">
-                <FieldShell label="First name" required htmlFor={`member-${entry.id}-first`}>
+                <FieldShell label="First name" required htmlFor={`member-${entry.id}-first`} error={rowError(idx, "firstName")}>
                   <Input
                     id={`member-${entry.id}-first`}
+                    aria-invalid={!!rowError(idx, "firstName")}
                     value={entry.firstName ?? ""}
                     onChange={(e) =>
                       update(entry.id, { firstName: e.target.value })
                     }
                   />
                 </FieldShell>
-                <FieldShell label="Last name" required htmlFor={`member-${entry.id}-last`}>
+                <FieldShell label="Last name" required htmlFor={`member-${entry.id}-last`} error={rowError(idx, "lastName")}>
                   <Input
                     id={`member-${entry.id}-last`}
+                    aria-invalid={!!rowError(idx, "lastName")}
                     value={entry.lastName ?? ""}
                     onChange={(e) =>
                       update(entry.id, { lastName: e.target.value })
@@ -117,9 +124,11 @@ export function RepeatableMemberFields({
                 required
                 className="md:col-span-2"
                 htmlFor={`member-${entry.id}-entity-name`}
+                error={rowError(idx, "entityName")}
               >
                 <Input
                   id={`member-${entry.id}-entity-name`}
+                  aria-invalid={!!rowError(idx, "entityName")}
                   value={entry.entityName ?? ""}
                   onChange={(e) =>
                     update(entry.id, { entityName: e.target.value })
@@ -131,6 +140,7 @@ export function RepeatableMemberFields({
 
           <AddressFieldsBlock
             prefix={`mem-${entry.id}`}
+            errors={rowError(idx, "address1") ? { address1: rowError(idx, "address1") } : undefined}
             value={{
               address1: entry.address1,
               address2: entry.address2,

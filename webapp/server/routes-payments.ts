@@ -305,7 +305,9 @@ app.post("/orders", async (c) => {
   // Names that our mirror of the state's records says are taken or held are
   // refused here, not just in the browser — the client cannot buy a filing
   // the Division will bounce. Waived automatically if the mirror is stale.
-  const nameProblems = await unavailableNames(
+  // A conversion carries no new name (14 Sep 2026: a name typed on the
+  // new-formation path and abandoned refused the order).
+  const nameProblems = data.filingPath === "CONVERT" ? null : await unavailableNames(
     [
       data.desiredLlcName ?? "",
       ...(data.exactNameOnly === true ? [] : [data.alternateName1 ?? "", data.alternateName2 ?? ""]),
@@ -382,7 +384,9 @@ app.post("/orders", async (c) => {
     orderId,
     llcName,
     priced,
-    buyerEmail: data.correspondentEmail,
+    // The receipt goes to the account holder; the correspondence contact is
+    // the Division's address (14 Sep 2026).
+    buyerEmail: data.clientEmail,
   });
   await db.query("UPDATE orders SET square_order_id = $1 WHERE id = $2", [
     checkout.squareOrderId,

@@ -46,6 +46,17 @@ export function raSelfPatch(): Partial<FloridaLLCFormData> {
     registeredAgentChoice: "SELF",
     registeredAgentType: "INDIVIDUAL",
     registeredAgentBusinessEntityName: "",
+    // Everything the service patch filled in is theirs to type now
+    // (14 Sep 2026: our office address and our series' name survived the
+    // switch and were signed as the client's own).
+    registeredAgentStreetAddress1: "",
+    registeredAgentStreetAddress2: "",
+    registeredAgentCity: "",
+    registeredAgentZip: "",
+    registeredAgentEmail: "",
+    registeredAgentPhone: "",
+    registeredAgentAcceptanceName: "",
+    registeredAgentElectronicSignature: "",
     registeredAgentState: "FL",
     registeredAgentIsAffiliatedPerson: true,
     registeredAgentAcceptanceCapacity: "INDIVIDUAL_AGENT",

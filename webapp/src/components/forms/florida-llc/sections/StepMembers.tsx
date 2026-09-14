@@ -79,6 +79,7 @@ export function StepMembers({ data, patch, errors }: StepProps) {
       <RepeatableMemberFields
         members={data.members}
         onChange={(next) => patch({ members: next })}
+        errors={errors}
       />
 
       {errors.members ? (

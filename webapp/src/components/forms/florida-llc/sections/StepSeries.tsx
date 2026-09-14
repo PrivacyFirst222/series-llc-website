@@ -179,6 +179,7 @@ export function StepSeries({ data, patch, errors }: StepProps) {
             <div className="flex-1">
               <FieldShell
                 label="Series identifier"
+                required
                 htmlFor={`series-${s.id}-name`}
                 error={errors[`series.${i}.name`]}
                 helper={
@@ -207,6 +208,7 @@ export function StepSeries({ data, patch, errors }: StepProps) {
               className="text-muted-foreground hover:text-destructive mt-0.5 shrink-0"
             >
               <Trash2 className="h-4 w-4" />
+              <span className="sr-only">Remove</span>
             </Button>
           </div>
         ))}

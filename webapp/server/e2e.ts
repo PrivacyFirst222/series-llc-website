@@ -476,6 +476,13 @@ check("service-RA order accepted with canonical details enforced", svc.status ==
     check("statement: the appointed order is marked sent to the Division", filed.status === 200, filed.body);
     const detail = await api(`/api/admin/orders/${apId}`, { cookies: adm.cookie });
     check("statement: the order card knows we signed the Articles", detail.body?.data?.articlesSignedByUs === true, detail.body?.data?.articlesSignedByUs);
+    {
+      // The sheet names the person who signs for us (Adam, 14 Sep 2026).
+      const fields = ((detail.body?.data?.groups ?? []) as { fields: { key: string; value: string }[] }[]).flatMap((g) => g.fields);
+      const arName = fields.find((f) => f.key === "arName")?.value;
+      const arSig = fields.find((f) => f.key === "arSignature")?.value;
+      check("sheet: an appointed order's Articles signature rows name Caitlin Kirwan, Manager of PS 1", arName === "Caitlin Kirwan — Manager, FLORIDA PROTECTED SERIES, LLC - PS 1" && arSig === "Caitlin Kirwan", { arName, arSig });
+    }
     const llcName = detail.body?.data?.llcName as string;
     const pdfFile = () => new File([new TextEncoder().encode("%PDF-1.4 e2e articles\n%%EOF")], "articles.pdf", { type: "application/pdf" });
     const noNum = new FormData(); noNum.set("articles", pdfFile());
@@ -498,6 +505,11 @@ check("service-RA order accepted with canonical details enforced", svc.status ==
     const clientList = (clientDocs.body?.data ?? []) as { id: string; kind: string; title: string }[];
     const clientStmt = clientList.find((d) => d.kind === "statement");
     check("statement: it is in the client's documents", !!clientStmt, clientList.map((d) => d.kind));
+    if (clientStmt && hasPdftotext) {
+      const bytes = new Uint8Array(await (await fetch(`${BASE}/api/portal/documents/${clientStmt.id}/download`, { headers: { Cookie: apPw.cookie } })).arrayBuffer());
+      const text = (pdfText(bytes) ?? "").replace(/\s+/g, " ");
+      check("read off the Statement PDF: signed /s/ Caitlin Kirwan, Manager (14 Sep 2026)", /\/s\/ Caitlin Kirwan/.test(text) && /Title: Manager/.test(text), text.match(/\/s\/[^.]{0,80}/)?.[0]);
+    }
     if (clientStmt) {
       const bytes = new Uint8Array(await (await fetch(`${BASE}/api/portal/documents/${clientStmt.id}/download`, { headers: { Cookie: apPw.cookie } })).arrayBuffer());
       check("statement: it downloads as a PDF", bytes[0] === 0x25 && bytes[1] === 0x50, bytes.length);
@@ -597,6 +609,11 @@ check("status flips to paid", post.body?.data?.status === "paid");
   check("the summary lists the price lines", /Formation service fee \| \$499\.00/.test(text) && /FL state fee — Articles of Organization \| \$100\.00/.test(text), text.match(/\| [^\n]*\$[^\n]*/g)?.slice(0, 4));
   check("the summary carries the questionnaire as typed", /100 Ocean Drive/.test(text) && /Casey Member/.test(text));
   check("the summary quotes the acknowledgments and the signature", /- I certify that the information provided is true and accurate/.test(text) && /Electronic signature typed:\*\*/.test(text));
+  check("the summary keeps the S election deadline acknowledgment the client ticked (14 Sep 2026)", /- I understand that MyFloridaSeriesLLC prepares Form 2553 but does not file it/.test(text), text.match(/Form 2553[^\n]{0,80}/)?.[0]);
+  check("the summary uses the client's words, not codes (14 Sep 2026)", /\*\*Purpose type:\*\* General purpose/.test(text) && /\*\*Type:\*\* Individual/.test(text) && /\*\*Capacity:\*\* The registered agent, an individual/.test(text) && !/\b(GENERAL|INDIVIDUAL_AGENT)\b/.test(text), text.match(/\*\*(Purpose type|Type|Capacity):\*\*[^\n]*/g));
+  const paidPayload = (await api(`/api/admin/orders/${orderId}`, { cookies: adm0.cookie })).body?.data?.payload;
+  const paidAck = (typeof paidPayload === "string" ? JSON.parse(paidPayload) : paidPayload)?.acknowledgments;
+  check("the order record carries the S election acknowledgment", paidAck?.sElectionFilingAcknowledgment === true, paidAck);
   check("the summary records the submitter's address", text.includes(`**From IP address:** ${RUN_IP}`), text.match(/From IP address[^\n]*/)?.[0]);
   const pdf = await fetch(`${BASE}/api/admin/orders/${orderId}/summary.pdf`, { headers: { Cookie: adm0.cookie } });
   const bytes = new Uint8Array(await pdf.arrayBuffer());
@@ -2863,6 +2880,25 @@ if (mint.status === 200) {
     takenOrder.status === 400 && takenOrder.body?.error?.code === "NAME_UNAVAILABLE",
     takenOrder.body,
   );
+  {
+    // A conversion that still carries a taken name from an abandoned
+    // new-formation path is not judged on it (14 Sep 2026), and the record
+    // keeps none of the new-formation answers.
+    const convEmail = testEmail.replace("@", "+convname@");
+    const convTaken = await api("/api/orders", { method: "POST", headers: NAME_IP, body: JSON.stringify({
+      ...formData, filingPath: "CONVERT", desiredLlcName: "E2E Sunshine Holding", alternateName1: "E2E Coastal Backup",
+      purposeType: "SPECIFIC", businessPurposeText: "left over", effectiveDateOption: "SPECIFIC", requestedEffectiveDate: "2026-10-01",
+      nameSearchAcknowledgment: false, governmentAffiliationAcknowledgment: false, lawfulPurposeNameAcknowledgment: false,
+      existingLlcName: "E2E Converted Holdings, LLC", sunbizDocumentNumber: "L24000999888", conversionAuthorityAcknowledgment: true,
+      series: [{ id: "s1", name: "E2E Converted Holdings, LLC, PS A" }],
+      clientEmail: convEmail, confirmClientEmail: convEmail, correspondentEmail: convEmail, confirmCorrespondentEmail: convEmail,
+    }) });
+    check("a conversion is not refused over a taken name it never uses", convTaken.status === 200, convTaken.body);
+    const admN = await adminSession();
+    const raw = (await api(`/api/admin/orders/${convTaken.body?.data?.orderId}`, { cookies: admN.cookie })).body?.data?.payload;
+    const pl = typeof raw === "string" ? JSON.parse(raw) : raw;
+    check("a conversion's record carries no new name, purpose, or effective date", pl?.llcName?.desiredName === "" && (pl?.llcName?.alternateNames ?? []).length === 0 && pl?.purpose?.purposeType === "" && pl?.effectiveDate?.option === "", { llcName: pl?.llcName, purpose: pl?.purpose, effectiveDate: pl?.effectiveDate });
+  }
   const optDocs = await api("/api/orders", {
     method: "POST",
     headers: NAME_IP,

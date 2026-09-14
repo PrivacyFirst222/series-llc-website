@@ -134,7 +134,8 @@ function ConversionName({ data, patch, errors }: StepProps) {
 
         <div className="rounded-xl border border-border bg-secondary/40 p-4 text-sm text-muted-foreground leading-relaxed">
           Because the company is already on file, there is no name availability
-          check and no $125 Articles of Organization filing fee.
+          check, and you skip the $125 filing fee for the Articles and Registered
+          Agent (if you keep your existing Registered Agent).
         </div>
       </div>
     );
@@ -221,7 +222,7 @@ function NewName({ data, patch, errors }: StepProps) {
         The State of Florida's website does not offer a way for services like
         ours to check availability automatically. We have created a tool to
         check whether a name is unavailable. It does not guarantee that the
-        name will be accepted by the Florida Secretary of State, but it can
+        name will be accepted by the Florida Division of Corporations, but it can
         save you time submitting a name that will be rejected. If you provide
         an alternate name and your first choice is not available, we will use
         your alternate names in order of preference. This will also save you

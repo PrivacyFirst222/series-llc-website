@@ -359,6 +359,7 @@ export interface SubmissionPayload {
     authorizedRepresentativeSignatureCheckbox: boolean;
     addressAccuracyAcknowledgment: boolean;
     termsOfServiceAcknowledgment: boolean;
+    sElectionFilingAcknowledgment: boolean;
   };
   /** The name-availability result the client saw, if the check ran. */
   nameCheck: { available: boolean; asOf?: string; results: { input: string; verdict: "taken" | "held" | "clear" }[] } | null;

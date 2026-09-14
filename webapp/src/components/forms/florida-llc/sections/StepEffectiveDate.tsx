@@ -64,10 +64,12 @@ export function StepEffectiveDate({ data, patch, errors }: StepProps) {
         <FieldShell
           label="Requested effective date"
           required
+          htmlFor="requested-effective-date"
           error={dateError ?? errors.requestedEffectiveDate}
           helper="Up to 5 business days before or 90 days after the anticipated filing date."
         >
           <Input
+            id="requested-effective-date"
             type="date"
             value={data.requestedEffectiveDate ?? ""}
             onChange={(e) =>

@@ -24,7 +24,7 @@ import ownersManualMd from "../../docs/owners-manual.md";
 import { deleteFile, putFile, readFileStream } from "./storage";
 import { sendMail, newDocumentEmail, legalMailEmail, emailChangedEmail, serviceFulfilledClientEmail, llcFormedEmail, sElectionEinAddedEmail, sElectionEinArrivedLateEmail } from "./email";
 import { einDigits, fmtEinDisplay, isValidEin } from "../src/lib/ein";
-import { filingGroups, seriesNames } from "./filing";
+import { filingGroups, seriesNames, AR_SIGNER } from "./filing";
 import { err, testHooks, MAX_UPLOAD_BYTES, looksLikePdf, requireAdmin } from "./shared";
 import { loadSummaryRow } from "./order-summary";
 import { oaSeed, purgeExpiredSElections, postSElectionPackage, isoDate, type SElectionStoredDetails } from "./routes-portal";
@@ -451,8 +451,8 @@ async function issueStatement(
   const { markdown, title } = assembleStatement({
     companyName: o.llc_name,
     documentNumber: documentNumber.trim(),
-    signerName: env.AR_SIGNER_NAME,
-    signerTitle: env.AR_SIGNER_TITLE,
+    signerName: AR_SIGNER.name,
+    signerTitle: AR_SIGNER.title,
     date: new Date().toLocaleDateString("en-US", { timeZone: "America/New_York", year: "numeric", month: "long", day: "numeric" }),
   });
   // Our own statement, not a licensed deliverable: page numbers only.

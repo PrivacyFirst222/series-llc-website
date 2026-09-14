@@ -22,7 +22,11 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
     existingLlcName: data.existingLlcName ?? "",
     sunbizDocumentNumber: data.sunbizDocumentNumber ?? "",
     formationType: data.formationType,
-    llcName: {
+    // A conversion names no new company: whatever was typed on the
+    // new-formation path before switching stays off the record (14 Sep 2026).
+    llcName: isConversion
+      ? { desiredName: "", designator: "", finalName, alternateNames: [], exactNameOnly: false }
+      : {
       desiredName: data.desiredLlcName,
       designator: data.llcDesignator || "",
       finalName,
@@ -86,11 +90,17 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
       memberList:
         data.managementStructure === "MANAGER_MANAGED" ? [] : data.members,
     },
-    purpose: {
+    // Purpose and effective date are Articles questions a conversion never
+    // sees; answers from an abandoned new-formation path stay off the record.
+    purpose: isConversion
+      ? { purposeType: "", businessPurposeText: "" }
+      : {
       purposeType: data.purposeType || "",
       businessPurposeText: data.businessPurposeText,
     },
-    effectiveDate: {
+    effectiveDate: isConversion
+      ? { option: "", requestedEffectiveDate: null }
+      : {
       option: data.effectiveDateOption,
       requestedEffectiveDate:
         data.effectiveDateOption === "SPECIFIC"
@@ -151,6 +161,9 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
       authorizedRepresentativeSignatureCheckbox: data.authorizedRepresentativeSignatureCheckbox === true,
       addressAccuracyAcknowledgment: data.addressAccuracyAcknowledgment === true,
       termsOfServiceAcknowledgment: data.termsOfServiceAcknowledgment === true,
+      // The no-refund deadline acknowledgment for the S election package
+      // (14 Sep 2026: required by the server, never recorded).
+      sElectionFilingAcknowledgment: data.sElectionFilingAcknowledgment === true,
     },
     nameCheck: data.nameCheck
       ? { available: data.nameCheck.available, asOf: data.nameCheck.asOf, results: data.nameCheck.results.map((r) => ({ input: r.input, verdict: r.verdict })) }

@@ -95525,8 +95525,6 @@ var env = {
   /** Who signs the Statement of Authorized Representative for FLORIDA
    *  PROTECTED SERIES, LLC - PS 1 (Adam, 13 Sep 2026). Set both in Vercel
    *  before go-live; dev prints placeholders so the build never guesses. */
-  AR_SIGNER_NAME: process.env.AR_SIGNER_NAME ?? "Signer name (set AR_SIGNER_NAME)",
-  AR_SIGNER_TITLE: process.env.AR_SIGNER_TITLE ?? "Title (set AR_SIGNER_TITLE)",
   /** Shared secret for the daily purge cron. Required in production. */
   CRON_SECRET: process.env.CRON_SECRET ?? "",
   // Dropbox app-folder credentials for the nightly client-file mirror.
@@ -100866,7 +100864,9 @@ function buildPayload(data) {
     existingLlcName: data.existingLlcName ?? "",
     sunbizDocumentNumber: data.sunbizDocumentNumber ?? "",
     formationType: data.formationType,
-    llcName: {
+    // A conversion names no new company: whatever was typed on the
+    // new-formation path before switching stays off the record (14 Sep 2026).
+    llcName: isConversion ? { desiredName: "", designator: "", finalName, alternateNames: [], exactNameOnly: false } : {
       desiredName: data.desiredLlcName,
       designator: data.llcDesignator || "",
       finalName,
@@ -100922,11 +100922,13 @@ function buildPayload(data) {
       // not reach the record.
       memberList: data.managementStructure === "MANAGER_MANAGED" ? [] : data.members
     },
-    purpose: {
+    // Purpose and effective date are Articles questions a conversion never
+    // sees; answers from an abandoned new-formation path stay off the record.
+    purpose: isConversion ? { purposeType: "", businessPurposeText: "" } : {
       purposeType: data.purposeType || "",
       businessPurposeText: data.businessPurposeText
     },
-    effectiveDate: {
+    effectiveDate: isConversion ? { option: "", requestedEffectiveDate: null } : {
       option: data.effectiveDateOption,
       requestedEffectiveDate: data.effectiveDateOption === "SPECIFIC" ? data.requestedEffectiveDate ?? null : null
     },
@@ -100981,7 +100983,10 @@ function buildPayload(data) {
       registeredAgentSignatureAuthorizationCheckbox: data.registeredAgentSignatureAuthorizationCheckbox === true,
       authorizedRepresentativeSignatureCheckbox: data.authorizedRepresentativeSignatureCheckbox === true,
       addressAccuracyAcknowledgment: data.addressAccuracyAcknowledgment === true,
-      termsOfServiceAcknowledgment: data.termsOfServiceAcknowledgment === true
+      termsOfServiceAcknowledgment: data.termsOfServiceAcknowledgment === true,
+      // The no-refund deadline acknowledgment for the S election package
+      // (14 Sep 2026: required by the server, never recorded).
+      sElectionFilingAcknowledgment: data.sElectionFilingAcknowledgment === true
     },
     nameCheck: data.nameCheck ? { available: data.nameCheck.available, asOf: data.nameCheck.asOf, results: data.nameCheck.results.map((r) => ({ input: r.input, verdict: r.verdict })) } : null,
     metadata: {
@@ -106599,6 +106604,7 @@ var MGMT_PROVISION = {
   MEMBER_MANAGED: "Pursuant to Florida Statutes Section 605.0407, the company is or will be member-managed."
 };
 var RA_SERVICE_SIGNER = "Caitlin Kirwan";
+var AR_SIGNER = { name: "Caitlin Kirwan", title: "Manager", company: "FLORIDA PROTECTED SERIES, LLC - PS 1" };
 function raFields(ra) {
   const raIsBusiness = (ra.businessEntityName ?? "").trim() !== "";
   const raName = personName(ra);
@@ -106644,7 +106650,7 @@ function conversionGroups(p2) {
         {
           key: "filingPath",
           label: "Filing",
-          value: "Protected Series Designations for an existing Florida LLC \u2014 filed online at the Division, $25 each; no Articles, no $125 fee",
+          value: "Protected Series Designations for an existing Florida LLC \u2014 filed online at the Division, $25 each; no Articles; the $125 Articles-and-agent fee is skipped unless the agent changes",
           statement: true,
           block: true
         },
@@ -106802,12 +106808,12 @@ function filingGroups(payload) {
       {
         key: "arName",
         label: "Authorized representative",
-        value: [cert.authorizedRepresentativeName, cert.authorizedRepresentativeTitle].map((x2) => (x2 ?? "").trim()).filter(Boolean).join(" \u2014 ")
+        value: cert.articlesSignedBy === "SERVICE" ? `${AR_SIGNER.name} \u2014 ${AR_SIGNER.title}, ${AR_SIGNER.company}` : [cert.authorizedRepresentativeName, cert.authorizedRepresentativeTitle].map((x2) => (x2 ?? "").trim()).filter(Boolean).join(" \u2014 ")
       },
       {
         key: "arSignature",
         label: "Electronic Signature (type exactly)",
-        value: (cert.authorizedRepresentativeSignature ?? "").trim()
+        value: cert.articlesSignedBy === "SERVICE" ? AR_SIGNER.name : (cert.authorizedRepresentativeSignature ?? "").trim()
       }
     ]
   });
@@ -108880,6 +108886,7 @@ var ACKNOWLEDGMENTS = [
   { field: "accuracyAcknowledged", text: "I certify that the information provided is true and accurate to the best of my knowledge." },
   { field: "addressAccuracyAcknowledgment", text: "I am solely responsible for the accuracy of all addresses I have provided. I understand that state filings, legal notices, and official correspondence will be directed to these addresses exactly as entered, and that MyFloridaSeriesLLC does not verify the accuracy or deliverability of any address. Any address-suggestion or address-checking feature in this form is a convenience only and is not a verification, warranty, or guarantee of any kind." },
   { field: "termsOfServiceAcknowledgment", text: "I agree to all terms and conditions set forth in the Terms of Service, including its binding individual arbitration provision and class action waiver." },
+  { field: "sElectionFilingAcknowledgment", text: "I understand that MyFloridaSeriesLLC prepares Form 2553 but does not file it, that I am responsible for filing it within 2 months and 15 days after my LLC's effective date, and that no refund is provided if I miss that deadline. MyFloridaSeriesLLC does not prepare late-election packages." },
   { field: "publicRecordAcknowledged", text: "I understand that filed information may become part of the public record." },
   { field: "notLegalAdviceAcknowledged", text: "I understand this service does not provide legal, tax, or accounting advice." }
 ];
@@ -108979,14 +108986,14 @@ function summaryMarkdown(o) {
   const ra = p2.registeredAgent;
   out.push(line("Choice", ra?.choice === "SERVICE" ? "Our registered agent service" : "Client's own agent"));
   if (ra?.choice !== "SERVICE") {
-    out.push(line("Type", ra?.type));
+    out.push(line("Type", ra?.type === "ENTITY" ? "Business entity" : ra?.type === "INDIVIDUAL" ? "Individual" : ra?.type));
     out.push(line("Name", ra?.businessEntityName || ra?.name));
     out.push(line("Address", addr(ra?.address)));
     out.push(line("Email", ra?.email));
     out.push(line("Phone", ra?.phone));
     out.push(`### Agent acceptance`);
     out.push(line("Accepted by", ra?.acceptance?.acceptanceName));
-    out.push(line("Capacity", ra?.acceptance?.capacity));
+    out.push(line("Capacity", ra?.acceptance?.capacity === "INDIVIDUAL_AGENT" ? "The registered agent, an individual" : ra?.acceptance?.capacity === "PRINCIPAL_OF_ENTITY" ? "Principal of the entity serving as agent" : ra?.acceptance?.capacity));
     out.push(line("Electronic signature", ra?.acceptance?.electronicSignature));
   }
   out.push(`### Management`);
@@ -109013,7 +109020,7 @@ function summaryMarkdown(o) {
   }
   if (!conversion) {
     out.push(`### Purpose`);
-    out.push(line("Purpose type", p2.purpose?.purposeType));
+    out.push(line("Purpose type", p2.purpose?.purposeType === "GENERAL" ? "General purpose" : p2.purpose?.purposeType === "SPECIFIC" ? "General purpose plus a specific purpose" : p2.purpose?.purposeType === "PROFESSIONAL" ? "Professional purpose" : p2.purpose?.purposeType));
     out.push(line("Specific purpose", p2.purpose?.businessPurposeText));
     out.push(`### Effective date`);
     out.push(line("Option", p2.effectiveDate?.option === "SPECIFIC" ? `Specific date: ${p2.effectiveDate?.requestedEffectiveDate ?? ""}` : "Date filed by the Division"));
@@ -109262,7 +109269,7 @@ function registerPaymentRoutes(app2) {
     if (data.managementStructure !== "MANAGER_MANAGED" && data.members.length < 1) {
       return c.json(err("At least one member is required.", "INVALID_INPUT"), 400);
     }
-    const nameProblems = await unavailableNames(
+    const nameProblems = data.filingPath === "CONVERT" ? null : await unavailableNames(
       [
         data.desiredLlcName ?? "",
         ...data.exactNameOnly === true ? [] : [data.alternateName1 ?? "", data.alternateName2 ?? ""]
@@ -109324,7 +109331,9 @@ function registerPaymentRoutes(app2) {
       orderId,
       llcName,
       priced,
-      buyerEmail: data.correspondentEmail
+      // The receipt goes to the account holder; the correspondence contact is
+      // the Division's address (14 Sep 2026).
+      buyerEmail: data.clientEmail
     });
     await db.query("UPDATE orders SET square_order_id = $1 WHERE id = $2", [
       checkout.squareOrderId,
@@ -110694,8 +110703,8 @@ function registerAdminRoutes(app2) {
     const { markdown, title } = assembleStatement({
       companyName: o.llc_name,
       documentNumber: documentNumber.trim(),
-      signerName: env.AR_SIGNER_NAME,
-      signerTitle: env.AR_SIGNER_TITLE,
+      signerName: AR_SIGNER.name,
+      signerTitle: AR_SIGNER.title,
       date: (/* @__PURE__ */ new Date()).toLocaleDateString("en-US", { timeZone: "America/New_York", year: "numeric", month: "long", day: "numeric" })
     });
     const pdf = await renderMarkdownPdf({ markdown, watermark: null, title });

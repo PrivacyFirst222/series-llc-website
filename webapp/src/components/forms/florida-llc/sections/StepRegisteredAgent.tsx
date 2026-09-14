@@ -124,7 +124,9 @@ export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
                   registeredAgentStreetAddress1: data.clientAddress.address1,
                   registeredAgentStreetAddress2: data.clientAddress.address2 ?? "",
                   registeredAgentCity: data.clientAddress.city,
-                  registeredAgentState: data.clientAddress.state,
+                  // A registered agent must be in Florida whatever the client's
+                  // own state is (14 Sep 2026: an Ohio client sailed to payment).
+                  registeredAgentState: "FL",
                   registeredAgentZip: data.clientAddress.zip,
                   registeredAgentEmail: data.clientEmail,
                   registeredAgentPhone: data.clientPhone ?? "",
@@ -218,8 +220,8 @@ export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
               />
             </FieldShell>
 
-            <FieldShell label="State" required className="md:col-span-2" htmlFor="ra-state">
-              <Input id="ra-state" value="FL — Florida" disabled />
+            <FieldShell label="State" required className="md:col-span-2" htmlFor="ra-state" error={errors.registeredAgentState}>
+              <Input id="ra-state" value={data.registeredAgentState === "FL" ? "FL — Florida" : data.registeredAgentState} disabled aria-invalid={!!errors.registeredAgentState} />
             </FieldShell>
 
             <FieldShell

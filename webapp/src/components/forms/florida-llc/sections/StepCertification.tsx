@@ -243,8 +243,8 @@ export function StepCertification({ data, patch, errors }: StepProps) {
               This makes sense if you have named a legal entity as the manager,
               but if you are serving as the manager personally, then your name
               is already on the public record. If your name does not appear on
-              Sunbiz.org (the Florida Secretary of State&rsquo;s website), a
-              bank, or the Division of Workers&rsquo; Compensation, may ask why
+              Sunbiz.org (the Florida Division of Corporations&rsquo; website), a
+              bank, or the Division of Workers&rsquo; Compensation may ask why
               the name on your formation document is not yours. We include a
               signed Statement of Authorized Representative with your documents
               to answer that, however, we cannot guarantee that all banks and

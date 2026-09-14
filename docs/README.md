@@ -38,7 +38,7 @@ check reports SKIP for it, which is correct. Since 13 September 2026 the server
 generates it from this master the moment the office uploads the filed Articles
 for such an order (`webapp/server/statement.ts`), naming the company by the
 Florida document number the office types beside the upload and signed "/s/" by
-the signer named in the `AR_SIGNER_NAME` and `AR_SIGNER_TITLE` settings. It lands
+Caitlin Kirwan, Manager of FLORIDA PROTECTED SERIES, LLC - PS 1 (Adam, 14 Sep 2026). It lands
 in the client's documents directly under the Articles.
 
 ### How the Word files stay current

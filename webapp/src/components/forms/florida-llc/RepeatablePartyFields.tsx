@@ -10,6 +10,9 @@ import type { PartyEntry, PartyKind } from "./types";
 interface RepeatablePartyFieldsProps {
   entries: PartyEntry[];
   onChange: (next: PartyEntry[]) => void;
+  /** Step errors keyed "managers.<index>.<field>" (14 Sep 2026: computed
+   *  and never shown, so Continue silently did nothing). */
+  errors?: Record<string, string>;
 }
 
 const newId = () => Math.random().toString(36).slice(2, 10);
@@ -35,7 +38,9 @@ const blank = (): PartyEntry => ({
 export function RepeatablePartyFields({
   entries,
   onChange,
+  errors = {},
 }: RepeatablePartyFieldsProps) {
+  const rowError = (i: number, field: string) => errors[`managers.${i}.${field}`];
   const update = (id: string, patch: Partial<PartyEntry>) =>
     onChange(entries.map((e) => (e.id === id ? { ...e, ...patch } : e)));
   const remove = (id: string) => onChange(entries.filter((e) => e.id !== id));
@@ -88,18 +93,20 @@ export function RepeatablePartyFields({
 
             {entry.personOrEntity === "INDIVIDUAL" ? (
               <div className="grid grid-cols-2 gap-4 md:col-span-2 md:grid-cols-3">
-                <FieldShell label="First name" required htmlFor={`party-${entry.id}-first`}>
+                <FieldShell label="First name" required htmlFor={`party-${entry.id}-first`} error={rowError(idx, "firstName")}>
                   <Input
                     id={`party-${entry.id}-first`}
+                    aria-invalid={!!rowError(idx, "firstName")}
                     value={entry.firstName ?? ""}
                     onChange={(e) =>
                       update(entry.id, { firstName: e.target.value })
                     }
                   />
                 </FieldShell>
-                <FieldShell label="Last name" required htmlFor={`party-${entry.id}-last`}>
+                <FieldShell label="Last name" required htmlFor={`party-${entry.id}-last`} error={rowError(idx, "lastName")}>
                   <Input
                     id={`party-${entry.id}-last`}
+                    aria-invalid={!!rowError(idx, "lastName")}
                     value={entry.lastName ?? ""}
                     onChange={(e) =>
                       update(entry.id, { lastName: e.target.value })
@@ -121,9 +128,11 @@ export function RepeatablePartyFields({
                 required
                 className="md:col-span-2"
                 htmlFor={`party-${entry.id}-entity-name`}
+                error={rowError(idx, "businessEntityName")}
               >
                 <Input
                   id={`party-${entry.id}-entity-name`}
+                  aria-invalid={!!rowError(idx, "businessEntityName")}
                   value={entry.businessEntityName ?? ""}
                   onChange={(e) =>
                     update(entry.id, {
@@ -137,6 +146,7 @@ export function RepeatablePartyFields({
 
           <AddressFieldsBlock
             prefix={`party-${entry.id}`}
+            errors={rowError(idx, "streetAddress1") ? { address1: rowError(idx, "streetAddress1") } : undefined}
             value={{
               address1: entry.streetAddress1,
               address2: entry.streetAddress2,

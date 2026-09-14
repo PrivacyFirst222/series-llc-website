@@ -377,8 +377,19 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
   if (run.ra === "SERVICE") {
     await clickCard(page, /first year included/i);
   } else {
+    // Our service first, then a change of mind: nothing of ours survives
+    // the switch (14 Sep 2026: our office address and our series' name were
+    // signed as the client's own).
+    await clickCard(page, /first year included/i);
+    await page.waitForTimeout(300);
     await clickCard(page, /serve as my own/i);
     await page.waitForTimeout(300);
+    expect((await page.locator("#ra-street").inputValue()) === "" && (await page.locator("#ra-city").inputValue()) === "" && (await page.locator("#ra-zip").inputValue()) === "", `${run.key}: switching from our service to my own agent leaves the address boxes empty`, { street: await page.locator("#ra-street").inputValue(), city: await page.locator("#ra-city").inputValue() });
+    // "Use my information" keeps the agent in Florida whatever the client's
+    // own state is.
+    await page.locator("main button").filter({ hasText: /^Use my information/ }).first().click();
+    await page.waitForTimeout(300);
+    expect((await page.locator("#ra-state").inputValue()) === "FL — Florida", `${run.key}: "Use my information" leaves the agent's state as Florida`, await page.locator("#ra-state").inputValue());
     // A converting client keeping their own agent is told the record must
     // match (Adam, 14 Sep 2026); a new formation is not.
     expect((run.path === "convert") === /enter your agent's name and address exactly as the Division has them on file/.test(await page.locator("main").innerText()), `${run.key}: the own-agent choice tells a conversion the agent must match the record`, run.path);
@@ -397,6 +408,7 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
   // must skip it — asserted by heading, not assumed).
   if (run.ra === "SELF") {
     expect((await stepHeading(page)).toLowerCase().includes("acceptance"), `${run.key}: self agent sees the acceptance step`, await stepHeading(page));
+    expect((await page.locator("#ra-accept-name").inputValue()) === "Casey Gatecheck", `${run.key}: the acceptance name is the client's own, not our series' name`, await page.locator("#ra-accept-name").inputValue());
     await page.locator("#ra-accept-name").fill("Casey Gatecheck");
     await page.locator("#ra-accept-signature").fill("Casey Gatecheck");
     await checkAllBoxes(page);
@@ -434,6 +446,14 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
       await page.locator("main button", { hasText: /add manager/i }).first().click();
       await page.waitForTimeout(300);
     }
+    {
+      // Continue with the row blank: the message sits on the field
+      // (14 Sep 2026: it was computed and never shown).
+      await page.locator("main button").filter({ hasText: /^Continue/ }).first().click();
+      await page.waitForTimeout(400);
+      const blankText = await page.locator("main").innerText();
+      expect(/First name required\.|Entity name required\./.test(blankText) && /Street address required\./.test(blankText), `${run.key}: a blank manager row says which boxes are missing`, blankText.match(/required\.[^\n]{0,40}/g));
+    }
     if (run.managerEntity) {
       await choose(page, "[id$='-type']", "Business Entity");
       await fill(page, "Business entity name", "Gate Managers of Florida, Inc.");
@@ -460,6 +480,12 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
     }
   } else {
     expect(/member/i.test(peopleHeading), `${run.key}: member-managed collects members`, peopleHeading);
+    {
+      await page.locator("main button").filter({ hasText: /^Continue/ }).first().click();
+      await page.waitForTimeout(400);
+      const blankText = await page.locator("main").innerText();
+      expect(/First name required\./.test(blankText) && /Address required\./.test(blankText), `${run.key}: a blank member row says which boxes are missing`, blankText.match(/required\.[^\n]{0,40}/g));
+    }
     if (run.memberEntity) {
       await choose(page, "[id$='-type']", "Entity");
       await fill(page, "Entity name", "Gate Member Holdings, Inc.");
@@ -2024,6 +2050,21 @@ async function main(): Promise<void> {
         expect(!!prov && prov.fields.some((f) => /The practice of law/.test(f.value)) && !prov.fields.some((f) => /Leave blank/.test(f.value)), "words: a PLLC's professional purpose is on the filing sheet, not 'Leave blank'", prov?.fields.map((f) => f.value.slice(0, 60)));
       }
       const read = async (path: string) => { await page.goto(`http://localhost:${WEB_PORT}${path}`); await page.waitForSelector("main"); await page.waitForTimeout(400); return page.locator("main").innerText(); };
+      {
+        // The form's banner follows the path; Getting started carries Adam's
+        // $125 sentence; the state's office has one name (14 Sep 2026).
+        await page.goto(`http://localhost:${WEB_PORT}/form-llc`);
+        await page.evaluate(() => localStorage.clear());
+        const convBanner = await read("/form-llc?path=convert");
+        expect(/prepare Protected Series Designations for filing/.test(convBanner) && !/validated Articles of Organization/.test(convBanner), "words: a converting client's banner promises Designations, not Articles", convBanner.slice(0, 300));
+        await page.evaluate(() => localStorage.clear());
+        const newBanner = await read("/form-llc?path=new");
+        expect(/validated Articles of Organization/.test(newBanner), "words: a new formation's banner still promises Articles", newBanner.slice(0, 300));
+        await page.evaluate(() => localStorage.clear());
+        const started = await read("/form-llc");
+        expect(/Converting skips the \$125 filing fee for the Articles and Registered Agent \(if you keep your existing Registered Agent\)\./.test(started), "words: Getting started carries the $125 sentence in Adam's words", started.match(/Converting skips[^\n]*/)?.[0]);
+        expect(!/Secretary of State/.test(started), "words: the form does not say Secretary of State");
+      }
       const benefits = await read("/benefits");
       expect(/One state filing covers 10 series/.test(benefits) && !/unlimited series/.test(benefits), "words: Benefits says one filing covers 10 series");
       const how = await read("/how-it-works");
