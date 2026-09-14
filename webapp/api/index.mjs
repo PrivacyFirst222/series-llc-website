@@ -101467,8 +101467,8 @@ function legalMailEmail(opts) {
       client portal now.</p>
       <p>Please sign in and download it today. Papers served on a company usually carry a
       deadline that runs from the day they were served, whether or not they have been read.
-      In Florida a lawsuit typically allows 20 days to respond. Get the papers to your
-      attorney the same day.</p>
+      In Florida a lawsuit typically allows 20 days to respond BUT THIS IS NOT ALWAYS THE CASE.
+      Contact an attorney immediately so they can provide you with proper legal guidance.</p>
       <p><a href="${opts.portalUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Sign in to your portal</a></p>
       <p style="color:#555;font-size:13px">This email is a notice that mail arrived. We do not
       review what it says and cannot advise you about it.</p>
@@ -103697,7 +103697,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
 
-**1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as a Majority in Interest may determine. A Protected Series may maintain its own place of business as determined by the Company.
+**1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as a Majority in Interest may determine. A Protected Series may maintain its own place of business as determined by a majority of the Members.
 
 **1.6 Registered Agent and Registered Office.** The registered agent and registered office of the Company shall be as stated in the records of the Department. As required by the Act, the registered agent and registered office of the Company shall also serve as the registered agent and registered office for each Protected Series. Service of process, notice, or demand on a Protected Series may be made as provided by law, including s. 48.062, Florida Statutes.
 
@@ -104191,7 +104191,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
 
-**1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as a Majority in Interest may determine. A Protected Series may maintain its own place of business as determined by the Company.
+**1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as a Majority in Interest may determine. A Protected Series may maintain its own place of business as determined by a majority of the Members.
 
 **1.6 Registered Agent and Registered Office.** The registered agent and registered office of the Company shall be as stated in the records of the Department. As required by the Act, the registered agent and registered office of the Company shall also serve as the registered agent and registered office for each Protected Series. Service of process, notice, or demand on a Protected Series may be made as provided by law, including s. 48.062, Florida Statutes.
 
@@ -105130,7 +105130,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
 
-**1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as the Member may determine. A Protected Series may maintain its own place of business as determined by the Company.
+**1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as the Member may determine. A Protected Series may maintain its own place of business as determined by the Member.
 
 **1.6 Registered Agent and Registered Office.** The registered agent and registered office of the Company shall be as stated in the records of the Department. As required by the Act, the registered agent and registered office of the Company shall also serve as the registered agent and registered office for each Protected Series. Service of process, notice, or demand on a Protected Series may be made as provided by law, including s. 48.062, Florida Statutes.
 
@@ -105500,7 +105500,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
 
-**1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as the Member may determine. A Protected Series may maintain its own place of business as determined by the Company.
+**1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as the Member may determine. A Protected Series may maintain its own place of business as determined by the Member.
 
 **1.6 Registered Agent and Registered Office.** The registered agent and registered office of the Company shall be as stated in the records of the Department. As required by the Act, the registered agent and registered office of the Company shall also serve as the registered agent and registered office for each Protected Series. Service of process, notice, or demand on a Protected Series may be made as provided by law, including s. 48.062, Florida Statutes.
 
@@ -106598,6 +106598,7 @@ var MGMT_PROVISION = {
   MANAGER_MANAGED: "Pursuant to Florida Statutes Section 605.0407, the company is or will be manager-managed.",
   MEMBER_MANAGED: "Pursuant to Florida Statutes Section 605.0407, the company is or will be member-managed."
 };
+var RA_SERVICE_SIGNER = "Caitlin Kirwan";
 function raFields(ra) {
   const raIsBusiness = (ra.businessEntityName ?? "").trim() !== "";
   const raName = personName(ra);
@@ -106627,7 +106628,9 @@ function raFields(ra) {
     {
       key: "raSignature",
       label: "Registered Agent Signature (must be an individual's name)",
-      value: ra.acceptance?.electronicSignature ?? ra.acceptance?.acceptanceName ?? ""
+      // Our service signs through a person (Adam, 14 Sep 2026: "Caitlin
+      // Kirwan"); a client's own agent signs as they typed.
+      value: ra.choice === "SERVICE" ? RA_SERVICE_SIGNER : ra.acceptance?.electronicSignature ?? ra.acceptance?.acceptanceName ?? ""
     }
   ];
 }

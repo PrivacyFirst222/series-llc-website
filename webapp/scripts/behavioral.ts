@@ -379,6 +379,9 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
   } else {
     await clickCard(page, /serve as my own/i);
     await page.waitForTimeout(300);
+    // A converting client keeping their own agent is told the record must
+    // match (Adam, 14 Sep 2026); a new formation is not.
+    expect((run.path === "convert") === /enter your agent's name and address exactly as the Division has them on file/.test(await page.locator("main").innerText()), `${run.key}: the own-agent choice tells a conversion the agent must match the record`, run.path);
     // By id: the choice card's own label CONTAINS phrases like "Florida
     // street address", so label lookup finds the card's hidden radio.
     await page.locator("#ra-first-name").fill("Casey");

@@ -1,6 +1,8 @@
 /**
  * Learn More screens for the operating agreement questionnaire.
- * Copy approved by Adam in chat 2026-08-05 — do not edit without re-approval.
+ * Copy approved by Adam in chat 2026-08-05; every passage changed since was
+ * posted to him on 2026-09-14 and the S corporation "No" passage is in his
+ * words. Do not edit without re-approval.
  * Format: explanation, then "If you choose X… / If you choose Y…".
  */
 import type { ReactNode } from "react";
@@ -36,8 +38,10 @@ export const LEARN_MORE: Record<string, LearnMoreScreen> = {
         </Choice>
         <Choice label={'If you choose "No":'}>
           Your agreement uses our standard form — with one owner, the company is simply part of
-          your personal tax return; with multiple owners, it is taxed as a partnership — and
-          different owners can share in different protected series in different percentages.
+          your personal tax return; with multiple owners, it is taxed as a partnership. Under our
+          operating agreements, different owners cannot share in different protected series in
+          different percentages even if it is taxed as a partnership due to the tax complexity
+          that creates.
         </Choice>
         <P>
           <strong className="text-foreground">Worth knowing:</strong> this questionnaire does not

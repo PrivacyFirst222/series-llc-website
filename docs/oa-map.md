@@ -27,8 +27,8 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | sgm sgms | 1.3 | Name; Names of Protected Series | c5e32e13 | covenant | manager | members | The company changed its name and never conformed the series names, so the series were not maintained. | s. 605.2202; the compliance recital was cut 2026-08-13 — non-variable under s. 605.2107(1)(j), so restating it only supplied a yardstick |
 | mbr mbs mul scp sgl sgm sgms sgs | 1.4 | Purposes and Powers | 493808f8 | benefit | company | members | — | s. 605.0108 |
 | mul scp sgl sgs | 1.5 | Principal Office | c4203c65 | mechanic | company | members | — | s. 605.0113 |
-| mbr mbs | 1.5 | Principal Office | de02adc7 | mechanic | company | members | — | s. 605.0113 |
-| sgm sgms | 1.5 | Principal Office | 61889faf | mechanic | company | members | — | s. 605.0113 |
+| mbr mbs | 1.5 | Principal Office | 7a4f8aa0 | mechanic | company | members | — | s. 605.0113 |
+| sgm sgms | 1.5 | Principal Office | ad6901a2 | mechanic | company | members | — | s. 605.0113 |
 | mbr mbs mul scp sgl sgm sgms sgs | 1.6 | Registered Agent and Registered Office | e86e55ec | statutory-route | — | members third-party | — | s. 605.0113(6); kept by Adam 2026-08-13 — it tells a process server where to serve a series |
 | mbr mbs mul scp sgl sgm sgms sgs | 1.7 | Term | 4ed8bc66 | mechanic | company | members | — | s. 605.0108(3) |
 | mul scp sgl sgs | 1.8 | Location of Records | 34bea4c4 | covenant | manager | members | The records were not kept where the agreement says, so they were not maintained. | s. 605.0410(1) |

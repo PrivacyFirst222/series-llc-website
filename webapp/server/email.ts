@@ -169,8 +169,8 @@ export function legalMailEmail(opts: { clientName: string; title: string; portal
       client portal now.</p>
       <p>Please sign in and download it today. Papers served on a company usually carry a
       deadline that runs from the day they were served, whether or not they have been read.
-      In Florida a lawsuit typically allows 20 days to respond. Get the papers to your
-      attorney the same day.</p>
+      In Florida a lawsuit typically allows 20 days to respond BUT THIS IS NOT ALWAYS THE CASE.
+      Contact an attorney immediately so they can provide you with proper legal guidance.</p>
       <p><a href="${opts.portalUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Sign in to your portal</a></p>
       <p style="color:#555;font-size:13px">This email is a notice that mail arrived. We do not
       review what it says and cannot advise you about it.</p>

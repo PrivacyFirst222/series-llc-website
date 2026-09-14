@@ -362,6 +362,14 @@ const svc = await api("/api/orders", {
   }),
 });
 check("service-RA order accepted with canonical details enforced", svc.status === 200, svc.body);
+{
+  // The sheet's agent signature row is a person's name when we are the
+  // agent (Adam, 14 Sep 2026), not the series' name.
+  const admS = await adminSession();
+  const sheet = (await api(`/api/admin/orders/${svc.body?.data?.orderId}`, { cookies: admS.cookie })).body?.data as { groups?: { fields: { key: string; value: string }[] }[] } | undefined;
+  const sig = sheet?.groups?.flatMap((g) => g.fields).find((f) => f.key === "raSignature");
+  check("our service's agent signature row on the sheet reads Caitlin Kirwan", sig?.value === "Caitlin Kirwan", sig);
+}
 
 // 1e. Signing the Articles: exactly one of the two paths must be complete.
 //     Florida requires an authorized representative's signature (s. 605.0203(1)(b)),
@@ -868,7 +876,7 @@ check("admin uploads document", uploadRes.status === 200, await uploadRes.clone(
   const afterLegal = (await outbox()).filter((m) => m.to === testEmail).at(-1);
   check("legal mail sends a notice naming the document", afterLegal?.subject === "Legal mail received for Summons — Coastal v. E2E Coastal Holdings", afterLegal?.subject);
   check("the legal-mail notice says the clock runs from service and names the 20 days",
-    /runs from the day they were served, whether or not they have been read/.test(afterLegal?.html ?? "") && /20 days to respond/.test(afterLegal?.html ?? "") && /Sign in to your portal/.test(afterLegal?.html ?? ""),
+    /runs from the day they were served, whether or not they have been read/.test(afterLegal?.html ?? "") && /20 days to respond BUT THIS IS NOT ALWAYS THE CASE\.\s+Contact an attorney immediately so they can provide you with proper legal guidance\./.test(afterLegal?.html ?? "") && /Sign in to your portal/.test(afterLegal?.html ?? ""),
     afterLegal?.html?.slice(0, 200));
 }
 

@@ -82,6 +82,9 @@ export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
             <div className="text-xs text-muted-foreground mt-1">
               You must have a physical Florida street address and you'll sign
               the acceptance on the next screen.
+              {data.filingPath === "CONVERT"
+                ? " For an existing LLC, enter your agent's name and address exactly as the Division has them on file. This order does not change your agent."
+                : ""}
             </div>
           </label>
         </div>

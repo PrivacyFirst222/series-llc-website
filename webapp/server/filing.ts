@@ -186,6 +186,10 @@ type PayloadLike = {
 
 /** The registered agent's rows, shared by the Articles sheet and the
  *  conversion sheet's change-of-agent filing. */
+/** The individual who signs Sunbiz's registered agent acceptance for our
+ *  service (Adam, 14 Sep 2026). */
+export const RA_SERVICE_SIGNER = "Caitlin Kirwan";
+
 function raFields(ra: NonNullable<PayloadLike["registeredAgent"]>): FilingField[] {
   const raIsBusiness = (ra.businessEntityName ?? "").trim() !== "";
   const raName = personName(ra);
@@ -219,7 +223,9 @@ function raFields(ra: NonNullable<PayloadLike["registeredAgent"]>): FilingField[
     {
       key: "raSignature",
       label: "Registered Agent Signature (must be an individual's name)",
-      value: ra.acceptance?.electronicSignature ?? ra.acceptance?.acceptanceName ?? "",
+      // Our service signs through a person (Adam, 14 Sep 2026: "Caitlin
+      // Kirwan"); a client's own agent signs as they typed.
+      value: ra.choice === "SERVICE" ? RA_SERVICE_SIGNER : (ra.acceptance?.electronicSignature ?? ra.acceptance?.acceptanceName ?? ""),
     },
   ];
 }
