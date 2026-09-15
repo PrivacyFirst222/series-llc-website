@@ -212,6 +212,9 @@ function UploadDialog({ client }: { client: AdminClient }) {
   const [open, setOpen] = useState<boolean>(false);
   const [title, setTitle] = useState<string>("");
   const [kind, setKind] = useState<"package" | "legal_mail">("package");
+  /** The day legal mail was received (Adam, 14 Sep 2026): required, and the
+   *  date the client's email names. */
+  const [receivedOn, setReceivedOn] = useState<string>("");
   const [notify, setNotify] = useState<boolean>(true);
   const [file, setFile] = useState<File | null>(null);
   // A package belongs to one company (Adam, 7 Sep 2026); the choice appears
@@ -228,6 +231,7 @@ function UploadDialog({ client }: { client: AdminClient }) {
       form.set("kind", kind);
       form.set("title", title);
       form.set("notify", String(notify));
+      if (kind === "legal_mail") form.set("receivedOn", receivedOn);
       if (kind === "package" && orderId) form.set("orderId", orderId);
       form.set("file", file);
       const res = await fetch("/api/admin/documents", {
@@ -327,7 +331,14 @@ function UploadDialog({ client }: { client: AdminClient }) {
             />
           </div>
           {kind === "legal_mail" ? (
-            <p className="text-xs text-muted-foreground">The client is emailed the moment legal mail is posted.</p>
+            <div className="space-y-2">
+              <Label htmlFor="received-on">Received on</Label>
+              <Input id="received-on" type="date" value={receivedOn} onChange={(e) => setReceivedOn(e.target.value)} />
+              <p className="text-xs text-muted-foreground">
+                The day the mail arrived, named in the client's email. The client is emailed the moment legal mail is posted.
+                {!receivedOn ? <span className="text-destructive" data-testid="received-on-needed"> Enter the date the mail was received.</span> : null}
+              </p>
+            </div>
           ) : (
             <label className="flex items-center gap-2 text-sm">
               <Checkbox checked={notify} onCheckedChange={(v) => setNotify(v === true)} />
@@ -336,7 +347,7 @@ function UploadDialog({ client }: { client: AdminClient }) {
           )}
           <Button
             className="w-full rounded-full"
-            disabled={!file || !title.trim() || upload.isPending || (needsCompany && !orderId)}
+            disabled={!file || !title.trim() || upload.isPending || (needsCompany && !orderId) || (kind === "legal_mail" && !receivedOn)}
             onClick={() => upload.mutate()}
           >
             {upload.isPending ? "Uploading…" : "Upload document"}

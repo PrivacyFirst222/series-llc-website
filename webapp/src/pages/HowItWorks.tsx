@@ -33,7 +33,7 @@ const STEPS: {
     n: "03",
     icon: FolderCheck,
     title: "You get your filed documents and records package",
-    body: "Once the state accepts your filing, we send you the filed Articles of Organization and each filed Protected Series Designation, along with a form Operating Agreement completed from your questionnaire answers, a property titling manual, ledger forms for each series, a maintenance guide, and free access to our iPhone recordkeeping app when it is released, expected by the end of the year.",
+    body: "Once the state accepts your filing, we send you the filed Articles of Organization and each filed Protected Series Designation, along with a form Operating Agreement completed from your questionnaire answers, a comprehensive Series LLC Owner's Manual, and free access to our iPhone recordkeeping app when it is released, expected by the end of the year.",
   },
 ];
 

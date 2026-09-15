@@ -16,13 +16,13 @@ const ROWS: { label: string; us: string; them: string; themHasNone: boolean }[] 
   {
     label: "Series LLC Owner's Manual",
     us: "Included",
-    them: "None offered, anywhere",
+    them: "Not offered",
     themHasNone: true,
   },
   {
     label: "Recordkeeping app built around §605.2301",
     us: "Free with formation",
-    them: "None offered, anywhere",
+    them: "Not offered",
     themHasNone: true,
   },
   {

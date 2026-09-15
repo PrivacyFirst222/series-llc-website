@@ -168,7 +168,7 @@ export default function RecordkeepingApp() {
               <span className="h-px w-6 bg-border" /> The practical reality
             </div>
             <p className="text-sm text-foreground/80 leading-relaxed">
-              Think of the legal structure as the blueprint and your records as the building. You can have the best blueprint in the world — but if no one follows it, the building is not what the plans describe. A well-formed FPSLLC with poor recordkeeping is a structure that exists legally but may not hold up to scrutiny when it actually needs to protect you.
+              Think of the legal structure as the blueprint and your records as the building. You can have a perfect blueprint — but if no one follows it, the building is not what the plans describe. A well-formed FPSLLC with poor recordkeeping is a structure that exists legally but may not hold up to scrutiny when it actually needs to protect you.
             </p>
           </div>
 
@@ -328,7 +328,7 @@ export default function RecordkeepingApp() {
               What goes wrong when records are not maintained properly.
             </h2>
             <p className="mt-4 text-base text-muted-foreground leading-relaxed">
-              These are the issues we see most often with FPSLLC owners who did not have a system in place from the start.
+              These are the problems the structure invites when no system is in place from the start.
             </p>
           </div>
 

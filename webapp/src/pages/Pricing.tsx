@@ -6,9 +6,7 @@ import { WhyOnlyUsCompact } from "@/components/home/WhyOnlyUs";
 
 const SHARED_FEATURES: string[] = [
   "Form Operating Agreement completed from your questionnaire answers — your LLC owns every series, so the whole structure stays on one tax return",
-  "Property titling manual — how to properly title assets in the LLC or series",
-  "Ledger forms for each series",
-  "Complete Series LLC maintenance guide",
+  "Comprehensive Series LLC Owner's Manual — titling assets, keeping records, and maintaining your series",
   "Up to 3 Protected Series Designations, including their state filing fees",
   "Florida registered agent service — first year included ($99/yr after)",
   "Free iOS app (available end of year) — track LLC records, income & expenses, asset acquisitions and sales",
@@ -139,7 +137,7 @@ export default function Pricing() {
               {
                 t: "S corporation election package",
                 p: "$95",
-                n: "We prepare IRS Form 2553 complete, with a cover letter and filing instructions — you sign and file it. Available for new LLCs we form, ordered within 65 days of formation. The IRS deadline for a first-year election is 2 months and 15 days from formation.",
+                n: "We prepare IRS Form 2553 complete, with a cover letter and filing instructions — you sign and file it. Available for new LLCs we form, ordered within 65 days of paying for your formation. The IRS deadline for a first-year election is 2 months and 15 days from formation.",
               },
               { t: "Florida registered agent service (after year one)", p: "$99 / yr" },
               { t: "Certificate of Status ($10 service fee + $5 state fee)", p: "$15" },

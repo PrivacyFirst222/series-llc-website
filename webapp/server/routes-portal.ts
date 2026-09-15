@@ -1041,12 +1041,14 @@ app.get("/portal/documents", async (c) => {
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const db = await getDb();
   const docs = await db.query<{
-    id: string; kind: string; title: string; size_bytes: number; created_at: string; order_id: string | null;
+    id: string; kind: string; title: string; size_bytes: number; created_at: string; order_id: string | null; meta: unknown;
   }>(
-    "SELECT id, kind, title, size_bytes, created_at, order_id FROM documents WHERE client_id = $1 ORDER BY created_at DESC",
+    "SELECT id, kind, title, size_bytes, created_at, order_id, meta FROM documents WHERE client_id = $1 ORDER BY created_at DESC",
     [session.clientId],
   );
-  return c.json({ data: docs });
+  // Legal mail carries the day it was received (14 Sep 2026); nothing else
+  // in meta is the client's to see.
+  return c.json({ data: docs.map(({ meta, ...d }) => ({ ...d, receivedOn: d.kind === "legal_mail" ? ((typeof meta === "string" ? JSON.parse(meta) : meta) as { receivedOn?: string } | null)?.receivedOn ?? null : null })) });
 });
 
 app.get("/portal/documents/:id/download", async (c) => {

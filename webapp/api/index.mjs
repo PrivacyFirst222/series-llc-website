@@ -101466,8 +101466,8 @@ function legalMailEmail(opts) {
   return {
     subject: `Legal mail received for ${opts.title}`,
     html: wrap(`
-      <p>Dear ${escapeHtml(opts.clientName || "client")};</p>
-      <p>We received legal mail today as your registered agent:
+      <p>Dear ${escapeHtml(opts.clientName || "client")},</p>
+      <p>We received legal mail on ${escapeHtml(opts.receivedOn)} as your registered agent:
       <strong>${escapeHtml(opts.title)}</strong>. It is in the Legal mail section of your
       client portal now.</p>
       <p>Please sign in and download it today. Papers served on a company usually carry a
@@ -101497,7 +101497,7 @@ function raCancellationEmail(name, renewalDate = null) {
       <p>We received your request to cancel registered agent service. Two things determine
       what happens next:</p>
       <p><strong>1. The renewal charge.</strong> Because you gave notice through your portal,
-      your service will not renew at the next renewal date${renewalDate ? `, ${escapeHtml(renewalDate)},` : ""} \u2014 as long as your notice was given
+      your service will not renew at the next renewal date${renewalDate ? `, ${escapeHtml(renewalDate)}` : ""} \u2014 as long as your notice was given
       at least 30 days before that date.</p>
       <p><strong>2. Removing us as agent of record.</strong> Florida requires your LLC to have
       a registered agent at all times, so you must designate a successor registered agent with
@@ -101610,7 +101610,7 @@ function llcFormedEmail(opts) {
   return {
     subject: opts.isConversion ? `${opts.llcName} \u2014 protected series established` : `${opts.llcName} is formed`,
     html: wrap(`
-      <p>Dear ${escapeHtml(opts.clientName)};</p>
+      <p>Dear ${escapeHtml(opts.clientName)},</p>
       ${headline}
       <p>${waiting}</p>
       <ul>
@@ -107646,10 +107646,10 @@ function registerPortalRoutes(app2) {
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
     const db = await getDb();
     const docs = await db.query(
-      "SELECT id, kind, title, size_bytes, created_at, order_id FROM documents WHERE client_id = $1 ORDER BY created_at DESC",
+      "SELECT id, kind, title, size_bytes, created_at, order_id, meta FROM documents WHERE client_id = $1 ORDER BY created_at DESC",
       [session.clientId]
     );
-    return c.json({ data: docs });
+    return c.json({ data: docs.map(({ meta, ...d2 }) => ({ ...d2, receivedOn: d2.kind === "legal_mail" ? (typeof meta === "string" ? JSON.parse(meta) : meta)?.receivedOn ?? null : null })) });
   });
   app2.get("/portal/documents/:id/download", async (c) => {
     const session = await getSession(c);
@@ -110286,7 +110286,7 @@ Practical rules:
 1. Approve it: the members of the company, by the vote your agreement requires (single-member: you) \u2014 the company owns every series, so there are no associated members to consult.
 2. Wind it up: collect its receivables, pay or provide for **its** creditors from **its** assets, and distribute the remainder to the company, its sole owner. Its creditors have no recourse to the other silos, and what reaches you comes from the company as a distribution.
 3. File the **articles of protected series dissolution** (online), and the series drops from the annual report's list.
-4. Retire its Series Exhibit (mark superseded \u2014 keep it; it is history a future diligence will want), close its bank account *after* winding up, archive its records. Do not reuse its name or ledger for a new venture \u2014 new series, new $25, new exhibit, clean history.
+4. Retire its Series Exhibit (mark superseded \u2014 keep it; it is history a future diligence will want), close its bank account *after* winding up, archive its records. Do not reuse its name or ledger for a new venture \u2014 new series, new $50 ($25 to prepare and the $25 state fee), new exhibit, clean history.
 **Dissolving the company** dissolves **every** series with it, automatically. Winding up runs series-by-series first (each silo pays its own creditors from its own assets), then the mothership; the company's winding-up is not complete until every series' is. File articles of dissolution; the shields survive for the wind-down but the structure is over. If the company was administratively dissolved by the state (missed annual reports), reinstatement is possible \u2014 but the episode is exactly the kind of self-neglect a veil-piercing plaintiff collects; do not let it happen.
 **A series LLC cannot merge, convert, or domesticate freely.** A protected series can never be a party to those transactions on its own, and the company's options are tightly limited (ss. 605.2602\u2013.2604). If a reorganization is ever on the table \u2014 selling the whole structure, converting to separate LLCs, moving states \u2014 plan it with counsel around these limits.
 # PART SIX \u2014 PRACTICE TOOLS
@@ -110404,7 +110404,7 @@ Practical rules:
 **Winding up** \u2014 paying a dissolved silo's creditors from its assets and distributing the rest.
 ## 32. FREQUENTLY ASKED QUESTIONS
 **Is each protected series a separate LLC?** No \u2014 one legal entity total. Each series is a legal "person" that acts in its own name, but it cannot exist apart from the company.
-**How many series can I have?** No statutory limit. Each is a $25 online filing plus a Series Exhibit \u2014 and, more importantly, a silo you must actually maintain. Add series for real compartments, not for sport.
+**How many series can I have?** No statutory limit. Each costs $50 through us \u2014 $25 to prepare and the $25 state filing fee \u2014 plus a Series Exhibit \u2014 and, more importantly, a silo you must actually maintain. Add series for real compartments, not for sport.
 **Can series be added or removed later?** Yes \u2014 designate new ones any time (all members must consent), and dissolve one without touching the rest (Section 26).
 **I sold the rental property in one of my series. I'm buying a new rental \u2014 can I reuse the empty series and title the new property in it?** Don't. Reusing a series is a bad idea, because a series keeps its liability history long after its asset is gone \u2014 nothing in Florida law forbids the reuse; the problem is what comes with it. A tenant injured during your years of ownership, a deposit dispute, a contractor's unpaid claim, a buyer alleging the roof was misrepresented or that termite damage was undisclosed \u2014 claims like these belong to *that series*, they can be filed years after the closing, and a judgment on any of them reaches whatever the series owns **at the time the creditor enforces** (s. 605.2404 tests association at enforcement, not just when the liability arose). Title the new property into the old series and you have staked your new investment against the old property's unknown past \u2014 the clean compartment you paid for is gone exactly where you need it most. A fresh series costs $25 and gives the new property the one thing the structure exists to provide: a silo with no history. The same logic applies to the sale proceeds: don't leave them parked in the old series, where the old property's tail can reach them \u2014 distribute them up to the company, documented, and fund the new purchase into the new series as a recorded contribution (Section 10). Keep the old series alive and empty until you and your advisor are satisfied its exposure has passed, then dissolve it (Section 26) \u2014 and never reuse its name or ledger (the same rule Section 26 already gives you).
 **Does each series need its own registered agent?** No \u2014 the company's agent automatically serves every series. One agent, one fee.
@@ -111528,6 +111528,10 @@ function registerAdminRoutes(app2) {
     if (!(file instanceof File) || !clientId || !title) {
       return c.json(err("clientId, title, and file are required.", "INVALID_INPUT"), 400);
     }
+    const receivedOn = typeof form.receivedOn === "string" ? form.receivedOn.trim() : "";
+    if (kind === "legal_mail" && !/^\d{4}-\d{2}-\d{2}$/.test(receivedOn)) {
+      return c.json(err("Enter the date the mail was received.", "RECEIVED_ON_REQUIRED"), 400);
+    }
     if (file.size > MAX_UPLOAD_BYTES) {
       return c.json(err("File is too large (20 MB max).", "TOO_LARGE"), 400);
     }
@@ -111552,13 +111556,13 @@ function registerAdminRoutes(app2) {
     }
     const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
     const rows = await db.query(
-      `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes)
-     VALUES ($1, $7, $2, $3, $4, $5, $6) RETURNING id`,
-      [clientId, kind, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes, orderId]
+      `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
+     VALUES ($1, $7, $2, $3, $4, $5, $6, $8::jsonb) RETURNING id`,
+      [clientId, kind, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes, orderId, JSON.stringify(kind === "legal_mail" ? { receivedOn } : {})]
     );
     let notified = false;
     if (notify) {
-      const mail = kind === "legal_mail" ? legalMailEmail({ clientName: clients[0].name, title, portalUrl: `${env.PUBLIC_BASE_URL}/portal` }) : newDocumentEmail(`${env.PUBLIC_BASE_URL}/portal`);
+      const mail = kind === "legal_mail" ? legalMailEmail({ clientName: clients[0].name, title, portalUrl: `${env.PUBLIC_BASE_URL}/portal`, receivedOn: fmtDate2(receivedOn) }) : newDocumentEmail(`${env.PUBLIC_BASE_URL}/portal`);
       notified = await sendMail({ to: clients[0].email, ...mail }).then(
         () => true,
         (e) => {

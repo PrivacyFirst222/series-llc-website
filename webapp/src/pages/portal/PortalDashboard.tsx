@@ -31,6 +31,8 @@ interface PortalDoc {
   title: string;
   size_bytes: number;
   created_at: string;
+  /** Legal mail: the day it was received, YYYY-MM-DD. */
+  receivedOn?: string | null;
   order_id: string | null;
 }
 
@@ -92,6 +94,11 @@ function DocList({
                     name sit at the end of the title and are what tell two
                     agreements apart. */}
                 <span className="text-sm font-medium">{d.title}</span>
+                {d.kind === "legal_mail" && d.receivedOn ? (
+                  <span className="text-xs text-muted-foreground" data-testid="received-on">
+                    Received {new Date(`${d.receivedOn}T12:00:00`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+                  </span>
+                ) : null}
                 {mine ? (
                   <>
                     <span

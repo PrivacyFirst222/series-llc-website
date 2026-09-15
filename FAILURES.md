@@ -3141,6 +3141,22 @@ The report condensed sixty findings, and condensing pushed every sentence toward
 
 Every reference to a section or article in a report carries what it is about in words, the first time it appears: "Article 9, the tax article that protects the S election". Long reports do not earn shorter sentences; if the report is too long to explain each item, it is too long, and the fix is fewer items per message, not fewer words per item.
 
+## P84 — Findings handed over as fragments, with nothing around them
+
+### THE FAILURE
+
+Adam, 14 Sep 2026: "You give me little bits with zero context. This is not helpful." And on the same list: "In what context?", "What is the context?", "I don't understand what you mean here", "What does an 'open form' mean?"
+
+The public-pages section of the audit report gave him lines like: "Pricing: S election 'within 65 days of formation'. The clock runs from payment." and a run-on of quoted scraps: "'first and only', 'None offered, anywhere', 'the only formation service anywhere', 'strongest possible shield', 'the best blueprint'. Also 'icy walkway' in Florida, a fake filename shown in the diagram." No page section, no full sentence, no statement of what the sentence claims or what is true instead. Four of the twelve items came back as questions, and one as a complaint. He could not decide any of them from what I gave him, and P82 (a file and a line instead of a place) and P83 (a section number instead of words) had already been written that day for the same shape of failure.
+
+### WHY IT HAPPENED
+
+I was the one who had read every page, so each scrap was a complete thought to me: "65 days of formation" pulled up the whole sentence and the code behind it in my head. I wrote the report from that position and never asked what the scrap would pull up for someone who had not read the page that hour. The compression was also deliberate: sixty findings, one message, and a rule about short sentences, so I traded the context for length and told myself the quoted words were the context. A quoted fragment feels like evidence; it is only evidence to the person who already knows where it came from. P82 and P83 were both about the same trade, and I treated each as a one-off about code and about section numbers instead of as one rule about who has to be able to read the sentence.
+
+### FIXED BY
+
+Every finding on a page carries, in this order: the page and the section a visitor would see, the full sentence as it reads today, what it claims, and what is true instead, then the proposed replacement. A message that cannot fit that for every item is split across messages by section, which is what Adam himself asked for when he said "one by one".
+
 ## Process — the ones that let the substantive ones through
 
 **M1 · Verify the proposition you set out to verify, not the one underneath.** A

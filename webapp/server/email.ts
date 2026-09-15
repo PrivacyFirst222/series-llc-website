@@ -159,12 +159,12 @@ export function emailChangedEmail(newEmail: string): { subject: string; html: st
 /** Legal mail received as registered agent (Adam, 10 Sep 2026). The Owner's
  *  Manual tells the client the response clock runs from service whether or
  *  not the papers are read; this email says so, the day the mail arrives. */
-export function legalMailEmail(opts: { clientName: string; title: string; portalUrl: string }): { subject: string; html: string } {
+export function legalMailEmail(opts: { clientName: string; title: string; portalUrl: string; receivedOn: string }): { subject: string; html: string } {
   return {
     subject: `Legal mail received for ${opts.title}`,
     html: wrap(`
-      <p>Dear ${escapeHtml(opts.clientName || "client")};</p>
-      <p>We received legal mail today as your registered agent:
+      <p>Dear ${escapeHtml(opts.clientName || "client")},</p>
+      <p>We received legal mail on ${escapeHtml(opts.receivedOn)} as your registered agent:
       <strong>${escapeHtml(opts.title)}</strong>. It is in the Legal mail section of your
       client portal now.</p>
       <p>Please sign in and download it today. Papers served on a company usually carry a
@@ -196,7 +196,7 @@ export function raCancellationEmail(name: string, renewalDate: string | null = n
       <p>We received your request to cancel registered agent service. Two things determine
       what happens next:</p>
       <p><strong>1. The renewal charge.</strong> Because you gave notice through your portal,
-      your service will not renew at the next renewal date${renewalDate ? `, ${escapeHtml(renewalDate)},` : ""} — as long as your notice was given
+      your service will not renew at the next renewal date${renewalDate ? `, ${escapeHtml(renewalDate)}` : ""} — as long as your notice was given
       at least 30 days before that date.</p>
       <p><strong>2. Removing us as agent of record.</strong> Florida requires your LLC to have
       a registered agent at all times, so you must designate a successor registered agent with
@@ -392,7 +392,7 @@ export function llcFormedEmail(opts: {
   return {
     subject: opts.isConversion ? `${opts.llcName} — protected series established` : `${opts.llcName} is formed`,
     html: wrap(`
-      <p>Dear ${escapeHtml(opts.clientName)};</p>
+      <p>Dear ${escapeHtml(opts.clientName)},</p>
       ${headline}
       <p>${waiting}</p>
       <ul>

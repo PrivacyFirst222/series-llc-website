@@ -901,10 +901,19 @@ check("admin uploads document", uploadRes.status === 200, await uploadRes.clone(
   lm.set("title", "Summons — Coastal v. E2E Coastal Holdings");
   lm.set("notify", "true");
   lm.set("file", new File([new TextEncoder().encode("%PDF-1.4 summons\n%%EOF")], "summons.pdf", { type: "application/pdf" }));
+  {
+    // Without the day it was received, legal mail is refused (Adam, 14 Sep 2026).
+    const noDate = await fetch(BASE + "/api/admin/documents", { method: "POST", headers: { Cookie: admin.cookie }, body: lm });
+    const noDateBody = await noDate.json().catch(() => null) as { error?: { code?: string; message?: string } } | null;
+    check("legal mail without a received-on date is refused with the reason", noDate.status === 400 && noDateBody?.error?.code === "RECEIVED_ON_REQUIRED" && noDateBody?.error?.message === "Enter the date the mail was received.", noDateBody);
+  }
+  lm.set("receivedOn", "2026-09-12");
   const lmRes = await fetch(BASE + "/api/admin/documents", { method: "POST", headers: { Cookie: admin.cookie }, body: lm });
   check("admin uploads legal mail", lmRes.status === 200, await lmRes.clone().json().catch(() => null));
   const afterLegal = (await outbox()).filter((m) => m.to === testEmail).at(-1);
   check("legal mail sends a notice naming the document", afterLegal?.subject === "Legal mail received for Summons — Coastal v. E2E Coastal Holdings", afterLegal?.subject);
+  check("the notice names the day the mail was received, not the day of the scan, and greets with a comma (14 Sep 2026)", /We received legal mail on September 12, 2026 as your registered agent/.test(afterLegal?.html ?? "") && /Dear Casey Member, Jr\.,/.test(afterLegal?.html ?? ""), afterLegal?.html?.match(/Dear[^<]{0,40}|We received legal mail[^:]{0,60}/g));
+
   check("the legal-mail notice says the clock runs from service and names the 20 days",
     /runs from the day they were served, whether or not they have been read/.test(afterLegal?.html ?? "") && /20 days to respond BUT THIS IS NOT ALWAYS THE CASE\.\s+Contact an attorney immediately so they can provide you with proper legal guidance\./.test(afterLegal?.html ?? "") && /Sign in to your portal/.test(afterLegal?.html ?? ""),
     afterLegal?.html?.slice(0, 200));
@@ -1852,9 +1861,15 @@ if (mint.status === 200) {
       mail.set("kind", "legal_mail");
       mail.set("title", "Hand-uploaded legal mail");
       mail.set("notify", "false");
+      mail.set("receivedOn", "2026-09-13");
       mail.set("file", new File([new TextEncoder().encode("%PDF-1.4 legal mail\n%%EOF")], "mail.pdf", { type: "application/pdf" }));
       const mailRes = await fetch(`${BASE}/api/admin/documents`, { method: "POST", body: mail, headers: { Cookie: admU.cookie, "X-Forwarded-For": RUN_IP } });
       check("legal mail needs no company", mailRes.status === 200, await mailRes.json().catch(() => null));
+      {
+        const mailDocs = ((await api("/api/portal/documents", { cookies: setPw.cookie })).body?.data ?? []) as { kind: string; title: string; receivedOn?: string | null }[];
+        const handMail = mailDocs.find((d) => d.kind === "legal_mail" && d.title === "Hand-uploaded legal mail");
+        check("the client's legal mail carries the day it was received (14 Sep 2026)", handMail?.receivedOn === "2026-09-13", handMail);
+      }
       // Legal mail is emailed whether or not the box was ticked (14 Sep 2026:
       // the office could post a summons silently).
       const lmMail = ((await api("/api/dev/outbox")).body?.data ?? []) as { to: string; subject: string }[];

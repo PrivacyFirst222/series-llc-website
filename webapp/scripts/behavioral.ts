@@ -2128,6 +2128,31 @@ async function main(): Promise<void> {
         expect(/Converting skips the \$125 filing fee for the Articles and Registered Agent \(if you keep your existing Registered Agent\)\./.test(started), "words: Getting started carries the $125 sentence in Adam's words", started.match(/Converting skips[^\n]*/)?.[0]);
         expect(!/Secretary of State/.test(started), "words: the form does not say Secretary of State");
       }
+      {
+        // The public pages after the 14 Sep 2026 audit, as Adam ruled them.
+        const home = await read("/");
+        expect(/Not offered/.test(home) && !/None offered, anywhere/.test(home) && /Florida registered agent service included/.test(home) && !/FL Division of Corporations registered agent/.test(home), "words: the home page's comparison rows read Not offered and the trust line names our agent service", home.match(/Not offered|None offered[^\n]{0,20}|Florida registered agent service included/g));
+        const whatIsText = await read("/what-is");
+        expect(!/fl-protected-series-llc\.diagram/.test(whatIsText) && !/Distinct membership interests/.test(whatIsText) && /Separate books, records, and asset ledger per series/.test(whatIsText), "words: the What Is diagram has no file name and no per-series ownership bullet", whatIsText.match(/fl-protected[^\n]{0,30}|Distinct membership[^\n]{0,40}/g));
+        const ap = await read("/asset-protection");
+        expect(/slips on a wet walkway/.test(ap) && /Ready to build the shield\?/.test(ap) && /defends against inside liability, outside liability, and inter-asset contagion — all in one filing\./.test(ap) && !/strongest possible|the only structure/.test(ap), "words: Asset Protection reads wet walkway and the plain closing banner", ap.match(/walkway[^.]{0,30}|Ready to build[^?]*\?|the only structure/g));
+        const pricing0 = await read("/pricing");
+        expect(/within 65 days of paying for your formation/.test(pricing0) && /Comprehensive Series LLC Owner's Manual/.test(pricing0) && !/titling manual|Ledger forms|maintenance guide/.test(pricing0), "words: Pricing counts the 65 days from payment and lists the Owner's Manual, not documents that do not exist", pricing0.match(/65 days[^.]{0,40}|titling manual|Ledger forms|maintenance guide/g));
+        const how0 = await read("/how-it-works");
+        expect(/a comprehensive Series LLC Owner's Manual/.test(how0) && !/titling manual|ledger forms|maintenance guide/.test(how0), "words: How It Works step 3 promises the Owner's Manual", how0.match(/Owner's Manual[^.]{0,40}|titling manual|ledger forms/g));
+        await page.goto(`http://localhost:${WEB_PORT}/faq`);
+        await page.waitForSelector("main");
+        // The answers sit behind their questions until opened, one at a time.
+        let faq0 = "";
+        for (const q of [/I already have a Florida LLC/, /federal tax treatment/]) {
+          await page.locator("main button").filter({ hasText: q }).first().click();
+          await page.waitForTimeout(400);
+          faq0 += "\n" + (await page.locator("main").innerText());
+        }
+        expect(/If you choose our registered agent service, Florida charges \$25 to change the agent on file for your LLC\./.test(faq0) && /You also receive an operating agreement drafted for S corporation status whether you have us prepare your S Election form or prepare it yourself\./.test(faq0) && /We will not be able to provide that service here\./.test(faq0), "words: the FAQ carries Adam's conversion and S election sentences", faq0.match(/If you choose our registered agent[^.]*\.|You also receive[^.]*\./g));
+        const app0 = await read("/recordkeeping-app");
+        expect(/You can have a perfect blueprint/.test(app0) && /These are the problems the structure invites when no system is in place from the start\./.test(app0) && !/best blueprint|we see most often/.test(app0), "words: the Recordkeeping App page reads as Adam ruled", app0.match(/perfect blueprint|best blueprint|we see most often|problems the structure invites/g));
+      }
       const benefits = await read("/benefits");
       expect(/One state filing covers 10 series/.test(benefits) && !/unlimited series/.test(benefits), "words: Benefits says one filing covers 10 series");
       const how = await read("/how-it-works");

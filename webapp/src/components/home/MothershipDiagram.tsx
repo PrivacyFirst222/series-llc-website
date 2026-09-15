@@ -28,7 +28,6 @@ export function MothershipDiagram() {
             </p>
             <ul className="space-y-3 pt-2 text-sm">
               {[
-                "Distinct membership interests, managers, and economic rights per series",
                 "Separate books, records, and asset ledger per series",
                 "Protected Series Designation filed with the state for each series",
                 "All under one Federal EIN structure & one Florida filing",
@@ -45,9 +44,7 @@ export function MothershipDiagram() {
           <div className="lg:col-span-7">
             <div className="relative rounded-3xl border border-border bg-card p-6 lg:p-10 shadow-sm">
               <div className="absolute inset-x-10 top-6 flex items-center justify-between">
-                <span className="font-mono-feature text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">
-                  fl-protected-series-llc.diagram
-                </span>
+                <span />
                 <span className="font-mono-feature text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">
                   §605.2101
                 </span>

@@ -27,7 +27,7 @@ import { einDigits, fmtEinDisplay, isValidEin } from "../src/lib/ein";
 import { filingGroups, seriesNames, AR_SIGNER } from "./filing";
 import { err, testHooks, MAX_UPLOAD_BYTES, looksLikePdf, requireAdmin } from "./shared";
 import { loadSummaryRow } from "./order-summary";
-import { oaSeed, purgeExpiredSElections, postSElectionPackage, isoDate, type SElectionStoredDetails } from "./routes-portal";
+import { oaSeed, purgeExpiredSElections, postSElectionPackage, isoDate, fmtDate, type SElectionStoredDetails } from "./routes-portal";
 import { evaluate2553Timing } from "../src/lib/form2553Timing";
 import { unpackSsns } from "../src/lib/jointOwner";
 import { easternDateIso } from "./datetime";
@@ -1438,6 +1438,12 @@ app.post("/admin/documents", async (c) => {
   if (!(file instanceof File) || !clientId || !title) {
     return c.json(err("clientId, title, and file are required.", "INVALID_INPUT"), 400);
   }
+  // Legal mail carries the day it was received (Adam, 14 Sep 2026): the
+  // email used to say "today", which was the day of the scan.
+  const receivedOn = typeof form.receivedOn === "string" ? form.receivedOn.trim() : "";
+  if (kind === "legal_mail" && !/^\d{4}-\d{2}-\d{2}$/.test(receivedOn)) {
+    return c.json(err("Enter the date the mail was received.", "RECEIVED_ON_REQUIRED"), 400);
+  }
   if (file.size > MAX_UPLOAD_BYTES) {
     return c.json(err("File is too large (20 MB max).", "TOO_LARGE"), 400);
   }
@@ -1472,9 +1478,9 @@ app.post("/admin/documents", async (c) => {
 
   const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
   const rows = await db.query<{ id: string }>(
-    `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes)
-     VALUES ($1, $7, $2, $3, $4, $5, $6) RETURNING id`,
-    [clientId, kind, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes, orderId],
+    `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
+     VALUES ($1, $7, $2, $3, $4, $5, $6, $8::jsonb) RETURNING id`,
+    [clientId, kind, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes, orderId, JSON.stringify(kind === "legal_mail" ? { receivedOn } : {})],
   );
 
   let notified = false;
@@ -1483,7 +1489,7 @@ app.post("/admin/documents", async (c) => {
     // keeps the plain new-document notice (Adam, 10 Sep 2026).
     const mail =
       kind === "legal_mail"
-        ? legalMailEmail({ clientName: clients[0].name, title, portalUrl: `${env.PUBLIC_BASE_URL}/portal` })
+        ? legalMailEmail({ clientName: clients[0].name, title, portalUrl: `${env.PUBLIC_BASE_URL}/portal`, receivedOn: fmtDate(receivedOn) })
         : newDocumentEmail(`${env.PUBLIC_BASE_URL}/portal`);
     notified = await sendMail({ to: clients[0].email, ...mail }).then(
       () => true,

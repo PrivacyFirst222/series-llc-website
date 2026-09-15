@@ -45,7 +45,7 @@ export default function AssetProtection() {
           </div>
 
           <p className="text-base text-foreground/80 leading-relaxed">
-            Every asset you own carries the potential to generate a lawsuit. A rental property tenant slips on an icy walkway. A piece of heavy equipment injures a worker. These are liabilities that are <em>born inside</em> the entity — they arise from the asset itself.
+            Every asset you own carries the potential to generate a lawsuit. A rental property tenant slips on a wet walkway. A piece of heavy equipment injures a worker. These are liabilities that are <em>born inside</em> the entity — they arise from the asset itself.
           </p>
 
           {/* Example */}
@@ -272,9 +272,9 @@ export default function AssetProtection() {
             <div className="flex justify-center mb-4">
               <ShieldCheck className="h-10 w-10 text-trust" />
             </div>
-            <h3 className="font-display text-2xl">Ready to build the strongest possible shield?</h3>
+            <h3 className="font-display text-2xl">Ready to build the shield?</h3>
             <p className="mt-3 text-muted-foreground max-w-md mx-auto">
-              A multi-member Florida Protected Series LLC is the only structure that defends against inside liability, outside liability, and inter-asset contagion — all in one filing.
+              A multi-member Florida Protected Series LLC defends against inside liability, outside liability, and inter-asset contagion — all in one filing.
             </p>
             <div className="mt-8 flex justify-center">
               <Button asChild size="lg" className="rounded-full bg-accent text-accent-foreground hover:bg-accent/90">
