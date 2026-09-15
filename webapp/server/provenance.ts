@@ -241,7 +241,6 @@ function masterKey(s: string): string {
       // Master-spelled choice cells: the generator picks one of the wordings
       // the master offers inside the bracket. The chosen wording traces; a
       // wording from anywhere else still fails.
-      .replace(/\[Same as Company Manager \/ NAME\]/g, "[NAME]")
       .replace(/\[None \/ variations from the base Agreement — may not vary [^\]]*\]/g, "[SPECIAL]")
       .replace(/<!--[^>]*-->/g, "")
   );
@@ -262,19 +261,22 @@ function knownOf(raw: string): Set<string> {
   // A master paragraph carrying <!-- one:… --> / <!-- many:… --> holds BOTH
   // wordings; the delivered document holds one. Resolve it both ways so the
   // chosen wording traces, and the unchosen one does not go missing.
-  const one = raw
-    .replace(/<!--\s*many:[a-z]+\s*-->[\s\S]*?<!--\s*\/many\s*-->/g, "")
-    .replace(/<!--\s*one:[a-z]+\s*-->([\s\S]*?)<!--\s*\/one\s*-->/g, "$1");
-  const many = raw
-    .replace(/<!--\s*one:[a-z]+\s*-->[\s\S]*?<!--\s*\/one\s*-->/g, "")
-    .replace(/<!--\s*many:[a-z]+\s*-->([\s\S]*?)<!--\s*\/many\s*-->/g, "$1");
+  // Each number key (member, manager, …) is chosen on its own: a sole owner
+  // with two Managers is singular in one place and plural in another
+  // (15 Sep 2026), so every combination of keys is a variant.
+  const keys = [...new Set([...raw.matchAll(/<!--\s*(?:one|many):([a-z]+)\s*-->/g)].map((m) => m[1]))];
+  const choose = (v: string, key: string, singular: boolean) => v
+    .replace(new RegExp(`<!--\\s*${singular ? "many" : "one"}:${key}\\s*-->[\\s\\S]*?<!--\\s*/${singular ? "many" : "one"}\\s*-->`, "g"), "")
+    .replace(new RegExp(`<!--\\s*${singular ? "one" : "many"}:${key}\\s*-->([\\s\\S]*?)<!--\\s*/${singular ? "one" : "many"}\\s*-->`, "g"), "$1");
+  let numbered: string[] = [raw];
+  for (const key of keys) numbered = numbered.flatMap((v) => [choose(v, key, true), choose(v, key, false)]);
   // <!-- if:X --> … <!-- /if --> likewise holds both states: present when the
   // condition is met, absent otherwise. Resolve each base variant both ways.
   const ifOut = (v: string) => v.replace(/<!--\s*if:[a-z]+\s*-->[\s\S]*?<!--\s*\/if\s*-->/g, "");
   const ifIn = (v: string) => v.replace(/<!--\s*if:[a-z]+\s*-->([\s\S]*?)<!--\s*\/if\s*-->/g, "$1");
 
   const known = new Set<string>();
-  for (const variant of [raw, one, many].flatMap((v) => [ifOut(v), ifIn(v)])) {
+  for (const variant of [raw, ...numbered].flatMap((v) => [ifOut(v), ifIn(v)])) {
     for (const b of blocks(variant)) {
       const k = keyMaster(b);
       if (k) known.add(k);

@@ -3157,6 +3157,22 @@ I was the one who had read every page, so each scrap was a complete thought to m
 
 Every finding on a page carries, in this order: the page and the section a visitor would see, the full sentence as it reads today, what it claims, and what is true instead, then the proposed replacement. A message that cannot fit that for every item is split across messages by section, which is what Adam himself asked for when he said "one by one".
 
+## P85 — Three audits, each finding what the last one missed and what the last one broke
+
+### THE FAILURE
+
+Adam, 15 Sep 2026: "This is the third time you have run the audit. How the fuck do you keep missing so much?"
+
+On 13 Sep he asked me to look over the day's sloppy mistakes and run through the whole process for more. That pass produced 25 items. The 14 Sep pass, five reviewers over 145 files, produced about 60 more, in the same pages. The 15 Sep pass produced 67 more, again in the same pages, and at least eight of them were made by the 14 Sep fixes: a duplicated paragraph in the FAQ, a rate limit I said I had moved and had not, the same comment pasted four times, a third "$25" in the Manual after I fixed two, the series consent's exhibit rows left naming Managers after the agreements' rows were changed, the consent's title and "Managed by" row left plural after I made the body singular, the Instructions sentence I wrote that day that is wrong for two forms, and a document-title change that broke the portal button that matched on it. Each pass was reported as complete, with counts and passing checks.
+
+### WHY IT HAPPENED
+
+Each audit was built from the previous day's mistakes: I wrote the reviewers a checklist of the kinds of defect I already knew, and they found those kinds. An audit that can only see the categories its author suspects will always leave a next pass, and I called each one "the audit" anyway because a long list of findings felt like thoroughness. Second, every fix was scoped by the sentence the finding quoted. A price, a deliverable, a document title, a signer, an exhibit row each live in three to eight places; I changed the place the finding named and never asked where else that fact lived, so each pass seeded the next. Third, I measured my fixes with checks I wrote to pass and gates whose baselines I wrote, and let "606 pass, 0 fail" stand in for reading the page afterwards as a reader would; the FAQ duplicate was visible to anyone who opened the answer. Fourth, the second and third passes were pointed at old defects, not at verifying the previous pass's work across every place the fact appears; I treated my own edits as safe ground, when they were the newest and least-read text in the product.
+
+### FIXED BY
+
+Before any further audit, a fact ledger: every product fact that appears in more than one place (prices and fees, deliverables, who signs what, document titles, exhibit rows, section and statute citations) with every location listed, and a check that fails when the locations disagree. When a finding is fixed, the fix is to the fact everywhere, found by searching the fact, not the quoted sentence. After every batch, each changed page is read whole, as a reader, not diffed by line. And the next pass starts by re-verifying the last pass's fixes in every location before it looks for anything new.
+
 ## Process — the ones that let the substantive ones through
 
 **M1 · Verify the proposition you set out to verify, not the one underneath.** A

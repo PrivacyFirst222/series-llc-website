@@ -9,6 +9,17 @@ Cloud sync is not version control. Dropbox has no diffable history, and an
 overwrite or a bad sync destroys a marked-up draft with nothing to restore from.
 That is why the masters live here.
 
+## The fact ledger
+
+`docs/facts.md` lists every product fact that lives in more than one place —
+prices, deliverables, who signs what, exhibit rows, citations, column names,
+the edition label — with every place it lives. `bun run docs/facts-check.ts`
+fails when any place disagrees, when a retired wording survives anywhere a
+client or the office reads, when a master's colophon does not match its body's
+citations, or when a portal rate limit is charged before the request's checks.
+It runs in `bun run check` and in the pre-commit hook. When a fact changes,
+change the ledger first, then every place it names.
+
 ## Masters → Word output
 
 | Master (edit this) | Word output, in `docs/word/` and Dropbox |

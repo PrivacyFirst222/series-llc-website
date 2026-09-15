@@ -1048,7 +1048,12 @@ app.get("/portal/documents", async (c) => {
   );
   // Legal mail carries the day it was received (14 Sep 2026); nothing else
   // in meta is the client's to see.
-  return c.json({ data: docs.map(({ meta, ...d }) => ({ ...d, receivedOn: d.kind === "legal_mail" ? ((typeof meta === "string" ? JSON.parse(meta) : meta) as { receivedOn?: string } | null)?.receivedOn ?? null : null })) });
+  // Legal mail carries the day it was received; a designation carries the
+  // series it covers, so the consent button can find it (15 Sep 2026).
+  return c.json({ data: docs.map(({ meta, ...d }) => {
+    const m = (typeof meta === "string" ? JSON.parse(meta) : meta) as { receivedOn?: string; seriesNames?: string[] } | null;
+    return { ...d, receivedOn: d.kind === "legal_mail" ? m?.receivedOn ?? null : null, seriesNames: d.kind === "psd" ? m?.seriesNames ?? [] : undefined };
+  }) });
 });
 
 app.get("/portal/documents/:id/download", async (c) => {
@@ -1860,12 +1865,6 @@ app.post("/portal/services/s-election", async (c) => {
   const db = await getDb();
   // Only a purchase that passed every check spends the allowance (Adam,
   // 14 Sep 2026: refusals do not count).
-  // Only a purchase that passed every check spends the allowance (Adam,
-  // 14 Sep 2026: refusals do not count).
-  // Only a purchase that passed every check spends the allowance (Adam,
-  // 14 Sep 2026: refusals do not count).
-  // Only a purchase that passed every check spends the allowance (Adam,
-  // 14 Sep 2026: refusals do not count).
   if (!(await rateLimit(`svc:${session.clientId}`, 20, 3600_000))) {
     return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
   }
@@ -2385,8 +2384,6 @@ app.post("/portal/account/password", async (c) => {
   }
   // Charged after the shape check, before the password check: a wrong
   // current password is still an attempt to limit (14 Sep 2026).
-  // Charged after the shape check, before the password check: a wrong
-  // current password is still an attempt to limit (14 Sep 2026).
   if (!(await rateLimit(`acct:${session.clientId}`, 10, 3600_000))) {
     return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
   }
@@ -2418,14 +2415,15 @@ app.post("/portal/account/password", async (c) => {
 app.post("/portal/account/email", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-  if (!(await rateLimit(`acct:${session.clientId}`, 10, 3600_000))) {
-    return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
-  }
   const body = z
     .object({ newEmail: z.string().email("Enter a valid email address."), currentPassword: z.string().min(1) })
     .safeParse(await c.req.json().catch(() => null));
   if (!body.success) {
     return c.json(err(body.error.issues[0]?.message ?? "Invalid request.", "INVALID_INPUT"), 400);
+  }
+  // Charged after the shape check, before the password check (15 Sep 2026).
+  if (!(await rateLimit(`acct:${session.clientId}`, 10, 3600_000))) {
+    return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
   }
   const newEmail = body.data.newEmail.toLowerCase();
   const db = await getDb();

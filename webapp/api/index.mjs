@@ -47147,7 +47147,7 @@ var init_es = __esm({
 
 // server/pdf-render.ts
 function sanitize(s) {
-  return s.replace(/—/g, "\u2014").replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/→/g, "->").replace(/✓|✔/g, "*").replace(/☐/g, "[ ]").replace(/[^\x20-\x7E\xA0-\xFF–—•]/g, "?");
+  return s.replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/→/g, "->").replace(/✓|✔/g, "*").replace(/☐/g, "[ ]").replace(/[^\x20-\x7E\xA0-\xFF–—•]/g, "?");
 }
 function parseInline(line2) {
   const parts = line2.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/).filter(Boolean);
@@ -95522,9 +95522,6 @@ var env = {
   MAIL_FROM: process.env.MAIL_FROM ?? "MyFloridaSeriesLLC <onboarding@resend.dev>",
   ADMIN_NOTIFY_EMAIL: process.env.ADMIN_NOTIFY_EMAIL ?? "",
   ADMIN_PASSWORD: process.env.ADMIN_PASSWORD ?? "",
-  /** Who signs the Statement of Authorized Representative for FLORIDA
-   *  PROTECTED SERIES, LLC - PS 1 (Adam, 13 Sep 2026). Set both in Vercel
-   *  before go-live; dev prints placeholders so the build never guesses. */
   /** Shared secret for the daily purge cron. Required in production. */
   CRON_SECRET: process.env.CRON_SECRET ?? "",
   // Dropbox app-folder credentials for the nightly client-file mirror.
@@ -101384,7 +101381,7 @@ var wrap = (inner) => `
   ${inner}
   <p style="color:#8a8f98;font-size:12px;margin-top:28px">MyFloridaSeriesLLC \u2014 support@myfloridaseriesllc.com</p>
 </div>`;
-function welcomeEmail(name, setPasswordUrl, isConversion = false) {
+function welcomeEmail(name, setPasswordUrl, isConversion = false, raService = true) {
   const preparing = isConversion ? `<p>Thanks for your order. We're preparing the Protected Series Designations for your
       existing company now and will file them with the Florida Division of Corporations \u2014
       you'll get an email here when your protected series are established.</p>` : `<p>Thanks for your order. We're preparing your Articles of Organization now and will
@@ -101395,9 +101392,9 @@ function welcomeEmail(name, setPasswordUrl, isConversion = false) {
     html: wrap(`
       <p>Hi ${escapeHtml(name || "there")},</p>
       ${preparing}
-      <p>Your client portal is ready \u2014 it's where your formation documents will be posted,
+      <p>Your client portal is ready \u2014 it's where your formation documents will be posted${raService ? `,
       and where any legal mail we receive as your registered agent will be available to
-      download. Your Owner's Manual \u2014 the plain-English guide to running your protected
+      download` : ""}. Your Owner's Manual \u2014 the plain-English guide to running your protected
       series LLC \u2014 is already in your portal's library, ready to download.</p>
       <p><a href="${setPasswordUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Set your password</a></p>
       <p style="color:#555;font-size:13px">This link expires in 7 days. If it expires, use
@@ -102193,7 +102190,7 @@ function shareValue(mode, share) {
 }
 
 // server/templates-new-series.md
-var templates_new_series_default = `# UNANIMOUS WRITTEN CONSENT OF THE MEMBERS
+var templates_new_series_default = `# <!-- if:several -->UNANIMOUS WRITTEN CONSENT OF THE MEMBERS<!-- /if --><!-- if:sole -->WRITTEN CONSENT OF THE SOLE MEMBER<!-- /if -->
 
 ## OF [COMPANY NAME], LLC
 
@@ -102211,13 +102208,13 @@ var templates_new_series_default = `# UNANIMOUS WRITTEN CONSENT OF THE MEMBERS
 
 **3. Ownership.** The new Protected Series is established without associated members. The Company owns all of its protected-series transferable interests, and no member of the Company holds any interest in it except indirectly, through that member's interest in the Company (ss. 605.2302(1), 605.2303(2), Fla. Stat.).
 
-**4. Authority to file.** <!-- if:membermanaged --><!-- if:several -->The Members authorize the Administrative Member, or any Member the Members designate, to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.<!-- /if --><!-- if:sole -->The Member is authorized to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.<!-- /if --><!-- /if --><!-- if:managermanaged --><!-- if:several -->The Members authorize the Manager<!-- /if --><!-- if:sole -->The Member authorizes the Manager<!-- /if --> to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.<!-- /if --> The protected series is established when its Protected Series Designation takes effect under s. 605.0207, Florida Statutes.
+**4. Authority to file.** <!-- if:membermanaged --><!-- if:several -->The Members authorize the Administrative Member, or any Member the Members designate, to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.<!-- /if --><!-- if:sole -->The Member is authorized to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.<!-- /if --><!-- /if --><!-- if:managermanaged --><!-- if:several -->The Members authorize <!-- /if --><!-- if:sole -->The Member authorizes <!-- /if --><!-- if:onemanager -->the Manager<!-- /if --><!-- if:manymanagers -->the Managers, acting as the Agreement provides,<!-- /if --> to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.<!-- /if --> The protected series is established when its Protected Series Designation takes effect under s. 605.0207, Florida Statutes.
 
 **5. Series Exhibit.** The Series Exhibit set forth below is adopted as part of the Agreement for the new Protected Series, as Section 3.1 of the Agreement requires at or before the filing of the Protected Series Designation.
 
 **6. Records.** The Company shall create and maintain, for the new Protected Series, the records required by s. 605.2301, Florida Statutes, and by Article 8 of the Agreement.
 
-**7. Effect.** This consent has the same effect as a vote taken at a meeting and shall be retained with the records of the Company.
+**7. Effect.** <!-- if:several -->This consent has the same effect as a vote taken at a meeting and shall be retained with the records of the Company.<!-- /if --><!-- if:sole -->This consent shall be retained with the records of the Company.<!-- /if -->
 
 <!-- if:several -->**MEMBERS:**<!-- /if --><!-- if:sole -->**MEMBER:**<!-- /if -->
 
@@ -102234,10 +102231,11 @@ var templates_new_series_default = `# UNANIMOUS WRITTEN CONSENT OF THE MEMBERS
 |---|---|
 | Purpose of this Protected Series | Any lawful purpose<!-- if:purpose -->, including, without limitation, [SERIES PURPOSE]<!-- /if --> |
 | Owner of this Protected Series | The Company. This Protected Series has no Associated Members (ss. 605.2302(1), 605.2303(2), Fla. Stat.). |
-<!-- if:managermanaged -->| Protected Series Manager | [PS MANAGER] |
-<!-- /if --><!-- if:membermanaged -->| Managed by | The Members, as protected-series managers (s. 605.2304, Fla. Stat., as varied by Section 5.2 of the Agreement) |
-<!-- /if -->| Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
-| Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit, together with the records maintained under Article 8. |
+<!-- if:managermanaged -->| Protected Series Manager | Same as Company Manager |
+<!-- /if --><!-- if:membermanaged --><!-- if:several -->| Managed by | The Members, as protected-series managers (s. 605.2304, Fla. Stat., as varied by Section 5.2 of the Agreement), acting by a Majority in Interest |
+<!-- /if --><!-- if:sole -->| Managed by | The Member, as protected-series manager (ss. 605.2304(1)-(2), 605.2107(1)(n), Fla. Stat.) |
+<!-- /if --><!-- /if -->| Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
+| Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the <!-- if:several -->Members<!-- /if --><!-- if:sole -->Member<!-- /if -->, together with the records maintained under Article 8. |
 | Special terms (if any) | [SPECIAL TERMS] |
 
 **Adopted effective [EFFECTIVE DATE] by the Company:**
@@ -102257,6 +102255,7 @@ var templates_new_series_default = `# UNANIMOUS WRITTEN CONSENT OF THE MEMBERS
 | | | | |
 | | | | |
 
+*New Protected Series \u2014 [SERIES NAME] \u2014 generated by MyFloridaSeriesLLC \xB7 Master [EDITION]*
 `;
 
 // server/oa.ts
@@ -102653,7 +102652,7 @@ By: _____________________________
 
 ---
 
-*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Manager-Managed, Single Member / Disregarded Entity), v1 draft. Statutory citations verified against Online Sunshine on August 3, 2026: ss. 605.2103, 605.2107, 605.2201, 605.2202, 605.2301, 605.2401, 605.2501, 605.2604, 48.062, 711.50\u2013711.512, Fla. Stat.*
+*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Manager-Managed, Single Member / Disregarded Entity), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0602, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04074, 711.501, 711.512, Fla. Stat.*
 
 *[TITLE] of [COMPANY NAME], LLC \u2014 generated by MyFloridaSeriesLLC \xB7 Master [EDITION]*
 `;
@@ -102874,7 +102873,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **6.5 Member Loans.** A Member may lend funds to the Company or to a specific Protected Series upon commercially reasonable terms evidenced by a written instrument identifying the borrower. A loan is not a contribution, and shall be an Associated Liability solely of the borrowing Protected Series or of the Company, as applicable.
 
-**6.6 Capital Accounts.** A capital account shall be established and maintained for each Member reflecting the Member's capital in the Company. Capital accounts shall be maintained in accordance with the capital accounting rules of section 704(b) of the Internal Revenue Code of 1986, as amended (the "Code"), and the Treasury Regulations thereunder, and shall be credited with contributions and allocations of profit and debited with distributions and allocations of loss as so required. A transferee of all or part of a Membership Interest succeeds to the portion of the transferor's capital account (and sub-accounts) attributable to the transferred interest. Nothing in this Agreement creates a deficit restoration obligation or otherwise personally obligates any Member to contribute capital beyond the contributions required by Sections 6.1 and 6.2.
+**6.6 Capital Accounts.** A capital account shall be established and maintained for each Member reflecting the Member's capital in the Company. Capital accounts shall be maintained in accordance with the capital accounting rules of section 704(b) of the Internal Revenue Code of 1986, as amended (the "Code"), and the Treasury Regulations thereunder, and shall be credited with contributions and allocations of profit and debited with distributions and allocations of loss as so required. A transferee of all or part of a Membership Interest succeeds to the portion of the transferor's capital account attributable to the transferred interest. Nothing in this Agreement creates a deficit restoration obligation or otherwise personally obligates any Member to contribute capital beyond the contributions required by Sections 6.1 and 6.2.
 
 **6.7 No Right to Specific Property.** No Member has any right to demand or receive any distribution in any specific property of the Company or of any Protected Series.
 
@@ -102933,6 +102932,8 @@ Records may be organized by specific listing, category, type, quantity, or compu
 **9.4 Tax Elections.** The Manager may make, change, or revoke any tax election for the Company or any Protected Series (including an election under section 754 of the Code) that the Manager determines to be in the best interests of the Members as a whole.
 
 **9.5 Fiscal Year.** The fiscal year of the Company and of each Protected Series is the calendar year unless the Manager selects another permitted year.
+
+---
 
 ## ARTICLE 10 \u2014 TRANSFERS; CREDITOR PROVISIONS
 
@@ -103161,7 +103162,7 @@ By: _____________________________
 
 ---
 
-*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Manager-Managed, Multiple Members / Partnership Taxation), v1 draft. Statutory citations verified against Online Sunshine on August 3, 2026: ss. 605.2103, 605.2107, 605.2201, 605.2202, 605.2301, 605.2401, 605.2501, 605.2604, 605.0502, 605.0503, 605.04091, 48.062, 711.50\u2013711.512, Fla. Stat.; 11 U.S.C. \xA7365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013).*
+*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Manager-Managed, Multiple Members / Partnership Taxation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04074, 605.04091, 711.501, 711.512, Fla. Stat.; 11 U.S.C. \xA7365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013).*
 
 *[TITLE] of [COMPANY NAME], LLC \u2014 generated by MyFloridaSeriesLLC \xB7 Master [EDITION]*
 `;
@@ -103282,7 +103283,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **3.4 Dissolution of a Protected Series Distinguished.** The dissolution and winding up of a Protected Series does not, by itself, cause the dissolution of the Company or of any other Protected Series. The dissolution of the Company causes the dissolution of every Protected Series, and the winding up of the Company is not complete until each Protected Series is wound up.
 
-**3.5 Series Exhibits Control Series Terms.** The terms specific to each Protected Series \u2014 including its name, purpose, Protected Series Manager, capital, and any variations from the default rules of this Agreement \u2014 are set forth in its Series Exhibit. In the event of a conflict between a Series Exhibit and this Agreement with respect to the Protected Series to which the Series Exhibit relates, the Series Exhibit controls, except that no Series Exhibit may vary a provision of the Act that may not be varied by an operating agreement (see s. 605.2107, Florida Statutes) or the provisions of Article 8.
+**3.5 Series Exhibits Control Series Terms.** The terms specific to each Protected Series \u2014 including its name, purpose, Protected Series Manager, capital, and any variations from the default rules of this Agreement \u2014 are set forth in its Series Exhibit. In the event of a conflict between a Series Exhibit and this Agreement with respect to the Protected Series to which the Series Exhibit relates, the Series Exhibit controls, except that no Series Exhibit may vary a provision of the Act that may not be varied by an operating agreement (see s. 605.2107, Florida Statutes), the provisions of Article 8, or the provisions of Article 9.
 
 **3.6 Company as Owner.**
 
@@ -103455,6 +103456,8 @@ Records may be organized by specific listing, category, type, quantity, or compu
 **9.5 Other Elections.** The Manager may make, change, or revoke any other tax election for the Company or any Protected Series that is consistent with maintaining the S corporation election and that the Manager determines to be in the best interests of the Members as a whole.
 
 **9.6 Fiscal Year.** The fiscal year of the Company and of each Protected Series is the calendar year unless another year is permitted for an S corporation under section 1378 of the Code and selected by the Manager.
+
+---
 
 ## ARTICLE 10 \u2014 TRANSFERS; CREDITOR PROVISIONS
 
@@ -103629,7 +103632,7 @@ Date: _____________________________
 
 **Transfer on Death designations (ss. 711.50\u2013711.512, Fla. Stat.):**
 
-| Designating Member | TOD beneficiary (any person or entity) | If that beneficiary does not survive the Member |
+| Designating Member | TOD beneficiary (eligible S corporation shareholder) | If that beneficiary does not survive the Member |
 |---|---|---|
 <!-- repeat:member -->
 | [MEMBER NAME] | [MEMBER TOD]<!-- if:couple --> (effective at the death of the last surviving spouse)<!-- /if --> | [MEMBER TOD BACKUP] |
@@ -103653,7 +103656,7 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
 | Protected Series Manager | Same as Company Manager |
 | Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
 | Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the Member(s), together with the records maintained under Article 8. |
-| Special terms (if any) | [None / variations from the base Agreement \u2014 may not vary Article 8 or non-variable provisions of the Act] |
+| Special terms (if any) | [None / variations from the base Agreement \u2014 may not vary Article 8, Article 9, or non-variable provisions of the Act] |
 
 <!-- one:manager -->**Adopted effective [DATE] by the Company, acting through its Manager:**<!-- /one --><!-- many:manager -->**Adopted effective [DATE] by the Company, acting through its Managers:**<!-- /many -->
 
@@ -103685,7 +103688,7 @@ By: _____________________________
 
 ---
 
-*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Manager-Managed / S Corporation), v1 draft. Statutory citations verified against Online Sunshine on August 3, 2026: ss. 605.2103, 605.2107, 605.2201, 605.2202, 605.2301, 605.2401, 605.2501, 605.2604, 605.0502, 605.0503, 605.04091, 48.062, 711.50\u2013711.512, Fla. Stat.; 11 U.S.C. \xA7365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013).*
+*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Manager-Managed / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04074, 605.04091, 711.501, 711.512, Fla. Stat.; 11 U.S.C. \xA7365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013).*
 
 *[TITLE] of [COMPANY NAME], LLC \u2014 generated by MyFloridaSeriesLLC \xB7 Master [EDITION]*
 `;
@@ -103908,7 +103911,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **6.5 Member Loans.** A Member may lend funds to the Company or to a specific Protected Series upon commercially reasonable terms evidenced by a written instrument identifying the borrower. A loan is not a contribution, and shall be an Associated Liability solely of the borrowing Protected Series or of the Company, as applicable.
 
-**6.6 Capital Accounts.** A capital account shall be established and maintained for each Member reflecting the Member's capital in the Company. Capital accounts shall be maintained in accordance with the capital accounting rules of section 704(b) of the Internal Revenue Code of 1986, as amended (the "Code"), and the Treasury Regulations thereunder, and shall be credited with contributions and allocations of profit and debited with distributions and allocations of loss as so required. A transferee of all or part of a Membership Interest succeeds to the portion of the transferor's capital account (and sub-accounts) attributable to the transferred interest. Nothing in this Agreement creates a deficit restoration obligation or otherwise personally obligates any Member to contribute capital beyond the contributions required by Sections 6.1 and 6.2.
+**6.6 Capital Accounts.** A capital account shall be established and maintained for each Member reflecting the Member's capital in the Company. Capital accounts shall be maintained in accordance with the capital accounting rules of section 704(b) of the Internal Revenue Code of 1986, as amended (the "Code"), and the Treasury Regulations thereunder, and shall be credited with contributions and allocations of profit and debited with distributions and allocations of loss as so required. A transferee of all or part of a Membership Interest succeeds to the portion of the transferor's capital account attributable to the transferred interest. Nothing in this Agreement creates a deficit restoration obligation or otherwise personally obligates any Member to contribute capital beyond the contributions required by Sections 6.1 and 6.2.
 
 **6.7 No Right to Specific Property.** No Member has any right to demand or receive any distribution in any specific property of the Company or of any Protected Series.
 
@@ -103967,6 +103970,8 @@ Records may be organized by specific listing, category, type, quantity, or compu
 **9.4 Tax Elections.** A Majority in Interest may make, change, or revoke any tax election for the Company or any Protected Series (including an election under section 754 of the Code) that it determines to be in the best interests of the Members as a whole.
 
 **9.5 Fiscal Year.** The fiscal year of the Company and of each Protected Series is the calendar year unless a Majority in Interest selects another permitted year.
+
+---
 
 ## ARTICLE 10 \u2014 TRANSFERS; CREDITOR PROVISIONS
 
@@ -104179,7 +104184,7 @@ By: _____________________________
 
 ---
 
-*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Member-Managed, Multiple Members / Partnership Taxation), v1 draft. Statutory citations verified against Online Sunshine on August 3, 2026: ss. 605.2103, 605.2107, 605.2201, 605.2202, 605.2301, 605.2401, 605.2501, 605.2604, 605.0502, 605.0503, 605.04091, 48.062, 711.50\u2013711.512, Fla. Stat.; 11 U.S.C. \xA7365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013).*
+*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Member-Managed, Multiple Members / Partnership Taxation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04091, 711.501, 711.512, Fla. Stat.; 11 U.S.C. \xA7365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013).*
 
 *[TITLE] of [COMPANY NAME], LLC \u2014 generated by MyFloridaSeriesLLC \xB7 Master [EDITION]*
 `;
@@ -104298,7 +104303,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **3.4 Dissolution of a Protected Series Distinguished.** The dissolution and winding up of a Protected Series does not, by itself, cause the dissolution of the Company or of any other Protected Series. The dissolution of the Company causes the dissolution of every Protected Series, and the winding up of the Company is not complete until each Protected Series is wound up.
 
-**3.5 Series Exhibits Control Series Terms.** The terms specific to each Protected Series \u2014 including its name, purpose, capital, and any variations from the default rules of this Agreement \u2014 are set forth in its Series Exhibit. In the event of a conflict between a Series Exhibit and this Agreement with respect to the Protected Series to which the Series Exhibit relates, the Series Exhibit controls, except that no Series Exhibit may vary a provision of the Act that may not be varied by an operating agreement (see s. 605.2107, Florida Statutes) or the provisions of Article 8.
+**3.5 Series Exhibits Control Series Terms.** The terms specific to each Protected Series \u2014 including its name, purpose, capital, and any variations from the default rules of this Agreement \u2014 are set forth in its Series Exhibit. In the event of a conflict between a Series Exhibit and this Agreement with respect to the Protected Series to which the Series Exhibit relates, the Series Exhibit controls, except that no Series Exhibit may vary a provision of the Act that may not be varied by an operating agreement (see s. 605.2107, Florida Statutes), the provisions of Article 8, or the provisions of Article 9.
 
 **3.6 Company as Owner.**
 
@@ -104476,6 +104481,8 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **9.6 Fiscal Year.** The fiscal year of the Company and of each Protected Series is the calendar year unless another year is permitted for an S corporation under section 1378 of the Code and selected by a Majority in Interest.
 
+---
+
 ## ARTICLE 10 \u2014 TRANSFERS; CREDITOR PROVISIONS
 
 **10.1 Restriction on Transfer.** No Member shall Transfer all or any portion of a Membership Interest, or any right to receive distributions from the Company or any Protected Series, except (a) a Transfer to an Immediate Family Member of the transferring Member made in compliance with Section 10.2, (b) a Transfer effective at death pursuant to the transferring Member's TOD designation under Section 4.11, or (c) another Transfer made with the prior written consent of a Majority in Interest of the Members other than the transferring Member. Any purported Transfer in violation of this Article is void to the fullest extent permitted by law, and the transferee acquires no rights other than those, if any, mandated by the Act.
@@ -104633,7 +104640,7 @@ Date: _____________________________
 
 **Transfer on Death designations (ss. 711.50\u2013711.512, Fla. Stat.):**
 
-| Designating Member | TOD beneficiary (any person or entity) | If that beneficiary does not survive the Member |
+| Designating Member | TOD beneficiary (eligible S corporation shareholder) | If that beneficiary does not survive the Member |
 |---|---|---|
 <!-- repeat:member -->
 | [MEMBER NAME] | [MEMBER TOD]<!-- if:couple --> (effective at the death of the last surviving spouse)<!-- /if --> | [MEMBER TOD BACKUP] |
@@ -104657,7 +104664,7 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
 | Managed by | The Members, as protected-series managers (s. 605.2304, Fla. Stat., as varied by Section 5.2 of the Agreement), acting by a Majority in Interest |
 | Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
 | Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the Member(s), together with the records maintained under Article 8. |
-| Special terms (if any) | [None / variations from the base Agreement \u2014 may not vary Article 8 or non-variable provisions of the Act] |
+| Special terms (if any) | [None / variations from the base Agreement \u2014 may not vary Article 8, Article 9, or non-variable provisions of the Act] |
 
 **Adopted effective [DATE] by the Company, acting through a Majority in Interest of its Members:**
 
@@ -104689,7 +104696,7 @@ By: _____________________________
 
 ---
 
-*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Member-Managed / S Corporation), v1 draft. Statutory citations verified against Online Sunshine on August 3, 2026: ss. 605.2103, 605.2107, 605.2201, 605.2202, 605.2301, 605.2401, 605.2501, 605.2604, 605.0502, 605.0503, 605.04091, 48.062, 711.50\u2013711.512, Fla. Stat.; 11 U.S.C. \xA7365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013).*
+*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Member-Managed / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04091, 711.501, 711.512, Fla. Stat.; 11 U.S.C. \xA7365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013).*
 
 *[TITLE] of [COMPANY NAME], LLC \u2014 generated by MyFloridaSeriesLLC \xB7 Master [EDITION]*
 `;
@@ -104854,7 +104861,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 (b) file, amend, or cancel a statement of authority under s. 605.0302, Florida Statutes, or record a certified copy of one; or
 
-(c) make, change, or revoke any election under the Code affecting the classification of the Company or of any Protected Series, or take any action described in Section 9.3.
+(c) make, change, or revoke any election under the Code affecting the classification of the Company or of any Protected Series.
 
 **5.5 Standard of Conduct; Exculpation.** The Manager and each Protected Series Manager shall discharge their duties consistent with the Act, including the duties applicable to managers and protected-series managers. No Manager or Protected Series Manager shall be liable to the Company, any Protected Series, or the Member for any act or omission performed or omitted in good faith and in a manner reasonably believed to be within the scope of authority conferred by this Agreement, except for conduct for which exoneration is prohibited by the Act.
 
@@ -105118,7 +105125,7 @@ By: _____________________________
 
 ---
 
-*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Manager-Managed, Single Member / S Corporation), v1 draft. Statutory citations verified against Online Sunshine: ss. 605.2103, 605.2107, 605.2201, 605.2202, 605.2301, 605.2303, 605.2304, 605.2401, 605.2501, 605.2604, 605.0302, 605.04074, 48.062, 711.50\u2013711.512, Fla. Stat. Code references: sections 1361, 1362, 1378.*
+*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Manager-Managed, Single Member / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0602, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04074, 711.501, 711.512, Fla. Stat. Code references: sections 1361, 1362, 1378.*
 
 *[TITLE] of [COMPANY NAME], LLC \u2014 generated by MyFloridaSeriesLLC \xB7 Master [EDITION]*
 `;
@@ -105484,7 +105491,7 @@ By: _____________________________
 
 ---
 
-*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Member-Managed, Single Member / Disregarded Entity), v1 draft. Statutory citations verified against Online Sunshine: ss. 605.2103, 605.2107, 605.2201, 605.2202, 605.2301, 605.2303, 605.2304, 605.2401, 605.2501, 605.2604, 605.0302, 605.04074, 48.062, 711.50\u2013711.512, Fla. Stat.*
+*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Member-Managed, Single Member / Disregarded Entity), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0602, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 711.501, 711.512, Fla. Stat.*
 
 *[TITLE] of [COMPANY NAME], LLC \u2014 generated by MyFloridaSeriesLLC \xB7 Master [EDITION]*
 `;
@@ -105882,7 +105889,7 @@ By: _____________________________
 
 ---
 
-*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Member-Managed, Single Member / S Corporation), v1 draft. Statutory citations verified against Online Sunshine: ss. 605.2103, 605.2107, 605.2201, 605.2202, 605.2301, 605.2303, 605.2304, 605.2401, 605.2501, 605.2604, 605.0302, 605.04074, 48.062, 711.50\u2013711.512, Fla. Stat. Code references: sections 1361, 1362, 1378.*
+*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Member-Managed, Single Member / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0602, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 711.501, 711.512, Fla. Stat. Code references: sections 1361, 1362, 1378.*
 
 *[TITLE] of [COMPANY NAME], LLC \u2014 generated by MyFloridaSeriesLLC \xB7 Master [EDITION]*
 `;
@@ -106339,6 +106346,11 @@ function must2(haystack, needle, label) {
 function assembleNewSeries(input) {
   let s = templates_new_series_default;
   const purpose = input.purpose.trim();
+  {
+    const mgrs = input.managerNames.map((n) => n.trim()).filter(Boolean);
+    s = resolveIf(s, "onemanager", mgrs.length <= 1);
+    s = resolveIf(s, "manymanagers", mgrs.length > 1);
+  }
   s = resolveIf(s, "membermanaged", input.memberManaged);
   s = resolveIf(s, "managermanaged", !input.memberManaged);
   if (input.memberNames.length === 0) throw new Error("new-series: at least one member is required");
@@ -106346,7 +106358,6 @@ function assembleNewSeries(input) {
   s = resolveIf(s, "several", input.memberNames.length > 1);
   const managers = input.managerNames.map((n) => n.trim()).filter(Boolean);
   if (!input.memberManaged && managers.length === 0) throw new Error("new-series: a manager-managed company needs at least one Manager");
-  const psManager = managers.join(", ");
   const signerOf = (entity) => (input.entitySigners ?? []).find((x2) => x2.entity.trim() === entity.trim());
   const block = (n, suffix) => {
     const sg = signerOf(n);
@@ -106377,10 +106388,8 @@ ${n}${suffix}`) + "\nDate: _____________________________";
   s = s.split("[EFFECTIVE DATE]").join(input.effectiveDate);
   must2(s, "[PS MANAGER SIGNATURE LINE]", "ps manager signature");
   s = s.split("[PS MANAGER SIGNATURE LINE]").join(psSignature);
-  if (!input.memberManaged) {
-    must2(s, "[PS MANAGER]", "ps manager");
-    s = s.split("[PS MANAGER]").join(psManager);
-  }
+  must2(s, "[EDITION]", "edition");
+  s = s.split("[EDITION]").join(OA_TEMPLATE_VERSION);
   must2(s, "[MEMBER SIGNATURE BLOCKS]", "member signature blocks");
   s = s.split("[MEMBER SIGNATURE BLOCKS]").join(blocks);
   s = s.replace(/\n{3,}/g, "\n\n");
@@ -106453,7 +106462,7 @@ function followUpOk(category, answer) {
 import { readFileSync as readFileSync2 } from "node:fs";
 
 // server/templates-oa-amendment.md
-var templates_oa_amendment_default = '# AMENDMENT NO. [AMENDMENT NUMBER]\n# TO OPERATING AGREEMENT\n## OF\n## [COMPANY NAME], LLC\n### A FLORIDA PROTECTED SERIES LIMITED LIABILITY COMPANY\n\n---\n\nTHIS AMENDMENT NO. [AMENDMENT NUMBER] TO OPERATING AGREEMENT (this "Amendment") of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the "Company"), is made effective as of [AMENDMENT DATE], by <!-- one:member -->the undersigned sole member (the "Member")<!-- /one --><!-- many:member -->the undersigned members (each a "Member" and collectively the "Members")<!-- /many --><!-- if:managed -->, and is acknowledged by the undersigned Manager<!-- /if -->.\n\n### RECITALS\n\nA. The Company is governed by the <!-- if:restated -->Amended and Restated <!-- /if -->Operating Agreement of the Company effective as of [AGREEMENT DATE] (the "Agreement").\n\nB. Section [AMENDMENT SECTION] of the Agreement provides that the Agreement may be amended only by a written instrument signed by <!-- one:member -->the Member<!-- /one --><!-- many:member -->all Members<!-- /many -->.\n\nC. <!-- one:member -->The Member wishes<!-- /one --><!-- many:member -->The Members wish<!-- /many --> to amend the Agreement as set forth in this Amendment.\n\nNOW, THEREFORE, <!-- one:member -->the Member amends<!-- /one --><!-- many:member -->the Members amend<!-- /many --> the Agreement as follows:\n\n---\n\n## AMENDMENT\n\n**1. Amendments to the Agreement.** The Agreement is amended as follows:\n\n<!-- if:typed -->[AMENDMENT TEXT]<!-- /if -->\n<!-- if:attached -->The Agreement is amended as set forth in Exhibit A attached to this Amendment.<!-- /if -->\n\n**2. Effect of Amendment.** Except as amended by this Amendment, the Agreement remains in full force and effect. Capitalized terms have the meanings given in the Agreement. This Amendment is effective on the date stated above.\n\n[[pagebreak]]\n\n## SIGNATURES\n\nIN WITNESS WHEREOF, the undersigned <!-- one:member -->has<!-- /one --><!-- many:member -->have<!-- /many --> executed this Amendment effective as of the date(s) set forth below.\n\n<!-- one:member -->**MEMBER:**<!-- /one --><!-- many:member -->**MEMBERS:**<!-- /many -->\n\n<!-- repeat:signatory -->\n<!-- if:unit -->**[UNIT]**\n[HOLDING]\n\n<!-- /if --><!-- if:person -->_____________________________\n[SIGNATORY NAME]\nDate: _____________________________\n\n<!-- /if --><!-- if:entity -->[SIGNATORY NAME]\n\nBy: _____________________________\n[[indent]][PRINTED NAME]\n[[indent]][TITLE]\nDate: _____________________________\n\n<!-- /if --><!-- /repeat -->\n\n<!-- if:managed --><!-- one:manager -->**ACKNOWLEDGED AND AGREED BY MANAGER:**<!-- /one --><!-- many:manager -->**ACKNOWLEDGED AND AGREED BY MANAGERS:**<!-- /many -->\n\n<!-- repeat:manager -->\n<!-- if:person -->_____________________________\n[MANAGER NAME], Manager\nDate: _____________________________\n\n<!-- /if --><!-- if:entity -->[MANAGER NAME], Manager\n\nBy: _____________________________\n[[indent]][PRINTED NAME]\n[[indent]][TITLE]\nDate: _____________________________\n\n<!-- /if --><!-- /repeat -->\n<!-- /if -->\n\n*[TITLE] of [COMPANY NAME], LLC \u2014 generated by MyFloridaSeriesLLC \xB7 Master [EDITION]*\n';
+var templates_oa_amendment_default = '# AMENDMENT NO. [AMENDMENT NUMBER]\n# TO OPERATING AGREEMENT\n## OF\n## [COMPANY NAME], LLC\n### A FLORIDA PROTECTED SERIES LIMITED LIABILITY COMPANY\n\n---\n\nTHIS AMENDMENT NO. [AMENDMENT NUMBER] TO OPERATING AGREEMENT (this "Amendment") of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the "Company"), is made effective as of [AMENDMENT DATE], by <!-- one:member -->the undersigned sole member (the "Member")<!-- /one --><!-- many:member -->the undersigned members (each a "Member" and collectively the "Members")<!-- /many --><!-- if:managed -->, and is acknowledged by the undersigned <!-- one:manager -->Manager<!-- /one --><!-- many:manager -->Managers<!-- /many --><!-- /if -->.\n\n### RECITALS\n\nA. The Company is governed by the <!-- if:restated -->Amended and Restated <!-- /if -->Operating Agreement of the Company effective as of [AGREEMENT DATE] (the "Agreement").\n\nB. Section [AMENDMENT SECTION] of the Agreement provides that the Agreement may be amended only by a written instrument signed by <!-- one:member -->the Member<!-- /one --><!-- many:member -->all Members<!-- /many -->.\n\nC. <!-- one:member -->The Member wishes<!-- /one --><!-- many:member -->The Members wish<!-- /many --> to amend the Agreement as set forth in this Amendment.\n\nNOW, THEREFORE, <!-- one:member -->the Member amends<!-- /one --><!-- many:member -->the Members amend<!-- /many --> the Agreement as follows:\n\n---\n\n## AMENDMENT\n\n**1. Amendments to the Agreement.** The Agreement is amended as follows:\n\n<!-- if:typed -->[AMENDMENT TEXT]<!-- /if -->\n<!-- if:attached -->The Agreement is amended as set forth in Exhibit A attached to this Amendment.<!-- /if -->\n\n**2. Effect of Amendment.** Except as amended by this Amendment, the Agreement remains in full force and effect. Capitalized terms have the meanings given in the Agreement. This Amendment is effective on the date stated above.\n\n[[pagebreak]]\n\n## SIGNATURES\n\nIN WITNESS WHEREOF, the undersigned <!-- one:member -->has<!-- /one --><!-- many:member -->have<!-- /many --> executed this Amendment effective as of the <!-- one:member -->date<!-- /one --><!-- many:member -->date(s)<!-- /many --> set forth below.\n\n<!-- one:member -->**MEMBER:**<!-- /one --><!-- many:member -->**MEMBERS:**<!-- /many -->\n\n<!-- repeat:signatory -->\n<!-- if:unit -->**[UNIT]**\n[HOLDING]\n\n<!-- /if --><!-- if:person -->_____________________________\n[SIGNATORY NAME]\nDate: _____________________________\n\n<!-- /if --><!-- if:entity -->[SIGNATORY NAME]\n\nBy: _____________________________\n[[indent]][PRINTED NAME]\n[[indent]][TITLE]\nDate: _____________________________\n\n<!-- /if --><!-- /repeat -->\n\n<!-- if:managed --><!-- one:manager -->**ACKNOWLEDGED AND AGREED BY MANAGER:**<!-- /one --><!-- many:manager -->**ACKNOWLEDGED AND AGREED BY MANAGERS:**<!-- /many -->\n\n<!-- repeat:manager -->\n<!-- if:person -->_____________________________\n[MANAGER NAME], Manager\nDate: _____________________________\n\n<!-- /if --><!-- if:entity -->[MANAGER NAME], Manager\n\nBy: _____________________________\n[[indent]][PRINTED NAME]\n[[indent]][TITLE]\nDate: _____________________________\n\n<!-- /if --><!-- /repeat -->\n<!-- /if -->\n\n*[TITLE] of [COMPANY NAME], LLC \u2014 generated by MyFloridaSeriesLLC \xB7 Master [EDITION]*\n';
 
 // server/oa-amendment.ts
 function loadTemplate2(v2) {
@@ -107653,7 +107662,10 @@ function registerPortalRoutes(app2) {
       "SELECT id, kind, title, size_bytes, created_at, order_id, meta FROM documents WHERE client_id = $1 ORDER BY created_at DESC",
       [session.clientId]
     );
-    return c.json({ data: docs.map(({ meta, ...d2 }) => ({ ...d2, receivedOn: d2.kind === "legal_mail" ? (typeof meta === "string" ? JSON.parse(meta) : meta)?.receivedOn ?? null : null })) });
+    return c.json({ data: docs.map(({ meta, ...d2 }) => {
+      const m2 = typeof meta === "string" ? JSON.parse(meta) : meta;
+      return { ...d2, receivedOn: d2.kind === "legal_mail" ? m2?.receivedOn ?? null : null, seriesNames: d2.kind === "psd" ? m2?.seriesNames ?? [] : void 0 };
+    }) });
   });
   app2.get("/portal/documents/:id/download", async (c) => {
     const session = await getSession(c);
@@ -108786,12 +108798,12 @@ function registerPortalRoutes(app2) {
   app2.post("/portal/account/email", async (c) => {
     const session = await getSession(c);
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    if (!await rateLimit(`acct:${session.clientId}`, 10, 36e5)) {
-      return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
-    }
     const body = external_exports.object({ newEmail: external_exports.string().email("Enter a valid email address."), currentPassword: external_exports.string().min(1) }).safeParse(await c.req.json().catch(() => null));
     if (!body.success) {
       return c.json(err(body.error.issues[0]?.message ?? "Invalid request.", "INVALID_INPUT"), 400);
+    }
+    if (!await rateLimit(`acct:${session.clientId}`, 10, 36e5)) {
+      return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
     }
     const newEmail = body.data.newEmail.toLowerCase();
     const db = await getDb();
@@ -109166,7 +109178,7 @@ async function fulfillPaidOrder(orderId, squarePaymentId) {
       "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at) VALUES ($1, $2, 'set_password', $3)",
       [tokenHash, clientId, new Date(Date.now() + 7 * 864e5).toISOString()]
     );
-    const mail = welcomeEmail(order2.contact_name, `${env.PUBLIC_BASE_URL}/portal/set-password?token=${token}`, payload?.filingPath === "CONVERT");
+    const mail = welcomeEmail(order2.contact_name, `${env.PUBLIC_BASE_URL}/portal/set-password?token=${token}`, payload?.filingPath === "CONVERT", payload?.registeredAgent?.choice === "SERVICE");
     await sendMail({ to: order2.contact_email, ...mail }).catch(
       (e) => console.error("[fulfill] welcome email failed:", e)
     );
@@ -109513,7 +109525,7 @@ function registerPaymentRoutes(app2) {
         [tokenHash, clients[0].id, new Date(Date.now() + 7 * 864e5).toISOString()]
       );
       const resendPayload = typeof orders[0].payload === "string" ? JSON.parse(orders[0].payload) : orders[0].payload;
-      const mail = welcomeEmail(orders[0].contact_name, `${env.PUBLIC_BASE_URL}/portal/set-password?token=${token}`, resendPayload?.filingPath === "CONVERT");
+      const mail = welcomeEmail(orders[0].contact_name, `${env.PUBLIC_BASE_URL}/portal/set-password?token=${token}`, resendPayload?.filingPath === "CONVERT", resendPayload?.registeredAgent?.choice === "SERVICE");
       await sendMail({ to: orders[0].contact_email, ...mail }).catch(
         (e) => console.error("[resend-welcome] failed:", e)
       );
@@ -109630,7 +109642,7 @@ The undersigned, on behalf of **FLORIDA PROTECTED SERIES, LLC - PS 1**, doing bu
 
 **4. Authority exhausted on filing.** The Filer's authority was limited to executing and filing the Articles of Organization. That authority terminated upon the filing, and the Filer has no continuing right, power, or duty with respect to the Company arising from having done so.
 
-**5. Where authority resides.** All ownership of the Company, and all authority to manage its activities and affairs and to act for it, rest with its members, as provided in its operating agreement and in chapter 605, Florida Statutes.
+**5. Where authority resides.** <!-- if:membermanaged -->All ownership of the Company, and all authority to manage its activities and affairs and to act for it, rest with its members, as provided in its operating agreement and in chapter 605, Florida Statutes.<!-- /if --><!-- if:managermanaged -->All ownership of the Company rests with its members, and all authority to manage its activities and affairs and to act for it rests with its manager or managers, as provided in its operating agreement and in chapter 605, Florida Statutes.<!-- /if -->
 
 **6. Registered agent service.** The Filer is not the Company's registered agent. If the Company has engaged **FLORIDA PROTECTED SERIES, LLC - PS 2**, a separate protected series of the same limited liability company, as its registered agent, that engagement is a distinct service governed by its own terms and by s. 605.0113, Florida Statutes, and nothing in this Statement affects it.
 
@@ -109638,17 +109650,18 @@ The undersigned, on behalf of **FLORIDA PROTECTED SERIES, LLC - PS 1**, doing bu
 
 ---
 
-**FLORIDA PROTECTED SERIES, LLC - PS 1**
-d/b/a MyFloridaSeriesLLC
+FLORIDA PROTECTED SERIES, LLC - PS 1, d/b/a MyFloridaSeriesLLC
 
-_____________________________
-By: [SIGNER NAME]
-Title: [SIGNER TITLE]
+By: [SIGNATURE]
+[[indent]][SIGNER NAME]
+[[indent]][SIGNER TITLE]
 Date: [DATE]
+
+*Statement of Authorized Representative of [COMPANY NAME], LLC \u2014 generated by MyFloridaSeriesLLC \xB7 Master [EDITION]*
 
 ---
 
-*Form document. Statutory citations: ss. 605.0102(8)(a), 605.0113, 605.0203(1)(b), 605.0205(3), Florida Statutes.*
+*Form document. Statutory citations: ss. 605.0102(8)(a), 605.0113, Florida Statutes.*
 `;
 
 // server/statement.ts
@@ -109661,22 +109674,28 @@ function must4(haystack, needle, label) {
 }
 function assembleStatement(inp) {
   for (const [k, v2] of Object.entries(inp)) {
+    if (typeof v2 === "boolean") continue;
     if (!String(v2 ?? "").trim()) throw new Error(`Statement: ${k} is required`);
   }
   let s = statementTemplate;
+  s = resolveIf(s, "membermanaged", inp.memberManaged);
+  s = resolveIf(s, "managermanaged", !inp.memberManaged);
   s = s.replace(/<!--[\s\S]*?-->\s*/g, "");
   s = s.replace(/\n---\n\n\*Form document\.[^\n]*\*\s*$/, "\n");
   must4(s, "[COMPANY NAME], LLC", "company name");
   s = s.split("[COMPANY NAME], LLC").join(inp.companyName);
   must4(s, "[DOCUMENT NUMBER]", "document number");
   s = s.split("[DOCUMENT NUMBER]").join(inp.documentNumber);
-  must4(s, "_____________________________\nBy: [SIGNER NAME]", "signature block");
-  s = s.replace("_____________________________\nBy: [SIGNER NAME]", `/s/ ${inp.signerName}
-By: ${inp.signerName}`);
+  must4(s, "By: [SIGNATURE]", "signature block");
+  s = s.replace("By: [SIGNATURE]", `By: /s/ ${inp.signerName}`);
+  must4(s, "[SIGNER NAME]", "signer name");
+  s = s.split("[SIGNER NAME]").join(inp.signerName);
   must4(s, "[SIGNER TITLE]", "signer title");
   s = s.split("[SIGNER TITLE]").join(inp.signerTitle);
   must4(s, "[DATE]", "date");
   s = s.split("[DATE]").join(inp.date);
+  must4(s, "[EDITION]", "edition");
+  s = s.split("[EDITION]").join(OA_TEMPLATE_VERSION);
   const leftover = s.match(/\[[A-Z][A-Z ()/.']*\]/g);
   if (leftover) throw new Error(`Statement: unfilled slot(s): ${[...new Set(leftover)].join(", ")}`);
   if (/Form document/.test(s)) throw new Error("Statement: draft colophon left in the document");
@@ -109983,7 +110002,7 @@ Full glossary in Section 31; these thirteen carry the load.
 | **Protected Series Designation** | The $25 online Sunbiz filing that creates a protected series |
 | **Member** | An owner of the company. In our structure the members own the company, and the company owns every series |
 | **Associated member** | A member of the company linked to a particular series (s. 605.2302). **Our agreements deliberately have none:** every series is wholly owned by the company, which is why the whole structure files one return (Section 18). Because no series has an associated member, s. 605.2304(2) would make the company its protected-series manager; every form of our agreement varies that default and names the Manager or the owners instead (Section 18) |
-| **Manager / Protected Series Manager** | Who runs the company / who runs a particular series. In the manager-managed forms each series is run by the company's Manager unless its Series Exhibit names someone else for that series. In the member-managed forms there is no manager: the owners run the company and are themselves named each series' protected-series managers |
+| **Manager / Protected Series Manager** | Who runs the company / who runs a particular series. In the manager-managed forms each series is run by the company's Manager. In the member-managed forms there is no manager: the owners run the company and are themselves named each series' protected-series managers |
 | **Associated asset** | An asset whose records satisfy s. 605.2301 for a particular silo \u2014 the only kind of asset the horizontal shield protects |
 | **Non-associated asset** | An asset whose records fail the test \u2014 reachable by creditors under s. 605.2404, with the burden of proof on you |
 | **Series Exhibit** | The exhibit to your operating agreement (PS-1, PS-2, \u2026) that states each series' name, purpose, manager, capital, and starting asset schedule, and records that the series has no associated members |
@@ -110001,7 +110020,7 @@ Full glossary in Section 31; these thirteen carry the load.
 > **Sunshine Holdings, LLC - PS 1**
 
 That full string \u2014 beginning to end \u2014 is the series' legal name. Use all of it, exactly, on every deed, account, contract, and signature block. "PS 1," "Series 1," or "Sunshine PS1" are not names of anything.
-**Step 5 \u2014 The paperwork that makes it real.** A designation without governance is a shell. At or before each designation, your operating agreement requires adopting a **Series Exhibit** for the new series (Section 7). The exhibit is where the series gets its manager, its purpose, its capital, and its opening asset schedule \u2014 the first entries in the records that s. 605.2301 demands. It also records that the series has no associated members: the company owns it.
+**Step 5 \u2014 The paperwork that makes it real.** A designation without governance is a shell. At or before each designation, your operating agreement requires adopting a **Series Exhibit** for the new series (Section 7). The exhibit is where the series gets its purpose, its capital, and its opening asset schedule \u2014 the first entries in the records that s. 605.2301 demands. It also records that the series has no associated members: the company owns it.
 **One registered agent for everything.** The company's registered agent automatically serves as registered agent for every protected series \u2014 the law requires it. If MyFloridaSeriesLLC provides your registered agent service, lawsuits and official notices served on any of your series arrive at our address, are scanned to your client portal the day received, and trigger an email alert to you (Section 24).
 ## 7. YOUR OPERATING AGREEMENT \u2014 A GUIDED TOUR
 Your operating agreement comes in one of eight versions. Three questions decide which one you have: **who manages the company**, **how many owners it has**, and **how it is taxed.**
@@ -110017,12 +110036,13 @@ All eight share the same skeleton through Article 9. From there the multi-owner 
 
 | **Where** | **What it does** |
 |---|---|
-| **Article 1** | The company: name, principal office, registered agent, and the titling rule \u2014 every asset is held in the name of the silo that owns it, never your personal name |
+| **Article 1** | The company: name, principal office, registered agent, and the rule that an asset belongs to a series only through the records Article 8 requires |
+| **Article 2** | The defined terms \u2014 Associated Asset, Protected Series, Series Exhibit, Majority in Interest, and the rest |
 | **Article 3** | The series engine: how series are established (unanimous consent, per the statute), their legal status, the liability shields in both directions, and the rule that Series Exhibits control series-specific terms |
 | **Article 4** | The owners: membership interests as simple percentages, the rule that no owner holds any series directly, voting (multi-owner), the transfer-on-death designation (Section 23), and \u2014 in the multi-owner forms \u2014 the member duties that power the bankruptcy protections |
-| **Article 5** | Management. In the **manager-managed** forms, the Manager runs the company, and each series is run by the company's Manager unless its Series Exhibit names someone else. In the **member-managed** forms there is no manager at all: the owners run the company by majority of ownership and \u2014 as s. 605.2107(1)(n) permits \u2014 are themselves named each series' protected-series managers (with one owner, that is you), and one owner may be designated **Administrative Member** to handle filings, records, and returns (a paperwork role, not a decision-making one). Every multi-owner form lists the big decisions that need an owner vote \u2014 including **moving any asset between silos** |
+| **Article 5** | Management. In the **manager-managed** forms, the Manager runs the company and every series. In the **member-managed** forms there is no manager at all: the owners run the company by majority of ownership and \u2014 as s. 605.2107(1)(n) permits \u2014 are themselves named each series' protected-series managers (with one owner, that is you), and one owner may be designated **Administrative Member** to handle filings, records, and returns (a paperwork role, not a decision-making one). Every multi-owner form lists the big decisions that need an owner vote \u2014 including **moving any asset between silos** |
 | **Articles 6\u20137** | Money: contributions (always made *to a specific silo* and recorded), capital accounts (multi-member partnership forms only; contribution records elsewhere), distributions \u2014 always **from a series' own assets, and by a series only to the company that owns it** |
-| **Article 8** | The recordkeeping covenants (this manual's Section 14 is its field guide) and the standing association rules that close the Article |
+| **Article 8** | The recordkeeping covenants (this manual's Section 14 is its field guide) and the standing association rules that close the Article \u2014 and the titling rule (\xA78.4): every asset is held in the name of the silo that owns it, never your personal name |
 | **Article 9** | Taxes (Part Four) |
 | **Article 10** | **In the multi-member forms:** transfers \u2014 family transfers permitted, everything else needs consent, transferees get money rights only, plus the charging-order and involuntary-transfer armor (Section 23). **In the single-owner forms:** admission of an additional member. Those forms have no transfer article, because Chapter 605 already makes a transfer permissible, gives a transferee distributions and nothing else, and binds a transferee who never signs \u2014 there was nothing left for the agreement to add |
 | **Article 11 (multi-owner)** | The executory-contract provisions \u2014 bankruptcy armor built on your members' ongoing duties (Section 23). In the single-owner forms, Article 11 is dissolution and winding up |
@@ -110276,7 +110296,7 @@ The shields in Section 2 protect the structure from the *business's* creditors. 
 **Charging-order exclusivity is not absolute \u2014 know its edges.** Section 605.0503(7) says the section does not limit a creditor's rights under a **consensual security interest** you granted, does not limit **fraudulent transfer** law, and does not limit "the equitable principles of alter ego, equitable lien, or constructive trust." Pledge your interest to a lender and the charging-order rules do not stand between that lender and its collateral. Move an interest to dodge a creditor and Ch. 726 applies. Run the structure as your personal checkbook and equitable doctrines are available. Exclusivity protects a *well-run* company from an *ordinary* judgment creditor; it is not a shield against your own conduct.
 **Involuntary transfers (multi-member).** If a member's interest is seized, passes through bankruptcy, or lands with an ex-spouse, your agreement (\xA710.4) gives the company \u2014 then the other members \u2014 an option to buy that interest at appraised fair value on up-to-five-year terms. A stranger who forces their way in holds only an economic interest (\xA710.3) and faces a structured buyout, not a seat at the table.
 **Bankruptcy armor (multi-member).** Article 11 of the multi-member agreement declares the agreement an executory contract under 11 U.S.C. \xA7365, catalogs each member's material ongoing duties, and \u2014 citing *In re Soderstrom* (M.D. Fla. 2013) \u2014 takes the position that a bankruptcy trustee cannot assume or assign a debtor-member's interest without the other members' consent. Understand it honestly: bankruptcy courts wield broad equitable power, and no drafting guarantees an outcome there. Article 11 gives your side the strongest available argument; combined with charging-order exclusivity, it makes the interest an unappetizing target \u2014 which is the practical goal.
-**Bankruptcy if you own alone.** Florida's statute has a trap for the sole owner of a member-managed company: filing bankruptcy automatically expels you as a member (s. 605.0602(8)), and a company with no members starts a 90-day clock toward dissolution \u2014 your worst financial day would also dissolve the container holding your assets. Your agreement turns that trap off (\xA74.7 of the member-managed single-member forms; \xA74.8 of the manager-managed forms, where the statute does not expel you but the same section keeps management and the series running): filing does not end your membership, the company and every series continue, and whoever ends up holding the interest holds it subject to the agreement. Understand what this section does *not* do: in a single-member company there are no co-members whose rights a bankruptcy court must respect, so the estate steps into your shoes \u2014 federal law makes the interest estate property no matter what any agreement says, and any clause that tried to punish filing would be void. The section's job is continuity, not concealment: the business keeps operating, the walls between series stand, and the estate deals with an intact company instead of a dissolving one. If bankruptcy is a live concern, that is a conversation for a bankruptcy attorney before filing, not after.
+**Bankruptcy if you own alone.** Florida's statute has a trap for the sole owner of a member-managed company: filing bankruptcy automatically expels you as a member (s. 605.0602(8)), and a company with no members starts a 90-day clock toward dissolution \u2014 your worst financial day would also dissolve the container holding your assets. Your agreement turns that trap off (\xA74.7 of the member-managed single-member forms; \xA74.8 of the manager-managed single-member forms, where the statute does not expel you but the same section keeps management and the series running): filing does not end your membership, the company and every series continue, and whoever ends up holding the interest holds it subject to the agreement. Understand what this section does *not* do: in a single-member company there are no co-members whose rights a bankruptcy court must respect, so the estate steps into your shoes \u2014 federal law makes the interest estate property no matter what any agreement says, and any clause that tried to punish filing would be void. The section's job is continuity, not concealment: the business keeps operating, the walls between series stand, and the estate deals with an intact company instead of a dissolving one. If bankruptcy is a live concern, that is a conversation for a bankruptcy attorney before filing, not after.
 
 **Death \u2014 the TOD designation.** Every form of the agreement lets each member register a transfer-on-death beneficiary \u2014 anyone the member chooses, subject on the S corporation forms to the eligible-shareholder rule \u2014 on Exhibit A, using Florida's registration-in-beneficiary-form statute (ss. 711.50\u2013711.512). At death the interest passes directly \u2014 no probate \u2014 and the beneficiary takes subject to the operating agreement. In the multi-member agreements, a beneficiary receives the economic interest automatically but becomes a voting member only with the consent of a majority in interest of the other members \u2014 death does not bypass the controls that govern lifetime transfers, and family is treated no differently. In the single-member agreement the beneficiary is admitted as the Member on delivering a signed agreement to be bound, since there is no one else to consent. Keep designations current (the formalities are strict: a signed writing with two witnesses, delivered as your form directs), and coordinate with your estate plan \u2014 for large or complicated estates, a trust may be the better vehicle; ask your estate planner. If no designation is made, the interest passes through your estate, and the agreement's continuation provisions keep the company alive while it does.
 ## 24. WHEN A SERIES GETS SUED \u2014 SERVICE OF PROCESS AND LEGAL MAIL
@@ -110297,7 +110317,7 @@ Practical rules:
 3. File the **articles of protected series dissolution** (online), and the series drops from the annual report's list.
 4. Retire its Series Exhibit (mark superseded \u2014 keep it; it is history a future diligence will want), close its bank account *after* winding up, archive its records. Do not reuse its name or ledger for a new venture \u2014 new series, new $50 ($25 to prepare and the $25 state fee), new exhibit, clean history.
 **Dissolving the company** dissolves **every** series with it, automatically. Winding up runs series-by-series first (each silo pays its own creditors from its own assets), then the mothership; the company's winding-up is not complete until every series' is. File articles of dissolution; the shields survive for the wind-down but the structure is over. If the company was administratively dissolved by the state (missed annual reports), reinstatement is possible \u2014 but the episode is exactly the kind of self-neglect a veil-piercing plaintiff collects; do not let it happen.
-**A series LLC cannot merge, convert, or domesticate freely.** A protected series can never be a party to those transactions on its own, and the company's options are tightly limited (ss. 605.2602\u2013.2604). If a reorganization is ever on the table \u2014 selling the whole structure, converting to separate LLCs, moving states \u2014 plan it with counsel around these limits.
+**A series LLC cannot merge, convert, or domesticate freely.** A protected series can never be a party to those transactions on its own, and the company's options are tightly limited (ss. 605.2602 and 605.2605\u2013605.2607). If a reorganization is ever on the table \u2014 selling the whole structure, converting to separate LLCs, moving states \u2014 plan it with counsel around these limits.
 # PART SIX \u2014 PRACTICE TOOLS
 ## 27. SIXTEEN TRAPS FOR THE UNWARY
 1. **Forming the LLC and never designating a series.** You built a normal LLC with extra paperwork. The horizontal shield starts at the first filed designation.
@@ -110350,7 +110370,7 @@ Practical rules:
 \u2610 Statement of authority, if you filed one, still within its five-year life \u2014 re-file and re-record before it lapses
 \u2610 Any new county where you bought property this year: certified copy recorded there
 **B. New-series checklist (every time)**
-\u2610 All-member consent (documented) \u2192 \u2610 File designation online ($25) \u2192 \u2610 Adopt and sign the Series Exhibit (name exactly as filed; purpose; manager; capital \u2014 no associated members; the company owns it) \u2192 \u2610 EIN if needed \u2192 \u2610 Open the series' bank account \u2192 \u2610 Fund it (recorded contribution) \u2192 \u2610 First asset onto the asset schedule \u2192 \u2610 Insurance in the series' name \u2192 \u2610 Add the series to the app.
+\u2610 All-member consent (documented) \u2192 \u2610 Adopt and sign the Series Exhibit (name exactly as it will be filed; purpose; capital \u2014 no associated members; the company owns it) \u2192 \u2610 File designation online ($25) \u2192 \u2610 EIN if needed \u2192 \u2610 Open the series' bank account \u2192 \u2610 Fund it (recorded contribution) \u2192 \u2610 First asset onto the asset schedule \u2192 \u2610 Insurance in the series' name \u2192 \u2610 Add the series to the app.
 **C. Asset-into-series checklist (every asset)**
 \u2610 Confirm which series (and that its exhibit's purpose covers it) \u2192 \u2610 Approvals per agreement (multi-member: \xA75.4 manager-managed, \xA75.5 member-managed, as applicable) \u2192 \u2610 Transfer document (deed / bill of sale / assignment) naming the series' full filed name \u2192 \u2610 Consideration documented \u2014 price, payor, payee (if from you: recorded contribution; if from another silo: transfer memo + bank movement) \u2192 \u2610 Re-title / record \u2192 \u2610 Asset schedule + ledger updated \u2192 \u2610 Insurance moved \u2192 \u2610 Related contracts and deposits assigned.
 **D. Real-estate-specific additions**
@@ -110398,7 +110418,7 @@ Practical rules:
 **Documentary stamp tax** \u2014 Florida's deed/note transfer tax.
 **EIN** \u2014 federal tax ID number.
 **Fraudulent transfer** \u2014 a transfer made to hinder, delay, or defraud creditors (Ch. 726); reversible and worse.
-**Manager / Protected Series Manager** \u2014 who manages the company, and who manages a particular series. Manager-managed forms: the company's Manager, unless a Series Exhibit names someone else for that series. Member-managed forms: the owners, and in a single-owner company, you.
+**Manager / Protected Series Manager** \u2014 who manages the company, and who manages a particular series. Manager-managed forms: the company's Manager. Member-managed forms: the owners, and in a single-owner company, you.
 **Member** \u2014 an owner of the company.
 **Mothership** \u2014 the series LLC itself.
 **Operating agreement** \u2014 the members' governing contract, including every Series Exhibit.
@@ -110415,7 +110435,7 @@ Practical rules:
 **Is each protected series a separate LLC?** No \u2014 one legal entity total. Each series is a legal "person" that acts in its own name, but it cannot exist apart from the company.
 **How many series can I have?** No statutory limit. Each costs $50 through us \u2014 $25 to prepare and the $25 state filing fee \u2014 plus a Series Exhibit \u2014 and, more importantly, a silo you must actually maintain. Add series for real compartments, not for sport.
 **Can series be added or removed later?** Yes \u2014 designate new ones any time (all members must consent), and dissolve one without touching the rest (Section 26).
-**I sold the rental property in one of my series. I'm buying a new rental \u2014 can I reuse the empty series and title the new property in it?** Don't. Reusing a series is a bad idea, because a series keeps its liability history long after its asset is gone \u2014 nothing in Florida law forbids the reuse; the problem is what comes with it. A tenant injured during your years of ownership, a deposit dispute, a contractor's unpaid claim, a buyer alleging the roof was misrepresented or that termite damage was undisclosed \u2014 claims like these belong to *that series*, they can be filed years after the closing, and a judgment on any of them reaches whatever the series owns **at the time the creditor enforces** (s. 605.2404 tests association at enforcement, not just when the liability arose). Title the new property into the old series and you have staked your new investment against the old property's unknown past \u2014 the clean compartment you paid for is gone exactly where you need it most. A fresh series costs $25 and gives the new property the one thing the structure exists to provide: a silo with no history. The same logic applies to the sale proceeds: don't leave them parked in the old series, where the old property's tail can reach them \u2014 distribute them up to the company, documented, and fund the new purchase into the new series as a recorded contribution (Section 10). Keep the old series alive and empty until you and your advisor are satisfied its exposure has passed, then dissolve it (Section 26) \u2014 and never reuse its name or ledger (the same rule Section 26 already gives you).
+**I sold the rental property in one of my series. I'm buying a new rental \u2014 can I reuse the empty series and title the new property in it?** Don't. Reusing a series is a bad idea, because a series keeps its liability history long after its asset is gone \u2014 nothing in Florida law forbids the reuse; the problem is what comes with it. A tenant injured during your years of ownership, a deposit dispute, a contractor's unpaid claim, a buyer alleging the roof was misrepresented or that termite damage was undisclosed \u2014 claims like these belong to *that series*, they can be filed years after the closing, and a judgment on any of them reaches whatever the series owns **at the time the creditor enforces** (s. 605.2404 tests association at enforcement, not just when the liability arose). Title the new property into the old series and you have staked your new investment against the old property's unknown past \u2014 the clean compartment you paid for is gone exactly where you need it most. A fresh series costs $50 and gives the new property the one thing the structure exists to provide: a silo with no history. The same logic applies to the sale proceeds: don't leave them parked in the old series, where the old property's tail can reach them \u2014 distribute them up to the company, documented, and fund the new purchase into the new series as a recorded contribution (Section 10). Keep the old series alive and empty until you and your advisor are satisfied its exposure has passed, then dissolve it (Section 26) \u2014 and never reuse its name or ledger (the same rule Section 26 already gives you).
 **Does each series need its own registered agent?** No \u2014 the company's agent automatically serves every series. One agent, one fee.
 **Do my series file their own annual reports?** No. The company files one report; the state auto-lists your series on it.
 **Do I really need a separate bank account for every series?** Yes. It is the cheapest, strongest association evidence there is \u2014 and the alternative (commingling) is the most common way the shield dies.
@@ -110428,7 +110448,7 @@ Practical rules:
 **What single habit matters most?** Contemporaneous records. Every section of this manual is a variation on that theme, and the app exists so the habit costs minutes, not weekends.
 ### ABOUT MYFLORIDASERIESLLC
 MyFloridaSeriesLLC is a document-preparation and registered agent service dedicated to the Florida Protected Series LLC. Your formation package includes the operating agreement and Series Exhibits, this manual, the recordkeeping app, and \u2014 if selected \u2014 registered agent service with same-day portal delivery of legal mail. Support: **support@myfloridaseriesllc.com**. Client portal: **myfloridaseriesllc.com/portal**.
-*\xA9 2026 MyFloridaSeriesLLC. This manual may be updated as Florida law and federal rules evolve; the portal always holds the current edition. Statutory citations verified against Official Florida Statutes: ss. 48.062, 605.0503, 605.2101\u2013605.2802 (including 605.2201, 605.2202, 605.2301, 605.2401, 605.2404, 605.2602\u2013605.2604), 711.50\u2013711.512; Ch. 726; Prop. Treas. Reg. \xA7301.7701-1(a)(5); FinCEN interim final rule (Mar. 2025); Florida Division of Corporations series LLC filing guidance.*
+*\xA9 2026 MyFloridaSeriesLLC. This manual may be updated as Florida law and federal rules evolve; the portal always holds the current edition. Statutory citations verified against Official Florida Statutes: ss. 48.062, 605.0503, 605.2101\u2013605.2802 (including 605.2201, 605.2202, 605.2301, 605.2401, 605.2404, 605.2602, 605.2605\u2013605.2607), 711.50\u2013711.512; Ch. 726; Prop. Treas. Reg. \xA7301.7701-1(a)(5); FinCEN interim final rule (Mar. 2025); Florida Division of Corporations series LLC filing guidance.*
 `;
 
 // server/routes-admin.ts
@@ -110741,6 +110761,7 @@ function registerAdminRoutes(app2) {
       documentNumber: documentNumber.trim(),
       signerName: AR_SIGNER.name,
       signerTitle: AR_SIGNER.title,
+      memberManaged: (typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload)?.management?.structure !== "MANAGER_MANAGED",
       date: (/* @__PURE__ */ new Date()).toLocaleDateString("en-US", { timeZone: "America/New_York", year: "numeric", month: "long", day: "numeric" })
     });
     const pdf = await renderMarkdownPdf({ markdown, watermark: null, title });
@@ -111067,12 +111088,14 @@ function registerAdminRoutes(app2) {
         AND type IN ('ein', 's-election') AND status IN ('awaiting_info', 'in_progress')`,
           [o.client_id]
         );
+        const hasStatement = (await db.query("SELECT id FROM documents WHERE order_id = $1 AND kind = 'statement' LIMIT 1", [o.id])).length > 0;
         const mail = llcFormedEmail({
           clientName: clients[0].name,
           llcName: o.llc_name,
           isConversion,
           seriesNames: required,
           otherDocuments: [
+            ...hasStatement ? ["Statement of Authorized Representative"] : [],
             ...certDocs.some((d2) => d2.kind === "certificate-of-status") ? ["Certificate of Status"] : [],
             ...certDocs.some((d2) => d2.kind === "certified-copy") ? ["Certified Copy of the Articles"] : []
           ],

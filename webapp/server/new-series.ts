@@ -20,7 +20,7 @@
  * what an owner — or their bank — actually wants.
  */
 import template from "./templates-new-series.md";
-import { resolveIf } from "./oa";
+import { resolveIf, OA_TEMPLATE_VERSION } from "./oa";
 
 export interface NewSeriesInput {
   companyName: string;
@@ -60,6 +60,13 @@ export function assembleNewSeries(input: NewSeriesInput): { markdown: string; ti
   // Who files, and who manages the series, are the master's own sentences,
   // one pair per management form (13 Sep 2026: the code said the Company was
   // the series manager, the opposite of the member-managed agreement's s. 5.2).
+  // The manager-count markers sit inside the manager-managed block, so they
+  // are resolved first, while the block still exists.
+  {
+    const mgrs = input.managerNames.map((n) => n.trim()).filter(Boolean);
+    s = resolveIf(s, "onemanager", mgrs.length <= 1);
+    s = resolveIf(s, "manymanagers", mgrs.length > 1);
+  }
   s = resolveIf(s, "membermanaged", input.memberManaged);
   s = resolveIf(s, "managermanaged", !input.memberManaged);
   // One owner signs alone, in the singular (Adam, 15 Sep 2026): "the sole
@@ -69,7 +76,6 @@ export function assembleNewSeries(input: NewSeriesInput): { markdown: string; ti
   s = resolveIf(s, "several", input.memberNames.length > 1);
   const managers = input.managerNames.map((n) => n.trim()).filter(Boolean);
   if (!input.memberManaged && managers.length === 0) throw new Error("new-series: a manager-managed company needs at least one Manager");
-  const psManager = managers.join(", ");
   // Manager-managed: one signature line per Manager, matching the Agreement.
   const signerOf = (entity: string) => (input.entitySigners ?? []).find((x) => x.entity.trim() === entity.trim());
   // A person's block is the rule then the name; an entity's is its name,
@@ -110,10 +116,8 @@ export function assembleNewSeries(input: NewSeriesInput): { markdown: string; ti
   s = s.split("[EFFECTIVE DATE]").join(input.effectiveDate);
   must(s, "[PS MANAGER SIGNATURE LINE]", "ps manager signature");
   s = s.split("[PS MANAGER SIGNATURE LINE]").join(psSignature);
-  if (!input.memberManaged) {
-    must(s, "[PS MANAGER]", "ps manager");
-    s = s.split("[PS MANAGER]").join(psManager);
-  }
+  must(s, "[EDITION]", "edition");
+  s = s.split("[EDITION]").join(OA_TEMPLATE_VERSION);
   must(s, "[MEMBER SIGNATURE BLOCKS]", "member signature blocks");
   s = s.split("[MEMBER SIGNATURE BLOCKS]").join(blocks);
   s = s.replace(/\n{3,}/g, "\n\n");

@@ -32,8 +32,8 @@ const PACKAGES: {
     key: "convert",
     eyebrow: "Existing LLC",
     heading: "Convert your existing Florida LLC",
-    blurb: "You already have a Florida LLC. There is no $125 Articles fee, because the company is already on file with the state.",
-    stateFees: ["No $125 Articles filing fee — your LLC already exists", "$25 state fee to change your registered agent if you take our service"],
+    blurb: "You already have a Florida LLC. You skip the $125 filing fee for the Articles and Registered Agent, because the company is already on file with the state.",
+    stateFees: ["No $125 filing fee for the Articles and Registered Agent — your LLC already exists", "$25 state fee to change your registered agent if you take our service"],
     features: [
       "Protected Series Designations filed for your existing LLC",
       ...SHARED_FEATURES,

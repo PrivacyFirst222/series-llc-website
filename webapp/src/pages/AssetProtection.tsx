@@ -85,7 +85,7 @@ export default function AssetProtection() {
           {/* Inside liability grid */}
           <div className="grid gap-px overflow-hidden rounded-2xl border border-border bg-border md:grid-cols-3">
             {[
-              { entity: "Corporation", verdict: "bad", note: "Inside liability contained, but all corporate assets are at risk from a single judgment due to no internal firewalls" },
+              { entity: "Corporation", verdict: "ok", note: "Inside liability is contained at the entity, but a single judgment can reach every corporate asset — no internal firewalls" },
               { entity: "Standard LLC", verdict: "ok", note: "Protects personal assets, but a single large judgment can wipe out all LLC assets" },
               { entity: "FL Protected Series LLC", verdict: "best", note: "Each series is a separate firewall — one judgment cannot reach other series assets" },
             ].map((row) => (

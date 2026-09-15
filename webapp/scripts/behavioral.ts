@@ -2151,7 +2151,7 @@ async function main(): Promise<void> {
         }
         expect(/If you choose our registered agent service, Florida charges \$25 to change the agent on file for your LLC\./.test(faq0) && /You also receive an operating agreement drafted for S corporation status whether you have us prepare your S Election form or prepare it yourself\./.test(faq0) && /We will not be able to provide that service here\./.test(faq0), "words: the FAQ carries Adam's conversion and S election sentences", faq0.match(/If you choose our registered agent[^.]*\.|You also receive[^.]*\./g));
         const app0 = await read("/recordkeeping-app");
-        expect(/You can have a perfect blueprint/.test(app0) && /These are the problems the structure invites when no system is in place from the start\./.test(app0) && !/best blueprint|we see most often/.test(app0), "words: the Recordkeeping App page reads as Adam ruled", app0.match(/perfect blueprint|best blueprint|we see most often|problems the structure invites/g));
+        expect(/You can have a perfect blueprint/.test(app0) && /These are the problems that show up when no system is in place from the start\./.test(app0) && !/best blueprint|we see most often/.test(app0), "words: the Recordkeeping App page reads as Adam ruled", app0.match(/perfect blueprint|best blueprint|we see most often|problems the structure invites/g));
       }
       const benefits = await read("/benefits");
       expect(/One state filing covers 10 series/.test(benefits) && !/unlimited series/.test(benefits), "words: Benefits says one filing covers 10 series");

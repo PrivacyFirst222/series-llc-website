@@ -445,7 +445,7 @@ function appointedUs(payload: unknown): boolean {
 const DOC_NUMBER_NEEDED = "This client appointed us to sign. Enter the Florida document number so the Statement of Authorized Representative can name the company.";
 async function issueStatement(
   db: Awaited<ReturnType<typeof getDb>>,
-  o: { id: string; client_id: string | null; llc_name: string },
+  o: { id: string; client_id: string | null; llc_name: string; payload?: unknown },
   documentNumber: string,
   put: (name: string, data: ArrayBuffer, type: string) => Promise<{ storageKey: string; sizeBytes: number }> = putFile,
 ): Promise<{ id: string; storageKey: string }> {
@@ -454,6 +454,7 @@ async function issueStatement(
     documentNumber: documentNumber.trim(),
     signerName: AR_SIGNER.name,
     signerTitle: AR_SIGNER.title,
+    memberManaged: ((typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload) as { management?: { structure?: string } } | null)?.management?.structure !== "MANAGER_MANAGED",
     date: new Date().toLocaleDateString("en-US", { timeZone: "America/New_York", year: "numeric", month: "long", day: "numeric" }),
   });
   // Our own statement, not a licensed deliverable: page numbers only.
@@ -843,12 +844,16 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
         AND type IN ('ein', 's-election') AND status IN ('awaiting_info', 'in_progress')`,
       [o.client_id],
     );
+    // The Statement, when we signed, is posted in the same step and named
+    // with the rest (15 Sep 2026: the email said "two things").
+    const hasStatement = (await db.query<{ id: string }>("SELECT id FROM documents WHERE order_id = $1 AND kind = 'statement' LIMIT 1", [o.id])).length > 0;
     const mail = llcFormedEmail({
       clientName: clients[0].name,
       llcName: o.llc_name,
       isConversion,
       seriesNames: required,
       otherDocuments: [
+        ...(hasStatement ? ["Statement of Authorized Representative"] : []),
         ...(certDocs.some((d) => d.kind === "certificate-of-status") ? ["Certificate of Status"] : []),
         ...(certDocs.some((d) => d.kind === "certified-copy") ? ["Certified Copy of the Articles"] : []),
       ],

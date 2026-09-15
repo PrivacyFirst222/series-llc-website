@@ -236,7 +236,8 @@ export const LEARN_MORE: Record<string, LearnMoreScreen> = {
         <Choice label="If you designate a beneficiary:">
           You may name any person or entity, and a backup who takes if the first beneficiary
           does not survive you — a person, an entity, or a class such as "my children in equal
-          shares." At your death, your interest passes to them automatically, subject to the
+          shares." On the S corporation forms the beneficiary must be an eligible S corporation
+          shareholder. At your death, your interest passes to them automatically, subject to the
           operating agreement. In multi-member companies: your
           beneficiary immediately receives the economic rights — your share of distributions —
           from day one. Your beneficiary becomes a voting member only if the other owners

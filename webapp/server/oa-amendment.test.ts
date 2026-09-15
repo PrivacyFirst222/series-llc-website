@@ -77,7 +77,7 @@ check("single: preamble names the sole member and no manager", sm.includes('by t
 check("single: recital A names the Amended and Restated agreement", sm.includes('A. The Company is governed by the Amended and Restated Operating Agreement of the Company effective as of August 5, 2026 (the "Agreement").'), sm.match(/A\. The Company[^\n]*/)?.[0]);
 check("single: recital B cites s. 12.1 and the Member", sm.includes("B. Section 12.1 of the Agreement provides that the Agreement may be amended only by a written instrument signed by the Member."), sm.match(/B\. Section[^\n]*/)?.[0]);
 check("single: recital C and the operative words are singular", sm.includes("C. The Member wishes to amend the Agreement as set forth in this Amendment.") && sm.includes("NOW, THEREFORE, the Member amends the Agreement as follows:"));
-check("single: IN WITNESS WHEREOF is singular and the heading is MEMBER", sm.includes("IN WITNESS WHEREOF, the undersigned has executed this Amendment effective as of the date(s) set forth below.\n\n**MEMBER:**\n\n_____________________________\nMaria Lopez\nDate: _____________________________"), sm.match(/IN WITNESS[\s\S]*$/)?.[0]);
+check("single: IN WITNESS WHEREOF is singular and the heading is MEMBER", sm.includes("IN WITNESS WHEREOF, the undersigned has executed this Amendment effective as of the date set forth below.\n\n**MEMBER:**\n\n_____________________________\nMaria Lopez\nDate: _____________________________"), sm.match(/IN WITNESS[\s\S]*$/)?.[0]);
 check("single member-managed: no manager block", !sm.includes("ACKNOWLEDGED") && !sm.includes(", Manager"));
 check("single: no slot or marker is left", !/\[[A-Z][A-Z ()/.']*\]/.test(sm) && !sm.includes("<!--"), sm.match(/\[[A-Z][A-Z ()/.']*\]|<!--[^>]*-->/g));
 

@@ -8,6 +8,7 @@
  */
 import { readFileSync } from "node:fs";
 import statementRaw from "./templates-statement-of-authorized-representative.md";
+import { resolveIf, OA_TEMPLATE_VERSION } from "./oa";
 
 function loadTemplate(v: string): string {
   return v.includes("STATEMENT OF AUTHORIZED REPRESENTATIVE") ? v : readFileSync(v, "utf8");
@@ -23,6 +24,8 @@ export interface StatementInputs {
   signerTitle: string;
   /** Human format, "September 13, 2026". */
   date: string;
+  /** Who manages the Company: item 5 says so (15 Sep 2026). */
+  memberManaged: boolean;
 }
 
 function must(haystack: string, needle: string, label: string): void {
@@ -31,9 +34,12 @@ function must(haystack: string, needle: string, label: string): void {
 
 export function assembleStatement(inp: StatementInputs): { markdown: string; title: string } {
   for (const [k, v] of Object.entries(inp)) {
+    if (typeof v === "boolean") continue;
     if (!String(v ?? "").trim()) throw new Error(`Statement: ${k} is required`);
   }
   let s = statementTemplate;
+  s = resolveIf(s, "membermanaged", inp.memberManaged);
+  s = resolveIf(s, "managermanaged", !inp.memberManaged);
   // The master's own editing note and draft colophon are not part of the
   // delivered document.
   s = s.replace(/<!--[\s\S]*?-->\s*/g, "");
@@ -44,13 +50,18 @@ export function assembleStatement(inp: StatementInputs): { markdown: string; tit
   s = s.split("[COMPANY NAME], LLC").join(inp.companyName);
   must(s, "[DOCUMENT NUMBER]", "document number");
   s = s.split("[DOCUMENT NUMBER]").join(inp.documentNumber);
-  // A conformed signature on the master's own line: "/s/" and the signer.
-  must(s, "_____________________________\nBy: [SIGNER NAME]", "signature block");
-  s = s.replace("_____________________________\nBy: [SIGNER NAME]", `/s/ ${inp.signerName}\nBy: ${inp.signerName}`);
+  // A conformed signature in the house entity block: "By: /s/ Name" over
+  // the printed name and title (15 Sep 2026).
+  must(s, "By: [SIGNATURE]", "signature block");
+  s = s.replace("By: [SIGNATURE]", `By: /s/ ${inp.signerName}`);
+  must(s, "[SIGNER NAME]", "signer name");
+  s = s.split("[SIGNER NAME]").join(inp.signerName);
   must(s, "[SIGNER TITLE]", "signer title");
   s = s.split("[SIGNER TITLE]").join(inp.signerTitle);
   must(s, "[DATE]", "date");
   s = s.split("[DATE]").join(inp.date);
+  must(s, "[EDITION]", "edition");
+  s = s.split("[EDITION]").join(OA_TEMPLATE_VERSION);
   const leftover = s.match(/\[[A-Z][A-Z ()/.']*\]/g);
   if (leftover) throw new Error(`Statement: unfilled slot(s): ${[...new Set(leftover)].join(", ")}`);
   if (/Form document/.test(s)) throw new Error("Statement: draft colophon left in the document");

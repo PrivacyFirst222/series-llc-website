@@ -6,7 +6,7 @@
 
 ---
 
-THIS AMENDMENT NO. [AMENDMENT NUMBER] TO OPERATING AGREEMENT (this "Amendment") of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the "Company"), is made effective as of [AMENDMENT DATE], by <!-- one:member -->the undersigned sole member (the "Member")<!-- /one --><!-- many:member -->the undersigned members (each a "Member" and collectively the "Members")<!-- /many --><!-- if:managed -->, and is acknowledged by the undersigned Manager<!-- /if -->.
+THIS AMENDMENT NO. [AMENDMENT NUMBER] TO OPERATING AGREEMENT (this "Amendment") of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the "Company"), is made effective as of [AMENDMENT DATE], by <!-- one:member -->the undersigned sole member (the "Member")<!-- /one --><!-- many:member -->the undersigned members (each a "Member" and collectively the "Members")<!-- /many --><!-- if:managed -->, and is acknowledged by the undersigned <!-- one:manager -->Manager<!-- /one --><!-- many:manager -->Managers<!-- /many --><!-- /if -->.
 
 ### RECITALS
 
@@ -33,7 +33,7 @@ NOW, THEREFORE, <!-- one:member -->the Member amends<!-- /one --><!-- many:membe
 
 ## SIGNATURES
 
-IN WITNESS WHEREOF, the undersigned <!-- one:member -->has<!-- /one --><!-- many:member -->have<!-- /many --> executed this Amendment effective as of the date(s) set forth below.
+IN WITNESS WHEREOF, the undersigned <!-- one:member -->has<!-- /one --><!-- many:member -->have<!-- /many --> executed this Amendment effective as of the <!-- one:member -->date<!-- /one --><!-- many:member -->date(s)<!-- /many --> set forth below.
 
 <!-- one:member -->**MEMBER:**<!-- /one --><!-- many:member -->**MEMBERS:**<!-- /many -->
 

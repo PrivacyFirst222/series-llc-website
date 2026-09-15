@@ -26,6 +26,12 @@ if ! (cd "$ROOT/webapp" && bun run test >/dev/null 2>&1); then
   echo "pre-commit: UNIT TESTS FAILED — commit refused. Run: cd webapp && bun run test" >&2
   exit 1
 fi
+# The fact ledger (docs/facts.md): a fact fixed in one place and left wrong
+# in another cannot be committed (FAILURES.md P85, 15 Sep 2026).
+if ! (cd "$ROOT/webapp" && bun run ../docs/facts-check.ts); then
+  echo "pre-commit: FACT LEDGER DISAGREES — commit refused. Run: cd webapp && bun run ../docs/facts-check.ts" >&2
+  exit 1
+fi
 
 MASTERS=$(git diff --cached --name-only --diff-filter=ACM \
   | grep -E '^(webapp/server/templates-oa-.*\.md|docs/owners-manual\.md|webapp/server/templates-statement-of-authorized-representative\.md)$' || true)

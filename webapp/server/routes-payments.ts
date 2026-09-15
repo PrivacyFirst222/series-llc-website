@@ -105,7 +105,8 @@ export async function fulfillPaidOrder(orderId: string, squarePaymentId: string 
       "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at) VALUES ($1, $2, 'set_password', $3)",
       [tokenHash, clientId, new Date(Date.now() + 7 * 86400_000).toISOString()],
     );
-    const mail = welcomeEmail(order.contact_name, `${env.PUBLIC_BASE_URL}/portal/set-password?token=${token}`, payload?.filingPath === "CONVERT");
+    // A self-agent client is not told to expect legal mail from us (15 Sep 2026).
+    const mail = welcomeEmail(order.contact_name, `${env.PUBLIC_BASE_URL}/portal/set-password?token=${token}`, payload?.filingPath === "CONVERT", (payload as { registeredAgent?: { choice?: string } } | null)?.registeredAgent?.choice === "SERVICE");
     // Email failures must never unwind a recorded payment; the client can
     // always recover portal access through the forgot-password flow.
     await sendMail({ to: order.contact_email, ...mail }).catch((e) =>
@@ -587,7 +588,7 @@ app.post("/orders/:id/resend-welcome", async (c) => {
       [tokenHash, clients[0].id, new Date(Date.now() + 7 * 86400_000).toISOString()],
     );
     const resendPayload = (typeof orders[0].payload === "string" ? JSON.parse(orders[0].payload) : orders[0].payload) as { filingPath?: string } | null;
-    const mail = welcomeEmail(orders[0].contact_name, `${env.PUBLIC_BASE_URL}/portal/set-password?token=${token}`, resendPayload?.filingPath === "CONVERT");
+    const mail = welcomeEmail(orders[0].contact_name, `${env.PUBLIC_BASE_URL}/portal/set-password?token=${token}`, resendPayload?.filingPath === "CONVERT", (resendPayload as { registeredAgent?: { choice?: string } } | null)?.registeredAgent?.choice === "SERVICE");
     await sendMail({ to: orders[0].contact_email, ...mail }).catch((e) =>
       console.error("[resend-welcome] failed:", e),
     );

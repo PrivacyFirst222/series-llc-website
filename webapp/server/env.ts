@@ -32,10 +32,6 @@ export const env = {
 
   ADMIN_PASSWORD: process.env.ADMIN_PASSWORD ?? "",
 
-  /** Who signs the Statement of Authorized Representative for FLORIDA
-   *  PROTECTED SERIES, LLC - PS 1 (Adam, 13 Sep 2026). Set both in Vercel
-   *  before go-live; dev prints placeholders so the build never guesses. */
-
   /** Shared secret for the daily purge cron. Required in production. */
   CRON_SECRET: process.env.CRON_SECRET ?? "",
   // Dropbox app-folder credentials for the nightly client-file mirror.

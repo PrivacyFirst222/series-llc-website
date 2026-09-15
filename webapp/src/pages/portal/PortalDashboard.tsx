@@ -27,12 +27,14 @@ import { ViewingAsBanner } from "./ViewingAsBanner";
 
 interface PortalDoc {
   id: string;
-  kind: "package" | "legal_mail";
+  kind: string;
   title: string;
   size_bytes: number;
   created_at: string;
   /** Legal mail: the day it was received, YYYY-MM-DD. */
   receivedOn?: string | null;
+  /** A designation: the series it covers. */
+  seriesNames?: string[];
   order_id: string | null;
 }
 
@@ -498,7 +500,9 @@ export default function PortalDashboard() {
       };
     }
     const filed = orders.find(
-      (o) => o.type === "series" && o.status === "fulfilled" && !!o.details.seriesName && d.title.endsWith(o.details.seriesName),
+      // Matched by the series the designation covers, not by its title
+      // (15 Sep 2026: a title change had left the button on the wrong row).
+      (o) => o.type === "series" && o.status === "fulfilled" && !!o.details.seriesName && d.kind === "psd" && (d.seriesNames ?? []).includes(o.details.seriesName),
     );
     if (filed) {
       return {

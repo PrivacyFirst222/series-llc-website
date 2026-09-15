@@ -108,10 +108,10 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbr mbs | 3.3 | Limitation of Liability Among Series (Statutory Shields) | 50adbb11 | statutory-route | — | members series company | — | s. 605.2401; no manager exists in these forms (s. 5.1), so the shield names member and protected-series manager only (13 Sep 2026) |
 | sgm sgms | 3.3 | Limitation of Liability Among Series (Statutory Shields) | b41afb07 | benefit | — | member series company | — | s. 605.2401; the Member now holds the protected-series manager office, so the shield names that capacity |
 | mbr mbs mul scp sgl sgm sgms sgs | 3.4 | Dissolution of a Protected Series Distinguished | ab68ccd0 | statutory-route | — | members | — | s. 605.2501 |
-| mul scp sgl | 3.5 | Series Exhibits Control Series Terms | 70d3c7b8 | mechanic | company | members | — | drafting convention |
-| mbr mbs sgm | 3.5 | Series Exhibits Control Series Terms | a3eb038e | mechanic | company | members | — | drafting convention |
-| sgs | 3.5 | Series Exhibits Control Series Terms | bd0bfd2d | mechanic | company | members | — | drafting convention |
-| sgms | 3.5 | Series Exhibits Control Series Terms | 3e179bb7 | mechanic | company | member | — | drafting convention; the Article 9 carve-out stops a Series Exhibit from varying the S corporation terms |
+| mul sgl | 3.5 | Series Exhibits Control Series Terms | 70d3c7b8 | mechanic | company | members | — | drafting convention |
+| scp sgs | 3.5 | Series Exhibits Control Series Terms | bd0bfd2d | mechanic | company | members | — | drafting convention |
+| mbr sgm | 3.5 | Series Exhibits Control Series Terms | a3eb038e | mechanic | company | members | — | drafting convention |
+| mbs sgms | 3.5 | Series Exhibits Control Series Terms | 3e179bb7 | mechanic | company | member | — | drafting convention; the Article 9 carve-out stops a Series Exhibit from varying the S corporation terms |
 | mbr mbs mul scp sgl sgm sgms sgs | 3.6 | Company as Owner | a566e682 | statutory-route | — | members company | — | s. 605.2303(1)-(3) |
 | sgl | 4.1 | Sole Member | 86821bf1 | mechanic | — | member | — | drafting convention |
 | mul scp | 4.1 | Members; Percentage Interests | 65ad85a1 | mechanic | — | members | — | s. 605.04073(1)(b) |
@@ -163,7 +163,7 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | sgl | 5.4 | Actions Requiring Member Approval | 1ab566f9 | authority | manager | members | the Manager moved the building into another series without the members' consent | ss. 605.04073(2)(d), 605.0302, 605.2301; the borrowing limit (former (b)) is a multi-member provision only (Adam, 13 Sep 2026) |
 | mul scp | 5.4 | Actions Requiring Member Approval | 08256f46 | authority | manager | members | the Manager moved the building into another series without the members' consent | ss. 605.04073(2)(d), 605.0302, 605.2301 |
 | mbr mbs | 5.4 | Authority to Act; Limits on Authority | be68b5c7 | authority | members | members | — | s. 605.04074(1) |
-| sgs | 5.4 | Actions Requiring Member Approval | 3554999a | authority | manager | members | the Manager moved the building into another series without the members' consent | ss. 605.04073(2)(d), 605.0302, 605.2301; the borrowing limit (former (b)) is a multi-member provision only (Adam, 13 Sep 2026) |
+| sgs | 5.4 | Actions Requiring Member Approval | 5f986214 | authority | manager | members | the Manager moved the building into another series without the members' consent | ss. 605.04073(2)(d), 605.0302, 605.2301; the borrowing threshold is a multi-member question; 15 Sep 2026: (c) no longer offers consent to acts s. 9.3 makes void (Adam) |
 | sgm sgms | 5.4 | Standard of Conduct; Exculpation | 048c8e4a | benefit | manager member | manager member | — | ss. 605.04091, 605.0105(3) |
 | sgl sgs | 5.5 | Standard of Conduct; Exculpation | cce8e03a | benefit | manager member | manager member | — | ss. 605.04091, 605.0105(3) |
 | mul scp | 5.5 | Standard of Conduct; Exculpation | db5f385a | benefit | manager members | manager members | — | ss. 605.04091, 605.0105(3) |
@@ -193,7 +193,7 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | sgms sgs | 6.4 | Member Loans | 82dc23b3 | mechanic | members | members | — | s. 605.0110(3) |
 | sgl sgm sgms sgs | 6.5 | No Right to Specific Property | f3efef85 | benefit | members | company members | — | s. 605.0110(1) |
 | mbr mbs mul scp | 6.5 | Member Loans | 99d1121e | mechanic | members | members | — | s. 605.0110(3) |
-| mbr mul | 6.6 | Capital Accounts | 9932dfcc | mechanic | company | members | — | Treas. Reg. 1.704-1(b)(2)(iv) |
+| mbr mul | 6.6 | Capital Accounts | 13fb41dd | mechanic | company | members | — | Treas. Reg. 1.704-1(b)(2)(iv); 15 Sep 2026: "(and sub-accounts)" removed — no sub-account exists |
 | mbs scp | 6.6 | Contribution Records; Identical Rights | 31a89541 | mechanic | company | members | — | IRC 1361(b)(1)(D) |
 | mbr mbs mul scp | 6.7 | No Right to Specific Property | 3e1803bb | benefit | members | company members | — | s. 605.0110(1) |
 | sgl sgs | 7.1 | Distributions | 0c3c8347 | authority | manager | member | — | s. 605.0404 |
@@ -252,15 +252,14 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbs | 9.4 | S Corporation Status; Intent; Savings Clause | 5f4827e9 | benefit | members | members | — | IRC 1361, 1362 |
 | sgs | 9.4 | Intent; Savings Clause | 1ecf2164 | benefit | — | member | — | IRC 1361, 1362(f) |
 | sgms | 9.4 | Intent; Savings Clause | 39ee4012 | benefit | — | member | — | IRC 1361, 1362(f) |
-| mul | 9.5 | Fiscal Year | 19362c64 | mechanic | company | members | — | IRC 706; 1378 for the S forms |
+| mul | 9.5 | Fiscal Year | cc0c6c19 | mechanic | company | members | — | IRC 706; 1378 for the S forms; 15 Sep 2026: text unchanged, a rule line added before Article 10 |
 | scp | 9.5 | Other Elections | 2da32cea | authority | manager members | members | — | IRC 1362 |
-| mbr | 9.5 | Fiscal Year | 5c940732 | mechanic | company | members | — | IRC 706; 1378 for the S forms |
+| mbr | 9.5 | Fiscal Year | 740effa3 | mechanic | company | members | — | IRC 706; 1378 for the S forms; 15 Sep 2026: text unchanged, a rule line added before Article 10 |
 | mbs | 9.5 | Other Elections | 8869aa20 | authority | manager members | members | — | IRC 1362 |
 | sgs | 9.5 | Other Elections | 0e08a85e | authority | manager | member | — | IRC 1362 |
 | sgms | 9.5 | Other Elections | afecf99a | authority | member | member | — | IRC 1362 |
-| scp | 9.6 | Fiscal Year | 98ee3c50 | mechanic | company | members | — | IRC 706; 1378 for the S forms |
-| mbs | 9.6 | Fiscal Year | 30cd60ee | mechanic | company | members | — | IRC 706; 1378 for the S forms |
-| sgs | 9.6 | Fiscal Year | 83c6bc46 | mechanic | company | member | — | IRC 1378, the required year for an S corporation |
+| scp sgs | 9.6 | Fiscal Year | 83c6bc46 | mechanic | company | member | — | IRC 1378, the required year for an S corporation |
+| mbs | 9.6 | Fiscal Year | 817eaba6 | mechanic | company | members | — | IRC 706; 1378 for the S forms; 15 Sep 2026: text unchanged, a rule line added before Article 10 |
 | sgms | 9.6 | Fiscal Year | 3d397f14 | mechanic | company | member | — | IRC 1378, the required year for an S corporation |
 | sgl sgm | 10.1 | Admission | 2b14cbb5 | authority | member | member | — | s. 605.0401(3) |
 | mul scp | 10.1 | Restriction on Transfer | 3ca8ae94 | covenant | members | members | The member transferred in breach of the agreement — a claim among the members, and the transferee takes as a transferee only. | ss. 605.0502, 605.0602 |

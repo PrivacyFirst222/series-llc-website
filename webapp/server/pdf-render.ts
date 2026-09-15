@@ -31,7 +31,6 @@ export interface Seg {
 /** WinAnsi-safe text: swap characters the standard fonts cannot encode. */
 function sanitize(s: string): string {
   return s
-    .replace(/—/g, "—") // em dash is WinAnsi-safe; keep
     .replace(/[‘’]/g, "'")
     .replace(/[“”]/g, '"')
     .replace(/→/g, "->")

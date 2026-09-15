@@ -369,7 +369,7 @@ export default function OrderBoard({ enabled }: { enabled: boolean }) {
         />
         <Column
           title="With The State"
-          hint="Filed, awaiting the Division"
+          hint="Filed, or formed with work still owed"
           orders={withState}
           servicesFor={servicesFor}
           onOpen={setOpenId}

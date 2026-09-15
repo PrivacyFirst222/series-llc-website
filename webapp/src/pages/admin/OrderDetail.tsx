@@ -120,9 +120,9 @@ function Field({
           {field.value}
         </div>
       </div>
+      {copyFailed ? <span className="shrink-0 text-xs text-destructive" data-testid="copy-failed">Copy failed — select the text and copy it by hand</span> : null}
       <Button type="button" variant="ghost" size="sm" aria-label={`Copy ${field.label}`} onClick={copy} className="shrink-0">
-        {copyFailed ? <span className="text-xs text-destructive" data-testid="copy-failed">Copy failed — select the text and copy it by hand</span> : null}
-      {flash ? <Check className="h-4 w-4 text-trust" /> : <Copy className="h-4 w-4" />}
+        {flash ? <Check className="h-4 w-4 text-trust" /> : <Copy className="h-4 w-4" />}
       </Button>
     </div>
   );

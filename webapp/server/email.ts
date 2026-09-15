@@ -66,7 +66,7 @@ const wrap = (inner: string) => `
   <p style="color:#8a8f98;font-size:12px;margin-top:28px">MyFloridaSeriesLLC — support@myfloridaseriesllc.com</p>
 </div>`;
 
-export function welcomeEmail(name: string, setPasswordUrl: string, isConversion = false): { subject: string; html: string } {
+export function welcomeEmail(name: string, setPasswordUrl: string, isConversion = false, raService = true): { subject: string; html: string } {
   // A converting client already owns the company: what we prepare is its
   // Protected Series Designations, never Articles (Adam, 9 Sep 2026).
   const preparing = isConversion
@@ -81,9 +81,9 @@ export function welcomeEmail(name: string, setPasswordUrl: string, isConversion 
     html: wrap(`
       <p>Hi ${escapeHtml(name || "there")},</p>
       ${preparing}
-      <p>Your client portal is ready — it's where your formation documents will be posted,
+      <p>Your client portal is ready — it's where your formation documents will be posted${raService ? `,
       and where any legal mail we receive as your registered agent will be available to
-      download. Your Owner's Manual — the plain-English guide to running your protected
+      download` : ""}. Your Owner's Manual — the plain-English guide to running your protected
       series LLC — is already in your portal's library, ready to download.</p>
       <p><a href="${setPasswordUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Set your password</a></p>
       <p style="color:#555;font-size:13px">This link expires in 7 days. If it expires, use

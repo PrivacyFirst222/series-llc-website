@@ -134,8 +134,8 @@ function ConversionName({ data, patch, errors }: StepProps) {
 
         <div className="rounded-xl border border-border bg-secondary/40 p-4 text-sm text-muted-foreground leading-relaxed">
           Because the company is already on file, there is no name availability
-          check, and you skip the $125 filing fee for the Articles and Registered
-          Agent (if you keep your existing Registered Agent).
+          check, and you skip the $125 filing fee for the Articles and Registered Agent
+          (if you keep your existing Registered Agent).
         </div>
       </div>
     );

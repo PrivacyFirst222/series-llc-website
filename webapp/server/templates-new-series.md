@@ -1,4 +1,4 @@
-# UNANIMOUS WRITTEN CONSENT OF THE MEMBERS
+# <!-- if:several -->UNANIMOUS WRITTEN CONSENT OF THE MEMBERS<!-- /if --><!-- if:sole -->WRITTEN CONSENT OF THE SOLE MEMBER<!-- /if -->
 
 ## OF [COMPANY NAME], LLC
 
@@ -16,13 +16,13 @@
 
 **3. Ownership.** The new Protected Series is established without associated members. The Company owns all of its protected-series transferable interests, and no member of the Company holds any interest in it except indirectly, through that member's interest in the Company (ss. 605.2302(1), 605.2303(2), Fla. Stat.).
 
-**4. Authority to file.** <!-- if:membermanaged --><!-- if:several -->The Members authorize the Administrative Member, or any Member the Members designate, to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.<!-- /if --><!-- if:sole -->The Member is authorized to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.<!-- /if --><!-- /if --><!-- if:managermanaged --><!-- if:several -->The Members authorize the Manager<!-- /if --><!-- if:sole -->The Member authorizes the Manager<!-- /if --> to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.<!-- /if --> The protected series is established when its Protected Series Designation takes effect under s. 605.0207, Florida Statutes.
+**4. Authority to file.** <!-- if:membermanaged --><!-- if:several -->The Members authorize the Administrative Member, or any Member the Members designate, to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.<!-- /if --><!-- if:sole -->The Member is authorized to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.<!-- /if --><!-- /if --><!-- if:managermanaged --><!-- if:several -->The Members authorize <!-- /if --><!-- if:sole -->The Member authorizes <!-- /if --><!-- if:onemanager -->the Manager<!-- /if --><!-- if:manymanagers -->the Managers, acting as the Agreement provides,<!-- /if --> to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.<!-- /if --> The protected series is established when its Protected Series Designation takes effect under s. 605.0207, Florida Statutes.
 
 **5. Series Exhibit.** The Series Exhibit set forth below is adopted as part of the Agreement for the new Protected Series, as Section 3.1 of the Agreement requires at or before the filing of the Protected Series Designation.
 
 **6. Records.** The Company shall create and maintain, for the new Protected Series, the records required by s. 605.2301, Florida Statutes, and by Article 8 of the Agreement.
 
-**7. Effect.** This consent has the same effect as a vote taken at a meeting and shall be retained with the records of the Company.
+**7. Effect.** <!-- if:several -->This consent has the same effect as a vote taken at a meeting and shall be retained with the records of the Company.<!-- /if --><!-- if:sole -->This consent shall be retained with the records of the Company.<!-- /if -->
 
 <!-- if:several -->**MEMBERS:**<!-- /if --><!-- if:sole -->**MEMBER:**<!-- /if -->
 
@@ -39,10 +39,11 @@
 |---|---|
 | Purpose of this Protected Series | Any lawful purpose<!-- if:purpose -->, including, without limitation, [SERIES PURPOSE]<!-- /if --> |
 | Owner of this Protected Series | The Company. This Protected Series has no Associated Members (ss. 605.2302(1), 605.2303(2), Fla. Stat.). |
-<!-- if:managermanaged -->| Protected Series Manager | [PS MANAGER] |
-<!-- /if --><!-- if:membermanaged -->| Managed by | The Members, as protected-series managers (s. 605.2304, Fla. Stat., as varied by Section 5.2 of the Agreement) |
-<!-- /if -->| Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
-| Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit, together with the records maintained under Article 8. |
+<!-- if:managermanaged -->| Protected Series Manager | Same as Company Manager |
+<!-- /if --><!-- if:membermanaged --><!-- if:several -->| Managed by | The Members, as protected-series managers (s. 605.2304, Fla. Stat., as varied by Section 5.2 of the Agreement), acting by a Majority in Interest |
+<!-- /if --><!-- if:sole -->| Managed by | The Member, as protected-series manager (ss. 605.2304(1)-(2), 605.2107(1)(n), Fla. Stat.) |
+<!-- /if --><!-- /if -->| Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
+| Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the <!-- if:several -->Members<!-- /if --><!-- if:sole -->Member<!-- /if -->, together with the records maintained under Article 8. |
 | Special terms (if any) | [SPECIAL TERMS] |
 
 **Adopted effective [EFFECTIVE DATE] by the Company:**
@@ -62,3 +63,4 @@
 | | | | |
 | | | | |
 
+*New Protected Series — [SERIES NAME] — generated by MyFloridaSeriesLLC · Master [EDITION]*

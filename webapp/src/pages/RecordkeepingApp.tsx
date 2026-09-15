@@ -30,7 +30,7 @@ const appFeatures = [
   { icon: DollarSign, label: "Income by entity", desc: "Log income received at the main LLC level or assign it to the correct protected series." },
   { icon: Receipt, label: "Expenses by entity", desc: "Track expenses paid by the main LLC versus expenses that belong to a specific series." },
   { icon: CreditCard, label: "Distributions", desc: "Document distributions to members, including amount, date, and the entity making the distribution." },
-  { icon: Users, label: "Ownership records", desc: "Keep a clear record of membership interests and ownership percentages for the main LLC and each series." },
+  { icon: Users, label: "Ownership records", desc: "Keep a clear record of the membership interests and ownership percentages in your LLC, and of the LLC's ownership of every series." },
   { icon: ArrowLeftRight, label: "Asset transfers", desc: "Record transfers of assets between the main LLC and its series, or between series, with supporting notes." },
   { icon: FileText, label: "Notes and records", desc: "Attach notes, memos, and records to any series, transaction, or asset entry for a complete audit trail." },
   { icon: LayoutGrid, label: "Separated by entity", desc: "Every item is organized by the entity or series it belongs to — no commingling, no confusion." },
@@ -328,7 +328,7 @@ export default function RecordkeepingApp() {
               What goes wrong when records are not maintained properly.
             </h2>
             <p className="mt-4 text-base text-muted-foreground leading-relaxed">
-              These are the problems the structure invites when no system is in place from the start.
+              These are the problems that show up when no system is in place from the start.
             </p>
           </div>
 
