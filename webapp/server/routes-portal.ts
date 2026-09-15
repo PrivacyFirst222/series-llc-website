@@ -1522,6 +1522,9 @@ app.post("/portal/series/consent", async (c) => {
       seriesName: z.string().min(1).max(300),
       seriesNumber: z.string().min(1).max(40),
       purpose: z.string().max(600).optional().default(""),
+      // The agreement's exhibit takes both; so does this one (15 Sep 2026).
+      specialTerms: z.string().max(2000).optional().default(""),
+      contribution: z.string().max(300).optional().default(""),
       effectiveDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
       // The company the series joins (Adam, 31 Aug 2026: one account, several
       // companies); the consent document is filed under it.
@@ -1580,6 +1583,8 @@ app.post("/portal/series/consent", async (c) => {
       memberNames: seriesOwners.map((m) => m.name),
       managerNames: seed.managerNames,
       memberManaged,
+      specialTerms: body.data.specialTerms,
+      contribution: body.data.contribution,
       entitySigners,
     });
     title = assembled.title;

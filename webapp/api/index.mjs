@@ -101625,6 +101625,10 @@ function llcFormedEmail(opts) {
       closing agent will ask for them.</p>
       <p>The next step is to create your operating agreement. You can do that
       in your personal portal (<a href="${opts.portalUrl}">Click here to open</a>).${svc}</p>
+      ${opts.sElectionOrdered ? `<p>Your S election form is now open in your portal: sign in, open
+      <strong>Orders in progress</strong>, and choose <strong>Provide details securely</strong>.
+      IRS Form 2553 must be filed within 2 months and 15 days of the date on your filed
+      Articles, so please complete the form soon.</p>` : ""}
       <p>Thank you for doing business with MyFloridaSeriesLLC!</p>
       <p>support@myfloridaseriesllc.com</p>
     `)
@@ -102197,25 +102201,25 @@ var templates_new_series_default = `# UNANIMOUS WRITTEN CONSENT OF THE MEMBERS
 
 ---
 
-The undersigned, being **all** of the members of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the "Company"), acting by written consent without a meeting as permitted by the Company's operating agreement (the "Agreement"), adopt the following as of **[EFFECTIVE DATE]**:
+<!-- if:several -->The undersigned, being **all** of the members of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the "Company"), acting by written consent without a meeting as permitted by the Company's operating agreement (the "Agreement"), adopt the following as of **[EFFECTIVE DATE]**:<!-- /if --><!-- if:sole -->The undersigned, being the sole member of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the "Company"), acting by written consent as permitted by the Company's operating agreement (the "Agreement"), adopts the following as of **[EFFECTIVE DATE]**:<!-- /if -->
 
-**1. Approval of the new Protected Series.** Under s. 605.2201(1), Florida Statutes, a limited liability company may establish a protected series with the affirmative vote or consent of all of its members, and Section 3.1 of the Agreement requires that consent. The Members, constituting all members of the Company, approve the establishment of a protected series to be named:
+**1. Approval of the new Protected Series.** Under s. 605.2201(1), Florida Statutes, a limited liability company may establish a protected series with the affirmative vote or consent of all of its members, and Section 3.1 of the Agreement requires that consent. <!-- if:several -->The Members, constituting all members of the Company, approve<!-- /if --><!-- if:sole -->The Member, being the sole member of the Company, approves<!-- /if --> the establishment of a protected series to be named:
 
-> **[SERIES NAME]**
+**[SERIES NAME]**
 
 **2. Purpose.** The purpose of the new Protected Series is any lawful purpose<!-- if:purpose -->, including, without limitation, [SERIES PURPOSE]<!-- /if -->.
 
 **3. Ownership.** The new Protected Series is established without associated members. The Company owns all of its protected-series transferable interests, and no member of the Company holds any interest in it except indirectly, through that member's interest in the Company (ss. 605.2302(1), 605.2303(2), Fla. Stat.).
 
-**4. Authority to file.** <!-- if:membermanaged -->The Members authorize the Administrative Member, or any Member the Members designate, to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.<!-- /if --><!-- if:managermanaged -->The Members authorize the Manager to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.<!-- /if --> The protected series is established when its Protected Series Designation takes effect under s. 605.0207, Florida Statutes.
+**4. Authority to file.** <!-- if:membermanaged --><!-- if:several -->The Members authorize the Administrative Member, or any Member the Members designate, to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.<!-- /if --><!-- if:sole -->The Member is authorized to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.<!-- /if --><!-- /if --><!-- if:managermanaged --><!-- if:several -->The Members authorize the Manager<!-- /if --><!-- if:sole -->The Member authorizes the Manager<!-- /if --> to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.<!-- /if --> The protected series is established when its Protected Series Designation takes effect under s. 605.0207, Florida Statutes.
 
 **5. Series Exhibit.** The Series Exhibit set forth below is adopted as part of the Agreement for the new Protected Series, as Section 3.1 of the Agreement requires at or before the filing of the Protected Series Designation.
 
-**6. Records.** The Company shall create and maintain, for the new Protected Series, the records required by s. 605.2301, Florida Statutes, and by Article 8 of the Agreement, and shall open and maintain a separate deposit account for it before any asset is associated with it.
+**6. Records.** The Company shall create and maintain, for the new Protected Series, the records required by s. 605.2301, Florida Statutes, and by Article 8 of the Agreement.
 
 **7. Effect.** This consent has the same effect as a vote taken at a meeting and shall be retained with the records of the Company.
 
-**MEMBERS:**
+<!-- if:several -->**MEMBERS:**<!-- /if --><!-- if:sole -->**MEMBER:**<!-- /if -->
 
 [MEMBER SIGNATURE BLOCKS]
 
@@ -102232,9 +102236,9 @@ The undersigned, being **all** of the members of **[COMPANY NAME], LLC**, a Flor
 | Owner of this Protected Series | The Company. This Protected Series has no Associated Members (ss. 605.2302(1), 605.2303(2), Fla. Stat.). |
 <!-- if:managermanaged -->| Protected Series Manager | [PS MANAGER] |
 <!-- /if --><!-- if:membermanaged -->| Managed by | The Members, as protected-series managers (s. 605.2304, Fla. Stat., as varied by Section 5.2 of the Agreement) |
-<!-- /if -->| Contributions to this Protected Series | By the Company: as recorded on the Asset Schedule attached to this Series Exhibit |
+<!-- /if -->| Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
 | Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit, together with the records maintained under Article 8. |
-| Special terms (if any) | None |
+| Special terms (if any) | [SPECIAL TERMS] |
 
 **Adopted effective [EFFECTIVE DATE] by the Company:**
 
@@ -102352,7 +102356,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 (b) may, in its own name, conduct any activity in furtherance of its purpose, exercise the powers described in Section 1.4, and sue and be sued;
 
-(c) is **not** a separate legal entity capable of existing independently of the Company, may not be a member of the Company, may not itself designate a protected series, and may not merge, convert, domesticate, or engage in an interest exchange except through the single statutory channel provided in s. 605.2604, Florida Statutes; and
+(c) is **not** a separate legal entity capable of existing independently of the Company, may not be a member of the Company, may not itself designate a protected series, and may not merge, convert, domesticate, or engage in an interest exchange except as ss. 605.2602 and 605.2605\u2013605.2607, Florida Statutes, permit; and
 
 (d) shall be governed by this Agreement, applied to that Protected Series as though the Protected Series were a separate limited liability company, except as its Series Exhibit expressly provides otherwise and except as the Act requires otherwise.
 
@@ -102614,7 +102618,7 @@ Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENE
 |---|---|
 | Purpose of this Protected Series | Any lawful purpose<!-- if:purpose -->, including, without limitation, [PURPOSE]<!-- /if --> |
 | Owner of this Protected Series | The Company. This Protected Series has no Associated Members (ss. 605.2302(1), 605.2303(2), Fla. Stat.). |
-| Protected Series Manager | [Same as Company Manager / NAME] |
+| Protected Series Manager | Same as Company Manager |
 | Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
 | Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the Member, together with the records maintained under Article 8. |
 | Special terms (if any) | [None / variations from the base Agreement \u2014 may not vary Article 8 or non-variable provisions of the Act] |
@@ -102754,7 +102758,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 (b) may, in its own name, conduct any activity in furtherance of its purpose, exercise the powers described in Section 1.4, and sue and be sued;
 
-(c) is **not** a separate legal entity capable of existing independently of the Company, may not be a member of the Company, may not itself designate a protected series, and may not merge, convert, domesticate, or engage in an interest exchange except through the single statutory channel provided in s. 605.2604, Florida Statutes; and
+(c) is **not** a separate legal entity capable of existing independently of the Company, may not be a member of the Company, may not itself designate a protected series, and may not merge, convert, domesticate, or engage in an interest exchange except as ss. 605.2602 and 605.2605\u2013605.2607, Florida Statutes, permit; and
 
 (d) shall be governed by this Agreement, applied to that Protected Series as though the Protected Series were a separate limited liability company, except as its Series Exhibit expressly provides otherwise and except as the Act requires otherwise.
 
@@ -102990,11 +102994,11 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **14.1 Dissolution of a Protected Series.** A Protected Series is dissolved, and its activities and affairs shall be wound up, upon the first to occur of: (a) the dissolution of the Company; (b) an event or circumstance specified in its Series Exhibit; (c) the affirmative vote or consent of a Majority in Interest; or (d) entry of a judicial order dissolving the Protected Series as provided by the Act.
 
-**14.2 Winding Up a Protected Series.** Upon dissolution of a Protected Series, its Protected Series Manager (or another person designated by a Majority in Interest) shall wind up its activities and affairs in the manner provided by the Act for winding up a limited liability company, applied to that Protected Series. Its Associated Assets shall be applied: first, to pay or provide for its Associated Liabilities to creditors other than Members; next, to pay or provide for its Associated Liabilities to Members as creditors, to the extent permitted by law; next, to the Company to the extent of their capital sub-account balances for that Protected Series; and finally, the balance to the Company. The Manager shall cause any statement or filing required by the Act or the Department in connection with the dissolution of the Protected Series to be made. The winding up of a Protected Series shall not draw upon, and its creditors shall have no recourse to, the Associated Assets of the Company or of any other Protected Series.
+**14.2 Winding Up a Protected Series.** Upon dissolution of a Protected Series, its Protected Series Manager (or another person designated by a Majority in Interest) shall wind up its activities and affairs in the manner provided by the Act for winding up a limited liability company, applied to that Protected Series. Its Associated Assets shall be applied: first, to pay or provide for its Associated Liabilities to creditors other than Members; next, to pay or provide for its Associated Liabilities to Members as creditors, to the extent permitted by law; and finally, the balance to the Company. The Manager shall cause any statement or filing required by the Act or the Department in connection with the dissolution of the Protected Series to be made. The winding up of a Protected Series shall not draw upon, and its creditors shall have no recourse to, the Associated Assets of the Company or of any other Protected Series.
 
 **14.3 Dissolution of the Company.** The Company is dissolved, and its activities and affairs shall be wound up, upon the first to occur of: (a) the written consent of **all** Members; (b) entry of a decree of judicial dissolution under the Act; or (c) any other event that under the Act requires dissolution. The death, incapacity, bankruptcy, dissociation, or withdrawal of a Member does not by itself dissolve the Company. Dissolution of the Company causes the dissolution of each Protected Series, and the winding up of the Company is not complete until the winding up of each Protected Series is complete.
 
-**14.4 Winding Up the Company.** Upon dissolution of the Company, the Manager (or, if there is none, a person designated by a Majority in Interest) shall wind up the Company and each Protected Series. After the winding up of each Protected Series under Section 14.2, the remaining Associated Assets of the Company shall be applied: first, to pay or provide for the Company's Associated Liabilities to creditors other than Members; next, to pay or provide for the Company's Associated Liabilities to Members as creditors; next, to the Members to the extent of their capital sub-account balances for the Company; and finally, the balance to the Members in proportion to their Percentage Interests. Articles of dissolution shall be filed as the Act requires, and the Company shall terminate when winding up is complete.
+**14.4 Winding Up the Company.** Upon dissolution of the Company, the Manager (or, if there is none, a person designated by a Majority in Interest) shall wind up the Company and each Protected Series. After the winding up of each Protected Series under Section 14.2, the remaining Associated Assets of the Company shall be applied: first, to pay or provide for the Company's Associated Liabilities to creditors other than Members; next, to pay or provide for the Company's Associated Liabilities to Members as creditors; next, to the Members to the extent of their capital account balances; and finally, the balance to the Members in proportion to their Percentage Interests. Articles of dissolution shall be filed as the Act requires, and the Company shall terminate when winding up is complete.
 
 **14.5 No Deficit Obligation; Recourse Limited.** No Member shall have any obligation to restore any deficit or to contribute capital in connection with any winding up (beyond unpaid contributions duly required under Sections 6.1 and 6.2), and each creditor of the Company or of any Protected Series shall look solely to the Associated Assets of its obligor.
 
@@ -103122,7 +103126,7 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
 |---|---|
 | Purpose of this Protected Series | Any lawful purpose<!-- if:purpose -->, including, without limitation, [PURPOSE]<!-- /if --> |
 | Owner of this Protected Series | The Company. This Protected Series has no Associated Members (ss. 605.2302(1), 605.2303(2), Fla. Stat.). |
-| Protected Series Manager | [Same as Company Manager / NAME] |
+| Protected Series Manager | Same as Company Manager |
 | Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
 | Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the Member(s), together with the records maintained under Article 8. |
 | Special terms (if any) | [None / variations from the base Agreement \u2014 may not vary Article 8 or non-variable provisions of the Act] |
@@ -103262,7 +103266,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 (b) may, in its own name, conduct any activity in furtherance of its purpose, exercise the powers described in Section 1.4, and sue and be sued;
 
-(c) is **not** a separate legal entity capable of existing independently of the Company, may not be a member of the Company, may not itself designate a protected series, and may not merge, convert, domesticate, or engage in an interest exchange except through the single statutory channel provided in s. 605.2604, Florida Statutes; and
+(c) is **not** a separate legal entity capable of existing independently of the Company, may not be a member of the Company, may not itself designate a protected series, and may not merge, convert, domesticate, or engage in an interest exchange except as ss. 605.2602 and 605.2605\u2013605.2607, Florida Statutes, permit; and
 
 (d) shall be governed by this Agreement, applied to that Protected Series as though the Protected Series were a separate limited liability company, except as its Series Exhibit expressly provides otherwise and except as the Act requires otherwise.
 
@@ -103646,7 +103650,7 @@ If no beneficiary is designated, or a designation fails, the Member's interest p
 |---|---|
 | Purpose of this Protected Series | Any lawful purpose<!-- if:purpose -->, including, without limitation, [PURPOSE]<!-- /if --> |
 | Owner of this Protected Series | The Company. This Protected Series has no Associated Members (ss. 605.2302(1), 605.2303(2), Fla. Stat.). |
-| Protected Series Manager | [Same as Company Manager / NAME] |
+| Protected Series Manager | Same as Company Manager |
 | Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
 | Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the Member(s), together with the records maintained under Article 8. |
 | Special terms (if any) | [None / variations from the base Agreement \u2014 may not vary Article 8 or non-variable provisions of the Act] |
@@ -103720,7 +103724,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
 
-**1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as a Majority in Interest may determine. A Protected Series may maintain its own place of business as determined by a majority of the Members.
+**1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as a Majority in Interest may determine. A Protected Series may maintain its own place of business as determined by a Majority in Interest.
 
 **1.6 Registered Agent and Registered Office.** The registered agent and registered office of the Company shall be as stated in the records of the Department. As required by the Act, the registered agent and registered office of the Company shall also serve as the registered agent and registered office for each Protected Series. Service of process, notice, or demand on a Protected Series may be made as provided by law, including s. 48.062, Florida Statutes.
 
@@ -103784,7 +103788,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 (b) may, in its own name, conduct any activity in furtherance of its purpose, exercise the powers described in Section 1.4, and sue and be sued;
 
-(c) is **not** a separate legal entity capable of existing independently of the Company, may not be a member of the Company, may not itself designate a protected series, and may not merge, convert, domesticate, or engage in an interest exchange except through the single statutory channel provided in s. 605.2604, Florida Statutes; and
+(c) is **not** a separate legal entity capable of existing independently of the Company, may not be a member of the Company, may not itself designate a protected series, and may not merge, convert, domesticate, or engage in an interest exchange except as ss. 605.2602 and 605.2605\u2013605.2607, Florida Statutes, permit; and
 
 (d) shall be governed by this Agreement, applied to that Protected Series as though the Protected Series were a separate limited liability company, except as its Series Exhibit expressly provides otherwise and except as the Act requires otherwise.
 
@@ -104024,11 +104028,11 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **14.1 Dissolution of a Protected Series.** A Protected Series is dissolved, and its activities and affairs shall be wound up, upon the first to occur of: (a) the dissolution of the Company; (b) an event or circumstance specified in its Series Exhibit; (c) the affirmative vote or consent of a Majority in Interest; or (d) entry of a judicial order dissolving the Protected Series as provided by the Act.
 
-**14.2 Winding Up a Protected Series.** Upon dissolution of a Protected Series, a Majority in Interest of the Members (or a person they designate) shall wind up its activities and affairs in the manner provided by the Act for winding up a limited liability company, applied to that Protected Series. Its Associated Assets shall be applied: first, to pay or provide for its Associated Liabilities to creditors other than Members; next, to pay or provide for its Associated Liabilities to Members as creditors, to the extent permitted by law; next, to the Company to the extent of their capital sub-account balances for that Protected Series; and finally, the balance to the Company. The Administrative Member shall cause any statement or filing required by the Act or the Department in connection with the dissolution of the Protected Series to be made. The winding up of a Protected Series shall not draw upon, and its creditors shall have no recourse to, the Associated Assets of the Company or of any other Protected Series.
+**14.2 Winding Up a Protected Series.** Upon dissolution of a Protected Series, a Majority in Interest of the Members (or a person they designate) shall wind up its activities and affairs in the manner provided by the Act for winding up a limited liability company, applied to that Protected Series. Its Associated Assets shall be applied: first, to pay or provide for its Associated Liabilities to creditors other than Members; next, to pay or provide for its Associated Liabilities to Members as creditors, to the extent permitted by law; and finally, the balance to the Company. The Administrative Member shall cause any statement or filing required by the Act or the Department in connection with the dissolution of the Protected Series to be made. The winding up of a Protected Series shall not draw upon, and its creditors shall have no recourse to, the Associated Assets of the Company or of any other Protected Series.
 
 **14.3 Dissolution of the Company.** The Company is dissolved, and its activities and affairs shall be wound up, upon the first to occur of: (a) the written consent of **all** Members; (b) entry of a decree of judicial dissolution under the Act; or (c) any other event that under the Act requires dissolution. The death, incapacity, bankruptcy, dissociation, or withdrawal of a Member does not by itself dissolve the Company. Dissolution of the Company causes the dissolution of each Protected Series, and the winding up of the Company is not complete until the winding up of each Protected Series is complete.
 
-**14.4 Winding Up the Company.** Upon dissolution of the Company, a person designated by a Majority in Interest shall wind up the Company and each Protected Series. After the winding up of each Protected Series under Section 14.2, the remaining Associated Assets of the Company shall be applied: first, to pay or provide for the Company's Associated Liabilities to creditors other than Members; next, to pay or provide for the Company's Associated Liabilities to Members as creditors; next, to the Members to the extent of their capital sub-account balances for the Company; and finally, the balance to the Members in proportion to their Percentage Interests. Articles of dissolution shall be filed as the Act requires, and the Company shall terminate when winding up is complete.
+**14.4 Winding Up the Company.** Upon dissolution of the Company, a person designated by a Majority in Interest shall wind up the Company and each Protected Series. After the winding up of each Protected Series under Section 14.2, the remaining Associated Assets of the Company shall be applied: first, to pay or provide for the Company's Associated Liabilities to creditors other than Members; next, to pay or provide for the Company's Associated Liabilities to Members as creditors; next, to the Members to the extent of their capital account balances; and finally, the balance to the Members in proportion to their Percentage Interests. Articles of dissolution shall be filed as the Act requires, and the Company shall terminate when winding up is complete.
 
 **14.5 No Deficit Obligation; Recourse Limited.** No Member shall have any obligation to restore any deficit or to contribute capital in connection with any winding up (beyond unpaid contributions duly required under Sections 6.1 and 6.2), and each creditor of the Company or of any Protected Series shall look solely to the Associated Assets of its obligor.
 
@@ -104036,7 +104040,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 ## ARTICLE 15 \u2014 AMENDMENTS; CONSENTS
 
-**15.1 Amendments.** This Agreement may be amended only by a written instrument signed by **all** Members; provided, that (a) a Series Exhibit may be amended by a written instrument signed by all Members; (b) the Administrative Member may amend Exhibit A and the Series Exhibits without further consent solely to record changes duly made under this Agreement (admissions, Transfers, TOD designations, capital adjustments under Section 6.3); and (c) no amendment may impose new obligations on any Member without that Member's written consent. Oral, implied, or course-of-dealing amendments are of no effect.
+**15.1 Amendments.** This Agreement may be amended only by a written instrument signed by **all** Members; provided, that the Administrative Member may amend Exhibit A and the Series Exhibits without further consent solely to record changes duly made under this Agreement (admissions, Transfers, TOD designations, capital adjustments under Section 6.3). Oral, implied, or course-of-dealing amendments are of no effect.
 
 **15.2 Action by Written Consent.** Any action of the Members under this Agreement may be taken by written consent as provided in Section 4.4.
 
@@ -104214,7 +104218,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
 
-**1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as a Majority in Interest may determine. A Protected Series may maintain its own place of business as determined by a majority of the Members.
+**1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as a Majority in Interest may determine. A Protected Series may maintain its own place of business as determined by a Majority in Interest.
 
 **1.6 Registered Agent and Registered Office.** The registered agent and registered office of the Company shall be as stated in the records of the Department. As required by the Act, the registered agent and registered office of the Company shall also serve as the registered agent and registered office for each Protected Series. Service of process, notice, or demand on a Protected Series may be made as provided by law, including s. 48.062, Florida Statutes.
 
@@ -104278,7 +104282,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 (b) may, in its own name, conduct any activity in furtherance of its purpose, exercise the powers described in Section 1.4, and sue and be sued;
 
-(c) is **not** a separate legal entity capable of existing independently of the Company, may not be a member of the Company, may not itself designate a protected series, and may not merge, convert, domesticate, or engage in an interest exchange except through the single statutory channel provided in s. 605.2604, Florida Statutes; and
+(c) is **not** a separate legal entity capable of existing independently of the Company, may not be a member of the Company, may not itself designate a protected series, and may not merge, convert, domesticate, or engage in an interest exchange except as ss. 605.2602 and 605.2605\u2013605.2607, Florida Statutes, permit; and
 
 (d) shall be governed by this Agreement, applied to that Protected Series as though the Protected Series were a separate limited liability company, except as its Series Exhibit expressly provides otherwise and except as the Act requires otherwise.
 
@@ -104544,7 +104548,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 ## ARTICLE 15 \u2014 AMENDMENTS; CONSENTS
 
-**15.1 Amendments.** This Agreement may be amended only by a written instrument signed by **all** Members; provided, that (a) a Series Exhibit may be amended by a written instrument signed by all Members; (b) the Administrative Member may amend Exhibit A and the Series Exhibits without further consent solely to record changes duly made under this Agreement (admissions, Transfers, TOD designations, capital adjustments under Section 6.3); and (c) no amendment may impose new obligations on any Member without that Member's written consent. Oral, implied, or course-of-dealing amendments are of no effect.
+**15.1 Amendments.** This Agreement may be amended only by a written instrument signed by **all** Members; provided, that the Administrative Member may amend Exhibit A and the Series Exhibits without further consent solely to record changes duly made under this Agreement (admissions, Transfers, TOD designations, capital adjustments under Section 6.3). Oral, implied, or course-of-dealing amendments are of no effect.
 
 **15.2 Action by Written Consent.** Any action of the Members under this Agreement may be taken by written consent as provided in Section 4.4.
 
@@ -104788,7 +104792,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 (b) may, in its own name, conduct any activity in furtherance of its purpose, exercise the powers described in Section 1.4, and sue and be sued;
 
-(c) is **not** a separate legal entity capable of existing independently of the Company, may not be a member of the Company, may not itself designate a protected series, and may not merge, convert, domesticate, or engage in an interest exchange except through the single statutory channel provided in s. 605.2604, Florida Statutes; and
+(c) is **not** a separate legal entity capable of existing independently of the Company, may not be a member of the Company, may not itself designate a protected series, and may not merge, convert, domesticate, or engage in an interest exchange except as ss. 605.2602 and 605.2605\u2013605.2607, Florida Statutes, permit; and
 
 (d) shall be governed by this Agreement, applied to that Protected Series as though the Protected Series were a separate limited liability company, except as its Series Exhibit expressly provides otherwise and except as the Act requires otherwise.
 
@@ -105079,7 +105083,7 @@ Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENE
 |---|---|
 | Purpose of this Protected Series | Any lawful purpose<!-- if:purpose -->, including, without limitation, [PURPOSE]<!-- /if --> |
 | Owner of this Protected Series | The Company. This Protected Series has no Associated Members (ss. 605.2302(1), 605.2303(2), Fla. Stat.). |
-| Protected Series Manager | [Same as Company Manager / NAME] |
+| Protected Series Manager | Same as Company Manager |
 | Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
 | Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the Member, together with the records maintained under Article 8. |
 | Special terms (if any) | [None / variations from the base Agreement \u2014 may not vary Article 8, Article 9, or non-variable provisions of the Act] |
@@ -105195,13 +105199,11 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **2.12 "Series Exhibit"** means, for each Protected Series, the exhibit to this Agreement (each numbered PS-1, PS-2, and so on) setting forth the terms specific to that Protected Series. Each Series Exhibit is a part of this Agreement.
 
-**2.13 "Transfer"** means any assignment, transfer, conveyance, devise, gift, pledge, hypothecation, encumbrance, or other disposition, direct or indirect, voluntary or involuntary, in trust or otherwise, and as a verb has a corresponding meaning.
-
 ---
 
 ## ARTICLE 3 \u2014 PROTECTED SERIES
 
-**3.1 Establishment.** With the consent of the Member, the Company may establish one or more Protected Series by causing a Protected Series Designation to be signed and filed with the Department as provided in s. 605.2201, Florida Statutes. At or before the filing of each Protected Series Designation, the Member shall adopt a Series Exhibit for the new Protected Series. Each Protected Series shall be established without Associated Members.
+**3.1 Establishment.** With the consent of the Member, the Company may establish one or more Protected Series by causing a Protected Series Designation to be signed and filed with the Department as provided in s. 605.2201, Florida Statutes. At or before the filing of each Protected Series Designation, the Member shall adopt a Series Exhibit for the new Protected Series. The Member is authorized to execute and file each Protected Series Designation. Each Protected Series shall be established without Associated Members.
 
 **3.2 Status of Each Protected Series.** As provided by the Act, each Protected Series:
 
@@ -105209,7 +105211,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 (b) may, in its own name, conduct any activity in furtherance of its purpose, exercise the powers described in Section 1.4, and sue and be sued;
 
-(c) is **not** a separate legal entity capable of existing independently of the Company, may not be a member of the Company, may not itself designate a protected series, and may not merge, convert, domesticate, or engage in an interest exchange except through the single statutory channel provided in s. 605.2604, Florida Statutes; and
+(c) is **not** a separate legal entity capable of existing independently of the Company, may not be a member of the Company, may not itself designate a protected series, and may not merge, convert, domesticate, or engage in an interest exchange except as ss. 605.2602 and 605.2605\u2013605.2607, Florida Statutes, permit; and
 
 (d) shall be governed by this Agreement, applied to that Protected Series as though the Protected Series were a separate limited liability company, except as its Series Exhibit expressly provides otherwise and except as the Act requires otherwise.
 
@@ -105573,7 +105575,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 ## ARTICLE 3 \u2014 PROTECTED SERIES
 
-**3.1 Establishment.** With the consent of the Member, the Company may establish one or more Protected Series by causing a Protected Series Designation to be signed and filed with the Department as provided in s. 605.2201, Florida Statutes. At or before the filing of each Protected Series Designation, the Member shall adopt a Series Exhibit for the new Protected Series. Each Protected Series shall be established without Associated Members.
+**3.1 Establishment.** With the consent of the Member, the Company may establish one or more Protected Series by causing a Protected Series Designation to be signed and filed with the Department as provided in s. 605.2201, Florida Statutes. At or before the filing of each Protected Series Designation, the Member shall adopt a Series Exhibit for the new Protected Series. The Member is authorized to execute and file each Protected Series Designation. Each Protected Series shall be established without Associated Members.
 
 **3.2 Status of Each Protected Series.** As provided by the Act, each Protected Series:
 
@@ -105581,7 +105583,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 (b) may, in its own name, conduct any activity in furtherance of its purpose, exercise the powers described in Section 1.4, and sue and be sued;
 
-(c) is **not** a separate legal entity capable of existing independently of the Company, may not be a member of the Company, may not itself designate a protected series, and may not merge, convert, domesticate, or engage in an interest exchange except through the single statutory channel provided in s. 605.2604, Florida Statutes; and
+(c) is **not** a separate legal entity capable of existing independently of the Company, may not be a member of the Company, may not itself designate a protected series, and may not merge, convert, domesticate, or engage in an interest exchange except as ss. 605.2602 and 605.2605\u2013605.2607, Florida Statutes, permit; and
 
 (d) shall be governed by this Agreement, applied to that Protected Series as though the Protected Series were a separate limited liability company, except as its Series Exhibit expressly provides otherwise and except as the Act requires otherwise.
 
@@ -106110,7 +106112,6 @@ function assembleOa(inputs) {
   s = replaceOnce(s, 'effective as of [DATE] (the "Effective Date")', `effective as of ${inputs.effectiveDate} (the "Effective Date")`, "effective date");
   s = s.split("[PRINCIPAL ADDRESS]").join(inputs.principalAddress);
   const managerNames = (inputs.managerNames ?? []).map((n) => n.trim()).filter(Boolean);
-  const managerList = managerNames.join(", ");
   if (!isMemberManaged) {
     if (managerNames.length === 0) throw new Error("OA: at least one manager is required");
     s = chooseNumber(s, "manager", managerNames.length === 1);
@@ -106177,9 +106178,9 @@ function assembleOa(inputs) {
     }
   }
   s = stripInstructionNotes(s);
-  let titleName = "OPERATING AGREEMENT";
+  let titleName = "Operating Agreement";
   if (inputs.amendedRestated) {
-    titleName = "AMENDED AND RESTATED OPERATING AGREEMENT";
+    titleName = "Amended and Restated Operating Agreement";
     s = replaceOnce(s, "# OPERATING AGREEMENT", "# AMENDED AND RESTATED\n# OPERATING AGREEMENT", "title");
     s = replaceOnce(s, 'THIS OPERATING AGREEMENT (this "Agreement")', 'THIS AMENDED AND RESTATED OPERATING AGREEMENT (this "Agreement")', "preamble");
     const supersede = inputs.priorAgreementDate ? `the Operating Agreement of the Company dated ${inputs.priorAgreementDate}` : "any and all prior operating agreements of the Company, whether written or oral";
@@ -106266,9 +106267,6 @@ NOW, THEREFORE,`,
 **${ser.name}**`);
     ex = resolveIf(ex, "purpose", ser.purpose.trim() !== "");
     ex = ex.split("[PURPOSE]").join(ser.purpose.trim());
-    if (!isMemberManaged) {
-      ex = ex.replace(/\| Protected Series Manager \|[^\n]*\|/, `| Protected Series Manager | ${managerList} |`);
-    }
     ex = ex.replace("[CONTRIBUTION]", ser.contribution || "\u2014");
     ex = ex.replace(/\| Special terms \(if any\) \|[^\n]*\|/, `| Special terms (if any) | ${(ser.specialTerms ?? "").trim().replace(/\|/g, "/").replace(/\s*\n\s*/g, " ") || "None"} |`);
     const adopters = isMemberManaged ? inputs.members.flatMap(
@@ -106343,21 +106341,23 @@ function assembleNewSeries(input) {
   const purpose = input.purpose.trim();
   s = resolveIf(s, "membermanaged", input.memberManaged);
   s = resolveIf(s, "managermanaged", !input.memberManaged);
+  if (input.memberNames.length === 0) throw new Error("new-series: at least one member is required");
+  s = resolveIf(s, "sole", input.memberNames.length === 1);
+  s = resolveIf(s, "several", input.memberNames.length > 1);
   const managers = input.managerNames.map((n) => n.trim()).filter(Boolean);
   if (!input.memberManaged && managers.length === 0) throw new Error("new-series: a manager-managed company needs at least one Manager");
   const psManager = managers.join(", ");
   const signerOf = (entity) => (input.entitySigners ?? []).find((x2) => x2.entity.trim() === entity.trim());
   const block = (n, suffix) => {
     const sg = signerOf(n);
-    return sg ? `${n}${suffix}
+    return (sg ? `${n}${suffix}
 
 By: _____________________________
 [[indent]]${sg.name}
 [[indent]]${sg.title}` : `_____________________________
-${n}${suffix}`;
+${n}${suffix}`) + "\nDate: _____________________________";
   };
-  if (input.memberNames.length === 0) throw new Error("new-series: at least one member is required");
-  const psSignature = input.memberManaged ? input.memberNames.map((n) => block(n, ", Member, for the Company")).join("\n\n") : managers.map((n) => block(n, ", Manager")).join("\n\n");
+  const psSignature = input.memberManaged ? input.memberNames.map((n) => block(n, ", Member")).join("\n\n") : managers.map((n) => block(n, ", Protected Series Manager")).join("\n\n");
   const blocks = input.memberNames.map((n) => block(n, "")).join("\n\n");
   must2(s, "[COMPANY NAME], LLC", "company name");
   s = s.split("[COMPANY NAME], LLC").join(input.companyName);
@@ -106369,6 +106369,10 @@ ${n}${suffix}`;
   must2(s, "[SERIES PURPOSE]", "series purpose");
   s = resolveIf(s, "purpose", purpose !== "");
   s = s.split("[SERIES PURPOSE]").join(purpose);
+  must2(s, "[CONTRIBUTION]", "contribution");
+  s = s.split("[CONTRIBUTION]").join((input.contribution ?? "").trim() || "as recorded on the Asset Schedule attached to this Series Exhibit");
+  must2(s, "[SPECIAL TERMS]", "special terms");
+  s = s.split("[SPECIAL TERMS]").join((input.specialTerms ?? "").trim().replace(/\|/g, "/").replace(/\s*\n\s*/g, " ") || "None");
   must2(s, "[EFFECTIVE DATE]", "effective date");
   s = s.split("[EFFECTIVE DATE]").join(input.effectiveDate);
   must2(s, "[PS MANAGER SIGNATURE LINE]", "ps manager signature");
@@ -108019,6 +108023,9 @@ function registerPortalRoutes(app2) {
       seriesName: external_exports.string().min(1).max(300),
       seriesNumber: external_exports.string().min(1).max(40),
       purpose: external_exports.string().max(600).optional().default(""),
+      // The agreement's exhibit takes both; so does this one (15 Sep 2026).
+      specialTerms: external_exports.string().max(2e3).optional().default(""),
+      contribution: external_exports.string().max(300).optional().default(""),
       effectiveDate: external_exports.string().regex(/^\d{4}-\d{2}-\d{2}$/),
       // The company the series joins (Adam, 31 Aug 2026: one account, several
       // companies); the consent document is filed under it.
@@ -108067,6 +108074,8 @@ function registerPortalRoutes(app2) {
         memberNames: seriesOwners.map((m2) => m2.name),
         managerNames: seed.managerNames,
         memberManaged,
+        specialTerms: body.data.specialTerms,
+        contribution: body.data.contribution,
         entitySigners
       });
       title = assembled.title;
@@ -110012,7 +110021,7 @@ All eight share the same skeleton through Article 9. From there the multi-owner 
 | **Article 3** | The series engine: how series are established (unanimous consent, per the statute), their legal status, the liability shields in both directions, and the rule that Series Exhibits control series-specific terms |
 | **Article 4** | The owners: membership interests as simple percentages, the rule that no owner holds any series directly, voting (multi-owner), the transfer-on-death designation (Section 23), and \u2014 in the multi-owner forms \u2014 the member duties that power the bankruptcy protections |
 | **Article 5** | Management. In the **manager-managed** forms, the Manager runs the company, and each series is run by the company's Manager unless its Series Exhibit names someone else. In the **member-managed** forms there is no manager at all: the owners run the company by majority of ownership and \u2014 as s. 605.2107(1)(n) permits \u2014 are themselves named each series' protected-series managers (with one owner, that is you), and one owner may be designated **Administrative Member** to handle filings, records, and returns (a paperwork role, not a decision-making one). Every multi-owner form lists the big decisions that need an owner vote \u2014 including **moving any asset between silos** |
-| **Articles 6\u20137** | Money: contributions (always made *to a specific silo* and recorded), capital accounts (contribution records, not capital accounts, in the S corporation forms), distributions \u2014 always **from a series' own assets, and by a series only to the company that owns it** |
+| **Articles 6\u20137** | Money: contributions (always made *to a specific silo* and recorded), capital accounts (multi-member partnership forms only; contribution records elsewhere), distributions \u2014 always **from a series' own assets, and by a series only to the company that owns it** |
 | **Article 8** | The recordkeeping covenants (this manual's Section 14 is its field guide) and the standing association rules that close the Article |
 | **Article 9** | Taxes (Part Four) |
 | **Article 10** | **In the multi-member forms:** transfers \u2014 family transfers permitted, everything else needs consent, transferees get money rights only, plus the charging-order and involuntary-transfer armor (Section 23). **In the single-owner forms:** admission of an additional member. Those forms have no transfer article, because Chapter 605 already makes a transfer permissible, gives a transferee distributions and nothing else, and binds a transferee who never signs \u2014 there was nothing left for the agreement to add |
@@ -110072,7 +110081,7 @@ Real estate is why most owners choose this structure, and it is where the costly
 **The statement of authority \u2014 optional, and the most consequential filing most owners have never heard of**
 Somebody in your structure can convey the company's real property by signing alone. Who, depends on the form. In a **member-managed** company it is *every member* \u2014 s. 605.04074 makes each one an agent. In a **manager-managed** company it is the Manager, and only the Manager; a member is not an agent merely by being a member.
 Either way, the sentence to know is s. 605.04074(3): unless a certified statement of authority **recorded in the applicable real estate records** limits that person's authority, the instrument they sign "is conclusive in favor of a person who gives value without knowledge of the lack of the authority."
-Your agreement forbids it among the owners \u2014 \xA75.4(b) in the member-managed forms \u2014 and an owner who does it anyway is liable to the company for the loss. That protects you **against each other.** It does not protect the property **against the outsider.** The only thing that does is a **statement of authority** under s. 605.0302.
+Your agreement forbids it among the owners \u2014 \xA75.4(b) in the member-managed multi-member forms \u2014 and an owner who does it anyway is liable to the company for the loss. That protects you **against each other,** not the property **against the outsider.** The only thing that does is a **statement of authority** under s. 605.0302.
 **Should you file one? It is your choice.** Your agreement says you *may*, not that you must. How to decide:
 - **Member-managed, two or more owners, holding real property \u2014 the strongest case.** Any one of you can convey. If that is not what you want the world to be able to rely on, file.
 - **Manager-managed \u2014 usually unnecessary.** Only the Manager can convey, and the members chose the Manager. It earns its keep if there is more than one manager, or if you want the Manager's own authority limited.
@@ -111040,7 +111049,7 @@ function registerAdminRoutes(app2) {
       }
       const raService = (typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload)?.registeredAgent?.choice === "SERVICE";
       await db.query(
-        raService ? "UPDATE orders SET status = 'formed', formed_at = now(), ra_renewal_date = (now() + interval '1 year')::date WHERE id = $1" : "UPDATE orders SET status = 'formed', formed_at = now() WHERE id = $1",
+        raService ? "UPDATE orders SET status = 'formed', formed_at = now(), ra_renewal_date = ((now() AT TIME ZONE 'America/New_York') + interval '1 year')::date WHERE id = $1" : "UPDATE orders SET status = 'formed', formed_at = now() WHERE id = $1",
         [o.id]
       );
       const clients = await db.query(

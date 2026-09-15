@@ -1155,6 +1155,11 @@ if (mint.status === 200) {
   });
   check("order marked formed via formation documents", formedRes.ok, await formedRes.clone().json().catch(() => null));
   {
+    const mails = ((await api("/api/dev/outbox")).body?.data ?? []) as { to: string; subject: string; html: string }[];
+    const formedMail = mails.filter((m) => m.to === testEmail).find((m) => /is formed$/.test(m.subject));
+    check("the formed email tells a client with the S election package that the form is open and names the IRS rule (15 Sep 2026)", !!formedMail && /Your S election form is now open in your portal/.test(formedMail.html) && /within 2 months and 15 days of the date on your filed\s+Articles/.test(formedMail.html), formedMail?.html?.match(/S election form[^<]{0,120}/)?.[0]);
+  }
+  {
     const fDet = (await api(`/api/admin/orders/${orderId}`, { cookies: adminLoginF.cookie })).body?.data as { filedAt: string | null; formedAt: string | null; raRenewalDate: string | null; documents: { kind: string; title: string; createdAt: string }[] } | undefined;
     check("an order formed without the Sent button carries no sent date (14 Sep 2026: one was invented)", fDet?.filedAt === null && !!fDet?.formedAt, fDet && { filedAt: fDet.filedAt, formedAt: fDet.formedAt });
     check("a client who is their own agent gets no renewal date", fDet?.raRenewalDate === null, fDet?.raRenewalDate);
@@ -1611,8 +1616,21 @@ if (mint.status === 200) {
       check("read off the consent PDF: its Series Exhibit row says the same", /Purpose of this Protected Series Any lawful purpose, including, without limitation, to acquire, own, and lease the real property at 400 Bay Court/.test(flat), flat.match(/Purpose of this Protected Series[^O]{0,200}/)?.[0]);
       check("read off the consent PDF: no fill-in brackets and no form-document footer (13 Sep 2026)", !/\[[A-Z]/.test(flat.replace(/\[INTENTIONALLY LEFT BLANK\]/g, "")) && !/Form document/.test(flat) && !/Dissolution events/.test(flat), flat.match(/\[[A-Z][^\]]{0,40}\]|Form document[^.]{0,60}/g));
       check("read off the consent PDF: a member-managed company's series is managed by the Members, as the agreement's s. 5.2 provides", /Managed by The Members, as protected-series managers \(s\. 605\.2304, Fla\. Stat\., as varied by Section 5\.2 of the Agreement\)/.test(flat) && !/The Company, as protected-series manager/.test(flat), flat.match(/Managed by[^|]{0,160}/)?.[0]);
-      check("read off the consent PDF: the Series Exhibit is adopted over every member's signature (Adam, 14 Sep 2026)", (flat.match(/Casey Member, Jr\., Member, for the Company/g) ?? []).length === 1 && !/The Company, as protected-series manager/.test(flat), flat.match(/Adopted effective[^A]{0,200}/)?.[0]);
+      check("read off the consent PDF: the Series Exhibit is adopted over every member's signature, under the agreement's own label, with a Date line (14 and 15 Sep 2026)", (flat.match(/Casey Member, Jr\., Member Date:/g) ?? []).length >= 1 && !/Member, for the Company/.test(flat) && !/The Company, as protected-series manager/.test(flat), flat.match(/Adopted effective[^A]{0,200}/)?.[0]);
+      check("read off the consent PDF: a sole owner's consent is in the singular and cites no Administrative Member (15 Sep 2026)", /being the sole member of/.test(flat) && /The Member, being the sole member of the Company, approves/.test(flat) && /The Member is authorized to sign and file/.test(flat) && /MEMBER: /.test(flat) && !/all of the members|MEMBERS:|Administrative Member/.test(flat), flat.match(/being the sole member[^.]{0,80}|MEMBERS?:|Administrative Member/g));
+      check("read off the consent PDF: no bank-account promise (15 Sep 2026)", !/separate deposit account/.test(flat) && /and by Article 8 of the Agreement\./.test(flat), flat.match(/Records\.[^.]*\./)?.[0]);
+      check("read off the consent PDF: no literal > before the series name", !/> E2E Coastal/.test(flat), flat.match(/>[^\n]{0,40}/)?.[0]);
       check("read off the consent PDF: the contributions and special-terms rows read as the master writes them", /By the Company: as recorded on the Asset Schedule attached to this Series Exhibit/.test(flat) && /Special terms \(if any\) None/.test(flat), flat.match(/Contributions to this Protected Series[^A]{0,120}/)?.[0]);
+    }
+  }
+  {
+    // Special terms and a contribution, as the agreement's exhibit takes them (15 Sep 2026).
+    const withTerms = await api("/api/portal/series/consent", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ seriesName: "E2E Coastal Holdings, LLC, PS E", seriesNumber: "E", purpose: "", effectiveDate: "2026-09-02", specialTerms: "The Member may not sell 500 Bay Street without a written appraisal.", contribution: "the real property at 500 Bay Street" }) });
+    check("a consent with special terms and a contribution generates", withTerms.status === 200, withTerms.body);
+    if (withTerms.status === 200 && hasPdftotext) {
+      const bytes = new Uint8Array(await (await fetch(`${BASE}/api/portal/documents/${withTerms.body?.data?.documentId}/download`, { headers: { Cookie: setPw.cookie } })).arrayBuffer());
+      const flat = (pdfText(bytes) ?? "").replace(/\s+/g, " ");
+      check("read off the consent PDF: the exhibit carries the special terms and the contribution typed", /Special terms \(if any\) The Member may not sell 500 Bay Street without a written appraisal\./.test(flat) && /By the Company: the real property at 500 Bay Street/.test(flat), flat.match(/Contributions to this Protected Series[^|]{0,120}|Special terms[^.]{0,120}\./g));
     }
   }
   const consentBlank = await api("/api/portal/series/consent", {
@@ -3573,9 +3591,11 @@ if (mint.status === 200) {
   const formed = await fetch(`${BASE}/api/admin/orders/${raId}/formation-documents`, { method: "POST", body: fd, headers: { Cookie: adm.cookie, "X-Forwarded-For": RUN_IP } });
   check("the renewal order is formed", formed.ok, await formed.clone().json().catch(() => null));
   const det = (await api(`/api/admin/orders/${raId}`, { cookies: adm.cookie })).body?.data as { raRenewalDate?: string | null; formedAt?: string | null } | undefined;
-  const expected = (() => { const d = new Date(); d.setUTCFullYear(d.getUTCFullYear() + 1); return d.toISOString().slice(0, 10); })();
-  const expectedLocal = (() => { const d = new Date(); d.setFullYear(d.getFullYear() + 1); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; })();
-  check("formation sets the renewal date one year out", det?.raRenewalDate === expected || det?.raRenewalDate === expectedLocal, { got: det?.raRenewalDate, expected, expectedLocal });
+  // A business date, reckoned in Florida's own time (15 Sep 2026: the
+  // server and the check disagreed across midnight).
+  const eastern = new Date().toLocaleDateString("en-CA", { timeZone: "America/New_York" });
+  const expected = `${Number(eastern.slice(0, 4)) + 1}${eastern.slice(4)}`;
+  check("formation sets the renewal date one year out, by Florida's calendar", det?.raRenewalDate === expected, { got: det?.raRenewalDate, expected });
   const afterMe = (await api("/api/auth/me", { cookies: raPw.cookie })).body?.data as { raRenewalDate?: string | null };
   check("the client is shown the same renewal date", afterMe?.raRenewalDate === det?.raRenewalDate, afterMe);
   const cancel = await api("/api/portal/registered-agent/cancel", { method: "POST", body: "{}", cookies: raPw.cookie });

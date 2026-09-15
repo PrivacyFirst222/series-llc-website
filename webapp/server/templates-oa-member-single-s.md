@@ -83,7 +83,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 ## ARTICLE 3 — PROTECTED SERIES
 
-**3.1 Establishment.** With the consent of the Member, the Company may establish one or more Protected Series by causing a Protected Series Designation to be signed and filed with the Department as provided in s. 605.2201, Florida Statutes. At or before the filing of each Protected Series Designation, the Member shall adopt a Series Exhibit for the new Protected Series. Each Protected Series shall be established without Associated Members.
+**3.1 Establishment.** With the consent of the Member, the Company may establish one or more Protected Series by causing a Protected Series Designation to be signed and filed with the Department as provided in s. 605.2201, Florida Statutes. At or before the filing of each Protected Series Designation, the Member shall adopt a Series Exhibit for the new Protected Series. The Member is authorized to execute and file each Protected Series Designation. Each Protected Series shall be established without Associated Members.
 
 **3.2 Status of Each Protected Series.** As provided by the Act, each Protected Series:
 
@@ -91,7 +91,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 (b) may, in its own name, conduct any activity in furtherance of its purpose, exercise the powers described in Section 1.4, and sue and be sued;
 
-(c) is **not** a separate legal entity capable of existing independently of the Company, may not be a member of the Company, may not itself designate a protected series, and may not merge, convert, domesticate, or engage in an interest exchange except through the single statutory channel provided in s. 605.2604, Florida Statutes; and
+(c) is **not** a separate legal entity capable of existing independently of the Company, may not be a member of the Company, may not itself designate a protected series, and may not merge, convert, domesticate, or engage in an interest exchange except as ss. 605.2602 and 605.2605–605.2607, Florida Statutes, permit; and
 
 (d) shall be governed by this Agreement, applied to that Protected Series as though the Protected Series were a separate limited liability company, except as its Series Exhibit expressly provides otherwise and except as the Act requires otherwise.
 

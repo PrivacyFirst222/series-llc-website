@@ -27,7 +27,7 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | sgm sgms | 1.3 | Name; Names of Protected Series | c5e32e13 | covenant | manager | members | The company changed its name and never conformed the series names, so the series were not maintained. | s. 605.2202; the compliance recital was cut 2026-08-13 — non-variable under s. 605.2107(1)(j), so restating it only supplied a yardstick |
 | mbr mbs mul scp sgl sgm sgms sgs | 1.4 | Purposes and Powers | 493808f8 | benefit | company | members | — | s. 605.0108 |
 | mul scp sgl sgs | 1.5 | Principal Office | c4203c65 | mechanic | company | members | — | s. 605.0113 |
-| mbr mbs | 1.5 | Principal Office | 7a4f8aa0 | mechanic | company | members | — | s. 605.0113 |
+| mbr mbs | 1.5 | Principal Office | a8bc210b | mechanic | company | members | — | s. 605.0113; 15 Sep 2026: "a Majority in Interest" replaces "a majority of the Members" for a series' place of business (Adam) |
 | sgm sgms | 1.5 | Principal Office | ad6901a2 | mechanic | company | members | — | s. 605.0113 |
 | mbr mbs mul scp sgl sgm sgms sgs | 1.6 | Registered Agent and Registered Office | e86e55ec | statutory-route | — | members third-party | — | s. 605.0113(6); kept by Adam 2026-08-13 — it tells a process server where to serve a series |
 | mbr mbs mul scp sgl sgm sgms sgs | 1.7 | Term | 4ed8bc66 | mechanic | company | members | — | s. 605.0108(3) |
@@ -77,11 +77,10 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | sgl sgms | 2.12 | "Protected Series Designation" | f35c80e6 | definition | — | members | — | s. 605.2201 |
 | mbr mbs mul scp | 2.12 | "Membership Interest" | 44cba7a2 | definition | — | members | — | s. 605.0102(41) |
 | sgs | 2.12 | "Protected Series" | d9412d95 | definition | — | members | — | s. 605.2102(8) |
-| sgm | 2.12 | "Series Exhibit" | 7ef43e0c | definition | — | members | — | drafting convention |
+| sgm | 2.12 | "Series Exhibit" | 56df7a6e | definition | — | members | — | drafting convention; 15 Sep 2026: unchanged; the unused "Transfer" definition that followed it was removed |
 | sgl | 2.13 | "Protected Series Manager" | 356e1117 | definition | — | members manager | — | s. 605.2102(9) |
 | mbr mbs mul scp | 2.13 | "Percentage Interest" | be447c4c | definition | — | members | — | s. 605.04073(1)(b) |
 | sgs | 2.13 | "Protected Series Designation" | f35c80e6 | definition | — | members | — | s. 605.2201 |
-| sgm | 2.13 | "Transfer" | a5129002 | definition | — | members | — | drafting convention |
 | sgms | 2.13 | "Series Exhibit" | 7ef43e0c | definition | — | member | — | drafting convention |
 | sgl | 2.14 | "Series Exhibit" | 7ef43e0c | definition | — | members | — | drafting convention |
 | mbr mbs mul scp | 2.14 | "Protected Series" | d9412d95 | definition | — | members | — | s. 605.2102(8) |
@@ -99,11 +98,11 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | sgl sgs | 3.1 | Establishment | 37edb48e | authority | company members | members | — | s. 605.2201 |
 | mul scp | 3.1 | Establishment | 6411b254 | authority | company members | members | — | s. 605.2201 |
 | mbr mbs | 3.1 | Establishment | 8c9018bb | authority | company members | members | — | s. 605.2201 |
-| sgm sgms | 3.1 | Establishment | 19ce69b6 | authority | company members | members | — | s. 605.2201 |
-| sgl sgs | 3.2 | Status of Each Protected Series | 46e12a62 | statutory-route | — | members series | — | ss. 605.2104, 605.2201 |
-| mul scp | 3.2 | Status of Each Protected Series | a2fc6c48 | statutory-route | — | members series | — | ss. 605.2104, 605.2201 |
-| mbr mbs | 3.2 | Status of Each Protected Series | 87e0ec17 | statutory-route | — | members series | — | ss. 605.2104, 605.2201 |
-| sgm sgms | 3.2 | Status of Each Protected Series | a9b565eb | statutory-route | — | members series | — | ss. 605.2104, 605.2201 |
+| sgm sgms | 3.1 | Establishment | aabeef76 | authority | company members | members | — | s. 605.2201; 15 Sep 2026: the Member is authorized to execute and file each Designation (Adam), so the series consent can cite it |
+| sgl sgs | 3.2 | Status of Each Protected Series | 2d81d594 | statutory-route | — | members series | — | ss. 605.2104, 605.2201; 15 Sep 2026: (c) cites s. 605.2602 and ss. 605.2605–605.2607 (read on Online Sunshine), not s. 605.2604, which restricts the company's mergers |
+| mul scp | 3.2 | Status of Each Protected Series | c39ce24e | statutory-route | — | members series | — | ss. 605.2104, 605.2201; 15 Sep 2026: (c) cites s. 605.2602 and ss. 605.2605–605.2607 (read on Online Sunshine), not s. 605.2604, which restricts the company's mergers |
+| mbr mbs | 3.2 | Status of Each Protected Series | 66595546 | statutory-route | — | members series | — | ss. 605.2104, 605.2201; 15 Sep 2026: (c) cites s. 605.2602 and ss. 605.2605–605.2607 (read on Online Sunshine), not s. 605.2604, which restricts the company's mergers |
+| sgm sgms | 3.2 | Status of Each Protected Series | 91fecf24 | statutory-route | — | members series | — | ss. 605.2104, 605.2201; 15 Sep 2026: (c) cites s. 605.2602 and ss. 605.2605–605.2607 (read on Online Sunshine), not s. 605.2604, which restricts the company's mergers |
 | sgl sgs | 3.3 | Limitation of Liability Among Series (Statutory Shields) | eadcbd5b | statutory-route | — | members series company | — | s. 605.2401 |
 | mul scp | 3.3 | Limitation of Liability Among Series (Statutory Shields) | d197829d | statutory-route | — | members series company | — | s. 605.2401 |
 | mbr mbs | 3.3 | Limitation of Liability Among Series (Statutory Shields) | 50adbb11 | statutory-route | — | members series company | — | s. 605.2401; no manager exists in these forms (s. 5.1), so the shield names member and protected-series manager only (13 Sep 2026) |
@@ -308,19 +307,17 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | sgl sgm sgms sgs | 13.9 | Interpretation | 88791917 | mechanic | — | members manager | — | drafting convention |
 | sgl sgm sgms sgs | 13.10 | Unregistered Interests | 5909e292 | mechanic | — | members company | — | 15 U.S.C. 77e; ch. 517, Fla. Stat. |
 | mbr mbs mul scp | 14.1 | Dissolution of a Protected Series | 4b25dea8 | mechanic | — | members series | — | s. 605.2501 |
-| mul | 14.2 | Winding Up a Protected Series | 48e94158 | mechanic | manager members | members series | — | s. 605.2502 |
-| scp | 14.2 | Winding Up a Protected Series | 600b1603 | mechanic | manager members | members series | — | s. 605.2502 |
-| mbr | 14.2 | Winding Up a Protected Series | 0c1bc8b3 | mechanic | manager members | members series | — | s. 605.2502 |
-| mbs | 14.2 | Winding Up a Protected Series | 5f431084 | mechanic | manager members | members series | — | s. 605.2502 |
+| mul scp | 14.2 | Winding Up a Protected Series | 600b1603 | mechanic | manager members | members series | — | s. 605.2502 |
+| mbr mbs | 14.2 | Winding Up a Protected Series | 5f431084 | mechanic | manager members | members series | — | s. 605.2502 |
 | mbr mbs mul scp | 14.3 | Dissolution of the Company | 92dba41b | mechanic | — | members | — | s. 605.0701 |
-| mul | 14.4 | Winding Up the Company | f234c2e9 | mechanic | manager members | members | — | ss. 605.0709, 605.0710 |
+| mul | 14.4 | Winding Up the Company | c9a4ba4c | mechanic | manager members | members | — | ss. 605.0709, 605.0710; 15 Sep 2026: "capital account balances" — the defined term; "capital sub-account" was never defined |
 | scp | 14.4 | Winding Up the Company | aedb6377 | mechanic | manager members | members | — | ss. 605.0709, 605.0710 |
-| mbr | 14.4 | Winding Up the Company | 2698c4e6 | mechanic | manager members | members | — | ss. 605.0709, 605.0710 |
+| mbr | 14.4 | Winding Up the Company | 2be18f45 | mechanic | manager members | members | — | ss. 605.0709, 605.0710; 15 Sep 2026: "capital account balances" — the defined term; "capital sub-account" was never defined |
 | mbs | 14.4 | Winding Up the Company | 7f3dbab2 | mechanic | manager members | members | — | ss. 605.0709, 605.0710 |
 | mbr mul | 14.5 | No Deficit Obligation; Recourse Limited | a80b2aad | benefit | — | members | — | s. 605.0405 |
 | mbs scp | 14.5 | No Obligation to Contribute; Recourse Limited | 758ff4ef | benefit | — | members | — | s. 605.0405; the S corporation forms carry no capital accounts, so deficit-restoration language was removed 2026-08-14 |
 | mul scp | 15.1 | Amendments | fa5b242d | authority | members | members | — | s. 605.04073(1)(d), (2)(e) |
-| mbr mbs | 15.1 | Amendments | a9428a3a | authority | members | members | — | s. 605.04073(1)(d), (2)(e) |
+| mbr mbs | 15.1 | Amendments | 490335cd | authority | members | members | — | s. 605.04073(1)(d), (2)(e); 15 Sep 2026: provisos (a) and (c) removed — with all Members signing, both said nothing (Adam) |
 | mbr mbs mul scp | 15.2 | Action by Written Consent | b25652f8 | mechanic | members | members | — | s. 605.04073(4) |
 | mul scp | 16.1 | Governing Law; Internal Affairs | b6174e72 | mechanic | — | members manager | — | s. 605.0104 |
 | mbr mbs | 16.1 | Governing Law; Internal Affairs | 6d41bc2b | mechanic | — | members manager | — | s. 605.0104 |

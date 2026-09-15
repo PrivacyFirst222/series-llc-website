@@ -181,8 +181,9 @@ function unwind(s: string): string {
     .split(OA_TEMPLATE_VERSION).join("[EDITION]")
     // The document title is chosen between two wordings the generator owns;
     // the master's footer line spells the slot.
-    .replace(/\b(?:AMENDED AND RESTATED )?OPERATING AGREEMENT(?= of \[COMPANY NAME\])/g, "[TITLE]")
+    // The footer's title is in ordinary case since 15 Sep 2026.
     .replace(/\bAmendment No\. \[NUM\] to Operating Agreement(?= of \[COMPANY NAME\])/g, "[TITLE]")
+    .replace(/\b(?:Amended and Restated |AMENDED AND RESTATED )?(?:Operating Agreement|OPERATING AGREEMENT)(?= of \[COMPANY NAME\])/g, "[TITLE]")
     // Exhibit A's series-contribution slot holds a LIST, "series: amount; …",
     // one item per series with a contribution (9 Sep 2026). Collapse it to
     // the master's single placeholder, as the name lists are collapsed above.

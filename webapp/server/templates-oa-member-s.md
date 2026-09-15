@@ -31,7 +31,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
 
-**1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as a Majority in Interest may determine. A Protected Series may maintain its own place of business as determined by a majority of the Members.
+**1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as a Majority in Interest may determine. A Protected Series may maintain its own place of business as determined by a Majority in Interest.
 
 **1.6 Registered Agent and Registered Office.** The registered agent and registered office of the Company shall be as stated in the records of the Department. As required by the Act, the registered agent and registered office of the Company shall also serve as the registered agent and registered office for each Protected Series. Service of process, notice, or demand on a Protected Series may be made as provided by law, including s. 48.062, Florida Statutes.
 
@@ -95,7 +95,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 (b) may, in its own name, conduct any activity in furtherance of its purpose, exercise the powers described in Section 1.4, and sue and be sued;
 
-(c) is **not** a separate legal entity capable of existing independently of the Company, may not be a member of the Company, may not itself designate a protected series, and may not merge, convert, domesticate, or engage in an interest exchange except through the single statutory channel provided in s. 605.2604, Florida Statutes; and
+(c) is **not** a separate legal entity capable of existing independently of the Company, may not be a member of the Company, may not itself designate a protected series, and may not merge, convert, domesticate, or engage in an interest exchange except as ss. 605.2602 and 605.2605–605.2607, Florida Statutes, permit; and
 
 (d) shall be governed by this Agreement, applied to that Protected Series as though the Protected Series were a separate limited liability company, except as its Series Exhibit expressly provides otherwise and except as the Act requires otherwise.
 
@@ -361,7 +361,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 ## ARTICLE 15 — AMENDMENTS; CONSENTS
 
-**15.1 Amendments.** This Agreement may be amended only by a written instrument signed by **all** Members; provided, that (a) a Series Exhibit may be amended by a written instrument signed by all Members; (b) the Administrative Member may amend Exhibit A and the Series Exhibits without further consent solely to record changes duly made under this Agreement (admissions, Transfers, TOD designations, capital adjustments under Section 6.3); and (c) no amendment may impose new obligations on any Member without that Member's written consent. Oral, implied, or course-of-dealing amendments are of no effect.
+**15.1 Amendments.** This Agreement may be amended only by a written instrument signed by **all** Members; provided, that the Administrative Member may amend Exhibit A and the Series Exhibits without further consent solely to record changes duly made under this Agreement (admissions, Transfers, TOD designations, capital adjustments under Section 6.3). Oral, implied, or course-of-dealing amendments are of no effect.
 
 **15.2 Action by Written Consent.** Any action of the Members under this Agreement may be taken by written consent as provided in Section 4.4.
 

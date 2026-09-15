@@ -821,7 +821,7 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
   const raService = ((typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload) as { registeredAgent?: { choice?: string } } | null)?.registeredAgent?.choice === "SERVICE";
   await db.query(
     raService
-      ? "UPDATE orders SET status = 'formed', formed_at = now(), ra_renewal_date = (now() + interval '1 year')::date WHERE id = $1"
+      ? "UPDATE orders SET status = 'formed', formed_at = now(), ra_renewal_date = ((now() AT TIME ZONE 'America/New_York') + interval '1 year')::date WHERE id = $1"
       : "UPDATE orders SET status = 'formed', formed_at = now() WHERE id = $1",
     [o.id],
   );

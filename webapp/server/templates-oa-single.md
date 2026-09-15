@@ -91,7 +91,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 (b) may, in its own name, conduct any activity in furtherance of its purpose, exercise the powers described in Section 1.4, and sue and be sued;
 
-(c) is **not** a separate legal entity capable of existing independently of the Company, may not be a member of the Company, may not itself designate a protected series, and may not merge, convert, domesticate, or engage in an interest exchange except through the single statutory channel provided in s. 605.2604, Florida Statutes; and
+(c) is **not** a separate legal entity capable of existing independently of the Company, may not be a member of the Company, may not itself designate a protected series, and may not merge, convert, domesticate, or engage in an interest exchange except as ss. 605.2602 and 605.2605–605.2607, Florida Statutes, permit; and
 
 (d) shall be governed by this Agreement, applied to that Protected Series as though the Protected Series were a separate limited liability company, except as its Series Exhibit expressly provides otherwise and except as the Act requires otherwise.
 
@@ -353,7 +353,7 @@ Upon the death of the Member, the Membership Interest shall pass to: **[TOD BENE
 |---|---|
 | Purpose of this Protected Series | Any lawful purpose<!-- if:purpose -->, including, without limitation, [PURPOSE]<!-- /if --> |
 | Owner of this Protected Series | The Company. This Protected Series has no Associated Members (ss. 605.2302(1), 605.2303(2), Fla. Stat.). |
-| Protected Series Manager | [Same as Company Manager / NAME] |
+| Protected Series Manager | Same as Company Manager |
 | Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
 | Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the Member, together with the records maintained under Article 8. |
 | Special terms (if any) | [None / variations from the base Agreement — may not vary Article 8 or non-variable provisions of the Act] |

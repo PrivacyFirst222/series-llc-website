@@ -146,7 +146,7 @@ export function OrdersInProgress({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formOpen]);
   const makeConsent = useMutation({
-    mutationFn: (body: { seriesName: string; seriesNumber: string; purpose: string; effectiveDate: string }) =>
+    mutationFn: (body: { seriesName: string; seriesNumber: string; purpose: string; effectiveDate: string; specialTerms: string; contribution: string }) =>
       api.post<{ documentId: string; title: string }>("/api/portal/series/consent", { ...body, company: company ?? undefined }),
     onSuccess: (res) => {
       setConsentFor(null);
@@ -330,6 +330,8 @@ export function OrdersInProgress({
                 seriesName: String(fd.get("seriesName") ?? ""),
                 seriesNumber: String(fd.get("seriesNumber") ?? ""),
                 purpose: String(fd.get("purpose") ?? ""),
+                specialTerms: String(fd.get("specialTerms") ?? ""),
+                contribution: String(fd.get("contribution") ?? ""),
                 effectiveDate: String(fd.get("effectiveDate") ?? ""),
               });
             }}
@@ -368,6 +370,18 @@ export function OrdersInProgress({
               />
               <p className="text-xs text-muted-foreground">
                 Leave blank for any lawful business.
+              </p>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium">What the Company contributes to this series (optional)</label>
+              <Input name="contribution" placeholder="e.g. the real property at 101 Palm Street" />
+              <p className="text-xs text-muted-foreground">Leave blank to point at the Asset Schedule.</p>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium">Special terms for this series (optional)</label>
+              <Input name="specialTerms" placeholder="Rules for this series alone, if any" />
+              <p className="text-xs text-muted-foreground">
+                As on the agreement's Series Exhibit. Special terms may not vary Article 8 (records) or the provisions of the Act that cannot be varied.
               </p>
             </div>
             {error ? <p className="text-xs text-destructive">{error}</p> : null}

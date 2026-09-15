@@ -408,7 +408,6 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
   // from the list; s. 5.1's majority rule then governs every later reference to
   // "the Manager" without pluralising each one.
   const managerNames = (inputs.managerNames ?? []).map((n) => n.trim()).filter(Boolean);
-  const managerList = managerNames.join(", ");
   // Member-managed masters name no Manager at all.
   if (!isMemberManaged) {
     if (managerNames.length === 0) throw new Error("OA: at least one manager is required");
@@ -521,9 +520,9 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
   s = stripInstructionNotes(s);
 
   // ---- Amended & Restated ----
-  let titleName = "OPERATING AGREEMENT";
+  let titleName = "Operating Agreement";
   if (inputs.amendedRestated) {
-    titleName = "AMENDED AND RESTATED OPERATING AGREEMENT";
+    titleName = "Amended and Restated Operating Agreement";
     s = replaceOnce(s, "# OPERATING AGREEMENT", "# AMENDED AND RESTATED\n# OPERATING AGREEMENT", "title");
     s = replaceOnce(s, "THIS OPERATING AGREEMENT (this \"Agreement\")", "THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \"Agreement\")", "preamble");
     const supersede = inputs.priorAgreementDate
@@ -641,10 +640,9 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
     // limiting what the series can do").
     ex = resolveIf(ex, "purpose", ser.purpose.trim() !== "");
     ex = ex.split("[PURPOSE]").join(ser.purpose.trim());
-    // Member-managed Series Exhibits carry a fixed "Managed by" row instead.
-    if (!isMemberManaged) {
-      ex = ex.replace(/\| Protected Series Manager \|[^\n]*\|/, `| Protected Series Manager | ${managerList} |`);
-    }
+    // The manager row is the master's own "Same as Company Manager" (Adam,
+    // 15 Sep 2026): whoever is Manager manages every series, and s. 5.2's
+    // fallback does the work; naming the day's Managers went stale.
     // Adam's ruling, 17 August 2026: the cell keeps the master's "By the
     // Company:" prefix — only the Company can contribute to a protected series
     // (ss. 605.2302(1), 605.2303(2), Fla. Stat.) — and the client's text fills

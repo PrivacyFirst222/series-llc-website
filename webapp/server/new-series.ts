@@ -29,6 +29,11 @@ export interface NewSeriesInput {
   /** PS-[N] label for the exhibit heading; the identifier after "PS". */
   seriesNumber: string;
   purpose: string;
+  /** The client's special terms for this series, if any (14 Sep 2026: the
+   *  agreement's exhibit takes them; this one hard-coded "None"). */
+  specialTerms?: string;
+  /** What the Company contributes to the series, if stated. */
+  contribution?: string;
   /** Human format, e.g. "August 11, 2026". */
   effectiveDate: string;
   memberNames: string[];
@@ -57,6 +62,11 @@ export function assembleNewSeries(input: NewSeriesInput): { markdown: string; ti
   // the series manager, the opposite of the member-managed agreement's s. 5.2).
   s = resolveIf(s, "membermanaged", input.memberManaged);
   s = resolveIf(s, "managermanaged", !input.memberManaged);
+  // One owner signs alone, in the singular (Adam, 15 Sep 2026): "the sole
+  // member", "The Member authorizes", "MEMBER:".
+  if (input.memberNames.length === 0) throw new Error("new-series: at least one member is required");
+  s = resolveIf(s, "sole", input.memberNames.length === 1);
+  s = resolveIf(s, "several", input.memberNames.length > 1);
   const managers = input.managerNames.map((n) => n.trim()).filter(Boolean);
   if (!input.memberManaged && managers.length === 0) throw new Error("new-series: a manager-managed company needs at least one Manager");
   const psManager = managers.join(", ");
@@ -64,20 +74,21 @@ export function assembleNewSeries(input: NewSeriesInput): { markdown: string; ti
   const signerOf = (entity: string) => (input.entitySigners ?? []).find((x) => x.entity.trim() === entity.trim());
   // A person's block is the rule then the name; an entity's is its name,
   // "By:" over the rule, and the printed name and title beneath (Adam,
-  // 13 Sep 2026). The template's own rule precedes the first block.
+  // 13 Sep 2026); every block ends with a Date line, as the agreements' do
+  // (15 Sep 2026).
   const block = (n: string, suffix: string) => {
     const sg = signerOf(n);
-    return sg
+    return (sg
       ? `${n}${suffix}\n\nBy: _____________________________\n[[indent]]${sg.name}\n[[indent]]${sg.title}`
-      : `_____________________________\n${n}${suffix}`;
+      : `_____________________________\n${n}${suffix}`) + "\nDate: _____________________________";
   };
-  if (input.memberNames.length === 0) throw new Error("new-series: at least one member is required");
   // Every member adopts the exhibit in a member-managed company, as the
   // agreement's exhibits are adopted (Adam, 14 Sep 2026: "Every member should
-  // sign it"); every Manager otherwise.
+  // sign it"); every Manager otherwise — under the agreements' own labels
+  // (15 Sep 2026): ", Member" and ", Protected Series Manager".
   const psSignature = input.memberManaged
-    ? input.memberNames.map((n) => block(n, ", Member, for the Company")).join("\n\n")
-    : managers.map((n) => block(n, ", Manager")).join("\n\n");
+    ? input.memberNames.map((n) => block(n, ", Member")).join("\n\n")
+    : managers.map((n) => block(n, ", Protected Series Manager")).join("\n\n");
 
   const blocks = input.memberNames.map((n) => block(n, "")).join("\n\n");
 
@@ -91,6 +102,10 @@ export function assembleNewSeries(input: NewSeriesInput): { markdown: string; ti
   must(s, "[SERIES PURPOSE]", "series purpose");
   s = resolveIf(s, "purpose", purpose !== "");
   s = s.split("[SERIES PURPOSE]").join(purpose);
+  must(s, "[CONTRIBUTION]", "contribution");
+  s = s.split("[CONTRIBUTION]").join((input.contribution ?? "").trim() || "as recorded on the Asset Schedule attached to this Series Exhibit");
+  must(s, "[SPECIAL TERMS]", "special terms");
+  s = s.split("[SPECIAL TERMS]").join((input.specialTerms ?? "").trim().replace(/\|/g, "/").replace(/\s*\n\s*/g, " ") || "None");
   must(s, "[EFFECTIVE DATE]", "effective date");
   s = s.split("[EFFECTIVE DATE]").join(input.effectiveDate);
   must(s, "[PS MANAGER SIGNATURE LINE]", "ps manager signature");
