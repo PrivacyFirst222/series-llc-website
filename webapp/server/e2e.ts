@@ -1697,6 +1697,13 @@ if (mint.status === 200) {
   });
   check("consent with no stated purpose generates", consentBlank.status === 200, consentBlank.body);
   {
+    // Paragraph 4 uses the singular whatever the number of Managers (Adam,
+    // 16 Sep 2026); the agreements say the singular includes the plural.
+    const { assembleNewSeries } = await import("./new-series");
+    const two = assembleNewSeries({ companyName: "E2E Two Managers, LLC", seriesName: "E2E Two Managers, LLC, PS A", seriesNumber: "A", purpose: "", effectiveDate: "October 1, 2026", memberNames: ["Casey Member", "Dana Reed"], managerNames: ["Casey Member", "Dana Reed"], memberManaged: false, specialTerms: "", contribution: "", entitySigners: [] }).markdown;
+    check("consent: with two Managers, paragraph 4 authorizes 'the Manager' in the singular and the exhibit is adopted through 'its Managers'", /The Members authorize the Manager to sign and file the Protected Series Designation/.test(two) && /acting through its Managers:/.test(two) && !/the Managers, acting as the Agreement provides/.test(two), two.match(/The Members authorize[^\n]{0,80}/)?.[0]);
+  }
+  {
     // Each refusal names the box (15 Sep 2026).
     const longTerms = await api("/api/portal/series/consent", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ seriesName: "E2E Coastal Holdings, LLC, PS E", seriesNumber: "E", effectiveDate: "2026-09-02", specialTerms: "x".repeat(2001) }) });
     check("consent: special terms over 2,000 characters are refused by name", longTerms.status === 400 && longTerms.body?.error?.message === "Special terms can be at most 2,000 characters.", longTerms.body);

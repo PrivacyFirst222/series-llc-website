@@ -303,7 +303,7 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | sgl sgm sgms sgs | 13.6 | Counterparts; Electronic Signatures | a8dc325e | mechanic | — | members manager | — | ch. 668, Fla. Stat. |
 | sgl sgm sgms sgs | 13.7 | Notices | 2c077363 | mechanic | — | members manager | — | drafting convention |
 | sgl sgm sgms sgs | 13.8 | No Third-Party Beneficiaries | 4d830aa4 | benefit | — | members manager company | — | drafting convention |
-| sgl sgm sgms sgs | 13.9 | Interpretation | 88791917 | mechanic | — | members manager | — | drafting convention |
+| sgl sgm sgms sgs | 13.9 | Interpretation | d7f8b8c3 | mechanic | — | members manager | — | drafting convention; singular includes plural added 16 Sep 2026 (Adam) |
 | sgl sgm sgms sgs | 13.10 | Unregistered Interests | 5909e292 | mechanic | — | members company | — | 15 U.S.C. 77e; ch. 517, Fla. Stat. |
 | mbr mbs mul scp | 14.1 | Dissolution of a Protected Series | 4b25dea8 | mechanic | — | members series | — | s. 605.2501 |
 | mul scp | 14.2 | Winding Up a Protected Series | 600b1603 | mechanic | manager members | members series | — | s. 605.2502 |
@@ -328,5 +328,5 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbr mbs mul scp | 16.6 | Counterparts; Electronic Signatures | a8dc325e | mechanic | — | members manager | — | ch. 668, Fla. Stat. |
 | mbr mbs mul scp | 16.7 | Notices | 2c077363 | mechanic | — | members manager | — | drafting convention |
 | mbr mbs mul scp | 16.8 | No Third-Party Beneficiaries | 4d830aa4 | benefit | — | members manager company | — | drafting convention |
-| mbr mbs mul scp | 16.9 | Interpretation | 88791917 | mechanic | — | members manager | — | drafting convention |
+| mbr mbs mul scp | 16.9 | Interpretation | d7f8b8c3 | mechanic | — | members manager | — | drafting convention; singular includes plural added 16 Sep 2026 (Adam) |
 | mbr mbs mul scp | 16.10 | Unregistered Interests | 0d19e3e9 | mechanic | — | members company | — | 15 U.S.C. 77e; ch. 517, Fla. Stat. |

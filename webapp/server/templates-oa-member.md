@@ -373,7 +373,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **16.8 No Third-Party Beneficiaries.** This Agreement is for the exclusive benefit of the parties and confers no rights on any creditor or other third party.
 
-**16.9 Interpretation.** Headings are for convenience only. "Including" means "including without limitation." References to statutes include amendments and successor provisions.
+**16.9 Interpretation.** Headings are for convenience only. "Including" means "including without limitation." References to statutes include amendments and successor provisions. Words in the singular include the plural, and words in the plural include the singular, as the context requires.
 
 **16.10 Unregistered Interests.** The Membership Interests have not been registered under federal or state securities laws and may not be offered, sold, or transferred except in compliance with this Agreement and applicable law.
 

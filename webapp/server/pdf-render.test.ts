@@ -97,6 +97,7 @@ for (const version of versions) {
   for (const professional of [false, true]) {
     const inputs = { ...base, members, version, professional } as OaInputs;
     const { markdown, title } = assembleOa(inputs);
+    check(`${version}: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)`, /Words in the singular include the plural, and words in the plural include the singular, as the context requires\./.test(markdown));
     const bytes = await renderMarkdownPdf({ markdown, watermark: null, title });
     const head = new TextDecoder().decode(bytes.slice(0, 5));
     check(`renders: ${version}${professional ? " (professional)" : ""} is a PDF`, head === "%PDF-", head);
