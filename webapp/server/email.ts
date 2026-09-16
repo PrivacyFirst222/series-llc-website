@@ -188,12 +188,12 @@ export function newDocumentEmail(portalUrl: string): { subject: string; html: st
   };
 }
 
-export function raCancellationEmail(name: string, renewalDate: string | null = null): { subject: string; html: string } {
+export function raCancellationEmail(name: string, renewalDate: string | null = null, llcName = ""): { subject: string; html: string } {
   return {
     subject: "Your registered agent cancellation request",
     html: wrap(`
       <p>Hi ${escapeHtml(name || "there")},</p>
-      <p>We received your request to cancel registered agent service. Two things determine
+      <p>We received your request to cancel registered agent service${llcName ? ` for <strong>${escapeHtml(llcName)}</strong>` : ""}. Two things determine
       what happens next:</p>
       <p><strong>1. The renewal charge.</strong> Because you gave notice through your portal,
       your service will not renew at the next renewal date${renewalDate ? `, ${escapeHtml(renewalDate)}` : ""} — as long as your notice was given
@@ -212,12 +212,13 @@ export function raCancellationEmail(name: string, renewalDate: string | null = n
 export function raCancellationAdminEmail(opts: {
   clientName: string;
   clientEmail: string;
+  llcName?: string;
 }): { subject: string; html: string } {
   return {
-    subject: `RA cancellation requested — ${opts.clientName || opts.clientEmail}`,
+    subject: `RA cancellation requested — ${opts.llcName || opts.clientName || opts.clientEmail}`,
     html: wrap(`
       <p><strong>${escapeHtml(opts.clientName)}</strong> &lt;${escapeHtml(opts.clientEmail)}&gt;
-      requested cancellation of registered agent service through the portal.</p>
+      requested cancellation of registered agent service${opts.llcName ? ` for <strong>${escapeHtml(opts.llcName)}</strong>` : ""} through the portal.</p>
       <p>Renewal billing should stop once their notice window is satisfied; watch for proof of
       a successor designation before treating the agency as terminated.</p>
     `),

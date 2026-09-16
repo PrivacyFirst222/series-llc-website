@@ -424,6 +424,12 @@ const MIGRATION_009_STATEMENTS: string[] = [
   `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_renewal_date date`,
 ];
 
+// A cancellation of registered agent service belongs to the company it
+// concerns (15 Sep 2026): a client with two companies cancels one of them.
+const MIGRATION_010_STATEMENTS: string[] = [
+  `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_cancellation_requested_at timestamptz`,
+];
+
 const MIGRATIONS: { id: number; name: string; statements: string[] }[] = [
   { id: 1, name: "initial-schema", statements: MIGRATION_001_STATEMENTS },
   { id: 2, name: "contact-messages", statements: MIGRATION_002_STATEMENTS },
@@ -434,6 +440,7 @@ const MIGRATIONS: { id: number; name: string; statements: string[] }[] = [
   { id: 7, name: "order-summary", statements: MIGRATION_007_STATEMENTS },
   { id: 8, name: "email-log", statements: MIGRATION_008_STATEMENTS },
   { id: 9, name: "rejection-and-ra-renewal", statements: MIGRATION_009_STATEMENTS },
+  { id: 10, name: "ra-cancellation-per-company", statements: MIGRATION_010_STATEMENTS },
   // Append future migrations here with the next id. Never edit an entry.
 ];
 

@@ -109,7 +109,9 @@ export function assembleNewSeries(input: NewSeriesInput): { markdown: string; ti
   s = resolveIf(s, "purpose", purpose !== "");
   s = s.split("[SERIES PURPOSE]").join(purpose);
   must(s, "[CONTRIBUTION]", "contribution");
-  s = s.split("[CONTRIBUTION]").join((input.contribution ?? "").trim() || "as recorded on the Asset Schedule attached to this Series Exhibit");
+  // An empty contribution prints a dash, as the agreement's own Series
+  // Exhibit does (15 Sep 2026).
+  s = s.split("[CONTRIBUTION]").join((input.contribution ?? "").trim() || "—");
   must(s, "[SPECIAL TERMS]", "special terms");
   s = s.split("[SPECIAL TERMS]").join((input.specialTerms ?? "").trim().replace(/\|/g, "/").replace(/\s*\n\s*/g, " ") || "None");
   must(s, "[EFFECTIVE DATE]", "effective date");

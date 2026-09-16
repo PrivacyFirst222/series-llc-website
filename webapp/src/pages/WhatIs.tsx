@@ -27,7 +27,7 @@ export default function WhatIs() {
                 A Protected Series LLC is a parent ("mothership") company that holds within it an
                 unlimited number of <em className="text-accent">series</em>. Each series can own its own
                 assets, sign its own contracts, and be sued separately — but they share one EIN-friendly
-                tax structure, one operating agreement, and one Florida filing.
+                tax structure, one operating agreement, and one annual report.
               </p>
             </div>
 

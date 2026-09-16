@@ -14,9 +14,11 @@ import { AddressAutocomplete } from "@/components/forms/florida-llc/AddressAutoc
 import { FORM_LABEL, type CoupleAnswer, type MemberAnswer, type SeriesAnswer, type Unit } from "./oaTypes";
 import { api } from "@/lib/api";
 
-export function OwnersCard({ owners, isMulti, ownerCountMismatch, patchMember, removeOwner, addOwner, suggestions = [], addOwnerWith }: {
+export function OwnersCard({ owners, isMulti, ownerCountMismatch, patchMember, removeOwner, addOwner, suggestions = [], addOwnerWith, sElection }: {
   owners: MemberAnswer[];
   isMulti: boolean;
+  /** The S corporation form is chosen: a company cannot be an owner. */
+  sElection?: boolean;
   ownerCountMismatch: string | null;
   patchMember: (i: number, p: Partial<MemberAnswer>) => void;
   removeOwner: (i: number) => void;
@@ -140,6 +142,18 @@ export function OwnersCard({ owners, isMulti, ownerCountMismatch, patchMember, r
                     />
                     <span>This owner is a company or trust</span>
                   </label>
+                  {/* The S form's own rules (15 Sep 2026): s. 9.3 voids a
+                      transfer to anyone who is not an eligible S corporation
+                      shareholder; s. 12.1 admits only an eligible one. */}
+                  {m.isEntity && sElection === true ? (
+                    <p className="rounded-lg border border-amber-300/60 bg-amber-50 p-3 text-xs leading-relaxed text-amber-900" data-testid="entity-s-warning">
+                      Under the S corporation form, an owner must be an eligible S corporation
+                      shareholder. A company cannot be one, and only certain trusts can. Your
+                      agreement's Section 9.3 makes a transfer to anyone else void, and its
+                      Section 12.1 admits only an eligible shareholder. If this owner is a
+                      company, choose the partnership form or remove the owner.
+                    </p>
+                  ) : null}
                   {m.isEntity ? (
                     <div className="grid gap-2 sm:grid-cols-2">
                       <Input
@@ -457,6 +471,14 @@ export function UnitFieldCards({ units, isMulti, owners, seedSeries, series, sEl
                       onChange={(e) => setUnitTodBackup(u, e.target.value)}
                     />
                   </div>
+                  {/* A backup with no first beneficiary would print "shall
+                      pass to: None, or if that beneficiary does not survive…"
+                      (15 Sep 2026). */}
+                  {(unitTodBackup(u) ?? "").trim() && !(unitTod(u) ?? "").trim() ? (
+                    <p className="pl-[50%] text-xs text-destructive" data-testid="tod-backup-needs-first">
+                      Name the first beneficiary before a backup, or leave the backup blank.
+                    </p>
+                  ) : null}
                   {u.kind === "couple" ? (
                     <p className="pl-[50%] text-xs text-muted-foreground">
                       Takes effect at the death of the last surviving spouse.

@@ -46,7 +46,7 @@
 | Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the <!-- if:several -->Members<!-- /if --><!-- if:sole -->Member<!-- /if -->, together with the records maintained under Article 8. |
 | Special terms (if any) | [SPECIAL TERMS] |
 
-**Adopted effective [EFFECTIVE DATE] by the Company:**
+**Adopted effective [EFFECTIVE DATE] by the Company, acting through <!-- if:managermanaged --><!-- if:onemanager -->its Manager<!-- /if --><!-- if:manymanagers -->its Managers<!-- /if --><!-- /if --><!-- if:membermanaged --><!-- if:sole -->the Member<!-- /if --><!-- if:several -->a Majority in Interest of its Members<!-- /if --><!-- /if -->:**
 
 [PS MANAGER SIGNATURE LINE]
 

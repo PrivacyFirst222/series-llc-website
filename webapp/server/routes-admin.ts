@@ -947,7 +947,7 @@ app.get("/admin/clients", async (c) => {
             COUNT(d.id)::int AS document_count,
             -- Each company with its renewal date once formed (15 Sep 2026:
             -- the client saw the date; no office screen did).
-            (SELECT COALESCE(jsonb_agg(DISTINCT (o.llc_name || COALESCE(' (renews ' || to_char(o.ra_renewal_date, 'FMMon FMDD, YYYY') || ')', ''))), '[]'::jsonb)
+            (SELECT COALESCE(jsonb_agg(DISTINCT (o.llc_name || CASE WHEN o.ra_renewal_date IS NULL AND o.ra_cancellation_requested_at IS NULL THEN '' ELSE ' (' || concat_ws(' — ', 'renews ' || to_char(o.ra_renewal_date, 'FMMon FMDD, YYYY'), 'cancellation requested ' || to_char(o.ra_cancellation_requested_at, 'FMMon FMDD, YYYY')) || ')' END)), '[]'::jsonb)
                FROM orders o
               WHERE o.client_id = cl.id AND o.status <> 'pending_payment'
                 AND o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_llcs,

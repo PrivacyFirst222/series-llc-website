@@ -296,24 +296,40 @@ function AgreementAndLibraryRow({ company }: { company: string | null }) {
   );
 }
 
-function RegisteredAgentCard({ me }: { me: Me | null }) {
+/** The company's registered agent facts, from the companies list (15 Sep
+ *  2026: the card belongs to the company tab it sits under). */
+interface CompanyInfo {
+  orderId: string;
+  llcName: string;
+  formed: boolean;
+  raService: boolean;
+  raRenewalDate: string | null;
+  raCancellationRequestedAt: string | null;
+}
+
+function RegisteredAgentCard({ company }: { company: CompanyInfo }) {
   const queryClient = useQueryClient();
   const cancelMutation = useMutation({
     mutationFn: () =>
       api.post<{ raCancellationRequestedAt: string }>(
         "/api/portal/registered-agent/cancel",
-        {},
+        { company: company.orderId },
       ),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["portal-me"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["portal-companies"] });
+      queryClient.invalidateQueries({ queryKey: ["portal-me"] });
+    },
   });
 
-  const requestedAt = me?.raCancellationRequestedAt ?? null;
+  const requestedAt = company.raCancellationRequestedAt;
+  const me = { raRenewalDate: company.raRenewalDate };
 
   return (
     <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card">
       <div className="flex items-center gap-2.5 border-b border-border bg-secondary/40 px-5 py-4">
         <ShieldCheck className="h-4 w-4 text-trust" />
         <h2 className="font-display text-lg">Registered agent service</h2>
+        <span className="ml-auto text-xs text-muted-foreground" data-testid="ra-card-company">{company.llcName}</span>
       </div>
       <div className="px-5 py-4">
         {requestedAt ? (
@@ -406,7 +422,7 @@ export default function PortalDashboard() {
   // (Adam, 31 Aug 2026). A single-company client sees the portal unchanged.
   const companiesQuery = useQuery({
     queryKey: ["portal-companies"],
-    queryFn: () => api.get<{ orderId: string; llcName: string; formed: boolean }[]>("/api/portal/companies"),
+    queryFn: () => api.get<CompanyInfo[]>("/api/portal/companies"),
     enabled: meQuery.isSuccess,
   });
   const companies = companiesQuery.data ?? [];
@@ -717,7 +733,10 @@ export default function PortalDashboard() {
 
       <ServicesCard company={company} />
 
-      {meQuery.data?.raService ? <RegisteredAgentCard me={meQuery.data} /> : null}
+      {(() => {
+        const current = companies.find((x) => x.orderId === company);
+        return current?.raService ? <RegisteredAgentCard company={current} /> : null;
+      })()}
 
       <AccountCard
         email={meQuery.data?.email ?? ""}

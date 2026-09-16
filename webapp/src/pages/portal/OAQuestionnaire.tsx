@@ -511,7 +511,7 @@ export default function OAQuestionnaire() {
               Change those three answers
             </button>
 
-            <OwnersCard owners={owners} isMulti={isMulti} ownerCountMismatch={ownerCountMismatch} patchMember={patchMember} removeOwner={removeOwner} addOwner={addOwner} suggestions={suggestions} addOwnerWith={addOwnerWith} />
+            <OwnersCard owners={owners} isMulti={isMulti} ownerCountMismatch={ownerCountMismatch} patchMember={patchMember} removeOwner={removeOwner} addOwner={addOwner} suggestions={suggestions} addOwnerWith={addOwnerWith} sElection={a.sElection === true} />
 
             {entityManagers.length > 0 ? (
               <QuestionCard title={entityManagers.length === 1 ? `Who signs for ${entityManagers[0].name}?` : "Who signs for each company that is a Manager?"}>

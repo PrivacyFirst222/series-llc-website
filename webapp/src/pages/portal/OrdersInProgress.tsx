@@ -14,6 +14,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ClipboardList, Lock, FileSignature } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { api, ApiError } from "@/lib/api";
@@ -209,12 +210,6 @@ export function OrdersInProgress({
                     {STATUS_LABEL[o.status]}
                   </span>
                 </div>
-                {o.type === "s-election" && o.status === "in_progress" ? (
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    We're preparing your Form 2553 package from your filed Articles — you'll get an
-                    email the moment it's ready to download.
-                  </p>
-                ) : null}
 
               </div>
               <div className="flex shrink-0 flex-wrap items-center gap-2">
@@ -379,9 +374,9 @@ export function OrdersInProgress({
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium">Special terms for this series (optional)</label>
-              <Input name="specialTerms" placeholder="Rules for this series alone, if any" />
+              <Textarea name="specialTerms" rows={3} maxLength={2000} placeholder="Rules for this series alone, if any" />
               <p className="text-xs text-muted-foreground">
-                As on the agreement's Series Exhibit. Special terms may not vary Article 8 (records) or the provisions of the Act that cannot be varied.
+                Up to 2,000 characters. As on the agreement's Series Exhibit. Special terms may not vary Article 8 (records) or the provisions of the Act that cannot be varied.
               </p>
             </div>
             {error ? <p className="text-xs text-destructive">{error}</p> : null}

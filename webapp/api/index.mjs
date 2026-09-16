@@ -95887,6 +95887,9 @@ var MIGRATION_009_STATEMENTS = [
   `ALTER TABLE orders ADD COLUMN IF NOT EXISTS rejected_at timestamptz`,
   `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_renewal_date date`
 ];
+var MIGRATION_010_STATEMENTS = [
+  `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_cancellation_requested_at timestamptz`
+];
 var MIGRATIONS = [
   { id: 1, name: "initial-schema", statements: MIGRATION_001_STATEMENTS },
   { id: 2, name: "contact-messages", statements: MIGRATION_002_STATEMENTS },
@@ -95896,7 +95899,8 @@ var MIGRATIONS = [
   { id: 6, name: "sessions-viewing-as-admin", statements: MIGRATION_006_STATEMENTS },
   { id: 7, name: "order-summary", statements: MIGRATION_007_STATEMENTS },
   { id: 8, name: "email-log", statements: MIGRATION_008_STATEMENTS },
-  { id: 9, name: "rejection-and-ra-renewal", statements: MIGRATION_009_STATEMENTS }
+  { id: 9, name: "rejection-and-ra-renewal", statements: MIGRATION_009_STATEMENTS },
+  { id: 10, name: "ra-cancellation-per-company", statements: MIGRATION_010_STATEMENTS }
   // Append future migrations here with the next id. Never edit an entry.
 ];
 function migrationChecksum(statements) {
@@ -101513,12 +101517,12 @@ function newDocumentEmail(portalUrl) {
     `)
   };
 }
-function raCancellationEmail(name, renewalDate = null) {
+function raCancellationEmail(name, renewalDate = null, llcName = "") {
   return {
     subject: "Your registered agent cancellation request",
     html: wrap(`
       <p>Hi ${escapeHtml(name || "there")},</p>
-      <p>We received your request to cancel registered agent service. Two things determine
+      <p>We received your request to cancel registered agent service${llcName ? ` for <strong>${escapeHtml(llcName)}</strong>` : ""}. Two things determine
       what happens next:</p>
       <p><strong>1. The renewal charge.</strong> Because you gave notice through your portal,
       your service will not renew at the next renewal date${renewalDate ? `, ${escapeHtml(renewalDate)}` : ""} \u2014 as long as your notice was given
@@ -101535,10 +101539,10 @@ function raCancellationEmail(name, renewalDate = null) {
 }
 function raCancellationAdminEmail(opts) {
   return {
-    subject: `RA cancellation requested \u2014 ${opts.clientName || opts.clientEmail}`,
+    subject: `RA cancellation requested \u2014 ${opts.llcName || opts.clientName || opts.clientEmail}`,
     html: wrap(`
       <p><strong>${escapeHtml(opts.clientName)}</strong> &lt;${escapeHtml(opts.clientEmail)}&gt;
-      requested cancellation of registered agent service through the portal.</p>
+      requested cancellation of registered agent service${opts.llcName ? ` for <strong>${escapeHtml(opts.llcName)}</strong>` : ""} through the portal.</p>
       <p>Renewal billing should stop once their notice window is satisfied; watch for proof of
       a successor designation before treating the agency as terminated.</p>
     `)
@@ -102265,7 +102269,7 @@ var templates_new_series_default = `# <!-- if:several -->UNANIMOUS WRITTEN CONSE
 | Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the <!-- if:several -->Members<!-- /if --><!-- if:sole -->Member<!-- /if -->, together with the records maintained under Article 8. |
 | Special terms (if any) | [SPECIAL TERMS] |
 
-**Adopted effective [EFFECTIVE DATE] by the Company:**
+**Adopted effective [EFFECTIVE DATE] by the Company, acting through <!-- if:managermanaged --><!-- if:onemanager -->its Manager<!-- /if --><!-- if:manymanagers -->its Managers<!-- /if --><!-- /if --><!-- if:membermanaged --><!-- if:sole -->the Member<!-- /if --><!-- if:several -->a Majority in Interest of its Members<!-- /if --><!-- /if -->:**
 
 [PS MANAGER SIGNATURE LINE]
 
@@ -106408,7 +106412,7 @@ ${n}${suffix}`) + "\nDate: _____________________________";
   s = resolveIf(s, "purpose", purpose !== "");
   s = s.split("[SERIES PURPOSE]").join(purpose);
   must2(s, "[CONTRIBUTION]", "contribution");
-  s = s.split("[CONTRIBUTION]").join((input.contribution ?? "").trim() || "as recorded on the Asset Schedule attached to this Series Exhibit");
+  s = s.split("[CONTRIBUTION]").join((input.contribution ?? "").trim() || "\u2014");
   must2(s, "[SPECIAL TERMS]", "special terms");
   s = s.split("[SPECIAL TERMS]").join((input.specialTerms ?? "").trim().replace(/\|/g, "/").replace(/\s*\n\s*/g, " ") || "None");
   must2(s, "[EFFECTIVE DATE]", "effective date");
@@ -107681,12 +107685,21 @@ function registerPortalRoutes(app2) {
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
     const db = await getDb();
     const rows = await db.query(
-      `SELECT id, llc_name, formed_at, payload->>'filingPath' AS filing_path
+      `SELECT id, llc_name, formed_at, payload->>'filingPath' AS filing_path,
+            (payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_service,
+            ra_renewal_date, ra_cancellation_requested_at
        FROM orders WHERE client_id = $1 AND paid_at IS NOT NULL
       ORDER BY paid_at DESC NULLS LAST`,
       [session.clientId]
     );
-    return c.json({ data: rows.map((r) => ({ orderId: r.id, llcName: r.llc_name, formed: !!r.formed_at })) });
+    return c.json({ data: rows.map((r) => ({
+      orderId: r.id,
+      llcName: r.llc_name,
+      formed: !!r.formed_at,
+      raService: r.ra_service === true,
+      raRenewalDate: r.ra_renewal_date ? isoDate(r.ra_renewal_date) : null,
+      raCancellationRequestedAt: r.ra_cancellation_requested_at ?? null
+    })) });
   });
   app2.get("/portal/documents", async (c) => {
     const session = await getSession(c);
@@ -107871,6 +107884,7 @@ function registerPortalRoutes(app2) {
     const coupleName = (cpl) => `${owners[cpl.a].name} and ${owners[cpl.b].name}`;
     const members = [];
     let entityGap = "";
+    let todGap = "";
     const emittedCouples = /* @__PURE__ */ new Set();
     owners.forEach((m2, i) => {
       const cpl = coupleAt(i);
@@ -107878,6 +107892,9 @@ function registerPortalRoutes(app2) {
         if (emittedCouples.has(cpl)) return;
         emittedCouples.add(cpl);
         const cplShare = { percentage: cpl.percentage, numerator: cpl.numerator, denominator: cpl.denominator };
+        if ((cpl.todBackup ?? "").trim() && !(cpl.todBeneficiary ?? "").trim()) {
+          todGap = `Name the first beneficiary for ${coupleName(cpl)} before a backup, or clear the backup.`;
+        }
         members.push({
           name: coupleName(cpl),
           address: owners[cpl.a].address,
@@ -107903,6 +107920,9 @@ function registerPortalRoutes(app2) {
           }
           entitySigner = { name: sn, title: st };
         }
+        if (!isEntity && (ans?.todBackup ?? "").trim() && !(ans?.todBeneficiary ?? "").trim()) {
+          todGap = `Name the first beneficiary for ${m2.name || `owner ${i + 1}`} before a backup, or clear the backup.`;
+        }
         members.push({
           name: m2.name,
           address: m2.address,
@@ -107918,6 +107938,7 @@ function registerPortalRoutes(app2) {
       }
     });
     if (entityGap) return c.json(err(entityGap, "INVALID_INPUT"), 400);
+    if (todGap) return c.json(err(todGap, "INVALID_INPUT"), 400);
     const managerEntitySigners = [];
     for (let i = 0; i < seed.managerNames.length; i += 1) {
       if (!seed.managerEntities?.[i]) continue;
@@ -108077,7 +108098,13 @@ function registerPortalRoutes(app2) {
       // companies); the consent document is filed under it.
       company: external_exports.string().uuid().optional()
     }).safeParse(await c.req.json().catch(() => null));
-    if (!body.success) return c.json(err("Series name, identifier, and date are required.", "INVALID_INPUT"), 400);
+    if (!body.success) {
+      const first = body.error.issues[0];
+      const field = String(first?.path?.[0] ?? "");
+      const tooBig = first?.code === "too_big";
+      const msg = field === "seriesName" ? tooBig ? "The series name can be at most 300 characters." : "Enter the protected series name." : field === "seriesNumber" ? tooBig ? "The exhibit identifier can be at most 40 characters." : "Enter the exhibit identifier." : field === "effectiveDate" ? "Enter the effective date." : field === "specialTerms" ? "Special terms can be at most 2,000 characters." : field === "contribution" ? "The contribution can be at most 300 characters." : field === "purpose" ? "The purpose can be at most 600 characters." : "Series name, identifier, and date are required.";
+      return c.json(err(msg, "INVALID_INPUT"), 400);
+    }
     const consentCompanyId = await resolveCompanyOrder(session.clientId, body.data.company);
     const seed = await oaSeed(session.clientId, consentCompanyId);
     if (!seed) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
@@ -108107,6 +108134,22 @@ function registerPortalRoutes(app2) {
       const sg = savedForSeries?.managerSigners?.[i];
       if (seed.managerEntities?.[i] && (sg?.name ?? "").trim()) entitySigners.push({ entity: n, name: (sg?.name ?? "").trim(), title: (sg?.title ?? "").trim() });
     });
+    for (let i = 0; i < seriesOwners.length; i += 1) {
+      const m2 = savedForSeries?.members?.[i];
+      const isEntity = m2?.isEntity ?? seed.members[i]?.isEntity ?? false;
+      if (!isEntity) continue;
+      const sg = entitySigners.find((x2) => x2.entity === seriesOwners[i].name);
+      if (!sg || !hasFirstAndLast(sg.name) || !sg.title) {
+        return c.json(err(`Name the person who signs for ${seriesOwners[i].name || `owner ${i + 1}`} \u2014 first and last name \u2014 and their title.`, "INVALID_INPUT"), 400);
+      }
+    }
+    for (let i = 0; i < seed.managerNames.length; i += 1) {
+      if (!seed.managerEntities?.[i]) continue;
+      const sg = entitySigners.find((x2) => x2.entity === seed.managerNames[i]);
+      if (!sg || !hasFirstAndLast(sg.name) || !sg.title) {
+        return c.json(err(`Name the person who signs for ${seed.managerNames[i]} \u2014 first and last name \u2014 and their title.`, "INVALID_INPUT"), 400);
+      }
+    }
     const generatedOn = /* @__PURE__ */ new Date();
     let pdf;
     let title;
@@ -108769,24 +108812,6 @@ function registerPortalRoutes(app2) {
         };
       })
     };
-    if (!merged.dateIncorporated) {
-      await db.query(
-        "UPDATE service_orders SET details = $1, ein_secret = $2, status = 'in_progress' WHERE id = $3",
-        [JSON.stringify(merged), encryptSecret(JSON.stringify(ssns)), so2.id]
-      );
-      if (env.ADMIN_NOTIFY_EMAIL) {
-        const clientsN = await db.query("SELECT email FROM clients WHERE id = $1", [session.clientId]);
-        const adminMail = einDetailsSubmittedAdminEmail({
-          summary: `S Corporation Election Package \u2014 ${so2.llc_name} (enter the formation date to build it)`,
-          clientEmail: clientsN[0]?.email ?? "",
-          adminUrl: `${env.PUBLIC_BASE_URL}/admin`
-        });
-        sendMail({ to: env.ADMIN_NOTIFY_EMAIL, ...adminMail }).catch(
-          (e) => console.error("[service] s-election-details admin email failed:", e)
-        );
-      }
-      return c.json({ data: { ok: true, documentId: null, editableUntil: null, awaitingFormationDate: true } });
-    }
     const built = await postSElectionPackage({ so: { id: so2.id, client_id: so2.client_id, llc_name: so2.llc_name }, merged, ssns, priorDocumentId: prior?.documentId });
     if (!built.ok) {
       return c.json(err("We could not build the package. Our team has been notified.", "GENERATION_FAILED"), 500);
@@ -108920,24 +108945,33 @@ function registerPortalRoutes(app2) {
     );
     if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
     const client = rows[0];
-    if (client.ra_cancellation_requested_at) {
-      return c.json({ data: { raCancellationRequestedAt: client.ra_cancellation_requested_at } });
+    const cancelBody = await c.req.json().catch(() => null);
+    const cancelCompanyId = await resolveCompanyOrder(session.clientId, typeof cancelBody?.company === "string" ? cancelBody.company : void 0);
+    const orderRows = cancelCompanyId ? await db.query(
+      "SELECT id, llc_name, payload, ra_renewal_date, ra_cancellation_requested_at FROM orders WHERE id = $1 AND client_id = $2",
+      [cancelCompanyId, session.clientId]
+    ) : [];
+    const order2 = orderRows[0];
+    if (!order2) return c.json(err("No company found on your account.", "NO_LLC"), 400);
+    const tookService = (typeof order2.payload === "string" ? JSON.parse(order2.payload) : order2.payload)?.registeredAgent?.choice === "SERVICE";
+    if (!tookService) {
+      return c.json(err(`${order2.llc_name} is its own registered agent; there is nothing to cancel.`, "NOT_OUR_SERVICE"), 400);
+    }
+    if (order2.ra_cancellation_requested_at) {
+      return c.json({ data: { raCancellationRequestedAt: order2.ra_cancellation_requested_at } });
     }
     const updated = await db.query(
-      "UPDATE clients SET ra_cancellation_requested_at = now() WHERE id = $1 RETURNING ra_cancellation_requested_at",
-      [session.clientId]
+      "UPDATE orders SET ra_cancellation_requested_at = now() WHERE id = $1 RETURNING ra_cancellation_requested_at",
+      [order2.id]
     );
     const requestedAt = updated[0]?.ra_cancellation_requested_at ?? (/* @__PURE__ */ new Date()).toISOString();
-    const renewalRow = await db.query(
-      "SELECT ra_renewal_date FROM orders WHERE client_id = $1 AND ra_renewal_date IS NOT NULL ORDER BY formed_at DESC NULLS LAST LIMIT 1",
-      [session.clientId]
-    );
-    const confirmation = raCancellationEmail(client.name, renewalRow[0]?.ra_renewal_date ? fmtDate2(isoDate(renewalRow[0].ra_renewal_date)) : null);
+    await db.query("UPDATE clients SET ra_cancellation_requested_at = COALESCE(ra_cancellation_requested_at, $2) WHERE id = $1", [session.clientId, requestedAt]);
+    const confirmation = raCancellationEmail(client.name, order2.ra_renewal_date ? fmtDate2(isoDate(order2.ra_renewal_date)) : null, order2.llc_name);
     sendMail({ to: client.email, ...confirmation }).catch(
       (e) => console.error("ra-cancel confirmation email failed", e)
     );
     if (env.ADMIN_NOTIFY_EMAIL) {
-      const notice = raCancellationAdminEmail({ clientName: client.name, clientEmail: client.email });
+      const notice = raCancellationAdminEmail({ clientName: client.name, clientEmail: client.email, llcName: order2.llc_name });
       sendMail({ to: env.ADMIN_NOTIFY_EMAIL, ...notice, replyTo: client.email }).catch(
         (e) => console.error("ra-cancel admin email failed", e)
       );
@@ -111203,7 +111237,7 @@ function registerAdminRoutes(app2) {
             COUNT(d.id)::int AS document_count,
             -- Each company with its renewal date once formed (15 Sep 2026:
             -- the client saw the date; no office screen did).
-            (SELECT COALESCE(jsonb_agg(DISTINCT (o.llc_name || COALESCE(' (renews ' || to_char(o.ra_renewal_date, 'FMMon FMDD, YYYY') || ')', ''))), '[]'::jsonb)
+            (SELECT COALESCE(jsonb_agg(DISTINCT (o.llc_name || CASE WHEN o.ra_renewal_date IS NULL AND o.ra_cancellation_requested_at IS NULL THEN '' ELSE ' (' || concat_ws(' \u2014 ', 'renews ' || to_char(o.ra_renewal_date, 'FMMon FMDD, YYYY'), 'cancellation requested ' || to_char(o.ra_cancellation_requested_at, 'FMMon FMDD, YYYY')) || ')' END)), '[]'::jsonb)
                FROM orders o
               WHERE o.client_id = cl.id AND o.status <> 'pending_payment'
                 AND o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_llcs,

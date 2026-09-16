@@ -1053,19 +1053,21 @@ if (mint.status === 200) {
     body: "{}",
     cookies: setPw.cookie,
   });
-  check("RA cancel records a timestamp", cancel.status === 200 && Boolean(cancel.body.data.raCancellationRequestedAt));
+  // The cancellation belongs to a company (15 Sep 2026): a client who is
+  // their own agent has nothing to cancel, and is told so by company name.
+  check("RA cancel for a company that is its own agent is refused by name", cancel.status === 400 && cancel.body?.error?.code === "NOT_OUR_SERVICE" && /E2E Coastal Holdings, LLC is its own registered agent/.test(cancel.body?.error?.message ?? ""), cancel.body);
   const cancelAgain = await api("/api/portal/registered-agent/cancel", {
     method: "POST",
     body: "{}",
     cookies: setPw.cookie,
   });
   check(
-    "RA cancel is idempotent",
-    cancelAgain.status === 200 &&
-      cancelAgain.body.data.raCancellationRequestedAt === cancel.body.data.raCancellationRequestedAt,
+    "RA cancel is refused the same way twice",
+    cancelAgain.status === 400 &&
+      cancelAgain.body?.error?.code === cancel.body?.error?.code,
   );
   const meAfter = await api("/api/auth/me", { cookies: setPw.cookie });
-  check("me reflects the cancellation request", Boolean(meAfter.body.data.raCancellationRequestedAt));
+  check("me shows no cancellation when the company is its own agent and the request was refused (15 Sep 2026)", meAfter.body.data.raCancellationRequestedAt === null, meAfter.body.data);
 
   // 11. Service orders: intake EIN became a paid order awaiting details
   const svc0 = await api("/api/portal/services", { cookies: setPw.cookie });
@@ -1669,7 +1671,8 @@ if (mint.status === 200) {
       check("read off the consent PDF: a sole owner's consent is in the singular and cites no Administrative Member (15 Sep 2026)", /being the sole member of/.test(flat) && /The Member, being the sole member of the Company, approves/.test(flat) && /The Member is authorized to sign and file/.test(flat) && /MEMBER: /.test(flat) && !/all of the members|MEMBERS:|Administrative Member/.test(flat), flat.match(/being the sole member[^.]{0,80}|MEMBERS?:|Administrative Member/g));
       check("read off the consent PDF: no bank-account promise (15 Sep 2026)", !/separate deposit account/.test(flat) && /and by Article 8 of the Agreement\./.test(flat), flat.match(/Records\.[^.]*\./)?.[0]);
       check("read off the consent PDF: no literal > before the series name", !/> E2E Coastal/.test(flat), flat.match(/>[^\n]{0,40}/)?.[0]);
-      check("read off the consent PDF: the contributions and special-terms rows read as the master writes them", /By the Company: as recorded on the Asset Schedule attached to this Series Exhibit/.test(flat) && /Special terms \(if any\) None/.test(flat), flat.match(/Contributions to this Protected Series[^A]{0,120}/)?.[0]);
+      check("read off the consent PDF: an empty contribution prints a dash and no special terms prints None, as the agreement's exhibit does (15 Sep 2026)", /By the Company: —/.test(flat) && /Special terms \(if any\) None/.test(flat), flat.match(/Contributions to this Protected Series[^A]{0,120}/)?.[0]);
+      check("read off the consent PDF: the adoption line says who acts for the Company, as the agreement's does (15 Sep 2026)", /Adopted effective [A-Z][a-z]+ \d{1,2}, \d{4} by the Company, acting through (the Member|a Majority in Interest of its Members|its Managers?):/.test(flat), flat.match(/Adopted effective[^:]{0,120}:/)?.[0]);
     }
   }
   {
@@ -1687,6 +1690,17 @@ if (mint.status === 200) {
     body: JSON.stringify({ seriesName: "E2E Coastal Holdings, LLC, PS E", seriesNumber: "E", purpose: "", effectiveDate: "2026-09-02" }),
   });
   check("consent with no stated purpose generates", consentBlank.status === 200, consentBlank.body);
+  {
+    // Each refusal names the box (15 Sep 2026).
+    const longTerms = await api("/api/portal/series/consent", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ seriesName: "E2E Coastal Holdings, LLC, PS E", seriesNumber: "E", effectiveDate: "2026-09-02", specialTerms: "x".repeat(2001) }) });
+    check("consent: special terms over 2,000 characters are refused by name", longTerms.status === 400 && longTerms.body?.error?.message === "Special terms can be at most 2,000 characters.", longTerms.body);
+    const noName = await api("/api/portal/series/consent", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ seriesName: "", seriesNumber: "E", effectiveDate: "2026-09-02" }) });
+    check("consent: a missing series name is refused by name", noName.status === 400 && noName.body?.error?.message === "Enter the protected series name.", noName.body);
+    const noDate = await api("/api/portal/series/consent", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ seriesName: "E2E Coastal Holdings, LLC, PS E", seriesNumber: "E", effectiveDate: "soon" }) });
+    check("consent: a missing date is refused by name", noDate.status === 400 && noDate.body?.error?.message === "Enter the effective date.", noDate.body);
+    const longContribution = await api("/api/portal/series/consent", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ seriesName: "E2E Coastal Holdings, LLC, PS E", seriesNumber: "E", effectiveDate: "2026-09-02", contribution: "y".repeat(301) }) });
+    check("consent: a contribution over 300 characters is refused by name", longContribution.status === 400 && longContribution.body?.error?.message === "The contribution can be at most 300 characters.", longContribution.body);
+  }
   {
     const bytes = new Uint8Array(await (await fetch(`${BASE}/api/portal/documents/${consentBlank.body?.data?.documentId}/download`, { headers: { Cookie: setPw.cookie } })).arrayBuffer());
     const text = pdfText(bytes);
@@ -1854,6 +1868,7 @@ if (mint.status === 200) {
     check("the newest company leads (it is the default tab)", list[0]?.llcName === "E2E Second Company, LLC", list[0]);
     const firstCo = list.find((x) => x.llcName === "E2E Coastal Holdings, LLC");
     check("the original company is still listed", !!firstCo, list.map((x) => x.llcName));
+    check("each company carries its own registered agent facts (15 Sep 2026)", list.every((x) => typeof (x as { raService?: unknown }).raService === "boolean" && "raRenewalDate" in x && "raCancellationRequestedAt" in x), list[0]);
     // Answers isolation: write to the SECOND company, read both.
     const save2 = await api(`/api/portal/oa/answers?company=${secondId}`, {
       method: "PUT", cookies: setPw.cookie,
@@ -2639,6 +2654,19 @@ if (mint.status === 200) {
   check("entity: an owner marked as a company or trust with no signer is refused, naming the owner", noSigner.status === 400 && /Name the person who signs for Vale Family Trust/.test(noSigner.body?.error?.message ?? ""), noSigner.body);
   const entityGen = await api("/api/portal/oa/generate", { method: "POST", cookies: smPw.cookie, body: JSON.stringify({ ...smAnswers, members: [trustOwner] }) });
   check("entity: with the trustee named, the agreement generates", entityGen.status === 200, entityGen.body);
+  {
+    // The consent refuses the same gap the agreement refuses (15 Sep 2026).
+    const smSeed = (await api("/api/portal/oa", { cookies: smPw.cookie })).body?.data?.seed as { llcName: string } | undefined;
+    const savedBefore = (await api("/api/portal/oa", { cookies: smPw.cookie })).body?.data?.answers as Record<string, unknown> | undefined;
+    await api("/api/portal/oa/answers", { method: "PUT", cookies: smPw.cookie, body: JSON.stringify({ ...smAnswers, members: [{ ...trustOwner, signerName: "" }] }) });
+    const consentGap = await api("/api/portal/series/consent", { method: "POST", cookies: smPw.cookie, body: JSON.stringify({ seriesName: `${smSeed?.llcName}, PS Z`, seriesNumber: "Z", effectiveDate: "2026-10-01" }) });
+    check("consent: a company or trust owner with no signer is refused, naming the owner", consentGap.status === 400 && /Name the person who signs for Vale Family Trust/.test(consentGap.body?.error?.message ?? ""), consentGap.body);
+    // A backup beneficiary with no first beneficiary is refused, naming the owner.
+    const soloOwner = { name: "Sam Solo", address: "9 Harbor Road, Naples, FL 34102", isEntity: false, todBeneficiary: "", todBackup: "my children in equal shares" };
+    const backupOnly = await api("/api/portal/oa/generate", { method: "POST", cookies: smPw.cookie, body: JSON.stringify({ ...smAnswers, members: [soloOwner] }) });
+    check("a backup beneficiary with no first beneficiary is refused, naming the owner (15 Sep 2026)", backupOnly.status === 400 && /Name the first beneficiary for Sam Solo before a backup/.test(backupOnly.body?.error?.message ?? ""), backupOnly.body);
+    if (savedBefore) await api("/api/portal/oa/answers", { method: "PUT", cookies: smPw.cookie, body: JSON.stringify(savedBefore) });
+  }
   if (entityGen.body?.data?.generationId) {
     const r = await api(`/api/dev/oa-generation-inputs/${entityGen.body.data.generationId}`);
     const md = r.status === 200 ? assembleOa(r.body?.data?.inputs as OaInputs).markdown : "";
@@ -3719,10 +3747,20 @@ if (mint.status === 200) {
   }
   const afterMe = (await api("/api/auth/me", { cookies: raPw.cookie })).body?.data as { raRenewalDate?: string | null };
   check("the client is shown the same renewal date", afterMe?.raRenewalDate === det?.raRenewalDate, afterMe);
-  const cancel = await api("/api/portal/registered-agent/cancel", { method: "POST", body: "{}", cookies: raPw.cookie });
+  const cancel = await api("/api/portal/registered-agent/cancel", { method: "POST", body: JSON.stringify({ company: raId }), cookies: raPw.cookie });
   check("the renewal client can give cancellation notice", cancel.status === 200, cancel.body);
+  {
+    // Recorded on the company (15 Sep 2026): the companies list shows it,
+    // the office row names it beside the renewal, and the email names the company.
+    const cos = (await api("/api/portal/companies", { cookies: raPw.cookie })).body?.data as { orderId: string; raService: boolean; raCancellationRequestedAt: string | null }[] | undefined;
+    const co = cos?.find((x) => x.orderId === raId);
+    check("the companies list shows the cancellation on that company", co?.raService === true && !!co?.raCancellationRequestedAt, co);
+    const cl2 = ((await api("/api/admin/clients", { cookies: adm.cookie })).body?.data as { email: string; ra_llcs: string[] }[] | undefined)?.find((x) => x.email === raEmail);
+    check("the Registered Agent Clients row names the cancellation beside the renewal", (cl2?.ra_llcs ?? []).some((s) => /\(renews [A-Z][a-z]{2} \d{1,2}, \d{4} — cancellation requested [A-Z][a-z]{2} \d{1,2}, \d{4}\)$/.test(s)), cl2?.ra_llcs);
+  }
   const mails = ((await api("/api/dev/outbox")).body?.data ?? []) as { to: string; subject: string; html: string }[];
   const cancelMail = mails.filter((m) => m.to === raEmail && /cancel/i.test(m.subject)).at(-1);
+  check("the cancellation email names the company (15 Sep 2026)", !!cancelMail && /registered agent service for <strong>/.test(cancelMail.html), cancelMail?.html?.match(/cancel registered agent service[^.]{0,80}/)?.[0]);
   const year = String(new Date().getFullYear() + 1);
   check("the cancellation email names the renewal date", !!cancelMail && cancelMail.html.includes(year) && /renew/i.test(cancelMail.html), cancelMail && { subject: cancelMail.subject, snippet: cancelMail.html.replace(/<[^>]+>/g, " ").match(/[^.]*renew[^.]*\./i)?.[0] });
 }

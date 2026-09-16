@@ -1676,6 +1676,18 @@ async function main(): Promise<void> {
       await tod.last().fill("Jordan Heir");
       // A backup beneficiary, a class in the owner's words (Adam, 12 Sep 2026).
       await page.locator('main input[aria-label^="Backup beneficiary for"]').last().fill("my children in equal shares");
+      {
+        // A backup typed before the first beneficiary is flagged under the box
+        // (15 Sep 2026), and the flag goes once the first is named.
+        const firstBox = tod.last();
+        const had = await firstBox.inputValue();
+        await firstBox.fill("");
+        await page.waitForTimeout(200);
+        expect((await page.locator('[data-testid="tod-backup-needs-first"]').count()) === 1, "OA-I: a backup with no first beneficiary is flagged under the box", await page.locator('[data-testid="tod-backup-needs-first"]').count());
+        await firstBox.fill(had);
+        await page.waitForTimeout(200);
+        expect((await page.locator('[data-testid="tod-backup-needs-first"]').count()) === 0, "OA-I: naming the first beneficiary clears the flag");
+      }
       await checkAllBoxes(page);
       genCaptured = null;
       await page.locator("main button").filter({ hasText: /^Generate|^Regenerate/ }).first().click({ timeout: 15000 });
@@ -2150,6 +2162,7 @@ async function main(): Promise<void> {
         expect(/Not offered/.test(home) && !/None offered, anywhere/.test(home) && /Florida registered agent service included/.test(home) && !/FL Division of Corporations registered agent/.test(home), "words: the home page's comparison rows read Not offered and the trust line names our agent service", home.match(/Not offered|None offered[^\n]{0,20}|Florida registered agent service included/g));
         const whatIsText = await read("/what-is");
         expect(!/fl-protected-series-llc\.diagram/.test(whatIsText) && !/Distinct membership interests/.test(whatIsText) && /Separate books, records, and asset ledger per series/.test(whatIsText), "words: the What Is diagram has no file name and no per-series ownership bullet", whatIsText.match(/fl-protected[^\n]{0,30}|Distinct membership[^\n]{0,40}/g));
+        expect(!/one Florida filing/.test(whatIsText) && (whatIsText.match(/one operating agreement, and one annual report/g) ?? []).length === 2, "words: the What Is page says one annual report, not one Florida filing, in the paragraph and the bullet (15 Sep 2026)", whatIsText.match(/one Florida filing|one annual report/g));
         const ap = await read("/asset-protection");
         expect(/slips on a wet walkway/.test(ap) && /Ready to build the shield\?/.test(ap) && /defends against inside liability, outside liability, and inter-asset contagion — all in one filing\./.test(ap) && !/strongest possible|the only structure/.test(ap), "words: Asset Protection reads wet walkway and the plain closing banner", ap.match(/walkway[^.]{0,30}|Ready to build[^?]*\?|the only structure/g));
         const pricing0 = await read("/pricing");

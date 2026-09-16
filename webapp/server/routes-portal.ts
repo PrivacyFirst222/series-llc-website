@@ -1027,13 +1027,24 @@ app.get("/portal/companies", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const db = await getDb();
-  const rows = await db.query<{ id: string; llc_name: string; formed_at: string | null; filing_path: string | null }>(
-    `SELECT id, llc_name, formed_at, payload->>'filingPath' AS filing_path
+  // The registered agent facts belong to the company (15 Sep 2026: the
+  // card showed one company's service under every tab).
+  const rows = await db.query<{ id: string; llc_name: string; formed_at: string | null; filing_path: string | null; ra_service: boolean; ra_renewal_date: unknown; ra_cancellation_requested_at: string | null }>(
+    `SELECT id, llc_name, formed_at, payload->>'filingPath' AS filing_path,
+            (payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_service,
+            ra_renewal_date, ra_cancellation_requested_at
        FROM orders WHERE client_id = $1 AND paid_at IS NOT NULL
       ORDER BY paid_at DESC NULLS LAST`,
     [session.clientId],
   );
-  return c.json({ data: rows.map((r) => ({ orderId: r.id, llcName: r.llc_name, formed: !!r.formed_at })) });
+  return c.json({ data: rows.map((r) => ({
+    orderId: r.id,
+    llcName: r.llc_name,
+    formed: !!r.formed_at,
+    raService: r.ra_service === true,
+    raRenewalDate: r.ra_renewal_date ? isoDate(r.ra_renewal_date) : null,
+    raCancellationRequestedAt: r.ra_cancellation_requested_at ?? null,
+  })) });
 });
 
 app.get("/portal/documents", async (c) => {
@@ -1290,6 +1301,9 @@ app.post("/portal/oa/generate", async (c) => {
 
   const members: OaInputs["members"] = [];
   let entityGap = "";
+  // A backup with no first beneficiary would print "shall pass to: None, or
+  // if that beneficiary does not survive…" (15 Sep 2026).
+  let todGap = "";
   const emittedCouples = new Set<(typeof couples)[number]>();
   owners.forEach((m, i) => {
     const cpl = coupleAt(i);
@@ -1297,6 +1311,9 @@ app.post("/portal/oa/generate", async (c) => {
       if (emittedCouples.has(cpl)) return;
       emittedCouples.add(cpl);
       const cplShare: OwnershipShare = { percentage: cpl.percentage, numerator: cpl.numerator, denominator: cpl.denominator };
+      if ((cpl.todBackup ?? "").trim() && !(cpl.todBeneficiary ?? "").trim()) {
+        todGap = `Name the first beneficiary for ${coupleName(cpl)} before a backup, or clear the backup.`;
+      }
       members.push({
         name: coupleName(cpl),
         address: owners[cpl.a].address,
@@ -1325,6 +1342,9 @@ app.post("/portal/oa/generate", async (c) => {
         }
         entitySigner = { name: sn, title: st };
       }
+      if (!isEntity && (ans?.todBackup ?? "").trim() && !(ans?.todBeneficiary ?? "").trim()) {
+        todGap = `Name the first beneficiary for ${m.name || `owner ${i + 1}`} before a backup, or clear the backup.`;
+      }
       members.push({
         name: m.name,
         address: m.address,
@@ -1340,6 +1360,7 @@ app.post("/portal/oa/generate", async (c) => {
     }
   });
   if (entityGap) return c.json(err(entityGap, "INVALID_INPUT"), 400);
+  if (todGap) return c.json(err(todGap, "INVALID_INPUT"), 400);
   // A Manager that is a company signs through a person (Adam, 13 Sep 2026).
   const managerEntitySigners: NonNullable<OaInputs["managerEntitySigners"]> = [];
   for (let i = 0; i < seed.managerNames.length; i += 1) {
@@ -1536,7 +1557,22 @@ app.post("/portal/series/consent", async (c) => {
       company: z.string().uuid().optional(),
     })
     .safeParse(await c.req.json().catch(() => null));
-  if (!body.success) return c.json(err("Series name, identifier, and date are required.", "INVALID_INPUT"), 400);
+  if (!body.success) {
+    // The refusal names the box (15 Sep 2026: every shape problem answered
+    // "Series name, identifier, and date are required.").
+    const first = body.error.issues[0];
+    const field = String(first?.path?.[0] ?? "");
+    const tooBig = first?.code === "too_big";
+    const msg =
+      field === "seriesName" ? (tooBig ? "The series name can be at most 300 characters." : "Enter the protected series name.")
+      : field === "seriesNumber" ? (tooBig ? "The exhibit identifier can be at most 40 characters." : "Enter the exhibit identifier.")
+      : field === "effectiveDate" ? "Enter the effective date."
+      : field === "specialTerms" ? "Special terms can be at most 2,000 characters."
+      : field === "contribution" ? "The contribution can be at most 300 characters."
+      : field === "purpose" ? "The purpose can be at most 600 characters."
+      : "Series name, identifier, and date are required.";
+    return c.json(err(msg, "INVALID_INPUT"), 400);
+  }
 
   const consentCompanyId = await resolveCompanyOrder(session.clientId, body.data.company);
   const seed = await oaSeed(session.clientId, consentCompanyId);
@@ -1575,6 +1611,24 @@ app.post("/portal/series/consent", async (c) => {
     const sg = savedForSeries?.managerSigners?.[i];
     if (seed.managerEntities?.[i] && (sg?.name ?? "").trim()) entitySigners.push({ entity: n, name: (sg?.name ?? "").trim(), title: (sg?.title ?? "").trim() });
   });
+  // A company or trust signs through a person, here as in the agreement
+  // (15 Sep 2026: the consent printed the company on a person's line).
+  for (let i = 0; i < seriesOwners.length; i += 1) {
+    const m = savedForSeries?.members?.[i];
+    const isEntity = m?.isEntity ?? seed.members[i]?.isEntity ?? false;
+    if (!isEntity) continue;
+    const sg = entitySigners.find((x) => x.entity === seriesOwners[i].name);
+    if (!sg || !hasFirstAndLast(sg.name) || !sg.title) {
+      return c.json(err(`Name the person who signs for ${seriesOwners[i].name || `owner ${i + 1}`} — first and last name — and their title.`, "INVALID_INPUT"), 400);
+    }
+  }
+  for (let i = 0; i < seed.managerNames.length; i += 1) {
+    if (!seed.managerEntities?.[i]) continue;
+    const sg = entitySigners.find((x) => x.entity === seed.managerNames[i]);
+    if (!sg || !hasFirstAndLast(sg.name) || !sg.title) {
+      return c.json(err(`Name the person who signs for ${seed.managerNames[i]} — first and last name — and their title.`, "INVALID_INPUT"), 400);
+    }
+  }
   const generatedOn = new Date();
   let pdf: Uint8Array;
   let title: string;
@@ -2339,29 +2393,9 @@ app.post("/portal/services/:id/s-election-details", async (c) => {
     }),
   };
 
-  // Without the formation date the package cannot be built: the office
-  // enters it from the filed Articles when it prepares the form. The details
-  // and the encrypted numbers are kept, the order waits, and the client is
-  // told so.
-  if (!merged.dateIncorporated) {
-    await db.query(
-      "UPDATE service_orders SET details = $1, ein_secret = $2, status = 'in_progress' WHERE id = $3",
-      [JSON.stringify(merged), encryptSecret(JSON.stringify(ssns)), so.id],
-    );
-    if (env.ADMIN_NOTIFY_EMAIL) {
-      const clientsN = await db.query<{ email: string }>("SELECT email FROM clients WHERE id = $1", [session.clientId]);
-      const adminMail = einDetailsSubmittedAdminEmail({
-        summary: `S Corporation Election Package — ${so.llc_name} (enter the formation date to build it)`,
-        clientEmail: clientsN[0]?.email ?? "",
-        adminUrl: `${env.PUBLIC_BASE_URL}/admin`,
-      });
-      sendMail({ to: env.ADMIN_NOTIFY_EMAIL, ...adminMail }).catch((e) =>
-        console.error("[service] s-election-details admin email failed:", e),
-      );
-    }
-    return c.json({ data: { ok: true, documentId: null, editableUntil: null, awaitingFormationDate: true } });
-  }
-
+  // The formation date is required by the form above, so the package is
+  // always built here (15 Sep 2026: a branch that waited for the office to
+  // enter it could no longer run).
   const built = await postSElectionPackage({ so: { id: so.id, client_id: so.client_id, llc_name: so.llc_name }, merged, ssns, priorDocumentId: prior?.documentId });
   if (!built.ok) {
     return c.json(err("We could not build the package. Our team has been notified.", "GENERATION_FAILED"), 500);
@@ -2524,25 +2558,39 @@ app.post("/portal/registered-agent/cancel", async (c) => {
   );
   if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
   const client = rows[0];
-  if (client.ra_cancellation_requested_at) {
-    return c.json({ data: { raCancellationRequestedAt: client.ra_cancellation_requested_at } });
+  // The company whose service is cancelled (15 Sep 2026): the request is
+  // recorded on that company, and the client record is marked too so the
+  // office's chip keeps working.
+  const cancelBody = (await c.req.json().catch(() => null)) as { company?: string } | null;
+  const cancelCompanyId = await resolveCompanyOrder(session.clientId, typeof cancelBody?.company === "string" ? cancelBody.company : undefined);
+  const orderRows = cancelCompanyId
+    ? await db.query<{ id: string; llc_name: string; payload: unknown; ra_renewal_date: unknown; ra_cancellation_requested_at: string | null }>(
+        "SELECT id, llc_name, payload, ra_renewal_date, ra_cancellation_requested_at FROM orders WHERE id = $1 AND client_id = $2",
+        [cancelCompanyId, session.clientId],
+      )
+    : [];
+  const order = orderRows[0];
+  if (!order) return c.json(err("No company found on your account.", "NO_LLC"), 400);
+  const tookService = ((typeof order.payload === "string" ? JSON.parse(order.payload) : order.payload) as { registeredAgent?: { choice?: string } } | null)?.registeredAgent?.choice === "SERVICE";
+  if (!tookService) {
+    return c.json(err(`${order.llc_name} is its own registered agent; there is nothing to cancel.`, "NOT_OUR_SERVICE"), 400);
+  }
+  if (order.ra_cancellation_requested_at) {
+    return c.json({ data: { raCancellationRequestedAt: order.ra_cancellation_requested_at } });
   }
   const updated = await db.query<{ ra_cancellation_requested_at: string }>(
-    "UPDATE clients SET ra_cancellation_requested_at = now() WHERE id = $1 RETURNING ra_cancellation_requested_at",
-    [session.clientId],
+    "UPDATE orders SET ra_cancellation_requested_at = now() WHERE id = $1 RETURNING ra_cancellation_requested_at",
+    [order.id],
   );
   const requestedAt = updated[0]?.ra_cancellation_requested_at ?? new Date().toISOString();
+  await db.query("UPDATE clients SET ra_cancellation_requested_at = COALESCE(ra_cancellation_requested_at, $2) WHERE id = $1", [session.clientId, requestedAt]);
   // Confirmation + admin notice must not unwind the recorded request.
-  const renewalRow = await db.query<{ ra_renewal_date: unknown }>(
-    "SELECT ra_renewal_date FROM orders WHERE client_id = $1 AND ra_renewal_date IS NOT NULL ORDER BY formed_at DESC NULLS LAST LIMIT 1",
-    [session.clientId],
-  );
-  const confirmation = raCancellationEmail(client.name, renewalRow[0]?.ra_renewal_date ? fmtDate(isoDate(renewalRow[0].ra_renewal_date)) : null);
+  const confirmation = raCancellationEmail(client.name, order.ra_renewal_date ? fmtDate(isoDate(order.ra_renewal_date)) : null, order.llc_name);
   sendMail({ to: client.email, ...confirmation }).catch((e) =>
     console.error("ra-cancel confirmation email failed", e),
   );
   if (env.ADMIN_NOTIFY_EMAIL) {
-    const notice = raCancellationAdminEmail({ clientName: client.name, clientEmail: client.email });
+    const notice = raCancellationAdminEmail({ clientName: client.name, clientEmail: client.email, llcName: order.llc_name });
     sendMail({ to: env.ADMIN_NOTIFY_EMAIL, ...notice, replyTo: client.email }).catch((e) =>
       console.error("ra-cancel admin email failed", e),
     );
