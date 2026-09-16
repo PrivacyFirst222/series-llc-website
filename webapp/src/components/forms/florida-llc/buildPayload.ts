@@ -64,6 +64,8 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
       },
       email: data.registeredAgentEmail ?? "",
       phone: data.registeredAgentPhone ?? "",
+      // The permission to keep the card for the yearly renewal, ours only.
+      renewalCardConsent: data.registeredAgentChoice === "SERVICE" && data.raRenewalCardConsent === true,
       acceptance: {
         accepted: data.registeredAgentAcceptanceCheckbox,
         acceptanceName: data.registeredAgentAcceptanceName,

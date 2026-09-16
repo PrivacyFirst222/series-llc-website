@@ -951,6 +951,15 @@ app.get("/admin/clients", async (c) => {
                FROM orders o
               WHERE o.client_id = cl.id AND o.status <> 'pending_payment'
                 AND o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_llcs,
+            -- The card kept for each agent company and its latest renewal (16 Sep 2026).
+            (SELECT COALESCE(jsonb_agg(jsonb_build_object(
+                'llc_name', o.llc_name, 'card_status', o.card_status, 'card_last4', o.card_last4, 'card_brand', o.card_brand, 'card_note', o.card_note,
+                'last_status', (SELECT r.status FROM ra_renewals r WHERE r.order_id = o.id ORDER BY r.renewal_date DESC LIMIT 1),
+                'last_date', (SELECT to_char(r.renewal_date, 'FMMon FMDD, YYYY') FROM ra_renewals r WHERE r.order_id = o.id ORDER BY r.renewal_date DESC LIMIT 1)
+              ) ORDER BY o.llc_name), '[]'::jsonb)
+               FROM orders o
+              WHERE o.client_id = cl.id AND o.status <> 'pending_payment'
+                AND o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_cards,
             (SELECT COALESCE(jsonb_agg(jsonb_build_object('id', o.id, 'llc_name', o.llc_name, 'contact_name', o.contact_name, 'has_summary', o.summary_storage_key IS NOT NULL) ORDER BY o.paid_at DESC), '[]'::jsonb)
                FROM orders o
               WHERE o.client_id = cl.id AND o.paid_at IS NOT NULL) AS companies

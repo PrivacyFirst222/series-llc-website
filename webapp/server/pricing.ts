@@ -1,6 +1,10 @@
 import { calculateEstimatedFees } from "../src/components/forms/florida-llc/validation";
 
 export const SERVICE_FEE_CENTS = 499_00;
+/** Registered agent service after the included first year (Terms 9(c):
+ *  "currently $99"; Pricing: "$99 / yr"). Charged 15 days before the
+ *  renewal date to the card kept on file (16 Sep 2026). */
+export const RA_RENEWAL_FEE_CENTS = 99_00;
 export const EIN_FEE_CENTS = 50_00;
 export const S_ELECTION_FEE_CENTS = 95_00;
 

@@ -14,7 +14,8 @@ import { env } from "./env";
 
 import { priceOrder, EIN_FEE_CENTS, S_ELECTION_FEE_CENTS } from "./pricing";
 
-import { createCheckout, verifyWebhookSignature } from "./square";
+import { createCheckout, verifyWebhookSignature, type CardSimulation } from "./square";
+import { fulfillPaidRenewal, saveRenewalCard } from "./renewals";
 import { newToken } from "./crypto";
 
 import { rateLimit, clientIp } from "./auth";
@@ -35,7 +36,7 @@ export const orderingEnabled = () =>
 
 /* ------------------------- payment fulfillment ------------------------- */
 
-export async function fulfillPaidOrder(orderId: string, squarePaymentId: string | null): Promise<void> {
+export async function fulfillPaidOrder(orderId: string, squarePaymentId: string | null, cardSim?: CardSimulation): Promise<void> {
   if (testHooks.failNextFulfillment) {
     testHooks.failNextFulfillment = false;
     throw new Error("injected fulfillment failure (dev test scaffolding)");
@@ -58,6 +59,11 @@ export async function fulfillPaidOrder(orderId: string, squarePaymentId: string 
   );
   if (claimed.length === 0) return;
   const order = claimed[0];
+
+  // The card the formation was paid with is kept for the registered agent
+  // renewals when the client took our service and agreed (16 Sep 2026).
+  // Never blocks the formation.
+  await saveRenewalCard(db, order, squarePaymentId, cardSim).catch((e) => console.error("[renewals] card not saved:", e));
 
   // Upsert the client account for this email.
   const existing = await db.query<{ id: string; password_hash: string | null }>(
@@ -476,6 +482,17 @@ app.post("/square/webhook", async (c) => {
         const mismatch = moneyMismatch(payment.amount_money, svc[0].amount_cents);
         if (mismatch) await alertMoneyMismatch(mismatch, payment.order_id, payment.id);
         else await fulfillPaidServiceOrder(svc[0].id, payment.id);
+      } else {
+        // A registered agent renewal paid through its link (16 Sep 2026).
+        const ren = await db.query<{ id: string; amount_cents: number }>(
+          "SELECT id, amount_cents FROM ra_renewals WHERE square_order_id = $1",
+          [payment.order_id],
+        );
+        if (ren.length > 0) {
+          const mismatch = moneyMismatch(payment.amount_money, ren[0].amount_cents);
+          if (mismatch) await alertMoneyMismatch(mismatch, payment.order_id, payment.id);
+          else await fulfillPaidRenewal(ren[0].id, payment.id);
+        }
       }
     }
   }

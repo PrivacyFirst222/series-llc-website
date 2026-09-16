@@ -92,6 +92,87 @@ export function welcomeEmail(name: string, setPasswordUrl: string, isConversion 
   };
 }
 
+/* ------------------- registered agent renewal (16 Sep 2026) ------------------- */
+
+/** The formation was paid with a prepaid gift card, which cannot be kept
+ *  (Adam, 16 Sep 2026). */
+export function giftCardNotKeptEmail(name: string, llcName: string, renewalDate: string | null): { subject: string; html: string } {
+  return {
+    subject: "About the card you paid with",
+    html: wrap(`
+      <p>Hi ${escapeHtml(name || "there")},</p>
+      <p>You paid with a prepaid gift card, which cannot be kept on file for the yearly
+      registered agent renewal for <strong>${escapeHtml(llcName)}</strong>. Nothing else
+      about your order is affected.</p>
+      <p>Before your renewal date${renewalDate ? ` (${escapeHtml(renewalDate)})` : ""} you will receive an email with a
+      payment link. Pay it with a credit or debit card and that card will be kept for
+      the following years, so the renewal is automatic from then on.</p>
+      <p>Questions? Just reply to this email.</p>
+    `),
+  };
+}
+
+/** The notice the Terms promise (9(d)): the date, the amount, the
+ *  cancellation deadline, and how to cancel — sent 45 days before the date. */
+export function raRenewalNoticeEmail(opts: {
+  name: string; llcName: string; renewalDate: string; amount: string; last4: string | null;
+  chargeDate: string; cancelBy: string; linkUrl: string | null; giftCard: boolean;
+}): { subject: string; html: string } {
+  const how = opts.last4
+    ? `<p>The renewal fee is <strong>${escapeHtml(opts.amount)}</strong> and will be charged to your card ending
+      <strong>${escapeHtml(opts.last4)}</strong> on <strong>${escapeHtml(opts.chargeDate)}</strong>. There is nothing you need to do.</p>`
+    : `<p>The renewal fee is <strong>${escapeHtml(opts.amount)}</strong>. ${opts.giftCard ? "No card is on file (a prepaid gift card cannot be kept)" : "No card is on file"},
+      so please pay it by <strong>${escapeHtml(opts.renewalDate)}</strong> using the button below. Paying with a credit or debit
+      card keeps that card for the following years, so the renewal is automatic from then on.</p>
+      <p><a href="${opts.linkUrl ?? "#"}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Pay the renewal</a></p>`;
+  return {
+    subject: `Your registered agent service renews on ${opts.renewalDate}`,
+    html: wrap(`
+      <p>Hi ${escapeHtml(opts.name || "there")},</p>
+      <p>Your registered agent service for <strong>${escapeHtml(opts.llcName)}</strong> renews on
+      <strong>${escapeHtml(opts.renewalDate)}</strong>.</p>
+      ${how}
+      <p><strong>To cancel</strong>, give notice by <strong>${escapeHtml(opts.cancelBy)}</strong> — in your client portal
+      (the Registered agent service card) or by email to support@myfloridaseriesllc.com. Florida law requires your LLC
+      to have a registered agent at all times, so you must also designate a successor agent with the Division of
+      Corporations and send us proof; the Terms of Service explain both steps.</p>
+      <p>Questions? Just reply to this email.</p>
+    `),
+  };
+}
+
+/** The receipt after the renewal is charged or paid through its link. */
+export function raRenewalReceiptEmail(opts: { name: string; llcName: string; amount: string; last4: string; throughDate: string }): { subject: string; html: string } {
+  return {
+    subject: `Registered agent service renewed — ${opts.llcName}`,
+    html: wrap(`
+      <p>Hi ${escapeHtml(opts.name || "there")},</p>
+      <p>${opts.last4 ? `We charged <strong>${escapeHtml(opts.amount)}</strong> to your card ending <strong>${escapeHtml(opts.last4)}</strong>` : `We received <strong>${escapeHtml(opts.amount)}</strong>`}
+      for registered agent service for <strong>${escapeHtml(opts.llcName)}</strong> through
+      <strong>${escapeHtml(opts.throughDate)}</strong>.</p>
+      <p>Your renewal date is shown on the Registered agent service card in your client portal.</p>
+    `),
+  };
+}
+
+/** The charge was declined (Terms 9(e)): pay by the renewal date or the
+ *  service is delinquent. */
+export function raRenewalDeclinedEmail(opts: { name: string; llcName: string; last4: string; renewalDate: string; linkUrl: string; willRetry: boolean; retryDate: string | null }): { subject: string; html: string } {
+  return {
+    subject: `Action needed: your registered agent renewal charge was declined`,
+    html: wrap(`
+      <p>Hi ${escapeHtml(opts.name || "there")},</p>
+      <p>The renewal charge to your card ending <strong>${escapeHtml(opts.last4)}</strong> for registered agent
+      service for <strong>${escapeHtml(opts.llcName)}</strong> was declined.${opts.willRetry && opts.retryDate ? ` We will try the card once more on ${escapeHtml(opts.retryDate)}.` : ""}</p>
+      <p>Pay by <strong>${escapeHtml(opts.renewalDate)}</strong> using the button below, or your service becomes
+      delinquent under the Terms of Service. Paying with a different credit or debit card keeps that card for the
+      following years.</p>
+      <p><a href="${opts.linkUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Pay the renewal</a></p>
+      <p>If the reason for the decline is not clear to you, your card issuer can tell you.</p>
+    `),
+  };
+}
+
 export function resetEmail(resetUrl: string): { subject: string; html: string } {
   return {
     subject: "Reset your portal password",

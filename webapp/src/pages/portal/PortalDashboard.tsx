@@ -305,7 +305,17 @@ interface CompanyInfo {
   raService: boolean;
   raRenewalDate: string | null;
   raCancellationRequestedAt: string | null;
+  /** The card kept with Square for the renewal (16 Sep 2026). */
+  cardStatus?: "on_file" | "none" | "gift_card" | null;
+  cardLast4?: string | null;
+  cardBrand?: string | null;
+  renewals?: { date: string | null; amountCents: number; status: string; chargedAt: string | null }[];
 }
+
+const brandWord = (b: string | null | undefined): string => {
+  const m: Record<string, string> = { VISA: "Visa", MASTERCARD: "Mastercard", AMERICAN_EXPRESS: "American Express", DISCOVER: "Discover" };
+  return m[(b ?? "").toUpperCase()] ?? (b ? b.charAt(0) + b.slice(1).toLowerCase() : "Card");
+};
 
 function RegisteredAgentCard({ company }: { company: CompanyInfo }) {
   const queryClient = useQueryClient();
@@ -352,10 +362,27 @@ function RegisteredAgentCard({ company }: { company: CompanyInfo }) {
           </div>
         ) : (
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm text-muted-foreground">
-              Your registered agent service is active{me?.raRenewalDate ? ` and renews on ${new Date(`${me.raRenewalDate}T12:00:00`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}` : " and renews annually"}. You can cancel
-              here at any time.
-            </p>
+            <div className="text-sm text-muted-foreground">
+              <p>
+                Your registered agent service is active{me?.raRenewalDate ? ` and renews on ${new Date(`${me.raRenewalDate}T12:00:00`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}` : " and renews annually"}. You can cancel
+                here at any time.
+              </p>
+              {/* The card kept for the renewal, or why none is (16 Sep 2026). */}
+              {company.cardStatus === "on_file" ? (
+                <p className="mt-1" data-testid="renewal-card">Renewal card: {brandWord(company.cardBrand)} ending {company.cardLast4}.</p>
+              ) : company.cardStatus === "gift_card" ? (
+                <p className="mt-1" data-testid="renewal-card">No card on file (a prepaid gift card cannot be kept) — you will receive a payment link before renewal.</p>
+              ) : company.cardStatus === "none" ? (
+                <p className="mt-1" data-testid="renewal-card">No card on file — you will receive a payment link before renewal.</p>
+              ) : null}
+              {(company.renewals ?? []).filter((r) => r.status === "charged" || r.status === "paid_by_link" || r.status === "declined").map((r) => (
+                <p key={`${r.date}-${r.status}`} className="mt-1" data-testid="renewal-line">
+                  {r.status === "declined"
+                    ? `Renewal charge declined for ${r.date ? new Date(`${r.date}T12:00:00`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : ""} — pay with the link in your email.`
+                    : `Renewed on ${r.chargedAt ? new Date(r.chargedAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : ""} for $${(r.amountCents / 100).toFixed(0)}.`}
+                </p>
+              ))}
+            </div>
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button

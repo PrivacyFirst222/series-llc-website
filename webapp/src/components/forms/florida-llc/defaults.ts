@@ -72,6 +72,7 @@ export const defaultFormData: FloridaLLCFormData = {
   registeredAgentIsAffiliatedPerson: false,
   registeredAgentNotSameAsLlc: false,
   registeredAgentPhysicalAddressAcknowledgment: false,
+  raRenewalCardConsent: false,
 
   registeredAgentAcceptanceName: "",
   registeredAgentAcceptanceCapacity: "",

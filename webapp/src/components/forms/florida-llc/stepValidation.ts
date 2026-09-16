@@ -201,6 +201,10 @@ export function validateStep(
   if (step === "agent") {
     if (!data.registeredAgentChoice)
       e.registeredAgentChoice = "Choose who will serve as registered agent.";
+    // Our service renews yearly on a card kept with Square, with the
+    // client's permission (16 Sep 2026).
+    if (data.registeredAgentChoice === "SERVICE" && data.raRenewalCardConsent !== true)
+      e.raRenewalCardConsent = "Please agree to keep a card on file for the yearly renewal.";
     if (data.registeredAgentChoice === "SELF") {
       if (!(data.registeredAgentFirstName ?? "").trim())
         e.registeredAgentFirstName = "First name is required.";

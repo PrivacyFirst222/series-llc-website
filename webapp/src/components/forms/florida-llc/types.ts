@@ -171,6 +171,9 @@ export interface FloridaLLCFormData {
   registeredAgentIsAffiliatedPerson: boolean;
   registeredAgentNotSameAsLlc: boolean;
   registeredAgentPhysicalAddressAcknowledgment: boolean;
+  /** Our service: the client agrees to a card kept on file with Square for
+   *  the yearly renewal (Square requires the permission; 16 Sep 2026). */
+  raRenewalCardConsent: boolean;
 
   // Section 6
   registeredAgentAcceptanceName: string;
@@ -272,6 +275,8 @@ export interface SubmissionPayload {
     address: AddressFields;
     email: string;
     phone: string;
+    /** The permission to keep the card for the yearly renewal (16 Sep 2026). */
+    renewalCardConsent: boolean;
     acceptance: {
       accepted: boolean;
       acceptanceName: string;

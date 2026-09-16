@@ -387,6 +387,15 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
   // Registered agent.
   if (run.ra === "SERVICE") {
     await clickCard(page, /first year included/i);
+    // The card-on-file permission Square requires (16 Sep 2026): named
+    // plainly, gift cards included, and required to continue.
+    await page.waitForTimeout(300);
+    const agentText = await page.locator("main").innerText();
+    expect(/Keep my card on file with Square for the yearly registered agent renewal/.test(agentText) && /A prepaid gift card \(the Visa or Mastercard kind\) cannot be kept on file/.test(agentText), `${run.key}: our service asks permission to keep the card, gift cards excluded`, agentText.match(/Keep my card[^\n]{0,80}/)?.[0]);
+    await page.locator("main button").filter({ hasText: /^Continue/ }).first().click();
+    await page.waitForTimeout(500);
+    expect(/Please agree to keep a card on file for the yearly renewal\./.test(await page.locator("main").innerText()), `${run.key}: continuing without the card permission is refused under the box`);
+    await checkAllBoxes(page);
   } else {
     // Our service first, then a change of mind: nothing of ours survives
     // the switch (14 Sep 2026: our office address and our series' name were

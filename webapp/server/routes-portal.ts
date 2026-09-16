@@ -1029,10 +1029,14 @@ app.get("/portal/companies", async (c) => {
   const db = await getDb();
   // The registered agent facts belong to the company (15 Sep 2026: the
   // card showed one company's service under every tab).
-  const rows = await db.query<{ id: string; llc_name: string; formed_at: string | null; filing_path: string | null; ra_service: boolean; ra_renewal_date: unknown; ra_cancellation_requested_at: string | null }>(
+  const rows = await db.query<{ id: string; llc_name: string; formed_at: string | null; filing_path: string | null; ra_service: boolean; ra_renewal_date: unknown; ra_cancellation_requested_at: string | null; card_status: string | null; card_last4: string | null; card_brand: string | null; renewals: unknown }>(
     `SELECT id, llc_name, formed_at, payload->>'filingPath' AS filing_path,
             (payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_service,
-            ra_renewal_date, ra_cancellation_requested_at
+            ra_renewal_date, ra_cancellation_requested_at,
+            card_status, card_last4, card_brand,
+            -- The renewals, newest first (16 Sep 2026).
+            (SELECT COALESCE(jsonb_agg(jsonb_build_object('id', r.id, 'date', r.renewal_date, 'amountCents', r.amount_cents, 'status', r.status, 'chargedAt', r.charged_at) ORDER BY r.renewal_date DESC), '[]'::jsonb)
+               FROM ra_renewals r WHERE r.order_id = orders.id) AS renewals
        FROM orders WHERE client_id = $1 AND paid_at IS NOT NULL
       ORDER BY paid_at DESC NULLS LAST`,
     [session.clientId],
@@ -1044,6 +1048,10 @@ app.get("/portal/companies", async (c) => {
     raService: r.ra_service === true,
     raRenewalDate: r.ra_renewal_date ? isoDate(r.ra_renewal_date) : null,
     raCancellationRequestedAt: r.ra_cancellation_requested_at ?? null,
+    cardStatus: r.card_status ?? null,
+    cardLast4: r.card_last4 ?? null,
+    cardBrand: r.card_brand ?? null,
+    renewals: ((typeof r.renewals === "string" ? JSON.parse(r.renewals) : r.renewals) as { id: string; date: unknown; amountCents: number; status: string; chargedAt: string | null }[] | null ?? []).map((x) => ({ ...x, date: x.date ? isoDate(x.date) : null })),
   })) });
 });
 

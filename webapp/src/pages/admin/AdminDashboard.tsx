@@ -33,8 +33,27 @@ interface AdminClient {
   suffix?: string | null;
   document_count: number;
   ra_llcs: string[];
+  /** Per agent company: the card kept for the renewal and the latest renewal (16 Sep 2026). */
+  ra_cards?: { llc_name: string; card_status: string | null; card_last4: string | null; card_brand: string | null; card_note: string | null; last_status: string | null; last_date: string | null }[];
   companies: { id: string; llc_name: string; contact_name?: string; has_summary?: boolean }[];
 }
+
+const cardWords = (c: NonNullable<AdminClient["ra_cards"]>[number]): string =>
+  c.card_status === "on_file" ? `${c.card_brand ? c.card_brand.charAt(0) + c.card_brand.slice(1).toLowerCase() : "card"} ${c.card_last4 ?? ""}`.trim()
+  : c.card_status === "gift_card" ? "no card — gift card"
+  : c.card_status === "none" ? `no card${c.card_note === "wallet payment" ? " — wallet" : ""}`
+  : "—";
+const renewalWords = (c: NonNullable<AdminClient["ra_cards"]>[number]): string =>
+  !c.last_status ? "—"
+  : c.last_status === "charged" ? `charged ${c.last_date ?? ""}`
+  : c.last_status === "paid_by_link" ? `paid by link ${c.last_date ?? ""}`
+  : c.last_status === "declined" ? `declined ${c.last_date ?? ""}`
+  : c.last_status === "notice_sent" ? `notice sent for ${c.last_date ?? ""}`
+  : c.last_status === "link_sent" ? `link sent for ${c.last_date ?? ""}`
+  : c.last_status === "cancelled" ? `cancelled ${c.last_date ?? ""}`
+  : c.last_status;
+/** A row that needs a hand: a decline, or a company with no card to charge. */
+const raNeedsHand = (cl: AdminClient): boolean => (cl.ra_cards ?? []).some((c) => c.last_status === "declined" || c.card_status === "gift_card" || c.card_status === "none");
 
 interface EmailRow {
   id: string;
@@ -510,6 +529,8 @@ function ClientsTable({
           <tr className="border-b border-border bg-secondary/40 text-left text-xs uppercase tracking-[0.14em] text-muted-foreground">
             <Head k="client" label="Client" />
             {variant === "ra" ? <Head k="ra" label="Registered agent for" /> : null}
+            {variant === "ra" ? <th className="px-3 py-3 font-medium">Card</th> : null}
+            {variant === "ra" ? <th className="px-3 py-3 font-medium">Renewals</th> : null}
             <Head k="companies" label="Companies" />
             <Head k="account" label="Portal account" />
             <Head k="documents" label="Documents" />
@@ -520,13 +541,13 @@ function ClientsTable({
         <tbody className="divide-y divide-border">
           {shown.length === 0 ? (
             <tr>
-              <td colSpan={variant === "ra" ? 7 : 6} className="px-4 py-6 text-muted-foreground">
+              <td colSpan={variant === "ra" ? 9 : 6} className="px-4 py-6 text-muted-foreground">
                 {q ? "No client matches that search." : emptyText}
               </td>
             </tr>
           ) : (
             shown.map((cl) => (
-              <tr key={cl.id} data-testid="client-row">
+              <tr key={cl.id} data-testid="client-row" className={variant === "ra" && raNeedsHand(cl) ? "bg-amber-50 dark:bg-amber-950/20" : undefined}>
                 <td className="px-3 py-3">
                   <span className="font-medium" data-testid="client-name">{displayName(cl)}</span>
                   {cl.ra_cancellation_requested_at ? (
@@ -538,6 +559,16 @@ function ClientsTable({
                 </td>
                 {variant === "ra" ? (
                   <td className="px-3 py-3">{(cl.ra_llcs ?? []).join(", ")}</td>
+                ) : null}
+                {variant === "ra" ? (
+                  <td className="px-3 py-3 text-xs" data-testid="ra-card-cell">
+                    {(cl.ra_cards ?? []).length === 0 ? "—" : (cl.ra_cards ?? []).map((c) => <div key={c.llc_name}>{(cl.ra_cards ?? []).length > 1 ? `${c.llc_name}: ` : ""}{cardWords(c)}</div>)}
+                  </td>
+                ) : null}
+                {variant === "ra" ? (
+                  <td className="px-3 py-3 text-xs" data-testid="ra-renewals-cell">
+                    {(cl.ra_cards ?? []).length === 0 ? "—" : (cl.ra_cards ?? []).map((c) => <div key={c.llc_name}>{(cl.ra_cards ?? []).length > 1 ? `${c.llc_name}: ` : ""}{renewalWords(c)}</div>)}
+                  </td>
                 ) : null}
                 {/* Every paid company under this account, with the name given
                     on the order when it differs from the account's (Adam,

@@ -16,6 +16,9 @@ import { syncDailies } from "./sunbiz";
 import { err, testHooks } from "./shared";
 import { devOutbox } from "./email";
 import { fulfillPaidOrder, fulfillPaidServiceOrder } from "./routes-payments";
+import { fulfillPaidRenewal, runRenewals } from "./renewals";
+import { easternDateIso } from "./datetime";
+import type { CardSimulation } from "./square";
 import { purgeExpiredSElections } from "./routes-portal";
 import { refreshOwnersManual } from "./routes-admin";
 
@@ -53,6 +56,13 @@ if (!env.isProd) {
     testHooks.failNextFulfillment = true;
     return c.json({ data: { armed: true } });
   });
+
+  /** Dev: the next card-on-file renewal charge is declined with this code. */
+  app.post("/dev/renewal-decline", async (c) => {
+    const { code } = (await c.req.json().catch(() => ({}))) as { code?: string };
+    testHooks.declineNextRenewal = code || "GENERIC_DECLINE";
+    return c.json({ data: { armed: testHooks.declineNextRenewal } });
+  });
 }
 
 // Dev-only: the mails that would have been sent, so the checks can read what
@@ -64,13 +74,17 @@ if (!env.isProd) {
 // Dev-only stand-in for the Square webhook while no Square account is connected.
 if (!env.SQUARE_ACCESS_TOKEN && !env.isProd) {
   app.post("/dev/simulate-payment", async (c) => {
-    const { orderId } = (await c.req.json()) as { orderId: string };
+    // `card` says how the fake payment looks to the card-saving step
+    // (16 Sep 2026): a credit card, a prepaid gift card, or a wallet.
+    const { orderId, card } = (await c.req.json()) as { orderId: string; card?: CardSimulation };
     const db = await getDb();
     const isFormation = await db.query("SELECT id FROM orders WHERE id = $1", [orderId]);
     if (isFormation.length > 0) {
-      await fulfillPaidOrder(orderId, "dev-payment");
+      await fulfillPaidOrder(orderId, "dev-payment", card);
     } else {
-      await fulfillPaidServiceOrder(orderId, "dev-payment");
+      const isRenewal = await db.query("SELECT id FROM ra_renewals WHERE id = $1", [orderId]);
+      if (isRenewal.length > 0) await fulfillPaidRenewal(orderId, `dev-payment-${Date.now()}`, card);
+      else await fulfillPaidServiceOrder(orderId, "dev-payment");
     }
     return c.json({ data: { ok: true } });
   });
@@ -236,6 +250,20 @@ if (!env.isProd) {
     return c.json({ data: { ok: true } });
   });
 }
+
+/** Nightly: registered agent renewals (16 Sep 2026) — the notice 45 days
+ *  out, the charge 15 days out, retries, and timely cancellations. Outside
+ *  production a `today` query runs the job as of that date, for the checks. */
+app.get("/cron/ra-renewals", async (c) => {
+  const auth = c.req.header("authorization") ?? "";
+  const secret = env.CRON_SECRET;
+  if (secret && auth !== `Bearer ${secret}`) return c.json(err("Not authorized", "UNAUTHENTICATED"), 401);
+  if (!secret && env.isProd) return c.json(err("Not authorized", "UNAUTHENTICATED"), 401);
+  const asked = c.req.query("today");
+  const today = !env.isProd && asked && /^\d{4}-\d{2}-\d{2}$/.test(asked) ? asked : easternDateIso();
+  const r = await runRenewals(today);
+  return c.json({ data: { today, ...r } });
+});
 
 /** Nightly: republish the manual if this deployment carries a newer master. */
 app.get("/cron/library-refresh", async (c) => {

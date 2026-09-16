@@ -215,6 +215,11 @@ const extendedFormSchema = formationFormSchema
           "Provide an alternate name, or confirm you want the exact name only.",
       });
     }
+    // Our service renews yearly on a card kept with Square; Square requires
+    // the client's permission first (16 Sep 2026).
+    if (data.registeredAgentChoice === "SERVICE" && data.raRenewalCardConsent !== true) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["raRenewalCardConsent"], message: "Please agree to keep a card on file for the yearly renewal." });
+    }
     if (
       data.registeredAgentChoice === "SELF" &&
       (!data.registeredAgentFirstName?.trim() || !data.registeredAgentLastName?.trim())

@@ -430,6 +430,37 @@ const MIGRATION_010_STATEMENTS: string[] = [
   `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_cancellation_requested_at timestamptz`,
 ];
 
+// 11 (16 Sep 2026): the card kept with Square for the registered agent
+// renewal, and one row per renewal — the notice, the charge, its result.
+const MIGRATION_011_STATEMENTS: string[] = [
+  `ALTER TABLE orders ADD COLUMN IF NOT EXISTS square_customer_id text`,
+  `ALTER TABLE orders ADD COLUMN IF NOT EXISTS square_card_id text`,
+  `ALTER TABLE orders ADD COLUMN IF NOT EXISTS card_last4 text`,
+  `ALTER TABLE orders ADD COLUMN IF NOT EXISTS card_brand text`,
+  `ALTER TABLE orders ADD COLUMN IF NOT EXISTS card_status text`,
+  `ALTER TABLE orders ADD COLUMN IF NOT EXISTS card_note text`,
+  `CREATE TABLE IF NOT EXISTS ra_renewals (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  order_id uuid NOT NULL,
+  renewal_date date NOT NULL,
+  amount_cents integer NOT NULL,
+  status text NOT NULL,
+  charge_due date,
+  notice_sent_at timestamptz,
+  charged_at timestamptz,
+  square_payment_id text,
+  square_order_id text,
+  link_url text,
+  decline_code text,
+  retry_after date,
+  retries integer NOT NULL DEFAULT 0,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (order_id, renewal_date)
+)`,
+  `CREATE INDEX IF NOT EXISTS ra_renewals_square_order_idx ON ra_renewals (square_order_id)`,
+];
+
 const MIGRATIONS: { id: number; name: string; statements: string[] }[] = [
   { id: 1, name: "initial-schema", statements: MIGRATION_001_STATEMENTS },
   { id: 2, name: "contact-messages", statements: MIGRATION_002_STATEMENTS },
@@ -441,6 +472,7 @@ const MIGRATIONS: { id: number; name: string; statements: string[] }[] = [
   { id: 8, name: "email-log", statements: MIGRATION_008_STATEMENTS },
   { id: 9, name: "rejection-and-ra-renewal", statements: MIGRATION_009_STATEMENTS },
   { id: 10, name: "ra-cancellation-per-company", statements: MIGRATION_010_STATEMENTS },
+  { id: 11, name: "ra-renewal-cards", statements: MIGRATION_011_STATEMENTS },
   // Append future migrations here with the next id. Never edit an entry.
 ];
 

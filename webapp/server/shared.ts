@@ -8,6 +8,8 @@ export const testHooks = {
   failNextFulfillment: false,
   /** When >= 0, the (N+1)th putFile in the next formation upload throws. */
   failFormationPutAfter: -1,
+  /** Dev: the next card-on-file charge is declined with this Square code. */
+  declineNextRenewal: "" as string,
 };
 
 

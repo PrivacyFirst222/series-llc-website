@@ -156,6 +156,9 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
           />
           <Row label="Email" value={data.registeredAgentEmail} />
           <Row label="Phone" value={data.registeredAgentPhone} />
+          {data.registeredAgentChoice === "SERVICE" ? (
+            <Row label="Renewal card on file" value={data.raRenewalCardConsent ? "Yes" : "No"} />
+          ) : null}
         </ReviewCard>
 
         {/* When we are the agent the acceptance is ours, not the client's:

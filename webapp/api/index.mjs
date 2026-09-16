@@ -33959,7 +33959,7 @@ var init_colors = __esm({
 });
 
 // node_modules/@cantoo/pdf-lib/es/api/svgPath.js
-var cx, cy, px, py, sx, sy, parameters, parse2, apply, runners, solveArc, arcToSegments, segmentToBezier, svgPathToOperators;
+var cx, cy, px, py, sx, sy, parameters, parse3, apply, runners, solveArc, arcToSegments, segmentToBezier, svgPathToOperators;
 var init_svgPath = __esm({
   "node_modules/@cantoo/pdf-lib/es/api/svgPath.js"() {
     init_operators();
@@ -33991,7 +33991,7 @@ var init_svgPath = __esm({
       ["Z", 0],
       ["z", 0]
     ]);
-    parse2 = (path) => {
+    parse3 = (path) => {
       let cmd;
       const ret = [];
       let args = [];
@@ -34308,7 +34308,7 @@ var init_svgPath = __esm({
       ];
       return result;
     };
-    svgPathToOperators = (path) => apply(parse2(path));
+    svgPathToOperators = (path) => apply(parse3(path));
   }
 });
 
@@ -34768,7 +34768,7 @@ var require_src = __commonJS({
         }).join("");
       }
       set innerHTML(content) {
-        const doc = parse4(content);
+        const doc = parse5(content);
         this.childNodes.forEach((node) => node.remove());
         doc.childNodes.forEach((node) => this.appendChild(node));
       }
@@ -34777,7 +34777,7 @@ var require_src = __commonJS({
         if (content instanceof AbstractNode) {
           content = [content];
         } else if (typeof content == "string") {
-          const r = parse4(content);
+          const r = parse5(content);
           content = r.childNodes.length ? r.childNodes : [new TextNode(content)];
         }
         this.childNodes = content;
@@ -35281,7 +35281,7 @@ var require_src = __commonJS({
       style: true,
       pre: true
     };
-    function parse4(data, options) {
+    function parse5(data, options) {
       var _a3, _b2;
       const root = new HTMLElement("");
       let currentParent = root;
@@ -35407,7 +35407,7 @@ var require_src = __commonJS({
       }
       return root;
     }
-    exports.parse = parse4;
+    exports.parse = parse5;
     var blockTags = [
       "html",
       "body",
@@ -35500,7 +35500,7 @@ var init_matrix = __esm({
 });
 
 // node_modules/@cantoo/pdf-lib/es/api/svg.js
-var import_node_html_better_parser, combineMatrix, applyTransformation, transformationToMatrix, combineTransformation, StrokeLineCapMap, FillRuleMap, StrokeLineJoinMap, runnersToPage, styleOrAttribute, parseStyles, parseColor, parseAttributes, getFittingRectangle, getAspectRatioTransformation, parseHTMLNode, parseSvgNode, parseGroupNode, parseFloatValue, parseBlendMode, parseViewBox, parse3, drawSvg;
+var import_node_html_better_parser, combineMatrix, applyTransformation, transformationToMatrix, combineTransformation, StrokeLineCapMap, FillRuleMap, StrokeLineJoinMap, runnersToPage, styleOrAttribute, parseStyles, parseColor, parseAttributes, getFittingRectangle, getAspectRatioTransformation, parseHTMLNode, parseSvgNode, parseGroupNode, parseFloatValue, parseBlendMode, parseViewBox, parse4, drawSvg;
 var init_svg = __esm({
   "node_modules/@cantoo/pdf-lib/es/api/svg.js"() {
     import_node_html_better_parser = __toESM(require_src(), 1);
@@ -36124,7 +36124,7 @@ var init_svg = __esm({
         height: heightViewBox
       };
     };
-    parse3 = (svg, { width, height, fontSize }, size, matrix) => {
+    parse4 = (svg, { width, height, fontSize }, size, matrix) => {
       const htmlElement = (0, import_node_html_better_parser.parse)(svg).firstChild;
       if (width)
         htmlElement.setAttribute("width", width + "");
@@ -36168,7 +36168,7 @@ var init_svg = __esm({
         options.x || 0,
         options.y || 0
       ];
-      const elements = parse3(svgNode.outerHTML, options, size, baseTransformation);
+      const elements = parse4(svgNode.outerHTML, options, size, baseTransformation);
       const runners2 = runnersToPage(page, Object.assign(Object.assign({}, options), { images: pdfSvg.images }));
       elements.forEach((elt) => {
         var _a3;
@@ -48504,7 +48504,7 @@ var require_parse = __commonJS({
       }
       return parsed;
     }
-    function parse4(command, args, options) {
+    function parse5(command, args, options) {
       if (args && !Array.isArray(args)) {
         options = args;
         args = null;
@@ -48523,7 +48523,7 @@ var require_parse = __commonJS({
       };
       return options.shell ? parsed : parseNonShell(parsed);
     }
-    module.exports = parse4;
+    module.exports = parse5;
   }
 });
 
@@ -48582,16 +48582,16 @@ var require_cross_spawn = __commonJS({
   "node_modules/cross-spawn/index.js"(exports, module) {
     "use strict";
     var cp = __require("child_process");
-    var parse4 = require_parse();
+    var parse5 = require_parse();
     var enoent = require_enoent();
     function spawn(command, args, options) {
-      const parsed = parse4(command, args, options);
+      const parsed = parse5(command, args, options);
       const spawned = cp.spawn(parsed.command, parsed.args, parsed.options);
       enoent.hookChildProcess(spawned, parsed);
       return spawned;
     }
     function spawnSync(command, args, options) {
-      const parsed = parse4(command, args, options);
+      const parsed = parse5(command, args, options);
       const result = cp.spawnSync(parsed.command, parsed.args, parsed.options);
       result.error = result.error || enoent.verifyENOENTSync(result.status, parsed);
       return result;
@@ -48599,7 +48599,7 @@ var require_cross_spawn = __commonJS({
     module.exports = spawn;
     module.exports.spawn = spawn;
     module.exports.sync = spawnSync;
-    module.exports._parse = parse4;
+    module.exports._parse = parse5;
     module.exports._enoent = enoent;
   }
 });
@@ -64453,7 +64453,7 @@ var require_schemas2 = __commonJS({
     var index_js_1 = require_core3();
     var checks = __importStar(require_checks2());
     var iso = __importStar(require_iso());
-    var parse4 = __importStar(require_parse3());
+    var parse5 = __importStar(require_parse3());
     exports.ZodType = core.$constructor("ZodType", (inst, def) => {
       core.$ZodType.init(inst, def);
       inst.def = def;
@@ -64473,19 +64473,19 @@ var require_schemas2 = __commonJS({
         reg.add(inst, meta);
         return inst;
       });
-      inst.parse = (data, params) => parse4.parse(inst, data, params, { callee: inst.parse });
-      inst.safeParse = (data, params) => parse4.safeParse(inst, data, params);
-      inst.parseAsync = async (data, params) => parse4.parseAsync(inst, data, params, { callee: inst.parseAsync });
-      inst.safeParseAsync = async (data, params) => parse4.safeParseAsync(inst, data, params);
+      inst.parse = (data, params) => parse5.parse(inst, data, params, { callee: inst.parse });
+      inst.safeParse = (data, params) => parse5.safeParse(inst, data, params);
+      inst.parseAsync = async (data, params) => parse5.parseAsync(inst, data, params, { callee: inst.parseAsync });
+      inst.safeParseAsync = async (data, params) => parse5.safeParseAsync(inst, data, params);
       inst.spa = inst.safeParseAsync;
-      inst.encode = (data, params) => parse4.encode(inst, data, params);
-      inst.decode = (data, params) => parse4.decode(inst, data, params);
-      inst.encodeAsync = async (data, params) => parse4.encodeAsync(inst, data, params);
-      inst.decodeAsync = async (data, params) => parse4.decodeAsync(inst, data, params);
-      inst.safeEncode = (data, params) => parse4.safeEncode(inst, data, params);
-      inst.safeDecode = (data, params) => parse4.safeDecode(inst, data, params);
-      inst.safeEncodeAsync = async (data, params) => parse4.safeEncodeAsync(inst, data, params);
-      inst.safeDecodeAsync = async (data, params) => parse4.safeDecodeAsync(inst, data, params);
+      inst.encode = (data, params) => parse5.encode(inst, data, params);
+      inst.decode = (data, params) => parse5.decode(inst, data, params);
+      inst.encodeAsync = async (data, params) => parse5.encodeAsync(inst, data, params);
+      inst.decodeAsync = async (data, params) => parse5.decodeAsync(inst, data, params);
+      inst.safeEncode = (data, params) => parse5.safeEncode(inst, data, params);
+      inst.safeDecode = (data, params) => parse5.safeDecode(inst, data, params);
+      inst.safeEncodeAsync = async (data, params) => parse5.safeEncodeAsync(inst, data, params);
+      inst.safeDecodeAsync = async (data, params) => parse5.safeDecodeAsync(inst, data, params);
       inst.refine = (check2, params) => inst.check(refine(check2, params));
       inst.superRefine = (refinement) => inst.check(superRefine(refinement));
       inst.overwrite = (fn) => inst.check(checks.overwrite(fn));
@@ -68168,13 +68168,13 @@ var require_jwk_to_key = __commonJS({
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var node_crypto_1 = __require("node:crypto");
-    var parse4 = (key) => {
+    var parse5 = (key) => {
       if (key.d) {
         return (0, node_crypto_1.createPrivateKey)({ format: "jwk", key });
       }
       return (0, node_crypto_1.createPublicKey)({ format: "jwk", key });
     };
-    exports.default = parse4;
+    exports.default = parse5;
   }
 });
 
@@ -95890,6 +95890,34 @@ var MIGRATION_009_STATEMENTS = [
 var MIGRATION_010_STATEMENTS = [
   `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_cancellation_requested_at timestamptz`
 ];
+var MIGRATION_011_STATEMENTS = [
+  `ALTER TABLE orders ADD COLUMN IF NOT EXISTS square_customer_id text`,
+  `ALTER TABLE orders ADD COLUMN IF NOT EXISTS square_card_id text`,
+  `ALTER TABLE orders ADD COLUMN IF NOT EXISTS card_last4 text`,
+  `ALTER TABLE orders ADD COLUMN IF NOT EXISTS card_brand text`,
+  `ALTER TABLE orders ADD COLUMN IF NOT EXISTS card_status text`,
+  `ALTER TABLE orders ADD COLUMN IF NOT EXISTS card_note text`,
+  `CREATE TABLE IF NOT EXISTS ra_renewals (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  order_id uuid NOT NULL,
+  renewal_date date NOT NULL,
+  amount_cents integer NOT NULL,
+  status text NOT NULL,
+  charge_due date,
+  notice_sent_at timestamptz,
+  charged_at timestamptz,
+  square_payment_id text,
+  square_order_id text,
+  link_url text,
+  decline_code text,
+  retry_after date,
+  retries integer NOT NULL DEFAULT 0,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (order_id, renewal_date)
+)`,
+  `CREATE INDEX IF NOT EXISTS ra_renewals_square_order_idx ON ra_renewals (square_order_id)`
+];
 var MIGRATIONS = [
   { id: 1, name: "initial-schema", statements: MIGRATION_001_STATEMENTS },
   { id: 2, name: "contact-messages", statements: MIGRATION_002_STATEMENTS },
@@ -95900,7 +95928,8 @@ var MIGRATIONS = [
   { id: 7, name: "order-summary", statements: MIGRATION_007_STATEMENTS },
   { id: 8, name: "email-log", statements: MIGRATION_008_STATEMENTS },
   { id: 9, name: "rejection-and-ra-renewal", statements: MIGRATION_009_STATEMENTS },
-  { id: 10, name: "ra-cancellation-per-company", statements: MIGRATION_010_STATEMENTS }
+  { id: 10, name: "ra-cancellation-per-company", statements: MIGRATION_010_STATEMENTS },
+  { id: 11, name: "ra-renewal-cards", statements: MIGRATION_011_STATEMENTS }
   // Append future migrations here with the next id. Never edit an entry.
 ];
 function migrationChecksum(statements) {
@@ -96091,7 +96120,9 @@ var testHooks = {
   /** Makes the next fulfillment throw once (dev suite scaffolding). */
   failNextFulfillment: false,
   /** When >= 0, the (N+1)th putFile in the next formation upload throws. */
-  failFormationPutAfter: -1
+  failFormationPutAfter: -1,
+  /** Dev: the next card-on-file charge is declined with this Square code. */
+  declineNextRenewal: ""
 };
 var err = (message, code) => ({ error: { message, code } });
 function maskEmail(email) {
@@ -100333,6 +100364,7 @@ var formationFormSchema = external_exports.object({
   registeredAgentPhysicalAddressAcknowledgment: external_exports.literal(true, {
     errorMap: () => ({ message: "Acknowledgment is required." })
   }),
+  raRenewalCardConsent: external_exports.boolean().optional().default(false),
   registeredAgentAcceptanceName: external_exports.string().trim().min(1, "Name required").refine(hasFirstAndLast, FIRST_AND_LAST),
   registeredAgentAcceptanceCapacity: external_exports.enum([
     "INDIVIDUAL_AGENT",
@@ -100750,6 +100782,9 @@ var extendedFormSchema = formationFormSchema.extend({
       message: "Provide an alternate name, or confirm you want the exact name only."
     });
   }
+  if (data.registeredAgentChoice === "SERVICE" && data.raRenewalCardConsent !== true) {
+    ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["raRenewalCardConsent"], message: "Please agree to keep a card on file for the yearly renewal." });
+  }
   if (data.registeredAgentChoice === "SELF" && (!data.registeredAgentFirstName?.trim() || !data.registeredAgentLastName?.trim())) {
     ctx.addIssue({
       code: external_exports.ZodIssueCode.custom,
@@ -100924,6 +100959,8 @@ function buildPayload(data) {
       },
       email: data.registeredAgentEmail ?? "",
       phone: data.registeredAgentPhone ?? "",
+      // The permission to keep the card for the yearly renewal, ours only.
+      renewalCardConsent: data.registeredAgentChoice === "SERVICE" && data.raRenewalCardConsent === true,
       acceptance: {
         accepted: data.registeredAgentAcceptanceCheckbox,
         acceptanceName: data.registeredAgentAcceptanceName,
@@ -101028,6 +101065,7 @@ function buildPayload(data) {
 
 // server/pricing.ts
 var SERVICE_FEE_CENTS = 49900;
+var RA_RENEWAL_FEE_CENTS = 9900;
 var EIN_FEE_CENTS = 5e3;
 var S_ELECTION_FEE_CENTS = 9500;
 var CERT_STATUS_FEE_CENTS = 1500;
@@ -101157,6 +101195,82 @@ async function createCheckout(opts) {
   }
   return { url: body.payment_link.url, squareOrderId: body.payment_link.order_id };
 }
+var squareHeaders = () => ({
+  Authorization: `Bearer ${env.SQUARE_ACCESS_TOKEN}`,
+  "Content-Type": "application/json",
+  "Square-Version": "2025-01-23"
+});
+async function saveCardFromPayment(opts) {
+  if (!env.SQUARE_ACCESS_TOKEN) {
+    const sim = opts.simulate ?? "credit";
+    if (sim === "wallet") return { ok: false, reason: "wallet payment" };
+    return {
+      ok: true,
+      card: { customerId: `dev-cust-${opts.referenceId.slice(0, 8)}`, cardId: `dev-card-${randomBytes2(4).toString("hex")}`, last4: sim === "prepaid" ? "0005" : "1111", brand: sim === "prepaid" ? "MASTERCARD" : "VISA", prepaid: sim === "prepaid" }
+    };
+  }
+  const custRes = await fetch(`${API_BASE}/v2/customers`, {
+    method: "POST",
+    headers: squareHeaders(),
+    body: JSON.stringify({
+      idempotency_key: randomBytes2(16).toString("hex"),
+      given_name: opts.givenName || void 0,
+      family_name: opts.familyName || void 0,
+      email_address: opts.email,
+      reference_id: opts.referenceId
+    })
+  });
+  const custBody = await custRes.json().catch(() => null);
+  if (!custRes.ok || !custBody?.customer) return { ok: false, reason: "customer", detail: JSON.stringify(custBody?.errors ?? custBody) };
+  const cardRes = await fetch(`${API_BASE}/v2/cards`, {
+    method: "POST",
+    headers: squareHeaders(),
+    body: JSON.stringify({
+      idempotency_key: randomBytes2(16).toString("hex"),
+      source_id: opts.paymentId,
+      card: { customer_id: custBody.customer.id, cardholder_name: [opts.givenName, opts.familyName].filter(Boolean).join(" ") || void 0, reference_id: opts.referenceId }
+    })
+  });
+  const cardBody = await cardRes.json().catch(() => null);
+  if (!cardRes.ok || !cardBody?.card) return { ok: false, reason: "not saveable", detail: JSON.stringify(cardBody?.errors ?? cardBody) };
+  return {
+    ok: true,
+    card: { customerId: custBody.customer.id, cardId: cardBody.card.id, last4: cardBody.card.last_4 ?? "", brand: cardBody.card.card_brand ?? "", prepaid: cardBody.card.prepaid_type === "PREPAID" }
+  };
+}
+async function disableCard(cardId) {
+  if (!env.SQUARE_ACCESS_TOKEN) return;
+  const res = await fetch(`${API_BASE}/v2/cards/${encodeURIComponent(cardId)}/disable`, { method: "POST", headers: squareHeaders() });
+  if (!res.ok) throw new Error(`Square disable card failed (${res.status})`);
+}
+async function chargeCardOnFile(opts) {
+  if (!env.SQUARE_ACCESS_TOKEN) {
+    if (testHooks.declineNextRenewal) {
+      const code = testHooks.declineNextRenewal;
+      testHooks.declineNextRenewal = "";
+      return { ok: false, code };
+    }
+    return { ok: true, paymentId: `dev-renewal-${randomBytes2(6).toString("hex")}` };
+  }
+  const res = await fetch(`${API_BASE}/v2/payments`, {
+    method: "POST",
+    headers: squareHeaders(),
+    body: JSON.stringify({
+      idempotency_key: opts.idempotencyKey,
+      source_id: opts.cardId,
+      customer_id: opts.customerId,
+      amount_money: { amount: opts.amountCents, currency: "USD" },
+      location_id: env.SQUARE_LOCATION_ID,
+      autocomplete: true,
+      reference_id: opts.referenceId.slice(0, 40),
+      note: opts.note.slice(0, 500),
+      buyer_email_address: opts.buyerEmail
+    })
+  });
+  const body = await res.json().catch(() => null);
+  if (!res.ok || !body?.payment) return { ok: false, code: body?.errors?.[0]?.code ?? `HTTP_${res.status}`, detail: body?.errors?.[0]?.detail };
+  return { ok: true, paymentId: body.payment.id };
+}
 function verifyWebhookSignature(opts) {
   if (!env.SQUARE_WEBHOOK_SIGNATURE_KEY) return !env.isProd;
   if (!opts.signatureHeader) return false;
@@ -101165,201 +101279,6 @@ function verifyWebhookSignature(opts) {
     opts.notificationUrl + opts.rawBody
   );
   return expected === opts.signatureHeader;
-}
-
-// server/sunbiz.ts
-function mmddyyyyToIso(s) {
-  const t = s.trim();
-  if (!/^\d{8}$/.test(t)) return null;
-  const mm = t.slice(0, 2), dd = t.slice(2, 4), yyyy = t.slice(4);
-  if (mm === "00" || dd === "00" || yyyy === "0000") return null;
-  return `${yyyy}-${mm}-${dd}`;
-}
-function parseCorRecord(line2) {
-  const l = line2.replace(/[\r\n]+$/, "");
-  if (!l.trim()) return null;
-  if (l.length < 500 || l.length > 1440) return null;
-  const r = l.padEnd(1440);
-  const status = r[204];
-  if (status !== "A" && status !== "I") return null;
-  const name = r.slice(12, 204).trim();
-  if (!name) return null;
-  const docNumber = r.slice(0, 12).trim();
-  if (!docNumber) return null;
-  return {
-    docNumber,
-    name,
-    status,
-    filingType: r.slice(205, 220).trim(),
-    fileDate: mmddyyyyToIso(r.slice(472, 480)),
-    lastTxnDate: mmddyyyyToIso(r.slice(495, 503)),
-    normKey: normalizeEntityName(name)
-  };
-}
-function parseCorFile(text) {
-  const entities = [];
-  let skipped = 0;
-  for (const line2 of text.split("\n")) {
-    if (!line2.trim()) continue;
-    const e = parseCorRecord(line2);
-    if (e) entities.push(e);
-    else skipped++;
-  }
-  return { entities, skipped };
-}
-function sqlLit(s) {
-  return s === null ? "NULL" : `'${s.replace(/'/g, "''")}'`;
-}
-async function upsertEntities(entities, batchSize = 5e3) {
-  const db = await getDb();
-  const byDoc = /* @__PURE__ */ new Map();
-  for (const e of entities) byDoc.set(e.docNumber, e);
-  const deduped = Array.from(byDoc.values());
-  let written = 0;
-  for (let i = 0; i < deduped.length; i += batchSize) {
-    const batch = deduped.slice(i, i + batchSize);
-    const values2 = batch.map(
-      (e) => `(${sqlLit(e.docNumber)},${sqlLit(e.name)},${sqlLit(e.status)},${sqlLit(e.filingType)},${sqlLit(e.fileDate)},${sqlLit(e.lastTxnDate)},${sqlLit(e.normKey)})`
-    ).join(",");
-    await db.query(
-      `INSERT INTO fl_entities (doc_number, name, status, filing_type, file_date, last_txn_date, norm_key)
-       VALUES ${values2}
-       ON CONFLICT (doc_number) DO UPDATE SET
-         name = EXCLUDED.name, status = EXCLUDED.status, filing_type = EXCLUDED.filing_type,
-         file_date = EXCLUDED.file_date, last_txn_date = EXCLUDED.last_txn_date, norm_key = EXCLUDED.norm_key`
-    );
-    written += batch.length;
-  }
-  return written;
-}
-async function getSyncState() {
-  const db = await getDb();
-  const rows = await db.query(
-    "SELECT baseline_label, last_daily::text, updated_at::text FROM fl_sync_state WHERE id = 1"
-  );
-  const r = rows[0];
-  return {
-    baselineLabel: r?.baseline_label ?? null,
-    lastDaily: r?.last_daily ?? null,
-    updatedAt: r?.updated_at ?? null
-  };
-}
-async function setSyncState(patch) {
-  const db = await getDb();
-  await db.query(
-    `INSERT INTO fl_sync_state (id, baseline_label, last_daily, updated_at)
-     VALUES (1, $1, $2, now())
-     ON CONFLICT (id) DO UPDATE SET
-       baseline_label = COALESCE($1, fl_sync_state.baseline_label),
-       last_daily = COALESCE($2::date, fl_sync_state.last_daily),
-       updated_at = now()`,
-    [patch.baselineLabel ?? null, patch.lastDaily ?? null]
-  );
-}
-var HOLD_DAYS = 366;
-function conflictReason(input, existing) {
-  const a2 = input.trim().toUpperCase().replace(/\s+/g, " ");
-  const b2 = existing.trim().toUpperCase().replace(/\s+/g, " ");
-  if (a2 === b2) return "Identical name";
-  return `Not distinguishable under Florida's rules \u2014 a different ending (Inc., LLC), "the", "&" vs "and", plurals, or punctuation do not make a name different`;
-}
-function detailUrl(existing) {
-  return "https://search.sunbiz.org/Inquiry/CorporationSearch/SearchResults?InquiryType=EntityName&SearchTerm=" + encodeURIComponent(existing);
-}
-async function lookupEntities(input) {
-  const key = normalizeEntityName(input);
-  if (!key) return [];
-  const db = await getDb();
-  const rows = await db.query(
-    `SELECT doc_number, name, status, filing_type
-     FROM fl_entities WHERE norm_key = $1
-     ORDER BY (status = 'A') DESC, last_txn_date DESC NULLS LAST
-     LIMIT 10`,
-    [key]
-  );
-  return rows.map((r) => ({ docNumber: r.doc_number, name: r.name, status: r.status === "A" ? "Active" : "Inactive", filingType: r.filing_type }));
-}
-async function checkName(input) {
-  const key = normalizeEntityName(input);
-  if (!key) return { input, verdict: "clear", conflicts: [] };
-  const db = await getDb();
-  const rows = await db.query(
-    `SELECT doc_number, name, status, last_txn_date::text, file_date::text
-     FROM fl_entities WHERE norm_key = $1
-     ORDER BY (status = 'A') DESC, last_txn_date DESC NULLS LAST
-     LIMIT 25`,
-    [key]
-  );
-  const now = Date.now();
-  const conflicts = [];
-  let verdict = "clear";
-  for (const r of rows) {
-    const active = r.status === "A";
-    const refDate = r.last_txn_date ?? r.file_date;
-    const withinHold = !active && refDate !== null && now - new Date(refDate).getTime() < HOLD_DAYS * 864e5;
-    if (active || withinHold) {
-      conflicts.push({
-        name: r.name,
-        docNumber: r.doc_number,
-        status: active ? "Active" : "Inactive",
-        reason: active ? conflictReason(input, r.name) : `${conflictReason(input, r.name)}; recently dissolved \u2014 the name may still be protected (s. 605.0715, Fla. Stat.)`,
-        detailUrl: detailUrl(r.name)
-      });
-      if (active) verdict = "taken";
-      else if (verdict === "clear") verdict = "held";
-    }
-  }
-  return { input, verdict, conflicts };
-}
-var SFTP_HOST = "sftp.floridados.gov";
-var SFTP_USER = "Public";
-var SFTP_PASSWORD = "PubAccess1845!";
-var DAILY_DIR = "/Public/doc/cor";
-async function syncDailies(maxFiles = 15) {
-  if (env.OFFLINE) {
-    return { filesIngested: [], written: 0, skipped: 0, lastDaily: null, skippedOffline: true };
-  }
-  const state = await getSyncState();
-  if (!state.baselineLabel) {
-    return { filesIngested: [], written: 0, skipped: 0, lastDaily: state.lastDaily };
-  }
-  const lastCompact = (state.lastDaily ?? "1970-01-01").replace(/-/g, "");
-  const { default: SftpClient } = await import("ssh2-sftp-client");
-  const sftp = new SftpClient();
-  await sftp.connect({ host: SFTP_HOST, username: SFTP_USER, password: SFTP_PASSWORD });
-  try {
-    const listing = await sftp.list(DAILY_DIR);
-    const targets = listing.map((f) => f.name).filter((n) => /^\d{8}c\.txt$/.test(n) && n.slice(0, 8) > lastCompact).sort().slice(0, maxFiles);
-    const report = { filesIngested: [], written: 0, skipped: 0, lastDaily: state.lastDaily };
-    for (const name of targets) {
-      const buf = await sftp.get(`${DAILY_DIR}/${name}`);
-      const { entities, skipped } = parseCorFile(buf.toString("latin1"));
-      report.written += await upsertEntities(entities);
-      report.skipped += skipped;
-      const iso = `${name.slice(0, 4)}-${name.slice(4, 6)}-${name.slice(6, 8)}`;
-      await setSyncState({ lastDaily: iso });
-      report.filesIngested.push(name);
-      report.lastDaily = iso;
-    }
-    return report;
-  } finally {
-    await sftp.end();
-  }
-}
-async function unavailableNames(names) {
-  try {
-    const state = await getSyncState();
-    if (!state.baselineLabel || !state.lastDaily) return null;
-    if (Date.now() - new Date(state.lastDaily).getTime() > 10 * 864e5) return null;
-    const out = [];
-    for (const name of names) {
-      const v2 = await checkName(name);
-      if (v2.verdict !== "clear") out.push({ name, verdict: v2.verdict });
-    }
-    return out;
-  } catch {
-    return null;
-  }
 }
 
 // server/email.ts
@@ -101430,6 +101349,69 @@ function welcomeEmail(name, setPasswordUrl, isConversion = false, raService = tr
       <p><a href="${setPasswordUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Set your password</a></p>
       <p style="color:#555;font-size:13px">This link expires in 7 days. If it expires, use
       "Forgot password" on the portal sign-in page with this email address.</p>
+    `)
+  };
+}
+function giftCardNotKeptEmail(name, llcName, renewalDate) {
+  return {
+    subject: "About the card you paid with",
+    html: wrap(`
+      <p>Hi ${escapeHtml(name || "there")},</p>
+      <p>You paid with a prepaid gift card, which cannot be kept on file for the yearly
+      registered agent renewal for <strong>${escapeHtml(llcName)}</strong>. Nothing else
+      about your order is affected.</p>
+      <p>Before your renewal date${renewalDate ? ` (${escapeHtml(renewalDate)})` : ""} you will receive an email with a
+      payment link. Pay it with a credit or debit card and that card will be kept for
+      the following years, so the renewal is automatic from then on.</p>
+      <p>Questions? Just reply to this email.</p>
+    `)
+  };
+}
+function raRenewalNoticeEmail(opts) {
+  const how = opts.last4 ? `<p>The renewal fee is <strong>${escapeHtml(opts.amount)}</strong> and will be charged to your card ending
+      <strong>${escapeHtml(opts.last4)}</strong> on <strong>${escapeHtml(opts.chargeDate)}</strong>. There is nothing you need to do.</p>` : `<p>The renewal fee is <strong>${escapeHtml(opts.amount)}</strong>. ${opts.giftCard ? "No card is on file (a prepaid gift card cannot be kept)" : "No card is on file"},
+      so please pay it by <strong>${escapeHtml(opts.renewalDate)}</strong> using the button below. Paying with a credit or debit
+      card keeps that card for the following years, so the renewal is automatic from then on.</p>
+      <p><a href="${opts.linkUrl ?? "#"}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Pay the renewal</a></p>`;
+  return {
+    subject: `Your registered agent service renews on ${opts.renewalDate}`,
+    html: wrap(`
+      <p>Hi ${escapeHtml(opts.name || "there")},</p>
+      <p>Your registered agent service for <strong>${escapeHtml(opts.llcName)}</strong> renews on
+      <strong>${escapeHtml(opts.renewalDate)}</strong>.</p>
+      ${how}
+      <p><strong>To cancel</strong>, give notice by <strong>${escapeHtml(opts.cancelBy)}</strong> \u2014 in your client portal
+      (the Registered agent service card) or by email to support@myfloridaseriesllc.com. Florida law requires your LLC
+      to have a registered agent at all times, so you must also designate a successor agent with the Division of
+      Corporations and send us proof; the Terms of Service explain both steps.</p>
+      <p>Questions? Just reply to this email.</p>
+    `)
+  };
+}
+function raRenewalReceiptEmail(opts) {
+  return {
+    subject: `Registered agent service renewed \u2014 ${opts.llcName}`,
+    html: wrap(`
+      <p>Hi ${escapeHtml(opts.name || "there")},</p>
+      <p>${opts.last4 ? `We charged <strong>${escapeHtml(opts.amount)}</strong> to your card ending <strong>${escapeHtml(opts.last4)}</strong>` : `We received <strong>${escapeHtml(opts.amount)}</strong>`}
+      for registered agent service for <strong>${escapeHtml(opts.llcName)}</strong> through
+      <strong>${escapeHtml(opts.throughDate)}</strong>.</p>
+      <p>Your renewal date is shown on the Registered agent service card in your client portal.</p>
+    `)
+  };
+}
+function raRenewalDeclinedEmail(opts) {
+  return {
+    subject: `Action needed: your registered agent renewal charge was declined`,
+    html: wrap(`
+      <p>Hi ${escapeHtml(opts.name || "there")},</p>
+      <p>The renewal charge to your card ending <strong>${escapeHtml(opts.last4)}</strong> for registered agent
+      service for <strong>${escapeHtml(opts.llcName)}</strong> was declined.${opts.willRetry && opts.retryDate ? ` We will try the card once more on ${escapeHtml(opts.retryDate)}.` : ""}</p>
+      <p>Pay by <strong>${escapeHtml(opts.renewalDate)}</strong> using the button below, or your service becomes
+      delinquent under the Terms of Service. Paying with a different credit or debit card keeps that card for the
+      following years.</p>
+      <p><a href="${opts.linkUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Pay the renewal</a></p>
+      <p>If the reason for the decline is not clear to you, your card issuer can tell you.</p>
     `)
   };
 }
@@ -101695,6 +101677,407 @@ function sElectionEinArrivedLateEmail(opts) {
   };
 }
 
+// server/renewals.ts
+var raRenewalFeeWords = () => `$${(RA_RENEWAL_FEE_CENTS / 100).toFixed(RA_RENEWAL_FEE_CENTS % 100 === 0 ? 0 : 2)}`;
+var toIso = (d2) => d2.toISOString().slice(0, 10);
+var parse2 = (iso) => /* @__PURE__ */ new Date(`${iso}T12:00:00Z`);
+var addDays = (iso, n) => {
+  const d2 = parse2(iso);
+  d2.setUTCDate(d2.getUTCDate() + n);
+  return toIso(d2);
+};
+var addYears = (iso, n) => {
+  const d2 = parse2(iso);
+  d2.setUTCFullYear(d2.getUTCFullYear() + n);
+  return toIso(d2);
+};
+var longDate = (iso) => parse2(iso).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric", timeZone: "UTC" });
+var isoOf = (v2) => {
+  if (!v2) return null;
+  if (v2 instanceof Date) return toIso(v2);
+  const s = String(v2);
+  return /^\d{4}-\d{2}-\d{2}/.test(s) ? s.slice(0, 10) : toIso(new Date(s));
+};
+var tookService = (payload) => (typeof payload === "string" ? JSON.parse(payload) : payload)?.registeredAgent?.choice === "SERVICE";
+var gaveConsent = (payload) => (typeof payload === "string" ? JSON.parse(payload) : payload)?.registeredAgent?.renewalCardConsent === true;
+async function saveRenewalCard(db, order2, paymentId, simulate) {
+  if (!tookService(order2.payload) || !gaveConsent(order2.payload)) return;
+  if (!paymentId) {
+    await db.query("UPDATE orders SET card_status = 'none', card_note = 'no payment id' WHERE id = $1", [order2.id]);
+    return;
+  }
+  const [givenName, ...rest] = (order2.contact_name ?? "").trim().split(/\s+/);
+  const saved = await saveCardFromPayment({
+    paymentId,
+    givenName: givenName ?? "",
+    familyName: rest.join(" "),
+    email: order2.contact_email,
+    referenceId: order2.id,
+    simulate
+  });
+  if (!saved.ok) {
+    await db.query("UPDATE orders SET card_status = 'none', card_note = $2 WHERE id = $1", [order2.id, saved.reason]);
+    return;
+  }
+  if (saved.card.prepaid) {
+    await disableCard(saved.card.cardId).catch((e) => console.error("[renewals] disable prepaid card failed:", e));
+    await db.query(
+      "UPDATE orders SET square_customer_id = $2, card_status = 'gift_card', card_note = 'prepaid gift card', card_last4 = NULL, card_brand = NULL, square_card_id = NULL WHERE id = $1",
+      [order2.id, saved.card.customerId]
+    );
+    const renewal = await db.query("SELECT ra_renewal_date, formed_at FROM orders WHERE id = $1", [order2.id]);
+    const mail = giftCardNotKeptEmail(order2.contact_name, order2.llc_name, isoOf(renewal[0]?.ra_renewal_date) ? longDate(isoOf(renewal[0].ra_renewal_date)) : null);
+    sendMail({ to: order2.contact_email, ...mail }).catch((e) => console.error("[renewals] gift-card email failed:", e));
+    return;
+  }
+  await db.query(
+    "UPDATE orders SET square_customer_id = $2, square_card_id = $3, card_last4 = $4, card_brand = $5, card_status = 'on_file', card_note = NULL WHERE id = $1",
+    [order2.id, saved.card.customerId, saved.card.cardId, saved.card.last4, saved.card.brand]
+  );
+}
+var NOTICE_DAYS = 45;
+var CHARGE_DAYS = 15;
+var CANCEL_DAYS = 30;
+async function paymentLinkFor(db, row, o) {
+  if (row.link_url) return row.link_url;
+  const link = await createCheckout({
+    orderId: row.id,
+    llcName: o.llc_name,
+    priced: {
+      serviceFeeCents: row.amount_cents,
+      stateFeesCents: 0,
+      totalCents: row.amount_cents,
+      lineItems: [{ name: `Registered agent service renewal \u2014 ${o.llc_name}`, amountCents: row.amount_cents }]
+    },
+    buyerEmail: o.contact_email,
+    redirectUrl: `${env.PUBLIC_BASE_URL}/portal?renewed=${row.id}`,
+    description: `Registered agent service renewal \u2014 ${o.llc_name}`
+  });
+  await db.query("UPDATE ra_renewals SET square_order_id = $2, link_url = $3, updated_at = now() WHERE id = $1", [row.id, link.squareOrderId, link.url]);
+  return link.url;
+}
+async function runRenewals(today) {
+  const db = await getDb();
+  const out = { notices: 0, charged: 0, declined: 0, cancelled: 0, retried: 0 };
+  const orders = await db.query(
+    `SELECT id, contact_name, contact_email, llc_name, ra_renewal_date, ra_cancellation_requested_at,
+            square_customer_id, square_card_id, card_last4, card_brand, card_status
+       FROM orders
+      WHERE status = 'formed' AND ra_renewal_date IS NOT NULL
+        AND payload->'registeredAgent'->>'choice' = 'SERVICE'`
+  );
+  for (const o of orders) {
+    const renewalDate = isoOf(o.ra_renewal_date);
+    if (!renewalDate) continue;
+    const cancelledInTime = (() => {
+      const c = isoOf(o.ra_cancellation_requested_at);
+      return !!c && c <= addDays(renewalDate, -CANCEL_DAYS);
+    })();
+    const rows = await db.query(
+      "SELECT id, order_id, renewal_date, amount_cents, status, charge_due, square_order_id, link_url, retry_after, retries FROM ra_renewals WHERE order_id = $1 AND renewal_date = $2",
+      [o.id, renewalDate]
+    );
+    let row = rows[0];
+    const hasCard = o.card_status === "on_file" && !!o.square_card_id && !!o.square_customer_id;
+    if (!row && today >= addDays(renewalDate, -NOTICE_DAYS)) {
+      if (cancelledInTime) continue;
+      const made = await db.query(
+        `INSERT INTO ra_renewals (order_id, renewal_date, amount_cents, status, charge_due, notice_sent_at)
+         VALUES ($1, $2, $3, $4, $5, now())
+         RETURNING id, order_id, renewal_date, amount_cents, status, charge_due, square_order_id, link_url, retry_after, retries`,
+        [o.id, renewalDate, RA_RENEWAL_FEE_CENTS, hasCard ? "notice_sent" : "link_sent", addDays(renewalDate, -CHARGE_DAYS)]
+      );
+      row = made[0];
+      const linkUrl = hasCard ? null : await paymentLinkFor(db, row, o);
+      const mail = raRenewalNoticeEmail({
+        name: o.contact_name,
+        llcName: o.llc_name,
+        renewalDate: longDate(renewalDate),
+        amount: raRenewalFeeWords(),
+        last4: hasCard ? o.card_last4 : null,
+        chargeDate: longDate(addDays(renewalDate, -CHARGE_DAYS)),
+        cancelBy: longDate(addDays(renewalDate, -CANCEL_DAYS)),
+        linkUrl,
+        giftCard: o.card_status === "gift_card"
+      });
+      sendMail({ to: o.contact_email, ...mail }).catch((e) => console.error("[renewals] notice failed:", e));
+      out.notices += 1;
+      continue;
+    }
+    if (!row) continue;
+    if (cancelledInTime && ["notice_sent", "link_sent", "declined"].includes(row.status)) {
+      await db.query("UPDATE ra_renewals SET status = 'cancelled', updated_at = now() WHERE id = $1", [row.id]);
+      out.cancelled += 1;
+      continue;
+    }
+    const chargeDue = isoOf(row.charge_due) ?? addDays(renewalDate, -CHARGE_DAYS);
+    const retryDue = row.status === "declined" && isoOf(row.retry_after) && row.retries < 1 && today >= isoOf(row.retry_after);
+    const firstDue = row.status === "notice_sent" && today >= chargeDue;
+    if ((firstDue || retryDue) && hasCard) {
+      const attempt = row.retries + 1;
+      const charged = await chargeCardOnFile({
+        cardId: o.square_card_id,
+        customerId: o.square_customer_id,
+        amountCents: row.amount_cents,
+        idempotencyKey: `ren-${row.id}-${attempt}`,
+        referenceId: o.id,
+        note: `Registered agent service renewal \u2014 ${o.llc_name}`,
+        buyerEmail: o.contact_email
+      });
+      if (retryDue) out.retried += 1;
+      if (charged.ok) {
+        const through = addYears(renewalDate, 1);
+        await db.query("UPDATE ra_renewals SET status = 'charged', charged_at = now(), square_payment_id = $2, retries = $3, updated_at = now() WHERE id = $1", [row.id, charged.paymentId, attempt]);
+        await db.query("UPDATE orders SET ra_renewal_date = $2 WHERE id = $1", [o.id, through]);
+        const mail = raRenewalReceiptEmail({ name: o.contact_name, llcName: o.llc_name, amount: raRenewalFeeWords(), last4: o.card_last4 ?? "", throughDate: longDate(through) });
+        sendMail({ to: o.contact_email, ...mail }).catch((e) => console.error("[renewals] receipt failed:", e));
+        out.charged += 1;
+      } else {
+        const retryAfter = charged.code === "INSUFFICIENT_FUNDS" && attempt < 2 ? addDays(today, 2) : null;
+        await db.query(
+          "UPDATE ra_renewals SET status = 'declined', decline_code = $2, retry_after = $3, retries = $4, updated_at = now() WHERE id = $1",
+          [row.id, charged.code, retryAfter, retryDue ? attempt : row.retries]
+        );
+        const linkUrl = await paymentLinkFor(db, { ...row, retries: attempt }, o);
+        const mail = raRenewalDeclinedEmail({ name: o.contact_name, llcName: o.llc_name, last4: o.card_last4 ?? "", renewalDate: longDate(renewalDate), linkUrl, willRetry: !!retryAfter, retryDate: retryAfter ? longDate(retryAfter) : null });
+        sendMail({ to: o.contact_email, ...mail }).catch((e) => console.error("[renewals] decline email failed:", e));
+        out.declined += 1;
+      }
+    }
+  }
+  return out;
+}
+async function fulfillPaidRenewal(renewalId, paymentId, simulate) {
+  const db = await getDb();
+  const rows = await db.query(
+    `UPDATE ra_renewals r SET status = 'paid_by_link', charged_at = now(), square_payment_id = $2, updated_at = now()
+       FROM orders o
+      WHERE r.id = $1 AND o.id = r.order_id AND r.status IN ('link_sent', 'declined', 'notice_sent')
+      RETURNING r.id, r.order_id, r.renewal_date, r.amount_cents, r.status, r.charge_due, r.square_order_id, r.link_url, r.retry_after, r.retries,
+                o.contact_name, o.contact_email, o.llc_name, o.payload`,
+    [renewalId, paymentId]
+  );
+  if (rows.length === 0) return;
+  const r = rows[0];
+  const renewalDate = isoOf(r.renewal_date);
+  const through = addYears(renewalDate, 1);
+  await db.query("UPDATE orders SET ra_renewal_date = $2 WHERE id = $1", [r.order_id, through]);
+  let last4 = "";
+  if (paymentId) {
+    const [givenName, ...rest] = (r.contact_name ?? "").trim().split(/\s+/);
+    const saved = await saveCardFromPayment({ paymentId, givenName: givenName ?? "", familyName: rest.join(" "), email: r.contact_email, referenceId: r.order_id, simulate });
+    if (saved.ok && !saved.card.prepaid) {
+      await db.query(
+        "UPDATE orders SET square_customer_id = $2, square_card_id = $3, card_last4 = $4, card_brand = $5, card_status = 'on_file', card_note = NULL WHERE id = $1",
+        [r.order_id, saved.card.customerId, saved.card.cardId, saved.card.last4, saved.card.brand]
+      );
+      last4 = saved.card.last4;
+    } else if (saved.ok && saved.card.prepaid) {
+      await disableCard(saved.card.cardId).catch(() => {
+      });
+      await db.query("UPDATE orders SET card_status = 'gift_card', card_note = 'prepaid gift card', square_card_id = NULL, card_last4 = NULL, card_brand = NULL WHERE id = $1", [r.order_id]);
+      last4 = saved.card.last4;
+    }
+  }
+  const mail = raRenewalReceiptEmail({ name: r.contact_name, llcName: r.llc_name, amount: raRenewalFeeWords(), last4, throughDate: longDate(through) });
+  sendMail({ to: r.contact_email, ...mail }).catch((e) => console.error("[renewals] link receipt failed:", e));
+}
+
+// server/sunbiz.ts
+function mmddyyyyToIso(s) {
+  const t = s.trim();
+  if (!/^\d{8}$/.test(t)) return null;
+  const mm = t.slice(0, 2), dd = t.slice(2, 4), yyyy = t.slice(4);
+  if (mm === "00" || dd === "00" || yyyy === "0000") return null;
+  return `${yyyy}-${mm}-${dd}`;
+}
+function parseCorRecord(line2) {
+  const l = line2.replace(/[\r\n]+$/, "");
+  if (!l.trim()) return null;
+  if (l.length < 500 || l.length > 1440) return null;
+  const r = l.padEnd(1440);
+  const status = r[204];
+  if (status !== "A" && status !== "I") return null;
+  const name = r.slice(12, 204).trim();
+  if (!name) return null;
+  const docNumber = r.slice(0, 12).trim();
+  if (!docNumber) return null;
+  return {
+    docNumber,
+    name,
+    status,
+    filingType: r.slice(205, 220).trim(),
+    fileDate: mmddyyyyToIso(r.slice(472, 480)),
+    lastTxnDate: mmddyyyyToIso(r.slice(495, 503)),
+    normKey: normalizeEntityName(name)
+  };
+}
+function parseCorFile(text) {
+  const entities = [];
+  let skipped = 0;
+  for (const line2 of text.split("\n")) {
+    if (!line2.trim()) continue;
+    const e = parseCorRecord(line2);
+    if (e) entities.push(e);
+    else skipped++;
+  }
+  return { entities, skipped };
+}
+function sqlLit(s) {
+  return s === null ? "NULL" : `'${s.replace(/'/g, "''")}'`;
+}
+async function upsertEntities(entities, batchSize = 5e3) {
+  const db = await getDb();
+  const byDoc = /* @__PURE__ */ new Map();
+  for (const e of entities) byDoc.set(e.docNumber, e);
+  const deduped = Array.from(byDoc.values());
+  let written = 0;
+  for (let i = 0; i < deduped.length; i += batchSize) {
+    const batch = deduped.slice(i, i + batchSize);
+    const values2 = batch.map(
+      (e) => `(${sqlLit(e.docNumber)},${sqlLit(e.name)},${sqlLit(e.status)},${sqlLit(e.filingType)},${sqlLit(e.fileDate)},${sqlLit(e.lastTxnDate)},${sqlLit(e.normKey)})`
+    ).join(",");
+    await db.query(
+      `INSERT INTO fl_entities (doc_number, name, status, filing_type, file_date, last_txn_date, norm_key)
+       VALUES ${values2}
+       ON CONFLICT (doc_number) DO UPDATE SET
+         name = EXCLUDED.name, status = EXCLUDED.status, filing_type = EXCLUDED.filing_type,
+         file_date = EXCLUDED.file_date, last_txn_date = EXCLUDED.last_txn_date, norm_key = EXCLUDED.norm_key`
+    );
+    written += batch.length;
+  }
+  return written;
+}
+async function getSyncState() {
+  const db = await getDb();
+  const rows = await db.query(
+    "SELECT baseline_label, last_daily::text, updated_at::text FROM fl_sync_state WHERE id = 1"
+  );
+  const r = rows[0];
+  return {
+    baselineLabel: r?.baseline_label ?? null,
+    lastDaily: r?.last_daily ?? null,
+    updatedAt: r?.updated_at ?? null
+  };
+}
+async function setSyncState(patch) {
+  const db = await getDb();
+  await db.query(
+    `INSERT INTO fl_sync_state (id, baseline_label, last_daily, updated_at)
+     VALUES (1, $1, $2, now())
+     ON CONFLICT (id) DO UPDATE SET
+       baseline_label = COALESCE($1, fl_sync_state.baseline_label),
+       last_daily = COALESCE($2::date, fl_sync_state.last_daily),
+       updated_at = now()`,
+    [patch.baselineLabel ?? null, patch.lastDaily ?? null]
+  );
+}
+var HOLD_DAYS = 366;
+function conflictReason(input, existing) {
+  const a2 = input.trim().toUpperCase().replace(/\s+/g, " ");
+  const b2 = existing.trim().toUpperCase().replace(/\s+/g, " ");
+  if (a2 === b2) return "Identical name";
+  return `Not distinguishable under Florida's rules \u2014 a different ending (Inc., LLC), "the", "&" vs "and", plurals, or punctuation do not make a name different`;
+}
+function detailUrl(existing) {
+  return "https://search.sunbiz.org/Inquiry/CorporationSearch/SearchResults?InquiryType=EntityName&SearchTerm=" + encodeURIComponent(existing);
+}
+async function lookupEntities(input) {
+  const key = normalizeEntityName(input);
+  if (!key) return [];
+  const db = await getDb();
+  const rows = await db.query(
+    `SELECT doc_number, name, status, filing_type
+     FROM fl_entities WHERE norm_key = $1
+     ORDER BY (status = 'A') DESC, last_txn_date DESC NULLS LAST
+     LIMIT 10`,
+    [key]
+  );
+  return rows.map((r) => ({ docNumber: r.doc_number, name: r.name, status: r.status === "A" ? "Active" : "Inactive", filingType: r.filing_type }));
+}
+async function checkName(input) {
+  const key = normalizeEntityName(input);
+  if (!key) return { input, verdict: "clear", conflicts: [] };
+  const db = await getDb();
+  const rows = await db.query(
+    `SELECT doc_number, name, status, last_txn_date::text, file_date::text
+     FROM fl_entities WHERE norm_key = $1
+     ORDER BY (status = 'A') DESC, last_txn_date DESC NULLS LAST
+     LIMIT 25`,
+    [key]
+  );
+  const now = Date.now();
+  const conflicts = [];
+  let verdict = "clear";
+  for (const r of rows) {
+    const active = r.status === "A";
+    const refDate = r.last_txn_date ?? r.file_date;
+    const withinHold = !active && refDate !== null && now - new Date(refDate).getTime() < HOLD_DAYS * 864e5;
+    if (active || withinHold) {
+      conflicts.push({
+        name: r.name,
+        docNumber: r.doc_number,
+        status: active ? "Active" : "Inactive",
+        reason: active ? conflictReason(input, r.name) : `${conflictReason(input, r.name)}; recently dissolved \u2014 the name may still be protected (s. 605.0715, Fla. Stat.)`,
+        detailUrl: detailUrl(r.name)
+      });
+      if (active) verdict = "taken";
+      else if (verdict === "clear") verdict = "held";
+    }
+  }
+  return { input, verdict, conflicts };
+}
+var SFTP_HOST = "sftp.floridados.gov";
+var SFTP_USER = "Public";
+var SFTP_PASSWORD = "PubAccess1845!";
+var DAILY_DIR = "/Public/doc/cor";
+async function syncDailies(maxFiles = 15) {
+  if (env.OFFLINE) {
+    return { filesIngested: [], written: 0, skipped: 0, lastDaily: null, skippedOffline: true };
+  }
+  const state = await getSyncState();
+  if (!state.baselineLabel) {
+    return { filesIngested: [], written: 0, skipped: 0, lastDaily: state.lastDaily };
+  }
+  const lastCompact = (state.lastDaily ?? "1970-01-01").replace(/-/g, "");
+  const { default: SftpClient } = await import("ssh2-sftp-client");
+  const sftp = new SftpClient();
+  await sftp.connect({ host: SFTP_HOST, username: SFTP_USER, password: SFTP_PASSWORD });
+  try {
+    const listing = await sftp.list(DAILY_DIR);
+    const targets = listing.map((f) => f.name).filter((n) => /^\d{8}c\.txt$/.test(n) && n.slice(0, 8) > lastCompact).sort().slice(0, maxFiles);
+    const report = { filesIngested: [], written: 0, skipped: 0, lastDaily: state.lastDaily };
+    for (const name of targets) {
+      const buf = await sftp.get(`${DAILY_DIR}/${name}`);
+      const { entities, skipped } = parseCorFile(buf.toString("latin1"));
+      report.written += await upsertEntities(entities);
+      report.skipped += skipped;
+      const iso = `${name.slice(0, 4)}-${name.slice(4, 6)}-${name.slice(6, 8)}`;
+      await setSyncState({ lastDaily: iso });
+      report.filesIngested.push(name);
+      report.lastDaily = iso;
+    }
+    return report;
+  } finally {
+    await sftp.end();
+  }
+}
+async function unavailableNames(names) {
+  try {
+    const state = await getSyncState();
+    if (!state.baselineLabel || !state.lastDaily) return null;
+    if (Date.now() - new Date(state.lastDaily).getTime() > 10 * 864e5) return null;
+    const out = [];
+    for (const name of names) {
+      const v2 = await checkName(name);
+      if (v2.verdict !== "clear") out.push({ name, verdict: v2.verdict });
+    }
+    return out;
+  } catch {
+    return null;
+  }
+}
+
 // server/oa-capital.ts
 var money = (n) => `$${n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
 var joinNames = (names) => names.length <= 1 ? names.join("") : names.length === 2 ? `${names[0]} and ${names[1]}` : `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]}`;
@@ -101807,7 +102190,7 @@ function toDisplay(iso) {
   const [y, m2, d2] = iso.split("-");
   return `${m2}/${d2}/${y}`;
 }
-function addDays(dt, n) {
+function addDays2(dt, n) {
   return new Date(dt.getTime() + n * 864e5);
 }
 function daysBetween(a2, b2) {
@@ -101821,12 +102204,12 @@ function form2553Deadline(effectiveDateISO) {
   const y = eff.getUTCFullYear(), m2 = eff.getUTCMonth(), d2 = eff.getUTCDate();
   const corresponding = new Date(Date.UTC(y, m2 + 2, d2));
   const noCorrespondingDay = corresponding.getUTCMonth() !== (m2 + 2) % 12;
-  const endOfTwoMonths = noCorrespondingDay ? lastDayOfMonth(y, m2 + 2) : addDays(corresponding, -1);
-  return toISO(addDays(endOfTwoMonths, 15));
+  const endOfTwoMonths = noCorrespondingDay ? lastDayOfMonth(y, m2 + 2) : addDays2(corresponding, -1);
+  return toISO(addDays2(endOfTwoMonths, 15));
 }
 function businessDaysBetween(a2, b2) {
   let count = 0;
-  for (let cur = addDays(a2, 1); cur.getTime() <= b2.getTime(); cur = addDays(cur, 1)) {
+  for (let cur = addDays2(a2, 1); cur.getTime() <= b2.getTime(); cur = addDays2(cur, 1)) {
     const dow = cur.getUTCDay();
     if (dow !== 0 && dow !== 6) count++;
   }
@@ -107687,7 +108070,11 @@ function registerPortalRoutes(app2) {
     const rows = await db.query(
       `SELECT id, llc_name, formed_at, payload->>'filingPath' AS filing_path,
             (payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_service,
-            ra_renewal_date, ra_cancellation_requested_at
+            ra_renewal_date, ra_cancellation_requested_at,
+            card_status, card_last4, card_brand,
+            -- The renewals, newest first (16 Sep 2026).
+            (SELECT COALESCE(jsonb_agg(jsonb_build_object('id', r.id, 'date', r.renewal_date, 'amountCents', r.amount_cents, 'status', r.status, 'chargedAt', r.charged_at) ORDER BY r.renewal_date DESC), '[]'::jsonb)
+               FROM ra_renewals r WHERE r.order_id = orders.id) AS renewals
        FROM orders WHERE client_id = $1 AND paid_at IS NOT NULL
       ORDER BY paid_at DESC NULLS LAST`,
       [session.clientId]
@@ -107698,7 +108085,11 @@ function registerPortalRoutes(app2) {
       formed: !!r.formed_at,
       raService: r.ra_service === true,
       raRenewalDate: r.ra_renewal_date ? isoDate(r.ra_renewal_date) : null,
-      raCancellationRequestedAt: r.ra_cancellation_requested_at ?? null
+      raCancellationRequestedAt: r.ra_cancellation_requested_at ?? null,
+      cardStatus: r.card_status ?? null,
+      cardLast4: r.card_last4 ?? null,
+      cardBrand: r.card_brand ?? null,
+      renewals: ((typeof r.renewals === "string" ? JSON.parse(r.renewals) : r.renewals) ?? []).map((x2) => ({ ...x2, date: x2.date ? isoDate(x2.date) : null }))
     })) });
   });
   app2.get("/portal/documents", async (c) => {
@@ -108953,8 +109344,8 @@ function registerPortalRoutes(app2) {
     ) : [];
     const order2 = orderRows[0];
     if (!order2) return c.json(err("No company found on your account.", "NO_LLC"), 400);
-    const tookService = (typeof order2.payload === "string" ? JSON.parse(order2.payload) : order2.payload)?.registeredAgent?.choice === "SERVICE";
-    if (!tookService) {
+    const tookService2 = (typeof order2.payload === "string" ? JSON.parse(order2.payload) : order2.payload)?.registeredAgent?.choice === "SERVICE";
+    if (!tookService2) {
       return c.json(err(`${order2.llc_name} is its own registered agent; there is nothing to cancel.`, "NOT_OUR_SERVICE"), 400);
     }
     if (order2.ra_cancellation_requested_at) {
@@ -109195,7 +109586,7 @@ async function writeOrderSummary(orderId) {
 
 // server/routes-payments.ts
 var orderingEnabled = () => env.isProd ? Boolean(env.DATABASE_URL && env.SQUARE_ACCESS_TOKEN) : true;
-async function fulfillPaidOrder(orderId, squarePaymentId) {
+async function fulfillPaidOrder(orderId, squarePaymentId, cardSim) {
   if (testHooks.failNextFulfillment) {
     testHooks.failNextFulfillment = false;
     throw new Error("injected fulfillment failure (dev test scaffolding)");
@@ -109209,6 +109600,7 @@ async function fulfillPaidOrder(orderId, squarePaymentId) {
   );
   if (claimed.length === 0) return;
   const order2 = claimed[0];
+  await saveRenewalCard(db, order2, squarePaymentId, cardSim).catch((e) => console.error("[renewals] card not saved:", e));
   const existing = await db.query(
     "SELECT id, password_hash FROM clients WHERE email = $1",
     [order2.contact_email]
@@ -109513,6 +109905,16 @@ function registerPaymentRoutes(app2) {
           const mismatch = moneyMismatch(payment.amount_money, svc[0].amount_cents);
           if (mismatch) await alertMoneyMismatch(mismatch, payment.order_id, payment.id);
           else await fulfillPaidServiceOrder(svc[0].id, payment.id);
+        } else {
+          const ren = await db.query(
+            "SELECT id, amount_cents FROM ra_renewals WHERE square_order_id = $1",
+            [payment.order_id]
+          );
+          if (ren.length > 0) {
+            const mismatch = moneyMismatch(payment.amount_money, ren[0].amount_cents);
+            if (mismatch) await alertMoneyMismatch(mismatch, payment.order_id, payment.id);
+            else await fulfillPaidRenewal(ren[0].id, payment.id);
+          }
         }
       }
     }
@@ -111241,6 +111643,15 @@ function registerAdminRoutes(app2) {
                FROM orders o
               WHERE o.client_id = cl.id AND o.status <> 'pending_payment'
                 AND o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_llcs,
+            -- The card kept for each agent company and its latest renewal (16 Sep 2026).
+            (SELECT COALESCE(jsonb_agg(jsonb_build_object(
+                'llc_name', o.llc_name, 'card_status', o.card_status, 'card_last4', o.card_last4, 'card_brand', o.card_brand, 'card_note', o.card_note,
+                'last_status', (SELECT r.status FROM ra_renewals r WHERE r.order_id = o.id ORDER BY r.renewal_date DESC LIMIT 1),
+                'last_date', (SELECT to_char(r.renewal_date, 'FMMon FMDD, YYYY') FROM ra_renewals r WHERE r.order_id = o.id ORDER BY r.renewal_date DESC LIMIT 1)
+              ) ORDER BY o.llc_name), '[]'::jsonb)
+               FROM orders o
+              WHERE o.client_id = cl.id AND o.status <> 'pending_payment'
+                AND o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_cards,
             (SELECT COALESCE(jsonb_agg(jsonb_build_object('id', o.id, 'llc_name', o.llc_name, 'contact_name', o.contact_name, 'has_summary', o.summary_storage_key IS NOT NULL) ORDER BY o.paid_at DESC), '[]'::jsonb)
                FROM orders o
               WHERE o.client_id = cl.id AND o.paid_at IS NOT NULL) AS companies
@@ -111782,19 +112193,26 @@ function registerOpsRoutes(app2) {
       testHooks.failNextFulfillment = true;
       return c.json({ data: { armed: true } });
     });
+    app2.post("/dev/renewal-decline", async (c) => {
+      const { code } = await c.req.json().catch(() => ({}));
+      testHooks.declineNextRenewal = code || "GENERIC_DECLINE";
+      return c.json({ data: { armed: testHooks.declineNextRenewal } });
+    });
   }
   if (!env.isProd) {
     app2.get("/dev/outbox", (c) => c.json({ data: devOutbox.map((m2) => ({ to: m2.to, subject: m2.subject, html: m2.html })) }));
   }
   if (!env.SQUARE_ACCESS_TOKEN && !env.isProd) {
     app2.post("/dev/simulate-payment", async (c) => {
-      const { orderId } = await c.req.json();
+      const { orderId, card } = await c.req.json();
       const db = await getDb();
       const isFormation = await db.query("SELECT id FROM orders WHERE id = $1", [orderId]);
       if (isFormation.length > 0) {
-        await fulfillPaidOrder(orderId, "dev-payment");
+        await fulfillPaidOrder(orderId, "dev-payment", card);
       } else {
-        await fulfillPaidServiceOrder(orderId, "dev-payment");
+        const isRenewal = await db.query("SELECT id FROM ra_renewals WHERE id = $1", [orderId]);
+        if (isRenewal.length > 0) await fulfillPaidRenewal(orderId, `dev-payment-${Date.now()}`, card);
+        else await fulfillPaidServiceOrder(orderId, "dev-payment");
       }
       return c.json({ data: { ok: true } });
     });
@@ -111918,6 +112336,16 @@ function registerOpsRoutes(app2) {
       return c.json({ data: { ok: true } });
     });
   }
+  app2.get("/cron/ra-renewals", async (c) => {
+    const auth = c.req.header("authorization") ?? "";
+    const secret = env.CRON_SECRET;
+    if (secret && auth !== `Bearer ${secret}`) return c.json(err("Not authorized", "UNAUTHENTICATED"), 401);
+    if (!secret && env.isProd) return c.json(err("Not authorized", "UNAUTHENTICATED"), 401);
+    const asked = c.req.query("today");
+    const today = !env.isProd && asked && /^\d{4}-\d{2}-\d{2}$/.test(asked) ? asked : easternDateIso();
+    const r = await runRenewals(today);
+    return c.json({ data: { today, ...r } });
+  });
   app2.get("/cron/library-refresh", async (c) => {
     const auth = c.req.header("authorization") ?? "";
     const secret = env.CRON_SECRET;
