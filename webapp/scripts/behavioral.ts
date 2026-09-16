@@ -2253,7 +2253,11 @@ async function main(): Promise<void> {
         await drawer.locator('[data-testid="upload-certificates"]').click();
         await page.waitForTimeout(2500);
         const afterText = await drawer.innerText();
-        expect(!/Still owed/.test(afterText) && (await drawer.locator("#upload-cert-status").count()) === 0, "certificates: once uploaded, nothing is owed and the slots are gone", afterText.slice(0, 300));
+        // Certificates are bought again (Adam, 15 Sep 2026): nothing is owed,
+        // the boxes stay for another copy, and the line says the client was emailed.
+        expect(!/Still owed/.test(afterText) && (await drawer.locator("#upload-cert-status").count()) === 1 && /another copy/i.test(afterText), "certificates: once uploaded, nothing is owed and the boxes stay for another copy", afterText.slice(0, 300));
+        expect(/Uploaded — the client was emailed\./.test(afterText), "certificates: the card says the client was emailed", afterText.match(/Uploaded[^\n]*/)?.[0]);
+        expect(/Certificate of Status - [A-Z][a-z]{2} \d{1,2}, \d{4} — /.test(afterText), "certificates: each copy is titled by its day", afterText.match(/Certificate of Status[^\n]*/)?.[0]);
         expect(/Certificate of Status/.test(afterText) && /Certified Copy/.test(afterText), "certificates: both are listed among the order's documents", afterText.slice(0, 300));
         expect((afterText.match(/uploaded \d{1,2}\/\d{1,2}\/\d{4}/g) ?? []).length >= 2, "documents: each listed document shows the day it went up (14 Sep 2026)", afterText.match(/uploaded [^\n]{0,20}/g));
         await page.unroute("**/api/**");
