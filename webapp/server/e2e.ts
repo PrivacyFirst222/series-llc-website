@@ -1350,6 +1350,13 @@ if (mint.status === 200) {
     const certDoc = (afterDocs.body?.data as { title: string; kind: string }[] | undefined)?.find((doc) => doc.title.startsWith("Certificate of Status"));
     check("the certificate lands in the client's portal documents", !!certDoc, afterDocs.body?.data?.length);
     check("a portal-bought certificate is stored under its own kind, so it sorts with the Articles (14 Sep 2026)", certDoc?.kind === "certificate-of-status", certDoc);
+    check("the portal copy is titled by its day (Adam, 15 Sep 2026)", !!certDoc && /^Certificate of Status - [A-Z][a-z]{2} \d{1,2}, \d{4} — /.test(certDoc.title), certDoc?.title);
+    {
+      // The formation order lists the copy but does not count it as an
+      // intake certificate: a portal purchase is its own obligation.
+      const fo = (await api(`/api/admin/orders/${orderId}`, { cookies: admCert.cookie })).body?.data as { documents: { kind: string }[]; hasCertStatus: boolean } | undefined;
+      check("a portal purchase's copy does not count as the intake certificate (Adam, 15 Sep 2026)", fo?.documents.some((d) => d.kind === "certificate-of-status") === true && fo?.hasCertStatus === false, fo && { docs: fo.documents.map((d) => d.kind), hasCertStatus: fo.hasCertStatus });
+    }
   }
   // The assistant's questions are enforced: a category's follow-up must be
   // one of the assistant's own answers, a reason must be one of its five, and
@@ -1722,6 +1729,11 @@ if (mint.status === 200) {
   manualFd.set("edition", "E2E Edition");
   manualFd.set("file", new File([new TextEncoder().encode("%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 612 792]>>endobj\ntrailer<</Root 1 0 R/Size 4>>\n%%EOF")], "manual.pdf", { type: "application/pdf" }));
   const pub = await fetch(`${BASE}/api/admin/library/owners-manual`, { method: "POST", headers: { Cookie: adminLogin2.cookie }, body: manualFd });
+  {
+    // A hand upload survives the nightly refresh (15 Sep 2026).
+    const nightly = await fetch(`${BASE}/api/cron/library-refresh`).then((r) => r.json()).catch(() => null) as { data?: { published?: boolean; pinned?: boolean } } | null;
+    check("the nightly refresh leaves a hand-uploaded manual alone", nightly?.data?.published === false && nightly?.data?.pinned === true, nightly);
+  }
   check("admin publishes manual", pub.ok, await pub.json().catch(() => null));
   const lib = await api("/api/portal/library", { cookies: setPw.cookie });
   check("portal library lists manual", (lib.body?.data ?? []).some((d: { key: string }) => d.key === "owners-manual"), lib.body);
@@ -1736,6 +1748,11 @@ if (mint.status === 200) {
     method: "POST", cookies: adminLogin2.cookie,
   });
   check("manual regenerates from the master", regen.status === 200 && regen.body?.data?.published === true, regen.body);
+  {
+    // Pressed again with nothing changed, the button says so (15 Sep 2026).
+    const regen2 = await api("/api/admin/library/owners-manual/regenerate", { method: "POST", cookies: adminLogin2.cookie });
+    check("a second press reports the manual already current", regen2.status === 200 && regen2.body?.data?.published === false, regen2.body);
+  }
   const realDl = await fetch(`${BASE}/api/portal/library/owners-manual/download`, { headers: { Cookie: setPw.cookie } });
   const realBytes = new Uint8Array(await realDl.arrayBuffer());
   check(
@@ -3202,6 +3219,19 @@ if (mint.status === 200) {
   );
   const m2 = await api("/api/admin/file-mirror/run", { method: "POST", cookies: adm.cookie, body: "{}" });
   check("a second mirror run copies nothing (incremental)", m2.body?.data?.mirrored === 0, m2.body?.data);
+  {
+    // The folder is the document's own company (15 Sep 2026): the first
+    // company's Articles sit under its name although a second company was
+    // paid for later.
+    const { readdirSync, existsSync } = await import("node:fs");
+    const { fileURLToPath } = await import("node:url");
+    const root = fileURLToPath(new URL("../.dev-data/dropbox-mirror/", import.meta.url));
+    const firstDet = (await api(`/api/admin/orders/${orderId}`, { cookies: adm.cookie })).body?.data as { documents: { id: string; kind: string }[] };
+    const artsId = firstDet.documents.find((d) => d.kind === "articles")?.id ?? "";
+    const folder = `${root}E2E Coastal Holdings, LLC`;
+    const inOwn = existsSync(folder) && readdirSync(folder).some((f) => f.startsWith(artsId.slice(0, 8)));
+    check("a document is mirrored into its own company's folder, not the client's newest company's", inOwn, { folder, artsId, listing: existsSync(folder) ? readdirSync(folder).slice(-5) : "missing" });
+  }
 
   // Dropbox's upload path travels in an HTTP header, which is ASCII-only —
   // an em-dashed title crashed production on 25 Aug 2026 while the on-disk
@@ -3566,9 +3596,26 @@ if (mint.status === 200) {
       again.set("certStatus", certPdf());
       again.set("notify", "false");
       const againRes = await fetch(`${BASE}/api/admin/orders/${certOrderId}/certificates`, { method: "POST", body: again, headers: { Cookie: adm.cookie, "X-Forwarded-For": RUN_IP } });
-      check("a second certificate upload replaces the first", againRes.status === 200);
-      const afterAgain = (await api(`/api/admin/orders/${certOrderId}`, { cookies: adm.cookie })).body?.data as { documents?: { kind: string }[] };
-      check("one certificate of status remains after the replacement", (afterAgain?.documents ?? []).filter((d) => d.kind === "certificate-of-status").length === 1, afterAgain?.documents);
+      check("a second certificate upload adds a copy (Adam, 15 Sep 2026)", againRes.status === 200);
+      const afterAgain = (await api(`/api/admin/orders/${certOrderId}`, { cookies: adm.cookie })).body?.data as { documents?: { id: string; kind: string; title: string; createdAt: string }[]; hasCertStatus?: boolean };
+      const copies = (afterAgain?.documents ?? []).filter((d) => d.kind === "certificate-of-status");
+      check("two certificate of status copies are on file, each titled by its day", copies.length === 2 && copies.every((d) => /^Certificate of Status - [A-Z][a-z]{2} \d{1,2}, \d{4} — E2E Coastal Holdings, LLC$/.test(d.title)), copies.map((d) => d.title));
+      check("the copies are listed newest first", copies.length === 2 && copies[0].createdAt >= copies[1].createdAt, copies.map((d) => d.createdAt));
+      // Delete the older copy: one remains and the certificate is still
+      // delivered; delete the last: owed again. The Articles cannot be
+      // deleted, and a certificate cannot be "replaced".
+      const delOld = await api(`/api/admin/documents/${copies[1].id}`, { method: "DELETE", cookies: adm.cookie });
+      const afterDel = (await api(`/api/admin/orders/${certOrderId}`, { cookies: adm.cookie })).body?.data as { documents?: { id: string; kind: string }[]; hasCertStatus?: boolean };
+      check("an older certificate copy can be deleted; the newer one still counts", delOld.status === 200 && (afterDel?.documents ?? []).filter((d) => d.kind === "certificate-of-status").length === 1 && afterDel?.hasCertStatus === true, { delOld: delOld.body, docs: afterDel?.documents });
+      const delLast = await api(`/api/admin/documents/${copies[0].id}`, { method: "DELETE", cookies: adm.cookie });
+      const afterLast = (await api(`/api/admin/orders/${certOrderId}`, { cookies: adm.cookie })).body?.data as { hasCertStatus?: boolean };
+      check("deleting the last copy makes the intake certificate owed again", delLast.status === 200 && afterLast?.hasCertStatus === false, afterLast);
+      const backFd = new FormData();
+      backFd.set("certStatus", certPdf());
+      backFd.set("notify", "false");
+      const backRes = await fetch(`${BASE}/api/admin/orders/${certOrderId}/certificates`, { method: "POST", body: backFd, headers: { Cookie: adm.cookie, "X-Forwarded-For": RUN_IP } });
+      const backBody = (await backRes.json().catch(() => null)) as { data?: { notified?: boolean } } | null;
+      check("a copy goes back up, and the route says no email was sent when none was asked for", backRes.ok && backBody?.data?.notified === false, backBody);
       const empty = new FormData();
       empty.set("notify", "false");
       const emptyRes = await fetch(`${BASE}/api/admin/orders/${certOrderId}/certificates`, { method: "POST", body: empty, headers: { Cookie: adm.cookie, "X-Forwarded-For": RUN_IP } });
@@ -3605,7 +3652,23 @@ if (mint.status === 200) {
     check("both certificates are stored with their own kinds", dC?.hasCertStatus === true && dC?.hasCertifiedCopy === true, dC);
     check("the certificate order is formed", dC?.status === "formed", dC?.status);
     const lateSeries = await api(`/api/admin/orders/${certOrderId}/series-filed`, { method: "POST", cookies: adm.cookie, body: "{}" });
-    check("a refusal names the board's own column, Complete, not 'formed' (14 Sep 2026)", lateSeries.status === 400 && /this one is in Complete\./.test(lateSeries.body?.error?.message ?? ""), lateSeries.body);
+    check("a refusal on a formed order says the day it was formed (15 Sep 2026)", lateSeries.status === 400 && /this order was formed on [A-Z][a-z]{2} \d{1,2}, \d{4}\./.test(lateSeries.body?.error?.message ?? ""), lateSeries.body);
+    // 19: the Articles are replaced in place, never deleted; a certificate
+    // is never "replaced".
+    {
+      const detR = (await api(`/api/admin/orders/${certOrderId}`, { cookies: adm.cookie })).body?.data as { documents: { id: string; kind: string }[] };
+      const arts = detR.documents.find((d) => d.kind === "articles");
+      const certCopy = detR.documents.find((d) => d.kind === "certificate-of-status");
+      const repFd = new FormData();
+      repFd.set("file", new File([new TextEncoder().encode("%PDF-1.4 corrected articles\n%%EOF")], "arts2.pdf", { type: "application/pdf" }));
+      const repRes = await fetch(`${BASE}/api/admin/documents/${arts?.id}/replace`, { method: "POST", body: repFd, headers: { Cookie: adm.cookie, "X-Forwarded-For": RUN_IP } });
+      const detR2 = (await api(`/api/admin/orders/${certOrderId}`, { cookies: adm.cookie })).body?.data as { documents: { id: string; kind: string }[] };
+      check("a wrong Articles PDF is replaced in place: same document, still one Articles (15 Sep 2026)", repRes.ok && detR2.documents.filter((d) => d.kind === "articles").length === 1 && detR2.documents.some((d) => d.id === arts?.id), { status: repRes.status, docs: detR2.documents.map((d) => d.kind) });
+      const badDel = await api(`/api/admin/documents/${arts?.id}`, { method: "DELETE", cookies: adm.cookie });
+      check("the Articles cannot be deleted, only replaced", badDel.status === 400 && badDel.body?.error?.code === "BAD_KIND", badDel.body);
+      const badRep = await fetch(`${BASE}/api/admin/documents/${certCopy?.id}/replace`, { method: "POST", body: repFd, headers: { Cookie: adm.cookie, "X-Forwarded-For": RUN_IP } });
+      check("a certificate copy is not replaced; another copy is uploaded instead", badRep.status === 400, badRep.status);
+    }
   }
 }
 
@@ -3647,6 +3710,13 @@ if (mint.status === 200) {
   const eastern = new Date().toLocaleDateString("en-CA", { timeZone: "America/New_York" });
   const expected = `${Number(eastern.slice(0, 4)) + 1}${eastern.slice(4)}`;
   check("formation sets the renewal date one year out, by Florida's calendar", det?.raRenewalDate === expected, { got: det?.raRenewalDate, expected });
+  {
+    // The office sees the date too (15 Sep 2026): the Registered Agent
+    // Clients row names it beside the company.
+    const cl = ((await api("/api/admin/clients", { cookies: adm.cookie })).body?.data as { email: string; ra_llcs: string[] }[] | undefined)?.find((x) => x.email === raEmail);
+    const renewsWord = new Date(`${expected}T12:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
+    check("the Registered Agent Clients row names the renewal date beside the company", (cl?.ra_llcs ?? []).some((s) => s.endsWith(` (renews ${renewsWord})`)), { ra_llcs: cl?.ra_llcs, renewsWord });
+  }
   const afterMe = (await api("/api/auth/me", { cookies: raPw.cookie })).body?.data as { raRenewalDate?: string | null };
   check("the client is shown the same renewal date", afterMe?.raRenewalDate === det?.raRenewalDate, afterMe);
   const cancel = await api("/api/portal/registered-agent/cancel", { method: "POST", body: "{}", cookies: raPw.cookie });

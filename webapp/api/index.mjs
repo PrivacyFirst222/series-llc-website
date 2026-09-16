@@ -109922,8 +109922,12 @@ async function runFileMirror() {
   if (!useDropbox && env.isProd) return { mirrored: 0, failed: 0, skipped: true };
   const docs = await db.query(
     `SELECT d.id, d.title, d.kind, d.storage_key,
-            (SELECT o.llc_name FROM orders o WHERE o.client_id = d.client_id AND o.paid_at IS NOT NULL
-              ORDER BY o.paid_at DESC LIMIT 1) AS llc_name,
+            -- The document's own company (15 Sep 2026: a two-company client's
+            -- older files landed in the newer company's folder); a document
+            -- with no company uses the client's newest paid company.
+            COALESCE((SELECT o.llc_name FROM orders o WHERE o.id = d.order_id),
+                     (SELECT o.llc_name FROM orders o WHERE o.client_id = d.client_id AND o.paid_at IS NOT NULL
+                       ORDER BY o.paid_at DESC LIMIT 1)) AS llc_name,
             cl.email
        FROM documents d LEFT JOIN clients cl ON cl.id = d.client_id
       WHERE d.mirrored_at IS NULL
@@ -110501,6 +110505,7 @@ async function refreshOwnersManual(force = false) {
     "SELECT meta FROM library_documents WHERE key = 'owners-manual'"
   );
   const meta = rows[0] ? typeof rows[0].meta === "string" ? JSON.parse(rows[0].meta) : rows[0].meta : null;
+  if (!force && meta?.pinned) return { published: false, pinned: true };
   if (!force && meta?.hash === hash) return { published: false };
   const { pdf, pages, edition } = await renderManualPdf2(owners_manual_default);
   const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength);
@@ -110525,7 +110530,10 @@ function registerAdminRoutes(app2) {
   app2.post("/admin/library/owners-manual/regenerate", async (c) => {
     const admin = await requireAdmin(c);
     if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    const r = await refreshOwnersManual(true);
+    const db = await getDb();
+    const cur = await db.query("SELECT meta FROM library_documents WHERE key = 'owners-manual'");
+    const pinned = !!(cur[0] ? (typeof cur[0].meta === "string" ? JSON.parse(cur[0].meta) : cur[0].meta)?.pinned : false);
+    const r = await refreshOwnersManual(pinned);
     return c.json({ data: r });
   });
   app2.post("/admin/library/:key", async (c) => {
@@ -110545,9 +110553,9 @@ function registerAdminRoutes(app2) {
     const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
     const db = await getDb();
     await db.query(
-      `INSERT INTO library_documents (key, title, edition, storage_key, content_type, size_bytes, updated_at)
-     VALUES ($1, $2, $3, $4, $5, $6, now())
-     ON CONFLICT (key) DO UPDATE SET title = $2, edition = $3, storage_key = $4, content_type = $5, size_bytes = $6, updated_at = now()`,
+      `INSERT INTO library_documents (key, title, edition, storage_key, content_type, size_bytes, meta, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, '{"pinned":true}'::jsonb, now())
+     ON CONFLICT (key) DO UPDATE SET title = $2, edition = $3, storage_key = $4, content_type = $5, size_bytes = $6, meta = '{"pinned":true}'::jsonb, updated_at = now()`,
       [c.req.param("key"), title, edition, stored.storageKey, file.type || "application/pdf", stored.sizeBytes]
     );
     return c.json({ data: { ok: true } });
@@ -110620,8 +110628,8 @@ function registerAdminRoutes(app2) {
             COALESCE((o.payload->'optionalDocuments'->>'ein')::boolean, false) AS ein_purchased,
             COALESCE((o.payload->'optionalDocuments'->>'certificateOfStatus')::boolean, false) AS cert_status_purchased,
             COALESCE((o.payload->'optionalDocuments'->>'certifiedCopy')::boolean, false) AS certified_copy_purchased,
-            EXISTS (SELECT 1 FROM documents d WHERE d.order_id = o.id AND d.kind = 'certificate-of-status') AS cert_status_uploaded,
-            EXISTS (SELECT 1 FROM documents d WHERE d.order_id = o.id AND d.kind = 'certified-copy') AS certified_copy_uploaded,
+            EXISTS (SELECT 1 FROM documents d WHERE d.order_id = o.id AND d.kind = 'certificate-of-status' AND COALESCE(d.meta->>'source', 'card') <> 'portal') AS cert_status_uploaded,
+            EXISTS (SELECT 1 FROM documents d WHERE d.order_id = o.id AND d.kind = 'certified-copy' AND COALESCE(d.meta->>'source', 'card') <> 'portal') AS certified_copy_uploaded,
             (o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_service,
             EXISTS (
               SELECT 1 FROM service_orders s
@@ -110640,6 +110648,17 @@ function registerAdminRoutes(app2) {
     return c.json({ data: { orders: rows, total: Number(total[0].c), shown: rows.length } });
   });
   const BOARD_LABEL = { pending_payment: "Pending payment", paid: "New Orders", filed: "With The State", formed: "Complete" };
+  function whereItIs(o) {
+    if (o.status === "formed" && o.formed_at) return `this order was formed on ${new Date(o.formed_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "America/New_York" })}.`;
+    return `this one is in ${BOARD_LABEL[o.status] ?? o.status}.`;
+  }
+  const CERT_KINDS = ["certificate-of-status", "certified-copy"];
+  function certTitle(kindTitle, llcName) {
+    const day = (/* @__PURE__ */ new Date()).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "America/New_York" });
+    return `${kindTitle} - ${day} \u2014 ${llcName}`;
+  }
+  const metaOf = (d2) => (typeof d2.meta === "string" ? JSON.parse(d2.meta) : d2.meta) ?? {};
+  const isCardCert = (d2, kind) => d2.kind === kind && metaOf(d2).source !== "portal";
   const isConversionPayload = (payload) => (typeof payload === "string" ? JSON.parse(payload) : payload)?.filingPath === "CONVERT";
   app2.post("/admin/orders/:id/filed", async (c) => {
     const admin = await requireAdmin(c);
@@ -110680,10 +110699,10 @@ function registerAdminRoutes(app2) {
     const admin = await requireAdmin(c);
     if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
     const db = await getDb();
-    const rows = await db.query("SELECT id, status FROM orders WHERE id = $1", [c.req.param("id")]);
+    const rows = await db.query("SELECT id, status, formed_at FROM orders WHERE id = $1", [c.req.param("id")]);
     if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
     if (rows[0].status !== "filed") {
-      return c.json(err(`Series designations are marked filed while the order is With The State; this one is in ${BOARD_LABEL[rows[0].status] ?? rows[0].status}.`, "BAD_STATE"), 400);
+      return c.json(err(`Series designations are marked filed while the order is With The State; ${whereItIs(rows[0])}`, "BAD_STATE"), 400);
     }
     await db.query("UPDATE orders SET series_filed_at = COALESCE(series_filed_at, now()) WHERE id = $1", [c.req.param("id")]);
     return c.json({ data: { ok: true } });
@@ -110786,8 +110805,14 @@ function registerAdminRoutes(app2) {
         hasArticles: docs.some((d2) => d2.kind === "articles"),
         certStatusPurchased: !!payload.optionalDocuments?.certificateOfStatus,
         certifiedCopyPurchased: !!payload.optionalDocuments?.certifiedCopy,
-        hasCertStatus: docs.some((d2) => d2.kind === "certificate-of-status"),
-        hasCertifiedCopy: docs.some((d2) => d2.kind === "certified-copy")
+        // Intake certificates count only copies uploaded from the card; a
+        // portal purchase is its own obligation (Adam, 15 Sep 2026).
+        hasCertStatus: docs.some((d2) => isCardCert(d2, "certificate-of-status")),
+        hasCertifiedCopy: docs.some((d2) => isCardCert(d2, "certified-copy")),
+        // The company's Florida document number, kept with the Articles (or
+        // the Statement) when the office typed it (15 Sep 2026).
+        documentNumber: String(metaOf(docs.find((d2) => d2.kind === "articles") ?? { meta: {} }).documentNumber ?? metaOf(docs.find((d2) => d2.kind === "statement") ?? { meta: {} }).documentNumber ?? ""),
+        raService: payload.registeredAgent?.choice === "SERVICE"
       }
     });
   });
@@ -110828,7 +110853,7 @@ function registerAdminRoutes(app2) {
     if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
     const db = await getDb();
     const rows = await db.query(
-      "SELECT id, client_id, llc_name, payload, status FROM orders WHERE id = $1",
+      "SELECT id, client_id, llc_name, payload, status, formed_at FROM orders WHERE id = $1",
       [c.req.param("id")]
     );
     if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
@@ -110838,7 +110863,7 @@ function registerAdminRoutes(app2) {
       return c.json(err("A conversion has no Articles of Organization: the company already exists.", "BAD_STATE"), 400);
     }
     if (o.status !== "filed") {
-      return c.json(err(`The filed Articles are uploaded while the order is With The State; this one is in ${BOARD_LABEL[o.status] ?? o.status}.`, "BAD_STATE"), 400);
+      return c.json(err(`The filed Articles are uploaded while the order is With The State; ${whereItIs(o)}`, "BAD_STATE"), 400);
     }
     const existing = await db.query(
       "SELECT id FROM documents WHERE order_id = $1 AND kind = 'articles'",
@@ -110855,7 +110880,7 @@ function registerAdminRoutes(app2) {
     const documentNumber = typeof form.documentNumber === "string" ? form.documentNumber.trim() : "";
     const weSigned = appointedUs(o.payload);
     if (weSigned && !documentNumber) return c.json(err(DOC_NUMBER_NEEDED, "DOCUMENT_NUMBER_REQUIRED"), 400);
-    if (weSigned && !/^L\d{11}$/.test(documentNumber)) return c.json(err("A Florida LLC document number is the letter L followed by eleven digits, like L26000123456. Use the digit zero, not the letter o.", "DOCUMENT_NUMBER_SHAPE"), 400);
+    if (documentNumber && !/^L\d{11}$/.test(documentNumber)) return c.json(err("A Florida LLC document number is the letter L followed by eleven digits, like L26000123456. Use the digit zero, not the letter o.", "DOCUMENT_NUMBER_SHAPE"), 400);
     if (articles.size > MAX_UPLOAD_BYTES) return c.json(err("The file is too large (20 MB max).", "TOO_LARGE"), 400);
     if (!await looksLikePdf(articles)) {
       return c.json(err("This is not a readable PDF. Upload the filed Articles from Sunbiz.", "NOT_A_PDF"), 400);
@@ -110863,8 +110888,8 @@ function registerAdminRoutes(app2) {
     const stored = await putFile(articles.name, await articles.arrayBuffer(), articles.type || "application/pdf");
     await db.query(
       `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
-     VALUES ($1, $2, 'articles', $3, $4, $5, $6, '{}'::jsonb)`,
-      [o.client_id, o.id, `Articles of Organization \u2014 ${o.llc_name}`, stored.storageKey, articles.type || "application/pdf", stored.sizeBytes]
+     VALUES ($1, $2, 'articles', $3, $4, $5, $6, $7)`,
+      [o.client_id, o.id, `Articles of Organization \u2014 ${o.llc_name}`, stored.storageKey, articles.type || "application/pdf", stored.sizeBytes, JSON.stringify(documentNumber ? { documentNumber } : {})]
     );
     if (weSigned) await issueStatement(db, o, documentNumber);
     return c.json({ data: { ok: true, statement: weSigned } });
@@ -110896,37 +110921,34 @@ function registerAdminRoutes(app2) {
         }
         if (f.size > MAX_UPLOAD_BYTES) return c.json(err("File is too large (20 MB max).", "TOO_LARGE"), 400);
         if (!await looksLikePdf(f)) return c.json(err(`${f.name} is not a readable PDF.`, "NOT_A_PDF"), 400);
-        files.push({ kind, title: `${title} \u2014 ${o.llc_name}`, file: f });
+        files.push({ kind, title: certTitle(title, o.llc_name), file: f });
       }
     }
     if (files.length === 0) return c.json(err("Choose a certificate file to upload.", "INVALID_INPUT"), 400);
     const uploaded = [];
     for (const cf of files) {
-      const prior = await db.query(
-        "SELECT id, storage_key FROM documents WHERE order_id = $1 AND kind = $2",
-        [o.id, cf.kind]
-      );
       const stored = await putFile(cf.file.name, await cf.file.arrayBuffer(), cf.file.type || "application/pdf");
       await db.query(
         `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, '{}'::jsonb)`,
+       VALUES ($1, $2, $3, $4, $5, $6, $7, '{"source":"card"}'::jsonb)`,
         [o.client_id, o.id, cf.kind, cf.title, stored.storageKey, cf.file.type || "application/pdf", stored.sizeBytes]
       );
-      for (const p2 of prior) {
-        await db.query("DELETE FROM documents WHERE id = $1", [p2.id]);
-        await deleteFile(p2.storage_key).catch(() => {
-        });
-      }
       uploaded.push(cf.kind);
     }
+    let notified = false;
     if (notify) {
       const clients = await db.query("SELECT email FROM clients WHERE id = $1", [o.client_id]);
       if (clients[0]) {
         const mail = newDocumentEmail(`${env.PUBLIC_BASE_URL}/portal`);
-        sendMail({ to: clients[0].email, ...mail }).catch((e) => console.error("[admin] certificate email failed:", e));
+        try {
+          await sendMail({ to: clients[0].email, ...mail });
+          notified = true;
+        } catch (e) {
+          console.error("[admin] certificate email failed:", e);
+        }
       }
     }
-    return c.json({ data: { uploaded } });
+    return c.json({ data: { uploaded, notified } });
   });
   app2.post("/admin/orders/:id/formation-documents", async (c) => {
     const admin = await requireAdmin(c);
@@ -110973,7 +110995,7 @@ function registerAdminRoutes(app2) {
         if (!payloadOpts?.[key]) {
           return c.json(err(`The client did not purchase a ${title.toLowerCase()} with this order.`, "NOT_PURCHASED"), 400);
         }
-        certFiles.push({ kind, title: `${title} \u2014 ${o.llc_name}`, file: f });
+        certFiles.push({ kind, title: certTitle(title, o.llc_name), file: f });
       }
     }
     const psdSeriesRaw = (Array.isArray(form["psdSeries"]) ? form["psdSeries"] : [form["psdSeries"]]).filter((v2) => typeof v2 === "string");
@@ -111021,7 +111043,7 @@ function registerAdminRoutes(app2) {
       return c.json(err("A replacement for this order is already being processed.", "REPLACEMENT_IN_PROGRESS"), 409);
     }
     try {
-      const retiredKinds = ["psd", ...articles ? ["articles"] : [], ...certFiles.map((cf) => cf.kind)];
+      const retiredKinds = ["psd", ...articles ? ["articles"] : []];
       const priorDocs = await db.query(
         "SELECT id, storage_key FROM documents WHERE order_id = $1 AND kind = ANY($2::text[])",
         [o.id, retiredKinds]
@@ -111069,7 +111091,7 @@ function registerAdminRoutes(app2) {
           newKeys.push(storedCert.storageKey);
           const certRow = await db.query(
             `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, '{}'::jsonb) RETURNING id`,
+         VALUES ($1, $2, $3, $4, $5, $6, $7, '{"source":"card"}'::jsonb) RETURNING id`,
             [o.client_id, o.id, cf.kind, cf.title, storedCert.storageKey, cf.file.type || "application/pdf", storedCert.sizeBytes]
           );
           newRows.push(certRow[0].id);
@@ -111179,7 +111201,9 @@ function registerAdminRoutes(app2) {
             (SELECT o.payload->'client'->>'lastName' FROM orders o WHERE o.client_id = cl.id AND o.paid_at IS NOT NULL ORDER BY o.paid_at ASC LIMIT 1) AS last_name,
             (SELECT o.payload->'client'->>'suffix' FROM orders o WHERE o.client_id = cl.id AND o.paid_at IS NOT NULL ORDER BY o.paid_at ASC LIMIT 1) AS suffix,
             COUNT(d.id)::int AS document_count,
-            (SELECT COALESCE(jsonb_agg(DISTINCT o.llc_name), '[]'::jsonb)
+            -- Each company with its renewal date once formed (15 Sep 2026:
+            -- the client saw the date; no office screen did).
+            (SELECT COALESCE(jsonb_agg(DISTINCT (o.llc_name || COALESCE(' (renews ' || to_char(o.ra_renewal_date, 'FMMon FMDD, YYYY') || ')', ''))), '[]'::jsonb)
                FROM orders o
               WHERE o.client_id = cl.id AND o.status <> 'pending_payment'
                 AND o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_llcs,
@@ -111481,7 +111505,7 @@ function registerAdminRoutes(app2) {
     const summary = so2.type === "series" ? `Protected Series Designation \u2014 ${details.seriesName ?? so2.llc_name}` : so2.type === "s-election" ? `S Corporation Election Package \u2014 ${so2.llc_name}` : so2.type === "certificate-of-status" ? `Certificate of Status \u2014 ${so2.llc_name}` : so2.type === "certified-copy" ? `Certified Copy of the Articles \u2014 ${so2.llc_name}` : `Federal EIN \u2014 ${details.target === "series" ? details.seriesName ?? so2.llc_name : so2.llc_name}`;
     let documentId = null;
     if (file) {
-      const title = titleOverride || (so2.type === "series" ? `Protected Series Designation \u2014 ${details.seriesName ?? so2.llc_name} \u2014 ${so2.llc_name}` : so2.type === "s-election" ? `S Corporation Election Package (Form 2553) \u2014 ${so2.llc_name}` : so2.type === "certificate-of-status" ? `Certificate of Status \u2014 ${so2.llc_name}` : so2.type === "certified-copy" ? `Certified Copy of the Articles \u2014 ${so2.llc_name}` : `EIN Confirmation Letter \u2014 ${details.target === "series" ? details.seriesName ?? so2.llc_name : so2.llc_name}`);
+      const title = titleOverride || (so2.type === "series" ? `Protected Series Designation \u2014 ${details.seriesName ?? so2.llc_name} \u2014 ${so2.llc_name}` : so2.type === "s-election" ? `S Corporation Election Package (Form 2553) \u2014 ${so2.llc_name}` : so2.type === "certificate-of-status" ? certTitle("Certificate of Status", so2.llc_name) : so2.type === "certified-copy" ? certTitle("Certified Copy of the Articles", so2.llc_name) : `EIN Confirmation Letter \u2014 ${details.target === "series" ? details.seriesName ?? so2.llc_name : so2.llc_name}`);
       if (!await looksLikePdf(file)) {
         return c.json(err(`${file.name} is not a readable PDF. The deliverable must be the actual PDF document.`, "NOT_A_PDF"), 400);
       }
@@ -111491,7 +111515,9 @@ function registerAdminRoutes(app2) {
       const doc = await db.query(
         `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
        VALUES ($1, $6, $7, $2, $3, $4, $5, $8) RETURNING id`,
-        [so2.client_id, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes, so2.formation_order_id, storedKind, JSON.stringify(isDesignation ? { seriesNames: [details.seriesName] } : {})]
+        // A portal purchase's copy is marked as its own, so the intake
+        // certificate is not counted delivered by it (Adam, 15 Sep 2026).
+        [so2.client_id, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes, so2.formation_order_id, storedKind, JSON.stringify(isDesignation ? { seriesNames: [details.seriesName] } : CERT_KINDS.includes(so2.type) ? { source: "portal", serviceOrderId: so2.id } : {})]
       );
       documentId = doc[0].id;
     }
@@ -111568,6 +111594,49 @@ function registerAdminRoutes(app2) {
     }
     return rebuilt;
   }
+  app2.delete("/admin/documents/:id", async (c) => {
+    const admin = await requireAdmin(c);
+    if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+    const db = await getDb();
+    const rows = await db.query(
+      "SELECT id, kind, storage_key FROM documents WHERE id = $1",
+      [c.req.param("id")]
+    );
+    if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+    if (!CERT_KINDS.includes(rows[0].kind)) {
+      return c.json(err("Only a certificate copy can be deleted. Replace the Articles or a designation instead.", "BAD_KIND"), 400);
+    }
+    await db.query("DELETE FROM documents WHERE id = $1", [rows[0].id]);
+    await deleteFile(rows[0].storage_key).catch(() => {
+    });
+    return c.json({ data: { ok: true } });
+  });
+  app2.post("/admin/documents/:id/replace", async (c) => {
+    const admin = await requireAdmin(c);
+    if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+    const db = await getDb();
+    const rows = await db.query(
+      "SELECT id, kind, storage_key FROM documents WHERE id = $1",
+      [c.req.param("id")]
+    );
+    if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+    if (rows[0].kind !== "articles" && rows[0].kind !== "psd") {
+      return c.json(err("Only the Articles or a designation can be replaced. Upload another certificate copy instead.", "BAD_KIND"), 400);
+    }
+    const form = await c.req.parseBody();
+    const file = form.file;
+    if (!(file instanceof File) || file.size === 0) return c.json(err("Choose the replacement PDF.", "INVALID_INPUT"), 400);
+    if (file.size > MAX_UPLOAD_BYTES) return c.json(err("The file is too large (20 MB max).", "TOO_LARGE"), 400);
+    if (!await looksLikePdf(file)) return c.json(err(`${file.name} is not a readable PDF.`, "NOT_A_PDF"), 400);
+    const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
+    await db.query(
+      "UPDATE documents SET storage_key = $2, content_type = $3, size_bytes = $4, mirrored_at = NULL WHERE id = $1",
+      [rows[0].id, stored.storageKey, file.type || "application/pdf", stored.sizeBytes]
+    );
+    await deleteFile(rows[0].storage_key).catch(() => {
+    });
+    return c.json({ data: { ok: true } });
+  });
   app2.get("/admin/documents/unscoped", async (c) => {
     const admin = await requireAdmin(c);
     if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);

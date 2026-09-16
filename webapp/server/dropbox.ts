@@ -126,8 +126,12 @@ export async function runFileMirror(): Promise<{ mirrored: number; failed: numbe
     email: string | null;
   }>(
     `SELECT d.id, d.title, d.kind, d.storage_key,
-            (SELECT o.llc_name FROM orders o WHERE o.client_id = d.client_id AND o.paid_at IS NOT NULL
-              ORDER BY o.paid_at DESC LIMIT 1) AS llc_name,
+            -- The document's own company (15 Sep 2026: a two-company client's
+            -- older files landed in the newer company's folder); a document
+            -- with no company uses the client's newest paid company.
+            COALESCE((SELECT o.llc_name FROM orders o WHERE o.id = d.order_id),
+                     (SELECT o.llc_name FROM orders o WHERE o.client_id = d.client_id AND o.paid_at IS NOT NULL
+                       ORDER BY o.paid_at DESC LIMIT 1)) AS llc_name,
             cl.email
        FROM documents d LEFT JOIN clients cl ON cl.id = d.client_id
       WHERE d.mirrored_at IS NULL

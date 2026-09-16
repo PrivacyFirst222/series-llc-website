@@ -254,6 +254,10 @@ function UploadDialog({ client }: { client: AdminClient }) {
       setOpen(false);
       setTitle("");
       setFile(null);
+      // The next upload starts clean: no previous item's date or type
+      // (15 Sep 2026).
+      setKind("package");
+      setReceivedOn("");
     },
     onError: (e: Error) => toast({ duration: Infinity, title: "Upload failed", description: e.message }),
   });

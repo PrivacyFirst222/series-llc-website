@@ -37,7 +37,7 @@ import { easternDateIso } from "./datetime";
  *  deployment whose manual is unchanged publishes nothing. This is what
  *  keeps "always the latest edition" true — the nightly cron calls it, and
  *  the admin Library section has a button for right-now. */
-export async function refreshOwnersManual(force = false): Promise<{ published: boolean; pages?: number; edition?: string }> {
+export async function refreshOwnersManual(force = false): Promise<{ published: boolean; pages?: number; edition?: string; pinned?: boolean }> {
   // The hash covers the renderer as well as the text: a layout fix that never
   // changes a word would otherwise never be published, and clients would keep
   // downloading the previous PDF.
@@ -51,7 +51,10 @@ export async function refreshOwnersManual(force = false): Promise<{ published: b
   const rows = await db.query<{ meta: unknown }>(
     "SELECT meta FROM library_documents WHERE key = 'owners-manual'",
   );
-  const meta = rows[0] ? ((typeof rows[0].meta === "string" ? JSON.parse(rows[0].meta) : rows[0].meta) as { hash?: string }) : null;
+  const meta = rows[0] ? ((typeof rows[0].meta === "string" ? JSON.parse(rows[0].meta) : rows[0].meta) as { hash?: string; pinned?: boolean }) : null;
+  // A manual uploaded by hand stays until the office replaces it (15 Sep
+  // 2026: the nightly refresh silently overwrote it).
+  if (!force && meta?.pinned) return { published: false, pinned: true };
   if (!force && meta?.hash === hash) return { published: false };
   const { pdf, pages, edition } = await renderManualPdf(ownersManualMd);
   const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength) as ArrayBuffer;
@@ -82,7 +85,13 @@ app.get("/admin/library", async (c) => {
 app.post("/admin/library/owners-manual/regenerate", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-  const r = await refreshOwnersManual(true);
+  // "Replace edition" replaces a hand-uploaded manual; otherwise it
+  // publishes only when the master differs from what is published, so
+  // "Already current" can be true (15 Sep 2026).
+  const db = await getDb();
+  const cur = await db.query<{ meta: unknown }>("SELECT meta FROM library_documents WHERE key = 'owners-manual'");
+  const pinned = !!(cur[0] ? ((typeof cur[0].meta === "string" ? JSON.parse(cur[0].meta) : cur[0].meta) as { pinned?: boolean } | null)?.pinned : false);
+  const r = await refreshOwnersManual(pinned);
   return c.json({ data: r });
 });
 
@@ -108,9 +117,9 @@ app.post("/admin/library/:key", async (c) => {
   const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
   const db = await getDb();
   await db.query(
-    `INSERT INTO library_documents (key, title, edition, storage_key, content_type, size_bytes, updated_at)
-     VALUES ($1, $2, $3, $4, $5, $6, now())
-     ON CONFLICT (key) DO UPDATE SET title = $2, edition = $3, storage_key = $4, content_type = $5, size_bytes = $6, updated_at = now()`,
+    `INSERT INTO library_documents (key, title, edition, storage_key, content_type, size_bytes, meta, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, '{"pinned":true}'::jsonb, now())
+     ON CONFLICT (key) DO UPDATE SET title = $2, edition = $3, storage_key = $4, content_type = $5, size_bytes = $6, meta = '{"pinned":true}'::jsonb, updated_at = now()`,
     [c.req.param("key"), title, edition, stored.storageKey, file.type || "application/pdf", stored.sizeBytes],
   );
   return c.json({ data: { ok: true } });
@@ -201,8 +210,8 @@ app.get("/admin/orders", async (c) => {
             COALESCE((o.payload->'optionalDocuments'->>'ein')::boolean, false) AS ein_purchased,
             COALESCE((o.payload->'optionalDocuments'->>'certificateOfStatus')::boolean, false) AS cert_status_purchased,
             COALESCE((o.payload->'optionalDocuments'->>'certifiedCopy')::boolean, false) AS certified_copy_purchased,
-            EXISTS (SELECT 1 FROM documents d WHERE d.order_id = o.id AND d.kind = 'certificate-of-status') AS cert_status_uploaded,
-            EXISTS (SELECT 1 FROM documents d WHERE d.order_id = o.id AND d.kind = 'certified-copy') AS certified_copy_uploaded,
+            EXISTS (SELECT 1 FROM documents d WHERE d.order_id = o.id AND d.kind = 'certificate-of-status' AND COALESCE(d.meta->>'source', 'card') <> 'portal') AS cert_status_uploaded,
+            EXISTS (SELECT 1 FROM documents d WHERE d.order_id = o.id AND d.kind = 'certified-copy' AND COALESCE(d.meta->>'source', 'card') <> 'portal') AS certified_copy_uploaded,
             (o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_service,
             EXISTS (
               SELECT 1 FROM service_orders s
@@ -225,6 +234,26 @@ app.get("/admin/orders", async (c) => {
  *  nothing in this system can observe a filing on sunbiz. */
 /** The board's own words for a status, for messages the office reads. */
 const BOARD_LABEL: Record<string, string> = { pending_payment: "Pending payment", paid: "New Orders", filed: "With The State", formed: "Complete" };
+/** Where a refusal says the order is (15 Sep 2026): a formed order sits in
+ *  the With The State column while work is owed, so "in Complete" could be
+ *  false; the day it was formed is always true. */
+function whereItIs(o: { status: string; formed_at?: string | null }): string {
+  if (o.status === "formed" && o.formed_at) return `this order was formed on ${new Date(o.formed_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "America/New_York" })}.`;
+  return `this one is in ${BOARD_LABEL[o.status] ?? o.status}.`;
+}
+/** Certificates are bought again and again — "they are only good for a
+ *  limited time" (Adam, 15 Sep 2026) — so every copy is titled by the day it
+ *  went up and none replaces another. */
+const CERT_KINDS = ["certificate-of-status", "certified-copy"] as const;
+function certTitle(kindTitle: string, llcName: string): string {
+  const day = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "America/New_York" });
+  return `${kindTitle} - ${day} — ${llcName}`;
+}
+const metaOf = (d: { meta: unknown }): Record<string, unknown> =>
+  (typeof d.meta === "string" ? JSON.parse(d.meta) : (d.meta as Record<string, unknown> | null)) ?? {};
+/** An intake certificate is owed until a copy uploaded from the card exists;
+ *  a copy delivered for a portal purchase belongs to that purchase. */
+const isCardCert = (d: { kind: string; meta: unknown }, kind: string): boolean => d.kind === kind && metaOf(d).source !== "portal";
 const isConversionPayload = (payload: unknown): boolean =>
   ((typeof payload === "string" ? JSON.parse(payload) : payload) as { filingPath?: string } | null)?.filingPath === "CONVERT";
 
@@ -253,7 +282,8 @@ app.post("/admin/orders/:id/filed", async (c) => {
   return c.json({ data: { ok: true } });
 });
 
-/** Undo — a misclick should not need a database console. */
+/** The Division rejected the filing: the order goes back to New Orders for
+ *  refiling, with a dated record of the rejection. */
 app.post("/admin/orders/:id/unfiled", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
@@ -283,11 +313,11 @@ app.post("/admin/orders/:id/series-filed", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const db = await getDb();
-  const rows = await db.query<{ id: string; status: string }>("SELECT id, status FROM orders WHERE id = $1", [c.req.param("id")]);
+  const rows = await db.query<{ id: string; status: string; formed_at: string | null }>("SELECT id, status, formed_at FROM orders WHERE id = $1", [c.req.param("id")]);
   if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
   // Only while the order is with the State, as the card offers it (14 Sep 2026).
   if (rows[0].status !== "filed") {
-    return c.json(err(`Series designations are marked filed while the order is With The State; this one is in ${BOARD_LABEL[rows[0].status] ?? rows[0].status}.`, "BAD_STATE"), 400);
+    return c.json(err(`Series designations are marked filed while the order is With The State; ${whereItIs(rows[0])}`, "BAD_STATE"), 400);
   }
   await db.query("UPDATE orders SET series_filed_at = COALESCE(series_filed_at, now()) WHERE id = $1", [c.req.param("id")]);
   return c.json({ data: { ok: true } });
@@ -414,8 +444,14 @@ app.get("/admin/orders/:id", async (c) => {
       hasArticles: docs.some((d) => d.kind === "articles"),
       certStatusPurchased: !!(payload as { optionalDocuments?: { certificateOfStatus?: boolean } }).optionalDocuments?.certificateOfStatus,
       certifiedCopyPurchased: !!(payload as { optionalDocuments?: { certifiedCopy?: boolean } }).optionalDocuments?.certifiedCopy,
-      hasCertStatus: docs.some((d) => d.kind === "certificate-of-status"),
-      hasCertifiedCopy: docs.some((d) => d.kind === "certified-copy"),
+      // Intake certificates count only copies uploaded from the card; a
+      // portal purchase is its own obligation (Adam, 15 Sep 2026).
+      hasCertStatus: docs.some((d) => isCardCert(d, "certificate-of-status")),
+      hasCertifiedCopy: docs.some((d) => isCardCert(d, "certified-copy")),
+      // The company's Florida document number, kept with the Articles (or
+      // the Statement) when the office typed it (15 Sep 2026).
+      documentNumber: String(metaOf(docs.find((d) => d.kind === "articles") ?? { meta: {} }).documentNumber ?? metaOf(docs.find((d) => d.kind === "statement") ?? { meta: {} }).documentNumber ?? ""),
+      raService: (payload as { registeredAgent?: { choice?: string } }).registeredAgent?.choice === "SERVICE",
     },
   });
 });
@@ -479,8 +515,8 @@ app.post("/admin/orders/:id/articles", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const db = await getDb();
-  const rows = await db.query<{ id: string; client_id: string | null; llc_name: string; payload: unknown; status: string }>(
-    "SELECT id, client_id, llc_name, payload, status FROM orders WHERE id = $1", [c.req.param("id")]);
+  const rows = await db.query<{ id: string; client_id: string | null; llc_name: string; payload: unknown; status: string; formed_at: string | null }>(
+    "SELECT id, client_id, llc_name, payload, status, formed_at FROM orders WHERE id = $1", [c.req.param("id")]);
   if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
   const o = rows[0];
   if (!o.client_id) return c.json(err("This order has no client account yet.", "NO_CLIENT"), 400);
@@ -491,7 +527,7 @@ app.post("/admin/orders/:id/articles", async (c) => {
   }
   // The card offers the upload only while the order is With The State.
   if (o.status !== "filed") {
-    return c.json(err(`The filed Articles are uploaded while the order is With The State; this one is in ${BOARD_LABEL[o.status] ?? o.status}.`, "BAD_STATE"), 400);
+    return c.json(err(`The filed Articles are uploaded while the order is With The State; ${whereItIs(o)}`, "BAD_STATE"), 400);
   }
   const existing = await db.query<{ id: string }>(
     "SELECT id FROM documents WHERE order_id = $1 AND kind = 'articles'", [o.id]);
@@ -509,7 +545,8 @@ app.post("/admin/orders/:id/articles", async (c) => {
   // Sunbiz's own numbers are the letter L and eleven digits, and its search
   // page warns: "use the number zero for all document numbers. The letter o
   // is not acceptable." (14 Sep 2026)
-  if (weSigned && !/^L\d{11}$/.test(documentNumber)) return c.json(err("A Florida LLC document number is the letter L followed by eleven digits, like L26000123456. Use the digit zero, not the letter o.", "DOCUMENT_NUMBER_SHAPE"), 400);
+  // Checked whenever one is typed: a self-signed order's number is kept too (15 Sep 2026).
+  if (documentNumber && !/^L\d{11}$/.test(documentNumber)) return c.json(err("A Florida LLC document number is the letter L followed by eleven digits, like L26000123456. Use the digit zero, not the letter o.", "DOCUMENT_NUMBER_SHAPE"), 400);
   if (articles.size > MAX_UPLOAD_BYTES) return c.json(err("The file is too large (20 MB max).", "TOO_LARGE"), 400);
   if (!(await looksLikePdf(articles))) {
     return c.json(err("This is not a readable PDF. Upload the filed Articles from Sunbiz.", "NOT_A_PDF"), 400);
@@ -517,8 +554,8 @@ app.post("/admin/orders/:id/articles", async (c) => {
   const stored = await putFile(articles.name, await articles.arrayBuffer(), articles.type || "application/pdf");
   await db.query(
     `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
-     VALUES ($1, $2, 'articles', $3, $4, $5, $6, '{}'::jsonb)`,
-    [o.client_id, o.id, `Articles of Organization — ${o.llc_name}`, stored.storageKey, articles.type || "application/pdf", stored.sizeBytes],
+     VALUES ($1, $2, 'articles', $3, $4, $5, $6, $7)`,
+    [o.client_id, o.id, `Articles of Organization — ${o.llc_name}`, stored.storageKey, articles.type || "application/pdf", stored.sizeBytes, JSON.stringify(documentNumber ? { documentNumber } : {})],
   );
   if (weSigned) await issueStatement(db, o, documentNumber);
   return c.json({ data: { ok: true, statement: weSigned } });
@@ -559,34 +596,33 @@ app.post("/admin/orders/:id/certificates", async (c) => {
       }
       if (f.size > MAX_UPLOAD_BYTES) return c.json(err("File is too large (20 MB max).", "TOO_LARGE"), 400);
       if (!(await looksLikePdf(f))) return c.json(err(`${f.name} is not a readable PDF.`, "NOT_A_PDF"), 400);
-      files.push({ kind, title: `${title} — ${o.llc_name}`, file: f });
+      files.push({ kind, title: certTitle(title, o.llc_name), file: f });
     }
   }
   if (files.length === 0) return c.json(err("Choose a certificate file to upload.", "INVALID_INPUT"), 400);
   const uploaded: string[] = [];
   for (const cf of files) {
-    const prior = await db.query<{ id: string; storage_key: string }>(
-      "SELECT id, storage_key FROM documents WHERE order_id = $1 AND kind = $2", [o.id, cf.kind]);
+    // Another copy, dated; earlier copies stay until the office deletes
+    // them (Adam, 15 Sep 2026).
     const stored = await putFile(cf.file.name, await cf.file.arrayBuffer(), cf.file.type || "application/pdf");
     await db.query(
       `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, '{}'::jsonb)`,
+       VALUES ($1, $2, $3, $4, $5, $6, $7, '{"source":"card"}'::jsonb)`,
       [o.client_id, o.id, cf.kind, cf.title, stored.storageKey, cf.file.type || "application/pdf", stored.sizeBytes],
     );
-    for (const p of prior) {
-      await db.query("DELETE FROM documents WHERE id = $1", [p.id]);
-      await deleteFile(p.storage_key).catch(() => {});
-    }
     uploaded.push(cf.kind);
   }
+  // The card says whether the client was emailed, from what happened (15 Sep 2026).
+  let notified = false;
   if (notify) {
     const clients = await db.query<{ email: string }>("SELECT email FROM clients WHERE id = $1", [o.client_id]);
     if (clients[0]) {
       const mail = newDocumentEmail(`${env.PUBLIC_BASE_URL}/portal`);
-      sendMail({ to: clients[0].email, ...mail }).catch((e) => console.error("[admin] certificate email failed:", e));
+      try { await sendMail({ to: clients[0].email, ...mail }); notified = true; }
+      catch (e) { console.error("[admin] certificate email failed:", e); }
     }
   }
-  return c.json({ data: { uploaded } });
+  return c.json({ data: { uploaded, notified } });
 });
 
 app.post("/admin/orders/:id/formation-documents", async (c) => {
@@ -647,7 +683,7 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
       if (!payloadOpts?.[key]) {
         return c.json(err(`The client did not purchase a ${title.toLowerCase()} with this order.`, "NOT_PURCHASED"), 400);
       }
-      certFiles.push({ kind, title: `${title} — ${o.llc_name}`, file: f });
+      certFiles.push({ kind, title: certTitle(title, o.llc_name), file: f });
     }
   }
   const psdSeriesRaw = (
@@ -719,7 +755,8 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
   // When no new Articles arrive, the existing Articles document survives the
   // retirement of the prior package — deleting it would form an order whose
   // portal has no Articles.
-  const retiredKinds = ["psd", ...(articles ? ["articles"] : []), ...certFiles.map((cf) => cf.kind)];
+  // Certificates are never retired: every copy stays (Adam, 15 Sep 2026).
+  const retiredKinds = ["psd", ...(articles ? ["articles"] : [])];
   const priorDocs = await db.query<{ id: string; storage_key: string }>(
     "SELECT id, storage_key FROM documents WHERE order_id = $1 AND kind = ANY($2::text[])",
     [o.id, retiredKinds],
@@ -771,7 +808,7 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
       newKeys.push(storedCert.storageKey);
       const certRow = await db.query<{ id: string }>(
         `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, '{}'::jsonb) RETURNING id`,
+         VALUES ($1, $2, $3, $4, $5, $6, $7, '{"source":"card"}'::jsonb) RETURNING id`,
         [o.client_id, o.id, cf.kind, cf.title, storedCert.storageKey, cf.file.type || "application/pdf", storedCert.sizeBytes],
       );
       newRows.push(certRow[0].id);
@@ -908,7 +945,9 @@ app.get("/admin/clients", async (c) => {
             (SELECT o.payload->'client'->>'lastName' FROM orders o WHERE o.client_id = cl.id AND o.paid_at IS NOT NULL ORDER BY o.paid_at ASC LIMIT 1) AS last_name,
             (SELECT o.payload->'client'->>'suffix' FROM orders o WHERE o.client_id = cl.id AND o.paid_at IS NOT NULL ORDER BY o.paid_at ASC LIMIT 1) AS suffix,
             COUNT(d.id)::int AS document_count,
-            (SELECT COALESCE(jsonb_agg(DISTINCT o.llc_name), '[]'::jsonb)
+            -- Each company with its renewal date once formed (15 Sep 2026:
+            -- the client saw the date; no office screen did).
+            (SELECT COALESCE(jsonb_agg(DISTINCT (o.llc_name || COALESCE(' (renews ' || to_char(o.ra_renewal_date, 'FMMon FMDD, YYYY') || ')', ''))), '[]'::jsonb)
                FROM orders o
               WHERE o.client_id = cl.id AND o.status <> 'pending_payment'
                 AND o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_llcs,
@@ -1289,9 +1328,9 @@ app.post("/admin/services/:id/fulfill", async (c) => {
         : so.type === "s-election"
           ? `S Corporation Election Package (Form 2553) — ${so.llc_name}`
           : so.type === "certificate-of-status"
-            ? `Certificate of Status — ${so.llc_name}`
+            ? certTitle("Certificate of Status", so.llc_name)
             : so.type === "certified-copy"
-              ? `Certified Copy of the Articles — ${so.llc_name}`
+              ? certTitle("Certified Copy of the Articles", so.llc_name)
               : `EIN Confirmation Letter — ${details.target === "series" ? details.seriesName ?? so.llc_name : so.llc_name}`);
     // Every service deliverable is a PDF (CP 575, the 2553 package, a filed
     // designation) and lands directly in the client's portal — and for EIN and
@@ -1312,7 +1351,9 @@ app.post("/admin/services/:id/fulfill", async (c) => {
     const doc = await db.query<{ id: string }>(
       `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
        VALUES ($1, $6, $7, $2, $3, $4, $5, $8) RETURNING id`,
-      [so.client_id, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes, so.formation_order_id, storedKind, JSON.stringify(isDesignation ? { seriesNames: [details.seriesName] } : {})],
+      // A portal purchase's copy is marked as its own, so the intake
+      // certificate is not counted delivered by it (Adam, 15 Sep 2026).
+      [so.client_id, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes, so.formation_order_id, storedKind, JSON.stringify(isDesignation ? { seriesNames: [details.seriesName] } : CERT_KINDS.includes(so.type as typeof CERT_KINDS[number]) ? { source: "portal", serviceOrderId: so.id } : {})],
     );
     documentId = doc[0].id;
   }
@@ -1406,6 +1447,52 @@ async function carryEinIntoSElections(args: { clientId: string; companyOrderId: 
 /** Package documents still carrying no company after the backfill — hand
  *  uploads whose titles name no company. Adam opens this in his admin
  *  session to see what is left (7 Sep 2026). */
+/** Delete one certificate copy (Adam, 15 Sep 2026: "the user has the ability
+ *  to delete older certificates"). Certificates only: the Articles and the
+ *  designations are replaced, never removed. Gone from the client's portal
+ *  the same moment. */
+app.delete("/admin/documents/:id", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const db = await getDb();
+  const rows = await db.query<{ id: string; kind: string; storage_key: string }>(
+    "SELECT id, kind, storage_key FROM documents WHERE id = $1", [c.req.param("id")]);
+  if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+  if (!CERT_KINDS.includes(rows[0].kind as typeof CERT_KINDS[number])) {
+    return c.json(err("Only a certificate copy can be deleted. Replace the Articles or a designation instead.", "BAD_KIND"), 400);
+  }
+  await db.query("DELETE FROM documents WHERE id = $1", [rows[0].id]);
+  await deleteFile(rows[0].storage_key).catch(() => {});
+  return c.json({ data: { ok: true } });
+});
+
+/** Replace a wrong Articles or designation PDF in place (15 Sep 2026): the
+ *  document keeps its title, kind and coverage; the client's portal serves
+ *  the new file; the old file is removed; the mirror copies it again. */
+app.post("/admin/documents/:id/replace", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const db = await getDb();
+  const rows = await db.query<{ id: string; kind: string; storage_key: string }>(
+    "SELECT id, kind, storage_key FROM documents WHERE id = $1", [c.req.param("id")]);
+  if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+  if (rows[0].kind !== "articles" && rows[0].kind !== "psd") {
+    return c.json(err("Only the Articles or a designation can be replaced. Upload another certificate copy instead.", "BAD_KIND"), 400);
+  }
+  const form = await c.req.parseBody();
+  const file = form.file;
+  if (!(file instanceof File) || file.size === 0) return c.json(err("Choose the replacement PDF.", "INVALID_INPUT"), 400);
+  if (file.size > MAX_UPLOAD_BYTES) return c.json(err("The file is too large (20 MB max).", "TOO_LARGE"), 400);
+  if (!(await looksLikePdf(file))) return c.json(err(`${file.name} is not a readable PDF.`, "NOT_A_PDF"), 400);
+  const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
+  await db.query(
+    "UPDATE documents SET storage_key = $2, content_type = $3, size_bytes = $4, mirrored_at = NULL WHERE id = $1",
+    [rows[0].id, stored.storageKey, file.type || "application/pdf", stored.sizeBytes],
+  );
+  await deleteFile(rows[0].storage_key).catch(() => {});
+  return c.json({ data: { ok: true } });
+});
+
 app.get("/admin/documents/unscoped", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);

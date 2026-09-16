@@ -72,11 +72,11 @@ function Card({
   // from that purchase, since the formation itself is old news.
   const newPurchases = order.status === "formed" ? services.filter((s) => boughtAfterFormation(s, order.formed_at)) : [];
   const freshWork = newPurchases.length > 0;
+  // Otherwise from the day the order was placed, in every column (15 Sep
+  // 2026: marking an order sent restarted the count).
   const ageFrom = freshWork
     ? newPurchases.reduce((latest, s) => (s.created_at > latest ? s.created_at : latest), newPurchases[0].created_at)
-    : order.status === "filed" && order.filed_at
-      ? order.filed_at
-      : order.created_at;
+    : order.created_at;
   return (
     <div
       className={cn(

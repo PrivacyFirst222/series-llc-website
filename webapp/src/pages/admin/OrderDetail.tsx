@@ -2,7 +2,7 @@ import { sunbizSearchUrl } from "@/components/forms/florida-llc/nameSimilarity";
 import { NameCheck } from "@/components/forms/florida-llc/NameCheck";
 import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AlertTriangle, Check, CheckCircle2, Copy, FileUp, Landmark, Loader2, X, XCircle } from "lucide-react";
+import { AlertTriangle, Check, CheckCircle2, Copy, FileUp, Landmark, Loader2, Trash2, X, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
@@ -52,6 +52,67 @@ interface OrderDetailData {
   certifiedCopyPurchased: boolean;
   hasCertStatus: boolean;
   hasCertifiedCopy: boolean;
+  /** The company's Florida document number, once the office typed it. */
+  documentNumber: string;
+  /** The order took our registered agent service. */
+  raService: boolean;
+  raRenewalDate: string | null;
+}
+
+/** Replace a wrong Articles or designation PDF in place (15 Sep 2026). */
+function ReplaceButton({ docId, orderId, onError }: { docId: string; orderId: string; onError: (m: string | null) => void }) {
+  const queryClient = useQueryClient();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const replace = useMutation({
+    mutationFn: async (file: File) => {
+      const fd = new FormData();
+      fd.set("file", file);
+      const res = await fetch(`/api/admin/documents/${docId}/replace`, { method: "POST", body: fd, credentials: "include" });
+      const body = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
+      if (!res.ok) throw new Error(body?.error?.message ?? "The replacement did not go through. Try again.");
+    },
+    onSuccess: () => { onError(null); queryClient.invalidateQueries({ queryKey: ["admin", "order", orderId] }); },
+    onError: (e: Error) => onError(e.message),
+  });
+  return (
+    <>
+      <input ref={inputRef} type="file" accept="application/pdf" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) replace.mutate(f); e.target.value = ""; }} />
+      <Button type="button" variant="ghost" size="sm" className="h-7 rounded-full px-2 text-xs" disabled={replace.isPending} onClick={() => inputRef.current?.click()} data-testid="replace-document">
+        {replace.isPending ? "Replacing…" : "Replace"}
+      </Button>
+    </>
+  );
+}
+
+/** Delete one certificate copy, after a plain-words confirmation (Adam, 15 Sep 2026). */
+function DeleteCopyButton({ docId, orderId, onError }: { docId: string; orderId: string; onError: (m: string | null) => void }) {
+  const queryClient = useQueryClient();
+  const [confirming, setConfirming] = useState(false);
+  const remove = useMutation({
+    mutationFn: async () => {
+      const res = await fetch(`/api/admin/documents/${docId}`, { method: "DELETE", credentials: "include" });
+      const body = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
+      if (!res.ok) throw new Error(body?.error?.message ?? "The copy could not be deleted. Try again.");
+    },
+    onSuccess: () => { onError(null); setConfirming(false); queryClient.invalidateQueries({ queryKey: ["admin", "order", orderId] }); },
+    onError: (e: Error) => onError(e.message),
+  });
+  if (confirming) {
+    return (
+      <span className="inline-flex items-center gap-1 text-xs">
+        Delete this copy? The client will no longer see it.
+        <Button type="button" variant="destructive" size="sm" className="h-7 rounded-full px-2 text-xs" disabled={remove.isPending} onClick={() => remove.mutate()} data-testid="confirm-delete-copy">
+          {remove.isPending ? "Deleting…" : "Delete"}
+        </Button>
+        <Button type="button" variant="ghost" size="sm" className="h-7 rounded-full px-2 text-xs" onClick={() => setConfirming(false)}>Keep</Button>
+      </span>
+    );
+  }
+  return (
+    <Button type="button" variant="ghost" size="sm" className="h-7 rounded-full px-2 text-xs" onClick={() => setConfirming(true)} data-testid="delete-copy">
+      <Trash2 className="mr-1 h-3 w-3" /> Delete
+    </Button>
+  );
 }
 
 /** A field and its copy button. The check is not a UI flourish — it is the
@@ -279,7 +340,9 @@ export default function OrderDetail({
   const sheet = d ? (
     <>
       {d.groups.filter((g) => {
-              if (isConversion) return d.status === "paid";
+              // A conversion: the whole sheet while it is being filed, and
+              // again once nothing is owed, as a formation (15 Sep 2026).
+              if (isConversion && d.status === "paid") return true;
               if (d.status === "paid") return !g.series;
               if (d.status === "filed") return !d.seriesFiledAt && !!g.series;
               // Formed: while anything is still owed the panel shows only the
@@ -312,6 +375,8 @@ export default function OrderDetail({
     setUploadError(null);
     setCertChosen(Boolean(certStatusRef.current?.files?.length || certifiedCopyRef.current?.files?.length));
   };
+  /** Whether the certificate email left, from the route's own report (15 Sep 2026). */
+  const [certNotified, setCertNotified] = useState<boolean | null>(null);
   const uploadCerts = useMutation({
     mutationFn: async () => {
       const fd = new FormData();
@@ -320,10 +385,13 @@ export default function OrderDetail({
       const certifiedCopy = certifiedCopyRef.current?.files?.[0];
       if (certifiedCopy) fd.append("certifiedCopy", certifiedCopy);
       const res = await fetch(`/api/admin/orders/${orderId}/certificates`, { method: "POST", body: fd, credentials: "include" });
-      const body = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
+      const body = (await res.json().catch(() => null)) as { error?: { message?: string }; data?: { notified?: boolean } } | null;
       if (!res.ok) throw new Error(body?.error?.message ?? "The upload did not go through. Try again.");
+      return body?.data?.notified === true;
     },
-    onSuccess: () => {
+    onSuccess: (notified) => {
+      setUploadError(null);
+      setCertNotified(notified);
       if (certStatusRef.current) certStatusRef.current.value = "";
       if (certifiedCopyRef.current) certifiedCopyRef.current.value = "";
       setCertChosen(false);
@@ -421,6 +489,18 @@ export default function OrderDetail({
                 ""
               )}
             </p>
+            {/* What the office looks up most (15 Sep 2026): the company's
+                number and, for an agent client, when the service renews. */}
+            {d?.documentNumber ? (
+              <p className="text-sm text-muted-foreground" data-testid="document-number">
+                <span className="font-medium text-foreground">Florida document number</span> {d.documentNumber}
+              </p>
+            ) : null}
+            {d?.raService && d.raRenewalDate ? (
+              <p className="text-sm text-muted-foreground" data-testid="ra-renewal">
+                Registered agent service renews {new Date(`${d.raRenewalDate}T12:00:00Z`).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric", timeZone: "UTC" })}
+              </p>
+            ) : null}
           </div>
           <Button variant="ghost" size="sm" onClick={onClose} aria-label="Close">
             <X className="h-4 w-4" />
@@ -560,10 +640,18 @@ export default function OrderDetail({
               {d.documents.length > 0 ? (
                 <ul className="mt-3 space-y-1 text-sm">
                   {d.documents.map((doc) => (
-                    <li key={doc.id} className="flex items-center gap-2 text-muted-foreground">
+                    <li key={doc.id} className="flex flex-wrap items-center gap-2 text-muted-foreground">
                       <Check className="h-3.5 w-3.5 text-trust" />
                       {doc.title}
                       <span className="text-xs">· uploaded {new Date(doc.createdAt).toLocaleDateString()}</span>
+                      {/* A wrong Articles or designation is replaced in place;
+                          a certificate copy is deleted (Adam, 15 Sep 2026). */}
+                      {doc.kind === "articles" || doc.kind === "psd" ? (
+                        <ReplaceButton docId={doc.id} orderId={orderId} onError={setActionError} />
+                      ) : null}
+                      {doc.kind === "certificate-of-status" || doc.kind === "certified-copy" ? (
+                        <DeleteCopyButton docId={doc.id} orderId={orderId} onError={setActionError} />
+                      ) : null}
                     </li>
                   ))}
                 </ul>
@@ -571,13 +659,15 @@ export default function OrderDetail({
 
               {/* The state's certificates are owed until delivered, formed or
                   not (Adam, 10 Sep 2026: ACME went formed in one step and both
-                  slots vanished with the certificates still owed). */}
-              {(d.certStatusPurchased && !d.hasCertStatus) || (d.certifiedCopyPurchased && !d.hasCertifiedCopy) ? (
-                <div className="mt-4 space-y-3" data-testid="certificates-owed">
-                  {d.certStatusPurchased && !d.hasCertStatus ? (
+                  slots vanished with the certificates still owed) — and the
+                  boxes stay after a copy exists, because certificates are
+                  bought again (Adam, 15 Sep 2026). */}
+              {d.certStatusPurchased || d.certifiedCopyPurchased ? (
+                <div className="mt-4 space-y-3" data-testid={(d.certStatusPurchased && !d.hasCertStatus) || (d.certifiedCopyPurchased && !d.hasCertifiedCopy) ? "certificates-owed" : "certificates-more"}>
+                  {d.certStatusPurchased ? (
                     <div>
                       <label htmlFor="upload-cert-status" className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
-                        Certificate of Status (purchased)
+                        {d.hasCertStatus ? "Upload a Certificate of Status (another copy)" : "Upload a Certificate of Status (purchased, still owed)"}
                       </label>
                       <input
                         id="upload-cert-status"
@@ -589,10 +679,10 @@ export default function OrderDetail({
                       />
                     </div>
                   ) : null}
-                  {d.certifiedCopyPurchased && !d.hasCertifiedCopy ? (
+                  {d.certifiedCopyPurchased ? (
                     <div>
                       <label htmlFor="upload-certified-copy" className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
-                        Certified Copy of the Articles (purchased)
+                        {d.hasCertifiedCopy ? "Upload a Certified Copy of the Articles (another copy)" : "Upload a Certified Copy of the Articles (purchased, still owed)"}
                       </label>
                       <input
                         id="upload-certified-copy"
@@ -606,6 +696,11 @@ export default function OrderDetail({
                   ) : null}
                   {uploadError && d.status === "formed" ? (
                     <p className="text-sm text-destructive" data-testid="certificate-upload-error">{uploadError}</p>
+                  ) : null}
+                  {certNotified !== null && !uploadCerts.isPending ? (
+                    <p className="text-sm text-trust" data-testid="certificate-upload-result">
+                      {certNotified ? "Uploaded — the client was emailed." : "Uploaded — the email to the client could not be sent."}
+                    </p>
                   ) : null}
                   {certChosen ? (
                     <Button
@@ -729,7 +824,7 @@ export default function OrderDetail({
             {/* The filing sequence, top to bottom: Articles first, the
                 designation uploads right under them, and only then the
                 ancillary services (Adam, 30 Aug 2026). */}
-            {d && d.status !== "paid" && services.length > 0 ? (
+            {d && (d.status !== "paid" || isConversion) && services.length > 0 ? (
               <section className="mt-3 rounded-xl border border-amber-500/40 bg-amber-500/5 p-4">
                 <div className="flex items-center gap-2">
                   <Landmark className="h-4 w-4 text-amber-700 dark:text-amber-400" />
