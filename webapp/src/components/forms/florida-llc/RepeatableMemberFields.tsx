@@ -140,7 +140,7 @@ export function RepeatableMemberFields({
 
           <AddressFieldsBlock
             prefix={`mem-${entry.id}`}
-            errors={rowError(idx, "address1") ? { address1: rowError(idx, "address1") } : undefined}
+            errors={{ address1: rowError(idx, "address1"), city: rowError(idx, "city"), state: rowError(idx, "state"), zip: rowError(idx, "zip") }}
             value={{
               address1: entry.address1,
               address2: entry.address2,

@@ -284,6 +284,15 @@ function conversionGroups(p: PayloadLike): FilingGroup[] {
       })),
     },
   ];
+  // The Division's acknowledgment goes to the correspondence contact on a
+  // conversion too (15 Sep 2026: the sheet had no row for it).
+  groups.push({
+    title: "Correspondence name and e-mail",
+    fields: [
+      { key: "corrName", label: "Name", value: p.correspondence?.name ?? "" },
+      { key: "corrEmail", label: "E-mail address (entered twice)", value: p.correspondence?.email ?? "" },
+    ],
+  });
   if (ra.choice === "SERVICE") {
     groups.push({ title: "Change of registered agent ($25) — Statement of Change", fields: raFields(ra) });
   }

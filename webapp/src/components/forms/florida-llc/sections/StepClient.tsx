@@ -103,6 +103,7 @@ export function StepClient({ data, patch, errors }: StepProps) {
           prefix="client"
           value={data.clientAddress}
           onChange={(v) => patch({ clientAddress: v })}
+          errors={{ address1: errors["clientAddress.address1"], city: errors["clientAddress.city"], state: errors["clientAddress.state"], zip: errors["clientAddress.zip"] }}
         />
       </FieldShell>
     </div>

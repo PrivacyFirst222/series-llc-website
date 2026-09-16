@@ -293,6 +293,9 @@ export function FloridaLLCFormationForm({
     // step already told the service chooser "nothing to sign", and the
     // server fills the canonical acceptance regardless of the browser.
     (STEPS[i]?.key === "acceptance" && data.registeredAgentChoice === "SERVICE") ||
+    // A conversion keeping its own agent files no appointment, so there is
+    // nothing to accept (15 Sep 2026).
+    (STEPS[i]?.key === "acceptance" && data.filingPath === "CONVERT" && data.registeredAgentChoice === "SELF") ||
     (STEPS[i]?.key === "managers" && data.managementStructure === "MEMBER_MANAGED") ||
     (STEPS[i]?.key === "members" && data.managementStructure === "MANAGER_MANAGED") ||
     // A conversion files Designations for a company already on file: purpose

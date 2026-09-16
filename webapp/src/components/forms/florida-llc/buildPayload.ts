@@ -4,6 +4,7 @@ import type { FloridaLLCFormData, SubmissionPayload } from "./types";
 
 export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
   const isConversion = data.filingPath === "CONVERT";
+  const signsSelf = !isConversion && data.articlesSignerChoice === "SELF";
   const fees = calculateEstimatedFees({
     isConversion,
     certificateOfStatus: data.orderCertificateOfStatus,
@@ -134,11 +135,11 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
     certifications: {
       articlesSignedBy: data.articlesSignerChoice,
       articlesSignerAppointed: data.articlesSignerAppointment,
-      authorizedRepresentativeName: data.authorizedRepresentativeName,
-      authorizedRepresentativeTitle:
-        data.authorizedRepresentativeTitle ?? "",
-      authorizedRepresentativeSignature:
-        data.authorizedRepresentativeSignature,
+      // The client's own signer details reach the record only when the
+      // client signs (15 Sep 2026: an appointed order still named the client).
+      authorizedRepresentativeName: signsSelf ? data.authorizedRepresentativeName : "",
+      authorizedRepresentativeTitle: signsSelf ? data.authorizedRepresentativeTitle ?? "" : "",
+      authorizedRepresentativeSignature: signsSelf ? data.authorizedRepresentativeSignature : "",
       atLeastOneMemberAcknowledged: data.atLeastOneMemberAcknowledgment,
       accuracyAcknowledged: data.accuracyAcknowledgment,
       publicRecordAcknowledged: data.publicRecordAcknowledgment,
@@ -158,12 +159,12 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
       registeredAgentPhysicalAddressAcknowledgment: data.registeredAgentPhysicalAddressAcknowledgment === true,
       registeredAgentAcceptanceCheckbox: data.registeredAgentAcceptanceCheckbox === true,
       registeredAgentSignatureAuthorizationCheckbox: data.registeredAgentSignatureAuthorizationCheckbox === true,
-      authorizedRepresentativeSignatureCheckbox: data.authorizedRepresentativeSignatureCheckbox === true,
+      authorizedRepresentativeSignatureCheckbox: signsSelf && data.authorizedRepresentativeSignatureCheckbox === true,
       addressAccuracyAcknowledgment: data.addressAccuracyAcknowledgment === true,
       termsOfServiceAcknowledgment: data.termsOfServiceAcknowledgment === true,
       // The no-refund deadline acknowledgment for the S election package
       // (14 Sep 2026: required by the server, never recorded).
-      sElectionFilingAcknowledgment: data.sElectionFilingAcknowledgment === true,
+      sElectionFilingAcknowledgment: !isConversion && data.sElectionFilingAcknowledgment === true,
     },
     nameCheck: data.nameCheck
       ? { available: data.nameCheck.available, asOf: data.nameCheck.asOf, results: data.nameCheck.results.map((r) => ({ input: r.input, verdict: r.verdict })) }

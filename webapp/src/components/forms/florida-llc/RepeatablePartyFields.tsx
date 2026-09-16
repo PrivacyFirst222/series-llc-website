@@ -146,7 +146,7 @@ export function RepeatablePartyFields({
 
           <AddressFieldsBlock
             prefix={`party-${entry.id}`}
-            errors={rowError(idx, "streetAddress1") ? { address1: rowError(idx, "streetAddress1") } : undefined}
+            errors={{ address1: rowError(idx, "streetAddress1"), city: rowError(idx, "city"), state: rowError(idx, "state"), zip: rowError(idx, "zip") }}
             value={{
               address1: entry.streetAddress1,
               address2: entry.streetAddress2,
@@ -203,9 +203,6 @@ export function RepeatablePartyFields({
         Add manager
       </Button>
 
-      <p className="text-xs text-muted-foreground">
-        The 50 states and the District of Columbia are available.
-      </p>
     </div>
   );
 }

@@ -50,7 +50,8 @@ export function priceOrder(opts: {
   });
   const stateFeesCents = fees.estimatedTotal * 100;
   const lineItems: { name: string; amountCents: number }[] = [
-    { name: "Formation service fee", amountCents: SERVICE_FEE_CENTS },
+    // A conversion buys designations for a company that exists (15 Sep 2026).
+    { name: opts.isConversion ? "Protected series service fee" : "Formation service fee", amountCents: SERVICE_FEE_CENTS },
   ];
   if (opts.ein) {
     lineItems.push({ name: "Federal EIN service", amountCents: EIN_FEE_CENTS });

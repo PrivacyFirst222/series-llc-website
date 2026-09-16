@@ -10,16 +10,21 @@ interface OrderStatus {
   llcName: string;
   /** A conversion: the company exists; the Designations are what we file. */
   isConversion?: boolean;
+  /** A returning client already has a portal password. */
+  hasPassword?: boolean;
 }
 
 const DRAFT_KEY = "fl-llc-formation-draft-v1";
 
 function ResendWelcome({ orderId }: { orderId: string }) {
   const resend = useMutation({
-    mutationFn: () => api.post(`/api/orders/${orderId}/resend-welcome`, {}),
+    mutationFn: () => api.post<{ ok: boolean; sent: boolean }>(`/api/orders/${orderId}/resend-welcome`, {}),
   });
   if (resend.isSuccess) {
-    return <span className="font-medium text-trust">Sent — check your inbox.</span>;
+    // What the route reports, not what the button hoped (15 Sep 2026).
+    return resend.data?.sent
+      ? <span className="font-medium text-trust">Sent — check your inbox.</span>
+      : <span className="font-medium">Your account already has a password — sign in below.</span>;
   }
   return (
     <button
@@ -102,11 +107,23 @@ export default function OrderConfirmed() {
               <div className="flex gap-3 rounded-xl border border-border bg-background p-4">
                 <KeyRound className="mt-0.5 h-5 w-5 shrink-0 text-trust" />
                 <div>
-                  <p className="text-sm font-medium">1. Create your portal account</p>
-                  <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
-                    We emailed you a secure link to set your password. Didn't get it?{" "}
-                    <ResendWelcome orderId={ref} />
-                  </p>
+                  {statusQuery.data?.hasPassword ? (
+                    <>
+                      <p className="text-sm font-medium" data-testid="returning-client">1. Sign in to your existing portal account</p>
+                      <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
+                        This order is on the account you already have.{" "}
+                        <Link to="/portal/login" className="font-medium underline underline-offset-2">Sign in</Link>.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-sm font-medium">1. Create your portal account</p>
+                      <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
+                        We emailed you a secure link to set your password. Didn't get it?{" "}
+                        <ResendWelcome orderId={ref} />
+                      </p>
+                    </>
+                  )}
                 </div>
               </div>
               <div className="flex gap-3 rounded-xl border border-border bg-background p-4">

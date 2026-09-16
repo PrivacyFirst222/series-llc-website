@@ -73,6 +73,13 @@ const extendedFormSchema = formationFormSchema
           "Please confirm you understand that your LLC will own every protected series.",
       }),
     }),
+    // The acceptance is signed only by a self-agent on a new formation; a
+    // conversion keeping its own agent files no appointment (15 Sep 2026).
+    // Re-imposed below for the case that needs it.
+    registeredAgentAcceptanceName: z.string().trim().max(200).optional().or(z.literal("")),
+    registeredAgentAcceptanceCheckbox: z.boolean().optional(),
+    registeredAgentElectronicSignature: z.string().max(200).optional().or(z.literal("")),
+    registeredAgentSignatureAuthorizationCheckbox: z.boolean().optional(),
     articlesSignerChoice: z.enum(["SELF", "SERVICE"], {
       errorMap: () => ({ message: "Choose who will sign the Articles." }),
     }),
@@ -80,7 +87,7 @@ const extendedFormSchema = formationFormSchema
   })
   .superRefine((data, ctx) => {
     // The S election add-on needs its acknowledgment (Adam, 6 Sep 2026).
-    if (data.orderSElection && data.sElectionFilingAcknowledgment !== true) {
+    if (data.filingPath !== "CONVERT" && data.orderSElection && data.sElectionFilingAcknowledgment !== true) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["sElectionFilingAcknowledgment"], message: "Please acknowledge the Form 2553 filing deadline to add the S election package." });
     }
     if (data.filingPath !== "CONVERT") {
@@ -236,6 +243,22 @@ const extendedFormSchema = formationFormSchema
     }
     // Exactly one of the two signing paths must be complete. Relaxing the base
     // schema to allow an empty signature block is only safe because of this.
+    if (data.registeredAgentChoice === "SELF" && data.filingPath !== "CONVERT") {
+      if (!(data.registeredAgentAcceptanceName ?? "").trim()) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["registeredAgentAcceptanceName"], message: "Name required" });
+      } else if (!hasFirstAndLast(data.registeredAgentAcceptanceName ?? "")) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["registeredAgentAcceptanceName"], message: FIRST_AND_LAST });
+      }
+      if (data.registeredAgentAcceptanceCheckbox !== true) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["registeredAgentAcceptanceCheckbox"], message: "Acceptance is required." });
+      }
+      if (!(data.registeredAgentElectronicSignature ?? "").trim()) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["registeredAgentElectronicSignature"], message: "Electronic signature required" });
+      }
+      if (data.registeredAgentSignatureAuthorizationCheckbox !== true) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["registeredAgentSignatureAuthorizationCheckbox"], message: "Authorization is required." });
+      }
+    }
     if (data.filingPath === "CONVERT") {
       // No Articles to sign: the authority certification above stands in.
     } else if (data.articlesSignerChoice === "SERVICE") {

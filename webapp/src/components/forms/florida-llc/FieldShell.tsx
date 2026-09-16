@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { Children, cloneElement, isValidElement, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 interface FieldShellProps {
@@ -20,6 +20,17 @@ export function FieldShell({
   children,
   className,
 }: FieldShellProps) {
+  // The message is tied to the box it belongs to (15 Sep 2026): the box is
+  // marked invalid and described by the message, so Continue can land on the
+  // first problem and a screen reader announces it with the box.
+  const errId = htmlFor && error ? `${htmlFor}-err` : undefined;
+  const wired = errId
+    ? Children.map(children, (child) =>
+        isValidElement<Record<string, unknown>>(child)
+          ? cloneElement(child, { "aria-invalid": true, "aria-describedby": errId })
+          : child,
+      )
+    : children;
   return (
     <div className={cn("flex flex-col gap-1.5", className)}>
       <label
@@ -29,12 +40,13 @@ export function FieldShell({
         {label}
         {required ? <span className="ml-0.5 text-accent">*</span> : null}
       </label>
-      {children}
+      {wired}
       {helper ? (
         <p className="text-xs text-muted-foreground leading-relaxed">{helper}</p>
       ) : null}
       {error ? (
         <p
+          id={errId}
           className="text-xs font-medium text-destructive"
           role="alert"
           aria-live="polite"

@@ -28,6 +28,8 @@ function nextDefaultName(existing: SeriesEntry[]): string {
 export function StepSeries({ data, patch, errors }: StepProps) {
   const llcName =
     buildFinalLlcName(data.desiredLlcName, data.llcDesignator) ||
+    // A conversion named its company two steps ago (15 Sep 2026).
+    (data.filingPath === "CONVERT" ? (data.existingLlcName ?? "").trim() : "") ||
     "[Your LLC Name]";
   const extraSeries = Math.max(0, data.series.length - INCLUDED_COUNT);
   const additionalFee = extraSeries * ADDITIONAL_FEE;

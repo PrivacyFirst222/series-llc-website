@@ -277,6 +277,8 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
     expect(/first name/i.test(errs), `${run.key}: empty first name error names the field`, errs.slice(0, 120));
     expect(/last name/i.test(errs), `${run.key}: empty last name error names the field`, errs.slice(0, 120));
     expect(/email/i.test(errs), `${run.key}: empty email error names the field`, errs.slice(0, 120));
+    expect(/State is required\./.test(errs), `${run.key}: the empty State box says "State is required." (15 Sep 2026)`, errs.slice(0, 200));
+    expect((await page.locator("#client-state[aria-invalid=\"true\"], [id$='-state'][aria-invalid=\"true\"]").count()) >= 1, `${run.key}: the State box is marked invalid, tied to its message`, await page.locator("[aria-invalid=\"true\"]").count());
   }
   await fill(page, "First name", "Casey");
   await fill(page, "Last name", "Gatecheck");
@@ -373,6 +375,13 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
     await rows.nth(i).fill(`PS ${["Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta"][i]}`);
     await rows.nth(i).blur();
   }
+  {
+    // The helper names the company: a conversion's existing name, never the
+    // placeholder (15 Sep 2026).
+    const seriesText = await page.locator("main").innerText();
+    const expectName = run.path === "convert" ? run.llcName : `${run.llcName}, ${run.designator}`;
+    expect(seriesText.includes(`Full name: ${expectName}, PS Alpha`) && !/\[Your LLC Name\]/.test(seriesText), `${run.key}: the series helper reads "Full name: ${expectName}, PS Alpha"`, seriesText.match(/Full name:[^\n]*/g));
+  }
   await advance(page);
 
   // Registered agent.
@@ -408,7 +417,11 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
 
   // Acceptance appears ONLY for a self agent (P-series: choosing our service
   // must skip it — asserted by heading, not assumed).
-  if (run.ra === "SELF") {
+  if (run.ra === "SELF" && run.path === "convert") {
+    // A conversion keeping its own agent files no appointment: no acceptance
+    // step (15 Sep 2026).
+    expect(!(await stepHeading(page)).toLowerCase().includes("acceptance"), `${run.key}: a conversion keeping its own agent skips the acceptance step`, await stepHeading(page));
+  } else if (run.ra === "SELF") {
     expect((await stepHeading(page)).toLowerCase().includes("acceptance"), `${run.key}: self agent sees the acceptance step`, await stepHeading(page));
     expect((await page.locator("#ra-accept-name").inputValue()) === "Casey Gatecheck", `${run.key}: the acceptance name is the client's own, not our series' name`, await page.locator("#ra-accept-name").inputValue());
     await page.locator("#ra-accept-name").fill("Casey Gatecheck");
@@ -426,6 +439,7 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
     const mgmtText = await page.locator("main").innerText();
     if (run.path === "convert") {
       expect(/How would you like your LLC to be managed\?/.test(mgmtText) && !/How will the LLC be managed\?/.test(mgmtText), `${run.key}: a conversion asks how the client would like the LLC managed`, mgmtText.slice(0, 200));
+      expect(/Nothing here is filed with the state\./.test(mgmtText) && !/Florida permits the Articles to include a statement/.test(mgmtText), `${run.key}: the management step opens with the conversion sentence, not the Articles one (15 Sep 2026)`, mgmtText.match(/Nothing here[^.]*\.|Florida permits[^.]*\./g));
     } else {
       expect(/How will the LLC be managed\?/.test(mgmtText), `${run.key}: a new formation keeps its management question`, mgmtText.slice(0, 200));
     }
@@ -632,7 +646,9 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
     // read case-blind; the codes carry underscores, which no label does.
     expect(!/\b(MEMBER_MANAGED|MANAGER_MANAGED|INDIVIDUAL_AGENT|PRINCIPAL_OF_ENTITY)\b/.test(review) && /Structure\s+(Member-managed|Manager-managed)/i.test(review) && (run.path === "convert" || /Type\s+(General purpose|General purpose plus a specific purpose|Professional purpose)/i.test(review)), `${run.key}: the Review step uses words, not codes`, review.match(/\b\w+_\w+\b|Structure\s+[^\n]+|Type\s+[^\n]+/gi));
     expect(/Certificate of Status\s+(Yes \(\+\$15\)|No)/i.test(review) && /Certified Copy\s+(Yes \(\+\$40\)|No)/i.test(review) && /Federal EIN\s+(Yes \(\+\$50\)|No)/i.test(review) && (run.path === "convert" ? !/S election package/i.test(review) : /S election package\s+(Yes \(\+\$95\)|No)/i.test(review)), `${run.key}: the Review step lists every optional purchase at the price charged`, review.match(/Optional Documents[\s\S]{0,300}/i)?.[0]);
-    expect((run.ra === "SELF") === /Registered Agent Acceptance/.test(review), `${run.key}: the acceptance card appears only when the client is their own agent`, review.match(/Registered Agent[\s\S]{0,200}/)?.[0]);
+    expect((run.ra === "SELF" && run.path !== "convert") === /Registered Agent Acceptance/.test(review), `${run.key}: the acceptance card appears only when the client is their own agent on a new formation`, review.match(/Registered Agent[\s\S]{0,200}/)?.[0]);
+    expect((run.path === "convert") !== /Statement in Articles/i.test(review), `${run.key}: the Statement in Articles row appears only on a new formation (15 Sep 2026)`, review.match(/Statement in Articles[^\n]*/i)?.[0]);
+    expect(!/\bMGR\b/.test(review), `${run.key}: managers are listed by name, no MGR code (15 Sep 2026)`, review.match(/MGR[^\n]{0,40}/g));
     if (run.ra === "SERVICE") expect(/Our registered agent service/.test(review), `${run.key}: the Review step names our agent service in words`, review.match(/Registered Agent[\s\S]{0,200}/)?.[0]);
   }
   // Review → certify.

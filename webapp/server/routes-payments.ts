@@ -388,6 +388,8 @@ app.post("/orders", async (c) => {
     // The receipt goes to the account holder; the correspondence contact is
     // the Division's address (14 Sep 2026).
     buyerEmail: data.clientEmail,
+    // A conversion's company already exists (15 Sep 2026).
+    description: data.filingPath === "CONVERT" ? `Protected Series Designations for ${llcName}` : undefined,
   });
   await db.query("UPDATE orders SET square_order_id = $1 WHERE id = $2", [
     checkout.squareOrderId,
@@ -414,7 +416,14 @@ app.get("/orders/:id/status", async (c) => {
   if (rows.length === 0) return c.json(err("Order not found", "NOT_FOUND"), 404);
   // A conversion's company already exists; the page's wording follows.
   const payload = (typeof rows[0].payload === "string" ? JSON.parse(rows[0].payload) : rows[0].payload) as { filingPath?: string } | null;
-  return c.json({ data: { status: rows[0].status, llcName: rows[0].llc_name, isConversion: payload?.filingPath === "CONVERT" } });
+  // Whether the client already has a portal password: a returning client is
+  // sent to sign in, not told to wait for an email that never comes
+  // (15 Sep 2026). Nothing else about the account is exposed.
+  const acct = await db.query<{ has: boolean }>(
+    "SELECT (c.password_hash IS NOT NULL) AS has FROM orders o JOIN clients c ON c.id = o.client_id WHERE o.id = $1",
+    [c.req.param("id")],
+  );
+  return c.json({ data: { status: rows[0].status, llcName: rows[0].llc_name, isConversion: payload?.filingPath === "CONVERT", hasPassword: acct[0]?.has === true } });
 });
 
 app.post("/square/webhook", async (c) => {
@@ -575,7 +584,7 @@ app.post("/orders/:id/resend-welcome", async (c) => {
   );
   // Always report success — never confirm order existence to a guesser.
   if (orders.length === 0 || orders[0].status !== "paid" || !orders[0].client_id) {
-    return c.json({ data: { ok: true } });
+    return c.json({ data: { ok: true, sent: false } });
   }
   const clients = await db.query<{ id: string; password_hash: string | null }>(
     "SELECT id, password_hash FROM clients WHERE id = $1",
@@ -592,8 +601,10 @@ app.post("/orders/:id/resend-welcome", async (c) => {
     await sendMail({ to: orders[0].contact_email, ...mail }).catch((e) =>
       console.error("[resend-welcome] failed:", e),
     );
+    return c.json({ data: { ok: true, sent: true } });
   }
-  return c.json({ data: { ok: true } });
+  // The page says "Sent" only when something was sent (15 Sep 2026).
+  return c.json({ data: { ok: true, sent: false } });
 });
 
 /** Name-availability check against our mirror of the Division of

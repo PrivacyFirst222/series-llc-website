@@ -46,8 +46,14 @@ export function validateStep(
       data.clientEmail !== data.confirmClientEmail
     )
       e.confirmClientEmail = "Emails do not match.";
-    if (!data.clientAddress.address1.trim() || !data.clientAddress.city.trim() || !data.clientAddress.zip.trim())
-      e.clientAddress = "Street address, city, and ZIP are required.";
+    // Each box says what it is missing, and the state is required here as
+    // the server requires it (15 Sep 2026: a typed address could skip it).
+    if (!data.clientAddress.address1.trim()) e["clientAddress.address1"] = "Street address is required.";
+    if (!data.clientAddress.city.trim()) e["clientAddress.city"] = "City is required.";
+    if (!data.clientAddress.state.trim()) e["clientAddress.state"] = "State is required.";
+    if (!data.clientAddress.zip.trim()) e["clientAddress.zip"] = "ZIP is required.";
+    if (!data.clientAddress.address1.trim() || !data.clientAddress.city.trim() || !data.clientAddress.state.trim() || !data.clientAddress.zip.trim())
+      e.clientAddress = "Street address, city, state, and ZIP are required.";
   }
 
   if (step === "name") {
@@ -220,7 +226,9 @@ export function validateStep(
     }
   }
 
-  if (step === "acceptance" && data.registeredAgentChoice !== "SERVICE") {
+  // A conversion keeping its own agent files no appointment: the step is
+  // hidden and nothing here applies (15 Sep 2026).
+  if (step === "acceptance" && data.registeredAgentChoice !== "SERVICE" && !(data.filingPath === "CONVERT" && data.registeredAgentChoice === "SELF")) {
     if (!data.registeredAgentAcceptanceName.trim())
       e.registeredAgentAcceptanceName = "Your name is required.";
     else if (!hasFirstAndLast(data.registeredAgentAcceptanceName))
@@ -253,7 +261,7 @@ export function validateStep(
       !data.managers.some((m) => m.role === "MGR")
     )
       e.managers =
-        "At least one Manager (MGR) is required when including a manager-managed statement in the Articles.";
+        "At least one Manager is required when including a manager-managed statement in the Articles.";
 
     data.managers.forEach((m, i) => {
       if (m.personOrEntity === "INDIVIDUAL" && !(m.firstName ?? "").trim())
@@ -264,6 +272,10 @@ export function validateStep(
         e[`managers.${i}.businessEntityName`] = "Entity name required.";
       if (!m.streetAddress1)
         e[`managers.${i}.streetAddress1`] = "Street address required.";
+      // The server requires city, state and ZIP per row (15 Sep 2026).
+      if (!(m.city ?? "").trim()) e[`managers.${i}.city`] = "City required.";
+      if (!(m.state ?? "").trim()) e[`managers.${i}.state`] = "State required.";
+      if (!(m.zip ?? "").trim()) e[`managers.${i}.zip`] = "ZIP required.";
     });
   }
 
@@ -282,6 +294,9 @@ export function validateStep(
       if (m.memberType === "ENTITY" && !m.entityName)
         e[`members.${i}.entityName`] = "Entity name required.";
       if (!m.address1) e[`members.${i}.address1`] = "Address required.";
+      if (!(m.city ?? "").trim()) e[`members.${i}.city`] = "City required.";
+      if (!(m.state ?? "").trim()) e[`members.${i}.state`] = "State required.";
+      if (!(m.zip ?? "").trim()) e[`members.${i}.zip`] = "ZIP required.";
     });
   }
 
@@ -341,7 +356,9 @@ export function validateStep(
   // "optional": the S election add-on carries a required acknowledgment
   // (Adam, 6 Sep 2026) — the client files it, within 2 months and 15 days,
   // and there is no refund for missing that.
-  if (step === "optional" && data.orderSElection && !data.sElectionFilingAcknowledgment) {
+  // A conversion never shows the package, so a tick left over from the
+  // new-formation path cannot trap it (15 Sep 2026).
+  if (step === "optional" && data.filingPath !== "CONVERT" && data.orderSElection && !data.sElectionFilingAcknowledgment) {
     e.sElectionFilingAcknowledgment = "Please acknowledge the Form 2553 filing deadline to add the S election package.";
   }
 

@@ -160,7 +160,7 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
 
         {/* When we are the agent the acceptance is ours, not the client's:
             no card, and no Edit to a step the form never shows (14 Sep 2026). */}
-        {data.registeredAgentChoice !== "SERVICE" ? (
+        {data.registeredAgentChoice !== "SERVICE" && data.filingPath !== "CONVERT" ? (
         <ReviewCard title="Registered Agent Acceptance" onEdit={() => goToStep("acceptance")}>
           <Row label="Acceptance signer" value={data.registeredAgentAcceptanceName} />
           <Row label="Capacity" value={data.registeredAgentAcceptanceCapacity === "INDIVIDUAL_AGENT" ? "The registered agent, an individual" : data.registeredAgentAcceptanceCapacity} />
@@ -177,20 +177,23 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
 
         <ReviewCard title="Management" onEdit={() => goToStep("management")}>
           <Row label="Structure" value={data.managementStructure === "MANAGER_MANAGED" ? "Manager-managed" : data.managementStructure === "MEMBER_MANAGED" ? "Member-managed" : data.managementStructure} />
+          {/* A conversion files no Articles; no statement goes anywhere. */}
+          {data.filingPath !== "CONVERT" ? (
+            <Row
+              label="Statement in Articles?"
+              value={data.includeManagementStatementInArticles ? "Yes" : "No"}
+            />
+          ) : null}
           <Row
-            label="Statement in Articles?"
-            value={data.includeManagementStatementInArticles ? "Yes" : "No"}
-          />
-          <Row
-            label="Managers / AR"
+            label="Managers"
             value={
               data.managers.length === 0
                 ? "None"
                 : data.managers
                     .map((m) =>
                       m.personOrEntity === "INDIVIDUAL"
-                        ? `${m.role}: ${fullPersonName(m.firstName, m.lastName, m.suffix)}`
-                        : `${m.role}: ${m.businessEntityName}`,
+                        ? fullPersonName(m.firstName, m.lastName, m.suffix)
+                        : m.businessEntityName,
                     )
                     .join("; ")
             }

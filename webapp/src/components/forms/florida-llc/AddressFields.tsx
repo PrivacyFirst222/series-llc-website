@@ -77,6 +77,7 @@ export function AddressFieldsBlock({
       >
         <Input
           id={`${prefix}-city`}
+          aria-invalid={Boolean(errors?.city)}
           value={value.city}
           onChange={(e) => set("city", e.target.value)}
         />
@@ -94,7 +95,7 @@ export function AddressFieldsBlock({
           onValueChange={(v) => set("state", v)}
           disabled={Boolean(lockState)}
         >
-          <SelectTrigger id={`${prefix}-state`}>
+          <SelectTrigger id={`${prefix}-state`} aria-invalid={Boolean(errors?.state)}>
             <SelectValue placeholder="Select…" />
           </SelectTrigger>
           <SelectContent>
@@ -116,6 +117,7 @@ export function AddressFieldsBlock({
       >
         <Input
           id={`${prefix}-zip`}
+          aria-invalid={Boolean(errors?.zip)}
           value={value.zip}
           onChange={(e) => set("zip", e.target.value)}
           inputMode="numeric"

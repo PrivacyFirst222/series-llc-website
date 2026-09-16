@@ -463,6 +463,11 @@ check("service-RA order accepted with canonical details enforced", svc.status ==
   });
   check("'we sign' with the appointment is accepted, with no client signature",
     appointed.status === 200, { status: appointed.status, body: appointed.body });
+  {
+    const apPayload = (await api(`/api/admin/orders/${appointed.body?.data?.orderId}`, { cookies: (await adminSession()).cookie })).body?.data?.payload;
+    const apc = (typeof apPayload === "string" ? JSON.parse(apPayload) : apPayload)?.certifications as { authorizedRepresentativeName?: string; authorizedRepresentativeSignature?: string } | undefined;
+    check("an appointed order's record carries no client signer name or signature (15 Sep 2026)", (apc?.authorizedRepresentativeName ?? "") === "" && (apc?.authorizedRepresentativeSignature ?? "") === "", apc);
+  }
 
   // The Statement of Authorized Representative (Adam, 13 Sep 2026): made the
   // moment the filed Articles go up for an order whose client appointed us,
@@ -699,6 +704,33 @@ check("client account auto-created on payment", !!client && !client.has_password
     correspondentEmail: uc("uiconv"), confirmCorrespondentEmail: uc("uiconv"),
   })});
   check("a UI-shaped conversion (no new-name fields) is accepted", conv.status === 200, conv.body);
+  {
+    const strayIp = () => ({ "X-Forwarded-For": `10.79.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}` });
+    // A tick left over from the new-formation path cannot trap a conversion,
+    // and a conversion keeping its own agent signs no acceptance (15 Sep 2026).
+    const stray = await api("/api/orders", { method: "POST", headers: strayIp(), body: JSON.stringify({
+      ...formData, filingPath: "CONVERT", desiredLlcName: "", llcDesignator: "", alternateName1: "",
+      nameSearchAcknowledgment: false, governmentAffiliationAcknowledgment: false, lawfulPurposeNameAcknowledgment: false,
+      existingLlcName: "E2E Converted Holdings, LLC", sunbizDocumentNumber: "L24000999888", conversionAuthorityAcknowledgment: true,
+      purposeType: "", atLeastOneMemberAcknowledgment: false,
+      series: [{ id: "s1", name: "E2E Converted Holdings, LLC, PS A" }],
+      orderSElection: true, sElectionFilingAcknowledgment: false,
+      registeredAgentAcceptanceName: "", registeredAgentElectronicSignature: "", registeredAgentAcceptanceCheckbox: false, registeredAgentSignatureAuthorizationCheckbox: false,
+      clientEmail: uc("stray"), confirmClientEmail: uc("stray"), correspondentEmail: uc("stray"), confirmCorrespondentEmail: uc("stray"),
+    }) });
+    check("a conversion with a stray S election tick and no agent acceptance is accepted", stray.status === 200, stray.body);
+    const strayDet = (await api(`/api/admin/orders/${stray.body?.data?.orderId}`, { cookies: admin.cookie })).body?.data as { payload?: unknown; groups?: { title: string; fields: { key: string; value: string }[] }[] } | undefined;
+    const sp = (typeof strayDet?.payload === "string" ? JSON.parse(strayDet.payload) : strayDet?.payload) as { optionalDocuments?: { sElection?: boolean }; acknowledgments?: { sElectionFilingAcknowledgment?: boolean }; certifications?: { authorizedRepresentativeSignature?: string } } | undefined;
+    check("the conversion's record carries no S election, no S election acknowledgment, and no client signature", sp?.optionalDocuments?.sElection === false && sp?.acknowledgments?.sElectionFilingAcknowledgment === false && (sp?.certifications?.authorizedRepresentativeSignature ?? "") === "", { od: sp?.optionalDocuments, ack: sp?.acknowledgments?.sElectionFilingAcknowledgment, sig: sp?.certifications?.authorizedRepresentativeSignature });
+    const corr = (strayDet?.groups ?? []).find((g) => /Correspondence/.test(g.title));
+    check("the conversion sheet carries the correspondence name and e-mail", !!corr && corr.fields.some((f) => f.key === "corrEmail" && f.value === uc("stray")), strayDet?.groups?.map((g) => g.title));
+    // A new formation's self-agent still signs the acceptance; the server
+    // refuses without it, naming the box. The client's state is required.
+    const noAccept = await api("/api/orders", { method: "POST", headers: strayIp(), body: JSON.stringify({ ...formData, registeredAgentAcceptanceCheckbox: false, clientEmail: uc("noacc"), confirmClientEmail: uc("noacc"), correspondentEmail: uc("noacc"), confirmCorrespondentEmail: uc("noacc") }) });
+    check("a new formation's self-agent must still accept the appointment", noAccept.status === 400 && /registeredAgentAcceptanceCheckbox/.test(JSON.stringify(noAccept.body)), noAccept.body);
+    const noState = await api("/api/orders", { method: "POST", headers: strayIp(), body: JSON.stringify({ ...formData, clientAddress: { ...formData.clientAddress, state: "" }, clientEmail: uc("nost"), confirmClientEmail: uc("nost"), correspondentEmail: uc("nost"), confirmCorrespondentEmail: uc("nost") }) });
+    check("the client's state is required by the server", noState.status === 400 && /clientAddress/.test(JSON.stringify(noState.body)) && /state/i.test(JSON.stringify(noState.body)), noState.body);
+  }
   const fullC = await api(`/api/admin/orders/${conv.body?.data?.orderId}`, { cookies: admin.cookie });
   check("a conversion order is named by the company being converted",
     (fullC.body?.data as { llcName?: string })?.llcName === "E2E Converted Holdings, LLC",
@@ -734,6 +766,15 @@ check("client account auto-created on payment", !!client && !client.has_password
     check("series designations cannot be marked filed on an order still in New Orders, and the refusal names the board", convSeries.status === 400 && /New Orders/.test(convSeries.body?.error?.message ?? ""), convSeries.body);
     const convStatus = await api(`/api/orders/${convId}/status`);
     check("the confirmation page can tell a conversion from a formation (13 Sep 2026)", convStatus.body?.data?.isConversion === true && (await api(`/api/orders/${orderId}/status`)).body?.data?.isConversion === false, convStatus.body);
+    {
+      // The receipt lines come from the server's own pricing (the client's
+      // numbers are never trusted); a conversion's names a protected series
+      // service, not a formation (15 Sep 2026).
+      const { priceOrder } = await import("./pricing");
+      const convItems = priceOrder({ isConversion: true, seriesCount: 1, certificateOfStatus: false, certifiedCopy: false, ein: false, sElection: false, registeredAgentChange: false }).lineItems;
+      const newItems = priceOrder({ isConversion: false, seriesCount: 1, certificateOfStatus: false, certifiedCopy: false, ein: false, sElection: false, registeredAgentChange: false }).lineItems;
+      check("a conversion's receipt sells a protected series service, not a formation (15 Sep 2026)", convItems.some((li) => li.name === "Protected series service fee") && !convItems.some((li) => li.name === "Formation service fee") && newItems.some((li) => li.name === "Formation service fee"), { convItems, newItems });
+    }
     const cd = (await api(`/api/admin/orders/${convId}`, { cookies: admin.cookie })).body?.data as {
       filingPath?: string; existingLlcName?: string; sunbizDocumentNumber?: string; status?: string;
       groups?: { title: string; fields: { label: string; value: string }[] }[];
@@ -1781,6 +1822,15 @@ if (mint.status === 200) {
     check("a second formation for the same email is accepted", second.status === 200, second.body?.error);
     const secondId = second.body?.data?.orderId as string;
     await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: secondId }) });
+    {
+      // The payment page knows a returning client (15 Sep 2026), and the
+      // resend button reports the truth: nothing is sent to an account that
+      // already has a password.
+      const st = await api(`/api/orders/${secondId}/status`);
+      check("the status says the client already has a portal password", st.body?.data?.hasPassword === true, st.body?.data);
+      const rs = await api(`/api/orders/${secondId}/resend-welcome`, { method: "POST", body: "{}" });
+      check("resend for a returning client answers that nothing was sent", rs.status === 200 && rs.body?.data?.sent === false, rs.body);
+    }
     const companies = await api("/api/portal/companies", { cookies: setPw.cookie });
     const list = (companies.body?.data ?? []) as { orderId: string; llcName: string }[];
     check("the companies list holds both formations", list.length >= 2, list.length);

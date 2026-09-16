@@ -100616,12 +100616,19 @@ var extendedFormSchema = formationFormSchema.extend({
       message: "Please confirm you understand that your LLC will own every protected series."
     })
   }),
+  // The acceptance is signed only by a self-agent on a new formation; a
+  // conversion keeping its own agent files no appointment (15 Sep 2026).
+  // Re-imposed below for the case that needs it.
+  registeredAgentAcceptanceName: external_exports.string().trim().max(200).optional().or(external_exports.literal("")),
+  registeredAgentAcceptanceCheckbox: external_exports.boolean().optional(),
+  registeredAgentElectronicSignature: external_exports.string().max(200).optional().or(external_exports.literal("")),
+  registeredAgentSignatureAuthorizationCheckbox: external_exports.boolean().optional(),
   articlesSignerChoice: external_exports.enum(["SELF", "SERVICE"], {
     errorMap: () => ({ message: "Choose who will sign the Articles." })
   }),
   articlesSignerAppointment: external_exports.boolean().optional().default(false)
 }).superRefine((data, ctx) => {
-  if (data.orderSElection && data.sElectionFilingAcknowledgment !== true) {
+  if (data.filingPath !== "CONVERT" && data.orderSElection && data.sElectionFilingAcknowledgment !== true) {
     ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["sElectionFilingAcknowledgment"], message: "Please acknowledge the Form 2553 filing deadline to add the S election package." });
   }
   if (data.filingPath !== "CONVERT") {
@@ -100762,6 +100769,22 @@ var extendedFormSchema = formationFormSchema.extend({
       ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["atLeastOneMemberAcknowledgment"], message: "Acknowledgment is required." });
     }
   }
+  if (data.registeredAgentChoice === "SELF" && data.filingPath !== "CONVERT") {
+    if (!(data.registeredAgentAcceptanceName ?? "").trim()) {
+      ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["registeredAgentAcceptanceName"], message: "Name required" });
+    } else if (!hasFirstAndLast(data.registeredAgentAcceptanceName ?? "")) {
+      ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["registeredAgentAcceptanceName"], message: FIRST_AND_LAST });
+    }
+    if (data.registeredAgentAcceptanceCheckbox !== true) {
+      ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["registeredAgentAcceptanceCheckbox"], message: "Acceptance is required." });
+    }
+    if (!(data.registeredAgentElectronicSignature ?? "").trim()) {
+      ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["registeredAgentElectronicSignature"], message: "Electronic signature required" });
+    }
+    if (data.registeredAgentSignatureAuthorizationCheckbox !== true) {
+      ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["registeredAgentSignatureAuthorizationCheckbox"], message: "Authorization is required." });
+    }
+  }
   if (data.filingPath === "CONVERT") {
   } else if (data.articlesSignerChoice === "SERVICE") {
     if (!data.articlesSignerAppointment) {
@@ -100845,6 +100868,7 @@ var orderFormSchema = external_exports.preprocess((raw2) => {
 // src/components/forms/florida-llc/buildPayload.ts
 function buildPayload(data) {
   const isConversion = data.filingPath === "CONVERT";
+  const signsSelf = !isConversion && data.articlesSignerChoice === "SELF";
   const fees = calculateEstimatedFees({
     isConversion,
     certificateOfStatus: data.orderCertificateOfStatus,
@@ -100956,9 +100980,11 @@ function buildPayload(data) {
     certifications: {
       articlesSignedBy: data.articlesSignerChoice,
       articlesSignerAppointed: data.articlesSignerAppointment,
-      authorizedRepresentativeName: data.authorizedRepresentativeName,
-      authorizedRepresentativeTitle: data.authorizedRepresentativeTitle ?? "",
-      authorizedRepresentativeSignature: data.authorizedRepresentativeSignature,
+      // The client's own signer details reach the record only when the
+      // client signs (15 Sep 2026: an appointed order still named the client).
+      authorizedRepresentativeName: signsSelf ? data.authorizedRepresentativeName : "",
+      authorizedRepresentativeTitle: signsSelf ? data.authorizedRepresentativeTitle ?? "" : "",
+      authorizedRepresentativeSignature: signsSelf ? data.authorizedRepresentativeSignature : "",
       atLeastOneMemberAcknowledged: data.atLeastOneMemberAcknowledgment,
       accuracyAcknowledged: data.accuracyAcknowledgment,
       publicRecordAcknowledged: data.publicRecordAcknowledgment,
@@ -100978,12 +101004,12 @@ function buildPayload(data) {
       registeredAgentPhysicalAddressAcknowledgment: data.registeredAgentPhysicalAddressAcknowledgment === true,
       registeredAgentAcceptanceCheckbox: data.registeredAgentAcceptanceCheckbox === true,
       registeredAgentSignatureAuthorizationCheckbox: data.registeredAgentSignatureAuthorizationCheckbox === true,
-      authorizedRepresentativeSignatureCheckbox: data.authorizedRepresentativeSignatureCheckbox === true,
+      authorizedRepresentativeSignatureCheckbox: signsSelf && data.authorizedRepresentativeSignatureCheckbox === true,
       addressAccuracyAcknowledgment: data.addressAccuracyAcknowledgment === true,
       termsOfServiceAcknowledgment: data.termsOfServiceAcknowledgment === true,
       // The no-refund deadline acknowledgment for the S election package
       // (14 Sep 2026: required by the server, never recorded).
-      sElectionFilingAcknowledgment: data.sElectionFilingAcknowledgment === true
+      sElectionFilingAcknowledgment: !isConversion && data.sElectionFilingAcknowledgment === true
     },
     nameCheck: data.nameCheck ? { available: data.nameCheck.available, asOf: data.nameCheck.asOf, results: data.nameCheck.results.map((r) => ({ input: r.input, verdict: r.verdict })) } : null,
     metadata: {
@@ -101016,7 +101042,8 @@ function priceOrder(opts) {
   });
   const stateFeesCents = fees.estimatedTotal * 100;
   const lineItems = [
-    { name: "Formation service fee", amountCents: SERVICE_FEE_CENTS }
+    // A conversion buys designations for a company that exists (15 Sep 2026).
+    { name: opts.isConversion ? "Protected series service fee" : "Formation service fee", amountCents: SERVICE_FEE_CENTS }
   ];
   if (opts.ein) {
     lineItems.push({ name: "Federal EIN service", amountCents: EIN_FEE_CENTS });
@@ -106708,6 +106735,13 @@ function conversionGroups(p2) {
       }))
     }
   ];
+  groups.push({
+    title: "Correspondence name and e-mail",
+    fields: [
+      { key: "corrName", label: "Name", value: p2.correspondence?.name ?? "" },
+      { key: "corrEmail", label: "E-mail address (entered twice)", value: p2.correspondence?.email ?? "" }
+    ]
+  });
   if (ra.choice === "SERVICE") {
     groups.push({ title: "Change of registered agent ($25) \u2014 Statement of Change", fields: raFields(ra) });
   }
@@ -109381,7 +109415,9 @@ function registerPaymentRoutes(app2) {
       priced,
       // The receipt goes to the account holder; the correspondence contact is
       // the Division's address (14 Sep 2026).
-      buyerEmail: data.clientEmail
+      buyerEmail: data.clientEmail,
+      // A conversion's company already exists (15 Sep 2026).
+      description: data.filingPath === "CONVERT" ? `Protected Series Designations for ${llcName}` : void 0
     });
     await db.query("UPDATE orders SET square_order_id = $1 WHERE id = $2", [
       checkout.squareOrderId,
@@ -109398,7 +109434,11 @@ function registerPaymentRoutes(app2) {
     );
     if (rows.length === 0) return c.json(err("Order not found", "NOT_FOUND"), 404);
     const payload = typeof rows[0].payload === "string" ? JSON.parse(rows[0].payload) : rows[0].payload;
-    return c.json({ data: { status: rows[0].status, llcName: rows[0].llc_name, isConversion: payload?.filingPath === "CONVERT" } });
+    const acct = await db.query(
+      "SELECT (c.password_hash IS NOT NULL) AS has FROM orders o JOIN clients c ON c.id = o.client_id WHERE o.id = $1",
+      [c.req.param("id")]
+    );
+    return c.json({ data: { status: rows[0].status, llcName: rows[0].llc_name, isConversion: payload?.filingPath === "CONVERT", hasPassword: acct[0]?.has === true } });
   });
   app2.post("/square/webhook", async (c) => {
     const rawBody = await c.req.text();
@@ -109512,7 +109552,7 @@ function registerPaymentRoutes(app2) {
       [c.req.param("id")]
     );
     if (orders.length === 0 || orders[0].status !== "paid" || !orders[0].client_id) {
-      return c.json({ data: { ok: true } });
+      return c.json({ data: { ok: true, sent: false } });
     }
     const clients = await db.query(
       "SELECT id, password_hash FROM clients WHERE id = $1",
@@ -109529,8 +109569,9 @@ function registerPaymentRoutes(app2) {
       await sendMail({ to: orders[0].contact_email, ...mail }).catch(
         (e) => console.error("[resend-welcome] failed:", e)
       );
+      return c.json({ data: { ok: true, sent: true } });
     }
-    return c.json({ data: { ok: true } });
+    return c.json({ data: { ok: true, sent: false } });
   });
   const contactSchema = external_exports.object({
     name: external_exports.string().trim().min(1).max(200).refine(hasFirstAndLast, FIRST_AND_LAST),

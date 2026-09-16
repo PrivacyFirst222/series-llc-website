@@ -201,7 +201,15 @@ export function StepCertification({ data, patch, errors }: StepProps) {
           <button
             key={opt.key}
             type="button"
-            onClick={() => patch({ articlesSignerChoice: opt.key })}
+            onClick={() =>
+              // Choosing "we sign" clears the client's own signer boxes, as
+              // choosing our agent service clears the agent boxes (15 Sep 2026).
+              patch(
+                opt.key === "SERVICE"
+                  ? { articlesSignerChoice: "SERVICE", authorizedRepresentativeName: "", authorizedRepresentativeTitle: "", authorizedRepresentativeSignature: "", authorizedRepresentativeSignatureCheckbox: false }
+                  : { articlesSignerChoice: opt.key },
+              )
+            }
             className={cn(
               "w-full text-left rounded-xl border p-4 transition",
               data.articlesSignerChoice === opt.key

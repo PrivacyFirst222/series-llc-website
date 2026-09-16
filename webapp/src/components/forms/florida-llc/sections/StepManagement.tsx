@@ -42,9 +42,9 @@ export function StepManagement({ data, patch, errors }: StepProps) {
       <header className="space-y-2">
         <h2 className="font-display text-3xl">Management structure</h2>
         <p className="text-sm text-muted-foreground max-w-2xl">
-          Florida permits the Articles to include a statement that the LLC is
-          manager-managed. Some institutions or agencies may require a manager or
-          authorized representative to appear in state records.
+          {data.filingPath === "CONVERT"
+            ? "How your LLC is managed decides who signs for it and who runs each series under your operating agreement. Nothing here is filed with the state."
+            : "Florida permits the Articles to include a statement that the LLC is manager-managed. Some institutions or agencies may require a manager or authorized representative to appear in state records."}
         </p>
       </header>
 
