@@ -1,0 +1,879 @@
+{
+  "files": [
+    {
+      "path": "webapp/server/filing.ts",
+      "lines": 595
+    },
+    {
+      "path": "webapp/server/manual-pdf.ts",
+      "lines": 413
+    },
+    {
+      "path": "webapp/server/new-series.ts",
+      "lines": 135
+    },
+    {
+      "path": "webapp/server/oa-amendment.ts",
+      "lines": 150
+    },
+    {
+      "path": "webapp/server/oa-capital.ts",
+      "lines": 139
+    },
+    {
+      "path": "webapp/server/oa.ts",
+      "lines": 765
+    },
+    {
+      "path": "webapp/server/order-summary.ts",
+      "lines": 264
+    },
+    {
+      "path": "webapp/server/pdf-render.ts",
+      "lines": 680
+    },
+    {
+      "path": "webapp/server/s-election.ts",
+      "lines": 346
+    },
+    {
+      "path": "webapp/server/statement.ts",
+      "lines": 69
+    },
+    {
+      "path": "webapp/server/templates-new-series.md",
+      "lines": 66
+    },
+    {
+      "path": "webapp/server/templates-oa-amendment.md",
+      "lines": 74
+    },
+    {
+      "path": "webapp/server/templates-oa-member-s.md",
+      "lines": 509
+    },
+    {
+      "path": "webapp/server/templates-oa-member-single-s.md",
+      "lines": 395
+    },
+    {
+      "path": "webapp/server/templates-oa-member-single.md",
+      "lines": 363
+    },
+    {
+      "path": "webapp/server/templates-oa-member.md",
+      "lines": 493
+    },
+    {
+      "path": "webapp/server/templates-oa-multi.md",
+      "lines": 507
+    },
+    {
+      "path": "webapp/server/templates-oa-s.md",
+      "lines": 523
+    },
+    {
+      "path": "webapp/server/templates-oa-single-s.md",
+      "lines": 426
+    },
+    {
+      "path": "webapp/server/templates-oa-single.md",
+      "lines": 393
+    },
+    {
+      "path": "webapp/server/templates-statement-of-authorized-representative.md",
+      "lines": 40
+    },
+    {
+      "path": "docs/oa-instructions.md",
+      "lines": 75
+    },
+    {
+      "path": "docs/owners-manual.md",
+      "lines": 536
+    },
+    {
+      "path": "docs/README.md",
+      "lines": 184
+    }
+  ],
+  "priorFindings": [
+    {
+      "id": "229",
+      "status": "confirmed",
+      "evidence": "The four manager-managed masters refer to authority conferred by §5.4 in indemnification; §5.3 grants authority and §5.4 supplies approval restrictions.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "230",
+      "status": "confirmed",
+      "evidence": "All eight signature introductions use the dates below although the preamble supplies an Effective Date; the amendment likewise has an amendment date above and signature dates below. The generated restatement DOES use Effective Date (oa.ts:534), so the never-used claim applies only to the unassembled masters.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "231",
+      "status": "confirmed",
+      "evidence": "The multi-member Tax Matters paragraphs use lowercase member/members for the defined parties; all four masters otherwise define Member/Members.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "232",
+      "status": "disputed",
+      "evidence": "The actual sentence is “(b) any amendment changing the rights or obligations of the Manager may not impose new obligations on the Manager without the Manager's written consent.” (single:256; single-s:289). It is redundant, not circular: changing rights does not itself require consent, whereas imposing new obligations does. No contradictory or indeterminate rule follows.",
+      "replacementOk": true,
+      "replacementNote": "The proposed shorter sentence preserves the rule, but is an optional concision edit rather than correction of circularity."
+    },
+    {
+      "id": "233",
+      "status": "disputed",
+      "evidence": "§3.1 requires the Members and Manager to adopt a Series Exhibit, not to sign that exhibit separately. Every Member signs the entire Agreement incorporating its exhibits; the Manager also signs. For later series, templates-new-series.md:21 expressly adopts the attached exhibit and all Members sign. A manager-only exhibit signature therefore does not prove lack of member adoption.",
+      "replacementOk": false,
+      "replacementNote": "No replacement is proposed; do not add redundant signature requirements without an intended change to the adoption procedure."
+    },
+    {
+      "id": "234",
+      "status": "disputed",
+      "evidence": "The actual exhibit says “completed by the Member(s), together with the records maintained under Article 8” (multi:472). Initial completion by Members and continuing maintenance by the Manager are compatible tasks; Article 8 does not forbid Members completing the attachment.",
+      "replacementOk": false,
+      "replacementNote": "Replacing completion by Members with maintenance under Article 8 removes an express task allocation; it is not a necessary correction."
+    },
+    {
+      "id": "235",
+      "status": "confirmed",
+      "evidence": "The eight colophons list 711.501 and 711.512 but omit the body's range endpoint 711.50; only the two single-owner S colophons list federal Code references. This is a source-colophon consistency issue; oa.ts:738 removes these colophons from delivered PDFs.",
+      "replacementOk": false,
+      "replacementNote": "Adding 711.50 is correct. “All or none” is not a complete replacement; choose one convention and enumerate the Code sections actually cited in each form."
+    },
+    {
+      "id": "236",
+      "status": "confirmed",
+      "evidence": "§2.13 and §4.1 in all four multi-member masters both state the interests are of a single class. This is a visible repetition, not a conflict.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "237",
+      "status": "confirmed",
+      "evidence": "Instructions:21 calls the companion the “Series LLC User's Manual”; docs/facts.md names the Owner's Manual.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "238",
+      "status": "confirmed",
+      "evidence": "Instructions:39 says the Administrative Member has “no authority to decide anything”; member/member-s §5.8 expressly permits additional authority conferred by the Agreement or a Majority in Interest.",
+      "replacementOk": false,
+      "replacementNote": "“Replace as proposed” supplies no replacement. Use: “The Administrative Member handles ministerial tasks and has any additional authority this Agreement or a Majority in Interest confers.”"
+    },
+    {
+      "id": "239",
+      "status": "confirmed",
+      "evidence": "Instructions:61 and Manual:139 use a majority of owners rather than Majority in Interest; Instructions:41 and Manual:138 add written to an approval rule whose listed consent is not limited to writing.",
+      "replacementOk": false,
+      "replacementNote": "Use “Members holding more than 50% of the Percentage Interests” for capital calls and “the consent of all Members” for borrowing; retain written notice of a capital call, which §6.2 actually requires."
+    },
+    {
+      "id": "240",
+      "status": "confirmed",
+      "evidence": "Manual:103 calls unanimity non-variable; Online Sunshine 2026 §605.2107(1)(i) expressly permits varying the manner of approving establishment. The masters themselves require unanimity in §3.1.",
+      "replacementOk": false,
+      "replacementNote": "The finding asks for a ruling rather than providing replacement text. The concrete replacement in item249 is correct."
+    },
+    {
+      "id": "241",
+      "status": "confirmed",
+      "evidence": "Manual:390 says the agreement requires current contact information, but the masters' notice provisions give delivery addresses without a covenant to update them.",
+      "replacementOk": false,
+      "replacementNote": "“Replace as proposed” is incomplete. Say “Keep your contact information current so notices reach you.” Do not invent an operating-agreement covenant."
+    },
+    {
+      "id": "242",
+      "status": "confirmed",
+      "evidence": "Manual:425 states “($75 total)” for three designations without identifying that as state fees; facts:19 prices additional series at $50 through the service.",
+      "replacementOk": false,
+      "replacementNote": "“($25 state fee each)” is correct. “$150 through us” is wrong for the first three included in a formation package; clarify whether the example describes initial or later designations."
+    },
+    {
+      "id": "243",
+      "status": "disputed",
+      "evidence": "Manual:77 cites §605.2602 for restrictions on series entity transactions. That section itself states the restrictions and points to §§605.2605–605.2607 for exceptions. A citation to it alone is not a false statement of the law; the proposed longer citation is optional.",
+      "replacementOk": true,
+      "replacementNote": "The expanded citation matches the ledger preference, but is not needed to correct the legal claim."
+    },
+    {
+      "id": "244",
+      "status": "confirmed",
+      "evidence": "Manual:130 says assets are never in a personal name, but every master §8.4 expressly permits a properly documented representative or nominee arrangement; 2026 §605.2301(5) also permits it subject to its exclusions.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "245",
+      "status": "confirmed",
+      "evidence": "Manual:70 and :130 place standing rules at the end of Article8 although §8.6 follows §8.5; line70 also mismatches plural rules with makes/it.",
+      "replacementOk": false,
+      "replacementNote": "Fix location and plural agreement. Also remove the separate absolute promise that no asset can ever be non-associated (new finding in this report); grammatical correction alone leaves that error."
+    },
+    {
+      "id": "246",
+      "status": "disputed",
+      "evidence": "The actual Manual colophon at :536 includes the entire “605.2101–605.2802” range. Thus 605.2107, 605.2302, 605.2304 and 605.2402 are already included, contrary to four of the alleged twelve omissions. The missing individually named provisions are 605.0302, 605.04074, 605.0410, 605.0602, 605.0714, 605.1103, former212.031 and220.02.",
+      "replacementOk": false,
+      "replacementNote": "Reconcile eight omitted individual citations, distinguish the repealed historical citation, and define whether ranges satisfy the colophon convention; do not report twelve absent sections."
+    },
+    {
+      "id": "247",
+      "status": "confirmed",
+      "evidence": "Manual:91 uses “s. 6.1” for an agreement section; README:69 calls the eight masters five. The extra blank source lines are also present but do not change delivered PDF text.",
+      "replacementOk": false,
+      "replacementNote": "The citation and eight corrections are sound. Track whitespace separately as housekeeping; the item mixes reader-visible wording with source-only whitespace."
+    },
+    {
+      "id": "248",
+      "status": "confirmed",
+      "evidence": "Manual cover:15 says “Florida Uniform Protected Series Act”; Online Sunshine 2026 §605.2101 gives Uniform Protected Series Provisions, and §605.0101 gives Florida Revised Limited Liability Company Act.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "249",
+      "status": "confirmed",
+      "evidence": "Manual:103 makes the approval rule non-variable, contrary to 2026 §605.2107(1)(i); §3.1 of each master retains unanimity. Already marked same defect as240, so not newly classified duplicate.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "250",
+      "status": "confirmed",
+      "evidence": "Manual:138 applies the dollar threshold to guarantees; multi/s:180 and member/member-s:186 require all-Member consent for every guarantee, irrespective of amount.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "251",
+      "status": "disputed",
+      "evidence": "The actual clause says “As permitted by s. 605.2107(1)(n) ... this Section varies s. 605.2304(2)”. Online Sunshine 2026 §605.2107(1)(n) makes only (3) and (6) non-variable, leaving (2) variable with §605.2106. The finding concedes precisely that result. Describing what the restriction permits is not an incorrect legal claim.",
+      "replacementOk": true,
+      "replacementNote": "The proposed wording is a more explicit explanation of the same true rule, not a substantive correction."
+    },
+    {
+      "id": "252",
+      "status": "confirmed",
+      "evidence": "The masters use statement of dissolution for a protected series; 2026 §605.2502(2) calls it articles of protected series dissolution and (3) separately names designation cancellation.",
+      "replacementOk": true,
+      "replacementNote": "Also change §1.9’s plural wording to articles of dissolution where applicable; cancellation follows winding up and is a separate filing."
+    },
+    {
+      "id": "253",
+      "status": "confirmed",
+      "evidence": "Manual:386 says each member may designate a TOD beneficiary, while master §4.11/§4.6 and 2026 §711.502 limit registration to qualifying individual ownership. The finding does not challenge the retained tenants-in-common language.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "254",
+      "status": "confirmed",
+      "evidence": "Manual:72 calls an added series $25, omitting the $25 preparation component in facts:19 and the Manual's own $50-through-us examples. Already linked to242.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "255",
+      "status": "confirmed",
+      "evidence": "Manual:160,165,235,389,413 use § for Florida statutes while other statute citations use s./ss.; this is visible citation style only.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "256",
+      "status": "confirmed",
+      "evidence": "Manual:130 says the rules close Article8 but §8.6 follows §8.5; the nominee qualification is also supported by §8.4. Already linked to245.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "257",
+      "status": "disputed",
+      "evidence": "The actual sentence, “The protected series is established when its Protected Series Designation takes effect under s. 605.0207, Florida Statutes,” tracks 2026 §605.2201(3) verbatim in substance. It says the designation takes effect under0207, not that0207 is the series-establishment section. The finding admits the sentence is true.",
+      "replacementOk": true,
+      "replacementNote": "Adding §605.2201(3) is an optional supplemental citation, not a correction to a false claim."
+    },
+    {
+      "id": "258",
+      "status": "confirmed",
+      "evidence": "new-series.ts:107 fills only PS-[N], whereas oa.ts:673–676 also adds the series' filed name to the detached Asset Schedule heading. Already linked to priorA50.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "259",
+      "status": "confirmed",
+      "evidence": "new-series.ts:134 titles the stored consent New Protected Series, whereas the document and portal describe a consent with exhibit. Already linked to priorA52.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "260",
+      "status": "housekeeping-only",
+      "evidence": "new-series.ts:112–113 inaccurately says its dash matches the agreement; computeCapital:124 supplies None to the agreement. The identified comment itself is invisible to clients.",
+      "replacementOk": false,
+      "replacementNote": "Changing the comment alone is housekeeping. The proposed code change also changes the delivered contribution cell and belongs to the already-reported A48 defect; do not count it as a new housekeeping-only client change."
+    },
+    {
+      "id": "261",
+      "status": "housekeeping-only",
+      "evidence": "README:25–39 omits the consent master, although templates-new-series.md and its generator exist. This concerns source documentation, not changed client wording. The statement that it is the twelfth master is inaccurate: the table already lists12 deliverables, so consent would be13.",
+      "replacementOk": false,
+      "replacementNote": "Add the consent to the source inventory; explicitly decide/document its Word-output status. The report cannot require an unverified Word deliverable to be generated during this read-only audit."
+    },
+    {
+      "id": "262",
+      "status": "disputed",
+      "evidence": "oa.ts:534 does compose the restatement recital, contrary to its local source-text rule, but the proposed “ten masters” is wrong: there are eight operating-agreement masters. Moreover single-s:20 and member-single-s:20 already have RecitalD; inserting anotherD as proposed creates duplicate lettering.",
+      "replacementOk": false,
+      "replacementNote": "Move the variant-specific recital to all eight OA masters and useE in the two single-member S forms, D in the other six. Moving otherwise identical text is housekeeping; duplicateD in delivered restatements is separately reported as new."
+    },
+    {
+      "id": "263",
+      "status": "disputed",
+      "evidence": "oa.ts:740 checks only draft-footer leakage, so the hardening observation is true. But the proposed final regex also matches legitimate client text such as “[ACME]” and “[TITLE]” inserted into names or asset descriptions; applied after substitution it would reject valid input. statement.ts:65 checks slots but :45 removes comments, rather than refusing every leftover comment as claimed.",
+      "replacementOk": false,
+      "replacementNote": "Validate template placeholders and markers before inserting client text, or track known template slots explicitly. Do not use an unrestricted uppercase-bracket scan on the completed document."
+    },
+    {
+      "id": "264",
+      "status": "disputed",
+      "evidence": "The actual function instructionsMarkdown authors the package text in TypeScript, as README:165–167 deliberately documents. The audit prompt contains no universal prohibition on client sentences in TypeScript; oa.ts's local master rule is not a rule governing this independent generator. An explicit architecture choice is not itself a defect.",
+      "replacementOk": false,
+      "replacementNote": "Neither a new master nor a new owner ruling is required by the cited audit instructions. Report particular incorrect sentences, rather than treating all generator text as inherently wrong."
+    },
+    {
+      "id": "265",
+      "status": "confirmed",
+      "evidence": "Instructions:39 names MANAGER NAME for filling the appointment, but the appointment slot is MANAGER NAMES and each signature still legitimately uses MANAGER NAME.",
+      "replacementOk": false,
+      "replacementNote": "Explain both: “[MANAGER NAMES] — the initial manager or managers in the appointment; [MANAGER NAME] — the signer in each manager signature block.”"
+    },
+    {
+      "id": "266",
+      "status": "confirmed",
+      "evidence": "order-summary.ts:122 says Federal EIN service, while :220 labels the same field Federal EIN; visible office-PDF wording, despite its placement under Housekeeping.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "267",
+      "status": "housekeeping-only",
+      "evidence": "single-s:191–192 contains the two source blank lines. oa.ts:738 collapses three or more newlines, and pdf-render.ts:63–65 ignores blank lines, so deleting one changes no delivered reader text.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    }
+  ],
+  "findings": [
+    {
+      "where": "Every operating agreement, Formation (§1.2) and definition of Act (§2.1) — webapp/server/templates-oa-multi.md:28",
+      "file": "webapp/server/templates-oa-multi.md",
+      "line": 28,
+      "reads": "**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes (the \"Act\"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101–605.2802 (the \"Protected Series Provisions\"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.",
+      "claims": "The governing chapter is named the Florida Revised Uniform Limited Liability Company Act.",
+      "truth": "2026 §605.0101 names it Florida Revised Limited Liability Company Act (https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605.html). All eight masters repeat the extra Uniform in §§1.2 and2.1. This is distinct from prior248's protected-series-provisions title.",
+      "replacement": "**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes (the \"Act\"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101–605.2802 (the \"Protected Series Provisions\"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.",
+      "severity": "wording"
+    },
+    {
+      "where": "Member-managed multi-owner agreement, Limited Liability; No Agency (§4.5) — webapp/server/templates-oa-member.md:136",
+      "file": "webapp/server/templates-oa-member.md",
+      "line": 136,
+      "reads": "**4.5 Limited Liability; No Agency.** No Member shall be personally liable for any debt, obligation, or liability of the Company or of any Protected Series, whether arising in contract, tort, or otherwise, solely by reason of being a Member. No Member is an agent of the Company or of any Protected Series solely by reason of being a member.",
+      "claims": "Membership does not make an owner an agent, even in the member-managed form.",
+      "truth": "The same master §5.4 (:166) says each Member is an agent; member-s repeats both clauses at136/166. Section605.04074(1) governs members acting as agents in a member-managed company. The manager-managed sentence was carried into the member-managed forms.",
+      "replacement": "**4.5 Limited Liability; Agency.** No Member shall be personally liable for any debt, obligation, or liability of the Company or of any Protected Series, whether arising in contract, tort, or otherwise, solely by reason of being a Member. A Member's authority to act for the Company or a Protected Series is governed by Section 5.4 and the Act.",
+      "severity": "substantive"
+    },
+    {
+      "where": "All four member-managed agreements, Management (§5.1), compared with Management of Each Protected Series (§5.2) — webapp/server/templates-oa-member.md:160",
+      "file": "webapp/server/templates-oa-member.md",
+      "line": 160,
+      "reads": "**5.1 Member-Managed.** The Company is **member-managed** as provided in its Articles of Organization and this Agreement. The management and conduct of the activities and affairs of the Company are vested in the Members. There is no manager, and no person shall be designated or hold out as a manager of the Company or of any Protected Series.",
+      "claims": "Nobody may be designated or hold out as manager of any Protected Series.",
+      "truth": "The next section expressly designates the Members as Protected Series Managers (member/member-s:162; member-single:138; member-single-s:144). §5.1 in those same four forms prohibits the title it immediately confers.",
+      "replacement": "**5.1 Member-Managed.** The Company is **member-managed** as provided in its Articles of Organization and this Agreement. The management and conduct of the activities and affairs of the Company are vested in the Members. There is no manager of the Company; the Members serve as Protected Series Managers as provided in Section 5.2.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Every agreement, Statutory Shields (§3.3) and creditor recourse during winding up (§14.2/§11.2 and §14.5/§11.5) — webapp/server/templates-oa-multi.md:106",
+      "file": "webapp/server/templates-oa-multi.md",
+      "line": 106,
+      "reads": "(a) A debt, obligation, or other liability of the Company is solely the debt, obligation, or liability of the Company, and is enforceable only against the Associated Assets of the Company;",
+      "claims": "A creditor can enforce a debt only against Associated Assets of the named debtor, with no legal exceptions.",
+      "truth": "2026 §605.2401 is subject to2404;2404 permits recovery from qualifying non-associated assets in other silos, and2402 permits disregarding limitations. Section3.3 also excludes even the debtor's own non-associated assets. The wind-up no-recourse language repeats the absolute. All eight forms contain it. https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605.html",
+      "replacement": "(a) A debt, obligation, or other liability of the Company is solely its own debt, obligation, or liability, subject to ss. 605.2402 and 605.2404, Florida Statutes, and any liability independently undertaken or imposed by law. Nothing in this Agreement restricts a creditor's remedies against the debtor's own assets.\n\n(b) A debt, obligation, or other liability of a Protected Series is solely its own debt, obligation, or liability, subject to ss. 605.2402 and 605.2404, Florida Statutes, and any liability independently undertaken or imposed by law.\n\n(c) Neither the Company nor a Protected Series is liable for another silo's debt solely by reason of their relationship within this structure. Nothing in this Section or the winding-up Article restricts remedies preserved by ss. 605.2402 and 605.2404, Florida Statutes, or liability independently undertaken or imposed by law.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Multi-owner S corporation agreements, savings clause §9.4(d) and company winding up §14.4 — webapp/server/templates-oa-s.md:280",
+      "file": "webapp/server/templates-oa-s.md",
+      "line": 280,
+      "reads": "**(d) Pro rata in all events.** Notwithstanding any other provision of this Agreement or of any Series Exhibit, all allocations and distributions — including distributions in liquidation of the Company or of any Protected Series — shall be made strictly pro rata in accordance with Percentage Interests, and every Membership Interest confers identical rights to distributions and liquidation proceeds.",
+      "claims": "Every series distribution, including its liquidation distributions, goes pro rata by the owners' Percentage Interests.",
+      "truth": "Sections3.6(a),7.2 and14.2 require each series to distribute solely to the Company, its100%owner. The overriding clause in s:280/member-s:282 and the winding-up sentences at356/358 conflict with that company-only recipient. Single-owner S forms correctly scope their pro-rata wording to Company distributions.",
+      "replacement": "**(d) Pro rata in all events.** All allocations and distributions by the Company to its Members, including liquidation proceeds received from a Protected Series and then distributed by the Company, shall be strictly pro rata in accordance with Percentage Interests, and every Membership Interest confers identical rights to distributions and liquidation proceeds. A Protected Series makes distributions solely to the Company under Sections 3.6, 7.2, and 14.2.\n\nAll distributions by the Company to its Members in winding up shall be made in proportion to Percentage Interests, so that every Membership Interest confers identical rights to liquidation proceeds. Distributions by a Protected Series are made solely to the Company under Section 14.2.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Amended and Restated single-member S corporation agreement, Recitals — webapp/server/oa.ts:534",
+      "file": "webapp/server/oa.ts",
+      "line": 534,
+      "reads": "      `D. This Agreement amends, restates, and supersedes in its entirety ${supersede}, which shall be of no further force or effect from the Effective Date.\\n\\nNOW, THEREFORE,`,",
+      "claims": "The new supersession recital is always RecitalD.",
+      "truth": "Both single-s and member-single-s masters already have RecitalD at line20; oa.ts:534 unconditionally inserts anotherD immediately before NOW, THEREFORE. The other six masters end atC. Prior262 objects to text location but does not identify this delivered duplicate lettering.",
+      "replacement": "E. This Agreement amends, restates, and supersedes in its entirety [PRIOR AGREEMENT], which shall be of no further force or effect from the Effective Date.",
+      "severity": "wording"
+    },
+    {
+      "where": "Owner's Manual, Why the Mothership Should Stay Asset-Light (§8); also the non-associated-assets discussion at line70 — docs/owners-manual.md:151",
+      "file": "docs/owners-manual.md",
+      "line": 151,
+      "reads": "**Second, your agreement's standing association rules make the mothership the default bucket.** Any asset you fail to associate with a series lands, by standing rule, in the company's silo. That is deliberately protective — it means a sloppy record never creates a *non-associated* free-for-all asset — but it also means **sloppiness collects in the mothership**. If the mothership is asset-light, a record you missed exposes little.",
+      "claims": "The standing default association rule guarantees that a sloppy record can never leave an asset non-associated.",
+      "truth": "2026 §605.2301(3) requires records identifying the asset, acquisition and inter-silo consideration; subsection4 allows procedures but does not waive those facts. Section2107(1)(k) is non-variable. A default ownership/association instruction cannot guarantee missing records exist. https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605.html",
+      "replacement": "**Second, your agreement's standing association rules make the mothership the default bucket.** Those rules help determine where assets belong, but the company must still keep the identifying, acquisition, and transfer records the statute requires. An asset can remain non-associated when those records are missing. Keep the mothership asset-light and document every asset; do not rely on the default rule to cure a missing record.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Owner's Manual, The EIN Question (§18), counterparties and W-9s — docs/owners-manual.md:344",
+      "file": "docs/owners-manual.md",
+      "line": 344,
+      "reads": "- **A counterparty demands a taxpayer number for the named entity** — a lender, title company, insurer, or property manager. Giving them the company's EIN for a series' business stitches the two identities together on paper, the opposite of the separateness you are documenting.",
+      "claims": "Using the parent's EIN for series business undermines separateness, and line340 says every company supplies its own EIN on W-9s.",
+      "truth": "The IRS requires a disregarded LLC to use its tax owner's name/TIN for income-tax information reporting, including W-9s; an individually owned disregarded parent likewise uses its owner's SSN/EIN. That tax reporting is compatible with a separately named legal entity. https://www.irs.gov/businesses/small-businesses-self-employed/single-member-limited-liability-companies; https://www.irs.gov/instructions/iw9",
+      "replacement": "- **A counterparty requests tax identification.** For a W-9 or other income-tax information reporting, follow the IRS rules for a disregarded entity and its tax owner; the correct number may be the company's EIN or the ultimate tax owner's TIN. Identify the series as the contracting party in the underlying documents. A separate series EIN may still be needed for banking, employment taxes, or other registrations.\n\n**The company's EIN and W-9.** Obtain the EIN needed for the company's banking and applicable tax filings. For income-tax reporting, a disregarded company generally uses its tax owner's TIN on Form W-9; a company taxed as a partnership or corporation uses its own EIN.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Owner's Manual, State Filings, Year After Year (§19), reinstatement — docs/owners-manual.md:354",
+      "file": "docs/owners-manual.md",
+      "line": 354,
+      "reads": "- **Reinstatement, if you let it lapse:** $100 plus every missed year's annual report fee — on top of losing the shields in the interim.",
+      "claims": "Administrative dissolution automatically removes the liability shields until reinstatement.",
+      "truth": "2026 §605.0304(2) preserves limited liability regardless of dissolution; §605.0714(5) limits an administratively dissolved company to winding up; §605.0715(4) makes reinstatement relate back. The Manual itself says shields survive winding up at404. https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605.html",
+      "replacement": "- **Reinstatement, if you let it lapse:** $100 plus every missed year's annual report fee. Administrative dissolution limits the company and its series to winding up; it does not automatically erase their liability shields. Keep the required separate records and resolve the lapse promptly.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Owner's Manual, Moving Real Estate into a Series (§11), documentary stamps — docs/owners-manual.md:180",
+      "file": "docs/owners-manual.md",
+      "line": 180,
+      "reads": "2. **Documentary stamp tax.** Florida taxes deed transfers (70 cents per $100 of consideration). Transferring *mortgaged* property to your own entity is generally taxed on the mortgage balance, even with no money changing hands. Price this before you transfer — on a $300,000 mortgage that is $2,100. An unencumbered property transferred for no consideration is a different analysis. Confirm the stamp treatment with your closing agent or CPA before recording; do not guess.",
+      "claims": "Every Florida deed transfer uses70cents per$100; the$300,000mortgage example universally costs$2,100.",
+      "truth": "2026 §§201.02 and201.0205 distinguish Miami-Dade; §201.031 permits its surtax. Florida DOR states60cents per$100 there, plus45cents unless only a single-family dwelling transfers. Opened: https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0200-0299/0201/0201.html and https://floridarevenue.com/taxes/tutorial/tutorial_docs/docStampTaxOverview.pdf",
+      "replacement": "2. **Documentary stamp tax.** Most Florida counties charge 70 cents per $100 or fraction of consideration. Miami-Dade charges 60 cents, plus a 45-cent surtax unless the transfer involves only a single-family dwelling. A mortgage can count as consideration even when no cash changes hands. At the 70-cent rate, $300,000 of taxable mortgage consideration produces $2,100 in tax; the Miami-Dade calculation differs. Confirm the consideration, rate, and any exemption with your closing agent or CPA before recording.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Owner's Manual, Keeping the Money Separate, personal funds — docs/owners-manual.md:211",
+      "file": "docs/owners-manual.md",
+      "line": 211,
+      "reads": "- Your personal money touches the structure in exactly two ways: documented contributions in, documented distributions out. The company debit card buys nothing personal, ever.",
+      "claims": "Contributions and distributions are the only permitted flows between owners and the structure.",
+      "truth": "All masters permit documented Member loans (multi:214 §6.5; single §6.4); expense reimbursement is also expressly permitted in management compensation. Calling contributions/distributions the only two ways contradicts those authorized flows.",
+      "replacement": "- Document every transfer between you and the structure: capital contributions, distributions, loans and repayments, and legitimate expense reimbursements. Identify the owner and the specific company or series involved, and use its proper account.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Owner's Manual, Maintaining the Agreement (§7), adding a second owner — docs/owners-manual.md:147",
+      "file": "docs/owners-manual.md",
+      "line": 147,
+      "reads": "3. **When you add a second owner to a single-member company, change agreements.** Your agreement does not require it — nothing in it does — but the single-member form is built for one owner: it has no voting rules, no capital-call machinery, no transfer restrictions among owners, and none of the multi-owner bankruptcy armor, and its tax treatment changes the moment a second member is admitted. Move to the multi-member form at the same time, not later. (The portal does this for you: add the new owner in the operating agreement questionnaire, and the regenerated agreement is built on the multi-owner form automatically.)",
+      "claims": "Admitting a second member always immediately changes tax treatment.",
+      "truth": "The Manual covers both disregarded and S corporation single-member forms. A second eligible shareholder does not by itself end an existing S election; IRS instructions say it remains effective until terminated or revoked. https://www.irs.gov/instructions/i2553, End of Election; https://www.irs.gov/businesses/small-businesses-self-employed/single-member-limited-liability-companies",
+      "replacement": "3. **When you add a second owner to a single-member company, change agreements.** Your agreement does not require it — nothing in it does — but the single-member form is built for one owner: it has no voting rules, no capital-call machinery, no transfer restrictions among owners, and none of the multi-owner bankruptcy armor, and a disregarded company ordinarily becomes a partnership for federal income-tax purposes when a second owner is admitted. An existing S election does not end merely because a second eligible owner is admitted. Move to the multi-member form at the same time, not later. (The portal does this for you: add the new owner in the operating agreement questionnaire, and the regenerated agreement is built on the multi-owner form automatically.)",
+      "severity": "substantive"
+    },
+    {
+      "where": "Owner's Manual, tax-return table (§18); repeated at346 — docs/owners-manual.md:314",
+      "file": "docs/owners-manual.md",
+      "line": 314,
+      "reads": "| One owner, no election | Nothing of its own. Everything on your Form 1040, each property or business as its own Schedule E or C activity |",
+      "claims": "Every single-owner disregarded company reports on Form1040.",
+      "truth": "The masters expressly support entity owners (oa.ts:680–691); the IRS says an LLC owned by a corporation or partnership reports as part of that owner's return. Form1040 applies to an individual owner, not every permitted owner. https://www.irs.gov/businesses/small-businesses-self-employed/single-member-limited-liability-companies",
+      "replacement": "| One owner, no election | No separate federal income-tax return. Activity appears on the tax owner's return; for an individual, usually Schedule C, E, or F of Form 1040 or 1040-SR. Entity owners use the applicable return for that entity. |",
+      "severity": "substantive"
+    },
+    {
+      "where": "Owner's Manual, S corporation safeguards (§18), uneven distributions under “Three things will end an election” — docs/owners-manual.md:332",
+      "file": "docs/owners-manual.md",
+      "line": 332,
+      "reads": "2. **Uneven distributions.** Paying one owner more than their percentage — even briefly, even as a \"loan\" nobody papers — is the most common way small S corporations get into trouble. Distribute pro rata, every time, and write it down.",
+      "claims": "Any uneven distribution ends the election; it is ranked as the most common cause without evidence.",
+      "truth": "Rev.Proc.2022-19 §3.02 says disproportionate distributions do not violate the one-class rule when governing provisions provide identical distribution/liquidation rights. They still have tax effects and may violate this Agreement. https://www.irs.gov/irb/2022-41_IRB",
+      "replacement": "2. **Uneven distributions.** Your agreement requires pro-rata distributions. Correct any departure with your CPA: unequal payments have tax consequences and may breach the agreement, but do not by themselves end S status when the governing provisions preserve identical distribution and liquidation rights.\n\n**Three issues to review with your CPA:**",
+      "severity": "substantive"
+    },
+    {
+      "where": "Owner's Manual, What Actually Breaks the Shield (§21) — docs/owners-manual.md:362",
+      "file": "docs/owners-manual.md",
+      "line": 362,
+      "reads": "The conduct that loses these fights, ranked by frequency:",
+      "claims": "The listed litigation behaviors are ranked by measured frequency.",
+      "truth": "Neither this paragraph nor the source materials supplies cases, a dataset, counts or a method establishing the ordering. The legal examples can stand without an unsupported empirical ranking.",
+      "replacement": "Conduct that can undermine the shields:",
+      "severity": "wording"
+    },
+    {
+      "where": "S corporation election package, record copy, deadline notice — webapp/server/s-election.ts:204",
+      "file": "webapp/server/s-election.ts",
+      "line": 204,
+      "reads": "The IRS deadline for this election was ${fmtDateLong(deadlineIso)}. A late election requires IRS relief — talk to your tax professional.",
+      "claims": "The IRS deadline has already passed whenever the package becomes a record copy.",
+      "truth": "The record copy is triggered14days after package creation (routes-portal.ts:517,548–630), not by the election deadline. A package created shortly after formation becomes a record copy long before the usual2months15days deadline. s-election.ts:314 computes the deadline independently.",
+      "replacement": "The IRS deadline for this election is ${fmtDateLong(deadlineIso)}. If that date has passed, discuss late-election relief with your tax professional.",
+      "severity": "substantive"
+    },
+    {
+      "where": "S corporation election package, EIN not yet available notice — webapp/server/s-election.ts:184",
+      "file": "webapp/server/s-election.ts",
+      "line": 184,
+      "reads": "    : `**Your EIN was not yet available when this package was prepared.** Write it in item A on page 1 (and the box at the top of page 2) before filing — the IRS will not process the form without it.`;",
+      "claims": "The owner must wait for an issued EIN because the IRS cannot process the election without it.",
+      "truth": "IRS Form2553 instructions, ItemA, expressly provide for Applied For plus the EIN application date if the EIN has not arrived when due. The generator itself prints Applied For (:80–85) but omits its date. https://www.irs.gov/instructions/i2553",
+      "replacement": "**Your EIN was not yet available when this package was prepared.** If it arrives before filing, enter it in item A and at the top of page 2. If it has not arrived by the filing deadline, follow the IRS instruction to enter “Applied For” and the date the EIN application was made; do not miss the deadline solely while waiting for the number.",
+      "severity": "substantive"
+    },
+    {
+      "where": "S corporation election package, record-copy warning — webapp/server/s-election.ts:194",
+      "file": "webapp/server/s-election.ts",
+      "line": 194,
+      "reads": "**An election filed with incomplete Social Security numbers is invalid.** Do not sign or mail this copy. It is here so you keep a record of what was prepared for ${d.llcName} — the election to be taxed as an S corporation effective ${fmtDateLong(d.effectiveDate)}, prepared with ${d.ein ? `EIN **${fmtEin(d.ein)}**` : \"no EIN on file\"}.",
+      "claims": "Every incomplete Social Security number necessarily invalidates an S election.",
+      "truth": "Rev.Proc.2022-19 §§2.03(3),3.03(4) distinguishes inadvertent administrative omissions from missing shareholder consent, officer signature and permitted tax year; the blanket invalidity assertion is broader. The service can still properly prohibit filing this intentionally incomplete record copy. https://www.irs.gov/irb/2022-41_IRB",
+      "replacement": "**This record copy is incomplete and is not suitable for filing.** Do not sign or mail it. It records the election package prepared for ${d.llcName}; obtain a complete filing copy if you still need to file.",
+      "severity": "wording"
+    },
+    {
+      "where": "Office Order Summary, the questionnaire, manager and member addresses — webapp/server/order-summary.ts:191",
+      "file": "webapp/server/order-summary.ts",
+      "line": 191,
+      "reads": "      out.push(line(`Manager ${i + 1}`, `${name}; ${addr({ address1: mm.streetAddress1 ?? mm.address1, city: mm.city, state: mm.state, zip: mm.zip })}`));",
+      "claims": "The summary preserves each address as typed.",
+      "truth": "The address helper at74–75 accepts address2, but the manager call191 supplies only streetAddress1/address1 and the member call201 only address1. The form stores streetAddress2 for managers and address2 for members, so apartment/suite lines are omitted from the supposedly complete summary. Add address2/streetAddress2 to the local structural types as well.",
+      "replacement": "out.push(line(`Manager ${i + 1}`, `${name}; ${addr({ address1: mm.streetAddress1 ?? mm.address1, address2: mm.streetAddress2 ?? mm.address2, city: mm.city, state: mm.state, zip: mm.zip })}`));\n\nout.push(line(`Member ${i + 1}`, `${name}; ${addr({ address1: mm.address1, address2: mm.address2, city: mm.city, state: mm.state, zip: mm.zip })}${pct}`));",
+      "severity": "substantive"
+    },
+    {
+      "where": "Generated agreements, amendments, consents and office summaries, non-Latin names and text — webapp/server/pdf-render.ts:39",
+      "file": "webapp/server/pdf-render.ts",
+      "line": 39,
+      "reads": "    .replace(/[^\\x20-\\x7E\\xA0-\\xFF–—•]/g, \"?\");",
+      "claims": "The original names and legal text are preserved in the PDF.",
+      "truth": "The sanitizer replaces every character outside its WinAnsi subset with ?. A valid input name such as 王明 becomes??; input schemas accept Unicode. manual-pdf.ts:44 uses the same lossy fallback. This changes legal names, not merely font appearance. The immediate replacement refuses a corrupt PDF; full Unicode font support is the better final rendering capability.",
+      "replacement": ".replace(/[^\\x20-\\x7E\\xA0-\\xFF–—•]/g, () => { throw new Error(\"This document contains characters the current PDF font cannot display. The document was not generated; contact us so the names and text can be preserved correctly.\"); });",
+      "severity": "substantive"
+    },
+    {
+      "where": "Operating agreement, Exhibit A contribution and owner tables — webapp/server/oa.ts:577",
+      "file": "webapp/server/oa.ts",
+      "line": 577,
+      "reads": "    const rows = inputs.members.map((m) => ({\n      \"[MEMBER NAME]\": m.name,\n      \"[MEMBER ADDRESS]\": m.address,\n      \"[MEMBER SHARE]\": pctOf(m),\n      \"[MEMBER CONTRIBUTION]\": m.contribution || \"—\",\n      \"[MEMBER DATE]\": inputs.effectiveDate,\n      \"[MEMBER TOD]\": m.todBeneficiary || \"None\",\n      \"[MEMBER TOD BACKUP]\": m.todBackup || \"None\",\n      // A marital unit's designation takes effect at the death of the last\n      // surviving spouse; the words are the master's row (Adam, 13 Sep 2026).\n      \"[COUPLE]\": m.jointHolding && m.todBeneficiary ? \"x\" : \"\",\n      // Empty for an individual, which drops the master's \" as […]\" fragment.\n      // The name matches the marker that guards it — <!-- if:holding --> looks\n      // up [HOLDING] — so a renamed slot cannot silently stop guarding.\n      \"[HOLDING]\": m.jointHolding ?? \"\",\n    }));",
+      "claims": "Client-entered data is a table-cell value, not document markup.",
+      "truth": "Owner names, addresses and asset descriptions are inserted raw at578–581 and616–619. pdf-render.ts:78 splits every vertical bar into a new column. Thus an asset description containing | changes the number and positions of cells; new-series.ts only sanitizes special terms, not its contribution. A newline similarly ends a table row. Escaping pipes alone is insufficient: the renderer must decode escaped or encoded delimiters and split only structural pipes.",
+      "replacement": "Encode client table-cell text before inserting it into Markdown, and decode it only after the renderer has identified the structural cells. Preserve vertical bars and line breaks inside their original cell. Apply the same encoding and decoding to the series-consent contribution cell.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Professional LLC operating agreement, Transfer on Death (§4.6), family transfers/admission and purpose — webapp/server/templates-oa-single.md:134",
+      "file": "webapp/server/templates-oa-single.md",
+      "line": 134,
+      "reads": "**4.6 Transfer on Death Designation.** The Membership Interest is \"registered\" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial \"registration in beneficiary form\" under ss. 711.50–711.512, Florida Statutes, and reflects the Member's designation, if any, of the person or persons who will become the owner of the Membership Interest upon the Member's death. The Member, if an individual, may designate any person or entity as a beneficiary. A designation may name a backup beneficiary to take if the first beneficiary does not survive the Member. The Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, delivered to the Manager; the change is effective upon receipt unless the Manager objects in writing within seven (7) days, and the Manager shall thereafter update Exhibit A (though updating is not required for effectiveness). A beneficiary who becomes the owner of the Membership Interest under this Section succeeds to the Membership Interest subject to this Agreement and is admitted as the Member upon delivery to the Company of a written agreement to be bound by this Agreement.",
+      "claims": "A professional LLC may admit any chosen beneficiary after agreement to be bound, without a professional-eligibility qualification.",
+      "truth": "oa.ts:389–397 changes only professional cover/preamble/recital; it leaves the ordinary admission and transfer clauses unchanged. 2026 §§621.09(2),621.11(2) restrict membership/transfers to eligible licensed individuals or professional entities;621.08 also limits the business purpose despite the ordinary §1.4 any-lawful-business wording. Entirechapter opened: https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0621/0621.html",
+      "replacement": "For a professional limited liability company, every transfer and admission under this Agreement, including a transfer on death, is subject to Chapter 621, Florida Statutes. A proposed recipient may be admitted only if eligible under s. 621.09(2), and no transfer may violate s. 621.11(2). The Company's business is limited as s. 621.08 requires, notwithstanding the general-purpose wording of Section 1.4.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Statement generator, source comment — webapp/server/statement.ts:7",
+      "file": "webapp/server/statement.ts",
+      "line": 7,
+      "reads": " * carries every word; this fills its six slots and nothing else.",
+      "claims": "The template has six distinct slots.",
+      "truth": "The master uses seven distinct placeholders: COMPANY NAME, DOCUMENT NUMBER, SIGNATURE, SIGNER NAME, SIGNER TITLE, DATE and EDITION. statement.ts fills all seven correctly.",
+      "replacement": " * carries every word; this fills its seven slots and nothing else.",
+      "severity": "housekeeping"
+    },
+    {
+      "where": "PDF generator, encryption source comment — webapp/server/pdf-render.ts:636",
+      "file": "webapp/server/pdf-render.ts",
+      "line": 636,
+      "reads": "      // The library's writer encrypts STREAMS only, never strings, so any Info\n      // metadata in an encrypted document is written plaintext into a file\n      // that declares string encryption — and every reader \"decrypts\" it into\n      // garbage (Codex PDF-001; confirmed against PDFWriter.encrypt, which\n      // tests `object instanceof PDFStream`). No string we set can survive,\n      // so the encrypted document carries NO Info dictionary: viewers then\n      // fall back to the clean filename. The watermark on every page, not the\n      // metadata, is what identifies the licensee.",
+      "claims": "Encrypted documents carry no Info metadata dictionary.",
+      "truth": "The later implementation at654 calls setMeta and655 encryptStrings; setMeta545–550 writes title/author/subject/producer/date. The older comment says the opposite of the code below it.",
+      "replacement": "// Metadata strings are encrypted with the other indirect-object strings below, so the encrypted PDF can retain its Info dictionary.",
+      "severity": "housekeeping"
+    },
+    {
+      "where": "Operating Agreement Instructions, optional deadlock provision (§5(c)) — docs/oa-instructions.md:63",
+      "file": "docs/oa-instructions.md",
+      "line": 63,
+      "reads": "**(c) Deadlock Buy-Sell (\"Shotgun\") — §13.2.** For companies that can split 50/50 (two equal owners, or two equal factions), a deadlock otherwise has no exit short of a lawsuit to dissolve the company. The shotgun works like cutting a cake: after a 60-day deadlock, either substantial owner may name a single price for the whole company; the *other* side then chooses whether to buy or sell at that price. Naming the price honestly is self-enforcing — name it too low and you get bought out cheap; too high and you overpay. **Caution:** the mechanism favors the owner with more cash, since the poorer side may be forced to sell even at a fair price. To omit it, replace the text of §13.2 with \"[Reserved.]\". Omit it if ownership is not evenly split (a majority can always outvote a deadlock) or if the owners' finances are badly mismatched.",
+      "claims": "Unequal ownership eliminates deadlock because the majority can always outvote it.",
+      "truth": "All four multi-member masters define deadlock as failure to obtain the vote required for the submitted matter (§13.2(a)). Borrowing above the threshold and guarantees (§5.4(f)/§5.5(f)) require unanimity, so a 60/40 company can deadlock even though one owner holds a majority; both owners also meet the 25% threshold. Section13.2(e), however, excludes matters requiring all Members’ consent when the Act expressly permits withholding consent. Unequal ownership does not eliminate deadlock, but the shotgun does not cover every unanimous-consent matter.",
+      "replacement": "**(c) Deadlock Buy-Sell (\"Shotgun\") — §13.2.** Consider this provision whenever a decision covered by Section 13.2 can produce a deadlock, including equal ownership and contractual unanimous-vote requirements such as major borrowing. Section 13.2(e) excludes certain matters for which the Act expressly permits a Member to withhold consent. After the contractual 60-day deadlock period, a Member holding at least 25% may offer a single valuation; the other Members then choose to buy or sell on the terms in Section 13.2. The mechanism can favor an owner with greater access to cash. If you omit it, replace Section 13.2 with \"[Reserved.]\". Unequal ownership does not eliminate deadlock on decisions requiring unanimity.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Owner’s Manual, federal beneficial ownership reporting (§20) and source colophon — docs/owners-manual.md:358",
+      "file": "docs/owners-manual.md",
+      "line": 358,
+      "reads": "The Corporate Transparency Act briefly required most small LLCs to file beneficial ownership reports with FinCEN. **As of this edition, U.S.-formed companies are exempt:** FinCEN's March 2025 interim final rule narrowed \"reporting company\" to entities formed under *foreign* law that register to do business here. A Florida series LLC formed in Florida currently files nothing with FinCEN, and its owners report nothing.",
+      "claims": "The current exemption is presented using the March 2025 interim final rule as its authority; the colophon at536 likewise lists only that interim rule.",
+      "truth": "The exemption conclusion remains correct, but FinCEN’s final rule took effect August 14, 2026, before this edition. FinCEN’s current alert and the final rule confirm adoption of the domestic exemption: https://www.fincen.gov/boi and https://www.federalregister.gov/documents/2026/08/14/2026-16576/beneficial-ownership-information-reporting-requirement-revision . This is an outdated authority description, not a claim that Florida LLCs now must file.",
+      "replacement": "The Corporate Transparency Act briefly required most small LLCs to file beneficial ownership reports with FinCEN. **As of this edition, U.S.-formed companies are exempt:** FinCEN’s final rule, effective August 14, 2026, retained the exemption introduced by its March 2025 interim final rule. A Florida series LLC formed in Florida currently files no federal beneficial ownership report, and its owners do not report beneficial ownership information for that company.",
+      "severity": "wording"
+    },
+    {
+      "where": "Multi-member operating agreements, bankruptcy protections (§11.2); Owner’s Manual §23 — webapp/server/templates-oa-multi.md:298",
+      "file": "webapp/server/templates-oa-multi.md",
+      "line": 298,
+      "reads": "**11.2 Personal Service Agreement; No Assumption or Assignment.** In accordance with *In re Soderstrom*, 484 B.R. 874 (M.D. Fla. 2013), this Agreement is a personal service agreement due to the managerial and governance duties and obligations owed by each Member and the Manager, and a bankruptcy trustee cannot assume or assign a debtor Member's interest in the Company in accordance with 11 U.S.C. §365(c)(1) without the prior written consent of the other Members.",
+      "claims": "Soderstrom prevents assumption or assignment of the debtor Member’s entire interest without the other Members’ consent.",
+      "truth": "The actual opinion distinguishes management from economic interests: the court held the trustee could not assume the management interest but affirmed the sale of the debtors’ 50% economic interest. See 484 B.R.874,880–881, https://gassmanlaw.com/wp-content/uploads/2013/04/In_Re_Sodestrom.pdf . The same overbroad sentence appears in templates-oa-member.md:300, templates-oa-s.md:312 and templates-oa-member-s.md:314; Manual:383 likewise says “interest” without the management qualification. Section365(c)(1) is conditional on applicable law excusing the other party’s performance and lack of consent; it does not create a blanket bar to sale of economic rights. Statutory text opened at https://usc-cdn.house.gov/view.xhtml?req=granuleid%3AUSC-prelim-title11-section365&num=0&edition=prelim .",
+      "replacement": "**11.2 Personal Service Agreement; Assumption and Assignment.** The managerial and governance duties under this Agreement are personal to those who owe them. The parties intend that, to the extent applicable law and 11 U.S.C. §365(c)(1) permit, a trustee may not assume or assign a debtor Member’s management rights without the required consent of the other Members. This does not prohibit a transfer of economic rights merely because management rights cannot be transferred. In re Soderstrom, 484 B.R.874 (M.D. Fla. 2013), upheld the sale of the debtor-members’ economic interest while preventing assumption and sale of their management interest.",
+      "severity": "substantive"
+    }
+  ],
+  "noFindings": [
+    {
+      "path": "webapp/server/filing.ts",
+      "scope": "No new finding after full-file reading; this does not erase prior findings."
+    },
+    {
+      "path": "webapp/server/oa-amendment.ts",
+      "scope": "No new finding after full-file reading; this does not erase prior findings."
+    },
+    {
+      "path": "webapp/server/oa-capital.ts",
+      "scope": "No new finding after full-file reading; this does not erase prior findings."
+    },
+    {
+      "path": "webapp/server/templates-new-series.md",
+      "scope": "No new finding after full-file reading; this does not erase prior findings."
+    },
+    {
+      "path": "webapp/server/templates-oa-amendment.md",
+      "scope": "No new finding after full-file reading; this does not erase prior findings."
+    },
+    {
+      "path": "webapp/server/templates-statement-of-authorized-representative.md",
+      "scope": "No new finding after full-file reading; this does not erase prior findings."
+    },
+    {
+      "path": "docs/README.md",
+      "scope": "No new finding after full-file reading; this does not erase prior findings."
+    }
+  ],
+  "verificationNotes": [
+    "All 24 assigned inventory files were read from first through last line with file-reading tools. Truncated outputs were reread in smaller ranges. Total: 8,140 lines. Facts was read as reference and is credited only by the root auditor.",
+    "All eight operating-agreement masters were compared across the four tax pairs and four management pairs, including each differing clause and exhibit row. The consent exhibit was compared with all eight Series Exhibits. Manual and Instructions cross-references were opened against their target sections. No additional mismatch was found beyond those separately reported or already among the prior findings.",
+    "Audit material read: README, prompt, rulings, facts, prior items 229–267, and raw buckets 6 and 7, with truncated portions reread. The prompt contains no global rule requiring all document prose to live in Markdown masters; oa.ts has its own narrower rule.",
+    "Florida statutes opened on Online Sunshine with 2026 headers: 605.0101 and 605.2105–605.2503; 711.50–711.512; entire Chapter 621; 201.02,201.0205,201.031;48.062; entire Chapter 726;220.02. Section 212.031 is absent from the 2026 text; its repeal was checked in Florida DOR TIP25A01-04. Root independently opened the remaining cited Chapter 605 provisions and other Florida authorities; no Florida finding here relies on memory.",
+    "Primary federal sources read: IRS single-member LLC guidance, Form2553 instructions, W9 requester instructions, Rev.Proc.2022-19 in IRB2022-41, proposed series regulation in IRB2010-45, FinCEN BOI alert and final rule effective August 14,2026. IRC 704,754,6223,1361,1362,1366 and 1377 and 1378, and Bankruptcy Code 365(c),(d) and surrounding operative provisions were opened on official House/GovInfo sources. The Soderstrom opinion itself was read in the reporter PDF, including its economic-interest/management-interest distinction.",
+    "Current eCFR web/API access returned errors (including 406). GovInfo’s most-recent annual edition is 2025; relevant text was read for Regulations 301.7701-1,301.7701-2,301.7701-3 and1.1361-1(l). As a currency cross-check, the current statutory/regulatory text republished by Cornell LII was also opened and the relevant provisions read at https://www.law.cornell.edu/cfr/text/26/301.7701-1 , https://www.law.cornell.edu/cfr/text/26/301.7701-2 , https://www.law.cornell.edu/cfr/text/26/301.7701-3 and https://www.law.cornell.edu/cfr/text/26/1.1361-1 . The cited domestic-classification, employment/excise-tax and one-class rules match; the current 301.7701-1 also includes newer Tribal-entity provisions, so no claim is made that the entire regulation is unchanged. Direct retrieval from current eCFR is NOT VERIFIED. The 2010 proposed series text was opened in IRS IRB2010-45; no final series-specific rule appears in the current republished 301.7701-1, but a comprehensive search of all later rulemaking history is NOT VERIFIED.",
+    "This audit reads source and legal authority; it did not start servers, install dependencies, render new PDFs, or perform end-to-end transactions. Generator findings identify reproducible source-level behavior; no live production result is represented as observed."
+  ],
+  "fileResults": [
+    {
+      "path": "webapp/server/filing.ts",
+      "newFindingOrdinals": [],
+      "result": "No new finding. Any prior finding concerning this file remains separately assessed in priorFindings."
+    },
+    {
+      "path": "webapp/server/manual-pdf.ts",
+      "newFindingOrdinals": [
+        20
+      ],
+      "result": "New finding(s) listed; prior findings are assessed separately."
+    },
+    {
+      "path": "webapp/server/new-series.ts",
+      "newFindingOrdinals": [
+        21
+      ],
+      "result": "New finding(s) listed; prior findings are assessed separately."
+    },
+    {
+      "path": "webapp/server/oa-amendment.ts",
+      "newFindingOrdinals": [],
+      "result": "No new finding. Any prior finding concerning this file remains separately assessed in priorFindings."
+    },
+    {
+      "path": "webapp/server/oa-capital.ts",
+      "newFindingOrdinals": [],
+      "result": "No new finding. Any prior finding concerning this file remains separately assessed in priorFindings."
+    },
+    {
+      "path": "webapp/server/oa.ts",
+      "newFindingOrdinals": [
+        6,
+        21
+      ],
+      "result": "New finding(s) listed; prior findings are assessed separately."
+    },
+    {
+      "path": "webapp/server/order-summary.ts",
+      "newFindingOrdinals": [
+        19
+      ],
+      "result": "New finding(s) listed; prior findings are assessed separately."
+    },
+    {
+      "path": "webapp/server/pdf-render.ts",
+      "newFindingOrdinals": [
+        20,
+        24
+      ],
+      "result": "New finding(s) listed; prior findings are assessed separately."
+    },
+    {
+      "path": "webapp/server/s-election.ts",
+      "newFindingOrdinals": [
+        16,
+        17,
+        18
+      ],
+      "result": "New finding(s) listed; prior findings are assessed separately."
+    },
+    {
+      "path": "webapp/server/statement.ts",
+      "newFindingOrdinals": [
+        23
+      ],
+      "result": "New finding(s) listed; prior findings are assessed separately."
+    },
+    {
+      "path": "webapp/server/templates-new-series.md",
+      "newFindingOrdinals": [],
+      "result": "No new finding. Any prior finding concerning this file remains separately assessed in priorFindings."
+    },
+    {
+      "path": "webapp/server/templates-oa-amendment.md",
+      "newFindingOrdinals": [],
+      "result": "No new finding. Any prior finding concerning this file remains separately assessed in priorFindings."
+    },
+    {
+      "path": "webapp/server/templates-oa-member-s.md",
+      "newFindingOrdinals": [
+        1,
+        4,
+        22,
+        27
+      ],
+      "result": "New finding(s) listed; prior findings are assessed separately."
+    },
+    {
+      "path": "webapp/server/templates-oa-member-single-s.md",
+      "newFindingOrdinals": [
+        1,
+        4,
+        22
+      ],
+      "result": "New finding(s) listed; prior findings are assessed separately."
+    },
+    {
+      "path": "webapp/server/templates-oa-member-single.md",
+      "newFindingOrdinals": [
+        1,
+        4,
+        22
+      ],
+      "result": "New finding(s) listed; prior findings are assessed separately."
+    },
+    {
+      "path": "webapp/server/templates-oa-member.md",
+      "newFindingOrdinals": [
+        1,
+        2,
+        3,
+        4,
+        22,
+        27
+      ],
+      "result": "New finding(s) listed; prior findings are assessed separately."
+    },
+    {
+      "path": "webapp/server/templates-oa-multi.md",
+      "newFindingOrdinals": [
+        1,
+        4,
+        22,
+        27
+      ],
+      "result": "New finding(s) listed; prior findings are assessed separately."
+    },
+    {
+      "path": "webapp/server/templates-oa-s.md",
+      "newFindingOrdinals": [
+        1,
+        4,
+        5,
+        22,
+        27
+      ],
+      "result": "New finding(s) listed; prior findings are assessed separately."
+    },
+    {
+      "path": "webapp/server/templates-oa-single-s.md",
+      "newFindingOrdinals": [
+        1,
+        4,
+        22
+      ],
+      "result": "New finding(s) listed; prior findings are assessed separately."
+    },
+    {
+      "path": "webapp/server/templates-oa-single.md",
+      "newFindingOrdinals": [
+        1,
+        4,
+        22
+      ],
+      "result": "New finding(s) listed; prior findings are assessed separately."
+    },
+    {
+      "path": "webapp/server/templates-statement-of-authorized-representative.md",
+      "newFindingOrdinals": [],
+      "result": "No new finding. Any prior finding concerning this file remains separately assessed in priorFindings."
+    },
+    {
+      "path": "docs/oa-instructions.md",
+      "newFindingOrdinals": [
+        25
+      ],
+      "result": "New finding(s) listed; prior findings are assessed separately."
+    },
+    {
+      "path": "docs/owners-manual.md",
+      "newFindingOrdinals": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        26,
+        27
+      ],
+      "result": "New finding(s) listed; prior findings are assessed separately."
+    },
+    {
+      "path": "docs/README.md",
+      "newFindingOrdinals": [],
+      "result": "No new finding. Any prior finding concerning this file remains separately assessed in priorFindings."
+    }
+  ]
+}

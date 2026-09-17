@@ -1,0 +1,109 @@
+{
+  "about": "Claude's check of Codex's audit of the audit, 16-17 Sep 2026: each of Codex's 63 disputes reopened at its file, each of its 67 new findings opened at its file, 23 sources opened in the browser. Codex reviews this file against its own reports. The builder refuses unless every id exists and the four dispute groups total exactly 63.",
+  "dropped": {
+    "6": "The Benefits 'Side by side' row is in rulings.md (15 Sep 2026); a ruled wording is not flagged.",
+    "16": "No contradiction: a generic operating agreement is still an operating agreement. Changing the grade needs competitor evidence the finding does not have.",
+    "21": "The teaser speaks of two sections of the statute, not two headings on the page; The Statute page cites ss. 605.2404 and 605.2402 as well as 605.2301.",
+    "32": "No contradiction: the app records a transfer when one happens, which the Manual itself calls for.",
+    "37": "A dated review is not false because time passes; deleting the date removes provenance.",
+    "40": "The Statute page cites seven sections beyond s. 605.2301, so 'Ch. 605 highlights' is accurate.",
+    "88": "The passage is headed 'How ownership works in this structure'; in context it describes this product, not Florida law.",
+    "107": "The item itself says no defect; it was a note that the sentence had been checked.",
+    "204": "Adam's words of 10 Sep 2026; a qualified general statement with Rule 1.140(a)(1) behind it, not advice about a document.",
+    "233": "Every Member signs the whole Agreement with its exhibits, and later exhibits are adopted by a consent all Members sign.",
+    "234": "Completion by the Members and maintenance under Article 8 are compatible tasks.",
+    "264": "docs/README.md records the choice to author the S election package in code; no rule is broken."
+  },
+  "optional": {
+    "30": "The Terms sentence is conditional ('If you provide a mobile number and opt in'); not false, only unused.",
+    "35": "The sentence makes no cross-device promise; 'in your browser' is a clarification.",
+    "45": "Notice may be given any day; only the charge cutoff is 30 days. Clarify, do not restrict: 'I may submit cancellation notice at any time. To stop the next renewal charge, I must give notice at least 30 days before renewal.'",
+    "74": "Italics, not quotation marks; the paraphrase of s. 605.0102(8)(a) is substantively accurate.",
+    "76": "The Statement names PS 1 'doing business as MyFloridaSeriesLLC'; the trade name is not a different appointee.",
+    "81": "'No Articles fee' is true; if expanded, say no state fee to designate an agent when the current agent is kept.",
+    "138": "'The exhibits can be regenerated' is not false; regenerating the agreement regenerates them.",
+    "144": "Same as 45: cancellation is available any day; the clarification about the 30-day cutoff is useful, not required.",
+    "151": "'Here' is loose, not false; the package is downloadable in the same portal.",
+    "183": "The office may upload a PDF under any title; the example is unrepresentative, not impossible.",
+    "206": "'Confirmation' can mean the filed document; 'document' is clearer.",
+    "232": "Redundant, not circular; the shorter sentence is a concision edit.",
+    "243": "A citation to s. 605.2602 alone is not false; the longer citation matches the ledger's preference.",
+    "251": "The sentence is true: s. 605.2107(1)(n) leaves s. 605.2304(2) variable. The longer explanation is optional.",
+    "257": "True as written; adding s. 605.2201(3) is a supplemental citation."
+  },
+  "corrected": {
+    "15": "'One EIN' is wrong as an absolute: the site sells EINs for individual series. Reword to say the company has one EIN by default and a series may need its own. Ruling needed on the words.",
+    "19": "'One state fee' is also wrong (Articles, agent designation and each series designation are separate state fees). Use 'One annual report for the company and its series'.",
+    "22": "'A sole owner's LLC files none either way' is false for a sole-owner S corporation (Form 1120-S). Qualify the row by tax classification, not owner count.",
+    "26": "Nothing stores the card's expiration, and Square's customer and card references are kept as well as brand and last four. Disclose the card on file and list what is actually kept; do not say 'only'.",
+    "27": "The collection-channel correction stands. 'We delete it the moment the EIN is issued' is not true while nightly backups keep the ciphertext (N1.01); the retention sentence waits on that decision.",
+    "28": "Nothing bills monthly, but replacing the sentence with an annual fee changes the bargain. Adam decides: build the monthly billing, or reword.",
+    "31": "The count is unverified; the proposed replacement miscalled the statute. Source the count or remove it without naming the entity after its provisions.",
+    "38": "Same as 15: do not substitute an unconditional 'one EIN'. 'A single tax filing' is still wrong for a sole owner.",
+    "44": "The 120-day hold exists: s. 605.0717(2), 'until 120 days after the effective date of dissolution or filing of a statement of termination, if earlier'. Cite s. 605.0715(5) for the one-year administrative hold and s. 605.0717(2) for the 120 days.",
+    "52": "The principal address feeds the operating agreement (the seed reads principalOfficeAddress), so a conversion must still ask it. Say what it is for; do not hide it.",
+    "53": "The formation type sets the agreement's professional wording (professional: seed.formationType === 'PLLC'), so a conversion must still ask it. Ask the existing company's actual type.",
+    "60": "No mail job exists, but the office sheet shows the address for hand use. Adam says what is mailed, or the fields go.",
+    "69": "No caller passes lockState. The live defect is in the registered agent step, which writes state 'FL' in the copy-my-address button and the suggestion handler. Fix those two handlers; refuse a non-Florida address rather than relabel it.",
+    "83": "The badge and 'usually the smarter choice' stand as the defect. 'Why many owners choose' asserts adoption nobody measured; use 'Compare manager-managed and member-managed'.",
+    "90": "Do not assert a dissolution the data does not prove. Describe a recently inactive record and this service's one-year hold; cite s. 605.0715(5) and s. 605.0717(2).",
+    "91": "Changing the boundary alone leaves 'PS-4' and 'PS 4' with different duplicate keys (reproduced: 'PS-4' vs '4'). Normalize the separator in the name rule, the canonical form and the duplicate key together.",
+    "93": "The option is labelled 'Domestic Florida PLLC'; check the typed ending against the chosen type in both directions; s. 621.12(2)(a) also permits 'chartered'.",
+    "100": "A compound item: split the visible Review-row defects from the unused code before batching.",
+    "105": "Delete the unreachable screen (lines 37-56) only; isService on line 19 is still read by the effect at line 28.",
+    "135": "The privacy sentence is false for member-managed companies. But s. 605.0202(5) requires an amendment only when filed information became inaccurate; do not prescribe amended Articles for every ownership change.",
+    "137": "A generated PDF is not an adopted agreement. Ask whether an agreement was adopted; do not disable 'first' merely because a generation exists. Ruling needed.",
+    "141": "A manager-managed client is pre-filled as the first owner (no blank row). The replacement wording stands: 'They start from the people named on your order'.",
+    "145": "Generated agreements appear before any state document. Use 'Your documents will appear here as they are prepared or uploaded.'",
+    "147": "The reset looks up the current sign-in email, not the order's. Use 'Enter the email address you sign in with'.",
+    "165": "The '03/21/2027' print exists nowhere in the product (searched src, server and docs). Keep the code-only fields.",
+    "179": "Say ten backed-up tables, and that each run attempts up to 200 pending files; name the providers.",
+    "189": "A pending order carries no client until payment, so the scenario needs malformed data. Harmless defensive housekeeping.",
+    "197": "An in-progress order already has the client's details. Pass each order's status to the email and ask for details only when they are awaited.",
+    "226": "Pending EIN secrets matter as well as the 14-day S election window. Rotate only when no encrypted secret of either kind is live, or re-encrypt first.",
+    "246": "The colophon's range 605.2101-605.2802 already covers four of the twelve. Eight are missing: 605.0302, 605.04074, 605.0410, 605.0602, 605.0714, 605.1103, former 212.031, 220.02.",
+    "262": "There are eight agreement masters, not ten, and the two single-owner S forms already have a Recital D (N2.06). Use markers in all eight, lettered E in those two.",
+    "263": "An unrestricted bracket scan after substitution would refuse client text such as '[ACME]'. Check the template's slots before client text goes in."
+  },
+  "disputeRejected": {
+    "63": "IRS Form 2553 instructions, item E: the deadline runs '2 months and 15 days after the date entered for item E', and for a first tax year that is the earliest of the day the entity 'first had shareholders (owners)', first had assets, or began doing business. A new LLC first has owners the day its Articles take effect, so A22's wording matches the rule.",
+    "152": "Same as 63. A later election date typed on the form is a later deemed classification date, and the window runs from it.",
+    "153": "Same as 63. 'The start of the company's first tax year' is the IRS's own phrase; A22 chose one wording for every place. Adam decides the sentence.",
+    "202": "Same as 63."
+  },
+  "duplicates": {
+    "201": "28", "211": "178", "228": "127", "167": "136",
+    "188": "187", "190": "187", "191": "187", "192": "187", "193": "187",
+    "96": "90", "112": "100"
+  },
+  "duplicateNotes": {
+    "211": "Codex adds: a company EIN with no S election package has no Form 2553 either; mention the form only when a matching package exists.",
+    "228": "Both label tables change together: src/lib/datetime.ts and server/datetime.ts.",
+    "96": "Also a live copy at stepValidation.ts:123; the hold uses last_txn_date/file_date, not a verified dissolution date."
+  },
+  "newRulingNeeded": [
+    "N1.01", "N1.02", "N1.09", "N1.10", "N1.11",
+    "N2.02", "N2.03", "N2.04", "N2.05",
+    "N2.07", "N2.08", "N2.09", "N2.10", "N2.11", "N2.12", "N2.13", "N2.14", "N2.15",
+    "N2.18", "N2.22", "N2.25", "N2.26", "N2.27",
+    "N3.10", "N3.12"
+  ],
+  "newNotes": {
+    "N2.10": "Verified: s. 201.02 (70 cents) and s. 201.031 (surtax, none on a single-family residence). NOT verified by Claude: Miami-Dade's 60-cent base rate (the Revenue Department page did not render).",
+    "N2.26": "Verified: FinCEN's page says the rule is final (alert updated 11 Aug 2026). NOT verified by Claude: the effective date of 14 Aug 2026.",
+    "N1.08": "Reproduced: 17 and 19 equal owners fail the exact-total check.",
+    "N4.02": "Reproduced in America/New_York: 9 Sep refused and 16 Dec accepted for a 16 Sep filing; correct in UTC.",
+    "N4.03": "Reproduced: Labor Day (7 Sep 2026) counts as a business day; s. 605.0102(9) excludes days a national bank is closed."
+  },
+  "parts": {
+    "17": [
+      { "key": "amend-title", "scope": "The Amendment page's browser title reads 'Page Not Found'; give it its proper title." },
+      { "key": "contact-wording", "scope": "The Contact page says 'please contact us' on the contact page itself." }
+    ],
+    "95": [
+      { "key": "eyebrow", "scope": "On the existing-LLC path the banner's eyebrow still says formation." },
+      { "key": "title", "scope": "The banner title on the existing-LLC path.", "waitsOn": ["ruling:82"] }
+    ]
+  },
+  "extraWaits": {}
+}

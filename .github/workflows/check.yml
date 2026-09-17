@@ -42,7 +42,17 @@ jobs:
 
       - name: Run everything
         working-directory: webapp
+        env:
+          CHECK_RESULTS_FILE: /tmp/server-results.jsonl
         run: bun run check
+
+      # The fix ledger's guard (docs/audit): every accepted fix replayed, the
+      # ledger's history append-only, a batch inside its declared scope. The
+      # push hook refuses an unaccepted release on Adam's Mac; this runs on
+      # every push so that a push made around that hook shows up red here.
+      # Detection, not prevention.
+      - name: The fix ledger's guard
+        run: bun run docs/audit/guard.ts
 
       # The behavioral gate (P52): a real Chromium buys every entity variation
       # the site sells — new + conversion, LLC + PLLC, member- + manager-
@@ -56,7 +66,15 @@ jobs:
 
       - name: A customer buys every product variant
         working-directory: webapp
+        env:
+          CHECK_RESULTS_FILE: /tmp/walk-results.jsonl
         run: bun run behavioral
+
+      # Pages, generated documents and named behaviour checks recorded by
+      # accepted fixes. A named check missing from the results counts as failed.
+      - name: Replay the accepted fixes' assertions
+        working-directory: webapp
+        run: bun run scripts/audit-assert.ts --results /tmp/server-results.jsonl --results /tmp/walk-results.jsonl
 
       - name: Server log on failure
         if: failure()

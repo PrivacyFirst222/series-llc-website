@@ -33,8 +33,20 @@ if ! (cd "$ROOT/webapp" && bun run ../docs/facts-check.ts); then
   exit 1
 fi
 
+# The fix ledger's guard (docs/audit/guard.ts, 17 Sep 2026): every fix Adam
+# has accepted is replayed against the staged files, the ledger's history is
+# append-only, and on a batch branch nothing outside the batch's declared
+# scope can be committed.
+if ! (cd "$ROOT" && bun run docs/audit/guard.ts --staged); then
+  echo "pre-commit: THE FIX LEDGER'S GUARD REFUSED — commit refused. Run: bun run docs/audit/guard.ts --staged" >&2
+  exit 1
+fi
+
+# docs/oa-instructions.md joined this list on 17 Sep 2026: the generator has
+# always built the Instructions, but a change to their master did not set it
+# off, so the Word copy went stale (found by Codex reviewing the fix ledger).
 MASTERS=$(git diff --cached --name-only --diff-filter=ACM \
-  | grep -E '^(webapp/server/templates-oa-.*\.md|docs/owners-manual\.md|webapp/server/templates-statement-of-authorized-representative\.md)$' || true)
+  | grep -E '^(webapp/server/templates-oa-.*\.md|docs/owners-manual\.md|docs/oa-instructions\.md|webapp/server/templates-statement-of-authorized-representative\.md)$' || true)
 
 if [ -n "$MASTERS" ]; then
   echo "pre-commit: master document changed, regenerating Word files"

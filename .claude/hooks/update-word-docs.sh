@@ -8,7 +8,7 @@
 # Everything is generated into a staging directory first and measured against
 # docs/format-baseline.json, which is taken from the hand-formatted originals in
 # docs/source/. If any document comes out less formatted than its original,
-# NOTHING is copied anywhere and this script fails. That check exists because a
+# NOTHING is written anywhere and this script fails. That check exists because a
 # generator once preserved every word, silently discarded the typography, and
 # wrote the result straight into Dropbox twice.
 #
@@ -201,21 +201,10 @@ echo "regenerated $count Word documents -> docs/word/"
 # them. docs/redline.py still exists and can be run by hand to compare two
 # masters on demand; nothing regenerates its output automatically.
 
-# Dropbox second, and never fatal. -d is not enough: under a macOS privacy denial
-# the directory tests as present and every write fails.
-if [ -d "$OUT_DROPBOX" ]; then
-  failed=0
-  for entry in "${DOCS[@]}"; do
-    name="${entry##*|}"
-    cp "$STAGE/$name" "$OUT_DROPBOX/$name" 2>/dev/null || failed=$((failed + 1))
-  done
-  if [ "$failed" -eq 0 ]; then
-    echo "copied $count Word documents -> Dropbox"
-  else
-    echo "DROPBOX NOT UPDATED: $failed of $count could not be written." >&2
-    echo "  docs/word/ is complete and current; only the Dropbox copies are stale." >&2
-    echo "  Usually macOS privacy: grant the terminal access to the Dropbox folder." >&2
-  fi
-else
-  echo "Dropbox folder not present — docs/word/ only"
-fi
+# Dropbox is NOT written here any more (17 Sep 2026). This script runs inside
+# the commit step, so a changed master used to reach Adam's Dropbox folder at
+# the local commit — before he had reviewed anything. The reviewed, committed
+# documents are copied to Dropbox at release, by docs/audit/publish-docs.ts,
+# and only for a commit he accepted. OUT_DROPBOX above is kept as the record
+# of where that copy goes.
+echo "Dropbox is updated at release, after Adam's acceptance — not by this script ($OUT_DROPBOX untouched)"

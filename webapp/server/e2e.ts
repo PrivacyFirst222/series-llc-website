@@ -6,7 +6,7 @@ import { defaultFormData } from "../src/components/forms/florida-llc/defaults";
 import { assembleOa, type OaInputs } from "./oa";
 import { serviceOrderClientEmail } from "./email";
 import { execSync } from "node:child_process";
-import { writeFileSync } from "node:fs";
+import { writeFileSync, appendFileSync } from "node:fs";
 import { tmpdir as osTmpdir } from "node:os";
 import { join as joinPath } from "node:path";
 
@@ -29,6 +29,9 @@ let failures = 0;
 function check(label: string, ok: boolean, detail?: unknown) {
   console.log(`${ok ? "✅" : "❌"} ${label}${ok ? "" : ` — ${JSON.stringify(detail)}`}`);
   if (!ok) failures++;
+  // The fix ledger reads results by label (docs/audit): a recorded fix names
+  // the check that proves it, and a label missing from this file is a failure.
+  if (process.env.CHECK_RESULTS_FILE) appendFileSync(process.env.CHECK_RESULTS_FILE, JSON.stringify({ label, ok }) + "\n");
 }
 
 const testEmail = `e2e-client-${Math.random().toString(36).slice(2, 8)}@example.com`;

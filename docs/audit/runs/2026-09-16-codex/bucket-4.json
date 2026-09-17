@@ -1,0 +1,747 @@
+{
+  "files": [
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepCertification.tsx",
+      "lines": 396
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepClient.tsx",
+      "lines": 111
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepCorrespondence.tsx",
+      "lines": 158
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepEffectiveDate.tsx",
+      "lines": 91
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepFilingPath.tsx",
+      "lines": 86
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepIntro.tsx",
+      "lines": 82
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepMailingAddress.tsx",
+      "lines": 70
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepManagement.tsx",
+      "lines": 158
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepManagers.tsx",
+      "lines": 174
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepMembers.tsx",
+      "lines": 90
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepName.tsx",
+      "lines": 351
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepOptionalDocs.tsx",
+      "lines": 132
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepPrincipalAddress.tsx",
+      "lines": 42
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepPurpose.tsx",
+      "lines": 119
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepRegisteredAgent.tsx",
+      "lines": 292
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepRegisteredAgentAcceptance.tsx",
+      "lines": 128
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepSeries.tsx",
+      "lines": 228
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepSubmissionPayload.tsx",
+      "lines": 86
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/ServiceFeeEstimate.tsx",
+      "lines": 76
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/steps.ts",
+      "lines": 119
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/stepValidation.ts",
+      "lines": 413
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/types.ts",
+      "lines": 377
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/us-states.ts",
+      "lines": 30
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/validation.ts",
+      "lines": 278
+    },
+    {
+      "path": "webapp/src/pages/FormLLC.tsx",
+      "lines": 31
+    },
+    {
+      "path": "webapp/src/pages/OrderConfirmed.tsx",
+      "lines": 165
+    },
+    {
+      "path": "webapp/server/assets/f2553-b64.ts",
+      "lines": 3
+    }
+  ],
+  "priorFindings": [
+    {
+      "id": "45",
+      "status": "disputed",
+      "evidence": "StepRegisteredAgent.tsx says “and I can cancel at any time in my portal.” The cancellation route accepts notice on any day; the30-day rule determines whether the next renewal charge stops. The finding conflates notice availability with the charge cutoff, and its replacement implies later notice cannot be submitted.",
+      "replacementOk": false,
+      "replacementNote": "Use “I may submit cancellation notice at any time. To stop the next renewal charge, I must give notice at least30 days before renewal.” This aligns the assessment with item144 and preserves the contractual timing."
+    },
+    {
+      "id": "46",
+      "status": "confirmed",
+      "evidence": "StepRegisteredAgent.tsx:122–124 says gift cards “will not be accepted for renewal”; renewals.ts:205–208 creates a payment link without a saved card and :275–305 accepts a paid link then declines to retain a prepaid card.",
+      "replacementOk": true,
+      "replacementNote": "Correct; preserve the owner ruling that prepaid cards cannot be kept on file."
+    },
+    {
+      "id": "47",
+      "status": "confirmed",
+      "evidence": "ReviewStep.tsx:160 renders “Renewal card on file: Yes” from consent; renewals.ts:82–98 saves only after payment.",
+      "replacementOk": true,
+      "replacementNote": "“Keep card for renewal: Agreed” describes the actual prepayment state."
+    },
+    {
+      "id": "48",
+      "status": "confirmed",
+      "evidence": "steps.ts:58–111 has no raRenewalCardConsent entry; :117 recognizes only registeredAgent-prefixed fields, so :118 sends this error to certify.",
+      "replacementOk": true,
+      "replacementNote": "Add raRenewalCardConsent: agent to FIELD_STEP."
+    },
+    {
+      "id": "49",
+      "status": "confirmed",
+      "evidence": "ReviewStep.tsx:208–213 reads includeMembersInArticles, default false; server/validation.ts:369 forces it true for MEMBER_MANAGED and filing.ts:538–568 lists AMBR members. Conversion also displays the row.",
+      "replacementOk": true,
+      "replacementNote": "Correct conditional wording and removal on conversion."
+    },
+    {
+      "id": "50",
+      "status": "confirmed",
+      "evidence": "StepManagers.tsx:126 and stepValidation.ts:268 refer to a chosen Articles statement on conversion; server/validation.ts:332 adds an irrelevant AR explanation.",
+      "replacementOk": true,
+      "replacementNote": "“A manager-managed LLC needs at least one Manager.” is correct for both paths."
+    },
+    {
+      "id": "51",
+      "status": "confirmed",
+      "evidence": "StepRegisteredAgent.tsx:30–32,161,173,275,284 still describe personal appointment although a conversion retaining its agent has no acceptance step (FloridaLLCFormationForm.tsx:296–298).",
+      "replacementOk": false,
+      "replacementNote": "Correct direction, but supporting entity agents requires changes to data type, server SELF first/last requirements at server/validation.ts:223–231, payload and review, not just labels and an entity-name box. Also collect the existing agent’s agreement to serve the protected series."
+    },
+    {
+      "id": "52",
+      "status": "disputed",
+      "evidence": "Principal and mailing screens do not feed conversion filingGroups (:246–303), but principalOfficeAddress is read by oaSeed at routes-portal.ts:87–93 and reaches generated agreement inputs :1464. “Answers reach no sheet row” does not mean they serve no purpose.",
+      "replacementOk": false,
+      "replacementNote": "Do not hide and discard addresses blindly. Explain they are for the operating agreement/records and verify current existing-company addresses, or obtain them elsewhere before document generation."
+    },
+    {
+      "id": "53",
+      "status": "disputed",
+      "evidence": "StepIntro.tsx:27 asks formation type on conversion, but it does change output: buildPayload.ts:25 stores it; routes-portal.ts:164 carries it and :1485 sets professional: seed.formationType === PLLC.",
+      "replacementOk": false,
+      "replacementNote": "Ask the existing company’s actual type, or derive and verify it. Simply hiding the choice can omit professional descriptors."
+    },
+    {
+      "id": "54",
+      "status": "housekeeping-only",
+      "evidence": "filing.ts:141–142 has MEMBER_MANAGED provision, while StepManagement.tsx:75 sets includeManagementStatementInArticles false for that structure; its normal UI branch is unreachable.",
+      "replacementOk": false,
+      "replacementNote": "Deleting the unused branch is supported. Forcing a new filed provision changes the product and requires a separate owner decision; the alternatives are not interchangeable."
+    },
+    {
+      "id": "55",
+      "status": "confirmed",
+      "evidence": "stepValidation.ts checks country on principal/mailing only; schema.ts:13,37,69 requires it for other addresses, whose components omit errors.country.",
+      "replacementOk": true,
+      "replacementNote": "Require and display Country required on all applicable address blocks."
+    },
+    {
+      "id": "56",
+      "status": "confirmed",
+      "evidence": "stepValidation.ts:54,158,172,218,282,303 accepts any nonempty ZIP; schema.ts:12,36,68,146 requires at least three characters.",
+      "replacementOk": false,
+      "replacementNote": "Align actual format rules as well as messages. “Enter a full ZIP code” alone does not define or enforce a full US ZIP; preserve postal-code support if foreign addresses are supported."
+    },
+    {
+      "id": "57",
+      "status": "confirmed",
+      "evidence": "RepeatablePartyFields.tsx:182–191 and StepCertification.tsx:324–344 show optional contacts without error props; schema.ts:39,220 validates email, while buildPayload.ts:141–152 omits representative email and phone.",
+      "replacementOk": true,
+      "replacementNote": "Remove unused representative contact boxes and validate/display manager email on its step."
+    },
+    {
+      "id": "58",
+      "status": "confirmed",
+      "evidence": "server/validation.ts:194–208 checks alternate-name duplicate keys outside the CONVERT guard, unlike its adjacent new-name checks.",
+      "replacementOk": true,
+      "replacementNote": "Skip alternate-name duplicate checks on conversion."
+    },
+    {
+      "id": "59",
+      "status": "confirmed",
+      "evidence": "StepCertification.tsx:96–101 includes “and the change of registered agent” for SERVICE; its actual checkbox label at :117 omits that authority.",
+      "replacementOk": true,
+      "replacementNote": "Add the same conditional clause to the checkbox."
+    },
+    {
+      "id": "60",
+      "status": "disputed",
+      "evidence": "StepCorrespondence.tsx:74,112,125–155 collects company, phone and paper address; filing.ts:449–454 explicitly displays “Mailing address for paper correspondence (ours, not Sunbiz’s)”. Absence of an automated postal-mail job does not prove office staff cannot use that address.",
+      "replacementOk": false,
+      "replacementNote": "Explain the intended manual use or remove unused fields by policy; do not assert that no human correspondence can be sent merely because no mail job exists."
+    },
+    {
+      "id": "61",
+      "status": "confirmed",
+      "evidence": "validateEffectiveDate defaults anticipatedFilingDate to new Date() at validation.ts:125; StepEffectiveDate.tsx:69 says anticipated filing date without supplying one.",
+      "replacementOk": false,
+      "replacementNote": "An expected filing day must actually be supplied and later rechecked at filing. Wording alone cannot ensure the legal date; separately fix UTC/local-day and bank-holiday defects reported below."
+    },
+    {
+      "id": "62",
+      "status": "confirmed",
+      "evidence": "stepValidation.ts:236–245 and server/validation.ts:250–264 require a nonempty agent signature but never compare it to the agent name; Articles signatures do compare.",
+      "replacementOk": true,
+      "replacementNote": "Apply an exact-name rule consistently, using the complete agent legal name including suffix."
+    },
+    {
+      "id": "63",
+      "status": "disputed",
+      "evidence": "StepOptionalDocs.tsx:69 says “2 months and 15 days from formation”; form2553Timing.ts:101–103 says effective date. IRS Form2553 Instructions, Item E, ties the deadline to the election effective tax-year date, using the earliest owners/assets/business date for a first tax year, not universally the Articles effective date. https://www.irs.gov/instructions/i2553",
+      "replacementOk": false,
+      "replacementNote": "Use the Form2553 Item E effective date and its first-tax-year rule, with applicable deadline extensions/late-election exclusions. Do not universalize the Articles date."
+    },
+    {
+      "id": "64",
+      "status": "confirmed",
+      "evidence": "OrderConfirmed.tsx:139–141 always offers login even without hasPassword; routes-payments.ts:603 rejects resend unless status exactly paid although filed/formed are paid states.",
+      "replacementOk": true,
+      "replacementNote": "Condition login on account readiness and base resend eligibility on payment/client/password facts, including filed and formed."
+    },
+    {
+      "id": "65",
+      "status": "confirmed",
+      "evidence": "FloridaLLCFormationForm.tsx:519–522 percentage uses all 19 steps; :541–542 step count excludes hidden ones but still includes submit. :449–457 redirects from certify; submit page is unreachable in the normal flow.",
+      "replacementOk": true,
+      "replacementNote": "Remove unreachable submit and calculate both progress displays from the same visible sequence."
+    },
+    {
+      "id": "66",
+      "status": "confirmed",
+      "evidence": "ServiceFeeEstimate.tsx:34 always says Formation service; server/pricing.ts names a conversion Protected series service fee.",
+      "replacementOk": true,
+      "replacementNote": "Use the same conditional label as pricing."
+    },
+    {
+      "id": "67",
+      "status": "confirmed",
+      "evidence": "StepOptionalDocs.tsx:17–20 says Optional state documents/from the Florida Division over IRS EIN and2553 services.",
+      "replacementOk": true,
+      "replacementNote": "Optional documents and services accurately includes all four items."
+    },
+    {
+      "id": "68",
+      "status": "confirmed",
+      "evidence": "StepIntro.tsx:65–78 and StepCertification.tsx:54–67 ask the same legal-advice/public-record acknowledgments using separate fields.",
+      "replacementOk": false,
+      "replacementNote": "No replacement is proposed. Choose the single retained acknowledgment point and migrate validation/payload consumers if consolidating; repetition alone is not a false statement."
+    },
+    {
+      "id": "69",
+      "status": "disputed",
+      "evidence": "AddressFields.tsx:47 does have state: lockState ?? s.state, but no product caller supplies lockState. The live agent screen instead uses AddressAutocomplete directly and overwrites state with FL at StepRegisteredAgent.tsx:225–229; its copy-client button does the same at :149–153.",
+      "replacementOk": false,
+      "replacementNote": "Fix the actual agent suggestion/copy handlers, rejecting non-FL addresses rather than relabeling them. Changing only the unused lockState path would leave the defect live."
+    },
+    {
+      "id": "70",
+      "status": "confirmed",
+      "evidence": "StepRegisteredAgent.tsx:83 and :284 require a Florida street address but not residence; 2026 s.605.0113(1)(b)1 requires an individual to reside in Florida. https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605.html",
+      "replacementOk": false,
+      "replacementNote": "Correct for a newly appointed individual agent. Make it conditional: a conversion retaining an existing corporate agent must not make the client affirm personal Florida residence."
+    },
+    {
+      "id": "71",
+      "status": "confirmed",
+      "evidence": "StepRegisteredAgent.tsx:83 promises signing on the next screen, but FloridaLLCFormationForm.tsx:296–298 hides it for CONVERT+SELF. Already linked to51.",
+      "replacementOk": true,
+      "replacementNote": "Proposed conversion-specific explanation is correct."
+    },
+    {
+      "id": "72",
+      "status": "confirmed",
+      "evidence": "StepRegisteredAgent.tsx:105–107 promises “anything we receive”; Terms10(b)–(c) limits processing to legal process/government correspondence and may reject general mail.",
+      "replacementOk": true,
+      "replacementNote": "Replacement aligns the promise with Terms10(b)."
+    },
+    {
+      "id": "73",
+      "status": "confirmed",
+      "evidence": "StepRegisteredAgentAcceptance.tsx:113 says “acknowledge the obligations”; s.605.0113(2) requires acceptance to provide familiarity with and acceptance of obligations. https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605.html",
+      "replacementOk": true,
+      "replacementNote": "Proposed wording supplies both concepts; this is a precision fix to the intake acknowledgment, not evidence the state’s separate filed acceptance is defective."
+    },
+    {
+      "id": "74",
+      "status": "disputed",
+      "evidence": "StepCertification.tsx:153–158 italicizes a shortened definition but uses no quotation marks. The omitted phrases “of the limited liability company” and “with the department” do not change its contextual meaning; italic emphasis alone does not make an inaccurate verbatim quotation. 2026 s.605.0102(8)(a) verified on Online Sunshine.",
+      "replacementOk": true,
+      "replacementNote": "Full statutory quotation is accurate if preferred, but current text is a substantively accurate paraphrase."
+    },
+    {
+      "id": "75",
+      "status": "confirmed",
+      "evidence": "StepCertification.tsx:254–255 reads “a bank, or the Division”; the extra comma splits the compound subject.",
+      "replacementOk": true,
+      "replacementNote": "Remove the comma after bank, as proposed."
+    },
+    {
+      "id": "76",
+      "status": "disputed",
+      "evidence": "StepCertification.tsx:273 appoints MyFloridaSeriesLLC; the Statement’s opening explicitly identifies PS1 “doing business as MyFloridaSeriesLLC,” and Terms1 identifies the filing party. Naming its trade name does not establish that a different person was appointed.",
+      "replacementOk": true,
+      "replacementNote": "Using PS1’s full legal name would improve clarity, but the finding overstates a proven wrong-party appointment."
+    },
+    {
+      "id": "77",
+      "status": "confirmed",
+      "evidence": "FloridaLLCFormationForm.tsx:746 says Submit intake, while :449–457 immediately creates checkout and navigates to payment.",
+      "replacementOk": true,
+      "replacementNote": "Continue to payment accurately describes the next step."
+    },
+    {
+      "id": "78",
+      "status": "confirmed",
+      "evidence": "StepName.tsx:313–318 shows a generic invalid-name warning while buildFinalLlcName returns the base when designator is still empty.",
+      "replacementOk": true,
+      "replacementNote": "Choose a designator above to complete the name is accurate for this missing-designator state; reserve a separate message for actual invalid names."
+    },
+    {
+      "id": "79",
+      "status": "confirmed",
+      "evidence": "StepIntro.tsx:27 calls the option Professional LLC; the selectable title at :31 is Domestic Florida PLLC.",
+      "replacementOk": true,
+      "replacementNote": "Use the exact displayed option name."
+    },
+    {
+      "id": "80",
+      "status": "confirmed",
+      "evidence": "StepClient.tsx:31 says formation documents on both paths; conversions prepare designations for an existing LLC. Already linked to A24.",
+      "replacementOk": true,
+      "replacementNote": "Filed documents is the consistent inclusive label."
+    },
+    {
+      "id": "81",
+      "status": "disputed",
+      "evidence": "StepFilingPath.tsx:27 says “no Articles fee,” which is true: a conversion files no Articles. Its header supplies the broader $125 context. Different levels of detail are not contradictory facts.",
+      "replacementOk": false,
+      "replacementNote": "If expanding, say no state fee to designate a new registered agent when retaining the current agent; “no registered agent fee” can be mistaken for absence of annual agent-service fees."
+    },
+    {
+      "id": "82",
+      "status": "confirmed",
+      "evidence": "StepFilingPath.tsx:26 uses Converting for adding series. s.605.1041 covers entity-type/jurisdiction conversion; s.605.2201 covers establishing series while retaining the company. https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605.html",
+      "replacementOk": true,
+      "replacementNote": "Adding series to an existing Florida LLC avoids the statutory term collision without changing the service."
+    },
+    {
+      "id": "83",
+      "status": "disputed",
+      "evidence": "The Recommended badge and “usually the smarter choice” exist at StepManagement.tsx:81–95. However proposed “Why many owners choose” asserts adoption evidence not supplied, and a general explanation is not by itself proof the service selected a structure on the client’s behalf.",
+      "replacementOk": false,
+      "replacementNote": "Use neutral “Compare manager-managed and member-managed” and remove unsupported comparative/adoption claims. Assess defaults separately against the no-selection promise."
+    },
+    {
+      "id": "84",
+      "status": "confirmed",
+      "evidence": "ReviewStep.tsx:255 displays requestedEffectiveDate directly as YYYY-MM-DD, while NameCheck.tsx:14–21 formats calendar dates in words.",
+      "replacementOk": true,
+      "replacementNote": "Use the calendar-components formatter, avoiding UTC parsing."
+    },
+    {
+      "id": "85",
+      "status": "confirmed",
+      "evidence": "RepeatablePartyFields.tsx:77,89 says Type/Business Entity; RepeatableMemberFields.tsx:73,85 says Member type/Entity.",
+      "replacementOk": false,
+      "replacementNote": "Use Manager type on managers and Member type on members; do not label both steps Manager type. Standardize option capitalization."
+    },
+    {
+      "id": "86",
+      "status": "confirmed",
+      "evidence": "AddressFields.tsx:93–108 restricts State to US_STATES while country remains free text; schema.ts:11 and stepValidation.ts require state. Foreign province/region entry is unavailable.",
+      "replacementOk": false,
+      "replacementNote": "Provide province/region and country-sensitive postal fields. Declaring a US-only restriction is a business decision, not an equivalent automatic repair, and supported US territories also need consideration."
+    },
+    {
+      "id": "87",
+      "status": "confirmed",
+      "evidence": "StepOptionalDocs.tsx:68 says mail while form2553Timing.ts:95–96 explicitly permits postmark or fax. Already linked to A65.",
+      "replacementOk": true,
+      "replacementNote": "Fax or mail makes the options consistent."
+    },
+    {
+      "id": "88",
+      "status": "disputed",
+      "evidence": "StepSeries.tsx:94 heading explicitly says “How ownership works in this structure,” followed by “Your LLC owns every protected series” and “This is deliberate.” In context it describes this product, not a universal rule of Florida law.",
+      "replacementOk": true,
+      "replacementNote": "Adding “in this structure” is accurate but redundant; the alleged legal misstatement is not established by the full passage."
+    },
+    {
+      "id": "89",
+      "status": "housekeeping-only",
+      "evidence": "StepSubmissionPayload.tsx:56–58 promises the agreement with filed documents, but the submit page is unreachable through the normal form flow (65). No current reader sees this page.",
+      "replacementOk": true,
+      "replacementNote": "Delete with the dead step; if reused, use the proposed portal/questionnaire explanation."
+    },
+    {
+      "id": "90",
+      "status": "disputed",
+      "evidence": "NameCheck.tsx:45 does assert recently dissolved from inactive status, but the audit’s inability to find a voluntary-dissolution hold is answered by s.605.0717(2), which sets120days or earlier termination. Its replacement still asserts dissolution without the data proving it. https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605.html",
+      "replacementOk": false,
+      "replacementNote": "Describe a recently inactive record and this service’s conservative one-year hold; distinguish statutory administrative and other dissolution periods and avoid treating last transaction as proven dissolution."
+    },
+    {
+      "id": "91",
+      "status": "disputed",
+      "evidence": "validation.ts:224 rejects PS-4; reproduced with imported helper. Statute605.2202 requires the abbreviation, not whitespace. But the suggested boundary substitution alone leaves dedupeKey(PS-4) as -4 and dedupeKey(PS 4) as4, contradicting the proposed equivalence.",
+      "replacementOk": false,
+      "replacementNote": "Accept punctuation boundaries and explicitly normalize separator punctuation consistently in canonicalization and deduplication; do not promise hyphen/space equivalence from the boundary regex alone."
+    },
+    {
+      "id": "92",
+      "status": "confirmed",
+      "evidence": "validation.ts:38–47 uses includes(llc); read-only helper reproduction marks Millcreek Holdings and Hillcrest Rentals as carrying a designator.",
+      "replacementOk": true,
+      "replacementNote": "The proposed terminal word-boundary match fixes these examples and the corresponding endsWith false positive."
+    },
+    {
+      "id": "93",
+      "status": "disputed",
+      "evidence": "validation.ts:27–34 accepts Acme PLLC unchanged even if LLC is selected; reproduced. The replacement tells the user to choose Professional LLC, an option absent from StepIntro, and only supplies the error for one direction of mismatch. 621.12(2)(a) also allows chartered; its text must not be reduced to an exhaustive three-option legal rule.",
+      "replacementOk": false,
+      "replacementNote": "Validate the actual final suffix against the chosen supported product type, provide both mismatch messages, and use Domestic Florida PLLC as the option label."
+    },
+    {
+      "id": "94",
+      "status": "confirmed",
+      "evidence": "stepValidation.ts:291 says internal records though filing.ts:538–568 publishes members on new member-managed Articles.",
+      "replacementOk": false,
+      "replacementNote": "Use separate conversion wording: an existing LLC’s members here are for its agreement, not new Articles. Proposed unconditional replacement is false on conversion."
+    },
+    {
+      "id": "95",
+      "status": "confirmed",
+      "evidence": "FormLLC.tsx:15–19 still says formation/Form your on conversion while description is conditional. Already linked to A24.",
+      "replacementOk": false,
+      "replacementNote": "Say “Add protected series to your existing Florida LLC”; proposed “Convert” perpetuates82’s terminology mismatch."
+    },
+    {
+      "id": "96",
+      "status": "duplicate",
+      "evidence": "Same unsupported dissolved-from-inactive explanation as90, repeated at routes-payments.ts:327–331 and sunbiz.ts:245; not marked same defect as in the open list.",
+      "replacementOk": true,
+      "replacementNote": "The proposed recently inactive formulation improves90; include stepValidation.ts:123 as another live copy and note the actual hold uses last_txn_date/file_date, not a verified dissolution date."
+    },
+    {
+      "id": "97",
+      "status": "confirmed",
+      "evidence": "filing.ts:256 implies the $125 applies when agent changes; pricing.ts:77–81 charges only a separate $25 change. Ledger wording is similarly ambiguous.",
+      "replacementOk": true,
+      "replacementNote": "Proposed explanation correctly separates Articles exemption from $25 agent change."
+    },
+    {
+      "id": "98",
+      "status": "confirmed",
+      "evidence": "filing.ts:427 says client chose no statement; StepManagement.tsx:75 derives it automatically, and member-managed is the only reachable blank general-purpose path.",
+      "replacementOk": true,
+      "replacementNote": "Proposed office wording accurately describes that path."
+    },
+    {
+      "id": "99",
+      "status": "confirmed",
+      "evidence": "server/validation.ts:178 uses §605.2202 while consent route uses s.605.2202, Fla.Stat.; the statute text verifies the name rule. Already linked to A64.",
+      "replacementOk": true,
+      "replacementNote": "Citation-style normalization is correct, independently of91’s validation bug."
+    },
+    {
+      "id": "100",
+      "status": "disputed",
+      "evidence": "The compound item mixes code-only leftovers with visible Review rows and missing exact-name information (ReviewStep.tsx:113–124,157–169,225–228). It cannot all be classified housekeeping-only; the “capacity code” branch is itself unreachable in normal SELF UI.",
+      "replacementOk": false,
+      "replacementNote": "Split visible wording/record defects from unused code. No concrete unified replacement is supplied, and ledger omissions are not false customer claims."
+    },
+    {
+      "id": "101",
+      "status": "confirmed",
+      "evidence": "buildPayload.ts:29 preserves abandoned finalName on conversion despite its comment. routes-portal.ts:162 prefers that name to orders.llc_name when seeding agreements, so this has reader-visible impact beyond housekeeping.",
+      "replacementOk": true,
+      "replacementNote": "Set finalName empty on conversion and always source the existing company identity for downstream documents; proposed field fix is correct."
+    },
+    {
+      "id": "102",
+      "status": "housekeeping-only",
+      "evidence": "buildPayload.ts:29 forces llcName.exactNameOnly false on conversion while :159 duplicates the stale original in acknowledgments.",
+      "replacementOk": true,
+      "replacementNote": "Use one canonical value and update all record consumers."
+    },
+    {
+      "id": "103",
+      "status": "housekeeping-only",
+      "evidence": "buildPayload.ts:176 still marks IP filling TODO; routes-payments.ts:346 already assigns clientIp(c).",
+      "replacementOk": true,
+      "replacementNote": "Proposed comment accurately describes existing behavior."
+    },
+    {
+      "id": "104",
+      "status": "housekeeping-only",
+      "evidence": "AddressAutocomplete.tsx:21 describes blur checking; no form caller supplies its onBlur prop; FloridaLLCFormationForm.tsx:342 performs the check on Continue.",
+      "replacementOk": true,
+      "replacementNote": "Remove the unused prop/comment or describe optional consumer behavior; wiring blur is an additional behavior change."
+    },
+    {
+      "id": "105",
+      "status": "disputed",
+      "evidence": "The SERVICE rendering branch at StepRegisteredAgentAcceptance.tsx:37–56 is unreachable, but proposed deletion also removes line19 isService, which the surviving effect still reads at :28.",
+      "replacementOk": false,
+      "replacementNote": "Delete the dead rendering branch while preserving isService until its remaining effect use is refactored; the replacement as specified leaves an undefined identifier."
+    },
+    {
+      "id": "106",
+      "status": "housekeeping-only",
+      "evidence": "StepCertification.tsx:355 repeats articlesSignerChoice===SELF inside the same condition at :348.",
+      "replacementOk": true,
+      "replacementNote": "Removing the repeated condition changes no reader-visible behavior."
+    },
+    {
+      "id": "107",
+      "status": "disputed",
+      "evidence": "The item itself says “No defect — recorded so the sentence is known to have been checked.” StepRegisteredAgent.tsx:57–60 matches Terms9(c) and the $25 statutory change fee.",
+      "replacementOk": true,
+      "replacementNote": "None is appropriate; remove this verification note from the defect count."
+    },
+    {
+      "id": "108",
+      "status": "housekeeping-only",
+      "evidence": "types.ts:171 defines registeredAgentIsAffiliatedPerson; defaults/raService assign it and schema requires it, but no UI or payload consumer uses it.",
+      "replacementOk": true,
+      "replacementNote": "Delete it consistently from the four stated data/schema files."
+    },
+    {
+      "id": "109",
+      "status": "housekeeping-only",
+      "evidence": "types.ts:329 groups additionalSeriesPrepFee inside estimatedStateFees although validation.ts:168–169 expressly calls it a service preparation charge. Actual pricing is recomputed.",
+      "replacementOk": true,
+      "replacementNote": "Separating service fees or renaming estimatedFees is correct; keep all typed consumers aligned."
+    },
+    {
+      "id": "110",
+      "status": "housekeeping-only",
+      "evidence": "validation.ts:203–216 lists unconditional member and HTML-rejection expectations absent from server/validation.ts; it is a stale internal comment.",
+      "replacementOk": true,
+      "replacementNote": "Proposed pointer to the actual schema and rules is accurate."
+    },
+    {
+      "id": "111",
+      "status": "housekeeping-only",
+      "evidence": "validation.ts:74–92 exports unused percentage helpers; RepeatableMemberFields.tsx has no ownership boxes and production references search finds no caller.",
+      "replacementOk": true,
+      "replacementNote": "Delete unused helpers and obsolete model fields after checking tests; no reader behavior changes."
+    },
+    {
+      "id": "112",
+      "status": "duplicate",
+      "evidence": "Same dead second member validation explicitly included in100: routes-payments.ts:308–310 is preceded by orderFormSchema rejection using server/validation.ts:128–134.",
+      "replacementOk": true,
+      "replacementNote": "Delete the redundant check; preserve the schema check."
+    },
+    {
+      "id": "113",
+      "status": "housekeeping-only",
+      "evidence": "routes-payments.ts:627–631 name-check docstring precedes contact route at635, while actual name-check route is688.",
+      "replacementOk": true,
+      "replacementNote": "Move the docstring to the intended route."
+    },
+    {
+      "id": "114",
+      "status": "housekeeping-only",
+      "evidence": "The conversion branch duplicates100, but this item also uniquely identifies a misplaced docstring at filing.ts:187–188 above RA_SERVICE_SIGNER instead of raFields(:198). Both changes affect internal code/comments, not reader output.",
+      "replacementOk": true,
+      "replacementNote": "Remove unreachable conversion branch and move the comment as proposed; both are code-only."
+    }
+  ],
+  "findings": [
+    {
+      "where": "Order form, Managers and Initial members: changing a row between a person and a business, then opening its agreement",
+      "file": "webapp/src/components/forms/florida-llc/RepeatablePartyFields.tsx",
+      "line": 81,
+      "reads": "update(entry.id, { personOrEntity: v as PartyKind })",
+      "claims": "The selected Person/Business Entity type identifies the legal party used in the review, state filing, and operating agreement.",
+      "truth": "RepeatablePartyFields.tsx:81–83 and RepeatableMemberFields.tsx:75–78 change only the discriminator and retain hidden names. buildPayload.ts:86,97 preserves both. ReviewStep.tsx:198,221 uses the discriminator, but routes-portal.ts:94–99,108–114,127–132 chooses any retained personal name before entityName/businessEntityName and infers isEntity from name absence. Enter John Smith, switch to Entity and enter Acme LLC: review identifies Acme LLC, while the OA seed identifies John Smith as an individual. In the reverse manager switch, filing.ts:512–523 instead prefers the retained businessEntityName. This is a reproducible deterministic data-path mismatch, not evidence of an actual customer document.",
+      "replacement": "When the row type changes, clear fields belonging to the other type. In the review, filing sheet, and agreement seed, choose the name and entity-signature treatment from memberType or personOrEntity; never infer the selected type from whichever hidden name remains populated.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Order form, Effective date: a Florida calendar date is shifted back one day",
+      "file": "webapp/src/components/forms/florida-llc/validation.ts",
+      "line": 139,
+      "reads": "Effective date cannot be more than 5 business days before the filing date.",
+      "claims": "The entered calendar date is tested against the stated legal interval.",
+      "truth": "validation.ts:128 parses YYYY-MM-DD as UTC, then :136 changes hours in the local time zone. Read-only imports under TZ=America/New_York with anticipated filing September 16, 2026 at noon rejected September 9 (the fifth preceding weekday) and accepted December 16 (91 calendar days later). Section 605.0207(2)(a)–(b), opened in the 2026 Online Sunshine chapter, permits five prior business days and 90 later days: https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605.html. This is separate from prior61, which concerns the assumed filing day.",
+      "replacement": "Parse the year, month, and day as a Florida calendar date and compare Florida calendar dates; accept September 9 and reject December 16 when the anticipated filing date is September 16, 2026. Keep the five-business-day and 90-day messages only after applying those boundaries correctly.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Order form, Effective date: bank holidays are counted as business days",
+      "file": "webapp/src/components/forms/florida-llc/validation.ts",
+      "line": 109,
+      "reads": "return day !== 0 && day !== 6;",
+      "claims": "Every Monday through Friday is a business day when counting backward from filing.",
+      "truth": "isBusinessDay excludes only Saturday and Sunday. Read-only evaluation returns true for Labor Day, September 7, 2026. Section 605.0102(9), opened on 2026 Online Sunshine, excludes days a national banking association is not open for normal business transactions; s.605.0207(2)(a) uses that business-day term. https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605.html Federal Reserve holiday calendar identifies September 7, 2026 as Labor Day: https://www.federalreserve.gov/aboutthefed/k8.htm. The earliest permitted date is therefore calculated too late around a bank holiday, independently of the UTC defect.",
+      "replacement": "Count only Monday through Friday dates on which national banking associations are open for normal business transactions, including observed bank-holiday rules, when computing the five-business-day lookback.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Order form, Business purpose: the clause promised in every Articles filing is never added",
+      "file": "webapp/src/components/forms/florida-llc/sections/StepPurpose.tsx",
+      "line": 65,
+      "reads": "Your Articles will always include a general purpose covering any lawful business activity, so your LLC is never limited to one line of business.",
+      "claims": "Every ordinary-LLC Articles filing contains the displayed general-purpose clause; a specific purpose is added alongside it.",
+      "truth": "StepPurpose.tsx:13–14 declares GENERAL_DEFAULT only for display at :76. filing.ts:408–440 constructs the Other Provisions rows from the management statement and SPECIFIC/PROFESSIONAL text only; GENERAL text is never appended. A general-purpose member-managed filing explicitly says Leave blank at :427. The same screen also says Included in every filing at :74 and alongside the general purpose at :106. Prior98 concerns the office row attributing a choice, not this missing promised clause. The corresponding “Included in every filing” badge and “alongside” helper must also be removed or revised for the replacement to be consistent.",
+      "replacement": "We leave the purpose provision blank unless you request a specific purpose below.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Order form, Business purpose after changing Professional LLC to ordinary LLC: an invisible professional purpose survives",
+      "file": "webapp/src/components/forms/florida-llc/sections/StepPurpose.tsx",
+      "line": 95,
+      "reads": "Also list a specific purpose in the Articles — for example, if a lender or licensing agency wants to see one.",
+      "claims": "When the optional-purpose checkbox is unchecked, no specific purpose is requested for the ordinary LLC.",
+      "truth": "StepPurpose.tsx:23 resets an ordinary LLC only when purposeType is empty. Returning from PLLC preserves purposeType PROFESSIONAL and its text; :18 makes addingSpecific false, so the checkbox is unchecked and :101 hides the text box. server/validation.ts:167–171 permits this combination; buildPayload carries the purpose and filing.ts:416–417 still appends the retained professional text. Thus a client who switches to an ordinary LLC can receive Articles with the previous professional-purpose clause while this screen presents an unchecked optional-purpose box.",
+      "replacement": "When changing from PLLC to an ordinary LLC, reset purposeType to GENERAL and clear the former professional purpose, or visibly ask the client to retain it as a SPECIFIC purpose. Reject inconsistent type/purpose combinations on the server.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Payment confirmation, Resend the email: failure is reported as sent",
+      "file": "webapp/src/pages/OrderConfirmed.tsx",
+      "line": 26,
+      "reads": "Sent — check your inbox.",
+      "claims": "The requested welcome/password-setting email has been successfully sent.",
+      "truth": "routes-payments.ts:618–621 catches a rejected sendMail call, logs it, and unconditionally returns sent:true. OrderConfirmed.tsx:23–26 trusts that flag. If the mail provider fails, the client sees Sent and loses the resend button despite no accepted delivery. Unlike prior64, this occurs for an otherwise eligible paid order and does not concern filed/formed eligibility. Correct behavior requires returning an API error on failed sendMail, preserving the resend control, and using the existing success sentence only after sendMail succeeds.",
+      "replacement": "Could not send the email. Please try again.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Order form, Adding series to an existing LLC while keeping its registered agent: the agent’s agreement is absent from the certification",
+      "file": "webapp/src/components/forms/florida-llc/sections/StepCertification.tsx",
+      "line": 117,
+      "reads": "I am authorized to act for ${company}, its members have consented to establishing the protected series on this order, and I authorize MyFloridaSeriesLLC to prepare and file the Protected Series Designations with the Florida Division of Corporations.",
+      "claims": "The listed confirmations cover the facts the service needs to file protected-series designations for an existing LLC.",
+      "truth": "2026 s.605.2203(2) requires an agreement with the registered agent covering the company and each protected series before delivery of a designation; subsection(3) says the designation signer affirms this as fact. Opened text: https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605.html. StepRegisteredAgent records the retained agent’s details and Florida-address acknowledgment but no agreement to serve every series; FloridaLLCFormationForm.tsx:296–298 hides acceptance for CONVERT+SELF; the certification at StepCertification.tsx:90–120 addresses authority and member consent only. This proves a missing intake confirmation, not that any particular agent has refused or no off-platform agreement exists. Add the proposed confirmation before filing and retain evidence or verification of the agreement.",
+      "replacement": "I am authorized to act for ${company}, its members have consented to establishing the protected series on this order, and I authorize MyFloridaSeriesLLC to prepare and file the Protected Series Designations with the Florida Division of Corporations. I confirm that the company’s registered agent has agreed to serve as registered agent for the company and every protected series in this order.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Order form, Management structure explanation: a transfer is incorrectly said to confer management",
+      "file": "webapp/src/components/forms/florida-llc/sections/StepManagement.tsx",
+      "line": 106,
+      "reads": "If a share later passes to a trust, a holding company, or a passive investor, the new owner inherits management authority — and the exposure — too.",
+      "claims": "A transfer of the ownership/economic interest automatically gives the recipient management authority in a member-managed LLC.",
+      "truth": "templates-oa-member.md:284–286 (§§10.2–10.3) expressly makes a transferee economic-only until admitted under §12.1; :308 imposes admission conditions. I opened those sections. The 2026 text of s.605.0502(1)(c), opened on Online Sunshine, likewise distinguishes transfer from management rights: https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605.html. Admission can confer membership rights; receiving the transferred economic interest alone does not.",
+      "replacement": "If a transferee is admitted as a member of a member-managed LLC, the new member gains management rights and duties; receiving only an economic interest does not confer management authority.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Order form, changing to Member-managed after partially entering a manager: checkout validates the hidden manager",
+      "file": "webapp/src/components/forms/florida-llc/stepValidation.ts",
+      "line": 258,
+      "reads": "// Hidden entirely for member-managed companies — nothing to validate.",
+      "claims": "An abandoned manager entry does not need completion once the member-managed path hides Managers.",
+      "truth": "FloridaLLCFormationForm.tsx:299 hides the step and stepValidation.ts:259 returns no manager errors, but submission :449–453 sends raw managers. schema.ts:178 validates all manager rows regardless of structure; server/validation.ts:342–374 never strips them. Read-only pure-function reproduction with MEMBER_MANAGED and a retained manager email invalid returned {} from validateStep(managers,...) and a server Enter a valid email issue at managers.0.email. Missing address fields similarly remain required. This differs from prior57’s missing visible email error: switching paths preserves an inapplicable row that blocks checkout.",
+      "replacement": "Before submitting or validating a member-managed order, omit abandoned manager rows that are inapplicable to the selected structure; apply the same rule on the server. If previously entered members are intentionally retained for the agreement after the reverse switch, display and validate them explicitly rather than hiding their errors.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Payment confirmation reopened after filing or formation: the status message still says preparation has just begun",
+      "file": "webapp/src/pages/OrderConfirmed.tsx",
+      "line": 101,
+      "reads": "We're preparing your filing now — you'll get an email when your LLC is formed.",
+      "claims": "The current order is still awaiting filing and formation.",
+      "truth": "OrderConfirmed.tsx:58,63 deliberately treats paid, filed, and formed as paid, but :101–103 renders this same future-tense message for all three. A formed order can therefore show both an already-completed server state and a claim that its filing is being prepared. The conversion branch has the parallel stale claim about series being established. This is independent of prior64’s login/resend mismatch.",
+      "replacement": "Paid: “We’re preparing your filing.” Filed: “Your filing has been submitted.” Formed: “Your LLC has been formed.” For an existing LLC’s series order, use “Your protected series have been established” at completion. Render the message for the actual order status.",
+      "severity": "wording"
+    },
+    {
+      "where": "Order form, Registered agent acceptance and Review: the agent’s suffix disappears",
+      "file": "webapp/src/components/forms/florida-llc/sections/StepRegisteredAgentAcceptance.tsx",
+      "line": 24,
+      "reads": "const raFullName = [data.registeredAgentFirstName, data.registeredAgentLastName]",
+      "claims": "The acceptance name carried over from the agent step is the complete legal name that the client entered.",
+      "truth": "The agent step collects registeredAgentSuffix, and buildPayload.ts:48 includes it in fullName; the acceptance prefill at StepRegisteredAgentAcceptance.tsx:24–30 omits it. ReviewStep.tsx:141–142 independently renders first and last name only. For John Smith Jr., acceptance and review show John Smith while the payload/filing identify John Smith Jr. This is a consistency defect, not a claim that every signature missing a suffix is legally invalid. Prior62 concerns absent signature/name comparison, not this loss of a collected name component.",
+      "replacement": "const raFullName = [data.registeredAgentFirstName, data.registeredAgentLastName, data.registeredAgentSuffix].map((x) => (x ?? \"\").trim()).filter(Boolean).join(\" \"); Use the same complete-name helper in Review.",
+      "severity": "wording"
+    }
+  ],
+  "filesWithNoNewFindings": [
+    "webapp/src/components/forms/florida-llc/sections/StepClient.tsx",
+    "webapp/src/components/forms/florida-llc/sections/StepCorrespondence.tsx",
+    "webapp/src/components/forms/florida-llc/sections/StepEffectiveDate.tsx",
+    "webapp/src/components/forms/florida-llc/sections/StepFilingPath.tsx",
+    "webapp/src/components/forms/florida-llc/sections/StepIntro.tsx",
+    "webapp/src/components/forms/florida-llc/sections/StepMailingAddress.tsx",
+    "webapp/src/components/forms/florida-llc/sections/StepManagers.tsx",
+    "webapp/src/components/forms/florida-llc/sections/StepMembers.tsx",
+    "webapp/src/components/forms/florida-llc/sections/StepName.tsx",
+    "webapp/src/components/forms/florida-llc/sections/StepOptionalDocs.tsx",
+    "webapp/src/components/forms/florida-llc/sections/StepPrincipalAddress.tsx",
+    "webapp/src/components/forms/florida-llc/sections/StepRegisteredAgent.tsx",
+    "webapp/src/components/forms/florida-llc/sections/StepSeries.tsx",
+    "webapp/src/components/forms/florida-llc/sections/StepSubmissionPayload.tsx",
+    "webapp/src/components/forms/florida-llc/ServiceFeeEstimate.tsx",
+    "webapp/src/components/forms/florida-llc/steps.ts",
+    "webapp/src/components/forms/florida-llc/types.ts",
+    "webapp/src/components/forms/florida-llc/us-states.ts",
+    "webapp/src/pages/FormLLC.tsx",
+    "webapp/server/assets/f2553-b64.ts"
+  ],
+  "readEvidence": "Assigned inventory files 57–82 read from first line to last with exec_command cat/sed. Truncated StepCertification 1–36 and steps.ts/stepValidation beginning were reopened. No application writes, servers, installs or git writes. The complete three-line f2553-b64.ts source was read using Path.read_text; its declaration/comment and suffix were inspected, and its entire embedded PDF was decoded in memory. All four pages of extracted text and all AcroForm field names were displayed and read without truncation. No decoded files were written. The official current IRS PDF was opened to verify its four-page Rev. December 2017 identity. No new finding in that asset.",
+  "statuteVerification": {
+    "status": "verified",
+    "sources": [
+      "https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605.html",
+      "https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0621/0621.html"
+    ],
+    "notes": "Opened 2026 Online Sunshine text for the statutory claims discussed in these findings and prior verifications. The s.605.0502 and s.605.2203 passages were additionally fetched directly from Online Sunshine and read in full after a web-tool excerpt was truncated. No statute conclusion relies on memory."
+  }
+}

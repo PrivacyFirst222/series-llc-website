@@ -1,0 +1,846 @@
+{
+  "files": [
+    {
+      "path": "webapp/src/content/oaLearnMore.tsx",
+      "lines": 371
+    },
+    {
+      "path": "webapp/src/content/oaLearnMoreParts.tsx",
+      "lines": 15
+    },
+    {
+      "path": "webapp/src/pages/portal/AccountCard.tsx",
+      "lines": 198
+    },
+    {
+      "path": "webapp/src/pages/portal/AmendAgreement.tsx",
+      "lines": 247
+    },
+    {
+      "path": "webapp/src/pages/portal/documentOrder.ts",
+      "lines": 30
+    },
+    {
+      "path": "webapp/src/pages/portal/drafts.ts",
+      "lines": 32
+    },
+    {
+      "path": "webapp/src/pages/portal/oaAssets.ts",
+      "lines": 24
+    },
+    {
+      "path": "webapp/src/pages/portal/OaAssetsCard.tsx",
+      "lines": 196
+    },
+    {
+      "path": "webapp/src/pages/portal/OaOwnersSections.tsx",
+      "lines": 492
+    },
+    {
+      "path": "webapp/src/pages/portal/OaQuestionCard.tsx",
+      "lines": 52
+    },
+    {
+      "path": "webapp/src/pages/portal/OAQuestionnaire.tsx",
+      "lines": 873
+    },
+    {
+      "path": "webapp/src/pages/portal/oaTypes.ts",
+      "lines": 75
+    },
+    {
+      "path": "webapp/src/pages/portal/OrdersInProgress.tsx",
+      "lines": 723
+    },
+    {
+      "path": "webapp/src/pages/portal/OwnershipEditor.tsx",
+      "lines": 174
+    },
+    {
+      "path": "webapp/src/pages/portal/PortalDashboard.tsx",
+      "lines": 782
+    },
+    {
+      "path": "webapp/src/pages/portal/PortalForgot.tsx",
+      "lines": 69
+    },
+    {
+      "path": "webapp/src/pages/portal/PortalLogin.tsx",
+      "lines": 77
+    },
+    {
+      "path": "webapp/src/pages/portal/PortalSetPassword.tsx",
+      "lines": 95
+    },
+    {
+      "path": "webapp/src/pages/portal/PortalVerifyEmail.tsx",
+      "lines": 86
+    },
+    {
+      "path": "webapp/src/pages/portal/SElectionDetailsForm.tsx",
+      "lines": 703
+    },
+    {
+      "path": "webapp/src/pages/portal/services.helpers.ts",
+      "lines": 42
+    },
+    {
+      "path": "webapp/src/pages/portal/ServicesCard.tsx",
+      "lines": 523
+    },
+    {
+      "path": "webapp/src/pages/portal/typedDate.ts",
+      "lines": 44
+    },
+    {
+      "path": "webapp/src/pages/portal/ViewingAsBanner.tsx",
+      "lines": 40
+    },
+    {
+      "path": "webapp/src/pages/admin/AdminDashboard.tsx",
+      "lines": 688
+    },
+    {
+      "path": "webapp/src/pages/admin/AdminLogin.tsx",
+      "lines": 55
+    },
+    {
+      "path": "webapp/src/pages/admin/LibrarySection.tsx",
+      "lines": 252
+    },
+    {
+      "path": "webapp/src/pages/admin/OrderBoard.tsx",
+      "lines": 406
+    },
+    {
+      "path": "webapp/src/pages/admin/OrderDetail.tsx",
+      "lines": 902
+    },
+    {
+      "path": "webapp/src/pages/admin/serviceOrders.helpers.ts",
+      "lines": 39
+    },
+    {
+      "path": "webapp/src/pages/admin/ServiceOrdersSection.tsx",
+      "lines": 465
+    }
+  ],
+  "priorFindings": [
+    {
+      "id": "115",
+      "status": "confirmed",
+      "evidence": "OAQuestionnaire.tsx and AmendAgreement.tsx show the formed-LLC refusal; routes-portal.ts:75-83 and 1107-1108 require a paid order, not formed_at.",
+      "replacementOk": false,
+      "replacementNote": "Use “a paid order” for NO_LLC only; distinguish network/server errors rather than replacing every failed request with this explanation."
+    },
+    {
+      "id": "116",
+      "status": "confirmed",
+      "evidence": "OrdersInProgress.tsx:355-358 promises a blank contribution points to the Asset Schedule, but new-series.ts uses “—”; oa-capital.ts:124/135 supplies “None” to the agreement exhibits.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "117",
+      "status": "confirmed",
+      "evidence": "new-series.ts adopter signature construction includes a Date line, whereas the agreement Series Exhibit adopter block has no separate date line; the effective date is already in the adoption sentence.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "118",
+      "status": "confirmed",
+      "evidence": "templates-new-series.md:46 prints Members/Member, and :61-64 supplies four rows; multi-member agreement Series Exhibits use Member(s) and five rows. This is consistency, not an invalid consent.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "119",
+      "status": "confirmed",
+      "evidence": "OrdersInProgress.tsx:379 names Article 8 but omits Article 9; OaOwnersSections.tsx:420-421 includes Article 9 when sElection is true, matching S-master special-terms restrictions.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "120",
+      "status": "confirmed",
+      "evidence": "OrdersInProgress.tsx labels the dialog Consent & Series Exhibit, while templates-new-series.md:66 and the document title use New Protected Series. The replacement identifies the actual combined document.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "121",
+      "status": "confirmed",
+      "evidence": "OrdersInProgress.tsx describes the S-election package as deleted; routes-portal.ts:548-630 instead attempts to replace it with a last-four record copy.",
+      "replacementOk": false,
+      "replacementNote": "Say the editable original is removed and a record copy is normally posted; do not promise system-wide SSN destruction: backup.ts:13-14/17-28 retains ciphertext and Dropbox retains old files. Handle a failed record-copy rebuild explicitly."
+    },
+    {
+      "id": "122",
+      "status": "confirmed",
+      "evidence": "OrdersInProgress.tsx formed-first S-election text demands an assigned EIN, although SElectionDetailsForm.tsx offers EIN pending. IRS Form2553 instructions, Item A, permit Applied For plus application date: https://www.irs.gov/instructions/i2553 .",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "123",
+      "status": "confirmed",
+      "evidence": "The EIN dialog title incorporates the service label and its company name instead of selecting the EIN target, while the form already knows whether the target is company or series.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "124",
+      "status": "confirmed",
+      "evidence": "oaLearnMore.tsx capital-call help and OAQuestionnaire.tsx use majority of owners; templates-oa-multi.md:208 requires Majority in Interest, a percentage vote.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "125",
+      "status": "confirmed",
+      "evidence": "oaLearnMore.tsx:243-244 says TOD admission uses the same rule as lifetime transfers; templates-oa-multi.md:154 and :306 distinguish majority-in-interest TOD/family admission from unanimous other admission.",
+      "replacementOk": false,
+      "replacementNote": "State explicitly that this is admission as a voting member, not permission to transfer. Say “For a TOD beneficiary or permitted family transferee, owners holding a majority of the remaining ownership interests must consent; other new members need all members’ consent.” Keep the signed-agreement requirement; outsider transfers separately require Manager and majority consent at :280."
+    },
+    {
+      "id": "126",
+      "status": "confirmed",
+      "evidence": "OaOwnersSections.tsx:153 cites Section12.1 for admission; templates-oa-single-s.md:289 makes12.1 Amendments and :265 makes10.1 Admission. The generic admission-section replacement works across variants.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "127",
+      "status": "confirmed",
+      "evidence": "server/datetime.ts:44 calls the sole-owner S form Single-Member S Corporation, while portal taxation pills use S Corporation; generation summaries abbreviate the document title. A shared label table and full title resolve the mismatch.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "128",
+      "status": "confirmed",
+      "evidence": "OAQuestionnaire.tsx:57, AmendAgreement.tsx:26 and consent defaults use toISOString().slice(0,10), which is UTC; relevant service dates use viewer-local formatting. server/datetime.ts:53-56 supplies the Eastern-calendar implementation.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "129",
+      "status": "confirmed",
+      "evidence": "OrdersInProgress.tsx consent identifier extraction recognizes PS but not the full Protected Series spelling; a statutorily valid full-spelling series therefore gets the wrong default. Online Sunshine 2026 s.605.2202 permits either form.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "130",
+      "status": "confirmed",
+      "evidence": "The spouse pairing option uses JTWROS without expansion; oaLearnMore.tsx:286 already supplies the full label Joint tenants with right of survivorship.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "131",
+      "status": "confirmed",
+      "evidence": "AmendAgreement.tsx refers to Update/regenerate and Operating Agreement while the dashboard uses Update / regenerate and Operating agreement. The difference is minor label consistency, not a broken link.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "132",
+      "status": "confirmed",
+      "evidence": "The two series-name refusals use §605.2202 and s.605.2202, Fla. Stat. respectively; both cite the same valid naming section, so this is citation style only.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "133",
+      "status": "confirmed",
+      "evidence": "OrdersInProgress.tsx tells the client to mail the package; the generated package provides fax as well. The IRS Form2553 instructions Where To File also permit fax: https://www.irs.gov/instructions/i2553 .",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "134",
+      "status": "confirmed",
+      "evidence": "oaLearnMore.tsx effective-date help promises today, but OAQuestionnaire.tsx:113 restores saved.effectiveDate before todayIso().",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "135",
+      "status": "disputed",
+      "evidence": "Actual OAQuestionnaire.tsx:432 says “Owners are never filed with the State”, which is false for this product’s AMBR filings. But the finding’s replacement also says every ownership change requires amended Articles. 2026 s.605.0202(5) concerns inaccurate filed information; merely adding an owner need not make an existing authorized-member listing inaccurate (s.605.0201(3)(c) permits one or more members).",
+      "replacementOk": false,
+      "replacementNote": "Keep the privacy correction, but say “If information on your filed Articles is no longer accurate, arrange the appropriate correction as well.” Do not prescribe amended Articles for every ownership change. Verified https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605.html ."
+    },
+    {
+      "id": "136",
+      "status": "confirmed",
+      "evidence": "OrdersInProgress.tsx:311-313 says unanimity is the only statutory route. Online Sunshine 2026 s.605.2107(1)(i) allows the agreement to vary approval of establishing a series; s.605.2201(1) is the default and these masters’3.1 requires unanimity.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "137",
+      "status": "disputed",
+      "evidence": "AmendAgreement.tsx:142 makes an unconditional Amended and Restated promise, but the proposed fix treats every generated PDF as an adopted agreement. OAQuestionnaire.tsx:109-111 preserves saved.firstOrAmended before using generation count, and :797-798 expressly says generated PDFs still need signature. A never-executed draft does not become an operative agreement just because it was generated.",
+      "replacementOk": false,
+      "replacementNote": "Ask whether an agreement has actually been adopted and use that answer. Suggested guidance: “If you are replacing an adopted agreement, select Amended and Restated. If you are correcting an unsigned first draft, select First operating agreement.” Do not disable First merely because a generation exists."
+    },
+    {
+      "id": "138",
+      "status": "disputed",
+      "evidence": "Actual oaLearnMore.tsx:348 says “the exhibits can be regenerated”, not that they can be regenerated alone; whole-agreement generation does regenerate its exhibits. The proposed replacement additionally promises every new document is Amended and Restated, which OAQuestionnaire.tsx:109-111/792-794 does not ensure.",
+      "replacementOk": false,
+      "replacementNote": "Optional clarification: “When the list changes, update it here and regenerate the agreement, including its exhibits.” Whether it should be amended depends on an adopted prior agreement, not the existence of a PDF."
+    },
+    {
+      "id": "139",
+      "status": "confirmed",
+      "evidence": "oaLearnMore.tsx:40 says a sole owner uses a personal tax return, but OaOwnersSections.tsx:134-143 permits an entity owner; its tax reporting is not necessarily the individual reader’s return.",
+      "replacementOk": false,
+      "replacementNote": "Qualify default treatment and entity ownership: “Without a corporate tax election, a one-owner LLC is generally disregarded for federal income tax purposes and a multiple-owner LLC is generally taxed as a partnership. An entity owner’s reporting depends on its own tax treatment.” Selecting No to S status does not rule out C-corporation treatment."
+    },
+    {
+      "id": "140",
+      "status": "confirmed",
+      "evidence": "OrdersInProgress.tsx:399 tells a conversion client the LLC does not yet exist; routes-portal.ts:400-404 gates llcFormed on this order’s formed_at, which for conversion is completion of its series filings.",
+      "replacementOk": false,
+      "replacementNote": "Branch on conversion and explain this service’s gate, not a legal prerequisite: “We are filing your Protected Series Designations. Our EIN-details form opens after those filings are completed.” An existing LLC need not legally wait for a new series to obtain its own EIN."
+    },
+    {
+      "id": "141",
+      "status": "disputed",
+      "evidence": "OaOwnersSections.tsx:99 says the rows start from formation information. The finding claims a manager-managed client sees one blank row, but routes-portal.ts:95-121 seeds a clientOwner and OAQuestionnaire.tsx:123-127 copies that name/address; suggested owners are separate chips. The assertion of a blank row is wrong.",
+      "replacementOk": true,
+      "replacementNote": "The proposed “people named on your order” is a useful, accurate refinement: the contact or manager is not automatically an owner. Do not support it with the false blank-row claim."
+    },
+    {
+      "id": "142",
+      "status": "confirmed",
+      "evidence": "PortalDashboard.tsx:206 says “signed-ready PDF”; the PDF is unsigned and the intended phrase is “PDF ready to sign”.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "143",
+      "status": "confirmed",
+      "evidence": "PortalDashboard.tsx:197-199 shows the payment explanation for every oaQuery.isError, including 500/network errors, which do not establish nonpayment.",
+      "replacementOk": false,
+      "replacementNote": "Use the specific NO_LLC API error, not every400; distinguish401 (sign in again), transport failure and server failure. The suggested retry message is correct for the latter failures."
+    },
+    {
+      "id": "144",
+      "status": "disputed",
+      "evidence": "Actual PortalDashboard.tsx:367 says “You can cancel here at any time”; routes-portal.ts cancellation accepts notice any day and the dialog at :403-405 explains the30-day renewal cutoff. Cancellation submission and stopping the upcoming charge are different acts; the quoted sentence does not promise that late notice stops that charge.",
+      "replacementOk": true,
+      "replacementNote": "The proposed sentence is accurate and useful clarification, but the original cancellation-availability claim is not false."
+    },
+    {
+      "id": "145",
+      "status": "disputed",
+      "evidence": "Actual empty state says “Your documents will appear here once your formation is prepared.” It is unsuitable for conversions, but the finding incorrectly says the first possible document is always returned Articles: routes-portal.ts:1107-1108 permits questionnaire access after payment and generated agreements appear before state filing. The replacement restricts the explanation to Division-returned documents.",
+      "replacementOk": false,
+      "replacementNote": "Use “Your documents will appear here as they are prepared or uploaded.” This covers self-generated agreements and conversion filings as well as state-returned documents."
+    },
+    {
+      "id": "146",
+      "status": "confirmed",
+      "evidence": "PortalDashboard.tsx:660 lists all account legal mail under every company. AdminDashboard.tsx:254 sends orderId only for package uploads; rows identify no company.",
+      "replacementOk": false,
+      "replacementNote": "The new company selection and attribution are right, but simply filtering existing mail by order_id hides all unassigned mail. Provide an explicit unassigned-mail section or assign existing records before applying the company filter."
+    },
+    {
+      "id": "147",
+      "status": "disputed",
+      "evidence": "PortalForgot.tsx:40 uses the loose phrase “signed up”, but the proposed “email address on your order” is wrong after the account email is changed using AccountCard. The reset route queries current clients.email at routes-portal.ts:975, not historical order contact_email.",
+      "replacementOk": false,
+      "replacementNote": "Use “Enter the email address you currently use to sign in, and we’ll send a link to choose a new password.”"
+    },
+    {
+      "id": "148",
+      "status": "confirmed",
+      "evidence": "PortalLogin.tsx:26 maps every status except429 to Incorrect email or password; routes-portal.ts:925 uses401 for bad credentials and app.ts:19-22 can produce500 for a server fault.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "149",
+      "status": "confirmed",
+      "evidence": "PortalLogin.tsx:38 describes formation-package documents for every client, although conversion orders produce Protected Series Designations. “Your filed documents” fits both paths.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "150",
+      "status": "confirmed",
+      "evidence": "SElectionDetailsForm.tsx:316 uses the client’s “our EIN” voice, but :217 changes it into a service-provider sentence saying “you’re obtaining ours”. The proposed provider voice resolves the reversal.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "151",
+      "status": "disputed",
+      "evidence": "Actual SElectionDetailsForm.tsx:690 says the package can be downloaded “here”; onDone closes the dialog and the package is downloadable in the same portal. “Here” does not expressly mean within this dialog, so the claimed false location is an inference.",
+      "replacementOk": true,
+      "replacementNote": "“It appears in Your documents, ready to download” is a useful precise label, but this is optional clarification rather than a demonstrated false promise."
+    },
+    {
+      "id": "152",
+      "status": "disputed",
+      "evidence": "The filing-date sentence is overbroad, but the proposed replacement endorses any later entered date as the controlling election date. IRS Form2553 Item E says a first-year election begins at the earliest owner/asset/business date; the UI’s permissive timing calculator does not make every later selected date legally valid.",
+      "replacementOk": false,
+      "replacementNote": "Say the deadline runs from the proper election effective date and explain the IRS first-year rule. Do not tell users an arbitrary later date moves a first-year deadline. Verified https://www.irs.gov/instructions/i2553 ."
+    },
+    {
+      "id": "153",
+      "status": "disputed",
+      "evidence": "Actual ServicesCard.tsx:411 refers to the start of the first tax year, matching IRS Form2553 Item E. The proposed replacement equates that with an LLC effective date and optional later selected date; the IRS instead specifies earliest shareholders, assets or business activity for a first-year election.",
+      "replacementOk": false,
+      "replacementNote": "Retain the first-tax-year distinction, clarify that the65-day ordering window is the service’s separate cutoff, and use the actual legally applicable election date for the IRS deadline. https://www.irs.gov/instructions/i2553 ."
+    },
+    {
+      "id": "154",
+      "status": "confirmed",
+      "evidence": "ServicesCard.tsx:182 calls it User’s Manual; docs/facts.md names the Series LLC Owner’s Manual and PortalDashboard.tsx:272 uses that title.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "155",
+      "status": "confirmed",
+      "evidence": "routes-portal.ts:162 prefers payload.llcName.finalName even for CONVERT; buildPayload.ts retains the old desired-name-derived finalName while routes-payments.ts names conversion orders from existingLlcName. The proposed branch uses the actual conversion company.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "156",
+      "status": "confirmed",
+      "evidence": "routes-portal.ts:1258-1268 selects the latest generation across all companies and formats its creation timestamp as prior agreement date; oa.ts uses it in the supersession recital instead of the prior agreement’s effective date.",
+      "replacementOk": false,
+      "replacementNote": "Select by this exact order and the actually adopted prior agreement. The proposed OR order_id IS NULL still admits unrelated legacy company drafts, and latest generated is not necessarily adopted. Where no adopted predecessor is known, ask the client for its date."
+    },
+    {
+      "id": "157",
+      "status": "confirmed",
+      "evidence": "routes-portal.ts:1921 and sibling duplicate-order refusals say below; PortalDashboard.tsx:747 puts Orders in progress above ServicesCard at :761.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "158",
+      "status": "housekeeping-only",
+      "evidence": "routes-portal.ts:2584 calls a SELF-agent LLC its own agent, but SELF names an individual. Contrary to the finding’s delivery assertion, PortalDashboard.tsx:426 shows a generic cancellation error, so this exact server sentence is not currently shown.",
+      "replacementOk": true,
+      "replacementNote": "The proposed server sentence is accurate; classify its present effect as housekeeping only, not a visible reader correction."
+    },
+    {
+      "id": "159",
+      "status": "confirmed",
+      "evidence": "routes-portal.ts:1963-1966 emits identifier-required for every schema failure, including a too-long purpose, and ServicesCard displays the returned message.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "160",
+      "status": "housekeeping-only",
+      "evidence": "routes-portal.ts:919 returns required for malformed email, but PortalLogin.tsx:26 replaces that response text. Changing this response alone changes no currently displayed text.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "161",
+      "status": "confirmed",
+      "evidence": "routes-portal.ts:1924 says LLCs “we formed”, while sElectionEligibility at :478-489 only requires a paid NEW order. “Formed through us” still implies formation is completed.",
+      "replacementOk": false,
+      "replacementNote": "Use “The S election package is available only for new LLCs ordered through us.” Keep the separate later gate on completing the details."
+    },
+    {
+      "id": "162",
+      "status": "confirmed",
+      "evidence": "routes-portal.ts:2277 says details were deleted, but :566 spreads the details into a kept record and :623 only nulls ein_secret. The refusal is displayed in SElectionDetailsForm.",
+      "replacementOk": false,
+      "replacementNote": "Replace details-deletion language with a precise live-system statement; do not claim all SSNs have been destroyed when backups and mirror copies persist, or promise a record copy exists if its rebuild failed."
+    },
+    {
+      "id": "163",
+      "status": "confirmed",
+      "evidence": "PortalDashboard.tsx:488-494 defines deleteGeneration without error handling and the document list renders no deletion error, so the refused request leaves the row silently unchanged.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "164",
+      "status": "confirmed",
+      "evidence": "routes-portal.ts:1135-1144 omits an Eastern date, while OAQuestionnaire and AmendAgreement calculate UTC today. Adding todayEastern corrects the same visible defect as128; blocked:false is additionally unused.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "165",
+      "status": "disputed",
+      "evidence": "The four obsolete contribution fields are present in oaTypes.ts and superseded by computeCapital in routes-portal.ts:1449-1479; account response fields are unused. However, the alleged printed “03/21/2027” is not present in product source and no file/line is supplied for it.",
+      "replacementOk": false,
+      "replacementNote": "Retain the evidenced code-only fields as housekeeping; remove or locate and quote the purported deadline before proposing a correction. This compound item cannot be confirmed wholesale."
+    },
+    {
+      "id": "166",
+      "status": "confirmed",
+      "evidence": "OwnershipEditor.tsx:82 actually opens window.confirm for fractional equal ownership. The suggested AlertDialog changes a reader-visible prompt, so this is not housekeeping-only.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "167",
+      "status": "duplicate",
+      "evidence": "Same unanimity-default defect as136, repeated in the OrdersInProgress.tsx:137 comment. The comment changes no reader-facing text.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "168",
+      "status": "housekeeping-only",
+      "evidence": "PortalDashboard.tsx:45-48 types three unused account RA values and :335 creates a shim from CompanyInfo; visible RA state already comes from the company. Removing the redundant fields/shim preserves displayed text.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "169",
+      "status": "confirmed",
+      "evidence": "PortalDashboard.tsx:725 actually calls window.confirm for deletion. Replacing a native confirmation with AlertDialog changes visible UI, despite the finding calling it code-only.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "170",
+      "status": "housekeeping-only",
+      "evidence": "routes-portal.ts:287-295/327/513-516/638-639/701-702/800-805 contain the cited misplaced or stale comments; none of those comments is rendered.",
+      "replacementOk": false,
+      "replacementNote": "Move the docstrings and correct null/obsolete office handling as proposed, but describe deletion of the live SSN field rather than implying destruction of every retained copy."
+    },
+    {
+      "id": "171",
+      "status": "confirmed",
+      "evidence": "AdminDashboard.tsx card-status ternary renders an em dash for null, giving the office no visible card status.",
+      "replacementOk": false,
+      "replacementNote": "Null does not by itself prove no permission: it can precede a card-save attempt or reflect an incomplete/failed capture path. Derive permission from the order’s consent and show “Card status not recorded” unless absence of consent is independently established."
+    },
+    {
+      "id": "172",
+      "status": "confirmed",
+      "evidence": "AdminDashboard.tsx renders the legacy client-level cancellation chip as well as per-company cancellation text; the account field retains an earlier company’s cancellation. Drop the account chip on the registered-agent tab.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "173",
+      "status": "confirmed",
+      "evidence": "AdminDashboard.tsx renders Invite sent when has_password is false; password absence neither proves a successful invite send nor records its delivery.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "174",
+      "status": "confirmed",
+      "evidence": "AdminDashboard.tsx email dialog labels provider acceptance as delivered and says Every email, whereas the route returns at most500 records. The newest500/accepted wording avoids both promises.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "175",
+      "status": "confirmed",
+      "evidence": "OrderDetail.tsx board-action refusals describe fixed columns even though OrderBoard.tsx:282-295 can classify formed orders as Complete, With the State or New work; matching the actual placement logic avoids the wrong location.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "176",
+      "status": "confirmed",
+      "evidence": "OrderDetail.tsx certificate upload uses mutation error state rendered beneath a different document action; the certificates block needs its own visible error line.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "177",
+      "status": "confirmed",
+      "evidence": "OrderDetail.tsx’s Articles identifier check is conditional on the office-signing branch, but the upload route validates any typed identifier. Matching the client check gives the actual reason before submission.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "178",
+      "status": "confirmed",
+      "evidence": "ServiceOrdersSection.tsx promises rebuilding an S election after a series EIN, labels a corrected date client-entered, describes a future upload in its own upload dialog, and retains typed EIN state on close.",
+      "replacementOk": false,
+      "replacementNote": "The item supplies no verbatim replacements. Use company-only rebuild wording; “Articles filing date”; “Upload the filed Designation here”; clear the EIN draft when switching orders or closing. A series EIN must not trigger company-election instructions."
+    },
+    {
+      "id": "179",
+      "status": "disputed",
+      "evidence": "LibrarySection.tsx:177-179 lists four table categories without saying only four; :244-246 says deletions never propagate, not that mirror uploads can never overwrite. BACKUP_TABLES has ten entries and mirror processing is capped, so there are real precision issues, but the finding attributes exclusive/no-overwrite statements the UI does not make.",
+      "replacementOk": false,
+      "replacementNote": "Use “A nightly snapshot of the ten backed-up tables is stored in private Vercel Blob storage.” For mirroring say “Each run attempts up to200 pending client files. Files may be replaced at the same destination; source deletions do not remove mirror copies.” Name providers rather than make an unverified corporate-ownership claim."
+    },
+    {
+      "id": "180",
+      "status": "confirmed",
+      "evidence": "LibrarySection.tsx offers Regenerate from the master without explaining that the published uploaded manual is replaced; the same publication slot serves all clients.",
+      "replacementOk": false,
+      "replacementNote": "Verbatim clarification: “Regenerating replaces the currently published manual, including any PDF you uploaded by hand, with a new PDF from the master.”"
+    },
+    {
+      "id": "181",
+      "status": "confirmed",
+      "evidence": "OrderBoard.tsx uses an unconditional days suffix for one day and a search-to-reach-rest hint even with an active search; service-open status labels differ between the board and dialog.",
+      "replacementOk": false,
+      "replacementNote": "Use singular “1 day”; while searching say “Showing the newest matching orders; narrow your search to find another order.” Use one shared display label for awaiting_info."
+    },
+    {
+      "id": "182",
+      "status": "confirmed",
+      "evidence": "AdminLogin.tsx treats every HTTP error except429 as Incorrect password, including500. Restrict that sentence to401 and show a server/connection error for other failures.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "183",
+      "status": "disputed",
+      "evidence": "Actual AdminDashboard.tsx:301 uses “e.g. Operating Agreement” as an upload-title example. The package-upload control accepts an arbitrary PDF and the server does not prohibit an office-uploaded agreement; client self-generation does not establish that the office can never upload one.",
+      "replacementOk": true,
+      "replacementNote": "A certificate example better matches common office work, but the asserted impossibility is not supported by the upload route."
+    },
+    {
+      "id": "184",
+      "status": "confirmed",
+      "evidence": "AdminDashboard.tsx:44 displays card_note only for wallet payment; other saved failure reasons are hidden. The proposed expression exposes the actual recorded reason.",
+      "replacementOk": true,
+      "replacementNote": "A human-readable mapping for “customer” and “not saveable” would further help, but the proposed code correctly exposes information currently omitted."
+    },
+    {
+      "id": "185",
+      "status": "confirmed",
+      "evidence": "LibrarySection.tsx:49 defaults a blank edition to month/year only, unlike the edition label in docs/facts.md. Requiring an explicit edition avoids publishing an incomplete label.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "186",
+      "status": "confirmed",
+      "evidence": "ServiceOrdersSection.tsx:69 omits year from the Placed date; retained historical service orders therefore have ambiguous dates. Add the year and preferably the same Eastern formatting used elsewhere.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "187",
+      "status": "housekeeping-only",
+      "evidence": "The cited family contains real code-only issues: AdminDashboard.tsx:497 constant sortable, OrderBoard.tsx unused declarations, OrderDetail.tsx:45 unused services, serviceOrders.helpers.ts unused exports, and orphan ServiceOrdersSection.tsx:74-77 comment.",
+      "replacementOk": false,
+      "replacementNote": "Do not certify the summary’s exact eleven/three counts: raw bucket4 itself identifies five unused board fields, and gives no complete eleven-comment list. Remove only enumerated, verified unused code; reader-facing defects are separately assessed."
+    },
+    {
+      "id": "188",
+      "status": "duplicate",
+      "evidence": "Same dead sortable branch already included in187/A79h; AdminDashboard.tsx:497 assigns true unconditionally, leaving the alternate header/search branches unreachable.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "189",
+      "status": "disputed",
+      "evidence": "OrderBoard.tsx:258-260 does not exclude pending_payment, but the claimed normal abandoned checkout cannot carry this client_id: routes-payments.ts:367-385 inserts the pending order without client_id and :83 links it only after successful payment. The finding assumes an unsupported database state.",
+      "replacementOk": true,
+      "replacementNote": "The guard is harmless defensive code for malformed legacy/test rows, but no normal client-visible loss is established by this scenario. Do not call it a confirmed production path."
+    },
+    {
+      "id": "190",
+      "status": "duplicate",
+      "evidence": "Same unused board fields already included in187/A79h (raw bucket4 explicitly lists all five); the narrower finding corrects the summary’s three-versus-five count.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "191",
+      "status": "duplicate",
+      "evidence": "Same unused OrderDetailData.services already included in187/A79h raw bucket4; the component renders its services prop instead.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "192",
+      "status": "duplicate",
+      "evidence": "Same unused money and STATUS_STYLE exports already included in187/A79h; the actual importers take the other helpers.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    },
+    {
+      "id": "193",
+      "status": "duplicate",
+      "evidence": "Same orphan serviceLabel docstring already counted in187/A79h, as this finding itself notes.",
+      "replacementOk": true,
+      "replacementNote": "Correct as written."
+    }
+  ],
+  "findings": [
+    {
+      "where": "Client portal → Operating agreement questionnaire → returning to Initial contributions",
+      "file": "webapp/src/pages/portal/OAQuestionnaire.tsx",
+      "line": 383,
+      "reads": "Your answers save automatically — you can return anytime, and regenerate whenever anything changes.",
+      "claims": "A returning client recovers the contributions already entered and saved.",
+      "truth": "OAQuestionnaire.tsx:105-138 reconstructs the saved answers but never copies saved.assets. Its Initial contributions card at :713 receives a.assets ?? [], and any later edit saves this reconstructed object at :145/168-174. routes-portal.ts:1174-1185 replaces the complete answers object; :1449 computes the exhibits from a.assets. oa-capital.ts:46 treats missing assets as an empty list, :130 gives zero contributions, and :133-136 prints None. Thus reopening loses the visible asset list, and generating from it can silently replace actual contributions with zero/None.",
+      "replacement": "Preserve the sentence only after restoring the actual saved assets. Add to the saved-answer initializer: assets: saved.assets ?? [],",
+      "severity": "substantive"
+    },
+    {
+      "where": "Client portal → Operating agreement questionnaire → saving edits after leaving and returning",
+      "file": "webapp/src/pages/portal/OAQuestionnaire.tsx",
+      "line": 83,
+      "reads": "const revRef = useRef(0);",
+      "claims": "A newly opened editor can continue saving an existing draft with monotonically increasing revisions.",
+      "truth": "Each mount starts revision0; edits increment it at :171. The GET response routes-portal.ts:1110/1135-1144 returns answers but no revision. The PUT writes only if oa_profiles.rev < the supplied revision at :1174-1176, otherwise returns HTTP200 with stale:true at :1180. The client’s :146 onSuccess clears its error without inspecting stale. A draft at revision20 silently discards the next20 edits after reopening, despite the automatic-save promise at :383-384.",
+      "replacement": "Return and initialize from the stored revision, reject stale writes visibly, and distinguish a rejected save from success. Conflict message: “Your latest changes were not saved because this draft changed elsewhere. Reload the draft before continuing.”",
+      "severity": "substantive"
+    },
+    {
+      "where": "Client portal → Operating agreement questionnaire → removing an owner after allocating contributions by share",
+      "file": "webapp/src/pages/portal/OAQuestionnaire.tsx",
+      "line": 218,
+      "reads": "patch({ members, couples: nextCouples });",
+      "claims": "Removing an owner preserves which remaining owner contributed each asset.",
+      "truth": "removeOwner at :213-218 remaps couples but leaves every asset.contributedBy.shares array unchanged; units at :230-250 then renumber. OaAssetsCard.tsx:59/113-123 binds shares by the new unit index. For owners A/B/C and contributed shares [0,100,0], deleting A leaves B/C receiving [0,100], a valid100 total now attributed to C. oa-capital.ts:69-81 uses the same positions to print contributions and contributor names.",
+      "replacement": "Bind contributor shares to stable owner/unit IDs. When deleting, pairing or unpairing owners, preserve the surviving identities and require confirmation of any changed allocation: “The owner list changed. Confirm who contributed each asset before generating the agreement.”",
+      "severity": "substantive"
+    },
+    {
+      "where": "Client portal → Operating agreement questionnaire → dollar amounts for contributions, capital calls and borrowing",
+      "file": "webapp/src/pages/portal/OaAssetsCard.tsx",
+      "line": 16,
+      "reads": "const digits = typed.replace(/[^\\d]/g, \"\");",
+      "claims": "A typed dollar amount is represented as that amount, rather than changing its magnitude.",
+      "truth": "The parser strips a decimal point and minus sign instead of validating them: pasting100.50 produces10050, and -100 produces100. The same parser is used for agreed value at :93 and cash allocations at :152; OAQuestionnaire.tsx:65-67 repeats the defect for capital-call caps and borrowing limits. oa-capital.ts:37-38/61 accepts and prints monetary values with up to two decimals, so the inflation is introduced by the UI parser.",
+      "replacement": "Parse a nonnegative dollar amount without deleting its decimal point or sign; reject invalid input rather than changing the number. Validation text: “Enter a nonnegative dollar amount with no more than two decimal places.”",
+      "severity": "substantive"
+    },
+    {
+      "where": "Office → service order → Federal EIN for a protected series → IRS assistant answer list",
+      "file": "webapp/src/pages/admin/ServiceOrdersSection.tsx",
+      "line": 333,
+      "reads": "[\"Legal name\", viewing.llc_name],",
+      "claims": "The listed legal name belongs to the entity for which this EIN was ordered.",
+      "truth": "At :291-292 the same dialog correctly says EIN for details.seriesName when target is series. The assistant’s legal-name row at :333 nevertheless always supplies the parent LLC name, although the office is told at :309-310 to type these answers straight down. This can submit the parent name on an application intended for the separately named series.",
+      "replacement": "[\"Legal name\", viewing.details.target === \"series\" ? viewing.details.seriesName ?? \"\" : viewing.llc_name],",
+      "severity": "substantive"
+    },
+    {
+      "where": "Client portal → S election details → owner mailing address",
+      "file": "webapp/src/pages/portal/SElectionDetailsForm.tsx",
+      "line": 533,
+      "reads": "Verified address",
+      "claims": "The displayed address has been selected and verified through the address lookup.",
+      "truth": "The live lookup sets verified:true at :525-527, but reopening any stored shareholder sets verified:true and verified2:true unconditionally at :119-134. Selecting an owner also sets verified:Boolean(m.address) at :486, regardless of address provenance. A manually entered nonempty address therefore gains the verification label after save/reopen or selection without lookup verification.",
+      "replacement": "Show “Address on file” for imported or previously saved addresses unless lookup verification was actually recorded. Reserve “Verified address” for a successful lookup result.",
+      "severity": "wording"
+    },
+    {
+      "where": "Client portal → Reset your password → response after a failed request",
+      "file": "webapp/src/pages/portal/PortalForgot.tsx",
+      "line": 34,
+      "reads": "If an account exists for that email address, a reset link is on its way.",
+      "claims": "A reset request reached the service and initiated mail whenever that account exists.",
+      "truth": "The catch at :19-20 swallows every failure and finally at :22 sets sent=true, including a lost connection or500 before the reset route runs. routes-portal.ts:972-987 already gives the same successful response for existing/nonexisting accounts, so avoiding account enumeration does not require turning transport/server failure into success.",
+      "replacement": "On a failed request show: “We could not request a reset link. Check your connection and try again.” Show the existing neutral success message only after a successful response.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Office → order board → Complete column when service orders have not loaded",
+      "file": "webapp/src/pages/admin/OrderBoard.tsx",
+      "line": 380,
+      "reads": "Everything delivered — documents and services",
+      "claims": "Every order in this column has no outstanding purchased service.",
+      "truth": "servicesQuery runs independently at :233-237. Until it succeeds, or after it fails without cached data, :263 substitutes an empty service list. everythingDone at :282-283 then accepts formed orders with delivered certificates, and :295 places them in Complete even when outstanding services have not been checked. The query has no visible failure state; only ordersQuery errors are shown.",
+      "replacement": "Require a successfully loaded service list before marking delivery complete. While it is unavailable show: “We could not check the remaining service orders. Try again.”",
+      "severity": "substantive"
+    },
+    {
+      "where": "Client portal → Legal mail → failed document-list request",
+      "file": "webapp/src/pages/portal/PortalDashboard.tsx",
+      "line": 742,
+      "reads": "Nothing here — that's good news. Anything we receive for you as registered agent will be posted here, and you'll get an email the moment it is.",
+      "claims": "No legal mail exists for the account.",
+      "truth": "docsQuery fetches at :471-475, but :645 treats unavailable data as [] and :660 filters that empty array. DocList at :740-742 therefore shows the reassuring empty state after a failed request, including while served documents may exist. No docsQuery.isError branch distinguishes unavailable mail from no mail.",
+      "replacement": "On a document-list failure show: “We could not load your documents or legal mail. Try again.” Show the no-mail sentence only after a successful empty response.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Client portal → Your documents → operating agreement status badges",
+      "file": "webapp/src/pages/portal/PortalDashboard.tsx",
+      "line": 111,
+      "reads": "{mine.isCurrent ? \"Current\" : \"Superseded\"}",
+      "claims": "The newest generated PDF is the operative agreement and every older agreement has been superseded.",
+      "truth": "The only test is generation order: :501-505 sets isCurrent to i===0. It does not record signing, adoption or effective date. OAQuestionnaire.tsx:797-798 says the generated PDF is still ready to print and sign, and :113 accepts the client’s chosen effective date. Merely creating a new unsigned or future-effective draft cannot establish that the earlier adopted agreement is superseded. The questionnaire’s generation list repeats the labels.",
+      "replacement": "Use “Most recently generated” and “Earlier generated copy” unless adoption and effectiveness are actually recorded. Explain: “Generation order does not determine which agreement is legally in effect.”",
+      "severity": "substantive"
+    },
+    {
+      "where": "Client portal → Operating agreement help → Deadlock Buy-Sell Provision",
+      "file": "webapp/src/content/oaLearnMore.tsx",
+      "line": 154,
+      "reads": "Without a plan, the only exit is asking a court to dissolve the company.",
+      "claims": "Without the optional buy-sell clause, no negotiated exit is possible.",
+      "truth": "The same help at :167-168 expressly identifies negotiation or a court proceeding. templates-oa-multi.md:280/282 permits consensual transfers and :316 permits withdrawal with all other members’ written consent; the buy-sell clause is not the sole route to a negotiated solution. This finding concerns the categorical only-exit sentence, not a prediction that parties will agree.",
+      "replacement": "Without an agreed exit mechanism, owners may need to negotiate a solution or ask a court for relief.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Client portal → Operating agreement questionnaire → instructions for changing managers",
+      "file": "webapp/src/pages/portal/OAQuestionnaire.tsx",
+      "line": 804,
+      "reads": "To add or remove members or managers, change ownership percentages, or change an option you chose here, update your answers and regenerate.",
+      "claims": "The questionnaire lets the client add or remove managers.",
+      "truth": "The complete questionnaire has owner add/remove controls, but no manager-list editor. At :396-399 it says managers come from the formation record and there is nothing to choose; :333 derives entityManagers from data.seed.managerNames and only collects their signers. routes-portal.ts OA assembly uses the seeded manager list. AmendAgreement.tsx:137 and PortalDashboard.tsx:238 repeat the unavailable-manager-edit instruction.",
+      "replacement": "To add or remove members, change ownership percentages, or change an option you chose here, update your answers and regenerate. Managers are taken from your formation record and cannot be added or removed in this questionnaire; changes the questionnaire cannot make require a separate amendment.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Client portal → Operating agreement questionnaire → full legal name of an entity owner",
+      "file": "webapp/src/pages/portal/OAQuestionnaire.tsx",
+      "line": 330,
+      "reads": "const incompleteOwner = owners.some((o) => !hasFirstAndLast(o.name) || !(o.address ?? \"\").trim());",
+      "claims": "Every owner’s legal name must consist of a human first and last name, including owners identified as companies or trusts.",
+      "truth": "OaOwnersSections.tsx:134-143 explicitly permits a company or trust and :126 asks its full legal name. OAQuestionnaire.tsx:330 nevertheless applies hasFirstAndLast to all owners, including isEntity:true; routes-portal.ts:1215-1217 repeats the restriction. An entity’s one-word legal name therefore blocks generation even with its separate human signer’s full name and title supplied at :335. The form conflates the entity’s legal name with the signer’s personal name.",
+      "replacement": "Require a nonblank full legal entity name for isEntity owners and apply first/last-name validation only to individual owners and human signers. Entity label: “Full legal name of the company or trust”.",
+      "severity": "substantive"
+    }
+  ],
+  "filesWithNoNewFindings": [
+    "webapp/src/content/oaLearnMoreParts.tsx",
+    "webapp/src/pages/portal/AccountCard.tsx",
+    "webapp/src/pages/portal/AmendAgreement.tsx",
+    "webapp/src/pages/portal/documentOrder.ts",
+    "webapp/src/pages/portal/drafts.ts",
+    "webapp/src/pages/portal/oaAssets.ts",
+    "webapp/src/pages/portal/OaOwnersSections.tsx",
+    "webapp/src/pages/portal/OaQuestionCard.tsx",
+    "webapp/src/pages/portal/oaTypes.ts",
+    "webapp/src/pages/portal/OrdersInProgress.tsx",
+    "webapp/src/pages/portal/OwnershipEditor.tsx",
+    "webapp/src/pages/portal/PortalLogin.tsx",
+    "webapp/src/pages/portal/PortalSetPassword.tsx",
+    "webapp/src/pages/portal/PortalVerifyEmail.tsx",
+    "webapp/src/pages/portal/services.helpers.ts",
+    "webapp/src/pages/portal/ServicesCard.tsx",
+    "webapp/src/pages/portal/typedDate.ts",
+    "webapp/src/pages/portal/ViewingAsBanner.tsx",
+    "webapp/src/pages/admin/AdminDashboard.tsx",
+    "webapp/src/pages/admin/AdminLogin.tsx",
+    "webapp/src/pages/admin/LibrarySection.tsx",
+    "webapp/src/pages/admin/OrderDetail.tsx",
+    "webapp/src/pages/admin/serviceOrders.helpers.ts"
+  ],
+  "methodNotes": [
+    "All31 listed inventory files were read from first through last line using file-reading tools, with truncated ranges reopened. The listed total is8,770 lines. Prior findings115–193 and raw reports bucket3/bucket4 were read in full. Coverage excludes cross-reference files assigned to other readers.",
+    "New findings are source-traced behavior conclusions; no servers were started and no application files were edited. Only this report was written.",
+    "Florida statutory text was opened on Online Sunshine’s2026 Chapter605 page, including605.0201/.0202/.2107/.2201/.2202/.2203/.2301-.2304. Relevant agreement sections were opened to verify cross-references. IRS Form2553 instructions were opened for the EIN and election-date claims.",
+    "No new finding reopens an owner-retained wording in docs/audit/rulings.md."
+  ]
+}

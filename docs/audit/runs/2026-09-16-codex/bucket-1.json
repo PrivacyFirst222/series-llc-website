@@ -1,0 +1,1163 @@
+{
+  "files": [
+    {
+      "path": "webapp/src/App.tsx",
+      "lines": 73
+    },
+    {
+      "path": "webapp/src/components/home/BenefitsGrid.tsx",
+      "lines": 96
+    },
+    {
+      "path": "webapp/src/components/home/HomeHero.tsx",
+      "lines": 136
+    },
+    {
+      "path": "webapp/src/components/home/MothershipDiagram.tsx",
+      "lines": 107
+    },
+    {
+      "path": "webapp/src/components/home/StatBar.tsx",
+      "lines": 22
+    },
+    {
+      "path": "webapp/src/components/home/StatuteTeaser.tsx",
+      "lines": 31
+    },
+    {
+      "path": "webapp/src/components/home/WeAreOne.tsx",
+      "lines": 103
+    },
+    {
+      "path": "webapp/src/components/home/WhyOnlyUs.tsx",
+      "lines": 137
+    },
+    {
+      "path": "webapp/src/components/layout/Footer.tsx",
+      "lines": 91
+    },
+    {
+      "path": "webapp/src/components/layout/Header.tsx",
+      "lines": 198
+    },
+    {
+      "path": "webapp/src/components/layout/Layout.tsx",
+      "lines": 52
+    },
+    {
+      "path": "webapp/src/components/layout/Logo.tsx",
+      "lines": 37
+    },
+    {
+      "path": "webapp/src/components/sections/CallToAction.tsx",
+      "lines": 83
+    },
+    {
+      "path": "webapp/src/components/sections/PageHero.tsx",
+      "lines": 32
+    },
+    {
+      "path": "webapp/src/content/privacy.md",
+      "lines": 78
+    },
+    {
+      "path": "webapp/src/content/terms.md",
+      "lines": 176
+    },
+    {
+      "path": "webapp/src/hooks/use-toast.ts",
+      "lines": 186
+    },
+    {
+      "path": "webapp/src/lib/api.ts",
+      "lines": 100
+    },
+    {
+      "path": "webapp/src/lib/datetime.ts",
+      "lines": 60
+    },
+    {
+      "path": "webapp/src/lib/ein.ts",
+      "lines": 17
+    },
+    {
+      "path": "webapp/src/lib/einActivity.ts",
+      "lines": 94
+    },
+    {
+      "path": "webapp/src/lib/form2553Timing.ts",
+      "lines": 113
+    },
+    {
+      "path": "webapp/src/lib/jointOwner.ts",
+      "lines": 58
+    },
+    {
+      "path": "webapp/src/lib/ownership.ts",
+      "lines": 93
+    },
+    {
+      "path": "webapp/src/lib/personName.ts",
+      "lines": 10
+    },
+    {
+      "path": "webapp/src/lib/phone.ts",
+      "lines": 12
+    },
+    {
+      "path": "webapp/src/lib/ssn.ts",
+      "lines": 40
+    },
+    {
+      "path": "webapp/src/lib/utils.ts",
+      "lines": 6
+    },
+    {
+      "path": "webapp/src/main.tsx",
+      "lines": 5
+    },
+    {
+      "path": "webapp/src/pages/AssetProtection.tsx",
+      "lines": 292
+    },
+    {
+      "path": "webapp/src/pages/Benefits.tsx",
+      "lines": 264
+    },
+    {
+      "path": "webapp/src/pages/Contact.tsx",
+      "lines": 150
+    },
+    {
+      "path": "webapp/src/pages/FAQ.tsx",
+      "lines": 170
+    },
+    {
+      "path": "webapp/src/pages/Home.tsx",
+      "lines": 21
+    },
+    {
+      "path": "webapp/src/pages/HowItWorks.tsx",
+      "lines": 136
+    },
+    {
+      "path": "webapp/src/pages/NotFound.tsx",
+      "lines": 32
+    },
+    {
+      "path": "webapp/src/pages/Pricing.tsx",
+      "lines": 159
+    },
+    {
+      "path": "webapp/src/pages/Privacy.tsx",
+      "lines": 86
+    },
+    {
+      "path": "webapp/src/pages/RecordkeepingApp.tsx",
+      "lines": 453
+    },
+    {
+      "path": "webapp/src/pages/Terms.tsx",
+      "lines": 63
+    },
+    {
+      "path": "webapp/src/pages/TheStatute.tsx",
+      "lines": 105
+    },
+    {
+      "path": "webapp/src/pages/WhatIs.tsx",
+      "lines": 167
+    },
+    {
+      "path": "webapp/src/vite-env.d.ts",
+      "lines": 1
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/AddressAutocomplete.tsx",
+      "lines": 159
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/AddressFields.tsx",
+      "lines": 149
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/buildPayload.ts",
+      "lines": 182
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/defaults.ts",
+      "lines": 134
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/FeeEstimate.tsx",
+      "lines": 104
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/FieldShell.tsx",
+      "lines": 106
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/FloridaLLCFormationForm.tsx",
+      "lines": 795
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/NameCheck.tsx",
+      "lines": 185
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/nameSimilarity.ts",
+      "lines": 58
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/raService.ts",
+      "lines": 69
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/RepeatableMemberFields.tsx",
+      "lines": 179
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/RepeatablePartyFields.tsx",
+      "lines": 209
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/ReviewStep.tsx",
+      "lines": 324
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/schema.ts",
+      "lines": 237
+    },
+    {
+      "path": "webapp/server/app.ts",
+      "lines": 25
+    },
+    {
+      "path": "webapp/server/auth.ts",
+      "lines": 123
+    },
+    {
+      "path": "webapp/server/backup.ts",
+      "lines": 144
+    },
+    {
+      "path": "webapp/server/chapter-605-notes.md",
+      "lines": 575
+    },
+    {
+      "path": "webapp/server/crypto.ts",
+      "lines": 70
+    },
+    {
+      "path": "webapp/server/datetime.ts",
+      "lines": 57
+    },
+    {
+      "path": "webapp/server/db.ts",
+      "lines": 549
+    },
+    {
+      "path": "webapp/server/dev.ts",
+      "lines": 5
+    },
+    {
+      "path": "webapp/server/dropbox.ts",
+      "lines": 160
+    },
+    {
+      "path": "webapp/server/email.ts",
+      "lines": 544
+    },
+    {
+      "path": "webapp/server/env.ts",
+      "lines": 55
+    },
+    {
+      "path": "webapp/server/md.d.ts",
+      "lines": 4
+    },
+    {
+      "path": "webapp/server/pricing.ts",
+      "lines": 114
+    },
+    {
+      "path": "webapp/server/provenance.ts",
+      "lines": 333
+    },
+    {
+      "path": "webapp/server/renewals.ts",
+      "lines": 310
+    },
+    {
+      "path": "webapp/server/routes-admin.ts",
+      "lines": 1605
+    },
+    {
+      "path": "webapp/server/routes-ops.ts",
+      "lines": 329
+    },
+    {
+      "path": "webapp/server/routes-payments.ts",
+      "lines": 713
+    },
+    {
+      "path": "webapp/server/routes-portal.ts",
+      "lines": 2608
+    },
+    {
+      "path": "webapp/server/shared.ts",
+      "lines": 48
+    },
+    {
+      "path": "webapp/server/square.ts",
+      "lines": 230
+    },
+    {
+      "path": "webapp/server/storage.ts",
+      "lines": 69
+    },
+    {
+      "path": "webapp/server/sunbiz.ts",
+      "lines": 341
+    },
+    {
+      "path": "webapp/server/validation.ts",
+      "lines": 374
+    },
+    {
+      "path": "webapp/server/vercel-entry.ts",
+      "lines": 56
+    },
+    {
+      "path": "webapp/vercel.json",
+      "lines": 38
+    },
+    {
+      "path": "docs/facts.md",
+      "lines": 171
+    }
+  ],
+  "priorFindings": [
+    {
+      "id": "1",
+      "status": "confirmed",
+      "evidence": "FAQ.tsx:84 says \"Drawn from real client questions about Florida’s Protected Series LLC statute.\" The owner expressly states there have been no clients.",
+      "replacementOk": true,
+      "replacementNote": "Accurately removes the invented client provenance; generic questions are already presented on the page."
+    },
+    {
+      "id": "2",
+      "status": "confirmed",
+      "evidence": "HowItWorks.tsx step 03 bundles the completed agreement with filed documents; routes-portal.ts:1190-1545 builds it only after the client submits questionnaire answers.",
+      "replacementOk": true,
+      "replacementNote": "Describe the filed documents first and the subsequent questionnaire generation separately."
+    },
+    {
+      "id": "3",
+      "status": "confirmed",
+      "evidence": "HowItWorks.tsx labels registered agent service an optional add-on, while Pricing.tsx:11 and facts.md include its first year in the package.",
+      "replacementOk": true,
+      "replacementNote": "Add-ons and choices distinguishes selection from an extra charge."
+    },
+    {
+      "id": "4",
+      "status": "confirmed",
+      "evidence": "terms.md:6 assigns sections 3-9 and 11-34 to Filing Services even though 9(c)-(g) and 11(e) govern Agent Services.",
+      "replacementOk": false,
+      "replacementNote": "Reassigning those clauses alone leaves the additional conflicts documented in linked item 29. Produce one complete section-allocation revision."
+    },
+    {
+      "id": "5",
+      "status": "confirmed",
+      "evidence": "The two last-updated dates remain August 13 and August 4; read-only git log verifies the latest respective file commits were September 15 and August 9, 2026.",
+      "replacementOk": false,
+      "replacementNote": "Use the actual effective/publication dates of the revised policies. A commit date establishes an edit, not by itself the legally effective date."
+    },
+    {
+      "id": "6",
+      "status": "disputed",
+      "evidence": "Benefits.tsx still contains \"One state filing covers 10 series\", but rulings.md expressly protects the Benefits Side by side row. The user prohibits flagging ruled wording.",
+      "replacementOk": false,
+      "replacementNote": "Retain the ruled wording; no replacement is authorized by this audit."
+    },
+    {
+      "id": "7",
+      "status": "confirmed",
+      "evidence": "Benefits.tsx places \"You only ever own 1 asset\" beneath \"Use multiple LLCs if…\"; the heading does not describe its own example.",
+      "replacementOk": true,
+      "replacementNote": "Use a regular LLC if… matches that case."
+    },
+    {
+      "id": "8",
+      "status": "confirmed",
+      "evidence": "Benefits.tsx says \"State fees only\" above a comparison that includes the $99 registered-agent fee.",
+      "replacementOk": true,
+      "replacementNote": "State fees and registered agent only accurately names the included categories."
+    },
+    {
+      "id": "9",
+      "status": "confirmed",
+      "evidence": "Benefits.tsx says \"3 of 10 covered by the fee\" without identifying which fee; facts.md assigns the first three designations to the service fee.",
+      "replacementOk": true,
+      "replacementNote": "Specify our service fee."
+    },
+    {
+      "id": "10",
+      "status": "confirmed",
+      "evidence": "AssetProtection.tsx uses \"vote his shares\" for an LLC interest and \"all of them\" for two directions; the proposed wording is more precise.",
+      "replacementOk": true,
+      "replacementNote": "Vote it and addresses both are appropriate wording corrections; this is not proof that using shares informally invalidates an LLC interest."
+    },
+    {
+      "id": "11",
+      "status": "confirmed",
+      "evidence": "FAQ.tsx contains the listed terminology/grammar inconsistencies and says one annual fee while separately listing annual report and agent costs.",
+      "replacementOk": false,
+      "replacementNote": "Correct the grammar and distinguish one annual report from agent fees. Secretary of State is not inherently a false umbrella agency reference; consistency with Division of Corporations is editorial."
+    },
+    {
+      "id": "12",
+      "status": "confirmed",
+      "evidence": "The hero/sections use informal Protected Series Act names. Online Sunshine 2026 section 605.2101 names these provisions Uniform Protected Series Provisions.",
+      "replacementOk": true,
+      "replacementNote": "Use the statutory title when purporting to give its formal name; informal shorthand is a wording issue."
+    },
+    {
+      "id": "13",
+      "status": "confirmed",
+      "evidence": "BenefitsGrid.tsx contains \"One master OA + lightweight Series Designations.\" The private Series Exhibit is different from the public designation.",
+      "replacementOk": false,
+      "replacementNote": "Proposed wording is accurate for the private exhibit but should distinguish it from the filed designation. Location correction: Home.tsx renders only the first four cards, so this later card is on Benefits, not the home grid."
+    },
+    {
+      "id": "14",
+      "status": "confirmed",
+      "evidence": "TheStatute.tsx contrasts title with associated-asset records but later describes the deed safe harbor. Section 605.2301(2)(b), opened in the 2026 chapter, supplies the real-property exception.",
+      "replacementOk": false,
+      "replacementNote": "The carve-out must retain the statutory conditions, including a recorded instrument in favor of a person giving value without knowledge of the signer’s lack of authority."
+    },
+    {
+      "id": "15",
+      "status": "disputed",
+      "evidence": "WhatIs.tsx reads \"one EIN-friendly tax structure\" and Benefits.tsx reads \"1 EIN structure\". An unconditional replacement \"one EIN\" contradicts FAQ.tsx’s stated series EIN exceptions and the series-EIN purchase route at routes-portal.ts:2093-2181.",
+      "replacementOk": false,
+      "replacementNote": "Do not turn imprecise shorthand into an absolute one-EIN promise. Explain that particular series may require separate EINs."
+    },
+    {
+      "id": "16",
+      "status": "disputed",
+      "evidence": "RecordkeepingApp.tsx grades provision of an operating agreement, while WhyOnlyUs.tsx says \"generic LLC agreement, if any\". A generic operating agreement is still an operating agreement; the quotations do not establish a contradiction.",
+      "replacementOk": false,
+      "replacementNote": "Changing the criterion to a protected-series-specific agreement and marking competitors no requires new competitor evidence; none is supplied by the finding."
+    },
+    {
+      "id": "17",
+      "status": "confirmed",
+      "evidence": "Contact.tsx uses the self-referential contact instruction, and Layout.tsx lacks a title mapping for the amendment route, whose fallback is Page Not Found.",
+      "replacementOk": true,
+      "replacementNote": "Add the actual amendment title. The contact rewrite is optional clarity; the missing title is the demonstrated defect."
+    },
+    {
+      "id": "18",
+      "status": "confirmed",
+      "evidence": "BenefitsGrid.tsx:26 puts the first-three promise directly after the $125 fee; facts.md and Pricing.tsx:90-91 place their state fees in the $499 service package.",
+      "replacementOk": true,
+      "replacementNote": "The replacement distinguishes the state fee and service package correctly."
+    },
+    {
+      "id": "19",
+      "status": "disputed",
+      "evidence": "BenefitsGrid.tsx:25 reads \"One filing, one franchise relationship\". Replacing it with \"One state fee, one annual report\" still wrongly collapses the Articles, agent-designation and series-designation state fees documented in facts.md.",
+      "replacementOk": false,
+      "replacementNote": "Use a heading such as \"One annual report for the company and its series\". The original finding’s universal no-franchise-tax explanation is not established by section 605.0212."
+    },
+    {
+      "id": "20",
+      "status": "confirmed",
+      "evidence": "HomeHero.tsx:87 says \"Florida registered agent service included\" without the first-year limit that Pricing.tsx and terms.md:46 state.",
+      "replacementOk": true,
+      "replacementNote": "First year included removes the ambiguity; the original does not expressly promise perpetual free service."
+    },
+    {
+      "id": "21",
+      "status": "disputed",
+      "evidence": "StatuteTeaser.tsx:17 actually reads \"Two sections do most of the day-to-day work: how a protected series holds property, and how a court reads a series when the chapter applies.\" That is not a statement that the linked page has two headings; TheStatute.tsx also cites multiple sections beyond 605.2301.",
+      "replacementOk": false,
+      "replacementNote": "The proposed claim that one section does most day-to-day work is unsupported and drops the distinct application-of-chapter point."
+    },
+    {
+      "id": "22",
+      "status": "disputed",
+      "evidence": "Benefits.tsx:61 does display 10 returns versus 1 return, but the proposed note \"A sole owner’s LLC files none either way\" is false for a sole-owner LLC electing S-corporation taxation, an option this product supports.",
+      "replacementOk": false,
+      "replacementNote": "Qualify the illustration by tax classification and income-tax-return type; a sole-owner disregarded entity differs from a sole-owner S corporation. Do not equate owner count with tax classification."
+    },
+    {
+      "id": "23",
+      "status": "confirmed",
+      "evidence": "Benefits.tsx:182 says agent pricing is held equal while the first-year arithmetic includes a waived/included first year on the protected-series side only.",
+      "replacementOk": false,
+      "replacementNote": "Explicitly distinguish equal renewal rates from the first-year inclusion. The conclusion that the entire comparison turns only on entity count remains too broad after the proposed edit."
+    },
+    {
+      "id": "24",
+      "status": "confirmed",
+      "evidence": "Contact.tsx:119 lacks the required marker and its precheck ignores message; routes-payments.ts:638 requires a nonblank trimmed message.",
+      "replacementOk": true,
+      "replacementNote": "Add the marker and include trimmed message in the precheck."
+    },
+    {
+      "id": "25",
+      "status": "confirmed",
+      "evidence": "Contact.tsx:132 says \"Document preparation service only.\" Footer.tsx and terms.md also describe the sold registered-agent service.",
+      "replacementOk": true,
+      "replacementNote": "The proposed combined service description matches those sources."
+    },
+    {
+      "id": "26",
+      "status": "disputed",
+      "evidence": "privacy.md:19 contains the quoted Square paragraph, but the replacement says \"we keep only the card brand, its last four digits, and its expiration\". renewals.ts stores Square customer/card identifiers as well and does not store expiration in that update.",
+      "replacementOk": false,
+      "replacementNote": "Disclose card-on-file consent and Square storage, and accurately list retained identifiers, brand and last four; do not invent retained expiration or say only."
+    },
+    {
+      "id": "27",
+      "status": "disputed",
+      "evidence": "privacy.md:15 does incorrectly deny website SSN collection. However, \"we delete it the moment the EIN is issued\" is not established by an office fulfillment update, and backup.ts:13-28,107-142 explicitly preserves service_orders ciphertext in permanent snapshots.",
+      "replacementOk": false,
+      "replacementNote": "Correct the portal-collection/application description, and resolve the actual retention policy and backup behavior before promising deletion at issuance. The finding’s assertion that the deletion claim is right is unsupported."
+    },
+    {
+      "id": "28",
+      "status": "disputed",
+      "evidence": "terms.md:54 contains the monthly-proration promise. renewals.ts implements annual renewals but no monthly collection. Absence of an automated charge does not prove that a contractual amount cannot be billed manually, and replacing it with an annual fee changes the bargain.",
+      "replacementOk": false,
+      "replacementNote": "Flag the missing documented monthly billing workflow for owner decision. Do not unilaterally substitute a new annual charge after timely cancellation."
+    },
+    {
+      "id": "29",
+      "status": "confirmed",
+      "evidence": "terms.md:6 allocates other provisions inconsistently with their text, including Agent Services liability and survival clauses. Already explicitly linked to item 4, so it is not an unmarked duplicate.",
+      "replacementOk": false,
+      "replacementNote": "Review all scopes together: the proposed exclusive Filing Services allocation still takes general sections such as eligibility/service descriptions away from Agent Services. Supply a complete, internally consistent allocation."
+    },
+    {
+      "id": "30",
+      "status": "disputed",
+      "evidence": "terms.md:101 actually begins \"If you provide a mobile number and opt in, we may send you service-related text messages.\" It is conditional; it does not establish a present opt-in or promise that texts are currently sent.",
+      "replacementOk": false,
+      "replacementNote": "Removing unused conditional boilerplate is optional housekeeping of the policy. Do not replace it with an unimplemented future STOP guarantee."
+    },
+    {
+      "id": "31",
+      "status": "disputed",
+      "evidence": "WhatIs.tsx:152 reads \"22 states authorize series LLCs.\" The prior reader explicitly says the count was not verified, which is not evidence that it is false. Its replacement, \"Florida’s series LLC is the Uniform Protected Series Provisions\", equates an entity with statutory provisions.",
+      "replacementOk": false,
+      "replacementNote": "Either research and source the count or remove the optional count without the category error. Count remains not verified in this review."
+    },
+    {
+      "id": "32",
+      "status": "disputed",
+      "evidence": "RecordkeepingApp.tsx:34 promises to \"Record transfers of assets ... with supporting notes.\" It does not recommend making transfers routinely. The cited Manual exception itself calls for a Transfer Log when a transfer occurs.",
+      "replacementOk": false,
+      "replacementNote": "An optional caution may be helpful, but no contradiction is proved by supporting records for an exceptional transaction."
+    },
+    {
+      "id": "33",
+      "status": "confirmed",
+      "evidence": "datetime.ts:53-54 maps the two standard single-owner forms to Single-Member in a tax-treatment label; owner count is not the tax treatment.",
+      "replacementOk": true,
+      "replacementNote": "Disregarded entity matches the standard non-S form; preserve the distinct S-corporation variants."
+    },
+    {
+      "id": "34",
+      "status": "confirmed",
+      "evidence": "form2553Timing.ts:109 says only U.S. residents may be shareholders. IRS Instructions for Form 2553, Who May Elect, prohibits nonresident alien shareholders and does not exclude U.S. citizens abroad.",
+      "replacementOk": true,
+      "replacementNote": "The replacement corrects direct shareholder eligibility. The IRS instructions separately recognize the ESBT beneficiary exception, which is not a direct alien-shareholder permission."
+    },
+    {
+      "id": "35",
+      "status": "disputed",
+      "evidence": "HowItWorks.tsx:24 reads \"It saves as you go, so you can stop and come back.\" FloridaLLCFormationForm.tsx:181-197 does autosave and loadDraft restores it. The sentence makes no cross-device promise.",
+      "replacementOk": true,
+      "replacementNote": "The suggested same-browser qualification is useful optional clarification; its absence does not establish the claimed behavioral defect. Same device alone also does not guarantee the same browser or preserved storage."
+    },
+    {
+      "id": "36",
+      "status": "confirmed",
+      "evidence": "WhyOnlyUs.tsx:24 presents the app as Free with formation without the coming-end-of-year qualification that RecordkeepingApp.tsx:129-130 and Pricing.tsx:12 contain.",
+      "replacementOk": true,
+      "replacementNote": "Add the already-ruled release qualification; do not alter the owner’s ruled release date."
+    },
+    {
+      "id": "37",
+      "status": "disputed",
+      "evidence": "WhyOnlyUs.tsx:37 reads \"Comparison based on our review of leading national formation services’ published offerings (August 2026).\" A dated review is not false because time passes; the finding identifies no change in the compared evidence.",
+      "replacementOk": false,
+      "replacementNote": "Retain the historical review date unless a new review supports updating it. Deleting provenance makes the comparison harder to assess."
+    },
+    {
+      "id": "38",
+      "status": "disputed",
+      "evidence": "MothershipDiagram.tsx:98 says \"... a single tax filing and operating agreement from your perspective.\" The proposed \"one EIN\" is not universal: the site and portal explicitly contemplate separate series EINs.",
+      "replacementOk": false,
+      "replacementNote": "Qualify tax treatment rather than substituting a new unconditional EIN claim. Owner-level income reporting does not establish that the diagram promises a separate entity return."
+    },
+    {
+      "id": "39",
+      "status": "confirmed",
+      "evidence": "FAQ.tsx:56 offers the $95 package without its new-formation restriction; routes-portal.ts:469-510 also requires payment within the 65-day ordering window.",
+      "replacementOk": false,
+      "replacementNote": "Add both restrictions: new LLCs we form, ordered within 65 days of formation payment. The proposed replacement omits the second."
+    },
+    {
+      "id": "40",
+      "status": "disputed",
+      "evidence": "Header.tsx:18 reads \"Ch. 605 highlights\". TheStatute.tsx cites 605.2103, 605.2104, 605.0109, 605.2202, 605.2404, 605.2402 and 605.04074 as well as 605.2301; the premise that it covers only one section is false.",
+      "replacementOk": false,
+      "replacementNote": "Keep the broader accurate navigation label or use a neutral descriptive subtitle."
+    },
+    {
+      "id": "41",
+      "status": "confirmed",
+      "evidence": "WhyOnlyUs.tsx:29 combines registered agent and legal-mail portal under First year included, obscuring which inclusion expires; terms.md:83 ties portal access to the account.",
+      "replacementOk": true,
+      "replacementNote": "The proposed row clarifies the first-year qualification without promising perpetual portal access."
+    },
+    {
+      "id": "42",
+      "status": "confirmed",
+      "evidence": "FAQ.tsx:143 and WhatIs.tsx:138 explicitly pin StatuteYear=2025. Opening the actual link returned The 2025 Florida Statutes, whereas the current chapter returned 2026.",
+      "replacementOk": true,
+      "replacementNote": "Use the current-year link. This changes what a reader opens, so it is not housekeeping-only despite its grouping."
+    },
+    {
+      "id": "43",
+      "status": "housekeeping-only",
+      "evidence": "app.ts:24–25 contains the quoted comment and re-exports both helpers. Removing an unused re-export changes no product text. The cited excluded e2e.ts was not read, so its import claim is not independently certified.",
+      "replacementOk": false,
+      "replacementNote": "The proposed comment depends on an excluded test file. Do not add an otherwise unnecessary import merely to justify an export; first verify excluded consumers before removing an API export."
+    },
+    {
+      "id": "44",
+      "status": "disputed",
+      "evidence": "sunbiz.ts:160 attributes both holds to 605.0715(5)–(6), but the 120-day voluntary-dissolution hold does exist in 2026 s.605.0717(2), opened on Online Sunshine. It ends earlier if a statement of termination is filed. The prior reader searched the wrong sections.",
+      "replacementOk": false,
+      "replacementNote": "Retain the 120-day rule, cite 605.0717(2), and include its earlier-termination exception; cite 605.0715(5) for administrative dissolution."
+    },
+    {
+      "id": "194",
+      "status": "confirmed",
+      "evidence": "renewals.ts:148 uses NOTICE_DAYS=45; terms.md:48 requires notice 30–60 days before the cancellation deadline, which :54 places 30 days before renewal. Current notice is only15 days before that deadline.",
+      "replacementOk": true,
+      "replacementNote": "Change the job and email descriptions to60 days before renewal. This verifies the code mismatch without reopening the ruled Terms or disputing that automatic renewal exists."
+    },
+    {
+      "id": "195",
+      "status": "confirmed",
+      "evidence": "renewals.ts:238–260 increments retries only on retryDue. First decline leaves0; the next attempt repeats ren-<id>-1 and Square sees the same idempotency key.",
+      "replacementOk": true,
+      "replacementNote": "Count and persist every attempted charge, including the first decline, and allow exactly two total attempts."
+    },
+    {
+      "id": "196",
+      "status": "confirmed",
+      "evidence": "email.ts:150 says We charged when last4 exists. fulfillPaidRenewal at renewals.ts:301,305,308 passes the card digits from a customer-initiated payment-link checkout into that same receipt.",
+      "replacementOk": true,
+      "replacementNote": "The proposed neutral received-payment wording is accurate for either payment path."
+    },
+    {
+      "id": "197",
+      "status": "disputed",
+      "evidence": "email.ts:468–472 says the open EIN/S-election orders are our next step. routes-admin.ts:879 selects both awaiting_info and in_progress; for in_progress the client has already supplied the details. The proposed universal statement that details are waiting from the client is false for that state.",
+      "replacementOk": false,
+      "replacementNote": "Pass each service status to the email. Ask for details only for awaiting_info and describe processing for in_progress."
+    },
+    {
+      "id": "198",
+      "status": "confirmed",
+      "evidence": "email.ts:84 calls the conversion deliverables formation documents even though :72–78 separately distinguishes conversion. The existing company receives an amendment/designations rather than newly filed Articles.",
+      "replacementOk": true,
+      "replacementNote": "Use the conversion-specific document wording in the welcome and corresponding portal heading."
+    },
+    {
+      "id": "199",
+      "status": "confirmed",
+      "evidence": "The quoted retry promise remains at email.ts:166; renewals.ts:257–263 can promise another retry while :235 prevents it because the counter was not advanced on the first attempt. This item is already explicitly linked to195.",
+      "replacementOk": true,
+      "replacementNote": "The proposed counting correction must update the first decline, retry guard, next-retry computation and email together."
+    },
+    {
+      "id": "200",
+      "status": "confirmed",
+      "evidence": "email.ts:222 directs password change after an unauthorized email-change request, but routes-portal.ts:2420–2455 does not consume verify_email tokens or clear pending_email. The attacker can still confirm the pending change.",
+      "replacementOk": true,
+      "replacementNote": "Invalidate pending email changes when changing the password before promising cancellation in the email. Correction to old evidence: requesting the unchanged old address does NOT cancel the earlier link; :2478 rejects it before token invalidation."
+    },
+    {
+      "id": "201",
+      "status": "duplicate",
+      "evidence": "Same missing automated monthly-proration mechanism and same Terms9(g) promise as item28; this separate email occurrence was not marked same defect as in findings-open.",
+      "replacementOk": false,
+      "replacementNote": "Neither absence of automation nor this email proves no manual billing can occur. Preserve the contractual monthly rate; the alternative wording can clarify manual administration, while replacing it with an annual fee would change the bargain."
+    },
+    {
+      "id": "202",
+      "status": "disputed",
+      "evidence": "email.ts:494 reads IRS Form2553 must be filed within2 months and15 days of the date on your filed Articles. IRS Instructions for Form2553, When To Make the Election and ItemE, tie the deadline to the tax year/election effective date; the first tax year uses the earliest ownership, assets or business date. Automatically substituting LLC effective date remains an oversimplification.",
+      "replacementOk": false,
+      "replacementNote": "Use the election effective date determined under IRS ItemE, explain the first-year rule and any applicable weekend/holiday adjustment. Source opened: https://www.irs.gov/instructions/i2553 ."
+    },
+    {
+      "id": "203",
+      "status": "confirmed",
+      "evidence": "email.ts:404–405 describes instructions for signing and mailing, while s-election.ts:238 expressly recommends fax and provides its instructions.",
+      "replacementOk": true,
+      "replacementNote": "Signing and faxing or mailing accurately describes the package."
+    },
+    {
+      "id": "204",
+      "status": "disputed",
+      "evidence": "email.ts:253 reads In Florida a lawsuit typically allows20 days to respond BUT THIS IS NOT ALWAYS THE CASE. Contact an attorney immediately so they can provide you with proper legal guidance. This is qualified general procedural information, not advice about a particular document or representation as a lawyer; the finding supplies no contrary procedural authority. Rule 1.140(a)(1), in the Florida Bar’s April 1, 2026 rules PDF, confirms the ordinary 20-day answer deadline and statutory exceptions: https://www-media.floridabar.org/uploads/2026/04/Civil-Procedure-Rules-04-01-26.pdf#page=38 .",
+      "replacementOk": true,
+      "replacementNote": "The proposed general deadline warning is acceptable optional wording, but no proved contradiction with the no-legal-advice policy makes the existing sentence a defect. No conclusion that every Florida response deadline is20 days is made."
+    },
+    {
+      "id": "205",
+      "status": "confirmed",
+      "evidence": "email.ts:89 names Forgot password; PortalLogin.tsx:71 names the link Forgot your password?. The7-day expiration agrees with routes-payments.ts:112 and614.",
+      "replacementOk": true,
+      "replacementNote": "Use the exact visible link label."
+    },
+    {
+      "id": "206",
+      "status": "disputed",
+      "evidence": "email.ts:335 reads No further action is needed from you. We'll post the confirmation to your portal when the work is complete. A filed designation or certificate can confirm completion; the finding treats this ordinary meaning as excluding the deliverable without evidence.",
+      "replacementOk": true,
+      "replacementNote": "Document is clearer optional wording, but confirmation does not assert a separate acknowledgement document."
+    },
+    {
+      "id": "207",
+      "status": "confirmed",
+      "evidence": "email.ts:374 says View them once; routes-admin.ts:1124–1132 decrypts the TIN on every authorized request. There is no once-only viewing restriction.",
+      "replacementOk": false,
+      "replacementNote": "Remove once. Qualify deletion as removal from the active service-order record unless backup retention is also corrected; the existing blanket deletion clause is not true for archived snapshots."
+    },
+    {
+      "id": "208",
+      "status": "confirmed",
+      "evidence": "routes-admin.ts:860–863 overwrites formed_at and ra_renewal_date on every formed-package upload, including the documented replacement path, moving the client's renewal anniversary.",
+      "replacementOk": true,
+      "replacementNote": "COALESCE preserves the initial timestamps on replacement. The initial anniversary policy is a separate issue212."
+    },
+    {
+      "id": "209",
+      "status": "confirmed",
+      "evidence": "routes-admin.ts:879 selects pending EIN/S-election work by client_id alone. The formed email for companyB can announce work ordered for companyA.",
+      "replacementOk": false,
+      "replacementNote": "Require the matching formation_order_id. Resolve legacy NULL associations to a specific order before inclusion; OR formation_order_id IS NULL otherwise repeats the ambiguity for every company."
+    },
+    {
+      "id": "210",
+      "status": "confirmed",
+      "evidence": "routes-admin.ts:250 uses a hyphen before the certificate date and an em dash before the LLC; other document titles consistently use an em dash. This is a reader-visible title-style inconsistency only.",
+      "replacementOk": true,
+      "replacementNote": "The proposed parenthesized date resolves the mixed separators."
+    },
+    {
+      "id": "211",
+      "status": "duplicate",
+      "evidence": "Same unconditional company-Form2553 hint as item178, now repeated in routes-admin.ts:1308; findings-open did not mark this as same defect as178.",
+      "replacementOk": false,
+      "replacementNote": "The proposed target check fixes series EINs, but a company EIN also need not have a purchased S-election package. Mention Form2553 only when a matching company package exists."
+    },
+    {
+      "id": "212",
+      "status": "confirmed",
+      "evidence": "routes-admin.ts:862 uses the package-upload day plus one year, while terms.md:46 calls it the anniversary date without identifying the event. The UI and code agree with each other, but the contract leaves the event ambiguous.",
+      "replacementOk": false,
+      "replacementNote": "The proposed fix is conditional, not a settled replacement, and the original effective date of an old converting LLC is unsuitable. Define anniversary as the start of this purchased agent term, or explicitly as the initial completed-package date, then calculate consistently."
+    },
+    {
+      "id": "213",
+      "status": "housekeeping-only",
+      "evidence": "chapter-605-notes.md:140 wrongly assigns605.2604 merger-party permission to a protected series;2026 sections605.2602–2607 distinguish the company's merger from continuation/relocation of its series. This is an internal reference note, not delivered product text.",
+      "replacementOk": true,
+      "replacementNote": "The replacement correctly distinguishes the company merger and the permitted series outcomes; facts.md already retires the old wording."
+    },
+    {
+      "id": "214",
+      "status": "housekeeping-only",
+      "evidence": "chapter-605-notes.md:264 describes the old125/0 fee split, while validation.ts:178–179 and pricing.ts:72–81 now split100/25. It changes only the internal historical note.",
+      "replacementOk": true,
+      "replacementNote": "Mark the conflict resolved rather than rewriting the historical instruction."
+    },
+    {
+      "id": "215",
+      "status": "housekeeping-only",
+      "evidence": "chapter-605-notes.md:270 says the conversion agent-change fee stopped being collected; pricing.ts:44–53 and validation.ts:179 collect25 when applicable. Internal note only.",
+      "replacementOk": true,
+      "replacementNote": "The proposed resolved note matches the implemented fee."
+    },
+    {
+      "id": "216",
+      "status": "housekeeping-only",
+      "evidence": "chapter-605-notes.md:275 labels the annual-report total unverified. Opened2026 s.607.193(1)–(2):88.75 supplemental fee and400 late charge, added to605.0213(5)50, establish138.75/538.75.",
+      "replacementOk": true,
+      "replacementNote": "Use the statutory arithmetic; retain607.193(2)(b)'s reinstatement exception if describing every late-payment case. https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0607/Sections/0607.193.html"
+    },
+    {
+      "id": "217",
+      "status": "housekeeping-only",
+      "evidence": "chapter-605-notes.md:173 omits605.0105(3)(p)4 from the internal indemnification summary. The missing category is breach of605.04091 duties as permissibly shaped by the agreement.",
+      "replacementOk": true,
+      "replacementNote": "Add that category; keep the exception for permissible duty modification."
+    },
+    {
+      "id": "218",
+      "status": "housekeeping-only",
+      "evidence": "chapter-605-notes.md:508 omits exceptions from the internal summary of605.1006(1)(d). The statute distinguishes court-ordered sales and qualifying cash-sale distribution plans.",
+      "replacementOk": false,
+      "replacementNote": "Say cash pursuant to a plan distributing all or substantially all NET proceeds to interest holders within one year; not merely any proceeds distributed within a year."
+    },
+    {
+      "id": "219",
+      "status": "confirmed",
+      "evidence": "email.ts:86 says the Manual is already in the portal. routes-admin.ts:40–70 publishes it only on refresh; app.ts/vercel-entry.ts do not establish publication before welcome. A fresh database can send this promise before its first refresh.",
+      "replacementOk": false,
+      "replacementNote": "Ensure an awaited successful publication before the first welcome or state availability only after checking the library. An unawaited app-start call or unconditional will-be promise does not establish availability."
+    },
+    {
+      "id": "220",
+      "status": "housekeeping-only",
+      "evidence": "saveRenewalCard reads ra_renewal_date at renewals.ts:108–109 during initial payment, before the formation upload sets it; the optional date parameter changes no currently emitted initial-payment email. fulfillPaidRenewal uses saveCardFromPayment directly, not this gift-card email.",
+      "replacementOk": true,
+      "replacementNote": "Dropping the dead parameter preserves current behavior; sending this email at formation instead is a separate behavior change."
+    },
+    {
+      "id": "221",
+      "status": "housekeeping-only",
+      "evidence": "renewals.ts:164 appends renewed=<id>; the portal does not consume it. The query parameter itself promises no acknowledgment to a reader, who still receives a receipt email.",
+      "replacementOk": true,
+      "replacementNote": "Dropping the unused parameter is valid housekeeping. Adding a verified receipt banner is an optional enhancement, not evidence that the current payment was unacknowledged."
+    },
+    {
+      "id": "222",
+      "status": "housekeeping-only",
+      "evidence": "routes-admin.ts:359 selects *, rejected_at, ra_renewal_date; * already includes the two named columns and no reader-visible value changes.",
+      "replacementOk": true,
+      "replacementNote": "SELECT * is equivalent here."
+    },
+    {
+      "id": "223",
+      "status": "confirmed",
+      "evidence": "backup.ts:17 omits email_log and ra_renewals, which db.ts:405–417 and442–461 define as persistent history. A restored snapshot cannot recover those records. This changes office evidence and renewal behavior, so it is not housekeeping-only.",
+      "replacementOk": true,
+      "replacementNote": "Include both tables in backup and the restore workflow, preserving foreign-key order and migration setup. The excluded restore script itself was not read; this is a required corresponding change, not certification of that script."
+    },
+    {
+      "id": "224",
+      "status": "housekeeping-only",
+      "evidence": "dropbox.ts:112 says every not-yet-mirrored document; :139 caps each sweep at200. Only the internal comment is corrected by the bounded-batch wording.",
+      "replacementOk": true,
+      "replacementNote": "Describe up to200 per sweep. An unbounded loop is not required to correct the comment."
+    },
+    {
+      "id": "225",
+      "status": "confirmed",
+      "evidence": "dropbox.ts:132 places unscoped legal mail under the newest paid LLC, although routes-admin.ts:1565 intentionally leaves that mail without a company association. The wrong company folder is visible to the office.",
+      "replacementOk": true,
+      "replacementNote": "Use a clearly shared client-level legal-mail folder or collect the actual target company; do not infer newest equals recipient."
+    },
+    {
+      "id": "226",
+      "status": "disputed",
+      "evidence": "crypto.ts:49–51 reads rotating SESSION_SECRET orphans stored ciphertexts, which is acceptable because these secrets are deleted at fulfillment by design. The finding rightly notices14-day S-election retention, but its replacement permits rotation whenever no S window is open even if an active EIN order still needs decryption.",
+      "replacementOk": false,
+      "replacementNote": "Document both lifetimes and require migration/re-encryption of ALL live encrypted secrets before key retirement; pending EIN secrets and retained S-election secrets both matter."
+    },
+    {
+      "id": "227",
+      "status": "housekeeping-only",
+      "evidence": "env.ts:35 describes CRON_SECRET as the daily purge secret; routes-ops.ts:257–328 uses it for six jobs. The original description is incomplete rather than exclusive, and no reader-facing text changes.",
+      "replacementOk": true,
+      "replacementNote": "The proposed list is a useful internal documentation expansion."
+    },
+    {
+      "id": "228",
+      "status": "duplicate",
+      "evidence": "Same tax-label inconsistency as item127, repeated in server/datetime.ts:44; the finding itself says Nothing new but was not marked same defect as in findings-open.",
+      "replacementOk": false,
+      "replacementNote": "Use one shared label mapping imported by both client and server; editing only server/datetime.ts does not update the separate src/lib/datetime.ts mapping."
+    }
+  ],
+  "findings": [
+    {
+      "where": "Privacy Policy, Social Security number retention; nightly database backups",
+      "file": "webapp/src/content/privacy.md",
+      "line": 15,
+      "reads": "At the end of that period we permanently delete every Social Security number you gave us and replace your copy of the completed form with a record copy showing only the last four digits.",
+      "claims": "Every retained copy of an S-election Social Security number is permanently deleted after14 days.",
+      "truth": "backup.ts:13–14 expressly includes taxpayer-number ciphertext; :124–142 snapshots every column of service_orders into immutable archives and :107–110 retains backups indefinitely. crypto.ts:52–53 derives the decrypting key from unchanged SESSION_SECRET. routes-portal.ts:623 clears only live rows. A backup made during the edit window remains decryptable afterwards. This is a separate retention defect from prior27's collection-channel wording; production execution is not asserted.",
+      "replacement": "At the end of that period we remove the Social Security numbers from the active service-order record and replace the portal form with a record copy showing only the last four digits. Encrypted copies remain in archived database backups. [To preserve the existing permanent-deletion promise instead, exclude live secrets from backups or expire their independent encryption keys, and remove already retained copies.]",
+      "severity": "substantive"
+    },
+    {
+      "where": "S-election package, what happens to the offsite copy after the edit window",
+      "file": "webapp/server/dropbox.ts",
+      "line": 9,
+      "reads": "* Vercel Blob. Copies are only ever added or overwritten — a deletion on the\n * live site never propagates; that is what makes it a backup.",
+      "claims": "Offsite files intentionally survive deletion on the live site, while privacy.md:15 and email.ts:407–410 promise permanent SSN deletion from the systems.",
+      "truth": "dropbox.ts:128–152 mirrors every pending document, without excluding full-SSN S-election packages. purgeExpiredSElections at routes-portal.ts:589–598 replaces only the live document/blob; it neither removes the old Dropbox object nor clears mirrored_at. The mirror filename includes the old title, so copying a differently titled Record Copy alone would not remove the original.",
+      "replacement": "Exclude full-SSN S-election filing copies from the offsite mirror. Remove any previously mirrored filing copies when the edit window closes, using a stored mirror path, and mirror only the redacted record copy.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Office, fulfilling an S-election package manually; client record-copy retention",
+      "file": "webapp/server/routes-admin.ts",
+      "line": 1372,
+      "reads": "await db.query(\n    \"UPDATE service_orders SET status = 'fulfilled', fulfilled_at = now(), ein_secret = NULL WHERE id = $1\",\n    [so.id],\n  );",
+      "claims": "Marking an uploaded S-election package fulfilled leaves a package that the standard14-day purge can identify and redact.",
+      "truth": "The manual fulfill route accepts awaiting_info orders (:1295–1297), inserts a PDF (:1360–1367), but does not store its documentId or the formation/shareholder details in service_orders.details. purgeExpiredSElections at routes-portal.ts:568 requires shareholder details and dateIncorporated before touching a PDF and otherwise merely clears ein_secret at:623. An office-uploaded full-SSN PDF can remain in the portal indefinitely.",
+      "replacement": "For S-election fulfillment, require the structured details needed for redaction and persist the uploaded document ID on the service order before setting fulfilled. If those details are unavailable, remove the linked filing PDF when the edit window closes instead of leaving it accessible.",
+      "severity": "substantive"
+    },
+    {
+      "where": "S-election package, company address on Form2553 and its record copy",
+      "file": "webapp/server/routes-portal.ts",
+      "line": 828,
+      "reads": "const seed = await oaSeed(so.client_id);",
+      "claims": "The address used for this company's tax package belongs to this company.",
+      "truth": "oaSeed without an order argument selects the newest paid company at routes-portal.ts:78–90. postSElectionPackage uses that unscoped seed at:828,837 although :879 retrieves the actual formation_order_id. The same mistake occurs during redaction at:569–574 and office draft at routes-admin.ts:1238–1241. An older company's form can carry the newer company's address.",
+      "replacement": "Resolve the service order's formation_order_id before building the package and call oaSeed(clientId, formationOrderId) for the original, office draft, corrections and redacted copy. Refuse an unresolved association rather than selecting another company.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Operating agreement questionnaire and generated Series Exhibit, list of this company's series",
+      "file": "webapp/server/routes-portal.ts",
+      "line": 150,
+      "reads": "\"SELECT details FROM service_orders WHERE client_id = $1 AND type = 'series' AND status IN ('in_progress','fulfilled')\",",
+      "claims": "Purchased extra series appended to the agreement belong to the selected company.",
+      "truth": "oaSeed first selects a company at:72–85 but its added-series query at:149–151 filters only client_id. It appends all paid in-progress/fulfilled series for the account to the selected intake series at:153–158. These seed series are used for generated agreements at:1460. A two-company account receives another company's protected series in its agreement.",
+      "replacement": "SELECT details FROM service_orders WHERE client_id = $1 AND formation_order_id = $2 AND type = 'series' AND status IN ('in_progress','fulfilled') [Bind the selected orders[0].id as $2; explicitly resolve any legacy unscoped orders.]",
+      "severity": "substantive"
+    },
+    {
+      "where": "Client portal, buying an EIN for a second company",
+      "file": "webapp/server/routes-portal.ts",
+      "line": 2118,
+      "reads": "Your LLC's EIN is already ordered — see your orders below.",
+      "claims": "The selected LLC already has an EIN order.",
+      "truth": "The purchase resolves purchaseCompanyId at:2090, but :2102–2112 searches every non-pending EIN order on the client account and treats any company-target EIN as a duplicate. CompanyA's EIN therefore blocks the first EIN purchase for companyB.",
+      "replacement": "Scope the duplicate query to formation_order_id = purchaseCompanyId as well as client_id, then compare the target within that company. Keep the existing error only when that company already has the order.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Office, EIN application instructions, Tax classification row",
+      "file": "webapp/server/routes-admin.ts",
+      "line": 1136,
+      "reads": "\"SELECT id FROM service_orders WHERE client_id = (SELECT client_id FROM service_orders WHERE id = $1) AND type = 's-election' AND status NOT IN ('pending_payment', 'cancelled') LIMIT 1\",",
+      "claims": "A paid S-election order on this client account proves the entity in the current EIN application should be described as an S corporation.",
+      "truth": "ServiceOrdersSection.tsx:326 uses sElectionPaid directly for the IRS Tax classification instruction. This query does not match formation_order_id or the EIN details.target. CompanyA's S package can label companyB's EIN as S corporation; a series-target EIN also inherits the account-wide flag.",
+      "replacement": "Derive tax classification from the EIN target entity and its actual intended tax treatment. For a company target, match any supporting S-election order by formation_order_id; do not infer the classification of a series from a package purchased for the parent or another company.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Operating agreement questionnaire, equal ownership fractions",
+      "file": "webapp/src/lib/ownership.ts",
+      "line": 50,
+      "reads": "num = num * d + n * den;\n    den = den * d;\n  }\n  return num === den;",
+      "claims": "Fraction ownership totals are tested exactly.",
+      "truth": "This multiplies denominators without reduction in JavaScript Number. A pure in-memory import of the existing helper returned false for equalShares('fraction',17) and for19, although17×1/17 and19×1/19 each equal1. The20-owner questionnaire limit permits both cases. Valid equal ownership therefore blocks validation.",
+      "replacement": "Accumulate numerator and denominator with BigInt, reducing by greatest common divisor on every addition, and compare the exact reduced numerator and denominator. Preserve the existing positive-integer validation.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Terms of Service, section16, license to use purchased documents",
+      "file": "webapp/src/content/terms.md",
+      "line": 92,
+      "reads": "You receive a limited, personal, non-transferable license to use deliverables for the internal purposes of the LLC formed through the Services, and no other rights.",
+      "claims": "The licensed LLC must have been formed through this service.",
+      "truth": "Pricing.tsx:32–40 sells deliverables for an existing Florida LLC, and buildPayload.ts:21–29 supports CONVERT. Such a buyer's company was not formed through the Services, so the written license omits a product the site sells.",
+      "replacement": "You receive a limited, personal, non-transferable license to use deliverables for the internal purposes of the LLC for which you purchased the Services, and no other rights.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Home and Benefits pages, Horizontal shield card; Asset Protection page, series example",
+      "file": "webapp/src/components/home/BenefitsGrid.tsx",
+      "line": 16,
+      "reads": "A creditor of Series A cannot reach Series B's assets, or the parent LLC's. Each series' debts stay with that series under §605.2401.",
+      "claims": "The horizontal shield is absolute.",
+      "truth": "Opened2026 Online Sunshine605.2401(2) expressly subjects the shield to605.2404;605.2404 permits enforcement against nonassociated assets, and605.2402 preserves piercing principles. AssetProtection.tsx:68 repeats the absolute cannot touch assertion. The site's TheStatute.tsx:67–71 itself describes those limits. Source: https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605.html .",
+      "replacement": "A debt of Series A is generally its own under §605.2401. Assets properly associated with Series B or the parent LLC are generally protected, subject to the nonassociated-asset rules in §605.2404 and other applicable liability rules.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Asset Protection page, Chuck and Belinda's apartment example",
+      "file": "webapp/src/pages/AssetProtection.tsx",
+      "line": 57,
+      "reads": "Because the property is titled in the LLC's name and Ralph was clearly dealing with a legal entity, he can only sue Heavenly Havens, LLC — not Chuck and Belinda personally.",
+      "claims": "Entity title and notice categorically prevent claims against the owners.",
+      "truth": "Opened2026 s.605.0304(1) protects against liability solely by reason of being or acting as a member or manager. It does not turn title to property into immunity from independently actionable conduct. The stated example does not establish who negligently maintained the walkway or any other basis for an individual claim. This concerns the inside-liability example, not the owner's ruled charging-order sentence. Source: https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/Sections/0605.0304.html .",
+      "replacement": "Ralph can sue Heavenly Havens, LLC. Chuck and Belinda are not personally liable merely because they own or manage it, but the LLC does not protect them from liability for their own wrongful conduct or other independent obligations.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Registered agent renewal, notice and payment-link delivery",
+      "file": "webapp/server/renewals.ts",
+      "line": 202,
+      "reads": "`INSERT INTO ra_renewals (order_id, renewal_date, amount_cents, status, charge_due, notice_sent_at)\n         VALUES ($1, $2, $3, $4, $5, now())\n         RETURNING id, order_id, renewal_date, amount_cents, status, charge_due, square_order_id, link_url, retry_after, retries`,\n        [o.id, renewalDate, RA_RENEWAL_FEE_CENTS, hasCard ? \"notice_sent\" : \"link_sent\", addDays(renewalDate, -CHARGE_DAYS)],",
+      "claims": "notice_sent/link_sent and notice_sent_at represent a notice or payment link actually sent.",
+      "truth": "The row is committed at:201–206 BEFORE paymentLinkFor at:208 and sendMail at:220. A failed checkout creates a link_sent row without a link; later jobs skip the !row branch. A failed notice email is caught without retry, while the notice_sent row can proceed to automatic charging at:235–250. This is independent of prior194's45-day schedule.",
+      "replacement": "Persist a pending-notice state first. Create/reuse the checkout and await successful mail submission before marking notice_sent or link_sent and notice_sent_at. Retry pending failures idempotently and do not charge until the contractual notice timing has been satisfied.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Formation order, recovery after a payment-fulfillment failure",
+      "file": "webapp/server/routes-payments.ts",
+      "line": 55,
+      "reads": "`UPDATE orders SET status = 'paid', paid_at = now(), square_payment_id = $1\n      WHERE id = $2 AND status = 'pending_payment'\n      RETURNING id, contact_name, contact_email, llc_name, total_cents, payload`,\n    [squarePaymentId, orderId],\n  );\n  if (claimed.length === 0) return;",
+      "claims": "A paid status means the client account and purchased services have already been fulfilled, so retry can return.",
+      "truth": "The paid transition at:55–60 precedes client creation/linking at:69–83 and purchased-service insertion at:93–104. A database failure after the claim leaves status paid with missing account or service; a retried webhook returns at:60 and can mark the event processed at:501–502. This is a statically verified failure path, not a claim of an observed production outage.",
+      "replacement": "Make fulfillment a resumable idempotent operation: distinguish payment recorded from fulfillment completed, insert/link the client and each purchased service idempotently, and mark completion only after all required records exist. Retry incomplete paid orders without charging again.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Office, replacing a formed package; client's Statement of Authorized Representative",
+      "file": "webapp/server/routes-admin.ts",
+      "line": 774,
+      "reads": "// If the new package fails partway, undo whatever of it landed — rows\n  // first, then blobs best-effort — so the client's portal shows exactly the\n  // intact prior package, not a hybrid.",
+      "claims": "A partial failure preserves the intact prior package.",
+      "truth": "During staging :801 calls issueStatement, whose :507–509 immediately deletes the prior statement and blob. A later certificate or designation upload failure reaches :836–843 and deletes the new statement too. The portal then has neither statement, contrary to the rollback comment.",
+      "replacement": "Stage the replacement statement without retiring its predecessor. Retire all prior package documents only after the complete new package succeeds; on failure delete only staged new rows and blobs.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Client portal, correcting and regenerating an S-election package",
+      "file": "webapp/server/routes-portal.ts",
+      "line": 867,
+      "reads": "await db.query(\"DELETE FROM documents WHERE id = $1 AND client_id = $2\", [args.priorDocumentId, so.client_id]);\n    if (old[0]?.storage_key) await deleteFile(old[0].storage_key).catch(() => {});\n  }\n  const title = `S Corporation Election Package (Form 2553) — ${so.llc_name}`;\n  const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength) as ArrayBuffer;\n  const stored = await putFile(\n    `${title.replace(/[^\\w-]+/g, \"_\")}_${stampForFilename()}.pdf`,\n    buf,\n    \"application/pdf\",\n  );",
+      "claims": "Regeneration safely replaces the earlier filing copy.",
+      "truth": "The previous document row and file are deleted at:867–868 before putFile at:872–876 and the replacement insert at:880–884. If storage or insertion fails, the original is already gone and the stored documentId still names it. This can occur during the promised14-day edit window.",
+      "replacement": "Upload and insert the new package first, atomically update the service order's documentId/details, then retire the old document. On failure remove only the staged replacement and retain the existing filing copy.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Client portal, S-election shareholder Social Security number validation",
+      "file": "webapp/src/lib/ssn.ts",
+      "line": 28,
+      "reads": "return ssnTypingProblem(value) || (d.length !== 9 ? SSN_LENGTH_MESSAGE : \"\");",
+      "claims": "A nine-digit SSN with an allowed area number needs no further structural correction.",
+      "truth": "ssnTypingProblem at:16–20 checks area and length only; routes-portal.ts:765–783 repeats those rules for both owners. Structurally impossible numbers with middle digits00 or final digits0000 pass, e.g.123-00-1234 and123-45-0000. SSA explicitly states those groups are never assigned: https://www.ssa.gov/employer/randomizationfaqs.html (opened, lines71–73). This concerns syntax checks, not verification that a real number belongs to a person.",
+      "replacement": "Reject middle digits 00 and final digits 0000 in both the shared client helper and the server schema, in addition to the existing length and area checks. Message: “That is not a valid Social Security number — the middle two digits cannot be 00 and the last four digits cannot be 0000.”",
+      "severity": "substantive"
+    }
+  ],
+  "filesWithNoNewFindings": [
+    "webapp/src/App.tsx",
+    "webapp/src/components/home/HomeHero.tsx",
+    "webapp/src/components/home/MothershipDiagram.tsx",
+    "webapp/src/components/home/StatBar.tsx",
+    "webapp/src/components/home/StatuteTeaser.tsx",
+    "webapp/src/components/home/WeAreOne.tsx",
+    "webapp/src/components/home/WhyOnlyUs.tsx",
+    "webapp/src/components/layout/Footer.tsx",
+    "webapp/src/components/layout/Header.tsx",
+    "webapp/src/components/layout/Layout.tsx",
+    "webapp/src/components/layout/Logo.tsx",
+    "webapp/src/components/sections/CallToAction.tsx",
+    "webapp/src/components/sections/PageHero.tsx",
+    "webapp/src/hooks/use-toast.ts",
+    "webapp/src/lib/api.ts",
+    "webapp/src/lib/datetime.ts",
+    "webapp/src/lib/ein.ts",
+    "webapp/src/lib/einActivity.ts",
+    "webapp/src/lib/form2553Timing.ts",
+    "webapp/src/lib/jointOwner.ts",
+    "webapp/src/lib/personName.ts",
+    "webapp/src/lib/phone.ts",
+    "webapp/src/lib/utils.ts",
+    "webapp/src/main.tsx",
+    "webapp/src/pages/Benefits.tsx",
+    "webapp/src/pages/Contact.tsx",
+    "webapp/src/pages/FAQ.tsx",
+    "webapp/src/pages/Home.tsx",
+    "webapp/src/pages/HowItWorks.tsx",
+    "webapp/src/pages/NotFound.tsx",
+    "webapp/src/pages/Pricing.tsx",
+    "webapp/src/pages/Privacy.tsx",
+    "webapp/src/pages/RecordkeepingApp.tsx",
+    "webapp/src/pages/Terms.tsx",
+    "webapp/src/pages/TheStatute.tsx",
+    "webapp/src/pages/WhatIs.tsx",
+    "webapp/src/vite-env.d.ts",
+    "webapp/src/components/forms/florida-llc/AddressAutocomplete.tsx",
+    "webapp/src/components/forms/florida-llc/AddressFields.tsx",
+    "webapp/src/components/forms/florida-llc/buildPayload.ts",
+    "webapp/src/components/forms/florida-llc/defaults.ts",
+    "webapp/src/components/forms/florida-llc/FeeEstimate.tsx",
+    "webapp/src/components/forms/florida-llc/FieldShell.tsx",
+    "webapp/src/components/forms/florida-llc/FloridaLLCFormationForm.tsx",
+    "webapp/src/components/forms/florida-llc/NameCheck.tsx",
+    "webapp/src/components/forms/florida-llc/nameSimilarity.ts",
+    "webapp/src/components/forms/florida-llc/raService.ts",
+    "webapp/src/components/forms/florida-llc/RepeatableMemberFields.tsx",
+    "webapp/src/components/forms/florida-llc/RepeatablePartyFields.tsx",
+    "webapp/src/components/forms/florida-llc/ReviewStep.tsx",
+    "webapp/src/components/forms/florida-llc/schema.ts",
+    "webapp/server/app.ts",
+    "webapp/server/auth.ts",
+    "webapp/server/backup.ts",
+    "webapp/server/chapter-605-notes.md",
+    "webapp/server/crypto.ts",
+    "webapp/server/datetime.ts",
+    "webapp/server/db.ts",
+    "webapp/server/dev.ts",
+    "webapp/server/email.ts",
+    "webapp/server/env.ts",
+    "webapp/server/md.d.ts",
+    "webapp/server/pricing.ts",
+    "webapp/server/provenance.ts",
+    "webapp/server/routes-ops.ts",
+    "webapp/server/shared.ts",
+    "webapp/server/square.ts",
+    "webapp/server/storage.ts",
+    "webapp/server/sunbiz.ts",
+    "webapp/server/validation.ts",
+    "webapp/server/vercel-entry.ts",
+    "webapp/vercel.json",
+    "docs/facts.md"
+  ],
+  "reviewNotes": [
+    "Every listed source file was read whole; searches were used only for later cross-checks. All seven prior raw buckets were read by the assigned reviewers. Reports describe source behavior; no server, production database, live customer action or fault injection was run. All database customers/orders are test data.",
+    "Current2026 Online Sunshine sections read directly include all cited605 sections in the inventory; the broad general-act groups0101–0117,0201–0213,0216,0301–0806,0901–0905,1006,1061,1101–1108 and protected-series2101–2802 were checked against the internal notes/public claims. Other reviewers verified Chapters621,711 and201;607.193 and501.165 were opened directly as well.",
+    "The22-state claim remains not verified: retrieved secondary lists use inconsistent definitions and include territories; none establishes a current primary-source state-by-state count. It is not certified or declared false.",
+    "Some proposed corrections are behavior specifications rather than drop-in code. They are not implemented or tested patches. Code-only references to excluded test/restore files are expressly limited where those files are outside the inventory.",
+    "Federal 11 USC 541(c)(1)-(2) was opened and read at https://www.law.cornell.edu/uscode/text/11/541 after official House and House CDN full-page endpoints returned 403; the official House search-index text dated September 15, 2026 corroborates the relevant language. This is a republication fallback, not a successful official full-page fetch. Rule 1.140(a), including exceptions to the ordinary 20-day answer deadline, was opened in the Florida Bar April 1, 2026 rules PDF."
+  ],
+  "coverageCheck": {
+    "command": "bun run docs/audit/coverage-check.ts 2026-09-16-codex",
+    "exitCode": 1,
+    "coverageLine": "166 of 166 files, 38081 of 38081 lines read; 4 reports, 67 findings, 267 prior items re-verified",
+    "problemCount": 267,
+    "statusVocabularyProblems": 267,
+    "otherProblems": [],
+    "explanation": "File and line coverage is complete. The gate rejected all 267 required audit statuses because it accepts only the earlier repair-status vocabulary. The requested statuses were preserved; the gate was not edited. It did not print coverage check passed."
+  },
+  "auditTotals": {
+    "files": 166,
+    "lines": 38081,
+    "priorFindings": {
+      "confirmed": 161,
+      "disputed": 63,
+      "housekeeping-only": 32,
+      "duplicate": 11
+    },
+    "newFindings": {
+      "substantive": 57,
+      "wording": 8,
+      "housekeeping": 2
+    }
+  }
+}

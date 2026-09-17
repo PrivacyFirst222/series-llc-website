@@ -22,7 +22,7 @@ import { memberRowIsBlank } from "../src/components/forms/florida-llc/validation
 import type { FloridaLLCFormData } from "../src/components/forms/florida-llc/types";
 import { normalizeEntityName } from "../src/components/forms/florida-llc/nameSimilarity";
 import { spawn, type Subprocess } from "bun";
-import { mkdtempSync, rmSync, existsSync, writeFileSync } from "node:fs";
+import { mkdtempSync, rmSync, existsSync, writeFileSync, appendFileSync } from "node:fs";
 import { execSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -117,6 +117,8 @@ const failures: string[] = [];
 let checks = 0;
 function expect(cond: unknown, what: string, got?: unknown): void {
   checks++;
+  // Results by label, for the fix ledger (docs/audit): see server/e2e.ts.
+  if (process.env.CHECK_RESULTS_FILE) appendFileSync(process.env.CHECK_RESULTS_FILE, JSON.stringify({ label: what, ok: !!cond }) + "\n");
   if (!cond) {
     failures.push(`${what}${got !== undefined ? ` — got ${JSON.stringify(got)?.slice(0, 200)}` : ""}`);
     console.log(`  ❌ ${what}`);

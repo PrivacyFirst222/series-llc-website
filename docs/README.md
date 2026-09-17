@@ -181,4 +181,5 @@ Word files are delivered to, and the Word-authored ones collected from:
 |---|---|---|
 | `md-to-docx.py` | master → Word | Generation. Writes to a temp file and only replaces the target after verifying the archive, so a failure cannot truncate a document. |
 | `docx-to-md.py` | Word → markdown | One-time import of a Word document to promote it to a master, and mirrors of documents still authored in Word. |
+| `audit/publish-docs.ts` | repo → Dropbox | The only writer of the Dropbox copies (17 Sep 2026). Copies the committed, reviewed `docs/word/` files at release, for a commit Adam accepted. The generator writes `docs/word/` only. |
 | `sync.ts` (`bun run docs:sync`) | Dropbox → repo | Pulls only Word-authored documents. Refuses to touch generated ones. Fails if the origin folder holds a document not listed here. |

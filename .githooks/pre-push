@@ -1,0 +1,11 @@
+#!/bin/bash
+# The release gate, for every push from this clone — Claude, Codex or a
+# terminal alike (17 Sep 2026; docs/audit/release-check.ts). A push made only
+# of record files passes. Anything else needs Adam's acceptance of the exact
+# commit, the review package he was shown, and its checks all passed.
+ROOT="$(git rev-parse --show-toplevel)"
+if ! command -v bun >/dev/null 2>&1; then
+  echo "pre-push: bun is not installed — the release gate cannot run, so the push is refused" >&2
+  exit 1
+fi
+exec bun run "$ROOT/docs/audit/release-check.ts" --pre-push

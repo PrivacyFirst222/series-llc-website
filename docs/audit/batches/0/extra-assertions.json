@@ -1,0 +1,28 @@
+[
+  {
+    "kind": "page",
+    "path": "/faq",
+    "present": [
+      "What's the federal tax treatment?"
+    ],
+    "absent": [
+      "This sentence is not on the FAQ page"
+    ]
+  },
+  {
+    "kind": "document",
+    "master": "docs/oa-instructions.md",
+    "word": "FPSLLC Operating Agreement Instructions - DRAFT.docx",
+    "masterPresent": [
+      "## 6. Transfer-on-Death Designations"
+    ],
+    "wordPresent": [
+      "Transfer-on-Death Designations"
+    ]
+  },
+  {
+    "kind": "check",
+    "suite": "server",
+    "label": "the client signs in"
+  }
+]

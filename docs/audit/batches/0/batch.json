@@ -1,0 +1,201 @@
+{
+  "id": "0",
+  "revision": 1,
+  "title": "The fix ledger itself: the record, the guard, the release gate, the isolated review site, and their demonstrations. No product page, email, agreement or price changes.",
+  "model": "claude-fable-5-1",
+  "base": "82abf541a6643981d93d41bc5d8b6da169897971",
+  "items": [],
+  "files": [
+    {
+      "path": "docs/audit/ledger-lib.ts",
+      "mode": "new",
+      "control": true,
+      "why": "shared types, file discovery, the append-only and replay rules"
+    },
+    {
+      "path": "docs/audit/ledger-build.ts",
+      "mode": "new",
+      "control": true,
+      "why": "seeds the ledger once, by script, 334 of 334 by exact id"
+    },
+    {
+      "path": "docs/audit/verdicts.json",
+      "mode": "new",
+      "why": "Claude's check of Codex's 63 disputes and 11 duplicates, read by the builder"
+    },
+    {
+      "path": "docs/audit/ledger.json",
+      "mode": "new",
+      "why": "the ledger: 334 source records"
+    },
+    {
+      "path": "docs/audit/ledger-print.ts",
+      "mode": "new",
+      "control": true,
+      "why": "the readable list, work orders, the rulings queue"
+    },
+    {
+      "path": "docs/audit/findings-open.md",
+      "mode": "generated",
+      "why": "now generated from the ledger"
+    },
+    {
+      "path": "docs/audit/sources/findings-open-2026-09-16.md",
+      "mode": "new",
+      "why": "the 16 Sep working list, moved here unchanged"
+    },
+    {
+      "path": "docs/audit/guard.ts",
+      "mode": "new",
+      "control": true,
+      "why": "the commit-time guard"
+    },
+    {
+      "path": "docs/audit/release-check.ts",
+      "mode": "new",
+      "control": true,
+      "why": "the one release gate"
+    },
+    {
+      "path": "docs/audit/batch.ts",
+      "mode": "new",
+      "control": true,
+      "why": "authorize, implemented, released, reject, ruling"
+    },
+    {
+      "path": "docs/audit/accept.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Adam's acceptance from a terminal"
+    },
+    {
+      "path": "docs/audit/publish-docs.ts",
+      "mode": "new",
+      "control": true,
+      "why": "the only writer of the Dropbox copies, at release"
+    },
+    {
+      "path": "docs/audit/demo.ts",
+      "mode": "new",
+      "control": true,
+      "why": "the demonstrations, in a disposable copy"
+    },
+    {
+      "path": "docs/audit/README.md",
+      "mode": "code",
+      "why": "how the fix ledger works"
+    },
+    {
+      "path": "docs/audit/runs/2026-09-16-codex/bucket-1.json",
+      "mode": "new",
+      "why": "Codex's audit report 1 of 4, as delivered"
+    },
+    {
+      "path": "docs/audit/runs/2026-09-16-codex/bucket-2.json",
+      "mode": "new",
+      "why": "Codex's audit report 2 of 4, as delivered"
+    },
+    {
+      "path": "docs/audit/runs/2026-09-16-codex/bucket-3.json",
+      "mode": "new",
+      "why": "Codex's audit report 3 of 4, as delivered"
+    },
+    {
+      "path": "docs/audit/runs/2026-09-16-codex/bucket-4.json",
+      "mode": "new",
+      "why": "Codex's audit report 4 of 4, as delivered"
+    },
+    {
+      "path": ".githooks/pre-push",
+      "mode": "new",
+      "control": true,
+      "why": "calls the release gate for every push from this clone"
+    },
+    {
+      "path": ".claude/hooks/accept-prompt.sh",
+      "mode": "new",
+      "control": true,
+      "why": "records Adam's acceptance from his chat message, outside the repository"
+    },
+    {
+      "path": ".claude/settings.local.json",
+      "mode": "code",
+      "control": true,
+      "why": "registers the acceptance hook beside the Go hook"
+    },
+    {
+      "path": ".claude/hooks/pre-commit.sh",
+      "mode": "code",
+      "control": true,
+      "why": "calls the guard; adds the Instructions master to the Word regeneration trigger"
+    },
+    {
+      "path": ".claude/hooks/update-word-docs.sh",
+      "mode": "code",
+      "control": true,
+      "why": "no longer copies to Dropbox; docs/word only"
+    },
+    {
+      "path": ".github/workflows/check.yml",
+      "mode": "code",
+      "control": true,
+      "why": "runs the guard and replays the accepted fixes on every push"
+    },
+    {
+      "path": "webapp/server/e2e.ts",
+      "mode": "code",
+      "control": true,
+      "why": "the server checks write their results by label (3 lines); no check changed"
+    },
+    {
+      "path": "webapp/scripts/behavioral.ts",
+      "mode": "code",
+      "control": true,
+      "why": "the browser walk writes its results by label (3 lines); no check changed"
+    },
+    {
+      "path": "webapp/scripts/isolated-stack.ts",
+      "mode": "new",
+      "control": true,
+      "why": "the review site: offline, proven by the server's own report, or it does not start"
+    },
+    {
+      "path": "webapp/scripts/audit-assert.ts",
+      "mode": "new",
+      "control": true,
+      "why": "replays page, document and behaviour assertions"
+    },
+    {
+      "path": "webapp/scripts/audit-review.ts",
+      "mode": "new",
+      "control": true,
+      "why": "runs the checks at the exact commit and writes the review package outside the repository"
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "why": "the commit step rebuilds the API bundle when anything under webapp/server is staged; e2e.ts is not part of it, so no change is expected"
+    },
+    {
+      "path": "docs/README.md",
+      "mode": "code",
+      "why": "one row: publish-docs.ts is the only writer of the Dropbox copies"
+    },
+    {
+      "path": "FAILURES.md",
+      "mode": "code",
+      "why": "P88, P89, P90"
+    }
+  ],
+  "requiredChecks": [
+    "typecheck",
+    "lint",
+    "unit",
+    "facts",
+    "guard",
+    "documents",
+    "server",
+    "walk",
+    "assertions"
+  ]
+}
