@@ -9,16 +9,27 @@
  */
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
-import { ROOT, LEDGER, saveLedger, now, type Item, type Ledger, type Part } from "./ledger-lib";
+import { ROOT, LEDGER, git, saveLedger, now, unmetWaits, type Item, type Ledger, type Part } from "./ledger-lib";
 
 const SNAPSHOT = "docs/audit/sources/findings-open-2026-09-16.md";
 const CODEX = [1, 2, 3, 4].map((n) => `docs/audit/runs/2026-09-16-codex/bucket-${n}.json`);
 const CODEX_NEW_COUNTS = [16, 27, 13, 11];
 
-if (existsSync(LEDGER) && !process.argv.includes("--demo-rebuild")) {
-  console.error("ledger.json already exists. It is seeded once; after that it changes only through batches and rulings.");
-  process.exit(1);
+// Seeded once. It may be rebuilt only while NOTHING has been accepted: then
+// no fix or acceptance can be lost, and the batch index and rulings carry over.
+let carried: Pick<Ledger, "rulings" | "batches"> = { rulings: [], batches: [] };
+if (existsSync(LEDGER)) {
+  const old = JSON.parse(readFileSync(LEDGER, "utf8")) as Ledger;
+  const touched = old.items.some((i) => i.parts.some((p) => p.status !== "open")) || old.batches.some((b) => ["authorized", "implemented", "accepted", "released"].includes(b.status));
+  if (!process.argv.includes("--rebuild") || touched) {
+    console.error(touched ? "ledger.json holds work in progress or accepted fixes; it is never rebuilt after that." : "ledger.json already exists. Pass --rebuild to reseed it (allowed only while nothing has been authorized or accepted).");
+    process.exit(1);
+  }
+  carried = { rulings: old.rulings, batches: old.batches };
 }
+// History is append-only even across a reseed: a part that already existed in
+// the last committed ledger keeps the history it had there.
+const committed = ((): Ledger | null => { const t = git(["show", "HEAD:docs/audit/ledger.json"], { allowFail: true }); return t ? (JSON.parse(t) as Ledger) : null; })();
 
 const problems: string[] = [];
 const verdicts = JSON.parse(readFileSync(join(ROOT, "docs/audit/verdicts.json"), "utf8")) as {
@@ -26,6 +37,7 @@ const verdicts = JSON.parse(readFileSync(join(ROOT, "docs/audit/verdicts.json"),
   disputeRejected: Record<string, string>; duplicates: Record<string, string>; duplicateNotes: Record<string, string>;
   newRulingNeeded: string[]; newNotes: Record<string, string>;
   parts: Record<string, { key: string; scope: string; waitsOn?: string[] }[]>;
+  extraWaits: Record<string, string[]>;
 };
 
 /* ---- the 267 ---- */
@@ -88,7 +100,8 @@ CODEX.forEach((path, bi) => {
     if (!it) { problems.push(`${path}: prior ${p.id} is not one of the 267`); continue; }
     if (codexSeen.has(it.id)) problems.push(`Codex assessed item ${it.id} twice`);
     codexSeen.add(it.id);
-    it.codex = { status: p.status, note: `${p.evidence}${p.replacementNote ? ` — Replacement: ${p.replacementNote}` : ""}` };
+    // The defect's status and the replacement's verdict are two different facts (Codex, finding 8).
+    it.codex = { status: p.status, evidence: p.evidence, replacementOk: typeof p.replacementOk === "boolean" ? p.replacementOk : null, replacementNote: p.replacementNote ?? "" };
   }
   if (rep.findings.length !== CODEX_NEW_COUNTS[bi]) problems.push(`${path}: ${rep.findings.length} new findings, expected ${CODEX_NEW_COUNTS[bi]}`);
   rep.findings.forEach((f, i) => {
@@ -131,12 +144,22 @@ for (const [id, note] of Object.entries(verdicts.newNotes)) {
   if (!it) problems.push(`newNotes names ${id}, which does not exist`); else it.correctedReplacement = note;
 }
 for (const id of verdicts.newRulingNeeded) if (!items.some((i) => i.id === id)) problems.push(`newRulingNeeded names ${id}, which does not exist`);
+for (const [id, waits] of Object.entries(verdicts.extraWaits ?? {})) {
+  const it = items.find((i) => i.id === id);
+  if (!it) { problems.push(`extraWaits names item ${id}, which does not exist`); continue; }
+  for (const w of waits) {
+    if (!items.some((i) => i.id === w.replace(/^ruling:/, ""))) problems.push(`item ${id} waits on ${w}, which does not exist`);
+    if (!it.waitsOn.includes(w)) it.waitsOn.push(w);
+  }
+}
+for (const split of Object.values(verdicts.parts)) for (const p of split) for (const w of p.waitsOn ?? []) if (!items.some((i) => i.id === w.replace(/^ruling:/, ""))) problems.push(`a part waits on ${w}, which does not exist`);
 
 /* ---- parts ---- */
 for (const it of items) {
   const split = verdicts.parts[it.id];
   const mk = (key: string, scope: string, waitsOn: string[] = []): Part => ({ key, scope, status: "open", waitsOn, history: [{ at: now(), event: "recorded" }] });
   it.parts = split ? split.map((p) => mk(p.key, p.scope, p.waitsOn ?? [])) : [mk("all", "The whole finding.")];
+  for (const p of it.parts) { const was = committed?.items.find((i) => i.id === it.id)?.parts.find((q) => q.key === p.key); if (was) p.history = was.history; }
 }
 for (const id of Object.keys(verdicts.parts)) if (!items.some((i) => i.id === id)) problems.push(`parts names item ${id}, which does not exist`);
 // A chain of "same defect as" ends at one main record.
@@ -160,10 +183,11 @@ if (problems.length > 0) {
   process.exit(1);
 }
 
-const ledger: Ledger = { version: 1, builtFrom: [SNAPSHOT, ...CODEX, "docs/audit/verdicts.json"], items, rulings: [], batches: [] };
+const ledger: Ledger = { version: 1, builtFrom: [SNAPSHOT, ...CODEX, "docs/audit/verdicts.json"], items, rulings: carried.rulings, batches: carried.batches };
 if (!process.argv.includes("--dry")) saveLedger(ledger);
 const n = (f: (i: Item) => boolean) => items.filter(f).length;
 console.log(`ledger: ${items.length} of ${expected.length} records (267 + 67), each id once`);
 console.log(`  dropped ${n((i) => i.verdict === "dropped")}, optional ${n((i) => i.verdict === "optional")}, corrected replacement ${Object.keys(verdicts.corrected).length}, Codex dispute not adopted ${Object.keys(verdicts.disputeRejected).length}`);
 console.log(`  second sightings linked to a main record: ${n((i) => !!i.canonical)} (${dupIds.length} of them from Codex)`);
-console.log(`  waiting on Adam's ruling: ${n((i) => i.verdict === "open" && i.waitsOn.some((w) => w.startsWith("ruling:")))}`);
+console.log(`  waiting on Adam's ruling, directly or through their main record: ${n((i) => i.verdict !== "dropped" && i.parts.some((p) => unmetWaits(ledger, i, p).some((w) => w.startsWith("ruling:"))))}`);
+console.log(`  confirmed defects whose proposed replacement Codex rejected: ${n((i) => i.codex?.status === "confirmed" && i.codex.replacementOk === false)}`);

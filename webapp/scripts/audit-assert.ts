@@ -7,7 +7,7 @@
  *              passed. A label that is missing from the results, or a suite
  *              that did not run, counts as FAILED.
  *
- *   bun run scripts/audit-assert.ts [--results file.jsonl]... [--extra assertions.json] [--base-url http://…]
+ *   bun run scripts/audit-assert.ts [--results file.jsonl]... [--commit <full>] [--extra assertions.json] [--base-url http://…]
  *
  * Pages behind a sign-in are not opened here; their fixes are protected by a
  * source assertion or by a named check in the walk.
@@ -31,17 +31,26 @@ if (existsSync(join(ROOT, "docs/audit/ledger.json"))) {
 }
 for (const f of flag("--extra")) for (const a of JSON.parse(readFileSync(f, "utf8")) as Assertion[]) todo.push({ name: `extra (${f.split("/").pop()})`, a });
 
+// Results are kept by SUITE and label: a server assertion is not satisfied by
+// a walk result that happens to share its label (Codex's review of r1, finding
+// 12). `ok` must be the boolean true. With --commit, a result from any other
+// commit does not count.
 const results = new Map<string, boolean[]>();
 const resultFiles = flag("--results");
+const wantCommit = flag("--commit")[0];
+let foreign = 0;
 for (const f of resultFiles) {
   if (!existsSync(f)) continue;
   for (const line of readFileSync(f, "utf8").split("\n").filter(Boolean)) {
-    const r = JSON.parse(line) as { label: string; ok: boolean };
-    results.set(r.label, [...(results.get(r.label) ?? []), r.ok]);
+    const r = JSON.parse(line) as { suite?: string; label: string; ok: unknown; commit?: string | null };
+    if (wantCommit && r.commit !== wantCommit) { foreign++; continue; }
+    const key = `${r.suite ?? "?"}\u0000${r.label}`;
+    results.set(key, [...(results.get(key) ?? []), r.ok === true]);
   }
 }
 
 const failures: string[] = [];
+const outside = new Set<string>();
 let ran = 0;
 
 /** The text of a Word document, the way a reader would see it. */
@@ -59,6 +68,8 @@ try {
     const base = given ?? (stack as Stack).web;
     const browser = await chromium.launch();
     const page = await browser.newPage();
+    // The page is read offline: nothing but this machine is contacted.
+    await page.route(/^https?:\/\/(?!localhost[:/]|127\.0\.0\.1[:/])/, (route) => { outside.add(new URL(route.request().url()).host); return route.abort(); });
     for (const { name, a } of pages) {
       if (a.kind !== "page") continue;
       ran++;
@@ -92,9 +103,9 @@ try {
     }
     if (a.kind === "check") {
       ran++;
-      const got = results.get(a.label);
+      const got = results.get(`${a.suite}\u0000${a.label}`);
       if (resultFiles.length === 0) failures.push(`${name}: the ${a.suite} check "${a.label}" — no results were supplied, so it did not run; that counts as failed`);
-      else if (!got) failures.push(`${name}: the ${a.suite} check "${a.label}" is missing from the results — skipped or removed counts as failed`);
+      else if (!got) failures.push(`${name}: the check "${a.label}" is missing from the ${a.suite} results${wantCommit ? ` for commit ${wantCommit.slice(0, 7)}` : ""} — skipped, removed, or run by another suite counts as failed`);
       else if (!got.every(Boolean)) failures.push(`${name}: the ${a.suite} check "${a.label}" ran and FAILED`);
     }
   }
@@ -102,5 +113,7 @@ try {
   stack?.stop();
 }
 
+if (foreign > 0) console.log(`assertions: ${foreign} result line(s) from another commit were ignored`);
+if (pages.length > 0) console.log(`assertions: requests to other machines stopped in the browser: ${outside.size === 0 ? "none attempted" : [...outside].join(", ")}`);
 console.log(`assertions: ${ran} replayed (${pages.length} page, ${todo.filter((t) => t.a.kind === "document").length} document, ${todo.filter((t) => t.a.kind === "check").length} behaviour), ${failures.length} failed`);
 if (failures.length > 0) { console.error(failures.map((f) => `  - ${f}`).join("\n")); process.exit(1); }

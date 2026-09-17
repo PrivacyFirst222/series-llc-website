@@ -37,11 +37,12 @@ export function renderList(l: Ledger): string {
       const flags = [
         it.housekeeping ? "housekeeping" : "",
         it.canonical ? `same defect as ${it.canonical}` : "",
-        ...it.waitsOn.map((w) => (w.startsWith("ruling:") ? "waits on Adam's ruling" : `waits on ${w}`)),
+        ...it.waitsOn.map((w) => (w.startsWith("ruling:") ? (w.slice(7) === it.id ? "waits on Adam's ruling" : `waits on Adam's ruling on item ${w.slice(7)}`) : `waits on ${w}`)),
       ].filter(Boolean).join("; ");
       out.push(`- **${it.id}. [${it.tag}]** — **${statusOf(it)}**${flags ? ` — ${flags}` : ""}`);
       for (const line of it.text.split("\n")) out.push(`  - ${line}`);
-      if (it.codex && it.codex.status !== "confirmed") out.push(`  - Codex (${it.codex.status}): ${it.codex.note}`);
+      if (it.codex && it.codex.status !== "confirmed") out.push(`  - Codex (${it.codex.status}): ${it.codex.evidence}`);
+      if (it.codex?.replacementOk === false) out.push(`  - **Codex rejected the proposed replacement:** ${it.codex.replacementNote || "(no note given)"}`);
       if (it.verdictReason) out.push(`  - Outcome: ${it.verdictReason}`);
       if (it.correctedReplacement) out.push(`  - Corrected after Codex's review: ${it.correctedReplacement}`);
       for (const r of l.rulings.filter((x) => x.item === it.id)) out.push(`  - Ruling, ${r.date}${r.part ? ` (${r.part})` : ""}: ${r.text}`);
@@ -72,7 +73,9 @@ export function renderOrder(l: Ledger, batchId: string): string {
   for (const bi of b.items) {
     const it = l.items.find((i) => i.id === bi.id);
     out.push(`## Item ${bi.id}${bi.part !== "all" ? ` — part "${bi.part}"` : ""}`, "", `Scope: ${bi.scope}`, "", "The finding:", ...(it?.text.split("\n").map((x) => `> ${x}`) ?? []), "");
+    if (it?.codex?.replacementOk === false) out.push(`**Codex rejected the proposed replacement above. Do not apply it as written.** Codex's correction: ${it.codex.replacementNote || "(no note given)"}`, "");
     if (it?.correctedReplacement) out.push(`Corrected after Codex's review: ${it.correctedReplacement}`, "");
+    if (it?.canonical) out.push(`This is a second sighting of item ${it.canonical}: the same defect in another place. Every place is fixed in the same batch.`, "");
     out.push("What must be true afterwards:", ...bi.assertions.map((a) => `- ${describe(a)}`), "");
     if (bi.assertions.some((a) => a.kind === "check")) out.push("This is a behaviour fix: its check is run on the tree BEFORE the fix and must FAIL for the reported reason, then after and must pass. Both runs are captured by the review command.", "");
   }

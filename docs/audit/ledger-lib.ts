@@ -88,7 +88,9 @@ export interface Item {
   text: string;
   verdict: "open" | "dropped" | "optional";
   verdictReason?: string;
-  codex?: { status: string; note: string };
+  /** Codex's verdict on the DEFECT (status) and, separately, on the proposed
+   *  REPLACEMENT. A confirmed defect does not mean an approved fix. */
+  codex?: { status: string; evidence: string; replacementOk: boolean | null; replacementNote: string };
   correctedReplacement?: string;
   /** Set when this item is a second sighting of another: that item's id. */
   canonical?: string;
@@ -98,7 +100,9 @@ export interface Item {
 
 export interface Ruling { date: string; item: string; part?: string; text: string; supersedes?: string }
 
-export interface BatchIndex { id: string; revision: number; frozenHash: string; status: "proposed" | "authorized" | "implemented" | "accepted" | "released" | "rejected"; model: string; base: string; history: HistoryEntry[] }
+/** Three different things, recorded separately: the push, the live site, the Dropbox copies. */
+export interface ReleaseRecord { git: { at: string; remoteMain: string }; deployment: { at: string; evidence: string } | null; documents: { at: string; evidence: string } | null }
+export interface BatchIndex { id: string; revision: number; frozenHash: string; status: "proposed" | "authorized" | "implemented" | "accepted" | "released" | "rejected"; model: string; base: string; history: HistoryEntry[]; release?: ReleaseRecord }
 
 export interface Ledger { version: 1; builtFrom: string[]; items: Item[]; rulings: Ruling[]; batches: BatchIndex[] }
 
@@ -115,8 +119,18 @@ export interface BatchFile {
    *  complete-diff review; "control" marks a check, hook, guard or publishing
    *  control, which must always be declared. */
   files: { path: string; mode: "replace" | "code" | "new" | "delete" | "generated"; control?: boolean; why: string }[];
+  /** Checks the batch ADDS. The mandatory minimum (MANDATORY_CHECKS) is not
+   *  the batch's to shorten. */
   requiredChecks: string[];
+  /** Test-only files a new check needs, carried onto the before-fix tree. */
+  testSupport?: string[];
+  /** Check labels this batch removes on purpose. Any other check that
+   *  disappears from a suite is refused. */
+  removedChecks?: string[];
 }
+
+/** Run for every batch, whatever its file says (Codex, review of r1, finding 5). */
+export const MANDATORY_CHECKS = ["typecheck", "lint", "unit", "facts", "guard", "documents", "server", "walk", "assertions", "dropbox-unchanged", "checkout-unchanged"] as const;
 
 /* -------------------------------- helpers ------------------------------ */
 
@@ -196,7 +210,7 @@ export const RECORD_PATHS: RegExp[] = [
   /^docs\/audit\/ledger\.json$/,
   /^docs\/audit\/findings-open\.md$/,
   /^docs\/audit\/rulings\.md$/,
-  /^docs\/audit\/batches\/[^/]+\/(batch\.json|batch\.md|evidence\/.+|codex-review\.md)$/,
+  /^docs\/audit\/batches\/[^/]+\/(batch\.json|batch\.md|evidence\/.+|codex-review[^/]*\.md)$/,
 ];
 export const isRecordPath = (p: string): boolean => RECORD_PATHS.some((r) => r.test(p));
 
@@ -205,7 +219,11 @@ export const isRecordPath = (p: string): boolean => RECORD_PATHS.some((r) => r.t
 export const CONTROL_PATHS: RegExp[] = [
   /^\.githooks\//, /^\.claude\/hooks\//, /^\.claude\/settings/, /^\.github\//,
   /^docs\/audit\/[^/]+\.ts$/, /^docs\/facts-check\.ts$/, /^docs\/[^/]+\.py$/,
-  /^webapp\/server\/e2e\.ts$/, /^webapp\/scripts\//, /\.test\.tsx?$/, /^webapp\/package\.json$/,
+  /^webapp\/server\/e2e\.ts$/, /^webapp\/scripts\//, /\.test\.tsx?$/, /^webapp\/package\.json$/, /^webapp\/bun\.lock$/,
+  // settings that decide what is built, checked or deployed; the verdicts the
+  // ledger was built from; the fact ledger and the formatting baselines
+  /^webapp\/vercel\.json$/, /^webapp\/(vite|eslint|postcss|tailwind)\.config\.(ts|js)$/, /^webapp\/tsconfig[^/]*\.json$/, /^webapp\/components\.json$/,
+  /^docs\/audit\/verdicts\.json$/, /^\.claude\/launch\.json$/, /^docs\/facts\.md$/, /^docs\/[^/]*baseline[^/]*\.json$/, /^docs\/source\//,
 ];
 export const isControlPath = (p: string): boolean => CONTROL_PATHS.some((r) => r.test(p));
 
@@ -214,11 +232,18 @@ export const isControlPath = (p: string): boolean => CONTROL_PATHS.some((r) => r
 const partOf = (l: Ledger, id: string, key: string): Part | undefined => l.items.find((i) => i.id === id)?.parts.find((p) => p.key === key);
 
 /** What may never happen between two versions of the ledger: a source record
- *  disappearing, history being rewritten, a status moving backwards without
- *  a recorded reason, or an accepted fix's assertions changing without a
- *  ruling that supersedes it. */
-export function ledgerRegressions(before: Ledger, after: Ledger): string[] {
+ *  disappearing, item or batch history being rewritten, a batch record or its
+ *  frozen hash changing, a status moving backwards without a recorded reason.
+ *
+ *  An accepted fix's assertions are what protect it. In STRICT mode (a push
+ *  that claims to be records only) they may not change at all, and nothing
+ *  accepted may move backwards: weakening a protection is never "just
+ *  records" and must go through Adam's acceptance. In the ordinary mode (the
+ *  commit guard, and a push Adam accepted) they may change only under a new
+ *  ruling that says in so many words what it supersedes. */
+export function ledgerRegressions(before: Ledger, after: Ledger, opts: { strict?: boolean } = {}): string[] {
   const out: string[] = [];
+  const isPrefix = (a: unknown[], b: unknown[]) => JSON.stringify(b.slice(0, a.length)) === JSON.stringify(a);
   for (const b of before.items) {
     const a = after.items.find((i) => i.id === b.id);
     if (!a) { out.push(`item ${b.id}: the source record was removed`); continue; }
@@ -229,25 +254,61 @@ export function ledgerRegressions(before: Ledger, after: Ledger): string[] {
         if (bp.status !== "open") out.push(`item ${b.id} part ${bp.key}: removed after work began`);
         continue;
       }
-      const prefix = JSON.stringify(ap.history.slice(0, bp.history.length)) === JSON.stringify(bp.history);
-      if (!prefix) out.push(`item ${b.id} part ${bp.key}: history was rewritten (it is append-only)`);
+      if (!isPrefix(bp.history, ap.history)) out.push(`item ${b.id} part ${bp.key}: history was rewritten (it is append-only)`);
       const back = ORDER.indexOf(ap.status) < ORDER.indexOf(bp.status);
       const reasoned = ap.history.slice(bp.history.length).some((h) => /^(rejected|reopened|superseded)/.test(h.event));
-      if (back && !reasoned) out.push(`item ${b.id} part ${bp.key}: status went back from ${bp.status} to ${ap.status} with no recorded reason`);
-      if ((bp.status === "accepted" || bp.status === "released") && bp.fix) {
+      const wasAccepted = bp.status === "accepted" || bp.status === "released";
+      if (back && (!reasoned || (opts.strict && wasAccepted))) out.push(`item ${b.id} part ${bp.key}: status went back from ${bp.status} to ${ap.status}${opts.strict && wasAccepted ? " — reopening an accepted fix needs Adam's acceptance, not a records push" : " with no recorded reason"}`);
+      if (wasAccepted && bp.fix) {
         const same = JSON.stringify(ap.fix?.assertions ?? null) === JSON.stringify(bp.fix.assertions);
-        const ruled = after.rulings.slice(before.rulings.length).some((r) => r.item === b.id && (!r.part || r.part === bp.key));
-        if (!same && !ruled && !reasoned) out.push(`item ${b.id} part ${bp.key}: an accepted fix's assertions changed with no ruling`);
+        const superseded = after.rulings.slice(before.rulings.length).some((r) => r.item === b.id && (!r.part || r.part === bp.key) && (r.supersedes ?? "").trim() !== "");
+        if (!same && (opts.strict || !superseded)) out.push(`item ${b.id} part ${bp.key}: an accepted fix's assertions changed${opts.strict ? " — that weakens a protection and needs Adam's acceptance, not a records push" : " with no ruling that says what it supersedes"}`);
       }
     }
   }
-  if (JSON.stringify(after.rulings.slice(0, before.rulings.length)) !== JSON.stringify(before.rulings)) out.push("rulings were rewritten (they are append-only)");
+  if (!isPrefix(before.rulings, after.rulings)) out.push("rulings were rewritten (they are append-only)");
   for (const bb of before.batches) {
     const ab = after.batches.find((x) => x.id === bb.id && x.revision === bb.revision);
-    if (!ab) out.push(`batch ${bb.id} r${bb.revision}: its record was removed`);
-    else if (ab.frozenHash !== bb.frozenHash) out.push(`batch ${bb.id} r${bb.revision}: its frozen hash changed — a changed batch is a new revision`);
+    if (!ab) { out.push(`batch ${bb.id} r${bb.revision}: its record was removed`); continue; }
+    if (ab.frozenHash !== bb.frozenHash) out.push(`batch ${bb.id} r${bb.revision}: its frozen hash changed — a changed batch is a new revision`);
+    if (!isPrefix(bb.history, ab.history)) out.push(`batch ${bb.id} r${bb.revision}: its history was rewritten (it is append-only)`);
+    if (ab.base !== bb.base || ab.model !== bb.model) out.push(`batch ${bb.id} r${bb.revision}: its base or model was edited`);
   }
   return out;
+}
+
+/** Batches whose files are frozen: from Adam's Go onward, not only after
+ *  acceptance. A rejected revision stays on file but is no longer guarded. */
+export const FROZEN_STATES = ["authorized", "implemented", "accepted", "released"];
+
+/** One defect, however many items saw it: the main record and every item that
+ *  is a second sighting of it. Work is claimed by defect, not by number. */
+export function familyOf(l: Ledger, id: string): Item[] {
+  const root = l.items.find((i) => i.id === id)?.canonical ?? id;
+  return l.items.filter((i) => i.id === root || i.canonical === root);
+}
+/** Another batch already working on this defect, if any. */
+export function familyClaim(l: Ledger, id: string, myBatch: string): string | null {
+  for (const it of familyOf(l, id)) for (const p of it.parts) {
+    if (p.batch && p.batch !== myBatch && (p.status === "assigned" || p.status === "implemented")) return `item ${it.id}${p.key === "all" ? "" : ` (${p.key})`} is ${p.status} in batch ${p.batch}`;
+  }
+  return null;
+}
+/** What an item (or a part of it) still waits on. A second sighting inherits
+ *  its main record's waits. */
+export function unmetWaits(l: Ledger, item: Item, part: Part): string[] {
+  const main = item.canonical ? l.items.find((i) => i.id === item.canonical) : undefined;
+  const all = [...new Set([...item.waitsOn, ...part.waitsOn, ...(main?.waitsOn ?? [])])];
+  return all.filter((w) => (w.startsWith("ruling:") ? !l.rulings.some((r) => r.item === w.slice(7)) : !(l.items.find((i) => i.id === w)?.parts.every((p) => p.status === "released") ?? false)));
+}
+
+/** The labels of the checks in a suite file, comments ignored — so a check
+ *  that is commented out or deleted inside a DECLARED file is still seen. */
+export function checkLabels(source: string): { labels: string[]; calls: number } {
+  const code = source.split("\n").filter((l) => !/^\s*\/\//.test(l)).join("\n").replace(/\/\*[\s\S]*?\*\//g, "");
+  const labels = [...code.matchAll(/\bcheck\(\s*(["'`])((?:\\.|(?!\1)[^\\])*)\1/g)].map((m) => m[2]);
+  const calls = (code.match(/\b(check|expect)\(/g) ?? []).length;
+  return { labels, calls };
 }
 
 /** Every fix Adam has accepted, replayed against the files as they stand:
@@ -260,7 +321,9 @@ export function replayStatic(l: Ledger, read: (file: string) => string | null, f
   for (const item of l.items) for (const part of item.parts) {
     if (!part.fix || !(part.status === "accepted" || part.status === "released" || part.status === "implemented")) continue;
     const name = `item ${item.id}${part.key === "all" ? "" : ` (${part.key})`}`;
-    const afters = part.fix.assertions.flatMap((a) => (a.kind === "replace" ? [a.after] : []));
+    // An approved sentence that contains the retired one is not a relapse —
+    // in the file it was approved for, and nowhere else.
+    const aftersIn = (f: string) => part.fix!.assertions.flatMap((a) => (a.kind === "replace" && a.file === f ? [a.after] : []));
     for (const a of part.fix.assertions) {
       if (a.kind === "replace" || a.kind === "present") {
         const text = a.kind === "replace" ? a.after : a.text;
@@ -274,13 +337,16 @@ export function replayStatic(l: Ledger, read: (file: string) => string | null, f
         for (const f of files) {
           let body = get(f);
           if (body === null) continue;
-          // An approved sentence that contains the retired one is not a relapse.
-          for (const keep of afters) body = body.split(keep).join("");
+          for (const keep of aftersIn(f)) body = body.split(keep).join("");
+          // A permitted leftover is removed at its exact place, at most the
+          // permitted number of times. Whatever remains is a relapse — another
+          // use in the same file does not hide behind the allowance.
+          for (const ok of allow.filter((x) => x.file === f && x.context.includes(text))) {
+            for (let k = 0; k < ok.count; k++) { const at = body.indexOf(ok.context); if (at < 0) break; body = body.slice(0, at) + body.slice(at + ok.context.length); }
+          }
           const n = count(body, text);
           if (n === 0) continue;
-          const ok = allow.find((x) => x.file === f);
-          if (ok && n <= ok.count && (get(f) ?? "").includes(ok.context)) continue;
-          out.push(`${name}: retired wording is back in ${f} (${n}×): "${text.slice(0, 90)}"`);
+          out.push(`${name}: retired wording is back in ${f} (${n}×${allow.some((x) => x.file === f) ? ", outside its permitted place" : ""}): "${text.slice(0, 90)}"`);
         }
       }
       if (a.kind === "document") {
@@ -298,6 +364,27 @@ export interface Acceptance { kind: "accept" | "reject"; batch: string; revision
 export function acceptances(): Acceptance[] {
   if (!existsSync(ACCEPTANCES)) return [];
   return rd(ACCEPTANCES).split("\n").filter((x) => x.trim()).map((x) => JSON.parse(x) as Acceptance);
+}
+
+/** Adam's standing acceptance of exactly this batch, revision and FULL
+ *  commit — or why there is none. A later rejection of the same batch and
+ *  revision cancels it. Shared by the release gate, the publisher and the
+ *  release bookkeeping, so they cannot disagree. */
+export function standingAcceptance(commitFull: string, batch?: string, revision?: number): { acc: Acceptance | null; why: string } {
+  const all = acceptances();
+  const mine = all.filter((a) => a.kind === "accept" && a.commit === commitFull && (batch === undefined || a.batch.toLowerCase() === batch.toLowerCase()) && (revision === undefined || a.revision === revision)).pop();
+  if (!mine) return { acc: null, why: `no acceptance from Adam names commit ${commitFull.slice(0, 7)}` };
+  const later = all.slice(all.indexOf(mine) + 1).find((a) => a.kind === "reject" && a.batch.toLowerCase() === mine.batch.toLowerCase() && (a.revision === null || a.revision === mine.revision));
+  if (later) return { acc: null, why: `batch ${mine.batch} revision ${mine.revision} was rejected by Adam on ${later.at.slice(0, 10)}${later.note ? ` (${later.note.slice(0, 120)})` : ""} after he accepted it — nothing in it is released; issue the next revision` };
+  return { acc: mine, why: "" };
+}
+
+/** The review package for a batch revision at a full commit, if one exists. */
+export function packageDir(batch: string, revision: number, commitFull: string): string | null {
+  if (!existsSync(REVIEWS)) return null;
+  const want = `${batch}-r${revision}-${commitFull}`.toLowerCase();
+  const found = readdirSync(REVIEWS).find((d) => d.toLowerCase() === want);
+  return found && existsSync(join(REVIEWS, found, "package.json")) ? join(REVIEWS, found) : null;
 }
 
 export { partOf, existsSync, join };

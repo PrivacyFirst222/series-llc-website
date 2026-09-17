@@ -1,7 +1,7 @@
 {
   "id": "0",
-  "revision": 1,
-  "title": "The fix ledger itself: the record, the guard, the release gate, the isolated review site, and their demonstrations. No product page, email, agreement or price changes.",
+  "revision": 2,
+  "title": "The fix ledger itself, revision 2: revision 1 was rejected on Codex's review (19 findings); all 19 corrected. The record, the guard, the release gate, the isolated review site, and their demonstrations. No customer-facing page, email, agreement or price changes.",
   "model": "claude-fable-5-1",
   "base": "82abf541a6643981d93d41bc5d8b6da169897971",
   "items": [],
@@ -21,7 +21,8 @@
     {
       "path": "docs/audit/verdicts.json",
       "mode": "new",
-      "why": "Claude's check of Codex's 63 disputes and 11 duplicates, read by the builder"
+      "why": "Claude's check of Codex's 63 disputes and 11 duplicates, read by the builder",
+      "control": true
     },
     {
       "path": "docs/audit/ledger.json",
@@ -145,13 +146,13 @@
       "path": "webapp/server/e2e.ts",
       "mode": "code",
       "control": true,
-      "why": "the server checks write their results by label (3 lines); no check changed"
+      "why": "the server checks write their results by suite, label, detail and commit; no check changed"
     },
     {
       "path": "webapp/scripts/behavioral.ts",
       "mode": "code",
       "control": true,
-      "why": "the browser walk writes its results by label (3 lines); no check changed"
+      "why": "the browser walk writes its results the same way and stops requests to other machines; no check changed"
     },
     {
       "path": "webapp/scripts/isolated-stack.ts",

@@ -31,7 +31,7 @@ function check(label: string, ok: boolean, detail?: unknown) {
   if (!ok) failures++;
   // The fix ledger reads results by label (docs/audit): a recorded fix names
   // the check that proves it, and a label missing from this file is a failure.
-  if (process.env.CHECK_RESULTS_FILE) appendFileSync(process.env.CHECK_RESULTS_FILE, JSON.stringify({ label, ok }) + "\n");
+  if (process.env.CHECK_RESULTS_FILE) appendFileSync(process.env.CHECK_RESULTS_FILE, JSON.stringify({ suite: "server", label, ok: ok === true, detail: ok ? undefined : detail, run: process.env.CHECK_RUN_ID ?? null, commit: process.env.CHECK_COMMIT ?? null }) + "\n");
 }
 
 const testEmail = `e2e-client-${Math.random().toString(36).slice(2, 8)}@example.com`;

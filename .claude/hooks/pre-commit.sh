@@ -79,3 +79,12 @@ if [ -n "$SERVER_CHANGED" ]; then
   git add "$ROOT/webapp/api/index.mjs"
   echo "pre-commit: webapp/api/index.mjs staged"
 fi
+
+# The guard once more, on the FINAL index: the Word documents and the API
+# bundle were staged above, after the first run, and nothing staged late may
+# go unguarded (17 Sep 2026; Codex's review of the fix ledger, finding 14).
+if ! (cd "$ROOT" && bun run docs/audit/guard.ts --staged >/dev/null); then
+  (cd "$ROOT" && bun run docs/audit/guard.ts --staged) >&2 || true
+  echo "pre-commit: THE FIX LEDGER'S GUARD REFUSED the final index (files staged by this hook included) — commit refused." >&2
+  exit 1
+fi

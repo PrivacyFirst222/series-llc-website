@@ -118,7 +118,7 @@ let checks = 0;
 function expect(cond: unknown, what: string, got?: unknown): void {
   checks++;
   // Results by label, for the fix ledger (docs/audit): see server/e2e.ts.
-  if (process.env.CHECK_RESULTS_FILE) appendFileSync(process.env.CHECK_RESULTS_FILE, JSON.stringify({ label: what, ok: !!cond }) + "\n");
+  if (process.env.CHECK_RESULTS_FILE) appendFileSync(process.env.CHECK_RESULTS_FILE, JSON.stringify({ suite: "walk", label: what, ok: !!cond, detail: cond ? undefined : got, run: process.env.CHECK_RUN_ID ?? null, commit: process.env.CHECK_COMMIT ?? null }) + "\n");
   if (!cond) {
     failures.push(`${what}${got !== undefined ? ` — got ${JSON.stringify(got)?.slice(0, 200)}` : ""}`);
     console.log(`  ❌ ${what}`);
@@ -797,6 +797,16 @@ async function main(): Promise<void> {
   });
 
   const browser = await chromium.launch();
+  // The walk is offline in the browser too, not only on the server: every
+  // request that is not to this machine is stopped and counted (the address
+  // lookup and web fonts are the known ones). Codex's review of the fix ledger.
+  const blockedRequests = new Set<string>();
+  const openPage = browser.newPage.bind(browser);
+  browser.newPage = async (...a: Parameters<typeof openPage>) => {
+    const p = await openPage(...a);
+    await p.route(/^https?:\/\/(?!localhost[:/]|127\.0\.0\.1[:/])/, (route) => { blockedRequests.add(new URL(route.request().url()).host); return route.abort(); });
+    return p;
+  };
   const adminLogin = await fetch(`${API}/api/admin/login`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: "dev-admin" }) });
   const adminCookie = (adminLogin.headers.get("set-cookie") ?? "").split(";")[0];
 
@@ -2700,6 +2710,7 @@ async function main(): Promise<void> {
   api.kill();
   rmSync(freshDir, { recursive: true, force: true });
 
+  console.log(`\nRequests to other machines stopped in the browser: ${blockedRequests.size === 0 ? "none attempted" : [...blockedRequests].join(", ")}`);
   console.log(`\nBehavioral gate: ${checks} checks, ${failures.length} failures.`);
   if (failures.length > 0) {
     console.log(failures.map((f) => ` - ${f}`).join("\n"));

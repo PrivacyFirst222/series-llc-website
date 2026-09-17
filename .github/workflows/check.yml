@@ -46,11 +46,10 @@ jobs:
           CHECK_RESULTS_FILE: /tmp/server-results.jsonl
         run: bun run check
 
-      # The fix ledger's guard (docs/audit): every accepted fix replayed, the
-      # ledger's history append-only, a batch inside its declared scope. The
-      # push hook refuses an unaccepted release on Adam's Mac; this runs on
-      # every push so that a push made around that hook shows up red here.
-      # Detection, not prevention.
+      # The fix ledger's guard (docs/audit): every accepted fix replayed against
+      # the files, the ledger's history append-only, a batch inside its declared
+      # scope. It does NOT check Adam's acceptance of a release — nothing on
+      # GitHub does; that is the push hook on his Mac, and it is procedural.
       - name: The fix ledger's guard
         run: bun run docs/audit/guard.ts
 
