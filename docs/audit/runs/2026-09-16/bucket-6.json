@@ -1,0 +1,252 @@
+{
+  "bucket": "bucket-6",
+  "reader": "Claude (Fable 5.1), 16 Sep 2026",
+  "scope": "the server: payments and orders, the client portal routes, the intake rules, Square, storage, the Sunbiz name check, the office copy sheet",
+  "files": [
+    { "path": "webapp/server/routes-payments.ts", "lines": 713 },
+    { "path": "webapp/server/routes-portal.ts", "lines": 2608 },
+    { "path": "webapp/server/shared.ts", "lines": 48 },
+    { "path": "webapp/server/square.ts", "lines": 230 },
+    { "path": "webapp/server/storage.ts", "lines": 69 },
+    { "path": "webapp/server/sunbiz.ts", "lines": 341 },
+    { "path": "webapp/server/validation.ts", "lines": 374 },
+    { "path": "webapp/server/vercel-entry.ts", "lines": 56 },
+    { "path": "webapp/vercel.json", "lines": 38 },
+    { "path": "webapp/server/filing.ts", "lines": 595 }
+  ],
+  "alsoRead": [
+    "docs/audit/prompt.md (78 of 78), docs/audit/rulings.md (24 of 24), docs/audit/findings-2026-09-16.md (123 of 123), docs/facts.md (172 of 172)",
+    "For the comparisons the prompt asks for (other buckets, read whole): webapp/src/components/forms/florida-llc/stepValidation.ts (414), schema.ts (237), validation.ts (278), buildPayload.ts (182), steps.ts (119), raService.ts (69), types.ts (377); webapp/server/new-series.ts (135), pricing.ts (114); webapp/src/pages/OrderConfirmed.tsx (165)",
+    "Read in part, to find the line that receives each refusal: FloridaLLCFormationForm.tsx 425-534 of 795; OrdersInProgress.tsx 140-399 of 723; PortalDashboard.tsx 484-500 and 740-772 of 782; OAQuestionnaire.tsx 150-175 and 283-292 of 873; PortalLogin.tsx 15-35 of 77; PortalForgot.tsx 14-30 of 77; PortalSetPassword.tsx 26-45 of 95; PortalVerifyEmail.tsx 22-45 of 86; Contact.tsx 48-80 of 150; oa.ts 520-540; plus targeted searches of ServicesCard.tsx, SElectionDetailsForm.tsx, AccountCard.tsx, AmendAgreement.tsx, StepClient.tsx, StepCertification.tsx, StepManagers.tsx, StepManagement.tsx, StepFilingPath.tsx, AddressFields.tsx, RepeatablePartyFields.tsx, RepeatableMemberFields.tsx, NameCheck.tsx, StepName.tsx, ServiceFeeEstimate.tsx, defaults.ts, oa-capital.ts, api.ts",
+    "Statutes opened in the browser (Online Sunshine, 2026 Florida Statutes), each read whole: s. 605.2202; s. 605.0715; s. 605.0407; s. 605.0112; s. 605.0707"
+  ],
+  "priorFindings": [
+    { "id": "A7", "status": "not in my bucket", "evidence": "steps.ts is not in this bucket. For the record: steps.ts:58-111 FIELD_STEP has no raRenewalCardConsent entry and steps.ts:117-118 sends any field not starting with 'registeredAgent' to 'certify'; the refusal that lands there is in this bucket, validation.ts:220-221 `path: [\"raRenewalCardConsent\"], message: \"Please agree to keep a card on file for the yearly renewal.\"`." },
+    { "id": "A9", "status": "still open", "evidence": "validation.ts:331-332 still reads `\"A manager-managed LLC needs at least one Manager. An authorized representative signs the Articles and manages nothing.\"`; the managers step has no AR role (StepManagers.tsx:23 `const role = \"MGR\"`), and StepManagers.tsx:126 still says \"At least one manager is required because you elected to include a manager-managed statement in the Articles.\"" },
+    { "id": "A11", "status": "still open", "evidence": "filing.ts:246-302 conversionGroups() has groups only for Filing information, Designations, Correspondence and (when SERVICE) Change of registered agent — no principal or mailing row; the form hides only the acceptance, purpose and effective-date steps on a conversion (FloridaLLCFormationForm.tsx:298-304). Ruling still needed." },
+    { "id": "A13", "status": "still open", "evidence": "filing.ts:141-142 still carries `MEMBER_MANAGED: \"Pursuant to Florida Statutes Section 605.0407, the company is or will be member-managed.\"`; it is reachable only if includeManagementStatementInArticles is true for a member-managed order, and StepManagement.tsx:75 sets `includeManagementStatementInArticles: o.v === \"MANAGER_MANAGED\"` while validation.ts:357-360 forces it true for manager-managed only. Ruling still needed." },
+    { "id": "A14", "status": "still open", "evidence": "Narrowed, not fixed. stepValidation.ts:159 and :173 now say `\"Country required.\"` for the principal and mailing steps; the client step (stepValidation.ts:51-56), managers (270-283), members (293-304) and correspondence address (351-357) still have no country rule, while the server requires it: schema.ts:13 addressSchema `country: z.string().min(1, \"Country is required\")` (used by clientAddress at :197 and correspondentAddress at :210), :37 for managers, :69 for members. Every country box starts as \"United States\" (defaults.ts:11,25,42; RepeatablePartyFields.tsx:33; RepeatableMemberFields.tsx:31; StepCorrespondence.tsx:21) so it bites only when a client clears it — and then no box shows it: StepClient.tsx:106 passes only address1/city/state/zip errors to the address block, and RepeatablePartyFields/RepeatableMemberFields never call rowError(idx, \"country\")." },
+    { "id": "A15", "status": "still open", "evidence": "schema.ts:12 `zip: z.string().min(3, \"ZIP / postal code is required\")`, :36 and :68 `zip: z.string().min(3, \"ZIP is required\")`, :146 `registeredAgentZip: z.string().min(3, \"ZIP required\")` — three wordings for one rule, none saying a full ZIP is wanted; the steps accept any non-empty ZIP (stepValidation.ts:54, 158, 172, 218, 282, 303, 356)." },
+    { "id": "A16", "status": "still open", "evidence": "schema.ts:39 `email: z.string().email(\"Enter a valid email\").optional().or(z.literal(\"\"))` refuses a malformed manager email at path managers.N.email; RepeatablePartyFields.tsx:182-188 has the \"Email (optional)\" box and its rowError() is never called for \"email\" (only address1/businessEntityName/city/entityName/firstName/lastName/state/streetAddress1/zip), so the refusal lands on the managers step with nothing under the box. schema.ts:220 `authorizedRepresentativeEmail: z.string().email().optional().or(z.literal(\"\"))` refuses with Zod's default text; StepCertification.tsx:328-341 has the email and phone boxes and renders no error for either key. buildPayload.ts:137-151 still stores neither." },
+    { "id": "A17", "status": "still open", "evidence": "Narrowed, not fixed. routes-payments.ts:317 now skips the availability check on a conversion (`data.filingPath === \"CONVERT\" ? null : await unavailableNames(`). But validation.ts:197-209 (the duplicate-alternate check) still runs with no filingPath gate on the raw form data, which on a conversion still carries whatever was typed on the abandoned new-formation path (the form never clears desiredLlcName on a path switch — StepFilingPath.tsx:68 only patches filingPath; buildPayload.ts:26-29 strips it from the stored payload only)." },
+    { "id": "A20", "status": "not in my bucket", "evidence": "The rule lives in webapp/src/components/forms/florida-llc/validation.ts:123-145 (`anticipatedFilingDate: Date = new Date()`, \"Effective date cannot be more than 5 business days before the filing date.\"); the server in this bucket calls it with that default at validation.ts:160 `validateEffectiveDate(data.requestedEffectiveDate ?? \"\")`." },
+    { "id": "A21", "status": "still open", "evidence": "validation.ts:260-262 only requires the agent's signature to be non-empty: `if (!(data.registeredAgentElectronicSignature ?? \"\").trim()) { ... message: \"Electronic signature required\" }` — no comparison with registeredAgentAcceptanceName, unlike the Articles rule at validation.ts:294-301. stepValidation.ts:240-241 is the same." },
+    { "id": "A25", "status": "still open", "evidence": "Partly fixed: routes-payments.ts:425-432 now returns `hasPassword` and OrderConfirmed.tsx:110-126 shows the sign-in card only for a returning client. Still open: routes-payments.ts:603 `if (orders.length === 0 || orders[0].status !== \"paid\" || !orders[0].client_id) { return c.json({ data: { ok: true, sent: false } }); }` — a filed or formed order with no password yet gets sent:false, and OrderConfirmed.tsx:27 then prints \"Your account already has a password — sign in below.\"" },
+    { "id": "A27", "status": "not in my bucket", "evidence": "Neither file is in this bucket. For the record: ServiceFeeEstimate.tsx:34 always labels the row \"Formation service (includes up to 3 series)\" (isConversion is read at :51 only for the S election row), while pricing.ts:58 charges `opts.isConversion ? \"Protected series service fee\" : \"Formation service fee\"`." },
+    { "id": "A30h", "status": "still open", "evidence": "In this bucket: filing.ts:320-328 still holds the dead conversion branch (`value: p.filingPath === \"CONVERT\" ? \"Conversion of an existing entity\" : \"New Florida LLC\"` and the existingName/sunbizDoc rows) after filing.ts:306 `if (p.filingPath === \"CONVERT\") return conversionGroups(p);`; routes-payments.ts:308-310 still holds the dead member check (`At least one member is required.`) that validation.ts:128-134 refuses first with different words; docs/facts.md (172 lines, read whole) still has no entry for the $99 renewal, the 45/15-day rules or the four optional prices. Not in my bucket: the review rows, the exact-name-only review row, schema.ts:70-71 ownershipPercentage/capitalContribution typed and never asked." },
+    { "id": "A47", "status": "still open", "evidence": "routes-portal.ts:1108, 1164, 1199, 1587, 1750, 1916, 1969, 2035, 2092 all answer `err(\"No formed LLC found on your account.\", \"NO_LLC\")` while the lookups behind them ask only `paid_at IS NOT NULL` (oaSeed at :75-85, clientLlcName at :363-368, resolveCompanyOrder at :379-384); the screens say \"We couldn't find a formed LLC on your account yet.\" (OAQuestionnaire.tsx:287, AmendAgreement.tsx:94)." },
+    { "id": "A48", "status": "still open", "evidence": "routes-portal.ts:1561 `contribution: z.string().max(300).optional().default(\"\")` passes the blank through; new-series.ts:112-114 prints it as a dash (`.join((input.contribution ?? \"\").trim() || \"—\")` under a comment claiming \"as the agreement's own Series Exhibit does\"), while the agreement's exhibit prints \"None\" (routes-portal.ts:1457 `contribution: capital.seriesCells[i] ?? \"None\"`, oa-capital.ts:124); the dialog help still reads \"Leave blank to point at the Asset Schedule.\" (OrdersInProgress.tsx:373)." },
+    { "id": "A52", "status": "not in my bucket", "evidence": "new-series.ts:134 still titles the document `New Protected Series — ${input.seriesName}`; the dialog title is \"Consent & Series Exhibit\" (OrdersInProgress.tsx:309) and the button \"Prepare the documents\" (:388)." },
+    { "id": "A53", "status": "still open", "evidence": "The server half is in this bucket: routes-portal.ts:2277 `\"The two-week window for changing this package has closed, and the details have been deleted. Contact us if you need a new one.\"` — the purge at routes-portal.ts:548-630 destroys the Social Security numbers and replaces the package with a record copy, and keeps the details. The screens: PortalDashboard.tsx:528 \"after that we delete the package\" beside :534 \"replaced the package with this record copy\"; OrdersInProgress.tsx:277-279 \"both they and the completed package are deleted from our systems two weeks after you build it\"." },
+    { "id": "A54", "status": "not in my bucket", "evidence": "OrdersInProgress.tsx:412 still reads \"has been assigned an EIN.\"; the S election details schema in this bucket accepts Applied For (routes-portal.ts:730 einPending, :793-795)." },
+    { "id": "A60", "status": "still open", "evidence": "OrdersInProgress.tsx:354, OAQuestionnaire.tsx:57 and AmendAgreement.tsx:26 still default the date from `new Date().toISOString().slice(0, 10)` (the device's UTC day). Server half in this bucket: /portal/services returns `todayEastern: easternDateIso()` (routes-portal.ts:1892) but /portal/oa (routes-portal.ts:1135-1146) returns no Florida date for the questionnaire or the amendment form to use." },
+    { "id": "A61", "status": "not in my bucket", "evidence": "OrdersInProgress.tsx:344 still defaults the identifier with `.replace(/.*\\bP\\.?S\\.?\\s*/i, \"\")`, which leaves \"Acme, LLC - Protected Series 4\" whole; the route in this bucket accepts any 1-40 character identifier (routes-portal.ts:1557)." },
+    { "id": "A64", "status": "still open", "evidence": "routes-portal.ts:1977 `'The series name must include \"PS\", \"P.S.\", or \"protected series\" (§605.2202).'` beside routes-portal.ts:1593 and :1599 `(s. 605.2202, Fla. Stat.)`; validation.ts:178 also uses `(§605.2202)`, as do stepValidation.ts:189 and StepSeries.tsx:72." },
+    { "id": "A66h", "status": "still open", "evidence": "routes-portal.ts:183 contributionToCompany, :195 members[].contribution, :214 series[].contribution and :248 couples[].contribution are accepted and saved; on generation the member and couple values are overwritten at :1453 (`m.contribution = capital.memberContributions[i] ?? \"$0\"`), the series value is replaced at :1457 (`capital.seriesCells[i] ?? \"None\"`) and contributionToCompany at :1479 (`capital.memberContributions[0] ?? \"$0\"`). /auth/me (routes-portal.ts:950-955) returns raCancellationRequestedAt and raRenewalDate; PortalDashboard.tsx:44-46 types them and reads them nowhere — the agent card takes them from /portal/companies (:306-307, :334-335). The 03/21/2027 print is not in my bucket." }
+  ],
+  "findings": [
+    {
+      "where": "Client portal, the operating agreement, consent and S election for a converted company — the company name the seed prefers",
+      "file": "webapp/server/routes-portal.ts",
+      "line": 162,
+      "reads": "llcName: p.llcName?.finalName || orders[0].llc_name,",
+      "claims": "The stored payload's finalName is the company's name, and the order's llc_name is only a fallback.",
+      "truth": "On a conversion buildPayload.ts:16-19 and :28-29 still fill finalName from desiredLlcName and llcDesignator — whatever the client typed on the new-formation path before switching (the form never clears it: StepFilingPath.tsx:68 patches filingPath only) — while the order itself is named from existingLlcName (routes-payments.ts:363-365). A client who typed \"Acme\" + LLC, then chose the conversion path for \"Sunshine Holdings, LLC\", gets an operating agreement, consent and Exhibit headed \"Acme, LLC\" (OaInputs.companyName at :1463 comes from seed.llcName), and the consent route refuses their real series name because it \"must begin with \\\"Acme, LLC\\\"\" (:1591-1595).",
+      "replacement": "llcName: (p.filingPath === \"CONVERT\" ? \"\" : p.llcName?.finalName) || orders[0].llc_name,  — and, in buildPayload.ts:28-29, finalName: \"\" on the conversion branch.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Client portal, Amended and Restated agreement — Recital D names the agreement it supersedes",
+      "file": "webapp/server/routes-portal.ts",
+      "line": 1258,
+      "reads": "const priorGens = await db.query<{ created_at: unknown }>(\n    \"SELECT created_at FROM oa_generations WHERE client_id = $1 ORDER BY created_at DESC LIMIT 1\",\n    [session.clientId],\n  );\n  // Drivers differ: Neon returns ISO strings, PGlite returns Date objects.\n  const priorDate =\n    priorGens.length > 0\n      ? new Date(String(priorGens[0].created_at)).toLocaleDateString(\"en-US\", {\n          year: \"numeric\",\n          month: \"long\",\n          day: \"numeric\",\n        })\n      : null;",
+      "claims": "The prior agreement's date is the day the client's newest generation was created.",
+      "truth": "oa.ts:528-529 prints it as \"the Operating Agreement of the Company dated <priorDate>\". Three things are wrong with the value: (1) it is taken across every company on the account (no order_id filter, unlike the count at :1251-1253), so a second company's Amended and Restated agreement recites the first company's date; (2) it is the generation timestamp, not the agreement's Effective Date the client chose (:1467 `effectiveDate: fmtDate(a.effectiveDate)`, stored in inputs), so an agreement generated on 1 September with an effective date of 1 August is superseded \"dated September 1, 2026\"; (3) toLocaleDateString runs in the server's zone (UTC on Vercel), so a 9 pm Eastern generation is dated the next day. The amendment route already asks the client for the agreement's date (:1730, :1780).",
+      "replacement": "const priorGens = await db.query<{ effective_date: string | null }>(\"SELECT inputs->>'effectiveDate' AS effective_date FROM oa_generations WHERE client_id = $1 AND (order_id = $2 OR order_id IS NULL) ORDER BY created_at DESC LIMIT 1\", [session.clientId, seed.orderId]); const priorDate = priorGens[0]?.effective_date ?? null;",
+      "severity": "substantive"
+    },
+    {
+      "where": "Client portal, Services card — the S election, certificate and EIN refusals point the reader \"below\"",
+      "file": "webapp/server/routes-portal.ts",
+      "line": 1921,
+      "reads": "\"You already have an S election order — see your orders below.\"",
+      "claims": "The client's orders are listed beneath the Services card.",
+      "truth": "The refusal is rendered inside the Services card (ServicesCard.tsx:252, 363, 416, 505), and the dashboard places Orders in progress above that card: PortalDashboard.tsx:747 `<OrdersInProgress …/>`, then :761 `<ServicesCard …/>`. The same wrong direction is at routes-portal.ts:2049 (\"is already on order — see your orders below.\"), :2119-2120 and :2134 (\"already ordered — see your orders below.\").",
+      "replacement": "\"You already have an S election order — see Orders in progress above.\" (and \"— see Orders in progress above.\" at 2049, 2119, 2120, 2134)",
+      "severity": "wording"
+    },
+    {
+      "where": "Client portal, registered agent card — the refusal when a company did not take our service",
+      "file": "webapp/server/routes-portal.ts",
+      "line": 2584,
+      "reads": "return c.json(err(`${order.llc_name} is its own registered agent; there is nothing to cancel.`, \"NOT_OUR_SERVICE\"), 400);",
+      "claims": "A company that did not take our service is its own registered agent.",
+      "truth": "The only other choice is SELF (validation.ts:15), under which the client names an individual — first and last name (validation.ts:223-232) — who accepts personally; the company is never its own agent. The sentence reaches the screen through PortalDashboard.tsx:426.",
+      "replacement": "return c.json(err(`${order.llc_name} did not take our registered agent service; there is nothing to cancel.`, \"NOT_OUR_SERVICE\"), 400);",
+      "severity": "wording"
+    },
+    {
+      "where": "Client portal, Services card — buying another series, the one refusal for every shape problem",
+      "file": "webapp/server/routes-portal.ts",
+      "line": 1966,
+      "reads": "if (!body.success) return c.json(err(\"A series identifier is required.\", \"INVALID_INPUT\"), 400);",
+      "claims": "The identifier was left blank.",
+      "truth": "The schema at :1963-1965 also refuses an identifier over 60 characters and a purpose over 300 (`suffix: z.string().min(1).max(60), purpose: z.string().max(300).optional()`); both answer \"A series identifier is required.\" The consent route was given per-box refusals for exactly this on 15 Sep 2026 (:1569-1582).",
+      "replacement": "const first = body.error.issues[0]; const field = String(first?.path?.[0] ?? \"\"); const msg = field === \"suffix\" ? (first?.code === \"too_big\" ? \"The series identifier can be at most 60 characters.\" : \"Enter a series identifier.\") : field === \"purpose\" ? \"The purpose can be at most 300 characters.\" : \"A series identifier is required.\"; return c.json(err(msg, \"INVALID_INPUT\"), 400);",
+      "severity": "wording"
+    },
+    {
+      "where": "Client portal sign-in — the refusal for a malformed email",
+      "file": "webapp/server/routes-portal.ts",
+      "line": 919,
+      "reads": "if (!body.success) return c.json(err(\"Email and password are required.\", \"INVALID_INPUT\"), 400);",
+      "claims": "A box was left empty.",
+      "truth": "loginSchema at :37 is `z.object({ email: z.string().email(), password: z.string().min(1) })`, so a typed but malformed address (\"adam@\") is answered \"required\". The sign-in page maps any 4xx other than 429 to \"Incorrect email or password.\" (PortalLogin.tsx:26), so this text reaches no reader today; it is wrong for the day the page starts showing it.",
+      "replacement": "if (!body.success) return c.json(err(\"Enter your email address and password.\", \"INVALID_INPUT\"), 400);",
+      "severity": "wording"
+    },
+    {
+      "where": "Client portal, Services card — the S election package refused for a conversion or an unpaid company",
+      "file": "webapp/server/routes-portal.ts",
+      "line": 1924,
+      "reads": ": \"The S election package is available only for new LLCs we formed.\";",
+      "claims": "The company must already be formed by us.",
+      "truth": "sElectionEligibility (:478-489) asks for a paid order with package = 'NEW' — formed or not; the package is sold from the day the formation is paid (:490-491). The formed gate is applied later, on the details (:2269-2271).",
+      "replacement": ": \"The S election package is available only for new LLCs formed through us.\";",
+      "severity": "wording"
+    },
+    {
+      "where": "Client portal, S election details — the refusal after the two-week window",
+      "file": "webapp/server/routes-portal.ts",
+      "line": 2277,
+      "reads": "\"The two-week window for changing this package has closed, and the details have been deleted. Contact us if you need a new one.\",",
+      "claims": "The details are gone.",
+      "truth": "purgeExpiredSElections (:548-630) deletes the encrypted Social Security numbers (:623 `ein_secret = NULL`) and rebuilds the package as a record copy showing last-four digits (:581-586); the details themselves are kept (:566 `const kept = { ...d, purgedAt }`). This is the server half of A53; the text is shown by SElectionDetailsForm.tsx:677.",
+      "replacement": "\"The two-week window for changing this package has closed: the Social Security numbers have been destroyed and the package replaced with a record copy. Contact us if you need a new one.\",",
+      "severity": "wording"
+    },
+    {
+      "where": "Client portal, Your documents — deleting one of your agreements when the server refuses",
+      "file": "webapp/server/routes-portal.ts",
+      "line": 1704,
+      "reads": "return c.json(err(\"Not found\", \"NOT_FOUND\"), 404);",
+      "claims": "The client is told the agreement could not be found.",
+      "truth": "The screen has no line for it: PortalDashboard.tsx:488-494 `deleteGeneration = useMutation({ mutationFn: (id) => api.delete(`/api/portal/oa/generations/${id}`), onSuccess: … })` has no onError, and nothing renders deleteGeneration.isError — a refused delete (or a lost connection) leaves the row in place with no message.",
+      "replacement": "In PortalDashboard.tsx add `onError: (e) => setDeleteError(e instanceof ApiError ? e.message : \"We could not delete that agreement. Try again.\")` and render it under the agreements list; and make the refusal say what it means: err(\"That agreement is no longer on your account.\", \"NOT_FOUND\").",
+      "severity": "wording"
+    },
+    {
+      "where": "Client portal, operating agreement questionnaire — the seed carries no Florida date for the effective-date box",
+      "file": "webapp/server/routes-portal.ts",
+      "line": 1135,
+      "reads": "return c.json({\n    data: {\n      seed,\n      version,\n      multiOwner,\n      memberManaged,\n      blocked: false,\n      templateVersion: OA_TEMPLATE_VERSION,\n      answers: savedAnswers,\n      generations,\n    },\n  });",
+      "claims": "Everything the questionnaire needs to open is here.",
+      "truth": "The questionnaire and the amendment form default their dates from the device's UTC day (OAQuestionnaire.tsx:57, AmendAgreement.tsx:26 `new Date().toISOString().slice(0, 10)`) — A60 — because this response gives them nothing better, while /portal/services already sends `todayEastern: easternDateIso()` (:1892). Also `blocked: false` is written and read nowhere (OAQuestionnaire.tsx:48 types it only).",
+      "replacement": "Add `todayEastern: easternDateIso(),` to the data object and drop `blocked: false`; then OAQuestionnaire.tsx:57 and AmendAgreement.tsx:26 default from it.",
+      "severity": "substantive"
+    },
+    {
+      "where": "Server, portal routes — stale and misplaced comments",
+      "file": "webapp/server/routes-portal.ts",
+      "line": 287,
+      "reads": "// Who owns the company, as the client last said. … /** A person's printed legal name … */ /** Operating agreements a company may keep in its documents list. */\nexport const OA_KEEP_MAX = 5;",
+      "claims": "Each comment describes the declaration beneath it.",
+      "truth": "Six do not: :287-295 (the owners comment and the personLegalName docstring sit above OA_KEEP_MAX, two declarations early); :327 says isoFromPrinted returns \"\" when the text is not a date, it returns null (:329, :332); :513-516 says the package is destroyed, the purge replaces it with a record copy (:548-553); :638-639 describes \"The client's answer that the LLC already has an EIN\" — no such field exists in einDetailsSchema (:640-699); :701-702 the \"Valid EINs\" docstring sits above companyEinFor, not the prefix list it describes; :800-805 says postSElectionPackage is shared with \"the office entering the date\" and sits above withFormationDefaults, while :2404-2406 records that the office branch can no longer run.",
+      "replacement": "Move each docstring to the declaration it describes; change :327 to \"null when the text is not a date\"; change :513-516 to \"before the Social Security numbers are destroyed and the package replaced with a record copy\"; delete :638-639; delete the office sentence at :803-805.",
+      "severity": "housekeeping"
+    },
+    {
+      "where": "Order form, Submit — the second member check",
+      "file": "webapp/server/routes-payments.ts",
+      "line": 308,
+      "reads": "if (data.managementStructure !== \"MANAGER_MANAGED\" && data.members.length < 1) {\n    return c.json(err(\"At least one member is required.\", \"INVALID_INPUT\"), 400);\n  }",
+      "claims": "An order with no members is refused here.",
+      "truth": "It never gets here: orderFormSchema (validation.ts:128-134) already refuses the same case as an issue on the members path with \"At least one initial member is required.\", and :290-296 returns before this line. Two wordings, one dead. (A30h.)",
+      "replacement": "Delete lines 305-310.",
+      "severity": "housekeeping"
+    },
+    {
+      "where": "Server, payment routes — the name-check docstring sits over the contact form",
+      "file": "webapp/server/routes-payments.ts",
+      "line": 627,
+      "reads": "/** Name-availability check against our mirror of the Division of\n *  Corporations' public data files (server/sunbiz.ts). Public: the intake\n *  name step calls it before an order exists. Verdicts say \"no conflict\n *  found\", never \"available\" — the Division makes the final determination. */\n// The public contact form.",
+      "claims": "The route beneath is the name check.",
+      "truth": "The route beneath (:635-665) is /contact; /name-check is at :688.",
+      "replacement": "Move the four-line docstring to sit above `app.post(\"/name-check\", …)` at line 688.",
+      "severity": "housekeeping"
+    },
+    {
+      "where": "Order form, LLC name step and Submit — why a name is unavailable when the record is inactive",
+      "file": "webapp/server/routes-payments.ts",
+      "line": 327,
+      "reads": "`The name \"${p.name}\" is unavailable — ${\n          p.verdict === \"taken\"\n            ? \"an existing Florida company already has it\"\n            : \"it belongs to a recently dissolved company, and Florida protects it for up to a year\"\n        }. Please choose a different name.`,",
+      "claims": "Every inactive record within the hold is a dissolved company, and Florida protects its name for up to a year.",
+      "truth": "The mirror knows only status 'A' or 'I' (sunbiz.ts:62-63) and applies the hold to every inactive record (sunbiz.ts:165, :236-237) — a company that merged, converted or withdrew is 'I' too. s. 605.0715(5), read whole in the browser: \"The name of the dissolved limited liability company is not available for assumption or use by another business entity until 1 year after the effective date of dissolution\" — a subsection of the reinstatement section, which begins \"A limited liability company that is administratively dissolved\". The over-blocking is Adam's rule (sunbiz.ts:322-324) and stays; the sentence should not assert a fact the data does not hold. The same words are at NameCheck.tsx:45, and sunbiz.ts:245 cites \"(s. 605.0715, Fla. Stat.)\" for every inactive record.",
+      "replacement": "\"it belongs to a company that recently went inactive in the Division's records, and Florida can protect such a name for up to a year\" (routes-payments.ts:330 and NameCheck.tsx:45); sunbiz.ts:245 `; recently inactive — the name may still be protected (s. 605.0715(5), Fla. Stat., for an administrative dissolution)`.",
+      "severity": "wording"
+    },
+    {
+      "where": "Server, the Sunbiz name check — the statute the hold is attributed to",
+      "file": "webapp/server/sunbiz.ts",
+      "line": 160,
+      "reads": "/** s. 605.0715(5)-(6), Fla. Stat.: after administrative dissolution the\n *  dissolved company's name is unavailable to others until one year has\n *  passed (120 days after a voluntary dissolution). The data file does not\n *  say which kind a dissolution was, so the longer window is applied to\n *  every inactive record — erring toward warning the client. */",
+      "claims": "Subsections (5) and (6) of s. 605.0715 set the one-year and 120-day holds.",
+      "truth": "s. 605.0715, read whole: (5) is the one-year hold; (6) says only that a dissolved company whose name has been lawfully taken must change its name before reinstatement — no hold. Neither s. 605.0715 nor s. 605.0707 (articles of dissolution, read whole) contains a 120-day rule for a voluntary dissolution; I could not find its source in the two sections read.",
+      "replacement": "/** s. 605.0715(5), Fla. Stat.: after administrative dissolution the dissolved company's name is unavailable to others until one year has passed. The data file does not say why a record is inactive, so the one-year window is applied to every inactive record — erring toward warning the client. */  (restore the 120-day sentence only with its section cited)",
+      "severity": "housekeeping"
+    },
+    {
+      "where": "Office, conversion copy sheet — the Filing statement",
+      "file": "webapp/server/filing.ts",
+      "line": 256,
+      "reads": "value: \"Protected Series Designations for an existing Florida LLC — filed online at the Division, $25 each; no Articles; the $125 Articles-and-agent fee is skipped unless the agent changes\",",
+      "claims": "If the agent changes, the $125 fee applies.",
+      "truth": "A change of agent is its own $25 filing — pricing.ts:77-81 charges \"FL state fee — change of registered agent\" at $25 and no Articles fee on a conversion; filing.ts:297 itself titles the group \"Change of registered agent ($25) — Statement of Change\". The ledger's own line (docs/facts.md:40 \"a conversion skips both unless it changes its agent\") carries the same ambiguity.",
+      "replacement": "value: \"Protected Series Designations for an existing Florida LLC — filed online at the Division, $25 each; no Articles and no $125 Articles-and-agent fee; if the client took our agent service, the change of agent is a separate $25 Statement of Change, listed below\",",
+      "severity": "wording"
+    },
+    {
+      "where": "Office, formation copy sheet — the empty Other Provisions box",
+      "file": "webapp/server/filing.ts",
+      "line": 427,
+      "reads": "value: \"Leave blank — the client chose a general purpose and no statement\",",
+      "claims": "The client chose not to include a management statement.",
+      "truth": "The client is never asked: StepManagement.tsx:75 derives `includeManagementStatementInArticles: o.v === \"MANAGER_MANAGED\"` and validation.ts:357-360 forces it for manager-managed orders, so this row appears only for a member-managed company with a general purpose.",
+      "replacement": "value: \"Leave blank — member-managed with a general purpose; nothing goes in this box\",",
+      "severity": "wording"
+    },
+    {
+      "where": "Office, copy sheet module — the dead conversion branch and an orphan docstring",
+      "file": "webapp/server/filing.ts",
+      "line": 320,
+      "reads": "value: p.filingPath === \"CONVERT\" ? \"Conversion of an existing entity\" : \"New Florida LLC\",\n        statement: true,\n      },\n      ...(p.filingPath === \"CONVERT\"\n        ? [\n            { key: \"existingName\", label: \"Existing entity name\", value: p.existingLlcName ?? \"\" },\n            { key: \"sunbizDoc\", label: \"Existing document number\", value: p.sunbizDocumentNumber ?? \"\" },\n          ]\n        : []),",
+      "claims": "The formation sheet can describe a conversion.",
+      "truth": "filing.ts:306 `if (p.filingPath === \"CONVERT\") return conversionGroups(p);` returns before this code for every conversion, so the branch is unreachable (A30h). Also filing.ts:187-188 `/** The registered agent's rows, shared by the Articles sheet and the conversion sheet's change-of-agent filing. */` sits above RA_SERVICE_SIGNER, not raFields (:198).",
+      "replacement": "value: \"New Florida LLC\", statement: true, }, — delete lines 323-328 — and move the docstring at 187-188 to line 197, above `function raFields`.",
+      "severity": "housekeeping"
+    },
+    {
+      "where": "Order form, Series step and the portal's series purchase — one statute cited two ways",
+      "file": "webapp/server/validation.ts",
+      "line": 178,
+      "reads": "message: 'Series names must include \"PS\", \"P.S.\", or \"protected series\" (§605.2202).',",
+      "claims": "The citation form for the statute.",
+      "truth": "The consent route in the same portal writes \"(s. 605.2202, Fla. Stat.)\" (routes-portal.ts:1593, :1599); this file, routes-portal.ts:1977, stepValidation.ts:189 and StepSeries.tsx:72 write \"§605.2202\". The statute itself (s. 605.2202(2)(b), read whole in the browser) requires the phrase \"protected series\" or the abbreviation \"P.S.\" or \"PS\" — the rule is right, the citation form is the A64 defect in one more file.",
+      "replacement": "message: 'Series names must include \"PS\", \"P.S.\", or \"protected series\" (s. 605.2202, Fla. Stat.).',  — and the same form at routes-portal.ts:1977, stepValidation.ts:189, StepSeries.tsx:72.",
+      "severity": "wording"
+    }
+  ],
+  "noFindings": [
+    "webapp/server/shared.ts — none.",
+    "webapp/server/square.ts — none (the checkout description, the card-on-file steps and the signature check match the routes that call them; square.ts:223 accepts an unsigned webhook only outside production).",
+    "webapp/server/storage.ts — none.",
+    "webapp/server/vercel-entry.ts — none.",
+    "webapp/vercel.json — none (six crons; the ra-renewals run at 09:00 UTC is 5 am Eastern)."
+  ],
+  "comparisons": {
+    "validationVsStep": "Compared every rule in server/validation.ts (374 lines) and the base schema it extends (schema.ts, 237 lines) with every rule in stepValidation.ts (414 lines), step by step. They agree on: path, eligibility, client names and emails, the conversion's name and number, the designator and its formation-type rule, the alternate-or-exact rule, the three name acknowledgments, principal and mailing addresses (including the P.O. box rule), series (count, ownership tick, phrase, dedupe), agent choice, the card consent, the self-agent's name/street/city/FL/ZIP/P.O. box/two ticks, the acceptance block (name with first and last, signature, two ticks; gated the same way on a conversion), management structure, at least one Manager, member rows, purpose and professional purpose, effective date, correspondence names and emails, the S election tick, the two signing paths (appointment, or name + exact-match signature + tick), the member acknowledgment and the five certify ticks. They differ in: country (A14), ZIP length and wording (A15), manager and authorized-representative email format (A16), the duplicate-alternate check running on a conversion (A17), no match-the-name rule for the agent's signature (A21), and the Manager message wording (A9). The server also caps lengths the steps do not (names 300, document number 50, series id 64) — harmless.",
+    "filingVsForm": "Compared every field buildPayload.ts (182 lines) writes with every row filingGroups/conversionGroups produce. Every Sunbiz-bound answer has a row: filing path, name and alternates and the exact-name-only flag, principal and mailing addresses, the agent (person or entity, address, signature — Caitlin Kirwan for our service), the management statement and specific/professional purpose in Other Provisions, correspondence name and email, the Articles signer and signature, managers (MGR rows; AR rows flagged do-not-list) and member-managed AMBRs, certificate and certified copy, effective date, the series; on a conversion the existing name and document number, the series, correspondence, and the change of agent when our service was taken. Answers with no row: principal and mailing on a conversion (A11), correspondence company and phone and the paper-mail address that nothing mails (A19, not mine), manager and member email/phone and the members' ownership/contribution numbers (A16, A30h), client phone (not a Sunbiz field), and the formation type (PLLC), which reaches Sunbiz only through the designator in the name and the professional purpose row."
+  },
+  "refusalLines": "Every refusal message in the two route files was traced to the screen that receives it. Order form: Zod issues become field errors on the owning step (FloridaLLCFormationForm.tsx:460-483) and every other refusal (name unavailable, agent address, rate limit, ordering disabled) is a persistent toast with the message (:485-492) — except the issue paths named in A7, A14 and A16, whose steps render no line for them. Order confirmed: resend result shown (OrderConfirmed.tsx:23-28). Contact: toast with the message (Contact.tsx:61-69). Portal: sign-in maps by status (PortalLogin.tsx:23-27); forgot always says sent (PortalForgot.tsx:19-23); set-password and verify-email show the message (PortalSetPassword.tsx:33-36; PortalVerifyEmail.tsx:31-34); questionnaire generate (OAQuestionnaire.tsx:776) and answers save (:769-773); consent dialog (OrdersInProgress.tsx:382); EIN details dialog (:708); S election form (SElectionDetailsForm.tsx:677); services purchases (ServicesCard.tsx:252, 363, 416, 505); account password and email (AccountCard.tsx:145, 187); amendment (AmendAgreement.tsx:227-229); agent cancellation (PortalDashboard.tsx:426). The one refusal with no line is the agreement delete (finding above).",
+  "fraction": "10 of 10 files read whole, 5,072 of 5,072 lines."
+}

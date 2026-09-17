@@ -1,0 +1,425 @@
+{
+  "bucket": "bucket-5",
+  "reader": "Claude (Fable 5.1)",
+  "date": "2026-09-16",
+  "files": [
+    { "path": "webapp/server/backup.ts", "lines": 144 },
+    { "path": "webapp/server/chapter-605-notes.md", "lines": 575 },
+    { "path": "webapp/server/crypto.ts", "lines": 70 },
+    { "path": "webapp/server/datetime.ts", "lines": 57 },
+    { "path": "webapp/server/db.ts", "lines": 549 },
+    { "path": "webapp/server/dev.ts", "lines": 5 },
+    { "path": "webapp/server/dropbox.ts", "lines": 160 },
+    { "path": "webapp/server/email.ts", "lines": 544 },
+    { "path": "webapp/server/env.ts", "lines": 55 },
+    { "path": "webapp/server/md.d.ts", "lines": 4 },
+    { "path": "webapp/server/pricing.ts", "lines": 114 },
+    { "path": "webapp/server/provenance.ts", "lines": 333 },
+    { "path": "webapp/server/renewals.ts", "lines": 310 },
+    { "path": "webapp/server/routes-admin.ts", "lines": 1605 },
+    { "path": "webapp/server/routes-ops.ts", "lines": 329 }
+  ],
+  "sourcesOpened": [
+    "webapp/src/content/terms.md (read in full, 177 lines) — for every email claim about renewal, cancellation, delinquency and proof of a successor",
+    "docs/facts.md (read in full, 172 lines) — prices, titles, column names",
+    "webapp/server/routes-payments.ts lines 60-200 and 590-640; webapp/server/routes-portal.ts lines 870-1000, 2210-2250, 2420-2620; webapp/server/square.ts (grep); webapp/vercel.json; webapp/src/content/privacy.md line 15; portal labels in PortalDashboard.tsx, OrdersInProgress.tsx, PortalLogin.tsx, AccountCard.tsx; StepRegisteredAgent.tsx lines 112-130; s-election.ts lines 10, 216, 238; validation.ts lines 159-196; LibrarySection.tsx line 178; OrderDetail.tsx line 296",
+    "Chapter 605 on Online Sunshine (leg.state.fl.us), the whole chapter loaded in the browser (413,991 characters of page text); every section the notes cite pulled and read in full: 605.0102(7),(23),(37),(45); 605.0103(4); 605.0105; 605.0106(5)-(6); 605.0107(4); 605.0108(1); 605.0110(4); 605.0111(1); 605.01125; 605.0112(1); 605.0113; 605.0117; 605.0201; 605.0203; 605.0205; 605.0207; 605.0209; 605.0210; 605.0211; 605.0212; 605.0213; 605.0301; 605.0302; 605.0403; 605.0404; 605.0405; 605.0406; 605.0407; 605.04072; 605.04073; 605.04074; 605.0408; 605.04091; 605.04092; 605.04093; 605.0410; 605.0411; 605.0502; 605.0503; 605.0601; 605.0602; 605.0701; 605.0702; 605.0706; 605.0709; 605.0710; 605.0711; 605.0712; 605.0714; 605.0715; 605.0717; 605.0801; 605.0802; 605.0804; 605.0902; 605.0904; 605.0905; 605.1006; 605.1061; 605.1101; 605.1103; 605.1108; 605.2102; 605.2103; 605.2104; 605.2105; 605.2107; 605.2108; 605.2201; 605.2202; 605.2203; 605.2206; 605.2301; 605.2302; 605.2303; 605.2304; 605.2401; 605.2402; 605.2403; 605.2404; 605.2501; 605.2503; 605.2602; 605.2603; 605.2604; 605.2605; 605.2606; 605.2607; 605.2608; 605.2802 — 95 sections",
+    "s. 607.193 on Online Sunshine (the whole section) — to resolve the notes' 'unverified' annual report fee"
+  ],
+  "priorFindings": [
+    {
+      "id": "A3",
+      "status": "still open",
+      "evidence": "renewals.ts:148 `const NOTICE_DAYS = 45;`; renewals.ts:199 `today >= addDays(renewalDate, -NOTICE_DAYS)`; the file's own header, renewals.ts:7-8, says 'sent 45 days before the renewal date, so 15 days before the deadline' while quoting 9(d) 'a notice 30 to 60 days before the cancellation deadline' in the line above it. Terms 9(d) (terms.md:48): 'not less than 30 days and not more than 60 days before the cancellation deadline'; 9(g) (terms.md:54) puts the deadline 30 days before the renewal date, so the notice must go 60-90 days before the renewal date. The same 45 is repeated in email.ts:116 ('sent 45 days before the date') and routes-ops.ts:254 ('the notice 45 days out'). Note for Adam: rulings.md line 21 (16 Sep) says 'Terms 9(c)-(e) stand; the code does what they say' — 9(d) is inside that range, so if the ruling was meant to cover the 45 days this item should be dropped; I could not tell, so it is reported."
+    },
+    {
+      "id": "A4",
+      "status": "still open",
+      "evidence": "renewals.ts:238 `const attempt = row.retries + 1;` and :243 `idempotencyKey: \\`ren-${row.id}-${attempt}\\``; on the first decline :260 stores `retryDue ? attempt : row.retries` — retryDue is false on the first charge, so retries stays 0; on the retry day attempt is again 0 + 1 = 1 and the key is again `ren-<id>-1`, the key of the declined payment. The attempt count is not stored on the first decline."
+    },
+    {
+      "id": "A5",
+      "status": "still open",
+      "evidence": "Partly fixed: email.ts:150 now reads 'We received …' when no last4 is passed. But fulfillPaidRenewal sets last4 from the card that paid the link — renewals.ts:301 (`last4 = saved.card.last4`) for a credit or debit card and :305 for a prepaid gift card — and passes it at :308, so a client who paid the link with a card is still told 'We charged $99 to your card ending 1234'; only a wallet payment (no card saved) gets 'We received'."
+    },
+    {
+      "id": "A23",
+      "status": "still open",
+      "evidence": "email.ts:468 'Your Federal EIN and S election package orders are in your portal as well — that's our next step.'; :470 'Your Federal EIN order is in your portal as well — that's our next step.'; :472 the S election line likewise. The EIN order is created 'awaiting_info' (routes-payments.ts:93-97) and waits on the client's details; the new S election paragraph at email.ts:492-495 does say 'sign in, open Orders in progress, and choose Provide details securely' but the EIN line does not."
+    },
+    {
+      "id": "A24",
+      "status": "still open",
+      "evidence": "email.ts:84 'Your client portal is ready — it's where your formation documents will be posted' is unconditional; `isConversion` changes only the 'preparing' paragraph at :72-78. (The 'Your information' header is in the portal, another bucket.)"
+    },
+    {
+      "id": "A67",
+      "status": "still open",
+      "evidence": "A67 is 'See A3, A4, A5' — each still open, evidence above."
+    },
+    {
+      "id": "A68",
+      "status": "still open",
+      "evidence": "The Card column is in AdminDashboard.tsx (not my bucket); the server half is: renewals.ts:83 `if (!tookService(order.payload) || !gaveConsent(order.payload)) return;` writes nothing, so card_status stays NULL and /admin/clients ra_cards (routes-admin.ts:955-962) carries card_status null and card_note null for an order with no permission — nothing for the column to say but '—'. Replacement on the server: before returning, `UPDATE orders SET card_status = 'none', card_note = 'no permission on the order'` when the service was taken without the tick."
+    },
+    {
+      "id": "A69",
+      "status": "still open",
+      "evidence": "The row and chip are in AdminDashboard.tsx (not my bucket); the server still sends both: routes-admin.ts:940 returns the client-level `cl.ra_cancellation_requested_at` and :950 builds the per-company 'cancellation requested <date>' text inside ra_llcs. The client-level column is still written with COALESCE (first date kept forever) by routes-portal.ts:2589 (another bucket). Replacement: drop cl.ra_cancellation_requested_at from /admin/clients once the tab stops using it."
+    },
+    { "id": "A70", "status": "not in my bucket", "evidence": "AdminDashboard.tsx wording; the server sends `has_password` (routes-admin.ts:941)." },
+    { "id": "A71", "status": "not in my bucket", "evidence": "AdminDashboard.tsx:97 still reads 'Every email the site sent to this address' and :135 'delivered'; the cap the wording must match is routes-admin.ts:982 `ORDER BY sent_at DESC LIMIT 500`." },
+    {
+      "id": "A72",
+      "status": "still open",
+      "evidence": "Half fixed. routes-admin.ts:296 'Only an order sitting with the State can be moved back.' names no column (cannot be wrong). routes-admin.ts:274 still reads `Only an order in New Orders can be marked sent; this one is in ${BOARD_LABEL[rows[0].status] ?? rows[0].status}.` — 'in Complete' for a formed order, the very case whereItIs() at :240-243 was written for; whereItIs is used at :320 and :530 but not here. Replacement: `Only an order in New Orders can be marked sent; ${whereItIs(rows[0])}` (select formed_at at :264)."
+    },
+    { "id": "A73", "status": "not in my bucket", "evidence": "OrderDetail.tsx certificates block." },
+    { "id": "A74", "status": "not in my bucket", "evidence": "Server side is done: routes-admin.ts:548-549 'Checked whenever one is typed' and `if (documentNumber && !/^L\\d{11}$/.test(documentNumber))`. The screen side, OrderDetail.tsx:296, still conditions the check on `detail.data?.articlesSignedByUs && docNumber.trim()`, so that file's reader should mark it still open." },
+    { "id": "A75", "status": "not in my bucket", "evidence": "OrderDetail.tsx dialog. Related server wording found in my bucket is reported as finding B19 (routes-admin.ts:1308)." },
+    { "id": "A76", "status": "not in my bucket", "evidence": "LibrarySection.tsx:178 still reads 'A nightly copy of clients, orders, service orders, and documents, stored privately outside the database's own company.' The truths in my bucket: backup.ts:17-28 dumps ten tables (see B23 for the two it omits); dropbox.ts:139 copies at most 200 pending files a night; dropbox.ts:60 uploads in `mode: \"overwrite\"` and routes-admin.ts:1498 resets mirrored_at so a replaced Articles or designation is copied again over the same path." },
+    { "id": "A77", "status": "not in my bucket", "evidence": "LibrarySection.tsx wording. Server: routes-admin.ts:85-96 now passes `force = pinned` so the button ('Replace edition') replaces a hand-uploaded manual while the nightly refresh leaves it (:55-57)." },
+    { "id": "A78", "status": "not in my bucket", "evidence": "OrderBoard.tsx wording." },
+    { "id": "A79", "status": "not in my bucket", "evidence": "AdminLogin wording; the server returns 401 'Incorrect password.' only for a wrong password (routes-admin.ts:180-181) and 429 'Too many attempts.' for the rate limit (:174-175)." },
+    {
+      "id": "A79h",
+      "status": "still open",
+      "evidence": "Of the eleven comments, these are in my bucket and still misplaced or stale: routes-admin.ts:233-234 ('Sent to the Division. The only transition on the board a person performs…') sits over BOARD_LABEL, belongs to POST /admin/orders/:id/filed at :260; :308-309 ('Which fields have been copied into the state's form…') sits over the series-filed route, belongs to /copied at :326; :459-471 (the formation-documents doc comment and the 'filed Articles come back' comment) sit over appointedUs(), belong to :628 and :514; :472-476 says issueStatement 'Returns the message to refuse with when the document number … is missing' — it returns {id, storageKey}; the message is the constant DOC_NUMBER_NEEDED at :481; :1157-1159 ('Draft S election package for admin review…') sits over the formation-date route, belongs to /s-election-draft at :1207; :1456-1458 ('Package documents still carrying no company…') sits over DELETE /admin/documents/:id, belongs to /admin/documents/unscoped at :1505. email.ts:11 ('Sends via Resend; without an API key, logs instead') sits over devOutbox, belongs to sendMail at :31; email.ts:435-437 and :438-442 are two doc comments on one function. routes-ops.ts:214-215 ('backdate a client's formation payment…') sits over /dev/reset-oa, belongs to /dev/age-formation at :229. db.ts:269-274 ('Mirror of the Division of Corporations' public data downloads…') sits inside the `ALTER TABLE library_documents ADD COLUMN meta` statement, describes fl_entities at :278 — and it is inside applied migration 1, whose checksum (db.ts:485-514) forbids editing it: leave it, note only. env.ts:35 'Shared secret for the daily purge cron' — six crons use it (routes-ops.ts:257-328, vercel.json). Unused helpers: none in my bucket (taxationLabel, stampEastern, stampForFilename, hmacSha256Base64, raRenewalFeeWords, addYears, longDate are all imported somewhere). Unused board fields: every field /admin/orders returns is referenced in OrderBoard.tsx (grep), so I cannot confirm 'three unused' from my side. Unreachable notify options: the server accepts `notify` on certificates (:583), fulfil (:1278, :1283) and documents (:1538); whether the screens offer them is in the admin bucket."
+    }
+  ],
+  "findings": [
+    {
+      "id": "B1",
+      "where": "Registered agent renewal, the email after the retry charge is declined (renewals job)",
+      "file": "webapp/server/email.ts",
+      "line": 166,
+      "reads": "We will try the card once more on ${escapeHtml(opts.retryDate)}.",
+      "claims": "That a further attempt will be made on the date named.",
+      "truth": "After the retry (the second attempt) is declined for insufficient funds, renewals.ts:257 sets retryAfter again because `attempt < 2` is still true (attempt is 1 — see A4), :260 stores retries = 1, and :263 passes willRetry: true, so the client is promised a third attempt; on the next pass :235 `row.retries < 1` is false and no charge runs. The promise is never kept.",
+      "replacement": "Store the attempt count on every decline (renewals.ts:260 `retries = attempt`), compute retryAfter only when `attempt < 2` with attempt counting both attempts (first decline attempt=1 → retry allowed; second decline attempt=2 → none), and allow the retry with `row.retries < 2` at :235. The email then says 'once more' only once.",
+      "severity": "substantive"
+    },
+    {
+      "id": "B2",
+      "where": "The 'A change to your portal email was requested' notice sent to the old address",
+      "file": "webapp/server/email.ts",
+      "line": 222,
+      "reads": "If this was not you, sign in and change your password immediately, then email support@myfloridaseriesllc.com. This address remains on the account until the new one is confirmed.",
+      "claims": "That changing the password is the way to stop the change.",
+      "truth": "Changing the password (routes-portal.ts:2420-2455) deletes other sessions but leaves pending_email set and the verify_email token valid for its hour; pending_email is cleared only when a link is confirmed (routes-portal.ts:2541, :2545) or by the office (routes-admin.ts:1076), and no portal control withdraws a pending change (AccountCard.tsx:65-67 only displays it). Someone holding the new inbox can still confirm the change after the password is changed. Requesting a new change to the old address does cancel the earlier link (routes-portal.ts:2478-2482 marks older tokens used) but the email does not say so.",
+      "replacement": "Code: on a password change, `UPDATE clients SET pending_email = NULL` and mark outstanding verify_email tokens used. Email: 'If this was not you, sign in and change your password immediately — that also cancels this request — then email support@myfloridaseriesllc.com.'",
+      "severity": "substantive"
+    },
+    {
+      "id": "B3",
+      "where": "Registered agent cancellation confirmation email, point 2",
+      "file": "webapp/server/email.ts",
+      "line": 285,
+      "reads": "Until we receive that proof, we remain your agent of record and service is billed at the then-current rate, prorated monthly, as described in the Terms of Service.",
+      "claims": "That after a timely cancellation without proof of a successor, the client is billed month by month.",
+      "truth": "Terms 9(g) (terms.md:54) say it; nothing performs it. A timely cancellation marks the renewal row 'cancelled' and the job stops there (renewals.ts:227-231); there is no monthly charge, no invoice and no office reminder — the Registered Agent Clients row only shows the cancellation date. The sentence describes hand work the office must remember.",
+      "replacement": "Either build it (a monthly charge or payment link for a cancelled company still on file, with the office row turning amber) or, until then, soften the email to 'Until we receive that proof, we remain your agent of record and the Terms of Service let us bill for that time at the then-current rate, prorated monthly.'",
+      "severity": "substantive"
+    },
+    {
+      "id": "B4",
+      "where": "Formed email, S election paragraph",
+      "file": "webapp/server/email.ts",
+      "line": 494,
+      "reads": "IRS Form 2553 must be filed within 2 months and 15 days of the date on your filed Articles, so please complete the form soon.",
+      "claims": "That the deadline runs from the Articles' filing date.",
+      "truth": "The window runs from the LLC's effective date, which a client who chose a delayed effective date has set later than the filing date; this is the third wording of the deadline A22 lists (evaluate2553Timing takes an effectiveDate, routes-admin.ts:1197).",
+      "replacement": "IRS Form 2553 must be filed within 2 months and 15 days after your LLC's effective date (the date on your filed Articles, unless you chose a later effective date), so please complete the form soon.",
+      "severity": "wording"
+    },
+    {
+      "id": "B5",
+      "where": "'Your Form 2553 package is ready' email",
+      "file": "webapp/server/email.ts",
+      "line": 404,
+      "reads": "ready to download in your portal: the completed IRS Form 2553, a cover letter, and step-by-step instructions for signing and mailing it to the IRS.",
+      "claims": "That the instructions are for mailing.",
+      "truth": "The package's instructions recommend fax: s-election.ts:238 '**Fax (recommended):** ${IRS_FAX}. Keep the fax transmission confirmation…' (the cover letter line at :216 says 'mail it'). Same as A65 in the portal.",
+      "replacement": "…step-by-step instructions for signing it and faxing or mailing it to the IRS.",
+      "severity": "wording"
+    },
+    {
+      "id": "B6",
+      "where": "Legal mail received email",
+      "file": "webapp/server/email.ts",
+      "line": 253,
+      "reads": "In Florida a lawsuit typically allows 20 days to respond BUT THIS IS NOT ALWAYS THE CASE. Contact an attorney immediately so they can provide you with proper legal guidance.",
+      "claims": "A rule about the time to respond to a Florida lawsuit.",
+      "truth": "Three lines later the same email says 'We do not review what it says and cannot advise you about it', and Terms 3 (terms.md:18) say no legal advice is given; a stated response period is advice about the papers. The comment at :240-242 attributes the email to Adam (10 Sep 2026), so this may be deliberate.",
+      "replacement": "Papers served on a company usually carry a deadline that runs from the day they were served, whether or not they have been read — often a short one. Contact an attorney immediately.",
+      "severity": "wording"
+    },
+    {
+      "id": "B7",
+      "where": "Welcome email, the note under the Set your password button",
+      "file": "webapp/server/email.ts",
+      "line": 89,
+      "reads": "This link expires in 7 days. If it expires, use \"Forgot password\" on the portal sign-in page with this email address.",
+      "claims": "The sign-in page has a link called 'Forgot password'.",
+      "truth": "The sign-in page link reads 'Forgot your password?' (PortalLogin.tsx:71) and the password-changed email at email.ts:193 says 'Forgot your password' — two wordings for one link. (The 7 days is true: routes-payments.ts:112 and :614.)",
+      "replacement": "This link expires in 7 days. If it expires, use \"Forgot your password?\" on the portal sign-in page with this email address.",
+      "severity": "wording"
+    },
+    {
+      "id": "B8",
+      "where": "Welcome email, the portal paragraph",
+      "file": "webapp/server/email.ts",
+      "line": 86,
+      "reads": "Your Owner's Manual — the plain-English guide to running your protected series LLC — is already in your portal's library, ready to download.",
+      "claims": "The manual is in the library at the moment the order is paid.",
+      "truth": "The manual reaches library_documents only when refreshOwnersManual runs (routes-admin.ts:40-70) — the nightly cron at 08:45 UTC (vercel.json) or the office's button (:85-96); nothing publishes at boot (no call in app.ts or vercel-entry.ts). On a fresh production database the first client paid before that runs finds an empty library.",
+      "replacement": "Publish the manual on first boot when no 'owners-manual' row exists (call refreshOwnersManual(false) from the cron and from app start), or word it 'will be in your portal's library'.",
+      "severity": "housekeeping"
+    },
+    {
+      "id": "B9",
+      "where": "Portal purchase confirmation email (series, certificate of status, certified copy)",
+      "file": "webapp/server/email.ts",
+      "line": 335,
+      "reads": "No further action is needed from you. We'll post the confirmation to your portal when the work is complete.",
+      "claims": "A 'confirmation' will be posted.",
+      "truth": "What is posted is the deliverable itself — the filed designation (routes-admin.ts:1336) or the state's certificate (:1340-1342) — not a confirmation.",
+      "replacement": "No further action is needed from you. We'll post the document to your portal when the work is complete.",
+      "severity": "wording"
+    },
+    {
+      "id": "B10",
+      "where": "Office email 'EIN details submitted — ready to file'",
+      "file": "webapp/server/email.ts",
+      "line": 374,
+      "reads": "View them once in the admin dashboard; the identification number is deleted automatically when you mark the order fulfilled.",
+      "claims": "The details can be viewed once.",
+      "truth": "GET /admin/services/:id decrypts the number on every call (routes-admin.ts:1124-1132); nothing limits viewing to once. The deletion clause is true (:1372-1375).",
+      "replacement": "View them in the admin dashboard; the identification number is deleted automatically when you mark the order fulfilled.",
+      "severity": "wording"
+    },
+    {
+      "id": "B11",
+      "where": "'About the card you paid with' email (prepaid gift card), the renewal date in parentheses",
+      "file": "webapp/server/email.ts",
+      "line": 107,
+      "reads": "Before your renewal date${renewalDate ? ` (${escapeHtml(renewalDate)})` : \"\"} you will receive an email with a payment link.",
+      "claims": "The date can be shown.",
+      "truth": "The email is sent from saveRenewalCard at payment (routes-payments.ts:66), and renewals.ts:108-109 reads ra_renewal_date then — but the date is written only at formation (routes-admin.ts:862), so it is always NULL here and the parenthesis never prints. Dead branch; the sentence without the date is true.",
+      "replacement": "Drop the renewalDate parameter (renewals.ts:108-109, email.ts:99, :107), or send the gift-card email at formation when the date exists.",
+      "severity": "housekeeping"
+    },
+    {
+      "id": "B12",
+      "where": "Registered agent renewal paid through its payment link — where the client lands afterwards",
+      "file": "webapp/server/renewals.ts",
+      "line": 164,
+      "reads": "redirectUrl: `${env.PUBLIC_BASE_URL}/portal?renewed=${row.id}`,",
+      "claims": "The portal will acknowledge the payment.",
+      "truth": "Nothing in webapp/src reads a `renewed` query parameter (grep of src for 'renewed': no matches); the client lands on the plain portal and the only acknowledgment is the receipt email (renewals.ts:308-309).",
+      "replacement": "Either read `renewed` on the portal and show 'Thank you — your registered agent service is renewed through [date]' on the Registered agent service card, or redirect to `/portal` and drop the parameter.",
+      "severity": "housekeeping"
+    },
+    {
+      "id": "B13",
+      "where": "Office: uploading a replacement formation package (Articles or designations) after the company is formed",
+      "file": "webapp/server/routes-admin.ts",
+      "line": 860,
+      "reads": "UPDATE orders SET status = 'formed', formed_at = now(), ra_renewal_date = ((now() AT TIME ZONE 'America/New_York') + interval '1 year')::date WHERE id = $1",
+      "claims": "Runs once, when the company is formed.",
+      "truth": "The route is also the replacement path (:466-471 'A wrong file is replaced later by the formed-step package upload, which retires priors'), and the UPDATE is unconditional, so every re-upload moves formed_at and pushes ra_renewal_date to a year after the re-upload — including after a renewal has been charged and the date advanced (renewals.ts:252). The renewal date the client was told (email.ts:129-133) and the cancellation deadline built from it silently change.",
+      "replacement": "UPDATE orders SET status = 'formed', formed_at = COALESCE(formed_at, now()), ra_renewal_date = COALESCE(ra_renewal_date, ((now() AT TIME ZONE 'America/New_York') + interval '1 year')::date) WHERE id = $1 (and the non-agent branch likewise for formed_at).",
+      "severity": "substantive"
+    },
+    {
+      "id": "B14",
+      "where": "Formed email — the 'Your Federal EIN order / S election package order is in your portal as well' line, for a client with two companies",
+      "file": "webapp/server/routes-admin.ts",
+      "line": 879,
+      "reads": "SELECT type FROM service_orders WHERE client_id = $1 AND type IN ('ein', 's-election') AND status IN ('awaiting_info', 'in_progress')",
+      "claims": "Lists the EIN and S election orders bought for the company being formed.",
+      "truth": "The query is by client, not by formation order: a client forming a second company whose first company still has an open EIN order is told, in the second company's formed email, that 'Your Federal EIN order is in your portal as well' (email.ts:466-473, :492-495). service_orders carries formation_order_id for both intake and portal purchases (routes-payments.ts:93-104; routes-portal.ts:1934, :1989, :2057, :2143).",
+      "replacement": "…WHERE client_id = $1 AND (formation_order_id = $2 OR formation_order_id IS NULL) AND type IN ('ein', 's-election') AND status IN ('awaiting_info', 'in_progress') with o.id as $2.",
+      "severity": "substantive"
+    },
+    {
+      "id": "B15",
+      "where": "Certificate titles as the client sees them in the portal ('Certificate of Status - Sep 16, 2026 — Acme, LLC')",
+      "file": "webapp/server/routes-admin.ts",
+      "line": 250,
+      "reads": "return `${kindTitle} - ${day} — ${llcName}`;",
+      "claims": "A title in the house style.",
+      "truth": "One title mixes a hyphen and an em dash; every other document title uses ' — ' alone (:558 Articles, :827 designations, :1336-1343 service deliverables).",
+      "replacement": "return `${kindTitle} (${day}) — ${llcName}`;",
+      "severity": "wording"
+    },
+    {
+      "id": "B16",
+      "where": "Office fulfil dialog refusal when the EIN box is empty, for an EIN bought for a series",
+      "file": "webapp/server/routes-admin.ts",
+      "line": 1308,
+      "reads": "Enter the 9-digit EIN from the letter — it goes on the client's Form 2553.",
+      "claims": "The number will be carried onto the client's Form 2553.",
+      "truth": "The rebuild runs only for a company EIN: :1402 `if ((details.target ?? \"company\") === \"company\")`; a series EIN (details.target === 'series', summary at :1329) is stored (:1398-1401) and goes on no 2553. Same problem A75 records in the dialog hint.",
+      "replacement": "`Enter the 9-digit EIN from the letter${(details.target ?? \"company\") === \"company\" ? \" — it goes on the client's Form 2553\" : \"\"}.` (move the `details` parse above the check).",
+      "severity": "wording"
+    },
+    {
+      "id": "B17",
+      "where": "Office order drawer query",
+      "file": "webapp/server/routes-admin.ts",
+      "line": 359,
+      "reads": "SELECT *, rejected_at, ra_renewal_date FROM orders WHERE id = $1",
+      "claims": "Nothing a reader sees.",
+      "truth": "`*` already returns rejected_at and ra_renewal_date; the two names are redundant.",
+      "replacement": "SELECT * FROM orders WHERE id = $1",
+      "severity": "housekeeping"
+    },
+    {
+      "id": "B18",
+      "where": "The registered agent renewal date — which anniversary",
+      "file": "webapp/server/routes-admin.ts",
+      "line": 862,
+      "reads": "ra_renewal_date = ((now() AT TIME ZONE 'America/New_York') + interval '1 year')::date",
+      "claims": "The service 'renews automatically on the anniversary date' (Terms 9(c), terms.md:46).",
+      "truth": "The date is a year after the day the office uploads the formed package, which can be days or weeks after the Articles' effective date on which the agent designation took effect (s. 605.0207; the Articles carry the agent's acceptance, s. 605.0201(2)(c)). The Terms do not say which anniversary; the portal (PortalDashboard.tsx:367) and every renewal email show this one. Adam should say whether the anniversary is the upload day or the Articles' effective date.",
+      "replacement": "If the effective date is meant: set ra_renewal_date from the Articles' effective date typed at upload (the office already types the document number there), and say 'the anniversary of your LLC's effective date' in Terms 9(c).",
+      "severity": "wording"
+    },
+    {
+      "id": "B19",
+      "where": "Nightly database backup — what it contains",
+      "file": "webapp/server/backup.ts",
+      "line": 17,
+      "reads": "export const BACKUP_TABLES = [\"clients\", \"orders\", \"service_orders\", \"documents\", \"oa_profiles\", \"oa_generations\", \"library_documents\", \"webhook_events\", \"fl_sync_state\", \"contact_messages\"] as const;",
+      "claims": "The header (:6) says these are 'the tables that cannot be rebuilt from anywhere else' and :9-12 lists the deliberate exclusions (fl_entities, sessions, auth_tokens).",
+      "truth": "Two tables added since are neither dumped nor listed as excluded: email_log (db.ts:405-417, kept so the office can prove 'that we sent them something') and ra_renewals (db.ts:442-461 — each renewal's notice, charge, Square payment id, decline code and payment link). A Neon-side loss takes the email record and every renewal's history with it. rate_limits and schema_migrations are also absent (harmless; the restore script must recreate the ledger).",
+      "replacement": "Add \"email_log\" and \"ra_renewals\" to BACKUP_TABLES and to scripts/db-restore.ts; list rate_limits with the deliberate exclusions in the header.",
+      "severity": "housekeeping"
+    },
+    {
+      "id": "B20",
+      "where": "Nightly Dropbox mirror — its own description",
+      "file": "webapp/server/dropbox.ts",
+      "line": 112,
+      "reads": "/** Copies every not-yet-mirrored document. One failure doesn't strand the rest — errors are counted and the document stays pending for the next sweep. */",
+      "claims": "Every pending document is copied in a sweep.",
+      "truth": ":139 `LIMIT 200` — a sweep copies at most 200; with more pending, the rest wait a night each. The office line A76 covers ('every file' nightly) rests on this.",
+      "replacement": "Comment: 'Copies up to 200 not-yet-mirrored documents a sweep…'; or loop until the query returns fewer than 200.",
+      "severity": "housekeeping"
+    },
+    {
+      "id": "B21",
+      "where": "Nightly Dropbox mirror — which folder legal mail lands in for a client with two companies",
+      "file": "webapp/server/dropbox.ts",
+      "line": 132,
+      "reads": "COALESCE((SELECT o.llc_name FROM orders o WHERE o.id = d.order_id), (SELECT o.llc_name FROM orders o WHERE o.client_id = d.client_id AND o.paid_at IS NOT NULL ORDER BY o.paid_at DESC LIMIT 1)) AS llc_name",
+      "claims": "A document with no company is filed under the client's newest paid company.",
+      "truth": "Legal mail carries no order_id by design (routes-admin.ts:1565 'Legal mail stays one shared section and carries no company'), so every piece of legal mail for a two-company client is mirrored into the newer company's folder whichever company it was served on.",
+      "replacement": "For kind = 'legal_mail' use the client's email as the folder (`safePathPart(doc.email)`), or add a per-piece company when the office uploads it.",
+      "severity": "housekeeping"
+    },
+    {
+      "id": "B22",
+      "where": "Encryption note on when the secrets are deleted",
+      "file": "webapp/server/crypto.ts",
+      "line": 47,
+      "reads": "rotating SESSION_SECRET orphans stored ciphertexts, which is acceptable because these secrets are deleted at fulfillment by design.",
+      "claims": "Secrets are deleted at fulfillment.",
+      "truth": "EIN secrets are (routes-admin.ts:1372-1375). S election SSNs are re-stored at fulfillment and kept for the 14-day edit window (routes-portal.ts:885-893, S_ELECTION_EDIT_DAYS = 14 at :517) before the purge; a key rotation inside that window orphans a live package the client may still regenerate.",
+      "replacement": "…because EIN secrets are deleted at fulfillment and S election secrets 14 days after it; rotate SESSION_SECRET only when no S election window is open.",
+      "severity": "housekeeping"
+    },
+    {
+      "id": "B23",
+      "where": "Environment notes",
+      "file": "webapp/server/env.ts",
+      "line": 35,
+      "reads": "/** Shared secret for the daily purge cron. Required in production. */",
+      "claims": "One cron uses it.",
+      "truth": "Six do: /cron/ra-renewals, /cron/library-refresh, /cron/sunbiz-sync, /cron/purge, /cron/db-backup, /cron/file-mirror (routes-ops.ts:257-328; vercel.json crons).",
+      "replacement": "/** Shared secret for the nightly crons (renewals, library refresh, Sunbiz sync, purge, backup, mirror). Required in production. */",
+      "severity": "housekeeping"
+    },
+    {
+      "id": "B24",
+      "where": "Taxation label helper (the label A59 says disagrees with the portal pill)",
+      "file": "webapp/server/datetime.ts",
+      "line": 44,
+      "reads": "if (version === \"single-s\" || version === \"member-single-s\") return \"Single-Member S Corporation\";",
+      "claims": "Nothing new — this is where A59's 'Single-Member S Corporation…' label comes from.",
+      "truth": "A59 (portal bucket) asks for one label table; the helper is used by oa.ts, PortalDashboard.tsx and OAQuestionnaire.tsx, so the fix belongs here.",
+      "replacement": "Per A59's ruling, one table here that both the title and the pill read.",
+      "severity": "housekeeping"
+    },
+    {
+      "id": "N1",
+      "where": "Chapter 605 notes, Administration, the entity-transactions bullet",
+      "file": "webapp/server/chapter-605-notes.md",
+      "line": 140,
+      "reads": "s. 605.2602–605.2604 — a protected series may not convert, domesticate, or participate in an interest exchange, and may merge only through the single channel in s. 605.2604 (every other party an LLC; surviving company not created in the merger).",
+      "claims": "That a protected series may merge, through s. 605.2604.",
+      "truth": "s. 605.2602 (read today): 'Except as provided in ss. 605.2605(2), 605.2606(2), and 605.2607(1), a protected series may not participate in; be a party to; result from; or be formed, organized, established, or created by … (1) A conversion, domestication, interest exchange, or merger'. The merger channel in s. 605.2604 belongs to the series limited liability COMPANY ('A series limited liability company may be a party to a merger … only if … (1) Each other party to the merger is a limited liability company. (2) The surviving company is not created in the merger.'); a protected series is only relocated, continued or terminated inside the company's merger under ss. 605.2605-605.2607. The masters have it right (facts.md: 'except as ss. 605.2602 and 605.2605–605.2607, Florida Statutes, permit') and facts.md retires exactly this note's wording ('605.2602–605.2604', 'single statutory channel provided in s. 605.2604').",
+      "replacement": "s. 605.2602 — a protected series may not be a party to, result from, or be created by a conversion, domestication, interest exchange or merger, except that in the company's own merger under s. 605.2604 (every other party an LLC; surviving company not created in the merger) a protected series is relocated, continued or terminated as ss. 605.2605–605.2607 provide. s. 605.2603 bars the series LLC itself from conversion, domestication and interest exchange.",
+      "severity": "substantive"
+    },
+    {
+      "id": "N2",
+      "where": "Chapter 605 notes, fee schedule, 'Conflicts with what we charge'",
+      "file": "webapp/server/chapter-605-notes.md",
+      "line": 264,
+      "reads": "On 2026-08-10 Adam directed \"It's a $125 filing fee for the Articles. No fee to designate a registered agent,\" and the calculator became articles $125 / agent $0. The statute splits it: $100 (2) + $25 (7) = $125. Same total to the customer, but our line items describe the fee contrary to the statute on a page that says fees are \"at cost.\"",
+      "claims": "The calculator and line items still describe the fee as $125 Articles / $0 agent.",
+      "truth": "Stale. validation.ts:178-179 now `articlesOfOrganization = isConversion ? 0 : 100` and `registeredAgentDesignation = … : 25`; pricing.ts:72-81 prints two lines, 'FL state fee — Articles of Organization' and 'FL state fee — registered agent designation'; docs/facts.md ledger 'The $125 a new company pays the state' fixes the split at $100 + $25 and retires '$125 Articles filing fee'.",
+      "replacement": "Resolved: since the facts ledger, the calculator and the line items split the $125 as the statute does — $100 under (2) and $25 under (7).",
+      "severity": "wording"
+    },
+    {
+      "id": "N3",
+      "where": "Chapter 605 notes, fee schedule, 'Conversion gap'",
+      "file": "webapp/server/chapter-605-notes.md",
+      "line": 270,
+      "reads": "If they take our registered agent service that is a change of agent — $25 under (7) — which we stopped collecting. Our intake offers exactly that choice.",
+      "claims": "The $25 change-of-agent fee is not collected on a conversion.",
+      "truth": "Stale. pricing.ts:44-46 and :53 pass `registeredAgentChange` ('A converting client who takes our registered agent service is changing the agent on file — s. 605.0213(7), $25'), validation.ts:179 charges it, and pricing.ts:77-78 prints 'FL state fee — change of registered agent'.",
+      "replacement": "Resolved: a converting client who takes our agent service is charged the $25 change-of-agent fee under (7).",
+      "severity": "wording"
+    },
+    {
+      "id": "N4",
+      "where": "Chapter 605 notes, fee schedule, 'Annual report unresolved'",
+      "file": "webapp/server/chapter-605-notes.md",
+      "line": 275,
+      "reads": "(5) says $50; the site publishes $138.75 / $538.75 late. Chapter 605 does not explain the difference. Treat $138.75 and the $400 penalty as unverified until the Department's schedule is checked.",
+      "claims": "The figures are unverified in statute.",
+      "truth": "They are statutory. s. 607.193(1) (read today on Online Sunshine): 'an annual supplemental corporate fee of $88.75 is imposed on each business entity that is authorized to transact business in this state and is required to file an annual report with the Department of State under s. 605.0212, s. 607.1622, or s. 620.1210.' $50 (s. 605.0213(5)) + $88.75 = $138.75. s. 607.193(2)(b): 'a late charge of $400 shall be imposed if the supplemental corporate fee is remitted after May 1' — $538.75.",
+      "replacement": "Annual report, verified: $50 under s. 605.0213(5) plus the $88.75 supplemental corporate fee under s. 607.193(1) = $138.75; the $400 late charge is s. 607.193(2)(b), payable when the fee is remitted after May 1 — $538.75.",
+      "severity": "wording"
+    },
+    {
+      "id": "N5",
+      "where": "Chapter 605 notes, General act, the s. 605.0105(3) bullet, item (p)",
+      "file": "webapp/server/chapter-605-notes.md",
+      "line": 173,
+      "reads": "(p) may not indemnify for bad faith, willful or intentional misconduct, improper personal benefit, or s. 605.0406 liability.",
+      "claims": "That list is the whole of (p).",
+      "truth": "s. 605.0105(3)(p) has a fourth item: '4. A breach of duties or obligations under s. 605.04091, taking into account a restriction, an expansion, or an elimination of such duties and obligations provided for in the operating agreement to the extent allowed by subsection (4).' It matters to the Indemnification sections, which A80 is already about.",
+      "replacement": "(p) may not indemnify for bad faith, willful or intentional misconduct, improper personal benefit, s. 605.0406 liability, or a breach of the s. 605.04091 duties as the agreement has shaped them.",
+      "severity": "wording"
+    },
+    {
+      "id": "N6",
+      "where": "Chapter 605 notes, Appraisal rights bullet",
+      "file": "webapp/server/chapter-605-notes.md",
+      "line": 508,
+      "reads": "s. 605.1006(1) — a member has appraisal rights on a merger, conversion, interest exchange, a sale of substantially all the assets where the member could vote on it, and certain amendments to the organic rules.",
+      "claims": "Every voted sale of substantially all the assets carries appraisal rights.",
+      "truth": "s. 605.1006(1)(d) excepts a sale 'pursuant to court order or … for cash pursuant to a plan under which all or substantially all of the net proceeds of the sale will be distributed to the interest holders within 1 year after the date of sale' — the ordinary case for a real-estate series being sold out.",
+      "replacement": "…a sale of substantially all the assets where the member could vote on it (unless by court order, or for cash with the proceeds distributed within a year)…",
+      "severity": "wording"
+    }
+  ],
+  "chapter605NotesAgreement": "Every other statement in chapter-605-notes.md that names a section was checked against that section's text opened today and agrees with it: the s. 605.2107 non-variable list (a)-(y) and subsection (2); ss. 605.2102(7),(10), .2103, .2104(2)-(4), .2105(4)(d),(5)(b), .2108(1),(3); .2201(1)-(2), .2202(2), .2203(1),(4)-(5), .2206(1)-(2); .2301(2)(a),(2)(b),(4),(5), .2302(1), .2303(1)-(4), .2304(2); .2401(2),(2)(c)3, .2402(1)-(2), .2403(2), .2404(2),(4); .2501(1)-(7), .2503; .2802(2); ss. 605.0102(23),(37),(45), .0103(4), .0105(1)(d),(3)(c),(e)-(k),(4)(c),(5), .0106(5)-(6), .0107(4), .0108(1), .0110(4), .0111(1), .01125, .0112(1)(b), .0113(1)(b),(6), .0117(3) note, .0201(2),(4), .0203(1)(b), .0205(3), .0207, .0209, .0210(5), .0211(3), .0212(1)(d),(6), .0213(1)-(12); .0301, .0302(7),(10), .0403(1),(5), .0404(1),(5), .0405, .0406, .0407(1), .04072(1),(4), .04073(1)(c)-(d),(2)(d)-(e), .04074(2)(a)-(b),(3), .0408(2), .04091(2)(c),(5), .04092(4)(a), .04093, .0410(1),(10), .0411, .0502(6), .0503(3)-(7), .0601(1),(4), .0602(8), .0701(3), .0702(1)(b)5,(2); .0706(2),(3),(5), .0710(2), .0711(11), .0712(2),(3)(b), .0714(1)(a),(1)(c),(2), .0715(4)(a),(5), .0717(1)(d),(2), .0801(2), .0802, .0804(5), .0902(3), .0904(1),(7), .0905(3), .1006(2), .1061(5), .1101, .1103(1)-(3), .1108(2). The registered-agent open question (notes 204-250) quotes ss. 605.0113(1)(b),(6), .2108(1),(3), .2104(2),(4), .2102(7), .0102(23) accurately and remains unresolved; nothing in the text read today answers it. The notes' '417,137 characters' is the chapter's size by their measure; the page text measured 413,991 characters today — a difference of extraction, not of content.",
+  "filesWithNoFindings": ["webapp/server/dev.ts", "webapp/server/md.d.ts", "webapp/server/pricing.ts", "webapp/server/provenance.ts", "webapp/server/db.ts (only the immutable-migration comment noted under A79h)"],
+  "fraction": "15 of 15 files read; 4,854 of 4,854 lines read (backup 144, chapter-605-notes 575, crypto 70, datetime 57, db 549, dev 5, dropbox 160, email 544, env 55, md.d.ts 4, pricing 114, provenance 333, renewals 310, routes-admin 1605 in two pages [1-945, 946-1605], routes-ops 329)."
+}

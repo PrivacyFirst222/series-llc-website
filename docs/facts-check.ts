@@ -48,7 +48,7 @@ function scanSet(): string[] {
     for (const name of readdirSync(join(ROOT, dir))) {
       const rel = join(dir, name);
       const st = statSync(join(ROOT, rel));
-      if (st.isDirectory()) { if (!/node_modules|dist|\.git|api$/.test(rel)) walk(rel); continue; }
+      if (st.isDirectory()) { if (!/node_modules|dist|\.git|api$|^docs\/audit$/.test(rel)) walk(rel); continue; }
       if (!/\.(tsx?|md|html)$/.test(name)) continue;
       if (/\.test\.ts$|e2e\.ts$|provenance\.ts$|behavioral\.ts$|chapter-605-notes\.md$|facts\.md$|facts-check\.ts$|oa-map\.md$|event-map|coverage-605|FAILURES\.md$|README\.md$|CLAUDE\.md$/.test(rel)) continue;
       out.push(rel);

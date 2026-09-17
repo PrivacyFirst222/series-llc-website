@@ -1,0 +1,971 @@
+{
+  "generatedAt": "2026-09-17T00:36:25.027Z",
+  "totalFiles": 166,
+  "totalLines": 38081,
+  "files": [
+    {
+      "path": "webapp/src/App.tsx",
+      "lines": 73,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/components/home/BenefitsGrid.tsx",
+      "lines": 96,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/components/home/HomeHero.tsx",
+      "lines": 136,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/components/home/MothershipDiagram.tsx",
+      "lines": 107,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/components/home/StatBar.tsx",
+      "lines": 22,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/components/home/StatuteTeaser.tsx",
+      "lines": 31,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/components/home/WeAreOne.tsx",
+      "lines": 103,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/components/home/WhyOnlyUs.tsx",
+      "lines": 137,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/components/layout/Footer.tsx",
+      "lines": 91,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/components/layout/Header.tsx",
+      "lines": 198,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/components/layout/Layout.tsx",
+      "lines": 52,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/components/layout/Logo.tsx",
+      "lines": 37,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/components/sections/CallToAction.tsx",
+      "lines": 83,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/components/sections/PageHero.tsx",
+      "lines": 32,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/content/privacy.md",
+      "lines": 78,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/content/terms.md",
+      "lines": 176,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/hooks/use-toast.ts",
+      "lines": 186,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/lib/api.ts",
+      "lines": 100,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/lib/datetime.ts",
+      "lines": 60,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/lib/ein.ts",
+      "lines": 17,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/lib/einActivity.ts",
+      "lines": 94,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/lib/form2553Timing.ts",
+      "lines": 113,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/lib/jointOwner.ts",
+      "lines": 58,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/lib/ownership.ts",
+      "lines": 93,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/lib/personName.ts",
+      "lines": 10,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/lib/phone.ts",
+      "lines": 12,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/lib/ssn.ts",
+      "lines": 40,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/lib/utils.ts",
+      "lines": 6,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/main.tsx",
+      "lines": 5,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/pages/AssetProtection.tsx",
+      "lines": 292,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/pages/Benefits.tsx",
+      "lines": 264,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/pages/Contact.tsx",
+      "lines": 150,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/pages/FAQ.tsx",
+      "lines": 170,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/pages/Home.tsx",
+      "lines": 21,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/pages/HowItWorks.tsx",
+      "lines": 136,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/pages/NotFound.tsx",
+      "lines": 32,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/pages/Pricing.tsx",
+      "lines": 159,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/pages/Privacy.tsx",
+      "lines": 86,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/pages/RecordkeepingApp.tsx",
+      "lines": 453,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/pages/Terms.tsx",
+      "lines": 63,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/pages/TheStatute.tsx",
+      "lines": 105,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/pages/WhatIs.tsx",
+      "lines": 167,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/vite-env.d.ts",
+      "lines": 1,
+      "area": "public pages"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/AddressAutocomplete.tsx",
+      "lines": 159,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/AddressFields.tsx",
+      "lines": 149,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/buildPayload.ts",
+      "lines": 182,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/defaults.ts",
+      "lines": 134,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/FeeEstimate.tsx",
+      "lines": 104,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/FieldShell.tsx",
+      "lines": 106,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/FloridaLLCFormationForm.tsx",
+      "lines": 795,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/NameCheck.tsx",
+      "lines": 185,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/nameSimilarity.ts",
+      "lines": 58,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/raService.ts",
+      "lines": 69,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/RepeatableMemberFields.tsx",
+      "lines": 179,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/RepeatablePartyFields.tsx",
+      "lines": 209,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/ReviewStep.tsx",
+      "lines": 324,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/schema.ts",
+      "lines": 237,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepCertification.tsx",
+      "lines": 396,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepClient.tsx",
+      "lines": 111,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepCorrespondence.tsx",
+      "lines": 158,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepEffectiveDate.tsx",
+      "lines": 91,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepFilingPath.tsx",
+      "lines": 86,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepIntro.tsx",
+      "lines": 82,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepMailingAddress.tsx",
+      "lines": 70,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepManagement.tsx",
+      "lines": 158,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepManagers.tsx",
+      "lines": 174,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepMembers.tsx",
+      "lines": 90,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepName.tsx",
+      "lines": 351,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepOptionalDocs.tsx",
+      "lines": 132,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepPrincipalAddress.tsx",
+      "lines": 42,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepPurpose.tsx",
+      "lines": 119,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepRegisteredAgent.tsx",
+      "lines": 292,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepRegisteredAgentAcceptance.tsx",
+      "lines": 128,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepSeries.tsx",
+      "lines": 228,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepSubmissionPayload.tsx",
+      "lines": 86,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/ServiceFeeEstimate.tsx",
+      "lines": 76,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/steps.ts",
+      "lines": 119,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/stepValidation.ts",
+      "lines": 413,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/types.ts",
+      "lines": 377,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/us-states.ts",
+      "lines": 30,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/validation.ts",
+      "lines": 278,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/pages/FormLLC.tsx",
+      "lines": 31,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/pages/OrderConfirmed.tsx",
+      "lines": 165,
+      "area": "order form and payment"
+    },
+    {
+      "path": "webapp/src/content/oaLearnMore.tsx",
+      "lines": 371,
+      "area": "client portal"
+    },
+    {
+      "path": "webapp/src/content/oaLearnMoreParts.tsx",
+      "lines": 15,
+      "area": "client portal"
+    },
+    {
+      "path": "webapp/src/pages/portal/AccountCard.tsx",
+      "lines": 198,
+      "area": "client portal"
+    },
+    {
+      "path": "webapp/src/pages/portal/AmendAgreement.tsx",
+      "lines": 247,
+      "area": "client portal"
+    },
+    {
+      "path": "webapp/src/pages/portal/documentOrder.ts",
+      "lines": 30,
+      "area": "client portal"
+    },
+    {
+      "path": "webapp/src/pages/portal/drafts.ts",
+      "lines": 32,
+      "area": "client portal"
+    },
+    {
+      "path": "webapp/src/pages/portal/oaAssets.ts",
+      "lines": 24,
+      "area": "client portal"
+    },
+    {
+      "path": "webapp/src/pages/portal/OaAssetsCard.tsx",
+      "lines": 196,
+      "area": "client portal"
+    },
+    {
+      "path": "webapp/src/pages/portal/OaOwnersSections.tsx",
+      "lines": 492,
+      "area": "client portal"
+    },
+    {
+      "path": "webapp/src/pages/portal/OaQuestionCard.tsx",
+      "lines": 52,
+      "area": "client portal"
+    },
+    {
+      "path": "webapp/src/pages/portal/OAQuestionnaire.tsx",
+      "lines": 873,
+      "area": "client portal"
+    },
+    {
+      "path": "webapp/src/pages/portal/oaTypes.ts",
+      "lines": 75,
+      "area": "client portal"
+    },
+    {
+      "path": "webapp/src/pages/portal/OrdersInProgress.tsx",
+      "lines": 723,
+      "area": "client portal"
+    },
+    {
+      "path": "webapp/src/pages/portal/OwnershipEditor.tsx",
+      "lines": 174,
+      "area": "client portal"
+    },
+    {
+      "path": "webapp/src/pages/portal/PortalDashboard.tsx",
+      "lines": 782,
+      "area": "client portal"
+    },
+    {
+      "path": "webapp/src/pages/portal/PortalForgot.tsx",
+      "lines": 69,
+      "area": "client portal"
+    },
+    {
+      "path": "webapp/src/pages/portal/PortalLogin.tsx",
+      "lines": 77,
+      "area": "client portal"
+    },
+    {
+      "path": "webapp/src/pages/portal/PortalSetPassword.tsx",
+      "lines": 95,
+      "area": "client portal"
+    },
+    {
+      "path": "webapp/src/pages/portal/PortalVerifyEmail.tsx",
+      "lines": 86,
+      "area": "client portal"
+    },
+    {
+      "path": "webapp/src/pages/portal/SElectionDetailsForm.tsx",
+      "lines": 703,
+      "area": "client portal"
+    },
+    {
+      "path": "webapp/src/pages/portal/services.helpers.ts",
+      "lines": 42,
+      "area": "client portal"
+    },
+    {
+      "path": "webapp/src/pages/portal/ServicesCard.tsx",
+      "lines": 523,
+      "area": "client portal"
+    },
+    {
+      "path": "webapp/src/pages/portal/typedDate.ts",
+      "lines": 44,
+      "area": "client portal"
+    },
+    {
+      "path": "webapp/src/pages/portal/ViewingAsBanner.tsx",
+      "lines": 40,
+      "area": "client portal"
+    },
+    {
+      "path": "webapp/src/pages/admin/AdminDashboard.tsx",
+      "lines": 688,
+      "area": "office"
+    },
+    {
+      "path": "webapp/src/pages/admin/AdminLogin.tsx",
+      "lines": 55,
+      "area": "office"
+    },
+    {
+      "path": "webapp/src/pages/admin/LibrarySection.tsx",
+      "lines": 252,
+      "area": "office"
+    },
+    {
+      "path": "webapp/src/pages/admin/OrderBoard.tsx",
+      "lines": 406,
+      "area": "office"
+    },
+    {
+      "path": "webapp/src/pages/admin/OrderDetail.tsx",
+      "lines": 902,
+      "area": "office"
+    },
+    {
+      "path": "webapp/src/pages/admin/serviceOrders.helpers.ts",
+      "lines": 39,
+      "area": "office"
+    },
+    {
+      "path": "webapp/src/pages/admin/ServiceOrdersSection.tsx",
+      "lines": 465,
+      "area": "office"
+    },
+    {
+      "path": "webapp/server/app.ts",
+      "lines": 25,
+      "area": "server and emails"
+    },
+    {
+      "path": "webapp/server/assets/f2553-b64.ts",
+      "lines": 3,
+      "area": "server and emails"
+    },
+    {
+      "path": "webapp/server/auth.ts",
+      "lines": 123,
+      "area": "server and emails"
+    },
+    {
+      "path": "webapp/server/backup.ts",
+      "lines": 144,
+      "area": "server and emails"
+    },
+    {
+      "path": "webapp/server/chapter-605-notes.md",
+      "lines": 575,
+      "area": "server and emails"
+    },
+    {
+      "path": "webapp/server/crypto.ts",
+      "lines": 70,
+      "area": "server and emails"
+    },
+    {
+      "path": "webapp/server/datetime.ts",
+      "lines": 57,
+      "area": "server and emails"
+    },
+    {
+      "path": "webapp/server/db.ts",
+      "lines": 549,
+      "area": "server and emails"
+    },
+    {
+      "path": "webapp/server/dev.ts",
+      "lines": 5,
+      "area": "server and emails"
+    },
+    {
+      "path": "webapp/server/dropbox.ts",
+      "lines": 160,
+      "area": "server and emails"
+    },
+    {
+      "path": "webapp/server/email.ts",
+      "lines": 544,
+      "area": "server and emails"
+    },
+    {
+      "path": "webapp/server/env.ts",
+      "lines": 55,
+      "area": "server and emails"
+    },
+    {
+      "path": "webapp/server/md.d.ts",
+      "lines": 4,
+      "area": "server and emails"
+    },
+    {
+      "path": "webapp/server/pricing.ts",
+      "lines": 114,
+      "area": "server and emails"
+    },
+    {
+      "path": "webapp/server/provenance.ts",
+      "lines": 333,
+      "area": "server and emails"
+    },
+    {
+      "path": "webapp/server/renewals.ts",
+      "lines": 310,
+      "area": "server and emails"
+    },
+    {
+      "path": "webapp/server/routes-admin.ts",
+      "lines": 1605,
+      "area": "server and emails"
+    },
+    {
+      "path": "webapp/server/routes-ops.ts",
+      "lines": 329,
+      "area": "server and emails"
+    },
+    {
+      "path": "webapp/server/routes-payments.ts",
+      "lines": 713,
+      "area": "server and emails"
+    },
+    {
+      "path": "webapp/server/routes-portal.ts",
+      "lines": 2608,
+      "area": "server and emails"
+    },
+    {
+      "path": "webapp/server/shared.ts",
+      "lines": 48,
+      "area": "server and emails"
+    },
+    {
+      "path": "webapp/server/square.ts",
+      "lines": 230,
+      "area": "server and emails"
+    },
+    {
+      "path": "webapp/server/storage.ts",
+      "lines": 69,
+      "area": "server and emails"
+    },
+    {
+      "path": "webapp/server/sunbiz.ts",
+      "lines": 341,
+      "area": "server and emails"
+    },
+    {
+      "path": "webapp/server/validation.ts",
+      "lines": 374,
+      "area": "server and emails"
+    },
+    {
+      "path": "webapp/server/vercel-entry.ts",
+      "lines": 56,
+      "area": "server and emails"
+    },
+    {
+      "path": "webapp/vercel.json",
+      "lines": 38,
+      "area": "server and emails"
+    },
+    {
+      "path": "webapp/server/filing.ts",
+      "lines": 595,
+      "area": "documents and masters"
+    },
+    {
+      "path": "webapp/server/manual-pdf.ts",
+      "lines": 413,
+      "area": "documents and masters"
+    },
+    {
+      "path": "webapp/server/new-series.ts",
+      "lines": 135,
+      "area": "documents and masters"
+    },
+    {
+      "path": "webapp/server/oa-amendment.ts",
+      "lines": 150,
+      "area": "documents and masters"
+    },
+    {
+      "path": "webapp/server/oa-capital.ts",
+      "lines": 139,
+      "area": "documents and masters"
+    },
+    {
+      "path": "webapp/server/oa.ts",
+      "lines": 765,
+      "area": "documents and masters"
+    },
+    {
+      "path": "webapp/server/order-summary.ts",
+      "lines": 264,
+      "area": "documents and masters"
+    },
+    {
+      "path": "webapp/server/pdf-render.ts",
+      "lines": 680,
+      "area": "documents and masters"
+    },
+    {
+      "path": "webapp/server/s-election.ts",
+      "lines": 346,
+      "area": "documents and masters"
+    },
+    {
+      "path": "webapp/server/statement.ts",
+      "lines": 69,
+      "area": "documents and masters"
+    },
+    {
+      "path": "webapp/server/templates-new-series.md",
+      "lines": 66,
+      "area": "documents and masters"
+    },
+    {
+      "path": "webapp/server/templates-oa-amendment.md",
+      "lines": 74,
+      "area": "documents and masters"
+    },
+    {
+      "path": "webapp/server/templates-oa-member-s.md",
+      "lines": 509,
+      "area": "documents and masters"
+    },
+    {
+      "path": "webapp/server/templates-oa-member-single-s.md",
+      "lines": 395,
+      "area": "documents and masters"
+    },
+    {
+      "path": "webapp/server/templates-oa-member-single.md",
+      "lines": 363,
+      "area": "documents and masters"
+    },
+    {
+      "path": "webapp/server/templates-oa-member.md",
+      "lines": 493,
+      "area": "documents and masters"
+    },
+    {
+      "path": "webapp/server/templates-oa-multi.md",
+      "lines": 507,
+      "area": "documents and masters"
+    },
+    {
+      "path": "webapp/server/templates-oa-s.md",
+      "lines": 523,
+      "area": "documents and masters"
+    },
+    {
+      "path": "webapp/server/templates-oa-single-s.md",
+      "lines": 426,
+      "area": "documents and masters"
+    },
+    {
+      "path": "webapp/server/templates-oa-single.md",
+      "lines": 393,
+      "area": "documents and masters"
+    },
+    {
+      "path": "webapp/server/templates-statement-of-authorized-representative.md",
+      "lines": 40,
+      "area": "documents and masters"
+    },
+    {
+      "path": "docs/facts.md",
+      "lines": 171,
+      "area": "guidance"
+    },
+    {
+      "path": "docs/oa-instructions.md",
+      "lines": 75,
+      "area": "guidance"
+    },
+    {
+      "path": "docs/owners-manual.md",
+      "lines": 536,
+      "area": "guidance"
+    },
+    {
+      "path": "docs/README.md",
+      "lines": 184,
+      "area": "guidance"
+    }
+  ],
+  "excluded": [
+    {
+      "path": "webapp/src/components/ui/alert-dialog.tsx",
+      "reason": "stock UI widgets (shadcn), not product text"
+    },
+    {
+      "path": "webapp/src/components/ui/tabs.tsx",
+      "reason": "stock UI widgets (shadcn), not product text"
+    },
+    {
+      "path": "webapp/src/components/ui/toaster.tsx",
+      "reason": "stock UI widgets (shadcn), not product text"
+    },
+    {
+      "path": "webapp/src/components/ui/label.tsx",
+      "reason": "stock UI widgets (shadcn), not product text"
+    },
+    {
+      "path": "webapp/src/components/ui/sonner.tsx",
+      "reason": "stock UI widgets (shadcn), not product text"
+    },
+    {
+      "path": "webapp/src/components/ui/accordion.tsx",
+      "reason": "stock UI widgets (shadcn), not product text"
+    },
+    {
+      "path": "webapp/src/components/ui/tooltip.tsx",
+      "reason": "stock UI widgets (shadcn), not product text"
+    },
+    {
+      "path": "webapp/src/components/ui/use-toast.ts",
+      "reason": "stock UI widgets (shadcn), not product text"
+    },
+    {
+      "path": "webapp/src/components/ui/button-variants.ts",
+      "reason": "stock UI widgets (shadcn), not product text"
+    },
+    {
+      "path": "webapp/src/components/ui/dialog.tsx",
+      "reason": "stock UI widgets (shadcn), not product text"
+    },
+    {
+      "path": "webapp/src/components/ui/button.tsx",
+      "reason": "stock UI widgets (shadcn), not product text"
+    },
+    {
+      "path": "webapp/src/components/ui/toast.tsx",
+      "reason": "stock UI widgets (shadcn), not product text"
+    },
+    {
+      "path": "webapp/src/components/ui/checkbox.tsx",
+      "reason": "stock UI widgets (shadcn), not product text"
+    },
+    {
+      "path": "webapp/src/components/ui/dropdown-menu.tsx",
+      "reason": "stock UI widgets (shadcn), not product text"
+    },
+    {
+      "path": "webapp/src/components/ui/select.tsx",
+      "reason": "stock UI widgets (shadcn), not product text"
+    },
+    {
+      "path": "webapp/src/components/ui/textarea.tsx",
+      "reason": "stock UI widgets (shadcn), not product text"
+    },
+    {
+      "path": "webapp/src/components/ui/input.tsx",
+      "reason": "stock UI widgets (shadcn), not product text"
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/validation.test.ts",
+      "reason": "test file"
+    },
+    {
+      "path": "webapp/src/lib/form2553Timing.test.ts",
+      "reason": "test file"
+    },
+    {
+      "path": "webapp/src/pages/portal/documentOrder.test.ts",
+      "reason": "test file"
+    },
+    {
+      "path": "webapp/server/statement.test.ts",
+      "reason": "test file"
+    },
+    {
+      "path": "webapp/server/pdf-render.test.ts",
+      "reason": "test file"
+    },
+    {
+      "path": "webapp/server/e2e.ts",
+      "reason": "check suite"
+    },
+    {
+      "path": "webapp/server/order-summary.test.ts",
+      "reason": "test file"
+    },
+    {
+      "path": "webapp/server/oa-capital.test.ts",
+      "reason": "test file"
+    },
+    {
+      "path": "webapp/server/oa-amendment.test.ts",
+      "reason": "test file"
+    },
+    {
+      "path": "webapp/server/sunbiz.test.ts",
+      "reason": "test file"
+    },
+    {
+      "path": "docs/dependency-audit.md",
+      "reason": "gate output or ops note, not client-facing"
+    },
+    {
+      "path": "docs/coverage-605.md",
+      "reason": "gate output or ops note, not client-facing"
+    },
+    {
+      "path": "docs/event-map.md",
+      "reason": "gate output or ops note, not client-facing"
+    },
+    {
+      "path": "docs/db-restore.md",
+      "reason": "gate output or ops note, not client-facing"
+    },
+    {
+      "path": "docs/event-map-text-review.md",
+      "reason": "gate output or ops note, not client-facing"
+    },
+    {
+      "path": "docs/oa-map.md",
+      "reason": "gate output or ops note, not client-facing"
+    }
+  ]
+}
