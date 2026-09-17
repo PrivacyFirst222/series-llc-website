@@ -17,6 +17,10 @@ remembers.
   them. A ruling is added the day it is given.
 - `findings-<day>.md` — each audit's list, numbered, with Adam's ruling beside
   each item as he gives it. The next audit's first job is this file.
+- `findings-open.md` — the one working list: every open item from every run,
+  merged, grouped by where a reader meets it, duplicates linked, rulings
+  marked. Fixes are proposed from this file, area by area; an item leaves it
+  only when the fix is live and the next run has re-verified it.
 - `coverage-check.ts` — the gate. Reads every report under `runs/<day>/`,
   compares it to the inventory, and refuses the audit if any file is missing
   or short, any finding lacks a part, or any prior item is unmarked. Prints

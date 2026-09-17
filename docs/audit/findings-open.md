@@ -1,0 +1,1244 @@
+# Everything open — the complete list (16 Sep 2026)
+
+One list, both runs merged: the 98 items of the morning run (A) and the 167 of the inventory-driven run (B), 267 in all (218 a reader can see, 49 housekeeping). Every item is still open; nothing has been fixed. Grouped by where a reader meets it. An item marked **same defect as …** is one defect seen from a second file and is fixed together with it. An item marked **ruling needed** waits on Adam. Housekeeping (code only, nothing a reader sees) is listed last in each area.
+
+Source records: docs/audit/findings-2026-09-16.md (A) and docs/audit/runs/2026-09-16/bucket-*.json (B). Rulings go beside the item here and into docs/audit/rulings.md.
+
+## Public pages, Terms and Privacy — 41 to fix, 3 housekeeping
+
+- **1. [A30]** — FAQ hero: "Drawn from real client questions about Florida's Protected Series LLC statute." No clients yet. Replace: "The questions people ask before forming a Florida Protected Series LLC, answered."
+  - Ruling: 
+- **2. [A31]** — How It Works step 03: "…we send you the filed Articles … along with a form Operating Agreement completed from your questionnaire answers…". The agreement exists only after the portal questionnaire. Replace: posted documents and Manual; "A short questionnaire in the portal then completes your form Operating Agreement".
+  - Ruling: 
+- **3. [A32]** — How It Works "Optional add-ons" calls the agent service an add-on; first year included. Replace: "Add-ons and choices".
+  - Ruling: 
+- **4. [A33]** — Terms s. 1 assigns 9(c)–(g) and 11(e) to Filing Services; they are Agent Services matters. Replace: assign them to Agent Services.
+  - Ruling: 
+- **5. [A34]** — Terms "Last updated: August 13, 2026" and Privacy "Last updated: August 4, 2026" predate the last edits (Sep 15; Aug 9). Replace the dates.
+  - Ruling: 
+- **6. [A35]** **— ruling needed** — Benefits "Side by side": "One state filing covers 10 series". Each series is its own filing. Ruling needed (a Benefits row was ruled correct on 15 Sep).
+  - Ruling: 
+- **7. [A36]** — Benefits "Use multiple LLCs if… You only ever own 1 asset". Replace eyebrow: "Use a regular LLC if…".
+  - Ruling: 
+- **8. [A37]** — Benefits footnote "State fees only" over a line including the $99 agent fee. Replace: "State fees and registered agent only".
+  - Ruling: 
+- **9. [A38]** — Benefits "Paid once" row "(3 of 10 covered by the fee)". Replace: "covered by our service fee".
+  - Ruling: 
+- **10. [A39]** — Asset Protection: "vote his shares" (no shares in an LLC); "two entirely different directions … addresses all of them". Replace: "vote it"; "addresses both".
+  - Ruling: 
+- **11. [A40]** — FAQ: "Florida Secretary of State" once (elsewhere Division of Corporations); "or (4) C corporation"; a comma splice; "only pay one annual fee" beside two yearly costs. Replace each; "file only one annual report".
+  - Ruling: 
+- **12. [A41]** **— ruling needed** — Home hero and two sections: "Protected Series LLC Act" / "Protected Series Act"; the statute is the "Uniform Protected Series Provisions" (s. 605.2101). Ruling needed.
+  - Ruling: 
+- **13. [A42]** — Home Benefits grid: "One master OA + lightweight Series Designations." Replace: "One master operating agreement + a short Series Exhibit for every series."
+  - Ruling: 
+- **14. [A43]** — The Statute page bullet 1 says the title does not make an asset a series' own; bullet 5 says a recorded deed is the record (s. 605.2301(2)(b)). Replace bullet 1 with a real-property carve-out.
+  - Ruling: 
+- **15. [A44]** **— ruling needed** — "one EIN-friendly tax structure" (What Is) and "1 EIN structure" (Benefits). Ruling needed: "one EIN".
+  - Ruling: 
+- **16. [A45]** — Recordkeeping App table grades "Provides operating agreement" typical: yes; home page says "generic LLC agreement, if any". Replace: "Provides an operating agreement written for protected series: typical no, ours yes".
+  - Ruling: 
+- **17. [A46]** — Contact page "please contact us" on the contact page; Amend Agreement tab title reads "Page Not Found". Replace: "send them using the form below."; add the title.
+  - Ruling: 
+- **18. [B1]** — Home page and Benefits page, the benefits grid, card 03 'One filing, one franchise relationship' — `webapp/src/components/home/BenefitsGrid.tsx:26`
+  - Reads: Pay the $125 Florida formation fee once. Your first three protected series are covered by the formation fee; each one after that is $50 — $25 to prepare plus the $25 state filing fee.
+  - Claims: That the $125 state fee covers the first three protected series.
+  - True: The $125 is $100 for the Articles plus $25 to designate the registered agent (docs/facts.md:39-40; s. 605.0213(2) and (7), opened). The three designations and their $25 state fees are covered by the $499 service fee (Pricing.tsx:90-91 'Covers up to 3 Protected Series Designations, including their state filing fees.'; FAQ.tsx:38). The StatBar ruling of 15 Sep covers the $125 stat bar, not this card.
+  - Replace with: Pay the $125 Florida state filing fee once. Our $499 service fee covers your first three Protected Series Designations, state fees included; each one after that is $50 — $25 to prepare plus the $25 state filing fee.
+  - Ruling: 
+- **19. [B2]** — Home page and Benefits page, the benefits grid, card 03 title — `webapp/src/components/home/BenefitsGrid.tsx:25`
+  - Reads: One filing, one franchise relationship
+  - Claims: That forming here creates one 'franchise relationship'.
+  - True: Florida imposes no franchise tax or franchise relationship on an LLC; the recurring state relationship is the annual report (s. 605.0212, opened) and the supplemental fee (s. 607.193, opened). No other page uses the phrase.
+  - Replace with: One state fee, one annual report
+  - Ruling: 
+- **20. [B3]** — Home page hero, the trust line under the buttons — `webapp/src/components/home/HomeHero.tsx:87`
+  - Reads: Florida registered agent service included
+  - Claims: That registered agent service is included, without limit.
+  - True: Only the first year is included; it renews at $99 (Pricing.tsx:11 'Florida registered agent service — first year included ($99/yr after)'; terms.md:46).
+  - Replace with: Florida registered agent service — first year included
+  - Ruling: 
+- **21. [B4]** — Home page, the dark 'Formed in Florida' teaser above the link to The Statute page — `webapp/src/components/home/StatuteTeaser.tsx:17`
+  - Reads: Two sections do most of the day-to-day work: how a protected series holds property, and how a court reads a series when the chapter applies.
+  - Claims: That the linked page covers two sections, including how a court reads a series (s. 605.2108).
+  - True: The Statute page (TheStatute.tsx:19-75) now has one section, §605.2301 'Associated Assets & Real Property'; there is no section on s. 605.2108 anywhere on the page.
+  - Replace with: One section does most of the day-to-day work: how a protected series holds property, and what your records must show.
+  - Ruling: 
+- **22. [B5]** — Benefits page, 'The math' table, the 'Tax filings' row — `webapp/src/pages/Benefits.tsx:61`
+  - Reads: { label: "Tax filings", oldVal: "10 returns", newVal: "1 return" },
+  - Claims: That ten LLCs file ten income tax returns and one Protected Series LLC files one.
+  - True: The FAQ (FAQ.tsx:56) tells the same reader that a single-owner LLC 'is taxed as a disregarded entity meaning that its income is reported directly on the owner's tax return and doesn't need to file its own income tax return' — so for a sole owner it is zero returns either way; the row is true only for an LLC taxed as a partnership or S corporation.
+  - Replace with: { label: "Income tax returns (if taxed as a partnership or S corporation)", note: "A sole owner's LLC files none either way", oldVal: "10 returns", newVal: "1 return" },
+  - Ruling: 
+- **23. [B6]** — Benefits page, the footnote under 'The math' table — `webapp/src/pages/Benefits.tsx:182`
+  - Reads: Registered agent pricing is held at $99/yr on both sides, so the comparison turns on the number of entities rather than on what any agent charges.
+  - Claims: That both columns are priced at $99 a year for the agent.
+  - True: In the first-year figure the ten LLCs are charged $990 of agent fees and the Protected Series LLC $0 (:52-53 '$990/yr' / '$99/yr' with the note :51 'Your first year is included in the service fee'; the ≈ $1,940 at :168 is 1,250 + 990 − (125 + 175)). The sides are held equal only from year two.
+  - Replace with: Registered agent pricing is held at $99/yr on both sides after the first year; the first-year figure counts the year our service fee includes, so the comparison turns on the number of entities rather than on what any agent charges.
+  - Ruling: 
+- **24. [B7]** — Contact page, the 'Message' box and the Send button — `webapp/src/pages/Contact.tsx:119`
+  - Reads: <Label htmlFor="message">Message</Label>
+  - Claims: That a message is optional (no asterisk; the pre-check at :35 tests only name and email: 'if (!form.name || !form.email)').
+  - True: The server refuses a blank message: routes-payments.ts:638 'message: z.string().trim().min(1).max(5000)' and :647 returns 'Please provide your name, a valid email, and a message.' A visitor who leaves it blank is refused after Send with a message about three boxes.
+  - Replace with: Label 'Message *'; pre-check 'if (!form.name || !form.email || !form.message.trim())' with the toast 'Please add your name, email, and a message so we can reply.'
+  - Ruling: 
+- **25. [B8]** — Contact page, the small line beside the Send button — `webapp/src/pages/Contact.tsx:132`
+  - Reads: Document preparation service only.
+  - Claims: That the business is a document preparation service only.
+  - True: The footer on the same screen (Footer.tsx:79-80) says 'MyFloridaSeriesLLC.com is a document preparation and registered agent service.' and Terms s. 4 sells registered agent service. Two wordings for one fact.
+  - Replace with: Document preparation and registered agent service — not legal advice.
+  - Ruling: 
+- **26. [B9]** — Privacy Policy, section 3 'Payment Information' — `webapp/src/content/privacy.md:19`
+  - Reads: Payments are processed by **Square, Inc.** We never receive or store your full card number, CVV, or bank credentials. Square provides us a confirmation of payment and limited details (such as the last four digits and the name on the order). Square's handling of your information is governed by Square's own privacy policy.
+  - Claims: That Square gives us only a payment confirmation and a few details.
+  - True: With the client's permission on the agent step the formation card is kept with Square for the yearly $99 renewal and charged 15 days before the renewal date (terms.md:44 'You authorize the charges shown at checkout and the renewal charges described below.', :50; buildPayload.ts:68 'renewalCardConsent'; commit e08f019 'the card the formation was paid with is kept with Square'). The policy never says a card is kept on file, by whom, or what we retain to identify it.
+  - Replace with: Add after the third sentence: "If you agree on the order form to keep your card for registered agent renewals, Square stores the card on our behalf and charges the renewal as the Terms describe; we keep only the card brand, its last four digits, and its expiration so you can recognize it in your portal."
+  - Ruling: 
+- **27. [B10]** — Privacy Policy, section 2 'Information You Give Us', the Social Security paragraph — `webapp/src/content/privacy.md:15`
+  - Reads: Our website forms do not request, and you should not enter into them, Social Security numbers, driver's license numbers, government identification numbers, biometric data, or bank account numbers. If you purchase our EIN service, we collect the responsible party's Social Security number or ITIN separately, through a secure channel we designate, solely to prepare and submit IRS Form SS-4, and we do not retain it after the EIN is issued.
+  - Claims: That no website form takes a Social Security number, and that the EIN service prepares and submits Form SS-4.
+  - True: The 'secure channel' is a website form — the portal's EIN details and S election forms (ssn.ts:1-4 'Social Security number checks shared by every box that takes one'; the S election form collects each owner's SSN). And the office applies through the IRS online EIN assistant, walked screen by screen (einActivity.ts:1-3), not by submitting a paper SS-4. The deletion claim is right: routes-admin.ts:1370 'The TIN is deleted the moment the order is fulfilled'.
+  - Replace with: Our order form does not request, and you should not enter into it, Social Security numbers, driver's license numbers, government identification numbers, biometric data, or bank account numbers. If you purchase our EIN service, we collect the responsible party's Social Security number or ITIN separately, through a secure form in your client portal, solely to complete the IRS's EIN application (Form SS-4 or its online equivalent), and we delete it the moment the EIN is issued.
+  - Ruling: 
+- **28. [B11]** — Terms of Service, section 9(g) 'How to cancel', last sentence — `webapp/src/content/terms.md:54`
+  - Reads: If we have not received the proof described in (ii) by your renewal date, we remain registered agent of record and your account will continue to be billed at the then-current rate, prorated monthly, until we receive that proof or our resignation under Section 10(f) takes effect.
+  - Claims: That after a timely cancellation without proof of a successor, the client is billed month by month at a prorated rate.
+  - True: Nothing bills monthly. A search of renewals.ts for 'prorat' and 'month' finds only a date formatter (:56); the only amount is the annual RA_RENEWAL_FEE_CENTS = 99_00 (pricing.ts:7), charged once 15 days before the renewal date, and a timely cancellation stops that charge (commit e08f019). Ruling 21 covers 9(c)–(e), not this sentence.
+  - Replace with: If we have not received the proof described in (ii) by your renewal date, we remain registered agent of record, the annual fee for the new term remains payable, and we may resign under Section 10(f).
+  - Ruling: 
+- **29. [B12]** (same defect as A33) — Terms of Service, section 1, 'Which Company party you are contracting with' (the sentence A33 covers, beyond the 9(c)–(g) and 11(e) point) — `webapp/src/content/terms.md:6`
+  - Reads: Sections 3 through 9 and 11 through 34 apply to Filing Services; Section 10 applies to Agent Services; and Sections 24 through 29 apply to both, each enforceable independently.
+  - Claims: That only Section 10 and Sections 24–29 bind Agent Services.
+  - True: The Terms themselves apply other sections to Agent Services: 30 applies 10(d) to North Carolina residents (:162), 32 lists 10(e)–(g), 12 and 13 among the sections that survive termination (:168), 12 (chargebacks), 13 (portal), 14, 16, 20, 31, 33 and 34 are written for both parties, and 25(c) caps Agent Services' liability. On the sentence's own terms none of 12, 13, 14, 16, 20, 30–34 binds Agent Services.
+  - Replace with: Sections 3 through 8, 9(a)–(b) and 11(a)–(d) and (f) apply to Filing Services; Sections 9(c)–(g), 10 and 11(e) apply to Agent Services; and every other Section applies to both, each enforceable independently.
+  - Ruling: 
+- **30. [B13]** — Terms of Service, section 19 'Text Messages' — `webapp/src/content/terms.md:101`
+  - Reads: If you provide a mobile number and opt in, we may send you service-related text messages. Message and data rates may apply. Reply STOP to opt out and HELP for help. We do not share mobile numbers with third parties for their marketing.
+  - Claims: That there is a text-message channel with an opt-in, STOP and HELP.
+  - True: No form offers an opt-in and nothing sends texts: a search of webapp/src for 'opt in', 'optIn', 'text message' and 'sms' finds nothing, and the server has no SMS provider (the only 'sms' hits are e2e.ts and the embedded Form 2553 asset). The Privacy Policy lists no SMS provider (privacy.md:38).
+  - Replace with: ### 19. Text Messages We do not currently send text messages. If we add them, we will ask for your consent first, and you will be able to reply STOP to opt out.
+  - Ruling: 
+- **31. [B14]** — What Is page, the sidebar 'Quick fact' card — `webapp/src/pages/WhatIs.tsx:152`
+  - Reads: 22 states authorize series LLCs.
+  - Claims: A count of states with series LLC statutes.
+  - True: No source is cited or opened; the count changes every session as states enact, and nothing on the site depends on it. Not verified by this reader.
+  - Replace with: Florida's series LLC is the Uniform Protected Series Provisions.
+  - Ruling: 
+- **32. [B15]** — Recordkeeping App page, the app feature grid, 'Asset transfers' (and the bullet at :182 'transfers between entities') — `webapp/src/pages/RecordkeepingApp.tsx:34`
+  - Reads: { icon: ArrowLeftRight, label: "Asset transfers", desc: "Record transfers of assets between the main LLC and its series, or between series, with supporting notes." },
+  - Claims: That moving assets between series is a routine activity the app supports.
+  - True: The Owner's Manual the same client receives says the opposite: docs/owners-manual.md:173 '**Do not move assets between series.** Treat each series as though it were a separate limited liability company…' and :231 'Do not move them between series… If one ever does move… s. 605.2301 requires the record to show the consideration, the payor, and the payee… (App: the Transfer Log writes both silos' entries at once.)' The feature exists for the exception; the page sells it as the rule.
+  - Replace with: { icon: ArrowLeftRight, label: "Transfer log", desc: "For the rare asset that must move — bought in the wrong series, or genuinely sold from one series to another — records the consideration, payor, and payee the statute requires. The Owner's Manual's rule is not to move assets between series." },
+  - Ruling: 
+- **33. [B16]** — Client portal, the 'taxed as' label beside each agreement (source of the label) — `webapp/src/lib/datetime.ts:53`
+  - Reads: single: "Single-Member",
+  - Claims: That 'Single-Member' is how the single-member agreements are taxed (the comment at :38 says 'How the agreement is taxed, in the words a client would use').
+  - True: 'Single-Member' names the number of owners, not a tax treatment; the FAQ (FAQ.tsx:56) calls it 'a disregarded entity'. The label is shown at PortalDashboard.tsx:506 and OAQuestionnaire.tsx:846. Same at :54 for 'member-single'.
+  - Replace with: single: "Disregarded entity",  and  "member-single": "Disregarded entity",
+  - Ruling: 
+- **34. [B17]** — Client portal, S election form, the eligibility acknowledgment, part (I) — `webapp/src/lib/form2553Timing.ts:109`
+  - Reads: I understand that (I) only U.S. residents can be S corporation shareholders, and an election with a nonresident alien shareholder will be rejected;
+  - Claims: That only U.S. residents may hold S corporation stock.
+  - True: The file's own source note (:105-107) states the IRS test as 'no nonresident alien shareholders'; a U.S. citizen living abroad is not a nonresident alien and is eligible, so 'only U.S. residents' excludes an eligible person. Adam's wording of 6 Sep 2026 — flagged for his decision.
+  - Replace with: I understand that (I) a nonresident alien cannot be an S corporation shareholder, and an election that lists one will be rejected;
+  - Ruling: 
+- **35. [B23]** — How It Works page, step 01 — `webapp/src/pages/HowItWorks.tsx:24`
+  - Reads: It saves as you go, so you can stop and come back.
+  - Claims: That the form's progress is saved and can be resumed.
+  - True: The draft is saved in the browser's localStorage only (FloridaLLCFormationForm.tsx:82, :192, :502); nothing is saved to us, so it cannot be resumed on another device or after clearing the browser.
+  - Replace with: It saves as you go in your browser, so you can stop and come back on the same device.
+  - Ruling: 
+- **36. [B24]** — Home page comparison table, the 'Recordkeeping app' row (and the Pricing page strip at :114 'Built around §605.2301 — free with formation') — `webapp/src/components/home/WhyOnlyUs.tsx:24`
+  - Reads: us: "Free with formation",
+  - Claims: That the app is available with formation today.
+  - True: It is not released: Pricing.tsx:12 'Free iOS app (available end of year)'; RecordkeepingApp.tsx:129-130 'the recordkeeping app is currently in development'. The table row carries no such note.
+  - Replace with: us: "Free with formation (iPhone app, coming end of year)",  and on :114  d: "Built around §605.2301 — free with formation, coming end of year"
+  - Ruling: 
+- **37. [B25]** — Home page comparison table and Pricing strip, the footnote — `webapp/src/components/home/WhyOnlyUs.tsx:37`
+  - Reads: "Comparison based on our review of leading national formation services' published offerings (August 2026).";
+  - Claims: A review date on a public page.
+  - True: The 15 Sep ruling keeps '(August 2026)' in 'every document footer'; this is a public-page footnote, so it may or may not be covered. Listed so the rulings filter can decide; the date will read stale by year end.
+  - Replace with: Comparison based on our review of leading national formation services' published offerings.
+  - Ruling: 
+- **38. [B26]** — What Is page (and Home), the mothership diagram, the note under the six series boxes — `webapp/src/components/home/MothershipDiagram.tsx:98`
+  - Reads: Each box is shielded like a separate entity for liability purposes — but a single tax filing and operating agreement from your perspective.
+  - Claims: That the structure has one tax filing.
+  - True: For a sole owner there is no tax filing of its own (FAQ.tsx:56 'doesn't need to file its own income tax return'); what is single in every case is the EIN, the operating agreement and the annual report (:33 on the same page).
+  - Replace with: Each box is shielded like a separate entity for liability purposes — but one EIN, one operating agreement, and one annual report from your perspective.
+  - Ruling: 
+- **39. [B27]** — FAQ, 'What's the federal tax treatment?', the S election sentence — `webapp/src/pages/FAQ.tsx:56`
+  - Reads: If you decide on an S corporation election, we offer a $95 package that prepares IRS Form 2553 for you to sign and file.
+  - Claims: That the package is available to any reader, including the converting client the FAQ addresses two answers earlier.
+  - True: It is sold only for new formations: Pricing.tsx:140 'Available for new LLCs we form, ordered within 65 days of paying for your formation.'; buildPayload.ts:133 'sElection: data.orderSElection && data.filingPath !== "CONVERT"'.
+  - Replace with: If you decide on an S corporation election for an LLC we form, we offer a $95 package that prepares IRS Form 2553 for you to sign and file.
+  - Ruling: 
+- **40. [B28]** — Site header, the Learn menu, the line under 'The Florida Statute' — `webapp/src/components/layout/Header.tsx:18`
+  - Reads: { to: "/the-statute", label: "The Florida Statute", sub: "Ch. 605 highlights" },
+  - Claims: That the page is a tour of Chapter 605 highlights.
+  - True: The page is one section, §605.2301, framed as 'What the statute requires of you' (TheStatute.tsx:13-16).
+  - Replace with: { to: "/the-statute", label: "The Florida Statute", sub: "What §605.2301 requires of you" },
+  - Ruling: 
+- **41. [B29]** — Home page comparison table, the last row — `webapp/src/components/home/WhyOnlyUs.tsx:29`
+  - Reads: label: "Registered agent + legal-mail client portal",     us: "First year included",
+  - Claims: That the portal, like the agent, is a first-year inclusion.
+  - True: Only the agent service is a first-year inclusion (Pricing.tsx:11); the portal is the client's for as long as the account exists (terms.md:83).
+  - Replace with: label: "Registered agent, with legal mail posted to your portal", us: "First year of agent service included",
+  - Ruling: 
+
+### Housekeeping
+
+- **42. [B30]** — FAQ sidebar 'Authoritative sources' and the What Is sidebar, the Chapter 605 link — `webapp/src/pages/FAQ.tsx:143`
+  - Reads: href="https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605ContentsIndex.html&StatuteYear=2025&Title=%2D%3E2025%2D%3EChapter%20605"
+  - Claims: Links the reader to the 2025 statutes.
+  - True: Online Sunshine now serves 'The 2026 Florida Statutes' (opened 16 Sep 2026); the same 2025 link is at WhatIs.tsx:138. The sections exist in both years, but the link pins last year's text.
+  - Replace with: https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605ContentsIndex.html (no StatuteYear, so the current year is served), in both files.
+  - Ruling: 
+- **43. [B98]** — Server entry — code only — `webapp/server/app.ts:24`
+  - Reads: // The e2e suite imports these from "./app"; they live in the portal module.
+  - Claims: The e2e suite imports both re-exports.
+  - True: server/e2e.ts:3328 imports personLegalName only; nothing under webapp/server or webapp/src imports effectiveOwners from './app' (routes-payments.ts:26 takes personLegalName from './routes-portal' directly).
+  - Replace with: // server/e2e.ts imports personLegalName from "./app"; it lives in the portal module. — and drop effectiveOwners from the export, or import it somewhere.
+  - Ruling: 
+- **44. [B143]** — Server, the Sunbiz name check — the statute the hold is attributed to — `webapp/server/sunbiz.ts:160`
+  - Reads: /** s. 605.0715(5)-(6), Fla. Stat.: after administrative dissolution the  *  dissolved company's name is unavailable to others until one year has  *  passed (120 days after a voluntary dissolution). The data file does not  *  say which kind a dissolution was, so the longer window is applied to  *  every inactive record — erring toward warning the client. */
+  - Claims: Subsections (5) and (6) of s. 605.0715 set the one-year and 120-day holds.
+  - True: s. 605.0715, read whole: (5) is the one-year hold; (6) says only that a dissolved company whose name has been lawfully taken must change its name before reinstatement — no hold. Neither s. 605.0715 nor s. 605.0707 (articles of dissolution, read whole) contains a 120-day rule for a voluntary dissolution; I could not find its source in the two sections read.
+  - Replace with: /** s. 605.0715(5), Fla. Stat.: after administrative dissolution the dissolved company's name is unavailable to others until one year has passed. The data file does not say why a record is inactive, so the one-year window is applied to every inactive record — erring toward warning the client. */  (restore the 120-day sentence only with its section cited)
+  - Ruling: 
+
+## Order form and payment — 55 to fix, 15 housekeeping
+
+- **45. [A1]** — Registered agent step, card tick (mine). Reads "…and I can cancel at any time in my portal." Terms 9(g) and the code stop the charge only on 30 days' notice. Replace: "…and I can cancel in my portal with at least 30 days' notice before the renewal date." (StepRegisteredAgent.tsx)
+  - Ruling: 
+- **46. [A2]** — Same tick (mine). Reads "…cannot be kept on file and will not be accepted for renewal." A gift-card client gets a payment link and may pay it with a gift card; only the keeping is refused. Replace: "…cannot be kept on file; if I pay with one, each year's renewal comes with a payment link instead."
+  - Ruling: 
+- **47. [A6]** — Review step, agent card (mine). "Renewal card on file: Yes" before any card exists. Replace: "Keep card for renewal: Agreed".
+  - Ruling: 
+- **48. [A7]** — steps.ts FIELD_STEP lacks raRenewalCardConsent; a server refusal lands on the Certify step. Replace: map it to the agent step.
+  - Ruling: 
+- **49. [A8]** — Review, Members card "In Articles?" reads "No" for member-managed orders (server lists them as AMBR) and shows on a conversion. Replace: "Yes — listed as members (AMBR)" for member-managed new formations; no row on a conversion.
+  - Ruling: 
+- **50. [A9]** — Managers step header and stepValidation on a conversion: "…because you elected to include a manager-managed statement in the Articles." Server version mentions an authorized representative row the form cannot make. Replace both: "A manager-managed LLC needs at least one Manager."
+  - Ruling: 
+- **51. [A10]** — Registered agent step on a conversion keeping its agent: header "Florida requires the agent's signed acceptance…", boxes "Your first name / Your last name", ticks "I am accepting this role personally" and "this is my physical street address". Replace on a conversion: "Keep the registered agent already on file", "Agent's first name / last name" plus entity name, one tick "This is the registered agent, and the Florida street address, that the Division has on file for my LLC. This order does not change it."
+  - Ruling: 
+- **52. [A11]** **— ruling needed** — Principal office and mailing steps shown on a conversion; answers reach no sheet row. Replace: hide on a conversion, or add sheet rows. Ruling needed.
+  - Ruling: 
+- **53. [A12]** — Eligibility step "Formation type" shown to a converting client; changes nothing. Replace: hide on a conversion.
+  - Ruling: 
+- **54. [A13]** **— ruling needed** — filing.ts member-managed "Any Other Provisions" sentence can never be produced. Replace: delete, or force the statement for member-managed too. Ruling needed.
+  - Ruling: 
+- **55. [A14]** — Country box: step allows empty; server refuses with no box marked. Replace: "Country required." on the step, error passed to the box (client, managers, members, correspondence).
+  - Ruling: 
+- **56. [A15]** — ZIP: one or two characters pass the step; server says "ZIP is required". Replace: "Enter a full ZIP code." on step and server.
+  - Ruling: 
+- **57. [A16]** — Managers "Email (optional)" and Certify "Email (optional)": malformed email refused after Submit with no message; Certify email/phone never stored. Replace: drop the Certify boxes; check the manager email on the step.
+  - Ruling: 
+- **58. [A17]** — Server alternate-name check runs on a conversion. Replace: skip on a conversion.
+  - Ruling: 
+- **59. [A18]** — Conversion certification paragraph says designations "and the change of registered agent"; the tick omits the agent change. Replace the tick to include it when our service is chosen.
+  - Ruling: 
+- **60. [A19]** **— ruling needed** — Correspondence "Company (optional)", "Phone (optional)" and the paper-mail address block reach nothing that mails. Replace: remove, or say what is mailed. Ruling needed.
+  - Ruling: 
+- **61. [A20]** — Effective date rule measured from the moment of Continue, described as the filing date. Replace: measure from an expected filing day and say so.
+  - Ruling: 
+- **62. [A21]** — Agent acceptance signature has no match-the-name rule (the Articles signature does). Replace: same rule.
+  - Ruling: 
+- **63. [A22]** — S election deadline described three ways. Replace all: "within 2 months and 15 days after your LLC's effective date (the date on your filed Articles, unless you chose a later effective date)".
+  - Ruling: 
+- **64. [A25]** — Order confirmed: "Sign in to your portal" button for a first-time client; resend answers "already has a password" for a filed or formed order. Replace: button only for a returning client; treat filed/formed as paid.
+  - Ruling: 
+- **65. [A26]** — Progress percent counts hidden steps and an unreachable "Submit" step (whose dead page says we send the operating agreement). Replace: remove the dead step; one denominator.
+  - Ruling: 
+- **66. [A27]** — Service-fee box "Formation service" on a conversion vs receipt "Protected series service fee". Replace: same words.
+  - Ruling: 
+- **67. [A28]** — Optional documents header "from the Florida Division of Corporations" over two IRS items. Replace: "Optional documents and services".
+  - Ruling: 
+- **68. [A29]** **— ruling needed** — Intro and Certify ask the same two acknowledgments. Ruling needed.
+  - Ruling: 
+- **69. [B21]** — Order form, any address block with a locked state (the registered agent's Florida address), choosing a suggestion from the drop-down — `webapp/src/components/forms/florida-llc/AddressFields.tsx:47`
+  - Reads: state: lockState ?? s.state,
+  - Claims: That a chosen suggestion fills the boxes with its own address.
+  - True: The Smarty suggestions are nationwide (AddressAutocomplete.tsx:65-66 has no state filter). With lockState 'FL', choosing '100 Peachtree St, Atlanta GA 30303' fills city 'Atlanta' and ZIP '30303' and writes state 'FL' — the client sees 'Atlanta, FL 30303' and the disabled State box gives no way to correct it.
+  - Replace with: When lockState is set and s.state !== lockState, keep only the street text and leave city/ZIP empty, showing 'Florida addresses only' under the box; or pass a state filter to the suggestion request.
+  - Ruling: 
+- **70. [B31]** — Registered agent step, the "I'll serve as my own registered agent" card and its address tick — `webapp/src/components/forms/florida-llc/sections/StepRegisteredAgent.tsx:83`
+  - Reads: You must have a physical Florida street address and you'll sign the acceptance on the next screen.
+  - Claims: A Florida street address is all an individual needs to serve as the agent; the tick at line 284 confirms only "I confirm this is my physical street address in Florida and not a P.O. Box."
+  - True: s. 605.0113(1)(b)1: the registered agent must be "An individual who resides in this state and whose business address is identical to the address of the registered office". Nothing on the step asks or confirms Florida residency; stepValidation.ts:208-230 and server/validation.ts:223-232 check name, address, state FL and two ticks only.
+  - Replace with: Card: "You must live in Florida and have a physical Florida street address; you'll sign the acceptance on the next screen." Tick (line 284): "I live in Florida, and this is my physical street address in Florida, not a P.O. Box."
+  - Ruling: 
+- **71. [B32]** (same defect as A10) — Registered agent step, the self-agent card on a conversion that keeps its agent — `webapp/src/components/forms/florida-llc/sections/StepRegisteredAgent.tsx:83`
+  - Reads: You must have a physical Florida street address and you'll sign the acceptance on the next screen. For an existing LLC, enter your agent's name and address exactly as the Division has them on file. This order does not change your agent.
+  - Claims: The converting client will sign an acceptance on the next screen.
+  - True: FloridaLLCFormationForm.tsx:296-298 hides the acceptance step for a conversion keeping its own agent, and stepValidation.ts:233-235 validates nothing there; no acceptance is signed.
+  - Replace with: On a conversion: "Enter your agent's name and Florida street address exactly as the Division has them on file. This order does not change your agent, and there is nothing to sign."
+  - Ruling: 
+- **72. [B33]** — Registered agent step, the note under "Your registered agent will be" — `webapp/src/components/forms/florida-llc/sections/StepRegisteredAgent.tsx:105`
+  - Reads: Nothing to sign here — we execute the registered agent acceptance when we prepare your filing, and anything we receive for your LLC is posted to your client portal.
+  - Claims: Everything received at the agent address is posted to the portal.
+  - True: Terms 10(b): we post "service of process and official government correspondence"; Terms 10(c): "Packages and general mail may be refused, returned to sender, or destroyed. We have no obligation to forward anything received through unauthorized use of the address."
+  - Replace with: Nothing to sign here — we execute the registered agent acceptance when we prepare your filing, and any legal process or official government correspondence we receive for your LLC is posted to your client portal.
+  - Ruling: 
+- **73. [B34]** — Agent acceptance step, the first tick — `webapp/src/components/forms/florida-llc/sections/StepRegisteredAgentAcceptance.tsx:113`
+  - Reads: I accept the appointment and acknowledge the obligations of serving as registered agent for this Florida LLC.
+  - Claims: This is the acceptance Florida requires.
+  - True: s. 605.0113(2): "The statement of acceptance must provide that the registered agent is familiar with and accepts the obligations of that position." The tick says "acknowledge", not "familiar with and accept".
+  - Replace with: I accept the appointment as registered agent for this Florida LLC, and I am familiar with and accept the obligations of that position.
+  - Ruling: 
+- **74. [B36]** — Certification & signature step, "Who is the authorized representative?" — `webapp/src/components/forms/florida-llc/sections/StepCertification.tsx:153`
+  - Reads: For a company being formed, Florida defines it as a person authorized by a prospective member to form the company by executing and filing its articles of organization (§605.0102(8)(a)).
+  - Claims: The italicized words are the statute's definition.
+  - True: s. 605.0102(8)(a) reads "a person authorized by a prospective member of the limited liability company to form the company by executing and filing its articles of organization with the department." Two phrases are dropped from text set as a quotation.
+  - Replace with: For a company being formed, Florida defines it as "a person authorized by a prospective member of the limited liability company to form the company by executing and filing its articles of organization with the department" (§605.0102(8)(a)).
+  - Ruling: 
+- **75. [B37]** — Certification & signature step, the amber "Before you choose this" box, second bullet — `webapp/src/components/forms/florida-llc/sections/StepCertification.tsx:253`
+  - Reads: If your name does not appear on Sunbiz.org (the Florida Division of Corporations’ website), a bank, or the Division of Workers’ Compensation may ask why the name on your formation document is not yours.
+  - Claims: Reads as a list of three places the name might not appear.
+  - True: The sentence means a bank or the Division of Workers' Compensation may ask; the comma after the parenthesis and before "or" breaks it. (Code comment at line 248 says these are Adam's words, 13 Sep 2026.)
+  - Replace with: If your name does not appear on Sunbiz.org (the Florida Division of Corporations’ website), a bank or the Division of Workers’ Compensation may ask why the name on your formation document is not yours.
+  - Ruling: 
+- **76. [B38]** **— ruling needed** — Certification & signature step, the "MyFloridaSeriesLLC signs for me" option and its appointment tick — `webapp/src/components/forms/florida-llc/sections/StepCertification.tsx:273`
+  - Reads: I appoint MyFloridaSeriesLLC as my authorized representative to sign and file my Articles of Organization, and I certify that the information I have provided is true, accurate, and complete.
+  - Claims: The client appoints "MyFloridaSeriesLLC" (also lines 195, 235-236, 168-170).
+  - True: The appointee that signs and files is FLORIDA PROTECTED SERIES, LLC - PS 1: Terms s. 1 ("Document preparation, filing, and all related deliverables are provided by Filing Services" = PS 1); the Statement of Authorized Representative master: "The undersigned, on behalf of FLORIDA PROTECTED SERIES, LLC - PS 1, doing business as MyFloridaSeriesLLC (the "Filer") … The Filer was so authorized by a prospective member of the Company, who appointed the Filer for that purpose"; docs/facts.md: signer "Caitlin Kirwan, Manager of FLORIDA PROTECTED SERIES, LLC - PS 1". The appointment on screen names the site brand, not the party the Statement says was appointed.
+  - Replace with: I appoint FLORIDA PROTECTED SERIES, LLC - PS 1 (doing business as MyFloridaSeriesLLC) as my authorized representative to sign and file my Articles of Organization, and I certify that the information I have provided is true, accurate, and complete. (Same change at lines 195 and 235.) Ruling needed.
+  - Ruling: 
+- **77. [B39]** — Certify & sign step, the button that ends the form — `webapp/src/components/forms/florida-llc/FloridaLLCFormationForm.tsx:746`
+  - Reads: {submitting ? "Submitting…" : "Submit intake"}
+  - Claims: Pressing it submits an intake.
+  - True: handleFinalSubmit (lines 449-457) posts the order and sends the browser to Square's checkout page; nothing on the Certify step says payment comes next (the fees are shown only on the Review and Optional docs steps).
+  - Replace with: {submitting ? "Taking you to payment…" : "Continue to payment"}
+  - Ruling: 
+- **78. [B40]** — LLC name step, the "Final name preview" box while no designator is chosen — `webapp/src/components/forms/florida-llc/sections/StepName.tsx:315`
+  - Reads: Florida LLC name must include LLC, L.L.C., Limited Liability Company, PLLC, P.L.L.C., or Professional Limited Liability Company.
+  - Claims: The typed name is defective.
+  - True: The box above says "The base name without the LLC designator (we'll add it for you)" (line 174); buildFinalLlcName (validation.ts:20-36) appends the designator only once one is chosen, so this red text appears simply because the dropdown is still empty. The same rule reads differently in stepValidation.ts:142 ("must include LLC, L.L.C., or Limited Liability Company.").
+  - Replace with: Choose a designator above to complete the name.
+  - Ruling: 
+- **79. [B41]** — Eligibility & basics step, the "Formation type" helper — `webapp/src/components/forms/florida-llc/sections/StepIntro.tsx:27`
+  - Reads: Choose 'Professional LLC' if your business will provide a regulated professional service such as law, medicine, or accounting.
+  - Claims: An option named "Professional LLC" exists.
+  - True: The option is titled "Domestic Florida PLLC" (line 31).
+  - Replace with: Choose 'Domestic Florida PLLC' if your business will provide a regulated professional service such as law, medicine, or accounting.
+  - Ruling: 
+- **80. [B42]** (same defect as A24) — Your information step, the introduction, for a converting client — `webapp/src/components/forms/florida-llc/sections/StepClient.tsx:31`
+  - Reads: Tell us who you are. Your client portal, your formation documents, and our emails about your LLC all belong to the person named here — and later questions offer your name and address wherever they fit, so you won't retype them.
+  - Claims: The client will receive formation documents.
+  - True: A conversion files Designations for a company already formed (StepIntro.tsx:22; FloridaLLCFormationForm.tsx:301-304). A24 records the same word in the emails and portal header.
+  - Replace with: Tell us who you are. Your client portal, your filed documents, and our emails about your LLC all belong to the person named here — and later questions offer your name and address wherever they fit, so you won't retype them.
+  - Ruling: 
+- **81. [B43]** — Getting started step, the "Converting an existing Florida LLC" card — `webapp/src/components/forms/florida-llc/sections/StepFilingPath.tsx:27`
+  - Reads: You already have a Florida LLC on file with the state. We file Protected Series Designations for it — no Articles fee.
+  - Claims: The saving is the Articles fee.
+  - True: docs/facts.md: "$100 for the Articles plus $25 to designate the registered agent; a conversion skips both unless it changes its agent"; the same screen's header (lines 39-41) says "Converting skips the $125 filing fee for the Articles and Registered Agent (if you keep your existing Registered Agent)." — two wordings for one fact on one screen.
+  - Replace with: You already have a Florida LLC on file with the state. We file Protected Series Designations for it — no Articles filing fee, and no registered agent fee if you keep your agent.
+  - Ruling: 
+- **82. [B44]** **— ruling needed** — Getting started step (and the site), the word "Converting" — `webapp/src/components/forms/florida-llc/sections/StepFilingPath.tsx:26`
+  - Reads: Converting an existing Florida LLC
+  - Claims: Adding protected series to an existing LLC is a conversion.
+  - True: In chapter 605 "conversion" is the change of an entity's type (ss. 605.1041-605.1046; s. 605.0213(10) "certificate of conversion"); establishing a protected series is s. 605.2201, and the Intro tick (StepIntro.tsx:61) itself says the form "adds protected series to that company". The Terms never use "convert". The word is used site-wide (Pricing.tsx:55 "converting the Florida LLC you already have").
+  - Replace with: Adding series to an existing Florida LLC (site-wide). Ruling needed.
+  - Ruling: 
+- **83. [B45]** **— ruling needed** — Management structure step, the "Recommended" badge and the panel title — `webapp/src/components/forms/florida-llc/sections/StepManagement.tsx:95`
+  - Reads: Why manager-managed is usually the smarter choice — learn why
+  - Claims: We recommend a management structure (badge "Recommended" at lines 81-85; preselected at defaults.ts:85).
+  - True: Terms s. 4: "We do not review your information for legal sufficiency, select entities or structures for you, or exercise legal judgment on your behalf. You are solely responsible for deciding whether a Florida Protected Series LLC is appropriate for you." The panel's content is general information, but the badge and title present a choice of structure.
+  - Replace with: Drop the badge; title "Why many owners choose manager-managed — learn why". Ruling needed.
+  - Ruling: 
+- **84. [B46]** — Review step, Effective Date card, the "Date" row — `webapp/src/components/forms/florida-llc/ReviewStep.tsx:255`
+  - Reads: <Row label="Date" value={data.requestedEffectiveDate} />
+  - Claims: Shows the chosen date.
+  - True: The date box (StepEffectiveDate.tsx:71-78, type="date") stores YYYY-MM-DD, so the review prints "2026-10-01" while every other date the client sees is written out (NameCheck.tsx:14-21 fmtDate).
+  - Replace with: Format the value as "October 1, 2026" (the fmtDate pattern from NameCheck.tsx).
+  - Ruling: 
+- **85. [B47]** — Managers step and Initial members step, the type dropdowns — `webapp/src/components/forms/florida-llc/RepeatablePartyFields.tsx:89`
+  - Reads: <SelectItem value="ENTITY">Business Entity</SelectItem>
+  - Claims: The choice is called "Business Entity" under the label "Type" (line 77).
+  - True: RepeatableMemberFields.tsx:85 calls the same choice "Entity" under "Member type" (line 73); Review prints "Business entity" for an agent (ReviewStep.tsx:137).
+  - Replace with: Label "Manager type"; items "Individual" / "Business entity" on both steps.
+  - Ruling: 
+- **86. [B48]** **— ruling needed** — Your information, Initial members, Managers and Correspondence steps — the address block's State box — `webapp/src/components/forms/florida-llc/sections/StepClient.tsx:101`
+  - Reads: <FieldShell label="Your address" required error={errors.clientAddress}>
+  - Claims: Any client can enter their address.
+  - True: AddressFieldsBlock (AddressFields.tsx:93-108, not in this bucket) offers only US states in a required State dropdown while Country (lines 127-139) is free text, and stepValidation.ts:53 / server schema.ts:11 require a state — a client, member or manager outside the United States cannot complete the form. Same block at RepeatableMemberFields.tsx:141, RepeatablePartyFields.tsx:147, StepCorrespondence.tsx:144. The Division's Articles form accepts foreign addresses for managers.
+  - Replace with: Either say on the Eligibility step that every person's address must be in the United States, or let the State box accept a province/region when the country is not the United States. Ruling needed.
+  - Ruling: 
+- **87. [B49]** (same defect as A65) — Optional docs step, the S corporation election item — `webapp/src/components/forms/florida-llc/sections/StepOptionalDocs.tsx:68`
+  - Reads: You review, sign, and mail it; there is no IRS filing fee.
+  - Claims: The form is mailed.
+  - True: The package's own deadline text says "Your Form 2553 must be filed (postmarked or faxed) by …" (form2553Timing.ts:95-96); A65 records the same mail/fax mismatch in the portal dialog.
+  - Replace with: You review, sign, and fax or mail it; there is no IRS filing fee.
+  - Ruling: 
+- **88. [B50]** — Series step, "How ownership works in this structure" — `webapp/src/components/forms/florida-llc/sections/StepSeries.tsx:98`
+  - Reads: No series has its own separate owners, and ownership cannot differ from one series to the next.
+  - Claims: Reads as a rule of law.
+  - True: Florida's Act allows a protected series to have its own associated members: s. 605.2102(3) "'Associated member' means a member that meets the requirements of s. 605.2302." The single-ownership design is this product's choice, which the next sentence ("This is deliberate.") half-says.
+  - Replace with: No series has its own separate owners, and in this structure ownership does not differ from one series to the next.
+  - Ruling: 
+- **89. [B51]** (same defect as A26) — Intake received page (unreachable; see A26), step 03 — `webapp/src/components/forms/florida-llc/sections/StepSubmissionPayload.tsx:56`
+  - Reads: Once the state accepts the filing, we send you the filed documents along with your form Operating Agreement and a comprehensive Owner’s Manual.
+  - Claims: The operating agreement is sent with the filed documents.
+  - True: The agreement is generated only after the portal questionnaire (A31; Terms s. 4 "completed with the information and the choices you make in the questionnaire"). The page is dead code (A26), so the fix is deletion; if kept, the sentence is wrong.
+  - Replace with: Delete the page with the step (A26); otherwise: "Once the state accepts the filing, we post the filed documents and the Owner’s Manual to your portal; a short questionnaire there then completes your form Operating Agreement."
+  - Ruling: 
+- **90. [B52]** **— ruling needed** — Name check result, the "held" verdict line — `webapp/src/components/forms/florida-llc/NameCheck.tsx:45`
+  - Reads: Unavailable — this name belongs to a recently dissolved company, and Florida protects it for up to a year. Please choose a different name.
+  - Claims: Florida protects a dissolved company's name for up to a year.
+  - True: s. 605.0715(5): "The name of the dissolved limited liability company is not available for assumption or use by another business entity until 1 year after the effective date of dissolution" — that section governs administrative dissolution (605.0715(1)); the check applies 366 days to every inactive record (server/sunbiz.ts:160-165), whose comment attributes a 120-day voluntary-dissolution hold to "s. 605.0715(5)-(6)" that the text does not contain (read ss. 605.0714, 605.0715, 605.0716 in full). "Up to a year" is true of the administratively dissolved case; for other inactive records the sentence asserts a protection I could not find. Adam's rule (22 Aug 2026, sunbiz.ts:322-324) is that held blocks anyway.
+  - Replace with: Unavailable — this name belongs to a company dissolved within the last year. Florida keeps an administratively dissolved company's name unavailable for one year (s. 605.0715(5)), and the state's records do not say which kind of dissolution this was, so we treat it as unavailable. Please choose a different name. Ruling needed on the 120-day claim in sunbiz.ts.
+  - Ruling: 
+- **91. [B55]** — Order form, Series step (and the portal's add-a-series service): the identifier rule — `webapp/src/components/forms/florida-llc/validation.ts:224`
+  - Reads: return /protected\s+series/i.test(name) || /(^|\s)p\.?s\.?(\s|$)/i.test(name);
+  - Claims: A series name contains the statutory phrase only when "PS" or "P.S." is bounded by whitespace or the ends of the string; stepValidation.ts:187-189 then refuses "PS-4" with 'Include "PS" (or "P.S." / "protected series") — §605.2202 requires it in every series name.' and routes-portal.ts:1975-1979 refuses "Acme, LLC - PS-4" the same way.
+  - True: s. 605.2202(2)(b) (opened): the name must 'Contain the phrase "protected series" or the abbreviation "P.S." or "PS."' — "PS-4" contains "PS". The site's own exhibit heading is "SERIES EXHIBIT PS-4" (templates-oa-multi.md:461) and StepSeries.tsx:20 describes the naming as "PS-1, PS-2, …", so a client copying that spelling is refused for lacking what the name has. seriesDedupeKey (:246) and canonicalizeSeriesName (:233-235) use the same whitespace-only boundary.
+  - Replace with: return /protected\s+series/i.test(name) || /(^|[^a-z0-9])p\.?s\.?(?=[^a-z0-9]|$)/i.test(name); — and the same boundary in canonicalizeSeriesName and seriesDedupeKey, so "PS-4", "PS 4" and "P.S. 4" are one series.
+  - Ruling: 
+- **92. [B56]** — Order form, Name step: the backup-name rule — `webapp/src/components/forms/florida-llc/validation.ts:38`
+  - Reads: export function nameContainsLegalDesignator(name: string): boolean { const lower = name.toLowerCase(); return ["limited liability company", "professional limited liability company", "llc", "l.l.c.", "pllc", "p.l.l.c."].some((d) => lower.includes(d)); }
+  - Claims: A name carries a designator whenever the letters "llc" appear anywhere in it. stepValidation.ts:134-136 (and server/validation.ts:152-157) then refuse the backup name with "Leave the designator off — your designator above is added automatically."
+  - True: "Millcreek Holdings", "Hillcrest Rentals", "Wellcome Farms" and "Fullcircle Properties" all contain "llc" inside a word and carry no designator; the client cannot enter any of them as a backup, and the message tells them to remove a designator that is not there. s. 605.0112(1)(a) (opened) requires the words or abbreviation as the entity indicator, not the letter sequence.
+  - Replace with: Match a designator as its own word, at the end of the name: /(^|[\s,])(p\.?l\.?l\.?c\.?|l\.?l\.?c\.?|(professional\s+)?limited\s+liability\s+company)\s*$/i — used by nameContainsLegalDesignator and by the endsWith test in buildFinalLlcName (:27-33).
+  - Ruling: 
+- **93. [B57]** — Order form, Name step: a typed professional designator on a standard LLC — `webapp/src/components/forms/florida-llc/validation.ts:27`
+  - Reads: const hasIt = lower.endsWith("llc") || lower.endsWith("l.l.c.") || lower.endsWith("limited liability company") || lower.endsWith("pllc") || lower.endsWith("p.l.l.c.") || lower.endsWith("professional limited liability company"); if (hasIt) return cleaned;
+  - Claims: A desired name that already ends in any designator is filed as typed, whatever designator the client chose and whatever the formation type.
+  - True: A client who picks Domestic LLC, chooses "LLC", and types "Acme PLLC" passes designatorAllowedForFormationType (stepValidation.ts:69-78 tests the chosen designator, not the typed one), buildFinalLlcName returns "Acme PLLC" unchanged, and nameContainsLegalDesignator finds "llc" inside "pllc" — so a non-professional LLC is filed under a professional designator. s. 621.12(2)(b)3 (opened) reserves "PLLC"/"P.L.L.C." to companies formed under ch. 621 ('in lieu of' the s. 605.0112 designators). The converse ("Acme LLC" typed for a PLLC) is caught only because the Division would refuse it.
+  - Replace with: In buildFinalLlcName, when the typed name already ends in a designator, require that designator to be one the formation type allows (STANDARD_DESIGNATORS for DOMESTIC_LLC, PLLC_DESIGNATORS for PLLC) and otherwise report on the name step: "Your name ends in a professional designator; choose Professional LLC on the first step, or leave the designator off and pick it below."
+  - Ruling: 
+- **94. [B59]** — Order form, Members step, the empty-list refusal — `webapp/src/components/forms/florida-llc/stepValidation.ts:291`
+  - Reads: "At least one initial member is required for internal formation records."
+  - Claims: The members are collected for internal records.
+  - True: The step only runs for member-managed companies (:289 returns early otherwise), whose members are filed on the Articles as AMBR (filing.ts:537-568) and are public; StepMembers.tsx:52 tells the client that on the same screen.
+  - Replace with: "At least one member is required — in a member-managed company the members are listed on the Articles of Organization."
+  - Ruling: 
+- **95. [B62]** (same defect as A24) — Order form banner, on the conversion path — `webapp/src/pages/FormLLC.tsx:15`
+  - Reads: eyebrow="Florida LLC formation" … Form your <em>Florida Protected Series LLC</em>
+  - Claims: The converting client is forming an LLC.
+  - True: The description on :24 was already changed for a conversion ("Tell us about your existing LLC. We'll prepare Protected Series Designations…"), but the eyebrow and title above it still say formation to a client whose LLC exists (14 Sep 2026 fix covered the description only).
+  - Replace with: On the conversion path: eyebrow "Florida Protected Series LLC", title "Convert your existing LLC into a <em>Florida Protected Series LLC</em>"; the formation wording stays for a new LLC.
+  - Ruling: 
+- **96. [B142]** — Order form, LLC name step and Submit — why a name is unavailable when the record is inactive — `webapp/server/routes-payments.ts:327`
+  - Reads: `The name "${p.name}" is unavailable — ${           p.verdict === "taken"             ? "an existing Florida company already has it"             : "it belongs to a recently dissolved company, and Florida protects it for up to a year"         }. Please choose a different name.`,
+  - Claims: Every inactive record within the hold is a dissolved company, and Florida protects its name for up to a year.
+  - True: The mirror knows only status 'A' or 'I' (sunbiz.ts:62-63) and applies the hold to every inactive record (sunbiz.ts:165, :236-237) — a company that merged, converted or withdrew is 'I' too. s. 605.0715(5), read whole in the browser: "The name of the dissolved limited liability company is not available for assumption or use by another business entity until 1 year after the effective date of dissolution" — a subsection of the reinstatement section, which begins "A limited liability company that is administratively dissolved". The over-blocking is Adam's rule (sunbiz.ts:322-324) and stays; the sentence should not assert a fact the data does not hold. The same words are at NameCheck.tsx:45, and sunbiz.ts:245 cites "(s. 605.0715, Fla. Stat.)" for every inactive record.
+  - Replace with: "it belongs to a company that recently went inactive in the Division's records, and Florida can protect such a name for up to a year" (routes-payments.ts:330 and NameCheck.tsx:45); sunbiz.ts:245 `; recently inactive — the name may still be protected (s. 605.0715(5), Fla. Stat., for an administrative dissolution)`.
+  - Ruling: 
+- **97. [B144]** — Office, conversion copy sheet — the Filing statement — `webapp/server/filing.ts:256`
+  - Reads: value: "Protected Series Designations for an existing Florida LLC — filed online at the Division, $25 each; no Articles; the $125 Articles-and-agent fee is skipped unless the agent changes",
+  - Claims: If the agent changes, the $125 fee applies.
+  - True: A change of agent is its own $25 filing — pricing.ts:77-81 charges "FL state fee — change of registered agent" at $25 and no Articles fee on a conversion; filing.ts:297 itself titles the group "Change of registered agent ($25) — Statement of Change". The ledger's own line (docs/facts.md:40 "a conversion skips both unless it changes its agent") carries the same ambiguity.
+  - Replace with: value: "Protected Series Designations for an existing Florida LLC — filed online at the Division, $25 each; no Articles and no $125 Articles-and-agent fee; if the client took our agent service, the change of agent is a separate $25 Statement of Change, listed below",
+  - Ruling: 
+- **98. [B145]** — Office, formation copy sheet — the empty Other Provisions box — `webapp/server/filing.ts:427`
+  - Reads: value: "Leave blank — the client chose a general purpose and no statement",
+  - Claims: The client chose not to include a management statement.
+  - True: The client is never asked: StepManagement.tsx:75 derives `includeManagementStatementInArticles: o.v === "MANAGER_MANAGED"` and validation.ts:357-360 forces it for manager-managed orders, so this row appears only for a member-managed company with a general purpose.
+  - Replace with: value: "Leave blank — member-managed with a general purpose; nothing goes in this box",
+  - Ruling: 
+- **99. [B147]** (same defect as A64) — Order form, Series step and the portal's series purchase — one statute cited two ways — `webapp/server/validation.ts:178`
+  - Reads: message: 'Series names must include "PS", "P.S.", or "protected series" (§605.2202).',
+  - Claims: The citation form for the statute.
+  - True: The consent route in the same portal writes "(s. 605.2202, Fla. Stat.)" (routes-portal.ts:1593, :1599); this file, routes-portal.ts:1977, stepValidation.ts:189 and StepSeries.tsx:72 write "§605.2202". The statute itself (s. 605.2202(2)(b), read whole in the browser) requires the phrase "protected series" or the abbreviation "P.S." or "PS" — the rule is right, the citation form is the A64 defect in one more file.
+  - Replace with: message: 'Series names must include "PS", "P.S.", or "protected series" (s. 605.2202, Fla. Stat.).',  — and the same form at routes-portal.ts:1977, stepValidation.ts:189, StepSeries.tsx:72.
+  - Ruling: 
+
+### Housekeeping
+
+- **100. [A30h]** — Housekeeping: review rows printing codes or "—" for a self-agent's email/phone; no "exact name only" row on the Review name card; dead duplicate-member check; dead conversion branch in the formation sheet; member fields typed but never asked; ledger lacks the $99 renewal, 15/30-day rules and the four optional prices.
+  - Ruling: 
+- **101. [B18]** — Order form, the payload built at submit (conversion branch) — `webapp/src/components/forms/florida-llc/buildPayload.ts:29`
+  - Reads: ? { desiredName: "", designator: "", finalName, alternateNames: [], exactNameOnly: false }
+  - Claims: Per the comment at :26-27, that on a conversion 'whatever was typed on the new-formation path before switching stays off the record'.
+  - True: finalName is computed at :16-19 from data.desiredLlcName and data.llcDesignator and sent regardless, so an abandoned typed name still reaches llcName.finalName; filing.ts:365 and order-summary.ts:151 print that value. The order's own name is safe only because routes-payments.ts:363-365 prefers existingLlcName on a conversion.
+  - Replace with: ? { desiredName: "", designator: "", finalName: "", alternateNames: [], exactNameOnly: false }
+  - Ruling: 
+- **102. [B19]** — Order form, the payload built at submit — `webapp/src/components/forms/florida-llc/buildPayload.ts:159`
+  - Reads: exactNameOnly: data.exactNameOnly === true,
+  - Claims: The exact-name-only choice, recorded a second time under acknowledgments.
+  - True: The same fact is sent at :39 under llcName.exactNameOnly, and on a conversion the two disagree (:29 forces false; :159 carries the typed value). Two values for one fact.
+  - Replace with: Drop one of the two; keep llcName.exactNameOnly and read it wherever acknowledgments.exactNameOnly is read.
+  - Ruling: 
+- **103. [B20]** — Order form, the payload built at submit, metadata — `webapp/src/components/forms/florida-llc/buildPayload.ts:176`
+  - Reads: ipAddress: "", // TODO(server): fill from request context
+  - Claims: That the server still has to fill the IP address.
+  - True: It does: routes-payments.ts:346 'payload.metadata.ipAddress = clientIp(c);'. The TODO is stale.
+  - Replace with: ipAddress: "", // the server fills this from the request (routes-payments.ts)
+  - Ruling: 
+- **104. [B22]** — Order form, the street-address box component — `webapp/src/components/forms/florida-llc/AddressAutocomplete.tsx:21`
+  - Reads: /** Runs when the client leaves the box — a typed address gets its check then. */   onBlur?: () => void;
+  - Claims: That leaving the box triggers the address check.
+  - True: No caller passes onBlur (a search of the form's .tsx files finds it only on StepSeries.tsx:198, a different box). The check runs when the client continues past the step (FloridaLLCFormationForm.tsx:342 calls /api/address/verify), as Privacy s. 5 says. Dead prop with a misleading comment.
+  - Replace with: Remove the onBlur prop and its comment, or wire it from AddressFieldsBlock.
+  - Ruling: 
+- **105. [B35]** — Agent acceptance step, the "Handled by us — nothing to sign." screen — `webapp/src/components/forms/florida-llc/sections/StepRegisteredAgentAcceptance.tsx:37`
+  - Reads: if (isService) { … Handled by us — nothing to sign. … }
+  - Claims: A screen exists for the service choice.
+  - True: FloridaLLCFormationForm.tsx:295 hides the acceptance step whenever registeredAgentChoice is SERVICE, so lines 37-56 never render.
+  - Replace with: Delete the branch (lines 19 and 37-56).
+  - Ruling: 
+- **106. [B53]** — Certification & signature step, the electronic signature error — `webapp/src/components/forms/florida-llc/sections/StepCertification.tsx:355`
+  - Reads: (sigMismatch && data.articlesSignerChoice === "SELF"
+  - Claims: Guards the SELF case.
+  - True: The whole block is already inside data.articlesSignerChoice === "SELF" (line 348); the second test is dead.
+  - Replace with: (sigMismatch
+  - Ruling: 
+- **107. [B54]** — Registered agent step, the service card on a conversion — `webapp/src/components/forms/florida-llc/sections/StepRegisteredAgent.tsx:57`
+  - Reads: First year included in your service fee ($99/yr after). We accept the appointment and handle legal mail for you. Florida charges $25 to change the agent on file for your LLC.
+  - Claims: Consistent with the Terms.
+  - True: Checked: Terms 9(c) "(currently $99)", 10(b); s. 605.0213(7) $25 for changing a registered agent; pricing.ts:7 RA_RENEWAL_FEE_CENTS = 99_00. No defect — recorded so the sentence is known to have been checked.
+  - Replace with: None.
+  - Ruling: 
+- **108. [B67]** — Order form data model: a field nobody asks — `webapp/src/components/forms/florida-llc/types.ts:171`
+  - Reads: registeredAgentIsAffiliatedPerson: boolean;
+  - Claims: The form records whether the agent is an affiliated person.
+  - True: The field is defaulted (defaults.ts) and reset by raService.ts and has no box on any step and no slot in SubmissionPayload (types.ts:267-287); grep across src and server finds no other reader.
+  - Replace with: Delete the field from FloridaLLCFormData, defaults.ts, schema.ts and raService.ts.
+  - Ruling: 
+- **109. [B68]** — Order form data model: a preparation fee filed under state fees — `webapp/src/components/forms/florida-llc/types.ts:329`
+  - Reads: estimatedStateFees: { articlesOfOrganization: number; registeredAgentDesignation: number; additionalSeriesPrepFee?: number; certificateOfStatus: number; certifiedCopy: number; estimatedTotal: number; };
+  - Claims: The additional-series preparation fee is a state fee.
+  - True: validation.ts:168-169 on the same figure: "Our preparation charge for series beyond the included three — NOT a state fee; billed with the service fee." The payload groups it with the Division's charges; server/pricing.ts recomputes everything, so nothing a client sees is wrong, but the record misfiles it.
+  - Replace with: Move additionalSeriesPrepFee out of estimatedStateFees into its own `serviceFees` block (or rename the group `estimatedFees`).
+  - Ruling: 
+- **110. [B69]** — Order form rules file: a stale contract comment — `webapp/src/components/forms/florida-llc/validation.ts:203`
+  - Reads: SERVER-SIDE VALIDATION EXPECTATIONS: … 2. Re-validate registered-agent address (FL state, no P.O. box). … 7. Require >= 1 initial member. … 10. Sanitize all string inputs and reject HTML/script payloads.
+  - Claims: The server enforces these ten rules.
+  - True: server/validation.ts does not require a member (manager-managed orders carry none; blank scaffold rows are dropped by memberRowIsBlank, validation.ts:55-59); the agent address rule applies only when the client is the agent; and no HTML/script rejection exists there. The list describes an intention from before the server existed.
+  - Replace with: Delete the block, or replace it with one line: "The server re-runs the Zod schema and the rules in server/validation.ts; keep the two in step."
+  - Ruling: 
+- **111. [B70]** — Order form rules file: two exports only tests call — `webapp/src/components/forms/florida-llc/validation.ts:74`
+  - Reads: export function totalOwnershipPct(…) … export function ownershipPercentageWarning(…) { … "Ownership percentages should be provided for all members or none." … }
+  - Claims: The form warns when member ownership percentages do not total 100.
+  - True: No step asks a percentage (RepeatableMemberFields.tsx:32-35 seeds ownershipPercentage undefined and renders no box); the only caller of ownershipPercentageWarning is validation.test.ts, and totalOwnershipPct has none outside this file.
+  - Replace with: Delete both functions and their test, with the MemberEntry fields A30h names.
+  - Ruling: 
+- **112. [B140]** — Order form, Submit — the second member check — `webapp/server/routes-payments.ts:308`
+  - Reads: if (data.managementStructure !== "MANAGER_MANAGED" && data.members.length < 1) {     return c.json(err("At least one member is required.", "INVALID_INPUT"), 400);   }
+  - Claims: An order with no members is refused here.
+  - True: It never gets here: orderFormSchema (validation.ts:128-134) already refuses the same case as an issue on the members path with "At least one initial member is required.", and :290-296 returns before this line. Two wordings, one dead. (A30h.)
+  - Replace with: Delete lines 305-310.
+  - Ruling: 
+- **113. [B141]** — Server, payment routes — the name-check docstring sits over the contact form — `webapp/server/routes-payments.ts:627`
+  - Reads: /** Name-availability check against our mirror of the Division of  *  Corporations' public data files (server/sunbiz.ts). Public: the intake  *  name step calls it before an order exists. Verdicts say "no conflict  *  found", never "available" — the Division makes the final determination. */ // The public contact form.
+  - Claims: The route beneath is the name check.
+  - True: The route beneath (:635-665) is /contact; /name-check is at :688.
+  - Replace with: Move the four-line docstring to sit above `app.post("/name-check", …)` at line 688.
+  - Ruling: 
+- **114. [B146]** — Office, copy sheet module — the dead conversion branch and an orphan docstring — `webapp/server/filing.ts:320`
+  - Reads: value: p.filingPath === "CONVERT" ? "Conversion of an existing entity" : "New Florida LLC",         statement: true,       },       ...(p.filingPath === "CONVERT"         ? [             { key: "existingName", label: "Existing entity name", value: p.existingLlcName ?? "" },             { key: "sunbizDoc", label: "Existing document number", value: p.sunbizDocumentNumber ?? "" },           ]         : []),
+  - Claims: The formation sheet can describe a conversion.
+  - True: filing.ts:306 `if (p.filingPath === "CONVERT") return conversionGroups(p);` returns before this code for every conversion, so the branch is unreachable (A30h). Also filing.ts:187-188 `/** The registered agent's rows, shared by the Articles sheet and the conversion sheet's change-of-agent filing. */` sits above RA_SERVICE_SIGNER, not raFields (:198).
+  - Replace with: value: "New Florida LLC", statement: true, }, — delete lines 323-328 — and move the docstring at 187-188 to line 197, above `function raFields`.
+  - Ruling: 
+
+## Client portal — 50 to fix, 6 housekeeping
+
+- **115. [A47]** — Questionnaire and amendment error "We couldn't find a formed LLC on your account yet" where the check is for a paid order. Replace: "a paid order".
+  - Ruling: 
+- **116. [A48]** — Consent dialog help "Leave blank to point at the Asset Schedule." prints a dash; and (mine) the consent prints "—" where the agreement's exhibit prints "None". Replace: both "None"; help says so.
+  - Ruling: 
+- **117. [A49]** — Consent adopter blocks (mine) carry a "Date:" line the agreement's exhibit blocks do not. Replace: drop it on exhibit blocks.
+  - Ruling: 
+- **118. [A50]** — Consent exhibit "Initial Associated Assets" reads "Members" where the multi-member agreements read "Member(s)"; Asset Schedule four rows vs five. Replace: match the agreements.
+  - Ruling: 
+- **119. [A51]** — Consent dialog special-terms note omits Article 9 for S companies. Replace: add it.
+  - Ruling: 
+- **120. [A52]** — Consent document listed "New Protected Series — …" while the dialog says "Consent & Series Exhibit" and "Prepare the documents". Replace: title "Consent & Series Exhibit — [series]"; button "Prepare the consent".
+  - Ruling: 
+- **121. [A53]** — S election dialog and "Editable until" row say the package is "deleted"; it is replaced with a record copy. Replace both to say so.
+  - Ruling: 
+- **122. [A54]** — Formed-first dialog S election branch: "…and that has been assigned an EIN." The form accepts Applied For. Replace: drop the clause.
+  - Ruling: 
+- **123. [A55]** — EIN details dialog: "…application for Federal EIN — Acme, LLC." Replace: the company or series name.
+  - Ruling: 
+- **124. [A56]** — Help "Additional Capital Calls" and its label: "a majority of the owners"; the agreement: Majority in Interest. Replace: "owners holding a majority of the ownership percentages".
+  - Ruling: 
+- **125. [A57]** — Help, transfer on death: "the same rule that applies to lifetime transfers." Replace: majority in interest for a beneficiary or family transferee; all owners otherwise.
+  - Ruling: 
+- **126. [A58]** — S corporation warning (mine) cites Section 12.1 on forms where 12.1 is Amendments. Replace: "…its admission section admits only an eligible shareholder."
+  - Ruling: 
+- **127. [A59]** — Sole-owner S title "Single-Member S Corporation…" vs pill "S Corporation"; "Amended & Restated (No. 2)" vs the document's full title. Replace: one label table; full title.
+  - Ruling: 
+- **128. [A60]** — Default dates from the device's UTC day (consent, questionnaire, amendment); two dates rendered in the viewer's zone. Replace: Florida's date from the server; formatDate.
+  - Ruling: 
+- **129. [A61]** — Consent exhibit-identifier default fails for "Protected Series 4". Replace: accept that spelling.
+  - Ruling: 
+- **130. [A62]** — Spouse pairing "JTWROS". Replace: "Joint tenants with right of survivorship".
+  - Ruling: 
+- **131. [A63]** — Amendment card names "Update/regenerate" under "Operating Agreement"; the button and heading read differently. Replace the button and heading.
+  - Ruling: 
+- **132. [A64]** — Two refusals cite "§605.2202" and "s. 605.2202, Fla. Stat.". Replace: the second.
+  - Ruling: 
+- **133. [A65]** — S election dialog "mail it" where the package recommends fax. Replace: "fax or mail it".
+  - Ruling: 
+- **134. [A66]** — Help "Effective Date": "We've pre-filled today's date" true only the first time. Replace: say the saved date is kept.
+  - Ruling: 
+- **135. [B58]** — Client portal, operating agreement questionnaire, first screen, note under "Will there be more than one LLC owner?" — `webapp/src/pages/portal/OAQuestionnaire.tsx:432`
+  - Reads: You'll list the owners by name on the next screen. Owners are never filed with the State, so this can differ from what you told us when the company was formed.
+  - Claims: No owner is ever on the public record, so the questionnaire's list is free to differ from the order.
+  - True: server/filing.ts:537-568 lists every member of a member-managed company on the Articles as "AMBR" ("a member-managed company lists its members as AMBR"), and the order form's own Members step says so (StepMembers.tsx:52: "In a member-managed company, the members are also listed in the Articles of Organization; in a manager-managed company they are not."). A member-managed client whose owners have changed needs an amendment to the Articles as well; the note tells them the opposite. (routes-portal.ts:1201-1202 carries the same wrong belief as a comment.)
+  - Replace with: You'll list the owners by name on the next screen. In a manager-managed company the owners are not filed with the State. In a member-managed company they are listed on your Articles as authorized members, so if the owners have changed since formation, the Articles need amending too — list the owners as they are today either way.
+  - Ruling: 
+- **136. [B60]** — Client portal, Orders in progress, the Consent & Series Exhibit dialog's opening sentence — `webapp/src/pages/portal/OrdersInProgress.tsx:311`
+  - Reads: Florida lets the company establish a protected series only with the consent of all members (s. 605.2201(1)), and Section 3.1 of your agreement requires it.
+  - Claims: The statute itself permits establishment only on unanimous consent.
+  - True: s. 605.2201(1) (opened): "With the affirmative vote or consent of all members of a limited liability company, the company may establish a protected series." — and s. 605.2107(1)(i) (opened) lets an operating agreement vary "the manner in which a series limited liability company approves establishing a protected series", so the statute's rule is a default, not an "only". The consent document itself says it correctly (templates-new-series.md:11: "a limited liability company may establish a protected series with the affirmative vote or consent of all of its members, and Section 3.1 of the Agreement requires that consent"), and new-series.ts:7-11 explains why. The comment at :137-139 repeats the dialog's overstatement.
+  - Replace with: Florida's rule, unless an operating agreement changes it, is that a protected series is established with the consent of all members (s. 605.2201(1)), and Section 3.1 of your agreement requires exactly that.
+  - Ruling: 
+- **137. [B61]** **— ruling needed** — Client portal, Amendment to Operating Agreement page, the grey guidance box — `webapp/src/pages/portal/AmendAgreement.tsx:142`
+  - Reads: The new agreement is an Amended and Restated Operating Agreement and replaces the old one.
+  - Claims: Regenerating always produces an Amended and Restated agreement.
+  - True: The questionnaire pre-selects "amended" when a generation exists (OAQuestionnaire.tsx:109-111) but leaves "This is the company's first operating agreement" selectable (:476-485), and the server takes whichever was chosen with no rule (routes-portal.ts:1468 `amendedRestated: a.firstOrAmended === "amended"`; :1246 only requires a choice). A client who switches back to "first" gets "Operating Agreement (No. 2)" with no superseding language (oa.ts:523-528), and two agreements the help screen warns against (oaLearnMore.tsx:79-84) are both alive.
+  - Replace with: Keep the sentence and make it true: routes-portal.ts generate refuses firstOrAmended "first" when the company already has a generation on file ("This company already has an operating agreement; the new one must be an Amended and Restated Operating Agreement."), and the questionnaire disables the "first" choice with the same note when data.generations.length > 0. Ruling needed.
+  - Ruling: 
+- **138. [B63]** — Client portal, questionnaire help screen "Initial Contributions", the "If you're not sure yet" choice — `webapp/src/content/oaLearnMore.tsx:348`
+  - Reads: List what you plan to contribute — the exhibits can be regenerated when the list changes. What matters most is that what actually moved matches what the records say.
+  - Claims: The exhibits alone can be regenerated.
+  - True: Nothing regenerates an exhibit on its own: the only regeneration is the whole agreement, which the site tells the client is an Amended and Restated Operating Agreement (OAQuestionnaire.tsx:793, AmendAgreement.tsx:142-143), and after five the client must delete one (:779-780).
+  - Replace with: List what you plan to contribute — when the list changes, update it here and regenerate: the new document is an Amended and Restated Operating Agreement with the new exhibits. What matters most is that what actually moved matches what the records say.
+  - Ruling: 
+- **139. [B64]** — Client portal, questionnaire help screen "S Corporation Status", the "If you choose No" choice — `webapp/src/content/oaLearnMore.tsx:40`
+  - Reads: Your agreement uses our standard form — with one owner, the company is simply part of your personal tax return; with multiple owners, it is taxed as a partnership.
+  - Claims: A one-owner company is reported on the reader's personal return.
+  - True: The sole owner may be a company or trust — the Owner card offers "This owner is a company or trust" (OaOwnersSections.tsx:134-144) and the single-member forms sign through an entity's signer — and then the company is reported on that owner's return, not the reader's personal one.
+  - Replace with: Your agreement uses our standard form — with one owner, the company is disregarded for income tax and reported on its owner's own return; with multiple owners, it is taxed as a partnership.
+  - Ruling: 
+- **140. [B65]** — Client portal, Orders in progress, the "formed first" dialog, for a converting client — `webapp/src/pages/portal/OrdersInProgress.tsx:399`
+  - Reads: Your LLC must be formed first. … An EIN can be obtained only for a company that exists. The IRS application is built on your filed Articles of Organization. We're preparing your filing now. You'll get an email when your LLC is formed.
+  - Claims: The client's LLC does not yet exist and Articles are being filed.
+  - True: The gate opens whenever llcFormed is false (:232-235), and routes-portal.ts:394-404 sets llcFormed only from formed_at, which a conversion receives when its designations are filed (email.ts:475 sends "protected series established" then). A converting client whose company has existed for years, with a portal EIN order waiting, reads that their LLC is not formed and that Articles are being prepared. The services response carries no isConversion flag for this dialog to branch on.
+  - Replace with: Add isConversion to /api/portal/services and, when it is true: title "Your protected series must be filed first." and "We're filing your Protected Series Designations now. You'll get an email when they are established, and you'll be able to complete the EIN application then."
+  - Ruling: 
+- **141. [B66]** — Client portal, questionnaire, Owners card, the note under the heading (manager-managed companies) — `webapp/src/pages/portal/OaOwnersSections.tsx:99`
+  - Reads: They start from what you gave us when the company was formed — change them if ownership has changed since.
+  - Claims: The owner rows were seeded from owners the client named on the order.
+  - True: A manager-managed order collects no members at all (stepValidation.ts:287-289: "Hidden entirely for manager-managed companies — ownership is collected in the operating agreement questionnaire, not here"); such a client sees one blank row and "From your order:" suggestion chips built from the client and managers (OAQuestionnaire.tsx:207-209), not owners they gave.
+  - Replace with: They start from the people named on your order — add, remove, or change them so the list is the owners as they are today.
+  - Ruling: 
+- **142. [B73]** — Client portal, the Operating agreement card before an agreement exists — `webapp/src/pages/portal/PortalDashboard.tsx:206`
+  - Reads: Answer a short questionnaire and we'll generate your operating agreement as a signed-ready PDF.
+  - Claims: The PDF is 'signed-ready'.
+  - True: The PDF is unsigned and ready for the members to sign; 'signed-ready' reads as if already signed. The sibling wording on the same screen is 'ready to sign' nowhere; the S election tile (ServicesCard.tsx:403) says 'completed and ready to sign'.
+  - Replace with: Answer a short questionnaire and we'll generate your operating agreement as a PDF ready to sign.
+  - Ruling: 
+- **143. [B74]** — Client portal, the Operating agreement card when the status request fails — `webapp/src/pages/portal/PortalDashboard.tsx:199`
+  - Reads: Your agreement questionnaire unlocks once your order is paid.
+  - Claims: The order is unpaid.
+  - True: The sentence is shown for any error from /api/portal/oa (`oaQuery.isError`, :197), including a dropped request. The route's only refusal is routes-portal.ts:1108 'No formed LLC found on your account.' (a 400); a 500 or a lost connection also lands here and tells a paid client they have not paid. The same file already distinguishes a 401 from other failures for the portal itself (:624-636).
+  - Replace with: Show 'Your agreement questionnaire unlocks once your order is paid.' only when the error is a 400 (ApiError status 400); otherwise 'We couldn't check your agreement just now.' with a Try again button, as at lines 630-633.
+  - Ruling: 
+- **144. [B75]** (same defect as A1) — Client portal, Registered agent service card, the status sentence — `webapp/src/pages/portal/PortalDashboard.tsx:367`
+  - Reads: Your registered agent service is active and renews on {date}. You can cancel here at any time.
+  - Claims: Cancellation is available at any time.
+  - True: Terms 9(g): 'you must (i) notify us of cancellation at least thirty (30) days before your renewal date … Timely notice under (i) stops the renewal charge'; renewals.ts:188-190 stops the charge only when the request is on or before renewal − 30 days. Notice can be given any day, but a late one does not stop the renewal — the card's own dialog says so at :403-405. Twin of A1 (the order form's tick).
+  - Replace with: Your registered agent service is active and renews on {date}. You can cancel here; notice given at least 30 days before the renewal date stops the renewal charge.
+  - Ruling: 
+- **145. [B76]** — Client portal, Your documents card, empty state — `webapp/src/pages/portal/PortalDashboard.tsx:720`
+  - Reads: Your documents will appear here once your formation is prepared.
+  - Claims: Documents appear when the formation is 'prepared'.
+  - True: The first document a new-formation client sees is the filed Articles, uploaded when the Division returns them (routes-admin.ts:544-560); a converting client has no formation at all — their first document is a filed Designation (routes-admin.ts:656-712). Nothing appears at 'preparation'. Twin of A24 ('formation documents' to a converting client).
+  - Replace with: Your filed documents will appear here as the Division returns them.
+  - Ruling: 
+- **146. [B77]** — Client portal with two or more companies, the Legal mail card under each company tab — `webapp/src/pages/portal/PortalDashboard.tsx:660`
+  - Reads: const legalMail = docs.filter((d) => d.kind === "legal_mail");
+  - Claims: The Legal mail card under a company's tab lists that company's legal mail.
+  - True: Legal mail is never tied to a company: the office's upload dialog sends an orderId only for kind 'package' (AdminDashboard.tsx:254 `if (kind === "package" && orderId)`), so every company's tab shows every piece of legal mail, and nothing on the row names the LLC it was served on (the row shows title, received date and download, :98-129). Package documents on the same screen are scoped per tab (:654-658). A client with two LLCs cannot tell which company a summons was served on unless the office typed it into the title.
+  - Replace with: Ask 'Company' on a legal-mail upload as the package upload does (AdminDashboard.tsx:329-346), store it as order_id, and filter legal mail by tab the way packageDocs is: `docs.filter((d) => d.kind === "legal_mail" && (!multiCompany || d.order_id === company))`; print the company name on the row.
+  - Ruling: 
+- **147. [B80]** — Client portal, Reset your password page — `webapp/src/pages/portal/PortalForgot.tsx:40`
+  - Reads: Enter the email address you used when you signed up, and we'll send a link to choose a new password.
+  - Claims: The client signed up.
+  - True: There is no sign-up: the account is created by the payment (routes-payments.ts:78-83 `INSERT INTO clients (email, name)` at fulfilment) from the order's contact email; the client's first visit is the welcome link. The one-hour claim at :35 is right (routes-portal.ts:982, 3600_000 ms).
+  - Replace with: Enter the email address on your order, and we'll send a link to choose a new password.
+  - Ruling: 
+- **148. [B81]** — Client portal, Sign in page, the error line — `webapp/src/pages/portal/PortalLogin.tsx:26`
+  - Reads: setError(status === 429 ? "Too many attempts. Try again in a few minutes." : status ? "Incorrect email or password." : "We could not reach the server. Check your connection and try again.");
+  - Claims: Any response other than a lockout or a lost connection means the credentials were wrong.
+  - True: The route answers 401 for bad credentials (routes-portal.ts:925), 400 'Email and password are required.' (:919), and app.ts:19-22 turns any thrown error into a 500 'Something went wrong on our end.' — a database fault is reported to the client as their own mistake. Twin of A79 on the admin page.
+  - Replace with: status === 429 ? "Too many attempts. Try again in a few minutes." : status === 401 ? "Incorrect email or password." : status ? "Something went wrong on our end. Please try again." : "We could not reach the server. Check your connection and try again."
+  - Ruling: 
+- **149. [B82]** (same defect as A24) — Client portal, Sign in page, the sentence under the heading — `webapp/src/pages/portal/PortalLogin.tsx:38`
+  - Reads: Access the documents from your formation package and anything we have received for you as registered agent.
+  - Claims: Every client has a formation package.
+  - True: A converting client has filed Designations, not a formation package (OrderDetail.tsx:626 names their section 'Protected Series Designations'; routes-admin.ts:526 'A conversion has no Articles of Organization'). Twin of A24.
+  - Replace with: Access your filed documents and anything we have received for you as registered agent.
+  - Ruling: 
+- **150. [B83]** — Client portal, S election details form, the EIN box and its 'Still needed' item — `webapp/src/pages/portal/SElectionDetailsForm.tsx:316`
+  - Reads: You're obtaining our EIN — use it when issued
+  - Claims: (A tick label written in the client's voice, addressed to us.)
+  - True: Every other label on the form is in our voice to the client ('Enter the date the Division filed your Articles', 'Choose who signs…'), and the matching 'Still needed' item at :217 flips the pronouns — 'Enter the 9-digit EIN, or tick that you're obtaining ours' — which, read in our voice, says the client is obtaining our EIN. One fact, two voices.
+  - Replace with: :316 'We're obtaining your EIN — we'll use it when it is issued'; :217 'Enter the 9-digit EIN, or tick that we're obtaining it for you'.
+  - Ruling: 
+- **151. [B84]** — Client portal, S election details form, the footer beside the build button — `webapp/src/pages/portal/SElectionDetailsForm.tsx:690`
+  - Reads: We build your package immediately — you'll be able to download it here.
+  - Claims: The download is in this dialog.
+  - True: On success the dialog closes (`onSuccess: onDone`, :200) and the package appears as a row in Your documents with its own Download button (PortalDashboard.tsx:124-129, :520-544).
+  - Replace with: We build your package immediately — it appears in Your documents, ready to download.
+  - Ruling: 
+- **152. [B85]** (same defect as A22) — Client portal, S election details form, help under 'Date the Division filed your Articles' — `webapp/src/pages/portal/SElectionDetailsForm.tsx:283`
+  - Reads: It's on your Articles of Organization, in your documents above. Your Form 2553 deadline runs from this date.
+  - Claims: The deadline runs from the Articles' filing date.
+  - True: The gate computes the deadline from the election effective date: src/lib/form2553Timing.ts:79 `form2553Deadline(effectiveDate)`, and the form passes `effectiveDate: typedEffective || undefined` (:155) — the filing date only when the effective-date box is blank (:332 'Leave blank and we'll use the date on your filed Articles'). Type a later effective date and the deadline moves with it, so the sentence is true only in the default case. Third wording of the deadline in the portal (see the ServicesCard finding and A22).
+  - Replace with: It's on your Articles of Organization, in your documents above. Your Form 2553 deadline runs from your election's effective date — this date, unless you enter a later one below.
+  - Ruling: 
+- **153. [B86]** (same defect as A22) — Client portal, Order services, the S Corporation Election Package dialog — `webapp/src/pages/portal/ServicesCard.tsx:411`
+  - Reads: The IRS deadline is strict — 2 months and 15 days from the start of the company's first tax year — which is why this package is only available until {date}. Choose this only if your tax professional recommends the election.
+  - Claims: States the Form 2553 deadline rule.
+  - True: A22 chose one wording for every place the deadline is described: 'within 2 months and 15 days after your LLC's effective date (the date on your filed Articles, unless you chose a later effective date)'. This dialog says 'from the start of the company's first tax year'; the details form says 'runs from this date' (SElectionDetailsForm.tsx:284); the gate says 'must be filed (postmarked or faxed) by {date}' (form2553Timing.ts:95). Three wordings for one fact within the portal.
+  - Replace with: The IRS deadline is strict — within 2 months and 15 days after your LLC's effective date (the date on your filed Articles, unless you chose a later effective date) — which is why this package is only available until {date}. Choose this only if your tax professional recommends the election.
+  - Ruling: 
+- **154. [B87]** (same defect as A88) — Client portal, Order services, the Federal EIN dialog, third paragraph — `webapp/src/pages/portal/ServicesCard.tsx:182`
+  - Reads: Questions about the technicalities? Check the User's Manual and ask your attorney or accountant.
+  - Claims: The deliverable is a 'User's Manual'.
+  - True: docs/facts.md, 'The deliverables': 'the Series LLC Owner's Manual'; the portal's own Reference library card calls it 'The Series LLC Owner's Manual' (PortalDashboard.tsx:272); the office publishes it under that title (LibrarySection.tsx:48, :116). A88 corrects the same word in the Instructions.
+  - Replace with: Questions about the technicalities? Check the Owner's Manual and ask your attorney or accountant.
+  - Ruling: 
+- **155. [B129]** — Client portal, the operating agreement, consent and S election for a converted company — the company name the seed prefers — `webapp/server/routes-portal.ts:162`
+  - Reads: llcName: p.llcName?.finalName || orders[0].llc_name,
+  - Claims: The stored payload's finalName is the company's name, and the order's llc_name is only a fallback.
+  - True: On a conversion buildPayload.ts:16-19 and :28-29 still fill finalName from desiredLlcName and llcDesignator — whatever the client typed on the new-formation path before switching (the form never clears it: StepFilingPath.tsx:68 patches filingPath only) — while the order itself is named from existingLlcName (routes-payments.ts:363-365). A client who typed "Acme" + LLC, then chose the conversion path for "Sunshine Holdings, LLC", gets an operating agreement, consent and Exhibit headed "Acme, LLC" (OaInputs.companyName at :1463 comes from seed.llcName), and the consent route refuses their real series name because it "must begin with \"Acme, LLC\"" (:1591-1595).
+  - Replace with: llcName: (p.filingPath === "CONVERT" ? "" : p.llcName?.finalName) || orders[0].llc_name,  — and, in buildPayload.ts:28-29, finalName: "" on the conversion branch.
+  - Ruling: 
+- **156. [B130]** — Client portal, Amended and Restated agreement — Recital D names the agreement it supersedes — `webapp/server/routes-portal.ts:1258`
+  - Reads: const priorGens = await db.query<{ created_at: unknown }>(     "SELECT created_at FROM oa_generations WHERE client_id = $1 ORDER BY created_at DESC LIMIT 1",     [session.clientId],   );   // Drivers differ: Neon returns ISO strings, PGlite returns Date objects.   const priorDate =     priorGens.length > 0       ? new Date(String(priorGens[0].created_at)).toLocaleDateString("en-US", {           year: "numeric",           month: "long",           day: "numeric",         })       : null;
+  - Claims: The prior agreement's date is the day the client's newest generation was created.
+  - True: oa.ts:528-529 prints it as "the Operating Agreement of the Company dated <priorDate>". Three things are wrong with the value: (1) it is taken across every company on the account (no order_id filter, unlike the count at :1251-1253), so a second company's Amended and Restated agreement recites the first company's date; (2) it is the generation timestamp, not the agreement's Effective Date the client chose (:1467 `effectiveDate: fmtDate(a.effectiveDate)`, stored in inputs), so an agreement generated on 1 September with an effective date of 1 August is superseded "dated September 1, 2026"; (3) toLocaleDateString runs in the server's zone (UTC on Vercel), so a 9 pm Eastern generation is dated the next day. The amendment route already asks the client for the agreement's date (:1730, :1780).
+  - Replace with: const priorGens = await db.query<{ effective_date: string | null }>("SELECT inputs->>'effectiveDate' AS effective_date FROM oa_generations WHERE client_id = $1 AND (order_id = $2 OR order_id IS NULL) ORDER BY created_at DESC LIMIT 1", [session.clientId, seed.orderId]); const priorDate = priorGens[0]?.effective_date ?? null;
+  - Ruling: 
+- **157. [B131]** — Client portal, Services card — the S election, certificate and EIN refusals point the reader "below" — `webapp/server/routes-portal.ts:1921`
+  - Reads: "You already have an S election order — see your orders below."
+  - Claims: The client's orders are listed beneath the Services card.
+  - True: The refusal is rendered inside the Services card (ServicesCard.tsx:252, 363, 416, 505), and the dashboard places Orders in progress above that card: PortalDashboard.tsx:747 `<OrdersInProgress …/>`, then :761 `<ServicesCard …/>`. The same wrong direction is at routes-portal.ts:2049 ("is already on order — see your orders below."), :2119-2120 and :2134 ("already ordered — see your orders below.").
+  - Replace with: "You already have an S election order — see Orders in progress above." (and "— see Orders in progress above." at 2049, 2119, 2120, 2134)
+  - Ruling: 
+- **158. [B132]** — Client portal, registered agent card — the refusal when a company did not take our service — `webapp/server/routes-portal.ts:2584`
+  - Reads: return c.json(err(`${order.llc_name} is its own registered agent; there is nothing to cancel.`, "NOT_OUR_SERVICE"), 400);
+  - Claims: A company that did not take our service is its own registered agent.
+  - True: The only other choice is SELF (validation.ts:15), under which the client names an individual — first and last name (validation.ts:223-232) — who accepts personally; the company is never its own agent. The sentence reaches the screen through PortalDashboard.tsx:426.
+  - Replace with: return c.json(err(`${order.llc_name} did not take our registered agent service; there is nothing to cancel.`, "NOT_OUR_SERVICE"), 400);
+  - Ruling: 
+- **159. [B133]** — Client portal, Services card — buying another series, the one refusal for every shape problem — `webapp/server/routes-portal.ts:1966`
+  - Reads: if (!body.success) return c.json(err("A series identifier is required.", "INVALID_INPUT"), 400);
+  - Claims: The identifier was left blank.
+  - True: The schema at :1963-1965 also refuses an identifier over 60 characters and a purpose over 300 (`suffix: z.string().min(1).max(60), purpose: z.string().max(300).optional()`); both answer "A series identifier is required." The consent route was given per-box refusals for exactly this on 15 Sep 2026 (:1569-1582).
+  - Replace with: const first = body.error.issues[0]; const field = String(first?.path?.[0] ?? ""); const msg = field === "suffix" ? (first?.code === "too_big" ? "The series identifier can be at most 60 characters." : "Enter a series identifier.") : field === "purpose" ? "The purpose can be at most 300 characters." : "A series identifier is required."; return c.json(err(msg, "INVALID_INPUT"), 400);
+  - Ruling: 
+- **160. [B134]** — Client portal sign-in — the refusal for a malformed email — `webapp/server/routes-portal.ts:919`
+  - Reads: if (!body.success) return c.json(err("Email and password are required.", "INVALID_INPUT"), 400);
+  - Claims: A box was left empty.
+  - True: loginSchema at :37 is `z.object({ email: z.string().email(), password: z.string().min(1) })`, so a typed but malformed address ("adam@") is answered "required". The sign-in page maps any 4xx other than 429 to "Incorrect email or password." (PortalLogin.tsx:26), so this text reaches no reader today; it is wrong for the day the page starts showing it.
+  - Replace with: if (!body.success) return c.json(err("Enter your email address and password.", "INVALID_INPUT"), 400);
+  - Ruling: 
+- **161. [B135]** (same defect as A47) — Client portal, Services card — the S election package refused for a conversion or an unpaid company — `webapp/server/routes-portal.ts:1924`
+  - Reads: : "The S election package is available only for new LLCs we formed.";
+  - Claims: The company must already be formed by us.
+  - True: sElectionEligibility (:478-489) asks for a paid order with package = 'NEW' — formed or not; the package is sold from the day the formation is paid (:490-491). The formed gate is applied later, on the details (:2269-2271).
+  - Replace with: : "The S election package is available only for new LLCs formed through us.";
+  - Ruling: 
+- **162. [B136]** (same defect as A53) — Client portal, S election details — the refusal after the two-week window — `webapp/server/routes-portal.ts:2277`
+  - Reads: "The two-week window for changing this package has closed, and the details have been deleted. Contact us if you need a new one.",
+  - Claims: The details are gone.
+  - True: purgeExpiredSElections (:548-630) deletes the encrypted Social Security numbers (:623 `ein_secret = NULL`) and rebuilds the package as a record copy showing last-four digits (:581-586); the details themselves are kept (:566 `const kept = { ...d, purgedAt }`). This is the server half of A53; the text is shown by SElectionDetailsForm.tsx:677.
+  - Replace with: "The two-week window for changing this package has closed: the Social Security numbers have been destroyed and the package replaced with a record copy. Contact us if you need a new one.",
+  - Ruling: 
+- **163. [B137]** — Client portal, Your documents — deleting one of your agreements when the server refuses — `webapp/server/routes-portal.ts:1704`
+  - Reads: return c.json(err("Not found", "NOT_FOUND"), 404);
+  - Claims: The client is told the agreement could not be found.
+  - True: The screen has no line for it: PortalDashboard.tsx:488-494 `deleteGeneration = useMutation({ mutationFn: (id) => api.delete(`/api/portal/oa/generations/${id}`), onSuccess: … })` has no onError, and nothing renders deleteGeneration.isError — a refused delete (or a lost connection) leaves the row in place with no message.
+  - Replace with: In PortalDashboard.tsx add `onError: (e) => setDeleteError(e instanceof ApiError ? e.message : "We could not delete that agreement. Try again.")` and render it under the agreements list; and make the refusal say what it means: err("That agreement is no longer on your account.", "NOT_FOUND").
+  - Ruling: 
+- **164. [B138]** (same defect as A60) — Client portal, operating agreement questionnaire — the seed carries no Florida date for the effective-date box — `webapp/server/routes-portal.ts:1135`
+  - Reads: return c.json({     data: {       seed,       version,       multiOwner,       memberManaged,       blocked: false,       templateVersion: OA_TEMPLATE_VERSION,       answers: savedAnswers,       generations,     },   });
+  - Claims: Everything the questionnaire needs to open is here.
+  - True: The questionnaire and the amendment form default their dates from the device's UTC day (OAQuestionnaire.tsx:57, AmendAgreement.tsx:26 `new Date().toISOString().slice(0, 10)`) — A60 — because this response gives them nothing better, while /portal/services already sends `todayEastern: easternDateIso()` (:1892). Also `blocked: false` is written and read nowhere (OAQuestionnaire.tsx:48 types it only).
+  - Replace with: Add `todayEastern: easternDateIso(),` to the data object and drop `blocked: false`; then OAQuestionnaire.tsx:57 and AmendAgreement.tsx:26 default from it.
+  - Ruling: 
+
+### Housekeeping
+
+- **165. [A66h]** — Housekeeping: four contribution answer fields saved and never used; two account-route values nothing reads; S election deadline printed 03/21/2027 in one place (Adam's ported module).
+  - Ruling: 
+- **166. [B71]** — Client portal, questionnaire Ownership card, the Equal ownership button — `webapp/src/pages/portal/OwnershipEditor.tsx:82`
+  - Reads: const ok = window.confirm(`${rows.length} owners can't split 100% evenly — 33.33 three times is 99.99. Use fractions instead (1/${rows.length} each)?`);
+  - Claims: A browser confirm box is the prompt.
+  - True: webapp/CLAUDE.md: "Use Dialog/AlertDialog from shadcn/ui, not window.alert() or window.confirm()." Every other question in the portal is a Dialog; this one is the browser's unstyled box, which the Vibecode webview may suppress.
+  - Replace with: An AlertDialog with the same sentence and two buttons, "Use fractions" and "Keep percentages".
+  - Ruling: 
+- **167. [B72]** — Client portal, Orders in progress: the comment over the consent state — `webapp/src/pages/portal/OrdersInProgress.tsx:137`
+  - Reads: // s. 605.2201(1) and Section 3.1 require the consent of all members before a series is established, and the designation filed with the state is signed by the company — so nothing on the public record shows the members agreed.
+  - Claims: The statute requires unanimity.
+  - True: Same as the dialog finding above: s. 605.2107(1)(i) lets the agreement vary the approval; only Section 3.1 makes it unanimous. new-series.ts:7-11 states this correctly.
+  - Replace with: // Section 3.1 requires the consent of all members before a series is established (s. 605.2201(1) is the default, variable under s. 605.2107(1)(i)), and the designation is signed by the company — so nothing on the public record shows the members agreed.
+  - Ruling: 
+- **168. [B78]** — Client portal, Sign in page and Reset page — code only — `webapp/src/pages/portal/PortalDashboard.tsx:45`
+  - Reads: raCancellationRequestedAt: string | null; raRenewalDate?: string | null; raService?: boolean;
+  - Claims: The dashboard reads these three fields from /api/auth/me.
+  - True: Nothing reads them: RegisteredAgentCard takes CompanyInfo (:301-313, :320), and :335 builds a shim `const me = { raRenewalDate: company.raRenewalDate }` so the old `me?.raRenewalDate` reads at :367 and :404 still compile. The route still computes and sends them (routes-portal.ts:950-962).
+  - Replace with: Drop the three fields from `Me`, delete the shim at :335, and read `company.raRenewalDate` at :367 and :404.
+  - Ruling: 
+- **169. [B79]** — Client portal, deleting a self-generated agreement — code only — `webapp/src/pages/portal/PortalDashboard.tsx:725`
+  - Reads: const ok = window.confirm(
+  - Claims: —
+  - True: webapp/CLAUDE.md (ux): 'Use Dialog/AlertDialog from shadcn/ui, not window.alert() or window.confirm().' The same file uses AlertDialog for the cancellation at :386-423.
+  - Replace with: An AlertDialog with the two sentences at :727-728 and the actions 'Keep it' / 'Delete'.
+  - Ruling: 
+- **170. [B139]** — Server, portal routes — stale and misplaced comments — `webapp/server/routes-portal.ts:287`
+  - Reads: // Who owns the company, as the client last said. … /** A person's printed legal name … */ /** Operating agreements a company may keep in its documents list. */ export const OA_KEEP_MAX = 5;
+  - Claims: Each comment describes the declaration beneath it.
+  - True: Six do not: :287-295 (the owners comment and the personLegalName docstring sit above OA_KEEP_MAX, two declarations early); :327 says isoFromPrinted returns "" when the text is not a date, it returns null (:329, :332); :513-516 says the package is destroyed, the purge replaces it with a record copy (:548-553); :638-639 describes "The client's answer that the LLC already has an EIN" — no such field exists in einDetailsSchema (:640-699); :701-702 the "Valid EINs" docstring sits above companyEinFor, not the prefix list it describes; :800-805 says postSElectionPackage is shared with "the office entering the date" and sits above withFormationDefaults, while :2404-2406 records that the office branch can no longer run.
+  - Replace with: Move each docstring to the declaration it describes; change :327 to "null when the text is not a date"; change :513-516 to "before the Social Security numbers are destroyed and the package replaced with a record copy"; delete :638-639; delete the office sentence at :803-805.
+  - Ruling: 
+
+## Office — 16 to fix, 7 housekeeping
+
+- **171. [A68]** — Registered Agent Clients Card column (mine): no permission on the order shows "—", no amber. Replace: "no card — no permission on the order", amber.
+  - Ruling: 
+- **172. [A69]** — Cancellation shown twice on a row; the client-level chip keeps the first company's date forever. Replace: keep the per-company text; drop the chip on that tab.
+  - Ruling: 
+- **173. [A70]** — Clients tab "Invite sent" means only "no password yet". Replace: "No password yet".
+  - Ruling: 
+- **174. [A71]** — Emails dialog "delivered" (provider acceptance); "Every email" (500). Replace: "accepted"; "The newest 500 emails".
+  - Ruling: 
+- **175. [A72]** — "Mark sent" and "move back" refusals name the wrong column for a formed order. Replace: whereItIs wording.
+  - Ruling: 
+- **176. [A73]** — Certificates block: a refused upload on a With The State order shows its red line under another button. Replace: its own error line.
+  - Ruling: 
+- **177. [A74]** — Articles box shape check only when we signed; server checks whenever typed. Replace: match.
+  - Ruling: 
+- **178. [A75]** — Fulfil dialog: EIN hint promises an S election rebuild for a series EIN; S election date row "entered by the client" after correction; series text "once … uploaded" though the dialog uploads; a typed EIN survives closing. Replace each.
+  - Ruling: 
+- **179. [A76]** — Reference Library backup line (four tables; "own company") and mirror line ("every file" nightly; nothing overwritten). Replace both sentences.
+  - Ruling: 
+- **180. [A77]** — "Regenerate from the master" silently replaces a hand-uploaded manual. Replace: say so on the screen.
+  - Ruling: 
+- **181. [A78]** — Board "1 days"; "search to reach the rest" while searching; open status worded two ways. Replace each.
+  - Ruling: 
+- **182. [A79]** — Admin sign-in "Incorrect password." for any server error. Replace: only for a 401.
+  - Ruling: 
+- **183. [B88]** — Office, Clients tab, the Upload dialog, Document title box — `webapp/src/pages/admin/AdminDashboard.tsx:301`
+  - Reads: placeholder="e.g. Operating Agreement"
+  - Claims: An operating agreement is a typical office upload.
+  - True: The office never uploads an operating agreement: clients generate their own from the questionnaire (PortalDashboard.tsx:204-213) and it is posted by routes-portal.ts, not by this dialog. This dialog's two kinds are 'Formation package' and 'Legal mail' (:316, :325); what the office actually uploads here is a certificate or a served document.
+  - Replace with: placeholder="e.g. Certificate of Status — Sep 16, 2026"
+  - Ruling: 
+- **184. [B89]** (same defect as A68) — Office, Registered Agent Clients tab, the Card column — `webapp/src/pages/admin/AdminDashboard.tsx:44`
+  - Reads: : c.card_status === "none" ? `no card${c.card_note === "wallet payment" ? " — wallet" : ""}`
+  - Claims: 'no card' with a reason only for a wallet payment.
+  - True: renewals.ts:85 and :98 store a reason on every 'none': 'no payment id', or square.ts's 'wallet payment' (:135), 'customer' (:153) or 'not saveable' (:164). Only 'wallet payment' is shown; a card Square refused to save reads simply 'no card', indistinguishable from a wallet payment, and the office cannot tell whether to ask the client for a card. Adjacent to A68.
+  - Replace with: : c.card_status === "none" ? `no card${c.card_note ? ` — ${c.card_note}` : ""}`
+  - Ruling: 
+- **185. [B91]** — Office, Reference Library tab, the manual's edition label — `webapp/src/pages/admin/LibrarySection.tsx:49`
+  - Reads: fd.set("edition", edition || new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" }));
+  - Claims: A blank edition box publishes the manual under the current month and year.
+  - True: The edition scheme every document footer uses is 'First Edition — August 2026' (docs/facts.md, 'The edition label on every generated document'; the box's own placeholder at :138 shows 'Second Edition — January 2027'). A blank box publishes 'September 2026' with no edition number, and the portal prints that label to every client beside 'always the latest edition' (PortalDashboard.tsx:281).
+  - Replace with: Require the label: disable the Publish/Replace button while `edition.trim() === ""` and drop the month-year default.
+  - Ruling: 
+- **186. [B96]** — Office, the Fulfil dialog, the 'Placed:' line — `webapp/src/pages/admin/ServiceOrdersSection.tsx:69`
+  - Reads: const day = (iso: string | null) => iso ? new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "—";
+  - Claims: 'Placed: Sep 5' identifies when the order was placed.
+  - True: No year: an S election order viewed a year on (the SSNs are gone at 14 days but the row stays, :186-187) reads 'Placed: Sep 5' whichever year it was. AdminDashboard.tsx:226-227's `day` prints the year.
+  - Replace with: { month: "short", day: "numeric", year: "numeric" }
+  - Ruling: 
+
+### Housekeeping
+
+- **187. [A79h]** — Housekeeping: eleven misplaced or stale comments; three unused board fields; two unused helpers; dead branches; unreachable notify options.
+  - Ruling: 
+- **188. [B90]** — Office, both client tabs — code only — `webapp/src/pages/admin/AdminDashboard.tsx:497`
+  - Reads: const sortable = true;
+  - Claims: —
+  - True: A constant that is always true: the `: (` branches at :511-513 (plain heading) and :525 (no search box) can never render.
+  - Replace with: Delete the constant and the two dead branches.
+  - Ruling: 
+- **189. [B92]** — Office, the order board — code only — `webapp/src/pages/admin/OrderBoard.tsx:258`
+  - Reads: for (const o of orders) { if (o.client_id && !newestByClient.has(o.client_id)) newestByClient.set(o.client_id, o.id); }
+  - Claims: A service order with no formation_order_id attaches to the client's newest visible formation.
+  - True: `orders` includes pending_payment rows (the same list feeds `pending` at :273). A client's newer abandoned checkout becomes their 'newest' order, and any legacy service order (formation_order_id null, routes-portal.ts:434) attaches to it — and pending orders are not cards (:361-386), so the service order appears on no card. Only pre-scoping test data is affected today.
+  - Replace with: for (const o of orders) { if (o.status !== "pending_payment" && o.client_id && !newestByClient.has(o.client_id)) newestByClient.set(o.client_id, o.id); }
+  - Ruling: 
+- **190. [B93]** — Office, the order board — code only — `webapp/src/pages/admin/OrderBoard.tsx:19`
+  - Reads: total_cents: number; created_at: string; paid_at: string | null; filed_at: string | null; … ein_purchased: boolean; … ein_outstanding: boolean;
+  - Claims: —
+  - True: total_cents, paid_at, filed_at, ein_purchased and ein_outstanding each appear exactly once in the file (their declaration); the board renders none of them, and routes-admin.ts:215-223 computes ein_outstanding with a subquery for nothing. A79h counted three; there are five.
+  - Replace with: Drop the five fields from BoardOrder and the matching columns/subquery from the /admin/orders SELECT, or use them.
+  - Ruling: 
+- **191. [B94]** — Office, the order drawer — code only — `webapp/src/pages/admin/OrderDetail.tsx:45`
+  - Reads: services: { id: string; type: string; status: string; llc_name: string }[];
+  - Claims: —
+  - True: `d.services` is never read; the drawer's service rows come from the `services` prop (:251, :834). The route still assembles the array.
+  - Replace with: Drop the field from OrderDetailData and from the route's response.
+  - Ruling: 
+- **192. [B95]** — Office, service-order helpers — code only — `webapp/src/pages/admin/serviceOrders.helpers.ts:5`
+  - Reads: export const money = (cents: number) => `$${(cents / 100).toFixed(2)}`; export const STATUS_STYLE: Record<string, string> = { … };
+  - Claims: —
+  - True: Neither is imported anywhere under webapp/src (the three importers take boughtAfterFormation, serviceIsOpen, serviceLabel, summaryOf). `money` here prints '$50.00' while the portal's money (services.helpers.ts:15-17) prints '$50' — a second format for one price, unused.
+  - Replace with: Delete both exports.
+  - Ruling: 
+- **193. [B97]** — Office, the Fulfil dialog — code only — `webapp/src/pages/admin/ServiceOrdersSection.tsx:74`
+  - Reads: /** The one-line name for a service order. The surrounding card or dialog already names the LLC, so series names are shortened to their own part — "Jimmy Flanagan, LLC - PS 3" reads "PS 3". Never truncated, only wrapped. */
+  - Claims: Documents the function beneath it.
+  - True: Nothing is beneath it: serviceLabel moved to serviceOrders.helpers.ts:21 on 29 Aug 2026 and the comment stayed. Counted in A79h.
+  - Replace with: Delete lines 74-77 (or move the comment above serviceLabel in serviceOrders.helpers.ts).
+  - Ruling: 
+
+## Emails and jobs — 25 to fix, 10 housekeeping
+
+- **194. [A3]** — Renewal notice timing (mine). renewals.ts NOTICE_DAYS = 45. Terms 9(d): notice 30–60 days before the cancellation deadline; deadline is renewal − 30 (9(g)); so notice must be 60–90 days before the date. Replace: 60.
+  - Ruling: 
+- **195. [A4]** — Renewal retry (mine). The retry reuses idempotency key `ren-<id>-1`; Square returns the first decline; the email promises a retry. Replace: store the attempt count on every decline; retry key numbered 2.
+  - Ruling: 
+- **196. [A5]** — Renewal receipt after a link payment (mine). "We charged $99 to your card ending 1234" when the client paid the link. Replace: "We received $99 for registered agent service for [company] through [date]."
+  - Ruling: 
+- **197. [A23]** — Formed email, EIN line: "that's our next step." The order waits on the client's details. Replace: "…it is waiting for the responsible party's details from you: sign in, open Orders in progress, and choose Provide details securely."
+  - Ruling: 
+- **198. [A24]** — Welcome email and Your information header say "formation documents" to a converting client. Replace: "filed Designations" / "your filed documents".
+  - Ruling: 
+- **199. [B99]** (same defect as A4) — Registered agent renewal, the email after the retry charge is declined (renewals job) — `webapp/server/email.ts:166`
+  - Reads: We will try the card once more on ${escapeHtml(opts.retryDate)}.
+  - Claims: That a further attempt will be made on the date named.
+  - True: After the retry (the second attempt) is declined for insufficient funds, renewals.ts:257 sets retryAfter again because `attempt < 2` is still true (attempt is 1 — see A4), :260 stores retries = 1, and :263 passes willRetry: true, so the client is promised a third attempt; on the next pass :235 `row.retries < 1` is false and no charge runs. The promise is never kept.
+  - Replace with: Store the attempt count on every decline (renewals.ts:260 `retries = attempt`), compute retryAfter only when `attempt < 2` with attempt counting both attempts (first decline attempt=1 → retry allowed; second decline attempt=2 → none), and allow the retry with `row.retries < 2` at :235. The email then says 'once more' only once.
+  - Ruling: 
+- **200. [B100]** — The 'A change to your portal email was requested' notice sent to the old address — `webapp/server/email.ts:222`
+  - Reads: If this was not you, sign in and change your password immediately, then email support@myfloridaseriesllc.com. This address remains on the account until the new one is confirmed.
+  - Claims: That changing the password is the way to stop the change.
+  - True: Changing the password (routes-portal.ts:2420-2455) deletes other sessions but leaves pending_email set and the verify_email token valid for its hour; pending_email is cleared only when a link is confirmed (routes-portal.ts:2541, :2545) or by the office (routes-admin.ts:1076), and no portal control withdraws a pending change (AccountCard.tsx:65-67 only displays it). Someone holding the new inbox can still confirm the change after the password is changed. Requesting a new change to the old address does cancel the earlier link (routes-portal.ts:2478-2482 marks older tokens used) but the email does not say so.
+  - Replace with: Code: on a password change, `UPDATE clients SET pending_email = NULL` and mark outstanding verify_email tokens used. Email: 'If this was not you, sign in and change your password immediately — that also cancels this request — then email support@myfloridaseriesllc.com.'
+  - Ruling: 
+- **201. [B101]** — Registered agent cancellation confirmation email, point 2 — `webapp/server/email.ts:285`
+  - Reads: Until we receive that proof, we remain your agent of record and service is billed at the then-current rate, prorated monthly, as described in the Terms of Service.
+  - Claims: That after a timely cancellation without proof of a successor, the client is billed month by month.
+  - True: Terms 9(g) (terms.md:54) say it; nothing performs it. A timely cancellation marks the renewal row 'cancelled' and the job stops there (renewals.ts:227-231); there is no monthly charge, no invoice and no office reminder — the Registered Agent Clients row only shows the cancellation date. The sentence describes hand work the office must remember.
+  - Replace with: Either build it (a monthly charge or payment link for a cancelled company still on file, with the office row turning amber) or, until then, soften the email to 'Until we receive that proof, we remain your agent of record and the Terms of Service let us bill for that time at the then-current rate, prorated monthly.'
+  - Ruling: 
+- **202. [B102]** (same defect as A22) — Formed email, S election paragraph — `webapp/server/email.ts:494`
+  - Reads: IRS Form 2553 must be filed within 2 months and 15 days of the date on your filed Articles, so please complete the form soon.
+  - Claims: That the deadline runs from the Articles' filing date.
+  - True: The window runs from the LLC's effective date, which a client who chose a delayed effective date has set later than the filing date; this is the third wording of the deadline A22 lists (evaluate2553Timing takes an effectiveDate, routes-admin.ts:1197).
+  - Replace with: IRS Form 2553 must be filed within 2 months and 15 days after your LLC's effective date (the date on your filed Articles, unless you chose a later effective date), so please complete the form soon.
+  - Ruling: 
+- **203. [B103]** (same defect as A65) — 'Your Form 2553 package is ready' email — `webapp/server/email.ts:404`
+  - Reads: ready to download in your portal: the completed IRS Form 2553, a cover letter, and step-by-step instructions for signing and mailing it to the IRS.
+  - Claims: That the instructions are for mailing.
+  - True: The package's instructions recommend fax: s-election.ts:238 '**Fax (recommended):** ${IRS_FAX}. Keep the fax transmission confirmation…' (the cover letter line at :216 says 'mail it'). Same as A65 in the portal.
+  - Replace with: …step-by-step instructions for signing it and faxing or mailing it to the IRS.
+  - Ruling: 
+- **204. [B104]** — Legal mail received email — `webapp/server/email.ts:253`
+  - Reads: In Florida a lawsuit typically allows 20 days to respond BUT THIS IS NOT ALWAYS THE CASE. Contact an attorney immediately so they can provide you with proper legal guidance.
+  - Claims: A rule about the time to respond to a Florida lawsuit.
+  - True: Three lines later the same email says 'We do not review what it says and cannot advise you about it', and Terms 3 (terms.md:18) say no legal advice is given; a stated response period is advice about the papers. The comment at :240-242 attributes the email to Adam (10 Sep 2026), so this may be deliberate.
+  - Replace with: Papers served on a company usually carry a deadline that runs from the day they were served, whether or not they have been read — often a short one. Contact an attorney immediately.
+  - Ruling: 
+- **205. [B105]** — Welcome email, the note under the Set your password button — `webapp/server/email.ts:89`
+  - Reads: This link expires in 7 days. If it expires, use "Forgot password" on the portal sign-in page with this email address.
+  - Claims: The sign-in page has a link called 'Forgot password'.
+  - True: The sign-in page link reads 'Forgot your password?' (PortalLogin.tsx:71) and the password-changed email at email.ts:193 says 'Forgot your password' — two wordings for one link. (The 7 days is true: routes-payments.ts:112 and :614.)
+  - Replace with: This link expires in 7 days. If it expires, use "Forgot your password?" on the portal sign-in page with this email address.
+  - Ruling: 
+- **206. [B107]** — Portal purchase confirmation email (series, certificate of status, certified copy) — `webapp/server/email.ts:335`
+  - Reads: No further action is needed from you. We'll post the confirmation to your portal when the work is complete.
+  - Claims: A 'confirmation' will be posted.
+  - True: What is posted is the deliverable itself — the filed designation (routes-admin.ts:1336) or the state's certificate (:1340-1342) — not a confirmation.
+  - Replace with: No further action is needed from you. We'll post the document to your portal when the work is complete.
+  - Ruling: 
+- **207. [B108]** — Office email 'EIN details submitted — ready to file' — `webapp/server/email.ts:374`
+  - Reads: View them once in the admin dashboard; the identification number is deleted automatically when you mark the order fulfilled.
+  - Claims: The details can be viewed once.
+  - True: GET /admin/services/:id decrypts the number on every call (routes-admin.ts:1124-1132); nothing limits viewing to once. The deletion clause is true (:1372-1375).
+  - Replace with: View them in the admin dashboard; the identification number is deleted automatically when you mark the order fulfilled.
+  - Ruling: 
+- **208. [B111]** — Office: uploading a replacement formation package (Articles or designations) after the company is formed — `webapp/server/routes-admin.ts:860`
+  - Reads: UPDATE orders SET status = 'formed', formed_at = now(), ra_renewal_date = ((now() AT TIME ZONE 'America/New_York') + interval '1 year')::date WHERE id = $1
+  - Claims: Runs once, when the company is formed.
+  - True: The route is also the replacement path (:466-471 'A wrong file is replaced later by the formed-step package upload, which retires priors'), and the UPDATE is unconditional, so every re-upload moves formed_at and pushes ra_renewal_date to a year after the re-upload — including after a renewal has been charged and the date advanced (renewals.ts:252). The renewal date the client was told (email.ts:129-133) and the cancellation deadline built from it silently change.
+  - Replace with: UPDATE orders SET status = 'formed', formed_at = COALESCE(formed_at, now()), ra_renewal_date = COALESCE(ra_renewal_date, ((now() AT TIME ZONE 'America/New_York') + interval '1 year')::date) WHERE id = $1 (and the non-agent branch likewise for formed_at).
+  - Ruling: 
+- **209. [B112]** — Formed email — the 'Your Federal EIN order / S election package order is in your portal as well' line, for a client with two companies — `webapp/server/routes-admin.ts:879`
+  - Reads: SELECT type FROM service_orders WHERE client_id = $1 AND type IN ('ein', 's-election') AND status IN ('awaiting_info', 'in_progress')
+  - Claims: Lists the EIN and S election orders bought for the company being formed.
+  - True: The query is by client, not by formation order: a client forming a second company whose first company still has an open EIN order is told, in the second company's formed email, that 'Your Federal EIN order is in your portal as well' (email.ts:466-473, :492-495). service_orders carries formation_order_id for both intake and portal purchases (routes-payments.ts:93-104; routes-portal.ts:1934, :1989, :2057, :2143).
+  - Replace with: …WHERE client_id = $1 AND (formation_order_id = $2 OR formation_order_id IS NULL) AND type IN ('ein', 's-election') AND status IN ('awaiting_info', 'in_progress') with o.id as $2.
+  - Ruling: 
+- **210. [B113]** — Certificate titles as the client sees them in the portal ('Certificate of Status - Sep 16, 2026 — Acme, LLC') — `webapp/server/routes-admin.ts:250`
+  - Reads: return `${kindTitle} - ${day} — ${llcName}`;
+  - Claims: A title in the house style.
+  - True: One title mixes a hyphen and an em dash; every other document title uses ' — ' alone (:558 Articles, :827 designations, :1336-1343 service deliverables).
+  - Replace with: return `${kindTitle} (${day}) — ${llcName}`;
+  - Ruling: 
+- **211. [B114]** — Office fulfil dialog refusal when the EIN box is empty, for an EIN bought for a series — `webapp/server/routes-admin.ts:1308`
+  - Reads: Enter the 9-digit EIN from the letter — it goes on the client's Form 2553.
+  - Claims: The number will be carried onto the client's Form 2553.
+  - True: The rebuild runs only for a company EIN: :1402 `if ((details.target ?? "company") === "company")`; a series EIN (details.target === 'series', summary at :1329) is stored (:1398-1401) and goes on no 2553. Same problem A75 records in the dialog hint.
+  - Replace with: `Enter the 9-digit EIN from the letter${(details.target ?? "company") === "company" ? " — it goes on the client's Form 2553" : ""}.` (move the `details` parse above the check).
+  - Ruling: 
+- **212. [B116]** (same defect as A3) — The registered agent renewal date — which anniversary — `webapp/server/routes-admin.ts:862`
+  - Reads: ra_renewal_date = ((now() AT TIME ZONE 'America/New_York') + interval '1 year')::date
+  - Claims: The service 'renews automatically on the anniversary date' (Terms 9(c), terms.md:46).
+  - True: The date is a year after the day the office uploads the formed package, which can be days or weeks after the Articles' effective date on which the agent designation took effect (s. 605.0207; the Articles carry the agent's acceptance, s. 605.0201(2)(c)). The Terms do not say which anniversary; the portal (PortalDashboard.tsx:367) and every renewal email show this one. Adam should say whether the anniversary is the upload day or the Articles' effective date.
+  - Replace with: If the effective date is meant: set ra_renewal_date from the Articles' effective date typed at upload (the office already types the document number there), and say 'the anniversary of your LLC's effective date' in Terms 9(c).
+  - Ruling: 
+- **213. [B123]** — Chapter 605 notes, Administration, the entity-transactions bullet — `webapp/server/chapter-605-notes.md:140`
+  - Reads: s. 605.2602–605.2604 — a protected series may not convert, domesticate, or participate in an interest exchange, and may merge only through the single channel in s. 605.2604 (every other party an LLC; surviving company not created in the merger).
+  - Claims: That a protected series may merge, through s. 605.2604.
+  - True: s. 605.2602 (read today): 'Except as provided in ss. 605.2605(2), 605.2606(2), and 605.2607(1), a protected series may not participate in; be a party to; result from; or be formed, organized, established, or created by … (1) A conversion, domestication, interest exchange, or merger'. The merger channel in s. 605.2604 belongs to the series limited liability COMPANY ('A series limited liability company may be a party to a merger … only if … (1) Each other party to the merger is a limited liability company. (2) The surviving company is not created in the merger.'); a protected series is only relocated, continued or terminated inside the company's merger under ss. 605.2605-605.2607. The masters have it right (facts.md: 'except as ss. 605.2602 and 605.2605–605.2607, Florida Statutes, permit') and facts.md retires exactly this note's wording ('605.2602–605.2604', 'single statutory channel provided in s. 605.2604').
+  - Replace with: s. 605.2602 — a protected series may not be a party to, result from, or be created by a conversion, domestication, interest exchange or merger, except that in the company's own merger under s. 605.2604 (every other party an LLC; surviving company not created in the merger) a protected series is relocated, continued or terminated as ss. 605.2605–605.2607 provide. s. 605.2603 bars the series LLC itself from conversion, domestication and interest exchange.
+  - Ruling: 
+- **214. [B124]** — Chapter 605 notes, fee schedule, 'Conflicts with what we charge' — `webapp/server/chapter-605-notes.md:264`
+  - Reads: On 2026-08-10 Adam directed "It's a $125 filing fee for the Articles. No fee to designate a registered agent," and the calculator became articles $125 / agent $0. The statute splits it: $100 (2) + $25 (7) = $125. Same total to the customer, but our line items describe the fee contrary to the statute on a page that says fees are "at cost."
+  - Claims: The calculator and line items still describe the fee as $125 Articles / $0 agent.
+  - True: Stale. validation.ts:178-179 now `articlesOfOrganization = isConversion ? 0 : 100` and `registeredAgentDesignation = … : 25`; pricing.ts:72-81 prints two lines, 'FL state fee — Articles of Organization' and 'FL state fee — registered agent designation'; docs/facts.md ledger 'The $125 a new company pays the state' fixes the split at $100 + $25 and retires '$125 Articles filing fee'.
+  - Replace with: Resolved: since the facts ledger, the calculator and the line items split the $125 as the statute does — $100 under (2) and $25 under (7).
+  - Ruling: 
+- **215. [B125]** — Chapter 605 notes, fee schedule, 'Conversion gap' — `webapp/server/chapter-605-notes.md:270`
+  - Reads: If they take our registered agent service that is a change of agent — $25 under (7) — which we stopped collecting. Our intake offers exactly that choice.
+  - Claims: The $25 change-of-agent fee is not collected on a conversion.
+  - True: Stale. pricing.ts:44-46 and :53 pass `registeredAgentChange` ('A converting client who takes our registered agent service is changing the agent on file — s. 605.0213(7), $25'), validation.ts:179 charges it, and pricing.ts:77-78 prints 'FL state fee — change of registered agent'.
+  - Replace with: Resolved: a converting client who takes our agent service is charged the $25 change-of-agent fee under (7).
+  - Ruling: 
+- **216. [B126]** — Chapter 605 notes, fee schedule, 'Annual report unresolved' — `webapp/server/chapter-605-notes.md:275`
+  - Reads: (5) says $50; the site publishes $138.75 / $538.75 late. Chapter 605 does not explain the difference. Treat $138.75 and the $400 penalty as unverified until the Department's schedule is checked.
+  - Claims: The figures are unverified in statute.
+  - True: They are statutory. s. 607.193(1) (read today on Online Sunshine): 'an annual supplemental corporate fee of $88.75 is imposed on each business entity that is authorized to transact business in this state and is required to file an annual report with the Department of State under s. 605.0212, s. 607.1622, or s. 620.1210.' $50 (s. 605.0213(5)) + $88.75 = $138.75. s. 607.193(2)(b): 'a late charge of $400 shall be imposed if the supplemental corporate fee is remitted after May 1' — $538.75.
+  - Replace with: Annual report, verified: $50 under s. 605.0213(5) plus the $88.75 supplemental corporate fee under s. 607.193(1) = $138.75; the $400 late charge is s. 607.193(2)(b), payable when the fee is remitted after May 1 — $538.75.
+  - Ruling: 
+- **217. [B127]** — Chapter 605 notes, General act, the s. 605.0105(3) bullet, item (p) — `webapp/server/chapter-605-notes.md:173`
+  - Reads: (p) may not indemnify for bad faith, willful or intentional misconduct, improper personal benefit, or s. 605.0406 liability.
+  - Claims: That list is the whole of (p).
+  - True: s. 605.0105(3)(p) has a fourth item: '4. A breach of duties or obligations under s. 605.04091, taking into account a restriction, an expansion, or an elimination of such duties and obligations provided for in the operating agreement to the extent allowed by subsection (4).' It matters to the Indemnification sections, which A80 is already about.
+  - Replace with: (p) may not indemnify for bad faith, willful or intentional misconduct, improper personal benefit, s. 605.0406 liability, or a breach of the s. 605.04091 duties as the agreement has shaped them.
+  - Ruling: 
+- **218. [B128]** — Chapter 605 notes, Appraisal rights bullet — `webapp/server/chapter-605-notes.md:508`
+  - Reads: s. 605.1006(1) — a member has appraisal rights on a merger, conversion, interest exchange, a sale of substantially all the assets where the member could vote on it, and certain amendments to the organic rules.
+  - Claims: Every voted sale of substantially all the assets carries appraisal rights.
+  - True: s. 605.1006(1)(d) excepts a sale 'pursuant to court order or … for cash pursuant to a plan under which all or substantially all of the net proceeds of the sale will be distributed to the interest holders within 1 year after the date of sale' — the ordinary case for a real-estate series being sold out.
+  - Replace with: …a sale of substantially all the assets where the member could vote on it (unless by court order, or for cash with the proceeds distributed within a year)…
+  - Ruling: 
+
+### Housekeeping
+
+- **219. [B106]** — Welcome email, the portal paragraph — `webapp/server/email.ts:86`
+  - Reads: Your Owner's Manual — the plain-English guide to running your protected series LLC — is already in your portal's library, ready to download.
+  - Claims: The manual is in the library at the moment the order is paid.
+  - True: The manual reaches library_documents only when refreshOwnersManual runs (routes-admin.ts:40-70) — the nightly cron at 08:45 UTC (vercel.json) or the office's button (:85-96); nothing publishes at boot (no call in app.ts or vercel-entry.ts). On a fresh production database the first client paid before that runs finds an empty library.
+  - Replace with: Publish the manual on first boot when no 'owners-manual' row exists (call refreshOwnersManual(false) from the cron and from app start), or word it 'will be in your portal's library'.
+  - Ruling: 
+- **220. [B109]** — 'About the card you paid with' email (prepaid gift card), the renewal date in parentheses — `webapp/server/email.ts:107`
+  - Reads: Before your renewal date${renewalDate ? ` (${escapeHtml(renewalDate)})` : ""} you will receive an email with a payment link.
+  - Claims: The date can be shown.
+  - True: The email is sent from saveRenewalCard at payment (routes-payments.ts:66), and renewals.ts:108-109 reads ra_renewal_date then — but the date is written only at formation (routes-admin.ts:862), so it is always NULL here and the parenthesis never prints. Dead branch; the sentence without the date is true.
+  - Replace with: Drop the renewalDate parameter (renewals.ts:108-109, email.ts:99, :107), or send the gift-card email at formation when the date exists.
+  - Ruling: 
+- **221. [B110]** — Registered agent renewal paid through its payment link — where the client lands afterwards — `webapp/server/renewals.ts:164`
+  - Reads: redirectUrl: `${env.PUBLIC_BASE_URL}/portal?renewed=${row.id}`,
+  - Claims: The portal will acknowledge the payment.
+  - True: Nothing in webapp/src reads a `renewed` query parameter (grep of src for 'renewed': no matches); the client lands on the plain portal and the only acknowledgment is the receipt email (renewals.ts:308-309).
+  - Replace with: Either read `renewed` on the portal and show 'Thank you — your registered agent service is renewed through [date]' on the Registered agent service card, or redirect to `/portal` and drop the parameter.
+  - Ruling: 
+- **222. [B115]** — Office order drawer query — `webapp/server/routes-admin.ts:359`
+  - Reads: SELECT *, rejected_at, ra_renewal_date FROM orders WHERE id = $1
+  - Claims: Nothing a reader sees.
+  - True: `*` already returns rejected_at and ra_renewal_date; the two names are redundant.
+  - Replace with: SELECT * FROM orders WHERE id = $1
+  - Ruling: 
+- **223. [B117]** — Nightly database backup — what it contains — `webapp/server/backup.ts:17`
+  - Reads: export const BACKUP_TABLES = ["clients", "orders", "service_orders", "documents", "oa_profiles", "oa_generations", "library_documents", "webhook_events", "fl_sync_state", "contact_messages"] as const;
+  - Claims: The header (:6) says these are 'the tables that cannot be rebuilt from anywhere else' and :9-12 lists the deliberate exclusions (fl_entities, sessions, auth_tokens).
+  - True: Two tables added since are neither dumped nor listed as excluded: email_log (db.ts:405-417, kept so the office can prove 'that we sent them something') and ra_renewals (db.ts:442-461 — each renewal's notice, charge, Square payment id, decline code and payment link). A Neon-side loss takes the email record and every renewal's history with it. rate_limits and schema_migrations are also absent (harmless; the restore script must recreate the ledger).
+  - Replace with: Add "email_log" and "ra_renewals" to BACKUP_TABLES and to scripts/db-restore.ts; list rate_limits with the deliberate exclusions in the header.
+  - Ruling: 
+- **224. [B118]** — Nightly Dropbox mirror — its own description — `webapp/server/dropbox.ts:112`
+  - Reads: /** Copies every not-yet-mirrored document. One failure doesn't strand the rest — errors are counted and the document stays pending for the next sweep. */
+  - Claims: Every pending document is copied in a sweep.
+  - True: :139 `LIMIT 200` — a sweep copies at most 200; with more pending, the rest wait a night each. The office line A76 covers ('every file' nightly) rests on this.
+  - Replace with: Comment: 'Copies up to 200 not-yet-mirrored documents a sweep…'; or loop until the query returns fewer than 200.
+  - Ruling: 
+- **225. [B119]** — Nightly Dropbox mirror — which folder legal mail lands in for a client with two companies — `webapp/server/dropbox.ts:132`
+  - Reads: COALESCE((SELECT o.llc_name FROM orders o WHERE o.id = d.order_id), (SELECT o.llc_name FROM orders o WHERE o.client_id = d.client_id AND o.paid_at IS NOT NULL ORDER BY o.paid_at DESC LIMIT 1)) AS llc_name
+  - Claims: A document with no company is filed under the client's newest paid company.
+  - True: Legal mail carries no order_id by design (routes-admin.ts:1565 'Legal mail stays one shared section and carries no company'), so every piece of legal mail for a two-company client is mirrored into the newer company's folder whichever company it was served on.
+  - Replace with: For kind = 'legal_mail' use the client's email as the folder (`safePathPart(doc.email)`), or add a per-piece company when the office uploads it.
+  - Ruling: 
+- **226. [B120]** — Encryption note on when the secrets are deleted — `webapp/server/crypto.ts:47`
+  - Reads: rotating SESSION_SECRET orphans stored ciphertexts, which is acceptable because these secrets are deleted at fulfillment by design.
+  - Claims: Secrets are deleted at fulfillment.
+  - True: EIN secrets are (routes-admin.ts:1372-1375). S election SSNs are re-stored at fulfillment and kept for the 14-day edit window (routes-portal.ts:885-893, S_ELECTION_EDIT_DAYS = 14 at :517) before the purge; a key rotation inside that window orphans a live package the client may still regenerate.
+  - Replace with: …because EIN secrets are deleted at fulfillment and S election secrets 14 days after it; rotate SESSION_SECRET only when no S election window is open.
+  - Ruling: 
+- **227. [B121]** — Environment notes — `webapp/server/env.ts:35`
+  - Reads: /** Shared secret for the daily purge cron. Required in production. */
+  - Claims: One cron uses it.
+  - True: Six do: /cron/ra-renewals, /cron/library-refresh, /cron/sunbiz-sync, /cron/purge, /cron/db-backup, /cron/file-mirror (routes-ops.ts:257-328; vercel.json crons).
+  - Replace with: /** Shared secret for the nightly crons (renewals, library refresh, Sunbiz sync, purge, backup, mirror). Required in production. */
+  - Ruling: 
+- **228. [B122]** — Taxation label helper (the label A59 says disagrees with the portal pill) — `webapp/server/datetime.ts:44`
+  - Reads: if (version === "single-s" || version === "member-single-s") return "Single-Member S Corporation";
+  - Claims: Nothing new — this is where A59's 'Single-Member S Corporation…' label comes from.
+  - True: A59 (portal bucket) asks for one label table; the helper is used by oa.ts, PortalDashboard.tsx and OAQuestionnaire.tsx, so the fix belongs here.
+  - Replace with: Per A59's ruling, one table here that both the title and the pill read.
+  - Ruling: 
+
+## Agreements and guidance — 31 to fix, 8 housekeeping
+
+- **229. [A80]** — Manager-managed forms (4), Indemnification: "an act exceeding the authority conferred by Section 5.4"; 5.4 is the approval list, 5.3 the authority. Replace: "an act taken without the approval Section 5.4 requires" (both places).
+  - Ruling: 
+- **230. [A81]** — All eight forms: "Effective Date" defined, never used; signature page "effective as of the date(s) set forth below". Amendment likewise. Replace: "executed this Agreement as of the Effective Date"; amendment "as of the date stated above".
+  - Ruling: 
+- **231. [A82]** — Four multi-member forms, Tax Matters: "No member … all members" uncapitalised. Replace: "No Member … all Members."
+  - Ruling: 
+- **232. [A83]** — Two manager-managed single-owner forms, Amendments (b): circular. Replace: "(b) no amendment may impose new obligations on the Manager without the Manager's written consent."
+  - Ruling: 
+- **233. [A84]** **— ruling needed** — Manager-managed forms 3.1: "the Members and the Manager shall adopt a Series Exhibit" but the Manager signs alone. Ruling needed.
+  - Ruling: 
+- **234. [A85]** — Manager-managed Series Exhibits "completed by the Member(s)"; Article 8 puts records on the Manager. Replace: "maintained under Article 8".
+  - Ruling: 
+- **235. [A86]** — Colophons omit s. 711.50; two single-owner S forms list Code sections, six do not. Replace: list 711.50; Code sections in all or none.
+  - Ruling: 
+- **236. [A87]** — Four multi-member forms say "single class" twice (2.13 and 4.1). Replace: keep 4.1.
+  - Ruling: 
+- **237. [A88]** — Instructions s. 1 "Series LLC User's Manual". Replace: "Owner's Manual".
+  - Ruling: 
+- **238. [A89]** — Instructions s. 3: Administrative Member "no authority to decide anything"; 5.8 lets a Majority in Interest confer authority. Replace as proposed.
+  - Ruling: 
+- **239. [A90]** — Instructions and Manual: capital call "a majority of owners" (Majority in Interest); borrowing limit "written" consent (consent). Replace both.
+  - Ruling: 
+- **240. [A91]** **— ruling needed** — Manual s. 6 step 3: unanimous consent "a rule your operating agreement cannot change"; 605.2107(1)(i) excepts the manner of approving establishment (repo statute notes). Ruling needed from the statute.
+  - Ruling: 
+- **241. [A92]** — Manual s. 24: "your operating agreement … require[s] current contact information". Replace as proposed.
+  - Ruling: 
+- **242. [A93]** — Manual s. 28 Example 1 "($75 total)" for three series. Replace: "($25 state fee each)" or "$150 through us".
+  - Ruling: 
+- **243. [A94]** — Manual s. 4 "(s. 605.2602)" alone. Replace: "ss. 605.2602 and 605.2605–605.2607".
+  - Ruling: 
+- **244. [A95]** — Manual map Article 8 row "never your personal name" overstates 8.4. Replace: mention the documented nominee arrangement.
+  - Ruling: 
+- **245. [A96]** — Manual s. 3 "at the end of Article 8 … makes … it works". Replace: "in Article 8 … make … they work" (twice).
+  - Ruling: 
+- **246. [A97]** — Manual colophon omits twelve cited sections. Replace: rebuild; add the Manual to the ledger's colophon check.
+  - Ruling: 
+- **247. [A98]** — Manual s. 5 "s. 6.1 of your agreement" (statute abbreviation); README "five" masters; two double blank lines. Replace: "§6.1"; "eight"; single blanks.
+  - Ruling: 
+- **248. [B148]** (same defect as A41) — Owner's Manual, cover page (title-page block) — `docs/owners-manual.md:15`
+  - Reads: 10|Written for the Florida Uniform Protected Series Act
+  - Claims: The statute the manual is written for is called the 'Florida Uniform Protected Series Act'.
+  - True: s. 605.2101, Florida Statutes, opened on Online Sunshine: 'Short title.—Sections 605.2101-605.2802 may be cited as the “Uniform Protected Series Provisions.”' The chapter itself is the Florida Revised Limited Liability Company Act. (The prior audit's A41 raised the same name on the Home page; the Manual's cover is in this bucket.)
+  - Replace with: 10|Written for the Uniform Protected Series Provisions of the Florida Revised Limited Liability Company Act
+  - Ruling: 
+- **249. [B149]** (same defect as A91) — Owner's Manual, s. 6 'How a Florida Protected Series LLC Is Formed', Step 3 — Consent (the ruling A91 asked for, answered by the statute) — `docs/owners-manual.md:103`
+  - Reads: **Step 3 — Consent.** Establishing a protected series requires the affirmative vote or consent of **all members** of the company (s. 605.2201). This is a rule your operating agreement **cannot change** — s. 605.2107 puts it on the list of non-variable provisions. In a single-member company this is trivial — your consent is everyone's consent. In a multi-member company, plan for it: one holdout member can block a new series.
+  - Claims: The unanimous-consent rule for establishing a series is non-variable under s. 605.2107.
+  - True: s. 605.2107(1)(i), opened on Online Sunshine: an operating agreement may not vary the effect of 'Section 605.2201, except to vary the manner in which a series limited liability company approves establishing a protected series'. The approval rule is exactly the part an agreement MAY change. Unanimity binds these clients because Section 3.1 of every form requires it (templates-oa-multi.md:92), which is what the series consent itself recites (templates-new-series.md:11: 'Section 3.1 of the Agreement requires that consent').
+  - Replace with: **Step 3 — Consent.** Establishing a protected series requires the affirmative vote or consent of **all members** of the company (s. 605.2201(1)). The statute lets an operating agreement choose a different approval rule (s. 605.2107(1)(i)); yours does not — Section 3.1 of your agreement keeps unanimity. In a single-member company this is trivial — your consent is everyone's consent. In a multi-member company, plan for it: one holdout member can block a new series.
+  - Ruling: 
+- **250. [B150]** — Owner's Manual, s. 7 'The choices you made' — The borrowing limit — `docs/owners-manual.md:138`
+  - Reads: **The borrowing limit (§5.4 / §5.5).** The multi-member forms ask for a dollar figure: above it, no debt may be incurred and no guarantee given for anyone, without the owners' written consent. There is no default — you chose the number, and it is printed in your agreement. Set it where a borrowing would be big enough that you would want to be asked first.
+  - Claims: Guarantees, like debt, need the owners' consent only above the dollar figure.
+  - True: templates-oa-multi.md:180 (5.4(f)) and templates-oa-member.md:186 (5.5(f)): 'incur … indebtedness in excess of $[THRESHOLD] in a single transaction or series of related transactions, or guarantee the obligation of any person (…) — the consent of **all Members**'. The threshold qualifies indebtedness only; every guarantee, of any amount, needs the consent of all Members, and the consent is not 'written' (A90).
+  - Replace with: **The borrowing limit (§5.4 / §5.5).** The multi-member forms ask for a dollar figure: above it, no debt may be incurred without the consent of every owner — and no guarantee of anyone's obligation, of any amount, may be given without that consent. There is no default — you chose the number, and it is printed in your agreement. Set it where a borrowing would be big enough that you would want to be asked first.
+  - Ruling: 
+- **251. [B151]** — Every operating agreement, Article 5, s. 5.2 'Management of Each Protected Series' (eight forms); the member-managed single-member Series Exhibit 'Managed by' row; the series consent's same row; Owner's Manual Article 5 map row — `webapp/server/templates-oa-multi.md:164`
+  - Reads: As permitted by s. 605.2107(1)(n), Florida Statutes, this Section varies s. 605.2304(2) so that the Protected Series Managers are the Manager or Managers of the Company rather than the Company itself.
+  - Claims: s. 605.2107(1)(n) permits varying s. 605.2304(2).
+  - True: s. 605.2107(1)(n), opened on Online Sunshine, is a prohibition, not a permission: 'An operating agreement may not vary the effect of: … (n) Section 605.2304(3) or (6);'. It leaves subsection (2) ('If a protected series has no associated members, the series limited liability company is the protected-series manager.') variable by saying nothing about it. The same phrasing is at templates-oa-s.md:164, member.md:162, member-s.md:162, single.md:146, single-s.md:150, member-single.md:138, member-single-s.md:144; the exhibit rows at member-single.md:326, member-single-s.md:358 and templates-new-series.md:44 cite '605.2107(1)(n)' the same way; owners-manual.md:128 says 'as s. 605.2107(1)(n) permits'.
+  - Replace with: This Section varies s. 605.2304(2), Florida Statutes — a provision s. 605.2107(1)(n) leaves an operating agreement free to vary — so that the Protected Series Managers are the Manager or Managers of the Company rather than the Company itself.
+  - Ruling: 
+- **252. [B152]** — Manager-managed and member-managed multi-member agreements, s. 5.4(d) / s. 5.5(d); every form's s. 1.9 Filings — `webapp/server/templates-oa-multi.md:176`
+  - Reads: (d) merge the Company as permitted by the Act — the consent of **all Members**; or file a statement of dissolution of a Protected Series — the approval required by Section 14.1;
+  - Claims: The filing that dissolves a protected series is a 'statement of dissolution'.
+  - True: s. 605.2502(2), opened on Online Sunshine: 'the company may deliver to the department for filing its articles of protected series dissolution'; s. 605.2502(3): after winding up, 'a statement of designation cancellation'. The Manual uses the statutory name (owners-manual.md:353 'articles of protected series dissolution', :402 'File the **articles of protected series dissolution**'); the agreements do not (multi.md:42 and every form's 1.9 'statements of dissolution'; s.md:176, member.md:182, member-s.md:182 same as here). Two names for one filing.
+  - Replace with: (d) merge the Company as permitted by the Act — the consent of **all Members**; or file articles of protected series dissolution or a statement of designation cancellation for a Protected Series — the approval required by Section 14.1;
+  - Ruling: 
+- **253. [B153]** — Owner's Manual, s. 23 — Death, the TOD designation — `docs/owners-manual.md:386`
+  - Reads: **Death — the TOD designation.** Every form of the agreement lets each member register a transfer-on-death beneficiary — anyone the member chooses, subject on the S corporation forms to the eligible-shareholder rule — on Exhibit A, using Florida's registration-in-beneficiary-form statute (ss. 711.50–711.512).
+  - Claims: Every member may register a beneficiary.
+  - True: templates-oa-multi.md:154 (4.11): 'A Member who is an individual may designate any person or entity as a beneficiary. … Members who hold a Membership Interest jointly as tenants in common may not designate a TOD beneficiary.' s. 711.502, opened on Online Sunshine: 'Only individuals whose registration of a security shows sole ownership by one individual or multiple ownership by two or more with right of survivorship, rather than as tenants in common, may obtain registration in beneficiary form.' The Instructions say so (oa-instructions.md:65); the Manual says 'each member'.
+  - Replace with: **Death — the TOD designation.** Every form of the agreement lets a member who is an individual (not a company or trust, and not co-owners holding as tenants in common) register a transfer-on-death beneficiary — anyone the member chooses, subject on the S corporation forms to the eligible-shareholder rule — on Exhibit A, using Florida's registration-in-beneficiary-form statute (ss. 711.50–711.512).
+  - Ruling: 
+- **254. [B154]** (same defect as A93) — Owner's Manual, s. 4 'Why use a series LLC' — Use it for — `docs/owners-manual.md:72`
+  - Reads: **Use it for:** multiple rental properties; a portfolio you are growing (add a $25 series per property instead of a $125+ LLC per property); separating a risky operating business from valuable equipment; or separating brands or projects.
+  - Claims: A new series costs $25.
+  - True: docs/facts.md:19: 'Price of an additional series — value: $50 — $25 to prepare and the $25 state filing fee'; the Manual's own lines 403, 521 and 523 say '$50 through us'. $25 is the state fee alone (the same slip A93 flagged at line 425).
+  - Replace with: **Use it for:** multiple rental properties; a portfolio you are growing (add a series per property — $50 through us, $25 of it the state fee — instead of a $125+ LLC per property); separating a risky operating business from valuable equipment; or separating brands or projects.
+  - Ruling: 
+- **255. [B155]** — Owner's Manual, ss. 9, 14, 24 and 27 — statute citations written '§605.…' where the rest of the manual writes 's. 605.…' — `docs/owners-manual.md:160`
+  - Reads: Get the name right and the record makes itself; get it wrong and you are proving association the hard way, out of ledgers, with the burden on you (§605.2404(4)).
+  - Claims: Nothing wrong in substance; the section symbol is the Manual's mark for agreement sections ('§5.4', '§8.4', '§10.6') and here is used for a statute.
+  - True: Two styles for one kind of citation: 's. 605.2404(4)' at line 66 but '§605.2404(4)' at 160, '§605.2301(5)' at 165, '§605.2404' at 235, 389 and 413; every other statute cite in the manual uses 's.' / 'ss.'. A98 flagged the converse ('s. 6.1 of your agreement').
+  - Replace with: Get the name right and the record makes itself; get it wrong and you are proving association the hard way, out of ledgers, with the burden on you (s. 605.2404(4)). — and the same change at lines 165, 235, 389 and 413.
+  - Ruling: 
+- **256. [B156]** (same defect as A96) — Owner's Manual, s. 7 map table, Article 8 row — `docs/owners-manual.md:130`
+  - Reads: | **Article 8** | The recordkeeping covenants (this manual's Section 14 is its field guide) and the standing association rules that close the Article — and the titling rule (§8.4): every asset is held in the name of the silo that owns it, never your personal name |
+  - Claims: The standing association rules are the last section of Article 8.
+  - True: templates-oa-multi.md:250-260: 8.5 'Standing Association Rules; Savings Provisions' is followed by 8.6 'Movement of an Asset Between Protected Series', which closes the Article (same in all eight forms). A third instance of A96's 'at the end of Article 8'; the 'never your personal name' half is A95.
+  - Replace with: | **Article 8** | The recordkeeping covenants (this manual's Section 14 is its field guide), the standing association rules in §8.5, and the holding rule (§8.4): every asset is held in the name of the silo that owns it, or through a nominee arrangement documented in the records — never simply in your personal name |
+  - Ruling: 
+- **257. [B157]** — Series consent, paragraph 4 'Authority to file', last sentence — `webapp/server/templates-new-series.md:19`
+  - Reads: The protected series is established when its Protected Series Designation takes effect under s. 605.0207, Florida Statutes.
+  - Claims: The establishment rule is in s. 605.0207.
+  - True: s. 605.0207 is the general 'Effective date and time' rule for every filing. The rule that a series is established at that moment is s. 605.2201(3), opened on Online Sunshine: 'A protected series is established when the protected series designation takes effect under s. 605.0207.' The sentence is true but cites the pointer's target rather than the pointer.
+  - Replace with: The protected series is established when its Protected Series Designation takes effect (ss. 605.2201(3) and 605.0207, Florida Statutes).
+  - Ruling: 
+- **258. [B158]** (same defect as A50) — Series consent and Series Exhibit — the Asset Schedule heading, compared with the agreement's — `webapp/server/new-series.ts:107`
+  - Reads: s = s.split("PS-[N]").join(`PS-${input.seriesNumber}`);
+  - Claims: The consent's asset schedule is headed 'ASSET SCHEDULE — ATTACHMENT TO SERIES EXHIBIT PS-4'.
+  - True: The agreement's asset schedule is headed with the series' filed name as well: oa.ts:673-676 renders `## ASSET SCHEDULE — ATTACHMENT TO SERIES EXHIBIT PS-${n} (${ser.name})`. A client detaching the two schedules for a bank gets one that names the series and one that does not.
+  - Replace with: In templates-new-series.md:55 head the schedule '## ASSET SCHEDULE — ATTACHMENT TO SERIES EXHIBIT PS-[N] ([SERIES NAME])' so the same fill produces the agreement's heading.
+  - Ruling: 
+- **259. [B167]** (same defect as A52) — Series consent — the document's title in the portal (the file behind A52) — `webapp/server/new-series.ts:134`
+  - Reads: return { markdown: s, title: `New Protected Series — ${input.seriesName}` };
+  - Claims: The stored document is titled 'New Protected Series — …'.
+  - True: The document's own heading is 'UNANIMOUS WRITTEN CONSENT OF THE MEMBERS … ESTABLISHING A NEW PROTECTED SERIES' with a 'SERIES EXHIBIT' (templates-new-series.md:1-5, 33); the prior audit's A52 (portal bucket) asked for 'Consent & Series Exhibit — [series]'. The title is set here, so the fix lives in this file.
+  - Replace with: return { markdown: s, title: `Consent & Series Exhibit — ${input.seriesName}` };
+  - Ruling: 
+
+### Housekeeping
+
+- **260. [B159]** — Series consent assembler — comment about the contribution cell (the code behind A48) — `webapp/server/new-series.ts:112`
+  - Reads: // An empty contribution prints a dash, as the agreement's own Series   // Exhibit does (15 Sep 2026).
+  - Claims: The agreement's Series Exhibit prints a dash for an empty contribution.
+  - True: It prints 'None': routes-portal.ts:1457 `contribution: capital.seriesCells[i] ?? "None"` and oa-capital.ts:122-124 `items: … : "None"`; oa.ts:650's `|| "—"` fallback is never reached from the portal. The comment justified the dash with a fact that is not so, which is how A48 stayed open.
+  - Replace with: s = s.split("[CONTRIBUTION]").join((input.contribution ?? "").trim() || "None"); with the comment 'An empty contribution prints None, as the agreement's Series Exhibit does (routes-portal.ts, oa-capital.ts).'
+  - Ruling: 
+- **261. [B160]** — docs/README.md — 'Masters → Word output' inventory table — `docs/README.md:25`
+  - Reads: | Master (edit this) | Word output, in `docs/word/` and Dropbox |
+  - Claims: The table is the inventory of every client-facing deliverable and its source path (CLAUDE.md: 'A deliverable with no entry there is a defect to report').
+  - True: webapp/server/templates-new-series.md — the Written Consent establishing a new series with its Series Exhibit and Asset Schedule, delivered to clients from routes-portal.ts:1644 — has no row, no Word output in docs/word/ (listed: 12 files, none for the consent), and is outside drafting-lint.py (README.md:69 'the five agreement masters') and the format gate. It is the twelfth master and the only client-facing one the inventory does not name.
+  - Replace with: Add a row: | `webapp/server/templates-new-series.md` | FPSLLC Written Consent Establishing a New Protected Series - FORM.docx | — and generate that Word output, or record in the README that the consent is portal-only with no Word twin and why.
+  - Ruling: 
+- **262. [B161]** — Operating agreement assembler — the Amended & Restated recital and title — `webapp/server/oa.ts:534`
+  - Reads: `D. This Agreement amends, restates, and supersedes in its entirety ${supersede}, which shall be of no further force or effect from the Effective Date.\n\nNOW, THEREFORE,`,
+  - Claims: Part of the agreement's recitals; a client receives this sentence (and, at line 526-527, the title 'AMENDED AND RESTATED' and preamble 'THIS AMENDED AND RESTATED OPERATING AGREEMENT').
+  - True: No master carries Recital D or the two alternative supersede phrases (lines 528-530: 'the Operating Agreement of the Company dated …' / 'any and all prior operating agreements of the Company, whether written or oral'). oa.ts:177-186 states the rule for this file: 'Every sentence a client receives has to come from a master … It may not compose a sentence.' This is the one legal sentence in the delivered agreement that Adam cannot find by reading a master. (The professional-company substitutions at lines 390-397 are also composed here, under Adam's 29 Aug 2026 dictation.)
+  - Replace with: Move Recital D into the ten masters behind a marker — e.g. `<!-- if:restated -->D. This Agreement amends, restates, and supersedes in its entirety <!-- if:priordate -->the Operating Agreement of the Company dated [PRIOR AGREEMENT DATE]<!-- /if --><!-- if:nopriordate -->any and all prior operating agreements of the Company, whether written or oral<!-- /if -->, which shall be of no further force or effect from the Effective Date.<!-- /if -->` — and the title/preamble alternatives as one:/many: style pairs, so the generator only chooses.
+  - Ruling: 
+- **263. [B162]** — Operating agreement assembler — final checks — `webapp/server/oa.ts:740`
+  - Reads: if (/Form document —|v1 draft/.test(s)) {
+  - Claims: The finished agreement is checked before it leaves the assembler.
+  - True: The check catches only the draft footer. new-series.ts:129-131 and oa-amendment.ts:141-143 and statement.ts:65-67 each refuse an unfilled '[SLOT]' and a leftover '<!--' marker; oa.ts has no such check, so a renamed slot or an unmatched marker in a master would ship in a signed instrument (the failure new-series.ts:127-128 records: '$[AMOUNT] on [DATE]' reached a client).
+  - Replace with: After line 746 add the same guard the other assemblers carry: throw if `/\[[A-Z][A-Za-z ()/.'—-]*\]/` matches anything other than '[Reserved.]', or if `/<!--/` matches.
+  - Ruling: 
+- **264. [B163]** — S corporation election package — instruction sheet, cover letter and continuation sheet — `webapp/server/s-election.ts:181`
+  - Reads: function instructionsMarkdown(d: SElectionDetails, deadlineIso: string): string {
+  - Claims: Everything the client reads in the package (three pages of instructions, the IRS cover letter, the continuation sheet) is authored here.
+  - True: Lines 166-285 hold roughly sixty client-facing sentences with no master; docs/README.md:165-167 records this deliberately ('Generated deliverables with no separate document to lose: the S corporation election package — webapp/server/s-election.ts'). Reported because the audit's rule is that no sentence a client receives should live only in TypeScript; the README's acknowledgement is the ruling to confirm or revisit.
+  - Replace with: Either promote the three texts to a master (templates-s-election.md) with slots for the name, EIN, dates and signers, or add to rulings.md that the S election package text stays in code.
+  - Ruling: 
+- **265. [B164]** — Operating Agreement Instructions, s. 3 'Filling in the Blanks' — `docs/oa-instructions.md:39`
+  - Reads: **[MANAGER NAME]** (manager-managed forms only) — the manager.
+  - Claims: The blank in the form is '[MANAGER NAME]'.
+  - True: The masters' appointment slot is '[MANAGER NAMES]' (templates-oa-multi.md:162, single.md:144); '[MANAGER NAME]' is only the signature-block slot (multi.md:407). A reader of the Word form looks for a blank that is spelled differently.
+  - Replace with: **[MANAGER NAMES]** (manager-managed forms only) — the manager or managers.
+  - Ruling: 
+- **266. [B165]** — Order Summary PDF (office only) — 'Items ordered' and 'Optional documents' sections — `webapp/server/order-summary.ts:122`
+  - Reads: out.push(line("Federal EIN service", p.optionalDocuments?.ein ? "Yes" : "No"));
+  - Claims: The EIN item is labelled 'Federal EIN service' here and 'Federal EIN' at line 220 in the same document.
+  - True: Two wordings for one fact in one PDF (lines 122 and 220 read the same field).
+  - Replace with: Use 'Federal EIN service' in both places.
+  - Ruling: 
+- **267. [B166]** — Manager-managed single-member S corporation agreement, between s. 7.2 and Article 8 — `webapp/server/templates-oa-single-s.md:192`
+  - Reads: (line 191 blank, line 192 blank — two consecutive blank lines between s. 7.2's last sentence 'Each distribution shall be recorded in the records maintained under Article 8, identifying its source.' on line 190 and the '---' rule before Article 8 on line 193)
+  - Claims: Two consecutive blank lines (191-192) where every other master has one.
+  - True: templates-oa-single.md:185-186 and the other six forms carry a single blank line before the '---' rule; this file alone has two.
+  - Replace with: Delete line 192.
+  - Ruling: 
+
