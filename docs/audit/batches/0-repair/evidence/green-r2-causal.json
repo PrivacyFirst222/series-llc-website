@@ -1,0 +1,119 @@
+{
+  "baseline": "3d84347fcd3cf9c116848688ed17e654f14b047c",
+  "rows": [
+    {
+      "name": "10/H1a: actual historical partial-package acceptance refused",
+      "ok": true,
+      "observed": {
+        "code": 1,
+        "output": "NOT RECORDED: package abcdef123456 is PARTIAL or has no explicit full-run marker — partial must be null\n"
+      }
+    },
+    {
+      "name": "10/H: partial package, real push from reset baseline",
+      "ok": true,
+      "observed": {
+        "before": "3d84347fcd3cf9c116848688ed17e654f14b047c",
+        "pushing": "0e2efcd71ae0e12763e45a6c2fdcd0db6fa11719",
+        "code": 1,
+        "output": "release gate: REFUSED for refs/heads/main:\n  - package abcdef123456 is PARTIAL or has no explicit full-run marker — partial must be null\nerror: failed to push some refs to '/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/ledger-controls-ZZFani/remote.git'\n"
+      }
+    },
+    {
+      "name": "10/H: added package, real push from reset baseline",
+      "ok": true,
+      "observed": {
+        "before": "3d84347fcd3cf9c116848688ed17e654f14b047c",
+        "pushing": "0e2efcd71ae0e12763e45a6c2fdcd0db6fa11719",
+        "code": 1,
+        "output": "release gate: REFUSED for refs/heads/main:\n  - the kept site: extra.js was added since the review\nerror: failed to push some refs to '/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/ledger-controls-ZZFani/remote.git'\n"
+      }
+    },
+    {
+      "name": "10/H: changed package, real push from reset baseline",
+      "ok": true,
+      "observed": {
+        "before": "3d84347fcd3cf9c116848688ed17e654f14b047c",
+        "pushing": "0e2efcd71ae0e12763e45a6c2fdcd0db6fa11719",
+        "code": 1,
+        "output": "release gate: REFUSED for refs/heads/main:\n  - the kept site: index.html changed since the review\nerror: failed to push some refs to '/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/ledger-controls-ZZFani/remote.git'\n"
+      }
+    },
+    {
+      "name": "10/H: regenerated package, real push from reset baseline",
+      "ok": true,
+      "observed": {
+        "before": "3d84347fcd3cf9c116848688ed17e654f14b047c",
+        "pushing": "0e2efcd71ae0e12763e45a6c2fdcd0db6fa11719",
+        "code": 1,
+        "output": "release gate: REFUSED for refs/heads/main:\n  - Adam's acceptance names package abcdef123456, which no longer exists — a regenerated package is a new package, with no acceptance — the review command builds a package, with the checks, before Adam is asked; an acceptance names that one package\nerror: failed to push some refs to '/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/ledger-controls-ZZFani/remote.git'\n"
+      }
+    },
+    {
+      "name": "10/H: valid package, real push from reset baseline",
+      "ok": true,
+      "observed": {
+        "before": "3d84347fcd3cf9c116848688ed17e654f14b047c",
+        "pushing": "0e2efcd71ae0e12763e45a6c2fdcd0db6fa11719",
+        "code": 0,
+        "output": "release gate: ok for refs/heads/main — accepted by Adam: batch 0, revision 3, commit 0e2efcd, package abcdef123456 (simulated decision, 2026-09-18T14:57)\nTo /var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/ledger-controls-ZZFani/remote.git\n   3d84347..0e2efcd  HEAD -> main\n"
+      }
+    },
+    {
+      "name": "10/E: actual historical wrapper: direct nonlocal request blocked",
+      "ok": true,
+      "observed": {
+        "name": "direct nonlocal request blocked",
+        "ok": true,
+        "detail": {
+          "sinkHitsBefore": 0,
+          "sinkHitsAfter": 0
+        }
+      }
+    },
+    {
+      "name": "10/E: actual historical wrapper: context page nonlocal request blocked",
+      "ok": true,
+      "observed": {
+        "name": "context page nonlocal request blocked",
+        "ok": true,
+        "detail": {
+          "sinkHitsBefore": 0,
+          "sinkHitsAfter": 0
+        }
+      }
+    },
+    {
+      "name": "10/E: actual historical wrapper: popup first request blocked",
+      "ok": true,
+      "observed": {
+        "name": "popup first request blocked",
+        "ok": true,
+        "detail": {
+          "sinkHitsBefore": 0,
+          "sinkHitsAfter": 0
+        }
+      }
+    },
+    {
+      "name": "10/E: actual historical wrapper: API handler nonlocal request blocked",
+      "ok": true,
+      "observed": {
+        "name": "API handler nonlocal request blocked",
+        "ok": true,
+        "detail": {
+          "sinkHitsBefore": 0,
+          "sinkHitsAfter": 0
+        }
+      }
+    },
+    {
+      "name": "10/E: browser harness completed without setup error",
+      "ok": true,
+      "observed": {
+        "code": 0,
+        "output": "{\"name\":\"local HTML and cookie\",\"ok\":true,\"detail\":[{\"name\":\"probe_cookie\",\"value\":\"yes\",\"domain\":\"127.0.0.1\",\"path\":\"/\",\"expires\":-1,\"httpOnly\":false,\"secure\":false,\"sameSite\":\"Lax\"},{\"name\":\"second_cookie\",\"value\":\"also\",\"domain\":\"127.0.0.1\",\"path\":\"/\",\"expires\":-1,\"httpOnly\":false,\"secure\":false,\"sameSite\":\"Lax\"}]}\n{\"name\":\"multiple cookies preserved\",\"ok\":true,\"detail\":[{\"name\":\"probe_cookie\",\"value\":\"yes\",\"domain\":\"127.0.0.1\",\"path\":\"/\",\"expires\":-1,\"httpOnly\":false,\"secure\":false,\"sameSite\":\"Lax\"},{\"name\":\"second_cookie\",\"value\":\"also\",\"domain\":\"127.0.0.1\",\"path\":\"/\",\"expires\":-1,\"httpOnly\":false,\"secure\":false,\"sameSite\":\"Lax\"}]}\n{\"name\":\"binary response preserved\",\"ok\":true,\"detail\":[0,1,127,255]}\n{\"name\":\"JSON response preserved\",\"ok\":true,\"detail\":{\"retained\":true}}\n{\"name\":\"POST forwarded once with body and cookie\",\"ok\":true,\"detail\":{\"postHits\":1,\"body\":\"POST:one-body:probe_cookie=yes; second_cookie=also\"}}\n{\"name\":\"direct nonlocal request blocked\",\"ok\":true,\"detail\":{\"sinkHitsBefore\":0,\"sinkHitsAfter\":0}}\n{\"name\":\"context page nonlocal request blocked\",\"ok\":true,\"detail\":{\"sinkHitsBefore\":0,\"sinkHitsAfter\":0}}\n{\"name\":\"popup first request blocked\",\"ok\":true,\"detail\":{\"sinkHitsBefore\":0,\"sinkHitsAfter\":0}}\n{\"name\":\"local redirect to nonlocal sink blocked\",\"ok\":true,\"detail\":{\"sinkHitsBefore\":0,\"sinkHitsAfter\":0}}\n{\"name\":\"continue URL override blocked\",\"ok\":true,\"detail\":{\"sinkHitsBefore\":0,\"sinkHitsAfter\":0}}\n{\"name\":\"API handler nonlocal request blocked\",\"ok\":true,\"detail\":{\"sinkHitsBefore\":0,\"sinkHitsAfter\":0}}\n{\"name\":\"outside API handler does not run\",\"ok\":true,\"detail\":{\"apiHandlerRan\":false}}\n{\"name\":\"fallback URL override blocked\",\"ok\":true,\"detail\":{\"sinkHitsBefore\":0,\"sinkHitsAfter\":0}}\n{\"name\":\"handler continue redirect blocked\",\"ok\":true,\"detail\":{\"sinkHitsBefore\":0,\"sinkHitsAfter\":0}}\n{\"name\":\"unsupported route.fetch cannot follow redirects\",\"ok\":true,\"detail\":{\"sinkHitsBefore\":0,\"sinkHitsAfter\":0}}\n{\"name\":\"local fallback overrides preserved\",\"ok\":true,\"detail\":{\"postHits\":2,\"body\":\"POST:override-body:null\"}}\n{\"name\":\"handler manufactured redirect blocked\",\"ok\":true,\"detail\":{\"sinkHitsBefore\":0,\"sinkHitsAfter\":0}}\n{\"name\":\"API forwarding does not follow redirects\",\"ok\":true,\"detail\":{\"refused\":true,\"sinkHitsBefore\":0,\"sinkHitsAfter\":0}}\n"
+      }
+    }
+  ]
+}

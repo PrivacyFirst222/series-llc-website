@@ -33,7 +33,7 @@
  *   bun run docs/audit/demo.ts [--with-behaviour] [--out red-before-revision-3.md]
  */
 import { execFileSync, spawnSync } from "node:child_process";
-import { mkdtempSync, writeFileSync, readFileSync, appendFileSync, mkdirSync, copyFileSync, existsSync, rmSync, readdirSync, statSync } from "node:fs";
+import { mkdtempSync, writeFileSync, readFileSync, appendFileSync, mkdirSync, copyFileSync, cpSync, existsSync, rmSync, readdirSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { createHash } from "node:crypto";
@@ -41,10 +41,13 @@ import { ROOT } from "./ledger-lib";
 
 const tmp = mkdtempSync(join(tmpdir(), "fix-ledger-demo-"));
 const COPY = join(tmp, "copy"), REMOTE = join(tmp, "remote.git"), HOME = join(tmp, "home"), FAKEBOX = join(tmp, "fake-dropbox");
-const env: Record<string, string> = { ...(process.env as Record<string, string>), FPSLLC_HOME: HOME, FPSLLC_DROPBOX: FAKEBOX, CLAUDE_PROJECT_DIR: COPY, GIT_AUTHOR_NAME: "demo", GIT_AUTHOR_EMAIL: "demo@example.com", GIT_COMMITTER_NAME: "demo", GIT_COMMITTER_EMAIL: "demo@example.com" };
+const env: Record<string, string> = { ...(process.env as Record<string, string>), FPSLLC_BATCH: "", FPSLLC_HOME: HOME, FPSLLC_DROPBOX: FAKEBOX, CLAUDE_PROJECT_DIR: COPY, GIT_AUTHOR_NAME: "demo", GIT_AUTHOR_EMAIL: "demo@example.com", GIT_COMMITTER_NAME: "demo", GIT_COMMITTER_EMAIL: "demo@example.com" };
 const S = "Drawn from real client questions about Florida's Protected Series LLC statute.";
 const T = "The questions people ask before forming a Florida Protected Series LLC, answered.";
 const FAQ = "webapp/src/pages/FAQ.tsx", CONTACT = "webapp/src/pages/Contact.tsx", HOW = "webapp/src/pages/HowItWorks.tsx", E2E = "webapp/server/e2e.ts";
+const reviewBatch = process.argv.includes("--batch") ? process.argv[process.argv.indexOf("--batch") + 1] : "0";
+const evidenceDir = join(ROOT, `docs/audit/batches/${reviewBatch}/evidence`);
+mkdirSync(evidenceDir, { recursive: true });
 const outName = process.argv.includes("--out") ? process.argv[process.argv.indexOf("--out") + 1] : "demo.md";
 
 type Kind = "exit" | "parsed" | "simulated" | "new";
@@ -92,7 +95,7 @@ appendFileSync(join(COPY, CONTACT), `\n// demo: ${S}\n`); // the same defect, se
 commit("baseline for the demonstrations");
 g("push", "-q", "--no-verify", "origin", "main"); bypass.push("creating the throwaway remote (setup)");
 
-const CHECKS = ["typecheck", "lint", "unit", "facts", "guard", "documents", "server", "walk", "assertions"];
+const CHECKS = ["typecheck", "lint", "unit", "facts", "guard", "documents", "server", "walk", "assertions", "ledger-controls"];
 const mkBatch = (id: string, items: unknown[], files: unknown[], extra: Record<string, unknown> = {}) => {
   const b = { id, revision: 1, title: `Demonstration batch ${id}`, model: "demo", base: g("rev-parse", "HEAD"), items, files, requiredChecks: CHECKS, ...extra };
   mkdirSync(join(COPY, `docs/audit/batches/${id}`), { recursive: true });
@@ -299,7 +302,7 @@ tryRow("C20", "Codex 19: a check disabled inside a DECLARED check file", () => {
 
 tryRow("C5", "Codex 2: conditional words recorded as acceptance", () => {
   const H = join(tmp, "hookhome"); pkg("demo", X, B1);
-  for (const d of readdirSync(join(HOME, "reviews"))) { mkdirSync(join(H, "reviews", d), { recursive: true }); copyFileSync(join(HOME, "reviews", d, "package.json"), join(H, "reviews", d, "package.json")); }
+  for (const d of readdirSync(join(HOME, "reviews"))) { mkdirSync(join(H, "reviews", d), { recursive: true }); cpSync(join(HOME, "reviews", d), join(H, "reviews", d), { recursive: true }); }
   const say = (m: string) => spawnSync(join(COPY, ".claude/hooks/accept-prompt.sh"), [], { input: JSON.stringify({ prompt: m }), env: { ...env, FPSLLC_HOME: H }, encoding: "utf8" });
   const count = () => (existsSync(join(H, "acceptances.jsonl")) ? readFileSync(join(H, "acceptances.jsonl"), "utf8").trim().split("\n").filter(Boolean).length : 0);
   say(`Accept demo, revision 1, ${X.slice(0, 7)} only if Codex finds no problems. Do not release yet.`);
@@ -467,24 +470,29 @@ tryRow("H", "H: packages", () => {
   const partial = pkg("pk", K, A, (c) => c, ALLNAMES, { partial: ["server"] });
   record("H1a", "H: a package marked partial cannot be accepted", sh("bun", ["run", "docs/audit/accept.ts", "accept", "pk", "1", K, "--package", partial.id]), /partial/i);
   writeAcceptance("pk", 1, K, partial.id);
+  resetRemote(A, "before H1b: force a real update independent of earlier outcomes");
   pushRow("H1b", "H: a partial package with a forged acceptance cannot be released", /partial/i, "simulated");
   rmSync(partial.dir, { recursive: true, force: true }); clearAcceptances();
   const full = pkg("pk", K, A);
   const acc = sh("bun", ["run", "docs/audit/accept.ts", "accept", "pk", "1", K]);
   parsed("H4a", "H: with one full package, acceptance resolves it and stores its id", "the record names the package", acc.code === 0 && /package/.test(acc.out) && JSON.stringify(readFileSync(join(HOME, "acceptances.jsonl"), "utf8")).includes(full.id), acc.out.trim().split("\n").pop() ?? "");
   writeFileSync(join(full.dir, "site", "extra.js"), "// added after review\n");
+  resetRemote(A, "before H2a: force a real update independent of earlier outcomes");
   pushRow("H2a", "H: a file ADDED to the kept site after acceptance", /site/i, "simulated");
   rmSync(join(full.dir, "site", "extra.js"));
   writeFileSync(join(full.dir, "site", "index.html"), "<html>changed</html>");
+  resetRemote(A, "before H2b: force a real update independent of earlier outcomes");
   pushRow("H2b", "H: a kept site file CHANGED after acceptance", /site/i, "simulated");
   rmSync(full.dir, { recursive: true, force: true });
   const regen = pkg("pk", K, A, undefined, undefined, { fresh: true });
+  resetRemote(A, "before H3: force a real update independent of earlier outcomes");
   pushRow("H3", "H: the accepted package deleted and regenerated (new id) — the old acceptance releases nothing", /(package|acceptance)/i, "simulated");
   const second = pkg("pk", K, A, undefined, undefined, { fresh: true });
   const amb = sh("bun", ["run", "docs/audit/accept.ts", "accept", "pk", "1", K]);
   parsed("H6", "H: with TWO full packages for the commit, acceptance refuses and prints the exact command with the package id", "refusal naming --package", amb.code !== 0 && /--package/.test(amb.out), amb.out.trim().split("\n").pop() ?? "");
   const pick = sh("bun", ["run", "docs/audit/accept.ts", "accept", "pk", "1", K, "--package", second.id]);
   if (pick.code !== 0) throw new Error(pick.out);
+  resetRemote(A, "before H5: force a real update independent of earlier outcomes");
   pushRow("H5", "H: the release of the package Adam named by id, checks fixtures, site intact (positive control)", "pass", "simulated");
   void regen;
 }, () => { g("checkout", "-q", "main"); reset(R3); sh("git", ["branch", "-q", "-D", "audit/batch-pk"]); resetRemote(R3, "after H"); clearAcceptances(); });
@@ -494,44 +502,13 @@ if (process.argv.includes("--with-behaviour")) {
   execFileSync("ln", ["-s", join(ROOT, "webapp/node_modules"), join(COPY, "webapp/node_modules")]);
   /* ---- E: browser isolation, four probes with a mocked sink (nothing real is contacted) ---- */
   tryRow("E", "E: browser isolation probes", () => {
-    const runner = join(tmp, "probe.ts");
-    writeFileSync(runner, `import { chromium } from ${JSON.stringify(join(COPY, "webapp/node_modules/playwright/index.mjs"))};
-import { isolateBrowser, guardedRoute } from ${JSON.stringify(join(COPY, "webapp/scripts/browser-isolation.ts"))};
-const browser = await chromium.launch();
-const out: Record<string, string> = {};
-const sinkHits: string[] = [];
-const iso = isolateBrowser(browser); // the real wrapper, installed the way the walk installs it
-const sink = async (ctx: { route: (u: string, h: (r: { fulfill: (o: { body: string }) => Promise<void>; request: () => { url: () => string } }) => Promise<void>) => Promise<void> }) => ctx.route("**probe.invalid**", async (r) => { sinkHits.push(r.request().url()); await r.fulfill({ body: "sink" }); });
-const attempt = async (page: { evaluate: (f: string) => Promise<unknown> }, url: string) => { try { return String(await page.evaluate("fetch(" + JSON.stringify(url) + ").then(r => 'reached:' + r.status).catch(e => 'failed:' + e.message)")); } catch (e) { return "failed:" + String(e).split("\\n")[0]; } };
-// 1 ordinary page — the sink is registered first so that, without isolation, it would answer
-const p1 = await browser.newPage(); await sink(p1.context()); await p1.goto("about:blank");
-const before1 = sinkHits.length; out.ordinary = (await attempt(p1, "http://probe.invalid/ping")) + (sinkHits.length > before1 ? " SINK REACHED" : " sink not reached");
-// 2 the Clients-tab route: a context, then a page from it
-const ctx = await browser.newContext(); await sink(ctx); const p2 = await ctx.newPage(); await p2.goto("about:blank");
-const before2 = sinkHits.length; out.contextPage = (await attempt(p2, "http://probe.invalid/ping")) + (sinkHits.length > before2 ? " SINK REACHED" : " sink not reached");
-// 3 a popup's first request
-const before3 = sinkHits.length; const popupPromise = ctx.waitForEvent("page", { timeout: 4000 }).catch(() => null);
-await p2.evaluate("window.open('http://probe.invalid/popup')"); const pop = await popupPromise; await new Promise((r) => setTimeout(r, 800));
-out.popup = (pop ? "popup opened, " : "no popup page, ") + (sinkHits.length > before3 ? "SINK REACHED" : "sink not reached");
-// 4 a page with the walk's API handler installed, sent to an outside /api/ path
-const p4 = await browser.newPage(); await sink(p4.context());
-let handlerRan = "handler did not run";
-await guardedRoute(p4, "**/api/**", async (route) => { handlerRan = "handler ran and continued"; await route.continue(); });
-await p4.goto("about:blank");
-const before4 = sinkHits.length; out.apiHandler = (await attempt(p4, "http://probe.invalid/api/x")) + (sinkHits.length > before4 ? " SINK REACHED" : " sink not reached") + "; " + handlerRan;
-out.blocked = "stopped: " + [...iso.blocked].join(", ");
-await browser.close();
-console.log(JSON.stringify(out));
-`);
-    const r = sh("bun", ["run", runner], join(COPY, "webapp"));
-    let o: Record<string, string> = {};
-    try { o = JSON.parse(r.out.trim().split("\n").pop() ?? "{}"); } catch { o = { error: r.out.slice(0, 300) }; }
-    const ok = (s?: string) => !!s && /sink not reached/.test(s) && !/reached:/.test(s);
-    parsed("E1", "E: an ordinary page's request to an outside host", "aborted; the sink never sees it", ok(o.ordinary), o.ordinary ?? o.error ?? "");
-    parsed("E2", "E: a page created from a separate browser context (the Clients-tab route)", "aborted; the sink never sees it", ok(o.contextPage), o.contextPage ?? o.error ?? "");
-    parsed("E3", "E: a popup's first request", "the sink never sees it", !!o.popup && /sink not reached/.test(o.popup), o.popup ?? o.error ?? "");
-    parsed("E4", "E: a page with the walk's API handler installed, request to an outside /api/ path", "aborted before the handler; the sink never sees it", ok(o.apiHandler) && /did not run/.test(o.apiHandler ?? ""), o.apiHandler ?? o.error ?? "");
-    writeFileSync(join(ROOT, "docs/audit/batches/0/evidence/browser-isolation-probes.json"), JSON.stringify(o, null, 2) + "\n");
+    const r = sh("bun", ["run", join(ROOT, "webapp/scripts/repair-browser-probe.ts"), "--target", COPY]);
+    const observations = r.out.split("\n").flatMap(line => { try { const x = JSON.parse(line); return x.name ? [x] : []; } catch { return []; } });
+    for (const [n, name] of [["E1", "direct nonlocal request blocked"], ["E2", "context page nonlocal request blocked"], ["E3", "popup first request blocked"], ["E4", "API handler nonlocal request blocked"], ["E5", "local redirect to nonlocal sink blocked"]]) {
+      const got = observations.find(x => x.name === name);
+      parsed(n, `E: ${name}`, "the local sink receives no request", got?.ok === true, got ? JSON.stringify(got.detail) : r.out.slice(-400));
+    }
+    writeFileSync(join(evidenceDir, "browser-isolation-probes.json"), JSON.stringify({ exit: r.code, output: r.out, observations }, null, 2) + "\n");
   });
 
   /* ---- M: the actual batch-zero sequence against main's real baseline, in a second clean clone ---- */
@@ -545,29 +522,32 @@ console.log(JSON.stringify(out));
     g2("remote", "remove", "origin"); g2("remote", "add", "origin", REM2); g2("config", "core.hooksPath", ".githooks");
     const MAIN = "82abf541a6643981d93d41bc5d8b6da169897971"; // main's actual baseline, the commit batch 0 was cut from
     g2("push", "-q", "--no-verify", "origin", `${MAIN}:refs/heads/main`); bypass.push("M: creating the second throwaway remote at main's real baseline");
-    g2("checkout", "-q", "-B", "audit/batch-0"); g2("add", "-A"); g2("commit", "-q", "--no-verify", "-m", "revision 3 as it stands in this working tree (fixture commit)");
+    g2("checkout", "-q", "-B", `audit/batch-${reviewBatch}`); g2("add", "-A");
+    if (sh2("git", ["diff", "--cached", "--quiet"]).code !== 0) g2("commit", "-q", "--no-verify", "-m", "controls as they stand in this working tree (fixture commit)");
+    const testedBatch = JSON.parse(readFileSync(join(C2, `docs/audit/batches/${reviewBatch}/batch.json`), "utf8"));
     const X3 = g2("rev-parse", "HEAD");
     execFileSync("ln", ["-s", join(ROOT, "webapp/node_modules"), join(C2, "webapp/node_modules")]);
     const lj = JSON.parse(readFileSync(join(C2, "docs/audit/ledger.json"), "utf8")) as { batches: { id: string; revision: number; status: string; history: { event: string }[] }[] };
     const r2 = lj.batches.find((b) => b.id === "0" && b.revision === 2), r3 = lj.batches.find((b) => b.id === "0" && b.revision === 3);
     parsed("M1", "M: revision 2 is recorded as rejected by Adam's own message, and revision 3 as authorized after it", "r2 rejected with a 'rejected by Adam' event; r3 authorized", r2?.status === "rejected" && r2.history.some((h) => /^rejected by Adam/.test(h.event)) && !!r3 && ["authorized", "implemented"].includes(r3.status), `r2: ${r2?.status}; r3: ${r3?.status ?? "absent"}`);
     parsed("M2", "M: the migration is declared in a file the ledger's changes must match", "docs/audit/migrations/001-part-level-links.json exists and the ledger names it", existsSync(join(C2, "docs/audit/migrations/001-part-level-links.json")) && /001-part-level-links/.test(readFileSync(join(C2, "docs/audit/ledger.json"), "utf8")), existsSync(join(C2, "docs/audit/migrations/001-part-level-links.json")) ? "declared" : "no migration file");
-    record("M3", "M: the local commit guard, run as the commit step runs it, on the revision-3 tree", sh2("bun", ["run", "docs/audit/guard.ts"], C2, { FPSLLC_BATCH: "0" }), "pass");
-    const rv = sh2("bun", ["run", "scripts/audit-review.ts", "0", "--no-serve"], join(C2, "webapp"));
+    record("M3", "M: the local commit guard, run as the commit step runs it, on the reviewed control tree", sh2("bun", ["run", "docs/audit/guard.ts"], C2, { FPSLLC_BATCH: reviewBatch }), "pass");
+    const rv = sh2("bun", ["run", "scripts/audit-review.ts", reviewBatch, "--no-serve"], join(C2, "webapp"));
+    writeFileSync(join(evidenceDir, "demo-M-review.log"), rv.out);
     const pkgLine = rv.out.split("\n").find((l) => /^review package:/.test(l)) ?? "";
     const pkgDir = pkgLine.replace(/^review package:\s*/, "").trim();
     const pkgId = existsSync(join(pkgDir, "package.json")) ? (JSON.parse(readFileSync(join(pkgDir, "package.json"), "utf8")) as { packageId?: string; partial?: unknown }).packageId ?? "" : "";
-    parsed("M4", "M: the review package for the exact revision-3 commit is built with NO acceptance on file, every mandatory check run from an isolated checkout", "Ready for Adam, a full package with an id", /Ready for Adam/.test(rv.out) && pkgId !== "", (rv.out.split("\n").filter((l) => /passed|FAILED|Ready|NOT READY|kept in the package/.test(l)).join(" / ")).slice(0, 400));
+    parsed("M4", "M: the review package for the exact control-batch commit is built with NO acceptance on file, every mandatory check run from an isolated checkout", "Ready for Adam, a full package with an id", /Ready for Adam/.test(rv.out) && pkgId !== "", (rv.out.split("\n").filter((l) => /passed|FAILED|Ready|NOT READY|kept in the package/.test(l)).join(" / ")).slice(0, 400));
     g2("checkout", "-q", "-B", "main", X3);
-    record("M5", "M: publication of revision 3 against main's real baseline, with no acceptance", sh2("git", ["push", "origin", "main"]), /no acceptance from Adam/);
-    const acc = sh2("bun", ["run", "docs/audit/accept.ts", "accept", "0", "3", X3, "--package", pkgId]);
+    record("M5", "M: publication of the control batch against main's real baseline, with no acceptance", sh2("git", ["push", "origin", "main"]), /no acceptance from Adam/);
+    const acc = sh2("bun", ["run", "docs/audit/accept.ts", "accept", reviewBatch, String(testedBatch.revision), X3, "--package", pkgId]);
     parsed("M6", "M: a simulated acceptance of exactly that package and commit", "recorded, naming the package", acc.code === 0, acc.out.trim().split("\n").pop() ?? "");
     record("M7", "M: publication permitted only now, under the established rules (real checks, real package, no fixtures)", sh2("git", ["push", "origin", "main"]), "pass");
-    const rel = sh2("bun", ["run", "docs/audit/batch.ts", "released", "0", X3, "--deployed", "not deployed: demonstration remote", "--documents", "none changed"]);
+    const rel = sh2("bun", ["run", "docs/audit/batch.ts", "released", reviewBatch, X3, "--deployed", "not deployed: demonstration remote", "--documents", "none changed"]);
     record("M8", "M: the release recorded against that acceptance, with the remote's answer", rel, "pass");
     g2("add", "-A"); g2("commit", "-q", "--no-verify", "-m", "record the release (records only)");
     record("M9", "M: the records-only bookkeeping push after release", sh2("git", ["push", "origin", "main"]), "pass");
-    if (existsSync(pkgDir)) { for (const f of ["package.json", "files.txt"]) if (existsSync(join(pkgDir, f))) copyFileSync(join(pkgDir, f), join(ROOT, "docs/audit/batches/0/evidence", `demo-M-${f}`)); }
+    if (existsSync(pkgDir)) { for (const f of ["package.json", "files.txt"]) if (existsSync(join(pkgDir, f))) copyFileSync(join(pkgDir, f), join(evidenceDir, `demo-M-${f}`)); }
   });
 
   tryRow("C14", "Codex 12: a server assertion satisfied by a walk result", () => {
@@ -598,7 +578,7 @@ console.log(JSON.stringify(out));
   parsed("26", "…and FAILS on the tree before the fix, at its own label", "a line saying so, naming the label", has(/red, as required: "demo: the health report carries the planted field" fails on/) !== "", has(/red, as required|NOT PROVEN: "demo/) || "(no before-fix result)");
   {
     const kept = (rv.out.match(/before-fix output kept: (\S+)/) ?? [])[1];
-    const retained = join(ROOT, "docs/audit/batches/0/evidence/before-fix-demo.log");
+    const retained = join(evidenceDir, "before-fix-demo.log");
     if (kept && existsSync(kept)) writeFileSync(retained, `# the before-fix run's complete output, copied out of the review package before the disposable copy is removed\n# the red line the review printed:\n# ${has(/red, as required: "demo/)}\n\n${readFileSync(kept, "utf8")}`);
     const detailOk = /what it got: \{"got"/.test(has(/red, as required: "demo/));
     parsed("C15", "Codex 13: the new check imports a NEW helper file; it is carried onto the before-fix tree; that run's full output and the failing check's detail are kept in evidence/before-fix-demo.log", "red is proven despite the new import; the retained log exists with content; the red line shows what the check got", has(/red, as required: "demo/) !== "" && existsSync(retained) && statSync(retained).size > 1000 && detailOk, (has(/red, as required: "demo/) || has(/NOT PROVEN: "demo|could not run/) || "(nothing)").slice(0, 300) + (existsSync(retained) ? ` | retained ${statSync(retained).size} bytes` : " | NOT RETAINED"));
@@ -606,6 +586,13 @@ console.log(JSON.stringify(out));
   record("27", "a named check that also passes BEFORE the fix proves nothing, so the review ends NOT READY", rv, /NOT PROVEN: "fresh database: server boots" PASSES on the tree before the fix/);
 }
 
+/* Cleanup is itself measured before calculating the report totals. */
+rmSync(tmp, { recursive: true, force: true });
+if (process.argv.includes("--with-behaviour")) {
+  const want = ["before-fix-demo.log", "browser-isolation-probes.json", "demo-M-review.log"];
+  const missing = want.filter(f => !existsSync(join(evidenceDir, f)) || statSync(join(evidenceDir, f)).size === 0);
+  parsed("Z", "retained evidence exists after disposable copies are removed", want.join(", "), missing.length === 0, missing.length ? `missing: ${missing.join(", ")}` : `present: ${want.join(", ")}`);
+}
 /* ---- the report ---- */
 const failed = rows.filter((r) => !r.ok);
 const md = [
@@ -616,11 +603,6 @@ const md = [
   "| # | What was tried | Required | Measured | Exit | What it printed |", "|---|---|---|---|---|---|",
   ...rows.map((r) => `| ${r.n} | ${r.what} | ${r.expect.replace(/\|/g, "\\|")} | ${r.kind} | ${r.exit === null ? "—" : r.exit} | ${r.ok ? "" : "**NOT AS REQUIRED** "}${r.line.replace(/\|/g, "\\|").replace(/\n/g, " ")} |`), "",
 ].join("\n");
-mkdirSync(join(ROOT, "docs/audit/batches/0/evidence"), { recursive: true });
-writeFileSync(join(ROOT, "docs/audit/batches/0/evidence", outName), md + "\n");
-rmSync(tmp, { recursive: true, force: true });
-{ const E = join(ROOT, "docs/audit/batches/0/evidence"); const want = ["before-fix-demo.log", "browser-isolation-probes.json"].filter(() => process.argv.includes("--with-behaviour"));
-  const present = want.filter((f) => existsSync(join(E, f)) && statSync(join(E, f)).size > 0);
-  if (want.length) { parsed("Z", "retained evidence still exists after the disposable copy was removed", want.join(", "), present.length === want.length, present.length === want.length ? `present: ${present.join(", ")}` : `missing: ${want.filter((f) => !present.includes(f)).join(", ")}`); writeFileSync(join(E, outName), md.replace(/\n$/, "") + "\n" + rows.slice(-1).map((r) => `| ${r.n} | ${r.what} | ${r.expect} | ${r.kind} | — | ${r.ok ? "" : "**NOT AS REQUIRED** "}${r.line} |`).join("\n") + "\n"); } }
-console.log(`\n${rows.filter((r) => r.ok).length} of ${rows.length} as required → docs/audit/batches/0/evidence/${outName}`);
+writeFileSync(join(evidenceDir, outName), md + "\n");
+console.log(`\n${rows.filter((r) => r.ok).length} of ${rows.length} as required → ${evidenceDir}/${outName}`);
 process.exit(rows.some((r) => !r.ok) ? 1 : 0);

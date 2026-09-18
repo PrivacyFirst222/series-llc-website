@@ -31,7 +31,7 @@
 INPUT=$(cat)
 ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
 PARSED=$(printf '%s' "$INPUT" | python3 -c '
-import json, sys, re
+import json, sys, re, base64
 try:
     prompt = json.load(sys.stdin).get("prompt", "")
 except Exception:
@@ -46,11 +46,11 @@ if m:
     sys.exit(0)
 m = re.fullmatch(r"reject\s+(?:batch\s+)?" + ID + r"(?:\s*,?\s+(?:revision|rev|r)\s*(\d+))?\s*[:.,-]?\s*(.*)", text, re.I | re.S)
 if m:
-    print("reject\x1f%s\x1f%s\x1f%s" % (m.group(1), m.group(2) or "", " ".join(m.group(3).split())[:500]))
+    print("reject\x1f%s\x1f%s\x1f%s" % (m.group(1), m.group(2) or "", base64.b64encode(m.group(3).strip().encode()).decode()))
     sys.exit(0)
 m = re.fullmatch(r"ruling\s+(?:(?:on\s+)?item\s+)?([0-9]+|N[0-9]\.[0-9]{2})(?:\s*,?\s+part\s+([A-Za-z0-9][A-Za-z0-9-]*))?\s*:\s*(.+)", text, re.I | re.S)
 if m:
-    print("ruling\x1f%s\x1f%s\x1f%s" % (m.group(1), m.group(2) or "", " ".join(m.group(3).split())[:2000]))
+    print("ruling\x1f%s\x1f%s\x1f%s" % (m.group(1), m.group(2) or "", base64.b64encode(m.group(3).strip().encode()).decode()))
     sys.exit(0)
 m = re.fullmatch(r"approve\s+migration\s+([A-Za-z0-9][A-Za-z0-9-]*)\s*[.!]?", text, re.I)
 if m:
@@ -68,12 +68,14 @@ case "$PARSED" in
     ;;
   reject*)
     IFS=$'\x1f' read -r _ B R N <<<"$PARSED"
+    N=$(python3 -c 'import base64,sys; sys.stdout.write(base64.b64decode(sys.argv[1]).decode())' "$N")
     if [ -z "$N" ]; then echo "[acceptance hook] NOT RECORDED: a rejection carries its reason — \"Reject <batch>[, revision <n>]: <reason>\". Tell Adam."
     elif [ -n "$R" ]; then (cd "$ROOT" && bun run docs/audit/accept.ts reject "$B" --revision "$R" --reason "$N" --source chat 2>&1) | say
     else (cd "$ROOT" && bun run docs/audit/accept.ts reject "$B" --reason "$N" --source chat 2>&1) | say; fi
     ;;
   ruling*)
     IFS=$'\x1f' read -r _ I P T <<<"$PARSED"
+    T=$(python3 -c 'import base64,sys; sys.stdout.write(base64.b64decode(sys.argv[1]).decode())' "$T")
     if [ -n "$P" ]; then (cd "$ROOT" && bun run docs/audit/accept.ts ruling "$I" "$T" --part "$P" --source chat 2>&1) | say
     else (cd "$ROOT" && bun run docs/audit/accept.ts ruling "$I" "$T" --source chat 2>&1) | say; fi
     ;;

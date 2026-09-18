@@ -43,7 +43,7 @@ if (cmd === "accept") {
   if (!/^[0-9a-f]{40}$/.test(full)) refuse(`"${c}" does not name exactly one commit in this repository`);
   const found = resolvePackage({ batch: a, revision: Number(b), commit: full, ...(packageId ? { packageId } : {}) });
   if ("error" in found) refuse(`${found.error} — an acceptance is of something that was put in front of you`);
-  const bad = packageProblems(found).filter((x) => /PARTIAL/.test(x));
+  const bad = packageProblems(found);
   if (bad.length) refuse(bad.join("; "));
   write(ACCEPTANCES, { kind: "accept", batch: found.pkg.batch, revision: found.pkg.revision, commit: full, packageId: found.pkg.packageId });
   console.log(`accepted: batch ${found.pkg.batch}, revision ${found.pkg.revision}, commit ${full}, package ${found.pkg.packageId}`);
@@ -52,7 +52,7 @@ if (cmd === "accept") {
   if (revisionOpt !== null && !/^\d+$/.test(revisionOpt)) refuse(`"${revisionOpt}" is not a revision number`);
   if (reason === null) refuse("a rejection records Adam's reason (--reason); it may be one word");
   if (argv.length > 2) refuse(`unexpected arguments: ${argv.slice(2).join(" ")} — the reason goes after --reason`);
-  write(ACCEPTANCES, { kind: "reject", batch: a, revision: revisionOpt === null ? null : Number(revisionOpt), commit: null, note: reason.slice(0, 500) });
+  write(ACCEPTANCES, { kind: "reject", batch: a, revision: revisionOpt === null ? null : Number(revisionOpt), commit: null, note: reason });
   console.log(`rejected: batch ${a}${revisionOpt !== null ? `, revision ${revisionOpt}` : " (every revision)"} — nothing in it can be released`);
 } else if (cmd === "ruling") {
   if (!a || !b || argv.length > 3) refuse('usage: ruling <item> "<text>" [--part <key>]');

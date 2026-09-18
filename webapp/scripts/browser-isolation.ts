@@ -17,8 +17,9 @@
  *     only for a request that stays on this machine. A lint rule refuses a
  *     bare page.route in this folder.
  *
- * What is "this machine": localhost, 127.0.0.1, ::1, and anything that is not
- * http(s) at all (about:, data:, blob:). Everything else is aborted and its
+ * What is "this machine": localhost, 127.0.0.1, ::1, and the non-network schemes
+ * about:, data:, blob:. HTTP redirects are refused before they can
+ * leave the intercepted request. Everything else is aborted and its
  * host recorded in `blocked`, which the walk prints at the end.
  */
 import type { Browser, BrowserContext, Page, Route } from "playwright";
@@ -28,8 +29,8 @@ export type RoutePattern = string | RegExp | ((url: URL) => boolean);
 
 export const isLocal = (url: string): boolean => {
   let u: URL;
-  try { u = new URL(url); } catch { return true; }
-  if (u.protocol !== "http:" && u.protocol !== "https:") return true;
+  try { u = new URL(url); } catch { return false; }
+  if (u.protocol !== "http:" && u.protocol !== "https:") return ["about:", "data:", "blob:"].includes(u.protocol);
   return u.hostname === "localhost" || u.hostname === "127.0.0.1" || u.hostname === "[::1]" || u.hostname === "::1";
 };
 
@@ -38,13 +39,69 @@ const rawRouteOf = new WeakMap<Page, Page["route"]>();
 const rawContextRouteOf = new WeakMap<BrowserContext, BrowserContext["route"]>();
 const hostOf = (url: string): string => { try { return new URL(url).host || url; } catch { return url; } };
 
-/** Wrap a handler so the isolation decision precedes it. */
+/** Native API forwarding uses the same no-redirect policy. A local first
+ * hop is insufficient: neither fetch nor Chromium may follow a 30x. */
+export const localFetch: typeof fetch = Object.assign(async (input: Parameters<typeof fetch>[0], init?: Parameters<typeof fetch>[1]) => {
+  const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+  if (!isLocal(url) || !/^https?:/.test(url)) throw new Error(`offline request refused: ${url}`);
+  const response = await fetch(input, { ...init, redirect: "manual" });
+  if (response.status >= 300 && response.status < 400 && response.headers.has("location")) {
+    await response.body?.cancel();
+    throw new Error(`offline redirect refused: ${url} -> ${response.headers.get("location")}`);
+  }
+  return response;
+}, { preconnect: fetch.preconnect });
+
+/** Forward once through native fetch. Playwright route.fetch currently fails
+ * on Set-Cookie under the installed Bun runtime; keeping redirects manual
+ * here also stops a redirect before any second network request. */
+async function forward(route: Route, options: Parameters<Route["continue"]>[0] = {}): Promise<void> {
+  const request = route.request();
+  const method = options.method ?? request.method();
+  if (options.postData !== undefined && typeof options.postData !== "string" && !Buffer.isBuffer(options.postData)) throw new Error("offline forwarding supports string or Buffer postData only");
+  const response = await localFetch(options.url ?? request.url(), {
+    method, headers: options.headers ?? await request.allHeaders(),
+    body: method === "GET" || method === "HEAD" ? undefined : options.postData ?? request.postDataBuffer(),
+  });
+  const headers = Object.fromEntries(response.headers.entries());
+  const cookies = response.headers.getSetCookie();
+  if (cookies.length) headers["set-cookie"] = cookies.join("\n");
+  // Native fetch returns the decoded body, so encoded transport headers no
+  // longer describe it. Playwright supplies the final length itself.
+  for (const key of ["content-encoding", "content-length", "transfer-encoding"]) delete headers[key];
+  await route.fulfill({ status: response.status, headers, body: Buffer.from(await response.arrayBuffer()) });
+}
+
 function guard(handler: RouteHandler | undefined, blocked: Set<string>): RouteHandler {
-  return async (route) => {
+  return async route => {
     const url = route.request().url();
-    if (!isLocal(url)) { blocked.add(hostOf(url)); await route.abort("blockedbyclient"); return; }
-    if (handler) await handler(route);
-    else await route.fallback();
+    const refuse = async (destination: string) => { blocked.add(hostOf(destination)); await route.abort("blockedbyclient"); };
+    if (!isLocal(url)) { await refuse(url); return; }
+    const safe = new Proxy(route, { get(target, key) {
+      if (key === "continue") return async (opts: Parameters<Route["continue"]>[0] = {}) => {
+        if (opts.url && !isLocal(opts.url)) return refuse(opts.url);
+        await forward(route, opts);
+      };
+      if (key === "fallback") return async (opts: Parameters<Route["fallback"]>[0] = {}) => {
+        if (opts.url && !isLocal(opts.url)) return refuse(opts.url);
+        await route.fallback(opts);
+      };
+      if (key === "fetch") return async () => { throw new Error("route.fetch is unsupported in the offline harness; use localFetch with manual redirects"); };
+      if (key === "fulfill") return async (opts: Parameters<Route["fulfill"]>[0] = {}) => {
+        const status = opts.status ?? opts.response?.status() ?? 200;
+        const headers = opts.headers ?? opts.response?.headers() ?? {};
+        const location = Object.entries(headers).find(([k]) => k.toLowerCase() === "location")?.[1];
+        if (status >= 300 && status < 400 && location) return refuse(new URL(location, url).href);
+        await route.fulfill(opts);
+      };
+      const value = Reflect.get(target, key);
+      return typeof value === "function" ? value.bind(target) : value;
+    } });
+    try { if (handler) await handler(safe); else await forward(route); }
+    catch (error) {
+      blocked.add(`refused ${url}: ${String(error)}`);
+      await route.abort("blockedbyclient").catch(() => {});
+    }
   };
 }
 

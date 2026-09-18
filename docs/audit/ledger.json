@@ -10366,6 +10366,25 @@
           "event": "implemented"
         }
       ]
+    },
+    {
+      "id": "0-repair",
+      "revision": 1,
+      "frozenHash": "d93c768ceb6ceaf73d6c9ac41a66cf0f444d816d6901d92a24c732c3d6b9a809",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "82abf541a6643981d93d41bc5d8b6da169897971",
+      "history": [
+        {
+          "at": "2026-09-18T15:00:37.611Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-18T15:00:37.630Z",
+          "event": "implemented"
+        }
+      ]
     }
   ]
 }

@@ -17,7 +17,7 @@
  * truth, not on toasts.
  */
 import { chromium, type Page } from "playwright";
-import { isolateBrowser, guardedRoute, guardedContextRoute } from "./browser-isolation";
+import { isolateBrowser, guardedRoute, guardedContextRoute, localFetch as fetch } from "./browser-isolation";
 import { buildPayload } from "../src/components/forms/florida-llc/buildPayload";
 import { memberRowIsBlank } from "../src/components/forms/florida-llc/validation";
 import type { FloridaLLCFormData } from "../src/components/forms/florida-llc/types";

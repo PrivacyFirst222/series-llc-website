@@ -1,0 +1,119 @@
+{
+  "baseline": "d0e3689fad8c655037e5e0233dda1014c1ddf043",
+  "rows": [
+    {
+      "name": "10/H1a: actual historical partial-package acceptance refused",
+      "ok": false,
+      "observed": {
+        "code": 0,
+        "output": "accepted: batch 0, revision 2, commit a14230aee3c60da74ca7ce64fdb0d71416e7cd26\n"
+      }
+    },
+    {
+      "name": "10/H: partial package, real push from reset baseline",
+      "ok": false,
+      "observed": {
+        "before": "d0e3689fad8c655037e5e0233dda1014c1ddf043",
+        "pushing": "a14230aee3c60da74ca7ce64fdb0d71416e7cd26",
+        "code": 0,
+        "output": "release gate: ok for refs/heads/main — accepted by Adam: batch 0, revision 2, commit a14230a (simulated decision, 2026-09-18T14:56)\nTo /var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/ledger-controls-tFI7fq/remote.git\n   d0e3689..a14230a  HEAD -> main\n"
+      }
+    },
+    {
+      "name": "10/H: added package, real push from reset baseline",
+      "ok": false,
+      "observed": {
+        "before": "d0e3689fad8c655037e5e0233dda1014c1ddf043",
+        "pushing": "a14230aee3c60da74ca7ce64fdb0d71416e7cd26",
+        "code": 0,
+        "output": "release gate: ok for refs/heads/main — accepted by Adam: batch 0, revision 2, commit a14230a (simulated decision, 2026-09-18T14:56)\nTo /var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/ledger-controls-tFI7fq/remote.git\n   d0e3689..a14230a  HEAD -> main\n"
+      }
+    },
+    {
+      "name": "10/H: changed package, real push from reset baseline",
+      "ok": false,
+      "observed": {
+        "before": "d0e3689fad8c655037e5e0233dda1014c1ddf043",
+        "pushing": "a14230aee3c60da74ca7ce64fdb0d71416e7cd26",
+        "code": 0,
+        "output": "release gate: ok for refs/heads/main — accepted by Adam: batch 0, revision 2, commit a14230a (simulated decision, 2026-09-18T14:56)\nTo /var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/ledger-controls-tFI7fq/remote.git\n   d0e3689..a14230a  HEAD -> main\n"
+      }
+    },
+    {
+      "name": "10/H: regenerated package, real push from reset baseline",
+      "ok": false,
+      "observed": {
+        "before": "d0e3689fad8c655037e5e0233dda1014c1ddf043",
+        "pushing": "a14230aee3c60da74ca7ce64fdb0d71416e7cd26",
+        "code": 0,
+        "output": "release gate: ok for refs/heads/main — accepted by Adam: batch 0, revision 2, commit a14230a (simulated decision, 2026-09-18T14:56)\nTo /var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/ledger-controls-tFI7fq/remote.git\n   d0e3689..a14230a  HEAD -> main\n"
+      }
+    },
+    {
+      "name": "10/H: valid package, real push from reset baseline",
+      "ok": true,
+      "observed": {
+        "before": "d0e3689fad8c655037e5e0233dda1014c1ddf043",
+        "pushing": "a14230aee3c60da74ca7ce64fdb0d71416e7cd26",
+        "code": 0,
+        "output": "release gate: ok for refs/heads/main — accepted by Adam: batch 0, revision 2, commit a14230a (simulated decision, 2026-09-18T14:56)\nTo /var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/ledger-controls-tFI7fq/remote.git\n   d0e3689..a14230a  HEAD -> main\n"
+      }
+    },
+    {
+      "name": "10/E: actual historical wrapper: direct nonlocal request blocked",
+      "ok": true,
+      "observed": {
+        "name": "direct nonlocal request blocked",
+        "ok": true,
+        "detail": {
+          "sinkHitsBefore": 0,
+          "sinkHitsAfter": 0
+        }
+      }
+    },
+    {
+      "name": "10/E: actual historical wrapper: context page nonlocal request blocked",
+      "ok": false,
+      "observed": {
+        "name": "context page nonlocal request blocked",
+        "ok": false,
+        "detail": {
+          "sinkHitsBefore": 0,
+          "sinkHitsAfter": 1
+        }
+      }
+    },
+    {
+      "name": "10/E: actual historical wrapper: popup first request blocked",
+      "ok": false,
+      "observed": {
+        "name": "popup first request blocked",
+        "ok": false,
+        "detail": {
+          "sinkHitsBefore": 1,
+          "sinkHitsAfter": 2
+        }
+      }
+    },
+    {
+      "name": "10/E: actual historical wrapper: API handler nonlocal request blocked",
+      "ok": false,
+      "observed": {
+        "name": "API handler nonlocal request blocked",
+        "ok": false,
+        "detail": {
+          "sinkHitsBefore": 4,
+          "sinkHitsAfter": 5
+        }
+      }
+    },
+    {
+      "name": "10/E: browser harness completed without setup error",
+      "ok": true,
+      "observed": {
+        "code": 1,
+        "output": "{\"adapter\":\"r2 actual inline wrapper\",\"source\":\"  const blockedRequests = new Set();\\n  const openPage = browser.newPage.bind(browser);\\n  browser.newPage = async (...a) => {\\n    const p = await openPage(...a);\\n    await p.route(/^https?:\\\\/\\\\/(?!localhost[:/]|127\\\\.0\\\\.0\\\\.1[:/])/, (route) => { blockedRequests.add(new URL(route.request().url()).host); return route.abort(); });\\n    return p;\\n  };\\n\"}\n{\"name\":\"local HTML and cookie\",\"ok\":true,\"detail\":[{\"name\":\"probe_cookie\",\"value\":\"yes\",\"domain\":\"127.0.0.1\",\"path\":\"/\",\"expires\":-1,\"httpOnly\":false,\"secure\":false,\"sameSite\":\"Lax\"},{\"name\":\"second_cookie\",\"value\":\"also\",\"domain\":\"127.0.0.1\",\"path\":\"/\",\"expires\":-1,\"httpOnly\":false,\"secure\":false,\"sameSite\":\"Lax\"}]}\n{\"name\":\"multiple cookies preserved\",\"ok\":true,\"detail\":[{\"name\":\"probe_cookie\",\"value\":\"yes\",\"domain\":\"127.0.0.1\",\"path\":\"/\",\"expires\":-1,\"httpOnly\":false,\"secure\":false,\"sameSite\":\"Lax\"},{\"name\":\"second_cookie\",\"value\":\"also\",\"domain\":\"127.0.0.1\",\"path\":\"/\",\"expires\":-1,\"httpOnly\":false,\"secure\":false,\"sameSite\":\"Lax\"}]}\n{\"name\":\"binary response preserved\",\"ok\":true,\"detail\":[0,1,127,255]}\n{\"name\":\"JSON response preserved\",\"ok\":true,\"detail\":{\"retained\":true}}\n{\"name\":\"POST forwarded once with body and cookie\",\"ok\":true,\"detail\":{\"postHits\":1,\"body\":\"POST:one-body:probe_cookie=yes; second_cookie=also\"}}\n{\"name\":\"direct nonlocal request blocked\",\"ok\":true,\"detail\":{\"sinkHitsBefore\":0,\"sinkHitsAfter\":0}}\n{\"name\":\"context page nonlocal request blocked\",\"ok\":false,\"detail\":{\"sinkHitsBefore\":0,\"sinkHitsAfter\":1}}\n{\"name\":\"popup first request blocked\",\"ok\":false,\"detail\":{\"sinkHitsBefore\":1,\"sinkHitsAfter\":2}}\n{\"name\":\"local redirect to nonlocal sink blocked\",\"ok\":false,\"detail\":{\"sinkHitsBefore\":2,\"sinkHitsAfter\":3}}\n{\"name\":\"continue URL override blocked\",\"ok\":false,\"detail\":{\"sinkHitsBefore\":3,\"sinkHitsAfter\":4}}\n{\"name\":\"API handler nonlocal request blocked\",\"ok\":false,\"detail\":{\"sinkHitsBefore\":4,\"sinkHitsAfter\":5}}\n{\"name\":\"outside API handler does not run\",\"ok\":false,\"detail\":{\"apiHandlerRan\":true}}\n{\"name\":\"fallback URL override blocked\",\"ok\":true,\"detail\":{\"sinkHitsBefore\":5,\"sinkHitsAfter\":5}}\n{\"name\":\"handler continue redirect blocked\",\"ok\":false,\"detail\":{\"sinkHitsBefore\":5,\"sinkHitsAfter\":6}}\n{\"name\":\"unsupported route.fetch cannot follow redirects\",\"ok\":false,\"detail\":{\"sinkHitsBefore\":6,\"sinkHitsAfter\":7}}\n{\"name\":\"local fallback overrides preserved\",\"ok\":true,\"detail\":{\"postHits\":2,\"body\":\"POST:override-body:null\"}}\n{\"name\":\"handler manufactured redirect blocked\",\"ok\":false,\"detail\":{\"sinkHitsBefore\":7,\"sinkHitsAfter\":8}}\n{\"name\":\"API forwarding does not follow redirects\",\"ok\":false,\"detail\":{\"refused\":false,\"sinkHitsBefore\":8,\"sinkHitsAfter\":9}}\n"
+      }
+    }
+  ]
+}

@@ -58,7 +58,10 @@ record rather than a chat message, is not done twice, and is not quietly
 undone later. Codex reviewed the design in four rounds, rejected the first
 build (revision 1, 19 findings) and the second (revision 2: 12 corrected, 7
 partly, 9 new reproductions), then reviewed the plan for this revision twice
-and approved it before Adam's Go. Its reviews are kept under `batches/0/`
+and approved the plan before Adam's Go. The implementation review then found
+ten defects. Corrective batch `0-repair` continues that work in a separate
+clone; it does not infer acceptance or rejection of revision 3. Its scope and
+evidence are in `batches/0-repair/`. Earlier reviews are kept under `batches/0/`
 (`codex-review-r1.md`, `codex-review-r2.md`, `codex-plan-review-r3.md`).
 
 What it promises: it DETECTS a regression that a recorded assertion covers,
@@ -84,7 +87,9 @@ and only if it obeys the records rules, each of which fails closed:
 - **R2** `findings-open.md` equals what the ledger in the same push renders.
 - **R3** `rulings.md` is an audit control (a ruling there suppresses
   findings): a line may be added only if it carries a ruling Adam recorded
-  himself; nothing may be removed or changed.
+  himself. `batch.ts ruling` appends a canonical entry naming the exact item,
+  optional part and complete JSON-escaped text; no substring match is accepted.
+  Existing content must remain an unchanged prefix.
 - **R4** `ledger.json` keeps every invariant below in strict mode.
 - **R5** `batches/<id>/batch.json` is replaced only by the valid next
   revision; every revision's snapshot (`revisions/r<n>.json`) is retained and
@@ -112,19 +117,28 @@ change.
   cannot read those records and says so; it never assumes them.
 - **An item is immutable**: its text, tag, area, source, verdicts, related
   items, waits, set of parts, each part's scope, link and waits, and an
-  accepted fix's assertions. A wait is satisfied by a ruling, never edited. A
+  recorded fix's assertions from implementation onward. A part's state must
+  match its owning batch and retained work order; a session-written reopening
+  cannot discard its fix. An authenticated rejection can reopen unfinished
+  work. A wait is satisfied by a ruling, never edited. A
   part can be replaced only by a migration, which keeps the old part under
   `retiredParts` with its whole history.
 - **A migration** is a file, `migrations/<id>.json`, declaring the exact
   change per item; `ledger-build.ts --migrate <id>` applies it and refuses
-  unless everything undeclared is identical afterwards. The ledger records it
+  unless everything undeclared is identical afterwards. The guard and release
+  gate independently compare the exact declared values, including sibling
+  parts and complete retirement records; approval of one link permits only
+  that link. Newly created parts start open with their migration history.
+  The ledger records it
   as a ruling carrying the file's hash. Records only if Adam's whole message
   "Approve migration <id>" was recorded for that exact file; otherwise it
   ships inside a commit he accepts. Migration 001 moved every second-sighting
   link to a PART of its main record and split seven compound findings.
 - **A ruling** enters the ledger only from Adam's record: his whole message
   "Ruling 28: …" (or "Ruling 27, part retention: …"), or
-  `accept.ts ruling` in his terminal, then `batch.ts ruling` copies it.
+  `accept.ts ruling` in his terminal, then `batch.ts ruling` copies it. The
+  chat hook preserves internal whitespace, newlines and the full text; it
+  does not truncate a long decision or discard a condition at its end.
 - **Work is claimed by defect.** A second sighting links to a part of its
   main record; the defect group is that part and everything pointing at it.
   One item's independent parts can be in different batches; a batch that
@@ -169,10 +183,19 @@ change.
   line; they are left, in those words, to Adam's complete-diff review.
   `--against <before>..<after>` is the GitHub form: the same rules between two
   commits, with the checks that need Adam's records reported as unavailable.
+  Their absence does not itself fail CI; malformed transitions still fail,
+  and the local gate still refuses without the required owner record.
 - `../../webapp/scripts/browser-isolation.ts` — every browser the check
   scripts open has service workers blocked and aborts every request to
-  another machine before any handler runs, in every context, popups
-  included; a lint rule refuses a bare `page.route` in that folder.
+  another machine before any HTTP handler runs, in every context, popups
+  included. All HTTP redirects are refused before a second request; the
+  current walkthrough needs none. API forwarding uses `localFetch` with the
+  same rule. URL overrides are checked, synthetic redirects are blocked,
+  and `route.fetch` is explicitly unsupported. Native forwarding preserves
+  binary responses, multiple cookies and string/Buffer request bodies;
+  explicit header overrides replace the original headers. These are HTTP
+  controls, not an operating-system network sandbox or a WebSocket guarantee.
+  A lint rule refuses a bare `page.route` in that folder.
 - `../../webapp/scripts/audit-assert.ts` — replays what a text search cannot:
   text on a rendered page, a generated Word document, a named behaviour check.
   A result counts only from the same suite, label, commit AND run; both
@@ -183,10 +206,16 @@ change.
   check on the tree before the fix, carrying the declared test-only files,
   and keeps that run's full output. Every package has an IDENTITY, is never
   overwritten, records whether the run was partial, and carries the manifest
-  of the kept site. A partial run is never announced ready. `--serve <batch>
+  of the kept site. Acceptance, serving and release require explicit
+  `partial: null`, a nonempty manifest with `index.html`, unique safe paths
+  and the exact file set; symlinks are refused. Every package integrity error
+  prevents acceptance. A partial run is never announced ready. `--serve <batch>
   --package <id>` shows a package before acceptance; without an id, only the
   package Adam's acceptance names. The server it starts must be its own
   child, owning its port, and must report itself offline, or nothing opens.
+  A clone with no remote compares with the declared batch base and labels it
+  an offline comparison baseline; it makes no claim about current remote main.
+  A `codex/` branch also requires `FPSLLC_BATCH=<id>` to select its work order.
 - `accept.ts` and `.claude/hooks/accept-prompt.sh` — Adam's records. Each is
   the WHOLE message: `Accept A, revision 1, 3f9c2ab` (optionally followed by
   `Go`), `Reject A, revision 1: reason`, `Ruling 28: text`, `Approve migration
@@ -208,7 +237,20 @@ change.
 - `demo.ts` — plants each fault in a disposable copy and shows the refusal.
   Each row says how it was measured; no row shows an exit code it did not
   have. Revision 3's rows were written first and run against revision 2
-  (`batches/0/evidence/red-before-revision-3.md`), then after.
+  (`batches/0/evidence/red-before-revision-3.md`), then after. That historical
+  report contains invalid red cases identified in the r3 review; preserve it
+  as history, not proof. `repair-check.ts --historical-only --against d0e3689`
+  supplies the corrected package-directory and actual-inline-browser adapters.
+  Every measured historical push resets the disposable remote first. The
+  ordinary-page control already passes on r2 and is not called a reproduction.
+  `demo.ts --batch 0-repair --with-behaviour` exercises the whole sequence,
+  including an unchanged clean commit. Its final evidence-retention row is
+  included before totals are calculated.
+- `repair-check.ts` — the additional mandatory `ledger-controls` suite, run
+  by both the review command and CI. It uses disposable clones and owner
+  records. `--against <commit>` applies the same probes to earlier controls;
+  fixture check results are explicitly simulated, never reported as a product
+  test run. Browser probes use loopback sinks only.
 
 ### One batch
 

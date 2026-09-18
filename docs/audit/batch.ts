@@ -18,9 +18,9 @@
  * is known about the live site, and what is known about the Dropbox copies.
  * What is not given is recorded as not recorded, never assumed.
  */
-import { writeFileSync, mkdirSync, existsSync, readFileSync } from "node:fs";
+import { writeFileSync, appendFileSync, mkdirSync, existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { ROOT, BATCHES, EVENT, git, gitOk, loadLedger, saveLedger, loadBatch, frozenHashOf, standingAcceptance, resolvePackage, packageProblems, familyClaim, unmetWaits, acceptances, rulingRecords, count, now, type Ledger } from "./ledger-lib";
+import { ROOT, BATCHES, EVENT, git, gitOk, loadLedger, saveLedger, loadBatch, frozenHashOf, standingAcceptance, resolvePackage, packageProblems, familyClaim, unmetWaits, acceptances, rulingRecords, rulingLine, count, now, type Ledger } from "./ledger-lib";
 import { renderList } from "./ledger-print";
 
 const [cmd, id, ...rest] = process.argv.slice(2);
@@ -37,6 +37,9 @@ if (cmd === "ruling") {
   const rec = rulingRecords().find((r) => r.kind === "ruling" && r.item === id && (r.part ?? "") === (part ?? "") && (r.text ?? "").trim() === text.trim());
   if (!rec) die(`no record from Adam says this on item ${id}${part ? ` (${part})` : ""}. A ruling is copied from his record, never written first: his whole message "Ruling ${id}${part ? `, part ${part}` : ""}: <text>", or  bun run docs/audit/accept.ts ruling ${id} "<text>"${part ? ` --part ${part}` : ""}`);
   l.rulings.push({ date: rec.at.slice(0, 10), kind: "ruling", item: id, text: rec.text as string, ...(part ? { part } : {}), ...(sup ? { supersedes: sup } : {}) });
+  const auditRules = join(ROOT, "docs/audit/rulings.md");
+  const entry = rulingLine(rec);
+  if (!readFileSync(auditRules, "utf8").split("\n").includes(entry)) appendFileSync(auditRules, `\n${entry}\n`);
   finish(`ruling recorded on item ${id}${part ? ` (${part})` : ""}, from Adam's record of ${rec.at.slice(0, 16)} (${rec.source})`);
   process.exit(0);
 }

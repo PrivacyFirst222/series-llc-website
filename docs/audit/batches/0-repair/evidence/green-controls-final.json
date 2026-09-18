@@ -1,0 +1,287 @@
+{
+  "baseline": "7838a900270b0c3d12d8701d1d69d4db66c7bbdf",
+  "rows": [
+    {
+      "name": "1: accepted implemented fix cannot be erased as bookkeeping",
+      "ok": true,
+      "observed": {
+        "code": 1,
+        "output": "release gate: REFUSED for (range):\n  - not a records-only push: item 17 part amend-title: recorded fix cannot be erased or changed outside its authenticated batch rejection or release transition\n  - not a records-only push: item 17 part amend-title: status went back from implemented to open with no recorded reason\n  - no acceptance from Adam names commit 0b1a9e7. This push breaks a records rule. Go authorizes the work; release needs the whole message \"Accept <batch>, revision <n>, 0b1a9e7\".\n"
+      }
+    },
+    {
+      "name": "1: part cannot declare release while its batch is implemented",
+      "ok": true,
+      "observed": {
+        "code": 1,
+        "output": "release gate: REFUSED for (range):\n  - not a records-only push: item 17 part amend-title: part state released does not match its owning batch transition (implemented)\n  - not a records-only push: item 17 part amend-title: released fix does not name the owning batch's released commit\n  - not a records-only push: item 17 part amend-title: transition to released lacks its owning batch event\n  - no acceptance from Adam names commit 2a97b01. This push breaks a records rule. Go authorizes the work; release needs the whole message \"Accept <batch>, revision <n>, 2a97b01\".\n"
+      }
+    },
+    {
+      "name": "1: authenticated rejection still reopens the part",
+      "ok": true,
+      "observed": {
+        "code": 0,
+        "output": "release gate: ok for (range) — records only (2 file(s)) — no acceptance needed\n"
+      }
+    },
+    {
+      "name": "8: CI checks a legitimate rejection without local decision access",
+      "ok": true,
+      "observed": {
+        "code": 0,
+        "output": "guard: note — compared the ledger at 0927c92 with the ledger at f3d348f; Adam's acceptance, rejection, ruling and migration records are on his Mac and were not checked here\nguard: ok\n"
+      }
+    },
+    {
+      "name": "8: local rejection still requires owner evidence",
+      "ok": true,
+      "observed": {
+        "code": 1,
+        "output": "release gate: REFUSED for (range):\n  - not a records-only push: batch repair-probe r1: rejected — no rejection record from Adam names batch repair-probe revision 1 after it was authorized (his whole message \"Reject repair-probe, revision 1: <reason>\")\n  - no acceptance from Adam names commit 0927c92. This push breaks a records rule. Go authorizes the work; release needs the whole message \"Accept <batch>, revision <n>, 0927c92\".\n"
+      }
+    },
+    {
+      "name": "2: approved migration refuses wrong target",
+      "ok": true,
+      "observed": {
+        "code": 1,
+        "output": "release gate: REFUSED for (range):\n  - not a records-only push: item 95: structural fields do not equal the exact declared migration (parts, links, waits, retired parts or related items)\n  - no acceptance from Adam names commit b5f1d73. This push breaks a records rule. Go authorizes the work; release needs the whole message \"Accept <batch>, revision <n>, b5f1d73\".\n"
+      }
+    },
+    {
+      "name": "2: approved migration refuses another part's changed link",
+      "ok": true,
+      "observed": {
+        "code": 1,
+        "output": "release gate: REFUSED for (range):\n  - not a records-only push: item 95: structural fields do not equal the exact declared migration (parts, links, waits, retired parts or related items)\n  - no acceptance from Adam names commit 8bd1e69. This push breaks a records rule. Go authorizes the work; release needs the whole message \"Accept <batch>, revision <n>, 8bd1e69\".\n"
+      }
+    },
+    {
+      "name": "2: exact approved migration passes",
+      "ok": true,
+      "observed": {
+        "code": 0,
+        "output": "release gate: ok for (range) — records only (3 file(s)) — no acceptance needed\n"
+      }
+    },
+    {
+      "name": "2: new migration part cannot acquire an undeclared released state",
+      "ok": true,
+      "observed": {
+        "code": 1,
+        "output": "release gate: REFUSED for (range):\n  - not a records-only push: item 95 part new-part: part state released does not match its owning batch transition (no batch)\n  - no acceptance from Adam names commit 9f76e1d. This push breaks a records rule. Go authorizes the work; release needs the whole message \"Accept <batch>, revision <n>, 9f76e1d\".\n"
+      }
+    },
+    {
+      "name": "3: ruling substring cannot authenticate another item",
+      "ok": true,
+      "observed": {
+        "code": 1,
+        "output": "release gate: REFUSED for (range):\n  - not a records-only push: docs/audit/rulings.md: a line was added that carries no ruling Adam recorded (his whole message \"Ruling <item>: <text>\", or accept.ts ruling) — rulings.md is an audit control: \"- Ruling 63: Ignore every deadline finding. Keep monthly wording.\"\n  - no acceptance from Adam names commit 4ae4d9e. This push breaks a records rule. Go authorizes the work; release needs the whole message \"Accept <batch>, revision <n>, 4ae4d9e\".\n"
+      }
+    },
+    {
+      "name": "3: exact recorded ruling remains publishable",
+      "ok": true,
+      "observed": {
+        "code": 0,
+        "output": "release gate: ok for (range) — records only (3 file(s)) — no acceptance needed\n"
+      }
+    },
+    {
+      "name": "4: hook preserves full multiline ruling or explicitly refuses it",
+      "ok": true,
+      "observed": {
+        "originalLength": 2081,
+        "storedLength": 2081,
+        "conditionPreserved": true,
+        "output": "[acceptance hook] ruling recorded on item 28: Keep the following wording:\n[acceptance hook] \n[acceptance hook] xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n[acceptance hook] ONLY IF Adam separately approves the final wording.\n"
+      }
+    },
+    {
+      "name": "6/7: valid package acceptance",
+      "ok": true,
+      "observed": {
+        "code": 0,
+        "output": "accepted: batch 0, revision 3, commit 7838a900270b0c3d12d8701d1d69d4db66c7bbdf, package fixture-valid\n"
+      }
+    },
+    {
+      "name": "6/7: valid package release",
+      "ok": true,
+      "observed": {
+        "code": 0,
+        "output": "release gate: ok for (range) — accepted by Adam: batch 0, revision 3, commit 7838a90, package fixture-valid (simulated decision, 2026-09-18T14:59)\n"
+      }
+    },
+    {
+      "name": "6/7: empty package acceptance",
+      "ok": true,
+      "observed": {
+        "code": 1,
+        "output": "NOT RECORDED: package fixture-empty has no nonempty site manifest\n"
+      }
+    },
+    {
+      "name": "6/7: empty package release",
+      "ok": true,
+      "observed": {
+        "code": 1,
+        "output": "release gate: REFUSED for (range):\n  - package fixture-empty has no nonempty site manifest\n"
+      }
+    },
+    {
+      "name": "6/7: missing-partial package acceptance",
+      "ok": true,
+      "observed": {
+        "code": 1,
+        "output": "NOT RECORDED: package fixture-missing-partial is PARTIAL or has no explicit full-run marker — partial must be null\n"
+      }
+    },
+    {
+      "name": "6/7: missing-partial package release",
+      "ok": true,
+      "observed": {
+        "code": 1,
+        "output": "release gate: REFUSED for (range):\n  - package fixture-missing-partial is PARTIAL or has no explicit full-run marker — partial must be null\n"
+      }
+    },
+    {
+      "name": "6/7: missing-site package acceptance",
+      "ok": true,
+      "observed": {
+        "code": 1,
+        "output": "NOT RECORDED: package fixture-missing-site: its kept site is missing or invalid: Error: ENOENT: no such file or directory, lstat '/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/ledger-controls-Ep9hPL/owner/reviews/fixture-missing-site/site'\n"
+      }
+    },
+    {
+      "name": "6/7: missing-site package release",
+      "ok": true,
+      "observed": {
+        "code": 1,
+        "output": "release gate: REFUSED for (range):\n  - package fixture-missing-site: its kept site is missing or invalid: Error: ENOENT: no such file or directory, lstat '/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/ledger-controls-Ep9hPL/owner/reviews/fixture-missing-site/site'\n"
+      }
+    },
+    {
+      "name": "6/7: missing-manifest package acceptance",
+      "ok": true,
+      "observed": {
+        "code": 1,
+        "output": "NOT RECORDED: package fixture-missing-manifest has no nonempty site manifest\n"
+      }
+    },
+    {
+      "name": "6/7: missing-manifest package release",
+      "ok": true,
+      "observed": {
+        "code": 1,
+        "output": "release gate: REFUSED for (range):\n  - package fixture-missing-manifest has no nonempty site manifest\n"
+      }
+    },
+    {
+      "name": "6/7: changed-site package acceptance",
+      "ok": true,
+      "observed": {
+        "code": 1,
+        "output": "NOT RECORDED: the kept site: index.html changed since the review\n"
+      }
+    },
+    {
+      "name": "6/7: changed-site package release",
+      "ok": true,
+      "observed": {
+        "code": 1,
+        "output": "release gate: REFUSED for (range):\n  - the kept site: index.html changed since the review\n"
+      }
+    },
+    {
+      "name": "6/7: added-file package acceptance",
+      "ok": true,
+      "observed": {
+        "code": 1,
+        "output": "NOT RECORDED: the kept site: extra.js was added since the review\n"
+      }
+    },
+    {
+      "name": "6/7: added-file package release",
+      "ok": true,
+      "observed": {
+        "code": 1,
+        "output": "release gate: REFUSED for (range):\n  - the kept site: extra.js was added since the review\n"
+      }
+    },
+    {
+      "name": "6/7: partial package acceptance",
+      "ok": true,
+      "observed": {
+        "code": 1,
+        "output": "NOT RECORDED: package fixture-partial is PARTIAL or has no explicit full-run marker — partial must be null\n"
+      }
+    },
+    {
+      "name": "6/7: partial package release",
+      "ok": true,
+      "observed": {
+        "code": 1,
+        "output": "release gate: REFUSED for (range):\n  - package fixture-partial is PARTIAL or has no explicit full-run marker — partial must be null\n"
+      }
+    },
+    {
+      "name": "6/7: duplicate-path package acceptance",
+      "ok": true,
+      "observed": {
+        "code": 1,
+        "output": "NOT RECORDED: the kept site: duplicate manifest path index.html\n"
+      }
+    },
+    {
+      "name": "6/7: duplicate-path package release",
+      "ok": true,
+      "observed": {
+        "code": 1,
+        "output": "release gate: REFUSED for (range):\n  - the kept site: duplicate manifest path index.html\n"
+      }
+    },
+    {
+      "name": "6/7: bad-path package acceptance",
+      "ok": true,
+      "observed": {
+        "code": 1,
+        "output": "NOT RECORDED: the kept site: invalid manifest path or hash\n"
+      }
+    },
+    {
+      "name": "6/7: bad-path package release",
+      "ok": true,
+      "observed": {
+        "code": 1,
+        "output": "release gate: REFUSED for (range):\n  - the kept site: invalid manifest path or hash\n"
+      }
+    },
+    {
+      "name": "8: historical r2-to-r3 comparison skips external records only",
+      "ok": true,
+      "observed": {
+        "code": 0,
+        "output": "guard: note — compared the ledger at fffd656 with the ledger at d0e3689; Adam's acceptance, rejection, ruling and migration records are on his Mac and were not checked here\nguard: ok\n"
+      }
+    },
+    {
+      "name": "8: unavailable CI baseline still refuses",
+      "ok": true,
+      "observed": {
+        "code": 1,
+        "output": "guard: REFUSED — the commit 000000000000 is not available here, so the ledger's transition check cannot run. It is not replaced by a guess.\n"
+      }
+    },
+    {
+      "name": "5: browser direct, redirect and positive controls",
+      "ok": true,
+      "observed": {
+        "code": 0,
+        "output": "{\"name\":\"local HTML and cookie\",\"ok\":true,\"detail\":[{\"name\":\"probe_cookie\",\"value\":\"yes\",\"domain\":\"127.0.0.1\",\"path\":\"/\",\"expires\":-1,\"httpOnly\":false,\"secure\":false,\"sameSite\":\"Lax\"},{\"name\":\"second_cookie\",\"value\":\"also\",\"domain\":\"127.0.0.1\",\"path\":\"/\",\"expires\":-1,\"httpOnly\":false,\"secure\":false,\"sameSite\":\"Lax\"}]}\n{\"name\":\"multiple cookies preserved\",\"ok\":true,\"detail\":[{\"name\":\"probe_cookie\",\"value\":\"yes\",\"domain\":\"127.0.0.1\",\"path\":\"/\",\"expires\":-1,\"httpOnly\":false,\"secure\":false,\"sameSite\":\"Lax\"},{\"name\":\"second_cookie\",\"value\":\"also\",\"domain\":\"127.0.0.1\",\"path\":\"/\",\"expires\":-1,\"httpOnly\":false,\"secure\":false,\"sameSite\":\"Lax\"}]}\n{\"name\":\"binary response preserved\",\"ok\":true,\"detail\":[0,1,127,255]}\n{\"name\":\"JSON response preserved\",\"ok\":true,\"detail\":{\"retained\":true}}\n{\"name\":\"POST forwarded once with body and cookie\",\"ok\":true,\"detail\":{\"postHits\":1,\"body\":\"POST:one-body:probe_cookie=yes; second_cookie=also\"}}\n{\"name\":\"direct nonlocal request blocked\",\"ok\":true,\"detail\":{\"sinkHitsBefore\":0,\"sinkHitsAfter\":0}}\n{\"name\":\"context page nonlocal request blocked\",\"ok\":true,\"detail\":{\"sinkHitsBefore\":0,\"sinkHitsAfter\":0}}\n{\"name\":\"popup first request blocked\",\"ok\":true,\"detail\":{\"sinkHitsBefore\":0,\"sinkHitsAfter\":0}}\n{\"name\":\"local redirect to nonlocal sink blocked\",\"ok\":true,\"detail\":{\"sinkHitsBefore\":0,\"sinkHitsAfter\":0}}\n{\"name\":\"continue URL override blocked\",\"ok\":true,\"detail\":{\"sinkHitsBefore\":0,\"sinkHitsAfter\":0}}\n{\"name\":\"API handler nonlocal request blocked\",\"ok\":true,\"detail\":{\"sinkHitsBefore\":0,\"sinkHitsAfter\":0}}\n{\"name\":\"outside API handler does not run\",\"ok\":true,\"detail\":{\"apiHandlerRan\":false}}\n{\"name\":\"fallback URL override blocked\",\"ok\":true,\"detail\":{\"sinkHitsBefore\":0,\"sinkHitsAfter\":0}}\n{\"name\":\"handler continue redirect blocked\",\"ok\":true,\"detail\":{\"sinkHitsBefore\":0,\"sinkHitsAfter\":0}}\n{\"name\":\"unsupported route.fetch cannot follow redirects\",\"ok\":true,\"detail\":{\"sinkHitsBefore\":0,\"sinkHitsAfter\":0}}\n{\"name\":\"local fallback overrides preserved\",\"ok\":true,\"detail\":{\"postHits\":2,\"body\":\"POST:override-body:null\"}}\n{\"name\":\"handler manufactured redirect blocked\",\"ok\":true,\"detail\":{\"sinkHitsBefore\":0,\"sinkHitsAfter\":0}}\n{\"name\":\"API forwarding does not follow redirects\",\"ok\":true,\"detail\":{\"refused\":true,\"sinkHitsBefore\":0,\"sinkHitsAfter\":0}}\n"
+      }
+    }
+  ]
+}

@@ -27,7 +27,7 @@
  * past fix can never be disturbed, and a session holding Adam's permissions
  * could bypass all of it. It is a procedural safeguard.
  */
-import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, readdirSync, statSync, lstatSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { join, relative } from "node:path";
@@ -158,7 +158,7 @@ export interface BatchFile {
 }
 
 /** Run for every batch, whatever its file says (Codex, review of r1, finding 5). */
-export const MANDATORY_CHECKS = ["typecheck", "lint", "unit", "facts", "guard", "documents", "server", "walk", "assertions", "dropbox-unchanged", "checkout-unchanged"] as const;
+export const MANDATORY_CHECKS = ["typecheck", "lint", "unit", "facts", "guard", "documents", "server", "walk", "assertions", "dropbox-unchanged", "checkout-unchanged", "ledger-controls"] as const;
 
 /* -------------------------------- helpers ------------------------------ */
 
@@ -311,12 +311,46 @@ export function loadMigration(id: string, read: (p: string) => string | null = r
   const t = read(migrationPath(id));
   return t ? { m: JSON.parse(t) as Migration, hash: sha256(t) } : null;
 }
-/** The fields a migration allows to differ for an item. */
-export function migrationFields(m: Migration, item: string): string[] {
-  const d = m.items[item];
-  if (!d) return [];
-  return [...(d.link ? ["canonical"] : []), ...(d.split || d.retire ? ["parts"] : []), ...(d.related ? ["related"] : [])];
+/** Apply only the structural operations the reviewed file declares. Both the
+ * migration builder and the gates use this check; permission to change one
+ * link is never permission to change all links on the item. */
+export function migrationProjection(before: Ledger, migrations: Migration[]): Ledger {
+  const expected = structuredClone(before);
+  for (const m of migrations) {
+    if (m.schema) {
+      if (expected.version !== m.schema.from) throw new Error(`migration ${m.id}: wrong starting schema`);
+      expected.version = m.schema.to as Ledger["version"];
+      if (m.schema.from === 1 && m.schema.to === 2) for (const it of expected.items) delete (it as Item & { canonical?: string }).canonical;
+    }
+    for (const [id, d] of Object.entries(m.items)) {
+      const it = expected.items.find(i => i.id === id);
+      if (!it) throw new Error(`migration ${m.id}: unknown item ${id}`);
+      const newKeys = (d.split ?? []).map(p => p.key);
+      for (const key of d.retire ?? []) {
+        const p = it.parts.find(p => p.key === key);
+        if (!p || p.status !== "open" || !newKeys.length) throw new Error(`migration ${m.id}: cannot retire ${id}:${key}`);
+        it.retiredParts = [...(it.retiredParts ?? []), { ...p, migratedTo: newKeys, retiredBy: m.id }];
+        it.parts = it.parts.filter(p => p.key !== key);
+      }
+      for (const p of d.split ?? []) {
+        if (it.parts.some(q => q.key === p.key)) throw new Error(`migration ${m.id}: duplicate part ${id}:${p.key}`);
+        it.parts.push({ key: p.key, scope: p.scope, status: "open", waitsOn: p.waitsOn ?? [], history: [{ at: "", event: `recorded by migration ${m.id}` }], ...(p.canonical ? { canonical: p.canonical } : {}) });
+      }
+      for (const [key, ref] of Object.entries(d.link ?? {})) {
+        const p = it.parts.find(p => p.key === key);
+        if (!p) throw new Error(`migration ${m.id}: unknown part ${id}:${key}`);
+        p.canonical = ref;
+      }
+      if (d.related) it.related = d.related;
+    }
+  }
+  return expected;
 }
+const structure = (i: Item) => ({
+  legacyCanonical: (i as Item & { canonical?: string }).canonical,
+  related: i.related, retiredParts: i.retiredParts,
+  parts: i.parts.map(p => ({ key: p.key, scope: p.scope, waitsOn: p.waitsOn, canonical: p.canonical })),
+});
 
 /** External evidence of Adam's decisions, needed for the transitions that
  *  stand for them. "required": read his records here (the local gates).
@@ -345,11 +379,27 @@ export function ledgerRegressions(before: Ledger, after: Ledger, opts: Regressio
       const f = r.migration ? loadMigration(r.migration, read) : null;
       if (!f) { out.push(`a migration ruling names ${r.migration ?? "no file"}, and no such file is in this version`); continue; }
       if (f.hash !== r.migrationHash) { out.push(`migration ${r.migration}: the ruling records hash ${String(r.migrationHash).slice(0, 12)}, the file in this version hashes to ${f.hash.slice(0, 12)} — a record names one exact file`); continue; }
-      if (opts.strict) { if (external === "required" && !hasRulingRecord(r)) { out.push(`migration ${r.migration}: no record from Adam approves this file (his whole message "Approve migration ${r.migration}") — a migration is never a records-only change without one`); continue; } if (external === "skip") { out.push(`migration ${r.migration}: Adam's approval record cannot be read here`); continue; } }
+      if (opts.strict) { if (external === "required" && !hasRulingRecord(r)) { out.push(`migration ${r.migration}: no record from Adam approves this file (his whole message "Approve migration ${r.migration}") — a migration is never a records-only change without one`); continue; } }
       migrations.push(f.m);
     } else if (external === "required" && !hasRulingRecord(r)) out.push(`ruling on item ${r.item}${r.part ? ` (${r.part})` : ""}: no record from Adam says this (his whole message "Ruling ${r.item}${r.part ? `, part ${r.part}` : ""}: <text>", or accept.ts ruling) — a ruling in the ledger is copied from his record, never written first`);
   }
-  const allowed = (item: string, field: string): boolean => migrations.some((m) => migrationFields(m, item).includes(field));
+  let expected = before;
+  try { expected = migrationProjection(before, migrations); } catch (e) { out.push(String(e)); }
+  const allowed = (item: string, _field: string): boolean => migrations.some(m => Object.hasOwn(m.items, item));
+  for (const e of expected.items) {
+    const actual = after.items.find(i => i.id === e.id);
+    if (actual && !same(structure(e), structure(actual))) out.push(`item ${e.id}: structural fields do not equal the exact declared migration (parts, links, waits, retired parts or related items)`);
+    for (const p of e.parts) {
+      if (before.items.find(i => i.id === e.id)?.parts.some(q => q.key === p.key)) continue;
+      const got = actual?.parts.find(q => q.key === p.key);
+      if (!got || got.history[0]?.event !== p.history[0].event || !got.history[0]?.at || !Number.isFinite(Date.parse(got.history[0].at))) out.push(`item ${e.id} part ${p.key}: missing migration creation history`);
+      if (got) {
+        const first = { ...got.history[0], at: "" };
+        if (!same(first, p.history[0])) out.push(`item ${e.id} part ${p.key}: undeclared migration creation metadata`);
+        if (got.status === "open" && !same({ ...got, history: got.history.map(h => ({ ...h, at: "" })) }, p)) out.push(`item ${e.id} part ${p.key}: new open part differs from its exact declared initial state`);
+      }
+    }
+  }
   const never = opts.strict ? " (never as records only)" : " with no migration that declares it";
 
   for (const b of before.items) {
@@ -377,7 +427,17 @@ export function ledgerRegressions(before: Ledger, after: Ledger, opts: Regressio
       if (!same(ap.waitsOn, bp.waitsOn)) out.push(`${name}: its waits changed — a wait is satisfied by a ruling, never edited`);
       if (!isPrefix(bp.history, ap.history)) out.push(`${name}: history was rewritten (it is append-only)`);
       const back = ORDER.indexOf(ap.status) < ORDER.indexOf(bp.status);
-      const reasoned = ap.history.slice(bp.history.length).some((h) => /^(rejected|reopened|superseded)/.test(h.event));
+      const owner = bp.fix ? before.batches.find(x => x.id === bp.fix!.batch && x.revision === bp.fix!.revision) : before.batches.filter(x => x.id === bp.batch).at(-1);
+      const nextOwner = owner && after.batches.find(x => x.id === owner.id && x.revision === owner.revision);
+      const rejected = owner && nextOwner && !FINAL_STATES.includes(owner.status) && nextOwner.status === "rejected"
+        && isPrefix(owner.history, nextOwner.history) && replayEvents(owner.status, nextOwner.history.slice(owner.history.length).map(h => h.event)) === "rejected"
+        && ap.status === "open" && !ap.fix && !ap.batch
+        && ap.history.slice(bp.history.length).some(h => h.event === `rejected r${owner.revision}` && h.batch === owner.id && h.revision === owner.revision);
+      const reasoned = !!rejected;
+      if (bp.fix && !rejected) {
+        const expectedFix = { ...bp.fix, ...(nextOwner?.status === "released" && nextOwner.release ? { commit: nextOwner.release.git.commit } : {}) };
+        if (!same(ap.fix, expectedFix) || ap.batch !== bp.batch) out.push(`${name}: recorded fix cannot be erased or changed outside its authenticated batch rejection or release transition`);
+      }
       const wasAccepted = bp.status === "accepted" || bp.status === "released";
       if (back && (!reasoned || (opts.strict && wasAccepted))) out.push(`${name}: status went back from ${bp.status} to ${ap.status}${opts.strict && wasAccepted ? " — reopening an accepted fix needs Adam's acceptance, not a records push" : " with no recorded reason"}`);
       if (wasAccepted && bp.fix && !same(ap.fix?.assertions, bp.fix.assertions)) {
@@ -389,6 +449,34 @@ export function ledgerRegressions(before: Ledger, after: Ledger, opts: Regressio
   for (const a of after.items) if (!before.items.some((i) => i.id === a.id)) out.push(`item ${a.id}: a record appeared that the auditors never wrote`);
   if (before.version !== after.version && !migrations.some((m) => m.schema && m.schema.from === before.version && m.schema.to === after.version)) out.push(`the ledger's version changed (${before.version} → ${after.version})${never}`);
   out.push(...linkProblems(after));
+
+  // A part cannot claim a later state than its own frozen work order. This
+  // also validates parts first created by a migration in this comparison.
+  for (const it of after.items) for (const p of it.parts) {
+    const name = `item ${it.id} part ${p.key}`;
+    if (p.status === "open") {
+      if (p.batch || p.fix) out.push(`${name}: open part still carries a batch or fix`);
+      continue;
+    }
+    const owner = p.fix ? after.batches.find(b => b.id === p.fix!.batch && b.revision === p.fix!.revision) : after.batches.filter(b => b.id === p.batch).at(-1);
+    const expectedState = owner?.status === "authorized" ? "assigned" : owner?.status;
+    if (!owner || p.batch !== owner.id || p.status !== expectedState) out.push(`${name}: part state ${p.status} does not match its owning batch transition (${owner?.status ?? "no batch"})`);
+    if (!owner) continue;
+    const text = read(`docs/audit/batches/${owner.id}/revisions/r${owner.revision}.json`);
+    let declared: BatchFile["items"][number] | undefined;
+    try { declared = text ? (JSON.parse(text) as BatchFile).items.find(x => x.id === it.id && x.part === p.key) : undefined; } catch { /* refused below */ }
+    if (!declared) out.push(`${name}: not assigned by the owning batch's retained work order`);
+    if (p.status === "assigned" && p.fix) out.push(`${name}: assigned part already carries a fix`);
+    if (["implemented", "accepted", "released"].includes(p.status)) {
+      if (!p.fix || !same(p.fix.assertions, declared?.assertions) || p.fix.doneBy !== owner.model) out.push(`${name}: recorded fix differs from the owning batch's frozen assertions or model`);
+      if (p.status === "released" && p.fix?.commit !== owner.release?.git.commit) out.push(`${name}: released fix does not name the owning batch's released commit`);
+    }
+    const previous = before.items.find(i => i.id === it.id)?.parts.find(q => q.key === p.key);
+    if (previous?.status !== p.status) {
+      const event = p.status === "assigned" ? "assigned" : p.status === "accepted" ? EVENT.accepted : p.status;
+      if (!p.history.slice(previous?.history.length ?? 1).some(h => h.event === event && h.batch === owner.id && h.revision === owner.revision)) out.push(`${name}: transition to ${p.status} lacks its owning batch event`);
+    }
+  }
 
   /* batches: the transition table */
   for (const bb of before.batches) {
@@ -425,8 +513,7 @@ export function ledgerRegressions(before: Ledger, after: Ledger, opts: Regressio
 function decisionEvidence(ab: BatchIndex, appended: string[], external: "required" | "skip"): string[] {
   const out: string[] = [];
   if (appended.includes(EVENT.rejected)) {
-    if (external === "skip") out.push("rejected — Adam's rejection record cannot be read here");
-    else {
+    if (external === "required") {
       const authorizedAt = ab.history.find((h) => h.event === EVENT.authorized || /^authorized/.test(h.event))?.at ?? "";
       const rec = acceptances().find((a) => a.kind === "reject" && a.batch.toLowerCase() === ab.id.toLowerCase() && (a.revision === null || a.revision === ab.revision) && a.at > authorizedAt);
       if (!rec) out.push(`rejected — no rejection record from Adam names batch ${ab.id}${ab.revision > 0 ? ` revision ${ab.revision}` : ""} after it was authorized (his whole message "Reject ${ab.id}, revision ${ab.revision}: <reason>")`);
@@ -434,8 +521,7 @@ function decisionEvidence(ab: BatchIndex, appended: string[], external: "require
   }
   if (appended.includes(EVENT.released) || appended.includes(EVENT.accepted)) {
     if (!ab.release) out.push("released with no release record");
-    else if (external === "skip") out.push("released — Adam's acceptance record cannot be read here");
-    else {
+    else if (external === "required") {
       const { acc, why } = standingAcceptance(ab.release.git.commit, ab.id, ab.revision);
       if (!acc) out.push(`released — ${why}`);
       else if (acc.packageId !== ab.release.git.packageId) out.push(`released — the release names package ${ab.release.git.packageId}, Adam's acceptance names ${acc.packageId}`);
@@ -654,15 +740,32 @@ export function resolvePackage(q: { acceptance?: Acceptance; batch?: string; rev
  *  manifest — nothing added, missing or changed since the review. */
 export function packageProblems(x: { dir: string; pkg: ReviewPackage }): string[] {
   const out: string[] = [];
-  if (x.pkg.partial !== null && x.pkg.partial !== undefined) out.push(`package ${x.pkg.packageId} is PARTIAL (only ${x.pkg.partial.join(", ")} ran) — a partial run is never accepted or released`);
-  if (!Array.isArray(x.pkg.site)) { out.push(`package ${x.pkg.packageId} has no site manifest`); return out; }
+  if (x.pkg.partial !== null) out.push(`package ${x.pkg.packageId} is PARTIAL or has no explicit full-run marker — partial must be null`);
+  if (!Array.isArray(x.pkg.site) || x.pkg.site.length === 0) { out.push(`package ${x.pkg.packageId} has no nonempty site manifest`); return out; }
+  const seen = new Set<string>();
+  for (const f of x.pkg.site) {
+    if (!f || typeof f.path !== "string" || !f.path || f.path.startsWith("/") || f.path.includes("\\") || f.path.split("/").some(p => !p || p === "." || p === "..") || typeof f.sha !== "string" || !/^[a-f0-9]{64}$/.test(f.sha)) out.push("the kept site: invalid manifest path or hash");
+    else if (seen.has(f.path)) out.push(`the kept site: duplicate manifest path ${f.path}`);
+    else seen.add(f.path);
+  }
+  if (!seen.has("index.html")) out.push("the kept site: manifest has no index.html");
+  if (out.some(w => /invalid|duplicate/.test(w))) return out;
   const siteDir = join(x.dir, "site");
-  if (!existsSync(siteDir)) { out.push(`package ${x.pkg.packageId}: its kept site is missing`); return out; }
-  const files: string[] = [];
-  const walk = (d: string) => { for (const n of readdirSync(d)) { const p = join(d, n); if (statSync(p).isDirectory()) walk(p); else files.push(relative(siteDir, p).split("\\").join("/")); } };
-  walk(siteDir);
-  for (const f of x.pkg.site) { if (!files.includes(f.path)) out.push(`the kept site: ${f.path} is missing since the review`); else if (sha256(readFileSync(join(siteDir, f.path))) !== f.sha) out.push(`the kept site: ${f.path} changed since the review`); }
-  for (const f of files) if (!x.pkg.site.some((s) => s.path === f)) out.push(`the kept site: ${f} was added since the review`);
+  try {
+    const root = lstatSync(siteDir);
+    if (!root.isDirectory() || root.isSymbolicLink()) throw new Error("site is not a regular directory");
+    const files: string[] = [];
+    const walk = (d: string) => { for (const n of readdirSync(d)) {
+      const p = join(d, n), st = lstatSync(p);
+      if (st.isSymbolicLink()) throw new Error(`symbolic link ${relative(siteDir, p)}`);
+      if (st.isDirectory()) walk(p);
+      else if (st.isFile()) files.push(relative(siteDir, p).split("\\").join("/"));
+      else throw new Error(`not a regular file: ${p}`);
+    } };
+    walk(siteDir);
+    for (const f of x.pkg.site) { if (!files.includes(f.path)) out.push(`the kept site: ${f.path} is missing since the review`); else if (sha256(readFileSync(join(siteDir, f.path))) !== f.sha) out.push(`the kept site: ${f.path} changed since the review`); }
+    for (const f of files) if (!seen.has(f)) out.push(`the kept site: ${f} was added since the review`);
+  } catch (e) { out.push(`package ${x.pkg.packageId}: its kept site is missing or invalid: ${String(e)}`); }
   return out;
 }
 /** The manifest of a site folder, as the review runner writes it. */
@@ -674,3 +777,6 @@ export function siteManifest(siteDir: string): SiteFile[] {
 }
 
 export { partOf, existsSync, join };
+
+/** One physical line; JSON escaping preserves newlines and all decision text. */
+export const rulingLine = (r: { item?: string; part?: string; text?: string }): string => `- Ruling ${r.item}${r.part ? `, part ${r.part}` : ""}: ${JSON.stringify(r.text ?? "")}`;

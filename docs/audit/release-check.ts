@@ -50,7 +50,7 @@
 import { readFileSync } from "node:fs";
 import {
   MANDATORY_CHECKS, git, gitBytes, sha256, loadLedger, ledgerRegressions, frozenFileProblems, linkProblems, isRecordPath, readAt,
-  standingAcceptance, resolvePackage, packageProblems, rulingRecords, type BatchFile,
+  standingAcceptance, resolvePackage, packageProblems, rulingRecords, rulingLine, type BatchFile,
 } from "./ledger-lib";
 import { renderList } from "./ledger-print";
 
@@ -89,13 +89,12 @@ function recordProblems(live: string, pushing: string, strict: boolean, files: s
 
   /* R3 — rulings.md: only lines Adam ruled may be added; nothing removed */
   if (files.includes("docs/audit/rulings.md")) {
-    const was = (readL("docs/audit/rulings.md") ?? "").split("\n"), is = (readP("docs/audit/rulings.md") ?? "").split("\n");
-    const removed = was.filter((l) => l.trim() && !is.includes(l));
-    const added = is.filter((l) => l.trim() && !was.includes(l));
-    if (removed.length) why.push(`docs/audit/rulings.md: ${removed.length} line(s) removed or changed — a ruling is never edited as records only: "${removed[0].slice(0, 100)}"`);
+    const was = readL("docs/audit/rulings.md") ?? "", is = readP("docs/audit/rulings.md");
+    if (is === null || !is.startsWith(was)) { why.push("docs/audit/rulings.md: existing content changed or removed; rulings are append-only"); return why; }
+    const added = is.slice(was.length).split("\n").filter(l => l.trim());
     const records = rulingRecords().filter((r) => r.kind === "ruling");
     for (const line of added) {
-      const hit = records.some((r) => (r.text ?? "").trim() !== "" && line.includes((r.text ?? "").trim()));
+      const hit = records.some((r) => line === rulingLine(r));
       if (!hit) why.push(`docs/audit/rulings.md: a line was added that carries no ruling Adam recorded (his whole message "Ruling <item>: <text>", or accept.ts ruling) — rulings.md is an audit control: "${line.slice(0, 100)}"`);
     }
   }

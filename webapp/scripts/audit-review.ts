@@ -79,11 +79,15 @@ if (argv[0] === "--serve") {
 const id = argv.find((a) => !a.startsWith("--") && argv[argv.indexOf(a) - 1] !== "--only") ?? "";
 const only = argv.includes("--only") ? argv[argv.indexOf("--only") + 1].split(",") : null;
 const branch = git(["rev-parse", "--abbrev-ref", "HEAD"]).trim();
-if (branch !== `audit/batch-${id}`) { console.error(`review: be on the branch audit/batch-${id} (this is ${branch})`); process.exit(1); }
+if (branch !== `audit/batch-${id}` && !(branch.startsWith("codex/") && process.env.FPSLLC_BATCH === id)) { console.error(`review: be on the branch audit/batch-${id} (this is ${branch})`); process.exit(1); }
 const commit = git(["rev-parse", "HEAD"]).trim();
 if (git(["status", "--porcelain"]).trim()) console.log("review: NOTE — this folder has uncommitted changes. They are NOT part of the review: the committed version is what gets checked out, tested, built and shown.");
-git(["fetch", "--quiet", "origin", "main"], { allowFail: true });
-const live = git(["rev-parse", "origin/main"]).trim();
+// With no remote, the declared batch base is the honest comparison point.
+// An isolated review never creates or contacts a production remote.
+const hasRemote = !!git(["remote", "get-url", "origin"], { allowFail: true }).trim();
+if (hasRemote) git(["fetch", "--quiet", "origin", "main"]);
+const declared = JSON.parse(git(["show", `${commit}:docs/audit/batches/${id}/batch.json`])) as BatchFile;
+const live = hasRemote ? git(["rev-parse", "origin/main"]).trim() : declared.base;
 
 const WT = checkout(commit, "review-commit");
 const W = join(WT, "webapp");
@@ -116,7 +120,7 @@ async function run(name: string, cmd: string[], opts: { cwd?: string; env?: Reco
   return exit;
 }
 
-console.log(`review: batch ${id} revision ${batch.revision}; checked out ${commit} in ${WT} — every check, the build and the site run from there (live main is ${live.slice(0, 7)})`);
+console.log(`review: batch ${id} revision ${batch.revision}; checked out ${commit} in ${WT} — every check, the build and the site run from there (${hasRemote ? "remote main" : "offline comparison baseline"} is ${live.slice(0, 7)})`);
 const serverResults = join(dir, "checks", "server-results.jsonl");
 const walkResults = join(dir, "checks", "walk-results.jsonl");
 const DOC_GATES = "python3 docs/provision-map.py && python3 docs/coverage-605.py && python3 docs/event-map.py && python3 docs/docs-consistency.py && python3 docs/structure.py && python3 docs/drafting-lint.py webapp/server/templates-oa-*.md && python3 docs/format-check.py docs/word/*.docx";
@@ -125,6 +129,7 @@ await run("typecheck", ["bun", "run", "typecheck"]);
 await run("lint", ["bun", "run", "lint"]);
 await run("unit", ["bun", "run", "test"]);
 await run("facts", ["bun", "run", "../docs/facts-check.ts"]);
+await run("ledger-controls", ["bun", "run", "../docs/audit/repair-check.ts"]);
 await run("guard", ["bun", "run", "../docs/audit/guard.ts"]);
 await run("documents", ["bash", "-c", DOC_GATES], { cwd: WT });
 if (!only || only.includes("server")) {
