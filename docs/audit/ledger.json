@@ -9915,7 +9915,7 @@
       "id": "0",
       "revision": 2,
       "frozenHash": "de8eb6057a236127509d788da611940cfd1992e8cba7bd648304655504f9bfd8",
-      "status": "implemented",
+      "status": "rejected",
       "model": "claude-fable-5-1",
       "base": "82abf541a6643981d93d41bc5d8b6da169897971",
       "history": [
@@ -9926,6 +9926,11 @@
         {
           "at": "2026-09-17T18:32:16.136Z",
           "event": "implemented"
+        },
+        {
+          "at": "2026-09-18T03:08:12.464Z",
+          "event": "rejected by Adam",
+          "note": "Adam, 17 Sep 2026: 'Reject 0, revision 2' (recorded by the acceptance hook, no reason given). Codex's review of d0e3689: 12 corrected, 7 partly, reproductions A-I (docs/audit/batches/0/codex-review-r2.md)."
         }
       ]
     }
