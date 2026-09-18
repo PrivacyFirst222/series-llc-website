@@ -51,32 +51,84 @@ Every file in the inventory, read whole, by someone who did not write it,
 with the line count stated and checked by a script. A count of findings is
 reported only with the fraction read beside it.
 
-## Repairs — the fix ledger (17 Sep 2026, FAILURES.md P88–P91)
+## Repairs — the fix ledger (17 Sep 2026, FAILURES.md P88–P92)
 
 Everything above finds defects. This part records repairs, so that a fix is a
 record rather than a chat message, is not done twice, and is not quietly
-undone later. Codex reviewed the design in four rounds, then rejected the
-first build (revision 1) with 19 findings; this is revision 2, and Codex's
-review is kept at `batches/0/codex-review-r1.md`.
+undone later. Codex reviewed the design in four rounds, rejected the first
+build (revision 1, 19 findings) and the second (revision 2: 12 corrected, 7
+partly, 9 new reproductions), then reviewed the plan for this revision twice
+and approved it before Adam's Go. Its reviews are kept under `batches/0/`
+(`codex-review-r1.md`, `codex-review-r2.md`, `codex-plan-review-r3.md`).
 
 What it promises: it DETECTS a regression that a recorded assertion covers,
 and on Adam's Mac it refuses a release he has not accepted. It does not
 promise that a past fix can never be disturbed. It is procedural:
 `git push --no-verify`, or a session using Adam's administrator login, goes
 around it, and NOTHING ON GITHUB CHECKS ADAM'S ACCEPTANCE — the GitHub
-workflow runs the guard and replays the recorded assertions, which is a
-different thing. It stops a careless session, not a determined one.
+workflow runs the guard against the ledger of the commit being replaced and
+replays the recorded assertions, which is a different thing. It stops a
+careless session, not a determined one.
 
 ### The rule
 
 Every product fix — from the audit or not — needs Adam's acceptance of its
 exact reviewed version. **Go authorizes the work. It does not accept the
-result.** Only a push made purely of record files (FAILURES.md, the ledger,
-rulings, batch folders) passes without acceptance, and only if it is nothing
-more than records: the gate decides that from the files in the push, and a
-"records" push that deletes the ledger, rewrites history, touches a batch file
-frozen at Go, or changes an accepted fix's protection is treated as a product
+result.** Only a push made purely of record files passes without acceptance,
+and only if it obeys the records rules, each of which fails closed:
+
+- **R1** `FAILURES.md` is append-only: what was already written is an
+  unchanged prefix, and the addition comes after it. That is all this proves
+  — the file is read by no script and controls nothing; what an appended
+  entry says is not checked. An informational exception, stated as such.
+- **R2** `findings-open.md` equals what the ledger in the same push renders.
+- **R3** `rulings.md` is an audit control (a ruling there suppresses
+  findings): a line may be added only if it carries a ruling Adam recorded
+  himself; nothing may be removed or changed.
+- **R4** `ledger.json` keeps every invariant below in strict mode.
+- **R5** `batches/<id>/batch.json` is replaced only by the valid next
+  revision; every revision's snapshot (`revisions/r<n>.json`) is retained and
+  matches its frozen hash. `batch.md`, `evidence/*` and `codex-*.md` are
+  informational.
+- **R6** Nothing else is a record path.
+
+Two kinds of change are told apart in code. An ADMINISTRATIVE EVENT is
+validated and may be records only: a batch moving by its transition table, a
+ruling Adam actually made satisfying a wait, a snapshot being retained. A
+CONTROL MIGRATION — changing a wait, a link, the set of parts, an accepted
+fix's assertions — is never records only: it happens only inside a migration
+file Adam approved by record, or inside a commit he accepts as a product
 change.
+
+### What the ledger may never do
+
+- **Batches move only by events.** `authorized` → `implemented` → (`accepted
+  by Adam`, `released`), or `authorized`/`implemented` → `rejected by Adam`.
+  Released and rejected are final. A status reached any other way, or with
+  no event, is refused. A new revision needs the one before it on record as
+  rejected. The events that stand for Adam's decision need his record outside
+  the repository: a rejection record after the batch was authorized; a
+  standing acceptance of the released commit AND package. The GitHub guard
+  cannot read those records and says so; it never assumes them.
+- **An item is immutable**: its text, tag, area, source, verdicts, related
+  items, waits, set of parts, each part's scope, link and waits, and an
+  accepted fix's assertions. A wait is satisfied by a ruling, never edited. A
+  part can be replaced only by a migration, which keeps the old part under
+  `retiredParts` with its whole history.
+- **A migration** is a file, `migrations/<id>.json`, declaring the exact
+  change per item; `ledger-build.ts --migrate <id>` applies it and refuses
+  unless everything undeclared is identical afterwards. The ledger records it
+  as a ruling carrying the file's hash. Records only if Adam's whole message
+  "Approve migration <id>" was recorded for that exact file; otherwise it
+  ships inside a commit he accepts. Migration 001 moved every second-sighting
+  link to a PART of its main record and split seven compound findings.
+- **A ruling** enters the ledger only from Adam's record: his whole message
+  "Ruling 28: …" (or "Ruling 27, part retention: …"), or
+  `accept.ts ruling` in his terminal, then `batch.ts ruling` copies it.
+- **Work is claimed by defect.** A second sighting links to a part of its
+  main record; the defect group is that part and everything pointing at it.
+  One item's independent parts can be in different batches; a batch that
+  takes one place of a defect must take every open place of it.
 
 ### The files
 
@@ -84,79 +136,100 @@ change.
   Codex's own numbers N1.01–N4.11), none ever removed. Each keeps Codex's
   verdict on the DEFECT and, separately, on the proposed REPLACEMENT — a
   confirmed defect is not an approved fix, and a rejected replacement is
-  printed as rejected in the list and in every work order. Each has the item
-  it is a second sighting of, what it waits on (a second sighting inherits its
-  main record's waits), and one or more PARTS, because one finding can hold
-  complaints that close at different times. A part runs open → assigned →
-  implemented → accepted → released. Item and batch history are append-only.
+  printed as rejected in the list and in every work order. Each has what it
+  waits on and one or more PARTS, because one finding can hold complaints that
+  close at different times; a part may link to the part of another item it is
+  a second sighting of, and inherits that part's and item's waits. A part runs
+  open → assigned → implemented → accepted → released. Every history is
+  append-only.
 - `ledger-build.ts` + `verdicts.json` — seed the ledger by script from the
-  auditors' own files, validating every id against Codex's own statuses. It
-  can be reseeded only while nothing has been authorized or accepted.
+  auditors' own files, validating every id against Codex's own statuses;
+  `--migrate <id>` applies a declared migration, checked.
+- `migrations/<id>.json` — each structural change ever made, as declared.
 - `batches/<id>/batch.json` — written BEFORE Go: the items, each one's narrow
   scope, the exact words to replace and the words Adam approved, every file
   the batch may touch, the test-only files a new check needs, any check it
-  removes on purpose. Frozen at Go by hash. A change is the next revision,
-  approved again; earlier revisions stay on record.
-- `batch.ts` — authorize, implemented, released, reject, ruling. Work is
-  claimed BY DEFECT: a main record and its second sightings cannot be in two
-  batches at once. "released" uses the release gate's own acceptance lookup (a
-  later rejection stops it), asks the REMOTE what its main is, and records the
-  push, the live site and the Dropbox copies as three separate facts.
+  removes on purpose. Frozen at Go by hash and retained as
+  `revisions/r<n>.json`. A change is the next revision, approved again.
+- `batch.ts` — authorize, implemented, released, reject, ruling. "released"
+  uses the release gate's own acceptance lookup (a later rejection stops it),
+  the package Adam's acceptance names, asks the REMOTE what its main is, and
+  records the push, the live site and the Dropbox copies as three separate
+  facts. "reject" and "ruling" copy Adam's records; nothing is manufactured.
 - `guard.ts` — the commit step, run on the first AND the final index. Fails
-  closed if the ledger is gone. Replays every accepted fix against the files
-  (found fresh each run); a permitted leftover sentence is matched at its
-  exact place and everything else is a relapse. For a batch it refuses an
-  undeclared file (new and unstaged ones included), an undeclared change to a
-  check, hook or setting, a check that disappears from a suite unnamed, and —
-  in a wording file — any difference from what the declared replacements
-  produce. Code files cannot be judged line by line; they are left, in those
-  words, to Adam's complete-diff review.
+  closed if the ledger is gone. Enforces everything under "What the ledger
+  may never do" against the last commit, reading Adam's records; permits a
+  Go-authorized migration so it can be committed and tested. Replays every
+  accepted fix against the files (found fresh each run); a permitted leftover
+  sentence is matched at its exact place and everything else is a relapse.
+  For a batch it refuses an undeclared file (new and unstaged ones included),
+  an undeclared change to a check, hook or setting, a check that disappears
+  from a suite unnamed, and — in a wording file — any difference from what
+  the declared replacements produce. Code files cannot be judged line by
+  line; they are left, in those words, to Adam's complete-diff review.
+  `--against <before>..<after>` is the GitHub form: the same rules between two
+  commits, with the checks that need Adam's records reported as unavailable.
+- `../../webapp/scripts/browser-isolation.ts` — every browser the check
+  scripts open has service workers blocked and aborts every request to
+  another machine before any handler runs, in every context, popups
+  included; a lint rule refuses a bare `page.route` in that folder.
 - `../../webapp/scripts/audit-assert.ts` — replays what a text search cannot:
   text on a rendered page, a generated Word document, a named behaviour check.
-  Results are matched by suite, label and commit; a check missing from its own
-  suite's results counts as failed. The browser is kept to this machine.
+  A result counts only from the same suite, label, commit AND run; both
+  identities are required arguments.
 - `../../webapp/scripts/audit-review.ts` — checks the exact commit out into
   its own folder and runs EVERYTHING from there: the mandatory checks (a batch
   cannot shorten the list), the build, the site. It runs a behaviour fix's
   check on the tree before the fix, carrying the declared test-only files,
-  and keeps that run's full output. It hashes the Dropbox folder before and
-  after, confirms the checkout is still the commit, keeps the built site in
-  the package (`~/.fpsllc/reviews/`), and `--serve` shows those same bytes
-  later. The server it starts must be its own child, owning its port, and
-  must report itself offline, or nothing opens.
-- `accept.ts` and `.claude/hooks/accept-prompt.sh` — Adam's acceptance. It is
-  the WHOLE message, `Accept A, revision 1, 3f9c2ab`, optionally followed by
-  `Go`; anything added records nothing and the session is told to say so. The
-  commit is resolved at once to its full identity and must have a review
-  package. Recorded in `~/.fpsllc/acceptances.jsonl`, outside the repository.
+  and keeps that run's full output. Every package has an IDENTITY, is never
+  overwritten, records whether the run was partial, and carries the manifest
+  of the kept site. A partial run is never announced ready. `--serve <batch>
+  --package <id>` shows a package before acceptance; without an id, only the
+  package Adam's acceptance names. The server it starts must be its own
+  child, owning its port, and must report itself offline, or nothing opens.
+- `accept.ts` and `.claude/hooks/accept-prompt.sh` — Adam's records. Each is
+  the WHOLE message: `Accept A, revision 1, 3f9c2ab` (optionally followed by
+  `Go`), `Reject A, revision 1: reason`, `Ruling 28: text`, `Approve migration
+  001-part-level-links`. Anything added records nothing and the session is
+  told to say so. An acceptance names one package: with several for the same
+  commit it refuses and prints the exact command. Recorded under `~/.fpsllc/`,
+  outside the repository.
 - `release-check.ts` — the one release gate, used by `.githooks/pre-push` and
   by `publish-docs.ts`. It judges the COMPLETE difference a push would
-  introduce against the package Adam reviewed.
+  introduce against the package Adam's acceptance names: full run, right
+  commit and base, same diff, every mandatory check passed, the kept site
+  exactly its manifest, the Word documents byte-for-byte.
 - `publish-docs.ts` — the only writer of the Dropbox copies: the committed,
-  reviewed files, for an accepted commit, with no exception. Documents whose
-  bytes already match are not written.
+  reviewed files, for an accepted commit and its package, with no exception.
+  Documents whose bytes already match are not written.
 - `ledger-print.ts` — the readable list, a batch's work order (with earlier
-  fixes in the same files marked DO NOT DISTURB), and the rulings queue.
+  fixes in the same files marked DO NOT DISTURB), and the rulings queue, built
+  from every unfinished part's unmet waits.
 - `demo.ts` — plants each fault in a disposable copy and shows the refusal.
-  Each row says how it was measured; no row shows an exit code it did not have.
+  Each row says how it was measured; no row shows an exit code it did not
+  have. Revision 3's rows were written first and run against revision 2
+  (`batches/0/evidence/red-before-revision-3.md`), then after.
 
 ### One batch
 
-1. On main: write `batches/<id>/batch.json` and its readable `.md`. Adam edits
-   the wording, names the model, says Go.
+1. On main: write `batches/<id>/batch.json` and its readable `.md`. The plan
+   goes to Codex in a text box first; Adam edits the wording, names the
+   model, says Go.
 2. `batch.ts authorize <id>` proves every "before" sentence is in its file at
-   the base, freezes the batch, assigns the items. Commit and push: records
-   only. Assignment is on main before work starts.
+   the base, freezes the batch, keeps its snapshot, assigns the items. Commit
+   and push: records only. Assignment is on main before work starts.
 3. `git checkout -b audit/batch-<id>` — a LOCAL branch. It is not pushed:
    a pushed branch makes Vercel build a preview, and the server treats any
    Vercel deployment as production (`isProd: !!process.env.VERCEL`).
 4. The model works from `ledger-print.ts order <id>`, then
    `batch.ts implemented <id>`, and commits (the guard runs, twice).
 5. `cd webapp && bun run scripts/audit-review.ts <id>` — checks, package, site.
-   Codex reviews the package's diff against the work order.
-6. Adam looks, then his whole message is `Accept <id>, revision <n>, <commit>`
-   — or he rejects, and then NOTHING in the batch is released; the rest is
-   reissued as the next revision.
+   It prints the package id with the commit. Codex reviews the package's diff
+   against the work order.
+6. Adam looks (`--serve <id> --package <the id>`), then his whole message is
+   `Accept <id>, revision <n>, <commit>` — or he rejects (`Reject <id>,
+   revision <n>: reason`), and then NOTHING in the batch is released; the rest
+   is reissued as the next revision.
 7. Release: fast-forward main to the accepted commit and push (the gate runs),
    `publish-docs.ts` if Word documents changed, then
    `batch.ts released <id> <commit> --deployed "…" --documents "…"` and a

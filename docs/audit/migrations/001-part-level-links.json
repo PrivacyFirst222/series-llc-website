@@ -1,0 +1,114 @@
+{
+  "id": "001-part-level-links",
+  "title": "Second sightings link to a PART of their main record, not to the whole item; three item-level links become related-item notes; seven compound findings are split into the parts a batch can take separately (Codex's review of revision 2, C; Codex's corrections of the revision-3 plan, section 4).",
+  "date": "2026-09-17",
+  "schema": {
+    "from": 1,
+    "to": 2,
+    "note": "Item.canonical (an item id) is removed; Part.canonical ({ item, part }) is added; Item.related and Item.retiredParts are added. Nothing else in the record changes."
+  },
+  "items": {
+    "29": { "link": { "all": { "item": "4", "part": "all" } } },
+    "71": { "link": { "all": { "item": "51", "part": "all" } } },
+    "80": { "link": { "all": { "item": "198", "part": "all" } } },
+    "149": { "link": { "all": { "item": "198", "part": "all" } } },
+    "87": { "link": { "all": { "item": "133", "part": "all" } } },
+    "203": { "link": { "all": { "item": "133", "part": "all" } } },
+    "99": { "link": { "all": { "item": "132", "part": "all" } } },
+    "144": { "link": { "all": { "item": "45", "part": "all" } } },
+    "152": { "link": { "all": { "item": "63", "part": "all" } } },
+    "153": { "link": { "all": { "item": "63", "part": "all" } } },
+    "202": { "link": { "all": { "item": "63", "part": "all" } } },
+    "154": { "link": { "all": { "item": "237", "part": "all" } } },
+    "161": { "link": { "all": { "item": "115", "part": "all" } } },
+    "162": { "link": { "all": { "item": "121", "part": "all" } } },
+    "199": { "link": { "all": { "item": "195", "part": "all" } } },
+    "248": { "link": { "all": { "item": "12", "part": "all" } } },
+    "249": { "link": { "all": { "item": "240", "part": "all" } } },
+    "254": { "link": { "all": { "item": "242", "part": "all" } } },
+    "201": { "link": { "all": { "item": "28", "part": "all" } } },
+    "167": { "link": { "all": { "item": "136", "part": "all" } } },
+    "228": { "link": { "all": { "item": "127", "part": "all" } } },
+    "96": { "link": { "all": { "item": "90", "part": "all" } } },
+
+    "184": { "related": ["171"], "note": "B89 (a card Square refused to save reads 'no card') and A68 (no permission on the order shows '—') are two defects in the same column, not one." },
+    "171": { "related": ["184"] },
+    "212": { "related": ["194"], "note": "B116 (which anniversary the renewal date is) and A3 (how many days before it the notice goes out) are two questions about the renewal, not one." },
+    "194": { "related": ["212"] },
+    "258": { "related": ["118"], "note": "B158 (the asset schedule's heading names the series in the agreement but not in the consent) and A50 ('Members' vs 'Member(s)'; four rows vs five) are different lines of the same exhibit." },
+    "118": { "related": ["258"] },
+
+    "65": {
+      "split": [
+        { "key": "dead-step", "scope": "The unreachable \"Submit\" step and its dead page, whose sentence says the operating agreement is sent with the filed documents, are removed." },
+        { "key": "denominator", "scope": "The progress percent counts only the steps a client can reach: one denominator, no hidden steps." }
+      ],
+      "retire": ["all"]
+    },
+    "89": { "link": { "all": { "item": "65", "part": "dead-step" } }, "note": "B51's sentence lives on the dead page A26 removes; it is not the progress percent." },
+
+    "120": {
+      "split": [
+        { "key": "title", "scope": "The consent document's title in the portal: \"Consent & Series Exhibit — [series]\"." },
+        { "key": "button", "scope": "The dialog's button: \"Prepare the consent\"." }
+      ],
+      "retire": ["all"]
+    },
+    "259": { "link": { "all": { "item": "120", "part": "title" } }, "note": "B167 is the server line that sets the title A52 asks for; it says nothing about the button." },
+
+    "128": {
+      "split": [
+        { "key": "florida-date", "scope": "The consent, questionnaire and amendment forms default their dates from Florida's date given by the server, not the device's UTC day." },
+        { "key": "viewer-zone-display", "scope": "The two dates rendered in the viewer's zone are formatted with formatDate." }
+      ],
+      "retire": ["all"]
+    },
+    "164": {
+      "split": [
+        { "key": "date", "scope": "The questionnaire seed carries todayEastern, so the questionnaire and amendment forms default from Florida's date.", "canonical": { "item": "128", "part": "florida-date" } },
+        { "key": "blocked-field", "scope": "`blocked: false` is written and read nowhere; dropped from the response and the type." }
+      ],
+      "retire": ["all"],
+      "note": "B138's date half is A60's device-clock default seen from the server; its `blocked: false` half is independent housekeeping."
+    },
+
+    "178": {
+      "split": [
+        { "key": "ein-hint-2553", "scope": "The EIN hint mentions Form 2553 only when a company EIN is being entered AND a matching S election package exists; a series EIN goes on no 2553." },
+        { "key": "s-election-date-row", "scope": "The S election date row no longer says \"entered by the client\" after a correction." },
+        { "key": "series-uploaded-text", "scope": "The series text no longer says \"once … uploaded\" inside the dialog that does the uploading." },
+        { "key": "typed-ein-survives", "scope": "A typed EIN does not survive closing the dialog." }
+      ],
+      "retire": ["all"]
+    },
+    "211": { "link": { "all": { "item": "178", "part": "ein-hint-2553" } }, "note": "B114 is the server-side refusal text making the same 2553 promise as the dialog's hint; the other three parts of A75 are untouched by it." },
+
+    "187": {
+      "split": [
+        { "key": "comments", "scope": "Eleven misplaced or stale comments in the office code." },
+        { "key": "unused-fields", "scope": "The unused board and drawer fields and the columns and subquery that feed them. An intentional work bundle: 190 (five board fields) and 191 (the drawer's services field) are distinct repairs done together." },
+        { "key": "unused-helpers", "scope": "The two unused helpers in serviceOrders.helpers.ts." },
+        { "key": "dead-branches", "scope": "The dead branches behind a constant that is always true." },
+        { "key": "notify-options", "scope": "The unreachable notify options." }
+      ],
+      "retire": ["all"]
+    },
+    "188": { "link": { "all": { "item": "187", "part": "dead-branches" } } },
+    "190": { "link": { "all": { "item": "187", "part": "unused-fields" } } },
+    "191": { "link": { "all": { "item": "187", "part": "unused-fields" } } },
+    "192": { "link": { "all": { "item": "187", "part": "unused-helpers" } } },
+    "193": { "link": { "all": { "item": "187", "part": "comments" } } },
+
+    "256": {
+      "split": [
+        { "key": "article8-location", "scope": "\"the standing association rules that close the Article\": §8.5 does not close Article 8 — the same misstatement A96 (245) records.", "canonical": { "item": "245", "part": "all" } },
+        { "key": "nominee", "scope": "\"never your personal name\" overstates §8.4; the documented nominee arrangement — the same overstatement A95 (244) records.", "canonical": { "item": "244", "part": "all" } }
+      ],
+      "retire": ["all"],
+      "note": "B156 is one table cell carrying two different defects; each half is a second sighting of a different item."
+    },
+
+    "95": { "link": { "eyebrow": { "item": "198", "part": "all" } }, "related": ["198"], "note": "The eyebrow is the same 'formation' wording to a converting client that A24 records; the title waits on Adam's ruling 82 and is not linked." },
+    "112": { "link": { "all": { "item": "100", "part": "unused-code" } }, "note": "B140's dead member check is A30h's unused code, not its Review rows or its fact ledger." }
+  }
+}

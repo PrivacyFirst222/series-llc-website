@@ -28,5 +28,23 @@ export default tseslint.config(
       "@typescript-eslint/no-empty-interface": "off",
       "@typescript-eslint/no-empty-object-type": "off",
     },
+  },
+  // The check scripts drive a browser offline. A route handler is installed
+  // only through scripts/browser-isolation.ts (guardedRoute), which takes the
+  // isolation decision before any handler runs; a bare page.route or
+  // context.route would run its handler first (Codex's review of the fix
+  // ledger, revision 2, E).
+  {
+    files: ["scripts/**/*.ts"],
+    ignores: ["scripts/browser-isolation.ts"],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "CallExpression[callee.type='MemberExpression'][callee.property.name='route']",
+          message: "Install route handlers through guardedRoute / guardedContextRoute from ./browser-isolation, never page.route or context.route directly.",
+        },
+      ],
+    },
   }
 );

@@ -10,17 +10,18 @@
  * anything older than the gate with no acceptance at all):
  *   - a document whose bytes already equal the destination's is not written;
  *   - if any document differs, the newest commit that changed docs/word must
- *     sit inside a commit Adam accepted, on origin/main, and that commit must
- *     pass the same release check the push hook uses. Otherwise NOTHING is
- *     written.
+ *     sit inside a commit Adam accepted, on origin/main; the package his
+ *     acceptance names must exist, be a full run and hold its reviewed site;
+ *     and that commit must pass the same release check the push hook uses.
+ *     Otherwise NOTHING is written.
  *
  *   bun run docs/audit/publish-docs.ts            copy what differs, if accepted
  *   bun run docs/audit/publish-docs.ts --snapshot print the Dropbox folder: path, content hash, time
  */
 import { readdirSync, readFileSync, copyFileSync, existsSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
-import { ROOT, git, gitOk, gitBytes, sha256, acceptances, standingAcceptance, packageDir } from "./ledger-lib";
-import { checkRange, type ReviewPackage } from "./release-check";
+import { ROOT, git, gitOk, gitBytes, sha256, acceptances, standingAcceptance, resolvePackage, packageProblems } from "./ledger-lib";
+import { checkRange } from "./release-check";
 
 export const DROPBOX = process.env.FPSLLC_DROPBOX || "/Users/adam/Library/CloudStorage/Dropbox/00 SharedWithMac/FPSLLC Operating Agreement";
 
@@ -43,7 +44,7 @@ export function snapshot(dir = DROPBOX): { path: string; sha: string; mtime: str
 
 if (import.meta.main) {
   if (process.argv.includes("--snapshot")) { console.log(JSON.stringify(snapshot(), null, 2)); process.exit(0); }
-  const refuse = (m: string): never => { console.error(`publish: REFUSED — ${m}. Nothing was written.`); process.exit(1); };
+  function refuse(m: string): never { console.error(`publish: REFUSED — ${m}. Nothing was written.`); process.exit(1); }
   if (!existsSync(DROPBOX)) { console.log("publish: the Dropbox folder is not present on this machine — nothing to write"); process.exit(0); }
   if (git(["status", "--porcelain", "--", "docs/word"]).trim()) refuse("docs/word has uncommitted changes; only committed, reviewed documents are published");
   const names = readdirSync(join(ROOT, "docs/word")).filter((f) => f.endsWith(".docx"));
@@ -60,10 +61,14 @@ if (import.meta.main) {
   const last = git(["log", "-1", "--format=%H", "--", "docs/word"]).trim();
   const candidates = acceptances().filter((a) => a.kind === "accept" && a.commit && /^[0-9a-f]{40}$/.test(a.commit) && gitOk(["cat-file", "-e", `${a.commit}^{commit}`]) && gitOk(["merge-base", "--is-ancestor", last, a.commit]) && gitOk(["merge-base", "--is-ancestor", a.commit, head]));
   const ok = candidates.map((a) => ({ a, standing: standingAcceptance(a.commit as string, a.batch, a.revision ?? undefined) })).filter((x) => x.standing.acc).pop();
-  if (!ok) refuse(`${differs.length} document(s) differ from Dropbox, they last changed in ${last.slice(0, 7)}, and no commit Adam accepted contains that change`);
-  const dir = packageDir((ok as NonNullable<typeof ok>).a.batch, (ok as NonNullable<typeof ok>).a.revision as number, (ok as NonNullable<typeof ok>).a.commit as string);
-  if (!dir) refuse("the accepted commit has no review package");
-  const pkg = JSON.parse(readFileSync(join(dir as string, "package.json"), "utf8")) as ReviewPackage;
+  const acc = ok?.standing.acc;
+  if (!acc) refuse(`${differs.length} document(s) differ from Dropbox, they last changed in ${last.slice(0, 7)}, and no commit Adam accepted contains that change`);
+  // The one package Adam's acceptance names — the same lookup the release gate uses (Codex, revision 2, H).
+  const found = resolvePackage({ acceptance: acc });
+  if ("error" in found) refuse(found.error);
+  const bad = packageProblems(found);
+  if (bad.length) refuse(bad.join("; "));
+  const pkg = found.pkg;
   const r = checkRange(pkg.base, pkg.commit);
   if (!r.ok) refuse(r.why.join("; "));
   for (const n of differs) {

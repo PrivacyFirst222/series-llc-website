@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "builtFrom": [
     "docs/audit/sources/findings-open-2026-09-16.md",
     "docs/audit/runs/2026-09-16-codex/bucket-1.json",
@@ -912,10 +912,13 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "canonical": {
+            "item": "4",
+            "part": "all"
+          }
         }
       ],
-      "canonical": "4",
       "codex": {
         "status": "confirmed",
         "evidence": "terms.md:6 allocates other provisions inconsistently with their text, including Agent Services liability and survival clauses. Already explicitly linked to item 4, so it is not an unmarked duplicate.",
@@ -2007,14 +2010,26 @@
       "waitsOn": [],
       "parts": [
         {
-          "key": "all",
-          "scope": "The whole finding.",
+          "key": "dead-step",
+          "scope": "The unreachable \"Submit\" step and its dead page, whose sentence says the operating agreement is sent with the filed documents, are removed.",
           "status": "open",
           "waitsOn": [],
           "history": [
             {
-              "at": "2026-09-17T15:33:57.152Z",
-              "event": "recorded"
+              "at": "2026-09-18T03:48:21.611Z",
+              "event": "recorded by migration 001-part-level-links"
+            }
+          ]
+        },
+        {
+          "key": "denominator",
+          "scope": "The progress percent counts only the steps a client can reach: one denominator, no hidden steps.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-18T03:48:21.611Z",
+              "event": "recorded by migration 001-part-level-links"
             }
           ]
         }
@@ -2024,7 +2039,26 @@
         "evidence": "FloridaLLCFormationForm.tsx:519–522 percentage uses all 19 steps; :541–542 step count excludes hidden ones but still includes submit. :449–457 redirects from certify; submit page is unreachable in the normal flow.",
         "replacementOk": true,
         "replacementNote": "Remove unreachable submit and calculate both progress displays from the same visible sequence."
-      }
+      },
+      "retiredParts": [
+        {
+          "key": "all",
+          "scope": "The whole finding.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-17T15:33:57.152Z",
+              "event": "recorded"
+            }
+          ],
+          "migratedTo": [
+            "dead-step",
+            "denominator"
+          ],
+          "retiredBy": "001-part-level-links"
+        }
+      ]
     },
     {
       "id": "66",
@@ -2199,10 +2233,13 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "canonical": {
+            "item": "51",
+            "part": "all"
+          }
         }
       ],
-      "canonical": "51",
       "codex": {
         "status": "confirmed",
         "evidence": "StepRegisteredAgent.tsx:83 promises signing on the next screen, but FloridaLLCFormationForm.tsx:296–298 hides it for CONVERT+SELF. Already linked to51.",
@@ -2474,10 +2511,13 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "canonical": {
+            "item": "198",
+            "part": "all"
+          }
         }
       ],
-      "canonical": "198",
       "codex": {
         "status": "confirmed",
         "evidence": "StepClient.tsx:31 says formation documents on both paths; conversions prepare designations for an existing LLC. Already linked to A24.",
@@ -2693,10 +2733,13 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "canonical": {
+            "item": "133",
+            "part": "all"
+          }
         }
       ],
-      "canonical": "133",
       "codex": {
         "status": "confirmed",
         "evidence": "StepOptionalDocs.tsx:68 says mail while form2553Timing.ts:95–96 explicitly permits postmark or fax. Already linked to A65.",
@@ -2755,10 +2798,13 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "canonical": {
+            "item": "65",
+            "part": "dead-step"
+          }
         }
       ],
-      "canonical": "65",
       "codex": {
         "status": "housekeeping-only",
         "evidence": "StepSubmissionPayload.tsx:56–58 promises the agreement with filed documents, but the submit page is unreachable through the normal form flow (65). No current reader sees this page.",
@@ -2941,7 +2987,11 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "canonical": {
+            "item": "198",
+            "part": "all"
+          }
         },
         {
           "key": "title",
@@ -2958,13 +3008,15 @@
           ]
         }
       ],
-      "canonical": "198",
       "codex": {
         "status": "confirmed",
         "evidence": "FormLLC.tsx:15–19 still says formation/Form your on conversion while description is conditional. Already linked to A24.",
         "replacementOk": false,
         "replacementNote": "Say “Add protected series to your existing Florida LLC”; proposed “Convert” perpetuates82’s terminology mismatch."
-      }
+      },
+      "related": [
+        "198"
+      ]
     },
     {
       "id": "96",
@@ -2986,7 +3038,11 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "canonical": {
+            "item": "90",
+            "part": "all"
+          }
         }
       ],
       "codex": {
@@ -2995,7 +3051,6 @@
         "replacementOk": true,
         "replacementNote": "The proposed recently inactive formulation improves90; include stepValidation.ts:123 as another live copy and note the actual hold uses last_txn_date/file_date, not a verified dissolution date."
       },
-      "canonical": "90",
       "correctedReplacement": "Also a live copy at stepValidation.ts:123; the hold uses last_txn_date/file_date, not a verified dissolution date."
     },
     {
@@ -3078,10 +3133,13 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "canonical": {
+            "item": "132",
+            "part": "all"
+          }
         }
       ],
-      "canonical": "132",
       "codex": {
         "status": "confirmed",
         "evidence": "server/validation.ts:178 uses §605.2202 while consent route uses s.605.2202, Fla.Stat.; the statute text verifies the name rule. Already linked to A64.",
@@ -3496,7 +3554,11 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "canonical": {
+            "item": "100",
+            "part": "unused-code"
+          }
         }
       ],
       "codex": {
@@ -3504,8 +3566,7 @@
         "evidence": "Same dead second member validation explicitly included in100: routes-payments.ts:308–310 is preceded by orderFormSchema rejection using server/validation.ts:128–134.",
         "replacementOk": true,
         "replacementNote": "Delete the redundant check; preserve the schema check."
-      },
-      "canonical": "100"
+      }
     },
     {
       "id": "113",
@@ -3685,7 +3746,10 @@
         "evidence": "templates-new-series.md:46 prints Members/Member, and :61-64 supplies four rows; multi-member agreement Series Exhibits use Member(s) and five rows. This is consistency, not an invalid consent.",
         "replacementOk": true,
         "replacementNote": "Correct as written."
-      }
+      },
+      "related": [
+        "258"
+      ]
     },
     {
       "id": "119",
@@ -3728,14 +3792,26 @@
       "waitsOn": [],
       "parts": [
         {
-          "key": "all",
-          "scope": "The whole finding.",
+          "key": "title",
+          "scope": "The consent document's title in the portal: \"Consent & Series Exhibit — [series]\".",
           "status": "open",
           "waitsOn": [],
           "history": [
             {
-              "at": "2026-09-17T15:33:57.152Z",
-              "event": "recorded"
+              "at": "2026-09-18T03:48:21.611Z",
+              "event": "recorded by migration 001-part-level-links"
+            }
+          ]
+        },
+        {
+          "key": "button",
+          "scope": "The dialog's button: \"Prepare the consent\".",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-18T03:48:21.611Z",
+              "event": "recorded by migration 001-part-level-links"
             }
           ]
         }
@@ -3745,7 +3821,26 @@
         "evidence": "OrdersInProgress.tsx labels the dialog Consent & Series Exhibit, while templates-new-series.md:66 and the document title use New Protected Series. The replacement identifies the actual combined document.",
         "replacementOk": true,
         "replacementNote": "Correct as written."
-      }
+      },
+      "retiredParts": [
+        {
+          "key": "all",
+          "scope": "The whole finding.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-17T15:33:57.152Z",
+              "event": "recorded"
+            }
+          ],
+          "migratedTo": [
+            "title",
+            "button"
+          ],
+          "retiredBy": "001-part-level-links"
+        }
+      ]
     },
     {
       "id": "121",
@@ -3968,14 +4063,26 @@
       "waitsOn": [],
       "parts": [
         {
-          "key": "all",
-          "scope": "The whole finding.",
+          "key": "florida-date",
+          "scope": "The consent, questionnaire and amendment forms default their dates from Florida's date given by the server, not the device's UTC day.",
           "status": "open",
           "waitsOn": [],
           "history": [
             {
-              "at": "2026-09-17T15:33:57.152Z",
-              "event": "recorded"
+              "at": "2026-09-18T03:48:21.611Z",
+              "event": "recorded by migration 001-part-level-links"
+            }
+          ]
+        },
+        {
+          "key": "viewer-zone-display",
+          "scope": "The two dates rendered in the viewer's zone are formatted with formatDate.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-18T03:48:21.611Z",
+              "event": "recorded by migration 001-part-level-links"
             }
           ]
         }
@@ -3985,7 +4092,26 @@
         "evidence": "OAQuestionnaire.tsx:57, AmendAgreement.tsx:26 and consent defaults use toISOString().slice(0,10), which is UTC; relevant service dates use viewer-local formatting. server/datetime.ts:53-56 supplies the Eastern-calendar implementation.",
         "replacementOk": true,
         "replacementNote": "Correct as written."
-      }
+      },
+      "retiredParts": [
+        {
+          "key": "all",
+          "scope": "The whole finding.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-17T15:33:57.152Z",
+              "event": "recorded"
+            }
+          ],
+          "migratedTo": [
+            "florida-date",
+            "viewer-zone-display"
+          ],
+          "retiredBy": "001-part-level-links"
+        }
+      ]
     },
     {
       "id": "129",
@@ -4463,10 +4589,13 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "canonical": {
+            "item": "45",
+            "part": "all"
+          }
         }
       ],
-      "canonical": "45",
       "codex": {
         "status": "disputed",
         "evidence": "Actual PortalDashboard.tsx:367 says “You can cancel here at any time”; routes-portal.ts cancellation accepts notice any day and the dialog at :403-405 explains the30-day renewal cutoff. Cancellation submission and stopping the upcoming charge are different acts; the quoted sentence does not promise that late notice stops that charge.",
@@ -4617,10 +4746,13 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "canonical": {
+            "item": "198",
+            "part": "all"
+          }
         }
       ],
-      "canonical": "198",
       "codex": {
         "status": "confirmed",
         "evidence": "PortalLogin.tsx:38 describes formation-package documents for every client, although conversion orders produce Protected Series Designations. “Your filed documents” fits both paths.",
@@ -4709,10 +4841,13 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "canonical": {
+            "item": "63",
+            "part": "all"
+          }
         }
       ],
-      "canonical": "63",
       "codex": {
         "status": "disputed",
         "evidence": "The filing-date sentence is overbroad, but the proposed replacement endorses any later entered date as the controlling election date. IRS Form2553 Item E says a first-year election begins at the earliest owner/asset/business date; the UI’s permissive timing calculator does not make every later selected date legally valid.",
@@ -4741,10 +4876,13 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "canonical": {
+            "item": "63",
+            "part": "all"
+          }
         }
       ],
-      "canonical": "63",
       "codex": {
         "status": "disputed",
         "evidence": "Actual ServicesCard.tsx:411 refers to the start of the first tax year, matching IRS Form2553 Item E. The proposed replacement equates that with an LLC effective date and optional later selected date; the IRS instead specifies earliest shareholders, assets or business activity for a first-year election.",
@@ -4773,10 +4911,13 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "canonical": {
+            "item": "237",
+            "part": "all"
+          }
         }
       ],
-      "canonical": "237",
       "codex": {
         "status": "confirmed",
         "evidence": "ServicesCard.tsx:182 calls it User’s Manual; docs/facts.md names the Series LLC Owner’s Manual and PortalDashboard.tsx:272 uses that title.",
@@ -4984,10 +5125,13 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "canonical": {
+            "item": "115",
+            "part": "all"
+          }
         }
       ],
-      "canonical": "115",
       "codex": {
         "status": "confirmed",
         "evidence": "routes-portal.ts:1924 says LLCs “we formed”, while sElectionEligibility at :478-489 only requires a paid NEW order. “Formed through us” still implies formation is completed.",
@@ -5015,10 +5159,13 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "canonical": {
+            "item": "121",
+            "part": "all"
+          }
         }
       ],
-      "canonical": "121",
       "codex": {
         "status": "confirmed",
         "evidence": "routes-portal.ts:2277 says details were deleted, but :566 spreads the details into a kept record and :623 only nulls ein_secret. The refusal is displayed in SElectionDetailsForm.",
@@ -5067,6 +5214,42 @@
       "waitsOn": [],
       "parts": [
         {
+          "key": "date",
+          "scope": "The questionnaire seed carries todayEastern, so the questionnaire and amendment forms default from Florida's date.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-18T03:48:21.611Z",
+              "event": "recorded by migration 001-part-level-links"
+            }
+          ],
+          "canonical": {
+            "item": "128",
+            "part": "florida-date"
+          }
+        },
+        {
+          "key": "blocked-field",
+          "scope": "`blocked: false` is written and read nowhere; dropped from the response and the type.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-18T03:48:21.611Z",
+              "event": "recorded by migration 001-part-level-links"
+            }
+          ]
+        }
+      ],
+      "codex": {
+        "status": "confirmed",
+        "evidence": "routes-portal.ts:1135-1144 omits an Eastern date, while OAQuestionnaire and AmendAgreement calculate UTC today. Adding todayEastern corrects the same visible defect as128; blocked:false is additionally unused.",
+        "replacementOk": true,
+        "replacementNote": "Correct as written."
+      },
+      "retiredParts": [
+        {
           "key": "all",
           "scope": "The whole finding.",
           "status": "open",
@@ -5076,16 +5259,14 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "migratedTo": [
+            "date",
+            "blocked-field"
+          ],
+          "retiredBy": "001-part-level-links"
         }
-      ],
-      "canonical": "128",
-      "codex": {
-        "status": "confirmed",
-        "evidence": "routes-portal.ts:1135-1144 omits an Eastern date, while OAQuestionnaire and AmendAgreement calculate UTC today. Adding todayEastern corrects the same visible defect as128; blocked:false is additionally unused.",
-        "replacementOk": true,
-        "replacementNote": "Correct as written."
-      }
+      ]
     },
     {
       "id": "165",
@@ -5168,7 +5349,11 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "canonical": {
+            "item": "136",
+            "part": "all"
+          }
         }
       ],
       "codex": {
@@ -5176,8 +5361,7 @@
         "evidence": "Same unanimity-default defect as136, repeated in the OrdersInProgress.tsx:137 comment. The comment changes no reader-facing text.",
         "replacementOk": true,
         "replacementNote": "Correct as written."
-      },
-      "canonical": "136"
+      }
     },
     {
       "id": "168",
@@ -5297,7 +5481,10 @@
         "evidence": "AdminDashboard.tsx card-status ternary renders an em dash for null, giving the office no visible card status.",
         "replacementOk": false,
         "replacementNote": "Null does not by itself prove no permission: it can precede a card-save attempt or reflect an incomplete/failed capture path. Derive permission from the order’s consent and show “Card status not recorded” unless absence of consent is independently established."
-      }
+      },
+      "related": [
+        "184"
+      ]
     },
     {
       "id": "172",
@@ -5490,14 +5677,50 @@
       "waitsOn": [],
       "parts": [
         {
-          "key": "all",
-          "scope": "The whole finding.",
+          "key": "ein-hint-2553",
+          "scope": "The EIN hint mentions Form 2553 only when a company EIN is being entered AND a matching S election package exists; a series EIN goes on no 2553.",
           "status": "open",
           "waitsOn": [],
           "history": [
             {
-              "at": "2026-09-17T15:33:57.152Z",
-              "event": "recorded"
+              "at": "2026-09-18T03:48:21.611Z",
+              "event": "recorded by migration 001-part-level-links"
+            }
+          ]
+        },
+        {
+          "key": "s-election-date-row",
+          "scope": "The S election date row no longer says \"entered by the client\" after a correction.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-18T03:48:21.611Z",
+              "event": "recorded by migration 001-part-level-links"
+            }
+          ]
+        },
+        {
+          "key": "series-uploaded-text",
+          "scope": "The series text no longer says \"once … uploaded\" inside the dialog that does the uploading.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-18T03:48:21.611Z",
+              "event": "recorded by migration 001-part-level-links"
+            }
+          ]
+        },
+        {
+          "key": "typed-ein-survives",
+          "scope": "A typed EIN does not survive closing the dialog.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-18T03:48:21.611Z",
+              "event": "recorded by migration 001-part-level-links"
             }
           ]
         }
@@ -5507,7 +5730,28 @@
         "evidence": "ServiceOrdersSection.tsx promises rebuilding an S election after a series EIN, labels a corrected date client-entered, describes a future upload in its own upload dialog, and retains typed EIN state on close.",
         "replacementOk": false,
         "replacementNote": "The item supplies no verbatim replacements. Use company-only rebuild wording; “Articles filing date”; “Upload the filed Designation here”; clear the EIN draft when switching orders or closing. A series EIN must not trigger company-election instructions."
-      }
+      },
+      "retiredParts": [
+        {
+          "key": "all",
+          "scope": "The whole finding.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-17T15:33:57.152Z",
+              "event": "recorded"
+            }
+          ],
+          "migratedTo": [
+            "ein-hint-2553",
+            "s-election-date-row",
+            "series-uploaded-text",
+            "typed-ein-survives"
+          ],
+          "retiredBy": "001-part-level-links"
+        }
+      ]
     },
     {
       "id": "179",
@@ -5684,13 +5928,15 @@
           ]
         }
       ],
-      "canonical": "171",
       "codex": {
         "status": "confirmed",
         "evidence": "AdminDashboard.tsx:44 displays card_note only for wallet payment; other saved failure reasons are hidden. The proposed expression exposes the actual recorded reason.",
         "replacementOk": true,
         "replacementNote": "A human-readable mapping for “customer” and “not saveable” would further help, but the proposed code correctly exposes information currently omitted."
-      }
+      },
+      "related": [
+        "171"
+      ]
     },
     {
       "id": "185",
@@ -5763,14 +6009,62 @@
       "waitsOn": [],
       "parts": [
         {
-          "key": "all",
-          "scope": "The whole finding.",
+          "key": "comments",
+          "scope": "Eleven misplaced or stale comments in the office code.",
           "status": "open",
           "waitsOn": [],
           "history": [
             {
-              "at": "2026-09-17T15:33:57.152Z",
-              "event": "recorded"
+              "at": "2026-09-18T03:48:21.611Z",
+              "event": "recorded by migration 001-part-level-links"
+            }
+          ]
+        },
+        {
+          "key": "unused-fields",
+          "scope": "The unused board and drawer fields and the columns and subquery that feed them. An intentional work bundle: 190 (five board fields) and 191 (the drawer's services field) are distinct repairs done together.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-18T03:48:21.611Z",
+              "event": "recorded by migration 001-part-level-links"
+            }
+          ]
+        },
+        {
+          "key": "unused-helpers",
+          "scope": "The two unused helpers in serviceOrders.helpers.ts.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-18T03:48:21.611Z",
+              "event": "recorded by migration 001-part-level-links"
+            }
+          ]
+        },
+        {
+          "key": "dead-branches",
+          "scope": "The dead branches behind a constant that is always true.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-18T03:48:21.611Z",
+              "event": "recorded by migration 001-part-level-links"
+            }
+          ]
+        },
+        {
+          "key": "notify-options",
+          "scope": "The unreachable notify options.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-18T03:48:21.611Z",
+              "event": "recorded by migration 001-part-level-links"
             }
           ]
         }
@@ -5780,7 +6074,29 @@
         "evidence": "The cited family contains real code-only issues: AdminDashboard.tsx:497 constant sortable, OrderBoard.tsx unused declarations, OrderDetail.tsx:45 unused services, serviceOrders.helpers.ts unused exports, and orphan ServiceOrdersSection.tsx:74-77 comment.",
         "replacementOk": false,
         "replacementNote": "Do not certify the summary’s exact eleven/three counts: raw bucket4 itself identifies five unused board fields, and gives no complete eleven-comment list. Remove only enumerated, verified unused code; reader-facing defects are separately assessed."
-      }
+      },
+      "retiredParts": [
+        {
+          "key": "all",
+          "scope": "The whole finding.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-17T15:33:57.152Z",
+              "event": "recorded"
+            }
+          ],
+          "migratedTo": [
+            "comments",
+            "unused-fields",
+            "unused-helpers",
+            "dead-branches",
+            "notify-options"
+          ],
+          "retiredBy": "001-part-level-links"
+        }
+      ]
     },
     {
       "id": "188",
@@ -5802,7 +6118,11 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "canonical": {
+            "item": "187",
+            "part": "dead-branches"
+          }
         }
       ],
       "codex": {
@@ -5810,8 +6130,7 @@
         "evidence": "Same dead sortable branch already included in187/A79h; AdminDashboard.tsx:497 assigns true unconditionally, leaving the alternate header/search branches unreachable.",
         "replacementOk": true,
         "replacementNote": "Correct as written."
-      },
-      "canonical": "187"
+      }
     },
     {
       "id": "189",
@@ -5864,7 +6183,11 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "canonical": {
+            "item": "187",
+            "part": "unused-fields"
+          }
         }
       ],
       "codex": {
@@ -5872,8 +6195,7 @@
         "evidence": "Same unused board fields already included in187/A79h (raw bucket4 explicitly lists all five); the narrower finding corrects the summary’s three-versus-five count.",
         "replacementOk": true,
         "replacementNote": "Correct as written."
-      },
-      "canonical": "187"
+      }
     },
     {
       "id": "191",
@@ -5895,7 +6217,11 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "canonical": {
+            "item": "187",
+            "part": "unused-fields"
+          }
         }
       ],
       "codex": {
@@ -5903,8 +6229,7 @@
         "evidence": "Same unused OrderDetailData.services already included in187/A79h raw bucket4; the component renders its services prop instead.",
         "replacementOk": true,
         "replacementNote": "Correct as written."
-      },
-      "canonical": "187"
+      }
     },
     {
       "id": "192",
@@ -5926,7 +6251,11 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "canonical": {
+            "item": "187",
+            "part": "unused-helpers"
+          }
         }
       ],
       "codex": {
@@ -5934,8 +6263,7 @@
         "evidence": "Same unused money and STATUS_STYLE exports already included in187/A79h; the actual importers take the other helpers.",
         "replacementOk": true,
         "replacementNote": "Correct as written."
-      },
-      "canonical": "187"
+      }
     },
     {
       "id": "193",
@@ -5957,7 +6285,11 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "canonical": {
+            "item": "187",
+            "part": "comments"
+          }
         }
       ],
       "codex": {
@@ -5965,8 +6297,7 @@
         "evidence": "Same orphan serviceLabel docstring already counted in187/A79h, as this finding itself notes.",
         "replacementOk": true,
         "replacementNote": "Correct as written."
-      },
-      "canonical": "187"
+      }
     },
     {
       "id": "194",
@@ -5996,7 +6327,10 @@
         "evidence": "renewals.ts:148 uses NOTICE_DAYS=45; terms.md:48 requires notice 30–60 days before the cancellation deadline, which :54 places 30 days before renewal. Current notice is only15 days before that deadline.",
         "replacementOk": true,
         "replacementNote": "Change the job and email descriptions to60 days before renewal. This verifies the code mismatch without reopening the ruled Terms or disputing that automatic renewal exists."
-      }
+      },
+      "related": [
+        "212"
+      ]
     },
     {
       "id": "195",
@@ -6139,10 +6473,13 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "canonical": {
+            "item": "195",
+            "part": "all"
+          }
         }
       ],
-      "canonical": "195",
       "codex": {
         "status": "confirmed",
         "evidence": "The quoted retry promise remains at email.ts:166; renewals.ts:257–263 can promise another retry while :235 prevents it because the counter was not advanced on the first attempt. This item is already explicitly linked to195.",
@@ -6200,7 +6537,11 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "canonical": {
+            "item": "28",
+            "part": "all"
+          }
         }
       ],
       "codex": {
@@ -6208,8 +6549,7 @@
         "evidence": "Same missing automated monthly-proration mechanism and same Terms9(g) promise as item28; this separate email occurrence was not marked same defect as in findings-open.",
         "replacementOk": false,
         "replacementNote": "Neither absence of automation nor this email proves no manual billing can occur. Preserve the contractual monthly rate; the alternative wording can clarify manual administration, while replacing it with an annual fee would change the bargain."
-      },
-      "canonical": "28"
+      }
     },
     {
       "id": "202",
@@ -6231,10 +6571,13 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "canonical": {
+            "item": "63",
+            "part": "all"
+          }
         }
       ],
-      "canonical": "63",
       "codex": {
         "status": "disputed",
         "evidence": "email.ts:494 reads IRS Form2553 must be filed within2 months and15 days of the date on your filed Articles. IRS Instructions for Form2553, When To Make the Election and ItemE, tie the deadline to the tax year/election effective date; the first tax year uses the earliest ownership, assets or business date. Automatically substituting LLC effective date remains an oversimplification.",
@@ -6263,10 +6606,13 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "canonical": {
+            "item": "133",
+            "part": "all"
+          }
         }
       ],
-      "canonical": "133",
       "codex": {
         "status": "confirmed",
         "evidence": "email.ts:404–405 describes instructions for signing and mailing, while s-election.ts:238 expressly recommends fax and provides its instructions.",
@@ -6506,7 +6852,11 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "canonical": {
+            "item": "178",
+            "part": "ein-hint-2553"
+          }
         }
       ],
       "codex": {
@@ -6515,7 +6865,6 @@
         "replacementOk": false,
         "replacementNote": "The proposed target check fixes series EINs, but a company EIN also need not have a purchased S-election package. Mention Form2553 only when a matching company package exists."
       },
-      "canonical": "178",
       "correctedReplacement": "Codex adds: a company EIN with no S election package has no Form 2553 either; mention the form only when a matching package exists."
     },
     {
@@ -6541,13 +6890,15 @@
           ]
         }
       ],
-      "canonical": "194",
       "codex": {
         "status": "confirmed",
         "evidence": "routes-admin.ts:862 uses the package-upload day plus one year, while terms.md:46 calls it the anniversary date without identifying the event. The UI and code agree with each other, but the contract leaves the event ambiguous.",
         "replacementOk": false,
         "replacementNote": "The proposed fix is conditional, not a settled replacement, and the original effective date of an old converting LLC is unsuitable. Define anniversary as the start of this purchased agent term, or explicitly as the initial completed-package date, then calculate consistently."
-      }
+      },
+      "related": [
+        "194"
+      ]
     },
     {
       "id": "213",
@@ -7020,7 +7371,11 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "canonical": {
+            "item": "127",
+            "part": "all"
+          }
         }
       ],
       "codex": {
@@ -7029,7 +7384,6 @@
         "replacementOk": false,
         "replacementNote": "Use one shared label mapping imported by both client and server; editing only server/datetime.ts does not update the separate src/lib/datetime.ts mapping."
       },
-      "canonical": "127",
       "correctedReplacement": "Both label tables change together: src/lib/datetime.ts and server/datetime.ts."
     },
     {
@@ -7631,10 +7985,13 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "canonical": {
+            "item": "12",
+            "part": "all"
+          }
         }
       ],
-      "canonical": "12",
       "codex": {
         "status": "confirmed",
         "evidence": "Manual cover:15 says “Florida Uniform Protected Series Act”; Online Sunshine 2026 §605.2101 gives Uniform Protected Series Provisions, and §605.0101 gives Florida Revised Limited Liability Company Act.",
@@ -7662,10 +8019,13 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "canonical": {
+            "item": "240",
+            "part": "all"
+          }
         }
       ],
-      "canonical": "240",
       "codex": {
         "status": "confirmed",
         "evidence": "Manual:103 makes the approval rule non-variable, contrary to 2026 §605.2107(1)(i); §3.1 of each master retains unanimity. Already marked same defect as240, so not newly classified duplicate.",
@@ -7814,10 +8174,13 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "canonical": {
+            "item": "242",
+            "part": "all"
+          }
         }
       ],
-      "canonical": "242",
       "codex": {
         "status": "confirmed",
         "evidence": "Manual:72 calls an added series $25, omitting the $25 preparation component in facts:19 and the Manual's own $50-through-us examples. Already linked to242.",
@@ -7866,6 +8229,46 @@
       "waitsOn": [],
       "parts": [
         {
+          "key": "article8-location",
+          "scope": "\"the standing association rules that close the Article\": §8.5 does not close Article 8 — the same misstatement A96 (245) records.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-18T03:48:21.612Z",
+              "event": "recorded by migration 001-part-level-links"
+            }
+          ],
+          "canonical": {
+            "item": "245",
+            "part": "all"
+          }
+        },
+        {
+          "key": "nominee",
+          "scope": "\"never your personal name\" overstates §8.4; the documented nominee arrangement — the same overstatement A95 (244) records.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-18T03:48:21.612Z",
+              "event": "recorded by migration 001-part-level-links"
+            }
+          ],
+          "canonical": {
+            "item": "244",
+            "part": "all"
+          }
+        }
+      ],
+      "codex": {
+        "status": "confirmed",
+        "evidence": "Manual:130 says the rules close Article8 but §8.6 follows §8.5; the nominee qualification is also supported by §8.4. Already linked to245.",
+        "replacementOk": true,
+        "replacementNote": "Correct as written."
+      },
+      "retiredParts": [
+        {
           "key": "all",
           "scope": "The whole finding.",
           "status": "open",
@@ -7875,16 +8278,14 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "migratedTo": [
+            "article8-location",
+            "nominee"
+          ],
+          "retiredBy": "001-part-level-links"
         }
-      ],
-      "canonical": "245",
-      "codex": {
-        "status": "confirmed",
-        "evidence": "Manual:130 says the rules close Article8 but §8.6 follows §8.5; the nominee qualification is also supported by §8.4. Already linked to245.",
-        "replacementOk": true,
-        "replacementNote": "Correct as written."
-      }
+      ]
     },
     {
       "id": "257",
@@ -7940,13 +8341,15 @@
           ]
         }
       ],
-      "canonical": "118",
       "codex": {
         "status": "confirmed",
         "evidence": "new-series.ts:107 fills only PS-[N], whereas oa.ts:673–676 also adds the series' filed name to the detached Asset Schedule heading. Already linked to priorA50.",
         "replacementOk": true,
         "replacementNote": "Correct as written."
-      }
+      },
+      "related": [
+        "118"
+      ]
     },
     {
       "id": "259",
@@ -7968,10 +8371,13 @@
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
             }
-          ]
+          ],
+          "canonical": {
+            "item": "120",
+            "part": "title"
+          }
         }
       ],
-      "canonical": "120",
       "codex": {
         "status": "confirmed",
         "evidence": "new-series.ts:134 titles the stored consent New Protected Series, whereas the document and portal describe a consent with exhibit. Already linked to priorA52.",
@@ -9886,7 +10292,15 @@
       ]
     }
   ],
-  "rulings": [],
+  "rulings": [
+    {
+      "date": "2026-09-17",
+      "kind": "migration",
+      "text": "Second sightings link to a PART of their main record, not to the whole item; three item-level links become related-item notes; seven compound findings are split into the parts a batch can take separately (Codex's review of revision 2, C; Codex's corrections of the revision-3 plan, section 4).",
+      "migration": "001-part-level-links",
+      "migrationHash": "59443ece9cdd45cf81ffaef16846770514352f6ebd13cf6485a681169ac8bfcf"
+    }
+  ],
   "batches": [
     {
       "id": "0",
@@ -9931,6 +10345,25 @@
           "at": "2026-09-18T03:08:12.464Z",
           "event": "rejected by Adam",
           "note": "Adam, 17 Sep 2026: 'Reject 0, revision 2' (recorded by the acceptance hook, no reason given). Codex's review of d0e3689: 12 corrected, 7 partly, reproductions A-I (docs/audit/batches/0/codex-review-r2.md)."
+        }
+      ]
+    },
+    {
+      "id": "0",
+      "revision": 3,
+      "frozenHash": "36438422e8d9e034f29dd5f1193f976ccd365edc2d812e2de53459d4e74da313",
+      "status": "implemented",
+      "model": "claude-fable-5-1",
+      "base": "82abf541a6643981d93d41bc5d8b6da169897971",
+      "history": [
+        {
+          "at": "2026-09-18T03:50:58.805Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-18T03:50:58.823Z",
+          "event": "implemented"
         }
       ]
     }

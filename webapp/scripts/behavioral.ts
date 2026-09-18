@@ -17,6 +17,7 @@
  * truth, not on toasts.
  */
 import { chromium, type Page } from "playwright";
+import { isolateBrowser, guardedRoute, guardedContextRoute } from "./browser-isolation";
 import { buildPayload } from "../src/components/forms/florida-llc/buildPayload";
 import { memberRowIsBlank } from "../src/components/forms/florida-llc/validation";
 import type { FloridaLLCFormData } from "../src/components/forms/florida-llc/types";
@@ -217,7 +218,7 @@ async function checkAllBoxes(page: Page, excludeIds: string[] = []): Promise<voi
 
 async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; totalCents: number }> {
   let captured: { orderId: string; totalCents: number } | null = null;
-  await page.route("**/api/**", async (route) => {
+  await guardedRoute(page, "**/api/**", async (route) => {
     const url = new URL(route.request().url());
     const target = `${API}${url.pathname}${url.search}`;
     const resp = await fetch(target, {
@@ -798,15 +799,12 @@ async function main(): Promise<void> {
 
   const browser = await chromium.launch();
   // The walk is offline in the browser too, not only on the server: every
-  // request that is not to this machine is stopped and counted (the address
-  // lookup and web fonts are the known ones). Codex's review of the fix ledger.
-  const blockedRequests = new Set<string>();
-  const openPage = browser.newPage.bind(browser);
-  browser.newPage = async (...a: Parameters<typeof openPage>) => {
-    const p = await openPage(...a);
-    await p.route(/^https?:\/\/(?!localhost[:/]|127\.0\.0\.1[:/])/, (route) => { blockedRequests.add(new URL(route.request().url()).host); return route.abort(); });
-    return p;
-  };
+  // context this browser makes has service workers blocked and aborts every
+  // request that is not to this machine, before any handler below sees it —
+  // pages, popups and the Clients-tab context alike (scripts/browser-isolation.ts;
+  // Codex's reviews of the fix ledger, revisions 1 and 2). The address lookup
+  // and web fonts are the known ones stopped.
+  const { blocked: blockedRequests } = isolateBrowser(browser);
   const adminLogin = await fetch(`${API}/api/admin/login`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: "dev-admin" }) });
   const adminCookie = (adminLogin.headers.get("set-cookie") ?? "").split(";")[0];
 
@@ -934,7 +932,7 @@ async function main(): Promise<void> {
       const mint = await fetch(`${API}/api/dev/mint-reset-token`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) }).then((r) => r.json()) as { data?: { token?: string } };
       if (!mint.data?.token) throw new Error("no reset token for run D's client");
       await fetch(`${API}/api/auth/set-password`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: mint.data.token, password: "gate-pass-12345" }) });
-      await page.route("**/api/**", async (route) => {
+      await guardedRoute(page, "**/api/**", async (route) => {
         const url = new URL(route.request().url());
         const resp = await fetch(`${API}${url.pathname}${url.search}`, {
           method: route.request().method(),
@@ -999,7 +997,7 @@ async function main(): Promise<void> {
       if (!mint.data?.token) throw new Error("no reset token for the action-needed client");
       await fetch(`${API}/api/auth/set-password`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: mint.data.token, password: "gate-pass-12345" }) });
 
-      await page.route("**/api/**", async (route) => {
+      await guardedRoute(page, "**/api/**", async (route) => {
         const url = new URL(route.request().url());
         const resp = await fetch(`${API}${url.pathname}${url.search}`, {
           method: route.request().method(),
@@ -1470,7 +1468,7 @@ async function main(): Promise<void> {
       let genPostBody: string | null = null;
       let amendCaptured: { documentId?: string; title?: string; number?: number } | null = null;
       let amendCookie = "";
-      await page.route("**/api/**", async (route) => {
+      await guardedRoute(page, "**/api/**", async (route) => {
         const url = new URL(route.request().url());
         // Deterministic USPS answer: the journey must see the advisory strip
         // whether or not the offline API holds Smarty credentials.
@@ -1905,7 +1903,7 @@ async function main(): Promise<void> {
       if (!mint.data?.token) throw new Error("no reset token for run H's client");
       await fetch(`${API}/api/auth/set-password`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: mint.data.token, password: "gate-pass-12345" }) });
       let hGen: { generationId?: string } | null = null;
-      await page.route("**/api/**", async (route) => {
+      await guardedRoute(page, "**/api/**", async (route) => {
         const url = new URL(route.request().url());
         const resp = await fetch(`${API}${url.pathname}${url.search}`, {
           method: route.request().method(),
@@ -1988,7 +1986,7 @@ async function main(): Promise<void> {
     const page = await browser.newPage();
     try {
       const hOrderId = orderIds.get("H")!;
-      await page.route("**/api/**", async (route) => {
+      await guardedRoute(page, "**/api/**", async (route) => {
         const url = new URL(route.request().url());
         const resp = await fetch(`${API}${url.pathname}${url.search}`, {
           method: route.request().method(),
@@ -2065,7 +2063,7 @@ async function main(): Promise<void> {
       const mint = await fetch(`${API}/api/dev/mint-reset-token`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) }).then((r) => r.json()) as { data?: { token?: string } };
       if (!mint.data?.token) throw new Error("no reset token for run H's client");
       await fetch(`${API}/api/auth/set-password`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: mint.data.token, password: "gate-pass-12345" }) });
-      await page.route("**/api/**", async (route) => {
+      await guardedRoute(page, "**/api/**", async (route) => {
         const url = new URL(route.request().url());
         const resp = await fetch(`${API}${url.pathname}${url.search}`, {
           method: route.request().method(),
@@ -2106,7 +2104,7 @@ async function main(): Promise<void> {
       const mint = await fetch(`${API}/api/dev/mint-reset-token`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) }).then((r) => r.json()) as { data?: { token?: string } };
       if (!mint.data?.token) throw new Error("no reset token for the self-agent client");
       await fetch(`${API}/api/auth/set-password`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: mint.data.token, password: "gate-pass-12345" }) });
-      await page.route("**/api/**", async (route) => {
+      await guardedRoute(page, "**/api/**", async (route) => {
         const url = new URL(route.request().url());
         const resp = await fetch(`${API}${url.pathname}${url.search}`, {
           method: route.request().method(),
@@ -2139,7 +2137,7 @@ async function main(): Promise<void> {
   {
     const page = await browser.newPage();
     try {
-      await page.route("**/api/**", async (route) => {
+      await guardedRoute(page, "**/api/**", async (route) => {
         const url = new URL(route.request().url());
         const resp = await fetch(`${API}${url.pathname}${url.search}`, {
           method: route.request().method(),
@@ -2239,7 +2237,7 @@ async function main(): Promise<void> {
       const formed = await fetch(`${API}/api/admin/orders/${gOrderId}/formation-documents`, { method: "POST", headers: { Cookie: adminCookie }, body: fd });
       expect(formed.status === 200, "documents: run G's company is formed before its certificates arrive", await formed.text().catch(() => ""));
       {
-        await page.route("**/api/**", async (route) => {
+        await guardedRoute(page, "**/api/**", async (route) => {
           const url = new URL(route.request().url());
           const resp = await fetch(`${API}${url.pathname}${url.search}`, {
             method: route.request().method(),
@@ -2300,7 +2298,7 @@ async function main(): Promise<void> {
       const mint = await fetch(`${API}/api/dev/mint-reset-token`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) }).then((r) => r.json()) as { data?: { token?: string } };
       if (!mint.data?.token) throw new Error("no reset token for run G's client");
       await fetch(`${API}/api/auth/set-password`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: mint.data.token, password: "gate-pass-12345" }) });
-      await page.route("**/api/**", async (route) => {
+      await guardedRoute(page, "**/api/**", async (route) => {
         const url = new URL(route.request().url());
         const resp = await fetch(`${API}${url.pathname}${url.search}`, {
           method: route.request().method(),
@@ -2339,7 +2337,7 @@ async function main(): Promise<void> {
     console.log("\n▶ Conversion at the office (run E)");
     const page = await browser.newPage();
     try {
-      await page.route("**/api/**", async (route) => {
+      await guardedRoute(page, "**/api/**", async (route) => {
         const url = new URL(route.request().url());
         const resp = await fetch(`${API}${url.pathname}${url.search}`, {
           method: route.request().method(),
@@ -2384,7 +2382,7 @@ async function main(): Promise<void> {
     console.log("\n▶ Clients tab: companies and View portal");
     const ctx = await browser.newContext();
     try {
-      await ctx.route("**/api/**", async (route) => {
+      await guardedContextRoute(ctx, "**/api/**", async (route) => {
         const url = new URL(route.request().url());
         const resp = await fetch(`${API}${url.pathname}${url.search}`, {
           method: route.request().method(),
@@ -2571,7 +2569,7 @@ async function main(): Promise<void> {
     const page = await browser.newPage();
     try {
       const aId = orderIds.get("A")!;
-      await page.route("**/api/**", async (route) => {
+      await guardedRoute(page, "**/api/**", async (route) => {
         const url = new URL(route.request().url());
         const resp = await fetch(`${API}${url.pathname}${url.search}`, { method: route.request().method(), headers: { "Content-Type": "application/json" }, body: route.request().postDataBuffer() ?? undefined });
         await route.fulfill({ status: resp.status, contentType: "application/json", body: await resp.text() });
@@ -2680,7 +2678,7 @@ async function main(): Promise<void> {
   {
     const page = await browser.newPage();
     try {
-      await page.route("**/api/**", async (route) => {
+      await guardedRoute(page, "**/api/**", async (route) => {
         const url = new URL(route.request().url());
         const resp = await fetch(`${API}${url.pathname}${url.search}`, { method: route.request().method(), headers: { "Content-Type": "application/json" }, body: route.request().postData() ?? undefined });
         await route.fulfill({ status: resp.status, contentType: "application/json", body: await resp.text() });

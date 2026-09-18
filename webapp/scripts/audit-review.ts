@@ -3,7 +3,17 @@
  *
  *   cd webapp && bun run scripts/audit-review.ts <batch>              checks + package + site
  *   cd webapp && bun run scripts/audit-review.ts <batch> --no-serve   checks + package only
- *   cd webapp && bun run scripts/audit-review.ts --serve <batch>      the newest package's preserved site
+ *   cd webapp && bun run scripts/audit-review.ts --serve <batch> --package <id>
+ *                                                                     that package's preserved site
+ *   cd webapp && bun run scripts/audit-review.ts --serve <batch>      the package Adam's acceptance names
+ *
+ * Revision 3 (Codex's review of revision 2, H): every package has an
+ * IDENTITY — a random packageId, printed with the commit — and is never
+ * overwritten: a second run for the same commit is a second package, and an
+ * acceptance names exactly one. package.json carries `partial` (null for a
+ * full run) and the complete manifest of the kept site; a partial run is
+ * never announced as ready, and --serve verifies the site against the
+ * manifest before serving it.
  *
  * Revision 2 (Codex's review of revision 1, findings 5, 7, 11, 13). Revision 1
  * checked the working tree once and then tested, built and served whatever
@@ -25,10 +35,11 @@
  * The package is written outside the repository (~/.fpsllc/reviews/).
  */
 import { spawn } from "bun";
-import { mkdirSync, writeFileSync, readFileSync, existsSync, readdirSync, symlinkSync, rmSync, mkdtempSync, statSync } from "node:fs";
+import { mkdirSync, writeFileSync, readFileSync, existsSync, readdirSync, symlinkSync, mkdtempSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
-import { ROOT, REVIEWS, MANDATORY_CHECKS, git, gitBytes, sha256, type BatchFile, type Ledger } from "../../docs/audit/ledger-lib";
+import { randomBytes } from "node:crypto";
+import { ROOT, REVIEWS, MANDATORY_CHECKS, git, gitBytes, sha256, acceptances, standingAcceptance, resolvePackage, packageProblems, siteManifest, type BatchFile, type Ledger } from "../../docs/audit/ledger-lib";
 import { snapshot } from "../../docs/audit/publish-docs";
 import { startIsolatedStack, buildSite, SANITIZED } from "./isolated-stack";
 
@@ -45,14 +56,22 @@ const dropCheckouts = () => { for (const wt of worktrees.splice(0)) git(["worktr
 process.on("SIGINT", () => { dropCheckouts(); process.exit(130); });
 
 if (argv[0] === "--serve") {
-  const want = (argv[1] ?? "").toLowerCase();
-  const dirs = existsSync(REVIEWS) ? readdirSync(REVIEWS).filter((d) => d.toLowerCase().startsWith(`${want}-r`) && existsSync(join(REVIEWS, d, "site/index.html"))) : [];
-  const newest = dirs.sort((a, b) => statSync(join(REVIEWS, b)).mtimeMs - statSync(join(REVIEWS, a)).mtimeMs)[0];
-  if (!newest) { console.error(`no review package with a preserved site for batch "${argv[1]}"`); process.exit(1); }
-  const pkg = JSON.parse(readFileSync(join(REVIEWS, newest, "package.json"), "utf8")) as { commit: string; batch: string; revision: number };
+  const want = argv[1] ?? "";
+  const pick = argv.includes("--package") ? argv[argv.indexOf("--package") + 1] : null;
+  let found: ReturnType<typeof resolvePackage>;
+  if (pick) found = resolvePackage({ batch: want, packageId: pick });
+  else {
+    // No id given: only the package Adam's standing acceptance names is served.
+    const acc = acceptances().filter((a) => a.kind === "accept" && a.batch.toLowerCase() === want.toLowerCase() && a.commit).map((a) => standingAcceptance(a.commit as string, a.batch, a.revision ?? undefined).acc).filter(Boolean).pop();
+    found = acc ? resolvePackage({ acceptance: acc }) : { error: `no standing acceptance from Adam names a package of batch "${want}" — before acceptance, name the package you are reviewing:  --serve ${want} --package <id>` };
+  }
+  if ("error" in found) { console.error(`serve: REFUSED — ${found.error}`); process.exit(1); }
+  const bad = packageProblems(found);
+  if (bad.length) { console.error(`serve: REFUSED — ${bad.join("; ")}`); process.exit(1); }
+  const pkg = found.pkg;
   const wt = checkout(pkg.commit, "serve-commit");
-  console.log(`serving batch ${pkg.batch} revision ${pkg.revision}: the site preserved in the package, and an API checked out at ${pkg.commit}`);
-  const s = await startIsolatedStack({ webPort: 8199, cwd: join(wt, "webapp"), serveDir: join(REVIEWS, newest, "site") });
+  console.log(`serving batch ${pkg.batch} revision ${pkg.revision}, package ${pkg.packageId}: the site preserved in the package (${pkg.site.length} files, all verified against its manifest), and an API checked out at ${pkg.commit}`);
+  const s = await startIsolatedStack({ webPort: 8199, cwd: join(wt, "webapp"), serveDir: join(found.dir, "site") });
   console.log(`\nThe review site is open at ${s.web} — press Ctrl-C to close it.`);
   await new Promise(() => {});
 }
@@ -73,8 +92,9 @@ const ledger = JSON.parse(readFileSync(join(WT, "docs/audit/ledger.json"), "utf8
 const notDone = batch.items.filter((bi) => ledger.items.find((i) => i.id === bi.id)?.parts.find((p) => p.key === bi.part)?.status !== "implemented");
 if (notDone.length) { dropCheckouts(); console.error(`review: not every item is recorded as implemented in the commit: ${notDone.map((x) => x.id).join(", ")}`); process.exit(1); }
 
-const dir = join(REVIEWS, `${id}-r${batch.revision}-${commit}`);
-rmSync(dir, { recursive: true, force: true });
+const packageId = randomBytes(6).toString("hex");
+const dir = join(REVIEWS, `${id}-r${batch.revision}-${commit}-${packageId}`);
+if (existsSync(dir)) { dropCheckouts(); console.error("review: a package with this identity already exists; run again"); process.exit(1); }
 mkdirSync(join(dir, "checks"), { recursive: true });
 const dropboxBefore = snapshot();
 const runId = `${id}-r${batch.revision}-${Date.now()}`;
@@ -114,7 +134,7 @@ if (!only || only.includes("server")) {
 await run("walk", ["bun", "run", "behavioral"], { env: { CHECK_RESULTS_FILE: walkResults } });
 {
   const extraFile = join(WT, `docs/audit/batches/${id}/extra-assertions.json`);
-  await run("assertions", ["bun", "run", "scripts/audit-assert.ts", "--results", serverResults, "--results", walkResults, "--commit", commit, ...(existsSync(extraFile) ? ["--extra", extraFile] : [])]);
+  await run("assertions", ["bun", "run", "scripts/audit-assert.ts", "--results", serverResults, "--results", walkResults, "--commit", commit, "--run", runId, ...(existsSync(extraFile) ? ["--extra", extraFile] : [])]);
 }
 
 /* A behaviour fix: its check must FAIL on the tree before the fix — at its own label. */
@@ -181,10 +201,12 @@ const docs = readdirSync(join(WT, "docs/word")).filter((f) => f.endsWith(".docx"
 const required = [...new Set([...MANDATORY_CHECKS, ...batch.requiredChecks, ...(named.length ? ["red-before-fix"] : []), "checkout-unchanged"])];
 writeFileSync(join(dir, "diff.patch"), diff);
 writeFileSync(join(dir, "files.txt"), git(["diff", "--stat", "--no-renames", live, commit]));
-writeFileSync(join(dir, "package.json"), JSON.stringify({ batch: id, revision: batch.revision, base: live, commit, diffSha: sha256(diff), createdAt: new Date().toISOString(), runId, partial: only, required, checks, docs }, null, 2));
+const site = only ? [] : siteManifest(join(dir, "site"));
+writeFileSync(join(dir, "package.json"), JSON.stringify({ batch: id, revision: batch.revision, base: live, commit, packageId, diffSha: sha256(diff), createdAt: new Date().toISOString(), runId, partial: only, required, checks, docs, site }, null, 2));
 const failed = required.filter((n) => checks.find((c) => c.name === n)?.exit !== 0);
-console.log(`\nreview package: ${dir}`);
-console.log(failed.length ? `NOT READY for Adam: ${failed.join(", ")} did not pass${only ? " (a partial run can never be released)" : ""}.` : `Ready for Adam. To accept exactly this version, his whole message is:  Accept ${id}, revision ${batch.revision}, ${commit.slice(0, 7)}`);
+console.log(`\nreview package: ${dir}\npackage id: ${packageId}   commit: ${commit}`);
+if (only) console.log(`PARTIAL RUN (${only.join(", ")}): this package can never be accepted or released; it is for looking at those checks only.`);
+else console.log(failed.length ? `NOT READY for Adam: ${failed.join(", ")} did not pass.` : `Ready for Adam. To accept exactly this version, his whole message is:  Accept ${id}, revision ${batch.revision}, ${commit.slice(0, 7)}\n(if more than one package exists for that commit, the acceptance names this one:  bun run docs/audit/accept.ts accept ${id} ${batch.revision} ${commit.slice(0, 7)} --package ${packageId})`);
 if (failed.length || argv.includes("--no-serve")) { dropCheckouts(); process.exit(failed.length ? 1 : 0); }
 const s = await startIsolatedStack({ webPort: 8199, cwd: W, serveDir: join(dir, "site") });
 console.log(`\nThe review site is open at ${s.web}: the build kept in the package, and an API checked out at ${commit.slice(0, 7)} — press Ctrl-C to close it.`);

@@ -3409,3 +3409,48 @@ while auditing old text, because auditing was run as artifact-comparison —
 and a defect that matches every artifact and offends only the audience
 survives any number of comparisons. P27.
 
+
+## Entries from P92 on are appended here, after the Process section
+
+The release gate (docs/audit/release-check.ts, rule R1) treats this file as
+append-only: a records-only push may add after everything already written and
+may not delete or change anything above. So from here on, new entries go at
+the end of the file, not before the Process section.
+
+## P92 — Three revisions of one batch, each checked only by its author before Adam saw it
+
+### THE FAILURE
+
+Adam, 17 Sep 2026: "Give me a text box with your revised plan so I can give
+it to codex to review. Do that every time. This is the third revision because
+you can't get it right. You can't be trusted. Codex needs to review and
+approve all of your plans."
+
+Batch zero was built twice and rejected twice, and each time Codex found real
+holes on the first pass: 19 findings in revision 1 (180623b), then 7 partly
+corrected and 9 new reproductions in revision 2 (d0e3689). Both times the plan
+for the next revision went from me to Adam for Go, in prose addressed to him,
+and Codex saw the work only after it was built. Adam had to ask for a text
+box for Codex once on 17 September, and then had to ask again and make it a
+standing rule. The cost is his: two builds, two Codex reviews and two
+rejections that a reviewed plan would have shortened, and the trust that a
+third attempt does not restore.
+
+### WHY IT HAPPENED
+
+I treated Codex as a reviewer of built things, not of plans. The loop that
+decides what gets built ran between Adam and me alone, so the plan was checked
+by the same author who would build it — the exact fault the ledger exists to
+remove — and I did not see it because a plan feels like a promise rather than
+an artifact, and I check artifacts. I also write for the person in front of
+me: a plan for Adam came out as prose to Adam, and when he asked for a
+reviewer's copy I produced one that time and went back to prose the next,
+because "give me a text box" registered as a request about that message and
+not as a rule about my process. He had to state the rule himself.
+
+### FIXED BY
+
+Every plan is issued as a self-contained text box for Codex, before Go, and
+nothing is built until Codex has reviewed it. The revision-3 plan was the
+first: Codex corrected it twice and approved it with five implementation
+details before Adam's Go (docs/audit/batches/0/codex-plan-review-r3.md).

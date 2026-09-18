@@ -3,20 +3,38 @@
  * push hook (.githooks/pre-push — Claude, Codex or a terminal alike) and the
  * Dropbox copy (docs/audit/publish-docs.ts).
  *
- * RECORDS ONLY. A push made only of record files (FAILURES.md, the ledger,
- * rulings, batch folders) passes without acceptance — but only if it is
- * nothing more than records. It FAILS CLOSED otherwise (Codex's review of
- * revision 1, finding 1): the ledger may not disappear; no item or batch
- * history may be rewritten; no batch file may change from Adam's Go onward;
- * and an accepted fix's assertions may not change or be reopened. A push
- * that does any of those is treated as a product change and needs acceptance.
+ * RECORDS ONLY. A push made only of record files passes without acceptance —
+ * but only if it obeys the records rules, each of which FAILS CLOSED (Codex's
+ * reviews of revisions 1 and 2):
+ *   R1 FAILURES.md is append-only: its prior content is an unchanged prefix
+ *      and the addition comes after it. That is all this proves — the file
+ *      is read by no script and controls nothing, and what an appended entry
+ *      says is not checked. A narrow, informational exception, stated as such.
+ *   R2 docs/audit/findings-open.md equals what the ledger in the same push
+ *      renders to.
+ *   R3 docs/audit/rulings.md is an audit control (a ruling there suppresses
+ *      findings): a line may be added only if it carries a ruling Adam
+ *      recorded himself (accept.ts ruling, or his whole message
+ *      "Ruling <item>: <text>"); nothing may be removed or changed.
+ *   R4 docs/audit/ledger.json obeys every invariant in strict mode: no
+ *      protected field changes except by a migration Adam approved by
+ *      record; batches move only by the transition table, with his record
+ *      for the events that stand for his decision; an accepted fix is never
+ *      weakened or reopened.
+ *   R5 docs/audit/batches/<id>/: batch.json is replaced only by the valid
+ *      next revision; every revision's snapshot is retained and matches its
+ *      frozen hash. batch.md, evidence/* and codex-*.md are informational.
+ *   R6 Nothing else is a record path (ledger-lib.ts, RECORD_PATHS).
+ * A push that breaks a rule is treated as a product change and needs
+ * acceptance.
  *
  * EVERYTHING ELSE is a product change, audit or not, and is refused unless:
- *   - Adam accepted this exact batch, revision and FULL commit, and has not
- *     rejected it since;
- *   - the review package he was shown is for this commit, was cut from what
- *     is live now (so nothing unreviewed rides along and main has not moved),
- *     and the complete difference being pushed hashes to the one he reviewed;
+ *   - Adam accepted this exact batch, revision and FULL commit, naming the
+ *     review package, and has not rejected it since;
+ *   - that package exists, is a full run, is for this commit, was cut from
+ *     what is live now (so nothing unreviewed rides along and main has not
+ *     moved), its complete difference hashes to the one being pushed, and
+ *     the site kept in it is exactly its manifest;
  *   - every MANDATORY check, plus whatever the batch added, ran for this
  *     commit and passed — missing or skipped counts as failed, and a batch
  *     cannot shorten the mandatory list;
@@ -30,34 +48,56 @@
  *   bun run docs/audit/release-check.ts --range <live> <pushing>
  */
 import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import {
-  FROZEN_STATES, MANDATORY_CHECKS, git, gitBytes, sha256, loadLedger, ledgerRegressions, frozenHashOf, isRecordPath,
-  standingAcceptance, packageDir, type BatchFile,
+  MANDATORY_CHECKS, git, gitBytes, sha256, loadLedger, ledgerRegressions, frozenFileProblems, linkProblems, isRecordPath, readAt,
+  standingAcceptance, resolvePackage, packageProblems, rulingRecords, type BatchFile,
 } from "./ledger-lib";
-
-export interface ReviewPackage {
-  batch: string; revision: number; base: string; commit: string; diffSha: string; createdAt: string;
-  required: string[];
-  checks: { name: string; command: string; exit: number | null; skipped: boolean; log: string }[];
-  docs: { path: string; sha: string }[];
-}
+import { renderList } from "./ledger-print";
 
 const ZERO = /^0+$/;
-const ledgerAt = (rev: string) => git(["show", `${rev}:docs/audit/ledger.json`], { allowFail: true });
 
-/** What a push may not do to the records, whoever accepted what. */
-function recordProblems(live: string, pushing: string, strict: boolean): string[] {
-  const before = ledgerAt(live), after = ledgerAt(pushing);
-  if (!before) return [];
-  if (!after) return ["docs/audit/ledger.json is missing from what is being pushed — the ledger existed and is gone"];
-  const why = ledgerRegressions(loadLedger(before), loadLedger(after), { strict });
-  const afterLedger = loadLedger(after);
-  for (const b of loadLedger(before).batches.filter((x) => FROZEN_STATES.includes(x.status))) {
-    if (afterLedger.batches.some((x) => x.id === b.id && x.revision > b.revision)) continue; // superseded by a later revision
-    if (afterLedger.batches.find((x) => x.id === b.id && x.revision === b.revision)?.status === "rejected") continue;
-    const t = git(["show", `${pushing}:docs/audit/batches/${b.id}/batch.json`], { allowFail: true });
-    if (!t || frozenHashOf(JSON.parse(t) as BatchFile) !== b.frozenHash) why.push(`batch ${b.id} r${b.revision} is ${b.status}: its batch file was changed or removed — a changed batch is the next revision, approved again`);
+/** What a push may not do to the records, whoever accepted what (R1–R5). */
+function recordProblems(live: string, pushing: string, strict: boolean, files: string[]): string[] {
+  const readL = readAt(live), readP = readAt(pushing);
+  const why: string[] = [];
+
+  /* R4, R5 — the ledger and the batch files */
+  const before = readL("docs/audit/ledger.json"), after = readP("docs/audit/ledger.json");
+  if (before && after === null) why.push("docs/audit/ledger.json is missing from what is being pushed — the ledger existed and is gone");
+  if (after !== null) {
+    const afterLedger = loadLedger(after);
+    if (before) why.push(...ledgerRegressions(loadLedger(before), afterLedger, { strict, read: readP, external: "required" }));
+    else why.push(...linkProblems(afterLedger));
+    why.push(...frozenFileProblems(afterLedger, readP));
+    /* R2 */
+    if (files.includes("docs/audit/findings-open.md") || files.includes("docs/audit/ledger.json")) {
+      if (readP("docs/audit/findings-open.md") !== renderList(afterLedger)) why.push("docs/audit/findings-open.md is not what the ledger being pushed renders to — it is generated, never edited");
+    }
+  }
+  if (!strict) return why;
+
+  /* R1 — FAILURES.md: the prior content is an unchanged prefix */
+  if (files.includes("FAILURES.md")) {
+    const was = readL("FAILURES.md") ?? "", is = readP("FAILURES.md");
+    if (is === null) why.push("FAILURES.md was deleted");
+    else if (!is.startsWith(was)) {
+      const wl = was.split("\n"), il = is.split("\n");
+      let k = 0; while (k < wl.length && k < il.length && wl[k] === il[k]) k++;
+      why.push(`FAILURES.md: its prior content is not an unchanged prefix of the new file (first difference at line ${k + 1}${k < wl.length ? `: "${wl[k].slice(0, 80)}" was there` : ""}) — the file is append-only; an entry is added after everything already written, and nothing already written is deleted or changed in the middle`);
+    }
+  }
+
+  /* R3 — rulings.md: only lines Adam ruled may be added; nothing removed */
+  if (files.includes("docs/audit/rulings.md")) {
+    const was = (readL("docs/audit/rulings.md") ?? "").split("\n"), is = (readP("docs/audit/rulings.md") ?? "").split("\n");
+    const removed = was.filter((l) => l.trim() && !is.includes(l));
+    const added = is.filter((l) => l.trim() && !was.includes(l));
+    if (removed.length) why.push(`docs/audit/rulings.md: ${removed.length} line(s) removed or changed — a ruling is never edited as records only: "${removed[0].slice(0, 100)}"`);
+    const records = rulingRecords().filter((r) => r.kind === "ruling");
+    for (const line of added) {
+      const hit = records.some((r) => (r.text ?? "").trim() !== "" && line.includes((r.text ?? "").trim()));
+      if (!hit) why.push(`docs/audit/rulings.md: a line was added that carries no ruling Adam recorded (his whole message "Ruling <item>: <text>", or accept.ts ruling) — rulings.md is an audit control: "${line.slice(0, 100)}"`);
+    }
   }
   return why;
 }
@@ -66,25 +106,26 @@ export function checkRange(live: string, pushing: string): { ok: boolean; why: s
   const files = git(["diff", "--name-only", "--no-renames", live, pushing]).split("\n").filter(Boolean);
   if (files.length === 0) return { ok: true, why: [], note: "nothing changes" };
 
-  let weakened: string[] = [];
+  let broken: string[] = [];
   if (files.every(isRecordPath)) {
-    weakened = recordProblems(live, pushing, true);
-    if (weakened.length === 0) return { ok: true, why: [], note: `records only (${files.length} file(s)) — no acceptance needed` };
-    // Not "only records": it removes or weakens something. Adam's acceptance is needed, like any product change.
+    broken = recordProblems(live, pushing, true, files);
+    if (broken.length === 0) return { ok: true, why: [], note: `records only (${files.length} file(s)) — no acceptance needed` };
+    // Not "only records": it breaks a records rule. Adam's acceptance is needed, like any product change.
   }
 
   const why: string[] = [];
   const product = files.filter((f) => !isRecordPath(f));
   const { acc: mine, why: noAcc } = standingAcceptance(pushing);
   if (!mine) {
-    why.push(...weakened.map((w) => `not a records-only push: ${w}`));
-    why.push(`${noAcc}. ${product.length ? `This push changes ${product.length} product or control file(s) (${product.slice(0, 4).join(", ")}${product.length > 4 ? ", …" : ""}).` : "This push weakens the records."} Go authorizes the work; release needs the whole message "Accept <batch>, revision <n>, ${pushing.slice(0, 7)}".`);
+    why.push(...broken.map((w) => `not a records-only push: ${w}`));
+    why.push(`${noAcc}. ${product.length ? `This push changes ${product.length} product or control file(s) (${product.slice(0, 4).join(", ")}${product.length > 4 ? ", …" : ""}).` : "This push breaks a records rule."} Go authorizes the work; release needs the whole message "Accept <batch>, revision <n>, ${pushing.slice(0, 7)}".`);
     return { ok: false, why, note: "" };
   }
 
-  const dir = packageDir(mine.batch, mine.revision as number, pushing);
-  if (!dir) { why.push(`no review package for batch ${mine.batch} r${mine.revision} at ${pushing.slice(0, 7)} — the review command builds it, with the checks, before Adam is asked`); return { ok: false, why, note: "" }; }
-  const pkg = JSON.parse(readFileSync(join(dir, "package.json"), "utf8")) as ReviewPackage;
+  const found = resolvePackage({ acceptance: mine });
+  if ("error" in found) { why.push(`${found.error} — the review command builds a package, with the checks, before Adam is asked; an acceptance names that one package`); return { ok: false, why, note: "" }; }
+  const { pkg } = found;
+  why.push(...packageProblems(found));
   if (pkg.commit !== pushing) why.push(`the review package is for ${pkg.commit.slice(0, 7)}, the push is ${pushing.slice(0, 7)} — a change after acceptance voids it`);
   if (pkg.base !== live) why.push(`Adam reviewed a change cut from ${pkg.base.slice(0, 7)}; what is live is ${live.slice(0, 7)} — main has moved, or other commits would ride along`);
   if (sha256(git(["diff", "--no-renames", live, pushing])) !== pkg.diffSha) why.push("the complete difference being pushed is not the one in the package Adam reviewed");
@@ -105,8 +146,8 @@ export function checkRange(live: string, pushing: string): { ok: boolean; why: s
     if (!bytes) why.push(`${d.path}: reviewed, but not in the commit`);
     else if (sha256(bytes) !== d.sha) why.push(`${d.path}: not byte-for-byte the document Adam reviewed`);
   }
-  why.push(...recordProblems(live, pushing, false));
-  return { ok: why.length === 0, why, note: `accepted by Adam: batch ${mine.batch}, revision ${mine.revision}, commit ${pushing.slice(0, 7)} (${mine.source}, ${mine.at.slice(0, 16)})` };
+  why.push(...recordProblems(live, pushing, false, files));
+  return { ok: why.length === 0, why, note: `accepted by Adam: batch ${mine.batch}, revision ${mine.revision}, commit ${pushing.slice(0, 7)}, package ${mine.packageId} (${mine.source}, ${mine.at.slice(0, 16)})` };
 }
 
 if (import.meta.main) {

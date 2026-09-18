@@ -1,0 +1,7 @@
+{
+  "ordinary": "failed:Failed to fetch sink not reached",
+  "contextPage": "failed:Failed to fetch sink not reached",
+  "popup": "popup opened, sink not reached",
+  "apiHandler": "failed:Failed to fetch sink not reached; handler did not run",
+  "blocked": "stopped: probe.invalid"
+}

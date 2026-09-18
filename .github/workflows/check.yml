@@ -20,7 +20,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
+      # Full history: the fix ledger's guard compares the ledger being pushed
+      # with the ledger at the commit it replaces.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: oven-sh/setup-bun@v2
         with:
@@ -44,14 +48,29 @@ jobs:
         working-directory: webapp
         env:
           CHECK_RESULTS_FILE: /tmp/server-results.jsonl
+          CHECK_COMMIT: ${{ github.sha }}
+          CHECK_RUN_ID: ${{ github.run_id }}-${{ github.run_attempt }}
         run: bun run check
 
-      # The fix ledger's guard (docs/audit): every accepted fix replayed against
-      # the files, the ledger's history append-only, a batch inside its declared
-      # scope. It does NOT check Adam's acceptance of a release — nothing on
-      # GitHub does; that is the push hook on his Mac, and it is procedural.
-      - name: The fix ledger's guard
-        run: bun run docs/audit/guard.ts
+      # The fix ledger's guard (docs/audit): the ledger at this commit against
+      # the ledger at the commit it replaces — on a push, the ref's previous
+      # tip; on a pull request, the base branch's tip; on a brand-new branch,
+      # origin/main's tip, reported as such. If that earlier commit cannot be
+      # read, the step FAILS and says so; it never substitutes HEAD^.
+      # It does NOT check Adam's acceptance, rejection, ruling or migration
+      # records — those are on his Mac, and the local gates read them; nothing
+      # on GitHub does.
+      - name: The fix ledger's guard, against the ledger being replaced
+        env:
+          BEFORE: ${{ github.event.before }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          if [ -n "$BASE" ]; then before="$BASE"; echo "pull request: comparing with the base branch at $before"
+          elif [ -n "$BEFORE" ] && ! echo "$BEFORE" | grep -Eq '^0+$'; then before="$BEFORE"; echo "push: comparing with the ref's previous tip $before"
+          else before="$(git rev-parse origin/main)"; echo "new branch: comparing with origin/main at $before"; fi
+          if ! git cat-file -e "$before^{commit}" 2>/dev/null; then echo "the earlier commit $before is not available here — the ledger's transition check could not run"; exit 1; fi
+          bun run docs/audit/guard.ts --against "$before..$HEAD_SHA"
 
       # The behavioral gate (P52): a real Chromium buys every entity variation
       # the site sells — new + conversion, LLC + PLLC, member- + manager-
@@ -67,13 +86,16 @@ jobs:
         working-directory: webapp
         env:
           CHECK_RESULTS_FILE: /tmp/walk-results.jsonl
+          CHECK_COMMIT: ${{ github.sha }}
+          CHECK_RUN_ID: ${{ github.run_id }}-${{ github.run_attempt }}
         run: bun run behavioral
 
       # Pages, generated documents and named behaviour checks recorded by
-      # accepted fixes. A named check missing from the results counts as failed.
+      # accepted fixes. A named check missing from the results counts as failed,
+      # and a result counts only from this commit and this run.
       - name: Replay the accepted fixes' assertions
         working-directory: webapp
-        run: bun run scripts/audit-assert.ts --results /tmp/server-results.jsonl --results /tmp/walk-results.jsonl
+        run: bun run scripts/audit-assert.ts --results /tmp/server-results.jsonl --results /tmp/walk-results.jsonl --commit ${{ github.sha }} --run ${{ github.run_id }}-${{ github.run_attempt }}
 
       - name: Server log on failure
         if: failure()
