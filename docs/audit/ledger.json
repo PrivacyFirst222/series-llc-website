@@ -6177,14 +6177,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T15:40:37.480Z",
+              "event": "assigned",
+              "batch": "05",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T15:56:45.786Z",
+              "event": "implemented",
+              "batch": "05",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "05",
+          "fix": {
+            "batch": "05",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch05 173: account label reflects password state"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -6207,14 +6234,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T15:40:37.480Z",
+              "event": "assigned",
+              "batch": "05",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T15:56:45.786Z",
+              "event": "implemented",
+              "batch": "05",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "05",
+          "fix": {
+            "batch": "05",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch05 174: email history describes provider acceptance and limit"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -6237,14 +6291,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T15:40:37.480Z",
+              "event": "assigned",
+              "batch": "05",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T15:56:45.786Z",
+              "event": "implemented",
+              "batch": "05",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "05",
+          "fix": {
+            "batch": "05",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch05 175: filing refusals describe status accurately"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -6267,14 +6348,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T15:40:37.480Z",
+              "event": "assigned",
+              "batch": "05",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T15:56:45.786Z",
+              "event": "implemented",
+              "batch": "05",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "05",
+          "fix": {
+            "batch": "05",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch05 176: certificate errors appear beside certificates"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -6297,14 +6405,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T15:40:37.480Z",
+              "event": "assigned",
+              "batch": "05",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T15:56:45.786Z",
+              "event": "implemented",
+              "batch": "05",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "05",
+          "fix": {
+            "batch": "05",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch05 177: Articles number validation matches the server"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -6339,38 +6474,119 @@
         {
           "key": "s-election-date-row",
           "scope": "The S election date row no longer says \"entered by the client\" after a correction.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-18T03:48:21.611Z",
               "event": "recorded by migration 001-part-level-links"
+            },
+            {
+              "at": "2026-09-19T15:40:37.480Z",
+              "event": "assigned",
+              "batch": "05",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T15:56:45.786Z",
+              "event": "implemented",
+              "batch": "05",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "05",
+          "fix": {
+            "batch": "05",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch05 178:s-election-date-row: corrected dates have neutral labels"
+              }
+            ]
+          }
         },
         {
           "key": "series-uploaded-text",
           "scope": "The series text no longer says \"once … uploaded\" inside the dialog that does the uploading.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-18T03:48:21.611Z",
               "event": "recorded by migration 001-part-level-links"
+            },
+            {
+              "at": "2026-09-19T15:40:37.480Z",
+              "event": "assigned",
+              "batch": "05",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T15:56:45.786Z",
+              "event": "implemented",
+              "batch": "05",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "05",
+          "fix": {
+            "batch": "05",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch05 178:series-uploaded-text: series instructions describe this upload"
+              }
+            ]
+          }
         },
         {
           "key": "typed-ein-survives",
           "scope": "A typed EIN does not survive closing the dialog.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-18T03:48:21.611Z",
               "event": "recorded by migration 001-part-level-links"
+            },
+            {
+              "at": "2026-09-19T15:40:37.480Z",
+              "event": "assigned",
+              "batch": "05",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T15:56:45.786Z",
+              "event": "implemented",
+              "batch": "05",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "05",
+          "fix": {
+            "batch": "05",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch05 178:typed-ein-survives: abandoned EIN drafts are cleared"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -6472,14 +6688,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T15:40:37.480Z",
+              "event": "assigned",
+              "batch": "05",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T15:56:45.786Z",
+              "event": "implemented",
+              "batch": "05",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "05",
+          "fix": {
+            "batch": "05",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch05 180: regeneration explains uploaded-manual replacement"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -6502,14 +6745,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T15:40:37.480Z",
+              "event": "assigned",
+              "batch": "05",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T15:56:45.786Z",
+              "event": "implemented",
+              "batch": "05",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "05",
+          "fix": {
+            "batch": "05",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch05 181: board wording matches counts search and status"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -6653,14 +6923,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T15:40:37.480Z",
+              "event": "assigned",
+              "batch": "05",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T15:56:45.786Z",
+              "event": "implemented",
+              "batch": "05",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "05",
+          "fix": {
+            "batch": "05",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch05 185: manual upload requires an edition"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -7942,14 +8239,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T15:40:37.480Z",
+              "event": "assigned",
+              "batch": "05",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T15:56:45.786Z",
+              "event": "implemented",
+              "batch": "05",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "05",
+          "fix": {
+            "batch": "05",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch05 219: default manual exists before welcome and portal use"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -10113,14 +10437,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T15:40:37.480Z",
+              "event": "assigned",
+              "batch": "05",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T15:56:45.786Z",
+              "event": "implemented",
+              "batch": "05",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "05",
+          "fix": {
+            "batch": "05",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch05 N1.13: paid setup resumes without duplicate services"
+              }
+            ]
+          }
         }
       ]
     },
@@ -10137,14 +10488,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T15:40:37.480Z",
+              "event": "assigned",
+              "batch": "05",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T15:56:45.786Z",
+              "event": "implemented",
+              "batch": "05",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "05",
+          "fix": {
+            "batch": "05",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch05 N1.14: failed replacement preserves the prior Statement"
+              }
+            ]
+          }
         }
       ]
     },
@@ -10161,14 +10539,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T15:40:37.480Z",
+              "event": "assigned",
+              "batch": "05",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T15:56:45.786Z",
+              "event": "implemented",
+              "batch": "05",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "05",
+          "fix": {
+            "batch": "05",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/server/routes-portal.ts",
+                "text": "  const stored = await putFile(\n    `${title.replace(/[^\\w-]+/g, \"_\")}_${stampForFilename()}.pdf`,\n    buf,\n    \"application/pdf\",\n    true,\n  );\n  // The package belongs to the company the order was placed for (Adam,\n  // 7 Sep 2026): without it, it showed under every tab of the account.\n  const docRows = await db.query<{ id: string }>(\n    `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)\n     VALUES ($1, $5, 'package', $2, $3, 'application/pdf', $4, $6) RETURNING id`,\n    [so.client_id, title, stored.storageKey, stored.sizeBytes, companyId, JSON.stringify({sensitive:true,serviceOrderId:so.id})],\n  );\n  merged.documentId = docRows[0].id;\n\n  // fulfilled_at starts the two-week clock, and a re-edit must not extend it.\n  await db.query(\n    `UPDATE service_orders\n        SET details = $1, ein_secret = $2, status = 'fulfilled',\n            fulfilled_at = COALESCE(fulfilled_at, now())\n      WHERE id = $3`,\n    [JSON.stringify(merged), encryptSecret(JSON.stringify(ssns)), so.id],\n  );\n  if (args.priorDocumentId) await requestDocumentDeletion(args.priorDocumentId, so.client_id);\n"
+              }
+            ]
+          }
         }
       ]
     },
@@ -11252,14 +11657,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T15:40:37.480Z",
+              "event": "assigned",
+              "batch": "05",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T15:56:45.786Z",
+              "event": "implemented",
+              "batch": "05",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "05",
+          "fix": {
+            "batch": "05",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch05 N3.08: completion waits for service information"
+              }
+            ]
+          }
         }
       ]
     },
@@ -12038,6 +12470,25 @@
         },
         {
           "at": "2026-09-19T14:28:06.691Z",
+          "event": "implemented"
+        }
+      ]
+    },
+    {
+      "id": "05",
+      "revision": 1,
+      "frozenHash": "43a4aa477e5e5beece6d99925a0390f9407d806c459ea1f5ed1831ec653c48b5",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "ef1f5d75620891ec94004a96a24732924546160b",
+      "history": [
+        {
+          "at": "2026-09-19T15:40:37.480Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-19T15:56:45.786Z",
           "event": "implemented"
         }
       ]

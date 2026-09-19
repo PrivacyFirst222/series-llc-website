@@ -490,6 +490,9 @@ const MIGRATIONS: { id: number; name: string; statements: string[] }[] = [
     `CREATE TABLE IF NOT EXISTS document_deletions (storage_key text PRIMARY KEY, document_id uuid, mirror_path text, requested_at timestamptz NOT NULL DEFAULT now(), completed_at timestamptz, error text)`,
     `CREATE TABLE IF NOT EXISTS backup_progress (id text PRIMARY KEY, started_at timestamptz, completed_at timestamptz, lease_until timestamptz, cursor text, error text)`,
   ] },
+  { id: 14, name: "resumable-formation-setup", statements: [
+    `ALTER TABLE orders ADD COLUMN IF NOT EXISTS fulfillment_completed_at timestamptz`,
+  ] },
   // Append future migrations here with the next id. Never edit an entry.
 ];
 

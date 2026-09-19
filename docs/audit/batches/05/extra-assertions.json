@@ -1,0 +1,7 @@
+[
+  {
+    "kind": "check",
+    "suite": "server",
+    "label": "batch05 N1.15: S package replacement failures preserve the retained copy"
+  }
+]

@@ -46,10 +46,11 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
   const upload = useMutation({
     mutationFn: async () => {
       if (!file) throw new Error("Choose a PDF first.");
+      if (!edition.trim()) throw new Error("Enter the edition label before publishing the manual.");
       const fd = new FormData();
       fd.set("file", file);
       fd.set("title", "Series LLC Owner's Manual");
-      fd.set("edition", edition || new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" }));
+      fd.set("edition", edition.trim());
       const res = await fetch("/api/admin/library/owners-manual", {
         method: "POST",
         body: fd,
@@ -125,13 +126,13 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
           <span className="text-xs text-muted-foreground">
             {manual
               ? `Current: ${manual.edition || "unlabeled edition"} · updated ${new Date(manual.updated_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`
-              : "Not yet published"}
+              : libraryQuery.isError ? "Manual publication needs attention" : "Preparing the default manual…"}
           </span>
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
-          Upload the manual as a plain PDF. Clients always download the latest edition, stamped
-          with their name and served copy-restricted; replacing the file updates it for everyone
-          instantly.
+          The site generates the default Owner’s Manual. Upload a replacement PDF only when needed;
+          an uploaded replacement stays in use until you replace it or regenerate from the master.
+          Clients download the current published edition, stamped with their name and served copy-restricted.
         </p>
         <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
           <input
@@ -151,7 +152,7 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
           <Button
             size="sm"
             className="rounded-full"
-            disabled={!file || upload.isPending}
+            disabled={!file || !edition.trim() || upload.isPending}
             onClick={() => upload.mutate()}
           >
             {upload.isPending ? "Publishing…" : manual ? "Replace edition" : "Publish"}
@@ -167,6 +168,10 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
             {regenerate.isPending ? "Rendering…" : "Regenerate from the master"}
           </Button>
         </div>
+        <p className="mt-2 text-xs text-muted-foreground">
+          Regenerating replaces the currently published manual, including any PDF you uploaded by hand, with a new PDF from the master.
+        </p>
+        {libraryQuery.isError ? <p className="mt-2 text-sm text-destructive" role="alert">We could not prepare or check the Owner’s Manual. Choose Regenerate from the master to retry. Any previously published copy remains in place.</p> : null}
         {message ? <p className="mt-2 text-xs text-muted-foreground">{message}</p> : null}
       </div>
 

@@ -1,0 +1,298 @@
+{
+  "id": "05",
+  "revision": 1,
+  "title": "Office fulfilment, uploads and accurate service status",
+  "model": "Codex",
+  "base": "ef1f5d75620891ec94004a96a24732924546160b",
+  "items": [
+    {
+      "id": "N1.13",
+      "part": "all",
+      "scope": "paid setup resumes without duplicate services",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch05 N1.13: paid setup resumes without duplicate services"
+        }
+      ]
+    },
+    {
+      "id": "N1.14",
+      "part": "all",
+      "scope": "failed replacement preserves the prior Statement",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch05 N1.14: failed replacement preserves the prior Statement"
+        }
+      ]
+    },
+    {
+      "id": "N3.08",
+      "part": "all",
+      "scope": "completion waits for service information",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch05 N3.08: completion waits for service information"
+        }
+      ]
+    },
+    {
+      "id": "175",
+      "part": "all",
+      "scope": "filing refusals describe status accurately",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch05 175: filing refusals describe status accurately"
+        }
+      ]
+    },
+    {
+      "id": "176",
+      "part": "all",
+      "scope": "certificate errors appear beside certificates",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch05 176: certificate errors appear beside certificates"
+        }
+      ]
+    },
+    {
+      "id": "177",
+      "part": "all",
+      "scope": "Articles number validation matches the server",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch05 177: Articles number validation matches the server"
+        }
+      ]
+    },
+    {
+      "id": "178",
+      "part": "s-election-date-row",
+      "scope": "corrected dates have neutral labels",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch05 178:s-election-date-row: corrected dates have neutral labels"
+        }
+      ]
+    },
+    {
+      "id": "178",
+      "part": "series-uploaded-text",
+      "scope": "series instructions describe this upload",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch05 178:series-uploaded-text: series instructions describe this upload"
+        }
+      ]
+    },
+    {
+      "id": "178",
+      "part": "typed-ein-survives",
+      "scope": "abandoned EIN drafts are cleared",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch05 178:typed-ein-survives: abandoned EIN drafts are cleared"
+        }
+      ]
+    },
+    {
+      "id": "180",
+      "part": "all",
+      "scope": "regeneration explains uploaded-manual replacement",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch05 180: regeneration explains uploaded-manual replacement"
+        }
+      ]
+    },
+    {
+      "id": "181",
+      "part": "all",
+      "scope": "board wording matches counts search and status",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch05 181: board wording matches counts search and status"
+        }
+      ]
+    },
+    {
+      "id": "185",
+      "part": "all",
+      "scope": "manual upload requires an edition",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch05 185: manual upload requires an edition"
+        }
+      ]
+    },
+    {
+      "id": "219",
+      "part": "all",
+      "scope": "default manual exists before welcome and portal use",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch05 219: default manual exists before welcome and portal use"
+        }
+      ]
+    },
+    {
+      "id": "173",
+      "part": "all",
+      "scope": "account label reflects password state",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch05 173: account label reflects password state"
+        }
+      ]
+    },
+    {
+      "id": "174",
+      "part": "all",
+      "scope": "email history describes provider acceptance and limit",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch05 174: email history describes provider acceptance and limit"
+        }
+      ]
+    },
+    {
+      "id": "N1.15",
+      "part": "all",
+      "scope": "Verify and record the replacement-before-retirement ordering already introduced by Batch 03; retain encrypted client-controlled documents.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/server/routes-portal.ts",
+          "text": "  const stored = await putFile(\n    `${title.replace(/[^\\w-]+/g, \"_\")}_${stampForFilename()}.pdf`,\n    buf,\n    \"application/pdf\",\n    true,\n  );\n  // The package belongs to the company the order was placed for (Adam,\n  // 7 Sep 2026): without it, it showed under every tab of the account.\n  const docRows = await db.query<{ id: string }>(\n    `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)\n     VALUES ($1, $5, 'package', $2, $3, 'application/pdf', $4, $6) RETURNING id`,\n    [so.client_id, title, stored.storageKey, stored.sizeBytes, companyId, JSON.stringify({sensitive:true,serviceOrderId:so.id})],\n  );\n  merged.documentId = docRows[0].id;\n\n  // fulfilled_at starts the two-week clock, and a re-edit must not extend it.\n  await db.query(\n    `UPDATE service_orders\n        SET details = $1, ein_secret = $2, status = 'fulfilled',\n            fulfilled_at = COALESCE(fulfilled_at, now())\n      WHERE id = $3`,\n    [JSON.stringify(merged), encryptSecret(JSON.stringify(ssns)), so.id],\n  );\n  if (args.priorDocumentId) await requestDocumentDeletion(args.priorDocumentId, so.client_id);\n"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "webapp/server/routes-payments.ts",
+      "mode": "code",
+      "why": "Implement the approved office-processing, upload, status and default-manual fixes; preserve prior fixes."
+    },
+    {
+      "path": "webapp/server/routes-admin.ts",
+      "mode": "code",
+      "why": "Implement the approved office-processing, upload, status and default-manual fixes; preserve prior fixes."
+    },
+    {
+      "path": "webapp/server/routes-portal.ts",
+      "mode": "code",
+      "why": "Implement the approved office-processing, upload, status and default-manual fixes; preserve prior fixes."
+    },
+    {
+      "path": "webapp/server/db.ts",
+      "mode": "code",
+      "why": "Implement the approved office-processing, upload, status and default-manual fixes; preserve prior fixes."
+    },
+    {
+      "path": "webapp/server/email.ts",
+      "mode": "code",
+      "why": "Implement the approved office-processing, upload, status and default-manual fixes; preserve prior fixes."
+    },
+    {
+      "path": "webapp/src/pages/admin/OrderBoard.tsx",
+      "mode": "code",
+      "why": "Implement the approved office-processing, upload, status and default-manual fixes; preserve prior fixes."
+    },
+    {
+      "path": "webapp/src/pages/admin/OrderDetail.tsx",
+      "mode": "code",
+      "why": "Implement the approved office-processing, upload, status and default-manual fixes; preserve prior fixes."
+    },
+    {
+      "path": "webapp/src/pages/admin/ServiceOrdersSection.tsx",
+      "mode": "code",
+      "why": "Implement the approved office-processing, upload, status and default-manual fixes; preserve prior fixes."
+    },
+    {
+      "path": "webapp/src/pages/admin/LibrarySection.tsx",
+      "mode": "code",
+      "why": "Implement the approved office-processing, upload, status and default-manual fixes; preserve prior fixes."
+    },
+    {
+      "path": "webapp/src/pages/admin/AdminDashboard.tsx",
+      "mode": "code",
+      "why": "Implement the approved office-processing, upload, status and default-manual fixes; preserve prior fixes."
+    },
+    {
+      "path": "webapp/src/pages/admin/serviceOrders.helpers.ts",
+      "mode": "code",
+      "why": "Implement the approved office-processing, upload, status and default-manual fixes; preserve prior fixes."
+    },
+    {
+      "path": "webapp/server/owners-manual.ts",
+      "mode": "new",
+      "why": "Shared safe publication of the default generated manual, respecting uploaded replacements."
+    },
+    {
+      "path": "webapp/server/e2e.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Add durable Batch 05 regressions and update only explicitly obsolete expectations for approved behavior."
+    },
+    {
+      "path": "webapp/scripts/behavioral.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Add durable Batch 05 regressions and update only explicitly obsolete expectations for approved behavior."
+    },
+    {
+      "path": "webapp/server/batch05-check.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Add durable Batch 05 regressions and update only explicitly obsolete expectations for approved behavior."
+    },
+    {
+      "path": "webapp/scripts/batch05-walk.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Add durable Batch 05 regressions and update only explicitly obsolete expectations for approved behavior."
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "why": "Normal API rebuild from the changed server source."
+    }
+  ],
+  "requiredChecks": [],
+  "testSupport": [
+    "webapp/server/batch05-check.ts",
+    "webapp/scripts/batch05-walk.ts"
+  ],
+  "removedChecks": []
+}

@@ -94,7 +94,7 @@ function EmailsDialog({ client }: { client: AdminClient }) {
       <DialogContent className="max-w-3xl">
         <DialogHeader>
           <DialogTitle>Emails sent to {client.email}</DialogTitle>
-          <DialogDescription>Every email the site sent to this address, newest first, and whether the mail provider accepted it.</DialogDescription>
+          <DialogDescription>The latest 500 recorded emails to this address, newest first. Accepted by the email provider does not confirm delivery to the inbox.</DialogDescription>
         </DialogHeader>
         {selected ? (
           <div className="space-y-3">
@@ -106,7 +106,7 @@ function EmailsDialog({ client }: { client: AdminClient }) {
                 <div className="text-sm">
                   <div className="font-medium">{one.data.subject}</div>
                   <div className="text-muted-foreground">
-                    {whenSent(one.data.sent_at)} — {one.data.ok ? `delivered to the mail provider${one.data.provider_id ? ` (id ${one.data.provider_id})` : ""}` : `failed: ${one.data.error ?? "unknown error"}`}
+                    {whenSent(one.data.sent_at)} — {one.data.ok ? `Accepted by email provider${one.data.provider_id ? ` (id ${one.data.provider_id})` : ""}` : `failed: ${one.data.error ?? "unknown error"}`}
                   </div>
                 </div>
                 <iframe
@@ -132,7 +132,7 @@ function EmailsDialog({ client }: { client: AdminClient }) {
                 <button type="button" onClick={() => setSelected(m.id)} className="flex w-full flex-wrap items-center justify-between gap-2 px-1 py-2 text-left hover:bg-secondary/40">
                   <span className="font-medium">{m.subject}</span>
                   <span className="text-xs text-muted-foreground">
-                    {whenSent(m.sent_at)} — {m.ok ? "delivered" : "failed"}
+                    {whenSent(m.sent_at)} — {m.ok ? "Accepted by email provider" : "failed"}
                   </span>
                 </button>
               </li>
@@ -588,7 +588,7 @@ function ClientsTable({
                     </ul>
                   )}
                 </td>
-                <td className="px-3 py-3">{cl.has_password ? "Active" : "Invite sent"}</td>
+                <td className="px-3 py-3">{cl.has_password ? "Active" : "No password yet"}</td>
                 <td className="px-3 py-3">{cl.document_count}</td>
                 <td className="px-3 py-3 text-muted-foreground">{day(cl.created_at)}</td>
                 <td className="px-3 py-3 text-right">

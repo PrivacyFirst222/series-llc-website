@@ -1,3 +1,4 @@
+import { ensureOwnersManual } from "./owners-manual";
 import { requestDocumentDeletion } from "./document-retention";
 import { storageWasDeleted } from "./storage";
 import { associateLegacyServices, serviceCompanyId } from "./company-scope";
@@ -1800,6 +1801,7 @@ app.post("/portal/oa/amend", async (c) => {
 app.get("/portal/library", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  await ensureOwnersManual();
   const db = await getDb();
   const rows = await db.query("SELECT key, title, edition, size_bytes, updated_at FROM library_documents ORDER BY title");
   return c.json({ data: rows });
@@ -1808,6 +1810,7 @@ app.get("/portal/library", async (c) => {
 app.get("/portal/library/:key/download", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  if (c.req.param("key") === "owners-manual") await ensureOwnersManual();
   const db = await getDb();
   const rows = await db.query<{ storage_key: string; title: string; edition: string }>(
     "SELECT storage_key, title, edition FROM library_documents WHERE key = $1",

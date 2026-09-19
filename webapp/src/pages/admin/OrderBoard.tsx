@@ -1,3 +1,5 @@
+import { Button } from "@/components/ui/button";
+import { WAITING_FOR_CLIENT } from "./serviceOrders.helpers";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -131,7 +133,7 @@ function Card({
                   <span className="min-w-0 break-words font-medium">{serviceLabel(s, order.llc_name)}</span>
                   <span className="shrink-0 text-muted-foreground">
                     {s.status === "awaiting_info" && (s.type === "ein" || s.type === "s-election")
-                      ? "— waiting on client"
+                      ? `— ${WAITING_FOR_CLIENT}`
                       : "— in progress"}
                   </span>
                 </button>
@@ -280,7 +282,7 @@ export default function OrderBoard({ enabled }: { enabled: boolean }) {
     (o.cert_status_purchased && !o.cert_status_uploaded) ||
     (o.certified_copy_purchased && !o.certified_copy_uploaded);
   const everythingDone = (o: BoardOrder) =>
-    o.status === "formed" && !certOwed(o) && !servicesFor(o.id).some(serviceIsOpen);
+    servicesQuery.isSuccess && o.status === "formed" && !certOwed(o) && !servicesFor(o.id).some(serviceIsOpen);
   // A formed company whose client bought something AFTER formation is NEW
   // WORK: it goes back to the first column with a green outline (Adam,
   // 31 Aug 2026). Open intake add-ons do not count (5 Sep 2026): a formed
@@ -312,7 +314,7 @@ export default function OrderBoard({ enabled }: { enabled: boolean }) {
         {ordersQuery.data ? (
           <span className="text-sm text-muted-foreground">
             {shown < total
-              ? `Showing the ${shown} most recent of ${total} orders${q ? " matching" : ""} — search to reach the rest`
+              ? q ? `Showing the ${shown} newest matching orders of ${total}; narrow your search to find another order.` : `Showing the ${shown} most recent of ${total} orders — search to reach the rest`
               : q
                 ? `${total} ${total === 1 ? "order matches" : "orders match"}`
                 : `${total} ${total === 1 ? "order" : "orders"}`}
@@ -335,7 +337,7 @@ export default function OrderBoard({ enabled }: { enabled: boolean }) {
           />
           <span className="font-medium">{pending.length} pending payment</span>
           <span className="text-muted-foreground">
-            oldest {oldestPending === 0 ? "today" : `${oldestPending} days`} — abandoned checkouts, or a
+            oldest {oldestPending === 0 ? "today" : oldestPending === 1 ? "1 day" : `${oldestPending} days`} — abandoned checkouts, or a
             payment whose confirmation never arrived
           </span>
           <ChevronRight className={cn("ml-auto h-4 w-4 transition", showPending && "rotate-90")} />
@@ -377,13 +379,20 @@ export default function OrderBoard({ enabled }: { enabled: boolean }) {
         />
         <Column
           title="Complete"
-          hint="Everything delivered — documents and services"
+          hint={servicesQuery.isSuccess ? "Everything delivered — documents and services" : "Completion has not been checked"}
           orders={done}
           servicesFor={servicesFor}
           onOpen={setOpenId}
           onFulfill={setViewing}
         />
       </div>
+
+      {!servicesQuery.isSuccess ? (
+        <div className="mt-3 text-sm" role="status" data-testid="service-load-status">
+          {servicesQuery.isError ? "We could not check the remaining service orders. Try again." : "Checking remaining service orders…"}
+          {servicesQuery.isError ? <Button type="button" variant="outline" size="sm" className="ml-2" onClick={() => servicesQuery.refetch()}>Try again</Button> : null}
+        </div>
+      ) : null}
 
       {ordersQuery.isError ? (
         <p className="mt-3 text-sm text-destructive">Could not load orders.</p>

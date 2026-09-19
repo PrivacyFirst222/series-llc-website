@@ -1,3 +1,4 @@
+import {batch05Checks} from "./batch05-check";
 import {batch04Checks} from "./batch04-check";
 import {batch03Checks} from "./batch03-check";
 import { batch02Checks } from "./batch02-check";
@@ -3977,6 +3978,16 @@ await batch04Checks((label,ok,detail)=>batch04Results.set(label,{ok,detail}));
 {const r=batch04Results.get("batch04 157: duplicate orders name their section");check("batch04 157: duplicate orders name their section",r?.ok===true,r?.detail);batch04Results.delete("batch04 157: duplicate orders name their section");}
 {const r=batch04Results.get("batch04 205: reset instructions match the visible link");check("batch04 205: reset instructions match the visible link",r?.ok===true,r?.detail);batch04Results.delete("batch04 205: reset instructions match the visible link");}
 for(const [label,r]of batch04Results)check(label,r.ok,r.detail);
+
+
+const batch05Results = new Map<string,{ok:boolean;detail?:unknown}>();
+await batch05Checks((label,ok,detail)=>batch05Results.set(label,{ok,detail}));
+{const r=batch05Results.get("batch05 N1.13: paid setup resumes without duplicate services");check("batch05 N1.13: paid setup resumes without duplicate services",r?.ok===true,r?.detail);batch05Results.delete("batch05 N1.13: paid setup resumes without duplicate services");}
+{const r=batch05Results.get("batch05 N1.14: failed replacement preserves the prior Statement");check("batch05 N1.14: failed replacement preserves the prior Statement",r?.ok===true,r?.detail);batch05Results.delete("batch05 N1.14: failed replacement preserves the prior Statement");}
+{const r=batch05Results.get("batch05 175: filing refusals describe status accurately");check("batch05 175: filing refusals describe status accurately",r?.ok===true,r?.detail);batch05Results.delete("batch05 175: filing refusals describe status accurately");}
+{const r=batch05Results.get("batch05 219: default manual exists before welcome and portal use");check("batch05 219: default manual exists before welcome and portal use",r?.ok===true,r?.detail);batch05Results.delete("batch05 219: default manual exists before welcome and portal use");}
+{const r=batch05Results.get("batch05 N1.15: S package replacement failures preserve the retained copy");check("batch05 N1.15: S package replacement failures preserve the retained copy",r?.ok===true,r?.detail);batch05Results.delete("batch05 N1.15: S package replacement failures preserve the retained copy");}
+for(const [label,r]of batch05Results)check(label,r.ok,r.detail);
 
 console.log(failures === 0 ? "\nALL PASS" : `\n${failures} FAILURES`);
 process.exit(failures === 0 ? 0 : 1);

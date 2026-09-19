@@ -26,6 +26,7 @@ import { sendMail, welcomeEmail, orderPaidEmail, serviceOrderClientEmail, servic
 import { personLegalName } from "./routes-portal";
 import { writeOrderSummary } from "./order-summary";
 import { err, testHooks } from "./shared";
+import { ensureOwnersManual } from "./owners-manual";
 
 /* ------------------------------- orders ------------------------------- */
 
@@ -42,77 +43,74 @@ export async function fulfillPaidOrder(orderId: string, squarePaymentId: string 
     throw new Error("injected fulfillment failure (dev test scaffolding)");
   }
   const db = await getDb();
-  // Claim the order atomically. Reading the status and then deciding was a
-  // race with two failure modes, both audited 26 Aug 2026: concurrent events
-  // could fulfil twice, and a late duplicate could drag an order that had
-  // already advanced to `filed`/`formed` back to `paid`. The WHERE clause
-  // does the deciding now, so exactly one caller can ever win, and only from
-  // pending_payment. Zero rows back = somebody already handled it.
-  const claimed = await db.query<{
-    id: string; contact_name: string; contact_email: string;
-    llc_name: string; total_cents: number; payload: unknown;
-  }>(
+  // Record the payment independently of setup. A failed setup is still a
+  // paid order, and another webhook can resume it without another charge.
+  await db.query(
     `UPDATE orders SET status = 'paid', paid_at = now(), square_payment_id = $1
-      WHERE id = $2 AND status = 'pending_payment'
-      RETURNING id, contact_name, contact_email, llc_name, total_cents, payload`,
-    [squarePaymentId, orderId],
+      WHERE id = $2 AND status = 'pending_payment'`, [squarePaymentId, orderId],
   );
-  if (claimed.length === 0) return;
-  const order = claimed[0];
-
-  // The card the formation was paid with is kept for the registered agent
-  // renewals when the client took our service and agreed (16 Sep 2026).
-  // Never blocks the formation.
+  // One SQL statement commits the account, purchased services and completion
+  // marker together. The row lock serializes concurrent deliveries; after a
+  // competing commit, PostgreSQL rechecks fulfillment_completed_at. A failed
+  // statement rolls all its setup changes back, leaving the paid order retryable.
+  const welcomeToken = newToken();
+  const completed = await db.query<{
+    id: string; contact_name: string; contact_email: string; llc_name: string;
+    total_cents: number; payload: unknown; client_id: string; password_hash: string | null;
+  }>(`WITH target AS MATERIALIZED (
+      SELECT * FROM orders WHERE id = $1 AND status IN ('paid','filed','formed')
+        AND fulfillment_completed_at IS NULL FOR UPDATE
+    ), account_created AS (
+      INSERT INTO clients (email, name)
+      SELECT contact_email, contact_name FROM target WHERE client_id IS NULL
+      ON CONFLICT (email) DO UPDATE SET email = EXCLUDED.email
+      RETURNING id, password_hash
+    ), account AS (
+      SELECT id, password_hash FROM account_created
+      UNION ALL
+      SELECT c.id, c.password_hash FROM target JOIN clients c ON c.id = target.client_id
+    ), services AS (
+      INSERT INTO service_orders
+        (client_id, type, status, llc_name, details, amount_cents, formation_order_id, paid_at, square_payment_id)
+      SELECT account.id, kind.type, 'awaiting_info', target.llc_name, kind.details,
+             kind.amount, target.id, target.paid_at, target.square_payment_id
+      FROM target CROSS JOIN account CROSS JOIN LATERAL (
+        SELECT 'ein'::text AS type, '{"target":"company"}'::jsonb AS details, $2::int AS amount
+          WHERE target.payload #>> '{optionalDocuments,ein}' = 'true'
+        UNION ALL
+        SELECT 's-election', '{}'::jsonb, $3::int
+          WHERE target.payload #>> '{optionalDocuments,sElection}' = 'true'
+            AND COALESCE(target.payload->>'filingPath','') <> 'CONVERT'
+      ) kind
+      WHERE NOT EXISTS (SELECT 1 FROM service_orders s
+        WHERE s.formation_order_id = target.id AND s.type = kind.type
+          AND (kind.type <> 'ein' OR s.details->>'target' = 'company'))
+      RETURNING id
+    ), welcome_link AS (
+      INSERT INTO auth_tokens(token_hash, client_id, purpose, expires_at)
+      SELECT $4, account.id, 'set_password', $5::timestamptz FROM account
+      WHERE account.password_hash IS NULL RETURNING token_hash
+    ), done AS (
+      UPDATE orders SET client_id = account.id, fulfillment_completed_at = now()
+      FROM target, account WHERE orders.id = target.id
+        AND (SELECT count(*) FROM services) >= 0 AND (SELECT count(*) FROM welcome_link) >= 0
+      RETURNING orders.*
+    ) SELECT done.*, account.password_hash FROM done CROSS JOIN account`,
+    [orderId, EIN_FEE_CENTS, S_ELECTION_FEE_CENTS, welcomeToken.tokenHash, new Date(Date.now() + 7 * 86400_000).toISOString()]);
+  if (completed.length === 0) return;
+  const order = completed[0];
+  const payload = (typeof order.payload === "string" ? JSON.parse(order.payload) : order.payload) as {
+    optionalDocuments?: { ein?: boolean; sElection?: boolean }; filingPath?: string;
+  } | null;
   await saveRenewalCard(db, order, squarePaymentId, cardSim).catch((e) => console.error("[renewals] card not saved:", e));
-
-  // Upsert the client account for this email.
-  const existing = await db.query<{ id: string; password_hash: string | null }>(
-    "SELECT id, password_hash FROM clients WHERE email = $1",
-    [order.contact_email],
-  );
-  let clientId: string;
-  if (existing.length > 0) {
-    clientId = existing[0].id;
-  } else {
-    const created = await db.query<{ id: string }>(
-      "INSERT INTO clients (email, name) VALUES ($1, $2) RETURNING id",
-      [order.contact_email, order.contact_name],
-    );
-    clientId = created[0].id;
-  }
-  await db.query("UPDATE orders SET client_id = $1 WHERE id = $2", [clientId, orderId]);
   await writeOrderSummary(orderId).catch((e) => console.error("[fulfill] summary rewrite failed:", e));
 
-  // An EIN purchased with the formation becomes a paid service order awaiting
-  // the responsible party's details, provided through the portal's secure form.
-  const payload = (typeof order.payload === "string" ? JSON.parse(order.payload) : order.payload) as {
-    optionalDocuments?: { ein?: boolean; sElection?: boolean };
-    filingPath?: string;
-  } | null;
-  if (payload?.optionalDocuments?.ein) {
-    await db.query(
-      `INSERT INTO service_orders (client_id, type, status, llc_name, details, amount_cents, formation_order_id, paid_at, square_payment_id)
-       VALUES ($1, 'ein', 'awaiting_info', $2, $3, $4, $5, now(), $6)`,
-      [clientId, order.llc_name, JSON.stringify({ target: "company" }), EIN_FEE_CENTS, orderId, squarePaymentId],
-    );
-  }
-  if (payload?.optionalDocuments?.sElection && payload?.filingPath !== "CONVERT") {
-    await db.query(
-      `INSERT INTO service_orders (client_id, type, status, llc_name, details, amount_cents, formation_order_id, paid_at, square_payment_id)
-       VALUES ($1, 's-election', 'awaiting_info', $2, $3, $4, $5, now(), $6)`,
-      [clientId, order.llc_name, JSON.stringify({}), S_ELECTION_FEE_CENTS, orderId, squarePaymentId],
-    );
-  }
-
   // First-time clients get a set-password link; returning clients just get notified.
-  if (existing.length === 0 || !existing[0].password_hash) {
-    const { token, tokenHash } = newToken();
-    await db.query(
-      "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at) VALUES ($1, $2, 'set_password', $3)",
-      [tokenHash, clientId, new Date(Date.now() + 7 * 86400_000).toISOString()],
-    );
+  if (!order.password_hash) {
+    const { token } = welcomeToken;
     // A self-agent client is not told to expect legal mail from us (15 Sep 2026).
-    const mail = welcomeEmail(order.contact_name, `${env.PUBLIC_BASE_URL}/portal/set-password?token=${token}`, payload?.filingPath === "CONVERT", (payload as { registeredAgent?: { choice?: string } } | null)?.registeredAgent?.choice === "SERVICE");
+    const manualReady = await ensureOwnersManual().then(() => true, (e) => { console.error("[manual] initial publication failed:", e); return false; });
+    const mail = welcomeEmail(order.contact_name, `${env.PUBLIC_BASE_URL}/portal/set-password?token=${token}`, payload?.filingPath === "CONVERT", (payload as { registeredAgent?: { choice?: string } } | null)?.registeredAgent?.choice === "SERVICE", manualReady);
     // Email failures must never unwind a recorded payment; the client can
     // always recover portal access through the forgot-password flow.
     await sendMail({ to: order.contact_email, ...mail }).catch((e) =>
@@ -614,7 +612,8 @@ app.post("/orders/:id/resend-welcome", async (c) => {
       [tokenHash, clients[0].id, new Date(Date.now() + 7 * 86400_000).toISOString()],
     );
     const resendPayload = (typeof orders[0].payload === "string" ? JSON.parse(orders[0].payload) : orders[0].payload) as { filingPath?: string } | null;
-    const mail = welcomeEmail(orders[0].contact_name, `${env.PUBLIC_BASE_URL}/portal/set-password?token=${token}`, resendPayload?.filingPath === "CONVERT", (resendPayload as { registeredAgent?: { choice?: string } } | null)?.registeredAgent?.choice === "SERVICE");
+    const manualReady = await ensureOwnersManual().then(() => true, (e) => { console.error("[manual] initial publication failed:", e); return false; });
+    const mail = welcomeEmail(orders[0].contact_name, `${env.PUBLIC_BASE_URL}/portal/set-password?token=${token}`, resendPayload?.filingPath === "CONVERT", (resendPayload as { registeredAgent?: { choice?: string } } | null)?.registeredAgent?.choice === "SERVICE", manualReady);
     try {
       await sendMail({ to: orders[0].contact_email, ...mail });
     } catch (e) {

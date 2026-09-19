@@ -272,6 +272,7 @@ export default function OrderDetail({
     { file: null, covers: [] },
   ]);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [certificateError, setCertificateError] = useState<string | null>(null);
 
   const articlesFirstRef = useRef<HTMLInputElement>(null);
   const [confirmReset, setConfirmReset] = useState(false);
@@ -293,7 +294,7 @@ export default function OrderDetail({
       if (!f) throw new Error("Choose the filed Articles PDF.");
       // Sunbiz's own numbers: the letter L and eleven digits (14 Sep 2026).
       // An empty box is the server's "required" message, which says why.
-      if (detail.data?.articlesSignedByUs && docNumber.trim() && !/^L\d{11}$/.test(docNumber.trim())) throw new Error(DOC_NUMBER_SHAPE);
+      if (docNumber.trim() && !/^L\d{11}$/.test(docNumber.trim())) throw new Error(DOC_NUMBER_SHAPE);
       const fd = new FormData();
       fd.append("articles", f);
       fd.append("documentNumber", docNumber.trim());
@@ -372,7 +373,7 @@ export default function OrderDetail({
   // arrive before the designations, so they no longer wait for formation.
   const [certChosen, setCertChosen] = useState(false);
   const noteCertChosen = () => {
-    setUploadError(null);
+    setCertificateError(null);
     setCertChosen(Boolean(certStatusRef.current?.files?.length || certifiedCopyRef.current?.files?.length));
   };
   /** Whether the certificate email left, from the route's own report (15 Sep 2026). */
@@ -390,7 +391,7 @@ export default function OrderDetail({
       return body?.data?.notified === true;
     },
     onSuccess: (notified) => {
-      setUploadError(null);
+      setCertificateError(null);
       setCertNotified(notified);
       if (certStatusRef.current) certStatusRef.current.value = "";
       if (certifiedCopyRef.current) certifiedCopyRef.current.value = "";
@@ -398,7 +399,7 @@ export default function OrderDetail({
       queryClient.invalidateQueries({ queryKey: ["admin", "order", orderId] });
       queryClient.invalidateQueries({ queryKey: ["admin", "orders"] });
     },
-    onError: (e: Error) => setUploadError(e.message),
+    onError: (e: Error) => setCertificateError(e.message),
   });
 
   const upload = useMutation({
@@ -694,8 +695,8 @@ export default function OrderDetail({
                       />
                     </div>
                   ) : null}
-                  {uploadError && d.status === "formed" ? (
-                    <p className="text-sm text-destructive" data-testid="certificate-upload-error">{uploadError}</p>
+                  {certificateError ? (
+                    <p className="text-sm text-destructive" data-testid="certificate-upload-error">{certificateError}</p>
                   ) : null}
                   {certNotified !== null && !uploadCerts.isPending ? (
                     <p className="text-sm text-trust" data-testid="certificate-upload-result">

@@ -13,7 +13,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { api } from "@/lib/api";
-import { summaryOf } from "./serviceOrders.helpers";
+import { summaryOf, WAITING_FOR_CLIENT } from "./serviceOrders.helpers";
 
 interface SElectionShareholderView {
   name: string;
@@ -85,6 +85,12 @@ export function ServiceFulfillDialog({
 }: {
   viewing: AdminServiceOrder | null;
   onClose: () => void;
+}) {
+  return <ServiceFulfillDialogContent key={viewing?.id ?? "closed"} viewing={viewing} onClose={onClose} />;
+}
+
+function ServiceFulfillDialogContent({viewing, onClose}: {
+  viewing: AdminServiceOrder | null; onClose: () => void;
 }) {
   const queryClient = useQueryClient();
   const [attachment, setAttachment] = useState<File | null>(null);
@@ -189,7 +195,7 @@ export function ServiceFulfillDialog({
                 ? `Attach the ${viewing?.type === "certificate-of-status" ? "Certificate of Status" : "Certified Copy of the Articles"} from the Division and mark fulfilled; it is posted to the client's documents.`
               : viewing?.type === "s-election"
                 ? "Download the draft package, review the filled Form 2553, and attach the final PDF to fulfill. The SSNs below are permanently deleted when you mark the order fulfilled."
-                : "Mark fulfilled once the designation is filed and the confirmation is uploaded to the client's documents."}
+                : "Upload the filed Protected Series Designation here, then mark the order fulfilled."}
           </DialogDescription>
         </DialogHeader>
         {viewing ? (
@@ -223,7 +229,7 @@ export function ServiceFulfillDialog({
                 {detailQuery.data?.details.dateIncorporated ? (
                   <div className="space-y-1">
                     <div>
-                      <span className="text-muted-foreground">Filed by the Division (entered by the client) / election effective:</span>{" "}
+                      <span className="text-muted-foreground">Articles filing date / Election effective date:</span>{" "}
                       {detailQuery.data.details.dateIncorporated} / {detailQuery.data.details.effectiveDate || detailQuery.data.details.dateIncorporated}
                     </div>
                     {/* The client typed it from their Articles; correct it here only
@@ -364,7 +370,7 @@ export function ServiceFulfillDialog({
             (Adam, 6 Sep 2026: "I can't upload the pdf"). */}
         {(viewing?.type === "ein" || viewing?.type === "s-election") && viewing?.status === "awaiting_info" ? (
           <div className="rounded-xl border border-amber-300/60 bg-amber-50 p-4 text-sm text-amber-900" data-testid="waiting-on-client">
-            <p className="font-medium">Waiting on the client.</p>
+            <p className="font-medium">{WAITING_FOR_CLIENT}</p>
             <p className="mt-1">
               {viewing.type === "ein"
                 ? "They haven't provided the responsible party's details yet. The EIN application can't be prepared or fulfilled until they do — the portal is asking them for it."

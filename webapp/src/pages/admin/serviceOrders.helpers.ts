@@ -37,3 +37,5 @@ export function summaryOf(o: { type: string; details: AdminServiceOrder["details
   if (o.type === "certified-copy") return `Certified Copy — ${o.llc_name}`;
   return `EIN — ${o.details.target === "series" ? o.details.seriesName ?? "series" : o.llc_name}`;
 }
+
+export const WAITING_FOR_CLIENT = "Waiting for client details";

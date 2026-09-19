@@ -20,8 +20,6 @@ import { decryptSecret } from "./crypto";
 
 import { createSession, rateLimit, clientIp } from "./auth";
 
-import { createHash } from "node:crypto";
-import ownersManualMd from "../../docs/owners-manual.md";
 import { deleteFile, putFile, readFileStream } from "./storage";
 import { sendMail, newDocumentEmail, legalMailEmail, emailChangedEmail, serviceFulfilledClientEmail, llcFormedEmail, sElectionEinAddedEmail, sElectionEinArrivedLateEmail } from "./email";
 import { einDigits, fmtEinDisplay, isValidEin } from "../src/lib/ein";
@@ -33,42 +31,8 @@ import { evaluate2553Timing } from "../src/lib/form2553Timing";
 import { unpackSsns } from "../src/lib/jointOwner";
 import { easternDateIso } from "./datetime";
 
-/** Renders the Owner's Manual PDF from the markdown master bundled with
- *  this deployment and publishes it to the client library. Hash-gated: a
- *  deployment whose manual is unchanged publishes nothing. This is what
- *  keeps "always the latest edition" true — the nightly cron calls it, and
- *  the admin Library section has a button for right-now. */
-export async function refreshOwnersManual(force = false): Promise<{ published: boolean; pages?: number; edition?: string; pinned?: boolean }> {
-  // The hash covers the renderer as well as the text: a layout fix that never
-  // changes a word would otherwise never be published, and clients would keep
-  // downloading the previous PDF.
-  const { renderManualPdf, MANUAL_RENDERER_VERSION } = await import("./manual-pdf");
-  const hash = createHash("sha256")
-    .update(ownersManualMd)
-    .update(`renderer:${MANUAL_RENDERER_VERSION}`)
-    .digest("hex")
-    .slice(0, 16);
-  const db = await getDb();
-  const rows = await db.query<{ meta: unknown }>(
-    "SELECT meta FROM library_documents WHERE key = 'owners-manual'",
-  );
-  const meta = rows[0] ? ((typeof rows[0].meta === "string" ? JSON.parse(rows[0].meta) : rows[0].meta) as { hash?: string; pinned?: boolean }) : null;
-  // A manual uploaded by hand stays until the office replaces it (15 Sep
-  // 2026: the nightly refresh silently overwrote it).
-  if (!force && meta?.pinned) return { published: false, pinned: true };
-  if (!force && meta?.hash === hash) return { published: false };
-  const { pdf, pages, edition } = await renderManualPdf(ownersManualMd);
-  const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength) as ArrayBuffer;
-  const stored = await putFile("owners-manual.pdf", buf, "application/pdf");
-  await db.query(
-    `INSERT INTO library_documents (key, title, edition, storage_key, content_type, size_bytes, meta, updated_at)
-     VALUES ('owners-manual', $1, $2, $3, 'application/pdf', $4, $5, now())
-     ON CONFLICT (key) DO UPDATE SET title = $1, edition = $2, storage_key = $3,
-       content_type = 'application/pdf', size_bytes = $4, meta = $5, updated_at = now()`,
-    ["Series LLC Owner's Manual", edition, stored.storageKey, stored.sizeBytes, JSON.stringify({ hash, pages })],
-  );
-  return { published: true, pages, edition };
-}
+import { refreshOwnersManual, ensureOwnersManual } from "./owners-manual";
+export { refreshOwnersManual } from "./owners-manual";
 
 export function registerAdminRoutes(app: Hono) {
 
@@ -79,6 +43,7 @@ app.get("/admin/library", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const db = await getDb();
+  await ensureOwnersManual();
   const rows = await db.query("SELECT key, title, edition, size_bytes, updated_at FROM library_documents ORDER BY title");
   return c.json({ data: rows });
 });
@@ -103,6 +68,7 @@ app.post("/admin/library/:key", async (c) => {
   const file = form.file;
   const title = typeof form.title === "string" ? form.title.trim() : "";
   const edition = typeof form.edition === "string" ? form.edition.trim() : "";
+  if (c.req.param("key") === "owners-manual" && !edition) return c.json(err("Enter the edition label before publishing the manual.", "EDITION_REQUIRED"), 400);
   if (!(file instanceof File) || !title) {
     return c.json(err("title and file are required.", "INVALID_INPUT"), 400);
   }
@@ -277,7 +243,7 @@ app.post("/admin/orders/:id/filed", async (c) => {
     return c.json(err("A conversion has nothing to send to the Division: its Designations are filed online.", "BAD_STATE"), 400);
   }
   if (rows[0].status !== "paid") {
-    return c.json(err(`Only an order in New Orders can be marked sent; this one is in ${BOARD_LABEL[rows[0].status] ?? rows[0].status}.`, "BAD_STATE"), 400);
+    return c.json(err(`Only an order in New Orders can be marked sent; this order’s filing status is ${rows[0].status}.`, "BAD_STATE"), 400);
   }
   // Submission precedes the stamped Articles: the state returns them days
   // later, so nothing is uploaded before Mark sent (Adam's correction,
@@ -299,7 +265,7 @@ app.post("/admin/orders/:id/unfiled", async (c) => {
   ]);
   if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
   if (rows[0].status !== "filed") {
-    return c.json(err("Only an order sitting with the State can be moved back.", "BAD_STATE"), 400);
+    return c.json(err("Only a filing awaiting the State’s decision can be moved back. A formed company may still appear in With The State because other work is owed.", "BAD_STATE"), 400);
   }
   // A Division rejection means refiling, usually under the alternate name:
   // every copied-field tick is cleared so the re-copy starts honest, and the
@@ -490,6 +456,7 @@ async function issueStatement(
   o: { id: string; client_id: string | null; llc_name: string; payload?: unknown },
   documentNumber: string,
   put: (name: string, data: ArrayBuffer, type: string) => Promise<{ storageKey: string; sizeBytes: number }> = putFile,
+  retirePrior = true,
 ): Promise<{ id: string; storageKey: string }> {
   const { markdown, title } = assembleStatement({
     companyName: o.llc_name,
@@ -510,7 +477,7 @@ async function issueStatement(
      VALUES ($1, $2, 'statement', $3, $4, 'application/pdf', $5, $6) RETURNING id`,
     [o.client_id, o.id, title, stored.storageKey, stored.sizeBytes, JSON.stringify({ documentNumber: documentNumber.trim() })],
   );
-  for (const pr of prior) {
+  for (const pr of retirePrior ? prior : []) {
     await db.query("DELETE FROM documents WHERE id = $1", [pr.id]);
     await deleteFile(pr.storage_key).catch(() => undefined);
   }
@@ -762,11 +729,12 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
   // retirement of the prior package — deleting it would form an order whose
   // portal has no Articles.
   // Certificates are never retired: every copy stays (Adam, 15 Sep 2026).
-  const retiredKinds = ["psd", ...(articles ? ["articles"] : [])];
+  const retiredKinds = ["psd", ...(articles ? ["articles"] : []), ...(articles && formedWeSigned ? ["statement"] : [])];
   const priorDocs = await db.query<{ id: string; storage_key: string }>(
     "SELECT id, storage_key FROM documents WHERE order_id = $1 AND kind = ANY($2::text[])",
     [o.id, retiredKinds],
   );
+  const newKeys: string[] = [];
   let formationPuts = 0;
   const stagedPut = async (name: string, data: ArrayBuffer, type: string) => {
     if (testHooks.failFormationPutAfter >= 0 && formationPuts >= testHooks.failFormationPutAfter) {
@@ -774,14 +742,15 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
       throw new Error("dev: injected formation storage failure");
     }
     formationPuts += 1;
-    return putFile(name, data, type);
+    const stored = await putFile(name, data, type);
+    newKeys.push(stored.storageKey);
+    return stored;
   };
 
   // If the new package fails partway, undo whatever of it landed — rows
   // first, then blobs best-effort — so the client's portal shows exactly the
   // intact prior package, not a hybrid.
   const newRows: string[] = [];
-  const newKeys: string[] = [];
   try {
     if (articles) {
       const storedArticles = await stagedPut(
@@ -789,7 +758,6 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
         await articles.arrayBuffer(),
         articles.type || "application/pdf",
       );
-      newKeys.push(storedArticles.storageKey);
       const artRow = await db.query<{ id: string }>(
         `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
          VALUES ($1, $2, 'articles', $3, $4, $5, $6, '{}'::jsonb) RETURNING id`,
@@ -804,14 +772,12 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
       );
       newRows.push(artRow[0].id);
       if (formedWeSigned) {
-        const st = await issueStatement(db, o, formedDocNumber, stagedPut);
+        const st = await issueStatement(db, o, formedDocNumber, stagedPut, false);
         newRows.push(st.id);
-        newKeys.push(st.storageKey);
       }
     }
     for (const cf of certFiles) {
       const storedCert = await stagedPut(cf.file.name, await cf.file.arrayBuffer(), cf.file.type || "application/pdf");
-      newKeys.push(storedCert.storageKey);
       const certRow = await db.query<{ id: string }>(
         `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
          VALUES ($1, $2, $3, $4, $5, $6, $7, '{"source":"card"}'::jsonb) RETURNING id`,
@@ -823,7 +789,6 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
       const f = psdFiles[i];
       const names = psdSeries[i];
       const stored = await stagedPut(f.name, await f.arrayBuffer(), f.type || "application/pdf");
-      newKeys.push(stored.storageKey);
       const psdRow = await db.query<{ id: string }>(
         `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
          VALUES ($1, $2, 'psd', $3, $4, $5, $6, $7) RETURNING id`,

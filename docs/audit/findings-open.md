@@ -703,7 +703,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: filing.ts:306 `if (p.filingPath === "CONVERT") return conversionGroups(p);` returns before this code for every conversion, so the branch is unreachable (A30h). Also filing.ts:187-188 `/** The registered agent's rows, shared by the Articles sheet and the conversion sheet's change-of-agent filing. */` sits above RA_SERVICE_SIGNER, not raFields (:198).
   - Replace with: value: "New Florida LLC", statement: true, }, — delete lines 323-328 — and move the docstring at 187-188 to line 197, above `function raFields`.
   - Codex (housekeeping-only): The conversion branch duplicates100, but this item also uniquely identifies a misplaced docstring at filing.ts:187–188 above RA_SERVICE_SIGNER instead of raFields(:198). Both changes affect internal code/comments, not reader output.
-- **N1.13. [substantive]** — **open**
+- **N1.13. [substantive]** — **implemented**
   - Formation order, recovery after a payment-fulfillment failure — `webapp/server/routes-payments.ts:55`
   - Reads: `UPDATE orders SET status = 'paid', paid_at = now(), square_payment_id = $1
   -       WHERE id = $2 AND status = 'pending_payment'
@@ -714,6 +714,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: A paid status means the client account and purchased services have already been fulfilled, so retry can return.
   - True: The paid transition at:55–60 precedes client creation/linking at:69–83 and purchased-service insertion at:93–104. A database failure after the claim leaves status paid with missing account or service; a retried webhook returns at:60 and can mark the event processed at:501–502. This is a statically verified failure path, not a claim of an observed production outage.
   - Replace with: Make fulfillment a resumable idempotent operation: distinguish payment recorded from fulfillment completed, insert/link the client and each purchased service idempotently, and mark completion only after all required records exist. Retry incomplete paid orders without charging again.
+  - Fixed: batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **N4.01. [substantive]** — **implemented**
   - Order form, Managers and Initial members: changing a row between a person and a business, then opening its agreement — `webapp/src/components/forms/florida-llc/RepeatablePartyFields.tsx:81`
   - Reads: update(entry.id, { personOrEntity: v as PartyKind })
@@ -1145,7 +1146,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: Accumulate numerator and denominator with BigInt, reducing by greatest common divisor on every addition, and compare the exact reduced numerator and denominator. Preserve the existing positive-integer validation.
   - Corrected after Codex's review: Reproduced: 17 and 19 equal owners fail the exact-total check.
   - Fixed: batch 01 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **N1.15. [substantive]** — **open**
+- **N1.15. [substantive]** — **implemented**
   - Client portal, correcting and regenerating an S-election package — `webapp/server/routes-portal.ts:867`
   - Reads: await db.query("DELETE FROM documents WHERE id = $1 AND client_id = $2", [args.priorDocumentId, so.client_id]);
   -     if (old[0]?.storage_key) await deleteFile(old[0].storage_key).catch(() => {});
@@ -1160,6 +1161,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: Regeneration safely replaces the earlier filing copy.
   - True: The previous document row and file are deleted at:867–868 before putFile at:872–876 and the replacement insert at:880–884. If storage or insertion fails, the original is already gone and the stored documentId still names it. This can occur during the promised14-day edit window.
   - Replace with: Upload and insert the new package first, atomically update the service order's documentId/details, then retire the old document. On failure remove only the staged replacement and retain the existing filing copy.
+  - Fixed: batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **N1.16. [substantive]** — **open**
   - Client portal, S-election shareholder Social Security number validation — `webapp/src/lib/ssn.ts:28`
   - Reads: return ssnTypingProblem(value) || (d.length !== 9 ? SSN_LENGTH_MESSAGE : "");
@@ -1248,23 +1250,31 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - **Codex rejected the proposed replacement:** Null does not by itself prove no permission: it can precede a card-save attempt or reflect an incomplete/failed capture path. Derive permission from the order’s consent and show “Card status not recorded” unless absence of consent is independently established.
 - **172. [A69]** — **open**
   - Cancellation shown twice on a row; the client-level chip keeps the first company's date forever. Replace: keep the per-company text; drop the chip on that tab.
-- **173. [A70]** — **open**
+- **173. [A70]** — **implemented**
   - Clients tab "Invite sent" means only "no password yet". Replace: "No password yet".
-- **174. [A71]** — **open**
+  - Fixed: batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **174. [A71]** — **implemented**
   - Emails dialog "delivered" (provider acceptance); "Every email" (500). Replace: "accepted"; "The newest 500 emails".
-- **175. [A72]** — **open**
+  - Fixed: batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **175. [A72]** — **implemented**
   - "Mark sent" and "move back" refusals name the wrong column for a formed order. Replace: whereItIs wording.
-- **176. [A73]** — **open**
+  - Fixed: batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **176. [A73]** — **implemented**
   - Certificates block: a refused upload on a With The State order shows its red line under another button. Replace: its own error line.
-- **177. [A74]** — **open**
+  - Fixed: batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **177. [A74]** — **implemented**
   - Articles box shape check only when we signed; server checks whenever typed. Replace: match.
-- **178. [A75]** — **open**
+  - Fixed: batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **178. [A75]** — **ein-hint-2553: open; s-election-date-row: implemented; series-uploaded-text: implemented; typed-ein-survives: implemented**
   - Fulfil dialog: EIN hint promises an S election rebuild for a series EIN; S election date row "entered by the client" after correction; series text "once … uploaded" though the dialog uploads; a typed EIN survives closing. Replace each.
   - **Codex rejected the proposed replacement:** The item supplies no verbatim replacements. Use company-only rebuild wording; “Articles filing date”; “Upload the filed Designation here”; clear the EIN draft when switching orders or closing. A series EIN must not trigger company-election instructions.
   - Part "ein-hint-2553" — open: The EIN hint mentions Form 2553 only when a company EIN is being entered AND a matching S election package exists; a series EIN goes on no 2553.
-  - Part "s-election-date-row" — open: The S election date row no longer says "entered by the client" after a correction.
-  - Part "series-uploaded-text" — open: The series text no longer says "once … uploaded" inside the dialog that does the uploading.
-  - Part "typed-ein-survives" — open: A typed EIN does not survive closing the dialog.
+  - Part "s-election-date-row" — implemented: The S election date row no longer says "entered by the client" after a correction.
+  - Fixed (s-election-date-row): batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Part "series-uploaded-text" — implemented: The series text no longer says "once … uploaded" inside the dialog that does the uploading.
+  - Fixed (series-uploaded-text): batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Part "typed-ein-survives" — implemented: A typed EIN does not survive closing the dialog.
+  - Fixed (typed-ein-survives): batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
   - Former part "all" (retired by 001-part-level-links, now ein-hint-2553, s-election-date-row, series-uploaded-text, typed-ein-survives): The whole finding.
 - **179. [A76]** — **implemented**
   - Reference Library backup line (four tables; "own company") and mirror line ("every file" nightly; nothing overwritten). Replace both sentences.
@@ -1272,12 +1282,14 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - **Codex rejected the proposed replacement:** Use “A nightly snapshot of the ten backed-up tables is stored in private Vercel Blob storage.” For mirroring say “Each run attempts up to200 pending client files. Files may be replaced at the same destination; source deletions do not remove mirror copies.” Name providers rather than make an unverified corporate-ownership claim.
   - Corrected after Codex's review: Say ten backed-up tables, and that each run attempts up to 200 pending files; name the providers.
   - Fixed: batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **180. [A77]** — **open**
+- **180. [A77]** — **implemented**
   - "Regenerate from the master" silently replaces a hand-uploaded manual. Replace: say so on the screen.
   - **Codex rejected the proposed replacement:** Verbatim clarification: “Regenerating replaces the currently published manual, including any PDF you uploaded by hand, with a new PDF from the master.”
-- **181. [A78]** — **open**
+  - Fixed: batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **181. [A78]** — **implemented**
   - Board "1 days"; "search to reach the rest" while searching; open status worded two ways. Replace each.
   - **Codex rejected the proposed replacement:** Use singular “1 day”; while searching say “Showing the newest matching orders; narrow your search to find another order.” Use one shared display label for awaiting_info.
+  - Fixed: batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **182. [A79]** — **implemented**
   - Admin sign-in "Incorrect password." for any server error. Replace: only for a 401.
   - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
@@ -1295,12 +1307,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: 'no card' with a reason only for a wallet payment.
   - True: renewals.ts:85 and :98 store a reason on every 'none': 'no payment id', or square.ts's 'wallet payment' (:135), 'customer' (:153) or 'not saveable' (:164). Only 'wallet payment' is shown; a card Square refused to save reads simply 'no card', indistinguishable from a wallet payment, and the office cannot tell whether to ask the client for a card. Adjacent to A68.
   - Replace with: : c.card_status === "none" ? `no card${c.card_note ? ` — ${c.card_note}` : ""}`
-- **185. [B91]** — **open**
+- **185. [B91]** — **implemented**
   - Office, Reference Library tab, the manual's edition label — `webapp/src/pages/admin/LibrarySection.tsx:49`
   - Reads: fd.set("edition", edition || new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" }));
   - Claims: A blank edition box publishes the manual under the current month and year.
   - True: The edition scheme every document footer uses is 'First Edition — August 2026' (docs/facts.md, 'The edition label on every generated document'; the box's own placeholder at :138 shows 'Second Edition — January 2027'). A blank box publishes 'September 2026' with no edition number, and the portal prints that label to every client beside 'always the latest edition' (PortalDashboard.tsx:281).
   - Replace with: Require the label: disable the Publish/Replace button while `edition.trim() === ""` and drop the month-year default.
+  - Fixed: batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **186. [B96]** — **open**
   - Office, the Fulfil dialog, the 'Placed:' line — `webapp/src/pages/admin/ServiceOrdersSection.tsx:69`
   - Reads: const day = (iso: string | null) => iso ? new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "—";
@@ -1377,7 +1390,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: ServiceOrdersSection.tsx:326 uses sElectionPaid directly for the IRS Tax classification instruction. This query does not match formation_order_id or the EIN details.target. CompanyA's S package can label companyB's EIN as S corporation; a series-target EIN also inherits the account-wide flag.
   - Replace with: Derive tax classification from the EIN target entity and its actual intended tax treatment. For a company target, match any supporting S-election order by formation_order_id; do not infer the classification of a series from a package purchased for the parent or another company.
   - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **N1.14. [substantive]** — **open**
+- **N1.14. [substantive]** — **implemented**
   - Office, replacing a formed package; client's Statement of Authorized Representative — `webapp/server/routes-admin.ts:774`
   - Reads: // If the new package fails partway, undo whatever of it landed — rows
   -   // first, then blobs best-effort — so the client's portal shows exactly the
@@ -1385,6 +1398,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: A partial failure preserves the intact prior package.
   - True: During staging :801 calls issueStatement, whose :507–509 immediately deletes the prior statement and blob. A later certificate or designation upload failure reaches :836–843 and deletes the new statement too. The portal then has neither statement, contrary to the rollback comment.
   - Replace with: Stage the replacement statement without retiring its predecessor. Retire all prior package documents only after the complete new package succeeds; on failure delete only staged new rows and blobs.
+  - Fixed: batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **N3.05. [substantive]** — **implemented**
   - Office → service order → Federal EIN for a protected series → IRS assistant answer list — `webapp/src/pages/admin/ServiceOrdersSection.tsx:333`
   - Reads: ["Legal name", viewing.llc_name],
@@ -1392,12 +1406,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: At :291-292 the same dialog correctly says EIN for details.seriesName when target is series. The assistant’s legal-name row at :333 nevertheless always supplies the parent LLC name, although the office is told at :309-310 to type these answers straight down. This can submit the parent name on an application intended for the separately named series.
   - Replace with: ["Legal name", viewing.details.target === "series" ? viewing.details.seriesName ?? "" : viewing.llc_name],
   - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **N3.08. [substantive]** — **open**
+- **N3.08. [substantive]** — **implemented**
   - Office → order board → Complete column when service orders have not loaded — `webapp/src/pages/admin/OrderBoard.tsx:380`
   - Reads: Everything delivered — documents and services
   - Claims: Every order in this column has no outstanding purchased service.
   - True: servicesQuery runs independently at :233-237. Until it succeeds, or after it fails without cached data, :263 substitutes an empty service list. everythingDone at :282-283 then accepts formed orders with delivered certificates, and :295 places them in Complete even when outstanding services have not been checked. The query has no visible failure state; only ordersQuery errors are shown.
   - Replace with: Require a successfully loaded service list before marking delivery complete. While it is unavailable show: “We could not check the remaining service orders. Try again.”
+  - Fixed: batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
 
 ## Emails and jobs — 36 open of 37
 
@@ -1563,13 +1578,14 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: …a sale of substantially all the assets where the member could vote on it (unless by court order, or for cash with the proceeds distributed within a year)…
   - Codex (housekeeping-only): chapter-605-notes.md:508 omits exceptions from the internal summary of605.1006(1)(d). The statute distinguishes court-ordered sales and qualifying cash-sale distribution plans.
   - **Codex rejected the proposed replacement:** Say cash pursuant to a plan distributing all or substantially all NET proceeds to interest holders within one year; not merely any proceeds distributed within a year.
-- **219. [B106]** — **open** — housekeeping
+- **219. [B106]** — **implemented** — housekeeping
   - Welcome email, the portal paragraph — `webapp/server/email.ts:86`
   - Reads: Your Owner's Manual — the plain-English guide to running your protected series LLC — is already in your portal's library, ready to download.
   - Claims: The manual is in the library at the moment the order is paid.
   - True: The manual reaches library_documents only when refreshOwnersManual runs (routes-admin.ts:40-70) — the nightly cron at 08:45 UTC (vercel.json) or the office's button (:85-96); nothing publishes at boot (no call in app.ts or vercel-entry.ts). On a fresh production database the first client paid before that runs finds an empty library.
   - Replace with: Publish the manual on first boot when no 'owners-manual' row exists (call refreshOwnersManual(false) from the cron and from app start), or word it 'will be in your portal's library'.
   - **Codex rejected the proposed replacement:** Ensure an awaited successful publication before the first welcome or state availability only after checking the library. An unawaited app-start call or unconditional will-be promise does not establish availability.
+  - Fixed: batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **220. [B109]** — **open** — housekeeping
   - 'About the card you paid with' email (prepaid gift card), the renewal date in parentheses — `webapp/server/email.ts:107`
   - Reads: Before your renewal date${renewalDate ? ` (${escapeHtml(renewalDate)})` : ""} you will receive an email with a payment link.

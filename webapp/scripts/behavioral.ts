@@ -1,3 +1,4 @@
+import {batch05Walk} from "./batch05-walk";
 import { batch04AccountWalk } from "./batch04-account-walk";
 import {batch04Walk} from "./batch04-walk";
 import {batch03Walk} from "./batch03-walk";
@@ -1367,7 +1368,8 @@ async function main(): Promise<void> {
       await page.getByLabel("Search by LLC name, client name, or email").fill("Gate Run Delta");
       await page.waitForTimeout(1500);
       const sRow = page.locator("main button").filter({ hasText: /^S Election/ }).first();
-      expect(/waiting on client/i.test(await sRow.innerText().catch(() => "")), "admin: the board row says the S election is waiting on the client", await sRow.innerText().catch(() => ""));
+      // Batch 05: keep the historical check identity; the displayed status is now shared with the dialog.
+      expect(/Waiting for client details/.test(await sRow.innerText().catch(() => "")), "admin: the board row says the S election is waiting on the client", await sRow.innerText().catch(() => ""));
       await sRow.click();
       await page.waitForTimeout(800);
       const dialog = page.locator('[role="dialog"]').first();
@@ -2497,7 +2499,7 @@ async function main(): Promise<void> {
         await page.waitForTimeout(1200);
         const dlg = page.locator('[role="dialog"]').first();
         const entries = await dlg.locator('[data-testid="emails-list"] li').allInnerTexts();
-        expect(entries.length >= 1 && entries.some((e) => /client portal/i.test(e) && /delivered/.test(e)), "emails: the welcome email is listed as delivered", entries);
+        expect(entries.length >= 1 && entries.some((e) => /client portal/i.test(e) && /Accepted by email provider/.test(e)), "emails: the welcome email is listed as delivered", entries);
         await dlg.locator('[data-testid="emails-list"] li button').first().click();
         await page.waitForTimeout(1200);
         expect((await dlg.locator('[data-testid="email-body"]').count()) === 1, "emails: an entry opens to show the body as sent");
@@ -2746,6 +2748,22 @@ async function main(): Promise<void> {
   {const r=batch04Results.get("batch04 163: agreement deletion reports failure");expect(r?.ok===true,"batch04 163: agreement deletion reports failure",r?.detail);batch04Results.delete("batch04 163: agreement deletion reports failure");}
   {const r=batch04Results.get("batch04 169: agreement deletion uses portal confirmation");expect(r?.ok===true,"batch04 169: agreement deletion uses portal confirmation",r?.detail);batch04Results.delete("batch04 169: agreement deletion uses portal confirmation");}
   for(const [label,r]of batch04Results)expect(r.ok,label,r.detail);
+
+const batch05Results = new Map<string,{ok:boolean;detail?:unknown}>();
+await batch05Walk(browser, `http://localhost:${WEB_PORT}`, (ok,label,detail)=>batch05Results.set(label,{ok,detail}));
+{const r=batch05Results.get("batch05 N3.08: completion waits for service information");expect(r?.ok===true,"batch05 N3.08: completion waits for service information",r?.detail);batch05Results.delete("batch05 N3.08: completion waits for service information");}
+{const r=batch05Results.get("batch05 176: certificate errors appear beside certificates");expect(r?.ok===true,"batch05 176: certificate errors appear beside certificates",r?.detail);batch05Results.delete("batch05 176: certificate errors appear beside certificates");}
+{const r=batch05Results.get("batch05 177: Articles number validation matches the server");expect(r?.ok===true,"batch05 177: Articles number validation matches the server",r?.detail);batch05Results.delete("batch05 177: Articles number validation matches the server");}
+{const r=batch05Results.get("batch05 178:s-election-date-row: corrected dates have neutral labels");expect(r?.ok===true,"batch05 178:s-election-date-row: corrected dates have neutral labels",r?.detail);batch05Results.delete("batch05 178:s-election-date-row: corrected dates have neutral labels");}
+{const r=batch05Results.get("batch05 178:series-uploaded-text: series instructions describe this upload");expect(r?.ok===true,"batch05 178:series-uploaded-text: series instructions describe this upload",r?.detail);batch05Results.delete("batch05 178:series-uploaded-text: series instructions describe this upload");}
+{const r=batch05Results.get("batch05 178:typed-ein-survives: abandoned EIN drafts are cleared");expect(r?.ok===true,"batch05 178:typed-ein-survives: abandoned EIN drafts are cleared",r?.detail);batch05Results.delete("batch05 178:typed-ein-survives: abandoned EIN drafts are cleared");}
+{const r=batch05Results.get("batch05 180: regeneration explains uploaded-manual replacement");expect(r?.ok===true,"batch05 180: regeneration explains uploaded-manual replacement",r?.detail);batch05Results.delete("batch05 180: regeneration explains uploaded-manual replacement");}
+{const r=batch05Results.get("batch05 181: board wording matches counts search and status");expect(r?.ok===true,"batch05 181: board wording matches counts search and status",r?.detail);batch05Results.delete("batch05 181: board wording matches counts search and status");}
+{const r=batch05Results.get("batch05 185: manual upload requires an edition");expect(r?.ok===true,"batch05 185: manual upload requires an edition",r?.detail);batch05Results.delete("batch05 185: manual upload requires an edition");}
+{const r=batch05Results.get("batch05 173: account label reflects password state");expect(r?.ok===true,"batch05 173: account label reflects password state",r?.detail);batch05Results.delete("batch05 173: account label reflects password state");}
+{const r=batch05Results.get("batch05 174: email history describes provider acceptance and limit");expect(r?.ok===true,"batch05 174: email history describes provider acceptance and limit",r?.detail);batch05Results.delete("batch05 174: email history describes provider acceptance and limit");}
+for(const [label,r]of batch05Results)expect(r.ok,label,r.detail);
+
   const accountResults = new Map<string, {ok: boolean; detail?: unknown}>();
   await batch04AccountWalk(browser, `http://localhost:${WEB_PORT}`, (ok, label, detail) => accountResults.set(label, {ok, detail}));
   {
