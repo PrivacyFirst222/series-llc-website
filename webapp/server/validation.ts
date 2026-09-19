@@ -169,6 +169,8 @@ const extendedFormSchema = formationFormSchema
         } else if (!(data.businessPurposeText ?? "").trim()) {
           ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["businessPurposeText"], message: "A Professional LLC must provide a specific professional purpose." });
         }
+      } else if (data.purposeType === "PROFESSIONAL") {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["purposeType"], message: "Choose a general or specific purpose for an ordinary LLC." });
       } else if (data.purposeType === "SPECIFIC" && !(data.businessPurposeText ?? "").trim()) {
         ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["businessPurposeText"], message: "Specific purpose is required." });
       }
@@ -358,6 +360,10 @@ const extendedFormSchema = formationFormSchema
 export const orderFormSchema = z.preprocess((raw) => {
   if (raw && typeof raw === "object") {
     let d = raw as Record<string, unknown>;
+    // Match the visible intake paths before field schemas can reject hidden answers.
+    d = { ...d, correspondentCompany: "", correspondentPhone: "", correspondentAddress: undefined, authorizedRepresentativeEmail: "", authorizedRepresentativePhone: "" };
+    if (d.managementStructure === "MEMBER_MANAGED") d = { ...d, managers: [] };
+    if (d.managementStructure === "MANAGER_MANAGED") d = { ...d, members: [] };
     if (Array.isArray(d.members)) {
       // Scaffold rows are stripped BEFORE validation: a manager-managed order
       // arrives with the untouched blank row from a step it never showed, and

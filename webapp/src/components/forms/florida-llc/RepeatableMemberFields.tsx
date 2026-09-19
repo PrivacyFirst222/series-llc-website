@@ -83,7 +83,7 @@ export function RepeatableMemberFields({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="INDIVIDUAL">Individual</SelectItem>
-                  <SelectItem value="ENTITY">Entity</SelectItem>
+                  <SelectItem value="ENTITY">Business entity</SelectItem>
                 </SelectContent>
               </Select>
             </FieldShell>
@@ -141,7 +141,7 @@ export function RepeatableMemberFields({
 
           <AddressFieldsBlock
             prefix={`mem-${entry.id}`}
-            errors={{ address1: rowError(idx, "address1"), city: rowError(idx, "city"), state: rowError(idx, "state"), zip: rowError(idx, "zip") }}
+            errors={{ address1: rowError(idx, "address1"), city: rowError(idx, "city"), state: rowError(idx, "state"), zip: rowError(idx, "zip"), country: rowError(idx, "country") }}
             value={{
               address1: entry.address1,
               address2: entry.address2,

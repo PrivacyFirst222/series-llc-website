@@ -119,10 +119,10 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
     },
     correspondence: {
       name: data.correspondentName,
-      company: data.correspondentCompany ?? "",
-      email: data.correspondentEmail,
-      phone: data.correspondentPhone ?? "",
-      address: data.correspondentAddress ?? null,
+      company: "",
+      email: data.correspondentEmail || data.clientEmail,
+      phone: "",
+      address: null,
     },
     optionalDocuments: {
       certificateOfStatus: data.orderCertificateOfStatus,

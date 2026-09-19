@@ -1,8 +1,6 @@
 import { useEffect } from "react";
-import { PHONE_HINT, formatPhone } from "@/lib/phone";
 import { Input } from "@/components/ui/input";
 import { FieldShell } from "../FieldShell";
-import { AddressFieldsBlock } from "../AddressFields";
 import { cleanEmailInput, fullPersonName } from "../validation";
 import type { FloridaLLCFormData } from "../types";
 
@@ -11,15 +9,6 @@ interface StepProps {
   patch: (p: Partial<FloridaLLCFormData>) => void;
   errors: Record<string, string>;
 }
-
-const blankAddress = () => ({
-  address1: "",
-  address2: "",
-  city: "",
-  state: "",
-  zip: "",
-  country: "United States",
-});
 
 export function StepCorrespondence({ data, patch, errors }: StepProps) {
   // Starts as the client — that's who correspondence belongs to unless they
@@ -31,9 +20,6 @@ export function StepCorrespondence({ data, patch, errors }: StepProps) {
     if (!name && !data.clientEmail) return;
     patch({
       correspondentName: name,
-      correspondentEmail: data.clientEmail,
-      confirmCorrespondentEmail: data.clientEmail,
-      correspondentPhone: data.clientPhone ?? "",
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -45,16 +31,14 @@ export function StepCorrespondence({ data, patch, errors }: StepProps) {
       ? "Emails do not match."
       : undefined;
 
-  const hasAddress = Boolean(data.correspondentAddress);
-
   return (
     <div className="space-y-6">
       <header className="space-y-2">
         <h2 className="font-display text-3xl">Correspondence contact</h2>
         <p className="text-sm text-muted-foreground max-w-2xl">
-          The Division of Corporations sends its filing acknowledgment and its
-          notices to this address. Our own emails go to the client email you
-          gave at the start.
+          The Division of Corporations sends filing emails to your user email
+          unless you provide a different email below. Our own emails go to the
+          user email you gave at the start.
         </p>
       </header>
 
@@ -71,19 +55,10 @@ export function StepCorrespondence({ data, patch, errors }: StepProps) {
             onChange={(e) => patch({ correspondentName: e.target.value })}
           />
         </FieldShell>
-        <FieldShell label="Company (optional)" htmlFor="correspondent-company">
-          <Input
-            id="correspondent-company"
-            value={data.correspondentCompany ?? ""}
-            onChange={(e) =>
-              patch({ correspondentCompany: e.target.value })
-            }
-          />
-        </FieldShell>
 
         <FieldShell
-          label="Email"
-          required
+          label="Email (optional)"
+          helper="Leave the email blank to use your email from Your information."
           error={errors.correspondentEmail}
           htmlFor="correspondent-email"
         >
@@ -91,12 +66,12 @@ export function StepCorrespondence({ data, patch, errors }: StepProps) {
             id="correspondent-email"
             type="email"
             value={data.correspondentEmail}
-            onChange={(e) => patch({ correspondentEmail: cleanEmailInput(e.target.value) })}
+            onChange={(e) => patch({ correspondentEmail: cleanEmailInput(e.target.value), ...(!e.target.value.trim() ? { confirmCorrespondentEmail: "" } : {}) })}
           />
         </FieldShell>
         <FieldShell
           label="Confirm email"
-          required
+          required={Boolean(data.correspondentEmail)}
           error={emailMismatch ?? errors.confirmCorrespondentEmail}
           htmlFor="correspondent-confirm-email"
         >
@@ -109,50 +84,7 @@ export function StepCorrespondence({ data, patch, errors }: StepProps) {
             }
           />
         </FieldShell>
-        <FieldShell label="Phone (optional)" htmlFor="correspondent-phone">
-          <Input
-            id="correspondent-phone"
-            type="tel"
-            placeholder={PHONE_HINT}
-            value={data.correspondentPhone ?? ""}
-            onChange={(e) =>
-              patch({ correspondentPhone: formatPhone(e.target.value) })
-            }
-          />
-        </FieldShell>
       </div>
-
-      <FieldShell label="Mailing address (optional)">
-        <label className="flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={hasAddress}
-            onChange={(e) =>
-              patch({
-                correspondentAddress: e.target.checked
-                  ? blankAddress()
-                  : undefined,
-              })
-            }
-            className="h-4 w-4 accent-trust"
-          />
-          Add a mailing address for paper correspondence
-        </label>
-      </FieldShell>
-
-      {hasAddress && data.correspondentAddress ? (
-        <AddressFieldsBlock
-          prefix="corres"
-          value={data.correspondentAddress}
-          onChange={(v) => patch({ correspondentAddress: v })}
-          errors={{
-            address1: errors["correspondentAddress.address1"],
-            city: errors["correspondentAddress.city"],
-            state: errors["correspondentAddress.state"],
-            zip: errors["correspondentAddress.zip"],
-          }}
-        />
-      ) : null}
     </div>
   );
 }

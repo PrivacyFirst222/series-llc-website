@@ -451,7 +451,12 @@ export function FloridaLLCFormationForm({
         "/api/orders",
         // The untouched scaffold member row is not an answer — a
         // manager-managed flow never shows the members step at all.
-        { ...data, members: data.members.filter((m) => !memberRowIsBlank(m as unknown as Record<string, unknown>)) },
+        { ...data,
+          managers: data.managementStructure === "MEMBER_MANAGED" ? [] : data.managers,
+          members: data.managementStructure === "MANAGER_MANAGED" ? [] : data.members.filter((m) => !memberRowIsBlank(m as unknown as Record<string, unknown>)),
+          correspondentCompany: "", correspondentPhone: "", correspondentAddress: undefined,
+          authorizedRepresentativeEmail: "", authorizedRepresentativePhone: "",
+        },
       );
       onSubmit?.(data);
       leavingForCheckout.current = true;

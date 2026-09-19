@@ -1,5 +1,6 @@
 import { FIRST_AND_LAST, hasFirstAndLast } from "@/lib/personName";
 import { z } from "zod";
+import { postalCodeError } from "./addressValidation";
 
 const PO_BOX_REGEX = /\b(p\.?\s*o\.?\s*box|post\s*office\s*box)\b/i;
 export const isPoBox = (s: string): boolean => PO_BOX_REGEX.test(s);
@@ -9,8 +10,11 @@ export const addressSchema = z.object({
   address2: z.string().optional().or(z.literal("")),
   city: z.string().min(1, "City is required"),
   state: z.string().min(1, "State is required"),
-  zip: z.string().min(3, "ZIP / postal code is required"),
-  country: z.string().min(1, "Country is required"),
+  zip: z.string(),
+  country: z.string().trim().min(1, "Country required."),
+}).superRefine((a, ctx) => {
+  const message = postalCodeError(a.zip, a.country);
+  if (message) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["zip"], message });
 });
 
 export const principalAddressSchema = addressSchema.refine(
@@ -33,11 +37,13 @@ export const partyEntrySchema = z.object({
   streetAddress2: z.string().optional().or(z.literal("")),
   city: z.string().min(1, "City is required"),
   state: z.string().min(1, "State is required"),
-  zip: z.string().min(3, "ZIP is required"),
-  country: z.string().min(1, "Country is required"),
+  zip: z.string(),
+  country: z.string().trim().min(1, "Country required."),
   phone: z.string().optional().or(z.literal("")),
   email: z.string().email("Enter a valid email").optional().or(z.literal("")),
 }).superRefine((p, ctx) => {
+  const postalError = postalCodeError(p.zip, p.country);
+  if (postalError) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["zip"], message: postalError });
   if (p.personOrEntity === "INDIVIDUAL" && (!p.firstName?.trim() || !p.lastName?.trim())) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -65,14 +71,16 @@ export const memberEntrySchema = z.object({
   address2: z.string().optional().or(z.literal("")),
   city: z.string().min(1, "City is required"),
   state: z.string().min(1, "State is required"),
-  zip: z.string().min(3, "ZIP is required"),
-  country: z.string().min(1, "Country is required"),
+  zip: z.string(),
+  country: z.string().trim().min(1, "Country required."),
   ownershipPercentage: z.number().min(0).max(100).optional(),
   capitalContribution: z.number().min(0).optional(),
   email: z.string().email("Enter a valid email").optional().or(z.literal("")),
   phone: z.string().optional().or(z.literal("")),
   isInitialMember: z.boolean(),
 }).superRefine((m, ctx) => {
+  const postalError = postalCodeError(m.zip, m.country);
+  if (postalError) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["zip"], message: postalError });
   if (m.memberType === "INDIVIDUAL" && (!m.firstName?.trim() || !m.lastName?.trim())) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -143,7 +151,7 @@ export const formationFormSchema = z.object({
   registeredAgentState: z.string().refine((s) => s === "FL", {
     message: "Registered agent address must be in Florida (FL).",
   }),
-  registeredAgentZip: z.string().min(3, "ZIP required"),
+  registeredAgentZip: z.string().refine((s) => !postalCodeError(s), { message: "Enter a 5-digit ZIP code or ZIP+4." }),
   registeredAgentEmail: z.string().email("Enter a valid email").optional().or(z.literal("")),
   registeredAgentPhone: z.string().optional().or(z.literal("")),
   registeredAgentIsAffiliatedPerson: z.boolean(),
@@ -204,12 +212,11 @@ export const formationFormSchema = z.object({
 
   correspondentName: z.string().trim().min(1, "Name required").refine(hasFirstAndLast, FIRST_AND_LAST),
   correspondentCompany: z.string().optional().or(z.literal("")),
-  correspondentEmail: z.string().email("Enter a valid email"),
-  confirmCorrespondentEmail: z.string().email("Enter a valid email"),
+  correspondentEmail: z.string().email("Enter a valid email").optional().or(z.literal("")),
+  confirmCorrespondentEmail: z.string().email("Enter a valid email").optional().or(z.literal("")),
   correspondentPhone: z.string().optional().or(z.literal("")),
-  // "Add a mailing address for paper correspondence" — optional, and when
-  // given it must be a whole address. Absent from this schema until 8 Sep
-  // 2026, so the server's parse silently dropped what the client typed.
+  // Legacy draft shape only. New submissions clear the retired extra
+  // correspondence fields before validation; historical orders stay intact.
   correspondentAddress: addressSchema.optional(),
 
   orderCertificateOfStatus: z.boolean(),

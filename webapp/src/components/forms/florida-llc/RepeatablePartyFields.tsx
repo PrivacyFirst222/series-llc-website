@@ -75,7 +75,7 @@ export function RepeatablePartyFields({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FieldShell label="Type" required htmlFor={`party-${entry.id}-type`}>
+            <FieldShell label="Manager type" required htmlFor={`party-${entry.id}-type`}>
               <Select
                 value={entry.personOrEntity}
                 onValueChange={(v) =>
@@ -87,7 +87,7 @@ export function RepeatablePartyFields({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="INDIVIDUAL">Individual</SelectItem>
-                  <SelectItem value="ENTITY">Business Entity</SelectItem>
+                  <SelectItem value="ENTITY">Business entity</SelectItem>
                 </SelectContent>
               </Select>
             </FieldShell>
@@ -147,7 +147,7 @@ export function RepeatablePartyFields({
 
           <AddressFieldsBlock
             prefix={`party-${entry.id}`}
-            errors={{ address1: rowError(idx, "streetAddress1"), city: rowError(idx, "city"), state: rowError(idx, "state"), zip: rowError(idx, "zip") }}
+            errors={{ address1: rowError(idx, "streetAddress1"), city: rowError(idx, "city"), state: rowError(idx, "state"), zip: rowError(idx, "zip"), country: rowError(idx, "country") }}
             value={{
               address1: entry.streetAddress1,
               address2: entry.streetAddress2,
@@ -180,9 +180,10 @@ export function RepeatablePartyFields({
                 }
               />
             </FieldShell>
-            <FieldShell label="Email (optional)" htmlFor={`party-${entry.id}-email`}>
+            <FieldShell label="Email (optional)" error={rowError(idx, "email")} htmlFor={`party-${entry.id}-email`}>
               <Input
                 id={`party-${entry.id}-email`}
+                aria-invalid={!!rowError(idx, "email")}
                 type="email"
                 value={entry.email ?? ""}
                 onChange={(e) =>

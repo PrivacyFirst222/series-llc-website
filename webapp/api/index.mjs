@@ -99123,6 +99123,15 @@ function hasFirstAndLast(name) {
   return words.length >= 2;
 }
 
+// src/components/forms/florida-llc/addressValidation.ts
+function postalCodeError(zip, country = "United States") {
+  const value = (zip ?? "").trim();
+  if (/^(?:US|USA|United States|United States of America)$/i.test(country.trim())) {
+    return /^\d{5}(?:-\d{4})?$/.test(value) ? void 0 : "Enter a 5-digit ZIP code or ZIP+4.";
+  }
+  return value.length >= 3 ? void 0 : "Enter a complete postal code.";
+}
+
 // src/components/forms/florida-llc/schema.ts
 var PO_BOX_REGEX = /\b(p\.?\s*o\.?\s*box|post\s*office\s*box)\b/i;
 var isPoBox = (s) => PO_BOX_REGEX.test(s);
@@ -99131,8 +99140,11 @@ var addressSchema = external_exports.object({
   address2: external_exports.string().optional().or(external_exports.literal("")),
   city: external_exports.string().min(1, "City is required"),
   state: external_exports.string().min(1, "State is required"),
-  zip: external_exports.string().min(3, "ZIP / postal code is required"),
-  country: external_exports.string().min(1, "Country is required")
+  zip: external_exports.string(),
+  country: external_exports.string().trim().min(1, "Country required.")
+}).superRefine((a2, ctx) => {
+  const message = postalCodeError(a2.zip, a2.country);
+  if (message) ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["zip"], message });
 });
 var principalAddressSchema = addressSchema.refine(
   (a2) => !isPoBox(a2.address1) && !isPoBox(a2.address2 ?? ""),
@@ -99153,11 +99165,13 @@ var partyEntrySchema = external_exports.object({
   streetAddress2: external_exports.string().optional().or(external_exports.literal("")),
   city: external_exports.string().min(1, "City is required"),
   state: external_exports.string().min(1, "State is required"),
-  zip: external_exports.string().min(3, "ZIP is required"),
-  country: external_exports.string().min(1, "Country is required"),
+  zip: external_exports.string(),
+  country: external_exports.string().trim().min(1, "Country required."),
   phone: external_exports.string().optional().or(external_exports.literal("")),
   email: external_exports.string().email("Enter a valid email").optional().or(external_exports.literal(""))
 }).superRefine((p2, ctx) => {
+  const postalError = postalCodeError(p2.zip, p2.country);
+  if (postalError) ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["zip"], message: postalError });
   if (p2.personOrEntity === "INDIVIDUAL" && (!p2.firstName?.trim() || !p2.lastName?.trim())) {
     ctx.addIssue({
       code: external_exports.ZodIssueCode.custom,
@@ -99184,14 +99198,16 @@ var memberEntrySchema = external_exports.object({
   address2: external_exports.string().optional().or(external_exports.literal("")),
   city: external_exports.string().min(1, "City is required"),
   state: external_exports.string().min(1, "State is required"),
-  zip: external_exports.string().min(3, "ZIP is required"),
-  country: external_exports.string().min(1, "Country is required"),
+  zip: external_exports.string(),
+  country: external_exports.string().trim().min(1, "Country required."),
   ownershipPercentage: external_exports.number().min(0).max(100).optional(),
   capitalContribution: external_exports.number().min(0).optional(),
   email: external_exports.string().email("Enter a valid email").optional().or(external_exports.literal("")),
   phone: external_exports.string().optional().or(external_exports.literal("")),
   isInitialMember: external_exports.boolean()
 }).superRefine((m2, ctx) => {
+  const postalError = postalCodeError(m2.zip, m2.country);
+  if (postalError) ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["zip"], message: postalError });
   if (m2.memberType === "INDIVIDUAL" && (!m2.firstName?.trim() || !m2.lastName?.trim())) {
     ctx.addIssue({
       code: external_exports.ZodIssueCode.custom,
@@ -99256,7 +99272,7 @@ var formationFormSchema = external_exports.object({
   registeredAgentState: external_exports.string().refine((s) => s === "FL", {
     message: "Registered agent address must be in Florida (FL)."
   }),
-  registeredAgentZip: external_exports.string().min(3, "ZIP required"),
+  registeredAgentZip: external_exports.string().refine((s) => !postalCodeError(s), { message: "Enter a 5-digit ZIP code or ZIP+4." }),
   registeredAgentEmail: external_exports.string().email("Enter a valid email").optional().or(external_exports.literal("")),
   registeredAgentPhone: external_exports.string().optional().or(external_exports.literal("")),
   registeredAgentIsAffiliatedPerson: external_exports.boolean(),
@@ -99309,12 +99325,11 @@ var formationFormSchema = external_exports.object({
   clientPhone: external_exports.string().optional().or(external_exports.literal("")),
   correspondentName: external_exports.string().trim().min(1, "Name required").refine(hasFirstAndLast, FIRST_AND_LAST),
   correspondentCompany: external_exports.string().optional().or(external_exports.literal("")),
-  correspondentEmail: external_exports.string().email("Enter a valid email"),
-  confirmCorrespondentEmail: external_exports.string().email("Enter a valid email"),
+  correspondentEmail: external_exports.string().email("Enter a valid email").optional().or(external_exports.literal("")),
+  confirmCorrespondentEmail: external_exports.string().email("Enter a valid email").optional().or(external_exports.literal("")),
   correspondentPhone: external_exports.string().optional().or(external_exports.literal("")),
-  // "Add a mailing address for paper correspondence" — optional, and when
-  // given it must be a whole address. Absent from this schema until 8 Sep
-  // 2026, so the server's parse silently dropped what the client typed.
+  // Legacy draft shape only. New submissions clear the retired extra
+  // correspondence fields before validation; historical orders stay intact.
   correspondentAddress: addressSchema.optional(),
   orderCertificateOfStatus: external_exports.boolean(),
   orderCertifiedCopy: external_exports.boolean(),
@@ -99681,6 +99696,8 @@ var extendedFormSchema = formationFormSchema.extend({
       } else if (!(data.businessPurposeText ?? "").trim()) {
         ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["businessPurposeText"], message: "A Professional LLC must provide a specific professional purpose." });
       }
+    } else if (data.purposeType === "PROFESSIONAL") {
+      ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["purposeType"], message: "Choose a general or specific purpose for an ordinary LLC." });
     } else if (data.purposeType === "SPECIFIC" && !(data.businessPurposeText ?? "").trim()) {
       ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["businessPurposeText"], message: "Specific purpose is required." });
     }
@@ -99851,6 +99868,9 @@ var extendedFormSchema = formationFormSchema.extend({
 var orderFormSchema = external_exports.preprocess((raw2) => {
   if (raw2 && typeof raw2 === "object") {
     let d2 = raw2;
+    d2 = { ...d2, correspondentCompany: "", correspondentPhone: "", correspondentAddress: void 0, authorizedRepresentativeEmail: "", authorizedRepresentativePhone: "" };
+    if (d2.managementStructure === "MEMBER_MANAGED") d2 = { ...d2, managers: [] };
+    if (d2.managementStructure === "MANAGER_MANAGED") d2 = { ...d2, members: [] };
     if (Array.isArray(d2.members)) {
       d2 = { ...d2, members: d2.members.filter((m2) => m2 && typeof m2 === "object" && !memberRowIsBlank(m2)) };
     }
@@ -99981,10 +100001,10 @@ function buildPayload(data) {
     },
     correspondence: {
       name: data.correspondentName,
-      company: data.correspondentCompany ?? "",
-      email: data.correspondentEmail,
-      phone: data.correspondentPhone ?? "",
-      address: data.correspondentAddress ?? null
+      company: "",
+      email: data.correspondentEmail || data.clientEmail,
+      phone: "",
+      address: null
     },
     optionalDocuments: {
       certificateOfStatus: data.orderCertificateOfStatus,

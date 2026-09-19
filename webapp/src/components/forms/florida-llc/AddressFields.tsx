@@ -133,6 +133,7 @@ export function AddressFieldsBlock({
       >
         <Input
           id={`${prefix}-country`}
+          aria-invalid={Boolean(errors?.country)}
           value={value.country}
           onChange={(e) => set("country", e.target.value)}
         />

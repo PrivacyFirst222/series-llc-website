@@ -1,3 +1,4 @@
+import { batch08Walk } from "./batch08-walk";
 import { batch07Walk } from "./batch07-walk";
 import { batch06Walk } from "./batch06-walk";
 import {batch05Walk} from "./batch05-walk";
@@ -79,8 +80,6 @@ type RunConfig = {
   viaPricing?: boolean;
   /** A second alternate name. */
   alternate2?: boolean;
-  /** A mailing address for the correspondence contact. */
-  correspondentMailing?: boolean;
   /** Managers beyond the first (manager-managed only). */
   extraManagers?: number;
   /** Every optional field left blank; unused scaffold rows untouched. */
@@ -95,13 +94,13 @@ const RUNS: RunConfig[] = [
   { key: "E", label: "conversion, member-managed, our RA, from the pricing card", path: "convert", formationType: "DOMESTIC_LLC", management: "MEMBER_MANAGED", ra: "SERVICE", llcName: "Gate Run Echo, LLC", designator: "", viaPricing: true },
   { key: "F", label: "conversion, manager-managed, self RA", path: "convert", formationType: "DOMESTIC_LLC", management: "MANAGER_MANAGED", ra: "SELF", llcName: "Gate Run Foxtrot, LLC", designator: "" },
   { key: "G", label: "new LLC, exact name only, dated, certificates, 4 series", path: "new", formationType: "DOMESTIC_LLC", management: "MEMBER_MANAGED", ra: "SERVICE", llcName: "Gate Run Golf", designator: "Limited Liability Company", exactNameOnly: true, requestedEffectiveDate: "2026-10-01", addons: { certificate: true, certifiedCopy: true }, extraSeries: 3, specificPurpose: "Holding and leasing residential real estate" },
-  { key: "H", label: "new LLC, entity manager, separate mailing, correspondent mailing, we sign (audit H)", path: "new", formationType: "DOMESTIC_LLC", management: "MANAGER_MANAGED", ra: "SERVICE", llcName: "Gate Run Hotel", designator: "LLC", managerEntity: true, separateMailing: true, correspondentMailing: true, weSign: true },
+  { key: "H", label: "new LLC, entity manager, separate LLC mailing, we sign (audit H)", path: "new", formationType: "DOMESTIC_LLC", management: "MANAGER_MANAGED", ra: "SERVICE", llcName: "Gate Run Hotel", designator: "LLC", managerEntity: true, separateMailing: true, weSign: true },
   { key: "I", label: "new PLLC, manager-managed, self RA (P.L.L.C.)", path: "new", formationType: "PLLC", management: "MANAGER_MANAGED", ra: "SELF", llcName: "Gate Run India", designator: "P.L.L.C." },
   // The audit's remaining scenarios (8 Sep 2026). Its "B" asked for an entity
   // member on a manager-managed company, which this product never collects
   // (ownership is the questionnaire's) — so L carries the rest of it.
   { key: "J", label: "minimum: every optional field blank, exact name only (audit J)", path: "new", formationType: "DOMESTIC_LLC", management: "MEMBER_MANAGED", ra: "SERVICE", llcName: "Gate Run Juliet", designator: "LLC", exactNameOnly: true, minimal: true, email: "gate-min@e2e.test" },
-  { key: "K", label: "maximum: two alternates, five series, three managers, both mailings, every add-on, dated, we sign (audit K)", path: "new", formationType: "DOMESTIC_LLC", management: "MANAGER_MANAGED", ra: "SERVICE", llcName: "Gate Run Kilo", designator: "LLC", alternate2: true, extraSeries: 4, extraManagers: 2, separateMailing: true, correspondentMailing: true, addons: { ein: true, sElection: true, certificate: true, certifiedCopy: true }, requestedEffectiveDate: "2026-11-02", specificPurpose: "Holding and leasing residential real estate in Orange County", weSign: true, email: "gate-max@e2e.test" },
+  { key: "K", label: "maximum: two alternates, five series, three managers, separate LLC mailing, every add-on, dated, we sign (audit K)", path: "new", formationType: "DOMESTIC_LLC", management: "MANAGER_MANAGED", ra: "SERVICE", llcName: "Gate Run Kilo", designator: "LLC", alternate2: true, extraSeries: 4, extraManagers: 2, separateMailing: true, addons: { ein: true, sElection: true, certificate: true, certifiedCopy: true }, requestedEffectiveDate: "2026-11-02", specificPurpose: "Holding and leasing residential real estate in Orange County", weSign: true, email: "gate-max@e2e.test" },
   // Its own account, so the self-agent portal journey is not muddied by a
   // run that took our service under the shared address.
   { key: "L", label: "new LLC, manager-managed, self RA, individual manager (audit B)", path: "new", formationType: "DOMESTIC_LLC", management: "MANAGER_MANAGED", ra: "SELF", llcName: "Gate Run Lima", designator: "LLC", email: "gate-self@e2e.test" },
@@ -491,7 +490,7 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
       expect(/First name required\.|Entity name required\./.test(blankText) && /Street address required\./.test(blankText), `${run.key}: a blank manager row says which boxes are missing`, blankText.match(/required\.[^\n]{0,40}/g));
     }
     if (run.managerEntity) {
-      await choose(page, "[id$='-type']", "Business Entity");
+      await choose(page, "[id$='-type']", "Business entity");
       await fill(page, "Business entity name", "Gate Managers of Florida, Inc.");
     } else {
       await fill(page, "First name", "Morgan");
@@ -523,7 +522,7 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
       expect(/First name required\./.test(blankText) && /Address required\./.test(blankText), `${run.key}: a blank member row says which boxes are missing`, blankText.match(/required\.[^\n]{0,40}/g));
     }
     if (run.memberEntity) {
-      await choose(page, "[id$='-type']", "Entity");
+      await choose(page, "[id$='-type']", "Business entity");
       await fill(page, "Entity name", "Gate Member Holdings, Inc.");
     } else {
       await fill(page, "First name", "Casey");
@@ -573,11 +572,7 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
   }
   await fill(page, "Email", run.email ?? "gate@e2e.test");
   await fill(page, "Confirm email", run.email ?? "gate@e2e.test");
-  // The intake's phone boxes take the shape as typed (Adam, 7 Sep 2026).
-  const corrPhone = page.locator("#correspondent-phone");
-  expect(!/[a-z]/i.test((await corrPhone.getAttribute("placeholder")) ?? ""), `${run.key}: the correspondence phone hint has no letters`);
-  await corrPhone.pressSequentially("4072106622", { delay: 20 });
-  expect((await corrPhone.inputValue()) === "(407) 210-6622", `${run.key}: the correspondence phone takes the shape as typed`, await corrPhone.inputValue());
+  expect(await page.locator("#correspondent-phone,#correspondent-company").count() === 0, `${run.key}: correspondence does not request unused extra contacts`);
   // The phone-sized run types slower than the page settles: read the boxes
   // back before tapping Continue, so the tap tests the one-word name and
   // nothing else.
@@ -589,15 +584,7 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
   await fill(page, "Contact name", "Casey Gatecheck");
   await fill(page, "Email", run.email ?? "gate@e2e.test");
   await fill(page, "Confirm email", run.email ?? "gate@e2e.test");
-  if (run.correspondentMailing) {
-    await page.locator("main label", { hasText: /mailing address for paper correspondence/i }).locator('input[type="checkbox"]').first().check({ force: true });
-    await page.waitForTimeout(300);
-    await page.locator("#corres-address1").fill("PO Box 9090");
-    await page.locator("#corres-city").fill("Winter Park");
-    await page.locator("#corres-state").click();
-    await page.getByRole("option", { name: "FL — Florida", exact: true }).first().click();
-    await page.locator("#corres-zip").fill("32790");
-  }
+  expect(await page.locator("#corres-address1").count() === 0, `${run.key}: correspondence has no separate paper-mail address`);
   await advance(page);
 
   // Optional docs and add-ons. The S election add-on carries Adam's calendar
@@ -868,7 +855,7 @@ async function main(): Promise<void> {
           expect(!payload.optionalDocuments?.ein && !payload.optionalDocuments?.sElection && !payload.optionalDocuments?.certificateOfStatus && !payload.optionalDocuments?.certifiedCopy, `${run.key}: minimal — no add-ons`, payload.optionalDocuments);
         }
         if (run.alternate2) expect((payload.llcName?.alternateNames ?? []).some((n: string) => n.includes("Reserve")), `${run.key}: the second alternate name is stored`, payload.llcName);
-        if (run.correspondentMailing) expect(JSON.stringify(payload).includes("PO Box 9090"), `${run.key}: the correspondent's mailing address is stored`, payload.correspondent ?? payload.correspondence);
+        expect(!payload.correspondence?.address && !payload.correspondence?.company && !payload.correspondence?.phone, `${run.key}: retired correspondence extras stay out of new orders`, payload.correspondence);
         if (run.extraManagers) {
           const mgrs = (payload.management?.managersOrAuthorizedRepresentatives ?? []).filter((m: { role?: string }) => (m.role ?? "MGR") === "MGR");
           expect(mgrs.length === 1 + run.extraManagers, `${run.key}: every manager row added on screen is stored`, mgrs.length);
@@ -2732,6 +2719,20 @@ async function main(): Promise<void> {
       await page.close();
     }
   }
+
+const batch08Results = new Map<string,{ok:boolean;detail?:unknown}>();
+await batch08Walk(browser, `http://localhost:${WEB_PORT}`, (ok,label,detail)=>batch08Results.set(label,{ok,detail}), API);
+{const r=batch08Results.get("batch08 49: review states which member information is filed");expect(r?.ok===true,"batch08 49: review states which member information is filed",r?.detail);batch08Results.delete("batch08 49: review states which member information is filed");}
+{const r=batch08Results.get("batch08 55: missing country is caught and shown on the current step");expect(r?.ok===true,"batch08 55: missing country is caught and shown on the current step",r?.detail);batch08Results.delete("batch08 55: missing country is caught and shown on the current step");}
+{const r=batch08Results.get("batch08 56: ZIP validation agrees before and after submission");expect(r?.ok===true,"batch08 56: ZIP validation agrees before and after submission",r?.detail);batch08Results.delete("batch08 56: ZIP validation agrees before and after submission");}
+{const r=batch08Results.get("batch08 57: only the user email is required and optional errors are visible");expect(r?.ok===true,"batch08 57: only the user email is required and optional errors are visible",r?.detail);batch08Results.delete("batch08 57: only the user email is required and optional errors are visible");}
+{const r=batch08Results.get("batch08 60: correspondence uses name and email without unused extra fields");expect(r?.ok===true,"batch08 60: correspondence uses name and email without unused extra fields",r?.detail);batch08Results.delete("batch08 60: correspondence uses name and email without unused extra fields");}
+{const r=batch08Results.get("batch08 85: manager and member type labels agree");expect(r?.ok===true,"batch08 85: manager and member type labels agree",r?.detail);batch08Results.delete("batch08 85: manager and member type labels agree");}
+{const r=batch08Results.get("batch08 94: member requirement describes the selected filing path");expect(r?.ok===true,"batch08 94: member requirement describes the selected filing path",r?.detail);batch08Results.delete("batch08 94: member requirement describes the selected filing path");}
+{const r=batch08Results.get("batch08 100: review includes exact-name instructions and omits inapplicable blanks");expect(r?.ok===true,"batch08 100: review includes exact-name instructions and omits inapplicable blanks",r?.detail);batch08Results.delete("batch08 100: review includes exact-name instructions and omits inapplicable blanks");}
+{const r=batch08Results.get("batch08 N4.09: hidden manager rows cannot block a member-managed order");expect(r?.ok===true,"batch08 N4.09: hidden manager rows cannot block a member-managed order",r?.detail);batch08Results.delete("batch08 N4.09: hidden manager rows cannot block a member-managed order");}
+{const r=batch08Results.get("batch08 N4.05: ordinary LLC orders do not retain a hidden professional purpose");expect(r?.ok===true,"batch08 N4.05: ordinary LLC orders do not retain a hidden professional purpose",r?.detail);batch08Results.delete("batch08 N4.05: ordinary LLC orders do not retain a hidden professional purpose");}
+for(const [label,result] of batch08Results) expect(result.ok,label,result.detail);
 
 const batch07Results = new Map<string,{ok:boolean;detail?:unknown}>();
 await batch07Walk(browser, `http://localhost:${WEB_PORT}`, (ok,label,detail)=>batch07Results.set(label,{ok,detail}));

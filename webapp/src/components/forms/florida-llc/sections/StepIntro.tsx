@@ -43,7 +43,7 @@ export function StepIntro({ data, patch, errors }: StepProps) {
                 name="formationType"
                 className="sr-only"
                 checked={data.formationType === opt.val}
-                onChange={() => patch({ formationType: opt.val })}
+                onChange={() => patch({ formationType: opt.val, ...(opt.val !== data.formationType ? { purposeType: opt.val === "PLLC" ? "PROFESSIONAL" : "GENERAL", businessPurposeText: "" } : {}) })}
               />
               <div className="font-medium">{opt.title}</div>
               <div className="text-xs text-muted-foreground mt-1">{opt.sub}</div>

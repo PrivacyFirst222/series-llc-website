@@ -1,3 +1,4 @@
+import { postalCodeError } from "./addressValidation";
 import { registeredAgentName } from "./registeredAgent";
 import { FIRST_AND_LAST, hasFirstAndLast } from "@/lib/personName";
 import { isPoBox } from "./schema";
@@ -52,7 +53,8 @@ export function validateStep(
     if (!data.clientAddress.address1.trim()) e["clientAddress.address1"] = "Street address is required.";
     if (!data.clientAddress.city.trim()) e["clientAddress.city"] = "City is required.";
     if (!data.clientAddress.state.trim()) e["clientAddress.state"] = "State is required.";
-    if (!data.clientAddress.zip.trim()) e["clientAddress.zip"] = "ZIP is required.";
+    if (postalCodeError(data.clientAddress.zip, data.clientAddress.country)) e["clientAddress.zip"] = postalCodeError(data.clientAddress.zip, data.clientAddress.country)!;
+    if (!data.clientAddress.country.trim()) e["clientAddress.country"] = "Country required.";
     if (!data.clientAddress.address1.trim() || !data.clientAddress.city.trim() || !data.clientAddress.state.trim() || !data.clientAddress.zip.trim())
       e.clientAddress = "Street address, city, state, and ZIP are required.";
   }
@@ -156,8 +158,8 @@ export function validateStep(
     if (!a.address1) e["principalAddress.address1"] = "Street address required.";
     if (!a.city) e["principalAddress.city"] = "City required.";
     if (!a.state) e["principalAddress.state"] = "State required.";
-    if (!a.zip) e["principalAddress.zip"] = "ZIP required.";
-    if (!a.country) e["principalAddress.country"] = "Country required.";
+    if (postalCodeError(a.zip, a.country)) e["principalAddress.zip"] = postalCodeError(a.zip, a.country)!;
+    if (!a.country.trim()) e["principalAddress.country"] = "Country required.";
     if (isPoBox(a.address1) || isPoBox(a.address2 ?? "")) {
       e["principalAddress.address1"] =
         "A P.O. Box cannot be used for the principal office address.";
@@ -170,8 +172,8 @@ export function validateStep(
       if (!a.address1) e["mailingAddress.address1"] = "Street address required.";
       if (!a.city) e["mailingAddress.city"] = "City required.";
       if (!a.state) e["mailingAddress.state"] = "State required.";
-      if (!a.zip) e["mailingAddress.zip"] = "ZIP required.";
-      if (!a.country) e["mailingAddress.country"] = "Country required.";
+      if (postalCodeError(a.zip, a.country)) e["mailingAddress.zip"] = postalCodeError(a.zip, a.country)!;
+      if (!a.country.trim()) e["mailingAddress.country"] = "Country required.";
     }
   }
 
@@ -219,7 +221,7 @@ export function validateStep(
       if (!data.registeredAgentCity) e.registeredAgentCity = "City required.";
       if (data.registeredAgentState !== "FL")
         e.registeredAgentState = "The registered agent's address must be in Florida.";
-      if (!data.registeredAgentZip) e.registeredAgentZip = "ZIP required.";
+      if (postalCodeError(data.registeredAgentZip)) e.registeredAgentZip = postalCodeError(data.registeredAgentZip)!;
       if (
         isPoBox(data.registeredAgentStreetAddress1) ||
         isPoBox(data.registeredAgentStreetAddress2 ?? "")
@@ -291,7 +293,9 @@ export function validateStep(
       // The server requires city, state and ZIP per row (15 Sep 2026).
       if (!(m.city ?? "").trim()) e[`managers.${i}.city`] = "City required.";
       if (!(m.state ?? "").trim()) e[`managers.${i}.state`] = "State required.";
-      if (!(m.zip ?? "").trim()) e[`managers.${i}.zip`] = "ZIP required.";
+      if (postalCodeError(m.zip, m.country)) e[`managers.${i}.zip`] = postalCodeError(m.zip, m.country)!;
+      if (!(m.country ?? "").trim()) e[`managers.${i}.country`] = "Country required.";
+      if (m.email && !isValidEmail(m.email)) e[`managers.${i}.email`] = "Enter a valid email.";
     });
   }
 
@@ -301,7 +305,9 @@ export function validateStep(
     if (data.managementStructure === "MANAGER_MANAGED") return e;
     if (data.members.length === 0)
       e.members =
-        "At least one initial member is required for internal formation records.";
+        data.filingPath === "CONVERT"
+          ? "At least one member is required for your operating agreement."
+          : "At least one member is required. We list these members in the Articles of Organization.";
     data.members.forEach((m, i) => {
       if (m.memberType === "INDIVIDUAL" && !(m.firstName ?? "").trim())
         e[`members.${i}.firstName`] = "First name required.";
@@ -312,7 +318,8 @@ export function validateStep(
       if (!m.address1) e[`members.${i}.address1`] = "Address required.";
       if (!(m.city ?? "").trim()) e[`members.${i}.city`] = "City required.";
       if (!(m.state ?? "").trim()) e[`members.${i}.state`] = "State required.";
-      if (!(m.zip ?? "").trim()) e[`members.${i}.zip`] = "ZIP required.";
+      if (postalCodeError(m.zip, m.country)) e[`members.${i}.zip`] = postalCodeError(m.zip, m.country)!;
+      if (!(m.country ?? "").trim()) e[`members.${i}.country`] = "Country required.";
     });
   }
 
@@ -347,10 +354,9 @@ export function validateStep(
   if (step === "correspondence") {
     if (!data.correspondentName.trim()) e.correspondentName = "Name required.";
     else if (!hasFirstAndLast(data.correspondentName)) e.correspondentName = FIRST_AND_LAST;
-    if (!data.correspondentEmail) e.correspondentEmail = "Email required.";
-    else if (!isValidEmail(data.correspondentEmail))
+    if (data.correspondentEmail && !isValidEmail(data.correspondentEmail))
       e.correspondentEmail = "That doesn't look like a valid email address.";
-    if (!data.confirmCorrespondentEmail)
+    if (data.correspondentEmail && !data.confirmCorrespondentEmail)
       e.confirmCorrespondentEmail = "Please confirm email.";
     if (
       data.correspondentEmail &&
@@ -358,15 +364,6 @@ export function validateStep(
       data.correspondentEmail !== data.confirmCorrespondentEmail
     )
       e.confirmCorrespondentEmail = "Emails do not match.";
-    // A ticked mailing address must be a whole one, caught here at the box
-    // rather than by the server after Submit.
-    if (data.correspondentAddress) {
-      const a = data.correspondentAddress;
-      if (!a.address1) e["correspondentAddress.address1"] = "Street address required.";
-      if (!a.city) e["correspondentAddress.city"] = "City required.";
-      if (!a.state) e["correspondentAddress.state"] = "State required.";
-      if (!a.zip) e["correspondentAddress.zip"] = "ZIP required.";
-    }
   }
 
   // "optional": the S election add-on carries a required acknowledgment

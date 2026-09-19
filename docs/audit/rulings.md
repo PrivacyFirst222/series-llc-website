@@ -27,3 +27,17 @@ Adam. A new ruling is added the day it is given.
 - Ruling N1.02: "Approved revised Batch 03: encrypt stored S-election forms and EIN letters including backup copies, keep them until the client deletes them, track deletion of controlled copies and retries, provide complete resumable backups, and do not clean up existing test copies."
 
 - Ruling 28: "Annual registered-agent billing only; no refund for changing agents midyear. Timely cancellation means at least 30 days before renewal. If replacement proof is missing by the renewal date, submit resignation on that date and charge $99 for state filing fees and processing, without a breakdown; this is not another service year. Email the resignation copy and mail the statutory notice. Appointment effective date starts the annual term. Both automatic-renewal consent and an eligible saved card are required. Show a prepaid warning only on an attempted prepaid purchase of our agent service. Allow immediate customer payment after decline. Approved by Adam in this conversation, culminating in “Go. Implement the changes”."
+
+- Ruling 50: "Batch 08 item 2: “To have a manager managed LLC, you must state so in the articles or the operating agreement. We just add it to the articles because it’s best practice”. Preserve the existing Articles practice; no change in Batch 08."
+
+- Ruling 57: "Batch 08 item 5: “The only one required to provide an email is the user”. Apply the approved fix with optional non-user emails and the user email as the correspondence fallback."
+
+- Ruling 60: "Batch 08 item 6 proposed removing optional correspondence company, phone and additional paper-mail address, retaining name and email. Adam approved “the rest”, with item 5 requiring email only from the user; use the user email when no alternative correspondence email is supplied."
+
+- Ruling 83: "Batch 08 item 7: “I reject the change. Leave as is”. Keep the recommendation, preselection and explanation unchanged."
+
+- Ruling 86: "Batch 08 item 9: “If this is an easy fix, make it. Otherwise skip it. We will have very few foreign customers”. No blanket authorization for a broader foreign-address implementation."
+
+- Ruling N4.04: "Batch 08 items 14 and 15: “The articles are entered manually and will contain that language. Do nothing”. Leave the current product text and manual filing workflow unchanged."
+
+- Ruling 98: "Batch 08 items 14 and 15: “The articles are entered manually and will contain that language. Do nothing”. Leave the current office filing instructions unchanged."

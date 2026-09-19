@@ -120,6 +120,7 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
           />
           <Row label="Final name" value={finalName} />
           <Row label="Designator" value={data.llcDesignator} />
+          <Row label="Exact name only" value={data.exactNameOnly ? "Yes" : "No"} />
           <Row label="Alt #1" value={data.alternateName1} />
           <Row label="Alt #2" value={data.alternateName2} />
         </ReviewCard>
@@ -153,8 +154,8 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
               country: "United States",
             })}
           />
-          <Row label="Email" value={data.registeredAgentEmail} />
-          <Row label="Phone" value={data.registeredAgentPhone} />
+          {data.registeredAgentEmail ? <Row label="Email" value={data.registeredAgentEmail} /> : null}
+          {data.registeredAgentPhone ? <Row label="Phone" value={data.registeredAgentPhone} /> : null}
           {data.registeredAgentChoice === "SERVICE" ? (
             <Row label="Automatic renewal and card storage" value={data.raRenewalCardConsent ? "Agreed — card saved at checkout" : "Not agreed"} />
           ) : null}
@@ -186,7 +187,7 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
               value={data.includeManagementStatementInArticles ? "Yes" : "No"}
             />
           ) : null}
-          <Row
+          {data.managementStructure === "MANAGER_MANAGED" ? <Row
             label="Managers"
             value={
               data.managers.length === 0
@@ -199,17 +200,17 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
                     )
                     .join("; ")
             }
-          />
+          /> : null}
         </ReviewCard>
 
         {/* Manager-managed: the members step never ran — ownership is
             collected in the operating agreement questionnaire. */}
         {data.managementStructure !== "MANAGER_MANAGED" ? (
         <ReviewCard title="Members / Ownership" onEdit={() => goToStep("members")}>
-          <Row
+          {data.filingPath !== "CONVERT" ? <Row
             label="In Articles?"
-            value={data.includeMembersInArticles ? "Yes" : "No"}
-          />
+            value="Yes — listed as authorized members (AMBR)"
+          /> : null}
           <Row
             label="Initial members"
             value={
@@ -258,12 +259,7 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
 
         <ReviewCard title="Correspondence" onEdit={() => goToStep("correspondence")}>
           <Row label="Name" value={data.correspondentName} />
-          <Row label="Company" value={data.correspondentCompany} />
-          <Row label="Email" value={data.correspondentEmail} />
-          <Row label="Phone" value={data.correspondentPhone} />
-          {data.correspondentAddress ? (
-            <Row label="Address" value={fmtAddr(data.correspondentAddress)} />
-          ) : null}
+          <Row label="Email" value={data.correspondentEmail || data.clientEmail} />
         </ReviewCard>
 
         {/* Every purchase on that step, at the price charged (14 Sep 2026). */}

@@ -1,0 +1,232 @@
+{
+  "id": "08",
+  "revision": 1,
+  "title": "Formation order: people, addresses and management choices",
+  "model": "Codex",
+  "base": "32eb7738d86ac9fc2eb26f82eadefd3533dabac4",
+  "items": [
+    {
+      "id": "49",
+      "part": "all",
+      "scope": "review states which member information is filed",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch08 49: review states which member information is filed"
+        }
+      ]
+    },
+    {
+      "id": "55",
+      "part": "all",
+      "scope": "missing country is caught and shown on the current step",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch08 55: missing country is caught and shown on the current step"
+        }
+      ]
+    },
+    {
+      "id": "56",
+      "part": "all",
+      "scope": "ZIP validation agrees before and after submission",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch08 56: ZIP validation agrees before and after submission"
+        }
+      ]
+    },
+    {
+      "id": "57",
+      "part": "all",
+      "scope": "only the user email is required and optional errors are visible",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch08 57: only the user email is required and optional errors are visible"
+        }
+      ]
+    },
+    {
+      "id": "60",
+      "part": "all",
+      "scope": "correspondence uses name and email without unused extra fields",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch08 60: correspondence uses name and email without unused extra fields"
+        }
+      ]
+    },
+    {
+      "id": "85",
+      "part": "all",
+      "scope": "manager and member type labels agree",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch08 85: manager and member type labels agree"
+        }
+      ]
+    },
+    {
+      "id": "94",
+      "part": "all",
+      "scope": "member requirement describes the selected filing path",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch08 94: member requirement describes the selected filing path"
+        }
+      ]
+    },
+    {
+      "id": "100",
+      "part": "review-rows",
+      "scope": "review includes exact-name instructions and omits inapplicable blanks",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch08 100: review includes exact-name instructions and omits inapplicable blanks"
+        }
+      ]
+    },
+    {
+      "id": "N4.09",
+      "part": "all",
+      "scope": "hidden manager rows cannot block a member-managed order",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch08 N4.09: hidden manager rows cannot block a member-managed order"
+        }
+      ]
+    },
+    {
+      "id": "N4.05",
+      "part": "all",
+      "scope": "ordinary LLC orders do not retain a hidden professional purpose",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch08 N4.05: ordinary LLC orders do not retain a hidden professional purpose"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "webapp/src/components/forms/florida-llc/AddressFields.tsx",
+      "mode": "code",
+      "why": "Approved Batch 08 validation, optional email, correspondence, review display and stale hidden answers."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/RepeatablePartyFields.tsx",
+      "mode": "code",
+      "why": "Approved Batch 08 validation, optional email, correspondence, review display and stale hidden answers."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/RepeatableMemberFields.tsx",
+      "mode": "code",
+      "why": "Approved Batch 08 validation, optional email, correspondence, review display and stale hidden answers."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/ReviewStep.tsx",
+      "mode": "code",
+      "why": "Approved Batch 08 validation, optional email, correspondence, review display and stale hidden answers."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/schema.ts",
+      "mode": "code",
+      "why": "Approved Batch 08 validation, optional email, correspondence, review display and stale hidden answers."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/stepValidation.ts",
+      "mode": "code",
+      "why": "Approved Batch 08 validation, optional email, correspondence, review display and stale hidden answers."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/buildPayload.ts",
+      "mode": "code",
+      "why": "Approved Batch 08 validation, optional email, correspondence, review display and stale hidden answers."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/FloridaLLCFormationForm.tsx",
+      "mode": "code",
+      "why": "Approved Batch 08 validation, optional email, correspondence, review display and stale hidden answers."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepClient.tsx",
+      "mode": "code",
+      "why": "Approved Batch 08 validation, optional email, correspondence, review display and stale hidden answers."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepCorrespondence.tsx",
+      "mode": "code",
+      "why": "Approved Batch 08 validation, optional email, correspondence, review display and stale hidden answers."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepCertification.tsx",
+      "mode": "code",
+      "why": "Approved Batch 08 validation, optional email, correspondence, review display and stale hidden answers."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepIntro.tsx",
+      "mode": "code",
+      "why": "Approved Batch 08 validation, optional email, correspondence, review display and stale hidden answers."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepPurpose.tsx",
+      "mode": "code",
+      "why": "Approved Batch 08 validation, optional email, correspondence, review display and stale hidden answers."
+    },
+    {
+      "path": "webapp/server/validation.ts",
+      "mode": "code",
+      "why": "Approved Batch 08 validation, optional email, correspondence, review display and stale hidden answers."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/addressValidation.ts",
+      "mode": "new",
+      "why": "Shared country and postal checks; foreign-address support is deferred."
+    },
+    {
+      "path": "webapp/scripts/behavioral.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Run durable Batch 08 assertions and replace checks for the owner-approved removal of optional correspondence phone/address."
+    },
+    {
+      "path": "webapp/scripts/batch08-walk.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Named before/after browser, schema and saved-order proofs for the ten approved repairs."
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "why": "Rebuild API from declared sources."
+    }
+  ],
+  "requiredChecks": [],
+  "testSupport": [
+    "webapp/scripts/batch08-walk.ts"
+  ],
+  "removedChecks": [
+    "${run.key}: the correspondence phone hint has no letters",
+    "${run.key}: the correspondence phone takes the shape as typed",
+    "${run.key}: the correspondent's mailing address is stored"
+  ]
+}

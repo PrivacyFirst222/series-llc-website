@@ -20,7 +20,7 @@ export function StepPurpose({ data, patch, errors }: StepProps) {
   // Non-professional LLCs always carry the general lawful purpose; there is
   // no way to narrow it in this flow.
   useEffect(() => {
-    if (!isPllc && !data.purposeType) {
+    if (!isPllc && (!data.purposeType || data.purposeType === "PROFESSIONAL")) {
       patch({ purposeType: "GENERAL", businessPurposeText: "" });
     }
     if (isPllc && data.purposeType !== "PROFESSIONAL") {
