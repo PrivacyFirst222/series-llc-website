@@ -149,3 +149,5 @@ Migration 12 changes existing sample database rows once at startup: sole-company
 Item 123 is a wording repair: the existing dialog already selected the right company or series; it included the service label in the application sentence. No incorrect applicant-selection claim is made for this item.
 
 This branch is stacked on the unaccepted Batch 01 commit. The package comparison to main therefore includes both batches. This work does not accept or release either batch. The 322 records outside Batch 02, including all 10 Batch 01 fixes, and all earlier batch records are unchanged.
+
+The final PDF probes read the actual standard-font text operators from generated PDF streams using the already installed PDF library, including encrypted agreement streams and flattened IRS appearances. The controlled fixtures contain ASCII company names/addresses. This avoids adding an undeclared dependency on the Mac-only pdftotext executable to CI. All 13 targeted server probes pass on the implementation and fail on the base with this extractor; portable-api-{green,red}.log retain the results. Poppler was additionally used for the manual rendered-page review.

@@ -1,10 +1,10 @@
 /** Exercise production routes and PDFs against deliberately conflicting legacy
  * records in a disposable database. No duplicate implementation of selectors. */
-import { mkdtempSync, rmSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
+import { mkdtempSync, rmSync, readdirSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { PDFDocument, PDFRawStream, decodePDFRawStream } from '@cantoo/pdf-lib';
 export async function batch02Checks(check: (label:string,ok:boolean,detail?:unknown)=>void) {
   const dir=mkdtempSync(join(tmpdir(),'batch02-db-'));
   try {
@@ -58,7 +58,21 @@ async function child() {
   const date=new Date(Date.now()-5*86400000).toISOString().slice(0,10);
   const merged={ein:'881234567',einPending:false,dateIncorporated:date,effectiveDate:date,officerName:'Alice Example',officerTitle:'Member',phone:'3055550100',shareholders:[{name:'Alice Example',address:'25 Owner Street, Miami, FL 33139',percentage:100,dateAcquired:date,ssnLast4:'6789'}]};
   const built=await postSElectionPackage({so:{id:sel,client_id:clientId,llc_name:'Scope Alpha, LLC'},merged,ssns:['123456789']});
-  const pdf=async(res:Response)=>{if(res.status!==200)return `HTTP ${res.status}: ${await res.text()}`;const path=join(process.env.DEV_PG_DIR!,'readback.pdf');writeFileSync(path,new Uint8Array(await res.arrayBuffer()));return execFileSync('pdftotext',['-layout',path,'-'],{encoding:'utf8'});};
+  // These controlled ASCII fixtures are drawn with standard PDF fonts as hex Tj
+  // operators, including the flattened Form 2553 appearances. Read those actual
+  // content streams with the installed library; no optional system executable
+  // and no skipped PDF checks in CI. This is not a general-purpose extractor.
+  const pdf=async(res:Response)=>{
+    if(res.status!==200)return `HTTP ${res.status}: ${await res.text()}`;
+    const document=await PDFDocument.load(await res.arrayBuffer(),{password:''});
+    const text:string[]=[];
+    for(const [,object] of document.context.enumerateIndirectObjects())if(object instanceof PDFRawStream){
+      const raw=Buffer.from(decodePDFRawStream(object).decode()).toString('latin1');
+      for(const match of raw.matchAll(/<([\da-fA-F]+)>\s*Tj/g))text.push(Buffer.from(match[1],'hex').toString('latin1'));
+    }
+    if(!text.length)throw new Error('PDF fixture has no readable rendered text operators');
+    return text.join(' ');
+  };
   const generated=await json(`/portal/oa/generate?company=${a}`,{firstOrAmended:'first',effectiveDate:date,authorized:true,members:[{todBeneficiary:'Jordan Example'}],series:[]});
   const oaText=generated.data?.documentId?await pdf(await req(`/portal/documents/${generated.data.documentId}/download`)):JSON.stringify(generated);
   report('batch02 generated Series Exhibit excludes the other company',oaText.includes('Scope Alpha, LLC, PS Added A')&&!oaText.includes('Scope Beta')&&!!generated.data?.documentId,{generated,otherCompany:oaText.includes('Scope Beta')});
