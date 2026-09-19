@@ -1,0 +1,9 @@
+{
+  "teamId": "team_GG5ErDDokSLvM8isIVKpFop9",
+  "plan": "pro",
+  "source": "Vercel CLI GET /v2/teams/team_GG5ErDDokSLvM8isIVKpFop9",
+  "verifiedAt": "2026-09-19",
+  "cronDocumentation": "https://vercel.com/docs/cron-jobs/usage-and-pricing",
+  "configuredContinuation": "*/5 * * * *",
+  "productionCronExecuted": false
+}

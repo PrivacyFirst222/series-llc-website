@@ -37,6 +37,8 @@ interface PortalDoc {
   seriesNames?: string[];
   order_id: string | null;
   company_name?: string | null;
+  deletable?: boolean;
+  encrypted?: boolean;
 }
 
 interface Me {
@@ -66,6 +68,7 @@ function DocList({
   empty,
   own,
   onDelete,
+  onDeleteTax,
   deleting,
   extra,
 }: {
@@ -74,6 +77,7 @@ function DocList({
   own?: Map<string, OwnAgreement>;
   onDelete?: (generationId: string, isCurrent: boolean) => void;
   deleting?: boolean;
+  onDeleteTax?: (doc: PortalDoc) => void;
   /** A fulfilled order's remaining actions and notes sit on its document —
    *  the S election's edit window, a filed series' consent (Adam, 6 Sep 2026). */
   extra?: (d: PortalDoc) => { note?: ReactNode; actions?: ReactNode } | null;
@@ -129,6 +133,9 @@ function DocList({
                   Download
                 </a>
               </Button>
+              {d.deletable && onDeleteTax ? <Button type="button" variant="outline" size="sm" className="rounded-full" onClick={() => onDeleteTax(d)} aria-label={`Delete ${d.title}`}>
+                <Trash2 className="mr-1.5 h-3.5 w-3.5" />Delete
+              </Button> : null}
               {mine && onDelete ? (
                 <button
                   type="button"
@@ -487,6 +494,18 @@ export default function PortalDashboard() {
     retry: false,
   });
 
+  const [deleteTaxDoc, setDeleteTaxDoc] = useState<PortalDoc | null>(null);
+  const deleteTax = useMutation({
+    mutationFn: (id: string) => api.delete<{ok:boolean;cleanupPending:boolean}>(`/api/portal/documents/${id}`),
+    onSuccess: (r) => {
+      setDeleteTaxDoc(null);
+      queryClient.invalidateQueries({queryKey:["portal-documents"]});
+      queryClient.invalidateQueries({queryKey:["portal-services"]});
+      toast({title:"Document deleted",description:r.cleanupPending ? "It is no longer available in your portal. Removal of stored copies is still being retried." : "The document and its active stored copies have been removed."});
+    },
+    onError: () => toast({title:"Deletion did not complete",description:"Try again. Your request will not be reported as complete until it is recorded.",variant:"destructive"}),
+  });
+
   const deleteGeneration = useMutation({
     mutationFn: (id: string) => api.delete(`/api/portal/oa/generations/${id}`),
     onSuccess: () => {
@@ -495,8 +514,8 @@ export default function PortalDashboard() {
     },
   });
 
-  // The agreements a client generated are the only documents they may remove;
-  // everything else on this list was posted by us and stays download-only.
+  // Agreement deletion retains its existing path. Completed tax documents
+  // have a separate deletion action, with durable storage cleanup.
   const ownAgreements = useMemo(() => {
     const gens = oaGenerations.data?.generations ?? [];
     const map = new Map<string, OwnAgreement>();
@@ -527,13 +546,13 @@ export default function PortalDashboard() {
         note:
           sel.editable && sel.editableUntil ? (
             <p className="mt-1 text-xs text-amber-700">
-              Editable until {formatDateTime(sel.editableUntil)} — after that we delete the package
-              and the Social Security numbers. Download and keep a copy.
+              Editable until {formatDateTime(sel.editableUntil)}. After that, the questionnaire numbers are removed.
+              This completed document stays encrypted in your portal until you delete it.
             </p>
           ) : sel.details.purgedAt ? (
             <p className="mt-1 text-xs text-muted-foreground">
-              On {formatDateTime(sel.details.purgedAt)} we destroyed the Social Security numbers and
-              replaced the package with this record copy, which shows only the last four digits.
+              Editing is closed. The questionnaire numbers were removed on {formatDateTime(sel.details.purgedAt)}.
+              This completed document remains available until you delete it.
             </p>
           ) : undefined,
         actions:
@@ -719,6 +738,7 @@ export default function PortalDashboard() {
           </div>
           <DocList
             docs={packageDocs}
+            onDeleteTax={setDeleteTaxDoc}
             empty="Your documents will appear here once your formation is prepared."
             own={ownAgreements}
             extra={docExtras}
@@ -773,12 +793,26 @@ export default function PortalDashboard() {
       />
 
       <p className="mt-8 text-xs leading-relaxed text-muted-foreground">
-        Documents are download-only. If something looks wrong or missing, email{" "}
+        Completed S-election forms and EIN letters stay encrypted here until you delete them. Download and keep your copies. If something looks wrong or missing, email{" "}
         <a href="mailto:support@myfloridaseriesllc.com" className="underline underline-offset-4">
           support@myfloridaseriesllc.com
         </a>
         .
       </p>
+      <AlertDialog open={!!deleteTaxDoc} onOpenChange={(open) => {if(!open && !deleteTax.isPending)setDeleteTaxDoc(null);}}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this document?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {deleteTaxDoc?.title}. Download and keep a copy first. This removes the document from your portal and requests removal of our stored and mirrored copies. Editing this document will also end. Your service-order record stays. This cannot be undone in the portal.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteTax.isPending}>Keep document</AlertDialogCancel>
+            <Button variant="destructive" disabled={deleteTax.isPending} onClick={() => {if(deleteTaxDoc)deleteTax.mutate(deleteTaxDoc.id);}}>{deleteTax.isPending ? "Deleting…" : "Delete document"}</Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </section>
   );
 }

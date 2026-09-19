@@ -1,3 +1,5 @@
+import { requestDocumentDeletion } from "./document-retention";
+import { storageWasDeleted } from "./storage";
 import { associateLegacyServices, serviceCompanyId } from "./company-scope";
 import { selectedParty } from "../src/lib/partyIdentity";
 import { contributorUnits, CONTRIBUTOR_REVIEW } from "../src/lib/oaContributors";
@@ -531,6 +533,7 @@ export interface SElectionStoredDetails {
   einPending?: boolean;
   /** "letter": the number came from the CP 575 the office uploaded. */
   einSource?: "letter";
+  documentDeletedAt?: string;
   dateIncorporated?: string;
   effectiveDate?: string;
   officerName?: string;
@@ -555,90 +558,14 @@ export function sElectionWindow(fulfilledAt: unknown): { open: boolean; deleteOn
   return { open: Date.now() < deleteOn.getTime(), deleteOn: deleteOn.toISOString() };
 }
 
-/** When the edit window closes, the Social Security numbers are destroyed —
- *  but the client keeps a record of what was prepared. The package is REBUILT
- *  with only the last four digits of each number and stamped unfileable, and
- *  the encrypted numbers are deleted. Rebuilding rather than editing the old
- *  PDF matters: a black box drawn over text leaves the text underneath, still
- *  extractable. Safe to call on any request. */
+/** Expire only the questionnaire's full taxpayer numbers. The encrypted
+ * completed PDF remains until the client deletes it (Adam, Batch 03). */
 export async function purgeExpiredSElections(): Promise<number> {
   const db = await getDb();
-  const cutoff = new Date(Date.now() - S_ELECTION_EDIT_DAYS * 86400_000).toISOString();
-  const rows = await db.query<{ id: string; client_id: string; llc_name: string; details: unknown; formation_order_id: string | null }>(
-    `SELECT id, client_id, llc_name, details, formation_order_id FROM service_orders
-      WHERE type = 's-election' AND status = 'fulfilled'
-        AND fulfilled_at IS NOT NULL AND fulfilled_at < $1
-        AND (ein_secret IS NOT NULL OR details->>'purgedAt' IS NULL)`,
-    [cutoff],
-  );
-  for (const row of rows) {
-    const d = (typeof row.details === "string" ? JSON.parse(row.details) : row.details) as SElectionStoredDetails;
-    const kept: SElectionStoredDetails = { ...d, purgedAt: new Date().toISOString() };
-
-    if (d?.shareholders?.length && d.dateIncorporated) {
-      const filled = withFormationDefaults(d);
-      try {
-        const companyId = await serviceCompanyId(row.id, row.client_id);
-        if (!companyId) throw new Error("The S-election order has no confirmed company association.");
-        const seed = await oaSeed(row.client_id, companyId);
-        if (!seed) throw new Error("The S-election company could not be loaded.");
-        const pdf = await buildSElectionPackage({
-          llcName: row.llc_name,
-          principalAddress: seed?.principalAddress ?? "",
-          ein: d.ein ?? "",
-          dateIncorporated: d.dateIncorporated,
-          effectiveDate: filled.effectiveDate,
-          officerName: d.officerName ?? "",
-          officerTitle: d.officerTitle ?? "",
-          phone: d.phone ?? "",
-          recordCopy: true,
-          // Only the last four survive in the stored record — that is all the
-          // record copy can show, and all it needs to.
-          shareholders: filled.shareholders.map((s) => ({ ...s, ssn: s.ssnLast4, ssn2: s.ssnLast4Second || undefined })),
-        });
-        const title = `S Corporation Election Package — Record Copy — ${row.llc_name}`;
-        const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength) as ArrayBuffer;
-        const stored = await putFile(`${title.replace(/[^\w-]+/g, "_")}.pdf`, buf, "application/pdf");
-        if (d.documentId) {
-          const old = await db.query<{ storage_key: string }>(
-            "SELECT storage_key FROM documents WHERE id = $1",
-            [d.documentId],
-          );
-          await db.query(
-            `UPDATE documents SET title = $1, storage_key = $2, size_bytes = $3 WHERE id = $4`,
-            [title, stored.storageKey, stored.sizeBytes, d.documentId],
-          );
-          if (old[0]?.storage_key) await deleteFile(old[0].storage_key).catch(() => {});
-        } else {
-          const doc = await db.query<{ id: string }>(
-            `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes)
-             VALUES ($1, $5, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,
-            [row.client_id, title, stored.storageKey, stored.sizeBytes, companyId],
-          );
-          kept.documentId = doc[0].id;
-        }
-      } catch (e) {
-        // A rebuild that fails must not leave the full-SSN copy in place: drop
-        // it, and the client still has whatever they downloaded.
-        console.error("[purge] record copy rebuild failed; removing the original:", e);
-        if (d.documentId) {
-          const old = await db.query<{ storage_key: string }>(
-            "SELECT storage_key FROM documents WHERE id = $1",
-            [d.documentId],
-          );
-          await db.query("DELETE FROM documents WHERE id = $1", [d.documentId]);
-          if (old[0]?.storage_key) await deleteFile(old[0].storage_key).catch(() => {});
-          kept.documentId = undefined;
-        }
-      }
-    }
-
-    await db.query("UPDATE service_orders SET details = $1, ein_secret = NULL WHERE id = $2", [
-      JSON.stringify(kept),
-      row.id,
-    ]);
-  }
-  if (rows.length > 0) console.log(`[purge] redacted ${rows.length} expired S election package(s)`);
+  const rows = await db.query(`UPDATE service_orders SET ein_secret=NULL,
+    details=COALESCE(details,'{}'::jsonb)||jsonb_build_object('purgedAt',now()::text)
+    WHERE type='s-election' AND status='fulfilled' AND fulfilled_at < now()-interval '14 days'
+      AND (ein_secret IS NOT NULL OR details->>'purgedAt' IS NULL) RETURNING id`);
   return rows.length;
 }
 
@@ -837,7 +764,10 @@ export async function postSElectionPackage(args: {
   priorDocumentId?: string;
 }): Promise<{ ok: true; documentId: string; editableUntil: string | null } | { ok: false }> {
   const { so, merged, ssns } = args;
+  if (merged.documentDeletedAt) return { ok: false };
   const db = await getDb();
+  const [current]=await db.query<{details:SElectionStoredDetails}>('SELECT details FROM service_orders WHERE id=$1 AND client_id=$2',[so.id,so.client_id]);
+  if (!current || current.details?.documentDeletedAt) return {ok:false};
   const formation = merged.dateIncorporated ?? "";
   const { effectiveDate, shareholders } = withFormationDefaults(merged);
   const companyId = await serviceCompanyId(so.id, so.client_id);
@@ -875,29 +805,20 @@ export async function postSElectionPackage(args: {
     return { ok: false };
   }
 
-  // Regenerating replaces the earlier PDF rather than stacking copies of the
-  // same form, each carrying the owners' Social Security numbers.
-  if (args.priorDocumentId) {
-    const old = await db.query<{ storage_key: string }>(
-      "SELECT storage_key FROM documents WHERE id = $1 AND client_id = $2",
-      [args.priorDocumentId, so.client_id],
-    );
-    await db.query("DELETE FROM documents WHERE id = $1 AND client_id = $2", [args.priorDocumentId, so.client_id]);
-    if (old[0]?.storage_key) await deleteFile(old[0].storage_key).catch(() => {});
-  }
   const title = `S Corporation Election Package (Form 2553) — ${so.llc_name}`;
   const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength) as ArrayBuffer;
   const stored = await putFile(
     `${title.replace(/[^\w-]+/g, "_")}_${stampForFilename()}.pdf`,
     buf,
     "application/pdf",
+    true,
   );
   // The package belongs to the company the order was placed for (Adam,
   // 7 Sep 2026): without it, it showed under every tab of the account.
   const docRows = await db.query<{ id: string }>(
-    `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes)
-     VALUES ($1, $5, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,
-    [so.client_id, title, stored.storageKey, stored.sizeBytes, companyId],
+    `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
+     VALUES ($1, $5, 'package', $2, $3, 'application/pdf', $4, $6) RETURNING id`,
+    [so.client_id, title, stored.storageKey, stored.sizeBytes, companyId, JSON.stringify({sensitive:true,serviceOrderId:so.id})],
   );
   merged.documentId = docRows[0].id;
 
@@ -909,6 +830,7 @@ export async function postSElectionPackage(args: {
       WHERE id = $3`,
     [JSON.stringify(merged), encryptSecret(JSON.stringify(ssns)), so.id],
   );
+  if (args.priorDocumentId) await requestDocumentDeletion(args.priorDocumentId, so.client_id);
   const after = await db.query<{ fulfilled_at: unknown }>(
     "SELECT fulfilled_at FROM service_orders WHERE id = $1",
     [so.id],
@@ -1072,6 +994,14 @@ app.get("/portal/companies", async (c) => {
   })) });
 });
 
+app.delete("/portal/documents/:id", async (c) => {
+  const session = await getSession(c);
+  if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  if (!await requestDocumentDeletion(c.req.param("id"), session.clientId)) return c.json(err("Not found or this document cannot be deleted here.", "NOT_FOUND"), 404);
+  const db=await getDb();const [state]=await db.query<{pending:boolean}>('SELECT completed_at IS NULL AS pending FROM document_deletions WHERE document_id=$1',[c.req.param('id')]);
+  return c.json({data:{ok:true,cleanupPending:state?.pending===true}});
+});
+
 app.get("/portal/documents", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
@@ -1081,7 +1011,7 @@ app.get("/portal/documents", async (c) => {
   }>(
     `SELECT d.id, d.kind, d.title, d.size_bytes, d.created_at, d.order_id, d.meta, o.llc_name AS company_name
        FROM documents d LEFT JOIN orders o ON o.id = d.order_id AND o.client_id = d.client_id
-       WHERE d.client_id = $1 ORDER BY d.created_at DESC`,
+       WHERE d.client_id = $1 AND d.deleted_at IS NULL ORDER BY d.created_at DESC`,
     [session.clientId],
   );
   // Legal mail carries the day it was received (14 Sep 2026); nothing else
@@ -1089,8 +1019,8 @@ app.get("/portal/documents", async (c) => {
   // Legal mail carries the day it was received; a designation carries the
   // series it covers, so the consent button can find it (15 Sep 2026).
   return c.json({ data: docs.map(({ meta, ...d }) => {
-    const m = (typeof meta === "string" ? JSON.parse(meta) : meta) as { receivedOn?: string; seriesNames?: string[] } | null;
-    return { ...d, receivedOn: d.kind === "legal_mail" ? m?.receivedOn ?? null : null, seriesNames: d.kind === "psd" ? m?.seriesNames ?? [] : undefined };
+    const m = (typeof meta === "string" ? JSON.parse(meta) : meta) as { receivedOn?: string; seriesNames?: string[]; sensitive?: boolean } | null;
+    return { ...d, deletable: m?.sensitive === true, encrypted: m?.sensitive === true, receivedOn: d.kind === "legal_mail" ? m?.receivedOn ?? null : null, seriesNames: d.kind === "psd" ? m?.seriesNames ?? [] : undefined };
   }) });
 });
 
@@ -1100,7 +1030,7 @@ app.get("/portal/documents/:id/download", async (c) => {
   if (!session?.clientId && !admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const db = await getDb();
   const rows = await db.query<{ storage_key: string; title: string; content_type: string; client_id: string }>(
-    "SELECT storage_key, title, content_type, client_id FROM documents WHERE id = $1",
+    "SELECT storage_key, title, content_type, client_id FROM documents WHERE id = $1 AND deleted_at IS NULL",
     [c.req.param("id")],
   );
   if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
@@ -1108,6 +1038,7 @@ app.get("/portal/documents/:id/download", async (c) => {
   if (!admin && doc.client_id !== session?.clientId) {
     return c.json(err("Not found", "NOT_FOUND"), 404);
   }
+  if (await storageWasDeleted(doc.storage_key)) return c.json(err("This document has been deleted.", "NOT_FOUND"), 404);
   const stream = await readFileStream(doc.storage_key);
   const filename = doc.title.replace(/[^\w.-]+/g, "_") || "document";
   return new Response(stream as BodyInit, {
@@ -1884,7 +1815,7 @@ app.get("/portal/library/:key/download", async (c) => {
     session.clientId,
   ]);
   const src = await readFileStream(rows[0].storage_key);
-  const bytes = src instanceof Buffer ? src : Buffer.from(await new Response(src as ReadableStream).arrayBuffer());
+  const bytes = src;
   let out: Uint8Array;
   try {
     out = await stampExistingPdf({
@@ -1957,7 +1888,7 @@ app.get("/portal/services", async (c) => {
         if (o.type !== "s-election") return o;
         const d = (typeof o.details === "string" ? JSON.parse(o.details) : o.details) as SElectionStoredDetails;
         const w = sElectionWindow(o.fulfilled_at);
-        return { ...o, editableUntil: w.deleteOn, editable: w.open, documentId: d?.documentId ?? null };
+        return { ...o, editableUntil: w.deleteOn, editable: w.open && !d?.documentDeletedAt, documentId: d?.documentId ?? null };
       }),
     },
   });
@@ -2325,11 +2256,12 @@ app.post("/portal/services/:id/s-election-details", async (c) => {
     return c.json(err("Your LLC must be formed before an S election can be made.", "NOT_FORMED"), 400);
   }
   const prior = (typeof so.details === "string" ? JSON.parse(so.details) : so.details) as SElectionStoredDetails;
+  if (prior?.documentDeletedAt) return c.json(err("You deleted this document. Contact us if you need a new form.", "DOCUMENT_DELETED"), 400);
   const editable = so.status === "awaiting_info" || sElectionWindow(so.fulfilled_at).open;
   if (!editable) {
     return c.json(
       err(
-        "The two-week window for changing this package has closed, and the details have been deleted. Contact us if you need a new one.",
+        "The two-week editing window has closed. The questionnaire numbers have been removed; your completed document remains in Your documents unless you deleted it. Contact us if you need a new form.",
         "WINDOW_CLOSED",
       ),
       400,

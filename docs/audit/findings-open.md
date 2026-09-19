@@ -116,7 +116,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: That the business is a document preparation service only.
   - True: The footer on the same screen (Footer.tsx:79-80) says 'MyFloridaSeriesLLC.com is a document preparation and registered agent service.' and Terms s. 4 sells registered agent service. Two wordings for one fact.
   - Replace with: Document preparation and registered agent service — not legal advice.
-- **26. [B9]** — **open**
+- **26. [B9]** — **implemented**
   - Privacy Policy, section 3 'Payment Information' — `webapp/src/content/privacy.md:19`
   - Reads: Payments are processed by **Square, Inc.** We never receive or store your full card number, CVV, or bank credentials. Square provides us a confirmation of payment and limited details (such as the last four digits and the name on the order). Square's handling of your information is governed by Square's own privacy policy.
   - Claims: That Square gives us only a payment confirmation and a few details.
@@ -125,7 +125,8 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (disputed): privacy.md:19 contains the quoted Square paragraph, but the replacement says "we keep only the card brand, its last four digits, and its expiration". renewals.ts stores Square customer/card identifiers as well and does not store expiration in that update.
   - **Codex rejected the proposed replacement:** Disclose card-on-file consent and Square storage, and accurately list retained identifiers, brand and last four; do not invent retained expiration or say only.
   - Corrected after Codex's review: Nothing stores the card's expiration, and Square's customer and card references are kept as well as brand and last four. Disclose the card on file and list what is actually kept; do not say 'only'.
-- **27. [B10]** — **open**
+  - Fixed: batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **27. [B10]** — **implemented**
   - Privacy Policy, section 2 'Information You Give Us', the Social Security paragraph — `webapp/src/content/privacy.md:15`
   - Reads: Our website forms do not request, and you should not enter into them, Social Security numbers, driver's license numbers, government identification numbers, biometric data, or bank account numbers. If you purchase our EIN service, we collect the responsible party's Social Security number or ITIN separately, through a secure channel we designate, solely to prepare and submit IRS Form SS-4, and we do not retain it after the EIN is issued.
   - Claims: That no website form takes a Social Security number, and that the EIN service prepares and submits Form SS-4.
@@ -134,8 +135,10 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (disputed): privacy.md:15 does incorrectly deny website SSN collection. However, "we delete it the moment the EIN is issued" is not established by an office fulfillment update, and backup.ts:13-28,107-142 explicitly preserves service_orders ciphertext in permanent snapshots.
   - **Codex rejected the proposed replacement:** Correct the portal-collection/application description, and resolve the actual retention policy and backup behavior before promising deletion at issuance. The finding’s assertion that the deletion claim is right is unsupported.
   - Corrected after Codex's review: Split into two parts. The collection-channel wording can proceed. 'We delete it the moment the EIN is issued' is not true while nightly backups keep the ciphertext (N1.01), so the retention sentence waits on Adam's decision about backups.
-  - Part "collection-channel" — open: Say that the Social Security number is collected through a secure form in the client portal, for the IRS's EIN application; the order form asks for none.
-  - Part "retention" — open: What the policy promises about keeping or deleting the number. (waits on ruling:N1.01)
+  - Part "collection-channel" — implemented: Say that the Social Security number is collected through a secure form in the client portal, for the IRS's EIN application; the order form asks for none.
+  - Fixed (collection-channel): batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Part "retention" — implemented: What the policy promises about keeping or deleting the number. (waits on ruling:N1.01)
+  - Fixed (retention): batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **28. [B11]** — **open** — waits on Adam's ruling
   - Terms of Service, section 9(g) 'How to cancel', last sentence — `webapp/src/content/terms.md:54`
   - Reads: If we have not received the proof described in (ii) by your renewal date, we remain registered agent of record and your account will continue to be billed at the then-current rate, prorated monthly, until we receive that proof or our resignation under Section 10(f) takes effect.
@@ -268,12 +271,14 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (disputed): sunbiz.ts:160 attributes both holds to 605.0715(5)–(6), but the 120-day voluntary-dissolution hold does exist in 2026 s.605.0717(2), opened on Online Sunshine. It ends earlier if a statement of termination is filed. The prior reader searched the wrong sections.
   - **Codex rejected the proposed replacement:** Retain the 120-day rule, cite 605.0717(2), and include its earlier-termination exception; cite 605.0715(5) for administrative dissolution.
   - Corrected after Codex's review: The 120-day hold exists: s. 605.0717(2), 'until 120 days after the effective date of dissolution or filing of a statement of termination, if earlier'. Cite s. 605.0715(5) for the one-year administrative hold and s. 605.0717(2) for the 120 days.
-- **N1.01. [substantive]** — **open** — waits on Adam's ruling
+- **N1.01. [substantive]** — **implemented** — waits on Adam's ruling
   - Privacy Policy, Social Security number retention; nightly database backups — `webapp/src/content/privacy.md:15`
   - Reads: At the end of that period we permanently delete every Social Security number you gave us and replace your copy of the completed form with a record copy showing only the last four digits.
   - Claims: Every retained copy of an S-election Social Security number is permanently deleted after14 days.
   - True: backup.ts:13–14 expressly includes taxpayer-number ciphertext; :124–142 snapshots every column of service_orders into immutable archives and :107–110 retains backups indefinitely. crypto.ts:52–53 derives the decrypting key from unchanged SESSION_SECRET. routes-portal.ts:623 clears only live rows. A backup made during the edit window remains decryptable afterwards. This is a separate retention defect from prior27's collection-channel wording; production execution is not asserted.
   - Replace with: At the end of that period we remove the Social Security numbers from the active service-order record and replace the portal form with a record copy showing only the last four digits. Encrypted copies remain in archived database backups. [To preserve the existing permanent-deletion promise instead, exclude live secrets from backups or expire their independent encryption keys, and remove already retained copies.]
+  - Ruling, 2026-09-19: Approved revised Batch 03: retain completed S-election forms and EIN letters encrypted until the client deletes them; remove underlying EIN numbers when fulfillment is recorded and S-election questionnaire numbers after the 14-day editing window; exclude transient taxpayer numbers from backups, prevent restoration from resurrecting deleted documents, and do not clean up existing test backups.
+  - Fixed: batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **N1.09. [substantive]** — **open** — waits on Adam's ruling
   - Terms of Service, section16, license to use purchased documents — `webapp/src/content/terms.md:92`
   - Reads: You receive a limited, personal, non-transferable license to use deliverables for the internal purposes of the LLC formed through the Services, and no other rights.
@@ -795,9 +800,10 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Part "title" — open: The consent document's title in the portal: "Consent & Series Exhibit — [series]".
   - Part "button" — open: The dialog's button: "Prepare the consent".
   - Former part "all" (retired by 001-part-level-links, now title, button): The whole finding.
-- **121. [A53]** — **open**
+- **121. [A53]** — **implemented**
   - S election dialog and "Editable until" row say the package is "deleted"; it is replaced with a record copy. Replace both to say so.
   - **Codex rejected the proposed replacement:** Say the editable original is removed and a record copy is normally posted; do not promise system-wide SSN destruction: backup.ts:13-14/17-28 retains ciphertext and Dropbox retains old files. Handle a failed record-copy rebuild explicitly.
+  - Fixed: batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **122. [A54]** — **open**
   - Formed-first dialog S election branch: "…and that has been assigned an EIN." The form accepts Applied For. Replace: drop the clause.
 - **123. [A55]** — **implemented**
@@ -1030,13 +1036,14 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: sElectionEligibility (:478-489) asks for a paid order with package = 'NEW' — formed or not; the package is sold from the day the formation is paid (:490-491). The formed gate is applied later, on the details (:2269-2271).
   - Replace with: : "The S election package is available only for new LLCs formed through us.";
   - **Codex rejected the proposed replacement:** Use “The S election package is available only for new LLCs ordered through us.” Keep the separate later gate on completing the details.
-- **162. [B136]** — **open** — same defect as 121
+- **162. [B136]** — **implemented** — same defect as 121
   - Client portal, S election details — the refusal after the two-week window — `webapp/server/routes-portal.ts:2277`
   - Reads: "The two-week window for changing this package has closed, and the details have been deleted. Contact us if you need a new one.",
   - Claims: The details are gone.
   - True: purgeExpiredSElections (:548-630) deletes the encrypted Social Security numbers (:623 `ein_secret = NULL`) and rebuilds the package as a record copy showing last-four digits (:581-586); the details themselves are kept (:566 `const kept = { ...d, purgedAt }`). This is the server half of A53; the text is shown by SElectionDetailsForm.tsx:677.
   - Replace with: "The two-week window for changing this package has closed: the Social Security numbers have been destroyed and the package replaced with a record copy. Contact us if you need a new one.",
   - **Codex rejected the proposed replacement:** Replace details-deletion language with a precise live-system statement; do not claim all SSNs have been destroyed when backups and mirror copies persist, or promise a record copy exists if its rebuild failed.
+  - Fixed: batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **163. [B137]** — **open**
   - Client portal, Your documents — deleting one of your agreements when the server refuses — `webapp/server/routes-portal.ts:1704`
   - Reads: return c.json(err("Not found", "NOT_FOUND"), 404);
@@ -1243,11 +1250,12 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Part "series-uploaded-text" — open: The series text no longer says "once … uploaded" inside the dialog that does the uploading.
   - Part "typed-ein-survives" — open: A typed EIN does not survive closing the dialog.
   - Former part "all" (retired by 001-part-level-links, now ein-hint-2553, s-election-date-row, series-uploaded-text, typed-ein-survives): The whole finding.
-- **179. [A76]** — **open**
+- **179. [A76]** — **implemented**
   - Reference Library backup line (four tables; "own company") and mirror line ("every file" nightly; nothing overwritten). Replace both sentences.
   - Codex (disputed): LibrarySection.tsx:177-179 lists four table categories without saying only four; :244-246 says deletions never propagate, not that mirror uploads can never overwrite. BACKUP_TABLES has ten entries and mirror processing is capped, so there are real precision issues, but the finding attributes exclusive/no-overwrite statements the UI does not make.
   - **Codex rejected the proposed replacement:** Use “A nightly snapshot of the ten backed-up tables is stored in private Vercel Blob storage.” For mirroring say “Each run attempts up to200 pending client files. Files may be replaced at the same destination; source deletions do not remove mirror copies.” Name providers rather than make an unverified corporate-ownership claim.
   - Corrected after Codex's review: Say ten backed-up tables, and that each run attempts up to 200 pending files; name the providers.
+  - Fixed: batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **180. [A77]** — **open**
   - "Regenerate from the master" silently replaces a hand-uploaded manual. Replace: say so on the screen.
   - **Codex rejected the proposed replacement:** Verbatim clarification: “Regenerating replaces the currently published manual, including any PDF you uploaded by hand, with a new PDF from the master.”
@@ -1335,7 +1343,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: Nothing is beneath it: serviceLabel moved to serviceOrders.helpers.ts:21 on 29 Aug 2026 and the comment stayed. Counted in A79h.
   - Replace with: Delete lines 74-77 (or move the comment above serviceLabel in serviceOrders.helpers.ts).
   - Codex (duplicate): Same orphan serviceLabel docstring already counted in187/A79h, as this finding itself notes.
-- **N1.03. [substantive]** — **open**
+- **N1.03. [substantive]** — **implemented**
   - Office, fulfilling an S-election package manually; client record-copy retention — `webapp/server/routes-admin.ts:1372`
   - Reads: await db.query(
   -     "UPDATE service_orders SET status = 'fulfilled', fulfilled_at = now(), ein_secret = NULL WHERE id = $1",
@@ -1344,6 +1352,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: Marking an uploaded S-election package fulfilled leaves a package that the standard14-day purge can identify and redact.
   - True: The manual fulfill route accepts awaiting_info orders (:1295–1297), inserts a PDF (:1360–1367), but does not store its documentId or the formation/shareholder details in service_orders.details. purgeExpiredSElections at routes-portal.ts:568 requires shareholder details and dateIncorporated before touching a PDF and otherwise merely clears ein_secret at:623. An office-uploaded full-SSN PDF can remain in the portal indefinitely.
   - Replace with: For S-election fulfillment, require the structured details needed for redaction and persist the uploaded document ID on the service order before setting fulfilled. If those details are unavailable, remove the linked filing PDF when the edit window closes instead of leaving it accessible.
+  - Fixed: batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **N1.07. [substantive]** — **implemented**
   - Office, EIN application instructions, Tax classification row — `webapp/server/routes-admin.ts:1136`
   - Reads: "SELECT id FROM service_orders WHERE client_id = (SELECT client_id FROM service_orders WHERE id = $1) AND type = 's-election' AND status NOT IN ('pending_payment', 'cancelled') LIMIT 1",
@@ -1445,13 +1454,14 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: No further action is needed from you. We'll post the document to your portal when the work is complete.
   - Codex (disputed): email.ts:335 reads No further action is needed from you. We'll post the confirmation to your portal when the work is complete. A filed designation or certificate can confirm completion; the finding treats this ordinary meaning as excluding the deliverable without evidence.
   - Outcome: 'Confirmation' can mean the filed document; 'document' is clearer.
-- **207. [B108]** — **open**
+- **207. [B108]** — **implemented**
   - Office email 'EIN details submitted — ready to file' — `webapp/server/email.ts:374`
   - Reads: View them once in the admin dashboard; the identification number is deleted automatically when you mark the order fulfilled.
   - Claims: The details can be viewed once.
   - True: GET /admin/services/:id decrypts the number on every call (routes-admin.ts:1124-1132); nothing limits viewing to once. The deletion clause is true (:1372-1375).
   - Replace with: View them in the admin dashboard; the identification number is deleted automatically when you mark the order fulfilled.
   - **Codex rejected the proposed replacement:** Remove once. Qualify deletion as removal from the active service-order record unless backup retention is also corrected; the existing blanket deletion clause is not true for archived snapshots.
+  - Fixed: batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **208. [B111]** — **open**
   - Office: uploading a replacement formation package (Articles or designations) after the company is formed — `webapp/server/routes-admin.ts:860`
   - Reads: UPDATE orders SET status = 'formed', formed_at = now(), ra_renewal_date = ((now() AT TIME ZONE 'America/New_York') + interval '1 year')::date WHERE id = $1
@@ -1559,19 +1569,21 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: `*` already returns rejected_at and ra_renewal_date; the two names are redundant.
   - Replace with: SELECT * FROM orders WHERE id = $1
   - Codex (housekeeping-only): routes-admin.ts:359 selects *, rejected_at, ra_renewal_date; * already includes the two named columns and no reader-visible value changes.
-- **223. [B117]** — **open** — housekeeping
+- **223. [B117]** — **implemented** — housekeeping
   - Nightly database backup — what it contains — `webapp/server/backup.ts:17`
   - Reads: export const BACKUP_TABLES = ["clients", "orders", "service_orders", "documents", "oa_profiles", "oa_generations", "library_documents", "webhook_events", "fl_sync_state", "contact_messages"] as const;
   - Claims: The header (:6) says these are 'the tables that cannot be rebuilt from anywhere else' and :9-12 lists the deliberate exclusions (fl_entities, sessions, auth_tokens).
   - True: Two tables added since are neither dumped nor listed as excluded: email_log (db.ts:405-417, kept so the office can prove 'that we sent them something') and ra_renewals (db.ts:442-461 — each renewal's notice, charge, Square payment id, decline code and payment link). A Neon-side loss takes the email record and every renewal's history with it. rate_limits and schema_migrations are also absent (harmless; the restore script must recreate the ledger).
   - Replace with: Add "email_log" and "ra_renewals" to BACKUP_TABLES and to scripts/db-restore.ts; list rate_limits with the deliberate exclusions in the header.
-- **224. [B118]** — **open** — housekeeping
+  - Fixed: batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **224. [B118]** — **implemented** — housekeeping
   - Nightly Dropbox mirror — its own description — `webapp/server/dropbox.ts:112`
   - Reads: /** Copies every not-yet-mirrored document. One failure doesn't strand the rest — errors are counted and the document stays pending for the next sweep. */
   - Claims: Every pending document is copied in a sweep.
   - True: :139 `LIMIT 200` — a sweep copies at most 200; with more pending, the rest wait a night each. The office line A76 covers ('every file' nightly) rests on this.
   - Replace with: Comment: 'Copies up to 200 not-yet-mirrored documents a sweep…'; or loop until the query returns fewer than 200.
   - Codex (housekeeping-only): dropbox.ts:112 says every not-yet-mirrored document; :139 caps each sweep at200. Only the internal comment is corrected by the bounded-batch wording.
+  - Fixed: batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **225. [B119]** — **implemented** — housekeeping
   - Nightly Dropbox mirror — which folder legal mail lands in for a client with two companies — `webapp/server/dropbox.ts:132`
   - Reads: COALESCE((SELECT o.llc_name FROM orders o WHERE o.id = d.order_id), (SELECT o.llc_name FROM orders o WHERE o.client_id = d.client_id AND o.paid_at IS NOT NULL ORDER BY o.paid_at DESC LIMIT 1)) AS llc_name
@@ -1579,7 +1591,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: Legal mail carries no order_id by design (routes-admin.ts:1565 'Legal mail stays one shared section and carries no company'), so every piece of legal mail for a two-company client is mirrored into the newer company's folder whichever company it was served on.
   - Replace with: For kind = 'legal_mail' use the client's email as the folder (`safePathPart(doc.email)`), or add a per-piece company when the office uploads it.
   - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **226. [B120]** — **open** — housekeeping
+- **226. [B120]** — **implemented** — housekeeping
   - Encryption note on when the secrets are deleted — `webapp/server/crypto.ts:47`
   - Reads: rotating SESSION_SECRET orphans stored ciphertexts, which is acceptable because these secrets are deleted at fulfillment by design.
   - Claims: Secrets are deleted at fulfillment.
@@ -1588,6 +1600,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (disputed): crypto.ts:49–51 reads rotating SESSION_SECRET orphans stored ciphertexts, which is acceptable because these secrets are deleted at fulfillment by design. The finding rightly notices14-day S-election retention, but its replacement permits rotation whenever no S window is open even if an active EIN order still needs decryption.
   - **Codex rejected the proposed replacement:** Document both lifetimes and require migration/re-encryption of ALL live encrypted secrets before key retirement; pending EIN secrets and retained S-election secrets both matter.
   - Corrected after Codex's review: Pending EIN secrets matter as well as the 14-day S election window. Rotate only when no encrypted secret of either kind is live, or re-encrypt first.
+  - Fixed: batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **227. [B121]** — **open** — housekeeping
   - Environment notes — `webapp/server/env.ts:35`
   - Reads: /** Shared secret for the daily purge cron. Required in production. */
@@ -1604,13 +1617,15 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (duplicate): Same tax-label inconsistency as item127, repeated in server/datetime.ts:44; the finding itself says Nothing new but was not marked same defect as in findings-open.
   - **Codex rejected the proposed replacement:** Use one shared label mapping imported by both client and server; editing only server/datetime.ts does not update the separate src/lib/datetime.ts mapping.
   - Corrected after Codex's review: Both label tables change together: src/lib/datetime.ts and server/datetime.ts.
-- **N1.02. [substantive]** — **open** — waits on Adam's ruling
+- **N1.02. [substantive]** — **implemented** — waits on Adam's ruling
   - S-election package, what happens to the offsite copy after the edit window — `webapp/server/dropbox.ts:9`
   - Reads: * Vercel Blob. Copies are only ever added or overwritten — a deletion on the
   -  * live site never propagates; that is what makes it a backup.
   - Claims: Offsite files intentionally survive deletion on the live site, while privacy.md:15 and email.ts:407–410 promise permanent SSN deletion from the systems.
   - True: dropbox.ts:128–152 mirrors every pending document, without excluding full-SSN S-election packages. purgeExpiredSElections at routes-portal.ts:589–598 replaces only the live document/blob; it neither removes the old Dropbox object nor clears mirrored_at. The mirror filename includes the old title, so copying a differently titled Record Copy alone would not remove the original.
   - Replace with: Exclude full-SSN S-election filing copies from the offsite mirror. Remove any previously mirrored filing copies when the edit window closes, using a stored mirror path, and mirror only the redacted record copy.
+  - Ruling, 2026-09-19: Approved revised Batch 03: encrypt stored S-election forms and EIN letters including backup copies, keep them until the client deletes them, track deletion of controlled copies and retries, provide complete resumable backups, and do not clean up existing test copies.
+  - Fixed: batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **N1.12. [substantive]** — **open**
   - Registered agent renewal, notice and payment-link delivery — `webapp/server/renewals.ts:202`
   - Reads: `INSERT INTO ra_renewals (order_id, renewal_date, amount_cents, status, charge_due, notice_sent_at)

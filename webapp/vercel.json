@@ -33,6 +33,15 @@
     {
       "path": "/api/cron/ra-renewals",
       "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/backup-continue",
+      "schedule": "*/5 * * * *"
     }
-  ]
+  ],
+  "functions": {
+    "api/index.mjs": {
+      "maxDuration": 300
+    }
+  }
 }

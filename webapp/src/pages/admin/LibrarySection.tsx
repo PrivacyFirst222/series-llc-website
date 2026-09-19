@@ -10,6 +10,9 @@ interface MirrorStatus {
   mirrored: number;
   pending: number;
   lastMirroredAt: string | null;
+  complete?: boolean;
+  failures?: number;
+  lastError?: string | null;
 }
 
 interface BackupInfo {
@@ -88,15 +91,20 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
     queryFn: () => api.get<BackupInfo[]>("/api/admin/backups"),
     enabled,
   });
+  const progressQuery = useQuery({
+    queryKey:["admin-backup-progress"],
+    queryFn:()=>api.get<{complete:boolean;pending:number;error:string|null;completedAt:string|null}>("/api/admin/backups/progress"),
+    enabled,refetchInterval:5000,
+  });
   const runBackup = useMutation({
-    mutationFn: () => api.post<{ key: string; sizeBytes: number }>("/api/admin/backups/run", {}),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-backups"] }),
+    mutationFn: () => api.post<{ key: string; sizeBytes: number; complete: boolean; pending: number }>("/api/admin/backups/run", {}),
+    onSuccess: () => {queryClient.invalidateQueries({ queryKey: ["admin-backups"] });queryClient.invalidateQueries({queryKey:["admin-backup-progress"]});},
   });
   const newest = (backupsQuery.data ?? [])[0];
   const mirrorQuery = useQuery({
     queryKey: ["admin-file-mirror"],
     queryFn: () => api.get<MirrorStatus>("/api/admin/file-mirror"),
-    enabled,
+    enabled,refetchInterval:5000,
   });
   const runMirror = useMutation({
     mutationFn: () => api.post<{ mirrored: number; failed: number; skipped: boolean }>("/api/admin/file-mirror/run", {}),
@@ -174,11 +182,13 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
           </span>
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
-          A nightly copy of clients, orders, service orders, and documents,
-          stored privately outside the database's own company. Every backup
-          is kept — timestamped, never overwritten, never pruned. Click a
-          backup to download it; restoring is described in the runbook
-          (docs/db-restore.md).
+          Complete backups include business records, email and renewal history, and a verified
+          manifest of retained documents. Database snapshots are stored privately in Vercel Blob;
+          document copies are verified in Dropbox. Transient questionnaire taxpayer numbers are excluded;
+          retained tax documents remain encrypted. Backups are kept. Restore instructions: docs/db-restore.md.
+        </p>
+        <p className="mt-2 text-xs" role="status" data-testid="backup-progress">
+          {progressQuery.isError ? "Backup status unavailable — completeness has not been verified." : progressQuery.data?.complete ? `Complete — records and retained document copies verified at ${new Date(progressQuery.data.completedAt!).toLocaleString()}.` : `Incomplete — ${progressQuery.data?.pending ?? "unknown"} files pending. ${progressQuery.data?.error || "Automatic continuation runs every five minutes while work remains."}`}
         </p>
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <Button
@@ -240,10 +250,11 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
               <span className="text-xs text-destructive" data-testid="mirror-result">{(runMirror.error as Error).message}</span>
             ) : null}
           </div>
+          <p className="mt-1 text-xs" role="status">{mirrorQuery.isError ? "Mirror status unavailable." : mirror?.complete ? "Complete — all retained client files verified." : `Incomplete — ${mirror?.pending ?? "unknown"} pending; ${mirror?.failures ?? 0} failures. ${mirror?.lastError || ""}`}</p>
           <p className="mt-1.5 text-xs text-muted-foreground">
-            Every client file is copied nightly into the app-scoped Dropbox
-            folder, organized by LLC. Deletions never propagate — the mirror
-            only ever grows.
+            All retained client files are backed up to Dropbox, organized by company.
+            Interrupted work resumes automatically; failures are reported and retried without blocking later files.
+            Sensitive documents are copied encrypted. Client deletion requests also remove their mirrored copies.
           </p>
         </div>
       </div>

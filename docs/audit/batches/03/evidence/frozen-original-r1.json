@@ -1,0 +1,328 @@
+{
+  "id": "03",
+  "revision": 1,
+  "title": "Private information, client-controlled documents and complete backups",
+  "model": "Codex",
+  "base": "f902a8e41b973f62a96ca6c39067c33ae0fb61a2",
+  "items": [
+    {
+      "id": "26",
+      "part": "all",
+      "scope": "payment storage disclosure",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch03 26 all: payment storage disclosure"
+        }
+      ]
+    },
+    {
+      "id": "27",
+      "part": "collection-channel",
+      "scope": "portal collection disclosure",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch03 27 collection-channel: portal collection disclosure"
+        }
+      ]
+    },
+    {
+      "id": "27",
+      "part": "retention",
+      "scope": "client controlled document retention",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch03 27 retention: client controlled document retention"
+        }
+      ]
+    },
+    {
+      "id": "N1.01",
+      "part": "all",
+      "scope": "backups exclude transient taxpayer numbers",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch03 N1.01 all: backups exclude transient taxpayer numbers"
+        }
+      ]
+    },
+    {
+      "id": "N1.02",
+      "part": "all",
+      "scope": "encrypted documents and deletion survive restore",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch03 N1.02 all: encrypted documents and deletion survive restore"
+        }
+      ]
+    },
+    {
+      "id": "N1.03",
+      "part": "all",
+      "scope": "manual tax documents use the same retention",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch03 N1.03 all: manual tax documents use the same retention"
+        }
+      ]
+    },
+    {
+      "id": "121",
+      "part": "all",
+      "scope": "editing expires without deleting documents",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch03 121 all: editing expires without deleting documents"
+        }
+      ]
+    },
+    {
+      "id": "162",
+      "part": "all",
+      "scope": "closed editing message preserves documents",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch03 162 all: closed editing message preserves documents"
+        }
+      ]
+    },
+    {
+      "id": "207",
+      "part": "all",
+      "scope": "office email describes repeatable access",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch03 207 all: office email describes repeatable access"
+        }
+      ]
+    },
+    {
+      "id": "223",
+      "part": "all",
+      "scope": "complete backup restores business history",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch03 223 all: complete backup restores business history"
+        }
+      ]
+    },
+    {
+      "id": "226",
+      "part": "all",
+      "scope": "key rotation preserves live information",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch03 226 all: key rotation preserves live information"
+        }
+      ]
+    },
+    {
+      "id": "179",
+      "part": "all",
+      "scope": "backup completes beyond 200 files",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch03 179 all: backup completes beyond 200 files"
+        }
+      ]
+    },
+    {
+      "id": "224",
+      "part": "all",
+      "scope": "mirror description matches complete processing",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch03 224 all: mirror description matches complete processing"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "webapp/server/storage.ts",
+      "mode": "code",
+      "why": "Approved revised Batch 03 retention, encryption, backup and matching descriptions."
+    },
+    {
+      "path": "webapp/server/crypto.ts",
+      "mode": "code",
+      "why": "Approved revised Batch 03 retention, encryption, backup and matching descriptions."
+    },
+    {
+      "path": "webapp/server/env.ts",
+      "mode": "code",
+      "why": "Approved revised Batch 03 retention, encryption, backup and matching descriptions."
+    },
+    {
+      "path": "webapp/server/backup.ts",
+      "mode": "code",
+      "why": "Approved revised Batch 03 retention, encryption, backup and matching descriptions."
+    },
+    {
+      "path": "webapp/server/dropbox.ts",
+      "mode": "code",
+      "why": "Approved revised Batch 03 retention, encryption, backup and matching descriptions."
+    },
+    {
+      "path": "webapp/server/db.ts",
+      "mode": "code",
+      "why": "Approved revised Batch 03 retention, encryption, backup and matching descriptions."
+    },
+    {
+      "path": "webapp/server/routes-portal.ts",
+      "mode": "code",
+      "why": "Approved revised Batch 03 retention, encryption, backup and matching descriptions."
+    },
+    {
+      "path": "webapp/server/routes-admin.ts",
+      "mode": "code",
+      "why": "Approved revised Batch 03 retention, encryption, backup and matching descriptions."
+    },
+    {
+      "path": "webapp/server/routes-ops.ts",
+      "mode": "code",
+      "why": "Approved revised Batch 03 retention, encryption, backup and matching descriptions."
+    },
+    {
+      "path": "webapp/server/email.ts",
+      "mode": "code",
+      "why": "Approved revised Batch 03 retention, encryption, backup and matching descriptions."
+    },
+    {
+      "path": "webapp/src/content/privacy.md",
+      "mode": "code",
+      "why": "Approved revised Batch 03 retention, encryption, backup and matching descriptions."
+    },
+    {
+      "path": "webapp/src/pages/portal/PortalDashboard.tsx",
+      "mode": "code",
+      "why": "Approved revised Batch 03 retention, encryption, backup and matching descriptions."
+    },
+    {
+      "path": "webapp/src/pages/portal/OrdersInProgress.tsx",
+      "mode": "code",
+      "why": "Approved revised Batch 03 retention, encryption, backup and matching descriptions."
+    },
+    {
+      "path": "webapp/src/pages/admin/LibrarySection.tsx",
+      "mode": "code",
+      "why": "Approved revised Batch 03 retention, encryption, backup and matching descriptions."
+    },
+    {
+      "path": "webapp/scripts/db-restore.ts",
+      "mode": "code",
+      "why": "Approved revised Batch 03 retention, encryption, backup and matching descriptions."
+    },
+    {
+      "path": "docs/db-restore.md",
+      "mode": "code",
+      "why": "Approved revised Batch 03 retention, encryption, backup and matching descriptions."
+    },
+    {
+      "path": "webapp/.env.example",
+      "mode": "code",
+      "why": "Approved revised Batch 03 retention, encryption, backup and matching descriptions."
+    },
+    {
+      "path": "webapp/vercel.json",
+      "mode": "code",
+      "why": "Approved revised Batch 03 retention, encryption, backup and matching descriptions."
+    },
+    {
+      "path": "webapp/server/encryption.ts",
+      "mode": "new",
+      "why": "Implement document encryption, durable deletion, verified restore and key rotation."
+    },
+    {
+      "path": "webapp/server/document-retention.ts",
+      "mode": "new",
+      "why": "Implement document encryption, durable deletion, verified restore and key rotation."
+    },
+    {
+      "path": "webapp/server/restore.ts",
+      "mode": "new",
+      "why": "Implement document encryption, durable deletion, verified restore and key rotation."
+    },
+    {
+      "path": "webapp/scripts/rotate-encryption.ts",
+      "mode": "new",
+      "why": "Implement document encryption, durable deletion, verified restore and key rotation."
+    },
+    {
+      "path": "docs/encryption-rotation.md",
+      "mode": "new",
+      "why": "Implement document encryption, durable deletion, verified restore and key rotation."
+    },
+    {
+      "path": "webapp/server/e2e.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Add Batch 03 regression evidence; adjust obsolete automatic-redaction checks to client-controlled retention, preserving company-address assertions."
+    },
+    {
+      "path": "webapp/scripts/behavioral.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Add Batch 03 regression evidence; adjust obsolete automatic-redaction checks to client-controlled retention, preserving company-address assertions."
+    },
+    {
+      "path": "webapp/server/batch02-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Add Batch 03 regression evidence; adjust obsolete automatic-redaction checks to client-controlled retention, preserving company-address assertions."
+    },
+    {
+      "path": "webapp/server/batch03-check.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Add Batch 03 regression evidence; adjust obsolete automatic-redaction checks to client-controlled retention, preserving company-address assertions."
+    },
+    {
+      "path": "webapp/scripts/batch03-walk.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Add Batch 03 regression evidence; adjust obsolete automatic-redaction checks to client-controlled retention, preserving company-address assertions."
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "why": "Normal API rebuild."
+    }
+  ],
+  "requiredChecks": [],
+  "testSupport": [
+    "webapp/server/batch03-check.ts",
+    "webapp/scripts/batch03-walk.ts"
+  ],
+  "removedChecks": [
+    "the client keeps a record copy",
+    "record copy still downloads as a PDF",
+    "full SSN is absent from the record copy bytes",
+    "record copy keeps the whole package"
+  ]
+}

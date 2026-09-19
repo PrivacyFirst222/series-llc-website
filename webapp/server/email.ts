@@ -371,8 +371,8 @@ export function einDetailsSubmittedAdminEmail(opts: {
     subject: `EIN details submitted — ready to file (${opts.clientEmail})`,
     html: wrap(`
       <p>The responsible-party details for <strong>${escapeHtml(opts.summary)}</strong> have been
-      submitted through the portal. View them once in the admin dashboard; the identification
-      number is deleted automatically when you mark the order fulfilled.</p>
+      submitted through the portal. View them in the admin dashboard until fulfillment; the identification
+      number is removed from the active questionnaire record when you mark the order fulfilled. The EIN letter remains available to the client until the client deletes it.</p>
       <p><a href="${opts.adminUrl}">Open admin</a></p>
     `),
   };
@@ -404,10 +404,9 @@ export function sElectionReadyEmail(opts: {
       ready to download in your portal: the completed IRS Form 2553, a cover letter, and
       step-by-step instructions for signing and mailing it to the IRS.</p>
       <p>You can correct your answers and regenerate the package until
-      <strong>${escapeHtml(opts.editableUntil)}</strong>. After that we permanently delete every
-      Social Security number from our systems and replace your copy with a record copy that shows
-      only the last four digits and cannot be filed with the IRS —
-      <strong>download the filing copy before then</strong>.</p>
+      <strong>${escapeHtml(opts.editableUntil)}</strong>. After that, editing closes and the full numbers are removed from the questionnaire records.
+      Your completed document stays encrypted in your portal until you choose to delete it.
+      Download and keep your own copy.</p>
       <p><a href="${opts.portalUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Open your portal</a></p>
     `),
   };

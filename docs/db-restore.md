@@ -1,79 +1,76 @@
-# Database backup & restore
+# Complete backup and restore
 
-## What is backed up, where, and when
+At 08:15 UTC the scheduled backup captures a consistent database snapshot.
+It includes clients, orders, service orders, document metadata, operating-agreement
+profiles and generations, library metadata, webhook history, Sunbiz sync state,
+contact messages, email history, renewal history and document-deletion records.
+The corresponding retained files (client documents, library files and order
+summaries) are copied to Dropbox and read back for verification. Only after all
+required files are accounted for is the completed snapshot published to private
+Vercel Blob storage. Completed snapshots are timestamped and kept; no old test
+backup cleanup or migration is performed by Batch 03.
 
-Every night at 08:15 UTC a Vercel cron job dumps the
-irreplaceable tables — clients, orders, service orders, document metadata,
-operating-agreement profiles and generations, library metadata, webhook
-events, contact-form messages, and the Sunbiz sync watermark — as gzipped JSON into **private
-Vercel Blob storage** under `backups/db-YYYY-MM-DD-HHMMSS.json.gz`. (The
-schedule is fixed in UTC, so the Eastern clock time shifts with daylight
-saving: 4:15 AM EDT in summer, 3:15 AM EST in winter.) Every backup is
-kept forever — filenames are timestamped to the second, overwriting is
-disabled at the storage layer, and nothing prunes them (Adam's ruling,
-29 Aug 2026: at ~17 KB per dump, years of them cost pennies, and a deleted
-backup is the one you needed). Each dump is read in a single database
-statement, so it is one consistent instant.
+The snapshot's file manifest identifies the recovery path and content hash for
+every retained file. Tax documents are encrypted before storage and remain
+ciphertext in Dropbox. Their plaintext content hashes allow verified in-place
+key rotation without invalidating earlier snapshot manifests. The keys are
+stored separately in the deployment's environment; keep a secure recovery copy
+of the key ring. Losing all copies of the required key makes recovery impossible.
 
-Deliberately excluded:
+Excluded: the reloadable Sunbiz entity dataset, sign-in sessions, one-time auth
+tokens, rate-limit windows and the schema-migration ledger (created by startup).
+The full taxpayer numbers in service-order questionnaire records are always
+excluded, including their encrypted values. An unfinished EIN application may
+need its number re-entered after restoration. The completed retained PDFs are
+included; they may contain full taxpayer numbers and are encrypted.
 
-- `fl_entities` — the 4.7M-row Sunbiz mirror, fully reloadable from the
-  state's files (`webapp/scripts/sunbiz-load.ts`).
-- `sessions` and `auth_tokens` — ephemeral sign-ins and one-time secrets.
-  After a restore, clients simply sign in again ("Forgot password" works
-  because their accounts are restored).
+## Progress and failures
 
-Taxpayer-number ciphertext is backed up exactly as stored — encrypted. The
-key is derived from `SESSION_SECRET` in the Vercel environment, so a stolen
-dump does not expose numbers — and a restore must keep `SESSION_SECRET`
-unchanged or stored ciphertexts become unreadable.
+The Office Reference Library shows complete/incomplete status, remaining files
+and errors. A file failure does not prevent later files from being attempted.
+Progress is saved outside the database in private storage. The continuation cron
+runs every five minutes, resuming incomplete work and retrying deletions; the
+nightly document-mirror job also verifies all retained client files. There is no
+200-file total limit. Per-invocation time limits preserve progress for continuation.
+A missing file or unavailable provider is an incomplete backup, not success.
 
-The **admin panel → Reference Library tab → Database backups card** shows the
-newest dump's date and size, and has a "Back up now" button. If the newest
-dump is more than a day old, the nightly cron is broken — investigate.
+Deployment requires a Vercel plan that permits a five-minute cron schedule and
+300-second function duration. Verify those capabilities before publishing; local
+tests do not prove a production cron has executed. Missing Dropbox credentials
+or encryption keys prevent a complete production backup. Do not call a staged
+job a completed snapshot.
 
-This complements (does not replace) Neon's instant restore: Neon can rewind
-the live database to any moment in its history window; these dumps survive
-the loss of Neon itself.
+## Restore into an empty database
 
-## Restore
+1. Download a completed snapshot from Office → Reference Library → Database backups.
+2. Create an empty target database. Supply DATABASE_URL for that target, the
+   original Blob/Dropbox credentials, and the required DOCUMENT_ENCRYPTION_KEYS
+   and DOCUMENT_ENCRYPTION_ACTIVE_KEY. The key values must not be pasted into logs.
+3. From webapp run `bun run scripts/db-restore.ts <snapshot.json.gz> --dry-run`.
+   This only parses row counts; it does not prove recovery.
+4. Run `bun run scripts/db-restore.ts <snapshot.json.gz>` with those environment
+   settings. Startup creates the schema. Any nonempty business-data table is refused;
+   there is no force-overwrite option. Restore into a fresh target after any
+   interrupted database restoration, rather than merging partial records.
+5. The restore reads the current deletion journal independently of the snapshot,
+   verifies the complete manifest and decryption keys, restores retained files
+   and rows, and reapplies deletion decisions. It fails closed if the journal,
+   a required file, or a key is unavailable. Verify client access and documents
+   before changing the production database configuration.
 
-1. **Download a dump**: admin panel → Reference Library → Database backups →
-   click the dump. (It downloads through the authed admin API.)
-2. **Create the target database**: a fresh Neon database (new project, or a
-   new database in the existing project).
-3. **Create the schema**: run the app once against the empty database — the
-   server's migrations create every table on startup:
-   `DATABASE_URL=postgres://<target> bun run --watch server/dev.ts` (Ctrl-C
-   once it's listening).
-4. **Dry-run first** — prints the dump's date and per-table row counts,
-   touches nothing:
-   `bun run scripts/db-restore.ts db-2026-08-28-105735.json.gz --dry-run`
-5. **Restore**:
-   `DATABASE_URL=postgres://<target> bun run scripts/db-restore.ts db-2026-08-28-105735.json.gz`
-   The script refuses a target that already contains clients unless
-   `--force` is passed.
-6. **Cut over**: change `DATABASE_URL` in Vercel's env settings to the new
-   database and redeploy. All other env vars stay as they
-   are — especially `SESSION_SECRET` (see above).
+A restore cannot recover records created after the snapshot. Do not remove the
+external `deletions/` journal: it is authoritative even when restoring an older
+database. Expired questionnaire numbers remain absent. Client-deleted tax
+files stay unavailable even if older snapshots refer to them.
 
-What is lost in this path: anything written after the dump was taken (up to
-24 hours), and all active sign-in sessions. Client documents live in Blob
-storage, not the database, and are unaffected.
+The current tool requires the new complete file-manifest format. Older test
+dumps are left alone and are not silently certified as complete backups.
 
-## Client-file mirror (Dropbox)
+## Deletion and provider recovery copies
 
-Separately from the database dumps, every client file (filed Articles,
-designations, EIN letters, legal mail, generated agreements) is mirrored
-nightly at 08:20 UTC into an app-scoped Dropbox folder, organized by LLC
-name. The server's credential reaches only that one folder. Deletions never
-propagate — the mirror only grows — and Dropbox's own version history sits
-underneath it.
-
-The admin Backups card shows mirrored/pending counts and a "Mirror now"
-button. "Not connected" means the three `DROPBOX_*` env vars are unset.
-
-Recovery is direct: the files are ordinary PDFs in Dropbox. To re-attach
-them to a restored database, upload them to the relevant client through the
-admin panel's Upload button (document metadata in the dump names every file
-and its LLC).
+Client deletion writes the external journal before hiding the document, then
+removes active Blob and Dropbox copies. Cleanup failures remain pending and
+are retried automatically; the Office reports them. This controls application
+access and our active stored copies. Provider-maintained recovery/version
+history may have its own retention. The Privacy Policy does not promise immediate
+physical erasure of every provider-held recovery copy.

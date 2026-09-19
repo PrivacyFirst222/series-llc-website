@@ -1,6 +1,9 @@
+import { isEncrypted, unseal } from "./encryption";
 import { gzipSync } from "node:zlib";
 import { env } from "./env";
 import { getDb } from "./db";
+import { putObject, readObject, storageWasDeleted, readStoredFile } from "./storage";
+import { mirrorFile, documentMirrorPath, hashBytes, type BackupFile } from "./dropbox";
 
 /**
  * Nightly logical backup of the tables that cannot be rebuilt from anywhere
@@ -10,8 +13,9 @@ import { getDb } from "./db";
  *   - fl_entities        — 4.7M rows, fully reloadable from the state's files
  *   - sessions           — ephemeral sign-ins; a restore should not revive them
  *   - auth_tokens        — one-time secrets; same
- * The taxpayer-number ciphertext in service_orders is backed up exactly as
- * stored — encrypted; the key lives only in the server's environment.
+ * Full taxpayer numbers in service_orders are excluded, even as ciphertext.
+ * rate_limits and schema_migrations are recreated, not restored. Retained
+ * tax PDFs are backed up as authenticated ciphertext; keys are kept separately.
  * Restore: scripts/db-restore.ts (see docs/db-restore.md).
  */
 export const BACKUP_TABLES = [
@@ -25,6 +29,9 @@ export const BACKUP_TABLES = [
   "webhook_events",
   "fl_sync_state",
   "contact_messages",
+  "email_log",
+  "ra_renewals",
+  "document_deletions",
 ] as const;
 
 const PREFIX = "backups/";
@@ -34,29 +41,6 @@ export interface BackupInfo {
   storageKey: string;
   sizeBytes: number;
   uploadedAt: string;
-}
-
-async function putBackup(name: string, data: Buffer): Promise<string> {
-  if (env.BLOB_READ_WRITE_TOKEN) {
-    const { put } = await import("@vercel/blob");
-    const blob = await put(`${PREFIX}${name}`, data, {
-      access: "private",
-      contentType: "application/gzip",
-      addRandomSuffix: false,
-      // Names carry a timestamp, so no write can ever replace an earlier
-      // backup — a later degraded snapshot silently overwrote the day's good
-      // one under the date-only scheme (that is exactly how local test dumps
-      // destroyed the production backups in P48; Codex OPS-001).
-      allowOverwrite: false,
-    });
-    return blob.url;
-  }
-  const { mkdir, writeFile } = await import("node:fs/promises");
-  const { fileURLToPath } = await import("node:url");
-  const dir = fileURLToPath(new URL("../.dev-data/blob/backups/", import.meta.url));
-  await mkdir(dir, { recursive: true });
-  await writeFile(dir + name, data);
-  return `dev:backups/${name}`;
 }
 
 export async function listBackups(): Promise<BackupInfo[]> {
@@ -84,7 +68,7 @@ export async function listBackups(): Promise<BackupInfo[]> {
   }
   const { readdir, stat } = await import("node:fs/promises");
   const { fileURLToPath } = await import("node:url");
-  const dir = fileURLToPath(new URL("../.dev-data/blob/backups/", import.meta.url));
+  const dir = process.env.DEV_STORAGE_DIR ? `${process.env.DEV_STORAGE_DIR}/backups/` : fileURLToPath(new URL("../.dev-data/blob/backups/", import.meta.url));
   try {
     const names = await readdir(dir);
     const out: BackupInfo[] = [];
@@ -109,36 +93,68 @@ export async function listBackups(): Promise<BackupInfo[]> {
  *  you needed. The admin panel shows the newest dump's date so a stall is
  *  visible. */
 
-export async function runDbBackup(): Promise<{
-  key: string;
-  sizeBytes: number;
-  rowCounts: Record<string, number>;
-}> {
-  const db = await getDb();
-  // ONE statement reads every table, so the whole dump is a single database
-  // instant. The per-table loop it replaces could capture each table at a
-  // different moment — an order without the document written between reads —
-  // and the Neon HTTP driver offers no multi-statement transaction to wrap
-  // them, but per-statement atomicity is exactly enough (Codex BAK-001).
-  // Table names come from the constant list above, never from input.
-  const selects = BACKUP_TABLES.map(
-    (t) => `'${t}', (SELECT coalesce(json_agg(x), '[]'::json) FROM ${t} x)`,
-  ).join(", ");
-  const snap = await db.query<{ dump: Record<string, unknown[]> }>(
-    `SELECT json_build_object(${selects}) AS dump`,
-  );
-  const tables = snap[0].dump;
-  const rowCounts: Record<string, number> = {};
-  for (const t of BACKUP_TABLES) rowCounts[t] = (tables[t] ?? []).length;
-  const dump = {
-    version: 1,
-    dumpedAt: new Date().toISOString(),
-    tables,
-  };
-  // Timestamped, immutable: db-YYYY-MM-DD-HHMMSS.json.gz.
-  const iso = dump.dumpedAt;
-  const name = `db-${iso.slice(0, 10)}-${iso.slice(11, 19).replace(/:/g, "")}.json.gz`;
-  const data = gzipSync(Buffer.from(JSON.stringify(dump)));
-  await putBackup(name, data);
-  return { key: name, sizeBytes: data.byteLength, rowCounts };
+export interface BackupDump {version:1; dumpedAt:string; tables:Record<string,Record<string,unknown>[]>; files:BackupFile[]; fileManifestVersion:1}
+interface BackupJob {key:string; dump:BackupDump; done:Record<string,string>; errors:Record<string,string>}
+const JOB='backup-jobs/current.json';
+export function backupFiles(tables:BackupDump['tables']):BackupFile[]{
+ const orders=new Map((tables.orders||[]).map(o=>[o.id,o]));const clients=new Map((tables.clients||[]).map(c=>[c.id,c]));
+ const files:BackupFile[]=[];
+ for(const d of tables.documents||[]){if(d.deleted_at)continue;const o=orders.get(d.order_id),c=clients.get(d.client_id);
+   files.push({storageKey:String(d.storage_key),path:documentMirrorPath({id:String(d.id),title:String(d.title),kind:String(d.kind),storage_key:String(d.storage_key),llc_name:o && o.client_id===d.client_id?String(o.llc_name):null,email:c?String(c.email):null})});}
+ for(const d of tables.library_documents||[])files.push({storageKey:String(d.storage_key),path:`/reference/${encodeURIComponent(String(d.key))}-${encodeURIComponent(String(d.storage_key).split('/').pop()!)}.backup`});
+ for(const o of tables.orders||[])if(o.summary_storage_key)files.push({storageKey:String(o.summary_storage_key),path:`/summaries/${o.id}-${encodeURIComponent(String(o.summary_storage_key).split('/').pop()!)}.backup`});
+ return [...new Map(files.map(f=>[f.storageKey,f])).values()];
+}
+export async function backupProgress(){
+ const db=await getDb();const [r]=await db.query<{started_at:unknown;completed_at:unknown;error:string|null}>("SELECT started_at,completed_at,error FROM backup_progress WHERE id='database'");
+ const raw=await readObject(JOB);const j:BackupJob|null=raw?JSON.parse(raw.toString()):null;
+ return {complete:!!r?.completed_at&&!r.error,startedAt:r?.started_at||null,completedAt:r?.completed_at||null,pending:j?j.dump.files.filter(f=>!j.done[f.storageKey]).length:0,errors:j?Object.values(j.errors):[],error:r?.error||null};
+}
+export async function runDbBackup(options:{resumeOnly?:boolean;budgetMs?:number}={}):Promise<{key:string;sizeBytes:number;rowCounts:Record<string,number>;complete:boolean;pending:number}>{
+ const db=await getDb();await db.query("INSERT INTO backup_progress(id) VALUES('database') ON CONFLICT DO NOTHING");
+ const locked=await db.query(`UPDATE backup_progress SET lease_until=now()+interval '10 minutes' WHERE id='database' AND (lease_until IS NULL OR lease_until<now()) RETURNING id`);
+ if(!locked.length)return {key:'',sizeBytes:0,rowCounts:{},complete:false,pending:0};
+ try{
+  const saved=await readObject(JOB);let job:BackupJob|null=saved?JSON.parse(saved.toString()):null;
+  if(!job&&options.resumeOnly)return {key:'',sizeBytes:0,rowCounts:{},complete:(await backupProgress()).complete,pending:0};
+  if(!job){
+   // One statement captures a consistent database snapshot. Never include
+   // transient encrypted taxpayer numbers in a retained backup.
+   const selects=BACKUP_TABLES.map(t=>`'${t}',(SELECT coalesce(json_agg(x),'[]'::json) FROM ${t} x)`).join(',');
+   const [snap]=await db.query<{dump:BackupDump['tables']}>(`SELECT json_build_object(${selects}) AS dump`);
+   for(const row of snap.dump.service_orders){row.ein_secret=null;}
+   const dump:BackupDump={version:1,dumpedAt:new Date().toISOString(),tables:snap.dump,files:[],fileManifestVersion:1};dump.files=backupFiles(dump.tables);
+   job={key:`db-${dump.dumpedAt.replace(/[:.]/g,'-')}.json.gz`,dump,done:{},errors:{}};
+   await putObject(JOB,Buffer.from(JSON.stringify(job)),true);
+   await db.query("UPDATE backup_progress SET started_at=now(),completed_at=NULL,error=NULL WHERE id='database'");
+  }
+  const began=Date.now();
+  // A failed early file does not prevent attempting the rest. Checkpoints
+  // survive process loss; the continuation cron repeats unfinished work.
+  for(const f of job.dump.files){
+   if(job.done[f.storageKey])continue;if(Date.now()-began>=(options.budgetMs??180000))break;
+   try{
+    if(await storageWasDeleted(f.storageKey)){job.done[f.storageKey]='deleted';delete job.errors[f.storageKey];}
+    else{await mirrorFile(f);const raw=await readStoredFile(f.storageKey);f.sha=hashBytes(isEncrypted(raw)?unseal(raw):raw);job.done[f.storageKey]=f.sha;delete job.errors[f.storageKey];}
+   }catch(e){job.errors[f.storageKey]=String(e);}
+   await putObject(JOB,Buffer.from(JSON.stringify(job)),true);
+  }
+  const pending=job.dump.files.filter(f=>!job!.done[f.storageKey]).length;
+  const rowCounts=Object.fromEntries(BACKUP_TABLES.map(t=>[t,job!.dump.tables[t].length]));
+  if(pending){await db.query("UPDATE backup_progress SET error=$1 WHERE id='database'",[`${pending} file(s) pending; automatic continuation scheduled`]);return {key:job.key,sizeBytes:0,rowCounts,complete:false,pending};}
+  // Deletions may arrive after a file was verified. Omit them from the final
+  // manifest and rows; a later deletion is additionally enforced on restore.
+  const deleted=new Set<string>();
+  for(const f of job.dump.files)if(await storageWasDeleted(f.storageKey))deleted.add(f.storageKey);
+  job.dump.files=job.dump.files.filter(f=>!deleted.has(f.storageKey));
+  job.dump.tables.documents=job.dump.tables.documents.filter(d=>!d.deleted_at&&!deleted.has(String(d.storage_key)));
+  const data=gzipSync(Buffer.from(JSON.stringify(job.dump)));
+  const existing=await readObject(PREFIX+job.key);
+  if(existing&&!existing.equals(data))throw new Error('Refusing to overwrite a different completed backup');
+  if(!existing)await putObject(PREFIX+job.key,data);
+  await db.query("UPDATE backup_progress SET completed_at=now(),error=NULL WHERE id='database'");
+  const {removeStoredFile}=await import('./storage');await removeStoredFile(env.BLOB_READ_WRITE_TOKEN?JOB:`dev:${JOB}`);
+  return {key:job.key,sizeBytes:data.length,rowCounts,complete:true,pending:0};
+ }catch(e){await db.query("UPDATE backup_progress SET error=$1,completed_at=NULL WHERE id='database'",[String(e)]);throw e;}
+ finally{await db.query("UPDATE backup_progress SET lease_until=NULL WHERE id='database'");}
 }

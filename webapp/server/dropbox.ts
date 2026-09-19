@@ -1,17 +1,11 @@
 import { env } from "./env";
 import { getDb } from "./db";
-import { readFileStream } from "./storage";
+import { readStoredFile, storageWasDeleted } from "./storage";
+import { createHash } from "node:crypto";
 
-/**
- * Nightly mirror of client files into Adam's Dropbox (app-folder scoped: the
- * token can reach ONE dedicated folder, nothing else in the account). This is
- * the offsite copy of the uploaded documents that otherwise exist only in
- * Vercel Blob. Copies are only ever added or overwritten — a deletion on the
- * live site never propagates; that is what makes it a backup.
- *
- * Dev (no Dropbox credentials): mirrors into .dev-data/dropbox-mirror/ so the
- * sweep, incremental marking, and admin surface are all testable.
- */
+/** Verified client-file backup. Sensitive files are copied as ciphertext.
+ * Deletion requests propagate through the durable deletion journal. Each run
+ * continues through all pending files; saved progress resumes interruptions. */
 
 const configured = () =>
   Boolean(env.DROPBOX_APP_KEY && env.DROPBOX_APP_SECRET && env.DROPBOX_REFRESH_TOKEN);
@@ -29,6 +23,7 @@ async function accessToken(): Promise<string> {
       client_id: env.DROPBOX_APP_KEY,
       client_secret: env.DROPBOX_APP_SECRET,
     }),
+    signal: AbortSignal.timeout(20000),
   });
   if (!res.ok) throw new Error(`Dropbox token refresh failed (${res.status}): ${await res.text()}`);
   const body = (await res.json()) as { access_token: string; expires_in: number };
@@ -60,6 +55,7 @@ async function uploadToDropbox(path: string, data: Buffer): Promise<void> {
       "Dropbox-API-Arg": headerSafeJson({ path, mode: "overwrite", mute: true }),
     },
     body: new Uint8Array(data),
+    signal: AbortSignal.timeout(20000),
   });
   if (!res.ok) throw new Error(`Dropbox upload failed (${res.status}): ${await res.text()}`);
 }
@@ -68,91 +64,94 @@ async function uploadDev(path: string, data: Buffer): Promise<void> {
   const { mkdir, writeFile } = await import("node:fs/promises");
   const { fileURLToPath } = await import("node:url");
   const { dirname } = await import("node:path");
-  const root = fileURLToPath(new URL("../.dev-data/dropbox-mirror", import.meta.url));
+  const root = process.env.DEV_MIRROR_DIR || fileURLToPath(new URL("../.dev-data/dropbox-mirror", import.meta.url));
   await mkdir(dirname(root + path), { recursive: true });
   await writeFile(root + path, data);
 }
 
-async function streamToBuffer(body: ReadableStream | Buffer): Promise<Buffer> {
-  if (Buffer.isBuffer(body)) return body;
-  const chunks: Uint8Array[] = [];
-  const reader = body.getReader();
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    if (value) chunks.push(value);
+
+export const hashBytes = (data: Buffer) => createHash('sha256').update(data).digest('hex');
+export interface BackupFile { storageKey: string; path: string; sha?: string; }
+export function documentMirrorPath(doc: {id: string; title: string; kind: string; llc_name?: string | null; email?: string | null; storage_key: string}): string {
+  return `/${safePathPart(doc.llc_name || doc.email || "unassigned")}/${doc.id.slice(0,8)}-${safePathPart(doc.title || doc.kind)}.pdf${doc.storage_key.endsWith('.encrypted') ? '.encrypted' : ''}`;
+}
+const devMirror = async (path: string) => {
+  const {fileURLToPath} = await import('node:url');
+  return (process.env.DEV_MIRROR_DIR || fileURLToPath(new URL('../.dev-data/dropbox-mirror', import.meta.url))) + path;
+};
+export async function readMirror(path: string): Promise<Buffer | null> {
+  if (!configured()) {
+    if (env.isProd) throw new Error('Dropbox is not connected');
+    const {readFile} = await import('node:fs/promises');
+    try { return await readFile(await devMirror(path)); } catch(e) { if((e as NodeJS.ErrnoException).code==='ENOENT') return null; throw e; }
   }
-  return Buffer.concat(chunks);
+  const r=await fetch('https://content.dropboxapi.com/2/files/download',{method:'POST',headers:{Authorization:`Bearer ${await accessToken()}`,'Dropbox-API-Arg':headerSafeJson({path})},signal:AbortSignal.timeout(20000)});
+  if(r.status===409 && (await r.text()).includes('not_found')) return null;
+  if(!r.ok) throw new Error(`Dropbox read failed (${r.status})`);
+  return Buffer.from(await r.arrayBuffer());
 }
-
-export interface MirrorStatus {
-  configured: boolean;
-  mirrored: number;
-  pending: number;
-  lastMirroredAt: string | null;
+export async function deleteMirror(path: string): Promise<void> {
+  if (!configured()) {
+    if (env.isProd) throw new Error('Dropbox is not connected');
+    const {unlink}=await import('node:fs/promises');
+    try {await unlink(await devMirror(path));} catch(e){if((e as NodeJS.ErrnoException).code!=='ENOENT')throw e;} return;
+  }
+  const r=await fetch('https://api.dropboxapi.com/2/files/delete_v2',{method:'POST',headers:{Authorization:`Bearer ${await accessToken()}`,'Content-Type':'application/json'},body:JSON.stringify({path}),signal:AbortSignal.timeout(20000)});
+  if(!r.ok){const text=await r.text();if(r.status===409&&text.includes('not_found'))return;throw new Error(`Dropbox deletion failed (${r.status})`);}
 }
-
+export async function mirrorFile(file: BackupFile): Promise<{sha:string;copied:boolean}> {
+  const bytes=await readStoredFile(file.storageKey), sha=hashBytes(bytes);
+  const prior=await readMirror(file.path);
+  let copied=false;
+  if(!prior || hashBytes(prior)!==sha){
+    if(configured())await uploadToDropbox(file.path,bytes);else await uploadDev(file.path,bytes);
+    copied=true;
+  }
+  // Verify what was stored, not just the upload response.
+  const saved=await readMirror(file.path);
+  if(!saved || hashBytes(saved)!==sha)throw new Error('Backup file byte verification failed');
+  // A client may delete while an upload is in flight. Do not recreate its copy.
+  if(await storageWasDeleted(file.storageKey)){await deleteMirror(file.path);throw new Error('Document was deleted during backup');}
+  return {sha,copied};
+}
+export interface MirrorStatus { configured:boolean; mirrored:number; pending:number; lastMirroredAt:string|null; complete:boolean; failures:number; lastError:string|null; }
 export async function mirrorStatus(): Promise<MirrorStatus> {
-  const db = await getDb();
-  const rows = await db.query<{ mirrored: string; pending: string; last: string | null }>(
-    `SELECT
-       count(*) FILTER (WHERE mirrored_at IS NOT NULL) AS mirrored,
-       count(*) FILTER (WHERE mirrored_at IS NULL) AS pending,
-       max(mirrored_at)::text AS last
-     FROM documents`,
-  );
-  return {
-    configured: configured(),
-    mirrored: Number(rows[0]?.mirrored ?? 0),
-    pending: Number(rows[0]?.pending ?? 0),
-    lastMirroredAt: rows[0]?.last ?? null,
-  };
+  const db=await getDb();
+  const [row]=await db.query<{mirrored:string;pending:string;last:string|null;failures:string}>(`SELECT count(*) FILTER(WHERE mirrored_at IS NOT NULL) AS mirrored, count(*) FILTER(WHERE mirrored_at IS NULL) AS pending, max(mirrored_at)::text AS last, count(*) FILTER(WHERE mirror_error IS NOT NULL) AS failures FROM documents WHERE deleted_at IS NULL`);
+  const [progress]=await db.query<{completed_at:unknown;error:string|null}>("SELECT completed_at,error FROM backup_progress WHERE id='mirror'");
+  const [deletions]=await db.query<{n:string}>("SELECT count(*) AS n FROM document_deletions WHERE completed_at IS NULL");
+  return {configured:configured(),mirrored:Number(row.mirrored),pending:Number(row.pending),lastMirroredAt:row.last,failures:Number(row.failures)+Number(deletions.n),complete:!!progress?.completed_at&&!progress.error&&Number(row.pending)===0&&Number(deletions.n)===0,lastError:progress?.error||null};
 }
-
-/** Copies every not-yet-mirrored document. One failure doesn't strand the
- *  rest — errors are counted and the document stays pending for the next
- *  sweep. */
-export async function runFileMirror(): Promise<{ mirrored: number; failed: number; skipped: boolean }> {
-  const db = await getDb();
-  const useDropbox = configured();
-  if (!useDropbox && env.isProd) return { mirrored: 0, failed: 0, skipped: true };
-
-  const docs = await db.query<{
-    id: string;
-    title: string;
-    kind: string;
-    storage_key: string;
-    llc_name: string | null;
-    email: string | null;
-  }>(
-    `SELECT d.id, d.title, d.kind, d.storage_key,
-            -- The document's own company (15 Sep 2026: a two-company client's
-            -- older files landed in the newer company's folder); a document
-            -- with no company uses the client folder, never a guessed recipient.
-            (SELECT o.llc_name FROM orders o WHERE o.id = d.order_id AND o.client_id = d.client_id) AS llc_name,
-            cl.email
-       FROM documents d LEFT JOIN clients cl ON cl.id = d.client_id
-      WHERE d.mirrored_at IS NULL
-      ORDER BY d.created_at
-      LIMIT 200`,
-  );
-
-  let mirrored = 0;
-  let failed = 0;
-  for (const doc of docs) {
-    try {
-      const bytes = await streamToBuffer(await readFileStream(doc.storage_key));
-      const folder = safePathPart(doc.llc_name || doc.email || "unassigned");
-      const name = `${doc.id.slice(0, 8)}-${safePathPart(doc.title || doc.kind)}.pdf`;
-      const path = `/${folder}/${name}`;
-      if (useDropbox) await uploadToDropbox(path, bytes);
-      else await uploadDev(path, bytes);
-      await db.query("UPDATE documents SET mirrored_at = now() WHERE id = $1", [doc.id]);
-      mirrored++;
-    } catch (e) {
-      failed++;
-      console.error(`[mirror] ${doc.id} failed:`, e);
-    }
+/** Verifies all retained documents, continuing in pages until finished or the
+ * invocation budget is reached. The five-minute continuation resumes its cursor;
+ * failed files are recorded and revisited after later files have been attempted. */
+export async function runFileMirror(options: {budgetMs?:number} = {}): Promise<{mirrored:number;failed:number;skipped:boolean;complete:boolean}> {
+ const db=await getDb();
+ if(!configured()&&env.isProd)return {mirrored:0,failed:0,skipped:true,complete:false};
+ const {retryDocumentDeletions}=await import('./document-retention');await retryDocumentDeletions();
+ await db.query("INSERT INTO backup_progress(id) VALUES('mirror') ON CONFLICT DO NOTHING");
+ const acquired=await db.query<{cursor:string|null}>(`UPDATE backup_progress SET lease_until=now()+interval '10 minutes',started_at=COALESCE(started_at,now()),completed_at=NULL WHERE id='mirror' AND (lease_until IS NULL OR lease_until<now()) RETURNING cursor`);
+ if(!acquired.length)return {mirrored:0,failed:0,skipped:false,complete:false};
+ const started=Date.now(),budget=options.budgetMs??180000; let cursor=acquired[0].cursor||'',mirrored=0,failed=0,complete=false;
+ try {
+  let exhausted=false;
+  while(Date.now()-started<budget){
+   const docs=await db.query<{id:string;title:string;kind:string;storage_key:string;llc_name:string|null;email:string|null}>(`SELECT d.id,d.title,d.kind,d.storage_key,o.llc_name,c.email FROM documents d LEFT JOIN orders o ON o.id=d.order_id AND o.client_id=d.client_id LEFT JOIN clients c ON c.id=d.client_id WHERE d.deleted_at IS NULL AND d.id::text>$1 ORDER BY d.id::text LIMIT 50`,[cursor]);
+   if(!docs.length){exhausted=true;break;}
+   for(const doc of docs){
+    if(Date.now()-started>=budget)break;
+    try {const path=documentMirrorPath(doc);const r=await mirrorFile({storageKey:doc.storage_key,path});if(r.copied)mirrored++;
+      await db.query('UPDATE documents SET mirrored_at=now(),mirror_path=$2,mirror_hash=$3,mirror_error=NULL,mirror_attempted_at=now() WHERE id=$1 AND storage_key=$4 AND deleted_at IS NULL',[doc.id,path,r.sha,doc.storage_key]);
+    }catch(e){failed++;await db.query('UPDATE documents SET mirrored_at=NULL,mirror_error=$2,mirror_attempted_at=now() WHERE id=$1',[doc.id,String(e)]);}
+    cursor=doc.id;await db.query("UPDATE backup_progress SET cursor=$1 WHERE id='mirror'",[cursor]);
+   }
   }
-  return { mirrored, failed, skipped: false };
+  if(exhausted){
+    const [r]=await db.query<{n:string}>("SELECT count(*) AS n FROM documents WHERE deleted_at IS NULL AND mirrored_at IS NULL");
+    const [deletions]=await db.query<{n:string}>('SELECT count(*) AS n FROM document_deletions WHERE completed_at IS NULL');
+    complete=Number(r.n)===0&&Number(deletions.n)===0;
+    await db.query("UPDATE backup_progress SET cursor=NULL,completed_at=CASE WHEN $1 THEN now() ELSE NULL END,error=$2 WHERE id='mirror'",[complete,complete?null:`${r.n} file(s) pending; automatic retry scheduled`]);
+  }
+ }finally{await db.query("UPDATE backup_progress SET lease_until=NULL WHERE id='mirror'");}
+ return {mirrored,failed,skipped:false,complete};
 }

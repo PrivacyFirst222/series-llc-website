@@ -1,3 +1,4 @@
+import {batch03Walk} from "./batch03-walk";
 import { batch02Walk } from "./batch02-walk";
 import { batch01Walk } from "./batch01-walk";
 /**
@@ -2725,6 +2726,7 @@ async function main(): Promise<void> {
 
   await batch01Walk(browser, `http://localhost:${WEB_PORT}`, expect);
   await batch02Walk(browser, `http://localhost:${WEB_PORT}`, expect);
+  await batch03Walk(browser, `http://localhost:${WEB_PORT}`, expect);
   await browser.close();
   web.stop();
   api.kill();

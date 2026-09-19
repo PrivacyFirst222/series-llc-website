@@ -1,0 +1,118 @@
+[
+  {
+    "path": "webapp/server/storage.ts",
+    "sha256": "219913f55e500297e53601e5a89bcb396e5e0ee27718afdb3794a0662c065d1f"
+  },
+  {
+    "path": "webapp/server/crypto.ts",
+    "sha256": "f398c9f5251b906ef1bdef165d0ae0fdfd8a01ab3b199c0d7260fd0451a1b413"
+  },
+  {
+    "path": "webapp/server/env.ts",
+    "sha256": "c9d485fc5bdee17362f7eb3f3ee4363230731f03e55ceab994420d596e6c73b3"
+  },
+  {
+    "path": "webapp/server/backup.ts",
+    "sha256": "faa7ea89dd5e811e7b925f28e07173f702eca7d8585a1dedca72a1ba9bf69ced"
+  },
+  {
+    "path": "webapp/server/dropbox.ts",
+    "sha256": "e65846ec103b01d9ac2332bd6aebf47debba5f8341e81e17a0856187fb51d5e6"
+  },
+  {
+    "path": "webapp/server/db.ts",
+    "sha256": "b35273abd5482d2b8ed1319307e88039c0d7d8ef13d6c53b5ad01755fc03f0e1"
+  },
+  {
+    "path": "webapp/server/routes-portal.ts",
+    "sha256": "60474212f8cf59454459ce941c8562cb397692b8f4c79f1ae8a514c796e91732"
+  },
+  {
+    "path": "webapp/server/routes-admin.ts",
+    "sha256": "b123e4347477213ac854e8f6109fbd1e5a26d75a0726ad489648e5112c73892b"
+  },
+  {
+    "path": "webapp/server/routes-ops.ts",
+    "sha256": "46b4ebc549f6dc6dc684d539478b48027a8acbd7d5dd82b640f8a5ae0c369280"
+  },
+  {
+    "path": "webapp/server/email.ts",
+    "sha256": "35082fff973cdfd1c8752d45533b77bd9c822a46e318cffeeed07bb08cf09eb0"
+  },
+  {
+    "path": "webapp/src/content/privacy.md",
+    "sha256": "bf01ee08f84c16bea4d8cf84b18e7cbe0f401250793c499fb3fda141eb12a4ab"
+  },
+  {
+    "path": "webapp/src/pages/portal/PortalDashboard.tsx",
+    "sha256": "c259a4d308e8a3cfd0d77614c1ab6bff83e2a3285b59836c7e4ac6085f3b6cd4"
+  },
+  {
+    "path": "webapp/src/pages/portal/OrdersInProgress.tsx",
+    "sha256": "d4ca5207c944348ea72b8080e629fa5a2033ee419678da45e7025417942f91a1"
+  },
+  {
+    "path": "webapp/src/pages/admin/LibrarySection.tsx",
+    "sha256": "ebb9b08533da7127055f734c445ab87b196ef4ac76c7d6179943a08982b5af16"
+  },
+  {
+    "path": "webapp/scripts/db-restore.ts",
+    "sha256": "1676df24c2083295cea3a9d7db40daa3ce85344a149caaf4a036d13c4488e0ea"
+  },
+  {
+    "path": "docs/db-restore.md",
+    "sha256": "a872973dd5ebe695b10a5f0a57efd94d11eea1efea437d67903eba41580b4054"
+  },
+  {
+    "path": "webapp/.env.example",
+    "sha256": "b7d0299e0f04ab1b491b88bb1aa8887ce1370ed19e280ef2f95778103f0cf258"
+  },
+  {
+    "path": "webapp/vercel.json",
+    "sha256": "87da7c90efd3894fb2d23a75013099b9fb5e21e22ecc23199defbe6043e5ee07"
+  },
+  {
+    "path": "webapp/server/encryption.ts",
+    "sha256": "522021a1e7e4b238afb1cdeae831bee806c543a5f940a510f7d5ebd72bf26037"
+  },
+  {
+    "path": "webapp/server/document-retention.ts",
+    "sha256": "325d2eaec8ca4a922f56f2d6e18623a7b926cc378e8ead470f58d9e4d98c7b01"
+  },
+  {
+    "path": "webapp/server/restore.ts",
+    "sha256": "59fd54c4be225da16263fec7fb909e846359677ef2a48b677822f63bd6c5abfc"
+  },
+  {
+    "path": "webapp/scripts/rotate-encryption.ts",
+    "sha256": "7c52b29b3293c54419f4f211a5e7adeee265d4b4fc7ef11edafdee72b0b07a6e"
+  },
+  {
+    "path": "docs/encryption-rotation.md",
+    "sha256": "251e27294db1d6e6d5d613c58abfd409f1aad2166da139524ab32eae7b688fac"
+  },
+  {
+    "path": "webapp/server/e2e.ts",
+    "sha256": "2a06b53c4e53c9e9a2a8b2c2d90ac222b76da76f9aedbf52ebe9026dedafce29"
+  },
+  {
+    "path": "webapp/scripts/behavioral.ts",
+    "sha256": "e030ce4fcc3a2a77177b4ec23cf567908b2d3c32d470f3aafe39ed00daba566d"
+  },
+  {
+    "path": "webapp/server/batch02-check.ts",
+    "sha256": "c4fe14a0eeb887af1148e38dbf6e6fd9f8e4262327987c9d2d8c4515176dacd3"
+  },
+  {
+    "path": "webapp/server/batch03-check.ts",
+    "sha256": "1d44a9606f5626d06f584364d7aa47818f7ec2c5938d003af3c32702d8be1836"
+  },
+  {
+    "path": "webapp/scripts/batch03-walk.ts",
+    "sha256": "05ad2ebd4537cfd8982366d990c707d4a5f2100e8790170410d1bdf16dd21723"
+  },
+  {
+    "path": "webapp/api/index.mjs",
+    "sha256": "24eae7aa9613522927493c792134ddb74cb7f274814cd6d1a5d45c0167224503"
+  }
+]

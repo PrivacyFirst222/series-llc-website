@@ -326,4 +326,20 @@ app.get("/cron/file-mirror", async (c) => {
   console.log(`[mirror] mirrored=${result.mirrored} failed=${result.failed} skipped=${result.skipped}`);
   return c.json({ data: result });
 });
+
+// Durable continuation: every five minutes, resume only incomplete snapshots
+// and document mirrors. The nightly routes start the next full verification.
+app.get("/cron/backup-continue", async (c) => {
+  if (!env.CRON_SECRET && env.isProd) return c.json(err("Not authorized", "UNAUTHENTICATED"), 401);
+  if (env.CRON_SECRET && c.req.header("authorization") !== `Bearer ${env.CRON_SECRET}`) return c.json(err("Not authorized", "UNAUTHENTICATED"), 401);
+  const { backupProgress } = await import('./backup');
+  const { mirrorStatus } = await import('./dropbox');
+  const { retryDocumentDeletions } = await import('./document-retention');
+  await retryDocumentDeletions();
+  const backup = await runDbBackup({resumeOnly:true,budgetMs:90000});
+  const status = await mirrorStatus();
+  if (!status.complete) await runFileMirror({budgetMs:90000});
+  return c.json({data:{backup,progress:await backupProgress(),mirror:await mirrorStatus()}});
+});
+
 }

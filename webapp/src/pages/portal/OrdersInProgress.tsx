@@ -275,8 +275,8 @@ export function OrdersInProgress({
               We use this to complete IRS Form 2553 for {detailsFor?.llc_name}. You sign the
               finished form and mail it to the IRS yourself — we file nothing. This form is
               transmitted over your secure portal session; Social Security numbers are encrypted,
-              and both they and the completed package are deleted from our systems two weeks after
-              you build it, so download and keep your copy.
+              and the questionnaire numbers are removed after the fourteen-day editing window.
+              Your completed document stays encrypted in Your documents until you choose to delete it.
             </DialogDescription>
           </DialogHeader>
           {detailsFor ? (
@@ -434,7 +434,7 @@ export function OrdersInProgress({
               We use this information to complete the IRS EIN application for{" "}
               {detailsFor ? (detailsFor.details.target === "series" ? detailsFor.details.seriesName : detailsFor.llc_name) : ""}. This form is transmitted over your secure
               portal session; the identification number is encrypted, used only for the IRS
-              application, and deleted from our systems when your EIN is issued.
+              application, and removed from the questionnaire record when our office records fulfillment. Your EIN letter stays encrypted in Your documents until you choose to delete it.
             </DialogDescription>
           </DialogHeader>
           <form

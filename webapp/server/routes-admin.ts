@@ -11,7 +11,7 @@ import { sortDocuments } from "../src/pages/portal/documentOrder";
 import { assembleStatement } from "./statement";
 import { renderMarkdownPdf } from "./pdf-render";
 import { env } from "./env";
-import { listBackups, runDbBackup } from "./backup";
+import { listBackups, runDbBackup, backupProgress } from "./backup";
 import { mirrorStatus, runFileMirror } from "./dropbox";
 
 import { buildSElectionPackage, type SElectionDetails } from "./s-election";
@@ -137,6 +137,11 @@ app.post("/admin/file-mirror/run", async (c) => {
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const result = await runFileMirror();
   return c.json({ data: { ...result, status: await mirrorStatus() } });
+});
+
+app.get("/admin/backups/progress", async (c) => {
+  if (!await requireAdmin(c)) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  return c.json({data:await backupProgress()});
 });
 
 app.get("/admin/backups", async (c) => {
@@ -1356,7 +1361,7 @@ app.post("/admin/services/:id/fulfill", async (c) => {
     if (!(await looksLikePdf(file))) {
       return c.json(err(`${file.name} is not a readable PDF. The deliverable must be the actual PDF document.`, "NOT_A_PDF"), 400);
     }
-    const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
+    const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf", so.type === "ein" || so.type === "s-election");
     // A designation delivered through a series order is a designation: stored
     // as one, covering its series, so the card counts it (14 Sep 2026).
     const isDesignation = so.type === "series" && !!details.seriesName;
@@ -1368,13 +1373,16 @@ app.post("/admin/services/:id/fulfill", async (c) => {
        VALUES ($1, $6, $7, $2, $3, $4, $5, $8) RETURNING id`,
       // A portal purchase's copy is marked as its own, so the intake
       // certificate is not counted delivered by it (Adam, 15 Sep 2026).
-      [so.client_id, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes, so.formation_order_id, storedKind, JSON.stringify(isDesignation ? { seriesNames: [details.seriesName] } : CERT_KINDS.includes(so.type as typeof CERT_KINDS[number]) ? { source: "portal", serviceOrderId: so.id } : {})],
+      [so.client_id, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes, so.formation_order_id, storedKind, JSON.stringify((so.type === "ein" || so.type === "s-election") ? {sensitive:true,serviceOrderId:so.id} : isDesignation ? { seriesNames: [details.seriesName] } : CERT_KINDS.includes(so.type as typeof CERT_KINDS[number]) ? { source: "portal", serviceOrderId: so.id } : {})],
     );
     documentId = doc[0].id;
   }
 
-  // The TIN is deleted the moment the order is fulfilled — this is what makes
-  // the Privacy Policy's "not retained after issuance" promise true.
+  if (documentId && (so.type === "ein" || so.type === "s-election")) {
+    await db.query("UPDATE service_orders SET details=COALESCE(details,'{}'::jsonb)||$2::jsonb WHERE id=$1",[so.id,JSON.stringify({documentId})]);
+  }
+  // The active questionnaire TIN is removed when the office records fulfillment.
+  // The encrypted delivered document has its separate client-controlled retention.
   await db.query(
     "UPDATE service_orders SET status = 'fulfilled', fulfilled_at = now(), ein_secret = NULL WHERE id = $1",
     [so.id],

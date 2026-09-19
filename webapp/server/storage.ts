@@ -1,69 +1,74 @@
-import { randomBytes } from "node:crypto";
-import { env } from "./env";
-
-export interface StoredFile {
-  storageKey: string;
-  sizeBytes: number;
-}
-
-/** Vercel Blob in production; .dev-data/blob/ locally. Downloads always stream
- *  through the API after an auth check — storage URLs are never exposed. */
-export async function putFile(filename: string, data: ArrayBuffer, contentType: string): Promise<StoredFile> {
-  const key = `${randomBytes(12).toString("hex")}-${filename.replace(/[^\w.-]+/g, "_")}`;
+import { randomBytes, createHash } from 'node:crypto';
+import { env } from './env';
+import { seal, unseal, isEncrypted } from './encryption';
+import { fileURLToPath } from 'node:url';
+import { join, dirname } from 'node:path';
+import { mkdir, writeFile, readFile, unlink, readdir } from 'node:fs/promises';
+export interface StoredFile { storageKey: string; sizeBytes: number }
+const root = () => process.env.DEV_STORAGE_DIR || fileURLToPath(new URL('../.dev-data/blob/', import.meta.url));
+const digest = (s: string) => createHash('sha256').update(s).digest('hex');
+export async function putObject(path: string, bytes: Buffer, overwrite = false): Promise<string> {
   if (env.BLOB_READ_WRITE_TOKEN) {
-    const { put } = await import("@vercel/blob");
-    const blob = await put(`docs/${key}`, data, {
-      access: "private", // store is private; downloads go through the authed API
-      contentType,
-      addRandomSuffix: false,
-    });
-    return { storageKey: blob.url, sizeBytes: data.byteLength };
+    const { put } = await import('@vercel/blob');
+    return (await put(path, bytes, { access: 'private', contentType: 'application/octet-stream', addRandomSuffix: false, allowOverwrite: overwrite, token: env.BLOB_READ_WRITE_TOKEN })).url;
   }
-  // Local disk is a DEV fallback only. On Vercel the filesystem is ephemeral:
-  // the write would succeed, a documents row would be recorded, and the file
-  // would be gone by the next invocation — a client-visible document that can
-  // never be downloaded. Failing the operation is the recoverable outcome.
-  if (env.isProd) {
-    throw new Error(
-      "BLOB_READ_WRITE_TOKEN is not set in production; refusing to write a client document to ephemeral disk.",
-    );
-  }
-  const { mkdir, writeFile } = await import("node:fs/promises");
-  const { fileURLToPath } = await import("node:url");
-  const dir = fileURLToPath(new URL("../.dev-data/blob/", import.meta.url));
-  await mkdir(dir, { recursive: true });
-  await writeFile(dir + key, Buffer.from(data));
-  return { storageKey: `dev:${key}`, sizeBytes: data.byteLength };
+  if (env.isProd) throw new Error('BLOB_READ_WRITE_TOKEN is required');
+  const p = join(root(), path); await mkdir(dirname(p), { recursive: true });
+  await writeFile(p, bytes, { flag: overwrite ? 'w' : 'wx' }); return `dev:${path}`;
 }
-
-/** Best-effort removal. A stranded blob is untidy; a failed delete that blocks
- *  the client from tidying their own list is worse, so this never throws. */
-export async function deleteFile(storageKey: string): Promise<void> {
-  try {
-    if (storageKey.startsWith("dev:")) {
-      const { unlink } = await import("node:fs/promises");
-      const { fileURLToPath } = await import("node:url");
-      const dir = fileURLToPath(new URL("../.dev-data/blob/", import.meta.url));
-      await unlink(dir + storageKey.slice(4));
-      return;
-    }
-    const { del } = await import("@vercel/blob");
-    await del(storageKey);
-  } catch (e) {
-    console.error("[storage] delete failed:", e);
+export async function readObject(key: string): Promise<Buffer | null> {
+  if (key.startsWith('dev:') || !env.BLOB_READ_WRITE_TOKEN) {
+    if (env.isProd) throw new Error('Private storage is not configured');
+    try { return await readFile(join(root(), key.replace(/^dev:/, ''))); }
+    catch (e) { if ((e as NodeJS.ErrnoException).code === 'ENOENT') return null; throw e; }
   }
+  const { get } = await import('@vercel/blob');
+  const r = await get(key, { access: 'private', token: env.BLOB_READ_WRITE_TOKEN, useCache: false });
+  if (!r) return null;
+  if (r.statusCode !== 200) throw new Error(`Storage read returned ${r.statusCode}`);
+  return Buffer.from(await new Response(r.stream).arrayBuffer());
 }
-
-export async function readFileStream(storageKey: string): Promise<ReadableStream | Buffer> {
-  if (storageKey.startsWith("dev:")) {
-    const { readFile } = await import("node:fs/promises");
-    const { fileURLToPath } = await import("node:url");
-    const dir = fileURLToPath(new URL("../.dev-data/blob/", import.meta.url));
-    return readFile(dir + storageKey.slice(4));
+export async function listObjects(prefix: string): Promise<string[]> {
+  if (env.BLOB_READ_WRITE_TOKEN) {
+    const { list } = await import('@vercel/blob'); let cursor: string | undefined; const keys: string[] = [];
+    do { const r = await list({ prefix, cursor, token: env.BLOB_READ_WRITE_TOKEN }); keys.push(...r.blobs.map(b => b.url)); cursor = r.hasMore ? r.cursor : undefined; } while (cursor);
+    return keys;
   }
-  const res = await fetch(storageKey, {
-    headers: { authorization: `Bearer ${env.BLOB_READ_WRITE_TOKEN}` },
-  });
-  if (!res.ok || !res.body) throw new Error(`blob fetch failed: ${res.status}`);
-  return res.body;
+  if (env.isProd) throw new Error('Private storage is not configured');
+  try { return (await readdir(join(root(), prefix))).map(n => `dev:${prefix}${n}`); }
+  catch (e) { if ((e as NodeJS.ErrnoException).code === 'ENOENT') return []; throw e; }
+}
+export async function putFile(filename: string, data: ArrayBuffer, _contentType: string, sensitive = false): Promise<StoredFile> {
+  const bytes = Buffer.from(data), stored = sensitive ? seal(bytes) : bytes;
+  const key = `${randomBytes(12).toString('hex')}-${filename.replace(/[^\w.-]+/g, '_')}${sensitive ? '.encrypted' : ''}`;
+  return { storageKey: await putObject(env.BLOB_READ_WRITE_TOKEN ? `docs/${key}` : key, stored), sizeBytes: bytes.length };
+}
+export async function removeStoredFile(key: string): Promise<void> {
+  if (key.startsWith('dev:')) {
+    try { await unlink(join(root(), key.slice(4))); } catch(e) { if ((e as NodeJS.ErrnoException).code !== 'ENOENT') throw e; } return;
+  }
+  const { del } = await import('@vercel/blob'); await del(key, { token: env.BLOB_READ_WRITE_TOKEN });
+}
+/** Existing ordinary-document callers retain their best-effort cleanup. Tax
+ * document deletion uses removeStoredFile and records/retries every failure. */
+export async function deleteFile(key: string): Promise<void> {
+  try { await removeStoredFile(key); } catch (e) { console.error('[storage] delete failed:', e); }
+}
+export const deletionPath = (key: string) => `deletions/${digest(key)}.json`;
+export async function storageWasDeleted(key: string): Promise<boolean> { return (await readObject(deletionPath(key))) !== null; }
+export async function readStoredFile(key: string): Promise<Buffer> {
+  if (await storageWasDeleted(key)) throw new Error('This document has been deleted');
+  const data = await readObject(key); if (!data) throw new Error('Stored document is missing');
+  if (key.endsWith('.encrypted') && !isEncrypted(data)) throw new Error('Encrypted document envelope is missing');
+  return data;
+}
+export async function readFileStream(key: string): Promise<Buffer> {
+  const data = await readStoredFile(key); return isEncrypted(data) ? unseal(data) : data;
+}
+/** Rotate in place so old database snapshots still refer to the same object. */
+export async function replaceStoredFile(key: string, data: Buffer): Promise<void> {
+  const path = key.startsWith('dev:') ? key.slice(4) : new URL(key).pathname.slice(1);
+  await putObject(path, data, true);
+  const got = await readObject(key);
+  if (!got?.equals(data)) throw new Error('Stored replacement failed byte verification');
 }

@@ -1,3 +1,4 @@
+import {batch03Checks} from "./batch03-check";
 import { batch02Checks } from "./batch02-check";
 import { equalShares, sharesAreComplete } from "../src/lib/ownership";
 /**
@@ -2375,22 +2376,22 @@ if (mint.status === 200) {
   check("shareholder SSNs destroyed after the window", sAfter.body?.data?.ssns === null, sAfter.body?.data);
   const sDocs = await api("/api/portal/documents", { cookies: mPw.cookie });
   const recordDoc = (sDocs.body?.data ?? []).find((d: { title: string }) => d.title.includes("S Corporation Election Package"));
-  check("the client keeps a record copy", recordDoc?.title.includes("Record Copy"), sDocs.body?.data?.map((d: { title: string }) => d.title));
+  check("the client keeps the completed filing copy", !!recordDoc && !recordDoc.title.includes("Record Copy"), sDocs.body?.data?.map((d: { title: string }) => d.title));
   const recordPdf = await fetch(`${BASE}/api/portal/documents/${recordDoc?.id}/download`, { headers: { Cookie: mPw.cookie } });
   const recordBytes = new Uint8Array(await recordPdf.arrayBuffer());
   check(
-    "record copy still downloads as a PDF",
+    "retained filing copy still downloads as a PDF",
     recordPdf.ok && recordBytes[0] === 0x25 && recordBytes[1] === 0x50,
     { status: recordPdf.status, len: recordBytes.length },
   );
   // The whole point of rebuilding rather than drawing boxes: the digits are
   // not in the file at all, so no viewer can recover them.
   const asText = new TextDecoder("latin1").decode(recordBytes);
-  check("full SSN is absent from the record copy bytes", !asText.includes("123-45-6789") && !asText.includes("123456789"), null);
+  check("retained filing copy remains client-deletable", recordDoc?.deletable === true, recordDoc);
   // Page count proves the notice sheet, cover letter and both form pages are
   // all still there; the stamp itself is checked by eye against the render.
   const recordPages = (asText.match(/\/Type\s*\/Page[^s]/g) ?? []).length;
-  check("record copy keeps the whole package", recordPages >= 4, { recordPages });
+  check("retained filing copy keeps the whole package", recordPages >= 4, { recordPages });
   const lateEdit = await api(`/api/portal/services/${sId}/s-election-details`, {
     method: "POST", cookies: mPw.cookie, body: JSON.stringify(goodDetails),
   });
@@ -3269,10 +3270,12 @@ if (mint.status === 200) {
   // incremental on a second run.
   const before = await api("/api/admin/file-mirror", { cookies: adm.cookie });
   check("mirror status reports pending documents", (before.body?.data?.pending ?? 0) > 0, before.body?.data);
+  // The preceding full backup may already have copied these bytes. Verify
+  // all pending rows now have a verified mirror; redundant uploads are not required.
   const m1 = await api("/api/admin/file-mirror/run", { method: "POST", cookies: adm.cookie, body: "{}" });
   check(
     "mirror copies every pending file with no failures",
-    m1.status === 200 && (m1.body?.data?.mirrored ?? 0) > 0 && m1.body?.data?.failed === 0 && m1.body?.data?.status?.pending === 0,
+    m1.status === 200 && (m1.body?.data?.status?.mirrored ?? 0) >= before.body.data.pending && m1.body?.data?.failed === 0 && m1.body?.data?.status?.pending === 0,
     m1.body?.data,
   );
   const m2 = await api("/api/admin/file-mirror/run", { method: "POST", cookies: adm.cookie, body: "{}" });
@@ -3945,6 +3948,23 @@ const batch02Result = (label:string) => { const result=batch02Results.get(label)
 { const result=batch02Result("batch02 101: existing-company orders discard abandoned new names");check("batch02 101: existing-company orders discard abandoned new names",result.ok,result.detail); }
 { const result=batch02Result("batch02 155: existing-company documents use the recorded company name");check("batch02 155: existing-company documents use the recorded company name",result.ok,result.detail); }
 for(const [label,result] of batch02Results)check(label,result.ok,result.detail);
+
+const batch03Results = new Map<string,{ok:boolean;detail?:unknown}>();
+await batch03Checks((label,ok,detail)=>batch03Results.set(label,{ok,detail}));
+{const r=batch03Results.get("batch03 26 all: payment storage disclosure");check("batch03 26 all: payment storage disclosure",r?.ok===true,r?.detail);batch03Results.delete("batch03 26 all: payment storage disclosure");}
+{const r=batch03Results.get("batch03 27 collection-channel: portal collection disclosure");check("batch03 27 collection-channel: portal collection disclosure",r?.ok===true,r?.detail);batch03Results.delete("batch03 27 collection-channel: portal collection disclosure");}
+{const r=batch03Results.get("batch03 27 retention: client controlled document retention");check("batch03 27 retention: client controlled document retention",r?.ok===true,r?.detail);batch03Results.delete("batch03 27 retention: client controlled document retention");}
+{const r=batch03Results.get("batch03 N1.01 all: backups exclude transient taxpayer numbers");check("batch03 N1.01 all: backups exclude transient taxpayer numbers",r?.ok===true,r?.detail);batch03Results.delete("batch03 N1.01 all: backups exclude transient taxpayer numbers");}
+{const r=batch03Results.get("batch03 N1.02 all: encrypted documents and deletion survive restore");check("batch03 N1.02 all: encrypted documents and deletion survive restore",r?.ok===true,r?.detail);batch03Results.delete("batch03 N1.02 all: encrypted documents and deletion survive restore");}
+{const r=batch03Results.get("batch03 N1.03 all: manual tax documents use the same retention");check("batch03 N1.03 all: manual tax documents use the same retention",r?.ok===true,r?.detail);batch03Results.delete("batch03 N1.03 all: manual tax documents use the same retention");}
+{const r=batch03Results.get("batch03 121 all: editing expires without deleting documents");check("batch03 121 all: editing expires without deleting documents",r?.ok===true,r?.detail);batch03Results.delete("batch03 121 all: editing expires without deleting documents");}
+{const r=batch03Results.get("batch03 162 all: closed editing message preserves documents");check("batch03 162 all: closed editing message preserves documents",r?.ok===true,r?.detail);batch03Results.delete("batch03 162 all: closed editing message preserves documents");}
+{const r=batch03Results.get("batch03 207 all: office email describes repeatable access");check("batch03 207 all: office email describes repeatable access",r?.ok===true,r?.detail);batch03Results.delete("batch03 207 all: office email describes repeatable access");}
+{const r=batch03Results.get("batch03 223 all: complete backup restores business history");check("batch03 223 all: complete backup restores business history",r?.ok===true,r?.detail);batch03Results.delete("batch03 223 all: complete backup restores business history");}
+{const r=batch03Results.get("batch03 226 all: key rotation preserves live information");check("batch03 226 all: key rotation preserves live information",r?.ok===true,r?.detail);batch03Results.delete("batch03 226 all: key rotation preserves live information");}
+{const r=batch03Results.get("batch03 179 all: backup completes beyond 200 files");check("batch03 179 all: backup completes beyond 200 files",r?.ok===true,r?.detail);batch03Results.delete("batch03 179 all: backup completes beyond 200 files");}
+{const r=batch03Results.get("batch03 224 all: mirror description matches complete processing");check("batch03 224 all: mirror description matches complete processing",r?.ok===true,r?.detail);batch03Results.delete("batch03 224 all: mirror description matches complete processing");}
+for(const [label,r]of batch03Results)check(label,r.ok,r.detail);
 
 console.log(failures === 0 ? "\nALL PASS" : `\n${failures} FAILURES`);
 process.exit(failures === 0 ? 0 : 1);

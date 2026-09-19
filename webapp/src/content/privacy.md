@@ -1,4 +1,4 @@
-Last updated: **August 4, 2026**
+Last updated: **September 19, 2026**
 
 This Privacy Policy explains how **FLORIDA PROTECTED SERIES, LLC - PS 1** and **FLORIDA PROTECTED SERIES, LLC - PS 2** (the same Company parties defined in our [Terms of Service](/terms); together, "we" and "us") collect, use, and disclose information when you use myfloridaseriesllc.com and our services (the "Services"). This Policy is part of, and incorporated into, our Terms of Service.
 
@@ -12,11 +12,13 @@ To prepare filings and provide the Services, we collect: your name and contact i
 
 **Please note:** most of this information is filed with the Florida Division of Corporations and becomes **public record**. That is a function of state filing law, not our choice.
 
-Our website forms do not request, and you should not enter into them, Social Security numbers, driver's license numbers, government identification numbers, biometric data, or bank account numbers. If you purchase our EIN service, we collect the responsible party's Social Security number or ITIN separately, through a secure channel we designate, solely to prepare and submit IRS Form SS-4, and we do not retain it after the EIN is issued. If you purchase our S corporation election service, we collect each owner's Social Security number through the same secure channel, solely to prepare IRS Form 2553. You may correct your answers and regenerate the package for fourteen (14) days after we deliver it. At the end of that period we permanently delete every Social Security number you gave us and replace your copy of the completed form with a record copy showing only the last four digits.
+Our formation order form does not request Social Security numbers, driver's license numbers, government identification numbers, biometric data, or bank account numbers; please do not enter them there. If you purchase our EIN service, we collect the responsible party's Social Security number or ITIN through a secure form in your client portal to complete the IRS EIN application. We remove that number from the active questionnaire record when our office records the EIN service as fulfilled. If you purchase our S corporation election service, we collect each owner's Social Security number through the client portal to prepare IRS Form 2553. You may correct your answers and regenerate the package for fourteen (14) days after delivery. After that editing window, our scheduled cleanup removes the full numbers from the questionnaire records. These questionnaire numbers are excluded from our database backups.
+
+We store your completed S corporation election forms and EIN confirmation letters encrypted and make them available through your client portal. The completed forms may contain the full taxpayer numbers needed for filing. You may keep these documents in your portal or choose to delete them. Closing the editing window does not delete the completed document. When you delete a document, we remove portal access and request removal of our stored and mirrored copies. Failed removal attempts are recorded and retried. We keep a deletion record so restoring an older backup does not make your deleted document available again. Our storage providers may retain their own recovery copies under their retention policies; we do not promise immediate destruction of every provider-held copy. Copies you downloaded are under your control. We retain the service-order record after you delete its document.
 
 ### 3. Payment Information
 
-Payments are processed by **Square, Inc.** We never receive or store your full card number, CVV, or bank credentials. Square provides us a confirmation of payment and limited details (such as the last four digits and the name on the order). Square's handling of your information is governed by Square's own privacy policy.
+Payments are processed by **Square, Inc.** We never receive or store your full card number, CVV, or bank credentials. Square provides us a confirmation of payment and limited details (such as the last four digits and the name on the order). Square's handling of your information is governed by Square's own privacy policy. If you agree to save your payment card for registered agent renewals, Square stores it on our behalf. We retain Square customer and card references, the card brand and last four digits, and the saved-card status; we do not store the expiration date. Renewal charges are described in our Terms of Service.
 
 ### 4. Information Collected Automatically
 
@@ -35,7 +37,7 @@ We send service-related emails (order confirmations, portal invitations, passwor
 ### 7. When We Disclose Information
 
 - **The Florida Division of Corporations**, to make your filings — this information becomes public record.
-- **Service providers** who process information on our behalf and only for us: Square (payments), Neon (database), Vercel (hosting and document storage), Resend (email delivery), and Smarty (address data).
+- **Service providers** who process information on our behalf and only for us: Square (payments), Neon (database), Vercel (hosting and document storage), Resend (email delivery), Dropbox (document backups), and Smarty (address data).
 - **Legal process**: when required by law, subpoena, or court order, or to protect our rights or someone's safety.
 - **A successor** in a merger, acquisition, or sale of assets, subject to this Policy.
 
@@ -43,7 +45,7 @@ We do not disclose your information to data brokers, lead generators, marketing 
 
 ### 8. Client Portal and Documents
 
-Documents we prepare for you, and legal mail we receive as your registered agent, are stored in access-controlled storage and available for download when you sign in. The portal is download-only — you cannot upload documents to it, and we do not accept documents for storage. Retain your own copies.
+Documents we prepare for you, and legal mail we receive as your registered agent, are stored in access-controlled storage and available for download when you sign in. You cannot upload documents to the client portal. You may delete completed S-election forms and EIN letters using the control beside the document. Other office-posted documents remain available for download. Retain your own copies.
 
 ### 9. Retention
 

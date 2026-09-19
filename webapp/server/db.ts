@@ -481,6 +481,15 @@ const MIGRATIONS: { id: number; name: string; statements: string[] }[] = [
         AND o.paid_at IS NOT NULL AND (SELECT count(*) FROM orders x WHERE x.client_id = d.client_id AND x.paid_at IS NOT NULL) = 1`,
     `DELETE FROM documents WHERE kind = 'legal_mail' AND order_id IS NULL`,
   ] },
+  { id: 13, name: "document-retention-and-backup-progress", statements: [
+    `ALTER TABLE documents ADD COLUMN IF NOT EXISTS deleted_at timestamptz`,
+    `ALTER TABLE documents ADD COLUMN IF NOT EXISTS mirror_path text`,
+    `ALTER TABLE documents ADD COLUMN IF NOT EXISTS mirror_hash text`,
+    `ALTER TABLE documents ADD COLUMN IF NOT EXISTS mirror_error text`,
+    `ALTER TABLE documents ADD COLUMN IF NOT EXISTS mirror_attempted_at timestamptz`,
+    `CREATE TABLE IF NOT EXISTS document_deletions (storage_key text PRIMARY KEY, document_id uuid, mirror_path text, requested_at timestamptz NOT NULL DEFAULT now(), completed_at timestamptz, error text)`,
+    `CREATE TABLE IF NOT EXISTS backup_progress (id text PRIMARY KEY, started_at timestamptz, completed_at timestamptz, lease_until timestamptz, cursor text, error text)`,
+  ] },
   // Append future migrations here with the next id. Never edit an entry.
 ];
 

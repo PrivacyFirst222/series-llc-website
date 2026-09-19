@@ -21,3 +21,7 @@ Adam. A new ruling is added the day it is given.
 - Automatic renewal of the registered agent fee exists (Terms 9(c)–(e) stand; the code does what they say) — 16 Sep 2026.
 - Prepaid gift cards (the Visa or Mastercard kind) are not acceptable for the card on file — 16 Sep 2026.
 - The series consent's paragraph 4 uses "the Manager" in the singular; the agreements say the singular includes the plural — 16 Sep 2026.
+
+- Ruling N1.01: "Approved revised Batch 03: retain completed S-election forms and EIN letters encrypted until the client deletes them; remove underlying EIN numbers when fulfillment is recorded and S-election questionnaire numbers after the 14-day editing window; exclude transient taxpayer numbers from backups, prevent restoration from resurrecting deleted documents, and do not clean up existing test backups."
+
+- Ruling N1.02: "Approved revised Batch 03: encrypt stored S-election forms and EIN letters including backup copies, keep them until the client deletes them, track deletion of controlled copies and retries, provide complete resumable backups, and do not clean up existing test copies."

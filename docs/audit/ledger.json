@@ -796,14 +796,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T12:28:48.412Z",
+              "event": "assigned",
+              "batch": "03",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T12:52:19.298Z",
+              "event": "implemented",
+              "batch": "03",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "03",
+          "fix": {
+            "batch": "03",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch03 26 all: payment storage disclosure"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -827,19 +854,46 @@
         {
           "key": "collection-channel",
           "scope": "Say that the Social Security number is collected through a secure form in the client portal, for the IRS's EIN application; the order form asks for none.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T18:29:55.001Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T12:28:48.412Z",
+              "event": "assigned",
+              "batch": "03",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T12:52:19.298Z",
+              "event": "implemented",
+              "batch": "03",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "03",
+          "fix": {
+            "batch": "03",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch03 27 collection-channel: portal collection disclosure"
+              }
+            ]
+          }
         },
         {
           "key": "retention",
           "scope": "What the policy promises about keeping or deleting the number.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [
             "ruling:N1.01"
           ],
@@ -847,8 +901,35 @@
             {
               "at": "2026-09-17T18:29:55.001Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T12:28:48.412Z",
+              "event": "assigned",
+              "batch": "03",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T12:52:19.298Z",
+              "event": "implemented",
+              "batch": "03",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "03",
+          "fix": {
+            "batch": "03",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch03 27 retention: client controlled document retention"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -3882,14 +3963,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T12:28:48.412Z",
+              "event": "assigned",
+              "batch": "03",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T12:52:19.298Z",
+              "event": "implemented",
+              "batch": "03",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "03",
+          "fix": {
+            "batch": "03",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch03 121 all: editing expires without deleting documents"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -5314,17 +5422,44 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T12:28:48.412Z",
+              "event": "assigned",
+              "batch": "03",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T12:52:19.298Z",
+              "event": "implemented",
+              "batch": "03",
+              "revision": 1,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "121",
             "part": "all"
+          },
+          "batch": "03",
+          "fix": {
+            "batch": "03",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch03 162 all: closed editing message preserves documents"
+              }
+            ]
           }
         }
       ],
@@ -5955,14 +6090,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T12:28:48.412Z",
+              "event": "assigned",
+              "batch": "03",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T12:52:19.298Z",
+              "event": "implemented",
+              "batch": "03",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "03",
+          "fix": {
+            "batch": "03",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch03 179 all: backup completes beyond 200 files"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -6914,14 +7076,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T12:28:48.412Z",
+              "event": "assigned",
+              "batch": "03",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T12:52:19.298Z",
+              "event": "implemented",
+              "batch": "03",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "03",
+          "fix": {
+            "batch": "03",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch03 207 all: office email describes repeatable access"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -7429,14 +7618,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T12:28:48.412Z",
+              "event": "assigned",
+              "batch": "03",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T12:52:19.298Z",
+              "event": "implemented",
+              "batch": "03",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "03",
+          "fix": {
+            "batch": "03",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch03 223 all: complete backup restores business history"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -7459,14 +7675,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T12:28:48.412Z",
+              "event": "assigned",
+              "batch": "03",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T12:52:19.298Z",
+              "event": "implemented",
+              "batch": "03",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "03",
+          "fix": {
+            "batch": "03",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch03 224 all: mirror description matches complete processing"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -7546,14 +7789,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T12:28:48.412Z",
+              "event": "assigned",
+              "batch": "03",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T12:52:19.298Z",
+              "event": "implemented",
+              "batch": "03",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "03",
+          "fix": {
+            "batch": "03",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch03 226 all: key rotation preserves live information"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -8886,14 +9156,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T12:28:48.412Z",
+              "event": "assigned",
+              "batch": "03",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T12:52:19.298Z",
+              "event": "implemented",
+              "batch": "03",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "03",
+          "fix": {
+            "batch": "03",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch03 N1.01 all: backups exclude transient taxpayer numbers"
+              }
+            ]
+          }
         }
       ]
     },
@@ -8912,14 +9209,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T12:28:48.412Z",
+              "event": "assigned",
+              "batch": "03",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T12:52:19.298Z",
+              "event": "implemented",
+              "batch": "03",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "03",
+          "fix": {
+            "batch": "03",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch03 N1.02 all: encrypted documents and deletion survive restore"
+              }
+            ]
+          }
         }
       ]
     },
@@ -8936,14 +9260,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T12:28:48.412Z",
+              "event": "assigned",
+              "batch": "03",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T12:52:19.298Z",
+              "event": "implemented",
+              "batch": "03",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "03",
+          "fix": {
+            "batch": "03",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch03 N1.03 all: manual tax documents use the same retention"
+              }
+            ]
+          }
         }
       ]
     },
@@ -10893,6 +11244,18 @@
       "text": "Second sightings link to a PART of their main record, not to the whole item; three item-level links become related-item notes; seven compound findings are split into the parts a batch can take separately (Codex's review of revision 2, C; Codex's corrections of the revision-3 plan, section 4).",
       "migration": "001-part-level-links",
       "migrationHash": "59443ece9cdd45cf81ffaef16846770514352f6ebd13cf6485a681169ac8bfcf"
+    },
+    {
+      "date": "2026-09-19",
+      "kind": "ruling",
+      "item": "N1.01",
+      "text": "Approved revised Batch 03: retain completed S-election forms and EIN letters encrypted until the client deletes them; remove underlying EIN numbers when fulfillment is recorded and S-election questionnaire numbers after the 14-day editing window; exclude transient taxpayer numbers from backups, prevent restoration from resurrecting deleted documents, and do not clean up existing test backups."
+    },
+    {
+      "date": "2026-09-19",
+      "kind": "ruling",
+      "item": "N1.02",
+      "text": "Approved revised Batch 03: encrypt stored S-election forms and EIN letters including backup copies, keep them until the client deletes them, track deletion of controlled copies and retries, provide complete resumable backups, and do not clean up existing test copies."
     }
   ],
   "batches": [
@@ -11059,6 +11422,25 @@
         },
         {
           "at": "2026-09-19T11:17:10.256Z",
+          "event": "implemented"
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "revision": 1,
+      "frozenHash": "a189ea16a3d5ae33f026097f719ebb2ca170657b3c40094dace42a9441b28618",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "f902a8e41b973f62a96ca6c39067c33ae0fb61a2",
+      "history": [
+        {
+          "at": "2026-09-19T12:28:48.412Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-19T12:52:19.298Z",
           "event": "implemented"
         }
       ]
