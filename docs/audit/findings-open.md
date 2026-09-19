@@ -14,9 +14,10 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - How It Works step 03: "…we send you the filed Articles … along with a form Operating Agreement completed from your questionnaire answers…". The agreement exists only after the portal questionnaire. Replace: posted documents and Manual; "A short questionnaire in the portal then completes your form Operating Agreement".
 - **3. [A32]** — **open**
   - How It Works "Optional add-ons" calls the agent service an add-on; first year included. Replace: "Add-ons and choices".
-- **4. [A33]** — **open**
+- **4. [A33]** — **implemented**
   - Terms s. 1 assigns 9(c)–(g) and 11(e) to Filing Services; they are Agent Services matters. Replace: assign them to Agent Services.
   - **Codex rejected the proposed replacement:** Reassigning those clauses alone leaves the additional conflicts documented in linked item 29. Produce one complete section-allocation revision.
+  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **5. [A34]** — **open**
   - Terms "Last updated: August 13, 2026" and Privacy "Last updated: August 4, 2026" predate the last edits (Sep 15; Aug 9). Replace the dates.
   - **Codex rejected the proposed replacement:** Use the actual effective/publication dates of the revised policies. A commit date establishes an edit, not by itself the legally effective date.
@@ -140,7 +141,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Fixed (collection-channel): batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
   - Part "retention" — implemented: What the policy promises about keeping or deleting the number. (waits on ruling:N1.01)
   - Fixed (retention): batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **28. [B11]** — **open** — waits on Adam's ruling
+- **28. [B11]** — **implemented** — waits on Adam's ruling
   - Terms of Service, section 9(g) 'How to cancel', last sentence — `webapp/src/content/terms.md:54`
   - Reads: If we have not received the proof described in (ii) by your renewal date, we remain registered agent of record and your account will continue to be billed at the then-current rate, prorated monthly, until we receive that proof or our resignation under Section 10(f) takes effect.
   - Claims: That after a timely cancellation without proof of a successor, the client is billed month by month at a prorated rate.
@@ -149,13 +150,16 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (disputed): terms.md:54 contains the monthly-proration promise. renewals.ts implements annual renewals but no monthly collection. Absence of an automated charge does not prove that a contractual amount cannot be billed manually, and replacing it with an annual fee changes the bargain.
   - **Codex rejected the proposed replacement:** Flag the missing documented monthly billing workflow for owner decision. Do not unilaterally substitute a new annual charge after timely cancellation.
   - Corrected after Codex's review: Nothing bills monthly, but replacing the sentence with an annual fee changes the bargain. Adam decides: build the monthly billing, or reword.
-- **29. [B12]** — **open** — same defect as 4
+  - Ruling, 2026-09-19: Annual registered-agent billing only; no refund for changing agents midyear. Timely cancellation means at least 30 days before renewal. If replacement proof is missing by the renewal date, submit resignation on that date and charge $99 for state filing fees and processing, without a breakdown; this is not another service year. Email the resignation copy and mail the statutory notice. Appointment effective date starts the annual term. Both automatic-renewal consent and an eligible saved card are required. Show a prepaid warning only on an attempted prepaid purchase of our agent service. Allow immediate customer payment after decline. Approved by Adam in this conversation, culminating in “Go. Implement the changes”.
+  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **29. [B12]** — **implemented** — same defect as 4
   - Terms of Service, section 1, 'Which Company party you are contracting with' (the sentence A33 covers, beyond the 9(c)–(g) and 11(e) point) — `webapp/src/content/terms.md:6`
   - Reads: Sections 3 through 9 and 11 through 34 apply to Filing Services; Section 10 applies to Agent Services; and Sections 24 through 29 apply to both, each enforceable independently.
   - Claims: That only Section 10 and Sections 24–29 bind Agent Services.
   - True: The Terms themselves apply other sections to Agent Services: 30 applies 10(d) to North Carolina residents (:162), 32 lists 10(e)–(g), 12 and 13 among the sections that survive termination (:168), 12 (chargebacks), 13 (portal), 14, 16, 20, 31, 33 and 34 are written for both parties, and 25(c) caps Agent Services' liability. On the sentence's own terms none of 12, 13, 14, 16, 20, 30–34 binds Agent Services.
   - Replace with: Sections 3 through 8, 9(a)–(b) and 11(a)–(d) and (f) apply to Filing Services; Sections 9(c)–(g), 10 and 11(e) apply to Agent Services; and every other Section applies to both, each enforceable independently.
   - **Codex rejected the proposed replacement:** Review all scopes together: the proposed exclusive Filing Services allocation still takes general sections such as eligibility/service descriptions away from Agent Services. Supply a complete, internally consistent allocation.
+  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **30. [B13]** — **optional — open**
   - Terms of Service, section 19 'Text Messages' — `webapp/src/content/terms.md:101`
   - Reads: If you provide a mobile number and opt in, we may send you service-related text messages. Message and data rates may apply. Reply STOP to opt out and HELP for help. We do not share mobile numbers with third parties for their marketing.
@@ -301,17 +305,21 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
 
 ## Order form and payment — 80 open of 82
 
-- **45. [A1]** — **optional — open**
+- **45. [A1]** — **optional — implemented**
   - Registered agent step, card tick (mine). Reads "…and I can cancel at any time in my portal." Terms 9(g) and the code stop the charge only on 30 days' notice. Replace: "…and I can cancel in my portal with at least 30 days' notice before the renewal date." (StepRegisteredAgent.tsx)
   - Codex (disputed): StepRegisteredAgent.tsx says “and I can cancel at any time in my portal.” The cancellation route accepts notice on any day; the30-day rule determines whether the next renewal charge stops. The finding conflates notice availability with the charge cutoff, and its replacement implies later notice cannot be submitted.
   - **Codex rejected the proposed replacement:** Use “I may submit cancellation notice at any time. To stop the next renewal charge, I must give notice at least30 days before renewal.” This aligns the assessment with item144 and preserves the contractual timing.
   - Outcome: Notice may be given any day; only the charge cutoff is 30 days. Clarify, do not restrict: 'I may submit cancellation notice at any time. To stop the next renewal charge, I must give notice at least 30 days before renewal.'
-- **46. [A2]** — **open**
+  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **46. [A2]** — **implemented**
   - Same tick (mine). Reads "…cannot be kept on file and will not be accepted for renewal." A gift-card client gets a payment link and may pay it with a gift card; only the keeping is refused. Replace: "…cannot be kept on file; if I pay with one, each year's renewal comes with a payment link instead."
-- **47. [A6]** — **open**
+  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **47. [A6]** — **implemented**
   - Review step, agent card (mine). "Renewal card on file: Yes" before any card exists. Replace: "Keep card for renewal: Agreed".
-- **48. [A7]** — **open**
+  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **48. [A7]** — **implemented**
   - steps.ts FIELD_STEP lacks raRenewalCardConsent; a server refusal lands on the Certify step. Replace: map it to the agent step.
+  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **49. [A8]** — **open**
   - Review, Members card "In Articles?" reads "No" for member-managed orders (server lists them as AMBR) and shows on a conversion. Replace: "Yes — listed as members (AMBR)" for member-managed new formations; no row on a conversion.
 - **50. [A9]** — **open**
@@ -923,7 +931,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: Show 'Your agreement questionnaire unlocks once your order is paid.' only when the error is a 400 (ApiError status 400); otherwise 'We couldn't check your agreement just now.' with a Try again button, as at lines 630-633.
   - **Codex rejected the proposed replacement:** Use the specific NO_LLC API error, not every400; distinguish401 (sign in again), transport failure and server failure. The suggested retry message is correct for the latter failures.
   - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **144. [B75]** — **optional — open** — same defect as 45
+- **144. [B75]** — **optional — implemented** — same defect as 45
   - Client portal, Registered agent service card, the status sentence — `webapp/src/pages/portal/PortalDashboard.tsx:367`
   - Reads: Your registered agent service is active and renews on {date}. You can cancel here at any time.
   - Claims: Cancellation is available at any time.
@@ -931,6 +939,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: Your registered agent service is active and renews on {date}. You can cancel here; notice given at least 30 days before the renewal date stops the renewal charge.
   - Codex (disputed): Actual PortalDashboard.tsx:367 says “You can cancel here at any time”; routes-portal.ts cancellation accepts notice any day and the dialog at :403-405 explains the30-day renewal cutoff. Cancellation submission and stopping the upcoming charge are different acts; the quoted sentence does not promise that late notice stops that charge.
   - Outcome: Same as 45: cancellation is available any day; the clarification about the 30-day cutoff is useful, not required.
+  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **145. [B76]** — **implemented**
   - Client portal, Your documents card, empty state — `webapp/src/pages/portal/PortalDashboard.tsx:720`
   - Reads: Your documents will appear here once your formation is prepared.
@@ -1256,11 +1265,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
 
 ## Office — 28 open of 28
 
-- **171. [A68]** — **open** — related: 184
+- **171. [A68]** — **implemented** — related: 184
   - Registered Agent Clients Card column (mine): no permission on the order shows "—", no amber. Replace: "no card — no permission on the order", amber.
   - **Codex rejected the proposed replacement:** Null does not by itself prove no permission: it can precede a card-save attempt or reflect an incomplete/failed capture path. Derive permission from the order’s consent and show “Card status not recorded” unless absence of consent is independently established.
-- **172. [A69]** — **open**
+  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **172. [A69]** — **implemented**
   - Cancellation shown twice on a row; the client-level chip keeps the first company's date forever. Replace: keep the per-company text; drop the chip on that tab.
+  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **173. [A70]** — **implemented**
   - Clients tab "Invite sent" means only "no password yet". Replace: "No password yet".
   - Fixed: batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
@@ -1312,12 +1323,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: placeholder="e.g. Certificate of Status — Sep 16, 2026"
   - Codex (disputed): Actual AdminDashboard.tsx:301 uses “e.g. Operating Agreement” as an upload-title example. The package-upload control accepts an arbitrary PDF and the server does not prohibit an office-uploaded agreement; client self-generation does not establish that the office can never upload one.
   - Outcome: The office may upload a PDF under any title; the example is unrepresentative, not impossible.
-- **184. [B89]** — **open** — related: 171
+- **184. [B89]** — **implemented** — related: 171
   - Office, Registered Agent Clients tab, the Card column — `webapp/src/pages/admin/AdminDashboard.tsx:44`
   - Reads: : c.card_status === "none" ? `no card${c.card_note === "wallet payment" ? " — wallet" : ""}`
   - Claims: 'no card' with a reason only for a wallet payment.
   - True: renewals.ts:85 and :98 store a reason on every 'none': 'no payment id', or square.ts's 'wallet payment' (:135), 'customer' (:153) or 'not saveable' (:164). Only 'wallet payment' is shown; a card Square refused to save reads simply 'no card', indistinguishable from a wallet payment, and the office cannot tell whether to ask the client for a card. Adjacent to A68.
   - Replace with: : c.card_status === "none" ? `no card${c.card_note ? ` — ${c.card_note}` : ""}`
+  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **185. [B91]** — **implemented**
   - Office, Reference Library tab, the manual's edition label — `webapp/src/pages/admin/LibrarySection.tsx:49`
   - Reads: fd.set("edition", edition || new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" }));
@@ -1427,12 +1439,15 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
 
 ## Emails and jobs — 36 open of 37
 
-- **194. [A3]** — **open** — related: 212
+- **194. [A3]** — **implemented** — related: 212
   - Renewal notice timing (mine). renewals.ts NOTICE_DAYS = 45. Terms 9(d): notice 30–60 days before the cancellation deadline; deadline is renewal − 30 (9(g)); so notice must be 60–90 days before the date. Replace: 60.
-- **195. [A4]** — **open**
+  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **195. [A4]** — **implemented**
   - Renewal retry (mine). The retry reuses idempotency key `ren-<id>-1`; Square returns the first decline; the email promises a retry. Replace: store the attempt count on every decline; retry key numbered 2.
-- **196. [A5]** — **open**
+  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **196. [A5]** — **implemented**
   - Renewal receipt after a link payment (mine). "We charged $99 to your card ending 1234" when the client paid the link. Replace: "We received $99 for registered agent service for [company] through [date]."
+  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **197. [A23]** — **open**
   - Formed email, EIN line: "that's our next step." The order waits on the client's details. Replace: "…it is waiting for the responsible party's details from you: sign in, open Orders in progress, and choose Provide details securely."
   - Codex (disputed): email.ts:468–472 says the open EIN/S-election orders are our next step. routes-admin.ts:879 selects both awaiting_info and in_progress; for in_progress the client has already supplied the details. The proposed universal statement that details are waiting from the client is false for that state.
@@ -1440,12 +1455,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Corrected after Codex's review: An in-progress order already has the client's details. Pass each order's status to the email and ask for details only when they are awaited.
 - **198. [A24]** — **open**
   - Welcome email and Your information header say "formation documents" to a converting client. Replace: "filed Designations" / "your filed documents".
-- **199. [B99]** — **open** — same defect as 195
+- **199. [B99]** — **implemented** — same defect as 195
   - Registered agent renewal, the email after the retry charge is declined (renewals job) — `webapp/server/email.ts:166`
   - Reads: We will try the card once more on ${escapeHtml(opts.retryDate)}.
   - Claims: That a further attempt will be made on the date named.
   - True: After the retry (the second attempt) is declined for insufficient funds, renewals.ts:257 sets retryAfter again because `attempt < 2` is still true (attempt is 1 — see A4), :260 stores retries = 1, and :263 passes willRetry: true, so the client is promised a third attempt; on the next pass :235 `row.retries < 1` is false and no charge runs. The promise is never kept.
   - Replace with: Store the attempt count on every decline (renewals.ts:260 `retries = attempt`), compute retryAfter only when `attempt < 2` with attempt counting both attempts (first decline attempt=1 → retry allowed; second decline attempt=2 → none), and allow the retry with `row.retries < 2` at :235. The email then says 'once more' only once.
+  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **200. [B100]** — **implemented**
   - The 'A change to your portal email was requested' notice sent to the old address — `webapp/server/email.ts:222`
   - Reads: If this was not you, sign in and change your password immediately, then email support@myfloridaseriesllc.com. This address remains on the account until the new one is confirmed.
@@ -1456,7 +1472,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Fixed (all): batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
   - Part "pending-email-notice" — implemented: After a successful password change, refresh the client portal Account card so the cancelled pending-email notice disappears without a page reload.
   - Fixed (pending-email-notice): batch 04-followup revision 1, commit , by Codex; protected by 1 assertion(s).
-- **201. [B101]** — **open** — same defect as 28
+- **201. [B101]** — **implemented** — same defect as 28
   - Registered agent cancellation confirmation email, point 2 — `webapp/server/email.ts:285`
   - Reads: Until we receive that proof, we remain your agent of record and service is billed at the then-current rate, prorated monthly, as described in the Terms of Service.
   - Claims: That after a timely cancellation without proof of a successor, the client is billed month by month.
@@ -1464,6 +1480,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: Either build it (a monthly charge or payment link for a cancelled company still on file, with the office row turning amber) or, until then, soften the email to 'Until we receive that proof, we remain your agent of record and the Terms of Service let us bill for that time at the then-current rate, prorated monthly.'
   - Codex (duplicate): Same missing automated monthly-proration mechanism and same Terms9(g) promise as item28; this separate email occurrence was not marked same defect as in findings-open.
   - **Codex rejected the proposed replacement:** Neither absence of automation nor this email proves no manual billing can occur. Preserve the contractual monthly rate; the alternative wording can clarify manual administration, while replacing it with an annual fee would change the bargain.
+  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **202. [B102]** — **open** — same defect as 63
   - Formed email, S election paragraph — `webapp/server/email.ts:494`
   - Reads: IRS Form 2553 must be filed within 2 months and 15 days of the date on your filed Articles, so please complete the form soon.
@@ -1510,12 +1527,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: View them in the admin dashboard; the identification number is deleted automatically when you mark the order fulfilled.
   - **Codex rejected the proposed replacement:** Remove once. Qualify deletion as removal from the active service-order record unless backup retention is also corrected; the existing blanket deletion clause is not true for archived snapshots.
   - Fixed: batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **208. [B111]** — **open**
+- **208. [B111]** — **implemented**
   - Office: uploading a replacement formation package (Articles or designations) after the company is formed — `webapp/server/routes-admin.ts:860`
   - Reads: UPDATE orders SET status = 'formed', formed_at = now(), ra_renewal_date = ((now() AT TIME ZONE 'America/New_York') + interval '1 year')::date WHERE id = $1
   - Claims: Runs once, when the company is formed.
   - True: The route is also the replacement path (:466-471 'A wrong file is replaced later by the formed-step package upload, which retires priors'), and the UPDATE is unconditional, so every re-upload moves formed_at and pushes ra_renewal_date to a year after the re-upload — including after a renewal has been charged and the date advanced (renewals.ts:252). The renewal date the client was told (email.ts:129-133) and the cancellation deadline built from it silently change.
   - Replace with: UPDATE orders SET status = 'formed', formed_at = COALESCE(formed_at, now()), ra_renewal_date = COALESCE(ra_renewal_date, ((now() AT TIME ZONE 'America/New_York') + interval '1 year')::date) WHERE id = $1 (and the non-agent branch likewise for formed_at).
+  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **209. [B112]** — **implemented**
   - Formed email — the 'Your Federal EIN order / S election package order is in your portal as well' line, for a client with two companies — `webapp/server/routes-admin.ts:879`
   - Reads: SELECT type FROM service_orders WHERE client_id = $1 AND type IN ('ein', 's-election') AND status IN ('awaiting_info', 'in_progress')
@@ -1539,13 +1557,14 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (duplicate): Same unconditional company-Form2553 hint as item178, now repeated in routes-admin.ts:1308; findings-open did not mark this as same defect as178.
   - **Codex rejected the proposed replacement:** The proposed target check fixes series EINs, but a company EIN also need not have a purchased S-election package. Mention Form2553 only when a matching company package exists.
   - Corrected after Codex's review: Codex adds: a company EIN with no S election package has no Form 2553 either; mention the form only when a matching package exists.
-- **212. [B116]** — **open** — related: 194
+- **212. [B116]** — **implemented** — related: 194
   - The registered agent renewal date — which anniversary — `webapp/server/routes-admin.ts:862`
   - Reads: ra_renewal_date = ((now() AT TIME ZONE 'America/New_York') + interval '1 year')::date
   - Claims: The service 'renews automatically on the anniversary date' (Terms 9(c), terms.md:46).
   - True: The date is a year after the day the office uploads the formed package, which can be days or weeks after the Articles' effective date on which the agent designation took effect (s. 605.0207; the Articles carry the agent's acceptance, s. 605.0201(2)(c)). The Terms do not say which anniversary; the portal (PortalDashboard.tsx:367) and every renewal email show this one. Adam should say whether the anniversary is the upload day or the Articles' effective date.
   - Replace with: If the effective date is meant: set ra_renewal_date from the Articles' effective date typed at upload (the office already types the document number there), and say 'the anniversary of your LLC's effective date' in Terms 9(c).
   - **Codex rejected the proposed replacement:** The proposed fix is conditional, not a settled replacement, and the original effective date of an old converting LLC is unsuitable. Define anniversary as the start of this purchased agent term, or explicitly as the initial completed-package date, then calculate consistently.
+  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **213. [B123]** — **open**
   - Chapter 605 notes, Administration, the entity-transactions bullet — `webapp/server/chapter-605-notes.md:140`
   - Reads: s. 605.2602–605.2604 — a protected series may not convert, domesticate, or participate in an interest exchange, and may merge only through the single channel in s. 605.2604 (every other party an LLC; surviving company not created in the merger).
@@ -1675,7 +1694,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: Exclude full-SSN S-election filing copies from the offsite mirror. Remove any previously mirrored filing copies when the edit window closes, using a stored mirror path, and mirror only the redacted record copy.
   - Ruling, 2026-09-19: Approved revised Batch 03: encrypt stored S-election forms and EIN letters including backup copies, keep them until the client deletes them, track deletion of controlled copies and retries, provide complete resumable backups, and do not clean up existing test copies.
   - Fixed: batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **N1.12. [substantive]** — **open**
+- **N1.12. [substantive]** — **implemented**
   - Registered agent renewal, notice and payment-link delivery — `webapp/server/renewals.ts:202`
   - Reads: `INSERT INTO ra_renewals (order_id, renewal_date, amount_cents, status, charge_due, notice_sent_at)
   -          VALUES ($1, $2, $3, $4, $5, now())
@@ -1684,6 +1703,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: notice_sent/link_sent and notice_sent_at represent a notice or payment link actually sent.
   - True: The row is committed at:201–206 BEFORE paymentLinkFor at:208 and sendMail at:220. A failed checkout creates a link_sent row without a link; later jobs skip the !row branch. A failed notice email is caught without retry, while the notice_sent row can proceed to automatic charging at:235–250. This is independent of prior194's45-day schedule.
   - Replace with: Persist a pending-notice state first. Create/reuse the checkout and await successful mail submission before marking notice_sent or link_sent and notice_sent_at. Retry pending failures idempotently and do not charge until the contractual notice timing has been satisfied.
+  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
 
 ## Agreements and guidance — 63 open of 66
 

@@ -972,13 +972,13 @@ app.get("/portal/companies", async (c) => {
   const db = await getDb();
   // The registered agent facts belong to the company (15 Sep 2026: the
   // card showed one company's service under every tab).
-  const rows = await db.query<{ id: string; llc_name: string; formed_at: string | null; filing_path: string | null; ra_service: boolean; ra_renewal_date: unknown; ra_cancellation_requested_at: string | null; card_status: string | null; card_last4: string | null; card_brand: string | null; renewals: unknown }>(
+  const rows = await db.query<{ id: string; llc_name: string; formed_at: string | null; filing_path: string | null; ra_service: boolean; ra_renewal_date: unknown; ra_cancellation_requested_at: string | null; card_status: string | null; card_last4: string | null; card_brand: string | null; card_note:string|null; ra_appointment_date:unknown;ra_resignation_due:unknown;ra_resignation_submitted:unknown;ra_ended_date:unknown; renewals: unknown }>(
     `SELECT id, llc_name, formed_at, payload->>'filingPath' AS filing_path,
             (payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_service,
-            ra_renewal_date, ra_cancellation_requested_at,
+            ra_renewal_date, ra_cancellation_requested_at, ra_appointment_date,ra_resignation_due,ra_resignation_submitted,ra_ended_date,card_note,
             card_status, card_last4, card_brand,
             -- The renewals, newest first (16 Sep 2026).
-            (SELECT COALESCE(jsonb_agg(jsonb_build_object('id', r.id, 'date', r.renewal_date, 'amountCents', r.amount_cents, 'status', r.status, 'chargedAt', r.charged_at) ORDER BY r.renewal_date DESC), '[]'::jsonb)
+            (SELECT COALESCE(jsonb_agg(jsonb_build_object('id', r.id, 'purpose',r.purpose,'linkUrl',r.link_url,'date', r.renewal_date, 'amountCents', r.amount_cents, 'status', r.status, 'chargedAt', r.charged_at) ORDER BY r.renewal_date DESC), '[]'::jsonb)
                FROM ra_renewals r WHERE r.order_id = orders.id) AS renewals
        FROM orders WHERE client_id = $1 AND paid_at IS NOT NULL
       ORDER BY paid_at DESC NULLS LAST`,
@@ -989,6 +989,11 @@ app.get("/portal/companies", async (c) => {
     llcName: r.llc_name,
     formed: !!r.formed_at,
     raService: r.ra_service === true,
+    raAppointmentDate:r.ra_appointment_date?isoDate(r.ra_appointment_date):null,
+    raResignationDue:r.ra_resignation_due?isoDate(r.ra_resignation_due):null,
+    raResignationSubmitted:r.ra_resignation_submitted?isoDate(r.ra_resignation_submitted):null,
+    raEndedDate:r.ra_ended_date?isoDate(r.ra_ended_date):null,
+    cardNote:r.card_note,
     raRenewalDate: r.ra_renewal_date ? isoDate(r.ra_renewal_date) : null,
     raCancellationRequestedAt: r.ra_cancellation_requested_at ?? null,
     cardStatus: r.card_status ?? null,

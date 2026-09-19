@@ -1,0 +1,435 @@
+{
+  "id": "07",
+  "revision": 1,
+  "title": "Registered agent: payment, renewal and cancellation",
+  "model": "Codex",
+  "base": "00628225d59793891b00ab4aebe23468b104cdbd",
+  "items": [
+    {
+      "id": "28",
+      "part": "all",
+      "scope": "annual billing and cancellation resignation policy",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch07 28: annual billing and cancellation resignation policy"
+        }
+      ]
+    },
+    {
+      "id": "201",
+      "part": "all",
+      "scope": "no monthly billing promise",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch07 201: no monthly billing promise"
+        }
+      ]
+    },
+    {
+      "id": "45",
+      "part": "all",
+      "scope": "cancellation timing is explicit",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch07 45: cancellation timing is explicit"
+        }
+      ]
+    },
+    {
+      "id": "144",
+      "part": "all",
+      "scope": "cancellation timing is consistent in intake",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch07 144: cancellation timing is consistent in intake"
+        }
+      ]
+    },
+    {
+      "id": "46",
+      "part": "all",
+      "scope": "prepaid attempted purchases are refused only for our agent service",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch07 46: prepaid attempted purchases are refused only for our agent service"
+        }
+      ]
+    },
+    {
+      "id": "47",
+      "part": "all",
+      "scope": "consent and a saved eligible card are both required",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch07 47: consent and a saved eligible card are both required"
+        }
+      ]
+    },
+    {
+      "id": "48",
+      "part": "all",
+      "scope": "renewal consent errors return to agent step",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch07 48: renewal consent errors return to agent step"
+        }
+      ]
+    },
+    {
+      "id": "171",
+      "part": "all",
+      "scope": "unknown card status is distinct from absent consent",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch07 171: unknown card status is distinct from absent consent"
+        }
+      ]
+    },
+    {
+      "id": "172",
+      "part": "all",
+      "scope": "cancellation status belongs to the company",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch07 172: cancellation status belongs to the company"
+        }
+      ]
+    },
+    {
+      "id": "184",
+      "part": "all",
+      "scope": "card failures have useful explanations",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch07 184: card failures have useful explanations"
+        }
+      ]
+    },
+    {
+      "id": "194",
+      "part": "all",
+      "scope": "notice precedes cancellation deadline by thirty days",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch07 194: notice precedes cancellation deadline by thirty days"
+        }
+      ]
+    },
+    {
+      "id": "195",
+      "part": "all",
+      "scope": "payment attempts are counted and idempotent",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch07 195: payment attempts are counted and idempotent"
+        }
+      ]
+    },
+    {
+      "id": "199",
+      "part": "all",
+      "scope": "no false retry promises",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch07 199: no false retry promises"
+        }
+      ]
+    },
+    {
+      "id": "196",
+      "part": "all",
+      "scope": "receipts describe payments accurately",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch07 196: receipts describe payments accurately"
+        }
+      ]
+    },
+    {
+      "id": "208",
+      "part": "all",
+      "scope": "replacement uploads preserve dates",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch07 208: replacement uploads preserve dates"
+        }
+      ]
+    },
+    {
+      "id": "212",
+      "part": "all",
+      "scope": "appointment effective date starts the service year",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch07 212: appointment effective date starts the service year"
+        }
+      ]
+    },
+    {
+      "id": "N1.12",
+      "part": "all",
+      "scope": "failed notices remain pending and block automatic charging",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch07 N1.12: failed notices remain pending and block automatic charging"
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "part": "all",
+      "scope": "Terms allocate services consistently",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch07 4: Terms allocate services consistently"
+        }
+      ]
+    },
+    {
+      "id": "29",
+      "part": "all",
+      "scope": "general Terms protect both service providers",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch07 29: general Terms protect both service providers"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "webapp/server/db.ts",
+      "mode": "code",
+      "why": "Approved Batch 07 billing, card eligibility, cancellation, appointment dates and consistent wording."
+    },
+    {
+      "path": "webapp/server/env.ts",
+      "mode": "code",
+      "why": "Approved Batch 07 billing, card eligibility, cancellation, appointment dates and consistent wording."
+    },
+    {
+      "path": "webapp/server/square.ts",
+      "mode": "code",
+      "why": "Approved Batch 07 billing, card eligibility, cancellation, appointment dates and consistent wording."
+    },
+    {
+      "path": "webapp/server/renewals.ts",
+      "mode": "code",
+      "why": "Approved Batch 07 billing, card eligibility, cancellation, appointment dates and consistent wording."
+    },
+    {
+      "path": "webapp/server/routes-payments.ts",
+      "mode": "code",
+      "why": "Approved Batch 07 billing, card eligibility, cancellation, appointment dates and consistent wording."
+    },
+    {
+      "path": "webapp/server/routes-admin.ts",
+      "mode": "code",
+      "why": "Approved Batch 07 billing, card eligibility, cancellation, appointment dates and consistent wording."
+    },
+    {
+      "path": "webapp/server/routes-portal.ts",
+      "mode": "code",
+      "why": "Approved Batch 07 billing, card eligibility, cancellation, appointment dates and consistent wording."
+    },
+    {
+      "path": "webapp/server/email.ts",
+      "mode": "code",
+      "why": "Approved Batch 07 billing, card eligibility, cancellation, appointment dates and consistent wording."
+    },
+    {
+      "path": "webapp/server/order-summary.ts",
+      "mode": "code",
+      "why": "Approved Batch 07 billing, card eligibility, cancellation, appointment dates and consistent wording."
+    },
+    {
+      "path": "webapp/server/app.ts",
+      "mode": "code",
+      "why": "Approved Batch 07 billing, card eligibility, cancellation, appointment dates and consistent wording."
+    },
+    {
+      "path": "webapp/server/backup.ts",
+      "mode": "code",
+      "why": "Approved Batch 07 billing, card eligibility, cancellation, appointment dates and consistent wording."
+    },
+    {
+      "path": "webapp/src/App.tsx",
+      "mode": "code",
+      "why": "Approved Batch 07 billing, card eligibility, cancellation, appointment dates and consistent wording."
+    },
+    {
+      "path": "webapp/src/pages/admin/AdminDashboard.tsx",
+      "mode": "code",
+      "why": "Approved Batch 07 billing, card eligibility, cancellation, appointment dates and consistent wording."
+    },
+    {
+      "path": "webapp/src/pages/admin/OrderDetail.tsx",
+      "mode": "code",
+      "why": "Approved Batch 07 billing, card eligibility, cancellation, appointment dates and consistent wording."
+    },
+    {
+      "path": "webapp/src/pages/portal/PortalDashboard.tsx",
+      "mode": "code",
+      "why": "Approved Batch 07 billing, card eligibility, cancellation, appointment dates and consistent wording."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/ReviewStep.tsx",
+      "mode": "code",
+      "why": "Approved Batch 07 billing, card eligibility, cancellation, appointment dates and consistent wording."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/steps.ts",
+      "mode": "code",
+      "why": "Approved Batch 07 billing, card eligibility, cancellation, appointment dates and consistent wording."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepRegisteredAgent.tsx",
+      "mode": "code",
+      "why": "Approved Batch 07 billing, card eligibility, cancellation, appointment dates and consistent wording."
+    },
+    {
+      "path": "webapp/src/content/terms.md",
+      "mode": "code",
+      "why": "Approved Batch 07 billing, card eligibility, cancellation, appointment dates and consistent wording."
+    },
+    {
+      "path": "docs/facts.md",
+      "mode": "code",
+      "why": "Approved Batch 07 billing, card eligibility, cancellation, appointment dates and consistent wording."
+    },
+    {
+      "path": "webapp/.env.example",
+      "mode": "code",
+      "why": "Approved Batch 07 billing, card eligibility, cancellation, appointment dates and consistent wording."
+    },
+    {
+      "path": "webapp/server/ra-checkout.ts",
+      "mode": "new",
+      "why": "Approved registered-agent checkout, office workflow and shared wording."
+    },
+    {
+      "path": "webapp/server/ra-office.ts",
+      "mode": "new",
+      "why": "Approved registered-agent checkout, office workflow and shared wording."
+    },
+    {
+      "path": "webapp/src/pages/AgentCheckout.tsx",
+      "mode": "new",
+      "why": "Approved registered-agent checkout, office workflow and shared wording."
+    },
+    {
+      "path": "webapp/src/pages/admin/AgentServicePanel.tsx",
+      "mode": "new",
+      "why": "Approved registered-agent checkout, office workflow and shared wording."
+    },
+    {
+      "path": "webapp/src/lib/agentBilling.ts",
+      "mode": "new",
+      "why": "Approved registered-agent checkout, office workflow and shared wording."
+    },
+    {
+      "path": "webapp/server/e2e.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Durable approved Batch 07 regressions; update obsolete policy expectations explicitly."
+    },
+    {
+      "path": "webapp/scripts/behavioral.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Durable approved Batch 07 regressions; update obsolete policy expectations explicitly."
+    },
+    {
+      "path": "webapp/server/order-summary.test.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Durable approved Batch 07 regressions; update obsolete policy expectations explicitly."
+    },
+    {
+      "path": "docs/facts-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Durable approved Batch 07 regressions; update obsolete policy expectations explicitly."
+    },
+    {
+      "path": "webapp/server/batch07-check.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Durable approved Batch 07 regressions; update obsolete policy expectations explicitly."
+    },
+    {
+      "path": "webapp/scripts/batch07-walk.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Durable approved Batch 07 regressions; update obsolete policy expectations explicitly."
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "why": "Rebuild API from declared changes."
+    },
+    {
+      "path": "webapp/server/routes-ops.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Existing offline fixture routes follow required eligible-card semantics."
+    },
+    {
+      "path": "webapp/src/pages/OrderConfirmed.tsx",
+      "mode": "code",
+      "why": "Report a pending card requirement or payment state accurately."
+    }
+  ],
+  "requiredChecks": [],
+  "testSupport": [
+    "webapp/server/batch07-check.ts",
+    "webapp/scripts/batch07-walk.ts"
+  ],
+  "removedChecks": [
+    "wallet: a payment Square cannot save leaves no card on file, and the office row says so",
+    "formation sets the renewal date one year out, by Florida's calendar",
+    "renewal: 60 days out, no notice yet",
+    "renewal: 45 days out, the notice goes and the renewal is recorded",
+    "gift card: a prepaid gift card is not kept and the company says so",
+    "gift card: the client is told the card cannot be kept and a link will come",
+    "gift card: the office row reads no card \u2014 gift card"
+  ]
+}

@@ -1,3 +1,4 @@
+import { AgentServicePanel } from "./AgentServicePanel";
 import { sunbizSearchUrl } from "@/components/forms/florida-llc/nameSimilarity";
 import { NameCheck } from "@/components/forms/florida-llc/NameCheck";
 import { useRef, useState } from "react";
@@ -514,6 +515,7 @@ export default function OrderDetail({
           <p className="px-6 py-8 text-sm text-destructive">Could not load this order.</p>
         ) : (
           <div className="space-y-8 px-6 py-6">
+            {d.raService ? <AgentServicePanel orderId={orderId} /> : null}
             {d.status === "paid" && !isConversion ? (
               <Button onClick={onMarkFiled} disabled={markingFiled} className="w-full rounded-full">
                 {markingFiled ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}

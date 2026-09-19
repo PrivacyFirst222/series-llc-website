@@ -26,9 +26,9 @@ var __commonJS = (cb, mod) => function __require2() {
     throw mod = 0, e;
   }
 };
-var __export = (target, all) => {
+var __export = (target2, all) => {
   for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
+    __defProp(target2, name, { get: all[name], enumerable: true });
 };
 var __copyProps = (to, from, except, desc) => {
   if (from && typeof from === "object" || typeof from === "function") {
@@ -38,12 +38,12 @@ var __copyProps = (to, from, except, desc) => {
   }
   return to;
 };
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+var __toESM = (mod, isNodeMode, target2) => (target2 = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
   // If the importer is in node compatibility mode or this is not an ESM
   // file that has been converted to a CommonJS file using a Babel-
   // compatible transform (i.e. "__esModule" has not been set), then set
   // "default" to the CommonJS "module.exports" for node compatibility.
-  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target2, "default", { value: mod, enumerable: true }) : target2,
   mod
 ));
 
@@ -57,6 +57,7 @@ var init_env = __esm({
       OFFLINE,
       DATABASE_URL: ext(process.env.DATABASE_URL),
       SESSION_SECRET: process.env.SESSION_SECRET ?? "dev-only-secret-change-me",
+      SQUARE_APPLICATION_ID: ext(process.env.SQUARE_APPLICATION_ID),
       SQUARE_ACCESS_TOKEN: ext(process.env.SQUARE_ACCESS_TOKEN),
       SQUARE_LOCATION_ID: ext(process.env.SQUARE_LOCATION_ID),
       SQUARE_ENV: process.env.SQUARE_ENV === "production" ? "production" : "sandbox",
@@ -5793,6 +5794,33 @@ CREATE TABLE IF NOT EXISTS fl_sync_state (
       ] },
       { id: 14, name: "resumable-formation-setup", statements: [
         `ALTER TABLE orders ADD COLUMN IF NOT EXISTS fulfillment_completed_at timestamptz`
+      ] },
+      { id: 15, name: "agent-billing-and-checkout", statements: [
+        `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_cancellation_note text`,
+        `ALTER TABLE orders ADD COLUMN IF NOT EXISTS agent_billing_consent text`,
+        `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_appointment_date date`,
+        `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_replaced_at date`,
+        `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_proof_received_at timestamptz`,
+        `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_proof_note text`,
+        `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_resignation_due date`,
+        `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_resignation_submitted date`,
+        `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_resignation_filed date`,
+        `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_resignation_mailed date`,
+        `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_resignation_emailed_at timestamptz`,
+        `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_resignation_document uuid`,
+        `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_ended_date date`,
+        `ALTER TABLE orders ADD COLUMN IF NOT EXISTS checkout_token text`,
+        `ALTER TABLE ra_renewals ADD COLUMN IF NOT EXISTS purpose text NOT NULL DEFAULT 'renewal'`,
+        `ALTER TABLE ra_renewals ADD COLUMN IF NOT EXISTS billing_hold boolean NOT NULL DEFAULT false`,
+        `ALTER TABLE ra_renewals ADD COLUMN IF NOT EXISTS notice_error text`,
+        `ALTER TABLE ra_renewals ADD COLUMN IF NOT EXISTS lock_until timestamptz`,
+        `ALTER TABLE ra_renewals ADD COLUMN IF NOT EXISTS checkout_token text`,
+        `CREATE TABLE IF NOT EXISTS ra_payment_attempts (
+      id uuid PRIMARY KEY DEFAULT gen_random_uuid(), target_id uuid NOT NULL, kind text NOT NULL,
+      automatic boolean NOT NULL DEFAULT false, source_token text NOT NULL, status text NOT NULL DEFAULT 'pending', square_payment_id text,
+      failure_code text, created_at timestamptz NOT NULL DEFAULT now(), lock_until timestamptz,
+      UNIQUE(target_id, id))`,
+        `CREATE UNIQUE INDEX IF NOT EXISTS ra_payment_one_active ON ra_payment_attempts(target_id) WHERE status IN ('pending','approved','completed')`
       ] }
       // Append future migrations here with the next id. Never edit an entry.
     ];
@@ -5882,9 +5910,9 @@ var require_version = __commonJS({
     var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;
     var __getOwnPropNames2 = Object.getOwnPropertyNames;
     var __hasOwnProp2 = Object.prototype.hasOwnProperty;
-    var __export2 = (target, all) => {
+    var __export2 = (target2, all) => {
       for (var name in all)
-        __defProp2(target, name, { get: all[name], enumerable: true });
+        __defProp2(target2, name, { get: all[name], enumerable: true });
     };
     var __copyProps2 = (to, from, except, desc) => {
       if (from && typeof from === "object" || typeof from === "function") {
@@ -5912,9 +5940,9 @@ var require_exchange_vercel_oidc_token = __commonJS({
     var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;
     var __getOwnPropNames2 = Object.getOwnPropertyNames;
     var __hasOwnProp2 = Object.prototype.hasOwnProperty;
-    var __export2 = (target, all) => {
+    var __export2 = (target2, all) => {
       for (var name in all)
-        __defProp2(target, name, { get: all[name], enumerable: true });
+        __defProp2(target2, name, { get: all[name], enumerable: true });
     };
     var __copyProps2 = (to, from, except, desc) => {
       if (from && typeof from === "object" || typeof from === "function") {
@@ -6051,9 +6079,9 @@ var require_get_context = __commonJS({
     var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;
     var __getOwnPropNames2 = Object.getOwnPropertyNames;
     var __hasOwnProp2 = Object.prototype.hasOwnProperty;
-    var __export2 = (target, all) => {
+    var __export2 = (target2, all) => {
       for (var name in all)
-        __defProp2(target, name, { get: all[name], enumerable: true });
+        __defProp2(target2, name, { get: all[name], enumerable: true });
     };
     var __copyProps2 = (to, from, except, desc) => {
       if (from && typeof from === "object" || typeof from === "function") {
@@ -6086,9 +6114,9 @@ var require_get_vercel_oidc_token_sync = __commonJS({
     var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;
     var __getOwnPropNames2 = Object.getOwnPropertyNames;
     var __hasOwnProp2 = Object.prototype.hasOwnProperty;
-    var __export2 = (target, all) => {
+    var __export2 = (target2, all) => {
       for (var name in all)
-        __defProp2(target, name, { get: all[name], enumerable: true });
+        __defProp2(target2, name, { get: all[name], enumerable: true });
     };
     var __copyProps2 = (to, from, except, desc) => {
       if (from && typeof from === "object" || typeof from === "function") {
@@ -6125,9 +6153,9 @@ var require_token_error = __commonJS({
     var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;
     var __getOwnPropNames2 = Object.getOwnPropertyNames;
     var __hasOwnProp2 = Object.prototype.hasOwnProperty;
-    var __export2 = (target, all) => {
+    var __export2 = (target2, all) => {
       for (var name in all)
-        __defProp2(target, name, { get: all[name], enumerable: true });
+        __defProp2(target2, name, { get: all[name], enumerable: true });
     };
     var __copyProps2 = (to, from, except, desc) => {
       if (from && typeof from === "object" || typeof from === "function") {
@@ -6167,9 +6195,9 @@ var require_errors = __commonJS({
     var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;
     var __getOwnPropNames2 = Object.getOwnPropertyNames;
     var __hasOwnProp2 = Object.prototype.hasOwnProperty;
-    var __export2 = (target, all) => {
+    var __export2 = (target2, all) => {
       for (var name in all)
-        __defProp2(target, name, { get: all[name], enumerable: true });
+        __defProp2(target2, name, { get: all[name], enumerable: true });
     };
     var __copyProps2 = (to, from, except, desc) => {
       if (from && typeof from === "object" || typeof from === "function") {
@@ -8281,9 +8309,9 @@ var require_envpath = __commonJS({
     var __getOwnPropNames2 = Object.getOwnPropertyNames;
     var __getProtoOf2 = Object.getPrototypeOf;
     var __hasOwnProp2 = Object.prototype.hasOwnProperty;
-    var __export2 = (target, all) => {
+    var __export2 = (target2, all) => {
       for (var name in all)
-        __defProp2(target, name, { get: all[name], enumerable: true });
+        __defProp2(target2, name, { get: all[name], enumerable: true });
     };
     var __copyProps2 = (to, from, except, desc) => {
       if (from && typeof from === "object" || typeof from === "function") {
@@ -8293,12 +8321,12 @@ var require_envpath = __commonJS({
       }
       return to;
     };
-    var __toESM2 = (mod, isNodeMode, target) => (target = mod != null ? __create2(__getProtoOf2(mod)) : {}, __copyProps2(
+    var __toESM2 = (mod, isNodeMode, target2) => (target2 = mod != null ? __create2(__getProtoOf2(mod)) : {}, __copyProps2(
       // If the importer is in node compatibility mode or this is not an ESM
       // file that has been converted to a CommonJS file using a Babel-
       // compatible transform (i.e. "__esModule" has not been set), then set
       // "default" to the CommonJS "module.exports" for node compatibility.
-      isNodeMode || !mod || !mod.__esModule ? __defProp2(target, "default", { value: mod, enumerable: true }) : target,
+      isNodeMode || !mod || !mod.__esModule ? __defProp2(target2, "default", { value: mod, enumerable: true }) : target2,
       mod
     ));
     var __toCommonJS = (mod) => __copyProps2(__defProp2({}, "__esModule", { value: true }), mod);
@@ -8367,9 +8395,9 @@ var require_errutils = __commonJS({
     var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;
     var __getOwnPropNames2 = Object.getOwnPropertyNames;
     var __hasOwnProp2 = Object.prototype.hasOwnProperty;
-    var __export2 = (target, all) => {
+    var __export2 = (target2, all) => {
       for (var name in all)
-        __defProp2(target, name, { get: all[name], enumerable: true });
+        __defProp2(target2, name, { get: all[name], enumerable: true });
     };
     var __copyProps2 = (to, from, except, desc) => {
       if (from && typeof from === "object" || typeof from === "function") {
@@ -8408,9 +8436,9 @@ var require_fsutils = __commonJS({
     var __getOwnPropNames2 = Object.getOwnPropertyNames;
     var __getProtoOf2 = Object.getPrototypeOf;
     var __hasOwnProp2 = Object.prototype.hasOwnProperty;
-    var __export2 = (target, all) => {
+    var __export2 = (target2, all) => {
       for (var name in all)
-        __defProp2(target, name, { get: all[name], enumerable: true });
+        __defProp2(target2, name, { get: all[name], enumerable: true });
     };
     var __copyProps2 = (to, from, except, desc) => {
       if (from && typeof from === "object" || typeof from === "function") {
@@ -8420,12 +8448,12 @@ var require_fsutils = __commonJS({
       }
       return to;
     };
-    var __toESM2 = (mod, isNodeMode, target) => (target = mod != null ? __create2(__getProtoOf2(mod)) : {}, __copyProps2(
+    var __toESM2 = (mod, isNodeMode, target2) => (target2 = mod != null ? __create2(__getProtoOf2(mod)) : {}, __copyProps2(
       // If the importer is in node compatibility mode or this is not an ESM
       // file that has been converted to a CommonJS file using a Babel-
       // compatible transform (i.e. "__esModule" has not been set), then set
       // "default" to the CommonJS "module.exports" for node compatibility.
-      isNodeMode || !mod || !mod.__esModule ? __defProp2(target, "default", { value: mod, enumerable: true }) : target,
+      isNodeMode || !mod || !mod.__esModule ? __defProp2(target2, "default", { value: mod, enumerable: true }) : target2,
       mod
     ));
     var __toCommonJS = (mod) => __copyProps2(__defProp2({}, "__esModule", { value: true }), mod);
@@ -8502,9 +8530,9 @@ var require_safety = __commonJS({
     var __getOwnPropNames2 = Object.getOwnPropertyNames;
     var __getProtoOf2 = Object.getPrototypeOf;
     var __hasOwnProp2 = Object.prototype.hasOwnProperty;
-    var __export2 = (target, all) => {
+    var __export2 = (target2, all) => {
       for (var name in all)
-        __defProp2(target, name, { get: all[name], enumerable: true });
+        __defProp2(target2, name, { get: all[name], enumerable: true });
     };
     var __copyProps2 = (to, from, except, desc) => {
       if (from && typeof from === "object" || typeof from === "function") {
@@ -8514,12 +8542,12 @@ var require_safety = __commonJS({
       }
       return to;
     };
-    var __toESM2 = (mod, isNodeMode, target) => (target = mod != null ? __create2(__getProtoOf2(mod)) : {}, __copyProps2(
+    var __toESM2 = (mod, isNodeMode, target2) => (target2 = mod != null ? __create2(__getProtoOf2(mod)) : {}, __copyProps2(
       // If the importer is in node compatibility mode or this is not an ESM
       // file that has been converted to a CommonJS file using a Babel-
       // compatible transform (i.e. "__esModule" has not been set), then set
       // "default" to the CommonJS "module.exports" for node compatibility.
-      isNodeMode || !mod || !mod.__esModule ? __defProp2(target, "default", { value: mod, enumerable: true }) : target,
+      isNodeMode || !mod || !mod.__esModule ? __defProp2(target2, "default", { value: mod, enumerable: true }) : target2,
       mod
     ));
     var __toCommonJS = (mod) => __copyProps2(__defProp2({}, "__esModule", { value: true }), mod);
@@ -8670,9 +8698,9 @@ var require_lookup = __commonJS({
     var __getOwnPropNames2 = Object.getOwnPropertyNames;
     var __getProtoOf2 = Object.getPrototypeOf;
     var __hasOwnProp2 = Object.prototype.hasOwnProperty;
-    var __export2 = (target, all) => {
+    var __export2 = (target2, all) => {
       for (var name in all)
-        __defProp2(target, name, { get: all[name], enumerable: true });
+        __defProp2(target2, name, { get: all[name], enumerable: true });
     };
     var __copyProps2 = (to, from, except, desc) => {
       if (from && typeof from === "object" || typeof from === "function") {
@@ -8682,12 +8710,12 @@ var require_lookup = __commonJS({
       }
       return to;
     };
-    var __toESM2 = (mod, isNodeMode, target) => (target = mod != null ? __create2(__getProtoOf2(mod)) : {}, __copyProps2(
+    var __toESM2 = (mod, isNodeMode, target2) => (target2 = mod != null ? __create2(__getProtoOf2(mod)) : {}, __copyProps2(
       // If the importer is in node compatibility mode or this is not an ESM
       // file that has been converted to a CommonJS file using a Babel-
       // compatible transform (i.e. "__esModule" has not been set), then set
       // "default" to the CommonJS "module.exports" for node compatibility.
-      isNodeMode || !mod || !mod.__esModule ? __defProp2(target, "default", { value: mod, enumerable: true }) : target,
+      isNodeMode || !mod || !mod.__esModule ? __defProp2(target2, "default", { value: mod, enumerable: true }) : target2,
       mod
     ));
     var __toCommonJS = (mod) => __copyProps2(__defProp2({}, "__esModule", { value: true }), mod);
@@ -9115,9 +9143,9 @@ var require_lookup = __commonJS({
         return command === "vercel" ? bin : null;
       }
       if (bin && typeof bin === "object") {
-        const target = bin[command];
-        if (typeof target === "string") {
-          return target;
+        const target2 = bin[command];
+        if (typeof target2 === "string") {
+          return target2;
         }
       }
       return null;
@@ -9138,9 +9166,9 @@ var require_exec = __commonJS({
     var __getOwnPropNames2 = Object.getOwnPropertyNames;
     var __getProtoOf2 = Object.getPrototypeOf;
     var __hasOwnProp2 = Object.prototype.hasOwnProperty;
-    var __export2 = (target, all) => {
+    var __export2 = (target2, all) => {
       for (var name in all)
-        __defProp2(target, name, { get: all[name], enumerable: true });
+        __defProp2(target2, name, { get: all[name], enumerable: true });
     };
     var __copyProps2 = (to, from, except, desc) => {
       if (from && typeof from === "object" || typeof from === "function") {
@@ -9150,12 +9178,12 @@ var require_exec = __commonJS({
       }
       return to;
     };
-    var __toESM2 = (mod, isNodeMode, target) => (target = mod != null ? __create2(__getProtoOf2(mod)) : {}, __copyProps2(
+    var __toESM2 = (mod, isNodeMode, target2) => (target2 = mod != null ? __create2(__getProtoOf2(mod)) : {}, __copyProps2(
       // If the importer is in node compatibility mode or this is not an ESM
       // file that has been converted to a CommonJS file using a Babel-
       // compatible transform (i.e. "__esModule" has not been set), then set
       // "default" to the CommonJS "module.exports" for node compatibility.
-      isNodeMode || !mod || !mod.__esModule ? __defProp2(target, "default", { value: mod, enumerable: true }) : target,
+      isNodeMode || !mod || !mod.__esModule ? __defProp2(target2, "default", { value: mod, enumerable: true }) : target2,
       mod
     ));
     var __toCommonJS = (mod) => __copyProps2(__defProp2({}, "__esModule", { value: true }), mod);
@@ -9251,9 +9279,9 @@ var require_dist = __commonJS({
     var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;
     var __getOwnPropNames2 = Object.getOwnPropertyNames;
     var __hasOwnProp2 = Object.prototype.hasOwnProperty;
-    var __export2 = (target, all) => {
+    var __export2 = (target2, all) => {
       for (var name in all)
-        __defProp2(target, name, { get: all[name], enumerable: true });
+        __defProp2(target2, name, { get: all[name], enumerable: true });
     };
     var __copyProps2 = (to, from, except, desc) => {
       if (from && typeof from === "object" || typeof from === "function") {
@@ -9516,8 +9544,8 @@ var require_util = __commonJS({
     function objectClone(obj) {
       return Object.create(Object.getPrototypeOf(obj), Object.getOwnPropertyDescriptors(obj));
     }
-    function assignProp(target, prop, value) {
-      Object.defineProperty(target, prop, {
+    function assignProp(target2, prop, value) {
+      Object.defineProperty(target2, prop, {
         value,
         writable: true,
         enumerable: true,
@@ -9682,35 +9710,35 @@ var require_util = __commonJS({
       return params;
     }
     function createTransparentProxy(getter) {
-      let target;
+      let target2;
       return new Proxy({}, {
         get(_, prop, receiver) {
-          target ?? (target = getter());
-          return Reflect.get(target, prop, receiver);
+          target2 ?? (target2 = getter());
+          return Reflect.get(target2, prop, receiver);
         },
         set(_, prop, value, receiver) {
-          target ?? (target = getter());
-          return Reflect.set(target, prop, value, receiver);
+          target2 ?? (target2 = getter());
+          return Reflect.set(target2, prop, value, receiver);
         },
         has(_, prop) {
-          target ?? (target = getter());
-          return Reflect.has(target, prop);
+          target2 ?? (target2 = getter());
+          return Reflect.has(target2, prop);
         },
         deleteProperty(_, prop) {
-          target ?? (target = getter());
-          return Reflect.deleteProperty(target, prop);
+          target2 ?? (target2 = getter());
+          return Reflect.deleteProperty(target2, prop);
         },
         ownKeys(_) {
-          target ?? (target = getter());
-          return Reflect.ownKeys(target);
+          target2 ?? (target2 = getter());
+          return Reflect.ownKeys(target2);
         },
         getOwnPropertyDescriptor(_, prop) {
-          target ?? (target = getter());
-          return Reflect.getOwnPropertyDescriptor(target, prop);
+          target2 ?? (target2 = getter());
+          return Reflect.getOwnPropertyDescriptor(target2, prop);
         },
         defineProperty(_, prop, descriptor) {
-          target ?? (target = getter());
-          return Reflect.defineProperty(target, prop, descriptor);
+          target2 ?? (target2 = getter());
+          return Reflect.defineProperty(target2, prop, descriptor);
         }
       });
     }
@@ -22370,7 +22398,7 @@ var require_iso = __commonJS({
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ZodISODuration = exports.ZodISOTime = exports.ZodISODate = exports.ZodISODateTime = void 0;
     exports.datetime = datetime;
-    exports.date = date;
+    exports.date = date2;
     exports.time = time;
     exports.duration = duration;
     var core = __importStar(require_core3());
@@ -22386,7 +22414,7 @@ var require_iso = __commonJS({
       core.$ZodISODate.init(inst, def);
       schemas.ZodStringFormat.init(inst, def);
     });
-    function date(params) {
+    function date2(params) {
       return core._isoDate(exports.ZodISODate, params);
     }
     exports.ZodISOTime = core.$constructor("ZodISOTime", (inst, def) => {
@@ -22612,7 +22640,7 @@ var require_schemas2 = __commonJS({
     exports.unknown = unknown;
     exports.never = never;
     exports.void = _void;
-    exports.date = date;
+    exports.date = date2;
     exports.array = array;
     exports.keyof = keyof;
     exports.object = object;
@@ -22708,7 +22736,7 @@ var require_schemas2 = __commonJS({
       inst.default = (def2) => _default(inst, def2);
       inst.prefault = (def2) => prefault(inst, def2);
       inst.catch = (params) => _catch(inst, params);
-      inst.pipe = (target) => pipe(inst, target);
+      inst.pipe = (target2) => pipe(inst, target2);
       inst.readonly = () => readonly(inst);
       inst.describe = (description) => {
         const cl = inst.clone();
@@ -23109,7 +23137,7 @@ var require_schemas2 = __commonJS({
       inst.minDate = c.minimum ? new Date(c.minimum) : null;
       inst.maxDate = c.maximum ? new Date(c.maximum) : null;
     });
-    function date(params) {
+    function date2(params) {
       return core._date(exports.ZodDate, params);
     }
     exports.ZodArray = core.$constructor("ZodArray", (inst, def) => {
@@ -23740,7 +23768,7 @@ var require_coerce = __commonJS({
     exports.number = number;
     exports.boolean = boolean;
     exports.bigint = bigint;
-    exports.date = date;
+    exports.date = date2;
     var core = __importStar(require_core3());
     var schemas = __importStar(require_schemas2());
     function string(params) {
@@ -23755,7 +23783,7 @@ var require_coerce = __commonJS({
     function bigint(params) {
       return core._coercedBigint(schemas.ZodBigInt, params);
     }
-    function date(params) {
+    function date2(params) {
       return core._coercedDate(schemas.ZodDate, params);
     }
   }
@@ -24541,9 +24569,9 @@ var require_token_io = __commonJS({
     var __getOwnPropNames2 = Object.getOwnPropertyNames;
     var __getProtoOf2 = Object.getPrototypeOf;
     var __hasOwnProp2 = Object.prototype.hasOwnProperty;
-    var __export2 = (target, all) => {
+    var __export2 = (target2, all) => {
       for (var name in all)
-        __defProp2(target, name, { get: all[name], enumerable: true });
+        __defProp2(target2, name, { get: all[name], enumerable: true });
     };
     var __copyProps2 = (to, from, except, desc) => {
       if (from && typeof from === "object" || typeof from === "function") {
@@ -24553,12 +24581,12 @@ var require_token_io = __commonJS({
       }
       return to;
     };
-    var __toESM2 = (mod, isNodeMode, target) => (target = mod != null ? __create2(__getProtoOf2(mod)) : {}, __copyProps2(
+    var __toESM2 = (mod, isNodeMode, target2) => (target2 = mod != null ? __create2(__getProtoOf2(mod)) : {}, __copyProps2(
       // If the importer is in node compatibility mode or this is not an ESM
       // file that has been converted to a CommonJS file using a Babel-
       // compatible transform (i.e. "__esModule" has not been set), then set
       // "default" to the CommonJS "module.exports" for node compatibility.
-      isNodeMode || !mod || !mod.__esModule ? __defProp2(target, "default", { value: mod, enumerable: true }) : target,
+      isNodeMode || !mod || !mod.__esModule ? __defProp2(target2, "default", { value: mod, enumerable: true }) : target2,
       mod
     ));
     var __toCommonJS = (mod) => __copyProps2(__defProp2({}, "__esModule", { value: true }), mod);
@@ -24618,9 +24646,9 @@ var require_oauth = __commonJS({
     var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;
     var __getOwnPropNames2 = Object.getOwnPropertyNames;
     var __hasOwnProp2 = Object.prototype.hasOwnProperty;
-    var __export2 = (target, all) => {
+    var __export2 = (target2, all) => {
       for (var name in all)
-        __defProp2(target, name, { get: all[name], enumerable: true });
+        __defProp2(target2, name, { get: all[name], enumerable: true });
     };
     var __copyProps2 = (to, from, except, desc) => {
       if (from && typeof from === "object" || typeof from === "function") {
@@ -24707,9 +24735,9 @@ var require_auth_errors = __commonJS({
     var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;
     var __getOwnPropNames2 = Object.getOwnPropertyNames;
     var __hasOwnProp2 = Object.prototype.hasOwnProperty;
-    var __export2 = (target, all) => {
+    var __export2 = (target2, all) => {
       for (var name in all)
-        __defProp2(target, name, { get: all[name], enumerable: true });
+        __defProp2(target2, name, { get: all[name], enumerable: true });
     };
     var __copyProps2 = (to, from, except, desc) => {
       if (from && typeof from === "object" || typeof from === "function") {
@@ -24756,9 +24784,9 @@ var require_token_util = __commonJS({
     var __getOwnPropNames2 = Object.getOwnPropertyNames;
     var __getProtoOf2 = Object.getPrototypeOf;
     var __hasOwnProp2 = Object.prototype.hasOwnProperty;
-    var __export2 = (target, all) => {
+    var __export2 = (target2, all) => {
       for (var name in all)
-        __defProp2(target, name, { get: all[name], enumerable: true });
+        __defProp2(target2, name, { get: all[name], enumerable: true });
     };
     var __copyProps2 = (to, from, except, desc) => {
       if (from && typeof from === "object" || typeof from === "function") {
@@ -24768,12 +24796,12 @@ var require_token_util = __commonJS({
       }
       return to;
     };
-    var __toESM2 = (mod, isNodeMode, target) => (target = mod != null ? __create2(__getProtoOf2(mod)) : {}, __copyProps2(
+    var __toESM2 = (mod, isNodeMode, target2) => (target2 = mod != null ? __create2(__getProtoOf2(mod)) : {}, __copyProps2(
       // If the importer is in node compatibility mode or this is not an ESM
       // file that has been converted to a CommonJS file using a Babel-
       // compatible transform (i.e. "__esModule" has not been set), then set
       // "default" to the CommonJS "module.exports" for node compatibility.
-      isNodeMode || !mod || !mod.__esModule ? __defProp2(target, "default", { value: mod, enumerable: true }) : target,
+      isNodeMode || !mod || !mod.__esModule ? __defProp2(target2, "default", { value: mod, enumerable: true }) : target2,
       mod
     ));
     var __toCommonJS = (mod) => __copyProps2(__defProp2({}, "__esModule", { value: true }), mod);
@@ -24984,9 +25012,9 @@ var require_token = __commonJS({
     var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;
     var __getOwnPropNames2 = Object.getOwnPropertyNames;
     var __hasOwnProp2 = Object.prototype.hasOwnProperty;
-    var __export2 = (target, all) => {
+    var __export2 = (target2, all) => {
       for (var name in all)
-        __defProp2(target, name, { get: all[name], enumerable: true });
+        __defProp2(target2, name, { get: all[name], enumerable: true });
     };
     var __copyProps2 = (to, from, except, desc) => {
       if (from && typeof from === "object" || typeof from === "function") {
@@ -25052,9 +25080,9 @@ var require_get_vercel_oidc_token_with_refresh = __commonJS({
     var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;
     var __getOwnPropNames2 = Object.getOwnPropertyNames;
     var __hasOwnProp2 = Object.prototype.hasOwnProperty;
-    var __export2 = (target, all) => {
+    var __export2 = (target2, all) => {
       for (var name in all)
-        __defProp2(target, name, { get: all[name], enumerable: true });
+        __defProp2(target2, name, { get: all[name], enumerable: true });
     };
     var __copyProps2 = (to, from, except, desc) => {
       if (from && typeof from === "object" || typeof from === "function") {
@@ -27530,8 +27558,8 @@ var require_encrypt3 = __commonJS({
         };
         for (let i = 0; i < this._recipients.length; i++) {
           const recipient = this._recipients[i];
-          const target = {};
-          jwe.recipients.push(target);
+          const target2 = {};
+          jwe.recipients.push(target2);
           const joseHeader = {
             ...this._protectedHeader,
             ...this._unprotectedHeader,
@@ -27552,15 +27580,15 @@ var require_encrypt3 = __commonJS({
               jwe.protected = flattened.protected;
             if (flattened.unprotected)
               jwe.unprotected = flattened.unprotected;
-            target.encrypted_key = flattened.encrypted_key;
+            target2.encrypted_key = flattened.encrypted_key;
             if (flattened.header)
-              target.header = flattened.header;
+              target2.header = flattened.header;
             continue;
           }
           const { encryptedKey, parameters: parameters2 } = await (0, encrypt_key_management_js_1.default)(recipient.unprotectedHeader?.alg || this._protectedHeader?.alg || this._unprotectedHeader?.alg, enc, recipient.key, cek, { p2c });
-          target.encrypted_key = (0, base64url_js_1.encode)(encryptedKey);
+          target2.encrypted_key = (0, base64url_js_1.encode)(encryptedKey);
           if (recipient.unprotectedHeader || parameters2)
-            target.header = { ...recipient.unprotectedHeader, ...parameters2 };
+            target2.header = { ...recipient.unprotectedHeader, ...parameters2 };
         }
         return jwe;
       }
@@ -28025,7 +28053,7 @@ var require_epoch = __commonJS({
   "../../../../Claude Projects/Series LLC Website/webapp/node_modules/jose/dist/node/cjs/lib/epoch.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.default = (date) => Math.floor(date.getTime() / 1e3);
+    exports.default = (date2) => Math.floor(date2.getTime() / 1e3);
   }
 });
 
@@ -29540,9 +29568,9 @@ var require_verify_vercel_oidc_token = __commonJS({
     var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;
     var __getOwnPropNames2 = Object.getOwnPropertyNames;
     var __hasOwnProp2 = Object.prototype.hasOwnProperty;
-    var __export2 = (target, all) => {
+    var __export2 = (target2, all) => {
       for (var name in all)
-        __defProp2(target, name, { get: all[name], enumerable: true });
+        __defProp2(target2, name, { get: all[name], enumerable: true });
     };
     var __copyProps2 = (to, from, except, desc) => {
       if (from && typeof from === "object" || typeof from === "function") {
@@ -29663,9 +29691,9 @@ var require_dist3 = __commonJS({
     var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;
     var __getOwnPropNames2 = Object.getOwnPropertyNames;
     var __hasOwnProp2 = Object.prototype.hasOwnProperty;
-    var __export2 = (target, all) => {
+    var __export2 = (target2, all) => {
       for (var name in all)
-        __defProp2(target, name, { get: all[name], enumerable: true });
+        __defProp2(target2, name, { get: all[name], enumerable: true });
     };
     var __copyProps2 = (to, from, except, desc) => {
       if (from && typeof from === "object" || typeof from === "function") {
@@ -34145,8 +34173,8 @@ var require_util3 = __commonJS({
          * @param {unknown} target
          * @param {'key' | 'value' | 'key+value'} kind
          */
-        constructor(target, kind) {
-          this.#target = target;
+        constructor(target2, kind) {
+          this.#target = target2;
           this.#kind = kind;
           this.#index = 0;
         }
@@ -34196,8 +34224,8 @@ var require_util3 = __commonJS({
         },
         next: { writable: true, enumerable: true, configurable: true }
       });
-      return function(target, kind) {
-        return new FastIterableIterator(target, kind);
+      return function(target2, kind) {
+        return new FastIterableIterator(target2, kind);
       };
     }
     function iteratorMixin(name, object, kInternalIterator, keyIndex = 0, valueIndex = 1) {
@@ -38025,8 +38053,8 @@ var require_pool = __commonJS({
         this[kOptions].interceptors = options.interceptors ? { ...options.interceptors } : void 0;
         this[kFactory] = factory;
         this.on("connectionError", (origin2, targets, error2) => {
-          for (const target of targets) {
-            const idx = this[kClients].indexOf(target);
+          for (const target2 of targets) {
+            const idx = this[kClients].indexOf(target2);
             if (idx !== -1) {
               this[kClients].splice(idx, 1);
             }
@@ -42187,12 +42215,12 @@ var require_response = __commonJS({
         ...state
       };
       return new Proxy(response, {
-        get(target, p2) {
-          return p2 in state ? state[p2] : target[p2];
+        get(target2, p2) {
+          return p2 in state ? state[p2] : target2[p2];
         },
-        set(target, p2, value) {
+        set(target2, p2, value) {
           assert(!(p2 in state));
-          target[p2] = value;
+          target2[p2] = value;
           return true;
         }
       });
@@ -45798,11 +45826,11 @@ var require_util7 = __commonJS({
       "Dec"
     ];
     var IMFPaddedNumbers = Array(61).fill(0).map((_, i) => i.toString().padStart(2, "0"));
-    function toIMFDate(date) {
-      if (typeof date === "number") {
-        date = new Date(date);
+    function toIMFDate(date2) {
+      if (typeof date2 === "number") {
+        date2 = new Date(date2);
       }
-      return `${IMFDays[date.getUTCDay()]}, ${IMFPaddedNumbers[date.getUTCDate()]} ${IMFMonths[date.getUTCMonth()]} ${date.getUTCFullYear()} ${IMFPaddedNumbers[date.getUTCHours()]}:${IMFPaddedNumbers[date.getUTCMinutes()]}:${IMFPaddedNumbers[date.getUTCSeconds()]} GMT`;
+      return `${IMFDays[date2.getUTCDay()]}, ${IMFPaddedNumbers[date2.getUTCDate()]} ${IMFMonths[date2.getUTCMonth()]} ${date2.getUTCFullYear()} ${IMFPaddedNumbers[date2.getUTCHours()]}:${IMFPaddedNumbers[date2.getUTCMinutes()]}:${IMFPaddedNumbers[date2.getUTCSeconds()]} GMT`;
     }
     function validateCookieMaxAge(maxAge) {
       if (maxAge < 0) {
@@ -46498,9 +46526,9 @@ var require_util8 = __commonJS({
     function isClosed(ws) {
       return ws[kReadyState] === states.CLOSED;
     }
-    function fireEvent(e, target, eventFactory = (type, init) => new Event(type, init), eventInitDict = {}) {
+    function fireEvent(e, target2, eventFactory = (type, init) => new Event(type, init), eventInitDict = {}) {
       const event = eventFactory(e, eventInitDict);
-      target.dispatchEvent(event);
+      target2.dispatchEvent(event);
     }
     function websocketMessageReceived(ws, type, data) {
       if (ws[kReadyState] !== states.OPEN) {
@@ -51124,7 +51152,7 @@ __export(storage_exports, {
   replaceStoredFile: () => replaceStoredFile,
   storageWasDeleted: () => storageWasDeleted
 });
-import { randomBytes as randomBytes4, createHash as createHash4 } from "node:crypto";
+import { randomBytes as randomBytes4, createHash as createHash5 } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { join, dirname } from "node:path";
 import { mkdir, writeFile, readFile, unlink, readdir } from "node:fs/promises";
@@ -51225,7 +51253,7 @@ var init_storage = __esm({
     init_env();
     init_encryption();
     root = () => process.env.DEV_STORAGE_DIR || fileURLToPath(new URL("../.dev-data/blob/", import.meta.url));
-    digest = (s) => createHash4("sha256").update(s).digest("hex");
+    digest = (s) => createHash5("sha256").update(s).digest("hex");
     deletionPath = (key) => `deletions/${digest(key)}.json`;
   }
 });
@@ -51406,8 +51434,8 @@ var init_strings = __esm({
         return void 0;
       const [, year, month = "01", day = "01", hours = "00", mins = "00", secs = "00", offsetSign = "Z", offsetHours = "00", offsetMins = "00"] = match2;
       const tzOffset = offsetSign === "Z" ? "Z" : `${offsetSign}${offsetHours}:${offsetMins}`;
-      const date = /* @__PURE__ */ new Date(`${year}-${month}-${day}T${hours}:${mins}:${secs}${tzOffset}`);
-      return date;
+      const date2 = /* @__PURE__ */ new Date(`${year}-${month}-${day}T${hours}:${mins}:${secs}${tzOffset}`);
+      return date2;
     };
     findLastMatch = (value, regex) => {
       var _a3;
@@ -61683,10 +61711,10 @@ var init_PDFHexString = __esm({
       }
       decodeDate() {
         const text = this.decodeText();
-        const date = parseDate(text);
-        if (!date)
+        const date2 = parseDate(text);
+        if (!date2)
           throw new InvalidPDFDateStringError(text);
-        return date;
+        return date2;
       }
       asString() {
         return this.value;
@@ -61954,10 +61982,10 @@ var init_PDFString = __esm({
       }
       decodeDate() {
         const text = this.decodeText();
-        const date = parseDate(text);
-        if (!date)
+        const date2 = parseDate(text);
+        if (!date2)
           throw new InvalidPDFDateStringError(text);
-        return date;
+        return date2;
       }
       asString() {
         return this.value;
@@ -61979,13 +62007,13 @@ var init_PDFString = __esm({
       }
     };
     PDFString.of = (value) => new PDFString(value);
-    PDFString.fromDate = (date) => {
-      const year = padStart(String(date.getUTCFullYear()), 4, "0");
-      const month = padStart(String(date.getUTCMonth() + 1), 2, "0");
-      const day = padStart(String(date.getUTCDate()), 2, "0");
-      const hours = padStart(String(date.getUTCHours()), 2, "0");
-      const mins = padStart(String(date.getUTCMinutes()), 2, "0");
-      const secs = padStart(String(date.getUTCSeconds()), 2, "0");
+    PDFString.fromDate = (date2) => {
+      const year = padStart(String(date2.getUTCFullYear()), 4, "0");
+      const month = padStart(String(date2.getUTCMonth() + 1), 2, "0");
+      const day = padStart(String(date2.getUTCDate()), 2, "0");
+      const hours = padStart(String(date2.getUTCHours()), 2, "0");
+      const mins = padStart(String(date2.getUTCMinutes()), 2, "0");
+      const secs = padStart(String(date2.getUTCSeconds()), 2, "0");
       return new PDFString(`D:${year}${month}${day}${hours}${mins}${secs}Z`);
     };
     PDFString_default = PDFString;
@@ -62490,32 +62518,32 @@ var init_PDFContext = __esm({
           this.snapshot.markRefForSave(containingRef);
         }
       }
-      findContainingIndirectObject(target) {
+      findContainingIndirectObject(target2) {
         const entries = Array.from(this.indirectObjects.entries());
         for (let idx = 0, len = entries.length; idx < len; idx++) {
           const [ref, object] = entries[idx];
-          if (this.objectContains(object, target)) {
+          if (this.objectContains(object, target2)) {
             return ref;
           }
         }
         return void 0;
       }
-      objectContains(container, target) {
-        if (container === target)
+      objectContains(container, target2) {
+        if (container === target2)
           return true;
         if (container instanceof PDFDict_default) {
           const values2 = container.values();
           for (let i = 0, len = values2.length; i < len; i++) {
-            if (this.objectContains(values2[i], target))
+            if (this.objectContains(values2[i], target2))
               return true;
           }
         } else if (container instanceof PDFArray_default) {
           for (let i = 0, len = container.size(); i < len; i++) {
-            if (this.objectContains(container.get(i), target))
+            if (this.objectContains(container.get(i), target2))
               return true;
           }
         } else if (container instanceof PDFStream_default) {
-          if (this.objectContains(container.dict, target))
+          if (this.objectContains(container.dict, target2))
             return true;
         }
         return false;
@@ -87979,7 +88007,7 @@ var init_xmp = __esm({
       "http://www.w3.org/XML/1998/namespace"
     ]);
     XPACKET_ID = "W5M0MpCehiHzreSzNTczkc9d";
-    formatDate = (date) => `${date.toISOString().split(".")[0]}Z`;
+    formatDate = (date2) => `${date2.toISOString().split(".")[0]}Z`;
     DESCRIPTION_RE = /<rdf:Description\b[^>]*\/>|<rdf:Description\b[^>]*>[\s\S]*?<\/rdf:Description>/g;
     XMLNS_RE = /\sxmlns(?::[A-Za-z_][\w.-]*)?=["']([^"']+)["']/g;
     declaredNamespaceUris = (description) => {
@@ -90715,12 +90743,12 @@ var init_imageBytes = __esm({
     };
     hasFilter = (dict, name) => {
       const filter = dict.lookup(PDFName_default.of("Filter"));
-      const target = PDFName_default.of(name);
-      if (filter === target)
+      const target2 = PDFName_default.of(name);
+      if (filter === target2)
         return true;
       if (filter instanceof PDFArray_default) {
         for (let i = 0, len = filter.size(); i < len; i++) {
-          if (filter.lookup(i) === target)
+          if (filter.lookup(i) === target2)
             return true;
         }
       }
@@ -93492,8 +93520,8 @@ function encryptStringsIn(doc, ref, object, done = /* @__PURE__ */ new WeakSet()
   if (!(ref instanceof PDFRef_default)) return;
   const security = doc.context.security;
   if (!security) return;
-  const target = object ?? doc.context.lookup(ref);
-  if (!target) return;
+  const target2 = object ?? doc.context.lookup(ref);
+  if (!target2) return;
   const fn = security.getEncryptFn(ref.objectNumber, ref.generationNumber);
   const toHex = (b2) => Array.from(b2, (x2) => x2.toString(16).padStart(2, "0")).join("");
   const enc = (s) => {
@@ -93524,7 +93552,7 @@ function encryptStringsIn(doc, ref, object, done = /* @__PURE__ */ new WeakSet()
     done.add(d2);
     for (const [k, v2] of d2.entries()) d2.set(k, walk(v2));
   };
-  walk(target);
+  walk(target2);
 }
 function finishFields(doc, font) {
   const form = doc.getForm();
@@ -93967,7 +93995,7 @@ __export(dropbox_exports, {
   readMirror: () => readMirror,
   runFileMirror: () => runFileMirror
 });
-import { createHash as createHash6 } from "node:crypto";
+import { createHash as createHash7 } from "node:crypto";
 async function accessToken() {
   if (cachedToken && Date.now() < cachedToken.expiresAt - 6e4) return cachedToken.token;
   const res = await fetch("https://api.dropboxapi.com/oauth2/token", {
@@ -94126,7 +94154,7 @@ var init_dropbox = __esm({
       /[\u007f-\uffff]/g,
       (c) => "\\u" + c.charCodeAt(0).toString(16).padStart(4, "0")
     );
-    hashBytes = (data) => createHash6("sha256").update(data).digest("hex");
+    hashBytes = (data) => createHash7("sha256").update(data).digest("hex");
     devMirror = async (path) => {
       const { fileURLToPath: fileURLToPath2 } = await import("node:url");
       return (process.env.DEV_MIRROR_DIR || fileURLToPath2(new URL("../.dev-data/dropbox-mirror", import.meta.url))) + path;
@@ -94352,6 +94380,7 @@ var init_backup = __esm({
       "contact_messages",
       "email_log",
       "ra_renewals",
+      "ra_payment_attempts",
       "document_deletions"
     ];
     PREFIX = "backups/";
@@ -94360,2392 +94389,6 @@ var init_backup = __esm({
     publishOptions = { allowOverwrite: false };
   }
 });
-
-// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/compose.js
-var compose = (middleware, onError, onNotFound) => {
-  return (context, next) => {
-    let index = -1;
-    return dispatch(0);
-    async function dispatch(i) {
-      if (i <= index) {
-        throw new Error("next() called multiple times");
-      }
-      index = i;
-      let res;
-      let isError2 = false;
-      let handler2;
-      if (middleware[i]) {
-        handler2 = middleware[i][0][0];
-        context.req.routeIndex = i;
-      } else {
-        handler2 = i === middleware.length && next || void 0;
-      }
-      if (handler2) {
-        try {
-          res = await handler2(context, () => dispatch(i + 1));
-        } catch (err3) {
-          if (err3 instanceof Error && onError) {
-            context.error = err3;
-            res = await onError(err3, context);
-            isError2 = true;
-          } else {
-            throw err3;
-          }
-        }
-      } else {
-        if (context.finalized === false && onNotFound) {
-          res = await onNotFound(context);
-        }
-      }
-      if (res && (context.finalized === false || isError2)) {
-        context.res = res;
-      }
-      return context;
-    }
-  };
-};
-
-// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/request/constants.js
-var GET_MATCH_RESULT = /* @__PURE__ */ Symbol();
-
-// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/utils/buffer.js
-var bufferToFormData = (arrayBuffer, contentType) => {
-  const response = new Response(arrayBuffer, {
-    headers: {
-      // Normalize the media type (case-insensitive) while keeping parameters like the boundary
-      "Content-Type": contentType.replace(/^[^;]+/, (mediaType) => mediaType.toLowerCase())
-    }
-  });
-  return response.formData();
-};
-
-// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/utils/body.js
-var MAX_NESTING_DEPTH = 32;
-var MAX_NESTED_OBJECTS = 1e4;
-var isRawRequest = (request) => "headers" in request;
-var parseBody = async (request, options = /* @__PURE__ */ Object.create(null)) => {
-  const { all = false, dot = false } = options;
-  const headers = isRawRequest(request) ? request.headers : request.raw.headers;
-  const contentType = headers.get("Content-Type");
-  const mediaType = contentType?.split(";")[0].trim().toLowerCase();
-  if (mediaType === "multipart/form-data" || mediaType === "application/x-www-form-urlencoded") {
-    return parseFormData(request, { all, dot });
-  }
-  return {};
-};
-async function parseFormData(request, options) {
-  if (!isRawRequest(request) && request.bodyCache.formData) {
-    return convertFormDataToBodyData(
-      await request.bodyCache.formData,
-      options
-    );
-  }
-  const headers = isRawRequest(request) ? request.headers : request.raw.headers;
-  const arrayBuffer = await request.arrayBuffer();
-  const formDataPromise = bufferToFormData(arrayBuffer, headers.get("Content-Type") || "");
-  if (!isRawRequest(request)) {
-    request.bodyCache.formData = formDataPromise;
-  }
-  const formData = await formDataPromise;
-  if (formData) {
-    return convertFormDataToBodyData(formData, options);
-  }
-  return {};
-}
-function convertFormDataToBodyData(formData, options) {
-  const form = /* @__PURE__ */ Object.create(null);
-  const nestingState = { count: 0 };
-  formData.forEach((value, key) => {
-    const shouldParseAllValues = options.all || key.endsWith("[]");
-    if (!shouldParseAllValues) {
-      form[key] = value;
-    } else {
-      handleParsingAllValues(form, key, value);
-    }
-  });
-  if (options.dot) {
-    Object.entries(form).forEach(([key, value]) => {
-      const shouldParseDotValues = key.includes(".");
-      if (shouldParseDotValues) {
-        handleParsingNestedValues(form, key, value, nestingState);
-        delete form[key];
-      }
-    });
-  }
-  return form;
-}
-var handleParsingAllValues = (form, key, value) => {
-  if (form[key] !== void 0) {
-    if (Array.isArray(form[key])) {
-      ;
-      form[key].push(value);
-    } else {
-      form[key] = [form[key], value];
-    }
-  } else {
-    if (!key.endsWith("[]")) {
-      form[key] = value;
-    } else {
-      form[key] = [value];
-    }
-  }
-};
-var handleParsingNestedValues = (form, key, value, state) => {
-  if (/(?:^|\.)__proto__\./.test(key)) {
-    return;
-  }
-  let nestedForm = form;
-  const keys = key.split(".", MAX_NESTING_DEPTH + 2);
-  if (keys.length > MAX_NESTING_DEPTH + 1) {
-    throwNestingLimitExceeded();
-  }
-  keys.forEach((key2, index) => {
-    if (index === keys.length - 1) {
-      nestedForm[key2] = value;
-    } else {
-      if (!nestedForm[key2] || typeof nestedForm[key2] !== "object" || Array.isArray(nestedForm[key2]) || nestedForm[key2] instanceof File) {
-        if (state.count++ >= MAX_NESTED_OBJECTS) {
-          throwNestingLimitExceeded();
-        }
-        nestedForm[key2] = /* @__PURE__ */ Object.create(null);
-      }
-      nestedForm = nestedForm[key2];
-    }
-  });
-};
-var throwNestingLimitExceeded = () => {
-  throw new Error("Nesting limit exceeded");
-};
-
-// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/utils/url.js
-var splitPath = (path) => {
-  const paths = path.split("/");
-  if (paths[0] === "") {
-    paths.shift();
-  }
-  return paths;
-};
-var splitRoutingPath = (routePath) => {
-  const { groups, path } = extractGroupsFromPath(routePath);
-  const paths = splitPath(path);
-  return replaceGroupMarks(paths, groups);
-};
-var extractGroupsFromPath = (path) => {
-  const groups = [];
-  path = path.replace(/\{[^}]+\}/g, (match2, index) => {
-    const mark = `@${index}`;
-    groups.push([mark, match2]);
-    return mark;
-  });
-  return { groups, path };
-};
-var replaceGroupMarks = (paths, groups) => {
-  for (let i = groups.length - 1; i >= 0; i--) {
-    const [mark] = groups[i];
-    for (let j = paths.length - 1; j >= 0; j--) {
-      if (paths[j].includes(mark)) {
-        paths[j] = paths[j].replace(mark, groups[i][1]);
-        break;
-      }
-    }
-  }
-  return paths;
-};
-var patternCache = {};
-var getPattern = (label, next) => {
-  if (label === "*") {
-    return "*";
-  }
-  const match2 = label.match(/^\:([^\{\}]+)(?:\{(.+)\})?$/);
-  if (match2) {
-    const cacheKey = `${label}#${next}`;
-    if (!patternCache[cacheKey]) {
-      if (match2[2]) {
-        patternCache[cacheKey] = next && next[0] !== ":" && next[0] !== "*" ? [cacheKey, match2[1], new RegExp(`^${match2[2]}(?=/${next})`)] : [label, match2[1], new RegExp(`^${match2[2]}$`)];
-      } else {
-        patternCache[cacheKey] = [label, match2[1], true];
-      }
-    }
-    return patternCache[cacheKey];
-  }
-  return null;
-};
-var tryDecode = (str, decoder) => {
-  try {
-    return decoder(str);
-  } catch {
-    return str.replace(/(?:%[0-9A-Fa-f]{2})+/g, (match2) => {
-      try {
-        return decoder(match2);
-      } catch {
-        return match2;
-      }
-    });
-  }
-};
-var tryDecodeURI = (str) => tryDecode(str, decodeURI);
-var getPath = (request) => {
-  const url = request.url;
-  const start = url.indexOf("/", url.indexOf(":") + 4);
-  let i = start;
-  for (; i < url.length; i++) {
-    const charCode = url.charCodeAt(i);
-    if (charCode === 37) {
-      const queryIndex = url.indexOf("?", i);
-      const hashIndex = url.indexOf("#", i);
-      const end = queryIndex === -1 ? hashIndex === -1 ? void 0 : hashIndex : hashIndex === -1 ? queryIndex : Math.min(queryIndex, hashIndex);
-      const path = url.slice(start, end);
-      return tryDecodeURI(path.includes("%25") ? path.replace(/%25/g, "%2525") : path);
-    } else if (charCode === 63 || charCode === 35) {
-      break;
-    }
-  }
-  return url.slice(start, i);
-};
-var getPathNoStrict = (request) => {
-  const result = getPath(request);
-  return result.length > 1 && result.at(-1) === "/" ? result.slice(0, -1) : result;
-};
-var mergePath = (base, sub, ...rest) => {
-  if (rest.length) {
-    sub = mergePath(sub, ...rest);
-  }
-  return `${base?.[0] === "/" ? "" : "/"}${base}${sub === "/" ? "" : `${base?.at(-1) === "/" ? "" : "/"}${sub?.[0] === "/" ? sub.slice(1) : sub}`}`;
-};
-var checkOptionalParameter = (path) => {
-  if (path.charCodeAt(path.length - 1) !== 63 || !path.includes(":")) {
-    return null;
-  }
-  const segments = path.split("/");
-  const results = [];
-  let basePath = "";
-  segments.forEach((segment) => {
-    if (segment !== "" && !/\:/.test(segment)) {
-      basePath += "/" + segment;
-    } else if (/\:/.test(segment)) {
-      if (segment.charCodeAt(segment.length - 1) === 63) {
-        if (results.length === 0 && basePath === "") {
-          results.push("/");
-        } else {
-          results.push(basePath);
-        }
-        const optionalSegment = segment.slice(0, -1);
-        basePath += "/" + optionalSegment;
-        results.push(basePath);
-      } else {
-        basePath += "/" + segment;
-      }
-    }
-  });
-  return results.filter((v2, i, a2) => a2.indexOf(v2) === i);
-};
-var tryDecodeURIComponent = (str) => str.indexOf("%") !== -1 ? tryDecode(str, decodeURIComponent_) : str;
-var _decodeURI = (value) => {
-  if (value.indexOf("+") !== -1) {
-    value = value.replace(/\+/g, " ");
-  }
-  return tryDecodeURIComponent(value);
-};
-var _getQueryParam = (url, key, multiple) => {
-  const hashIndex = url.indexOf("#", 8);
-  if (hashIndex !== -1) {
-    url = url.slice(0, hashIndex);
-  }
-  let encoded;
-  if (!multiple && key && key.indexOf("%") === -1 && key.indexOf("+") === -1) {
-    let keyIndex2 = url.indexOf("?", 8);
-    if (keyIndex2 === -1) {
-      return void 0;
-    }
-    if (!url.startsWith(key, keyIndex2 + 1)) {
-      keyIndex2 = url.indexOf(`&${key}`, keyIndex2 + 1);
-    }
-    while (keyIndex2 !== -1) {
-      const trailingKeyCode = url.charCodeAt(keyIndex2 + key.length + 1);
-      if (trailingKeyCode === 61) {
-        const valueIndex = keyIndex2 + key.length + 2;
-        const endIndex = url.indexOf("&", valueIndex);
-        return _decodeURI(url.slice(valueIndex, endIndex === -1 ? void 0 : endIndex));
-      } else if (trailingKeyCode == 38 || isNaN(trailingKeyCode)) {
-        return "";
-      }
-      keyIndex2 = url.indexOf(`&${key}`, keyIndex2 + 1);
-    }
-    encoded = /[%+]/.test(url);
-    if (!encoded) {
-      return void 0;
-    }
-  }
-  const results = /* @__PURE__ */ Object.create(null);
-  encoded ??= /[%+]/.test(url);
-  let keyIndex = url.indexOf("?", 8);
-  while (keyIndex !== -1) {
-    const nextKeyIndex = url.indexOf("&", keyIndex + 1);
-    let valueIndex = url.indexOf("=", keyIndex);
-    if (valueIndex > nextKeyIndex && nextKeyIndex !== -1) {
-      valueIndex = -1;
-    }
-    let name = url.slice(
-      keyIndex + 1,
-      valueIndex === -1 ? nextKeyIndex === -1 ? void 0 : nextKeyIndex : valueIndex
-    );
-    if (encoded) {
-      name = _decodeURI(name);
-    }
-    keyIndex = nextKeyIndex;
-    if (name === "") {
-      continue;
-    }
-    let value;
-    if (valueIndex === -1) {
-      value = "";
-    } else {
-      value = url.slice(valueIndex + 1, nextKeyIndex === -1 ? void 0 : nextKeyIndex);
-      if (encoded) {
-        value = _decodeURI(value);
-      }
-    }
-    if (multiple) {
-      if (!(results[name] && Array.isArray(results[name]))) {
-        results[name] = [];
-      }
-      ;
-      results[name].push(value);
-    } else {
-      results[name] ??= value;
-    }
-  }
-  return key ? results[key] : results;
-};
-var getQueryParam = _getQueryParam;
-var getQueryParams = (url, key) => {
-  return _getQueryParam(url, key, true);
-};
-var decodeURIComponent_ = decodeURIComponent;
-
-// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/request.js
-var HonoRequest = class {
-  /**
-   * `.raw` can get the raw Request object.
-   *
-   * @see {@link https://hono.dev/docs/api/request#raw}
-   *
-   * @example
-   * ```ts
-   * // For Cloudflare Workers
-   * app.post('/', async (c) => {
-   *   const metadata = c.req.raw.cf?.hostMetadata?
-   *   ...
-   * })
-   * ```
-   */
-  raw;
-  #validatedData;
-  // Short name of validatedData
-  #matchResult;
-  routeIndex = 0;
-  /**
-   * `.path` can get the pathname of the request.
-   *
-   * @see {@link https://hono.dev/docs/api/request#path}
-   *
-   * @example
-   * ```ts
-   * app.get('/about/me', (c) => {
-   *   const pathname = c.req.path // `/about/me`
-   * })
-   * ```
-   */
-  path;
-  bodyCache = {};
-  constructor(request, path = "/", matchResult = [[]]) {
-    this.raw = request;
-    this.path = path;
-    this.#matchResult = matchResult;
-  }
-  param(key) {
-    return key ? this.#getDecodedParam(key) : this.#getAllDecodedParams();
-  }
-  #getDecodedParam(key) {
-    const paramKey = this.#matchResult[0][this.routeIndex]?.[1][key];
-    const param = this.#getParamValue(paramKey);
-    return param && tryDecodeURIComponent(param);
-  }
-  #getAllDecodedParams() {
-    const decoded = {};
-    const keys = Object.keys(this.#matchResult[0][this.routeIndex]?.[1] ?? {});
-    for (const key of keys) {
-      const value = this.#getParamValue(this.#matchResult[0][this.routeIndex][1][key]);
-      if (value !== void 0) {
-        decoded[key] = tryDecodeURIComponent(value);
-      }
-    }
-    return decoded;
-  }
-  #getParamValue(paramKey) {
-    return this.#matchResult[1] ? this.#matchResult[1][paramKey] : paramKey;
-  }
-  query(key) {
-    return getQueryParam(this.url, key);
-  }
-  queries(key) {
-    return getQueryParams(this.url, key);
-  }
-  header(name) {
-    if (name) {
-      return this.raw.headers.get(name) ?? void 0;
-    }
-    const headerData = /* @__PURE__ */ Object.create(null);
-    this.raw.headers.forEach((value, key) => {
-      headerData[key] = value;
-    });
-    return headerData;
-  }
-  async parseBody(options) {
-    return parseBody(this, options);
-  }
-  #cachedBody = (key) => {
-    const { bodyCache, raw: raw2 } = this;
-    const cachedBody = bodyCache[key];
-    if (cachedBody) {
-      return cachedBody;
-    }
-    for (const anyCachedKey in bodyCache) {
-      return bodyCache[anyCachedKey].then((body) => {
-        if (anyCachedKey === "json") {
-          body = JSON.stringify(body);
-        }
-        return new Response(body)[key]();
-      });
-    }
-    return bodyCache[key] = raw2[key]();
-  };
-  /**
-   * `.json()` can parse Request body of type `application/json`
-   *
-   * @see {@link https://hono.dev/docs/api/request#json}
-   *
-   * @example
-   * ```ts
-   * app.post('/entry', async (c) => {
-   *   const body = await c.req.json()
-   * })
-   * ```
-   */
-  json() {
-    return this.#cachedBody("text").then((text) => JSON.parse(text));
-  }
-  /**
-   * `.text()` can parse Request body of type `text/plain`
-   *
-   * @see {@link https://hono.dev/docs/api/request#text}
-   *
-   * @example
-   * ```ts
-   * app.post('/entry', async (c) => {
-   *   const body = await c.req.text()
-   * })
-   * ```
-   */
-  text() {
-    return this.#cachedBody("text");
-  }
-  /**
-   * `.arrayBuffer()` parse Request body as an `ArrayBuffer`
-   *
-   * @see {@link https://hono.dev/docs/api/request#arraybuffer}
-   *
-   * @example
-   * ```ts
-   * app.post('/entry', async (c) => {
-   *   const body = await c.req.arrayBuffer()
-   * })
-   * ```
-   */
-  arrayBuffer() {
-    return this.#cachedBody("arrayBuffer");
-  }
-  /**
-   * `.bytes()` parses the request body as a `Uint8Array`.
-   *
-   * @see {@link https://hono.dev/docs/api/request#bytes}
-   *
-   * @example
-   * ```ts
-   * app.post('/entry', async (c) => {
-   *   const body = await c.req.bytes()
-   * })
-   * ```
-   */
-  bytes() {
-    return this.#cachedBody("arrayBuffer").then((buffer) => new Uint8Array(buffer));
-  }
-  /**
-   * Parses the request body as a `Blob`.
-   * @example
-   * ```ts
-   * app.post('/entry', async (c) => {
-   *   const body = await c.req.blob();
-   * });
-   * ```
-   * @see https://hono.dev/docs/api/request#blob
-   */
-  blob() {
-    return this.#cachedBody("blob");
-  }
-  /**
-   * Parses the request body as `FormData`.
-   * @example
-   * ```ts
-   * app.post('/entry', async (c) => {
-   *   const body = await c.req.formData();
-   * });
-   * ```
-   * @see https://hono.dev/docs/api/request#formdata
-   */
-  formData() {
-    return this.#cachedBody("formData");
-  }
-  /**
-   * Adds validated data to the request.
-   *
-   * @param target - The target of the validation.
-   * @param data - The validated data to add.
-   */
-  addValidatedData(target, data) {
-    ;
-    (this.#validatedData ??= {})[target] = data;
-  }
-  valid(target) {
-    return this.#validatedData?.[target];
-  }
-  /**
-   * `.url()` can get the request url strings.
-   *
-   * @see {@link https://hono.dev/docs/api/request#url}
-   *
-   * @example
-   * ```ts
-   * app.get('/about/me', (c) => {
-   *   const url = c.req.url // `http://localhost:8787/about/me`
-   *   ...
-   * })
-   * ```
-   */
-  get url() {
-    return this.raw.url;
-  }
-  /**
-   * `.method()` can get the method name of the request.
-   *
-   * @see {@link https://hono.dev/docs/api/request#method}
-   *
-   * @example
-   * ```ts
-   * app.get('/about/me', (c) => {
-   *   const method = c.req.method // `GET`
-   * })
-   * ```
-   */
-  get method() {
-    return this.raw.method;
-  }
-  get [GET_MATCH_RESULT]() {
-    return this.#matchResult;
-  }
-  /**
-   * `.matchedRoutes()` can return a matched route in the handler
-   *
-   * @deprecated
-   *
-   * Use matchedRoutes helper defined in "hono/route" instead.
-   *
-   * @see {@link https://hono.dev/docs/api/request#matchedroutes}
-   *
-   * @example
-   * ```ts
-   * app.use('*', async function logger(c, next) {
-   *   await next()
-   *   c.req.matchedRoutes.forEach(({ handler, method, path }, i) => {
-   *     const name = handler.name || (handler.length < 2 ? '[handler]' : '[middleware]')
-   *     console.log(
-   *       method,
-   *       ' ',
-   *       path,
-   *       ' '.repeat(Math.max(10 - path.length, 0)),
-   *       name,
-   *       i === c.req.routeIndex ? '<- respond from here' : ''
-   *     )
-   *   })
-   * })
-   * ```
-   */
-  get matchedRoutes() {
-    return this.#matchResult[0].map(([[, route]]) => route);
-  }
-  /**
-   * `routePath()` can retrieve the path registered within the handler
-   *
-   * @deprecated
-   *
-   * Use routePath helper defined in "hono/route" instead.
-   *
-   * @see {@link https://hono.dev/docs/api/request#routepath}
-   *
-   * @example
-   * ```ts
-   * app.get('/posts/:id', (c) => {
-   *   return c.json({ path: c.req.routePath })
-   * })
-   * ```
-   */
-  get routePath() {
-    return this.#matchResult[0].map(([[, route]]) => route)[this.routeIndex].path;
-  }
-};
-
-// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/utils/html.js
-var HtmlEscapedCallbackPhase = {
-  Stringify: 1,
-  BeforeStream: 2,
-  Stream: 3
-};
-var raw = (value, callbacks) => {
-  const escapedString = new String(value);
-  escapedString.isEscaped = true;
-  escapedString.callbacks = callbacks;
-  return escapedString;
-};
-var resolveCallback = async (str, phase, preserveCallbacks, context, buffer) => {
-  if (typeof str === "object" && !(str instanceof String)) {
-    if (!(str instanceof Promise)) {
-      str = str.toString();
-    }
-    if (str instanceof Promise) {
-      str = await str;
-    }
-  }
-  const callbacks = str.callbacks;
-  if (!callbacks?.length) {
-    return Promise.resolve(str);
-  }
-  if (buffer) {
-    buffer[0] += str;
-  } else {
-    buffer = [str];
-  }
-  const resStr = Promise.all(callbacks.map((c) => c({ phase, buffer, context }))).then(
-    (res) => Promise.all(
-      res.filter(Boolean).map((str2) => resolveCallback(str2, phase, false, context, buffer))
-    ).then(() => buffer[0])
-  );
-  if (preserveCallbacks) {
-    return raw(await resStr, callbacks);
-  } else {
-    return resStr;
-  }
-};
-
-// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/context.js
-var TEXT_PLAIN = "text/plain; charset=UTF-8";
-var setDefaultContentType = (contentType, headers) => {
-  return {
-    "Content-Type": contentType,
-    ...headers
-  };
-};
-var createResponseInstance = (body, init) => new Response(body, init);
-var Context = class {
-  #rawRequest;
-  #req;
-  /**
-   * `.env` can get bindings (environment variables, secrets, KV namespaces, D1 database, R2 bucket etc.) in Cloudflare Workers.
-   *
-   * @see {@link https://hono.dev/docs/api/context#env}
-   *
-   * @example
-   * ```ts
-   * // Environment object for Cloudflare Workers
-   * app.get('*', async c => {
-   *   const counter = c.env.COUNTER
-   * })
-   * ```
-   */
-  env = {};
-  #var;
-  finalized = false;
-  /**
-   * `.error` can get the error object from the middleware if the Handler throws an error.
-   *
-   * @see {@link https://hono.dev/docs/api/context#error}
-   *
-   * @example
-   * ```ts
-   * app.use('*', async (c, next) => {
-   *   await next()
-   *   if (c.error) {
-   *     // do something...
-   *   }
-   * })
-   * ```
-   */
-  error;
-  #status;
-  #executionCtx;
-  #res;
-  #layout;
-  #renderer;
-  #notFoundHandler;
-  #preparedHeaders;
-  #matchResult;
-  #path;
-  /**
-   * Creates an instance of the Context class.
-   *
-   * @param req - The Request object.
-   * @param options - Optional configuration options for the context.
-   */
-  constructor(req, options) {
-    this.#rawRequest = req;
-    if (options) {
-      this.#executionCtx = options.executionCtx;
-      this.env = options.env;
-      this.#notFoundHandler = options.notFoundHandler;
-      this.#path = options.path;
-      this.#matchResult = options.matchResult;
-    }
-  }
-  /**
-   * `.req` is the instance of {@link HonoRequest}.
-   */
-  get req() {
-    this.#req ??= new HonoRequest(this.#rawRequest, this.#path, this.#matchResult);
-    return this.#req;
-  }
-  /**
-   * @see {@link https://hono.dev/docs/api/context#event}
-   * The FetchEvent associated with the current request.
-   *
-   * @throws Will throw an error if the context does not have a FetchEvent.
-   */
-  get event() {
-    if (this.#executionCtx && "respondWith" in this.#executionCtx) {
-      return this.#executionCtx;
-    } else {
-      throw Error("This context has no FetchEvent");
-    }
-  }
-  /**
-   * @see {@link https://hono.dev/docs/api/context#executionctx}
-   * The ExecutionContext associated with the current request.
-   *
-   * @throws Will throw an error if the context does not have an ExecutionContext.
-   */
-  get executionCtx() {
-    if (this.#executionCtx) {
-      return this.#executionCtx;
-    } else {
-      throw Error("This context has no ExecutionContext");
-    }
-  }
-  /**
-   * @see {@link https://hono.dev/docs/api/context#res}
-   * The Response object for the current request.
-   */
-  get res() {
-    return this.#res ||= createResponseInstance(null, {
-      headers: this.#preparedHeaders ??= new Headers()
-    });
-  }
-  /**
-   * Sets the Response object for the current request.
-   *
-   * @param _res - The Response object to set.
-   */
-  set res(_res) {
-    if (this.#res && _res) {
-      _res = createResponseInstance(_res.body, _res);
-      for (const [k, v2] of this.#res.headers.entries()) {
-        if (k === "content-type") {
-          continue;
-        }
-        if (k === "set-cookie") {
-          const cookies = this.#res.headers.getSetCookie();
-          _res.headers.delete("set-cookie");
-          for (const cookie of cookies) {
-            _res.headers.append("set-cookie", cookie);
-          }
-        } else {
-          _res.headers.set(k, v2);
-        }
-      }
-    }
-    this.#res = _res;
-    this.finalized = true;
-  }
-  /**
-   * `.render()` can create a response within a layout.
-   *
-   * @see {@link https://hono.dev/docs/api/context#render-setrenderer}
-   *
-   * @example
-   * ```ts
-   * app.get('/', (c) => {
-   *   return c.render('Hello!')
-   * })
-   * ```
-   */
-  render = (...args) => {
-    this.#renderer ??= (content) => this.html(content);
-    return this.#renderer(...args);
-  };
-  /**
-   * Sets the layout for the response.
-   *
-   * @param layout - The layout to set.
-   * @returns The layout function.
-   */
-  setLayout = (layout) => this.#layout = layout;
-  /**
-   * Gets the current layout for the response.
-   *
-   * @returns The current layout function.
-   */
-  getLayout = () => this.#layout;
-  /**
-   * `.setRenderer()` can set the layout in the custom middleware.
-   *
-   * @see {@link https://hono.dev/docs/api/context#render-setrenderer}
-   *
-   * @example
-   * ```tsx
-   * app.use('*', async (c, next) => {
-   *   c.setRenderer((content) => {
-   *     return c.html(
-   *       <html>
-   *         <body>
-   *           <p>{content}</p>
-   *         </body>
-   *       </html>
-   *     )
-   *   })
-   *   await next()
-   * })
-   * ```
-   */
-  setRenderer = (renderer) => {
-    this.#renderer = renderer;
-  };
-  /**
-   * `.header()` can set headers.
-   *
-   * @see {@link https://hono.dev/docs/api/context#header}
-   *
-   * @example
-   * ```ts
-   * app.get('/welcome', (c) => {
-   *   // Set headers
-   *   c.header('X-Message', 'Hello!')
-   *   c.header('Content-Type', 'text/plain')
-   *
-   *   // Append multiple headers using the append option (e.g. Vary)
-   *   c.header('Vary', 'Accept-Encoding', { append: true })
-   *   c.header('Vary', 'User-Agent', { append: true })
-   *
-   *   return c.body('Thank you for coming')
-   * })
-   * ```
-   */
-  header = (name, value, options) => {
-    if (this.finalized) {
-      this.#res = createResponseInstance(this.#res.body, this.#res);
-    }
-    const headers = this.#res ? this.#res.headers : this.#preparedHeaders ??= new Headers();
-    if (value === void 0) {
-      headers.delete(name);
-    } else if (options?.append) {
-      headers.append(name, value);
-    } else {
-      headers.set(name, value);
-    }
-  };
-  status = (status) => {
-    this.#status = status;
-  };
-  /**
-   * `.set()` can set the value specified by the key.
-   *
-   * @see {@link https://hono.dev/docs/api/context#set-get}
-   *
-   * @example
-   * ```ts
-   * app.use('*', async (c, next) => {
-   *   c.set('message', 'Hono is hot!!')
-   *   await next()
-   * })
-   * ```
-   */
-  set = (key, value) => {
-    this.#var ??= /* @__PURE__ */ new Map();
-    this.#var.set(key, value);
-  };
-  /**
-   * `.get()` can use the value specified by the key.
-   *
-   * @see {@link https://hono.dev/docs/api/context#set-get}
-   *
-   * @example
-   * ```ts
-   * app.get('/', (c) => {
-   *   const message = c.get('message')
-   *   return c.text(`The message is "${message}"`)
-   * })
-   * ```
-   */
-  get = (key) => {
-    return this.#var ? this.#var.get(key) : void 0;
-  };
-  /**
-   * `.var` can access the value of a variable.
-   *
-   * @see {@link https://hono.dev/docs/api/context#var}
-   *
-   * @example
-   * ```ts
-   * const result = c.var.client.oneMethod()
-   * ```
-   */
-  // c.var.propName is a read-only
-  get var() {
-    if (!this.#var) {
-      return {};
-    }
-    return Object.fromEntries(this.#var);
-  }
-  #newResponse(data, arg, headers) {
-    let responseHeaders = this.#res ? new Headers(this.#res.headers) : this.#preparedHeaders;
-    if (typeof arg === "object" && arg.headers) {
-      responseHeaders ??= new Headers();
-      for (const [key, value] of new Headers(arg.headers)) {
-        if (key === "set-cookie") {
-          responseHeaders.append(key, value);
-        } else {
-          responseHeaders.set(key, value);
-        }
-      }
-    }
-    if (headers) {
-      if (!responseHeaders) {
-        let count = 0;
-        for (const k in headers) {
-          if (++count > 1 || typeof headers[k] !== "string") {
-            responseHeaders = new Headers();
-            break;
-          }
-        }
-      }
-      if (responseHeaders) {
-        for (const k in headers) {
-          const v2 = headers[k];
-          if (typeof v2 === "string") {
-            responseHeaders.set(k, v2);
-          } else {
-            responseHeaders.delete(k);
-            for (const v22 of v2) {
-              responseHeaders.append(k, v22);
-            }
-          }
-        }
-      }
-    }
-    const status = typeof arg === "number" ? arg : arg?.status ?? this.#status;
-    return createResponseInstance(data, {
-      status,
-      headers: responseHeaders ?? headers
-    });
-  }
-  newResponse = (...args) => this.#newResponse(...args);
-  /**
-   * `.body()` can return the HTTP response.
-   * You can set headers with `.header()` and set HTTP status code with `.status`.
-   * This can also be set in `.text()`, `.json()` and so on.
-   *
-   * @see {@link https://hono.dev/docs/api/context#body}
-   *
-   * @example
-   * ```ts
-   * app.get('/welcome', (c) => {
-   *   // Set headers
-   *   c.header('X-Message', 'Hello!')
-   *   c.header('Content-Type', 'text/plain')
-   *   // Set HTTP status code
-   *   c.status(201)
-   *
-   *   // Return the response body
-   *   return c.body('Thank you for coming')
-   * })
-   * ```
-   */
-  body = (data, arg, headers) => this.#newResponse(data, arg, headers);
-  /**
-   * `.text()` can render text as `Content-Type:text/plain`.
-   *
-   * @see {@link https://hono.dev/docs/api/context#text}
-   *
-   * @example
-   * ```ts
-   * app.get('/say', (c) => {
-   *   return c.text('Hello!')
-   * })
-   * ```
-   */
-  text = (text, arg, headers) => {
-    return !this.#preparedHeaders && !this.#status && !arg && !headers && !this.finalized ? new Response(text) : this.#newResponse(
-      text,
-      arg,
-      setDefaultContentType(TEXT_PLAIN, headers)
-    );
-  };
-  /**
-   * `.json()` can render JSON as `Content-Type:application/json`.
-   *
-   * @see {@link https://hono.dev/docs/api/context#json}
-   *
-   * @example
-   * ```ts
-   * app.get('/api', (c) => {
-   *   return c.json({ message: 'Hello!' })
-   * })
-   * ```
-   */
-  json = (object, arg, headers) => {
-    return this.#newResponse(
-      JSON.stringify(object),
-      arg,
-      setDefaultContentType("application/json", headers)
-    );
-  };
-  html = (html, arg, headers) => {
-    const res = (html2) => this.#newResponse(html2, arg, setDefaultContentType("text/html; charset=UTF-8", headers));
-    return typeof html === "object" ? resolveCallback(html, HtmlEscapedCallbackPhase.Stringify, false, {}).then(res) : res(html);
-  };
-  /**
-   * `.redirect()` can Redirect, default status code is 302.
-   *
-   * @see {@link https://hono.dev/docs/api/context#redirect}
-   *
-   * @example
-   * ```ts
-   * app.get('/redirect', (c) => {
-   *   return c.redirect('/')
-   * })
-   * app.get('/redirect-permanently', (c) => {
-   *   return c.redirect('/', 301)
-   * })
-   * ```
-   */
-  redirect = (location, status) => {
-    const locationString = String(location);
-    this.header(
-      "Location",
-      // Multibyes should be encoded
-      // eslint-disable-next-line no-control-regex
-      !/[^\x00-\xFF]/.test(locationString) ? locationString : encodeURI(locationString)
-    );
-    return this.newResponse(null, status ?? 302);
-  };
-  /**
-   * `.notFound()` can return the Not Found Response.
-   *
-   * @see {@link https://hono.dev/docs/api/context#notfound}
-   *
-   * @example
-   * ```ts
-   * app.get('/notfound', (c) => {
-   *   return c.notFound()
-   * })
-   * ```
-   */
-  notFound = () => {
-    this.#notFoundHandler ??= () => createResponseInstance();
-    return this.#notFoundHandler(this);
-  };
-};
-
-// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/router.js
-var METHOD_NAME_ALL = "ALL";
-var METHOD_NAME_ALL_LOWERCASE = "all";
-var METHODS = ["get", "post", "put", "delete", "options", "patch", "query"];
-var MESSAGE_MATCHER_IS_ALREADY_BUILT = "Can not add a route since the matcher is already built.";
-var UnsupportedPathError = class extends Error {
-};
-
-// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/utils/constants.js
-var COMPOSED_HANDLER = "__COMPOSED_HANDLER";
-
-// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/hono-base.js
-var notFoundHandler = (c) => {
-  return c.text("404 Not Found", 404);
-};
-var errorHandler = (err3, c) => {
-  if ("getResponse" in err3) {
-    const res = err3.getResponse();
-    return c.newResponse(res.body, res);
-  }
-  console.error(err3);
-  return c.text("Internal Server Error", 500);
-};
-var Hono = class _Hono {
-  get;
-  post;
-  put;
-  delete;
-  options;
-  patch;
-  query;
-  all;
-  on;
-  use;
-  /*
-    This class is like an abstract class and does not have a router.
-    To use it, inherit the class and implement router in the constructor.
-  */
-  router;
-  getPath;
-  // Cannot use `#` because it requires visibility at JavaScript runtime.
-  _basePath = "/";
-  #path = "/";
-  routes = [];
-  constructor(options = {}) {
-    const allMethods = [...METHODS, METHOD_NAME_ALL_LOWERCASE];
-    allMethods.forEach((method) => {
-      this[method] = (args1, ...args) => {
-        if (typeof args1 === "string") {
-          this.#path = args1;
-        } else {
-          this.#addRoute(method, this.#path, args1);
-        }
-        args.forEach((handler2) => {
-          this.#addRoute(method, this.#path, handler2);
-        });
-        return this;
-      };
-    });
-    this.on = (method, path, ...handlers) => {
-      for (const p2 of [path].flat()) {
-        this.#path = p2;
-        for (const m2 of [method].flat()) {
-          handlers.map((handler2) => {
-            this.#addRoute(m2.toUpperCase(), this.#path, handler2);
-          });
-        }
-      }
-      return this;
-    };
-    this.use = (arg1, ...handlers) => {
-      if (typeof arg1 === "string") {
-        this.#path = arg1;
-      } else {
-        this.#path = "*";
-        handlers.unshift(arg1);
-      }
-      handlers.forEach((handler2) => {
-        this.#addRoute(METHOD_NAME_ALL, this.#path, handler2);
-      });
-      return this;
-    };
-    const { strict: strict2, ...optionsWithoutStrict } = options;
-    Object.assign(this, optionsWithoutStrict);
-    this.getPath = strict2 ?? true ? options.getPath ?? getPath : getPathNoStrict;
-  }
-  #clone() {
-    const clone = new _Hono({
-      router: this.router,
-      getPath: this.getPath
-    });
-    clone.errorHandler = this.errorHandler;
-    clone.#notFoundHandler = this.#notFoundHandler;
-    clone.routes = this.routes;
-    return clone;
-  }
-  #notFoundHandler = notFoundHandler;
-  // Cannot use `#` because it requires visibility at JavaScript runtime.
-  errorHandler = errorHandler;
-  /**
-   * `.route()` allows grouping other Hono instance in routes.
-   *
-   * @see {@link https://hono.dev/docs/api/routing#grouping}
-   *
-   * @param {string} path - base Path
-   * @param {Hono} app - other Hono instance
-   * @returns {Hono} routed Hono instance
-   *
-   * @example
-   * ```ts
-   * const app = new Hono()
-   * const app2 = new Hono()
-   *
-   * app2.get("/user", (c) => c.text("user"))
-   * app.route("/api", app2) // GET /api/user
-   * ```
-   */
-  route(path, app2) {
-    const subApp = this.basePath(path);
-    app2.routes.map((r) => {
-      let handler2;
-      if (app2.errorHandler === errorHandler) {
-        handler2 = r.handler;
-      } else {
-        handler2 = async (c, next) => (await compose([], app2.errorHandler)(c, () => r.handler(c, next))).res;
-        handler2[COMPOSED_HANDLER] = r.handler;
-      }
-      subApp.#addRoute(r.method, r.path, handler2, r.basePath);
-    });
-    return this;
-  }
-  /**
-   * `.basePath()` allows base paths to be specified.
-   *
-   * @see {@link https://hono.dev/docs/api/routing#base-path}
-   *
-   * @param {string} path - base Path
-   * @returns {Hono} changed Hono instance
-   *
-   * @example
-   * ```ts
-   * const api = new Hono().basePath('/api')
-   * ```
-   */
-  basePath(path) {
-    const subApp = this.#clone();
-    subApp._basePath = mergePath(this._basePath, path);
-    return subApp;
-  }
-  /**
-   * `.onError()` handles an error and returns a customized Response.
-   *
-   * @see {@link https://hono.dev/docs/api/hono#error-handling}
-   *
-   * @param {ErrorHandler} handler - request Handler for error
-   * @returns {Hono} changed Hono instance
-   *
-   * @example
-   * ```ts
-   * app.onError((err, c) => {
-   *   console.error(`${err}`)
-   *   return c.text('Custom Error Message', 500)
-   * })
-   * ```
-   */
-  onError = (handler2) => {
-    this.errorHandler = handler2;
-    return this;
-  };
-  /**
-   * `.notFound()` allows you to customize a Not Found Response.
-   *
-   * @see {@link https://hono.dev/docs/api/hono#not-found}
-   *
-   * @param {NotFoundHandler} handler - request handler for not-found
-   * @returns {Hono} changed Hono instance
-   *
-   * @example
-   * ```ts
-   * app.notFound((c) => {
-   *   return c.text('Custom 404 Message', 404)
-   * })
-   * ```
-   */
-  notFound = (handler2) => {
-    this.#notFoundHandler = handler2;
-    return this;
-  };
-  /**
-   * `.mount()` allows you to mount applications built with other frameworks into your Hono application.
-   *
-   * @see {@link https://hono.dev/docs/api/hono#mount}
-   *
-   * @param {string} path - base Path
-   * @param {Function} applicationHandler - other Request Handler
-   * @param {MountOptions} [options] - options of `.mount()`
-   * @returns {Hono} mounted Hono instance
-   *
-   * @example
-   * ```ts
-   * import { Router as IttyRouter } from 'itty-router'
-   * import { Hono } from 'hono'
-   * // Create itty-router application
-   * const ittyRouter = IttyRouter()
-   * // GET /itty-router/hello
-   * ittyRouter.get('/hello', () => new Response('Hello from itty-router'))
-   *
-   * const app = new Hono()
-   * app.mount('/itty-router', ittyRouter.handle)
-   * ```
-   *
-   * @example
-   * ```ts
-   * const app = new Hono()
-   * // Send the request to another application without modification.
-   * app.mount('/app', anotherApp, {
-   *   replaceRequest: (req) => req,
-   * })
-   * ```
-   */
-  mount(path, applicationHandler, options) {
-    let replaceRequest;
-    let optionHandler;
-    if (options) {
-      if (typeof options === "function") {
-        optionHandler = options;
-      } else {
-        optionHandler = options.optionHandler;
-        if (options.replaceRequest === false) {
-          replaceRequest = (request) => request;
-        } else {
-          replaceRequest = options.replaceRequest;
-        }
-      }
-    }
-    const getOptions = optionHandler ? (c) => {
-      const options2 = optionHandler(c);
-      return Array.isArray(options2) ? options2 : [options2];
-    } : (c) => {
-      let executionContext = void 0;
-      try {
-        executionContext = c.executionCtx;
-      } catch {
-      }
-      return [c.env, executionContext];
-    };
-    replaceRequest ||= (() => {
-      const mergedPath = mergePath(this._basePath, path);
-      const pathPrefixLength = mergedPath === "/" ? 0 : mergedPath.length;
-      return (request) => {
-        const url = new URL(request.url);
-        url.pathname = this.getPath(request).slice(pathPrefixLength) || "/";
-        return new Request(url, request);
-      };
-    })();
-    const handler2 = async (c, next) => {
-      const res = await applicationHandler(replaceRequest(c.req.raw), ...getOptions(c));
-      if (res) {
-        return res;
-      }
-      await next();
-    };
-    this.#addRoute(METHOD_NAME_ALL, mergePath(path, "*"), handler2);
-    return this;
-  }
-  #addRoute(method, path, handler2, baseRoutePath) {
-    method = method.toUpperCase();
-    path = mergePath(this._basePath, path);
-    const r = {
-      basePath: baseRoutePath !== void 0 ? mergePath(this._basePath, baseRoutePath) : this._basePath,
-      path,
-      method,
-      handler: handler2
-    };
-    this.router.add(method, path, [handler2, r]);
-    this.routes.push(r);
-  }
-  #handleError(err3, c) {
-    if (err3 instanceof Error) {
-      return this.errorHandler(err3, c);
-    }
-    throw err3;
-  }
-  #dispatch(request, executionCtx, env2, method) {
-    if (method === "HEAD") {
-      return (async () => new Response(null, await this.#dispatch(request, executionCtx, env2, "GET")))();
-    }
-    const path = this.getPath(request, { env: env2 });
-    const matchResult = this.router.match(method, path);
-    const c = new Context(request, {
-      path,
-      matchResult,
-      env: env2,
-      executionCtx,
-      notFoundHandler: this.#notFoundHandler
-    });
-    if (matchResult[0].length === 1) {
-      let res;
-      try {
-        res = matchResult[0][0][0][0](c, async () => {
-          c.res = await this.#notFoundHandler(c);
-        });
-      } catch (err3) {
-        return this.#handleError(err3, c);
-      }
-      return res instanceof Promise ? res.then(
-        (resolved) => resolved || (c.finalized ? c.res : this.#notFoundHandler(c))
-      ).catch((err3) => this.#handleError(err3, c)) : res ?? this.#notFoundHandler(c);
-    }
-    const composed = compose(matchResult[0], this.errorHandler, this.#notFoundHandler);
-    return (async () => {
-      try {
-        const context = await composed(c);
-        if (!context.finalized) {
-          throw new Error(
-            "Context is not finalized. Did you forget to return a Response object or `await next()`?"
-          );
-        }
-        return context.res;
-      } catch (err3) {
-        return this.#handleError(err3, c);
-      }
-    })();
-  }
-  /**
-   * `.fetch()` will be entry point of your app.
-   *
-   * @see {@link https://hono.dev/docs/api/hono#fetch}
-   *
-   * @param {Request} request - request Object of request
-   * @param {Env} env - env Object
-   * @param {ExecutionContext} executionCtx - context of execution
-   * @returns {Response | Promise<Response>} response of request
-   *
-   */
-  fetch = (request, ...rest) => {
-    return this.#dispatch(request, rest[1], rest[0], request.method);
-  };
-  /**
-   * `.request()` is a useful method for testing.
-   * You can pass a URL or pathname to send a GET request.
-   * app will return a Response object.
-   * ```ts
-   * test('GET /hello is ok', async () => {
-   *   const res = await app.request('/hello')
-   *   expect(res.status).toBe(200)
-   * })
-   * ```
-   * @see https://hono.dev/docs/api/hono#request
-   */
-  request = (input, requestInit, Env, executionCtx) => {
-    if (input instanceof Request) {
-      return this.fetch(requestInit ? new Request(input, requestInit) : input, Env, executionCtx);
-    }
-    input = input.toString();
-    return this.fetch(
-      new Request(
-        /^https?:\/\//.test(input) ? input : `http://localhost${mergePath("/", input)}`,
-        requestInit
-      ),
-      Env,
-      executionCtx
-    );
-  };
-  /**
-   * `.fire()` automatically adds a global fetch event listener.
-   * This can be useful for environments that adhere to the Service Worker API, such as non-ES module Cloudflare Workers.
-   * @deprecated
-   * Use `fire` from `hono/service-worker` instead.
-   * ```ts
-   * import { Hono } from 'hono'
-   * import { fire } from 'hono/service-worker'
-   *
-   * const app = new Hono()
-   * // ...
-   * fire(app)
-   * ```
-   * @see https://hono.dev/docs/api/hono#fire
-   * @see https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API
-   * @see https://developers.cloudflare.com/workers/reference/migrate-to-module-workers/
-   */
-  fire = () => {
-    addEventListener("fetch", (event) => {
-      event.respondWith(this.#dispatch(event.request, event, void 0, event.request.method));
-    });
-  };
-};
-
-// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/router/utils.js
-var createNullObject = () => /* @__PURE__ */ Object.create(null);
-
-// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/router/reg-exp-router/matcher.js
-var emptyParam = [];
-function match(method, path) {
-  const matchers = this.buildAllMatchers();
-  const match2 = ((method2, path2) => {
-    const matcher = matchers[method2] || matchers[METHOD_NAME_ALL];
-    const staticMatch = matcher[2][path2];
-    if (staticMatch) {
-      return staticMatch;
-    }
-    const match3 = path2.match(matcher[0]);
-    if (!match3) {
-      return [[], emptyParam];
-    }
-    const index = match3.indexOf("", 1);
-    return [matcher[1][index], match3];
-  });
-  this.match = match2;
-  return match2(method, path);
-}
-
-// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/router/reg-exp-router/node.js
-var LABEL_REG_EXP_STR = "[^/]+";
-var ONLY_WILDCARD_REG_EXP_STR = ".*";
-var TAIL_WILDCARD_REG_EXP_STR = "(?:|/.*)";
-var PATH_ERROR = /* @__PURE__ */ Symbol();
-var regExpMetaChars = new Set(".\\+*[^]$()");
-function compareKey(a2, b2) {
-  if (a2.length === 1) {
-    return b2.length === 1 ? a2 < b2 ? -1 : 1 : -1;
-  }
-  if (b2.length === 1) {
-    return 1;
-  }
-  if (a2 === ONLY_WILDCARD_REG_EXP_STR || a2 === TAIL_WILDCARD_REG_EXP_STR) {
-    return b2 === TAIL_WILDCARD_REG_EXP_STR ? -1 : 1;
-  } else if (b2 === ONLY_WILDCARD_REG_EXP_STR || b2 === TAIL_WILDCARD_REG_EXP_STR) {
-    return -1;
-  }
-  if (a2 === LABEL_REG_EXP_STR) {
-    return 1;
-  } else if (b2 === LABEL_REG_EXP_STR) {
-    return -1;
-  }
-  return a2.length === b2.length ? a2 < b2 ? -1 : 1 : b2.length - a2.length;
-}
-var Node = class _Node {
-  // handler index of a dynamic path, or -1 for a static path terminal
-  #index;
-  #varIndex;
-  #children = createNullObject();
-  insert(tokens, index, paramMap, context, isStatic) {
-    let node = this;
-    for (let i = 0, len = tokens.length; i < len; i++) {
-      const token = tokens[i];
-      const pattern = token.length === 1 ? token === "*" ? i === len - 1 ? ["", "", ONLY_WILDCARD_REG_EXP_STR] : ["", "", LABEL_REG_EXP_STR] : null : token === "/*" ? ["", "", TAIL_WILDCARD_REG_EXP_STR] : token.match(/^\:([^\{\}]+)(?:\{(.+)\})?$/);
-      let nextNode;
-      if (pattern) {
-        const name = pattern[1];
-        let regexpStr = pattern[2] || LABEL_REG_EXP_STR;
-        if (name && pattern[2]) {
-          if (regexpStr === ".*") {
-            throw PATH_ERROR;
-          }
-          regexpStr = regexpStr.replace(/^\((?!\?:)(?=[^)]+\)$)/, "(?:");
-          if (/\((?!\?:)/.test(regexpStr)) {
-            throw PATH_ERROR;
-          }
-          if (regexpStr.length === 1 && regExpMetaChars.has(regexpStr)) {
-            throw PATH_ERROR;
-          }
-        }
-        nextNode = node.#children[regexpStr];
-        if (!nextNode) {
-          if (regexpStr !== ONLY_WILDCARD_REG_EXP_STR && regexpStr !== TAIL_WILDCARD_REG_EXP_STR) {
-            for (const k in node.#children) {
-              if (
-                // a single-char pattern coexists with single-char literals as a literal does
-                (regexpStr.length > 1 || k.length > 1) && k !== ONLY_WILDCARD_REG_EXP_STR && k !== TAIL_WILDCARD_REG_EXP_STR
-              ) {
-                throw PATH_ERROR;
-              }
-            }
-          }
-          nextNode = node.#children[regexpStr] = new _Node();
-        }
-        if (name !== "") {
-          nextNode.#varIndex ??= context.varIndex++;
-          paramMap.push([name, nextNode.#varIndex]);
-        }
-      } else {
-        nextNode = node.#children[token];
-        if (!nextNode) {
-          for (const k in node.#children) {
-            if (k.length > 1 && k !== ONLY_WILDCARD_REG_EXP_STR && k !== TAIL_WILDCARD_REG_EXP_STR) {
-              throw PATH_ERROR;
-            }
-          }
-          nextNode = node.#children[token] = new _Node();
-        }
-      }
-      node = nextNode;
-    }
-    if (node.#index !== void 0) {
-      throw PATH_ERROR;
-    }
-    node.#index = isStatic ? -1 : index;
-  }
-  buildRegExpStr() {
-    const childKeys = Object.keys(this.#children).sort(compareKey);
-    const strList = childKeys.map((k) => {
-      const c = this.#children[k];
-      const childStr = c.buildRegExpStr();
-      return childStr === "" ? "" : (typeof c.#varIndex === "number" ? `(${k})@${c.#varIndex}` : regExpMetaChars.has(k) ? `\\${k}` : k) + childStr;
-    }).filter(Boolean);
-    if (typeof this.#index === "number" && this.#index !== -1) {
-      strList.unshift(`#${this.#index}`);
-    }
-    if (strList.length === 0) {
-      return "";
-    }
-    if (strList.length === 1) {
-      return strList[0];
-    }
-    return "(?:" + strList.join("|") + ")";
-  }
-};
-
-// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/router/reg-exp-router/trie.js
-var Trie = class {
-  #context = { varIndex: 0 };
-  #root = new Node();
-  #index = 0;
-  // dynamic path -> [handler index, param assoc]; static paths are not registered
-  paths = createNullObject();
-  insert(path, isStatic) {
-    if (isStatic) {
-      this.#root.insert(path.split(""), 0, [], this.#context, true);
-      return;
-    }
-    const paramAssoc = [];
-    const groups = [];
-    let markedPath = path;
-    for (let i = 0; ; ) {
-      let replaced = false;
-      markedPath = markedPath.replace(/\{[^}]+\}/g, (m2) => {
-        const mark = `@\\${i}`;
-        groups[i] = [mark, m2];
-        i++;
-        replaced = true;
-        return mark;
-      });
-      if (!replaced) {
-        break;
-      }
-    }
-    const tokens = markedPath.match(/(?::[^\/]+)|(?:\/\*$)|./g) || [];
-    for (let i = groups.length - 1; i >= 0; i--) {
-      const [mark] = groups[i];
-      for (let j = tokens.length - 1; j >= 0; j--) {
-        if (tokens[j].indexOf(mark) !== -1) {
-          tokens[j] = tokens[j].replace(mark, groups[i][1]);
-          break;
-        }
-      }
-    }
-    this.#root.insert(tokens, this.#index, paramAssoc, this.#context, false);
-    this.paths[path] = [this.#index++, paramAssoc];
-  }
-  buildRegExp() {
-    let regexp = this.#root.buildRegExpStr();
-    if (regexp === "") {
-      return [/^$/, [], []];
-    }
-    let captureIndex = 0;
-    const indexReplacementMap = [];
-    const paramReplacementMap = [];
-    regexp = regexp.replace(/#(\d+)|@(\d+)|\.\*\$/g, (_, handlerIndex, paramIndex) => {
-      if (handlerIndex !== void 0) {
-        indexReplacementMap[++captureIndex] = Number(handlerIndex);
-        return "$()";
-      }
-      if (paramIndex !== void 0) {
-        paramReplacementMap[Number(paramIndex)] = ++captureIndex;
-        return "";
-      }
-      return "";
-    });
-    return [new RegExp(`^${regexp}`), indexReplacementMap, paramReplacementMap];
-  }
-};
-
-// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/router/reg-exp-router/router.js
-var wildcardRegExpCache = createNullObject();
-function buildWildcardRegExp(path) {
-  return wildcardRegExpCache[path] ??= new RegExp(
-    `^${path.replace(
-      /\/:[^/{}]+(?:\{\[\^\/]\+})?(?=[/{]|$)|\/?\*$|([.\\+*[^\]$()?{}|])/g,
-      (match2, metaChar) => metaChar ? `\\${metaChar}` : match2 === "/*" ? TAIL_WILDCARD_REG_EXP_STR : match2 === "*" ? ONLY_WILDCARD_REG_EXP_STR : `/:${LABEL_REG_EXP_STR}`
-    )}$`
-  );
-}
-function findMiddleware(middleware, path) {
-  for (const k of Object.keys(middleware).sort((a2, b2) => b2.length - a2.length)) {
-    if (buildWildcardRegExp(k).test(path)) {
-      return [...middleware[k]];
-    }
-  }
-  return void 0;
-}
-var RegExpRouter = class {
-  name = "RegExpRouter";
-  #middleware;
-  #routes;
-  #tries;
-  constructor() {
-    this.#middleware = { [METHOD_NAME_ALL]: createNullObject() };
-    this.#routes = { [METHOD_NAME_ALL]: createNullObject() };
-    this.#tries = { [METHOD_NAME_ALL]: new Trie() };
-  }
-  #insertPath(method, path) {
-    try {
-      this.#tries[method].insert(path, !/\*|\/:/.test(path));
-    } catch (e) {
-      throw e === PATH_ERROR ? new UnsupportedPathError(path) : e;
-    }
-  }
-  add(method, path, handler2) {
-    const middleware = this.#middleware;
-    const routes = this.#routes;
-    if (!middleware) {
-      throw new Error(MESSAGE_MATCHER_IS_ALREADY_BUILT);
-    }
-    if (!middleware[method]) {
-      this.#tries[method] = new Trie();
-      for (const handlerMap of [middleware, routes]) {
-        handlerMap[method] = createNullObject();
-        for (const p2 in handlerMap[METHOD_NAME_ALL]) {
-          handlerMap[method][p2] = [...handlerMap[METHOD_NAME_ALL][p2]];
-          this.#insertPath(method, p2);
-        }
-      }
-    }
-    if (path === "/*") {
-      path = "*";
-    }
-    const methods = method === METHOD_NAME_ALL ? Object.keys(middleware) : [method];
-    if (/\*$/.test(path)) {
-      const re = buildWildcardRegExp(path);
-      for (const m2 of methods) {
-        if (!middleware[m2][path]) {
-          this.#insertPath(m2, path);
-          middleware[m2][path] = findMiddleware(middleware[m2], path) || findMiddleware(middleware[METHOD_NAME_ALL], path) || [];
-        }
-      }
-      for (const handlerMap of [middleware, routes]) {
-        for (const m2 of methods) {
-          for (const p2 in handlerMap[m2]) {
-            re.test(p2) && handlerMap[m2][p2].push([handler2, path]);
-          }
-        }
-      }
-      return;
-    }
-    const paths = checkOptionalParameter(path) || [path];
-    for (const path2 of paths) {
-      for (const m2 of methods) {
-        if (!routes[m2][path2]) {
-          this.#insertPath(m2, path2);
-          routes[m2][path2] = findMiddleware(middleware[m2], path2) || findMiddleware(middleware[METHOD_NAME_ALL], path2) || [];
-        }
-        routes[m2][path2].push([handler2, path2]);
-      }
-    }
-  }
-  match = match;
-  buildAllMatchers() {
-    const matchers = createNullObject();
-    for (const method of Object.keys(this.#routes)) {
-      matchers[method] = this.#buildMatcher(method);
-    }
-    this.#middleware = this.#routes = this.#tries = void 0;
-    wildcardRegExpCache = createNullObject();
-    return matchers;
-  }
-  #buildMatcher(method) {
-    const middleware = this.#middleware[method];
-    const routes = this.#routes[method];
-    const trie = this.#tries[method];
-    const staticMap = createNullObject();
-    const handlerData = [];
-    const [regexp, indexReplacementMap, paramReplacementMap] = trie.buildRegExp();
-    for (const r of [middleware, routes]) {
-      for (const path in r) {
-        const handlers = r[path];
-        const pathData = trie.paths[path];
-        if (!pathData) {
-          staticMap[path] = [handlers.map(([h]) => [h, createNullObject()]), emptyParam];
-          continue;
-        }
-        handlerData[pathData[0]] = handlers.map(([h, handlerPath]) => [
-          h,
-          trie.paths[handlerPath][1].reduceRight((map2, [key], i) => {
-            map2[key] = paramReplacementMap[pathData[1][i][1]];
-            return map2;
-          }, createNullObject())
-        ]);
-      }
-    }
-    return [regexp, indexReplacementMap.map((i) => handlerData[i]), staticMap];
-  }
-};
-
-// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/router/smart-router/router.js
-var SmartRouter = class {
-  name = "SmartRouter";
-  #routers = [];
-  #routes = [];
-  constructor(init) {
-    this.#routers = init.routers;
-  }
-  add(method, path, handler2) {
-    if (!this.#routes) {
-      throw new Error(MESSAGE_MATCHER_IS_ALREADY_BUILT);
-    }
-    this.#routes.push([method, path, handler2]);
-  }
-  match(method, path) {
-    if (!this.#routes) {
-      throw new Error("Fatal error");
-    }
-    const routers = this.#routers;
-    const routes = this.#routes;
-    const len = routers.length;
-    let i = 0;
-    let res;
-    for (; i < len; i++) {
-      const router = routers[i];
-      try {
-        for (let i2 = 0, len2 = routes.length; i2 < len2; i2++) {
-          router.add(...routes[i2]);
-        }
-        res = router.match(method, path);
-      } catch (e) {
-        if (e instanceof UnsupportedPathError) {
-          continue;
-        }
-        throw e;
-      }
-      this.match = router.match.bind(router);
-      this.#routers = [router];
-      this.#routes = void 0;
-      break;
-    }
-    if (i === len) {
-      throw new Error("Fatal error");
-    }
-    this.name = `SmartRouter + ${this.activeRouter.name}`;
-    return res;
-  }
-  get activeRouter() {
-    if (this.#routes || this.#routers.length !== 1) {
-      throw new Error("No active router has been determined yet.");
-    }
-    return this.#routers[0];
-  }
-};
-
-// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/router/trie-router/node.js
-var emptyParams = createNullObject();
-var order = 0;
-var Node2 = class _Node2 {
-  #methods = [];
-  #children = createNullObject();
-  #patterns = [];
-  #pattern;
-  #params = emptyParams;
-  insert(method, path, handler2) {
-    let curNode = this;
-    const parts = splitRoutingPath(path);
-    const possibleKeys = /* @__PURE__ */ new Set();
-    let i = 0;
-    for (const p2 of parts) {
-      const nextP = parts[++i];
-      const pattern = getPattern(p2, nextP) || (nextP === void 0 && p2 && p2.indexOf("*") === p2.length - 1 ? p2 : null);
-      const isParam = Array.isArray(pattern);
-      const key = isParam ? pattern[0] : pattern || p2;
-      const child = curNode.#children[key] ||= new _Node2();
-      if (pattern && !child.#pattern) {
-        child.#pattern = pattern;
-        curNode.#patterns.push(child);
-      }
-      curNode = child;
-      if (isParam) {
-        possibleKeys.add(pattern[1]);
-      }
-    }
-    curNode.#methods.push({
-      [method]: {
-        handler: handler2,
-        possibleKeys: [...possibleKeys],
-        score: ++order
-      }
-    });
-  }
-  #pushHandlerSets(handlerSets, node, method, nodeParams, params) {
-    for (let i = 0, len = node.#methods.length; i < len; i++) {
-      const m2 = node.#methods[i];
-      const handlerSet = m2[method] || m2[METHOD_NAME_ALL];
-      if (handlerSet) {
-        handlerSet.params = createNullObject();
-        handlerSets.push(handlerSet);
-        for (let i2 = 0, len2 = handlerSet.possibleKeys.length; i2 < len2; i2++) {
-          const key = handlerSet.possibleKeys[i2];
-          handlerSet.params[key] = params?.[key] && !i2 ? params[key] : nodeParams[key] ?? params?.[key];
-        }
-      }
-    }
-  }
-  search(method, path) {
-    const handlerSets = [];
-    this.#params = emptyParams;
-    const curNode = this;
-    let curNodes = [curNode];
-    const parts = splitPath(path);
-    const curNodesQueue = [];
-    const len = parts.length;
-    let partOffsets = null;
-    for (let i = 0; i < len; i++) {
-      const part = parts[i];
-      const isLast = i === len - 1;
-      const tempNodes = [];
-      for (let j = 0, len2 = curNodes.length; j < len2; j++) {
-        const node = curNodes[j];
-        const nextNode = node.#children[part];
-        if (nextNode) {
-          nextNode.#params = node.#params;
-          if (isLast) {
-            if (nextNode.#children["*"]) {
-              this.#pushHandlerSets(handlerSets, nextNode.#children["*"], method, node.#params);
-            }
-            this.#pushHandlerSets(handlerSets, nextNode, method, node.#params);
-          } else {
-            tempNodes.push(nextNode);
-          }
-        }
-        for (const child of node.#patterns) {
-          const pattern = child.#pattern;
-          const params = node.#params === emptyParams ? {} : { ...node.#params };
-          if (typeof pattern === "string") {
-            if (pattern === "*" || part.startsWith(pattern.slice(0, -1))) {
-              this.#pushHandlerSets(handlerSets, child, method, node.#params);
-              if (pattern === "*") {
-                child.#params = params;
-                tempNodes.push(child);
-              }
-            }
-            continue;
-          }
-          const [, name, matcher] = pattern;
-          if (!part && matcher === true) {
-            continue;
-          }
-          if (matcher !== true) {
-            if (!partOffsets) {
-              partOffsets = [];
-              let offset = path[0] === "/" ? 1 : 0;
-              for (let p2 = 0; p2 < len; p2++) {
-                partOffsets[p2] = offset;
-                offset += parts[p2].length + 1;
-              }
-            }
-            const restPathString = path.slice(partOffsets[i]);
-            const m2 = matcher.exec(restPathString);
-            if (m2) {
-              params[name] = m2[0];
-              this.#pushHandlerSets(handlerSets, child, method, node.#params, params);
-              if (m2[0].length === restPathString.length && child.#children["*"]) {
-                this.#pushHandlerSets(
-                  handlerSets,
-                  child.#children["*"],
-                  method,
-                  node.#params,
-                  params
-                );
-              }
-              for (const _ in child.#children) {
-                child.#params = params;
-                const componentCount = m2[0].match(/\//g)?.length ?? 0;
-                const targetCurNodes = curNodesQueue[componentCount] ||= [];
-                targetCurNodes.push(child);
-                break;
-              }
-              continue;
-            }
-          }
-          if (matcher === true || matcher.test(part)) {
-            params[name] = part;
-            if (isLast) {
-              this.#pushHandlerSets(handlerSets, child, method, params, node.#params);
-              if (child.#children["*"]) {
-                this.#pushHandlerSets(
-                  handlerSets,
-                  child.#children["*"],
-                  method,
-                  params,
-                  node.#params
-                );
-              }
-            } else {
-              child.#params = params;
-              tempNodes.push(child);
-            }
-          }
-        }
-      }
-      const shifted = curNodesQueue.shift();
-      curNodes = shifted ? tempNodes.concat(shifted) : tempNodes;
-    }
-    if (handlerSets[1]) {
-      handlerSets.sort((a2, b2) => {
-        return a2.score - b2.score;
-      });
-    }
-    return [handlerSets.map(({ handler: handler2, params }) => [handler2, params])];
-  }
-};
-
-// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/router/trie-router/router.js
-var TrieRouter = class {
-  name = "TrieRouter";
-  #node = new Node2();
-  add(method, path, handler2) {
-    for (const result of checkOptionalParameter(path) || [path]) {
-      this.#node.insert(method, result, handler2);
-    }
-  }
-  match(method, path) {
-    return this.#node.search(method, path);
-  }
-};
-
-// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/hono.js
-var Hono2 = class extends Hono {
-  /**
-   * Creates an instance of the Hono class.
-   *
-   * @param options - Optional configuration options for the Hono instance.
-   */
-  constructor(options = {}) {
-    super(options);
-    this.router = options.router ?? new SmartRouter({
-      routers: [new RegExpRouter(), new TrieRouter()]
-    });
-  }
-};
-
-// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/utils/cookie.js
-var validCookieNameRegEx = /^[\w!#$%&'*.^`|~+-]+$/;
-var relaxedCookieNameRegEx = /^[!#-:<>-[\]-~]+$/;
-var validCookieValueRegEx = /^[ !#-:<-[\]-~]*$/;
-var trimCookieWhitespace = (value) => {
-  let start = 0;
-  let end = value.length;
-  while (start < end) {
-    const charCode = value.charCodeAt(start);
-    if (charCode !== 32 && charCode !== 9) {
-      break;
-    }
-    start++;
-  }
-  while (end > start) {
-    const charCode = value.charCodeAt(end - 1);
-    if (charCode !== 32 && charCode !== 9) {
-      break;
-    }
-    end--;
-  }
-  return start === 0 && end === value.length ? value : value.slice(start, end);
-};
-var parse = (cookie, name) => {
-  if (name && cookie.indexOf(name) === -1) {
-    return {};
-  }
-  const pairs = cookie.split(";");
-  const parsedCookie = /* @__PURE__ */ Object.create(null);
-  for (const pairStr of pairs) {
-    const valueStartPos = pairStr.indexOf("=");
-    if (valueStartPos === -1) {
-      continue;
-    }
-    const cookieName = trimCookieWhitespace(pairStr.substring(0, valueStartPos));
-    if (name && name !== cookieName || !relaxedCookieNameRegEx.test(cookieName) || cookieName in parsedCookie) {
-      continue;
-    }
-    let cookieValue = trimCookieWhitespace(pairStr.substring(valueStartPos + 1));
-    if (cookieValue.startsWith('"') && cookieValue.endsWith('"')) {
-      cookieValue = cookieValue.slice(1, -1);
-    }
-    if (validCookieValueRegEx.test(cookieValue)) {
-      parsedCookie[cookieName] = tryDecodeURIComponent(cookieValue);
-      if (name) {
-        break;
-      }
-    }
-  }
-  return parsedCookie;
-};
-var _serialize = (name, value, opt = {}) => {
-  if (!validCookieNameRegEx.test(name)) {
-    throw new Error("Invalid cookie name");
-  }
-  let cookie = `${name}=${value}`;
-  if (name.startsWith("__Secure-") && !opt.secure) {
-    throw new Error("__Secure- Cookie must have Secure attributes");
-  }
-  if (name.startsWith("__Host-")) {
-    if (!opt.secure) {
-      throw new Error("__Host- Cookie must have Secure attributes");
-    }
-    if (opt.path !== "/") {
-      throw new Error('__Host- Cookie must have Path attributes with "/"');
-    }
-    if (opt.domain) {
-      throw new Error("__Host- Cookie must not have Domain attributes");
-    }
-  }
-  for (const key of ["domain", "path", "sameSite", "priority"]) {
-    if (opt[key] && /[;\r\n]/.test(opt[key])) {
-      throw new Error(`${key} must not contain ";", "\\r", or "\\n"`);
-    }
-  }
-  if (opt && typeof opt.maxAge === "number" && opt.maxAge >= 0) {
-    if (opt.maxAge > 3456e4) {
-      throw new Error(
-        "Cookies Max-Age SHOULD NOT be greater than 400 days (34560000 seconds) in duration."
-      );
-    }
-    cookie += `; Max-Age=${opt.maxAge | 0}`;
-  }
-  if (opt.domain && opt.prefix !== "host") {
-    cookie += `; Domain=${opt.domain}`;
-  }
-  if (opt.path) {
-    cookie += `; Path=${opt.path}`;
-  }
-  if (opt.expires) {
-    if (opt.expires.getTime() - Date.now() > 3456e7) {
-      throw new Error(
-        "Cookies Expires SHOULD NOT be greater than 400 days (34560000 seconds) in the future."
-      );
-    }
-    cookie += `; Expires=${opt.expires.toUTCString()}`;
-  }
-  if (opt.httpOnly) {
-    cookie += "; HttpOnly";
-  }
-  if (opt.secure) {
-    cookie += "; Secure";
-  }
-  if (opt.sameSite) {
-    cookie += `; SameSite=${opt.sameSite.charAt(0).toUpperCase() + opt.sameSite.slice(1)}`;
-  }
-  if (opt.priority) {
-    cookie += `; Priority=${opt.priority.charAt(0).toUpperCase() + opt.priority.slice(1)}`;
-  }
-  if (opt.partitioned) {
-    if (!opt.secure) {
-      throw new Error("Partitioned Cookie must have Secure attributes");
-    }
-    cookie += "; Partitioned";
-  }
-  return cookie;
-};
-var serialize = (name, value, opt) => {
-  value = encodeURIComponent(value);
-  return _serialize(name, value, opt);
-};
-
-// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/helper/cookie/index.js
-var getCookie = (c, key, prefix) => {
-  const cookie = c.req.raw.headers.get("Cookie");
-  if (typeof key === "string") {
-    if (!cookie) {
-      return void 0;
-    }
-    let finalKey = key;
-    if (prefix === "secure") {
-      finalKey = "__Secure-" + key;
-    } else if (prefix === "host") {
-      finalKey = "__Host-" + key;
-    }
-    const obj2 = parse(cookie, finalKey);
-    return obj2[finalKey];
-  }
-  if (!cookie) {
-    return {};
-  }
-  const obj = parse(cookie);
-  return obj;
-};
-var generateCookie = (name, value, opt) => {
-  let cookie;
-  if (opt?.prefix === "secure") {
-    cookie = serialize("__Secure-" + name, value, { path: "/", ...opt, secure: true });
-  } else if (opt?.prefix === "host") {
-    cookie = serialize("__Host-" + name, value, {
-      ...opt,
-      path: "/",
-      secure: true,
-      domain: void 0
-    });
-  } else {
-    cookie = serialize(name, value, { path: "/", ...opt });
-  }
-  return cookie;
-};
-var setCookie = (c, name, value, opt) => {
-  const cookie = generateCookie(name, value, opt);
-  c.header("Set-Cookie", cookie, { append: true });
-};
-var deleteCookie = (c, name, opt) => {
-  const deletedCookie = getCookie(c, name, opt?.prefix);
-  setCookie(c, name, "", { ...opt, maxAge: 0 });
-  return deletedCookie;
-};
-
-// server/auth.ts
-init_db();
-
-// server/crypto.ts
-init_env();
-init_encryption();
-import {
-  randomBytes as randomBytes2,
-  scrypt as scryptCb,
-  timingSafeEqual,
-  createHash as createHash3,
-  createHmac,
-  createDecipheriv as createDecipheriv2,
-  hkdfSync
-} from "node:crypto";
-function scrypt(password, salt) {
-  return new Promise(
-    (resolve, reject) => scryptCb(password, salt, 64, (err3, key) => err3 ? reject(err3) : resolve(key))
-  );
-}
-async function hashPassword(password) {
-  const salt = randomBytes2(16);
-  const key = await scrypt(password, salt);
-  return `s1:${salt.toString("hex")}:${key.toString("hex")}`;
-}
-async function verifyPassword(password, stored) {
-  const [v2, saltHex, keyHex] = stored.split(":");
-  if (v2 !== "s1" || !saltHex || !keyHex) return false;
-  const key = await scrypt(password, Buffer.from(saltHex, "hex"));
-  const expected = Buffer.from(keyHex, "hex");
-  return key.length === expected.length && timingSafeEqual(key, expected);
-}
-function newToken() {
-  const token = randomBytes2(32).toString("base64url");
-  return { token, tokenHash: hashToken(token) };
-}
-function hashToken(token) {
-  return createHash3("sha256").update(token).digest("hex");
-}
-function hmacSha256Base64(key, message) {
-  return createHmac("sha256", key).update(message).digest("base64");
-}
-function secretKey() {
-  return Buffer.from(hkdfSync("sha256", process.env.LEGACY_SESSION_SECRET || env.SESSION_SECRET, "fpsllc-ein-v1", "ein-encryption", 32));
-}
-function encryptSecret(plain) {
-  return `v2:${seal(Buffer.from(plain)).toString("base64")}`;
-}
-function decryptSecret(stored) {
-  if (stored.startsWith("v2:")) return unseal(Buffer.from(stored.slice(3), "base64")).toString();
-  const [v2, ivHex, tagHex, ctHex] = stored.split(":");
-  if (v2 !== "v1" || !ivHex || !tagHex || !ctHex) throw new Error("bad secret format");
-  const decipher = createDecipheriv2("aes-256-gcm", secretKey(), Buffer.from(ivHex, "hex"));
-  decipher.setAuthTag(Buffer.from(tagHex, "hex"));
-  return Buffer.concat([decipher.update(Buffer.from(ctHex, "hex")), decipher.final()]).toString("utf8");
-}
-
-// server/auth.ts
-init_env();
-var CLIENT_COOKIE = "fpsllc_session";
-var ADMIN_COOKIE = "fpsllc_admin";
-var SESSION_DAYS = 30;
-async function createSession(c, opts) {
-  const db = await getDb();
-  const { token, tokenHash } = newToken();
-  const expires = new Date(Date.now() + (opts.hours ? opts.hours * 36e5 : SESSION_DAYS * 864e5));
-  await db.query(
-    "INSERT INTO sessions (token_hash, client_id, is_admin, viewing_as_admin, expires_at) VALUES ($1, $2, $3, $4, $5)",
-    [tokenHash, opts.clientId ?? null, opts.isAdmin ?? false, opts.viewingAsAdmin ?? false, expires.toISOString()]
-  );
-  setCookie(c, opts.isAdmin ? ADMIN_COOKIE : CLIENT_COOKIE, token, {
-    httpOnly: true,
-    secure: env.isProd,
-    sameSite: "Lax",
-    path: "/",
-    expires
-  });
-}
-async function lookup(c, cookieName) {
-  const token = getCookie(c, cookieName);
-  if (!token) return null;
-  const db = await getDb();
-  const tokenHash = hashToken(token);
-  const rows = await db.query(
-    "SELECT client_id, is_admin, viewing_as_admin FROM sessions WHERE token_hash = $1 AND expires_at > now()",
-    [tokenHash]
-  );
-  if (rows.length === 0) return null;
-  return { clientId: rows[0].client_id, isAdmin: rows[0].is_admin, tokenHash, viewingAsAdmin: rows[0].viewing_as_admin };
-}
-async function getSession(c) {
-  const s = await lookup(c, CLIENT_COOKIE);
-  return s?.clientId ? s : null;
-}
-async function getAdminSession(c) {
-  const s = await lookup(c, ADMIN_COOKIE);
-  return s?.isAdmin ? s : null;
-}
-async function destroySession(c, role = "client") {
-  const cookieName = role === "admin" ? ADMIN_COOKIE : CLIENT_COOKIE;
-  const token = getCookie(c, cookieName);
-  if (token) {
-    const db = await getDb();
-    await db.query("DELETE FROM sessions WHERE token_hash = $1", [hashToken(token)]);
-  }
-  deleteCookie(c, cookieName, { path: "/" });
-}
-async function rateLimit(key, max, windowMs, failMode = "open") {
-  try {
-    const db = await getDb();
-    const rows = await db.query(
-      `INSERT INTO rate_limits (key, window_start, count) VALUES ($1, now(), 1)
-       ON CONFLICT (key) DO UPDATE SET
-         count = CASE WHEN rate_limits.window_start < now() - make_interval(secs => $2)
-                      THEN 1 ELSE rate_limits.count + 1 END,
-         window_start = CASE WHEN rate_limits.window_start < now() - make_interval(secs => $2)
-                             THEN now() ELSE rate_limits.window_start END
-       RETURNING count`,
-      [key, windowMs / 1e3]
-    );
-    return rows[0].count <= max;
-  } catch (e) {
-    console.error(`[rateLimit] check failed, failing ${failMode}:`, e);
-    return failMode === "open";
-  }
-}
-function clientIp(c) {
-  return c.req.header("x-forwarded-for")?.split(",")[0].trim() || c.req.header("x-real-ip") || "local";
-}
-
-// server/shared.ts
-var testHooks = {
-  /** Makes the next fulfillment throw once (dev suite scaffolding). */
-  failNextFulfillment: false,
-  /** When >= 0, the (N+1)th putFile in the next formation upload throws. */
-  failFormationPutAfter: -1,
-  /** Dev: the next card-on-file charge is declined with this Square code. */
-  declineNextRenewal: ""
-};
-var err = (message, code) => ({ error: { message, code } });
-function maskEmail(email) {
-  const [local, domain] = email.split("@");
-  return `${local.slice(0, 1)}${"\u2022".repeat(Math.max(2, local.length - 1))}@${domain ?? ""}`;
-}
-async function requireAdmin(c) {
-  return getAdminSession(c);
-}
-var MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
-var looksLikePdf = async (f) => {
-  const bytes2 = new Uint8Array(await f.arrayBuffer());
-  if (bytes2.length < 8) return false;
-  const head2 = new TextDecoder().decode(bytes2.slice(0, 8));
-  if (!head2.startsWith("%PDF-")) return false;
-  const tail = new TextDecoder().decode(bytes2.slice(-1024));
-  return tail.includes("%%EOF");
-};
 
 // ../../../../Claude Projects/Series LLC Website/webapp/node_modules/zod/v3/external.js
 var external_exports = {};
@@ -97672,8 +95315,8 @@ var ZodType = class {
       description
     });
   }
-  pipe(target) {
-    return ZodPipeline.create(this, target);
+  pipe(target2) {
+    return ZodPipeline.create(this, target2);
   }
   readonly() {
     return ZodReadonly.create(this);
@@ -100788,6 +98431,691 @@ var coerce = {
 };
 var NEVER = INVALID;
 
+// server/ra-checkout.ts
+init_db();
+init_env();
+
+// server/crypto.ts
+init_env();
+init_encryption();
+import {
+  randomBytes as randomBytes2,
+  scrypt as scryptCb,
+  timingSafeEqual,
+  createHash as createHash3,
+  createHmac,
+  createDecipheriv as createDecipheriv2,
+  hkdfSync
+} from "node:crypto";
+function scrypt(password, salt) {
+  return new Promise(
+    (resolve, reject) => scryptCb(password, salt, 64, (err3, key) => err3 ? reject(err3) : resolve(key))
+  );
+}
+async function hashPassword(password) {
+  const salt = randomBytes2(16);
+  const key = await scrypt(password, salt);
+  return `s1:${salt.toString("hex")}:${key.toString("hex")}`;
+}
+async function verifyPassword(password, stored) {
+  const [v2, saltHex, keyHex] = stored.split(":");
+  if (v2 !== "s1" || !saltHex || !keyHex) return false;
+  const key = await scrypt(password, Buffer.from(saltHex, "hex"));
+  const expected = Buffer.from(keyHex, "hex");
+  return key.length === expected.length && timingSafeEqual(key, expected);
+}
+function newToken() {
+  const token = randomBytes2(32).toString("base64url");
+  return { token, tokenHash: hashToken(token) };
+}
+function hashToken(token) {
+  return createHash3("sha256").update(token).digest("hex");
+}
+function hmacSha256Base64(key, message) {
+  return createHmac("sha256", key).update(message).digest("base64");
+}
+function secretKey() {
+  return Buffer.from(hkdfSync("sha256", process.env.LEGACY_SESSION_SECRET || env.SESSION_SECRET, "fpsllc-ein-v1", "ein-encryption", 32));
+}
+function encryptSecret(plain) {
+  return `v2:${seal(Buffer.from(plain)).toString("base64")}`;
+}
+function decryptSecret(stored) {
+  if (stored.startsWith("v2:")) return unseal(Buffer.from(stored.slice(3), "base64")).toString();
+  const [v2, ivHex, tagHex, ctHex] = stored.split(":");
+  if (v2 !== "v1" || !ivHex || !tagHex || !ctHex) throw new Error("bad secret format");
+  const decipher = createDecipheriv2("aes-256-gcm", secretKey(), Buffer.from(ivHex, "hex"));
+  decipher.setAuthTag(Buffer.from(tagHex, "hex"));
+  return Buffer.concat([decipher.update(Buffer.from(ctHex, "hex")), decipher.final()]).toString("utf8");
+}
+
+// server/square.ts
+init_env();
+import { createHash as createHash4, randomBytes as randomBytes3 } from "node:crypto";
+
+// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/utils/url.js
+var splitPath = (path) => {
+  const paths = path.split("/");
+  if (paths[0] === "") {
+    paths.shift();
+  }
+  return paths;
+};
+var splitRoutingPath = (routePath) => {
+  const { groups, path } = extractGroupsFromPath(routePath);
+  const paths = splitPath(path);
+  return replaceGroupMarks(paths, groups);
+};
+var extractGroupsFromPath = (path) => {
+  const groups = [];
+  path = path.replace(/\{[^}]+\}/g, (match2, index) => {
+    const mark = `@${index}`;
+    groups.push([mark, match2]);
+    return mark;
+  });
+  return { groups, path };
+};
+var replaceGroupMarks = (paths, groups) => {
+  for (let i = groups.length - 1; i >= 0; i--) {
+    const [mark] = groups[i];
+    for (let j = paths.length - 1; j >= 0; j--) {
+      if (paths[j].includes(mark)) {
+        paths[j] = paths[j].replace(mark, groups[i][1]);
+        break;
+      }
+    }
+  }
+  return paths;
+};
+var patternCache = {};
+var getPattern = (label, next) => {
+  if (label === "*") {
+    return "*";
+  }
+  const match2 = label.match(/^\:([^\{\}]+)(?:\{(.+)\})?$/);
+  if (match2) {
+    const cacheKey = `${label}#${next}`;
+    if (!patternCache[cacheKey]) {
+      if (match2[2]) {
+        patternCache[cacheKey] = next && next[0] !== ":" && next[0] !== "*" ? [cacheKey, match2[1], new RegExp(`^${match2[2]}(?=/${next})`)] : [label, match2[1], new RegExp(`^${match2[2]}$`)];
+      } else {
+        patternCache[cacheKey] = [label, match2[1], true];
+      }
+    }
+    return patternCache[cacheKey];
+  }
+  return null;
+};
+var tryDecode = (str, decoder) => {
+  try {
+    return decoder(str);
+  } catch {
+    return str.replace(/(?:%[0-9A-Fa-f]{2})+/g, (match2) => {
+      try {
+        return decoder(match2);
+      } catch {
+        return match2;
+      }
+    });
+  }
+};
+var tryDecodeURI = (str) => tryDecode(str, decodeURI);
+var getPath = (request) => {
+  const url = request.url;
+  const start = url.indexOf("/", url.indexOf(":") + 4);
+  let i = start;
+  for (; i < url.length; i++) {
+    const charCode = url.charCodeAt(i);
+    if (charCode === 37) {
+      const queryIndex = url.indexOf("?", i);
+      const hashIndex = url.indexOf("#", i);
+      const end = queryIndex === -1 ? hashIndex === -1 ? void 0 : hashIndex : hashIndex === -1 ? queryIndex : Math.min(queryIndex, hashIndex);
+      const path = url.slice(start, end);
+      return tryDecodeURI(path.includes("%25") ? path.replace(/%25/g, "%2525") : path);
+    } else if (charCode === 63 || charCode === 35) {
+      break;
+    }
+  }
+  return url.slice(start, i);
+};
+var getPathNoStrict = (request) => {
+  const result = getPath(request);
+  return result.length > 1 && result.at(-1) === "/" ? result.slice(0, -1) : result;
+};
+var mergePath = (base, sub, ...rest) => {
+  if (rest.length) {
+    sub = mergePath(sub, ...rest);
+  }
+  return `${base?.[0] === "/" ? "" : "/"}${base}${sub === "/" ? "" : `${base?.at(-1) === "/" ? "" : "/"}${sub?.[0] === "/" ? sub.slice(1) : sub}`}`;
+};
+var checkOptionalParameter = (path) => {
+  if (path.charCodeAt(path.length - 1) !== 63 || !path.includes(":")) {
+    return null;
+  }
+  const segments = path.split("/");
+  const results = [];
+  let basePath = "";
+  segments.forEach((segment) => {
+    if (segment !== "" && !/\:/.test(segment)) {
+      basePath += "/" + segment;
+    } else if (/\:/.test(segment)) {
+      if (segment.charCodeAt(segment.length - 1) === 63) {
+        if (results.length === 0 && basePath === "") {
+          results.push("/");
+        } else {
+          results.push(basePath);
+        }
+        const optionalSegment = segment.slice(0, -1);
+        basePath += "/" + optionalSegment;
+        results.push(basePath);
+      } else {
+        basePath += "/" + segment;
+      }
+    }
+  });
+  return results.filter((v2, i, a2) => a2.indexOf(v2) === i);
+};
+var tryDecodeURIComponent = (str) => str.indexOf("%") !== -1 ? tryDecode(str, decodeURIComponent_) : str;
+var _decodeURI = (value) => {
+  if (value.indexOf("+") !== -1) {
+    value = value.replace(/\+/g, " ");
+  }
+  return tryDecodeURIComponent(value);
+};
+var _getQueryParam = (url, key, multiple) => {
+  const hashIndex = url.indexOf("#", 8);
+  if (hashIndex !== -1) {
+    url = url.slice(0, hashIndex);
+  }
+  let encoded;
+  if (!multiple && key && key.indexOf("%") === -1 && key.indexOf("+") === -1) {
+    let keyIndex2 = url.indexOf("?", 8);
+    if (keyIndex2 === -1) {
+      return void 0;
+    }
+    if (!url.startsWith(key, keyIndex2 + 1)) {
+      keyIndex2 = url.indexOf(`&${key}`, keyIndex2 + 1);
+    }
+    while (keyIndex2 !== -1) {
+      const trailingKeyCode = url.charCodeAt(keyIndex2 + key.length + 1);
+      if (trailingKeyCode === 61) {
+        const valueIndex = keyIndex2 + key.length + 2;
+        const endIndex = url.indexOf("&", valueIndex);
+        return _decodeURI(url.slice(valueIndex, endIndex === -1 ? void 0 : endIndex));
+      } else if (trailingKeyCode == 38 || isNaN(trailingKeyCode)) {
+        return "";
+      }
+      keyIndex2 = url.indexOf(`&${key}`, keyIndex2 + 1);
+    }
+    encoded = /[%+]/.test(url);
+    if (!encoded) {
+      return void 0;
+    }
+  }
+  const results = /* @__PURE__ */ Object.create(null);
+  encoded ??= /[%+]/.test(url);
+  let keyIndex = url.indexOf("?", 8);
+  while (keyIndex !== -1) {
+    const nextKeyIndex = url.indexOf("&", keyIndex + 1);
+    let valueIndex = url.indexOf("=", keyIndex);
+    if (valueIndex > nextKeyIndex && nextKeyIndex !== -1) {
+      valueIndex = -1;
+    }
+    let name = url.slice(
+      keyIndex + 1,
+      valueIndex === -1 ? nextKeyIndex === -1 ? void 0 : nextKeyIndex : valueIndex
+    );
+    if (encoded) {
+      name = _decodeURI(name);
+    }
+    keyIndex = nextKeyIndex;
+    if (name === "") {
+      continue;
+    }
+    let value;
+    if (valueIndex === -1) {
+      value = "";
+    } else {
+      value = url.slice(valueIndex + 1, nextKeyIndex === -1 ? void 0 : nextKeyIndex);
+      if (encoded) {
+        value = _decodeURI(value);
+      }
+    }
+    if (multiple) {
+      if (!(results[name] && Array.isArray(results[name]))) {
+        results[name] = [];
+      }
+      ;
+      results[name].push(value);
+    } else {
+      results[name] ??= value;
+    }
+  }
+  return key ? results[key] : results;
+};
+var getQueryParam = _getQueryParam;
+var getQueryParams = (url, key) => {
+  return _getQueryParam(url, key, true);
+};
+var decodeURIComponent_ = decodeURIComponent;
+
+// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/utils/cookie.js
+var validCookieNameRegEx = /^[\w!#$%&'*.^`|~+-]+$/;
+var relaxedCookieNameRegEx = /^[!#-:<>-[\]-~]+$/;
+var validCookieValueRegEx = /^[ !#-:<-[\]-~]*$/;
+var trimCookieWhitespace = (value) => {
+  let start = 0;
+  let end = value.length;
+  while (start < end) {
+    const charCode = value.charCodeAt(start);
+    if (charCode !== 32 && charCode !== 9) {
+      break;
+    }
+    start++;
+  }
+  while (end > start) {
+    const charCode = value.charCodeAt(end - 1);
+    if (charCode !== 32 && charCode !== 9) {
+      break;
+    }
+    end--;
+  }
+  return start === 0 && end === value.length ? value : value.slice(start, end);
+};
+var parse = (cookie, name) => {
+  if (name && cookie.indexOf(name) === -1) {
+    return {};
+  }
+  const pairs = cookie.split(";");
+  const parsedCookie = /* @__PURE__ */ Object.create(null);
+  for (const pairStr of pairs) {
+    const valueStartPos = pairStr.indexOf("=");
+    if (valueStartPos === -1) {
+      continue;
+    }
+    const cookieName = trimCookieWhitespace(pairStr.substring(0, valueStartPos));
+    if (name && name !== cookieName || !relaxedCookieNameRegEx.test(cookieName) || cookieName in parsedCookie) {
+      continue;
+    }
+    let cookieValue = trimCookieWhitespace(pairStr.substring(valueStartPos + 1));
+    if (cookieValue.startsWith('"') && cookieValue.endsWith('"')) {
+      cookieValue = cookieValue.slice(1, -1);
+    }
+    if (validCookieValueRegEx.test(cookieValue)) {
+      parsedCookie[cookieName] = tryDecodeURIComponent(cookieValue);
+      if (name) {
+        break;
+      }
+    }
+  }
+  return parsedCookie;
+};
+var _serialize = (name, value, opt = {}) => {
+  if (!validCookieNameRegEx.test(name)) {
+    throw new Error("Invalid cookie name");
+  }
+  let cookie = `${name}=${value}`;
+  if (name.startsWith("__Secure-") && !opt.secure) {
+    throw new Error("__Secure- Cookie must have Secure attributes");
+  }
+  if (name.startsWith("__Host-")) {
+    if (!opt.secure) {
+      throw new Error("__Host- Cookie must have Secure attributes");
+    }
+    if (opt.path !== "/") {
+      throw new Error('__Host- Cookie must have Path attributes with "/"');
+    }
+    if (opt.domain) {
+      throw new Error("__Host- Cookie must not have Domain attributes");
+    }
+  }
+  for (const key of ["domain", "path", "sameSite", "priority"]) {
+    if (opt[key] && /[;\r\n]/.test(opt[key])) {
+      throw new Error(`${key} must not contain ";", "\\r", or "\\n"`);
+    }
+  }
+  if (opt && typeof opt.maxAge === "number" && opt.maxAge >= 0) {
+    if (opt.maxAge > 3456e4) {
+      throw new Error(
+        "Cookies Max-Age SHOULD NOT be greater than 400 days (34560000 seconds) in duration."
+      );
+    }
+    cookie += `; Max-Age=${opt.maxAge | 0}`;
+  }
+  if (opt.domain && opt.prefix !== "host") {
+    cookie += `; Domain=${opt.domain}`;
+  }
+  if (opt.path) {
+    cookie += `; Path=${opt.path}`;
+  }
+  if (opt.expires) {
+    if (opt.expires.getTime() - Date.now() > 3456e7) {
+      throw new Error(
+        "Cookies Expires SHOULD NOT be greater than 400 days (34560000 seconds) in the future."
+      );
+    }
+    cookie += `; Expires=${opt.expires.toUTCString()}`;
+  }
+  if (opt.httpOnly) {
+    cookie += "; HttpOnly";
+  }
+  if (opt.secure) {
+    cookie += "; Secure";
+  }
+  if (opt.sameSite) {
+    cookie += `; SameSite=${opt.sameSite.charAt(0).toUpperCase() + opt.sameSite.slice(1)}`;
+  }
+  if (opt.priority) {
+    cookie += `; Priority=${opt.priority.charAt(0).toUpperCase() + opt.priority.slice(1)}`;
+  }
+  if (opt.partitioned) {
+    if (!opt.secure) {
+      throw new Error("Partitioned Cookie must have Secure attributes");
+    }
+    cookie += "; Partitioned";
+  }
+  return cookie;
+};
+var serialize = (name, value, opt) => {
+  value = encodeURIComponent(value);
+  return _serialize(name, value, opt);
+};
+
+// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/helper/cookie/index.js
+var getCookie = (c, key, prefix) => {
+  const cookie = c.req.raw.headers.get("Cookie");
+  if (typeof key === "string") {
+    if (!cookie) {
+      return void 0;
+    }
+    let finalKey = key;
+    if (prefix === "secure") {
+      finalKey = "__Secure-" + key;
+    } else if (prefix === "host") {
+      finalKey = "__Host-" + key;
+    }
+    const obj2 = parse(cookie, finalKey);
+    return obj2[finalKey];
+  }
+  if (!cookie) {
+    return {};
+  }
+  const obj = parse(cookie);
+  return obj;
+};
+var generateCookie = (name, value, opt) => {
+  let cookie;
+  if (opt?.prefix === "secure") {
+    cookie = serialize("__Secure-" + name, value, { path: "/", ...opt, secure: true });
+  } else if (opt?.prefix === "host") {
+    cookie = serialize("__Host-" + name, value, {
+      ...opt,
+      path: "/",
+      secure: true,
+      domain: void 0
+    });
+  } else {
+    cookie = serialize(name, value, { path: "/", ...opt });
+  }
+  return cookie;
+};
+var setCookie = (c, name, value, opt) => {
+  const cookie = generateCookie(name, value, opt);
+  c.header("Set-Cookie", cookie, { append: true });
+};
+var deleteCookie = (c, name, opt) => {
+  const deletedCookie = getCookie(c, name, opt?.prefix);
+  setCookie(c, name, "", { ...opt, maxAge: 0 });
+  return deletedCookie;
+};
+
+// server/auth.ts
+init_db();
+init_env();
+var CLIENT_COOKIE = "fpsllc_session";
+var ADMIN_COOKIE = "fpsllc_admin";
+var SESSION_DAYS = 30;
+async function createSession(c, opts) {
+  const db = await getDb();
+  const { token, tokenHash } = newToken();
+  const expires = new Date(Date.now() + (opts.hours ? opts.hours * 36e5 : SESSION_DAYS * 864e5));
+  await db.query(
+    "INSERT INTO sessions (token_hash, client_id, is_admin, viewing_as_admin, expires_at) VALUES ($1, $2, $3, $4, $5)",
+    [tokenHash, opts.clientId ?? null, opts.isAdmin ?? false, opts.viewingAsAdmin ?? false, expires.toISOString()]
+  );
+  setCookie(c, opts.isAdmin ? ADMIN_COOKIE : CLIENT_COOKIE, token, {
+    httpOnly: true,
+    secure: env.isProd,
+    sameSite: "Lax",
+    path: "/",
+    expires
+  });
+}
+async function lookup(c, cookieName) {
+  const token = getCookie(c, cookieName);
+  if (!token) return null;
+  const db = await getDb();
+  const tokenHash = hashToken(token);
+  const rows = await db.query(
+    "SELECT client_id, is_admin, viewing_as_admin FROM sessions WHERE token_hash = $1 AND expires_at > now()",
+    [tokenHash]
+  );
+  if (rows.length === 0) return null;
+  return { clientId: rows[0].client_id, isAdmin: rows[0].is_admin, tokenHash, viewingAsAdmin: rows[0].viewing_as_admin };
+}
+async function getSession(c) {
+  const s = await lookup(c, CLIENT_COOKIE);
+  return s?.clientId ? s : null;
+}
+async function getAdminSession(c) {
+  const s = await lookup(c, ADMIN_COOKIE);
+  return s?.isAdmin ? s : null;
+}
+async function destroySession(c, role = "client") {
+  const cookieName = role === "admin" ? ADMIN_COOKIE : CLIENT_COOKIE;
+  const token = getCookie(c, cookieName);
+  if (token) {
+    const db = await getDb();
+    await db.query("DELETE FROM sessions WHERE token_hash = $1", [hashToken(token)]);
+  }
+  deleteCookie(c, cookieName, { path: "/" });
+}
+async function rateLimit(key, max, windowMs, failMode = "open") {
+  try {
+    const db = await getDb();
+    const rows = await db.query(
+      `INSERT INTO rate_limits (key, window_start, count) VALUES ($1, now(), 1)
+       ON CONFLICT (key) DO UPDATE SET
+         count = CASE WHEN rate_limits.window_start < now() - make_interval(secs => $2)
+                      THEN 1 ELSE rate_limits.count + 1 END,
+         window_start = CASE WHEN rate_limits.window_start < now() - make_interval(secs => $2)
+                             THEN now() ELSE rate_limits.window_start END
+       RETURNING count`,
+      [key, windowMs / 1e3]
+    );
+    return rows[0].count <= max;
+  } catch (e) {
+    console.error(`[rateLimit] check failed, failing ${failMode}:`, e);
+    return failMode === "open";
+  }
+}
+function clientIp(c) {
+  return c.req.header("x-forwarded-for")?.split(",")[0].trim() || c.req.header("x-real-ip") || "local";
+}
+
+// server/shared.ts
+var testHooks = {
+  /** Makes the next fulfillment throw once (dev suite scaffolding). */
+  failNextFulfillment: false,
+  /** When >= 0, the (N+1)th putFile in the next formation upload throws. */
+  failFormationPutAfter: -1,
+  /** Dev: the next card-on-file charge is declined with this Square code. */
+  declineNextRenewal: ""
+};
+var err = (message, code) => ({ error: { message, code } });
+function maskEmail(email) {
+  const [local, domain] = email.split("@");
+  return `${local.slice(0, 1)}${"\u2022".repeat(Math.max(2, local.length - 1))}@${domain ?? ""}`;
+}
+async function requireAdmin(c) {
+  return getAdminSession(c);
+}
+var MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
+var looksLikePdf = async (f) => {
+  const bytes2 = new Uint8Array(await f.arrayBuffer());
+  if (bytes2.length < 8) return false;
+  const head2 = new TextDecoder().decode(bytes2.slice(0, 8));
+  if (!head2.startsWith("%PDF-")) return false;
+  const tail = new TextDecoder().decode(bytes2.slice(-1024));
+  return tail.includes("%%EOF");
+};
+
+// server/square.ts
+var API_BASE = env.SQUARE_ENV === "production" ? "https://connect.squareup.com" : "https://connect.squareupsandbox.com";
+async function createCheckout(opts) {
+  const redirectUrl = opts.redirectUrl ?? `${env.PUBLIC_BASE_URL}/order/confirmed?ref=${opts.orderId}`;
+  if (!env.SQUARE_ACCESS_TOKEN) {
+    return {
+      url: `${redirectUrl}&dev=1`,
+      squareOrderId: `dev-${opts.orderId}`
+    };
+  }
+  const request = (withPrefill) => fetch(`${API_BASE}/v2/online-checkout/payment-links`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${env.SQUARE_ACCESS_TOKEN}`,
+      "Content-Type": "application/json",
+      "Square-Version": "2025-01-23"
+    },
+    body: JSON.stringify({
+      idempotency_key: randomBytes3(16).toString("hex"),
+      order: {
+        location_id: env.SQUARE_LOCATION_ID,
+        reference_id: opts.orderId,
+        line_items: opts.priced.lineItems.map((li) => ({
+          name: li.name,
+          quantity: "1",
+          base_price_money: { amount: li.amountCents, currency: "USD" }
+        }))
+      },
+      checkout_options: {
+        redirect_url: redirectUrl,
+        merchant_support_email: "support@myfloridaseriesllc.com"
+      },
+      ...withPrefill ? { pre_populated_data: { buyer_email: opts.buyerEmail } } : {},
+      description: opts.description ?? `Florida Protected Series LLC formation \u2014 ${opts.llcName}`
+    })
+  });
+  const attemptWithRetry = async (withPrefill) => {
+    let lastError;
+    for (let i = 0; i < 3; i++) {
+      try {
+        return await request(withPrefill);
+      } catch (e) {
+        lastError = e;
+        await new Promise((resolve) => setTimeout(resolve, 400 * (i + 1)));
+      }
+    }
+    throw lastError;
+  };
+  let res = await attemptWithRetry(true);
+  let body = await res.json();
+  if (!res.ok && body.errors?.some((e) => e.field?.includes("buyer_email"))) {
+    res = await attemptWithRetry(false);
+    body = await res.json();
+  }
+  if (!res.ok || !body.payment_link) {
+    throw new Error(`Square payment link failed (${res.status}): ${JSON.stringify(body.errors ?? body)}`);
+  }
+  return { url: body.payment_link.url, squareOrderId: body.payment_link.order_id };
+}
+var squareHeaders = () => ({
+  Authorization: `Bearer ${env.SQUARE_ACCESS_TOKEN}`,
+  "Content-Type": "application/json",
+  "Square-Version": "2025-01-23"
+});
+async function saveCardFromPayment(opts) {
+  if (!env.SQUARE_ACCESS_TOKEN) {
+    const sim = opts.simulate ?? "credit";
+    if (sim === "wallet") return { ok: false, reason: "wallet payment" };
+    return {
+      ok: true,
+      card: { customerId: `dev-cust-${opts.referenceId.slice(0, 8)}`, cardId: `dev-card-${randomBytes3(4).toString("hex")}`, last4: sim === "prepaid" ? "0005" : "1111", brand: sim === "prepaid" ? "MASTERCARD" : "VISA", prepaid: sim === "prepaid" }
+    };
+  }
+  const custRes = await fetch(`${API_BASE}/v2/customers`, {
+    method: "POST",
+    headers: squareHeaders(),
+    signal: AbortSignal.timeout(3e4),
+    body: JSON.stringify({
+      idempotency_key: createHash4("sha256").update(`customer:${opts.paymentId}`).digest("hex").slice(0, 40),
+      given_name: opts.givenName || void 0,
+      family_name: opts.familyName || void 0,
+      email_address: opts.email,
+      reference_id: opts.referenceId
+    })
+  });
+  const custBody = await custRes.json().catch(() => null);
+  if (!custRes.ok || !custBody?.customer) return { ok: false, reason: "customer", detail: JSON.stringify(custBody?.errors ?? custBody) };
+  const cardRes = await fetch(`${API_BASE}/v2/cards`, {
+    method: "POST",
+    headers: squareHeaders(),
+    signal: AbortSignal.timeout(3e4),
+    body: JSON.stringify({
+      idempotency_key: createHash4("sha256").update(`card:${opts.paymentId}`).digest("hex").slice(0, 40),
+      source_id: opts.paymentId,
+      card: { customer_id: custBody.customer.id, cardholder_name: [opts.givenName, opts.familyName].filter(Boolean).join(" ") || void 0, reference_id: opts.referenceId }
+    })
+  });
+  const cardBody = await cardRes.json().catch(() => null);
+  if (!cardRes.ok || !cardBody?.card) return { ok: false, reason: "not saveable", detail: JSON.stringify(cardBody?.errors ?? cardBody) };
+  return {
+    ok: true,
+    card: { customerId: custBody.customer.id, cardId: cardBody.card.id, last4: cardBody.card.last_4 ?? "", brand: cardBody.card.card_brand ?? "", prepaid: cardBody.card.prepaid_type === "PREPAID" }
+  };
+}
+async function disableCard(cardId) {
+  if (!env.SQUARE_ACCESS_TOKEN) return;
+  const res = await fetch(`${API_BASE}/v2/cards/${encodeURIComponent(cardId)}/disable`, { method: "POST", headers: squareHeaders() });
+  if (!res.ok) throw new Error(`Square disable card failed (${res.status})`);
+}
+function verifyWebhookSignature(opts) {
+  if (!env.SQUARE_WEBHOOK_SIGNATURE_KEY) return !env.isProd;
+  if (!opts.signatureHeader) return false;
+  const expected = hmacSha256Base64(
+    env.SQUARE_WEBHOOK_SIGNATURE_KEY,
+    opts.notificationUrl + opts.rawBody
+  );
+  return expected === opts.signatureHeader;
+}
+async function agentSquarePayment(action, opts) {
+  if (!env.SQUARE_ACCESS_TOKEN) {
+    if (action === "authorize" && (opts.source?.includes("decline") || testHooks.declineNextRenewal)) {
+      const code = testHooks.declineNextRenewal || "GENERIC_DECLINE";
+      testHooks.declineNextRenewal = "";
+      throw new SquareDecline(code);
+    }
+    return { id: opts.id || `dev-${opts.key}`, status: action === "cancel" ? "CANCELED" : action === "complete" ? "COMPLETED" : "APPROVED", card_details: { card: { prepaid_type: opts.source?.includes("prepaid") ? "PREPAID" : "NOT_PREPAID" } } };
+  }
+  const path = action === "authorize" ? "/v2/payments" : `/v2/payments/${encodeURIComponent(opts.id)}` + (action === "get" ? "" : `/${action}`);
+  const body = action === "authorize" ? { idempotency_key: opts.key, source_id: opts.source, ...opts.customerId ? { customer_id: opts.customerId } : {}, amount_money: { amount: opts.amount, currency: "USD" }, location_id: env.SQUARE_LOCATION_ID, autocomplete: false, delay_action: "CANCEL", reference_id: opts.reference, buyer_email_address: opts.email, customer_details: { customer_initiated: opts.customerInitiated === true, seller_keyed_in: false } } : {};
+  const res = await fetch(API_BASE + path, { method: action === "get" ? "GET" : "POST", headers: squareHeaders(), ...action === "get" ? {} : { body: JSON.stringify(body) }, signal: AbortSignal.timeout(3e4) });
+  const out = await res.json();
+  if (!res.ok || !out.payment) {
+    const code = out.errors?.[0]?.code ?? `HTTP_${res.status}`;
+    if (action === "authorize" && ["GENERIC_DECLINE", "CARD_DECLINED", "INSUFFICIENT_FUNDS", "CARD_EXPIRED", "CVV_FAILURE", "ADDRESS_VERIFICATION_FAILURE", "CARD_NOT_SUPPORTED", "INVALID_CARD", "VERIFY_CVV_FAILURE", "VERIFY_AVS_FAILURE", "PAN_FAILURE", "CARD_DECLINED_VERIFICATION_REQUIRED", "CARD_TOKEN_EXPIRED", "CARD_TOKEN_USED", "INVALID_EXPIRATION", "INVALID_PIN", "INVALID_ACCOUNT", "TRANSACTION_LIMIT"].includes(code)) throw new SquareDecline(code);
+    throw new Error(`Square ${action} unresolved (${code}); retry this payment`);
+  }
+  return out.payment;
+}
+var SquareDecline = class extends Error {
+  constructor(code) {
+    super(code);
+    this.code = code;
+  }
+  code;
+};
+
 // src/lib/personName.ts
 var FIRST_AND_LAST = "Enter first and last name.";
 function hasFirstAndLast(name) {
@@ -101081,18 +99409,18 @@ function addBusinessDays(start, n) {
 }
 function validateEffectiveDate(isoDate2, anticipatedFilingDate = /* @__PURE__ */ new Date()) {
   if (!isoDate2) return "Effective date is required.";
-  const target = new Date(isoDate2);
-  if (isNaN(target.getTime())) return "Invalid effective date.";
+  const target2 = new Date(isoDate2);
+  if (isNaN(target2.getTime())) return "Invalid effective date.";
   const earliest = addBusinessDays(anticipatedFilingDate, -5);
   const latest = new Date(anticipatedFilingDate);
   latest.setDate(latest.getDate() + 90);
   earliest.setHours(0, 0, 0, 0);
   latest.setHours(23, 59, 59, 999);
-  target.setHours(12, 0, 0, 0);
-  if (target < earliest) {
+  target2.setHours(12, 0, 0, 0);
+  if (target2 < earliest) {
     return "Effective date cannot be more than 5 business days before the filing date.";
   }
-  if (target > latest) {
+  if (target2 > latest) {
     return "Effective date cannot be more than 90 days after the filing date.";
   }
   return null;
@@ -101610,11 +99938,11 @@ function buildPayload(data) {
       // The permission to keep the card for the yearly renewal, ours only.
       renewalCardConsent: data.registeredAgentChoice === "SERVICE" && data.raRenewalCardConsent === true,
       acceptance: {
-        accepted: data.registeredAgentAcceptanceCheckbox,
-        acceptanceName: data.registeredAgentAcceptanceName,
+        accepted: !(isConversion && data.registeredAgentChoice === "SELF") && data.registeredAgentAcceptanceCheckbox,
+        acceptanceName: isConversion && data.registeredAgentChoice === "SELF" ? "" : data.registeredAgentAcceptanceName,
         capacity: data.registeredAgentAcceptanceCapacity || "",
-        electronicSignature: data.registeredAgentElectronicSignature,
-        signatureAuthorizationConfirmed: data.registeredAgentSignatureAuthorizationCheckbox
+        electronicSignature: isConversion && data.registeredAgentChoice === "SELF" ? "" : data.registeredAgentElectronicSignature,
+        signatureAuthorizationConfirmed: !(isConversion && data.registeredAgentChoice === "SELF") && data.registeredAgentSignatureAuthorizationCheckbox
       }
     },
     management: {
@@ -101790,156 +100118,17 @@ function priceOrder(opts) {
   };
 }
 
-// server/square.ts
-init_env();
-import { randomBytes as randomBytes3 } from "node:crypto";
-var API_BASE = env.SQUARE_ENV === "production" ? "https://connect.squareup.com" : "https://connect.squareupsandbox.com";
-async function createCheckout(opts) {
-  const redirectUrl = opts.redirectUrl ?? `${env.PUBLIC_BASE_URL}/order/confirmed?ref=${opts.orderId}`;
-  if (!env.SQUARE_ACCESS_TOKEN) {
-    return {
-      url: `${redirectUrl}&dev=1`,
-      squareOrderId: `dev-${opts.orderId}`
-    };
-  }
-  const request = (withPrefill) => fetch(`${API_BASE}/v2/online-checkout/payment-links`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${env.SQUARE_ACCESS_TOKEN}`,
-      "Content-Type": "application/json",
-      "Square-Version": "2025-01-23"
-    },
-    body: JSON.stringify({
-      idempotency_key: randomBytes3(16).toString("hex"),
-      order: {
-        location_id: env.SQUARE_LOCATION_ID,
-        reference_id: opts.orderId,
-        line_items: opts.priced.lineItems.map((li) => ({
-          name: li.name,
-          quantity: "1",
-          base_price_money: { amount: li.amountCents, currency: "USD" }
-        }))
-      },
-      checkout_options: {
-        redirect_url: redirectUrl,
-        merchant_support_email: "support@myfloridaseriesllc.com"
-      },
-      ...withPrefill ? { pre_populated_data: { buyer_email: opts.buyerEmail } } : {},
-      description: opts.description ?? `Florida Protected Series LLC formation \u2014 ${opts.llcName}`
-    })
-  });
-  const attemptWithRetry = async (withPrefill) => {
-    let lastError;
-    for (let i = 0; i < 3; i++) {
-      try {
-        return await request(withPrefill);
-      } catch (e) {
-        lastError = e;
-        await new Promise((resolve) => setTimeout(resolve, 400 * (i + 1)));
-      }
-    }
-    throw lastError;
-  };
-  let res = await attemptWithRetry(true);
-  let body = await res.json();
-  if (!res.ok && body.errors?.some((e) => e.field?.includes("buyer_email"))) {
-    res = await attemptWithRetry(false);
-    body = await res.json();
-  }
-  if (!res.ok || !body.payment_link) {
-    throw new Error(`Square payment link failed (${res.status}): ${JSON.stringify(body.errors ?? body)}`);
-  }
-  return { url: body.payment_link.url, squareOrderId: body.payment_link.order_id };
-}
-var squareHeaders = () => ({
-  Authorization: `Bearer ${env.SQUARE_ACCESS_TOKEN}`,
-  "Content-Type": "application/json",
-  "Square-Version": "2025-01-23"
-});
-async function saveCardFromPayment(opts) {
-  if (!env.SQUARE_ACCESS_TOKEN) {
-    const sim = opts.simulate ?? "credit";
-    if (sim === "wallet") return { ok: false, reason: "wallet payment" };
-    return {
-      ok: true,
-      card: { customerId: `dev-cust-${opts.referenceId.slice(0, 8)}`, cardId: `dev-card-${randomBytes3(4).toString("hex")}`, last4: sim === "prepaid" ? "0005" : "1111", brand: sim === "prepaid" ? "MASTERCARD" : "VISA", prepaid: sim === "prepaid" }
-    };
-  }
-  const custRes = await fetch(`${API_BASE}/v2/customers`, {
-    method: "POST",
-    headers: squareHeaders(),
-    body: JSON.stringify({
-      idempotency_key: randomBytes3(16).toString("hex"),
-      given_name: opts.givenName || void 0,
-      family_name: opts.familyName || void 0,
-      email_address: opts.email,
-      reference_id: opts.referenceId
-    })
-  });
-  const custBody = await custRes.json().catch(() => null);
-  if (!custRes.ok || !custBody?.customer) return { ok: false, reason: "customer", detail: JSON.stringify(custBody?.errors ?? custBody) };
-  const cardRes = await fetch(`${API_BASE}/v2/cards`, {
-    method: "POST",
-    headers: squareHeaders(),
-    body: JSON.stringify({
-      idempotency_key: randomBytes3(16).toString("hex"),
-      source_id: opts.paymentId,
-      card: { customer_id: custBody.customer.id, cardholder_name: [opts.givenName, opts.familyName].filter(Boolean).join(" ") || void 0, reference_id: opts.referenceId }
-    })
-  });
-  const cardBody = await cardRes.json().catch(() => null);
-  if (!cardRes.ok || !cardBody?.card) return { ok: false, reason: "not saveable", detail: JSON.stringify(cardBody?.errors ?? cardBody) };
-  return {
-    ok: true,
-    card: { customerId: custBody.customer.id, cardId: cardBody.card.id, last4: cardBody.card.last_4 ?? "", brand: cardBody.card.card_brand ?? "", prepaid: cardBody.card.prepaid_type === "PREPAID" }
-  };
-}
-async function disableCard(cardId) {
-  if (!env.SQUARE_ACCESS_TOKEN) return;
-  const res = await fetch(`${API_BASE}/v2/cards/${encodeURIComponent(cardId)}/disable`, { method: "POST", headers: squareHeaders() });
-  if (!res.ok) throw new Error(`Square disable card failed (${res.status})`);
-}
-async function chargeCardOnFile(opts) {
-  if (!env.SQUARE_ACCESS_TOKEN) {
-    if (testHooks.declineNextRenewal) {
-      const code = testHooks.declineNextRenewal;
-      testHooks.declineNextRenewal = "";
-      return { ok: false, code };
-    }
-    return { ok: true, paymentId: `dev-renewal-${randomBytes3(6).toString("hex")}` };
-  }
-  const res = await fetch(`${API_BASE}/v2/payments`, {
-    method: "POST",
-    headers: squareHeaders(),
-    body: JSON.stringify({
-      idempotency_key: opts.idempotencyKey,
-      source_id: opts.cardId,
-      customer_id: opts.customerId,
-      amount_money: { amount: opts.amountCents, currency: "USD" },
-      location_id: env.SQUARE_LOCATION_ID,
-      autocomplete: true,
-      reference_id: opts.referenceId.slice(0, 40),
-      note: opts.note.slice(0, 500),
-      buyer_email_address: opts.buyerEmail
-    })
-  });
-  const body = await res.json().catch(() => null);
-  if (!res.ok || !body?.payment) return { ok: false, code: body?.errors?.[0]?.code ?? `HTTP_${res.status}`, detail: body?.errors?.[0]?.detail };
-  return { ok: true, paymentId: body.payment.id };
-}
-function verifyWebhookSignature(opts) {
-  if (!env.SQUARE_WEBHOOK_SIGNATURE_KEY) return !env.isProd;
-  if (!opts.signatureHeader) return false;
-  const expected = hmacSha256Base64(
-    env.SQUARE_WEBHOOK_SIGNATURE_KEY,
-    opts.notificationUrl + opts.rawBody
-  );
-  return expected === opts.signatureHeader;
-}
-
 // server/renewals.ts
 init_db();
-init_env();
+
+// src/lib/agentBilling.ts
+var RA_NOTICE_DAYS = 60;
+var RA_CANCEL_DAYS = 30;
+var RA_CHARGE_DAYS = 15;
+var RA_RESIGNATION_CENTS = 9900;
+var RA_CANCELLATION = "You may give cancellation notice at any time. To stop the next annual renewal, give notice at least 30 days before your renewal date and provide proof by the renewal date that another registered agent has replaced us. If you give timely notice but do not provide that proof, we will submit our resignation on the renewal date and charge $99 for state filing fees and processing. This charge does not purchase another year of registered-agent service. We will email you a copy of the resignation and mail the notice required by Florida law. Our appointment ends when the resignation becomes effective under Florida law. Changing agents during a paid service year does not entitle you to a refund.";
+var RA_CARD_CONSENT = "I agree to automatic annual renewal and to keep my card on file with Square. The first year begins when our registered-agent appointment takes effect and is included in the service fee. From the second year, the $99 annual renewal is charged 15 days before the renewal date. I may give cancellation notice at any time; to stop the next renewal, I must give notice at least 30 days before renewal and provide replacement-agent proof by the renewal date. Timely cancellation without that proof results in a $99 resignation charge for state filing fees and processing instead of another service year. A successfully saved eligible card is required for this service.";
+var RA_PREPAID_ERROR = "We do not accept prepaid cards for packages that include our registered-agent service. Use a credit or non-prepaid debit card, or choose another registered agent.";
 
 // server/email.ts
 init_env();
@@ -101976,7 +100165,8 @@ ${mail.html}`);
       to: [mail.to],
       subject: mail.subject,
       html: mail.html,
-      reply_to: mail.replyTo
+      reply_to: mail.replyTo,
+      attachments: mail.attachments
     })
   });
   if (!res.ok) {
@@ -102014,24 +100204,9 @@ function welcomeEmail(name, setPasswordUrl, isConversion = false, raService = tr
     `)
   };
 }
-function giftCardNotKeptEmail(name, llcName, renewalDate) {
-  return {
-    subject: "About the card you paid with",
-    html: wrap(`
-      <p>Hi ${escapeHtml(name || "there")},</p>
-      <p>You paid with a prepaid gift card, which cannot be kept on file for the yearly
-      registered agent renewal for <strong>${escapeHtml(llcName)}</strong>. Nothing else
-      about your order is affected.</p>
-      <p>Before your renewal date${renewalDate ? ` (${escapeHtml(renewalDate)})` : ""} you will receive an email with a
-      payment link. Pay it with a credit or debit card and that card will be kept for
-      the following years, so the renewal is automatic from then on.</p>
-      <p>Questions? Just reply to this email.</p>
-    `)
-  };
-}
 function raRenewalNoticeEmail(opts) {
-  const how = opts.last4 ? `<p>The renewal fee is <strong>${escapeHtml(opts.amount)}</strong> and will be charged to your card ending
-      <strong>${escapeHtml(opts.last4)}</strong> on <strong>${escapeHtml(opts.chargeDate)}</strong>. There is nothing you need to do.</p>` : `<p>The renewal fee is <strong>${escapeHtml(opts.amount)}</strong>. ${opts.giftCard ? "No card is on file (a prepaid gift card cannot be kept)" : "No card is on file"},
+  const how = opts.billingHold ? `<p>Your renewal notice was delayed. Automatic charging is on hold; please contact us to resolve the renewal. You may also pay now using <a href="${opts.linkUrl}">this payment link</a>.</p>` : opts.last4 ? `<p>The renewal fee is <strong>${escapeHtml(opts.amount)}</strong> and will be charged to your card ending
+      <strong>${escapeHtml(opts.last4)}</strong> on <strong>${escapeHtml(opts.chargeDate)}</strong>. There is nothing you need to do.</p>` : `<p>The renewal fee is <strong>${escapeHtml(opts.amount)}</strong>. ${opts.giftCard ? "An eligible card is required" : "No eligible card is on file"},
       so please pay it by <strong>${escapeHtml(opts.renewalDate)}</strong> using the button below. Paying with a credit or debit
       card keeps that card for the following years, so the renewal is automatic from then on.</p>
       <p><a href="${opts.linkUrl ?? "#"}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Pay the renewal</a></p>`;
@@ -102055,7 +100230,7 @@ function raRenewalReceiptEmail(opts) {
     subject: `Registered agent service renewed \u2014 ${opts.llcName}`,
     html: wrap(`
       <p>Hi ${escapeHtml(opts.name || "there")},</p>
-      <p>${opts.last4 ? `We charged <strong>${escapeHtml(opts.amount)}</strong> to your card ending <strong>${escapeHtml(opts.last4)}</strong>` : `We received <strong>${escapeHtml(opts.amount)}</strong>`}
+      <p>We received <strong>${escapeHtml(opts.amount)}</strong>
       for registered agent service for <strong>${escapeHtml(opts.llcName)}</strong> through
       <strong>${escapeHtml(opts.throughDate)}</strong>.</p>
       <p>Your renewal date is shown on the Registered agent service card in your client portal.</p>
@@ -102064,15 +100239,13 @@ function raRenewalReceiptEmail(opts) {
 }
 function raRenewalDeclinedEmail(opts) {
   return {
-    subject: `Action needed: your registered agent renewal charge was declined`,
+    subject: `Action needed: your registered agent ${opts.resignation ? "resignation" : "renewal"} charge was declined`,
     html: wrap(`
       <p>Hi ${escapeHtml(opts.name || "there")},</p>
-      <p>The renewal charge to your card ending <strong>${escapeHtml(opts.last4)}</strong> for registered agent
+      <p>The ${opts.resignation ? "resignation" : "renewal"} charge to your card ending <strong>${escapeHtml(opts.last4)}</strong> for registered agent
       service for <strong>${escapeHtml(opts.llcName)}</strong> was declined.${opts.willRetry && opts.retryDate ? ` We will try the card once more on ${escapeHtml(opts.retryDate)}.` : ""}</p>
-      <p>Pay by <strong>${escapeHtml(opts.renewalDate)}</strong> using the button below, or your service becomes
-      delinquent under the Terms of Service. Paying with a different credit or debit card keeps that card for the
-      following years.</p>
-      <p><a href="${opts.linkUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Pay the renewal</a></p>
+      <p>You may pay now using the same or a different eligible card; there is no two-day waiting period. ${opts.resignation ? "This payment is for state filing fees and processing, not another service year." : `Pay by ${escapeHtml(opts.renewalDate)} to avoid delinquency. The card you use is saved for future annual renewals.`}</p>
+      <p><a href="${opts.linkUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Pay the ${opts.resignation ? "resignation charge" : "renewal"}</a></p>
       <p>If the reason for the decline is not clear to you, your card issuer can tell you.</p>
     `)
   };
@@ -102166,17 +100339,10 @@ function raCancellationEmail(name, renewalDate = null, llcName = "") {
     subject: "Your registered agent cancellation request",
     html: wrap(`
       <p>Hi ${escapeHtml(name || "there")},</p>
-      <p>We received your request to cancel registered agent service${llcName ? ` for <strong>${escapeHtml(llcName)}</strong>` : ""}. Two things determine
-      what happens next:</p>
-      <p><strong>1. The renewal charge.</strong> Because you gave notice through your portal,
-      your service will not renew at the next renewal date${renewalDate ? `, ${escapeHtml(renewalDate)}` : ""} \u2014 as long as your notice was given
-      at least 30 days before that date.</p>
-      <p><strong>2. Removing us as agent of record.</strong> Florida requires your LLC to have
-      a registered agent at all times, so you must designate a successor registered agent with
-      the Florida Division of Corporations and send written proof (such as the filed change)
-      to support@myfloridaseriesllc.com. Until we receive that proof, we remain your agent of
-      record and service is billed at the then-current rate, prorated monthly, as described in
-      the Terms of Service.</p>
+      <p>We received your request to cancel registered agent service${llcName ? ` for <strong>${escapeHtml(llcName)}</strong>` : ""}.</p>
+      ${renewalDate ? `<p>Your renewal date is ${escapeHtml(renewalDate)}.</p>` : ""}
+      <p>${escapeHtml(RA_CANCELLATION)}</p>
+      <p>Email replacement proof to support@myfloridaseriesllc.com.</p>
       <p>Questions? Just reply to this email.</p>
     `)
   };
@@ -102338,6 +100504,49 @@ function sElectionEinArrivedLateEmail(opts) {
   };
 }
 
+// server/datetime.ts
+var ZONE = "America/New_York";
+function stampEastern(d2 = /* @__PURE__ */ new Date()) {
+  const date2 = d2.toLocaleDateString("en-US", {
+    timeZone: ZONE,
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  });
+  const time = d2.toLocaleTimeString("en-US", {
+    timeZone: ZONE,
+    hour: "numeric",
+    minute: "2-digit"
+  });
+  return `${date2} at ${time} ET`;
+}
+function stampForFilename(d2 = /* @__PURE__ */ new Date()) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  }).formatToParts(d2);
+  const get2 = (t) => parts.find((p2) => p2.type === t)?.value ?? "";
+  const hour = get2("hour") === "24" ? "00" : get2("hour");
+  return `${get2("year")}-${get2("month")}-${get2("day")}-${hour}${get2("minute")}ET`;
+}
+function taxationLabel(version) {
+  if (version === "s" || version === "member-s") return "S Corporation";
+  if (version === "single-s" || version === "member-single-s") return "Single-Member S Corporation";
+  if (version === "member-single") return "Single-Member";
+  if (version === "single") return "Single-Member";
+  return "Partnership";
+}
+function easternDateIso(d2 = /* @__PURE__ */ new Date()) {
+  const parts = new Intl.DateTimeFormat("en-CA", { timeZone: ZONE, year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(d2);
+  const get2 = (t) => parts.find((p2) => p2.type === t)?.value ?? "";
+  return `${get2("year")}-${get2("month")}-${get2("day")}`;
+}
+
 // server/renewals.ts
 var raRenewalFeeWords = () => `$${(RA_RENEWAL_FEE_CENTS / 100).toFixed(RA_RENEWAL_FEE_CENTS % 100 === 0 ? 0 : 2)}`;
 var toIso = (d2) => d2.toISOString().slice(0, 10);
@@ -102349,7 +100558,9 @@ var addDays = (iso, n) => {
 };
 var addYears = (iso, n) => {
   const d2 = parse2(iso);
+  const month = d2.getUTCMonth();
   d2.setUTCFullYear(d2.getUTCFullYear() + n);
+  if (d2.getUTCMonth() !== month) d2.setUTCDate(0);
   return toIso(d2);
 };
 var longDate = (iso) => parse2(iso).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric", timeZone: "UTC" });
@@ -102362,10 +100573,13 @@ var isoOf = (v2) => {
 var tookService = (payload) => (typeof payload === "string" ? JSON.parse(payload) : payload)?.registeredAgent?.choice === "SERVICE";
 var gaveConsent = (payload) => (typeof payload === "string" ? JSON.parse(payload) : payload)?.registeredAgent?.renewalCardConsent === true;
 async function saveRenewalCard(db, order2, paymentId, simulate) {
-  if (!tookService(order2.payload) || !gaveConsent(order2.payload)) return;
+  if (!tookService(order2.payload)) return true;
+  if (!gaveConsent(order2.payload)) return false;
+  const [current] = await db.query("SELECT card_status,square_card_id,square_customer_id FROM orders WHERE id=$1", [order2.id]);
+  if (current?.card_status === "on_file" && current.square_card_id && current.square_customer_id) return true;
   if (!paymentId) {
     await db.query("UPDATE orders SET card_status = 'none', card_note = 'no payment id' WHERE id = $1", [order2.id]);
-    return;
+    return false;
   }
   const [givenName, ...rest] = (order2.contact_name ?? "").trim().split(/\s+/);
   const saved = await saveCardFromPayment({
@@ -102378,7 +100592,7 @@ async function saveRenewalCard(db, order2, paymentId, simulate) {
   });
   if (!saved.ok) {
     await db.query("UPDATE orders SET card_status = 'none', card_note = $2 WHERE id = $1", [order2.id, saved.reason]);
-    return;
+    return false;
   }
   if (saved.card.prepaid) {
     await disableCard(saved.card.cardId).catch((e) => console.error("[renewals] disable prepaid card failed:", e));
@@ -102386,162 +100600,101 @@ async function saveRenewalCard(db, order2, paymentId, simulate) {
       "UPDATE orders SET square_customer_id = $2, card_status = 'gift_card', card_note = 'prepaid gift card', card_last4 = NULL, card_brand = NULL, square_card_id = NULL WHERE id = $1",
       [order2.id, saved.card.customerId]
     );
-    const renewal = await db.query("SELECT ra_renewal_date, formed_at FROM orders WHERE id = $1", [order2.id]);
-    const mail = giftCardNotKeptEmail(order2.contact_name, order2.llc_name, isoOf(renewal[0]?.ra_renewal_date) ? longDate(isoOf(renewal[0].ra_renewal_date)) : null);
-    sendMail({ to: order2.contact_email, ...mail }).catch((e) => console.error("[renewals] gift-card email failed:", e));
-    return;
+    return false;
   }
   await db.query(
     "UPDATE orders SET square_customer_id = $2, square_card_id = $3, card_last4 = $4, card_brand = $5, card_status = 'on_file', card_note = NULL WHERE id = $1",
     [order2.id, saved.card.customerId, saved.card.cardId, saved.card.last4, saved.card.brand]
   );
-}
-var NOTICE_DAYS = 45;
-var CHARGE_DAYS = 15;
-var CANCEL_DAYS = 30;
-async function paymentLinkFor(db, row, o) {
-  if (row.link_url) return row.link_url;
-  const link = await createCheckout({
-    orderId: row.id,
-    llcName: o.llc_name,
-    priced: {
-      serviceFeeCents: row.amount_cents,
-      stateFeesCents: 0,
-      totalCents: row.amount_cents,
-      lineItems: [{ name: `Registered agent service renewal \u2014 ${o.llc_name}`, amountCents: row.amount_cents }]
-    },
-    buyerEmail: o.contact_email,
-    redirectUrl: `${env.PUBLIC_BASE_URL}/portal?renewed=${row.id}`,
-    description: `Registered agent service renewal \u2014 ${o.llc_name}`
-  });
-  await db.query("UPDATE ra_renewals SET square_order_id = $2, link_url = $3, updated_at = now() WHERE id = $1", [row.id, link.squareOrderId, link.url]);
-  return link.url;
+  return true;
 }
 async function runRenewals(today) {
-  const db = await getDb();
-  const out = { notices: 0, charged: 0, declined: 0, cancelled: 0, retried: 0 };
-  const orders = await db.query(
-    `SELECT id, contact_name, contact_email, llc_name, ra_renewal_date, ra_cancellation_requested_at,
-            square_customer_id, square_card_id, card_last4, card_brand, card_status
-       FROM orders
-      WHERE status = 'formed' AND ra_renewal_date IS NOT NULL
-        AND payload->'registeredAgent'->>'choice' = 'SERVICE'`
-  );
+  const db = await getDb(), out = { notices: 0, charged: 0, declined: 0, cancelled: 0, retried: 0 };
+  const orders = await db.query("SELECT * FROM orders WHERE status='formed' AND ra_renewal_date IS NOT NULL AND payload->'registeredAgent'->>'choice'='SERVICE' AND ra_ended_date IS NULL AND ra_replaced_at IS NULL");
   for (const o of orders) {
-    const renewalDate = isoOf(o.ra_renewal_date);
-    if (!renewalDate) continue;
-    const cancelledInTime = (() => {
-      const c = isoOf(o.ra_cancellation_requested_at);
-      return !!c && c <= addDays(renewalDate, -CANCEL_DAYS);
-    })();
-    const rows = await db.query(
-      "SELECT id, order_id, renewal_date, amount_cents, status, charge_due, square_order_id, link_url, retry_after, retries FROM ra_renewals WHERE order_id = $1 AND renewal_date = $2",
-      [o.id, renewalDate]
-    );
-    let row = rows[0];
-    const hasCard = o.card_status === "on_file" && !!o.square_card_id && !!o.square_customer_id;
-    if (!row && today >= addDays(renewalDate, -NOTICE_DAYS)) {
-      if (cancelledInTime) continue;
-      const made = await db.query(
-        `INSERT INTO ra_renewals (order_id, renewal_date, amount_cents, status, charge_due, notice_sent_at)
-         VALUES ($1, $2, $3, $4, $5, now())
-         RETURNING id, order_id, renewal_date, amount_cents, status, charge_due, square_order_id, link_url, retry_after, retries`,
-        [o.id, renewalDate, RA_RENEWAL_FEE_CENTS, hasCard ? "notice_sent" : "link_sent", addDays(renewalDate, -CHARGE_DAYS)]
-      );
-      row = made[0];
-      const linkUrl = hasCard ? null : await paymentLinkFor(db, row, o);
-      const mail = raRenewalNoticeEmail({
-        name: o.contact_name,
-        llcName: o.llc_name,
-        renewalDate: longDate(renewalDate),
-        amount: raRenewalFeeWords(),
-        last4: hasCard ? o.card_last4 : null,
-        chargeDate: longDate(addDays(renewalDate, -CHARGE_DAYS)),
-        cancelBy: longDate(addDays(renewalDate, -CANCEL_DAYS)),
-        linkUrl,
-        giftCard: o.card_status === "gift_card"
-      });
-      sendMail({ to: o.contact_email, ...mail }).catch((e) => console.error("[renewals] notice failed:", e));
-      out.notices += 1;
-      continue;
-    }
-    if (!row) continue;
-    if (cancelledInTime && ["notice_sent", "link_sent", "declined"].includes(row.status)) {
-      await db.query("UPDATE ra_renewals SET status = 'cancelled', updated_at = now() WHERE id = $1", [row.id]);
-      out.cancelled += 1;
-      continue;
-    }
-    const chargeDue = isoOf(row.charge_due) ?? addDays(renewalDate, -CHARGE_DAYS);
-    const retryDue = row.status === "declined" && isoOf(row.retry_after) && row.retries < 1 && today >= isoOf(row.retry_after);
-    const firstDue = row.status === "notice_sent" && today >= chargeDue;
-    if ((firstDue || retryDue) && hasCard) {
-      const attempt = row.retries + 1;
-      const charged = await chargeCardOnFile({
-        cardId: o.square_card_id,
-        customerId: o.square_customer_id,
-        amountCents: row.amount_cents,
-        idempotencyKey: `ren-${row.id}-${attempt}`,
-        referenceId: o.id,
-        note: `Registered agent service renewal \u2014 ${o.llc_name}`,
-        buyerEmail: o.contact_email
-      });
-      if (retryDue) out.retried += 1;
-      if (charged.ok) {
-        const through = addYears(renewalDate, 1);
-        await db.query("UPDATE ra_renewals SET status = 'charged', charged_at = now(), square_payment_id = $2, retries = $3, updated_at = now() WHERE id = $1", [row.id, charged.paymentId, attempt]);
-        await db.query("UPDATE orders SET ra_renewal_date = $2 WHERE id = $1", [o.id, through]);
-        const mail = raRenewalReceiptEmail({ name: o.contact_name, llcName: o.llc_name, amount: raRenewalFeeWords(), last4: o.card_last4 ?? "", throughDate: longDate(through) });
-        sendMail({ to: o.contact_email, ...mail }).catch((e) => console.error("[renewals] receipt failed:", e));
-        out.charged += 1;
-      } else {
-        const retryAfter = charged.code === "INSUFFICIENT_FUNDS" && attempt < 2 ? addDays(today, 2) : null;
-        await db.query(
-          "UPDATE ra_renewals SET status = 'declined', decline_code = $2, retry_after = $3, retries = $4, updated_at = now() WHERE id = $1",
-          [row.id, charged.code, retryAfter, retryDue ? attempt : row.retries]
-        );
-        const linkUrl = await paymentLinkFor(db, { ...row, retries: attempt }, o);
-        const mail = raRenewalDeclinedEmail({ name: o.contact_name, llcName: o.llc_name, last4: o.card_last4 ?? "", renewalDate: longDate(renewalDate), linkUrl, willRetry: !!retryAfter, retryDate: retryAfter ? longDate(retryAfter) : null });
-        sendMail({ to: o.contact_email, ...mail }).catch((e) => console.error("[renewals] decline email failed:", e));
-        out.declined += 1;
+    const date2 = isoOf(o.ra_renewal_date);
+    const cancel = o.ra_cancellation_requested_at ? easternDateIso(new Date(String(o.ra_cancellation_requested_at))) : null;
+    const timely = !!cancel && cancel <= addDays(date2, -RA_CANCEL_DAYS);
+    let [row] = await db.query("SELECT * FROM ra_renewals WHERE order_id=$1 AND renewal_date=$2", [o.id, date2]);
+    if (timely) {
+      if (today < date2) {
+        if (row && !["charged", "paid_by_link", "cancelled"].includes(row.status)) {
+          await db.query("UPDATE ra_renewals SET status='cancelled',retry_after=NULL WHERE id=$1", [row.id]);
+          out.cancelled++;
+        }
+        continue;
       }
+      if (o.ra_proof_received_at) continue;
+      await db.query("UPDATE orders SET ra_resignation_due=COALESCE(ra_resignation_due,$2) WHERE id=$1", [o.id, date2]);
+      if (!row) {
+        [row] = await db.query("INSERT INTO ra_renewals(order_id,renewal_date,amount_cents,status,purpose,charge_due) VALUES($1,$2,$3,'notice_pending','resignation',$2) ON CONFLICT(order_id,renewal_date) DO UPDATE SET order_id=EXCLUDED.order_id RETURNING *", [o.id, date2, RA_RESIGNATION_CENTS]);
+      } else if (row.purpose !== "resignation" && !["charged", "paid_by_link"].includes(row.status)) {
+        [row] = await db.query("UPDATE ra_renewals SET purpose='resignation',status='notice_pending',amount_cents=$2,charge_due=renewal_date,notice_sent_at=NULL,billing_hold=false,retry_after=NULL,retries=0 WHERE id=$1 RETURNING *", [row.id, RA_RESIGNATION_CENTS]);
+      }
+    } else if (!row && today >= addDays(date2, -RA_NOTICE_DAYS)) {
+      [row] = await db.query("INSERT INTO ra_renewals(order_id,renewal_date,amount_cents,status,charge_due) VALUES($1,$2,$3,'notice_pending',$4) ON CONFLICT(order_id,renewal_date) DO UPDATE SET order_id=EXCLUDED.order_id RETURNING *", [o.id, date2, RA_RENEWAL_FEE_CENTS, addDays(date2, -RA_CHARGE_DAYS)]);
+    }
+    if (!row || ["charged", "paid_by_link", "cancelled"].includes(row.status)) continue;
+    const [locked] = await db.query("UPDATE ra_renewals SET lock_until=now()+interval '2 minutes' WHERE id=$1 AND (lock_until IS NULL OR lock_until<now()) RETURNING *", [row.id]);
+    if (!locked) continue;
+    row = locked;
+    try {
+      const hasCard = o.card_status === "on_file" && !!o.square_card_id && !!o.square_customer_id && gaveConsent(o.payload);
+      if (row.status === "notice_pending") {
+        const link = await agentCheckoutLink("renewal", row.id);
+        const late2 = row.purpose === "renewal" && today > addDays(date2, -RA_NOTICE_DAYS);
+        const mail = row.purpose === "resignation" ? { subject: `Registered-agent resignation due \u2014 ${o.llc_name}`, html: `<p>Your timely cancellation has reached its renewal date without replacement proof. A $99 charge for state filing fees and processing is due. This does not purchase another service year. The office must submit the resignation; this notice does not confirm filing.</p><p><a href="${link}">Pay now</a></p>` } : raRenewalNoticeEmail({ name: o.contact_name, llcName: o.llc_name, renewalDate: longDate(date2), amount: raRenewalFeeWords(), last4: hasCard ? o.card_last4 : null, chargeDate: longDate(addDays(date2, -RA_CHARGE_DAYS)), cancelBy: longDate(addDays(date2, -RA_CANCEL_DAYS)), linkUrl: link, giftCard: false, billingHold: late2 });
+        try {
+          await sendMail({ to: o.contact_email, ...mail });
+          await db.query("UPDATE ra_renewals SET status=$2,notice_sent_at=$3,billing_hold=$4,notice_error=NULL,link_url=$5 WHERE id=$1", [row.id, hasCard ? "notice_sent" : "link_sent", `${today}T12:00:00Z`, late2, link]);
+          out.notices++;
+          row = { ...row, status: hasCard ? "notice_sent" : "link_sent", notice_sent_at: `${today}T12:00:00Z`, billing_hold: late2 };
+        } catch (e) {
+          await db.query("UPDATE ra_renewals SET notice_error=$2 WHERE id=$1", [row.id, String(e).slice(0, 300)]);
+        }
+        if (row.purpose !== "resignation" || !row.notice_sent_at) continue;
+      }
+      if (!row.notice_sent_at || row.billing_hold || !hasCard) continue;
+      const retry2 = row.status === "declined" && row.retries < 2 && !!row.retry_after && today >= isoOf(row.retry_after);
+      const first = row.status === "notice_sent" && today >= isoOf(row.charge_due);
+      const recover = row.status === "charging";
+      if (!first && !retry2 && !recover) continue;
+      await db.query("UPDATE ra_renewals SET status='charging' WHERE id=$1 AND status NOT IN ('charged','paid_by_link','cancelled')", [row.id]);
+      const result = await payAgentTarget("renewal", row.id, { cardId: o.square_card_id, customerId: o.square_customer_id, automatic: true });
+      if (result.ok) {
+        out.charged++;
+        if (retry2) out.retried++;
+      } else if (result.code !== "UNRESOLVED" && result.code !== "PROCESSING") {
+        const attempt = row.retries + 1, retryAfter = result.code === "INSUFFICIENT_FUNDS" && attempt < 2 ? addDays(today, 2) : null;
+        await db.query("UPDATE ra_renewals SET status='declined',retries=$2,retry_after=$3,decline_code=$4 WHERE id=$1 AND status='charging'", [row.id, attempt, retryAfter, result.code]);
+        const link = await agentCheckoutLink("renewal", row.id);
+        const mail = raRenewalDeclinedEmail({ name: o.contact_name, llcName: o.llc_name, last4: o.card_last4 ?? "", renewalDate: longDate(date2), linkUrl: link, willRetry: !!retryAfter, retryDate: retryAfter ? longDate(retryAfter) : null, resignation: row.purpose === "resignation" });
+        await sendMail({ to: o.contact_email, ...mail }).catch((e) => console.error("[renewal] decline notice failed", e));
+        out.declined++;
+        if (retry2) out.retried++;
+      }
+    } catch (e) {
+      console.error("[renewal] company needs attention", o.id, e);
+      await db.query("UPDATE ra_renewals SET notice_error=$2 WHERE id=$1", [row.id, String(e).slice(0, 300)]);
+    } finally {
+      await db.query("UPDATE ra_renewals SET lock_until=NULL WHERE id=$1", [row.id]);
     }
   }
   return out;
 }
-async function fulfillPaidRenewal(renewalId, paymentId, simulate) {
+async function fulfillPaidRenewal(renewalId, paymentId, simulate, cardAlreadySaved = false, automatic2 = false) {
   const db = await getDb();
-  const rows = await db.query(
-    `UPDATE ra_renewals r SET status = 'paid_by_link', charged_at = now(), square_payment_id = $2, updated_at = now()
-       FROM orders o
-      WHERE r.id = $1 AND o.id = r.order_id AND r.status IN ('link_sent', 'declined', 'notice_sent')
-      RETURNING r.id, r.order_id, r.renewal_date, r.amount_cents, r.status, r.charge_due, r.square_order_id, r.link_url, r.retry_after, r.retries,
-                o.contact_name, o.contact_email, o.llc_name, o.payload`,
-    [renewalId, paymentId]
-  );
-  if (rows.length === 0) return;
-  const r = rows[0];
-  const renewalDate = isoOf(r.renewal_date);
-  const through = addYears(renewalDate, 1);
-  await db.query("UPDATE orders SET ra_renewal_date = $2 WHERE id = $1", [r.order_id, through]);
-  let last4 = "";
-  if (paymentId) {
-    const [givenName, ...rest] = (r.contact_name ?? "").trim().split(/\s+/);
-    const saved = await saveCardFromPayment({ paymentId, givenName: givenName ?? "", familyName: rest.join(" "), email: r.contact_email, referenceId: r.order_id, simulate });
-    if (saved.ok && !saved.card.prepaid) {
-      await db.query(
-        "UPDATE orders SET square_customer_id = $2, square_card_id = $3, card_last4 = $4, card_brand = $5, card_status = 'on_file', card_note = NULL WHERE id = $1",
-        [r.order_id, saved.card.customerId, saved.card.cardId, saved.card.last4, saved.card.brand]
-      );
-      last4 = saved.card.last4;
-    } else if (saved.ok && saved.card.prepaid) {
-      await disableCard(saved.card.cardId).catch(() => {
-      });
-      await db.query("UPDATE orders SET card_status = 'gift_card', card_note = 'prepaid gift card', square_card_id = NULL, card_last4 = NULL, card_brand = NULL WHERE id = $1", [r.order_id]);
-      last4 = saved.card.last4;
-    }
-  }
-  const mail = raRenewalReceiptEmail({ name: r.contact_name, llcName: r.llc_name, amount: raRenewalFeeWords(), last4, throughDate: longDate(through) });
-  sendMail({ to: r.contact_email, ...mail }).catch((e) => console.error("[renewals] link receipt failed:", e));
+  const [row] = await db.query(`SELECT r.*,o.contact_name,o.contact_email,o.llc_name,o.payload,o.ra_appointment_date FROM ra_renewals r JOIN orders o ON o.id=r.order_id WHERE r.id=$1`, [renewalId]);
+  if (!row || ["charged", "paid_by_link", "cancelled"].includes(row.status)) return;
+  if (!cardAlreadySaved && row.purpose !== "resignation" && !await saveRenewalCard(db, { ...row, id: row.order_id }, paymentId, simulate)) throw new Error("An eligible renewal card must be saved before renewal fulfillment");
+  const renewalDate = isoOf(row.renewal_date);
+  const nextYear = Number(renewalDate.slice(0, 4)) + 1;
+  const appointment = isoOf(row.ra_appointment_date);
+  const through = appointment ? addYears(appointment, nextYear - Number(appointment.slice(0, 4))) : addYears(renewalDate, 1);
+  const done = await db.query(`WITH paid AS (UPDATE ra_renewals SET status=$3,charged_at=now(),square_payment_id=$2,retries=GREATEST(retries,(SELECT count(*)::int FROM ra_payment_attempts a WHERE a.target_id=$1 AND a.automatic)),retry_after=NULL,updated_at=now() WHERE id=$1 AND status NOT IN ('charged','paid_by_link','cancelled') RETURNING order_id,purpose) UPDATE orders o SET ra_renewal_date=CASE WHEN paid.purpose='renewal' THEN $4::date ELSE o.ra_renewal_date END FROM paid WHERE o.id=paid.order_id RETURNING o.id`, [renewalId, paymentId, automatic2 ? "charged" : "paid_by_link", through]);
+  if (!done.length) return;
+  const mail = row.purpose === "resignation" ? { subject: `Registered-agent resignation payment \u2014 ${row.llc_name}`, html: "<p>We received $99 for state filing fees and processing of the registered-agent resignation. This does not purchase another year of service. Your portal shows the actual resignation status.</p>" } : raRenewalReceiptEmail({ name: row.contact_name, llcName: row.llc_name, amount: `$${(row.amount_cents / 100).toFixed(2)}`, last4: "", throughDate: longDate(through) });
+  await sendMail({ to: row.contact_email, ...mail }).catch((e) => console.error("[renewal] receipt failed", e));
 }
 
 // server/sunbiz.ts
@@ -102742,7 +100895,7 @@ async function unavailableNames(names) {
 }
 
 // server/owners-manual.ts
-import { createHash as createHash5 } from "node:crypto";
+import { createHash as createHash6 } from "node:crypto";
 
 // ../docs/owners-manual.md
 var owners_manual_default = `<!-- MASTER. This file is the Owner's Manual. Edit it here.
@@ -103305,7 +101458,7 @@ async function publish(force) {
   const meta = typeof current?.meta === "string" ? JSON.parse(current.meta) : current?.meta;
   if (!force && meta?.pinned) return { published: false, pinned: true };
   const { renderManualPdf: renderManualPdf2, MANUAL_RENDERER_VERSION: MANUAL_RENDERER_VERSION2 } = await Promise.resolve().then(() => (init_manual_pdf(), manual_pdf_exports));
-  const hash = createHash5("sha256").update(owners_manual_default).update(`renderer:${MANUAL_RENDERER_VERSION2}`).digest("hex").slice(0, 16);
+  const hash = createHash6("sha256").update(owners_manual_default).update(`renderer:${MANUAL_RENDERER_VERSION2}`).digest("hex").slice(0, 16);
   if (!force && meta?.hash === hash) return { published: false };
   const { pdf, pages, edition } = await renderManualPdf2(owners_manual_default);
   const stored = await putFile("owners-manual.pdf", pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength), "application/pdf");
@@ -107599,49 +105752,6 @@ By: _____________________________
 *[TITLE] of [COMPANY NAME], LLC \u2014 generated by MyFloridaSeriesLLC \xB7 Master [EDITION]*
 `;
 
-// server/datetime.ts
-var ZONE = "America/New_York";
-function stampEastern(d2 = /* @__PURE__ */ new Date()) {
-  const date = d2.toLocaleDateString("en-US", {
-    timeZone: ZONE,
-    year: "numeric",
-    month: "long",
-    day: "numeric"
-  });
-  const time = d2.toLocaleTimeString("en-US", {
-    timeZone: ZONE,
-    hour: "numeric",
-    minute: "2-digit"
-  });
-  return `${date} at ${time} ET`;
-}
-function stampForFilename(d2 = /* @__PURE__ */ new Date()) {
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone: ZONE,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false
-  }).formatToParts(d2);
-  const get2 = (t) => parts.find((p2) => p2.type === t)?.value ?? "";
-  const hour = get2("hour") === "24" ? "00" : get2("hour");
-  return `${get2("year")}-${get2("month")}-${get2("day")}-${hour}${get2("minute")}ET`;
-}
-function taxationLabel(version) {
-  if (version === "s" || version === "member-s") return "S Corporation";
-  if (version === "single-s" || version === "member-single-s") return "Single-Member S Corporation";
-  if (version === "member-single") return "Single-Member";
-  if (version === "single") return "Single-Member";
-  return "Partnership";
-}
-function easternDateIso(d2 = /* @__PURE__ */ new Date()) {
-  const parts = new Intl.DateTimeFormat("en-CA", { timeZone: ZONE, year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(d2);
-  const get2 = (t) => parts.find((p2) => p2.type === t)?.value ?? "";
-  return `${get2("year")}-${get2("month")}-${get2("day")}`;
-}
-
 // server/oa.ts
 function loadTemplate(v2) {
   return v2.includes("OPERATING AGREEMENT") ? v2 : readFileSync(v2, "utf8");
@@ -109253,10 +107363,10 @@ function registerPortalRoutes(app2) {
     const rows = await db.query(
       `SELECT id, llc_name, formed_at, payload->>'filingPath' AS filing_path,
             (payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_service,
-            ra_renewal_date, ra_cancellation_requested_at,
+            ra_renewal_date, ra_cancellation_requested_at, ra_appointment_date,ra_resignation_due,ra_resignation_submitted,ra_ended_date,card_note,
             card_status, card_last4, card_brand,
             -- The renewals, newest first (16 Sep 2026).
-            (SELECT COALESCE(jsonb_agg(jsonb_build_object('id', r.id, 'date', r.renewal_date, 'amountCents', r.amount_cents, 'status', r.status, 'chargedAt', r.charged_at) ORDER BY r.renewal_date DESC), '[]'::jsonb)
+            (SELECT COALESCE(jsonb_agg(jsonb_build_object('id', r.id, 'purpose',r.purpose,'linkUrl',r.link_url,'date', r.renewal_date, 'amountCents', r.amount_cents, 'status', r.status, 'chargedAt', r.charged_at) ORDER BY r.renewal_date DESC), '[]'::jsonb)
                FROM ra_renewals r WHERE r.order_id = orders.id) AS renewals
        FROM orders WHERE client_id = $1 AND paid_at IS NOT NULL
       ORDER BY paid_at DESC NULLS LAST`,
@@ -109267,6 +107377,11 @@ function registerPortalRoutes(app2) {
       llcName: r.llc_name,
       formed: !!r.formed_at,
       raService: r.ra_service === true,
+      raAppointmentDate: r.ra_appointment_date ? isoDate(r.ra_appointment_date) : null,
+      raResignationDue: r.ra_resignation_due ? isoDate(r.ra_resignation_due) : null,
+      raResignationSubmitted: r.ra_resignation_submitted ? isoDate(r.ra_resignation_submitted) : null,
+      raEndedDate: r.ra_ended_date ? isoDate(r.ra_ended_date) : null,
+      cardNote: r.card_note,
       raRenewalDate: r.ra_renewal_date ? isoDate(r.ra_renewal_date) : null,
       raCancellationRequestedAt: r.ra_cancellation_requested_at ?? null,
       cardStatus: r.card_status ?? null,
@@ -110176,7 +108291,7 @@ function registerPortalRoutes(app2) {
     if (body.data.target === "series" && !body.data.seriesName?.trim()) {
       return c.json(err("Name the protected series the EIN is for.", "INVALID_INPUT"), 400);
     }
-    const target = body.data.target;
+    const target2 = body.data.target;
     const seriesName = body.data.seriesName?.trim() ?? "";
     const db = await getDb();
     const existingEin = await db.query(
@@ -110186,19 +108301,19 @@ function registerPortalRoutes(app2) {
     );
     const alreadyOrdered = existingEin.some((r) => {
       const d2 = typeof r.details === "string" ? JSON.parse(r.details) : r.details;
-      if (target === "company") return (d2?.target ?? "company") === "company";
+      if (target2 === "company") return (d2?.target ?? "company") === "company";
       return d2?.target === "series" && (d2.seriesName ?? "").trim().toLowerCase() === seriesName.toLowerCase();
     });
     if (alreadyOrdered) {
       return c.json(
         err(
-          target === "company" ? "Your LLC's EIN is already ordered \u2014 See Orders in progress." : "An EIN for that protected series is already ordered \u2014 See Orders in progress.",
+          target2 === "company" ? "Your LLC's EIN is already ordered \u2014 See Orders in progress." : "An EIN for that protected series is already ordered \u2014 See Orders in progress.",
           "ALREADY_ORDERED"
         ),
         400
       );
     }
-    if (target === "series") {
+    if (target2 === "series") {
       const mine = await clientSeries(session.clientId, purchaseCompanyId);
       const match2 = mine.find((s) => s.name.toLowerCase() === seriesName.toLowerCase());
       if (!match2) return c.json(err("That protected series is not on your account.", "UNKNOWN_SERIES"), 400);
@@ -110212,11 +108327,11 @@ function registerPortalRoutes(app2) {
     const rows = await db.query(
       `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents, formation_order_id)
      VALUES ($1, 'ein', $2, $3, $4, $5) RETURNING id`,
-      [session.clientId, llcName, JSON.stringify({ target, seriesName }), EIN_FEE_CENTS, purchaseCompanyId]
+      [session.clientId, llcName, JSON.stringify({ target: target2, seriesName }), EIN_FEE_CENTS, purchaseCompanyId]
     );
     const serviceOrderId = rows[0].id;
     const clients = await db.query("SELECT email FROM clients WHERE id = $1", [session.clientId]);
-    const forName = target === "series" ? seriesName : llcName;
+    const forName = target2 === "series" ? seriesName : llcName;
     const checkout = await createCheckout({
       orderId: serviceOrderId,
       llcName,
@@ -110796,6 +108911,8 @@ function summaryMarkdown(o) {
   out.push(line("Signed at", when(p2.metadata?.submittedAt ?? o.created_at)));
   out.push(``);
   out.push(`## Acknowledgments ticked`);
+  const billingConsent = o.agent_billing_consent;
+  if (billingConsent) out.push(`Automatic renewal and card storage: ${billingConsent}`);
   out.push(`Each box below was ticked by the client, in these words, at ${when(p2.metadata?.submittedAt ?? o.created_at)}.`);
   for (const t of ticked(p2)) out.push(`- ${t.text}`);
   out.push(``);
@@ -110810,7 +108927,7 @@ async function loadSummaryRow(orderId) {
   const db = await getDb();
   const rows = await db.query(
     `SELECT id, llc_name, package, contact_name, contact_email, payload, service_fee_cents, state_fees_cents, total_cents,
-            status, square_order_id, square_payment_id, created_at, paid_at, line_items, submitted_ip, submitted_user_agent
+            status, square_order_id, square_payment_id, created_at, paid_at, line_items, submitted_ip, submitted_user_agent, agent_billing_consent
        FROM orders WHERE id = $1`,
     [orderId]
   );
@@ -110834,11 +108951,14 @@ async function fulfillPaidOrder(orderId, squarePaymentId, cardSim) {
     throw new Error("injected fulfillment failure (dev test scaffolding)");
   }
   const db = await getDb();
+  const [candidate] = await db.query("SELECT * FROM orders WHERE id=$1", [orderId]);
+  if (!candidate || candidate.fulfillment_completed_at) return;
   await db.query(
     `UPDATE orders SET status = 'paid', paid_at = now(), square_payment_id = $1
       WHERE id = $2 AND status = 'pending_payment'`,
     [squarePaymentId, orderId]
   );
+  if (!await saveRenewalCard(db, candidate, squarePaymentId, cardSim)) throw new Error("Registered-agent service requires consent and an eligible saved card; setup is held.");
   const welcomeToken = newToken();
   const completed = await db.query(
     `WITH target AS MATERIALIZED (
@@ -110885,7 +109005,6 @@ async function fulfillPaidOrder(orderId, squarePaymentId, cardSim) {
   if (completed.length === 0) return;
   const order2 = completed[0];
   const payload = typeof order2.payload === "string" ? JSON.parse(order2.payload) : order2.payload;
-  await saveRenewalCard(db, order2, squarePaymentId, cardSim).catch((e) => console.error("[renewals] card not saved:", e));
   await writeOrderSummary(orderId).catch((e) => console.error("[fulfill] summary rewrite failed:", e));
   if (!order2.password_hash) {
     const { token } = welcomeToken;
@@ -111070,8 +109189,8 @@ function registerPaymentRoutes(app2) {
     const llcName = (payload.filingPath === "CONVERT" ? payload.existingLlcName : "") || payload.llcName.finalName || payload.llcName.desiredName || "Unnamed LLC";
     const db = await getDb();
     const rows = await db.query(
-      `INSERT INTO orders (contact_name, contact_email, package, llc_name, payload, service_fee_cents, state_fees_cents, total_cents, line_items, submitted_ip, submitted_user_agent)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id`,
+      `INSERT INTO orders (contact_name, contact_email, package, llc_name, payload, service_fee_cents, state_fees_cents, total_cents, line_items, submitted_ip, submitted_user_agent, agent_billing_consent)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id`,
       [
         // The CLIENT owns the order: portal account, welcome email, and the
         // admin's "Client:" line all come from the up-front card, not from the
@@ -111086,11 +109205,12 @@ function registerPaymentRoutes(app2) {
         priced.totalCents,
         JSON.stringify(priced.lineItems),
         payload.metadata.ipAddress,
-        payload.metadata.userAgent
+        payload.metadata.userAgent,
+        data.registeredAgentChoice === "SERVICE" && data.raRenewalCardConsent ? RA_CARD_CONSENT : null
       ]
     );
     const orderId = rows[0].id;
-    const checkout = await createCheckout({
+    const checkout = data.registeredAgentChoice === "SERVICE" ? { url: await agentCheckoutLink("order", orderId), squareOrderId: `agent-${orderId}` } : await createCheckout({
       orderId,
       llcName,
       priced,
@@ -111142,6 +109262,18 @@ function registerPaymentRoutes(app2) {
       if (claimedEvent.length === 0) return c.json({ data: { ok: true, duplicate: true } });
     }
     const payment = event.data?.object?.payment;
+    if (event.type?.startsWith("payment.") && payment?.status === "COMPLETED") {
+      const [a2] = await db.query("SELECT target_id,kind FROM ra_payment_attempts WHERE square_payment_id=$1 AND status IN ('approved','completed')", [payment.id]);
+      if (a2) {
+        const [target2] = await db.query(a2.kind === "order" ? "SELECT total_cents AS amount FROM orders WHERE id=$1" : "SELECT amount_cents AS amount FROM ra_renewals WHERE id=$1", [a2.target_id]);
+        const mismatch = moneyMismatch(payment.amount_money, target2.amount);
+        if (mismatch) await alertMoneyMismatch(mismatch, payment.order_id ?? a2.target_id, payment.id);
+        else {
+          const result = await payAgentTarget(a2.kind, a2.target_id, { token: "resume-persisted-attempt" });
+          if (!result.ok) throw new Error("Recorded agent payment needs retry: " + result.code);
+        }
+      }
+    }
     if (event.type?.startsWith("payment.") && payment?.status === "COMPLETED" && payment.order_id) {
       const rows = await db.query(
         "SELECT id, total_cents FROM orders WHERE square_order_id = $1",
@@ -111339,6 +109471,2050 @@ function registerPaymentRoutes(app2) {
     }
   });
 }
+
+// server/ra-checkout.ts
+async function target(kind, id) {
+  const db = await getDb();
+  return (await db.query(kind === "order" ? `SELECT id,id AS order_id,status,total_cents AS amount,contact_email AS email,contact_name AS name,llc_name,payload,checkout_token FROM orders WHERE id=$1` : `SELECT r.id,r.order_id,r.status,r.amount_cents AS amount,o.contact_email AS email,o.contact_name AS name,o.llc_name,o.payload,r.checkout_token,r.purpose FROM ra_renewals r JOIN orders o ON o.id=r.order_id WHERE r.id=$1`, [id]))[0];
+}
+async function agentCheckoutLink(kind, id) {
+  const db = await getDb(), table = kind === "order" ? "orders" : "ra_renewals";
+  const row = await target(kind, id);
+  if (!row) throw new Error("Payment target missing");
+  const token = row.checkout_token ?? newToken().token;
+  const [saved] = await db.query(`UPDATE ${table} SET checkout_token=COALESCE(checkout_token,$2) WHERE id=$1 RETURNING checkout_token`, [id, token]);
+  return `${env.PUBLIC_BASE_URL}/agent-checkout?kind=${kind}&id=${id}&token=${saved.checkout_token}`;
+}
+async function payAgentTarget(kind, id, source) {
+  const db = await getDb(), t = await target(kind, id);
+  if (!t) throw new Error("Payment target missing");
+  const p2 = typeof t.payload === "string" ? JSON.parse(t.payload) : t.payload;
+  if (t.purpose !== "resignation" && p2?.registeredAgent?.renewalCardConsent !== true) return { ok: false, code: "CARD_CONSENT", message: "Automatic renewal and card storage consent are required for registered-agent service." };
+  if (kind === "order" && t.status !== "pending_payment") {
+    await fulfillPaidOrder(id, null);
+    return { ok: true };
+  }
+  if (kind === "renewal" && ["charged", "paid_by_link"].includes(t.status)) return { ok: true };
+  if (kind === "renewal" && t.status === "cancelled") return { ok: false, code: "CANCELLED", message: "This renewal has been cancelled." };
+  if (kind === "renewal" && t.purpose !== "resignation") {
+    const [o] = await db.query(`SELECT o.ra_cancellation_requested_at,o.ra_replaced_at,o.ra_ended_date,r.renewal_date FROM orders o JOIN ra_renewals r ON r.order_id=o.id WHERE r.id=$1`, [id]);
+    const cancelled = o.ra_cancellation_requested_at ? easternDateIso(new Date(String(o.ra_cancellation_requested_at))) : null;
+    if (o.ra_replaced_at || o.ra_ended_date || cancelled && cancelled <= addDays(isoOf(o.renewal_date), -30)) return { ok: false, code: "CANCELLED", message: "This service renewal is cancelled. Any resignation charge is shown separately." };
+  }
+  if (!source.token && !source.cardId) return { ok: false, code: "CARD_REQUIRED", message: "Enter an eligible payment card." };
+  await db.query(`INSERT INTO ra_payment_attempts(target_id,kind,source_token,automatic) VALUES($1,$2,$3,$4) ON CONFLICT DO NOTHING`, [id, kind, encryptSecret(JSON.stringify(source)), source.automatic === true]);
+  const [a2] = await db.query(`UPDATE ra_payment_attempts SET lock_until=now()+interval '2 minutes' WHERE target_id=$1 AND status IN ('pending','approved','completed') AND (lock_until IS NULL OR lock_until<now()) RETURNING *`, [id]);
+  if (!a2) return { ok: false, code: "PROCESSING", message: "A payment is being checked. Please retry shortly; do not submit another payment elsewhere." };
+  let actual = source;
+  try {
+    actual = a2.source_token ? JSON.parse(decryptSecret(a2.source_token)) : source;
+    if (a2.status === "completed") {
+      if (kind === "order") await fulfillPaidOrder(id, a2.square_payment_id);
+      else await fulfillPaidRenewal(id, a2.square_payment_id, void 0, true, actual.automatic === true);
+      await db.query("UPDATE ra_payment_attempts SET source_token='' WHERE id=$1", [a2.id]);
+      return { ok: true, paymentId: a2.square_payment_id, automatic: actual.automatic };
+    }
+    let pay = a2.square_payment_id ? await agentSquarePayment("get", { id: a2.square_payment_id }) : await agentSquarePayment("authorize", { key: a2.id, source: actual.token ?? actual.cardId, customerId: actual.customerId, amount: t.amount, email: t.email, reference: id, customerInitiated: !actual.automatic });
+    await db.query("UPDATE ra_payment_attempts SET square_payment_id=$2,status='approved' WHERE id=$1", [a2.id, pay.id]);
+    if (pay.status === "CANCELED" || pay.status === "FAILED") throw new SquareDecline(a2.failure_code ?? "PAYMENT_CANCELLED");
+    if (a2.failure_code) {
+      await agentSquarePayment("cancel", { id: pay.id });
+      throw new SquareDecline(a2.failure_code);
+    }
+    if (pay.status !== "APPROVED" && pay.status !== "COMPLETED") throw new Error("Payment has not reached an actionable state");
+    if (pay.status !== "COMPLETED" && actual.token && t.purpose !== "resignation") {
+      let refusal = pay.card_details?.card?.prepaid_type === "PREPAID" ? "PREPAID_CARD" : null;
+      if (!refusal) {
+        const [givenName, ...names] = t.name.split(/\s+/);
+        const saved = await saveCardFromPayment({ paymentId: pay.id, givenName, familyName: names.join(" "), email: t.email, referenceId: `${t.order_id}:${a2.id}`, simulate: actual.token.includes("wallet") ? "wallet" : actual.token.includes("prepaid") ? "prepaid" : "credit" });
+        if (!saved.ok) refusal = "CARD_NOT_SAVED";
+        else if (saved.card.prepaid) {
+          await disableCard(saved.card.cardId);
+          refusal = "PREPAID_CARD";
+        } else await db.query("UPDATE orders SET square_customer_id=$2,square_card_id=$3,card_last4=$4,card_brand=$5,card_status='on_file',card_note=NULL WHERE id=$1", [t.order_id, saved.card.customerId, saved.card.cardId, saved.card.last4, saved.card.brand]);
+      }
+      if (refusal) {
+        await db.query("UPDATE ra_payment_attempts SET failure_code=$2 WHERE id=$1", [a2.id, refusal]);
+        await agentSquarePayment("cancel", { id: pay.id });
+        throw new SquareDecline(refusal);
+      }
+    }
+    if (pay.status === "APPROVED") pay = await agentSquarePayment("complete", { id: pay.id });
+    if (pay.status !== "COMPLETED") throw new Error("Payment completion is unconfirmed");
+    await db.query("UPDATE ra_payment_attempts SET status='completed' WHERE id=$1", [a2.id]);
+    if (kind === "order") await fulfillPaidOrder(id, pay.id);
+    else await fulfillPaidRenewal(id, pay.id, void 0, true, actual.automatic === true);
+    await db.query("UPDATE ra_payment_attempts SET source_token='' WHERE id=$1", [a2.id]);
+    return { ok: true, paymentId: pay.id, automatic: actual.automatic };
+  } catch (e) {
+    if (e instanceof SquareDecline) {
+      await db.query("UPDATE ra_payment_attempts SET status='failed',failure_code=$2,source_token='' WHERE id=$1", [a2.id, e.code]);
+      return { ok: false, code: e.code, automatic: actual.automatic, message: e.code === "PREPAID_CARD" ? RA_PREPAID_ERROR : e.code === "CARD_NOT_SAVED" ? "Square could not save this card. We have not completed the purchase. Try another eligible card." : "Payment was declined. Try again now or use another card. Your issuer can explain the decline." };
+    }
+    console.error("[agent-payment] unresolved", e);
+    return { ok: false, code: "UNRESOLVED", message: "We could not confirm the payment result. Retry to check this same payment; we will not start a second charge." };
+  } finally {
+    await db.query("UPDATE ra_payment_attempts SET lock_until=NULL WHERE id=$1", [a2.id]);
+  }
+}
+function registerAgentCheckout(app2) {
+  const schema = external_exports.object({ sourceId: external_exports.string().min(1).max(2048), consent: external_exports.literal(true) });
+  const identify = async (kind, id, token) => {
+    if (!["order", "renewal"].includes(kind) || !external_exports.string().uuid().safeParse(id).success) return null;
+    const t = await target(kind, id);
+    return t?.checkout_token && hashToken(token) === hashToken(t.checkout_token) ? t : null;
+  };
+  app2.get("/agent-checkout/:kind/:id", async (c) => {
+    const t = await identify(c.req.param("kind"), c.req.param("id"), c.req.query("token") ?? "");
+    if (!t) return c.json(err("Payment link not found.", "NOT_FOUND"), 404);
+    if (env.SQUARE_ACCESS_TOKEN && (!env.SQUARE_APPLICATION_ID || !env.SQUARE_LOCATION_ID)) return c.json(err("Card checkout is not configured yet. Please contact support.", "UNAVAILABLE"), 503);
+    return c.json({ data: { company: t.llc_name, amountCents: t.amount, purpose: t.purpose ?? "order", paid: ["paid", "filed", "formed", "charged", "paid_by_link"].includes(t.status), applicationId: env.SQUARE_APPLICATION_ID, locationId: env.SQUARE_LOCATION_ID, sandbox: env.SQUARE_ENV !== "production", offline: env.OFFLINE, email: t.email } });
+  });
+  app2.post("/agent-checkout/:kind/:id", async (c) => {
+    const kind = c.req.param("kind"), id = c.req.param("id");
+    const t = await identify(kind, id, c.req.query("token") ?? "");
+    if (!t) return c.json(err("Payment link not found.", "NOT_FOUND"), 404);
+    if (!await rateLimit(`agent-pay:${clientIp(c)}`, 30, 36e5)) return c.json(err("Too many payment attempts. Please contact support.", "RATE_LIMITED"), 429);
+    const b2 = schema.safeParse(await c.req.json().catch(() => null));
+    if (!b2.success) return c.json(err("Card storage and payment consent are required.", "INVALID_INPUT"), 400);
+    const result = await payAgentTarget(kind, id, { token: b2.data.sourceId });
+    if (!result.ok) return c.json(err(result.message ?? "Payment could not be completed.", result.code ?? "PAYMENT_FAILED"), result.code === "PROCESSING" ? 409 : result.code === "UNRESOLVED" ? 503 : 400);
+    return c.json({ data: { ok: true, redirect: kind === "order" ? `/order/confirmed?ref=${id}` : "/portal" } });
+  });
+}
+
+// server/ra-office.ts
+init_db();
+init_storage();
+var date = external_exports.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine((s) => !Number.isNaN(Date.parse(s + "T12:00:00Z")) && (/* @__PURE__ */ new Date(s + "T12:00:00Z")).toISOString().slice(0, 10) === s, "Enter a valid calendar date.");
+function registerAgentOffice(app2) {
+  app2.get("/admin/orders/:id/agent", async (c) => {
+    if (!await requireAdmin(c)) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+    const db = await getDb();
+    const [o] = await db.query("SELECT ra_appointment_date,ra_renewal_date,ra_cancellation_requested_at,ra_cancellation_note,ra_replaced_at,ra_proof_received_at,ra_proof_note,ra_resignation_due,ra_resignation_submitted,ra_resignation_filed,ra_resignation_mailed,ra_resignation_emailed_at,ra_resignation_document,ra_ended_date,card_status,card_note FROM orders WHERE id=$1", [c.req.param("id")]);
+    return o ? c.json({ data: o }) : c.json(err("Not found", "NOT_FOUND"), 404);
+  });
+  app2.post("/admin/orders/:id/agent", async (c) => {
+    if (!await requireAdmin(c)) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+    const db = await getDb(), id = c.req.param("id");
+    const [o] = await db.query("SELECT * FROM orders WHERE id=$1", [id]);
+    if (!o) return c.json(err("Not found", "NOT_FOUND"), 404);
+    const p2 = typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload;
+    if (p2?.registeredAgent?.choice !== "SERVICE") return c.json(err("This order does not appoint our agent service.", "BAD_STATE"), 400);
+    const body = await c.req.json().catch(() => null);
+    const parsed = external_exports.discriminatedUnion("action", [
+      external_exports.object({ action: external_exports.literal("appointment"), date }),
+      external_exports.object({ action: external_exports.literal("cancellation"), date, note: external_exports.string().trim().min(1).max(3e3) }),
+      external_exports.object({ action: external_exports.literal("replacement"), date, note: external_exports.string().trim().min(1).max(3e3) }),
+      external_exports.object({ action: external_exports.literal("submitted"), date }),
+      external_exports.object({ action: external_exports.literal("filed"), date }),
+      external_exports.object({ action: external_exports.literal("mailed"), date })
+    ]).safeParse(body);
+    if (!parsed.success) return c.json(err("Enter a valid date and the required supporting information.", "INVALID_INPUT"), 400);
+    const b2 = parsed.data, today = easternDateIso();
+    if (b2.date > today) return c.json(err("Record the actual event after it occurs; do not record a future event as complete.", "FUTURE_EVENT"), 400);
+    if (b2.action === "appointment") {
+      if (!o.paid_at || o.card_status !== "on_file" || !o.square_card_id || !o.square_customer_id || !gaveConsent(o.payload)) return c.json(err("Payment, automatic-renewal consent and an eligible saved card are required before our appointment.", "CARD_REQUIRED"), 400);
+      if (o.ra_appointment_date && isoOf(o.ra_appointment_date) !== b2.date) return c.json(err("The appointment date is already recorded. Document replacement cannot reset it. Contact support to correct a mistaken record.", "ALREADY_RECORDED"), 409);
+      await db.query("UPDATE orders SET ra_appointment_date=COALESCE(ra_appointment_date,$2),ra_renewal_date=COALESCE(ra_renewal_date,$3) WHERE id=$1", [id, b2.date, addYears(b2.date, 1)]);
+    } else if (b2.action === "cancellation") {
+      await db.query("UPDATE orders SET ra_cancellation_requested_at=LEAST(COALESCE(ra_cancellation_requested_at,$2::timestamptz),$2::timestamptz) WHERE id=$1", [id, b2.date + "T12:00:00Z"]);
+      await db.query("UPDATE orders SET ra_cancellation_note=$2 WHERE id=$1", [id, b2.note]);
+    } else if (b2.action === "replacement") {
+      await db.query("UPDATE orders SET ra_replaced_at=$2,ra_ended_date=$2,ra_proof_received_at=now(),ra_proof_note=$3 WHERE id=$1", [id, b2.date, b2.note]);
+      await db.query("UPDATE ra_renewals SET status='cancelled',retry_after=NULL WHERE order_id=$1 AND purpose='renewal' AND status IN ('notice_pending','notice_sent','link_sent','declined')", [id]);
+    } else if (b2.action === "submitted") {
+      if (!o.ra_resignation_due || b2.date < isoOf(o.ra_resignation_due)) return c.json(err("The cancellation resignation is not due yet.", "NOT_DUE"), 400);
+      await db.query("UPDATE orders SET ra_resignation_submitted=$2 WHERE id=$1", [id, b2.date]);
+    } else if (b2.action === "filed") {
+      if (!o.ra_resignation_submitted || b2.date < isoOf(o.ra_resignation_submitted)) return c.json(err("Record submission first, then the actual state filing date.", "BAD_STATE"), 400);
+      await db.query("UPDATE orders SET ra_resignation_filed=$2,ra_ended_date=CASE WHEN ra_replaced_at IS NOT NULL THEN LEAST(ra_replaced_at,$3::date) ELSE $3::date END WHERE id=$1", [id, b2.date, addDays(b2.date, 31)]);
+    } else {
+      if (!o.ra_resignation_submitted || b2.date < isoOf(o.ra_resignation_submitted)) return c.json(err("Submit the resignation before recording its mailed notice.", "BAD_STATE"), 400);
+      await db.query("UPDATE orders SET ra_resignation_mailed=$2 WHERE id=$1", [id, b2.date]);
+    }
+    return c.json({ data: { ok: true } });
+  });
+  app2.post("/admin/orders/:id/agent-copy", async (c) => {
+    if (!await requireAdmin(c)) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+    const db = await getDb();
+    const [o] = await db.query("SELECT * FROM orders WHERE id=$1", [c.req.param("id")]);
+    if (!o?.client_id || !o.ra_resignation_submitted) return c.json(err("Record the actual resignation submission first.", "BAD_STATE"), 400);
+    const form = await c.req.parseBody(), f = form.file;
+    let key;
+    if (f instanceof File) {
+      if (f.size > MAX_UPLOAD_BYTES || !await looksLikePdf(f)) return c.json(err("Upload a readable resignation PDF, no larger than 20 MB.", "BAD_FILE"), 400);
+      const stored = await putFile(f.name, await f.arrayBuffer(), "application/pdf");
+      key = stored.storageKey;
+      const [d2] = await db.query("INSERT INTO documents(client_id,order_id,kind,title,storage_key,content_type,size_bytes) VALUES($1,$2,'ra-resignation',$3,$4,'application/pdf',$5) RETURNING id", [o.client_id, o.id, `Registered-agent resignation \u2014 ${o.llc_name}`, key, stored.sizeBytes]);
+      await db.query("UPDATE orders SET ra_resignation_document=$2,ra_resignation_emailed_at=NULL WHERE id=$1", [o.id, d2.id]);
+    } else {
+      const [d2] = await db.query("SELECT storage_key FROM documents WHERE id=$1 AND order_id=$2", [o.ra_resignation_document, o.id]);
+      if (!d2) return c.json(err("Choose the resignation PDF first.", "FILE_REQUIRED"), 400);
+      key = d2.storage_key;
+    }
+    try {
+      await sendMail({ to: o.contact_email, subject: `Registered-agent resignation \u2014 ${o.llc_name}`, html: "<p>A copy of the submitted registered-agent resignation is attached and is also available in your portal. Submission does not end the appointment immediately. We will also mail the notice required by Florida law.</p>", attachments: [{ filename: "registered-agent-resignation.pdf", content: Buffer.from(await readFileStream(key)).toString("base64") }] });
+      await db.query("UPDATE orders SET ra_resignation_emailed_at=now() WHERE id=$1", [o.id]);
+    } catch {
+      return c.json(err("The copy is in the portal, but email failed. Retry sending the existing copy.", "EMAIL_FAILED"), 503);
+    }
+    return c.json({ data: { ok: true } });
+  });
+}
+
+// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/compose.js
+var compose = (middleware, onError, onNotFound) => {
+  return (context, next) => {
+    let index = -1;
+    return dispatch(0);
+    async function dispatch(i) {
+      if (i <= index) {
+        throw new Error("next() called multiple times");
+      }
+      index = i;
+      let res;
+      let isError2 = false;
+      let handler2;
+      if (middleware[i]) {
+        handler2 = middleware[i][0][0];
+        context.req.routeIndex = i;
+      } else {
+        handler2 = i === middleware.length && next || void 0;
+      }
+      if (handler2) {
+        try {
+          res = await handler2(context, () => dispatch(i + 1));
+        } catch (err3) {
+          if (err3 instanceof Error && onError) {
+            context.error = err3;
+            res = await onError(err3, context);
+            isError2 = true;
+          } else {
+            throw err3;
+          }
+        }
+      } else {
+        if (context.finalized === false && onNotFound) {
+          res = await onNotFound(context);
+        }
+      }
+      if (res && (context.finalized === false || isError2)) {
+        context.res = res;
+      }
+      return context;
+    }
+  };
+};
+
+// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/request/constants.js
+var GET_MATCH_RESULT = /* @__PURE__ */ Symbol();
+
+// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/utils/buffer.js
+var bufferToFormData = (arrayBuffer, contentType) => {
+  const response = new Response(arrayBuffer, {
+    headers: {
+      // Normalize the media type (case-insensitive) while keeping parameters like the boundary
+      "Content-Type": contentType.replace(/^[^;]+/, (mediaType) => mediaType.toLowerCase())
+    }
+  });
+  return response.formData();
+};
+
+// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/utils/body.js
+var MAX_NESTING_DEPTH = 32;
+var MAX_NESTED_OBJECTS = 1e4;
+var isRawRequest = (request) => "headers" in request;
+var parseBody = async (request, options = /* @__PURE__ */ Object.create(null)) => {
+  const { all = false, dot = false } = options;
+  const headers = isRawRequest(request) ? request.headers : request.raw.headers;
+  const contentType = headers.get("Content-Type");
+  const mediaType = contentType?.split(";")[0].trim().toLowerCase();
+  if (mediaType === "multipart/form-data" || mediaType === "application/x-www-form-urlencoded") {
+    return parseFormData(request, { all, dot });
+  }
+  return {};
+};
+async function parseFormData(request, options) {
+  if (!isRawRequest(request) && request.bodyCache.formData) {
+    return convertFormDataToBodyData(
+      await request.bodyCache.formData,
+      options
+    );
+  }
+  const headers = isRawRequest(request) ? request.headers : request.raw.headers;
+  const arrayBuffer = await request.arrayBuffer();
+  const formDataPromise = bufferToFormData(arrayBuffer, headers.get("Content-Type") || "");
+  if (!isRawRequest(request)) {
+    request.bodyCache.formData = formDataPromise;
+  }
+  const formData = await formDataPromise;
+  if (formData) {
+    return convertFormDataToBodyData(formData, options);
+  }
+  return {};
+}
+function convertFormDataToBodyData(formData, options) {
+  const form = /* @__PURE__ */ Object.create(null);
+  const nestingState = { count: 0 };
+  formData.forEach((value, key) => {
+    const shouldParseAllValues = options.all || key.endsWith("[]");
+    if (!shouldParseAllValues) {
+      form[key] = value;
+    } else {
+      handleParsingAllValues(form, key, value);
+    }
+  });
+  if (options.dot) {
+    Object.entries(form).forEach(([key, value]) => {
+      const shouldParseDotValues = key.includes(".");
+      if (shouldParseDotValues) {
+        handleParsingNestedValues(form, key, value, nestingState);
+        delete form[key];
+      }
+    });
+  }
+  return form;
+}
+var handleParsingAllValues = (form, key, value) => {
+  if (form[key] !== void 0) {
+    if (Array.isArray(form[key])) {
+      ;
+      form[key].push(value);
+    } else {
+      form[key] = [form[key], value];
+    }
+  } else {
+    if (!key.endsWith("[]")) {
+      form[key] = value;
+    } else {
+      form[key] = [value];
+    }
+  }
+};
+var handleParsingNestedValues = (form, key, value, state) => {
+  if (/(?:^|\.)__proto__\./.test(key)) {
+    return;
+  }
+  let nestedForm = form;
+  const keys = key.split(".", MAX_NESTING_DEPTH + 2);
+  if (keys.length > MAX_NESTING_DEPTH + 1) {
+    throwNestingLimitExceeded();
+  }
+  keys.forEach((key2, index) => {
+    if (index === keys.length - 1) {
+      nestedForm[key2] = value;
+    } else {
+      if (!nestedForm[key2] || typeof nestedForm[key2] !== "object" || Array.isArray(nestedForm[key2]) || nestedForm[key2] instanceof File) {
+        if (state.count++ >= MAX_NESTED_OBJECTS) {
+          throwNestingLimitExceeded();
+        }
+        nestedForm[key2] = /* @__PURE__ */ Object.create(null);
+      }
+      nestedForm = nestedForm[key2];
+    }
+  });
+};
+var throwNestingLimitExceeded = () => {
+  throw new Error("Nesting limit exceeded");
+};
+
+// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/request.js
+var HonoRequest = class {
+  /**
+   * `.raw` can get the raw Request object.
+   *
+   * @see {@link https://hono.dev/docs/api/request#raw}
+   *
+   * @example
+   * ```ts
+   * // For Cloudflare Workers
+   * app.post('/', async (c) => {
+   *   const metadata = c.req.raw.cf?.hostMetadata?
+   *   ...
+   * })
+   * ```
+   */
+  raw;
+  #validatedData;
+  // Short name of validatedData
+  #matchResult;
+  routeIndex = 0;
+  /**
+   * `.path` can get the pathname of the request.
+   *
+   * @see {@link https://hono.dev/docs/api/request#path}
+   *
+   * @example
+   * ```ts
+   * app.get('/about/me', (c) => {
+   *   const pathname = c.req.path // `/about/me`
+   * })
+   * ```
+   */
+  path;
+  bodyCache = {};
+  constructor(request, path = "/", matchResult = [[]]) {
+    this.raw = request;
+    this.path = path;
+    this.#matchResult = matchResult;
+  }
+  param(key) {
+    return key ? this.#getDecodedParam(key) : this.#getAllDecodedParams();
+  }
+  #getDecodedParam(key) {
+    const paramKey = this.#matchResult[0][this.routeIndex]?.[1][key];
+    const param = this.#getParamValue(paramKey);
+    return param && tryDecodeURIComponent(param);
+  }
+  #getAllDecodedParams() {
+    const decoded = {};
+    const keys = Object.keys(this.#matchResult[0][this.routeIndex]?.[1] ?? {});
+    for (const key of keys) {
+      const value = this.#getParamValue(this.#matchResult[0][this.routeIndex][1][key]);
+      if (value !== void 0) {
+        decoded[key] = tryDecodeURIComponent(value);
+      }
+    }
+    return decoded;
+  }
+  #getParamValue(paramKey) {
+    return this.#matchResult[1] ? this.#matchResult[1][paramKey] : paramKey;
+  }
+  query(key) {
+    return getQueryParam(this.url, key);
+  }
+  queries(key) {
+    return getQueryParams(this.url, key);
+  }
+  header(name) {
+    if (name) {
+      return this.raw.headers.get(name) ?? void 0;
+    }
+    const headerData = /* @__PURE__ */ Object.create(null);
+    this.raw.headers.forEach((value, key) => {
+      headerData[key] = value;
+    });
+    return headerData;
+  }
+  async parseBody(options) {
+    return parseBody(this, options);
+  }
+  #cachedBody = (key) => {
+    const { bodyCache, raw: raw2 } = this;
+    const cachedBody = bodyCache[key];
+    if (cachedBody) {
+      return cachedBody;
+    }
+    for (const anyCachedKey in bodyCache) {
+      return bodyCache[anyCachedKey].then((body) => {
+        if (anyCachedKey === "json") {
+          body = JSON.stringify(body);
+        }
+        return new Response(body)[key]();
+      });
+    }
+    return bodyCache[key] = raw2[key]();
+  };
+  /**
+   * `.json()` can parse Request body of type `application/json`
+   *
+   * @see {@link https://hono.dev/docs/api/request#json}
+   *
+   * @example
+   * ```ts
+   * app.post('/entry', async (c) => {
+   *   const body = await c.req.json()
+   * })
+   * ```
+   */
+  json() {
+    return this.#cachedBody("text").then((text) => JSON.parse(text));
+  }
+  /**
+   * `.text()` can parse Request body of type `text/plain`
+   *
+   * @see {@link https://hono.dev/docs/api/request#text}
+   *
+   * @example
+   * ```ts
+   * app.post('/entry', async (c) => {
+   *   const body = await c.req.text()
+   * })
+   * ```
+   */
+  text() {
+    return this.#cachedBody("text");
+  }
+  /**
+   * `.arrayBuffer()` parse Request body as an `ArrayBuffer`
+   *
+   * @see {@link https://hono.dev/docs/api/request#arraybuffer}
+   *
+   * @example
+   * ```ts
+   * app.post('/entry', async (c) => {
+   *   const body = await c.req.arrayBuffer()
+   * })
+   * ```
+   */
+  arrayBuffer() {
+    return this.#cachedBody("arrayBuffer");
+  }
+  /**
+   * `.bytes()` parses the request body as a `Uint8Array`.
+   *
+   * @see {@link https://hono.dev/docs/api/request#bytes}
+   *
+   * @example
+   * ```ts
+   * app.post('/entry', async (c) => {
+   *   const body = await c.req.bytes()
+   * })
+   * ```
+   */
+  bytes() {
+    return this.#cachedBody("arrayBuffer").then((buffer) => new Uint8Array(buffer));
+  }
+  /**
+   * Parses the request body as a `Blob`.
+   * @example
+   * ```ts
+   * app.post('/entry', async (c) => {
+   *   const body = await c.req.blob();
+   * });
+   * ```
+   * @see https://hono.dev/docs/api/request#blob
+   */
+  blob() {
+    return this.#cachedBody("blob");
+  }
+  /**
+   * Parses the request body as `FormData`.
+   * @example
+   * ```ts
+   * app.post('/entry', async (c) => {
+   *   const body = await c.req.formData();
+   * });
+   * ```
+   * @see https://hono.dev/docs/api/request#formdata
+   */
+  formData() {
+    return this.#cachedBody("formData");
+  }
+  /**
+   * Adds validated data to the request.
+   *
+   * @param target - The target of the validation.
+   * @param data - The validated data to add.
+   */
+  addValidatedData(target2, data) {
+    ;
+    (this.#validatedData ??= {})[target2] = data;
+  }
+  valid(target2) {
+    return this.#validatedData?.[target2];
+  }
+  /**
+   * `.url()` can get the request url strings.
+   *
+   * @see {@link https://hono.dev/docs/api/request#url}
+   *
+   * @example
+   * ```ts
+   * app.get('/about/me', (c) => {
+   *   const url = c.req.url // `http://localhost:8787/about/me`
+   *   ...
+   * })
+   * ```
+   */
+  get url() {
+    return this.raw.url;
+  }
+  /**
+   * `.method()` can get the method name of the request.
+   *
+   * @see {@link https://hono.dev/docs/api/request#method}
+   *
+   * @example
+   * ```ts
+   * app.get('/about/me', (c) => {
+   *   const method = c.req.method // `GET`
+   * })
+   * ```
+   */
+  get method() {
+    return this.raw.method;
+  }
+  get [GET_MATCH_RESULT]() {
+    return this.#matchResult;
+  }
+  /**
+   * `.matchedRoutes()` can return a matched route in the handler
+   *
+   * @deprecated
+   *
+   * Use matchedRoutes helper defined in "hono/route" instead.
+   *
+   * @see {@link https://hono.dev/docs/api/request#matchedroutes}
+   *
+   * @example
+   * ```ts
+   * app.use('*', async function logger(c, next) {
+   *   await next()
+   *   c.req.matchedRoutes.forEach(({ handler, method, path }, i) => {
+   *     const name = handler.name || (handler.length < 2 ? '[handler]' : '[middleware]')
+   *     console.log(
+   *       method,
+   *       ' ',
+   *       path,
+   *       ' '.repeat(Math.max(10 - path.length, 0)),
+   *       name,
+   *       i === c.req.routeIndex ? '<- respond from here' : ''
+   *     )
+   *   })
+   * })
+   * ```
+   */
+  get matchedRoutes() {
+    return this.#matchResult[0].map(([[, route]]) => route);
+  }
+  /**
+   * `routePath()` can retrieve the path registered within the handler
+   *
+   * @deprecated
+   *
+   * Use routePath helper defined in "hono/route" instead.
+   *
+   * @see {@link https://hono.dev/docs/api/request#routepath}
+   *
+   * @example
+   * ```ts
+   * app.get('/posts/:id', (c) => {
+   *   return c.json({ path: c.req.routePath })
+   * })
+   * ```
+   */
+  get routePath() {
+    return this.#matchResult[0].map(([[, route]]) => route)[this.routeIndex].path;
+  }
+};
+
+// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/utils/html.js
+var HtmlEscapedCallbackPhase = {
+  Stringify: 1,
+  BeforeStream: 2,
+  Stream: 3
+};
+var raw = (value, callbacks) => {
+  const escapedString = new String(value);
+  escapedString.isEscaped = true;
+  escapedString.callbacks = callbacks;
+  return escapedString;
+};
+var resolveCallback = async (str, phase, preserveCallbacks, context, buffer) => {
+  if (typeof str === "object" && !(str instanceof String)) {
+    if (!(str instanceof Promise)) {
+      str = str.toString();
+    }
+    if (str instanceof Promise) {
+      str = await str;
+    }
+  }
+  const callbacks = str.callbacks;
+  if (!callbacks?.length) {
+    return Promise.resolve(str);
+  }
+  if (buffer) {
+    buffer[0] += str;
+  } else {
+    buffer = [str];
+  }
+  const resStr = Promise.all(callbacks.map((c) => c({ phase, buffer, context }))).then(
+    (res) => Promise.all(
+      res.filter(Boolean).map((str2) => resolveCallback(str2, phase, false, context, buffer))
+    ).then(() => buffer[0])
+  );
+  if (preserveCallbacks) {
+    return raw(await resStr, callbacks);
+  } else {
+    return resStr;
+  }
+};
+
+// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/context.js
+var TEXT_PLAIN = "text/plain; charset=UTF-8";
+var setDefaultContentType = (contentType, headers) => {
+  return {
+    "Content-Type": contentType,
+    ...headers
+  };
+};
+var createResponseInstance = (body, init) => new Response(body, init);
+var Context = class {
+  #rawRequest;
+  #req;
+  /**
+   * `.env` can get bindings (environment variables, secrets, KV namespaces, D1 database, R2 bucket etc.) in Cloudflare Workers.
+   *
+   * @see {@link https://hono.dev/docs/api/context#env}
+   *
+   * @example
+   * ```ts
+   * // Environment object for Cloudflare Workers
+   * app.get('*', async c => {
+   *   const counter = c.env.COUNTER
+   * })
+   * ```
+   */
+  env = {};
+  #var;
+  finalized = false;
+  /**
+   * `.error` can get the error object from the middleware if the Handler throws an error.
+   *
+   * @see {@link https://hono.dev/docs/api/context#error}
+   *
+   * @example
+   * ```ts
+   * app.use('*', async (c, next) => {
+   *   await next()
+   *   if (c.error) {
+   *     // do something...
+   *   }
+   * })
+   * ```
+   */
+  error;
+  #status;
+  #executionCtx;
+  #res;
+  #layout;
+  #renderer;
+  #notFoundHandler;
+  #preparedHeaders;
+  #matchResult;
+  #path;
+  /**
+   * Creates an instance of the Context class.
+   *
+   * @param req - The Request object.
+   * @param options - Optional configuration options for the context.
+   */
+  constructor(req, options) {
+    this.#rawRequest = req;
+    if (options) {
+      this.#executionCtx = options.executionCtx;
+      this.env = options.env;
+      this.#notFoundHandler = options.notFoundHandler;
+      this.#path = options.path;
+      this.#matchResult = options.matchResult;
+    }
+  }
+  /**
+   * `.req` is the instance of {@link HonoRequest}.
+   */
+  get req() {
+    this.#req ??= new HonoRequest(this.#rawRequest, this.#path, this.#matchResult);
+    return this.#req;
+  }
+  /**
+   * @see {@link https://hono.dev/docs/api/context#event}
+   * The FetchEvent associated with the current request.
+   *
+   * @throws Will throw an error if the context does not have a FetchEvent.
+   */
+  get event() {
+    if (this.#executionCtx && "respondWith" in this.#executionCtx) {
+      return this.#executionCtx;
+    } else {
+      throw Error("This context has no FetchEvent");
+    }
+  }
+  /**
+   * @see {@link https://hono.dev/docs/api/context#executionctx}
+   * The ExecutionContext associated with the current request.
+   *
+   * @throws Will throw an error if the context does not have an ExecutionContext.
+   */
+  get executionCtx() {
+    if (this.#executionCtx) {
+      return this.#executionCtx;
+    } else {
+      throw Error("This context has no ExecutionContext");
+    }
+  }
+  /**
+   * @see {@link https://hono.dev/docs/api/context#res}
+   * The Response object for the current request.
+   */
+  get res() {
+    return this.#res ||= createResponseInstance(null, {
+      headers: this.#preparedHeaders ??= new Headers()
+    });
+  }
+  /**
+   * Sets the Response object for the current request.
+   *
+   * @param _res - The Response object to set.
+   */
+  set res(_res) {
+    if (this.#res && _res) {
+      _res = createResponseInstance(_res.body, _res);
+      for (const [k, v2] of this.#res.headers.entries()) {
+        if (k === "content-type") {
+          continue;
+        }
+        if (k === "set-cookie") {
+          const cookies = this.#res.headers.getSetCookie();
+          _res.headers.delete("set-cookie");
+          for (const cookie of cookies) {
+            _res.headers.append("set-cookie", cookie);
+          }
+        } else {
+          _res.headers.set(k, v2);
+        }
+      }
+    }
+    this.#res = _res;
+    this.finalized = true;
+  }
+  /**
+   * `.render()` can create a response within a layout.
+   *
+   * @see {@link https://hono.dev/docs/api/context#render-setrenderer}
+   *
+   * @example
+   * ```ts
+   * app.get('/', (c) => {
+   *   return c.render('Hello!')
+   * })
+   * ```
+   */
+  render = (...args) => {
+    this.#renderer ??= (content) => this.html(content);
+    return this.#renderer(...args);
+  };
+  /**
+   * Sets the layout for the response.
+   *
+   * @param layout - The layout to set.
+   * @returns The layout function.
+   */
+  setLayout = (layout) => this.#layout = layout;
+  /**
+   * Gets the current layout for the response.
+   *
+   * @returns The current layout function.
+   */
+  getLayout = () => this.#layout;
+  /**
+   * `.setRenderer()` can set the layout in the custom middleware.
+   *
+   * @see {@link https://hono.dev/docs/api/context#render-setrenderer}
+   *
+   * @example
+   * ```tsx
+   * app.use('*', async (c, next) => {
+   *   c.setRenderer((content) => {
+   *     return c.html(
+   *       <html>
+   *         <body>
+   *           <p>{content}</p>
+   *         </body>
+   *       </html>
+   *     )
+   *   })
+   *   await next()
+   * })
+   * ```
+   */
+  setRenderer = (renderer) => {
+    this.#renderer = renderer;
+  };
+  /**
+   * `.header()` can set headers.
+   *
+   * @see {@link https://hono.dev/docs/api/context#header}
+   *
+   * @example
+   * ```ts
+   * app.get('/welcome', (c) => {
+   *   // Set headers
+   *   c.header('X-Message', 'Hello!')
+   *   c.header('Content-Type', 'text/plain')
+   *
+   *   // Append multiple headers using the append option (e.g. Vary)
+   *   c.header('Vary', 'Accept-Encoding', { append: true })
+   *   c.header('Vary', 'User-Agent', { append: true })
+   *
+   *   return c.body('Thank you for coming')
+   * })
+   * ```
+   */
+  header = (name, value, options) => {
+    if (this.finalized) {
+      this.#res = createResponseInstance(this.#res.body, this.#res);
+    }
+    const headers = this.#res ? this.#res.headers : this.#preparedHeaders ??= new Headers();
+    if (value === void 0) {
+      headers.delete(name);
+    } else if (options?.append) {
+      headers.append(name, value);
+    } else {
+      headers.set(name, value);
+    }
+  };
+  status = (status) => {
+    this.#status = status;
+  };
+  /**
+   * `.set()` can set the value specified by the key.
+   *
+   * @see {@link https://hono.dev/docs/api/context#set-get}
+   *
+   * @example
+   * ```ts
+   * app.use('*', async (c, next) => {
+   *   c.set('message', 'Hono is hot!!')
+   *   await next()
+   * })
+   * ```
+   */
+  set = (key, value) => {
+    this.#var ??= /* @__PURE__ */ new Map();
+    this.#var.set(key, value);
+  };
+  /**
+   * `.get()` can use the value specified by the key.
+   *
+   * @see {@link https://hono.dev/docs/api/context#set-get}
+   *
+   * @example
+   * ```ts
+   * app.get('/', (c) => {
+   *   const message = c.get('message')
+   *   return c.text(`The message is "${message}"`)
+   * })
+   * ```
+   */
+  get = (key) => {
+    return this.#var ? this.#var.get(key) : void 0;
+  };
+  /**
+   * `.var` can access the value of a variable.
+   *
+   * @see {@link https://hono.dev/docs/api/context#var}
+   *
+   * @example
+   * ```ts
+   * const result = c.var.client.oneMethod()
+   * ```
+   */
+  // c.var.propName is a read-only
+  get var() {
+    if (!this.#var) {
+      return {};
+    }
+    return Object.fromEntries(this.#var);
+  }
+  #newResponse(data, arg, headers) {
+    let responseHeaders = this.#res ? new Headers(this.#res.headers) : this.#preparedHeaders;
+    if (typeof arg === "object" && arg.headers) {
+      responseHeaders ??= new Headers();
+      for (const [key, value] of new Headers(arg.headers)) {
+        if (key === "set-cookie") {
+          responseHeaders.append(key, value);
+        } else {
+          responseHeaders.set(key, value);
+        }
+      }
+    }
+    if (headers) {
+      if (!responseHeaders) {
+        let count = 0;
+        for (const k in headers) {
+          if (++count > 1 || typeof headers[k] !== "string") {
+            responseHeaders = new Headers();
+            break;
+          }
+        }
+      }
+      if (responseHeaders) {
+        for (const k in headers) {
+          const v2 = headers[k];
+          if (typeof v2 === "string") {
+            responseHeaders.set(k, v2);
+          } else {
+            responseHeaders.delete(k);
+            for (const v22 of v2) {
+              responseHeaders.append(k, v22);
+            }
+          }
+        }
+      }
+    }
+    const status = typeof arg === "number" ? arg : arg?.status ?? this.#status;
+    return createResponseInstance(data, {
+      status,
+      headers: responseHeaders ?? headers
+    });
+  }
+  newResponse = (...args) => this.#newResponse(...args);
+  /**
+   * `.body()` can return the HTTP response.
+   * You can set headers with `.header()` and set HTTP status code with `.status`.
+   * This can also be set in `.text()`, `.json()` and so on.
+   *
+   * @see {@link https://hono.dev/docs/api/context#body}
+   *
+   * @example
+   * ```ts
+   * app.get('/welcome', (c) => {
+   *   // Set headers
+   *   c.header('X-Message', 'Hello!')
+   *   c.header('Content-Type', 'text/plain')
+   *   // Set HTTP status code
+   *   c.status(201)
+   *
+   *   // Return the response body
+   *   return c.body('Thank you for coming')
+   * })
+   * ```
+   */
+  body = (data, arg, headers) => this.#newResponse(data, arg, headers);
+  /**
+   * `.text()` can render text as `Content-Type:text/plain`.
+   *
+   * @see {@link https://hono.dev/docs/api/context#text}
+   *
+   * @example
+   * ```ts
+   * app.get('/say', (c) => {
+   *   return c.text('Hello!')
+   * })
+   * ```
+   */
+  text = (text, arg, headers) => {
+    return !this.#preparedHeaders && !this.#status && !arg && !headers && !this.finalized ? new Response(text) : this.#newResponse(
+      text,
+      arg,
+      setDefaultContentType(TEXT_PLAIN, headers)
+    );
+  };
+  /**
+   * `.json()` can render JSON as `Content-Type:application/json`.
+   *
+   * @see {@link https://hono.dev/docs/api/context#json}
+   *
+   * @example
+   * ```ts
+   * app.get('/api', (c) => {
+   *   return c.json({ message: 'Hello!' })
+   * })
+   * ```
+   */
+  json = (object, arg, headers) => {
+    return this.#newResponse(
+      JSON.stringify(object),
+      arg,
+      setDefaultContentType("application/json", headers)
+    );
+  };
+  html = (html, arg, headers) => {
+    const res = (html2) => this.#newResponse(html2, arg, setDefaultContentType("text/html; charset=UTF-8", headers));
+    return typeof html === "object" ? resolveCallback(html, HtmlEscapedCallbackPhase.Stringify, false, {}).then(res) : res(html);
+  };
+  /**
+   * `.redirect()` can Redirect, default status code is 302.
+   *
+   * @see {@link https://hono.dev/docs/api/context#redirect}
+   *
+   * @example
+   * ```ts
+   * app.get('/redirect', (c) => {
+   *   return c.redirect('/')
+   * })
+   * app.get('/redirect-permanently', (c) => {
+   *   return c.redirect('/', 301)
+   * })
+   * ```
+   */
+  redirect = (location, status) => {
+    const locationString = String(location);
+    this.header(
+      "Location",
+      // Multibyes should be encoded
+      // eslint-disable-next-line no-control-regex
+      !/[^\x00-\xFF]/.test(locationString) ? locationString : encodeURI(locationString)
+    );
+    return this.newResponse(null, status ?? 302);
+  };
+  /**
+   * `.notFound()` can return the Not Found Response.
+   *
+   * @see {@link https://hono.dev/docs/api/context#notfound}
+   *
+   * @example
+   * ```ts
+   * app.get('/notfound', (c) => {
+   *   return c.notFound()
+   * })
+   * ```
+   */
+  notFound = () => {
+    this.#notFoundHandler ??= () => createResponseInstance();
+    return this.#notFoundHandler(this);
+  };
+};
+
+// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/router.js
+var METHOD_NAME_ALL = "ALL";
+var METHOD_NAME_ALL_LOWERCASE = "all";
+var METHODS = ["get", "post", "put", "delete", "options", "patch", "query"];
+var MESSAGE_MATCHER_IS_ALREADY_BUILT = "Can not add a route since the matcher is already built.";
+var UnsupportedPathError = class extends Error {
+};
+
+// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/utils/constants.js
+var COMPOSED_HANDLER = "__COMPOSED_HANDLER";
+
+// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/hono-base.js
+var notFoundHandler = (c) => {
+  return c.text("404 Not Found", 404);
+};
+var errorHandler = (err3, c) => {
+  if ("getResponse" in err3) {
+    const res = err3.getResponse();
+    return c.newResponse(res.body, res);
+  }
+  console.error(err3);
+  return c.text("Internal Server Error", 500);
+};
+var Hono = class _Hono {
+  get;
+  post;
+  put;
+  delete;
+  options;
+  patch;
+  query;
+  all;
+  on;
+  use;
+  /*
+    This class is like an abstract class and does not have a router.
+    To use it, inherit the class and implement router in the constructor.
+  */
+  router;
+  getPath;
+  // Cannot use `#` because it requires visibility at JavaScript runtime.
+  _basePath = "/";
+  #path = "/";
+  routes = [];
+  constructor(options = {}) {
+    const allMethods = [...METHODS, METHOD_NAME_ALL_LOWERCASE];
+    allMethods.forEach((method) => {
+      this[method] = (args1, ...args) => {
+        if (typeof args1 === "string") {
+          this.#path = args1;
+        } else {
+          this.#addRoute(method, this.#path, args1);
+        }
+        args.forEach((handler2) => {
+          this.#addRoute(method, this.#path, handler2);
+        });
+        return this;
+      };
+    });
+    this.on = (method, path, ...handlers) => {
+      for (const p2 of [path].flat()) {
+        this.#path = p2;
+        for (const m2 of [method].flat()) {
+          handlers.map((handler2) => {
+            this.#addRoute(m2.toUpperCase(), this.#path, handler2);
+          });
+        }
+      }
+      return this;
+    };
+    this.use = (arg1, ...handlers) => {
+      if (typeof arg1 === "string") {
+        this.#path = arg1;
+      } else {
+        this.#path = "*";
+        handlers.unshift(arg1);
+      }
+      handlers.forEach((handler2) => {
+        this.#addRoute(METHOD_NAME_ALL, this.#path, handler2);
+      });
+      return this;
+    };
+    const { strict: strict2, ...optionsWithoutStrict } = options;
+    Object.assign(this, optionsWithoutStrict);
+    this.getPath = strict2 ?? true ? options.getPath ?? getPath : getPathNoStrict;
+  }
+  #clone() {
+    const clone = new _Hono({
+      router: this.router,
+      getPath: this.getPath
+    });
+    clone.errorHandler = this.errorHandler;
+    clone.#notFoundHandler = this.#notFoundHandler;
+    clone.routes = this.routes;
+    return clone;
+  }
+  #notFoundHandler = notFoundHandler;
+  // Cannot use `#` because it requires visibility at JavaScript runtime.
+  errorHandler = errorHandler;
+  /**
+   * `.route()` allows grouping other Hono instance in routes.
+   *
+   * @see {@link https://hono.dev/docs/api/routing#grouping}
+   *
+   * @param {string} path - base Path
+   * @param {Hono} app - other Hono instance
+   * @returns {Hono} routed Hono instance
+   *
+   * @example
+   * ```ts
+   * const app = new Hono()
+   * const app2 = new Hono()
+   *
+   * app2.get("/user", (c) => c.text("user"))
+   * app.route("/api", app2) // GET /api/user
+   * ```
+   */
+  route(path, app2) {
+    const subApp = this.basePath(path);
+    app2.routes.map((r) => {
+      let handler2;
+      if (app2.errorHandler === errorHandler) {
+        handler2 = r.handler;
+      } else {
+        handler2 = async (c, next) => (await compose([], app2.errorHandler)(c, () => r.handler(c, next))).res;
+        handler2[COMPOSED_HANDLER] = r.handler;
+      }
+      subApp.#addRoute(r.method, r.path, handler2, r.basePath);
+    });
+    return this;
+  }
+  /**
+   * `.basePath()` allows base paths to be specified.
+   *
+   * @see {@link https://hono.dev/docs/api/routing#base-path}
+   *
+   * @param {string} path - base Path
+   * @returns {Hono} changed Hono instance
+   *
+   * @example
+   * ```ts
+   * const api = new Hono().basePath('/api')
+   * ```
+   */
+  basePath(path) {
+    const subApp = this.#clone();
+    subApp._basePath = mergePath(this._basePath, path);
+    return subApp;
+  }
+  /**
+   * `.onError()` handles an error and returns a customized Response.
+   *
+   * @see {@link https://hono.dev/docs/api/hono#error-handling}
+   *
+   * @param {ErrorHandler} handler - request Handler for error
+   * @returns {Hono} changed Hono instance
+   *
+   * @example
+   * ```ts
+   * app.onError((err, c) => {
+   *   console.error(`${err}`)
+   *   return c.text('Custom Error Message', 500)
+   * })
+   * ```
+   */
+  onError = (handler2) => {
+    this.errorHandler = handler2;
+    return this;
+  };
+  /**
+   * `.notFound()` allows you to customize a Not Found Response.
+   *
+   * @see {@link https://hono.dev/docs/api/hono#not-found}
+   *
+   * @param {NotFoundHandler} handler - request handler for not-found
+   * @returns {Hono} changed Hono instance
+   *
+   * @example
+   * ```ts
+   * app.notFound((c) => {
+   *   return c.text('Custom 404 Message', 404)
+   * })
+   * ```
+   */
+  notFound = (handler2) => {
+    this.#notFoundHandler = handler2;
+    return this;
+  };
+  /**
+   * `.mount()` allows you to mount applications built with other frameworks into your Hono application.
+   *
+   * @see {@link https://hono.dev/docs/api/hono#mount}
+   *
+   * @param {string} path - base Path
+   * @param {Function} applicationHandler - other Request Handler
+   * @param {MountOptions} [options] - options of `.mount()`
+   * @returns {Hono} mounted Hono instance
+   *
+   * @example
+   * ```ts
+   * import { Router as IttyRouter } from 'itty-router'
+   * import { Hono } from 'hono'
+   * // Create itty-router application
+   * const ittyRouter = IttyRouter()
+   * // GET /itty-router/hello
+   * ittyRouter.get('/hello', () => new Response('Hello from itty-router'))
+   *
+   * const app = new Hono()
+   * app.mount('/itty-router', ittyRouter.handle)
+   * ```
+   *
+   * @example
+   * ```ts
+   * const app = new Hono()
+   * // Send the request to another application without modification.
+   * app.mount('/app', anotherApp, {
+   *   replaceRequest: (req) => req,
+   * })
+   * ```
+   */
+  mount(path, applicationHandler, options) {
+    let replaceRequest;
+    let optionHandler;
+    if (options) {
+      if (typeof options === "function") {
+        optionHandler = options;
+      } else {
+        optionHandler = options.optionHandler;
+        if (options.replaceRequest === false) {
+          replaceRequest = (request) => request;
+        } else {
+          replaceRequest = options.replaceRequest;
+        }
+      }
+    }
+    const getOptions = optionHandler ? (c) => {
+      const options2 = optionHandler(c);
+      return Array.isArray(options2) ? options2 : [options2];
+    } : (c) => {
+      let executionContext = void 0;
+      try {
+        executionContext = c.executionCtx;
+      } catch {
+      }
+      return [c.env, executionContext];
+    };
+    replaceRequest ||= (() => {
+      const mergedPath = mergePath(this._basePath, path);
+      const pathPrefixLength = mergedPath === "/" ? 0 : mergedPath.length;
+      return (request) => {
+        const url = new URL(request.url);
+        url.pathname = this.getPath(request).slice(pathPrefixLength) || "/";
+        return new Request(url, request);
+      };
+    })();
+    const handler2 = async (c, next) => {
+      const res = await applicationHandler(replaceRequest(c.req.raw), ...getOptions(c));
+      if (res) {
+        return res;
+      }
+      await next();
+    };
+    this.#addRoute(METHOD_NAME_ALL, mergePath(path, "*"), handler2);
+    return this;
+  }
+  #addRoute(method, path, handler2, baseRoutePath) {
+    method = method.toUpperCase();
+    path = mergePath(this._basePath, path);
+    const r = {
+      basePath: baseRoutePath !== void 0 ? mergePath(this._basePath, baseRoutePath) : this._basePath,
+      path,
+      method,
+      handler: handler2
+    };
+    this.router.add(method, path, [handler2, r]);
+    this.routes.push(r);
+  }
+  #handleError(err3, c) {
+    if (err3 instanceof Error) {
+      return this.errorHandler(err3, c);
+    }
+    throw err3;
+  }
+  #dispatch(request, executionCtx, env2, method) {
+    if (method === "HEAD") {
+      return (async () => new Response(null, await this.#dispatch(request, executionCtx, env2, "GET")))();
+    }
+    const path = this.getPath(request, { env: env2 });
+    const matchResult = this.router.match(method, path);
+    const c = new Context(request, {
+      path,
+      matchResult,
+      env: env2,
+      executionCtx,
+      notFoundHandler: this.#notFoundHandler
+    });
+    if (matchResult[0].length === 1) {
+      let res;
+      try {
+        res = matchResult[0][0][0][0](c, async () => {
+          c.res = await this.#notFoundHandler(c);
+        });
+      } catch (err3) {
+        return this.#handleError(err3, c);
+      }
+      return res instanceof Promise ? res.then(
+        (resolved) => resolved || (c.finalized ? c.res : this.#notFoundHandler(c))
+      ).catch((err3) => this.#handleError(err3, c)) : res ?? this.#notFoundHandler(c);
+    }
+    const composed = compose(matchResult[0], this.errorHandler, this.#notFoundHandler);
+    return (async () => {
+      try {
+        const context = await composed(c);
+        if (!context.finalized) {
+          throw new Error(
+            "Context is not finalized. Did you forget to return a Response object or `await next()`?"
+          );
+        }
+        return context.res;
+      } catch (err3) {
+        return this.#handleError(err3, c);
+      }
+    })();
+  }
+  /**
+   * `.fetch()` will be entry point of your app.
+   *
+   * @see {@link https://hono.dev/docs/api/hono#fetch}
+   *
+   * @param {Request} request - request Object of request
+   * @param {Env} env - env Object
+   * @param {ExecutionContext} executionCtx - context of execution
+   * @returns {Response | Promise<Response>} response of request
+   *
+   */
+  fetch = (request, ...rest) => {
+    return this.#dispatch(request, rest[1], rest[0], request.method);
+  };
+  /**
+   * `.request()` is a useful method for testing.
+   * You can pass a URL or pathname to send a GET request.
+   * app will return a Response object.
+   * ```ts
+   * test('GET /hello is ok', async () => {
+   *   const res = await app.request('/hello')
+   *   expect(res.status).toBe(200)
+   * })
+   * ```
+   * @see https://hono.dev/docs/api/hono#request
+   */
+  request = (input, requestInit, Env, executionCtx) => {
+    if (input instanceof Request) {
+      return this.fetch(requestInit ? new Request(input, requestInit) : input, Env, executionCtx);
+    }
+    input = input.toString();
+    return this.fetch(
+      new Request(
+        /^https?:\/\//.test(input) ? input : `http://localhost${mergePath("/", input)}`,
+        requestInit
+      ),
+      Env,
+      executionCtx
+    );
+  };
+  /**
+   * `.fire()` automatically adds a global fetch event listener.
+   * This can be useful for environments that adhere to the Service Worker API, such as non-ES module Cloudflare Workers.
+   * @deprecated
+   * Use `fire` from `hono/service-worker` instead.
+   * ```ts
+   * import { Hono } from 'hono'
+   * import { fire } from 'hono/service-worker'
+   *
+   * const app = new Hono()
+   * // ...
+   * fire(app)
+   * ```
+   * @see https://hono.dev/docs/api/hono#fire
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API
+   * @see https://developers.cloudflare.com/workers/reference/migrate-to-module-workers/
+   */
+  fire = () => {
+    addEventListener("fetch", (event) => {
+      event.respondWith(this.#dispatch(event.request, event, void 0, event.request.method));
+    });
+  };
+};
+
+// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/router/utils.js
+var createNullObject = () => /* @__PURE__ */ Object.create(null);
+
+// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/router/reg-exp-router/matcher.js
+var emptyParam = [];
+function match(method, path) {
+  const matchers = this.buildAllMatchers();
+  const match2 = ((method2, path2) => {
+    const matcher = matchers[method2] || matchers[METHOD_NAME_ALL];
+    const staticMatch = matcher[2][path2];
+    if (staticMatch) {
+      return staticMatch;
+    }
+    const match3 = path2.match(matcher[0]);
+    if (!match3) {
+      return [[], emptyParam];
+    }
+    const index = match3.indexOf("", 1);
+    return [matcher[1][index], match3];
+  });
+  this.match = match2;
+  return match2(method, path);
+}
+
+// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/router/reg-exp-router/node.js
+var LABEL_REG_EXP_STR = "[^/]+";
+var ONLY_WILDCARD_REG_EXP_STR = ".*";
+var TAIL_WILDCARD_REG_EXP_STR = "(?:|/.*)";
+var PATH_ERROR = /* @__PURE__ */ Symbol();
+var regExpMetaChars = new Set(".\\+*[^]$()");
+function compareKey(a2, b2) {
+  if (a2.length === 1) {
+    return b2.length === 1 ? a2 < b2 ? -1 : 1 : -1;
+  }
+  if (b2.length === 1) {
+    return 1;
+  }
+  if (a2 === ONLY_WILDCARD_REG_EXP_STR || a2 === TAIL_WILDCARD_REG_EXP_STR) {
+    return b2 === TAIL_WILDCARD_REG_EXP_STR ? -1 : 1;
+  } else if (b2 === ONLY_WILDCARD_REG_EXP_STR || b2 === TAIL_WILDCARD_REG_EXP_STR) {
+    return -1;
+  }
+  if (a2 === LABEL_REG_EXP_STR) {
+    return 1;
+  } else if (b2 === LABEL_REG_EXP_STR) {
+    return -1;
+  }
+  return a2.length === b2.length ? a2 < b2 ? -1 : 1 : b2.length - a2.length;
+}
+var Node = class _Node {
+  // handler index of a dynamic path, or -1 for a static path terminal
+  #index;
+  #varIndex;
+  #children = createNullObject();
+  insert(tokens, index, paramMap, context, isStatic) {
+    let node = this;
+    for (let i = 0, len = tokens.length; i < len; i++) {
+      const token = tokens[i];
+      const pattern = token.length === 1 ? token === "*" ? i === len - 1 ? ["", "", ONLY_WILDCARD_REG_EXP_STR] : ["", "", LABEL_REG_EXP_STR] : null : token === "/*" ? ["", "", TAIL_WILDCARD_REG_EXP_STR] : token.match(/^\:([^\{\}]+)(?:\{(.+)\})?$/);
+      let nextNode;
+      if (pattern) {
+        const name = pattern[1];
+        let regexpStr = pattern[2] || LABEL_REG_EXP_STR;
+        if (name && pattern[2]) {
+          if (regexpStr === ".*") {
+            throw PATH_ERROR;
+          }
+          regexpStr = regexpStr.replace(/^\((?!\?:)(?=[^)]+\)$)/, "(?:");
+          if (/\((?!\?:)/.test(regexpStr)) {
+            throw PATH_ERROR;
+          }
+          if (regexpStr.length === 1 && regExpMetaChars.has(regexpStr)) {
+            throw PATH_ERROR;
+          }
+        }
+        nextNode = node.#children[regexpStr];
+        if (!nextNode) {
+          if (regexpStr !== ONLY_WILDCARD_REG_EXP_STR && regexpStr !== TAIL_WILDCARD_REG_EXP_STR) {
+            for (const k in node.#children) {
+              if (
+                // a single-char pattern coexists with single-char literals as a literal does
+                (regexpStr.length > 1 || k.length > 1) && k !== ONLY_WILDCARD_REG_EXP_STR && k !== TAIL_WILDCARD_REG_EXP_STR
+              ) {
+                throw PATH_ERROR;
+              }
+            }
+          }
+          nextNode = node.#children[regexpStr] = new _Node();
+        }
+        if (name !== "") {
+          nextNode.#varIndex ??= context.varIndex++;
+          paramMap.push([name, nextNode.#varIndex]);
+        }
+      } else {
+        nextNode = node.#children[token];
+        if (!nextNode) {
+          for (const k in node.#children) {
+            if (k.length > 1 && k !== ONLY_WILDCARD_REG_EXP_STR && k !== TAIL_WILDCARD_REG_EXP_STR) {
+              throw PATH_ERROR;
+            }
+          }
+          nextNode = node.#children[token] = new _Node();
+        }
+      }
+      node = nextNode;
+    }
+    if (node.#index !== void 0) {
+      throw PATH_ERROR;
+    }
+    node.#index = isStatic ? -1 : index;
+  }
+  buildRegExpStr() {
+    const childKeys = Object.keys(this.#children).sort(compareKey);
+    const strList = childKeys.map((k) => {
+      const c = this.#children[k];
+      const childStr = c.buildRegExpStr();
+      return childStr === "" ? "" : (typeof c.#varIndex === "number" ? `(${k})@${c.#varIndex}` : regExpMetaChars.has(k) ? `\\${k}` : k) + childStr;
+    }).filter(Boolean);
+    if (typeof this.#index === "number" && this.#index !== -1) {
+      strList.unshift(`#${this.#index}`);
+    }
+    if (strList.length === 0) {
+      return "";
+    }
+    if (strList.length === 1) {
+      return strList[0];
+    }
+    return "(?:" + strList.join("|") + ")";
+  }
+};
+
+// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/router/reg-exp-router/trie.js
+var Trie = class {
+  #context = { varIndex: 0 };
+  #root = new Node();
+  #index = 0;
+  // dynamic path -> [handler index, param assoc]; static paths are not registered
+  paths = createNullObject();
+  insert(path, isStatic) {
+    if (isStatic) {
+      this.#root.insert(path.split(""), 0, [], this.#context, true);
+      return;
+    }
+    const paramAssoc = [];
+    const groups = [];
+    let markedPath = path;
+    for (let i = 0; ; ) {
+      let replaced = false;
+      markedPath = markedPath.replace(/\{[^}]+\}/g, (m2) => {
+        const mark = `@\\${i}`;
+        groups[i] = [mark, m2];
+        i++;
+        replaced = true;
+        return mark;
+      });
+      if (!replaced) {
+        break;
+      }
+    }
+    const tokens = markedPath.match(/(?::[^\/]+)|(?:\/\*$)|./g) || [];
+    for (let i = groups.length - 1; i >= 0; i--) {
+      const [mark] = groups[i];
+      for (let j = tokens.length - 1; j >= 0; j--) {
+        if (tokens[j].indexOf(mark) !== -1) {
+          tokens[j] = tokens[j].replace(mark, groups[i][1]);
+          break;
+        }
+      }
+    }
+    this.#root.insert(tokens, this.#index, paramAssoc, this.#context, false);
+    this.paths[path] = [this.#index++, paramAssoc];
+  }
+  buildRegExp() {
+    let regexp = this.#root.buildRegExpStr();
+    if (regexp === "") {
+      return [/^$/, [], []];
+    }
+    let captureIndex = 0;
+    const indexReplacementMap = [];
+    const paramReplacementMap = [];
+    regexp = regexp.replace(/#(\d+)|@(\d+)|\.\*\$/g, (_, handlerIndex, paramIndex) => {
+      if (handlerIndex !== void 0) {
+        indexReplacementMap[++captureIndex] = Number(handlerIndex);
+        return "$()";
+      }
+      if (paramIndex !== void 0) {
+        paramReplacementMap[Number(paramIndex)] = ++captureIndex;
+        return "";
+      }
+      return "";
+    });
+    return [new RegExp(`^${regexp}`), indexReplacementMap, paramReplacementMap];
+  }
+};
+
+// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/router/reg-exp-router/router.js
+var wildcardRegExpCache = createNullObject();
+function buildWildcardRegExp(path) {
+  return wildcardRegExpCache[path] ??= new RegExp(
+    `^${path.replace(
+      /\/:[^/{}]+(?:\{\[\^\/]\+})?(?=[/{]|$)|\/?\*$|([.\\+*[^\]$()?{}|])/g,
+      (match2, metaChar) => metaChar ? `\\${metaChar}` : match2 === "/*" ? TAIL_WILDCARD_REG_EXP_STR : match2 === "*" ? ONLY_WILDCARD_REG_EXP_STR : `/:${LABEL_REG_EXP_STR}`
+    )}$`
+  );
+}
+function findMiddleware(middleware, path) {
+  for (const k of Object.keys(middleware).sort((a2, b2) => b2.length - a2.length)) {
+    if (buildWildcardRegExp(k).test(path)) {
+      return [...middleware[k]];
+    }
+  }
+  return void 0;
+}
+var RegExpRouter = class {
+  name = "RegExpRouter";
+  #middleware;
+  #routes;
+  #tries;
+  constructor() {
+    this.#middleware = { [METHOD_NAME_ALL]: createNullObject() };
+    this.#routes = { [METHOD_NAME_ALL]: createNullObject() };
+    this.#tries = { [METHOD_NAME_ALL]: new Trie() };
+  }
+  #insertPath(method, path) {
+    try {
+      this.#tries[method].insert(path, !/\*|\/:/.test(path));
+    } catch (e) {
+      throw e === PATH_ERROR ? new UnsupportedPathError(path) : e;
+    }
+  }
+  add(method, path, handler2) {
+    const middleware = this.#middleware;
+    const routes = this.#routes;
+    if (!middleware) {
+      throw new Error(MESSAGE_MATCHER_IS_ALREADY_BUILT);
+    }
+    if (!middleware[method]) {
+      this.#tries[method] = new Trie();
+      for (const handlerMap of [middleware, routes]) {
+        handlerMap[method] = createNullObject();
+        for (const p2 in handlerMap[METHOD_NAME_ALL]) {
+          handlerMap[method][p2] = [...handlerMap[METHOD_NAME_ALL][p2]];
+          this.#insertPath(method, p2);
+        }
+      }
+    }
+    if (path === "/*") {
+      path = "*";
+    }
+    const methods = method === METHOD_NAME_ALL ? Object.keys(middleware) : [method];
+    if (/\*$/.test(path)) {
+      const re = buildWildcardRegExp(path);
+      for (const m2 of methods) {
+        if (!middleware[m2][path]) {
+          this.#insertPath(m2, path);
+          middleware[m2][path] = findMiddleware(middleware[m2], path) || findMiddleware(middleware[METHOD_NAME_ALL], path) || [];
+        }
+      }
+      for (const handlerMap of [middleware, routes]) {
+        for (const m2 of methods) {
+          for (const p2 in handlerMap[m2]) {
+            re.test(p2) && handlerMap[m2][p2].push([handler2, path]);
+          }
+        }
+      }
+      return;
+    }
+    const paths = checkOptionalParameter(path) || [path];
+    for (const path2 of paths) {
+      for (const m2 of methods) {
+        if (!routes[m2][path2]) {
+          this.#insertPath(m2, path2);
+          routes[m2][path2] = findMiddleware(middleware[m2], path2) || findMiddleware(middleware[METHOD_NAME_ALL], path2) || [];
+        }
+        routes[m2][path2].push([handler2, path2]);
+      }
+    }
+  }
+  match = match;
+  buildAllMatchers() {
+    const matchers = createNullObject();
+    for (const method of Object.keys(this.#routes)) {
+      matchers[method] = this.#buildMatcher(method);
+    }
+    this.#middleware = this.#routes = this.#tries = void 0;
+    wildcardRegExpCache = createNullObject();
+    return matchers;
+  }
+  #buildMatcher(method) {
+    const middleware = this.#middleware[method];
+    const routes = this.#routes[method];
+    const trie = this.#tries[method];
+    const staticMap = createNullObject();
+    const handlerData = [];
+    const [regexp, indexReplacementMap, paramReplacementMap] = trie.buildRegExp();
+    for (const r of [middleware, routes]) {
+      for (const path in r) {
+        const handlers = r[path];
+        const pathData = trie.paths[path];
+        if (!pathData) {
+          staticMap[path] = [handlers.map(([h]) => [h, createNullObject()]), emptyParam];
+          continue;
+        }
+        handlerData[pathData[0]] = handlers.map(([h, handlerPath]) => [
+          h,
+          trie.paths[handlerPath][1].reduceRight((map2, [key], i) => {
+            map2[key] = paramReplacementMap[pathData[1][i][1]];
+            return map2;
+          }, createNullObject())
+        ]);
+      }
+    }
+    return [regexp, indexReplacementMap.map((i) => handlerData[i]), staticMap];
+  }
+};
+
+// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/router/smart-router/router.js
+var SmartRouter = class {
+  name = "SmartRouter";
+  #routers = [];
+  #routes = [];
+  constructor(init) {
+    this.#routers = init.routers;
+  }
+  add(method, path, handler2) {
+    if (!this.#routes) {
+      throw new Error(MESSAGE_MATCHER_IS_ALREADY_BUILT);
+    }
+    this.#routes.push([method, path, handler2]);
+  }
+  match(method, path) {
+    if (!this.#routes) {
+      throw new Error("Fatal error");
+    }
+    const routers = this.#routers;
+    const routes = this.#routes;
+    const len = routers.length;
+    let i = 0;
+    let res;
+    for (; i < len; i++) {
+      const router = routers[i];
+      try {
+        for (let i2 = 0, len2 = routes.length; i2 < len2; i2++) {
+          router.add(...routes[i2]);
+        }
+        res = router.match(method, path);
+      } catch (e) {
+        if (e instanceof UnsupportedPathError) {
+          continue;
+        }
+        throw e;
+      }
+      this.match = router.match.bind(router);
+      this.#routers = [router];
+      this.#routes = void 0;
+      break;
+    }
+    if (i === len) {
+      throw new Error("Fatal error");
+    }
+    this.name = `SmartRouter + ${this.activeRouter.name}`;
+    return res;
+  }
+  get activeRouter() {
+    if (this.#routes || this.#routers.length !== 1) {
+      throw new Error("No active router has been determined yet.");
+    }
+    return this.#routers[0];
+  }
+};
+
+// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/router/trie-router/node.js
+var emptyParams = createNullObject();
+var order = 0;
+var Node2 = class _Node2 {
+  #methods = [];
+  #children = createNullObject();
+  #patterns = [];
+  #pattern;
+  #params = emptyParams;
+  insert(method, path, handler2) {
+    let curNode = this;
+    const parts = splitRoutingPath(path);
+    const possibleKeys = /* @__PURE__ */ new Set();
+    let i = 0;
+    for (const p2 of parts) {
+      const nextP = parts[++i];
+      const pattern = getPattern(p2, nextP) || (nextP === void 0 && p2 && p2.indexOf("*") === p2.length - 1 ? p2 : null);
+      const isParam = Array.isArray(pattern);
+      const key = isParam ? pattern[0] : pattern || p2;
+      const child = curNode.#children[key] ||= new _Node2();
+      if (pattern && !child.#pattern) {
+        child.#pattern = pattern;
+        curNode.#patterns.push(child);
+      }
+      curNode = child;
+      if (isParam) {
+        possibleKeys.add(pattern[1]);
+      }
+    }
+    curNode.#methods.push({
+      [method]: {
+        handler: handler2,
+        possibleKeys: [...possibleKeys],
+        score: ++order
+      }
+    });
+  }
+  #pushHandlerSets(handlerSets, node, method, nodeParams, params) {
+    for (let i = 0, len = node.#methods.length; i < len; i++) {
+      const m2 = node.#methods[i];
+      const handlerSet = m2[method] || m2[METHOD_NAME_ALL];
+      if (handlerSet) {
+        handlerSet.params = createNullObject();
+        handlerSets.push(handlerSet);
+        for (let i2 = 0, len2 = handlerSet.possibleKeys.length; i2 < len2; i2++) {
+          const key = handlerSet.possibleKeys[i2];
+          handlerSet.params[key] = params?.[key] && !i2 ? params[key] : nodeParams[key] ?? params?.[key];
+        }
+      }
+    }
+  }
+  search(method, path) {
+    const handlerSets = [];
+    this.#params = emptyParams;
+    const curNode = this;
+    let curNodes = [curNode];
+    const parts = splitPath(path);
+    const curNodesQueue = [];
+    const len = parts.length;
+    let partOffsets = null;
+    for (let i = 0; i < len; i++) {
+      const part = parts[i];
+      const isLast = i === len - 1;
+      const tempNodes = [];
+      for (let j = 0, len2 = curNodes.length; j < len2; j++) {
+        const node = curNodes[j];
+        const nextNode = node.#children[part];
+        if (nextNode) {
+          nextNode.#params = node.#params;
+          if (isLast) {
+            if (nextNode.#children["*"]) {
+              this.#pushHandlerSets(handlerSets, nextNode.#children["*"], method, node.#params);
+            }
+            this.#pushHandlerSets(handlerSets, nextNode, method, node.#params);
+          } else {
+            tempNodes.push(nextNode);
+          }
+        }
+        for (const child of node.#patterns) {
+          const pattern = child.#pattern;
+          const params = node.#params === emptyParams ? {} : { ...node.#params };
+          if (typeof pattern === "string") {
+            if (pattern === "*" || part.startsWith(pattern.slice(0, -1))) {
+              this.#pushHandlerSets(handlerSets, child, method, node.#params);
+              if (pattern === "*") {
+                child.#params = params;
+                tempNodes.push(child);
+              }
+            }
+            continue;
+          }
+          const [, name, matcher] = pattern;
+          if (!part && matcher === true) {
+            continue;
+          }
+          if (matcher !== true) {
+            if (!partOffsets) {
+              partOffsets = [];
+              let offset = path[0] === "/" ? 1 : 0;
+              for (let p2 = 0; p2 < len; p2++) {
+                partOffsets[p2] = offset;
+                offset += parts[p2].length + 1;
+              }
+            }
+            const restPathString = path.slice(partOffsets[i]);
+            const m2 = matcher.exec(restPathString);
+            if (m2) {
+              params[name] = m2[0];
+              this.#pushHandlerSets(handlerSets, child, method, node.#params, params);
+              if (m2[0].length === restPathString.length && child.#children["*"]) {
+                this.#pushHandlerSets(
+                  handlerSets,
+                  child.#children["*"],
+                  method,
+                  node.#params,
+                  params
+                );
+              }
+              for (const _ in child.#children) {
+                child.#params = params;
+                const componentCount = m2[0].match(/\//g)?.length ?? 0;
+                const targetCurNodes = curNodesQueue[componentCount] ||= [];
+                targetCurNodes.push(child);
+                break;
+              }
+              continue;
+            }
+          }
+          if (matcher === true || matcher.test(part)) {
+            params[name] = part;
+            if (isLast) {
+              this.#pushHandlerSets(handlerSets, child, method, params, node.#params);
+              if (child.#children["*"]) {
+                this.#pushHandlerSets(
+                  handlerSets,
+                  child.#children["*"],
+                  method,
+                  params,
+                  node.#params
+                );
+              }
+            } else {
+              child.#params = params;
+              tempNodes.push(child);
+            }
+          }
+        }
+      }
+      const shifted = curNodesQueue.shift();
+      curNodes = shifted ? tempNodes.concat(shifted) : tempNodes;
+    }
+    if (handlerSets[1]) {
+      handlerSets.sort((a2, b2) => {
+        return a2.score - b2.score;
+      });
+    }
+    return [handlerSets.map(({ handler: handler2, params }) => [handler2, params])];
+  }
+};
+
+// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/router/trie-router/router.js
+var TrieRouter = class {
+  name = "TrieRouter";
+  #node = new Node2();
+  add(method, path, handler2) {
+    for (const result of checkOptionalParameter(path) || [path]) {
+      this.#node.insert(method, result, handler2);
+    }
+  }
+  match(method, path) {
+    return this.#node.search(method, path);
+  }
+};
+
+// ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/hono.js
+var Hono2 = class extends Hono {
+  /**
+   * Creates an instance of the Hono class.
+   *
+   * @param options - Optional configuration options for the Hono instance.
+   */
+  constructor(options = {}) {
+    super(options);
+    this.router = options.router ?? new SmartRouter({
+      routers: [new RegExpRouter(), new TrieRouter()]
+    });
+  }
+};
 
 // server/routes-admin.ts
 init_db();
@@ -112067,9 +112243,11 @@ function registerAdminRoutes(app2) {
         }
       }
       const raService = (typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload)?.registeredAgent?.choice === "SERVICE";
+      const [agentRecord] = await db.query("SELECT ra_appointment_date FROM orders WHERE id=$1", [o.id]);
+      const agentAppointment = agentRecord?.ra_appointment_date;
       await db.query(
-        raService ? "UPDATE orders SET status = 'formed', formed_at = now(), ra_renewal_date = ((now() AT TIME ZONE 'America/New_York') + interval '1 year')::date WHERE id = $1" : "UPDATE orders SET status = 'formed', formed_at = now() WHERE id = $1",
-        [o.id]
+        raService ? "UPDATE orders SET status = 'formed', formed_at = COALESCE(formed_at,now()), ra_renewal_date = COALESCE(ra_renewal_date,$2::date) WHERE id = $1" : "UPDATE orders SET status = 'formed', formed_at = COALESCE(formed_at,now()) WHERE id = $1",
+        raService ? [o.id, agentAppointment ? addYears(isoOf(agentAppointment), 1) : null] : [o.id]
       );
       const clients = await db.query(
         "SELECT email, name FROM clients WHERE id = $1",
@@ -112145,7 +112323,10 @@ function registerAdminRoutes(app2) {
                 AND o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_llcs,
             -- The card kept for each agent company and its latest renewal (16 Sep 2026).
             (SELECT COALESCE(jsonb_agg(jsonb_build_object(
-                'llc_name', o.llc_name, 'card_status', o.card_status, 'card_last4', o.card_last4, 'card_brand', o.card_brand, 'card_note', o.card_note,
+                'order_id', o.id, 'consent', o.payload->'registeredAgent'->'renewalCardConsent', 'resignation_due', o.ra_resignation_due, 'resignation_submitted', o.ra_resignation_submitted, 'llc_name', o.llc_name, 'card_status', o.card_status, 'card_last4', o.card_last4, 'card_brand', o.card_brand, 'card_note', o.card_note,
+                'billing_hold', (SELECT r.billing_hold FROM ra_renewals r WHERE r.order_id=o.id ORDER BY r.renewal_date DESC LIMIT 1),
+                'notice_error', (SELECT r.notice_error FROM ra_renewals r WHERE r.order_id=o.id ORDER BY r.renewal_date DESC LIMIT 1),
+                'purpose', (SELECT r.purpose FROM ra_renewals r WHERE r.order_id=o.id ORDER BY r.renewal_date DESC LIMIT 1),
                 'last_status', (SELECT r.status FROM ra_renewals r WHERE r.order_id = o.id ORDER BY r.renewal_date DESC LIMIT 1),
                 'last_date', (SELECT to_char(r.renewal_date, 'FMMon FMDD, YYYY') FROM ra_renewals r WHERE r.order_id = o.id ORDER BY r.renewal_date DESC LIMIT 1)
               ) ORDER BY o.llc_name), '[]'::jsonb)
@@ -112720,13 +112901,18 @@ function registerOpsRoutes(app2) {
     app2.post("/dev/simulate-payment", async (c) => {
       const { orderId, card } = await c.req.json();
       const db = await getDb();
-      const isFormation = await db.query("SELECT id FROM orders WHERE id = $1", [orderId]);
+      const isFormation = await db.query("SELECT payload FROM orders WHERE id = $1", [orderId]);
       if (isFormation.length > 0) {
-        await fulfillPaidOrder(orderId, "dev-payment", card);
+        if (tookService(isFormation[0].payload)) {
+          const result = await payAgentTarget("order", orderId, { token: `offline-${card ?? "credit"}` });
+          if (!result.ok) return c.json(err(result.message ?? "Payment failed", result.code ?? "FAILED"), 400);
+        } else await fulfillPaidOrder(orderId, "dev-payment", card);
       } else {
         const isRenewal = await db.query("SELECT id FROM ra_renewals WHERE id = $1", [orderId]);
-        if (isRenewal.length > 0) await fulfillPaidRenewal(orderId, `dev-payment-${Date.now()}`, card);
-        else await fulfillPaidServiceOrder(orderId, "dev-payment");
+        if (isRenewal.length > 0) {
+          const result = await payAgentTarget("renewal", orderId, { token: `offline-${card ?? "credit"}` });
+          if (!result.ok) return c.json(err(result.message ?? "Payment failed", result.code ?? "FAILED"), 400);
+        } else await fulfillPaidServiceOrder(orderId, "dev-payment");
       }
       return c.json({ data: { ok: true } });
     });
@@ -112921,6 +113107,8 @@ function registerOpsRoutes(app2) {
 // server/app.ts
 var app = new Hono2().basePath("/api");
 registerPaymentRoutes(app);
+registerAgentCheckout(app);
+registerAgentOffice(app);
 registerPortalRoutes(app);
 registerAdminRoutes(app);
 registerOpsRoutes(app);

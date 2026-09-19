@@ -21,6 +21,7 @@ export const env = {
   DATABASE_URL: ext(process.env.DATABASE_URL),
   SESSION_SECRET: process.env.SESSION_SECRET ?? "dev-only-secret-change-me",
 
+  SQUARE_APPLICATION_ID: ext(process.env.SQUARE_APPLICATION_ID),
   SQUARE_ACCESS_TOKEN: ext(process.env.SQUARE_ACCESS_TOKEN),
   SQUARE_LOCATION_ID: ext(process.env.SQUARE_LOCATION_ID),
   SQUARE_ENV: process.env.SQUARE_ENV === "production" ? "production" : "sandbox",

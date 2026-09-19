@@ -1,4 +1,4 @@
-import { randomBytes } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
 import { env } from "./env";
 import { hmacSha256Base64 } from "./crypto";
 import type { PricedOrder } from "./pricing";
@@ -141,8 +141,9 @@ export async function saveCardFromPayment(opts: {
   const custRes = await fetch(`${API_BASE}/v2/customers`, {
     method: "POST",
     headers: squareHeaders(),
+    signal: AbortSignal.timeout(30000),
     body: JSON.stringify({
-      idempotency_key: randomBytes(16).toString("hex"),
+      idempotency_key: createHash("sha256").update(`customer:${opts.paymentId}`).digest("hex").slice(0,40),
       given_name: opts.givenName || undefined,
       family_name: opts.familyName || undefined,
       email_address: opts.email,
@@ -154,8 +155,9 @@ export async function saveCardFromPayment(opts: {
   const cardRes = await fetch(`${API_BASE}/v2/cards`, {
     method: "POST",
     headers: squareHeaders(),
+    signal: AbortSignal.timeout(30000),
     body: JSON.stringify({
-      idempotency_key: randomBytes(16).toString("hex"),
+      idempotency_key: createHash("sha256").update(`card:${opts.paymentId}`).digest("hex").slice(0,40),
       source_id: opts.paymentId,
       card: { customer_id: custBody.customer.id, cardholder_name: [opts.givenName, opts.familyName].filter(Boolean).join(" ") || undefined, reference_id: opts.referenceId },
     }),
@@ -228,3 +230,27 @@ export function verifyWebhookSignature(opts: {
   );
   return expected === opts.signatureHeader;
 }
+
+/** Registered-agent checkout authorizes first; capture waits for card eligibility/storage. */
+export interface AgentPayment { id: string; status: string; order_id?: string; card_details?: { card?: { prepaid_type?: string } } }
+export async function agentSquarePayment(action: 'authorize' | 'get' | 'complete' | 'cancel', opts: { id?: string; key?: string; source?: string; customerId?: string; amount?: number; email?: string; reference?: string; customerInitiated?: boolean }): Promise<AgentPayment> {
+  if (!env.SQUARE_ACCESS_TOKEN) {
+    if (action === 'authorize' && (opts.source?.includes('decline') || testHooks.declineNextRenewal)) {
+      const code = testHooks.declineNextRenewal || 'GENERIC_DECLINE'; testHooks.declineNextRenewal = ''; throw new SquareDecline(code);
+    }
+    return { id: opts.id || `dev-${opts.key}`, status: action === 'cancel' ? 'CANCELED' : action === 'complete' ? 'COMPLETED' : 'APPROVED', card_details: { card: { prepaid_type: opts.source?.includes('prepaid') ? 'PREPAID' : 'NOT_PREPAID' } } };
+  }
+  const path = action === 'authorize' ? '/v2/payments' : `/v2/payments/${encodeURIComponent(opts.id!)}` + (action === 'get' ? '' : `/${action}`);
+  const body = action === 'authorize' ? { idempotency_key: opts.key, source_id: opts.source, ...(opts.customerId ? { customer_id: opts.customerId } : {}), amount_money: { amount: opts.amount, currency: 'USD' }, location_id: env.SQUARE_LOCATION_ID, autocomplete: false, delay_action: 'CANCEL', reference_id: opts.reference, buyer_email_address: opts.email, customer_details: { customer_initiated: opts.customerInitiated === true, seller_keyed_in: false } } : {};
+  const res = await fetch(API_BASE + path, { method: action === 'get' ? 'GET' : 'POST', headers: squareHeaders(), ...(action === 'get' ? {} : { body: JSON.stringify(body) }), signal: AbortSignal.timeout(30000) });
+  const out = await res.json() as { payment?: AgentPayment; errors?: { code?: string }[] };
+  if (!res.ok || !out.payment) {
+    const code = out.errors?.[0]?.code ?? `HTTP_${res.status}`;
+    // Only definitive payment/card refusals release the attempt. Transport and
+    // provider failures keep its identity for reconciliation, never a new charge.
+    if (action === 'authorize' && ['GENERIC_DECLINE','CARD_DECLINED','INSUFFICIENT_FUNDS','CARD_EXPIRED','CVV_FAILURE','ADDRESS_VERIFICATION_FAILURE','CARD_NOT_SUPPORTED','INVALID_CARD','VERIFY_CVV_FAILURE','VERIFY_AVS_FAILURE','PAN_FAILURE','CARD_DECLINED_VERIFICATION_REQUIRED','CARD_TOKEN_EXPIRED','CARD_TOKEN_USED','INVALID_EXPIRATION','INVALID_PIN','INVALID_ACCOUNT','TRANSACTION_LIMIT'].includes(code)) throw new SquareDecline(code);
+    throw new Error(`Square ${action} unresolved (${code}); retry this payment`);
+  }
+  return out.payment;
+}
+export class SquareDecline extends Error { constructor(public code: string) { super(code); } }

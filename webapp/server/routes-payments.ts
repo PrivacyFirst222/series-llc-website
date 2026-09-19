@@ -1,3 +1,4 @@
+import { agentCheckoutLink, payAgentTarget } from "./ra-checkout";
 // Split from app.ts on 29 Aug 2026 — one domain per file, code moved
 // verbatim (the two dev test flags became shared.testHooks so they stay
 // mutable across modules). Routes register inside registerPaymentRoutes(app),
@@ -23,6 +24,7 @@ import { checkName, getSyncState, lookupEntities, unavailableNames } from "./sun
 
 import { sendMail, welcomeEmail, orderPaidEmail, serviceOrderClientEmail, serviceOrderAdminEmail } from "./email";
 
+import { RA_CARD_CONSENT } from "../src/lib/agentBilling";
 import { personLegalName } from "./routes-portal";
 import { writeOrderSummary } from "./order-summary";
 import { err, testHooks } from "./shared";
@@ -43,12 +45,15 @@ export async function fulfillPaidOrder(orderId: string, squarePaymentId: string 
     throw new Error("injected fulfillment failure (dev test scaffolding)");
   }
   const db = await getDb();
+  const [candidate] = await db.query<{ id:string;contact_name:string;contact_email:string;llc_name:string;payload:unknown;fulfillment_completed_at:unknown }>("SELECT * FROM orders WHERE id=$1",[orderId]);
+  if (!candidate || candidate.fulfillment_completed_at) return;
   // Record the payment independently of setup. A failed setup is still a
   // paid order, and another webhook can resume it without another charge.
   await db.query(
     `UPDATE orders SET status = 'paid', paid_at = now(), square_payment_id = $1
       WHERE id = $2 AND status = 'pending_payment'`, [squarePaymentId, orderId],
   );
+  if (!await saveRenewalCard(db,candidate,squarePaymentId,cardSim)) throw new Error("Registered-agent service requires consent and an eligible saved card; setup is held.");
   // One SQL statement commits the account, purchased services and completion
   // marker together. The row lock serializes concurrent deliveries; after a
   // competing commit, PostgreSQL rechecks fulfillment_completed_at. A failed
@@ -102,7 +107,6 @@ export async function fulfillPaidOrder(orderId: string, squarePaymentId: string 
   const payload = (typeof order.payload === "string" ? JSON.parse(order.payload) : order.payload) as {
     optionalDocuments?: { ein?: boolean; sElection?: boolean }; filingPath?: string;
   } | null;
-  await saveRenewalCard(db, order, squarePaymentId, cardSim).catch((e) => console.error("[renewals] card not saved:", e));
   await writeOrderSummary(orderId).catch((e) => console.error("[fulfill] summary rewrite failed:", e));
 
   // First-time clients get a set-password link; returning clients just get notified.
@@ -364,8 +368,8 @@ app.post("/orders", async (c) => {
 
   const db = await getDb();
   const rows = await db.query<{ id: string }>(
-    `INSERT INTO orders (contact_name, contact_email, package, llc_name, payload, service_fee_cents, state_fees_cents, total_cents, line_items, submitted_ip, submitted_user_agent)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id`,
+    `INSERT INTO orders (contact_name, contact_email, package, llc_name, payload, service_fee_cents, state_fees_cents, total_cents, line_items, submitted_ip, submitted_user_agent, agent_billing_consent)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id`,
     [
       // The CLIENT owns the order: portal account, welcome email, and the
       // admin's "Client:" line all come from the up-front card, not from the
@@ -381,11 +385,12 @@ app.post("/orders", async (c) => {
       JSON.stringify(priced.lineItems),
       payload.metadata.ipAddress,
       payload.metadata.userAgent,
+      data.registeredAgentChoice === "SERVICE" && data.raRenewalCardConsent ? RA_CARD_CONSENT : null,
     ],
   );
   const orderId = rows[0].id;
 
-  const checkout = await createCheckout({
+  const checkout = data.registeredAgentChoice === "SERVICE" ? {url: await agentCheckoutLink("order",orderId), squareOrderId: `agent-${orderId}`} : await createCheckout({
     orderId,
     llcName,
     priced,
@@ -462,6 +467,15 @@ app.post("/square/webhook", async (c) => {
   }
 
   const payment = event.data?.object?.payment;
+  if (event.type?.startsWith("payment.") && payment?.status === "COMPLETED") {
+    const [a] = await db.query<{target_id:string;kind:"order"|"renewal"}>("SELECT target_id,kind FROM ra_payment_attempts WHERE square_payment_id=$1 AND status IN ('approved','completed')",[payment.id]);
+    if(a){
+      const [target] = await db.query<{amount:number}>(a.kind==='order' ? 'SELECT total_cents AS amount FROM orders WHERE id=$1' : 'SELECT amount_cents AS amount FROM ra_renewals WHERE id=$1',[a.target_id]);
+      const mismatch=moneyMismatch(payment.amount_money,target.amount);
+      if(mismatch)await alertMoneyMismatch(mismatch,payment.order_id??a.target_id,payment.id);
+      else {const result=await payAgentTarget(a.kind,a.target_id,{token:'resume-persisted-attempt'});if(!result.ok)throw new Error('Recorded agent payment needs retry: '+result.code);}
+    }
+  }
   if (event.type?.startsWith("payment.") && payment?.status === "COMPLETED" && payment.order_id) {
     const rows = await db.query<{ id: string; total_cents: number }>(
       "SELECT id, total_cents FROM orders WHERE square_order_id = $1",

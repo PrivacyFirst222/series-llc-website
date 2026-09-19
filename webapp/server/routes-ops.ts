@@ -15,8 +15,10 @@ import { syncDailies } from "./sunbiz";
 
 import { err, testHooks } from "./shared";
 import { devOutbox } from "./email";
+import { payAgentTarget } from "./ra-checkout";
+import { tookService } from "./renewals";
 import { fulfillPaidOrder, fulfillPaidServiceOrder } from "./routes-payments";
-import { fulfillPaidRenewal, runRenewals } from "./renewals";
+import { runRenewals } from "./renewals";
 import { easternDateIso } from "./datetime";
 import type { CardSimulation } from "./square";
 import { purgeExpiredSElections } from "./routes-portal";
@@ -78,12 +80,13 @@ if (!env.SQUARE_ACCESS_TOKEN && !env.isProd) {
     // (16 Sep 2026): a credit card, a prepaid gift card, or a wallet.
     const { orderId, card } = (await c.req.json()) as { orderId: string; card?: CardSimulation };
     const db = await getDb();
-    const isFormation = await db.query("SELECT id FROM orders WHERE id = $1", [orderId]);
+    const isFormation = await db.query<{payload:unknown}>("SELECT payload FROM orders WHERE id = $1", [orderId]);
     if (isFormation.length > 0) {
-      await fulfillPaidOrder(orderId, "dev-payment", card);
+      if(tookService(isFormation[0].payload)){const result=await payAgentTarget("order",orderId,{token:`offline-${card??"credit"}`});if(!result.ok)return c.json(err(result.message??"Payment failed",result.code??"FAILED"),400);}
+      else await fulfillPaidOrder(orderId, "dev-payment", card);
     } else {
       const isRenewal = await db.query("SELECT id FROM ra_renewals WHERE id = $1", [orderId]);
-      if (isRenewal.length > 0) await fulfillPaidRenewal(orderId, `dev-payment-${Date.now()}`, card);
+      if (isRenewal.length > 0) {const result=await payAgentTarget("renewal",orderId,{token:`offline-${card??"credit"}`});if(!result.ok)return c.json(err(result.message??"Payment failed",result.code??"FAILED"),400);}
       else await fulfillPaidServiceOrder(orderId, "dev-payment");
     }
     return c.json({ data: { ok: true } });
@@ -251,7 +254,7 @@ if (!env.isProd) {
   });
 }
 
-/** Nightly: registered agent renewals (16 Sep 2026) — the notice 45 days
+/** Nightly: registered agent renewals (16 Sep 2026) — the notice 60 days
  *  out, the charge 15 days out, retries, and timely cancellations. Outside
  *  production a `today` query runs the job as of that date, for the checks. */
 app.get("/cron/ra-renewals", async (c) => {

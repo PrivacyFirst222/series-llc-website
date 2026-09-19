@@ -1,3 +1,4 @@
+import { RA_CANCELLATION, cardStatusWords } from "@/lib/agentBilling";
 import { AgreementLoadError } from "./AgreementLoadError";
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { Navigate, Link, useNavigate, useSearchParams } from "react-router-dom";
@@ -312,12 +313,17 @@ interface CompanyInfo {
   formed: boolean;
   raService: boolean;
   raRenewalDate: string | null;
+  raAppointmentDate?:string|null;
+  raResignationDue?:string|null;
+  raResignationSubmitted?:string|null;
+  raEndedDate?:string|null;
+  cardNote?:string|null;
   raCancellationRequestedAt: string | null;
   /** The card kept with Square for the renewal (16 Sep 2026). */
   cardStatus?: "on_file" | "none" | "gift_card" | null;
   cardLast4?: string | null;
   cardBrand?: string | null;
-  renewals?: { date: string | null; amountCents: number; status: string; chargedAt: string | null }[];
+  renewals?: { linkUrl?:string|null;purpose?:string; date: string | null; amountCents: number; status: string; chargedAt: string | null }[];
 }
 
 const brandWord = (b: string | null | undefined): string => {
@@ -363,8 +369,7 @@ function RegisteredAgentCard({ company }: { company: CompanyInfo }) {
                 <a href="mailto:support@myfloridaseriesllc.com" className="underline underline-offset-2">
                   support@myfloridaseriesllc.com
                 </a>
-                . Until we receive that proof, we remain your agent of record and service
-                continues to be billed as described in the Terms of Service.
+                . {RA_CANCELLATION}
               </p>
             </div>
           </div>
@@ -372,22 +377,18 @@ function RegisteredAgentCard({ company }: { company: CompanyInfo }) {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="text-sm text-muted-foreground">
               <p>
-                Your registered agent service is active{me?.raRenewalDate ? ` and renews on ${new Date(`${me.raRenewalDate}T12:00:00`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}` : " and renews annually"}. You can cancel
-                here at any time.
+                {company.raEndedDate ? `Our registered-agent appointment ends on ${company.raEndedDate}.` : company.raAppointmentDate ? `Your registered agent service is active${me?.raRenewalDate ? ` and renews on ${new Date(`${me.raRenewalDate}T12:00:00`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}` : ""}.` : "Your appointment date has not yet been recorded. Your first service year begins when our appointment takes effect."} You may give cancellation notice here at any time. Give notice at least 30 days before renewal and provide replacement proof by renewal to avoid a resignation charge.
               </p>
               {/* The card kept for the renewal, or why none is (16 Sep 2026). */}
               {company.cardStatus === "on_file" ? (
                 <p className="mt-1" data-testid="renewal-card">Renewal card: {brandWord(company.cardBrand)} ending {company.cardLast4}.</p>
-              ) : company.cardStatus === "gift_card" ? (
-                <p className="mt-1" data-testid="renewal-card">No card on file (a prepaid gift card cannot be kept) — you will receive a payment link before renewal.</p>
-              ) : company.cardStatus === "none" ? (
-                <p className="mt-1" data-testid="renewal-card">No card on file — you will receive a payment link before renewal.</p>
-              ) : null}
+              ) : <p className="mt-1" data-testid="renewal-card">{cardStatusWords(company.cardStatus,company.cardNote)}.</p>}
+
               {(company.renewals ?? []).filter((r) => r.status === "charged" || r.status === "paid_by_link" || r.status === "declined").map((r) => (
                 <p key={`${r.date}-${r.status}`} className="mt-1" data-testid="renewal-line">
                   {r.status === "declined"
-                    ? `Renewal charge declined for ${r.date ? new Date(`${r.date}T12:00:00`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : ""} — pay with the link in your email.`
-                    : `Renewed on ${r.chargedAt ? new Date(r.chargedAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : ""} for $${(r.amountCents / 100).toFixed(0)}.`}
+                    ? `${r.purpose === "resignation" ? "Resignation" : "Renewal"} charge declined for ${r.date ? new Date(`${r.date}T12:00:00`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : ""} — pay with the link in your email.`
+                    : `${r.purpose === "resignation" ? "Resignation payment received on" : "Renewed on"} ${r.chargedAt ? new Date(r.chargedAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : ""} for $${(r.amountCents / 100).toFixed(0)}.`}
                 </p>
               ))}
             </div>
@@ -407,17 +408,7 @@ function RegisteredAgentCard({ company }: { company: CompanyInfo }) {
                   <AlertDialogTitle>Cancel registered agent service?</AlertDialogTitle>
                   <AlertDialogDescription asChild>
                     <div className="space-y-2 text-sm">
-                      <p>
-                        This records your cancellation notice today. If your notice is at
-                        least 30 days before your renewal date{me?.raRenewalDate ? ` (${new Date(`${me.raRenewalDate}T12:00:00`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })})` : ""}, your service will not renew.
-                      </p>
-                      <p>
-                        Florida law requires your LLC to have a registered agent at all
-                        times. To finish cancelling, you must designate a successor
-                        registered agent with the Florida Division of Corporations and send
-                        us proof of the change. Until we receive that proof, we remain your
-                        agent of record and service continues to be billed.
-                      </p>
+                      <p>{RA_CANCELLATION}</p>
                     </div>
                   </AlertDialogDescription>
                 </AlertDialogHeader>
@@ -431,6 +422,8 @@ function RegisteredAgentCard({ company }: { company: CompanyInfo }) {
             </AlertDialog>
           </div>
         )}
+        {company.raResignationDue ? <p className="mt-3">{company.raResignationSubmitted ? `Resignation submitted ${company.raResignationSubmitted}.` : `Resignation due ${company.raResignationDue}; submission has not yet been recorded.`} {company.raEndedDate ? `Appointment ends ${company.raEndedDate}.` : ""}</p> : null}
+        {(company.renewals ?? []).filter(r=>r.linkUrl && !["charged","paid_by_link","cancelled"].includes(r.status)).map(r=><p key={r.date} className="mt-3"><a className="underline text-trust" href={r.linkUrl!}>Pay {r.purpose === "resignation" ? "resignation charge" : "renewal"} now / use another card</a></p>)}
         {cancelMutation.isError ? (
           <p className="mt-2 text-xs text-destructive">
             Something went wrong recording your request. Please try again or email

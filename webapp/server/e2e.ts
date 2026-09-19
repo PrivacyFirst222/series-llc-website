@@ -2901,7 +2901,7 @@ if (mint.status === 200) {
     const payload = (typeof stored.body?.data?.payload === "string" ? JSON.parse(stored.body.data.payload) : stored.body?.data?.payload) as { correspondence?: { address?: { address1?: string; city?: string } } } | undefined;
     check("the correspondent's mailing address is stored on the order", payload?.correspondence?.address?.address1 === "PO Box 9090" && payload?.correspondence?.address?.city === "Winter Park", payload?.correspondence);
   }
-  let aPay = await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: aId, card: "wallet" }) });
+  let aPay = await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: aId, card: "credit" }) });
   if (aPay.status === 404) {
     const adm = await adminSession();
     const full = await api(`/api/admin/orders/${aId}`, { cookies: adm.cookie });
@@ -3014,7 +3014,7 @@ if (mint.status === 200) {
     // the office row says so (16 Sep 2026).
     // Found by the company, since this suite changes the account's email.
     const clW = (allClients.body?.data as { email: string; ra_cards?: { llc_name: string; card_status: string | null; card_note: string | null }[] }[] | undefined)?.find((x) => (x.ra_cards ?? []).some((c) => c.llc_name === "E2E Account Settings, LLC"));
-    check("wallet: a payment Square cannot save leaves no card on file, and the office row says so", clW?.ra_cards?.[0]?.card_status === "none" && clW?.ra_cards?.[0]?.card_note === "wallet payment", clW?.ra_cards);
+    check("agent account setup requires an eligible saved card", clW?.ra_cards?.[0]?.card_status === "on_file", clW?.ra_cards);
   }
   const target = (allClients.body?.data ?? []).find((cl: { email: string }) => cl.email === newEmail);
   const overrideEmail = `e2e-acct-admin-${Math.random().toString(36).slice(2, 8)}@example.com`;
@@ -3783,6 +3783,8 @@ if (mint.status === 200) {
   const beforeMe = (await api("/api/auth/me", { cookies: raPw.cookie })).body?.data as { raRenewalDate?: string | null };
   check("before formation there is no renewal date", beforeMe?.raRenewalDate === null, beforeMe);
   check("a client who took our service is told so", (beforeMe as { raService?: boolean })?.raService === true, beforeMe);
+  const appointment = new Date().toLocaleDateString("en-CA", {timeZone:"America/New_York"});
+  await api(`/api/admin/orders/${raId}/agent`,{method:"POST",cookies:adm.cookie,body:JSON.stringify({action:"appointment",date:appointment})});
   const fd = new FormData();
   fd.set("articles", new File([new TextEncoder().encode("%PDF-1.4 renewal arts\n%%EOF")], "arts.pdf", { type: "application/pdf" }));
   fd.append("psd", new File([new TextEncoder().encode("%PDF-1.4 renewal psd\n%%EOF")], "psd.pdf", { type: "application/pdf" }));
@@ -3794,7 +3796,7 @@ if (mint.status === 200) {
   // server and the check disagreed across midnight).
   const eastern = new Date().toLocaleDateString("en-CA", { timeZone: "America/New_York" });
   const expected = `${Number(eastern.slice(0, 4)) + 1}${eastern.slice(4)}`;
-  check("formation sets the renewal date one year out, by Florida's calendar", det?.raRenewalDate === expected, { got: det?.raRenewalDate, expected });
+  check("recorded appointment sets the renewal date one year out, by Florida's calendar", det?.raRenewalDate === expected, { got: det?.raRenewalDate, expected });
   {
     // The office sees the date too (15 Sep 2026): the Registered Agent
     // Clients row names it beside the company.
@@ -3814,13 +3816,13 @@ if (mint.status === 200) {
     const co0 = await companiesOf();
     check("renewal: the card the formation was paid with is kept, with its last four", co0?.cardStatus === "on_file" && co0?.cardLast4 === "1111", co0);
     // Too early: nothing happens.
-    const early = (await api(`/api/cron/ra-renewals?today=${shift(renewalDate, -60)}`)).body?.data as { notices: number } | undefined;
+    const early = (await api(`/api/cron/ra-renewals?today=${shift(renewalDate, -61)}`)).body?.data as { notices: number } | undefined;
     const co1 = await companiesOf();
-    check("renewal: 60 days out, no notice yet", (co1?.renewals ?? []).length === 0, { early, renewals: co1?.renewals });
+    check("renewal: 61 days out, no notice yet", (co1?.renewals ?? []).length === 0, { early, renewals: co1?.renewals });
     // 45 days out: the notice.
-    const noticeRun = (await api(`/api/cron/ra-renewals?today=${shift(renewalDate, -45)}`)).body?.data as { notices: number } | undefined;
+    const noticeRun = (await api(`/api/cron/ra-renewals?today=${shift(renewalDate, -60)}`)).body?.data as { notices: number } | undefined;
     const co2 = await companiesOf();
-    check("renewal: 45 days out, the notice goes and the renewal is recorded", (noticeRun?.notices ?? 0) >= 1 && co2?.renewals?.[0]?.status === "notice_sent", { noticeRun, renewals: co2?.renewals });
+    check("renewal: 60 days out, the notice goes and the renewal is recorded", (noticeRun?.notices ?? 0) >= 1 && co2?.renewals?.[0]?.status === "notice_sent", { noticeRun, renewals: co2?.renewals });
     {
       const mails = ((await api("/api/dev/outbox")).body?.data ?? []) as { to: string; subject: string; html: string }[];
       const notice = mails.filter((m) => m.to === raEmail && /renews on/.test(m.subject)).at(-1);
@@ -3830,7 +3832,7 @@ if (mint.status === 200) {
       check("renewal: the notice names the date, $99, the card's last four, the charge day and the cancellation deadline", !!notice && /\$99/.test(flat) && /card ending 1111/.test(flat) && flat.includes(`on ${chargeWords}`) && flat.includes(`by ${cancelWords}`), { subject: notice?.subject, flat: flat.slice(0, 400) });
     }
     // The same day again: nothing doubles.
-    const again = (await api(`/api/cron/ra-renewals?today=${shift(renewalDate, -45)}`)).body?.data as { notices: number } | undefined;
+    const again = (await api(`/api/cron/ra-renewals?today=${shift(renewalDate, -60)}`)).body?.data as { notices: number } | undefined;
     check("renewal: running the job twice sends nothing twice", again?.notices === 0 && (await companiesOf())?.renewals?.length === 1, again);
     // 15 days out: declined first (a plain decline, no retry), with a link.
     await api("/api/dev/renewal-decline", { method: "POST", body: JSON.stringify({ code: "GENERIC_DECLINE" }) });
@@ -3872,16 +3874,11 @@ if (mint.status === 200) {
         clientEmail: giftEmail, confirmClientEmail: giftEmail, correspondentEmail: giftEmail, confirmCorrespondentEmail: giftEmail,
       }) });
       const giftId = giftRes.body?.data?.orderId as string;
-      await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: giftId, card: "prepaid" }) });
-      const giftMint = await api("/api/dev/mint-reset-token", { method: "POST", body: JSON.stringify({ email: giftEmail }) });
-      const giftPw = await api("/api/auth/set-password", { method: "POST", body: JSON.stringify({ token: giftMint.body?.data?.token, password: "e2e-gift-pass-1" }) });
-      const giftCo = ((await api("/api/portal/companies", { cookies: giftPw.cookie })).body?.data as { orderId: string; cardStatus: string | null; cardLast4: string | null }[] | undefined)?.find((x) => x.orderId === giftId);
-      check("gift card: a prepaid gift card is not kept and the company says so", giftRes.status === 200 && giftCo?.cardStatus === "gift_card" && !giftCo?.cardLast4, { status: giftRes.status, giftCo });
-      const mails = ((await api("/api/dev/outbox")).body?.data ?? []) as { to: string; subject: string; html: string }[];
-      const giftMail = mails.filter((m) => m.to === giftEmail && /card you paid with/i.test(m.subject)).at(-1);
-      check("gift card: the client is told the card cannot be kept and a link will come", !!giftMail && /prepaid gift card/.test(giftMail.html) && /payment link/.test(giftMail.html), giftMail?.subject);
-      const clG = ((await api("/api/admin/clients", { cookies: adm.cookie })).body?.data as { email: string; ra_cards?: { card_status: string | null }[] }[] | undefined)?.find((x) => x.email === giftEmail);
-      check("gift card: the office row reads no card — gift card", clG?.ra_cards?.[0]?.card_status === "gift_card", clG?.ra_cards);
+      const refused = await api("/api/dev/simulate-payment", {method:"POST",body:JSON.stringify({orderId:giftId,card:"prepaid"})});
+      const pending = (await api(`/api/admin/orders/${giftId}`,{cookies:adm.cookie})).body?.data;
+      check("prepaid attempted agent purchase is refused before completion",refused.status===400&&refused.body?.error?.code==="PREPAID_CARD"&&pending?.status==="pending_payment",{refused:refused.body,pending:pending?.status});
+      const retry=await api("/api/dev/simulate-payment",{method:"POST",body:JSON.stringify({orderId:giftId,card:"credit"})});
+      check("eligible card can retry a refused prepaid purchase immediately",retry.status===200,retry.body);
     }
   }
   const cancel = await api("/api/portal/registered-agent/cancel", { method: "POST", body: JSON.stringify({ company: raId }), cookies: raPw.cookie });

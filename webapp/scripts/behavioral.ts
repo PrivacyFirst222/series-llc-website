@@ -1,3 +1,4 @@
+import { batch07Walk } from "./batch07-walk";
 import { batch06Walk } from "./batch06-walk";
 import {batch05Walk} from "./batch05-walk";
 import { batch04AccountWalk } from "./batch04-account-walk";
@@ -401,7 +402,7 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
     // plainly, gift cards included, and required to continue.
     await page.waitForTimeout(300);
     const agentText = await page.locator("main").innerText();
-    expect(/Keep my card on file with Square for the yearly registered agent renewal/.test(agentText) && /A prepaid gift card \(the Visa or Mastercard kind\) cannot be kept on file/.test(agentText), `${run.key}: our service asks permission to keep the card, gift cards excluded`, agentText.match(/Keep my card[^\n]{0,80}/)?.[0]);
+    expect(/I agree to automatic annual renewal and to keep my card on file with Square/.test(agentText) && /successfully saved eligible card is required/.test(agentText) && !/prepaid gift card/.test(agentText), `${run.key}: our service asks permission to keep the card, gift cards excluded`, agentText.match(/Keep my card[^\n]{0,80}/)?.[0]);
     await page.locator("main button").filter({ hasText: /^Continue/ }).first().click();
     await page.waitForTimeout(500);
     expect(/Please agree to keep a card on file for the yearly renewal\./.test(await page.locator("main").innerText()), `${run.key}: continuing without the card permission is refused under the box`);
@@ -996,6 +997,7 @@ async function main(): Promise<void> {
       fd.set("articles", pdf("articles"));
       fd.append("psd", pdf("psd"));
       fd.append("psdSeries", JSON.stringify(seriesNames));
+      await fetch(`${API}/api/admin/orders/${dOrderId}/agent`,{method:"POST",headers:{Cookie:adminCookie,"Content-Type":"application/json"},body:JSON.stringify({action:"appointment",date:new Date().toLocaleDateString("en-CA",{timeZone:"America/New_York"})})});
       const formed = await fetch(`${API}/api/admin/orders/${dOrderId}/formation-documents`, { method: "POST", headers: { Cookie: adminCookie }, body: fd });
       expect(formed.status === 200, "actions: run D's company is formed through the admin API", await formed.text().catch(() => ""));
 
@@ -2731,6 +2733,28 @@ async function main(): Promise<void> {
     }
   }
 
+const batch07Results = new Map<string,{ok:boolean;detail?:unknown}>();
+await batch07Walk(browser, `http://localhost:${WEB_PORT}`, (ok,label,detail)=>batch07Results.set(label,{ok,detail}));
+{const r=batch07Results.get("batch07 28: annual billing and cancellation resignation policy");expect(r?.ok===true,"batch07 28: annual billing and cancellation resignation policy",r?.detail);batch07Results.delete("batch07 28: annual billing and cancellation resignation policy");}
+{const r=batch07Results.get("batch07 201: no monthly billing promise");expect(r?.ok===true,"batch07 201: no monthly billing promise",r?.detail);batch07Results.delete("batch07 201: no monthly billing promise");}
+{const r=batch07Results.get("batch07 45: cancellation timing is explicit");expect(r?.ok===true,"batch07 45: cancellation timing is explicit",r?.detail);batch07Results.delete("batch07 45: cancellation timing is explicit");}
+{const r=batch07Results.get("batch07 144: cancellation timing is consistent in intake");expect(r?.ok===true,"batch07 144: cancellation timing is consistent in intake",r?.detail);batch07Results.delete("batch07 144: cancellation timing is consistent in intake");}
+{const r=batch07Results.get("batch07 46: prepaid attempted purchases are refused only for our agent service");expect(r?.ok===true,"batch07 46: prepaid attempted purchases are refused only for our agent service",r?.detail);batch07Results.delete("batch07 46: prepaid attempted purchases are refused only for our agent service");}
+{const r=batch07Results.get("batch07 47: consent and a saved eligible card are both required");expect(r?.ok===true,"batch07 47: consent and a saved eligible card are both required",r?.detail);batch07Results.delete("batch07 47: consent and a saved eligible card are both required");}
+{const r=batch07Results.get("batch07 48: renewal consent errors return to agent step");expect(r?.ok===true,"batch07 48: renewal consent errors return to agent step",r?.detail);batch07Results.delete("batch07 48: renewal consent errors return to agent step");}
+{const r=batch07Results.get("batch07 171: unknown card status is distinct from absent consent");expect(r?.ok===true,"batch07 171: unknown card status is distinct from absent consent",r?.detail);batch07Results.delete("batch07 171: unknown card status is distinct from absent consent");}
+{const r=batch07Results.get("batch07 172: cancellation status belongs to the company");expect(r?.ok===true,"batch07 172: cancellation status belongs to the company",r?.detail);batch07Results.delete("batch07 172: cancellation status belongs to the company");}
+{const r=batch07Results.get("batch07 184: card failures have useful explanations");expect(r?.ok===true,"batch07 184: card failures have useful explanations",r?.detail);batch07Results.delete("batch07 184: card failures have useful explanations");}
+{const r=batch07Results.get("batch07 194: notice precedes cancellation deadline by thirty days");expect(r?.ok===true,"batch07 194: notice precedes cancellation deadline by thirty days",r?.detail);batch07Results.delete("batch07 194: notice precedes cancellation deadline by thirty days");}
+{const r=batch07Results.get("batch07 195: payment attempts are counted and idempotent");expect(r?.ok===true,"batch07 195: payment attempts are counted and idempotent",r?.detail);batch07Results.delete("batch07 195: payment attempts are counted and idempotent");}
+{const r=batch07Results.get("batch07 199: no false retry promises");expect(r?.ok===true,"batch07 199: no false retry promises",r?.detail);batch07Results.delete("batch07 199: no false retry promises");}
+{const r=batch07Results.get("batch07 196: receipts describe payments accurately");expect(r?.ok===true,"batch07 196: receipts describe payments accurately",r?.detail);batch07Results.delete("batch07 196: receipts describe payments accurately");}
+{const r=batch07Results.get("batch07 208: replacement uploads preserve dates");expect(r?.ok===true,"batch07 208: replacement uploads preserve dates",r?.detail);batch07Results.delete("batch07 208: replacement uploads preserve dates");}
+{const r=batch07Results.get("batch07 212: appointment effective date starts the service year");expect(r?.ok===true,"batch07 212: appointment effective date starts the service year",r?.detail);batch07Results.delete("batch07 212: appointment effective date starts the service year");}
+{const r=batch07Results.get("batch07 N1.12: failed notices remain pending and block automatic charging");expect(r?.ok===true,"batch07 N1.12: failed notices remain pending and block automatic charging",r?.detail);batch07Results.delete("batch07 N1.12: failed notices remain pending and block automatic charging");}
+{const r=batch07Results.get("batch07 4: Terms allocate services consistently");expect(r?.ok===true,"batch07 4: Terms allocate services consistently",r?.detail);batch07Results.delete("batch07 4: Terms allocate services consistently");}
+{const r=batch07Results.get("batch07 29: general Terms protect both service providers");expect(r?.ok===true,"batch07 29: general Terms protect both service providers",r?.detail);batch07Results.delete("batch07 29: general Terms protect both service providers");}
+for(const [label,r] of batch07Results) expect(r.ok,label,r.detail);
   await batch01Walk(browser, `http://localhost:${WEB_PORT}`, expect);
   await batch02Walk(browser, `http://localhost:${WEB_PORT}`, expect);
   await batch03Walk(browser, `http://localhost:${WEB_PORT}`, expect);

@@ -1,3 +1,4 @@
+import { addYears, isoOf as agentIso } from "./renewals";
 import { associateLegacyServices, serviceCompanyId } from "./company-scope";
 // Split from app.ts on 29 Aug 2026 — one domain per file, code moved
 // verbatim (the two dev test flags became shared.testHooks so they stay
@@ -825,14 +826,16 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
   }
 
   // No invented "sent" date: filed_at is set only by the button (14 Sep 2026).
-  // The registered-agent service renews on the anniversary of formation; the
-  // date is stored here so the portal and the cancellation email can show it.
+  // Preserve document completion and any renewal already paid. The office records
+  // the actual appointment separately; never infer it from upload time.
   const raService = ((typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload) as { registeredAgent?: { choice?: string } } | null)?.registeredAgent?.choice === "SERVICE";
+  const [agentRecord] = await db.query<{ra_appointment_date:unknown}>("SELECT ra_appointment_date FROM orders WHERE id=$1",[o.id]);
+  const agentAppointment = agentRecord?.ra_appointment_date;
   await db.query(
     raService
-      ? "UPDATE orders SET status = 'formed', formed_at = now(), ra_renewal_date = ((now() AT TIME ZONE 'America/New_York') + interval '1 year')::date WHERE id = $1"
-      : "UPDATE orders SET status = 'formed', formed_at = now() WHERE id = $1",
-    [o.id],
+      ? "UPDATE orders SET status = 'formed', formed_at = COALESCE(formed_at,now()), ra_renewal_date = COALESCE(ra_renewal_date,$2::date) WHERE id = $1"
+      : "UPDATE orders SET status = 'formed', formed_at = COALESCE(formed_at,now()) WHERE id = $1",
+    raService ? [o.id, agentAppointment ? addYears(agentIso(agentAppointment)!,1) : null] : [o.id],
   );
 
   const clients = await db.query<{ email: string; name: string }>(
@@ -925,7 +928,10 @@ app.get("/admin/clients", async (c) => {
                 AND o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_llcs,
             -- The card kept for each agent company and its latest renewal (16 Sep 2026).
             (SELECT COALESCE(jsonb_agg(jsonb_build_object(
-                'llc_name', o.llc_name, 'card_status', o.card_status, 'card_last4', o.card_last4, 'card_brand', o.card_brand, 'card_note', o.card_note,
+                'order_id', o.id, 'consent', o.payload->'registeredAgent'->'renewalCardConsent', 'resignation_due', o.ra_resignation_due, 'resignation_submitted', o.ra_resignation_submitted, 'llc_name', o.llc_name, 'card_status', o.card_status, 'card_last4', o.card_last4, 'card_brand', o.card_brand, 'card_note', o.card_note,
+                'billing_hold', (SELECT r.billing_hold FROM ra_renewals r WHERE r.order_id=o.id ORDER BY r.renewal_date DESC LIMIT 1),
+                'notice_error', (SELECT r.notice_error FROM ra_renewals r WHERE r.order_id=o.id ORDER BY r.renewal_date DESC LIMIT 1),
+                'purpose', (SELECT r.purpose FROM ra_renewals r WHERE r.order_id=o.id ORDER BY r.renewal_date DESC LIMIT 1),
                 'last_status', (SELECT r.status FROM ra_renewals r WHERE r.order_id = o.id ORDER BY r.renewal_date DESC LIMIT 1),
                 'last_date', (SELECT to_char(r.renewal_date, 'FMMon FMDD, YYYY') FROM ra_renewals r WHERE r.order_id = o.id ORDER BY r.renewal_date DESC LIMIT 1)
               ) ORDER BY o.llc_name), '[]'::jsonb)

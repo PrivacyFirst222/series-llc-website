@@ -493,6 +493,33 @@ const MIGRATIONS: { id: number; name: string; statements: string[] }[] = [
   { id: 14, name: "resumable-formation-setup", statements: [
     `ALTER TABLE orders ADD COLUMN IF NOT EXISTS fulfillment_completed_at timestamptz`,
   ] },
+  { id: 15, name: "agent-billing-and-checkout", statements: [
+    `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_cancellation_note text`,
+    `ALTER TABLE orders ADD COLUMN IF NOT EXISTS agent_billing_consent text`,
+    `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_appointment_date date`,
+    `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_replaced_at date`,
+    `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_proof_received_at timestamptz`,
+    `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_proof_note text`,
+    `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_resignation_due date`,
+    `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_resignation_submitted date`,
+    `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_resignation_filed date`,
+    `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_resignation_mailed date`,
+    `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_resignation_emailed_at timestamptz`,
+    `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_resignation_document uuid`,
+    `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_ended_date date`,
+    `ALTER TABLE orders ADD COLUMN IF NOT EXISTS checkout_token text`,
+    `ALTER TABLE ra_renewals ADD COLUMN IF NOT EXISTS purpose text NOT NULL DEFAULT 'renewal'`,
+    `ALTER TABLE ra_renewals ADD COLUMN IF NOT EXISTS billing_hold boolean NOT NULL DEFAULT false`,
+    `ALTER TABLE ra_renewals ADD COLUMN IF NOT EXISTS notice_error text`,
+    `ALTER TABLE ra_renewals ADD COLUMN IF NOT EXISTS lock_until timestamptz`,
+    `ALTER TABLE ra_renewals ADD COLUMN IF NOT EXISTS checkout_token text`,
+    `CREATE TABLE IF NOT EXISTS ra_payment_attempts (
+      id uuid PRIMARY KEY DEFAULT gen_random_uuid(), target_id uuid NOT NULL, kind text NOT NULL,
+      automatic boolean NOT NULL DEFAULT false, source_token text NOT NULL, status text NOT NULL DEFAULT 'pending', square_payment_id text,
+      failure_code text, created_at timestamptz NOT NULL DEFAULT now(), lock_until timestamptz,
+      UNIQUE(target_id, id))`,
+    `CREATE UNIQUE INDEX IF NOT EXISTS ra_payment_one_active ON ra_payment_attempts(target_id) WHERE status IN ('pending','approved','completed')`,
+  ]},
   // Append future migrations here with the next id. Never edit an entry.
 ];
 

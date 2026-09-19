@@ -48,6 +48,7 @@ export const ACKNOWLEDGMENTS: { field: string; text: string | ((p: SubmissionPay
 ];
 
 export interface SummaryOrderRow {
+  agent_billing_consent?: string | null;
   id: string;
   llc_name: string;
   package: string;
@@ -239,6 +240,8 @@ export function summaryMarkdown(o: SummaryOrderRow): string {
   out.push(line("Signed at", when(p.metadata?.submittedAt ?? o.created_at)));
   out.push(``);
   out.push(`## Acknowledgments ticked`);
+  const billingConsent = o.agent_billing_consent;
+  if (billingConsent) out.push(`Automatic renewal and card storage: ${billingConsent}`);
   out.push(`Each box below was ticked by the client, in these words, at ${when(p.metadata?.submittedAt ?? o.created_at)}.`);
   for (const t of ticked(p)) out.push(`- ${t.text}`);
   out.push(``);
@@ -254,7 +257,7 @@ export async function loadSummaryRow(orderId: string): Promise<SummaryOrderRow |
   const db = await getDb();
   const rows = await db.query<SummaryOrderRow>(
     `SELECT id, llc_name, package, contact_name, contact_email, payload, service_fee_cents, state_fees_cents, total_cents,
-            status, square_order_id, square_payment_id, created_at, paid_at, line_items, submitted_ip, submitted_user_agent
+            status, square_order_id, square_payment_id, created_at, paid_at, line_items, submitted_ip, submitted_user_agent, agent_billing_consent
        FROM orders WHERE id = $1`,
     [orderId],
   );

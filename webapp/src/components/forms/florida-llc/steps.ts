@@ -57,6 +57,7 @@ export const stepIndexOf = (key: StepKey): number =>
  *  the right screen when server-side validation flags something. */
 const FIELD_STEP: Record<string, StepKey> = {
   filingPath: "path",
+  raRenewalCardConsent: "agent",
   registeredAgentResidencyAcknowledgment: "agent",
   registeredAgentExistingRecordAcknowledgment: "agent",
   registeredAgentSeriesAgreementAcknowledgment: "certify",

@@ -112,14 +112,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T19:41:15.309Z",
+              "event": "assigned",
+              "batch": "07",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T20:13:28.551Z",
+              "event": "implemented",
+              "batch": "07",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "07",
+          "fix": {
+            "batch": "07",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch07 4: Terms allocate services consistently"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -982,14 +1009,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T19:41:15.309Z",
+              "event": "assigned",
+              "batch": "07",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T20:13:28.551Z",
+              "event": "implemented",
+              "batch": "07",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "07",
+          "fix": {
+            "batch": "07",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch07 28: annual billing and cancellation resignation policy"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -1013,17 +1067,44 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T19:41:15.309Z",
+              "event": "assigned",
+              "batch": "07",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T20:13:28.551Z",
+              "event": "implemented",
+              "batch": "07",
+              "revision": 1,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "4",
             "part": "all"
+          },
+          "batch": "07",
+          "fix": {
+            "batch": "07",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch07 29: general Terms protect both service providers"
+              }
+            ]
           }
         }
       ],
@@ -1507,14 +1588,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T19:41:15.309Z",
+              "event": "assigned",
+              "batch": "07",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T20:13:28.551Z",
+              "event": "implemented",
+              "batch": "07",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "07",
+          "fix": {
+            "batch": "07",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch07 45: cancellation timing is explicit"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -1538,14 +1646,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T19:41:15.309Z",
+              "event": "assigned",
+              "batch": "07",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T20:13:28.551Z",
+              "event": "implemented",
+              "batch": "07",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "07",
+          "fix": {
+            "batch": "07",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch07 46: prepaid attempted purchases are refused only for our agent service"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -1568,14 +1703,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T19:41:15.309Z",
+              "event": "assigned",
+              "batch": "07",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T20:13:28.551Z",
+              "event": "implemented",
+              "batch": "07",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "07",
+          "fix": {
+            "batch": "07",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch07 47: consent and a saved eligible card are both required"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -1598,14 +1760,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T19:41:15.309Z",
+              "event": "assigned",
+              "batch": "07",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T20:13:28.551Z",
+              "event": "implemented",
+              "batch": "07",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "07",
+          "fix": {
+            "batch": "07",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch07 48: renewal consent errors return to agent step"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -5149,17 +5338,44 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T19:41:15.309Z",
+              "event": "assigned",
+              "batch": "07",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T20:13:28.551Z",
+              "event": "implemented",
+              "batch": "07",
+              "revision": 1,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "45",
             "part": "all"
+          },
+          "batch": "07",
+          "fix": {
+            "batch": "07",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch07 144: cancellation timing is consistent in intake"
+              }
+            ]
           }
         }
       ],
@@ -6357,14 +6573,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T19:41:15.309Z",
+              "event": "assigned",
+              "batch": "07",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T20:13:28.551Z",
+              "event": "implemented",
+              "batch": "07",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "07",
+          "fix": {
+            "batch": "07",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch07 171: unknown card status is distinct from absent consent"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -6390,14 +6633,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T19:41:15.309Z",
+              "event": "assigned",
+              "batch": "07",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T20:13:28.551Z",
+              "event": "implemented",
+              "batch": "07",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "07",
+          "fix": {
+            "batch": "07",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch07 172: cancellation status belongs to the company"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -7133,14 +7403,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T19:41:15.309Z",
+              "event": "assigned",
+              "batch": "07",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T20:13:28.551Z",
+              "event": "implemented",
+              "batch": "07",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "07",
+          "fix": {
+            "batch": "07",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch07 184: card failures have useful explanations"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -7554,14 +7851,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T19:41:15.309Z",
+              "event": "assigned",
+              "batch": "07",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T20:13:28.551Z",
+              "event": "implemented",
+              "batch": "07",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "07",
+          "fix": {
+            "batch": "07",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch07 194: notice precedes cancellation deadline by thirty days"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -7587,14 +7911,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T19:41:15.309Z",
+              "event": "assigned",
+              "batch": "07",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T20:13:28.551Z",
+              "event": "implemented",
+              "batch": "07",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "07",
+          "fix": {
+            "batch": "07",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch07 195: payment attempts are counted and idempotent"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -7617,14 +7968,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T19:41:15.309Z",
+              "event": "assigned",
+              "batch": "07",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T20:13:28.551Z",
+              "event": "implemented",
+              "batch": "07",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "07",
+          "fix": {
+            "batch": "07",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch07 196: receipts describe payments accurately"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -7708,17 +8086,44 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T19:41:15.309Z",
+              "event": "assigned",
+              "batch": "07",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T20:13:28.551Z",
+              "event": "implemented",
+              "batch": "07",
+              "revision": 1,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "195",
             "part": "all"
+          },
+          "batch": "07",
+          "fix": {
+            "batch": "07",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch07 199: no false retry promises"
+              }
+            ]
           }
         }
       ],
@@ -7838,17 +8243,44 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T19:41:15.309Z",
+              "event": "assigned",
+              "batch": "07",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T20:13:28.551Z",
+              "event": "implemented",
+              "batch": "07",
+              "revision": 1,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "28",
             "part": "all"
+          },
+          "batch": "07",
+          "fix": {
+            "batch": "07",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch07 201: no monthly billing promise"
+              }
+            ]
           }
         }
       ],
@@ -8117,14 +8549,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T19:41:15.309Z",
+              "event": "assigned",
+              "batch": "07",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T20:13:28.551Z",
+              "event": "implemented",
+              "batch": "07",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "07",
+          "fix": {
+            "batch": "07",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch07 208: replacement uploads preserve dates"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -8269,14 +8728,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T19:41:15.309Z",
+              "event": "assigned",
+              "batch": "07",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T20:13:28.551Z",
+              "event": "implemented",
+              "batch": "07",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "07",
+          "fix": {
+            "batch": "07",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch07 212: appointment effective date starts the service year"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -10656,14 +11142,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T19:41:15.309Z",
+              "event": "assigned",
+              "batch": "07",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T20:13:28.551Z",
+              "event": "implemented",
+              "batch": "07",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "07",
+          "fix": {
+            "batch": "07",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch07 N1.12: failed notices remain pending and block automatic charging"
+              }
+            ]
+          }
         }
       ]
     },
@@ -12544,6 +13057,12 @@
       "text": "Add the authorized Account-card display follow-up to item 200; preserve its implemented security fix and every existing part and batch record.",
       "migration": "002-batch04-account-notice",
       "migrationHash": "b029878313d1336b46a56cf8a5d370a508972075ee0a1c33d9f18cbb81c52c17"
+    },
+    {
+      "date": "2026-09-19",
+      "kind": "ruling",
+      "item": "28",
+      "text": "Annual registered-agent billing only; no refund for changing agents midyear. Timely cancellation means at least 30 days before renewal. If replacement proof is missing by the renewal date, submit resignation on that date and charge $99 for state filing fees and processing, without a breakdown; this is not another service year. Email the resignation copy and mail the statutory notice. Appointment effective date starts the annual term. Both automatic-renewal consent and an eligible saved card are required. Show a prepaid warning only on an attempted prepaid purchase of our agent service. Allow immediate customer payment after decline. Approved by Adam in this conversation, culminating in “Go. Implement the changes”."
     }
   ],
   "batches": [
@@ -12805,6 +13324,25 @@
         },
         {
           "at": "2026-09-19T17:26:09.494Z",
+          "event": "implemented"
+        }
+      ]
+    },
+    {
+      "id": "07",
+      "revision": 1,
+      "frozenHash": "9a19d9417bf162071e3d565710a646bb0034cc118549486781c0511f067c6293",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "00628225d59793891b00ab4aebe23468b104cdbd",
+      "history": [
+        {
+          "at": "2026-09-19T19:41:15.309Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-19T20:13:28.551Z",
           "event": "implemented"
         }
       ]

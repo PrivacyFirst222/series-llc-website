@@ -31,6 +31,7 @@ export const BACKUP_TABLES = [
   "contact_messages",
   "email_log",
   "ra_renewals",
+  "ra_payment_attempts",
   "document_deletions",
 ] as const;
 

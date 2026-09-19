@@ -1,3 +1,4 @@
+import { RA_CARD_CONSENT } from "../src/lib/agentBilling";
 import { AGENT_FORM_VERSION } from "../src/components/forms/florida-llc/registeredAgent";
 /**
  * The Order Summary's acknowledgment wordings must match the form's own
@@ -59,6 +60,8 @@ const row: SummaryOrderRow = {
   submitted_ip: "203.0.113.7", submitted_user_agent: "Safari on iPad",
 };
 const md = summaryMarkdown(row);
+const agentSummary=summaryMarkdown({...row,agent_billing_consent:RA_CARD_CONSENT});
+check("agent summary preserves the actual new billing consent without inventing it for old orders",agentSummary.includes(RA_CARD_CONSENT)&&!md.includes(RA_CARD_CONSENT));
 check("the summary names the company and the client", /E2E Coastal Holdings, LLC/.test(md) && /Casey Member, Jr\. <casey@example\.com>/.test(md));
 check("the summary carries the payment id and the paid time", /sq-pay-1/.test(md) && /\*\*Paid:\*\* September 10, 2026/.test(md), md.match(/\*\*Paid:\*\*[^\n]*/)?.[0]);
 check("the summary lists every price line and the total", /Formation service fee \| \$499\.00/.test(md) && /Federal EIN service \| \$50\.00/.test(md) && /Total charged\*\* \| \*\*\$709\.00/.test(md));

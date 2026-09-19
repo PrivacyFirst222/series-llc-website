@@ -1,3 +1,4 @@
+import { RA_CARD_CONSENT } from "@/lib/agentBilling";
 import { useState } from "react";
 import { AGENT_RESIDENCY, AGENT_EXISTING_RECORD } from "../registeredAgent";
 import { ShieldCheck, UserRound } from "lucide-react";
@@ -117,15 +118,7 @@ export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
               checked={data.raRenewalCardConsent === true}
               onChange={(v) => patch({ raRenewalCardConsent: v })}
               error={errors.raRenewalCardConsent}
-              label={
-                <>
-                  Keep my card on file with Square for the yearly registered agent renewal. The
-                  first year is included; from the second year the $99 renewal is charged 15 days
-                  before the renewal date, and I can cancel at any time in my portal. A prepaid
-                  gift card (the Visa or Mastercard kind) cannot be kept on file and will not be
-                  accepted for renewal.
-                </>
-              }
+              label={RA_CARD_CONSENT}
             />
           </div>
         </div>

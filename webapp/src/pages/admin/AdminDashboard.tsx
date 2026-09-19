@@ -1,3 +1,5 @@
+import { cardStatusWords } from "@/lib/agentBilling";
+import { AgentServicePanel } from "./AgentServicePanel";
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -34,17 +36,17 @@ interface AdminClient {
   document_count: number;
   ra_llcs: string[];
   /** Per agent company: the card kept for the renewal and the latest renewal (16 Sep 2026). */
-  ra_cards?: { llc_name: string; card_status: string | null; card_last4: string | null; card_brand: string | null; card_note: string | null; last_status: string | null; last_date: string | null }[];
+  ra_cards?: { billing_hold?:boolean;notice_error?:string|null;purpose?:string;order_id?:string; consent?:boolean; resignation_due?:string|null; resignation_submitted?:string|null; llc_name: string; card_status: string | null; card_last4: string | null; card_brand: string | null; card_note: string | null; last_status: string | null; last_date: string | null }[];
   companies: { id: string; llc_name: string; contact_name?: string; has_summary?: boolean }[];
 }
 
 const cardWords = (c: NonNullable<AdminClient["ra_cards"]>[number]): string =>
   c.card_status === "on_file" ? `${c.card_brand ? c.card_brand.charAt(0) + c.card_brand.slice(1).toLowerCase() : "card"} ${c.card_last4 ?? ""}`.trim()
-  : c.card_status === "gift_card" ? "no card — gift card"
-  : c.card_status === "none" ? `no card${c.card_note === "wallet payment" ? " — wallet" : ""}`
-  : "—";
+  : cardStatusWords(c.card_status,c.card_note);
 const renewalWords = (c: NonNullable<AdminClient["ra_cards"]>[number]): string =>
-  !c.last_status ? "—"
+  c.billing_hold ? "Automatic charge held — notice sent late; client may pay voluntarily"
+  : c.notice_error ? "Notice failed — automatic charge held; next job retries notice"
+  : !c.last_status ? "—"
   : c.last_status === "charged" ? `charged ${c.last_date ?? ""}`
   : c.last_status === "paid_by_link" ? `paid by link ${c.last_date ?? ""}`
   : c.last_status === "declined" ? `declined ${c.last_date ?? ""}`
@@ -53,7 +55,7 @@ const renewalWords = (c: NonNullable<AdminClient["ra_cards"]>[number]): string =
   : c.last_status === "cancelled" ? `cancelled ${c.last_date ?? ""}`
   : c.last_status;
 /** A row that needs a hand: a decline, or a company with no card to charge. */
-const raNeedsHand = (cl: AdminClient): boolean => (cl.ra_cards ?? []).some((c) => c.last_status === "declined" || c.card_status === "gift_card" || c.card_status === "none");
+const raNeedsHand = (cl: AdminClient): boolean => (cl.ra_cards ?? []).some((c) => c.billing_hold || c.notice_error || c.last_status === "declined" || c.last_status === "notice_pending" || c.card_status !== "on_file" || Boolean(c.resignation_due && !c.resignation_submitted));
 
 interface EmailRow {
   id: string;
@@ -549,7 +551,7 @@ function ClientsTable({
               <tr key={cl.id} data-testid="client-row" className={variant === "ra" && raNeedsHand(cl) ? "bg-amber-50 dark:bg-amber-950/20" : undefined}>
                 <td className="px-3 py-3">
                   <span className="font-medium" data-testid="client-name">{displayName(cl)}</span>
-                  {cl.ra_cancellation_requested_at ? (
+                  {variant !== "ra" && cl.ra_cancellation_requested_at ? (
                     <span className="ml-2 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-900">
                       RA cancel requested {day(cl.ra_cancellation_requested_at)}
                     </span>
@@ -561,7 +563,7 @@ function ClientsTable({
                 ) : null}
                 {variant === "ra" ? (
                   <td className="px-3 py-3 text-xs" data-testid="ra-card-cell">
-                    {(cl.ra_cards ?? []).length === 0 ? "—" : (cl.ra_cards ?? []).map((c) => <div key={c.llc_name}>{(cl.ra_cards ?? []).length > 1 ? `${c.llc_name}: ` : ""}{cardWords(c)}</div>)}
+                    {(cl.ra_cards ?? []).length === 0 ? "—" : (cl.ra_cards ?? []).map((c) => <div key={c.llc_name}>{(cl.ra_cards ?? []).length > 1 ? `${c.llc_name}: ` : ""}{cardWords(c)}<div>Renewal permission: {c.consent === true ? "Agreed" : c.consent === false ? "Not agreed" : "Not recorded"}</div>{c.resignation_due && !c.resignation_submitted ? <strong>Resignation due {c.resignation_due.slice(0,10)}</strong> : null}{c.order_id ? <details><summary className="cursor-pointer underline">Manage appointment</summary><AgentServicePanel orderId={c.order_id}/></details> : null}</div>)}
                   </td>
                 ) : null}
                 {variant === "ra" ? (

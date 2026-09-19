@@ -1,3 +1,4 @@
+import AgentCheckout from "./pages/AgentCheckout";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -52,6 +53,7 @@ const App = () => (
             <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/form-llc" element={<FormLLC />} />
+            <Route path="/agent-checkout" element={<AgentCheckout />} />
             <Route path="/order/confirmed" element={<OrderConfirmed />} />
             <Route path="/portal" element={<PortalDashboard />} />
             <Route path="/portal/agreement" element={<OAQuestionnaire />} />

@@ -156,7 +156,7 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
           <Row label="Email" value={data.registeredAgentEmail} />
           <Row label="Phone" value={data.registeredAgentPhone} />
           {data.registeredAgentChoice === "SERVICE" ? (
-            <Row label="Renewal card on file" value={data.raRenewalCardConsent ? "Yes" : "No"} />
+            <Row label="Automatic renewal and card storage" value={data.raRenewalCardConsent ? "Agreed — card saved at checkout" : "Not agreed"} />
           ) : null}
         </ReviewCard>
 
