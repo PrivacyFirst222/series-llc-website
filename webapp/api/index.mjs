@@ -101969,7 +101969,7 @@ function welcomeEmail(name, setPasswordUrl, isConversion = false, raService = tr
       series LLC \u2014 is already in your portal's library, ready to download.</p>
       <p><a href="${setPasswordUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Set your password</a></p>
       <p style="color:#555;font-size:13px">This link expires in 7 days. If it expires, use
-      "Forgot password" on the portal sign-in page with this email address.</p>
+      "Forgot your password?" on the portal sign-in page with this email address.</p>
     `)
   };
 }
@@ -102052,7 +102052,7 @@ function passwordChangedEmail(portalUrl) {
     html: wrap(`
       <p>The password for your MyFloridaSeriesLLC portal account was just changed, and every
       other signed-in device was signed out.</p>
-      <p><strong>If you did not do this,</strong> use "Forgot your password" on the sign-in page
+      <p><strong>If you did not do this,</strong> use "Forgot your password?" on the sign-in page
       to regain control of the account, and email support@myfloridaseriesllc.com immediately.</p>
       <p><a href="${portalUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Open your portal</a></p>
     `)
@@ -102077,7 +102077,7 @@ function emailChangeRequestedEmail(maskedNew) {
       <p>Someone requested changing the email address on your MyFloridaSeriesLLC portal account
       to <strong>${escapeHtml(maskedNew)}</strong>. The change takes effect only if that address
       is confirmed.</p>
-      <p><strong>If this was not you,</strong> sign in and change your password immediately, then
+      <p><strong>If this was not you,</strong> sign in and change your password immediately \u2014 that also cancels this request \u2014 then
       email support@myfloridaseriesllc.com. This address remains on the account until the new one
       is confirmed.</p>
     `)
@@ -108534,7 +108534,7 @@ function registerPortalRoutes(app2) {
       return c.json(err("Too many attempts. Try again in a few minutes.", "RATE_LIMITED"), 429);
     }
     const body = loginSchema.safeParse(await c.req.json().catch(() => null));
-    if (!body.success) return c.json(err("Email and password are required.", "INVALID_INPUT"), 400);
+    if (!body.success) return c.json(err("Enter a valid email address and your password.", "INVALID_INPUT"), 400);
     const db = await getDb();
     const rows = await db.query(
       "SELECT id, password_hash FROM clients WHERE email = $1",
@@ -108610,9 +108610,12 @@ function registerPortalRoutes(app2) {
       [hashToken(body.data.token)]
     );
     if (rows.length === 0) {
-      return c.json(err("This link is invalid or has expired. Use \u201CForgot password\u201D to get a new one.", "BAD_TOKEN"), 400);
+      return c.json(err("This link is invalid or has expired. Use \u201CForgot your password?\u201D to get a new one.", "BAD_TOKEN"), 400);
     }
-    await db.query("UPDATE clients SET password_hash = $1 WHERE id = $2", [
+    await db.query(`WITH changed AS (
+    UPDATE clients SET password_hash = $1, pending_email = NULL WHERE id = $2 RETURNING id
+  ) UPDATE auth_tokens SET used_at = now()
+    WHERE client_id IN (SELECT id FROM changed) AND purpose = 'verify_email' AND used_at IS NULL`, [
       await hashPassword(body.data.password),
       rows[0].client_id
     ]);
@@ -108702,7 +108705,7 @@ function registerPortalRoutes(app2) {
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
     const companyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
     const seed = await oaSeed(session.clientId, companyId);
-    if (!seed) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
+    if (!seed) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
     const db = await getDb();
     const saved = await db.query("SELECT answers, rev FROM oa_profiles WHERE client_id = $1 AND order_id = $2", [session.clientId, seed.orderId]);
     const gens = await db.query(
@@ -108757,7 +108760,7 @@ function registerPortalRoutes(app2) {
     const body = oaAnswersSchema.safeParse(await c.req.json().catch(() => null));
     if (!body.success) return c.json(err(answersProblem(body.error), "INVALID_INPUT"), 400);
     const answersCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
-    if (!answersCompanyId) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
+    if (!answersCompanyId) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
     const db = await getDb();
     const baseRaw = c.req.query("baseRev");
     if (baseRaw !== void 0) {
@@ -108795,7 +108798,7 @@ function registerPortalRoutes(app2) {
     const a2 = body.data;
     const genCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
     const seed = await oaSeed(session.clientId, genCompanyId);
-    if (!seed) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
+    if (!seed) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
     const owners = effectiveOwners(seed.members, a2);
     if (owners.length === 0) {
       return c.json(err("An operating agreement needs at least one owner.", "INVALID_INPUT"), 400);
@@ -109101,7 +109104,7 @@ function registerPortalRoutes(app2) {
     }
     const consentCompanyId = await resolveCompanyOrder(session.clientId, body.data.company);
     const seed = await oaSeed(session.clientId, consentCompanyId);
-    if (!seed) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
+    if (!seed) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
     if (!body.data.seriesName.trim().toLowerCase().startsWith(seed.llcName.trim().toLowerCase())) {
       return c.json(
         err(`The series name must begin with "${seed.llcName}" (s. 605.2202, Fla. Stat.).`, "INVALID_INPUT"),
@@ -109203,7 +109206,7 @@ function registerPortalRoutes(app2) {
       [c.req.param("id")]
     );
     if (rows.length === 0 || rows[0].client_id !== session.clientId) {
-      return c.json(err("Not found", "NOT_FOUND"), 404);
+      return c.json(err("That agreement is no longer on your account.", "NOT_FOUND"), 404);
     }
     if (rows[0].document_id) {
       const docs = await db.query(
@@ -109244,7 +109247,7 @@ function registerPortalRoutes(app2) {
     }
     const amendCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
     const seed = await oaSeed(session.clientId, amendCompanyId);
-    if (!seed) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
+    if (!seed) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
     const db = await getDb();
     const current = await db.query(
       `SELECT inputs FROM oa_generations WHERE client_id = $1 AND (order_id = $2 OR order_id IS NULL) ORDER BY created_at DESC LIMIT 1`,
@@ -109393,10 +109396,10 @@ function registerPortalRoutes(app2) {
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
     const purchaseCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
     const llcName = await clientLlcName(session.clientId, purchaseCompanyId);
-    if (!llcName) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
+    if (!llcName) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
     const gate = await sElectionEligibility(session.clientId, purchaseCompanyId);
     if (!gate.eligible) {
-      const msg = gate.reason === "already_ordered" ? "You already have an S election order \u2014 see your orders below." : gate.reason === "window_closed" ? "The ordering window for the S election package has closed. A late election requires IRS relief \u2014 please consult a tax professional." : "The S election package is available only for new LLCs we formed.";
+      const msg = gate.reason === "already_ordered" ? "You already have an S election order \u2014 See Orders in progress." : gate.reason === "window_closed" ? "The ordering window for the S election package has closed. A late election requires IRS relief \u2014 please consult a tax professional." : "The S election package is available only with a paid new-LLC formation order through us.";
       return c.json(err(msg, gate.reason === "window_closed" ? "WINDOW_CLOSED" : "NOT_ELIGIBLE"), 400);
     }
     const db = await getDb();
@@ -109436,7 +109439,7 @@ function registerPortalRoutes(app2) {
     if (!body.success) return c.json(err("A series identifier is required.", "INVALID_INPUT"), 400);
     const purchaseCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
     const llcName = await clientLlcName(session.clientId, purchaseCompanyId);
-    if (!llcName) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
+    if (!llcName) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
     const suffix = body.data.suffix.trim().replace(/\s+/g, " ");
     if (!/^[\w .,'&-]+$/.test(suffix)) {
       return c.json(err("The series identifier contains unsupported characters.", "INVALID_INPUT"), 400);
@@ -109494,7 +109497,7 @@ function registerPortalRoutes(app2) {
     const spec = CERT_TYPES[body.data.kind];
     const purchaseCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
     const llcName = await clientLlcName(session.clientId, purchaseCompanyId);
-    if (!llcName) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
+    if (!llcName) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
     if (!await clientLlcFormed(session.clientId, purchaseCompanyId)) {
       return c.json(err("The state issues these only for a formed LLC \u2014 yours is still in progress.", "NOT_FORMED"), 400);
     }
@@ -109506,7 +109509,7 @@ function registerPortalRoutes(app2) {
       [session.clientId, body.data.kind, purchaseCompanyId]
     );
     if (open.length > 0) {
-      return c.json(err(`A ${spec.name.toLowerCase()} is already on order \u2014 see your orders below.`, "ALREADY_ORDERED"), 400);
+      return c.json(err(`A ${spec.name.toLowerCase()} is already on order \u2014 See Orders in progress.`, "ALREADY_ORDERED"), 400);
     }
     if (!await rateLimit(`svc:${session.clientId}`, 20, 36e5)) {
       return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
@@ -109544,7 +109547,7 @@ function registerPortalRoutes(app2) {
     if (!body.success) return c.json(err("Choose what the EIN is for.", "INVALID_INPUT"), 400);
     const purchaseCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
     const llcName = await clientLlcName(session.clientId, purchaseCompanyId);
-    if (!llcName) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
+    if (!llcName) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
     if (body.data.target === "series" && !body.data.seriesName?.trim()) {
       return c.json(err("Name the protected series the EIN is for.", "INVALID_INPUT"), 400);
     }
@@ -109564,7 +109567,7 @@ function registerPortalRoutes(app2) {
     if (alreadyOrdered) {
       return c.json(
         err(
-          target === "company" ? "Your LLC's EIN is already ordered \u2014 see your orders below." : "An EIN for that protected series is already ordered \u2014 see your orders below.",
+          target === "company" ? "Your LLC's EIN is already ordered \u2014 See Orders in progress." : "An EIN for that protected series is already ordered \u2014 See Orders in progress.",
           "ALREADY_ORDERED"
         ),
         400
@@ -109575,7 +109578,7 @@ function registerPortalRoutes(app2) {
       const match2 = mine.find((s) => s.name.toLowerCase() === seriesName.toLowerCase());
       if (!match2) return c.json(err("That protected series is not on your account.", "UNKNOWN_SERIES"), 400);
       if (match2.einOrdered) {
-        return c.json(err("An EIN for that protected series is already ordered \u2014 see your orders below.", "ALREADY_ORDERED"), 400);
+        return c.json(err("An EIN for that protected series is already ordered \u2014 See Orders in progress.", "ALREADY_ORDERED"), 400);
       }
     }
     if (!await rateLimit(`svc:${session.clientId}`, 20, 36e5)) {
@@ -109835,7 +109838,10 @@ function registerPortalRoutes(app2) {
     if (!client?.password_hash || !await verifyPassword(body.data.currentPassword, client.password_hash)) {
       return c.json(err("That current password is not correct.", "BAD_CREDENTIALS"), 401);
     }
-    await db.query("UPDATE clients SET password_hash = $1 WHERE id = $2", [
+    await db.query(`WITH changed AS (
+    UPDATE clients SET password_hash = $1, pending_email = NULL WHERE id = $2 RETURNING id
+  ) UPDATE auth_tokens SET used_at = now()
+    WHERE client_id IN (SELECT id FROM changed) AND purpose = 'verify_email' AND used_at IS NULL`, [
       await hashPassword(body.data.newPassword),
       session.clientId
     ]);
@@ -109921,10 +109927,8 @@ function registerPortalRoutes(app2) {
       return c.json(err("That address is now in use on another account.", "EMAIL_TAKEN"), 400);
     }
     const previous = clients[0].email;
-    await db.query("UPDATE clients SET email = $1, pending_email = NULL WHERE id = $2", [
-      pending,
-      rows[0].client_id
-    ]);
+    const changed = await db.query("UPDATE clients SET email = $1, pending_email = NULL WHERE id = $2 AND pending_email = $1 RETURNING id", [pending, rows[0].client_id]);
+    if (changed.length === 0) return c.json(err("This email change was cancelled. Request it again from your portal.", "BAD_TOKEN"), 400);
     const mail = emailChangedEmail(pending);
     sendMail({ to: pending, ...mail }).catch((e) => console.error("[account] email-changed (new) failed:", e));
     sendMail({ to: previous, ...mail }).catch((e) => console.error("[account] email-changed (old) failed:", e));
@@ -110592,10 +110596,10 @@ function registerPaymentRoutes(app2) {
     }
     const db = await getDb();
     const orders = await db.query(
-      "SELECT client_id, status, contact_name, contact_email, payload FROM orders WHERE id = $1",
+      "SELECT client_id, paid_at, status, contact_name, contact_email, payload FROM orders WHERE id = $1",
       [c.req.param("id")]
     );
-    if (orders.length === 0 || orders[0].status !== "paid" || !orders[0].client_id) {
+    if (orders.length === 0 || !orders[0].paid_at || !orders[0].client_id) {
       return c.json({ data: { ok: true, sent: false } });
     }
     const clients = await db.query(
@@ -110610,9 +110614,12 @@ function registerPaymentRoutes(app2) {
       );
       const resendPayload = typeof orders[0].payload === "string" ? JSON.parse(orders[0].payload) : orders[0].payload;
       const mail = welcomeEmail(orders[0].contact_name, `${env.PUBLIC_BASE_URL}/portal/set-password?token=${token}`, resendPayload?.filingPath === "CONVERT", resendPayload?.registeredAgent?.choice === "SERVICE");
-      await sendMail({ to: orders[0].contact_email, ...mail }).catch(
-        (e) => console.error("[resend-welcome] failed:", e)
-      );
+      try {
+        await sendMail({ to: orders[0].contact_email, ...mail });
+      } catch (e) {
+        console.error("[resend-welcome] failed:", e);
+        return c.json(err("Could not send the email. Please try again.", "EMAIL_FAILED"), 503);
+      }
       return c.json({ data: { ok: true, sent: true } });
     }
     return c.json({ data: { ok: true, sent: false } });

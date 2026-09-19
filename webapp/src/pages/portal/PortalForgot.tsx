@@ -3,23 +3,27 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { api } from "@/lib/api";
+import { api, ApiError } from "@/lib/api";
 
 export default function PortalForgot() {
   const [email, setEmail] = useState<string>("");
   const [sent, setSent] = useState<boolean>(false);
+  const [error, setError] = useState("");
   const [busy, setBusy] = useState<boolean>(false);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (busy) return;
     setBusy(true);
+    setError("");
     try {
       await api.post("/api/auth/forgot", { email });
-    } catch {
-      // Same message either way — the endpoint never reveals whether an account exists.
-    } finally {
       setSent(true);
+    } catch (e) {
+      setError(e instanceof ApiError && e.status === 429
+        ? "Too many requests. Try again later."
+        : "We could not request a reset link. Check your connection and try again.");
+    } finally {
       setBusy(false);
     }
   };
@@ -37,7 +41,7 @@ export default function PortalForgot() {
         ) : (
           <>
             <p className="mt-2 text-sm text-muted-foreground">
-              Enter the email address you used when you signed up, and we'll send a
+              Enter the email address you currently use to sign in, and we'll send a
               link to choose a new password.
             </p>
             <form onSubmit={submit} className="mt-8 space-y-5">
@@ -52,6 +56,7 @@ export default function PortalForgot() {
                   required
                 />
               </div>
+              {error ? <p role="alert" className="text-sm text-destructive">{error}</p> : null}
               <Button type="submit" size="lg" className="w-full rounded-full" disabled={busy}>
                 {busy ? "Sending…" : "Email me a reset link"}
               </Button>

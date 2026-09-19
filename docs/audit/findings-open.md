@@ -104,12 +104,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: In the first-year figure the ten LLCs are charged $990 of agent fees and the Protected Series LLC $0 (:52-53 '$990/yr' / '$99/yr' with the note :51 'Your first year is included in the service fee'; the ≈ $1,940 at :168 is 1,250 + 990 − (125 + 175)). The sides are held equal only from year two.
   - Replace with: Registered agent pricing is held at $99/yr on both sides after the first year; the first-year figure counts the year our service fee includes, so the comparison turns on the number of entities rather than on what any agent charges.
   - **Codex rejected the proposed replacement:** Explicitly distinguish equal renewal rates from the first-year inclusion. The conclusion that the entire comparison turns only on entity count remains too broad after the proposed edit.
-- **24. [B7]** — **open**
+- **24. [B7]** — **implemented**
   - Contact page, the 'Message' box and the Send button — `webapp/src/pages/Contact.tsx:119`
   - Reads: <Label htmlFor="message">Message</Label>
   - Claims: That a message is optional (no asterisk; the pre-check at :35 tests only name and email: 'if (!form.name || !form.email)').
   - True: The server refuses a blank message: routes-payments.ts:638 'message: z.string().trim().min(1).max(5000)' and :647 returns 'Please provide your name, a valid email, and a message.' A visitor who leaves it blank is refused after Send with a message about three boxes.
   - Replace with: Label 'Message *'; pre-check 'if (!form.name || !form.email || !form.message.trim())' with the toast 'Please add your name, email, and a message so we can reply.'
+  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **25. [B8]** — **open**
   - Contact page, the small line beside the Send button — `webapp/src/pages/Contact.tsx:132`
   - Reads: Document preparation service only.
@@ -358,8 +359,9 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (disputed): StepOptionalDocs.tsx:69 says “2 months and 15 days from formation”; form2553Timing.ts:101–103 says effective date. IRS Form2553 Instructions, Item E, ties the deadline to the election effective tax-year date, using the earliest owners/assets/business date for a first tax year, not universally the Articles effective date. https://www.irs.gov/instructions/i2553
   - **Codex rejected the proposed replacement:** Use the Form2553 Item E effective date and its first-tax-year rule, with applicable deadline extensions/late-election exclusions. Do not universalize the Articles date.
   - Outcome: Codex's dispute not adopted: Codex's dispute is not adopted as written, and the wording is left to ADAM'S DECISION; it is not recorded as settled law. IRS Form 2553 instructions, item E: the deadline runs '2 months and 15 days after the date entered for item E', and for a first tax year that is the earliest of the day the entity 'first had shareholders (owners)', first had assets, or began doing business. Claude's reading is that a new LLC first has owners the day its Articles take effect, which matches A22's wording; Codex's review did not establish that every path the product supports satisfies that assumption.
-- **64. [A25]** — **open**
+- **64. [A25]** — **implemented**
   - Order confirmed: "Sign in to your portal" button for a first-time client; resend answers "already has a password" for a filed or formed order. Replace: button only for a returning client; treat filed/formed as paid.
+  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **65. [A26]** — **open**
   - Progress percent counts hidden steps and an unreachable "Submit" step (whose dead page says we send the operating agreement). Replace: remove the dead step; one denominator.
   - Part "dead-step" — open: The unreachable "Submit" step and its dead page, whose sentence says the operating agreement is sent with the filed documents, are removed.
@@ -745,12 +747,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: When the optional-purpose checkbox is unchecked, no specific purpose is requested for the ordinary LLC.
   - True: StepPurpose.tsx:23 resets an ordinary LLC only when purposeType is empty. Returning from PLLC preserves purposeType PROFESSIONAL and its text; :18 makes addingSpecific false, so the checkbox is unchecked and :101 hides the text box. server/validation.ts:167–171 permits this combination; buildPayload carries the purpose and filing.ts:416–417 still appends the retained professional text. Thus a client who switches to an ordinary LLC can receive Articles with the previous professional-purpose clause while this screen presents an unchecked optional-purpose box.
   - Replace with: When changing from PLLC to an ordinary LLC, reset purposeType to GENERAL and clear the former professional purpose, or visibly ask the client to retain it as a SPECIFIC purpose. Reject inconsistent type/purpose combinations on the server.
-- **N4.06. [substantive]** — **open**
+- **N4.06. [substantive]** — **implemented**
   - Payment confirmation, Resend the email: failure is reported as sent — `webapp/src/pages/OrderConfirmed.tsx:26`
   - Reads: Sent — check your inbox.
   - Claims: The requested welcome/password-setting email has been successfully sent.
   - True: routes-payments.ts:618–621 catches a rejected sendMail call, logs it, and unconditionally returns sent:true. OrderConfirmed.tsx:23–26 trusts that flag. If the mail provider fails, the client sees Sent and loses the resend button despite no accepted delivery. Unlike prior64, this occurs for an otherwise eligible paid order and does not concern filed/formed eligibility. Correct behavior requires returning an API error on failed sendMail, preserving the resend control, and using the existing success sentence only after sendMail succeeds.
   - Replace with: Could not send the email. Please try again.
+  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **N4.07. [substantive]** — **open**
   - Order form, Adding series to an existing LLC while keeping its registered agent: the agent’s agreement is absent from the certification — `webapp/src/components/forms/florida-llc/sections/StepCertification.tsx:117`
   - Reads: I am authorized to act for ${company}, its members have consented to establishing the protected series on this order, and I authorize MyFloridaSeriesLLC to prepare and file the Protected Series Designations with the Florida Division of Corporations.
@@ -769,12 +772,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: An abandoned manager entry does not need completion once the member-managed path hides Managers.
   - True: FloridaLLCFormationForm.tsx:299 hides the step and stepValidation.ts:259 returns no manager errors, but submission :449–453 sends raw managers. schema.ts:178 validates all manager rows regardless of structure; server/validation.ts:342–374 never strips them. Read-only pure-function reproduction with MEMBER_MANAGED and a retained manager email invalid returned {} from validateStep(managers,...) and a server Enter a valid email issue at managers.0.email. Missing address fields similarly remain required. This differs from prior57’s missing visible email error: switching paths preserves an inapplicable row that blocks checkout.
   - Replace with: Before submitting or validating a member-managed order, omit abandoned manager rows that are inapplicable to the selected structure; apply the same rule on the server. If previously entered members are intentionally retained for the agreement after the reverse switch, display and validate them explicitly rather than hiding their errors.
-- **N4.10. [wording]** — **open**
+- **N4.10. [wording]** — **implemented**
   - Payment confirmation reopened after filing or formation: the status message still says preparation has just begun — `webapp/src/pages/OrderConfirmed.tsx:101`
   - Reads: We're preparing your filing now — you'll get an email when your LLC is formed.
   - Claims: The current order is still awaiting filing and formation.
   - True: OrderConfirmed.tsx:58,63 deliberately treats paid, filed, and formed as paid, but :101–103 renders this same future-tense message for all three. A formed order can therefore show both an already-completed server state and a claim that its filing is being prepared. The conversion branch has the parallel stale claim about series being established. This is independent of prior64’s login/resend mismatch.
   - Replace with: Paid: “We’re preparing your filing.” Filed: “Your filing has been submitted.” Formed: “Your LLC has been formed.” For an existing LLC’s series order, use “Your protected series have been established” at completion. Render the message for the actual order status.
+  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **N4.11. [wording]** — **open**
   - Order form, Registered agent acceptance and Review: the agent’s suffix disappears — `webapp/src/components/forms/florida-llc/sections/StepRegisteredAgentAcceptance.tsx:24`
   - Reads: const raFullName = [data.registeredAgentFirstName, data.registeredAgentLastName]
@@ -784,9 +788,10 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
 
 ## Client portal — 73 open of 73
 
-- **115. [A47]** — **open**
+- **115. [A47]** — **implemented**
   - Questionnaire and amendment error "We couldn't find a formed LLC on your account yet" where the check is for a paid order. Replace: "a paid order".
   - **Codex rejected the proposed replacement:** Use “a paid order” for NO_LLC only; distinguish network/server errors rather than replacing every failed request with this explanation.
+  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **116. [A48]** — **open**
   - Consent dialog help "Leave blank to point at the Asset Schedule." prints a dash; and (mine) the consent prints "—" where the agreement's exhibit prints "None". Replace: both "None"; help says so.
 - **117. [A49]** — **open**
@@ -898,13 +903,14 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: The PDF is 'signed-ready'.
   - True: The PDF is unsigned and ready for the members to sign; 'signed-ready' reads as if already signed. The sibling wording on the same screen is 'ready to sign' nowhere; the S election tile (ServicesCard.tsx:403) says 'completed and ready to sign'.
   - Replace with: Answer a short questionnaire and we'll generate your operating agreement as a PDF ready to sign.
-- **143. [B74]** — **open**
+- **143. [B74]** — **implemented**
   - Client portal, the Operating agreement card when the status request fails — `webapp/src/pages/portal/PortalDashboard.tsx:199`
   - Reads: Your agreement questionnaire unlocks once your order is paid.
   - Claims: The order is unpaid.
   - True: The sentence is shown for any error from /api/portal/oa (`oaQuery.isError`, :197), including a dropped request. The route's only refusal is routes-portal.ts:1108 'No formed LLC found on your account.' (a 400); a 500 or a lost connection also lands here and tells a paid client they have not paid. The same file already distinguishes a 401 from other failures for the portal itself (:624-636).
   - Replace with: Show 'Your agreement questionnaire unlocks once your order is paid.' only when the error is a 400 (ApiError status 400); otherwise 'We couldn't check your agreement just now.' with a Try again button, as at lines 630-633.
   - **Codex rejected the proposed replacement:** Use the specific NO_LLC API error, not every400; distinguish401 (sign in again), transport failure and server failure. The suggested retry message is correct for the latter failures.
+  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **144. [B75]** — **optional — open** — same defect as 45
   - Client portal, Registered agent service card, the status sentence — `webapp/src/pages/portal/PortalDashboard.tsx:367`
   - Reads: Your registered agent service is active and renews on {date}. You can cancel here at any time.
@@ -913,7 +919,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: Your registered agent service is active and renews on {date}. You can cancel here; notice given at least 30 days before the renewal date stops the renewal charge.
   - Codex (disputed): Actual PortalDashboard.tsx:367 says “You can cancel here at any time”; routes-portal.ts cancellation accepts notice any day and the dialog at :403-405 explains the30-day renewal cutoff. Cancellation submission and stopping the upcoming charge are different acts; the quoted sentence does not promise that late notice stops that charge.
   - Outcome: Same as 45: cancellation is available any day; the clarification about the 30-day cutoff is useful, not required.
-- **145. [B76]** — **open**
+- **145. [B76]** — **implemented**
   - Client portal, Your documents card, empty state — `webapp/src/pages/portal/PortalDashboard.tsx:720`
   - Reads: Your documents will appear here once your formation is prepared.
   - Claims: Documents appear when the formation is 'prepared'.
@@ -922,6 +928,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (disputed): Actual empty state says “Your documents will appear here once your formation is prepared.” It is unsuitable for conversions, but the finding incorrectly says the first possible document is always returned Articles: routes-portal.ts:1107-1108 permits questionnaire access after payment and generated agreements appear before state filing. The replacement restricts the explanation to Division-returned documents.
   - **Codex rejected the proposed replacement:** Use “Your documents will appear here as they are prepared or uploaded.” This covers self-generated agreements and conversion filings as well as state-returned documents.
   - Corrected after Codex's review: Generated agreements can appear before any state document. Use 'Your documents will appear here as they are prepared or uploaded.'
+  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **146. [B77]** — **implemented**
   - Client portal with two or more companies, the Legal mail card under each company tab — `webapp/src/pages/portal/PortalDashboard.tsx:660`
   - Reads: const legalMail = docs.filter((d) => d.kind === "legal_mail");
@@ -930,7 +937,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: Ask 'Company' on a legal-mail upload as the package upload does (AdminDashboard.tsx:329-346), store it as order_id, and filter legal mail by tab the way packageDocs is: `docs.filter((d) => d.kind === "legal_mail" && (!multiCompany || d.order_id === company))`; print the company name on the row.
   - **Codex rejected the proposed replacement:** The new company selection and attribution are right, but simply filtering existing mail by order_id hides all unassigned mail. Provide an explicit unassigned-mail section or assign existing records before applying the company filter.
   - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **147. [B80]** — **open**
+- **147. [B80]** — **implemented**
   - Client portal, Reset your password page — `webapp/src/pages/portal/PortalForgot.tsx:40`
   - Reads: Enter the email address you used when you signed up, and we'll send a link to choose a new password.
   - Claims: The client signed up.
@@ -939,12 +946,14 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (disputed): PortalForgot.tsx:40 uses the loose phrase “signed up”, but the proposed “email address on your order” is wrong after the account email is changed using AccountCard. The reset route queries current clients.email at routes-portal.ts:975, not historical order contact_email.
   - **Codex rejected the proposed replacement:** Use “Enter the email address you currently use to sign in, and we’ll send a link to choose a new password.”
   - Corrected after Codex's review: The reset looks up the current sign-in email, not the order's. Use 'Enter the email address you sign in with'.
-- **148. [B81]** — **open**
+  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **148. [B81]** — **implemented**
   - Client portal, Sign in page, the error line — `webapp/src/pages/portal/PortalLogin.tsx:26`
   - Reads: setError(status === 429 ? "Too many attempts. Try again in a few minutes." : status ? "Incorrect email or password." : "We could not reach the server. Check your connection and try again.");
   - Claims: Any response other than a lockout or a lost connection means the credentials were wrong.
   - True: The route answers 401 for bad credentials (routes-portal.ts:925), 400 'Email and password are required.' (:919), and app.ts:19-22 turns any thrown error into a 500 'Something went wrong on our end.' — a database fault is reported to the client as their own mistake. Twin of A79 on the admin page.
   - Replace with: status === 429 ? "Too many attempts. Try again in a few minutes." : status === 401 ? "Incorrect email or password." : status ? "Something went wrong on our end. Please try again." : "We could not reach the server. Check your connection and try again."
+  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **149. [B82]** — **open** — same defect as 198
   - Client portal, Sign in page, the sentence under the heading — `webapp/src/pages/portal/PortalLogin.tsx:38`
   - Reads: Access the documents from your formation package and anything we have received for you as registered agent.
@@ -1003,12 +1012,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: oa.ts:528-529 prints it as "the Operating Agreement of the Company dated <priorDate>". Three things are wrong with the value: (1) it is taken across every company on the account (no order_id filter, unlike the count at :1251-1253), so a second company's Amended and Restated agreement recites the first company's date; (2) it is the generation timestamp, not the agreement's Effective Date the client chose (:1467 `effectiveDate: fmtDate(a.effectiveDate)`, stored in inputs), so an agreement generated on 1 September with an effective date of 1 August is superseded "dated September 1, 2026"; (3) toLocaleDateString runs in the server's zone (UTC on Vercel), so a 9 pm Eastern generation is dated the next day. The amendment route already asks the client for the agreement's date (:1730, :1780).
   - Replace with: const priorGens = await db.query<{ effective_date: string | null }>("SELECT inputs->>'effectiveDate' AS effective_date FROM oa_generations WHERE client_id = $1 AND (order_id = $2 OR order_id IS NULL) ORDER BY created_at DESC LIMIT 1", [session.clientId, seed.orderId]); const priorDate = priorGens[0]?.effective_date ?? null;
   - **Codex rejected the proposed replacement:** Select by this exact order and the actually adopted prior agreement. The proposed OR order_id IS NULL still admits unrelated legacy company drafts, and latest generated is not necessarily adopted. Where no adopted predecessor is known, ask the client for its date.
-- **157. [B131]** — **open**
+- **157. [B131]** — **implemented**
   - Client portal, Services card — the S election, certificate and EIN refusals point the reader "below" — `webapp/server/routes-portal.ts:1921`
   - Reads: "You already have an S election order — see your orders below."
   - Claims: The client's orders are listed beneath the Services card.
   - True: The refusal is rendered inside the Services card (ServicesCard.tsx:252, 363, 416, 505), and the dashboard places Orders in progress above that card: PortalDashboard.tsx:747 `<OrdersInProgress …/>`, then :761 `<ServicesCard …/>`. The same wrong direction is at routes-portal.ts:2049 ("is already on order — see your orders below."), :2119-2120 and :2134 ("already ordered — see your orders below.").
   - Replace with: "You already have an S election order — see Orders in progress above." (and "— see Orders in progress above." at 2049, 2119, 2120, 2134)
+  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **158. [B132]** — **open**
   - Client portal, registered agent card — the refusal when a company did not take our service — `webapp/server/routes-portal.ts:2584`
   - Reads: return c.json(err(`${order.llc_name} is its own registered agent; there is nothing to cancel.`, "NOT_OUR_SERVICE"), 400);
@@ -1022,20 +1032,22 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: The identifier was left blank.
   - True: The schema at :1963-1965 also refuses an identifier over 60 characters and a purpose over 300 (`suffix: z.string().min(1).max(60), purpose: z.string().max(300).optional()`); both answer "A series identifier is required." The consent route was given per-box refusals for exactly this on 15 Sep 2026 (:1569-1582).
   - Replace with: const first = body.error.issues[0]; const field = String(first?.path?.[0] ?? ""); const msg = field === "suffix" ? (first?.code === "too_big" ? "The series identifier can be at most 60 characters." : "Enter a series identifier.") : field === "purpose" ? "The purpose can be at most 300 characters." : "A series identifier is required."; return c.json(err(msg, "INVALID_INPUT"), 400);
-- **160. [B134]** — **open**
+- **160. [B134]** — **implemented**
   - Client portal sign-in — the refusal for a malformed email — `webapp/server/routes-portal.ts:919`
   - Reads: if (!body.success) return c.json(err("Email and password are required.", "INVALID_INPUT"), 400);
   - Claims: A box was left empty.
   - True: loginSchema at :37 is `z.object({ email: z.string().email(), password: z.string().min(1) })`, so a typed but malformed address ("adam@") is answered "required". The sign-in page maps any 4xx other than 429 to "Incorrect email or password." (PortalLogin.tsx:26), so this text reaches no reader today; it is wrong for the day the page starts showing it.
   - Replace with: if (!body.success) return c.json(err("Enter your email address and password.", "INVALID_INPUT"), 400);
   - Codex (housekeeping-only): routes-portal.ts:919 returns required for malformed email, but PortalLogin.tsx:26 replaces that response text. Changing this response alone changes no currently displayed text.
-- **161. [B135]** — **open** — same defect as 115
+  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **161. [B135]** — **implemented** — same defect as 115
   - Client portal, Services card — the S election package refused for a conversion or an unpaid company — `webapp/server/routes-portal.ts:1924`
   - Reads: : "The S election package is available only for new LLCs we formed.";
   - Claims: The company must already be formed by us.
   - True: sElectionEligibility (:478-489) asks for a paid order with package = 'NEW' — formed or not; the package is sold from the day the formation is paid (:490-491). The formed gate is applied later, on the details (:2269-2271).
   - Replace with: : "The S election package is available only for new LLCs formed through us.";
   - **Codex rejected the proposed replacement:** Use “The S election package is available only for new LLCs ordered through us.” Keep the separate later gate on completing the details.
+  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **162. [B136]** — **implemented** — same defect as 121
   - Client portal, S election details — the refusal after the two-week window — `webapp/server/routes-portal.ts:2277`
   - Reads: "The two-week window for changing this package has closed, and the details have been deleted. Contact us if you need a new one.",
@@ -1044,12 +1056,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: "The two-week window for changing this package has closed: the Social Security numbers have been destroyed and the package replaced with a record copy. Contact us if you need a new one.",
   - **Codex rejected the proposed replacement:** Replace details-deletion language with a precise live-system statement; do not claim all SSNs have been destroyed when backups and mirror copies persist, or promise a record copy exists if its rebuild failed.
   - Fixed: batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **163. [B137]** — **open**
+- **163. [B137]** — **implemented**
   - Client portal, Your documents — deleting one of your agreements when the server refuses — `webapp/server/routes-portal.ts:1704`
   - Reads: return c.json(err("Not found", "NOT_FOUND"), 404);
   - Claims: The client is told the agreement could not be found.
   - True: The screen has no line for it: PortalDashboard.tsx:488-494 `deleteGeneration = useMutation({ mutationFn: (id) => api.delete(`/api/portal/oa/generations/${id}`), onSuccess: … })` has no onError, and nothing renders deleteGeneration.isError — a refused delete (or a lost connection) leaves the row in place with no message.
   - Replace with: In PortalDashboard.tsx add `onError: (e) => setDeleteError(e instanceof ApiError ? e.message : "We could not delete that agreement. Try again.")` and render it under the agreements list; and make the refusal say what it means: err("That agreement is no longer on your account.", "NOT_FOUND").
+  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **164. [B138]** — **open**
   - Client portal, operating agreement questionnaire — the seed carries no Florida date for the effective-date box — `webapp/server/routes-portal.ts:1135`
   - Reads: return c.json({     data: {       seed,       version,       multiOwner,       memberManaged,       blocked: false,       templateVersion: OA_TEMPLATE_VERSION,       answers: savedAnswers,       generations,     },   });
@@ -1085,12 +1098,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: Nothing reads them: RegisteredAgentCard takes CompanyInfo (:301-313, :320), and :335 builds a shim `const me = { raRenewalDate: company.raRenewalDate }` so the old `me?.raRenewalDate` reads at :367 and :404 still compile. The route still computes and sends them (routes-portal.ts:950-962).
   - Replace with: Drop the three fields from `Me`, delete the shim at :335, and read `company.raRenewalDate` at :367 and :404.
   - Codex (housekeeping-only): PortalDashboard.tsx:45-48 types three unused account RA values and :335 creates a shim from CompanyInfo; visible RA state already comes from the company. Removing the redundant fields/shim preserves displayed text.
-- **169. [B79]** — **open** — housekeeping
+- **169. [B79]** — **implemented** — housekeeping
   - Client portal, deleting a self-generated agreement — code only — `webapp/src/pages/portal/PortalDashboard.tsx:725`
   - Reads: const ok = window.confirm(
   - Claims: —
   - True: webapp/CLAUDE.md (ux): 'Use Dialog/AlertDialog from shadcn/ui, not window.alert() or window.confirm().' The same file uses AlertDialog for the cancellation at :386-423.
   - Replace with: An AlertDialog with the two sentences at :727-728 and the actions 'Keep it' / 'Delete'.
+  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **170. [B139]** — **open** — housekeeping
   - Server, portal routes — stale and misplaced comments — `webapp/server/routes-portal.ts:287`
   - Reads: // Who owns the company, as the client last said. … /** A person's printed legal name … */ /** Operating agreements a company may keep in its documents list. */ export const OA_KEEP_MAX = 5;
@@ -1187,18 +1201,20 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: The live lookup sets verified:true at :525-527, but reopening any stored shareholder sets verified:true and verified2:true unconditionally at :119-134. Selecting an owner also sets verified:Boolean(m.address) at :486, regardless of address provenance. A manually entered nonempty address therefore gains the verification label after save/reopen or selection without lookup verification.
   - Replace with: Show “Address on file” for imported or previously saved addresses unless lookup verification was actually recorded. Reserve “Verified address” for a successful lookup result.
   - Fixed: batch 01 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **N3.07. [substantive]** — **open**
+- **N3.07. [substantive]** — **implemented**
   - Client portal → Reset your password → response after a failed request — `webapp/src/pages/portal/PortalForgot.tsx:34`
   - Reads: If an account exists for that email address, a reset link is on its way.
   - Claims: A reset request reached the service and initiated mail whenever that account exists.
   - True: The catch at :19-20 swallows every failure and finally at :22 sets sent=true, including a lost connection or500 before the reset route runs. routes-portal.ts:972-987 already gives the same successful response for existing/nonexisting accounts, so avoiding account enumeration does not require turning transport/server failure into success.
   - Replace with: On a failed request show: “We could not request a reset link. Check your connection and try again.” Show the existing neutral success message only after a successful response.
-- **N3.09. [substantive]** — **open**
+  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **N3.09. [substantive]** — **implemented**
   - Client portal → Legal mail → failed document-list request — `webapp/src/pages/portal/PortalDashboard.tsx:742`
   - Reads: Nothing here — that's good news. Anything we receive for you as registered agent will be posted here, and you'll get an email the moment it is.
   - Claims: No legal mail exists for the account.
   - True: docsQuery fetches at :471-475, but :645 treats unavailable data as [] and :660 filters that empty array. DocList at :740-742 therefore shows the reassuring empty state after a failed request, including while served documents may exist. No docsQuery.isError branch distinguishes unavailable mail from no mail.
   - Replace with: On a document-list failure show: “We could not load your documents or legal mail. Try again.” Show the no-mail sentence only after a successful empty response.
+  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **N3.10. [substantive]** — **open** — waits on Adam's ruling
   - Client portal → Your documents → operating agreement status badges — `webapp/src/pages/portal/PortalDashboard.tsx:111`
   - Reads: {mine.isCurrent ? "Current" : "Superseded"}
@@ -1262,8 +1278,9 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
 - **181. [A78]** — **open**
   - Board "1 days"; "search to reach the rest" while searching; open status worded two ways. Replace each.
   - **Codex rejected the proposed replacement:** Use singular “1 day”; while searching say “Showing the newest matching orders; narrow your search to find another order.” Use one shared display label for awaiting_info.
-- **182. [A79]** — **open**
+- **182. [A79]** — **implemented**
   - Admin sign-in "Incorrect password." for any server error. Replace: only for a 401.
+  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **183. [B88]** — **optional — open**
   - Office, Clients tab, the Upload dialog, Document title box — `webapp/src/pages/admin/AdminDashboard.tsx:301`
   - Reads: placeholder="e.g. Operating Agreement"
@@ -1403,12 +1420,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: That a further attempt will be made on the date named.
   - True: After the retry (the second attempt) is declined for insufficient funds, renewals.ts:257 sets retryAfter again because `attempt < 2` is still true (attempt is 1 — see A4), :260 stores retries = 1, and :263 passes willRetry: true, so the client is promised a third attempt; on the next pass :235 `row.retries < 1` is false and no charge runs. The promise is never kept.
   - Replace with: Store the attempt count on every decline (renewals.ts:260 `retries = attempt`), compute retryAfter only when `attempt < 2` with attempt counting both attempts (first decline attempt=1 → retry allowed; second decline attempt=2 → none), and allow the retry with `row.retries < 2` at :235. The email then says 'once more' only once.
-- **200. [B100]** — **open**
+- **200. [B100]** — **implemented**
   - The 'A change to your portal email was requested' notice sent to the old address — `webapp/server/email.ts:222`
   - Reads: If this was not you, sign in and change your password immediately, then email support@myfloridaseriesllc.com. This address remains on the account until the new one is confirmed.
   - Claims: That changing the password is the way to stop the change.
   - True: Changing the password (routes-portal.ts:2420-2455) deletes other sessions but leaves pending_email set and the verify_email token valid for its hour; pending_email is cleared only when a link is confirmed (routes-portal.ts:2541, :2545) or by the office (routes-admin.ts:1076), and no portal control withdraws a pending change (AccountCard.tsx:65-67 only displays it). Someone holding the new inbox can still confirm the change after the password is changed. Requesting a new change to the old address does cancel the earlier link (routes-portal.ts:2478-2482 marks older tokens used) but the email does not say so.
   - Replace with: Code: on a password change, `UPDATE clients SET pending_email = NULL` and mark outstanding verify_email tokens used. Email: 'If this was not you, sign in and change your password immediately — that also cancels this request — then email support@myfloridaseriesllc.com.'
+  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **201. [B101]** — **open** — same defect as 28
   - Registered agent cancellation confirmation email, point 2 — `webapp/server/email.ts:285`
   - Reads: Until we receive that proof, we remain your agent of record and service is billed at the then-current rate, prorated monthly, as described in the Terms of Service.
@@ -1440,12 +1458,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: Papers served on a company usually carry a deadline that runs from the day they were served, whether or not they have been read — often a short one. Contact an attorney immediately.
   - Codex (disputed): email.ts:253 reads In Florida a lawsuit typically allows20 days to respond BUT THIS IS NOT ALWAYS THE CASE. Contact an attorney immediately so they can provide you with proper legal guidance. This is qualified general procedural information, not advice about a particular document or representation as a lawyer; the finding supplies no contrary procedural authority. Rule 1.140(a)(1), in the Florida Bar’s April 1, 2026 rules PDF, confirms the ordinary 20-day answer deadline and statutory exceptions: https://www-media.floridabar.org/uploads/2026/04/Civil-Procedure-Rules-04-01-26.pdf#page=38 .
   - Outcome: Adam's words of 10 Sep 2026; a qualified general statement with Rule 1.140(a)(1) behind it, not advice about a document.
-- **205. [B105]** — **open**
+- **205. [B105]** — **implemented**
   - Welcome email, the note under the Set your password button — `webapp/server/email.ts:89`
   - Reads: This link expires in 7 days. If it expires, use "Forgot password" on the portal sign-in page with this email address.
   - Claims: The sign-in page has a link called 'Forgot password'.
   - True: The sign-in page link reads 'Forgot your password?' (PortalLogin.tsx:71) and the password-changed email at email.ts:193 says 'Forgot your password' — two wordings for one link. (The 7 days is true: routes-payments.ts:112 and :614.)
   - Replace with: This link expires in 7 days. If it expires, use "Forgot your password?" on the portal sign-in page with this email address.
+  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **206. [B107]** — **optional — open**
   - Portal purchase confirmation email (series, certificate of status, certified copy) — `webapp/server/email.ts:335`
   - Reads: No further action is needed from you. We'll post the confirmation to your portal when the work is complete.

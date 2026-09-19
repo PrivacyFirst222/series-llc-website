@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, CheckCircle2, Clock, KeyRound, ScrollText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
@@ -17,24 +17,29 @@ interface OrderStatus {
 const DRAFT_KEY = "fl-llc-formation-draft-v1";
 
 function ResendWelcome({ orderId }: { orderId: string }) {
+  const queryClient = useQueryClient();
   const resend = useMutation({
     mutationFn: () => api.post<{ ok: boolean; sent: boolean }>(`/api/orders/${orderId}/resend-welcome`, {}),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["order-status", orderId] }); },
   });
   if (resend.isSuccess) {
     // What the route reports, not what the button hoped (15 Sep 2026).
     return resend.data?.sent
       ? <span className="font-medium text-trust">Sent — check your inbox.</span>
-      : <span className="font-medium">Your account already has a password — sign in below.</span>;
+      : <span className="font-medium">A setup email was not sent. If you already set a password, use the portal sign-in page.</span>;
   }
   return (
-    <button
-      type="button"
-      onClick={() => resend.mutate()}
-      disabled={resend.isPending}
-      className="font-medium underline underline-offset-2"
-    >
-      {resend.isPending ? "Sending…" : "Resend the email"}
-    </button>
+    <span>
+      {resend.isError ? <span role="alert" className="block text-destructive">Could not send the email. Please try again.</span> : null}
+      <button
+        type="button"
+        onClick={() => resend.mutate()}
+        disabled={resend.isPending}
+        className="font-medium underline underline-offset-2"
+      >
+        {resend.isPending ? "Sending…" : "Resend the email"}
+      </button>
+    </span>
   );
 }
 
@@ -98,9 +103,11 @@ export default function OrderConfirmed() {
             <CheckCircle2 className="mx-auto h-12 w-12 text-trust" />
             <h1 className="display mt-5 text-3xl lg:text-4xl">Payment received.</h1>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-              Thank you{statusQuery.data?.llcName ? ` — we have everything we need to begin on ${statusQuery.data.llcName}` : ""}. We're
-              preparing your filing now — you'll get an email when {statusQuery.data?.isConversion ? "your protected series are established" : "your LLC is formed"}. Two
-              steps to finish setting up:
+              {statusQuery.data?.llcName ? `${statusQuery.data.llcName}: ` : ""}
+              {statusQuery.data?.status === "formed"
+                ? statusQuery.data.isConversion ? "Your protected series have been established." : "Your LLC has been formed."
+                : statusQuery.data?.status === "filed" ? "Your filing has been submitted." : "We're preparing your filing."}
+              {" "}Your portal and operating agreement:
             </p>
 
             <div className="mt-6 space-y-3 text-left">
@@ -138,9 +145,11 @@ export default function OrderConfirmed() {
               </div>
             </div>
 
+            {statusQuery.data?.hasPassword ? (
             <Button asChild size="lg" className="mt-8 rounded-full">
               <Link to="/portal/login">Sign in to your portal</Link>
             </Button>
+            ) : null}
           </>
         ) : (
           <>

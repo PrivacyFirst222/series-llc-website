@@ -1,0 +1,339 @@
+{
+  "id": "04",
+  "revision": 1,
+  "title": "Sign-in, email messages and accurate portal status",
+  "model": "Codex",
+  "base": "fae579f41b46e94b55a78ff08dd69d053488ddb8",
+  "items": [
+    {
+      "id": "24",
+      "part": "all",
+      "scope": "contact requires a message",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch04 24: contact requires a message"
+        }
+      ]
+    },
+    {
+      "id": "64",
+      "part": "all",
+      "scope": "welcome resend follows paid account state",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch04 64: welcome resend follows paid account state"
+        }
+      ]
+    },
+    {
+      "id": "N4.06",
+      "part": "all",
+      "scope": "failed welcome email remains retryable",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch04 N4.06: failed welcome email remains retryable"
+        }
+      ]
+    },
+    {
+      "id": "N4.10",
+      "part": "all",
+      "scope": "confirmation matches filing stage",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch04 N4.10: confirmation matches filing stage"
+        }
+      ]
+    },
+    {
+      "id": "147",
+      "part": "all",
+      "scope": "reset asks for current sign-in email",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch04 147: reset asks for current sign-in email"
+        }
+      ]
+    },
+    {
+      "id": "148",
+      "part": "all",
+      "scope": "client login separates failures",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch04 148: client login separates failures"
+        }
+      ]
+    },
+    {
+      "id": "160",
+      "part": "all",
+      "scope": "malformed login explains valid input",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch04 160: malformed login explains valid input"
+        }
+      ]
+    },
+    {
+      "id": "182",
+      "part": "all",
+      "scope": "office login separates failures",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch04 182: office login separates failures"
+        }
+      ]
+    },
+    {
+      "id": "200",
+      "part": "all",
+      "scope": "password changes cancel pending email changes",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch04 200: password changes cancel pending email changes"
+        }
+      ]
+    },
+    {
+      "id": "N3.07",
+      "part": "all",
+      "scope": "failed reset stays retryable",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch04 N3.07: failed reset stays retryable"
+        }
+      ]
+    },
+    {
+      "id": "N3.09",
+      "part": "all",
+      "scope": "failed mail loading is not empty mail",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch04 N3.09: failed mail loading is not empty mail"
+        }
+      ]
+    },
+    {
+      "id": "115",
+      "part": "all",
+      "scope": "agreement tools explain paid-order eligibility",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch04 115: agreement tools explain paid-order eligibility"
+        }
+      ]
+    },
+    {
+      "id": "161",
+      "part": "all",
+      "scope": "S election purchase describes paid formation order",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch04 161: S election purchase describes paid formation order"
+        }
+      ]
+    },
+    {
+      "id": "143",
+      "part": "all",
+      "scope": "agreement card separates eligibility and failure",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch04 143: agreement card separates eligibility and failure"
+        }
+      ]
+    },
+    {
+      "id": "145",
+      "part": "all",
+      "scope": "documents explain preparation and upload",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch04 145: documents explain preparation and upload"
+        }
+      ]
+    },
+    {
+      "id": "157",
+      "part": "all",
+      "scope": "duplicate orders name their section",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch04 157: duplicate orders name their section"
+        }
+      ]
+    },
+    {
+      "id": "163",
+      "part": "all",
+      "scope": "agreement deletion reports failure",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch04 163: agreement deletion reports failure"
+        }
+      ]
+    },
+    {
+      "id": "169",
+      "part": "all",
+      "scope": "agreement deletion uses portal confirmation",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch04 169: agreement deletion uses portal confirmation"
+        }
+      ]
+    },
+    {
+      "id": "205",
+      "part": "all",
+      "scope": "reset instructions match the visible link",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch04 205: reset instructions match the visible link"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "webapp/src/pages/Contact.tsx",
+      "mode": "code",
+      "why": "Implement the 18 approved Batch 04 fixes, preserving earlier batch behavior."
+    },
+    {
+      "path": "webapp/src/pages/OrderConfirmed.tsx",
+      "mode": "code",
+      "why": "Implement the 18 approved Batch 04 fixes, preserving earlier batch behavior."
+    },
+    {
+      "path": "webapp/src/pages/portal/PortalForgot.tsx",
+      "mode": "code",
+      "why": "Implement the 18 approved Batch 04 fixes, preserving earlier batch behavior."
+    },
+    {
+      "path": "webapp/src/pages/portal/PortalLogin.tsx",
+      "mode": "code",
+      "why": "Implement the 18 approved Batch 04 fixes, preserving earlier batch behavior."
+    },
+    {
+      "path": "webapp/src/pages/admin/AdminLogin.tsx",
+      "mode": "code",
+      "why": "Implement the 18 approved Batch 04 fixes, preserving earlier batch behavior."
+    },
+    {
+      "path": "webapp/src/pages/portal/PortalDashboard.tsx",
+      "mode": "code",
+      "why": "Implement the 18 approved Batch 04 fixes, preserving earlier batch behavior."
+    },
+    {
+      "path": "webapp/src/pages/portal/OAQuestionnaire.tsx",
+      "mode": "code",
+      "why": "Implement the 18 approved Batch 04 fixes, preserving earlier batch behavior."
+    },
+    {
+      "path": "webapp/src/pages/portal/AmendAgreement.tsx",
+      "mode": "code",
+      "why": "Implement the 18 approved Batch 04 fixes, preserving earlier batch behavior."
+    },
+    {
+      "path": "webapp/server/routes-payments.ts",
+      "mode": "code",
+      "why": "Implement the 18 approved Batch 04 fixes, preserving earlier batch behavior."
+    },
+    {
+      "path": "webapp/server/routes-portal.ts",
+      "mode": "code",
+      "why": "Implement the 18 approved Batch 04 fixes, preserving earlier batch behavior."
+    },
+    {
+      "path": "webapp/server/email.ts",
+      "mode": "code",
+      "why": "Implement the 18 approved Batch 04 fixes, preserving earlier batch behavior."
+    },
+    {
+      "path": "webapp/src/lib/authMessages.ts",
+      "mode": "new",
+      "why": "Shared accurate sign-in and agreement-load messages."
+    },
+    {
+      "path": "webapp/src/pages/portal/AgreementLoadError.tsx",
+      "mode": "new",
+      "why": "Shared accurate sign-in and agreement-load messages."
+    },
+    {
+      "path": "webapp/server/e2e.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Add named Batch 04 regressions and update only obsolete expectations for the approved wording or dialog."
+    },
+    {
+      "path": "webapp/scripts/behavioral.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Add named Batch 04 regressions and update only obsolete expectations for the approved wording or dialog."
+    },
+    {
+      "path": "webapp/server/batch04-check.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Add named Batch 04 regressions and update only obsolete expectations for the approved wording or dialog."
+    },
+    {
+      "path": "webapp/scripts/batch04-walk.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Add named Batch 04 regressions and update only obsolete expectations for the approved wording or dialog."
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "why": "Normal API rebuild."
+    }
+  ],
+  "requiredChecks": [],
+  "testSupport": [
+    "webapp/server/batch04-check.ts",
+    "webapp/scripts/batch04-walk.ts"
+  ],
+  "removedChecks": []
+}

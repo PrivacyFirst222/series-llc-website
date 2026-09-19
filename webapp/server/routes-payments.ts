@@ -595,12 +595,12 @@ app.post("/orders/:id/resend-welcome", async (c) => {
     return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
   }
   const db = await getDb();
-  const orders = await db.query<{ client_id: string | null; status: string; contact_name: string; contact_email: string; payload: unknown }>(
-    "SELECT client_id, status, contact_name, contact_email, payload FROM orders WHERE id = $1",
+  const orders = await db.query<{ client_id: string | null; paid_at: unknown; status: string; contact_name: string; contact_email: string; payload: unknown }>(
+    "SELECT client_id, paid_at, status, contact_name, contact_email, payload FROM orders WHERE id = $1",
     [c.req.param("id")],
   );
   // Always report success — never confirm order existence to a guesser.
-  if (orders.length === 0 || orders[0].status !== "paid" || !orders[0].client_id) {
+  if (orders.length === 0 || !orders[0].paid_at || !orders[0].client_id) {
     return c.json({ data: { ok: true, sent: false } });
   }
   const clients = await db.query<{ id: string; password_hash: string | null }>(
@@ -615,9 +615,12 @@ app.post("/orders/:id/resend-welcome", async (c) => {
     );
     const resendPayload = (typeof orders[0].payload === "string" ? JSON.parse(orders[0].payload) : orders[0].payload) as { filingPath?: string } | null;
     const mail = welcomeEmail(orders[0].contact_name, `${env.PUBLIC_BASE_URL}/portal/set-password?token=${token}`, resendPayload?.filingPath === "CONVERT", (resendPayload as { registeredAgent?: { choice?: string } } | null)?.registeredAgent?.choice === "SERVICE");
-    await sendMail({ to: orders[0].contact_email, ...mail }).catch((e) =>
-      console.error("[resend-welcome] failed:", e),
-    );
+    try {
+      await sendMail({ to: orders[0].contact_email, ...mail });
+    } catch (e) {
+      console.error("[resend-welcome] failed:", e);
+      return c.json(err("Could not send the email. Please try again.", "EMAIL_FAILED"), 503);
+    }
     return c.json({ data: { ok: true, sent: true } });
   }
   // The page says "Sent" only when something was sent (15 Sep 2026).

@@ -32,11 +32,11 @@ export default function Contact() {
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!form.name || !form.email) {
+    if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
       toast({
         duration: Infinity,
         title: "Missing details",
-        description: "Please add your name and email so we can reach you.",
+        description: "Please add your name, email, and a message so we can reply.",
       });
       return;
     }
@@ -116,7 +116,7 @@ export default function Contact() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="message">Message</Label>
+                <Label htmlFor="message">Message *</Label>
                 <Textarea
                   id="message"
                   rows={6}

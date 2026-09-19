@@ -1,3 +1,4 @@
+import { AgreementLoadError } from "./AgreementLoadError";
 import { DollarInput } from "@/components/ui/dollar-input";
 import { contributorUnits, reconcileContributors } from "@/lib/oaContributors";
 import { ViewingAsBanner } from "./ViewingAsBanner";
@@ -329,10 +330,7 @@ export default function OAQuestionnaire() {
   if (oaQuery.isError) {
     return (
       <section className="container-wide section-y">
-        <p className="text-sm text-muted-foreground">
-          We couldn't find a formed LLC on your account yet. If you just completed checkout, your
-          documents are being prepared — check back shortly or email support@myfloridaseriesllc.com.
-        </p>
+        <AgreementLoadError error={oaQuery.error} retry={() => { void oaQuery.refetch(); }} />
       </section>
     );
   }

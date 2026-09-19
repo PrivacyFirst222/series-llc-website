@@ -855,7 +855,7 @@ app.post("/auth/login", async (c) => {
     return c.json(err("Too many attempts. Try again in a few minutes.", "RATE_LIMITED"), 429);
   }
   const body = loginSchema.safeParse(await c.req.json().catch(() => null));
-  if (!body.success) return c.json(err("Email and password are required.", "INVALID_INPUT"), 400);
+  if (!body.success) return c.json(err("Enter a valid email address and your password.", "INVALID_INPUT"), 400);
   const db = await getDb();
   const rows = await db.query<{ id: string; password_hash: string | null }>(
     "SELECT id, password_hash FROM clients WHERE email = $1",
@@ -947,9 +947,12 @@ app.post("/auth/set-password", async (c) => {
     [hashToken(body.data.token)],
   );
   if (rows.length === 0) {
-    return c.json(err("This link is invalid or has expired. Use “Forgot password” to get a new one.", "BAD_TOKEN"), 400);
+    return c.json(err("This link is invalid or has expired. Use “Forgot your password?” to get a new one.", "BAD_TOKEN"), 400);
   }
-  await db.query("UPDATE clients SET password_hash = $1 WHERE id = $2", [
+  await db.query(`WITH changed AS (
+    UPDATE clients SET password_hash = $1, pending_email = NULL WHERE id = $2 RETURNING id
+  ) UPDATE auth_tokens SET used_at = now()
+    WHERE client_id IN (SELECT id FROM changed) AND purpose = 'verify_email' AND used_at IS NULL`, [
     await hashPassword(body.data.password),
     rows[0].client_id,
   ]);
@@ -1055,7 +1058,7 @@ app.get("/portal/oa", async (c) => {
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const companyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
   const seed = await oaSeed(session.clientId, companyId);
-  if (!seed) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
+  if (!seed) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
   const db = await getDb();
   const saved = await db.query<{ answers: unknown; rev: number }>("SELECT answers, rev FROM oa_profiles WHERE client_id = $1 AND order_id = $2", [session.clientId, seed.orderId]);
   const gens = await db.query(
@@ -1128,7 +1131,7 @@ app.put("/portal/oa/answers", async (c) => {
   const body = oaAnswersSchema.safeParse(await c.req.json().catch(() => null));
   if (!body.success) return c.json(err(answersProblem(body.error), "INVALID_INPUT"), 400);
   const answersCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
-  if (!answersCompanyId) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
+  if (!answersCompanyId) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
   const db = await getDb();
   // A revision, when the client supplies one, makes the write monotonic: an
   // earlier keystroke that arrives late is ignored rather than allowed to bury
@@ -1171,7 +1174,7 @@ app.post("/portal/oa/generate", async (c) => {
   const a = body.data;
   const genCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
   const seed = await oaSeed(session.clientId, genCompanyId);
-  if (!seed) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
+  if (!seed) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
   // The owners are an answer, not a reading of the formation record. Members
   // are never filed with the Division — server/filing.ts has no member field —
   // so the intake list is where the list starts, not what it is fixed to.
@@ -1570,7 +1573,7 @@ app.post("/portal/series/consent", async (c) => {
 
   const consentCompanyId = await resolveCompanyOrder(session.clientId, body.data.company);
   const seed = await oaSeed(session.clientId, consentCompanyId);
-  if (!seed) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
+  if (!seed) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
 
   // s. 605.2202 requires every protected series name to begin with the
   // company's full name; a designation filed otherwise is rejected.
@@ -1687,7 +1690,7 @@ app.delete("/portal/oa/generations/:id", async (c) => {
     [c.req.param("id")],
   );
   if (rows.length === 0 || rows[0].client_id !== session.clientId) {
-    return c.json(err("Not found", "NOT_FOUND"), 404);
+    return c.json(err("That agreement is no longer on your account.", "NOT_FOUND"), 404);
   }
   if (rows[0].document_id) {
     const docs = await db.query<{ storage_key: string }>(
@@ -1733,7 +1736,7 @@ app.post("/portal/oa/amend", async (c) => {
   }
   const amendCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
   const seed = await oaSeed(session.clientId, amendCompanyId);
-  if (!seed) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
+  if (!seed) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
   const db = await getDb();
   const current = await db.query<{ inputs: unknown }>(
     `SELECT inputs FROM oa_generations WHERE client_id = $1 AND (order_id = $2 OR order_id IS NULL) ORDER BY created_at DESC LIMIT 1`,
@@ -1899,15 +1902,15 @@ app.post("/portal/services/s-election", async (c) => {
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const purchaseCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
   const llcName = await clientLlcName(session.clientId, purchaseCompanyId);
-  if (!llcName) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
+  if (!llcName) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
   const gate = await sElectionEligibility(session.clientId, purchaseCompanyId);
   if (!gate.eligible) {
     const msg =
       gate.reason === "already_ordered"
-        ? "You already have an S election order — see your orders below."
+        ? "You already have an S election order — See Orders in progress."
         : gate.reason === "window_closed"
           ? "The ordering window for the S election package has closed. A late election requires IRS relief — please consult a tax professional."
-          : "The S election package is available only for new LLCs we formed.";
+          : "The S election package is available only with a paid new-LLC formation order through us.";
     return c.json(err(msg, gate.reason === "window_closed" ? "WINDOW_CLOSED" : "NOT_ELIGIBLE"), 400);
   }
   const db = await getDb();
@@ -1952,7 +1955,7 @@ app.post("/portal/services/series", async (c) => {
   if (!body.success) return c.json(err("A series identifier is required.", "INVALID_INPUT"), 400);
   const purchaseCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
   const llcName = await clientLlcName(session.clientId, purchaseCompanyId);
-  if (!llcName) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
+  if (!llcName) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
   const suffix = body.data.suffix.trim().replace(/\s+/g, " ");
   if (!/^[\w .,'&-]+$/.test(suffix)) {
     return c.json(err("The series identifier contains unsupported characters.", "INVALID_INPUT"), 400);
@@ -2018,7 +2021,7 @@ app.post("/portal/services/certificate", async (c) => {
   const spec = CERT_TYPES[body.data.kind];
   const purchaseCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
   const llcName = await clientLlcName(session.clientId, purchaseCompanyId);
-  if (!llcName) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
+  if (!llcName) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
   if (!(await clientLlcFormed(session.clientId, purchaseCompanyId))) {
     return c.json(err("The state issues these only for a formed LLC — yours is still in progress.", "NOT_FORMED"), 400);
   }
@@ -2032,7 +2035,7 @@ app.post("/portal/services/certificate", async (c) => {
     [session.clientId, body.data.kind, purchaseCompanyId],
   );
   if (open.length > 0) {
-    return c.json(err(`A ${spec.name.toLowerCase()} is already on order — see your orders below.`, "ALREADY_ORDERED"), 400);
+    return c.json(err(`A ${spec.name.toLowerCase()} is already on order — See Orders in progress.`, "ALREADY_ORDERED"), 400);
   }
   // Only a purchase that passed every check spends the allowance (Adam,
   // 14 Sep 2026: refusals do not count).
@@ -2075,7 +2078,7 @@ app.post("/portal/services/ein", async (c) => {
   if (!body.success) return c.json(err("Choose what the EIN is for.", "INVALID_INPUT"), 400);
   const purchaseCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
   const llcName = await clientLlcName(session.clientId, purchaseCompanyId);
-  if (!llcName) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
+  if (!llcName) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
   if (body.data.target === "series" && !body.data.seriesName?.trim()) {
     return c.json(err("Name the protected series the EIN is for.", "INVALID_INPUT"), 400);
   }
@@ -2102,8 +2105,8 @@ app.post("/portal/services/ein", async (c) => {
     return c.json(
       err(
         target === "company"
-          ? "Your LLC's EIN is already ordered — see your orders below."
-          : "An EIN for that protected series is already ordered — see your orders below.",
+          ? "Your LLC's EIN is already ordered — See Orders in progress."
+          : "An EIN for that protected series is already ordered — See Orders in progress.",
         "ALREADY_ORDERED",
       ),
       400,
@@ -2117,7 +2120,7 @@ app.post("/portal/services/ein", async (c) => {
     const match = mine.find((s) => s.name.toLowerCase() === seriesName.toLowerCase());
     if (!match) return c.json(err("That protected series is not on your account.", "UNKNOWN_SERIES"), 400);
     if (match.einOrdered) {
-      return c.json(err("An EIN for that protected series is already ordered — see your orders below.", "ALREADY_ORDERED"), 400);
+      return c.json(err("An EIN for that protected series is already ordered — See Orders in progress.", "ALREADY_ORDERED"), 400);
     }
   }
   // Only a purchase that passed every check spends the allowance (Adam,
@@ -2425,7 +2428,10 @@ app.post("/portal/account/password", async (c) => {
   if (!client?.password_hash || !(await verifyPassword(body.data.currentPassword, client.password_hash))) {
     return c.json(err("That current password is not correct.", "BAD_CREDENTIALS"), 401);
   }
-  await db.query("UPDATE clients SET password_hash = $1 WHERE id = $2", [
+  await db.query(`WITH changed AS (
+    UPDATE clients SET password_hash = $1, pending_email = NULL WHERE id = $2 RETURNING id
+  ) UPDATE auth_tokens SET used_at = now()
+    WHERE client_id IN (SELECT id FROM changed) AND purpose = 'verify_email' AND used_at IS NULL`, [
     await hashPassword(body.data.newPassword),
     session.clientId,
   ]);
@@ -2529,10 +2535,9 @@ app.post("/auth/verify-email", async (c) => {
     return c.json(err("That address is now in use on another account.", "EMAIL_TAKEN"), 400);
   }
   const previous = clients[0].email;
-  await db.query("UPDATE clients SET email = $1, pending_email = NULL WHERE id = $2", [
-    pending,
-    rows[0].client_id,
-  ]);
+  // Recheck at the write in case a password change cancelled it after the read.
+  const changed = await db.query("UPDATE clients SET email = $1, pending_email = NULL WHERE id = $2 AND pending_email = $1 RETURNING id", [pending, rows[0].client_id]);
+  if (changed.length === 0) return c.json(err("This email change was cancelled. Request it again from your portal.", "BAD_TOKEN"), 400);
   const mail = emailChangedEmail(pending);
   sendMail({ to: pending, ...mail }).catch((e) => console.error("[account] email-changed (new) failed:", e));
   sendMail({ to: previous, ...mail }).catch((e) => console.error("[account] email-changed (old) failed:", e));

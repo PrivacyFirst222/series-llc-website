@@ -1,3 +1,4 @@
+import { AgreementLoadError } from "./AgreementLoadError";
 // Amendment to Operating Agreement (Adam, 12 Sep 2026): "a standard amendment
 // form with recitals that refer to the amendment provisions in the OA and then
 // an area for them to add changes or to make changes set forth in the attached
@@ -90,10 +91,7 @@ export default function AmendAgreement() {
   if (oaQuery.isError) {
     return (
       <section className="container-wide section-y">
-        <p className="text-sm text-muted-foreground">
-          We couldn't find a formed LLC on your account yet. If you just completed checkout, your
-          documents are being prepared — check back shortly or email support@myfloridaseriesllc.com.
-        </p>
+        <AgreementLoadError error={oaQuery.error} retry={() => { void oaQuery.refetch(); }} />
       </section>
     );
   }

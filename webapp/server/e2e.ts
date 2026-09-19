@@ -1,3 +1,4 @@
+import {batch04Checks} from "./batch04-check";
 import {batch03Checks} from "./batch03-check";
 import { batch02Checks } from "./batch02-check";
 import { equalShares, sharesAreComplete } from "../src/lib/ownership";
@@ -3965,6 +3966,17 @@ await batch03Checks((label,ok,detail)=>batch03Results.set(label,{ok,detail}));
 {const r=batch03Results.get("batch03 179 all: backup completes beyond 200 files");check("batch03 179 all: backup completes beyond 200 files",r?.ok===true,r?.detail);batch03Results.delete("batch03 179 all: backup completes beyond 200 files");}
 {const r=batch03Results.get("batch03 224 all: mirror description matches complete processing");check("batch03 224 all: mirror description matches complete processing",r?.ok===true,r?.detail);batch03Results.delete("batch03 224 all: mirror description matches complete processing");}
 for(const [label,r]of batch03Results)check(label,r.ok,r.detail);
+
+const batch04Results = new Map<string,{ok:boolean;detail?:unknown}>();
+await batch04Checks((label,ok,detail)=>batch04Results.set(label,{ok,detail}));
+{const r=batch04Results.get("batch04 64: welcome resend follows paid account state");check("batch04 64: welcome resend follows paid account state",r?.ok===true,r?.detail);batch04Results.delete("batch04 64: welcome resend follows paid account state");}
+{const r=batch04Results.get("batch04 N4.06: failed welcome email remains retryable");check("batch04 N4.06: failed welcome email remains retryable",r?.ok===true,r?.detail);batch04Results.delete("batch04 N4.06: failed welcome email remains retryable");}
+{const r=batch04Results.get("batch04 160: malformed login explains valid input");check("batch04 160: malformed login explains valid input",r?.ok===true,r?.detail);batch04Results.delete("batch04 160: malformed login explains valid input");}
+{const r=batch04Results.get("batch04 200: password changes cancel pending email changes");check("batch04 200: password changes cancel pending email changes",r?.ok===true,r?.detail);batch04Results.delete("batch04 200: password changes cancel pending email changes");}
+{const r=batch04Results.get("batch04 161: S election purchase describes paid formation order");check("batch04 161: S election purchase describes paid formation order",r?.ok===true,r?.detail);batch04Results.delete("batch04 161: S election purchase describes paid formation order");}
+{const r=batch04Results.get("batch04 157: duplicate orders name their section");check("batch04 157: duplicate orders name their section",r?.ok===true,r?.detail);batch04Results.delete("batch04 157: duplicate orders name their section");}
+{const r=batch04Results.get("batch04 205: reset instructions match the visible link");check("batch04 205: reset instructions match the visible link",r?.ok===true,r?.detail);batch04Results.delete("batch04 205: reset instructions match the visible link");}
+for(const [label,r]of batch04Results)check(label,r.ok,r.detail);
 
 console.log(failures === 0 ? "\nALL PASS" : `\n${failures} FAILURES`);
 process.exit(failures === 0 ? 0 : 1);

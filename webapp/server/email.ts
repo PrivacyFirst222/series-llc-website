@@ -87,7 +87,7 @@ export function welcomeEmail(name: string, setPasswordUrl: string, isConversion 
       series LLC — is already in your portal's library, ready to download.</p>
       <p><a href="${setPasswordUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Set your password</a></p>
       <p style="color:#555;font-size:13px">This link expires in 7 days. If it expires, use
-      "Forgot password" on the portal sign-in page with this email address.</p>
+      "Forgot your password?" on the portal sign-in page with this email address.</p>
     `),
   };
 }
@@ -190,7 +190,7 @@ export function passwordChangedEmail(portalUrl: string): { subject: string; html
     html: wrap(`
       <p>The password for your MyFloridaSeriesLLC portal account was just changed, and every
       other signed-in device was signed out.</p>
-      <p><strong>If you did not do this,</strong> use "Forgot your password" on the sign-in page
+      <p><strong>If you did not do this,</strong> use "Forgot your password?" on the sign-in page
       to regain control of the account, and email support@myfloridaseriesllc.com immediately.</p>
       <p><a href="${portalUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Open your portal</a></p>
     `),
@@ -219,7 +219,7 @@ export function emailChangeRequestedEmail(maskedNew: string): { subject: string;
       <p>Someone requested changing the email address on your MyFloridaSeriesLLC portal account
       to <strong>${escapeHtml(maskedNew)}</strong>. The change takes effect only if that address
       is confirmed.</p>
-      <p><strong>If this was not you,</strong> sign in and change your password immediately, then
+      <p><strong>If this was not you,</strong> sign in and change your password immediately — that also cancels this request — then
       email support@myfloridaseriesllc.com. This address remains on the account until the new one
       is confirmed.</p>
     `),

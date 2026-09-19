@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { api } from "@/lib/api";
+import { loginErrorMessage } from "@/lib/authMessages";
 
 export default function AdminLogin() {
   const navigate = useNavigate();
@@ -20,9 +21,7 @@ export default function AdminLogin() {
       await api.post("/api/admin/login", { password });
       navigate("/admin");
     } catch (e) {
-      // A lockout and a lost connection are not a wrong password (14 Sep 2026).
-      const status = (e as { status?: number })?.status;
-      setError(status === 429 ? "Too many attempts. Try again in a few minutes." : status ? "Incorrect password." : "We could not reach the server. Check your connection and try again.");
+      setError(loginErrorMessage(e, true));
     } finally {
       setBusy(false);
     }
@@ -44,7 +43,7 @@ export default function AdminLogin() {
               required
             />
           </div>
-          {error ? <p className="text-sm text-destructive">{error}</p> : null}
+          {error ? <p role="alert" className="text-sm text-destructive">{error}</p> : null}
           <Button type="submit" className="w-full rounded-full" disabled={busy}>
             {busy ? "Signing in…" : "Sign in"}
           </Button>

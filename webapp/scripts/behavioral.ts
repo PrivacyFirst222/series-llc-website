@@ -1,3 +1,4 @@
+import {batch04Walk} from "./batch04-walk";
 import {batch03Walk} from "./batch03-walk";
 import { batch02Walk } from "./batch02-walk";
 import { batch01Walk } from "./batch01-walk";
@@ -2173,7 +2174,9 @@ async function main(): Promise<void> {
         await page.waitForSelector("main h1");
         for (let i = 0; i < 20 && !/Payment received/.test(await page.locator("main h1").innerText()); i++) await page.waitForTimeout(500);
         const t = await page.locator("main").innerText();
-        expect(/when your protected series are established/.test(t) && !/when your LLC is formed/.test(t), "words: a conversion's payment page does not promise a formed LLC", t.slice(0, 400));
+        const confirmation = await fetch(`${API}/api/orders/${orderIds.get("E")}/status`).then(r => r.json());
+        const expectedStage = confirmation.data.status === "formed" ? "Your protected series have been established." : confirmation.data.status === "filed" ? "Your filing has been submitted." : "We're preparing your filing.";
+        expect(t.includes(expectedStage) && !/your LLC is formed|Your LLC has been formed/.test(t), "words: a conversion's payment page does not promise a formed LLC", { status: confirmation.data.status, text: t.slice(0, 400) });
       }
       if (orderIds.has("D")) {
         const detail = await fetch(`${API}/api/admin/orders/${orderIds.get("D")}`, { headers: { Cookie: adminCookie } }).then((r) => r.json()) as { data?: { groups?: { title: string; fields: { key: string; value: string }[] }[] } };
@@ -2727,6 +2730,21 @@ async function main(): Promise<void> {
   await batch01Walk(browser, `http://localhost:${WEB_PORT}`, expect);
   await batch02Walk(browser, `http://localhost:${WEB_PORT}`, expect);
   await batch03Walk(browser, `http://localhost:${WEB_PORT}`, expect);
+  const batch04Results = new Map<string,{ok:boolean;detail?:unknown}>();
+  await batch04Walk(browser, `http://localhost:${WEB_PORT}`, (ok,label,detail)=>batch04Results.set(label,{ok,detail}));
+  {const r=batch04Results.get("batch04 24: contact requires a message");expect(r?.ok===true,"batch04 24: contact requires a message",r?.detail);batch04Results.delete("batch04 24: contact requires a message");}
+  {const r=batch04Results.get("batch04 N4.10: confirmation matches filing stage");expect(r?.ok===true,"batch04 N4.10: confirmation matches filing stage",r?.detail);batch04Results.delete("batch04 N4.10: confirmation matches filing stage");}
+  {const r=batch04Results.get("batch04 147: reset asks for current sign-in email");expect(r?.ok===true,"batch04 147: reset asks for current sign-in email",r?.detail);batch04Results.delete("batch04 147: reset asks for current sign-in email");}
+  {const r=batch04Results.get("batch04 148: client login separates failures");expect(r?.ok===true,"batch04 148: client login separates failures",r?.detail);batch04Results.delete("batch04 148: client login separates failures");}
+  {const r=batch04Results.get("batch04 182: office login separates failures");expect(r?.ok===true,"batch04 182: office login separates failures",r?.detail);batch04Results.delete("batch04 182: office login separates failures");}
+  {const r=batch04Results.get("batch04 N3.07: failed reset stays retryable");expect(r?.ok===true,"batch04 N3.07: failed reset stays retryable",r?.detail);batch04Results.delete("batch04 N3.07: failed reset stays retryable");}
+  {const r=batch04Results.get("batch04 N3.09: failed mail loading is not empty mail");expect(r?.ok===true,"batch04 N3.09: failed mail loading is not empty mail",r?.detail);batch04Results.delete("batch04 N3.09: failed mail loading is not empty mail");}
+  {const r=batch04Results.get("batch04 115: agreement tools explain paid-order eligibility");expect(r?.ok===true,"batch04 115: agreement tools explain paid-order eligibility",r?.detail);batch04Results.delete("batch04 115: agreement tools explain paid-order eligibility");}
+  {const r=batch04Results.get("batch04 143: agreement card separates eligibility and failure");expect(r?.ok===true,"batch04 143: agreement card separates eligibility and failure",r?.detail);batch04Results.delete("batch04 143: agreement card separates eligibility and failure");}
+  {const r=batch04Results.get("batch04 145: documents explain preparation and upload");expect(r?.ok===true,"batch04 145: documents explain preparation and upload",r?.detail);batch04Results.delete("batch04 145: documents explain preparation and upload");}
+  {const r=batch04Results.get("batch04 163: agreement deletion reports failure");expect(r?.ok===true,"batch04 163: agreement deletion reports failure",r?.detail);batch04Results.delete("batch04 163: agreement deletion reports failure");}
+  {const r=batch04Results.get("batch04 169: agreement deletion uses portal confirmation");expect(r?.ok===true,"batch04 169: agreement deletion uses portal confirmation",r?.detail);batch04Results.delete("batch04 169: agreement deletion uses portal confirmation");}
+  for(const [label,r]of batch04Results)expect(r.ok,label,r.detail);
   await browser.close();
   web.stop();
   api.kill();

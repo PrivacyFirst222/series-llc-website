@@ -1,3 +1,4 @@
+import { AgreementLoadError } from "./AgreementLoadError";
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { Navigate, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -204,9 +205,7 @@ function AgreementAndLibraryRow({ company }: { company: string | null }) {
         </div>
         <div className="px-5 py-4">
           {oaQuery.isError ? (
-            <p className="text-sm text-muted-foreground">
-              Your agreement questionnaire unlocks once your order is paid.
-            </p>
+            <AgreementLoadError error={oaQuery.error} retry={() => { void oaQuery.refetch(); }} />
           ) : (
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-sm text-muted-foreground">
@@ -506,11 +505,23 @@ export default function PortalDashboard() {
     onError: () => toast({title:"Deletion did not complete",description:"Try again. Your request will not be reported as complete until it is recorded.",variant:"destructive"}),
   });
 
+  const [agreementToDelete, setAgreementToDelete] = useState<{ id: string; title: string } | null>(null);
+  const [agreementDeleteError, setAgreementDeleteError] = useState("");
   const deleteGeneration = useMutation({
     mutationFn: (id: string) => api.delete(`/api/portal/oa/generations/${id}`),
     onSuccess: () => {
+      setAgreementToDelete(null);
+      setAgreementDeleteError("");
       queryClient.invalidateQueries({ queryKey: ["portal-documents"] });
       queryClient.invalidateQueries({ queryKey: ["portal-oa"] });
+    },
+    onError: (error) => {
+      if (error instanceof ApiError && error.status === 404) {
+        setAgreementToDelete(null);
+        setAgreementDeleteError("That agreement is no longer on your account.");
+        queryClient.invalidateQueries({ queryKey: ["portal-documents"] });
+        queryClient.invalidateQueries({ queryKey: ["portal-oa"] });
+      } else setAgreementDeleteError("We could not delete that agreement. Try again.");
     },
   });
 
@@ -736,22 +747,22 @@ export default function PortalDashboard() {
             <FileText className="h-4 w-4 text-trust" />
             <h2 className="font-display text-lg">Your documents</h2>
           </div>
-          <DocList
+          {docsQuery.isPending ? <p className="p-5 text-sm text-muted-foreground">Loading your documents…</p> : docsQuery.isError ? (
+            <div role="alert" className="p-5"><p>We could not load your documents or legal mail. Try again.</p><Button onClick={() => docsQuery.refetch()}>Try again</Button></div>
+          ) : <DocList
             docs={packageDocs}
             onDeleteTax={setDeleteTaxDoc}
-            empty="Your documents will appear here once your formation is prepared."
+            empty="Your documents will appear here as they are prepared or uploaded."
             own={ownAgreements}
             extra={docExtras}
             deleting={deleteGeneration.isPending}
-            onDelete={(generationId, isCurrent) => {
-              const ok = window.confirm(
-                isCurrent
-                  ? "Delete your most recent agreement? The PDF is removed from your documents. Anything we posted for you is unaffected."
-                  : "Delete this superseded agreement? The PDF is removed from your documents.",
-              );
-              if (ok) deleteGeneration.mutate(generationId);
+            onDelete={(generationId) => {
+              const doc = packageDocs.find(d => ownAgreements.get(d.id)?.generationId === generationId);
+              setAgreementDeleteError("");
+              setAgreementToDelete({ id: generationId, title: doc?.title ?? "Operating agreement" });
             }}
-          />
+          />}
+          {agreementDeleteError && !agreementToDelete ? <p role="alert" className="p-5 text-sm text-destructive">{agreementDeleteError}</p> : null}
         </div>
 
         <div className="overflow-hidden rounded-2xl border border-border bg-card">
@@ -759,16 +770,34 @@ export default function PortalDashboard() {
             <Mail className="h-4 w-4 text-trust" />
             <h2 className="font-display text-lg">Legal mail</h2>
           </div>
-          <DocList
+          {docsQuery.isPending ? <p className="p-5 text-sm text-muted-foreground">Loading your legal mail…</p> : docsQuery.isError ? (
+            <div role="alert" className="p-5"><p>We could not load your documents or legal mail. Try again.</p><Button onClick={() => docsQuery.refetch()}>Try again</Button></div>
+          ) : <DocList
             docs={legalMail}
             empty="Nothing here — that's good news. Anything we receive for you as registered agent will be posted here, and you'll get an email the moment it is."
-          />
+          />}
         </div>
       </div>
 
+      <AlertDialog open={!!agreementToDelete} onOpenChange={open => { if (!open && !deleteGeneration.isPending) { setAgreementToDelete(null); setAgreementDeleteError(""); } }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this operating agreement?</AlertDialogTitle>
+            <AlertDialogDescription>{agreementToDelete?.title}. The PDF is removed from Your documents. Anything we posted for you is unaffected.</AlertDialogDescription>
+          </AlertDialogHeader>
+          {agreementDeleteError ? <p role="alert" className="text-sm text-destructive">{agreementDeleteError}</p> : null}
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteGeneration.isPending}>Keep it</AlertDialogCancel>
+            <AlertDialogAction disabled={deleteGeneration.isPending} onClick={e => { e.preventDefault(); if (agreementToDelete) deleteGeneration.mutate(agreementToDelete.id); }}>
+              {deleteGeneration.isPending ? "Deleting…" : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <OrdersInProgress company={company} external={external} onExternalHandled={() => setExternal(null)} onFormOpenChange={setFormOpen} />
 
-      {otherDocs.length > 0 ? (
+      {!docsQuery.isError && otherDocs.length > 0 ? (
         <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card">
           <div className="flex items-center gap-2.5 border-b border-border bg-secondary/40 px-5 py-4">
             <FileText className="h-4 w-4 text-trust" />
