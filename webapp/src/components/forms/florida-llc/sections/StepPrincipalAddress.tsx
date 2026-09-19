@@ -27,6 +27,7 @@ export function StepPrincipalAddress({ data, patch, errors }: StepProps) {
       </header>
 
       <AddressFieldsBlock
+        usage={data.filingPath === "CONVERT" ? "agreement" : "filing"}
         prefix="principal"
         value={data.principalAddress}
         onChange={(v) => patch({ principalAddress: v })}

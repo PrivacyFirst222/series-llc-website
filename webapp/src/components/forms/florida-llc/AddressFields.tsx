@@ -13,6 +13,7 @@ interface AddressFieldsProps {
   errors?: Partial<Record<keyof AddressType, string>>;
   lockState?: string;
   hideAddress2?: boolean;
+  usage?: "filing" | "agreement" | "records";
 }
 
 export function AddressFieldsBlock({
@@ -22,6 +23,7 @@ export function AddressFieldsBlock({
   errors,
   lockState,
   hideAddress2,
+  usage = "filing",
 }: AddressFieldsProps) {
   const set = <K extends keyof AddressType>(k: K, v: AddressType[K]) =>
     onChange({ ...value, [k]: v });
@@ -140,10 +142,11 @@ export function AddressFieldsBlock({
       </FieldShell>
 
       <p className="md:col-span-6 text-xs leading-relaxed text-muted-foreground">
-        We prepare your filing using this address exactly as entered. Please
-        double-check it — an incorrect address can cause missed legal notices
-        and state correspondence. Address suggestions are a convenience, not a
-        verification.
+        {usage === "agreement"
+          ? "We use this address in your operating agreement exactly as entered. Please double-check it. Address suggestions are a convenience, not a verification."
+          : usage === "records"
+            ? "We keep this address in our office order records exactly as entered. Please double-check it. Address suggestions are a convenience, not a verification."
+            : "We prepare your filing using this address exactly as entered. Please double-check it — an incorrect address can cause missed legal notices and state correspondence. Address suggestions are a convenience, not a verification."}
       </p>
     </div>
   );

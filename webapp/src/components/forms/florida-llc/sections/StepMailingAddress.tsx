@@ -54,6 +54,7 @@ export function StepMailingAddress({ data, patch, errors }: StepProps) {
 
       {!same ? (
         <AddressFieldsBlock
+        usage={data.filingPath === "CONVERT" ? "records" : "filing"}
           prefix="mailing"
           value={data.mailingAddress}
           onChange={(v) => patch({ mailingAddress: v })}

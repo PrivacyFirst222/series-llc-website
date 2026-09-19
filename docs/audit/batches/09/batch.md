@@ -53,3 +53,13 @@ Expects: the same service and state-fee facts across form, receipt, filing sheet
 ## Verification
 
 18 durable named regression assertions across 21 active parts and 20 source records; all must fail for the intended defect on the base and pass after. Positive controls preserve new formations, retained answers and current prices. Full mandatory review, all previous assertions, real route/outbox checks, rendered page/email inspection and package verification. Necessary selector/check updates are declared up front. No publication or acceptance inferred.
+
+## Revision 2 — complete the shared address hint within approved item 52
+
+Rendered review exposed this sentence from AddressFields.tsx: “We prepare your filing using this address exactly as entered.” It still appeared underneath the existing-company principal-address explanation, and under the separate mailing address when selected. The approved fix must agree across the whole screen. Revision 2 declares that shared component, supplies agreement/office-record usage from the two existing-company callers, and keeps the filing hint unchanged elsewhere.
+
+Exact new helper wording: “We use this address in your operating agreement exactly as entered. Please double-check it. Address suggestions are a convenience, not a verification.” Mailing helper: “We keep this address in our office order records exactly as entered. Please double-check it. Address suggestions are a convenience, not a verification.”
+
+No new product decision is inferred. Adam approved all Batch 09 fixes; this is the remaining dependency of item 52. Revision 1 and its interrupted review logs remain preserved; its rejected state is an explicitly documented administrative supersession, not a claimed new judgment by Adam. The recorded source names the existing Go and distinguishes it from acceptance or publication.
+
+The new address assertion opens a separate mailing address as well as principal address, verifies both explanations, and refuses the obsolete filing promise on those screens. It retains the full original fee-note paragraphs as the evidence for all three note failures.
