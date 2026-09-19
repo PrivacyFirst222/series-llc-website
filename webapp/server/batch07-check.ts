@@ -52,6 +52,10 @@ async function child(){
    const link=await agentCheckoutLink('order',id3);const wrong=await req(`/agent-checkout/order/${id3}?token=wrong`);check(wrong.status===404&&new URL(link).searchParams.get('token')!.length>=32,'batch07 payment links reject the wrong capability',{status:wrong.status});
   }finally{env.SQUARE_ACCESS_TOKEN='';globalThis.fetch=mailFetch;}
  });
+ await attempt('batch07 missing email credentials leave the notice pending',async()=>{
+  const id=await scheduled(),prior={key:env.RESEND_API_KEY,prod:env.isProd};
+  try{env.RESEND_API_KEY='';env.isProd=true;await runRenewals(addDays(renewal,-60));const r=await rows(id);check(r[0]?.status==='notice_pending'&&!r[0]?.notice_sent_at,'batch07 missing email credentials leave the notice pending',r);}finally{env.RESEND_API_KEY=prior.key;env.isProd=prior.prod;}
+ });
  await attempt('batch07 missing Square credentials cannot simulate a live payment',async()=>{
   const {payAgentTarget}=await import('./ra-checkout');const id=await order('pending_payment');const prior={offline:env.OFFLINE,prod:env.isProd};
   try{env.OFFLINE=false;env.isProd=true;const result=await payAgentTarget('order',id,{token:'fixture-card'});const [o]=await query<{status:string;paid_at:unknown}>('SELECT status,paid_at FROM orders WHERE id=$1',[id]);check(!result.ok&&result.code==='UNAVAILABLE'&&o.status==='pending_payment'&&!o.paid_at,'batch07 missing Square credentials cannot simulate a live payment',{result,o});}finally{env.OFFLINE=prior.offline;env.isProd=prior.prod;}

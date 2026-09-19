@@ -32,6 +32,7 @@ async function recordMail(mail: Mail, ok: boolean, providerId: string | null, er
 
 export async function sendMail(mail: Mail): Promise<void> {
   if (!env.RESEND_API_KEY) {
+    if (env.isProd) {await recordMail(mail,false,null,"Email provider is not configured");throw new Error("Email provider is not configured");}
     console.log(`[email:dev] to=${mail.to} subject="${mail.subject}"\n${mail.html}`);
     devOutbox.push(mail);
     if (devOutbox.length > 50) devOutbox.splice(0, devOutbox.length - 50);
@@ -40,6 +41,7 @@ export async function sendMail(mail: Mail): Promise<void> {
   }
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
+    signal: AbortSignal.timeout(30000),
     headers: {
       Authorization: `Bearer ${env.RESEND_API_KEY}`,
       "Content-Type": "application/json",
@@ -59,7 +61,8 @@ export async function sendMail(mail: Mail): Promise<void> {
     throw new Error(`Resend ${res.status}: ${body}`);
   }
   const accepted = (await res.json().catch(() => null)) as { id?: string } | null;
-  await recordMail(mail, true, accepted?.id ?? null, null);
+  if (!accepted?.id) {await recordMail(mail,false,null,"Email provider did not confirm acceptance");throw new Error("Email provider did not confirm acceptance");}
+  await recordMail(mail, true, accepted.id, null);
 }
 
 const wrap = (inner: string) => `

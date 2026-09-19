@@ -100147,6 +100147,10 @@ async function recordMail(mail, ok, providerId, error2) {
 }
 async function sendMail(mail) {
   if (!env.RESEND_API_KEY) {
+    if (env.isProd) {
+      await recordMail(mail, false, null, "Email provider is not configured");
+      throw new Error("Email provider is not configured");
+    }
     console.log(`[email:dev] to=${mail.to} subject="${mail.subject}"
 ${mail.html}`);
     devOutbox.push(mail);
@@ -100156,6 +100160,7 @@ ${mail.html}`);
   }
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
+    signal: AbortSignal.timeout(3e4),
     headers: {
       Authorization: `Bearer ${env.RESEND_API_KEY}`,
       "Content-Type": "application/json"
@@ -100175,7 +100180,11 @@ ${mail.html}`);
     throw new Error(`Resend ${res.status}: ${body}`);
   }
   const accepted = await res.json().catch(() => null);
-  await recordMail(mail, true, accepted?.id ?? null, null);
+  if (!accepted?.id) {
+    await recordMail(mail, false, null, "Email provider did not confirm acceptance");
+    throw new Error("Email provider did not confirm acceptance");
+  }
+  await recordMail(mail, true, accepted.id, null);
 }
 var wrap = (inner) => `
 <div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#1c2530;max-width:560px;margin:0 auto;padding:24px">

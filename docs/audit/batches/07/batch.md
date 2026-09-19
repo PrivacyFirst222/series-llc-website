@@ -70,3 +70,5 @@ All user decisions above are retained. No test-data cleanup, legal-master edits,
 The staged guard correctly refused the first commit attempt: `docs/facts.md` was declared as content, although the system classifies it as a control. The optional new fact-ledger entry was removed; existing ledger facts remain true. The frozen work order, hash, and authorization were preserved. The new policy is recorded in Adam's authenticated ruling 28, the shared billing constants, the Terms, and this batch's durable assertions. No gate or approval record was weakened.
 
 Final defensive review added an explicit live-configuration guard: missing Square credentials cannot trigger a simulated purchase. Only an explicitly offline, non-production review can use simulated cards. A fixture verifies the order remains unpaid when the production configuration is missing.
+
+The same check applies to email: a missing production mail credential is a failed send, never a dev-log success. A successful provider response must include its acceptance id. Requests time out; a missing configuration keeps the renewal notice pending.
