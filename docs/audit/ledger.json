@@ -1983,7 +1983,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -2002,22 +2002,15 @@
               "batch": "09",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-19T23:15:28.295Z",
+              "event": "rejected r1",
+              "batch": "09",
+              "revision": 1,
+              "note": "Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision."
             }
-          ],
-          "batch": "09",
-          "fix": {
-            "batch": "09",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "walk",
-                "label": "batch09 52: addresses explain their use without promising a Sunbiz update"
-              }
-            ]
-          }
+          ]
         }
       ],
       "codex": {
@@ -2041,7 +2034,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -2060,22 +2053,15 @@
               "batch": "09",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-19T23:15:28.295Z",
+              "event": "rejected r1",
+              "batch": "09",
+              "revision": 1,
+              "note": "Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision."
             }
-          ],
-          "batch": "09",
-          "fix": {
-            "batch": "09",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "walk",
-                "label": "batch09 53: existing company type is retained for its agreement"
-              }
-            ]
-          }
+          ]
         }
       ],
       "codex": {
@@ -2362,7 +2348,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -2381,22 +2367,15 @@
               "batch": "09",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-19T23:15:28.295Z",
+              "event": "rejected r1",
+              "batch": "09",
+              "revision": 1,
+              "note": "Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision."
             }
-          ],
-          "batch": "09",
-          "fix": {
-            "batch": "09",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "walk",
-                "label": "batch09 58: abandoned alternate names do not block existing companies"
-              }
-            ]
-          }
+          ]
         }
       ],
       "codex": {
@@ -2794,7 +2773,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -2813,22 +2792,15 @@
               "batch": "09",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-19T23:15:28.295Z",
+              "event": "rejected r1",
+              "batch": "09",
+              "revision": 1,
+              "note": "Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision."
             }
-          ],
-          "batch": "09",
-          "fix": {
-            "batch": "09",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "walk",
-                "label": "batch09 66: existing company service fee has the receipt label"
-              }
-            ]
-          }
+          ]
         }
       ],
       "codex": {
@@ -2851,7 +2823,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -2870,22 +2842,15 @@
               "batch": "09",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-19T23:15:28.295Z",
+              "event": "rejected r1",
+              "batch": "09",
+              "revision": 1,
+              "note": "Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision."
             }
-          ],
-          "batch": "09",
-          "fix": {
-            "batch": "09",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "walk",
-                "label": "batch09 67: optional step includes documents and services"
-              }
-            ]
-          }
+          ]
         }
       ],
       "codex": {
@@ -2910,7 +2875,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -2929,22 +2894,15 @@
               "batch": "09",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-19T23:15:28.295Z",
+              "event": "rejected r1",
+              "batch": "09",
+              "revision": 1,
+              "note": "Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision."
             }
-          ],
-          "batch": "09",
-          "fix": {
-            "batch": "09",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "walk",
-                "label": "batch09 68: legal and public record consent is given once at certification"
-              }
-            ]
-          }
+          ]
         }
       ],
       "codex": {
@@ -3378,7 +3336,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -3397,22 +3355,15 @@
               "batch": "09",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-19T23:15:28.295Z",
+              "event": "rejected r1",
+              "batch": "09",
+              "revision": 1,
+              "note": "Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision."
             }
-          ],
-          "batch": "09",
-          "fix": {
-            "batch": "09",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "walk",
-                "label": "batch09 77: final button describes payment"
-              }
-            ]
-          }
+          ]
         }
       ],
       "codex": {
@@ -3465,7 +3416,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -3484,22 +3435,15 @@
               "batch": "09",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-19T23:15:28.295Z",
+              "event": "rejected r1",
+              "batch": "09",
+              "revision": 1,
+              "note": "Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision."
             }
-          ],
-          "batch": "09",
-          "fix": {
-            "batch": "09",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "walk",
-                "label": "batch09 79: professional helper names the actual option"
-              }
-            ]
-          }
+          ]
         }
       ],
       "codex": {
@@ -3522,7 +3466,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -3541,25 +3485,18 @@
               "batch": "09",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-19T23:15:28.295Z",
+              "event": "rejected r1",
+              "batch": "09",
+              "revision": 1,
+              "note": "Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision."
             }
           ],
           "canonical": {
             "item": "198",
             "part": "all"
-          },
-          "batch": "09",
-          "fix": {
-            "batch": "09",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "walk",
-                "label": "batch09 198: shared documents wording covers existing companies"
-              }
-            ]
           }
         }
       ],
@@ -3583,7 +3520,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -3602,22 +3539,15 @@
               "batch": "09",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-19T23:15:28.295Z",
+              "event": "rejected r1",
+              "batch": "09",
+              "revision": 1,
+              "note": "Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision."
             }
-          ],
-          "batch": "09",
-          "fix": {
-            "batch": "09",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "walk",
-                "label": "batch09 81: existing company fee explanation separates agent change"
-              }
-            ]
-          }
+          ]
         }
       ],
       "codex": {
@@ -3643,7 +3573,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -3662,22 +3592,15 @@
               "batch": "09",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-19T23:15:28.295Z",
+              "event": "rejected r1",
+              "batch": "09",
+              "revision": 1,
+              "note": "Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision."
             }
-          ],
-          "batch": "09",
-          "fix": {
-            "batch": "09",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "walk",
-                "label": "batch09 82: adding series terminology is consistent"
-              }
-            ]
-          }
+          ]
         }
       ],
       "codex": {
@@ -4173,7 +4096,7 @@
         {
           "key": "eyebrow",
           "scope": "On the existing-LLC path the banner's eyebrow still says formation.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -4192,31 +4115,24 @@
               "batch": "09",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-19T23:15:28.295Z",
+              "event": "rejected r1",
+              "batch": "09",
+              "revision": 1,
+              "note": "Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision."
             }
           ],
           "canonical": {
             "item": "198",
             "part": "all"
-          },
-          "batch": "09",
-          "fix": {
-            "batch": "09",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "walk",
-                "label": "batch09 198: shared documents wording covers existing companies"
-              }
-            ]
           }
         },
         {
           "key": "title",
           "scope": "The banner title on the existing-LLC path.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [
             "ruling:82"
           ],
@@ -4237,22 +4153,15 @@
               "batch": "09",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-19T23:15:28.295Z",
+              "event": "rejected r1",
+              "batch": "09",
+              "revision": 1,
+              "note": "Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision."
             }
-          ],
-          "batch": "09",
-          "fix": {
-            "batch": "09",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "walk",
-                "label": "batch09 95:title: banner follows the selected filing path"
-              }
-            ]
-          }
+          ]
         }
       ],
       "codex": {
@@ -4313,7 +4222,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -4332,22 +4241,15 @@
               "batch": "09",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-19T23:15:28.295Z",
+              "event": "rejected r1",
+              "batch": "09",
+              "revision": 1,
+              "note": "Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision."
             }
-          ],
-          "batch": "09",
-          "fix": {
-            "batch": "09",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "walk",
-                "label": "batch09 97: existing company filing sheet separates the agent fee"
-              }
-            ]
-          }
+          ]
         }
       ],
       "codex": {
@@ -6384,7 +6286,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -6403,25 +6305,18 @@
               "batch": "09",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-19T23:15:28.295Z",
+              "event": "rejected r1",
+              "batch": "09",
+              "revision": 1,
+              "note": "Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision."
             }
           ],
           "canonical": {
             "item": "198",
             "part": "all"
-          },
-          "batch": "09",
-          "fix": {
-            "batch": "09",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "walk",
-                "label": "batch09 198: shared documents wording covers existing companies"
-              }
-            ]
           }
         }
       ],
@@ -8806,7 +8701,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -8825,22 +8720,15 @@
               "batch": "09",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-19T23:15:28.295Z",
+              "event": "rejected r1",
+              "batch": "09",
+              "revision": 1,
+              "note": "Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision."
             }
-          ],
-          "batch": "09",
-          "fix": {
-            "batch": "09",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "walk",
-                "label": "batch09 197: completion email follows each remaining service status"
-              }
-            ]
-          }
+          ]
         }
       ],
       "codex": {
@@ -8864,7 +8752,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -8883,22 +8771,15 @@
               "batch": "09",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-19T23:15:28.295Z",
+              "event": "rejected r1",
+              "batch": "09",
+              "revision": 1,
+              "note": "Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision."
             }
-          ],
-          "batch": "09",
-          "fix": {
-            "batch": "09",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "walk",
-                "label": "batch09 198: shared documents wording covers existing companies"
-              }
-            ]
-          }
+          ]
         }
       ],
       "codex": {
@@ -9296,7 +9177,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -9315,22 +9196,15 @@
               "batch": "09",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-19T23:15:28.295Z",
+              "event": "rejected r1",
+              "batch": "09",
+              "revision": 1,
+              "note": "Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision."
             }
-          ],
-          "batch": "09",
-          "fix": {
-            "batch": "09",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "walk",
-                "label": "batch09 206: service confirmation promises the document"
-              }
-            ]
-          }
+          ]
         }
       ],
       "codex": {
@@ -9680,7 +9554,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -9699,22 +9573,15 @@
               "batch": "09",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-19T23:15:28.295Z",
+              "event": "rejected r1",
+              "batch": "09",
+              "revision": 1,
+              "note": "Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision."
             }
-          ],
-          "batch": "09",
-          "fix": {
-            "batch": "09",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "walk",
-                "label": "batch09 214: historical fee split conflict is marked resolved"
-              }
-            ]
-          }
+          ]
         }
       ],
       "codex": {
@@ -9737,7 +9604,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -9756,22 +9623,15 @@
               "batch": "09",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-19T23:15:28.295Z",
+              "event": "rejected r1",
+              "batch": "09",
+              "revision": 1,
+              "note": "Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision."
             }
-          ],
-          "batch": "09",
-          "fix": {
-            "batch": "09",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "walk",
-                "label": "batch09 215: agent change collection note matches pricing"
-              }
-            ]
-          }
+          ]
         }
       ],
       "codex": {
@@ -9794,7 +9654,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -9813,22 +9673,15 @@
               "batch": "09",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-19T23:15:28.295Z",
+              "event": "rejected r1",
+              "batch": "09",
+              "revision": 1,
+              "note": "Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision."
             }
-          ],
-          "batch": "09",
-          "fix": {
-            "batch": "09",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "walk",
-                "label": "batch09 216: annual report note includes statutory components and exception"
-              }
-            ]
-          }
+          ]
         }
       ],
       "codex": {
@@ -14491,7 +14344,7 @@
       "id": "09",
       "revision": 1,
       "frozenHash": "636c8f6e97fac2dceff0544627599cc3d6eb83f8f6ba570407e74bc8e5331df4",
-      "status": "implemented",
+      "status": "rejected",
       "model": "Codex",
       "base": "c22d47592edf06826e0bfbad69f42e349dda44f7",
       "history": [
@@ -14503,6 +14356,11 @@
         {
           "at": "2026-09-19T23:05:23.198Z",
           "event": "implemented"
+        },
+        {
+          "at": "2026-09-19T23:15:28.295Z",
+          "event": "rejected by Adam",
+          "note": "Adam's record of 2026-09-19T23:15 (Adam: Go. - approve all (Batch 09); standing instruction to complete necessary fixes and tests without a second confirmation. Codex administrative revision transition; no new owner verdict inferred.): Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision."
         }
       ]
     }
