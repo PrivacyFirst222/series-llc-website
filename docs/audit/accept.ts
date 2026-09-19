@@ -60,7 +60,7 @@ if (cmd === "accept") {
   write(RULINGS_FILE, { kind: "ruling", item: a, ...(partOpt ? { part: partOpt } : {}), text: b.trim() });
   console.log(`ruling recorded on item ${a}${partOpt ? ` (${partOpt})` : ""}: ${b.trim()}`);
 } else if (cmd === "approve-replacement") {
-  if (!a || argv.length !== 2 || !revisionOpt || !/^[1-9]\d*$/.test(revisionOpt)) refuse("usage: approve-replacement <batch> --revision <n>");
+  if (!a || !/^[A-Za-z0-9][A-Za-z0-9-]*$/.test(a) || argv.length !== 2 || !revisionOpt || !/^[1-9]\d*$/.test(revisionOpt) || packageId !== null || reason !== null || partOpt !== null) refuse("usage: approve-replacement <batch> --revision <n>");
   let batch; try { batch = loadBatch(a); } catch { refuse("replacement work order is missing or unreadable"); }
   if (batch.id !== a || batch.revision !== Number(revisionOpt)) refuse("replacement batch/revision does not match the work order");
   const entries = batch.items.filter(x => x.replaces);

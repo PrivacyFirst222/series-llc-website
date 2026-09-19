@@ -73,6 +73,7 @@ try {
   refuse('N2: ordinary ruling does not approve replacement',run('docs/audit/batch.ts','authorize','replacement'),/replacement|approval|record/i);
   refuse('N2: free-form supersedes flag is not authority',run('docs/audit/batch.ts','ruling','9001','Unrelated ordinary ruling.','--supersedes','anything'),/supersedes|replacement/i);
   refuse('N2: wrong revision cannot be approved',run('docs/audit/accept.ts','approve-replacement','replacement','--revision','2'),/revision|work order/i);
+  refuse('N2: unrelated terminal option cannot be ignored',run('docs/audit/accept.ts','approve-replacement','replacement','--revision','1','--reason','only if approved later'),/usage/);
   pass('N2: exact work order can be approved' ,run('docs/audit/accept.ts','approve-replacement','replacement','--revision','1'));
   const exactRecords=readFileSync(join(home,'rulings.jsonl'),'utf8');
   for(const key of ['batch','revision','hash']) {

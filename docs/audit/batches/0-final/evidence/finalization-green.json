@@ -5,7 +5,7 @@
       "ok": true,
       "observed": {
         "code": 0,
-        "output": "Controls under test: 850cfb330b49cdca6132b9da24bec1a9f4758104; harness SHA256 0a58cd72fd4b269d01162ad074793f01f923792599086648ae2f01a28c30f394; fixture commits skip hooks; no pushes.\nSynthetic fixture baseline: cb7ec781d2ae79959ad0f68f08e6ba723d2a3b8f; real source ledger not used.\nPASS 1: accepted implemented fix cannot be erased as bookkeeping: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - not a records-only push: item 17 part amend-title: recorded fix cannot be erased or changed outside its authenticated batch rejection or release transition\\n  - not a records-only push: item 17 part amend-title: status went back from implemented to open with no recorded reason\\n  - no acceptance from Adam names commit 4f47468. This push breaks a records rule. Go authorizes the work; release needs the whole message \\\"Accept <batch>, revision <n>, 4f47468\\\".\\n\"}\nPASS 1: part cannot declare release while its batch is implemented: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - not a records-only push: item 17 part amend-title: part state released does not match its owning batch transition (implemented)\\n  - not a records-only push: item 17 part amend-title: released fix does not name the owning batch's released commit\\n  - not a records-only push: item 17 part amend-title: transition to released lacks its owning batch event\\n  - no acceptance from Adam names commit ecf8076. This push breaks a records rule. Go authorizes the work; release needs the whole message \\\"Accept <batch>, revision <n>, ecf8076\\\".\\n\"}\nPASS 1: authenticated rejection still reopens the part: {\"code\":0,\"output\":\"release gate: ok for (range) — records only (2 file(s)) — no acceptance needed\\n\"}\nPASS 8: CI checks a legitimate rejection without local decision access: {\"code\":0,\"output\":\"guard: note — compared the ledger at c684660 with the ledger at 280b72f; Adam's acceptance, rejection, ruling and migration records are on his Mac and were not checked here\\nguard: ok\\n\"}\nPASS 8: local rejection still requires owner evidence: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - not a records-only push: batch repair-probe r1: rejected — no rejection record from Adam names batch repair-probe revision 1 after it was authorized (his whole message \\\"Reject repair-probe, revision 1: <reason>\\\")\\n  - no acceptance from Adam names commit c684660. This push breaks a records rule. Go authorizes the work; release needs the whole message \\\"Accept <batch>, revision <n>, c684660\\\".\\n\"}\nPASS 2: approved migration refuses wrong target: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - not a records-only push: item 95: structural fields do not equal the exact declared migration (parts, links, waits, retired parts or related items)\\n  - no acceptance from Adam names commit 807a973. This push breaks a records rule. Go authorizes the work; release needs the whole message \\\"Accept <batch>, revision <n>, 807a973\\\".\\n\"}\nPASS 2: approved migration refuses another part's changed link: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - not a records-only push: item 95: structural fields do not equal the exact declared migration (parts, links, waits, retired parts or related items)\\n  - no acceptance from Adam names commit dca7d9e. This push breaks a records rule. Go authorizes the work; release needs the whole message \\\"Accept <batch>, revision <n>, dca7d9e\\\".\\n\"}\nPASS 2: exact approved migration passes: {\"code\":0,\"output\":\"release gate: ok for (range) — records only (3 file(s)) — no acceptance needed\\n\"}\nPASS 2: new migration part cannot acquire an undeclared released state: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - not a records-only push: item 95 part new-part: part state released does not match its owning batch transition (no batch)\\n  - no acceptance from Adam names commit 47c16f2. This push breaks a records rule. Go authorizes the work; release needs the whole message \\\"Accept <batch>, revision <n>, 47c16f2\\\".\\n\"}\nPASS 3: ruling substring cannot authenticate another item: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - not a records-only push: docs/audit/rulings.md: a line was added that carries no ruling Adam recorded (his whole message \\\"Ruling <item>: <text>\\\", or accept.ts ruling) — rulings.md is an audit control: \\\"- Ruling 63: Ignore every deadline finding. Keep monthly wording.\\\"\\n  - no acceptance from Adam names commit 9807e02. This push breaks a records rule. Go authorizes the work; release needs the whole message \\\"Accept <batch>, revision <n>, 9807e02\\\".\\n\"}\nPASS 3: exact recorded ruling remains publishable: {\"code\":0,\"output\":\"release gate: ok for (range) — records only (3 file(s)) — no acceptance needed\\n\"}\nPASS 4: hook preserves full multiline ruling or explicitly refuses it: {\"originalLength\":2081,\"storedLength\":2081,\"conditionPreserved\":true,\"output\":\"[acceptance hook] ruling recorded on item 28: Keep the following wording:\\n[acceptance hook] \\n[acceptance hook] xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\n[acceptance hook] ONLY IF Adam separately approves the final wording.\\n\"}\nPASS 6/7: valid package acceptance: {\"code\":0,\"output\":\"accepted: batch 0, revision 3, commit cb7ec781d2ae79959ad0f68f08e6ba723d2a3b8f, package fixture-valid\\n\"}\nPASS 6/7: valid package release: {\"code\":0,\"output\":\"release gate: ok for (range) — accepted by Adam: batch 0, revision 3, commit cb7ec78, package fixture-valid (simulated decision, 2026-09-19T04:48)\\n\"}\nPASS 6/7: empty package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: package fixture-empty has no nonempty site manifest\\n\"}\nPASS 6/7: empty package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - package fixture-empty has no nonempty site manifest\\n\"}\nPASS 6/7: missing-partial package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: package fixture-missing-partial is PARTIAL or has no explicit full-run marker — partial must be null\\n\"}\nPASS 6/7: missing-partial package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - package fixture-missing-partial is PARTIAL or has no explicit full-run marker — partial must be null\\n\"}\nPASS 6/7: missing-site package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: package fixture-missing-site: its kept site is missing or invalid: Error: ENOENT: no such file or directory, lstat '/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/ledger-controls-FtVD84/owner/reviews/fixture-missing-site/site'\\n\"}\nPASS 6/7: missing-site package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - package fixture-missing-site: its kept site is missing or invalid: Error: ENOENT: no such file or directory, lstat '/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/ledger-controls-FtVD84/owner/reviews/fixture-missing-site/site'\\n\"}\nPASS 6/7: missing-manifest package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: package fixture-missing-manifest has no nonempty site manifest\\n\"}\nPASS 6/7: missing-manifest package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - package fixture-missing-manifest has no nonempty site manifest\\n\"}\nPASS 6/7: changed-site package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: the kept site: index.html changed since the review\\n\"}\nPASS 6/7: changed-site package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - the kept site: index.html changed since the review\\n\"}\nPASS 6/7: added-file package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: the kept site: extra.js was added since the review\\n\"}\nPASS 6/7: added-file package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - the kept site: extra.js was added since the review\\n\"}\nPASS 6/7: partial package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: package fixture-partial is PARTIAL or has no explicit full-run marker — partial must be null\\n\"}\nPASS 6/7: partial package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - package fixture-partial is PARTIAL or has no explicit full-run marker — partial must be null\\n\"}\nPASS 6/7: duplicate-path package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: the kept site: duplicate manifest path index.html\\n\"}\nPASS 6/7: duplicate-path package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - the kept site: duplicate manifest path index.html\\n\"}\nPASS 6/7: bad-path package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: the kept site: invalid manifest path or hash\\n\"}\nPASS 6/7: bad-path package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - the kept site: invalid manifest path or hash\\n\"}\nPASS 8: historical r2-to-r3 comparison skips external records only: {\"code\":0,\"output\":\"guard: note — compared the ledger at fffd656 with the ledger at d0e3689; Adam's acceptance, rejection, ruling and migration records are on his Mac and were not checked here\\nguard: ok\\n\"}\nPASS 8: unavailable CI baseline still refuses: {\"code\":1,\"output\":\"guard: REFUSED — the commit 000000000000 is not available here, so the ledger's transition check cannot run. It is not replaced by a guess.\\n\"}\n34/34 control cases passed\n"
+        "output": "Controls under test: 68581ed5d0507c2ee26e33e6b6abf8f887b44f25; harness SHA256 0a58cd72fd4b269d01162ad074793f01f923792599086648ae2f01a28c30f394; fixture commits skip hooks; no pushes.\nSynthetic fixture baseline: b43aaa2adc9b8d848b76f5bb72513dfafafe913f; real source ledger not used.\nPASS 1: accepted implemented fix cannot be erased as bookkeeping: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - not a records-only push: item 17 part amend-title: recorded fix cannot be erased or changed outside its authenticated batch rejection or release transition\\n  - not a records-only push: item 17 part amend-title: status went back from implemented to open with no recorded reason\\n  - no acceptance from Adam names commit 1532ff2. This push breaks a records rule. Go authorizes the work; release needs the whole message \\\"Accept <batch>, revision <n>, 1532ff2\\\".\\n\"}\nPASS 1: part cannot declare release while its batch is implemented: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - not a records-only push: item 17 part amend-title: part state released does not match its owning batch transition (implemented)\\n  - not a records-only push: item 17 part amend-title: released fix does not name the owning batch's released commit\\n  - not a records-only push: item 17 part amend-title: transition to released lacks its owning batch event\\n  - no acceptance from Adam names commit 2d8be5d. This push breaks a records rule. Go authorizes the work; release needs the whole message \\\"Accept <batch>, revision <n>, 2d8be5d\\\".\\n\"}\nPASS 1: authenticated rejection still reopens the part: {\"code\":0,\"output\":\"release gate: ok for (range) — records only (2 file(s)) — no acceptance needed\\n\"}\nPASS 8: CI checks a legitimate rejection without local decision access: {\"code\":0,\"output\":\"guard: note — compared the ledger at 183a399 with the ledger at 686adb5; Adam's acceptance, rejection, ruling and migration records are on his Mac and were not checked here\\nguard: ok\\n\"}\nPASS 8: local rejection still requires owner evidence: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - not a records-only push: batch repair-probe r1: rejected — no rejection record from Adam names batch repair-probe revision 1 after it was authorized (his whole message \\\"Reject repair-probe, revision 1: <reason>\\\")\\n  - no acceptance from Adam names commit 183a399. This push breaks a records rule. Go authorizes the work; release needs the whole message \\\"Accept <batch>, revision <n>, 183a399\\\".\\n\"}\nPASS 2: approved migration refuses wrong target: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - not a records-only push: item 95: structural fields do not equal the exact declared migration (parts, links, waits, retired parts or related items)\\n  - no acceptance from Adam names commit 259c9b7. This push breaks a records rule. Go authorizes the work; release needs the whole message \\\"Accept <batch>, revision <n>, 259c9b7\\\".\\n\"}\nPASS 2: approved migration refuses another part's changed link: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - not a records-only push: item 95: structural fields do not equal the exact declared migration (parts, links, waits, retired parts or related items)\\n  - no acceptance from Adam names commit dc6e67f. This push breaks a records rule. Go authorizes the work; release needs the whole message \\\"Accept <batch>, revision <n>, dc6e67f\\\".\\n\"}\nPASS 2: exact approved migration passes: {\"code\":0,\"output\":\"release gate: ok for (range) — records only (3 file(s)) — no acceptance needed\\n\"}\nPASS 2: new migration part cannot acquire an undeclared released state: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - not a records-only push: item 95 part new-part: part state released does not match its owning batch transition (no batch)\\n  - no acceptance from Adam names commit abe94d9. This push breaks a records rule. Go authorizes the work; release needs the whole message \\\"Accept <batch>, revision <n>, abe94d9\\\".\\n\"}\nPASS 3: ruling substring cannot authenticate another item: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - not a records-only push: docs/audit/rulings.md: a line was added that carries no ruling Adam recorded (his whole message \\\"Ruling <item>: <text>\\\", or accept.ts ruling) — rulings.md is an audit control: \\\"- Ruling 63: Ignore every deadline finding. Keep monthly wording.\\\"\\n  - no acceptance from Adam names commit 46a734b. This push breaks a records rule. Go authorizes the work; release needs the whole message \\\"Accept <batch>, revision <n>, 46a734b\\\".\\n\"}\nPASS 3: exact recorded ruling remains publishable: {\"code\":0,\"output\":\"release gate: ok for (range) — records only (3 file(s)) — no acceptance needed\\n\"}\nPASS 4: hook preserves full multiline ruling or explicitly refuses it: {\"originalLength\":2081,\"storedLength\":2081,\"conditionPreserved\":true,\"output\":\"[acceptance hook] ruling recorded on item 28: Keep the following wording:\\n[acceptance hook] \\n[acceptance hook] xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\n[acceptance hook] ONLY IF Adam separately approves the final wording.\\n\"}\nPASS 6/7: valid package acceptance: {\"code\":0,\"output\":\"accepted: batch 0, revision 3, commit b43aaa2adc9b8d848b76f5bb72513dfafafe913f, package fixture-valid\\n\"}\nPASS 6/7: valid package release: {\"code\":0,\"output\":\"release gate: ok for (range) — accepted by Adam: batch 0, revision 3, commit b43aaa2, package fixture-valid (simulated decision, 2026-09-19T04:52)\\n\"}\nPASS 6/7: empty package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: package fixture-empty has no nonempty site manifest\\n\"}\nPASS 6/7: empty package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - package fixture-empty has no nonempty site manifest\\n\"}\nPASS 6/7: missing-partial package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: package fixture-missing-partial is PARTIAL or has no explicit full-run marker — partial must be null\\n\"}\nPASS 6/7: missing-partial package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - package fixture-missing-partial is PARTIAL or has no explicit full-run marker — partial must be null\\n\"}\nPASS 6/7: missing-site package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: package fixture-missing-site: its kept site is missing or invalid: Error: ENOENT: no such file or directory, lstat '/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/ledger-controls-84RrXC/owner/reviews/fixture-missing-site/site'\\n\"}\nPASS 6/7: missing-site package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - package fixture-missing-site: its kept site is missing or invalid: Error: ENOENT: no such file or directory, lstat '/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/ledger-controls-84RrXC/owner/reviews/fixture-missing-site/site'\\n\"}\nPASS 6/7: missing-manifest package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: package fixture-missing-manifest has no nonempty site manifest\\n\"}\nPASS 6/7: missing-manifest package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - package fixture-missing-manifest has no nonempty site manifest\\n\"}\nPASS 6/7: changed-site package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: the kept site: index.html changed since the review\\n\"}\nPASS 6/7: changed-site package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - the kept site: index.html changed since the review\\n\"}\nPASS 6/7: added-file package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: the kept site: extra.js was added since the review\\n\"}\nPASS 6/7: added-file package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - the kept site: extra.js was added since the review\\n\"}\nPASS 6/7: partial package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: package fixture-partial is PARTIAL or has no explicit full-run marker — partial must be null\\n\"}\nPASS 6/7: partial package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - package fixture-partial is PARTIAL or has no explicit full-run marker — partial must be null\\n\"}\nPASS 6/7: duplicate-path package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: the kept site: duplicate manifest path index.html\\n\"}\nPASS 6/7: duplicate-path package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - the kept site: duplicate manifest path index.html\\n\"}\nPASS 6/7: bad-path package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: the kept site: invalid manifest path or hash\\n\"}\nPASS 6/7: bad-path package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - the kept site: invalid manifest path or hash\\n\"}\nPASS 8: historical r2-to-r3 comparison skips external records only: {\"code\":0,\"output\":\"guard: note — compared the ledger at fffd656 with the ledger at d0e3689; Adam's acceptance, rejection, ruling and migration records are on his Mac and were not checked here\\nguard: ok\\n\"}\nPASS 8: unavailable CI baseline still refuses: {\"code\":1,\"output\":\"guard: REFUSED — the commit 000000000000 is not available here, so the ledger's transition check cannot run. It is not replaced by a guess.\\n\"}\n34/34 control cases passed\n"
       }
     },
     {
@@ -13,7 +13,7 @@
       "ok": true,
       "observed": {
         "code": 0,
-        "output": "Controls under test: 0d112f86c67f30e0ac09f6309acd3a1d057082dc; harness SHA256 0a58cd72fd4b269d01162ad074793f01f923792599086648ae2f01a28c30f394; fixture commits skip hooks; no pushes.\nSynthetic fixture baseline: 6b6c8949469b577dc36526a93764c0049c0a5b02; real source ledger not used.\nPASS 1: accepted implemented fix cannot be erased as bookkeeping: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - not a records-only push: item 17 part amend-title: recorded fix cannot be erased or changed outside its authenticated batch rejection or release transition\\n  - not a records-only push: item 17 part amend-title: status went back from implemented to open with no recorded reason\\n  - no acceptance from Adam names commit 1735ac6. This push breaks a records rule. Go authorizes the work; release needs the whole message \\\"Accept <batch>, revision <n>, 1735ac6\\\".\\n\"}\nPASS 1: part cannot declare release while its batch is implemented: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - not a records-only push: item 17 part amend-title: part state released does not match its owning batch transition (implemented)\\n  - not a records-only push: item 17 part amend-title: released fix does not name the owning batch's released commit\\n  - not a records-only push: item 17 part amend-title: transition to released lacks its owning batch event\\n  - no acceptance from Adam names commit 658284b. This push breaks a records rule. Go authorizes the work; release needs the whole message \\\"Accept <batch>, revision <n>, 658284b\\\".\\n\"}\nPASS 1: authenticated rejection still reopens the part: {\"code\":0,\"output\":\"release gate: ok for (range) — records only (2 file(s)) — no acceptance needed\\n\"}\nPASS 8: CI checks a legitimate rejection without local decision access: {\"code\":0,\"output\":\"guard: note — compared the ledger at e37d166 with the ledger at 8ac0cd9; Adam's acceptance, rejection, ruling and migration records are on his Mac and were not checked here\\nguard: ok\\n\"}\nPASS 8: local rejection still requires owner evidence: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - not a records-only push: batch repair-probe r1: rejected — no rejection record from Adam names batch repair-probe revision 1 after it was authorized (his whole message \\\"Reject repair-probe, revision 1: <reason>\\\")\\n  - no acceptance from Adam names commit e37d166. This push breaks a records rule. Go authorizes the work; release needs the whole message \\\"Accept <batch>, revision <n>, e37d166\\\".\\n\"}\nPASS 2: approved migration refuses wrong target: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - not a records-only push: item 95: structural fields do not equal the exact declared migration (parts, links, waits, retired parts or related items)\\n  - no acceptance from Adam names commit 3dcc930. This push breaks a records rule. Go authorizes the work; release needs the whole message \\\"Accept <batch>, revision <n>, 3dcc930\\\".\\n\"}\nPASS 2: approved migration refuses another part's changed link: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - not a records-only push: item 95: structural fields do not equal the exact declared migration (parts, links, waits, retired parts or related items)\\n  - no acceptance from Adam names commit b880175. This push breaks a records rule. Go authorizes the work; release needs the whole message \\\"Accept <batch>, revision <n>, b880175\\\".\\n\"}\nPASS 2: exact approved migration passes: {\"code\":0,\"output\":\"release gate: ok for (range) — records only (3 file(s)) — no acceptance needed\\n\"}\nPASS 2: new migration part cannot acquire an undeclared released state: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - not a records-only push: item 95 part new-part: part state released does not match its owning batch transition (no batch)\\n  - no acceptance from Adam names commit daaffba. This push breaks a records rule. Go authorizes the work; release needs the whole message \\\"Accept <batch>, revision <n>, daaffba\\\".\\n\"}\nPASS 3: ruling substring cannot authenticate another item: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - not a records-only push: docs/audit/rulings.md: a line was added that carries no ruling Adam recorded (his whole message \\\"Ruling <item>: <text>\\\", or accept.ts ruling) — rulings.md is an audit control: \\\"- Ruling 63: Ignore every deadline finding. Keep monthly wording.\\\"\\n  - no acceptance from Adam names commit 9a6b1c5. This push breaks a records rule. Go authorizes the work; release needs the whole message \\\"Accept <batch>, revision <n>, 9a6b1c5\\\".\\n\"}\nPASS 3: exact recorded ruling remains publishable: {\"code\":0,\"output\":\"release gate: ok for (range) — records only (3 file(s)) — no acceptance needed\\n\"}\nPASS 4: hook preserves full multiline ruling or explicitly refuses it: {\"originalLength\":2081,\"storedLength\":2081,\"conditionPreserved\":true,\"output\":\"[acceptance hook] ruling recorded on item 28: Keep the following wording:\\n[acceptance hook] \\n[acceptance hook] xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\n[acceptance hook] ONLY IF Adam separately approves the final wording.\\n\"}\nPASS 6/7: valid package acceptance: {\"code\":0,\"output\":\"accepted: batch 0, revision 3, commit 6b6c8949469b577dc36526a93764c0049c0a5b02, package fixture-valid\\n\"}\nPASS 6/7: valid package release: {\"code\":0,\"output\":\"release gate: ok for (range) — accepted by Adam: batch 0, revision 3, commit 6b6c894, package fixture-valid (simulated decision, 2026-09-19T04:48)\\n\"}\nPASS 6/7: empty package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: package fixture-empty has no nonempty site manifest\\n\"}\nPASS 6/7: empty package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - package fixture-empty has no nonempty site manifest\\n\"}\nPASS 6/7: missing-partial package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: package fixture-missing-partial is PARTIAL or has no explicit full-run marker — partial must be null\\n\"}\nPASS 6/7: missing-partial package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - package fixture-missing-partial is PARTIAL or has no explicit full-run marker — partial must be null\\n\"}\nPASS 6/7: missing-site package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: package fixture-missing-site: its kept site is missing or invalid: Error: ENOENT: no such file or directory, lstat '/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/ledger-controls-sfKkCg/owner/reviews/fixture-missing-site/site'\\n\"}\nPASS 6/7: missing-site package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - package fixture-missing-site: its kept site is missing or invalid: Error: ENOENT: no such file or directory, lstat '/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/ledger-controls-sfKkCg/owner/reviews/fixture-missing-site/site'\\n\"}\nPASS 6/7: missing-manifest package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: package fixture-missing-manifest has no nonempty site manifest\\n\"}\nPASS 6/7: missing-manifest package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - package fixture-missing-manifest has no nonempty site manifest\\n\"}\nPASS 6/7: changed-site package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: the kept site: index.html changed since the review\\n\"}\nPASS 6/7: changed-site package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - the kept site: index.html changed since the review\\n\"}\nPASS 6/7: added-file package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: the kept site: extra.js was added since the review\\n\"}\nPASS 6/7: added-file package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - the kept site: extra.js was added since the review\\n\"}\nPASS 6/7: partial package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: package fixture-partial is PARTIAL or has no explicit full-run marker — partial must be null\\n\"}\nPASS 6/7: partial package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - package fixture-partial is PARTIAL or has no explicit full-run marker — partial must be null\\n\"}\nPASS 6/7: duplicate-path package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: the kept site: duplicate manifest path index.html\\n\"}\nPASS 6/7: duplicate-path package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - the kept site: duplicate manifest path index.html\\n\"}\nPASS 6/7: bad-path package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: the kept site: invalid manifest path or hash\\n\"}\nPASS 6/7: bad-path package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - the kept site: invalid manifest path or hash\\n\"}\nPASS 8: historical r2-to-r3 comparison skips external records only: {\"code\":0,\"output\":\"guard: note — compared the ledger at fffd656 with the ledger at d0e3689; Adam's acceptance, rejection, ruling and migration records are on his Mac and were not checked here\\nguard: ok\\n\"}\nPASS 8: unavailable CI baseline still refuses: {\"code\":1,\"output\":\"guard: REFUSED — the commit 000000000000 is not available here, so the ledger's transition check cannot run. It is not replaced by a guess.\\n\"}\n34/34 control cases passed\n"
+        "output": "Controls under test: 60398bbb60ce03f1bfd1a36190a68310270c17b7; harness SHA256 0a58cd72fd4b269d01162ad074793f01f923792599086648ae2f01a28c30f394; fixture commits skip hooks; no pushes.\nSynthetic fixture baseline: 1326fe3e2f612e7dcaa45140271ca0394a561923; real source ledger not used.\nPASS 1: accepted implemented fix cannot be erased as bookkeeping: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - not a records-only push: item 17 part amend-title: recorded fix cannot be erased or changed outside its authenticated batch rejection or release transition\\n  - not a records-only push: item 17 part amend-title: status went back from implemented to open with no recorded reason\\n  - no acceptance from Adam names commit b904240. This push breaks a records rule. Go authorizes the work; release needs the whole message \\\"Accept <batch>, revision <n>, b904240\\\".\\n\"}\nPASS 1: part cannot declare release while its batch is implemented: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - not a records-only push: item 17 part amend-title: part state released does not match its owning batch transition (implemented)\\n  - not a records-only push: item 17 part amend-title: released fix does not name the owning batch's released commit\\n  - not a records-only push: item 17 part amend-title: transition to released lacks its owning batch event\\n  - no acceptance from Adam names commit a46b456. This push breaks a records rule. Go authorizes the work; release needs the whole message \\\"Accept <batch>, revision <n>, a46b456\\\".\\n\"}\nPASS 1: authenticated rejection still reopens the part: {\"code\":0,\"output\":\"release gate: ok for (range) — records only (2 file(s)) — no acceptance needed\\n\"}\nPASS 8: CI checks a legitimate rejection without local decision access: {\"code\":0,\"output\":\"guard: note — compared the ledger at 2216e00 with the ledger at 4311467; Adam's acceptance, rejection, ruling and migration records are on his Mac and were not checked here\\nguard: ok\\n\"}\nPASS 8: local rejection still requires owner evidence: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - not a records-only push: batch repair-probe r1: rejected — no rejection record from Adam names batch repair-probe revision 1 after it was authorized (his whole message \\\"Reject repair-probe, revision 1: <reason>\\\")\\n  - no acceptance from Adam names commit 2216e00. This push breaks a records rule. Go authorizes the work; release needs the whole message \\\"Accept <batch>, revision <n>, 2216e00\\\".\\n\"}\nPASS 2: approved migration refuses wrong target: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - not a records-only push: item 95: structural fields do not equal the exact declared migration (parts, links, waits, retired parts or related items)\\n  - no acceptance from Adam names commit 82ed048. This push breaks a records rule. Go authorizes the work; release needs the whole message \\\"Accept <batch>, revision <n>, 82ed048\\\".\\n\"}\nPASS 2: approved migration refuses another part's changed link: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - not a records-only push: item 95: structural fields do not equal the exact declared migration (parts, links, waits, retired parts or related items)\\n  - no acceptance from Adam names commit ebdb6ec. This push breaks a records rule. Go authorizes the work; release needs the whole message \\\"Accept <batch>, revision <n>, ebdb6ec\\\".\\n\"}\nPASS 2: exact approved migration passes: {\"code\":0,\"output\":\"release gate: ok for (range) — records only (3 file(s)) — no acceptance needed\\n\"}\nPASS 2: new migration part cannot acquire an undeclared released state: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - not a records-only push: item 95 part new-part: part state released does not match its owning batch transition (no batch)\\n  - no acceptance from Adam names commit ab63fc6. This push breaks a records rule. Go authorizes the work; release needs the whole message \\\"Accept <batch>, revision <n>, ab63fc6\\\".\\n\"}\nPASS 3: ruling substring cannot authenticate another item: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - not a records-only push: docs/audit/rulings.md: a line was added that carries no ruling Adam recorded (his whole message \\\"Ruling <item>: <text>\\\", or accept.ts ruling) — rulings.md is an audit control: \\\"- Ruling 63: Ignore every deadline finding. Keep monthly wording.\\\"\\n  - no acceptance from Adam names commit 8b1566d. This push breaks a records rule. Go authorizes the work; release needs the whole message \\\"Accept <batch>, revision <n>, 8b1566d\\\".\\n\"}\nPASS 3: exact recorded ruling remains publishable: {\"code\":0,\"output\":\"release gate: ok for (range) — records only (3 file(s)) — no acceptance needed\\n\"}\nPASS 4: hook preserves full multiline ruling or explicitly refuses it: {\"originalLength\":2081,\"storedLength\":2081,\"conditionPreserved\":true,\"output\":\"[acceptance hook] ruling recorded on item 28: Keep the following wording:\\n[acceptance hook] \\n[acceptance hook] xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\n[acceptance hook] ONLY IF Adam separately approves the final wording.\\n\"}\nPASS 6/7: valid package acceptance: {\"code\":0,\"output\":\"accepted: batch 0, revision 3, commit 1326fe3e2f612e7dcaa45140271ca0394a561923, package fixture-valid\\n\"}\nPASS 6/7: valid package release: {\"code\":0,\"output\":\"release gate: ok for (range) — accepted by Adam: batch 0, revision 3, commit 1326fe3, package fixture-valid (simulated decision, 2026-09-19T04:52)\\n\"}\nPASS 6/7: empty package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: package fixture-empty has no nonempty site manifest\\n\"}\nPASS 6/7: empty package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - package fixture-empty has no nonempty site manifest\\n\"}\nPASS 6/7: missing-partial package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: package fixture-missing-partial is PARTIAL or has no explicit full-run marker — partial must be null\\n\"}\nPASS 6/7: missing-partial package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - package fixture-missing-partial is PARTIAL or has no explicit full-run marker — partial must be null\\n\"}\nPASS 6/7: missing-site package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: package fixture-missing-site: its kept site is missing or invalid: Error: ENOENT: no such file or directory, lstat '/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/ledger-controls-U7kPlB/owner/reviews/fixture-missing-site/site'\\n\"}\nPASS 6/7: missing-site package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - package fixture-missing-site: its kept site is missing or invalid: Error: ENOENT: no such file or directory, lstat '/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/ledger-controls-U7kPlB/owner/reviews/fixture-missing-site/site'\\n\"}\nPASS 6/7: missing-manifest package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: package fixture-missing-manifest has no nonempty site manifest\\n\"}\nPASS 6/7: missing-manifest package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - package fixture-missing-manifest has no nonempty site manifest\\n\"}\nPASS 6/7: changed-site package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: the kept site: index.html changed since the review\\n\"}\nPASS 6/7: changed-site package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - the kept site: index.html changed since the review\\n\"}\nPASS 6/7: added-file package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: the kept site: extra.js was added since the review\\n\"}\nPASS 6/7: added-file package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - the kept site: extra.js was added since the review\\n\"}\nPASS 6/7: partial package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: package fixture-partial is PARTIAL or has no explicit full-run marker — partial must be null\\n\"}\nPASS 6/7: partial package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - package fixture-partial is PARTIAL or has no explicit full-run marker — partial must be null\\n\"}\nPASS 6/7: duplicate-path package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: the kept site: duplicate manifest path index.html\\n\"}\nPASS 6/7: duplicate-path package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - the kept site: duplicate manifest path index.html\\n\"}\nPASS 6/7: bad-path package acceptance: {\"code\":1,\"output\":\"NOT RECORDED: the kept site: invalid manifest path or hash\\n\"}\nPASS 6/7: bad-path package release: {\"code\":1,\"output\":\"release gate: REFUSED for (range):\\n  - the kept site: invalid manifest path or hash\\n\"}\nPASS 8: historical r2-to-r3 comparison skips external records only: {\"code\":0,\"output\":\"guard: note — compared the ledger at fffd656 with the ledger at d0e3689; Adam's acceptance, rejection, ruling and migration records are on his Mac and were not checked here\\nguard: ok\\n\"}\nPASS 8: unavailable CI baseline still refuses: {\"code\":1,\"output\":\"guard: REFUSED — the commit 000000000000 is not available here, so the ledger's transition check cannot run. It is not replaced by a guess.\\n\"}\n34/34 control cases passed\n"
       }
     },
     {
@@ -49,11 +49,19 @@
       }
     },
     {
+      "name": "N2: unrelated terminal option cannot be ignored",
+      "ok": true,
+      "observed": {
+        "code": 1,
+        "output": "NOT RECORDED: usage: approve-replacement <batch> --revision <n>\n"
+      }
+    },
+    {
       "name": "N2: exact work order can be approved",
       "ok": true,
       "observed": {
         "code": 0,
-        "output": "replacement approved: batch replacement revision 1, work order 7a75c03a6c5934de31a638458563ee2a2c453153fb0260b32d8890ea57f93789; implementation only, publication still needs exact-package acceptance\n"
+        "output": "replacement approved: batch replacement revision 1, work order 3ef097c63da019cf49f035c3d7c1398f411ef9e61e88c5cc2dc389fcd254e981; implementation only, publication still needs exact-package acceptance\n"
       }
     },
     {
@@ -88,7 +96,7 @@
     {
       "name": "N2: exact whole-message hook binds work order",
       "ok": true,
-      "observed": "[acceptance hook] replacement approved: batch replacement revision 1, work order 7a75c03a6c5934de31a638458563ee2a2c453153fb0260b32d8890ea57f93789; implementation only, publication still needs exact-package acceptance\n"
+      "observed": "[acceptance hook] replacement approved: batch replacement revision 1, work order 3ef097c63da019cf49f035c3d7c1398f411ef9e61e88c5cc2dc389fcd254e981; implementation only, publication still needs exact-package acceptance\n"
     },
     {
       "name": "N2: changed work order refuses",
@@ -103,7 +111,7 @@
       "ok": true,
       "observed": {
         "code": 0,
-        "output": "batch replacement r1 authorized: 1 item(s) assigned, batch file frozen as 7a75c03a6c59, snapshot kept at revisions/r1.json\n"
+        "output": "batch replacement r1 authorized: 1 item(s) assigned, batch file frozen as 3ef097c63da0, snapshot kept at revisions/r1.json\n"
       }
     },
     {
@@ -143,7 +151,7 @@
       "ok": true,
       "observed": {
         "code": 1,
-        "output": "release gate: REFUSED for (range):\n  - not a records-only push: item 9001 part all: replacement needs acceptance; never records-only publication\n  - not a records-only push: item 9001 part all: status went back from released to assigned — reopening an accepted fix needs Adam's acceptance, not a records push\n  - no acceptance from Adam names commit d894504. This push breaks a records rule. Go authorizes the work; release needs the whole message \"Accept <batch>, revision <n>, d894504\".\n"
+        "output": "release gate: REFUSED for (range):\n  - not a records-only push: item 9001 part all: replacement needs acceptance; never records-only publication\n  - not a records-only push: item 9001 part all: status went back from released to assigned — reopening an accepted fix needs Adam's acceptance, not a records push\n  - no acceptance from Adam names commit 715f9e3. This push breaks a records rule. Go authorizes the work; release needs the whole message \"Accept <batch>, revision <n>, 715f9e3\".\n"
       }
     },
     {
@@ -178,7 +186,7 @@
           "prior": {
             "batch": "past",
             "revision": 1,
-            "commit": "a68979d3f6bd9f24eeaa8f5926732b3e92135ebb",
+            "commit": "b13939725b53d6512d8349e7dfaf5bd099b3189a",
             "doneBy": "fixture",
             "assertions": [
               {
@@ -195,7 +203,7 @@
           },
           "batch": "replacement",
           "revision": 1,
-          "hash": "7a75c03a6c5934de31a638458563ee2a2c453153fb0260b32d8890ea57f93789"
+          "hash": "3ef097c63da019cf49f035c3d7c1398f411ef9e61e88c5cc2dc389fcd254e981"
         }
       ]
     },
@@ -236,7 +244,7 @@
       "ok": true,
       "observed": {
         "code": 1,
-        "output": "release gate: REFUSED for (range):\n  - no acceptance from Adam names commit 0d24d18. This push changes 1 product or control file(s) (webapp/src/pages/LedgerFixture.tsx). Go authorizes the work; release needs the whole message \"Accept <batch>, revision <n>, 0d24d18\".\n"
+        "output": "release gate: REFUSED for (range):\n  - no acceptance from Adam names commit 5a3a70d. This push changes 1 product or control file(s) (webapp/src/pages/LedgerFixture.tsx). Go authorizes the work; release needs the whole message \"Accept <batch>, revision <n>, 5a3a70d\".\n"
       }
     },
     {
@@ -244,7 +252,7 @@
       "ok": true,
       "observed": {
         "code": 0,
-        "output": "accepted: batch replacement, revision 1, commit 0d24d18ed89a17c1b3693aa9a38cfd2886815836, package abcdef123456\n"
+        "output": "accepted: batch replacement, revision 1, commit 5a3a70d1cd5d2cb59b26896b505682cf42f26b16, package abcdef123456\n"
       }
     },
     {
@@ -252,7 +260,7 @@
       "ok": true,
       "observed": {
         "code": 0,
-        "output": "release gate: ok for (range) — accepted by Adam: batch replacement, revision 1, commit 0d24d18, package abcdef123456 (terminal, 2026-09-19T04:48)\n"
+        "output": "release gate: ok for (range) — accepted by Adam: batch replacement, revision 1, commit 5a3a70d, package abcdef123456 (terminal, 2026-09-19T04:52)\n"
       }
     },
     {
@@ -260,7 +268,7 @@
       "ok": true,
       "observed": {
         "code": 0,
-        "output": "release gate: ok for refs/heads/main — accepted by Adam: batch replacement, revision 1, commit 0d24d18, package abcdef123456 (terminal, 2026-09-19T04:48)\nTo /var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/ledger-lifecycle-ARYFbd/remote.git\n   7dfbcc7..0d24d18  HEAD -> main\n"
+        "output": "release gate: ok for refs/heads/main — accepted by Adam: batch replacement, revision 1, commit 5a3a70d, package abcdef123456 (terminal, 2026-09-19T04:52)\nTo /var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/ledger-lifecycle-AseFae/remote.git\n   07604cb..5a3a70d  HEAD -> main\n"
       }
     },
     {
@@ -268,7 +276,7 @@
       "ok": true,
       "observed": {
         "code": 0,
-        "output": "batch replacement r1 recorded as pushed at 0d24d18 (package abcdef123456); live site: not recorded; Dropbox copies: not recorded\n"
+        "output": "batch replacement r1 recorded as pushed at 5a3a70d (package abcdef123456); live site: not recorded; Dropbox copies: not recorded\n"
       }
     },
     {
@@ -284,7 +292,7 @@
       "ok": true,
       "observed": {
         "code": 0,
-        "output": "guard: note — compared the ledger at bd8825f with the ledger at 7dfbcc7; Adam's acceptance, rejection, ruling and migration records are on his Mac and were not checked here\nguard: ok\n"
+        "output": "guard: note — compared the ledger at 9ee7a1b with the ledger at 07604cb; Adam's acceptance, rejection, ruling and migration records are on his Mac and were not checked here\nguard: ok\n"
       }
     },
     {
@@ -293,9 +301,9 @@
       "observed": {
         "id": "past",
         "revision": 1,
-        "base": "a68979d3f6bd9f24eeaa8f5926732b3e92135ebb",
+        "base": "b13939725b53d6512d8349e7dfaf5bd099b3189a",
         "model": "fixture",
-        "frozenHash": "6ba08328724926903fcd9379f98d357694e574d3dc7d2ca8df3e81a25577352f",
+        "frozenHash": "11366b37e7c3743d4feb079c9c51b93f15968fc432c5d4e10b603ebe3422390d",
         "status": "released",
         "history": [
           {
@@ -318,8 +326,8 @@
         "release": {
           "git": {
             "at": "2026-01-01T00:00:00Z",
-            "remoteMain": "a68979d3f6bd9f24eeaa8f5926732b3e92135ebb",
-            "commit": "a68979d3f6bd9f24eeaa8f5926732b3e92135ebb",
+            "remoteMain": "b13939725b53d6512d8349e7dfaf5bd099b3189a",
+            "commit": "b13939725b53d6512d8349e7dfaf5bd099b3189a",
             "packageId": "simulated-old"
           },
           "deployment": null,
@@ -332,7 +340,7 @@
       "ok": true,
       "observed": {
         "code": 0,
-        "output": "replacement approved: batch reject-assigned revision 1, work order 8f07f16acdd9bb555d9c7a2a6c4082690889716238867df8bf24affcdf56d3a6; implementation only, publication still needs exact-package acceptance\n"
+        "output": "replacement approved: batch reject-assigned revision 1, work order ee34c16162f807378b4ed188dd8569db9e0c8c5321342a805b4cca441efd180d; implementation only, publication still needs exact-package acceptance\n"
       }
     },
     {
@@ -340,7 +348,7 @@
       "ok": true,
       "observed": {
         "code": 0,
-        "output": "batch reject-assigned r1 authorized: 1 item(s) assigned, batch file frozen as 8f07f16acdd9, snapshot kept at revisions/r1.json\n"
+        "output": "batch reject-assigned r1 authorized: 1 item(s) assigned, batch file frozen as ee34c16162f8, snapshot kept at revisions/r1.json\n"
       }
     },
     {
@@ -356,7 +364,7 @@
       "ok": true,
       "observed": {
         "code": 0,
-        "output": "batch reject-assigned r1 rejected on Adam's record of 2026-09-19T04:48 — nothing in it is released; 0 item(s) back to open; 1 prior released fix(es) restored\n"
+        "output": "batch reject-assigned r1 rejected on Adam's record of 2026-09-19T04:52 — nothing in it is released; 0 item(s) back to open; 1 prior released fix(es) restored\n"
       }
     },
     {
@@ -384,53 +392,53 @@
             "revision": 1
           },
           {
-            "at": "2026-09-19T04:48:30.790Z",
+            "at": "2026-09-19T04:52:16.443Z",
             "event": "superseded by approved replacement",
             "batch": "replacement",
             "revision": 1,
-            "note": "prior fix past r1 at a68979d3f6bd9f24eeaa8f5926732b3e92135ebb; approved work order 7a75c03a6c5934de31a638458563ee2a2c453153fb0260b32d8890ea57f93789"
+            "note": "prior fix past r1 at b13939725b53d6512d8349e7dfaf5bd099b3189a; approved work order 3ef097c63da019cf49f035c3d7c1398f411ef9e61e88c5cc2dc389fcd254e981"
           },
           {
-            "at": "2026-09-19T04:48:30.790Z",
+            "at": "2026-09-19T04:52:16.443Z",
             "event": "assigned",
             "batch": "replacement",
             "revision": 1
           },
           {
-            "at": "2026-09-19T04:48:31.349Z",
+            "at": "2026-09-19T04:52:17.110Z",
             "event": "implemented",
             "batch": "replacement",
             "revision": 1,
             "note": "by fixture"
           },
           {
-            "at": "2026-09-19T04:48:31.906Z",
+            "at": "2026-09-19T04:52:17.760Z",
             "event": "accepted by Adam",
             "batch": "replacement",
             "revision": 1,
-            "note": "commit 0d24d18ed89a17c1b3693aa9a38cfd2886815836, package abcdef123456, by terminal"
+            "note": "commit 5a3a70d1cd5d2cb59b26896b505682cf42f26b16, package abcdef123456, by terminal"
           },
           {
-            "at": "2026-09-19T04:48:33.098Z",
+            "at": "2026-09-19T04:52:19.128Z",
             "event": "released",
             "batch": "replacement",
             "revision": 1
           },
           {
-            "at": "2026-09-19T04:48:33.487Z",
+            "at": "2026-09-19T04:52:19.601Z",
             "event": "superseded by approved replacement",
             "batch": "reject-assigned",
             "revision": 1,
-            "note": "prior fix replacement r1 at 0d24d18ed89a17c1b3693aa9a38cfd2886815836; approved work order 8f07f16acdd9bb555d9c7a2a6c4082690889716238867df8bf24affcdf56d3a6"
+            "note": "prior fix replacement r1 at 5a3a70d1cd5d2cb59b26896b505682cf42f26b16; approved work order ee34c16162f807378b4ed188dd8569db9e0c8c5321342a805b4cca441efd180d"
           },
           {
-            "at": "2026-09-19T04:48:33.487Z",
+            "at": "2026-09-19T04:52:19.601Z",
             "event": "assigned",
             "batch": "reject-assigned",
             "revision": 1
           },
           {
-            "at": "2026-09-19T04:48:33.553Z",
+            "at": "2026-09-19T04:52:19.679Z",
             "event": "rejected r1",
             "batch": "reject-assigned",
             "revision": 1,
@@ -442,7 +450,7 @@
             "prior": {
               "batch": "past",
               "revision": 1,
-              "commit": "a68979d3f6bd9f24eeaa8f5926732b3e92135ebb",
+              "commit": "b13939725b53d6512d8349e7dfaf5bd099b3189a",
               "doneBy": "fixture",
               "assertions": [
                 {
@@ -459,13 +467,13 @@
             },
             "batch": "replacement",
             "revision": 1,
-            "hash": "7a75c03a6c5934de31a638458563ee2a2c453153fb0260b32d8890ea57f93789"
+            "hash": "3ef097c63da019cf49f035c3d7c1398f411ef9e61e88c5cc2dc389fcd254e981"
           },
           {
             "prior": {
               "batch": "replacement",
               "revision": 1,
-              "commit": "0d24d18ed89a17c1b3693aa9a38cfd2886815836",
+              "commit": "5a3a70d1cd5d2cb59b26896b505682cf42f26b16",
               "doneBy": "fixture",
               "assertions": [
                 {
@@ -477,13 +485,13 @@
             },
             "batch": "reject-assigned",
             "revision": 1,
-            "hash": "8f07f16acdd9bb555d9c7a2a6c4082690889716238867df8bf24affcdf56d3a6"
+            "hash": "ee34c16162f807378b4ed188dd8569db9e0c8c5321342a805b4cca441efd180d"
           }
         ],
         "fix": {
           "batch": "replacement",
           "revision": 1,
-          "commit": "0d24d18ed89a17c1b3693aa9a38cfd2886815836",
+          "commit": "5a3a70d1cd5d2cb59b26896b505682cf42f26b16",
           "doneBy": "fixture",
           "assertions": [
             {
@@ -500,7 +508,7 @@
       "ok": true,
       "observed": {
         "code": 0,
-        "output": "guard: note — compared the ledger at 4f9161b with the ledger at 9f231e8; Adam's acceptance, rejection, ruling and migration records are on his Mac and were not checked here\nguard: ok\n"
+        "output": "guard: note — compared the ledger at a5a93f0 with the ledger at 3307b2d; Adam's acceptance, rejection, ruling and migration records are on his Mac and were not checked here\nguard: ok\n"
       }
     },
     {
@@ -508,7 +516,7 @@
       "ok": true,
       "observed": {
         "code": 0,
-        "output": "guard: note — compared the ledger at 4f9161b with the ledger at bd8825f; Adam's acceptance, rejection, ruling and migration records are on his Mac and were not checked here\nguard: ok\n"
+        "output": "guard: note — compared the ledger at a5a93f0 with the ledger at 9ee7a1b; Adam's acceptance, rejection, ruling and migration records are on his Mac and were not checked here\nguard: ok\n"
       }
     },
     {
@@ -524,7 +532,7 @@
       "ok": true,
       "observed": {
         "code": 0,
-        "output": "replacement approved: batch reject-implemented revision 1, work order 71943e34914958409cb6dd3144b9610afeca253a43b628bc5444216eb0eb2aa3; implementation only, publication still needs exact-package acceptance\n"
+        "output": "replacement approved: batch reject-implemented revision 1, work order 1c0ae1e6ca0df955ee8328fc8cfb8331ba3137317281e61a8dae6ae926cfb481; implementation only, publication still needs exact-package acceptance\n"
       }
     },
     {
@@ -532,7 +540,7 @@
       "ok": true,
       "observed": {
         "code": 0,
-        "output": "batch reject-implemented r1 authorized: 1 item(s) assigned, batch file frozen as 71943e349149, snapshot kept at revisions/r1.json\n"
+        "output": "batch reject-implemented r1 authorized: 1 item(s) assigned, batch file frozen as 1c0ae1e6ca0d, snapshot kept at revisions/r1.json\n"
       }
     },
     {
@@ -548,7 +556,7 @@
       "ok": true,
       "observed": {
         "code": 0,
-        "output": "batch reject-implemented r1 rejected on Adam's record of 2026-09-19T04:48 — nothing in it is released; 0 item(s) back to open; 1 prior released fix(es) restored\n"
+        "output": "batch reject-implemented r1 rejected on Adam's record of 2026-09-19T04:52 — nothing in it is released; 0 item(s) back to open; 1 prior released fix(es) restored\n"
       }
     },
     {
@@ -576,80 +584,80 @@
             "revision": 1
           },
           {
-            "at": "2026-09-19T04:48:30.790Z",
+            "at": "2026-09-19T04:52:16.443Z",
             "event": "superseded by approved replacement",
             "batch": "replacement",
             "revision": 1,
-            "note": "prior fix past r1 at a68979d3f6bd9f24eeaa8f5926732b3e92135ebb; approved work order 7a75c03a6c5934de31a638458563ee2a2c453153fb0260b32d8890ea57f93789"
+            "note": "prior fix past r1 at b13939725b53d6512d8349e7dfaf5bd099b3189a; approved work order 3ef097c63da019cf49f035c3d7c1398f411ef9e61e88c5cc2dc389fcd254e981"
           },
           {
-            "at": "2026-09-19T04:48:30.790Z",
+            "at": "2026-09-19T04:52:16.443Z",
             "event": "assigned",
             "batch": "replacement",
             "revision": 1
           },
           {
-            "at": "2026-09-19T04:48:31.349Z",
+            "at": "2026-09-19T04:52:17.110Z",
             "event": "implemented",
             "batch": "replacement",
             "revision": 1,
             "note": "by fixture"
           },
           {
-            "at": "2026-09-19T04:48:31.906Z",
+            "at": "2026-09-19T04:52:17.760Z",
             "event": "accepted by Adam",
             "batch": "replacement",
             "revision": 1,
-            "note": "commit 0d24d18ed89a17c1b3693aa9a38cfd2886815836, package abcdef123456, by terminal"
+            "note": "commit 5a3a70d1cd5d2cb59b26896b505682cf42f26b16, package abcdef123456, by terminal"
           },
           {
-            "at": "2026-09-19T04:48:33.098Z",
+            "at": "2026-09-19T04:52:19.128Z",
             "event": "released",
             "batch": "replacement",
             "revision": 1
           },
           {
-            "at": "2026-09-19T04:48:33.487Z",
+            "at": "2026-09-19T04:52:19.601Z",
             "event": "superseded by approved replacement",
             "batch": "reject-assigned",
             "revision": 1,
-            "note": "prior fix replacement r1 at 0d24d18ed89a17c1b3693aa9a38cfd2886815836; approved work order 8f07f16acdd9bb555d9c7a2a6c4082690889716238867df8bf24affcdf56d3a6"
+            "note": "prior fix replacement r1 at 5a3a70d1cd5d2cb59b26896b505682cf42f26b16; approved work order ee34c16162f807378b4ed188dd8569db9e0c8c5321342a805b4cca441efd180d"
           },
           {
-            "at": "2026-09-19T04:48:33.487Z",
+            "at": "2026-09-19T04:52:19.601Z",
             "event": "assigned",
             "batch": "reject-assigned",
             "revision": 1
           },
           {
-            "at": "2026-09-19T04:48:33.553Z",
+            "at": "2026-09-19T04:52:19.679Z",
             "event": "rejected r1",
             "batch": "reject-assigned",
             "revision": 1,
             "note": "simulated rejection"
           },
           {
-            "at": "2026-09-19T04:48:34.235Z",
+            "at": "2026-09-19T04:52:20.501Z",
             "event": "superseded by approved replacement",
             "batch": "reject-implemented",
             "revision": 1,
-            "note": "prior fix replacement r1 at 0d24d18ed89a17c1b3693aa9a38cfd2886815836; approved work order 71943e34914958409cb6dd3144b9610afeca253a43b628bc5444216eb0eb2aa3"
+            "note": "prior fix replacement r1 at 5a3a70d1cd5d2cb59b26896b505682cf42f26b16; approved work order 1c0ae1e6ca0df955ee8328fc8cfb8331ba3137317281e61a8dae6ae926cfb481"
           },
           {
-            "at": "2026-09-19T04:48:34.235Z",
+            "at": "2026-09-19T04:52:20.501Z",
             "event": "assigned",
             "batch": "reject-implemented",
             "revision": 1
           },
           {
-            "at": "2026-09-19T04:48:34.250Z",
+            "at": "2026-09-19T04:52:20.518Z",
             "event": "implemented",
             "batch": "reject-implemented",
             "revision": 1,
             "note": "by fixture"
           },
           {
-            "at": "2026-09-19T04:48:34.320Z",
+            "at": "2026-09-19T04:52:20.597Z",
             "event": "rejected r1",
             "batch": "reject-implemented",
             "revision": 1,
@@ -661,7 +669,7 @@
             "prior": {
               "batch": "past",
               "revision": 1,
-              "commit": "a68979d3f6bd9f24eeaa8f5926732b3e92135ebb",
+              "commit": "b13939725b53d6512d8349e7dfaf5bd099b3189a",
               "doneBy": "fixture",
               "assertions": [
                 {
@@ -678,13 +686,13 @@
             },
             "batch": "replacement",
             "revision": 1,
-            "hash": "7a75c03a6c5934de31a638458563ee2a2c453153fb0260b32d8890ea57f93789"
+            "hash": "3ef097c63da019cf49f035c3d7c1398f411ef9e61e88c5cc2dc389fcd254e981"
           },
           {
             "prior": {
               "batch": "replacement",
               "revision": 1,
-              "commit": "0d24d18ed89a17c1b3693aa9a38cfd2886815836",
+              "commit": "5a3a70d1cd5d2cb59b26896b505682cf42f26b16",
               "doneBy": "fixture",
               "assertions": [
                 {
@@ -696,13 +704,13 @@
             },
             "batch": "reject-assigned",
             "revision": 1,
-            "hash": "8f07f16acdd9bb555d9c7a2a6c4082690889716238867df8bf24affcdf56d3a6"
+            "hash": "ee34c16162f807378b4ed188dd8569db9e0c8c5321342a805b4cca441efd180d"
           },
           {
             "prior": {
               "batch": "replacement",
               "revision": 1,
-              "commit": "0d24d18ed89a17c1b3693aa9a38cfd2886815836",
+              "commit": "5a3a70d1cd5d2cb59b26896b505682cf42f26b16",
               "doneBy": "fixture",
               "assertions": [
                 {
@@ -714,13 +722,13 @@
             },
             "batch": "reject-implemented",
             "revision": 1,
-            "hash": "71943e34914958409cb6dd3144b9610afeca253a43b628bc5444216eb0eb2aa3"
+            "hash": "1c0ae1e6ca0df955ee8328fc8cfb8331ba3137317281e61a8dae6ae926cfb481"
           }
         ],
         "fix": {
           "batch": "replacement",
           "revision": 1,
-          "commit": "0d24d18ed89a17c1b3693aa9a38cfd2886815836",
+          "commit": "5a3a70d1cd5d2cb59b26896b505682cf42f26b16",
           "doneBy": "fixture",
           "assertions": [
             {
@@ -737,7 +745,7 @@
       "ok": true,
       "observed": {
         "code": 0,
-        "output": "guard: note — compared the ledger at efc187d with the ledger at 7016e65; Adam's acceptance, rejection, ruling and migration records are on his Mac and were not checked here\nguard: ok\n"
+        "output": "guard: note — compared the ledger at 9f59622 with the ledger at 4084987; Adam's acceptance, rejection, ruling and migration records are on his Mac and were not checked here\nguard: ok\n"
       }
     },
     {
@@ -745,7 +753,7 @@
       "ok": true,
       "observed": {
         "code": 0,
-        "output": "guard: note — compared the ledger at efc187d with the ledger at 4f9161b; Adam's acceptance, rejection, ruling and migration records are on his Mac and were not checked here\nguard: ok\n"
+        "output": "guard: note — compared the ledger at 9f59622 with the ledger at a5a93f0; Adam's acceptance, rejection, ruling and migration records are on his Mac and were not checked here\nguard: ok\n"
       }
     },
     {
@@ -761,7 +769,7 @@
       "ok": true,
       "observed": {
         "code": 0,
-        "output": "guard: note — compared the ledger at HEAD with the ledger at 0d24d18; Adam's acceptance, rejection, ruling and migration records are on his Mac and were not checked here\nguard: ok\n"
+        "output": "guard: note — compared the ledger at HEAD with the ledger at 5a3a70d; Adam's acceptance, rejection, ruling and migration records are on his Mac and were not checked here\nguard: ok\n"
       }
     },
     {
@@ -769,7 +777,7 @@
       "ok": true,
       "observed": {
         "code": 0,
-        "output": "guard: note — compared the ledger at HEAD with the ledger at 7dfbcc7; Adam's acceptance, rejection, ruling and migration records are on his Mac and were not checked here\nguard: ok\n"
+        "output": "guard: note — compared the ledger at HEAD with the ledger at 07604cb; Adam's acceptance, rejection, ruling and migration records are on his Mac and were not checked here\nguard: ok\n"
       }
     }
   ]

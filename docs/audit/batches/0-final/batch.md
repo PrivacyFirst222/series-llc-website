@@ -35,7 +35,7 @@ The unchanged a68979d controls failed both causal reproductions: real item 17
 assigned caused the mandatory harness to stop with “cannot be claimed twice”;
 an exact approved replacement of a released fixture was refused by the same
 claim rule. These were the intended failures, not missing-helper failures.
-The repaired implementation passed 55/55 lifecycle cases, including actual
+The repaired implementation passed 56/56 lifecycle cases, including actual
 CLI and chat-hook entry points. Logs are retained under evidence/. Owner
 approvals, packages and published fixes in these tests are explicitly simulated.
 
