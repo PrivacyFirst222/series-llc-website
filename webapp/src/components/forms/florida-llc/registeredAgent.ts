@@ -35,7 +35,7 @@ export function patchAgentConsents(data: FloridaLLCFormData, patch: Partial<Flor
     next.registeredAgentResidencyAcknowledgment = false;
     if (next.registeredAgentChoice !== "SERVICE") {
       next.registeredAgentPhysicalAddressAcknowledgment = false;
-      next.registeredAgentAcceptanceName = registeredAgentName(next);
+      next.registeredAgentAcceptanceName = next.filingPath === "CONVERT" ? "" : registeredAgentName(next);
       next.registeredAgentElectronicSignature = "";
       next.registeredAgentAcceptanceCheckbox = false;
       next.registeredAgentSignatureAuthorizationCheckbox = false;

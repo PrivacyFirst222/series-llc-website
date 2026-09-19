@@ -65,12 +65,12 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
       // The permission to keep the card for the yearly renewal, ours only.
       renewalCardConsent: data.registeredAgentChoice === "SERVICE" && data.raRenewalCardConsent === true,
       acceptance: {
-        accepted: data.registeredAgentAcceptanceCheckbox,
-        acceptanceName: data.registeredAgentAcceptanceName,
+        accepted: !(isConversion && data.registeredAgentChoice === "SELF") && data.registeredAgentAcceptanceCheckbox,
+        acceptanceName: isConversion && data.registeredAgentChoice === "SELF" ? "" : data.registeredAgentAcceptanceName,
         capacity: data.registeredAgentAcceptanceCapacity || "",
-        electronicSignature: data.registeredAgentElectronicSignature,
+        electronicSignature: isConversion && data.registeredAgentChoice === "SELF" ? "" : data.registeredAgentElectronicSignature,
         signatureAuthorizationConfirmed:
-          data.registeredAgentSignatureAuthorizationCheckbox,
+          !(isConversion && data.registeredAgentChoice === "SELF") && data.registeredAgentSignatureAuthorizationCheckbox,
       },
     },
     management: {
