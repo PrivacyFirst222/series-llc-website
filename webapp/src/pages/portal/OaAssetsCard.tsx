@@ -59,7 +59,7 @@ export function OaAssetsCard({ units, isMulti, seedSeries, assets, setAssets, on
           const cashAllocated = seedSeries.reduce((a, _, k) => a + (asset.cashAllocations?.[k] ?? 0), 0);
           const cashRest = Math.max(0, (asset.value ?? 0) - cashAllocated);
           return (
-            <div key={i} className="space-y-3 rounded-xl border border-border p-4" data-testid="asset-row">
+            <div key={asset.id ?? i} className="space-y-3 rounded-xl border border-border p-4" data-testid="asset-row">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Asset {i + 1}</span>
                 <Button type="button" variant="ghost" size="sm" className="rounded-full" aria-label={`Remove asset ${i + 1}`} onClick={() => removeAsset(i)}>

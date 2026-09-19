@@ -59,7 +59,10 @@ export async function batch01Walk(browser: Browser, web: string, check: Check) {
     const assets=f.stored.assets;
     await f.page.reload();await f.page.getByRole('button',{name:'Continue',exact:true}).click();
     const after=await f.page.getByLabel('Description of asset 1',{exact:true}).inputValue().catch(()=>null);
-    return {ok:before==='Saved equipment'&&after===before&&JSON.stringify(assets).includes('Saved equipment'),detail:{before,after,assets}};
+    await f.page.getByLabel('Full legal name of owner 1',{exact:true}).fill('Alice Quick Navigation');
+    await f.page.getByRole('link',{name:'Back to portal',exact:true}).click();await f.page.waitForTimeout(900);
+    const navigatedSave=f.stored.members[0].name==='Alice Quick Navigation';
+    return {ok:before==='Saved equipment'&&after===before&&JSON.stringify(assets).includes('Saved equipment')&&navigatedSave,detail:{before,after,assets,navigatedSave}};
   });
   await probe('N3.02',async f=>{
     await f.page.getByLabel('Full legal name of owner 1',{exact:true}).fill('Alice Saved');await f.page.waitForTimeout(900);
@@ -90,7 +93,8 @@ export async function batch01Walk(browser: Browser, web: string, check: Check) {
     const shown=await input.inputValue();
     await input.fill('-100');const invalid=await input.getAttribute('aria-invalid');
     const text=await f.page.locator('main').innerText();
-    return {ok:Number(shown.replace(/,/g,''))===100.5&&invalid==='true'&&text.includes('nonnegative dollar amount'),detail:{shown,invalid}};
+    const blocked=await f.page.getByRole('button',{name:/^Generate .*Operating Agreement/}).isDisabled();
+    return {ok:Number(shown.replace(/,/g,''))===100.5&&invalid==='true'&&text.includes('nonnegative dollar amount')&&blocked,detail:{shown,invalid,blocked}};
   });
   const entity=answers();entity.multiOwner=false;entity.assets=[];entity.members=[{name:'Acme',address,isEntity:true,signerName:'Alice Example',signerTitle:'Manager',percentage:100}];
   await probe('N3.13',async f=>{await f.page.waitForTimeout(900);const button=f.page.getByRole('button',{name:/^Generate .*Operating Agreement/});return {ok:await button.isEnabled(),detail:await f.page.locator('main').innerText()};},entity);
@@ -106,7 +110,14 @@ export async function batch01Walk(browser: Browser, web: string, check: Check) {
     return {ok:cancelled==='34'&&await f.page.getByLabel('Alice Example denominator',{exact:true}).inputValue()==='3',detail:{cancelled}};
   });
   await probe('134',async f=>{const card=f.page.locator('div.rounded-2xl').filter({has:f.page.getByRole('heading',{name:'Effective date',exact:true})}).last();await card.getByRole('button',{name:'Learn More',exact:true}).click();const text=await f.page.getByRole('dialog').innerText();return {ok:text.includes('when you return, we keep your saved date'),detail:text};});
-  await probe('N3.06',async f=>{await f.page.goto(`${web}/portal`);await f.page.getByRole('button',{name:'Provide details securely',exact:true}).click();const text=await f.page.getByRole('dialog').innerText();return {ok:text.includes('Address on file')&&!text.includes('Verified address'),detail:text.match(/(?:Verified address|Address on file)/g)};});
+  await probe('N3.06',async f=>{
+    await f.page.goto(`${web}/portal`);await f.page.getByRole('button',{name:'Provide details securely',exact:true}).click();
+    const text=await f.page.getByRole('dialog').innerText();
+    await f.page.evaluate(()=>{const key='fpsllc-draft:sel:s1';const draft=JSON.parse(localStorage.getItem(key)!);draft.rows[0].verified=true;localStorage.setItem(key,JSON.stringify(draft));});
+    await f.page.reload();await f.page.getByRole('button',{name:'Provide details securely',exact:true}).click();
+    const restored=await f.page.getByRole('dialog').innerText();
+    return {ok:text.includes('Address on file')&&!text.includes('Verified address')&&restored.includes('Address on file')&&!restored.includes('Verified address'),detail:{initial:text.match(/(?:Verified address|Address on file)/g),restored:restored.match(/(?:Verified address|Address on file)/g)}};
+  });
 }
 if(import.meta.main){
   const stack=await startIsolatedStack({cwd:process.cwd()});const browser=await chromium.launch({headless:true});await isolateBrowser(browser,new Set());let failures=0;

@@ -85,6 +85,7 @@ export default function OAQuestionnaire() {
     const next = new Set(prev); if (valid) next.delete(id); else next.add(id); return next;
   }), []);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingSave = useRef<(() => void) | null>(null);
   const [saveFailed, setSaveFailed] = useState<boolean | string>(false);
   // Three questions decide which of the eight forms this is. They come first,
   // on their own screen, so the rest of the page is only ever the questions
@@ -145,7 +146,7 @@ export default function OAQuestionnaire() {
       };
       restored.members = restored.members?.map(m => ({ ...m, id: m.id ?? crypto.randomUUID() }));
       const ids = contributorUnits(restored.members ?? [], restored.couples ?? []).map(u => u.id);
-      restored.assets = reconcileContributors(restored.assets ?? [], ids, ids);
+      restored.assets = reconcileContributors((restored.assets ?? []).map(asset => ({ ...asset, id: asset.id ?? crypto.randomUUID() })), ids, ids);
       setA(restored);
       setLoaded(true);
     }
@@ -196,15 +197,29 @@ export default function OAQuestionnaire() {
       if (p.members) next.members = p.members.map(m => ({ ...m, id: m.id ?? crypto.randomUUID() }));
       const before = contributorUnits(prev.members ?? [], prev.couples ?? []).map(u => u.id);
       const after = contributorUnits(next.members ?? [], next.couples ?? []).map(u => u.id);
-      next.assets = reconcileContributors(next.assets ?? [], before, after);
+      next.assets = reconcileContributors((next.assets ?? []).map(asset => ({ ...asset, id: asset.id ?? crypto.randomUUID() })), before, after);
       const sequence = ++editSequence.current;
       setSaving(true);
       if (saveTimer.current) clearTimeout(saveTimer.current);
-      saveTimer.current = setTimeout(() => save.mutate({ answers: next, sequence }), 400);
+      pendingSave.current = () => save.mutate({ answers: next, sequence });
+      saveTimer.current = setTimeout(() => {
+        saveTimer.current = null;
+        const send = pendingSave.current; pendingSave.current = null; send?.();
+      }, 400);
       return next;
     });
   };
-  useEffect(() => () => { if (saveTimer.current) clearTimeout(saveTimer.current); }, []);
+  useEffect(() => () => {
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    // Navigating within the portal must flush the last debounced edit.
+    const send = pendingSave.current; pendingSave.current = null; send?.();
+  }, []);
+  useEffect(() => {
+    if (!saving && !save.isPending && !saveFailed && invalidMoney.size === 0) return;
+    const warn = (event: BeforeUnloadEvent) => { event.preventDefault(); event.returnValue = ""; };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [saving, save.isPending, saveFailed, invalidMoney.size]);
   const patchMember = (i: number, p: Partial<MemberAnswer>) => {
     const members = [...(a.members ?? [])];
     members[i] = { ...members[i], ...p };

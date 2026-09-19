@@ -107509,6 +107509,7 @@ var oaAnswersSchema = external_exports.object({
   // Capital as a list of assets (Adam, 12 Sep 2026).
   assets: external_exports.array(
     external_exports.object({
+      id: external_exports.string().uuid().optional(),
       description: external_exports.string().max(400).optional(),
       kind: external_exports.enum(["cash", "other"]).optional(),
       value: external_exports.number().min(0).max(1e12).multipleOf(0.01).optional(),

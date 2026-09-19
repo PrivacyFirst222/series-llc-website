@@ -228,6 +228,7 @@ export const oaAnswersSchema = z.object({
   assets: z
     .array(
       z.object({
+        id: z.string().uuid().optional(),
         description: z.string().max(400).optional(),
         kind: z.enum(["cash", "other"]).optional(),
         value: z.number().min(0).max(1_000_000_000_000).multipleOf(0.01).optional(),
@@ -1187,7 +1188,7 @@ app.put("/portal/oa/answers", async (c) => {
   // A revision, when the client supplies one, makes the write monotonic: an
   // earlier keystroke that arrives late is ignored rather than allowed to bury
   // a newer answer. Callers without a revision keep the old unconditional
-  // behaviour and leave the stored revision untouched.
+  // behavior, but advance the revision so guarded editors detect their changes.
   const baseRaw = c.req.query("baseRev");
   if (baseRaw !== undefined) {
     const expected = expectedRevision(baseRaw);
@@ -1240,7 +1241,7 @@ app.post("/portal/oa/generate", async (c) => {
       400,
     );
   }
-  // A first and last name for every owner (Adam, 7 Sep 2026).
+  // Human owners need first and last names; entities have separate human signers.
   const halfNamed = owners.find((o, i) => !(a.members?.[i]?.isEntity ?? seed.members[i]?.isEntity ?? false) && !hasFirstAndLast(o.name));
   if (halfNamed) {
     return c.json(err(`${halfNamed.name}: ${FIRST_AND_LAST} Every owner's full legal name is printed in Exhibit A and the signature block.`, "INVALID_INPUT"), 400);

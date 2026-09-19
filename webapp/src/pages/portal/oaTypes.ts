@@ -40,6 +40,7 @@ export interface CoupleAnswer {
 /** One contributed asset (Adam, 12 Sep 2026): its agreed value, who
  *  contributed it, and where the company allocates it. */
 export interface AssetAnswer {
+  id?: string;
   description?: string;
   kind?: "cash" | "other";
   value?: number;
