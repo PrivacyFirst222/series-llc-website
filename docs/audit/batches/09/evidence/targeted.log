@@ -1,0 +1,25 @@
+review server: process 78903, started by this command from /Users/adam/Documents/FLPSLLC Website Review/batch-09-implementation-2026-09-19/repo/webapp, owns port 51961; it reports offline = true and no live connections (database, square, blob, resend, dropbox, smarty, sunbiz all off); database: a throwaway folder
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+{"ok":true,"label":"batch09 52: addresses explain their use without promising a Sunbiz update"}
+{"ok":true,"label":"batch09 53: existing company type is retained for its agreement"}
+{"ok":true,"label":"batch09 58: abandoned alternate names do not block existing companies"}
+{"ok":true,"label":"batch09 saved existing-company order has no abandoned new names"}
+{"ok":true,"label":"batch09 66: existing company service fee has the receipt label"}
+{"ok":true,"label":"batch09 67: optional step includes documents and services"}
+{"ok":true,"label":"batch09 68: legal and public record consent is given once at certification"}
+{"ok":true,"label":"batch09 77: final button describes payment"}
+{"ok":true,"label":"batch09 79: professional helper names the actual option"}
+{"ok":true,"label":"batch09 81: existing company fee explanation separates agent change"}
+{"ok":true,"label":"batch09 82: adding series terminology is consistent"}
+{"ok":true,"label":"batch09 95:title: banner follows the selected filing path"}
+{"ok":true,"label":"batch09 198: shared documents wording covers existing companies"}
+{"ok":true,"label":"batch09 197: completion email follows each remaining service status"}
+{"ok":true,"label":"batch09 206: service confirmation promises the document"}
+{"ok":true,"label":"batch09 97: existing company filing sheet separates the agent fee"}
+{"ok":true,"label":"batch09 214: historical fee split conflict is marked resolved"}
+{"ok":true,"label":"batch09 215: agent change collection note matches pricing"}
+{"ok":true,"label":"batch09 216: annual report note includes statutory components and exception"}
