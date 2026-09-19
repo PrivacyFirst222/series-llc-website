@@ -33,7 +33,7 @@ export async function batch02Walk(browser:Browser,web:string,check:Check){
   check(tax.includes('Confirm this series'),'batch02 office series tax treatment requires confirmation',tax);await screenshot('office-ein');
  }catch(e){check(false,'batch02 N3.05: office EIN answers name the series applicant',String(e));}
  try{
-  const texts=[];for(const target of ['series','company']){portalTarget=target;await page.goto(`${web}/portal?company=co1`);await page.reload();await page.getByRole('button',{name:'Provide details securely',exact:true}).click();texts.push(await page.getByRole('dialog').innerText());await screenshot(`portal-ein-${target}`);}
+  const texts:string[]=[];for(const target of ['series','company']){portalTarget=target;await page.goto(`${web}/portal?company=co1`);await page.reload();await page.getByRole('button',{name:'Provide details securely',exact:true}).click();texts.push(await page.getByRole('dialog').innerText());await screenshot(`portal-ein-${target}`);}
   check(texts[0].includes(`We use this information to complete the IRS EIN application for ${series}.`)&&texts[1].includes(`We use this information to complete the IRS EIN application for ${name}.`),'batch02 123: EIN description names the applicant directly',texts.map(t=>t.slice(0,400)));
  }catch(e){check(false,'batch02 123: EIN description names the applicant directly',String(e));}
  try{
@@ -47,7 +47,7 @@ export async function batch02Walk(browser:Browser,web:string,check:Check){
   check(disabled&&/name="orderId"\r\n\r\nco1/.test(uploadBody)&&/name="kind"\r\n\r\nlegal_mail/.test(uploadBody),'batch02 office legal-mail upload selects and sends recipient company',{disabled,uploadBody});
  }catch(e){check(false,'batch02 office legal-mail upload selects and sends recipient company',String(e));}
  await page.close();
- const observations=[];
+ const observations:{kind:string;ok:boolean;entity?:unknown;individual?:unknown;error?:string;screen?:string}[]=[];
  for(const kind of ['member','manager'] as const){const p=await browser.newPage();p.setDefaultTimeout(6000);try{
    const data=structuredClone(defaultFormData);data.filingPath='NEW';data.managementStructure=kind==='member'?'MEMBER_MANAGED':'MANAGER_MANAGED';data.members=[{...data.members[0],firstName:'Old',lastName:'Human'}];data.managers=[{...data.managers[0],id:'m1',role:'MGR',personOrEntity:'INDIVIDUAL',firstName:'Old',lastName:'Human',businessEntityName:''}];
    await p.addInitScript(({data,step})=>localStorage.setItem('fl-llc-formation-draft-v1',JSON.stringify({__draft:2,data,stepIndex:step,maxStep:step,visited:Array.from({length:step+1},(_,i)=>i)})),{data,step:kind==='member'?10:11});
@@ -61,4 +61,4 @@ export async function batch02Walk(browser:Browser,web:string,check:Check){
  }catch(e){observations.push({kind,ok:false,error:String(e),screen:await p.locator('body').innerText()});}finally{await p.close();}}
  check(observations.every(x=>x.ok),'batch02 N4.01: changing party type clears the previous name',observations);
 }
-if(import.meta.main){const stack=await startIsolatedStack({cwd:process.cwd()});const browser=await chromium.launch({headless:true});await isolateBrowser(browser,new Set());let failures=0;try{await batch02Walk(browser,stack.web,(ok,label,detail)=>{console.log(JSON.stringify({ok,label,detail:ok?undefined:detail}));if(!ok)failures++;});}finally{await browser.close();stack.stop();}process.exit(failures?1:0);}
+if(import.meta.main){const stack=await startIsolatedStack({cwd:process.cwd()});const browser=await chromium.launch({headless:true});await isolateBrowser(browser);let failures=0;try{await batch02Walk(browser,stack.web,(ok,label,detail)=>{console.log(JSON.stringify({ok,label,detail:ok?undefined:detail}));if(!ok)failures++;});}finally{await browser.close();stack.stop();}process.exit(failures?1:0);}
