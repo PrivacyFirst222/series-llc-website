@@ -2751,7 +2751,7 @@ async function main(): Promise<void> {
   for(const [label,r]of batch04Results)expect(r.ok,label,r.detail);
 
 const batch06Results = new Map<string, {ok:boolean;detail?:unknown}>();
-await batch06Walk(browser, `http://localhost:${WEB_PORT}`, (ok,label,detail)=>batch06Results.set(label,{ok,detail}));
+await batch06Walk(browser, `http://localhost:${WEB_PORT}`, (ok,label,detail)=>batch06Results.set(label,{ok,detail}), API);
 {const r=batch06Results.get('batch06 51: retained agents support individuals and entities');expect(r?.ok===true,'batch06 51: retained agents support individuals and entities',r?.detail);batch06Results.delete('batch06 51: retained agents support individuals and entities');}
 {const r=batch06Results.get('batch06 71: retained agents do not promise a new acceptance');expect(r?.ok===true,'batch06 71: retained agents do not promise a new acceptance',r?.detail);batch06Results.delete('batch06 71: retained agents do not promise a new acceptance');}
 {const r=batch06Results.get('batch06 59: agent change is included in conversion authority');expect(r?.ok===true,'batch06 59: agent change is included in conversion authority',r?.detail);batch06Results.delete('batch06 59: agent change is included in conversion authority');}

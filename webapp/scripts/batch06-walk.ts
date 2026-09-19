@@ -5,7 +5,7 @@ import { agentFixture, batch06Checks } from '../server/batch06-check';
 import { mkdirSync } from 'node:fs';
 import type { FloridaLLCFormData } from '../src/components/forms/florida-llc/types';
 type Check=(ok:boolean,label:string,detail?:unknown)=>void;
-export async function batch06Walk(browser:Browser,web:string,check:Check){
+export async function batch06Walk(browser:Browser,web:string,check:Check,api=web){
  batch06Checks(check);
  const open=async(step:number,data:FloridaLLCFormData):Promise<Page>=>{const p=await browser.newPage();p.setDefaultTimeout(4000);await guardedRoute(p,'**/api/address/check',r=>r.fulfill({contentType:'application/json',body:JSON.stringify({data:{status:'unavailable'}})}));await p.addInitScript(({data,step})=>localStorage.setItem('fl-llc-formation-draft-v1',JSON.stringify({__draft:2,data,stepIndex:step,maxStep:18,visited:Array.from({length:19},(_,i)=>i)})),{data,step});await p.goto(web+'/form-llc');await p.getByRole('heading',{name:step===7?'Registered agent':step===8?'Registered agent acceptance':step===17?(data.filingPath==='CONVERT'?'Certification':'Certification & signature'):'Review your information',exact:true}).waitFor();return p;};
  const shot=async(p:Page,name:string)=>{if(process.env.SHOT_DIR){mkdirSync(process.env.SHOT_DIR,{recursive:true});await p.screenshot({path:`${process.env.SHOT_DIR}/batch06-${name}.png`,fullPage:true});}};
@@ -28,18 +28,19 @@ export async function batch06Walk(browser:Browser,web:string,check:Check){
    try {
      let observed: {ok:boolean; body: {data?: {orderId?:string}}} | undefined;
      await guardedRoute(p,'**/api/orders',async route=>{
-       const request=route.request();const response=await localFetch(request.url(),{method:request.method(),headers:request.headers(),body:request.postData()});const body=await response.text();
+       const request=route.request();const response=await localFetch(api+'/api/orders',{method:request.method(),headers:request.headers(),body:request.postData()});const body=await response.text();
        observed={ok:response.ok,body:JSON.parse(body)};
        await route.fulfill({status:response.status,contentType:'application/json',body});
      });
      await p.getByRole('button',{name:'Submit intake',exact:true}).click();
      for(let i=0;!observed&&i<40;i++)await p.waitForTimeout(100);
-     check(observed?.ok===true,'batch06 retained entity submits through actual form',observed);
+     check(observed?.ok===true,'batch06 retained entity submits through actual form',observed??{page:await p.locator('main').innerText()});
      if(observed?.ok) {
-       const login=await p.request.post(web+'/api/admin/login',{data:{password:'dev-admin'},headers:{'x-forwarded-for':'192.0.2.206'}});
-       const detail=await p.request.get(web+'/api/admin/orders/'+observed.body.data?.orderId);
+       const login=await localFetch(api+'/api/admin/login',{method:'POST',body:JSON.stringify({password:'dev-admin'}),headers:{'content-type':'application/json','x-forwarded-for':'192.0.2.206'}});
+       const cookie=(login.headers.get('set-cookie')??'').split(';')[0];
+       const detail=await localFetch(api+'/api/admin/orders/'+observed.body.data?.orderId,{headers:{cookie}});
        const saved=(await detail.json()).data?.payload;
-       check(login.ok()&&detail.ok()&&saved?.registeredAgent?.type==='ENTITY'&&saved.registeredAgent.businessEntityName==='Existing Agent Inc.'&&saved.registeredAgent.name==='Existing Agent Inc.'&&!saved.registeredAgent.firstName&&!saved.registeredAgent.acceptance.electronicSignature&&saved.acknowledgments.registeredAgentSeriesAgreementAcknowledgment===true&&saved.acknowledgments.registeredAgentExistingRecordAcknowledgment===true,'batch06 retained entity submits and reaches office intact',saved);
+       check(login.ok&&detail.ok&&saved?.registeredAgent?.type==='ENTITY'&&saved.registeredAgent.businessEntityName==='Existing Agent Inc.'&&saved.registeredAgent.name==='Existing Agent Inc.'&&!saved.registeredAgent.firstName&&!saved.registeredAgent.acceptance.electronicSignature&&saved.acknowledgments.registeredAgentSeriesAgreementAcknowledgment===true&&saved.acknowledgments.registeredAgentExistingRecordAcknowledgment===true,'batch06 retained entity submits and reaches office intact',saved);
      }
    } finally {await p.close();}
  });
@@ -52,4 +53,4 @@ export async function batch06Walk(browser:Browser,web:string,check:Check){
  });
 
 }
-if(import.meta.main){const stack=await startIsolatedStack({cwd:process.cwd()});const browser=await chromium.launch({headless:true});await isolateBrowser(browser);let failed=0;try{await batch06Walk(browser,stack.web,(ok,label,detail)=>{console.log(JSON.stringify({ok,label,detail:ok?undefined:detail}));if(!ok)failed++;});}finally{await browser.close();stack.stop();}process.exit(failed?1:0);}
+if(import.meta.main){const stack=await startIsolatedStack({cwd:process.cwd()});const browser=await chromium.launch({headless:true});await isolateBrowser(browser);let failed=0;try{await batch06Walk(browser,stack.web,(ok,label,detail)=>{console.log(JSON.stringify({ok,label,detail:ok?undefined:detail}));if(!ok)failed++;},stack.api);}finally{await browser.close();stack.stop();}process.exit(failed?1:0);}
