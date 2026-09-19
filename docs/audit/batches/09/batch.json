@@ -1,0 +1,453 @@
+{
+  "id": "09",
+  "revision": 1,
+  "title": "Existing companies and the filing flow",
+  "model": "Codex",
+  "base": "c22d47592edf06826e0bfbad69f42e349dda44f7",
+  "items": [
+    {
+      "id": "52",
+      "part": "all",
+      "scope": "addresses explain their use without promising a Sunbiz update",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch09 52: addresses explain their use without promising a Sunbiz update"
+        }
+      ]
+    },
+    {
+      "id": "53",
+      "part": "all",
+      "scope": "existing company type is retained for its agreement",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch09 53: existing company type is retained for its agreement"
+        }
+      ]
+    },
+    {
+      "id": "58",
+      "part": "all",
+      "scope": "abandoned alternate names do not block existing companies",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch09 58: abandoned alternate names do not block existing companies"
+        }
+      ]
+    },
+    {
+      "id": "66",
+      "part": "all",
+      "scope": "existing company service fee has the receipt label",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch09 66: existing company service fee has the receipt label"
+        }
+      ]
+    },
+    {
+      "id": "67",
+      "part": "all",
+      "scope": "optional step includes documents and services",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch09 67: optional step includes documents and services"
+        }
+      ]
+    },
+    {
+      "id": "68",
+      "part": "all",
+      "scope": "legal and public record consent is given once at certification",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch09 68: legal and public record consent is given once at certification"
+        }
+      ]
+    },
+    {
+      "id": "77",
+      "part": "all",
+      "scope": "final button describes payment",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch09 77: final button describes payment"
+        }
+      ]
+    },
+    {
+      "id": "79",
+      "part": "all",
+      "scope": "professional helper names the actual option",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch09 79: professional helper names the actual option"
+        }
+      ]
+    },
+    {
+      "id": "81",
+      "part": "all",
+      "scope": "existing company fee explanation separates agent change",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch09 81: existing company fee explanation separates agent change"
+        }
+      ]
+    },
+    {
+      "id": "82",
+      "part": "all",
+      "scope": "adding series terminology is consistent",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch09 82: adding series terminology is consistent"
+        }
+      ]
+    },
+    {
+      "id": "95",
+      "part": "title",
+      "scope": "banner follows the selected filing path",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch09 95:title: banner follows the selected filing path"
+        }
+      ]
+    },
+    {
+      "id": "80",
+      "part": "all",
+      "scope": "shared documents wording covers existing companies",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch09 198: shared documents wording covers existing companies"
+        }
+      ]
+    },
+    {
+      "id": "95",
+      "part": "eyebrow",
+      "scope": "shared documents wording covers existing companies",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch09 198: shared documents wording covers existing companies"
+        }
+      ]
+    },
+    {
+      "id": "149",
+      "part": "all",
+      "scope": "shared documents wording covers existing companies",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch09 198: shared documents wording covers existing companies"
+        }
+      ]
+    },
+    {
+      "id": "198",
+      "part": "all",
+      "scope": "shared documents wording covers existing companies",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch09 198: shared documents wording covers existing companies"
+        }
+      ]
+    },
+    {
+      "id": "197",
+      "part": "all",
+      "scope": "completion email follows each remaining service status",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch09 197: completion email follows each remaining service status"
+        }
+      ]
+    },
+    {
+      "id": "206",
+      "part": "all",
+      "scope": "service confirmation promises the document",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch09 206: service confirmation promises the document"
+        }
+      ]
+    },
+    {
+      "id": "97",
+      "part": "all",
+      "scope": "existing company filing sheet separates the agent fee",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch09 97: existing company filing sheet separates the agent fee"
+        }
+      ]
+    },
+    {
+      "id": "214",
+      "part": "all",
+      "scope": "historical fee split conflict is marked resolved",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch09 214: historical fee split conflict is marked resolved"
+        }
+      ]
+    },
+    {
+      "id": "215",
+      "part": "all",
+      "scope": "agent change collection note matches pricing",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch09 215: agent change collection note matches pricing"
+        }
+      ]
+    },
+    {
+      "id": "216",
+      "part": "all",
+      "scope": "annual report note includes statutory components and exception",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch09 216: annual report note includes statutory components and exception"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepIntro.tsx",
+      "mode": "code",
+      "why": "Approved Batch 09 existing-company flow, retained records, notices, service status and consistent terminology."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepFilingPath.tsx",
+      "mode": "code",
+      "why": "Approved Batch 09 existing-company flow, retained records, notices, service status and consistent terminology."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepPrincipalAddress.tsx",
+      "mode": "code",
+      "why": "Approved Batch 09 existing-company flow, retained records, notices, service status and consistent terminology."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepMailingAddress.tsx",
+      "mode": "code",
+      "why": "Approved Batch 09 existing-company flow, retained records, notices, service status and consistent terminology."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepName.tsx",
+      "mode": "code",
+      "why": "Approved Batch 09 existing-company flow, retained records, notices, service status and consistent terminology."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepOptionalDocs.tsx",
+      "mode": "code",
+      "why": "Approved Batch 09 existing-company flow, retained records, notices, service status and consistent terminology."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepClient.tsx",
+      "mode": "code",
+      "why": "Approved Batch 09 existing-company flow, retained records, notices, service status and consistent terminology."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/ServiceFeeEstimate.tsx",
+      "mode": "code",
+      "why": "Approved Batch 09 existing-company flow, retained records, notices, service status and consistent terminology."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/FloridaLLCFormationForm.tsx",
+      "mode": "code",
+      "why": "Approved Batch 09 existing-company flow, retained records, notices, service status and consistent terminology."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/schema.ts",
+      "mode": "code",
+      "why": "Approved Batch 09 existing-company flow, retained records, notices, service status and consistent terminology."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/stepValidation.ts",
+      "mode": "code",
+      "why": "Approved Batch 09 existing-company flow, retained records, notices, service status and consistent terminology."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/buildPayload.ts",
+      "mode": "code",
+      "why": "Approved Batch 09 existing-company flow, retained records, notices, service status and consistent terminology."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/steps.ts",
+      "mode": "code",
+      "why": "Approved Batch 09 existing-company flow, retained records, notices, service status and consistent terminology."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/types.ts",
+      "mode": "code",
+      "why": "Approved Batch 09 existing-company flow, retained records, notices, service status and consistent terminology."
+    },
+    {
+      "path": "webapp/src/pages/FormLLC.tsx",
+      "mode": "code",
+      "why": "Approved Batch 09 existing-company flow, retained records, notices, service status and consistent terminology."
+    },
+    {
+      "path": "webapp/src/pages/Pricing.tsx",
+      "mode": "code",
+      "why": "Approved Batch 09 existing-company flow, retained records, notices, service status and consistent terminology."
+    },
+    {
+      "path": "webapp/src/pages/FAQ.tsx",
+      "mode": "code",
+      "why": "Approved Batch 09 existing-company flow, retained records, notices, service status and consistent terminology."
+    },
+    {
+      "path": "webapp/src/pages/portal/PortalLogin.tsx",
+      "mode": "code",
+      "why": "Approved Batch 09 existing-company flow, retained records, notices, service status and consistent terminology."
+    },
+    {
+      "path": "webapp/src/pages/portal/ServicesCard.tsx",
+      "mode": "code",
+      "why": "Approved Batch 09 existing-company flow, retained records, notices, service status and consistent terminology."
+    },
+    {
+      "path": "webapp/src/content/oaLearnMore.tsx",
+      "mode": "code",
+      "why": "Approved Batch 09 existing-company flow, retained records, notices, service status and consistent terminology."
+    },
+    {
+      "path": "webapp/server/validation.ts",
+      "mode": "code",
+      "why": "Approved Batch 09 existing-company flow, retained records, notices, service status and consistent terminology."
+    },
+    {
+      "path": "webapp/server/email.ts",
+      "mode": "code",
+      "why": "Approved Batch 09 existing-company flow, retained records, notices, service status and consistent terminology."
+    },
+    {
+      "path": "webapp/server/routes-admin.ts",
+      "mode": "code",
+      "why": "Approved Batch 09 existing-company flow, retained records, notices, service status and consistent terminology."
+    },
+    {
+      "path": "webapp/server/filing.ts",
+      "mode": "code",
+      "why": "Approved Batch 09 existing-company flow, retained records, notices, service status and consistent terminology."
+    },
+    {
+      "path": "webapp/server/order-summary.ts",
+      "mode": "code",
+      "why": "Approved Batch 09 existing-company flow, retained records, notices, service status and consistent terminology."
+    },
+    {
+      "path": "webapp/server/chapter-605-notes.md",
+      "mode": "code",
+      "why": "Approved Batch 09 existing-company flow, retained records, notices, service status and consistent terminology."
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "why": "Approved Batch 09 existing-company flow, retained records, notices, service status and consistent terminology."
+    },
+    {
+      "path": "docs/facts.md",
+      "mode": "code",
+      "control": true,
+      "why": "Correct the shared existing-company fee wording and its required locations; preserve other facts."
+    },
+    {
+      "path": "webapp/scripts/behavioral.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Update affected approved wording selectors and assertions; retain previous behavior coverage. Add route-level completion-email status verification where applicable."
+    },
+    {
+      "path": "webapp/scripts/batch06-walk.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Update affected approved wording selectors and assertions; retain previous behavior coverage. Add route-level completion-email status verification where applicable."
+    },
+    {
+      "path": "webapp/scripts/batch08-walk.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Update affected approved wording selectors and assertions; retain previous behavior coverage. Add route-level completion-email status verification where applicable."
+    },
+    {
+      "path": "webapp/server/e2e.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Update affected approved wording selectors and assertions; retain previous behavior coverage. Add route-level completion-email status verification where applicable."
+    },
+    {
+      "path": "webapp/server/batch02-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Update affected approved wording selectors and assertions; retain previous behavior coverage. Add route-level completion-email status verification where applicable."
+    },
+    {
+      "path": "webapp/server/order-summary.test.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Update affected approved wording selectors and assertions; retain previous behavior coverage. Add route-level completion-email status verification where applicable."
+    },
+    {
+      "path": "webapp/scripts/batch09-walk.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Durable isolated before/after browser, payload, service-email, filing-sheet and fee-note checks for all 18 approved units."
+    }
+  ],
+  "requiredChecks": [],
+  "testSupport": [
+    "webapp/scripts/batch09-walk.ts"
+  ],
+  "removedChecks": [
+    "words: Getting started carries the $125 sentence in Adam's words"
+  ]
+}

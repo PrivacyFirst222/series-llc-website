@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { PageHero } from "@/components/sections/PageHero";
 import { FloridaLLCFormationForm } from "@/components/forms/florida-llc/FloridaLLCFormationForm";
@@ -8,14 +9,15 @@ export default function FormLLC() {
   const location = useLocation();
   const fromState = (location.state as { path?: unknown } | null)?.path;
   const path = new URLSearchParams(location.search).get("path") ?? (typeof fromState === "string" ? fromState : null);
-  const isConversion = path === "convert";
+  const [filingPath, setFilingPath] = useState<"NEW" | "CONVERT">(path === "convert" ? "CONVERT" : "NEW");
+  const isConversion = filingPath === "CONVERT";
   return (
     <>
       <PageHero
-        eyebrow="Florida LLC formation"
+        eyebrow={isConversion ? "Protected Series Designations" : "Florida LLC formation"}
         align="center"
         title={
-          <>
+          isConversion ? <>Add protected series to your <em>existing Florida LLC</em></> : <>
             Form your <em>Florida Protected Series LLC</em>
           </>
         }
@@ -25,7 +27,7 @@ export default function FormLLC() {
             : "Tell us about your LLC. We'll prepare clean, validated Articles of Organization for filing with the Florida Division of Corporations. Saved automatically as you go."
         }
       />
-      <FloridaLLCFormationForm />
+      <FloridaLLCFormationForm onFilingPathChange={setFilingPath} />
     </>
   );
 }

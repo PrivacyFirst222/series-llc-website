@@ -22,6 +22,7 @@ export function StepPrincipalAddress({ data, patch, errors }: StepProps) {
         <p className="text-sm text-muted-foreground max-w-2xl">
           This should be the street address of the LLC's principal office.
           P.O. boxes are not accepted for the principal office.
+          {data.filingPath === "CONVERT" ? " We use this address in your operating agreement. Entering it here does not update the address on Sunbiz." : ""}
         </p>
       </header>
 

@@ -1,3 +1,4 @@
+import { batch09Walk } from "./batch09-walk";
 import { batch08Walk } from "./batch08-walk";
 import { batch07Walk } from "./batch07-walk";
 import { batch06Walk } from "./batch06-walk";
@@ -707,7 +708,7 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
     // refused and the step stays; the exact name clears it.
     const sig3 = page.getByLabel(/electronic signature/i).first();
     if (await sig3.isVisible().catch(() => false)) {
-      await page.locator("main button").filter({ hasText: /^Submit intake/ }).first().click();
+      await page.locator("main button").filter({ hasText: /^(Continue to payment|Submit intake)$/ }).first().click();
       await page.waitForTimeout(1500);
       expect(!captured && /Certif/i.test(await stepHeading(page).catch(() => "")), `${run.key}: submitting is refused while the signature does not match the name`, await stepHeading(page).catch(() => "(navigated)"));
       await sig3.fill("Casey Gatecheck");
@@ -727,7 +728,7 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
   // Submit navigates to the (fake) checkout, so the page leaves the SPA —
   // success is the CAPTURED accepted POST, not any heading. A submit that
   // instead bounces to an earlier step is a real finding: dump its errors.
-  await page.locator("main button").filter({ hasText: /^Submit intake/ }).first().click();
+  await page.locator("main button").filter({ hasText: /^(Continue to payment|Submit intake)$/ }).first().click();
   for (let i = 0; i < 40 && !captured; i++) await page.waitForTimeout(500);
   if (!captured) {
     const where = await stepHeading(page).catch(() => "(page navigated)");
@@ -2189,7 +2190,7 @@ async function main(): Promise<void> {
         expect(/validated Articles of Organization/.test(newBanner), "words: a new formation's banner still promises Articles", newBanner.slice(0, 300));
         await page.evaluate(() => localStorage.clear());
         const started = await read("/form-llc");
-        expect(/Converting skips the \$125 filing fee for the Articles and Registered Agent \(if you keep your existing Registered Agent\)\./.test(started), "words: Getting started carries the $125 sentence in Adam's words", started.match(/Converting skips[^\n]*/)?.[0]);
+        expect(/No Articles filing fee\. If you appoint us as your registered agent, a separate \$25 state change-of-agent fee applies\./.test(started), "words: Getting started separates Articles and agent-change fees", started);
         expect(!/Secretary of State/.test(started), "words: the form does not say Secretary of State");
       }
       {
@@ -2719,6 +2720,28 @@ async function main(): Promise<void> {
       await page.close();
     }
   }
+
+const batch09Results = new Map<string,{ok:boolean;detail?:unknown}>();
+await batch09Walk(browser, `http://localhost:${WEB_PORT}`, (ok,label,detail)=>batch09Results.set(label,{ok,detail}), API);
+{const r=batch09Results.get("batch09 52: addresses explain their use without promising a Sunbiz update");expect(r?.ok===true,"batch09 52: addresses explain their use without promising a Sunbiz update",r?.detail);batch09Results.delete("batch09 52: addresses explain their use without promising a Sunbiz update");}
+{const r=batch09Results.get("batch09 53: existing company type is retained for its agreement");expect(r?.ok===true,"batch09 53: existing company type is retained for its agreement",r?.detail);batch09Results.delete("batch09 53: existing company type is retained for its agreement");}
+{const r=batch09Results.get("batch09 58: abandoned alternate names do not block existing companies");expect(r?.ok===true,"batch09 58: abandoned alternate names do not block existing companies",r?.detail);batch09Results.delete("batch09 58: abandoned alternate names do not block existing companies");}
+{const r=batch09Results.get("batch09 66: existing company service fee has the receipt label");expect(r?.ok===true,"batch09 66: existing company service fee has the receipt label",r?.detail);batch09Results.delete("batch09 66: existing company service fee has the receipt label");}
+{const r=batch09Results.get("batch09 67: optional step includes documents and services");expect(r?.ok===true,"batch09 67: optional step includes documents and services",r?.detail);batch09Results.delete("batch09 67: optional step includes documents and services");}
+{const r=batch09Results.get("batch09 68: legal and public record consent is given once at certification");expect(r?.ok===true,"batch09 68: legal and public record consent is given once at certification",r?.detail);batch09Results.delete("batch09 68: legal and public record consent is given once at certification");}
+{const r=batch09Results.get("batch09 77: final button describes payment");expect(r?.ok===true,"batch09 77: final button describes payment",r?.detail);batch09Results.delete("batch09 77: final button describes payment");}
+{const r=batch09Results.get("batch09 79: professional helper names the actual option");expect(r?.ok===true,"batch09 79: professional helper names the actual option",r?.detail);batch09Results.delete("batch09 79: professional helper names the actual option");}
+{const r=batch09Results.get("batch09 81: existing company fee explanation separates agent change");expect(r?.ok===true,"batch09 81: existing company fee explanation separates agent change",r?.detail);batch09Results.delete("batch09 81: existing company fee explanation separates agent change");}
+{const r=batch09Results.get("batch09 82: adding series terminology is consistent");expect(r?.ok===true,"batch09 82: adding series terminology is consistent",r?.detail);batch09Results.delete("batch09 82: adding series terminology is consistent");}
+{const r=batch09Results.get("batch09 95:title: banner follows the selected filing path");expect(r?.ok===true,"batch09 95:title: banner follows the selected filing path",r?.detail);batch09Results.delete("batch09 95:title: banner follows the selected filing path");}
+{const r=batch09Results.get("batch09 198: shared documents wording covers existing companies");expect(r?.ok===true,"batch09 198: shared documents wording covers existing companies",r?.detail);batch09Results.delete("batch09 198: shared documents wording covers existing companies");}
+{const r=batch09Results.get("batch09 197: completion email follows each remaining service status");expect(r?.ok===true,"batch09 197: completion email follows each remaining service status",r?.detail);batch09Results.delete("batch09 197: completion email follows each remaining service status");}
+{const r=batch09Results.get("batch09 206: service confirmation promises the document");expect(r?.ok===true,"batch09 206: service confirmation promises the document",r?.detail);batch09Results.delete("batch09 206: service confirmation promises the document");}
+{const r=batch09Results.get("batch09 97: existing company filing sheet separates the agent fee");expect(r?.ok===true,"batch09 97: existing company filing sheet separates the agent fee",r?.detail);batch09Results.delete("batch09 97: existing company filing sheet separates the agent fee");}
+{const r=batch09Results.get("batch09 214: historical fee split conflict is marked resolved");expect(r?.ok===true,"batch09 214: historical fee split conflict is marked resolved",r?.detail);batch09Results.delete("batch09 214: historical fee split conflict is marked resolved");}
+{const r=batch09Results.get("batch09 215: agent change collection note matches pricing");expect(r?.ok===true,"batch09 215: agent change collection note matches pricing",r?.detail);batch09Results.delete("batch09 215: agent change collection note matches pricing");}
+{const r=batch09Results.get("batch09 216: annual report note includes statutory components and exception");expect(r?.ok===true,"batch09 216: annual report note includes statutory components and exception",r?.detail);batch09Results.delete("batch09 216: annual report note includes statutory components and exception");}
+for(const [label,r] of batch09Results) expect(r.ok,label,r.detail);
 
 const batch08Results = new Map<string,{ok:boolean;detail?:unknown}>();
 await batch08Walk(browser, `http://localhost:${WEB_PORT}`, (ok,label,detail)=>batch08Results.set(label,{ok,detail}), API);

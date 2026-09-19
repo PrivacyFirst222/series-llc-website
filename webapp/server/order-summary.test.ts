@@ -73,5 +73,11 @@ check("the summary records the address and browser", /203\.0\.113\.7/.test(md) &
 check("the summary records the name check the client saw", /Availability check the client saw:\*\* E2E Coastal Holdings, LLC: clear/.test(md));
 const pending = summaryMarkdown({ ...row, paid_at: null, square_payment_id: null });
 check("before payment the summary says so", /not yet received at the time of this summary/.test(pending));
+const legacyPayload = structuredClone(payload);
+legacyPayload.acknowledgments.notLegalAdvice = true;
+legacyPayload.acknowledgments.publicRecordNotice = true;
+const legacyMd = summaryMarkdown({ ...row, payload: legacyPayload });
+check("historical order summary retains the removed Eligibility consents actually given", legacyMd.includes("I understand that this service does not provide legal, tax, or accounting advice.") && legacyMd.includes("I understand that information submitted to the Florida Division of Corporations may become part of the public record."));
+check("new order summary records the final consent without inventing removed Eligibility consents", !md.includes("I understand that this service") && !md.includes("I understand that information submitted") && md.includes("I understand this service does not provide legal, tax, or accounting advice.") && md.includes("I understand that filed information may become part of the public record."));
 console.log(`\n${checks} checks, ${failures} failures`);
 if (failures > 0) process.exit(1);

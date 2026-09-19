@@ -72,7 +72,7 @@ export const LEARN_MORE: Record<string, LearnMoreScreen> = {
           the old agreement — whatever it said — no longer governs, and only the new document
           controls. Choose this if the company already has an operating agreement of any kind:
           one we generated before, one prepared elsewhere, or even an informal oral arrangement
-          among the owners. If you converted an existing LLC, your company almost certainly has a
+          among the owners. If you added protected series to an existing LLC, your company almost certainly has a
           prior agreement, which is why we've pre-selected this option for you.
         </Choice>
         <P>

@@ -121,6 +121,7 @@ export interface FloridaLLCFormData {
   // Section 1
   formationType: FormationType;
   isFloridaDomesticEntityOnly: boolean;
+  /** Legacy Eligibility value; new orders record only Certification consent. */
   notLegalAdvice: boolean;
   publicRecordNotice: boolean;
 
@@ -354,7 +355,8 @@ export interface SubmissionPayload {
    *  10 Sep 2026): the record of what the client agreed to. */
   acknowledgments: {
     isFloridaDomesticEntityOnly: boolean;
-    notLegalAdvice: boolean;
+    /** Legacy Eligibility value; new orders record only Certification consent. */
+  notLegalAdvice: boolean;
     publicRecordNotice: boolean;
     nameSearchAcknowledgment: boolean;
     governmentAffiliationAcknowledgment: boolean;

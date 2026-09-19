@@ -76,8 +76,6 @@ const FIELD_STEP: Record<string, StepKey> = {
   confirmClientEmail: "client",
   clientPhone: "client",
   isFloridaDomesticEntityOnly: "intro",
-  notLegalAdvice: "intro",
-  publicRecordNotice: "intro",
   desiredLlcName: "name",
   llcDesignator: "name",
   alternateName1: "name",

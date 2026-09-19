@@ -24,7 +24,7 @@ export function StepIntro({ data, patch, errors }: StepProps) {
         </p>
       </header>
 
-      <FieldShell label="Formation type" required helper="Choose 'Professional LLC' if your business will provide a regulated professional service such as law, medicine, or accounting.">
+      <FieldShell label={converting ? "Existing company type" : "Formation type"} required helper={converting ? "Choose how your existing company is currently organized: Domestic Florida LLC or Domestic Florida PLLC. We use this answer to prepare your operating agreement; it does not change your company type on Sunbiz." : "Choose 'Domestic Florida PLLC' if your business will provide a regulated professional service such as law, medicine, or accounting."}>
         <div className="grid sm:grid-cols-2 gap-3">
           {([
             { val: "DOMESTIC_LLC", title: "Domestic Florida LLC", sub: "Standard LLC for any lawful business." },
@@ -62,20 +62,8 @@ export function StepIntro({ data, patch, errors }: StepProps) {
             : "I understand this form is for forming a new domestic Florida series LLC only."}
           error={errors.isFloridaDomesticEntityOnly}
         />
-        <AcknowledgeBox
-          id="ack-legal"
-          checked={data.notLegalAdvice}
-          onChange={(v) => patch({ notLegalAdvice: v })}
-          label="I understand that this service does not provide legal, tax, or accounting advice."
-          error={errors.notLegalAdvice}
-        />
-        <AcknowledgeBox
-          id="ack-public"
-          checked={data.publicRecordNotice}
-          onChange={(v) => patch({ publicRecordNotice: v })}
-          label="I understand that information submitted to the Florida Division of Corporations may become part of the public record."
-          error={errors.publicRecordNotice}
-        />
+        <p className="text-sm text-muted-foreground">This service does not provide legal, tax, or accounting advice.</p>
+        <p className="text-sm text-muted-foreground">Information submitted to the Florida Division of Corporations may become part of the public record.</p>
       </div>
     </div>
   );

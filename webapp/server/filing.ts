@@ -255,7 +255,7 @@ function conversionGroups(p: PayloadLike): FilingGroup[] {
         {
           key: "filingPath",
           label: "Filing",
-          value: "Protected Series Designations for an existing Florida LLC — filed online at the Division, $25 each; no Articles; the $125 Articles-and-agent fee is skipped unless the agent changes",
+          value: "Protected Series Designations for an existing Florida LLC — filed online at the Division, $25 each; no Articles filing fee. If the company appoints us as its registered agent, file a separate Statement of Change with a $25 state fee.",
           statement: true,
           block: true,
         },

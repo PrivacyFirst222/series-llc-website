@@ -29,7 +29,7 @@ const FAQ_ITEMS: {
     a: "One. Every protected series in the LLC we form for you is owned by the LLC itself, so the company and all of its series operate under a single Federal Tax ID Number. A series would need its own EIN only in narrower situations — for example, if it has its own employees. If you believe you need separate EINs for separate series, that is a question for your CPA, and it generally signals a structure more complex than the one we prepare.",
   },
   {
-    q: "I already have a Florida LLC. Can I convert it instead of starting over?",
+    q: "I already have a Florida LLC. Can I add protected series instead of starting over?",
     a: "Yes. Florida law lets an existing Florida LLC add protected series, so you don't need to dissolve anything or form a new company. The service fee is the same $499 and covers up to 3 Protected Series Designations including their state filing fees, and you skip the $125 filing fee for the Articles and Registered Agent because your LLC is already on file with the state. If you choose our registered agent service, Florida charges $25 to change the agent on file for your LLC.",
     link: { to: "/pricing", label: "See both options" },
   },

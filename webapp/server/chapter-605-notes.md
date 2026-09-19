@@ -261,20 +261,30 @@ or changing a registered agent $25** · (8) agent's resignation, company not
 dissolved $85 · (9) same, dissolved $25 · (10) certificate of conversion $25 ·
 (11) any other LLC document **$25** · (12) certificate of status **$5**.
 
-**Conflicts with what we charge.** On 2026-08-10 Adam directed "It's a $125
+**Historical fee-split conflict — resolved.** On 2026-08-10 Adam directed "It's a $125
 filing fee for the Articles. No fee to designate a registered agent," and the
-calculator became articles $125 / agent $0. The statute splits it: $100 (2) +
-$25 (7) = $125. Same total to the customer, but our line items describe the fee
-contrary to the statute on a page that says fees are "at cost."
+calculator then became articles $125 / agent $0. That historical instruction is
+preserved here; it does not describe the current calculator. `server/pricing.ts`
+and `src/components/forms/florida-llc/validation.ts` now split the new-company
+fee into $100 for Articles under (2) plus $25 for the agent designation under (7).
+The total remains $125.
 
-**Conversion gap.** A converting client files no articles, so $0 is right IF they
-keep their own agent. If they take our registered agent service that is a change
-of agent — $25 under (7) — which we stopped collecting. Our intake offers exactly
-that choice.
+**Historical agent-change collection gap — resolved.** An existing company
+adding protected series files no new Articles. Both current calculators charge
+$0 for a retained agent and $25 for appointing our registered agent service,
+the change-of-agent fee under (7). The earlier stopped-collecting warning no
+longer describes the order form or server pricing.
 
-**Annual report unresolved.** (5) says $50; the site publishes $138.75 / $538.75
-late. Chapter 605 does not explain the difference. Treat $138.75 and the $400
-penalty as unverified until the Department's schedule is checked.
+**Annual report — verified, 19 September 2026.** Section 605.0213(5) supplies
+$50; [s. 607.193(1)](https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0607/Sections/0607.193.html)
+adds the $88.75 supplemental corporate fee to entities reporting under
+s. 605.0212, giving $138.75. Section 607.193(2)(b) adds $400 when that fee is
+remitted after May 1, ordinarily totaling $538.75. Its exception is a business
+entity administratively dissolved or with authority revoked for failure to
+file an annual report that subsequently applies for reinstatement and pays
+the applicable reinstatement fee. The $538.75 figure is not a statement of
+reinstatement fees. Checked against both sections in the 2026 Florida Statutes
+on Online Sunshine, not inferred from Chapter 605 alone.
 
 ## Findings — ss. 605.0109-605.0216
 

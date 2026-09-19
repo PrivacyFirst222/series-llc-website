@@ -30,9 +30,6 @@ export function validateStep(
   if (step === "intro") {
     if (!data.isFloridaDomesticEntityOnly)
       e.isFloridaDomesticEntityOnly = "Acknowledgment is required.";
-    if (!data.notLegalAdvice) e.notLegalAdvice = "Acknowledgment is required.";
-    if (!data.publicRecordNotice)
-      e.publicRecordNotice = "Acknowledgment is required.";
   }
 
   if (step === "client") {

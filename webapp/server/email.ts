@@ -87,7 +87,7 @@ export function welcomeEmail(name: string, setPasswordUrl: string, isConversion 
     html: wrap(`
       <p>Hi ${escapeHtml(name || "there")},</p>
       ${preparing}
-      <p>Your client portal is ready — it's where your formation documents will be posted${raService ? `,
+      <p>Your client portal is ready — it's where your documents will be posted${raService ? `,
       and where any legal mail we receive as your registered agent will be available to
       download` : ""}.${manualReady ? ` Your Owner's Manual — the plain-English guide to running your protected
       series LLC — is already in your portal's library, ready to download.` : ""}</p>
@@ -311,7 +311,7 @@ export function serviceOrderClientEmail(opts: {
       : `<p><strong>One step is needed from you:</strong> sign in to your portal and provide the
        responsible party's details through the secure form. We cannot obtain the EIN until you do.
        For your security, never send Social Security numbers by email.</p>`
-    : `<p>No further action is needed from you. We'll post the confirmation to your portal when
+    : `<p>No further action is needed from you. We'll post the document to your portal when
        the work is complete.</p>`;
   return {
     subject,
@@ -425,8 +425,7 @@ export function llcFormedEmail(opts: {
   isConversion?: boolean;
   seriesNames: string[];
   otherDocuments: string[];
-  einOrdered: boolean;
-  sElectionOrdered: boolean;
+  outstandingServices: { type: "ein" | "s-election"; status: "awaiting_info" | "in_progress"; seriesName?: string }[];
   portalUrl: string;
 }): { subject: string; html: string } {
   const series = opts.seriesNames.map((n) => `<li>${escapeHtml(n)}</li>`).join("");
@@ -441,14 +440,14 @@ export function llcFormedEmail(opts: {
     : `<p>Congratulations, your Florida Protected Series LLC,
       <strong>${escapeHtml(opts.llcName)}</strong>, has been officially formed
       with the Florida Division of Corporations!</p>`;
-  const svc =
-    opts.einOrdered && opts.sElectionOrdered
-      ? " Your Federal EIN and S election package orders are in your portal as well — that's our next step."
-      : opts.einOrdered
-        ? " Your Federal EIN order is in your portal as well — that's our next step."
-        : opts.sElectionOrdered
-          ? " Your S election package order is in your portal as well — that's our next step."
-          : "";
+  const serviceNote = (name: string, status: "awaiting_info" | "in_progress" | null) =>
+    status === "awaiting_info"
+      ? `<p>Your ${name} order needs your details. Sign in to your portal, open <strong>Orders in progress</strong>, and choose <strong>Provide details securely</strong> for that order.</p>`
+      : status === "in_progress"
+        ? `<p>We have received your details and will prepare your ${name}. No further details are needed from you at this stage.</p>`
+        : "";
+  const svc = opts.outstandingServices.map((service) => serviceNote(service.type === "s-election" ? "S election package" : `Federal EIN${service.seriesName ? ` for ${escapeHtml(service.seriesName)}` : ""}`, service.status)).join("");
+  const sElectionStatus = opts.outstandingServices.find((service) => service.type === "s-election")?.status;
   return {
     subject: opts.isConversion ? `${opts.llcName} — protected series established` : `${opts.llcName} is formed`,
     html: wrap(`
@@ -466,11 +465,10 @@ export function llcFormedEmail(opts: {
       <p>Keep these with your company records — a bank, a title company, or a
       closing agent will ask for them.</p>
       <p>The next step is to create your operating agreement. You can do that
-      in your personal portal (<a href="${opts.portalUrl}">Click here to open</a>).${svc}</p>
-      ${opts.sElectionOrdered ? `<p>Your S election form is now open in your portal: sign in, open
-      <strong>Orders in progress</strong>, and choose <strong>Provide details securely</strong>.
-      IRS Form 2553 must be filed within 2 months and 15 days of the date on your filed
-      Articles, so please complete the form soon.</p>` : ""}
+      in your personal portal (<a href="${opts.portalUrl}">Click here to open</a>).</p>
+      ${svc}
+      ${sElectionStatus ? `<p>IRS Form 2553 must be filed within 2 months and 15 days of the date on your filed
+      Articles.${sElectionStatus === "awaiting_info" ? " Please complete the form soon." : ""}</p>` : ""}
       <p>Thank you for doing business with MyFloridaSeriesLLC!</p>
       <p>support@myfloridaseriesllc.com</p>
     `),

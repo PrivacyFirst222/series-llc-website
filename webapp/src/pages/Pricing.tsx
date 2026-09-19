@@ -31,7 +31,7 @@ const PACKAGES: {
   {
     key: "convert",
     eyebrow: "Existing LLC",
-    heading: "Convert your existing Florida LLC",
+    heading: "Add protected series to your existing Florida LLC",
     blurb: "You already have a Florida LLC. You skip the $125 filing fee for the Articles and Registered Agent, because the company is already on file with the state.",
     stateFees: ["No $125 filing fee for the Articles and Registered Agent — your LLC already exists", "$25 state fee to change your registered agent if you take our service"],
     features: [
@@ -52,7 +52,7 @@ export default function Pricing() {
             Honest pricing. <em>One flat fee</em>. Three series included.
           </>
         }
-        description="The same $499 service fee whether you are forming a new Protected Series LLC or converting the Florida LLC you already have. Need more series, or a Federal EIN? Add them at a straightforward rate."
+        description="The same $499 service fee whether you are forming a new Protected Series LLC or adding protected series to the Florida LLC you already have. Need more series, or a Federal EIN? Add them at a straightforward rate."
       />
 
       <section className="container-wide section-pb">

@@ -34,7 +34,7 @@ export default function PortalLogin() {
         <span className="eyebrow">Client portal</span>
         <h1 className="display mt-3 text-3xl">Sign in</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Access the documents from your formation package and anything we have
+          Access your documents and anything we have
           received for you as registered agent.
         </p>
         <form onSubmit={submit} className="mt-8 space-y-5">

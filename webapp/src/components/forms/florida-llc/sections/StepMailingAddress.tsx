@@ -18,6 +18,7 @@ export function StepMailingAddress({ data, patch, errors }: StepProps) {
         <p className="text-sm text-muted-foreground max-w-2xl">
           Florida allows the mailing address to be different from the principal
           office address. A P.O. Box is acceptable for the mailing address.
+          {data.filingPath === "CONVERT" ? " We keep this mailing address in your office order records. Entering it here does not update the address on Sunbiz." : ""}
         </p>
       </header>
 

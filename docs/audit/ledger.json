@@ -1983,14 +1983,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T22:59:25.945Z",
+              "event": "assigned",
+              "batch": "09",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T23:05:23.198Z",
+              "event": "implemented",
+              "batch": "09",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "09",
+          "fix": {
+            "batch": "09",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch09 52: addresses explain their use without promising a Sunbiz update"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -2014,14 +2041,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T22:59:25.945Z",
+              "event": "assigned",
+              "batch": "09",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T23:05:23.198Z",
+              "event": "implemented",
+              "batch": "09",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "09",
+          "fix": {
+            "batch": "09",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch09 53: existing company type is retained for its agreement"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -2308,14 +2362,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T22:59:25.945Z",
+              "event": "assigned",
+              "batch": "09",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T23:05:23.198Z",
+              "event": "implemented",
+              "batch": "09",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "09",
+          "fix": {
+            "batch": "09",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch09 58: abandoned alternate names do not block existing companies"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -2713,14 +2794,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T22:59:25.945Z",
+              "event": "assigned",
+              "batch": "09",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T23:05:23.198Z",
+              "event": "implemented",
+              "batch": "09",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "09",
+          "fix": {
+            "batch": "09",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch09 66: existing company service fee has the receipt label"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -2743,14 +2851,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T22:59:25.945Z",
+              "event": "assigned",
+              "batch": "09",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T23:05:23.198Z",
+              "event": "implemented",
+              "batch": "09",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "09",
+          "fix": {
+            "batch": "09",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch09 67: optional step includes documents and services"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -2775,14 +2910,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T22:59:25.945Z",
+              "event": "assigned",
+              "batch": "09",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T23:05:23.198Z",
+              "event": "implemented",
+              "batch": "09",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "09",
+          "fix": {
+            "batch": "09",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch09 68: legal and public record consent is given once at certification"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -3216,14 +3378,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T22:59:25.945Z",
+              "event": "assigned",
+              "batch": "09",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T23:05:23.198Z",
+              "event": "implemented",
+              "batch": "09",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "09",
+          "fix": {
+            "batch": "09",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch09 77: final button describes payment"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -3276,14 +3465,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T22:59:25.945Z",
+              "event": "assigned",
+              "batch": "09",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T23:05:23.198Z",
+              "event": "implemented",
+              "batch": "09",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "09",
+          "fix": {
+            "batch": "09",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch09 79: professional helper names the actual option"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -3306,17 +3522,44 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T22:59:25.945Z",
+              "event": "assigned",
+              "batch": "09",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T23:05:23.198Z",
+              "event": "implemented",
+              "batch": "09",
+              "revision": 1,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "198",
             "part": "all"
+          },
+          "batch": "09",
+          "fix": {
+            "batch": "09",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch09 198: shared documents wording covers existing companies"
+              }
+            ]
           }
         }
       ],
@@ -3340,14 +3583,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T22:59:25.945Z",
+              "event": "assigned",
+              "batch": "09",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T23:05:23.198Z",
+              "event": "implemented",
+              "batch": "09",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "09",
+          "fix": {
+            "batch": "09",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch09 81: existing company fee explanation separates agent change"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -3373,14 +3643,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T22:59:25.945Z",
+              "event": "assigned",
+              "batch": "09",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T23:05:23.198Z",
+              "event": "implemented",
+              "batch": "09",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "09",
+          "fix": {
+            "batch": "09",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch09 82: adding series terminology is consistent"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -3876,23 +4173,50 @@
         {
           "key": "eyebrow",
           "scope": "On the existing-LLC path the banner's eyebrow still says formation.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T22:59:25.945Z",
+              "event": "assigned",
+              "batch": "09",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T23:05:23.198Z",
+              "event": "implemented",
+              "batch": "09",
+              "revision": 1,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "198",
             "part": "all"
+          },
+          "batch": "09",
+          "fix": {
+            "batch": "09",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch09 198: shared documents wording covers existing companies"
+              }
+            ]
           }
         },
         {
           "key": "title",
           "scope": "The banner title on the existing-LLC path.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [
             "ruling:82"
           ],
@@ -3900,8 +4224,35 @@
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T22:59:25.945Z",
+              "event": "assigned",
+              "batch": "09",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T23:05:23.198Z",
+              "event": "implemented",
+              "batch": "09",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "09",
+          "fix": {
+            "batch": "09",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch09 95:title: banner follows the selected filing path"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -3962,14 +4313,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T22:59:25.945Z",
+              "event": "assigned",
+              "batch": "09",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T23:05:23.198Z",
+              "event": "implemented",
+              "batch": "09",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "09",
+          "fix": {
+            "batch": "09",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch09 97: existing company filing sheet separates the agent fee"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -6006,17 +6384,44 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T22:59:25.945Z",
+              "event": "assigned",
+              "batch": "09",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T23:05:23.198Z",
+              "event": "implemented",
+              "batch": "09",
+              "revision": 1,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "198",
             "part": "all"
+          },
+          "batch": "09",
+          "fix": {
+            "batch": "09",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch09 198: shared documents wording covers existing companies"
+              }
+            ]
           }
         }
       ],
@@ -8401,14 +8806,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T22:59:25.945Z",
+              "event": "assigned",
+              "batch": "09",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T23:05:23.198Z",
+              "event": "implemented",
+              "batch": "09",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "09",
+          "fix": {
+            "batch": "09",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch09 197: completion email follows each remaining service status"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -8432,14 +8864,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T22:59:25.945Z",
+              "event": "assigned",
+              "batch": "09",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T23:05:23.198Z",
+              "event": "implemented",
+              "batch": "09",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "09",
+          "fix": {
+            "batch": "09",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch09 198: shared documents wording covers existing companies"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -8837,14 +9296,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T22:59:25.945Z",
+              "event": "assigned",
+              "batch": "09",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T23:05:23.198Z",
+              "event": "implemented",
+              "batch": "09",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "09",
+          "fix": {
+            "batch": "09",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch09 206: service confirmation promises the document"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -9194,14 +9680,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T22:59:25.945Z",
+              "event": "assigned",
+              "batch": "09",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T23:05:23.198Z",
+              "event": "implemented",
+              "batch": "09",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "09",
+          "fix": {
+            "batch": "09",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch09 214: historical fee split conflict is marked resolved"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -9224,14 +9737,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T22:59:25.945Z",
+              "event": "assigned",
+              "batch": "09",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T23:05:23.198Z",
+              "event": "implemented",
+              "batch": "09",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "09",
+          "fix": {
+            "batch": "09",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch09 215: agent change collection note matches pricing"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -9254,14 +9794,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T22:59:25.945Z",
+              "event": "assigned",
+              "batch": "09",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T23:05:23.198Z",
+              "event": "implemented",
+              "batch": "09",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "09",
+          "fix": {
+            "batch": "09",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch09 216: annual report note includes statutory components and exception"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -13575,6 +14142,24 @@
       "kind": "ruling",
       "item": "98",
       "text": "Batch 08 items 14 and 15: “The articles are entered manually and will contain that language. Do nothing”. Leave the current office filing instructions unchanged."
+    },
+    {
+      "date": "2026-09-19",
+      "kind": "ruling",
+      "item": "52",
+      "text": "Keep principal and mailing address questions for existing companies; explain principal address feeds the operating agreement, mailing is retained in office order records, and neither entry updates Sunbiz."
+    },
+    {
+      "date": "2026-09-19",
+      "kind": "ruling",
+      "item": "68",
+      "text": "Show plain no-advice and public-record notices at Eligibility; require the corresponding checkboxes once at Certification."
+    },
+    {
+      "date": "2026-09-19",
+      "kind": "ruling",
+      "item": "82",
+      "text": "Use adding protected series to an existing Florida LLC in visible service wording; keep internal codes and existing orders compatible."
     }
   ],
   "batches": [
@@ -13898,6 +14483,25 @@
         },
         {
           "at": "2026-09-19T22:11:28.857Z",
+          "event": "implemented"
+        }
+      ]
+    },
+    {
+      "id": "09",
+      "revision": 1,
+      "frozenHash": "636c8f6e97fac2dceff0544627599cc3d6eb83f8f6ba570407e74bc8e5331df4",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "c22d47592edf06826e0bfbad69f42e349dda44f7",
+      "history": [
+        {
+          "at": "2026-09-19T22:59:25.946Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-19T23:05:23.198Z",
           "event": "implemented"
         }
       ]

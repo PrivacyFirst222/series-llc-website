@@ -111,12 +111,9 @@ export const formationFormSchema = z.object({
   isFloridaDomesticEntityOnly: z.literal(true, {
     errorMap: () => ({ message: "Acknowledgment is required." }),
   }),
-  notLegalAdvice: z.literal(true, {
-    errorMap: () => ({ message: "Acknowledgment is required." }),
-  }),
-  publicRecordNotice: z.literal(true, {
-    errorMap: () => ({ message: "Acknowledgment is required." }),
-  }),
+  // Retained for old drafts only; consent is required once, at Certification.
+  notLegalAdvice: z.boolean().optional().default(false),
+  publicRecordNotice: z.boolean().optional().default(false),
 
   desiredLlcName: z.string().min(1, "LLC name is required"),
   llcDesignator: z.enum(llcDesignators, {

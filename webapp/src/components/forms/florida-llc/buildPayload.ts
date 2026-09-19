@@ -149,8 +149,8 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
     },
     acknowledgments: {
       isFloridaDomesticEntityOnly: data.isFloridaDomesticEntityOnly === true,
-      notLegalAdvice: data.notLegalAdvice === true,
-      publicRecordNotice: data.publicRecordNotice === true,
+      notLegalAdvice: false, // Removed Eligibility checkbox; do not invent consent from a stale draft.
+      publicRecordNotice: false, // The actual final consent is recorded above.
       nameSearchAcknowledgment: data.nameSearchAcknowledgment === true,
       governmentAffiliationAcknowledgment: data.governmentAffiliationAcknowledgment === true,
       lawfulPurposeNameAcknowledgment: data.lawfulPurposeNameAcknowledgment === true,

@@ -14,9 +14,9 @@ export function StepOptionalDocs({ data, patch, errors }: StepProps) {
   return (
     <div className="space-y-6">
       <header className="space-y-2">
-        <h2 className="font-display text-3xl">Optional state documents</h2>
+        <h2 className="font-display text-3xl">Optional documents and services</h2>
         <p className="text-sm text-muted-foreground max-w-2xl">
-          Add optional documents from the Florida Division of Corporations.
+          Add optional documents from the Florida Division of Corporations and IRS-related services.
           State fees may change without notice.
         </p>
       </header>

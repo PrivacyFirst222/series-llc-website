@@ -99236,12 +99236,9 @@ var formationFormSchema = external_exports.object({
   isFloridaDomesticEntityOnly: external_exports.literal(true, {
     errorMap: () => ({ message: "Acknowledgment is required." })
   }),
-  notLegalAdvice: external_exports.literal(true, {
-    errorMap: () => ({ message: "Acknowledgment is required." })
-  }),
-  publicRecordNotice: external_exports.literal(true, {
-    errorMap: () => ({ message: "Acknowledgment is required." })
-  }),
+  // Retained for old drafts only; consent is required once, at Certification.
+  notLegalAdvice: external_exports.boolean().optional().default(false),
+  publicRecordNotice: external_exports.boolean().optional().default(false),
   desiredLlcName: external_exports.string().min(1, "LLC name is required"),
   llcDesignator: external_exports.enum(llcDesignators, {
     errorMap: () => ({ message: "Choose an LLC designator." })
@@ -99723,10 +99720,10 @@ var extendedFormSchema = formationFormSchema.extend({
     ctx.addIssue({
       code: external_exports.ZodIssueCode.custom,
       path: ["existingLlcName"],
-      message: "The existing LLC's name is required for a conversion."
+      message: "The existing LLC's name is required to add protected series."
     });
   }
-  {
+  if (data.filingPath !== "CONVERT") {
     const pk = normalizeEntityName(data.desiredLlcName ?? "");
     const a1 = normalizeEntityName(data.alternateName1 ?? "");
     const a2 = normalizeEntityName(data.alternateName2 ?? "");
@@ -100031,8 +100028,10 @@ function buildPayload(data) {
     },
     acknowledgments: {
       isFloridaDomesticEntityOnly: data.isFloridaDomesticEntityOnly === true,
-      notLegalAdvice: data.notLegalAdvice === true,
-      publicRecordNotice: data.publicRecordNotice === true,
+      notLegalAdvice: false,
+      // Removed Eligibility checkbox; do not invent consent from a stale draft.
+      publicRecordNotice: false,
+      // The actual final consent is recorded above.
       nameSearchAcknowledgment: data.nameSearchAcknowledgment === true,
       governmentAffiliationAcknowledgment: data.governmentAffiliationAcknowledgment === true,
       lawfulPurposeNameAcknowledgment: data.lawfulPurposeNameAcknowledgment === true,
@@ -100223,7 +100222,7 @@ function welcomeEmail(name, setPasswordUrl, isConversion = false, raService = tr
     html: wrap(`
       <p>Hi ${escapeHtml(name || "there")},</p>
       ${preparing}
-      <p>Your client portal is ready \u2014 it's where your formation documents will be posted${raService ? `,
+      <p>Your client portal is ready \u2014 it's where your documents will be posted${raService ? `,
       and where any legal mail we receive as your registered agent will be available to
       download` : ""}.${manualReady ? ` Your Owner's Manual \u2014 the plain-English guide to running your protected
       series LLC \u2014 is already in your portal's library, ready to download.` : ""}</p>
@@ -100395,7 +100394,7 @@ function serviceOrderClientEmail(opts) {
          deadline, so please do this promptly. For your security, never send Social Security
          numbers by email.</p>` : `<p><strong>One step is needed from you:</strong> sign in to your portal and provide the
        responsible party's details through the secure form. We cannot obtain the EIN until you do.
-       For your security, never send Social Security numbers by email.</p>` : `<p>No further action is needed from you. We'll post the confirmation to your portal when
+       For your security, never send Social Security numbers by email.</p>` : `<p>No further action is needed from you. We'll post the document to your portal when
        the work is complete.</p>`;
   return {
     subject,
@@ -100472,7 +100471,9 @@ function llcFormedEmail(opts) {
       Florida Division of Corporations!</p>` : `<p>Congratulations, your Florida Protected Series LLC,
       <strong>${escapeHtml(opts.llcName)}</strong>, has been officially formed
       with the Florida Division of Corporations!</p>`;
-  const svc = opts.einOrdered && opts.sElectionOrdered ? " Your Federal EIN and S election package orders are in your portal as well \u2014 that's our next step." : opts.einOrdered ? " Your Federal EIN order is in your portal as well \u2014 that's our next step." : opts.sElectionOrdered ? " Your S election package order is in your portal as well \u2014 that's our next step." : "";
+  const serviceNote = (name, status) => status === "awaiting_info" ? `<p>Your ${name} order needs your details. Sign in to your portal, open <strong>Orders in progress</strong>, and choose <strong>Provide details securely</strong> for that order.</p>` : status === "in_progress" ? `<p>We have received your details and will prepare your ${name}. No further details are needed from you at this stage.</p>` : "";
+  const svc = opts.outstandingServices.map((service) => serviceNote(service.type === "s-election" ? "S election package" : `Federal EIN${service.seriesName ? ` for ${escapeHtml(service.seriesName)}` : ""}`, service.status)).join("");
+  const sElectionStatus = opts.outstandingServices.find((service) => service.type === "s-election")?.status;
   return {
     subject: opts.isConversion ? `${opts.llcName} \u2014 protected series established` : `${opts.llcName} is formed`,
     html: wrap(`
@@ -100490,11 +100491,10 @@ function llcFormedEmail(opts) {
       <p>Keep these with your company records \u2014 a bank, a title company, or a
       closing agent will ask for them.</p>
       <p>The next step is to create your operating agreement. You can do that
-      in your personal portal (<a href="${opts.portalUrl}">Click here to open</a>).${svc}</p>
-      ${opts.sElectionOrdered ? `<p>Your S election form is now open in your portal: sign in, open
-      <strong>Orders in progress</strong>, and choose <strong>Provide details securely</strong>.
-      IRS Form 2553 must be filed within 2 months and 15 days of the date on your filed
-      Articles, so please complete the form soon.</p>` : ""}
+      in your personal portal (<a href="${opts.portalUrl}">Click here to open</a>).</p>
+      ${svc}
+      ${sElectionStatus ? `<p>IRS Form 2553 must be filed within 2 months and 15 days of the date on your filed
+      Articles.${sElectionStatus === "awaiting_info" ? " Please complete the form soon." : ""}</p>` : ""}
       <p>Thank you for doing business with MyFloridaSeriesLLC!</p>
       <p>support@myfloridaseriesllc.com</p>
     `)
@@ -106471,7 +106471,7 @@ function conversionGroups(p2) {
         {
           key: "filingPath",
           label: "Filing",
-          value: "Protected Series Designations for an existing Florida LLC \u2014 filed online at the Division, $25 each; no Articles; the $125 Articles-and-agent fee is skipped unless the agent changes",
+          value: "Protected Series Designations for an existing Florida LLC \u2014 filed online at the Division, $25 each; no Articles filing fee. If the company appoints us as its registered agent, file a separate Statement of Change with a $25 state fee.",
           statement: true,
           block: true
         },
@@ -108754,8 +108754,8 @@ init_pdf_render();
 init_storage();
 var ACKNOWLEDGMENTS = [
   { field: "isFloridaDomesticEntityOnly", text: (p2) => p2.filingPath === "CONVERT" ? "I understand this form is for an existing Florida LLC that is already on file with the Division of Corporations, and that it adds protected series to that company." : "I understand this form is for forming a new domestic Florida series LLC only." },
-  { field: "notLegalAdvice", text: "I understand that this service does not provide legal, tax, or accounting advice." },
-  { field: "publicRecordNotice", text: "I understand that information submitted to the Florida Division of Corporations may become part of the public record." },
+  { field: "notLegalAdvice", text: "I understand that this service does not provide legal, tax, or accounting advice.", when: (p2) => p2.acknowledgments?.notLegalAdvice === true },
+  { field: "publicRecordNotice", text: "I understand that information submitted to the Florida Division of Corporations may become part of the public record.", when: (p2) => p2.acknowledgments?.publicRecordNotice === true },
   { field: "nameSearchAcknowledgment", text: "I understand that availability is not guaranteed until accepted by the Florida Division of Corporations." },
   { field: "governmentAffiliationAcknowledgment", text: "I confirm the name does not imply affiliation with a state or federal government agency." },
   { field: "lawfulPurposeNameAcknowledgment", text: "I confirm the name does not imply a purpose unauthorized for this LLC." },
@@ -108814,7 +108814,7 @@ function summaryMarkdown(o) {
   out.push(`This summary records the order as it was placed and, once received, as it was paid. It is kept for the office and does not appear in the client's portal.`);
   out.push(`## The order`);
   out.push(line("Company", o.llc_name));
-  out.push(line("Filing", conversion ? `Conversion of an existing Florida LLC (document ${p2.sunbizDocumentNumber || "not given"})` : "New Florida LLC"));
+  out.push(line("Filing", conversion ? `Adding protected series to an existing Florida LLC (document ${p2.sunbizDocumentNumber || "not given"})` : "New Florida LLC"));
   out.push(line("Client", `${o.contact_name} <${o.contact_email}>`));
   out.push(line("Placed", when(o.created_at)));
   out.push(line("Paid", o.paid_at ? when(o.paid_at) : "not yet received at the time of this summary"));
@@ -111812,7 +111812,7 @@ function registerAdminRoutes(app2) {
     ]);
     if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
     if (isConversionPayload(rows[0].payload)) {
-      return c.json(err("A conversion has nothing to send to the Division: its Designations are filed online.", "BAD_STATE"), 400);
+      return c.json(err("An existing-company order has nothing to send to the Division: its Designations are filed online.", "BAD_STATE"), 400);
     }
     if (rows[0].status !== "paid") {
       return c.json(err(`Only an order in New Orders can be marked sent; this order\u2019s filing status is ${rows[0].status}.`, "BAD_STATE"), 400);
@@ -112003,7 +112003,7 @@ function registerAdminRoutes(app2) {
     const o = rows[0];
     if (!o.client_id) return c.json(err("This order has no client account yet.", "NO_CLIENT"), 400);
     if (isConversionPayload(o.payload)) {
-      return c.json(err("A conversion has no Articles of Organization: the company already exists.", "BAD_STATE"), 400);
+      return c.json(err("Adding protected series requires no new Articles of Organization: the company already exists.", "BAD_STATE"), 400);
     }
     if (o.status !== "filed") {
       return c.json(err(`The filed Articles are uploaded while the order is With The State; ${whereItIs(o)}`, "BAD_STATE"), 400);
@@ -112291,7 +112291,7 @@ function registerAdminRoutes(app2) {
         );
         await associateLegacyServices(o.client_id);
         const openSvc = await db.query(
-          `SELECT type FROM service_orders WHERE client_id = $1 AND formation_order_id = $2
+          `SELECT type, status, details FROM service_orders WHERE client_id = $1 AND formation_order_id = $2
         AND type IN ('ein', 's-election') AND status IN ('awaiting_info', 'in_progress')`,
           [o.client_id, o.id]
         );
@@ -112306,8 +112306,10 @@ function registerAdminRoutes(app2) {
             ...certDocs.some((d2) => d2.kind === "certificate-of-status") ? ["Certificate of Status"] : [],
             ...certDocs.some((d2) => d2.kind === "certified-copy") ? ["Certified Copy of the Articles"] : []
           ],
-          einOrdered: openSvc.some((r) => r.type === "ein"),
-          sElectionOrdered: openSvc.some((r) => r.type === "s-election"),
+          outstandingServices: openSvc.map((r) => {
+            const details = typeof r.details === "string" ? JSON.parse(r.details) : r.details;
+            return { type: r.type, status: r.status, ...r.type === "ein" && details?.target === "series" && details.seriesName ? { seriesName: details.seriesName } : {} };
+          }),
           portalUrl: `${env.PUBLIC_BASE_URL}/portal`
         });
         notified = await sendMail({ to: clients[0].email, ...mail }).then(

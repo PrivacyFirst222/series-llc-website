@@ -28,7 +28,7 @@ export function StepClient({ data, patch, errors }: StepProps) {
       <header className="space-y-2">
         <h2 className="font-display text-3xl">Your information</h2>
         <p className="text-sm text-muted-foreground max-w-2xl">
-          Tell us who you are. Your client portal, your formation documents,
+          Tell us who you are. Your client portal, your documents,
           and our emails about your LLC all belong to the person named here —
           and later questions offer your name and address wherever they fit,
           so you won't retype them.

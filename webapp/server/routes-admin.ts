@@ -241,7 +241,7 @@ app.post("/admin/orders/:id/filed", async (c) => {
   // The card hides the button for a conversion; the server refuses too
   // (14 Sep 2026): a conversion has no Articles to send.
   if (isConversionPayload(rows[0].payload)) {
-    return c.json(err("A conversion has nothing to send to the Division: its Designations are filed online.", "BAD_STATE"), 400);
+    return c.json(err("An existing-company order has nothing to send to the Division: its Designations are filed online.", "BAD_STATE"), 400);
   }
   if (rows[0].status !== "paid") {
     return c.json(err(`Only an order in New Orders can be marked sent; this order’s filing status is ${rows[0].status}.`, "BAD_STATE"), 400);
@@ -497,7 +497,7 @@ app.post("/admin/orders/:id/articles", async (c) => {
   // A conversion has no Articles: refused here as the card refuses to offer
   // it (14 Sep 2026), so no Statement can be issued for a company we never formed.
   if (isConversionPayload(o.payload)) {
-    return c.json(err("A conversion has no Articles of Organization: the company already exists.", "BAD_STATE"), 400);
+    return c.json(err("Adding protected series requires no new Articles of Organization: the company already exists.", "BAD_STATE"), 400);
   }
   // The card offers the upload only while the order is With The State.
   if (o.status !== "filed") {
@@ -851,8 +851,8 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
       [o.id],
     );
     await associateLegacyServices(o.client_id);
-    const openSvc = await db.query<{ type: string }>(
-      `SELECT type FROM service_orders WHERE client_id = $1 AND formation_order_id = $2
+    const openSvc = await db.query<{ type: "ein" | "s-election"; status: "awaiting_info" | "in_progress"; details: unknown }>(
+      `SELECT type, status, details FROM service_orders WHERE client_id = $1 AND formation_order_id = $2
         AND type IN ('ein', 's-election') AND status IN ('awaiting_info', 'in_progress')`,
       [o.client_id, o.id],
     );
@@ -869,8 +869,10 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
         ...(certDocs.some((d) => d.kind === "certificate-of-status") ? ["Certificate of Status"] : []),
         ...(certDocs.some((d) => d.kind === "certified-copy") ? ["Certified Copy of the Articles"] : []),
       ],
-      einOrdered: openSvc.some((r) => r.type === "ein"),
-      sElectionOrdered: openSvc.some((r) => r.type === "s-election"),
+      outstandingServices: openSvc.map((r) => {
+        const details = (typeof r.details === "string" ? JSON.parse(r.details) : r.details) as { target?: string; seriesName?: string } | null;
+        return { type: r.type, status: r.status, ...(r.type === "ein" && details?.target === "series" && details.seriesName ? { seriesName: details.seriesName } : {}) };
+      }),
       portalUrl: `${env.PUBLIC_BASE_URL}/portal`,
     });
     notified = await sendMail({ to: clients[0].email, ...mail }).then(

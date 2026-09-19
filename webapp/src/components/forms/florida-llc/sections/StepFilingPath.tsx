@@ -23,7 +23,7 @@ const OPTIONS: {
   {
     val: "CONVERT",
     icon: Building2,
-    title: "Converting an existing Florida LLC",
+    title: "Adding protected series to an existing Florida LLC",
     sub: "You already have a Florida LLC on file with the state. We file Protected Series Designations for it — no Articles fee.",
   },
 ];
@@ -36,14 +36,13 @@ export function StepFilingPath({ data, patch, errors }: StepProps) {
       <header className="space-y-2">
         <h2 className="font-display text-3xl">Getting started</h2>
         <p className="text-sm text-muted-foreground max-w-2xl">
-          The service fee is the same either way. Converting skips the $125
-          filing fee for the Articles and Registered Agent (if you keep your
-          existing Registered Agent).
+          The service fee is the same either way. For an existing Florida LLC:
+          No Articles filing fee. If you appoint us as your registered agent, a separate $25 state change-of-agent fee applies.
         </p>
       </header>
 
       <FieldShell
-        label="Are you forming a new LLC or converting an existing one?"
+        label="Are you forming a new LLC or adding protected series to an existing one?"
         required
         error={errors.filingPath}
       >

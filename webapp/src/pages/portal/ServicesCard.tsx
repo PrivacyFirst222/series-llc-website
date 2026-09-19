@@ -449,7 +449,7 @@ export function ServicesCard({ company }: { company?: string | null }) {
           >
             <div className="flex items-center gap-2 text-trust">
               <FileCheck2 className="h-4 w-4" />
-              <span className="text-sm font-medium text-foreground">Convert an existing Florida LLC</span>
+              <span className="text-sm font-medium text-foreground">Add protected series to an existing Florida LLC</span>
             </div>
             <p className="mt-1 text-xs text-muted-foreground">
               Already have another Florida LLC? We file its Protected Series

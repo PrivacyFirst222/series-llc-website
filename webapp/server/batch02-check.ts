@@ -95,11 +95,29 @@ async function child() {
   const formed=new FormData();formed.set('articles',new File(['%PDF-1.4 test\n%%EOF'],'articles.pdf',{type:'application/pdf'}));formed.set('psd',new File(['%PDF-1.4 test\n%%EOF'],'psd.pdf',{type:'application/pdf'}));formed.set('psdSeries',JSON.stringify(['Scope Beta, LLC, PS B']));
   const formedRes=await req(`/admin/orders/${b}/formation-documents`,formed,true);const outbox=(await json('/dev/outbox')).data as {to:string;subject:string;html:string}[];const notice=outbox.filter(x=>x.to===email&&/formed/i.test(x.subject)).at(-1);
   report('batch02 209: formed email lists only that company services',formedRes.status===200&&!!notice&&!/EIN|S corporation election|S Corporation Election/i.test(notice.html),{status:formedRes.status,notice});
+  // Batch 09: production completion route must retain each service's status.
+  const einCompany=await service(b,'ein',{target:'company'},'awaiting_info');
+  const einSeries=await service(b,'ein',{target:'series',seriesName:'Scope Beta, LLC, PS B'},'in_progress');
+  const se=await service(b,'s-election',{},'in_progress');
+  for(const waiting of [false,true]) {
+    await db.query("UPDATE service_orders SET status=$1 WHERE id=$2",[waiting?'awaiting_info':'in_progress',se]);
+    const result=await req(`/admin/orders/${b}/formation-documents`,formed,true);
+    const mails=(await json('/dev/outbox')).data as {to:string;subject:string;html:string}[];
+    const html=mails.filter(x=>x.to===email&&/formed/i.test(x.subject)).at(-1)?.html??'';
+    const clean=html.replace(/<[^>]*>/g,' ').replace(/\s+/g,' ');
+    report(`batch09 production completion email: S details ${waiting?'missing':'received'}`,result.status===200&&clean.includes('Your Federal EIN order needs your details')&&clean.includes('We have received your details and will prepare your Federal EIN for Scope Beta, LLC, PS B')&&clean.includes(waiting?'Your S election package order needs your details':'We have received your details and will prepare your S election package')&&!clean.includes("that's our next step"),{status:result.status,text:clean});
+  }
+  await db.query('DELETE FROM service_orders WHERE id=ANY($1::uuid[])',[[einCompany,einSeries,se]]);
   const conversion=buildPayload({...base,filingPath:'CONVERT',existingLlcName:'Actual Existing, LLC',desiredLlcName:'Abandoned Candidate',sunbizDocumentNumber:'L24000999888'});
   report('batch02 101: existing-company orders discard abandoned new names',conversion.llcName.finalName==='',conversion.llcName);
   conversion.llcName.finalName='Abandoned Candidate, LLC';await db.query('UPDATE orders SET llc_name=$1,payload=$2 WHERE id=$3',['Actual Existing, LLC',JSON.stringify(conversion),b]);
   const legacy=await oaSeed(clientId,b);
   report('batch02 155: existing-company documents use the recorded company name',legacy?.llcName==='Actual Existing, LLC',legacy?.llcName);
+  const professional=structuredClone(conversion);professional.formationType='PLLC';
+  await db.query('UPDATE orders SET payload=$1 WHERE id=$2',[JSON.stringify(professional),b]);
+  const professionalSeed=await oaSeed(clientId,b);
+  report('batch09 existing-company seed retains professional type and principal address',professionalSeed?.formationType==='PLLC'&&professionalSeed.principalAddress.includes('111 Alpha Avenue'),professionalSeed&&{formationType:professionalSeed.formationType,principalAddress:professionalSeed.principalAddress});
+  await db.query('UPDATE orders SET payload=$1 WHERE id=$2',[JSON.stringify(conversion),b]);
   const consent=await json('/portal/series/consent',{company:b,seriesName:'Actual Existing, LLC, PS New',seriesNumber:'New',purpose:'',effectiveDate:date});
   const consentText=consent.data?.documentId?await pdf(await req(`/portal/documents/${consent.data.documentId}/download`)):JSON.stringify(consent);
   report('batch02 existing-company consent names the recorded company',!!consent.data?.documentId&&consentText.includes('Actual Existing')&&!consentText.includes('Abandoned Candidate'),consent);

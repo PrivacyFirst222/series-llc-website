@@ -21,8 +21,8 @@ export const ACKNOWLEDGMENTS: { field: string; text: string | ((p: SubmissionPay
   { field: "isFloridaDomesticEntityOnly", text: (p) => p.filingPath === "CONVERT"
       ? "I understand this form is for an existing Florida LLC that is already on file with the Division of Corporations, and that it adds protected series to that company."
       : "I understand this form is for forming a new domestic Florida series LLC only." },
-  { field: "notLegalAdvice", text: "I understand that this service does not provide legal, tax, or accounting advice." },
-  { field: "publicRecordNotice", text: "I understand that information submitted to the Florida Division of Corporations may become part of the public record." },
+  { field: "notLegalAdvice", text: "I understand that this service does not provide legal, tax, or accounting advice.", when: (p) => p.acknowledgments?.notLegalAdvice === true },
+  { field: "publicRecordNotice", text: "I understand that information submitted to the Florida Division of Corporations may become part of the public record.", when: (p) => p.acknowledgments?.publicRecordNotice === true },
   { field: "nameSearchAcknowledgment", text: "I understand that availability is not guaranteed until accepted by the Florida Division of Corporations." },
   { field: "governmentAffiliationAcknowledgment", text: "I confirm the name does not imply affiliation with a state or federal government agency." },
   { field: "lawfulPurposeNameAcknowledgment", text: "I confirm the name does not imply a purpose unauthorized for this LLC." },
@@ -112,7 +112,7 @@ export function summaryMarkdown(o: SummaryOrderRow): string {
   out.push(`This summary records the order as it was placed and, once received, as it was paid. It is kept for the office and does not appear in the client's portal.`);
   out.push(`## The order`);
   out.push(line("Company", o.llc_name));
-  out.push(line("Filing", conversion ? `Conversion of an existing Florida LLC (document ${p.sunbizDocumentNumber || "not given"})` : "New Florida LLC"));
+  out.push(line("Filing", conversion ? `Adding protected series to an existing Florida LLC (document ${p.sunbizDocumentNumber || "not given"})` : "New Florida LLC"));
   out.push(line("Client", `${o.contact_name} <${o.contact_email}>`));
   out.push(line("Placed", when(o.created_at)));
   out.push(line("Paid", o.paid_at ? when(o.paid_at) : "not yet received at the time of this summary"));

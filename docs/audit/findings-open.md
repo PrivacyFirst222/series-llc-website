@@ -331,16 +331,19 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Registered agent step on a conversion keeping its agent: header "Florida requires the agent's signed acceptance…", boxes "Your first name / Your last name", ticks "I am accepting this role personally" and "this is my physical street address". Replace on a conversion: "Keep the registered agent already on file", "Agent's first name / last name" plus entity name, one tick "This is the registered agent, and the Florida street address, that the Division has on file for my LLC. This order does not change it."
   - **Codex rejected the proposed replacement:** Correct direction, but supporting entity agents requires changes to data type, server SELF first/last requirements at server/validation.ts:223–231, payload and review, not just labels and an entity-name box. Also collect the existing agent’s agreement to serve the protected series.
   - Fixed: batch 06 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **52. [A11]** — **open** — waits on Adam's ruling
+- **52. [A11]** — **implemented** — waits on Adam's ruling
   - Principal office and mailing steps shown on a conversion; answers reach no sheet row. Replace: hide on a conversion, or add sheet rows. Ruling needed.
   - Codex (disputed): Principal and mailing screens do not feed conversion filingGroups (:246–303), but principalOfficeAddress is read by oaSeed at routes-portal.ts:87–93 and reaches generated agreement inputs :1464. “Answers reach no sheet row” does not mean they serve no purpose.
   - **Codex rejected the proposed replacement:** Do not hide and discard addresses blindly. Explain they are for the operating agreement/records and verify current existing-company addresses, or obtain them elsewhere before document generation.
   - Corrected after Codex's review: The principal address feeds the operating agreement (the seed reads principalOfficeAddress), so a conversion must still ask it. Say what it is for; do not hide it.
-- **53. [A12]** — **open**
+  - Ruling, 2026-09-19: Keep principal and mailing address questions for existing companies; explain principal address feeds the operating agreement, mailing is retained in office order records, and neither entry updates Sunbiz.
+  - Fixed: batch 09 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **53. [A12]** — **implemented**
   - Eligibility step "Formation type" shown to a converting client; changes nothing. Replace: hide on a conversion.
   - Codex (disputed): StepIntro.tsx:27 asks formation type on conversion, but it does change output: buildPayload.ts:25 stores it; routes-portal.ts:164 carries it and :1485 sets professional: seed.formationType === PLLC.
   - **Codex rejected the proposed replacement:** Ask the existing company’s actual type, or derive and verify it. Simply hiding the choice can omit professional descriptors.
   - Corrected after Codex's review: The formation type sets the agreement's professional wording (professional: seed.formationType === 'PLLC'), so a conversion must still ask it. Ask the existing company's actual type.
+  - Fixed: batch 09 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **54. [A13]** — **open** — waits on Adam's ruling
   - filing.ts member-managed "Any Other Provisions" sentence can never be produced. Replace: delete, or force the statement for member-managed too. Ruling needed.
   - Codex (housekeeping-only): filing.ts:141–142 has MEMBER_MANAGED provision, while StepManagement.tsx:75 sets includeManagementStatementInArticles false for that structure; its normal UI branch is unreachable.
@@ -359,8 +362,9 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Ruling, 2026-09-19: Batch 08 item 5: “The only one required to provide an email is the user”. Apply the approved fix with optional non-user emails and the user email as the correspondence fallback.
   - Fixed: batch 08 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-19 rejected r1: Supersede the failed review revision to complete the omitted tests already authorized with Batch 08; product decisions unchanged. Adam: why did you need to stop and ask me.  if you need to do the tests, just fucking do them and dont waste my time
-- **58. [A17]** — **open**
+- **58. [A17]** — **implemented**
   - Server alternate-name check runs on a conversion. Replace: skip on a conversion.
+  - Fixed: batch 09 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **59. [A18]** — **implemented**
   - Conversion certification paragraph says designations "and the change of registered agent"; the tick omits the agent change. Replace the tick to include it when our service is chosen.
   - Fixed: batch 06 revision 1, commit , by Codex; protected by 1 assertion(s).
@@ -391,13 +395,17 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Part "dead-step" — open: The unreachable "Submit" step and its dead page, whose sentence says the operating agreement is sent with the filed documents, are removed.
   - Part "denominator" — open: The progress percent counts only the steps a client can reach: one denominator, no hidden steps.
   - Former part "all" (retired by 001-part-level-links, now dead-step, denominator): The whole finding.
-- **66. [A27]** — **open**
+- **66. [A27]** — **implemented**
   - Service-fee box "Formation service" on a conversion vs receipt "Protected series service fee". Replace: same words.
-- **67. [A28]** — **open**
+  - Fixed: batch 09 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **67. [A28]** — **implemented**
   - Optional documents header "from the Florida Division of Corporations" over two IRS items. Replace: "Optional documents and services".
-- **68. [A29]** — **open** — waits on Adam's ruling
+  - Fixed: batch 09 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **68. [A29]** — **implemented** — waits on Adam's ruling
   - Intro and Certify ask the same two acknowledgments. Ruling needed.
   - **Codex rejected the proposed replacement:** No replacement is proposed. Choose the single retained acknowledgment point and migrate validation/payload consumers if consolidating; repetition alone is not a false statement.
+  - Ruling, 2026-09-19: Show plain no-advice and public-record notices at Eligibility; require the corresponding checkboxes once at Certification.
+  - Fixed: batch 09 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **69. [B21]** — **implemented**
   - Order form, any address block with a locked state (the registered agent's Florida address), choosing a suggestion from the drop-down — `webapp/src/components/forms/florida-llc/AddressFields.tsx:47`
   - Reads: state: lockState ?? s.state,
@@ -460,31 +468,34 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: I appoint FLORIDA PROTECTED SERIES, LLC - PS 1 (doing business as MyFloridaSeriesLLC) as my authorized representative to sign and file my Articles of Organization, and I certify that the information I have provided is true, accurate, and complete. (Same change at lines 195 and 235.) Ruling needed.
   - Codex (disputed): StepCertification.tsx:273 appoints MyFloridaSeriesLLC; the Statement’s opening explicitly identifies PS1 “doing business as MyFloridaSeriesLLC,” and Terms1 identifies the filing party. Naming its trade name does not establish that a different person was appointed.
   - Outcome: The Statement names PS 1 'doing business as MyFloridaSeriesLLC'; the trade name is not a different appointee.
-- **77. [B39]** — **open**
+- **77. [B39]** — **implemented**
   - Certify & sign step, the button that ends the form — `webapp/src/components/forms/florida-llc/FloridaLLCFormationForm.tsx:746`
   - Reads: {submitting ? "Submitting…" : "Submit intake"}
   - Claims: Pressing it submits an intake.
   - True: handleFinalSubmit (lines 449-457) posts the order and sends the browser to Square's checkout page; nothing on the Certify step says payment comes next (the fees are shown only on the Review and Optional docs steps).
   - Replace with: {submitting ? "Taking you to payment…" : "Continue to payment"}
+  - Fixed: batch 09 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **78. [B40]** — **open**
   - LLC name step, the "Final name preview" box while no designator is chosen — `webapp/src/components/forms/florida-llc/sections/StepName.tsx:315`
   - Reads: Florida LLC name must include LLC, L.L.C., Limited Liability Company, PLLC, P.L.L.C., or Professional Limited Liability Company.
   - Claims: The typed name is defective.
   - True: The box above says "The base name without the LLC designator (we'll add it for you)" (line 174); buildFinalLlcName (validation.ts:20-36) appends the designator only once one is chosen, so this red text appears simply because the dropdown is still empty. The same rule reads differently in stepValidation.ts:142 ("must include LLC, L.L.C., or Limited Liability Company.").
   - Replace with: Choose a designator above to complete the name.
-- **79. [B41]** — **open**
+- **79. [B41]** — **implemented**
   - Eligibility & basics step, the "Formation type" helper — `webapp/src/components/forms/florida-llc/sections/StepIntro.tsx:27`
   - Reads: Choose 'Professional LLC' if your business will provide a regulated professional service such as law, medicine, or accounting.
   - Claims: An option named "Professional LLC" exists.
   - True: The option is titled "Domestic Florida PLLC" (line 31).
   - Replace with: Choose 'Domestic Florida PLLC' if your business will provide a regulated professional service such as law, medicine, or accounting.
-- **80. [B42]** — **open** — same defect as 198
+  - Fixed: batch 09 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **80. [B42]** — **implemented** — same defect as 198
   - Your information step, the introduction, for a converting client — `webapp/src/components/forms/florida-llc/sections/StepClient.tsx:31`
   - Reads: Tell us who you are. Your client portal, your formation documents, and our emails about your LLC all belong to the person named here — and later questions offer your name and address wherever they fit, so you won't retype them.
   - Claims: The client will receive formation documents.
   - True: A conversion files Designations for a company already formed (StepIntro.tsx:22; FloridaLLCFormationForm.tsx:301-304). A24 records the same word in the emails and portal header.
   - Replace with: Tell us who you are. Your client portal, your filed documents, and our emails about your LLC all belong to the person named here — and later questions offer your name and address wherever they fit, so you won't retype them.
-- **81. [B43]** — **optional — open**
+  - Fixed: batch 09 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **81. [B43]** — **optional — implemented**
   - Getting started step, the "Converting an existing Florida LLC" card — `webapp/src/components/forms/florida-llc/sections/StepFilingPath.tsx:27`
   - Reads: You already have a Florida LLC on file with the state. We file Protected Series Designations for it — no Articles fee.
   - Claims: The saving is the Articles fee.
@@ -493,12 +504,15 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (disputed): StepFilingPath.tsx:27 says “no Articles fee,” which is true: a conversion files no Articles. Its header supplies the broader $125 context. Different levels of detail are not contradictory facts.
   - **Codex rejected the proposed replacement:** If expanding, say no state fee to designate a new registered agent when retaining the current agent; “no registered agent fee” can be mistaken for absence of annual agent-service fees.
   - Outcome: 'No Articles fee' is true; if expanded, say no state fee to designate an agent when the current agent is kept.
-- **82. [B44]** — **open** — waits on Adam's ruling
+  - Fixed: batch 09 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **82. [B44]** — **implemented** — waits on Adam's ruling
   - Getting started step (and the site), the word "Converting" — `webapp/src/components/forms/florida-llc/sections/StepFilingPath.tsx:26`
   - Reads: Converting an existing Florida LLC
   - Claims: Adding protected series to an existing LLC is a conversion.
   - True: In chapter 605 "conversion" is the change of an entity's type (ss. 605.1041-605.1046; s. 605.0213(10) "certificate of conversion"); establishing a protected series is s. 605.2201, and the Intro tick (StepIntro.tsx:61) itself says the form "adds protected series to that company". The Terms never use "convert". The word is used site-wide (Pricing.tsx:55 "converting the Florida LLC you already have").
   - Replace with: Adding series to an existing Florida LLC (site-wide). Ruling needed.
+  - Ruling, 2026-09-19: Use adding protected series to an existing Florida LLC in visible service wording; keep internal codes and existing orders compatible.
+  - Fixed: batch 09 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **83. [B45]** — **open** — waits on Adam's ruling
   - Management structure step, the "Recommended" badge and the panel title — `webapp/src/components/forms/florida-llc/sections/StepManagement.tsx:95`
   - Reads: Why manager-managed is usually the smarter choice — learn why
@@ -595,15 +609,17 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - **Codex rejected the proposed replacement:** Use separate conversion wording: an existing LLC’s members here are for its agreement, not new Articles. Proposed unconditional replacement is false on conversion.
   - Fixed: batch 08 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-19 rejected r1: Supersede the failed review revision to complete the omitted tests already authorized with Batch 08; product decisions unchanged. Adam: why did you need to stop and ask me.  if you need to do the tests, just fucking do them and dont waste my time
-- **95. [B62]** — **open** — related: 198
+- **95. [B62]** — **implemented** — related: 198
   - Order form banner, on the conversion path — `webapp/src/pages/FormLLC.tsx:15`
   - Reads: eyebrow="Florida LLC formation" … Form your <em>Florida Protected Series LLC</em>
   - Claims: The converting client is forming an LLC.
   - True: The description on :24 was already changed for a conversion ("Tell us about your existing LLC. We'll prepare Protected Series Designations…"), but the eyebrow and title above it still say formation to a client whose LLC exists (14 Sep 2026 fix covered the description only).
   - Replace with: On the conversion path: eyebrow "Florida Protected Series LLC", title "Convert your existing LLC into a <em>Florida Protected Series LLC</em>"; the formation wording stays for a new LLC.
   - **Codex rejected the proposed replacement:** Say “Add protected series to your existing Florida LLC”; proposed “Convert” perpetuates82’s terminology mismatch.
-  - Part "eyebrow" — open: On the existing-LLC path the banner's eyebrow still says formation. — same defect as 198
-  - Part "title" — open: The banner title on the existing-LLC path. (waits on ruling:82)
+  - Part "eyebrow" — implemented: On the existing-LLC path the banner's eyebrow still says formation. — same defect as 198
+  - Fixed (eyebrow): batch 09 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Part "title" — implemented: The banner title on the existing-LLC path. (waits on ruling:82)
+  - Fixed (title): batch 09 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **96. [B142]** — **open** — same defect as 90
   - Order form, LLC name step and Submit — why a name is unavailable when the record is inactive — `webapp/server/routes-payments.ts:327`
   - Reads: `The name "${p.name}" is unavailable — ${           p.verdict === "taken"             ? "an existing Florida company already has it"             : "it belongs to a recently dissolved company, and Florida protects it for up to a year"         }. Please choose a different name.`,
@@ -612,12 +628,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: "it belongs to a company that recently went inactive in the Division's records, and Florida can protect such a name for up to a year" (routes-payments.ts:330 and NameCheck.tsx:45); sunbiz.ts:245 `; recently inactive — the name may still be protected (s. 605.0715(5), Fla. Stat., for an administrative dissolution)`.
   - Codex (duplicate): Same unsupported dissolved-from-inactive explanation as90, repeated at routes-payments.ts:327–331 and sunbiz.ts:245; not marked same defect as in the open list.
   - Corrected after Codex's review: Also a live copy at stepValidation.ts:123; the hold uses last_txn_date/file_date, not a verified dissolution date.
-- **97. [B144]** — **open**
+- **97. [B144]** — **implemented**
   - Office, conversion copy sheet — the Filing statement — `webapp/server/filing.ts:256`
   - Reads: value: "Protected Series Designations for an existing Florida LLC — filed online at the Division, $25 each; no Articles; the $125 Articles-and-agent fee is skipped unless the agent changes",
   - Claims: If the agent changes, the $125 fee applies.
   - True: A change of agent is its own $25 filing — pricing.ts:77-81 charges "FL state fee — change of registered agent" at $25 and no Articles fee on a conversion; filing.ts:297 itself titles the group "Change of registered agent ($25) — Statement of Change". The ledger's own line (docs/facts.md:40 "a conversion skips both unless it changes its agent") carries the same ambiguity.
   - Replace with: value: "Protected Series Designations for an existing Florida LLC — filed online at the Division, $25 each; no Articles and no $125 Articles-and-agent fee; if the client took our agent service, the change of agent is a separate $25 Statement of Change, listed below",
+  - Fixed: batch 09 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **98. [B145]** — **open**
   - Office, formation copy sheet — the empty Other Provisions box — `webapp/server/filing.ts:427`
   - Reads: value: "Leave blank — the client chose a general purpose and no statement",
@@ -1002,12 +1019,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: The route answers 401 for bad credentials (routes-portal.ts:925), 400 'Email and password are required.' (:919), and app.ts:19-22 turns any thrown error into a 500 'Something went wrong on our end.' — a database fault is reported to the client as their own mistake. Twin of A79 on the admin page.
   - Replace with: status === 429 ? "Too many attempts. Try again in a few minutes." : status === 401 ? "Incorrect email or password." : status ? "Something went wrong on our end. Please try again." : "We could not reach the server. Check your connection and try again."
   - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **149. [B82]** — **open** — same defect as 198
+- **149. [B82]** — **implemented** — same defect as 198
   - Client portal, Sign in page, the sentence under the heading — `webapp/src/pages/portal/PortalLogin.tsx:38`
   - Reads: Access the documents from your formation package and anything we have received for you as registered agent.
   - Claims: Every client has a formation package.
   - True: A converting client has filed Designations, not a formation package (OrderDetail.tsx:626 names their section 'Protected Series Designations'; routes-admin.ts:526 'A conversion has no Articles of Organization'). Twin of A24.
   - Replace with: Access your filed documents and anything we have received for you as registered agent.
+  - Fixed: batch 09 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **150. [B83]** — **open**
   - Client portal, S election details form, the EIN box and its 'Still needed' item — `webapp/src/pages/portal/SElectionDetailsForm.tsx:316`
   - Reads: You're obtaining our EIN — use it when issued
@@ -1475,13 +1493,15 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
 - **196. [A5]** — **implemented**
   - Renewal receipt after a link payment (mine). "We charged $99 to your card ending 1234" when the client paid the link. Replace: "We received $99 for registered agent service for [company] through [date]."
   - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **197. [A23]** — **open**
+- **197. [A23]** — **implemented**
   - Formed email, EIN line: "that's our next step." The order waits on the client's details. Replace: "…it is waiting for the responsible party's details from you: sign in, open Orders in progress, and choose Provide details securely."
   - Codex (disputed): email.ts:468–472 says the open EIN/S-election orders are our next step. routes-admin.ts:879 selects both awaiting_info and in_progress; for in_progress the client has already supplied the details. The proposed universal statement that details are waiting from the client is false for that state.
   - **Codex rejected the proposed replacement:** Pass each service status to the email. Ask for details only for awaiting_info and describe processing for in_progress.
   - Corrected after Codex's review: An in-progress order already has the client's details. Pass each order's status to the email and ask for details only when they are awaited.
-- **198. [A24]** — **open**
+  - Fixed: batch 09 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **198. [A24]** — **implemented**
   - Welcome email and Your information header say "formation documents" to a converting client. Replace: "filed Designations" / "your filed documents".
+  - Fixed: batch 09 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **199. [B99]** — **implemented** — same defect as 195
   - Registered agent renewal, the email after the retry charge is declined (renewals job) — `webapp/server/email.ts:166`
   - Reads: We will try the card once more on ${escapeHtml(opts.retryDate)}.
@@ -1538,7 +1558,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: The sign-in page link reads 'Forgot your password?' (PortalLogin.tsx:71) and the password-changed email at email.ts:193 says 'Forgot your password' — two wordings for one link. (The 7 days is true: routes-payments.ts:112 and :614.)
   - Replace with: This link expires in 7 days. If it expires, use "Forgot your password?" on the portal sign-in page with this email address.
   - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **206. [B107]** — **optional — open**
+- **206. [B107]** — **optional — implemented**
   - Portal purchase confirmation email (series, certificate of status, certified copy) — `webapp/server/email.ts:335`
   - Reads: No further action is needed from you. We'll post the confirmation to your portal when the work is complete.
   - Claims: A 'confirmation' will be posted.
@@ -1546,6 +1566,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: No further action is needed from you. We'll post the document to your portal when the work is complete.
   - Codex (disputed): email.ts:335 reads No further action is needed from you. We'll post the confirmation to your portal when the work is complete. A filed designation or certificate can confirm completion; the finding treats this ordinary meaning as excluding the deliverable without evidence.
   - Outcome: 'Confirmation' can mean the filed document; 'document' is clearer.
+  - Fixed: batch 09 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **207. [B108]** — **implemented**
   - Office email 'EIN details submitted — ready to file' — `webapp/server/email.ts:374`
   - Reads: View them once in the admin dashboard; the identification number is deleted automatically when you mark the order fulfilled.
@@ -1599,27 +1620,30 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: s. 605.2602 (read today): 'Except as provided in ss. 605.2605(2), 605.2606(2), and 605.2607(1), a protected series may not participate in; be a party to; result from; or be formed, organized, established, or created by … (1) A conversion, domestication, interest exchange, or merger'. The merger channel in s. 605.2604 belongs to the series limited liability COMPANY ('A series limited liability company may be a party to a merger … only if … (1) Each other party to the merger is a limited liability company. (2) The surviving company is not created in the merger.'); a protected series is only relocated, continued or terminated inside the company's merger under ss. 605.2605-605.2607. The masters have it right (facts.md: 'except as ss. 605.2602 and 605.2605–605.2607, Florida Statutes, permit') and facts.md retires exactly this note's wording ('605.2602–605.2604', 'single statutory channel provided in s. 605.2604').
   - Replace with: s. 605.2602 — a protected series may not be a party to, result from, or be created by a conversion, domestication, interest exchange or merger, except that in the company's own merger under s. 605.2604 (every other party an LLC; surviving company not created in the merger) a protected series is relocated, continued or terminated as ss. 605.2605–605.2607 provide. s. 605.2603 bars the series LLC itself from conversion, domestication and interest exchange.
   - Codex (housekeeping-only): chapter-605-notes.md:140 wrongly assigns605.2604 merger-party permission to a protected series;2026 sections605.2602–2607 distinguish the company's merger from continuation/relocation of its series. This is an internal reference note, not delivered product text.
-- **214. [B124]** — **open**
+- **214. [B124]** — **implemented**
   - Chapter 605 notes, fee schedule, 'Conflicts with what we charge' — `webapp/server/chapter-605-notes.md:264`
   - Reads: On 2026-08-10 Adam directed "It's a $125 filing fee for the Articles. No fee to designate a registered agent," and the calculator became articles $125 / agent $0. The statute splits it: $100 (2) + $25 (7) = $125. Same total to the customer, but our line items describe the fee contrary to the statute on a page that says fees are "at cost."
   - Claims: The calculator and line items still describe the fee as $125 Articles / $0 agent.
   - True: Stale. validation.ts:178-179 now `articlesOfOrganization = isConversion ? 0 : 100` and `registeredAgentDesignation = … : 25`; pricing.ts:72-81 prints two lines, 'FL state fee — Articles of Organization' and 'FL state fee — registered agent designation'; docs/facts.md ledger 'The $125 a new company pays the state' fixes the split at $100 + $25 and retires '$125 Articles filing fee'.
   - Replace with: Resolved: since the facts ledger, the calculator and the line items split the $125 as the statute does — $100 under (2) and $25 under (7).
   - Codex (housekeeping-only): chapter-605-notes.md:264 describes the old125/0 fee split, while validation.ts:178–179 and pricing.ts:72–81 now split100/25. It changes only the internal historical note.
-- **215. [B125]** — **open**
+  - Fixed: batch 09 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **215. [B125]** — **implemented**
   - Chapter 605 notes, fee schedule, 'Conversion gap' — `webapp/server/chapter-605-notes.md:270`
   - Reads: If they take our registered agent service that is a change of agent — $25 under (7) — which we stopped collecting. Our intake offers exactly that choice.
   - Claims: The $25 change-of-agent fee is not collected on a conversion.
   - True: Stale. pricing.ts:44-46 and :53 pass `registeredAgentChange` ('A converting client who takes our registered agent service is changing the agent on file — s. 605.0213(7), $25'), validation.ts:179 charges it, and pricing.ts:77-78 prints 'FL state fee — change of registered agent'.
   - Replace with: Resolved: a converting client who takes our agent service is charged the $25 change-of-agent fee under (7).
   - Codex (housekeeping-only): chapter-605-notes.md:270 says the conversion agent-change fee stopped being collected; pricing.ts:44–53 and validation.ts:179 collect25 when applicable. Internal note only.
-- **216. [B126]** — **open**
+  - Fixed: batch 09 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **216. [B126]** — **implemented**
   - Chapter 605 notes, fee schedule, 'Annual report unresolved' — `webapp/server/chapter-605-notes.md:275`
   - Reads: (5) says $50; the site publishes $138.75 / $538.75 late. Chapter 605 does not explain the difference. Treat $138.75 and the $400 penalty as unverified until the Department's schedule is checked.
   - Claims: The figures are unverified in statute.
   - True: They are statutory. s. 607.193(1) (read today on Online Sunshine): 'an annual supplemental corporate fee of $88.75 is imposed on each business entity that is authorized to transact business in this state and is required to file an annual report with the Department of State under s. 605.0212, s. 607.1622, or s. 620.1210.' $50 (s. 605.0213(5)) + $88.75 = $138.75. s. 607.193(2)(b): 'a late charge of $400 shall be imposed if the supplemental corporate fee is remitted after May 1' — $538.75.
   - Replace with: Annual report, verified: $50 under s. 605.0213(5) plus the $88.75 supplemental corporate fee under s. 607.193(1) = $138.75; the $400 late charge is s. 607.193(2)(b), payable when the fee is remitted after May 1 — $538.75.
   - Codex (housekeeping-only): chapter-605-notes.md:275 labels the annual-report total unverified. Opened2026 s.607.193(1)–(2):88.75 supplemental fee and400 late charge, added to605.0213(5)50, establish138.75/538.75.
+  - Fixed: batch 09 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **217. [B127]** — **open**
   - Chapter 605 notes, General act, the s. 605.0105(3) bullet, item (p) — `webapp/server/chapter-605-notes.md:173`
   - Reads: (p) may not indemnify for bad faith, willful or intentional misconduct, improper personal benefit, or s. 605.0406 liability.

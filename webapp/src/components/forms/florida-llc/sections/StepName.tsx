@@ -69,7 +69,7 @@ function ConversionName({ data, patch, errors }: StepProps) {
         <header className="space-y-2">
           <h2 className="font-display text-3xl">Your existing LLC</h2>
           <p className="text-sm text-muted-foreground max-w-2xl">
-            Tell us which company you want to convert. Enter the name exactly as
+            Tell us which existing company you want to add protected series to. Enter the name exactly as
             it appears on Sunbiz, along with its document number, so we file
             against the right entity.
           </p>

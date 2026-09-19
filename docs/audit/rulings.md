@@ -41,3 +41,9 @@ Adam. A new ruling is added the day it is given.
 - Ruling N4.04: "Batch 08 items 14 and 15: “The articles are entered manually and will contain that language. Do nothing”. Leave the current product text and manual filing workflow unchanged."
 
 - Ruling 98: "Batch 08 items 14 and 15: “The articles are entered manually and will contain that language. Do nothing”. Leave the current office filing instructions unchanged."
+
+- Ruling 52: "Keep principal and mailing address questions for existing companies; explain principal address feeds the operating agreement, mailing is retained in office order records, and neither entry updates Sunbiz."
+
+- Ruling 68: "Show plain no-advice and public-record notices at Eligibility; require the corresponding checkboxes once at Certification."
+
+- Ruling 82: "Use adding protected series to an existing Florida LLC in visible service wording; keep internal codes and existing orders compatible."

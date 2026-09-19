@@ -37,8 +37,8 @@ scanned set; add ` in <path prefix>` to confine the ban to matching files.
 - retired: `maintenance guide`
 
 ### The $125 a new company pays the state
-- value: `$100 for the Articles plus $25 to designate the registered agent; a conversion skips both unless it changes its agent`
-- where: webapp/src/components/forms/florida-llc/sections/StepFilingPath.tsx — `filing fee for the Articles and Registered Agent`
+- value: `$100 for the Articles plus $25 to designate the registered agent for a new LLC; an existing LLC pays no new Articles fee, and pays a separate $25 state change-of-agent fee if it appoints our service`
+- where: webapp/src/components/forms/florida-llc/sections/StepFilingPath.tsx — `a separate $25 state change-of-agent fee applies`
 - where: webapp/src/components/forms/florida-llc/sections/StepName.tsx — `filing fee for the Articles and Registered Agent`
 - where: webapp/src/pages/Pricing.tsx — `filing fee for the Articles and Registered Agent`
 - where: webapp/src/pages/FAQ.tsx — `filing fee for the Articles and Registered Agent`

@@ -31,7 +31,7 @@ export function ServiceFeeEstimate({
 }: ServiceFeeEstimateProps) {
   const extraSeries = Math.max(0, seriesCount - 3);
   const rows: { label: string; cents: number }[] = [
-    { label: "Formation service (includes up to 3 series)", cents: SERVICE_FEE_CENTS },
+    { label: isConversion ? "Protected series service fee (includes up to 3 series)" : "Formation service (includes up to 3 series)", cents: SERVICE_FEE_CENTS },
   ];
   if (extraSeries > 0) {
     rows.push({

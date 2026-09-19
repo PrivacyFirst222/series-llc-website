@@ -38,6 +38,7 @@ const STORAGE_KEY = "fl-llc-formation-draft-v1";
 interface FormProps {
   initialData?: FloridaLLCFormData;
   onSubmit?: (data: FloridaLLCFormData) => void;
+  onFilingPathChange?: (path: "NEW" | "CONVERT") => void;
 }
 
 interface StoredDraft {
@@ -112,6 +113,7 @@ function loadDraft(initialData?: FloridaLLCFormData): {
 export function FloridaLLCFormationForm({
   initialData,
   onSubmit,
+  onFilingPathChange,
 }: FormProps) {
   const location = useLocation();
   const PATH_PRESET = pathPresetFrom(location.search, location.state);
@@ -121,6 +123,8 @@ export function FloridaLLCFormationForm({
     // over whatever an older draft recorded.
     return PATH_PRESET ? { ...d, filingPath: PATH_PRESET } : d;
   });
+  // The banner reflects the live answer, including a restored draft.
+  useEffect(() => { onFilingPathChange?.(data.filingPath ?? "NEW"); }, [data.filingPath, onFilingPathChange]);
   const [stepIndex, setStepIndex] = useState<number>(() => {
     const s0 = loadDraft(initialData).step;
     return PATH_PRESET && s0 === 0 ? 1 : s0;
@@ -749,7 +753,7 @@ export function FloridaLLCFormationForm({
                     disabled={submitting}
                     className="rounded-full bg-accent text-accent-foreground hover:bg-accent/90"
                   >
-                    {submitting ? "Submitting…" : "Submit intake"}
+                    {submitting ? "Taking you to payment…" : "Continue to payment"}
                     <ArrowRight className="ml-1.5 h-4 w-4" />
                   </Button>
                 ) : (

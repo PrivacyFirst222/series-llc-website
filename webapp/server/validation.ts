@@ -196,10 +196,10 @@ const extendedFormSchema = formationFormSchema
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["existingLlcName"],
-        message: "The existing LLC's name is required for a conversion.",
+        message: "The existing LLC's name is required to add protected series.",
       });
     }
-    {
+    if (data.filingPath !== "CONVERT") {
       const pk = normalizeEntityName(data.desiredLlcName ?? "");
       const a1 = normalizeEntityName(data.alternateName1 ?? "");
       const a2 = normalizeEntityName(data.alternateName2 ?? "");
