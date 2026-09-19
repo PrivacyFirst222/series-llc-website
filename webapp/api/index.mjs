@@ -109486,6 +109486,7 @@ async function agentCheckoutLink(kind, id) {
   return `${env.PUBLIC_BASE_URL}/agent-checkout?kind=${kind}&id=${id}&token=${saved.checkout_token}`;
 }
 async function payAgentTarget(kind, id, source) {
+  if (!env.OFFLINE && !env.SQUARE_ACCESS_TOKEN || env.isProd && env.OFFLINE) return { ok: false, code: "UNAVAILABLE", message: "Card checkout is unavailable. Please contact support; no payment was taken." };
   const db = await getDb(), t = await target(kind, id);
   if (!t) throw new Error("Payment target missing");
   const p2 = typeof t.payload === "string" ? JSON.parse(t.payload) : t.payload;
@@ -109567,7 +109568,7 @@ function registerAgentCheckout(app2) {
   app2.get("/agent-checkout/:kind/:id", async (c) => {
     const t = await identify(c.req.param("kind"), c.req.param("id"), c.req.query("token") ?? "");
     if (!t) return c.json(err("Payment link not found.", "NOT_FOUND"), 404);
-    if (env.SQUARE_ACCESS_TOKEN && (!env.SQUARE_APPLICATION_ID || !env.SQUARE_LOCATION_ID)) return c.json(err("Card checkout is not configured yet. Please contact support.", "UNAVAILABLE"), 503);
+    if (!env.OFFLINE && (!env.SQUARE_ACCESS_TOKEN || !env.SQUARE_APPLICATION_ID || !env.SQUARE_LOCATION_ID) || env.isProd && env.OFFLINE) return c.json(err("Card checkout is not configured yet. Please contact support.", "UNAVAILABLE"), 503);
     return c.json({ data: { company: t.llc_name, amountCents: t.amount, purpose: t.purpose ?? "order", paid: ["paid", "filed", "formed", "charged", "paid_by_link"].includes(t.status), applicationId: env.SQUARE_APPLICATION_ID, locationId: env.SQUARE_LOCATION_ID, sandbox: env.SQUARE_ENV !== "production", offline: env.OFFLINE, email: t.email } });
   });
   app2.post("/agent-checkout/:kind/:id", async (c) => {

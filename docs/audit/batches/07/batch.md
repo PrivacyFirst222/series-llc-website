@@ -68,3 +68,5 @@ All user decisions above are retained. No test-data cleanup, legal-master edits,
 - API webhook recovery resumes known completed agent payments through the same persisted attempt; uncertain payments retain their identity.
 
 The staged guard correctly refused the first commit attempt: `docs/facts.md` was declared as content, although the system classifies it as a control. The optional new fact-ledger entry was removed; existing ledger facts remain true. The frozen work order, hash, and authorization were preserved. The new policy is recorded in Adam's authenticated ruling 28, the shared billing constants, the Terms, and this batch's durable assertions. No gate or approval record was weakened.
+
+Final defensive review added an explicit live-configuration guard: missing Square credentials cannot trigger a simulated purchase. Only an explicitly offline, non-production review can use simulated cards. A fixture verifies the order remains unpaid when the production configuration is missing.

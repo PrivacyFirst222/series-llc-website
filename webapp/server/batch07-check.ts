@@ -52,6 +52,10 @@ async function child(){
    const link=await agentCheckoutLink('order',id3);const wrong=await req(`/agent-checkout/order/${id3}?token=wrong`);check(wrong.status===404&&new URL(link).searchParams.get('token')!.length>=32,'batch07 payment links reject the wrong capability',{status:wrong.status});
   }finally{env.SQUARE_ACCESS_TOKEN='';globalThis.fetch=mailFetch;}
  });
+ await attempt('batch07 missing Square credentials cannot simulate a live payment',async()=>{
+  const {payAgentTarget}=await import('./ra-checkout');const id=await order('pending_payment');const prior={offline:env.OFFLINE,prod:env.isProd};
+  try{env.OFFLINE=false;env.isProd=true;const result=await payAgentTarget('order',id,{token:'fixture-card'});const [o]=await query<{status:string;paid_at:unknown}>('SELECT status,paid_at FROM orders WHERE id=$1',[id]);check(!result.ok&&result.code==='UNAVAILABLE'&&o.status==='pending_payment'&&!o.paid_at,'batch07 missing Square credentials cannot simulate a live payment',{result,o});}finally{env.OFFLINE=prior.offline;env.isProd=prior.prod;}
+ });
  await attempt('batch07 resignation records email and statutory mailing separately',async()=>{
   const id=await scheduled();await query("UPDATE orders SET ra_cancellation_requested_at='2026-06-01T12:00:00Z' WHERE id=$1",[id]);await runRenewals(renewal);
   const future=await req(`/admin/orders/${id}/agent`,{action:'submitted',date:'2099-01-01'});const submitted=await req(`/admin/orders/${id}/agent`,{action:'submitted',date:renewal});

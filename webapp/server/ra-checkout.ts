@@ -27,6 +27,7 @@ export async function agentCheckoutLink(kind:PaymentKind,id:string):Promise<stri
 interface Source { token?:string; cardId?:string; customerId?:string; automatic?:boolean }
 interface Attempt { id:string;source_token:string;status:string;square_payment_id:string|null;failure_code:string|null }
 export async function payAgentTarget(kind:PaymentKind,id:string,source:Source):Promise<{ok:boolean; code?:string; message?:string; paymentId?:string; automatic?:boolean}> {
+ if ((!env.OFFLINE && !env.SQUARE_ACCESS_TOKEN) || (env.isProd && env.OFFLINE)) return {ok:false,code:'UNAVAILABLE',message:'Card checkout is unavailable. Please contact support; no payment was taken.'};
  const db=await getDb(), t=await target(kind,id); if(!t)throw new Error('Payment target missing');
  const p=typeof t.payload==='string'?JSON.parse(t.payload):t.payload;
  if (t.purpose!=='resignation' && p?.registeredAgent?.renewalCardConsent!==true) return {ok:false,code:'CARD_CONSENT',message:'Automatic renewal and card storage consent are required for registered-agent service.'};
@@ -87,7 +88,7 @@ export function registerAgentCheckout(app:Hono) {
  };
  app.get('/agent-checkout/:kind/:id',async c=>{
   const t=await identify(c.req.param('kind'),c.req.param('id'),c.req.query('token')??'');if(!t)return c.json(err('Payment link not found.','NOT_FOUND'),404);
-  if(env.SQUARE_ACCESS_TOKEN&&(!env.SQUARE_APPLICATION_ID||!env.SQUARE_LOCATION_ID))return c.json(err('Card checkout is not configured yet. Please contact support.','UNAVAILABLE'),503);
+  if((!env.OFFLINE&&(!env.SQUARE_ACCESS_TOKEN||!env.SQUARE_APPLICATION_ID||!env.SQUARE_LOCATION_ID))||(env.isProd&&env.OFFLINE))return c.json(err('Card checkout is not configured yet. Please contact support.','UNAVAILABLE'),503);
   return c.json({data:{company:t.llc_name,amountCents:t.amount,purpose:t.purpose??'order',paid:['paid','filed','formed','charged','paid_by_link'].includes(t.status),applicationId:env.SQUARE_APPLICATION_ID,locationId:env.SQUARE_LOCATION_ID,sandbox:env.SQUARE_ENV!=='production',offline:env.OFFLINE,email:t.email}});
  });
  app.post('/agent-checkout/:kind/:id',async c=>{
