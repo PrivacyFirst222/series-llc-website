@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Scale } from "lucide-react";
@@ -38,6 +40,7 @@ export function OwnershipEditor({
   onShareChange,
   onEqualize,
 }: OwnershipEditorProps) {
+  const [offerFractions, setOfferFractions] = useState(false);
   const complete = sharesAreComplete(mode, rows.map((r) => r.share));
   const needsFractionsToBeEqual = mode === "percent" && !splitsEvenlyAsPercent(rows.length);
 
@@ -53,6 +56,21 @@ export function OwnershipEditor({
 
   return (
     <div className="space-y-3">
+      <AlertDialog open={offerFractions} onOpenChange={setOfferFractions}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Use fractions for equal ownership?</AlertDialogTitle>
+            <AlertDialogDescription>
+              These {rows.length} owners cannot have exactly equal percentages with two decimal places.
+              Use fractions instead (1/{rows.length} each)?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep percentages</AlertDialogCancel>
+            <AlertDialogAction onClick={() => onEqualize("fraction", equalShares("fraction", rows.length))}>Use fractions</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <div className="flex flex-wrap items-center gap-2">
         <div className="inline-flex rounded-full border border-border p-0.5">
           {(["percent", "fraction"] as const).map((m) => (
@@ -79,14 +97,8 @@ export function OwnershipEditor({
             // Equal shares in percentages only work when 100 divides evenly;
             // otherwise fractions are the exact answer, so offer the switch.
             if (needsFractionsToBeEqual) {
-              const ok = window.confirm(
-                `${rows.length} owners can't split 100% evenly — 33.33 three times is 99.99. ` +
-                  `Use fractions instead (1/${rows.length} each)?`,
-              );
-              if (ok) {
-                onEqualize("fraction", equalShares("fraction", rows.length));
-                return;
-              }
+              setOfferFractions(true);
+              return;
             }
             onEqualize(mode, equalShares(mode, rows.length));
           }}

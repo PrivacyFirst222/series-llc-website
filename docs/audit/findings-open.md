@@ -824,8 +824,9 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Two refusals cite "§605.2202" and "s. 605.2202, Fla. Stat.". Replace: the second.
 - **133. [A65]** — **open**
   - S election dialog "mail it" where the package recommends fax. Replace: "fax or mail it".
-- **134. [A66]** — **open**
+- **134. [A66]** — **implemented**
   - Help "Effective Date": "We've pre-filled today's date" true only the first time. Replace: say the saved date is kept.
+  - Fixed: batch 01 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **135. [B58]** — **open**
   - Client portal, operating agreement questionnaire, first screen, note under "Will there be more than one LLC owner?" — `webapp/src/pages/portal/OAQuestionnaire.tsx:432`
   - Reads: You'll list the owners by name on the next screen. Owners are never filed with the State, so this can differ from what you told us when the company was formed.
@@ -873,7 +874,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: The gate opens whenever llcFormed is false (:232-235), and routes-portal.ts:394-404 sets llcFormed only from formed_at, which a conversion receives when its designations are filed (email.ts:475 sends "protected series established" then). A converting client whose company has existed for years, with a portal EIN order waiting, reads that their LLC is not formed and that Articles are being prepared. The services response carries no isConversion flag for this dialog to branch on.
   - Replace with: Add isConversion to /api/portal/services and, when it is true: title "Your protected series must be filed first." and "We're filing your Protected Series Designations now. You'll get an email when they are established, and you'll be able to complete the EIN application then."
   - **Codex rejected the proposed replacement:** Branch on conversion and explain this service’s gate, not a legal prerequisite: “We are filing your Protected Series Designations. Our EIN-details form opens after those filings are completed.” An existing LLC need not legally wait for a new series to obtain its own EIN.
-- **141. [B66]** — **open**
+- **141. [B66]** — **implemented**
   - Client portal, questionnaire, Owners card, the note under the heading (manager-managed companies) — `webapp/src/pages/portal/OaOwnersSections.tsx:99`
   - Reads: They start from what you gave us when the company was formed — change them if ownership has changed since.
   - Claims: The owner rows were seeded from owners the client named on the order.
@@ -881,6 +882,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: They start from the people named on your order — add, remove, or change them so the list is the owners as they are today.
   - Codex (disputed): OaOwnersSections.tsx:99 says the rows start from formation information. The finding claims a manager-managed client sees one blank row, but routes-portal.ts:95-121 seeds a clientOwner and OAQuestionnaire.tsx:123-127 copies that name/address; suggested owners are separate chips. The assertion of a blank row is wrong.
   - Corrected after Codex's review: A manager-managed client is pre-filled as the first owner (no blank row). The replacement wording stands: 'They start from the people named on your order'.
+  - Fixed: batch 01 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **142. [B73]** — **open**
   - Client portal, the Operating agreement card before an agreement exists — `webapp/src/pages/portal/PortalDashboard.tsx:206`
   - Reads: Answer a short questionnaire and we'll generate your operating agreement as a signed-ready PDF.
@@ -1050,12 +1052,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (disputed): The four obsolete contribution fields are present in oaTypes.ts and superseded by computeCapital in routes-portal.ts:1449-1479; account response fields are unused. However, the alleged printed “03/21/2027” is not present in product source and no file/line is supplied for it.
   - **Codex rejected the proposed replacement:** Retain the evidenced code-only fields as housekeeping; remove or locate and quote the purported deadline before proposing a correction. This compound item cannot be confirmed wholesale.
   - Corrected after Codex's review: The '03/21/2027' print exists nowhere in the product (searched src, server and docs). Keep the code-only fields.
-- **166. [B71]** — **open** — housekeeping
+- **166. [B71]** — **implemented** — housekeeping
   - Client portal, questionnaire Ownership card, the Equal ownership button — `webapp/src/pages/portal/OwnershipEditor.tsx:82`
   - Reads: const ok = window.confirm(`${rows.length} owners can't split 100% evenly — 33.33 three times is 99.99. Use fractions instead (1/${rows.length} each)?`);
   - Claims: A browser confirm box is the prompt.
   - True: webapp/CLAUDE.md: "Use Dialog/AlertDialog from shadcn/ui, not window.alert() or window.confirm()." Every other question in the portal is a Dialog; this one is the browser's unstyled box, which the Vibecode webview may suppress.
   - Replace with: An AlertDialog with the same sentence and two buttons, "Use fractions" and "Keep percentages".
+  - Fixed: batch 01 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **167. [B72]** — **open** — housekeeping; same defect as 136
   - Client portal, Orders in progress: the comment over the consent state — `webapp/src/pages/portal/OrdersInProgress.tsx:137`
   - Reads: // s. 605.2201(1) and Section 3.1 require the consent of all members before a series is established, and the designation filed with the state is signed by the company — so nothing on the public record shows the members agreed.
@@ -1102,7 +1105,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: The selected LLC already has an EIN order.
   - True: The purchase resolves purchaseCompanyId at:2090, but :2102–2112 searches every non-pending EIN order on the client account and treats any company-target EIN as a duplicate. CompanyA's EIN therefore blocks the first EIN purchase for companyB.
   - Replace with: Scope the duplicate query to formation_order_id = purchaseCompanyId as well as client_id, then compare the target within that company. Keep the existing error only when that company already has the order.
-- **N1.08. [substantive]** — **open**
+- **N1.08. [substantive]** — **implemented**
   - Operating agreement questionnaire, equal ownership fractions — `webapp/src/lib/ownership.ts:50`
   - Reads: num = num * d + n * den;
   -     den = den * d;
@@ -1112,6 +1115,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: This multiplies denominators without reduction in JavaScript Number. A pure in-memory import of the existing helper returned false for equalShares('fraction',17) and for19, although17×1/17 and19×1/19 each equal1. The20-owner questionnaire limit permits both cases. Valid equal ownership therefore blocks validation.
   - Replace with: Accumulate numerator and denominator with BigInt, reducing by greatest common divisor on every addition, and compare the exact reduced numerator and denominator. Preserve the existing positive-integer validation.
   - Corrected after Codex's review: Reproduced: 17 and 19 equal owners fail the exact-total check.
+  - Fixed: batch 01 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **N1.15. [substantive]** — **open**
   - Client portal, correcting and regenerating an S-election package — `webapp/server/routes-portal.ts:867`
   - Reads: await db.query("DELETE FROM documents WHERE id = $1 AND client_id = $2", [args.priorDocumentId, so.client_id]);
@@ -1133,36 +1137,41 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: A nine-digit SSN with an allowed area number needs no further structural correction.
   - True: ssnTypingProblem at:16–20 checks area and length only; routes-portal.ts:765–783 repeats those rules for both owners. Structurally impossible numbers with middle digits00 or final digits0000 pass, e.g.123-00-1234 and123-45-0000. SSA explicitly states those groups are never assigned: https://www.ssa.gov/employer/randomizationfaqs.html (opened, lines71–73). This concerns syntax checks, not verification that a real number belongs to a person.
   - Replace with: Reject middle digits 00 and final digits 0000 in both the shared client helper and the server schema, in addition to the existing length and area checks. Message: “That is not a valid Social Security number — the middle two digits cannot be 00 and the last four digits cannot be 0000.”
-- **N3.01. [substantive]** — **open**
+- **N3.01. [substantive]** — **implemented**
   - Client portal → Operating agreement questionnaire → returning to Initial contributions — `webapp/src/pages/portal/OAQuestionnaire.tsx:383`
   - Reads: Your answers save automatically — you can return anytime, and regenerate whenever anything changes.
   - Claims: A returning client recovers the contributions already entered and saved.
   - True: OAQuestionnaire.tsx:105-138 reconstructs the saved answers but never copies saved.assets. Its Initial contributions card at :713 receives a.assets ?? [], and any later edit saves this reconstructed object at :145/168-174. routes-portal.ts:1174-1185 replaces the complete answers object; :1449 computes the exhibits from a.assets. oa-capital.ts:46 treats missing assets as an empty list, :130 gives zero contributions, and :133-136 prints None. Thus reopening loses the visible asset list, and generating from it can silently replace actual contributions with zero/None.
   - Replace with: Preserve the sentence only after restoring the actual saved assets. Add to the saved-answer initializer: assets: saved.assets ?? [],
-- **N3.02. [substantive]** — **open**
+  - Fixed: batch 01 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **N3.02. [substantive]** — **implemented**
   - Client portal → Operating agreement questionnaire → saving edits after leaving and returning — `webapp/src/pages/portal/OAQuestionnaire.tsx:83`
   - Reads: const revRef = useRef(0);
   - Claims: A newly opened editor can continue saving an existing draft with monotonically increasing revisions.
   - True: Each mount starts revision0; edits increment it at :171. The GET response routes-portal.ts:1110/1135-1144 returns answers but no revision. The PUT writes only if oa_profiles.rev < the supplied revision at :1174-1176, otherwise returns HTTP200 with stale:true at :1180. The client’s :146 onSuccess clears its error without inspecting stale. A draft at revision20 silently discards the next20 edits after reopening, despite the automatic-save promise at :383-384.
   - Replace with: Return and initialize from the stored revision, reject stale writes visibly, and distinguish a rejected save from success. Conflict message: “Your latest changes were not saved because this draft changed elsewhere. Reload the draft before continuing.”
-- **N3.03. [substantive]** — **open**
+  - Fixed: batch 01 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **N3.03. [substantive]** — **implemented**
   - Client portal → Operating agreement questionnaire → removing an owner after allocating contributions by share — `webapp/src/pages/portal/OAQuestionnaire.tsx:218`
   - Reads: patch({ members, couples: nextCouples });
   - Claims: Removing an owner preserves which remaining owner contributed each asset.
   - True: removeOwner at :213-218 remaps couples but leaves every asset.contributedBy.shares array unchanged; units at :230-250 then renumber. OaAssetsCard.tsx:59/113-123 binds shares by the new unit index. For owners A/B/C and contributed shares [0,100,0], deleting A leaves B/C receiving [0,100], a valid100 total now attributed to C. oa-capital.ts:69-81 uses the same positions to print contributions and contributor names.
   - Replace with: Bind contributor shares to stable owner/unit IDs. When deleting, pairing or unpairing owners, preserve the surviving identities and require confirmation of any changed allocation: “The owner list changed. Confirm who contributed each asset before generating the agreement.”
-- **N3.04. [substantive]** — **open**
+  - Fixed: batch 01 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **N3.04. [substantive]** — **implemented**
   - Client portal → Operating agreement questionnaire → dollar amounts for contributions, capital calls and borrowing — `webapp/src/pages/portal/OaAssetsCard.tsx:16`
   - Reads: const digits = typed.replace(/[^\d]/g, "");
   - Claims: A typed dollar amount is represented as that amount, rather than changing its magnitude.
   - True: The parser strips a decimal point and minus sign instead of validating them: pasting100.50 produces10050, and -100 produces100. The same parser is used for agreed value at :93 and cash allocations at :152; OAQuestionnaire.tsx:65-67 repeats the defect for capital-call caps and borrowing limits. oa-capital.ts:37-38/61 accepts and prints monetary values with up to two decimals, so the inflation is introduced by the UI parser.
   - Replace with: Parse a nonnegative dollar amount without deleting its decimal point or sign; reject invalid input rather than changing the number. Validation text: “Enter a nonnegative dollar amount with no more than two decimal places.”
-- **N3.06. [wording]** — **open**
+  - Fixed: batch 01 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **N3.06. [wording]** — **implemented**
   - Client portal → S election details → owner mailing address — `webapp/src/pages/portal/SElectionDetailsForm.tsx:533`
   - Reads: Verified address
   - Claims: The displayed address has been selected and verified through the address lookup.
   - True: The live lookup sets verified:true at :525-527, but reopening any stored shareholder sets verified:true and verified2:true unconditionally at :119-134. Selecting an owner also sets verified:Boolean(m.address) at :486, regardless of address provenance. A manually entered nonempty address therefore gains the verification label after save/reopen or selection without lookup verification.
   - Replace with: Show “Address on file” for imported or previously saved addresses unless lookup verification was actually recorded. Reserve “Verified address” for a successful lookup result.
+  - Fixed: batch 01 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **N3.07. [substantive]** — **open**
   - Client portal → Reset your password → response after a failed request — `webapp/src/pages/portal/PortalForgot.tsx:34`
   - Reads: If an account exists for that email address, a reset link is on its way.
@@ -1193,12 +1202,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: The questionnaire lets the client add or remove managers.
   - True: The complete questionnaire has owner add/remove controls, but no manager-list editor. At :396-399 it says managers come from the formation record and there is nothing to choose; :333 derives entityManagers from data.seed.managerNames and only collects their signers. routes-portal.ts OA assembly uses the seeded manager list. AmendAgreement.tsx:137 and PortalDashboard.tsx:238 repeat the unavailable-manager-edit instruction.
   - Replace with: To add or remove members, change ownership percentages, or change an option you chose here, update your answers and regenerate. Managers are taken from your formation record and cannot be added or removed in this questionnaire; changes the questionnaire cannot make require a separate amendment.
-- **N3.13. [substantive]** — **open**
+- **N3.13. [substantive]** — **implemented**
   - Client portal → Operating agreement questionnaire → full legal name of an entity owner — `webapp/src/pages/portal/OAQuestionnaire.tsx:330`
   - Reads: const incompleteOwner = owners.some((o) => !hasFirstAndLast(o.name) || !(o.address ?? "").trim());
   - Claims: Every owner’s legal name must consist of a human first and last name, including owners identified as companies or trusts.
   - True: OaOwnersSections.tsx:134-143 explicitly permits a company or trust and :126 asks its full legal name. OAQuestionnaire.tsx:330 nevertheless applies hasFirstAndLast to all owners, including isEntity:true; routes-portal.ts:1215-1217 repeats the restriction. An entity’s one-word legal name therefore blocks generation even with its separate human signer’s full name and title supplied at :335. The form conflates the entity’s legal name with the signer’s personal name.
   - Replace with: Require a nonblank full legal entity name for isEntity owners and apply first/last-name validation only to individual owners and human signers. Entity label: “Full legal name of the company or trust”.
+  - Fixed: batch 01 revision 1, commit , by Codex; protected by 1 assertion(s).
 
 ## Office — 28 open of 28
 

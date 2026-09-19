@@ -96,9 +96,9 @@ export function OwnersCard({ owners, isMulti, ownerCountMismatch, patchMember, r
   return (
     <QuestionCard title={isMulti ? "Owners" : "Owner"}>
               <p className="text-xs text-muted-foreground">
-                Every name and address here is printed in Exhibit A and in the signature block. They
-                start from what you gave us when the company was formed — change them if ownership
-                has changed since.
+                Every name and address here is printed in Exhibit A and in the signature block. The initial suggestions
+                come from your order and may include the order contact or managers. Confirm the actual
+                owners, adding, removing or changing names and addresses as needed.
               </p>
               {owners.map((m, i) => (
                 <div key={i} className="space-y-2 rounded-lg border border-border bg-secondary/30 p-3">

@@ -1,3 +1,4 @@
+import { contributorUnits, CONTRIBUTOR_REVIEW } from "../src/lib/oaContributors";
 // Split from app.ts on 29 Aug 2026 — one domain per file, code moved
 // verbatim (the two dev test flags became shared.testHooks so they stay
 // mutable across modules). Routes register inside registerPortalRoutes(app),
@@ -187,6 +188,7 @@ export const oaAnswersSchema = z.object({
       z.object({
         // Name and address travel WITH the owner. Held in a second array keyed
         // by position, a deletion would shift every share onto the wrong person.
+        id: z.string().uuid().optional(),
         name: z.string().max(200).optional(),
         address: z.string().max(300).optional(),
         percentage: z.number().min(0).max(100).optional(),
@@ -218,20 +220,20 @@ export const oaAnswersSchema = z.object({
     )
     .optional(),
   includeCapitalCalls: z.boolean().optional(),
-  capitalCallCap: z.number().min(0).max(100_000_000).optional(),
+  capitalCallCap: z.number().min(0).max(100_000_000).multipleOf(0.01).optional(),
   competition: z.enum(["A", "B"]).optional(),
   includeShotgun: z.boolean().optional(),
-  borrowingThreshold: z.number().min(0).max(100_000_000).optional(),
+  borrowingThreshold: z.number().min(0).max(100_000_000).multipleOf(0.01).optional(),
   // Capital as a list of assets (Adam, 12 Sep 2026).
   assets: z
     .array(
       z.object({
         description: z.string().max(400).optional(),
         kind: z.enum(["cash", "other"]).optional(),
-        value: z.number().min(0).max(1_000_000_000_000).optional(),
-        contributedBy: z.object({ mode: z.enum(["equal", "shares"]).optional(), shares: z.array(z.number().min(0).max(100)).max(20).optional() }).optional(),
+        value: z.number().min(0).max(1_000_000_000_000).multipleOf(0.01).optional(),
+        contributedBy: z.object({ mode: z.enum(["equal", "shares"]).optional(), shares: z.array(z.number().min(0).max(100)).max(20).optional(), unitIds: z.array(z.string().max(100)).max(20).optional(), needsReview: z.boolean().optional() }).optional(),
         allocatedTo: z.union([z.literal("company"), z.number().int().min(0).max(200)]).optional(),
-        cashAllocations: z.array(z.number().min(0).max(1_000_000_000_000)).max(200).optional(),
+        cashAllocations: z.array(z.number().min(0).max(1_000_000_000_000).multipleOf(0.01)).max(200).optional(),
       }),
     )
     .max(50)
@@ -262,6 +264,8 @@ export const oaAnswersSchema = z.object({
   // sanitize themselves, but no client bug may ever save a ghost couple.
   .superRefine((a, ctx) => {
     const n = a.members?.length ?? 0;
+    const ids = (a.members ?? []).flatMap(m => m.id ? [m.id] : []);
+    if (new Set(ids).size !== ids.length) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["members"], message: "Each owner must have a distinct identity." });
     const seen = new Set<number>();
     for (const [i, cpl] of (a.couples ?? []).entries()) {
       for (const idx of [cpl.a, cpl.b]) {
@@ -1107,7 +1111,7 @@ app.get("/portal/oa", async (c) => {
   const seed = await oaSeed(session.clientId, companyId);
   if (!seed) return c.json(err("No formed LLC found on your account.", "NO_LLC"), 400);
   const db = await getDb();
-  const saved = await db.query<{ answers: unknown }>("SELECT answers FROM oa_profiles WHERE client_id = $1 AND order_id = $2", [session.clientId, seed.orderId]);
+  const saved = await db.query<{ answers: unknown; rev: number }>("SELECT answers, rev FROM oa_profiles WHERE client_id = $1 AND order_id = $2", [session.clientId, seed.orderId]);
   const gens = await db.query(
     `SELECT id, document_id, template_version, amended_restated, created_at,
             COALESCE(generation_number, 0) AS generation_number,
@@ -1141,6 +1145,7 @@ app.get("/portal/oa", async (c) => {
       blocked: false,
       templateVersion: OA_TEMPLATE_VERSION,
       answers: savedAnswers,
+      rev: Number(saved[0]?.rev ?? 0),
       generations,
     },
   });
@@ -1155,6 +1160,22 @@ function answersProblem(error: z.ZodError): string {
   return first?.code === "custom" && first.message ? first.message : "Please check your answers.";
 }
 
+const DRAFT_CONFLICT = "Your latest changes were not saved because this draft changed elsewhere. Reload the draft before continuing.";
+function expectedRevision(value: string): number | null {
+  return /^\d+$/.test(value) && Number.isSafeInteger(Number(value)) && Number(value) < 2_147_483_647 ? Number(value) : null;
+}
+async function saveExpectedDraft(db: Awaited<ReturnType<typeof getDb>>, clientId: string, orderId: string, answers: unknown, baseRev: number) {
+  // A conditional INSERT handles the first save without allowing a missing
+  // profile to accept an arbitrary old revision. UPDATE is a compare-and-swap.
+  if (baseRev === 0) return db.query<{ rev: number }>(
+    `INSERT INTO oa_profiles (client_id, order_id, answers, rev, updated_at) VALUES ($1,$2,$3,1,now())
+     ON CONFLICT (client_id, order_id) DO UPDATE SET answers=$3, rev=1, updated_at=now() WHERE oa_profiles.rev=0 RETURNING rev`,
+    [clientId, orderId, JSON.stringify(answers)]);
+  return db.query<{ rev: number }>(
+    `UPDATE oa_profiles SET answers=$3, rev=rev+1, updated_at=now() WHERE client_id=$1 AND order_id=$2 AND rev=$4 RETURNING rev`,
+    [clientId, orderId, JSON.stringify(answers), baseRev]);
+}
+
 app.put("/portal/oa/answers", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
@@ -1167,6 +1188,14 @@ app.put("/portal/oa/answers", async (c) => {
   // earlier keystroke that arrives late is ignored rather than allowed to bury
   // a newer answer. Callers without a revision keep the old unconditional
   // behaviour and leave the stored revision untouched.
+  const baseRaw = c.req.query("baseRev");
+  if (baseRaw !== undefined) {
+    const expected = expectedRevision(baseRaw);
+    if (expected === null) return c.json(err("Reload the questionnaire before saving.", "INVALID_REVISION"), 400);
+    const wrote = await saveExpectedDraft(db, session.clientId, answersCompanyId, body.data, expected);
+    if (!wrote.length) return c.json(err(DRAFT_CONFLICT, "DRAFT_CONFLICT"), 409);
+    return c.json({ data: { ok: true, rev: Number(wrote[0].rev) } });
+  }
   const revRaw = c.req.query("rev");
   const rev = revRaw !== undefined && revRaw !== "" ? Number(revRaw) : null;
   if (rev !== null && Number.isFinite(rev)) {
@@ -1181,8 +1210,8 @@ app.put("/portal/oa/answers", async (c) => {
     return c.json({ data: { ok: true, rev } });
   }
   await db.query(
-    `INSERT INTO oa_profiles (client_id, order_id, answers, updated_at) VALUES ($1, $3, $2, now())
-     ON CONFLICT (client_id, order_id) DO UPDATE SET answers = $2, updated_at = now()`,
+    `INSERT INTO oa_profiles (client_id, order_id, answers, rev, updated_at) VALUES ($1, $3, $2, 1, now())
+     ON CONFLICT (client_id, order_id) DO UPDATE SET answers = $2, rev = oa_profiles.rev + 1, updated_at = now()`,
     [session.clientId, JSON.stringify(body.data), answersCompanyId],
   );
   return c.json({ data: { ok: true } });
@@ -1212,7 +1241,7 @@ app.post("/portal/oa/generate", async (c) => {
     );
   }
   // A first and last name for every owner (Adam, 7 Sep 2026).
-  const halfNamed = owners.find((o) => !hasFirstAndLast(o.name));
+  const halfNamed = owners.find((o, i) => !(a.members?.[i]?.isEntity ?? seed.members[i]?.isEntity ?? false) && !hasFirstAndLast(o.name));
   if (halfNamed) {
     return c.json(err(`${halfNamed.name}: ${FIRST_AND_LAST} Every owner's full legal name is printed in Exhibit A and the signature block.`, "INVALID_INPUT"), 400);
   }
@@ -1446,9 +1475,20 @@ app.post("/portal/oa/generate", async (c) => {
   // Capital as a list of assets (Adam, 12 Sep 2026): what each owner
   // contributed and what each series holds are computed from the list, once,
   // and the same errors the questionnaire shows are refused here.
+  const contributorIds = contributorUnits(a.members ?? owners, couples).map(u => u.id);
+  if (a.assets?.some(asset => asset.contributedBy?.needsReview || (asset.contributedBy?.unitIds && JSON.stringify(asset.contributedBy.unitIds) !== JSON.stringify(contributorIds)))) {
+    return c.json(err(CONTRIBUTOR_REVIEW, "CONTRIBUTOR_REVIEW"), 400);
+  }
   const capital = computeCapital(a.assets, members.map((m) => m.name), seed.series.map((sr) => sr.name));
   if (capital.errors.length > 0) {
     return c.json(err(capital.errors[0], "CAPITAL"), 400);
+  }
+  const generationBase = c.req.query("baseRev");
+  if (generationBase !== undefined) {
+    const expected = expectedRevision(generationBase);
+    if (expected === null) return c.json(err("Reload the questionnaire before generating.", "INVALID_REVISION"), 400);
+    const wrote = await saveExpectedDraft(db, session.clientId, seed.orderId, a, expected);
+    if (!wrote.length) return c.json(err(DRAFT_CONFLICT, "DRAFT_CONFLICT"), 409);
   }
   members.forEach((m, i) => { m.contribution = capital.memberContributions[i] ?? "$0"; });
   const series = seed.series.map((sr, i) => ({
@@ -1518,9 +1558,9 @@ app.post("/portal/oa/generate", async (c) => {
     return c.json(err("We could not generate the agreement. Our team has been notified.", "GENERATION_FAILED"), 500);
   }
 
-  await db.query(
-    `INSERT INTO oa_profiles (client_id, order_id, answers, updated_at) VALUES ($1, $3, $2, now())
-     ON CONFLICT (client_id, order_id) DO UPDATE SET answers = $2, updated_at = now()`,
+  if (generationBase === undefined) await db.query(
+    `INSERT INTO oa_profiles (client_id, order_id, answers, rev, updated_at) VALUES ($1, $3, $2, 1, now())
+     ON CONFLICT (client_id, order_id) DO UPDATE SET answers = $2, rev = oa_profiles.rev + 1, updated_at = now()`,
     [session.clientId, JSON.stringify(a), seed.orderId],
   );
   const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength) as ArrayBuffer;

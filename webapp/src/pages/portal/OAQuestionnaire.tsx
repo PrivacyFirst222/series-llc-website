@@ -1,8 +1,10 @@
+import { DollarInput } from "@/components/ui/dollar-input";
+import { contributorUnits, reconcileContributors } from "@/lib/oaContributors";
 import { ViewingAsBanner } from "./ViewingAsBanner";
 import { OaAssetsCard } from "./OaAssetsCard";
 import { assetProblems } from "./oaAssets";
 import { hasFirstAndLast } from "@/lib/personName";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Navigate, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight, Download, FileText, History } from "lucide-react";
@@ -48,6 +50,7 @@ interface OaData {
   blocked: boolean;
   templateVersion: string;
   answers: Answers;
+  rev: number;
   generations: OaGeneration[];
 }
 
@@ -58,14 +61,6 @@ function todayIso(): string {
 }
 
 
-
-/** Dollar boxes show commas as typed (Adam, 9 Sep 2026); the answer stays a
- *  plain number, which the agreement prints as "$20,000". */
-const withCommas = (n: number | undefined): string => (n === undefined || Number.isNaN(n) ? "" : Math.round(n).toLocaleString("en-US"));
-const dollarsFrom = (typed: string): number | undefined => {
-  const digits = typed.replace(/\D/g, "");
-  return digits === "" ? undefined : Number(digits);
-};
 
 export default function OAQuestionnaire() {
   const [oaSearchParams] = useSearchParams();
@@ -81,6 +76,14 @@ export default function OAQuestionnaire() {
   // bury a later answer. The debounce keeps one request per pause instead of
   // one per keystroke.
   const revRef = useRef(0);
+  const editSequence = useRef(0);
+  const conflict = useRef(false);
+  const [saving, setSaving] = useState(false);
+  const [invalidMoney, setInvalidMoney] = useState<Set<string>>(new Set());
+  const onMoneyValidity = useCallback((id: string, valid: boolean) => setInvalidMoney(prev => {
+    if (prev.has(id) === !valid) return prev;
+    const next = new Set(prev); if (valid) next.delete(id); else next.add(id); return next;
+  }), []);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [saveFailed, setSaveFailed] = useState<boolean | string>(false);
   // Three questions decide which of the eight forms this is. They come first,
@@ -105,7 +108,11 @@ export default function OAQuestionnaire() {
   useEffect(() => {
     if (data && !loaded) {
       const saved = data.answers ?? {};
-      setA({
+      revRef.current = data.rev ?? 0;
+      conflict.current = false;
+      const restored: Answers = {
+        ...saved,
+        assets: saved.assets ?? [],
         firstOrAmended:
           saved.firstOrAmended ??
           (data.seed.filingPath === "CONVERT" || data.generations.length > 0 ? "amended" : "first"),
@@ -135,24 +142,42 @@ export default function OAQuestionnaire() {
         competition: saved.competition,
         includeShotgun: saved.includeShotgun,
         borrowingThreshold: saved.borrowingThreshold,
-      });
+      };
+      restored.members = restored.members?.map(m => ({ ...m, id: m.id ?? crypto.randomUUID() }));
+      const ids = contributorUnits(restored.members ?? [], restored.couples ?? []).map(u => u.id);
+      restored.assets = reconcileContributors(restored.assets ?? [], ids, ids);
+      setA(restored);
       setLoaded(true);
     }
   }, [data, loaded]);
 
   const save = useMutation({
-    mutationFn: ({ answers, rev }: { answers: Answers; rev: number }) =>
-      api.put(`/api/portal/oa/answers?rev=${rev}${oaCompany ? `&company=${oaCompany}` : ""}`, answers),
-    onSuccess: () => setSaveFailed(false),
+    scope: { id: `oa-save-${oaCompany ?? "default"}` },
+    mutationFn: async ({ answers }: { answers: Answers; sequence: number }) => {
+      if (conflict.current) throw new Error("This draft changed elsewhere. Reload it before continuing.");
+      try {
+        const result = await api.put<{ rev: number; stale?: boolean }>(`/api/portal/oa/answers?baseRev=${revRef.current}&rev=${revRef.current + 1}${oaCompany ? `&company=${oaCompany}` : ""}`, answers);
+        if (result.stale || !Number.isSafeInteger(result.rev)) throw new Error("The server did not confirm this save. Reload the draft before continuing.");
+        revRef.current = result.rev;
+      } catch (e) {
+        // An uncertain save may have reached the server; do not overwrite it
+        // by retrying against a guessed revision.
+        conflict.current = true;
+        throw e;
+      }
+    },
+    onSuccess: (_, variables) => {
+      if (variables.sequence === editSequence.current) { setSaveFailed(false); setSaving(false); }
+    },
     // A save that fails silently is how an answer the client believes is
     // recorded never reaches the agreement.
     // The server's reason when it gave one (14 Sep 2026), not "check your connection".
-    onError: (e) => setSaveFailed(e instanceof ApiError && e.status === 400 ? e.message : true),
+    onError: (e) => { setSaving(false); setSaveFailed(e instanceof Error ? e.message : true); },
   });
 
   const generate = useMutation({
     mutationFn: (answers: Answers) =>
-      api.post<{ documentId: string; title: string }>(`/api/portal/oa/generate${oaCq}`, answers),
+      api.post<{ documentId: string; title: string }>(`/api/portal/oa/generate?baseRev=${revRef.current}${oaCompany ? `&company=${oaCompany}` : ""}`, answers),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["portal-oa"] });
       queryClient.invalidateQueries({ queryKey: ["portal-documents"] });
@@ -168,12 +193,18 @@ export default function OAQuestionnaire() {
   const patch = (p: Partial<Answers>) => {
     setA((prev) => {
       const next = { ...prev, ...p };
-      const rev = ++revRef.current;
+      if (p.members) next.members = p.members.map(m => ({ ...m, id: m.id ?? crypto.randomUUID() }));
+      const before = contributorUnits(prev.members ?? [], prev.couples ?? []).map(u => u.id);
+      const after = contributorUnits(next.members ?? [], next.couples ?? []).map(u => u.id);
+      next.assets = reconcileContributors(next.assets ?? [], before, after);
+      const sequence = ++editSequence.current;
+      setSaving(true);
       if (saveTimer.current) clearTimeout(saveTimer.current);
-      saveTimer.current = setTimeout(() => save.mutate({ answers: next, rev }), 400);
+      saveTimer.current = setTimeout(() => save.mutate({ answers: next, sequence }), 400);
       return next;
     });
   };
+  useEffect(() => () => { if (saveTimer.current) clearTimeout(saveTimer.current); }, []);
   const patchMember = (i: number, p: Partial<MemberAnswer>) => {
     const members = [...(a.members ?? [])];
     members[i] = { ...members[i], ...p };
@@ -327,7 +358,7 @@ export default function OAQuestionnaire() {
       : isMulti
         ? "You answered that the LLC has more than one owner. Add the other owners here."
         : "You answered that the LLC has one owner, but more than one is listed. Remove the others here.";
-  const incompleteOwner = owners.some((o) => !hasFirstAndLast(o.name) || !(o.address ?? "").trim());
+  const incompleteOwner = owners.some((o) => (o.isEntity ? !(o.name ?? "").trim() : !hasFirstAndLast(o.name)) || !(o.address ?? "").trim());
   // Every company or trust — owner or Manager — needs the person who signs
   // for it, first and last name, and their title (Adam, 13 Sep 2026).
   const entityManagers = (data?.seed.managerNames ?? []).map((name, i) => ({ name, i })).filter(({ i }) => data?.seed.managerEntities?.[i]);
@@ -617,11 +648,11 @@ export default function OAQuestionnaire() {
                   {a.includeCapitalCalls ? (
                     <div className="flex items-center gap-2 pl-6">
                       <span className="text-sm">Annual per-owner cap: $</span>
-                      <Input
-                        inputMode="numeric"
+                      <DollarInput
+                        onValidityChange={onMoneyValidity}
                         aria-label="Annual per-owner capital call cap in dollars"
-                        value={withCommas(a.capitalCallCap)}
-                        onChange={(e) => patch({ capitalCallCap: dollarsFrom(e.target.value) })}
+                        value={a.capitalCallCap}
+                        onValueChange={(capitalCallCap) => patch({ capitalCallCap })}
                         className="w-32"
                       />
                     </div>
@@ -689,11 +720,11 @@ export default function OAQuestionnaire() {
               <QuestionCard title={data.memberManaged ? "Borrowing limit" : "Manager's borrowing limit"} learnMore={data.memberManaged ? "thresholdMember" : "threshold"}>
                 <div className="flex items-center gap-2">
                   <span className="text-sm">Debt above $</span>
-                  <Input
-                    inputMode="numeric"
+                  <DollarInput
+                    onValidityChange={onMoneyValidity}
                     aria-label="Borrowing limit in dollars"
-                    value={withCommas(a.borrowingThreshold)}
-                    onChange={(e) => patch({ borrowingThreshold: dollarsFrom(e.target.value) })}
+                    value={a.borrowingThreshold}
+                    onValueChange={(borrowingThreshold) => patch({ borrowingThreshold })}
                     className="w-32"
                   />
                   <span className="text-sm">requires the consent of all Members</span>
@@ -707,6 +738,7 @@ export default function OAQuestionnaire() {
             ) : null}
 
             <OaAssetsCard
+              onMoneyValidity={onMoneyValidity}
               units={isMulti ? units : [{ kind: "member", index: 0, label: ownerLabel(owners[0], 0) } as Unit]}
               isMulti={isMulti}
               seedSeries={data.seed.series}
@@ -762,8 +794,8 @@ export default function OAQuestionnaire() {
               ) : null}
               {incompleteOwner ? (
                 <p className="mt-3 text-sm text-destructive">
-                  Every owner needs a first and last name and an address — both are printed in Exhibit A
-                  and the signature block.
+                  Every owner needs a full legal name and an address. Individuals need a first and last name;
+                  companies and trusts need their full legal entity name.
                 </p>
               ) : null}
               {saveFailed ? (
@@ -783,7 +815,7 @@ export default function OAQuestionnaire() {
               <Button
                 className="mt-4 w-full rounded-full"
                 size="lg"
-                disabled={generate.isPending || a.authorized !== true || ownerCountMismatch !== "" || incompleteOwner || incompleteSigner || atCap || assetProblemCount > 0}
+                disabled={saving || save.isPending || !!saveFailed || invalidMoney.size > 0 || generate.isPending || a.authorized !== true || ownerCountMismatch !== "" || incompleteOwner || incompleteSigner || atCap || assetProblemCount > 0}
                 onClick={() => generate.mutate(a)}
               >
                 <FileText className="mr-2 h-4 w-4" />

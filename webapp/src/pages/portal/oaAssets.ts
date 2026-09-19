@@ -7,6 +7,7 @@ export function assetProblems(assets: AssetAnswer[], unitCount: number, seriesCo
   const out: string[] = [];
   assets.forEach((asset, ai) => {
     const label = `Asset ${ai + 1}`;
+    if (asset.contributedBy?.needsReview) out.push(`${label}: confirm who contributed this asset after the owner list changed.`);
     if (!(asset.description ?? "").trim()) out.push(`${label}: describe the asset.`);
     if (!(typeof asset.value === "number" && asset.value > 0)) out.push(`${label}: give an agreed value in dollars.`);
     if (unitCount > 1 && asset.contributedBy?.mode === "shares") {

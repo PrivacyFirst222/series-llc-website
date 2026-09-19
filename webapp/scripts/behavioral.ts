@@ -1,3 +1,4 @@
+import { batch01Walk } from "./batch01-walk";
 /**
  * The behavioral gate: a real browser buys what the site sells.
  *
@@ -1707,6 +1708,15 @@ async function main(): Promise<void> {
         await page.waitForTimeout(200);
         expect((await page.locator('[data-testid="tod-backup-needs-first"]').count()) === 0, "OA-I: naming the first beneficiary clears the flag");
       }
+      // Retained assets need an explicit contributor decision after adding
+      // or unpairing owners. The fixture chooses all current owners equally.
+      for (const row of await page.locator('[data-testid="asset-row"]').all()) {
+        const confirm = row.getByRole("button", { name: /^Confirm contributors for asset/ });
+        if (await confirm.count()) {
+          await row.getByText("All owners equally", { exact: true }).click();
+          await confirm.click();
+        }
+      }
       await checkAllBoxes(page);
       genCaptured = null;
       await page.locator("main button").filter({ hasText: /^Generate|^Regenerate/ }).first().click({ timeout: 15000 });
@@ -1741,6 +1751,15 @@ async function main(): Promise<void> {
       await page.locator("main button").filter({ hasText: /^Equal ownership/ }).first().click();
       await page.waitForTimeout(400);
       expect((await page.locator('main input[aria-label$=" numerator"]').count()) === 3, "OA-I: unpaired, three ownership units", await page.locator('main input[aria-label$=" numerator"]').count());
+      // Retained assets need an explicit contributor decision after adding
+      // or unpairing owners. The fixture chooses all current owners equally.
+      for (const row of await page.locator('[data-testid="asset-row"]').all()) {
+        const confirm = row.getByRole("button", { name: /^Confirm contributors for asset/ });
+        if (await confirm.count()) {
+          await row.getByText("All owners equally", { exact: true }).click();
+          await confirm.click();
+        }
+      }
       await checkAllBoxes(page);
       genCaptured = null;
       await page.locator("main button").filter({ hasText: /^Generate|^Regenerate/ }).first().click({ timeout: 15000 });
@@ -2703,6 +2722,7 @@ async function main(): Promise<void> {
     }
   }
 
+  await batch01Walk(browser, `http://localhost:${WEB_PORT}`, expect);
   await browser.close();
   web.stop();
   api.kill();

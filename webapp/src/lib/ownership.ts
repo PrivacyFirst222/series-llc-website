@@ -41,14 +41,17 @@ export function sharesAreComplete(mode: OwnershipMode, shares: OwnershipShare[])
     return total === 10_000;
   }
   // Sum n/d over a common denominator using integers only.
-  let num = 0;
-  let den = 1;
+  let num = BigInt(0);
+  let den = BigInt(1);
   for (const s of shares) {
     const n = s.numerator ?? 0;
     const d = s.denominator ?? 0;
-    if (d <= 0 || n < 0) return false;
-    num = num * d + n * den;
-    den = den * d;
+    if (!Number.isSafeInteger(n) || !Number.isSafeInteger(d) || d <= 0 || n < 0) return false;
+    num = num * BigInt(d) + BigInt(n) * den;
+    den *= BigInt(d);
+    let a = num, b = den;
+    while (b !== BigInt(0)) [a, b] = [b, a % b];
+    num /= a; den /= a;
   }
   return num === den;
 }

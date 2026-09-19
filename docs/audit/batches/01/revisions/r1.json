@@ -1,0 +1,218 @@
+{
+  "id": "01",
+  "revision": 1,
+  "title": "Saved operating-agreement answers and owner data; S-election address label",
+  "model": "Codex",
+  "base": "ba8b8a6b30c58004b47aaf8ff84641b586e2e8d5",
+  "items": [
+    {
+      "id": "N3.01",
+      "part": "all",
+      "scope": "saved contributions survive reopening",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch01 N3.01: saved contributions survive reopening"
+        }
+      ]
+    },
+    {
+      "id": "N3.02",
+      "part": "all",
+      "scope": "reopened edits save and conflicts are visible",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch01 N3.02: reopened edits save and conflicts are visible"
+        }
+      ]
+    },
+    {
+      "id": "N3.03",
+      "part": "all",
+      "scope": "owner removal preserves contributors and requires review",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch01 N3.03: owner removal preserves contributors and requires review"
+        }
+      ]
+    },
+    {
+      "id": "N3.04",
+      "part": "all",
+      "scope": "dollar inputs preserve cents and reject invalid amounts",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch01 N3.04: dollar inputs preserve cents and reject invalid amounts"
+        }
+      ]
+    },
+    {
+      "id": "N1.08",
+      "part": "all",
+      "scope": "seventeen and nineteen equal fractions are complete",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch01 N1.08: seventeen and nineteen equal fractions are complete"
+        }
+      ]
+    },
+    {
+      "id": "N3.13",
+      "part": "all",
+      "scope": "entity owners are distinct from human signers",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch01 N3.13: entity owners are distinct from human signers"
+        }
+      ]
+    },
+    {
+      "id": "141",
+      "part": "all",
+      "scope": "owner note identifies unconfirmed order suggestions",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch01 141: owner note identifies unconfirmed order suggestions"
+        }
+      ]
+    },
+    {
+      "id": "166",
+      "part": "all",
+      "scope": "equal ownership uses the portal dialog",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch01 166: equal ownership uses the portal dialog"
+        }
+      ]
+    },
+    {
+      "id": "134",
+      "part": "all",
+      "scope": "effective-date help explains saved dates",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch01 134: effective-date help explains saved dates"
+        }
+      ]
+    },
+    {
+      "id": "N3.06",
+      "part": "all",
+      "scope": "saved S-election addresses are not called verified",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch01 N3.06: saved S-election addresses are not called verified"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "webapp/src/pages/portal/OAQuestionnaire.tsx",
+      "mode": "code",
+      "why": "Batch 01 fixes only; complete diff reviewed with the package."
+    },
+    {
+      "path": "webapp/src/pages/portal/oaTypes.ts",
+      "mode": "code",
+      "why": "Batch 01 fixes only; complete diff reviewed with the package."
+    },
+    {
+      "path": "webapp/src/pages/portal/oaAssets.ts",
+      "mode": "code",
+      "why": "Batch 01 fixes only; complete diff reviewed with the package."
+    },
+    {
+      "path": "webapp/src/pages/portal/OaAssetsCard.tsx",
+      "mode": "code",
+      "why": "Batch 01 fixes only; complete diff reviewed with the package."
+    },
+    {
+      "path": "webapp/src/pages/portal/OaOwnersSections.tsx",
+      "mode": "code",
+      "why": "Batch 01 fixes only; complete diff reviewed with the package."
+    },
+    {
+      "path": "webapp/src/pages/portal/OwnershipEditor.tsx",
+      "mode": "code",
+      "why": "Batch 01 fixes only; complete diff reviewed with the package."
+    },
+    {
+      "path": "webapp/src/pages/portal/SElectionDetailsForm.tsx",
+      "mode": "code",
+      "why": "Batch 01 fixes only; complete diff reviewed with the package."
+    },
+    {
+      "path": "webapp/src/lib/ownership.ts",
+      "mode": "code",
+      "why": "Batch 01 fixes only; complete diff reviewed with the package."
+    },
+    {
+      "path": "webapp/src/content/oaLearnMore.tsx",
+      "mode": "code",
+      "why": "Batch 01 fixes only; complete diff reviewed with the package."
+    },
+    {
+      "path": "webapp/server/routes-portal.ts",
+      "mode": "code",
+      "why": "Batch 01 fixes only; complete diff reviewed with the package."
+    },
+    {
+      "path": "webapp/src/lib/oaContributors.ts",
+      "mode": "new",
+      "why": "Shared identity reconciliation or decimal-safe input required by the approved fixes."
+    },
+    {
+      "path": "webapp/src/components/ui/dollar-input.tsx",
+      "mode": "new",
+      "why": "Shared identity reconciliation or decimal-safe input required by the approved fixes."
+    },
+    {
+      "path": "webapp/server/e2e.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Add regression checks for Batch 01; preserve every existing check."
+    },
+    {
+      "path": "webapp/scripts/behavioral.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Add regression checks for Batch 01; preserve every existing check."
+    },
+    {
+      "path": "webapp/scripts/batch01-walk.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Add regression checks for Batch 01; preserve every existing check."
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "why": "API bundle rebuilt by the normal pre-commit hook."
+    }
+  ],
+  "requiredChecks": [],
+  "testSupport": [
+    "webapp/scripts/batch01-walk.ts"
+  ]
+}

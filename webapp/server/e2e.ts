@@ -1,3 +1,4 @@
+import { equalShares, sharesAreComplete } from "../src/lib/ownership";
 /**
  * Local end-to-end walk of the whole money path (bun run server/e2e.ts).
  * Requires the dev API on :3000. Uses the same defaults + validation the form uses.
@@ -33,6 +34,8 @@ function check(label: string, ok: boolean, detail?: unknown) {
   // the check that proves it, and a label missing from this file is a failure.
   if (process.env.CHECK_RESULTS_FILE) appendFileSync(process.env.CHECK_RESULTS_FILE, JSON.stringify({ suite: "server", label, ok: ok === true, detail: ok ? undefined : detail, run: process.env.CHECK_RUN_ID ?? null, commit: process.env.CHECK_COMMIT ?? null }) + "\n");
 }
+
+check("batch01 N1.08: seventeen and nineteen equal fractions are complete", [17,19].every(n=>sharesAreComplete("fraction",equalShares("fraction",n))), {seventeen:sharesAreComplete("fraction",equalShares("fraction",17)),nineteen:sharesAreComplete("fraction",equalShares("fraction",19))});
 
 const testEmail = `e2e-client-${Math.random().toString(36).slice(2, 8)}@example.com`;
 
@@ -3498,6 +3501,25 @@ if (mint.status === 200) {
   // A newer revision still wins normally.
   await put(6, "NEWEST");
   check("a newer revision still saves", (await storedPurpose()) === "NEWEST", await storedPurpose());
+  const loaded = await api("/api/portal/oa", {cookies:pw.cookie});
+  const baseRev=loaded.body?.data?.rev;
+  const cas=await api(`/api/portal/oa/answers?baseRev=${baseRev}`,{method:"PUT",cookies:pw.cookie,body:JSON.stringify(answers("REOPENED"))});
+  check("batch01 API: reopened draft returns its revision and accepts the next edit", Number.isInteger(baseRev)&&cas.status===200&&cas.body?.data?.rev===baseRev+1,cas.body);
+  const conflicting=await api(`/api/portal/oa/answers?baseRev=${baseRev}`,{method:"PUT",cookies:pw.cookie,body:JSON.stringify(answers("CONFLICT"))});
+  check("batch01 API: a competing editor receives 409 and cannot overwrite the saved answer",conflicting.status===409&&await storedPurpose()==="REOPENED",conflicting.body);
+  const money=await api("/api/portal/oa/answers",{method:"PUT",cookies:pw.cookie,body:JSON.stringify({...answers("BAD MONEY"),borrowingThreshold:100.501})});
+  check("batch01 API: fractional cents are rejected",money.status===400,money.body);
+  const oneWord={...answers("ENTITY"),multiOwner:false,members:[{name:"Acme",address:"100 Ocean Drive, Miami, FL 33139",isEntity:true,signerName:"Alice Example",signerTitle:"Manager",percentage:100}],assets:[{description:"Precision cash",kind:"cash",value:100.50,contributedBy:{mode:"equal"},cashAllocations:[]}]};
+  const reviewNeeded=await api("/api/portal/oa/generate",{method:"POST",cookies:pw.cookie,body:JSON.stringify({...oneWord,assets:[{...oneWord.assets[0],contributedBy:{mode:"equal",needsReview:true}}]})});
+  check("batch01 API: unconfirmed contributors block generation",reviewNeeded.status===400&&reviewNeeded.body?.error?.code==="CONTRIBUTOR_REVIEW",reviewNeeded.body);
+  const entity=await api("/api/portal/oa/generate",{method:"POST",cookies:pw.cookie,body:JSON.stringify(oneWord)});
+  check("batch01 API: a one-word entity with a human signer generates",entity.status===200,entity.body);
+  if(entity.status===200){
+    const input=await api(`/api/dev/oa-generation-inputs/${entity.body.data.generationId}`);
+    check("batch01 API: entity name and cents reach the agreement",input.body?.data?.inputs?.members?.[0]?.name==="Acme"&&input.body?.data?.inputs?.members?.[0]?.contribution==="$100.5",input.body?.data?.inputs?.members);
+  }
+
+
 }
 
 // === Payment durability (Codex RUN-PAY-01 and the status-regression twin) ==

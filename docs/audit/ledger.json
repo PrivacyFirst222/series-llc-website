@@ -4276,14 +4276,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T09:49:50.604Z",
+              "event": "assigned",
+              "batch": "01",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T09:59:52.475Z",
+              "event": "implemented",
+              "batch": "01",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "01",
+          "fix": {
+            "batch": "01",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch01 134: effective-date help explains saved dates"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -4491,14 +4518,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T09:49:50.604Z",
+              "event": "assigned",
+              "batch": "01",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T09:59:52.475Z",
+              "event": "implemented",
+              "batch": "01",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "01",
+          "fix": {
+            "batch": "01",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch01 141: owner note identifies unconfirmed order suggestions"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -5312,14 +5366,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T09:49:50.604Z",
+              "event": "assigned",
+              "batch": "01",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T09:59:52.475Z",
+              "event": "implemented",
+              "batch": "01",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "01",
+          "fix": {
+            "batch": "01",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch01 166: equal ownership uses the portal dialog"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -8813,14 +8894,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T09:49:50.604Z",
+              "event": "assigned",
+              "batch": "01",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T09:59:52.475Z",
+              "event": "implemented",
+              "batch": "01",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "01",
+          "fix": {
+            "batch": "01",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch01 N1.08: seventeen and nineteen equal fractions are complete"
+              }
+            ]
+          }
         }
       ],
       "correctedReplacement": "Reproduced: 17 and 19 equal owners fail the exact-total check."
@@ -9722,14 +9830,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T09:49:50.604Z",
+              "event": "assigned",
+              "batch": "01",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T09:59:52.475Z",
+              "event": "implemented",
+              "batch": "01",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "01",
+          "fix": {
+            "batch": "01",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch01 N3.01: saved contributions survive reopening"
+              }
+            ]
+          }
         }
       ]
     },
@@ -9746,14 +9881,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T09:49:50.604Z",
+              "event": "assigned",
+              "batch": "01",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T09:59:52.475Z",
+              "event": "implemented",
+              "batch": "01",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "01",
+          "fix": {
+            "batch": "01",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch01 N3.02: reopened edits save and conflicts are visible"
+              }
+            ]
+          }
         }
       ]
     },
@@ -9770,14 +9932,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T09:49:50.604Z",
+              "event": "assigned",
+              "batch": "01",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T09:59:52.475Z",
+              "event": "implemented",
+              "batch": "01",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "01",
+          "fix": {
+            "batch": "01",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch01 N3.03: owner removal preserves contributors and requires review"
+              }
+            ]
+          }
         }
       ]
     },
@@ -9794,14 +9983,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T09:49:50.604Z",
+              "event": "assigned",
+              "batch": "01",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T09:59:52.475Z",
+              "event": "implemented",
+              "batch": "01",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "01",
+          "fix": {
+            "batch": "01",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch01 N3.04: dollar inputs preserve cents and reject invalid amounts"
+              }
+            ]
+          }
         }
       ]
     },
@@ -9842,14 +10058,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T09:49:50.604Z",
+              "event": "assigned",
+              "batch": "01",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T09:59:52.475Z",
+              "event": "implemented",
+              "batch": "01",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "01",
+          "fix": {
+            "batch": "01",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch01 N3.06: saved S-election addresses are not called verified"
+              }
+            ]
+          }
         }
       ]
     },
@@ -10014,14 +10257,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T09:49:50.604Z",
+              "event": "assigned",
+              "batch": "01",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T09:59:52.475Z",
+              "event": "implemented",
+              "batch": "01",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "01",
+          "fix": {
+            "batch": "01",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch01 N3.13: entity owners are distinct from human signers"
+              }
+            ]
+          }
         }
       ]
     },
@@ -10430,6 +10700,25 @@
           "evidence": "No docs/word changes in reviewed range 82abf54..ca80d08; Dropbox publication not needed and not run."
         }
       }
+    },
+    {
+      "id": "01",
+      "revision": 1,
+      "frozenHash": "1a51f85ea695969c4c1b247cd7dd2b08242231001e2d95a17bc763a51ceba66c",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "ba8b8a6b30c58004b47aaf8ff84641b586e2e8d5",
+      "history": [
+        {
+          "at": "2026-09-19T09:49:50.605Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-19T09:59:52.475Z",
+          "event": "implemented"
+        }
+      ]
     }
   ]
 }

@@ -3,6 +3,8 @@
 // or by share — and where the company allocates it; cash split among the
 // series by amount. The server computes Exhibit A from the same list and
 // refuses the same errors shown here.
+import { DollarInput } from "@/components/ui/dollar-input";
+import { CONTRIBUTOR_REVIEW } from "@/lib/oaContributors";
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,17 +13,13 @@ import { QuestionCard } from "./OaQuestionCard";
 import type { AssetAnswer, Unit } from "./oaTypes";
 import { assetProblems } from "./oaAssets";
 
-const withCommas = (n: number | undefined): string => (n === undefined || Number.isNaN(n) ? "" : Math.round(n).toLocaleString("en-US"));
-const dollarsFrom = (typed: string): number | undefined => {
-  const digits = typed.replace(/[^\d]/g, "");
-  return digits ? Number(digits) : undefined;
-};
 const money = (n: number) => `$${n.toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
 
 
-export function OaAssetsCard({ units, isMulti, seedSeries, assets, setAssets }: {
+export function OaAssetsCard({ units, isMulti, seedSeries, assets, setAssets, onMoneyValidity }: {
   units: Unit[];
   isMulti: boolean;
+  onMoneyValidity: (id: string, valid: boolean) => void;
   seedSeries: { name: string }[];
   assets: AssetAnswer[];
   setAssets: (next: AssetAnswer[]) => void;
@@ -86,11 +84,11 @@ export function OaAssetsCard({ units, isMulti, seedSeries, assets, setAssets }: 
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <span className="w-1/3 shrink-0">Agreed value $</span>
-                <Input
-                  inputMode="numeric"
+                <DollarInput
+                  onValidityChange={onMoneyValidity}
                   aria-label={`Agreed value of asset ${i + 1}`}
-                  value={withCommas(asset.value)}
-                  onChange={(e) => patchAsset(i, { value: dollarsFrom(e.target.value) })}
+                  value={asset.value}
+                  onValueChange={(value) => patchAsset(i, { value })}
                   className="w-40"
                 />
               </div>
@@ -100,11 +98,11 @@ export function OaAssetsCard({ units, isMulti, seedSeries, assets, setAssets }: 
                   <div className="font-medium">Contributed by</div>
                   <div className="flex flex-wrap items-center gap-4">
                     <label className="flex items-center gap-2">
-                      <input type="radio" name={`asset-by-${i}`} checked={asset.contributedBy?.mode !== "shares"} onChange={() => patchAsset(i, { contributedBy: { mode: "equal" } })} className="accent-trust" />
+                      <input type="radio" name={`asset-by-${i}`} checked={asset.contributedBy?.mode !== "shares"} onChange={() => patchAsset(i, { contributedBy: { ...asset.contributedBy, mode: "equal" } })} className="accent-trust" />
                       All owners equally
                     </label>
                     <label className="flex items-center gap-2">
-                      <input type="radio" name={`asset-by-${i}`} checked={asset.contributedBy?.mode === "shares"} onChange={() => patchAsset(i, { contributedBy: { mode: "shares", shares: asset.contributedBy?.shares ?? [] } })} className="accent-trust" />
+                      <input type="radio" name={`asset-by-${i}`} checked={asset.contributedBy?.mode === "shares"} onChange={() => patchAsset(i, { contributedBy: { ...asset.contributedBy, mode: "shares", shares: asset.contributedBy?.shares ?? [] } })} className="accent-trust" />
                       By share
                     </label>
                   </div>
@@ -120,7 +118,7 @@ export function OaAssetsCard({ units, isMulti, seedSeries, assets, setAssets }: 
                             onChange={(e) => {
                               const next = [...Array.from({ length: unitCount }, (_, j) => asset.contributedBy?.shares?.[j] ?? 0)];
                               next[k] = e.target.value === "" ? 0 : Number(e.target.value);
-                              patchAsset(i, { contributedBy: { mode: "shares", shares: next } });
+                              patchAsset(i, { contributedBy: { ...asset.contributedBy, mode: "shares", shares: next } });
                             }}
                             className="w-24"
                           />
@@ -143,13 +141,13 @@ export function OaAssetsCard({ units, isMulti, seedSeries, assets, setAssets }: 
                       <div key={sr.name} className="flex items-center gap-2">
                         <span className="w-1/2 break-words">{sr.name}</span>
                         <span>$</span>
-                        <Input
-                          inputMode="numeric"
+                        <DollarInput
+                          onValidityChange={onMoneyValidity}
                           aria-label={`Amount of asset ${i + 1} allocated to ${sr.name}`}
-                          value={withCommas(asset.cashAllocations?.[k])}
-                          onChange={(e) => {
+                          value={asset.cashAllocations?.[k]}
+                          onValueChange={(value) => {
                             const next = seedSeries.map((_, j) => asset.cashAllocations?.[j] ?? 0);
-                            next[k] = dollarsFrom(e.target.value) ?? 0;
+                            next[k] = value ?? 0;
                             patchAsset(i, { cashAllocations: next });
                           }}
                           className="w-40"
@@ -177,6 +175,15 @@ export function OaAssetsCard({ units, isMulti, seedSeries, assets, setAssets }: 
                   </Select>
                 )}
               </div>
+              {asset.contributedBy?.needsReview ? (
+                <div className="rounded-lg border border-amber-400 p-3 text-sm" data-testid="contributor-review">
+                  <p>{CONTRIBUTOR_REVIEW}</p>
+                  <Button type="button" variant="outline" className="mt-2" disabled={unitCount > 1 && asset.contributedBy.mode === "shares" && Math.abs(shareTotal - 100) > 0.01}
+                    onClick={() => patchAsset(i, { contributedBy: { ...asset.contributedBy, needsReview: false } })}>
+                    Confirm contributors for asset {i + 1}
+                  </Button>
+                </div>
+              ) : null}
               {errs.length > 0 ? (
                 <ul className="space-y-1 rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-xs text-destructive" data-testid={`asset-${i}-problems`}>
                   {errs.map((e) => <li key={e}>{e}</li>)}

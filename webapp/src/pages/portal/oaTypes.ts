@@ -4,6 +4,7 @@
 import type { OwnershipMode } from "@/lib/ownership";
 
 export interface MemberAnswer {
+  id?: string;
   // Identity travels with the owner. Kept in a parallel array keyed by
   // position, deleting an owner would slide every share onto the wrong person.
   name?: string;
@@ -42,7 +43,7 @@ export interface AssetAnswer {
   description?: string;
   kind?: "cash" | "other";
   value?: number;
-  contributedBy?: { mode?: "equal" | "shares"; shares?: number[] };
+  contributedBy?: { mode?: "equal" | "shares"; shares?: number[]; unitIds?: string[]; needsReview?: boolean };
   allocatedTo?: "company" | number;
   cashAllocations?: number[];
 }

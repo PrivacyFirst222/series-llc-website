@@ -114,7 +114,7 @@ export function SElectionDetailsForm({
   const [officerTitle, setOfficerTitle] = useState(draft?.officerTitle ?? prior.officerTitle ?? "Manager");
   const [phone, setPhone] = useState(formatPhone(draft?.phone ?? prior.phone ?? ""));
   const [rows, setRows] = useState<ShareholderRow[]>(
-    draft?.rows ??
+    draft?.rows.map(row => ({ ...row, verified: false, verified2: false })) ??
     (prior.shareholders?.length
       ? prior.shareholders.map((s) => ({
           name: s.name,
@@ -124,14 +124,14 @@ export function SElectionDetailsForm({
           atFormation: !s.dateAcquired || s.dateAcquired === prior.dateIncorporated,
           ssn: "",
           ssnLast4: s.ssnLast4,
-          verified: true,
+          verified: false,
           joint: s.joint ?? "",
           name2: s.name2 ?? "",
           ssn2: "",
           ssnLast4Second: s.ssnLast4Second,
           address2: s.address2 ?? "",
           sameAddress: !s.address2,
-          verified2: true,
+          verified2: false,
         }))
       : [{ ...EMPTY_ROW }]),
   );
@@ -483,7 +483,7 @@ export function SElectionDetailsForm({
                         return;
                       }
                       const m = members.find((mm) => mm.name === v);
-                      patchRow(i, { name: v, address: m?.address ?? r.address, verified: Boolean(m?.address), ssnLast4: undefined });
+                      patchRow(i, { name: v, address: m?.address ?? r.address, verified: false, ssnLast4: undefined });
                     } else {
                       patchRow(i, { name2: v === OTHER ? " " : v, ssnLast4Second: undefined });
                     }
@@ -533,9 +533,7 @@ export function SElectionDetailsForm({
                       <CheckCircle2 className="h-3 w-3" /> Verified address
                     </p>
                   ) : (
-                    <p className="text-xs text-amber-700">
-                      Pick the address from the list so the IRS gets a deliverable address.
-                    </p>
+                    <p className="text-xs text-muted-foreground">Address on file</p>
                   )
                 ) : null}
               </div>

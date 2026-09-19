@@ -355,7 +355,7 @@ export const LEARN_MORE: Record<string, LearnMoreScreen> = {
     title: "Effective Date",
     body: (
       <div className="space-y-3">
-        <P>The date your operating agreement takes effect. We've pre-filled today's date.</P>
+        <P>The date your operating agreement takes effect. A new questionnaire starts with today's date; when you return, we keep your saved date.</P>
         <Choice label="If you keep today's date:">
           The agreement governs from today forward — the usual choice when the company is newly
           formed.
