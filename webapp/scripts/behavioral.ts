@@ -1,3 +1,4 @@
+import { batch06Walk } from "./batch06-walk";
 import {batch05Walk} from "./batch05-walk";
 import { batch04AccountWalk } from "./batch04-account-walk";
 import {batch04Walk} from "./batch04-walk";
@@ -411,7 +412,7 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
     // signed as the client's own).
     await clickCard(page, /first year included/i);
     await page.waitForTimeout(300);
-    await clickCard(page, /serve as my own/i);
+    await clickCard(page, /serve as my own|keep the registered agent already on file/i);
     await page.waitForTimeout(300);
     expect((await page.locator("#ra-street").inputValue()) === "" && (await page.locator("#ra-city").inputValue()) === "" && (await page.locator("#ra-zip").inputValue()) === "", `${run.key}: switching from our service to my own agent leaves the address boxes empty`, { street: await page.locator("#ra-street").inputValue(), city: await page.locator("#ra-city").inputValue() });
     // "Use my information" keeps the agent in Florida whatever the client's
@@ -421,7 +422,7 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
     expect((await page.locator("#ra-state").inputValue()) === "FL — Florida", `${run.key}: "Use my information" leaves the agent's state as Florida`, await page.locator("#ra-state").inputValue());
     // A converting client keeping their own agent is told the record must
     // match (Adam, 14 Sep 2026); a new formation is not.
-    expect((run.path === "convert") === /enter your agent's name and address exactly as the Division has them on file/.test(await page.locator("main").innerText()), `${run.key}: the own-agent choice tells a conversion the agent must match the record`, run.path);
+    expect((run.path === "convert") === /Enter your agent[’']s name and (?:Florida street )?address exactly as the Division has them on file/i.test(await page.locator("main").innerText()), `${run.key}: the own-agent choice tells a conversion the agent must match the record`, run.path);
     // By id: the choice card's own label CONTAINS phrases like "Florida
     // street address", so label lookup finds the card's hidden radio.
     await page.locator("#ra-first-name").fill("Casey");
@@ -2749,6 +2750,20 @@ async function main(): Promise<void> {
   {const r=batch04Results.get("batch04 169: agreement deletion uses portal confirmation");expect(r?.ok===true,"batch04 169: agreement deletion uses portal confirmation",r?.detail);batch04Results.delete("batch04 169: agreement deletion uses portal confirmation");}
   for(const [label,r]of batch04Results)expect(r.ok,label,r.detail);
 
+const batch06Results = new Map<string, {ok:boolean;detail?:unknown}>();
+await batch06Walk(browser, `http://localhost:${WEB_PORT}`, (ok,label,detail)=>batch06Results.set(label,{ok,detail}));
+{const r=batch06Results.get('batch06 51: retained agents support individuals and entities');expect(r?.ok===true,'batch06 51: retained agents support individuals and entities',r?.detail);batch06Results.delete('batch06 51: retained agents support individuals and entities');}
+{const r=batch06Results.get('batch06 71: retained agents do not promise a new acceptance');expect(r?.ok===true,'batch06 71: retained agents do not promise a new acceptance',r?.detail);batch06Results.delete('batch06 71: retained agents do not promise a new acceptance');}
+{const r=batch06Results.get('batch06 59: agent change is included in conversion authority');expect(r?.ok===true,'batch06 59: agent change is included in conversion authority',r?.detail);batch06Results.delete('batch06 59: agent change is included in conversion authority');}
+{const r=batch06Results.get('batch06 62: agent signature matches the complete legal name');expect(r?.ok===true,'batch06 62: agent signature matches the complete legal name',r?.detail);batch06Results.delete('batch06 62: agent signature matches the complete legal name');}
+{const r=batch06Results.get('batch06 69: non-Florida addresses are never relabeled');expect(r?.ok===true,'batch06 69: non-Florida addresses are never relabeled',r?.detail);batch06Results.delete('batch06 69: non-Florida addresses are never relabeled');}
+{const r=batch06Results.get('batch06 70: individual agent confirms Florida residency');expect(r?.ok===true,'batch06 70: individual agent confirms Florida residency',r?.detail);batch06Results.delete('batch06 70: individual agent confirms Florida residency');}
+{const r=batch06Results.get('batch06 72: mail promise matches the Terms');expect(r?.ok===true,'batch06 72: mail promise matches the Terms',r?.detail);batch06Results.delete('batch06 72: mail promise matches the Terms');}
+{const r=batch06Results.get('batch06 73: agent accepts and is familiar with obligations');expect(r?.ok===true,'batch06 73: agent accepts and is familiar with obligations',r?.detail);batch06Results.delete('batch06 73: agent accepts and is familiar with obligations');}
+{const r=batch06Results.get('batch06 75: signature warning punctuation is corrected');expect(r?.ok===true,'batch06 75: signature warning punctuation is corrected',r?.detail);batch06Results.delete('batch06 75: signature warning punctuation is corrected');}
+{const r=batch06Results.get('batch06 N4.07: retained agent agreement covers every series');expect(r?.ok===true,'batch06 N4.07: retained agent agreement covers every series',r?.detail);batch06Results.delete('batch06 N4.07: retained agent agreement covers every series');}
+{const r=batch06Results.get('batch06 N4.11: agent suffix survives acceptance and review');expect(r?.ok===true,'batch06 N4.11: agent suffix survives acceptance and review',r?.detail);batch06Results.delete('batch06 N4.11: agent suffix survives acceptance and review');}
+for(const [label,r] of batch06Results) expect(r.ok,label,r.detail);
 const batch05Results = new Map<string,{ok:boolean;detail?:unknown}>();
 await batch05Walk(browser, `http://localhost:${WEB_PORT}`, (ok,label,detail)=>batch05Results.set(label,{ok,detail}));
 {const r=batch05Results.get("batch05 N3.08: completion waits for service information");expect(r?.ok===true,"batch05 N3.08: completion waits for service information",r?.detail);batch05Results.delete("batch05 N3.08: completion waits for service information");}

@@ -21,6 +21,7 @@ export function raServicePatch(): Partial<FloridaLLCFormData> {
     registeredAgentType: "ENTITY",
     registeredAgentFirstName: "",
     registeredAgentLastName: "",
+    registeredAgentSuffix: "",
     registeredAgentBusinessEntityName: RA_SERVICE.name,
     registeredAgentStreetAddress1: RA_SERVICE.address1,
     registeredAgentStreetAddress2: RA_SERVICE.address2,
@@ -46,6 +47,9 @@ export function raSelfPatch(): Partial<FloridaLLCFormData> {
     registeredAgentChoice: "SELF",
     registeredAgentType: "INDIVIDUAL",
     registeredAgentBusinessEntityName: "",
+    registeredAgentFirstName: "",
+    registeredAgentLastName: "",
+    registeredAgentSuffix: "",
     // Everything the service patch filled in is theirs to type now
     // (14 Sep 2026: our office address and our series' name survived the
     // switch and were signed as the client's own).

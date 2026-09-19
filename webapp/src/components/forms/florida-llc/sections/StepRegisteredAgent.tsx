@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { AGENT_RESIDENCY, AGENT_EXISTING_RECORD } from "../registeredAgent";
 import { ShieldCheck, UserRound } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -16,6 +18,8 @@ interface StepProps {
 
 export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
   const choice = data.registeredAgentChoice;
+  const existing = data.filingPath === "CONVERT";
+  const [addressError, setAddressError] = useState<string>();
   const poBoxError =
     isPoBox(data.registeredAgentStreetAddress1) ||
     isPoBox(data.registeredAgentStreetAddress2 ?? "")
@@ -28,8 +32,9 @@ export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
         <h2 className="font-display text-3xl">Registered agent</h2>
         <p className="text-sm text-muted-foreground max-w-2xl">
           The registered agent receives legal notices on behalf of the LLC and
-          must have a physical Florida street address. Florida requires the
-          agent's signed acceptance, so the agent must be our service or you.
+          must have a physical Florida street address. {existing
+            ? "Keep the agent already on file or choose our service to replace it."
+            : "For a new appointment, Florida requires the agent’s signed acceptance. Through this service, you may appoint our service or serve personally."}
         </p>
       </header>
 
@@ -77,14 +82,12 @@ export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
             />
             <div className="flex items-center gap-2 font-medium">
               <UserRound className="h-4 w-4 text-trust" />
-              I'll serve as my own registered agent
+              {existing ? "Keep the registered agent already on file" : "I’ll serve as my own registered agent"}
             </div>
             <div className="text-xs text-muted-foreground mt-1">
-              You must have a physical Florida street address and you'll sign
-              the acceptance on the next screen.
-              {data.filingPath === "CONVERT"
-                ? " For an existing LLC, enter your agent's name and address exactly as the Division has them on file. This order does not change your agent."
-                : ""}
+              {existing
+                ? "Enter your agent’s name and Florida street address exactly as the Division has them on file. This order does not change your agent; no new appointment acceptance is needed. You will confirm the agent’s agreement to serve the protected series at Certification."
+                : "You must live in Florida and have a physical Florida business address; you’ll sign the acceptance on the next screen."}
             </div>
           </label>
         </div>
@@ -103,8 +106,7 @@ export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
           </div>
           <p className="pt-2 text-xs text-muted-foreground">
             Nothing to sign here — we execute the registered agent acceptance
-            when we prepare your filing, and anything we receive for your LLC
-            is posted to your client portal.
+            when we prepare your filing, and service of process and official government correspondence we receive for your LLC is posted to your client portal.
           </p>
           {/* Square requires the client's permission before a card is kept
               ("include a checkbox in your purchase flow"); the Terms' yearly
@@ -131,12 +133,14 @@ export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
 
       {choice === "SELF" ? (
         <>
-          {[data.clientFirstName, data.clientLastName].every((s) => s.trim()) ? (
+          {data.registeredAgentType !== "ENTITY" && [data.clientFirstName, data.clientLastName].every((s) => s.trim()) ? (
             <Button
               type="button"
               variant="outline"
               size="sm"
-              onClick={() =>
+              onClick={() => {
+                if (data.clientAddress.state !== "FL") { setAddressError("A Florida address is required. Your information was not copied; enter the agent’s Florida address."); return; }
+                setAddressError(undefined);
                 patch({
                   registeredAgentFirstName: data.clientFirstName.trim(),
                   registeredAgentLastName: data.clientLastName.trim(),
@@ -144,21 +148,31 @@ export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
                   registeredAgentStreetAddress1: data.clientAddress.address1,
                   registeredAgentStreetAddress2: data.clientAddress.address2 ?? "",
                   registeredAgentCity: data.clientAddress.city,
-                  // A registered agent must be in Florida whatever the client's
-                  // own state is (14 Sep 2026: an Ohio client sailed to payment).
+                  // The source state was checked before copying any field.
                   registeredAgentState: "FL",
                   registeredAgentZip: data.clientAddress.zip,
                   registeredAgentEmail: data.clientEmail,
                   registeredAgentPhone: data.clientPhone ?? "",
-                })
-              }
+                });
+              }}
             >
               Use my information ({fullPersonName(data.clientFirstName, data.clientLastName, data.clientSuffix)})
             </Button>
           ) : null}
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+          {existing ? (
+            <FieldShell label="Agent type" required htmlFor="ra-type" error={errors.registeredAgentType}>
+              <select id="ra-type" className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={data.registeredAgentType} onChange={(e) => patch({ registeredAgentType: e.target.value as "INDIVIDUAL" | "ENTITY", registeredAgentFirstName: "", registeredAgentLastName: "", registeredAgentSuffix: "", registeredAgentBusinessEntityName: "" })}>
+                <option value="INDIVIDUAL">Individual</option><option value="ENTITY">Business entity</option>
+              </select>
+            </FieldShell>
+          ) : null}
+          {existing && data.registeredAgentType === "ENTITY" ? (
+            <FieldShell label="Agent's legal entity name" required htmlFor="ra-entity" error={errors.registeredAgentBusinessEntityName}>
+              <Input id="ra-entity" value={data.registeredAgentBusinessEntityName ?? ""} onChange={(e) => patch({ registeredAgentBusinessEntityName: e.target.value })} />
+            </FieldShell>
+          ) : <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
             <FieldShell
-              label="Your first name"
+              label={existing ? "Agent’s first name" : "Your first name"}
               required
               error={errors.registeredAgentFirstName}
               htmlFor="ra-first-name"
@@ -170,7 +184,7 @@ export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
               />
             </FieldShell>
             <FieldShell
-              label="Your last name"
+              label={existing ? "Agent’s last name" : "Your last name"}
               required
               error={errors.registeredAgentLastName}
               htmlFor="ra-last-name"
@@ -189,30 +203,32 @@ export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
                 placeholder="Jr, Sr, III…"
               />
             </FieldShell>
-          </div>
+          </div>}
 
           <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
             <FieldShell
               label="Florida street address"
               required
               className="md:col-span-6"
-              error={poBoxError ?? errors.registeredAgentStreetAddress1}
+              error={addressError ?? poBoxError ?? errors.registeredAgentStreetAddress1}
               htmlFor="ra-street"
             >
               <AddressAutocomplete
                 id="ra-street"
                 value={data.registeredAgentStreetAddress1}
                 onChangeText={(text) =>
-                  patch({ registeredAgentStreetAddress1: text })
+                  { setAddressError(undefined); patch({ registeredAgentStreetAddress1: text }); }
                 }
-                onSelect={(s) =>
+                onSelect={(s) => {
+                  if (s.state !== "FL") { setAddressError("A Florida address is required. This suggestion was not selected."); return; }
+                  setAddressError(undefined);
                   patch({
                     registeredAgentStreetAddress1: s.address1,
                     registeredAgentCity: s.city,
                     registeredAgentState: "FL",
                     registeredAgentZip: s.zip,
-                  })
-                }
+                  });
+                }}
               />
             </FieldShell>
 
@@ -268,22 +284,10 @@ export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
           </div>
 
           <div className="space-y-3">
-            <AcknowledgeBox
-              id="ra-not-llc"
-              checked={data.registeredAgentNotSameAsLlc}
-              onChange={(v) => patch({ registeredAgentNotSameAsLlc: v })}
-              label="I understand that the LLC itself cannot serve as its own registered agent — I am accepting this role personally."
-              error={errors.registeredAgentNotSameAsLlc}
-            />
-            <AcknowledgeBox
-              id="ra-physical"
-              checked={data.registeredAgentPhysicalAddressAcknowledgment}
-              onChange={(v) =>
-                patch({ registeredAgentPhysicalAddressAcknowledgment: v })
-              }
-              label="I confirm this is my physical street address in Florida and not a P.O. Box."
-              error={errors.registeredAgentPhysicalAddressAcknowledgment}
-            />
+            {existing ? <AcknowledgeBox id="ra-existing-record" checked={data.registeredAgentExistingRecordAcknowledgment === true} onChange={(v) => patch({ registeredAgentExistingRecordAcknowledgment: v })} label={AGENT_EXISTING_RECORD} error={errors.registeredAgentExistingRecordAcknowledgment} /> : <>
+              <AcknowledgeBox id="ra-not-llc" checked={data.registeredAgentNotSameAsLlc} onChange={(v) => patch({ registeredAgentNotSameAsLlc: v })} label="I understand that the LLC itself cannot serve as its own registered agent — I am accepting this role personally." error={errors.registeredAgentNotSameAsLlc} />
+              <AcknowledgeBox id="ra-physical" checked={data.registeredAgentResidencyAcknowledgment === true && data.registeredAgentPhysicalAddressAcknowledgment} onChange={(v) => patch({ registeredAgentResidencyAcknowledgment: v, registeredAgentPhysicalAddressAcknowledgment: v })} label={AGENT_RESIDENCY} error={errors.registeredAgentResidencyAcknowledgment ?? errors.registeredAgentPhysicalAddressAcknowledgment} />
+            </>}
           </div>
         </>
       ) : null}

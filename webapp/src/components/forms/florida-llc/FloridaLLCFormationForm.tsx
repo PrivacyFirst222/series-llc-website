@@ -1,3 +1,4 @@
+import { patchAgentConsents } from "./registeredAgent";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Check, Save, Trash2 } from "lucide-react";
@@ -209,7 +210,7 @@ export function FloridaLLCFormationForm({
   }, [data]);
 
   const patch = (p: Partial<FloridaLLCFormData>) =>
-    setData((d) => ({ ...d, ...p }));
+    setData((d) => patchAgentConsents(d, p));
 
   // Soft USPS check state: which step has an unresolved warning. Continuing a
   // second time proceeds — the check advises, it never blocks.

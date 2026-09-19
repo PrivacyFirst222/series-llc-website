@@ -1,7 +1,8 @@
+import { registeredAgentName } from "../src/components/forms/florida-llc/registeredAgent";
 import { z } from "zod";
 import { FIRST_AND_LAST, hasFirstAndLast } from "../src/lib/personName";
 import { normalizeEntityName } from "../src/components/forms/florida-llc/nameSimilarity";
-import { formationFormSchema } from "../src/components/forms/florida-llc/schema";
+import { isPoBox, formationFormSchema } from "../src/components/forms/florida-llc/schema";
 import { designatorAllowedForFormationType, hasProtectedSeriesPhrase, memberRowIsBlank, nameContainsLegalDesignator, seriesDedupeKey, validateEffectiveDate } from "../src/components/forms/florida-llc/validation";
 import { llcDesignators } from "../src/components/forms/florida-llc/schema";
 import { raServicePatch } from "../src/components/forms/florida-llc/raService";
@@ -76,6 +77,8 @@ const extendedFormSchema = formationFormSchema
     // The acceptance is signed only by a self-agent on a new formation; a
     // conversion keeping its own agent files no appointment (15 Sep 2026).
     // Re-imposed below for the case that needs it.
+    registeredAgentNotSameAsLlc: z.boolean().optional(),
+    registeredAgentPhysicalAddressAcknowledgment: z.boolean().optional(),
     registeredAgentAcceptanceName: z.string().trim().max(200).optional().or(z.literal("")),
     registeredAgentAcceptanceCheckbox: z.boolean().optional(),
     registeredAgentElectronicSignature: z.string().max(200).optional().or(z.literal("")),
@@ -220,15 +223,25 @@ const extendedFormSchema = formationFormSchema
     if (data.registeredAgentChoice === "SERVICE" && data.raRenewalCardConsent !== true) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["raRenewalCardConsent"], message: "Please agree to keep a card on file for the yearly renewal." });
     }
-    if (
-      data.registeredAgentChoice === "SELF" &&
-      (!data.registeredAgentFirstName?.trim() || !data.registeredAgentLastName?.trim())
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["registeredAgentLastName"],
-        message: "The registered agent's first and last name are required.",
-      });
+    if (data.registeredAgentChoice === "SELF") {
+      const retained = data.filingPath === "CONVERT";
+      const entity = retained && data.registeredAgentType === "ENTITY";
+      const issue = (field: string, message: string) => ctx.addIssue({ code: z.ZodIssueCode.custom, path: [field], message });
+      if (entity) {
+        if (!data.registeredAgentBusinessEntityName?.trim()) issue("registeredAgentBusinessEntityName", "The agent’s legal entity name is required.");
+      } else {
+        if (data.registeredAgentType !== "INDIVIDUAL") issue("registeredAgentType", "Choose an individual agent.");
+        if (!data.registeredAgentFirstName?.trim() || !data.registeredAgentLastName?.trim()) issue("registeredAgentLastName", "The registered agent's first and last name are required.");
+      }
+      if (isPoBox(data.registeredAgentStreetAddress1) || isPoBox(data.registeredAgentStreetAddress2 ?? "")) issue("registeredAgentStreetAddress1", "A P.O. Box cannot be used for the registered agent address.");
+      if (retained) {
+        if (data.registeredAgentExistingRecordAcknowledgment !== true) issue("registeredAgentExistingRecordAcknowledgment", "Confirm the agent and address match the Division’s existing record.");
+        if (data.registeredAgentSeriesAgreementAcknowledgment !== true) issue("registeredAgentSeriesAgreementAcknowledgment", "Confirm the registered agent has agreed to serve the company and each protected series.");
+      } else {
+        if (data.registeredAgentNotSameAsLlc !== true) issue("registeredAgentNotSameAsLlc", "Acknowledgment is required.");
+        if (data.registeredAgentPhysicalAddressAcknowledgment !== true) issue("registeredAgentPhysicalAddressAcknowledgment", "Acknowledgment is required.");
+        if (data.registeredAgentResidencyAcknowledgment !== true) issue("registeredAgentResidencyAcknowledgment", "Confirm that you live in Florida and this is your business address and the registered office.");
+      }
     }
     if (data.filingPath === "CONVERT") {
       if (data.conversionAuthorityAcknowledgment !== true) {
@@ -254,6 +267,9 @@ const extendedFormSchema = formationFormSchema
       } else if (!hasFirstAndLast(data.registeredAgentAcceptanceName ?? "")) {
         ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["registeredAgentAcceptanceName"], message: FIRST_AND_LAST });
       }
+      const expected = registeredAgentName(data);
+      if ((data.registeredAgentAcceptanceName ?? "").trim() !== expected) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["registeredAgentAcceptanceName"], message: `The acceptance name must match the registered agent name exactly: ${expected}` });
+      if ((data.registeredAgentElectronicSignature ?? "").trim() !== expected) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["registeredAgentElectronicSignature"], message: `Your electronic signature must match the registered agent name exactly: ${expected}` });
       if (data.registeredAgentAcceptanceCheckbox !== true) {
         ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["registeredAgentAcceptanceCheckbox"], message: "Acceptance is required." });
       }
@@ -354,6 +370,9 @@ export const orderFormSchema = z.preprocess((raw) => {
     if (d.registeredAgentChoice === "SERVICE") {
       d = { ...d, ...raServicePatch() };
     }
+    if (d.registeredAgentType === "ENTITY") d = { ...d, registeredAgentFirstName: "", registeredAgentLastName: "", registeredAgentSuffix: "" };
+    else if (d.registeredAgentType === "INDIVIDUAL") d = { ...d, registeredAgentBusinessEntityName: "" };
+    if (d.filingPath === "CONVERT" && d.registeredAgentChoice === "SELF") d = { ...d, registeredAgentAcceptanceName: "", registeredAgentElectronicSignature: "", registeredAgentAcceptanceCheckbox: false, registeredAgentSignatureAuthorizationCheckbox: false };
     if (d.managementStructure === "MANAGER_MANAGED") {
       // The manager-managed statement always goes in the Articles.
       d = { ...d, includeManagementStatementInArticles: true };

@@ -1,3 +1,4 @@
+import { AGENT_RESIDENCY, AGENT_EXISTING_RECORD, AGENT_ACCEPTANCE, AGENT_SERIES_AGREEMENT, AGENT_FORM_VERSION, conversionAuthority } from "../src/components/forms/florida-llc/registeredAgent";
 import { selectedParty } from "../src/lib/partyIdentity";
 /**
  * The Order Summary (Adam, 10 Sep 2026): one PDF per order, written when the
@@ -28,13 +29,16 @@ export const ACKNOWLEDGMENTS: { field: string; text: string | ((p: SubmissionPay
   { field: "exactNameOnly", text: "I only want this exact name — if it is unavailable, contact me before doing anything else." },
   { field: "seriesOwnershipAcknowledged", text: "I understand that every protected series will be owned by my LLC, and that no series will have its own separate owners." },
   { field: "registeredAgentNotSameAsLlc", text: "I understand that the LLC itself cannot serve as its own registered agent — I am accepting this role personally." },
-  { field: "registeredAgentPhysicalAddressAcknowledgment", text: "I confirm this is my physical street address in Florida and not a P.O. Box." },
-  { field: "registeredAgentAcceptanceCheckbox", text: "I accept the appointment and acknowledge the obligations of serving as registered agent for this Florida LLC." },
+  { field: "registeredAgentPhysicalAddressAcknowledgment", text: "I confirm this is my physical street address in Florida and not a P.O. Box.", when: (p) => p.metadata?.formVersion !== AGENT_FORM_VERSION },
+  { field: "registeredAgentResidencyAcknowledgment", text: AGENT_RESIDENCY },
+  { field: "registeredAgentExistingRecordAcknowledgment", text: AGENT_EXISTING_RECORD },
+  { field: "registeredAgentSeriesAgreementAcknowledgment", text: AGENT_SERIES_AGREEMENT },
+  { field: "registeredAgentAcceptanceCheckbox", text: (p) => p.metadata?.formVersion === AGENT_FORM_VERSION ? AGENT_ACCEPTANCE : "I accept the appointment and acknowledge the obligations of serving as registered agent for this Florida LLC." },
   { field: "registeredAgentSignatureAuthorizationCheckbox", text: "I certify that I am signing for myself as the registered agent." },
   { field: "articlesSignerAppointed", text: "I appoint MyFloridaSeriesLLC as my authorized representative to sign and file my Articles of Organization, and I certify that the information I have provided is true, accurate, and complete." },
   { field: "authorizedRepresentativeSignatureCheckbox", text: "I certify that I am authorized to sign and submit information for this LLC." },
   { field: "atLeastOneMemberAcknowledged", text: "I affirm that the LLC has or will have at least one member when the Articles of Organization become effective." },
-  { field: "conversionAuthorityAcknowledged", text: (p) => `I am authorized to act for ${(p.existingLlcName ?? "").trim() || "the company"}, its members have consented to establishing the protected series on this order, and I authorize MyFloridaSeriesLLC to prepare and file the Protected Series Designations with the Florida Division of Corporations.` },
+  { field: "conversionAuthorityAcknowledged", text: (p) => p.metadata?.formVersion === AGENT_FORM_VERSION ? conversionAuthority(p.existingLlcName ?? "", p.registeredAgent?.choice === "SERVICE") : `I am authorized to act for ${(p.existingLlcName ?? "").trim() || "the company"}, its members have consented to establishing the protected series on this order, and I authorize MyFloridaSeriesLLC to prepare and file the Protected Series Designations with the Florida Division of Corporations.` },
   { field: "accuracyAcknowledged", text: "I certify that the information provided is true and accurate to the best of my knowledge." },
   { field: "addressAccuracyAcknowledgment", text: "I am solely responsible for the accuracy of all addresses I have provided. I understand that state filings, legal notices, and official correspondence will be directed to these addresses exactly as entered, and that MyFloridaSeriesLLC does not verify the accuracy or deliverability of any address. Any address-suggestion or address-checking feature in this form is a convenience only and is not a verification, warranty, or guarantee of any kind." },
   { field: "termsOfServiceAcknowledgment", text: "I agree to all terms and conditions set forth in the Terms of Service, including its binding individual arbitration provision and class action waiver." },
@@ -88,9 +92,9 @@ function ticked(p: SubmissionPayload): { text: string; field: string }[] {
   };
   // When we are the agent, the four agent boxes are filled in by the program,
   // never shown to the client: not "ticked by the client" (14 Sep 2026).
-  const raBoxes = new Set(["registeredAgentNotSameAsLlc", "registeredAgentPhysicalAddressAcknowledgment", "registeredAgentAcceptanceCheckbox", "registeredAgentSignatureAuthorizationCheckbox"]);
+  const raBoxes = new Set(["registeredAgentNotSameAsLlc", "registeredAgentPhysicalAddressAcknowledgment", "registeredAgentAcceptanceCheckbox", "registeredAgentSignatureAuthorizationCheckbox", "registeredAgentResidencyAcknowledgment", "registeredAgentExistingRecordAcknowledgment", "registeredAgentSeriesAgreementAcknowledgment"]);
   const ourAgent = p.registeredAgent?.choice === "SERVICE";
-  return ACKNOWLEDGMENTS.filter((a) => flags[a.field] === true && !(ourAgent && raBoxes.has(a.field))).map((a) => ({ field: a.field, text: typeof a.text === "function" ? a.text(p) : a.text }));
+  return ACKNOWLEDGMENTS.filter((a) => flags[a.field] === true && (!a.when || a.when(p)) && !(ourAgent && raBoxes.has(a.field))).map((a) => ({ field: a.field, text: typeof a.text === "function" ? a.text(p) : a.text }));
 }
 
 /** The summary as markdown, from the stored order row. */
@@ -119,7 +123,7 @@ export function summaryMarkdown(o: SummaryOrderRow): string {
   out.push(line("Package", conversion ? "Protected Series Designations for an existing Florida LLC" : "New Protected Series LLC formation"));
   out.push(line("Formation type", p.formationType === "PLLC" ? "Professional LLC" : "LLC"));
   out.push(line("Protected series", (p.series ?? []).map((s) => s.name).join("; ")));
-  out.push(line("Registered agent", p.registeredAgent?.choice === "SERVICE" ? "Our registered agent service" : "Client's own agent"));
+  out.push(line("Registered agent", p.registeredAgent?.choice === "SERVICE" ? "Our registered agent service" : conversion ? "Existing registered agent retained" : "Client serving personally"));
   out.push(line("Certificate of Status", p.optionalDocuments?.certificateOfStatus ? "Yes" : "No"));
   out.push(line("Certified Copy", p.optionalDocuments?.certifiedCopy ? "Yes" : "No"));
   out.push(line("Federal EIN service", p.optionalDocuments?.ein ? "Yes" : "No"));
@@ -170,17 +174,19 @@ export function summaryMarkdown(o: SummaryOrderRow): string {
   (p.series ?? []).forEach((s, i) => out.push(line(`Series ${i + 1}`, s.name)));
   out.push(`### Registered agent`);
   const ra = p.registeredAgent;
-  out.push(line("Choice", ra?.choice === "SERVICE" ? "Our registered agent service" : "Client's own agent"));
+  out.push(line("Choice", ra?.choice === "SERVICE" ? "Our registered agent service" : conversion ? "Existing registered agent retained" : "Client serving personally"));
   if (ra?.choice !== "SERVICE") {
     out.push(line("Type", ra?.type === "ENTITY" ? "Business entity" : ra?.type === "INDIVIDUAL" ? "Individual" : ra?.type));
     out.push(line("Name", ra?.businessEntityName || ra?.name));
     out.push(line("Address", addr(ra?.address)));
     out.push(line("Email", ra?.email));
     out.push(line("Phone", ra?.phone));
+    if (!conversion) {
     out.push(`### Agent acceptance`);
     out.push(line("Accepted by", ra?.acceptance?.acceptanceName));
     out.push(line("Capacity", ra?.acceptance?.capacity === "INDIVIDUAL_AGENT" ? "The registered agent, an individual" : ra?.acceptance?.capacity === "PRINCIPAL_OF_ENTITY" ? "Principal of the entity serving as agent" : ra?.acceptance?.capacity));
     out.push(line("Electronic signature", ra?.acceptance?.electronicSignature));
+    }
   }
   out.push(`### Management`);
   out.push(line("Structure", p.management?.structure === "MANAGER_MANAGED" ? "Manager-managed" : p.management?.structure === "MEMBER_MANAGED" ? "Member-managed" : p.management?.structure));

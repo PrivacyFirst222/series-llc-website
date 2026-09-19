@@ -1,3 +1,4 @@
+import { registeredAgentName } from "./registeredAgent";
 import { FIRST_AND_LAST, hasFirstAndLast } from "@/lib/personName";
 import { isPoBox } from "./schema";
 import { nameCheckKey, normalizeEntityName } from "./nameSimilarity";
@@ -206,9 +207,12 @@ export function validateStep(
     if (data.registeredAgentChoice === "SERVICE" && data.raRenewalCardConsent !== true)
       e.raRenewalCardConsent = "Please agree to keep a card on file for the yearly renewal.";
     if (data.registeredAgentChoice === "SELF") {
-      if (!(data.registeredAgentFirstName ?? "").trim())
+      const retainedEntity = data.filingPath === "CONVERT" && data.registeredAgentType === "ENTITY";
+      if (!retainedEntity && data.registeredAgentType !== "INDIVIDUAL") e.registeredAgentType = "Choose an individual agent.";
+      if (retainedEntity && !(data.registeredAgentBusinessEntityName ?? "").trim()) e.registeredAgentBusinessEntityName = "The agent’s legal entity name is required.";
+      if (!retainedEntity && !(data.registeredAgentFirstName ?? "").trim())
         e.registeredAgentFirstName = "First name is required.";
-      if (!(data.registeredAgentLastName ?? "").trim())
+      if (!retainedEntity && !(data.registeredAgentLastName ?? "").trim())
         e.registeredAgentLastName = "Last name is required.";
       if (!data.registeredAgentStreetAddress1)
         e.registeredAgentStreetAddress1 = "Street address required.";
@@ -222,11 +226,16 @@ export function validateStep(
       )
         e.registeredAgentStreetAddress1 =
           "A P.O. Box cannot be used for the registered agent address.";
-      if (!data.registeredAgentNotSameAsLlc)
-        e.registeredAgentNotSameAsLlc = "Acknowledgment is required.";
-      if (!data.registeredAgentPhysicalAddressAcknowledgment)
-        e.registeredAgentPhysicalAddressAcknowledgment =
-          "Acknowledgment is required.";
+      if (data.filingPath === "CONVERT") {
+        if (data.registeredAgentExistingRecordAcknowledgment !== true) e.registeredAgentExistingRecordAcknowledgment = "Confirm the agent and address match the Division’s existing record.";
+      } else {
+        if (data.registeredAgentResidencyAcknowledgment !== true) e.registeredAgentResidencyAcknowledgment = "Confirm that you live in Florida and this is your business address and the registered office.";
+        if (!data.registeredAgentNotSameAsLlc)
+          e.registeredAgentNotSameAsLlc = "Acknowledgment is required.";
+        if (!data.registeredAgentPhysicalAddressAcknowledgment)
+          e.registeredAgentPhysicalAddressAcknowledgment =
+            "Acknowledgment is required.";
+      }
     }
   }
 
@@ -239,6 +248,9 @@ export function validateStep(
       e.registeredAgentAcceptanceName = FIRST_AND_LAST;
     if (!data.registeredAgentElectronicSignature)
       e.registeredAgentElectronicSignature = "Electronic signature required.";
+    const expected = registeredAgentName(data);
+    if (data.registeredAgentAcceptanceName.trim() !== expected) e.registeredAgentAcceptanceName = `The acceptance name must match the registered agent name exactly: ${expected}`;
+    if (data.registeredAgentElectronicSignature.trim() !== expected) e.registeredAgentElectronicSignature = `Your electronic signature must match the registered agent name exactly: ${expected}`;
     if (!data.registeredAgentAcceptanceCheckbox)
       e.registeredAgentAcceptanceCheckbox = "Acceptance is required.";
     if (!data.registeredAgentSignatureAuthorizationCheckbox)
@@ -368,6 +380,7 @@ export function validateStep(
 
   // "review" step has no required validation
   if (step === "certify") {
+    if (data.filingPath === "CONVERT" && data.registeredAgentChoice === "SELF" && data.registeredAgentSeriesAgreementAcknowledgment !== true) e.registeredAgentSeriesAgreementAcknowledgment = "Confirm the registered agent has agreed to serve the company and each protected series.";
     if (data.filingPath === "CONVERT") {
       // No Articles to sign: the client certifies authority for the company
       // already on file and authorizes the Designation filings.

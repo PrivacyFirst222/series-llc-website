@@ -154,7 +154,7 @@ export interface FloridaLLCFormData {
   mailingAddress: AddressFields;
 
   // Section 5
-  /** SERVICE = our registered agent service; SELF = the customer is the agent. */
+  /** SERVICE = our service; SELF = personal agent for NEW, retained agent for CONVERT. */
   registeredAgentChoice?: "SERVICE" | "SELF";
   registeredAgentType: RegisteredAgentType | "";
   registeredAgentFirstName?: string;
@@ -171,6 +171,9 @@ export interface FloridaLLCFormData {
   registeredAgentIsAffiliatedPerson: boolean;
   registeredAgentNotSameAsLlc: boolean;
   registeredAgentPhysicalAddressAcknowledgment: boolean;
+  registeredAgentResidencyAcknowledgment?: boolean;
+  registeredAgentExistingRecordAcknowledgment?: boolean;
+  registeredAgentSeriesAgreementAcknowledgment?: boolean;
   /** Our service: the client agrees to a card kept on file with Square for
    *  the yearly renewal (Square requires the permission; 16 Sep 2026). */
   raRenewalCardConsent: boolean;
@@ -359,6 +362,9 @@ export interface SubmissionPayload {
     exactNameOnly: boolean;
     registeredAgentNotSameAsLlc: boolean;
     registeredAgentPhysicalAddressAcknowledgment: boolean;
+    registeredAgentResidencyAcknowledgment?: boolean;
+    registeredAgentExistingRecordAcknowledgment?: boolean;
+    registeredAgentSeriesAgreementAcknowledgment?: boolean;
     registeredAgentAcceptanceCheckbox: boolean;
     registeredAgentSignatureAuthorizationCheckbox: boolean;
     authorizedRepresentativeSignatureCheckbox: boolean;

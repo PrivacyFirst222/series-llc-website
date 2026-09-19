@@ -1,3 +1,4 @@
+import { conversionAuthority, AGENT_SERIES_AGREEMENT } from "../registeredAgent";
 import { Link } from "react-router-dom";
 import { PHONE_HINT, formatPhone } from "@/lib/phone";
 import { fullPersonName } from "../validation";
@@ -114,9 +115,10 @@ function ConversionCertification({ data, patch, errors }: StepProps) {
           id="cert-conversion-authority"
           checked={data.conversionAuthorityAcknowledgment === true}
           onChange={(v) => patch({ conversionAuthorityAcknowledgment: v })}
-          label={`I am authorized to act for ${company}, its members have consented to establishing the protected series on this order, and I authorize MyFloridaSeriesLLC to prepare and file the Protected Series Designations with the Florida Division of Corporations.`}
+          label={conversionAuthority(company, data.registeredAgentChoice === "SERVICE")}
           error={errors.conversionAuthorityAcknowledgment}
         />
+        {data.registeredAgentChoice === "SELF" ? <AcknowledgeBox id="cert-agent-series" checked={data.registeredAgentSeriesAgreementAcknowledgment === true} onChange={(v) => patch({ registeredAgentSeriesAgreementAcknowledgment: v })} label={AGENT_SERIES_AGREEMENT} error={errors.registeredAgentSeriesAgreementAcknowledgment} /> : null}
         <SharedAcknowledgments data={data} patch={patch} errors={errors} />
       </div>
     </div>
@@ -252,7 +254,7 @@ export function StepCertification({ data, patch, errors }: StepProps) {
               but if you are serving as the manager personally, then your name
               is already on the public record. If your name does not appear on
               Sunbiz.org (the Florida Division of Corporations&rsquo; website), a
-              bank, or the Division of Workers&rsquo; Compensation may ask why
+              bank or the Division of Workers&rsquo; Compensation may ask why
               the name on your formation document is not yours. We include a
               signed Statement of Authorized Representative with your documents
               to answer that, however, we cannot guarantee that all banks and
@@ -389,6 +391,7 @@ export function StepCertification({ data, patch, errors }: StepProps) {
           label="I affirm that the LLC has or will have at least one member when the Articles of Organization become effective."
           error={errors.atLeastOneMemberAcknowledgment}
         />
+        {data.registeredAgentChoice === "SELF" ? <AcknowledgeBox id="cert-agent-series" checked={data.registeredAgentSeriesAgreementAcknowledgment === true} onChange={(v) => patch({ registeredAgentSeriesAgreementAcknowledgment: v })} label={AGENT_SERIES_AGREEMENT} error={errors.registeredAgentSeriesAgreementAcknowledgment} /> : null}
         <SharedAcknowledgments data={data} patch={patch} errors={errors} />
       </div>
     </div>

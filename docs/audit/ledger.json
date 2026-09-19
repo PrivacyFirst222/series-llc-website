@@ -1688,14 +1688,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T17:14:14.811Z",
+              "event": "assigned",
+              "batch": "06",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T17:26:09.494Z",
+              "event": "implemented",
+              "batch": "06",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "06",
+          "fix": {
+            "batch": "06",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch06 51: retained agents support individuals and entities"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -1934,14 +1961,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T17:14:14.811Z",
+              "event": "assigned",
+              "batch": "06",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T17:26:09.494Z",
+              "event": "implemented",
+              "batch": "06",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "06",
+          "fix": {
+            "batch": "06",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch06 59: agent change is included in conversion authority"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -2027,14 +2081,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T17:14:14.811Z",
+              "event": "assigned",
+              "batch": "06",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T17:26:09.494Z",
+              "event": "implemented",
+              "batch": "06",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "06",
+          "fix": {
+            "batch": "06",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch06 62: agent signature matches the complete legal name"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -2300,14 +2381,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T17:14:14.811Z",
+              "event": "assigned",
+              "batch": "06",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T17:26:09.494Z",
+              "event": "implemented",
+              "batch": "06",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "06",
+          "fix": {
+            "batch": "06",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch06 69: non-Florida addresses are never relabeled"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -2331,14 +2439,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T17:14:14.811Z",
+              "event": "assigned",
+              "batch": "06",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T17:26:09.494Z",
+              "event": "implemented",
+              "batch": "06",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "06",
+          "fix": {
+            "batch": "06",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch06 70: individual agent confirms Florida residency"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -2361,17 +2496,44 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T17:14:14.811Z",
+              "event": "assigned",
+              "batch": "06",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T17:26:09.494Z",
+              "event": "implemented",
+              "batch": "06",
+              "revision": 1,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "51",
             "part": "all"
+          },
+          "batch": "06",
+          "fix": {
+            "batch": "06",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch06 71: retained agents do not promise a new acceptance"
+              }
+            ]
           }
         }
       ],
@@ -2395,14 +2557,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T17:14:14.811Z",
+              "event": "assigned",
+              "batch": "06",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T17:26:09.494Z",
+              "event": "implemented",
+              "batch": "06",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "06",
+          "fix": {
+            "batch": "06",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch06 72: mail promise matches the Terms"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -2425,14 +2614,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T17:14:14.811Z",
+              "event": "assigned",
+              "batch": "06",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T17:26:09.494Z",
+              "event": "implemented",
+              "batch": "06",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "06",
+          "fix": {
+            "batch": "06",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch06 73: agent accepts and is familiar with obligations"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -2486,14 +2702,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T17:14:14.811Z",
+              "event": "assigned",
+              "batch": "06",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T17:26:09.494Z",
+              "event": "implemented",
+              "batch": "06",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "06",
+          "fix": {
+            "batch": "06",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch06 75: signature warning punctuation is corrected"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -12086,14 +12329,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T17:14:14.811Z",
+              "event": "assigned",
+              "batch": "06",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T17:26:09.494Z",
+              "event": "implemented",
+              "batch": "06",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "06",
+          "fix": {
+            "batch": "06",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch06 N4.07: retained agent agreement covers every series"
+              }
+            ]
+          }
         }
       ]
     },
@@ -12209,14 +12479,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T17:14:14.811Z",
+              "event": "assigned",
+              "batch": "06",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T17:26:09.494Z",
+              "event": "implemented",
+              "batch": "06",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "06",
+          "fix": {
+            "batch": "06",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch06 N4.11: agent suffix survives acceptance and review"
+              }
+            ]
+          }
         }
       ]
     }
@@ -12489,6 +12786,25 @@
         },
         {
           "at": "2026-09-19T15:56:45.786Z",
+          "event": "implemented"
+        }
+      ]
+    },
+    {
+      "id": "06",
+      "revision": 1,
+      "frozenHash": "6c6938381f21c81890c1138f20c23d3bcefe568879590ee95d880372c69687a5",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "f2aa05568a2f057808066fdba3ac6055a7578ef2",
+      "history": [
+        {
+          "at": "2026-09-19T17:14:14.812Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-19T17:26:09.494Z",
           "event": "implemented"
         }
       ]

@@ -1,3 +1,4 @@
+import { AGENT_FORM_VERSION } from "../src/components/forms/florida-llc/registeredAgent";
 /**
  * The Order Summary's acknowledgment wordings must match the form's own
  * boxes, word for word — the summary is the record of what the client agreed
@@ -21,10 +22,10 @@ const norm = (s: string) => s.replace(/\s+/g, " ").replace(/&mdash;/g, "—").tr
 const dir = new URL("../src/components/forms/florida-llc/sections/", import.meta.url);
 // The S election deadline box's words live beside the 2553 timing rule,
 // not in a section file (14 Sep 2026).
-const sources = norm([...readdirSync(dir).filter((f) => f.endsWith(".tsx")).map((f) => readFileSync(new URL(f, dir), "utf8")), readFileSync(new URL("../src/lib/form2553Timing.ts", import.meta.url), "utf8")].join("\n"));
-const sampleNew = { filingPath: "NEW", existingLlcName: "" } as SubmissionPayload;
-const sampleConv = { filingPath: "CONVERT", existingLlcName: "ACME LLC" } as SubmissionPayload;
-for (const a of ACKNOWLEDGMENTS) {
+const sources = norm([...readdirSync(dir).filter((f) => f.endsWith(".tsx")).map((f) => readFileSync(new URL(f, dir), "utf8")), readFileSync(new URL("../src/lib/form2553Timing.ts", import.meta.url), "utf8"), readFileSync(new URL("../src/components/forms/florida-llc/registeredAgent.ts", import.meta.url), "utf8")].join("\n"));
+const sampleNew = { metadata: { formVersion: AGENT_FORM_VERSION }, filingPath: "NEW", existingLlcName: "" } as SubmissionPayload;
+const sampleConv = { metadata: { formVersion: AGENT_FORM_VERSION }, filingPath: "CONVERT", existingLlcName: "ACME LLC" } as SubmissionPayload;
+for (const a of ACKNOWLEDGMENTS.filter(a => !a.when || a.when(sampleNew) || a.when(sampleConv))) {
   const texts = typeof a.text === "function" ? [a.text(sampleNew), a.text(sampleConv)] : [a.text];
   for (const t of texts) {
     // The form writes a few of these across JSX lines and template pieces;

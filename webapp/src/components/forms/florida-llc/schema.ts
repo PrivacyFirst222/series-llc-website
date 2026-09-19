@@ -154,6 +154,9 @@ export const formationFormSchema = z.object({
     errorMap: () => ({ message: "Acknowledgment is required." }),
   }),
 
+  registeredAgentResidencyAcknowledgment: z.boolean().optional(),
+  registeredAgentExistingRecordAcknowledgment: z.boolean().optional(),
+  registeredAgentSeriesAgreementAcknowledgment: z.boolean().optional(),
   raRenewalCardConsent: z.boolean().optional().default(false),
   registeredAgentAcceptanceName: z.string().trim().min(1, "Name required").refine(hasFirstAndLast, FIRST_AND_LAST),
   registeredAgentAcceptanceCapacity: z.enum([

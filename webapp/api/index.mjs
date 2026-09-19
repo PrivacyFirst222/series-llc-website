@@ -100795,37 +100795,6 @@ function hasFirstAndLast(name) {
   return words.length >= 2;
 }
 
-// src/components/forms/florida-llc/nameSimilarity.ts
-var SUFFIXES = /* @__PURE__ */ new Set([
-  "LLC",
-  "L.L.C",
-  "PLLC",
-  "P.L.L.C",
-  "INC",
-  "INCORPORATED",
-  "CORP",
-  "CORPORATION",
-  "CO",
-  "COMPANY",
-  "LTD",
-  "LIMITED",
-  "LP",
-  "L.P",
-  "LLP",
-  "LLLP",
-  "PA",
-  "P.A",
-  "PL",
-  "P.L",
-  "PC",
-  "CHARTERED"
-]);
-var ARTICLES = /* @__PURE__ */ new Set(["THE", "A", "AN"]);
-function normalizeEntityName(name) {
-  const tokens = name.toUpperCase().replace(/&/g, " AND ").replace(/['\u2019]/g, "").replace(/[^A-Z0-9 ]+/g, " ").split(/\s+/).filter(Boolean).filter((t) => !SUFFIXES.has(t) && !ARTICLES.has(t) && t !== "AND").map((t) => t.length > 3 && t.endsWith("S") ? t.slice(0, -1) : t);
-  return tokens.join(" ");
-}
-
 // src/components/forms/florida-llc/schema.ts
 var PO_BOX_REGEX = /\b(p\.?\s*o\.?\s*box|post\s*office\s*box)\b/i;
 var isPoBox = (s) => PO_BOX_REGEX.test(s);
@@ -100969,6 +100938,9 @@ var formationFormSchema = external_exports.object({
   registeredAgentPhysicalAddressAcknowledgment: external_exports.literal(true, {
     errorMap: () => ({ message: "Acknowledgment is required." })
   }),
+  registeredAgentResidencyAcknowledgment: external_exports.boolean().optional(),
+  registeredAgentExistingRecordAcknowledgment: external_exports.boolean().optional(),
+  registeredAgentSeriesAgreementAcknowledgment: external_exports.boolean().optional(),
   raRenewalCardConsent: external_exports.boolean().optional().default(false),
   registeredAgentAcceptanceName: external_exports.string().trim().min(1, "Name required").refine(hasFirstAndLast, FIRST_AND_LAST),
   registeredAgentAcceptanceCapacity: external_exports.enum([
@@ -101164,6 +101136,51 @@ function fullPersonName(first, last2, suffix) {
   return sfx ? `${base}, ${sfx}` : base;
 }
 
+// src/components/forms/florida-llc/registeredAgent.ts
+var AGENT_RESIDENCY = "I live in Florida, and the Florida street address entered above is my business address and the LLC\u2019s registered office, not a P.O. Box.";
+var AGENT_EXISTING_RECORD = "This is the registered agent, and the Florida street address, that the Division has on file for my LLC. This order does not change it.";
+var AGENT_ACCEPTANCE = "I accept the appointment as registered agent for this Florida LLC, and I am familiar with and accept the obligations of that position.";
+var AGENT_SERIES_AGREEMENT = "I confirm that the company\u2019s registered agent has agreed to serve as registered agent for the company and each of its protected series, including every protected series in this order.";
+var AGENT_FORM_VERSION = "fl-llc-formation-v2-agent-consent";
+function conversionAuthority(name, changeAgent) {
+  const company = name.trim() || "the company";
+  return `I am authorized to act for ${company}, its members have consented to establishing the protected series on this order, and I authorize MyFloridaSeriesLLC to prepare and file the Protected Series Designations${changeAgent ? " and the change of registered agent" : ""} with the Florida Division of Corporations.`;
+}
+function registeredAgentName(data) {
+  return data.registeredAgentType === "ENTITY" ? (data.registeredAgentBusinessEntityName ?? "").trim() : fullPersonName(data.registeredAgentFirstName, data.registeredAgentLastName, data.registeredAgentSuffix);
+}
+
+// src/components/forms/florida-llc/nameSimilarity.ts
+var SUFFIXES = /* @__PURE__ */ new Set([
+  "LLC",
+  "L.L.C",
+  "PLLC",
+  "P.L.L.C",
+  "INC",
+  "INCORPORATED",
+  "CORP",
+  "CORPORATION",
+  "CO",
+  "COMPANY",
+  "LTD",
+  "LIMITED",
+  "LP",
+  "L.P",
+  "LLP",
+  "LLLP",
+  "PA",
+  "P.A",
+  "PL",
+  "P.L",
+  "PC",
+  "CHARTERED"
+]);
+var ARTICLES = /* @__PURE__ */ new Set(["THE", "A", "AN"]);
+function normalizeEntityName(name) {
+  const tokens = name.toUpperCase().replace(/&/g, " AND ").replace(/['\u2019]/g, "").replace(/[^A-Z0-9 ]+/g, " ").split(/\s+/).filter(Boolean).filter((t) => !SUFFIXES.has(t) && !ARTICLES.has(t) && t !== "AND").map((t) => t.length > 3 && t.endsWith("S") ? t.slice(0, -1) : t);
+  return tokens.join(" ");
+}
+
 // src/components/forms/florida-llc/raService.ts
 var RA_SERVICE = {
   name: "FLORIDA PROTECTED SERIES, LLC - PS 2",
@@ -101180,6 +101197,7 @@ function raServicePatch() {
     registeredAgentType: "ENTITY",
     registeredAgentFirstName: "",
     registeredAgentLastName: "",
+    registeredAgentSuffix: "",
     registeredAgentBusinessEntityName: RA_SERVICE.name,
     registeredAgentStreetAddress1: RA_SERVICE.address1,
     registeredAgentStreetAddress2: RA_SERVICE.address2,
@@ -101260,6 +101278,8 @@ var extendedFormSchema = formationFormSchema.extend({
   // The acceptance is signed only by a self-agent on a new formation; a
   // conversion keeping its own agent files no appointment (15 Sep 2026).
   // Re-imposed below for the case that needs it.
+  registeredAgentNotSameAsLlc: external_exports.boolean().optional(),
+  registeredAgentPhysicalAddressAcknowledgment: external_exports.boolean().optional(),
   registeredAgentAcceptanceName: external_exports.string().trim().max(200).optional().or(external_exports.literal("")),
   registeredAgentAcceptanceCheckbox: external_exports.boolean().optional(),
   registeredAgentElectronicSignature: external_exports.string().max(200).optional().or(external_exports.literal("")),
@@ -101390,12 +101410,25 @@ var extendedFormSchema = formationFormSchema.extend({
   if (data.registeredAgentChoice === "SERVICE" && data.raRenewalCardConsent !== true) {
     ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["raRenewalCardConsent"], message: "Please agree to keep a card on file for the yearly renewal." });
   }
-  if (data.registeredAgentChoice === "SELF" && (!data.registeredAgentFirstName?.trim() || !data.registeredAgentLastName?.trim())) {
-    ctx.addIssue({
-      code: external_exports.ZodIssueCode.custom,
-      path: ["registeredAgentLastName"],
-      message: "The registered agent's first and last name are required."
-    });
+  if (data.registeredAgentChoice === "SELF") {
+    const retained = data.filingPath === "CONVERT";
+    const entity = retained && data.registeredAgentType === "ENTITY";
+    const issue = (field, message) => ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: [field], message });
+    if (entity) {
+      if (!data.registeredAgentBusinessEntityName?.trim()) issue("registeredAgentBusinessEntityName", "The agent\u2019s legal entity name is required.");
+    } else {
+      if (data.registeredAgentType !== "INDIVIDUAL") issue("registeredAgentType", "Choose an individual agent.");
+      if (!data.registeredAgentFirstName?.trim() || !data.registeredAgentLastName?.trim()) issue("registeredAgentLastName", "The registered agent's first and last name are required.");
+    }
+    if (isPoBox(data.registeredAgentStreetAddress1) || isPoBox(data.registeredAgentStreetAddress2 ?? "")) issue("registeredAgentStreetAddress1", "A P.O. Box cannot be used for the registered agent address.");
+    if (retained) {
+      if (data.registeredAgentExistingRecordAcknowledgment !== true) issue("registeredAgentExistingRecordAcknowledgment", "Confirm the agent and address match the Division\u2019s existing record.");
+      if (data.registeredAgentSeriesAgreementAcknowledgment !== true) issue("registeredAgentSeriesAgreementAcknowledgment", "Confirm the registered agent has agreed to serve the company and each protected series.");
+    } else {
+      if (data.registeredAgentNotSameAsLlc !== true) issue("registeredAgentNotSameAsLlc", "Acknowledgment is required.");
+      if (data.registeredAgentPhysicalAddressAcknowledgment !== true) issue("registeredAgentPhysicalAddressAcknowledgment", "Acknowledgment is required.");
+      if (data.registeredAgentResidencyAcknowledgment !== true) issue("registeredAgentResidencyAcknowledgment", "Confirm that you live in Florida and this is your business address and the registered office.");
+    }
   }
   if (data.filingPath === "CONVERT") {
     if (data.conversionAuthorityAcknowledgment !== true) {
@@ -101419,6 +101452,9 @@ var extendedFormSchema = formationFormSchema.extend({
     } else if (!hasFirstAndLast(data.registeredAgentAcceptanceName ?? "")) {
       ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["registeredAgentAcceptanceName"], message: FIRST_AND_LAST });
     }
+    const expected = registeredAgentName(data);
+    if ((data.registeredAgentAcceptanceName ?? "").trim() !== expected) ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["registeredAgentAcceptanceName"], message: `The acceptance name must match the registered agent name exactly: ${expected}` });
+    if ((data.registeredAgentElectronicSignature ?? "").trim() !== expected) ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["registeredAgentElectronicSignature"], message: `Your electronic signature must match the registered agent name exactly: ${expected}` });
     if (data.registeredAgentAcceptanceCheckbox !== true) {
       ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["registeredAgentAcceptanceCheckbox"], message: "Acceptance is required." });
     }
@@ -101496,6 +101532,9 @@ var orderFormSchema = external_exports.preprocess((raw2) => {
     if (d2.registeredAgentChoice === "SERVICE") {
       d2 = { ...d2, ...raServicePatch() };
     }
+    if (d2.registeredAgentType === "ENTITY") d2 = { ...d2, registeredAgentFirstName: "", registeredAgentLastName: "", registeredAgentSuffix: "" };
+    else if (d2.registeredAgentType === "INDIVIDUAL") d2 = { ...d2, registeredAgentBusinessEntityName: "" };
+    if (d2.filingPath === "CONVERT" && d2.registeredAgentChoice === "SELF") d2 = { ...d2, registeredAgentAcceptanceName: "", registeredAgentElectronicSignature: "", registeredAgentAcceptanceCheckbox: false, registeredAgentSignatureAuthorizationCheckbox: false };
     if (d2.managementStructure === "MANAGER_MANAGED") {
       d2 = { ...d2, includeManagementStatementInArticles: true };
     }
@@ -101553,11 +101592,7 @@ function buildPayload(data) {
     registeredAgent: {
       choice: data.registeredAgentChoice ?? "",
       type: data.registeredAgentType || "",
-      name: fullPersonName(
-        data.registeredAgentFirstName,
-        data.registeredAgentLastName,
-        data.registeredAgentSuffix
-      ),
+      name: registeredAgentName(data),
       firstName: data.registeredAgentFirstName ?? "",
       lastName: data.registeredAgentLastName ?? "",
       suffix: data.registeredAgentSuffix ?? "",
@@ -101654,10 +101689,13 @@ function buildPayload(data) {
       governmentAffiliationAcknowledgment: data.governmentAffiliationAcknowledgment === true,
       lawfulPurposeNameAcknowledgment: data.lawfulPurposeNameAcknowledgment === true,
       exactNameOnly: data.exactNameOnly === true,
-      registeredAgentNotSameAsLlc: data.registeredAgentNotSameAsLlc === true,
-      registeredAgentPhysicalAddressAcknowledgment: data.registeredAgentPhysicalAddressAcknowledgment === true,
-      registeredAgentAcceptanceCheckbox: data.registeredAgentAcceptanceCheckbox === true,
-      registeredAgentSignatureAuthorizationCheckbox: data.registeredAgentSignatureAuthorizationCheckbox === true,
+      registeredAgentNotSameAsLlc: !isConversion && data.registeredAgentNotSameAsLlc === true,
+      registeredAgentPhysicalAddressAcknowledgment: !isConversion && data.registeredAgentPhysicalAddressAcknowledgment === true,
+      registeredAgentResidencyAcknowledgment: !isConversion && data.registeredAgentChoice === "SELF" && data.registeredAgentResidencyAcknowledgment === true,
+      registeredAgentExistingRecordAcknowledgment: isConversion && data.registeredAgentChoice === "SELF" && data.registeredAgentExistingRecordAcknowledgment === true,
+      registeredAgentSeriesAgreementAcknowledgment: isConversion && data.registeredAgentChoice === "SELF" && data.registeredAgentSeriesAgreementAcknowledgment === true,
+      registeredAgentAcceptanceCheckbox: !isConversion && data.registeredAgentAcceptanceCheckbox === true,
+      registeredAgentSignatureAuthorizationCheckbox: !isConversion && data.registeredAgentSignatureAuthorizationCheckbox === true,
       authorizedRepresentativeSignatureCheckbox: signsSelf && data.authorizedRepresentativeSignatureCheckbox === true,
       addressAccuracyAcknowledgment: data.addressAccuracyAcknowledgment === true,
       termsOfServiceAcknowledgment: data.termsOfServiceAcknowledgment === true,
@@ -101671,7 +101709,7 @@ function buildPayload(data) {
       ipAddress: "",
       // TODO(server): fill from request context
       userAgent: typeof navigator !== "undefined" ? navigator.userAgent : "",
-      formVersion: "fl-llc-formation-v1"
+      formVersion: AGENT_FORM_VERSION
     }
   };
 }
@@ -110580,13 +110618,16 @@ var ACKNOWLEDGMENTS = [
   { field: "exactNameOnly", text: "I only want this exact name \u2014 if it is unavailable, contact me before doing anything else." },
   { field: "seriesOwnershipAcknowledged", text: "I understand that every protected series will be owned by my LLC, and that no series will have its own separate owners." },
   { field: "registeredAgentNotSameAsLlc", text: "I understand that the LLC itself cannot serve as its own registered agent \u2014 I am accepting this role personally." },
-  { field: "registeredAgentPhysicalAddressAcknowledgment", text: "I confirm this is my physical street address in Florida and not a P.O. Box." },
-  { field: "registeredAgentAcceptanceCheckbox", text: "I accept the appointment and acknowledge the obligations of serving as registered agent for this Florida LLC." },
+  { field: "registeredAgentPhysicalAddressAcknowledgment", text: "I confirm this is my physical street address in Florida and not a P.O. Box.", when: (p2) => p2.metadata?.formVersion !== AGENT_FORM_VERSION },
+  { field: "registeredAgentResidencyAcknowledgment", text: AGENT_RESIDENCY },
+  { field: "registeredAgentExistingRecordAcknowledgment", text: AGENT_EXISTING_RECORD },
+  { field: "registeredAgentSeriesAgreementAcknowledgment", text: AGENT_SERIES_AGREEMENT },
+  { field: "registeredAgentAcceptanceCheckbox", text: (p2) => p2.metadata?.formVersion === AGENT_FORM_VERSION ? AGENT_ACCEPTANCE : "I accept the appointment and acknowledge the obligations of serving as registered agent for this Florida LLC." },
   { field: "registeredAgentSignatureAuthorizationCheckbox", text: "I certify that I am signing for myself as the registered agent." },
   { field: "articlesSignerAppointed", text: "I appoint MyFloridaSeriesLLC as my authorized representative to sign and file my Articles of Organization, and I certify that the information I have provided is true, accurate, and complete." },
   { field: "authorizedRepresentativeSignatureCheckbox", text: "I certify that I am authorized to sign and submit information for this LLC." },
   { field: "atLeastOneMemberAcknowledged", text: "I affirm that the LLC has or will have at least one member when the Articles of Organization become effective." },
-  { field: "conversionAuthorityAcknowledged", text: (p2) => `I am authorized to act for ${(p2.existingLlcName ?? "").trim() || "the company"}, its members have consented to establishing the protected series on this order, and I authorize MyFloridaSeriesLLC to prepare and file the Protected Series Designations with the Florida Division of Corporations.` },
+  { field: "conversionAuthorityAcknowledged", text: (p2) => p2.metadata?.formVersion === AGENT_FORM_VERSION ? conversionAuthority(p2.existingLlcName ?? "", p2.registeredAgent?.choice === "SERVICE") : `I am authorized to act for ${(p2.existingLlcName ?? "").trim() || "the company"}, its members have consented to establishing the protected series on this order, and I authorize MyFloridaSeriesLLC to prepare and file the Protected Series Designations with the Florida Division of Corporations.` },
   { field: "accuracyAcknowledged", text: "I certify that the information provided is true and accurate to the best of my knowledge." },
   { field: "addressAccuracyAcknowledgment", text: "I am solely responsible for the accuracy of all addresses I have provided. I understand that state filings, legal notices, and official correspondence will be directed to these addresses exactly as entered, and that MyFloridaSeriesLLC does not verify the accuracy or deliverability of any address. Any address-suggestion or address-checking feature in this form is a convenience only and is not a verification, warranty, or guarantee of any kind." },
   { field: "termsOfServiceAcknowledgment", text: "I agree to all terms and conditions set forth in the Terms of Service, including its binding individual arbitration provision and class action waiver." },
@@ -110613,9 +110654,9 @@ function ticked(p2) {
     publicRecordAcknowledged: p2.certifications?.publicRecordAcknowledged === true,
     notLegalAdviceAcknowledged: p2.certifications?.notLegalAdviceAcknowledged === true
   };
-  const raBoxes = /* @__PURE__ */ new Set(["registeredAgentNotSameAsLlc", "registeredAgentPhysicalAddressAcknowledgment", "registeredAgentAcceptanceCheckbox", "registeredAgentSignatureAuthorizationCheckbox"]);
+  const raBoxes = /* @__PURE__ */ new Set(["registeredAgentNotSameAsLlc", "registeredAgentPhysicalAddressAcknowledgment", "registeredAgentAcceptanceCheckbox", "registeredAgentSignatureAuthorizationCheckbox", "registeredAgentResidencyAcknowledgment", "registeredAgentExistingRecordAcknowledgment", "registeredAgentSeriesAgreementAcknowledgment"]);
   const ourAgent = p2.registeredAgent?.choice === "SERVICE";
-  return ACKNOWLEDGMENTS.filter((a2) => flags[a2.field] === true && !(ourAgent && raBoxes.has(a2.field))).map((a2) => ({ field: a2.field, text: typeof a2.text === "function" ? a2.text(p2) : a2.text }));
+  return ACKNOWLEDGMENTS.filter((a2) => flags[a2.field] === true && (!a2.when || a2.when(p2)) && !(ourAgent && raBoxes.has(a2.field))).map((a2) => ({ field: a2.field, text: typeof a2.text === "function" ? a2.text(p2) : a2.text }));
 }
 function summaryMarkdown(o) {
   const p2 = structuredClone(typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload);
@@ -110641,7 +110682,7 @@ function summaryMarkdown(o) {
   out.push(line("Package", conversion ? "Protected Series Designations for an existing Florida LLC" : "New Protected Series LLC formation"));
   out.push(line("Formation type", p2.formationType === "PLLC" ? "Professional LLC" : "LLC"));
   out.push(line("Protected series", (p2.series ?? []).map((s) => s.name).join("; ")));
-  out.push(line("Registered agent", p2.registeredAgent?.choice === "SERVICE" ? "Our registered agent service" : "Client's own agent"));
+  out.push(line("Registered agent", p2.registeredAgent?.choice === "SERVICE" ? "Our registered agent service" : conversion ? "Existing registered agent retained" : "Client serving personally"));
   out.push(line("Certificate of Status", p2.optionalDocuments?.certificateOfStatus ? "Yes" : "No"));
   out.push(line("Certified Copy", p2.optionalDocuments?.certifiedCopy ? "Yes" : "No"));
   out.push(line("Federal EIN service", p2.optionalDocuments?.ein ? "Yes" : "No"));
@@ -110690,17 +110731,19 @@ function summaryMarkdown(o) {
   (p2.series ?? []).forEach((s, i) => out.push(line(`Series ${i + 1}`, s.name)));
   out.push(`### Registered agent`);
   const ra = p2.registeredAgent;
-  out.push(line("Choice", ra?.choice === "SERVICE" ? "Our registered agent service" : "Client's own agent"));
+  out.push(line("Choice", ra?.choice === "SERVICE" ? "Our registered agent service" : conversion ? "Existing registered agent retained" : "Client serving personally"));
   if (ra?.choice !== "SERVICE") {
     out.push(line("Type", ra?.type === "ENTITY" ? "Business entity" : ra?.type === "INDIVIDUAL" ? "Individual" : ra?.type));
     out.push(line("Name", ra?.businessEntityName || ra?.name));
     out.push(line("Address", addr(ra?.address)));
     out.push(line("Email", ra?.email));
     out.push(line("Phone", ra?.phone));
-    out.push(`### Agent acceptance`);
-    out.push(line("Accepted by", ra?.acceptance?.acceptanceName));
-    out.push(line("Capacity", ra?.acceptance?.capacity === "INDIVIDUAL_AGENT" ? "The registered agent, an individual" : ra?.acceptance?.capacity === "PRINCIPAL_OF_ENTITY" ? "Principal of the entity serving as agent" : ra?.acceptance?.capacity));
-    out.push(line("Electronic signature", ra?.acceptance?.electronicSignature));
+    if (!conversion) {
+      out.push(`### Agent acceptance`);
+      out.push(line("Accepted by", ra?.acceptance?.acceptanceName));
+      out.push(line("Capacity", ra?.acceptance?.capacity === "INDIVIDUAL_AGENT" ? "The registered agent, an individual" : ra?.acceptance?.capacity === "PRINCIPAL_OF_ENTITY" ? "Principal of the entity serving as agent" : ra?.acceptance?.capacity));
+      out.push(line("Electronic signature", ra?.acceptance?.electronicSignature));
+    }
   }
   out.push(`### Management`);
   out.push(line("Structure", p2.management?.structure === "MANAGER_MANAGED" ? "Manager-managed" : p2.management?.structure === "MEMBER_MANAGED" ? "Member-managed" : p2.management?.structure));

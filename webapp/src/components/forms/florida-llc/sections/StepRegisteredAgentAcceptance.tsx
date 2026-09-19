@@ -1,3 +1,4 @@
+import { AGENT_ACCEPTANCE, registeredAgentName } from "../registeredAgent";
 import { useEffect } from "react";
 import { AlertTriangle, ShieldCheck } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -20,11 +21,8 @@ export function StepRegisteredAgentAcceptance({
 
   // Self-agents sign as themselves — carry the name over so they don't
   // retype it, and pin the capacity.
+  const raFullName = registeredAgentName(data);
   useEffect(() => {
-    const raFullName = [data.registeredAgentFirstName, data.registeredAgentLastName]
-      .map((x) => (x ?? "").trim())
-      .filter(Boolean)
-      .join(" ");
     if (!isService && raFullName && !data.registeredAgentAcceptanceName) {
       patch({
         registeredAgentAcceptanceName: raFullName,
@@ -92,7 +90,7 @@ export function StepRegisteredAgentAcceptance({
         label="Electronic signature"
         htmlFor="ra-accept-signature"
         required
-        helper="Type your full legal name as your electronic signature."
+        helper={`Type your full legal name exactly as entered: ${raFullName}`}
         error={errors.registeredAgentElectronicSignature}
       >
         <Input
@@ -110,7 +108,7 @@ export function StepRegisteredAgentAcceptance({
           id="ra-accept"
           checked={data.registeredAgentAcceptanceCheckbox}
           onChange={(v) => patch({ registeredAgentAcceptanceCheckbox: v })}
-          label="I accept the appointment and acknowledge the obligations of serving as registered agent for this Florida LLC."
+          label={AGENT_ACCEPTANCE}
           error={errors.registeredAgentAcceptanceCheckbox}
         />
         <AcknowledgeBox

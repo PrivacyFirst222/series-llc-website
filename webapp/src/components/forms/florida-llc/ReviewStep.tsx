@@ -1,3 +1,4 @@
+import { registeredAgentName } from "./registeredAgent";
 import { Pencil, Info } from "lucide-react";
 import { fullPersonName } from "./validation";
 import { Button } from "@/components/ui/button";
@@ -138,9 +139,7 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
           <Row
             label="Name"
             value={
-              data.registeredAgentType === "INDIVIDUAL"
-                ? [data.registeredAgentFirstName, data.registeredAgentLastName].filter(Boolean).join(" ")
-                : data.registeredAgentBusinessEntityName
+              registeredAgentName(data)
             }
           />
           <Row

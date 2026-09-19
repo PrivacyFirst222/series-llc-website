@@ -1,3 +1,4 @@
+import { AGENT_FORM_VERSION, registeredAgentName } from "./registeredAgent";
 import { selectedParty } from "../../../lib/partyIdentity";
 import { canonicalizeSeriesName, buildFinalLlcName, calculateEstimatedFees } from "./validation";
 import { fullPersonName } from "./validation";
@@ -46,11 +47,7 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
     registeredAgent: {
       choice: data.registeredAgentChoice ?? "",
       type: data.registeredAgentType || "",
-      name: fullPersonName(
-        data.registeredAgentFirstName,
-        data.registeredAgentLastName,
-        data.registeredAgentSuffix,
-      ),
+      name: registeredAgentName(data),
       firstName: data.registeredAgentFirstName ?? "",
       lastName: data.registeredAgentLastName ?? "",
       suffix: data.registeredAgentSuffix ?? "",
@@ -158,10 +155,13 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
       governmentAffiliationAcknowledgment: data.governmentAffiliationAcknowledgment === true,
       lawfulPurposeNameAcknowledgment: data.lawfulPurposeNameAcknowledgment === true,
       exactNameOnly: data.exactNameOnly === true,
-      registeredAgentNotSameAsLlc: data.registeredAgentNotSameAsLlc === true,
-      registeredAgentPhysicalAddressAcknowledgment: data.registeredAgentPhysicalAddressAcknowledgment === true,
-      registeredAgentAcceptanceCheckbox: data.registeredAgentAcceptanceCheckbox === true,
-      registeredAgentSignatureAuthorizationCheckbox: data.registeredAgentSignatureAuthorizationCheckbox === true,
+      registeredAgentNotSameAsLlc: !isConversion && data.registeredAgentNotSameAsLlc === true,
+      registeredAgentPhysicalAddressAcknowledgment: !isConversion && data.registeredAgentPhysicalAddressAcknowledgment === true,
+      registeredAgentResidencyAcknowledgment: !isConversion && data.registeredAgentChoice === "SELF" && data.registeredAgentResidencyAcknowledgment === true,
+      registeredAgentExistingRecordAcknowledgment: isConversion && data.registeredAgentChoice === "SELF" && data.registeredAgentExistingRecordAcknowledgment === true,
+      registeredAgentSeriesAgreementAcknowledgment: isConversion && data.registeredAgentChoice === "SELF" && data.registeredAgentSeriesAgreementAcknowledgment === true,
+      registeredAgentAcceptanceCheckbox: !isConversion && data.registeredAgentAcceptanceCheckbox === true,
+      registeredAgentSignatureAuthorizationCheckbox: !isConversion && data.registeredAgentSignatureAuthorizationCheckbox === true,
       authorizedRepresentativeSignatureCheckbox: signsSelf && data.authorizedRepresentativeSignatureCheckbox === true,
       addressAccuracyAcknowledgment: data.addressAccuracyAcknowledgment === true,
       termsOfServiceAcknowledgment: data.termsOfServiceAcknowledgment === true,
@@ -177,7 +177,7 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
       ipAddress: "", // TODO(server): fill from request context
       userAgent:
         typeof navigator !== "undefined" ? navigator.userAgent : "",
-      formVersion: "fl-llc-formation-v1",
+      formVersion: AGENT_FORM_VERSION,
     },
   };
 }

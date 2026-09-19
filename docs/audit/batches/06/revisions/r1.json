@@ -1,0 +1,270 @@
+{
+  "id": "06",
+  "revision": 1,
+  "title": "Registered agent: appointment, consent and signature",
+  "model": "Codex",
+  "base": "f2aa05568a2f057808066fdba3ac6055a7578ef2",
+  "items": [
+    {
+      "id": "51",
+      "part": "all",
+      "scope": "retained agents support individuals and entities",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch06 51: retained agents support individuals and entities"
+        }
+      ]
+    },
+    {
+      "id": "71",
+      "part": "all",
+      "scope": "retained agents do not promise a new acceptance",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch06 71: retained agents do not promise a new acceptance"
+        }
+      ]
+    },
+    {
+      "id": "59",
+      "part": "all",
+      "scope": "agent change is included in conversion authority",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch06 59: agent change is included in conversion authority"
+        }
+      ]
+    },
+    {
+      "id": "62",
+      "part": "all",
+      "scope": "agent signature matches the complete legal name",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch06 62: agent signature matches the complete legal name"
+        }
+      ]
+    },
+    {
+      "id": "69",
+      "part": "all",
+      "scope": "non-Florida addresses are never relabeled",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch06 69: non-Florida addresses are never relabeled"
+        }
+      ]
+    },
+    {
+      "id": "70",
+      "part": "all",
+      "scope": "individual agent confirms Florida residency",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch06 70: individual agent confirms Florida residency"
+        }
+      ]
+    },
+    {
+      "id": "72",
+      "part": "all",
+      "scope": "mail promise matches the Terms",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch06 72: mail promise matches the Terms"
+        }
+      ]
+    },
+    {
+      "id": "73",
+      "part": "all",
+      "scope": "agent accepts and is familiar with obligations",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch06 73: agent accepts and is familiar with obligations"
+        }
+      ]
+    },
+    {
+      "id": "75",
+      "part": "all",
+      "scope": "signature warning punctuation is corrected",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch06 75: signature warning punctuation is corrected"
+        }
+      ]
+    },
+    {
+      "id": "N4.07",
+      "part": "all",
+      "scope": "retained agent agreement covers every series",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch06 N4.07: retained agent agreement covers every series"
+        }
+      ]
+    },
+    {
+      "id": "N4.11",
+      "part": "all",
+      "scope": "agent suffix survives acceptance and review",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch06 N4.11: agent suffix survives acceptance and review"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "webapp/src/components/forms/florida-llc/types.ts",
+      "mode": "code",
+      "why": "Approved Batch 06 registered-agent intake, complete name, consent and validation consistency."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/schema.ts",
+      "mode": "code",
+      "why": "Approved Batch 06 registered-agent intake, complete name, consent and validation consistency."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/defaults.ts",
+      "mode": "code",
+      "why": "Approved Batch 06 registered-agent intake, complete name, consent and validation consistency."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/raService.ts",
+      "mode": "code",
+      "why": "Approved Batch 06 registered-agent intake, complete name, consent and validation consistency."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/steps.ts",
+      "mode": "code",
+      "why": "Approved Batch 06 registered-agent intake, complete name, consent and validation consistency."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/stepValidation.ts",
+      "mode": "code",
+      "why": "Approved Batch 06 registered-agent intake, complete name, consent and validation consistency."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/buildPayload.ts",
+      "mode": "code",
+      "why": "Approved Batch 06 registered-agent intake, complete name, consent and validation consistency."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/FloridaLLCFormationForm.tsx",
+      "mode": "code",
+      "why": "Approved Batch 06 registered-agent intake, complete name, consent and validation consistency."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/ReviewStep.tsx",
+      "mode": "code",
+      "why": "Approved Batch 06 registered-agent intake, complete name, consent and validation consistency."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepRegisteredAgent.tsx",
+      "mode": "code",
+      "why": "Approved Batch 06 registered-agent intake, complete name, consent and validation consistency."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepRegisteredAgentAcceptance.tsx",
+      "mode": "code",
+      "why": "Approved Batch 06 registered-agent intake, complete name, consent and validation consistency."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepCertification.tsx",
+      "mode": "code",
+      "why": "Approved Batch 06 registered-agent intake, complete name, consent and validation consistency."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/registeredAgent.ts",
+      "mode": "new",
+      "why": "Shared agent identity, consent wording and address-selection rules."
+    },
+    {
+      "path": "webapp/server/validation.ts",
+      "mode": "code",
+      "why": "Enforce approved agent rules and preserve truthful filing and consent records."
+    },
+    {
+      "path": "webapp/server/order-summary.ts",
+      "mode": "code",
+      "why": "Enforce approved agent rules and preserve truthful filing and consent records."
+    },
+    {
+      "path": "webapp/server/filing.ts",
+      "mode": "code",
+      "why": "Enforce approved agent rules and preserve truthful filing and consent records."
+    },
+    {
+      "path": "webapp/server/e2e.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Durable Batch 06 regressions and fixture updates for approved consent and name requirements; preserve existing checks."
+    },
+    {
+      "path": "webapp/scripts/behavioral.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Durable Batch 06 regressions and fixture updates for approved consent and name requirements; preserve existing checks."
+    },
+    {
+      "path": "webapp/server/order-summary.test.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Durable Batch 06 regressions and fixture updates for approved consent and name requirements; preserve existing checks."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/validation.test.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Durable Batch 06 regressions and fixture updates for approved consent and name requirements; preserve existing checks."
+    },
+    {
+      "path": "webapp/scripts/batch06-walk.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Durable Batch 06 regressions and fixture updates for approved consent and name requirements; preserve existing checks."
+    },
+    {
+      "path": "webapp/server/batch06-check.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Durable Batch 06 regressions and fixture updates for approved consent and name requirements; preserve existing checks."
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "why": "API rebuild from approved server changes."
+    }
+  ],
+  "requiredChecks": [],
+  "testSupport": [
+    "webapp/scripts/batch06-walk.ts",
+    "webapp/server/batch06-check.ts"
+  ],
+  "removedChecks": []
+}

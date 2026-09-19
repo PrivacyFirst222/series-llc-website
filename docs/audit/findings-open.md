@@ -316,9 +316,10 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Review, Members card "In Articles?" reads "No" for member-managed orders (server lists them as AMBR) and shows on a conversion. Replace: "Yes — listed as members (AMBR)" for member-managed new formations; no row on a conversion.
 - **50. [A9]** — **open**
   - Managers step header and stepValidation on a conversion: "…because you elected to include a manager-managed statement in the Articles." Server version mentions an authorized representative row the form cannot make. Replace both: "A manager-managed LLC needs at least one Manager."
-- **51. [A10]** — **open**
+- **51. [A10]** — **implemented**
   - Registered agent step on a conversion keeping its agent: header "Florida requires the agent's signed acceptance…", boxes "Your first name / Your last name", ticks "I am accepting this role personally" and "this is my physical street address". Replace on a conversion: "Keep the registered agent already on file", "Agent's first name / last name" plus entity name, one tick "This is the registered agent, and the Florida street address, that the Division has on file for my LLC. This order does not change it."
   - **Codex rejected the proposed replacement:** Correct direction, but supporting entity agents requires changes to data type, server SELF first/last requirements at server/validation.ts:223–231, payload and review, not just labels and an entity-name box. Also collect the existing agent’s agreement to serve the protected series.
+  - Fixed: batch 06 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **52. [A11]** — **open** — waits on Adam's ruling
   - Principal office and mailing steps shown on a conversion; answers reach no sheet row. Replace: hide on a conversion, or add sheet rows. Ruling needed.
   - Codex (disputed): Principal and mailing screens do not feed conversion filingGroups (:246–303), but principalOfficeAddress is read by oaSeed at routes-portal.ts:87–93 and reaches generated agreement inputs :1464. “Answers reach no sheet row” does not mean they serve no purpose.
@@ -342,8 +343,9 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Managers "Email (optional)" and Certify "Email (optional)": malformed email refused after Submit with no message; Certify email/phone never stored. Replace: drop the Certify boxes; check the manager email on the step.
 - **58. [A17]** — **open**
   - Server alternate-name check runs on a conversion. Replace: skip on a conversion.
-- **59. [A18]** — **open**
+- **59. [A18]** — **implemented**
   - Conversion certification paragraph says designations "and the change of registered agent"; the tick omits the agent change. Replace the tick to include it when our service is chosen.
+  - Fixed: batch 06 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **60. [A19]** — **open** — waits on Adam's ruling
   - Correspondence "Company (optional)", "Phone (optional)" and the paper-mail address block reach nothing that mails. Replace: remove, or say what is mailed. Ruling needed.
   - Codex (disputed): StepCorrespondence.tsx:74,112,125–155 collects company, phone and paper address; filing.ts:449–454 explicitly displays “Mailing address for paper correspondence (ours, not Sunbiz’s)”. Absence of an automated postal-mail job does not prove office staff cannot use that address.
@@ -352,8 +354,9 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
 - **61. [A20]** — **open**
   - Effective date rule measured from the moment of Continue, described as the filing date. Replace: measure from an expected filing day and say so.
   - **Codex rejected the proposed replacement:** An expected filing day must actually be supplied and later rechecked at filing. Wording alone cannot ensure the legal date; separately fix UTC/local-day and bank-holiday defects reported below.
-- **62. [A21]** — **open**
+- **62. [A21]** — **implemented**
   - Agent acceptance signature has no match-the-name rule (the Articles signature does). Replace: same rule.
+  - Fixed: batch 06 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **63. [A22]** — **open** — waits on Adam's ruling
   - S election deadline described three ways. Replace all: "within 2 months and 15 days after your LLC's effective date (the date on your filed Articles, unless you chose a later effective date)".
   - Codex (disputed): StepOptionalDocs.tsx:69 says “2 months and 15 days from formation”; form2553Timing.ts:101–103 says effective date. IRS Form2553 Instructions, Item E, ties the deadline to the election effective tax-year date, using the earliest owners/assets/business date for a first tax year, not universally the Articles effective date. https://www.irs.gov/instructions/i2553
@@ -374,7 +377,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
 - **68. [A29]** — **open** — waits on Adam's ruling
   - Intro and Certify ask the same two acknowledgments. Ruling needed.
   - **Codex rejected the proposed replacement:** No replacement is proposed. Choose the single retained acknowledgment point and migrate validation/payload consumers if consolidating; repetition alone is not a false statement.
-- **69. [B21]** — **open**
+- **69. [B21]** — **implemented**
   - Order form, any address block with a locked state (the registered agent's Florida address), choosing a suggestion from the drop-down — `webapp/src/components/forms/florida-llc/AddressFields.tsx:47`
   - Reads: state: lockState ?? s.state,
   - Claims: That a chosen suggestion fills the boxes with its own address.
@@ -383,31 +386,36 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (disputed): AddressFields.tsx:47 does have state: lockState ?? s.state, but no product caller supplies lockState. The live agent screen instead uses AddressAutocomplete directly and overwrites state with FL at StepRegisteredAgent.tsx:225–229; its copy-client button does the same at :149–153.
   - **Codex rejected the proposed replacement:** Fix the actual agent suggestion/copy handlers, rejecting non-FL addresses rather than relabeling them. Changing only the unused lockState path would leave the defect live.
   - Corrected after Codex's review: No caller passes lockState. The live defect is in the registered agent step, which writes state 'FL' in the copy-my-address button and the suggestion handler. Fix those two handlers; refuse a non-Florida address rather than relabel it.
-- **70. [B31]** — **open**
+  - Fixed: batch 06 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **70. [B31]** — **implemented**
   - Registered agent step, the "I'll serve as my own registered agent" card and its address tick — `webapp/src/components/forms/florida-llc/sections/StepRegisteredAgent.tsx:83`
   - Reads: You must have a physical Florida street address and you'll sign the acceptance on the next screen.
   - Claims: A Florida street address is all an individual needs to serve as the agent; the tick at line 284 confirms only "I confirm this is my physical street address in Florida and not a P.O. Box."
   - True: s. 605.0113(1)(b)1: the registered agent must be "An individual who resides in this state and whose business address is identical to the address of the registered office". Nothing on the step asks or confirms Florida residency; stepValidation.ts:208-230 and server/validation.ts:223-232 check name, address, state FL and two ticks only.
   - Replace with: Card: "You must live in Florida and have a physical Florida street address; you'll sign the acceptance on the next screen." Tick (line 284): "I live in Florida, and this is my physical street address in Florida, not a P.O. Box."
   - **Codex rejected the proposed replacement:** Correct for a newly appointed individual agent. Make it conditional: a conversion retaining an existing corporate agent must not make the client affirm personal Florida residence.
-- **71. [B32]** — **open** — same defect as 51
+  - Fixed: batch 06 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **71. [B32]** — **implemented** — same defect as 51
   - Registered agent step, the self-agent card on a conversion that keeps its agent — `webapp/src/components/forms/florida-llc/sections/StepRegisteredAgent.tsx:83`
   - Reads: You must have a physical Florida street address and you'll sign the acceptance on the next screen. For an existing LLC, enter your agent's name and address exactly as the Division has them on file. This order does not change your agent.
   - Claims: The converting client will sign an acceptance on the next screen.
   - True: FloridaLLCFormationForm.tsx:296-298 hides the acceptance step for a conversion keeping its own agent, and stepValidation.ts:233-235 validates nothing there; no acceptance is signed.
   - Replace with: On a conversion: "Enter your agent's name and Florida street address exactly as the Division has them on file. This order does not change your agent, and there is nothing to sign."
-- **72. [B33]** — **open**
+  - Fixed: batch 06 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **72. [B33]** — **implemented**
   - Registered agent step, the note under "Your registered agent will be" — `webapp/src/components/forms/florida-llc/sections/StepRegisteredAgent.tsx:105`
   - Reads: Nothing to sign here — we execute the registered agent acceptance when we prepare your filing, and anything we receive for your LLC is posted to your client portal.
   - Claims: Everything received at the agent address is posted to the portal.
   - True: Terms 10(b): we post "service of process and official government correspondence"; Terms 10(c): "Packages and general mail may be refused, returned to sender, or destroyed. We have no obligation to forward anything received through unauthorized use of the address."
   - Replace with: Nothing to sign here — we execute the registered agent acceptance when we prepare your filing, and any legal process or official government correspondence we receive for your LLC is posted to your client portal.
-- **73. [B34]** — **open**
+  - Fixed: batch 06 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **73. [B34]** — **implemented**
   - Agent acceptance step, the first tick — `webapp/src/components/forms/florida-llc/sections/StepRegisteredAgentAcceptance.tsx:113`
   - Reads: I accept the appointment and acknowledge the obligations of serving as registered agent for this Florida LLC.
   - Claims: This is the acceptance Florida requires.
   - True: s. 605.0113(2): "The statement of acceptance must provide that the registered agent is familiar with and accepts the obligations of that position." The tick says "acknowledge", not "familiar with and accept".
   - Replace with: I accept the appointment as registered agent for this Florida LLC, and I am familiar with and accept the obligations of that position.
+  - Fixed: batch 06 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **74. [B36]** — **optional — open**
   - Certification & signature step, "Who is the authorized representative?" — `webapp/src/components/forms/florida-llc/sections/StepCertification.tsx:153`
   - Reads: For a company being formed, Florida defines it as a person authorized by a prospective member to form the company by executing and filing its articles of organization (§605.0102(8)(a)).
@@ -416,12 +424,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: For a company being formed, Florida defines it as "a person authorized by a prospective member of the limited liability company to form the company by executing and filing its articles of organization with the department" (§605.0102(8)(a)).
   - Codex (disputed): StepCertification.tsx:153–158 italicizes a shortened definition but uses no quotation marks. The omitted phrases “of the limited liability company” and “with the department” do not change its contextual meaning; italic emphasis alone does not make an inaccurate verbatim quotation. 2026 s.605.0102(8)(a) verified on Online Sunshine.
   - Outcome: Italics, not quotation marks; the paraphrase of s. 605.0102(8)(a) is substantively accurate.
-- **75. [B37]** — **open**
+- **75. [B37]** — **implemented**
   - Certification & signature step, the amber "Before you choose this" box, second bullet — `webapp/src/components/forms/florida-llc/sections/StepCertification.tsx:253`
   - Reads: If your name does not appear on Sunbiz.org (the Florida Division of Corporations’ website), a bank, or the Division of Workers’ Compensation may ask why the name on your formation document is not yours.
   - Claims: Reads as a list of three places the name might not appear.
   - True: The sentence means a bank or the Division of Workers' Compensation may ask; the comma after the parenthesis and before "or" breaks it. (Code comment at line 248 says these are Adam's words, 13 Sep 2026.)
   - Replace with: If your name does not appear on Sunbiz.org (the Florida Division of Corporations’ website), a bank or the Division of Workers’ Compensation may ask why the name on your formation document is not yours.
+  - Fixed: batch 06 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **76. [B38]** — **optional — open** — waits on Adam's ruling
   - Certification & signature step, the "MyFloridaSeriesLLC signs for me" option and its appointment tick — `webapp/src/components/forms/florida-llc/sections/StepCertification.tsx:273`
   - Reads: I appoint MyFloridaSeriesLLC as my authorized representative to sign and file my Articles of Organization, and I certify that the information I have provided is true, accurate, and complete.
@@ -755,12 +764,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: routes-payments.ts:618–621 catches a rejected sendMail call, logs it, and unconditionally returns sent:true. OrderConfirmed.tsx:23–26 trusts that flag. If the mail provider fails, the client sees Sent and loses the resend button despite no accepted delivery. Unlike prior64, this occurs for an otherwise eligible paid order and does not concern filed/formed eligibility. Correct behavior requires returning an API error on failed sendMail, preserving the resend control, and using the existing success sentence only after sendMail succeeds.
   - Replace with: Could not send the email. Please try again.
   - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **N4.07. [substantive]** — **open**
+- **N4.07. [substantive]** — **implemented**
   - Order form, Adding series to an existing LLC while keeping its registered agent: the agent’s agreement is absent from the certification — `webapp/src/components/forms/florida-llc/sections/StepCertification.tsx:117`
   - Reads: I am authorized to act for ${company}, its members have consented to establishing the protected series on this order, and I authorize MyFloridaSeriesLLC to prepare and file the Protected Series Designations with the Florida Division of Corporations.
   - Claims: The listed confirmations cover the facts the service needs to file protected-series designations for an existing LLC.
   - True: 2026 s.605.2203(2) requires an agreement with the registered agent covering the company and each protected series before delivery of a designation; subsection(3) says the designation signer affirms this as fact. Opened text: https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605.html. StepRegisteredAgent records the retained agent’s details and Florida-address acknowledgment but no agreement to serve every series; FloridaLLCFormationForm.tsx:296–298 hides acceptance for CONVERT+SELF; the certification at StepCertification.tsx:90–120 addresses authority and member consent only. This proves a missing intake confirmation, not that any particular agent has refused or no off-platform agreement exists. Add the proposed confirmation before filing and retain evidence or verification of the agreement.
   - Replace with: I am authorized to act for ${company}, its members have consented to establishing the protected series on this order, and I authorize MyFloridaSeriesLLC to prepare and file the Protected Series Designations with the Florida Division of Corporations. I confirm that the company’s registered agent has agreed to serve as registered agent for the company and every protected series in this order.
+  - Fixed: batch 06 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **N4.08. [substantive]** — **open**
   - Order form, Management structure explanation: a transfer is incorrectly said to confer management — `webapp/src/components/forms/florida-llc/sections/StepManagement.tsx:106`
   - Reads: If a share later passes to a trust, a holding company, or a passive investor, the new owner inherits management authority — and the exposure — too.
@@ -780,12 +790,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: OrderConfirmed.tsx:58,63 deliberately treats paid, filed, and formed as paid, but :101–103 renders this same future-tense message for all three. A formed order can therefore show both an already-completed server state and a claim that its filing is being prepared. The conversion branch has the parallel stale claim about series being established. This is independent of prior64’s login/resend mismatch.
   - Replace with: Paid: “We’re preparing your filing.” Filed: “Your filing has been submitted.” Formed: “Your LLC has been formed.” For an existing LLC’s series order, use “Your protected series have been established” at completion. Render the message for the actual order status.
   - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **N4.11. [wording]** — **open**
+- **N4.11. [wording]** — **implemented**
   - Order form, Registered agent acceptance and Review: the agent’s suffix disappears — `webapp/src/components/forms/florida-llc/sections/StepRegisteredAgentAcceptance.tsx:24`
   - Reads: const raFullName = [data.registeredAgentFirstName, data.registeredAgentLastName]
   - Claims: The acceptance name carried over from the agent step is the complete legal name that the client entered.
   - True: The agent step collects registeredAgentSuffix, and buildPayload.ts:48 includes it in fullName; the acceptance prefill at StepRegisteredAgentAcceptance.tsx:24–30 omits it. ReviewStep.tsx:141–142 independently renders first and last name only. For John Smith Jr., acceptance and review show John Smith while the payload/filing identify John Smith Jr. This is a consistency defect, not a claim that every signature missing a suffix is legally invalid. Prior62 concerns absent signature/name comparison, not this loss of a collected name component.
   - Replace with: const raFullName = [data.registeredAgentFirstName, data.registeredAgentLastName, data.registeredAgentSuffix].map((x) => (x ?? "").trim()).filter(Boolean).join(" "); Use the same complete-name helper in Review.
+  - Fixed: batch 06 revision 1, commit , by Codex; protected by 1 assertion(s).
 
 ## Client portal — 73 open of 73
 
