@@ -95929,7 +95929,15 @@ var MIGRATIONS = [
   { id: 8, name: "email-log", statements: MIGRATION_008_STATEMENTS },
   { id: 9, name: "rejection-and-ra-renewal", statements: MIGRATION_009_STATEMENTS },
   { id: 10, name: "ra-cancellation-per-company", statements: MIGRATION_010_STATEMENTS },
-  { id: 11, name: "ra-renewal-cards", statements: MIGRATION_011_STATEMENTS }
+  { id: 11, name: "ra-renewal-cards", statements: MIGRATION_011_STATEMENTS },
+  // Batch 02: Adam confirmed all existing customer records are test data and
+  // approved correcting/removing unassigned mail instead of adding a permanent section.
+  { id: 12, name: "legal-mail-recipient-company", statements: [
+    `UPDATE documents d SET order_id = o.id, mirrored_at = NULL FROM orders o
+      WHERE d.kind = 'legal_mail' AND d.order_id IS NULL AND o.client_id = d.client_id
+        AND o.paid_at IS NOT NULL AND (SELECT count(*) FROM orders x WHERE x.client_id = d.client_id AND x.paid_at IS NOT NULL) = 1`,
+    `DELETE FROM documents WHERE kind = 'legal_mail' AND order_id IS NULL`
+  ] }
   // Append future migrations here with the next id. Never edit an entry.
 ];
 function migrationChecksum(statements) {
@@ -100904,6 +100912,14 @@ var orderFormSchema = external_exports.preprocess((raw2) => {
   return raw2;
 }, extendedFormSchema);
 
+// src/lib/partyIdentity.ts
+function selectedParty(party) {
+  const kind = party.memberType ?? party.personOrEntity;
+  if (kind === "ENTITY") return { ...party, firstName: "", lastName: "", suffix: "", fullName: "", fullLegalName: "" };
+  if (kind === "INDIVIDUAL") return { ...party, entityName: "", businessEntityName: "" };
+  return { ...party };
+}
+
 // src/components/forms/florida-llc/buildPayload.ts
 function buildPayload(data) {
   const isConversion = data.filingPath === "CONVERT";
@@ -100926,7 +100942,7 @@ function buildPayload(data) {
     formationType: data.formationType,
     // A conversion names no new company: whatever was typed on the
     // new-formation path before switching stays off the record (14 Sep 2026).
-    llcName: isConversion ? { desiredName: "", designator: "", finalName, alternateNames: [], exactNameOnly: false } : {
+    llcName: isConversion ? { desiredName: "", designator: "", finalName: "", alternateNames: [], exactNameOnly: false } : {
       desiredName: data.desiredLlcName,
       designator: data.llcDesignator || "",
       finalName,
@@ -100974,7 +100990,7 @@ function buildPayload(data) {
       includeManagementStatementInArticles: data.includeManagementStatementInArticles,
       // Member-managed: the members are listed automatically (AMBR) and the
       // managers step is never shown — a stray entry must not reach the filing.
-      managersOrAuthorizedRepresentatives: data.managementStructure === "MEMBER_MANAGED" ? [] : data.managers
+      managersOrAuthorizedRepresentatives: data.managementStructure === "MEMBER_MANAGED" ? [] : data.managers.map(selectedParty)
     },
     members: {
       collectForInternalRecords: data.collectMembersForInternalRecords,
@@ -100982,7 +100998,7 @@ function buildPayload(data) {
       // Manager-managed: the members step is never shown — ownership lives in
       // the operating agreement questionnaire, and a stray default row must
       // not reach the record.
-      memberList: data.managementStructure === "MANAGER_MANAGED" ? [] : data.members
+      memberList: data.managementStructure === "MANAGER_MANAGED" ? [] : data.members.map(selectedParty)
     },
     // Purpose and effective date are Articles questions a conversion never
     // sees; answers from an abandoned new-formation path stay off the record.
@@ -102076,6 +102092,25 @@ async function unavailableNames(names) {
   } catch {
     return null;
   }
+}
+
+// server/company-scope.ts
+async function associateLegacyServices(clientId) {
+  const db = await getDb();
+  await db.query(`UPDATE service_orders s SET formation_order_id = o.id
+    FROM orders o WHERE s.client_id = $1 AND s.formation_order_id IS NULL
+      AND o.client_id = s.client_id AND o.paid_at IS NOT NULL
+      AND lower(trim(o.llc_name)) = lower(trim(s.llc_name))
+      AND (SELECT count(*) FROM orders other WHERE other.client_id = s.client_id
+        AND other.paid_at IS NOT NULL AND lower(trim(other.llc_name)) = lower(trim(s.llc_name))) = 1`, [clientId]);
+}
+async function serviceCompanyId(serviceId, clientId) {
+  await associateLegacyServices(clientId);
+  const db = await getDb();
+  const rows = await db.query(`SELECT o.id FROM service_orders s JOIN orders o
+    ON o.id = s.formation_order_id AND o.client_id = s.client_id
+    WHERE s.id = $1 AND s.client_id = $2 AND o.paid_at IS NOT NULL`, [serviceId, clientId]);
+  return rows[0]?.id ?? null;
 }
 
 // src/lib/oaContributors.ts
@@ -107153,7 +107188,9 @@ function conversionGroups(p2) {
   return groups.map((g) => ({ ...g, fields: g.fields.filter((f) => f.value !== "") })).filter((g) => g.fields.length > 0);
 }
 function filingGroups(payload) {
-  const p2 = payload ?? {};
+  const p2 = structuredClone(payload ?? {});
+  if (p2.management?.managersOrAuthorizedRepresentatives) p2.management.managersOrAuthorizedRepresentatives = p2.management.managersOrAuthorizedRepresentatives.map(selectedParty);
+  if (p2.members?.memberList) p2.members.memberList = p2.members.memberList.map(selectedParty);
   if (p2.filingPath === "CONVERT") return conversionGroups(p2);
   const ra = p2.registeredAgent ?? {};
   const mgmt = p2.management ?? {};
@@ -107400,6 +107437,9 @@ async function oaSeed(clientId, orderId) {
   );
   if (orders.length === 0) return null;
   const p2 = typeof orders[0].payload === "string" ? JSON.parse(orders[0].payload) : orders[0].payload;
+  if (p2.members?.memberList) p2.members.memberList = p2.members.memberList.map(selectedParty);
+  if (p2.management?.managersOrAuthorizedRepresentatives) p2.management.managersOrAuthorizedRepresentatives = p2.management.managersOrAuthorizedRepresentatives.map(selectedParty);
+  await associateLegacyServices(clientId);
   const addr2 = p2.principalOfficeAddress ?? {};
   const principalAddress = [addr2.address1, addr2.address2, [addr2.city, addr2.state].filter(Boolean).join(", "), addr2.zip].filter((x2) => x2 && String(x2).trim()).join(", ");
   const joinAddr = (a2) => [a2?.address1, a2?.address2, [a2?.city, a2?.state].filter(Boolean).join(", "), a2?.zip].filter((x2) => x2 && String(x2).trim()).join(", ");
@@ -107435,8 +107475,8 @@ async function oaSeed(clientId, orderId) {
     );
   }
   const svcSeries = await db.query(
-    "SELECT details FROM service_orders WHERE client_id = $1 AND type = 'series' AND status IN ('in_progress','fulfilled')",
-    [clientId]
+    "SELECT details FROM service_orders WHERE client_id = $1 AND formation_order_id = $2 AND type = 'series' AND status IN ('in_progress','fulfilled')",
+    [clientId, orders[0].id]
   );
   const series = (p2.series ?? []).map((sr) => ({ name: sr.name, purpose: "" }));
   for (const row of svcSeries) {
@@ -107447,7 +107487,7 @@ async function oaSeed(clientId, orderId) {
   }
   return {
     orderId: orders[0].id,
-    llcName: p2.llcName?.finalName || orders[0].llc_name,
+    llcName: (p2.filingPath === "CONVERT" ? "" : p2.llcName?.finalName) || orders[0].llc_name,
     filingPath: p2.filingPath ?? "NEW",
     formationType: p2.formationType ?? "",
     managementStructure,
@@ -107609,6 +107649,7 @@ async function clientLlcName(clientId, orderId) {
   return rows[0]?.llc_name ?? "";
 }
 async function resolveCompanyOrder(clientId, requested) {
+  await associateLegacyServices(clientId);
   const db = await getDb();
   const rows = requested ? await db.query(
     "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
@@ -107651,7 +107692,7 @@ async function clientSeries(clientId, orderId) {
   const svc = orderId ? await db.query(
     `SELECT type, details FROM service_orders
          WHERE client_id = $1 AND type IN ('series', 'ein') AND status <> 'pending_payment'
-           AND (formation_order_id IS NULL OR formation_order_id = $2)`,
+           AND formation_order_id = $2`,
     [clientId, orderId]
   ) : await db.query(
     `SELECT type, details FROM service_orders
@@ -107690,7 +107731,7 @@ async function sElectionEligibility(clientId, orderId) {
   const orderBy = new Date(paidAt.getTime() + S_ELECTION_WINDOW_DAYS * 864e5);
   const existing = orderId ? await db.query(
     `SELECT id FROM service_orders WHERE client_id = $1 AND type = 's-election' AND status NOT IN ('cancelled', 'pending_payment')
-           AND (formation_order_id IS NULL OR formation_order_id = $2)`,
+           AND formation_order_id = $2`,
     [clientId, orderId]
   ) : await db.query(
     // An abandoned checkout must not lock the client out (14 Sep 2026), as
@@ -107728,9 +107769,12 @@ async function purgeExpiredSElections() {
     const d2 = typeof row.details === "string" ? JSON.parse(row.details) : row.details;
     const kept = { ...d2, purgedAt: (/* @__PURE__ */ new Date()).toISOString() };
     if (d2?.shareholders?.length && d2.dateIncorporated) {
-      const seed = await oaSeed(row.client_id);
       const filled = withFormationDefaults(d2);
       try {
+        const companyId = await serviceCompanyId(row.id, row.client_id);
+        if (!companyId) throw new Error("The S-election order has no confirmed company association.");
+        const seed = await oaSeed(row.client_id, companyId);
+        if (!seed) throw new Error("The S-election company could not be loaded.");
         const pdf = await buildSElectionPackage({
           llcName: row.llc_name,
           principalAddress: seed?.principalAddress ?? "",
@@ -107763,7 +107807,7 @@ async function purgeExpiredSElections() {
           const doc = await db.query(
             `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes)
              VALUES ($1, $5, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,
-            [row.client_id, title, stored.storageKey, stored.sizeBytes, row.formation_order_id]
+            [row.client_id, title, stored.storageKey, stored.sizeBytes, companyId]
           );
           kept.documentId = doc[0].id;
         }
@@ -107838,10 +107882,12 @@ var einDetailsSchema = external_exports.object({
   message: "Tell us which of the special activities applies."
 });
 async function companyEinFor(clientId, companyOrderId) {
+  if (!companyOrderId) return null;
+  await associateLegacyServices(clientId);
   const db = await getDb();
   const rows = await db.query(
     `SELECT details FROM service_orders WHERE client_id = $1 AND type = 'ein' AND status = 'fulfilled'
-       AND (formation_order_id IS NULL OR $2::text IS NULL OR formation_order_id::text = $2::text) ORDER BY fulfilled_at DESC`,
+       AND formation_order_id::text = $2::text ORDER BY fulfilled_at DESC`,
     [clientId, companyOrderId]
   );
   for (const r of rows) {
@@ -107917,7 +107963,10 @@ async function postSElectionPackage(args) {
   const db = await getDb();
   const formation = merged.dateIncorporated ?? "";
   const { effectiveDate, shareholders } = withFormationDefaults(merged);
-  const seed = await oaSeed(so2.client_id);
+  const companyId = await serviceCompanyId(so2.id, so2.client_id);
+  if (!companyId) return { ok: false };
+  const seed = await oaSeed(so2.client_id, companyId);
+  if (!seed) return { ok: false };
   const clients = await db.query(
     "SELECT email, name FROM clients WHERE id = $1",
     [so2.client_id]
@@ -107964,11 +108013,10 @@ async function postSElectionPackage(args) {
     buf,
     "application/pdf"
   );
-  const companyRow = await db.query("SELECT formation_order_id FROM service_orders WHERE id = $1", [so2.id]);
   const docRows = await db.query(
     `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes)
      VALUES ($1, $5, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,
-    [so2.client_id, title, stored.storageKey, stored.sizeBytes, companyRow[0]?.formation_order_id ?? null]
+    [so2.client_id, title, stored.storageKey, stored.sizeBytes, companyId]
   );
   merged.documentId = docRows[0].id;
   await db.query(
@@ -108119,7 +108167,9 @@ function registerPortalRoutes(app2) {
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
     const db = await getDb();
     const docs = await db.query(
-      "SELECT id, kind, title, size_bytes, created_at, order_id, meta FROM documents WHERE client_id = $1 ORDER BY created_at DESC",
+      `SELECT d.id, d.kind, d.title, d.size_bytes, d.created_at, d.order_id, d.meta, o.llc_name AS company_name
+       FROM documents d LEFT JOIN orders o ON o.id = d.order_id AND o.client_id = d.client_id
+       WHERE d.client_id = $1 ORDER BY d.created_at DESC`,
       [session.clientId]
     );
     return c.json({ data: docs.map(({ meta, ...d2 }) => {
@@ -108800,7 +108850,7 @@ function registerPortalRoutes(app2) {
     const svcCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
     const orders = svcCompanyId ? await db.query(
       `SELECT ${SERVICE_SAFE_COLUMNS} FROM service_orders WHERE client_id = $1
-           AND (formation_order_id IS NULL OR formation_order_id = $2) ORDER BY created_at DESC`,
+           AND formation_order_id = $2 ORDER BY created_at DESC`,
       [session.clientId, svcCompanyId]
     ) : await db.query(
       `SELECT ${SERVICE_SAFE_COLUMNS} FROM service_orders WHERE client_id = $1 ORDER BY created_at DESC`,
@@ -108956,7 +109006,7 @@ function registerPortalRoutes(app2) {
     const open = await db.query(
       `SELECT id FROM service_orders
       WHERE client_id = $1 AND type = $2 AND status IN ('in_progress', 'awaiting_info')
-        AND (formation_order_id IS NULL OR formation_order_id = $3)`,
+        AND formation_order_id = $3`,
       [session.clientId, body.data.kind, purchaseCompanyId]
     );
     if (open.length > 0) {
@@ -109007,8 +109057,8 @@ function registerPortalRoutes(app2) {
     const db = await getDb();
     const existingEin = await db.query(
       `SELECT details FROM service_orders
-     WHERE client_id = $1 AND type = 'ein' AND status <> 'pending_payment'`,
-      [session.clientId]
+     WHERE client_id = $1 AND formation_order_id = $2 AND type = 'ein' AND status NOT IN ('pending_payment', 'cancelled')`,
+      [session.clientId, purchaseCompanyId]
     );
     const alreadyOrdered = existingEin.some((r) => {
       const d2 = typeof r.details === "string" ? JSON.parse(r.details) : r.details;
@@ -109478,7 +109528,9 @@ function ticked(p2) {
   return ACKNOWLEDGMENTS.filter((a2) => flags[a2.field] === true && !(ourAgent && raBoxes.has(a2.field))).map((a2) => ({ field: a2.field, text: typeof a2.text === "function" ? a2.text(p2) : a2.text }));
 }
 function summaryMarkdown(o) {
-  const p2 = typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload;
+  const p2 = structuredClone(typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload);
+  if (p2.management?.managersOrAuthorizedRepresentatives) p2.management.managersOrAuthorizedRepresentatives = p2.management.managersOrAuthorizedRepresentatives.map(selectedParty);
+  if (p2.members?.memberList) p2.members.memberList = p2.members.memberList.map(selectedParty);
   const items = typeof o.line_items === "string" ? JSON.parse(o.line_items) : o.line_items;
   const conversion = p2.filingPath === "CONVERT";
   const out = [];
@@ -110417,10 +110469,8 @@ async function runFileMirror() {
     `SELECT d.id, d.title, d.kind, d.storage_key,
             -- The document's own company (15 Sep 2026: a two-company client's
             -- older files landed in the newer company's folder); a document
-            -- with no company uses the client's newest paid company.
-            COALESCE((SELECT o.llc_name FROM orders o WHERE o.id = d.order_id),
-                     (SELECT o.llc_name FROM orders o WHERE o.client_id = d.client_id AND o.paid_at IS NOT NULL
-                       ORDER BY o.paid_at DESC LIMIT 1)) AS llc_name,
+            -- with no company uses the client folder, never a guessed recipient.
+            (SELECT o.llc_name FROM orders o WHERE o.id = d.order_id AND o.client_id = d.client_id) AS llc_name,
             cl.email
        FROM documents d LEFT JOIN clients cl ON cl.id = d.client_id
       WHERE d.mirrored_at IS NULL
@@ -111639,10 +111689,11 @@ function registerAdminRoutes(app2) {
           "SELECT kind FROM documents WHERE order_id = $1 AND kind IN ('certificate-of-status', 'certified-copy')",
           [o.id]
         );
+        await associateLegacyServices(o.client_id);
         const openSvc = await db.query(
-          `SELECT type FROM service_orders WHERE client_id = $1
+          `SELECT type FROM service_orders WHERE client_id = $1 AND formation_order_id = $2
         AND type IN ('ein', 's-election') AND status IN ('awaiting_info', 'in_progress')`,
-          [o.client_id]
+          [o.client_id, o.id]
         );
         const hasStatement = (await db.query("SELECT id FROM documents WHERE order_id = $1 AND kind = 'statement' LIMIT 1", [o.id])).length > 0;
         const mail = llcFormedEmail({
@@ -111840,7 +111891,7 @@ function registerAdminRoutes(app2) {
     if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
     const db = await getDb();
     const rows = await db.query(
-      "SELECT id, type, status, llc_name, details, amount_cents, ein_secret, created_at, paid_at, square_order_id FROM service_orders WHERE id = $1",
+      "SELECT id, type, status, llc_name, details, amount_cents, ein_secret, created_at, paid_at, square_order_id, client_id FROM service_orders WHERE id = $1",
       [c.req.param("id")]
     );
     if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
@@ -111856,9 +111907,11 @@ function registerAdminRoutes(app2) {
         console.error("[admin] EIN secret decrypt failed:", e);
       }
     }
-    const sElectionPaid = (await db.query(
-      "SELECT id FROM service_orders WHERE client_id = (SELECT client_id FROM service_orders WHERE id = $1) AND type = 's-election' AND status NOT IN ('pending_payment', 'cancelled') LIMIT 1",
-      [so2.id]
+    const companyId = await serviceCompanyId(so2.id, so2.client_id);
+    const detail = typeof so2.details === "string" ? JSON.parse(so2.details) : so2.details;
+    const sElectionPaid = detail?.target !== "series" && !!companyId && (await db.query(
+      "SELECT id FROM service_orders WHERE client_id = $1 AND formation_order_id = $2 AND type = 's-election' AND status NOT IN ('pending_payment', 'cancelled') LIMIT 1",
+      [so2.client_id, companyId]
     )).length > 0;
     return c.json({
       data: {
@@ -111935,7 +111988,10 @@ function registerAdminRoutes(app2) {
       console.error("[admin] s-election secret decrypt failed:", e);
       return c.json(err("Could not decrypt the shareholder details.", "DECRYPT_FAILED"), 500);
     }
-    const seed = await oaSeed(so2.client_id);
+    const companyId = await serviceCompanyId(so2.id, so2.client_id);
+    if (!companyId) return c.json(err("Assign this service order to its company before generating the package.", "COMPANY_REQUIRED"), 400);
+    const seed = await oaSeed(so2.client_id, companyId);
+    if (!seed) return c.json(err("The company could not be loaded.", "COMPANY_REQUIRED"), 400);
     const input = {
       llcName: so2.llc_name,
       principalAddress: seed?.principalAddress ?? "",
@@ -112055,11 +112111,13 @@ function registerAdminRoutes(app2) {
     return c.json({ data: { ok: true, documentId, rebuiltSElections } });
   });
   async function carryEinIntoSElections(args) {
+    if (!args.companyOrderId) return 0;
+    await associateLegacyServices(args.clientId);
     const db = await getDb();
     const rows = await db.query(
       `SELECT id, client_id, llc_name, status, details, ein_secret FROM service_orders
       WHERE client_id = $1 AND type = 's-election' AND status <> 'pending_payment'
-        AND (formation_order_id IS NULL OR $2::text IS NULL OR formation_order_id::text = $2::text)`,
+        AND formation_order_id::text = $2::text`,
       [args.clientId, args.companyOrderId]
     );
     const clients = await db.query("SELECT email FROM clients WHERE id = $1", [args.clientId]);
@@ -112187,15 +112245,15 @@ function registerAdminRoutes(app2) {
     if (clients.length === 0) return c.json(err("Client not found.", "NOT_FOUND"), 404);
     const requestedOrderId = typeof form.orderId === "string" ? form.orderId.trim() : "";
     let orderId = null;
-    if (kind === "package") {
+    {
       const companies = await db.query("SELECT id FROM orders WHERE client_id = $1 AND paid_at IS NOT NULL ORDER BY paid_at DESC", [clientId]);
       if (requestedOrderId) {
         if (!companies.some((o) => o.id === requestedOrderId)) return c.json(err("That company is not on this client's account.", "INVALID_INPUT"), 400);
         orderId = requestedOrderId;
       } else if (companies.length === 1) {
         orderId = companies[0].id;
-      } else if (companies.length > 1) {
-        return c.json(err("This client has more than one company \u2014 choose which one the document belongs to.", "COMPANY_REQUIRED"), 400);
+      } else {
+        return c.json(err("Choose the company this document belongs to.", "COMPANY_REQUIRED"), 400);
       }
     }
     const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");

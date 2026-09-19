@@ -1,3 +1,4 @@
+import { selectedParty } from "../src/lib/partyIdentity";
 /**
  * The Order Summary (Adam, 10 Sep 2026): one PDF per order, written when the
  * order is placed and again when it is paid, holding the order, the items,
@@ -94,7 +95,9 @@ function ticked(p: SubmissionPayload): { text: string; field: string }[] {
 
 /** The summary as markdown, from the stored order row. */
 export function summaryMarkdown(o: SummaryOrderRow): string {
-  const p = (typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload) as SubmissionPayload;
+  const p = structuredClone((typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload) as SubmissionPayload);
+  if (p.management?.managersOrAuthorizedRepresentatives) p.management.managersOrAuthorizedRepresentatives = p.management.managersOrAuthorizedRepresentatives.map(selectedParty);
+  if (p.members?.memberList) p.members.memberList = p.members.memberList.map(selectedParty);
   const items = (typeof o.line_items === "string" ? JSON.parse(o.line_items) : o.line_items) as { name: string; amountCents: number }[] | null;
   const conversion = p.filingPath === "CONVERT";
   const out: string[] = [];

@@ -1,0 +1,267 @@
+{
+  "id": "02",
+  "revision": 1,
+  "title": "The correct company on every order and document",
+  "model": "Codex",
+  "base": "3465320475ab690615f08cc3291f7cf186ebf814",
+  "items": [
+    {
+      "id": "N1.04",
+      "part": "all",
+      "scope": "S-election copies use their own company address",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch02 N1.04: S-election copies use their own company address"
+        }
+      ]
+    },
+    {
+      "id": "N1.05",
+      "part": "all",
+      "scope": "agreement series belong to the selected company",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch02 N1.05: agreement series belong to the selected company"
+        }
+      ]
+    },
+    {
+      "id": "N1.06",
+      "part": "all",
+      "scope": "EIN duplicate checks stay within one company",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch02 N1.06: EIN duplicate checks stay within one company"
+        }
+      ]
+    },
+    {
+      "id": "N1.07",
+      "part": "all",
+      "scope": "EIN tax instructions do not borrow another entity election",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch02 N1.07: EIN tax instructions do not borrow another entity election"
+        }
+      ]
+    },
+    {
+      "id": "N3.05",
+      "part": "all",
+      "scope": "office EIN answers name the series applicant",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch02 N3.05: office EIN answers name the series applicant"
+        }
+      ]
+    },
+    {
+      "id": "123",
+      "part": "all",
+      "scope": "EIN description names the applicant directly",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch02 123: EIN description names the applicant directly"
+        }
+      ]
+    },
+    {
+      "id": "146",
+      "part": "all",
+      "scope": "legal mail uploads require and retain their company",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch02 146: legal mail uploads require and retain their company"
+        }
+      ]
+    },
+    {
+      "id": "225",
+      "part": "all",
+      "scope": "legal mail mirror uses its recipient company",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch02 225: legal mail mirror uses its recipient company"
+        }
+      ]
+    },
+    {
+      "id": "209",
+      "part": "all",
+      "scope": "formed email lists only that company services",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch02 209: formed email lists only that company services"
+        }
+      ]
+    },
+    {
+      "id": "101",
+      "part": "all",
+      "scope": "existing-company orders discard abandoned new names",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch02 101: existing-company orders discard abandoned new names"
+        }
+      ]
+    },
+    {
+      "id": "155",
+      "part": "all",
+      "scope": "existing-company documents use the recorded company name",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch02 155: existing-company documents use the recorded company name"
+        }
+      ]
+    },
+    {
+      "id": "N4.01",
+      "part": "all",
+      "scope": "changing party type clears the previous name",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch02 N4.01: changing party type clears the previous name"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "webapp/server/routes-portal.ts",
+      "mode": "code",
+      "why": "Approved Batch 02 company/applicant identity fix; complete diff reviewed."
+    },
+    {
+      "path": "webapp/server/routes-admin.ts",
+      "mode": "code",
+      "why": "Approved Batch 02 company/applicant identity fix; complete diff reviewed."
+    },
+    {
+      "path": "webapp/server/dropbox.ts",
+      "mode": "code",
+      "why": "Approved Batch 02 company/applicant identity fix; complete diff reviewed."
+    },
+    {
+      "path": "webapp/server/db.ts",
+      "mode": "code",
+      "why": "Approved Batch 02 company/applicant identity fix; complete diff reviewed."
+    },
+    {
+      "path": "webapp/server/filing.ts",
+      "mode": "code",
+      "why": "Approved Batch 02 company/applicant identity fix; complete diff reviewed."
+    },
+    {
+      "path": "webapp/server/order-summary.ts",
+      "mode": "code",
+      "why": "Approved Batch 02 company/applicant identity fix; complete diff reviewed."
+    },
+    {
+      "path": "webapp/src/pages/admin/AdminDashboard.tsx",
+      "mode": "code",
+      "why": "Approved Batch 02 company/applicant identity fix; complete diff reviewed."
+    },
+    {
+      "path": "webapp/src/pages/admin/ServiceOrdersSection.tsx",
+      "mode": "code",
+      "why": "Approved Batch 02 company/applicant identity fix; complete diff reviewed."
+    },
+    {
+      "path": "webapp/src/pages/portal/PortalDashboard.tsx",
+      "mode": "code",
+      "why": "Approved Batch 02 company/applicant identity fix; complete diff reviewed."
+    },
+    {
+      "path": "webapp/src/pages/portal/OrdersInProgress.tsx",
+      "mode": "code",
+      "why": "Approved Batch 02 company/applicant identity fix; complete diff reviewed."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/buildPayload.ts",
+      "mode": "code",
+      "why": "Approved Batch 02 company/applicant identity fix; complete diff reviewed."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/RepeatablePartyFields.tsx",
+      "mode": "code",
+      "why": "Approved Batch 02 company/applicant identity fix; complete diff reviewed."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/RepeatableMemberFields.tsx",
+      "mode": "code",
+      "why": "Approved Batch 02 company/applicant identity fix; complete diff reviewed."
+    },
+    {
+      "path": "webapp/server/company-scope.ts",
+      "mode": "new",
+      "why": "Shared company association and selected party identity."
+    },
+    {
+      "path": "webapp/src/lib/partyIdentity.ts",
+      "mode": "new",
+      "why": "Shared company association and selected party identity."
+    },
+    {
+      "path": "webapp/server/e2e.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Add durable Batch 02 regressions, preserve Batch 01; replace obsolete legal-mail-no-company check with required company checks."
+    },
+    {
+      "path": "webapp/scripts/behavioral.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Add durable Batch 02 regressions, preserve Batch 01; replace obsolete legal-mail-no-company check with required company checks."
+    },
+    {
+      "path": "webapp/scripts/batch02-walk.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Add durable Batch 02 regressions, preserve Batch 01; replace obsolete legal-mail-no-company check with required company checks."
+    },
+    {
+      "path": "webapp/server/batch02-check.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Add durable Batch 02 regressions, preserve Batch 01; replace obsolete legal-mail-no-company check with required company checks."
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "why": "Normal pre-commit API rebuild."
+    }
+  ],
+  "requiredChecks": [],
+  "testSupport": [
+    "webapp/scripts/batch02-walk.ts",
+    "webapp/server/batch02-check.ts"
+  ],
+  "removedChecks": [
+    "legal mail needs no company"
+  ]
+}

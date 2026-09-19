@@ -36,6 +36,7 @@ interface PortalDoc {
   /** A designation: the series it covers. */
   seriesNames?: string[];
   order_id: string | null;
+  company_name?: string | null;
 }
 
 interface Me {
@@ -96,6 +97,7 @@ function DocList({
                     name sit at the end of the title and are what tell two
                     agreements apart. */}
                 <span className="text-sm font-medium">{d.title}</span>
+                {d.kind === "legal_mail" && d.company_name ? <span className="text-xs text-muted-foreground">{d.company_name}</span> : null}
                 {d.kind === "legal_mail" && d.receivedOn ? (
                   <span className="text-xs text-muted-foreground" data-testid="received-on">
                     Received {new Date(`${d.receivedOn}T12:00:00`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
@@ -657,7 +659,7 @@ export default function PortalDashboard() {
       (!multiCompany || d.order_id === company),
   ));
 
-  const legalMail = docs.filter((d) => d.kind === "legal_mail");
+  const legalMail = docs.filter((d) => d.kind === "legal_mail" && d.order_id === company);
   // Anything whose kind no section claims. Better a plainly labelled leftover
   // than a document the client paid for and never sees.
   const otherDocs = docs.filter(

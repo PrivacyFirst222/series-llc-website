@@ -431,8 +431,8 @@ export function OrdersInProgress({
           <DialogHeader>
             <DialogTitle>EIN application details</DialogTitle>
             <DialogDescription>
-              We use this to complete the IRS EIN application for{" "}
-              {detailsFor ? summaryOf(detailsFor) : ""}. This form is transmitted over your secure
+              We use this information to complete the IRS EIN application for{" "}
+              {detailsFor ? (detailsFor.details.target === "series" ? detailsFor.details.seriesName : detailsFor.llc_name) : ""}. This form is transmitted over your secure
               portal session; the identification number is encrypted, used only for the IRS
               application, and deleted from our systems when your EIN is issued.
             </DialogDescription>

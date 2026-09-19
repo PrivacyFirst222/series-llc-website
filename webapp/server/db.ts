@@ -473,6 +473,14 @@ const MIGRATIONS: { id: number; name: string; statements: string[] }[] = [
   { id: 9, name: "rejection-and-ra-renewal", statements: MIGRATION_009_STATEMENTS },
   { id: 10, name: "ra-cancellation-per-company", statements: MIGRATION_010_STATEMENTS },
   { id: 11, name: "ra-renewal-cards", statements: MIGRATION_011_STATEMENTS },
+  // Batch 02: Adam confirmed all existing customer records are test data and
+  // approved correcting/removing unassigned mail instead of adding a permanent section.
+  { id: 12, name: "legal-mail-recipient-company", statements: [
+    `UPDATE documents d SET order_id = o.id, mirrored_at = NULL FROM orders o
+      WHERE d.kind = 'legal_mail' AND d.order_id IS NULL AND o.client_id = d.client_id
+        AND o.paid_at IS NOT NULL AND (SELECT count(*) FROM orders x WHERE x.client_id = d.client_id AND x.paid_at IS NOT NULL) = 1`,
+    `DELETE FROM documents WHERE kind = 'legal_mail' AND order_id IS NULL`,
+  ] },
   // Append future migrations here with the next id. Never edit an entry.
 ];
 

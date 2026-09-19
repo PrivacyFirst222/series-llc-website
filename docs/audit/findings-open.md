@@ -595,12 +595,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Part "review-rows" — open: Review rows print codes or a dash for a self-agent's email and phone; the Review name card has no 'exact name only' row.
   - Part "unused-code" — open: The dead duplicate-member check, the dead conversion branch in the formation sheet, and member fields typed but never asked. Item 112 is the same dead check.
   - Part "fact-ledger" — open: The fact ledger lacks the $99 renewal, the 15- and 30-day rules and the four optional prices.
-- **101. [B18]** — **open** — housekeeping
+- **101. [B18]** — **implemented** — housekeeping
   - Order form, the payload built at submit (conversion branch) — `webapp/src/components/forms/florida-llc/buildPayload.ts:29`
   - Reads: ? { desiredName: "", designator: "", finalName, alternateNames: [], exactNameOnly: false }
   - Claims: Per the comment at :26-27, that on a conversion 'whatever was typed on the new-formation path before switching stays off the record'.
   - True: finalName is computed at :16-19 from data.desiredLlcName and data.llcDesignator and sent regardless, so an abandoned typed name still reaches llcName.finalName; filing.ts:365 and order-summary.ts:151 print that value. The order's own name is safe only because routes-payments.ts:363-365 prefers existingLlcName on a conversion.
   - Replace with: ? { desiredName: "", designator: "", finalName: "", alternateNames: [], exactNameOnly: false }
+  - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **102. [B19]** — **open** — housekeeping
   - Order form, the payload built at submit — `webapp/src/components/forms/florida-llc/buildPayload.ts:159`
   - Reads: exactNameOnly: data.exactNameOnly === true,
@@ -706,12 +707,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: A paid status means the client account and purchased services have already been fulfilled, so retry can return.
   - True: The paid transition at:55–60 precedes client creation/linking at:69–83 and purchased-service insertion at:93–104. A database failure after the claim leaves status paid with missing account or service; a retried webhook returns at:60 and can mark the event processed at:501–502. This is a statically verified failure path, not a claim of an observed production outage.
   - Replace with: Make fulfillment a resumable idempotent operation: distinguish payment recorded from fulfillment completed, insert/link the client and each purchased service idempotently, and mark completion only after all required records exist. Retry incomplete paid orders without charging again.
-- **N4.01. [substantive]** — **open**
+- **N4.01. [substantive]** — **implemented**
   - Order form, Managers and Initial members: changing a row between a person and a business, then opening its agreement — `webapp/src/components/forms/florida-llc/RepeatablePartyFields.tsx:81`
   - Reads: update(entry.id, { personOrEntity: v as PartyKind })
   - Claims: The selected Person/Business Entity type identifies the legal party used in the review, state filing, and operating agreement.
   - True: RepeatablePartyFields.tsx:81–83 and RepeatableMemberFields.tsx:75–78 change only the discriminator and retain hidden names. buildPayload.ts:86,97 preserves both. ReviewStep.tsx:198,221 uses the discriminator, but routes-portal.ts:94–99,108–114,127–132 chooses any retained personal name before entityName/businessEntityName and infers isEntity from name absence. Enter John Smith, switch to Entity and enter Acme LLC: review identifies Acme LLC, while the OA seed identifies John Smith as an individual. In the reverse manager switch, filing.ts:512–523 instead prefers the retained businessEntityName. This is a reproducible deterministic data-path mismatch, not evidence of an actual customer document.
   - Replace with: When the row type changes, clear fields belonging to the other type. In the review, filing sheet, and agreement seed, choose the name and entity-signature treatment from memberType or personOrEntity; never infer the selected type from whichever hidden name remains populated.
+  - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **N4.02. [substantive]** — **open**
   - Order form, Effective date: a Florida calendar date is shifted back one day — `webapp/src/components/forms/florida-llc/validation.ts:139`
   - Reads: Effective date cannot be more than 5 business days before the filing date.
@@ -798,8 +800,9 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - **Codex rejected the proposed replacement:** Say the editable original is removed and a record copy is normally posted; do not promise system-wide SSN destruction: backup.ts:13-14/17-28 retains ciphertext and Dropbox retains old files. Handle a failed record-copy rebuild explicitly.
 - **122. [A54]** — **open**
   - Formed-first dialog S election branch: "…and that has been assigned an EIN." The form accepts Applied For. Replace: drop the clause.
-- **123. [A55]** — **open**
+- **123. [A55]** — **implemented**
   - EIN details dialog: "…application for Federal EIN — Acme, LLC." Replace: the company or series name.
+  - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **124. [A56]** — **open**
   - Help "Additional Capital Calls" and its label: "a majority of the owners"; the agreement: Majority in Interest. Replace: "owners holding a majority of the ownership percentages".
 - **125. [A57]** — **open**
@@ -913,13 +916,14 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (disputed): Actual empty state says “Your documents will appear here once your formation is prepared.” It is unsuitable for conversions, but the finding incorrectly says the first possible document is always returned Articles: routes-portal.ts:1107-1108 permits questionnaire access after payment and generated agreements appear before state filing. The replacement restricts the explanation to Division-returned documents.
   - **Codex rejected the proposed replacement:** Use “Your documents will appear here as they are prepared or uploaded.” This covers self-generated agreements and conversion filings as well as state-returned documents.
   - Corrected after Codex's review: Generated agreements can appear before any state document. Use 'Your documents will appear here as they are prepared or uploaded.'
-- **146. [B77]** — **open**
+- **146. [B77]** — **implemented**
   - Client portal with two or more companies, the Legal mail card under each company tab — `webapp/src/pages/portal/PortalDashboard.tsx:660`
   - Reads: const legalMail = docs.filter((d) => d.kind === "legal_mail");
   - Claims: The Legal mail card under a company's tab lists that company's legal mail.
   - True: Legal mail is never tied to a company: the office's upload dialog sends an orderId only for kind 'package' (AdminDashboard.tsx:254 `if (kind === "package" && orderId)`), so every company's tab shows every piece of legal mail, and nothing on the row names the LLC it was served on (the row shows title, received date and download, :98-129). Package documents on the same screen are scoped per tab (:654-658). A client with two LLCs cannot tell which company a summons was served on unless the office typed it into the title.
   - Replace with: Ask 'Company' on a legal-mail upload as the package upload does (AdminDashboard.tsx:329-346), store it as order_id, and filter legal mail by tab the way packageDocs is: `docs.filter((d) => d.kind === "legal_mail" && (!multiCompany || d.order_id === company))`; print the company name on the row.
   - **Codex rejected the proposed replacement:** The new company selection and attribution are right, but simply filtering existing mail by order_id hides all unassigned mail. Provide an explicit unassigned-mail section or assign existing records before applying the company filter.
+  - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **147. [B80]** — **open**
   - Client portal, Reset your password page — `webapp/src/pages/portal/PortalForgot.tsx:40`
   - Reads: Enter the email address you used when you signed up, and we'll send a link to choose a new password.
@@ -979,12 +983,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: The deliverable is a 'User's Manual'.
   - True: docs/facts.md, 'The deliverables': 'the Series LLC Owner's Manual'; the portal's own Reference library card calls it 'The Series LLC Owner's Manual' (PortalDashboard.tsx:272); the office publishes it under that title (LibrarySection.tsx:48, :116). A88 corrects the same word in the Instructions.
   - Replace with: Questions about the technicalities? Check the Owner's Manual and ask your attorney or accountant.
-- **155. [B129]** — **open**
+- **155. [B129]** — **implemented**
   - Client portal, the operating agreement, consent and S election for a converted company — the company name the seed prefers — `webapp/server/routes-portal.ts:162`
   - Reads: llcName: p.llcName?.finalName || orders[0].llc_name,
   - Claims: The stored payload's finalName is the company's name, and the order's llc_name is only a fallback.
   - True: On a conversion buildPayload.ts:16-19 and :28-29 still fill finalName from desiredLlcName and llcDesignator — whatever the client typed on the new-formation path before switching (the form never clears it: StepFilingPath.tsx:68 patches filingPath only) — while the order itself is named from existingLlcName (routes-payments.ts:363-365). A client who typed "Acme" + LLC, then chose the conversion path for "Sunshine Holdings, LLC", gets an operating agreement, consent and Exhibit headed "Acme, LLC" (OaInputs.companyName at :1463 comes from seed.llcName), and the consent route refuses their real series name because it "must begin with \"Acme, LLC\"" (:1591-1595).
   - Replace with: llcName: (p.filingPath === "CONVERT" ? "" : p.llcName?.finalName) || orders[0].llc_name,  — and, in buildPayload.ts:28-29, finalName: "" on the conversion branch.
+  - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **156. [B130]** — **open**
   - Client portal, Amended and Restated agreement — Recital D names the agreement it supersedes — `webapp/server/routes-portal.ts:1258`
   - Reads: const priorGens = await db.query<{ created_at: unknown }>(     "SELECT created_at FROM oa_generations WHERE client_id = $1 ORDER BY created_at DESC LIMIT 1",     [session.clientId],   );   // Drivers differ: Neon returns ISO strings, PGlite returns Date objects.   const priorDate =     priorGens.length > 0       ? new Date(String(priorGens[0].created_at)).toLocaleDateString("en-US", {           year: "numeric",           month: "long",           day: "numeric",         })       : null;
@@ -1087,24 +1092,27 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: Move each docstring to the declaration it describes; change :327 to "null when the text is not a date"; change :513-516 to "before the Social Security numbers are destroyed and the package replaced with a record copy"; delete :638-639; delete the office sentence at :803-805.
   - Codex (housekeeping-only): routes-portal.ts:287-295/327/513-516/638-639/701-702/800-805 contain the cited misplaced or stale comments; none of those comments is rendered.
   - **Codex rejected the proposed replacement:** Move the docstrings and correct null/obsolete office handling as proposed, but describe deletion of the live SSN field rather than implying destruction of every retained copy.
-- **N1.04. [substantive]** — **open**
+- **N1.04. [substantive]** — **implemented**
   - S-election package, company address on Form2553 and its record copy — `webapp/server/routes-portal.ts:828`
   - Reads: const seed = await oaSeed(so.client_id);
   - Claims: The address used for this company's tax package belongs to this company.
   - True: oaSeed without an order argument selects the newest paid company at routes-portal.ts:78–90. postSElectionPackage uses that unscoped seed at:828,837 although :879 retrieves the actual formation_order_id. The same mistake occurs during redaction at:569–574 and office draft at routes-admin.ts:1238–1241. An older company's form can carry the newer company's address.
   - Replace with: Resolve the service order's formation_order_id before building the package and call oaSeed(clientId, formationOrderId) for the original, office draft, corrections and redacted copy. Refuse an unresolved association rather than selecting another company.
-- **N1.05. [substantive]** — **open**
+  - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **N1.05. [substantive]** — **implemented**
   - Operating agreement questionnaire and generated Series Exhibit, list of this company's series — `webapp/server/routes-portal.ts:150`
   - Reads: "SELECT details FROM service_orders WHERE client_id = $1 AND type = 'series' AND status IN ('in_progress','fulfilled')",
   - Claims: Purchased extra series appended to the agreement belong to the selected company.
   - True: oaSeed first selects a company at:72–85 but its added-series query at:149–151 filters only client_id. It appends all paid in-progress/fulfilled series for the account to the selected intake series at:153–158. These seed series are used for generated agreements at:1460. A two-company account receives another company's protected series in its agreement.
   - Replace with: SELECT details FROM service_orders WHERE client_id = $1 AND formation_order_id = $2 AND type = 'series' AND status IN ('in_progress','fulfilled') [Bind the selected orders[0].id as $2; explicitly resolve any legacy unscoped orders.]
-- **N1.06. [substantive]** — **open**
+  - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **N1.06. [substantive]** — **implemented**
   - Client portal, buying an EIN for a second company — `webapp/server/routes-portal.ts:2118`
   - Reads: Your LLC's EIN is already ordered — see your orders below.
   - Claims: The selected LLC already has an EIN order.
   - True: The purchase resolves purchaseCompanyId at:2090, but :2102–2112 searches every non-pending EIN order on the client account and treats any company-target EIN as a duplicate. CompanyA's EIN therefore blocks the first EIN purchase for companyB.
   - Replace with: Scope the duplicate query to formation_order_id = purchaseCompanyId as well as client_id, then compare the target within that company. Keep the existing error only when that company already has the order.
+  - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **N1.08. [substantive]** — **implemented**
   - Operating agreement questionnaire, equal ownership fractions — `webapp/src/lib/ownership.ts:50`
   - Reads: num = num * d + n * den;
@@ -1336,12 +1344,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: Marking an uploaded S-election package fulfilled leaves a package that the standard14-day purge can identify and redact.
   - True: The manual fulfill route accepts awaiting_info orders (:1295–1297), inserts a PDF (:1360–1367), but does not store its documentId or the formation/shareholder details in service_orders.details. purgeExpiredSElections at routes-portal.ts:568 requires shareholder details and dateIncorporated before touching a PDF and otherwise merely clears ein_secret at:623. An office-uploaded full-SSN PDF can remain in the portal indefinitely.
   - Replace with: For S-election fulfillment, require the structured details needed for redaction and persist the uploaded document ID on the service order before setting fulfilled. If those details are unavailable, remove the linked filing PDF when the edit window closes instead of leaving it accessible.
-- **N1.07. [substantive]** — **open**
+- **N1.07. [substantive]** — **implemented**
   - Office, EIN application instructions, Tax classification row — `webapp/server/routes-admin.ts:1136`
   - Reads: "SELECT id FROM service_orders WHERE client_id = (SELECT client_id FROM service_orders WHERE id = $1) AND type = 's-election' AND status NOT IN ('pending_payment', 'cancelled') LIMIT 1",
   - Claims: A paid S-election order on this client account proves the entity in the current EIN application should be described as an S corporation.
   - True: ServiceOrdersSection.tsx:326 uses sElectionPaid directly for the IRS Tax classification instruction. This query does not match formation_order_id or the EIN details.target. CompanyA's S package can label companyB's EIN as S corporation; a series-target EIN also inherits the account-wide flag.
   - Replace with: Derive tax classification from the EIN target entity and its actual intended tax treatment. For a company target, match any supporting S-election order by formation_order_id; do not infer the classification of a series from a package purchased for the parent or another company.
+  - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **N1.14. [substantive]** — **open**
   - Office, replacing a formed package; client's Statement of Authorized Representative — `webapp/server/routes-admin.ts:774`
   - Reads: // If the new package fails partway, undo whatever of it landed — rows
@@ -1350,12 +1359,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: A partial failure preserves the intact prior package.
   - True: During staging :801 calls issueStatement, whose :507–509 immediately deletes the prior statement and blob. A later certificate or designation upload failure reaches :836–843 and deletes the new statement too. The portal then has neither statement, contrary to the rollback comment.
   - Replace with: Stage the replacement statement without retiring its predecessor. Retire all prior package documents only after the complete new package succeeds; on failure delete only staged new rows and blobs.
-- **N3.05. [substantive]** — **open**
+- **N3.05. [substantive]** — **implemented**
   - Office → service order → Federal EIN for a protected series → IRS assistant answer list — `webapp/src/pages/admin/ServiceOrdersSection.tsx:333`
   - Reads: ["Legal name", viewing.llc_name],
   - Claims: The listed legal name belongs to the entity for which this EIN was ordered.
   - True: At :291-292 the same dialog correctly says EIN for details.seriesName when target is series. The assistant’s legal-name row at :333 nevertheless always supplies the parent LLC name, although the office is told at :309-310 to type these answers straight down. This can submit the parent name on an application intended for the separately named series.
   - Replace with: ["Legal name", viewing.details.target === "series" ? viewing.details.seriesName ?? "" : viewing.llc_name],
+  - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **N3.08. [substantive]** — **open**
   - Office → order board → Complete column when service orders have not loaded — `webapp/src/pages/admin/OrderBoard.tsx:380`
   - Reads: Everything delivered — documents and services
@@ -1448,13 +1458,14 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: Runs once, when the company is formed.
   - True: The route is also the replacement path (:466-471 'A wrong file is replaced later by the formed-step package upload, which retires priors'), and the UPDATE is unconditional, so every re-upload moves formed_at and pushes ra_renewal_date to a year after the re-upload — including after a renewal has been charged and the date advanced (renewals.ts:252). The renewal date the client was told (email.ts:129-133) and the cancellation deadline built from it silently change.
   - Replace with: UPDATE orders SET status = 'formed', formed_at = COALESCE(formed_at, now()), ra_renewal_date = COALESCE(ra_renewal_date, ((now() AT TIME ZONE 'America/New_York') + interval '1 year')::date) WHERE id = $1 (and the non-agent branch likewise for formed_at).
-- **209. [B112]** — **open**
+- **209. [B112]** — **implemented**
   - Formed email — the 'Your Federal EIN order / S election package order is in your portal as well' line, for a client with two companies — `webapp/server/routes-admin.ts:879`
   - Reads: SELECT type FROM service_orders WHERE client_id = $1 AND type IN ('ein', 's-election') AND status IN ('awaiting_info', 'in_progress')
   - Claims: Lists the EIN and S election orders bought for the company being formed.
   - True: The query is by client, not by formation order: a client forming a second company whose first company still has an open EIN order is told, in the second company's formed email, that 'Your Federal EIN order is in your portal as well' (email.ts:466-473, :492-495). service_orders carries formation_order_id for both intake and portal purchases (routes-payments.ts:93-104; routes-portal.ts:1934, :1989, :2057, :2143).
   - Replace with: …WHERE client_id = $1 AND (formation_order_id = $2 OR formation_order_id IS NULL) AND type IN ('ein', 's-election') AND status IN ('awaiting_info', 'in_progress') with o.id as $2.
   - **Codex rejected the proposed replacement:** Require the matching formation_order_id. Resolve legacy NULL associations to a specific order before inclusion; OR formation_order_id IS NULL otherwise repeats the ambiguity for every company.
+  - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **210. [B113]** — **open**
   - Certificate titles as the client sees them in the portal ('Certificate of Status - Sep 16, 2026 — Acme, LLC') — `webapp/server/routes-admin.ts:250`
   - Reads: return `${kindTitle} - ${day} — ${llcName}`;
@@ -1561,12 +1572,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: :139 `LIMIT 200` — a sweep copies at most 200; with more pending, the rest wait a night each. The office line A76 covers ('every file' nightly) rests on this.
   - Replace with: Comment: 'Copies up to 200 not-yet-mirrored documents a sweep…'; or loop until the query returns fewer than 200.
   - Codex (housekeeping-only): dropbox.ts:112 says every not-yet-mirrored document; :139 caps each sweep at200. Only the internal comment is corrected by the bounded-batch wording.
-- **225. [B119]** — **open** — housekeeping
+- **225. [B119]** — **implemented** — housekeeping
   - Nightly Dropbox mirror — which folder legal mail lands in for a client with two companies — `webapp/server/dropbox.ts:132`
   - Reads: COALESCE((SELECT o.llc_name FROM orders o WHERE o.id = d.order_id), (SELECT o.llc_name FROM orders o WHERE o.client_id = d.client_id AND o.paid_at IS NOT NULL ORDER BY o.paid_at DESC LIMIT 1)) AS llc_name
   - Claims: A document with no company is filed under the client's newest paid company.
   - True: Legal mail carries no order_id by design (routes-admin.ts:1565 'Legal mail stays one shared section and carries no company'), so every piece of legal mail for a two-company client is mirrored into the newer company's folder whichever company it was served on.
   - Replace with: For kind = 'legal_mail' use the client's email as the folder (`safePathPart(doc.email)`), or add a per-piece company when the office uploads it.
+  - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **226. [B120]** — **open** — housekeeping
   - Encryption note on when the secrets are deleted — `webapp/server/crypto.ts:47`
   - Reads: rotating SESSION_SECRET orphans stored ciphertexts, which is acceptable because these secrets are deleted at fulfillment by design.

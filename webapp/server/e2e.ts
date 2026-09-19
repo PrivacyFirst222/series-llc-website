@@ -1,3 +1,4 @@
+import { batch02Checks } from "./batch02-check";
 import { equalShares, sharesAreComplete } from "../src/lib/ownership";
 /**
  * Local end-to-end walk of the whole money path (bun run server/e2e.ts).
@@ -1984,7 +1985,10 @@ if (mint.status === 200) {
       mail.set("receivedOn", "2026-09-13");
       mail.set("file", new File([new TextEncoder().encode("%PDF-1.4 legal mail\n%%EOF")], "mail.pdf", { type: "application/pdf" }));
       const mailRes = await fetch(`${BASE}/api/admin/documents`, { method: "POST", body: mail, headers: { Cookie: admU.cookie, "X-Forwarded-For": RUN_IP } });
-      check("legal mail needs no company", mailRes.status === 200, await mailRes.json().catch(() => null));
+      check("legal mail requires its recipient company", mailRes.status === 400, await mailRes.json().catch(() => null));
+      mail.set("orderId", secondId);
+      const assignedMail = await fetch(`${BASE}/api/admin/documents`, { method: "POST", body: mail, headers: { Cookie: admU.cookie, "X-Forwarded-For": RUN_IP } });
+      check("legal mail with its recipient company uploads", assignedMail.status === 200, await assignedMail.json());
       {
         const mailDocs = ((await api("/api/portal/documents", { cookies: setPw.cookie })).body?.data ?? []) as { kind: string; title: string; receivedOn?: string | null }[];
         const handMail = mailDocs.find((d) => d.kind === "legal_mail" && d.title === "Hand-uploaded legal mail");
@@ -3927,6 +3931,20 @@ if (mint.status === 200) {
   const good = await api("/api/portal/services/series", { method: "POST", cookies: pw.cookie, body: JSON.stringify({ suffix: "PS 7" }) });
   check("a good purchase still goes through after the refusals", good.status === 200, good.body);
 }
+
+const batch02Results = new Map<string, {ok:boolean; detail?:unknown}>();
+await batch02Checks((label,ok,detail)=>batch02Results.set(label,{ok,detail}));
+const batch02Result = (label:string) => { const result=batch02Results.get(label);batch02Results.delete(label);return result ?? {ok:false,detail:"The Batch 02 probe did not run"}; };
+{ const result=batch02Result("batch02 N1.04: S-election copies use their own company address");check("batch02 N1.04: S-election copies use their own company address",result.ok,result.detail); }
+{ const result=batch02Result("batch02 N1.05: agreement series belong to the selected company");check("batch02 N1.05: agreement series belong to the selected company",result.ok,result.detail); }
+{ const result=batch02Result("batch02 N1.06: EIN duplicate checks stay within one company");check("batch02 N1.06: EIN duplicate checks stay within one company",result.ok,result.detail); }
+{ const result=batch02Result("batch02 N1.07: EIN tax instructions do not borrow another entity election");check("batch02 N1.07: EIN tax instructions do not borrow another entity election",result.ok,result.detail); }
+{ const result=batch02Result("batch02 146: legal mail uploads require and retain their company");check("batch02 146: legal mail uploads require and retain their company",result.ok,result.detail); }
+{ const result=batch02Result("batch02 225: legal mail mirror uses its recipient company");check("batch02 225: legal mail mirror uses its recipient company",result.ok,result.detail); }
+{ const result=batch02Result("batch02 209: formed email lists only that company services");check("batch02 209: formed email lists only that company services",result.ok,result.detail); }
+{ const result=batch02Result("batch02 101: existing-company orders discard abandoned new names");check("batch02 101: existing-company orders discard abandoned new names",result.ok,result.detail); }
+{ const result=batch02Result("batch02 155: existing-company documents use the recorded company name");check("batch02 155: existing-company documents use the recorded company name",result.ok,result.detail); }
+for(const [label,result] of batch02Results)check(label,result.ok,result.detail);
 
 console.log(failures === 0 ? "\nALL PASS" : `\n${failures} FAILURES`);
 process.exit(failures === 0 ? 0 : 1);

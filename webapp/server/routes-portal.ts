@@ -1,3 +1,5 @@
+import { associateLegacyServices, serviceCompanyId } from "./company-scope";
+import { selectedParty } from "../src/lib/partyIdentity";
 import { contributorUnits, CONTRIBUTOR_REVIEW } from "../src/lib/oaContributors";
 // Split from app.ts on 29 Aug 2026 — one domain per file, code moved
 // verbatim (the two dev test flags became shared.testHooks so they stay
@@ -47,7 +49,7 @@ export interface SeedPayload {
   client?: { name?: string; address?: { address1?: string; address2?: string; city?: string; state?: string; zip?: string } };
   management?: {
     structure?: string;
-    managersOrAuthorizedRepresentatives?: { role?: string; firstName?: string; lastName?: string; suffix?: string; fullName?: string; businessEntityName?: string; streetAddress1?: string; streetAddress2?: string; city?: string; state?: string; zip?: string }[];
+    managersOrAuthorizedRepresentatives?: { role?: string; personOrEntity?: string; firstName?: string; lastName?: string; suffix?: string; fullName?: string; businessEntityName?: string; streetAddress1?: string; streetAddress2?: string; city?: string; state?: string; zip?: string }[];
   };
   members?: { memberList?: { memberType?: string; entityName?: string; firstName?: string; lastName?: string; suffix?: string; fullLegalName?: string; address1?: string; address2?: string; city?: string; state?: string; zip?: string }[] };
   series?: { id: string; name: string }[];
@@ -86,6 +88,9 @@ export async function oaSeed(clientId: string, orderId?: string | null): Promise
       );
   if (orders.length === 0) return null;
   const p = (typeof orders[0].payload === "string" ? JSON.parse(orders[0].payload) : orders[0].payload) as SeedPayload;
+  if (p.members?.memberList) p.members.memberList = p.members.memberList.map(selectedParty);
+  if (p.management?.managersOrAuthorizedRepresentatives) p.management.managersOrAuthorizedRepresentatives = p.management.managersOrAuthorizedRepresentatives.map(selectedParty);
+  await associateLegacyServices(clientId);
   const addr = p.principalOfficeAddress ?? {};
   const principalAddress = [addr.address1, addr.address2, [addr.city, addr.state].filter(Boolean).join(", "), addr.zip]
     .filter((x) => x && String(x).trim())
@@ -148,8 +153,8 @@ export async function oaSeed(clientId: string, orderId?: string | null): Promise
   }
   // Series = intake series + any fulfilled portal series orders
   const svcSeries = await db.query<{ details: unknown }>(
-    "SELECT details FROM service_orders WHERE client_id = $1 AND type = 'series' AND status IN ('in_progress','fulfilled')",
-    [clientId],
+    "SELECT details FROM service_orders WHERE client_id = $1 AND formation_order_id = $2 AND type = 'series' AND status IN ('in_progress','fulfilled')",
+    [clientId, orders[0].id],
   );
   const series: { name: string; purpose: string }[] = (p.series ?? []).map((sr) => ({ name: sr.name, purpose: "" }));
   for (const row of svcSeries) {
@@ -160,7 +165,7 @@ export async function oaSeed(clientId: string, orderId?: string | null): Promise
   }
   return {
     orderId: orders[0].id,
-    llcName: p.llcName?.finalName || orders[0].llc_name,
+    llcName: (p.filingPath === "CONVERT" ? "" : p.llcName?.finalName) || orders[0].llc_name,
     filingPath: p.filingPath ?? "NEW",
     formationType: p.formationType ?? "",
     managementStructure,
@@ -378,6 +383,7 @@ export async function clientLlcName(clientId: string, orderId?: string | null): 
 /** Resolve the ?company= parameter to one of the client's own paid orders —
  *  or their latest when absent, which is exactly the pre-tabs behavior. */
 export async function resolveCompanyOrder(clientId: string, requested: string | undefined): Promise<string | null> {
+  await associateLegacyServices(clientId);
   const db = await getDb();
   const rows = requested
     ? await db.query<{ id: string }>(
@@ -436,13 +442,12 @@ export async function clientSeries(clientId: string, orderId?: string | null): P
       names.push(n.toLowerCase().startsWith(llcName.toLowerCase()) ? n : `${llcName} - ${n}`);
     }
   }
-  // Service orders from before company scoping have no formation_order_id;
-  // they belong to the client's only company then, so a NULL matches any.
+  // Only unambiguously associated service orders belong to this company.
   const svc = orderId
     ? await db.query<{ type: string; details: unknown }>(
         `SELECT type, details FROM service_orders
          WHERE client_id = $1 AND type IN ('series', 'ein') AND status <> 'pending_payment'
-           AND (formation_order_id IS NULL OR formation_order_id = $2)`,
+           AND formation_order_id = $2`,
         [clientId, orderId],
       )
     : await db.query<{ type: string; details: unknown }>(
@@ -497,7 +502,7 @@ export async function sElectionEligibility(clientId: string, orderId?: string | 
   const existing = orderId
     ? await db.query(
         `SELECT id FROM service_orders WHERE client_id = $1 AND type = 's-election' AND status NOT IN ('cancelled', 'pending_payment')
-           AND (formation_order_id IS NULL OR formation_order_id = $2)`,
+           AND formation_order_id = $2`,
         [clientId, orderId],
       )
     : await db.query(
@@ -571,9 +576,12 @@ export async function purgeExpiredSElections(): Promise<number> {
     const kept: SElectionStoredDetails = { ...d, purgedAt: new Date().toISOString() };
 
     if (d?.shareholders?.length && d.dateIncorporated) {
-      const seed = await oaSeed(row.client_id);
       const filled = withFormationDefaults(d);
       try {
+        const companyId = await serviceCompanyId(row.id, row.client_id);
+        if (!companyId) throw new Error("The S-election order has no confirmed company association.");
+        const seed = await oaSeed(row.client_id, companyId);
+        if (!seed) throw new Error("The S-election company could not be loaded.");
         const pdf = await buildSElectionPackage({
           llcName: row.llc_name,
           principalAddress: seed?.principalAddress ?? "",
@@ -605,7 +613,7 @@ export async function purgeExpiredSElections(): Promise<number> {
           const doc = await db.query<{ id: string }>(
             `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes)
              VALUES ($1, $5, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,
-            [row.client_id, title, stored.storageKey, stored.sizeBytes, row.formation_order_id],
+            [row.client_id, title, stored.storageKey, stored.sizeBytes, companyId],
           );
           kept.documentId = doc[0].id;
         }
@@ -710,10 +718,12 @@ export const einDetailsSchema = z
  *  added to the 2553"). Null until an EIN order for the company itself is
  *  fulfilled with a number. */
 export async function companyEinFor(clientId: string, companyOrderId: string | null): Promise<string | null> {
+  if (!companyOrderId) return null;
+  await associateLegacyServices(clientId);
   const db = await getDb();
   const rows = await db.query<{ details: unknown }>(
     `SELECT details FROM service_orders WHERE client_id = $1 AND type = 'ein' AND status = 'fulfilled'
-       AND (formation_order_id IS NULL OR $2::text IS NULL OR formation_order_id::text = $2::text) ORDER BY fulfilled_at DESC`,
+       AND formation_order_id::text = $2::text ORDER BY fulfilled_at DESC`,
     [clientId, companyOrderId],
   );
   for (const r of rows) {
@@ -830,7 +840,10 @@ export async function postSElectionPackage(args: {
   const db = await getDb();
   const formation = merged.dateIncorporated ?? "";
   const { effectiveDate, shareholders } = withFormationDefaults(merged);
-  const seed = await oaSeed(so.client_id);
+  const companyId = await serviceCompanyId(so.id, so.client_id);
+  if (!companyId) return { ok: false };
+  const seed = await oaSeed(so.client_id, companyId);
+  if (!seed) return { ok: false };
   const clients = await db.query<{ email: string; name: string }>(
     "SELECT email, name FROM clients WHERE id = $1",
     [so.client_id],
@@ -881,11 +894,10 @@ export async function postSElectionPackage(args: {
   );
   // The package belongs to the company the order was placed for (Adam,
   // 7 Sep 2026): without it, it showed under every tab of the account.
-  const companyRow = await db.query<{ formation_order_id: string | null }>("SELECT formation_order_id FROM service_orders WHERE id = $1", [so.id]);
   const docRows = await db.query<{ id: string }>(
     `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes)
      VALUES ($1, $5, 'package', $2, $3, 'application/pdf', $4) RETURNING id`,
-    [so.client_id, title, stored.storageKey, stored.sizeBytes, companyRow[0]?.formation_order_id ?? null],
+    [so.client_id, title, stored.storageKey, stored.sizeBytes, companyId],
   );
   merged.documentId = docRows[0].id;
 
@@ -1067,7 +1079,9 @@ app.get("/portal/documents", async (c) => {
   const docs = await db.query<{
     id: string; kind: string; title: string; size_bytes: number; created_at: string; order_id: string | null; meta: unknown;
   }>(
-    "SELECT id, kind, title, size_bytes, created_at, order_id, meta FROM documents WHERE client_id = $1 ORDER BY created_at DESC",
+    `SELECT d.id, d.kind, d.title, d.size_bytes, d.created_at, d.order_id, d.meta, o.llc_name AS company_name
+       FROM documents d LEFT JOIN orders o ON o.id = d.order_id AND o.client_id = d.client_id
+       WHERE d.client_id = $1 ORDER BY d.created_at DESC`,
     [session.clientId],
   );
   // Legal mail carries the day it was received (14 Sep 2026); nothing else
@@ -1901,7 +1915,7 @@ app.get("/portal/services", async (c) => {
   const orders = svcCompanyId
     ? await db.query<{ id: string; type: string; status: string; details: unknown; fulfilled_at: unknown }>(
         `SELECT ${SERVICE_SAFE_COLUMNS} FROM service_orders WHERE client_id = $1
-           AND (formation_order_id IS NULL OR formation_order_id = $2) ORDER BY created_at DESC`,
+           AND formation_order_id = $2 ORDER BY created_at DESC`,
         [session.clientId, svcCompanyId],
       )
     : await db.query<{ id: string; type: string; status: string; details: unknown; fulfilled_at: unknown }>(
@@ -2083,7 +2097,7 @@ app.post("/portal/services/certificate", async (c) => {
   const open = await db.query<{ id: string }>(
     `SELECT id FROM service_orders
       WHERE client_id = $1 AND type = $2 AND status IN ('in_progress', 'awaiting_info')
-        AND (formation_order_id IS NULL OR formation_order_id = $3)`,
+        AND formation_order_id = $3`,
     [session.clientId, body.data.kind, purchaseCompanyId],
   );
   if (open.length > 0) {
@@ -2142,8 +2156,8 @@ app.post("/portal/services/ein", async (c) => {
   // abandoned checkout must not lock the client out forever.
   const existingEin = await db.query<{ details: unknown }>(
     `SELECT details FROM service_orders
-     WHERE client_id = $1 AND type = 'ein' AND status <> 'pending_payment'`,
-    [session.clientId],
+     WHERE client_id = $1 AND formation_order_id = $2 AND type = 'ein' AND status NOT IN ('pending_payment', 'cancelled')`,
+    [session.clientId, purchaseCompanyId],
   );
   const alreadyOrdered = existingEin.some((r) => {
     const d = (typeof r.details === "string" ? JSON.parse(r.details) : r.details) as {

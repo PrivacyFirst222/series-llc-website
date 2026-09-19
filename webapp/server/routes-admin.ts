@@ -1,3 +1,4 @@
+import { associateLegacyServices, serviceCompanyId } from "./company-scope";
 // Split from app.ts on 29 Aug 2026 — one domain per file, code moved
 // verbatim (the two dev test flags became shared.testHooks so they stay
 // mutable across modules). Routes register inside registerAdminRoutes(app),
@@ -876,10 +877,11 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
       "SELECT kind FROM documents WHERE order_id = $1 AND kind IN ('certificate-of-status', 'certified-copy')",
       [o.id],
     );
+    await associateLegacyServices(o.client_id);
     const openSvc = await db.query<{ type: string }>(
-      `SELECT type FROM service_orders WHERE client_id = $1
+      `SELECT type FROM service_orders WHERE client_id = $1 AND formation_order_id = $2
         AND type IN ('ein', 's-election') AND status IN ('awaiting_info', 'in_progress')`,
-      [o.client_id],
+      [o.client_id, o.id],
     );
     // The Statement, when we signed, is posted in the same step and named
     // with the rest (15 Sep 2026: the email said "two things").
@@ -1112,9 +1114,9 @@ app.get("/admin/services/:id", async (c) => {
   const rows = await db.query<{
     id: string; type: string; status: string; llc_name: string; details: unknown;
     amount_cents: number; ein_secret: string | null; created_at: string; paid_at: string | null;
-    square_order_id: string | null;
+    square_order_id: string | null; client_id: string;
   }>(
-    "SELECT id, type, status, llc_name, details, amount_cents, ein_secret, created_at, paid_at, square_order_id FROM service_orders WHERE id = $1",
+    "SELECT id, type, status, llc_name, details, amount_cents, ein_secret, created_at, paid_at, square_order_id, client_id FROM service_orders WHERE id = $1",
     [c.req.param("id")],
   );
   if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
@@ -1130,11 +1132,12 @@ app.get("/admin/services/:id", async (c) => {
       console.error("[admin] EIN secret decrypt failed:", e);
     }
   }
-  // Whether a paid S election package is on the client's account: the EIN
-  // is reported as an S corporation then (14 Sep 2026).
-  const sElectionPaid = (await db.query<{ id: string }>(
-    "SELECT id FROM service_orders WHERE client_id = (SELECT client_id FROM service_orders WHERE id = $1) AND type = 's-election' AND status NOT IN ('pending_payment', 'cancelled') LIMIT 1",
-    [so.id],
+  const companyId = await serviceCompanyId(so.id, so.client_id);
+  const detail = (typeof so.details === "string" ? JSON.parse(so.details) : so.details) as { target?: string } | null;
+  // A parent election says nothing about a series or another company.
+  const sElectionPaid = detail?.target !== "series" && !!companyId && (await db.query<{ id: string }>(
+    "SELECT id FROM service_orders WHERE client_id = $1 AND formation_order_id = $2 AND type = 's-election' AND status NOT IN ('pending_payment', 'cancelled') LIMIT 1",
+    [so.client_id, companyId],
   )).length > 0;
   return c.json({
     data: {
@@ -1235,7 +1238,10 @@ app.get("/admin/services/:id/s-election-draft", async (c) => {
     console.error("[admin] s-election secret decrypt failed:", e);
     return c.json(err("Could not decrypt the shareholder details.", "DECRYPT_FAILED"), 500);
   }
-  const seed = await oaSeed(so.client_id);
+  const companyId = await serviceCompanyId(so.id, so.client_id);
+  if (!companyId) return c.json(err("Assign this service order to its company before generating the package.", "COMPANY_REQUIRED"), 400);
+  const seed = await oaSeed(so.client_id, companyId);
+  if (!seed) return c.json(err("The company could not be loaded.", "COMPANY_REQUIRED"), 400);
   const input: SElectionDetails = {
     llcName: so.llc_name,
     principalAddress: seed?.principalAddress ?? "",
@@ -1411,11 +1417,13 @@ app.post("/admin/services/:id/fulfill", async (c) => {
  *  the client is told. Past the window the numbers are gone, so the client
  *  is told that instead. Returns how many were rebuilt. */
 async function carryEinIntoSElections(args: { clientId: string; companyOrderId: string | null; llcName: string; ein: string }): Promise<number> {
+  if (!args.companyOrderId) return 0;
+  await associateLegacyServices(args.clientId);
   const db = await getDb();
   const rows = await db.query<{ id: string; client_id: string; llc_name: string; status: string; details: unknown; ein_secret: string | null }>(
     `SELECT id, client_id, llc_name, status, details, ein_secret FROM service_orders
       WHERE client_id = $1 AND type = 's-election' AND status <> 'pending_payment'
-        AND (formation_order_id IS NULL OR $2::text IS NULL OR formation_order_id::text = $2::text)`,
+        AND formation_order_id::text = $2::text`,
     [args.clientId, args.companyOrderId],
   );
   const clients = await db.query<{ email: string }>("SELECT email FROM clients WHERE id = $1", [args.clientId]);
@@ -1562,18 +1570,18 @@ app.post("/admin/documents", async (c) => {
 
   // A package belongs to one of the client's companies (Adam, 7 Sep 2026).
   // One company: filled in silently. Several: the office must say which.
-  // Legal mail stays one shared section and carries no company.
+  // Legal mail identifies its recipient company just like a package.
   const requestedOrderId = typeof form.orderId === "string" ? form.orderId.trim() : "";
   let orderId: string | null = null;
-  if (kind === "package") {
+  {
     const companies = await db.query<{ id: string }>("SELECT id FROM orders WHERE client_id = $1 AND paid_at IS NOT NULL ORDER BY paid_at DESC", [clientId]);
     if (requestedOrderId) {
       if (!companies.some((o) => o.id === requestedOrderId)) return c.json(err("That company is not on this client's account.", "INVALID_INPUT"), 400);
       orderId = requestedOrderId;
     } else if (companies.length === 1) {
       orderId = companies[0].id;
-    } else if (companies.length > 1) {
-      return c.json(err("This client has more than one company — choose which one the document belongs to.", "COMPANY_REQUIRED"), 400);
+    } else {
+      return c.json(err("Choose the company this document belongs to.", "COMPANY_REQUIRED"), 400);
     }
   }
 

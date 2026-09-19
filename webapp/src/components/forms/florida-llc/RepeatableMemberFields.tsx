@@ -1,3 +1,4 @@
+import { selectedParty } from "../../../lib/partyIdentity";
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -74,7 +75,7 @@ export function RepeatableMemberFields({
               <Select
                 value={entry.memberType}
                 onValueChange={(v) =>
-                  update(entry.id, { memberType: v as PartyKind })
+                  update(entry.id, selectedParty({ ...entry, memberType: v as PartyKind }))
                 }
               >
                 <SelectTrigger id={`member-${entry.id}-type`}>

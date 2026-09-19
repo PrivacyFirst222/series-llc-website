@@ -1,3 +1,4 @@
+import { batch02Walk } from "./batch02-walk";
 import { batch01Walk } from "./batch01-walk";
 /**
  * The behavioral gate: a real browser buys what the site sells.
@@ -2723,6 +2724,7 @@ async function main(): Promise<void> {
   }
 
   await batch01Walk(browser, `http://localhost:${WEB_PORT}`, expect);
+  await batch02Walk(browser, `http://localhost:${WEB_PORT}`, expect);
   await browser.close();
   web.stop();
   api.kill();

@@ -3215,14 +3215,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T10:58:37.375Z",
+              "event": "assigned",
+              "batch": "02",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T11:17:10.256Z",
+              "event": "implemented",
+              "batch": "02",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "02",
+          "fix": {
+            "batch": "02",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch02 101: existing-company orders discard abandoned new names"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -3915,14 +3942,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T10:58:37.375Z",
+              "event": "assigned",
+              "batch": "02",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T11:17:10.256Z",
+              "event": "implemented",
+              "batch": "02",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "02",
+          "fix": {
+            "batch": "02",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch02 123: EIN description names the applicant directly"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -4702,14 +4756,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T10:58:37.375Z",
+              "event": "assigned",
+              "batch": "02",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T11:17:10.256Z",
+              "event": "implemented",
+              "batch": "02",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "02",
+          "fix": {
+            "batch": "02",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch02 146: legal mail uploads require and retain their company"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -4992,14 +5073,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T10:58:37.375Z",
+              "event": "assigned",
+              "batch": "02",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T11:17:10.256Z",
+              "event": "implemented",
+              "batch": "02",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "02",
+          "fix": {
+            "batch": "02",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch02 155: existing-company documents use the recorded company name"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -6866,14 +6974,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T10:58:37.375Z",
+              "event": "assigned",
+              "batch": "02",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T11:17:10.256Z",
+              "event": "implemented",
+              "batch": "02",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "02",
+          "fix": {
+            "batch": "02",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch02 209: formed email lists only that company services"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -7354,14 +7489,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T10:58:37.375Z",
+              "event": "assigned",
+              "batch": "02",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T11:17:10.256Z",
+              "event": "implemented",
+              "batch": "02",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "02",
+          "fix": {
+            "batch": "02",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch02 225: legal mail mirror uses its recipient company"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -8798,14 +8960,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T10:58:37.375Z",
+              "event": "assigned",
+              "batch": "02",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T11:17:10.256Z",
+              "event": "implemented",
+              "batch": "02",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "02",
+          "fix": {
+            "batch": "02",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch02 N1.04: S-election copies use their own company address"
+              }
+            ]
+          }
         }
       ]
     },
@@ -8822,14 +9011,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T10:58:37.375Z",
+              "event": "assigned",
+              "batch": "02",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T11:17:10.256Z",
+              "event": "implemented",
+              "batch": "02",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "02",
+          "fix": {
+            "batch": "02",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch02 N1.05: agreement series belong to the selected company"
+              }
+            ]
+          }
         }
       ]
     },
@@ -8846,14 +9062,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T10:58:37.375Z",
+              "event": "assigned",
+              "batch": "02",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T11:17:10.256Z",
+              "event": "implemented",
+              "batch": "02",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "02",
+          "fix": {
+            "batch": "02",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch02 N1.06: EIN duplicate checks stay within one company"
+              }
+            ]
+          }
         }
       ]
     },
@@ -8870,14 +9113,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T10:58:37.375Z",
+              "event": "assigned",
+              "batch": "02",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T11:17:10.256Z",
+              "event": "implemented",
+              "batch": "02",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "02",
+          "fix": {
+            "batch": "02",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch02 N1.07: EIN tax instructions do not borrow another entity election"
+              }
+            ]
+          }
         }
       ]
     },
@@ -10034,14 +10304,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T10:58:37.375Z",
+              "event": "assigned",
+              "batch": "02",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T11:17:10.256Z",
+              "event": "implemented",
+              "batch": "02",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "02",
+          "fix": {
+            "batch": "02",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch02 N3.05: office EIN answers name the series applicant"
+              }
+            ]
+          }
         }
       ]
     },
@@ -10308,14 +10605,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-19T10:58:37.375Z",
+              "event": "assigned",
+              "batch": "02",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T11:17:10.256Z",
+              "event": "implemented",
+              "batch": "02",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "02",
+          "fix": {
+            "batch": "02",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch02 N4.01: changing party type clears the previous name"
+              }
+            ]
+          }
         }
       ]
     },
@@ -10716,6 +11040,25 @@
         },
         {
           "at": "2026-09-19T09:59:52.475Z",
+          "event": "implemented"
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "revision": 1,
+      "frozenHash": "6d0b2214493c73c38e2c82522a425b997aa216001ba039c5686663916d93d045",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "3465320475ab690615f08cc3291f7cf186ebf814",
+      "history": [
+        {
+          "at": "2026-09-19T10:58:37.376Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-19T11:17:10.256Z",
           "event": "implemented"
         }
       ]

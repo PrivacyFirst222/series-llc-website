@@ -1,3 +1,4 @@
+import { selectedParty } from "../src/lib/partyIdentity";
 /**
  * What you need in front of you to file the Articles, in the order the Division
  * asks for it.
@@ -56,6 +57,7 @@ type PersonLike = {
   businessEntityName?: string;
   entityName?: string;
   memberType?: string;
+  personOrEntity?: string;
   streetAddress1?: string;
   streetAddress2?: string;
   address1?: string;
@@ -302,7 +304,9 @@ function conversionGroups(p: PayloadLike): FilingGroup[] {
 }
 
 export function filingGroups(payload: unknown): FilingGroup[] {
-  const p: PayloadLike = (payload ?? {}) as PayloadLike;
+  const p: PayloadLike = structuredClone((payload ?? {}) as PayloadLike);
+  if (p.management?.managersOrAuthorizedRepresentatives) p.management.managersOrAuthorizedRepresentatives = p.management.managersOrAuthorizedRepresentatives.map(selectedParty);
+  if (p.members?.memberList) p.members.memberList = p.members.memberList.map(selectedParty);
   if (p.filingPath === "CONVERT") return conversionGroups(p);
   const ra = p.registeredAgent ?? {};
   const mgmt = p.management ?? {};

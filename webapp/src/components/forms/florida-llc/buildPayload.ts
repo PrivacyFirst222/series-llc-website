@@ -1,3 +1,4 @@
+import { selectedParty } from "../../../lib/partyIdentity";
 import { canonicalizeSeriesName, buildFinalLlcName, calculateEstimatedFees } from "./validation";
 import { fullPersonName } from "./validation";
 import type { FloridaLLCFormData, SubmissionPayload } from "./types";
@@ -26,7 +27,7 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
     // A conversion names no new company: whatever was typed on the
     // new-formation path before switching stays off the record (14 Sep 2026).
     llcName: isConversion
-      ? { desiredName: "", designator: "", finalName, alternateNames: [], exactNameOnly: false }
+      ? { desiredName: "", designator: "", finalName: "", alternateNames: [], exactNameOnly: false }
       : {
       desiredName: data.desiredLlcName,
       designator: data.llcDesignator || "",
@@ -82,7 +83,7 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
       // Member-managed: the members are listed automatically (AMBR) and the
       // managers step is never shown — a stray entry must not reach the filing.
       managersOrAuthorizedRepresentatives:
-        data.managementStructure === "MEMBER_MANAGED" ? [] : data.managers,
+        data.managementStructure === "MEMBER_MANAGED" ? [] : data.managers.map(selectedParty),
     },
     members: {
       collectForInternalRecords: data.collectMembersForInternalRecords,
@@ -91,7 +92,7 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
       // the operating agreement questionnaire, and a stray default row must
       // not reach the record.
       memberList:
-        data.managementStructure === "MANAGER_MANAGED" ? [] : data.members,
+        data.managementStructure === "MANAGER_MANAGED" ? [] : data.members.map(selectedParty),
     },
     // Purpose and effective date are Articles questions a conversion never
     // sees; answers from an abandoned new-formation path stay off the record.

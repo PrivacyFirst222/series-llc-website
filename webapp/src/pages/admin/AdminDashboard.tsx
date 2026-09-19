@@ -236,11 +236,10 @@ function UploadDialog({ client }: { client: AdminClient }) {
   const [receivedOn, setReceivedOn] = useState<string>("");
   const [notify, setNotify] = useState<boolean>(true);
   const [file, setFile] = useState<File | null>(null);
-  // A package belongs to one company (Adam, 7 Sep 2026); the choice appears
-  // only when the client has more than one.
+  // Packages and legal mail identify one company; a sole company is preselected.
   const companies = client.companies ?? [];
   const [orderId, setOrderId] = useState<string>(companies.length === 1 ? companies[0].id : "");
-  const needsCompany = kind === "package" && companies.length > 1;
+  const needsCompany = companies.length !== 1;
 
   const upload = useMutation({
     mutationFn: async () => {
@@ -251,7 +250,7 @@ function UploadDialog({ client }: { client: AdminClient }) {
       form.set("title", title);
       form.set("notify", String(notify));
       if (kind === "legal_mail") form.set("receivedOn", receivedOn);
-      if (kind === "package" && orderId) form.set("orderId", orderId);
+      if (orderId) form.set("orderId", orderId);
       form.set("file", file);
       const res = await fetch("/api/admin/documents", {
         method: "POST",
