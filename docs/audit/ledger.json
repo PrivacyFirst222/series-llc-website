@@ -10390,7 +10390,7 @@
       "id": "0-final",
       "revision": 1,
       "frozenHash": "6ec66e83a8ce7d8944dc7ffb0e4af179eb7f856a3cb42167be54ddff8ccc844d",
-      "status": "implemented",
+      "status": "released",
       "model": "Codex",
       "base": "82abf541a6643981d93d41bc5d8b6da169897971",
       "history": [
@@ -10402,8 +10402,34 @@
         {
           "at": "2026-09-19T04:49:27.847Z",
           "event": "implemented"
+        },
+        {
+          "at": "2026-09-19T06:55:00.341Z",
+          "event": "accepted by Adam",
+          "note": "commit ca80d088cc70250a99a35e94f9fd5f4ef75b38e3, package 4b5ff6472ebb (Adam explicit Codex message: Accept 0-final, revision 1, ca80d08, package 4b5ff6472ebb)"
+        },
+        {
+          "at": "2026-09-19T06:58:46.369Z",
+          "event": "released",
+          "note": "the remote's main is ca80d08 and contains the accepted commit; live site: Vercel production dpl_DbeHhmj8EHeygvkypJuMVFNxkbLD Ready for ca80d088cc70250a99a35e94f9fd5f4ef75b38e3; https://myfloridaseriesllc.com/ and /api/config both HTTP 200 on 2026-09-19. GitHub run 35428017644 still in progress when recorded.; Dropbox copies: No docs/word changes in reviewed range 82abf54..ca80d08; Dropbox publication not needed and not run."
         }
-      ]
+      ],
+      "release": {
+        "git": {
+          "at": "2026-09-19T06:58:46.369Z",
+          "remoteMain": "ca80d088cc70250a99a35e94f9fd5f4ef75b38e3",
+          "commit": "ca80d088cc70250a99a35e94f9fd5f4ef75b38e3",
+          "packageId": "4b5ff6472ebb"
+        },
+        "deployment": {
+          "at": "2026-09-19T06:58:46.369Z",
+          "evidence": "Vercel production dpl_DbeHhmj8EHeygvkypJuMVFNxkbLD Ready for ca80d088cc70250a99a35e94f9fd5f4ef75b38e3; https://myfloridaseriesllc.com/ and /api/config both HTTP 200 on 2026-09-19. GitHub run 35428017644 still in progress when recorded."
+        },
+        "documents": {
+          "at": "2026-09-19T06:58:46.369Z",
+          "evidence": "No docs/word changes in reviewed range 82abf54..ca80d08; Dropbox publication not needed and not run."
+        }
+      }
     }
   ]
 }
