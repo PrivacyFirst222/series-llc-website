@@ -92,9 +92,24 @@ export interface Part {
   waitsOn: string[];
   history: HistoryEntry[];
   fix?: Fix;
+  /** Append-only attempts to replace a released fix. Rejection restores prior
+   * but keeps this entry and the part's whole history. */
+  supersessions?: Supersession[];
   /** Set when this part is a second sighting of another item's part: the
    *  same defect, seen in another place. Work is claimed by defect. */
   canonical?: PartRef;
+}
+
+export interface Supersession {
+  prior: Fix;
+  batch: string;
+  revision: number;
+  hash: string;
+}
+
+/** Assertions remain active while a replacement is only assigned. */
+export function activeFix(p: Part): Fix | undefined {
+  return p.fix ?? (p.status === "assigned" ? p.supersessions?.at(-1)?.prior : undefined);
 }
 
 /** A part that a migration replaced with narrower ones. Kept, with its whole
@@ -141,7 +156,7 @@ export interface BatchFile {
   model: string;
   /** The commit on main this batch was cut from. */
   base: string;
-  items: { id: string; part: string; covers?: string[]; scope: string; assertions: Assertion[] }[];
+  items: { id: string; part: string; covers?: string[]; scope: string; assertions: Assertion[]; replaces?: Fix }[];
   /** Every file the batch may touch. "replace" files are rebuilt from the
    *  declared replacements and compared; "code" files are left to Adam's
    *  complete-diff review; "control" marks a check, hook, guard or publishing
@@ -355,6 +370,25 @@ const structure = (i: Item) => ({
 /** External evidence of Adam's decisions, needed for the transitions that
  *  stand for them. "required": read his records here (the local gates).
  *  "skip": not available on this machine (GitHub); the caller says so. */
+export function hasReplacementApproval(b: BatchFile): boolean {
+  return rulingRecords().some(r => r.kind === "replacement" && r.batch === b.id && r.revision === b.revision && r.hash === frozenHashOf(b));
+}
+
+/** Validate a retained attempt even on a clean checkout: approving the old
+ * text or adding a free-form supersedes flag is never replacement permission. */
+function supersessionProblems(l: Ledger, item: string, part: string, s: Supersession, read: (p: string) => string | null, external: "required" | "skip"): string[] {
+  const out: string[] = [], name = `item ${item} part ${part}: replacement`;
+  const old = l.batches.find(b => b.id === s.prior.batch && b.revision === s.prior.revision);
+  const next = l.batches.find(b => b.id === s.batch && b.revision === s.revision);
+  const parse = (id: string, revision: number): BatchFile | null => { try { const t = read(`docs/audit/batches/${id}/revisions/r${revision}.json`); return t ? JSON.parse(t) : null; } catch { return null; } };
+  const ob = parse(s.prior.batch, s.prior.revision), nb = parse(s.batch, s.revision);
+  const oldPart = ob?.items.find(x => x.id === item && x.part === part), newPart = nb?.items.find(x => x.id === item && x.part === part);
+  if (!old || old.status !== "released" || old.release?.git.commit !== s.prior.commit || old.model !== s.prior.doneBy || !same(oldPart?.assertions, s.prior.assertions)) out.push(`${name}: archived prior fix is not the released work order`);
+  if (!next || next.id === old?.id || next.frozenHash !== s.hash || !nb || frozenHashOf(nb) !== s.hash || !same(newPart?.replaces, s.prior) || !newPart?.assertions.length) out.push(`${name}: exact prior fix and new work order are not bound by the retained snapshot`);
+  if (nb && external === "required" && !hasReplacementApproval(nb)) out.push(`${name}: no owner approval names this exact replacement work order`);
+  return out;
+}
+
 export interface RegressionOpts { strict?: boolean; read?: (p: string) => string | null; external?: "required" | "skip" }
 
 /** What may never happen between two versions of the ledger.
@@ -364,7 +398,8 @@ export interface RegressionOpts { strict?: boolean; read?: (p: string) => string
  *  Otherwise (the commit guard, a push Adam accepted): a protected field may
  *  change only in the ways a migration file named by a new migration ruling
  *  declares (its hash recorded in the ruling), and an accepted fix's
- *  assertions only under a ruling that says what it supersedes. */
+ *  assertions only in a new work order that exactly names the released fix
+ *  it replaces, with Adam's hash-bound replacement approval. */
 export function ledgerRegressions(before: Ledger, after: Ledger, opts: RegressionOpts = {}): string[] {
   const out: string[] = [];
   const read = opts.read ?? readTree;
@@ -429,21 +464,52 @@ export function ledgerRegressions(before: Ledger, after: Ledger, opts: Regressio
       const back = ORDER.indexOf(ap.status) < ORDER.indexOf(bp.status);
       const owner = bp.fix ? before.batches.find(x => x.id === bp.fix!.batch && x.revision === bp.fix!.revision) : before.batches.filter(x => x.id === bp.batch).at(-1);
       const nextOwner = owner && after.batches.find(x => x.id === owner.id && x.revision === owner.revision);
+      const priorAttempts = bp.supersessions ?? [], attempts = ap.supersessions ?? [];
+      if (!isPrefix(priorAttempts, attempts)) out.push(`${name}: supersession archive was rewritten`);
+      const appendedAttempts = isPrefix(priorAttempts, attempts) ? attempts.slice(priorAttempts.length) : [];
+      // Replay exact attempts across the compared commits. A cancelled
+      // attempt retains its archive but returns to the same released fix.
+      const completedBeforeReplacement = bp.fix && bp.status === "implemented" && owner && nextOwner?.status === "released" && nextOwner.release
+        && isPrefix(owner.history, nextOwner.history) && replayEvents(owner.status, nextOwner.history.slice(owner.history.length).map(h => h.event)) === "released"
+        && ap.history.slice(bp.history.length).some(h => h.event === "released" && h.batch === owner.id && h.revision === owner.revision);
+      let cursor = completedBeforeReplacement ? { ...bp.fix!, commit: nextOwner!.release!.git.commit } : bp.fix;
+      let cursorBatch = bp.batch, cursorStatus: PartStatus = completedBeforeReplacement ? "released" : bp.status;
+      let replaced = appendedAttempts.length > 0 && cursorStatus === "released" && !!cursor;
+      for (const attempt of appendedAttempts) {
+        const target = after.batches.find(x => x.id === attempt.batch && x.revision === attempt.revision);
+        const events = ap.history.slice(bp.history.length);
+        if (!target || cursorStatus !== "released" || !same(attempt.prior, cursor)
+          || before.batches.some(x => x.id === target.id && x.revision === target.revision)
+          || supersessionProblems(after, b.id, bp.key, attempt, read, external).length
+          || !events.some(h => h.event === "superseded by approved replacement" && h.batch === target.id && h.revision === target.revision)) { replaced = false; break; }
+        if (target.status === "rejected") {
+          if (!events.some(h => h.event === `rejected r${target.revision}` && h.batch === target.id && h.revision === target.revision)) replaced = false;
+          continue;
+        }
+        cursorBatch = target.id;
+        cursorStatus = target.status === "authorized" ? "assigned" : target.status as PartStatus;
+        const work = JSON.parse(read(`docs/audit/batches/${target.id}/revisions/r${target.revision}.json`)!) as BatchFile;
+        const entry = work.items.find(x => x.id === b.id && x.part === bp.key)!;
+        cursor = target.status === "authorized" ? undefined : { batch: target.id, revision: target.revision, commit: target.release?.git.commit ?? "", doneBy: target.model, assertions: entry.assertions };
+      }
+      replaced = replaced && cursorStatus === ap.status && cursorBatch === ap.batch && same(cursor, ap.fix);
+      if (appendedAttempts.length && !replaced) out.push(`${name}: invalid replacement transition or archived prior fix`);
+      if (replaced && opts.strict && (bp.status !== ap.status || bp.batch !== ap.batch || !same(bp.fix, ap.fix))) out.push(`${name}: replacement needs acceptance; never records-only publication`);
+      const restore = bp.supersessions?.at(-1);
+      const restored = restore && owner && restore.batch === owner.id && restore.revision === owner.revision
+        && ap.status === "released" && same(ap.fix, restore.prior) && ap.batch === restore.prior.batch;
       const rejected = owner && nextOwner && !FINAL_STATES.includes(owner.status) && nextOwner.status === "rejected"
         && isPrefix(owner.history, nextOwner.history) && replayEvents(owner.status, nextOwner.history.slice(owner.history.length).map(h => h.event)) === "rejected"
-        && ap.status === "open" && !ap.fix && !ap.batch
+        && ((ap.status === "open" && !ap.fix && !ap.batch && !restore) || restored)
         && ap.history.slice(bp.history.length).some(h => h.event === `rejected r${owner.revision}` && h.batch === owner.id && h.revision === owner.revision);
-      const reasoned = !!rejected;
-      if (bp.fix && !rejected) {
+      const reasoned = !!rejected || !!replaced;
+      if (bp.fix && !rejected && !replaced) {
         const expectedFix = { ...bp.fix, ...(nextOwner?.status === "released" && nextOwner.release ? { commit: nextOwner.release.git.commit } : {}) };
         if (!same(ap.fix, expectedFix) || ap.batch !== bp.batch) out.push(`${name}: recorded fix cannot be erased or changed outside its authenticated batch rejection or release transition`);
       }
       const wasAccepted = bp.status === "accepted" || bp.status === "released";
       if (back && (!reasoned || (opts.strict && wasAccepted))) out.push(`${name}: status went back from ${bp.status} to ${ap.status}${opts.strict && wasAccepted ? " — reopening an accepted fix needs Adam's acceptance, not a records push" : " with no recorded reason"}`);
-      if (wasAccepted && bp.fix && !same(ap.fix?.assertions, bp.fix.assertions)) {
-        const superseded = newRulings.some((r) => rulingKind(r) === "ruling" && r.item === b.id && (!r.part || r.part === bp.key) && (r.supersedes ?? "").trim() !== "");
-        if (opts.strict || !superseded) out.push(`${name}: an accepted fix's assertions changed${opts.strict ? " — that weakens a protection and needs Adam's acceptance, not a records push" : " with no ruling that says what it supersedes"}`);
-      }
+      if (wasAccepted && bp.fix && !same(ap.fix?.assertions, bp.fix.assertions) && !replaced) out.push(`${name}: an accepted fix's assertions changed without an exact approved replacement work order`);
     }
   }
   for (const a of after.items) if (!before.items.some((i) => i.id === a.id)) out.push(`item ${a.id}: a record appeared that the auditors never wrote`);
@@ -454,6 +520,7 @@ export function ledgerRegressions(before: Ledger, after: Ledger, opts: Regressio
   // also validates parts first created by a migration in this comparison.
   for (const it of after.items) for (const p of it.parts) {
     const name = `item ${it.id} part ${p.key}`;
+    for (const s of p.supersessions ?? []) out.push(...supersessionProblems(after, it.id, p.key, s, read, external));
     if (p.status === "open") {
       if (p.batch || p.fix) out.push(`${name}: open part still carries a batch or fix`);
       continue;
@@ -466,13 +533,18 @@ export function ledgerRegressions(before: Ledger, after: Ledger, opts: Regressio
     let declared: BatchFile["items"][number] | undefined;
     try { declared = text ? (JSON.parse(text) as BatchFile).items.find(x => x.id === it.id && x.part === p.key) : undefined; } catch { /* refused below */ }
     if (!declared) out.push(`${name}: not assigned by the owning batch's retained work order`);
+    if (declared?.replaces && !(p.supersessions ?? []).some(s => s.batch === owner.id && s.revision === owner.revision && same(s.prior, declared.replaces))) out.push(`${name}: replacement has no retained prior fix`);
     if (p.status === "assigned" && p.fix) out.push(`${name}: assigned part already carries a fix`);
     if (["implemented", "accepted", "released"].includes(p.status)) {
       if (!p.fix || !same(p.fix.assertions, declared?.assertions) || p.fix.doneBy !== owner.model) out.push(`${name}: recorded fix differs from the owning batch's frozen assertions or model`);
       if (p.status === "released" && p.fix?.commit !== owner.release?.git.commit) out.push(`${name}: released fix does not name the owning batch's released commit`);
     }
     const previous = before.items.find(i => i.id === it.id)?.parts.find(q => q.key === p.key);
-    if (previous?.status !== p.status) {
+    const lastAttempt = p.supersessions?.at(-1);
+    const restoration = lastAttempt && p.status === "released" && same(p.fix, lastAttempt.prior)
+      && after.batches.some(b => b.id === lastAttempt.batch && b.revision === lastAttempt.revision && b.status === "rejected")
+      && p.history.slice(previous?.history.length ?? 0).some(h => h.event === `rejected r${lastAttempt.revision}` && h.batch === lastAttempt.batch && h.revision === lastAttempt.revision);
+    if (previous?.status !== p.status && !restoration) {
       const event = p.status === "assigned" ? "assigned" : p.status === "accepted" ? EVENT.accepted : p.status;
       if (!p.history.slice(previous?.history.length ?? 1).some(h => h.event === event && h.batch === owner.id && h.revision === owner.revision)) out.push(`${name}: transition to ${p.status} lacks its owning batch event`);
     }
@@ -620,12 +692,13 @@ export function replayStatic(l: Ledger, read: (file: string) => string | null, f
   const cache = new Map<string, string | null>();
   const get = (f: string) => { if (!cache.has(f)) cache.set(f, read(f)); return cache.get(f) ?? null; };
   for (const item of l.items) for (const part of item.parts) {
-    if (!part.fix || !(part.status === "accepted" || part.status === "released" || part.status === "implemented")) continue;
+    const fix = activeFix(part);
+    if (!fix) continue;
     const name = `item ${item.id}${part.key === "all" ? "" : ` (${part.key})`}`;
     // An approved sentence that contains the retired one is not a relapse —
     // in the file it was approved for, and nowhere else.
-    const aftersIn = (f: string) => part.fix!.assertions.flatMap((a) => (a.kind === "replace" && a.file === f ? [a.after] : []));
-    for (const a of part.fix.assertions) {
+    const aftersIn = (f: string) => fix.assertions.flatMap((a) => (a.kind === "replace" && a.file === f ? [a.after] : []));
+    for (const a of fix.assertions) {
       if (a.kind === "replace" || a.kind === "present") {
         const text = a.kind === "replace" ? a.after : a.text;
         const body = get(a.file);
@@ -670,7 +743,7 @@ export function acceptances(): Acceptance[] {
 }
 /** A ruling Adam made ("Ruling 28: …"), or his approval of a migration file
  *  ("Approve migration 001-…"), recorded with the file's hash at that moment. */
-export interface RulingRecord { kind: "ruling" | "migration"; item?: string; part?: string; text?: string; migration?: string; hash?: string; at: string; source: string }
+export interface RulingRecord { kind: "ruling" | "migration" | "replacement"; batch?: string; revision?: number; item?: string; part?: string; text?: string; migration?: string; hash?: string; at: string; source: string }
 export function rulingRecords(): RulingRecord[] {
   if (!existsSync(RULINGS_FILE)) return [];
   return rd(RULINGS_FILE).split("\n").filter((x) => x.trim()).map((x) => JSON.parse(x) as RulingRecord);

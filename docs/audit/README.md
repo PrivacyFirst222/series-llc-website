@@ -116,11 +116,12 @@ change.
   standing acceptance of the released commit AND package. The GitHub guard
   cannot read those records and says so; it never assumes them.
 - **An item is immutable**: its text, tag, area, source, verdicts, related
-  items, waits, set of parts, each part's scope, link and waits, and an
+  items, waits, set of parts, each part's scope, link and waits, and a
   recorded fix's assertions from implementation onward. A part's state must
   match its owning batch and retained work order; a session-written reopening
   cannot discard its fix. An authenticated rejection can reopen unfinished
-  work. A wait is satisfied by a ruling, never edited. A
+  work, or restore the prior released fix when a replacement is rejected.
+  A released fix changes only through the exact replacement workflow below. A wait is satisfied by a ruling, never edited. A
   part can be replaced only by a migration, which keeps the old part under
   `retiredParts` with its whole history.
 - **A migration** is a file, `migrations/<id>.json`, declaring the exact
@@ -250,7 +251,13 @@ change.
   by both the review command and CI. It uses disposable clones and owner
   records. `--against <commit>` applies the same probes to earlier controls;
   fixture check results are explicitly simulated, never reported as a product
-  test run. Browser probes use loopback sinks only.
+  test run. The suite replaces the real audit items and rulings with synthetic
+  records in its disposable baseline before probing them. It does not borrow
+  an unfinished real item. Browser probes use loopback sinks only.
+- `lifecycle-check.ts` — part of the mandatory control suite: runs the tests
+  after real item assignment and with no live findings, then exercises exact
+  replacement approvals, preserved assertions, rejection and release through
+  real commands against simulated owner records and a local filesystem remote.
 
 ### One batch
 
@@ -276,3 +283,39 @@ change.
    `publish-docs.ts` if Word documents changed, then
    `batch.ts released <id> <commit> --deployed "…" --documents "…"` and a
    records-only push.
+
+### Replacing a released fix, with Adam's approval
+
+A later correction uses a NEW batch id. Its item entry includes `replaces`,
+the complete existing Fix object (old batch, revision, commit, author,
+assertions and any facts metadata), and the full new assertions. The printed
+work order displays both. The old batch and its snapshot remain unchanged.
+
+1. Adam reviews that exact work order, then sends the whole message
+   `Approve replacement <batch>, revision <n>`, or runs
+   `bun run docs/audit/accept.ts approve-replacement <batch> --revision <n>`.
+   This records a hash of the entire work order outside the repository.
+   An ordinary ruling or a free-form `--supersedes` flag cannot authorize it.
+2. `batch.ts authorize <batch>` requires that approval and the exact currently
+   released fix. It appends the old fix to the part's `supersessions` history,
+   identifies the new work order and assigns the part. While only assigned,
+   both static and runtime checks still replay the old assertions.
+3. Make the declared change; `batch.ts implemented <batch>` installs the new
+   assertions. The prior fix, assertions, batch snapshot and complete part
+   history are retained. Other parts' protections remain active.
+4. Commit and run the complete review. Unlike ordinary assignment, a
+   replacement assignment cannot be pushed as records only. Keep it local
+   until Adam accepts the exact complete package and separately authorizes
+   publication. Approval to replace is permission to build, not to publish.
+5. Release uses the ordinary acceptance and release gate. If Adam rejects
+   the attempt instead, `batch.ts reject` restores the most recent released
+   fix and its assertions. The implementer must also restore the product
+   behavior; the guard refuses until it matches the restored assertions.
+   The rejected attempt remains in history. A cancellation that leaves all
+   live protections unchanged may be recorded as bookkeeping; it requires
+   both the replacement approval and the actual rejection record.
+
+Every local guard rechecks retained replacement approvals against the frozen
+work orders. CI checks structure, history and exact work orders but cannot
+read Adam's external decisions. These remain procedural controls under the
+same disclosed administrator-access and hook-bypass limits.

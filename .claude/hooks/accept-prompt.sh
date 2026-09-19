@@ -10,6 +10,7 @@
 #     Ruling 28: keep the monthly proration; build the billing
 #     Ruling 27, part retention: keep it as written
 #     Approve migration 001-part-level-links
+#     Approve replacement A, revision 1
 #
 # Revision 2 (Codex's review of revision 1, finding 2): revision 1 matched the
 # beginning of the message and ignored the rest, so "Accept A, revision 1,
@@ -52,11 +53,15 @@ m = re.fullmatch(r"ruling\s+(?:(?:on\s+)?item\s+)?([0-9]+|N[0-9]\.[0-9]{2})(?:\s
 if m:
     print("ruling\x1f%s\x1f%s\x1f%s" % (m.group(1), m.group(2) or "", base64.b64encode(m.group(3).strip().encode()).decode()))
     sys.exit(0)
+m = re.fullmatch(r"approve\s+replacement\s+" + ID + r"\s*,?\s+revision\s+([1-9]\d*)\s*[.!]?", text, re.I)
+if m:
+    print("replacement\x1f%s\x1f%s" % (m.group(1), m.group(2)))
+    sys.exit(0)
 m = re.fullmatch(r"approve\s+migration\s+([A-Za-z0-9][A-Za-z0-9-]*)\s*[.!]?", text, re.I)
 if m:
     print("migration\x1f%s" % m.group(1))
     sys.exit(0)
-if re.match(r"\s*(accept\s+(?:batch\s+)?[A-Za-z0-9-]+\s*,?\s+(?:revision|rev|r)\s*\d+|ruling\s+|approve\s+migration)", text, re.I):
+if re.match(r"\s*(accept\s+(?:batch\s+)?[A-Za-z0-9-]+\s*,?\s+(?:revision|rev|r)\s*\d+|ruling\s+|approve\s+(?:migration|replacement))", text, re.I):
     print("unclear")
 ' 2>/dev/null)
 say() { sed 's/^/[acceptance hook] /'; }
@@ -78,6 +83,10 @@ case "$PARSED" in
     T=$(python3 -c 'import base64,sys; sys.stdout.write(base64.b64decode(sys.argv[1]).decode())' "$T")
     if [ -n "$P" ]; then (cd "$ROOT" && bun run docs/audit/accept.ts ruling "$I" "$T" --part "$P" --source chat 2>&1) | say
     else (cd "$ROOT" && bun run docs/audit/accept.ts ruling "$I" "$T" --source chat 2>&1) | say; fi
+    ;;
+  replacement*)
+    IFS=$'\x1f' read -r _ B R <<<"$PARSED"
+    (cd "$ROOT" && bun run docs/audit/accept.ts approve-replacement "$B" --revision "$R" --source chat 2>&1) | say
     ;;
   migration*)
     IFS=$'\x1f' read -r _ M <<<"$PARSED"

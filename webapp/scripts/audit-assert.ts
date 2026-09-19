@@ -21,7 +21,7 @@ import { chromium } from "playwright";
 import { readFileSync, existsSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { join } from "node:path";
-import { ROOT, loadLedger, type Assertion } from "../../docs/audit/ledger-lib";
+import { ROOT, loadLedger, activeFix, type Assertion } from "../../docs/audit/ledger-lib";
 import { startIsolatedStack, type Stack } from "./isolated-stack";
 import { isolateBrowser } from "./browser-isolation";
 
@@ -34,8 +34,9 @@ if (!/^[0-9a-f]{40}$/.test(wantCommit) || wantRun.trim() === "") { console.error
 const todo: { name: string; a: Assertion }[] = [];
 if (existsSync(join(ROOT, "docs/audit/ledger.json"))) {
   for (const it of loadLedger().items) for (const p of it.parts) {
-    if (!p.fix || p.status === "open" || p.status === "assigned") continue;
-    for (const a of p.fix.assertions) todo.push({ name: `item ${it.id}${p.key === "all" ? "" : ` (${p.key})`}`, a });
+    const fix = activeFix(p);
+    if (!fix) continue;
+    for (const a of fix.assertions) todo.push({ name: `item ${it.id}${p.key === "all" ? "" : ` (${p.key})`}`, a });
   }
 }
 for (const f of flag("--extra")) for (const a of JSON.parse(readFileSync(f, "utf8")) as Assertion[]) todo.push({ name: `extra (${f.split("/").pop()})`, a });

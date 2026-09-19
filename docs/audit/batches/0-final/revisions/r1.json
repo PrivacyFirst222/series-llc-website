@@ -1,0 +1,254 @@
+{
+  "id": "0-final",
+  "revision": 1,
+  "title": "Finalize fixture independence and owner-approved replacement of a released fix",
+  "model": "Codex",
+  "base": "82abf541a6643981d93d41bc5d8b6da169897971",
+  "items": [],
+  "files": [
+    {
+      "path": "docs/audit/ledger-lib.ts",
+      "mode": "new",
+      "control": true,
+      "why": "shared types and rules: the transition table, immutable fields and migrations, part-level defect groups, ruling records, package identity and resolution"
+    },
+    {
+      "path": "docs/audit/ledger-build.ts",
+      "mode": "new",
+      "control": true,
+      "why": "seeds the ledger once, by script; --migrate applies a declared migration file, checked"
+    },
+    {
+      "path": "docs/audit/verdicts.json",
+      "mode": "new",
+      "why": "Claude's check of Codex's 63 disputes and 11 duplicates, read by the builder",
+      "control": true
+    },
+    {
+      "path": "docs/audit/ledger.json",
+      "mode": "new",
+      "why": "the ledger: 334 source records; migrated to version 2 by migration 001"
+    },
+    {
+      "path": "docs/audit/ledger-print.ts",
+      "mode": "new",
+      "control": true,
+      "why": "the readable list, work orders, the rulings queue over every unfinished part"
+    },
+    {
+      "path": "docs/audit/findings-open.md",
+      "mode": "generated",
+      "why": "now generated from the ledger"
+    },
+    {
+      "path": "docs/audit/sources/findings-open-2026-09-16.md",
+      "mode": "new",
+      "why": "the 16 Sep working list, moved here unchanged"
+    },
+    {
+      "path": "docs/audit/guard.ts",
+      "mode": "new",
+      "control": true,
+      "why": "the commit-time guard; --against for GitHub, compared with the earlier commit's ledger"
+    },
+    {
+      "path": "docs/audit/release-check.ts",
+      "mode": "new",
+      "control": true,
+      "why": "the one release gate: records rules R1\u2013R6, acceptance bound to a package"
+    },
+    {
+      "path": "docs/audit/batch.ts",
+      "mode": "new",
+      "control": true,
+      "why": "authorize (snapshot kept), implemented, released, reject and ruling \u2014 the last two only from Adam's records"
+    },
+    {
+      "path": "docs/audit/accept.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Adam's records from a terminal: accept (naming a package), reject (named arguments), ruling, approve-migration"
+    },
+    {
+      "path": "docs/audit/publish-docs.ts",
+      "mode": "new",
+      "control": true,
+      "why": "the only writer of the Dropbox copies, at release, through the shared package resolver"
+    },
+    {
+      "path": "docs/audit/demo.ts",
+      "mode": "new",
+      "control": true,
+      "why": "the demonstrations, in a disposable copy: rows 1\u201327, Codex's C1\u2013C20, and revision 3's R, A, B, C, D, E, F, G, H, M rows"
+    },
+    {
+      "path": "docs/audit/README.md",
+      "mode": "code",
+      "why": "how the fix ledger works, revision 3"
+    },
+    {
+      "path": "docs/audit/runs/2026-09-16-codex/bucket-1.json",
+      "mode": "new",
+      "why": "Codex's audit report 1 of 4, as delivered"
+    },
+    {
+      "path": "docs/audit/runs/2026-09-16-codex/bucket-2.json",
+      "mode": "new",
+      "why": "Codex's audit report 2 of 4, as delivered"
+    },
+    {
+      "path": "docs/audit/runs/2026-09-16-codex/bucket-3.json",
+      "mode": "new",
+      "why": "Codex's audit report 3 of 4, as delivered"
+    },
+    {
+      "path": "docs/audit/runs/2026-09-16-codex/bucket-4.json",
+      "mode": "new",
+      "why": "Codex's audit report 4 of 4, as delivered"
+    },
+    {
+      "path": ".githooks/pre-push",
+      "mode": "new",
+      "control": true,
+      "why": "calls the release gate for every push from this clone"
+    },
+    {
+      "path": ".claude/hooks/accept-prompt.sh",
+      "mode": "new",
+      "control": true,
+      "why": "records Adam's acceptance, rejection (named arguments), ruling and migration approval from his whole chat message, outside the repository"
+    },
+    {
+      "path": ".claude/settings.local.json",
+      "mode": "code",
+      "control": true,
+      "why": "registers the acceptance hook beside the Go hook"
+    },
+    {
+      "path": ".claude/hooks/pre-commit.sh",
+      "mode": "code",
+      "control": true,
+      "why": "calls the guard; adds the Instructions master to the Word regeneration trigger"
+    },
+    {
+      "path": ".claude/hooks/update-word-docs.sh",
+      "mode": "code",
+      "control": true,
+      "why": "no longer copies to Dropbox; docs/word only"
+    },
+    {
+      "path": ".github/workflows/check.yml",
+      "mode": "code",
+      "control": true,
+      "why": "the guard compares with the earlier commit's ledger; run identity passed to the suites and the assertion replay"
+    },
+    {
+      "path": "webapp/server/e2e.ts",
+      "mode": "code",
+      "control": true,
+      "why": "the server checks write their results by suite, label, detail and commit; no check changed"
+    },
+    {
+      "path": "webapp/scripts/behavioral.ts",
+      "mode": "code",
+      "control": true,
+      "why": "every route handler goes through the shared isolation wrapper; no check changed"
+    },
+    {
+      "path": "webapp/scripts/isolated-stack.ts",
+      "mode": "new",
+      "control": true,
+      "why": "the review site: offline, proven by the server's own report, or it does not start"
+    },
+    {
+      "path": "webapp/scripts/audit-assert.ts",
+      "mode": "new",
+      "control": true,
+      "why": "replays page, document and behaviour assertions; --commit and --run required"
+    },
+    {
+      "path": "webapp/scripts/audit-review.ts",
+      "mode": "new",
+      "control": true,
+      "why": "runs the checks at the exact commit; every package has an identity, is never overwritten, carries its site manifest; --serve --package"
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "why": "the commit step rebuilds the API bundle when anything under webapp/server is staged; e2e.ts is not part of it, so no change is expected"
+    },
+    {
+      "path": "docs/README.md",
+      "mode": "code",
+      "why": "one row: publish-docs.ts is the only writer of the Dropbox copies"
+    },
+    {
+      "path": "FAILURES.md",
+      "mode": "code",
+      "why": "P88\u2013P92, appended"
+    },
+    {
+      "path": "docs/audit/migrations/001-part-level-links.json",
+      "mode": "new",
+      "why": "migration 001: the exact structural change the ledger made, checked by ledger-build.ts --migrate"
+    },
+    {
+      "path": "webapp/scripts/browser-isolation.ts",
+      "mode": "new",
+      "control": true,
+      "why": "the shared browser isolation: contexts created with service workers blocked, outside requests aborted before any handler"
+    },
+    {
+      "path": "webapp/eslint.config.js",
+      "mode": "code",
+      "control": true,
+      "why": "the rule refusing a bare page.route or context.route in the scripts folder"
+    },
+    {
+      "path": "docs/audit/repair-check.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Repair the ten independently reproduced revision-3 control defects; verified against the preserved baseline."
+    },
+    {
+      "path": "webapp/scripts/repair-browser-probe.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Repair the ten independently reproduced revision-3 control defects; verified against the preserved baseline."
+    },
+    {
+      "path": "docs/audit/batches/0/extra-assertions.json",
+      "mode": "new",
+      "control": true,
+      "why": "Unchanged prior batch-zero control included in cumulative diff from 82abf54; its original own-folder exception does not apply to 0-repair."
+    },
+    {
+      "path": "docs/audit/lifecycle-check.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Regression coverage for independent fixtures and the approved replacement lifecycle."
+    },
+    {
+      "path": "docs/audit/batches/0-repair/batch.json",
+      "mode": "new",
+      "why": "Unchanged preceding corrective work order retained in cumulative review."
+    },
+    {
+      "path": "docs/audit/batches/0-repair/revisions/r1.json",
+      "mode": "new",
+      "why": "Unchanged preceding corrective work order retained in cumulative review."
+    }
+  ],
+  "requiredChecks": [
+    "typecheck",
+    "lint",
+    "unit",
+    "facts",
+    "guard",
+    "documents",
+    "server",
+    "walk",
+    "assertions",
+    "ledger-controls"
+  ]
+}

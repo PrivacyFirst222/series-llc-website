@@ -46,7 +46,7 @@ const S = "Drawn from real client questions about Florida's Protected Series LLC
 const T = "The questions people ask before forming a Florida Protected Series LLC, answered.";
 const FAQ = "webapp/src/pages/FAQ.tsx", CONTACT = "webapp/src/pages/Contact.tsx", HOW = "webapp/src/pages/HowItWorks.tsx", E2E = "webapp/server/e2e.ts";
 const reviewBatch = process.argv.includes("--batch") ? process.argv[process.argv.indexOf("--batch") + 1] : "0";
-const evidenceDir = join(ROOT, `docs/audit/batches/${reviewBatch}/evidence`);
+const evidenceDir = process.argv.includes("--evidence-dir") ? process.argv[process.argv.indexOf("--evidence-dir") + 1] : join(ROOT, `docs/audit/batches/${reviewBatch}/evidence`);
 mkdirSync(evidenceDir, { recursive: true });
 const outName = process.argv.includes("--out") ? process.argv[process.argv.indexOf("--out") + 1] : "demo.md";
 
@@ -547,6 +547,7 @@ if (process.argv.includes("--with-behaviour")) {
     record("M8", "M: the release recorded against that acceptance, with the remote's answer", rel, "pass");
     g2("add", "-A"); g2("commit", "-q", "--no-verify", "-m", "record the release (records only)");
     record("M9", "M: the records-only bookkeeping push after release", sh2("git", ["push", "origin", "main"]), "pass");
+    if (existsSync(pkgDir) && process.argv.includes("--evidence-dir")) cpSync(pkgDir, join(evidenceDir, "review-package"), { recursive: true, errorOnExist: true, force: false });
     if (existsSync(pkgDir)) { for (const f of ["package.json", "files.txt"]) if (existsSync(join(pkgDir, f))) copyFileSync(join(pkgDir, f), join(evidenceDir, `demo-M-${f}`)); }
   });
 

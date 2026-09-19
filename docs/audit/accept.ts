@@ -6,6 +6,7 @@
  *   bun run docs/audit/accept.ts reject <batch> [--revision <n>] --reason "<text>"
  *   bun run docs/audit/accept.ts ruling <item> "<text>" [--part <key>]
  *   bun run docs/audit/accept.ts approve-migration <id>
+ *   bun run docs/audit/accept.ts approve-replacement <batch> --revision <n>
  *   bun run docs/audit/accept.ts list
  *
  * The chat hook (.claude/hooks/accept-prompt.sh) calls these same commands,
@@ -23,7 +24,7 @@
  * gates require before a ruling or a migration enters the ledger (Codex, B).
  */
 import { mkdirSync, appendFileSync } from "node:fs";
-import { HOME, ACCEPTANCES, RULINGS_FILE, acceptances, rulingRecords, resolvePackage, packageProblems, loadMigration, git, now } from "./ledger-lib";
+import { HOME, ACCEPTANCES, RULINGS_FILE, acceptances, rulingRecords, resolvePackage, packageProblems, loadMigration, loadBatch, loadLedger, frozenHashOf, git, now } from "./ledger-lib";
 
 const argv = process.argv.slice(2);
 const take = (name: string): string | null => { const i = argv.indexOf(name); if (i < 0) return null; const v = argv[i + 1] ?? null; argv.splice(i, 2); return v; };
@@ -58,10 +59,23 @@ if (cmd === "accept") {
   if (!a || !b || argv.length > 3) refuse('usage: ruling <item> "<text>" [--part <key>]');
   write(RULINGS_FILE, { kind: "ruling", item: a, ...(partOpt ? { part: partOpt } : {}), text: b.trim() });
   console.log(`ruling recorded on item ${a}${partOpt ? ` (${partOpt})` : ""}: ${b.trim()}`);
+} else if (cmd === "approve-replacement") {
+  if (!a || argv.length !== 2 || !revisionOpt || !/^[1-9]\d*$/.test(revisionOpt)) refuse("usage: approve-replacement <batch> --revision <n>");
+  let batch; try { batch = loadBatch(a); } catch { refuse("replacement work order is missing or unreadable"); }
+  if (batch.id !== a || batch.revision !== Number(revisionOpt)) refuse("replacement batch/revision does not match the work order");
+  const entries = batch.items.filter(x => x.replaces);
+  if (!entries.length) refuse("work order names no released fix to replace");
+  const l = loadLedger();
+  for (const bi of entries) {
+    const p = l.items.find(i => i.id === bi.id)?.parts.find(p => p.key === bi.part);
+    if (!p || p.status !== "released" || JSON.stringify(p.fix) !== JSON.stringify(bi.replaces) || !bi.assertions.length || p.fix?.batch === batch.id) refuse(`item ${bi.id} (${bi.part}): requires the exact currently released fix and nonempty new assertions in a new batch`);
+  }
+  write(RULINGS_FILE, { kind: "replacement", batch: batch.id, revision: batch.revision, hash: frozenHashOf(batch) });
+  console.log(`replacement approved: batch ${batch.id} revision ${batch.revision}, work order ${frozenHashOf(batch)}; implementation only, publication still needs exact-package acceptance`);
 } else if (cmd === "approve-migration") {
   if (!a || argv.length > 2) refuse("usage: approve-migration <id>");
   const f = loadMigration(a);
   if (!f) refuse(`there is no docs/audit/migrations/${a}.json in this working tree`);
   write(RULINGS_FILE, { kind: "migration", migration: a, hash: f.hash });
   console.log(`migration ${a} approved as the file hashing to ${f.hash} — a different file is a different migration`);
-} else refuse("usage: accept | reject | ruling | approve-migration | list");
+} else refuse("usage: accept | reject | ruling | approve-migration | approve-replacement | list");

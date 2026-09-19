@@ -51,6 +51,7 @@ export function renderList(l: Ledger): string {
       for (const r of l.rulings.filter((x) => (x.kind ?? "ruling") === "ruling" && x.item === it.id)) out.push(`  - Ruling, ${r.date}${r.part ? ` (${r.part})` : ""}: ${r.text}`);
       for (const p of it.parts) {
         if (it.parts.length > 1) out.push(`  - Part "${p.key}" — ${p.status}: ${p.scope}${p.waitsOn.length ? ` (waits on ${p.waitsOn.join(", ")})` : ""}${link(p) ? ` — ${link(p)}` : ""}`);
+        for (const s of p.supersessions ?? []) out.push(`  - Previous fix${it.parts.length > 1 ? ` (${p.key})` : ""}: ${s.prior.batch} r${s.prior.revision}, commit ${s.prior.commit}; ${s.prior.assertions.length} assertion(s) retained. Replacement attempt: ${s.batch} r${s.revision}, work order ${s.hash}.`);
         if (p.fix) out.push(`  - Fixed${it.parts.length > 1 ? ` (${p.key})` : ""}: batch ${p.fix.batch} revision ${p.fix.revision}, commit ${p.fix.commit.slice(0, 7)}, by ${p.fix.doneBy}; protected by ${p.fix.assertions.length} assertion(s).`);
         for (const h of p.history.filter((x) => /^(rejected|reopened|superseded)/.test(x.event))) out.push(`  - ${h.at.slice(0, 10)} ${h.event}${h.note ? `: ${h.note}` : ""}`);
       }
@@ -82,6 +83,7 @@ export function renderOrder(l: Ledger, batchId: string): string {
     const part = it?.parts.find((p) => p.key === bi.part);
     if (part?.canonical) out.push(`This is a second sighting of item ${part.canonical.item}${part.canonical.part === "all" ? "" : ` (part "${part.canonical.part}")`}: the same defect in another place. Every place is fixed in the same batch.`, "");
     if (it?.related?.length) out.push(`Related findings, not the same defect: ${it.related.join(", ")}.`, "");
+    if (bi.replaces) out.push(`This replaces batch ${bi.replaces.batch} revision ${bi.replaces.revision}, commit ${bi.replaces.commit}. Its prior assertions:`, ...bi.replaces.assertions.map(a => `- ${describe(a)}`), "", `Adam must approve this exact replacement work order before authorization. Its history stays intact. Publication still needs acceptance of the complete new package.`, "");
     out.push("What must be true afterwards:", ...bi.assertions.map((a) => `- ${describe(a)}`), "");
     if (bi.assertions.some((a) => a.kind === "check")) out.push("This is a behaviour fix: its check is run on the tree BEFORE the fix and must FAIL for the reported reason, then after and must pass. Both runs are captured by the review command.", "");
   }

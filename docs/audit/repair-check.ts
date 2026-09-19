@@ -96,6 +96,16 @@ try {
 
   if (process.argv.includes("--historical-only")) await historicalPackages();
   else {
+  // Synthetic baseline only. Never borrow real findings, waits, assignments
+  // or rulings: this suite must still work after all real work is completed.
+  const synthetic = (id: string, keys = ["all"]) => ({ id, tag: "SYNTHETIC", area: "Public pages, Terms and Privacy", housekeeping: true,
+    source: "disposable regression fixture", text: "Synthetic fixture; not an audit finding.", verdict: "open", waitsOn: [],
+    parts: keys.map(key => ({ key, scope: "fixture", status: "open", waitsOn: [], history: [{ at: "2026-01-01T00:00:00Z", event: "synthetic fixture" }] })) });
+  const fixture = readLedger();
+  fixture.items = [synthetic("17", ["amend-title"]), synthetic("95", ["eyebrow", "title"]), ...["1", "28", "63", "127", "198"].map(id => synthetic(id))];
+  fixture.rulings = [];
+  ledger(fixture); baseline = commit();
+  console.log(`Synthetic fixture baseline: ${baseline}; real source ledger not used.`);
   // 1: use the actual authorize/implemented commands, then erase a recorded fix.
   const batch = { id: "repair-probe", revision: 1, title: "fixture", model: "fixture", base: baseline,
     items: [{ id: "17", part: "amend-title", scope: "fixture", assertions: [{ kind: "present", file: "webapp/src/pages/FAQ.tsx", text: "Questions, answered" }] }], files: [], requiredChecks: [] };
@@ -201,8 +211,14 @@ try {
   const ci = run("docs/audit/guard.ts", "--against", "d0e3689..fffd6567");
   assert("8: historical r2-to-r3 comparison skips external records only", ci.code === 0, ci);
   refused("8: unavailable CI baseline still refuses", run("docs/audit/guard.ts", "--against", "0000000000000000000000000000000000000001..HEAD"), /not available/);
-  const browser = sh(["bun", "run", join(ROOT, "webapp/scripts/repair-browser-probe.ts"), "--target", repo]);
-  assert("5: browser direct, redirect and positive controls", browser.code === 0, browser);
+  if (!process.argv.includes("--fixtures-only")) {
+    const browser = sh(["bun", "run", join(ROOT, "webapp/scripts/repair-browser-probe.ts"), "--target", repo]);
+    assert("5: browser direct, redirect and positive controls", browser.code === 0, browser);
+    if (!process.argv.includes("--against")) {
+      const lifecycle = sh(["bun", "run", join(ROOT, "docs/audit/lifecycle-check.ts")]);
+      assert("N1/N2: future ledger progress and approved replacement lifecycle", lifecycle.code === 0, lifecycle);
+    }
+  }
   }
 } catch (e) { assert("harness setup/runtime (not a reproduced product defect)", false, String(e)); }
 finally {

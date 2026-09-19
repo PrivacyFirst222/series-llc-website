@@ -1,0 +1,20 @@
+{
+  "rows": [
+    {
+      "name": "N1: mandatory tests survive real item 17 being assigned",
+      "ok": false,
+      "observed": {
+        "code": 1,
+        "output": "Controls under test: 4240b3b405d8598012b0dac93cd2b88430cb7f8e; harness SHA256 2015dccd2a4f5e4bca41e353ea0b8d26396d103ce3fa67be455688a2d9a2bb75; fixture commits skip hooks; no pushes.\nFAIL harness setup/runtime (not a reproduced product defect): Error: batch: REFUSED — item 17 (amend-title) is assigned in batch future-real-batch — it cannot be claimed twice\n\n0/1 control cases passed\nNote: switching to '4240b3b405d8598012b0dac93cd2b88430cb7f8e'.\n\nYou are in 'detached HEAD' state. You can look around, make experimental\nchanges and commit them, and you can discard any commits you make in this\nstate without impacting any branches by switching back to a branch.\n\nIf you want to create a new branch to retain commits you create, you may\ndo so (now or later) by using -c with the switch command. Example:\n\n  git switch -c <new-branch-name>\n\nOr undo this operation with:\n\n  git switch -\n\nTurn off this advice by setting config variable advice.detachedHead to false\n\n"
+      }
+    },
+    {
+      "name": "N2: owner-approved released fix can enter its replacement batch",
+      "ok": false,
+      "observed": {
+        "code": 1,
+        "output": "batch: REFUSED — item 9001 is released in batch past — it cannot be claimed twice\n"
+      }
+    }
+  ]
+}
