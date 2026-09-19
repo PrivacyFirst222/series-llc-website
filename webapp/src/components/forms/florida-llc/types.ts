@@ -356,7 +356,7 @@ export interface SubmissionPayload {
   acknowledgments: {
     isFloridaDomesticEntityOnly: boolean;
     /** Legacy Eligibility value; new orders record only Certification consent. */
-  notLegalAdvice: boolean;
+    notLegalAdvice: boolean;
     publicRecordNotice: boolean;
     nameSearchAcknowledgment: boolean;
     governmentAffiliationAcknowledgment: boolean;
