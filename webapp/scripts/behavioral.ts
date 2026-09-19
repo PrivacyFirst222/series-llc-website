@@ -1,3 +1,4 @@
+import { batch04AccountWalk } from "./batch04-account-walk";
 import {batch04Walk} from "./batch04-walk";
 import {batch03Walk} from "./batch03-walk";
 import { batch02Walk } from "./batch02-walk";
@@ -2745,6 +2746,15 @@ async function main(): Promise<void> {
   {const r=batch04Results.get("batch04 163: agreement deletion reports failure");expect(r?.ok===true,"batch04 163: agreement deletion reports failure",r?.detail);batch04Results.delete("batch04 163: agreement deletion reports failure");}
   {const r=batch04Results.get("batch04 169: agreement deletion uses portal confirmation");expect(r?.ok===true,"batch04 169: agreement deletion uses portal confirmation",r?.detail);batch04Results.delete("batch04 169: agreement deletion uses portal confirmation");}
   for(const [label,r]of batch04Results)expect(r.ok,label,r.detail);
+  const accountResults = new Map<string, {ok: boolean; detail?: unknown}>();
+  await batch04AccountWalk(browser, `http://localhost:${WEB_PORT}`, (ok, label, detail) => accountResults.set(label, {ok, detail}));
+  {
+    const label = "batch04 follow-up: cancelled email notice clears without reload";
+    const result = accountResults.get(label);
+    expect(result?.ok === true, "batch04 follow-up: cancelled email notice clears without reload", result?.detail);
+    accountResults.delete(label);
+  }
+  for (const [label, result] of accountResults) expect(result.ok, label, result.detail);
   await browser.close();
   web.stop();
   api.kill();

@@ -7237,6 +7237,45 @@
               }
             ]
           }
+        },
+        {
+          "key": "pending-email-notice",
+          "scope": "After a successful password change, refresh the client portal Account card so the cancelled pending-email notice disappears without a page reload.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-19T14:25:58.108Z",
+              "event": "recorded by migration 002-batch04-account-notice"
+            },
+            {
+              "at": "2026-09-19T14:25:58.151Z",
+              "event": "assigned",
+              "batch": "04-followup",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-19T14:28:06.691Z",
+              "event": "implemented",
+              "batch": "04-followup",
+              "revision": 1,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "04-followup",
+          "fix": {
+            "batch": "04-followup",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch04 follow-up: cancelled email notice clears without reload"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -11769,6 +11808,13 @@
       "kind": "ruling",
       "item": "N1.02",
       "text": "Approved revised Batch 03: encrypt stored S-election forms and EIN letters including backup copies, keep them until the client deletes them, track deletion of controlled copies and retries, provide complete resumable backups, and do not clean up existing test copies."
+    },
+    {
+      "date": "2026-09-19",
+      "kind": "migration",
+      "text": "Add the authorized Account-card display follow-up to item 200; preserve its implemented security fix and every existing part and batch record.",
+      "migration": "002-batch04-account-notice",
+      "migrationHash": "b029878313d1336b46a56cf8a5d370a508972075ee0a1c33d9f18cbb81c52c17"
     }
   ],
   "batches": [
@@ -11973,6 +12019,25 @@
         },
         {
           "at": "2026-09-19T13:54:58.583Z",
+          "event": "implemented"
+        }
+      ]
+    },
+    {
+      "id": "04-followup",
+      "revision": 1,
+      "frozenHash": "8d5c2ddc64bc45827ade4311b92cc4d8c33e48665937069cecc0c341a39cd269",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "80d4c558ce2c5295ae7610f323e4a30cc12a514a",
+      "history": [
+        {
+          "at": "2026-09-19T14:25:58.151Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-19T14:28:06.691Z",
           "event": "implemented"
         }
       ]

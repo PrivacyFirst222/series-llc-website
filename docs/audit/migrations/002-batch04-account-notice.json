@@ -1,0 +1,17 @@
+{
+  "id": "002-batch04-account-notice",
+  "title": "Add the authorized Account-card display follow-up to item 200; preserve its implemented security fix and every existing part and batch record.",
+  "date": "2026-09-19",
+  "items": {
+    "200": {
+      "split": [
+        {
+          "key": "pending-email-notice",
+          "scope": "After a successful password change, refresh the client portal Account card so the cancelled pending-email notice disappears without a page reload.",
+          "waitsOn": []
+        }
+      ],
+      "note": "Follow-up observed during Batch 04 browser verification; Adam authorized it with \u201cGo. Make the last fix\u201d. No existing part is changed or retired."
+    }
+  }
+}

@@ -1426,7 +1426,10 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: That changing the password is the way to stop the change.
   - True: Changing the password (routes-portal.ts:2420-2455) deletes other sessions but leaves pending_email set and the verify_email token valid for its hour; pending_email is cleared only when a link is confirmed (routes-portal.ts:2541, :2545) or by the office (routes-admin.ts:1076), and no portal control withdraws a pending change (AccountCard.tsx:65-67 only displays it). Someone holding the new inbox can still confirm the change after the password is changed. Requesting a new change to the old address does cancel the earlier link (routes-portal.ts:2478-2482 marks older tokens used) but the email does not say so.
   - Replace with: Code: on a password change, `UPDATE clients SET pending_email = NULL` and mark outstanding verify_email tokens used. Email: 'If this was not you, sign in and change your password immediately — that also cancels this request — then email support@myfloridaseriesllc.com.'
-  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Part "all" — implemented: The whole finding.
+  - Fixed (all): batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Part "pending-email-notice" — implemented: After a successful password change, refresh the client portal Account card so the cancelled pending-email notice disappears without a page reload.
+  - Fixed (pending-email-notice): batch 04-followup revision 1, commit , by Codex; protected by 1 assertion(s).
 - **201. [B101]** — **open** — same defect as 28
   - Registered agent cancellation confirmation email, point 2 — `webapp/server/email.ts:285`
   - Reads: Until we receive that proof, we remain your agent of record and service is billed at the then-current rate, prorated monthly, as described in the Terms of Service.

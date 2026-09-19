@@ -1,0 +1,51 @@
+{
+  "id": "04-followup",
+  "revision": 1,
+  "title": "Client portal Account card: remove a cancelled email-change notice",
+  "model": "Codex",
+  "base": "80d4c558ce2c5295ae7610f323e4a30cc12a514a",
+  "items": [
+    {
+      "id": "200",
+      "part": "pending-email-notice",
+      "scope": "After a successful password change, refresh the client portal Account card so the cancelled pending-email notice disappears without a page reload.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch04 follow-up: cancelled email notice clears without reload"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "webapp/src/pages/portal/AccountCard.tsx",
+      "mode": "code",
+      "why": "Refresh portal-me after a successful password change."
+    },
+    {
+      "path": "webapp/scripts/behavioral.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Register the follow-up browser regression; keep every existing check."
+    },
+    {
+      "path": "webapp/scripts/batch04-account-walk.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Exercise successful and failed password changes and subsequent email changes in the real Account card."
+    },
+    {
+      "path": "docs/audit/migrations/002-batch04-account-notice.json",
+      "mode": "new",
+      "control": true,
+      "why": "Declare only the added follow-up part; preserve the original frozen Batch 04 scope and all prior records."
+    }
+  ],
+  "requiredChecks": [],
+  "testSupport": [
+    "webapp/scripts/batch04-account-walk.ts"
+  ],
+  "removedChecks": []
+}

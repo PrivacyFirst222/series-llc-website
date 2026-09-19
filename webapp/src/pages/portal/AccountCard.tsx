@@ -34,6 +34,7 @@ export function AccountCard({ email, pendingEmail }: AccountCardProps) {
       setPasswordOpen(false);
       setDone("Your password was changed. Any other signed-in device was signed out.");
       setError("");
+      refresh();
     },
     onError: (e) => setError(e instanceof ApiError ? e.message : "Something went wrong."),
   });
