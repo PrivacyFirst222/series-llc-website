@@ -38,11 +38,12 @@ const packageFor = (id:string,base:string,commitId:string) => {
  return packageId;
 };
 try {
- execFileSync('git',['clone','--quiet','--no-hardlinks',root,repo]);git('remote','remove','origin');git('config','core.hooksPath','.githooks');
+ execFileSync('git',['clone','--quiet','--no-hardlinks',root,repo]);git('remote','remove','origin');git('config','core.hooksPath','.githooks');git('checkout','--detach','HEAD');
  const ai=process.argv.indexOf('--against');
  if(ai>=0) git('checkout','--detach',process.argv[ai+1]);
  else for(const p of execFileSync('git',['ls-files','-m','-o','--exclude-standard'],{cwd:root,encoding:'utf8'}).split('\n').filter(Boolean)) if(existsSync(join(root,p))) {mkdirSync(dirname(join(repo,p)),{recursive:true});copyFileSync(join(root,p),join(repo,p));}
  symlinkSync(join(root,'webapp/node_modules'),join(repo,'webapp/node_modules'));
+ record('N1: fixture checkout has no inherited active batch branch',git('rev-parse','--abbrev-ref','HEAD')==='HEAD',git('rev-parse','--abbrev-ref','HEAD'));
  const source=git('rev-parse','HEAD');console.log(`Controls: ${source}; fixture commits bypass hooks; simulated approvals/checks only; local remotes only.`);
  // N1: reproduce using the actual mandatory command with real item 17 assigned.
  const real=json(lp);const seventeen=real.items.find((i:any)=>i.id==='17')?.parts.find((p:any)=>p.key==='amend-title');

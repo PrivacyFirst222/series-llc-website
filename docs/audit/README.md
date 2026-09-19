@@ -252,7 +252,8 @@ change.
   records. `--against <commit>` applies the same probes to earlier controls;
   fixture check results are explicitly simulated, never reported as a product
   test run. The suite replaces the real audit items and rulings with synthetic
-  records in its disposable baseline before probing them. It does not borrow
+  records in its disposable baseline before probing them. Lifecycle fixtures
+  explicitly detach from the caller's batch branch. The suite does not borrow
   an unfinished real item. Browser probes use loopback sinks only.
 - `lifecycle-check.ts` — part of the mandatory control suite: runs the tests
   after real item assignment and with no live findings, then exercises exact

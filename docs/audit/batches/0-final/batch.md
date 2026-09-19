@@ -35,7 +35,7 @@ The unchanged a68979d controls failed both causal reproductions: real item 17
 assigned caused the mandatory harness to stop with “cannot be claimed twice”;
 an exact approved replacement of a released fixture was refused by the same
 claim rule. These were the intended failures, not missing-helper failures.
-The repaired implementation passed 56/56 lifecycle cases, including actual
+The repaired implementation passed 57/57 lifecycle cases, including actual
 CLI and chat-hook entry points. Logs are retained under evidence/. Owner
 approvals, packages and published fixes in these tests are explicitly simulated.
 
@@ -54,3 +54,11 @@ This permits a clean-source run whose reviewed commit is also the final commit,
 without committing generated evidence back into the already-tested version.
 Final run results belong in the external FINAL-REVIEW.md handoff. No independent
 review of this new version is claimed; the handoff includes a request for Claude.
+
+Full-run correction: a review launched from an audit/batch-* branch exposed
+a fixture branch inheritance failure after a replacement rejection. The
+fixture now explicitly detaches before probing; its branch state is asserted.
+A separate run of the complete mandatory control suite from an actual
+audit/batch-0-final checkout checks that integration context before packaging.
+The failed/interrupted runs remain in external final-evidence, not counted
+as successful final verification.
