@@ -51,3 +51,11 @@ Expects: correct applicable answers and no rewritten filing instructions or lega
 Ten durable named assertions must fail on the unmodified base for the intended defects and pass on the implementation. Include real browser interactions, server parsing, actual submission/readback, new/existing and member/manager-managed paths. Preserve all earlier fix assertions. Replace only the three obsolete correspondence-phone/address check sites expressly named in batch.json; the corresponding required behavior is removed by approval.
 
 No product fix or external owner decision is fabricated for excluded items. No live server, payment, email or publication is needed for this review.
+
+## Revision 2 — complete the authorized test dependencies
+
+Adam's follow-up instruction: “why did you need to stop and ask me.  if you need to do the tests, just fucking do them and dont waste my time”. This authorizes completing the needed test updates without a second confirmation. Revision 1's failed review and snapshot remain on record; it is superseded administratively to declare the omitted test files. No product decision or release acceptance is inferred.
+
+The governing approved behavior is unchanged: the extra correspondence address is removed; manager/member labels are “Manager type” / “Member type”, with “Business entity”. The old server test reads “a half-typed correspondent mailing address is refused” and “the correspondent's mailing address is stored on the order”. Replace those with assertions that stale extra addresses do not block submission and are absent from new saved orders. Give the newly successful test request a separate caller IP, preserving the production rate limit and all existing rate-limit checks.
+
+The old Batch 02 test selects `/^Type/` and `Entity`/`Business Entity`; update only those selectors to the approved labels. Keep its assertion and name-clearing checks intact. Improve Batch 08's email-error proof to record the reached step, rather than timing out when the old form advances away from the invalid input. Both sides have been exercised in disposable copies; the final committed revision still receives a complete review.

@@ -52,7 +52,7 @@ export async function batch02Walk(browser:Browser,web:string,check:Check){
    const data=structuredClone(defaultFormData);data.filingPath='NEW';data.managementStructure=kind==='member'?'MEMBER_MANAGED':'MANAGER_MANAGED';data.members=[{...data.members[0],firstName:'Old',lastName:'Human'}];data.managers=[{...data.managers[0],id:'m1',role:'MGR',personOrEntity:'INDIVIDUAL',firstName:'Old',lastName:'Human',businessEntityName:''}];
    await p.addInitScript(({data,step})=>localStorage.setItem('fl-llc-formation-draft-v1',JSON.stringify({__draft:2,data,stepIndex:step,maxStep:step,visited:Array.from({length:step+1},(_,i)=>i)})),{data,step:kind==='member'?10:11});
    await p.goto(`${web}/form-llc`);
-   const select=p.getByRole('combobox',{name:kind==='member'?/^Member type/:/^Type/});await select.click();await p.getByRole('option',{name:kind==='member'?'Entity':'Business Entity',exact:true}).click();
+   const select=p.getByRole('combobox',{name:kind==='member'?/^Member type/:/^Manager type/});await select.click();await p.getByRole('option',{name:'Business entity',exact:true}).click();
    await p.getByLabel(kind==='member'?/^Entity name/:/^Business entity name/).fill('New Entity');await p.waitForTimeout(350);
    const entity=await p.evaluate(()=>JSON.parse(localStorage.getItem('fl-llc-formation-draft-v1')!).data);
    await select.click();await p.getByRole('option',{name:'Individual',exact:true}).click();await p.waitForTimeout(350);

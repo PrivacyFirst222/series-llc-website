@@ -852,16 +852,15 @@ check("client account auto-created on payment", !!client && !client.has_password
     correspondentEmail: uc("stdwrong"), confirmCorrespondentEmail: uc("stdwrong"),
   })});
   check("a standard LLC with a professional designator is refused", wrongStd.status === 400, wrongStd.body);
-  // The correspondent's mailing address reaches the stored order (8 Sep 2026:
-  // the schema stripped it, so every one ever typed was stored as null), and
-  // a half-typed one is refused.
-  const corrHalf = await api("/api/orders", { method: "POST", body: JSON.stringify({
+  // Batch 08 removes the extra correspondence address. An old draft may
+  // still contain an incomplete address; it must not block the order.
+  const corrHalf = await api("/api/orders", { method: "POST", headers: { "X-Forwarded-For": "192.0.2.208" }, body: JSON.stringify({
     ...formData,
     clientEmail: uc("corrhalf"), confirmClientEmail: uc("corrhalf"),
     correspondentEmail: uc("corrhalf"), confirmCorrespondentEmail: uc("corrhalf"),
     correspondentAddress: { address1: "PO Box 1", address2: "", city: "", state: "", zip: "", country: "United States" },
   })});
-  check("a half-typed correspondent mailing address is refused", corrHalf.status === 400, corrHalf.body);
+  check("a retired partial correspondence address does not block the order", corrHalf.status === 200, corrHalf.body);
 }
 
 // 5c. The scaffolded blank member row is not an answer: a manager-managed
@@ -2888,8 +2887,8 @@ if (mint.status === 200) {
     // Our RA service, so the suite holds one PAID RA order — what the admin
     // Registered Agent Clients tab (ra_llcs) is asserted against.
     registeredAgentChoice: "SERVICE" as const, raRenewalCardConsent: true,
-    // A mailing address for paper correspondence (8 Sep 2026: the schema
-    // stripped it, so every one ever typed was stored as null).
+    // An old draft carries an extra correspondence address; new orders
+    // must discard it after the Batch 08 field removal.
     correspondentAddress: { address1: "PO Box 9090", address2: "", city: "Winter Park", state: "FL", zip: "32790", country: "United States" },
   };
   const aOrder = await api("/api/orders", { method: "POST", body: JSON.stringify(acctData) });
@@ -2899,7 +2898,7 @@ if (mint.status === 200) {
     const adm = await adminSession();
     const stored = await api(`/api/admin/orders/${aId}`, { cookies: adm.cookie });
     const payload = (typeof stored.body?.data?.payload === "string" ? JSON.parse(stored.body.data.payload) : stored.body?.data?.payload) as { correspondence?: { address?: { address1?: string; city?: string } } } | undefined;
-    check("the correspondent's mailing address is stored on the order", payload?.correspondence?.address?.address1 === "PO Box 9090" && payload?.correspondence?.address?.city === "Winter Park", payload?.correspondence);
+    check("the retired correspondence address is absent from the saved order", payload?.correspondence?.address === null, payload?.correspondence);
   }
   let aPay = await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: aId, card: "credit" }) });
   if (aPay.status === 404) {

@@ -39,9 +39,9 @@ export async function batch08Walk(browser: Browser, web: string, check: Check, a
   });
   await attempt('batch08 57: only the user email is required and optional errors are visible',async()=>{
     const blank=fixture(), bad=fixture({managers:[{...fixture().managers[0],email:'not-an-email'}]});
-    const p=await open('managers',bad);let managerVisible=false;try{await p.getByRole('button',{name:'Continue',exact:true}).click();managerVisible=await p.locator('[id$="-email"]').getAttribute('aria-invalid')==='true';await shot(p,'optional-email-error');}finally{await p.close();}
+    const p=await open('managers',bad);let managerVisible=false,managerStep='';try{await p.getByRole('button',{name:'Continue',exact:true}).click();managerStep=await p.locator('main h2').innerText();managerVisible=await p.locator('[id$="-email"]').count()===1&&await p.locator('[id$="-email"]').getAttribute('aria-invalid')==='true';await shot(p,'optional-email-error');}finally{await p.close();}
     const signer=await open('certify',fixture({articlesSignerChoice:'SELF',authorizedRepresentativeName:'Jane Owner',authorizedRepresentativeSignature:'Jane Owner',authorizedRepresentativeSignatureCheckbox:true}));let removed=false;try{removed=await signer.locator('#representative-email,#representative-phone').count()===0;}finally{await signer.close();}
-    const detail={blank:parsedIssues(blank),bad:parsedIssues(bad),step:validateStep('managers',bad),fallback:buildPayload(blank).correspondence.email,missingUser:parsedIssues(fixture({clientEmail:'',confirmClientEmail:''})),managerVisible,removed};
+    const detail={blank:parsedIssues(blank),bad:parsedIssues(bad),step:validateStep('managers',bad),fallback:buildPayload(blank).correspondence.email,missingUser:parsedIssues(fixture({clientEmail:'',confirmClientEmail:''})),managerVisible,managerStep,removed};
     check(!detail.blank.length&&detail.bad.some(x=>x.path==='managers.0.email')&&!!detail.step['managers.0.email']&&detail.fallback===blank.clientEmail&&detail.missingUser.some(x=>x.path==='clientEmail')&&managerVisible&&removed,'batch08 57: only the user email is required and optional errors are visible',detail);
   });
   await attempt('batch08 60: correspondence uses name and email without unused extra fields',async()=>{

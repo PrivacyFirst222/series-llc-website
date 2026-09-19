@@ -320,8 +320,9 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
 - **48. [A7]** — **implemented**
   - steps.ts FIELD_STEP lacks raRenewalCardConsent; a server refusal lands on the Certify step. Replace: map it to the agent step.
   - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **49. [A8]** — **open**
+- **49. [A8]** — **implemented**
   - Review, Members card "In Articles?" reads "No" for member-managed orders (server lists them as AMBR) and shows on a conversion. Replace: "Yes — listed as members (AMBR)" for member-managed new formations; no row on a conversion.
+  - Fixed: batch 08 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-19 rejected r1: Supersede the failed review revision to complete the omitted tests already authorized with Batch 08; product decisions unchanged. Adam: why did you need to stop and ask me.  if you need to do the tests, just fucking do them and dont waste my time
 - **50. [A9]** — **open**
   - Managers step header and stepValidation on a conversion: "…because you elected to include a manager-managed statement in the Articles." Server version mentions an authorized representative row the form cannot make. Replace both: "A manager-managed LLC needs at least one Manager."
@@ -344,28 +345,32 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - filing.ts member-managed "Any Other Provisions" sentence can never be produced. Replace: delete, or force the statement for member-managed too. Ruling needed.
   - Codex (housekeeping-only): filing.ts:141–142 has MEMBER_MANAGED provision, while StepManagement.tsx:75 sets includeManagementStatementInArticles false for that structure; its normal UI branch is unreachable.
   - **Codex rejected the proposed replacement:** Deleting the unused branch is supported. Forcing a new filed provision changes the product and requires a separate owner decision; the alternatives are not interchangeable.
-- **55. [A14]** — **open**
+- **55. [A14]** — **implemented**
   - Country box: step allows empty; server refuses with no box marked. Replace: "Country required." on the step, error passed to the box (client, managers, members, correspondence).
+  - Fixed: batch 08 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-19 rejected r1: Supersede the failed review revision to complete the omitted tests already authorized with Batch 08; product decisions unchanged. Adam: why did you need to stop and ask me.  if you need to do the tests, just fucking do them and dont waste my time
-- **56. [A15]** — **open**
+- **56. [A15]** — **implemented**
   - ZIP: one or two characters pass the step; server says "ZIP is required". Replace: "Enter a full ZIP code." on step and server.
   - **Codex rejected the proposed replacement:** Align actual format rules as well as messages. “Enter a full ZIP code” alone does not define or enforce a full US ZIP; preserve postal-code support if foreign addresses are supported.
+  - Fixed: batch 08 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-19 rejected r1: Supersede the failed review revision to complete the omitted tests already authorized with Batch 08; product decisions unchanged. Adam: why did you need to stop and ask me.  if you need to do the tests, just fucking do them and dont waste my time
-- **57. [A16]** — **open**
+- **57. [A16]** — **implemented**
   - Managers "Email (optional)" and Certify "Email (optional)": malformed email refused after Submit with no message; Certify email/phone never stored. Replace: drop the Certify boxes; check the manager email on the step.
   - Ruling, 2026-09-19: Batch 08 item 5: “The only one required to provide an email is the user”. Apply the approved fix with optional non-user emails and the user email as the correspondence fallback.
+  - Fixed: batch 08 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-19 rejected r1: Supersede the failed review revision to complete the omitted tests already authorized with Batch 08; product decisions unchanged. Adam: why did you need to stop and ask me.  if you need to do the tests, just fucking do them and dont waste my time
 - **58. [A17]** — **open**
   - Server alternate-name check runs on a conversion. Replace: skip on a conversion.
 - **59. [A18]** — **implemented**
   - Conversion certification paragraph says designations "and the change of registered agent"; the tick omits the agent change. Replace the tick to include it when our service is chosen.
   - Fixed: batch 06 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **60. [A19]** — **open** — waits on Adam's ruling
+- **60. [A19]** — **implemented** — waits on Adam's ruling
   - Correspondence "Company (optional)", "Phone (optional)" and the paper-mail address block reach nothing that mails. Replace: remove, or say what is mailed. Ruling needed.
   - Codex (disputed): StepCorrespondence.tsx:74,112,125–155 collects company, phone and paper address; filing.ts:449–454 explicitly displays “Mailing address for paper correspondence (ours, not Sunbiz’s)”. Absence of an automated postal-mail job does not prove office staff cannot use that address.
   - **Codex rejected the proposed replacement:** Explain the intended manual use or remove unused fields by policy; do not assert that no human correspondence can be sent merely because no mail job exists.
   - Corrected after Codex's review: No mail job exists, but the office sheet shows the address for hand use. Adam says what is mailed, or the fields go.
   - Ruling, 2026-09-19: Batch 08 item 6 proposed removing optional correspondence company, phone and additional paper-mail address, retaining name and email. Adam approved “the rest”, with item 5 requiring email only from the user; use the user email when no alternative correspondence email is supplied.
+  - Fixed: batch 08 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-19 rejected r1: Supersede the failed review revision to complete the omitted tests already authorized with Batch 08; product decisions unchanged. Adam: why did you need to stop and ask me.  if you need to do the tests, just fucking do them and dont waste my time
 - **61. [A20]** — **open**
   - Effective date rule measured from the moment of Continue, described as the filing date. Replace: measure from an expected filing day and say so.
@@ -510,13 +515,14 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: Shows the chosen date.
   - True: The date box (StepEffectiveDate.tsx:71-78, type="date") stores YYYY-MM-DD, so the review prints "2026-10-01" while every other date the client sees is written out (NameCheck.tsx:14-21 fmtDate).
   - Replace with: Format the value as "October 1, 2026" (the fmtDate pattern from NameCheck.tsx).
-- **85. [B47]** — **open**
+- **85. [B47]** — **implemented**
   - Managers step and Initial members step, the type dropdowns — `webapp/src/components/forms/florida-llc/RepeatablePartyFields.tsx:89`
   - Reads: <SelectItem value="ENTITY">Business Entity</SelectItem>
   - Claims: The choice is called "Business Entity" under the label "Type" (line 77).
   - True: RepeatableMemberFields.tsx:85 calls the same choice "Entity" under "Member type" (line 73); Review prints "Business entity" for an agent (ReviewStep.tsx:137).
   - Replace with: Label "Manager type"; items "Individual" / "Business entity" on both steps.
   - **Codex rejected the proposed replacement:** Use Manager type on managers and Member type on members; do not label both steps Manager type. Standardize option capitalization.
+  - Fixed: batch 08 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-19 rejected r1: Supersede the failed review revision to complete the omitted tests already authorized with Batch 08; product decisions unchanged. Adam: why did you need to stop and ask me.  if you need to do the tests, just fucking do them and dont waste my time
 - **86. [B48]** — **open** — waits on Adam's ruling
   - Your information, Initial members, Managers and Correspondence steps — the address block's State box — `webapp/src/components/forms/florida-llc/sections/StepClient.tsx:101`
@@ -580,13 +586,14 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (disputed): validation.ts:27–34 accepts Acme PLLC unchanged even if LLC is selected; reproduced. The replacement tells the user to choose Professional LLC, an option absent from StepIntro, and only supplies the error for one direction of mismatch. 621.12(2)(a) also allows chartered; its text must not be reduced to an exhaustive three-option legal rule.
   - **Codex rejected the proposed replacement:** Validate the actual final suffix against the chosen supported product type, provide both mismatch messages, and use Domestic Florida PLLC as the option label.
   - Corrected after Codex's review: The option is labelled 'Domestic Florida PLLC'; check the typed ending against the chosen type in both directions; s. 621.12(2)(a) also permits 'chartered'.
-- **94. [B59]** — **open**
+- **94. [B59]** — **implemented**
   - Order form, Members step, the empty-list refusal — `webapp/src/components/forms/florida-llc/stepValidation.ts:291`
   - Reads: "At least one initial member is required for internal formation records."
   - Claims: The members are collected for internal records.
   - True: The step only runs for member-managed companies (:289 returns early otherwise), whose members are filed on the Articles as AMBR (filing.ts:537-568) and are public; StepMembers.tsx:52 tells the client that on the same screen.
   - Replace with: "At least one member is required — in a member-managed company the members are listed on the Articles of Organization."
   - **Codex rejected the proposed replacement:** Use separate conversion wording: an existing LLC’s members here are for its agreement, not new Articles. Proposed unconditional replacement is false on conversion.
+  - Fixed: batch 08 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-19 rejected r1: Supersede the failed review revision to complete the omitted tests already authorized with Batch 08; product decisions unchanged. Adam: why did you need to stop and ask me.  if you need to do the tests, just fucking do them and dont waste my time
 - **95. [B62]** — **open** — related: 198
   - Order form banner, on the conversion path — `webapp/src/pages/FormLLC.tsx:15`
@@ -624,12 +631,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: The citation form for the statute.
   - True: The consent route in the same portal writes "(s. 605.2202, Fla. Stat.)" (routes-portal.ts:1593, :1599); this file, routes-portal.ts:1977, stepValidation.ts:189 and StepSeries.tsx:72 write "§605.2202". The statute itself (s. 605.2202(2)(b), read whole in the browser) requires the phrase "protected series" or the abbreviation "P.S." or "PS" — the rule is right, the citation form is the A64 defect in one more file.
   - Replace with: message: 'Series names must include "PS", "P.S.", or "protected series" (s. 605.2202, Fla. Stat.).',  — and the same form at routes-portal.ts:1977, stepValidation.ts:189, StepSeries.tsx:72.
-- **100. [A30h]** — **open** — housekeeping
+- **100. [A30h]** — **review-rows: implemented; unused-code: open; fact-ledger: open** — housekeeping
   - Housekeeping: review rows printing codes or "—" for a self-agent's email/phone; no "exact name only" row on the Review name card; dead duplicate-member check; dead conversion branch in the formation sheet; member fields typed but never asked; ledger lacks the $99 renewal, 15/30-day rules and the four optional prices.
   - Codex (disputed): The compound item mixes code-only leftovers with visible Review rows and missing exact-name information (ReviewStep.tsx:113–124,157–169,225–228). It cannot all be classified housekeeping-only; the “capacity code” branch is itself unreachable in normal SELF UI.
   - **Codex rejected the proposed replacement:** Split visible wording/record defects from unused code. No concrete unified replacement is supplied, and ledger omissions are not false customer claims.
   - Corrected after Codex's review: A compound item, now split into three parts: the visible Review rows, the unused code, and the fact ledger's omissions.
-  - Part "review-rows" — open: Review rows print codes or a dash for a self-agent's email and phone; the Review name card has no 'exact name only' row.
+  - Part "review-rows" — implemented: Review rows print codes or a dash for a self-agent's email and phone; the Review name card has no 'exact name only' row.
+  - Fixed (review-rows): batch 08 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-19 rejected r1: Supersede the failed review revision to complete the omitted tests already authorized with Batch 08; product decisions unchanged. Adam: why did you need to stop and ask me.  if you need to do the tests, just fucking do them and dont waste my time
   - Part "unused-code" — open: The dead duplicate-member check, the dead conversion branch in the formation sheet, and member fields typed but never asked. Item 112 is the same dead check.
   - Part "fact-ledger" — open: The fact ledger lacks the $99 renewal, the 15- and 30-day rules and the four optional prices.
@@ -774,12 +782,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: StepPurpose.tsx:13–14 declares GENERAL_DEFAULT only for display at :76. filing.ts:408–440 constructs the Other Provisions rows from the management statement and SPECIFIC/PROFESSIONAL text only; GENERAL text is never appended. A general-purpose member-managed filing explicitly says Leave blank at :427. The same screen also says Included in every filing at :74 and alongside the general purpose at :106. Prior98 concerns the office row attributing a choice, not this missing promised clause. The corresponding “Included in every filing” badge and “alongside” helper must also be removed or revised for the replacement to be consistent.
   - Replace with: We leave the purpose provision blank unless you request a specific purpose below.
   - Ruling, 2026-09-19: Batch 08 items 14 and 15: “The articles are entered manually and will contain that language. Do nothing”. Leave the current product text and manual filing workflow unchanged.
-- **N4.05. [substantive]** — **open**
+- **N4.05. [substantive]** — **implemented**
   - Order form, Business purpose after changing Professional LLC to ordinary LLC: an invisible professional purpose survives — `webapp/src/components/forms/florida-llc/sections/StepPurpose.tsx:95`
   - Reads: Also list a specific purpose in the Articles — for example, if a lender or licensing agency wants to see one.
   - Claims: When the optional-purpose checkbox is unchecked, no specific purpose is requested for the ordinary LLC.
   - True: StepPurpose.tsx:23 resets an ordinary LLC only when purposeType is empty. Returning from PLLC preserves purposeType PROFESSIONAL and its text; :18 makes addingSpecific false, so the checkbox is unchecked and :101 hides the text box. server/validation.ts:167–171 permits this combination; buildPayload carries the purpose and filing.ts:416–417 still appends the retained professional text. Thus a client who switches to an ordinary LLC can receive Articles with the previous professional-purpose clause while this screen presents an unchecked optional-purpose box.
   - Replace with: When changing from PLLC to an ordinary LLC, reset purposeType to GENERAL and clear the former professional purpose, or visibly ask the client to retain it as a SPECIFIC purpose. Reject inconsistent type/purpose combinations on the server.
+  - Fixed: batch 08 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-19 rejected r1: Supersede the failed review revision to complete the omitted tests already authorized with Batch 08; product decisions unchanged. Adam: why did you need to stop and ask me.  if you need to do the tests, just fucking do them and dont waste my time
 - **N4.06. [substantive]** — **implemented**
   - Payment confirmation, Resend the email: failure is reported as sent — `webapp/src/pages/OrderConfirmed.tsx:26`
@@ -801,12 +810,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: A transfer of the ownership/economic interest automatically gives the recipient management authority in a member-managed LLC.
   - True: templates-oa-member.md:284–286 (§§10.2–10.3) expressly makes a transferee economic-only until admitted under §12.1; :308 imposes admission conditions. I opened those sections. The 2026 text of s.605.0502(1)(c), opened on Online Sunshine, likewise distinguishes transfer from management rights: https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605.html. Admission can confer membership rights; receiving the transferred economic interest alone does not.
   - Replace with: If a transferee is admitted as a member of a member-managed LLC, the new member gains management rights and duties; receiving only an economic interest does not confer management authority.
-- **N4.09. [substantive]** — **open**
+- **N4.09. [substantive]** — **implemented**
   - Order form, changing to Member-managed after partially entering a manager: checkout validates the hidden manager — `webapp/src/components/forms/florida-llc/stepValidation.ts:258`
   - Reads: // Hidden entirely for member-managed companies — nothing to validate.
   - Claims: An abandoned manager entry does not need completion once the member-managed path hides Managers.
   - True: FloridaLLCFormationForm.tsx:299 hides the step and stepValidation.ts:259 returns no manager errors, but submission :449–453 sends raw managers. schema.ts:178 validates all manager rows regardless of structure; server/validation.ts:342–374 never strips them. Read-only pure-function reproduction with MEMBER_MANAGED and a retained manager email invalid returned {} from validateStep(managers,...) and a server Enter a valid email issue at managers.0.email. Missing address fields similarly remain required. This differs from prior57’s missing visible email error: switching paths preserves an inapplicable row that blocks checkout.
   - Replace with: Before submitting or validating a member-managed order, omit abandoned manager rows that are inapplicable to the selected structure; apply the same rule on the server. If previously entered members are intentionally retained for the agreement after the reverse switch, display and validate them explicitly rather than hiding their errors.
+  - Fixed: batch 08 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-19 rejected r1: Supersede the failed review revision to complete the omitted tests already authorized with Batch 08; product decisions unchanged. Adam: why did you need to stop and ask me.  if you need to do the tests, just fucking do them and dont waste my time
 - **N4.10. [wording]** — **implemented**
   - Payment confirmation reopened after filing or formation: the status message still says preparation has just begun — `webapp/src/pages/OrderConfirmed.tsx:101`
