@@ -108799,7 +108799,7 @@ function summaryMarkdown(o) {
   out.push(line("Placed", when(o.created_at)));
   out.push(line("Paid", o.paid_at ? when(o.paid_at) : "not yet received at the time of this summary"));
   out.push(line("Square payment", o.square_payment_id ?? "\u2014"));
-  out.push(line("Square checkout", o.square_order_id ?? "\u2014"));
+  out.push(line("Checkout reference", o.square_order_id ?? "\u2014"));
   out.push(line("Order", o.id));
   out.push(``);
   out.push(`## Items ordered`);

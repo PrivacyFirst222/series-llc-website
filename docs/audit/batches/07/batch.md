@@ -72,3 +72,5 @@ The staged guard correctly refused the first commit attempt: `docs/facts.md` was
 Final defensive review added an explicit live-configuration guard: missing Square credentials cannot trigger a simulated purchase. Only an explicitly offline, non-production review can use simulated cards. A fixture verifies the order remains unpaid when the production configuration is missing.
 
 The same check applies to email: a missing production mail credential is a failed send, never a dev-log success. A successful provider response must include its acceptance id. Requests time out; a missing configuration keeps the renewal notice pending.
+
+The office summary calls the initial checkout identifier a “Checkout reference”: agent checkout begins with our internal reference, while ordinary hosted checkout uses Square's identifier. The actual Square payment id remains labeled separately.
