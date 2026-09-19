@@ -96,6 +96,8 @@ export async function listBackups(): Promise<BackupInfo[]> {
 export interface BackupDump {version:1; dumpedAt:string; tables:Record<string,Record<string,unknown>[]>; files:BackupFile[]; fileManifestVersion:1}
 interface BackupJob {key:string; dump:BackupDump; done:Record<string,string>; errors:Record<string,string>}
 const JOB='backup-jobs/current.json';
+const backupKey=(iso:string)=>`db-${iso.slice(0,10)}-${iso.slice(11, 19).replace(/:/g, "")}.json.gz`;
+const publishOptions = { allowOverwrite: false };
 export function backupFiles(tables:BackupDump['tables']):BackupFile[]{
  const orders=new Map((tables.orders||[]).map(o=>[o.id,o]));const clients=new Map((tables.clients||[]).map(c=>[c.id,c]));
  const files:BackupFile[]=[];
@@ -124,7 +126,11 @@ export async function runDbBackup(options:{resumeOnly?:boolean;budgetMs?:number}
    const [snap]=await db.query<{dump:BackupDump['tables']}>(`SELECT json_build_object(${selects}) AS dump`);
    for(const row of snap.dump.service_orders){row.ein_secret=null;}
    const dump:BackupDump={version:1,dumpedAt:new Date().toISOString(),tables:snap.dump,files:[],fileManifestVersion:1};dump.files=backupFiles(dump.tables);
-   job={key:`db-${dump.dumpedAt.replace(/[:.]/g,'-')}.json.gz`,dump,done:{},errors:{}};
+   let key=backupKey(new Date().toISOString());
+   // Preserve the established UTC filename format without overwriting a second
+   // backup requested in the same second. The database lease serializes jobs.
+   while(await readObject(PREFIX+key)){await new Promise(r=>setTimeout(r,100));key=backupKey(new Date().toISOString());}
+   job={key,dump,done:{},errors:{}};
    await putObject(JOB,Buffer.from(JSON.stringify(job)),true);
    await db.query("UPDATE backup_progress SET started_at=now(),completed_at=NULL,error=NULL WHERE id='database'");
   }
@@ -151,7 +157,7 @@ export async function runDbBackup(options:{resumeOnly?:boolean;budgetMs?:number}
   const data=gzipSync(Buffer.from(JSON.stringify(job.dump)));
   const existing=await readObject(PREFIX+job.key);
   if(existing&&!existing.equals(data))throw new Error('Refusing to overwrite a different completed backup');
-  if(!existing)await putObject(PREFIX+job.key,data);
+  if(!existing)await putObject(PREFIX+job.key,data,publishOptions.allowOverwrite);
   await db.query("UPDATE backup_progress SET completed_at=now(),error=NULL WHERE id='database'");
   const {removeStoredFile}=await import('./storage');await removeStoredFile(env.BLOB_READ_WRITE_TOKEN?JOB:`dev:${JOB}`);
   return {key:job.key,sizeBytes:data.length,rowCounts,complete:true,pending:0};

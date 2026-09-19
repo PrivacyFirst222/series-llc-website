@@ -93900,7 +93900,12 @@ async function runDbBackup(options = {}) {
       }
       const dump = { version: 1, dumpedAt: (/* @__PURE__ */ new Date()).toISOString(), tables: snap.dump, files: [], fileManifestVersion: 1 };
       dump.files = backupFiles(dump.tables);
-      job = { key: `db-${dump.dumpedAt.replace(/[:.]/g, "-")}.json.gz`, dump, done: {}, errors: {} };
+      let key = backupKey((/* @__PURE__ */ new Date()).toISOString());
+      while (await readObject(PREFIX + key)) {
+        await new Promise((r) => setTimeout(r, 100));
+        key = backupKey((/* @__PURE__ */ new Date()).toISOString());
+      }
+      job = { key, dump, done: {}, errors: {} };
       await putObject(JOB, Buffer.from(JSON.stringify(job)), true);
       await db.query("UPDATE backup_progress SET started_at=now(),completed_at=NULL,error=NULL WHERE id='database'");
     }
@@ -93937,7 +93942,7 @@ async function runDbBackup(options = {}) {
     const data = gzipSync(Buffer.from(JSON.stringify(job.dump)));
     const existing = await readObject(PREFIX + job.key);
     if (existing && !existing.equals(data)) throw new Error("Refusing to overwrite a different completed backup");
-    if (!existing) await putObject(PREFIX + job.key, data);
+    if (!existing) await putObject(PREFIX + job.key, data, publishOptions.allowOverwrite);
     await db.query("UPDATE backup_progress SET completed_at=now(),error=NULL WHERE id='database'");
     const { removeStoredFile: removeStoredFile2 } = await Promise.resolve().then(() => (init_storage(), storage_exports));
     await removeStoredFile2(env.BLOB_READ_WRITE_TOKEN ? JOB : `dev:${JOB}`);
@@ -93949,7 +93954,7 @@ async function runDbBackup(options = {}) {
     await db.query("UPDATE backup_progress SET lease_until=NULL WHERE id='database'");
   }
 }
-var BACKUP_TABLES, PREFIX, JOB;
+var BACKUP_TABLES, PREFIX, JOB, backupKey, publishOptions;
 var init_backup = __esm({
   "server/backup.ts"() {
     init_encryption();
@@ -93974,6 +93979,8 @@ var init_backup = __esm({
     ];
     PREFIX = "backups/";
     JOB = "backup-jobs/current.json";
+    backupKey = (iso) => `db-${iso.slice(0, 10)}-${iso.slice(11, 19).replace(/:/g, "")}.json.gz`;
+    publishOptions = { allowOverwrite: false };
   }
 });
 

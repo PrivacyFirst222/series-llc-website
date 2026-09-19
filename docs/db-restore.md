@@ -7,7 +7,9 @@ contact messages, email history, renewal history and document-deletion records.
 The corresponding retained files (client documents, library files and order
 summaries) are copied to Dropbox and read back for verification. Only after all
 required files are accounted for is the completed snapshot published to private
-Vercel Blob storage. Completed snapshots are timestamped and kept; no old test
+Vercel Blob storage. Completed snapshots use the UTC filename pattern
+`db-YYYY-MM-DD-HHMMSS.json.gz`; they are immutable and kept. A second request
+in the same second waits for a new timestamp instead of overwriting. No old test
 backup cleanup or migration is performed by Batch 03.
 
 The snapshot's file manifest identifies the recovery path and content hash for
