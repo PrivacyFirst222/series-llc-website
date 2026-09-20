@@ -1837,14 +1837,61 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T13:49:23.141Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T14:25:36.879Z",
+              "event": "rejected r1",
+              "batch": "18",
+              "revision": 1,
+              "note": "Reject Batch 18 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T14:26:58.370Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T14:26:58.390Z",
+              "event": "implemented",
+              "batch": "18",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "18",
+          "fix": {
+            "batch": "18",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/src/pages/FAQ.tsx",
+                "before": "https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605ContentsIndex.html&StatuteYear=2025&Title=%2D%3E2025%2D%3EChapter%20605",
+                "after": "https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605ContentsIndex.html"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/src/pages/WhatIs.tsx",
+                "before": "https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605ContentsIndex.html&StatuteYear=2025&Title=%2D%3E2025%2D%3EChapter%20605",
+                "after": "https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605ContentsIndex.html"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -5263,17 +5310,57 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T13:49:23.141Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T14:25:36.879Z",
+              "event": "rejected r1",
+              "batch": "18",
+              "revision": 1,
+              "note": "Reject Batch 18 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T14:26:58.370Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T14:26:58.390Z",
+              "event": "implemented",
+              "batch": "18",
+              "revision": 2,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "132",
             "part": "all"
+          },
+          "batch": "18",
+          "fix": {
+            "batch": "18",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/src/components/forms/florida-llc/sections/StepSeries.tsx",
+                "text": "(s. 605.2202, Fla. Stat.)."
+              }
+            ]
           }
         }
       ],
@@ -6994,14 +7081,69 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T13:49:23.141Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T14:25:36.879Z",
+              "event": "rejected r1",
+              "batch": "18",
+              "revision": 1,
+              "note": "Reject Batch 18 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T14:26:58.370Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T14:26:58.390Z",
+              "event": "implemented",
+              "batch": "18",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "18",
+          "fix": {
+            "batch": "18",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/server/validation.ts",
+                "text": "(s. 605.2202, Fla. Stat.)."
+              },
+              {
+                "kind": "present",
+                "file": "webapp/server/routes-portal.ts",
+                "text": "(s. 605.2202, Fla. Stat.)."
+              },
+              {
+                "kind": "present",
+                "file": "webapp/src/components/forms/florida-llc/stepValidation.ts",
+                "text": "s. 605.2202, Fla. Stat., requires it in every series name."
+              },
+              {
+                "kind": "present",
+                "file": "webapp/src/components/forms/florida-llc/sections/StepSeries.tsx",
+                "text": "(s. 605.2202, Fla. Stat.)."
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -8296,17 +8438,57 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T13:49:23.141Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T14:25:36.879Z",
+              "event": "rejected r1",
+              "batch": "18",
+              "revision": 1,
+              "note": "Reject Batch 18 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T14:26:58.370Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T14:26:58.390Z",
+              "event": "implemented",
+              "batch": "18",
+              "revision": 2,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "237",
             "part": "all"
+          },
+          "batch": "18",
+          "fix": {
+            "batch": "18",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/src/pages/portal/ServicesCard.tsx",
+                "text": "Check the Owner's Manual"
+              }
+            ]
           }
         }
       ],
@@ -11542,14 +11724,54 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T13:49:23.141Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T14:25:36.879Z",
+              "event": "rejected r1",
+              "batch": "18",
+              "revision": 1,
+              "note": "Reject Batch 18 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T14:26:58.370Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T14:26:58.390Z",
+              "event": "implemented",
+              "batch": "18",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "18",
+          "fix": {
+            "batch": "18",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/server/routes-admin.ts",
+                "text": "`${kindTitle} (${day}) — ${llcName}`"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -12689,14 +12911,89 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T13:49:23.141Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T14:25:36.879Z",
+              "event": "rejected r1",
+              "batch": "18",
+              "revision": 1,
+              "note": "Reject Batch 18 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T14:26:58.370Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T14:26:58.390Z",
+              "event": "implemented",
+              "batch": "18",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "18",
+          "fix": {
+            "batch": "18",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/server/templates-oa-member-s.md",
+                "text": "*Form document — [COMPANY NAME], LLC Operating Agreement (Member-Managed / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04091, 711.50, 711.501, 711.512, Fla. Stat.; 11 U.S.C. §365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013). Internal Revenue Code sections: 1361, 1362, 1366, 1377, 1378.*"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/server/templates-oa-member-single-s.md",
+                "text": "*Form document — [COMPANY NAME], LLC Operating Agreement (Member-Managed, Single Member / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0602, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 711.50, 711.501, 711.512, Fla. Stat. Internal Revenue Code sections: 1361, 1362, 1378.*"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/server/templates-oa-member-single.md",
+                "text": "*Form document — [COMPANY NAME], LLC Operating Agreement (Member-Managed, Single Member / Disregarded Entity), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0602, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 711.50, 711.501, 711.512, Fla. Stat.*"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/server/templates-oa-member.md",
+                "text": "*Form document — [COMPANY NAME], LLC Operating Agreement (Member-Managed, Multiple Members / Partnership Taxation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04091, 711.50, 711.501, 711.512, Fla. Stat.; 11 U.S.C. §365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013). Internal Revenue Code sections: 704, 754, 6221, 6223, 6226.*"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/server/templates-oa-multi.md",
+                "text": "*Form document — [COMPANY NAME], LLC Operating Agreement (Manager-Managed, Multiple Members / Partnership Taxation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04074, 605.04091, 711.50, 711.501, 711.512, Fla. Stat.; 11 U.S.C. §365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013). Internal Revenue Code sections: 704, 754, 6221, 6223, 6226.*"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/server/templates-oa-s.md",
+                "text": "*Form document — [COMPANY NAME], LLC Operating Agreement (Manager-Managed / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04074, 605.04091, 711.50, 711.501, 711.512, Fla. Stat.; 11 U.S.C. §365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013). Internal Revenue Code sections: 1361, 1362, 1366, 1377, 1378.*"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/server/templates-oa-single-s.md",
+                "text": "*Form document — [COMPANY NAME], LLC Operating Agreement (Manager-Managed, Single Member / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0602, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04074, 711.50, 711.501, 711.512, Fla. Stat. Internal Revenue Code sections: 1361, 1362, 1378.*"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/server/templates-oa-single.md",
+                "text": "*Form document — [COMPANY NAME], LLC Operating Agreement (Manager-Managed, Single Member / Disregarded Entity), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0602, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04074, 711.50, 711.501, 711.512, Fla. Stat.*"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -12749,14 +13046,59 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T13:49:23.141Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T14:25:36.879Z",
+              "event": "rejected r1",
+              "batch": "18",
+              "revision": 1,
+              "note": "Reject Batch 18 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T14:26:58.370Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T14:26:58.390Z",
+              "event": "implemented",
+              "batch": "18",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "18",
+          "fix": {
+            "batch": "18",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "docs/oa-instructions.md",
+                "text": "Series LLC Owner's Manual"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/src/pages/portal/ServicesCard.tsx",
+                "text": "Check the Owner's Manual"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -13084,14 +13426,54 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T13:49:23.141Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T14:25:36.879Z",
+              "event": "rejected r1",
+              "batch": "18",
+              "revision": 1,
+              "note": "Reject Batch 18 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T14:26:58.370Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T14:26:58.390Z",
+              "event": "implemented",
+              "batch": "18",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "18",
+          "fix": {
+            "batch": "18",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "docs/owners-manual.md",
+                "text": "keep your email address current in the portal so notices reach you"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -13342,14 +13724,54 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T13:49:23.141Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T14:25:36.879Z",
+              "event": "rejected r1",
+              "batch": "18",
+              "revision": 1,
+              "note": "Reject Batch 18 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T14:26:58.370Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T14:26:58.390Z",
+              "event": "implemented",
+              "batch": "18",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "18",
+          "fix": {
+            "batch": "18",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "docs/owners-manual.md",
+                "text": "Statutory citations verified against Official Florida Statutes: ss. 48.062, 220.02, 605.0302, 605.0410, 605.0503, 605.0602, 605.0714, 605.1103, 605.04074, 605.2101–605.2802, 711.50–711.512; former s. 212.031 (historical commercial-rent tax); Ch. 726;"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -13373,14 +13795,64 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T13:49:23.141Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T14:25:36.879Z",
+              "event": "rejected r1",
+              "batch": "18",
+              "revision": 1,
+              "note": "Reject Batch 18 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T14:26:58.370Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T14:26:58.390Z",
+              "event": "implemented",
+              "batch": "18",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "18",
+          "fix": {
+            "batch": "18",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "docs/owners-manual.md",
+                "text": "Section 6.1 of your agreement"
+              },
+              {
+                "kind": "present",
+                "file": "docs/README.md",
+                "text": "on the eight agreement masters"
+              },
+              {
+                "kind": "present",
+                "file": "docs/owners-manual.md",
+                "text": "[[contents]]\n\n"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -13867,14 +14339,59 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T13:49:23.141Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T14:25:36.879Z",
+              "event": "rejected r1",
+              "batch": "18",
+              "revision": 1,
+              "note": "Reject Batch 18 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T14:26:58.370Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T14:26:58.390Z",
+              "event": "implemented",
+              "batch": "18",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "18",
+          "fix": {
+            "batch": "18",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "docs/owners-manual.md",
+                "text": "s. 605.2301"
+              },
+              {
+                "kind": "present",
+                "file": "docs/owners-manual.md",
+                "text": "s. 605.2404"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -14118,14 +14635,54 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T13:49:23.141Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T14:25:36.879Z",
+              "event": "rejected r1",
+              "batch": "18",
+              "revision": 1,
+              "note": "Reject Batch 18 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T14:26:58.370Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T14:26:58.390Z",
+              "event": "implemented",
+              "batch": "18",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "18",
+          "fix": {
+            "batch": "18",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/server/templates-new-series.md",
+                "text": "## ASSET SCHEDULE — ATTACHMENT TO SERIES EXHIBIT PS-[N] ([SERIES NAME])"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -14269,14 +14826,54 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T13:49:23.141Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T14:25:36.879Z",
+              "event": "rejected r1",
+              "batch": "18",
+              "revision": 1,
+              "note": "Reject Batch 18 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T14:26:58.370Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T14:26:58.390Z",
+              "event": "implemented",
+              "batch": "18",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "18",
+          "fix": {
+            "batch": "18",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "docs/README.md",
+                "text": "### Portal-only document\n\n`webapp/server/templates-new-series.md` is the master for the unanimous consent, Series Exhibit and attached Asset Schedule generated in the client portal when another series is added. Its output is a client-specific PDF; it has no Word counterpart.\n\n### How the Word files stay current"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -14330,14 +14927,54 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T13:49:23.141Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T14:25:36.879Z",
+              "event": "rejected r1",
+              "batch": "18",
+              "revision": 1,
+              "note": "Reject Batch 18 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T14:26:58.370Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T14:26:58.390Z",
+              "event": "implemented",
+              "batch": "18",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "18",
+          "fix": {
+            "batch": "18",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch18 263: unresolved template fields fail without mistaking client text"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -14538,14 +15175,54 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T13:49:23.141Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T14:25:36.879Z",
+              "event": "rejected r1",
+              "batch": "18",
+              "revision": 1,
+              "note": "Reject Batch 18 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T14:26:58.370Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T14:26:58.390Z",
+              "event": "implemented",
+              "batch": "18",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "18",
+          "fix": {
+            "batch": "18",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/server/templates-oa-single-s.md",
+                "text": "**7.2 Source Limitation.** Distributions in respect of a Protected Series shall be made **solely from the Associated Assets of that Protected Series, and solely to the Company**; distributions in respect of the Company shall be made solely from the Associated Assets of the Company, to the Member. Each distribution shall be recorded in the records maintained under Article 8, identifying its source.\n\n"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -16130,14 +16807,54 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T13:49:23.141Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T14:25:36.879Z",
+              "event": "rejected r1",
+              "batch": "18",
+              "revision": 1,
+              "note": "Reject Batch 18 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T14:26:58.370Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T14:26:58.390Z",
+              "event": "implemented",
+              "batch": "18",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "18",
+          "fix": {
+            "batch": "18",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch18 N2.19: manager and member suites survive the office summary"
+              }
+            ]
+          }
         }
       ]
     },
@@ -16154,14 +16871,54 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T13:49:23.141Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T14:25:36.879Z",
+              "event": "rejected r1",
+              "batch": "18",
+              "revision": 1,
+              "note": "Reject Batch 18 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T14:26:58.370Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T14:26:58.390Z",
+              "event": "implemented",
+              "batch": "18",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "18",
+          "fix": {
+            "batch": "18",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch18 N2.20: English input is enforced before business writes"
+              }
+            ]
+          }
         }
       ]
     },
@@ -16178,14 +16935,54 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T13:49:23.141Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T14:25:36.879Z",
+              "event": "rejected r1",
+              "batch": "18",
+              "revision": 1,
+              "note": "Reject Batch 18 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T14:26:58.370Z",
+              "event": "assigned",
+              "batch": "18",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T14:26:58.390Z",
+              "event": "implemented",
+              "batch": "18",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "18",
+          "fix": {
+            "batch": "18",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch18 N2.21: client pipes and line breaks remain inside their document cells"
+              }
+            ]
+          }
         }
       ]
     },
@@ -18456,6 +19253,45 @@
         },
         {
           "at": "2026-09-20T12:53:11.099Z",
+          "event": "implemented"
+        }
+      ]
+    },
+    {
+      "id": "18",
+      "revision": 1,
+      "frozenHash": "25a822a209ae7d9b42f98006916c2e8c0f8744062aef2e4d217a004eec8cf14c",
+      "status": "rejected",
+      "model": "Codex",
+      "base": "a500e3c5f4e85e89e7b5b8664004cae01f619c53",
+      "history": [
+        {
+          "at": "2026-09-20T13:49:23.142Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-20T14:25:36.879Z",
+          "event": "rejected by Adam",
+          "note": "Adam's record of 2026-09-20T14:25 (Adam explicit Codex message, 2026-09-20): Reject Batch 18 revision 1; proceed with revision 2."
+        }
+      ]
+    },
+    {
+      "id": "18",
+      "revision": 2,
+      "frozenHash": "b57a3dc15c68e86449fff5c4946f8600fff5e79366fcca67d3f022f14bf28ba6",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "a500e3c5f4e85e89e7b5b8664004cae01f619c53",
+      "history": [
+        {
+          "at": "2026-09-20T14:26:58.370Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-20T14:26:58.390Z",
           "event": "implemented"
         }
       ]

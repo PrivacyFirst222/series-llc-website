@@ -1,3 +1,4 @@
+import { documentInputs, decodeDocumentText, assertTemplateComplete } from "./document-text";
 /**
  * Builds the two documents a client needs when the company establishes another
  * protected series after formation: the members' unanimous written consent, and
@@ -49,7 +50,8 @@ function must(haystack: string, needle: string, label: string): void {
   if (!haystack.includes(needle)) throw new Error(`new-series template marker missing: ${label}`);
 }
 
-export function assembleNewSeries(input: NewSeriesInput): { markdown: string; title: string } {
+export function assembleNewSeries(input: NewSeriesInput): { markdown: string; title: string; encodedClientText: true } {
+  input = documentInputs(input);
   let s = template as unknown as string;
 
   // The purpose is the master's "any lawful purpose"; the client's phrase
@@ -112,7 +114,7 @@ export function assembleNewSeries(input: NewSeriesInput): { markdown: string; ti
   // An empty contribution prints None, matching the agreement's Series Exhibit.
   s = s.split("[CONTRIBUTION]").join((input.contribution ?? "").trim() || "None");
   must(s, "[SPECIAL TERMS]", "special terms");
-  s = s.split("[SPECIAL TERMS]").join((input.specialTerms ?? "").trim().replace(/\|/g, "/").replace(/\s*\n\s*/g, " ") || "None");
+  s = s.split("[SPECIAL TERMS]").join((input.specialTerms ?? "").trim() || "None");
   must(s, "[EFFECTIVE DATE]", "effective date");
   s = s.split("[EFFECTIVE DATE]").join(input.effectiveDate);
   must(s, "[PS MANAGER SIGNATURE LINE]", "ps manager signature");
@@ -123,12 +125,7 @@ export function assembleNewSeries(input: NewSeriesInput): { markdown: string; ti
   s = s.split("[MEMBER SIGNATURE BLOCKS]").join(blocks);
   s = s.replace(/\n{3,}/g, "\n\n");
 
-  // Nothing bracketed and no marker may reach the client (13 Sep 2026: the
-  // consent shipped "$[AMOUNT] on [DATE]" and "[None / describe]").
-  const leftovers = s.match(/\[[A-Z][A-Za-z ()/.'—-]*\]/g);
-  if (leftovers) throw new Error(`new-series template left unfilled: ${leftovers.join(", ")}`);
-  if (/<!--/.test(s)) throw new Error("new-series: template marker left in the document");
-  if (/Form document/.test(s)) throw new Error("new-series: draft colophon left in the document");
+  assertTemplateComplete(s);
 
-  return { markdown: s, title: `Consent & Series Exhibit — ${input.seriesName}` };
+  return { markdown: s, encodedClientText: true, title: `Consent & Series Exhibit — ${decodeDocumentText(input.seriesName)}` };
 }

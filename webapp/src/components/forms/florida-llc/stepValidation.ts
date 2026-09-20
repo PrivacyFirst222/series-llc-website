@@ -1,3 +1,5 @@
+import { englishTextProblems } from "@/lib/englishText";
+import { stepForField } from "./steps";
 import { postalCodeError } from "./addressValidation";
 import { registeredAgentName } from "./registeredAgent";
 import { FIRST_AND_LAST, hasFirstAndLast } from "@/lib/personName";
@@ -190,7 +192,7 @@ export function validateStep(
         e[`series.${i}.name`] = "Series identifier is required.";
       } else if (!hasProtectedSeriesPhrase(name)) {
         e[`series.${i}.name`] =
-          'Include "PS" (or "P.S." / "protected series") — §605.2202 requires it in every series name.';
+          'Include "PS" (or "P.S." / "protected series") — s. 605.2202, Fla. Stat., requires it in every series name.';
       }
     });
     const keys = data.series.map((s) => seriesDedupeKey(s.name));
@@ -420,5 +422,8 @@ export function validateStep(
       e.legalAdviceAcknowledgment = "Acknowledgment is required.";
   }
 
+  for (const [field, message] of Object.entries(englishTextProblems(data))) {
+    if (stepForField(field.split(".")[0]) === step) e[field] = message;
+  }
   return e;
 }

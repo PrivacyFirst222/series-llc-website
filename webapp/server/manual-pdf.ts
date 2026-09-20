@@ -35,13 +35,14 @@ interface Fonts { regular: PDFFont; bold: PDFFont; italic: PDFFont; boldItalic: 
 
 function sanitize(s: string): string {
   return s
+    .replace(/\t/g, "    ")
     .replace(/[‘’]/g, "'")
     .replace(/[“”]/g, '"')
     .replace(/→/g, "->")
     .replace(/✓|✔/g, "*")
     .replace(/☐/g, "[ ]")
     .replace(/…/g, "...")
-    .replace(/[^\x20-\x7E\xA0-\xFF–—•]/g, "?");
+    .replace(/[^\x20-\x7E\xA0-\xFF–—•€™]/g, (c) => { throw new Error(`Unsupported PDF character: ${JSON.stringify(c)}`); });
 }
 
 function parseInline(line: string): Seg[] {

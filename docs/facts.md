@@ -222,3 +222,13 @@ scanned set; add ` in <path prefix>` to confine the ban to matching files.
 - where: docs/owners-manual.md — `Missing records can leave an asset non-associated.`
 - where: docs/owners-manual.md — `it does not automatically remove its liability protections.`
 - where: docs/owners-manual.md — `Miami-Dade charges 60 cents per $100 or fraction, plus a 45-cent surtax`
+
+
+### Batch 18 — document text and current source references (Adam, 20 September 2026)
+- Client business text uses English A-Z letters, numbers, spaces and standard punctuation; unsupported letters are refused before submission and by the API. Passwords and opaque tokens are not business text.
+- Client brackets and table delimiters are preserved as text, never interpreted as template fields or table structure.
+- The series consent has a portal-generated PDF and no Word counterpart.
+- where: docs/README.md — `Its output is a client-specific PDF; it has no Word counterpart.`
+- where: webapp/src/lib/englishText.ts — `Please use English letters (A–Z). Numbers, spaces and standard punctuation are also allowed. Replace the highlighted characters to continue.`
+- where: docs/oa-instructions.md — `Series LLC Owner's Manual`
+- where: docs/owners-manual.md — `keep your email address current in the portal so notices reach you`

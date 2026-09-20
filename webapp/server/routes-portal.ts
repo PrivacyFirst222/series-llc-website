@@ -1516,6 +1516,7 @@ app.post("/portal/oa/generate", async (c) => {
     title = assembled.title;
     pdf = await renderMarkdownPdf({
       markdown: assembled.markdown,
+      encodedClientText: assembled.encodedClientText,
       watermark: {
         name: client?.name || members[0].name,
         email: client?.email ?? "",
@@ -1665,6 +1666,7 @@ app.post("/portal/series/consent", async (c) => {
     );
     pdf = await renderMarkdownPdf({
       markdown: assembled.markdown,
+      encodedClientText: assembled.encodedClientText,
       watermark: {
         name: clients[0]?.name || seed.members[0]?.name || "",
         email: clients[0]?.email ?? "",
@@ -1986,7 +1988,7 @@ app.post("/portal/services/series", async (c) => {
   const seriesName = `${llcName} - ${suffix}`;
   if (!hasProtectedSeriesPhrase(seriesName)) {
     return c.json(
-      err('The series name must include "PS", "P.S.", or "protected series" (§605.2202).', "INVALID_INPUT"),
+      err('The series name must include "PS", "P.S.", or "protected series" (s. 605.2202, Fla. Stat.).', "INVALID_INPUT"),
       400,
     );
   }

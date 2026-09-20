@@ -294,6 +294,13 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
     expect(/State is required\./.test(errs), `${run.key}: the empty State box says "State is required." (15 Sep 2026)`, errs.slice(0, 200));
     expect((await page.locator("#client-state[aria-invalid=\"true\"], [id$='-state'][aria-invalid=\"true\"]").count()) >= 1, `${run.key}: the State box is marked invalid, tied to its message`, await page.locator("[aria-invalid=\"true\"]").count());
   }
+  if (run.probeValidation) {
+    await fill(page, "First name", "José");
+    const field = page.locator("#client-first-name");
+    expect(await field.getAttribute("aria-invalid") === "true" && (await page.locator("main").innerText()).includes("Please use English letters"), "batch18: formation shows unsupported letters at entry");
+    await fill(page, "First name", "Jose");
+    expect(await field.evaluate((e: HTMLInputElement) => e.validity.valid), "batch18: correcting English letters clears the input error");
+  }
   await fill(page, "First name", "Casey");
   await fill(page, "Last name", "Gatecheck");
   await fill(page, "Email", run.email ?? "gate@e2e.test");
@@ -2312,7 +2319,7 @@ async function main(): Promise<void> {
         // the boxes stay for another copy, and the line says the client was emailed.
         expect(!/Still owed/.test(afterText) && (await drawer.locator("#upload-cert-status").count()) === 1 && /another copy/i.test(afterText), "certificates: once uploaded, nothing is owed and the boxes stay for another copy", afterText.slice(0, 300));
         expect(/Uploaded — the client was emailed\./.test(afterText), "certificates: the card says the client was emailed", afterText.match(/Uploaded[^\n]*/)?.[0]);
-        expect(/Certificate of Status - [A-Z][a-z]{2} \d{1,2}, \d{4} — /.test(afterText), "certificates: each copy is titled by its day", afterText.match(/Certificate of Status[^\n]*/)?.[0]);
+        expect(/Certificate of Status \([A-Z][a-z]{2} \d{1,2}, \d{4}\) — /.test(afterText), "certificates: each copy is titled by its day", afterText.match(/Certificate of Status[^\n]*/)?.[0]);
         expect(/Certificate of Status/.test(afterText) && /Certified Copy/.test(afterText), "certificates: both are listed among the order's documents", afterText.slice(0, 300));
         expect((afterText.match(/uploaded \d{1,2}\/\d{1,2}\/\d{4}/g) ?? []).length >= 2, "documents: each listed document shows the day it went up (14 Sep 2026)", afterText.match(/uploaded [^\n]{0,20}/g));
         await page.unroute("**/api/**");

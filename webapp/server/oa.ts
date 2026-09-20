@@ -1,3 +1,4 @@
+import { documentInputs, decodeDocumentText, assertTemplateComplete } from "./document-text";
 /**
  * Operating agreement assembly: transforms the master templates per client
  * inputs. The blank masters live server-side only; every transform asserts
@@ -351,7 +352,8 @@ function stripInstructionNotes(s: string): string {
     .replace(/ \[SELECT ONE ALTERNATIVE[\s\S]*?\](?=\*\*|$)/gm, "");
 }
 
-export function assembleOa(inputs: OaInputs): { markdown: string; title: string } {
+export function assembleOa(inputs: OaInputs): { markdown: string; title: string; encodedClientText: true } {
+  inputs = documentInputs(inputs);
   const TEMPLATES = {
     single: singleTemplate,
     multi: multiTemplate,
@@ -651,7 +653,7 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
     // The client's special terms for this series, or None; the dissolution
     // row is gone (Adam, 12 Sep 2026) — such an event is a special term, and
     // s. 14.1(b) reaches it there.
-    ex = ex.replace(/\| Special terms \(if any\) \|[^\n]*\|/, `| Special terms (if any) | ${(ser.specialTerms ?? "").trim().replace(/\|/g, "/").replace(/\s*\n\s*/g, " ") || "None"} |`);
+    ex = ex.replace(/\| Special terms \(if any\) \|[^\n]*\|/, `| Special terms (if any) | ${(ser.specialTerms ?? "").trim() || "None"} |`);
     // Each Protected Series is owned by the Company, so the Series Exhibit is
     // adopted by whoever acts for the Company — the Manager, or all Members in
     // a member-managed company.
@@ -745,6 +747,8 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
   // one between exhibits, so a run of them would print a blank page.
   s = s.replace(/(\[\[pagebreak\]\]\s*){2,}/g, "[[pagebreak]]\n\n");
 
+  assertTemplateComplete(s);
+
   const seq = inputs.generationNumber ? ` (No. ${inputs.generationNumber})` : "";
   // The taxation designation leads the name: a client holding three PDFs should
   // be able to tell the S corporation form from the partnership form without
@@ -752,7 +756,8 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string 
   const tax = taxationLabel(inputs.version);
   return {
     markdown: s,
-    title: `${inputs.amendedRestated ? "Amended and Restated " : ""}${tax} Operating Agreement${seq} — ${co}`,
+    encodedClientText: true,
+    title: `${inputs.amendedRestated ? "Amended and Restated " : ""}${tax} Operating Agreement${seq} — ${decodeDocumentText(co)}`,
   };
 }
 

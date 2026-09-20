@@ -3,6 +3,7 @@ import { registerAgentOffice } from "./ra-office";
 // The API entry point. Every route lives in a domain module; this file
 // creates the app, registers each domain, and holds the terminal handlers.
 // Split from a single 3,585-line file on 29 Aug 2026 — same code, four rooms.
+import { englishBusinessInput } from "./english-input";
 import { Hono } from "hono";
 import { err } from "./shared";
 import { registerPaymentRoutes } from "./routes-payments";
@@ -11,6 +12,8 @@ import { registerAdminRoutes } from "./routes-admin";
 import { registerOpsRoutes } from "./routes-ops";
 
 export const app = new Hono().basePath("/api");
+
+app.use("*", englishBusinessInput);
 
 registerPaymentRoutes(app);
 registerAgentCheckout(app);

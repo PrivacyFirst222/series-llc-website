@@ -140,7 +140,7 @@ export default function FAQ() {
               <ul className="mt-3 space-y-2 text-sm">
                 <li>
                   <a
-                    href="https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605ContentsIndex.html&StatuteYear=2025&Title=%2D%3E2025%2D%3EChapter%20605"
+                    href="https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605ContentsIndex.html"
                     target="_blank"
                     rel="noreferrer"
                     className="hover:text-accent"

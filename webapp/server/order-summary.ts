@@ -196,19 +196,19 @@ export function summaryMarkdown(o: SummaryOrderRow): string {
   if (managers.length > 0) {
     out.push(`### Managers`);
     managers.forEach((m, i) => {
-      const mm = m as unknown as { firstName?: string; lastName?: string; suffix?: string; businessEntityName?: string; entityName?: string; streetAddress1?: string; address1?: string; city?: string; state?: string; zip?: string };
+      const mm = m as unknown as { firstName?: string; lastName?: string; suffix?: string; businessEntityName?: string; entityName?: string; streetAddress1?: string; streetAddress2?: string; address1?: string; address2?: string; city?: string; state?: string; zip?: string };
       const name = mm.businessEntityName || mm.entityName || [mm.firstName, mm.lastName, mm.suffix].filter(Boolean).join(" ");
-      out.push(line(`Manager ${i + 1}`, `${name}; ${addr({ address1: mm.streetAddress1 ?? mm.address1, city: mm.city, state: mm.state, zip: mm.zip })}`));
+      out.push(line(`Manager ${i + 1}`, `${name}; ${addr({ address1: mm.streetAddress1 ?? mm.address1, address2: mm.streetAddress2 ?? mm.address2, city: mm.city, state: mm.state, zip: mm.zip })}`));
     });
   }
   const members = p.members?.memberList ?? [];
   if (members.length > 0) {
     out.push(`### Initial members`);
     members.forEach((m, i) => {
-      const mm = m as unknown as { firstName?: string; lastName?: string; suffix?: string; entityName?: string; memberType?: string; address1?: string; city?: string; state?: string; zip?: string; ownershipPercentage?: number | string };
+      const mm = m as unknown as { firstName?: string; lastName?: string; suffix?: string; entityName?: string; memberType?: string; address1?: string; address2?: string; city?: string; state?: string; zip?: string; ownershipPercentage?: number | string };
       const name = mm.memberType === "ENTITY" ? mm.entityName ?? "" : [mm.firstName, mm.lastName, mm.suffix].filter(Boolean).join(" ");
       const pct = mm.ownershipPercentage !== undefined && mm.ownershipPercentage !== "" ? `; ${mm.ownershipPercentage}%` : "";
-      out.push(line(`Member ${i + 1}`, `${name}; ${addr({ address1: mm.address1, city: mm.city, state: mm.state, zip: mm.zip })}${pct}`));
+      out.push(line(`Member ${i + 1}`, `${name}; ${addr({ address1: mm.address1, address2: mm.address2, city: mm.city, state: mm.state, zip: mm.zip })}${pct}`));
     });
   }
   if (!conversion) {

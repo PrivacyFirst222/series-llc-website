@@ -182,7 +182,7 @@ const extendedFormSchema = formationFormSchema
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ["series", i, "name"],
-          message: 'Series names must include "PS", "P.S.", or "protected series" (§605.2202).',
+          message: 'Series names must include "PS", "P.S.", or "protected series" (s. 605.2202, Fla. Stat.).',
         });
       }
     });

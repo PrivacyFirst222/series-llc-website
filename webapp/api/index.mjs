@@ -93116,19 +93116,79 @@ var init_es = __esm({
   }
 });
 
+// src/lib/englishText.ts
+function englishTextError(value) {
+  return UNSUPPORTED.test(value) ? ENGLISH_TEXT_ERROR : null;
+}
+function englishTextProblems(value, path = "") {
+  if (typeof value === "string") return englishTextError(value) ? { [path]: ENGLISH_TEXT_ERROR } : {};
+  if (!value || typeof value !== "object") return {};
+  const result = {};
+  for (const [key, child] of Object.entries(value)) {
+    if (/^(password|newPassword|currentPassword|confirmPassword|nameCheck|token|sourceId|verificationToken|idempotencyKey)$/i.test(key)) continue;
+    Object.assign(result, englishTextProblems(child, path ? `${path}.${key}` : key));
+  }
+  return result;
+}
+function assertEnglishText(value) {
+  const errors = englishTextProblems(value);
+  if (Object.keys(errors).length) throw new Error(`${ENGLISH_TEXT_ERROR} Fields: ${Object.keys(errors).join(", ")}`);
+}
+var ENGLISH_TEXT_ERROR, UNSUPPORTED;
+var init_englishText = __esm({
+  "src/lib/englishText.ts"() {
+    ENGLISH_TEXT_ERROR = "Please use English letters (A\u2013Z). Numbers, spaces and standard punctuation are also allowed. Replace the highlighted characters to continue.";
+    UNSUPPORTED = /[^\x20-\x7E\r\n\t‘’“”–—…•·§©®™£€]/u;
+  }
+});
+
+// server/document-text.ts
+function encodeDocumentText(text) {
+  return text.replace(/\$(?=[$&`'])|[&|[\]<>*#\r\n]/g, (c) => `&#${c.charCodeAt(0)};`).replace(/Form document/g, "&#70;orm document").replace(/v1 draft/g, "v&#49; draft");
+}
+function decodeDocumentText(text) {
+  return text.replace(/&#(35|36|38|124|91|93|60|62|42|13|10|70|49);/g, (_, n) => String.fromCharCode(Number(n)));
+}
+function documentInputs(value) {
+  assertEnglishText(value);
+  function encode2(v2) {
+    if (typeof v2 === "string") return encodeDocumentText(v2);
+    if (Array.isArray(v2)) return v2.map(encode2);
+    if (v2 && typeof v2 === "object") return Object.fromEntries(Object.entries(v2).map(([k, c]) => [k, encode2(c)]));
+    return v2;
+  }
+  return encode2(value);
+}
+function assertTemplateComplete(markdown) {
+  const templateText = markdown.replace(/\[\[(?:pagebreak|indent)\]\]/g, "").replace(/\[Reserved\.\]/g, "");
+  const unfilled = templateText.match(/\[[^\]\r\n]+\]/g);
+  if (unfilled || /<!--|Form document —|v1 draft/.test(templateText)) {
+    throw new Error(`Document template left unfilled: ${unfilled?.join(", ") ?? "internal marker"}`);
+  }
+}
+var init_document_text = __esm({
+  "server/document-text.ts"() {
+    init_englishText();
+  }
+});
+
 // server/pdf-render.ts
 function sanitize(s) {
-  return s.replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/→/g, "->").replace(/✓|✔/g, "*").replace(/☐/g, "[ ]").replace(/[^\x20-\x7E\xA0-\xFF–—•]/g, "?");
-}
-function parseInline(line2) {
-  const parts = line2.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/).filter(Boolean);
-  return parts.map((p2) => {
-    if (p2.startsWith("**") && p2.endsWith("**")) return { text: sanitize(p2.slice(2, -2)), bold: true, italic: false };
-    if (p2.startsWith("*") && p2.endsWith("*") && p2.length > 2) return { text: sanitize(p2.slice(1, -1)), bold: false, italic: true };
-    return { text: sanitize(p2), bold: false, italic: false };
+  return s.replace(/\t/g, "    ").replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/→/g, "->").replace(/✓|✔/g, "*").replace(/☐/g, "[ ]").replace(/…/g, "...").replace(/[^\x20-\x7E\xA0-\xFF–—•€™]/g, (c) => {
+    throw new Error(`Unsupported PDF character: ${JSON.stringify(c)}`);
   });
 }
-function parseMarkdown(md) {
+function parseInline(line2, encodedClientText = false) {
+  const plain = (s) => sanitize(encodedClientText ? decodeDocumentText(s) : s);
+  const parts = line2.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/).filter(Boolean);
+  return parts.map((p2) => {
+    if (p2.startsWith("**") && p2.endsWith("**")) return { text: plain(p2.slice(2, -2)), bold: true, italic: false };
+    if (p2.startsWith("*") && p2.endsWith("*") && p2.length > 2) return { text: plain(p2.slice(1, -1)), bold: false, italic: true };
+    return { text: plain(p2), bold: false, italic: false };
+  });
+}
+function parseMarkdown(md, encodedClientText = false) {
+  const linesOf = (s) => encodedClientText ? s.split(/&#13;&#10;|&#10;|&#13;/) : [s];
   const lines = md.split("\n");
   const blocks = [];
   let i = 0;
@@ -93150,11 +93210,11 @@ function parseMarkdown(md) {
     }
     const m2 = line2.match(/^(#{1,3})\s+(.*)$/);
     if (m2) {
-      blocks.push({ kind: "heading", level: m2[1].length, text: sanitize(m2[2].replace(/\*\*/g, "")) });
+      blocks.push({ kind: "heading", level: m2[1].length, text: sanitize(encodedClientText ? decodeDocumentText(linesOf(m2[2].replace(/\*\*/g, "")).join(" ")) : m2[2].replace(/\*\*/g, "")) });
       i++;
       continue;
     }
-    blocks.push({ kind: "para", segs: parseInline(line2.trim()) });
+    for (const part of linesOf(line2.trim())) blocks.push({ kind: "para", segs: parseInline(part, encodedClientText) });
     i++;
   }
   return blocks;
@@ -93220,7 +93280,7 @@ function wrapSegs(f, segs, width, size) {
   });
 }
 async function renderMarkdownPdf(opts) {
-  const blocks = parseMarkdown(opts.markdown);
+  const blocks = parseMarkdown(opts.markdown, opts.encodedClientText === true);
   const doc = await PDFDocument.create();
   const fonts = {
     regular: await doc.embedFont(StandardFonts.TimesRoman),
@@ -93419,7 +93479,7 @@ async function renderMarkdownPdf(opts) {
         const row = block.rows[ri];
         const fillable = isAssetSchedule && ri > 0 && row.every((c) => c.trim() === "");
         const cellLines = row.map(
-          (cell2) => wrapSegs(fonts, parseInline(cell2).map((s) => ri === 0 ? { ...s, bold: true } : s), colW - 2 * pad, size)
+          (cell2) => (opts.encodedClientText ? cell2.split(/&#13;&#10;|&#10;|&#13;/) : [cell2]).flatMap((line2) => wrapSegs(fonts, parseInline(line2, opts.encodedClientText).map((s) => ri === 0 ? { ...s, bold: true } : s), colW - 2 * pad, size))
         );
         const rowH = (fillable ? FILL_LINES : Math.max(1, ...cellLines.map((c) => c.length))) * lineH + 2 * pad;
         need(rowH);
@@ -93597,6 +93657,7 @@ async function stampExistingPdf(opts) {
 var PAGE_W, PAGE_H, MARGIN, SIG_W, BODY_SIZE, LINE_GAP, FOOTER_Y, glyphWidthCache;
 var init_pdf_render = __esm({
   "server/pdf-render.ts"() {
+    init_document_text();
     init_es();
     PAGE_W = 612;
     PAGE_H = 792;
@@ -93617,7 +93678,9 @@ __export(manual_pdf_exports, {
   renderManualPdf: () => renderManualPdf
 });
 function sanitize2(s) {
-  return s.replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/→/g, "->").replace(/✓|✔/g, "*").replace(/☐/g, "[ ]").replace(/…/g, "...").replace(/[^\x20-\x7E\xA0-\xFF–—•]/g, "?");
+  return s.replace(/\t/g, "    ").replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/→/g, "->").replace(/✓|✔/g, "*").replace(/☐/g, "[ ]").replace(/…/g, "...").replace(/[^\x20-\x7E\xA0-\xFF–—•€™]/g, (c) => {
+    throw new Error(`Unsupported PDF character: ${JSON.stringify(c)}`);
+  });
 }
 function parseInline2(line2) {
   const parts = line2.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/).filter(Boolean);
@@ -99723,7 +99786,7 @@ var extendedFormSchema = formationFormSchema.extend({
       ctx.addIssue({
         code: external_exports.ZodIssueCode.custom,
         path: ["series", i, "name"],
-        message: 'Series names must include "PS", "P.S.", or "protected series" (\xA7605.2202).'
+        message: 'Series names must include "PS", "P.S.", or "protected series" (s. 605.2202, Fla. Stat.).'
       });
     }
   });
@@ -100981,7 +101044,6 @@ var owners_manual_default = `<!-- MASTER. This file is the Owner's Manual. Edit 
 
 [[contents]]
 
-
 ### IMPORTANT DISCLAIMER
 This manual is provided for general educational and informational purposes only. It is not legal, tax, accounting, financial, investment, title, or insurance advice, and it is not advice about your particular situation. MyFloridaSeriesLLC is not a law firm, and no attorney-client, accountant-client, fiduciary, or advisory relationship is created by this manual or your use of it. Laws change, tax rules are complex, and the correct treatment of any transaction depends on its facts. Consult your own attorney, CPA, title company, lender, and insurance professional before forming, funding, operating, or relying on a series LLC. Statutory references in this manual were verified against the official Florida Statutes as of the edition date on the cover.
 ## HOW TO USE THIS MANUAL
@@ -101057,7 +101119,7 @@ Full glossary in Section 31; these thirteen carry the load.
 | **Transferable interest** | The economic slice of a membership interest \u2014 the right to receive distributions. A creditor or unapproved transferee can hold this and nothing more |
 | **Charging order** | The court order that gives a member's personal creditor the member's distributions \u2014 and, in a multi-member LLC, nothing else (Section 23) |
 | **Distribution** | Money or property paid out by a silo \u2014 a series pays the company; the company pays the members \u2014 always from that silo's own assets, always recorded |
-| **Contribution** | Money or property put into a silo. You fund the company; the company funds each series (s. 6.1 of your agreement). Recorded against the silo that receives it |
+| **Contribution** | Money or property put into a silo. You fund the company; the company funds each series (Section 6.1 of your agreement). Recorded against the silo that receives it |
 
 # PART TWO \u2014 FORMATION AND STRUCTURE
 ## 6. HOW A FLORIDA PROTECTED SERIES LLC IS FORMED
@@ -101120,18 +101182,18 @@ In practice:
 # PART THREE \u2014 OPERATING THE STRUCTURE
 ## 9. TITLING ASSETS CORRECTLY
 **First, the thing almost everyone gets backwards.** What makes an asset belong to a series is *the records*, not the name on the title. Section 605.2301(2) says an asset is a series' associated asset **only if** the series keeps records naming it and describing the asset well enough for a stranger to identify it, see when and from whom it came, and \u2014 if it came from another silo \u2014 see what was paid, by whom, to whom. Title is not the legal test. Section 14 is where that battle is actually won.
-**Titling is how you prove it cheaply.** Get the name right and the record makes itself; get it wrong and you are proving association the hard way, out of ledgers, with the burden on you (\xA7605.2404(4)). So the practice below is a strong recommendation, not a statutory command:
+**Titling is how you prove it cheaply.** Get the name right and the record makes itself; get it wrong and you are proving association the hard way, out of ledgers, with the burden on you (s. 605.2404(4)). So the practice below is a strong recommendation, not a statutory command:
 > Deed grantee: **Sunshine Holdings, LLC - PS 2**
 > Bank account title: **Sunshine Holdings, LLC - PS 2**
 > Vehicle title: **Sunshine Holdings, LLC - PS 2**
 
-**Two things the statute flatly forbids, and they are the ones to memorize.** Under \xA7605.2301(5), a protected series may **not** hold an associated asset in the name of the company or of another series, and the company may **not** hold one in the name of a series. Titling PS 2's building as "Sunshine Holdings, LLC," or as PS 1, is not a bookkeeping slip \u2014 it is the one titling error Florida law does not permit. Everything else in this chapter is best practice; those two are rules.
+**Two things the statute flatly forbids, and they are the ones to memorize.** Under s. 605.2301(5), a protected series may **not** hold an associated asset in the name of the company or of another series, and the company may **not** hold one in the name of a series. Titling PS 2's building as "Sunshine Holdings, LLC," or as PS 1, is not a bookkeeping slip \u2014 it is the one titling error Florida law does not permit. Everything else in this chapter is best practice; those two are rules.
 **Nominee arrangements \u2014 lawful, with one duty attached.** Section 605.2301(5) allows a company or a series to hold an associated asset **directly or indirectly, "through a representative, nominee, or similar arrangement."** So a nominee arrangement is lawful \u2014 a title company holding for a series pending closing, for instance. Your agreement (Article 8, *Holding Associated Assets*) allows it and requires one thing in exchange: document the arrangement in your Article 8 records, naming the holder, the silo it is held for, and the date it began. An undocumented nominee arrangement is an asset with no association record, which is the worst position to be in.
 Never "in my head, that one's PS 2's."
 Titling in the series' name does double duty. It puts the world on notice who owns the asset, and \u2014 under your agreement's standing association rules \u2014 the titling instrument *is itself an association record*: an asset acquired by an instrument naming a series is that series' associated asset from the date of acquisition. For real property Florida goes further: a properly recorded deed or instrument naming the series serves as an association record by statute (s. 605.2301(2)(b)). Every correctly titled asset is a brick in your evidentiary wall.
 **Assets people forget to title or assign:** bank and brokerage accounts; vehicles and trailers; equipment and tools; websites, domains, and trademarks; contracts and customer lists; leases (assign them to the series that owns the building); accounts receivable; notes and mortgages held as lender; security deposits (they belong to the series whose tenants paid them); insurance policies (the named insured must be the titled owner \u2014 Section 15); membership interests the structure owns in other companies.
 ## 10. PUTTING ASSETS IN \u2014 AND WHY THEY STAY THERE
-**Funding a series (contributions).** When you put your own money or property into a series, that is a capital contribution. Your agreement requires each contribution to be made *to a specific silo*, deposited to that silo's account, and recorded (Article 6; the Series Exhibit's contribution line). The record answers \xA7605.2301's second question \u2014 when and from whom the asset came.
+**Funding a series (contributions).** When you put your own money or property into a series, that is a capital contribution. Your agreement requires each contribution to be made *to a specific silo*, deposited to that silo's account, and recorded (Article 6; the Series Exhibit's contribution line). The record answers s. 605.2301's second question \u2014 when and from whom the asset came.
 **Buying assets.** When a series buys from an outsider, buy *in the series' name*, pay *from the series' account*, and keep the closing document. Purchase money out of PS 2's account + deed naming PS 2 = a self-documenting acquisition under those standing rules.
 **Do not move assets between series.** Treat each series as though it were a separate limited liability company \u2014 its own account, its own assets, its own contracts, its own records. If you owned three ordinary LLCs you would not deed a building out of one and into another because it felt tidier, or move a truck across on a Sunday afternoon. The same discipline applies here, for the same reason: the moment an asset moves, its association has to be proved all over again, and s. 605.2404(4) puts that burden on you.
 This is why the moment of acquisition matters so much. An asset bought in the right series' name, with the right series' money, is associated from day one and stays associated. An asset bought carelessly and relocated later is an asset whose history a stranger has to reconstruct.
@@ -101140,7 +101202,7 @@ Series can still do business with each other \u2014 one can lease equipment or s
 ## 11. REAL ESTATE \u2014 THE EXPENSIVE-MISTAKES CHAPTER
 Real estate is why most owners choose this structure, and it is where the costly mistakes live. Before deeding any property into a series, walk this list:
 1. **The mortgage.** Nearly every mortgage has a due-on-sale clause; a deed to your series is a "transfer" that can technically trigger it. Lenders often consent \u2014 ask first, in writing. Refinancing later? The new lender will have opinions about the borrower entity.
-2. **Documentary stamp tax.** Outside Miami-Dade County, the rate is 70 cents per $100 or fraction of taxable consideration. Miami-Dade charges 60 cents per $100 or fraction, plus a 45-cent surtax unless the document transfers only a single-family dwelling. Transferring *mortgaged* property to your own entity can produce taxable consideration even when no cash changes hands. At the 70-cent rate outside Miami-Dade, $300,000 of taxable consideration produces $2,100 in tax. An unencumbered property transferred for no consideration is a different analysis. Confirm the consideration, rate, and any exemption with your closing agent or CPA before recording; do not guess.
+2. **Documentary stamp tax.** Outside Miami-Dade County, the rate is 70 cents per $100 or fraction of taxable consideration. Miami-Dade charges 60 cents per $100 or fraction, plus a 45-cent surtax unless only a single-family dwelling is transferred. Mortgaged-property transfers can be taxable without cash changing hands. At the outside-Miami-Dade rate, $300,000 of taxable consideration means $2,100 in tax. Unencumbered, no-consideration transfers require separate analysis. Confirm consideration, rate and exemptions with your closing agent or CPA before recording.
 3. **Title insurance.** Your existing owner's policy insures *you*, not your series. A conveyance can end your coverage. Talk to the title company about an endorsement or a new policy naming the series.
 4. **Homestead \u2014 bright red line.** Do not transfer your personal residence into a series (or any LLC) without specific legal advice. You can forfeit the homestead creditor exemption \u2014 one of the strongest protections in Florida law \u2014 and your property-tax homestead exemption and Save Our Homes cap along with it. The structure is for investment and business assets.
 5. **Insurance, leases, deposits, and the county.** Re-issue the landlord policy in the series' name; assign leases; move security deposits to the series' account; tell tenants where rent goes now; update the property appraiser's mailing records.
@@ -101189,13 +101251,13 @@ Rules of the road:
 - If a counterparty (bank, insurer, franchisor) insists on contracting with "the LLC," understand what that means \u2014 the obligation belongs to the mothership \u2014 and paper the internal reality accordingly, or push back.
 ## 14. THE RECORDKEEPING SYSTEM \u2014 YOUR ARTICLE 8 FIELD GUIDE
 Article 8 of your operating agreement turns s. 605.2301 into a checklist. Here is the whole system \u2014 six habits:
-**Habit 1 \u2014 The asset schedule (per series).** Every asset, described so a stranger could pick it out: address *and* legal description for real estate; institution/title/last-four for accounts; year-make-model-VIN for vehicles; serial numbers for equipment; parties-and-date for contracts. Plus: date acquired, from whom, and \u2014 if acquired from another silo \u2014 consideration, payor, payee. This is the record \xA7605.2301 names first, and the first thing to update after any acquisition. *(App: the Assets tab, per series.)*
+**Habit 1 \u2014 The asset schedule (per series).** Every asset, described so a stranger could pick it out: address *and* legal description for real estate; institution/title/last-four for accounts; year-make-model-VIN for vehicles; serial numbers for equipment; parties-and-date for contracts. Plus: date acquired, from whom, and \u2014 if acquired from another silo \u2014 consideration, payor, payee. This is the record s. 605.2301 names first, and the first thing to update after any acquisition. *(App: the Assets tab, per series.)*
 **Habit 2 \u2014 Every silo has at least one account of its own, and no commingling** (Section 12). Nothing in ch. 605 requires separate accounts and your agreement does not either \u2014 they are evidence, and the best evidence there is. Bank statements in the series' name are association records a stranger believes instantly.
 **Habit 3 \u2014 Assets stay where they were acquired** (Section 10). Do not move them between series, any more than you would move a building between two separate LLCs you own. If one ever does move \u2014 because it was acquired in the wrong silo, or because one series genuinely bought it from another \u2014 s. 605.2301 requires the record to show the consideration, the payor, and the payee, and Section 30 has the form. *(App: the Transfer Log writes both silos' entries at once.)*
 **Habit 4 \u2014 Separate books.** Income, expenses, contributions, and distributions per silo. Your accountant can run one accounting file with a class/location per series \u2014 what matters is that each series' picture can be produced *separately*. *(App: per-series ledger with income/expense categories.)*
 **Habit 5 \u2014 File the paper.** Designations, Series Exhibits, deeds, titles, contracts, insurance, consents, and resolutions \u2014 one file per series (digital is fine; the statute requires records "retrievable in perceivable form"). Your portal already holds the formation package; keep the rest with your app records or alongside them.
 **The separate list Chapter 605 requires of every LLC.** Apart from the association records above, s. 605.0410(1) requires the company to keep, at its principal office or another location, a current list of members and managers with addresses, the operating agreement and every amendment, the articles and other filed documents, a record of the agreed value of each member's contributions, and \u2014 the two people forget \u2014 **income tax returns and reports for the three most recent years** and **financial statements for the three most recent years**. Note that these are the records the company may *not* wrap in confidentiality restrictions when an owner asks to see them (s. 605.0410(10)); keep them somewhere you could hand them over the same week.
-**Habit 6 \u2014 The annual review.** Nothing in the Act or in your agreement requires one, which is exactly why it is a habit and not a covenant: a review you skipped is not a breach of your own document. Do it with the annual report each spring: Section 29's checklist is the agenda. Fix what you find *when you find it* \u2014 Article 8's correction provision makes correcting records a duty, and corrections made before a claim arises are worth incomparably more than corrections after (remember \xA7605.2404 lets a creditor test association as of the date a liability was incurred, so a fix made after a claim exists comes too late for that claim).
+**Habit 6 \u2014 The annual review.** Nothing in the Act or in your agreement requires one, which is exactly why it is a habit and not a covenant: a review you skipped is not a breach of your own document. Do it with the annual report each spring: Section 29's checklist is the agenda. Fix what you find *when you find it* \u2014 Article 8's correction provision makes correcting records a duty, and corrections made before a claim arises are worth incomparably more than corrections after (remember s. 605.2404 lets a creditor test association as of the date a liability was incurred, so a fix made after a claim exists comes too late for that claim).
 **How good is good enough?** The statute's own standard is the answer: could a *disinterested, reasonable individual* \u2014 a bank examiner, a judge's clerk \u2014 take your records and, without asking you anything, sort every asset into its silo and trace where it came from? If yes, you have a horizontal shield. If they would need you to explain, you have homework.
 ## 15. INSURANCE \u2014 THE FIRST LINE, NOT THE BACKUP
 The series structure is your *second* line of defense. Insurance is the first: it pays lawyers and judgments so the shield never gets tested. Structure without insurance is planning to lose slowly.
@@ -101349,8 +101411,8 @@ The shields in Section 2 protect the structure from the *business's* creditors. 
 **Death \u2014 the TOD designation.** Every form of the agreement lets an individual member register a transfer-on-death beneficiary (an owner that is a company or trust cannot make this designation, nor can co-owners holding an interest as tenants in common) \u2014 anyone the member chooses, subject on the S corporation forms to the eligible-shareholder rule \u2014 on Exhibit A, using Florida's registration-in-beneficiary-form statute (ss. 711.50\u2013711.512). At death the interest passes directly \u2014 no probate \u2014 and the beneficiary takes subject to the operating agreement. In the multi-member agreements, a beneficiary receives the economic interest automatically but becomes a voting member only after delivering a signed agreement to be bound and obtaining written consent from owners holding more than 50% of the ownership interests held by the remaining members. A permitted family transferee needs the same admission approval, excluding the transferring owner; other new members need every member's written consent and a signed agreement to be bound. Permission to transfer an interest and admission as a voting member are separate requirements. In the single-member agreement the beneficiary is admitted as the Member on delivering a signed agreement to be bound, since there is no one else to consent. Keep designations current (the formalities are strict: a signed writing with two witnesses, delivered as your form directs), and coordinate with your estate plan \u2014 for large or complicated estates, a trust may be the better vehicle; ask your estate planner. If no designation is made, the interest passes through your estate, and the agreement's continuation provisions keep the company alive while it does.
 ## 24. WHEN A SERIES GETS SUED \u2014 SERVICE OF PROCESS AND LEGAL MAIL
 A protected series can sue and be sued in its own name. Process against a series is served like process against the LLC (s. 48.062) \u2014 which in practice means **served on the registered agent**, who is the same for the company and every series.
-If MyFloridaSeriesLLC is your registered agent: anything served or officially delivered for any of your silos is scanned to your client portal the day we receive it, and you get an email alert immediately. Then the clock is yours to respect: **a lawsuit has a response deadline (typically 20 days in Florida) that runs whether or not you read it.** Sign in, download, and get the papers to your attorney the same day. A default judgment converts a defensible claim into a fixed debt of that series \u2014 and tests your records under \xA7605.2404 at their worst moment. The alert email is not the last step; it is the first.
-Housekeeping that keeps service working: keep your email address current in the portal (your operating agreement and our terms both require current contact information), and keep the registered agent service paid \u2014 an agent's resignation for nonpayment leaves every silo exposed to service you will never see.
+If MyFloridaSeriesLLC is your registered agent: anything served or officially delivered for any of your silos is scanned to your client portal the day we receive it, and you get an email alert immediately. Then the clock is yours to respect: **a lawsuit has a response deadline (typically 20 days in Florida) that runs whether or not you read it.** Sign in, download, and get the papers to your attorney the same day. A default judgment converts a defensible claim into a fixed debt of that series \u2014 and tests your records under s. 605.2404 at their worst moment. The alert email is not the last step; it is the first.
+Housekeeping that keeps service working: keep your email address current in the portal so notices reach you, and keep the registered agent service paid \u2014 an agent's resignation for nonpayment leaves every silo exposed to service you will never see.
 ## 25. CROSSING STATE LINES
 Florida courts will enforce Florida's horizontal shield. Another state's courts might not \u2014 especially states with no series legislation of their own. About half the states have some form of series LLC law (Delaware since 1996, plus Texas, Illinois, Nevada, and the Uniform Act states, among others); the rest have none, and a court there may treat your carefully separated series as one undifferentiated LLC in a dispute governed by its law.
 Practical rules:
@@ -101373,7 +101435,7 @@ Practical rules:
 3. **Titling everything in the mothership.** One pool with decorative labels \u2014 and the pool sits in the silo most exposed to general liabilities (Section 8).
 4. **One bank account for everything.** The classic. Commingling is the first exhibit in every piercing case.
 5. **Records that only you can explain.** The statute's standard is a *stranger* reading your records cold (Section 14).
-6. **Moving assets between silos at all.** Each move restarts the asset's association from scratch, with the burden of proof on you under \xA7605.2404 \u2014 and an undocumented move, with no consideration, payor, or payee, leaves nothing to carry that burden with. Acquire in the right silo and leave it there (Section 10).
+6. **Moving assets between silos at all.** Each move restarts the asset's association from scratch, with the burden of proof on you under s. 605.2404 \u2014 and an undocumented move, with no consideration, payor, or payee, leaves nothing to carry that burden with. Acquire in the right silo and leave it there (Section 10).
 7. **Signing personally, or for the wrong silo.** The signature block is the liability's mailing address (Section 13).
 8. **Deeding your homestead into a series.** Do not \u2014 not without specific advice (Section 11).
 9. **Transferring mortgaged property without reading the mortgage.** Due-on-sale clauses and documentary stamps are real (Section 11).
@@ -101496,7 +101558,7 @@ Practical rules:
 **What single habit matters most?** Contemporaneous records. Every section of this manual is a variation on that theme, and the app exists so the habit costs minutes, not weekends.
 ### ABOUT MYFLORIDASERIESLLC
 MyFloridaSeriesLLC is a document-preparation and registered agent service dedicated to the Florida Protected Series LLC. Your formation package includes the operating agreement and Series Exhibits, this manual, the recordkeeping app, and \u2014 if selected \u2014 registered agent service with same-day portal delivery of legal mail. Support: **support@myfloridaseriesllc.com**. Client portal: **myfloridaseriesllc.com/portal**.
-*\xA9 2026 MyFloridaSeriesLLC. This manual may be updated as Florida law and federal rules evolve; the portal always holds the current edition. Statutory citations verified against Official Florida Statutes: ss. 48.062, 605.0503, 605.2101\u2013605.2802 (including 605.2201, 605.2202, 605.2301, 605.2401, 605.2404, 605.2602, 605.2605\u2013605.2607), 711.50\u2013711.512; Ch. 726; Prop. Treas. Reg. \xA7301.7701-1(a)(5); FinCEN interim final rule (Mar. 2025); Florida Division of Corporations series LLC filing guidance.*
+*\xA9 2026 MyFloridaSeriesLLC. This manual may be updated as Florida law and federal rules evolve; the portal always holds the current edition. Statutory citations verified against Official Florida Statutes: ss. 48.062, 220.02, 605.0302, 605.0410, 605.0503, 605.0602, 605.0714, 605.1103, 605.04074, 605.2101\u2013605.2802, 711.50\u2013711.512; former s. 212.031 (historical commercial-rent tax); Ch. 726; Prop. Treas. Reg. \xA7301.7701-1(a)(5); FinCEN interim final rule (Mar. 2025); Florida Division of Corporations series LLC filing guidance.*
 `;
 
 // server/owners-manual.ts
@@ -102142,6 +102204,9 @@ function shareValue(mode, share) {
   return d2 > 0 ? (share.numerator ?? 0) / d2 * 100 : 0;
 }
 
+// server/new-series.ts
+init_document_text();
+
 // server/templates-new-series.md
 var templates_new_series_default = `# <!-- if:several -->UNANIMOUS WRITTEN CONSENT OF THE MEMBERS<!-- /if --><!-- if:sole -->WRITTEN CONSENT OF THE SOLE MEMBER<!-- /if -->
 
@@ -102197,7 +102262,7 @@ var templates_new_series_default = `# <!-- if:several -->UNANIMOUS WRITTEN CONSE
 
 [[pagebreak]]
 
-## ASSET SCHEDULE \u2014 ATTACHMENT TO SERIES EXHIBIT PS-[N]
+## ASSET SCHEDULE \u2014 ATTACHMENT TO SERIES EXHIBIT PS-[N] ([SERIES NAME])
 
 *Complete this schedule for each asset of this Protected Series. Describe each asset so that a stranger could identify it without asking you anything: real property \u2014 street address AND legal description, date acquired, and grantor; deposit account \u2014 institution, account title, last four digits, and date opened; vehicle \u2014 year, make, model, and VIN; equipment \u2014 description and serial number; contract \u2014 parties and date. For any asset acquired from the Company or from another Protected Series, also state the consideration paid, the payor, and the payee. Add pages as needed; keep this schedule current as assets are acquired and disposed of.*
 
@@ -102213,6 +102278,7 @@ var templates_new_series_default = `# <!-- if:several -->UNANIMOUS WRITTEN CONSE
 `;
 
 // server/oa.ts
+init_document_text();
 import { readFileSync } from "node:fs";
 
 // server/templates-oa-single.md
@@ -102606,7 +102672,7 @@ By: _____________________________
 
 ---
 
-*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Manager-Managed, Single Member / Disregarded Entity), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0602, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04074, 711.501, 711.512, Fla. Stat.*
+*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Manager-Managed, Single Member / Disregarded Entity), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0602, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04074, 711.50, 711.501, 711.512, Fla. Stat.*
 
 *[TITLE] of [COMPANY NAME], LLC \u2014 generated by MyFloridaSeriesLLC \xB7 Master [EDITION]*
 `;
@@ -103116,7 +103182,7 @@ By: _____________________________
 
 ---
 
-*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Manager-Managed, Multiple Members / Partnership Taxation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04074, 605.04091, 711.501, 711.512, Fla. Stat.; 11 U.S.C. \xA7365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013).*
+*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Manager-Managed, Multiple Members / Partnership Taxation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04074, 605.04091, 711.50, 711.501, 711.512, Fla. Stat.; 11 U.S.C. \xA7365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013). Internal Revenue Code sections: 704, 754, 6221, 6223, 6226.*
 
 *[TITLE] of [COMPANY NAME], LLC \u2014 generated by MyFloridaSeriesLLC \xB7 Master [EDITION]*
 `;
@@ -103642,7 +103708,7 @@ By: _____________________________
 
 ---
 
-*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Manager-Managed / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04074, 605.04091, 711.501, 711.512, Fla. Stat.; 11 U.S.C. \xA7365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013).*
+*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Manager-Managed / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04074, 605.04091, 711.50, 711.501, 711.512, Fla. Stat.; 11 U.S.C. \xA7365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013). Internal Revenue Code sections: 1361, 1362, 1366, 1377, 1378.*
 
 *[TITLE] of [COMPANY NAME], LLC \u2014 generated by MyFloridaSeriesLLC \xB7 Master [EDITION]*
 `;
@@ -104138,7 +104204,7 @@ By: _____________________________
 
 ---
 
-*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Member-Managed, Multiple Members / Partnership Taxation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04091, 711.501, 711.512, Fla. Stat.; 11 U.S.C. \xA7365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013).*
+*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Member-Managed, Multiple Members / Partnership Taxation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04091, 711.50, 711.501, 711.512, Fla. Stat.; 11 U.S.C. \xA7365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013). Internal Revenue Code sections: 704, 754, 6221, 6223, 6226.*
 
 *[TITLE] of [COMPANY NAME], LLC \u2014 generated by MyFloridaSeriesLLC \xB7 Master [EDITION]*
 `;
@@ -104650,7 +104716,7 @@ By: _____________________________
 
 ---
 
-*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Member-Managed / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04091, 711.501, 711.512, Fla. Stat.; 11 U.S.C. \xA7365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013).*
+*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Member-Managed / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04091, 711.50, 711.501, 711.512, Fla. Stat.; 11 U.S.C. \xA7365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013). Internal Revenue Code sections: 1361, 1362, 1366, 1377, 1378.*
 
 *[TITLE] of [COMPANY NAME], LLC \u2014 generated by MyFloridaSeriesLLC \xB7 Master [EDITION]*
 `;
@@ -104846,7 +104912,6 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 **7.1 Distributions.** The Manager (or, as to a Protected Series, its Protected Series Manager) may from time to time determine the extent to which cash on hand of the Company or of a Protected Series exceeds current and anticipated needs, including operating expenses, debt service, acquisitions, and reserves, and may distribute any such excess.
 
 **7.2 Source Limitation.** Distributions in respect of a Protected Series shall be made **solely from the Associated Assets of that Protected Series, and solely to the Company**; distributions in respect of the Company shall be made solely from the Associated Assets of the Company, to the Member. Each distribution shall be recorded in the records maintained under Article 8, identifying its source.
-
 
 ---
 
@@ -105079,7 +105144,7 @@ By: _____________________________
 
 ---
 
-*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Manager-Managed, Single Member / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0602, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04074, 711.501, 711.512, Fla. Stat. Code references: sections 1361, 1362, 1378.*
+*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Manager-Managed, Single Member / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0602, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04074, 711.50, 711.501, 711.512, Fla. Stat. Internal Revenue Code sections: 1361, 1362, 1378.*
 
 *[TITLE] of [COMPANY NAME], LLC \u2014 generated by MyFloridaSeriesLLC \xB7 Master [EDITION]*
 `;
@@ -105445,7 +105510,7 @@ By: _____________________________
 
 ---
 
-*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Member-Managed, Single Member / Disregarded Entity), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0602, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 711.501, 711.512, Fla. Stat.*
+*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Member-Managed, Single Member / Disregarded Entity), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0602, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 711.50, 711.501, 711.512, Fla. Stat.*
 
 *[TITLE] of [COMPANY NAME], LLC \u2014 generated by MyFloridaSeriesLLC \xB7 Master [EDITION]*
 `;
@@ -105843,7 +105908,7 @@ By: _____________________________
 
 ---
 
-*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Member-Managed, Single Member / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0602, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 711.501, 711.512, Fla. Stat. Code references: sections 1361, 1362, 1378.*
+*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Member-Managed, Single Member / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0602, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 711.50, 711.501, 711.512, Fla. Stat. Internal Revenue Code sections: 1361, 1362, 1378.*
 
 *[TITLE] of [COMPANY NAME], LLC \u2014 generated by MyFloridaSeriesLLC \xB7 Master [EDITION]*
 `;
@@ -105986,6 +106051,7 @@ function stripInstructionNotes(s) {
   return s.replace(/\s*\*\((To omit|Retain the selected|If this Section is omitted)[\s\S]*?\)\*/g, "").replace(/\s*\*\[include only if[\s\S]*?\]\*/g, "").replace(/ \[OPTIONAL PROVISION[\s\S]*?\](?=\*\*|$)/gm, "").replace(/ \[SELECT ONE ALTERNATIVE[\s\S]*?\](?=\*\*|$)/gm, "");
 }
 function assembleOa(inputs) {
+  inputs = documentInputs(inputs);
   const TEMPLATES = {
     single: singleTemplate,
     multi: multiTemplate,
@@ -106186,7 +106252,7 @@ NOW, THEREFORE,`,
     ex = resolveIf(ex, "purpose", ser.purpose.trim() !== "");
     ex = ex.split("[PURPOSE]").join(ser.purpose.trim());
     ex = ex.replace("[CONTRIBUTION]", ser.contribution || "\u2014");
-    ex = ex.replace(/\| Special terms \(if any\) \|[^\n]*\|/, `| Special terms (if any) | ${(ser.specialTerms ?? "").trim().replace(/\|/g, "/").replace(/\s*\n\s*/g, " ") || "None"} |`);
+    ex = ex.replace(/\| Special terms \(if any\) \|[^\n]*\|/, `| Special terms (if any) | ${(ser.specialTerms ?? "").trim() || "None"} |`);
     const adopters = isMemberManaged ? inputs.members.flatMap(
       (m2) => m2.entitySigner ? [{ name: m2.name, entity: m2.entitySigner }] : (m2.signatories ?? [m2.name]).map((n2) => ({ name: n2, entity: null }))
     ) : managerNames.map((n2) => ({ name: n2, entity: managerSignerOf(inputs, n2) }));
@@ -106238,11 +106304,13 @@ NOW, THEREFORE,`,
     throw new Error("OA assembly leaked the internal draft footer into the client document");
   }
   s = s.replace(/(\[\[pagebreak\]\]\s*){2,}/g, "[[pagebreak]]\n\n");
+  assertTemplateComplete(s);
   const seq = inputs.generationNumber ? ` (No. ${inputs.generationNumber})` : "";
   const tax = taxationLabel(inputs.version);
   return {
     markdown: s,
-    title: `${inputs.amendedRestated ? "Amended and Restated " : ""}${tax} Operating Agreement${seq} \u2014 ${co}`
+    encodedClientText: true,
+    title: `${inputs.amendedRestated ? "Amended and Restated " : ""}${tax} Operating Agreement${seq} \u2014 ${decodeDocumentText(co)}`
   };
 }
 function replaceSectionBody(s, re, replacement, label) {
@@ -106255,6 +106323,7 @@ function must2(haystack, needle, label) {
   if (!haystack.includes(needle)) throw new Error(`new-series template marker missing: ${label}`);
 }
 function assembleNewSeries(input) {
+  input = documentInputs(input);
   let s = templates_new_series_default;
   const purpose = input.purpose.trim();
   {
@@ -106294,7 +106363,7 @@ ${n}${suffix}`) + (dated ? "\nDate: _____________________________" : "");
   must2(s, "[CONTRIBUTION]", "contribution");
   s = s.split("[CONTRIBUTION]").join((input.contribution ?? "").trim() || "None");
   must2(s, "[SPECIAL TERMS]", "special terms");
-  s = s.split("[SPECIAL TERMS]").join((input.specialTerms ?? "").trim().replace(/\|/g, "/").replace(/\s*\n\s*/g, " ") || "None");
+  s = s.split("[SPECIAL TERMS]").join((input.specialTerms ?? "").trim() || "None");
   must2(s, "[EFFECTIVE DATE]", "effective date");
   s = s.split("[EFFECTIVE DATE]").join(input.effectiveDate);
   must2(s, "[PS MANAGER SIGNATURE LINE]", "ps manager signature");
@@ -106304,11 +106373,8 @@ ${n}${suffix}`) + (dated ? "\nDate: _____________________________" : "");
   must2(s, "[MEMBER SIGNATURE BLOCKS]", "member signature blocks");
   s = s.split("[MEMBER SIGNATURE BLOCKS]").join(blocks);
   s = s.replace(/\n{3,}/g, "\n\n");
-  const leftovers = s.match(/\[[A-Z][A-Za-z ()/.'—-]*\]/g);
-  if (leftovers) throw new Error(`new-series template left unfilled: ${leftovers.join(", ")}`);
-  if (/<!--/.test(s)) throw new Error("new-series: template marker left in the document");
-  if (/Form document/.test(s)) throw new Error("new-series: draft colophon left in the document");
-  return { markdown: s, title: `Consent & Series Exhibit \u2014 ${input.seriesName}` };
+  assertTemplateComplete(s);
+  return { markdown: s, encodedClientText: true, title: `Consent & Series Exhibit \u2014 ${decodeDocumentText(input.seriesName)}` };
 }
 
 // src/lib/einActivity.ts
@@ -107886,6 +107952,7 @@ function registerPortalRoutes(app2) {
       title = assembled.title;
       pdf = await renderMarkdownPdf({
         markdown: assembled.markdown,
+        encodedClientText: assembled.encodedClientText,
         watermark: {
           name: client?.name || members[0].name,
           email: client?.email ?? "",
@@ -108005,6 +108072,7 @@ function registerPortalRoutes(app2) {
       );
       pdf = await renderMarkdownPdf({
         markdown: assembled.markdown,
+        encodedClientText: assembled.encodedClientText,
         watermark: {
           name: clients[0]?.name || seed.members[0]?.name || "",
           email: clients[0]?.email ?? "",
@@ -108287,7 +108355,7 @@ function registerPortalRoutes(app2) {
     const seriesName = `${llcName} - ${suffix}`;
     if (!hasProtectedSeriesPhrase(seriesName)) {
       return c.json(
-        err('The series name must include "PS", "P.S.", or "protected series" (\xA7605.2202).', "INVALID_INPUT"),
+        err('The series name must include "PS", "P.S.", or "protected series" (s. 605.2202, Fla. Stat.).', "INVALID_INPUT"),
         400
       );
     }
@@ -108981,7 +109049,7 @@ function summaryMarkdown(o) {
     managers.forEach((m2, i) => {
       const mm = m2;
       const name = mm.businessEntityName || mm.entityName || [mm.firstName, mm.lastName, mm.suffix].filter(Boolean).join(" ");
-      out.push(line(`Manager ${i + 1}`, `${name}; ${addr({ address1: mm.streetAddress1 ?? mm.address1, city: mm.city, state: mm.state, zip: mm.zip })}`));
+      out.push(line(`Manager ${i + 1}`, `${name}; ${addr({ address1: mm.streetAddress1 ?? mm.address1, address2: mm.streetAddress2 ?? mm.address2, city: mm.city, state: mm.state, zip: mm.zip })}`));
     });
   }
   const members = p2.members?.memberList ?? [];
@@ -108991,7 +109059,7 @@ function summaryMarkdown(o) {
       const mm = m2;
       const name = mm.memberType === "ENTITY" ? mm.entityName ?? "" : [mm.firstName, mm.lastName, mm.suffix].filter(Boolean).join(" ");
       const pct = mm.ownershipPercentage !== void 0 && mm.ownershipPercentage !== "" ? `; ${mm.ownershipPercentage}%` : "";
-      out.push(line(`Member ${i + 1}`, `${name}; ${addr({ address1: mm.address1, city: mm.city, state: mm.state, zip: mm.zip })}${pct}`));
+      out.push(line(`Member ${i + 1}`, `${name}; ${addr({ address1: mm.address1, address2: mm.address2, city: mm.city, state: mm.state, zip: mm.zip })}${pct}`));
     });
   }
   if (!conversion) {
@@ -109775,6 +109843,26 @@ function registerAgentOffice(app2) {
     return c.json({ data: { ok: true } });
   });
 }
+
+// server/english-input.ts
+init_englishText();
+var englishBusinessInput = async (c, next) => {
+  if (!["POST", "PUT", "PATCH"].includes(c.req.method) || /\/(?:webhooks?|cron)(?:\/|$)/.test(c.req.path)) return next();
+  const type = c.req.header("content-type") ?? "";
+  let value;
+  try {
+    if (type.includes("application/json")) value = await c.req.raw.clone().json();
+    else if (type.includes("multipart/form-data")) {
+      const form = await c.req.raw.clone().formData();
+      value = Object.fromEntries([...form.entries()].filter(([, v2]) => typeof v2 === "string"));
+    } else return next();
+  } catch {
+    return next();
+  }
+  const fields = englishTextProblems(value);
+  if (Object.keys(fields).length) return c.json({ ...err(ENGLISH_TEXT_ERROR, "INVALID_INPUT"), fields }, 400);
+  return next();
+};
 
 // ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/compose.js
 var compose = (middleware, onError, onNotFound) => {
@@ -111881,7 +111969,7 @@ function registerAdminRoutes(app2) {
   const CERT_KINDS = ["certificate-of-status", "certified-copy"];
   function certTitle(kindTitle, llcName) {
     const day = (/* @__PURE__ */ new Date()).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "America/New_York" });
-    return `${kindTitle} - ${day} \u2014 ${llcName}`;
+    return `${kindTitle} (${day}) \u2014 ${llcName}`;
   }
   const metaOf = (d2) => (typeof d2.meta === "string" ? JSON.parse(d2.meta) : d2.meta) ?? {};
   const isCardCert = (d2, kind) => d2.kind === kind && metaOf(d2).source !== "portal";
@@ -113226,6 +113314,7 @@ function registerOpsRoutes(app2) {
 
 // server/app.ts
 var app = new Hono2().basePath("/api");
+app.use("*", englishBusinessInput);
 registerPaymentRoutes(app);
 registerAgentCheckout(app);
 registerAgentOffice(app);

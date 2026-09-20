@@ -1,0 +1,561 @@
+{
+  "id": "18",
+  "revision": 2,
+  "title": "Document output, editions and source references",
+  "model": "Codex",
+  "base": "a500e3c5f4e85e89e7b5b8664004cae01f619c53",
+  "items": [
+    {
+      "id": "42",
+      "part": "all",
+      "scope": "Approved Batch 18 fix; optional review items 7 and 10 remain unchanged. Item 17 uses English A-Z validation as Adam directed.",
+      "assertions": [
+        {
+          "kind": "replace",
+          "file": "webapp/src/pages/FAQ.tsx",
+          "before": "https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605ContentsIndex.html&StatuteYear=2025&Title=%2D%3E2025%2D%3EChapter%20605",
+          "after": "https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605ContentsIndex.html"
+        },
+        {
+          "kind": "replace",
+          "file": "webapp/src/pages/WhatIs.tsx",
+          "before": "https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605ContentsIndex.html&StatuteYear=2025&Title=%2D%3E2025%2D%3EChapter%20605",
+          "after": "https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605ContentsIndex.html"
+        }
+      ]
+    },
+    {
+      "id": "132",
+      "part": "all",
+      "scope": "Approved Batch 18 fix; optional review items 7 and 10 remain unchanged. Item 17 uses English A-Z validation as Adam directed.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/server/validation.ts",
+          "text": "(s. 605.2202, Fla. Stat.)."
+        },
+        {
+          "kind": "present",
+          "file": "webapp/server/routes-portal.ts",
+          "text": "(s. 605.2202, Fla. Stat.)."
+        },
+        {
+          "kind": "present",
+          "file": "webapp/src/components/forms/florida-llc/stepValidation.ts",
+          "text": "s. 605.2202, Fla. Stat., requires it in every series name."
+        },
+        {
+          "kind": "present",
+          "file": "webapp/src/components/forms/florida-llc/sections/StepSeries.tsx",
+          "text": "(s. 605.2202, Fla. Stat.)."
+        }
+      ]
+    },
+    {
+      "id": "99",
+      "part": "all",
+      "scope": "Approved Batch 18 fix; optional review items 7 and 10 remain unchanged. Item 17 uses English A-Z validation as Adam directed.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/src/components/forms/florida-llc/sections/StepSeries.tsx",
+          "text": "(s. 605.2202, Fla. Stat.)."
+        }
+      ]
+    },
+    {
+      "id": "210",
+      "part": "all",
+      "scope": "Approved Batch 18 fix; optional review items 7 and 10 remain unchanged. Item 17 uses English A-Z validation as Adam directed.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/server/routes-admin.ts",
+          "text": "`${kindTitle} (${day}) — ${llcName}`"
+        }
+      ]
+    },
+    {
+      "id": "235",
+      "part": "all",
+      "scope": "Approved Batch 18 fix; optional review items 7 and 10 remain unchanged. Item 17 uses English A-Z validation as Adam directed.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/server/templates-oa-member-s.md",
+          "text": "*Form document — [COMPANY NAME], LLC Operating Agreement (Member-Managed / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04091, 711.50, 711.501, 711.512, Fla. Stat.; 11 U.S.C. §365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013). Internal Revenue Code sections: 1361, 1362, 1366, 1377, 1378.*"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/server/templates-oa-member-single-s.md",
+          "text": "*Form document — [COMPANY NAME], LLC Operating Agreement (Member-Managed, Single Member / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0602, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 711.50, 711.501, 711.512, Fla. Stat. Internal Revenue Code sections: 1361, 1362, 1378.*"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/server/templates-oa-member-single.md",
+          "text": "*Form document — [COMPANY NAME], LLC Operating Agreement (Member-Managed, Single Member / Disregarded Entity), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0602, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 711.50, 711.501, 711.512, Fla. Stat.*"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/server/templates-oa-member.md",
+          "text": "*Form document — [COMPANY NAME], LLC Operating Agreement (Member-Managed, Multiple Members / Partnership Taxation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04091, 711.50, 711.501, 711.512, Fla. Stat.; 11 U.S.C. §365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013). Internal Revenue Code sections: 704, 754, 6221, 6223, 6226.*"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/server/templates-oa-multi.md",
+          "text": "*Form document — [COMPANY NAME], LLC Operating Agreement (Manager-Managed, Multiple Members / Partnership Taxation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04074, 605.04091, 711.50, 711.501, 711.512, Fla. Stat.; 11 U.S.C. §365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013). Internal Revenue Code sections: 704, 754, 6221, 6223, 6226.*"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/server/templates-oa-s.md",
+          "text": "*Form document — [COMPANY NAME], LLC Operating Agreement (Manager-Managed / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04074, 605.04091, 711.50, 711.501, 711.512, Fla. Stat.; 11 U.S.C. §365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013). Internal Revenue Code sections: 1361, 1362, 1366, 1377, 1378.*"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/server/templates-oa-single-s.md",
+          "text": "*Form document — [COMPANY NAME], LLC Operating Agreement (Manager-Managed, Single Member / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0602, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04074, 711.50, 711.501, 711.512, Fla. Stat. Internal Revenue Code sections: 1361, 1362, 1378.*"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/server/templates-oa-single.md",
+          "text": "*Form document — [COMPANY NAME], LLC Operating Agreement (Manager-Managed, Single Member / Disregarded Entity), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0602, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04074, 711.50, 711.501, 711.512, Fla. Stat.*"
+        }
+      ]
+    },
+    {
+      "id": "237",
+      "part": "all",
+      "scope": "Approved Batch 18 fix; optional review items 7 and 10 remain unchanged. Item 17 uses English A-Z validation as Adam directed.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "docs/oa-instructions.md",
+          "text": "Series LLC Owner's Manual"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/src/pages/portal/ServicesCard.tsx",
+          "text": "Check the Owner's Manual"
+        }
+      ]
+    },
+    {
+      "id": "154",
+      "part": "all",
+      "scope": "Approved Batch 18 fix; optional review items 7 and 10 remain unchanged. Item 17 uses English A-Z validation as Adam directed.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/src/pages/portal/ServicesCard.tsx",
+          "text": "Check the Owner's Manual"
+        }
+      ]
+    },
+    {
+      "id": "241",
+      "part": "all",
+      "scope": "Approved Batch 18 fix; optional review items 7 and 10 remain unchanged. Item 17 uses English A-Z validation as Adam directed.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "docs/owners-manual.md",
+          "text": "keep your email address current in the portal so notices reach you"
+        }
+      ]
+    },
+    {
+      "id": "246",
+      "part": "all",
+      "scope": "Approved Batch 18 fix; optional review items 7 and 10 remain unchanged. Item 17 uses English A-Z validation as Adam directed.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "docs/owners-manual.md",
+          "text": "Statutory citations verified against Official Florida Statutes: ss. 48.062, 220.02, 605.0302, 605.0410, 605.0503, 605.0602, 605.0714, 605.1103, 605.04074, 605.2101–605.2802, 711.50–711.512; former s. 212.031 (historical commercial-rent tax); Ch. 726;"
+        }
+      ]
+    },
+    {
+      "id": "247",
+      "part": "all",
+      "scope": "Approved Batch 18 fix; optional review items 7 and 10 remain unchanged. Item 17 uses English A-Z validation as Adam directed.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "docs/owners-manual.md",
+          "text": "Section 6.1 of your agreement"
+        },
+        {
+          "kind": "present",
+          "file": "docs/README.md",
+          "text": "on the eight agreement masters"
+        },
+        {
+          "kind": "present",
+          "file": "docs/owners-manual.md",
+          "text": "[[contents]]\n\n"
+        }
+      ]
+    },
+    {
+      "id": "255",
+      "part": "all",
+      "scope": "Approved Batch 18 fix; optional review items 7 and 10 remain unchanged. Item 17 uses English A-Z validation as Adam directed.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "docs/owners-manual.md",
+          "text": "s. 605.2301"
+        },
+        {
+          "kind": "present",
+          "file": "docs/owners-manual.md",
+          "text": "s. 605.2404"
+        }
+      ]
+    },
+    {
+      "id": "258",
+      "part": "all",
+      "scope": "Approved Batch 18 fix; optional review items 7 and 10 remain unchanged. Item 17 uses English A-Z validation as Adam directed.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/server/templates-new-series.md",
+          "text": "## ASSET SCHEDULE — ATTACHMENT TO SERIES EXHIBIT PS-[N] ([SERIES NAME])"
+        }
+      ]
+    },
+    {
+      "id": "261",
+      "part": "all",
+      "scope": "Approved Batch 18 fix; optional review items 7 and 10 remain unchanged. Item 17 uses English A-Z validation as Adam directed.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "docs/README.md",
+          "text": "### Portal-only document\n\n`webapp/server/templates-new-series.md` is the master for the unanimous consent, Series Exhibit and attached Asset Schedule generated in the client portal when another series is added. Its output is a client-specific PDF; it has no Word counterpart.\n\n### How the Word files stay current"
+        }
+      ]
+    },
+    {
+      "id": "263",
+      "part": "all",
+      "scope": "Approved Batch 18 fix; optional review items 7 and 10 remain unchanged. Item 17 uses English A-Z validation as Adam directed.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch18 263: unresolved template fields fail without mistaking client text"
+        }
+      ]
+    },
+    {
+      "id": "267",
+      "part": "all",
+      "scope": "Approved Batch 18 fix; optional review items 7 and 10 remain unchanged. Item 17 uses English A-Z validation as Adam directed.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/server/templates-oa-single-s.md",
+          "text": "**7.2 Source Limitation.** Distributions in respect of a Protected Series shall be made **solely from the Associated Assets of that Protected Series, and solely to the Company**; distributions in respect of the Company shall be made solely from the Associated Assets of the Company, to the Member. Each distribution shall be recorded in the records maintained under Article 8, identifying its source.\n\n"
+        }
+      ]
+    },
+    {
+      "id": "N2.19",
+      "part": "all",
+      "scope": "Approved Batch 18 fix; optional review items 7 and 10 remain unchanged. Item 17 uses English A-Z validation as Adam directed.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch18 N2.19: manager and member suites survive the office summary"
+        }
+      ]
+    },
+    {
+      "id": "N2.20",
+      "part": "all",
+      "scope": "Approved Batch 18 fix; optional review items 7 and 10 remain unchanged. Item 17 uses English A-Z validation as Adam directed.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch18 N2.20: English input is enforced before business writes"
+        }
+      ]
+    },
+    {
+      "id": "N2.21",
+      "part": "all",
+      "scope": "Approved Batch 18 fix; optional review items 7 and 10 remain unchanged. Item 17 uses English A-Z validation as Adam directed.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch18 N2.21: client pipes and line breaks remain inside their document cells"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "webapp/src/pages/FAQ.tsx",
+      "mode": "code",
+      "why": "Approved Batch 18 wording or document source correction, reviewed in the full diff."
+    },
+    {
+      "path": "webapp/src/pages/WhatIs.tsx",
+      "mode": "code",
+      "why": "Approved Batch 18 wording or document source correction, reviewed in the full diff."
+    },
+    {
+      "path": "webapp/server/validation.ts",
+      "mode": "code",
+      "why": "Approved Batch 18 wording or document source correction, reviewed in the full diff."
+    },
+    {
+      "path": "webapp/server/routes-portal.ts",
+      "mode": "code",
+      "why": "Approved Batch 18 wording or document source correction, reviewed in the full diff."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/stepValidation.ts",
+      "mode": "code",
+      "why": "Batch 18 input validation, safe document assembly, regression evidence or shared fact consistency."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepSeries.tsx",
+      "mode": "code",
+      "why": "Approved Batch 18 wording or document source correction, reviewed in the full diff."
+    },
+    {
+      "path": "webapp/server/routes-admin.ts",
+      "mode": "code",
+      "why": "Approved Batch 18 wording or document source correction, reviewed in the full diff."
+    },
+    {
+      "path": "webapp/server/templates-oa-member-s.md",
+      "mode": "code",
+      "why": "Approved Batch 18 wording or document source correction, reviewed in the full diff."
+    },
+    {
+      "path": "webapp/server/templates-oa-member-single-s.md",
+      "mode": "code",
+      "why": "Approved Batch 18 wording or document source correction, reviewed in the full diff."
+    },
+    {
+      "path": "webapp/server/templates-oa-member-single.md",
+      "mode": "code",
+      "why": "Approved Batch 18 wording or document source correction, reviewed in the full diff."
+    },
+    {
+      "path": "webapp/server/templates-oa-member.md",
+      "mode": "code",
+      "why": "Approved Batch 18 wording or document source correction, reviewed in the full diff."
+    },
+    {
+      "path": "webapp/server/templates-oa-multi.md",
+      "mode": "code",
+      "why": "Approved Batch 18 wording or document source correction, reviewed in the full diff."
+    },
+    {
+      "path": "webapp/server/templates-oa-s.md",
+      "mode": "code",
+      "why": "Approved Batch 18 wording or document source correction, reviewed in the full diff."
+    },
+    {
+      "path": "webapp/server/templates-oa-single-s.md",
+      "mode": "code",
+      "why": "Approved Batch 18 wording or document source correction, reviewed in the full diff."
+    },
+    {
+      "path": "webapp/server/templates-oa-single.md",
+      "mode": "code",
+      "why": "Approved Batch 18 wording or document source correction, reviewed in the full diff."
+    },
+    {
+      "path": "docs/oa-instructions.md",
+      "mode": "code",
+      "why": "Approved Batch 18 wording or document source correction, reviewed in the full diff."
+    },
+    {
+      "path": "webapp/src/pages/portal/ServicesCard.tsx",
+      "mode": "code",
+      "why": "Approved Batch 18 wording or document source correction, reviewed in the full diff."
+    },
+    {
+      "path": "docs/owners-manual.md",
+      "mode": "code",
+      "why": "Approved Batch 18 wording or document source correction, reviewed in the full diff."
+    },
+    {
+      "path": "docs/README.md",
+      "mode": "code",
+      "why": "Approved Batch 18 wording or document source correction, reviewed in the full diff."
+    },
+    {
+      "path": "webapp/server/templates-new-series.md",
+      "mode": "code",
+      "why": "Approved Batch 18 wording or document source correction, reviewed in the full diff."
+    },
+    {
+      "path": "docs/facts.md",
+      "mode": "code",
+      "why": "Batch 18 input validation, safe document assembly, regression evidence or shared fact consistency.",
+      "control": true
+    },
+    {
+      "path": "docs/facts-check.ts",
+      "mode": "code",
+      "why": "Batch 18 input validation, safe document assembly, regression evidence or shared fact consistency.",
+      "control": true
+    },
+    {
+      "path": "webapp/server/oa.ts",
+      "mode": "code",
+      "why": "Batch 18 input validation, safe document assembly, regression evidence or shared fact consistency."
+    },
+    {
+      "path": "webapp/server/new-series.ts",
+      "mode": "code",
+      "why": "Batch 18 input validation, safe document assembly, regression evidence or shared fact consistency."
+    },
+    {
+      "path": "webapp/server/pdf-render.ts",
+      "mode": "code",
+      "why": "Batch 18 input validation, safe document assembly, regression evidence or shared fact consistency."
+    },
+    {
+      "path": "webapp/server/manual-pdf.ts",
+      "mode": "code",
+      "why": "Batch 18 input validation, safe document assembly, regression evidence or shared fact consistency."
+    },
+    {
+      "path": "webapp/server/order-summary.ts",
+      "mode": "code",
+      "why": "Batch 18 input validation, safe document assembly, regression evidence or shared fact consistency."
+    },
+    {
+      "path": "webapp/server/app.ts",
+      "mode": "code",
+      "why": "Batch 18 input validation, safe document assembly, regression evidence or shared fact consistency."
+    },
+    {
+      "path": "webapp/server/document-text.ts",
+      "mode": "new",
+      "why": "Batch 18 input validation, safe document assembly, regression evidence or shared fact consistency."
+    },
+    {
+      "path": "webapp/server/english-input.ts",
+      "mode": "new",
+      "why": "Batch 18 input validation, safe document assembly, regression evidence or shared fact consistency."
+    },
+    {
+      "path": "webapp/server/batch18-check.ts",
+      "mode": "new",
+      "why": "Batch 18 input validation, safe document assembly, regression evidence or shared fact consistency.",
+      "control": true
+    },
+    {
+      "path": "webapp/server/e2e.ts",
+      "mode": "code",
+      "why": "Batch 18 input validation, safe document assembly, regression evidence or shared fact consistency.",
+      "control": true
+    },
+    {
+      "path": "webapp/src/lib/englishText.ts",
+      "mode": "new",
+      "why": "Batch 18 input validation, safe document assembly, regression evidence or shared fact consistency."
+    },
+    {
+      "path": "webapp/src/lib/api.ts",
+      "mode": "code",
+      "why": "Batch 18 input validation, safe document assembly, regression evidence or shared fact consistency."
+    },
+    {
+      "path": "webapp/src/components/ui/input.tsx",
+      "mode": "code",
+      "why": "Batch 18 input validation, safe document assembly, regression evidence or shared fact consistency."
+    },
+    {
+      "path": "webapp/src/components/ui/textarea.tsx",
+      "mode": "code",
+      "why": "Batch 18 input validation, safe document assembly, regression evidence or shared fact consistency."
+    },
+    {
+      "path": "webapp/scripts/behavioral.ts",
+      "mode": "code",
+      "why": "Batch 18 input validation, safe document assembly, regression evidence or shared fact consistency.",
+      "control": true
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement - Member-Managed Multi-Member (Partnership) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Mandatory regeneration from changed masters; preserve formatting."
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement - Member-Managed (S Corporation) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Mandatory regeneration from changed masters; preserve formatting."
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement - Manager-Managed Multi-Member (Partnership) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Mandatory regeneration from changed masters; preserve formatting."
+    },
+    {
+      "path": "docs/word/FPSLLC Statement of Authorized Representative - FORM.docx",
+      "mode": "generated",
+      "why": "Mandatory regeneration from changed masters; preserve formatting."
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement - Manager-Managed (S Corporation) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Mandatory regeneration from changed masters; preserve formatting."
+    },
+    {
+      "path": "docs/word/SMMMDE - FPSLLC Operating Agreement - Manager-Managed Single Member (Disregarded) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Mandatory regeneration from changed masters; preserve formatting."
+    },
+    {
+      "path": "docs/word/SMMMS - FPSLLC Operating Agreement - Manager-Managed Single Member (S Corporation) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Mandatory regeneration from changed masters; preserve formatting."
+    },
+    {
+      "path": "docs/word/SMMEMDE - FPSLLC Operating Agreement - Member-Managed Single Member (Disregarded) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Mandatory regeneration from changed masters; preserve formatting."
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement Instructions - DRAFT.docx",
+      "mode": "generated",
+      "why": "Mandatory regeneration from changed masters; preserve formatting."
+    },
+    {
+      "path": "docs/word/SMMEMS - FPSLLC Operating Agreement - Member-Managed Single Member (S Corporation) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Mandatory regeneration from changed masters; preserve formatting."
+    },
+    {
+      "path": "docs/word/Series LLC Owners Manual - REVISED DRAFT.docx",
+      "mode": "generated",
+      "why": "Mandatory regeneration from changed masters; preserve formatting."
+    },
+    {
+      "path": "docs/word/FPSLLC Amendment to Operating Agreement - FORM.docx",
+      "mode": "generated",
+      "why": "Mandatory regeneration from changed masters; preserve formatting."
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "why": "Mandatory API bundle rebuild."
+    }
+  ],
+  "requiredChecks": [],
+  "removedChecks": []
+}

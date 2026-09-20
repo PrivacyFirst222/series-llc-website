@@ -267,12 +267,14 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: That the portal, like the agent, is a first-year inclusion.
   - True: Only the agent service is a first-year inclusion (Pricing.tsx:11); the portal is the client's for as long as the account exists (terms.md:83).
   - Replace with: label: "Registered agent, with legal mail posted to your portal", us: "First year of agent service included",
-- **42. [B30]** — **open** — housekeeping
+- **42. [B30]** — **implemented** — housekeeping
   - FAQ sidebar 'Authoritative sources' and the What Is sidebar, the Chapter 605 link — `webapp/src/pages/FAQ.tsx:143`
   - Reads: href="https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605ContentsIndex.html&StatuteYear=2025&Title=%2D%3E2025%2D%3EChapter%20605"
   - Claims: Links the reader to the 2025 statutes.
   - True: Online Sunshine now serves 'The 2026 Florida Statutes' (opened 16 Sep 2026); the same 2025 link is at WhatIs.tsx:138. The sections exist in both years, but the link pins last year's text.
   - Replace with: https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605ContentsIndex.html (no StatuteYear, so the current year is served), in both files.
+  - Fixed: batch 18 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
 - **43. [B98]** — **open** — housekeeping
   - Server entry — code only — `webapp/server/app.ts:24`
   - Reads: // The e2e suite imports these from "./app"; they live in the portal module.
@@ -682,12 +684,14 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: The client is never asked: StepManagement.tsx:75 derives `includeManagementStatementInArticles: o.v === "MANAGER_MANAGED"` and validation.ts:357-360 forces it for manager-managed orders, so this row appears only for a member-managed company with a general purpose.
   - Replace with: value: "Leave blank — member-managed with a general purpose; nothing goes in this box",
   - Ruling, 2026-09-19: Batch 08 items 14 and 15: “The articles are entered manually and will contain that language. Do nothing”. Leave the current office filing instructions unchanged.
-- **99. [B147]** — **open** — same defect as 132
+- **99. [B147]** — **implemented** — same defect as 132
   - Order form, Series step and the portal's series purchase — one statute cited two ways — `webapp/server/validation.ts:178`
   - Reads: message: 'Series names must include "PS", "P.S.", or "protected series" (§605.2202).',
   - Claims: The citation form for the statute.
   - True: The consent route in the same portal writes "(s. 605.2202, Fla. Stat.)" (routes-portal.ts:1593, :1599); this file, routes-portal.ts:1977, stepValidation.ts:189 and StepSeries.tsx:72 write "§605.2202". The statute itself (s. 605.2202(2)(b), read whole in the browser) requires the phrase "protected series" or the abbreviation "P.S." or "PS" — the rule is right, the citation form is the A64 defect in one more file.
   - Replace with: message: 'Series names must include "PS", "P.S.", or "protected series" (s. 605.2202, Fla. Stat.).',  — and the same form at routes-portal.ts:1977, stepValidation.ts:189, StepSeries.tsx:72.
+  - Fixed: batch 18 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
 - **100. [A30h]** — **review-rows: implemented; unused-code: open; fact-ledger: open** — housekeeping
   - Housekeeping: review rows printing codes or "—" for a self-agent's email/phone; no "exact name only" row on the Review name card; dead duplicate-member check; dead conversion branch in the formation sheet; member fields typed but never asked; ledger lacks the $99 renewal, 15/30-day rules and the four optional prices.
   - Codex (disputed): The compound item mixes code-only leftovers with visible Review rows and missing exact-name information (ReviewStep.tsx:113–124,157–169,225–228). It cannot all be classified housekeeping-only; the “capacity code” branch is itself unreachable in normal SELF UI.
@@ -961,8 +965,10 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
 - **131. [A63]** — **implemented**
   - Amendment card names "Update/regenerate" under "Operating Agreement"; the button and heading read differently. Replace the button and heading.
   - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **132. [A64]** — **open**
+- **132. [A64]** — **implemented**
   - Two refusals cite "§605.2202" and "s. 605.2202, Fla. Stat.". Replace: the second.
+  - Fixed: batch 18 revision 2, commit , by Codex; protected by 4 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
 - **133. [A65]** — **implemented**
   - S election dialog "mail it" where the package recommends fax. Replace: "fax or mail it".
   - Fixed: batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
@@ -1138,12 +1144,14 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - **Codex rejected the proposed replacement:** Retain the first-tax-year distinction, clarify that the65-day ordering window is the service’s separate cutoff, and use the actual legally applicable election date for the IRS deadline. https://www.irs.gov/instructions/i2553 .
   - Outcome: Codex's dispute not adopted: Same as 63. 'The start of the company's first tax year' is the IRS's own phrase; A22 chose one wording for every place. Waits on Adam's decision on 63.
   - Fixed: batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **154. [B87]** — **open** — same defect as 237
+- **154. [B87]** — **implemented** — same defect as 237
   - Client portal, Order services, the Federal EIN dialog, third paragraph — `webapp/src/pages/portal/ServicesCard.tsx:182`
   - Reads: Questions about the technicalities? Check the User's Manual and ask your attorney or accountant.
   - Claims: The deliverable is a 'User's Manual'.
   - True: docs/facts.md, 'The deliverables': 'the Series LLC Owner's Manual'; the portal's own Reference library card calls it 'The Series LLC Owner's Manual' (PortalDashboard.tsx:272); the office publishes it under that title (LibrarySection.tsx:48, :116). A88 corrects the same word in the Instructions.
   - Replace with: Questions about the technicalities? Check the Owner's Manual and ask your attorney or accountant.
+  - Fixed: batch 18 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
 - **155. [B129]** — **implemented**
   - Client portal, the operating agreement, consent and S election for a converted company — the company name the seed prefers — `webapp/server/routes-portal.ts:162`
   - Reads: llcName: p.llcName?.finalName || orders[0].llc_name,
@@ -1689,12 +1697,14 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: …WHERE client_id = $1 AND (formation_order_id = $2 OR formation_order_id IS NULL) AND type IN ('ein', 's-election') AND status IN ('awaiting_info', 'in_progress') with o.id as $2.
   - **Codex rejected the proposed replacement:** Require the matching formation_order_id. Resolve legacy NULL associations to a specific order before inclusion; OR formation_order_id IS NULL otherwise repeats the ambiguity for every company.
   - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **210. [B113]** — **open**
+- **210. [B113]** — **implemented**
   - Certificate titles as the client sees them in the portal ('Certificate of Status - Sep 16, 2026 — Acme, LLC') — `webapp/server/routes-admin.ts:250`
   - Reads: return `${kindTitle} - ${day} — ${llcName}`;
   - Claims: A title in the house style.
   - True: One title mixes a hyphen and an em dash; every other document title uses ' — ' alone (:558 Articles, :827 designations, :1336-1343 service deliverables).
   - Replace with: return `${kindTitle} (${day}) — ${llcName}`;
+  - Fixed: batch 18 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
 - **211. [B114]** — **implemented** — same defect as 178 (ein-hint-2553)
   - Office fulfil dialog refusal when the EIN box is empty, for an EIN bought for a series — `webapp/server/routes-admin.ts:1308`
   - Reads: Enter the 9-digit EIN from the letter — it goes on the client's Form 2553.
@@ -1883,13 +1893,17 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (disputed): The actual exhibit says “completed by the Member(s), together with the records maintained under Article 8” (multi:472). Initial completion by Members and continuing maintenance by the Manager are compatible tasks; Article 8 does not forbid Members completing the attachment.
   - **Codex rejected the proposed replacement:** Replacing completion by Members with maintenance under Article 8 removes an express task allocation; it is not a necessary correction.
   - Outcome: Completion by the Members and maintenance under Article 8 are compatible tasks.
-- **235. [A86]** — **open**
+- **235. [A86]** — **implemented**
   - Colophons omit s. 711.50; two single-owner S forms list Code sections, six do not. Replace: list 711.50; Code sections in all or none.
   - **Codex rejected the proposed replacement:** Adding 711.50 is correct. “All or none” is not a complete replacement; choose one convention and enumerate the Code sections actually cited in each form.
+  - Fixed: batch 18 revision 2, commit , by Codex; protected by 8 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
 - **236. [A87]** — **open**
   - Four multi-member forms say "single class" twice (2.13 and 4.1). Replace: keep 4.1.
-- **237. [A88]** — **open**
+- **237. [A88]** — **implemented**
   - Instructions s. 1 "Series LLC User's Manual". Replace: "Owner's Manual".
+  - Fixed: batch 18 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
 - **238. [A89]** — **implemented**
   - Instructions s. 3: Administrative Member "no authority to decide anything"; 5.8 lets a Majority in Interest confer authority. Replace as proposed.
   - **Codex rejected the proposed replacement:** “Replace as proposed” supplies no replacement. Use: “The Administrative Member handles ministerial tasks and has any additional authority this Agreement or a Majority in Interest confers.”
@@ -1906,9 +1920,11 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Ruling, 2026-09-20: Batch 15 approved: distinguish the statutory default from the agreement rule. Florida permits a different approval rule; Section 3.1 of these agreements retains unanimous consent to establish a protected series. Correct the Manual and matching portal explanation.
   - Fixed: batch 15 revision 2, commit , by Codex; protected by 3 assertion(s).
   - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
-- **241. [A92]** — **open**
+- **241. [A92]** — **implemented**
   - Manual s. 24: "your operating agreement … require[s] current contact information". Replace as proposed.
   - **Codex rejected the proposed replacement:** “Replace as proposed” is incomplete. Say “Keep your contact information current so notices reach you.” Do not invent an operating-agreement covenant.
+  - Fixed: batch 18 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
 - **242. [A93]** — **open**
   - Manual s. 28 Example 1 "($75 total)" for three series. Replace: "($25 state fee each)" or "$150 through us".
   - **Codex rejected the proposed replacement:** “($25 state fee each)” is correct. “$150 through us” is wrong for the first three included in a formation package; clarify whether the example describes initial or later designations.
@@ -1925,14 +1941,18 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - **Codex rejected the proposed replacement:** Fix location and plural agreement. Also remove the separate absolute promise that no asset can ever be non-associated (new finding in this report); grammatical correction alone leaves that error.
   - Fixed: batch 17 revision 2, commit , by Codex; protected by 3 assertion(s).
   - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
-- **246. [A97]** — **open**
+- **246. [A97]** — **implemented**
   - Manual colophon omits twelve cited sections. Replace: rebuild; add the Manual to the ledger's colophon check.
   - Codex (disputed): The actual Manual colophon at :536 includes the entire “605.2101–605.2802” range. Thus 605.2107, 605.2302, 605.2304 and 605.2402 are already included, contrary to four of the alleged twelve omissions. The missing individually named provisions are 605.0302, 605.04074, 605.0410, 605.0602, 605.0714, 605.1103, former212.031 and220.02.
   - **Codex rejected the proposed replacement:** Reconcile eight omitted individual citations, distinguish the repealed historical citation, and define whether ranges satisfy the colophon convention; do not report twelve absent sections.
   - Corrected after Codex's review: The colophon's range 605.2101-605.2802 already covers four of the twelve. Eight are missing: 605.0302, 605.04074, 605.0410, 605.0602, 605.0714, 605.1103, former 212.031, 220.02.
-- **247. [A98]** — **open**
+  - Fixed: batch 18 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
+- **247. [A98]** — **implemented**
   - Manual s. 5 "s. 6.1 of your agreement" (statute abbreviation); README "five" masters; two double blank lines. Replace: "§6.1"; "eight"; single blanks.
   - **Codex rejected the proposed replacement:** The citation and eight corrections are sound. Track whitespace separately as housekeeping; the item mixes reader-visible wording with source-only whitespace.
+  - Fixed: batch 18 revision 2, commit , by Codex; protected by 3 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
 - **248. [B148]** — **implemented** — same defect as 12
   - Owner's Manual, cover page (title-page block) — `docs/owners-manual.md:15`
   - Reads: 10|Written for the Florida Uniform Protected Series Act
@@ -1985,12 +2005,14 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: A new series costs $25.
   - True: docs/facts.md:19: 'Price of an additional series — value: $50 — $25 to prepare and the $25 state filing fee'; the Manual's own lines 403, 521 and 523 say '$50 through us'. $25 is the state fee alone (the same slip A93 flagged at line 425).
   - Replace with: **Use it for:** multiple rental properties; a portfolio you are growing (add a series per property — $50 through us, $25 of it the state fee — instead of a $125+ LLC per property); separating a risky operating business from valuable equipment; or separating brands or projects.
-- **255. [B155]** — **open**
+- **255. [B155]** — **implemented**
   - Owner's Manual, ss. 9, 14, 24 and 27 — statute citations written '§605.…' where the rest of the manual writes 's. 605.…' — `docs/owners-manual.md:160`
   - Reads: Get the name right and the record makes itself; get it wrong and you are proving association the hard way, out of ledgers, with the burden on you (§605.2404(4)).
   - Claims: Nothing wrong in substance; the section symbol is the Manual's mark for agreement sections ('§5.4', '§8.4', '§10.6') and here is used for a statute.
   - True: Two styles for one kind of citation: 's. 605.2404(4)' at line 66 but '§605.2404(4)' at 160, '§605.2301(5)' at 165, '§605.2404' at 235, 389 and 413; every other statute cite in the manual uses 's.' / 'ss.'. A98 flagged the converse ('s. 6.1 of your agreement').
   - Replace with: Get the name right and the record makes itself; get it wrong and you are proving association the hard way, out of ledgers, with the burden on you (s. 605.2404(4)). — and the same change at lines 165, 235, 389 and 413.
+  - Fixed: batch 18 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
 - **256. [B156]** — **implemented**
   - Owner's Manual, s. 7 map table, Article 8 row — `docs/owners-manual.md:130`
   - Reads: | **Article 8** | The recordkeeping covenants (this manual's Section 14 is its field guide) and the standing association rules that close the Article — and the titling rule (§8.4): every asset is held in the name of the silo that owns it, never your personal name |
@@ -2013,12 +2035,14 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (disputed): The actual sentence, “The protected series is established when its Protected Series Designation takes effect under s. 605.0207, Florida Statutes,” tracks 2026 §605.2201(3) verbatim in substance. It says the designation takes effect under0207, not that0207 is the series-establishment section. The finding admits the sentence is true.
   - Outcome: True as written; adding s. 605.2201(3) is a supplemental citation.
   - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **258. [B158]** — **open** — related: 118
+- **258. [B158]** — **implemented** — related: 118
   - Series consent and Series Exhibit — the Asset Schedule heading, compared with the agreement's — `webapp/server/new-series.ts:107`
   - Reads: s = s.split("PS-[N]").join(`PS-${input.seriesNumber}`);
   - Claims: The consent's asset schedule is headed 'ASSET SCHEDULE — ATTACHMENT TO SERIES EXHIBIT PS-4'.
   - True: The agreement's asset schedule is headed with the series' filed name as well: oa.ts:673-676 renders `## ASSET SCHEDULE — ATTACHMENT TO SERIES EXHIBIT PS-${n} (${ser.name})`. A client detaching the two schedules for a bank gets one that names the series and one that does not.
   - Replace with: In templates-new-series.md:55 head the schedule '## ASSET SCHEDULE — ATTACHMENT TO SERIES EXHIBIT PS-[N] ([SERIES NAME])' so the same fill produces the agreement's heading.
+  - Fixed: batch 18 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
 - **259. [B167]** — **implemented** — same defect as 120 (title)
   - Series consent — the document's title in the portal (the file behind A52) — `webapp/server/new-series.ts:134`
   - Reads: return { markdown: s, title: `New Protected Series — ${input.seriesName}` };
@@ -2035,7 +2059,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (housekeeping-only): new-series.ts:112–113 inaccurately says its dash matches the agreement; computeCapital:124 supplies None to the agreement. The identified comment itself is invisible to clients.
   - **Codex rejected the proposed replacement:** Changing the comment alone is housekeeping. The proposed code change also changes the delivered contribution cell and belongs to the already-reported A48 defect; do not count it as a new housekeeping-only client change.
   - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **261. [B160]** — **open** — housekeeping
+- **261. [B160]** — **implemented** — housekeeping
   - docs/README.md — 'Masters → Word output' inventory table — `docs/README.md:25`
   - Reads: | Master (edit this) | Word output, in `docs/word/` and Dropbox |
   - Claims: The table is the inventory of every client-facing deliverable and its source path (CLAUDE.md: 'A deliverable with no entry there is a defect to report').
@@ -2043,6 +2067,8 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: Add a row: | `webapp/server/templates-new-series.md` | FPSLLC Written Consent Establishing a New Protected Series - FORM.docx | — and generate that Word output, or record in the README that the consent is portal-only with no Word twin and why.
   - Codex (housekeeping-only): README:25–39 omits the consent master, although templates-new-series.md and its generator exist. This concerns source documentation, not changed client wording. The statement that it is the twelfth master is inaccurate: the table already lists12 deliverables, so consent would be13.
   - **Codex rejected the proposed replacement:** Add the consent to the source inventory; explicitly decide/document its Word-output status. The report cannot require an unverified Word deliverable to be generated during this read-only audit.
+  - Fixed: batch 18 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
 - **262. [B161]** — **open** — housekeeping
   - Operating agreement assembler — the Amended & Restated recital and title — `webapp/server/oa.ts:534`
   - Reads: `D. This Agreement amends, restates, and supersedes in its entirety ${supersede}, which shall be of no further force or effect from the Effective Date.\n\nNOW, THEREFORE,`,
@@ -2052,7 +2078,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (disputed): oa.ts:534 does compose the restatement recital, contrary to its local source-text rule, but the proposed “ten masters” is wrong: there are eight operating-agreement masters. Moreover single-s:20 and member-single-s:20 already have RecitalD; inserting anotherD as proposed creates duplicate lettering.
   - **Codex rejected the proposed replacement:** Move the variant-specific recital to all eight OA masters and useE in the two single-member S forms, D in the other six. Moving otherwise identical text is housekeeping; duplicateD in delivered restatements is separately reported as new.
   - Corrected after Codex's review: There are eight agreement masters, not ten, and the two single-owner S forms already have a Recital D (N2.06). Use markers in all eight, lettered E in those two.
-- **263. [B162]** — **open** — housekeeping
+- **263. [B162]** — **implemented** — housekeeping
   - Operating agreement assembler — final checks — `webapp/server/oa.ts:740`
   - Reads: if (/Form document —|v1 draft/.test(s)) {
   - Claims: The finished agreement is checked before it leaves the assembler.
@@ -2061,6 +2087,8 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (disputed): oa.ts:740 checks only draft-footer leakage, so the hardening observation is true. But the proposed final regex also matches legitimate client text such as “[ACME]” and “[TITLE]” inserted into names or asset descriptions; applied after substitution it would reject valid input. statement.ts:65 checks slots but :45 removes comments, rather than refusing every leftover comment as claimed.
   - **Codex rejected the proposed replacement:** Validate template placeholders and markers before inserting client text, or track known template slots explicitly. Do not use an unrestricted uppercase-bracket scan on the completed document.
   - Corrected after Codex's review: An unrestricted bracket scan after substitution would refuse client text such as '[ACME]'. Check the template's slots before client text goes in.
+  - Fixed: batch 18 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
 - **264. [B163]** — **dropped** — housekeeping
   - S corporation election package — instruction sheet, cover letter and continuation sheet — `webapp/server/s-election.ts:181`
   - Reads: function instructionsMarkdown(d: SElectionDetails, deadlineIso: string): string {
@@ -2086,13 +2114,15 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: Two wordings for one fact in one PDF (lines 122 and 220 read the same field).
   - Replace with: Use 'Federal EIN service' in both places.
   - Fixed: batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **267. [B166]** — **open** — housekeeping
+- **267. [B166]** — **implemented** — housekeeping
   - Manager-managed single-member S corporation agreement, between s. 7.2 and Article 8 — `webapp/server/templates-oa-single-s.md:192`
   - Reads: (line 191 blank, line 192 blank — two consecutive blank lines between s. 7.2's last sentence 'Each distribution shall be recorded in the records maintained under Article 8, identifying its source.' on line 190 and the '---' rule before Article 8 on line 193)
   - Claims: Two consecutive blank lines (191-192) where every other master has one.
   - True: templates-oa-single.md:185-186 and the other six forms carry a single blank line before the '---' rule; this file alone has two.
   - Replace with: Delete line 192.
   - Codex (housekeeping-only): single-s:191–192 contains the two source blank lines. oa.ts:738 collapses three or more newlines, and pdf-render.ts:63–65 ignores blank lines, so deleting one changes no delivered reader text.
+  - Fixed: batch 18 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
 - **N2.01. [wording]** — **open**
   - Every operating agreement, Formation (§1.2) and definition of Act (§2.1) — webapp/server/templates-oa-multi.md:28 — `webapp/server/templates-oa-multi.md:28`
   - Reads: **1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes (the "Act"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101–605.2802 (the "Protected Series Provisions"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.
@@ -2233,7 +2263,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: Rev.Proc.2022-19 §§2.03(3),3.03(4) distinguishes inadvertent administrative omissions from missing shareholder consent, officer signature and permitted tax year; the blanket invalidity assertion is broader. The service can still properly prohibit filing this intentionally incomplete record copy. https://www.irs.gov/irb/2022-41_IRB
   - Replace with: **This record copy is incomplete and is not suitable for filing.** Do not sign or mail it. It records the election package prepared for ${d.llcName}; obtain a complete filing copy if you still need to file.
   - Ruling, 2026-09-20: Batch 13 item 11 rejected: leave the Form 2553 incomplete-SSN warning as is.
-- **N2.19. [substantive]** — **open**
+- **N2.19. [substantive]** — **implemented**
   - Office Order Summary, the questionnaire, manager and member addresses — webapp/server/order-summary.ts:191 — `webapp/server/order-summary.ts:191`
   - Reads:       out.push(line(`Manager ${i + 1}`, `${name}; ${addr({ address1: mm.streetAddress1 ?? mm.address1, city: mm.city, state: mm.state, zip: mm.zip })}`));
   - Claims: The summary preserves each address as typed.
@@ -2241,13 +2271,17 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: out.push(line(`Manager ${i + 1}`, `${name}; ${addr({ address1: mm.streetAddress1 ?? mm.address1, address2: mm.streetAddress2 ?? mm.address2, city: mm.city, state: mm.state, zip: mm.zip })}`));
   - 
   - out.push(line(`Member ${i + 1}`, `${name}; ${addr({ address1: mm.address1, address2: mm.address2, city: mm.city, state: mm.state, zip: mm.zip })}${pct}`));
-- **N2.20. [substantive]** — **open**
+  - Fixed: batch 18 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
+- **N2.20. [substantive]** — **implemented**
   - Generated agreements, amendments, consents and office summaries, non-Latin names and text — webapp/server/pdf-render.ts:39 — `webapp/server/pdf-render.ts:39`
   - Reads:     .replace(/[^\x20-\x7E\xA0-\xFF–—•]/g, "?");
   - Claims: The original names and legal text are preserved in the PDF.
   - True: The sanitizer replaces every character outside its WinAnsi subset with ?. A valid input name such as 王明 becomes??; input schemas accept Unicode. manual-pdf.ts:44 uses the same lossy fallback. This changes legal names, not merely font appearance. The immediate replacement refuses a corrupt PDF; full Unicode font support is the better final rendering capability.
   - Replace with: .replace(/[^\x20-\x7E\xA0-\xFF–—•]/g, () => { throw new Error("This document contains characters the current PDF font cannot display. The document was not generated; contact us so the names and text can be preserved correctly."); });
-- **N2.21. [substantive]** — **open**
+  - Fixed: batch 18 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
+- **N2.21. [substantive]** — **implemented**
   - Operating agreement, Exhibit A contribution and owner tables — webapp/server/oa.ts:577 — `webapp/server/oa.ts:577`
   - Reads:     const rows = inputs.members.map((m) => ({
   -       "[MEMBER NAME]": m.name,
@@ -2268,6 +2302,8 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: Client-entered data is a table-cell value, not document markup.
   - True: Owner names, addresses and asset descriptions are inserted raw at578–581 and616–619. pdf-render.ts:78 splits every vertical bar into a new column. Thus an asset description containing | changes the number and positions of cells; new-series.ts only sanitizes special terms, not its contribution. A newline similarly ends a table row. Escaping pipes alone is insufficient: the renderer must decode escaped or encoded delimiters and split only structural pipes.
   - Replace with: Encode client table-cell text before inserting it into Markdown, and decode it only after the renderer has identified the structural cells. Preserve vertical bars and line breaks inside their original cell. Apply the same encoding and decoding to the series-consent contribution cell.
+  - Fixed: batch 18 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
 - **N2.22. [substantive]** — **open** — waits on Adam's ruling
   - Professional LLC operating agreement, Transfer on Death (§4.6), family transfers/admission and purpose — webapp/server/templates-oa-single.md:134 — `webapp/server/templates-oa-single.md:134`
   - Reads: **4.6 Transfer on Death Designation.** The Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50–711.512, Florida Statutes, and reflects the Member's designation, if any, of the person or persons who will become the owner of the Membership Interest upon the Member's death. The Member, if an individual, may designate any person or entity as a beneficiary. A designation may name a backup beneficiary to take if the first beneficiary does not survive the Member. The Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, delivered to the Manager; the change is effective upon receipt unless the Manager objects in writing within seven (7) days, and the Manager shall thereafter update Exhibit A (though updating is not required for effectiveness). A beneficiary who becomes the owner of the Membership Interest under this Section succeeds to the Membership Interest subject to this Agreement and is admitted as the Member upon delivery to the Company of a written agreement to be bound by this Agreement.

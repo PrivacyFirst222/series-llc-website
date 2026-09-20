@@ -52,7 +52,7 @@
 
 [[pagebreak]]
 
-## ASSET SCHEDULE — ATTACHMENT TO SERIES EXHIBIT PS-[N]
+## ASSET SCHEDULE — ATTACHMENT TO SERIES EXHIBIT PS-[N] ([SERIES NAME])
 
 *Complete this schedule for each asset of this Protected Series. Describe each asset so that a stranger could identify it without asking you anything: real property — street address AND legal description, date acquired, and grantor; deposit account — institution, account title, last four digits, and date opened; vehicle — year, make, model, and VIN; equipment — description and serial number; contract — parties and date. For any asset acquired from the Company or from another Protected Series, also state the consideration paid, the payor, and the payee. Add pages as needed; keep this schedule current as assets are acquired and disposed of.*
 

@@ -18,7 +18,7 @@ In practice:
 **Do not move assets between series.** Treat each series as though it were a separate limited liability company — its own account, its own assets, its own contracts, its own records.
 **Keep the mothership (the company itself) asset-light.** Under §8.5(b) of your agreement, any asset you fail to associate with a series defaults to the company, where it is exposed to the company's creditors. Owning assets at the series level, with clean records, is the whole point of the structure.
 **Review your records once a year.** Neither the statute nor your agreement requires it; do it anyway — it is the cheapest way to find a gap while it can still be fixed.
-The free MyFloridaSeriesLLC recordkeeping app and the Series LLC User's Manual included with your formation package are built around these requirements.
+The free MyFloridaSeriesLLC recordkeeping app and the Series LLC Owner's Manual included with your formation package are built around these requirements.
 ## 2. Which Agreement to Use
 
 | **Your situation** | **Use this form** |

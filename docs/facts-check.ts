@@ -91,10 +91,32 @@ for (const n of masters) {
   const m = t.match(/^\*Form document — .*?Statutory citations in this form: ss\. (.*?), Fla\. Stat\./m);
   if (!m || m.index === undefined) { problems.push(`${n}: no colophon in the ledger's form`); continue; }
   const body = t.slice(0, m.index);
-  const cite = (s: string) => new Set([...s.matchAll(/\b605\.\d{4,5}\b/g), ...s.matchAll(/\b711\.\d{3}\b/g), ...s.matchAll(/\b48\.\d{3}\b/g)].map((x) => x[0]));
+  const cite = (s: string) => new Set([...s.matchAll(/\b605\.\d{4,5}\b/g), ...s.matchAll(/\b711\.\d{2,3}\b/g), ...s.matchAll(/\b48\.\d{3}\b/g)].map((x) => x[0]));
   const inBody = cite(body); const inColophon = cite(m[1]);
   for (const c of inBody) if (!inColophon.has(c)) problems.push(`${n}: body cites s. ${c}, colophon does not list it`);
   for (const c of inColophon) if (!inBody.has(c)) problems.push(`${n}: colophon lists s. ${c}, body never cites it`);
+  const federal = new Set([...body.matchAll(/\bsections? (\d{3,4})(?:\([^)]+\))?(?: and (\d{3,4}))? of (?:the )?(?:Internal Revenue Code|Code)/g)].flatMap(x => [x[1], x[2]].filter(Boolean)));
+  const list = t.slice(m.index).match(/Internal Revenue Code sections: ([\d, ]+)\./)?.[1] ?? "";
+  const listed = new Set(list.match(/\d+/g) ?? []);
+  for (const c of federal) if (!listed.has(c)) problems.push(`${n}: body cites Internal Revenue Code ${c}, colophon does not`);
+  for (const c of listed) if (!federal.has(c)) problems.push(`${n}: colophon lists Internal Revenue Code ${c}, body does not`);
+
+}
+
+// The Manual has a wider source list, including historical law. Check coverage
+// of every numbered Florida authority, respecting its explicit statutory ranges.
+{
+  const manual = rd("docs/owners-manual.md");
+  const at = manual.indexOf("*© 2026");
+  if (at < 0) problems.push("owners-manual.md: missing source list");
+  else {
+    const body = manual.slice(0, at), sources = manual.slice(at);
+    const citations = [...body.matchAll(/\b(?:48|605|711|212|220)\.\d+\b/g)].map(x => x[0]);
+    const listed = new Set(sources.match(/\b(?:48|605|711|212|220)\.\d+\b/g) ?? []);
+    const ranges = [...sources.matchAll(/\b(\d+\.\d+)–(\d+\.\d+)\b/g)].map(x => [Number(x[1]), Number(x[2])]);
+    for (const c of new Set(citations)) if (!listed.has(c) && !ranges.some(([a,b]) => Number(c) >= a && Number(c) <= b)) problems.push(`owners-manual.md: body cites s. ${c}, source list does not cover it`);
+    if (sources.includes("212.031") && !sources.includes("former s. 212.031")) problems.push("owners-manual.md: repealed commercial-rent source must be identified as historical");
+  }
 }
 
 // Portal limits for signed-in actions are charged after the route's first check.

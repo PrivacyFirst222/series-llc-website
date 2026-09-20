@@ -1,0 +1,23 @@
+[
+  {
+    "file": "webapp/server/templates-oa-s.md",
+    "removed": "1377, ",
+    "expected": "body cites Internal Revenue Code 1377",
+    "refused": true,
+    "detail": "facts-check: 1 problem(s)\n  templates-oa-s.md: body cites Internal Revenue Code 1377, colophon does not"
+  },
+  {
+    "file": "webapp/server/templates-oa-single.md",
+    "removed": "711.50, ",
+    "expected": "body cites s. 711.50",
+    "refused": true,
+    "detail": "facts-check: 1 problem(s)\n  templates-oa-single.md: body cites s. 711.50, colophon does not list it"
+  },
+  {
+    "file": "docs/owners-manual.md",
+    "removed": "220.02, ",
+    "expected": "body cites s. 220.02",
+    "refused": true,
+    "detail": "facts-check: 1 problem(s)\n  owners-manual.md: body cites s. 220.02, source list does not cover it"
+  }
+]

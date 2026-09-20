@@ -1,3 +1,4 @@
+import { batch18Checks } from "./batch18-check";
 import {batch05Checks} from "./batch05-check";
 import {batch04Checks} from "./batch04-check";
 import {batch03Checks} from "./batch03-check";
@@ -1370,7 +1371,7 @@ if (mint.status === 200) {
     const certDoc = (afterDocs.body?.data as { title: string; kind: string }[] | undefined)?.find((doc) => doc.title.startsWith("Certificate of Status"));
     check("the certificate lands in the client's portal documents", !!certDoc, afterDocs.body?.data?.length);
     check("a portal-bought certificate is stored under its own kind, so it sorts with the Articles (14 Sep 2026)", certDoc?.kind === "certificate-of-status", certDoc);
-    check("the portal copy is titled by its day (Adam, 15 Sep 2026)", !!certDoc && /^Certificate of Status - [A-Z][a-z]{2} \d{1,2}, \d{4} — /.test(certDoc.title), certDoc?.title);
+    check("the portal copy is titled by its day (Adam, 15 Sep 2026)", !!certDoc && /^Certificate of Status \([A-Z][a-z]{2} \d{1,2}, \d{4}\) — /.test(certDoc.title), certDoc?.title);
     {
       // The formation order lists the copy but does not count it as an
       // intake certificate: a portal purchase is its own obligation.
@@ -3686,7 +3687,7 @@ if (mint.status === 200) {
       check("a second certificate upload adds a copy (Adam, 15 Sep 2026)", againRes.status === 200);
       const afterAgain = (await api(`/api/admin/orders/${certOrderId}`, { cookies: adm.cookie })).body?.data as { documents?: { id: string; kind: string; title: string; createdAt: string }[]; hasCertStatus?: boolean };
       const copies = (afterAgain?.documents ?? []).filter((d) => d.kind === "certificate-of-status");
-      check("two certificate of status copies are on file, each titled by its day", copies.length === 2 && copies.every((d) => /^Certificate of Status - [A-Z][a-z]{2} \d{1,2}, \d{4} — E2E Coastal Holdings, LLC$/.test(d.title)), copies.map((d) => d.title));
+      check("two certificate of status copies are on file, each titled by its day", copies.length === 2 && copies.every((d) => /^Certificate of Status \([A-Z][a-z]{2} \d{1,2}, \d{4}\) — E2E Coastal Holdings, LLC$/.test(d.title)), copies.map((d) => d.title));
       check("the copies are listed newest first", copies.length === 2 && copies[0].createdAt >= copies[1].createdAt, copies.map((d) => d.createdAt));
       // Delete the older copy: one remains and the certificate is still
       // delivered; delete the last: owed again. The Articles cannot be
@@ -3990,6 +3991,13 @@ await batch05Checks((label,ok,detail)=>batch05Results.set(label,{ok,detail}));
 {const r=batch05Results.get("batch05 219: default manual exists before welcome and portal use");check("batch05 219: default manual exists before welcome and portal use",r?.ok===true,r?.detail);batch05Results.delete("batch05 219: default manual exists before welcome and portal use");}
 {const r=batch05Results.get("batch05 N1.15: S package replacement failures preserve the retained copy");check("batch05 N1.15: S package replacement failures preserve the retained copy",r?.ok===true,r?.detail);batch05Results.delete("batch05 N1.15: S package replacement failures preserve the retained copy");}
 for(const [label,r]of batch05Results)check(label,r.ok,r.detail);
+
+const batch18Results = new Map<string, {ok:boolean;detail?:unknown}>();
+await batch18Checks((label,ok,detail)=>batch18Results.set(label,{ok,detail}),BASE);
+{const r=batch18Results.get("batch18 263: unresolved template fields fail without mistaking client text");check("batch18 263: unresolved template fields fail without mistaking client text",r?.ok===true,r?.detail);}
+{const r=batch18Results.get("batch18 N2.19: manager and member suites survive the office summary");check("batch18 N2.19: manager and member suites survive the office summary",r?.ok===true,r?.detail);}
+{const r=batch18Results.get("batch18 N2.20: English input is enforced before business writes");check("batch18 N2.20: English input is enforced before business writes",r?.ok===true,r?.detail);}
+{const r=batch18Results.get("batch18 N2.21: client pipes and line breaks remain inside their document cells");check("batch18 N2.21: client pipes and line breaks remain inside their document cells",r?.ok===true,r?.detail);}
 
 console.log(failures === 0 ? "\nALL PASS" : `\n${failures} FAILURES`);
 process.exit(failures === 0 ? 0 : 1);

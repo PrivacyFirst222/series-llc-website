@@ -1,3 +1,4 @@
+import { decodeDocumentText } from "./document-text";
 /**
  * Renders the markdown subset used by the OA templates (headings, **bold**,
  * *italic*, tables, paragraphs) into a paginated, watermarked PDF, and stamps
@@ -31,20 +32,23 @@ export interface Seg {
 /** WinAnsi-safe text: swap characters the standard fonts cannot encode. */
 function sanitize(s: string): string {
   return s
+    .replace(/\t/g, "    ")
     .replace(/[‘’]/g, "'")
     .replace(/[“”]/g, '"')
     .replace(/→/g, "->")
     .replace(/✓|✔/g, "*")
     .replace(/☐/g, "[ ]")
-    .replace(/[^\x20-\x7E\xA0-\xFF–—•]/g, "?");
+    .replace(/…/g, "...")
+    .replace(/[^\x20-\x7E\xA0-\xFF–—•€™]/g, (c) => { throw new Error(`Unsupported PDF character: ${JSON.stringify(c)}`); });
 }
 
-function parseInline(line: string): Seg[] {
+function parseInline(line: string, encodedClientText = false): Seg[] {
+  const plain = (s: string) => sanitize(encodedClientText ? decodeDocumentText(s) : s);
   const parts = line.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/).filter(Boolean);
   return parts.map((p) => {
-    if (p.startsWith("**") && p.endsWith("**")) return { text: sanitize(p.slice(2, -2)), bold: true, italic: false };
-    if (p.startsWith("*") && p.endsWith("*") && p.length > 2) return { text: sanitize(p.slice(1, -1)), bold: false, italic: true };
-    return { text: sanitize(p), bold: false, italic: false };
+    if (p.startsWith("**") && p.endsWith("**")) return { text: plain(p.slice(2, -2)), bold: true, italic: false };
+    if (p.startsWith("*") && p.endsWith("*") && p.length > 2) return { text: plain(p.slice(1, -1)), bold: false, italic: true };
+    return { text: plain(p), bold: false, italic: false };
   });
 }
 
@@ -54,7 +58,8 @@ type Block =
   | { kind: "table"; rows: string[][] }
   | { kind: "pagebreak" };
 
-export function parseMarkdown(md: string): Block[] {
+export function parseMarkdown(md: string, encodedClientText = false): Block[] {
+  const linesOf = (s: string) => encodedClientText ? s.split(/&#13;&#10;|&#10;|&#13;/) : [s];
   const lines = md.split("\n");
   const blocks: Block[] = [];
   let i = 0;
@@ -81,11 +86,11 @@ export function parseMarkdown(md: string): Block[] {
     }
     const m = line.match(/^(#{1,3})\s+(.*)$/);
     if (m) {
-      blocks.push({ kind: "heading", level: m[1].length, text: sanitize(m[2].replace(/\*\*/g, "")) });
+      blocks.push({ kind: "heading", level: m[1].length, text: sanitize(encodedClientText ? decodeDocumentText(linesOf(m[2].replace(/\*\*/g, "")).join(" ")) : m[2].replace(/\*\*/g, "")) });
       i++;
       continue;
     }
-    blocks.push({ kind: "para", segs: parseInline(line.trim()) });
+    for (const part of linesOf(line.trim())) blocks.push({ kind: "para", segs: parseInline(part, encodedClientText) });
     i++;
   }
   return blocks;
@@ -169,6 +174,8 @@ export function wrapSegs(f: Fonts, segs: Seg[], width: number, size: number): Se
 
 export async function renderMarkdownPdf(opts: {
   markdown: string;
+  /** Only assemblers that protect every client value may enable decoding. */
+  encodedClientText?: boolean;
   /** null renders a plain document — page numbers only, no license footer, no encryption
    *  (used for filing packages the client mails out, not licensed deliverables). */
   watermark: WatermarkInfo | null;
@@ -176,7 +183,7 @@ export async function renderMarkdownPdf(opts: {
   /** Business letters set flush left throughout — no centered title block. */
   centerTitleBlock?: boolean;
 }): Promise<Uint8Array> {
-  const blocks = parseMarkdown(opts.markdown);
+  const blocks = parseMarkdown(opts.markdown, opts.encodedClientText === true);
   const doc = await PDFDocument.create();
   const fonts: Fonts = {
     regular: await doc.embedFont(StandardFonts.TimesRoman),
@@ -452,7 +459,7 @@ export async function renderMarkdownPdf(opts: {
         const row = block.rows[ri];
         const fillable = isAssetSchedule && ri > 0 && row.every((c) => c.trim() === "");
         const cellLines = row.map((cell) =>
-          wrapSegs(fonts, parseInline(cell).map((s) => (ri === 0 ? { ...s, bold: true } : s)), colW - 2 * pad, size),
+          (opts.encodedClientText ? cell.split(/&#13;&#10;|&#10;|&#13;/) : [cell]).flatMap((line) => wrapSegs(fonts, parseInline(line, opts.encodedClientText).map((s) => (ri === 0 ? { ...s, bold: true } : s)), colW - 2 * pad, size)),
         );
         const rowH = (fillable ? FILL_LINES : Math.max(1, ...cellLines.map((c) => c.length))) * lineH + 2 * pad;
         need(rowH);

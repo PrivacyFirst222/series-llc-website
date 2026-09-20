@@ -181,7 +181,7 @@ export function ServicesCard({ company }: { company?: string | null }) {
     "Every series is wholly owned by your LLC, so the IRS disregards it — a series never files its own income tax return, with or without an EIN. The only income tax return in the structure is the LLC's own. A series needs its own EIN only in limited circumstances — most commonly because its bank requires one for an account in the series' name, or because the series will have employees.";
   const einSeparateBold = "A separate EIN does not create a separate tax return.";
   const einSeparateRest =
-    "Questions about the technicalities? Check the User's Manual and ask your attorney or accountant.";
+    "Questions about the technicalities? Check the Owner's Manual and ask your attorney or accountant.";
   const einPriceRest =
     "After payment, you'll provide the responsible party's details through a secure form here in the portal — never by email.";
   // Adam, 7 Sep 2026: the calendar-year warning applies to the EIN as it does

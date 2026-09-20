@@ -1,3 +1,4 @@
+import { Input } from "@/components/ui/input";
 import { Plus, Trash2, Layers, Info, DollarSign, Network } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AcknowledgeBox, FieldShell } from "../FieldShell";
@@ -69,7 +70,7 @@ export function StepSeries({ data, patch, errors }: StepProps) {
             Florida requires every protected series name to <strong>begin with your
             LLC&rsquo;s name</strong> and to <strong>contain the phrase &ldquo;protected
             series&rdquo; or the abbreviation &ldquo;P.S.&rdquo; or &ldquo;PS&rdquo;</strong>{" "}
-            (&sect;605.2202). We use <strong>PS</strong>.
+            (s. 605.2202, Fla. Stat.). We use <strong>PS</strong>.
           </li>
           <li>
             <strong>Full name format:</strong>{" "}
@@ -190,7 +191,7 @@ export function StepSeries({ data, patch, errors }: StepProps) {
                     : undefined
                 }
               >
-                <input
+                <Input
                   id={`series-${s.id}-name`}
                   type="text"
                   value={s.name}

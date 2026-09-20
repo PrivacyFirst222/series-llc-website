@@ -52,6 +52,10 @@ Florida document number the office types beside the upload and signed "/s/" by
 Caitlin Kirwan, Manager of FLORIDA PROTECTED SERIES, LLC - PS 1 (Adam, 14 Sep 2026). It lands
 in the client's documents directly under the Articles.
 
+### Portal-only document
+
+`webapp/server/templates-new-series.md` is the master for the unanimous consent, Series Exhibit and attached Asset Schedule generated in the client portal when another series is added. Its output is a client-specific PDF; it has no Word counterpart.
+
 ### How the Word files stay current
 
 A git `pre-commit` hook (`.claude/hooks/pre-commit.sh`, installed as a shim at
@@ -66,7 +70,7 @@ To regenerate by hand at any time:
 
 ### The drafting gate
 
-`drafting-lint.py` runs first, on the five agreement masters. Every check exists
+`drafting-lint.py` runs first, on the eight agreement masters. Every check exists
 because a fault reached a document and was caught by reading it, so the lint
 catches the recurrence rather than the intention:
 

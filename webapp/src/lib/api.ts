@@ -1,3 +1,5 @@
+import { assertEnglishText } from "./englishText";
+
 const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || "";
 
 class ApiError extends Error {
@@ -24,6 +26,9 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     credentials: "include",
   };
 
+  if (typeof config.body === "string" && config.headers && (config.method === "POST" || config.method === "PUT" || config.method === "PATCH")) {
+    assertEnglishText(JSON.parse(config.body));
+  }
   const response = await fetch(url, config);
 
   if (!response.ok) {

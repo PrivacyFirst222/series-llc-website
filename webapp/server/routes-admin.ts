@@ -220,7 +220,7 @@ function whereItIs(o: { status: string; formed_at?: string | null }): string {
 const CERT_KINDS = ["certificate-of-status", "certified-copy"] as const;
 function certTitle(kindTitle: string, llcName: string): string {
   const day = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "America/New_York" });
-  return `${kindTitle} - ${day} — ${llcName}`;
+  return `${kindTitle} (${day}) — ${llcName}`;
 }
 const metaOf = (d: { meta: unknown }): Record<string, unknown> =>
   (typeof d.meta === "string" ? JSON.parse(d.meta) : (d.meta as Record<string, unknown> | null)) ?? {};
