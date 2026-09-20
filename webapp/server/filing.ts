@@ -134,15 +134,11 @@ const MANAGEMENT_LABEL: Record<string, string> = {
   MANAGER_MANAGED: "Manager-managed",
 };
 
-/** Adam's approved Other-Provisions sentences, 20 August 2026. The
- *  manager-managed sentence quotes the safe-harbor words of
- *  s. 605.0407(1)(a)1 verbatim; the member-managed parallel declares the
- *  statutory default at the client's request. */
+/** Adam's approved manager-managed sentence, copied by the office into
+ *  the Articles. Preserve this filing instruction (Batch 19). */
 const MGMT_PROVISION: Record<string, string> = {
   MANAGER_MANAGED:
     "Pursuant to Florida Statutes Section 605.0407, the company is or will be manager-managed.",
-  MEMBER_MANAGED:
-    "Pursuant to Florida Statutes Section 605.0407, the company is or will be member-managed.",
 };
 
 /** The stored-payload shape this module reads. Structural and all-optional:
@@ -187,8 +183,6 @@ type PayloadLike = {
   series?: { name?: string }[];
 };
 
-/** The registered agent's rows, shared by the Articles sheet and the
- *  conversion sheet's change-of-agent filing. */
 /** The individual who signs Sunbiz's registered agent acceptance for our
  *  service (Adam, 14 Sep 2026). */
 export const RA_SERVICE_SIGNER = "Caitlin Kirwan";
@@ -198,6 +192,8 @@ export const RA_SERVICE_SIGNER = "Caitlin Kirwan";
  *  company as authorized representative as manager of FPS, LLC - PS 1"). */
 export const AR_SIGNER = { name: "Caitlin Kirwan", title: "Manager", company: "FLORIDA PROTECTED SERIES, LLC - PS 1" } as const;
 
+/** The registered agent's rows, shared by the Articles sheet and the
+ *  conversion sheet's change-of-agent filing. */
 function raFields(ra: NonNullable<PayloadLike["registeredAgent"]>): FilingField[] {
   const raIsBusiness = (ra.businessEntityName ?? "").trim() !== "";
   const raName = personName(ra);
@@ -322,15 +318,9 @@ export function filingGroups(payload: unknown, filingDay = easternToday()): Fili
       {
         key: "filingPath",
         label: "Filing",
-        value: p.filingPath === "CONVERT" ? "Conversion of an existing entity" : "New Florida LLC",
+        value: "New Florida LLC",
         statement: true,
       },
-      ...(p.filingPath === "CONVERT"
-        ? [
-            { key: "existingName", label: "Existing entity name", value: p.existingLlcName ?? "" },
-            { key: "sunbizDoc", label: "Existing document number", value: p.sunbizDocumentNumber ?? "" },
-          ]
-        : []),
       {
         key: "effectiveDate",
         label: "Effective date",

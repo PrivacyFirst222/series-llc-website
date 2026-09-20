@@ -30,7 +30,6 @@ export function raServicePatch(): Partial<FloridaLLCFormData> {
     registeredAgentZip: RA_SERVICE.zip,
     registeredAgentEmail: RA_SERVICE.email,
     registeredAgentPhone: "",
-    registeredAgentIsAffiliatedPerson: false,
     registeredAgentNotSameAsLlc: true,
     registeredAgentPhysicalAddressAcknowledgment: true,
     registeredAgentAcceptanceName: RA_SERVICE.name,
@@ -62,7 +61,6 @@ export function raSelfPatch(): Partial<FloridaLLCFormData> {
     registeredAgentAcceptanceName: "",
     registeredAgentElectronicSignature: "",
     registeredAgentState: "FL",
-    registeredAgentIsAffiliatedPerson: true,
     registeredAgentAcceptanceCapacity: "INDIVIDUAL_AGENT",
     // The acceptance fields are theirs to complete — they are the agent.
     registeredAgentNotSameAsLlc: false,

@@ -30,8 +30,6 @@ const blank = (): MemberEntry => ({
   state: "",
   zip: "",
   country: "United States",
-  ownershipPercentage: undefined,
-  capitalContribution: undefined,
   email: "",
   phone: "",
   isInitialMember: true,

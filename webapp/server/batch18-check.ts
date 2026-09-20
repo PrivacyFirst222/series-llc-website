@@ -58,7 +58,7 @@ export async function batch18Checks(check: Check, baseUrl?: string) {
   const data = agentFixture();
   data.managers[0].streetAddress2 = "Suite 512";
   data.includeMembersInArticles=true;
-  data.members=[{id:"owner18",isInitialMember:true,memberType:"INDIVIDUAL",firstName:"Jane",lastName:"Smith",address1:"101 Main St",address2:"Apartment 813",city:"Orlando",state:"FL",zip:"32803",country:"United States",ownershipPercentage:100}];
+  data.members=[{id:"owner18",isInitialMember:true,memberType:"INDIVIDUAL",firstName:"Jane",lastName:"Smith",address1:"101 Main St",address2:"Apartment 813",city:"Orlando",state:"FL",zip:"32803",country:"United States"}];
   const summary = summaryFor(data);
   check("batch18 N2.19: manager and member suites survive the office summary",summary.includes("Suite 512") && summaryFor({...data,managementStructure:"MEMBER_MANAGED"}).includes("Apartment 813"),summary);
 

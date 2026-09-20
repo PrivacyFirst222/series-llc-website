@@ -74,8 +74,6 @@ export interface MemberEntry {
   state: string;
   zip: string;
   country: string;
-  ownershipPercentage?: number;
-  capitalContribution?: number;
   email?: string;
   phone?: string;
   isInitialMember: boolean;
@@ -169,7 +167,6 @@ export interface FloridaLLCFormData {
   registeredAgentZip: string;
   registeredAgentEmail?: string;
   registeredAgentPhone?: string;
-  registeredAgentIsAffiliatedPerson: boolean;
   registeredAgentNotSameAsLlc: boolean;
   registeredAgentPhysicalAddressAcknowledgment: boolean;
   registeredAgentResidencyAcknowledgment?: boolean;
@@ -361,7 +358,6 @@ export interface SubmissionPayload {
     nameSearchAcknowledgment: boolean;
     governmentAffiliationAcknowledgment: boolean;
     lawfulPurposeNameAcknowledgment: boolean;
-    exactNameOnly: boolean;
     registeredAgentNotSameAsLlc: boolean;
     registeredAgentPhysicalAddressAcknowledgment: boolean;
     registeredAgentResidencyAcknowledgment?: boolean;

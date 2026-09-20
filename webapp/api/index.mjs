@@ -99312,8 +99312,6 @@ var memberEntrySchema = external_exports.object({
   state: external_exports.string().min(1, "State is required"),
   zip: external_exports.string(),
   country: external_exports.string().trim().min(1, "Country required."),
-  ownershipPercentage: external_exports.number().min(0).max(100).optional(),
-  capitalContribution: external_exports.number().min(0).optional(),
   email: external_exports.string().email("Enter a valid email").optional().or(external_exports.literal("")),
   phone: external_exports.string().optional().or(external_exports.literal("")),
   isInitialMember: external_exports.boolean()
@@ -99384,7 +99382,6 @@ var formationFormSchema = external_exports.object({
   registeredAgentZip: external_exports.string().refine((s) => !postalCodeError(s), { message: "Enter a 5-digit ZIP code or ZIP+4." }),
   registeredAgentEmail: external_exports.string().email("Enter a valid email").optional().or(external_exports.literal("")),
   registeredAgentPhone: external_exports.string().optional().or(external_exports.literal("")),
-  registeredAgentIsAffiliatedPerson: external_exports.boolean(),
   registeredAgentNotSameAsLlc: external_exports.literal(true, {
     errorMap: () => ({ message: "Acknowledgment is required." })
   }),
@@ -99626,7 +99623,6 @@ function raServicePatch() {
     registeredAgentZip: RA_SERVICE.zip,
     registeredAgentEmail: RA_SERVICE.email,
     registeredAgentPhone: "",
-    registeredAgentIsAffiliatedPerson: false,
     registeredAgentNotSameAsLlc: true,
     registeredAgentPhysicalAddressAcknowledgment: true,
     registeredAgentAcceptanceName: RA_SERVICE.name,
@@ -100057,7 +100053,7 @@ function buildPayload(data) {
       // Manager-managed: the members step is never shown — ownership lives in
       // the operating agreement questionnaire, and a stray default row must
       // not reach the record.
-      memberList: data.managementStructure === "MANAGER_MANAGED" ? [] : data.members.map(selectedParty)
+      memberList: data.managementStructure === "MANAGER_MANAGED" ? [] : data.members.map(({ id, memberType, firstName, lastName, suffix, entityName, address1, address2, city, state, zip, country, email, phone, isInitialMember }) => selectedParty({ id, memberType, firstName, lastName, suffix, entityName, address1, address2, city, state, zip, country, email, phone, isInitialMember }))
     },
     // Purpose and effective date are Articles questions a conversion never
     // sees; answers from an abandoned new-formation path stay off the record.
@@ -100117,7 +100113,6 @@ function buildPayload(data) {
       nameSearchAcknowledgment: data.nameSearchAcknowledgment === true,
       governmentAffiliationAcknowledgment: data.governmentAffiliationAcknowledgment === true,
       lawfulPurposeNameAcknowledgment: data.lawfulPurposeNameAcknowledgment === true,
-      exactNameOnly: data.exactNameOnly === true,
       registeredAgentNotSameAsLlc: !isConversion && data.registeredAgentNotSameAsLlc === true,
       registeredAgentPhysicalAddressAcknowledgment: !isConversion && data.registeredAgentPhysicalAddressAcknowledgment === true,
       registeredAgentResidencyAcknowledgment: !isConversion && data.registeredAgentChoice === "SELF" && data.registeredAgentResidencyAcknowledgment === true,
@@ -100136,7 +100131,7 @@ function buildPayload(data) {
     metadata: {
       submittedAt: (/* @__PURE__ */ new Date()).toISOString(),
       ipAddress: "",
-      // TODO(server): fill from request context
+      // The server fills this from the request (routes-payments.ts).
       userAgent: typeof navigator !== "undefined" ? navigator.userAgent : "",
       formVersion: AGENT_FORM_VERSION
     }
@@ -106541,8 +106536,7 @@ var MANAGEMENT_LABEL = {
   MANAGER_MANAGED: "Manager-managed"
 };
 var MGMT_PROVISION = {
-  MANAGER_MANAGED: "Pursuant to Florida Statutes Section 605.0407, the company is or will be manager-managed.",
-  MEMBER_MANAGED: "Pursuant to Florida Statutes Section 605.0407, the company is or will be member-managed."
+  MANAGER_MANAGED: "Pursuant to Florida Statutes Section 605.0407, the company is or will be manager-managed."
 };
 var RA_SERVICE_SIGNER = "Caitlin Kirwan";
 var AR_SIGNER = { name: "Caitlin Kirwan", title: "Manager", company: "FLORIDA PROTECTED SERIES, LLC - PS 1" };
@@ -106646,13 +106640,9 @@ function filingGroups(payload, filingDay = easternToday()) {
       {
         key: "filingPath",
         label: "Filing",
-        value: p2.filingPath === "CONVERT" ? "Conversion of an existing entity" : "New Florida LLC",
+        value: "New Florida LLC",
         statement: true
       },
-      ...p2.filingPath === "CONVERT" ? [
-        { key: "existingName", label: "Existing entity name", value: p2.existingLlcName ?? "" },
-        { key: "sunbizDoc", label: "Existing document number", value: p2.sunbizDocumentNumber ?? "" }
-      ] : [],
       {
         key: "effectiveDate",
         label: "Effective date",
@@ -108941,6 +108931,7 @@ var addr = (a2) => a2 && a2.address1 ? [a2.address1, a2.address2, `${a2.city ?? 
 function ticked(p2) {
   const flags = {
     ...p2.acknowledgments ?? {},
+    exactNameOnly: p2.llcName?.exactNameOnly === true,
     seriesOwnershipAcknowledged: p2.certifications?.seriesOwnershipAcknowledged === true,
     articlesSignerAppointed: p2.certifications?.articlesSignerAppointed === true,
     atLeastOneMemberAcknowledged: p2.certifications?.atLeastOneMemberAcknowledged === true,
@@ -109328,9 +109319,6 @@ function registerPaymentRoutes(app2) {
       data.registeredAgentState
     );
     if (raError) return c.json(err(raError, "INVALID_INPUT"), 400);
-    if (data.managementStructure !== "MANAGER_MANAGED" && data.members.length < 1) {
-      return c.json(err("At least one member is required.", "INVALID_INPUT"), 400);
-    }
     const nameProblems = data.filingPath === "CONVERT" ? null : await unavailableNames(
       [
         data.desiredLlcName ?? "",

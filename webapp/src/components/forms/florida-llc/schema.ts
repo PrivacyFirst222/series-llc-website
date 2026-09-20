@@ -73,8 +73,6 @@ export const memberEntrySchema = z.object({
   state: z.string().min(1, "State is required"),
   zip: z.string(),
   country: z.string().trim().min(1, "Country required."),
-  ownershipPercentage: z.number().min(0).max(100).optional(),
-  capitalContribution: z.number().min(0).optional(),
   email: z.string().email("Enter a valid email").optional().or(z.literal("")),
   phone: z.string().optional().or(z.literal("")),
   isInitialMember: z.boolean(),
@@ -151,7 +149,6 @@ export const formationFormSchema = z.object({
   registeredAgentZip: z.string().refine((s) => !postalCodeError(s), { message: "Enter a 5-digit ZIP code or ZIP+4." }),
   registeredAgentEmail: z.string().email("Enter a valid email").optional().or(z.literal("")),
   registeredAgentPhone: z.string().optional().or(z.literal("")),
-  registeredAgentIsAffiliatedPerson: z.boolean(),
   registeredAgentNotSameAsLlc: z.literal(true, {
     errorMap: () => ({ message: "Acknowledgment is required." }),
   }),

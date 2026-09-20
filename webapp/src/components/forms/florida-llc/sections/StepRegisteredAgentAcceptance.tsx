@@ -1,9 +1,8 @@
 import { AGENT_ACCEPTANCE, registeredAgentName } from "../registeredAgent";
 import { useEffect } from "react";
-import { AlertTriangle, ShieldCheck } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { AcknowledgeBox, FieldShell } from "../FieldShell";
-import { RA_SERVICE } from "../raService";
 import type { FloridaLLCFormData } from "../types";
 
 interface StepProps {
@@ -32,26 +31,6 @@ export function StepRegisteredAgentAcceptance({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (isService) {
-    return (
-      <div className="space-y-6">
-        <header className="space-y-2">
-          <h2 className="font-display text-3xl">Registered agent acceptance</h2>
-        </header>
-        <div className="rounded-xl border border-trust/30 bg-trust/5 p-5 flex gap-3">
-          <ShieldCheck className="h-5 w-5 shrink-0 text-trust mt-0.5" />
-          <div className="space-y-1.5">
-            <p className="text-sm font-medium">Handled by us — nothing to sign.</p>
-            <p className="text-sm text-muted-foreground">
-              {RA_SERVICE.name} accepts the appointment as your registered
-              agent, and we execute the signed acceptance when we prepare your
-              filing with the Florida Division of Corporations.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">

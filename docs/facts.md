@@ -30,7 +30,6 @@ scanned set; add ` in <path prefix>` to confine the ban to matching files.
 - where: webapp/src/pages/Pricing.tsx — `Comprehensive Series LLC Owner's Manual`
 - where: webapp/src/pages/HowItWorks.tsx — `a comprehensive Series LLC Owner's Manual`
 - where: webapp/src/content/terms.md — `the Series LLC Owner's Manual`
-- where: webapp/src/components/forms/florida-llc/sections/StepSubmissionPayload.tsx — `Owner&rsquo;s Manual`
 - retired: `titling manual`
 - retired: `ledger forms`
 - retired: `Ledger forms`

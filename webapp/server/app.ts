@@ -28,5 +28,5 @@ app.onError((e, c) => {
   return c.json(err("Something went wrong on our end.", "INTERNAL"), 500);
 });
 
-// The e2e suite imports these from "./app"; they live in the portal module.
-export { personLegalName, effectiveOwners } from "./routes-portal";
+// The e2e suite imports personLegalName from "./app"; it lives in the portal module.
+export { personLegalName } from "./routes-portal";

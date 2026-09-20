@@ -223,11 +223,7 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
                         m.memberType === "INDIVIDUAL"
                           ? fullPersonName(m.firstName, m.lastName, m.suffix)
                           : m.entityName;
-                      const pct =
-                        m.ownershipPercentage !== undefined
-                          ? ` (${m.ownershipPercentage}%)`
-                          : "";
-                      return `${name}${pct}`;
+                      return name;
                     })
                     .join("; ")
             }

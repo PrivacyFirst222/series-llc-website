@@ -1914,14 +1914,53 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T15:21:38.563Z",
+              "event": "assigned",
+              "batch": "19",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T15:44:37.722Z",
+              "event": "rejected r1",
+              "batch": "19",
+              "revision": 1,
+              "note": "Reject Batch 19 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T15:44:55.600Z",
+              "event": "assigned",
+              "batch": "19",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T15:45:23.170Z",
+              "event": "implemented",
+              "batch": "19",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "19",
+          "fix": {
+            "batch": "19",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "absent",
+                "text": "export { personLegalName, effectiveOwners }"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -2555,14 +2594,58 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T15:21:38.563Z",
+              "event": "assigned",
+              "batch": "19",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T15:44:37.722Z",
+              "event": "rejected r1",
+              "batch": "19",
+              "revision": 1,
+              "note": "Reject Batch 19 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T15:44:55.600Z",
+              "event": "assigned",
+              "batch": "19",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T15:45:23.170Z",
+              "event": "implemented",
+              "batch": "19",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "19",
+          "fix": {
+            "batch": "19",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "absent",
+                "text": "Pursuant to Florida Statutes Section 605.0407, the company is or will be member-managed."
+              },
+              {
+                "kind": "present",
+                "file": "webapp/server/filing.ts",
+                "text": "Pursuant to Florida Statutes Section 605.0407, the company is or will be manager-managed."
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -3261,26 +3344,105 @@
         {
           "key": "dead-step",
           "scope": "The unreachable \"Submit\" step and its dead page, whose sentence says the operating agreement is sent with the filed documents, are removed.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-18T03:48:21.611Z",
               "event": "recorded by migration 001-part-level-links"
+            },
+            {
+              "at": "2026-09-20T15:21:38.563Z",
+              "event": "assigned",
+              "batch": "19",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T15:44:37.722Z",
+              "event": "rejected r1",
+              "batch": "19",
+              "revision": 1,
+              "note": "Reject Batch 19 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T15:44:55.600Z",
+              "event": "assigned",
+              "batch": "19",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T15:45:23.170Z",
+              "event": "implemented",
+              "batch": "19",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "19",
+          "fix": {
+            "batch": "19",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "absent",
+                "text": "StepSubmissionPayload"
+              }
+            ]
+          }
         },
         {
           "key": "denominator",
           "scope": "The progress percent counts only the steps a client can reach: one denominator, no hidden steps.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-18T03:48:21.611Z",
               "event": "recorded by migration 001-part-level-links"
+            },
+            {
+              "at": "2026-09-20T15:21:38.563Z",
+              "event": "assigned",
+              "batch": "19",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T15:44:37.722Z",
+              "event": "rejected r1",
+              "batch": "19",
+              "revision": 1,
+              "note": "Reject Batch 19 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T15:44:55.600Z",
+              "event": "assigned",
+              "batch": "19",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T15:45:23.170Z",
+              "event": "implemented",
+              "batch": "19",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "19",
+          "fix": {
+            "batch": "19",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch19 65: progress matches reachable screens and resumes at certification"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -4706,17 +4868,56 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T15:21:38.563Z",
+              "event": "assigned",
+              "batch": "19",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T15:44:37.722Z",
+              "event": "rejected r1",
+              "batch": "19",
+              "revision": 1,
+              "note": "Reject Batch 19 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T15:44:55.600Z",
+              "event": "assigned",
+              "batch": "19",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T15:45:23.170Z",
+              "event": "implemented",
+              "batch": "19",
+              "revision": 2,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "65",
             "part": "dead-step"
+          },
+          "batch": "19",
+          "fix": {
+            "batch": "19",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "absent",
+                "text": "StepSubmissionPayload"
+              }
+            ]
           }
         }
       ],
@@ -5443,14 +5644,61 @@
         {
           "key": "unused-code",
           "scope": "The dead duplicate-member check, the dead conversion branch in the formation sheet, and member fields typed but never asked. Item 112 is the same dead check.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T18:29:55.001Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T15:21:38.563Z",
+              "event": "assigned",
+              "batch": "19",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T15:44:37.722Z",
+              "event": "rejected r1",
+              "batch": "19",
+              "revision": 1,
+              "note": "Reject Batch 19 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T15:44:55.600Z",
+              "event": "assigned",
+              "batch": "19",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T15:45:23.170Z",
+              "event": "implemented",
+              "batch": "19",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "19",
+          "fix": {
+            "batch": "19",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "absent",
+                "text": "ownershipPercentage?: number;"
+              },
+              {
+                "kind": "absent",
+                "text": "return c.json(err(\"At least one member is required.\", \"INVALID_INPUT\"), 400);"
+              },
+              {
+                "kind": "absent",
+                "text": "Conversion of an existing entity"
+              }
+            ]
+          }
         },
         {
           "key": "fact-ledger",
@@ -5543,14 +5791,54 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T15:21:38.563Z",
+              "event": "assigned",
+              "batch": "19",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T15:44:37.722Z",
+              "event": "rejected r1",
+              "batch": "19",
+              "revision": 1,
+              "note": "Reject Batch 19 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T15:44:55.600Z",
+              "event": "assigned",
+              "batch": "19",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T15:45:23.170Z",
+              "event": "implemented",
+              "batch": "19",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "19",
+          "fix": {
+            "batch": "19",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch19 102: exact-name consent has one canonical source and survives the office record"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -5573,14 +5861,54 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T15:21:38.563Z",
+              "event": "assigned",
+              "batch": "19",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T15:44:37.722Z",
+              "event": "rejected r1",
+              "batch": "19",
+              "revision": 1,
+              "note": "Reject Batch 19 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T15:44:55.600Z",
+              "event": "assigned",
+              "batch": "19",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T15:45:23.170Z",
+              "event": "implemented",
+              "batch": "19",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "19",
+          "fix": {
+            "batch": "19",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/src/components/forms/florida-llc/buildPayload.ts",
+                "text": "ipAddress: \"\", // The server fills this from the request (routes-payments.ts)."
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -5609,6 +5937,19 @@
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T15:21:38.563Z",
+              "event": "assigned",
+              "batch": "19",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T15:44:37.722Z",
+              "event": "rejected r1",
+              "batch": "19",
+              "revision": 1,
+              "note": "Reject Batch 19 revision 1; proceed with revision 2."
             }
           ]
         }
@@ -5633,14 +5974,58 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T15:21:38.563Z",
+              "event": "assigned",
+              "batch": "19",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T15:44:37.722Z",
+              "event": "rejected r1",
+              "batch": "19",
+              "revision": 1,
+              "note": "Reject Batch 19 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T15:44:55.600Z",
+              "event": "assigned",
+              "batch": "19",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T15:45:23.170Z",
+              "event": "implemented",
+              "batch": "19",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "19",
+          "fix": {
+            "batch": "19",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "absent",
+                "text": "if (isService) {"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/src/components/forms/florida-llc/sections/StepRegisteredAgentAcceptance.tsx",
+                "text": "if (!isService && raFullName && !data.registeredAgentAcceptanceName)"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -5664,14 +6049,53 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T15:21:38.563Z",
+              "event": "assigned",
+              "batch": "19",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T15:44:37.722Z",
+              "event": "rejected r1",
+              "batch": "19",
+              "revision": 1,
+              "note": "Reject Batch 19 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T15:44:55.600Z",
+              "event": "assigned",
+              "batch": "19",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T15:45:23.170Z",
+              "event": "implemented",
+              "batch": "19",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "19",
+          "fix": {
+            "batch": "19",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "absent",
+                "text": "sigMismatch && data.articlesSignerChoice === \"SELF\""
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -5725,14 +6149,53 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T15:21:38.563Z",
+              "event": "assigned",
+              "batch": "19",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T15:44:37.722Z",
+              "event": "rejected r1",
+              "batch": "19",
+              "revision": 1,
+              "note": "Reject Batch 19 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T15:44:55.600Z",
+              "event": "assigned",
+              "batch": "19",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T15:45:23.170Z",
+              "event": "implemented",
+              "batch": "19",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "19",
+          "fix": {
+            "batch": "19",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "absent",
+                "text": "registeredAgentIsAffiliatedPerson"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -5785,14 +6248,58 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T15:21:38.563Z",
+              "event": "assigned",
+              "batch": "19",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T15:44:37.722Z",
+              "event": "rejected r1",
+              "batch": "19",
+              "revision": 1,
+              "note": "Reject Batch 19 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T15:44:55.600Z",
+              "event": "assigned",
+              "batch": "19",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T15:45:23.170Z",
+              "event": "implemented",
+              "batch": "19",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "19",
+          "fix": {
+            "batch": "19",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "absent",
+                "text": "SERVER-SIDE VALIDATION EXPECTATIONS:"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/src/components/forms/florida-llc/validation.ts",
+                "text": "Order requests are validated by webapp/server/validation.ts before routes-payments.ts builds the stored payload."
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -5815,14 +6322,57 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T15:21:38.563Z",
+              "event": "assigned",
+              "batch": "19",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T15:44:37.722Z",
+              "event": "rejected r1",
+              "batch": "19",
+              "revision": 1,
+              "note": "Reject Batch 19 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T15:44:55.600Z",
+              "event": "assigned",
+              "batch": "19",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T15:45:23.170Z",
+              "event": "implemented",
+              "batch": "19",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "19",
+          "fix": {
+            "batch": "19",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "absent",
+                "text": "totalOwnershipPct"
+              },
+              {
+                "kind": "absent",
+                "text": "ownershipPercentageWarning"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -5845,17 +6395,56 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T15:21:38.563Z",
+              "event": "assigned",
+              "batch": "19",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T15:44:37.722Z",
+              "event": "rejected r1",
+              "batch": "19",
+              "revision": 1,
+              "note": "Reject Batch 19 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T15:44:55.600Z",
+              "event": "assigned",
+              "batch": "19",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T15:45:23.170Z",
+              "event": "implemented",
+              "batch": "19",
+              "revision": 2,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "100",
             "part": "unused-code"
+          },
+          "batch": "19",
+          "fix": {
+            "batch": "19",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "absent",
+                "text": "ownershipPercentage?: number;"
+              }
+            ]
           }
         }
       ],
@@ -5879,14 +6468,54 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T15:21:38.563Z",
+              "event": "assigned",
+              "batch": "19",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T15:44:37.722Z",
+              "event": "rejected r1",
+              "batch": "19",
+              "revision": 1,
+              "note": "Reject Batch 19 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T15:44:55.600Z",
+              "event": "assigned",
+              "batch": "19",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T15:45:23.170Z",
+              "event": "implemented",
+              "batch": "19",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "19",
+          "fix": {
+            "batch": "19",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/server/routes-payments.ts",
+                "text": " *  found\", never \"available\" — the Division makes the final determination. */\napp.post(\"/name-check\""
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -5909,14 +6538,58 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T15:21:38.563Z",
+              "event": "assigned",
+              "batch": "19",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T15:44:37.722Z",
+              "event": "rejected r1",
+              "batch": "19",
+              "revision": 1,
+              "note": "Reject Batch 19 revision 1; proceed with revision 2."
+            },
+            {
+              "at": "2026-09-20T15:44:55.600Z",
+              "event": "assigned",
+              "batch": "19",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-20T15:45:23.170Z",
+              "event": "implemented",
+              "batch": "19",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "19",
+          "fix": {
+            "batch": "19",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "absent",
+                "text": "Conversion of an existing entity"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/server/filing.ts",
+                "text": "/** The registered agent's rows, shared by the Articles sheet and the\n *  conversion sheet's change-of-agent filing. */\nfunction raFields"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -18744,6 +19417,18 @@
       "kind": "ruling",
       "item": "N2.10",
       "text": "Batch 17 revision 2: Adam rejected revision 1 and authorized the prepared shorter documentary-stamp-tax paragraph to correct portal-PDF pagination. Exact approved text is in revisions/r2.json. All other approved changes and rejected units remain unchanged."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "54",
+      "text": "Batch 19: preserve the manager-managed Articles sentence and the office workflow that uses it; remove only the unused member-managed alternative. Adam clarified: “That is the language that will be added to the articles of a manager managed LLC. But we do that in the office”, then approved the clarified proposal with “Go. Approve all”."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "109",
+      "text": "Batch 19 review item 12: leave the internal fee grouping unchanged, as recommended in response to “Why does this matter?” and included in the clarified scope approved by “Go. Approve all”. No pricing or customer-facing fee change."
     }
   ],
   "batches": [
@@ -19292,6 +19977,45 @@
         },
         {
           "at": "2026-09-20T14:26:58.390Z",
+          "event": "implemented"
+        }
+      ]
+    },
+    {
+      "id": "19",
+      "revision": 1,
+      "frozenHash": "6957ef8713d7706ae4c501ba8e6663f62c30c635e782e6515279a361f0ebc1e7",
+      "status": "rejected",
+      "model": "Codex",
+      "base": "8ec01904bfff8d6028fba5e85c818808517daef7",
+      "history": [
+        {
+          "at": "2026-09-20T15:21:38.563Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-20T15:44:37.722Z",
+          "event": "rejected by Adam",
+          "note": "Adam's record of 2026-09-20T15:44 (Adam's explicit chat message, transcribed by Codex): Reject Batch 19 revision 1; proceed with revision 2."
+        }
+      ]
+    },
+    {
+      "id": "19",
+      "revision": 2,
+      "frozenHash": "94da6d6b118cba75fc16f34c55323a645e3dddb8fafbc1f8ba8a30a8dc2cfd35",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "8ec01904bfff8d6028fba5e85c818808517daef7",
+      "history": [
+        {
+          "at": "2026-09-20T15:44:55.601Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-20T15:45:23.170Z",
           "event": "implemented"
         }
       ]

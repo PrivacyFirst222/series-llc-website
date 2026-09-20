@@ -89,7 +89,8 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
       // the operating agreement questionnaire, and a stray default row must
       // not reach the record.
       memberList:
-        data.managementStructure === "MANAGER_MANAGED" ? [] : data.members.map(selectedParty),
+        data.managementStructure === "MANAGER_MANAGED" ? [] : data.members.map(({ id, memberType, firstName, lastName, suffix, entityName, address1, address2, city, state, zip, country, email, phone, isInitialMember }) =>
+          selectedParty({ id, memberType, firstName, lastName, suffix, entityName, address1, address2, city, state, zip, country, email, phone, isInitialMember })),
     },
     // Purpose and effective date are Articles questions a conversion never
     // sees; answers from an abandoned new-formation path stay off the record.
@@ -154,7 +155,6 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
       nameSearchAcknowledgment: data.nameSearchAcknowledgment === true,
       governmentAffiliationAcknowledgment: data.governmentAffiliationAcknowledgment === true,
       lawfulPurposeNameAcknowledgment: data.lawfulPurposeNameAcknowledgment === true,
-      exactNameOnly: data.exactNameOnly === true,
       registeredAgentNotSameAsLlc: !isConversion && data.registeredAgentNotSameAsLlc === true,
       registeredAgentPhysicalAddressAcknowledgment: !isConversion && data.registeredAgentPhysicalAddressAcknowledgment === true,
       registeredAgentResidencyAcknowledgment: !isConversion && data.registeredAgentChoice === "SELF" && data.registeredAgentResidencyAcknowledgment === true,
@@ -174,7 +174,7 @@ export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
       : null,
     metadata: {
       submittedAt: new Date().toISOString(),
-      ipAddress: "", // TODO(server): fill from request context
+      ipAddress: "", // The server fills this from the request (routes-payments.ts).
       userAgent:
         typeof navigator !== "undefined" ? navigator.userAgent : "",
       formVersion: AGENT_FORM_VERSION,

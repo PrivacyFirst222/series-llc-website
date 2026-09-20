@@ -23,8 +23,7 @@ export type StepKey =
   | "correspondence"
   | "optional"
   | "review"
-  | "certify"
-  | "submit";
+  | "certify";
 
 export const STEPS: { key: StepKey; label: string }[] = [
   { key: "path", label: "Getting started" },
@@ -47,7 +46,6 @@ export const STEPS: { key: StepKey; label: string }[] = [
   { key: "optional", label: "Optional docs" },
   { key: "review", label: "Review" },
   { key: "certify", label: "Certify & sign" },
-  { key: "submit", label: "Submit" },
 ];
 
 export const stepIndexOf = (key: StepKey): number =>

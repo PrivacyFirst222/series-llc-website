@@ -1,5 +1,5 @@
 import { patchAgentConsents } from "./registeredAgent";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Check, Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,6 @@ import { StepCorrespondence } from "./sections/StepCorrespondence";
 import { StepOptionalDocs } from "./sections/StepOptionalDocs";
 import { StepSeries } from "./sections/StepSeries";
 import { StepCertification } from "./sections/StepCertification";
-import { StepSubmissionPayload } from "./sections/StepSubmissionPayload";
 import { StepFilingPath } from "./sections/StepFilingPath";
 import { STEPS, stepIndexOf, stepForField } from "./steps";
 import type { FloridaLLCFormData } from "./types";
@@ -79,7 +78,7 @@ function loadDraft(initialData?: FloridaLLCFormData): {
   if (initialData) return { data: initialData, step: 0, max: 0, visited: [0] };
   // Refreshing must never lose the customer's place: the draft stores both
   // the answers and how far they had gotten.
-  const lastResumable = STEPS.length - 2; // never restore onto the submit screen
+  const lastResumable = stepIndexOf("certify"); // old drafts on the retired last screen resume here
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
@@ -431,7 +430,7 @@ export function FloridaLLCFormationForm({
 
   const handleFinalSubmit = async () => {
     // Validate every step before final submission
-    for (let i = 0; i < STEPS.length - 1; i++) {
+    for (let i = 0; i < STEPS.length; i++) {
       const e = validateStep(STEPS[i].key, data);
       if (Object.keys(e).length > 0) {
         setStepIndex(i);
@@ -526,14 +525,13 @@ export function FloridaLLCFormationForm({
 
   const stepKey = STEPS[stepIndex].key;
 
-  const progressPct = useMemo(
-    () => Math.round(((stepIndex + 1) / STEPS.length) * 100),
-    [stepIndex],
-  );
+  const visibleSteps = STEPS.map((step, index) => ({ ...step, index }))
+    .filter(({ index }) => !stepHidden(index));
+  const visiblePosition = visibleSteps.filter(({ index }) => index <= stepIndex).length;
+  const progressPct = Math.round((visiblePosition / visibleSteps.length) * 100);
 
   const isReview = stepKey === "review";
   const isCertify = stepKey === "certify";
-  const isSubmit = stepKey === "submit";
   const isLastBeforeReview = stepKey === "optional";
 
   return (
@@ -548,8 +546,7 @@ export function FloridaLLCFormationForm({
             <div className="mt-2 flex items-baseline gap-2">
               <span className="font-display text-3xl">{progressPct}%</span>
               <span className="text-xs text-muted-foreground">
-                Step {STEPS.slice(0, stepIndex + 1).filter((_, i) => !stepHidden(i)).length} of{" "}
-                {STEPS.filter((_, i) => !stepHidden(i)).length}
+                Step {visiblePosition} of {visibleSteps.length}
               </span>
             </div>
             <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-border">
@@ -562,21 +559,13 @@ export function FloridaLLCFormationForm({
 
           <div className="rounded-2xl border border-border bg-card p-3">
           <ol className="hidden lg:block space-y-1">
-            {STEPS.map(({ key, label }, i) => {
-              if (stepHidden(i)) return null;
-              const displayNumber = STEPS.slice(0, i + 1).filter((_, j) => !stepHidden(j)).length;
+            {visibleSteps.map(({ key, label, index: i }, position) => {
+              const displayNumber = position + 1;
               // Every step is reachable at any time, in any order. A tick means
               // the customer has BEEN here and nothing on the step is
               // outstanding — never completeness alone, which would tick steps
               // that validate at their defaults and were never opened.
-              //
-              // The last entry is the exception: it is the confirmation screen
-              // shown after filing, not a step to fill in. Reaching it by
-              // clicking would show a completed filing that never happened.
-              const isConfirmation = i === STEPS.length - 1;
-              const reachable = !isConfirmation || stepIndex === i;
               const done =
-                !isConfirmation &&
                 visited.has(i) &&
                 Object.keys(validateStep(key, data)).length === 0;
               const active = i === stepIndex;
@@ -584,15 +573,12 @@ export function FloridaLLCFormationForm({
                 <li key={key}>
                   <button
                     type="button"
-                    onClick={() => reachable && goToStep(i)}
+                    onClick={() => goToStep(i)}
                     className={`w-full flex items-center gap-2 text-left rounded-md px-3 py-2 text-sm transition-colors ${
                       active
                         ? "bg-trust/10 text-foreground font-medium"
-                        : reachable
-                          ? "text-foreground/80 hover:bg-secondary"
-                          : "text-muted-foreground cursor-not-allowed"
+                        : "text-foreground/80 hover:bg-secondary"
                     }`}
-                    disabled={!reachable}
                   >
                     <span
                       className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-medium ${
@@ -701,8 +687,6 @@ export function FloridaLLCFormationForm({
               <ReviewStep data={data} goToStep={(k) => goToStep(stepIndexOf(k))} />
             ) : isCertify ? (
               <StepCertification data={data} patch={patch} errors={errors} />
-            ) : isSubmit ? (
-              <StepSubmissionPayload data={data} />
             ) : null}
 
             {addressWarning?.step === stepKey ? (
@@ -723,7 +707,6 @@ export function FloridaLLCFormationForm({
             ) : null}
 
             {/* Nav */}
-            {!isSubmit ? (
               <div className="mt-10 flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 border-t border-border pt-6">
                 <div className="flex flex-wrap gap-2">
                   <Button
@@ -778,18 +761,6 @@ export function FloridaLLCFormationForm({
                   </Button>
                 )}
               </div>
-            ) : (
-              <div className="mt-10 flex justify-end gap-2 border-t border-border pt-6">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => goToStep(0)}
-                  className="rounded-full"
-                >
-                  Start a new filing
-                </Button>
-              </div>
-            )}
           </div>
 
           <p className="mt-6 text-xs text-muted-foreground leading-relaxed">

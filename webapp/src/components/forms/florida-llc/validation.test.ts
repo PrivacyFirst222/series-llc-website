@@ -19,10 +19,8 @@ import { canonicalizeSeriesName, seriesDedupeKey,
   calculateEstimatedFees,
   designatorAllowedForFormationType,
   nameContainsLegalDesignator,
-  ownershipPercentageWarning,
   validateEffectiveDate,
 } from "./validation";
-import type { MemberEntry } from "./types";
 
 type AssertFn = (cond: boolean, label: string) => void;
 const results: { label: string; ok: boolean }[] = [];
@@ -80,37 +78,6 @@ ok.setDate(today.getDate() + 10);
 assert(
   validateEffectiveDate(ok.toISOString().slice(0, 10)) === null,
   "10 days out is accepted",
-);
-
-// Ownership percentage total
-const m = (pct?: number, isInitial = true): MemberEntry => ({
-  id: Math.random().toString(),
-  memberType: "INDIVIDUAL",
-  firstName: "Test",
-  lastName: "Member",
-  entityName: "",
-  address1: "1 Main",
-  city: "Miami",
-  state: "FL",
-  zip: "33101",
-  country: "US",
-  ownershipPercentage: pct,
-  capitalContribution: undefined,
-  isInitialMember: isInitial,
-  email: "",
-  phone: "",
-});
-assert(
-  ownershipPercentageWarning([m(50), m(50)]) === null,
-  "100% total is fine",
-);
-assert(
-  typeof ownershipPercentageWarning([m(50), m(40)]) === "string",
-  "90% total flags warning",
-);
-assert(
-  ownershipPercentageWarning([m(undefined), m(undefined)]) === null,
-  "no percentages provided is fine",
 );
 
 // Fee estimate

@@ -304,12 +304,6 @@ app.post("/orders", async (c) => {
     data.registeredAgentState,
   );
   if (raError) return c.json(err(raError, "INVALID_INPUT"), 400);
-  // Members are collected at intake only for member-managed companies (they
-  // are the AMBRs the Articles list). Manager-managed intakes never see the
-  // members step — ownership lives in the operating agreement questionnaire.
-  if (data.managementStructure !== "MANAGER_MANAGED" && data.members.length < 1) {
-    return c.json(err("At least one member is required.", "INVALID_INPUT"), 400);
-  }
 
   // Names that our mirror of the state's records says are taken or held are
   // refused here, not just in the browser — the client cannot buy a filing
@@ -640,10 +634,6 @@ app.post("/orders/:id/resend-welcome", async (c) => {
   return c.json({ data: { ok: true, sent: false } });
 });
 
-/** Name-availability check against our mirror of the Division of
- *  Corporations' public data files (server/sunbiz.ts). Public: the intake
- *  name step calls it before an order exists. Verdicts say "no conflict
- *  found", never "available" — the Division makes the final determination. */
 // The public contact form. Until 30 Aug 2026 this form SENT NOTHING — it
 // told the visitor a specialist would reply within a business day, then
 // discarded the message (P51). Now: stored (and so backed up nightly),
@@ -701,6 +691,10 @@ app.post("/entity-lookup", async (c) => {
   }
 });
 
+/** Name-availability check against our mirror of the Division of
+ *  Corporations' public data files (server/sunbiz.ts). Public: the intake
+ *  name step calls it before an order exists. Verdicts say "no conflict
+ *  found", never "available" — the Division makes the final determination. */
 app.post("/name-check", async (c) => {
   if (!(await rateLimit(`namecheck:${clientIp(c)}`, 30, 600_000))) {
     return c.json(err("Too many checks. Try again in a few minutes.", "RATE_LIMITED"), 429);

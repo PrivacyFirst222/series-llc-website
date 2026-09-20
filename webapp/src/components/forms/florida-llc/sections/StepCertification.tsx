@@ -332,7 +332,7 @@ export function StepCertification({ data, patch, errors }: StepProps) {
         helper="Type your full legal name. This is your electronic signature."
         error={
           errors.authorizedRepresentativeSignature ??
-          (sigMismatch && data.articlesSignerChoice === "SELF"
+          (sigMismatch
             ? `Your electronic signature must match the authorized representative name exactly: ${data.authorizedRepresentativeName.trim()}`
             : undefined)
         }

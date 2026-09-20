@@ -92,7 +92,6 @@ const formData: FloridaLLCFormData = {
       city: "Miami",
       state: "FL",
       zip: "33139",
-      ownershipPercentage: 100,
     },
   ],
   purposeType: "GENERAL",
@@ -2414,8 +2413,8 @@ if (mint.status === 200) {
     includeManagementStatementInArticles: true,
     managers: [],
     members: [
-      { ...structuredClone(defaultFormData.members[0]), firstName: "Dana", lastName: "Reed", address1: "70 Palm Way", city: "Tampa", state: "FL", zip: "33601", ownershipPercentage: 50 },
-      { ...structuredClone(defaultFormData.members[0]), firstName: "Jamie", lastName: "Reed", address1: "70 Palm Way", city: "Tampa", state: "FL", zip: "33601", ownershipPercentage: 50 },
+      { ...structuredClone(defaultFormData.members[0]), firstName: "Dana", lastName: "Reed", address1: "70 Palm Way", city: "Tampa", state: "FL", zip: "33601" },
+      { ...structuredClone(defaultFormData.members[0]), firstName: "Jamie", lastName: "Reed", address1: "70 Palm Way", city: "Tampa", state: "FL", zip: "33601" },
     ],
     correspondentName: "Dana Reed",
     correspondentEmail: mmEmail,
@@ -4056,7 +4055,7 @@ for(const [label,r]of batch05Results)check(label,r.ok,r.detail);
   check("batch18 N2.21: client pipes and line breaks remain inside their document cells",cells,observations);
 
   const data=agentFixture();data.managers[0].streetAddress2="Suite 512";data.includeMembersInArticles=true;
-  data.members=[{id:"owner18",isInitialMember:true,memberType:"INDIVIDUAL",firstName:"Jane",lastName:"Smith",address1:"101 Main St",address2:"Apartment 813",city:"Orlando",state:"FL",zip:"32803",country:"United States",ownershipPercentage:100}];
+  data.members=[{id:"owner18",isInitialMember:true,memberType:"INDIVIDUAL",firstName:"Jane",lastName:"Smith",address1:"101 Main St",address2:"Apartment 813",city:"Orlando",state:"FL",zip:"32803",country:"United States"}];
   const managerSummary=summaryFor(data), memberSummary=summaryFor({...data,managementStructure:"MEMBER_MANAGED"});
   check("batch18 N2.19: manager and member suites survive the office summary",managerSummary.includes("Suite 512") && memberSummary.includes("Apartment 813"),{managerSummary,memberSummary});
 
@@ -4072,6 +4071,30 @@ for(const [label,r]of batch05Results)check(label,r.ok,r.detail);
   const valid=validateStep("client",{...agentFixture(),clientFirstName:"Jane"}).clientFirstName;
   blocked &&= !!invalid && !valid;inputObservations.push({invalid,valid});
   check("batch18 N2.20: English input is enforced before business writes",blocked,inputObservations);
+}
+
+// Batch 19: the stored name instruction is the one the office records.
+{
+  const { buildPayload: payload19 } = await import("../src/components/forms/florida-llc/buildPayload");
+  const { agentFixture, summaryFor } = await import("./batch06-check");
+  const observations: unknown[] = [];
+  let correct = true;
+  for (const filingPath of ["NEW", "CONVERT"] as const) for (const exactNameOnly of [false, true]) {
+    const data = { ...agentFixture(), filingPath, exactNameOnly };
+    const payload = payload19(data);
+    const summary = summaryFor(data);
+    const wanted = filingPath === "NEW" && exactNameOnly;
+    const recorded = summary.includes("I only want this exact name — if it is unavailable, contact me before doing anything else.");
+    const duplicate = Object.prototype.hasOwnProperty.call(payload.acknowledgments, "exactNameOnly");
+    correct &&= payload.llcName.exactNameOnly === wanted && recorded === wanted && !duplicate;
+    observations.push({ filingPath, exactNameOnly, canonical: payload.llcName.exactNameOnly, recorded, duplicate });
+  }
+  check("batch19 102: exact-name consent has one canonical source and survives the office record", correct, observations);
+  const { filingGroups } = await import("./filing");
+  const manager = agentFixture();
+  manager.managementStructure = "MANAGER_MANAGED"; manager.includeManagementStatementInArticles = true;
+  const sentence = "Pursuant to Florida Statutes Section 605.0407, the company is or will be manager-managed.";
+  check("batch19 54: office keeps the approved manager-managed Articles sentence", filingGroups(payload19(manager)).some(g => g.fields.some(f => f.value === sentence)));
 }
 
 console.log(failures === 0 ? "\nALL PASS" : `\n${failures} FAILURES`);

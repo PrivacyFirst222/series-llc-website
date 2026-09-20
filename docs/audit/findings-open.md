@@ -275,7 +275,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605ContentsIndex.html (no StatuteYear, so the current year is served), in both files.
   - Fixed: batch 18 revision 2, commit , by Codex; protected by 2 assertion(s).
   - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
-- **43. [B98]** — **open** — housekeeping
+- **43. [B98]** — **implemented** — housekeeping
   - Server entry — code only — `webapp/server/app.ts:24`
   - Reads: // The e2e suite imports these from "./app"; they live in the portal module.
   - Claims: The e2e suite imports both re-exports.
@@ -283,6 +283,8 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: // server/e2e.ts imports personLegalName from "./app"; it lives in the portal module. — and drop effectiveOwners from the export, or import it somewhere.
   - Codex (housekeeping-only): app.ts:24–25 contains the quoted comment and re-exports both helpers. Removing an unused re-export changes no product text. The cited excluded e2e.ts was not read, so its import claim is not independently certified.
   - **Codex rejected the proposed replacement:** The proposed comment depends on an excluded test file. Do not add an otherwise unnecessary import merely to justify an export; first verify excluded consumers before removing an API export.
+  - Fixed: batch 19 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
 - **44. [B143]** — **implemented** — housekeeping
   - Server, the Sunbiz name check — the statute the hold is attributed to — `webapp/server/sunbiz.ts:160`
   - Reads: /** s. 605.0715(5)-(6), Fla. Stat.: after administrative dissolution the  *  dissolved company's name is unavailable to others until one year has  *  passed (120 days after a voluntary dissolution). The data file does not  *  say which kind a dissolution was, so the longer window is applied to  *  every inactive record — erring toward warning the client. */
@@ -365,10 +367,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Corrected after Codex's review: The formation type sets the agreement's professional wording (professional: seed.formationType === 'PLLC'), so a conversion must still ask it. Ask the existing company's actual type.
   - Fixed: batch 09 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-19 rejected r1: Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision.
-- **54. [A13]** — **open** — waits on Adam's ruling
+- **54. [A13]** — **implemented** — waits on Adam's ruling
   - filing.ts member-managed "Any Other Provisions" sentence can never be produced. Replace: delete, or force the statement for member-managed too. Ruling needed.
   - Codex (housekeeping-only): filing.ts:141–142 has MEMBER_MANAGED provision, while StepManagement.tsx:75 sets includeManagementStatementInArticles false for that structure; its normal UI branch is unreachable.
   - **Codex rejected the proposed replacement:** Deleting the unused branch is supported. Forcing a new filed provision changes the product and requires a separate owner decision; the alternatives are not interchangeable.
+  - Ruling, 2026-09-20: Batch 19: preserve the manager-managed Articles sentence and the office workflow that uses it; remove only the unused member-managed alternative. Adam clarified: “That is the language that will be added to the articles of a manager managed LLC. But we do that in the office”, then approved the clarified proposal with “Go. Approve all”.
+  - Fixed: batch 19 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
 - **55. [A14]** — **implemented**
   - Country box: step allows empty; server refuses with no box marked. Replace: "Country required." on the step, error passed to the box (client, managers, members, correspondence).
   - Fixed: batch 08 revision 2, commit , by Codex; protected by 1 assertion(s).
@@ -415,10 +420,14 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
 - **64. [A25]** — **implemented**
   - Order confirmed: "Sign in to your portal" button for a first-time client; resend answers "already has a password" for a filed or formed order. Replace: button only for a returning client; treat filed/formed as paid.
   - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **65. [A26]** — **open**
+- **65. [A26]** — **implemented**
   - Progress percent counts hidden steps and an unreachable "Submit" step (whose dead page says we send the operating agreement). Replace: remove the dead step; one denominator.
-  - Part "dead-step" — open: The unreachable "Submit" step and its dead page, whose sentence says the operating agreement is sent with the filed documents, are removed.
-  - Part "denominator" — open: The progress percent counts only the steps a client can reach: one denominator, no hidden steps.
+  - Part "dead-step" — implemented: The unreachable "Submit" step and its dead page, whose sentence says the operating agreement is sent with the filed documents, are removed.
+  - Fixed (dead-step): batch 19 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
+  - Part "denominator" — implemented: The progress percent counts only the steps a client can reach: one denominator, no hidden steps.
+  - Fixed (denominator): batch 19 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
   - Former part "all" (retired by 001-part-level-links, now dead-step, denominator): The whole finding.
 - **66. [A27]** — **implemented**
   - Service-fee box "Formation service" on a conversion vs receipt "Protected series service fee". Replace: same words.
@@ -596,13 +605,15 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: No series has its own separate owners, and in this structure ownership does not differ from one series to the next.
   - Codex (disputed): StepSeries.tsx:94 heading explicitly says “How ownership works in this structure,” followed by “Your LLC owns every protected series” and “This is deliberate.” In context it describes this product, not a universal rule of Florida law.
   - Outcome: The passage is headed 'How ownership works in this structure'; in context it describes this product, not Florida law.
-- **89. [B51]** — **open** — same defect as 65 (dead-step)
+- **89. [B51]** — **implemented** — same defect as 65 (dead-step)
   - Intake received page (unreachable; see A26), step 03 — `webapp/src/components/forms/florida-llc/sections/StepSubmissionPayload.tsx:56`
   - Reads: Once the state accepts the filing, we send you the filed documents along with your form Operating Agreement and a comprehensive Owner’s Manual.
   - Claims: The operating agreement is sent with the filed documents.
   - True: The agreement is generated only after the portal questionnaire (A31; Terms s. 4 "completed with the information and the choices you make in the questionnaire"). The page is dead code (A26), so the fix is deletion; if kept, the sentence is wrong.
   - Replace with: Delete the page with the step (A26); otherwise: "Once the state accepts the filing, we post the filed documents and the Owner’s Manual to your portal; a short questionnaire there then completes your form Operating Agreement."
   - Codex (housekeeping-only): StepSubmissionPayload.tsx:56–58 promises the agreement with filed documents, but the submit page is unreachable through the normal form flow (65). No current reader sees this page.
+  - Fixed: batch 19 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
 - **90. [B52]** — **open** — waits on Adam's ruling
   - Name check result, the "held" verdict line — `webapp/src/components/forms/florida-llc/NameCheck.tsx:45`
   - Reads: Unavailable — this name belongs to a recently dissolved company, and Florida protects it for up to a year. Please choose a different name.
@@ -692,7 +703,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: message: 'Series names must include "PS", "P.S.", or "protected series" (s. 605.2202, Fla. Stat.).',  — and the same form at routes-portal.ts:1977, stepValidation.ts:189, StepSeries.tsx:72.
   - Fixed: batch 18 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
-- **100. [A30h]** — **review-rows: implemented; unused-code: open; fact-ledger: open** — housekeeping
+- **100. [A30h]** — **review-rows: implemented; unused-code: implemented; fact-ledger: open** — housekeeping
   - Housekeeping: review rows printing codes or "—" for a self-agent's email/phone; no "exact name only" row on the Review name card; dead duplicate-member check; dead conversion branch in the formation sheet; member fields typed but never asked; ledger lacks the $99 renewal, 15/30-day rules and the four optional prices.
   - Codex (disputed): The compound item mixes code-only leftovers with visible Review rows and missing exact-name information (ReviewStep.tsx:113–124,157–169,225–228). It cannot all be classified housekeeping-only; the “capacity code” branch is itself unreachable in normal SELF UI.
   - **Codex rejected the proposed replacement:** Split visible wording/record defects from unused code. No concrete unified replacement is supplied, and ledger omissions are not false customer claims.
@@ -700,7 +711,9 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Part "review-rows" — implemented: Review rows print codes or a dash for a self-agent's email and phone; the Review name card has no 'exact name only' row.
   - Fixed (review-rows): batch 08 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-19 rejected r1: Supersede the failed review revision to complete the omitted tests already authorized with Batch 08; product decisions unchanged. Adam: why did you need to stop and ask me.  if you need to do the tests, just fucking do them and dont waste my time
-  - Part "unused-code" — open: The dead duplicate-member check, the dead conversion branch in the formation sheet, and member fields typed but never asked. Item 112 is the same dead check.
+  - Part "unused-code" — implemented: The dead duplicate-member check, the dead conversion branch in the formation sheet, and member fields typed but never asked. Item 112 is the same dead check.
+  - Fixed (unused-code): batch 19 revision 2, commit , by Codex; protected by 3 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
   - Part "fact-ledger" — open: The fact ledger lacks the $99 renewal, the 15- and 30-day rules and the four optional prices.
 - **101. [B18]** — **implemented** — housekeeping
   - Order form, the payload built at submit (conversion branch) — `webapp/src/components/forms/florida-llc/buildPayload.ts:29`
@@ -709,20 +722,24 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: finalName is computed at :16-19 from data.desiredLlcName and data.llcDesignator and sent regardless, so an abandoned typed name still reaches llcName.finalName; filing.ts:365 and order-summary.ts:151 print that value. The order's own name is safe only because routes-payments.ts:363-365 prefers existingLlcName on a conversion.
   - Replace with: ? { desiredName: "", designator: "", finalName: "", alternateNames: [], exactNameOnly: false }
   - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **102. [B19]** — **open** — housekeeping
+- **102. [B19]** — **implemented** — housekeeping
   - Order form, the payload built at submit — `webapp/src/components/forms/florida-llc/buildPayload.ts:159`
   - Reads: exactNameOnly: data.exactNameOnly === true,
   - Claims: The exact-name-only choice, recorded a second time under acknowledgments.
   - True: The same fact is sent at :39 under llcName.exactNameOnly, and on a conversion the two disagree (:29 forces false; :159 carries the typed value). Two values for one fact.
   - Replace with: Drop one of the two; keep llcName.exactNameOnly and read it wherever acknowledgments.exactNameOnly is read.
   - Codex (housekeeping-only): buildPayload.ts:29 forces llcName.exactNameOnly false on conversion while :159 duplicates the stale original in acknowledgments.
-- **103. [B20]** — **open** — housekeeping
+  - Fixed: batch 19 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
+- **103. [B20]** — **implemented** — housekeeping
   - Order form, the payload built at submit, metadata — `webapp/src/components/forms/florida-llc/buildPayload.ts:176`
   - Reads: ipAddress: "", // TODO(server): fill from request context
   - Claims: That the server still has to fill the IP address.
   - True: It does: routes-payments.ts:346 'payload.metadata.ipAddress = clientIp(c);'. The TODO is stale.
   - Replace with: ipAddress: "", // the server fills this from the request (routes-payments.ts)
   - Codex (housekeeping-only): buildPayload.ts:176 still marks IP filling TODO; routes-payments.ts:346 already assigns clientIp(c).
+  - Fixed: batch 19 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
 - **104. [B22]** — **open** — housekeeping
   - Order form, the street-address box component — `webapp/src/components/forms/florida-llc/AddressAutocomplete.tsx:21`
   - Reads: /** Runs when the client leaves the box — a typed address gets its check then. */   onBlur?: () => void;
@@ -730,7 +747,8 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: No caller passes onBlur (a search of the form's .tsx files finds it only on StepSeries.tsx:198, a different box). The check runs when the client continues past the step (FloridaLLCFormationForm.tsx:342 calls /api/address/verify), as Privacy s. 5 says. Dead prop with a misleading comment.
   - Replace with: Remove the onBlur prop and its comment, or wire it from AddressFieldsBlock.
   - Codex (housekeeping-only): AddressAutocomplete.tsx:21 describes blur checking; no form caller supplies its onBlur prop; FloridaLLCFormationForm.tsx:342 performs the check on Continue.
-- **105. [B35]** — **open** — housekeeping
+  - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
+- **105. [B35]** — **implemented** — housekeeping
   - Agent acceptance step, the "Handled by us — nothing to sign." screen — `webapp/src/components/forms/florida-llc/sections/StepRegisteredAgentAcceptance.tsx:37`
   - Reads: if (isService) { … Handled by us — nothing to sign. … }
   - Claims: A screen exists for the service choice.
@@ -739,13 +757,17 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (disputed): The SERVICE rendering branch at StepRegisteredAgentAcceptance.tsx:37–56 is unreachable, but proposed deletion also removes line19 isService, which the surviving effect still reads at :28.
   - **Codex rejected the proposed replacement:** Delete the dead rendering branch while preserving isService until its remaining effect use is refactored; the replacement as specified leaves an undefined identifier.
   - Corrected after Codex's review: Delete the unreachable screen (lines 37-56) only; isService on line 19 is still read by the effect at line 28.
-- **106. [B53]** — **open** — housekeeping
+  - Fixed: batch 19 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
+- **106. [B53]** — **implemented** — housekeeping
   - Certification & signature step, the electronic signature error — `webapp/src/components/forms/florida-llc/sections/StepCertification.tsx:355`
   - Reads: (sigMismatch && data.articlesSignerChoice === "SELF"
   - Claims: Guards the SELF case.
   - True: The whole block is already inside data.articlesSignerChoice === "SELF" (line 348); the second test is dead.
   - Replace with: (sigMismatch
   - Codex (housekeeping-only): StepCertification.tsx:355 repeats articlesSignerChoice===SELF inside the same condition at :348.
+  - Fixed: batch 19 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
 - **107. [B54]** — **dropped** — housekeeping
   - Registered agent step, the service card on a conversion — `webapp/src/components/forms/florida-llc/sections/StepRegisteredAgent.tsx:57`
   - Reads: First year included in your service fee ($99/yr after). We accept the appointment and handle legal mail for you. Florida charges $25 to change the agent on file for your LLC.
@@ -754,13 +776,15 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: None.
   - Codex (disputed): The item itself says “No defect — recorded so the sentence is known to have been checked.” StepRegisteredAgent.tsx:57–60 matches Terms9(c) and the $25 statutory change fee.
   - Outcome: The item itself says no defect; it was a note that the sentence had been checked.
-- **108. [B67]** — **open** — housekeeping
+- **108. [B67]** — **implemented** — housekeeping
   - Order form data model: a field nobody asks — `webapp/src/components/forms/florida-llc/types.ts:171`
   - Reads: registeredAgentIsAffiliatedPerson: boolean;
   - Claims: The form records whether the agent is an affiliated person.
   - True: The field is defaulted (defaults.ts) and reset by raService.ts and has no box on any step and no slot in SubmissionPayload (types.ts:267-287); grep across src and server finds no other reader.
   - Replace with: Delete the field from FloridaLLCFormData, defaults.ts, schema.ts and raService.ts.
   - Codex (housekeeping-only): types.ts:171 defines registeredAgentIsAffiliatedPerson; defaults/raService assign it and schema requires it, but no UI or payload consumer uses it.
+  - Fixed: batch 19 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
 - **109. [B68]** — **open** — housekeeping
   - Order form data model: a preparation fee filed under state fees — `webapp/src/components/forms/florida-llc/types.ts:329`
   - Reads: estimatedStateFees: { articlesOfOrganization: number; registeredAgentDesignation: number; additionalSeriesPrepFee?: number; certificateOfStatus: number; certifiedCopy: number; estimatedTotal: number; };
@@ -768,41 +792,52 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: validation.ts:168-169 on the same figure: "Our preparation charge for series beyond the included three — NOT a state fee; billed with the service fee." The payload groups it with the Division's charges; server/pricing.ts recomputes everything, so nothing a client sees is wrong, but the record misfiles it.
   - Replace with: Move additionalSeriesPrepFee out of estimatedStateFees into its own `serviceFees` block (or rename the group `estimatedFees`).
   - Codex (housekeeping-only): types.ts:329 groups additionalSeriesPrepFee inside estimatedStateFees although validation.ts:168–169 expressly calls it a service preparation charge. Actual pricing is recomputed.
-- **110. [B69]** — **open** — housekeeping
+  - Ruling, 2026-09-20: Batch 19 review item 12: leave the internal fee grouping unchanged, as recommended in response to “Why does this matter?” and included in the clarified scope approved by “Go. Approve all”. No pricing or customer-facing fee change.
+- **110. [B69]** — **implemented** — housekeeping
   - Order form rules file: a stale contract comment — `webapp/src/components/forms/florida-llc/validation.ts:203`
   - Reads: SERVER-SIDE VALIDATION EXPECTATIONS: … 2. Re-validate registered-agent address (FL state, no P.O. box). … 7. Require >= 1 initial member. … 10. Sanitize all string inputs and reject HTML/script payloads.
   - Claims: The server enforces these ten rules.
   - True: server/validation.ts does not require a member (manager-managed orders carry none; blank scaffold rows are dropped by memberRowIsBlank, validation.ts:55-59); the agent address rule applies only when the client is the agent; and no HTML/script rejection exists there. The list describes an intention from before the server existed.
   - Replace with: Delete the block, or replace it with one line: "The server re-runs the Zod schema and the rules in server/validation.ts; keep the two in step."
   - Codex (housekeeping-only): validation.ts:203–216 lists unconditional member and HTML-rejection expectations absent from server/validation.ts; it is a stale internal comment.
-- **111. [B70]** — **open** — housekeeping
+  - Fixed: batch 19 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
+- **111. [B70]** — **implemented** — housekeeping
   - Order form rules file: two exports only tests call — `webapp/src/components/forms/florida-llc/validation.ts:74`
   - Reads: export function totalOwnershipPct(…) … export function ownershipPercentageWarning(…) { … "Ownership percentages should be provided for all members or none." … }
   - Claims: The form warns when member ownership percentages do not total 100.
   - True: No step asks a percentage (RepeatableMemberFields.tsx:32-35 seeds ownershipPercentage undefined and renders no box); the only caller of ownershipPercentageWarning is validation.test.ts, and totalOwnershipPct has none outside this file.
   - Replace with: Delete both functions and their test, with the MemberEntry fields A30h names.
   - Codex (housekeeping-only): validation.ts:74–92 exports unused percentage helpers; RepeatableMemberFields.tsx has no ownership boxes and production references search finds no caller.
-- **112. [B140]** — **open** — housekeeping; same defect as 100 (unused-code)
+  - Fixed: batch 19 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
+- **112. [B140]** — **implemented** — housekeeping; same defect as 100 (unused-code)
   - Order form, Submit — the second member check — `webapp/server/routes-payments.ts:308`
   - Reads: if (data.managementStructure !== "MANAGER_MANAGED" && data.members.length < 1) {     return c.json(err("At least one member is required.", "INVALID_INPUT"), 400);   }
   - Claims: An order with no members is refused here.
   - True: It never gets here: orderFormSchema (validation.ts:128-134) already refuses the same case as an issue on the members path with "At least one initial member is required.", and :290-296 returns before this line. Two wordings, one dead. (A30h.)
   - Replace with: Delete lines 305-310.
   - Codex (duplicate): Same dead second member validation explicitly included in100: routes-payments.ts:308–310 is preceded by orderFormSchema rejection using server/validation.ts:128–134.
-- **113. [B141]** — **open** — housekeeping
+  - Fixed: batch 19 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
+- **113. [B141]** — **implemented** — housekeeping
   - Server, payment routes — the name-check docstring sits over the contact form — `webapp/server/routes-payments.ts:627`
   - Reads: /** Name-availability check against our mirror of the Division of  *  Corporations' public data files (server/sunbiz.ts). Public: the intake  *  name step calls it before an order exists. Verdicts say "no conflict  *  found", never "available" — the Division makes the final determination. */ // The public contact form.
   - Claims: The route beneath is the name check.
   - True: The route beneath (:635-665) is /contact; /name-check is at :688.
   - Replace with: Move the four-line docstring to sit above `app.post("/name-check", …)` at line 688.
   - Codex (housekeeping-only): routes-payments.ts:627–631 name-check docstring precedes contact route at635, while actual name-check route is688.
-- **114. [B146]** — **open** — housekeeping
+  - Fixed: batch 19 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
+- **114. [B146]** — **implemented** — housekeeping
   - Office, copy sheet module — the dead conversion branch and an orphan docstring — `webapp/server/filing.ts:320`
   - Reads: value: p.filingPath === "CONVERT" ? "Conversion of an existing entity" : "New Florida LLC",         statement: true,       },       ...(p.filingPath === "CONVERT"         ? [             { key: "existingName", label: "Existing entity name", value: p.existingLlcName ?? "" },             { key: "sunbizDoc", label: "Existing document number", value: p.sunbizDocumentNumber ?? "" },           ]         : []),
   - Claims: The formation sheet can describe a conversion.
   - True: filing.ts:306 `if (p.filingPath === "CONVERT") return conversionGroups(p);` returns before this code for every conversion, so the branch is unreachable (A30h). Also filing.ts:187-188 `/** The registered agent's rows, shared by the Articles sheet and the conversion sheet's change-of-agent filing. */` sits above RA_SERVICE_SIGNER, not raFields (:198).
   - Replace with: value: "New Florida LLC", statement: true, }, — delete lines 323-328 — and move the docstring at 187-188 to line 197, above `function raFields`.
   - Codex (housekeeping-only): The conversion branch duplicates100, but this item also uniquely identifies a misplaced docstring at filing.ts:187–188 above RA_SERVICE_SIGNER instead of raFields(:198). Both changes affect internal code/comments, not reader output.
+  - Fixed: batch 19 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
 - **N1.13. [substantive]** — **implemented**
   - Formation order, recovery after a payment-fulfillment failure — `webapp/server/routes-payments.ts:55`
   - Reads: `UPDATE orders SET status = 'paid', paid_at = now(), square_payment_id = $1

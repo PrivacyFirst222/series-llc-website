@@ -2897,6 +2897,53 @@ for(const [label,r]of batch05Results)expect(r.ok,label,r.detail);
     accountResults.delete(label);
   }
   for (const [label, result] of accountResults) expect(result.ok, label, result.detail);
+  // Batch 19: independent expected screen names, not imported from the production step list.
+  {
+    const { defaultFormData } = await import("../src/components/forms/florida-llc/defaults");
+    let correct = true;
+    const observations: unknown[] = [];
+    for (const filingPath of ["NEW", "CONVERT"] as const) for (const managementStructure of ["MEMBER_MANAGED", "MANAGER_MANAGED"] as const) for (const registeredAgentChoice of ["SELF", "SERVICE"] as const) for (const preset of [false, true]) {
+      const page = await browser.newPage({ viewport: { width: 1280, height: 1000 } });
+      try {
+        await guardedRoute(page, new RegExp("/api/"), async route => {
+          await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ data: { available: false, results: [] } }) });
+        });
+        await page.goto(`http://localhost:${WEB_PORT}/`);
+        const data = { ...structuredClone(defaultFormData), filingPath, managementStructure, registeredAgentChoice, clientFirstName: "Preserved", clientLastName: "Draft" };
+        await page.evaluate(data => localStorage.setItem("fl-llc-formation-draft-v1", JSON.stringify({ __draft: 2, data, stepIndex: 18, maxStep: 18, visited: [18] })), data);
+        await page.goto(`http://localhost:${WEB_PORT}/form-llc${preset ? `?path=${filingPath.toLowerCase()}` : ""}`);
+        await page.getByRole("button", { name: "Continue to payment", exact: true }).waitFor();
+        const labels = [
+          ...(!preset ? ["Getting started"] : []), "Eligibility", "Your information", "LLC name", "Principal address", "Mailing address", "Series", "Registered agent",
+          ...(filingPath === "NEW" && registeredAgentChoice === "SELF" ? ["Agent acceptance"] : []),
+          "Management", managementStructure === "MEMBER_MANAGED" ? "Initial members" : "Managers",
+          ...(filingPath === "NEW" ? ["Purpose", "Effective date"] : []), "Correspondence", "Optional docs", "Review", "Certify & sign",
+        ];
+        const buttons = page.locator("aside ol button");
+        const names = (await buttons.allTextContents()).map(t => t.trim().replace(/^\d+/, "").trim());
+        const resumed = await page.locator("aside").innerText();
+        let rowOk = JSON.stringify(names) === JSON.stringify(labels) && resumed.includes("100%") && resumed.includes(`Step ${labels.length} of ${labels.length}`);
+        if (rowOk) for (let index = 0; index < labels.length; index++) {
+          await buttons.filter({ hasText: labels[index] }).last().click();
+          const expected = Math.round((index + 1) / labels.length * 100);
+          await page.waitForFunction(({ n, total, expected }) => {
+            const text = document.querySelector("aside")?.textContent ?? "";
+            return text.includes(`Step ${n} of ${total}`) && text.includes(`${expected}%`);
+          }, { n: index + 1, total: labels.length, expected }, { timeout: 1500 }).catch(() => { rowOk = false; });
+        }
+        await page.reload();
+        await page.getByRole("button", { name: "Continue to payment", exact: true }).waitFor();
+        const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("fl-llc-formation-draft-v1") ?? "{}").data?.clientFirstName);
+        rowOk &&= saved === "Preserved" && (await page.locator("aside").innerText()).includes("100%");
+        if (preset && filingPath === "NEW" && managementStructure === "MANAGER_MANAGED" && registeredAgentChoice === "SERVICE") await shot(page, "batch19-certification-progress");
+        observations.push({ filingPath, managementStructure, registeredAgentChoice, preset, names, expected: labels, resumed, saved, ok: rowOk });
+        correct &&= rowOk;
+      } catch (e) { correct = false; observations.push({ filingPath, managementStructure, registeredAgentChoice, preset, error: String(e) }); }
+      finally { await page.close(); }
+    }
+    expect(correct, "batch19 65: progress matches reachable screens and resumes at certification", observations);
+  }
+
   await browser.close();
   web.stop();
   api.kill();

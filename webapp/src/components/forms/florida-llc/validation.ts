@@ -1,7 +1,6 @@
 import { easternToday, validCalendarDate, isBankingDay, shiftBankingDays, effectiveDateRange } from "../../../lib/calendar";
 import { isPoBox } from "./schema";
 import type {
-  FloridaLLCFormData,
   FormationType,
   LlcDesignator,
 } from "./types";
@@ -62,25 +61,6 @@ export function designatorAllowedForFormationType(
   // s. 621.12(2)(b)3: a PLLC formed on or after 1 Jan 2014 uses a professional
   // designator IN LIEU OF the s. 605.0112 ones — plain "LLC" is not allowed.
   return PLLC_DESIGNATORS.includes(designator as LlcDesignator);
-}
-
-export function totalOwnershipPct(members: FloridaLLCFormData["members"]): number {
-  return members.reduce((sum, m) => sum + (m.ownershipPercentage ?? 0), 0);
-}
-
-export function ownershipPercentageWarning(
-  members: FloridaLLCFormData["members"],
-): string | null {
-  const provided = members.filter((m) => typeof m.ownershipPercentage === "number");
-  if (provided.length === 0) return null;
-  if (provided.length !== members.length) {
-    return "Ownership percentages should be provided for all members or none.";
-  }
-  const total = totalOwnershipPct(members);
-  if (Math.abs(total - 100) > 0.001) {
-    return `Ownership percentages total ${total}%. Should equal 100%.`;
-  }
-  return null;
 }
 
 export function validateRegisteredAgentAddress(
@@ -171,21 +151,7 @@ export function calculateEstimatedFees(opts: {
   };
 }
 
-/**
- * SERVER-SIDE VALIDATION EXPECTATIONS:
- * 1. Re-run the full Zod schema in `schema.ts` on the request body.
- * 2. Re-validate registered-agent address (FL state, no P.O. box).
- * 3. Re-validate principal office address (no P.O. box).
- * 4. Re-validate LLC name contains a legal designator.
- * 5. If formationType === "PLLC", require purposeType === "PROFESSIONAL"
- *    and businessPurposeText non-empty.
- * 6. If managementStructure === "MANAGER_MANAGED" and
- *    includeManagementStatementInArticles, require >=1 manager (role MGR).
- * 7. Require >= 1 initial member.
- * 8. If specific effective date, re-validate -5 business days / +90 days range.
- * 9. Verify both correspondent emails match.
- * 10. Sanitize all string inputs and reject HTML/script payloads.
- */
+// Order requests are validated by webapp/server/validation.ts before routes-payments.ts builds the stored payload.
 
 /**
  * s. 605.2202(2)(b): a protected series name must contain the phrase

@@ -1,0 +1,361 @@
+{
+  "id": "19",
+  "revision": 2,
+  "title": "Order-form and validation cleanup; preserve office management wording and fee grouping",
+  "model": "Codex",
+  "base": "8ec01904bfff8d6028fba5e85c818808517daef7",
+  "items": [
+    {
+      "id": "43",
+      "part": "all",
+      "scope": "Approved Batch 19 cleanup. Preserve manager-managed office Articles wording; exclude review item 12 (finding 109). No portal ownership changes, publication or test-data cleanup. Preserve the live owner-address blur callback and member contact-prefill fields. Item 104 is excluded because its callback has a live consumer.",
+      "assertions": [
+        {
+          "kind": "absent",
+          "text": "export { personLegalName, effectiveOwners }"
+        }
+      ]
+    },
+    {
+      "id": "54",
+      "part": "all",
+      "scope": "Approved Batch 19 cleanup. Preserve manager-managed office Articles wording; exclude review item 12 (finding 109). No portal ownership changes, publication or test-data cleanup. Preserve the live owner-address blur callback and member contact-prefill fields. Item 104 is excluded because its callback has a live consumer.",
+      "assertions": [
+        {
+          "kind": "absent",
+          "text": "Pursuant to Florida Statutes Section 605.0407, the company is or will be member-managed."
+        },
+        {
+          "kind": "present",
+          "file": "webapp/server/filing.ts",
+          "text": "Pursuant to Florida Statutes Section 605.0407, the company is or will be manager-managed."
+        }
+      ]
+    },
+    {
+      "id": "65",
+      "part": "dead-step",
+      "scope": "Approved Batch 19 cleanup. Preserve manager-managed office Articles wording; exclude review item 12 (finding 109). No portal ownership changes, publication or test-data cleanup. Preserve the live owner-address blur callback and member contact-prefill fields. Item 104 is excluded because its callback has a live consumer.",
+      "assertions": [
+        {
+          "kind": "absent",
+          "text": "StepSubmissionPayload"
+        }
+      ]
+    },
+    {
+      "id": "89",
+      "part": "all",
+      "scope": "Approved Batch 19 cleanup. Preserve manager-managed office Articles wording; exclude review item 12 (finding 109). No portal ownership changes, publication or test-data cleanup. Preserve the live owner-address blur callback and member contact-prefill fields. Item 104 is excluded because its callback has a live consumer.",
+      "assertions": [
+        {
+          "kind": "absent",
+          "text": "StepSubmissionPayload"
+        }
+      ]
+    },
+    {
+      "id": "65",
+      "part": "denominator",
+      "scope": "Approved Batch 19 cleanup. Preserve manager-managed office Articles wording; exclude review item 12 (finding 109). No portal ownership changes, publication or test-data cleanup. Preserve the live owner-address blur callback and member contact-prefill fields. Item 104 is excluded because its callback has a live consumer.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch19 65: progress matches reachable screens and resumes at certification"
+        }
+      ]
+    },
+    {
+      "id": "100",
+      "part": "unused-code",
+      "scope": "Approved Batch 19 cleanup. Preserve manager-managed office Articles wording; exclude review item 12 (finding 109). No portal ownership changes, publication or test-data cleanup. Preserve the live owner-address blur callback and member contact-prefill fields. Item 104 is excluded because its callback has a live consumer.",
+      "assertions": [
+        {
+          "kind": "absent",
+          "text": "ownershipPercentage?: number;"
+        },
+        {
+          "kind": "absent",
+          "text": "return c.json(err(\"At least one member is required.\", \"INVALID_INPUT\"), 400);"
+        },
+        {
+          "kind": "absent",
+          "text": "Conversion of an existing entity"
+        }
+      ]
+    },
+    {
+      "id": "112",
+      "part": "all",
+      "scope": "Approved Batch 19 cleanup. Preserve manager-managed office Articles wording; exclude review item 12 (finding 109). No portal ownership changes, publication or test-data cleanup. Preserve the live owner-address blur callback and member contact-prefill fields. Item 104 is excluded because its callback has a live consumer.",
+      "assertions": [
+        {
+          "kind": "absent",
+          "text": "ownershipPercentage?: number;"
+        }
+      ]
+    },
+    {
+      "id": "102",
+      "part": "all",
+      "scope": "Approved Batch 19 cleanup. Preserve manager-managed office Articles wording; exclude review item 12 (finding 109). No portal ownership changes, publication or test-data cleanup. Preserve the live owner-address blur callback and member contact-prefill fields. Item 104 is excluded because its callback has a live consumer.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch19 102: exact-name consent has one canonical source and survives the office record"
+        }
+      ]
+    },
+    {
+      "id": "103",
+      "part": "all",
+      "scope": "Approved Batch 19 cleanup. Preserve manager-managed office Articles wording; exclude review item 12 (finding 109). No portal ownership changes, publication or test-data cleanup. Preserve the live owner-address blur callback and member contact-prefill fields. Item 104 is excluded because its callback has a live consumer.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/src/components/forms/florida-llc/buildPayload.ts",
+          "text": "ipAddress: \"\", // The server fills this from the request (routes-payments.ts)."
+        }
+      ]
+    },
+    {
+      "id": "105",
+      "part": "all",
+      "scope": "Approved Batch 19 cleanup. Preserve manager-managed office Articles wording; exclude review item 12 (finding 109). No portal ownership changes, publication or test-data cleanup. Preserve the live owner-address blur callback and member contact-prefill fields. Item 104 is excluded because its callback has a live consumer.",
+      "assertions": [
+        {
+          "kind": "absent",
+          "text": "if (isService) {"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/src/components/forms/florida-llc/sections/StepRegisteredAgentAcceptance.tsx",
+          "text": "if (!isService && raFullName && !data.registeredAgentAcceptanceName)"
+        }
+      ]
+    },
+    {
+      "id": "106",
+      "part": "all",
+      "scope": "Approved Batch 19 cleanup. Preserve manager-managed office Articles wording; exclude review item 12 (finding 109). No portal ownership changes, publication or test-data cleanup. Preserve the live owner-address blur callback and member contact-prefill fields. Item 104 is excluded because its callback has a live consumer.",
+      "assertions": [
+        {
+          "kind": "absent",
+          "text": "sigMismatch && data.articlesSignerChoice === \"SELF\""
+        }
+      ]
+    },
+    {
+      "id": "108",
+      "part": "all",
+      "scope": "Approved Batch 19 cleanup. Preserve manager-managed office Articles wording; exclude review item 12 (finding 109). No portal ownership changes, publication or test-data cleanup. Preserve the live owner-address blur callback and member contact-prefill fields. Item 104 is excluded because its callback has a live consumer.",
+      "assertions": [
+        {
+          "kind": "absent",
+          "text": "registeredAgentIsAffiliatedPerson"
+        }
+      ]
+    },
+    {
+      "id": "110",
+      "part": "all",
+      "scope": "Approved Batch 19 cleanup. Preserve manager-managed office Articles wording; exclude review item 12 (finding 109). No portal ownership changes, publication or test-data cleanup. Preserve the live owner-address blur callback and member contact-prefill fields. Item 104 is excluded because its callback has a live consumer.",
+      "assertions": [
+        {
+          "kind": "absent",
+          "text": "SERVER-SIDE VALIDATION EXPECTATIONS:"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/src/components/forms/florida-llc/validation.ts",
+          "text": "Order requests are validated by webapp/server/validation.ts before routes-payments.ts builds the stored payload."
+        }
+      ]
+    },
+    {
+      "id": "111",
+      "part": "all",
+      "scope": "Approved Batch 19 cleanup. Preserve manager-managed office Articles wording; exclude review item 12 (finding 109). No portal ownership changes, publication or test-data cleanup. Preserve the live owner-address blur callback and member contact-prefill fields. Item 104 is excluded because its callback has a live consumer.",
+      "assertions": [
+        {
+          "kind": "absent",
+          "text": "totalOwnershipPct"
+        },
+        {
+          "kind": "absent",
+          "text": "ownershipPercentageWarning"
+        }
+      ]
+    },
+    {
+      "id": "113",
+      "part": "all",
+      "scope": "Approved Batch 19 cleanup. Preserve manager-managed office Articles wording; exclude review item 12 (finding 109). No portal ownership changes, publication or test-data cleanup. Preserve the live owner-address blur callback and member contact-prefill fields. Item 104 is excluded because its callback has a live consumer.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/server/routes-payments.ts",
+          "text": " *  found\", never \"available\" \u2014 the Division makes the final determination. */\napp.post(\"/name-check\""
+        }
+      ]
+    },
+    {
+      "id": "114",
+      "part": "all",
+      "scope": "Approved Batch 19 cleanup. Preserve manager-managed office Articles wording; exclude review item 12 (finding 109). No portal ownership changes, publication or test-data cleanup. Preserve the live owner-address blur callback and member contact-prefill fields. Item 104 is excluded because its callback has a live consumer.",
+      "assertions": [
+        {
+          "kind": "absent",
+          "text": "Conversion of an existing entity"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/server/filing.ts",
+          "text": "/** The registered agent's rows, shared by the Articles sheet and the\n *  conversion sheet's change-of-agent filing. */\nfunction raFields"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "webapp/server/app.ts",
+      "mode": "code",
+      "why": "Approved formation cleanup; preserve live consumers and earlier fixes."
+    },
+    {
+      "path": "webapp/server/filing.ts",
+      "mode": "code",
+      "why": "Approved formation cleanup; preserve live consumers and earlier fixes."
+    },
+    {
+      "path": "webapp/server/routes-payments.ts",
+      "mode": "code",
+      "why": "Approved formation cleanup; preserve live consumers and earlier fixes."
+    },
+    {
+      "path": "webapp/server/order-summary.ts",
+      "mode": "code",
+      "why": "Approved formation cleanup; preserve live consumers and earlier fixes."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/types.ts",
+      "mode": "code",
+      "why": "Approved formation cleanup; preserve live consumers and earlier fixes."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/steps.ts",
+      "mode": "code",
+      "why": "Approved formation cleanup; preserve live consumers and earlier fixes."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/FloridaLLCFormationForm.tsx",
+      "mode": "code",
+      "why": "Approved formation cleanup; preserve live consumers and earlier fixes."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/defaults.ts",
+      "mode": "code",
+      "why": "Approved formation cleanup; preserve live consumers and earlier fixes."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/schema.ts",
+      "mode": "code",
+      "why": "Approved formation cleanup; preserve live consumers and earlier fixes."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/RepeatableMemberFields.tsx",
+      "mode": "code",
+      "why": "Approved formation cleanup; preserve live consumers and earlier fixes."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/ReviewStep.tsx",
+      "mode": "code",
+      "why": "Approved formation cleanup; preserve live consumers and earlier fixes."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/buildPayload.ts",
+      "mode": "code",
+      "why": "Approved formation cleanup; preserve live consumers and earlier fixes."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepRegisteredAgentAcceptance.tsx",
+      "mode": "code",
+      "why": "Approved formation cleanup; preserve live consumers and earlier fixes."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepCertification.tsx",
+      "mode": "code",
+      "why": "Approved formation cleanup; preserve live consumers and earlier fixes."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/raService.ts",
+      "mode": "code",
+      "why": "Approved formation cleanup; preserve live consumers and earlier fixes."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/validation.ts",
+      "mode": "code",
+      "why": "Approved formation cleanup; preserve live consumers and earlier fixes."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/validation.test.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Regression evidence or removal of obsolete formation-only fixture fields; existing functional assertions preserved."
+    },
+    {
+      "path": "webapp/server/e2e.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Regression evidence or removal of obsolete formation-only fixture fields; existing functional assertions preserved."
+    },
+    {
+      "path": "webapp/scripts/behavioral.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Regression evidence or removal of obsolete formation-only fixture fields; existing functional assertions preserved."
+    },
+    {
+      "path": "webapp/server/batch03-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Regression evidence or removal of obsolete formation-only fixture fields; existing functional assertions preserved."
+    },
+    {
+      "path": "webapp/server/batch05-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Regression evidence or removal of obsolete formation-only fixture fields; existing functional assertions preserved."
+    },
+    {
+      "path": "webapp/server/batch18-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Regression evidence or removal of obsolete formation-only fixture fields; existing functional assertions preserved."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepSubmissionPayload.tsx",
+      "mode": "delete",
+      "why": "Remove unreachable submission screen."
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "why": "Mandatory API rebuild."
+    },
+    {
+      "path": "docs/facts.md",
+      "mode": "code",
+      "control": true,
+      "why": "Remove the obsolete deliverables-location reference to the deleted, unreachable confirmation screen. Preserve every other fact and check."
+    }
+  ],
+  "requiredChecks": [],
+  "removedChecks": [
+    "100% total is fine",
+    "90% total flags warning",
+    "no percentages provided is fine"
+  ]
+}

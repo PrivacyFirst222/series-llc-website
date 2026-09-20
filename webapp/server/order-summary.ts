@@ -83,6 +83,7 @@ const addr = (a: Addr) =>
 function ticked(p: SubmissionPayload): { text: string; field: string }[] {
   const flags: Record<string, boolean> = {
     ...(p.acknowledgments ?? {}),
+    exactNameOnly: p.llcName?.exactNameOnly === true,
     seriesOwnershipAcknowledged: p.certifications?.seriesOwnershipAcknowledged === true,
     articlesSignerAppointed: p.certifications?.articlesSignerAppointed === true,
     atLeastOneMemberAcknowledged: p.certifications?.atLeastOneMemberAcknowledged === true,
