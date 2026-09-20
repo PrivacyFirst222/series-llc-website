@@ -1270,7 +1270,7 @@ async function main(): Promise<void> {
       await row2.locator('input[aria-label="SSN — Susan Jones"]').pressSequentially("666", { delay: 20 });
       await page.waitForTimeout(200);
       expect(/check the first three digits/.test(await row2.locator('[data-testid="ssn-problem"]').first().innerText().catch(() => "")) && (await row2.locator('input[aria-label="SSN — Susan Jones"][aria-invalid="true"]').count()) === 1, "S election: 666 is called out under the box before the number is finished");
-      expect(/Susan Jones: check the first three digits/.test(await selDialog.innerText()), "S election: the still-needed list names the owner whose number is wrong");
+      expect(/Susan Jones: That is not a valid Social Security number — check the first three digits\./.test(await selDialog.innerText()), "S election: the still-needed list names the owner whose number is wrong");
       await row2.locator('input[aria-label="SSN — Susan Jones"]').scrollIntoViewIfNeeded().catch(() => {});
       await shot(page, "s-election-ssn-problem");
       await row2.locator('input[aria-label="SSN — Susan Jones"]').fill("234567890");
@@ -1431,7 +1431,7 @@ async function main(): Promise<void> {
       await page.waitForTimeout(800);
       const withEin = page.locator('[role="dialog"]').first();
       expect((await withEin.locator('[data-testid="ein-from-letter"]').inputValue()) === "88-1234567", "client: the S election form shows the EIN from the letter, read-only", await withEin.locator('[data-testid="ein-from-letter"]').inputValue().catch(() => ""));
-      expect((await withEin.locator("text=You're obtaining our EIN").count()) === 0, "client: no 'obtaining our EIN' tick once we have the number");
+      expect((await withEin.getByText("We’re obtaining your EIN — we’ll use it when it is issued", { exact: true }).count()) === 0, "client: no 'obtaining our EIN' tick once we have the number");
       await page.keyboard.press("Escape");
       await page.waitForTimeout(400);
       await page.reload();

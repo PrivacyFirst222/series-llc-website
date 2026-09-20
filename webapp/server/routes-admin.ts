@@ -1398,10 +1398,10 @@ app.post("/admin/services/:id/fulfill", async (c) => {
   return c.json({ data: { ok: true, documentId, rebuiltSElections } });
 });
 
-/** The EIN just arrived: every S election package for the company that was
- *  built as "Applied For" is rebuilt with it while its window is open, and
- *  the client is told. Past the window the numbers are gone, so the client
- *  is told that instead. Returns how many were rebuilt. */
+/** The EIN just arrived: saved S-election answers for this company become
+ *  a filing package with the issued number, and the client is told. Legacy
+ *  pending packages can also be rebuilt while their encrypted numbers remain.
+ *  If those numbers were purged, notify the client. Returns packages built. */
 async function carryEinIntoSElections(args: { clientId: string; companyOrderId: string | null; llcName: string; ein: string }): Promise<number> {
   if (!args.companyOrderId) return 0;
   await associateLegacyServices(args.clientId);

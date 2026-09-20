@@ -1801,7 +1801,7 @@ if (mint.status === 200) {
   );
 
   // The intake S election, built before the EIN exists: item A says
-  // "Applied For" until the office uploads the letter with the number
+  // Answers wait without a filing PDF until the office uploads the letter with the issued number
   // (Adam, 7 Sep 2026).
   const intakeSelDetails = {
     formationDate: easternToday(), ein: "", einPending: true, effectiveDate: "",
