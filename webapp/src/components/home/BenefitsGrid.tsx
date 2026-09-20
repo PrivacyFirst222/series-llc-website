@@ -38,7 +38,7 @@ const BENEFITS: { icon: typeof Shield; title: string; body: string }[] = [
   {
     icon: Scroll,
     title: "Cleaner operating agreements",
-    body: "One master OA + lightweight Series Designations. Easier to amend, easier for lenders to underwrite, easier to explain to partners.",
+    body: "One master operating agreement, with a short Series Exhibit for each series. Each series also requires a Protected Series Designation filed with Florida.",
   },
   {
     icon: Building2,

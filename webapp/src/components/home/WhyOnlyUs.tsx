@@ -46,7 +46,7 @@ export function WhyOnlyUs() {
             Formation is the <em>easy</em> part. Everything else is why we exist.
           </h2>
           <p className="text-base leading-relaxed text-muted-foreground">
-            Any filing service can send Articles to Tallahassee. But Florida's Protected Series Act
+            Any filing service can send Articles to Tallahassee. But Florida's protected series statute
             only protects you if your operating agreement is properly drafted and every series'
             assets are documented to the statute's standard — and that's where the industry goes
             silent. National formation services either don't form series LLCs at all or hand you a

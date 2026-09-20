@@ -92,7 +92,7 @@ export function WeAreOne() {
 
               <p className="mt-6 border-t border-border pt-4 text-xs text-muted-foreground">
                 The same architecture we build for clients — filed, designated, and operated under
-                Florida's Protected Series Act.
+                Florida's protected series statute.
               </p>
             </div>
           </div>

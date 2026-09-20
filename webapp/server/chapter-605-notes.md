@@ -137,10 +137,15 @@ s. 14.1 on s. 605.2501(2) — neither is in the non-variable list.
 - **s. 605.2104(2)–(4)** — a series has the same powers and purposes as the
   company EXCEPT that it may not be a member of the company, may not establish a
   protected series, and ceases to exist when the company completes winding up.
-- **s. 605.2602–605.2604** — a protected series may not convert, domesticate, or
-  participate in an interest exchange, and may merge only through the single
-  channel in s. 605.2604 (every other party an LLC; surviving company not
-  created in the merger).
+- **ss. 605.2602–605.2607** — distinguish the company from its protected
+  series. Section 605.2603 bars the series LLC itself from conversion,
+  domestication, and interest exchange. Its merger must satisfy s. 605.2604:
+  every other party is an LLC, and the surviving company is not created in
+  the merger. Section 605.2602 restricts protected-series transactions,
+  subject to ss. 605.2605(2), 605.2606(2), and 605.2607(1). In the company's
+  merger, existing series may continue, relocate, or be dissolved, wound up,
+  and terminated; a new series may be established through the merger filings
+  as ss. 605.2605–605.2607 provide.
 - **s. 605.2108(1)** — the deeming rule applies in the application of
   ss. 605.2106, 605.2304(3) and (6), 605.2501(4)(a), 605.2502(1), and
   605.2503(2). (Our old statute page labeled 605.2503(2) a "claims process"; it

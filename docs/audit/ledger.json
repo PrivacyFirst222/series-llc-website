@@ -322,14 +322,56 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T12:19:19.277Z",
+              "event": "assigned",
+              "batch": "17",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T12:19:19.300Z",
+              "event": "implemented",
+              "batch": "17",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "17",
+          "fix": {
+            "batch": "17",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/src/pages/AssetProtection.tsx",
+                "before": "They cannot seize his interest, vote his shares, or reach the property.",
+                "after": "They cannot seize his interest, exercise his voting rights, or reach the property."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/src/pages/AssetProtection.tsx",
+                "before": "A Florida Protected Series LLC addresses all of them simultaneously,",
+                "after": "A Florida Protected Series LLC addresses both simultaneously,"
+              },
+              {
+                "kind": "page",
+                "path": "/asset-protection",
+                "present": [
+                  "exercise his voting rights",
+                  "addresses both simultaneously"
+                ]
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -352,14 +394,60 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T12:19:19.277Z",
+              "event": "assigned",
+              "batch": "17",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T12:19:19.300Z",
+              "event": "implemented",
+              "batch": "17",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "17",
+          "fix": {
+            "batch": "17",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/src/pages/FAQ.tsx",
+                "before": "You get the asset segregation of multiple LLCs and only pay one annual fee.",
+                "after": "You get the asset segregation of multiple LLCs and file one Florida annual report covering the company and its protected series."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/src/pages/FAQ.tsx",
+                "before": "the processing time belongs to the Florida Secretary of State,",
+                "after": "the processing time belongs to the Florida Division of Corporations,"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/src/pages/FAQ.tsx",
+                "before": "(3) an S corporation, or (4) C corporation,",
+                "after": "(3) an S corporation, or (4) a C corporation,"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/src/pages/FAQ.tsx",
+                "before": "It is also possible for different series to be taxed differently, however, that raises some very complex income tax issues.",
+                "after": "It is also possible for different series to be taxed differently; however, that raises some very complex income tax issues."
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -384,14 +472,61 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T12:19:19.277Z",
+              "event": "assigned",
+              "batch": "17",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T12:19:19.300Z",
+              "event": "implemented",
+              "batch": "17",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "17",
+          "fix": {
+            "batch": "17",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/src/components/home/HomeHero.tsx",
+                "before": ">Protected Series LLC Act</span>",
+                "after": ">protected series statute</span>"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/src/components/home/WeAreOne.tsx",
+                "before": "                Florida's Protected Series Act.",
+                "after": "                Florida's protected series statute."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/src/components/home/WhyOnlyUs.tsx",
+                "before": "            Any filing service can send Articles to Tallahassee. But Florida's Protected Series Act",
+                "after": "            Any filing service can send Articles to Tallahassee. But Florida's protected series statute"
+              },
+              {
+                "kind": "page",
+                "path": "/",
+                "present": [
+                  "Florida's protected series statute"
+                ]
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -414,14 +549,50 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T12:19:19.277Z",
+              "event": "assigned",
+              "batch": "17",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T12:19:19.300Z",
+              "event": "implemented",
+              "batch": "17",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "17",
+          "fix": {
+            "batch": "17",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/src/components/home/BenefitsGrid.tsx",
+                "before": "One master OA + lightweight Series Designations. Easier to amend, easier for lenders to underwrite, easier to explain to partners.",
+                "after": "One master operating agreement, with a short Series Exhibit for each series. Each series also requires a Protected Series Designation filed with Florida."
+              },
+              {
+                "kind": "page",
+                "path": "/benefits",
+                "present": [
+                  "One master operating agreement, with a short Series Exhibit for each series.",
+                  "Each series also requires a Protected Series Designation filed with Florida."
+                ]
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -444,14 +615,56 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T12:19:19.277Z",
+              "event": "assigned",
+              "batch": "17",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T12:19:19.300Z",
+              "event": "implemented",
+              "batch": "17",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "17",
+          "fix": {
+            "batch": "17",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/src/pages/TheStatute.tsx",
+                "before": "                    \"What makes an asset a series' own is your records, not the name on the title: they must let a disinterested, reasonable person identify the asset, determine when and from whom it was acquired, and — if it came from the company or another series — the consideration, payor, and payee (§605.2301(2)).\",",
+                "after": "                    \"An asset’s association with a protected series generally depends on its records. Those records must identify the series and the asset, distinguish the asset from other assets, and show when and from whom it was acquired or how it became the series’ asset. For transfers from the company or another series, they must also identify the consideration, payor and payee. Recorded real-property instruments have the special rule described below (§605.2301(2)).\","
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/src/pages/TheStatute.tsx",
+                "before": "                    \"Titling real property in the series' name is what earns you the safe harbor: a recorded instrument naming the series is conclusive of the signer's authority and is itself a record of association (§605.2301(2)(b)).\",",
+                "after": "                    \"A recorded deed or other instrument transferring or affecting a protected series’ interest in real property can itself establish the required association record. To the extent the instrument favors someone who gives value without knowing that the signer lacked authority, it conclusively establishes the signer’s authority and records the interest as an associated asset or liability of that series, as applicable (§605.2301(2)(b)).\","
+              },
+              {
+                "kind": "page",
+                "path": "/the-statute",
+                "present": [
+                  "An asset’s association with a protected series generally depends on its records. Those records must identify the series and the asset, distinguish the asset from other assets, and show when and from whom it was acquired or how it became the series’ asset. For transfers from the company or another series, they must also identify the consideration, payor and payee. Recorded real-property instruments have the special rule described below (§605.2301(2)).",
+                  "A recorded deed or other instrument transferring or affecting a protected series’ interest in real property can itself establish the required association record. To the extent the instrument favors someone who gives value without knowing that the signer lacked authority, it conclusively establishes the signer’s authority and records the interest as an associated asset or liability of that series, as applicable (§605.2301(2)(b))."
+                ]
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -11381,14 +11594,42 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T12:19:19.277Z",
+              "event": "assigned",
+              "batch": "17",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T12:19:19.300Z",
+              "event": "implemented",
+              "batch": "17",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "17",
+          "fix": {
+            "batch": "17",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/server/chapter-605-notes.md",
+                "before": "- **s. 605.2602–605.2604** — a protected series may not convert, domesticate, or\n  participate in an interest exchange, and may merge only through the single\n  channel in s. 605.2604 (every other party an LLC; surviving company not\n  created in the merger).",
+                "after": "- **ss. 605.2602–605.2607** — distinguish the company from its protected\n  series. Section 605.2603 bars the series LLC itself from conversion,\n  domestication, and interest exchange. Its merger must satisfy s. 605.2604:\n  every other party is an LLC, and the surviving company is not created in\n  the merger. Section 605.2602 restricts protected-series transactions,\n  subject to ss. 605.2605(2), 605.2606(2), and 605.2607(1). In the company's\n  merger, existing series may continue, relocate, or be dissolved, wound up,\n  and terminated; a new series may be established through the merger filings\n  as ss. 605.2605–605.2607 provide."
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -12814,14 +13055,42 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T12:19:19.277Z",
+              "event": "assigned",
+              "batch": "17",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T12:19:19.300Z",
+              "event": "implemented",
+              "batch": "17",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "17",
+          "fix": {
+            "batch": "17",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "docs/owners-manual.md",
+                "before": "and the titling rule (§8.4): every asset is held in the name of the silo that owns it, never your personal name",
+                "after": "and the holding rule (§8.4): hold assets in the owning company's or series' name, or through a properly documented nominee arrangement under Section 8.4 — not simply in your personal name"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -12844,14 +13113,53 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T12:19:19.277Z",
+              "event": "assigned",
+              "batch": "17",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T12:19:19.300Z",
+              "event": "implemented",
+              "batch": "17",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "17",
+          "fix": {
+            "batch": "17",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "docs/owners-manual.md",
+                "before": "and the standing association rules that close the Article",
+                "after": "and the standing association rules in Section 8.5"
+              },
+              {
+                "kind": "replace",
+                "file": "docs/owners-manual.md",
+                "before": "1. **Sign it, and sign every Series Exhibit.** An unsigned operating agreement is a rumor. Your agreement also makes itself part of the association records (the standing association rules at the end of Article 8) — it only earns that status executed.",
+                "after": "1. **Sign it, and sign every Series Exhibit.** An unsigned operating agreement is a rumor. Your agreement also makes itself part of the association records (the standing association rules in Section 8.5) — it only earns that status executed."
+              },
+              {
+                "kind": "present",
+                "file": "docs/owners-manual.md",
+                "text": "The standing association rules in Section 8.5 make the agreement *itself* part of your records"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -12935,17 +13243,56 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T12:19:19.277Z",
+              "event": "assigned",
+              "batch": "17",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T12:19:19.300Z",
+              "event": "implemented",
+              "batch": "17",
+              "revision": 1,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "12",
             "part": "all"
+          },
+          "batch": "17",
+          "fix": {
+            "batch": "17",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "docs/owners-manual.md",
+                "before": "10|Written for the Florida Uniform Protected Series Act",
+                "after": "10|Written for Florida's Uniform Protected Series Provisions"
+              },
+              {
+                "kind": "document",
+                "master": "docs/owners-manual.md",
+                "word": "Series LLC Owners Manual - REVISED DRAFT.docx",
+                "masterPresent": [
+                  "Written for Florida's Uniform Protected Series Provisions"
+                ],
+                "wordPresent": [
+                  "Written for Florida's Uniform Protected Series Provisions"
+                ]
+              }
+            ]
           }
         }
       ],
@@ -13370,33 +13717,87 @@
         {
           "key": "article8-location",
           "scope": "\"the standing association rules that close the Article\": §8.5 does not close Article 8 — the same misstatement A96 (245) records.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-18T03:48:21.612Z",
               "event": "recorded by migration 001-part-level-links"
+            },
+            {
+              "at": "2026-09-20T12:19:19.277Z",
+              "event": "assigned",
+              "batch": "17",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T12:19:19.300Z",
+              "event": "implemented",
+              "batch": "17",
+              "revision": 1,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "245",
             "part": "all"
+          },
+          "batch": "17",
+          "fix": {
+            "batch": "17",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "docs/owners-manual.md",
+                "text": "and the standing association rules in Section 8.5"
+              }
+            ]
           }
         },
         {
           "key": "nominee",
           "scope": "\"never your personal name\" overstates §8.4; the documented nominee arrangement — the same overstatement A95 (244) records.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-18T03:48:21.612Z",
               "event": "recorded by migration 001-part-level-links"
+            },
+            {
+              "at": "2026-09-20T12:19:19.277Z",
+              "event": "assigned",
+              "batch": "17",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T12:19:19.300Z",
+              "event": "implemented",
+              "batch": "17",
+              "revision": 1,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "244",
             "part": "all"
+          },
+          "batch": "17",
+          "fix": {
+            "batch": "17",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "docs/owners-manual.md",
+                "text": "a properly documented nominee arrangement under Section 8.4"
+              }
+            ]
           }
         }
       ],
@@ -14847,14 +15248,59 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T12:19:19.277Z",
+              "event": "assigned",
+              "batch": "17",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T12:19:19.300Z",
+              "event": "implemented",
+              "batch": "17",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "17",
+          "fix": {
+            "batch": "17",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "docs/owners-manual.md",
+                "before": "Your operating agreement fights this battle for you in two ways. Article 8 puts the records in a named person's hands and sets the standard they must meet. And the standing association rules at the end of Article 8 — a provision you will not find in other companies' forms — makes the agreement *itself* part of your records: assets titled in a series' name, bought with a series' funds, or held in a series' accounts are associated with that series by standing rule, income and proceeds follow the asset that produced them, and anything left over is associated with the mothership so that **no asset of yours is ever \"non-associated.\"** They are a safety net, not a substitute: it works alongside real ledgers and real bank accounts, not instead of them.",
+                "after": "Your operating agreement fights this battle for you in two ways. Article 8 puts the records in a named person's hands and sets the standard they must meet. The standing association rules in Section 8.5 make the agreement *itself* part of your records and help determine where assets belong. They work alongside real ledgers and real bank accounts, not instead of them. Missing records can leave an asset non-associated; the default rule does not replace the identifying, acquisition, and transfer information the statute requires."
+              },
+              {
+                "kind": "replace",
+                "file": "docs/owners-manual.md",
+                "before": "**Second, your agreement's standing association rules make the mothership the default bucket.** Any asset you fail to associate with a series lands, by standing rule, in the company's silo. That is deliberately protective — it means a sloppy record never creates a *non-associated* free-for-all asset — but it also means **sloppiness collects in the mothership**. If the mothership is asset-light, a record you missed exposes little.",
+                "after": "**Second, your agreement's standing association rules make the mothership the default bucket.** The standing association rules help determine where assets belong, but they do not replace the required records. Missing records can leave an asset non-associated. Keep the mothership asset-light and document every asset."
+              },
+              {
+                "kind": "document",
+                "master": "docs/owners-manual.md",
+                "word": "Series LLC Owners Manual - REVISED DRAFT.docx",
+                "masterPresent": [
+                  "Missing records can leave an asset non-associated."
+                ],
+                "wordPresent": [
+                  "Missing records can leave an asset non-associated."
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -14899,14 +15345,53 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T12:19:19.277Z",
+              "event": "assigned",
+              "batch": "17",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T12:19:19.300Z",
+              "event": "implemented",
+              "batch": "17",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "17",
+          "fix": {
+            "batch": "17",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "docs/owners-manual.md",
+                "before": "- **Reinstatement, if you let it lapse:** $100 plus every missed year's annual report fee — on top of losing the shields in the interim.",
+                "after": "- **Reinstatement, if you let it lapse:** $100 plus every missed year's annual report fee. Administrative dissolution restricts the company to winding up; it does not automatically remove its liability protections. Keep the required records and resolve the lapse promptly."
+              },
+              {
+                "kind": "document",
+                "master": "docs/owners-manual.md",
+                "word": "Series LLC Owners Manual - REVISED DRAFT.docx",
+                "masterPresent": [
+                  "it does not automatically remove its liability protections."
+                ],
+                "wordPresent": [
+                  "it does not automatically remove its liability protections."
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -14925,14 +15410,53 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T12:19:19.277Z",
+              "event": "assigned",
+              "batch": "17",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T12:19:19.300Z",
+              "event": "implemented",
+              "batch": "17",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "17",
+          "fix": {
+            "batch": "17",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "docs/owners-manual.md",
+                "before": "2. **Documentary stamp tax.** Florida taxes deed transfers (70 cents per $100 of consideration). Transferring *mortgaged* property to your own entity is generally taxed on the mortgage balance, even with no money changing hands. Price this before you transfer — on a $300,000 mortgage that is $2,100. An unencumbered property transferred for no consideration is a different analysis. Confirm the stamp treatment with your closing agent or CPA before recording; do not guess.",
+                "after": "2. **Documentary stamp tax.** Outside Miami-Dade County, the rate is 70 cents per $100 or fraction of taxable consideration. Miami-Dade charges 60 cents per $100 or fraction, plus a 45-cent surtax unless the document transfers only a single-family dwelling. Transferring *mortgaged* property to your own entity can produce taxable consideration even when no cash changes hands. At the 70-cent rate outside Miami-Dade, $300,000 of taxable consideration produces $2,100 in tax. An unencumbered property transferred for no consideration is a different analysis. Confirm the consideration, rate, and any exemption with your closing agent or CPA before recording; do not guess."
+              },
+              {
+                "kind": "document",
+                "master": "docs/owners-manual.md",
+                "word": "Series LLC Owners Manual - REVISED DRAFT.docx",
+                "masterPresent": [
+                  "Outside Miami-Dade County, the rate is 70 cents per $100 or fraction of taxable consideration."
+                ],
+                "wordPresent": [
+                  "Outside Miami-Dade County, the rate is 70 cents per $100 or fraction of taxable consideration."
+                ]
+              }
+            ]
+          }
         }
       ],
       "correctedReplacement": "Verified: s. 201.02 (70 cents) and s. 201.031 (surtax, none on a single-family residence). NOT verified by Claude: Miami-Dade's 60-cent base rate (the Revenue Department page did not render)."
@@ -14952,14 +15476,53 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T12:19:19.277Z",
+              "event": "assigned",
+              "batch": "17",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T12:19:19.300Z",
+              "event": "implemented",
+              "batch": "17",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "17",
+          "fix": {
+            "batch": "17",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "docs/owners-manual.md",
+                "before": "- Your personal money touches the structure in exactly two ways: documented contributions in, documented distributions out. The company debit card buys nothing personal, ever.",
+                "after": "- Document every transfer between you and the company or a series: contributions, distributions, loans, repayments, and legitimate expense reimbursements. Identify the parties and purpose, and use the correct account. The company debit card buys nothing personal, ever."
+              },
+              {
+                "kind": "document",
+                "master": "docs/owners-manual.md",
+                "word": "Series LLC Owners Manual - REVISED DRAFT.docx",
+                "masterPresent": [
+                  "contributions, distributions, loans, repayments, and legitimate expense reimbursements."
+                ],
+                "wordPresent": [
+                  "contributions, distributions, loans, repayments, and legitimate expense reimbursements."
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -15056,14 +15619,53 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T12:19:19.277Z",
+              "event": "assigned",
+              "batch": "17",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T12:19:19.300Z",
+              "event": "implemented",
+              "batch": "17",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "17",
+          "fix": {
+            "batch": "17",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "docs/owners-manual.md",
+                "before": "The conduct that loses these fights, ranked by frequency:",
+                "after": "Conduct that can undermine the shields:"
+              },
+              {
+                "kind": "document",
+                "master": "docs/owners-manual.md",
+                "word": "Series LLC Owners Manual - REVISED DRAFT.docx",
+                "masterPresent": [
+                  "Conduct that can undermine the shields:"
+                ],
+                "wordPresent": [
+                  "Conduct that can undermine the shields:"
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -16953,6 +17555,72 @@
       "kind": "ruling",
       "item": "N2.25",
       "text": "Batch 15 approved, including Adam's clarification: a 60% owner cannot override unanimous approval, so unequal ownership can still deadlock. Correct Instructions, Manual and portal help; preserve Section 13.2's covered matters, exclusions, written-notice period and 25% initiating threshold. No agreement-clause change."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "12",
+      "text": "Batch 17 review item 3 approved: use Florida's protected series statute on the public pages and Florida's Uniform Protected Series Provisions on the Manual cover. Preserve references to the model Uniform Protected Series Act."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "14",
+      "text": "Batch 17 review item 5: Adam approved the two displayed replacement paragraphs distinguishing the general asset-record rule from the recorded-real-property-instrument exception and preserving the giving-value and lack-of-knowledge conditions. Exact text is retained in Batch 17 revision 1."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "N2.07",
+      "text": "Batch 17 review item 10 approved: explain that standing association rules work alongside required records and missing records can leave an asset non-associated; keep the agreement's allocation rules unchanged."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "N2.09",
+      "text": "Batch 17 review item 11 approved: administrative dissolution restricts activity to winding up but does not automatically remove liability protections; retain the reinstatement fees."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "N2.10",
+      "text": "Batch 17 review item 12 approved: distinguish Miami-Dade documentary stamp rates and surtax exception; state the example in terms of taxable consideration and the outside-Miami-Dade rate."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "N2.11",
+      "text": "Batch 17 review item 13 approved: include documented loans, repayments and legitimate expense reimbursements alongside contributions and distributions."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "N2.15",
+      "text": "Batch 17 review item 14 approved: remove the unsupported frequency ranking while retaining the conduct list."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "31",
+      "text": "Batch 17 review item 6 rejected. Keep the existing state-count wording as is."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "N1.10",
+      "text": "Batch 17 review item 7 rejected. Keep the existing public liability-shield explanation as is."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "N1.11",
+      "text": "Batch 17 review item 8 rejected. Keep the existing owner-immunity example as is."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "N2.04",
+      "text": "Batch 17 review item 9 rejected. Keep the existing agreement creditor/recourse clauses and matching liability descriptions as is. This does not reject the separately approved Manual recordkeeping and dissolution corrections."
     }
   ],
   "batches": [
@@ -17419,6 +18087,25 @@
         },
         {
           "at": "2026-09-20T10:03:22.965Z",
+          "event": "implemented"
+        }
+      ]
+    },
+    {
+      "id": "17",
+      "revision": 1,
+      "frozenHash": "fb4cbe496aaecc0dd532ab32dd9e5676acf18bc91a1ea7b72a23a2495a4ba623",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "2d36183d239a1e378026bcb7e2923af35912854f",
+      "history": [
+        {
+          "at": "2026-09-20T12:19:19.278Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-20T12:19:19.300Z",
           "event": "implemented"
         }
       ]

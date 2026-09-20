@@ -205,3 +205,20 @@ scanned set; add ` in <path prefix>` to confine the ban to matching files.
 - Unequal ownership can still deadlock on unanimous decisions. Section 13.2 applies only to covered matters, after 60 days following written notice, with an initiator holding at least 25%; retain its statutory withholding-consent exclusion and cash-access warning. Negotiation remains possible without the optional mechanism.
 - TOD designation is for qualifying individual ownership, not entity owners or tenants in common. S-form beneficiary restrictions remain.
 - Formation Articles list AMBRs for member-managed companies and managers for manager-managed companies, including an owner serving in that role. Questionnaire answers do not update public filings. Correct inaccurate filed facts through the appropriate amendment or other permitted correction; ownership changes do not invariably require amended Articles.
+
+## Batch 17 — asset records and statutory explanations (Adam approved 20 September 2026)
+
+- Florida's enacted Part III is the Uniform Protected Series Provisions; public shorthand is Florida's protected series statute. The model-law name remains Uniform Protected Series Act.
+- One Florida annual report covers the company and its protected series. That is not a promise of only one fee for every service. The filing office is the Florida Division of Corporations.
+- The general association rule requires identifying, acquisition and transfer records. Standing allocation provisions do not guarantee that every asset is associated. The recorded-real-property-instrument exception has the giving-value and lack-of-knowledge qualifications stated in s.605.2301(2)(b).
+- Administrative dissolution restricts activity to winding up; it does not automatically remove liability protections. Existing reinstatement fees remain.
+- Documentary stamp tax: outside Miami-Dade, 70 cents per $100 or fraction of taxable consideration; Miami-Dade, 60 cents plus 45-cent surtax except an instrument transferring only a single-family dwelling. The $2,100 example is $300,000 taxable consideration at the outside-Miami-Dade rate.
+- Document contributions, distributions, loans, repayments and legitimate expense reimbursements. Section 8.4 permits properly documented nominee holding; standing association rules are in Section 8.5, followed by Section 8.6.
+- Company-level mergers and series-level outcomes are distinct under ss.605.2602–605.2607; internal notes must not apply the company merger channel directly to a series.
+- Adam retained Batch 17 review items 6–9: state-count wording, the specified public liability explanations and the agreement creditor/recourse clauses. No frequency ranking is asserted for the Manual's conduct list.
+
+### Batch 17 recordkeeping explanations
+- where: webapp/src/pages/TheStatute.tsx — `To the extent the instrument favors someone who gives value without knowing that the signer lacked authority`
+- where: docs/owners-manual.md — `Missing records can leave an asset non-associated.`
+- where: docs/owners-manual.md — `it does not automatically remove its liability protections.`
+- where: docs/owners-manual.md — `Miami-Dade charges 60 cents per $100 or fraction, plus a 45-cent surtax`

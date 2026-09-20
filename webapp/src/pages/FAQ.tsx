@@ -14,7 +14,7 @@ const FAQ_ITEMS: {
   },
   {
     q: "How is a Protected Series LLC different from a regular LLC?",
-    a: "A regular LLC is a single legal entity. A Protected Series LLC is a parent entity that holds an unlimited number of internal 'series,' and each series gets the same liability protection as an individual LLC. You get the asset segregation of multiple LLCs and only pay one annual fee.",
+    a: "A regular LLC is a single legal entity. A Protected Series LLC is a parent entity that holds an unlimited number of internal 'series,' and each series gets the same liability protection as an individual LLC. You get the asset segregation of multiple LLCs and file one Florida annual report covering the company and its protected series.",
   },
   {
     q: "Can different people own different series?",
@@ -53,12 +53,12 @@ const FAQ_ITEMS: {
   },
   {
     q: "What's the federal tax treatment?",
-    a: "A Florida Protected Series LLC can be taxed as (1) a disregarded entity, (2) a partnership, (3) an S corporation, or (4) C corporation, depending on a number of factors, including whether the LLC is owned by one or more people and what elections you file with the IRS. It is also possible for different series to be taxed differently, however, that raises some very complex income tax issues. The Florida Protected Series LLC we create for you has the individual series owned by the LLC. This results in it having a single Federal Tax ID Number. If 100% of the LLC is owned by a single person, it can be taxed as a disregarded entity meaning that its income is reported directly on the owner's tax return and doesn't need to file its own income tax return. If the LLC has two or more owners, it will file a single annual return for the LLC reporting the combined income of the LLC and all of the series. What is best for you needs to be discussed with your CPA or other tax professional. If you decide on an S corporation election, we offer a $95 package that prepares IRS Form 2553 for you to sign and file. You also receive an operating agreement drafted for S corporation status whether you have us prepare your S Election form or prepare it yourself. If you need a series LLC that allows for different series to be owned by different individuals and in differing percentages, the added tax complexity will require you to hire an attorney to draft your operating agreement. We will not be able to provide that service here.",
+    a: "A Florida Protected Series LLC can be taxed as (1) a disregarded entity, (2) a partnership, (3) an S corporation, or (4) a C corporation, depending on a number of factors, including whether the LLC is owned by one or more people and what elections you file with the IRS. It is also possible for different series to be taxed differently; however, that raises some very complex income tax issues. The Florida Protected Series LLC we create for you has the individual series owned by the LLC. This results in it having a single Federal Tax ID Number. If 100% of the LLC is owned by a single person, it can be taxed as a disregarded entity meaning that its income is reported directly on the owner's tax return and doesn't need to file its own income tax return. If the LLC has two or more owners, it will file a single annual return for the LLC reporting the combined income of the LLC and all of the series. What is best for you needs to be discussed with your CPA or other tax professional. If you decide on an S corporation election, we offer a $95 package that prepares IRS Form 2553 for you to sign and file. You also receive an operating agreement drafted for S corporation status whether you have us prepare your S Election form or prepare it yourself. If you need a series LLC that allows for different series to be owned by different individuals and in differing percentages, the added tax complexity will require you to hire an attorney to draft your operating agreement. We will not be able to provide that service here.",
     link: { to: "/pricing", label: "See the election package" },
   },
   {
     q: "How long does formation take?",
-    a: "We cannot promise a timeframe. We file promptly once your intake is complete, but from there the processing time belongs to the Florida Secretary of State, which gives no guarantee and offers no expedited service.",
+    a: "We cannot promise a timeframe. We file promptly once your intake is complete, but from there the processing time belongs to the Florida Division of Corporations, which gives no guarantee and offers no expedited service.",
     link: {
       href: "https://dos.fl.gov/sunbiz/document-processing-dates/",
       label: "Check current processing dates on Sunbiz",

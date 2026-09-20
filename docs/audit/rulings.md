@@ -69,3 +69,25 @@ Adam. A new ruling is added the day it is given.
 - Ruling 240: "Batch 15 approved: distinguish the statutory default from the agreement rule. Florida permits a different approval rule; Section 3.1 of these agreements retains unanimous consent to establish a protected series. Correct the Manual and matching portal explanation."
 
 - Ruling N2.25: "Batch 15 approved, including Adam's clarification: a 60% owner cannot override unanimous approval, so unequal ownership can still deadlock. Correct Instructions, Manual and portal help; preserve Section 13.2's covered matters, exclusions, written-notice period and 25% initiating threshold. No agreement-clause change."
+
+- Ruling 12: "Batch 17 review item 3 approved: use Florida's protected series statute on the public pages and Florida's Uniform Protected Series Provisions on the Manual cover. Preserve references to the model Uniform Protected Series Act."
+
+- Ruling 14: "Batch 17 review item 5: Adam approved the two displayed replacement paragraphs distinguishing the general asset-record rule from the recorded-real-property-instrument exception and preserving the giving-value and lack-of-knowledge conditions. Exact text is retained in Batch 17 revision 1."
+
+- Ruling N2.07: "Batch 17 review item 10 approved: explain that standing association rules work alongside required records and missing records can leave an asset non-associated; keep the agreement's allocation rules unchanged."
+
+- Ruling N2.09: "Batch 17 review item 11 approved: administrative dissolution restricts activity to winding up but does not automatically remove liability protections; retain the reinstatement fees."
+
+- Ruling N2.10: "Batch 17 review item 12 approved: distinguish Miami-Dade documentary stamp rates and surtax exception; state the example in terms of taxable consideration and the outside-Miami-Dade rate."
+
+- Ruling N2.11: "Batch 17 review item 13 approved: include documented loans, repayments and legitimate expense reimbursements alongside contributions and distributions."
+
+- Ruling N2.15: "Batch 17 review item 14 approved: remove the unsupported frequency ranking while retaining the conduct list."
+
+- Ruling 31: "Batch 17 review item 6 rejected. Keep the existing state-count wording as is."
+
+- Ruling N1.10: "Batch 17 review item 7 rejected. Keep the existing public liability-shield explanation as is."
+
+- Ruling N1.11: "Batch 17 review item 8 rejected. Keep the existing owner-immunity example as is."
+
+- Ruling N2.04: "Batch 17 review item 9 rejected. Keep the existing agreement creditor/recourse clauses and matching liability descriptions as is. This does not reject the separately approved Manual recordkeeping and dissolution corrections."

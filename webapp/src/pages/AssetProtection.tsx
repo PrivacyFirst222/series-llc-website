@@ -21,7 +21,7 @@ export default function AssetProtection() {
       <section className="container-wide pb-12">
         <div className="mx-auto max-w-3xl rounded-2xl border border-accent/30 bg-accent/5 p-8">
           <p className="text-base text-foreground/80 leading-relaxed">
-            When most people talk about "asset protection," they are only thinking about one dimension of liability. In reality, every asset you own faces threats from two entirely different directions — and a proper legal structure must defend against both. A Florida Protected Series LLC addresses all of them simultaneously, for every asset in your portfolio, under a single filing.
+            When most people talk about "asset protection," they are only thinking about one dimension of liability. In reality, every asset you own faces threats from two entirely different directions — and a proper legal structure must defend against both. A Florida Protected Series LLC addresses both simultaneously, for every asset in your portfolio, under a single filing.
           </p>
         </div>
       </section>
@@ -161,7 +161,7 @@ export default function AssetProtection() {
               <span className="h-px w-6 bg-border" /> How a charging order plays out
             </div>
             <p className="text-sm text-foreground/80 leading-relaxed">
-              The same $20 million judgment — but now Chuck and Belinda hold the property in <strong>Heavenly Havens, LLC</strong>. The creditors obtain a charging order against Chuck's 50% interest. They cannot seize his interest, vote his shares, or reach the property. Chuck and Belinda, still the managers, simply reinvest all rental income rather than distributing it. The creditors receive nothing. Faced with a 20-year wait, they negotiate a settlement for far less than the full judgment amount.
+              The same $20 million judgment — but now Chuck and Belinda hold the property in <strong>Heavenly Havens, LLC</strong>. The creditors obtain a charging order against Chuck's 50% interest. They cannot seize his interest, exercise his voting rights, or reach the property. Chuck and Belinda, still the managers, simply reinvest all rental income rather than distributing it. The creditors receive nothing. Faced with a 20-year wait, they negotiate a settlement for far less than the full judgment amount.
             </p>
             <div className="flex items-center gap-2 mt-2">
               <CheckCircle2 className="h-4 w-4 text-trust shrink-0" />

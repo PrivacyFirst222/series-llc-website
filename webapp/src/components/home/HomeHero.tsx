@@ -55,7 +55,7 @@ export function HomeHero() {
             </h1>
 
             <p className="max-w-2xl text-lg leading-relaxed text-muted-foreground text-pretty">
-              Florida's new <span className="text-foreground font-medium">Protected Series LLC Act</span>{" "}
+              Florida's new <span className="text-foreground font-medium">protected series statute</span>{" "}
               (Statute §605.2101) lets you segregate every property, fund, or venture
               under a single umbrella — with horizontal <em className="text-foreground font-display">and</em>{" "}
               vertical liability shields written into the statute. We file it all for you.
