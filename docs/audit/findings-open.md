@@ -32,26 +32,26 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Benefits footnote "State fees only" over a line including the $99 agent fee. Replace: "State fees and registered agent only".
 - **9. [A38]** — **open**
   - Benefits "Paid once" row "(3 of 10 covered by the fee)". Replace: "covered by our service fee".
-- **10. [A39]** — **implemented**
+- **10. [A39]** — **open**
   - Asset Protection: "vote his shares" (no shares in an LLC); "two entirely different directions … addresses all of them". Replace: "vote it"; "addresses both".
-  - Fixed: batch 17 revision 1, commit , by Codex; protected by 3 assertion(s).
-- **11. [A40]** — **implemented**
+  - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
+- **11. [A40]** — **open**
   - FAQ: "Florida Secretary of State" once (elsewhere Division of Corporations); "or (4) C corporation"; a comma splice; "only pay one annual fee" beside two yearly costs. Replace each; "file only one annual report".
   - **Codex rejected the proposed replacement:** Correct the grammar and distinguish one annual report from agent fees. Secretary of State is not inherently a false umbrella agency reference; consistency with Division of Corporations is editorial.
-  - Fixed: batch 17 revision 1, commit , by Codex; protected by 4 assertion(s).
-- **12. [A41]** — **implemented** — waits on Adam's ruling
+  - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
+- **12. [A41]** — **open** — waits on Adam's ruling
   - Home hero and two sections: "Protected Series LLC Act" / "Protected Series Act"; the statute is the "Uniform Protected Series Provisions" (s. 605.2101). Ruling needed.
   - Ruling, 2026-09-20: Batch 17 review item 3 approved: use Florida's protected series statute on the public pages and Florida's Uniform Protected Series Provisions on the Manual cover. Preserve references to the model Uniform Protected Series Act.
-  - Fixed: batch 17 revision 1, commit , by Codex; protected by 4 assertion(s).
-- **13. [A42]** — **implemented**
+  - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
+- **13. [A42]** — **open**
   - Home Benefits grid: "One master OA + lightweight Series Designations." Replace: "One master operating agreement + a short Series Exhibit for every series."
   - **Codex rejected the proposed replacement:** Proposed wording is accurate for the private exhibit but should distinguish it from the filed designation. Location correction: Home.tsx renders only the first four cards, so this later card is on Benefits, not the home grid.
-  - Fixed: batch 17 revision 1, commit , by Codex; protected by 2 assertion(s).
-- **14. [A43]** — **implemented**
+  - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
+- **14. [A43]** — **open**
   - The Statute page bullet 1 says the title does not make an asset a series' own; bullet 5 says a recorded deed is the record (s. 605.2301(2)(b)). Replace bullet 1 with a real-property carve-out.
   - **Codex rejected the proposed replacement:** The carve-out must retain the statutory conditions, including a recorded instrument in favor of a person giving value without knowledge of the signer’s lack of authority.
   - Ruling, 2026-09-20: Batch 17 review item 5: Adam approved the two displayed replacement paragraphs distinguishing the general asset-record rule from the recorded-real-property-instrument exception and preserving the giving-value and lack-of-knowledge conditions. Exact text is retained in Batch 17 revision 1.
-  - Fixed: batch 17 revision 1, commit , by Codex; protected by 3 assertion(s).
+  - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
 - **15. [A44]** — **open** — waits on Adam's ruling
   - "one EIN-friendly tax structure" (What Is) and "1 EIN structure" (Benefits). Ruling needed: "one EIN".
   - Codex (disputed): WhatIs.tsx reads "one EIN-friendly tax structure" and Benefits.tsx reads "1 EIN structure". An unconditional replacement "one EIN" contradicts FAQ.tsx’s stated series EIN exceptions and the series-EIN purchase route at routes-portal.ts:2093-2181.
@@ -1708,14 +1708,14 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: If the effective date is meant: set ra_renewal_date from the Articles' effective date typed at upload (the office already types the document number there), and say 'the anniversary of your LLC's effective date' in Terms 9(c).
   - **Codex rejected the proposed replacement:** The proposed fix is conditional, not a settled replacement, and the original effective date of an old converting LLC is unsuitable. Define anniversary as the start of this purchased agent term, or explicitly as the initial completed-package date, then calculate consistently.
   - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **213. [B123]** — **implemented**
+- **213. [B123]** — **open**
   - Chapter 605 notes, Administration, the entity-transactions bullet — `webapp/server/chapter-605-notes.md:140`
   - Reads: s. 605.2602–605.2604 — a protected series may not convert, domesticate, or participate in an interest exchange, and may merge only through the single channel in s. 605.2604 (every other party an LLC; surviving company not created in the merger).
   - Claims: That a protected series may merge, through s. 605.2604.
   - True: s. 605.2602 (read today): 'Except as provided in ss. 605.2605(2), 605.2606(2), and 605.2607(1), a protected series may not participate in; be a party to; result from; or be formed, organized, established, or created by … (1) A conversion, domestication, interest exchange, or merger'. The merger channel in s. 605.2604 belongs to the series limited liability COMPANY ('A series limited liability company may be a party to a merger … only if … (1) Each other party to the merger is a limited liability company. (2) The surviving company is not created in the merger.'); a protected series is only relocated, continued or terminated inside the company's merger under ss. 605.2605-605.2607. The masters have it right (facts.md: 'except as ss. 605.2602 and 605.2605–605.2607, Florida Statutes, permit') and facts.md retires exactly this note's wording ('605.2602–605.2604', 'single statutory channel provided in s. 605.2604').
   - Replace with: s. 605.2602 — a protected series may not be a party to, result from, or be created by a conversion, domestication, interest exchange or merger, except that in the company's own merger under s. 605.2604 (every other party an LLC; surviving company not created in the merger) a protected series is relocated, continued or terminated as ss. 605.2605–605.2607 provide. s. 605.2603 bars the series LLC itself from conversion, domestication and interest exchange.
   - Codex (housekeeping-only): chapter-605-notes.md:140 wrongly assigns605.2604 merger-party permission to a protected series;2026 sections605.2602–2607 distinguish the company's merger from continuation/relocation of its series. This is an internal reference note, not delivered product text.
-  - Fixed: batch 17 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
 - **214. [B124]** — **implemented**
   - Chapter 605 notes, fee schedule, 'Conflicts with what we charge' — `webapp/server/chapter-605-notes.md:264`
   - Reads: On 2026-08-10 Adam directed "It's a $125 filing fee for the Articles. No fee to designate a registered agent," and the calculator became articles $125 / agent $0. The statute splits it: $100 (2) + $25 (7) = $125. Same total to the customer, but our line items describe the fee contrary to the statute on a page that says fees are "at cost."
@@ -1910,13 +1910,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Manual s. 4 "(s. 605.2602)" alone. Replace: "ss. 605.2602 and 605.2605–605.2607".
   - Codex (disputed): Manual:77 cites §605.2602 for restrictions on series entity transactions. That section itself states the restrictions and points to §§605.2605–605.2607 for exceptions. A citation to it alone is not a false statement of the law; the proposed longer citation is optional.
   - Outcome: A citation to s. 605.2602 alone is not false; the longer citation matches the ledger's preference.
-- **244. [A95]** — **implemented**
+- **244. [A95]** — **open**
   - Manual map Article 8 row "never your personal name" overstates 8.4. Replace: mention the documented nominee arrangement.
-  - Fixed: batch 17 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **245. [A96]** — **implemented**
+  - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
+- **245. [A96]** — **open**
   - Manual s. 3 "at the end of Article 8 … makes … it works". Replace: "in Article 8 … make … they work" (twice).
   - **Codex rejected the proposed replacement:** Fix location and plural agreement. Also remove the separate absolute promise that no asset can ever be non-associated (new finding in this report); grammatical correction alone leaves that error.
-  - Fixed: batch 17 revision 1, commit , by Codex; protected by 3 assertion(s).
+  - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
 - **246. [A97]** — **open**
   - Manual colophon omits twelve cited sections. Replace: rebuild; add the Manual to the ledger's colophon check.
   - Codex (disputed): The actual Manual colophon at :536 includes the entire “605.2101–605.2802” range. Thus 605.2107, 605.2302, 605.2304 and 605.2402 are already included, contrary to four of the alleged twelve omissions. The missing individually named provisions are 605.0302, 605.04074, 605.0410, 605.0602, 605.0714, 605.1103, former212.031 and220.02.
@@ -1925,13 +1925,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
 - **247. [A98]** — **open**
   - Manual s. 5 "s. 6.1 of your agreement" (statute abbreviation); README "five" masters; two double blank lines. Replace: "§6.1"; "eight"; single blanks.
   - **Codex rejected the proposed replacement:** The citation and eight corrections are sound. Track whitespace separately as housekeeping; the item mixes reader-visible wording with source-only whitespace.
-- **248. [B148]** — **implemented** — same defect as 12
+- **248. [B148]** — **open** — same defect as 12
   - Owner's Manual, cover page (title-page block) — `docs/owners-manual.md:15`
   - Reads: 10|Written for the Florida Uniform Protected Series Act
   - Claims: The statute the manual is written for is called the 'Florida Uniform Protected Series Act'.
   - True: s. 605.2101, Florida Statutes, opened on Online Sunshine: 'Short title.—Sections 605.2101-605.2802 may be cited as the “Uniform Protected Series Provisions.”' The chapter itself is the Florida Revised Limited Liability Company Act. (The prior audit's A41 raised the same name on the Home page; the Manual's cover is in this bucket.)
   - Replace with: 10|Written for the Uniform Protected Series Provisions of the Florida Revised Limited Liability Company Act
-  - Fixed: batch 17 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
 - **249. [B149]** — **implemented** — same defect as 240
   - Owner's Manual, s. 6 'How a Florida Protected Series LLC Is Formed', Step 3 — Consent (the ruling A91 asked for, answered by the statute) — `docs/owners-manual.md:103`
   - Reads: **Step 3 — Consent.** Establishing a protected series requires the affirmative vote or consent of **all members** of the company (s. 605.2201). This is a rule your operating agreement **cannot change** — s. 605.2107 puts it on the list of non-variable provisions. In a single-member company this is trivial — your consent is everyone's consent. In a multi-member company, plan for it: one holdout member can block a new series.
@@ -1982,16 +1982,16 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: Nothing wrong in substance; the section symbol is the Manual's mark for agreement sections ('§5.4', '§8.4', '§10.6') and here is used for a statute.
   - True: Two styles for one kind of citation: 's. 605.2404(4)' at line 66 but '§605.2404(4)' at 160, '§605.2301(5)' at 165, '§605.2404' at 235, 389 and 413; every other statute cite in the manual uses 's.' / 'ss.'. A98 flagged the converse ('s. 6.1 of your agreement').
   - Replace with: Get the name right and the record makes itself; get it wrong and you are proving association the hard way, out of ledgers, with the burden on you (s. 605.2404(4)). — and the same change at lines 165, 235, 389 and 413.
-- **256. [B156]** — **implemented**
+- **256. [B156]** — **open**
   - Owner's Manual, s. 7 map table, Article 8 row — `docs/owners-manual.md:130`
   - Reads: | **Article 8** | The recordkeeping covenants (this manual's Section 14 is its field guide) and the standing association rules that close the Article — and the titling rule (§8.4): every asset is held in the name of the silo that owns it, never your personal name |
   - Claims: The standing association rules are the last section of Article 8.
   - True: templates-oa-multi.md:250-260: 8.5 'Standing Association Rules; Savings Provisions' is followed by 8.6 'Movement of an Asset Between Protected Series', which closes the Article (same in all eight forms). A third instance of A96's 'at the end of Article 8'; the 'never your personal name' half is A95.
   - Replace with: | **Article 8** | The recordkeeping covenants (this manual's Section 14 is its field guide), the standing association rules in §8.5, and the holding rule (§8.4): every asset is held in the name of the silo that owns it, or through a nominee arrangement documented in the records — never simply in your personal name |
-  - Part "article8-location" — implemented: "the standing association rules that close the Article": §8.5 does not close Article 8 — the same misstatement A96 (245) records. — same defect as 245
-  - Fixed (article8-location): batch 17 revision 1, commit , by Codex; protected by 1 assertion(s).
-  - Part "nominee" — implemented: "never your personal name" overstates §8.4; the documented nominee arrangement — the same overstatement A95 (244) records. — same defect as 244
-  - Fixed (nominee): batch 17 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Part "article8-location" — open: "the standing association rules that close the Article": §8.5 does not close Article 8 — the same misstatement A96 (245) records. — same defect as 245
+  - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
+  - Part "nominee" — open: "never your personal name" overstates §8.4; the documented nominee arrangement — the same overstatement A95 (244) records. — same defect as 244
+  - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
   - Former part "all" (retired by 001-part-level-links, now article8-location, nominee): The whole finding.
 - **257. [B157]** — **optional — implemented**
   - Series consent, paragraph 4 'Authority to file', last sentence — `webapp/server/templates-new-series.md:19`
@@ -2125,14 +2125,14 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: The new supersession recital is always RecitalD.
   - True: Both single-s and member-single-s masters already have RecitalD at line20; oa.ts:534 unconditionally inserts anotherD immediately before NOW, THEREFORE. The other six masters end atC. Prior262 objects to text location but does not identify this delivered duplicate lettering.
   - Replace with: E. This Agreement amends, restates, and supersedes in its entirety [PRIOR AGREEMENT], which shall be of no further force or effect from the Effective Date.
-- **N2.07. [substantive]** — **implemented** — waits on Adam's ruling
+- **N2.07. [substantive]** — **open** — waits on Adam's ruling
   - Owner's Manual, Why the Mothership Should Stay Asset-Light (§8); also the non-associated-assets discussion at line70 — docs/owners-manual.md:151 — `docs/owners-manual.md:151`
   - Reads: **Second, your agreement's standing association rules make the mothership the default bucket.** Any asset you fail to associate with a series lands, by standing rule, in the company's silo. That is deliberately protective — it means a sloppy record never creates a *non-associated* free-for-all asset — but it also means **sloppiness collects in the mothership**. If the mothership is asset-light, a record you missed exposes little.
   - Claims: The standing default association rule guarantees that a sloppy record can never leave an asset non-associated.
   - True: 2026 §605.2301(3) requires records identifying the asset, acquisition and inter-silo consideration; subsection4 allows procedures but does not waive those facts. Section2107(1)(k) is non-variable. A default ownership/association instruction cannot guarantee missing records exist. https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605.html
   - Replace with: **Second, your agreement's standing association rules make the mothership the default bucket.** Those rules help determine where assets belong, but the company must still keep the identifying, acquisition, and transfer records the statute requires. An asset can remain non-associated when those records are missing. Keep the mothership asset-light and document every asset; do not rely on the default rule to cure a missing record.
   - Ruling, 2026-09-20: Batch 17 review item 10 approved: explain that standing association rules work alongside required records and missing records can leave an asset non-associated; keep the agreement's allocation rules unchanged.
-  - Fixed: batch 17 revision 1, commit , by Codex; protected by 3 assertion(s).
+  - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
 - **N2.08. [substantive]** — **open** — waits on Adam's ruling
   - Owner's Manual, The EIN Question (§18), counterparties and W-9s — docs/owners-manual.md:344 — `docs/owners-manual.md:344`
   - Reads: - **A counterparty demands a taxpayer number for the named entity** — a lender, title company, insurer, or property manager. Giving them the company's EIN for a series' business stitches the two identities together on paper, the opposite of the separateness you are documenting.
@@ -2141,15 +2141,15 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: - **A counterparty requests tax identification.** For a W-9 or other income-tax information reporting, follow the IRS rules for a disregarded entity and its tax owner; the correct number may be the company's EIN or the ultimate tax owner's TIN. Identify the series as the contracting party in the underlying documents. A separate series EIN may still be needed for banking, employment taxes, or other registrations.
   - 
   - **The company's EIN and W-9.** Obtain the EIN needed for the company's banking and applicable tax filings. For income-tax reporting, a disregarded company generally uses its tax owner's TIN on Form W-9; a company taxed as a partnership or corporation uses its own EIN.
-- **N2.09. [substantive]** — **implemented** — waits on Adam's ruling
+- **N2.09. [substantive]** — **open** — waits on Adam's ruling
   - Owner's Manual, State Filings, Year After Year (§19), reinstatement — docs/owners-manual.md:354 — `docs/owners-manual.md:354`
   - Reads: - **Reinstatement, if you let it lapse:** $100 plus every missed year's annual report fee — on top of losing the shields in the interim.
   - Claims: Administrative dissolution automatically removes the liability shields until reinstatement.
   - True: 2026 §605.0304(2) preserves limited liability regardless of dissolution; §605.0714(5) limits an administratively dissolved company to winding up; §605.0715(4) makes reinstatement relate back. The Manual itself says shields survive winding up at404. https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605.html
   - Replace with: - **Reinstatement, if you let it lapse:** $100 plus every missed year's annual report fee. Administrative dissolution limits the company and its series to winding up; it does not automatically erase their liability shields. Keep the required separate records and resolve the lapse promptly.
   - Ruling, 2026-09-20: Batch 17 review item 11 approved: administrative dissolution restricts activity to winding up but does not automatically remove liability protections; retain the reinstatement fees.
-  - Fixed: batch 17 revision 1, commit , by Codex; protected by 2 assertion(s).
-- **N2.10. [substantive]** — **implemented** — waits on Adam's ruling
+  - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
+- **N2.10. [substantive]** — **open** — waits on Adam's ruling
   - Owner's Manual, Moving Real Estate into a Series (§11), documentary stamps — docs/owners-manual.md:180 — `docs/owners-manual.md:180`
   - Reads: 2. **Documentary stamp tax.** Florida taxes deed transfers (70 cents per $100 of consideration). Transferring *mortgaged* property to your own entity is generally taxed on the mortgage balance, even with no money changing hands. Price this before you transfer — on a $300,000 mortgage that is $2,100. An unencumbered property transferred for no consideration is a different analysis. Confirm the stamp treatment with your closing agent or CPA before recording; do not guess.
   - Claims: Every Florida deed transfer uses70cents per$100; the$300,000mortgage example universally costs$2,100.
@@ -2157,15 +2157,15 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: 2. **Documentary stamp tax.** Most Florida counties charge 70 cents per $100 or fraction of consideration. Miami-Dade charges 60 cents, plus a 45-cent surtax unless the transfer involves only a single-family dwelling. A mortgage can count as consideration even when no cash changes hands. At the 70-cent rate, $300,000 of taxable mortgage consideration produces $2,100 in tax; the Miami-Dade calculation differs. Confirm the consideration, rate, and any exemption with your closing agent or CPA before recording.
   - Corrected after Codex's review: Verified: s. 201.02 (70 cents) and s. 201.031 (surtax, none on a single-family residence). NOT verified by Claude: Miami-Dade's 60-cent base rate (the Revenue Department page did not render).
   - Ruling, 2026-09-20: Batch 17 review item 12 approved: distinguish Miami-Dade documentary stamp rates and surtax exception; state the example in terms of taxable consideration and the outside-Miami-Dade rate.
-  - Fixed: batch 17 revision 1, commit , by Codex; protected by 2 assertion(s).
-- **N2.11. [substantive]** — **implemented** — waits on Adam's ruling
+  - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
+- **N2.11. [substantive]** — **open** — waits on Adam's ruling
   - Owner's Manual, Keeping the Money Separate, personal funds — docs/owners-manual.md:211 — `docs/owners-manual.md:211`
   - Reads: - Your personal money touches the structure in exactly two ways: documented contributions in, documented distributions out. The company debit card buys nothing personal, ever.
   - Claims: Contributions and distributions are the only permitted flows between owners and the structure.
   - True: All masters permit documented Member loans (multi:214 §6.5; single §6.4); expense reimbursement is also expressly permitted in management compensation. Calling contributions/distributions the only two ways contradicts those authorized flows.
   - Replace with: - Document every transfer between you and the structure: capital contributions, distributions, loans and repayments, and legitimate expense reimbursements. Identify the owner and the specific company or series involved, and use its proper account.
   - Ruling, 2026-09-20: Batch 17 review item 13 approved: include documented loans, repayments and legitimate expense reimbursements alongside contributions and distributions.
-  - Fixed: batch 17 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
 - **N2.12. [substantive]** — **open** — waits on Adam's ruling
   - Owner's Manual, Maintaining the Agreement (§7), adding a second owner — docs/owners-manual.md:147 — `docs/owners-manual.md:147`
   - Reads: 3. **When you add a second owner to a single-member company, change agreements.** Your agreement does not require it — nothing in it does — but the single-member form is built for one owner: it has no voting rules, no capital-call machinery, no transfer restrictions among owners, and none of the multi-owner bankruptcy armor, and its tax treatment changes the moment a second member is admitted. Move to the multi-member form at the same time, not later. (The portal does this for you: add the new owner in the operating agreement questionnaire, and the regenerated agreement is built on the multi-owner form automatically.)
@@ -2186,14 +2186,14 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: 2. **Uneven distributions.** Your agreement requires pro-rata distributions. Correct any departure with your CPA: unequal payments have tax consequences and may breach the agreement, but do not by themselves end S status when the governing provisions preserve identical distribution and liquidation rights.
   - 
   - **Three issues to review with your CPA:**
-- **N2.15. [wording]** — **implemented** — waits on Adam's ruling
+- **N2.15. [wording]** — **open** — waits on Adam's ruling
   - Owner's Manual, What Actually Breaks the Shield (§21) — docs/owners-manual.md:362 — `docs/owners-manual.md:362`
   - Reads: The conduct that loses these fights, ranked by frequency:
   - Claims: The listed litigation behaviors are ranked by measured frequency.
   - True: Neither this paragraph nor the source materials supplies cases, a dataset, counts or a method establishing the ordering. The legal examples can stand without an unsupported empirical ranking.
   - Replace with: Conduct that can undermine the shields:
   - Ruling, 2026-09-20: Batch 17 review item 14 approved: remove the unsupported frequency ranking while retaining the conduct list.
-  - Fixed: batch 17 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
 - **N2.16. [substantive]** — **implemented**
   - S corporation election package, record copy, deadline notice — webapp/server/s-election.ts:204 — `webapp/server/s-election.ts:204`
   - Reads: The IRS deadline for this election was ${fmtDateLong(deadlineIso)}. A late election requires IRS relief — talk to your tax professional.
