@@ -1,4 +1,3 @@
-import { batch18Checks } from "./batch18-check";
 import {batch05Checks} from "./batch05-check";
 import {batch04Checks} from "./batch04-check";
 import {batch03Checks} from "./batch03-check";
@@ -3992,12 +3991,88 @@ await batch05Checks((label,ok,detail)=>batch05Results.set(label,{ok,detail}));
 {const r=batch05Results.get("batch05 N1.15: S package replacement failures preserve the retained copy");check("batch05 N1.15: S package replacement failures preserve the retained copy",r?.ok===true,r?.detail);batch05Results.delete("batch05 N1.15: S package replacement failures preserve the retained copy");}
 for(const [label,r]of batch05Results)check(label,r.ok,r.detail);
 
-const batch18Results = new Map<string, {ok:boolean;detail?:unknown}>();
-await batch18Checks((label,ok,detail)=>batch18Results.set(label,{ok,detail}),BASE);
-{const r=batch18Results.get("batch18 263: unresolved template fields fail without mistaking client text");check("batch18 263: unresolved template fields fail without mistaking client text",r?.ok===true,r?.detail);}
-{const r=batch18Results.get("batch18 N2.19: manager and member suites survive the office summary");check("batch18 N2.19: manager and member suites survive the office summary",r?.ok===true,r?.detail);}
-{const r=batch18Results.get("batch18 N2.20: English input is enforced before business writes");check("batch18 N2.20: English input is enforced before business writes",r?.ok===true,r?.detail);}
-{const r=batch18Results.get("batch18 N2.21: client pipes and line breaks remain inside their document cells");check("batch18 N2.21: client pipes and line breaks remain inside their document cells",r?.ok===true,r?.detail);}
+// Keep these regressions in the suite the review runner carries to the old tree.
+// They exercise that tree's actual assemblers and API; no new product helper is
+// copied into the before-fix tree, and a missing import never counts as a defect.
+{
+  const fs18 = await import("node:fs");
+  const path18 = await import("node:path");
+  const { execFileSync } = await import("node:child_process");
+  const { renderMarkdownPdf, parseMarkdown } = await import("./pdf-render");
+  const { assembleNewSeries } = await import("./new-series");
+  const { agentFixture, summaryFor } = await import("./batch06-check");
+  const { validateStep } = await import("../src/components/forms/florida-llc/stepValidation");
+  const input: OaInputs = {
+    version:"multi", companyName:"[ACME] | Holdings LLC", principalAddress:"101 Main St, Suite 7", managerNames:["Jane [TITLE] Smith"],
+    effectiveDate:"September 20, 2026", amendedRestated:false, priorAgreementDate:null, borrowingThreshold:50000,
+    members:[{name:"Jane | [TITLE] Smith",address:"101 Main St\nSuite 7",percentage:100,contribution:"Equipment | tools\nSecond line",todBeneficiary:"[ACME] Trust"}],
+    series:[{name:"[ACME] | Holdings LLC - PS 1",purpose:"Property | rental",contribution:"Equipment | tools\nSecond line",specialTerms:"Keep [ACME] | tools\nIn room 2"}],
+    assets:[{description:"Pump | valve\nSecond line",value:"$500",by:"Jane | [TITLE] Smith",to:"Company"}],
+  };
+  const dir=fs18.mkdtempSync(path18.join(osTmpdir(),"batch18-regression-"));
+  let literalClientText=true, cells=true, unknownRefused=false;
+  const observations: unknown[]=[];
+  try {
+    const forms: OaInputs["version"][]=["single","single-s","member-single","member-single-s","multi","s","member","member-s"];
+    for(const version of forms){
+      try {
+        const result=assembleOa({...input,version});
+        const tables=parseMarkdown(result.markdown,result.encodedClientText).filter(b=>b.kind==="table");
+        const uniform=tables.every(t=>t.rows.every(row=>row.length===t.rows[0].length));
+        const file=path18.join(dir,`${version}.pdf`);
+        fs18.writeFileSync(file,await renderMarkdownPdf({...result,watermark:null}));
+        const text=execFileSync("pdftotext",["-layout",file,"-"],{encoding:"utf8"});
+        const literals=text.includes("Jane | [TITLE] Smith") && !text.includes("&#");
+        const preserved=text.includes("Pump | valve") && text.includes("Second line");
+        literalClientText &&= literals; cells &&= uniform && preserved;
+        observations.push({version,uniform,literals,preserved});
+      } catch(e) {literalClientText=false;cells=false;observations.push({version,error:String(e)});}
+    }
+    try {
+    const consent=assembleNewSeries({companyName:input.companyName,seriesName:input.series[0].name,seriesNumber:"1",purpose:"Rental",contribution:"Equipment | tools\nSecond line",specialTerms:"[ACME] | property",effectiveDate:input.effectiveDate,memberNames:["Jane [TITLE] Smith"],managerNames:input.managerNames,memberManaged:false});
+    const file=path18.join(dir,"consent.pdf");fs18.writeFileSync(file,await renderMarkdownPdf({...consent,watermark:null}));
+    const text=execFileSync("pdftotext",["-layout",file,"-"],{encoding:"utf8"});
+    const consentCells=parseMarkdown(consent.markdown,consent.encodedClientText).filter(b=>b.kind==="table").every(t=>t.rows.every(r=>r.length===t.rows[0].length));
+    cells &&= consentCells && text.includes("Equipment | tools") && text.includes("Second line") && text.includes("[ACME] | property");
+    observations.push({consentCells,consentTextPreserved:text.includes("Equipment | tools")});
+    } catch(e) { cells=false;observations.push({consentError:String(e)}); }
+
+    // Plant an unresolved slot in a COPY of the actual master. The child loads
+    // the actual assembler fresh. An import/setup failure cannot satisfy this.
+    const copy=path18.join(dir,"fixture");fs18.mkdirSync(path18.join(copy,"server"),{recursive:true});fs18.mkdirSync(path18.join(copy,"src/lib"),{recursive:true});
+    for(const name of fs18.readdirSync(import.meta.dir).filter(n=>/^templates-oa-.*\.md$/.test(n) || ["oa.ts","datetime.ts","document-text.ts"].includes(n))){
+      fs18.copyFileSync(path18.join(import.meta.dir,name),path18.join(copy,"server",name));
+    }
+    const english=path18.join(import.meta.dir,"../src/lib/englishText.ts");
+    if(fs18.existsSync(english))fs18.copyFileSync(english,path18.join(copy,"src/lib/englishText.ts"));
+    const master=path18.join(copy,"server/templates-oa-single.md");
+    fs18.writeFileSync(master,fs18.readFileSync(master,"utf8").replace("\n","\n\n[UNFILLED_BATCH18_PROBE]\n"));
+    const code='import {assembleOa} from "./server/oa.ts"; const input=JSON.parse(process.env.BATCH18_FIXTURE!); try { const r=assembleOa(input); console.log(JSON.stringify({assembled:true,containsSlot:r.markdown.includes("[UNFILLED_BATCH18_PROBE]")})); } catch(e) { console.log(JSON.stringify({assembled:false,error:String(e)})); }';
+    const observed=JSON.parse(execFileSync(process.execPath,["--loader",".md:text","-e",code],{cwd:copy,env:{...process.env,BATCH18_FIXTURE:JSON.stringify({...input,version:"single"})},encoding:"utf8"}));
+    unknownRefused=observed.assembled===false && observed.error.includes("Document template left unfilled") && observed.error.includes("UNFILLED_BATCH18_PROBE");
+    observations.push({plantedSlot:observed});
+  } finally {fs18.rmSync(dir,{recursive:true,force:true});}
+  check("batch18 263: unresolved template fields fail without mistaking client text",unknownRefused && literalClientText,observations);
+  check("batch18 N2.21: client pipes and line breaks remain inside their document cells",cells,observations);
+
+  const data=agentFixture();data.managers[0].streetAddress2="Suite 512";data.includeMembersInArticles=true;
+  data.members=[{id:"owner18",isInitialMember:true,memberType:"INDIVIDUAL",firstName:"Jane",lastName:"Smith",address1:"101 Main St",address2:"Apartment 813",city:"Orlando",state:"FL",zip:"32803",country:"United States",ownershipPercentage:100}];
+  const managerSummary=summaryFor(data), memberSummary=summaryFor({...data,managementStructure:"MEMBER_MANAGED"});
+  check("batch18 N2.19: manager and member suites survive the office summary",managerSummary.includes("Suite 512") && memberSummary.includes("Apartment 813"),{managerSummary,memberSummary});
+
+  const inputObservations:unknown[]=[];let blocked=true;
+  for(const name of ["José","李","Иван","😀"]){
+    const res=await fetch(`${BASE}/api/portal/oa/generate`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({companyName:name})});
+    const body=await res.text();blocked &&= res.status===400 && body.includes("English letters");inputObservations.push({name,status:res.status,body});
+  }
+  const multipart=new FormData();multipart.set("name","José");multipart.set("file",new File(["sample"],"sample.pdf"));
+  const res=await fetch(`${BASE}/api/portal/oa/generate`,{method:"POST",body:multipart});const body=await res.text();
+  blocked &&= res.status===400 && body.includes("English letters");inputObservations.push({multipartStatus:res.status,body});
+  const invalid=validateStep("client",{...agentFixture(),clientFirstName:"José"}).clientFirstName;
+  const valid=validateStep("client",{...agentFixture(),clientFirstName:"Jane"}).clientFirstName;
+  blocked &&= !!invalid && !valid;inputObservations.push({invalid,valid});
+  check("batch18 N2.20: English input is enforced before business writes",blocked,inputObservations);
+}
 
 console.log(failures === 0 ? "\nALL PASS" : `\n${failures} FAILURES`);
 process.exit(failures === 0 ? 0 : 1);

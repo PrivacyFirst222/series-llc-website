@@ -1,0 +1,340 @@
+{
+  "before": [
+    {
+      "label": "batch18 263: unresolved template fields fail without mistaking client text",
+      "ok": false,
+      "detail": [
+        {
+          "version": "single",
+          "uniform": false,
+          "literals": true,
+          "preserved": false
+        },
+        {
+          "version": "single-s",
+          "uniform": false,
+          "literals": true,
+          "preserved": false
+        },
+        {
+          "version": "member-single",
+          "uniform": false,
+          "literals": true,
+          "preserved": false
+        },
+        {
+          "version": "member-single-s",
+          "uniform": false,
+          "literals": true,
+          "preserved": false
+        },
+        {
+          "version": "multi",
+          "uniform": false,
+          "literals": true,
+          "preserved": false
+        },
+        {
+          "version": "s",
+          "uniform": false,
+          "literals": true,
+          "preserved": false
+        },
+        {
+          "version": "member",
+          "uniform": false,
+          "literals": true,
+          "preserved": false
+        },
+        {
+          "version": "member-s",
+          "uniform": false,
+          "literals": true,
+          "preserved": false
+        },
+        {
+          "consentError": "Error: new-series template left unfilled: [ACME], [ACME], [ACME], [TITLE], [ACME], [ACME], [TITLE], [ACME]"
+        },
+        {
+          "plantedSlot": {
+            "assembled": true,
+            "containsSlot": true
+          }
+        }
+      ]
+    },
+    {
+      "label": "batch18 N2.21: client pipes and line breaks remain inside their document cells",
+      "ok": false,
+      "detail": [
+        {
+          "version": "single",
+          "uniform": false,
+          "literals": true,
+          "preserved": false
+        },
+        {
+          "version": "single-s",
+          "uniform": false,
+          "literals": true,
+          "preserved": false
+        },
+        {
+          "version": "member-single",
+          "uniform": false,
+          "literals": true,
+          "preserved": false
+        },
+        {
+          "version": "member-single-s",
+          "uniform": false,
+          "literals": true,
+          "preserved": false
+        },
+        {
+          "version": "multi",
+          "uniform": false,
+          "literals": true,
+          "preserved": false
+        },
+        {
+          "version": "s",
+          "uniform": false,
+          "literals": true,
+          "preserved": false
+        },
+        {
+          "version": "member",
+          "uniform": false,
+          "literals": true,
+          "preserved": false
+        },
+        {
+          "version": "member-s",
+          "uniform": false,
+          "literals": true,
+          "preserved": false
+        },
+        {
+          "consentError": "Error: new-series template left unfilled: [ACME], [ACME], [ACME], [TITLE], [ACME], [ACME], [TITLE], [ACME]"
+        },
+        {
+          "plantedSlot": {
+            "assembled": true,
+            "containsSlot": true
+          }
+        }
+      ]
+    },
+    {
+      "label": "batch18 N2.19: manager and member suites survive the office summary",
+      "ok": false,
+      "detail": {
+        "managerSummary": "# Order Summary\n\n## Batch Six LLC\n\nThis summary records the order as it was placed and, once received, as it was paid. It is kept for the office and does not appear in the client's portal.\n\n## The order\n\n**Company:** Batch Six LLC\n\n**Filing:** New Florida LLC\n\n**Client:** Jane Owner <batch06@example.test>\n\n**Placed:** September 19, 2026 at 8:00 AM ET\n\n**Paid:** not yet received at the time of this summary\n\n**Square payment:** \u2014\n\n**Checkout reference:** \u2014\n\n**Order:** batch06\n\n\n\n## Items ordered\n\n**Package:** New Protected Series LLC formation\n\n**Formation type:** LLC\n\n**Protected series:** PS One\n\n**Registered agent:** Client serving personally\n\n**Certificate of Status:** No\n\n**Certified Copy:** No\n\n**Federal EIN service:** No\n\n**S election package:** No\n\n\n\n## Price\n\n| Item | Amount |\n|---|---|\n| Service subtotal | $0.00 |\n| State fees subtotal | $0.00 |\n| **Total charged** | **$0.00** |\n\n**State fees shown to the client on the review step:** $125.00\n\n**State fees charged:** $0.00\n\n\n\n## The questionnaire, as typed\n\n### Your information\n\n**Name:** Jane Owner\n\n**Email:** batch06@example.test\n\n**Phone:** \u2014\n\n**Address:** 101 Main St, Orlando, FL 32803, United States\n\n### LLC name\n\n**Desired name:** Batch Six\n\n**Designator:** LLC\n\n**Final name:** Batch Six, LLC\n\n**Alternate names:** \u2014\n\n**Exact name only:** Yes\n\n**Availability check the client saw:** none recorded\n\n### Principal address\n\n**Address:** 101 Main St, Orlando, FL 32803, United States\n\n### Mailing address\n\n**Address:** 101 Main St, Orlando, FL 32803, United States\n\n### Series\n\n**Series 1:** PS One\n\n### Registered agent\n\n**Choice:** Client serving personally\n\n**Type:** Individual\n\n**Name:** John Smith, Jr.\n\n**Address:** 101 Main St, Orlando, FL 32803, United States\n\n**Email:** \u2014\n\n**Phone:** \u2014\n\n### Agent acceptance\n\n**Accepted by:** John Smith, Jr.\n\n**Capacity:** The registered agent, an individual\n\n**Electronic signature:** John Smith, Jr.\n\n### Management\n\n**Structure:** Manager-managed\n\n**Statement in the Articles:** Yes\n\n### Managers\n\n**Manager 1:** Jane Owner; 101 Main St, Orlando, FL 32803\n\n### Purpose\n\n**Purpose type:** General purpose\n\n**Specific purpose:** \u2014\n\n### Effective date\n\n**Option:** Date filed by the Division\n\n### Correspondence\n\n**Name:** Jane Owner\n\n**Company:** \u2014\n\n**Email:** batch06@example.test\n\n**Phone:** \u2014\n\n**Mailing address:** \u2014\n\n### Optional documents\n\n**Certificate of Status:** No\n\n**Certified Copy:** No\n\n**Federal EIN service:** No\n\n**S election package:** No\n\n### Certification\n\n**Articles signed by:** MyFloridaSeriesLLC, as appointed authorized representative\n\n**Authorized representative:** \u2014\n\n**Title:** \u2014\n\n**Electronic signature typed:** \u2014\n\n**Signed at:** September 20, 2026 at 10:32 AM ET\n\n\n\n## Acknowledgments ticked\n\nEach box below was ticked by the client, in these words, at September 20, 2026 at 10:32 AM ET.\n\n- I understand this form is for forming a new domestic Florida series LLC only.\n\n- I understand that availability is not guaranteed until accepted by the Florida Division of Corporations.\n\n- I confirm the name does not imply affiliation with a state or federal government agency.\n\n- I confirm the name does not imply a purpose unauthorized for this LLC.\n\n- I only want this exact name \u2014 if it is unavailable, contact me before doing anything else.\n\n- I understand that every protected series will be owned by my LLC, and that no series will have its own separate owners.\n\n- I understand that the LLC itself cannot serve as its own registered agent \u2014 I am accepting this role personally.\n\n- I live in Florida, and the Florida street address entered above is my business address and the LLC\u2019s registered office, not a P.O. Box.\n\n- I accept the appointment as registered agent for this Florida LLC, and I am familiar with and accept the obligations of that position.\n\n- I certify that I am signing for myself as the registered agent.\n\n- I appoint MyFloridaSeriesLLC as my authorized representative to sign and file my Articles of Organization, and I certify that the information I have provided is true, accurate, and complete.\n\n- I affirm that the LLC has or will have at least one member when the Articles of Organization become effective.\n\n- I certify that the information provided is true and accurate to the best of my knowledge.\n\n- I am solely responsible for the accuracy of all addresses I have provided. I understand that state filings, legal notices, and official correspondence will be directed to these addresses exactly as entered, and that MyFloridaSeriesLLC does not verify the accuracy or deliverability of any address. Any address-suggestion or address-checking feature in this form is a convenience only and is not a verification, warranty, or guarantee of any kind.\n\n- I agree to all terms and conditions set forth in the Terms of Service, including its binding individual arbitration provision and class action waiver.\n\n- I understand that filed information may become part of the public record.\n\n- I understand this service does not provide legal, tax, or accounting advice.\n\n\n\n## Submission record\n\n**Submitted at:** September 20, 2026 at 10:32 AM ET\n\n**From IP address:** not recorded\n\n**Browser:** Bun/1.3.14\n\n**Form version:** fl-llc-formation-v2-agent-consent",
+        "memberSummary": "# Order Summary\n\n## Batch Six LLC\n\nThis summary records the order as it was placed and, once received, as it was paid. It is kept for the office and does not appear in the client's portal.\n\n## The order\n\n**Company:** Batch Six LLC\n\n**Filing:** New Florida LLC\n\n**Client:** Jane Owner <batch06@example.test>\n\n**Placed:** September 19, 2026 at 8:00 AM ET\n\n**Paid:** not yet received at the time of this summary\n\n**Square payment:** \u2014\n\n**Checkout reference:** \u2014\n\n**Order:** batch06\n\n\n\n## Items ordered\n\n**Package:** New Protected Series LLC formation\n\n**Formation type:** LLC\n\n**Protected series:** PS One\n\n**Registered agent:** Client serving personally\n\n**Certificate of Status:** No\n\n**Certified Copy:** No\n\n**Federal EIN service:** No\n\n**S election package:** No\n\n\n\n## Price\n\n| Item | Amount |\n|---|---|\n| Service subtotal | $0.00 |\n| State fees subtotal | $0.00 |\n| **Total charged** | **$0.00** |\n\n**State fees shown to the client on the review step:** $125.00\n\n**State fees charged:** $0.00\n\n\n\n## The questionnaire, as typed\n\n### Your information\n\n**Name:** Jane Owner\n\n**Email:** batch06@example.test\n\n**Phone:** \u2014\n\n**Address:** 101 Main St, Orlando, FL 32803, United States\n\n### LLC name\n\n**Desired name:** Batch Six\n\n**Designator:** LLC\n\n**Final name:** Batch Six, LLC\n\n**Alternate names:** \u2014\n\n**Exact name only:** Yes\n\n**Availability check the client saw:** none recorded\n\n### Principal address\n\n**Address:** 101 Main St, Orlando, FL 32803, United States\n\n### Mailing address\n\n**Address:** 101 Main St, Orlando, FL 32803, United States\n\n### Series\n\n**Series 1:** PS One\n\n### Registered agent\n\n**Choice:** Client serving personally\n\n**Type:** Individual\n\n**Name:** John Smith, Jr.\n\n**Address:** 101 Main St, Orlando, FL 32803, United States\n\n**Email:** \u2014\n\n**Phone:** \u2014\n\n### Agent acceptance\n\n**Accepted by:** John Smith, Jr.\n\n**Capacity:** The registered agent, an individual\n\n**Electronic signature:** John Smith, Jr.\n\n### Management\n\n**Structure:** Member-managed\n\n**Statement in the Articles:** Yes\n\n### Initial members\n\n**Member 1:** Jane Smith; 101 Main St, Orlando, FL 32803; 100%\n\n### Purpose\n\n**Purpose type:** General purpose\n\n**Specific purpose:** \u2014\n\n### Effective date\n\n**Option:** Date filed by the Division\n\n### Correspondence\n\n**Name:** Jane Owner\n\n**Company:** \u2014\n\n**Email:** batch06@example.test\n\n**Phone:** \u2014\n\n**Mailing address:** \u2014\n\n### Optional documents\n\n**Certificate of Status:** No\n\n**Certified Copy:** No\n\n**Federal EIN service:** No\n\n**S election package:** No\n\n### Certification\n\n**Articles signed by:** MyFloridaSeriesLLC, as appointed authorized representative\n\n**Authorized representative:** \u2014\n\n**Title:** \u2014\n\n**Electronic signature typed:** \u2014\n\n**Signed at:** September 20, 2026 at 10:32 AM ET\n\n\n\n## Acknowledgments ticked\n\nEach box below was ticked by the client, in these words, at September 20, 2026 at 10:32 AM ET.\n\n- I understand this form is for forming a new domestic Florida series LLC only.\n\n- I understand that availability is not guaranteed until accepted by the Florida Division of Corporations.\n\n- I confirm the name does not imply affiliation with a state or federal government agency.\n\n- I confirm the name does not imply a purpose unauthorized for this LLC.\n\n- I only want this exact name \u2014 if it is unavailable, contact me before doing anything else.\n\n- I understand that every protected series will be owned by my LLC, and that no series will have its own separate owners.\n\n- I understand that the LLC itself cannot serve as its own registered agent \u2014 I am accepting this role personally.\n\n- I live in Florida, and the Florida street address entered above is my business address and the LLC\u2019s registered office, not a P.O. Box.\n\n- I accept the appointment as registered agent for this Florida LLC, and I am familiar with and accept the obligations of that position.\n\n- I certify that I am signing for myself as the registered agent.\n\n- I appoint MyFloridaSeriesLLC as my authorized representative to sign and file my Articles of Organization, and I certify that the information I have provided is true, accurate, and complete.\n\n- I affirm that the LLC has or will have at least one member when the Articles of Organization become effective.\n\n- I certify that the information provided is true and accurate to the best of my knowledge.\n\n- I am solely responsible for the accuracy of all addresses I have provided. I understand that state filings, legal notices, and official correspondence will be directed to these addresses exactly as entered, and that MyFloridaSeriesLLC does not verify the accuracy or deliverability of any address. Any address-suggestion or address-checking feature in this form is a convenience only and is not a verification, warranty, or guarantee of any kind.\n\n- I agree to all terms and conditions set forth in the Terms of Service, including its binding individual arbitration provision and class action waiver.\n\n- I understand that filed information may become part of the public record.\n\n- I understand this service does not provide legal, tax, or accounting advice.\n\n\n\n## Submission record\n\n**Submitted at:** September 20, 2026 at 10:32 AM ET\n\n**From IP address:** not recorded\n\n**Browser:** Bun/1.3.14\n\n**Form version:** fl-llc-formation-v2-agent-consent"
+      }
+    },
+    {
+      "label": "batch18 N2.20: English input is enforced before business writes",
+      "ok": false,
+      "detail": [
+        {
+          "name": "Jos\u00e9",
+          "status": 401,
+          "body": "{\"error\":{\"message\":\"Not signed in\",\"code\":\"UNAUTHENTICATED\"}}"
+        },
+        {
+          "name": "\u674e",
+          "status": 401,
+          "body": "{\"error\":{\"message\":\"Not signed in\",\"code\":\"UNAUTHENTICATED\"}}"
+        },
+        {
+          "name": "\u0418\u0432\u0430\u043d",
+          "status": 401,
+          "body": "{\"error\":{\"message\":\"Not signed in\",\"code\":\"UNAUTHENTICATED\"}}"
+        },
+        {
+          "name": "\ud83d\ude00",
+          "status": 401,
+          "body": "{\"error\":{\"message\":\"Not signed in\",\"code\":\"UNAUTHENTICATED\"}}"
+        },
+        {
+          "multipartStatus": 401,
+          "body": "{\"error\":{\"message\":\"Not signed in\",\"code\":\"UNAUTHENTICATED\"}}"
+        },
+        {}
+      ]
+    }
+  ],
+  "after": [
+    {
+      "label": "batch18 263: unresolved template fields fail without mistaking client text",
+      "ok": true,
+      "detail": [
+        {
+          "version": "single",
+          "uniform": true,
+          "literals": true,
+          "preserved": true
+        },
+        {
+          "version": "single-s",
+          "uniform": true,
+          "literals": true,
+          "preserved": true
+        },
+        {
+          "version": "member-single",
+          "uniform": true,
+          "literals": true,
+          "preserved": true
+        },
+        {
+          "version": "member-single-s",
+          "uniform": true,
+          "literals": true,
+          "preserved": true
+        },
+        {
+          "version": "multi",
+          "uniform": true,
+          "literals": true,
+          "preserved": true
+        },
+        {
+          "version": "s",
+          "uniform": true,
+          "literals": true,
+          "preserved": true
+        },
+        {
+          "version": "member",
+          "uniform": true,
+          "literals": true,
+          "preserved": true
+        },
+        {
+          "version": "member-s",
+          "uniform": true,
+          "literals": true,
+          "preserved": true
+        },
+        {
+          "consentCells": true,
+          "consentTextPreserved": true
+        },
+        {
+          "plantedSlot": {
+            "assembled": false,
+            "error": "Error: Document template left unfilled: [UNFILLED_BATCH18_PROBE]"
+          }
+        }
+      ]
+    },
+    {
+      "label": "batch18 N2.21: client pipes and line breaks remain inside their document cells",
+      "ok": true,
+      "detail": [
+        {
+          "version": "single",
+          "uniform": true,
+          "literals": true,
+          "preserved": true
+        },
+        {
+          "version": "single-s",
+          "uniform": true,
+          "literals": true,
+          "preserved": true
+        },
+        {
+          "version": "member-single",
+          "uniform": true,
+          "literals": true,
+          "preserved": true
+        },
+        {
+          "version": "member-single-s",
+          "uniform": true,
+          "literals": true,
+          "preserved": true
+        },
+        {
+          "version": "multi",
+          "uniform": true,
+          "literals": true,
+          "preserved": true
+        },
+        {
+          "version": "s",
+          "uniform": true,
+          "literals": true,
+          "preserved": true
+        },
+        {
+          "version": "member",
+          "uniform": true,
+          "literals": true,
+          "preserved": true
+        },
+        {
+          "version": "member-s",
+          "uniform": true,
+          "literals": true,
+          "preserved": true
+        },
+        {
+          "consentCells": true,
+          "consentTextPreserved": true
+        },
+        {
+          "plantedSlot": {
+            "assembled": false,
+            "error": "Error: Document template left unfilled: [UNFILLED_BATCH18_PROBE]"
+          }
+        }
+      ]
+    },
+    {
+      "label": "batch18 N2.19: manager and member suites survive the office summary",
+      "ok": true,
+      "detail": {
+        "managerSummary": "# Order Summary\n\n## Batch Six LLC\n\nThis summary records the order as it was placed and, once received, as it was paid. It is kept for the office and does not appear in the client's portal.\n\n## The order\n\n**Company:** Batch Six LLC\n\n**Filing:** New Florida LLC\n\n**Client:** Jane Owner <batch06@example.test>\n\n**Placed:** September 19, 2026 at 8:00 AM ET\n\n**Paid:** not yet received at the time of this summary\n\n**Square payment:** \u2014\n\n**Checkout reference:** \u2014\n\n**Order:** batch06\n\n\n\n## Items ordered\n\n**Package:** New Protected Series LLC formation\n\n**Formation type:** LLC\n\n**Protected series:** PS One\n\n**Registered agent:** Client serving personally\n\n**Certificate of Status:** No\n\n**Certified Copy:** No\n\n**Federal EIN service:** No\n\n**S election package:** No\n\n\n\n## Price\n\n| Item | Amount |\n|---|---|\n| Service subtotal | $0.00 |\n| State fees subtotal | $0.00 |\n| **Total charged** | **$0.00** |\n\n**State fees shown to the client on the review step:** $125.00\n\n**State fees charged:** $0.00\n\n\n\n## The questionnaire, as typed\n\n### Your information\n\n**Name:** Jane Owner\n\n**Email:** batch06@example.test\n\n**Phone:** \u2014\n\n**Address:** 101 Main St, Orlando, FL 32803, United States\n\n### LLC name\n\n**Desired name:** Batch Six\n\n**Designator:** LLC\n\n**Final name:** Batch Six, LLC\n\n**Alternate names:** \u2014\n\n**Exact name only:** Yes\n\n**Availability check the client saw:** none recorded\n\n### Principal address\n\n**Address:** 101 Main St, Orlando, FL 32803, United States\n\n### Mailing address\n\n**Address:** 101 Main St, Orlando, FL 32803, United States\n\n### Series\n\n**Series 1:** PS One\n\n### Registered agent\n\n**Choice:** Client serving personally\n\n**Type:** Individual\n\n**Name:** John Smith, Jr.\n\n**Address:** 101 Main St, Orlando, FL 32803, United States\n\n**Email:** \u2014\n\n**Phone:** \u2014\n\n### Agent acceptance\n\n**Accepted by:** John Smith, Jr.\n\n**Capacity:** The registered agent, an individual\n\n**Electronic signature:** John Smith, Jr.\n\n### Management\n\n**Structure:** Manager-managed\n\n**Statement in the Articles:** Yes\n\n### Managers\n\n**Manager 1:** Jane Owner; 101 Main St, Suite 512, Orlando, FL 32803\n\n### Purpose\n\n**Purpose type:** General purpose\n\n**Specific purpose:** \u2014\n\n### Effective date\n\n**Option:** Date filed by the Division\n\n### Correspondence\n\n**Name:** Jane Owner\n\n**Company:** \u2014\n\n**Email:** batch06@example.test\n\n**Phone:** \u2014\n\n**Mailing address:** \u2014\n\n### Optional documents\n\n**Certificate of Status:** No\n\n**Certified Copy:** No\n\n**Federal EIN service:** No\n\n**S election package:** No\n\n### Certification\n\n**Articles signed by:** MyFloridaSeriesLLC, as appointed authorized representative\n\n**Authorized representative:** \u2014\n\n**Title:** \u2014\n\n**Electronic signature typed:** \u2014\n\n**Signed at:** September 20, 2026 at 10:32 AM ET\n\n\n\n## Acknowledgments ticked\n\nEach box below was ticked by the client, in these words, at September 20, 2026 at 10:32 AM ET.\n\n- I understand this form is for forming a new domestic Florida series LLC only.\n\n- I understand that availability is not guaranteed until accepted by the Florida Division of Corporations.\n\n- I confirm the name does not imply affiliation with a state or federal government agency.\n\n- I confirm the name does not imply a purpose unauthorized for this LLC.\n\n- I only want this exact name \u2014 if it is unavailable, contact me before doing anything else.\n\n- I understand that every protected series will be owned by my LLC, and that no series will have its own separate owners.\n\n- I understand that the LLC itself cannot serve as its own registered agent \u2014 I am accepting this role personally.\n\n- I live in Florida, and the Florida street address entered above is my business address and the LLC\u2019s registered office, not a P.O. Box.\n\n- I accept the appointment as registered agent for this Florida LLC, and I am familiar with and accept the obligations of that position.\n\n- I certify that I am signing for myself as the registered agent.\n\n- I appoint MyFloridaSeriesLLC as my authorized representative to sign and file my Articles of Organization, and I certify that the information I have provided is true, accurate, and complete.\n\n- I affirm that the LLC has or will have at least one member when the Articles of Organization become effective.\n\n- I certify that the information provided is true and accurate to the best of my knowledge.\n\n- I am solely responsible for the accuracy of all addresses I have provided. I understand that state filings, legal notices, and official correspondence will be directed to these addresses exactly as entered, and that MyFloridaSeriesLLC does not verify the accuracy or deliverability of any address. Any address-suggestion or address-checking feature in this form is a convenience only and is not a verification, warranty, or guarantee of any kind.\n\n- I agree to all terms and conditions set forth in the Terms of Service, including its binding individual arbitration provision and class action waiver.\n\n- I understand that filed information may become part of the public record.\n\n- I understand this service does not provide legal, tax, or accounting advice.\n\n\n\n## Submission record\n\n**Submitted at:** September 20, 2026 at 10:32 AM ET\n\n**From IP address:** not recorded\n\n**Browser:** Bun/1.3.14\n\n**Form version:** fl-llc-formation-v2-agent-consent",
+        "memberSummary": "# Order Summary\n\n## Batch Six LLC\n\nThis summary records the order as it was placed and, once received, as it was paid. It is kept for the office and does not appear in the client's portal.\n\n## The order\n\n**Company:** Batch Six LLC\n\n**Filing:** New Florida LLC\n\n**Client:** Jane Owner <batch06@example.test>\n\n**Placed:** September 19, 2026 at 8:00 AM ET\n\n**Paid:** not yet received at the time of this summary\n\n**Square payment:** \u2014\n\n**Checkout reference:** \u2014\n\n**Order:** batch06\n\n\n\n## Items ordered\n\n**Package:** New Protected Series LLC formation\n\n**Formation type:** LLC\n\n**Protected series:** PS One\n\n**Registered agent:** Client serving personally\n\n**Certificate of Status:** No\n\n**Certified Copy:** No\n\n**Federal EIN service:** No\n\n**S election package:** No\n\n\n\n## Price\n\n| Item | Amount |\n|---|---|\n| Service subtotal | $0.00 |\n| State fees subtotal | $0.00 |\n| **Total charged** | **$0.00** |\n\n**State fees shown to the client on the review step:** $125.00\n\n**State fees charged:** $0.00\n\n\n\n## The questionnaire, as typed\n\n### Your information\n\n**Name:** Jane Owner\n\n**Email:** batch06@example.test\n\n**Phone:** \u2014\n\n**Address:** 101 Main St, Orlando, FL 32803, United States\n\n### LLC name\n\n**Desired name:** Batch Six\n\n**Designator:** LLC\n\n**Final name:** Batch Six, LLC\n\n**Alternate names:** \u2014\n\n**Exact name only:** Yes\n\n**Availability check the client saw:** none recorded\n\n### Principal address\n\n**Address:** 101 Main St, Orlando, FL 32803, United States\n\n### Mailing address\n\n**Address:** 101 Main St, Orlando, FL 32803, United States\n\n### Series\n\n**Series 1:** PS One\n\n### Registered agent\n\n**Choice:** Client serving personally\n\n**Type:** Individual\n\n**Name:** John Smith, Jr.\n\n**Address:** 101 Main St, Orlando, FL 32803, United States\n\n**Email:** \u2014\n\n**Phone:** \u2014\n\n### Agent acceptance\n\n**Accepted by:** John Smith, Jr.\n\n**Capacity:** The registered agent, an individual\n\n**Electronic signature:** John Smith, Jr.\n\n### Management\n\n**Structure:** Member-managed\n\n**Statement in the Articles:** Yes\n\n### Initial members\n\n**Member 1:** Jane Smith; 101 Main St, Apartment 813, Orlando, FL 32803; 100%\n\n### Purpose\n\n**Purpose type:** General purpose\n\n**Specific purpose:** \u2014\n\n### Effective date\n\n**Option:** Date filed by the Division\n\n### Correspondence\n\n**Name:** Jane Owner\n\n**Company:** \u2014\n\n**Email:** batch06@example.test\n\n**Phone:** \u2014\n\n**Mailing address:** \u2014\n\n### Optional documents\n\n**Certificate of Status:** No\n\n**Certified Copy:** No\n\n**Federal EIN service:** No\n\n**S election package:** No\n\n### Certification\n\n**Articles signed by:** MyFloridaSeriesLLC, as appointed authorized representative\n\n**Authorized representative:** \u2014\n\n**Title:** \u2014\n\n**Electronic signature typed:** \u2014\n\n**Signed at:** September 20, 2026 at 10:32 AM ET\n\n\n\n## Acknowledgments ticked\n\nEach box below was ticked by the client, in these words, at September 20, 2026 at 10:32 AM ET.\n\n- I understand this form is for forming a new domestic Florida series LLC only.\n\n- I understand that availability is not guaranteed until accepted by the Florida Division of Corporations.\n\n- I confirm the name does not imply affiliation with a state or federal government agency.\n\n- I confirm the name does not imply a purpose unauthorized for this LLC.\n\n- I only want this exact name \u2014 if it is unavailable, contact me before doing anything else.\n\n- I understand that every protected series will be owned by my LLC, and that no series will have its own separate owners.\n\n- I understand that the LLC itself cannot serve as its own registered agent \u2014 I am accepting this role personally.\n\n- I live in Florida, and the Florida street address entered above is my business address and the LLC\u2019s registered office, not a P.O. Box.\n\n- I accept the appointment as registered agent for this Florida LLC, and I am familiar with and accept the obligations of that position.\n\n- I certify that I am signing for myself as the registered agent.\n\n- I appoint MyFloridaSeriesLLC as my authorized representative to sign and file my Articles of Organization, and I certify that the information I have provided is true, accurate, and complete.\n\n- I affirm that the LLC has or will have at least one member when the Articles of Organization become effective.\n\n- I certify that the information provided is true and accurate to the best of my knowledge.\n\n- I am solely responsible for the accuracy of all addresses I have provided. I understand that state filings, legal notices, and official correspondence will be directed to these addresses exactly as entered, and that MyFloridaSeriesLLC does not verify the accuracy or deliverability of any address. Any address-suggestion or address-checking feature in this form is a convenience only and is not a verification, warranty, or guarantee of any kind.\n\n- I agree to all terms and conditions set forth in the Terms of Service, including its binding individual arbitration provision and class action waiver.\n\n- I understand that filed information may become part of the public record.\n\n- I understand this service does not provide legal, tax, or accounting advice.\n\n\n\n## Submission record\n\n**Submitted at:** September 20, 2026 at 10:32 AM ET\n\n**From IP address:** not recorded\n\n**Browser:** Bun/1.3.14\n\n**Form version:** fl-llc-formation-v2-agent-consent"
+      }
+    },
+    {
+      "label": "batch18 N2.20: English input is enforced before business writes",
+      "ok": true,
+      "detail": [
+        {
+          "name": "Jos\u00e9",
+          "status": 400,
+          "body": "{\"error\":{\"message\":\"Please use English letters (A\u2013Z). Numbers, spaces and standard punctuation are also allowed. Replace the highlighted characters to continue.\",\"code\":\"INVALID_INPUT\"},\"fields\":{\"companyName\":\"Please use English letters (A\u2013Z). Numbers, spaces and standard punctuation are also allowed. Replace the highlighted characters to continue.\"}}"
+        },
+        {
+          "name": "\u674e",
+          "status": 400,
+          "body": "{\"error\":{\"message\":\"Please use English letters (A\u2013Z). Numbers, spaces and standard punctuation are also allowed. Replace the highlighted characters to continue.\",\"code\":\"INVALID_INPUT\"},\"fields\":{\"companyName\":\"Please use English letters (A\u2013Z). Numbers, spaces and standard punctuation are also allowed. Replace the highlighted characters to continue.\"}}"
+        },
+        {
+          "name": "\u0418\u0432\u0430\u043d",
+          "status": 400,
+          "body": "{\"error\":{\"message\":\"Please use English letters (A\u2013Z). Numbers, spaces and standard punctuation are also allowed. Replace the highlighted characters to continue.\",\"code\":\"INVALID_INPUT\"},\"fields\":{\"companyName\":\"Please use English letters (A\u2013Z). Numbers, spaces and standard punctuation are also allowed. Replace the highlighted characters to continue.\"}}"
+        },
+        {
+          "name": "\ud83d\ude00",
+          "status": 400,
+          "body": "{\"error\":{\"message\":\"Please use English letters (A\u2013Z). Numbers, spaces and standard punctuation are also allowed. Replace the highlighted characters to continue.\",\"code\":\"INVALID_INPUT\"},\"fields\":{\"companyName\":\"Please use English letters (A\u2013Z). Numbers, spaces and standard punctuation are also allowed. Replace the highlighted characters to continue.\"}}"
+        },
+        {
+          "multipartStatus": 400,
+          "body": "{\"error\":{\"message\":\"Please use English letters (A\u2013Z). Numbers, spaces and standard punctuation are also allowed. Replace the highlighted characters to continue.\",\"code\":\"INVALID_INPUT\"},\"fields\":{\"name\":\"Please use English letters (A\u2013Z). Numbers, spaces and standard punctuation are also allowed. Replace the highlighted characters to continue.\"}}"
+        },
+        {
+          "invalid": "Please use English letters (A\u2013Z). Numbers, spaces and standard punctuation are also allowed. Replace the highlighted characters to continue."
+        }
+      ]
+    }
+  ]
+}
