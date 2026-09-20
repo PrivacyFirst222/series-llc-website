@@ -3466,3 +3466,19 @@ I omitted two test dependencies from Batch 08's work order and then asked Adam f
 ### WHY IT HAPPENED
 
 I treated the ledger's prescribed message format as the source of authorization instead of carrying the user's existing authorization through the administrative transition. My preference for a mechanically exact approval record shifted routine test completion back onto Adam.
+
+## P94 — Audit completion was not tied to every audit obligation
+
+### THE FAILURE
+
+Adam, 20 September 2026: "I need there to be a system because you and Claude ran three audits and kept finding new errors because you weren’t being systematic and thorough"
+
+Successive audits left further defects for later readers. During preparation of the next audit I verified that coverage-check.ts accepts an overstated line count and does not reconcile submitted prior findings against the full expected set. The earlier completion language was stronger than those checks established. Adam has had to restate that the deliverable is a repeatable audit system.
+
+### WHY IT HAPPENED
+
+I relied on the label “coverage check passed” without first checking whether it enforced every obligation in the audit instructions. I treated a successful implementation test run as more reassuring about audit completeness than its scope justified. Separating required evidence from the author's completion claim was necessary before either could support a whole-product conclusion.
+
+### FIXED BY
+
+In progress in batch audit-mechanism: commit-bound scope, exact reading coverage, complete part-level prior reconciliation, required evidence for workflows and document comparisons, source-backed findings with separate rechecks, and checked ledger intake. This entry does not claim that the mechanism is finished or that another audit has passed.

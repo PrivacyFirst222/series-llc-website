@@ -2,9 +2,10 @@
 
 GENERATED from docs/audit/ledger.json by `bun run docs/audit/ledger-print.ts list`. Do not edit: the commit step refuses a copy that differs from the ledger. The auditors' original files are unchanged under docs/audit/sources/ and docs/audit/runs/.
 
-334 records: 267 from the 16 Sep working list and 67 from Codex's audit (N1.01–N4.11). 12 dropped after Codex's review, 15 optional wording, 35 second sightings of another item's part. Released: 0 of 322.
+334 records: 267 from the 16 Sep working list, 67 from Codex's audit (N1.01–N4.11), and 0 from later checked audit intakes. 12 dropped after Codex's review, 15 optional wording, 35 second sightings of another item's part. Released: 0 of 322.
 
 A status reads: open → assigned (to a batch) → implemented → accepted (by Adam, by exact commit) → released.
+For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-session.ts. The historical coverage-check.ts alone does not establish complete prior-item reconciliation. Audit completion does not approve repairs or publication.
 
 ## Public pages, Terms and Privacy — 42 open of 48
 

@@ -1,0 +1,72 @@
+{
+  "id": "audit-mechanism",
+  "revision": 1,
+  "title": "Whole-product audit coverage, reconciliation, evidence and checked finding intake",
+  "model": "Codex",
+  "base": "e63054181dd0b341f639d56ff5c4a6ac6329f253",
+  "items": [],
+  "files": [
+    {
+      "path": "docs/audit/audit-session-lib.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Audit control and checked append-only finding intake; no product changes."
+    },
+    {
+      "path": "docs/audit/audit-session.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Audit control and checked append-only finding intake; no product changes."
+    },
+    {
+      "path": "docs/audit/audit-session-check.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Audit control and checked append-only finding intake; no product changes."
+    },
+    {
+      "path": "docs/audit/audit-import-lib.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Audit control and checked append-only finding intake; no product changes."
+    },
+    {
+      "path": "docs/audit/audit-import.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Audit control and checked append-only finding intake; no product changes."
+    },
+    {
+      "path": "docs/audit/AUDIT-WORKFLOW.md",
+      "mode": "new",
+      "control": true,
+      "why": "Audit control and checked append-only finding intake; no product changes."
+    },
+    {
+      "path": "docs/audit/audit-reader.md",
+      "mode": "new",
+      "control": true,
+      "why": "Audit control and checked append-only finding intake; no product changes."
+    },
+    {
+      "path": "docs/audit/ledger-lib.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Audit control and checked append-only finding intake; no product changes."
+    },
+    {
+      "path": "docs/audit/ledger-print.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Audit control and checked append-only finding intake; no product changes."
+    },
+    {
+      "path": "docs/audit/repair-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Audit control and checked append-only finding intake; no product changes."
+    }
+  ],
+  "requiredChecks": [],
+  "removedChecks": []
+}

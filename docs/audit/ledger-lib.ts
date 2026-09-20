@@ -33,6 +33,7 @@ import { createHash } from "node:crypto";
 import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { homedir } from "node:os";
+import { importProblems, type ImportRef } from "./audit-import-lib";
 
 export const ROOT = fileURLToPath(new URL("../../", import.meta.url)).replace(/\/$/, "");
 export const LEDGER = join(ROOT, "docs/audit/ledger.json");
@@ -147,7 +148,7 @@ export interface ReleaseRecord { git: { at: string; remoteMain: string; commit: 
 export type BatchStatus = "authorized" | "implemented" | "accepted" | "released" | "rejected";
 export interface BatchIndex { id: string; revision: number; frozenHash: string; status: BatchStatus; model: string; base: string; history: HistoryEntry[]; release?: ReleaseRecord }
 
-export interface Ledger { version: 1 | 2; builtFrom: string[]; items: Item[]; rulings: Ruling[]; batches: BatchIndex[] }
+export interface Ledger { auditImports?: ImportRef[]; version: 1 | 2; builtFrom: string[]; items: Item[]; rulings: Ruling[]; batches: BatchIndex[] }
 
 export interface BatchFile {
   id: string;
@@ -512,7 +513,9 @@ export function ledgerRegressions(before: Ledger, after: Ledger, opts: Regressio
       if (wasAccepted && bp.fix && !same(ap.fix?.assertions, bp.fix.assertions) && !replaced) out.push(`${name}: an accepted fix's assertions changed without an exact approved replacement work order`);
     }
   }
-  for (const a of after.items) if (!before.items.some((i) => i.id === a.id)) out.push(`item ${a.id}: a record appeared that the auditors never wrote`);
+  const intake = importProblems(before, after, read, opts.strict === true);
+  out.push(...intake.problems);
+  for (const a of after.items) if (!before.items.some((i) => i.id === a.id) && !intake.allowed.has(a.id)) out.push(`item ${a.id}: a record appeared that the auditors never wrote`);
   if (before.version !== after.version && !migrations.some((m) => m.schema && m.schema.from === before.version && m.schema.to === after.version)) out.push(`the ledger's version changed (${before.version} → ${after.version})${never}`);
   out.push(...linkProblems(after));
 
