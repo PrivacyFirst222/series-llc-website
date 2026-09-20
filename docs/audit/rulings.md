@@ -91,3 +91,5 @@ Adam. A new ruling is added the day it is given.
 - Ruling N1.11: "Batch 17 review item 8 rejected. Keep the existing owner-immunity example as is."
 
 - Ruling N2.04: "Batch 17 review item 9 rejected. Keep the existing agreement creditor/recourse clauses and matching liability descriptions as is. This does not reject the separately approved Manual recordkeeping and dissolution corrections."
+
+- Ruling N2.10: "Batch 17 revision 2: Adam rejected revision 1 and authorized the prepared shorter documentary-stamp-tax paragraph to correct portal-PDF pagination. Exact approved text is in revisions/r2.json. All other approved changes and rejected units remain unchanged."

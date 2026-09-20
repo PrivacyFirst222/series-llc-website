@@ -327,3 +327,15 @@ After:
   and terminated; a new series may be established through the merger filings
   as ss. 605.2605–605.2607 provide.
 ```
+
+## Revision 2 — approved pagination correction
+
+Adam: "Reject Batch 17 revision 1; proceed with revision 2." Revision 1 remains in history and its frozen snapshot is unchanged. Only the documentary-stamp-tax paragraph changes from the revision-1 wording above.
+
+Governing source reopened: Florida Department of Revenue, https://floridarevenue.com/taxes/taxesfees/Pages/doc_stamp.aspx: "The surtax is not due on a document that transfers only a single-family dwelling." Rates, consideration-based example and confirmation instruction remain.
+
+Approved replacement:
+
+2. **Documentary stamp tax.** Outside Miami-Dade County, the rate is 70 cents per $100 or fraction of taxable consideration. Miami-Dade charges 60 cents per $100 or fraction, plus a 45-cent surtax unless only a single-family dwelling is transferred. Mortgaged-property transfers can be taxable without cash changing hands. At the outside-Miami-Dade rate, $300,000 of taxable consideration means $2,100 in tax. Unencumbered, no-consideration transfers require separate analysis. Confirm consideration, rate and exemptions with your closing agent or CPA before recording.
+
+Before authorization the actual portal renderer reproduced r1 at 38 pages with a two-line body page, and the candidate at 37 pages without a sparse body page. The Word candidate was also rendered and examined separately. Full review is repeated after the revision-2 commit; no assertion is weakened. Batch 16 remains pending separately; nothing is published.
