@@ -194,3 +194,14 @@ scanned set; add ` in <path prefix>` to confine the ban to matching files.
 - Manager-managed agreement questionnaires support editing, adding and removing managers, with entity signer details carried with each manager. Preparing an agreement does not change state filing records.
 - The series consent's blank contribution prints “None”; its exhibit adopter blocks have no additional Date line and its asset schedule has five blank rows, matching the masters. Consent member signatures retain Date lines. Its document title/footer is “Consent & Series Exhibit — [series name]”.
 - The consent special-terms warning includes Article 9 for the selected company's S agreement and Article 8 for every form.
+
+## Batch 15 — voting, authority and transfers (Adam approved 20 September 2026)
+
+- Majority in Interest means more than 50% of the Percentage Interests held by admitted members, not a majority by headcount. Capital calls use that vote; their existing annual cap and written-notice requirements remain.
+- Under the multi-member forms, a TOD beneficiary or permitted family transferee needs a signed agreement to be bound and written Majority-in-Interest approval from the other members for admission. Other new members need all members' written consent. Permission to transfer and admission are separate; an economic transferee alone has no management authority.
+- An Administrative Member performs ministerial tasks and may receive additional authority under the agreement or from a Majority in Interest; the role does not make that person a manager.
+- Borrowing above the chosen threshold requires every member's consent. Guarantees require every member's consent at any amount; preserve the express written instrument required for guarantees of one series' obligations by another or by the company.
+- Unanimous establishment approval is a variable statutory default under ss.605.2201(1) and 605.2107(1)(i); Section 3.1 of these agreements retains unanimity.
+- Unequal ownership can still deadlock on unanimous decisions. Section 13.2 applies only to covered matters, after 60 days following written notice, with an initiator holding at least 25%; retain its statutory withholding-consent exclusion and cash-access warning. Negotiation remains possible without the optional mechanism.
+- TOD designation is for qualifying individual ownership, not entity owners or tenants in common. S-form beneficiary restrictions remain.
+- Formation Articles list AMBRs for member-managed companies and managers for manager-managed companies, including an owner serving in that role. Questionnaire answers do not update public filings. Correct inaccurate filed facts through the appropriate amendment or other permitted correction; ownership changes do not invariably require amended Articles.

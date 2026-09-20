@@ -848,12 +848,14 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: 2026 s.605.2203(2) requires an agreement with the registered agent covering the company and each protected series before delivery of a designation; subsection(3) says the designation signer affirms this as fact. Opened text: https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605.html. StepRegisteredAgent records the retained agent’s details and Florida-address acknowledgment but no agreement to serve every series; FloridaLLCFormationForm.tsx:296–298 hides acceptance for CONVERT+SELF; the certification at StepCertification.tsx:90–120 addresses authority and member consent only. This proves a missing intake confirmation, not that any particular agent has refused or no off-platform agreement exists. Add the proposed confirmation before filing and retain evidence or verification of the agreement.
   - Replace with: I am authorized to act for ${company}, its members have consented to establishing the protected series on this order, and I authorize MyFloridaSeriesLLC to prepare and file the Protected Series Designations with the Florida Division of Corporations. I confirm that the company’s registered agent has agreed to serve as registered agent for the company and every protected series in this order.
   - Fixed: batch 06 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **N4.08. [substantive]** — **open**
+- **N4.08. [substantive]** — **implemented**
   - Order form, Management structure explanation: a transfer is incorrectly said to confer management — `webapp/src/components/forms/florida-llc/sections/StepManagement.tsx:106`
   - Reads: If a share later passes to a trust, a holding company, or a passive investor, the new owner inherits management authority — and the exposure — too.
   - Claims: A transfer of the ownership/economic interest automatically gives the recipient management authority in a member-managed LLC.
   - True: templates-oa-member.md:284–286 (§§10.2–10.3) expressly makes a transferee economic-only until admitted under §12.1; :308 imposes admission conditions. I opened those sections. The 2026 text of s.605.0502(1)(c), opened on Online Sunshine, likewise distinguishes transfer from management rights: https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605.html. Admission can confer membership rights; receiving the transferred economic interest alone does not.
   - Replace with: If a transferee is admitted as a member of a member-managed LLC, the new member gains management rights and duties; receiving only an economic interest does not confer management authority.
+  - Fixed: batch 15 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
 - **N4.09. [substantive]** — **implemented**
   - Order form, changing to Member-managed after partially entering a manager: checkout validates the hidden manager — `webapp/src/components/forms/florida-llc/stepValidation.ts:258`
   - Reads: // Hidden entirely for member-managed companies — nothing to validate.
@@ -912,13 +914,19 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
 - **123. [A55]** — **implemented**
   - EIN details dialog: "…application for Federal EIN — Acme, LLC." Replace: the company or series name.
   - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **124. [A56]** — **open**
+- **124. [A56]** — **implemented**
   - Help "Additional Capital Calls" and its label: "a majority of the owners"; the agreement: Majority in Interest. Replace: "owners holding a majority of the ownership percentages".
-- **125. [A57]** — **open**
+  - Fixed: batch 15 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
+- **125. [A57]** — **implemented**
   - Help, transfer on death: "the same rule that applies to lifetime transfers." Replace: majority in interest for a beneficiary or family transferee; all owners otherwise.
   - **Codex rejected the proposed replacement:** State explicitly that this is admission as a voting member, not permission to transfer. Say “For a TOD beneficiary or permitted family transferee, owners holding a majority of the remaining ownership interests must consent; other new members need all members’ consent.” Keep the signed-agreement requirement; outsider transfers separately require Manager and majority consent at :280.
-- **126. [A58]** — **open**
+  - Fixed: batch 15 revision 2, commit , by Codex; protected by 3 assertion(s).
+  - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
+- **126. [A58]** — **implemented**
   - S corporation warning (mine) cites Section 12.1 on forms where 12.1 is Amendments. Replace: "…its admission section admits only an eligible shareholder."
+  - Fixed: batch 15 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
 - **127. [A59]** — **open**
   - Sole-owner S title "Single-Member S Corporation…" vs pill "S Corporation"; "Amended & Restated (No. 2)" vs the document's full title. Replace: one label table; full title.
 - **128. [A60]** — **implemented**
@@ -931,8 +939,10 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
 - **129. [A61]** — **implemented**
   - Consent exhibit-identifier default fails for "Protected Series 4". Replace: accept that spelling.
   - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **130. [A62]** — **open**
+- **130. [A62]** — **implemented**
   - Spouse pairing "JTWROS". Replace: "Joint tenants with right of survivorship".
+  - Fixed: batch 15 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
 - **131. [A63]** — **implemented**
   - Amendment card names "Update/regenerate" under "Operating Agreement"; the button and heading read differently. Replace the button and heading.
   - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
@@ -944,7 +954,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
 - **134. [A66]** — **implemented**
   - Help "Effective Date": "We've pre-filled today's date" true only the first time. Replace: say the saved date is kept.
   - Fixed: batch 01 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **135. [B58]** — **open**
+- **135. [B58]** — **implemented**
   - Client portal, operating agreement questionnaire, first screen, note under "Will there be more than one LLC owner?" — `webapp/src/pages/portal/OAQuestionnaire.tsx:432`
   - Reads: You'll list the owners by name on the next screen. Owners are never filed with the State, so this can differ from what you told us when the company was formed.
   - Claims: No owner is ever on the public record, so the questionnaire's list is free to differ from the order.
@@ -953,12 +963,16 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (disputed): Actual OAQuestionnaire.tsx:432 says “Owners are never filed with the State”, which is false for this product’s AMBR filings. But the finding’s replacement also says every ownership change requires amended Articles. 2026 s.605.0202(5) concerns inaccurate filed information; merely adding an owner need not make an existing authorized-member listing inaccurate (s.605.0201(3)(c) permits one or more members).
   - **Codex rejected the proposed replacement:** Keep the privacy correction, but say “If information on your filed Articles is no longer accurate, arrange the appropriate correction as well.” Do not prescribe amended Articles for every ownership change. Verified https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605.html .
   - Corrected after Codex's review: The privacy sentence is false for member-managed companies. But s. 605.0202(5) requires an amendment only when filed information became inaccurate; do not prescribe amended Articles for every ownership change.
-- **136. [B60]** — **open**
+  - Fixed: batch 15 revision 2, commit , by Codex; protected by 3 assertion(s).
+  - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
+- **136. [B60]** — **implemented**
   - Client portal, Orders in progress, the Consent & Series Exhibit dialog's opening sentence — `webapp/src/pages/portal/OrdersInProgress.tsx:311`
   - Reads: Florida lets the company establish a protected series only with the consent of all members (s. 605.2201(1)), and Section 3.1 of your agreement requires it.
   - Claims: The statute itself permits establishment only on unanimous consent.
   - True: s. 605.2201(1) (opened): "With the affirmative vote or consent of all members of a limited liability company, the company may establish a protected series." — and s. 605.2107(1)(i) (opened) lets an operating agreement vary "the manner in which a series limited liability company approves establishing a protected series", so the statute's rule is a default, not an "only". The consent document itself says it correctly (templates-new-series.md:11: "a limited liability company may establish a protected series with the affirmative vote or consent of all of its members, and Section 3.1 of the Agreement requires that consent"), and new-series.ts:7-11 explains why. The comment at :137-139 repeats the dialog's overstatement.
   - Replace with: Florida's rule, unless an operating agreement changes it, is that a protected series is established with the consent of all members (s. 605.2201(1)), and Section 3.1 of your agreement requires exactly that.
+  - Fixed: batch 15 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
 - **137. [B61]** — **implemented** — waits on Adam's ruling
   - Client portal, Amendment to Operating Agreement page, the grey guidance box — `webapp/src/pages/portal/AmendAgreement.tsx:142`
   - Reads: The new agreement is an Amended and Restated Operating Agreement and replaces the old one.
@@ -1204,13 +1218,15 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: webapp/CLAUDE.md: "Use Dialog/AlertDialog from shadcn/ui, not window.alert() or window.confirm()." Every other question in the portal is a Dialog; this one is the browser's unstyled box, which the Vibecode webview may suppress.
   - Replace with: An AlertDialog with the same sentence and two buttons, "Use fractions" and "Keep percentages".
   - Fixed: batch 01 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **167. [B72]** — **open** — housekeeping; same defect as 136
+- **167. [B72]** — **implemented** — housekeeping; same defect as 136
   - Client portal, Orders in progress: the comment over the consent state — `webapp/src/pages/portal/OrdersInProgress.tsx:137`
   - Reads: // s. 605.2201(1) and Section 3.1 require the consent of all members before a series is established, and the designation filed with the state is signed by the company — so nothing on the public record shows the members agreed.
   - Claims: The statute requires unanimity.
   - True: Same as the dialog finding above: s. 605.2107(1)(i) lets the agreement vary the approval; only Section 3.1 makes it unanimous. new-series.ts:7-11 states this correctly.
   - Replace with: // Section 3.1 requires the consent of all members before a series is established (s. 605.2201(1) is the default, variable under s. 605.2107(1)(i)), and the designation is signed by the company — so nothing on the public record shows the members agreed.
   - Codex (duplicate): Same unanimity-default defect as136, repeated in the OrdersInProgress.tsx:137 comment. The comment changes no reader-facing text.
+  - Fixed: batch 15 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
 - **168. [B78]** — **open** — housekeeping
   - Client portal, Sign in page and Reset page — code only — `webapp/src/pages/portal/PortalDashboard.tsx:45`
   - Reads: raCancellationRequestedAt: string | null; raRenewalDate?: string | null; raService?: boolean;
@@ -1345,12 +1361,14 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: Use “Most recently generated” and “Earlier generated copy” unless adoption and effectiveness are actually recorded. Explain: “Generation order does not determine which agreement is legally in effect.”
   - Ruling, 2026-09-20: Batch 14 approved: label generation order Most recently generated / Earlier generated copy; state that generation order does not determine legal effect. No inferred adoption tracker.
   - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **N3.11. [substantive]** — **open**
+- **N3.11. [substantive]** — **implemented**
   - Client portal → Operating agreement help → Deadlock Buy-Sell Provision — `webapp/src/content/oaLearnMore.tsx:154`
   - Reads: Without a plan, the only exit is asking a court to dissolve the company.
   - Claims: Without the optional buy-sell clause, no negotiated exit is possible.
   - True: The same help at :167-168 expressly identifies negotiation or a court proceeding. templates-oa-multi.md:280/282 permits consensual transfers and :316 permits withdrawal with all other members’ written consent; the buy-sell clause is not the sole route to a negotiated solution. This finding concerns the categorical only-exit sentence, not a prediction that parties will agree.
   - Replace with: Without an agreed exit mechanism, owners may need to negotiate a solution or ask a court for relief.
+  - Fixed: batch 15 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
 - **N3.12. [substantive]** — **implemented** — waits on Adam's ruling
   - Client portal → Operating agreement questionnaire → instructions for changing managers — `webapp/src/pages/portal/OAQuestionnaire.tsx:804`
   - Reads: To add or remove members or managers, change ownership percentages, or change an option you chose here, update your answers and regenerate.
@@ -1855,15 +1873,22 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Four multi-member forms say "single class" twice (2.13 and 4.1). Replace: keep 4.1.
 - **237. [A88]** — **open**
   - Instructions s. 1 "Series LLC User's Manual". Replace: "Owner's Manual".
-- **238. [A89]** — **open**
+- **238. [A89]** — **implemented**
   - Instructions s. 3: Administrative Member "no authority to decide anything"; 5.8 lets a Majority in Interest confer authority. Replace as proposed.
   - **Codex rejected the proposed replacement:** “Replace as proposed” supplies no replacement. Use: “The Administrative Member handles ministerial tasks and has any additional authority this Agreement or a Majority in Interest confers.”
-- **239. [A90]** — **open**
+  - Fixed: batch 15 revision 2, commit , by Codex; protected by 3 assertion(s).
+  - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
+- **239. [A90]** — **implemented**
   - Instructions and Manual: capital call "a majority of owners" (Majority in Interest); borrowing limit "written" consent (consent). Replace both.
   - **Codex rejected the proposed replacement:** Use “Members holding more than 50% of the Percentage Interests” for capital calls and “the consent of all Members” for borrowing; retain written notice of a capital call, which §6.2 actually requires.
-- **240. [A91]** — **open** — waits on Adam's ruling
+  - Fixed: batch 15 revision 2, commit , by Codex; protected by 6 assertion(s).
+  - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
+- **240. [A91]** — **implemented** — waits on Adam's ruling
   - Manual s. 6 step 3: unanimous consent "a rule your operating agreement cannot change"; 605.2107(1)(i) excepts the manner of approving establishment (repo statute notes). Ruling needed from the statute.
   - **Codex rejected the proposed replacement:** The finding asks for a ruling rather than providing replacement text. The concrete replacement in item249 is correct.
+  - Ruling, 2026-09-20: Batch 15 approved: distinguish the statutory default from the agreement rule. Florida permits a different approval rule; Section 3.1 of these agreements retains unanimous consent to establish a protected series. Correct the Manual and matching portal explanation.
+  - Fixed: batch 15 revision 2, commit , by Codex; protected by 3 assertion(s).
+  - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
 - **241. [A92]** — **open**
   - Manual s. 24: "your operating agreement … require[s] current contact information". Replace as proposed.
   - **Codex rejected the proposed replacement:** “Replace as proposed” is incomplete. Say “Keep your contact information current so notices reach you.” Do not invent an operating-agreement covenant.
@@ -1893,18 +1918,22 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: The statute the manual is written for is called the 'Florida Uniform Protected Series Act'.
   - True: s. 605.2101, Florida Statutes, opened on Online Sunshine: 'Short title.—Sections 605.2101-605.2802 may be cited as the “Uniform Protected Series Provisions.”' The chapter itself is the Florida Revised Limited Liability Company Act. (The prior audit's A41 raised the same name on the Home page; the Manual's cover is in this bucket.)
   - Replace with: 10|Written for the Uniform Protected Series Provisions of the Florida Revised Limited Liability Company Act
-- **249. [B149]** — **open** — same defect as 240
+- **249. [B149]** — **implemented** — same defect as 240
   - Owner's Manual, s. 6 'How a Florida Protected Series LLC Is Formed', Step 3 — Consent (the ruling A91 asked for, answered by the statute) — `docs/owners-manual.md:103`
   - Reads: **Step 3 — Consent.** Establishing a protected series requires the affirmative vote or consent of **all members** of the company (s. 605.2201). This is a rule your operating agreement **cannot change** — s. 605.2107 puts it on the list of non-variable provisions. In a single-member company this is trivial — your consent is everyone's consent. In a multi-member company, plan for it: one holdout member can block a new series.
   - Claims: The unanimous-consent rule for establishing a series is non-variable under s. 605.2107.
   - True: s. 605.2107(1)(i), opened on Online Sunshine: an operating agreement may not vary the effect of 'Section 605.2201, except to vary the manner in which a series limited liability company approves establishing a protected series'. The approval rule is exactly the part an agreement MAY change. Unanimity binds these clients because Section 3.1 of every form requires it (templates-oa-multi.md:92), which is what the series consent itself recites (templates-new-series.md:11: 'Section 3.1 of the Agreement requires that consent').
   - Replace with: **Step 3 — Consent.** Establishing a protected series requires the affirmative vote or consent of **all members** of the company (s. 605.2201(1)). The statute lets an operating agreement choose a different approval rule (s. 605.2107(1)(i)); yours does not — Section 3.1 of your agreement keeps unanimity. In a single-member company this is trivial — your consent is everyone's consent. In a multi-member company, plan for it: one holdout member can block a new series.
-- **250. [B150]** — **open**
+  - Fixed: batch 15 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
+- **250. [B150]** — **implemented**
   - Owner's Manual, s. 7 'The choices you made' — The borrowing limit — `docs/owners-manual.md:138`
   - Reads: **The borrowing limit (§5.4 / §5.5).** The multi-member forms ask for a dollar figure: above it, no debt may be incurred and no guarantee given for anyone, without the owners' written consent. There is no default — you chose the number, and it is printed in your agreement. Set it where a borrowing would be big enough that you would want to be asked first.
   - Claims: Guarantees, like debt, need the owners' consent only above the dollar figure.
   - True: templates-oa-multi.md:180 (5.4(f)) and templates-oa-member.md:186 (5.5(f)): 'incur … indebtedness in excess of $[THRESHOLD] in a single transaction or series of related transactions, or guarantee the obligation of any person (…) — the consent of **all Members**'. The threshold qualifies indebtedness only; every guarantee, of any amount, needs the consent of all Members, and the consent is not 'written' (A90).
   - Replace with: **The borrowing limit (§5.4 / §5.5).** The multi-member forms ask for a dollar figure: above it, no debt may be incurred without the consent of every owner — and no guarantee of anyone's obligation, of any amount, may be given without that consent. There is no default — you chose the number, and it is printed in your agreement. Set it where a borrowing would be big enough that you would want to be asked first.
+  - Fixed: batch 15 revision 2, commit , by Codex; protected by 3 assertion(s).
+  - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
 - **251. [B151]** — **optional — open**
   - Every operating agreement, Article 5, s. 5.2 'Management of Each Protected Series' (eight forms); the member-managed single-member Series Exhibit 'Managed by' row; the series consent's same row; Owner's Manual Article 5 map row — `webapp/server/templates-oa-multi.md:164`
   - Reads: As permitted by s. 605.2107(1)(n), Florida Statutes, this Section varies s. 605.2304(2) so that the Protected Series Managers are the Manager or Managers of the Company rather than the Company itself.
@@ -1919,12 +1948,14 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: The filing that dissolves a protected series is a 'statement of dissolution'.
   - True: s. 605.2502(2), opened on Online Sunshine: 'the company may deliver to the department for filing its articles of protected series dissolution'; s. 605.2502(3): after winding up, 'a statement of designation cancellation'. The Manual uses the statutory name (owners-manual.md:353 'articles of protected series dissolution', :402 'File the **articles of protected series dissolution**'); the agreements do not (multi.md:42 and every form's 1.9 'statements of dissolution'; s.md:176, member.md:182, member-s.md:182 same as here). Two names for one filing.
   - Replace with: (d) merge the Company as permitted by the Act — the consent of **all Members**; or file articles of protected series dissolution or a statement of designation cancellation for a Protected Series — the approval required by Section 14.1;
-- **253. [B153]** — **open**
+- **253. [B153]** — **implemented**
   - Owner's Manual, s. 23 — Death, the TOD designation — `docs/owners-manual.md:386`
   - Reads: **Death — the TOD designation.** Every form of the agreement lets each member register a transfer-on-death beneficiary — anyone the member chooses, subject on the S corporation forms to the eligible-shareholder rule — on Exhibit A, using Florida's registration-in-beneficiary-form statute (ss. 711.50–711.512).
   - Claims: Every member may register a beneficiary.
   - True: templates-oa-multi.md:154 (4.11): 'A Member who is an individual may designate any person or entity as a beneficiary. … Members who hold a Membership Interest jointly as tenants in common may not designate a TOD beneficiary.' s. 711.502, opened on Online Sunshine: 'Only individuals whose registration of a security shows sole ownership by one individual or multiple ownership by two or more with right of survivorship, rather than as tenants in common, may obtain registration in beneficiary form.' The Instructions say so (oa-instructions.md:65); the Manual says 'each member'.
   - Replace with: **Death — the TOD designation.** Every form of the agreement lets a member who is an individual (not a company or trust, and not co-owners holding as tenants in common) register a transfer-on-death beneficiary — anyone the member chooses, subject on the S corporation forms to the eligible-shareholder rule — on Exhibit A, using Florida's registration-in-beneficiary-form statute (ss. 711.50–711.512).
+  - Fixed: batch 15 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
 - **254. [B154]** — **open** — same defect as 242
   - Owner's Manual, s. 4 'Why use a series LLC' — Use it for — `docs/owners-manual.md:72`
   - Reads: **Use it for:** multiple rental properties; a portfolio you are growing (add a $25 series per property instead of a $125+ LLC per property); separating a risky operating business from valuable equipment; or separating brands or projects.
@@ -2012,13 +2043,15 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (disputed): The actual function instructionsMarkdown authors the package text in TypeScript, as README:165–167 deliberately documents. The audit prompt contains no universal prohibition on client sentences in TypeScript; oa.ts's local master rule is not a rule governing this independent generator. An explicit architecture choice is not itself a defect.
   - **Codex rejected the proposed replacement:** Neither a new master nor a new owner ruling is required by the cited audit instructions. Report particular incorrect sentences, rather than treating all generator text as inherently wrong.
   - Outcome: docs/README.md records the choice to author the S election package in code; no rule is broken.
-- **265. [B164]** — **open** — housekeeping
+- **265. [B164]** — **implemented** — housekeeping
   - Operating Agreement Instructions, s. 3 'Filling in the Blanks' — `docs/oa-instructions.md:39`
   - Reads: **[MANAGER NAME]** (manager-managed forms only) — the manager.
   - Claims: The blank in the form is '[MANAGER NAME]'.
   - True: The masters' appointment slot is '[MANAGER NAMES]' (templates-oa-multi.md:162, single.md:144); '[MANAGER NAME]' is only the signature-block slot (multi.md:407). A reader of the Word form looks for a blank that is spelled differently.
   - Replace with: **[MANAGER NAMES]** (manager-managed forms only) — the manager or managers.
   - **Codex rejected the proposed replacement:** Explain both: “[MANAGER NAMES] — the initial manager or managers in the appointment; [MANAGER NAME] — the signer in each manager signature block.”
+  - Fixed: batch 15 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
 - **266. [B165]** — **implemented** — housekeeping
   - Order Summary PDF (office only) — 'Items ordered' and 'Optional documents' sections — `webapp/server/order-summary.ts:122`
   - Reads: out.push(line("Federal EIN service", p.optionalDocuments?.ein ? "Yes" : "No"));
@@ -2216,12 +2249,15 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: Encrypted documents carry no Info metadata dictionary.
   - True: The later implementation at654 calls setMeta and655 encryptStrings; setMeta545–550 writes title/author/subject/producer/date. The older comment says the opposite of the code below it.
   - Replace with: // Metadata strings are encrypted with the other indirect-object strings below, so the encrypted PDF can retain its Info dictionary.
-- **N2.25. [substantive]** — **open** — waits on Adam's ruling
+- **N2.25. [substantive]** — **implemented** — waits on Adam's ruling
   - Operating Agreement Instructions, optional deadlock provision (§5(c)) — docs/oa-instructions.md:63 — `docs/oa-instructions.md:63`
   - Reads: **(c) Deadlock Buy-Sell ("Shotgun") — §13.2.** For companies that can split 50/50 (two equal owners, or two equal factions), a deadlock otherwise has no exit short of a lawsuit to dissolve the company. The shotgun works like cutting a cake: after a 60-day deadlock, either substantial owner may name a single price for the whole company; the *other* side then chooses whether to buy or sell at that price. Naming the price honestly is self-enforcing — name it too low and you get bought out cheap; too high and you overpay. **Caution:** the mechanism favors the owner with more cash, since the poorer side may be forced to sell even at a fair price. To omit it, replace the text of §13.2 with "[Reserved.]". Omit it if ownership is not evenly split (a majority can always outvote a deadlock) or if the owners' finances are badly mismatched.
   - Claims: Unequal ownership eliminates deadlock because the majority can always outvote it.
   - True: All four multi-member masters define deadlock as failure to obtain the vote required for the submitted matter (§13.2(a)). Borrowing above the threshold and guarantees (§5.4(f)/§5.5(f)) require unanimity, so a 60/40 company can deadlock even though one owner holds a majority; both owners also meet the 25% threshold. Section13.2(e), however, excludes matters requiring all Members’ consent when the Act expressly permits withholding consent. Unequal ownership does not eliminate deadlock, but the shotgun does not cover every unanimous-consent matter.
   - Replace with: **(c) Deadlock Buy-Sell ("Shotgun") — §13.2.** Consider this provision whenever a decision covered by Section 13.2 can produce a deadlock, including equal ownership and contractual unanimous-vote requirements such as major borrowing. Section 13.2(e) excludes certain matters for which the Act expressly permits a Member to withhold consent. After the contractual 60-day deadlock period, a Member holding at least 25% may offer a single valuation; the other Members then choose to buy or sell on the terms in Section 13.2. The mechanism can favor an owner with greater access to cash. If you omit it, replace Section 13.2 with "[Reserved.]". Unequal ownership does not eliminate deadlock on decisions requiring unanimity.
+  - Ruling, 2026-09-20: Batch 15 approved, including Adam's clarification: a 60% owner cannot override unanimous approval, so unequal ownership can still deadlock. Correct Instructions, Manual and portal help; preserve Section 13.2's covered matters, exclusions, written-notice period and 25% initiating threshold. No agreement-clause change.
+  - Fixed: batch 15 revision 2, commit , by Codex; protected by 7 assertion(s).
+  - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
 - **N2.26. [wording]** — **open** — waits on Adam's ruling
   - Owner’s Manual, federal beneficial ownership reporting (§20) and source colophon — docs/owners-manual.md:358 — `docs/owners-manual.md:358`
   - Reads: The Corporate Transparency Act briefly required most small LLCs to file beneficial ownership reports with FinCEN. **As of this edition, U.S.-formed companies are exempt:** FinCEN's March 2025 interim final rule narrowed "reporting company" to entities formed under *foreign* law that register to do business here. A Florida series LLC formed in Florida currently files nothing with FinCEN, and its owners report nothing.

@@ -476,8 +476,12 @@ export default function OAQuestionnaire() {
                 <span>More than one owner</span>
               </label>
               <p className="text-xs text-muted-foreground">
-                You'll list the owners by name on the next screen. Owners are never filed with the
-                State, so this can differ from what you told us when the company was formed.
+                You'll list today's owners by name on the next screen. We list members of a
+                member-managed company in the Articles as authorized members. In a
+                manager-managed company, we list managers; an owner who is also a manager
+                appears in that role. Changing these answers does not update the state filing.
+                If information in your filed Articles is no longer accurate, arrange the
+                appropriate amendment or other permitted correction as well.
               </p>
             </QuestionCard>
 
@@ -631,7 +635,7 @@ export default function OAQuestionnaire() {
                       onChange={() => patch({ includeCapitalCalls: true })}
                       className="mt-0.5 accent-trust"
                     />
-                    <span>Include — a majority can require contributions, up to an annual cap</span>
+                    <span>Include — owners holding more than 50% of the ownership interests held by members can require contributions, up to an annual cap</span>
                   </label>
                   <label className="flex items-start gap-2 text-sm">
                     <input

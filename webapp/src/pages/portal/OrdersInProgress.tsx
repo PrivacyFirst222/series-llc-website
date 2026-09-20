@@ -134,8 +134,9 @@ export function OrdersInProgress({
     onSuccess: refresh,
   });
 
-  // s. 605.2201(1) and Section 3.1 require the consent of all members before a
-  // series is established, and the designation filed with the state is signed
+  // Section 3.1 retains unanimous consent to establish a series. The statutory
+  // default in s. 605.2201(1) may be varied under s. 605.2107(1)(i). The
+  // designation filed with the state is signed
   // by the company — so nothing on the public record shows the members agreed.
   // This is the only document that does, and it carries the Series Exhibit
   // Section 3.1 requires adopted at or before the filing.
@@ -309,9 +310,10 @@ export function OrdersInProgress({
           <DialogHeader>
             <DialogTitle>Consent &amp; Series Exhibit</DialogTitle>
             <DialogDescription>
-              Florida lets the company establish a protected series only with the consent of
-              <strong> all members</strong> (s. 605.2201(1)), and Section 3.1 of your agreement
-              requires it. The designation filed with the state is signed by the company, so
+              Florida's default rule requires <strong>every member's consent</strong> to
+              establish a protected series (s. 605.2201(1)). An operating agreement can
+              change that approval rule (s. 605.2107(1)(i)); Section 3.1 of your agreement
+              keeps unanimous consent. The designation filed with the state is signed by the company, so
               nothing on the public record shows the members agreed — this is the document that
               does. It comes with the Series Exhibit your agreement requires adopted at or before
               the filing.

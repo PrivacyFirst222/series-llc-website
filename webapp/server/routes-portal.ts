@@ -303,8 +303,9 @@ export const SPOUSAL_FORM_LABEL: Record<"TBE" | "JTWROS", string> = {
 };
 
 // Who owns the company, as the client last said. The intake list is only the
-// starting point: members are never filed with the Division (server/filing.ts
-// has no member field), so nothing about the formation record fixes it. An
+// starting point: member-managed filings list members as AMBR, and an owner
+// who is also a manager may appear as MGR. Current answers do not amend that
+// public filing; inaccurate filed information needs an appropriate correction. An
 // untouched draft carries shares but no names, which is how the two are told
 // apart. Every document that names the owners resolves them HERE — otherwise
 // two documents generated the same afternoon disagree about who owns the company.
@@ -1197,9 +1198,9 @@ app.post("/portal/oa/generate", async (c) => {
   const genCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
   const seed = await oaSeed(session.clientId, genCompanyId);
   if (!seed) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
-  // The owners are an answer, not a reading of the formation record. Members
-  // are never filed with the Division — server/filing.ts has no member field —
-  // so the intake list is where the list starts, not what it is fixed to.
+  // The owners are a current answer, not a fixed reading of the formation
+  // record. Member-managed filings list AMBRs; these answers do not update
+  // that public filing or remove the duty to correct inaccurate filed facts.
   // Untouched drafts carry shares but no names, which is how we tell them apart.
   const owners = effectiveOwners(seed.members, a);
   if (owners.length === 0) {

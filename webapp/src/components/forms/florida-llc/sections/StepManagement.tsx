@@ -103,9 +103,10 @@ export function StepManagement({ data, patch, errors }: StepProps) {
             and reckless conduct is not. In a member-managed LLC, every owner
             automatically has that management power: every owner can sign
             contracts and bind the company, and every owner carries
-            manager-level exposure. If a share later passes to a trust, a
-            holding company, or a passive investor, the new owner inherits
-            management authority — and the exposure — too.
+            manager-level exposure. If a transferee is admitted as a member of a
+            member-managed LLC, the new member gains management rights and
+            duties; receiving only an economic interest does not confer
+            management authority.
           </p>
           <p>
             An example: a manager who knows a rental property's balcony railing

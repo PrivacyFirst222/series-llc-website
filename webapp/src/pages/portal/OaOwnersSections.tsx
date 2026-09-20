@@ -144,13 +144,13 @@ export function OwnersCard({ owners, isMulti, ownerCountMismatch, patchMember, r
                   </label>
                   {/* The S form's own rules (15 Sep 2026): s. 9.3 voids a
                       transfer to anyone who is not an eligible S corporation
-                      shareholder; s. 12.1 admits only an eligible one. */}
+                      shareholder; the admission section admits only an eligible one. */}
                   {m.isEntity && sElection === true ? (
                     <p className="rounded-lg border border-amber-300/60 bg-amber-50 p-3 text-xs leading-relaxed text-amber-900" data-testid="entity-s-warning">
                       Under the S corporation form, an owner must be an eligible S corporation
                       shareholder. A company cannot be one, and only certain trusts can. Your
                       agreement's Section 9.3 makes a transfer to anyone else void, and its
-                      Section 12.1 admits only an eligible shareholder. If this owner is a
+                      admission section admits only an eligible shareholder. If this owner is a
                       company, choose the partnership form or remove the owner.
                     </p>
                   ) : null}
@@ -343,7 +343,7 @@ export function SpousePairingCard({ owners, couples, unpaired, onPair, onUnpair 
                               onChange={() => setPairForm("JTWROS")}
                               className="accent-trust"
                             />
-                            JTWROS
+                            Joint tenants with right of survivorship
                           </label>
                           <Button
                             type="button"

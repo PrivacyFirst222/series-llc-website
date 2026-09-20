@@ -1,0 +1,540 @@
+{
+  "id": "15",
+  "revision": 2,
+  "title": "Owner decisions: voting, transfers and manager authority",
+  "model": "Codex",
+  "base": "47fc704e377fd73242e6ae0cbcdb9deb7db672b0",
+  "items": [
+    {
+      "id": "124",
+      "part": "all",
+      "scope": "Approved Batch 15 explanation and consistency correction; agreement provisions unchanged.",
+      "assertions": [
+        {
+          "kind": "replace",
+          "file": "webapp/src/content/oaLearnMore.tsx",
+          "before": "A majority of the owners can approve a \"capital call.\" Every owner must then contribute",
+          "after": "Owners holding more than 50% of the ownership interests held by members can approve a\n          \"capital call.\" Every owner must then contribute"
+        },
+        {
+          "kind": "replace",
+          "file": "webapp/src/pages/portal/OAQuestionnaire.tsx",
+          "before": "<span>Include \u2014 a majority can require contributions, up to an annual cap</span>",
+          "after": "<span>Include \u2014 owners holding more than 50% of the ownership interests held by members can require contributions, up to an annual cap</span>"
+        }
+      ]
+    },
+    {
+      "id": "125",
+      "part": "all",
+      "scope": "Approved Batch 15 explanation and consistency correction; agreement provisions unchanged.",
+      "assertions": [
+        {
+          "kind": "replace",
+          "file": "webapp/src/content/oaLearnMore.tsx",
+          "before": "Your beneficiary becomes a voting member only if the other owners\n          consent, the same rule that applies to lifetime transfers. Either way, the money flows",
+          "after": "Your beneficiary becomes a voting member only after signing an agreement to be bound\n          and obtaining written consent from owners holding more than 50% of the ownership\n          interests held by the remaining members. A permitted family transferee needs the\n          same admission approval, excluding the transferring owner. Other new members need\n          every member's written consent and a signed agreement to be bound. Permission to\n          transfer an interest and admission as a voting member are separate requirements.\n          Either way, the money flows"
+        },
+        {
+          "kind": "replace",
+          "file": "docs/oa-instructions.md",
+          "before": "\u2014 death does not bypass the same controls that govern lifetime transfers.",
+          "after": "\u2014 the same admission threshold applies to a permitted family transferee, excluding the transferring owner; other new members need every member's written consent and a signed agreement to be bound. Permission to transfer an interest is separate from admission as a voting member."
+        },
+        {
+          "kind": "replace",
+          "file": "docs/owners-manual.md",
+          "before": "but becomes a voting member only with the consent of a majority in interest of the other members \u2014 death does not bypass the controls that govern lifetime transfers, and family is treated no differently.",
+          "after": "but becomes a voting member only after delivering a signed agreement to be bound and obtaining written consent from owners holding more than 50% of the ownership interests held by the remaining members. A permitted family transferee needs the same admission approval, excluding the transferring owner; other new members need every member's written consent and a signed agreement to be bound. Permission to transfer an interest and admission as a voting member are separate requirements."
+        }
+      ]
+    },
+    {
+      "id": "126",
+      "part": "all",
+      "scope": "Approved Batch 15 explanation and consistency correction; agreement provisions unchanged.",
+      "assertions": [
+        {
+          "kind": "replace",
+          "file": "webapp/src/pages/portal/OaOwnersSections.tsx",
+          "before": "shareholder; s. 12.1 admits only an eligible one.",
+          "after": "shareholder; the admission section admits only an eligible one."
+        },
+        {
+          "kind": "replace",
+          "file": "webapp/src/pages/portal/OaOwnersSections.tsx",
+          "before": "Section 12.1 admits only an eligible shareholder.",
+          "after": "admission section admits only an eligible shareholder."
+        }
+      ]
+    },
+    {
+      "id": "130",
+      "part": "all",
+      "scope": "Approved Batch 15 explanation and consistency correction; agreement provisions unchanged.",
+      "assertions": [
+        {
+          "kind": "replace",
+          "file": "webapp/src/pages/portal/OaOwnersSections.tsx",
+          "before": "                            JTWROS\n",
+          "after": "                            Joint tenants with right of survivorship\n"
+        }
+      ]
+    },
+    {
+      "id": "135",
+      "part": "all",
+      "scope": "Approved Batch 15 explanation and consistency correction; agreement provisions unchanged.",
+      "assertions": [
+        {
+          "kind": "replace",
+          "file": "webapp/src/pages/portal/OAQuestionnaire.tsx",
+          "before": "You'll list the owners by name on the next screen. Owners are never filed with the\n                State, so this can differ from what you told us when the company was formed.",
+          "after": "You'll list today's owners by name on the next screen. We list members of a\n                member-managed company in the Articles as authorized members. In a\n                manager-managed company, we list managers; an owner who is also a manager\n                appears in that role. Changing these answers does not update the state filing.\n                If information in your filed Articles is no longer accurate, arrange the\n                appropriate amendment or other permitted correction as well."
+        },
+        {
+          "kind": "replace",
+          "file": "webapp/server/routes-portal.ts",
+          "before": "// starting point: members are never filed with the Division (server/filing.ts\n// has no member field), so nothing about the formation record fixes it. An",
+          "after": "// starting point: member-managed filings list members as AMBR, and an owner\n// who is also a manager may appear as MGR. Current answers do not amend that\n// public filing; inaccurate filed information needs an appropriate correction. An"
+        },
+        {
+          "kind": "replace",
+          "file": "webapp/server/routes-portal.ts",
+          "before": "  // The owners are an answer, not a reading of the formation record. Members\n  // are never filed with the Division \u2014 server/filing.ts has no member field \u2014\n  // so the intake list is where the list starts, not what it is fixed to.",
+          "after": "  // The owners are a current answer, not a fixed reading of the formation\n  // record. Member-managed filings list AMBRs; these answers do not update\n  // that public filing or remove the duty to correct inaccurate filed facts."
+        }
+      ]
+    },
+    {
+      "id": "136",
+      "part": "all",
+      "scope": "Approved Batch 15 explanation and consistency correction; agreement provisions unchanged.",
+      "assertions": [
+        {
+          "kind": "replace",
+          "file": "webapp/src/pages/portal/OrdersInProgress.tsx",
+          "before": "Florida lets the company establish a protected series only with the consent of\n              <strong> all members</strong> (s. 605.2201(1)), and Section 3.1 of your agreement\n              requires it.",
+          "after": "Florida's default rule requires <strong>every member's consent</strong> to\n              establish a protected series (s. 605.2201(1)). An operating agreement can\n              change that approval rule (s. 605.2107(1)(i)); Section 3.1 of your agreement\n              keeps unanimous consent."
+        }
+      ]
+    },
+    {
+      "id": "167",
+      "part": "all",
+      "scope": "Approved Batch 15 explanation and consistency correction; agreement provisions unchanged.",
+      "assertions": [
+        {
+          "kind": "replace",
+          "file": "webapp/src/pages/portal/OrdersInProgress.tsx",
+          "before": "  // s. 605.2201(1) and Section 3.1 require the consent of all members before a\n  // series is established, and the designation filed with the state is signed",
+          "after": "  // Section 3.1 retains unanimous consent to establish a series. The statutory\n  // default in s. 605.2201(1) may be varied under s. 605.2107(1)(i). The\n  // designation filed with the state is signed"
+        }
+      ]
+    },
+    {
+      "id": "238",
+      "part": "all",
+      "scope": "Approved Batch 15 explanation and consistency correction; agreement provisions unchanged.",
+      "assertions": [
+        {
+          "kind": "replace",
+          "file": "docs/oa-instructions.md",
+          "before": "to handle ministerial tasks, with no authority to decide anything on the members' behalf.",
+          "after": "to handle ministerial tasks. The Administrative Member also has any additional authority expressly granted by the agreement or by owners holding a Majority in Interest; the role does not make that person a manager."
+        },
+        {
+          "kind": "replace",
+          "file": "docs/owners-manual.md",
+          "before": "(a paperwork role, not a decision-making one).",
+          "after": "(a paperwork role with any additional authority expressly granted by the agreement or by owners holding a Majority in Interest)."
+        },
+        {
+          "kind": "document",
+          "master": "docs/oa-instructions.md",
+          "word": "FPSLLC Operating Agreement Instructions - DRAFT.docx",
+          "masterPresent": [
+            "The Administrative Member also has any additional authority expressly granted"
+          ],
+          "wordPresent": [
+            "The Administrative Member also has any additional authority expressly granted"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "239",
+      "part": "all",
+      "scope": "Approved Batch 15 explanation and consistency correction; agreement provisions unchanged.",
+      "assertions": [
+        {
+          "kind": "replace",
+          "file": "docs/oa-instructions.md",
+          "before": "If included, a majority of owners can require everyone to chip in more money (pro rata),",
+          "after": "If included, owners holding more than 50% of the ownership interests held by members can require everyone to chip in more money (pro rata),"
+        },
+        {
+          "kind": "replace",
+          "file": "docs/owners-manual.md",
+          "before": "If you included it, a majority of owners can require everyone to contribute more money,",
+          "after": "If you included it, owners holding more than 50% of the ownership interests held by members can require everyone to contribute more money,"
+        },
+        {
+          "kind": "replace",
+          "file": "docs/owners-manual.md",
+          "before": "with the Manager, or with a majority of the owners \u2014 never with the creditor.",
+          "after": "with the Manager, or with owners holding a Majority in Interest \u2014 never with the creditor."
+        },
+        {
+          "kind": "replace",
+          "file": "docs/oa-instructions.md",
+          "before": "the dollar amount of debt that may be incurred without the written consent of every owner:",
+          "after": "the dollar amount of debt that may be incurred without the consent of every owner:"
+        },
+        {
+          "kind": "replace",
+          "file": "docs/owners-manual.md",
+          "before": "without the owners' written consent.",
+          "after": "without the consent of every owner."
+        },
+        {
+          "kind": "document",
+          "master": "docs/owners-manual.md",
+          "word": "Series LLC Owners Manual - REVISED DRAFT.docx",
+          "masterPresent": [
+            "owners holding more than 50% of the ownership interests held by members"
+          ],
+          "wordPresent": [
+            "owners holding more than 50% of the ownership interests held by members"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "240",
+      "part": "all",
+      "scope": "Approved Batch 15 explanation and consistency correction; agreement provisions unchanged.",
+      "assertions": [
+        {
+          "kind": "replace",
+          "file": "docs/owners-manual.md",
+          "before": "Establishing a protected series requires the affirmative vote or consent of **all members** of the company (s. 605.2201). This is a rule your operating agreement **cannot change** \u2014 s. 605.2107 puts it on the list of non-variable provisions.",
+          "after": "Florida's default rule requires the affirmative vote or consent of **all members** to establish a protected series (s. 605.2201(1)). The statute allows an operating agreement to choose a different approval rule (s. 605.2107(1)(i)). Section 3.1 of your agreement retains unanimous consent."
+        },
+        {
+          "kind": "replace",
+          "file": "docs/owners-manual.md",
+          "before": "how series are established (unanimous consent, per the statute),",
+          "after": "how series are established (unanimous consent under Section 3.1, retaining the statutory default),"
+        },
+        {
+          "kind": "document",
+          "master": "docs/owners-manual.md",
+          "word": "Series LLC Owners Manual - REVISED DRAFT.docx",
+          "masterPresent": [
+            "Section 3.1 of your agreement retains unanimous consent."
+          ],
+          "wordPresent": [
+            "Section 3.1 of your agreement retains unanimous consent."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "249",
+      "part": "all",
+      "scope": "Approved Batch 15 explanation and consistency correction; agreement provisions unchanged.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "docs/owners-manual.md",
+          "text": "Section 3.1 of your agreement retains unanimous consent."
+        },
+        {
+          "kind": "document",
+          "master": "docs/owners-manual.md",
+          "word": "Series LLC Owners Manual - REVISED DRAFT.docx",
+          "masterPresent": [
+            "Section 3.1 of your agreement retains unanimous consent."
+          ],
+          "wordPresent": [
+            "Section 3.1 of your agreement retains unanimous consent."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "250",
+      "part": "all",
+      "scope": "Approved Batch 15 explanation and consistency correction; agreement provisions unchanged.",
+      "assertions": [
+        {
+          "kind": "replace",
+          "file": "docs/owners-manual.md",
+          "before": "above it, no debt may be incurred and no guarantee given for anyone,",
+          "after": "above it, no debt may be incurred without the consent of every owner. A guarantee of anyone's obligation, of any amount, may not be given"
+        },
+        {
+          "kind": "replace",
+          "file": "docs/oa-instructions.md",
+          "before": "Above this number, any one owner can refuse. Common choices:",
+          "after": "Above this number, any one owner can refuse. A guarantee of anyone's obligation requires every owner's consent regardless of amount. A guarantee of one series' obligations by another series or by the company also requires the express written instrument specified in the agreement. Common choices:"
+        },
+        {
+          "kind": "document",
+          "master": "docs/owners-manual.md",
+          "word": "Series LLC Owners Manual - REVISED DRAFT.docx",
+          "masterPresent": [
+            "A guarantee of anyone's obligation, of any amount"
+          ],
+          "wordPresent": [
+            "A guarantee of anyone's obligation, of any amount"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "253",
+      "part": "all",
+      "scope": "Approved Batch 15 explanation and consistency correction; agreement provisions unchanged.",
+      "assertions": [
+        {
+          "kind": "replace",
+          "file": "docs/owners-manual.md",
+          "before": "Every form of the agreement lets each member register a transfer-on-death beneficiary",
+          "after": "Every form of the agreement lets an individual member register a transfer-on-death beneficiary (an owner that is a company or trust cannot make this designation, nor can co-owners holding an interest as tenants in common)"
+        },
+        {
+          "kind": "document",
+          "master": "docs/owners-manual.md",
+          "word": "Series LLC Owners Manual - REVISED DRAFT.docx",
+          "masterPresent": [
+            "an owner that is a company or trust cannot make this designation"
+          ],
+          "wordPresent": [
+            "an owner that is a company or trust cannot make this designation"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "265",
+      "part": "all",
+      "scope": "Approved Batch 15 explanation and consistency correction; agreement provisions unchanged.",
+      "assertions": [
+        {
+          "kind": "replace",
+          "file": "docs/oa-instructions.md",
+          "before": "**[MANAGER NAME]** (manager-managed forms only) \u2014 the manager.",
+          "after": "**[MANAGER NAMES]** (manager-managed forms only) \u2014 the initial manager or managers in the appointment. **[MANAGER NAME]** \u2014 the manager identified in each manager signature block."
+        },
+        {
+          "kind": "document",
+          "master": "docs/oa-instructions.md",
+          "word": "FPSLLC Operating Agreement Instructions - DRAFT.docx",
+          "masterPresent": [
+            "[MANAGER NAMES]"
+          ],
+          "wordPresent": [
+            "[MANAGER NAMES]"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "N2.25",
+      "part": "all",
+      "scope": "Approved Batch 15 explanation and consistency correction; agreement provisions unchanged.",
+      "assertions": [
+        {
+          "kind": "replace",
+          "file": "docs/oa-instructions.md",
+          "before": "**(c) Deadlock Buy-Sell (\"Shotgun\") \u2014 \u00a713.2.** For companies that can split 50/50 (two equal owners, or two equal factions), a deadlock otherwise has no exit short of a lawsuit to dissolve the company. The shotgun works like cutting a cake: after a 60-day deadlock, either substantial owner may name a single price for the whole company; the *other* side then chooses whether to buy or sell at that price. Naming the price honestly is self-enforcing \u2014 name it too low and you get bought out cheap; too high and you overpay. **Caution:** the mechanism favors the owner with more cash, since the poorer side may be forced to sell even at a fair price. To omit it, replace the text of \u00a713.2 with \"[Reserved.]\". Omit it if ownership is not evenly split (a majority can always outvote a deadlock) or if the owners' finances are badly mismatched.",
+          "after": "**(c) Deadlock Buy-Sell (\"Shotgun\") \u2014 \u00a713.2.** A company can deadlock with equal or unequal ownership: a majority cannot override a decision requiring unanimous approval. Section 13.2 covers a failure to obtain the required vote to approve or reject a matter that continues for 60 days after written notice of the deadlock. It excludes matters requiring every member's consent where the Act expressly permits a member to withhold that consent. If you include it, an owner holding at least 25% may offer a single cash valuation for the company and all its series; the *other* owners then choose to buy the offering owner's interest or sell their own at their proportionate shares of that valuation. The mechanism can favor an owner with greater access to cash. Without an agreed exit mechanism, owners may need to negotiate a solution or ask a court for relief. To omit it, replace the text of \u00a713.2 with \"[Reserved.]\". Unequal ownership alone is not a reason to omit it; consider the covered decisions and the owners' ability to fund a buyout."
+        },
+        {
+          "kind": "replace",
+          "file": "docs/owners-manual.md",
+          "before": "**Deadlock buy-sell, the \"shotgun\" (\u00a713.2).** For a company that can split evenly, a deadlock otherwise has no exit short of suing to dissolve. If you included it: after a 60-day deadlock, one substantial owner names a single price for the whole company, and the *other* side chooses whether to buy or sell at that price. Naming the price honestly is self-enforcing \u2014 too low and you get bought out cheap, too high and you overpay. Two cautions: it favors whoever has more cash, and it prices the company and all of its series as one unit. If ownership is not evenly split, or the owners' finances are badly mismatched, you were better off omitting it.",
+          "after": "**Deadlock buy-sell, the \"shotgun\" (\u00a713.2).** A company can deadlock with equal or unequal ownership: a majority cannot override a decision requiring unanimous approval. Section 13.2 covers a failure to obtain the required vote to approve or reject a matter that continues for 60 days after written notice of the deadlock. It excludes matters requiring every member's consent where the Act expressly permits a member to withhold that consent. If you include it, an owner holding at least 25% may offer a single cash valuation for the company and all its series; the *other* owners then choose to buy the offering owner's interest or sell their own at their proportionate shares of that valuation. The mechanism can favor an owner with greater access to cash. Without an agreed exit mechanism, owners may need to negotiate a solution or ask a court for relief. Unequal ownership alone does not eliminate the need for a deadlock plan."
+        },
+        {
+          "kind": "replace",
+          "file": "webapp/src/content/oaLearnMore.tsx",
+          "before": "If ownership can split evenly \u2014 two 50/50 owners, or two equal factions \u2014 the company\n          can deadlock: no majority, no decision, no way forward.",
+          "after": "A company can deadlock with equal or unequal ownership. A majority cannot override\n          a decision requiring unanimous approval."
+        },
+        {
+          "kind": "replace",
+          "file": "webapp/src/content/oaLearnMore.tsx",
+          "before": "After a deadlock lasts 60 days, any owner holding at least 25% may name a single",
+          "after": "For a covered matter, after the failure to obtain the required vote to approve or\n          reject it continues for 60 days after written deadlock notice, any owner holding\n          at least 25% may name a single"
+        },
+        {
+          "kind": "replace",
+          "file": "webapp/src/content/oaLearnMore.tsx",
+          "before": "other side may be forced to sell even at a fair price.",
+          "after": "other side may be forced to sell even at a fair price. Section 13.2 excludes matters\n          requiring every member's consent where the Act expressly permits a member to\n          withhold that consent."
+        },
+        {
+          "kind": "replace",
+          "file": "webapp/src/content/oaLearnMore.tsx",
+          "before": "Owners with unequal percentages rarely need this provision \u2014 a majority can simply\n          outvote a deadlock.",
+          "after": "Unequal ownership does not eliminate deadlock on decisions requiring unanimous\n          approval. Consider the covered decisions and the owners' ability to fund a buyout."
+        },
+        {
+          "kind": "document",
+          "master": "docs/oa-instructions.md",
+          "word": "FPSLLC Operating Agreement Instructions - DRAFT.docx",
+          "masterPresent": [
+            "A company can deadlock with equal or unequal ownership:"
+          ],
+          "wordPresent": [
+            "A company can deadlock with equal or unequal ownership:"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "N3.11",
+      "part": "all",
+      "scope": "Approved Batch 15 explanation and consistency correction; agreement provisions unchanged.",
+      "assertions": [
+        {
+          "kind": "replace",
+          "file": "webapp/src/content/oaLearnMore.tsx",
+          "before": "Without a plan, the only exit\n          is asking a court to dissolve the company. This provision builds in an exit.",
+          "after": "Without an agreed exit mechanism, owners may need\n          to negotiate a solution or ask a court for relief. This provision builds in an exit\n          for the matters it covers."
+        }
+      ]
+    },
+    {
+      "id": "N4.08",
+      "part": "all",
+      "scope": "Approved Batch 15 explanation and consistency correction; agreement provisions unchanged.",
+      "assertions": [
+        {
+          "kind": "replace",
+          "file": "webapp/src/components/forms/florida-llc/sections/StepManagement.tsx",
+          "before": "If a share later passes to a trust, a\n            holding company, or a passive investor, the new owner inherits\n            management authority \u2014 and the exposure \u2014 too.",
+          "after": "If a transferee is admitted as a member of a\n            member-managed LLC, the new member gains management rights and\n            duties; receiving only an economic interest does not confer\n            management authority."
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "webapp/src/content/oaLearnMore.tsx",
+      "mode": "replace",
+      "why": "Exact approved Batch 15 wording and matching explanations."
+    },
+    {
+      "path": "webapp/src/pages/portal/OAQuestionnaire.tsx",
+      "mode": "replace",
+      "why": "Exact approved Batch 15 wording and matching explanations."
+    },
+    {
+      "path": "docs/oa-instructions.md",
+      "mode": "replace",
+      "why": "Exact approved Batch 15 wording and matching explanations."
+    },
+    {
+      "path": "docs/owners-manual.md",
+      "mode": "replace",
+      "why": "Exact approved Batch 15 wording and matching explanations."
+    },
+    {
+      "path": "webapp/src/pages/portal/OaOwnersSections.tsx",
+      "mode": "replace",
+      "why": "Exact approved Batch 15 wording and matching explanations."
+    },
+    {
+      "path": "webapp/server/routes-portal.ts",
+      "mode": "replace",
+      "why": "Exact approved Batch 15 wording and matching explanations."
+    },
+    {
+      "path": "webapp/src/pages/portal/OrdersInProgress.tsx",
+      "mode": "replace",
+      "why": "Exact approved Batch 15 wording and matching explanations."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepManagement.tsx",
+      "mode": "replace",
+      "why": "Exact approved Batch 15 wording and matching explanations."
+    },
+    {
+      "path": "docs/facts.md",
+      "mode": "code",
+      "control": true,
+      "why": "Record shared voting, admission, authority and deadlock facts."
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "why": "Hook rebuild after correcting source comments."
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement - Member-Managed Multi-Member (Partnership) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Existing mandatory master-to-Word generator; unchanged document XML preserved."
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement - Member-Managed (S Corporation) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Existing mandatory master-to-Word generator; unchanged document XML preserved."
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement - Manager-Managed Multi-Member (Partnership) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Existing mandatory master-to-Word generator; unchanged document XML preserved."
+    },
+    {
+      "path": "docs/word/FPSLLC Statement of Authorized Representative - FORM.docx",
+      "mode": "generated",
+      "why": "Existing mandatory master-to-Word generator; unchanged document XML preserved."
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement - Manager-Managed (S Corporation) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Existing mandatory master-to-Word generator; unchanged document XML preserved."
+    },
+    {
+      "path": "docs/word/SMMMDE - FPSLLC Operating Agreement - Manager-Managed Single Member (Disregarded) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Existing mandatory master-to-Word generator; unchanged document XML preserved."
+    },
+    {
+      "path": "docs/word/SMMMS - FPSLLC Operating Agreement - Manager-Managed Single Member (S Corporation) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Existing mandatory master-to-Word generator; unchanged document XML preserved."
+    },
+    {
+      "path": "docs/word/SMMEMDE - FPSLLC Operating Agreement - Member-Managed Single Member (Disregarded) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Existing mandatory master-to-Word generator; unchanged document XML preserved."
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement Instructions - DRAFT.docx",
+      "mode": "generated",
+      "why": "Existing mandatory master-to-Word generator; unchanged document XML preserved."
+    },
+    {
+      "path": "docs/word/SMMEMS - FPSLLC Operating Agreement - Member-Managed Single Member (S Corporation) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Existing mandatory master-to-Word generator; unchanged document XML preserved."
+    },
+    {
+      "path": "docs/word/Series LLC Owners Manual - REVISED DRAFT.docx",
+      "mode": "generated",
+      "why": "Existing mandatory master-to-Word generator; unchanged document XML preserved."
+    },
+    {
+      "path": "docs/word/FPSLLC Amendment to Operating Agreement - FORM.docx",
+      "mode": "generated",
+      "why": "Existing mandatory master-to-Word generator; unchanged document XML preserved."
+    }
+  ],
+  "requiredChecks": [],
+  "removedChecks": []
+}

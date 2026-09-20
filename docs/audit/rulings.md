@@ -65,3 +65,7 @@ Adam. A new ruling is added the day it is given.
 - Ruling N3.10: "Batch 14 approved: label generation order Most recently generated / Earlier generated copy; state that generation order does not determine legal effect. No inferred adoption tracker."
 
 - Ruling N3.12: "Batch 14 approved: implement editing, adding and removing managers in the manager-managed operating-agreement questionnaire, preserving each entity signer with its manager and leaving state filing records unchanged."
+
+- Ruling 240: "Batch 15 approved: distinguish the statutory default from the agreement rule. Florida permits a different approval rule; Section 3.1 of these agreements retains unanimous consent to establish a protected series. Correct the Manual and matching portal explanation."
+
+- Ruling N2.25: "Batch 15 approved, including Adam's clarification: a 60% owner cannot override unanimous approval, so unequal ownership can still deadlock. Correct Instructions, Manual and portal help; preserve Section 13.2's covered matters, exclusions, written-notice period and 25% initiating threshold. No agreement-clause change."

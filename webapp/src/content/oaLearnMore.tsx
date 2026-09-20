@@ -97,7 +97,8 @@ export const LEARN_MORE: Record<string, LearnMoreScreen> = {
           <em>required</em> to contribute more money after formation.
         </P>
         <Choice label="If you choose Include:">
-          A majority of the owners can approve a "capital call." Every owner must then contribute
+          Owners holding more than 50% of the ownership interests held by members can approve a
+          "capital call." Every owner must then contribute
           their share (proportional to ownership) within 30 days, up to the annual per-owner cap
           you set below. An owner who fails to pay can face enforcement, and the other owners may
           cover the shortfall and receive a larger ownership percentage in exchange. This gives
@@ -151,24 +152,29 @@ export const LEARN_MORE: Record<string, LearnMoreScreen> = {
     body: (
       <div className="space-y-3">
         <P>
-          If ownership can split evenly — two 50/50 owners, or two equal factions — the company
-          can deadlock: no majority, no decision, no way forward. Without a plan, the only exit
-          is asking a court to dissolve the company. This provision builds in an exit.
+          A company can deadlock with equal or unequal ownership. A majority cannot override
+          a decision requiring unanimous approval. Without an agreed exit mechanism, owners may need
+          to negotiate a solution or ask a court for relief. This provision builds in an exit
+          for the matters it covers.
         </P>
         <Choice label="If you choose Include:">
-          After a deadlock lasts 60 days, any owner holding at least 25% may name a single
+          For a covered matter, after the failure to obtain the required vote to approve or
+          reject it continues for 60 days after written deadlock notice, any owner holding
+          at least 25% may name a single
           all-cash value for the entire company. The <em>other</em> side then chooses: buy the
           offering owner out at that value, or sell their own interest at it. Because the person
           naming the price doesn't know whether they'll end up the buyer or the seller, they have
           every reason to name a fair number — it works like one person cutting the cake and the
           other choosing the slice. Be aware: the mechanism favors the side with more cash, since
-          the other side may be forced to sell even at a fair price.
+          the other side may be forced to sell even at a fair price. Section 13.2 excludes matters
+          requiring every member's consent where the Act expressly permits a member to
+          withhold that consent.
         </Choice>
         <Choice label="If you choose Omit:">
           There is no built-in deadlock exit. A deadlocked company continues under the last
           decisions actually made, and an owner's remedy is negotiation or a court proceeding.
-          Owners with unequal percentages rarely need this provision — a majority can simply
-          outvote a deadlock.
+          Unequal ownership does not eliminate deadlock on decisions requiring unanimous
+          approval. Consider the covered decisions and the owners' ability to fund a buyout.
         </Choice>
       </div>
     ),
@@ -241,8 +247,13 @@ export const LEARN_MORE: Record<string, LearnMoreScreen> = {
           shareholder. At your death, your interest passes to them automatically, subject to the
           operating agreement. In multi-member companies: your
           beneficiary immediately receives the economic rights — your share of distributions —
-          from day one. Your beneficiary becomes a voting member only if the other owners
-          consent, the same rule that applies to lifetime transfers. Either way, the money flows
+          from day one. Your beneficiary becomes a voting member only after signing an agreement to be bound
+          and obtaining written consent from owners holding more than 50% of the ownership
+          interests held by the remaining members. A permitted family transferee needs the
+          same admission approval, excluding the transferring owner. Other new members need
+          every member's written consent and a signed agreement to be bound. Permission to
+          transfer an interest and admission as a voting member are separate requirements.
+          Either way, the money flows
           to your chosen person without probate.
         </Choice>
         <Choice label="If you skip it:">
