@@ -1218,7 +1218,7 @@ if (mint.status === 200) {
   {
     const mails = ((await api("/api/dev/outbox")).body?.data ?? []) as { to: string; subject: string; html: string }[];
     const formedMail = mails.filter((m) => m.to === testEmail).find((m) => /is formed$/.test(m.subject));
-    check("the formed email tells a client with the S election package that the form is open and names the IRS rule (15 Sep 2026)", !!formedMail && /Your S election package order needs your details/.test(formedMail.html) && /Provide details securely/.test(formedMail.html) && /within 2 months and 15 days of the date on your filed\s+Articles/.test(formedMail.html), formedMail?.html?.match(/S election package[^<]{0,180}/)?.[0]);
+    check("the formed email tells a client with the S election package that the form is open and names the IRS rule (15 Sep 2026)", !!formedMail && /Your S election package order needs your details/.test(formedMail.html) && /Provide details securely/.test(formedMail.html) && /within 2 months and 15 days after your LLC is officially formed with the Florida Division of Corporations/.test(formedMail.html), formedMail?.html?.match(/S election package[^<]{0,180}/)?.[0]);
   }
   {
     const fDet = (await api(`/api/admin/orders/${orderId}`, { cookies: adminLoginF.cookie })).body?.data as { filedAt: string | null; formedAt: string | null; raRenewalDate: string | null; documents: { kind: string; title: string; createdAt: string }[] } | undefined;
