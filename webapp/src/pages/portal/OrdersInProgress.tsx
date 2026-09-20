@@ -207,7 +207,7 @@ export function OrdersInProgress({
                 <div className="text-xs text-muted-foreground">
                   {money(o.amount_cents)} ·{" "}
                   <span className={o.status === "awaiting_info" ? "font-medium text-amber-700" : ""}>
-                    {STATUS_LABEL[o.status]}
+                    {o.type === "s-election" && o.status === "in_progress" && o.details.einPending ? "Details saved — waiting for your issued EIN" : STATUS_LABEL[o.status]}
                   </span>
                 </div>
 
@@ -224,7 +224,7 @@ export function OrdersInProgress({
                     Consent &amp; Series Exhibit
                   </Button>
                 ) : null}
-                {o.status === "awaiting_info" ? (
+                {o.status === "awaiting_info" || (o.type === "s-election" && o.status === "in_progress" && o.details.einPending) ? (
                   <Button
                     size="sm"
                     className="rounded-full"
@@ -238,7 +238,7 @@ export function OrdersInProgress({
                     }}
                   >
                     <Lock className="mr-1.5 h-3.5 w-3.5" />
-                    Provide details securely
+                    {o.type === "s-election" && o.status === "in_progress" && o.details.einPending ? "Edit saved details" : "Provide details securely"}
                   </Button>
                 ) : null}
                 {data.dev && o.status === "pending_payment" ? (
@@ -273,7 +273,7 @@ export function OrdersInProgress({
             <DialogTitle>S corporation election details</DialogTitle>
             <DialogDescription>
               We use this to complete IRS Form 2553 for {detailsFor?.llc_name}. You sign the
-              finished form and mail it to the IRS yourself — we file nothing. This form is
+              finished form and fax or mail it to the IRS yourself — we file nothing. This form is
               transmitted over your secure portal session; Social Security numbers are encrypted,
               and the questionnaire numbers are removed after the fourteen-day editing window.
               Your completed document stays encrypted in Your documents until you choose to delete it.
@@ -287,6 +287,7 @@ export function OrdersInProgress({
               priorFormationDate={detailsFor.details.dateIncorporated}
               todayEastern={data.todayEastern}
               companyEin={data.companyEin ?? undefined}
+              einServiceOrdered={data.einCompanyOrdered}
               draft={selDrafts[detailsFor.id]}
               onDraftChange={(d) => {
                 setSelDrafts((prev) => ({ ...prev, [detailsFor.id]: d }));

@@ -16,6 +16,8 @@ export const ssnDigits = (value: string): string => value.replace(/\D/g, "");
 export function ssnTypingProblem(value: string): string {
   const d = ssnDigits(value);
   if (d.length >= 3 && /^(000|666|9\d\d)/.test(d)) return SSN_AREA_MESSAGE;
+  if (d.length >= 5 && d.slice(3, 5) === "00") return "That is not a valid Social Security number — the middle two digits cannot be 00.";
+  if (d.length >= 9 && d.slice(5, 9) === "0000") return "That is not a valid Social Security number — the last four digits cannot be 0000.";
   if (d.length > 9) return SSN_LENGTH_MESSAGE;
   return "";
 }

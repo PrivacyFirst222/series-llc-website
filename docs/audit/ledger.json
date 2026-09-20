@@ -2759,14 +2759,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T03:53:45.880Z",
+              "event": "assigned",
+              "batch": "13",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T04:00:34.981Z",
+              "event": "implemented",
+              "batch": "13",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "13",
+          "fix": {
+            "batch": "13",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch13 formation deadline wording"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -4200,17 +4227,44 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T03:53:45.880Z",
+              "event": "assigned",
+              "batch": "13",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T04:00:34.981Z",
+              "event": "implemented",
+              "batch": "13",
+              "revision": 1,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "133",
             "part": "all"
+          },
+          "batch": "13",
+          "fix": {
+            "batch": "13",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch13 fax or mail consistently"
+              }
+            ]
           }
         }
       ],
@@ -6198,14 +6252,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T03:53:45.880Z",
+              "event": "assigned",
+              "batch": "13",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T04:00:34.981Z",
+              "event": "implemented",
+              "batch": "13",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "13",
+          "fix": {
+            "batch": "13",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch13 fax or mail consistently"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -6440,14 +6521,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T03:53:45.880Z",
+              "event": "assigned",
+              "batch": "13",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T04:00:34.981Z",
+              "event": "implemented",
+              "batch": "13",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "13",
+          "fix": {
+            "batch": "13",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch13 existing LLC can submit EIN details"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -6988,14 +7096,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T03:53:45.880Z",
+              "event": "assigned",
+              "batch": "13",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T04:00:34.981Z",
+              "event": "implemented",
+              "batch": "13",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "13",
+          "fix": {
+            "batch": "13",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch13 pending EIN requires our paid company service"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -7018,14 +7153,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T03:53:45.880Z",
+              "event": "assigned",
+              "batch": "13",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T04:00:34.981Z",
+              "event": "implemented",
+              "batch": "13",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "13",
+          "fix": {
+            "batch": "13",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch13 package location and pending status"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -7049,17 +7211,44 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T03:53:45.880Z",
+              "event": "assigned",
+              "batch": "13",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T04:00:34.981Z",
+              "event": "implemented",
+              "batch": "13",
+              "revision": 1,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "63",
             "part": "all"
+          },
+          "batch": "13",
+          "fix": {
+            "batch": "13",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch13 formation deadline wording"
+              }
+            ]
           }
         }
       ],
@@ -7084,17 +7273,44 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T03:53:45.880Z",
+              "event": "assigned",
+              "batch": "13",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T04:00:34.981Z",
+              "event": "implemented",
+              "batch": "13",
+              "revision": 1,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "63",
             "part": "all"
+          },
+          "batch": "13",
+          "fix": {
+            "batch": "13",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch13 formation deadline wording"
+              }
+            ]
           }
         }
       ],
@@ -8353,14 +8569,41 @@
         {
           "key": "ein-hint-2553",
           "scope": "The EIN hint mentions Form 2553 only when a company EIN is being entered AND a matching S election package exists; a series EIN goes on no 2553.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-18T03:48:21.611Z",
               "event": "recorded by migration 001-part-level-links"
+            },
+            {
+              "at": "2026-09-20T03:53:45.880Z",
+              "event": "assigned",
+              "batch": "13",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T04:00:34.981Z",
+              "event": "implemented",
+              "batch": "13",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "13",
+          "fix": {
+            "batch": "13",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch13 office EIN hint matches applicable package"
+              }
+            ]
+          }
         },
         {
           "key": "s-election-date-row",
@@ -9803,17 +10046,44 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T03:53:45.880Z",
+              "event": "assigned",
+              "batch": "13",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T04:00:34.981Z",
+              "event": "implemented",
+              "batch": "13",
+              "revision": 1,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "63",
             "part": "all"
+          },
+          "batch": "13",
+          "fix": {
+            "batch": "13",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch13 formation deadline wording"
+              }
+            ]
           }
         }
       ],
@@ -9838,17 +10108,44 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T03:53:45.880Z",
+              "event": "assigned",
+              "batch": "13",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T04:00:34.981Z",
+              "event": "implemented",
+              "batch": "13",
+              "revision": 1,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "133",
             "part": "all"
+          },
+          "batch": "13",
+          "fix": {
+            "batch": "13",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch13 fax or mail consistently"
+              }
+            ]
           }
         }
       ],
@@ -10239,17 +10536,44 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T03:53:45.880Z",
+              "event": "assigned",
+              "batch": "13",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T04:00:34.981Z",
+              "event": "implemented",
+              "batch": "13",
+              "revision": 1,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "178",
             "part": "ein-hint-2553"
+          },
+          "batch": "13",
+          "fix": {
+            "batch": "13",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch13 office EIN hint matches applicable package"
+              }
+            ]
           }
         }
       ],
@@ -12278,14 +12602,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T03:53:45.880Z",
+              "event": "assigned",
+              "batch": "13",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T04:00:34.981Z",
+              "event": "implemented",
+              "batch": "13",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "13",
+          "fix": {
+            "batch": "13",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch13 office EIN labels agree"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -13033,14 +13384,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T03:53:45.880Z",
+              "event": "assigned",
+              "batch": "13",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T04:00:34.981Z",
+              "event": "implemented",
+              "batch": "13",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "13",
+          "fix": {
+            "batch": "13",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch13 SSN impossible groups rejected"
+              }
+            ]
+          }
         }
       ]
     },
@@ -13444,14 +13822,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T03:53:45.880Z",
+              "event": "assigned",
+              "batch": "13",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T04:00:34.981Z",
+              "event": "implemented",
+              "batch": "13",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "13",
+          "fix": {
+            "batch": "13",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch13 record copy deadline neutral tense"
+              }
+            ]
+          }
         }
       ]
     },
@@ -13468,14 +13873,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T03:53:45.880Z",
+              "event": "assigned",
+              "batch": "13",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T04:00:34.981Z",
+              "event": "implemented",
+              "batch": "13",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "13",
+          "fix": {
+            "batch": "13",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch13 issued EIN required for filing package"
+              }
+            ]
+          }
         }
       ]
     },
@@ -14958,6 +15390,42 @@
       "kind": "ruling",
       "item": "82",
       "text": "Use adding protected series to an existing Florida LLC in visible service wording; keep internal codes and existing orders compatible."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "63",
+      "text": "Batch 13 approved: state the Form 2553 deadline as within 2 months and 15 days after the LLC is officially formed with the Florida Division of Corporations; use a later effective date stated in the Articles rather than the earlier filing date."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "122",
+      "text": "Batch 13 item 2 rejected: leave the issued-EIN prerequisite as is. Our Form 2553 filing package requires an issued EIN."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "140",
+      "text": "Batch 13 item 4: let the client complete the EIN application questionnaire if the LLC is already formed, without waiting for protected-series filings."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "150",
+      "text": "Batch 13 item 5: the obtaining-EIN checkbox is available only when the client hired us to obtain that company EIN; otherwise require the issued number."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "N2.17",
+      "text": "Batch 13 item 10: never tell clients to enter Applied For. Require an issued EIN on the Form 2553 filing package."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "N2.18",
+      "text": "Batch 13 item 11 rejected: leave the Form 2553 incomplete-SSN warning as is."
     }
   ],
   "batches": [
@@ -15343,6 +15811,25 @@
         },
         {
           "at": "2026-09-20T00:54:42.311Z",
+          "event": "implemented"
+        }
+      ]
+    },
+    {
+      "id": "13",
+      "revision": 1,
+      "frozenHash": "29b49fa2f0b5af28fd5226e4e3401af31abd1662a5d18a36b79cf717b0ed9c7e",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "80277f5dffd5c765a8ca8c81b6c93679a8252a83",
+      "history": [
+        {
+          "at": "2026-09-20T03:53:45.881Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-20T04:00:34.981Z",
           "event": "implemented"
         }
       ]

@@ -385,7 +385,7 @@ export function ServicesCard({ company }: { company?: string | null }) {
                 </div>
                 <p className="mt-1 text-xs text-muted-foreground">
                   Completed IRS Form 2553 with a cover letter and filing instructions — you sign
-                  and mail it. If we complete the S election form, we will elect a calendar tax year. If you need to elect a fiscal year, do not purchase this service from us — seek the advice of your attorney or CPA.
+                  and fax or mail it. If we complete the S election form, we will elect a calendar tax year. If you need to elect a fiscal year, do not purchase this service from us — seek the advice of your attorney or CPA.
                   {data.sElection.orderBy ? (
                     <span className="font-medium text-amber-700">
                       {" "}Available until {fmtDay(data.sElection.orderBy)}.
@@ -408,8 +408,7 @@ export function ServicesCard({ company }: { company?: string | null }) {
                 </DialogDescription>
               </DialogHeader>
               <p className="text-xs text-muted-foreground">
-                The IRS deadline is strict — 2 months and 15 days from the start of the company's
-                first tax year — which is why this package is only available until{" "}
+                The IRS deadline is strict — 2 months and 15 days after your LLC is officially formed with the Florida Division of Corporations — which is why this package is only available until{" "}
                 {data.sElection.orderBy ? fmtDay(data.sElection.orderBy) : "the window closes"}.
                 Choose this only if your tax professional recommends the election.
               </p>

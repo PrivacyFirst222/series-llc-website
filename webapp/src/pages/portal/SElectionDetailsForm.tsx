@@ -72,6 +72,7 @@ export function SElectionDetailsForm({
   priorFormationDate,
   todayEastern,
   companyEin,
+  einServiceOrdered = false,
   draft,
   onDraftChange,
   onDone,
@@ -86,6 +87,7 @@ export function SElectionDetailsForm({
   /** The EIN we obtained, from the CP 575 in the client's documents: shown
    *  read-only instead of asked (Adam, 7 Sep 2026). */
   companyEin?: string;
+  einServiceOrdered?: boolean;
   /** Florida's date, from our server — the gate never uses the device clock. */
   todayEastern?: string;
   draft?: SElectionDraft;
@@ -104,7 +106,8 @@ export function SElectionDetailsForm({
   const [formationDateTyped, setFormationDateTyped] = useState(draft?.formationDateTyped ?? isoToTypedDate(priorFormationDate));
   const formationDate = typedDateToIso(formationDateTyped) || undefined;
   const [ein, setEin] = useState(companyEin ?? draft?.ein ?? prior.ein ?? "");
-  const [einPending, setEinPending] = useState(companyEin ? false : draft ? draft.einPending : Boolean(prior.einPending));
+  const [einPending, setEinPending] = useState(!einServiceOrdered || companyEin ? false : draft ? draft.einPending : Boolean(prior.einPending));
+  useEffect(() => { if (!einServiceOrdered || companyEin) setEinPending(false); }, [einServiceOrdered, companyEin]);
   const [effectiveDate, setEffectiveDate] = useState(draft?.effectiveDate ?? isoToTypedDate(prior.effectiveDate));
   const [officerName, setOfficerName] = useState(draft?.officerName ?? prior.officerName ?? knownSigners[0] ?? "");
   // "Someone else…" stays selected while the typed name is not a known one.
@@ -214,7 +217,7 @@ export function SElectionDetailsForm({
   // off while this list has anything on it.
   const stillNeeded: string[] = [];
   if (!formationDate) stillNeeded.push(formationDateBad ? "Enter the date the Division filed your Articles as MM/DD/YYYY" : "Enter the date the Division filed your Articles");
-  if (!einPending && !/^\d{9}$/.test(ein.replace(/\D/g, ""))) stillNeeded.push("Enter the 9-digit EIN, or tick that you're obtaining ours");
+  if (!einPending && !/^\d{9}$/.test(ein.replace(/\D/g, ""))) stillNeeded.push(einServiceOrdered ? "Enter your issued EIN, or select that we’re obtaining it for you" : "Enter your issued 9-digit EIN");
   if (effectiveDate.trim() !== "" && typedDateToIso(effectiveDate) === null) stillNeeded.push("Enter the election effective date as MM/DD/YYYY, or leave it blank");
   if (formationDate && timing && timing.status !== "ok") stillNeeded.push("Resolve the deadline notice above — the election can't be built as dated");
   if (premature) stillNeeded.push("Choose an effective date no later than next year");
@@ -233,11 +236,11 @@ export function SElectionDetailsForm({
     if (!(Number(r.percentage) > 0)) stillNeeded.push(`${who}: enter the ownership percentage`);
     if (r.atFormation === false && (r.dateAcquired.trim() === "" || typedDateToIso(r.dateAcquired) === null)) stillNeeded.push(`${who}: enter the date acquired as MM/DD/YYYY, or tick "Acquired at formation"`);
     if (!r.ssn && !r.ssnLast4) stillNeeded.push(`${who}: enter the SSN${r.name.trim() ? ` for ${r.name.trim()}` : ""}`);
-    else if (r.ssn && ssnTypingProblem(r.ssn)) stillNeeded.push(`${who}${r.name.trim() ? `, ${r.name.trim()}` : ""}: check the first three digits of the SSN`);
+    else if (r.ssn && ssnTypingProblem(r.ssn)) stillNeeded.push(`${who}${r.name.trim() ? `, ${r.name.trim()}` : ""}: ${ssnTypingProblem(r.ssn)}`);
     else if (r.ssn && r.ssn.replace(/\D/g, "").length !== 9) stillNeeded.push(`${who}: the SSN needs 9 digits`);
     if (isJoint(r.joint)) {
       if (!r.ssn2 && !r.ssnLast4Second) stillNeeded.push(`${who}: enter the SSN${(r.name2 ?? "").trim() ? ` for ${(r.name2 ?? "").trim()}` : " for the co-owner"}`);
-      else if (r.ssn2 && ssnTypingProblem(r.ssn2)) stillNeeded.push(`${who}, co-owner ${(r.name2 ?? "").trim() || ""}: check the first three digits of the SSN`);
+      else if (r.ssn2 && ssnTypingProblem(r.ssn2)) stillNeeded.push(`${who}, co-owner ${(r.name2 ?? "").trim() || ""}: ${ssnTypingProblem(r.ssn2)}`);
       else if (r.ssn2 && r.ssn2.replace(/\D/g, "").length !== 9) stillNeeded.push(`${who}: the co-owner's SSN needs 9 digits`);
     }
   });
@@ -280,8 +283,7 @@ export function SElectionDetailsForm({
             className="w-48"
           />
           <p className="text-xs text-muted-foreground">
-            It's on your Articles of Organization, in your documents above. Your Form 2553 deadline
-            runs from this date.
+            It's on your Articles of Organization, in your documents above. The deadline runs from when your LLC is officially formed with the Florida Division of Corporations. If your Articles specify a later effective date, enter it below.
           </p>
           {formationDateBad ? (
             <p className="text-xs text-destructive">Enter the date as MM/DD/YYYY.</p>
@@ -306,20 +308,20 @@ export function SElectionDetailsForm({
                 aria-label="EIN"
                 disabled={einPending}
               />
-              <label className="flex items-center gap-2 text-xs text-muted-foreground">
+              {einServiceOrdered ? <label className="flex items-center gap-2 text-xs text-muted-foreground">
                 <input
                   type="checkbox"
                   checked={einPending}
                   onChange={(e) => { setEinPending(e.target.checked); if (e.target.checked) setEin(""); }}
                   className="h-3.5 w-3.5 accent-trust"
                 />
-                You're obtaining our EIN — use it when issued
-              </label>
+                We’re obtaining your EIN — we’ll use it when it is issued
+              </label> : null}
             </>
           )}
         </div>
         <div className="space-y-1.5">
-          <label className="text-sm font-medium">Election effective date</label>
+          <label className="text-sm font-medium">Later formation effective date (if stated in your Articles)</label>
           <Input
             value={effectiveDate}
             onChange={(e) => setEffectiveDate(formatTypedDate(e.target.value))}
@@ -329,7 +331,7 @@ export function SElectionDetailsForm({
             aria-label="Election effective date"
           />
           <p className="text-xs text-muted-foreground">
-            Usually your formation date. Leave blank and we'll use the date on your filed Articles.
+            Leave blank unless your Articles specify a later effective date. That is the date your LLC is officially formed, and the date we use for Form 2553.
           </p>
         </div>
         {premature ? (
@@ -685,14 +687,14 @@ export function SElectionDetailsForm({
       ) : null}
       <DialogFooter className="flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:justify-end">
         <p className="text-xs text-muted-foreground sm:mr-auto">
-          We build your package immediately — you'll be able to download it here.
+          {einPending ? "We save your answers securely. Once we have your issued EIN, we prepare the package and place it in Your documents." : "We build your package immediately — it appears in Your documents, ready to download."}
         </p>
         <Button
           type="submit"
           disabled={submit.isPending || stillNeeded.length > 0}
           className="rounded-full"
         >
-          {submit.isPending ? "Building your package…" : "Certify and build my package"}
+          {submit.isPending ? (einPending ? "Saving your answers…" : "Building your package…") : (einPending ? "Certify and save my details" : "Certify and build my package")}
         </Button>
       </DialogFooter>
     </form>

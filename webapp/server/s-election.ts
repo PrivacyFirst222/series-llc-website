@@ -9,6 +9,7 @@
  *   Department of the Treasury, Internal Revenue Service Center, Ogden, UT 84201
  *   Fax: 855-214-7520. There is no IRS filing fee.
  */
+import { isValidEin } from "../src/lib/ein";
 import { form2553Deadline } from "../src/lib/form2553Timing";
 import { type JointKind, columnJText, isJoint, jointDisplayName, ssnColumnText } from "../src/lib/jointOwner";
 import { PDFDocument, StandardFonts, degrees, rgb } from "@cantoo/pdf-lib";
@@ -37,7 +38,7 @@ export interface SElectionShareholder {
 export interface SElectionDetails {
   llcName: string;
   principalAddress: string; // "street, city, ST zip"
-  ein: string; // 9 digits, or "" if pending
+  ein: string; // issued EIN: 9 digits
   dateIncorporated: string; // YYYY-MM-DD (Articles filing date)
   effectiveDate: string; // YYYY-MM-DD (item E)
   officerName: string;
@@ -77,12 +78,9 @@ function fmtDateLong(iso: string): string {
   });
 }
 
-/** Item A. The IRS instructions: "If the corporation (entity) hasn't
- *  received its EIN by the time the return is due, enter 'Applied For' and
- *  the date the EIN was applied in the space for the EIN." We know only that
- *  it is pending, so the form says "Applied For". */
+/** Adam, Batch 13: filing packages require an issued EIN. */
 function fmtEin(ein: string): string {
-  return ein ? `${ein.slice(0, 2)}-${ein.slice(2)}` : "Applied For";
+  return `${ein.slice(0, 2)}-${ein.slice(2)}`;
 }
 
 /** Filing deadline: 2 months and 15 days after the election's effective
@@ -111,8 +109,7 @@ async function fillForm2553(d: SElectionDetails): Promise<PDFDocument> {
   const setText = (name: string, value: string) => {
     if (!value) return;
     const field = form.getTextField(name);
-    // The EIN boxes are combed to ten characters; the IRS's own phrase for
-    // a pending number, "Applied For", is eleven. Lift the limit for it.
+    // Allow longer values where the original form field limit is too small.
     const max = field.getMaxLength();
     if (max !== undefined && value.length > max) field.setMaxLength(undefined);
     field.setText(value);
@@ -179,9 +176,7 @@ ${rows}
 }
 
 function instructionsMarkdown(d: SElectionDetails, deadlineIso: string): string {
-  const einLine = d.ein
-    ? `The form is completed with your EIN, **${fmtEin(d.ein)}**.`
-    : `**Your EIN was not yet available when this package was prepared.** Write it in item A on page 1 (and the box at the top of page 2) before filing — the IRS will not process the form without it.`;
+  const einLine = `The form is completed with your EIN, **${fmtEin(d.ein)}**.`;
   if (d.recordCopy) {
     return `# S CORPORATION ELECTION PACKAGE — RECORD COPY
 
@@ -201,7 +196,7 @@ If you still need to file, contact us and we will prepare a new package.
 2. The cover letter as it was prepared.
 3. **IRS Form 2553 as it was completed**, with the Social Security numbers removed.
 
-The IRS deadline for this election was ${fmtDateLong(deadlineIso)}. A late election requires IRS relief — talk to your tax professional.
+The IRS deadline for this election is ${fmtDateLong(deadlineIso)}. If that date has passed, discuss late-election relief with your tax professional.
 `;
   }
   return `# S CORPORATION ELECTION PACKAGE
@@ -213,7 +208,7 @@ The IRS deadline for this election was ${fmtDateLong(deadlineIso)}. A late elect
 ## WHAT IS IN THIS PACKAGE
 
 1. This instruction sheet — keep it.
-2. A cover letter to the IRS — mail it with the form.
+2. A cover letter to the IRS — fax or mail it with the form.
 3. **IRS Form 2553, completed and ready to sign** — the election by ${d.llcName} to be taxed as an S corporation effective ${fmtDateLong(d.effectiveDate)}.
 
 ${einLine}
@@ -231,7 +226,7 @@ ${d.shareholders.length > 7 ? `- **Owners eight onward sign the continuation she
 
 ## STEP 3 — FILE IT (DEADLINE: ${fmtDateLong(deadlineIso).toUpperCase()})
 
-The IRS must receive Form 2553 **no later than 2 months and 15 days after the start of the company's first tax year** — for your company, that is **${fmtDateLong(deadlineIso)}**. File as soon as the form is signed; do not wait for the deadline.
+You must file Form 2553 **within 2 months and 15 days after your LLC is officially formed with the Florida Division of Corporations** — for your company, that is **${fmtDateLong(deadlineIso)}**. File as soon as the form is signed; do not wait for the deadline.
 
 Choose ONE of the following. There is no IRS filing fee.
 
@@ -311,6 +306,7 @@ async function stampRecordCopy(doc: PDFDocument): Promise<void> {
 }
 
 export async function buildSElectionPackage(d: SElectionDetails): Promise<Uint8Array> {
+  if (!isValidEin(d.ein)) throw new Error("An issued EIN is required before preparing Form 2553.");
   const deadline = electionDeadline(d.effectiveDate);
   const title = `S Corporation Election Package — ${d.llcName}`;
   const instructions = await renderMarkdownPdf({

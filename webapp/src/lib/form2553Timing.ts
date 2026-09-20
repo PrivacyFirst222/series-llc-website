@@ -98,7 +98,7 @@ export function evaluate2553Timing(opts: {
 
 export const ORDER_TIME_ACKNOWLEDGMENT =
   "I understand that MyFloridaSeriesLLC prepares Form 2553 but does not file it, that I am responsible " +
-  "for filing it within 2 months and 15 days after my LLC's effective date, and that no refund is provided " +
+  "for filing it within 2 months and 15 days after my LLC is officially formed with the Florida Division of Corporations, and that no refund is provided " +
   "if I miss that deadline. MyFloridaSeriesLLC does not prepare late-election packages.";
 
 /** Adam's eligibility acknowledgment on the S election form (6 Sep 2026).

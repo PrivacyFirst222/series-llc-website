@@ -177,3 +177,12 @@ scanned set; add ` in <path prefix>` to confine the ban to matching files.
 - where: webapp/src/components/forms/florida-llc/ReviewStep.tsx — `EFFECTIVE_DATE_NOTICE`
 - where: webapp/server/filing.ts — `closestEffectiveDate`
 - where: webapp/server/order-summary.ts — `Exact effective date is not guaranteed.`
+
+## Batch 13 owner decisions — 19 Sep 2026
+
+- First-year Form 2553 deadline wording: within 2 months and 15 days after the LLC is officially formed with the Florida Division of Corporations. A later effective date stated in the filed Articles controls over the earlier filing date. The portal asks for that later date only when stated in the Articles.
+- Our filing package requires an issued EIN. If we were hired to obtain the company EIN, the client may submit encrypted questionnaire answers while it is pending; no filing PDF is generated until the EIN is issued. Self-applicants must enter the issued EIN. Never instruct the client to enter Applied For. This is our service policy; it is not a claim that the IRS offers no other filing procedure.
+- A paid conversion order identifies an already-existing LLC: its EIN questionnaire is available before the protected-series filings finish. This status is company-specific.
+- Clients fax or mail Form 2553 themselves; we prepare the package and do not file it.
+- Impossible SSNs: middle group 00 and ending 0000 are rejected, alongside the existing length/area restrictions, on client and server.
+- Owner retained the issued-EIN prerequisite (item 122) and the incomplete-SSN warning (N2.18). The dormant record-copy deadline uses neutral tense; no automatic redacted-copy replacement is restored.

@@ -1180,6 +1180,10 @@ app.post("/admin/services/:id/s-election-formation-date", async (c) => {
     return c.json(err(gate.message, `TIMING_${gate.status.toUpperCase()}`), 400);
   }
   merged.dateIncorporated = body.data.date;
+  if (!merged.ein) {
+    await db.query("UPDATE service_orders SET details=$1 WHERE id=$2", [JSON.stringify(merged), so.id]);
+    return c.json({ data: { ok: true, awaitingEin: true, documentId: null } });
+  }
   const built = await postSElectionPackage({ so: { id: so.id, client_id: so.client_id, llc_name: so.llc_name }, merged, ssns, priorDocumentId });
   if (!built.ok) return c.json(err("The package could not be built.", "GENERATION_FAILED"), 500);
   return c.json({ data: { ok: true, documentId: built.documentId, editableUntil: built.editableUntil } });
@@ -1206,6 +1210,7 @@ app.get("/admin/services/:id/s-election-draft", async (c) => {
     officerName: string; officerTitle: string; phone: string;
     shareholders: { name: string; address: string; percentage: number; dateAcquired: string }[];
   };
+  if (!isValidEin(details.ein ?? "")) return c.json(err("The issued EIN is required before preparing the filing package.", "EIN_REQUIRED"), 400);
   if (!details.dateIncorporated) {
     return c.json(err("Enter the date the Division filed the Articles first — the form is built from it.", "FORMATION_DATE_REQUIRED"), 400);
   }
@@ -1289,7 +1294,7 @@ app.post("/admin/services/:id/fulfill", async (c) => {
   // The number is entered with the letter so the 2553 can carry it (Adam,
   // 7 Sep 2026). Checked the way the S election form checks one.
   if (so.type === "ein" && !isValidEin(assignedEin)) {
-    return c.json(err("Enter the 9-digit EIN from the letter — it goes on the client's Form 2553.", "EIN_REQUIRED"), 400);
+    return c.json(err("Enter the 9-digit EIN from the IRS confirmation letter.", "EIN_REQUIRED"), 400);
   }
   if (so.type === "s-election" && !file) {
     return c.json(err("Attach the election package PDF to fulfill an S election order.", "PACKAGE_REQUIRED"), 400);
@@ -1403,7 +1408,7 @@ async function carryEinIntoSElections(args: { clientId: string; companyOrderId: 
   const db = await getDb();
   const rows = await db.query<{ id: string; client_id: string; llc_name: string; status: string; details: unknown; ein_secret: string | null }>(
     `SELECT id, client_id, llc_name, status, details, ein_secret FROM service_orders
-      WHERE client_id = $1 AND type = 's-election' AND status <> 'pending_payment'
+      WHERE client_id = $1 AND type = 's-election' AND status NOT IN ('pending_payment','cancelled')
         AND formation_order_id::text = $2::text`,
     [args.clientId, args.companyOrderId],
   );

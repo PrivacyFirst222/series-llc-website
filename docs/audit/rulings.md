@@ -47,3 +47,15 @@ Adam. A new ruling is added the day it is given.
 - Ruling 68: "Show plain no-advice and public-record notices at Eligibility; require the corresponding checkboxes once at Certification."
 
 - Ruling 82: "Use adding protected series to an existing Florida LLC in visible service wording; keep internal codes and existing orders compatible."
+
+- Ruling 63: "Batch 13 approved: state the Form 2553 deadline as within 2 months and 15 days after the LLC is officially formed with the Florida Division of Corporations; use a later effective date stated in the Articles rather than the earlier filing date."
+
+- Ruling 122: "Batch 13 item 2 rejected: leave the issued-EIN prerequisite as is. Our Form 2553 filing package requires an issued EIN."
+
+- Ruling 140: "Batch 13 item 4: let the client complete the EIN application questionnaire if the LLC is already formed, without waiting for protected-series filings."
+
+- Ruling 150: "Batch 13 item 5: the obtaining-EIN checkbox is available only when the client hired us to obtain that company EIN; otherwise require the issued number."
+
+- Ruling N2.17: "Batch 13 item 10: never tell clients to enter Applied For. Require an issued EIN on the Form 2553 filing package."
+
+- Ruling N2.18: "Batch 13 item 11 rejected: leave the Form 2553 incomplete-SSN warning as is."

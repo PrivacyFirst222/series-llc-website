@@ -1810,7 +1810,7 @@ if (mint.status === 200) {
     shareholders: [{ name: "Casey Member, Jr.", address: "100 Ocean Drive, Miami, FL 33139", percentage: 100, dateAcquired: "", ssn: "123-45-6789" }],
   };
   const appliedFor = await api(`/api/portal/services/${intakeSElection?.id}/s-election-details`, { method: "POST", cookies: setPw.cookie, body: JSON.stringify(intakeSelDetails) });
-  check("an S election builds as Applied For before the EIN exists", appliedFor.status === 200 && Boolean(appliedFor.body?.data?.documentId), appliedFor.body);
+  check("an S election saves securely without a filing package before the EIN exists", appliedFor.status === 200 && appliedFor.body?.data?.awaitingEin === true && !appliedFor.body?.data?.documentId, appliedFor.body);
   const appliedForDoc = appliedFor.body?.data?.documentId as string;
   const beforeEin = await api("/api/portal/services", { cookies: setPw.cookie });
   check("no company EIN is known before the letter is uploaded", beforeEin.body?.data?.companyEin === null, beforeEin.body?.data?.companyEin);
@@ -1846,7 +1846,7 @@ if (mint.status === 200) {
   check("the company's EIN is now known to the portal", afterEin.body?.data?.companyEin === "881234567", afterEin.body?.data?.companyEin);
   const rebuiltSel = (afterEin.body?.data?.orders ?? []).find((o: { id: string }) => o.id === intakeSElection?.id);
   check("the rebuilt package carries the EIN from the letter", rebuiltSel?.details?.ein === "881234567" && rebuiltSel?.details?.einPending === false && rebuiltSel?.details?.einSource === "letter", rebuiltSel?.details);
-  check("the rebuilt package replaced the Applied For one", Boolean(rebuiltSel?.details?.documentId) && rebuiltSel?.details?.documentId !== appliedForDoc, { before: appliedForDoc, after: rebuiltSel?.details?.documentId });
+  check("the issued EIN creates the first filing package", Boolean(rebuiltSel?.details?.documentId) && !appliedForDoc, { before: appliedForDoc, after: rebuiltSel?.details?.documentId });
   const einAdmin = await api(`/api/admin/services/${intakeEin.id}`, { cookies: adminLogin2.cookie });
   check("the number is kept on the EIN order", einAdmin.body?.data?.details?.assignedEin === "881234567", einAdmin.body?.data?.details);
   // A later build for the same company gets the number whatever the client sends.

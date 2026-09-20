@@ -100461,7 +100461,7 @@ function sElectionReadyEmail(opts) {
     html: wrap(`
       <p>Your S corporation election package for <strong>${escapeHtml(opts.llcName)}</strong> is
       ready to download in your portal: the completed IRS Form 2553, a cover letter, and
-      step-by-step instructions for signing and mailing it to the IRS.</p>
+      step-by-step instructions for signing it and faxing or mailing it to the IRS.</p>
       <p>You can correct your answers and regenerate the package until
       <strong>${escapeHtml(opts.editableUntil)}</strong>. After that, editing closes and the full numbers are removed from the questionnaire records.
       Your completed document stays encrypted in your portal until you choose to delete it.
@@ -100512,8 +100512,7 @@ function llcFormedEmail(opts) {
       <p>The next step is to create your operating agreement. You can do that
       in your personal portal (<a href="${opts.portalUrl}">Click here to open</a>).</p>
       ${svc}
-      ${sElectionStatus ? `<p>IRS Form 2553 must be filed within 2 months and 15 days of the date on your filed
-      Articles.${sElectionStatus === "awaiting_info" ? " Please complete the form soon." : ""}</p>` : ""}
+      ${sElectionStatus ? `<p>IRS Form 2553 must be filed within 2 months and 15 days after your LLC is officially formed with the Florida Division of Corporations.${sElectionStatus === "awaiting_info" ? " Please complete the form soon." : ""}</p>` : ""}
       <p>Thank you for doing business with MyFloridaSeriesLLC!</p>
       <p>support@myfloridaseriesllc.com</p>
     `)
@@ -100528,9 +100527,8 @@ function sElectionEinAddedEmail(opts) {
     html: wrap(`
       <p>The IRS has issued the EIN for <strong>${escapeHtml(opts.llcName)}</strong>:
       <strong>${escapeHtml(opts.einDisplay)}</strong>. The confirmation letter is in your portal.</p>
-      <p>Your S corporation election package has been rebuilt so that Form 2553 now carries the
-      EIN in item A instead of "Applied For." <strong>Download the new copy before signing and
-      mailing</strong> \u2014 an earlier copy marked "Applied For" should not be filed now that the
+      <p>Your S corporation election package is ready with the issued EIN in item A. <strong>Download the new copy before signing and
+      faxing or mailing</strong> \u2014 use this updated copy now that the
       number exists.</p>
       <p><a href="${opts.portalUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Open your portal</a></p>
     `)
@@ -100542,10 +100540,9 @@ function sElectionEinArrivedLateEmail(opts) {
     html: wrap(`
       <p>The IRS has issued the EIN for <strong>${escapeHtml(opts.llcName)}</strong>:
       <strong>${escapeHtml(opts.einDisplay)}</strong>. The confirmation letter is in your portal.</p>
-      <p>Your S corporation election package was built with "Applied For" in item A, and its
-      two-week editing window has closed, so we no longer hold the details needed to rebuild it.
+      <p>Your S corporation election package\u2019s two-week editing window has closed, so we no longer hold the questionnaire details needed to rebuild it.
       If you have not yet filed Form 2553, write the EIN in item A by hand on your filing copy
-      before signing and mailing, or contact us at
+      before signing and faxing or mailing, or contact us at
       <a href="mailto:${escapeHtml(opts.supportEmail)}">${escapeHtml(opts.supportEmail)}</a>.</p>
       <p><a href="${opts.portalUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Open your portal</a></p>
     `)
@@ -101655,9 +101652,40 @@ function computeCapital(assets, unitNames, seriesNames2) {
   };
 }
 
+// src/lib/ssn.ts
+var SSN_AREA_MESSAGE = "That is not a valid Social Security number \u2014 check the first three digits.";
+var SSN_LENGTH_MESSAGE = "A Social Security number has 9 digits.";
+var ssnDigits = (value) => value.replace(/\D/g, "");
+function ssnTypingProblem(value) {
+  const d2 = ssnDigits(value);
+  if (d2.length >= 3 && /^(000|666|9\d\d)/.test(d2)) return SSN_AREA_MESSAGE;
+  if (d2.length >= 5 && d2.slice(3, 5) === "00") return "That is not a valid Social Security number \u2014 the middle two digits cannot be 00.";
+  if (d2.length >= 9 && d2.slice(5, 9) === "0000") return "That is not a valid Social Security number \u2014 the last four digits cannot be 0000.";
+  if (d2.length > 9) return SSN_LENGTH_MESSAGE;
+  return "";
+}
+function ssnProblem(value) {
+  const d2 = ssnDigits(value);
+  if (d2 === "") return "";
+  return ssnTypingProblem(value) || (d2.length !== 9 ? SSN_LENGTH_MESSAGE : "");
+}
+
 // server/routes-portal.ts
 init_db();
 init_env();
+
+// src/lib/ein.ts
+var VALID_EIN_PREFIXES = new Set(
+  "10 12 60 67 50 53 01 02 03 04 05 06 11 13 14 16 21 22 23 25 34 51 52 54 55 56 57 58 59 65 30 32 35 36 37 38 61 15 24 40 44 94 95 80 90 33 39 41 42 43 46 48 62 63 64 66 68 71 72 73 74 75 76 77 85 86 87 88 91 92 93 98 99 20 26 27 45 47 81 82 83 84 31".split(" ")
+);
+function einDigits(raw2) {
+  return (raw2 ?? "").replace(/[\s-]/g, "");
+}
+function isValidEin(raw2) {
+  const d2 = einDigits(raw2);
+  return /^\d{9}$/.test(d2) && VALID_EIN_PREFIXES.has(d2.slice(0, 2));
+}
+var fmtEinDisplay = (digits) => /^\d{9}$/.test(digits) ? `${digits.slice(0, 2)}-${digits.slice(2)}` : digits;
 
 // src/lib/form2553Timing.ts
 var DEFAULT_MIN_DAYS = 5;
@@ -101822,7 +101850,7 @@ function fmtDateLong(iso) {
   });
 }
 function fmtEin(ein) {
-  return ein ? `${ein.slice(0, 2)}-${ein.slice(2)}` : "Applied For";
+  return `${ein.slice(0, 2)}-${ein.slice(2)}`;
 }
 function electionDeadline(startIso) {
   return form2553Deadline(startIso);
@@ -101894,7 +101922,7 @@ ${rows}
 `;
 }
 function instructionsMarkdown(d2, deadlineIso) {
-  const einLine = d2.ein ? `The form is completed with your EIN, **${fmtEin(d2.ein)}**.` : `**Your EIN was not yet available when this package was prepared.** Write it in item A on page 1 (and the box at the top of page 2) before filing \u2014 the IRS will not process the form without it.`;
+  const einLine = `The form is completed with your EIN, **${fmtEin(d2.ein)}**.`;
   if (d2.recordCopy) {
     return `# S CORPORATION ELECTION PACKAGE \u2014 RECORD COPY
 
@@ -101914,7 +101942,7 @@ If you still need to file, contact us and we will prepare a new package.
 2. The cover letter as it was prepared.
 3. **IRS Form 2553 as it was completed**, with the Social Security numbers removed.
 
-The IRS deadline for this election was ${fmtDateLong(deadlineIso)}. A late election requires IRS relief \u2014 talk to your tax professional.
+The IRS deadline for this election is ${fmtDateLong(deadlineIso)}. If that date has passed, discuss late-election relief with your tax professional.
 `;
   }
   return `# S CORPORATION ELECTION PACKAGE
@@ -101926,7 +101954,7 @@ The IRS deadline for this election was ${fmtDateLong(deadlineIso)}. A late elect
 ## WHAT IS IN THIS PACKAGE
 
 1. This instruction sheet \u2014 keep it.
-2. A cover letter to the IRS \u2014 mail it with the form.
+2. A cover letter to the IRS \u2014 fax or mail it with the form.
 3. **IRS Form 2553, completed and ready to sign** \u2014 the election by ${d2.llcName} to be taxed as an S corporation effective ${fmtDateLong(d2.effectiveDate)}.
 
 ${einLine}
@@ -101948,7 +101976,7 @@ ${d2.shareholders.length > 7 ? `- **Owners eight onward sign the continuation sh
 
 ## STEP 3 \u2014 FILE IT (DEADLINE: ${fmtDateLong(deadlineIso).toUpperCase()})
 
-The IRS must receive Form 2553 **no later than 2 months and 15 days after the start of the company's first tax year** \u2014 for your company, that is **${fmtDateLong(deadlineIso)}**. File as soon as the form is signed; do not wait for the deadline.
+You must file Form 2553 **within 2 months and 15 days after your LLC is officially formed with the Florida Division of Corporations** \u2014 for your company, that is **${fmtDateLong(deadlineIso)}**. File as soon as the form is signed; do not wait for the deadline.
 
 Choose ONE of the following. There is no IRS filing fee.
 
@@ -102020,6 +102048,7 @@ async function stampRecordCopy(doc) {
   }
 }
 async function buildSElectionPackage(d2) {
+  if (!isValidEin(d2.ein)) throw new Error("An issued EIN is required before preparing Form 2553.");
   const deadline = electionDeadline(d2.effectiveDate);
   const title = `S Corporation Election Package \u2014 ${d2.llcName}`;
   const instructions = await renderMarkdownPdf({
@@ -106263,19 +106292,6 @@ ${n}${suffix}`) + "\nDate: _____________________________";
   return { markdown: s, title: `New Protected Series \u2014 ${input.seriesName}` };
 }
 
-// src/lib/ein.ts
-var VALID_EIN_PREFIXES = new Set(
-  "10 12 60 67 50 53 01 02 03 04 05 06 11 13 14 16 21 22 23 25 34 51 52 54 55 56 57 58 59 65 30 32 35 36 37 38 61 15 24 40 44 94 95 80 90 33 39 41 42 43 46 48 62 63 64 66 68 71 72 73 74 75 76 77 85 86 87 88 91 92 93 98 99 20 26 27 45 47 81 82 83 84 31".split(" ")
-);
-function einDigits(raw2) {
-  return (raw2 ?? "").replace(/[\s-]/g, "");
-}
-function isValidEin(raw2) {
-  const d2 = einDigits(raw2);
-  return /^\d{9}$/.test(d2) && VALID_EIN_PREFIXES.has(d2.slice(0, 2));
-}
-var fmtEinDisplay = (digits) => /^\d{9}$/.test(digits) ? `${digits.slice(0, 2)}-${digits.slice(2)}` : digits;
-
 // src/lib/einActivity.ts
 var EIN_REASONS = [
   "Started a new business",
@@ -107006,10 +107022,10 @@ async function resolveCompanyOrder(clientId, requested) {
 async function clientLlcFormed(clientId, orderId) {
   const db = await getDb();
   const rows = orderId ? await db.query(
-    "SELECT 1 AS ok FROM orders WHERE client_id = $1 AND id = $2 AND formed_at IS NOT NULL LIMIT 1",
+    "SELECT 1 AS ok FROM orders WHERE client_id = $1 AND id = $2 AND (formed_at IS NOT NULL OR (paid_at IS NOT NULL AND payload->>'filingPath' = 'CONVERT')) LIMIT 1",
     [clientId, orderId]
   ) : await db.query(
-    "SELECT 1 AS ok FROM orders WHERE client_id = $1 AND formed_at IS NOT NULL LIMIT 1",
+    "SELECT 1 AS ok FROM orders WHERE client_id = $1 AND (formed_at IS NOT NULL OR (paid_at IS NOT NULL AND payload->>'filingPath' = 'CONVERT')) LIMIT 1",
     [clientId]
   );
   return rows.length > 0;
@@ -107169,6 +107185,14 @@ async function companyEinFor(clientId, companyOrderId) {
   }
   return null;
 }
+async function companyEinOrdered(clientId, companyOrderId) {
+  if (!companyOrderId) return false;
+  const db = await getDb();
+  const rows = await db.query(`SELECT id FROM service_orders WHERE client_id=$1 AND formation_order_id=$2
+    AND type='ein' AND paid_at IS NOT NULL AND status NOT IN ('pending_payment','cancelled')
+    AND COALESCE(details->>'target','company')='company' LIMIT 1`, [clientId, companyOrderId]);
+  return rows.length > 0;
+}
 var sElectionDetailsSchema = external_exports.object({
   ein: external_exports.string().transform((s) => s.replace(/[\s-]/g, "")).refine((s) => s === "" || /^\d{9}$/.test(s), "Enter the 9-digit EIN, or leave it blank if we're obtaining it.").refine((s) => s === "" || VALID_EIN_PREFIXES.has(s.slice(0, 2)), "That is not a valid EIN \u2014 check the first two digits."),
   einPending: external_exports.boolean().optional().default(false),
@@ -107205,7 +107229,10 @@ var sElectionDetailsSchema = external_exports.object({
       // The Social Security Administration never issues area numbers
       // 000, 666 or 900-999 (ssa.gov, "Social Security Number
       // Randomization": "excluding area numbers 000, 666 and 900-999").
-      ssn: external_exports.string().transform((s) => s.replace(/[\s-]/g, "")).refine((s) => s === "" || /^\d{9}$/.test(s), "Each owner's SSN must be 9 digits.").refine((s) => s === "" || !/^(000|666|9\d\d)/.test(s), "That is not a valid Social Security number \u2014 check the first three digits."),
+      ssn: external_exports.string().transform((s) => s.replace(/[\s-]/g, "")).refine((s) => s === "" || /^\d{9}$/.test(s), "Each owner's SSN must be 9 digits.").superRefine((s, ctx) => {
+        const problem = ssnProblem(s);
+        if (problem) ctx.addIssue({ code: external_exports.ZodIssueCode.custom, message: problem });
+      }),
       // A jointly held interest (Adam, 6 Sep 2026): the co-owner's name
       // and Social Security number ride on the same row.
       joint: external_exports.enum(["", "tbe", "jtwros"]).optional().default(""),
@@ -107213,7 +107240,10 @@ var sElectionDetailsSchema = external_exports.object({
       // The co-owner's own address when they live apart (Adam, 7 Sep
       // 2026); blank means the same address as the first owner.
       address2: external_exports.string().max(300).optional().default(""),
-      ssn2: external_exports.string().optional().default("").transform((s) => s.replace(/[\s-]/g, "")).refine((s) => s === "" || /^\d{9}$/.test(s), "Each co-owner's SSN must be 9 digits.").refine((s) => s === "" || !/^(000|666|9\d\d)/.test(s), "That is not a valid Social Security number \u2014 check the first three digits.")
+      ssn2: external_exports.string().optional().default("").transform((s) => s.replace(/[\s-]/g, "")).refine((s) => s === "" || /^\d{9}$/.test(s), "Each co-owner's SSN must be 9 digits.").superRefine((s, ctx) => {
+        const problem = ssnProblem(s);
+        if (problem) ctx.addIssue({ code: external_exports.ZodIssueCode.custom, message: problem });
+      })
     }).refine((sh) => !isJoint(sh.joint) || sh.name2.trim() !== "", { message: "Enter the co-owner's name on each jointly held row." }).refine((sh) => !isJoint(sh.joint) || hasFirstAndLast(sh.name2), { message: `Co-owner: ${FIRST_AND_LAST}` })
   ).min(1, "At least one owner is required.").max(100, "An S corporation may have no more than 100 shareholders."),
   certified: external_exports.literal(true, {
@@ -108167,11 +108197,7 @@ function registerPortalRoutes(app2) {
         // The EIN we obtained, if we have: the S election form shows it
         // read-only instead of asking (Adam, 7 Sep 2026).
         companyEin: await companyEinFor(session.clientId, svcCompanyId),
-        einCompanyOrdered: orders.some((o) => {
-          if (o.type !== "ein" || o.status === "pending_payment") return false;
-          const d2 = typeof o.details === "string" ? JSON.parse(o.details) : o.details;
-          return (d2?.target ?? "company") === "company";
-        }),
+        einCompanyOrdered: await companyEinOrdered(session.clientId, svcCompanyId),
         orders: orders.map((o) => {
           if (o.type !== "s-election") return o;
           const d2 = typeof o.details === "string" ? JSON.parse(o.details) : o.details;
@@ -108504,7 +108530,7 @@ function registerPortalRoutes(app2) {
     }
     const prior = typeof so2.details === "string" ? JSON.parse(so2.details) : so2.details;
     if (prior?.documentDeletedAt) return c.json(err("You deleted this document. Contact us if you need a new form.", "DOCUMENT_DELETED"), 400);
-    const editable = so2.status === "awaiting_info" || sElectionWindow(so2.fulfilled_at).open;
+    const editable = so2.status === "awaiting_info" || so2.status === "in_progress" && prior?.einPending === true && !so2.fulfilled_at || sElectionWindow(so2.fulfilled_at).open;
     if (!editable) {
       return c.json(
         err(
@@ -108573,9 +108599,14 @@ function registerPortalRoutes(app2) {
       if (isJoint(sh.joint) && !/^\d{9}$/.test(use2)) {
         return c.json(err(`Enter ${sh.name2 || "the co-owner"}'s Social Security number \u2014 every co-owner of a jointly held interest is a shareholder.`, "INVALID_INPUT"), 400);
       }
+      const numberProblem = ssnProblem(use) || (use2 ? ssnProblem(use2) : "");
+      if (numberProblem) return c.json(err(numberProblem, "INVALID_INPUT"), 400);
       ssns.push(packSsns(use, use2));
     }
     const knownEin = await companyEinFor(so2.client_id, so2.formation_order_id);
+    if (!knownEin && d2.einPending && !await companyEinOrdered(so2.client_id, so2.formation_order_id)) {
+      return c.json(err("Enter your issued EIN. The pending option is available only when you have hired us to obtain this company\u2019s EIN.", "EIN_SERVICE_REQUIRED"), 400);
+    }
     const merged = {
       ein: knownEin ?? (d2.einPending ? "" : d2.ein),
       einPending: knownEin ? false : d2.einPending,
@@ -108605,6 +108636,13 @@ function registerPortalRoutes(app2) {
         };
       })
     };
+    if (!merged.ein) {
+      await db.query(
+        "UPDATE service_orders SET details=$1, ein_secret=$2, status='in_progress' WHERE id=$3",
+        [JSON.stringify(merged), encryptSecret(JSON.stringify(ssns)), so2.id]
+      );
+      return c.json({ data: { ok: true, awaitingEin: true, documentId: null, editableUntil: null } });
+    }
     const built = await postSElectionPackage({ so: { id: so2.id, client_id: so2.client_id, llc_name: so2.llc_name }, merged, ssns, priorDocumentId: prior?.documentId });
     if (!built.ok) {
       return c.json(err("We could not build the package. Our team has been notified.", "GENERATION_FAILED"), 500);
@@ -108801,7 +108839,7 @@ var ACKNOWLEDGMENTS = [
   { field: "accuracyAcknowledged", text: "I certify that the information provided is true and accurate to the best of my knowledge." },
   { field: "addressAccuracyAcknowledgment", text: "I am solely responsible for the accuracy of all addresses I have provided. I understand that state filings, legal notices, and official correspondence will be directed to these addresses exactly as entered, and that MyFloridaSeriesLLC does not verify the accuracy or deliverability of any address. Any address-suggestion or address-checking feature in this form is a convenience only and is not a verification, warranty, or guarantee of any kind." },
   { field: "termsOfServiceAcknowledgment", text: "I agree to all terms and conditions set forth in the Terms of Service, including its binding individual arbitration provision and class action waiver." },
-  { field: "sElectionFilingAcknowledgment", text: "I understand that MyFloridaSeriesLLC prepares Form 2553 but does not file it, that I am responsible for filing it within 2 months and 15 days after my LLC's effective date, and that no refund is provided if I miss that deadline. MyFloridaSeriesLLC does not prepare late-election packages." },
+  { field: "sElectionFilingAcknowledgment", text: "I understand that MyFloridaSeriesLLC prepares Form 2553 but does not file it, that I am responsible for filing it within 2 months and 15 days after my LLC is officially formed with the Florida Division of Corporations, and that no refund is provided if I miss that deadline. MyFloridaSeriesLLC does not prepare late-election packages." },
   { field: "publicRecordAcknowledged", text: "I understand that filed information may become part of the public record." },
   { field: "notLegalAdviceAcknowledged", text: "I understand this service does not provide legal, tax, or accounting advice." }
 ];
@@ -108953,7 +108991,7 @@ function summaryMarkdown(o) {
   out.push(`### Optional documents`);
   out.push(line("Certificate of Status", p2.optionalDocuments?.certificateOfStatus ? "Yes" : "No"));
   out.push(line("Certified Copy", p2.optionalDocuments?.certifiedCopy ? "Yes" : "No"));
-  out.push(line("Federal EIN", p2.optionalDocuments?.ein ? "Yes" : "No"));
+  out.push(line("Federal EIN service", p2.optionalDocuments?.ein ? "Yes" : "No"));
   out.push(line("S election package", p2.optionalDocuments?.sElection ? "Yes" : "No"));
   out.push(`### Certification`);
   const c = p2.certifications;
@@ -112591,6 +112629,10 @@ function registerAdminRoutes(app2) {
       return c.json(err(gate.message, `TIMING_${gate.status.toUpperCase()}`), 400);
     }
     merged.dateIncorporated = body.data.date;
+    if (!merged.ein) {
+      await db.query("UPDATE service_orders SET details=$1 WHERE id=$2", [JSON.stringify(merged), so2.id]);
+      return c.json({ data: { ok: true, awaitingEin: true, documentId: null } });
+    }
     const built = await postSElectionPackage({ so: { id: so2.id, client_id: so2.client_id, llc_name: so2.llc_name }, merged, ssns, priorDocumentId });
     if (!built.ok) return c.json(err("The package could not be built.", "GENERATION_FAILED"), 500);
     return c.json({ data: { ok: true, documentId: built.documentId, editableUntil: built.editableUntil } });
@@ -112609,6 +112651,7 @@ function registerAdminRoutes(app2) {
       return c.json(err("This order has no S election details yet.", "BAD_STATE"), 400);
     }
     const details = typeof so2.details === "string" ? JSON.parse(so2.details) : so2.details;
+    if (!isValidEin(details.ein ?? "")) return c.json(err("The issued EIN is required before preparing the filing package.", "EIN_REQUIRED"), 400);
     if (!details.dateIncorporated) {
       return c.json(err("Enter the date the Division filed the Articles first \u2014 the form is built from it.", "FORMATION_DATE_REQUIRED"), 400);
     }
@@ -112682,7 +112725,7 @@ function registerAdminRoutes(app2) {
       return c.json(err("Attach the EIN confirmation letter (CP 575) to fulfill an EIN order.", "LETTER_REQUIRED"), 400);
     }
     if (so2.type === "ein" && !isValidEin(assignedEin)) {
-      return c.json(err("Enter the 9-digit EIN from the letter \u2014 it goes on the client's Form 2553.", "EIN_REQUIRED"), 400);
+      return c.json(err("Enter the 9-digit EIN from the IRS confirmation letter.", "EIN_REQUIRED"), 400);
     }
     if (so2.type === "s-election" && !file) {
       return c.json(err("Attach the election package PDF to fulfill an S election order.", "PACKAGE_REQUIRED"), 400);
@@ -112750,7 +112793,7 @@ function registerAdminRoutes(app2) {
     const db = await getDb();
     const rows = await db.query(
       `SELECT id, client_id, llc_name, status, details, ein_secret FROM service_orders
-      WHERE client_id = $1 AND type = 's-election' AND status <> 'pending_payment'
+      WHERE client_id = $1 AND type = 's-election' AND status NOT IN ('pending_payment','cancelled')
         AND formation_order_id::text = $2::text`,
       [args.clientId, args.companyOrderId]
     );

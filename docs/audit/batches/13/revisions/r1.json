@@ -1,0 +1,312 @@
+{
+  "id": "13",
+  "revision": 1,
+  "title": "EIN applications and S-election packages",
+  "model": "Codex",
+  "base": "80277f5dffd5c765a8ca8c81b6c93679a8252a83",
+  "items": [
+    {
+      "id": "63",
+      "part": "all",
+      "scope": "formation deadline wording",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch13 formation deadline wording"
+        }
+      ]
+    },
+    {
+      "id": "152",
+      "part": "all",
+      "scope": "formation deadline wording",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch13 formation deadline wording"
+        }
+      ]
+    },
+    {
+      "id": "153",
+      "part": "all",
+      "scope": "formation deadline wording",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch13 formation deadline wording"
+        }
+      ]
+    },
+    {
+      "id": "202",
+      "part": "all",
+      "scope": "formation deadline wording",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch13 formation deadline wording"
+        }
+      ]
+    },
+    {
+      "id": "87",
+      "part": "all",
+      "scope": "fax or mail consistently",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch13 fax or mail consistently"
+        }
+      ]
+    },
+    {
+      "id": "133",
+      "part": "all",
+      "scope": "fax or mail consistently",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch13 fax or mail consistently"
+        }
+      ]
+    },
+    {
+      "id": "203",
+      "part": "all",
+      "scope": "fax or mail consistently",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch13 fax or mail consistently"
+        }
+      ]
+    },
+    {
+      "id": "140",
+      "part": "all",
+      "scope": "existing LLC can submit EIN details",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch13 existing LLC can submit EIN details"
+        }
+      ]
+    },
+    {
+      "id": "150",
+      "part": "all",
+      "scope": "pending EIN requires our paid company service",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch13 pending EIN requires our paid company service"
+        }
+      ]
+    },
+    {
+      "id": "151",
+      "part": "all",
+      "scope": "package location and pending status",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch13 package location and pending status"
+        }
+      ]
+    },
+    {
+      "id": "178",
+      "part": "ein-hint-2553",
+      "scope": "office EIN hint matches applicable package",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch13 office EIN hint matches applicable package"
+        }
+      ]
+    },
+    {
+      "id": "211",
+      "part": "all",
+      "scope": "office EIN hint matches applicable package",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch13 office EIN hint matches applicable package"
+        }
+      ]
+    },
+    {
+      "id": "N1.16",
+      "part": "all",
+      "scope": "SSN impossible groups rejected",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch13 SSN impossible groups rejected"
+        }
+      ]
+    },
+    {
+      "id": "N2.16",
+      "part": "all",
+      "scope": "record copy deadline neutral tense",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch13 record copy deadline neutral tense"
+        }
+      ]
+    },
+    {
+      "id": "N2.17",
+      "part": "all",
+      "scope": "issued EIN required for filing package",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch13 issued EIN required for filing package"
+        }
+      ]
+    },
+    {
+      "id": "266",
+      "part": "all",
+      "scope": "office EIN labels agree",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch13 office EIN labels agree"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "webapp/src/lib/form2553Timing.ts",
+      "mode": "code",
+      "why": "Approved Batch 13 EIN eligibility, issued-number workflow, timing wording, SSN checks and associated regression coverage."
+    },
+    {
+      "path": "webapp/src/lib/ssn.ts",
+      "mode": "code",
+      "why": "Approved Batch 13 EIN eligibility, issued-number workflow, timing wording, SSN checks and associated regression coverage."
+    },
+    {
+      "path": "webapp/src/pages/portal/SElectionDetailsForm.tsx",
+      "mode": "code",
+      "why": "Approved Batch 13 EIN eligibility, issued-number workflow, timing wording, SSN checks and associated regression coverage."
+    },
+    {
+      "path": "webapp/src/pages/portal/OrdersInProgress.tsx",
+      "mode": "code",
+      "why": "Approved Batch 13 EIN eligibility, issued-number workflow, timing wording, SSN checks and associated regression coverage."
+    },
+    {
+      "path": "webapp/src/pages/portal/ServicesCard.tsx",
+      "mode": "code",
+      "why": "Approved Batch 13 EIN eligibility, issued-number workflow, timing wording, SSN checks and associated regression coverage."
+    },
+    {
+      "path": "webapp/src/pages/admin/ServiceOrdersSection.tsx",
+      "mode": "code",
+      "why": "Approved Batch 13 EIN eligibility, issued-number workflow, timing wording, SSN checks and associated regression coverage."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepOptionalDocs.tsx",
+      "mode": "code",
+      "why": "Approved Batch 13 EIN eligibility, issued-number workflow, timing wording, SSN checks and associated regression coverage."
+    },
+    {
+      "path": "webapp/server/routes-portal.ts",
+      "mode": "code",
+      "why": "Approved Batch 13 EIN eligibility, issued-number workflow, timing wording, SSN checks and associated regression coverage."
+    },
+    {
+      "path": "webapp/server/routes-admin.ts",
+      "mode": "code",
+      "why": "Approved Batch 13 EIN eligibility, issued-number workflow, timing wording, SSN checks and associated regression coverage."
+    },
+    {
+      "path": "webapp/server/s-election.ts",
+      "mode": "code",
+      "why": "Approved Batch 13 EIN eligibility, issued-number workflow, timing wording, SSN checks and associated regression coverage."
+    },
+    {
+      "path": "webapp/server/email.ts",
+      "mode": "code",
+      "why": "Approved Batch 13 EIN eligibility, issued-number workflow, timing wording, SSN checks and associated regression coverage."
+    },
+    {
+      "path": "webapp/server/order-summary.ts",
+      "mode": "code",
+      "why": "Approved Batch 13 EIN eligibility, issued-number workflow, timing wording, SSN checks and associated regression coverage."
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "why": "Approved Batch 13 EIN eligibility, issued-number workflow, timing wording, SSN checks and associated regression coverage."
+    },
+    {
+      "path": "webapp/scripts/behavioral.ts",
+      "mode": "code",
+      "why": "Approved Batch 13 EIN eligibility, issued-number workflow, timing wording, SSN checks and associated regression coverage.",
+      "control": true
+    },
+    {
+      "path": "webapp/server/e2e.ts",
+      "mode": "code",
+      "why": "Approved Batch 13 EIN eligibility, issued-number workflow, timing wording, SSN checks and associated regression coverage.",
+      "control": true
+    },
+    {
+      "path": "webapp/scripts/batch13-walk.ts",
+      "mode": "new",
+      "why": "Approved Batch 13 EIN eligibility, issued-number workflow, timing wording, SSN checks and associated regression coverage.",
+      "control": true
+    },
+    {
+      "path": "webapp/src/lib/form2553Timing.test.ts",
+      "mode": "code",
+      "why": "Approved Batch 13 EIN eligibility, issued-number workflow, timing wording, SSN checks and associated regression coverage.",
+      "control": true
+    },
+    {
+      "path": "webapp/package.json",
+      "mode": "code",
+      "why": "Approved Batch 13 EIN eligibility, issued-number workflow, timing wording, SSN checks and associated regression coverage.",
+      "control": true
+    },
+    {
+      "path": "docs/facts.md",
+      "mode": "code",
+      "control": true,
+      "why": "Record owner-approved EIN and first-year deadline policies."
+    }
+  ],
+  "requiredChecks": [],
+  "testSupport": [
+    "webapp/scripts/batch13-walk.ts"
+  ],
+  "removedChecks": [
+    "an S election builds as Applied For before the EIN exists",
+    "the rebuilt package replaced the Applied For one"
+  ]
+}

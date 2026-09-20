@@ -381,7 +381,7 @@ export function sElectionReadyEmail(opts: {
     html: wrap(`
       <p>Your S corporation election package for <strong>${escapeHtml(opts.llcName)}</strong> is
       ready to download in your portal: the completed IRS Form 2553, a cover letter, and
-      step-by-step instructions for signing and mailing it to the IRS.</p>
+      step-by-step instructions for signing it and faxing or mailing it to the IRS.</p>
       <p>You can correct your answers and regenerate the package until
       <strong>${escapeHtml(opts.editableUntil)}</strong>. After that, editing closes and the full numbers are removed from the questionnaire records.
       Your completed document stays encrypted in your portal until you choose to delete it.
@@ -467,8 +467,7 @@ export function llcFormedEmail(opts: {
       <p>The next step is to create your operating agreement. You can do that
       in your personal portal (<a href="${opts.portalUrl}">Click here to open</a>).</p>
       ${svc}
-      ${sElectionStatus ? `<p>IRS Form 2553 must be filed within 2 months and 15 days of the date on your filed
-      Articles.${sElectionStatus === "awaiting_info" ? " Please complete the form soon." : ""}</p>` : ""}
+      ${sElectionStatus ? `<p>IRS Form 2553 must be filed within 2 months and 15 days after your LLC is officially formed with the Florida Division of Corporations.${sElectionStatus === "awaiting_info" ? " Please complete the form soon." : ""}</p>` : ""}
       <p>Thank you for doing business with MyFloridaSeriesLLC!</p>
       <p>support@myfloridaseriesllc.com</p>
     `),
@@ -492,9 +491,8 @@ export function sElectionEinAddedEmail(opts: { llcName: string; einDisplay: stri
     html: wrap(`
       <p>The IRS has issued the EIN for <strong>${escapeHtml(opts.llcName)}</strong>:
       <strong>${escapeHtml(opts.einDisplay)}</strong>. The confirmation letter is in your portal.</p>
-      <p>Your S corporation election package has been rebuilt so that Form 2553 now carries the
-      EIN in item A instead of "Applied For." <strong>Download the new copy before signing and
-      mailing</strong> — an earlier copy marked "Applied For" should not be filed now that the
+      <p>Your S corporation election package is ready with the issued EIN in item A. <strong>Download the new copy before signing and
+      faxing or mailing</strong> — use this updated copy now that the
       number exists.</p>
       <p><a href="${opts.portalUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Open your portal</a></p>
     `),
@@ -509,10 +507,9 @@ export function sElectionEinArrivedLateEmail(opts: { llcName: string; einDisplay
     html: wrap(`
       <p>The IRS has issued the EIN for <strong>${escapeHtml(opts.llcName)}</strong>:
       <strong>${escapeHtml(opts.einDisplay)}</strong>. The confirmation letter is in your portal.</p>
-      <p>Your S corporation election package was built with "Applied For" in item A, and its
-      two-week editing window has closed, so we no longer hold the details needed to rebuild it.
+      <p>Your S corporation election package’s two-week editing window has closed, so we no longer hold the questionnaire details needed to rebuild it.
       If you have not yet filed Form 2553, write the EIN in item A by hand on your filing copy
-      before signing and mailing, or contact us at
+      before signing and faxing or mailing, or contact us at
       <a href="mailto:${escapeHtml(opts.supportEmail)}">${escapeHtml(opts.supportEmail)}</a>.</p>
       <p><a href="${opts.portalUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Open your portal</a></p>
     `),

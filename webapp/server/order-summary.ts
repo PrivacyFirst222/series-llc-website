@@ -42,7 +42,7 @@ export const ACKNOWLEDGMENTS: { field: string; text: string | ((p: SubmissionPay
   { field: "accuracyAcknowledged", text: "I certify that the information provided is true and accurate to the best of my knowledge." },
   { field: "addressAccuracyAcknowledgment", text: "I am solely responsible for the accuracy of all addresses I have provided. I understand that state filings, legal notices, and official correspondence will be directed to these addresses exactly as entered, and that MyFloridaSeriesLLC does not verify the accuracy or deliverability of any address. Any address-suggestion or address-checking feature in this form is a convenience only and is not a verification, warranty, or guarantee of any kind." },
   { field: "termsOfServiceAcknowledgment", text: "I agree to all terms and conditions set forth in the Terms of Service, including its binding individual arbitration provision and class action waiver." },
-  { field: "sElectionFilingAcknowledgment", text: "I understand that MyFloridaSeriesLLC prepares Form 2553 but does not file it, that I am responsible for filing it within 2 months and 15 days after my LLC's effective date, and that no refund is provided if I miss that deadline. MyFloridaSeriesLLC does not prepare late-election packages." },
+  { field: "sElectionFilingAcknowledgment", text: "I understand that MyFloridaSeriesLLC prepares Form 2553 but does not file it, that I am responsible for filing it within 2 months and 15 days after my LLC is officially formed with the Florida Division of Corporations, and that no refund is provided if I miss that deadline. MyFloridaSeriesLLC does not prepare late-election packages." },
   { field: "publicRecordAcknowledged", text: "I understand that filed information may become part of the public record." },
   { field: "notLegalAdviceAcknowledged", text: "I understand this service does not provide legal, tax, or accounting advice." },
 ];
@@ -227,7 +227,7 @@ export function summaryMarkdown(o: SummaryOrderRow): string {
   out.push(`### Optional documents`);
   out.push(line("Certificate of Status", p.optionalDocuments?.certificateOfStatus ? "Yes" : "No"));
   out.push(line("Certified Copy", p.optionalDocuments?.certifiedCopy ? "Yes" : "No"));
-  out.push(line("Federal EIN", p.optionalDocuments?.ein ? "Yes" : "No"));
+  out.push(line("Federal EIN service", p.optionalDocuments?.ein ? "Yes" : "No"));
   out.push(line("S election package", p.optionalDocuments?.sElection ? "Yes" : "No"));
   out.push(`### Certification`);
   const c = p.certifications;

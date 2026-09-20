@@ -194,6 +194,8 @@ function ServiceFulfillDialogContent({viewing, onClose}: {
                 ? "The client built this package from their own details and has it in their portal. The SSNs below are deleted two weeks after the build. If their Articles show a different filing date, correct it below and the package is rebuilt."
               : isCertificate
                 ? `Attach the ${viewing?.type === "certificate-of-status" ? "Certificate of Status" : "Certified Copy of the Articles"} from the Division and mark fulfilled; it is posted to the client's documents.`
+              : viewing?.type === "s-election" && viewing.details.einPending
+                ? "The client’s answers are saved securely. Complete this company’s EIN order with the issued number to generate the S-election filing package."
               : viewing?.type === "s-election"
                 ? "Download the draft package, review the filled Form 2553, and attach the final PDF to fulfill. The SSNs below are permanently deleted when you mark the order fulfilled."
                 : "Upload the filed Protected Series Designation here, then mark the order fulfilled."}
@@ -282,7 +284,7 @@ function ServiceFulfillDialogContent({viewing, onClose}: {
                     </div>
                   </div>
                 ))}
-                {viewing.has_secret && detailQuery.data?.details.dateIncorporated ? (
+                {viewing.has_secret && detailQuery.data?.details.dateIncorporated && detailQuery.data?.details.ein ? (
                   <a
                     href={`/api/admin/services/${viewing.id}/s-election-draft`}
                     className="inline-block rounded-full border border-border px-4 py-1.5 text-sm font-medium hover:border-accent"
@@ -423,8 +425,8 @@ function ServiceFulfillDialogContent({viewing, onClose}: {
                 autoComplete="off"
               />
               <p className="text-xs text-muted-foreground">
-                From the letter. It goes on the client's Form 2553: any S election package built
-                as "Applied For" is rebuilt with it and the client is emailed.
+                Enter the 9-digit EIN from the IRS confirmation letter.
+                {viewing.details.target !== "series" && detailQuery.data?.sElectionPaid ? " If this company’s S-election answers are on file and its editing window is open, we use this EIN to prepare its package and email the client." : ""}
                 {assignedEin && !einOk ? <span className="text-destructive"> Enter the 9-digit EIN from the letter.</span> : null}
               </p>
             </div>

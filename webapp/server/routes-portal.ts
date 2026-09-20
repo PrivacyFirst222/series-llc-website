@@ -9,6 +9,7 @@ import { contributorUnits, CONTRIBUTOR_REVIEW } from "../src/lib/oaContributors"
 // mutable across modules). Routes register inside registerPortalRoutes(app),
 // which app.ts calls after creating the app — no circular imports.
 import { computeCapital } from "./oa-capital";
+import { ssnProblem } from "../src/lib/ssn";
 import { Hono } from "hono";
 import { z } from "zod";
 
@@ -411,11 +412,11 @@ export async function clientLlcFormed(clientId: string, orderId?: string | null)
   // second, not-yet-formed LLC is not formed because the first one is.
   const rows = orderId
     ? await db.query<{ ok: number }>(
-        "SELECT 1 AS ok FROM orders WHERE client_id = $1 AND id = $2 AND formed_at IS NOT NULL LIMIT 1",
+        "SELECT 1 AS ok FROM orders WHERE client_id = $1 AND id = $2 AND (formed_at IS NOT NULL OR (paid_at IS NOT NULL AND payload->>'filingPath' = 'CONVERT')) LIMIT 1",
         [clientId, orderId],
       )
     : await db.query<{ ok: number }>(
-        "SELECT 1 AS ok FROM orders WHERE client_id = $1 AND formed_at IS NOT NULL LIMIT 1",
+        "SELECT 1 AS ok FROM orders WHERE client_id = $1 AND (formed_at IS NOT NULL OR (paid_at IS NOT NULL AND payload->>'filingPath' = 'CONVERT')) LIMIT 1",
         [clientId],
       );
   return rows.length > 0;
@@ -661,6 +662,16 @@ export async function companyEinFor(clientId: string, companyOrderId: string | n
   return null;
 }
 
+/** A paid, uncancelled COMPANY EIN service is required for the pending option. */
+export async function companyEinOrdered(clientId: string, companyOrderId: string | null): Promise<boolean> {
+  if (!companyOrderId) return false;
+  const db = await getDb();
+  const rows = await db.query(`SELECT id FROM service_orders WHERE client_id=$1 AND formation_order_id=$2
+    AND type='ein' AND paid_at IS NOT NULL AND status NOT IN ('pending_payment','cancelled')
+    AND COALESCE(details->>'target','company')='company' LIMIT 1`, [clientId, companyOrderId]);
+  return rows.length > 0;
+}
+
 export const sElectionDetailsSchema = z
   .object({
     ein: z
@@ -709,7 +720,7 @@ export const sElectionDetailsSchema = z
             .string()
             .transform((s) => s.replace(/[\s-]/g, ""))
             .refine((s) => s === "" || /^\d{9}$/.test(s), "Each owner's SSN must be 9 digits.")
-            .refine((s) => s === "" || !(/^(000|666|9\d\d)/.test(s)), "That is not a valid Social Security number — check the first three digits."),
+            .superRefine((s, ctx) => { const problem = ssnProblem(s); if (problem) ctx.addIssue({ code: z.ZodIssueCode.custom, message: problem }); }),
           // A jointly held interest (Adam, 6 Sep 2026): the co-owner's name
           // and Social Security number ride on the same row.
           joint: z.enum(["", "tbe", "jtwros"]).optional().default(""),
@@ -723,7 +734,7 @@ export const sElectionDetailsSchema = z
             .default("")
             .transform((s) => s.replace(/[\s-]/g, ""))
             .refine((s) => s === "" || /^\d{9}$/.test(s), "Each co-owner's SSN must be 9 digits.")
-            .refine((s) => s === "" || !(/^(000|666|9\d\d)/.test(s)), "That is not a valid Social Security number — check the first three digits."),
+            .superRefine((s, ctx) => { const problem = ssnProblem(s); if (problem) ctx.addIssue({ code: z.ZodIssueCode.custom, message: problem }); }),
         }).refine((sh) => !isJoint(sh.joint) || sh.name2.trim() !== "", { message: "Enter the co-owner's name on each jointly held row." })
           .refine((sh) => !isJoint(sh.joint) || hasFirstAndLast(sh.name2), { message: `Co-owner: ${FIRST_AND_LAST}` }),
       )
@@ -1891,11 +1902,7 @@ app.get("/portal/services", async (c) => {
       // The EIN we obtained, if we have: the S election form shows it
       // read-only instead of asking (Adam, 7 Sep 2026).
       companyEin: await companyEinFor(session.clientId, svcCompanyId),
-      einCompanyOrdered: orders.some((o) => {
-        if (o.type !== "ein" || o.status === "pending_payment") return false;
-        const d = (typeof o.details === "string" ? JSON.parse(o.details) : o.details) as { target?: string } | null;
-        return (d?.target ?? "company") === "company";
-      }),
+      einCompanyOrdered: await companyEinOrdered(session.clientId, svcCompanyId),
       orders: orders.map((o) => {
         if (o.type !== "s-election") return o;
         const d = (typeof o.details === "string" ? JSON.parse(o.details) : o.details) as SElectionStoredDetails;
@@ -2276,7 +2283,7 @@ app.post("/portal/services/:id/s-election-details", async (c) => {
   }
   const prior = (typeof so.details === "string" ? JSON.parse(so.details) : so.details) as SElectionStoredDetails;
   if (prior?.documentDeletedAt) return c.json(err("You deleted this document. Contact us if you need a new form.", "DOCUMENT_DELETED"), 400);
-  const editable = so.status === "awaiting_info" || sElectionWindow(so.fulfilled_at).open;
+  const editable = so.status === "awaiting_info" || (so.status === "in_progress" && prior?.einPending === true && !so.fulfilled_at) || sElectionWindow(so.fulfilled_at).open;
   if (!editable) {
     return c.json(
       err(
@@ -2366,17 +2373,21 @@ app.post("/portal/services/:id/s-election-details", async (c) => {
     if (isJoint(sh.joint) && !/^\d{9}$/.test(use2)) {
       return c.json(err(`Enter ${sh.name2 || "the co-owner"}'s Social Security number — every co-owner of a jointly held interest is a shareholder.`, "INVALID_INPUT"), 400);
     }
+    const numberProblem = ssnProblem(use) || (use2 ? ssnProblem(use2) : "");
+    if (numberProblem) return c.json(err(numberProblem, "INVALID_INPUT"), 400);
     ssns.push(packSsns(use, use2));
   }
 
   // SSNs live only in the encrypted secret; the visible record keeps the last
   // four digits so a row is identifiable without exposing the number.
-  // "You're obtaining our EIN" wins over a typed number, on our side as in
-  // the form (which clears the box when it is ticked): the IRS form then
-  // says "Applied For" (Adam's item 6, 6 Sep 2026).
+  // Selecting our EIN service clears a typed number; answers wait securely
+  // until the office supplies the issued EIN (Adam, Batch 13).
   // The number from the CP 575 we uploaded outranks anything typed: it is
   // the one the IRS issued (Adam, 7 Sep 2026).
   const knownEin = await companyEinFor(so.client_id, so.formation_order_id);
+  if (!knownEin && d.einPending && !(await companyEinOrdered(so.client_id, so.formation_order_id))) {
+    return c.json(err("Enter your issued EIN. The pending option is available only when you have hired us to obtain this company’s EIN.", "EIN_SERVICE_REQUIRED"), 400);
+  }
   const merged: SElectionStoredDetails = {
     ein: knownEin ?? (d.einPending ? "" : d.ein),
     einPending: knownEin ? false : d.einPending,
@@ -2407,9 +2418,13 @@ app.post("/portal/services/:id/s-election-details", async (c) => {
     }),
   };
 
-  // The formation date is required by the form above, so the package is
-  // always built here (15 Sep 2026: a branch that waited for the office to
-  // enter it could no longer run).
+  // Adam, Batch 13: collect answers while we obtain the EIN, but publish no
+  // filing PDF without the issued number. The edit clock starts at fulfillment.
+  if (!merged.ein) {
+    await db.query("UPDATE service_orders SET details=$1, ein_secret=$2, status='in_progress' WHERE id=$3",
+      [JSON.stringify(merged), encryptSecret(JSON.stringify(ssns)), so.id]);
+    return c.json({ data: { ok: true, awaitingEin: true, documentId: null, editableUntil: null } });
+  }
   const built = await postSElectionPackage({ so: { id: so.id, client_id: so.client_id, llc_name: so.llc_name }, merged, ssns, priorDocumentId: prior?.documentId });
   if (!built.ok) {
     return c.json(err("We could not build the package. Our team has been notified.", "GENERATION_FAILED"), 500);

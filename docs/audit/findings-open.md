@@ -387,11 +387,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
 - **62. [A21]** — **implemented**
   - Agent acceptance signature has no match-the-name rule (the Articles signature does). Replace: same rule.
   - Fixed: batch 06 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **63. [A22]** — **open** — waits on Adam's ruling
+- **63. [A22]** — **implemented** — waits on Adam's ruling
   - S election deadline described three ways. Replace all: "within 2 months and 15 days after your LLC's effective date (the date on your filed Articles, unless you chose a later effective date)".
   - Codex (disputed): StepOptionalDocs.tsx:69 says “2 months and 15 days from formation”; form2553Timing.ts:101–103 says effective date. IRS Form2553 Instructions, Item E, ties the deadline to the election effective tax-year date, using the earliest owners/assets/business date for a first tax year, not universally the Articles effective date. https://www.irs.gov/instructions/i2553
   - **Codex rejected the proposed replacement:** Use the Form2553 Item E effective date and its first-tax-year rule, with applicable deadline extensions/late-election exclusions. Do not universalize the Articles date.
   - Outcome: Codex's dispute not adopted: Codex's dispute is not adopted as written, and the wording is left to ADAM'S DECISION; it is not recorded as settled law. IRS Form 2553 instructions, item E: the deadline runs '2 months and 15 days after the date entered for item E', and for a first tax year that is the earliest of the day the entity 'first had shareholders (owners)', first had assets, or began doing business. Claude's reading is that a new LLC first has owners the day its Articles take effect, which matches A22's wording; Codex's review did not establish that every path the product supports satisfies that assumption.
+  - Ruling, 2026-09-20: Batch 13 approved: state the Form 2553 deadline as within 2 months and 15 days after the LLC is officially formed with the Florida Division of Corporations; use a later effective date stated in the Articles rather than the earlier filing date.
+  - Fixed: batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **64. [A25]** — **implemented**
   - Order confirmed: "Sign in to your portal" button for a first-time client; resend answers "already has a password" for a filed or formed order. Replace: button only for a returning client; treat filed/formed as paid.
   - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
@@ -561,12 +563,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: Either say on the Eligibility step that every person's address must be in the United States, or let the State box accept a province/region when the country is not the United States. Ruling needed.
   - **Codex rejected the proposed replacement:** Provide province/region and country-sensitive postal fields. Declaring a US-only restriction is a business decision, not an equivalent automatic repair, and supported US territories also need consideration.
   - Ruling, 2026-09-19: Batch 08 item 9: “If this is an easy fix, make it. Otherwise skip it. We will have very few foreign customers”. No blanket authorization for a broader foreign-address implementation.
-- **87. [B49]** — **open** — same defect as 133
+- **87. [B49]** — **implemented** — same defect as 133
   - Optional docs step, the S corporation election item — `webapp/src/components/forms/florida-llc/sections/StepOptionalDocs.tsx:68`
   - Reads: You review, sign, and mail it; there is no IRS filing fee.
   - Claims: The form is mailed.
   - True: The package's own deadline text says "Your Form 2553 must be filed (postmarked or faxed) by …" (form2553Timing.ts:95-96); A65 records the same mail/fax mismatch in the portal dialog.
   - Replace with: You review, sign, and fax or mail it; there is no IRS filing fee.
+  - Fixed: batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **88. [B50]** — **dropped**
   - Series step, "How ownership works in this structure" — `webapp/src/components/forms/florida-llc/sections/StepSeries.tsx:98`
   - Reads: No series has its own separate owners, and ownership cannot differ from one series to the next.
@@ -898,6 +901,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Fixed: batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **122. [A54]** — **open**
   - Formed-first dialog S election branch: "…and that has been assigned an EIN." The form accepts Applied For. Replace: drop the clause.
+  - Ruling, 2026-09-20: Batch 13 item 2 rejected: leave the issued-EIN prerequisite as is. Our Form 2553 filing package requires an issued EIN.
 - **123. [A55]** — **implemented**
   - EIN details dialog: "…application for Federal EIN — Acme, LLC." Replace: the company or series name.
   - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
@@ -925,8 +929,9 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Amendment card names "Update/regenerate" under "Operating Agreement"; the button and heading read differently. Replace the button and heading.
 - **132. [A64]** — **open**
   - Two refusals cite "§605.2202" and "s. 605.2202, Fla. Stat.". Replace: the second.
-- **133. [A65]** — **open**
+- **133. [A65]** — **implemented**
   - S election dialog "mail it" where the package recommends fax. Replace: "fax or mail it".
+  - Fixed: batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **134. [A66]** — **implemented**
   - Help "Effective Date": "We've pre-filled today's date" true only the first time. Replace: say the saved date is kept.
   - Fixed: batch 01 revision 1, commit , by Codex; protected by 1 assertion(s).
@@ -970,13 +975,15 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: The sole owner may be a company or trust — the Owner card offers "This owner is a company or trust" (OaOwnersSections.tsx:134-144) and the single-member forms sign through an entity's signer — and then the company is reported on that owner's return, not the reader's personal one.
   - Replace with: Your agreement uses our standard form — with one owner, the company is disregarded for income tax and reported on its owner's own return; with multiple owners, it is taxed as a partnership.
   - **Codex rejected the proposed replacement:** Qualify default treatment and entity ownership: “Without a corporate tax election, a one-owner LLC is generally disregarded for federal income tax purposes and a multiple-owner LLC is generally taxed as a partnership. An entity owner’s reporting depends on its own tax treatment.” Selecting No to S status does not rule out C-corporation treatment.
-- **140. [B65]** — **open**
+- **140. [B65]** — **implemented**
   - Client portal, Orders in progress, the "formed first" dialog, for a converting client — `webapp/src/pages/portal/OrdersInProgress.tsx:399`
   - Reads: Your LLC must be formed first. … An EIN can be obtained only for a company that exists. The IRS application is built on your filed Articles of Organization. We're preparing your filing now. You'll get an email when your LLC is formed.
   - Claims: The client's LLC does not yet exist and Articles are being filed.
   - True: The gate opens whenever llcFormed is false (:232-235), and routes-portal.ts:394-404 sets llcFormed only from formed_at, which a conversion receives when its designations are filed (email.ts:475 sends "protected series established" then). A converting client whose company has existed for years, with a portal EIN order waiting, reads that their LLC is not formed and that Articles are being prepared. The services response carries no isConversion flag for this dialog to branch on.
   - Replace with: Add isConversion to /api/portal/services and, when it is true: title "Your protected series must be filed first." and "We're filing your Protected Series Designations now. You'll get an email when they are established, and you'll be able to complete the EIN application then."
   - **Codex rejected the proposed replacement:** Branch on conversion and explain this service’s gate, not a legal prerequisite: “We are filing your Protected Series Designations. Our EIN-details form opens after those filings are completed.” An existing LLC need not legally wait for a new series to obtain its own EIN.
+  - Ruling, 2026-09-20: Batch 13 item 4: let the client complete the EIN application questionnaire if the LLC is already formed, without waiting for protected-series filings.
+  - Fixed: batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **141. [B66]** — **implemented**
   - Client portal, questionnaire, Owners card, the note under the heading (manager-managed companies) — `webapp/src/pages/portal/OaOwnersSections.tsx:99`
   - Reads: They start from what you gave us when the company was formed — change them if ownership has changed since.
@@ -1052,13 +1059,15 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: Access your filed documents and anything we have received for you as registered agent.
   - Fixed: batch 09 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-19 rejected r1: Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision.
-- **150. [B83]** — **open**
+- **150. [B83]** — **implemented**
   - Client portal, S election details form, the EIN box and its 'Still needed' item — `webapp/src/pages/portal/SElectionDetailsForm.tsx:316`
   - Reads: You're obtaining our EIN — use it when issued
   - Claims: (A tick label written in the client's voice, addressed to us.)
   - True: Every other label on the form is in our voice to the client ('Enter the date the Division filed your Articles', 'Choose who signs…'), and the matching 'Still needed' item at :217 flips the pronouns — 'Enter the 9-digit EIN, or tick that you're obtaining ours' — which, read in our voice, says the client is obtaining our EIN. One fact, two voices.
   - Replace with: :316 'We're obtaining your EIN — we'll use it when it is issued'; :217 'Enter the 9-digit EIN, or tick that we're obtaining it for you'.
-- **151. [B84]** — **optional — open**
+  - Ruling, 2026-09-20: Batch 13 item 5: the obtaining-EIN checkbox is available only when the client hired us to obtain that company EIN; otherwise require the issued number.
+  - Fixed: batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **151. [B84]** — **optional — implemented**
   - Client portal, S election details form, the footer beside the build button — `webapp/src/pages/portal/SElectionDetailsForm.tsx:690`
   - Reads: We build your package immediately — you'll be able to download it here.
   - Claims: The download is in this dialog.
@@ -1066,7 +1075,8 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: We build your package immediately — it appears in Your documents, ready to download.
   - Codex (disputed): Actual SElectionDetailsForm.tsx:690 says the package can be downloaded “here”; onDone closes the dialog and the package is downloadable in the same portal. “Here” does not expressly mean within this dialog, so the claimed false location is an inference.
   - Outcome: 'Here' is loose, not false; the package is downloadable in the same portal.
-- **152. [B85]** — **open** — same defect as 63
+  - Fixed: batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **152. [B85]** — **implemented** — same defect as 63
   - Client portal, S election details form, help under 'Date the Division filed your Articles' — `webapp/src/pages/portal/SElectionDetailsForm.tsx:283`
   - Reads: It's on your Articles of Organization, in your documents above. Your Form 2553 deadline runs from this date.
   - Claims: The deadline runs from the Articles' filing date.
@@ -1075,7 +1085,8 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (disputed): The filing-date sentence is overbroad, but the proposed replacement endorses any later entered date as the controlling election date. IRS Form2553 Item E says a first-year election begins at the earliest owner/asset/business date; the UI’s permissive timing calculator does not make every later selected date legally valid.
   - **Codex rejected the proposed replacement:** Say the deadline runs from the proper election effective date and explain the IRS first-year rule. Do not tell users an arbitrary later date moves a first-year deadline. Verified https://www.irs.gov/instructions/i2553 .
   - Outcome: Codex's dispute not adopted: Same as 63; waits on Adam's decision there.
-- **153. [B86]** — **open** — same defect as 63
+  - Fixed: batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **153. [B86]** — **implemented** — same defect as 63
   - Client portal, Order services, the S Corporation Election Package dialog — `webapp/src/pages/portal/ServicesCard.tsx:411`
   - Reads: The IRS deadline is strict — 2 months and 15 days from the start of the company's first tax year — which is why this package is only available until {date}. Choose this only if your tax professional recommends the election.
   - Claims: States the Form 2553 deadline rule.
@@ -1084,6 +1095,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (disputed): Actual ServicesCard.tsx:411 refers to the start of the first tax year, matching IRS Form2553 Item E. The proposed replacement equates that with an LLC effective date and optional later selected date; the IRS instead specifies earliest shareholders, assets or business activity for a first-year election.
   - **Codex rejected the proposed replacement:** Retain the first-tax-year distinction, clarify that the65-day ordering window is the service’s separate cutoff, and use the actual legally applicable election date for the IRS deadline. https://www.irs.gov/instructions/i2553 .
   - Outcome: Codex's dispute not adopted: Same as 63. 'The start of the company's first tax year' is the IRS's own phrase; A22 chose one wording for every place. Waits on Adam's decision on 63.
+  - Fixed: batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **154. [B87]** — **open** — same defect as 237
   - Client portal, Order services, the Federal EIN dialog, third paragraph — `webapp/src/pages/portal/ServicesCard.tsx:182`
   - Reads: Questions about the technicalities? Check the User's Manual and ask your attorney or accountant.
@@ -1255,12 +1267,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: The previous document row and file are deleted at:867–868 before putFile at:872–876 and the replacement insert at:880–884. If storage or insertion fails, the original is already gone and the stored documentId still names it. This can occur during the promised14-day edit window.
   - Replace with: Upload and insert the new package first, atomically update the service order's documentId/details, then retire the old document. On failure remove only the staged replacement and retain the existing filing copy.
   - Fixed: batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **N1.16. [substantive]** — **open**
+- **N1.16. [substantive]** — **implemented**
   - Client portal, S-election shareholder Social Security number validation — `webapp/src/lib/ssn.ts:28`
   - Reads: return ssnTypingProblem(value) || (d.length !== 9 ? SSN_LENGTH_MESSAGE : "");
   - Claims: A nine-digit SSN with an allowed area number needs no further structural correction.
   - True: ssnTypingProblem at:16–20 checks area and length only; routes-portal.ts:765–783 repeats those rules for both owners. Structurally impossible numbers with middle digits00 or final digits0000 pass, e.g.123-00-1234 and123-45-0000. SSA explicitly states those groups are never assigned: https://www.ssa.gov/employer/randomizationfaqs.html (opened, lines71–73). This concerns syntax checks, not verification that a real number belongs to a person.
   - Replace with: Reject middle digits 00 and final digits 0000 in both the shared client helper and the server schema, in addition to the existing length and area checks. Message: “That is not a valid Social Security number — the middle two digits cannot be 00 and the last four digits cannot be 0000.”
+  - Fixed: batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **N3.01. [substantive]** — **implemented**
   - Client portal → Operating agreement questionnaire → returning to Initial contributions — `webapp/src/pages/portal/OAQuestionnaire.tsx:383`
   - Reads: Your answers save automatically — you can return anytime, and regenerate whenever anything changes.
@@ -1360,10 +1373,11 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
 - **177. [A74]** — **implemented**
   - Articles box shape check only when we signed; server checks whenever typed. Replace: match.
   - Fixed: batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **178. [A75]** — **ein-hint-2553: open; s-election-date-row: implemented; series-uploaded-text: implemented; typed-ein-survives: implemented**
+- **178. [A75]** — **implemented**
   - Fulfil dialog: EIN hint promises an S election rebuild for a series EIN; S election date row "entered by the client" after correction; series text "once … uploaded" though the dialog uploads; a typed EIN survives closing. Replace each.
   - **Codex rejected the proposed replacement:** The item supplies no verbatim replacements. Use company-only rebuild wording; “Articles filing date”; “Upload the filed Designation here”; clear the EIN draft when switching orders or closing. A series EIN must not trigger company-election instructions.
-  - Part "ein-hint-2553" — open: The EIN hint mentions Form 2553 only when a company EIN is being entered AND a matching S election package exists; a series EIN goes on no 2553.
+  - Part "ein-hint-2553" — implemented: The EIN hint mentions Form 2553 only when a company EIN is being entered AND a matching S election package exists; a series EIN goes on no 2553.
+  - Fixed (ein-hint-2553): batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
   - Part "s-election-date-row" — implemented: The S election date row no longer says "entered by the client" after a correction.
   - Fixed (s-election-date-row): batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
   - Part "series-uploaded-text" — implemented: The series text no longer says "once … uploaded" inside the dialog that does the uploading.
@@ -1559,7 +1573,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (duplicate): Same missing automated monthly-proration mechanism and same Terms9(g) promise as item28; this separate email occurrence was not marked same defect as in findings-open.
   - **Codex rejected the proposed replacement:** Neither absence of automation nor this email proves no manual billing can occur. Preserve the contractual monthly rate; the alternative wording can clarify manual administration, while replacing it with an annual fee would change the bargain.
   - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **202. [B102]** — **open** — same defect as 63
+- **202. [B102]** — **implemented** — same defect as 63
   - Formed email, S election paragraph — `webapp/server/email.ts:494`
   - Reads: IRS Form 2553 must be filed within 2 months and 15 days of the date on your filed Articles, so please complete the form soon.
   - Claims: That the deadline runs from the Articles' filing date.
@@ -1568,12 +1582,14 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (disputed): email.ts:494 reads IRS Form2553 must be filed within2 months and15 days of the date on your filed Articles. IRS Instructions for Form2553, When To Make the Election and ItemE, tie the deadline to the tax year/election effective date; the first tax year uses the earliest ownership, assets or business date. Automatically substituting LLC effective date remains an oversimplification.
   - **Codex rejected the proposed replacement:** Use the election effective date determined under IRS ItemE, explain the first-year rule and any applicable weekend/holiday adjustment. Source opened: https://www.irs.gov/instructions/i2553 .
   - Outcome: Codex's dispute not adopted: Same as 63; waits on Adam's decision there.
-- **203. [B103]** — **open** — same defect as 133
+  - Fixed: batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **203. [B103]** — **implemented** — same defect as 133
   - 'Your Form 2553 package is ready' email — `webapp/server/email.ts:404`
   - Reads: ready to download in your portal: the completed IRS Form 2553, a cover letter, and step-by-step instructions for signing and mailing it to the IRS.
   - Claims: That the instructions are for mailing.
   - True: The package's instructions recommend fax: s-election.ts:238 '**Fax (recommended):** ${IRS_FAX}. Keep the fax transmission confirmation…' (the cover letter line at :216 says 'mail it'). Same as A65 in the portal.
   - Replace with: …step-by-step instructions for signing it and faxing or mailing it to the IRS.
+  - Fixed: batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **204. [B104]** — **dropped**
   - Legal mail received email — `webapp/server/email.ts:253`
   - Reads: In Florida a lawsuit typically allows 20 days to respond BUT THIS IS NOT ALWAYS THE CASE. Contact an attorney immediately so they can provide you with proper legal guidance.
@@ -1628,7 +1644,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: A title in the house style.
   - True: One title mixes a hyphen and an em dash; every other document title uses ' — ' alone (:558 Articles, :827 designations, :1336-1343 service deliverables).
   - Replace with: return `${kindTitle} (${day}) — ${llcName}`;
-- **211. [B114]** — **open** — same defect as 178 (ein-hint-2553)
+- **211. [B114]** — **implemented** — same defect as 178 (ein-hint-2553)
   - Office fulfil dialog refusal when the EIN box is empty, for an EIN bought for a series — `webapp/server/routes-admin.ts:1308`
   - Reads: Enter the 9-digit EIN from the letter — it goes on the client's Form 2553.
   - Claims: The number will be carried onto the client's Form 2553.
@@ -1637,6 +1653,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (duplicate): Same unconditional company-Form2553 hint as item178, now repeated in routes-admin.ts:1308; findings-open did not mark this as same defect as178.
   - **Codex rejected the proposed replacement:** The proposed target check fixes series EINs, but a company EIN also need not have a purchased S-election package. Mention Form2553 only when a matching company package exists.
   - Corrected after Codex's review: Codex adds: a company EIN with no S election package has no Form 2553 either; mention the form only when a matching package exists.
+  - Fixed: batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **212. [B116]** — **implemented** — related: 194
   - The registered agent renewal date — which anniversary — `webapp/server/routes-admin.ts:862`
   - Reads: ra_renewal_date = ((now() AT TIME ZONE 'America/New_York') + interval '1 year')::date
@@ -1981,12 +1998,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: The masters' appointment slot is '[MANAGER NAMES]' (templates-oa-multi.md:162, single.md:144); '[MANAGER NAME]' is only the signature-block slot (multi.md:407). A reader of the Word form looks for a blank that is spelled differently.
   - Replace with: **[MANAGER NAMES]** (manager-managed forms only) — the manager or managers.
   - **Codex rejected the proposed replacement:** Explain both: “[MANAGER NAMES] — the initial manager or managers in the appointment; [MANAGER NAME] — the signer in each manager signature block.”
-- **266. [B165]** — **open** — housekeeping
+- **266. [B165]** — **implemented** — housekeeping
   - Order Summary PDF (office only) — 'Items ordered' and 'Optional documents' sections — `webapp/server/order-summary.ts:122`
   - Reads: out.push(line("Federal EIN service", p.optionalDocuments?.ein ? "Yes" : "No"));
   - Claims: The EIN item is labelled 'Federal EIN service' here and 'Federal EIN' at line 220 in the same document.
   - True: Two wordings for one fact in one PDF (lines 122 and 220 read the same field).
   - Replace with: Use 'Federal EIN service' in both places.
+  - Fixed: batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **267. [B166]** — **open** — housekeeping
   - Manager-managed single-member S corporation agreement, between s. 7.2 and Article 8 — `webapp/server/templates-oa-single-s.md:192`
   - Reads: (line 191 blank, line 192 blank — two consecutive blank lines between s. 7.2's last sentence 'Each distribution shall be recorded in the records maintained under Article 8, identifying its source.' on line 190 and the '---' rule before Article 8 on line 193)
@@ -2095,24 +2113,28 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: The listed litigation behaviors are ranked by measured frequency.
   - True: Neither this paragraph nor the source materials supplies cases, a dataset, counts or a method establishing the ordering. The legal examples can stand without an unsupported empirical ranking.
   - Replace with: Conduct that can undermine the shields:
-- **N2.16. [substantive]** — **open**
+- **N2.16. [substantive]** — **implemented**
   - S corporation election package, record copy, deadline notice — webapp/server/s-election.ts:204 — `webapp/server/s-election.ts:204`
   - Reads: The IRS deadline for this election was ${fmtDateLong(deadlineIso)}. A late election requires IRS relief — talk to your tax professional.
   - Claims: The IRS deadline has already passed whenever the package becomes a record copy.
   - True: The record copy is triggered14days after package creation (routes-portal.ts:517,548–630), not by the election deadline. A package created shortly after formation becomes a record copy long before the usual2months15days deadline. s-election.ts:314 computes the deadline independently.
   - Replace with: The IRS deadline for this election is ${fmtDateLong(deadlineIso)}. If that date has passed, discuss late-election relief with your tax professional.
-- **N2.17. [substantive]** — **open**
+  - Fixed: batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **N2.17. [substantive]** — **implemented**
   - S corporation election package, EIN not yet available notice — webapp/server/s-election.ts:184 — `webapp/server/s-election.ts:184`
   - Reads:     : `**Your EIN was not yet available when this package was prepared.** Write it in item A on page 1 (and the box at the top of page 2) before filing — the IRS will not process the form without it.`;
   - Claims: The owner must wait for an issued EIN because the IRS cannot process the election without it.
   - True: IRS Form2553 instructions, ItemA, expressly provide for Applied For plus the EIN application date if the EIN has not arrived when due. The generator itself prints Applied For (:80–85) but omits its date. https://www.irs.gov/instructions/i2553
   - Replace with: **Your EIN was not yet available when this package was prepared.** If it arrives before filing, enter it in item A and at the top of page 2. If it has not arrived by the filing deadline, follow the IRS instruction to enter “Applied For” and the date the EIN application was made; do not miss the deadline solely while waiting for the number.
+  - Ruling, 2026-09-20: Batch 13 item 10: never tell clients to enter Applied For. Require an issued EIN on the Form 2553 filing package.
+  - Fixed: batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **N2.18. [wording]** — **open** — waits on Adam's ruling
   - S corporation election package, record-copy warning — webapp/server/s-election.ts:194 — `webapp/server/s-election.ts:194`
   - Reads: **An election filed with incomplete Social Security numbers is invalid.** Do not sign or mail this copy. It is here so you keep a record of what was prepared for ${d.llcName} — the election to be taxed as an S corporation effective ${fmtDateLong(d.effectiveDate)}, prepared with ${d.ein ? `EIN **${fmtEin(d.ein)}**` : "no EIN on file"}.
   - Claims: Every incomplete Social Security number necessarily invalidates an S election.
   - True: Rev.Proc.2022-19 §§2.03(3),3.03(4) distinguishes inadvertent administrative omissions from missing shareholder consent, officer signature and permitted tax year; the blanket invalidity assertion is broader. The service can still properly prohibit filing this intentionally incomplete record copy. https://www.irs.gov/irb/2022-41_IRB
   - Replace with: **This record copy is incomplete and is not suitable for filing.** Do not sign or mail it. It records the election package prepared for ${d.llcName}; obtain a complete filing copy if you still need to file.
+  - Ruling, 2026-09-20: Batch 13 item 11 rejected: leave the Form 2553 incomplete-SSN warning as is.
 - **N2.19. [substantive]** — **open**
   - Office Order Summary, the questionnaire, manager and member addresses — webapp/server/order-summary.ts:191 — `webapp/server/order-summary.ts:191`
   - Reads:       out.push(line(`Manager ${i + 1}`, `${name}; ${addr({ address1: mm.streetAddress1 ?? mm.address1, city: mm.city, state: mm.state, zip: mm.zip })}`));

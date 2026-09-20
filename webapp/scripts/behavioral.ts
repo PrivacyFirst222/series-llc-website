@@ -1,3 +1,4 @@
+import { batch13Walk } from "./batch13-walk";
 import { batch10Walk } from "./batch10-walk";
 import { batch09Walk } from "./batch09-walk";
 import { batch08Walk } from "./batch08-walk";
@@ -2721,6 +2722,19 @@ async function main(): Promise<void> {
       await page.close();
     }
   }
+
+const batch13Results = new Map<string,{ok:boolean;detail?:unknown}>();
+await batch13Walk(browser, `http://localhost:${WEB_PORT}`, (ok,label,detail)=>batch13Results.set(label,{ok,detail}));
+{const r=batch13Results.get("batch13 formation deadline wording");expect(r?.ok===true,"batch13 formation deadline wording",r?.detail);}
+{const r=batch13Results.get("batch13 fax or mail consistently");expect(r?.ok===true,"batch13 fax or mail consistently",r?.detail);}
+{const r=batch13Results.get("batch13 existing LLC can submit EIN details");expect(r?.ok===true,"batch13 existing LLC can submit EIN details",r?.detail);}
+{const r=batch13Results.get("batch13 pending EIN requires our paid company service");expect(r?.ok===true,"batch13 pending EIN requires our paid company service",r?.detail);}
+{const r=batch13Results.get("batch13 package location and pending status");expect(r?.ok===true,"batch13 package location and pending status",r?.detail);}
+{const r=batch13Results.get("batch13 office EIN hint matches applicable package");expect(r?.ok===true,"batch13 office EIN hint matches applicable package",r?.detail);}
+{const r=batch13Results.get("batch13 SSN impossible groups rejected");expect(r?.ok===true,"batch13 SSN impossible groups rejected",r?.detail);}
+{const r=batch13Results.get("batch13 record copy deadline neutral tense");expect(r?.ok===true,"batch13 record copy deadline neutral tense",r?.detail);}
+{const r=batch13Results.get("batch13 issued EIN required for filing package");expect(r?.ok===true,"batch13 issued EIN required for filing package",r?.detail);}
+{const r=batch13Results.get("batch13 office EIN labels agree");expect(r?.ok===true,"batch13 office EIN labels agree",r?.detail);}
 
 const batch10Results = new Map<string,{ok:boolean;detail?:unknown}>();
 await batch10Walk(browser, `http://localhost:${WEB_PORT}`, (ok,label,detail)=>batch10Results.set(label,{ok,detail}));
