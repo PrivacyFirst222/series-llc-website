@@ -1,3 +1,4 @@
+import { closestEffectiveDate, easternToday, validCalendarDate } from "../src/lib/calendar";
 import { selectedParty } from "../src/lib/partyIdentity";
 /**
  * What you need in front of you to file the Articles, in the order the Division
@@ -303,7 +304,7 @@ function conversionGroups(p: PayloadLike): FilingGroup[] {
     .filter((g) => g.fields.length > 0);
 }
 
-export function filingGroups(payload: unknown): FilingGroup[] {
+export function filingGroups(payload: unknown, filingDay = easternToday()): FilingGroup[] {
   const p: PayloadLike = structuredClone((payload ?? {}) as PayloadLike);
   if (p.management?.managersOrAuthorizedRepresentatives) p.management.managersOrAuthorizedRepresentatives = p.management.managersOrAuthorizedRepresentatives.map(selectedParty);
   if (p.members?.memberList) p.members.memberList = p.members.memberList.map(selectedParty);
@@ -335,12 +336,13 @@ export function filingGroups(payload: unknown): FilingGroup[] {
         label: "Effective date",
         value:
           p.effectiveDate?.option === "SPECIFIC"
-            ? p.effectiveDate?.requestedEffectiveDate ?? ""
+            ? validCalendarDate(p.effectiveDate?.requestedEffectiveDate ?? "") ? closestEffectiveDate(p.effectiveDate!.requestedEffectiveDate!, filingDay) : "Invalid requested date — do not file"
             : "Leave blank — effective on the date of filing",
         // A requested date is a VALUE to enter on Sunbiz and keeps its copy
         // button; the leave-blank default is only advice.
         statement: p.effectiveDate?.option !== "SPECIFIC",
       },
+      ...(p.effectiveDate?.option === "SPECIFIC" ? [{key:"effectiveDateCalculation", label:"Effective-date calculation", value:`Requested: ${p.effectiveDate.requestedEffectiveDate}. Closest permitted date calculated for filing on ${filingDay} (Eastern). Refresh if filing on another day. Exact effective date is not guaranteed.`, statement:true, block:true}] : []),
       { key: "filingFee", label: "Required filing fee", value: "$125.00", statement: true },
       {
         key: "certStatus",

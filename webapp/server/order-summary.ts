@@ -216,7 +216,7 @@ export function summaryMarkdown(o: SummaryOrderRow): string {
     out.push(line("Purpose type", p.purpose?.purposeType === "GENERAL" ? "General purpose" : p.purpose?.purposeType === "SPECIFIC" ? "General purpose plus a specific purpose" : p.purpose?.purposeType === "PROFESSIONAL" ? "Professional purpose" : p.purpose?.purposeType));
     out.push(line("Specific purpose", p.purpose?.businessPurposeText));
     out.push(`### Effective date`);
-    out.push(line("Option", p.effectiveDate?.option === "SPECIFIC" ? `Specific date: ${p.effectiveDate?.requestedEffectiveDate ?? ""}` : "Date filed by the Division"));
+    out.push(line("Option", p.effectiveDate?.option === "SPECIFIC" ? `Requested date: ${p.effectiveDate?.requestedEffectiveDate ?? ""}. If outside the permitted range at filing, the closest permitted date will be used. Exact effective date is not guaranteed.` : "Date filed by the Division"));
   }
   out.push(`### Correspondence`);
   out.push(line("Name", p.correspondence?.name));

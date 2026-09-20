@@ -1,0 +1,334 @@
+{
+  "id": "10",
+  "revision": 1,
+  "title": "Company names, filing dates and calendar rules",
+  "model": "Codex",
+  "base": "880d1b2389eb19b9854fb3dd8467a619d69beefc",
+  "items": [
+    {
+      "id": "44",
+      "part": "all",
+      "scope": "name-hold comment cites both rules",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch10 44: name-hold comment cites both rules"
+        }
+      ]
+    },
+    {
+      "id": "61",
+      "part": "all",
+      "scope": "one business day estimate and automatic nearest permitted filing date",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch10 61: one business day estimate and automatic nearest permitted filing date"
+        }
+      ]
+    },
+    {
+      "id": "78",
+      "part": "all",
+      "scope": "missing designator asks for selection",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch10 78: missing designator asks for selection"
+        }
+      ]
+    },
+    {
+      "id": "84",
+      "part": "all",
+      "scope": "review shows the selected calendar day in words",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch10 84: review shows the selected calendar day in words"
+        }
+      ]
+    },
+    {
+      "id": "91",
+      "part": "all",
+      "scope": "series separators validate and deduplicate consistently",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch10 91: series separators validate and deduplicate consistently"
+        }
+      ]
+    },
+    {
+      "id": "92",
+      "part": "all",
+      "scope": "embedded llc letters are not designators",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch10 92: embedded llc letters are not designators"
+        }
+      ]
+    },
+    {
+      "id": "93",
+      "part": "all",
+      "scope": "typed name ending agrees with company type",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch10 93: typed name ending agrees with company type"
+        }
+      ]
+    },
+    {
+      "id": "128",
+      "part": "florida-date",
+      "scope": "document defaults use server Eastern date",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch10 128:florida-date: document defaults use server Eastern date"
+        }
+      ]
+    },
+    {
+      "id": "164",
+      "part": "date",
+      "scope": "document defaults use server Eastern date",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch10 128:florida-date: document defaults use server Eastern date"
+        }
+      ]
+    },
+    {
+      "id": "128",
+      "part": "viewer-zone-display",
+      "scope": "service deadlines use Eastern display",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch10 128:viewer-zone-display: service deadlines use Eastern display"
+        }
+      ]
+    },
+    {
+      "id": "186",
+      "part": "all",
+      "scope": "office dates include year and Eastern day",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch10 186: office dates include year and Eastern day"
+        }
+      ]
+    },
+    {
+      "id": "N4.02",
+      "part": "all",
+      "scope": "effective date endpoints do not shift with timezone",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch10 N4.02: effective date endpoints do not shift with timezone"
+        }
+      ]
+    },
+    {
+      "id": "N4.03",
+      "part": "all",
+      "scope": "business days exclude banking holidays",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch10 N4.03: business days exclude banking holidays"
+        }
+      ]
+    },
+    {
+      "id": "159",
+      "part": "all",
+      "scope": "series errors identify the invalid field",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch10 159: series errors identify the invalid field"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "webapp/src/lib/calendar.ts",
+      "mode": "new",
+      "why": "Approved Batch 10 name, date, nearest permitted effective date and associated display/filing dependencies. Item 5 name-blocking behavior and customer wording are excluded."
+    },
+    {
+      "path": "webapp/src/lib/datetime.ts",
+      "mode": "code",
+      "why": "Approved Batch 10 name, date, nearest permitted effective date and associated display/filing dependencies. Item 5 name-blocking behavior and customer wording are excluded."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/validation.ts",
+      "mode": "code",
+      "why": "Approved Batch 10 name, date, nearest permitted effective date and associated display/filing dependencies. Item 5 name-blocking behavior and customer wording are excluded."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/stepValidation.ts",
+      "mode": "code",
+      "why": "Approved Batch 10 name, date, nearest permitted effective date and associated display/filing dependencies. Item 5 name-blocking behavior and customer wording are excluded."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepName.tsx",
+      "mode": "code",
+      "why": "Approved Batch 10 name, date, nearest permitted effective date and associated display/filing dependencies. Item 5 name-blocking behavior and customer wording are excluded."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepEffectiveDate.tsx",
+      "mode": "code",
+      "why": "Approved Batch 10 name, date, nearest permitted effective date and associated display/filing dependencies. Item 5 name-blocking behavior and customer wording are excluded."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/ReviewStep.tsx",
+      "mode": "code",
+      "why": "Approved Batch 10 name, date, nearest permitted effective date and associated display/filing dependencies. Item 5 name-blocking behavior and customer wording are excluded."
+    },
+    {
+      "path": "webapp/src/pages/portal/OAQuestionnaire.tsx",
+      "mode": "code",
+      "why": "Approved Batch 10 name, date, nearest permitted effective date and associated display/filing dependencies. Item 5 name-blocking behavior and customer wording are excluded."
+    },
+    {
+      "path": "webapp/src/pages/portal/AmendAgreement.tsx",
+      "mode": "code",
+      "why": "Approved Batch 10 name, date, nearest permitted effective date and associated display/filing dependencies. Item 5 name-blocking behavior and customer wording are excluded."
+    },
+    {
+      "path": "webapp/src/pages/portal/OrdersInProgress.tsx",
+      "mode": "code",
+      "why": "Approved Batch 10 name, date, nearest permitted effective date and associated display/filing dependencies. Item 5 name-blocking behavior and customer wording are excluded."
+    },
+    {
+      "path": "webapp/src/pages/portal/ServicesCard.tsx",
+      "mode": "code",
+      "why": "Approved Batch 10 name, date, nearest permitted effective date and associated display/filing dependencies. Item 5 name-blocking behavior and customer wording are excluded."
+    },
+    {
+      "path": "webapp/src/pages/admin/ServiceOrdersSection.tsx",
+      "mode": "code",
+      "why": "Approved Batch 10 name, date, nearest permitted effective date and associated display/filing dependencies. Item 5 name-blocking behavior and customer wording are excluded."
+    },
+    {
+      "path": "webapp/src/pages/admin/OrderDetail.tsx",
+      "mode": "code",
+      "why": "Approved Batch 10 name, date, nearest permitted effective date and associated display/filing dependencies. Item 5 name-blocking behavior and customer wording are excluded."
+    },
+    {
+      "path": "webapp/server/sunbiz.ts",
+      "mode": "code",
+      "why": "Approved Batch 10 name, date, nearest permitted effective date and associated display/filing dependencies. Item 5 name-blocking behavior and customer wording are excluded."
+    },
+    {
+      "path": "webapp/server/validation.ts",
+      "mode": "code",
+      "why": "Approved Batch 10 name, date, nearest permitted effective date and associated display/filing dependencies. Item 5 name-blocking behavior and customer wording are excluded."
+    },
+    {
+      "path": "webapp/server/filing.ts",
+      "mode": "code",
+      "why": "Approved Batch 10 name, date, nearest permitted effective date and associated display/filing dependencies. Item 5 name-blocking behavior and customer wording are excluded."
+    },
+    {
+      "path": "webapp/server/order-summary.ts",
+      "mode": "code",
+      "why": "Approved Batch 10 name, date, nearest permitted effective date and associated display/filing dependencies. Item 5 name-blocking behavior and customer wording are excluded."
+    },
+    {
+      "path": "webapp/server/routes-portal.ts",
+      "mode": "code",
+      "why": "Approved Batch 10 name, date, nearest permitted effective date and associated display/filing dependencies. Item 5 name-blocking behavior and customer wording are excluded."
+    },
+    {
+      "path": "webapp/server/routes-admin.ts",
+      "mode": "code",
+      "why": "Approved Batch 10 name, date, nearest permitted effective date and associated display/filing dependencies. Item 5 name-blocking behavior and customer wording are excluded."
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "why": "Approved Batch 10 name, date, nearest permitted effective date and associated display/filing dependencies. Item 5 name-blocking behavior and customer wording are excluded."
+    },
+    {
+      "path": "webapp/scripts/behavioral.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Meaningful new name/calendar regression probes and approved adjustment of old out-of-range refusal expectation; preserve other assertions."
+    },
+    {
+      "path": "webapp/server/e2e.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Meaningful new name/calendar regression probes and approved adjustment of old out-of-range refusal expectation; preserve other assertions."
+    },
+    {
+      "path": "webapp/scripts/batch10-walk.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Meaningful new name/calendar regression probes and approved adjustment of old out-of-range refusal expectation; preserve other assertions."
+    },
+    {
+      "path": "webapp/src/lib/calendar.test.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Meaningful new name/calendar regression probes and approved adjustment of old out-of-range refusal expectation; preserve other assertions."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/validation.test.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Meaningful new name/calendar regression probes and approved adjustment of old out-of-range refusal expectation; preserve other assertions."
+    },
+    {
+      "path": "webapp/server/order-summary.test.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Meaningful new name/calendar regression probes and approved adjustment of old out-of-range refusal expectation; preserve other assertions."
+    },
+    {
+      "path": "webapp/package.json",
+      "mode": "code",
+      "control": true,
+      "why": "Meaningful new name/calendar regression probes and approved adjustment of old out-of-range refusal expectation; preserve other assertions."
+    },
+    {
+      "path": "docs/facts.md",
+      "mode": "code",
+      "control": true,
+      "why": "Record approved turnaround and nearest permitted effective-date policy for consistency."
+    }
+  ],
+  "requiredChecks": [],
+  "testSupport": [
+    "webapp/scripts/batch10-walk.ts"
+  ],
+  "removedChecks": [
+    "server enforces: an effective date outside the window"
+  ]
+}

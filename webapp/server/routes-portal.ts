@@ -1098,6 +1098,7 @@ app.get("/portal/oa", async (c) => {
       multiOwner,
       memberManaged,
       blocked: false,
+      todayEastern: easternDateIso(),
       templateVersion: OA_TEMPLATE_VERSION,
       answers: savedAnswers,
       rev: Number(saved[0]?.rev ?? 0),
@@ -1960,11 +1961,18 @@ app.post("/portal/services/series", async (c) => {
   const body = z
     .object({ suffix: z.string().min(1).max(60), purpose: z.string().max(300).optional() })
     .safeParse(await c.req.json().catch(() => null));
-  if (!body.success) return c.json(err("A series identifier is required.", "INVALID_INPUT"), 400);
+  if (!body.success) {
+    const issue = body.error.issues[0];
+    const message = issue.path[0] === "purpose" ? "The purpose can be at most 300 characters."
+      : issue.path[0] === "suffix" && issue.code === "too_big" ? "The series identifier can be at most 60 characters."
+      : "Enter a series identifier.";
+    return c.json(err(message, "INVALID_INPUT"), 400);
+  }
   const purchaseCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
   const llcName = await clientLlcName(session.clientId, purchaseCompanyId);
   if (!llcName) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
   const suffix = body.data.suffix.trim().replace(/\s+/g, " ");
+  if (!suffix) return c.json(err("Enter a series identifier.", "INVALID_INPUT"), 400);
   if (!/^[\w .,'&-]+$/.test(suffix)) {
     return c.json(err("The series identifier contains unsupported characters.", "INVALID_INPUT"), 400);
   }

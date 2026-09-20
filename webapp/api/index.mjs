@@ -99123,6 +99123,55 @@ function hasFirstAndLast(name) {
   return words.length >= 2;
 }
 
+// src/lib/calendar.ts
+var EASTERN_ZONE = "America/New_York";
+function easternToday(now = /* @__PURE__ */ new Date()) {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: EASTERN_ZONE, year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
+}
+function validCalendarDate(iso) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(iso) || iso.slice(0, 4) === "0000") return false;
+  const d2 = /* @__PURE__ */ new Date(`${iso}T12:00:00Z`);
+  return Number.isFinite(d2.getTime()) && d2.toISOString().slice(0, 10) === iso;
+}
+function shiftCalendarDay(iso, days) {
+  const d2 = /* @__PURE__ */ new Date(`${iso}T12:00:00Z`);
+  d2.setUTCDate(d2.getUTCDate() + days);
+  return d2.toISOString().slice(0, 10);
+}
+function weekday(iso) {
+  return (/* @__PURE__ */ new Date(`${iso}T12:00:00Z`)).getUTCDay();
+}
+function nthMonday(year, month, n) {
+  const first = `${year}-${month}-01`;
+  return shiftCalendarDay(first, (8 - weekday(first)) % 7 + 7 * (n - 1));
+}
+function isBankingDay(iso) {
+  if (!validCalendarDate(iso) || [0, 6].includes(weekday(iso))) return false;
+  const y = iso.slice(0, 4);
+  const fixed = ["01-01", "06-19", "07-04", "11-11", "12-25"].map((md) => `${y}-${md}`);
+  const memorial = shiftCalendarDay(`${y}-05-31`, -((weekday(`${y}-05-31`) + 6) % 7));
+  const thanksgiving = shiftCalendarDay(`${y}-11-01`, (11 - weekday(`${y}-11-01`)) % 7 + 21);
+  const holidays = [...fixed.flatMap((d2) => weekday(d2) === 0 ? [d2, shiftCalendarDay(d2, 1)] : [d2]), nthMonday(y, "01", 3), nthMonday(y, "02", 3), memorial, nthMonday(y, "09", 1), nthMonday(y, "10", 2), thanksgiving];
+  return !holidays.includes(iso);
+}
+function shiftBankingDays(iso, count) {
+  let d2 = iso;
+  for (let moved = 0; moved < Math.abs(count); ) {
+    d2 = shiftCalendarDay(d2, count < 0 ? -1 : 1);
+    if (isBankingDay(d2)) moved++;
+  }
+  return d2;
+}
+function effectiveDateRange(filingDay) {
+  if (!validCalendarDate(filingDay)) throw new Error("Invalid filing date.");
+  return { earliest: shiftBankingDays(filingDay, -5), latest: shiftCalendarDay(filingDay, 90) };
+}
+function closestEffectiveDate(requested, filingDay) {
+  if (!validCalendarDate(requested)) throw new Error("Invalid requested effective date.");
+  const { earliest, latest } = effectiveDateRange(filingDay);
+  return requested < earliest ? earliest : requested > latest ? latest : requested;
+}
+
 // src/components/forms/florida-llc/addressValidation.ts
 function postalCodeError(zip, country = "United States") {
   const value = (zip ?? "").trim();
@@ -99368,21 +99417,20 @@ var STANDARD_DESIGNATORS = [
 function buildFinalLlcName(desired, designator) {
   const cleaned = desired.trim();
   if (!cleaned || !designator) return cleaned;
-  const lower = cleaned.toLowerCase();
-  const hasIt = lower.endsWith("llc") || lower.endsWith("l.l.c.") || lower.endsWith("limited liability company") || lower.endsWith("pllc") || lower.endsWith("p.l.l.c.") || lower.endsWith("professional limited liability company");
-  if (hasIt) return cleaned;
+  if (nameContainsLegalDesignator(cleaned)) return cleaned;
   return `${cleaned}, ${designator}`;
 }
+var DESIGNATOR_END = /(?:^|[\s,])(p\.?l\.?l\.?c\.?|l\.?l\.?c\.?|(?:professional\s+)?limited\s+liability\s+company)\s*$/i;
 function nameContainsLegalDesignator(name) {
-  const lower = name.toLowerCase();
-  return [
-    "limited liability company",
-    "professional limited liability company",
-    "llc",
-    "l.l.c.",
-    "pllc",
-    "p.l.l.c."
-  ].some((d2) => lower.includes(d2));
+  return DESIGNATOR_END.test(name);
+}
+function typedDesignatorProblem(name, type) {
+  const ending = name.match(DESIGNATOR_END)?.[1];
+  if (!ending) return null;
+  const professional = /^p/i.test(ending);
+  if (professional && type === "DOMESTIC_LLC") return "Your name has a professional ending. Choose Domestic Florida PLLC, or remove the ending and use the LLC designator selected below.";
+  if (!professional && type === "PLLC") return "Your name has an ordinary LLC ending. Choose Domestic Florida LLC, or remove the ending and use the PLLC designator selected below.";
+  return null;
 }
 function memberRowIsBlank(m2) {
   return ["firstName", "lastName", "entityName", "address1", "city", "zip"].every(
@@ -99405,37 +99453,8 @@ function validateRegisteredAgentAddress(street1, street2, state) {
   }
   return null;
 }
-function isBusinessDay(d2) {
-  const day = d2.getDay();
-  return day !== 0 && day !== 6;
-}
-function addBusinessDays(start, n) {
-  const d2 = new Date(start);
-  let added = 0;
-  const dir = n >= 0 ? 1 : -1;
-  while (added < Math.abs(n)) {
-    d2.setDate(d2.getDate() + dir);
-    if (isBusinessDay(d2)) added++;
-  }
-  return d2;
-}
-function validateEffectiveDate(isoDate2, anticipatedFilingDate = /* @__PURE__ */ new Date()) {
-  if (!isoDate2) return "Effective date is required.";
-  const target2 = new Date(isoDate2);
-  if (isNaN(target2.getTime())) return "Invalid effective date.";
-  const earliest = addBusinessDays(anticipatedFilingDate, -5);
-  const latest = new Date(anticipatedFilingDate);
-  latest.setDate(latest.getDate() + 90);
-  earliest.setHours(0, 0, 0, 0);
-  latest.setHours(23, 59, 59, 999);
-  target2.setHours(12, 0, 0, 0);
-  if (target2 < earliest) {
-    return "Effective date cannot be more than 5 business days before the filing date.";
-  }
-  if (target2 > latest) {
-    return "Effective date cannot be more than 90 days after the filing date.";
-  }
-  return null;
+function validateRequestedDate(iso) {
+  return !iso ? "Effective date is required." : validCalendarDate(iso) ? null : "Invalid effective date.";
 }
 function calculateEstimatedFees(opts) {
   const articlesOfOrganization = opts.isConversion ? 0 : 100;
@@ -99456,18 +99475,16 @@ function calculateEstimatedFees(opts) {
   };
 }
 function hasProtectedSeriesPhrase(name) {
-  return /protected\s+series/i.test(name) || /(^|\s)p\.?s\.?(\s|$)/i.test(name);
+  return /(?:^|[^a-z0-9])(?:protected\s+series|p\.?s\.?)(?=[^a-z0-9]|$)/i.test(name);
 }
 function canonicalizeSeriesName(name) {
-  let s = name.trim().replace(/\s+/g, " ");
-  s = s.replace(/protected\s+series/gi, "Protected Series");
-  s = s.replace(/(^|\s)p\.\s?s\.?(?=\s|$)/gi, "$1P.S.");
-  s = s.replace(/(^|\s)ps\.(?=\s|$)/gi, "$1P.S.");
-  s = s.replace(/(^|\s)ps(?=\s|$)/gi, "$1PS");
-  return s;
+  return name.trim().replace(/\s+/g, " ").replace(
+    /(^|[^a-z0-9])(protected\s+series|p\.?s\.?)(?=[^a-z0-9]|$)[\s-]*/gi,
+    (_, lead, token) => `${lead}${/^protected/i.test(token) ? "Protected Series" : token.includes(".") ? "P.S." : "PS"} `
+  ).trim();
 }
 function seriesDedupeKey(name) {
-  return name.toUpperCase().replace(/PROTECTED\s+SERIES/g, " ").replace(/(^|\s)P\.?S\.?(?=\s|$)/g, " ").replace(/\s+/g, " ").trim();
+  return canonicalizeSeriesName(name).toUpperCase().replace(/(^|[^A-Z0-9])(?:PROTECTED\s+SERIES|P\.?S\.?)(?=[^A-Z0-9]|$)[\s-]*/g, "$1").replace(/\s+/g, " ").trim();
 }
 function fullPersonName(first, last2, suffix) {
   const base = [first, last2].map((s) => (s ?? "").trim()).filter(Boolean).join(" ");
@@ -99633,6 +99650,8 @@ var extendedFormSchema = formationFormSchema.extend({
     ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["sElectionFilingAcknowledgment"], message: "Please acknowledge the Form 2553 filing deadline to add the S election package." });
   }
   if (data.filingPath !== "CONVERT") {
+    const endingProblem = typedDesignatorProblem(data.desiredLlcName ?? "", data.formationType);
+    if (endingProblem) ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["desiredLlcName"], message: endingProblem });
     for (const k of ["nameSearchAcknowledgment", "governmentAffiliationAcknowledgment", "lawfulPurposeNameAcknowledgment"]) {
       if (data[k] !== true) {
         ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: [k], message: "Acknowledgment is required." });
@@ -99684,7 +99703,7 @@ var extendedFormSchema = formationFormSchema.extend({
       }
     }
     if (data.effectiveDateOption === "SPECIFIC") {
-      const dateErr = validateEffectiveDate(data.requestedEffectiveDate ?? "");
+      const dateErr = validateRequestedDate(data.requestedEffectiveDate ?? "");
       if (dateErr) ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["requestedEffectiveDate"], message: dateErr });
     }
     if (data.formationType === "PLLC") {
@@ -106510,7 +106529,7 @@ function conversionGroups(p2) {
   }
   return groups.map((g) => ({ ...g, fields: g.fields.filter((f) => f.value !== "") })).filter((g) => g.fields.length > 0);
 }
-function filingGroups(payload) {
+function filingGroups(payload, filingDay = easternToday()) {
   const p2 = structuredClone(payload ?? {});
   if (p2.management?.managersOrAuthorizedRepresentatives) p2.management.managersOrAuthorizedRepresentatives = p2.management.managersOrAuthorizedRepresentatives.map(selectedParty);
   if (p2.members?.memberList) p2.members.memberList = p2.members.memberList.map(selectedParty);
@@ -106536,11 +106555,12 @@ function filingGroups(payload) {
       {
         key: "effectiveDate",
         label: "Effective date",
-        value: p2.effectiveDate?.option === "SPECIFIC" ? p2.effectiveDate?.requestedEffectiveDate ?? "" : "Leave blank \u2014 effective on the date of filing",
+        value: p2.effectiveDate?.option === "SPECIFIC" ? validCalendarDate(p2.effectiveDate?.requestedEffectiveDate ?? "") ? closestEffectiveDate(p2.effectiveDate.requestedEffectiveDate, filingDay) : "Invalid requested date \u2014 do not file" : "Leave blank \u2014 effective on the date of filing",
         // A requested date is a VALUE to enter on Sunbiz and keeps its copy
         // button; the leave-blank default is only advice.
         statement: p2.effectiveDate?.option !== "SPECIFIC"
       },
+      ...p2.effectiveDate?.option === "SPECIFIC" ? [{ key: "effectiveDateCalculation", label: "Effective-date calculation", value: `Requested: ${p2.effectiveDate.requestedEffectiveDate}. Closest permitted date calculated for filing on ${filingDay} (Eastern). Refresh if filing on another day. Exact effective date is not guaranteed.`, statement: true, block: true }] : [],
       { key: "filingFee", label: "Required filing fee", value: "$125.00", statement: true },
       {
         key: "certStatus",
@@ -107495,6 +107515,7 @@ function registerPortalRoutes(app2) {
         multiOwner,
         memberManaged,
         blocked: false,
+        todayEastern: easternDateIso(),
         templateVersion: OA_TEMPLATE_VERSION,
         answers: savedAnswers,
         rev: Number(saved[0]?.rev ?? 0),
@@ -108205,11 +108226,16 @@ function registerPortalRoutes(app2) {
     const session = await getSession(c);
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
     const body = external_exports.object({ suffix: external_exports.string().min(1).max(60), purpose: external_exports.string().max(300).optional() }).safeParse(await c.req.json().catch(() => null));
-    if (!body.success) return c.json(err("A series identifier is required.", "INVALID_INPUT"), 400);
+    if (!body.success) {
+      const issue = body.error.issues[0];
+      const message = issue.path[0] === "purpose" ? "The purpose can be at most 300 characters." : issue.path[0] === "suffix" && issue.code === "too_big" ? "The series identifier can be at most 60 characters." : "Enter a series identifier.";
+      return c.json(err(message, "INVALID_INPUT"), 400);
+    }
     const purchaseCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
     const llcName = await clientLlcName(session.clientId, purchaseCompanyId);
     if (!llcName) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
     const suffix = body.data.suffix.trim().replace(/\s+/g, " ");
+    if (!suffix) return c.json(err("Enter a series identifier.", "INVALID_INPUT"), 400);
     if (!/^[\w .,'&-]+$/.test(suffix)) {
       return c.json(err("The series identifier contains unsupported characters.", "INVALID_INPUT"), 400);
     }
@@ -108916,7 +108942,7 @@ function summaryMarkdown(o) {
     out.push(line("Purpose type", p2.purpose?.purposeType === "GENERAL" ? "General purpose" : p2.purpose?.purposeType === "SPECIFIC" ? "General purpose plus a specific purpose" : p2.purpose?.purposeType === "PROFESSIONAL" ? "Professional purpose" : p2.purpose?.purposeType));
     out.push(line("Specific purpose", p2.purpose?.businessPurposeText));
     out.push(`### Effective date`);
-    out.push(line("Option", p2.effectiveDate?.option === "SPECIFIC" ? `Specific date: ${p2.effectiveDate?.requestedEffectiveDate ?? ""}` : "Date filed by the Division"));
+    out.push(line("Option", p2.effectiveDate?.option === "SPECIFIC" ? `Requested date: ${p2.effectiveDate?.requestedEffectiveDate ?? ""}. If outside the permitted range at filing, the closest permitted date will be used. Exact effective date is not guaranteed.` : "Date filed by the Division"));
   }
   out.push(`### Correspondence`);
   out.push(line("Name", p2.correspondence?.name));

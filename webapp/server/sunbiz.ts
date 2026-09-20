@@ -157,11 +157,13 @@ export async function setSyncState(patch: { baselineLabel?: string; lastDaily?: 
 
 /* ------------------------------- name check ------------------------------- */
 
-/** s. 605.0715(5)-(6), Fla. Stat.: after administrative dissolution the
- *  dissolved company's name is unavailable to others until one year has
- *  passed (120 days after a voluntary dissolution). The data file does not
- *  say which kind a dissolution was, so the longer window is applied to
- *  every inactive record — erring toward warning the client. */
+/** s.605.0715(5): administrative-dissolution name hold is one year,
+ * unless the company authorizes earlier use. s.605.0717(2): otherwise
+ * 120 days after dissolution or filing a statement of termination, if earlier.
+ * This service uses 366 days from last_txn_date (fallback file_date) for
+ * inactive records because the mirror does not establish the dissolution
+ * cause/date. That is a conservative proxy, not the statutory clock.
+ * Batch 10 item 5 is unapproved: do not change blocking or visible wording. */
 const HOLD_DAYS = 366;
 
 export interface NameConflict {

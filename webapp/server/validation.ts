@@ -3,7 +3,7 @@ import { z } from "zod";
 import { FIRST_AND_LAST, hasFirstAndLast } from "../src/lib/personName";
 import { normalizeEntityName } from "../src/components/forms/florida-llc/nameSimilarity";
 import { isPoBox, formationFormSchema } from "../src/components/forms/florida-llc/schema";
-import { designatorAllowedForFormationType, hasProtectedSeriesPhrase, memberRowIsBlank, nameContainsLegalDesignator, seriesDedupeKey, validateEffectiveDate } from "../src/components/forms/florida-llc/validation";
+import { designatorAllowedForFormationType, hasProtectedSeriesPhrase, memberRowIsBlank, nameContainsLegalDesignator, typedDesignatorProblem, seriesDedupeKey, validateRequestedDate } from "../src/components/forms/florida-llc/validation";
 import { llcDesignators } from "../src/components/forms/florida-llc/schema";
 import { raServicePatch } from "../src/components/forms/florida-llc/raService";
 
@@ -94,6 +94,8 @@ const extendedFormSchema = formationFormSchema
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["sElectionFilingAcknowledgment"], message: "Please acknowledge the Form 2553 filing deadline to add the S election package." });
     }
     if (data.filingPath !== "CONVERT") {
+      const endingProblem = typedDesignatorProblem(data.desiredLlcName ?? "", data.formationType);
+      if (endingProblem) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["desiredLlcName"], message: endingProblem });
       for (const k of ["nameSearchAcknowledgment", "governmentAffiliationAcknowledgment", "lawfulPurposeNameAcknowledgment"] as const) {
         if (data[k] !== true) {
           ctx.addIssue({ code: z.ZodIssueCode.custom, path: [k], message: "Acknowledgment is required." });
@@ -160,7 +162,7 @@ const extendedFormSchema = formationFormSchema
         }
       }
       if (data.effectiveDateOption === "SPECIFIC") {
-        const dateErr = validateEffectiveDate(data.requestedEffectiveDate ?? "");
+        const dateErr = validateRequestedDate(data.requestedEffectiveDate ?? "");
         if (dateErr) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["requestedEffectiveDate"], message: dateErr });
       }
       if (data.formationType === "PLLC") {

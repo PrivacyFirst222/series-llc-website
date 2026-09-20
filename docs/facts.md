@@ -169,3 +169,11 @@ scanned set; add ` in <path prefix>` to confine the ban to matching files.
 - value: `members (member-managed) or the manager or managers (manager-managed)`
 - where: webapp/server/templates-statement-of-authorized-representative.md — `rests with its manager or managers`
 - where: webapp/server/templates-statement-of-authorized-representative.md — `rest with its members`
+
+### Requested formation effective dates (Adam, Batch 10)
+- value: `Typical submission within one business day of completed order; estimated range uses next banking business day in Eastern time. Preserve the requested date; at filing use the closest permitted date if outside the range. Exact effective date is not guaranteed; no client follow-up for adjustment.`
+- where: webapp/src/lib/calendar.ts — `We cannot guarantee an exact effective date.`
+- where: webapp/src/components/forms/florida-llc/sections/StepEffectiveDate.tsx — `EFFECTIVE_DATE_NOTICE`
+- where: webapp/src/components/forms/florida-llc/ReviewStep.tsx — `EFFECTIVE_DATE_NOTICE`
+- where: webapp/server/filing.ts — `closestEffectiveDate`
+- where: webapp/server/order-summary.ts — `Exact effective date is not guaranteed.`

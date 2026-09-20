@@ -1,3 +1,4 @@
+import { easternToday, validCalendarDate, isBankingDay, shiftBankingDays, effectiveDateRange } from "../../../lib/calendar";
 import { isPoBox } from "./schema";
 import type {
   FloridaLLCFormData,
@@ -23,28 +24,20 @@ export function buildFinalLlcName(
 ): string {
   const cleaned = desired.trim();
   if (!cleaned || !designator) return cleaned;
-  const lower = cleaned.toLowerCase();
-  const hasIt =
-    lower.endsWith("llc") ||
-    lower.endsWith("l.l.c.") ||
-    lower.endsWith("limited liability company") ||
-    lower.endsWith("pllc") ||
-    lower.endsWith("p.l.l.c.") ||
-    lower.endsWith("professional limited liability company");
-  if (hasIt) return cleaned;
+  if (nameContainsLegalDesignator(cleaned)) return cleaned;
   return `${cleaned}, ${designator}`;
 }
 
-export function nameContainsLegalDesignator(name: string): boolean {
-  const lower = name.toLowerCase();
-  return [
-    "limited liability company",
-    "professional limited liability company",
-    "llc",
-    "l.l.c.",
-    "pllc",
-    "p.l.l.c.",
-  ].some((d) => lower.includes(d));
+/** A complete terminal designator, never letters embedded in Millcreek. */
+const DESIGNATOR_END = /(?:^|[\s,])(p\.?l\.?l\.?c\.?|l\.?l\.?c\.?|(?:professional\s+)?limited\s+liability\s+company)\s*$/i;
+export function nameContainsLegalDesignator(name: string): boolean { return DESIGNATOR_END.test(name); }
+export function typedDesignatorProblem(name: string, type: FormationType): string | null {
+  const ending = name.match(DESIGNATOR_END)?.[1];
+  if (!ending) return null;
+  const professional = /^p/i.test(ending);
+  if (professional && type === "DOMESTIC_LLC") return "Your name has a professional ending. Choose Domestic Florida PLLC, or remove the ending and use the LLC designator selected below.";
+  if (!professional && type === "PLLC") return "Your name has an ordinary LLC ending. Choose Domestic Florida LLC, or remove the ending and use the PLLC designator selected below.";
+  return null;
 }
 
 /** The wizard scaffolds one empty member row; a manager-managed flow hides
@@ -104,48 +97,26 @@ export function validateRegisteredAgentAddress(
   return null;
 }
 
-export function isBusinessDay(d: Date): boolean {
-  const day = d.getDay();
-  return day !== 0 && day !== 6;
-}
-
+export function isBusinessDay(d: Date): boolean { return isBankingDay(easternToday(d)); }
 export function addBusinessDays(start: Date, n: number): Date {
-  const d = new Date(start);
-  let added = 0;
-  const dir = n >= 0 ? 1 : -1;
-  while (added < Math.abs(n)) {
-    d.setDate(d.getDate() + dir);
-    if (isBusinessDay(d)) added++;
-  }
-  return d;
+  return new Date(`${shiftBankingDays(easternToday(start), n)}T12:00:00Z`);
 }
-
-export function validateEffectiveDate(
-  isoDate: string,
-  anticipatedFilingDate: Date = new Date(),
-): string | null {
-  if (!isoDate) return "Effective date is required.";
-  const target = new Date(isoDate);
-  if (isNaN(target.getTime())) return "Invalid effective date.";
-  const earliest = addBusinessDays(anticipatedFilingDate, -5);
-  const latest = new Date(anticipatedFilingDate);
-  latest.setDate(latest.getDate() + 90);
-
-  earliest.setHours(0, 0, 0, 0);
-  latest.setHours(23, 59, 59, 999);
-  target.setHours(12, 0, 0, 0);
-
-  if (target < earliest) {
-    return "Effective date cannot be more than 5 business days before the filing date.";
-  }
-  if (target > latest) {
-    return "Effective date cannot be more than 90 days after the filing date.";
-  }
+/** Requested dates can be outside the range: the approved policy clamps at filing. */
+export function validateRequestedDate(iso: string): string | null {
+  return !iso ? "Effective date is required." : validCalendarDate(iso) ? null : "Invalid effective date.";
+}
+/** Range evaluator for filing checks, kept separate from accepting a request. */
+export function validateEffectiveDate(isoDate: string, filingDate: Date = new Date()): string | null {
+  const problem = validateRequestedDate(isoDate);
+  if (problem) return problem;
+  const { earliest, latest } = effectiveDateRange(easternToday(filingDate));
+  if (isoDate < earliest) return "Effective date cannot be more than 5 business days before the filing date.";
+  if (isoDate > latest) return "Effective date cannot be more than 90 days after the filing date.";
   return null;
 }
 
 export function shouldRecommendJanuary1Effective(today: Date = new Date()): boolean {
-  const m = today.getMonth(); // 0=Jan
+  const m = Number(easternToday(today).slice(5, 7)) - 1; // 0=Jan, Eastern calendar
   return m >= 9 && m <= 11; // Oct, Nov, Dec
 }
 
@@ -221,31 +192,26 @@ export function calculateEstimatedFees(opts: {
  * "protected series" or the abbreviation "P.S." or "PS."
  */
 export function hasProtectedSeriesPhrase(name: string): boolean {
-  return /protected\s+series/i.test(name) || /(^|\s)p\.?s\.?(\s|$)/i.test(name);
+  return /(?:^|[^a-z0-9])(?:protected\s+series|p\.?s\.?)(?=[^a-z0-9]|$)/i.test(name);
 }
 
 /** Adam's rule (23 Aug 2026): the statutory prefix is corrected, not
  *  rejected — any dotted variant becomes "P.S.", bare "ps" becomes "PS",
  *  and "protected series" gets initial caps. */
 export function canonicalizeSeriesName(name: string): string {
-  let s = name.trim().replace(/\s+/g, " ");
-  s = s.replace(/protected\s+series/gi, "Protected Series");
-  s = s.replace(/(^|\s)p\.\s?s\.?(?=\s|$)/gi, "$1P.S.");
-  s = s.replace(/(^|\s)ps\.(?=\s|$)/gi, "$1P.S.");
-  s = s.replace(/(^|\s)ps(?=\s|$)/gi, "$1PS");
-  return s;
+  return name.trim().replace(/\s+/g, " ").replace(
+    /(^|[^a-z0-9])(protected\s+series|p\.?s\.?)(?=[^a-z0-9]|$)[\s-]*/gi,
+    (_, lead: string, token: string) => `${lead}${/^protected/i.test(token) ? "Protected Series" : token.includes(".") ? "P.S." : "PS"} `,
+  ).trim();
 }
 
 /** Two series identifiers are the SAME once every prefix occurrence
  *  ("Protected Series" / "P.S." / "PS") and capitalization are ignored:
  *  "PS 2" ≡ "P.s. 2", "Protected Series Jimmy" ≡ "PS Jimmy". */
 export function seriesDedupeKey(name: string): string {
-  return name
-    .toUpperCase()
-    .replace(/PROTECTED\s+SERIES/g, " ")
-    .replace(/(^|\s)P\.?S\.?(?=\s|$)/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+  return canonicalizeSeriesName(name).toUpperCase()
+    .replace(/(^|[^A-Z0-9])(?:PROTECTED\s+SERIES|P\.?S\.?)(?=[^A-Z0-9]|$)[\s-]*/g, "$1")
+    .replace(/\s+/g, " ").trim();
 }
 
 /** Same strictness as the server's Zod email rule — no colons, spaces, or

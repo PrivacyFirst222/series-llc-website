@@ -126,16 +126,18 @@ function Field({
   field,
   copied,
   onCopied,
+  currentValue,
 }: {
   field: FilingField;
   copied: boolean;
   onCopied: (key: string, next: boolean) => void;
+  currentValue?: () => Promise<string>;
 }) {
   const [flash, setFlash] = useState(false);
   const [copyFailed, setCopyFailed] = useState(false);
   const copy = async () => {
     try {
-      await navigator.clipboard.writeText(field.value);
+      await navigator.clipboard.writeText(currentValue ? await currentValue() : field.value);
     } catch {
       // A refused copy is not a copy: say so and leave the tick alone (14 Sep 2026).
       setCopyFailed(true);
@@ -182,7 +184,7 @@ function Field({
           {field.value}
         </div>
       </div>
-      {copyFailed ? <span className="shrink-0 text-xs text-destructive" data-testid="copy-failed">Copy failed — select the text and copy it by hand</span> : null}
+      {copyFailed ? <span className="shrink-0 text-xs text-destructive" data-testid="copy-failed">{currentValue ? "Could not refresh or copy the filing date — refresh this order and try again" : "Copy failed — select the text and copy it by hand"}</span> : null}
       <Button type="button" variant="ghost" size="sm" aria-label={`Copy ${field.label}`} onClick={copy} className="shrink-0">
         {flash ? <Check className="h-4 w-4 text-trust" /> : <Copy className="h-4 w-4" />}
       </Button>
@@ -360,6 +362,13 @@ export default function OrderDetail({
                     <Field
                       key={f.key}
                       field={f}
+                      currentValue={f.key === "effectiveDate" && !f.statement ? async () => {
+                        const fresh = await detail.refetch();
+                        if (fresh.error || !fresh.data) throw new Error("Could not refresh the filing date.");
+                        const value = fresh.data.groups.flatMap(g => g.fields).find(x => x.key === "effectiveDate")?.value;
+                        if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) throw new Error("Invalid filing date.");
+                        return value;
+                      } : undefined}
                       copied={!!d.copiedFields[f.key]}
                       onCopied={(key, copied) => setCopied.mutate({ key, copied })}
                     />

@@ -1,3 +1,4 @@
+import { formatDate } from "@/lib/datetime";
 import { jointDisplayName } from "@/lib/jointOwner";
 import { fmtEinDisplay, isValidEin } from "@/lib/ein";
 import { useEffect, useState } from "react";
@@ -67,7 +68,7 @@ interface ServiceDetail {
 }
 
 const day = (iso: string | null) =>
-  iso ? new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "—";
+  iso ? formatDate(iso) : "—";
 
 
 

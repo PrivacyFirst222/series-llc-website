@@ -49,6 +49,7 @@ interface OaData {
   multiOwner: boolean;
   memberManaged: boolean;
   blocked: boolean;
+  todayEastern: string;
   templateVersion: string;
   answers: Answers;
   rev: number;
@@ -57,9 +58,7 @@ interface OaData {
 
 
 
-function todayIso(): string {
-  return new Date().toISOString().slice(0, 10);
-}
+
 
 
 
@@ -119,7 +118,7 @@ export default function OAQuestionnaire() {
           saved.firstOrAmended ??
           (data.seed.filingPath === "CONVERT" || data.generations.length > 0 ? "amended" : "first"),
         sElection: saved.sElection ?? false,
-        effectiveDate: saved.effectiveDate ?? todayIso(),
+        effectiveDate: saved.effectiveDate ?? data.todayEastern,
         authorized: saved.authorized ?? false,
         contributionToCompany: saved.contributionToCompany ?? "",
         multiOwner: saved.multiOwner ?? data.multiOwner,

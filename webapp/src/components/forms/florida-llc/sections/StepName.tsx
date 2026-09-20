@@ -7,7 +7,7 @@ import { AcknowledgeBox, FieldShell } from "../FieldShell";
 import {
   buildFinalLlcName,
   designatorAllowedForFormationType,
-  nameContainsLegalDesignator,
+  nameContainsLegalDesignator, typedDesignatorProblem,
 } from "../validation";
 import type { FloridaLLCFormData, LlcDesignator } from "../types";
 
@@ -149,6 +149,7 @@ function NewName({ data, patch, errors }: StepProps) {
 
   const finalName = buildFinalLlcName(data.desiredLlcName, data.llcDesignator);
   const finalNameValid = !finalName || nameContainsLegalDesignator(finalName);
+  const nameProblem = !data.llcDesignator ? "Choose a designator above to complete the name." : typedDesignatorProblem(finalName, data.formationType) ?? (!finalNameValid ? "Choose a valid company designator." : null);
 
   const designatorMismatch =
     data.llcDesignator &&
@@ -310,11 +311,9 @@ function NewName({ data, patch, errors }: StepProps) {
                 Alternate {i + 1}: <span className="font-display text-base text-foreground">{n}</span>
               </div>
             ))}
-          {!finalNameValid ? (
+          {nameProblem ? (
             <p className="mt-2 text-xs text-destructive">
-              Florida LLC name must include LLC, L.L.C., Limited Liability
-              Company, PLLC, P.L.L.C., or Professional Limited Liability
-              Company.
+              {nameProblem}
             </p>
           ) : null}
         </div>

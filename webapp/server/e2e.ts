@@ -444,7 +444,7 @@ check("service-RA order accepted with canonical details enforced", svc.status ==
     await rule("no filing path chosen", { filingPath: "" }, /"filingPath"/);
     await rule("correspondence emails differ", { confirmCorrespondentEmail: "other@example.com" }, /correspondence email addresses do not match/);
     await rule("an alternate name carrying its own designator", { alternateName1: "E2E Coastal Backup LLC" }, /Leave the designator off/);
-    await rule("an effective date outside the window", { effectiveDateOption: "SPECIFIC", requestedEffectiveDate: "2020-01-01" }, /effective date|Effective date/i);
+    await rule("an invalid effective calendar date", { effectiveDateOption: "SPECIFIC", requestedEffectiveDate: "2026-02-30" }, /effective date|Effective date/i);
     await rule("a PLLC without a professional purpose", { formationType: "PLLC", purposeType: "GENERAL" }, /Professional LLC must select a professional purpose/);
     await rule("a specific purpose with no text", { purposeType: "SPECIFIC", businessPurposeText: "" }, /Specific purpose is required/);
     const convNoNumber = await api("/api/orders", { method: "POST", headers: sideAddr(), body: JSON.stringify({

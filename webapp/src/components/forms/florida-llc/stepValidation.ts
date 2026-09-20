@@ -9,8 +9,8 @@ import {
   designatorAllowedForFormationType,
   hasProtectedSeriesPhrase,
   isValidEmail,
-  nameContainsLegalDesignator,
-  validateEffectiveDate,
+  nameContainsLegalDesignator, typedDesignatorProblem,
+  validateRequestedDate,
 } from "./validation";
 import type { FloridaLLCFormData, LlcDesignator } from "./types";
 import type { StepKey } from "./steps";
@@ -141,6 +141,8 @@ export function validateStep(
         e.desiredLlcName =
           "Florida LLC name must include LLC, L.L.C., or Limited Liability Company.";
       }
+      const endingProblem = typedDesignatorProblem(data.desiredLlcName, data.formationType);
+      if (endingProblem) e.desiredLlcName = endingProblem;
       if (!data.nameSearchAcknowledgment)
         e.nameSearchAcknowledgment = "Acknowledgment is required.";
       if (!data.governmentAffiliationAcknowledgment)
@@ -342,7 +344,7 @@ export function validateStep(
       if (!data.requestedEffectiveDate)
         e.requestedEffectiveDate = "Please select a date.";
       else {
-        const err = validateEffectiveDate(data.requestedEffectiveDate);
+        const err = validateRequestedDate(data.requestedEffectiveDate);
         if (err) e.requestedEffectiveDate = err;
       }
     }

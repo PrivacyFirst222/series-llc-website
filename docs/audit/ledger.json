@@ -1557,14 +1557,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T00:38:11.492Z",
+              "event": "assigned",
+              "batch": "10",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T00:54:42.311Z",
+              "event": "implemented",
+              "batch": "10",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "10",
+          "fix": {
+            "batch": "10",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch10 44: name-hold comment cites both rules"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -2616,14 +2643,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T00:38:11.492Z",
+              "event": "assigned",
+              "batch": "10",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T00:54:42.311Z",
+              "event": "implemented",
+              "batch": "10",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "10",
+          "fix": {
+            "batch": "10",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch10 61: one business day estimate and automatic nearest permitted filing date"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -3575,14 +3629,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T00:38:11.492Z",
+              "event": "assigned",
+              "batch": "10",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T00:54:42.311Z",
+              "event": "implemented",
+              "batch": "10",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "10",
+          "fix": {
+            "batch": "10",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch10 78: missing designator asks for selection"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -3953,14 +4034,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T00:38:11.492Z",
+              "event": "assigned",
+              "batch": "10",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T00:54:42.311Z",
+              "event": "implemented",
+              "batch": "10",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "10",
+          "fix": {
+            "batch": "10",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch10 84: review shows the selected calendar day in words"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -4224,14 +4332,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T00:38:11.492Z",
+              "event": "assigned",
+              "batch": "10",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T00:54:42.311Z",
+              "event": "implemented",
+              "batch": "10",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "10",
+          "fix": {
+            "batch": "10",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch10 91: series separators validate and deduplicate consistently"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -4255,14 +4390,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T00:38:11.492Z",
+              "event": "assigned",
+              "batch": "10",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T00:54:42.311Z",
+              "event": "implemented",
+              "batch": "10",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "10",
+          "fix": {
+            "batch": "10",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch10 92: embedded llc letters are not designators"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -4285,14 +4447,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T00:38:11.492Z",
+              "event": "assigned",
+              "batch": "10",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T00:54:42.311Z",
+              "event": "implemented",
+              "batch": "10",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "10",
+          "fix": {
+            "batch": "10",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch10 93: typed name ending agrees with company type"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -5774,26 +5963,80 @@
         {
           "key": "florida-date",
           "scope": "The consent, questionnaire and amendment forms default their dates from Florida's date given by the server, not the device's UTC day.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-18T03:48:21.611Z",
               "event": "recorded by migration 001-part-level-links"
+            },
+            {
+              "at": "2026-09-20T00:38:11.492Z",
+              "event": "assigned",
+              "batch": "10",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T00:54:42.311Z",
+              "event": "implemented",
+              "batch": "10",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "10",
+          "fix": {
+            "batch": "10",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch10 128:florida-date: document defaults use server Eastern date"
+              }
+            ]
+          }
         },
         {
           "key": "viewer-zone-display",
           "scope": "The two dates rendered in the viewer's zone are formatted with formatDate.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-18T03:48:21.611Z",
               "event": "recorded by migration 001-part-level-links"
+            },
+            {
+              "at": "2026-09-20T00:38:11.492Z",
+              "event": "assigned",
+              "batch": "10",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T00:54:42.311Z",
+              "event": "implemented",
+              "batch": "10",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "10",
+          "fix": {
+            "batch": "10",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch10 128:viewer-zone-display: service deadlines use Eastern display"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -7084,14 +7327,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T00:38:11.492Z",
+              "event": "assigned",
+              "batch": "10",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T00:54:42.311Z",
+              "event": "implemented",
+              "batch": "10",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "10",
+          "fix": {
+            "batch": "10",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch10 159: series errors identify the invalid field"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -7350,17 +7620,44 @@
         {
           "key": "date",
           "scope": "The questionnaire seed carries todayEastern, so the questionnaire and amendment forms default from Florida's date.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-18T03:48:21.611Z",
               "event": "recorded by migration 001-part-level-links"
+            },
+            {
+              "at": "2026-09-20T00:38:11.492Z",
+              "event": "assigned",
+              "batch": "10",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T00:54:42.311Z",
+              "event": "implemented",
+              "batch": "10",
+              "revision": 1,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "128",
             "part": "florida-date"
+          },
+          "batch": "10",
+          "fix": {
+            "batch": "10",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch10 128:florida-date: document defaults use server Eastern date"
+              }
+            ]
           }
         },
         {
@@ -8601,14 +8898,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T00:38:11.492Z",
+              "event": "assigned",
+              "batch": "10",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T00:54:42.311Z",
+              "event": "implemented",
+              "batch": "10",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "10",
+          "fix": {
+            "batch": "10",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch10 186: office dates include year and Eastern day"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -14056,14 +14380,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T00:38:11.492Z",
+              "event": "assigned",
+              "batch": "10",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T00:54:42.311Z",
+              "event": "implemented",
+              "batch": "10",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "10",
+          "fix": {
+            "batch": "10",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch10 N4.02: effective date endpoints do not shift with timezone"
+              }
+            ]
+          }
         }
       ],
       "correctedReplacement": "Reproduced in America/New_York: 9 Sep refused and 16 Dec accepted for a 16 Sep filing; correct in UTC."
@@ -14081,14 +14432,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T00:38:11.492Z",
+              "event": "assigned",
+              "batch": "10",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T00:54:42.311Z",
+              "event": "implemented",
+              "batch": "10",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "10",
+          "fix": {
+            "batch": "10",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch10 N4.03: business days exclude banking holidays"
+              }
+            ]
+          }
         }
       ],
       "correctedReplacement": "Reproduced: Labor Day (7 Sep 2026) counts as a business day; s. 605.0102(9) excludes days a national bank is closed."
@@ -14946,6 +15324,25 @@
         },
         {
           "at": "2026-09-19T23:16:45.312Z",
+          "event": "implemented"
+        }
+      ]
+    },
+    {
+      "id": "10",
+      "revision": 1,
+      "frozenHash": "a8244f67bc27fc4cd163b7c904757bbe9eb2d7ccc84f069b345716b51dec7a45",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "880d1b2389eb19b9854fb3dd8467a619d69beefc",
+      "history": [
+        {
+          "at": "2026-09-20T00:38:11.493Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-20T00:54:42.311Z",
           "event": "implemented"
         }
       ]

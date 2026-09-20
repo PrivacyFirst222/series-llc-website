@@ -267,7 +267,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: // server/e2e.ts imports personLegalName from "./app"; it lives in the portal module. — and drop effectiveOwners from the export, or import it somewhere.
   - Codex (housekeeping-only): app.ts:24–25 contains the quoted comment and re-exports both helpers. Removing an unused re-export changes no product text. The cited excluded e2e.ts was not read, so its import claim is not independently certified.
   - **Codex rejected the proposed replacement:** The proposed comment depends on an excluded test file. Do not add an otherwise unnecessary import merely to justify an export; first verify excluded consumers before removing an API export.
-- **44. [B143]** — **open** — housekeeping
+- **44. [B143]** — **implemented** — housekeeping
   - Server, the Sunbiz name check — the statute the hold is attributed to — `webapp/server/sunbiz.ts:160`
   - Reads: /** s. 605.0715(5)-(6), Fla. Stat.: after administrative dissolution the  *  dissolved company's name is unavailable to others until one year has  *  passed (120 days after a voluntary dissolution). The data file does not  *  say which kind a dissolution was, so the longer window is applied to  *  every inactive record — erring toward warning the client. */
   - Claims: Subsections (5) and (6) of s. 605.0715 set the one-year and 120-day holds.
@@ -276,6 +276,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (disputed): sunbiz.ts:160 attributes both holds to 605.0715(5)–(6), but the 120-day voluntary-dissolution hold does exist in 2026 s.605.0717(2), opened on Online Sunshine. It ends earlier if a statement of termination is filed. The prior reader searched the wrong sections.
   - **Codex rejected the proposed replacement:** Retain the 120-day rule, cite 605.0717(2), and include its earlier-termination exception; cite 605.0715(5) for administrative dissolution.
   - Corrected after Codex's review: The 120-day hold exists: s. 605.0717(2), 'until 120 days after the effective date of dissolution or filing of a statement of termination, if earlier'. Cite s. 605.0715(5) for the one-year administrative hold and s. 605.0717(2) for the 120 days.
+  - Fixed: batch 10 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **N1.01. [substantive]** — **implemented** — waits on Adam's ruling
   - Privacy Policy, Social Security number retention; nightly database backups — `webapp/src/content/privacy.md:15`
   - Reads: At the end of that period we permanently delete every Social Security number you gave us and replace your copy of the completed form with a record copy showing only the last four digits.
@@ -379,9 +380,10 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Ruling, 2026-09-19: Batch 08 item 6 proposed removing optional correspondence company, phone and additional paper-mail address, retaining name and email. Adam approved “the rest”, with item 5 requiring email only from the user; use the user email when no alternative correspondence email is supplied.
   - Fixed: batch 08 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-19 rejected r1: Supersede the failed review revision to complete the omitted tests already authorized with Batch 08; product decisions unchanged. Adam: why did you need to stop and ask me.  if you need to do the tests, just fucking do them and dont waste my time
-- **61. [A20]** — **open**
+- **61. [A20]** — **implemented**
   - Effective date rule measured from the moment of Continue, described as the filing date. Replace: measure from an expected filing day and say so.
   - **Codex rejected the proposed replacement:** An expected filing day must actually be supplied and later rechecked at filing. Wording alone cannot ensure the legal date; separately fix UTC/local-day and bank-holiday defects reported below.
+  - Fixed: batch 10 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **62. [A21]** — **implemented**
   - Agent acceptance signature has no match-the-name rule (the Articles signature does). Replace: same rule.
   - Fixed: batch 06 revision 1, commit , by Codex; protected by 1 assertion(s).
@@ -482,12 +484,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: {submitting ? "Taking you to payment…" : "Continue to payment"}
   - Fixed: batch 09 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-19 rejected r1: Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision.
-- **78. [B40]** — **open**
+- **78. [B40]** — **implemented**
   - LLC name step, the "Final name preview" box while no designator is chosen — `webapp/src/components/forms/florida-llc/sections/StepName.tsx:315`
   - Reads: Florida LLC name must include LLC, L.L.C., Limited Liability Company, PLLC, P.L.L.C., or Professional Limited Liability Company.
   - Claims: The typed name is defective.
   - True: The box above says "The base name without the LLC designator (we'll add it for you)" (line 174); buildFinalLlcName (validation.ts:20-36) appends the designator only once one is chosen, so this red text appears simply because the dropdown is still empty. The same rule reads differently in stepValidation.ts:142 ("must include LLC, L.L.C., or Limited Liability Company.").
   - Replace with: Choose a designator above to complete the name.
+  - Fixed: batch 10 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **79. [B41]** — **implemented**
   - Eligibility & basics step, the "Formation type" helper — `webapp/src/components/forms/florida-llc/sections/StepIntro.tsx:27`
   - Reads: Choose 'Professional LLC' if your business will provide a regulated professional service such as law, medicine, or accounting.
@@ -534,12 +537,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - **Codex rejected the proposed replacement:** Use neutral “Compare manager-managed and member-managed” and remove unsupported comparative/adoption claims. Assess defaults separately against the no-selection promise.
   - Corrected after Codex's review: The badge and 'usually the smarter choice' stand as the defect. 'Why many owners choose' asserts adoption nobody measured; use 'Compare manager-managed and member-managed'.
   - Ruling, 2026-09-19: Batch 08 item 7: “I reject the change. Leave as is”. Keep the recommendation, preselection and explanation unchanged.
-- **84. [B46]** — **open**
+- **84. [B46]** — **implemented**
   - Review step, Effective Date card, the "Date" row — `webapp/src/components/forms/florida-llc/ReviewStep.tsx:255`
   - Reads: <Row label="Date" value={data.requestedEffectiveDate} />
   - Claims: Shows the chosen date.
   - True: The date box (StepEffectiveDate.tsx:71-78, type="date") stores YYYY-MM-DD, so the review prints "2026-10-01" while every other date the client sees is written out (NameCheck.tsx:14-21 fmtDate).
   - Replace with: Format the value as "October 1, 2026" (the fmtDate pattern from NameCheck.tsx).
+  - Fixed: batch 10 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **85. [B47]** — **implemented**
   - Managers step and Initial members step, the type dropdowns — `webapp/src/components/forms/florida-llc/RepeatablePartyFields.tsx:89`
   - Reads: <SelectItem value="ENTITY">Business Entity</SelectItem>
@@ -587,7 +591,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (disputed): NameCheck.tsx:45 does assert recently dissolved from inactive status, but the audit’s inability to find a voluntary-dissolution hold is answered by s.605.0717(2), which sets120days or earlier termination. Its replacement still asserts dissolution without the data proving it. https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605.html
   - **Codex rejected the proposed replacement:** Describe a recently inactive record and this service’s conservative one-year hold; distinguish statutory administrative and other dissolution periods and avoid treating last transaction as proven dissolution.
   - Corrected after Codex's review: Do not assert a dissolution the data does not prove. Describe a recently inactive record and this service's one-year hold; cite s. 605.0715(5) and s. 605.0717(2).
-- **91. [B55]** — **open**
+- **91. [B55]** — **implemented**
   - Order form, Series step (and the portal's add-a-series service): the identifier rule — `webapp/src/components/forms/florida-llc/validation.ts:224`
   - Reads: return /protected\s+series/i.test(name) || /(^|\s)p\.?s\.?(\s|$)/i.test(name);
   - Claims: A series name contains the statutory phrase only when "PS" or "P.S." is bounded by whitespace or the ends of the string; stepValidation.ts:187-189 then refuses "PS-4" with 'Include "PS" (or "P.S." / "protected series") — §605.2202 requires it in every series name.' and routes-portal.ts:1975-1979 refuses "Acme, LLC - PS-4" the same way.
@@ -596,13 +600,15 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (disputed): validation.ts:224 rejects PS-4; reproduced with imported helper. Statute605.2202 requires the abbreviation, not whitespace. But the suggested boundary substitution alone leaves dedupeKey(PS-4) as -4 and dedupeKey(PS 4) as4, contradicting the proposed equivalence.
   - **Codex rejected the proposed replacement:** Accept punctuation boundaries and explicitly normalize separator punctuation consistently in canonicalization and deduplication; do not promise hyphen/space equivalence from the boundary regex alone.
   - Corrected after Codex's review: Changing the boundary alone leaves 'PS-4' and 'PS 4' with different duplicate keys (reproduced: 'PS-4' vs '4'). Normalize the separator in the name rule, the canonical form and the duplicate key together.
-- **92. [B56]** — **open**
+  - Fixed: batch 10 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **92. [B56]** — **implemented**
   - Order form, Name step: the backup-name rule — `webapp/src/components/forms/florida-llc/validation.ts:38`
   - Reads: export function nameContainsLegalDesignator(name: string): boolean { const lower = name.toLowerCase(); return ["limited liability company", "professional limited liability company", "llc", "l.l.c.", "pllc", "p.l.l.c."].some((d) => lower.includes(d)); }
   - Claims: A name carries a designator whenever the letters "llc" appear anywhere in it. stepValidation.ts:134-136 (and server/validation.ts:152-157) then refuse the backup name with "Leave the designator off — your designator above is added automatically."
   - True: "Millcreek Holdings", "Hillcrest Rentals", "Wellcome Farms" and "Fullcircle Properties" all contain "llc" inside a word and carry no designator; the client cannot enter any of them as a backup, and the message tells them to remove a designator that is not there. s. 605.0112(1)(a) (opened) requires the words or abbreviation as the entity indicator, not the letter sequence.
   - Replace with: Match a designator as its own word, at the end of the name: /(^|[\s,])(p\.?l\.?l\.?c\.?|l\.?l\.?c\.?|(professional\s+)?limited\s+liability\s+company)\s*$/i — used by nameContainsLegalDesignator and by the endsWith test in buildFinalLlcName (:27-33).
-- **93. [B57]** — **open**
+  - Fixed: batch 10 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **93. [B57]** — **implemented**
   - Order form, Name step: a typed professional designator on a standard LLC — `webapp/src/components/forms/florida-llc/validation.ts:27`
   - Reads: const hasIt = lower.endsWith("llc") || lower.endsWith("l.l.c.") || lower.endsWith("limited liability company") || lower.endsWith("pllc") || lower.endsWith("p.l.l.c.") || lower.endsWith("professional limited liability company"); if (hasIt) return cleaned;
   - Claims: A desired name that already ends in any designator is filed as typed, whatever designator the client chose and whatever the formation type.
@@ -611,6 +617,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (disputed): validation.ts:27–34 accepts Acme PLLC unchanged even if LLC is selected; reproduced. The replacement tells the user to choose Professional LLC, an option absent from StepIntro, and only supplies the error for one direction of mismatch. 621.12(2)(a) also allows chartered; its text must not be reduced to an exhaustive three-option legal rule.
   - **Codex rejected the proposed replacement:** Validate the actual final suffix against the chosen supported product type, provide both mismatch messages, and use Domestic Florida PLLC as the option label.
   - Corrected after Codex's review: The option is labelled 'Domestic Florida PLLC'; check the typed ending against the chosen type in both directions; s. 621.12(2)(a) also permits 'chartered'.
+  - Fixed: batch 10 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **94. [B59]** — **implemented**
   - Order form, Members step, the empty-list refusal — `webapp/src/components/forms/florida-llc/stepValidation.ts:291`
   - Reads: "At least one initial member is required for internal formation records."
@@ -792,20 +799,22 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: RepeatablePartyFields.tsx:81–83 and RepeatableMemberFields.tsx:75–78 change only the discriminator and retain hidden names. buildPayload.ts:86,97 preserves both. ReviewStep.tsx:198,221 uses the discriminator, but routes-portal.ts:94–99,108–114,127–132 chooses any retained personal name before entityName/businessEntityName and infers isEntity from name absence. Enter John Smith, switch to Entity and enter Acme LLC: review identifies Acme LLC, while the OA seed identifies John Smith as an individual. In the reverse manager switch, filing.ts:512–523 instead prefers the retained businessEntityName. This is a reproducible deterministic data-path mismatch, not evidence of an actual customer document.
   - Replace with: When the row type changes, clear fields belonging to the other type. In the review, filing sheet, and agreement seed, choose the name and entity-signature treatment from memberType or personOrEntity; never infer the selected type from whichever hidden name remains populated.
   - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **N4.02. [substantive]** — **open**
+- **N4.02. [substantive]** — **implemented**
   - Order form, Effective date: a Florida calendar date is shifted back one day — `webapp/src/components/forms/florida-llc/validation.ts:139`
   - Reads: Effective date cannot be more than 5 business days before the filing date.
   - Claims: The entered calendar date is tested against the stated legal interval.
   - True: validation.ts:128 parses YYYY-MM-DD as UTC, then :136 changes hours in the local time zone. Read-only imports under TZ=America/New_York with anticipated filing September 16, 2026 at noon rejected September 9 (the fifth preceding weekday) and accepted December 16 (91 calendar days later). Section 605.0207(2)(a)–(b), opened in the 2026 Online Sunshine chapter, permits five prior business days and 90 later days: https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605.html. This is separate from prior61, which concerns the assumed filing day.
   - Replace with: Parse the year, month, and day as a Florida calendar date and compare Florida calendar dates; accept September 9 and reject December 16 when the anticipated filing date is September 16, 2026. Keep the five-business-day and 90-day messages only after applying those boundaries correctly.
   - Corrected after Codex's review: Reproduced in America/New_York: 9 Sep refused and 16 Dec accepted for a 16 Sep filing; correct in UTC.
-- **N4.03. [substantive]** — **open**
+  - Fixed: batch 10 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **N4.03. [substantive]** — **implemented**
   - Order form, Effective date: bank holidays are counted as business days — `webapp/src/components/forms/florida-llc/validation.ts:109`
   - Reads: return day !== 0 && day !== 6;
   - Claims: Every Monday through Friday is a business day when counting backward from filing.
   - True: isBusinessDay excludes only Saturday and Sunday. Read-only evaluation returns true for Labor Day, September 7, 2026. Section 605.0102(9), opened on 2026 Online Sunshine, excludes days a national banking association is not open for normal business transactions; s.605.0207(2)(a) uses that business-day term. https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605.html Federal Reserve holiday calendar identifies September 7, 2026 as Labor Day: https://www.federalreserve.gov/aboutthefed/k8.htm. The earliest permitted date is therefore calculated too late around a bank holiday, independently of the UTC defect.
   - Replace with: Count only Monday through Friday dates on which national banking associations are open for normal business transactions, including observed bank-holiday rules, when computing the five-business-day lookback.
   - Corrected after Codex's review: Reproduced: Labor Day (7 Sep 2026) counts as a business day; s. 605.0102(9) excludes days a national bank is closed.
+  - Fixed: batch 10 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **N4.04. [substantive]** — **open**
   - Order form, Business purpose: the clause promised in every Articles filing is never added — `webapp/src/components/forms/florida-llc/sections/StepPurpose.tsx:65`
   - Reads: Your Articles will always include a general purpose covering any lawful business activity, so your LLC is never limited to one line of business.
@@ -901,10 +910,12 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - S corporation warning (mine) cites Section 12.1 on forms where 12.1 is Amendments. Replace: "…its admission section admits only an eligible shareholder."
 - **127. [A59]** — **open**
   - Sole-owner S title "Single-Member S Corporation…" vs pill "S Corporation"; "Amended & Restated (No. 2)" vs the document's full title. Replace: one label table; full title.
-- **128. [A60]** — **open**
+- **128. [A60]** — **implemented**
   - Default dates from the device's UTC day (consent, questionnaire, amendment); two dates rendered in the viewer's zone. Replace: Florida's date from the server; formatDate.
-  - Part "florida-date" — open: The consent, questionnaire and amendment forms default their dates from Florida's date given by the server, not the device's UTC day.
-  - Part "viewer-zone-display" — open: The two dates rendered in the viewer's zone are formatted with formatDate.
+  - Part "florida-date" — implemented: The consent, questionnaire and amendment forms default their dates from Florida's date given by the server, not the device's UTC day.
+  - Fixed (florida-date): batch 10 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Part "viewer-zone-display" — implemented: The two dates rendered in the viewer's zone are formatted with formatDate.
+  - Fixed (viewer-zone-display): batch 10 revision 1, commit , by Codex; protected by 1 assertion(s).
   - Former part "all" (retired by 001-part-level-links, now florida-date, viewer-zone-display): The whole finding.
 - **129. [A61]** — **open**
   - Consent exhibit-identifier default fails for "Protected Series 4". Replace: accept that spelling.
@@ -1107,12 +1118,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: The only other choice is SELF (validation.ts:15), under which the client names an individual — first and last name (validation.ts:223-232) — who accepts personally; the company is never its own agent. The sentence reaches the screen through PortalDashboard.tsx:426.
   - Replace with: return c.json(err(`${order.llc_name} did not take our registered agent service; there is nothing to cancel.`, "NOT_OUR_SERVICE"), 400);
   - Codex (housekeeping-only): routes-portal.ts:2584 calls a SELF-agent LLC its own agent, but SELF names an individual. Contrary to the finding’s delivery assertion, PortalDashboard.tsx:426 shows a generic cancellation error, so this exact server sentence is not currently shown.
-- **159. [B133]** — **open**
+- **159. [B133]** — **implemented**
   - Client portal, Services card — buying another series, the one refusal for every shape problem — `webapp/server/routes-portal.ts:1966`
   - Reads: if (!body.success) return c.json(err("A series identifier is required.", "INVALID_INPUT"), 400);
   - Claims: The identifier was left blank.
   - True: The schema at :1963-1965 also refuses an identifier over 60 characters and a purpose over 300 (`suffix: z.string().min(1).max(60), purpose: z.string().max(300).optional()`); both answer "A series identifier is required." The consent route was given per-box refusals for exactly this on 15 Sep 2026 (:1569-1582).
   - Replace with: const first = body.error.issues[0]; const field = String(first?.path?.[0] ?? ""); const msg = field === "suffix" ? (first?.code === "too_big" ? "The series identifier can be at most 60 characters." : "Enter a series identifier.") : field === "purpose" ? "The purpose can be at most 300 characters." : "A series identifier is required."; return c.json(err(msg, "INVALID_INPUT"), 400);
+  - Fixed: batch 10 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **160. [B134]** — **implemented**
   - Client portal sign-in — the refusal for a malformed email — `webapp/server/routes-portal.ts:919`
   - Reads: if (!body.success) return c.json(err("Email and password are required.", "INVALID_INPUT"), 400);
@@ -1144,13 +1156,14 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: The screen has no line for it: PortalDashboard.tsx:488-494 `deleteGeneration = useMutation({ mutationFn: (id) => api.delete(`/api/portal/oa/generations/${id}`), onSuccess: … })` has no onError, and nothing renders deleteGeneration.isError — a refused delete (or a lost connection) leaves the row in place with no message.
   - Replace with: In PortalDashboard.tsx add `onError: (e) => setDeleteError(e instanceof ApiError ? e.message : "We could not delete that agreement. Try again.")` and render it under the agreements list; and make the refusal say what it means: err("That agreement is no longer on your account.", "NOT_FOUND").
   - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **164. [B138]** — **open**
+- **164. [B138]** — **date: implemented; blocked-field: open**
   - Client portal, operating agreement questionnaire — the seed carries no Florida date for the effective-date box — `webapp/server/routes-portal.ts:1135`
   - Reads: return c.json({     data: {       seed,       version,       multiOwner,       memberManaged,       blocked: false,       templateVersion: OA_TEMPLATE_VERSION,       answers: savedAnswers,       generations,     },   });
   - Claims: Everything the questionnaire needs to open is here.
   - True: The questionnaire and the amendment form default their dates from the device's UTC day (OAQuestionnaire.tsx:57, AmendAgreement.tsx:26 `new Date().toISOString().slice(0, 10)`) — A60 — because this response gives them nothing better, while /portal/services already sends `todayEastern: easternDateIso()` (:1892). Also `blocked: false` is written and read nowhere (OAQuestionnaire.tsx:48 types it only).
   - Replace with: Add `todayEastern: easternDateIso(),` to the data object and drop `blocked: false`; then OAQuestionnaire.tsx:57 and AmendAgreement.tsx:26 default from it.
-  - Part "date" — open: The questionnaire seed carries todayEastern, so the questionnaire and amendment forms default from Florida's date. — same defect as 128 (florida-date)
+  - Part "date" — implemented: The questionnaire seed carries todayEastern, so the questionnaire and amendment forms default from Florida's date. — same defect as 128 (florida-date)
+  - Fixed (date): batch 10 revision 1, commit , by Codex; protected by 1 assertion(s).
   - Part "blocked-field" — open: `blocked: false` is written and read nowhere; dropped from the response and the type.
   - Former part "all" (retired by 001-part-level-links, now date, blocked-field): The whole finding.
 - **165. [A66h]** — **open** — housekeeping
@@ -1397,12 +1410,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: The edition scheme every document footer uses is 'First Edition — August 2026' (docs/facts.md, 'The edition label on every generated document'; the box's own placeholder at :138 shows 'Second Edition — January 2027'). A blank box publishes 'September 2026' with no edition number, and the portal prints that label to every client beside 'always the latest edition' (PortalDashboard.tsx:281).
   - Replace with: Require the label: disable the Publish/Replace button while `edition.trim() === ""` and drop the month-year default.
   - Fixed: batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **186. [B96]** — **open**
+- **186. [B96]** — **implemented**
   - Office, the Fulfil dialog, the 'Placed:' line — `webapp/src/pages/admin/ServiceOrdersSection.tsx:69`
   - Reads: const day = (iso: string | null) => iso ? new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "—";
   - Claims: 'Placed: Sep 5' identifies when the order was placed.
   - True: No year: an S election order viewed a year on (the SSNs are gone at 14 days but the row stays, :186-187) reads 'Placed: Sep 5' whichever year it was. AdminDashboard.tsx:226-227's `day` prints the year.
   - Replace with: { month: "short", day: "numeric", year: "numeric" }
+  - Fixed: batch 10 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **187. [A79h]** — **open** — housekeeping
   - Housekeeping: eleven misplaced or stale comments; three unused board fields; two unused helpers; dead branches; unreachable notify options.
   - Codex (housekeeping-only): The cited family contains real code-only issues: AdminDashboard.tsx:497 constant sortable, OrderBoard.tsx unused declarations, OrderDetail.tsx:45 unused services, serviceOrders.helpers.ts unused exports, and orphan ServiceOrdersSection.tsx:74-77 comment.

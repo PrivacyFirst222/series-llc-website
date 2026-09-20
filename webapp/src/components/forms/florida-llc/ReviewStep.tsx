@@ -1,3 +1,4 @@
+import { formatCalendarDate, EFFECTIVE_DATE_NOTICE } from "@/lib/calendar";
 import { registeredAgentName } from "./registeredAgent";
 import { Pencil, Info } from "lucide-react";
 import { fullPersonName } from "./validation";
@@ -252,7 +253,10 @@ export function ReviewStep({ data, goToStep }: ReviewStepProps) {
             }
           />
           {data.effectiveDateOption === "SPECIFIC" ? (
-            <Row label="Date" value={data.requestedEffectiveDate} />
+            <>
+              <Row label="Requested date" value={formatCalendarDate(data.requestedEffectiveDate ?? "")} />
+              <p className="pt-2 text-muted-foreground">{EFFECTIVE_DATE_NOTICE}</p>
+            </>
           ) : null}
         </ReviewCard>
         ) : null}

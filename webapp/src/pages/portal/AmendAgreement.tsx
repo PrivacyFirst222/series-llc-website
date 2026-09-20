@@ -19,13 +19,12 @@ import { QuestionCard } from "./OaQuestionCard";
 import { ViewingAsBanner } from "./ViewingAsBanner";
 
 interface AmendData {
+  todayEastern: string;
   seed: { llcName: string };
   generations: { id: string; created_at: string; amended_restated: boolean; generation_number: number; effective_date: string | null; effective_date_iso: string | null }[];
 }
 
-function todayIso(): string {
-  return new Date().toISOString().slice(0, 10);
-}
+
 
 export default function AmendAgreement() {
   const [params] = useSearchParams();
@@ -33,7 +32,7 @@ export default function AmendAgreement() {
   const cq = company ? `?company=${company}` : "";
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const [effectiveDate, setEffectiveDate] = useState<string>(todayIso());
+  const [effectiveDate, setEffectiveDate] = useState<string | null>(null);
   // The agreement being amended, by its effective date: prefilled from the
   // current agreement on file, confirmed or corrected by the client, printed
   // in Recital A (Adam, 12 Sep 2026).
@@ -62,7 +61,7 @@ export default function AmendAgreement() {
     mutationFn: (payload: { agreementDate: string }) =>
       api.post<{ documentId: string; title: string; number: number }>(`/api/portal/oa/amend${cq}`, {
         agreementDate: payload.agreementDate,
-        effectiveDate,
+        effectiveDate: effectiveDate ?? oaQuery.data?.todayEastern ?? "",
         mode,
         text: mode === "typed" ? text : undefined,
       }),
@@ -105,7 +104,7 @@ export default function AmendAgreement() {
 
   const current = data.generations[0];
   const agreementDateValue = agreementDate ?? current?.effective_date_iso ?? "";
-  const canCreate = !amend.isPending && !!agreementDateValue && !!effectiveDate && (mode === "attached" || text.trim() !== "");
+  const canCreate = !amend.isPending && !!agreementDateValue && !!(effectiveDate ?? oaQuery.data?.todayEastern) && (mode === "attached" || text.trim() !== "");
 
   return (
     <section className="container-wide section-y">
@@ -173,7 +172,7 @@ export default function AmendAgreement() {
               <Input
                 type="date"
                 aria-label="Amendment effective date"
-                value={effectiveDate}
+                value={effectiveDate ?? oaQuery.data?.todayEastern ?? ""}
                 onChange={(e) => setEffectiveDate(e.target.value)}
                 className="max-w-xs"
               />

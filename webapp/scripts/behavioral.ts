@@ -1,3 +1,4 @@
+import { batch10Walk } from "./batch10-walk";
 import { batch09Walk } from "./batch09-walk";
 import { batch08Walk } from "./batch08-walk";
 import { batch07Walk } from "./batch07-walk";
@@ -2720,6 +2721,22 @@ async function main(): Promise<void> {
       await page.close();
     }
   }
+
+const batch10Results = new Map<string,{ok:boolean;detail?:unknown}>();
+await batch10Walk(browser, `http://localhost:${WEB_PORT}`, (ok,label,detail)=>batch10Results.set(label,{ok,detail}));
+{const r=batch10Results.get("batch10 44: name-hold comment cites both rules");expect(r?.ok===true,"batch10 44: name-hold comment cites both rules",r?.detail);batch10Results.delete("batch10 44: name-hold comment cites both rules");}
+{const r=batch10Results.get("batch10 61: one business day estimate and automatic nearest permitted filing date");expect(r?.ok===true,"batch10 61: one business day estimate and automatic nearest permitted filing date",r?.detail);batch10Results.delete("batch10 61: one business day estimate and automatic nearest permitted filing date");}
+{const r=batch10Results.get("batch10 78: missing designator asks for selection");expect(r?.ok===true,"batch10 78: missing designator asks for selection",r?.detail);batch10Results.delete("batch10 78: missing designator asks for selection");}
+{const r=batch10Results.get("batch10 84: review shows the selected calendar day in words");expect(r?.ok===true,"batch10 84: review shows the selected calendar day in words",r?.detail);batch10Results.delete("batch10 84: review shows the selected calendar day in words");}
+{const r=batch10Results.get("batch10 91: series separators validate and deduplicate consistently");expect(r?.ok===true,"batch10 91: series separators validate and deduplicate consistently",r?.detail);batch10Results.delete("batch10 91: series separators validate and deduplicate consistently");}
+{const r=batch10Results.get("batch10 92: embedded llc letters are not designators");expect(r?.ok===true,"batch10 92: embedded llc letters are not designators",r?.detail);batch10Results.delete("batch10 92: embedded llc letters are not designators");}
+{const r=batch10Results.get("batch10 93: typed name ending agrees with company type");expect(r?.ok===true,"batch10 93: typed name ending agrees with company type",r?.detail);batch10Results.delete("batch10 93: typed name ending agrees with company type");}
+{const r=batch10Results.get("batch10 128:florida-date: document defaults use server Eastern date");expect(r?.ok===true,"batch10 128:florida-date: document defaults use server Eastern date",r?.detail);batch10Results.delete("batch10 128:florida-date: document defaults use server Eastern date");}
+{const r=batch10Results.get("batch10 128:viewer-zone-display: service deadlines use Eastern display");expect(r?.ok===true,"batch10 128:viewer-zone-display: service deadlines use Eastern display",r?.detail);batch10Results.delete("batch10 128:viewer-zone-display: service deadlines use Eastern display");}
+{const r=batch10Results.get("batch10 186: office dates include year and Eastern day");expect(r?.ok===true,"batch10 186: office dates include year and Eastern day",r?.detail);batch10Results.delete("batch10 186: office dates include year and Eastern day");}
+{const r=batch10Results.get("batch10 N4.02: effective date endpoints do not shift with timezone");expect(r?.ok===true,"batch10 N4.02: effective date endpoints do not shift with timezone",r?.detail);batch10Results.delete("batch10 N4.02: effective date endpoints do not shift with timezone");}
+{const r=batch10Results.get("batch10 N4.03: business days exclude banking holidays");expect(r?.ok===true,"batch10 N4.03: business days exclude banking holidays",r?.detail);batch10Results.delete("batch10 N4.03: business days exclude banking holidays");}
+{const r=batch10Results.get("batch10 159: series errors identify the invalid field");expect(r?.ok===true,"batch10 159: series errors identify the invalid field",r?.detail);batch10Results.delete("batch10 159: series errors identify the invalid field");}
 
 const batch09Results = new Map<string,{ok:boolean;detail?:unknown}>();
 await batch09Walk(browser, `http://localhost:${WEB_PORT}`, (ok,label,detail)=>batch09Results.set(label,{ok,detail}), API);

@@ -351,7 +351,7 @@ export function OrdersInProgress({
                 <Input
                   name="effectiveDate"
                   type="date"
-                  defaultValue={new Date().toISOString().slice(0, 10)}
+                  defaultValue={data.todayEastern}
                   required
                 />
               </div>

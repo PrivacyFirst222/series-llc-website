@@ -1,8 +1,9 @@
+import { anticipatedFilingDay, effectiveDateRange, closestEffectiveDate, formatCalendarDate, EFFECTIVE_DATE_NOTICE } from "@/lib/calendar";
 import { Input } from "@/components/ui/input";
 import { FieldShell } from "../FieldShell";
 import {
   shouldRecommendJanuary1Effective,
-  validateEffectiveDate,
+  validateRequestedDate,
 } from "../validation";
 import type { EffectiveDateOption, FloridaLLCFormData } from "../types";
 
@@ -15,11 +16,16 @@ interface StepProps {
 export function StepEffectiveDate({ data, patch, errors }: StepProps) {
   const dateError =
     data.effectiveDateOption === "SPECIFIC" && data.requestedEffectiveDate
-      ? validateEffectiveDate(data.requestedEffectiveDate)
+      ? validateRequestedDate(data.requestedEffectiveDate)
       : data.effectiveDateOption === "SPECIFIC"
         ? "Please select a date."
         : null;
 
+  const filingDay = anticipatedFilingDay();
+  const range = effectiveDateRange(filingDay);
+  const adjusted = data.effectiveDateOption === "SPECIFIC" && data.requestedEffectiveDate && !dateError
+    ? closestEffectiveDate(data.requestedEffectiveDate, filingDay)
+    : null;
   const showJan1Tip = shouldRecommendJanuary1Effective();
 
   return (
@@ -60,13 +66,15 @@ export function StepEffectiveDate({ data, patch, errors }: StepProps) {
         </div>
       </FieldShell>
 
+      <p className="text-sm text-muted-foreground">{EFFECTIVE_DATE_NOTICE}</p>
+      {adjusted && adjusted !== data.requestedEffectiveDate ? <p className="text-sm" role="status">Based on the anticipated filing date, the closest permitted effective date is {formatCalendarDate(adjusted)}.</p> : null}
       {data.effectiveDateOption === "SPECIFIC" ? (
         <FieldShell
           label="Requested effective date"
           required
           htmlFor="requested-effective-date"
           error={dateError ?? errors.requestedEffectiveDate}
-          helper="Up to 5 business days before or 90 days after the anticipated filing date."
+          helper={`Anticipated filing: ${formatCalendarDate(filingDay)}. Estimated range: ${formatCalendarDate(range.earliest)} through ${formatCalendarDate(range.latest)}.`}
         >
           <Input
             id="requested-effective-date"

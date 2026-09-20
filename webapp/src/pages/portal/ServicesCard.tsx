@@ -1,3 +1,4 @@
+import { formatDate } from "@/lib/datetime";
 import type { JointKind } from "@/lib/jointOwner";
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -104,8 +105,7 @@ export interface ShareholderRow {
 }
 
 
-const fmtDay = (iso: string) =>
-  new Date(iso).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+const fmtDay = formatDate;
 
 export function ServicesCard({ company }: { company?: string | null }) {
   // Every read and purchase carries the selected company (Adam, 31 Aug 2026);

@@ -1,3 +1,4 @@
+import { validCalendarDate, formatCalendarDate } from "./calendar";
 /**
  * Every timestamp a client sees is Florida time with the zone stated. A client
  * may be reading from anywhere, and the server that wrote the record runs in
@@ -25,6 +26,7 @@ export function formatDateTime(iso: string): string {
 
 /** "August 9, 2026" — for things that are dated but not timed. */
 export function formatDate(iso: string): string {
+  if (validCalendarDate(iso)) return formatCalendarDate(iso);
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "";
   return d.toLocaleDateString("en-US", {
