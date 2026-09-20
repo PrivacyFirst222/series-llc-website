@@ -186,3 +186,11 @@ scanned set; add ` in <path prefix>` to confine the ban to matching files.
 - Clients fax or mail Form 2553 themselves; we prepare the package and do not file it.
 - Impossible SSNs: middle group 00 and ending 0000 are rejected, alongside the existing length/area restrictions, on client and server.
 - Owner retained the issued-EIN prerequisite (item 122) and the incomplete-SSN warning (N2.18). The dormant record-copy deadline uses neutral tense; no automatic redacted-copy replacement is restored.
+
+## Batch 14 — agreement preparation (Adam approved 20 September 2026)
+
+- A generated PDF does not establish adoption. The operating-agreement questionnaire asks whether an agreement has been adopted (written, oral or implied). Correcting an unused draft remains a first agreement; replacing an adopted agreement uses amended/restated. The client identifies a company-specific predecessor and confirms its effective date, or identifies an external or undated/date-unknown agreement. Never substitute generation time for the prior effective date.
+- Portal badges say “Most recently generated” and “Earlier generated copy”. Generation order does not determine which agreement is legally in effect.
+- Manager-managed agreement questionnaires support editing, adding and removing managers, with entity signer details carried with each manager. Preparing an agreement does not change state filing records.
+- The series consent's blank contribution prints “None”; its exhibit adopter blocks have no additional Date line and its asset schedule has five blank rows, matching the masters. Consent member signatures retain Date lines. Its document title/footer is “Consent & Series Exhibit — [series name]”.
+- The consent special-terms warning includes Article 9 for the selected company's S agreement and Article 8 for every form.

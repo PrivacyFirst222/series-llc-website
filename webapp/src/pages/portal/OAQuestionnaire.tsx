@@ -1,3 +1,5 @@
+import { agreementManagers, managerProblem } from "@/lib/oaManagers";
+import { OaManagersCard } from "./OaManagersCard";
 import { AgreementLoadError } from "./AgreementLoadError";
 import { DollarInput } from "@/components/ui/dollar-input";
 import { contributorUnits, reconcileContributors } from "@/lib/oaContributors";
@@ -35,6 +37,7 @@ interface OaSeed {
 interface OaGeneration {
   id: string;
   document_id: string | null;
+  effective_date_iso?: string | null;
   template_version: string;
   amended_restated: boolean;
   generation_number: number;
@@ -114,9 +117,8 @@ export default function OAQuestionnaire() {
       const restored: Answers = {
         ...saved,
         assets: saved.assets ?? [],
-        firstOrAmended:
-          saved.firstOrAmended ??
-          (data.seed.filingPath === "CONVERT" || data.generations.length > 0 ? "amended" : "first"),
+        firstOrAmended: saved.firstOrAmended,
+        managers: agreementManagers(data.seed, saved),
         sElection: saved.sElection ?? false,
         effectiveDate: saved.effectiveDate ?? data.todayEastern,
         authorized: saved.authorized ?? false,
@@ -373,13 +375,15 @@ export default function OAQuestionnaire() {
   const incompleteOwner = owners.some((o) => (o.isEntity ? !(o.name ?? "").trim() : !hasFirstAndLast(o.name)) || !(o.address ?? "").trim());
   // Every company or trust — owner or Manager — needs the person who signs
   // for it, first and last name, and their title (Adam, 13 Sep 2026).
-  const entityManagers = (data?.seed.managerNames ?? []).map((name, i) => ({ name, i })).filter(({ i }) => data?.seed.managerEntities?.[i]);
+  const managers = a.managers ?? [];
+  const invalidManager = data.memberManaged ? null : managerProblem(managers);
   const incompleteSigner =
     owners.some((o) => o.isEntity && (!hasFirstAndLast(o.signerName) || !(o.signerTitle ?? "").trim())) ||
-    entityManagers.some(({ i }) => !hasFirstAndLast(a.managerSigners?.[i]?.name) || !(a.managerSigners?.[i]?.title ?? "").trim());
+    (!data.memberManaged && managers.some(m => m.isEntity && (!hasFirstAndLast(m.signerName) || !(m.signerTitle ?? "").trim())));
 
   // Answering "more than one owner" with one name on file would otherwise dead-end
   // — there would be nowhere to type the second owner.
+  const priorIncomplete = a.firstOrAmended === "amended" && (!a.priorAgreement || (a.priorAgreement !== "unknown" && !a.priorAgreementDate));
   const goToDetails = () => {
     if (a.multiOwner === true && owners.length < 2) {
       patch({ members: [...owners, { name: "", address: "" }] });
@@ -437,9 +441,9 @@ export default function OAQuestionnaire() {
           ) : (
             <>
               Your company is <strong className="text-foreground">manager-managed</strong>, so your
-              agreement is built on our manager-managed form: {data.seed.managerNames.length > 0 ? data.seed.managerNames.join(", ") : "your Manager"} runs
-              the company day to day. We take this from your formation record — there's nothing to
-              choose here.
+              agreement is built on our manager-managed form. The managers run the company day to day.
+              You can update their names on the next screen. The management structure comes from
+              your formation record.
             </>
           )}
         </div>
@@ -513,7 +517,7 @@ export default function OAQuestionnaire() {
             </QuestionCard>
 
             <QuestionCard
-              title="Is this the LLC's first operating agreement, or an amendment to a previous one?"
+              title="Has the LLC adopted an operating agreement?"
               learnMore="firstOrAmended"
             >
               <label className="flex items-start gap-2 text-sm">
@@ -524,7 +528,7 @@ export default function OAQuestionnaire() {
                   onChange={() => patch({ firstOrAmended: "first" })}
                   className="mt-0.5 accent-trust"
                 />
-                <span>This is the company's first operating agreement</span>
+                <span>No — this is the company's first operating agreement</span>
               </label>
               <label className="flex items-start gap-2 text-sm">
                 <input
@@ -534,8 +538,25 @@ export default function OAQuestionnaire() {
                   onChange={() => patch({ firstOrAmended: "amended" })}
                   className="mt-0.5 accent-trust"
                 />
-                <span>I'm amending and restating an existing operating agreement</span>
+                <span>Yes — I'm amending and restating an existing operating agreement</span>
               </label>
+              <p className="text-xs text-muted-foreground">An adopted agreement may be written, oral or implied. Generating a PDF does not establish adoption. If you are only correcting an unused draft, choose No.</p>
+              {a.firstOrAmended === "amended" ? <div className="space-y-3">
+                <label className="block text-sm font-medium" htmlFor="prior-agreement">Which adopted agreement are you replacing?</label>
+                <select id="prior-agreement" className="w-full rounded-md border border-input bg-background p-2 text-sm" value={a.priorAgreement ?? ""} onChange={e => {
+                  const g = data.generations.find(g => g.id === e.target.value);
+                  patch({ priorAgreement: e.target.value, priorAgreementDate: g?.effective_date_iso ?? "" });
+                }}>
+                  <option value="">Choose the agreement</option>
+                  {data.generations.map(g => <option key={g.id} value={g.id}>Agreement No. {g.generation_number}{g.effective_date_iso ? ` — effective ${g.effective_date_iso}` : " — date not recorded"}</option>)}
+                  <option value="external">An agreement prepared elsewhere</option>
+                  <option value="unknown">An undated agreement / effective date unknown</option>
+                </select>
+                {a.priorAgreement && a.priorAgreement !== "unknown" ? <label className="block space-y-1 text-sm">Confirm the prior agreement's effective date
+                  <Input aria-label="Prior agreement effective date" type="date" value={a.priorAgreementDate ?? ""} onChange={e => patch({ priorAgreementDate: e.target.value })} />
+                </label> : null}
+                <p className="text-xs text-muted-foreground">Use the effective date of the agreement you adopted, not the day its PDF was generated. If the date is unknown, select the undated / date unknown option.</p>
+              </div> : null}
             </QuestionCard>
 
             <Button className="w-full rounded-full" size="lg" onClick={goToDetails}>
@@ -556,42 +577,7 @@ export default function OAQuestionnaire() {
 
             <OwnersCard owners={owners} isMulti={isMulti} ownerCountMismatch={ownerCountMismatch} patchMember={patchMember} removeOwner={removeOwner} addOwner={addOwner} suggestions={suggestions} addOwnerWith={addOwnerWith} sElection={a.sElection === true} />
 
-            {entityManagers.length > 0 ? (
-              <QuestionCard title={entityManagers.length === 1 ? `Who signs for ${entityManagers[0].name}?` : "Who signs for each company that is a Manager?"}>
-                <p className="text-xs text-muted-foreground">
-                  A company that serves as Manager signs through a person. The agreement prints the
-                  company's name, then "By:" over the signature line, with this person's name and
-                  title beneath it.
-                </p>
-                {entityManagers.map(({ name, i }) => (
-                  <div key={i} className="space-y-2 rounded-lg border border-border bg-secondary/30 p-3">
-                    <span className="text-xs font-medium text-muted-foreground">{name}</span>
-                    <div className="grid gap-2 sm:grid-cols-2">
-                      <Input
-                        aria-label={`Who signs for ${name}`}
-                        placeholder="Who signs for it — first and last name"
-                        value={a.managerSigners?.[i]?.name ?? ""}
-                        onChange={(e) => {
-                          const next = [...(a.managerSigners ?? [])];
-                          next[i] = { ...(next[i] ?? {}), name: e.target.value };
-                          patch({ managerSigners: next });
-                        }}
-                      />
-                      <Input
-                        aria-label={`Title of the signer for ${name}`}
-                        placeholder="Their title, e.g. Manager or President"
-                        value={a.managerSigners?.[i]?.title ?? ""}
-                        onChange={(e) => {
-                          const next = [...(a.managerSigners ?? [])];
-                          next[i] = { ...(next[i] ?? {}), title: e.target.value };
-                          patch({ managerSigners: next });
-                        }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </QuestionCard>
-            ) : null}
+            {!data.memberManaged ? <OaManagersCard managers={managers} onChange={managers => patch({ managers })} /> : null}
 
             {isMulti ? (
               <>
@@ -799,6 +785,8 @@ export default function OAQuestionnaire() {
               {ownerCountMismatch ? (
                 <p className="mt-3 text-sm text-destructive">{ownerCountMismatch}</p>
               ) : null}
+              {!a.firstOrAmended || priorIncomplete ? <p className="mt-3 text-sm text-destructive">Use “Change those three answers” to confirm whether an agreement has been adopted and identify it if you are replacing it.</p> : null}
+              {invalidManager ? <p className="mt-3 text-sm text-destructive">{invalidManager}</p> : null}
               {incompleteSigner ? (
                 <p className="mt-3 rounded-lg border border-amber-300/60 bg-amber-50 p-3 text-sm text-amber-900" data-testid="signer-incomplete">
                   Name the person who signs for each company or trust — first and last name — and their title.
@@ -827,7 +815,7 @@ export default function OAQuestionnaire() {
               <Button
                 className="mt-4 w-full rounded-full"
                 size="lg"
-                disabled={saving || save.isPending || !!saveFailed || invalidMoney.size > 0 || generate.isPending || a.authorized !== true || ownerCountMismatch !== "" || incompleteOwner || incompleteSigner || atCap || assetProblemCount > 0}
+                disabled={!a.firstOrAmended || priorIncomplete || !!invalidManager || saving || save.isPending || !!saveFailed || invalidMoney.size > 0 || generate.isPending || a.authorized !== true || ownerCountMismatch !== "" || incompleteOwner || incompleteSigner || atCap || assetProblemCount > 0}
                 onClick={() => generate.mutate(a)}
               >
                 <FileText className="mr-2 h-4 w-4" />
@@ -865,10 +853,10 @@ export default function OAQuestionnaire() {
                   <History className="h-4 w-4 text-trust" />
                   <h3 className="font-display text-base font-semibold">Your agreements</h3>
                 </div>
+                <p className="mt-2 text-xs text-muted-foreground">Generation order does not determine which agreement is legally in effect.</p>
                 <ul className="mt-3 divide-y divide-border">
                   {data.generations.map((g, gi) => {
-                    // The API returns newest first, so index 0 is the live one
-                    // and the sequence number counts up from the oldest.
+                    // The API returns newest first; this says nothing about adoption.
                     const isCurrent = gi === 0;
                     // The number is stored with the generation, not derived from
                     // position — deleting a draft must not renumber the others.
@@ -884,7 +872,7 @@ export default function OAQuestionnaire() {
                               isCurrent ? "bg-trust/10 text-trust" : "bg-secondary text-muted-foreground"
                             }`}
                           >
-                            {isCurrent ? "Current" : "Superseded"}
+                            {isCurrent ? "Most recently generated" : "Earlier generated copy"}
                           </span>
                           <span className="ml-2 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
                             {taxationLabel(g.version ?? "")}

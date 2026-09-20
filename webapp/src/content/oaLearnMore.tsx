@@ -46,8 +46,8 @@ export const LEARN_MORE: Record<string, LearnMoreScreen> = {
         <P>
           <strong className="text-foreground">Worth knowing:</strong> this questionnaire does not
           make the election — that happens with the IRS. Choose Yes only if you have made, or
-          your tax professional is making, the election. You can switch forms later by generating
-          an amended and restated agreement.
+          your tax professional is making, the election. You can switch forms later by regenerating the agreement. If an agreement has already
+          been adopted, choose amended and restated; an unused draft remains a first agreement.
         </P>
       </div>
     ),
@@ -63,17 +63,18 @@ export const LEARN_MORE: Record<string, LearnMoreScreen> = {
         </P>
         <Choice label={'If you choose "This is the company\'s first operating agreement":'}>
           The document is titled simply "Operating Agreement" and takes effect as the company's
-          original governing agreement. Choose this if the company has never had a written or
-          oral operating agreement — typical for a newly formed company.
+          original governing agreement. Choose this if the company has not adopted an operating
+          agreement, including an oral or implied agreement. Correcting an unused generated draft
+          does not by itself make this an amended agreement.
         </Choice>
         <Choice label={'If you choose "I\'m amending and restating an existing agreement":'}>
           The document is titled "Amended and Restated Operating Agreement" and includes language
           stating that it replaces the prior agreement in its entirety. From its effective date,
           the old agreement — whatever it said — no longer governs, and only the new document
           controls. Choose this if the company already has an operating agreement of any kind:
-          one we generated before, one prepared elsewhere, or even an informal oral arrangement
-          among the owners. If you added protected series to an existing LLC, your company almost certainly has a
-          prior agreement, which is why we've pre-selected this option for you.
+          one adopted from a document we generated, one adopted elsewhere, or an oral or implied
+          agreement among the owners. Generating a PDF does not establish adoption. Identify the
+          agreement you are replacing and its effective date, or select undated / date unknown.
         </Choice>
         <P>
           <strong className="text-foreground">Worth knowing:</strong> keeping two operating
@@ -345,8 +346,8 @@ export const LEARN_MORE: Record<string, LearnMoreScreen> = {
           signing.
         </Choice>
         <Choice label="If you're not sure yet:">
-          List what you plan to contribute — the exhibits can be regenerated when the list
-          changes. What matters most is that what actually moved matches what the records say.
+          When the list changes, update it here and regenerate the agreement, including its exhibits.
+          What matters most is that what actually moved matches what the records say.
         </Choice>
       </div>
     ),

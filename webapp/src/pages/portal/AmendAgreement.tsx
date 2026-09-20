@@ -136,8 +136,8 @@ export default function AmendAgreement() {
               <Link to={`/portal/agreement${cq}`} className="font-medium text-foreground underline underline-offset-2">
                 update your answers and regenerate
               </Link>
-              . The new agreement is an Amended and Restated Operating Agreement and replaces the
-              old one. Use an amendment only to change a term of the operating agreement that the
+              . If you are replacing an adopted agreement, choose Amended and Restated;
+              if you are correcting an unused draft, keep it as a first agreement. Use an amendment only to change a term of the operating agreement that the
               questionnaire cannot change.
             </div>
             <div className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950" data-testid="amendment-notice">
@@ -158,7 +158,7 @@ export default function AmendAgreement() {
                 className="max-w-xs"
               />
               <p className="text-xs text-muted-foreground" data-testid="agreement-on-file">
-                Your current agreement on file:{" "}
+                Most recently generated agreement on file:{" "}
                 <strong className="text-foreground">
                   {current.amended_restated ? "Amended & Restated" : "Operating Agreement"} (No. {current.generation_number})
                 </strong>

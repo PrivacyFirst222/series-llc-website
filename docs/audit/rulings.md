@@ -59,3 +59,9 @@ Adam. A new ruling is added the day it is given.
 - Ruling N2.17: "Batch 13 item 10: never tell clients to enter Applied For. Require an issued EIN on the Form 2553 filing package."
 
 - Ruling N2.18: "Batch 13 item 11 rejected: leave the Form 2553 incomplete-SSN warning as is."
+
+- Ruling 137: "Batch 14 approved: explicitly ask whether an agreement has been adopted, including oral or implied; correcting an unused draft stays a first agreement. Require a company-specific predecessor or outside/unknown-date choice for restatement."
+
+- Ruling N3.10: "Batch 14 approved: label generation order Most recently generated / Earlier generated copy; state that generation order does not determine legal effect. No inferred adoption tracker."
+
+- Ruling N3.12: "Batch 14 approved: implement editing, adding and removing managers in the manager-managed operating-agreement questionnaire, preserving each entity signer with its manager and leaving state filing records unchanged."

@@ -57,6 +57,8 @@ export interface ServiceOrder {
 
 export interface ServicesData {
   llcName: string;
+  /** Tax form of this company's most recently generated agreement, or saved draft. */
+  oaSElection?: boolean;
   dev: boolean;
   members: { name: string; address: string }[];
   pricing: { seriesCents: number; einCents: number; sElectionCents: number; certStatusCents: number; certifiedCopyCents: number };

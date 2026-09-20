@@ -342,7 +342,7 @@ export function OrdersInProgress({
                 <label className="text-sm font-medium">Exhibit identifier</label>
                 <Input
                   name="seriesNumber"
-                  defaultValue={(consentFor?.details.seriesName ?? "").replace(/.*\bP\.?S\.?\s*/i, "").trim()}
+                  defaultValue={(consentFor?.details.seriesName ?? "").replace(/.*\b(?:protected\s+series|P\.?S\.?)[\s-]*/i, "").trim()}
                   required
                 />
                 <p className="text-xs text-muted-foreground">Appears as “Series Exhibit PS-___”.</p>
@@ -371,13 +371,15 @@ export function OrdersInProgress({
             <div className="space-y-1.5">
               <label className="text-sm font-medium">What the Company contributes to this series (optional)</label>
               <Input name="contribution" placeholder="e.g. the real property at 101 Palm Street" />
-              <p className="text-xs text-muted-foreground">Leave blank to point at the Asset Schedule.</p>
+              <p className="text-xs text-muted-foreground">Leave blank if the Company is making no contribution to this series.</p>
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium">Special terms for this series (optional)</label>
               <Textarea name="specialTerms" rows={3} maxLength={2000} placeholder="Rules for this series alone, if any" />
               <p className="text-xs text-muted-foreground">
-                Up to 2,000 characters. As on the agreement's Series Exhibit. Special terms may not vary Article 8 (records) or the provisions of the Act that cannot be varied.
+                Up to 2,000 characters. As on the agreement's Series Exhibit. {data.oaSElection
+                  ? "Special terms may not override Article 8 (records), Article 9 (the tax rules protecting the S election), or statutory provisions that cannot be changed."
+                  : "Special terms may not override Article 8 (records) or statutory provisions that cannot be changed."}
               </p>
             </div>
             {error ? <p className="text-xs text-destructive">{error}</p> : null}
@@ -386,7 +388,7 @@ export function OrdersInProgress({
                 Every member signs it; keep it with your company records.
               </p>
               <Button type="submit" disabled={makeConsent.isPending} className="rounded-full">
-                {makeConsent.isPending ? "Preparing…" : "Prepare the documents"}
+                {makeConsent.isPending ? "Preparing…" : "Prepare the consent"}
               </Button>
             </DialogFooter>
           </form>

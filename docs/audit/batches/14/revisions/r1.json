@@ -1,0 +1,326 @@
+{
+  "id": "14",
+  "revision": 1,
+  "title": "Agreements: adoption, regeneration and series consents",
+  "model": "Codex",
+  "base": "810ee613b34783965ca185dd6bd12d718bd1ca69",
+  "items": [
+    {
+      "id": "17",
+      "part": "amend-title",
+      "scope": "amendment browser title",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch14 amendment browser title"
+        }
+      ]
+    },
+    {
+      "id": "116",
+      "part": "all",
+      "scope": "empty consent contribution",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch14 empty consent contribution"
+        }
+      ]
+    },
+    {
+      "id": "117",
+      "part": "all",
+      "scope": "consent signature dates",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch14 consent signature dates"
+        }
+      ]
+    },
+    {
+      "id": "118",
+      "part": "all",
+      "scope": "consent asset schedule",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch14 consent asset schedule"
+        }
+      ]
+    },
+    {
+      "id": "119",
+      "part": "all",
+      "scope": "S agreement warning",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch14 S agreement warning"
+        }
+      ]
+    },
+    {
+      "id": "120",
+      "part": "title",
+      "scope": "consent document title",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch14 consent document title"
+        }
+      ]
+    },
+    {
+      "id": "259",
+      "part": "all",
+      "scope": "consent document title",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch14 consent document title"
+        }
+      ]
+    },
+    {
+      "id": "120",
+      "part": "button",
+      "scope": "prepare consent action",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch14 prepare consent action"
+        }
+      ]
+    },
+    {
+      "id": "129",
+      "part": "all",
+      "scope": "full series identifier",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch14 full series identifier"
+        }
+      ]
+    },
+    {
+      "id": "131",
+      "part": "all",
+      "scope": "regeneration navigation",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch14 regeneration navigation"
+        }
+      ]
+    },
+    {
+      "id": "137",
+      "part": "all",
+      "scope": "adoption choice",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch14 adoption choice"
+        }
+      ]
+    },
+    {
+      "id": "138",
+      "part": "all",
+      "scope": "contribution regeneration help",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch14 contribution regeneration help"
+        }
+      ]
+    },
+    {
+      "id": "142",
+      "part": "all",
+      "scope": "ready to sign wording",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch14 ready to sign wording"
+        }
+      ]
+    },
+    {
+      "id": "156",
+      "part": "all",
+      "scope": "chosen company predecessor",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch14 chosen company predecessor"
+        }
+      ]
+    },
+    {
+      "id": "N3.10",
+      "part": "all",
+      "scope": "generation status labels",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch14 generation status labels"
+        }
+      ]
+    },
+    {
+      "id": "N3.12",
+      "part": "all",
+      "scope": "editable agreement managers",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch14 editable agreement managers"
+        }
+      ]
+    },
+    {
+      "id": "260",
+      "part": "all",
+      "scope": "contribution comment",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch14 contribution comment"
+        }
+      ]
+    },
+    {
+      "id": "257",
+      "part": "all",
+      "scope": "consent effective date citation",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch14 consent effective date citation"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "webapp/src/components/layout/Layout.tsx",
+      "mode": "code",
+      "why": "Approved Batch 14 agreement workflow, consent alignment and regression coverage."
+    },
+    {
+      "path": "webapp/src/pages/portal/OAQuestionnaire.tsx",
+      "mode": "code",
+      "why": "Approved Batch 14 agreement workflow, consent alignment and regression coverage."
+    },
+    {
+      "path": "webapp/src/pages/portal/oaTypes.ts",
+      "mode": "code",
+      "why": "Approved Batch 14 agreement workflow, consent alignment and regression coverage."
+    },
+    {
+      "path": "webapp/src/pages/portal/PortalDashboard.tsx",
+      "mode": "code",
+      "why": "Approved Batch 14 agreement workflow, consent alignment and regression coverage."
+    },
+    {
+      "path": "webapp/src/pages/portal/AmendAgreement.tsx",
+      "mode": "code",
+      "why": "Approved Batch 14 agreement workflow, consent alignment and regression coverage."
+    },
+    {
+      "path": "webapp/src/pages/portal/OrdersInProgress.tsx",
+      "mode": "code",
+      "why": "Approved Batch 14 agreement workflow, consent alignment and regression coverage."
+    },
+    {
+      "path": "webapp/src/pages/portal/ServicesCard.tsx",
+      "mode": "code",
+      "why": "Approved Batch 14 agreement workflow, consent alignment and regression coverage."
+    },
+    {
+      "path": "webapp/src/content/oaLearnMore.tsx",
+      "mode": "code",
+      "why": "Approved Batch 14 agreement workflow, consent alignment and regression coverage."
+    },
+    {
+      "path": "webapp/server/routes-portal.ts",
+      "mode": "code",
+      "why": "Approved Batch 14 agreement workflow, consent alignment and regression coverage."
+    },
+    {
+      "path": "webapp/server/new-series.ts",
+      "mode": "code",
+      "why": "Approved Batch 14 agreement workflow, consent alignment and regression coverage."
+    },
+    {
+      "path": "webapp/server/templates-new-series.md",
+      "mode": "code",
+      "why": "Approved Batch 14 agreement workflow, consent alignment and regression coverage."
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "why": "Approved Batch 14 agreement workflow, consent alignment and regression coverage."
+    },
+    {
+      "path": "webapp/scripts/behavioral.ts",
+      "mode": "code",
+      "why": "Approved Batch 14 agreement workflow, consent alignment and regression coverage.",
+      "control": true
+    },
+    {
+      "path": "webapp/server/e2e.ts",
+      "mode": "code",
+      "why": "Approved Batch 14 agreement workflow, consent alignment and regression coverage.",
+      "control": true
+    },
+    {
+      "path": "webapp/scripts/batch14-walk.ts",
+      "mode": "new",
+      "why": "Approved Batch 14 agreement workflow, consent alignment and regression coverage.",
+      "control": true
+    },
+    {
+      "path": "webapp/src/lib/oaManagers.ts",
+      "mode": "new",
+      "why": "Approved Batch 14 agreement workflow, consent alignment and regression coverage."
+    },
+    {
+      "path": "webapp/src/pages/portal/OaManagersCard.tsx",
+      "mode": "new",
+      "why": "Approved Batch 14 agreement workflow, consent alignment and regression coverage."
+    },
+    {
+      "path": "docs/facts.md",
+      "mode": "code",
+      "control": true,
+      "why": "Record the approved adoption, manager and generation-label policy."
+    }
+  ],
+  "requiredChecks": [],
+  "testSupport": [
+    "webapp/scripts/batch14-walk.ts"
+  ],
+  "removedChecks": []
+}

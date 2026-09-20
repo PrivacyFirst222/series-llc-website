@@ -80,21 +80,21 @@ export function assembleNewSeries(input: NewSeriesInput): { markdown: string; ti
   const signerOf = (entity: string) => (input.entitySigners ?? []).find((x) => x.entity.trim() === entity.trim());
   // A person's block is the rule then the name; an entity's is its name,
   // "By:" over the rule, and the printed name and title beneath (Adam,
-  // 13 Sep 2026); every block ends with a Date line, as the agreements' do
-  // (15 Sep 2026).
-  const block = (n: string, suffix: string) => {
+  // 13 Sep 2026). Only consent signatures carry a separate Date line;
+  // the Series Exhibit uses its adopted-effective date, matching the masters.
+  const block = (n: string, suffix: string, dated = true) => {
     const sg = signerOf(n);
     return (sg
       ? `${n}${suffix}\n\nBy: _____________________________\n[[indent]]${sg.name}\n[[indent]]${sg.title}`
-      : `_____________________________\n${n}${suffix}`) + "\nDate: _____________________________";
+      : `_____________________________\n${n}${suffix}`) + (dated ? "\nDate: _____________________________" : "");
   };
   // Every member adopts the exhibit in a member-managed company, as the
   // agreement's exhibits are adopted (Adam, 14 Sep 2026: "Every member should
   // sign it"); every Manager otherwise — under the agreements' own labels
   // (15 Sep 2026): ", Member" and ", Protected Series Manager".
   const psSignature = input.memberManaged
-    ? input.memberNames.map((n) => block(n, ", Member")).join("\n\n")
-    : managers.map((n) => block(n, ", Protected Series Manager")).join("\n\n");
+    ? input.memberNames.map((n) => block(n, ", Member", false)).join("\n\n")
+    : managers.map((n) => block(n, ", Protected Series Manager", false)).join("\n\n");
 
   const blocks = input.memberNames.map((n) => block(n, "")).join("\n\n");
 
@@ -109,9 +109,8 @@ export function assembleNewSeries(input: NewSeriesInput): { markdown: string; ti
   s = resolveIf(s, "purpose", purpose !== "");
   s = s.split("[SERIES PURPOSE]").join(purpose);
   must(s, "[CONTRIBUTION]", "contribution");
-  // An empty contribution prints a dash, as the agreement's own Series
-  // Exhibit does (15 Sep 2026).
-  s = s.split("[CONTRIBUTION]").join((input.contribution ?? "").trim() || "—");
+  // An empty contribution prints None, matching the agreement's Series Exhibit.
+  s = s.split("[CONTRIBUTION]").join((input.contribution ?? "").trim() || "None");
   must(s, "[SPECIAL TERMS]", "special terms");
   s = s.split("[SPECIAL TERMS]").join((input.specialTerms ?? "").trim().replace(/\|/g, "/").replace(/\s*\n\s*/g, " ") || "None");
   must(s, "[EFFECTIVE DATE]", "effective date");
@@ -131,5 +130,5 @@ export function assembleNewSeries(input: NewSeriesInput): { markdown: string; ti
   if (/<!--/.test(s)) throw new Error("new-series: template marker left in the document");
   if (/Form document/.test(s)) throw new Error("new-series: draft colophon left in the document");
 
-  return { markdown: s, title: `New Protected Series — ${input.seriesName}` };
+  return { markdown: s, title: `Consent & Series Exhibit — ${input.seriesName}` };
 }

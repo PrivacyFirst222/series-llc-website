@@ -1,3 +1,4 @@
+import { agreementManagers, managerProblem } from "../src/lib/oaManagers";
 import { ensureOwnersManual } from "./owners-manual";
 import { requestDocumentDeletion } from "./document-retention";
 import { storageWasDeleted } from "./storage";
@@ -184,6 +185,9 @@ export async function oaSeed(clientId: string, orderId?: string | null): Promise
 
 export const oaAnswersSchema = z.object({
   firstOrAmended: z.enum(["first", "amended"]).optional(),
+  priorAgreement: z.string().max(100).optional(),
+  priorAgreementDate: z.string().max(10).optional(),
+  managers: z.array(z.object({ name: z.string().max(200).optional(), isEntity: z.boolean().optional(), signerName: z.string().max(200).optional(), signerTitle: z.string().max(120).optional() })).max(20).optional(),
   sElection: z.boolean().optional(), // true = build on the S corporation form
   // Asked, not derived. The intake list is where the owners START; a client can
   // take on a partner or buy one out before the agreement is written.
@@ -328,14 +332,14 @@ export function effectiveOwners(
     : seedMembers.map((m) => ({ name: m.name, address: m.address }));
 }
 
-export async function savedOaAnswers(clientId: string, orderId?: string | null): Promise<{ members?: { name?: string; address?: string; isEntity?: boolean; signerName?: string; signerTitle?: string }[]; managerSigners?: { name?: string; title?: string }[] } | null> {
+export async function savedOaAnswers(clientId: string, orderId?: string | null): Promise<z.infer<typeof oaAnswersSchema> | null> {
   const db = await getDb();
   const rows = orderId
     ? await db.query<{ answers: unknown }>("SELECT answers FROM oa_profiles WHERE client_id = $1 AND order_id = $2", [clientId, orderId])
     : await db.query<{ answers: unknown }>("SELECT answers FROM oa_profiles WHERE client_id = $1 ORDER BY updated_at DESC LIMIT 1", [clientId]);
   if (rows.length === 0) return null;
   const raw = rows[0].answers;
-  return (typeof raw === "string" ? JSON.parse(raw) : raw) as { members?: { name?: string; address?: string }[] };
+  return (typeof raw === "string" ? JSON.parse(raw) : raw) as z.infer<typeof oaAnswersSchema>;
 }
 
 /** "August 5, 2026" → "2026-08-05"; "" when the text is not a date. */
@@ -1083,7 +1087,7 @@ app.get("/portal/oa", async (c) => {
             COALESCE(generation_number, 0) AS generation_number,
             inputs->>'version' AS version,
             inputs->>'effectiveDate' AS effective_date
-       FROM oa_generations WHERE client_id = $1 AND (order_id = $2 OR order_id IS NULL) ORDER BY created_at DESC`,
+       FROM oa_generations WHERE client_id = $1 AND order_id = $2 ORDER BY created_at DESC`,
     [session.clientId, seed.orderId],
   );
   // The agreement's effective date, as printed ("August 5, 2026") and as a
@@ -1251,19 +1255,24 @@ app.post("/portal/oa/generate", async (c) => {
   if (Number(kept[0]?.n ?? 0) >= OA_KEEP_MAX) {
     return c.json(err(`This company already has ${OA_KEEP_MAX} operating agreements on file. Delete one from your documents to generate another.`, "AGREEMENT_CAP"), 400);
   }
-  const priorGens = await db.query<{ created_at: unknown }>(
-    "SELECT created_at FROM oa_generations WHERE client_id = $1 ORDER BY created_at DESC LIMIT 1",
-    [session.clientId],
-  );
-  // Drivers differ: Neon returns ISO strings, PGlite returns Date objects.
-  const priorDate =
-    priorGens.length > 0
-      ? new Date(String(priorGens[0].created_at)).toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        })
-      : null;
+  // A generated file is not proof of adoption. The client chooses the adopted
+  // predecessor, and confirms its effective date; unknown dates use the master's
+  // generic supersession recital. Never use generation time or another company.
+  let priorDate: string | null = null;
+  if (a.firstOrAmended === "amended") {
+    if (!a.priorAgreement) return c.json(err("Identify the adopted agreement you are replacing.", "INVALID_INPUT"), 400);
+    if (a.priorAgreement !== "unknown") {
+      if (a.priorAgreement !== "external") {
+        if (!z.string().uuid().safeParse(a.priorAgreement).success) return c.json(err("Choose a prior agreement for this company.", "INVALID_INPUT"), 400);
+        const prior = await db.query<{ id: string }>("SELECT id FROM oa_generations WHERE id = $1 AND client_id = $2 AND order_id = $3", [a.priorAgreement, session.clientId, seed.orderId]);
+        if (!prior.length) return c.json(err("That prior agreement is not on this company's record. Choose its agreement, or an agreement prepared elsewhere.", "INVALID_INPUT"), 400);
+      }
+      const date = a.priorAgreementDate ?? "";
+      const parsed = new Date(date + "T12:00:00Z");
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !Number.isFinite(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== date) return c.json(err("Confirm the prior agreement's effective date, or choose undated / date unknown.", "INVALID_INPUT"), 400);
+      priorDate = fmtDate(date);
+    }
+  }
   // Never reuse a number: it is printed on the PDF, and a client may still hold
   // a copy of an agreement they later deleted. The counter lives on the client,
   // so deleting a row cannot roll it back.
@@ -1365,17 +1374,10 @@ app.post("/portal/oa/generate", async (c) => {
   });
   if (entityGap) return c.json(err(entityGap, "INVALID_INPUT"), 400);
   if (todGap) return c.json(err(todGap, "INVALID_INPUT"), 400);
-  // A Manager that is a company signs through a person (Adam, 13 Sep 2026).
-  const managerEntitySigners: NonNullable<OaInputs["managerEntitySigners"]> = [];
-  for (let i = 0; i < seed.managerNames.length; i += 1) {
-    if (!seed.managerEntities?.[i]) continue;
-    const sn = (a.managerSigners?.[i]?.name ?? "").trim();
-    const st = (a.managerSigners?.[i]?.title ?? "").trim();
-    if (!hasFirstAndLast(sn) || !st) {
-      return c.json(err(`Name the person who signs for ${seed.managerNames[i]} — first and last name — and their title.`, "INVALID_INPUT"), 400);
-    }
-    managerEntitySigners.push({ manager: seed.managerNames[i], name: sn, title: st });
-  }
+  const managers = agreementManagers(seed, a);
+  const invalidManager = memberManaged ? null : managerProblem(managers);
+  if (invalidManager) return c.json(err(invalidManager, "INVALID_INPUT"), 400);
+  const managerEntitySigners: NonNullable<OaInputs["managerEntitySigners"]> = managers.filter(m => m.isEntity).map(m => ({ manager: m.name!.trim(), name: m.signerName!.trim(), title: m.signerTitle!.trim() }));
   const isSCorp =
     version === "s" || version === "member-s" ||
     version === "single-s" || version === "member-single-s";
@@ -1469,7 +1471,7 @@ app.post("/portal/oa/generate", async (c) => {
     version,
     companyName: seed.llcName,
     principalAddress: seed.principalAddress,
-    managerNames: seed.managerNames,
+    managerNames: managers.map(m => m.name!.trim()),
     managerEntitySigners,
     effectiveDate: fmtDate(a.effectiveDate),
     amendedRestated: a.firstOrAmended === "amended",
@@ -1613,6 +1615,9 @@ app.post("/portal/series/consent", async (c) => {
   // owner must not get a series document that names the intake list.
   const savedForSeries = await savedOaAnswers(session.clientId, consentCompanyId);
   const seriesOwners = effectiveOwners(seed.members, savedForSeries);
+  const managers = agreementManagers(seed, savedForSeries);
+  const invalidManager = memberManaged ? null : managerProblem(managers);
+  if (invalidManager) return c.json(err(invalidManager, "INVALID_INPUT"), 400);
   // Entity owners and Managers sign through the people the questionnaire
   // named (Adam, 13 Sep 2026).
   const entitySigners: { entity: string; name: string; title: string }[] = [];
@@ -1622,10 +1627,7 @@ app.post("/portal/series/consent", async (c) => {
       entitySigners.push({ entity: owner.name, name: (m.signerName ?? "").trim(), title: (m.signerTitle ?? "").trim() });
     }
   });
-  seed.managerNames.forEach((n, i) => {
-    const sg = savedForSeries?.managerSigners?.[i];
-    if (seed.managerEntities?.[i] && (sg?.name ?? "").trim()) entitySigners.push({ entity: n, name: (sg?.name ?? "").trim(), title: (sg?.title ?? "").trim() });
-  });
+  managers.filter(m => m.isEntity).forEach(m => entitySigners.push({ entity: m.name!.trim(), name: m.signerName!.trim(), title: m.signerTitle!.trim() }));
   // A company or trust signs through a person, here as in the agreement
   // (15 Sep 2026: the consent printed the company on a person's line).
   for (let i = 0; i < seriesOwners.length; i += 1) {
@@ -1635,13 +1637,6 @@ app.post("/portal/series/consent", async (c) => {
     const sg = entitySigners.find((x) => x.entity === seriesOwners[i].name);
     if (!sg || !hasFirstAndLast(sg.name) || !sg.title) {
       return c.json(err(`Name the person who signs for ${seriesOwners[i].name || `owner ${i + 1}`} — first and last name — and their title.`, "INVALID_INPUT"), 400);
-    }
-  }
-  for (let i = 0; i < seed.managerNames.length; i += 1) {
-    if (!seed.managerEntities?.[i]) continue;
-    const sg = entitySigners.find((x) => x.entity === seed.managerNames[i]);
-    if (!sg || !hasFirstAndLast(sg.name) || !sg.title) {
-      return c.json(err(`Name the person who signs for ${seed.managerNames[i]} — first and last name — and their title.`, "INVALID_INPUT"), 400);
     }
   }
   const generatedOn = new Date();
@@ -1655,7 +1650,7 @@ app.post("/portal/series/consent", async (c) => {
       purpose: body.data.purpose,
       effectiveDate: fmtDate(body.data.effectiveDate),
       memberNames: seriesOwners.map((m) => m.name),
-      managerNames: seed.managerNames,
+      managerNames: managers.map(m => m.name!.trim()),
       memberManaged,
       specialTerms: body.data.specialTerms,
       contribution: body.data.contribution,
@@ -1881,10 +1876,14 @@ app.get("/portal/services", async (c) => {
   // by anything answered in the operating-agreement questionnaire — the only
   // ownership source a manager-managed company has.
   const seed = await oaSeed(session.clientId, svcCompanyId);
-  const owners = effectiveOwners(seed?.members ?? [], await savedOaAnswers(session.clientId, svcCompanyId));
+  const savedAgreement = await savedOaAnswers(session.clientId, svcCompanyId);
+  const owners = effectiveOwners(seed?.members ?? [], savedAgreement);
+  const agreementForm = await db.query<{ version: string }>("SELECT inputs->>'version' AS version FROM oa_generations WHERE client_id = $1 AND order_id = $2 ORDER BY created_at DESC LIMIT 1", [session.clientId, svcCompanyId]);
+  const oaSElection = agreementForm.length ? ["s", "member-s", "single-s", "member-single-s"].includes(agreementForm[0].version) : savedAgreement?.sElection === true;
   return c.json({
     data: {
       llcName: await clientLlcName(session.clientId, svcCompanyId),
+      oaSElection,
       dev: !env.isProd && !env.SQUARE_ACCESS_TOKEN,
       members: owners,
       pricing: {

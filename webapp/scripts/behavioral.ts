@@ -1,3 +1,4 @@
+import { batch14Walk } from "./batch14-walk";
 import { batch13Walk } from "./batch13-walk";
 import { batch10Walk } from "./batch10-walk";
 import { batch09Walk } from "./batch09-walk";
@@ -1518,6 +1519,7 @@ async function main(): Promise<void> {
 
       await page.goto(`http://localhost:${WEB_PORT}/portal/agreement`);
       await page.waitForSelector("main h2, main h1");
+      await page.getByRole("radio", { name: /first operating agreement/ }).check();
       // Intro: more than one owner.
       await clickCard(page, /More than one owner/i);
       await page.locator("main button").filter({ hasText: /^Continue/ }).first().click();
@@ -1809,7 +1811,7 @@ async function main(): Promise<void> {
       const amH = headings.findIndex((h) => /^Amendment to Operating Agreement$/.test(h.trim()));
       expect(oaH >= 0 && amH === oaH + 1, "AMEND: the Amendment card sits directly under the Operating agreement card", headings);
       const cardText = await page.locator('[data-testid="amendment-card"]').innerText().catch(() => "");
-      expect(/do not use this amendment form\. Instead, update your answers and regenerate the operating agreement using the Update\/regenerate button under Operating Agreement\. The new agreement is an Amended and Restated Operating Agreement and replaces the old one\. Use this amendment form only to change a term of the operating agreement that the questionnaire cannot change\./.test(cardText) && /reviewed by an attorney before it is signed/.test(cardText), "AMEND: the card says which changes regenerate and which amend, in Adam's words, with the warning", cardText);
+      expect(/do not use this amendment form\. Instead, update your answers and regenerate the operating agreement using the Update \/ regenerate button under Operating agreement\. If you are replacing an adopted agreement, choose Amended and Restated; if you are correcting an unused draft, keep it as a first agreement\. Use this amendment form only to change a term of the operating agreement that the questionnaire cannot change\./.test(cardText) && /reviewed by an attorney before it is signed/.test(cardText), "AMEND: the card says which changes regenerate and which amend, in Adam's words, with the warning", cardText);
       await shot(page, "portal-amendment-card");
       await page.locator('[data-testid="amendment-card"] a').filter({ hasText: /^Create an amendment/ }).first().click();
       await page.waitForURL(/\/portal\/amend/, { timeout: 10000 });
@@ -1824,9 +1826,9 @@ async function main(): Promise<void> {
       const prefilled = await dateBox.inputValue().catch(() => "");
       const onFile = await page.locator('[data-testid="agreement-on-file"]').innerText().catch(() => "");
       expect(/^\d{4}-\d{2}-\d{2}$/.test(prefilled), "AMEND: the agreement's effective date is prefilled from the agreement on file", prefilled);
-      expect(/Your current agreement on file: Operating Agreement \(No\. \d+\), effective [A-Z][a-z]+ \d{1,2}, \d{4}\./.test(onFile), "AMEND: the line beneath names the agreement on file and its date", onFile);
+      expect(/Most recently generated agreement on file: Operating Agreement \(No\. \d+\), effective [A-Z][a-z]+ \d{1,2}, \d{4}\./.test(onFile), "AMEND: the line beneath names the agreement on file and its date", onFile);
       expect(/legal consequences you do not intend/.test(notice) && /reviewed by an attorney before it is signed/.test(notice), "AMEND: the page warns of unintended legal consequences and urges attorney review", notice);
-      expect(/Your current agreement on file:/.test(await page.locator("main").innerText()), "AMEND: the page names the agreement it amends");
+      expect(/Most recently generated agreement on file:/.test(await page.locator("main").innerText()), "AMEND: the page names the agreement it amends");
       await shot(page, "amend-page");
       const createBtn = page.locator("main button").filter({ hasText: /^Create amendment/ }).first();
       expect(await createBtn.isDisabled(), "AMEND: Create waits until changes are typed");
@@ -1941,6 +1943,7 @@ async function main(): Promise<void> {
       await page.goto(`http://localhost:${WEB_PORT}/portal/agreement?company=${hOrderId}`);
       await page.waitForSelector("main h2, main h1");
       await page.waitForTimeout(800);
+      await page.getByRole("radio", { name: /first operating agreement/ }).check();
       {
         // With more than one owner, tapping the company named at intake adds
         // it as a company, so the signer question appears without a second
@@ -2722,6 +2725,26 @@ async function main(): Promise<void> {
       await page.close();
     }
   }
+
+const batch14Results = new Map<string,{ok:boolean;detail?:unknown}>();
+await batch14Walk(browser, `http://localhost:${WEB_PORT}`, (ok,label,detail)=>batch14Results.set(label,{ok,detail}));
+{const r=batch14Results.get("batch14 amendment browser title");expect(r?.ok===true,"batch14 amendment browser title",r?.detail);}
+{const r=batch14Results.get("batch14 empty consent contribution");expect(r?.ok===true,"batch14 empty consent contribution",r?.detail);}
+{const r=batch14Results.get("batch14 consent signature dates");expect(r?.ok===true,"batch14 consent signature dates",r?.detail);}
+{const r=batch14Results.get("batch14 consent asset schedule");expect(r?.ok===true,"batch14 consent asset schedule",r?.detail);}
+{const r=batch14Results.get("batch14 S agreement warning");expect(r?.ok===true,"batch14 S agreement warning",r?.detail);}
+{const r=batch14Results.get("batch14 consent document title");expect(r?.ok===true,"batch14 consent document title",r?.detail);}
+{const r=batch14Results.get("batch14 prepare consent action");expect(r?.ok===true,"batch14 prepare consent action",r?.detail);}
+{const r=batch14Results.get("batch14 full series identifier");expect(r?.ok===true,"batch14 full series identifier",r?.detail);}
+{const r=batch14Results.get("batch14 regeneration navigation");expect(r?.ok===true,"batch14 regeneration navigation",r?.detail);}
+{const r=batch14Results.get("batch14 adoption choice");expect(r?.ok===true,"batch14 adoption choice",r?.detail);}
+{const r=batch14Results.get("batch14 contribution regeneration help");expect(r?.ok===true,"batch14 contribution regeneration help",r?.detail);}
+{const r=batch14Results.get("batch14 ready to sign wording");expect(r?.ok===true,"batch14 ready to sign wording",r?.detail);}
+{const r=batch14Results.get("batch14 chosen company predecessor");expect(r?.ok===true,"batch14 chosen company predecessor",r?.detail);}
+{const r=batch14Results.get("batch14 generation status labels");expect(r?.ok===true,"batch14 generation status labels",r?.detail);}
+{const r=batch14Results.get("batch14 editable agreement managers");expect(r?.ok===true,"batch14 editable agreement managers",r?.detail);}
+{const r=batch14Results.get("batch14 contribution comment");expect(r?.ok===true,"batch14 contribution comment",r?.detail);}
+{const r=batch14Results.get("batch14 consent effective date citation");expect(r?.ok===true,"batch14 consent effective date citation",r?.detail);}
 
 const batch13Results = new Map<string,{ok:boolean;detail?:unknown}>();
 await batch13Walk(browser, `http://localhost:${WEB_PORT}`, (ok,label,detail)=>batch13Results.set(label,{ok,detail}));

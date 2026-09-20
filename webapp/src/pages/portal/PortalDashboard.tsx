@@ -116,8 +116,9 @@ function DocList({
                         mine.isCurrent ? "bg-trust/10 text-trust" : "bg-secondary text-muted-foreground"
                       }`}
                     >
-                      {mine.isCurrent ? "Current" : "Superseded"}
+                      {mine.isCurrent ? "Most recently generated" : "Earlier generated copy"}
                     </span>
+                    <span className="block text-xs text-muted-foreground">Generation order does not determine which agreement is legally in effect.</span>
                     <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
                       {mine.taxation}
                     </span>
@@ -212,7 +213,7 @@ function AgreementAndLibraryRow({ company }: { company: string | null }) {
               <p className="text-sm text-muted-foreground">
                 {hasGeneration
                   ? "Your agreement is generated. Update your answers and regenerate anytime — always on the current master edition."
-                  : "Answer a short questionnaire and we'll generate your operating agreement as a signed-ready PDF."}
+                  : "Answer a short questionnaire and we'll generate your operating agreement as a PDF ready to sign."}
               </p>
               <Button asChild size="sm" className="shrink-0 self-start rounded-full sm:self-auto">
                 <Link to={company ? `/portal/agreement?company=${company}` : "/portal/agreement"}>
@@ -233,7 +234,7 @@ function AgreementAndLibraryRow({ company }: { company: string | null }) {
           agreement should be a different document. Not just an amend your
           operating agreement button."). Ordinary changes — members, managers,
           percentages, chosen options — go to the questionnaire and come back
-          as an Amended and Restated agreement; the amendment is for terms the
+          as a first draft or Amended and Restated agreement according to adoption; the amendment is for terms the
           questionnaire cannot change. */}
       {!oaQuery.isError ? (
         <div className="overflow-hidden rounded-2xl border border-border bg-card" data-testid="amendment-card">
@@ -246,9 +247,9 @@ function AgreementAndLibraryRow({ company }: { company: string | null }) {
             <p className="text-sm text-muted-foreground">
               To add or remove members or managers, change ownership percentages, or change an option
               you chose in the questionnaire, do not use this amendment form. Instead, update your
-              answers and regenerate the operating agreement using the Update/regenerate button under
-              Operating Agreement. The new agreement is an Amended and Restated Operating Agreement and
-              replaces the old one. Use this amendment form only to change a term of the operating
+              answers and regenerate the operating agreement using the Update / regenerate button under
+              Operating agreement. If you are replacing an adopted agreement, choose Amended and
+              Restated; if you are correcting an unused draft, keep it as a first agreement. Use this amendment form only to change a term of the operating
               agreement that the questionnaire cannot change.
             </p>
             <p className="mt-3 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950">

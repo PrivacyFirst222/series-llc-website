@@ -538,14 +538,41 @@
         {
           "key": "amend-title",
           "scope": "The Amendment page's browser title reads 'Page Not Found'; give it its proper title.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T08:55:19.594Z",
+              "event": "assigned",
+              "batch": "14",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T09:05:33.629Z",
+              "event": "implemented",
+              "batch": "14",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "14",
+          "fix": {
+            "batch": "14",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch14 amendment browser title"
+              }
+            ]
+          }
         },
         {
           "key": "contact-wording",
@@ -5569,14 +5596,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T08:55:19.594Z",
+              "event": "assigned",
+              "batch": "14",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T09:05:33.629Z",
+              "event": "implemented",
+              "batch": "14",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "14",
+          "fix": {
+            "batch": "14",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch14 empty consent contribution"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -5599,14 +5653,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T08:55:19.594Z",
+              "event": "assigned",
+              "batch": "14",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T09:05:33.629Z",
+              "event": "implemented",
+              "batch": "14",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "14",
+          "fix": {
+            "batch": "14",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch14 consent signature dates"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -5629,14 +5710,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T08:55:19.594Z",
+              "event": "assigned",
+              "batch": "14",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T09:05:33.629Z",
+              "event": "implemented",
+              "batch": "14",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "14",
+          "fix": {
+            "batch": "14",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch14 consent asset schedule"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -5662,14 +5770,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T08:55:19.594Z",
+              "event": "assigned",
+              "batch": "14",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T09:05:33.629Z",
+              "event": "implemented",
+              "batch": "14",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "14",
+          "fix": {
+            "batch": "14",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch14 S agreement warning"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -5692,26 +5827,80 @@
         {
           "key": "title",
           "scope": "The consent document's title in the portal: \"Consent & Series Exhibit — [series]\".",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-18T03:48:21.611Z",
               "event": "recorded by migration 001-part-level-links"
+            },
+            {
+              "at": "2026-09-20T08:55:19.594Z",
+              "event": "assigned",
+              "batch": "14",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T09:05:33.629Z",
+              "event": "implemented",
+              "batch": "14",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "14",
+          "fix": {
+            "batch": "14",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch14 consent document title"
+              }
+            ]
+          }
         },
         {
           "key": "button",
           "scope": "The dialog's button: \"Prepare the consent\".",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-18T03:48:21.611Z",
               "event": "recorded by migration 001-part-level-links"
+            },
+            {
+              "at": "2026-09-20T08:55:19.594Z",
+              "event": "assigned",
+              "batch": "14",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T09:05:33.629Z",
+              "event": "implemented",
+              "batch": "14",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "14",
+          "fix": {
+            "batch": "14",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch14 prepare consent action"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -6132,14 +6321,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T08:55:19.594Z",
+              "event": "assigned",
+              "batch": "14",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T09:05:33.629Z",
+              "event": "implemented",
+              "batch": "14",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "14",
+          "fix": {
+            "batch": "14",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch14 full series identifier"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -6192,14 +6408,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T08:55:19.594Z",
+              "event": "assigned",
+              "batch": "14",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T09:05:33.629Z",
+              "event": "implemented",
+              "batch": "14",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "14",
+          "fix": {
+            "batch": "14",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch14 regeneration navigation"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -6429,14 +6672,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T08:55:19.594Z",
+              "event": "assigned",
+              "batch": "14",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T09:05:33.629Z",
+              "event": "implemented",
+              "batch": "14",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "14",
+          "fix": {
+            "batch": "14",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch14 adoption choice"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -6460,14 +6730,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T08:55:19.594Z",
+              "event": "assigned",
+              "batch": "14",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T09:05:33.629Z",
+              "event": "implemented",
+              "batch": "14",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "14",
+          "fix": {
+            "batch": "14",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch14 contribution regeneration help"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -6636,14 +6933,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T08:55:19.594Z",
+              "event": "assigned",
+              "batch": "14",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T09:05:33.629Z",
+              "event": "implemented",
+              "batch": "14",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "14",
+          "fix": {
+            "batch": "14",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch14 ready to sign wording"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -7426,14 +7750,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T08:55:19.594Z",
+              "event": "assigned",
+              "batch": "14",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T09:05:33.629Z",
+              "event": "implemented",
+              "batch": "14",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "14",
+          "fix": {
+            "batch": "14",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch14 chosen company predecessor"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -12321,14 +12672,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T08:55:19.594Z",
+              "event": "assigned",
+              "batch": "14",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T09:05:33.629Z",
+              "event": "implemented",
+              "batch": "14",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "14",
+          "fix": {
+            "batch": "14",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch14 consent effective date citation"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -12385,17 +12763,44 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T08:55:19.594Z",
+              "event": "assigned",
+              "batch": "14",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T09:05:33.629Z",
+              "event": "implemented",
+              "batch": "14",
+              "revision": 1,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "120",
             "part": "title"
+          },
+          "batch": "14",
+          "fix": {
+            "batch": "14",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch14 consent document title"
+              }
+            ]
           }
         }
       ],
@@ -12419,14 +12824,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T08:55:19.594Z",
+              "event": "assigned",
+              "batch": "14",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T09:05:33.629Z",
+              "event": "implemented",
+              "batch": "14",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "14",
+          "fix": {
+            "batch": "14",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch14 contribution comment"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -14636,14 +15068,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T08:55:19.594Z",
+              "event": "assigned",
+              "batch": "14",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T09:05:33.629Z",
+              "event": "implemented",
+              "batch": "14",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "14",
+          "fix": {
+            "batch": "14",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch14 generation status labels"
+              }
+            ]
+          }
         }
       ]
     },
@@ -14686,14 +15145,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T08:55:19.594Z",
+              "event": "assigned",
+              "batch": "14",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T09:05:33.629Z",
+              "event": "implemented",
+              "batch": "14",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "14",
+          "fix": {
+            "batch": "14",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch14 editable agreement managers"
+              }
+            ]
+          }
         }
       ]
     },
@@ -15426,6 +15912,24 @@
       "kind": "ruling",
       "item": "N2.18",
       "text": "Batch 13 item 11 rejected: leave the Form 2553 incomplete-SSN warning as is."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "137",
+      "text": "Batch 14 approved: explicitly ask whether an agreement has been adopted, including oral or implied; correcting an unused draft stays a first agreement. Require a company-specific predecessor or outside/unknown-date choice for restatement."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "N3.10",
+      "text": "Batch 14 approved: label generation order Most recently generated / Earlier generated copy; state that generation order does not determine legal effect. No inferred adoption tracker."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "N3.12",
+      "text": "Batch 14 approved: implement editing, adding and removing managers in the manager-managed operating-agreement questionnaire, preserving each entity signer with its manager and leaving state filing records unchanged."
     }
   ],
   "batches": [
@@ -15830,6 +16334,25 @@
         },
         {
           "at": "2026-09-20T04:00:34.981Z",
+          "event": "implemented"
+        }
+      ]
+    },
+    {
+      "id": "14",
+      "revision": 1,
+      "frozenHash": "10ac4c9f3a7917d0d2c73b35967cf9edb127b8276a6abcfbb348bd40a18343c8",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "810ee613b34783965ca185dd6bd12d718bd1ca69",
+      "history": [
+        {
+          "at": "2026-09-20T08:55:19.595Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-20T09:05:33.629Z",
           "event": "implemented"
         }
       ]

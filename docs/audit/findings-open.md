@@ -55,9 +55,10 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (disputed): RecordkeepingApp.tsx grades provision of an operating agreement, while WhyOnlyUs.tsx says "generic LLC agreement, if any". A generic operating agreement is still an operating agreement; the quotations do not establish a contradiction.
   - **Codex rejected the proposed replacement:** Changing the criterion to a protected-series-specific agreement and marking competitors no requires new competitor evidence; none is supplied by the finding.
   - Outcome: No contradiction: a generic operating agreement is still an operating agreement. Changing the grade needs competitor evidence the finding does not have.
-- **17. [A46]** — **open**
+- **17. [A46]** — **amend-title: implemented; contact-wording: open**
   - Contact page "please contact us" on the contact page; Amend Agreement tab title reads "Page Not Found". Replace: "send them using the form below."; add the title.
-  - Part "amend-title" — open: The Amendment page's browser title reads 'Page Not Found'; give it its proper title.
+  - Part "amend-title" — implemented: The Amendment page's browser title reads 'Page Not Found'; give it its proper title.
+  - Fixed (amend-title): batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
   - Part "contact-wording" — open: The Contact page says 'please contact us' on the contact page itself.
 - **18. [B1]** — **open**
   - Home page and Benefits page, the benefits grid, card 03 'One filing, one franchise relationship' — `webapp/src/components/home/BenefitsGrid.tsx:26`
@@ -882,18 +883,24 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Questionnaire and amendment error "We couldn't find a formed LLC on your account yet" where the check is for a paid order. Replace: "a paid order".
   - **Codex rejected the proposed replacement:** Use “a paid order” for NO_LLC only; distinguish network/server errors rather than replacing every failed request with this explanation.
   - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **116. [A48]** — **open**
+- **116. [A48]** — **implemented**
   - Consent dialog help "Leave blank to point at the Asset Schedule." prints a dash; and (mine) the consent prints "—" where the agreement's exhibit prints "None". Replace: both "None"; help says so.
-- **117. [A49]** — **open**
+  - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **117. [A49]** — **implemented**
   - Consent adopter blocks (mine) carry a "Date:" line the agreement's exhibit blocks do not. Replace: drop it on exhibit blocks.
-- **118. [A50]** — **open** — related: 258
+  - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **118. [A50]** — **implemented** — related: 258
   - Consent exhibit "Initial Associated Assets" reads "Members" where the multi-member agreements read "Member(s)"; Asset Schedule four rows vs five. Replace: match the agreements.
-- **119. [A51]** — **open**
+  - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **119. [A51]** — **implemented**
   - Consent dialog special-terms note omits Article 9 for S companies. Replace: add it.
-- **120. [A52]** — **open**
+  - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **120. [A52]** — **implemented**
   - Consent document listed "New Protected Series — …" while the dialog says "Consent & Series Exhibit" and "Prepare the documents". Replace: title "Consent & Series Exhibit — [series]"; button "Prepare the consent".
-  - Part "title" — open: The consent document's title in the portal: "Consent & Series Exhibit — [series]".
-  - Part "button" — open: The dialog's button: "Prepare the consent".
+  - Part "title" — implemented: The consent document's title in the portal: "Consent & Series Exhibit — [series]".
+  - Fixed (title): batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Part "button" — implemented: The dialog's button: "Prepare the consent".
+  - Fixed (button): batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
   - Former part "all" (retired by 001-part-level-links, now title, button): The whole finding.
 - **121. [A53]** — **implemented**
   - S election dialog and "Editable until" row say the package is "deleted"; it is replaced with a record copy. Replace both to say so.
@@ -921,12 +928,14 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Part "viewer-zone-display" — implemented: The two dates rendered in the viewer's zone are formatted with formatDate.
   - Fixed (viewer-zone-display): batch 10 revision 1, commit , by Codex; protected by 1 assertion(s).
   - Former part "all" (retired by 001-part-level-links, now florida-date, viewer-zone-display): The whole finding.
-- **129. [A61]** — **open**
+- **129. [A61]** — **implemented**
   - Consent exhibit-identifier default fails for "Protected Series 4". Replace: accept that spelling.
+  - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **130. [A62]** — **open**
   - Spouse pairing "JTWROS". Replace: "Joint tenants with right of survivorship".
-- **131. [A63]** — **open**
+- **131. [A63]** — **implemented**
   - Amendment card names "Update/regenerate" under "Operating Agreement"; the button and heading read differently. Replace the button and heading.
+  - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **132. [A64]** — **open**
   - Two refusals cite "§605.2202" and "s. 605.2202, Fla. Stat.". Replace: the second.
 - **133. [A65]** — **implemented**
@@ -950,7 +959,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: The statute itself permits establishment only on unanimous consent.
   - True: s. 605.2201(1) (opened): "With the affirmative vote or consent of all members of a limited liability company, the company may establish a protected series." — and s. 605.2107(1)(i) (opened) lets an operating agreement vary "the manner in which a series limited liability company approves establishing a protected series", so the statute's rule is a default, not an "only". The consent document itself says it correctly (templates-new-series.md:11: "a limited liability company may establish a protected series with the affirmative vote or consent of all of its members, and Section 3.1 of the Agreement requires that consent"), and new-series.ts:7-11 explains why. The comment at :137-139 repeats the dialog's overstatement.
   - Replace with: Florida's rule, unless an operating agreement changes it, is that a protected series is established with the consent of all members (s. 605.2201(1)), and Section 3.1 of your agreement requires exactly that.
-- **137. [B61]** — **open** — waits on Adam's ruling
+- **137. [B61]** — **implemented** — waits on Adam's ruling
   - Client portal, Amendment to Operating Agreement page, the grey guidance box — `webapp/src/pages/portal/AmendAgreement.tsx:142`
   - Reads: The new agreement is an Amended and Restated Operating Agreement and replaces the old one.
   - Claims: Regenerating always produces an Amended and Restated agreement.
@@ -959,7 +968,9 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (disputed): AmendAgreement.tsx:142 makes an unconditional Amended and Restated promise, but the proposed fix treats every generated PDF as an adopted agreement. OAQuestionnaire.tsx:109-111 preserves saved.firstOrAmended before using generation count, and :797-798 expressly says generated PDFs still need signature. A never-executed draft does not become an operative agreement just because it was generated.
   - **Codex rejected the proposed replacement:** Ask whether an agreement has actually been adopted and use that answer. Suggested guidance: “If you are replacing an adopted agreement, select Amended and Restated. If you are correcting an unsigned first draft, select First operating agreement.” Do not disable First merely because a generation exists.
   - Corrected after Codex's review: A generated PDF is not an adopted agreement. Ask whether an agreement was adopted; do not disable 'first' merely because a generation exists. Ruling needed.
-- **138. [B63]** — **optional — open**
+  - Ruling, 2026-09-20: Batch 14 approved: explicitly ask whether an agreement has been adopted, including oral or implied; correcting an unused draft stays a first agreement. Require a company-specific predecessor or outside/unknown-date choice for restatement.
+  - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **138. [B63]** — **optional — implemented**
   - Client portal, questionnaire help screen "Initial Contributions", the "If you're not sure yet" choice — `webapp/src/content/oaLearnMore.tsx:348`
   - Reads: List what you plan to contribute — the exhibits can be regenerated when the list changes. What matters most is that what actually moved matches what the records say.
   - Claims: The exhibits alone can be regenerated.
@@ -968,6 +979,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (disputed): Actual oaLearnMore.tsx:348 says “the exhibits can be regenerated”, not that they can be regenerated alone; whole-agreement generation does regenerate its exhibits. The proposed replacement additionally promises every new document is Amended and Restated, which OAQuestionnaire.tsx:109-111/792-794 does not ensure.
   - **Codex rejected the proposed replacement:** Optional clarification: “When the list changes, update it here and regenerate the agreement, including its exhibits.” Whether it should be amended depends on an adopted prior agreement, not the existence of a PDF.
   - Outcome: 'The exhibits can be regenerated' is not false; regenerating the agreement regenerates them.
+  - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **139. [B64]** — **open**
   - Client portal, questionnaire help screen "S Corporation Status", the "If you choose No" choice — `webapp/src/content/oaLearnMore.tsx:40`
   - Reads: Your agreement uses our standard form — with one owner, the company is simply part of your personal tax return; with multiple owners, it is taxed as a partnership.
@@ -993,12 +1005,13 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (disputed): OaOwnersSections.tsx:99 says the rows start from formation information. The finding claims a manager-managed client sees one blank row, but routes-portal.ts:95-121 seeds a clientOwner and OAQuestionnaire.tsx:123-127 copies that name/address; suggested owners are separate chips. The assertion of a blank row is wrong.
   - Corrected after Codex's review: A manager-managed client is pre-filled as the first owner (no blank row). The replacement wording stands: 'They start from the people named on your order'.
   - Fixed: batch 01 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **142. [B73]** — **open**
+- **142. [B73]** — **implemented**
   - Client portal, the Operating agreement card before an agreement exists — `webapp/src/pages/portal/PortalDashboard.tsx:206`
   - Reads: Answer a short questionnaire and we'll generate your operating agreement as a signed-ready PDF.
   - Claims: The PDF is 'signed-ready'.
   - True: The PDF is unsigned and ready for the members to sign; 'signed-ready' reads as if already signed. The sibling wording on the same screen is 'ready to sign' nowhere; the S election tile (ServicesCard.tsx:403) says 'completed and ready to sign'.
   - Replace with: Answer a short questionnaire and we'll generate your operating agreement as a PDF ready to sign.
+  - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **143. [B74]** — **implemented**
   - Client portal, the Operating agreement card when the status request fails — `webapp/src/pages/portal/PortalDashboard.tsx:199`
   - Reads: Your agreement questionnaire unlocks once your order is paid.
@@ -1109,13 +1122,14 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: On a conversion buildPayload.ts:16-19 and :28-29 still fill finalName from desiredLlcName and llcDesignator — whatever the client typed on the new-formation path before switching (the form never clears it: StepFilingPath.tsx:68 patches filingPath only) — while the order itself is named from existingLlcName (routes-payments.ts:363-365). A client who typed "Acme" + LLC, then chose the conversion path for "Sunshine Holdings, LLC", gets an operating agreement, consent and Exhibit headed "Acme, LLC" (OaInputs.companyName at :1463 comes from seed.llcName), and the consent route refuses their real series name because it "must begin with \"Acme, LLC\"" (:1591-1595).
   - Replace with: llcName: (p.filingPath === "CONVERT" ? "" : p.llcName?.finalName) || orders[0].llc_name,  — and, in buildPayload.ts:28-29, finalName: "" on the conversion branch.
   - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **156. [B130]** — **open**
+- **156. [B130]** — **implemented**
   - Client portal, Amended and Restated agreement — Recital D names the agreement it supersedes — `webapp/server/routes-portal.ts:1258`
   - Reads: const priorGens = await db.query<{ created_at: unknown }>(     "SELECT created_at FROM oa_generations WHERE client_id = $1 ORDER BY created_at DESC LIMIT 1",     [session.clientId],   );   // Drivers differ: Neon returns ISO strings, PGlite returns Date objects.   const priorDate =     priorGens.length > 0       ? new Date(String(priorGens[0].created_at)).toLocaleDateString("en-US", {           year: "numeric",           month: "long",           day: "numeric",         })       : null;
   - Claims: The prior agreement's date is the day the client's newest generation was created.
   - True: oa.ts:528-529 prints it as "the Operating Agreement of the Company dated <priorDate>". Three things are wrong with the value: (1) it is taken across every company on the account (no order_id filter, unlike the count at :1251-1253), so a second company's Amended and Restated agreement recites the first company's date; (2) it is the generation timestamp, not the agreement's Effective Date the client chose (:1467 `effectiveDate: fmtDate(a.effectiveDate)`, stored in inputs), so an agreement generated on 1 September with an effective date of 1 August is superseded "dated September 1, 2026"; (3) toLocaleDateString runs in the server's zone (UTC on Vercel), so a 9 pm Eastern generation is dated the next day. The amendment route already asks the client for the agreement's date (:1730, :1780).
   - Replace with: const priorGens = await db.query<{ effective_date: string | null }>("SELECT inputs->>'effectiveDate' AS effective_date FROM oa_generations WHERE client_id = $1 AND (order_id = $2 OR order_id IS NULL) ORDER BY created_at DESC LIMIT 1", [session.clientId, seed.orderId]); const priorDate = priorGens[0]?.effective_date ?? null;
   - **Codex rejected the proposed replacement:** Select by this exact order and the actually adopted prior agreement. The proposed OR order_id IS NULL still admits unrelated legacy company drafts, and latest generated is not necessarily adopted. Where no adopted predecessor is known, ask the client for its date.
+  - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **157. [B131]** — **implemented**
   - Client portal, Services card — the S election, certificate and EIN refusals point the reader "below" — `webapp/server/routes-portal.ts:1921`
   - Reads: "You already have an S election order — see your orders below."
@@ -1323,24 +1337,28 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: docsQuery fetches at :471-475, but :645 treats unavailable data as [] and :660 filters that empty array. DocList at :740-742 therefore shows the reassuring empty state after a failed request, including while served documents may exist. No docsQuery.isError branch distinguishes unavailable mail from no mail.
   - Replace with: On a document-list failure show: “We could not load your documents or legal mail. Try again.” Show the no-mail sentence only after a successful empty response.
   - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **N3.10. [substantive]** — **open** — waits on Adam's ruling
+- **N3.10. [substantive]** — **implemented** — waits on Adam's ruling
   - Client portal → Your documents → operating agreement status badges — `webapp/src/pages/portal/PortalDashboard.tsx:111`
   - Reads: {mine.isCurrent ? "Current" : "Superseded"}
   - Claims: The newest generated PDF is the operative agreement and every older agreement has been superseded.
   - True: The only test is generation order: :501-505 sets isCurrent to i===0. It does not record signing, adoption or effective date. OAQuestionnaire.tsx:797-798 says the generated PDF is still ready to print and sign, and :113 accepts the client’s chosen effective date. Merely creating a new unsigned or future-effective draft cannot establish that the earlier adopted agreement is superseded. The questionnaire’s generation list repeats the labels.
   - Replace with: Use “Most recently generated” and “Earlier generated copy” unless adoption and effectiveness are actually recorded. Explain: “Generation order does not determine which agreement is legally in effect.”
+  - Ruling, 2026-09-20: Batch 14 approved: label generation order Most recently generated / Earlier generated copy; state that generation order does not determine legal effect. No inferred adoption tracker.
+  - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **N3.11. [substantive]** — **open**
   - Client portal → Operating agreement help → Deadlock Buy-Sell Provision — `webapp/src/content/oaLearnMore.tsx:154`
   - Reads: Without a plan, the only exit is asking a court to dissolve the company.
   - Claims: Without the optional buy-sell clause, no negotiated exit is possible.
   - True: The same help at :167-168 expressly identifies negotiation or a court proceeding. templates-oa-multi.md:280/282 permits consensual transfers and :316 permits withdrawal with all other members’ written consent; the buy-sell clause is not the sole route to a negotiated solution. This finding concerns the categorical only-exit sentence, not a prediction that parties will agree.
   - Replace with: Without an agreed exit mechanism, owners may need to negotiate a solution or ask a court for relief.
-- **N3.12. [substantive]** — **open** — waits on Adam's ruling
+- **N3.12. [substantive]** — **implemented** — waits on Adam's ruling
   - Client portal → Operating agreement questionnaire → instructions for changing managers — `webapp/src/pages/portal/OAQuestionnaire.tsx:804`
   - Reads: To add or remove members or managers, change ownership percentages, or change an option you chose here, update your answers and regenerate.
   - Claims: The questionnaire lets the client add or remove managers.
   - True: The complete questionnaire has owner add/remove controls, but no manager-list editor. At :396-399 it says managers come from the formation record and there is nothing to choose; :333 derives entityManagers from data.seed.managerNames and only collects their signers. routes-portal.ts OA assembly uses the seeded manager list. AmendAgreement.tsx:137 and PortalDashboard.tsx:238 repeat the unavailable-manager-edit instruction.
   - Replace with: To add or remove members, change ownership percentages, or change an option you chose here, update your answers and regenerate. Managers are taken from your formation record and cannot be added or removed in this questionnaire; changes the questionnaire cannot make require a separate amendment.
+  - Ruling, 2026-09-20: Batch 14 approved: implement editing, adding and removing managers in the manager-managed operating-agreement questionnaire, preserving each entity signer with its manager and leaving state filing records unchanged.
+  - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **N3.13. [substantive]** — **implemented**
   - Client portal → Operating agreement questionnaire → full legal name of an entity owner — `webapp/src/pages/portal/OAQuestionnaire.tsx:330`
   - Reads: const incompleteOwner = owners.some((o) => !hasFirstAndLast(o.name) || !(o.address ?? "").trim());
@@ -1928,7 +1946,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Part "article8-location" — open: "the standing association rules that close the Article": §8.5 does not close Article 8 — the same misstatement A96 (245) records. — same defect as 245
   - Part "nominee" — open: "never your personal name" overstates §8.4; the documented nominee arrangement — the same overstatement A95 (244) records. — same defect as 244
   - Former part "all" (retired by 001-part-level-links, now article8-location, nominee): The whole finding.
-- **257. [B157]** — **optional — open**
+- **257. [B157]** — **optional — implemented**
   - Series consent, paragraph 4 'Authority to file', last sentence — `webapp/server/templates-new-series.md:19`
   - Reads: The protected series is established when its Protected Series Designation takes effect under s. 605.0207, Florida Statutes.
   - Claims: The establishment rule is in s. 605.0207.
@@ -1936,19 +1954,21 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: The protected series is established when its Protected Series Designation takes effect (ss. 605.2201(3) and 605.0207, Florida Statutes).
   - Codex (disputed): The actual sentence, “The protected series is established when its Protected Series Designation takes effect under s. 605.0207, Florida Statutes,” tracks 2026 §605.2201(3) verbatim in substance. It says the designation takes effect under0207, not that0207 is the series-establishment section. The finding admits the sentence is true.
   - Outcome: True as written; adding s. 605.2201(3) is a supplemental citation.
+  - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **258. [B158]** — **open** — related: 118
   - Series consent and Series Exhibit — the Asset Schedule heading, compared with the agreement's — `webapp/server/new-series.ts:107`
   - Reads: s = s.split("PS-[N]").join(`PS-${input.seriesNumber}`);
   - Claims: The consent's asset schedule is headed 'ASSET SCHEDULE — ATTACHMENT TO SERIES EXHIBIT PS-4'.
   - True: The agreement's asset schedule is headed with the series' filed name as well: oa.ts:673-676 renders `## ASSET SCHEDULE — ATTACHMENT TO SERIES EXHIBIT PS-${n} (${ser.name})`. A client detaching the two schedules for a bank gets one that names the series and one that does not.
   - Replace with: In templates-new-series.md:55 head the schedule '## ASSET SCHEDULE — ATTACHMENT TO SERIES EXHIBIT PS-[N] ([SERIES NAME])' so the same fill produces the agreement's heading.
-- **259. [B167]** — **open** — same defect as 120 (title)
+- **259. [B167]** — **implemented** — same defect as 120 (title)
   - Series consent — the document's title in the portal (the file behind A52) — `webapp/server/new-series.ts:134`
   - Reads: return { markdown: s, title: `New Protected Series — ${input.seriesName}` };
   - Claims: The stored document is titled 'New Protected Series — …'.
   - True: The document's own heading is 'UNANIMOUS WRITTEN CONSENT OF THE MEMBERS … ESTABLISHING A NEW PROTECTED SERIES' with a 'SERIES EXHIBIT' (templates-new-series.md:1-5, 33); the prior audit's A52 (portal bucket) asked for 'Consent & Series Exhibit — [series]'. The title is set here, so the fix lives in this file.
   - Replace with: return { markdown: s, title: `Consent & Series Exhibit — ${input.seriesName}` };
-- **260. [B159]** — **open** — housekeeping
+  - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **260. [B159]** — **implemented** — housekeeping
   - Series consent assembler — comment about the contribution cell (the code behind A48) — `webapp/server/new-series.ts:112`
   - Reads: // An empty contribution prints a dash, as the agreement's own Series   // Exhibit does (15 Sep 2026).
   - Claims: The agreement's Series Exhibit prints a dash for an empty contribution.
@@ -1956,6 +1976,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: s = s.split("[CONTRIBUTION]").join((input.contribution ?? "").trim() || "None"); with the comment 'An empty contribution prints None, as the agreement's Series Exhibit does (routes-portal.ts, oa-capital.ts).'
   - Codex (housekeeping-only): new-series.ts:112–113 inaccurately says its dash matches the agreement; computeCapital:124 supplies None to the agreement. The identified comment itself is invisible to clients.
   - **Codex rejected the proposed replacement:** Changing the comment alone is housekeeping. The proposed code change also changes the delivered contribution cell and belongs to the already-reported A48 defect; do not count it as a new housekeeping-only client change.
+  - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **261. [B160]** — **open** — housekeeping
   - docs/README.md — 'Masters → Word output' inventory table — `docs/README.md:25`
   - Reads: | Master (edit this) | Word output, in `docs/word/` and Dropbox |

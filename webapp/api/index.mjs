@@ -100939,6 +100939,24 @@ async function unavailableNames(names) {
   }
 }
 
+// src/lib/oaManagers.ts
+function agreementManagers(seed, answers) {
+  if (seed.managementStructure === "MEMBER_MANAGED") return [];
+  return answers?.managers ?? seed.managerNames.map((name, i) => ({ name, isEntity: !!seed.managerEntities?.[i], signerName: answers?.managerSigners?.[i]?.name, signerTitle: answers?.managerSigners?.[i]?.title }));
+}
+function managerProblem(managers) {
+  if (!managers.length) return "A manager-managed company needs at least one manager.";
+  const names = /* @__PURE__ */ new Set();
+  for (const m2 of managers) {
+    const name = (m2.name ?? "").trim();
+    if (!name || !m2.isEntity && !hasFirstAndLast(name)) return "Every manager needs a full legal name. Individuals need a first and last name.";
+    if (names.has(name.toLowerCase())) return `List ${name} only once as a manager.`;
+    names.add(name.toLowerCase());
+    if (m2.isEntity && (!hasFirstAndLast(m2.signerName) || !(m2.signerTitle ?? "").trim())) return `Name the person who signs for ${name} \u2014 first and last name \u2014 and their title.`;
+  }
+  return null;
+}
+
 // server/owners-manual.ts
 import { createHash as createHash6 } from "node:crypto";
 
@@ -102143,7 +102161,7 @@ var templates_new_series_default = `# <!-- if:several -->UNANIMOUS WRITTEN CONSE
 
 **3. Ownership.** The new Protected Series is established without associated members. The Company owns all of its protected-series transferable interests, and no member of the Company holds any interest in it except indirectly, through that member's interest in the Company (ss. 605.2302(1), 605.2303(2), Fla. Stat.).
 
-**4. Authority to file.** <!-- if:membermanaged --><!-- if:several -->The Members authorize the Administrative Member, or any Member the Members designate, to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.<!-- /if --><!-- if:sole -->The Member is authorized to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.<!-- /if --><!-- /if --><!-- if:managermanaged --><!-- if:several -->The Members authorize <!-- /if --><!-- if:sole -->The Member authorizes <!-- /if -->the Manager to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.<!-- /if --> The protected series is established when its Protected Series Designation takes effect under s. 605.0207, Florida Statutes.
+**4. Authority to file.** <!-- if:membermanaged --><!-- if:several -->The Members authorize the Administrative Member, or any Member the Members designate, to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.<!-- /if --><!-- if:sole -->The Member is authorized to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.<!-- /if --><!-- /if --><!-- if:managermanaged --><!-- if:several -->The Members authorize <!-- /if --><!-- if:sole -->The Member authorizes <!-- /if -->the Manager to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement.<!-- /if --> The protected series is established when its Protected Series Designation takes effect (ss. 605.2201(3) and 605.0207, Florida Statutes).
 
 **5. Series Exhibit.** The Series Exhibit set forth below is adopted as part of the Agreement for the new Protected Series, as Section 3.1 of the Agreement requires at or before the filing of the Protected Series Designation.
 
@@ -102170,7 +102188,7 @@ var templates_new_series_default = `# <!-- if:several -->UNANIMOUS WRITTEN CONSE
 <!-- /if --><!-- if:membermanaged --><!-- if:several -->| Managed by | The Members, as protected-series managers (s. 605.2304, Fla. Stat., as varied by Section 5.2 of the Agreement), acting by a Majority in Interest |
 <!-- /if --><!-- if:sole -->| Managed by | The Member, as protected-series manager (ss. 605.2304(1)-(2), 605.2107(1)(n), Fla. Stat.) |
 <!-- /if --><!-- /if -->| Contributions to this Protected Series | By the Company: [CONTRIBUTION] |
-| Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the <!-- if:several -->Members<!-- /if --><!-- if:sole -->Member<!-- /if -->, together with the records maintained under Article 8. |
+| Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the <!-- if:several -->Member(s)<!-- /if --><!-- if:sole -->Member<!-- /if -->, together with the records maintained under Article 8. |
 | Special terms (if any) | [SPECIAL TERMS] |
 
 **Adopted effective [EFFECTIVE DATE] by the Company, acting through <!-- if:managermanaged --><!-- if:onemanager -->its Manager<!-- /if --><!-- if:manymanagers -->its Managers<!-- /if --><!-- /if --><!-- if:membermanaged --><!-- if:sole -->the Member<!-- /if --><!-- if:several -->a Majority in Interest of its Members<!-- /if --><!-- /if -->:**
@@ -102189,8 +102207,9 @@ var templates_new_series_default = `# <!-- if:several -->UNANIMOUS WRITTEN CONSE
 | | | | |
 | | | | |
 | | | | |
+| | | | |
 
-*New Protected Series \u2014 [SERIES NAME] \u2014 generated by MyFloridaSeriesLLC \xB7 Master [EDITION]*
+*Consent & Series Exhibit \u2014 [SERIES NAME] \u2014 generated by MyFloridaSeriesLLC \xB7 Master [EDITION]*
 `;
 
 // server/oa.ts
@@ -106251,16 +106270,16 @@ function assembleNewSeries(input) {
   const managers = input.managerNames.map((n) => n.trim()).filter(Boolean);
   if (!input.memberManaged && managers.length === 0) throw new Error("new-series: a manager-managed company needs at least one Manager");
   const signerOf = (entity) => (input.entitySigners ?? []).find((x2) => x2.entity.trim() === entity.trim());
-  const block = (n, suffix) => {
+  const block = (n, suffix, dated = true) => {
     const sg = signerOf(n);
     return (sg ? `${n}${suffix}
 
 By: _____________________________
 [[indent]]${sg.name}
 [[indent]]${sg.title}` : `_____________________________
-${n}${suffix}`) + "\nDate: _____________________________";
+${n}${suffix}`) + (dated ? "\nDate: _____________________________" : "");
   };
-  const psSignature = input.memberManaged ? input.memberNames.map((n) => block(n, ", Member")).join("\n\n") : managers.map((n) => block(n, ", Protected Series Manager")).join("\n\n");
+  const psSignature = input.memberManaged ? input.memberNames.map((n) => block(n, ", Member", false)).join("\n\n") : managers.map((n) => block(n, ", Protected Series Manager", false)).join("\n\n");
   const blocks = input.memberNames.map((n) => block(n, "")).join("\n\n");
   must2(s, "[COMPANY NAME], LLC", "company name");
   s = s.split("[COMPANY NAME], LLC").join(input.companyName);
@@ -106273,7 +106292,7 @@ ${n}${suffix}`) + "\nDate: _____________________________";
   s = resolveIf(s, "purpose", purpose !== "");
   s = s.split("[SERIES PURPOSE]").join(purpose);
   must2(s, "[CONTRIBUTION]", "contribution");
-  s = s.split("[CONTRIBUTION]").join((input.contribution ?? "").trim() || "\u2014");
+  s = s.split("[CONTRIBUTION]").join((input.contribution ?? "").trim() || "None");
   must2(s, "[SPECIAL TERMS]", "special terms");
   s = s.split("[SPECIAL TERMS]").join((input.specialTerms ?? "").trim().replace(/\|/g, "/").replace(/\s*\n\s*/g, " ") || "None");
   must2(s, "[EFFECTIVE DATE]", "effective date");
@@ -106289,7 +106308,7 @@ ${n}${suffix}`) + "\nDate: _____________________________";
   if (leftovers) throw new Error(`new-series template left unfilled: ${leftovers.join(", ")}`);
   if (/<!--/.test(s)) throw new Error("new-series: template marker left in the document");
   if (/Form document/.test(s)) throw new Error("new-series: draft colophon left in the document");
-  return { markdown: s, title: `New Protected Series \u2014 ${input.seriesName}` };
+  return { markdown: s, title: `Consent & Series Exhibit \u2014 ${input.seriesName}` };
 }
 
 // src/lib/einActivity.ts
@@ -106860,6 +106879,9 @@ async function oaSeed(clientId, orderId) {
 }
 var oaAnswersSchema = external_exports.object({
   firstOrAmended: external_exports.enum(["first", "amended"]).optional(),
+  priorAgreement: external_exports.string().max(100).optional(),
+  priorAgreementDate: external_exports.string().max(10).optional(),
+  managers: external_exports.array(external_exports.object({ name: external_exports.string().max(200).optional(), isEntity: external_exports.boolean().optional(), signerName: external_exports.string().max(200).optional(), signerTitle: external_exports.string().max(120).optional() })).max(20).optional(),
   sElection: external_exports.boolean().optional(),
   // true = build on the S corporation form
   // Asked, not derived. The intake list is where the owners START; a client can
@@ -107530,7 +107552,7 @@ function registerPortalRoutes(app2) {
             COALESCE(generation_number, 0) AS generation_number,
             inputs->>'version' AS version,
             inputs->>'effectiveDate' AS effective_date
-       FROM oa_generations WHERE client_id = $1 AND (order_id = $2 OR order_id IS NULL) ORDER BY created_at DESC`,
+       FROM oa_generations WHERE client_id = $1 AND order_id = $2 ORDER BY created_at DESC`,
       [session.clientId, seed.orderId]
     );
     const generations = gens.map((g) => ({ ...g, effective_date_iso: isoFromPrinted(String(g.effective_date ?? "")) }));
@@ -107656,15 +107678,21 @@ function registerPortalRoutes(app2) {
     if (Number(kept[0]?.n ?? 0) >= OA_KEEP_MAX) {
       return c.json(err(`This company already has ${OA_KEEP_MAX} operating agreements on file. Delete one from your documents to generate another.`, "AGREEMENT_CAP"), 400);
     }
-    const priorGens = await db.query(
-      "SELECT created_at FROM oa_generations WHERE client_id = $1 ORDER BY created_at DESC LIMIT 1",
-      [session.clientId]
-    );
-    const priorDate = priorGens.length > 0 ? new Date(String(priorGens[0].created_at)).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric"
-    }) : null;
+    let priorDate = null;
+    if (a2.firstOrAmended === "amended") {
+      if (!a2.priorAgreement) return c.json(err("Identify the adopted agreement you are replacing.", "INVALID_INPUT"), 400);
+      if (a2.priorAgreement !== "unknown") {
+        if (a2.priorAgreement !== "external") {
+          if (!external_exports.string().uuid().safeParse(a2.priorAgreement).success) return c.json(err("Choose a prior agreement for this company.", "INVALID_INPUT"), 400);
+          const prior = await db.query("SELECT id FROM oa_generations WHERE id = $1 AND client_id = $2 AND order_id = $3", [a2.priorAgreement, session.clientId, seed.orderId]);
+          if (!prior.length) return c.json(err("That prior agreement is not on this company's record. Choose its agreement, or an agreement prepared elsewhere.", "INVALID_INPUT"), 400);
+        }
+        const date2 = a2.priorAgreementDate ?? "";
+        const parsed = /* @__PURE__ */ new Date(date2 + "T12:00:00Z");
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(date2) || !Number.isFinite(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== date2) return c.json(err("Confirm the prior agreement's effective date, or choose undated / date unknown.", "INVALID_INPUT"), 400);
+        priorDate = fmtDate2(date2);
+      }
+    }
     const bumped = await db.query(
       "UPDATE clients SET oa_generation_seq = oa_generation_seq + 1 WHERE id = $1 RETURNING oa_generation_seq",
       [session.clientId]
@@ -107743,16 +107771,10 @@ function registerPortalRoutes(app2) {
     });
     if (entityGap) return c.json(err(entityGap, "INVALID_INPUT"), 400);
     if (todGap) return c.json(err(todGap, "INVALID_INPUT"), 400);
-    const managerEntitySigners = [];
-    for (let i = 0; i < seed.managerNames.length; i += 1) {
-      if (!seed.managerEntities?.[i]) continue;
-      const sn = (a2.managerSigners?.[i]?.name ?? "").trim();
-      const st = (a2.managerSigners?.[i]?.title ?? "").trim();
-      if (!hasFirstAndLast(sn) || !st) {
-        return c.json(err(`Name the person who signs for ${seed.managerNames[i]} \u2014 first and last name \u2014 and their title.`, "INVALID_INPUT"), 400);
-      }
-      managerEntitySigners.push({ manager: seed.managerNames[i], name: sn, title: st });
-    }
+    const managers = agreementManagers(seed, a2);
+    const invalidManager = memberManaged ? null : managerProblem(managers);
+    if (invalidManager) return c.json(err(invalidManager, "INVALID_INPUT"), 400);
+    const managerEntitySigners = managers.filter((m2) => m2.isEntity).map((m2) => ({ manager: m2.name.trim(), name: m2.signerName.trim(), title: m2.signerTitle.trim() }));
     const isSCorp = version === "s" || version === "member-s" || version === "single-s" || version === "member-single-s";
     if (members.length === 1) {
       members[0].percentage = 100;
@@ -107826,7 +107848,7 @@ function registerPortalRoutes(app2) {
       version,
       companyName: seed.llcName,
       principalAddress: seed.principalAddress,
-      managerNames: seed.managerNames,
+      managerNames: managers.map((m2) => m2.name.trim()),
       managerEntitySigners,
       effectiveDate: fmtDate2(a2.effectiveDate),
       amendedRestated: a2.firstOrAmended === "amended",
@@ -107938,6 +107960,9 @@ function registerPortalRoutes(app2) {
     const memberManaged = seed.managementStructure === "MEMBER_MANAGED";
     const savedForSeries = await savedOaAnswers(session.clientId, consentCompanyId);
     const seriesOwners = effectiveOwners(seed.members, savedForSeries);
+    const managers = agreementManagers(seed, savedForSeries);
+    const invalidManager = memberManaged ? null : managerProblem(managers);
+    if (invalidManager) return c.json(err(invalidManager, "INVALID_INPUT"), 400);
     const entitySigners = [];
     (savedForSeries?.members ?? []).forEach((m2, i) => {
       const owner = seriesOwners[i];
@@ -107945,10 +107970,7 @@ function registerPortalRoutes(app2) {
         entitySigners.push({ entity: owner.name, name: (m2.signerName ?? "").trim(), title: (m2.signerTitle ?? "").trim() });
       }
     });
-    seed.managerNames.forEach((n, i) => {
-      const sg = savedForSeries?.managerSigners?.[i];
-      if (seed.managerEntities?.[i] && (sg?.name ?? "").trim()) entitySigners.push({ entity: n, name: (sg?.name ?? "").trim(), title: (sg?.title ?? "").trim() });
-    });
+    managers.filter((m2) => m2.isEntity).forEach((m2) => entitySigners.push({ entity: m2.name.trim(), name: m2.signerName.trim(), title: m2.signerTitle.trim() }));
     for (let i = 0; i < seriesOwners.length; i += 1) {
       const m2 = savedForSeries?.members?.[i];
       const isEntity = m2?.isEntity ?? seed.members[i]?.isEntity ?? false;
@@ -107956,13 +107978,6 @@ function registerPortalRoutes(app2) {
       const sg = entitySigners.find((x2) => x2.entity === seriesOwners[i].name);
       if (!sg || !hasFirstAndLast(sg.name) || !sg.title) {
         return c.json(err(`Name the person who signs for ${seriesOwners[i].name || `owner ${i + 1}`} \u2014 first and last name \u2014 and their title.`, "INVALID_INPUT"), 400);
-      }
-    }
-    for (let i = 0; i < seed.managerNames.length; i += 1) {
-      if (!seed.managerEntities?.[i]) continue;
-      const sg = entitySigners.find((x2) => x2.entity === seed.managerNames[i]);
-      if (!sg || !hasFirstAndLast(sg.name) || !sg.title) {
-        return c.json(err(`Name the person who signs for ${seed.managerNames[i]} \u2014 first and last name \u2014 and their title.`, "INVALID_INPUT"), 400);
       }
     }
     const generatedOn = /* @__PURE__ */ new Date();
@@ -107976,7 +107991,7 @@ function registerPortalRoutes(app2) {
         purpose: body.data.purpose,
         effectiveDate: fmtDate2(body.data.effectiveDate),
         memberNames: seriesOwners.map((m2) => m2.name),
-        managerNames: seed.managerNames,
+        managerNames: managers.map((m2) => m2.name.trim()),
         memberManaged,
         specialTerms: body.data.specialTerms,
         contribution: body.data.contribution,
@@ -108176,10 +108191,14 @@ function registerPortalRoutes(app2) {
       [session.clientId]
     );
     const seed = await oaSeed(session.clientId, svcCompanyId);
-    const owners = effectiveOwners(seed?.members ?? [], await savedOaAnswers(session.clientId, svcCompanyId));
+    const savedAgreement = await savedOaAnswers(session.clientId, svcCompanyId);
+    const owners = effectiveOwners(seed?.members ?? [], savedAgreement);
+    const agreementForm = await db.query("SELECT inputs->>'version' AS version FROM oa_generations WHERE client_id = $1 AND order_id = $2 ORDER BY created_at DESC LIMIT 1", [session.clientId, svcCompanyId]);
+    const oaSElection = agreementForm.length ? ["s", "member-s", "single-s", "member-single-s"].includes(agreementForm[0].version) : savedAgreement?.sElection === true;
     return c.json({
       data: {
         llcName: await clientLlcName(session.clientId, svcCompanyId),
+        oaSElection,
         dev: !env.isProd && !env.SQUARE_ACCESS_TOKEN,
         members: owners,
         pricing: {

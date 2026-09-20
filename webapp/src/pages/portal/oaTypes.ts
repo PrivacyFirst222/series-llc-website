@@ -1,6 +1,7 @@
 // Shared answer types for the operating-agreement questionnaire — split from
 // OAQuestionnaire.tsx on 29 Aug 2026 so the section components declare their
 // contracts explicitly instead of closing over one 880-line component.
+import type { AgreementManager } from "@/lib/oaManagers";
 import type { OwnershipMode } from "@/lib/ownership";
 
 export interface MemberAnswer {
@@ -50,6 +51,9 @@ export interface AssetAnswer {
 }
 export interface Answers {
   firstOrAmended?: "first" | "amended";
+  priorAgreement?: string; // generated id, external, or unknown
+  priorAgreementDate?: string;
+  managers?: AgreementManager[];
   assets?: AssetAnswer[];
   sElection?: boolean;
   multiOwner?: boolean;
