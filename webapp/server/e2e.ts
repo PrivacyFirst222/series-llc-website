@@ -11,6 +11,7 @@ import { defaultFormData } from "../src/components/forms/florida-llc/defaults";
 import { assembleOa, type OaInputs } from "./oa";
 import { serviceOrderClientEmail } from "./email";
 import { execSync } from "node:child_process";
+import { isDeepStrictEqual } from "node:util";
 import { writeFileSync, appendFileSync } from "node:fs";
 import { tmpdir as osTmpdir } from "node:os";
 import { join as joinPath } from "node:path";
@@ -1063,8 +1064,9 @@ if (mint.status === 200) {
     const clientOnlyAdmin = await api("/api/admin/me", { cookies: setPw.cookie });
     check("a client cookie is not an admin session", clientOnlyAdmin.status === 401, clientOnlyAdmin.status);
   }
-  check("me shows no RA cancellation yet", me.status === 200 && me.body.data.raCancellationRequestedAt === null);
-  check("a client who is their own agent is told so, so the portal shows no agent card (14 Sep 2026)", me.body?.data?.raService === false, me.body?.data?.raService);
+  const agentCompany20 = ((await api("/api/portal/companies", { cookies: setPw.cookie })).body?.data ?? []).find((x: { orderId: string }) => x.orderId === orderId);
+  check("me shows no RA cancellation yet", me.status === 200 && agentCompany20?.raCancellationRequestedAt === null);
+  check("a client who is their own agent is told so, so the portal shows no agent card (14 Sep 2026)", agentCompany20?.raService === false, agentCompany20);
   const cancel = await api("/api/portal/registered-agent/cancel", {
     method: "POST",
     body: "{}",
@@ -1072,7 +1074,7 @@ if (mint.status === 200) {
   });
   // The cancellation belongs to a company (15 Sep 2026): a client who is
   // their own agent has nothing to cancel, and is told so by company name.
-  check("RA cancel for a company that is its own agent is refused by name", cancel.status === 400 && cancel.body?.error?.code === "NOT_OUR_SERVICE" && /E2E Coastal Holdings, LLC is its own registered agent/.test(cancel.body?.error?.message ?? ""), cancel.body);
+  check("RA cancel for a company that is its own agent is refused by name", cancel.status === 400 && cancel.body?.error?.code === "NOT_OUR_SERVICE" && /E2E Coastal Holdings, LLC did not take our registered agent service/.test(cancel.body?.error?.message ?? ""), cancel.body);
   const cancelAgain = await api("/api/portal/registered-agent/cancel", {
     method: "POST",
     body: "{}",
@@ -1083,8 +1085,8 @@ if (mint.status === 200) {
     cancelAgain.status === 400 &&
       cancelAgain.body?.error?.code === cancel.body?.error?.code,
   );
-  const meAfter = await api("/api/auth/me", { cookies: setPw.cookie });
-  check("me shows no cancellation when the company is its own agent and the request was refused (15 Sep 2026)", meAfter.body.data.raCancellationRequestedAt === null, meAfter.body.data);
+  const meAfter = ((await api("/api/portal/companies", { cookies: setPw.cookie })).body?.data ?? []).find((x: { orderId: string }) => x.orderId === orderId);
+  check("me shows no cancellation when the company is its own agent and the request was refused (15 Sep 2026)", meAfter?.raCancellationRequestedAt === null, meAfter);
 
   // 11. Service orders: intake EIN became a paid order awaiting details
   const svc0 = await api("/api/portal/services", { cookies: setPw.cookie });
@@ -1897,14 +1899,15 @@ if (mint.status === 200) {
     check("the original company is still listed", !!firstCo, list.map((x) => x.llcName));
     check("each company carries its own registered agent facts (15 Sep 2026)", list.every((x) => typeof (x as { raService?: unknown }).raService === "boolean" && "raRenewalDate" in x && "raCancellationRequestedAt" in x), list[0]);
     // Answers isolation: write to the SECOND company, read both.
+    const secondCompanyAsset = { id: crypto.randomUUID(), description: "Second company cash", kind: "cash", value: 777, contributedBy: { mode: "equal" }, allocatedTo: "company" };
     const save2 = await api(`/api/portal/oa/answers?company=${secondId}`, {
       method: "PUT", cookies: setPw.cookie,
-      body: JSON.stringify({ firstOrAmended: "first", effectiveDate: "2026-10-01", contributionToCompany: "$777 cash", members: [{}], series: [] }),
+      body: JSON.stringify({ firstOrAmended: "first", effectiveDate: "2026-10-01", assets: [secondCompanyAsset], members: [{}], series: [] }),
     });
     check("answers save against the chosen company", save2.status === 200, save2.body);
     const oa2 = await api(`/api/portal/oa?company=${secondId}`, { cookies: setPw.cookie });
     check("the second company reads back its own answers",
-      JSON.stringify(oa2.body?.data).includes("$777 cash"), oa2.body?.data?.answers);
+      isDeepStrictEqual(oa2.body?.data?.answers?.assets, [secondCompanyAsset]), oa2.body?.data?.answers);
     {
       // The consent for the second company signs with the second company's
       // members (14 Sep 2026: it took whichever company was edited last).
@@ -1921,7 +1924,7 @@ if (mint.status === 200) {
     }
     const oa1 = await api(`/api/portal/oa?company=${firstCo?.orderId}`, { cookies: setPw.cookie });
     check("the first company's answers are untouched by the second's",
-      !JSON.stringify(oa1.body?.data).includes("$777 cash"), null);
+      !JSON.stringify(oa1.body?.data).includes(secondCompanyAsset.id), oa1.body?.data?.answers);
     check("the first company's seed is ITS company, not the newest",
       JSON.stringify(oa1.body?.data).includes("E2E Coastal Holdings"), oa1.body?.data?.seed?.llcName);
     // Service scoping: each tab's Order Services card shows only that
@@ -2455,7 +2458,7 @@ if (mint.status === 200) {
   const mmSeed = await api("/api/portal/oa", { cookies: mmPw.cookie });
   check(
     "OA seed routes to member-managed (no longer blocked)",
-    mmSeed.body?.data?.version === "member" && mmSeed.body?.data?.multiOwner === true && mmSeed.body?.data?.blocked === false && mmSeed.body?.data?.memberManaged === true,
+    mmSeed.body?.data?.version === "member" && mmSeed.body?.data?.multiOwner === true && !("blocked" in (mmSeed.body?.data ?? {})) && mmSeed.body?.data?.memberManaged === true,
     mmSeed.body?.data,
   );
   const mmAnswers = {
@@ -3781,7 +3784,7 @@ if (mint.status === 200) {
   check("the renewal client signs in", raPw.status === 200, raPw.body);
   const seed = (await api("/api/portal/oa", { cookies: raPw.cookie })).body?.data?.seed as { suggestedOwners?: { name: string; isEntity?: boolean }[]; managerEntities?: boolean[] } | undefined;
   check("the company serving as Manager is suggested as a company owner, not a person", seed?.suggestedOwners?.some((o) => o.name === "Harbor Managers, LLC" && o.isEntity === true) === true, seed?.suggestedOwners);
-  const beforeMe = (await api("/api/auth/me", { cookies: raPw.cookie })).body?.data as { raRenewalDate?: string | null };
+  const beforeMe = ((await api("/api/portal/companies", { cookies: raPw.cookie })).body?.data ?? []).find((x: { orderId: string }) => x.orderId === raId) as { raRenewalDate?: string | null; raService?: boolean } | undefined;
   check("before formation there is no renewal date", beforeMe?.raRenewalDate === null, beforeMe);
   check("a client who took our service is told so", (beforeMe as { raService?: boolean })?.raService === true, beforeMe);
   const appointment = new Date().toLocaleDateString("en-CA", {timeZone:"America/New_York"});
@@ -3805,7 +3808,7 @@ if (mint.status === 200) {
     const renewsWord = new Date(`${expected}T12:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
     check("the Registered Agent Clients row names the renewal date beside the company", (cl?.ra_llcs ?? []).some((s) => s.endsWith(` (renews ${renewsWord})`)), { ra_llcs: cl?.ra_llcs, renewsWord });
   }
-  const afterMe = (await api("/api/auth/me", { cookies: raPw.cookie })).body?.data as { raRenewalDate?: string | null };
+  const afterMe = ((await api("/api/portal/companies", { cookies: raPw.cookie })).body?.data ?? []).find((x: { orderId: string }) => x.orderId === raId) as { raRenewalDate?: string | null; raService?: boolean } | undefined;
   check("the client is shown the same renewal date", afterMe?.raRenewalDate === det?.raRenewalDate, afterMe);
   // ---- Automatic renewal (16 Sep 2026): the card kept from the formation
   //      payment, the notice 45 days out, the charge 15 days out, a decline
@@ -4095,6 +4098,16 @@ for(const [label,r]of batch05Results)check(label,r.ok,r.detail);
   manager.managementStructure = "MANAGER_MANAGED"; manager.includeManagementStatementInArticles = true;
   const sentence = "Pursuant to Florida Statutes Section 605.0407, the company is or will be manager-managed.";
   check("batch19 54: office keeps the approved manager-managed Articles sentence", filingGroups(payload19(manager)).some(g => g.fields.some(f => f.value === sentence)));
+}
+
+// Batch 20: obsolete answer fields cannot shadow the asset-list source of truth.
+{
+  const { oaAnswersSchema } = await import("./routes-portal");
+  const assets = [{ id: crypto.randomUUID(), description: "Cash", kind: "cash", value: 1250, contributedBy: { mode: "equal" }, allocatedTo: "company" }];
+  const parsed = oaAnswersSchema.parse({ contributionToCompany: "obsolete", members: [{name:"Jane Smith",contribution:"obsolete"},{name:"John Smith",contribution:"obsolete"}], series:[{purpose:"Rental",contribution:"obsolete"}], couples:[{a:0,b:1,form:"TBE",contribution:"obsolete"}], assets });
+  const { computeCapital } = await import("./oa-capital");
+  const capital = computeCapital(parsed.assets, ["Jane Smith"], []);
+  check("batch20 165: asset contributions survive removal of obsolete answer fields", !JSON.stringify(parsed).includes("obsolete") && JSON.stringify(parsed.assets) === JSON.stringify(assets) && capital.errors.length === 0 && capital.memberContributions[0].includes("1,250"), {parsed,capital});
 }
 
 console.log(failures === 0 ? "\nALL PASS" : `\n${failures} FAILURES`);

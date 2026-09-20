@@ -13,7 +13,6 @@ export interface MemberAnswer {
   percentage?: number;
   numerator?: number;
   denominator?: number;
-  contribution?: string;
   todBeneficiary?: string;
   todBackup?: string;
   /** A company or trust as owner signs through a person (Adam, 13 Sep 2026). */
@@ -23,7 +22,6 @@ export interface MemberAnswer {
 }
 export interface SeriesAnswer {
   purpose?: string;
-  contribution?: string;
   specialTerms?: string;
 
 }
@@ -34,7 +32,6 @@ export interface CoupleAnswer {
   percentage?: number;
   numerator?: number;
   denominator?: number;
-  contribution?: string;
   todBeneficiary?: string;
   todBackup?: string;
 }
@@ -59,7 +56,6 @@ export interface Answers {
   multiOwner?: boolean;
   effectiveDate?: string;
   authorized?: boolean;
-  contributionToCompany?: string;
   members?: MemberAnswer[];
   /** Who signs for each Manager that is a company, in the seed's manager order. */
   managerSigners?: { name?: string; title?: string }[];

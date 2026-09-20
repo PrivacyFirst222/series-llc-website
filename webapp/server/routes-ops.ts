@@ -214,8 +214,6 @@ if (!env.isProd) {
     return c.json({ data: { token } });
   });
 
-  // Dev-only: backdate a client's formation payment so e2e can exercise the
-  // S election 65-day ordering window without waiting.
   // Dev-only: reset a client's OA profile (answers AND revision) so the UI
   // walkthrough harness can replay deterministically. Added when a reset via
   // a huge rev poisoned the monotonic guard and every later autosave was
@@ -229,6 +227,8 @@ if (!env.isProd) {
     return c.json({ data: { ok: true } });
   });
 
+  // Dev-only: backdate a client's formation payment so e2e can exercise the
+  // S election 65-day ordering window without waiting.
   app.post("/dev/age-formation", async (c) => {
     const { email, days } = (await c.req.json()) as { email: string; days: number };
     const db = await getDb();
@@ -290,8 +290,8 @@ app.get("/cron/sunbiz-sync", async (c) => {
   return c.json({ data: report });
 });
 
-/** Daily sweep so expired packages are destroyed even if nobody signs in.
- *  Vercel cron calls this; a shared secret keeps it from being public. */
+/** Daily sweep removes expired questionnaire numbers without deleting the
+ *  client-retained encrypted documents. The shared cron secret protects it. */
 app.get("/cron/purge", async (c) => {
   const auth = c.req.header("authorization") ?? "";
   const secret = env.CRON_SECRET;

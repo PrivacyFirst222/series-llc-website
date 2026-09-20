@@ -1,0 +1,512 @@
+[
+  {
+    "file": "webapp/server/routes-portal.ts",
+    "before": "${order.llc_name} is its own registered agent; there is nothing to cancel.",
+    "after": "${order.llc_name} did not take our registered agent service; there is nothing to cancel.",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-portal.ts",
+    "before": "      blocked: false,\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/src/pages/portal/OAQuestionnaire.tsx",
+    "before": "  blocked: boolean;\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/src/pages/portal/OAQuestionnaire.tsx",
+    "before": "        contributionToCompany: saved.contributionToCompany ?? \"\",\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/src/pages/portal/oaTypes.ts",
+    "before": "  contribution?: string;\n",
+    "after": "",
+    "count": 3
+  },
+  {
+    "file": "webapp/src/pages/portal/oaTypes.ts",
+    "before": "  contributionToCompany?: string;\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-portal.ts",
+    "before": "  contributionToCompany: z.string().max(300).optional(),\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-portal.ts",
+    "before": "        contribution: z.string().max(300).optional(),\n",
+    "after": "",
+    "count": 3
+  },
+  {
+    "file": "webapp/server/routes-portal.ts",
+    "before": "        contribution: cpl.contribution ?? \"\",",
+    "after": "        contribution: \"\", // Filled from the asset list below.",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-portal.ts",
+    "before": "        contribution: ans?.contribution ?? \"\",",
+    "after": "        contribution: \"\", // Filled from the asset list below.",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-portal.ts",
+    "before": "email: string; name: string; pending_email: string | null; ra_cancellation_requested_at: string | null",
+    "after": "email: string; name: string; pending_email: string | null",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-portal.ts",
+    "before": "SELECT email, name, pending_email, ra_cancellation_requested_at FROM clients WHERE id = $1",
+    "after": "SELECT email, name, pending_email FROM clients WHERE id = $1",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-portal.ts",
+    "before": "      raCancellationRequestedAt: rows[0]?.ra_cancellation_requested_at ?? null,\n      // The registered-agent renewal date, from the newest formed order that\n      // took our service (14 Sep 2026).\n      raRenewalDate: await db\n        .query<{ ra_renewal_date: unknown }>(\"SELECT ra_renewal_date FROM orders WHERE client_id = $1 AND ra_renewal_date IS NOT NULL ORDER BY formed_at DESC NULLS LAST LIMIT 1\", [session.clientId])\n        .then((r) => (r[0]?.ra_renewal_date ? isoDate(r[0].ra_renewal_date) : null)),\n      // Whether any paid order took our registered agent service: the agent\n      // card is shown only then (14 Sep 2026: every client saw it).\n      raService: await db\n        .query<{ payload: unknown }>(\"SELECT payload FROM orders WHERE client_id = $1 AND status <> 'pending_payment'\", [session.clientId])\n        .then((rows) => rows.some((r) => ((typeof r.payload === \"string\" ? JSON.parse(r.payload) : r.payload) as { registeredAgent?: { choice?: string } } | null)?.registeredAgent?.choice === \"SERVICE\")),\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/src/pages/portal/PortalDashboard.tsx",
+    "before": "  raCancellationRequestedAt: string | null;\n  raRenewalDate?: string | null;\n  /** True when a paid order took our registered agent service. */\n  raService?: boolean;\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/src/pages/portal/PortalDashboard.tsx",
+    "before": "  const me = { raRenewalDate: company.raRenewalDate };\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/src/pages/portal/PortalDashboard.tsx",
+    "before": "me?.raRenewalDate",
+    "after": "company.raRenewalDate",
+    "count": 1
+  },
+  {
+    "file": "webapp/src/pages/portal/PortalDashboard.tsx",
+    "before": "${me.raRenewalDate}",
+    "after": "${company.raRenewalDate}",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-portal.ts",
+    "before": "// Who owns the company, as the client last said. The intake list is only the\n// starting point: member-managed filings list members as AMBR, and an owner\n// who is also a manager may appear as MGR. Current answers do not amend that\n// public filing; inaccurate filed information needs an appropriate correction. An\n// untouched draft carries shares but no names, which is how the two are told\n// apart. Every document that names the owners resolves them HERE \u2014 otherwise\n// two documents generated the same afternoon disagree about who owns the company.\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-portal.ts",
+    "before": "export function effectiveOwners(",
+    "after": "// Who owns the company, as the client last said. The intake list is only the\n// starting point: member-managed filings list members as AMBR, and an owner\n// who is also a manager may appear as MGR. Current answers do not amend that\n// public filing; inaccurate filed information needs an appropriate correction. An\n// untouched draft carries shares but no names, which is how the two are told\n// apart. Every document that names the owners resolves them HERE \u2014 otherwise\n// two documents generated the same afternoon disagree about who owns the company.\nexport function effectiveOwners(",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-portal.ts",
+    "before": "/** A person's printed legal name, suffix set off by a comma \u2014 the form's\n *  fullPersonName, server-side. Exhibit A and the signature blocks print\n *  this verbatim, so \"John Smith, Jr.\" must survive the whole path. */\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-portal.ts",
+    "before": "export function personLegalName(",
+    "after": "/** A person's printed legal name, suffix set off by a comma \u2014 the form's\n *  fullPersonName, server-side. Exhibit A and the signature blocks print\n *  this verbatim, so \"John Smith, Jr.\" must survive the whole path. */\nexport function personLegalName(",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-portal.ts",
+    "before": "/** \"August 5, 2026\" \u2192 \"2026-08-05\"; \"\" when the text is not a date. */",
+    "after": "/** \"August 5, 2026\" \u2192 \"2026-08-05\"; null when the text is not a date. */",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-portal.ts",
+    "before": "/** How long a client may edit and re-download the S election package before we\n *  destroy it. The package IS the clients' copy of Form 2553, complete with\n *  every owner's Social Security number, so it does not live here longer than\n *  it has to. */\n",
+    "after": "/** The editing window after fulfillment. Questionnaire numbers are purged\n *  afterward; the encrypted delivered document remains until the client deletes it. */\n",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-portal.ts",
+    "before": "/** The client's answer that the LLC already has an EIN: nothing else is\n *  needed, and no application is made. */\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-portal.ts",
+    "before": "/** irs.gov, \"Valid EINs\": every prefix an IRS campus, the online\n *  application, or the SBA has ever assigned. Anything else is a typo. */\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-portal.ts",
+    "before": "/** Build the Form 2553 package from the stored details and the office's\n *  formation date, post it to the client's documents (replacing an earlier\n *  copy), mark the order fulfilled \u2014 which starts the two-week clock \u2014 and\n *  tell the client it is ready. Shared by the client's submission (when the\n *  date is already on file, i.e. an edit inside the window) and by the\n *  office entering the date. */\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-portal.ts",
+    "before": "export async function postSElectionPackage(",
+    "after": "/** Build and post the encrypted Form 2553 package, replacing its prior copy,\n *  and notify the client. Shared by client submission, office date correction,\n *  and completion after the company EIN arrives. The first fulfillment starts\n *  the editing window; rebuilding does not extend it. */\nexport async function postSElectionPackage(",
+    "count": 1
+  },
+  {
+    "file": "webapp/src/pages/admin/AdminDashboard.tsx",
+    "before": "/** The client roster. The RA variant shows the LLCs we serve as registered\n *  agent for \u2014 that is what the relationship attaches to \u2014 and keeps a client\n *  listed after a cancellation request until we are replaced as agent of\n *  record (the chip carries that state). */\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/src/pages/admin/AdminDashboard.tsx",
+    "before": "function ClientsTable(",
+    "after": "/** The client roster. The RA variant shows the LLCs we serve as registered\n *  agent for \u2014 that is what the relationship attaches to \u2014 and keeps a client\n *  listed after a cancellation request until we are replaced as agent of\n *  record (the chip carries that state). */\nfunction ClientsTable(",
+    "count": 1
+  },
+  {
+    "file": "webapp/src/pages/admin/AdminDashboard.tsx",
+    "before": "  const sortable = true;\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/src/pages/admin/AdminDashboard.tsx",
+    "before": "  const Head = ({ k, label }: { k: SortKey; label: string }) =>\n    sortable ? (",
+    "after": "  const Head = ({ k, label }: { k: SortKey; label: string }) => (",
+    "count": 1
+  },
+  {
+    "file": "webapp/src/pages/admin/AdminDashboard.tsx",
+    "before": "    ) : (\n      <th className=\"px-3 py-3 font-medium\">{label}</th>\n    );",
+    "after": "    );",
+    "count": 1
+  },
+  {
+    "file": "webapp/src/pages/admin/AdminDashboard.tsx",
+    "before": "      {sortable ? (\n        <Input",
+    "after": "      <Input",
+    "count": 1
+  },
+  {
+    "file": "webapp/src/pages/admin/AdminDashboard.tsx",
+    "before": "      ) : null}\n    <div className=\"mt-4 overflow-x-auto",
+    "after": "    <div className=\"mt-4 overflow-x-auto",
+    "count": 1
+  },
+  {
+    "file": "webapp/src/pages/admin/ServiceOrdersSection.tsx",
+    "before": "/** The one-line name for a service order. The surrounding card or dialog\n *  already names the LLC, so series names are shortened to their own part \u2014\n *  \"Jimmy Flanagan, LLC - PS 3\" reads \"PS 3\". Never truncated, only wrapped. */\n\n\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/src/pages/admin/serviceOrders.helpers.ts",
+    "before": "export const money = (cents: number) => `$${(cents / 100).toFixed(2)}`;\nexport const STATUS_STYLE: Record<string, string> = {\n  fulfilled: \"bg-trust/10 text-trust\",\n  in_progress: \"bg-amber-100 text-amber-900\",\n  awaiting_info: \"bg-secondary text-muted-foreground\",\n  pending_payment: \"bg-secondary text-muted-foreground\",\n};\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/src/pages/admin/serviceOrders.helpers.ts",
+    "before": "export function serviceLabel",
+    "after": "/** The one-line name for a service order. The surrounding card or dialog\n *  already names the LLC, so series names are shortened to their own part \u2014\n *  \"Jimmy Flanagan, LLC - PS 3\" reads \"PS 3\". Never truncated, only wrapped. */\nexport function serviceLabel",
+    "count": 1
+  },
+  {
+    "file": "webapp/src/pages/admin/OrderBoard.tsx",
+    "before": "  total_cents: number;\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/src/pages/admin/OrderBoard.tsx",
+    "before": "  paid_at: string | null;\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/src/pages/admin/OrderBoard.tsx",
+    "before": "  filed_at: string | null;\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/src/pages/admin/OrderBoard.tsx",
+    "before": "  ein_purchased: boolean;\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/src/pages/admin/OrderBoard.tsx",
+    "before": "  ein_outstanding: boolean;\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/src/pages/admin/OrderDetail.tsx",
+    "before": "  services: { id: string; type: string; status: string; llc_name: string }[];\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-admin.ts",
+    "before": "o.status, o.service_fee_cents, o.state_fees_cents, o.total_cents,",
+    "after": "o.status, o.service_fee_cents, o.state_fees_cents,",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-admin.ts",
+    "before": "o.created_at, o.paid_at, o.filed_at, o.formed_at,",
+    "after": "o.created_at, o.formed_at,",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-admin.ts",
+    "before": "            COALESCE((o.payload->'optionalDocuments'->>'ein')::boolean, false) AS ein_purchased,\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-admin.ts",
+    "before": "            EXISTS (\n              SELECT 1 FROM service_orders s\n               WHERE s.formation_order_id = o.id AND s.type = 'ein'\n                 AND s.status <> 'fulfilled'\n            ) AS ein_outstanding\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-admin.ts",
+    "before": "AS ra_service,\n       FROM orders o",
+    "after": "AS ra_service\n       FROM orders o",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-admin.ts",
+    "before": "SELECT *, rejected_at, ra_renewal_date FROM orders WHERE id = $1",
+    "after": "SELECT * FROM orders WHERE id = $1",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-admin.ts",
+    "before": "  // Services bought against this formation \u2014 the EIN is the one that changes\n  // what \"done\" means, and its SSNs stay in the service record, not here.\n  const services = o.client_id\n    ? await db.query<{ id: string; type: string; status: string; llc_name: string }>(\n        `SELECT id, type, status, llc_name FROM service_orders\n          WHERE formation_order_id = $1 ORDER BY created_at`,\n        [o.id],\n      )\n    : [];\n\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-admin.ts",
+    "before": "      services,\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-admin.ts",
+    "before": "  // Everything a card on the board shows, in one query. series_count and\n  // ein_purchased are on the card because they change what \"finished\" means:\n  // an order can look complete with a series undesignated or an EIN still owed.",
+    "after": "  // Fields displayed by the board. Outstanding service work is loaded by\n  // the separate service-orders query before a card can count as complete.",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-admin.ts",
+    "before": "/** Sent to the Division. The only transition on the board a person performs \u2014\n *  nothing in this system can observe a filing on sunbiz. */\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-admin.ts",
+    "before": "app.post(\"/admin/orders/:id/filed\",",
+    "after": "/** Record that the office sent the Articles to the Division. */\napp.post(\"/admin/orders/:id/filed\",",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-admin.ts",
+    "before": "/** Which fields have been copied into the state's form. Stored per order so an\n *  interrupted filing resumes on whatever machine you pick it up on. */\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-admin.ts",
+    "before": "app.post(\"/admin/orders/:id/copied\",",
+    "after": "/** Which fields have been copied into the state's form. Stored per order so an\n *  interrupted filing resumes on whatever machine you pick it up on. */\napp.post(\"/admin/orders/:id/copied\",",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-admin.ts",
+    "before": "/** The Articles and the Protected Series Designations, in one action.\n *\n *  This is the only way an order becomes \"formed\": the same request that writes\n *  the documents sets the status and emails the client, so the board can never\n *  show a completed order whose client has an empty portal. One PSD document may\n *  cover several series \u2014 Florida allows it \u2014 so coverage is declared per file\n *  and checked against the order's own series list. Miss one and this refuses. */\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-admin.ts",
+    "before": "app.post(\"/admin/orders/:id/formation-documents\",",
+    "after": "/** The Articles and the Protected Series Designations, in one action.\n *\n *  This is the only way an order becomes \"formed\": the same request that writes\n *  the documents sets the status and emails the client, so the board can never\n *  show a completed order whose client has an empty portal. One PSD document may\n *  cover several series \u2014 Florida allows it \u2014 so coverage is declared per file\n *  and checked against the order's own series list. Miss one and this refuses. */\napp.post(\"/admin/orders/:id/formation-documents\",",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-admin.ts",
+    "before": "// The filed Articles come back from the Division while the order is With The\n// State, and go up here (Adam's sequence, 30 Aug 2026; the card offers the\n// upload at that stage only, 14 Sep 2026): the PDF is stored against the\n// order, the status does not move, and the client is not emailed \u2014 they hear\n// once, at formed. A wrong file is replaced later by the formed-step package\n// upload, which retires priors.\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-admin.ts",
+    "before": "app.post(\"/admin/orders/:id/articles\",",
+    "after": "// The filed Articles come back from the Division while the order is With The\n// State, and go up here (Adam's sequence, 30 Aug 2026; the card offers the\n// upload at that stage only, 14 Sep 2026): the PDF is stored against the\n// order, the status does not move, and the client is not emailed \u2014 they hear\n// once, at formed. A wrong file is replaced later by the formed-step package\n// upload, which retires priors.\napp.post(\"/admin/orders/:id/articles\",",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-admin.ts",
+    "before": "/** Statement of Authorized Representative (Adam, 13 Sep 2026): made the\n *  moment the filed Articles go up, for an order whose client appointed us to\n *  sign them, and stored under the company beside the Articles. A later\n *  Articles upload replaces it. Returns the message to refuse with when the\n *  document number the Statement needs is missing. */\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-admin.ts",
+    "before": "async function issueStatement(",
+    "after": "/** Generate and store the Statement beside the company's Articles. Returns\n *  its document id and storage key; callers validate the document number first. */\nasync function issueStatement(",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-admin.ts",
+    "before": "/** Draft S election package for admin review: instructions + cover letter +\n *  the filled official Form 2553. Generated on demand from the encrypted\n *  details; nothing is stored \u2014 Adam reviews and attaches it at fulfillment. */\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-admin.ts",
+    "before": "app.get(\"/admin/services/:id/s-election-draft\",",
+    "after": "/** Draft S election package for admin review: instructions + cover letter +\n *  the filled official Form 2553. Generated on demand from the encrypted\n *  details; nothing is stored \u2014 Adam reviews and attaches it at fulfillment. */\napp.get(\"/admin/services/:id/s-election-draft\",",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-admin.ts",
+    "before": "// The office enters the formation date from the filed Articles when it\n// prepares the S election (Adam, 6 Sep 2026: \"We will manually enter it when\n// the S-election form is created\"). Entering it builds the package, posts it\n// to the client, and starts their two-week window.\n",
+    "after": "// Correct the formation date supplied by the client. Existing encrypted\n// questionnaire numbers are required; the package waits if its EIN is missing.\n",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-admin.ts",
+    "before": "/** Package documents still carrying no company after the backfill \u2014 hand\n *  uploads whose titles name no company. Adam opens this in his admin\n *  session to see what is left (7 Sep 2026). */\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-admin.ts",
+    "before": "app.get(\"/admin/documents/unscoped\",",
+    "after": "/** Package documents still carrying no company after the backfill \u2014 hand\n *  uploads whose titles name no company. Adam opens this in his admin\n *  session to see what is left (7 Sep 2026). */\napp.get(\"/admin/documents/unscoped\",",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/email.ts",
+    "before": "/** Sends via Resend; without an API key, logs instead (dev). */\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/email.ts",
+    "before": "export async function sendMail(",
+    "after": "/** Sends via Resend; development without a key records a simulated send,\n *  while production without a key refuses the send. */\nexport async function sendMail(",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/email.ts",
+    "before": " *  saying \"a new document is available\" like every other upload. */\n/** The formed announcement, in Adam's own words (30 Aug 2026). Two truthful",
+    "after": " *  saying \"a new document is available\" like every other upload.\n *  The formed announcement, in Adam's own words (30 Aug 2026). Two truthful",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-ops.ts",
+    "before": "  // Dev-only: backdate a client's formation payment so e2e can exercise the\n  // S election 65-day ordering window without waiting.\n",
+    "after": "",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-ops.ts",
+    "before": "  app.post(\"/dev/age-formation\",",
+    "after": "  // Dev-only: backdate a client's formation payment so e2e can exercise the\n  // S election 65-day ordering window without waiting.\n  app.post(\"/dev/age-formation\",",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/routes-ops.ts",
+    "before": "/** Daily sweep so expired packages are destroyed even if nobody signs in.\n *  Vercel cron calls this; a shared secret keeps it from being public. */",
+    "after": "/** Daily sweep removes expired questionnaire numbers without deleting the\n *  client-retained encrypted documents. The shared cron secret protects it. */",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/env.ts",
+    "before": "Shared secret for the daily purge cron.",
+    "after": "Shared secret for scheduled maintenance jobs.",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/statement.ts",
+    "before": "this fills its six slots",
+    "after": "this fills its seven slots",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/pdf-render.ts",
+    "before": "      // The library's writer encrypts STREAMS only, never strings, so any Info\n      // metadata in an encrypted document is written plaintext into a file\n      // that declares string encryption \u2014 and every reader \"decrypts\" it into\n      // garbage (Codex PDF-001; confirmed against PDFWriter.encrypt, which\n      // tests `object instanceof PDFStream`). No string we set can survive,\n      // so the encrypted document carries NO Info dictionary: viewers then\n      // fall back to the clean filename. The watermark on every page, not the\n      // metadata, is what identifies the licensee.\n",
+    "after": "      // Metadata strings are encrypted with the other indirect-object strings\n      // below, so the encrypted PDF can retain its Info dictionary.\n",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/e2e.ts",
+    "before": "  check(\"me shows no RA cancellation yet\", me.status === 200 && me.body.data.raCancellationRequestedAt === null);",
+    "after": "  const agentCompany20 = ((await api(\"/api/portal/companies\", { cookies: setPw.cookie })).body?.data ?? []).find((x: { orderId: string }) => x.orderId === orderId);\n  check(\"me shows no RA cancellation yet\", me.status === 200 && agentCompany20?.raCancellationRequestedAt === null);",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/e2e.ts",
+    "before": "me.body?.data?.raService === false, me.body?.data?.raService",
+    "after": "agentCompany20?.raService === false, agentCompany20",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/e2e.ts",
+    "before": "/E2E Coastal Holdings, LLC is its own registered agent/",
+    "after": "/E2E Coastal Holdings, LLC did not take our registered agent service/",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/e2e.ts",
+    "before": "  const meAfter = await api(\"/api/auth/me\", { cookies: setPw.cookie });",
+    "after": "  const meAfter = ((await api(\"/api/portal/companies\", { cookies: setPw.cookie })).body?.data ?? []).find((x: { orderId: string }) => x.orderId === orderId);",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/e2e.ts",
+    "before": "meAfter.body.data.raCancellationRequestedAt === null, meAfter.body.data",
+    "after": "meAfter?.raCancellationRequestedAt === null, meAfter",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/e2e.ts",
+    "before": "mmSeed.body?.data?.blocked === false",
+    "after": "!(\"blocked\" in (mmSeed.body?.data ?? {}))",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/e2e.ts",
+    "before": "  const beforeMe = (await api(\"/api/auth/me\", { cookies: raPw.cookie })).body?.data as { raRenewalDate?: string | null };",
+    "after": "  const beforeMe = ((await api(\"/api/portal/companies\", { cookies: raPw.cookie })).body?.data ?? []).find((x: { orderId: string }) => x.orderId === raId) as { raRenewalDate?: string | null; raService?: boolean } | undefined;",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/e2e.ts",
+    "before": "  const afterMe = (await api(\"/api/auth/me\", { cookies: raPw.cookie })).body?.data as { raRenewalDate?: string | null };",
+    "after": "  const afterMe = ((await api(\"/api/portal/companies\", { cookies: raPw.cookie })).body?.data ?? []).find((x: { orderId: string }) => x.orderId === raId) as { raRenewalDate?: string | null; raService?: boolean } | undefined;",
+    "count": 1
+  },
+  {
+    "file": "webapp/server/e2e.ts",
+    "before": "console.log(failures === 0 ? \"\\nALL PASS\"",
+    "after": "// Batch 20: obsolete answer fields cannot shadow the asset-list source of truth.\n{\n  const { oaAnswersSchema } = await import(\"./routes-portal\");\n  const assets = [{ id: crypto.randomUUID(), description: \"Cash\", kind: \"cash\", value: 1250, contributedBy: { mode: \"equal\" }, allocatedTo: \"company\" }];\n  const parsed = oaAnswersSchema.parse({ contributionToCompany: \"obsolete\", members: [{name:\"Jane Smith\",contribution:\"obsolete\"},{name:\"John Smith\",contribution:\"obsolete\"}], series:[{purpose:\"Rental\",contribution:\"obsolete\"}], couples:[{a:0,b:1,form:\"TBE\",contribution:\"obsolete\"}], assets });\n  const { computeCapital } = await import(\"./oa-capital\");\n  const capital = computeCapital(parsed.assets, [\"Jane Smith\"], []);\n  check(\"batch20 165: asset contributions survive removal of obsolete answer fields\", !JSON.stringify(parsed).includes(\"obsolete\") && JSON.stringify(parsed.assets) === JSON.stringify(assets) && capital.errors.length === 0 && capital.memberContributions[0].includes(\"1,250\"), {parsed,capital});\n}\n\nconsole.log(failures === 0 ? \"\\nALL PASS\"",
+    "count": 1
+  }
+]

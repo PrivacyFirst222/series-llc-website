@@ -1,0 +1,421 @@
+{
+  "id": "20",
+  "revision": 1,
+  "title": "Portal, office and scheduled-job cleanup; preserve live behavior",
+  "model": "Codex",
+  "base": "29d7b470bcedcd03abe4842f171fb624f3e497ff",
+  "items": [
+    {
+      "id": "158",
+      "part": "all",
+      "scope": "Approved Batch 20 cleanup only. Preserve actual asset calculations, company-specific agent facts, notification behavior, all prior fixes, legal text and database migrations. No publication or data cleanup.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/server/routes-portal.ts",
+          "text": "${order.llc_name} did not take our registered agent service; there is nothing to cancel."
+        },
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "RA cancel for a company that is its own agent is refused by name"
+        }
+      ]
+    },
+    {
+      "id": "164",
+      "part": "blocked-field",
+      "scope": "Approved Batch 20 cleanup only. Preserve actual asset calculations, company-specific agent facts, notification behavior, all prior fixes, legal text and database migrations. No publication or data cleanup.",
+      "assertions": [
+        {
+          "kind": "absent",
+          "text": "blocked: false,"
+        },
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "OA seed routes to member-managed (no longer blocked)"
+        }
+      ]
+    },
+    {
+      "id": "165",
+      "part": "all",
+      "scope": "Approved Batch 20 cleanup only. Preserve actual asset calculations, company-specific agent facts, notification behavior, all prior fixes, legal text and database migrations. No publication or data cleanup.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch20 165: asset contributions survive removal of obsolete answer fields"
+        }
+      ]
+    },
+    {
+      "id": "168",
+      "part": "all",
+      "scope": "Approved Batch 20 cleanup only. Preserve actual asset calculations, company-specific agent facts, notification behavior, all prior fixes, legal text and database migrations. No publication or data cleanup.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/server/routes-portal.ts",
+          "text": "SELECT email, name, pending_email FROM clients WHERE id = $1"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/src/pages/portal/PortalDashboard.tsx",
+          "text": "interface Me {\n  email: string;\n  name: string;\n  pendingEmail: string | null;\n  viewingAsAdmin?: boolean;\n}"
+        },
+        {
+          "kind": "absent",
+          "text": "const me = { raRenewalDate: company.raRenewalDate };"
+        }
+      ]
+    },
+    {
+      "id": "170",
+      "part": "all",
+      "scope": "Approved Batch 20 cleanup only. Preserve actual asset calculations, company-specific agent facts, notification behavior, all prior fixes, legal text and database migrations. No publication or data cleanup.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/server/routes-portal.ts",
+          "text": "null when the text is not a date. */"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/server/routes-portal.ts",
+          "text": " *  afterward; the encrypted delivered document remains until the client deletes it. */"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/server/routes-portal.ts",
+          "text": " *  the editing window; rebuilding does not extend it. */\nexport async function postSElectionPackage("
+        }
+      ]
+    },
+    {
+      "id": "187",
+      "part": "comments",
+      "scope": "Approved Batch 20 cleanup only. Preserve actual asset calculations, company-specific agent facts, notification behavior, all prior fixes, legal text and database migrations. No publication or data cleanup.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/server/routes-admin.ts",
+          "text": "/** Record that the office sent the Articles to the Division. */\napp.post(\"/admin/orders/:id/filed\","
+        },
+        {
+          "kind": "present",
+          "file": "webapp/server/routes-admin.ts",
+          "text": " *  its document id and storage key; callers validate the document number first. */\nasync function issueStatement("
+        },
+        {
+          "kind": "present",
+          "file": "webapp/src/pages/admin/serviceOrders.helpers.ts",
+          "text": " *  \"Jimmy Flanagan, LLC - PS 3\" reads \"PS 3\". Never truncated, only wrapped. */\nexport function serviceLabel"
+        }
+      ]
+    },
+    {
+      "id": "187",
+      "part": "unused-fields",
+      "scope": "Approved Batch 20 cleanup only. Preserve actual asset calculations, company-specific agent facts, notification behavior, all prior fixes, legal text and database migrations. No publication or data cleanup.",
+      "assertions": [
+        {
+          "kind": "absent",
+          "text": "ein_outstanding"
+        },
+        {
+          "kind": "absent",
+          "text": "ein_purchased"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/src/pages/admin/OrderDetail.tsx",
+          "text": "interface OrderDetailData {\n  id: string;\n  clientId: string | null;\n  /** A conversion designates series for a company already on file. */\n  filingPath: \"NEW\" | \"CONVERT\";\n  existingLlcName: string;\n  sunbizDocumentNumber: string;\n  llcName: string;\n  alternateNames: string[];\n  status: string;\n  contactName: string;\n  contactEmail: string;\n  createdAt: string;\n  filedAt: string | null;\n  formedAt: string | null;\n  rejectedAt: string | null;\n  groups: FilingGroup[];\n  seriesFiledAt: string | null;\n  copiedFields: Record<string, boolean>;\n  series: { name: string; covered: boolean }[];\n  documents: { id: string; kind: string; title: string; createdAt: string }[];\n  hasArticles: boolean;\n  /** The client appointed us to sign the Articles: the Statement of\n   *  Authorized Representative is made when the Articles go up, and the\n   *  upload needs the Florida document number to name the company. */\n  articlesSignedByUs: boolean;\n  certStatusPurchased: boolean;\n  certifiedCopyPurchased: boolean;\n  hasCertStatus: boolean;\n  hasCertifiedCopy: boolean;\n  /** The company's Florida document number, once the office typed it. */\n  documentNumber: string;\n  /** The order took our registered agent service. */\n  raService: boolean;\n  raRenewalDate: string | null;\n}"
+        }
+      ]
+    },
+    {
+      "id": "187",
+      "part": "unused-helpers",
+      "scope": "Approved Batch 20 cleanup only. Preserve actual asset calculations, company-specific agent facts, notification behavior, all prior fixes, legal text and database migrations. No publication or data cleanup.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/src/pages/admin/serviceOrders.helpers.ts",
+          "text": "import type { AdminServiceOrder } from \"./ServiceOrdersSection\";\n\nexport const serviceIsOpen"
+        }
+      ]
+    },
+    {
+      "id": "187",
+      "part": "dead-branches",
+      "scope": "Approved Batch 20 cleanup only. Preserve actual asset calculations, company-specific agent facts, notification behavior, all prior fixes, legal text and database migrations. No publication or data cleanup.",
+      "assertions": [
+        {
+          "kind": "absent",
+          "text": "const sortable = true;"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/src/pages/admin/AdminDashboard.tsx",
+          "text": "const Head = ({ k, label }: { k: SortKey; label: string }) => ("
+        }
+      ]
+    },
+    {
+      "id": "220",
+      "part": "all",
+      "scope": "Already addressed in prior billing work; record and protect the existing result, with no new payment or email feature.",
+      "assertions": [
+        {
+          "kind": "absent",
+          "text": "About the card you paid with"
+        }
+      ]
+    },
+    {
+      "id": "221",
+      "part": "all",
+      "scope": "Already addressed in prior billing work; record and protect the existing result, with no new payment or email feature.",
+      "assertions": [
+        {
+          "kind": "absent",
+          "text": "/portal?renewed="
+        }
+      ]
+    },
+    {
+      "id": "222",
+      "part": "all",
+      "scope": "Approved Batch 20 cleanup only. Preserve actual asset calculations, company-specific agent facts, notification behavior, all prior fixes, legal text and database migrations. No publication or data cleanup.",
+      "assertions": [
+        {
+          "kind": "absent",
+          "text": "SELECT *, rejected_at, ra_renewal_date FROM orders"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/server/routes-admin.ts",
+          "text": "\"SELECT * FROM orders WHERE id = $1\", [c.req.param(\"id\")])"
+        }
+      ]
+    },
+    {
+      "id": "227",
+      "part": "all",
+      "scope": "Approved Batch 20 cleanup only. Preserve actual asset calculations, company-specific agent facts, notification behavior, all prior fixes, legal text and database migrations. No publication or data cleanup.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/server/env.ts",
+          "text": "/** Shared secret for scheduled maintenance jobs. Required in production. */"
+        }
+      ]
+    },
+    {
+      "id": "N2.23",
+      "part": "all",
+      "scope": "Approved Batch 20 cleanup only. Preserve actual asset calculations, company-specific agent facts, notification behavior, all prior fixes, legal text and database migrations. No publication or data cleanup.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/server/statement.ts",
+          "text": "this fills its seven slots and nothing else."
+        }
+      ]
+    },
+    {
+      "id": "N2.24",
+      "part": "all",
+      "scope": "Approved Batch 20 cleanup only. Preserve actual asset calculations, company-specific agent facts, notification behavior, all prior fixes, legal text and database migrations. No publication or data cleanup.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/server/pdf-render.ts",
+          "text": "// Metadata strings are encrypted with the other indirect-object strings\n      // below, so the encrypted PDF can retain its Info dictionary."
+        }
+      ]
+    },
+    {
+      "id": "193",
+      "part": "all",
+      "scope": "Approved Batch 20 cleanup only. Preserve actual asset calculations, company-specific agent facts, notification behavior, all prior fixes, legal text and database migrations. No publication or data cleanup.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/server/routes-admin.ts",
+          "text": "/** Record that the office sent the Articles to the Division. */\napp.post(\"/admin/orders/:id/filed\","
+        },
+        {
+          "kind": "present",
+          "file": "webapp/server/routes-admin.ts",
+          "text": " *  its document id and storage key; callers validate the document number first. */\nasync function issueStatement("
+        },
+        {
+          "kind": "present",
+          "file": "webapp/src/pages/admin/serviceOrders.helpers.ts",
+          "text": " *  \"Jimmy Flanagan, LLC - PS 3\" reads \"PS 3\". Never truncated, only wrapped. */\nexport function serviceLabel"
+        }
+      ]
+    },
+    {
+      "id": "190",
+      "part": "all",
+      "scope": "Approved Batch 20 cleanup only. Preserve actual asset calculations, company-specific agent facts, notification behavior, all prior fixes, legal text and database migrations. No publication or data cleanup.",
+      "assertions": [
+        {
+          "kind": "absent",
+          "text": "ein_outstanding"
+        },
+        {
+          "kind": "absent",
+          "text": "ein_purchased"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/src/pages/admin/OrderDetail.tsx",
+          "text": "interface OrderDetailData {\n  id: string;\n  clientId: string | null;\n  /** A conversion designates series for a company already on file. */\n  filingPath: \"NEW\" | \"CONVERT\";\n  existingLlcName: string;\n  sunbizDocumentNumber: string;\n  llcName: string;\n  alternateNames: string[];\n  status: string;\n  contactName: string;\n  contactEmail: string;\n  createdAt: string;\n  filedAt: string | null;\n  formedAt: string | null;\n  rejectedAt: string | null;\n  groups: FilingGroup[];\n  seriesFiledAt: string | null;\n  copiedFields: Record<string, boolean>;\n  series: { name: string; covered: boolean }[];\n  documents: { id: string; kind: string; title: string; createdAt: string }[];\n  hasArticles: boolean;\n  /** The client appointed us to sign the Articles: the Statement of\n   *  Authorized Representative is made when the Articles go up, and the\n   *  upload needs the Florida document number to name the company. */\n  articlesSignedByUs: boolean;\n  certStatusPurchased: boolean;\n  certifiedCopyPurchased: boolean;\n  hasCertStatus: boolean;\n  hasCertifiedCopy: boolean;\n  /** The company's Florida document number, once the office typed it. */\n  documentNumber: string;\n  /** The order took our registered agent service. */\n  raService: boolean;\n  raRenewalDate: string | null;\n}"
+        }
+      ]
+    },
+    {
+      "id": "191",
+      "part": "all",
+      "scope": "Approved Batch 20 cleanup only. Preserve actual asset calculations, company-specific agent facts, notification behavior, all prior fixes, legal text and database migrations. No publication or data cleanup.",
+      "assertions": [
+        {
+          "kind": "absent",
+          "text": "ein_outstanding"
+        },
+        {
+          "kind": "absent",
+          "text": "ein_purchased"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/src/pages/admin/OrderDetail.tsx",
+          "text": "interface OrderDetailData {\n  id: string;\n  clientId: string | null;\n  /** A conversion designates series for a company already on file. */\n  filingPath: \"NEW\" | \"CONVERT\";\n  existingLlcName: string;\n  sunbizDocumentNumber: string;\n  llcName: string;\n  alternateNames: string[];\n  status: string;\n  contactName: string;\n  contactEmail: string;\n  createdAt: string;\n  filedAt: string | null;\n  formedAt: string | null;\n  rejectedAt: string | null;\n  groups: FilingGroup[];\n  seriesFiledAt: string | null;\n  copiedFields: Record<string, boolean>;\n  series: { name: string; covered: boolean }[];\n  documents: { id: string; kind: string; title: string; createdAt: string }[];\n  hasArticles: boolean;\n  /** The client appointed us to sign the Articles: the Statement of\n   *  Authorized Representative is made when the Articles go up, and the\n   *  upload needs the Florida document number to name the company. */\n  articlesSignedByUs: boolean;\n  certStatusPurchased: boolean;\n  certifiedCopyPurchased: boolean;\n  hasCertStatus: boolean;\n  hasCertifiedCopy: boolean;\n  /** The company's Florida document number, once the office typed it. */\n  documentNumber: string;\n  /** The order took our registered agent service. */\n  raService: boolean;\n  raRenewalDate: string | null;\n}"
+        }
+      ]
+    },
+    {
+      "id": "192",
+      "part": "all",
+      "scope": "Approved Batch 20 cleanup only. Preserve actual asset calculations, company-specific agent facts, notification behavior, all prior fixes, legal text and database migrations. No publication or data cleanup.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/src/pages/admin/serviceOrders.helpers.ts",
+          "text": "import type { AdminServiceOrder } from \"./ServiceOrdersSection\";\n\nexport const serviceIsOpen"
+        }
+      ]
+    },
+    {
+      "id": "188",
+      "part": "all",
+      "scope": "Approved Batch 20 cleanup only. Preserve actual asset calculations, company-specific agent facts, notification behavior, all prior fixes, legal text and database migrations. No publication or data cleanup.",
+      "assertions": [
+        {
+          "kind": "absent",
+          "text": "const sortable = true;"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/src/pages/admin/AdminDashboard.tsx",
+          "text": "const Head = ({ k, label }: { k: SortKey; label: string }) => ("
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "webapp/server/e2e.ts",
+      "mode": "code",
+      "why": "Approved internal cleanup or focused regression verification.",
+      "control": true
+    },
+    {
+      "path": "webapp/server/email.ts",
+      "mode": "code",
+      "why": "Approved internal cleanup; preserve live consumers."
+    },
+    {
+      "path": "webapp/server/env.ts",
+      "mode": "code",
+      "why": "Approved internal cleanup; preserve live consumers."
+    },
+    {
+      "path": "webapp/server/pdf-render.ts",
+      "mode": "code",
+      "why": "Approved internal cleanup; preserve live consumers."
+    },
+    {
+      "path": "webapp/server/routes-admin.ts",
+      "mode": "code",
+      "why": "Approved internal cleanup; preserve live consumers."
+    },
+    {
+      "path": "webapp/server/routes-ops.ts",
+      "mode": "code",
+      "why": "Approved internal cleanup; preserve live consumers."
+    },
+    {
+      "path": "webapp/server/routes-portal.ts",
+      "mode": "code",
+      "why": "Approved internal cleanup; preserve live consumers."
+    },
+    {
+      "path": "webapp/server/statement.ts",
+      "mode": "code",
+      "why": "Approved internal cleanup; preserve live consumers."
+    },
+    {
+      "path": "webapp/src/pages/admin/AdminDashboard.tsx",
+      "mode": "code",
+      "why": "Approved internal cleanup; preserve live consumers."
+    },
+    {
+      "path": "webapp/src/pages/admin/OrderBoard.tsx",
+      "mode": "code",
+      "why": "Approved internal cleanup; preserve live consumers."
+    },
+    {
+      "path": "webapp/src/pages/admin/OrderDetail.tsx",
+      "mode": "code",
+      "why": "Approved internal cleanup; preserve live consumers."
+    },
+    {
+      "path": "webapp/src/pages/admin/ServiceOrdersSection.tsx",
+      "mode": "code",
+      "why": "Approved internal cleanup; preserve live consumers."
+    },
+    {
+      "path": "webapp/src/pages/admin/serviceOrders.helpers.ts",
+      "mode": "code",
+      "why": "Approved internal cleanup; preserve live consumers."
+    },
+    {
+      "path": "webapp/src/pages/portal/OAQuestionnaire.tsx",
+      "mode": "code",
+      "why": "Approved internal cleanup; preserve live consumers."
+    },
+    {
+      "path": "webapp/src/pages/portal/PortalDashboard.tsx",
+      "mode": "code",
+      "why": "Approved internal cleanup; preserve live consumers."
+    },
+    {
+      "path": "webapp/src/pages/portal/oaTypes.ts",
+      "mode": "code",
+      "why": "Approved internal cleanup; preserve live consumers."
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "why": "Normal hook builds the API from changed server source."
+    }
+  ],
+  "requiredChecks": [],
+  "removedChecks": []
+}

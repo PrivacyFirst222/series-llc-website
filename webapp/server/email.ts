@@ -10,7 +10,6 @@ interface Mail {
   attachments?: {filename:string;content:string}[];
 }
 
-/** Sends via Resend; without an API key, logs instead (dev). */
 /** Dev only: the last mails that would have been sent, newest last, so the
  *  server checks can read what a client would receive (10 Sep 2026). Never
  *  filled when a real mail key is configured. */
@@ -30,6 +29,8 @@ async function recordMail(mail: Mail, ok: boolean, providerId: string | null, er
   }
 }
 
+/** Sends via Resend; development without a key records a simulated send,
+ *  while production without a key refuses the send. */
 export async function sendMail(mail: Mail): Promise<void> {
   if (!env.RESEND_API_KEY) {
     if (env.isProd) {await recordMail(mail,false,null,"Email provider is not configured");throw new Error("Email provider is not configured");}
@@ -412,8 +413,8 @@ export function orderPaidEmail(opts: {
 
 /** The company exists. This is the message the whole formation was for, so it
  *  names the company and lists what is now in the client's portal rather than
- *  saying "a new document is available" like every other upload. */
-/** The formed announcement, in Adam's own words (30 Aug 2026). Two truthful
+ *  saying "a new document is available" like every other upload.
+ *  The formed announcement, in Adam's own words (30 Aug 2026). Two truthful
  *  adaptations, both his-approved: "Two things are waiting" only when it IS
  *  two things (extra documents switch to a count-free line), and an ordered
  *  EIN / S election is announced as an ORDER in the portal — the document

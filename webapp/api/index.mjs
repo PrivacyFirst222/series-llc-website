@@ -66,7 +66,7 @@ var init_env = __esm({
       MAIL_FROM: process.env.MAIL_FROM ?? "MyFloridaSeriesLLC <onboarding@resend.dev>",
       ADMIN_NOTIFY_EMAIL: process.env.ADMIN_NOTIFY_EMAIL ?? "",
       ADMIN_PASSWORD: process.env.ADMIN_PASSWORD ?? "",
-      /** Shared secret for the daily purge cron. Required in production. */
+      /** Shared secret for scheduled maintenance jobs. Required in production. */
       CRON_SECRET: process.env.CRON_SECRET ?? "",
       // Dropbox app-folder credentials for the nightly client-file mirror.
       DROPBOX_APP_KEY: ext(process.env.DROPBOX_APP_KEY),
@@ -106945,7 +106945,6 @@ var oaAnswersSchema = external_exports.object({
   multiOwner: external_exports.boolean().optional(),
   effectiveDate: external_exports.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   authorized: external_exports.boolean().optional(),
-  contributionToCompany: external_exports.string().max(300).optional(),
   ownershipMode: external_exports.enum(["percent", "fraction"]).optional(),
   members: external_exports.array(
     external_exports.object({
@@ -106957,7 +106956,6 @@ var oaAnswersSchema = external_exports.object({
       percentage: external_exports.number().min(0).max(100).optional(),
       numerator: external_exports.number().int().min(0).max(1e5).optional(),
       denominator: external_exports.number().int().min(1).max(1e5).optional(),
-      contribution: external_exports.string().max(300).optional(),
       // Any person or entity (s. 4.11), so no person-name rule (13 Sep 2026).
       todBeneficiary: external_exports.string().max(300).optional(),
       // A backup may be a class ("my children in equal shares"), so no name rule.
@@ -106974,7 +106972,6 @@ var oaAnswersSchema = external_exports.object({
   series: external_exports.array(
     external_exports.object({
       purpose: external_exports.string().max(300).optional(),
-      contribution: external_exports.string().max(300).optional(),
       specialTerms: external_exports.string().max(2e3).optional()
     })
   ).optional(),
@@ -107003,7 +107000,6 @@ var oaAnswersSchema = external_exports.object({
       percentage: external_exports.number().min(0).max(100).optional(),
       numerator: external_exports.number().int().min(0).max(1e5).optional(),
       denominator: external_exports.number().int().min(1).max(1e5).optional(),
-      contribution: external_exports.string().max(300).optional(),
       // Any person or entity (s. 4.11), so no person-name rule (13 Sep 2026).
       todBeneficiary: external_exports.string().max(300).optional(),
       // A backup may be a class ("my children in equal shares"), so no name rule.
@@ -107445,7 +107441,7 @@ function registerPortalRoutes(app2) {
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
     const db = await getDb();
     const rows = await db.query(
-      "SELECT email, name, pending_email, ra_cancellation_requested_at FROM clients WHERE id = $1",
+      "SELECT email, name, pending_email FROM clients WHERE id = $1",
       [session.clientId]
     );
     return c.json({
@@ -107453,13 +107449,6 @@ function registerPortalRoutes(app2) {
         email: rows[0]?.email ?? "",
         name: rows[0]?.name ?? "",
         pendingEmail: rows[0]?.pending_email ?? null,
-        raCancellationRequestedAt: rows[0]?.ra_cancellation_requested_at ?? null,
-        // The registered-agent renewal date, from the newest formed order that
-        // took our service (14 Sep 2026).
-        raRenewalDate: await db.query("SELECT ra_renewal_date FROM orders WHERE client_id = $1 AND ra_renewal_date IS NOT NULL ORDER BY formed_at DESC NULLS LAST LIMIT 1", [session.clientId]).then((r) => r[0]?.ra_renewal_date ? isoDate(r[0].ra_renewal_date) : null),
-        // Whether any paid order took our registered agent service: the agent
-        // card is shown only then (14 Sep 2026: every client saw it).
-        raService: await db.query("SELECT payload FROM orders WHERE client_id = $1 AND status <> 'pending_payment'", [session.clientId]).then((rows2) => rows2.some((r) => (typeof r.payload === "string" ? JSON.parse(r.payload) : r.payload)?.registeredAgent?.choice === "SERVICE")),
         // The portal shows a banner and an Exit when the admin is looking.
         viewingAsAdmin: session.viewingAsAdmin
       }
@@ -107622,7 +107611,6 @@ function registerPortalRoutes(app2) {
         version,
         multiOwner,
         memberManaged,
-        blocked: false,
         todayEastern: easternDateIso(),
         templateVersion: OA_TEMPLATE_VERSION,
         answers: savedAnswers,
@@ -107789,7 +107777,8 @@ function registerPortalRoutes(app2) {
           percentage: shareValue(ownershipMode, cplShare),
           percentageLabel: shareLabel(ownershipMode, cplShare),
           jointHolding: SPOUSAL_FORM_LABEL[cpl.form],
-          contribution: cpl.contribution ?? "",
+          contribution: "",
+          // Filled from the asset list below.
           // The "last surviving spouse" words are Exhibit A's own row now.
           todBeneficiary: cpl.todBeneficiary ?? "",
           todBackup: cpl.todBackup ?? "",
@@ -107816,7 +107805,8 @@ function registerPortalRoutes(app2) {
           address: m2.address,
           percentage: shareValue(multiOwner ? ownershipMode : "percent", mShare),
           percentageLabel: shareLabel(multiOwner ? ownershipMode : "percent", mShare),
-          contribution: ans?.contribution ?? "",
+          contribution: "",
+          // Filled from the asset list below.
           // Only an individual may designate (s. 4.11): a company or trust
           // prints None whatever was typed.
           todBeneficiary: isEntity ? "" : ans?.todBeneficiary ?? "",
@@ -108864,7 +108854,7 @@ function registerPortalRoutes(app2) {
     if (!order2) return c.json(err("No company found on your account.", "NO_LLC"), 400);
     const tookService2 = (typeof order2.payload === "string" ? JSON.parse(order2.payload) : order2.payload)?.registeredAgent?.choice === "SERVICE";
     if (!tookService2) {
-      return c.json(err(`${order2.llc_name} is its own registered agent; there is nothing to cancel.`, "NOT_OUR_SERVICE"), 400);
+      return c.json(err(`${order2.llc_name} did not take our registered agent service; there is nothing to cancel.`, "NOT_OUR_SERVICE"), 400);
     }
     if (order2.ra_cancellation_requested_at) {
       return c.json({ data: { raCancellationRequestedAt: order2.ra_cancellation_requested_at } });
@@ -111924,20 +111914,14 @@ function registerAdminRoutes(app2) {
     const params = qRaw ? [`%${qRaw}%`] : [];
     const rows = await db.query(
       `SELECT o.id, o.client_id, o.contact_name, o.contact_email, o.package, o.llc_name,
-            o.status, o.service_fee_cents, o.state_fees_cents, o.total_cents,
-            o.created_at, o.paid_at, o.filed_at, o.formed_at,
+            o.status, o.service_fee_cents, o.state_fees_cents,
+            o.created_at, o.formed_at,
             COALESCE(jsonb_array_length(o.payload->'series'), 0) AS series_count,
-            COALESCE((o.payload->'optionalDocuments'->>'ein')::boolean, false) AS ein_purchased,
             COALESCE((o.payload->'optionalDocuments'->>'certificateOfStatus')::boolean, false) AS cert_status_purchased,
             COALESCE((o.payload->'optionalDocuments'->>'certifiedCopy')::boolean, false) AS certified_copy_purchased,
             EXISTS (SELECT 1 FROM documents d WHERE d.order_id = o.id AND d.kind = 'certificate-of-status' AND COALESCE(d.meta->>'source', 'card') <> 'portal') AS cert_status_uploaded,
             EXISTS (SELECT 1 FROM documents d WHERE d.order_id = o.id AND d.kind = 'certified-copy' AND COALESCE(d.meta->>'source', 'card') <> 'portal') AS certified_copy_uploaded,
-            (o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_service,
-            EXISTS (
-              SELECT 1 FROM service_orders s
-               WHERE s.formation_order_id = o.id AND s.type = 'ein'
-                 AND s.status <> 'fulfilled'
-            ) AS ein_outstanding
+            (o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_service
        FROM orders o
       ${where}
       ORDER BY o.created_at DESC LIMIT 200`,
@@ -112034,7 +112018,7 @@ function registerAdminRoutes(app2) {
     const admin = await requireAdmin(c);
     if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
     const db = await getDb();
-    const rows = await db.query("SELECT *, rejected_at, ra_renewal_date FROM orders WHERE id = $1", [c.req.param("id")]);
+    const rows = await db.query("SELECT * FROM orders WHERE id = $1", [c.req.param("id")]);
     if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
     const o = rows[0];
     const payload = typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload;
@@ -112042,11 +112026,6 @@ function registerAdminRoutes(app2) {
       `SELECT id, kind, title, meta, created_at FROM documents
           WHERE client_id = $1 AND order_id = $2 ORDER BY created_at`,
       [o.client_id, o.id]
-    ) : [];
-    const services = o.client_id ? await db.query(
-      `SELECT id, type, status, llc_name FROM service_orders
-          WHERE formation_order_id = $1 ORDER BY created_at`,
-      [o.id]
     ) : [];
     const covered = /* @__PURE__ */ new Set();
     for (const d2 of docs) {
@@ -112103,7 +112082,6 @@ function registerAdminRoutes(app2) {
           title: d2.title,
           createdAt: d2.created_at
         })),
-        services,
         hasArticles: docs.some((d2) => d2.kind === "articles"),
         certStatusPurchased: !!payload.optionalDocuments?.certificateOfStatus,
         certifiedCopyPurchased: !!payload.optionalDocuments?.certifiedCopy,

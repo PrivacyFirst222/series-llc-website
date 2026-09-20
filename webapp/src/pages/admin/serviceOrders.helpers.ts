@@ -2,13 +2,6 @@
 // file exports only components (react-refresh) — split 29 Aug 2026.
 import type { AdminServiceOrder } from "./ServiceOrdersSection";
 
-export const money = (cents: number) => `$${(cents / 100).toFixed(2)}`;
-export const STATUS_STYLE: Record<string, string> = {
-  fulfilled: "bg-trust/10 text-trust",
-  in_progress: "bg-amber-100 text-amber-900",
-  awaiting_info: "bg-secondary text-muted-foreground",
-  pending_payment: "bg-secondary text-muted-foreground",
-};
 export const serviceIsOpen = (s: AdminServiceOrder) => s.status === "awaiting_info" || s.status === "in_progress";
 
 /** A service order bought AFTER the company was formed — a new order from an
@@ -18,6 +11,9 @@ export const serviceIsOpen = (s: AdminServiceOrder) => s.status === "awaiting_in
  *  still owing them stays in column two. */
 export const boughtAfterFormation = (s: AdminServiceOrder, formedAt: string | null) =>
   !!formedAt && serviceIsOpen(s) && new Date(s.created_at).getTime() > new Date(formedAt).getTime();
+/** The one-line name for a service order. The surrounding card or dialog
+ *  already names the LLC, so series names are shortened to their own part —
+ *  "Jimmy Flanagan, LLC - PS 3" reads "PS 3". Never truncated, only wrapped. */
 export function serviceLabel(s: AdminServiceOrder, llcName: string, long = false): string {
   const short = (name?: string) => {
     if (!name) return "";

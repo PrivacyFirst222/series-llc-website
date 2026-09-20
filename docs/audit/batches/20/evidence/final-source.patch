@@ -1,0 +1,864 @@
+diff --git a/webapp/server/e2e.ts b/webapp/server/e2e.ts
+index 1523e67..9fcce64 100644
+--- a/webapp/server/e2e.ts
++++ b/webapp/server/e2e.ts
+@@ -11,6 +11,7 @@ import { defaultFormData } from "../src/components/forms/florida-llc/defaults";
+ import { assembleOa, type OaInputs } from "./oa";
+ import { serviceOrderClientEmail } from "./email";
+ import { execSync } from "node:child_process";
++import { isDeepStrictEqual } from "node:util";
+ import { writeFileSync, appendFileSync } from "node:fs";
+ import { tmpdir as osTmpdir } from "node:os";
+ import { join as joinPath } from "node:path";
+@@ -1063,8 +1064,9 @@ if (mint.status === 200) {
+     const clientOnlyAdmin = await api("/api/admin/me", { cookies: setPw.cookie });
+     check("a client cookie is not an admin session", clientOnlyAdmin.status === 401, clientOnlyAdmin.status);
+   }
+-  check("me shows no RA cancellation yet", me.status === 200 && me.body.data.raCancellationRequestedAt === null);
+-  check("a client who is their own agent is told so, so the portal shows no agent card (14 Sep 2026)", me.body?.data?.raService === false, me.body?.data?.raService);
++  const agentCompany20 = ((await api("/api/portal/companies", { cookies: setPw.cookie })).body?.data ?? []).find((x: { orderId: string }) => x.orderId === orderId);
++  check("me shows no RA cancellation yet", me.status === 200 && agentCompany20?.raCancellationRequestedAt === null);
++  check("a client who is their own agent is told so, so the portal shows no agent card (14 Sep 2026)", agentCompany20?.raService === false, agentCompany20);
+   const cancel = await api("/api/portal/registered-agent/cancel", {
+     method: "POST",
+     body: "{}",
+@@ -1072,7 +1074,7 @@ if (mint.status === 200) {
+   });
+   // The cancellation belongs to a company (15 Sep 2026): a client who is
+   // their own agent has nothing to cancel, and is told so by company name.
+-  check("RA cancel for a company that is its own agent is refused by name", cancel.status === 400 && cancel.body?.error?.code === "NOT_OUR_SERVICE" && /E2E Coastal Holdings, LLC is its own registered agent/.test(cancel.body?.error?.message ?? ""), cancel.body);
++  check("RA cancel for a company that is its own agent is refused by name", cancel.status === 400 && cancel.body?.error?.code === "NOT_OUR_SERVICE" && /E2E Coastal Holdings, LLC did not take our registered agent service/.test(cancel.body?.error?.message ?? ""), cancel.body);
+   const cancelAgain = await api("/api/portal/registered-agent/cancel", {
+     method: "POST",
+     body: "{}",
+@@ -1083,8 +1085,8 @@ if (mint.status === 200) {
+     cancelAgain.status === 400 &&
+       cancelAgain.body?.error?.code === cancel.body?.error?.code,
+   );
+-  const meAfter = await api("/api/auth/me", { cookies: setPw.cookie });
+-  check("me shows no cancellation when the company is its own agent and the request was refused (15 Sep 2026)", meAfter.body.data.raCancellationRequestedAt === null, meAfter.body.data);
++  const meAfter = ((await api("/api/portal/companies", { cookies: setPw.cookie })).body?.data ?? []).find((x: { orderId: string }) => x.orderId === orderId);
++  check("me shows no cancellation when the company is its own agent and the request was refused (15 Sep 2026)", meAfter?.raCancellationRequestedAt === null, meAfter);
+ 
+   // 11. Service orders: intake EIN became a paid order awaiting details
+   const svc0 = await api("/api/portal/services", { cookies: setPw.cookie });
+@@ -1897,14 +1899,15 @@ if (mint.status === 200) {
+     check("the original company is still listed", !!firstCo, list.map((x) => x.llcName));
+     check("each company carries its own registered agent facts (15 Sep 2026)", list.every((x) => typeof (x as { raService?: unknown }).raService === "boolean" && "raRenewalDate" in x && "raCancellationRequestedAt" in x), list[0]);
+     // Answers isolation: write to the SECOND company, read both.
++    const secondCompanyAsset = { id: crypto.randomUUID(), description: "Second company cash", kind: "cash", value: 777, contributedBy: { mode: "equal" }, allocatedTo: "company" };
+     const save2 = await api(`/api/portal/oa/answers?company=${secondId}`, {
+       method: "PUT", cookies: setPw.cookie,
+-      body: JSON.stringify({ firstOrAmended: "first", effectiveDate: "2026-10-01", contributionToCompany: "$777 cash", members: [{}], series: [] }),
++      body: JSON.stringify({ firstOrAmended: "first", effectiveDate: "2026-10-01", assets: [secondCompanyAsset], members: [{}], series: [] }),
+     });
+     check("answers save against the chosen company", save2.status === 200, save2.body);
+     const oa2 = await api(`/api/portal/oa?company=${secondId}`, { cookies: setPw.cookie });
+     check("the second company reads back its own answers",
+-      JSON.stringify(oa2.body?.data).includes("$777 cash"), oa2.body?.data?.answers);
++      isDeepStrictEqual(oa2.body?.data?.answers?.assets, [secondCompanyAsset]), oa2.body?.data?.answers);
+     {
+       // The consent for the second company signs with the second company's
+       // members (14 Sep 2026: it took whichever company was edited last).
+@@ -1921,7 +1924,7 @@ if (mint.status === 200) {
+     }
+     const oa1 = await api(`/api/portal/oa?company=${firstCo?.orderId}`, { cookies: setPw.cookie });
+     check("the first company's answers are untouched by the second's",
+-      !JSON.stringify(oa1.body?.data).includes("$777 cash"), null);
++      !JSON.stringify(oa1.body?.data).includes(secondCompanyAsset.id), oa1.body?.data?.answers);
+     check("the first company's seed is ITS company, not the newest",
+       JSON.stringify(oa1.body?.data).includes("E2E Coastal Holdings"), oa1.body?.data?.seed?.llcName);
+     // Service scoping: each tab's Order Services card shows only that
+@@ -2455,7 +2458,7 @@ if (mint.status === 200) {
+   const mmSeed = await api("/api/portal/oa", { cookies: mmPw.cookie });
+   check(
+     "OA seed routes to member-managed (no longer blocked)",
+-    mmSeed.body?.data?.version === "member" && mmSeed.body?.data?.multiOwner === true && mmSeed.body?.data?.blocked === false && mmSeed.body?.data?.memberManaged === true,
++    mmSeed.body?.data?.version === "member" && mmSeed.body?.data?.multiOwner === true && !("blocked" in (mmSeed.body?.data ?? {})) && mmSeed.body?.data?.memberManaged === true,
+     mmSeed.body?.data,
+   );
+   const mmAnswers = {
+@@ -3781,7 +3784,7 @@ if (mint.status === 200) {
+   check("the renewal client signs in", raPw.status === 200, raPw.body);
+   const seed = (await api("/api/portal/oa", { cookies: raPw.cookie })).body?.data?.seed as { suggestedOwners?: { name: string; isEntity?: boolean }[]; managerEntities?: boolean[] } | undefined;
+   check("the company serving as Manager is suggested as a company owner, not a person", seed?.suggestedOwners?.some((o) => o.name === "Harbor Managers, LLC" && o.isEntity === true) === true, seed?.suggestedOwners);
+-  const beforeMe = (await api("/api/auth/me", { cookies: raPw.cookie })).body?.data as { raRenewalDate?: string | null };
++  const beforeMe = ((await api("/api/portal/companies", { cookies: raPw.cookie })).body?.data ?? []).find((x: { orderId: string }) => x.orderId === raId) as { raRenewalDate?: string | null; raService?: boolean } | undefined;
+   check("before formation there is no renewal date", beforeMe?.raRenewalDate === null, beforeMe);
+   check("a client who took our service is told so", (beforeMe as { raService?: boolean })?.raService === true, beforeMe);
+   const appointment = new Date().toLocaleDateString("en-CA", {timeZone:"America/New_York"});
+@@ -3805,7 +3808,7 @@ if (mint.status === 200) {
+     const renewsWord = new Date(`${expected}T12:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
+     check("the Registered Agent Clients row names the renewal date beside the company", (cl?.ra_llcs ?? []).some((s) => s.endsWith(` (renews ${renewsWord})`)), { ra_llcs: cl?.ra_llcs, renewsWord });
+   }
+-  const afterMe = (await api("/api/auth/me", { cookies: raPw.cookie })).body?.data as { raRenewalDate?: string | null };
++  const afterMe = ((await api("/api/portal/companies", { cookies: raPw.cookie })).body?.data ?? []).find((x: { orderId: string }) => x.orderId === raId) as { raRenewalDate?: string | null; raService?: boolean } | undefined;
+   check("the client is shown the same renewal date", afterMe?.raRenewalDate === det?.raRenewalDate, afterMe);
+   // ---- Automatic renewal (16 Sep 2026): the card kept from the formation
+   //      payment, the notice 45 days out, the charge 15 days out, a decline
+@@ -4097,5 +4100,15 @@ for(const [label,r]of batch05Results)check(label,r.ok,r.detail);
+   check("batch19 54: office keeps the approved manager-managed Articles sentence", filingGroups(payload19(manager)).some(g => g.fields.some(f => f.value === sentence)));
+ }
+ 
++// Batch 20: obsolete answer fields cannot shadow the asset-list source of truth.
++{
++  const { oaAnswersSchema } = await import("./routes-portal");
++  const assets = [{ id: crypto.randomUUID(), description: "Cash", kind: "cash", value: 1250, contributedBy: { mode: "equal" }, allocatedTo: "company" }];
++  const parsed = oaAnswersSchema.parse({ contributionToCompany: "obsolete", members: [{name:"Jane Smith",contribution:"obsolete"},{name:"John Smith",contribution:"obsolete"}], series:[{purpose:"Rental",contribution:"obsolete"}], couples:[{a:0,b:1,form:"TBE",contribution:"obsolete"}], assets });
++  const { computeCapital } = await import("./oa-capital");
++  const capital = computeCapital(parsed.assets, ["Jane Smith"], []);
++  check("batch20 165: asset contributions survive removal of obsolete answer fields", !JSON.stringify(parsed).includes("obsolete") && JSON.stringify(parsed.assets) === JSON.stringify(assets) && capital.errors.length === 0 && capital.memberContributions[0].includes("1,250"), {parsed,capital});
++}
++
+ console.log(failures === 0 ? "\nALL PASS" : `\n${failures} FAILURES`);
+ process.exit(failures === 0 ? 0 : 1);
+diff --git a/webapp/server/email.ts b/webapp/server/email.ts
+index cb51bff..928af24 100644
+--- a/webapp/server/email.ts
++++ b/webapp/server/email.ts
+@@ -10,7 +10,6 @@ interface Mail {
+   attachments?: {filename:string;content:string}[];
+ }
+ 
+-/** Sends via Resend; without an API key, logs instead (dev). */
+ /** Dev only: the last mails that would have been sent, newest last, so the
+  *  server checks can read what a client would receive (10 Sep 2026). Never
+  *  filled when a real mail key is configured. */
+@@ -30,6 +29,8 @@ async function recordMail(mail: Mail, ok: boolean, providerId: string | null, er
+   }
+ }
+ 
++/** Sends via Resend; development without a key records a simulated send,
++ *  while production without a key refuses the send. */
+ export async function sendMail(mail: Mail): Promise<void> {
+   if (!env.RESEND_API_KEY) {
+     if (env.isProd) {await recordMail(mail,false,null,"Email provider is not configured");throw new Error("Email provider is not configured");}
+@@ -412,8 +413,8 @@ export function orderPaidEmail(opts: {
+ 
+ /** The company exists. This is the message the whole formation was for, so it
+  *  names the company and lists what is now in the client's portal rather than
+- *  saying "a new document is available" like every other upload. */
+-/** The formed announcement, in Adam's own words (30 Aug 2026). Two truthful
++ *  saying "a new document is available" like every other upload.
++ *  The formed announcement, in Adam's own words (30 Aug 2026). Two truthful
+  *  adaptations, both his-approved: "Two things are waiting" only when it IS
+  *  two things (extra documents switch to a count-free line), and an ordered
+  *  EIN / S election is announced as an ORDER in the portal — the document
+diff --git a/webapp/server/env.ts b/webapp/server/env.ts
+index 467f59c..ada39cb 100644
+--- a/webapp/server/env.ts
++++ b/webapp/server/env.ts
+@@ -33,7 +33,7 @@ export const env = {
+ 
+   ADMIN_PASSWORD: process.env.ADMIN_PASSWORD ?? "",
+ 
+-  /** Shared secret for the daily purge cron. Required in production. */
++  /** Shared secret for scheduled maintenance jobs. Required in production. */
+   CRON_SECRET: process.env.CRON_SECRET ?? "",
+   // Dropbox app-folder credentials for the nightly client-file mirror.
+   DROPBOX_APP_KEY: ext(process.env.DROPBOX_APP_KEY),
+diff --git a/webapp/server/pdf-render.ts b/webapp/server/pdf-render.ts
+index 6baf7b9..91c92bb 100644
+--- a/webapp/server/pdf-render.ts
++++ b/webapp/server/pdf-render.ts
+@@ -635,14 +635,8 @@ async function finishWithPermissions(doc: PDFDocument, title: string, wm: Waterm
+       }) => Promise<void> | void;
+     };
+     if (typeof anyDoc.encrypt === "function") {
+-      // The library's writer encrypts STREAMS only, never strings, so any Info
+-      // metadata in an encrypted document is written plaintext into a file
+-      // that declares string encryption — and every reader "decrypts" it into
+-      // garbage (Codex PDF-001; confirmed against PDFWriter.encrypt, which
+-      // tests `object instanceof PDFStream`). No string we set can survive,
+-      // so the encrypted document carries NO Info dictionary: viewers then
+-      // fall back to the clean filename. The watermark on every page, not the
+-      // metadata, is what identifies the licensee.
++      // Metadata strings are encrypted with the other indirect-object strings
++      // below, so the encrypted PDF can retain its Info dictionary.
+       await anyDoc.encrypt({
+         ownerPassword: `mfsl-${Math.random().toString(36).slice(2)}${Date.now().toString(36)}`,
+         // Clients may print and add their own notes/signatures; the underlying
+diff --git a/webapp/server/routes-admin.ts b/webapp/server/routes-admin.ts
+index 44b7de0..e073e33 100644
+--- a/webapp/server/routes-admin.ts
++++ b/webapp/server/routes-admin.ts
+@@ -172,25 +172,18 @@ app.get("/admin/orders", async (c) => {
+   const qRaw = (c.req.query("q") ?? "").trim().slice(0, 100);
+   const where = qRaw ? `WHERE o.llc_name ILIKE $1 OR o.contact_email ILIKE $1 OR o.contact_name ILIKE $1` : "";
+   const params = qRaw ? [`%${qRaw}%`] : [];
+-  // Everything a card on the board shows, in one query. series_count and
+-  // ein_purchased are on the card because they change what "finished" means:
+-  // an order can look complete with a series undesignated or an EIN still owed.
++  // Fields displayed by the board. Outstanding service work is loaded by
++  // the separate service-orders query before a card can count as complete.
+   const rows = await db.query(
+     `SELECT o.id, o.client_id, o.contact_name, o.contact_email, o.package, o.llc_name,
+-            o.status, o.service_fee_cents, o.state_fees_cents, o.total_cents,
+-            o.created_at, o.paid_at, o.filed_at, o.formed_at,
++            o.status, o.service_fee_cents, o.state_fees_cents,
++            o.created_at, o.formed_at,
+             COALESCE(jsonb_array_length(o.payload->'series'), 0) AS series_count,
+-            COALESCE((o.payload->'optionalDocuments'->>'ein')::boolean, false) AS ein_purchased,
+             COALESCE((o.payload->'optionalDocuments'->>'certificateOfStatus')::boolean, false) AS cert_status_purchased,
+             COALESCE((o.payload->'optionalDocuments'->>'certifiedCopy')::boolean, false) AS certified_copy_purchased,
+             EXISTS (SELECT 1 FROM documents d WHERE d.order_id = o.id AND d.kind = 'certificate-of-status' AND COALESCE(d.meta->>'source', 'card') <> 'portal') AS cert_status_uploaded,
+             EXISTS (SELECT 1 FROM documents d WHERE d.order_id = o.id AND d.kind = 'certified-copy' AND COALESCE(d.meta->>'source', 'card') <> 'portal') AS certified_copy_uploaded,
+-            (o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_service,
+-            EXISTS (
+-              SELECT 1 FROM service_orders s
+-               WHERE s.formation_order_id = o.id AND s.type = 'ein'
+-                 AND s.status <> 'fulfilled'
+-            ) AS ein_outstanding
++            (o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_service
+        FROM orders o
+       ${where}
+       ORDER BY o.created_at DESC LIMIT 200`,
+@@ -203,8 +196,6 @@ app.get("/admin/orders", async (c) => {
+   return c.json({ data: { orders: rows, total: Number(total[0].c), shown: rows.length } });
+ });
+ 
+-/** Sent to the Division. The only transition on the board a person performs —
+- *  nothing in this system can observe a filing on sunbiz. */
+ /** The board's own words for a status, for messages the office reads. */
+ const BOARD_LABEL: Record<string, string> = { pending_payment: "Pending payment", paid: "New Orders", filed: "With The State", formed: "Complete" };
+ /** Where a refusal says the order is (15 Sep 2026): a formed order sits in
+@@ -230,6 +221,7 @@ const isCardCert = (d: { kind: string; meta: unknown }, kind: string): boolean =
+ const isConversionPayload = (payload: unknown): boolean =>
+   ((typeof payload === "string" ? JSON.parse(payload) : payload) as { filingPath?: string } | null)?.filingPath === "CONVERT";
+ 
++/** Record that the office sent the Articles to the Division. */
+ app.post("/admin/orders/:id/filed", async (c) => {
+   const admin = await requireAdmin(c);
+   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+@@ -278,8 +270,6 @@ app.post("/admin/orders/:id/unfiled", async (c) => {
+   return c.json({ data: { ok: true } });
+ });
+ 
+-/** Which fields have been copied into the state's form. Stored per order so an
+- *  interrupted filing resumes on whatever machine you pick it up on. */
+ // The second check-off: the Protected Series Designations are filed only
+ // after the Division forms the base LLC (Adam, 30 Aug 2026). Idempotent.
+ app.post("/admin/orders/:id/series-filed", async (c) => {
+@@ -296,6 +286,8 @@ app.post("/admin/orders/:id/series-filed", async (c) => {
+   return c.json({ data: { ok: true } });
+ });
+ 
++/** Which fields have been copied into the state's form. Stored per order so an
++ *  interrupted filing resumes on whatever machine you pick it up on. */
+ app.post("/admin/orders/:id/copied", async (c) => {
+   const admin = await requireAdmin(c);
+   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+@@ -329,7 +321,7 @@ app.get("/admin/orders/:id", async (c) => {
+     payload: unknown; copied_fields: unknown; created_at: string;
+     paid_at: string | null; filed_at: string | null; formed_at: string | null;
+     contact_name: string; contact_email: string; total_cents: number;
+-  }>("SELECT *, rejected_at, ra_renewal_date FROM orders WHERE id = $1", [c.req.param("id")]);
++  }>("SELECT * FROM orders WHERE id = $1", [c.req.param("id")]);
+   if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+   const o = rows[0];
+   const payload = typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload;
+@@ -344,16 +336,6 @@ app.get("/admin/orders/:id", async (c) => {
+       )
+     : [];
+ 
+-  // Services bought against this formation — the EIN is the one that changes
+-  // what "done" means, and its SSNs stay in the service record, not here.
+-  const services = o.client_id
+-    ? await db.query<{ id: string; type: string; status: string; llc_name: string }>(
+-        `SELECT id, type, status, llc_name FROM service_orders
+-          WHERE formation_order_id = $1 ORDER BY created_at`,
+-        [o.id],
+-      )
+-    : [];
+-
+   const covered = new Set<string>();
+   for (const d of docs) {
+     if (d.kind !== "psd") continue;
+@@ -413,7 +395,6 @@ app.get("/admin/orders/:id", async (c) => {
+         title: d.title,
+         createdAt: d.created_at,
+       })),
+-      services,
+       hasArticles: docs.some((d) => d.kind === "articles"),
+       certStatusPurchased: !!(payload as { optionalDocuments?: { certificateOfStatus?: boolean } }).optionalDocuments?.certificateOfStatus,
+       certifiedCopyPurchased: !!(payload as { optionalDocuments?: { certifiedCopy?: boolean } }).optionalDocuments?.certifiedCopy,
+@@ -429,29 +410,13 @@ app.get("/admin/orders/:id", async (c) => {
+   });
+ });
+ 
+-/** The Articles and the Protected Series Designations, in one action.
+- *
+- *  This is the only way an order becomes "formed": the same request that writes
+- *  the documents sets the status and emails the client, so the board can never
+- *  show a completed order whose client has an empty portal. One PSD document may
+- *  cover several series — Florida allows it — so coverage is declared per file
+- *  and checked against the order's own series list. Miss one and this refuses. */
+-// The filed Articles come back from the Division while the order is With The
+-// State, and go up here (Adam's sequence, 30 Aug 2026; the card offers the
+-// upload at that stage only, 14 Sep 2026): the PDF is stored against the
+-// order, the status does not move, and the client is not emailed — they hear
+-// once, at formed. A wrong file is replaced later by the formed-step package
+-// upload, which retires priors.
+-/** Statement of Authorized Representative (Adam, 13 Sep 2026): made the
+- *  moment the filed Articles go up, for an order whose client appointed us to
+- *  sign them, and stored under the company beside the Articles. A later
+- *  Articles upload replaces it. Returns the message to refuse with when the
+- *  document number the Statement needs is missing. */
+ function appointedUs(payload: unknown): boolean {
+   const p = (typeof payload === "string" ? JSON.parse(payload) : payload) as { certifications?: { articlesSignedBy?: string } } | null;
+   return p?.certifications?.articlesSignedBy === "SERVICE";
+ }
+ const DOC_NUMBER_NEEDED = "This client appointed us to sign. Enter the Florida document number so the Statement of Authorized Representative can name the company.";
++/** Generate and store the Statement beside the company's Articles. Returns
++ *  its document id and storage key; callers validate the document number first. */
+ async function issueStatement(
+   db: Awaited<ReturnType<typeof getDb>>,
+   o: { id: string; client_id: string | null; llc_name: string; payload?: unknown },
+@@ -485,6 +450,12 @@ async function issueStatement(
+   return { id: row[0].id, storageKey: stored.storageKey };
+ }
+ 
++// The filed Articles come back from the Division while the order is With The
++// State, and go up here (Adam's sequence, 30 Aug 2026; the card offers the
++// upload at that stage only, 14 Sep 2026): the PDF is stored against the
++// order, the status does not move, and the client is not emailed — they hear
++// once, at formed. A wrong file is replaced later by the formed-step package
++// upload, which retires priors.
+ app.post("/admin/orders/:id/articles", async (c) => {
+   const admin = await requireAdmin(c);
+   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+@@ -599,6 +570,13 @@ app.post("/admin/orders/:id/certificates", async (c) => {
+   return c.json({ data: { uploaded, notified } });
+ });
+ 
++/** The Articles and the Protected Series Designations, in one action.
++ *
++ *  This is the only way an order becomes "formed": the same request that writes
++ *  the documents sets the status and emails the client, so the board can never
++ *  show a completed order whose client has an empty portal. One PSD document may
++ *  cover several series — Florida allows it — so coverage is declared per file
++ *  and checked against the order's own series list. Miss one and this refuses. */
+ app.post("/admin/orders/:id/formation-documents", async (c) => {
+   const admin = await requireAdmin(c);
+   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+@@ -1135,13 +1113,8 @@ app.get("/admin/services/:id", async (c) => {
+   });
+ });
+ 
+-/** Draft S election package for admin review: instructions + cover letter +
+- *  the filled official Form 2553. Generated on demand from the encrypted
+- *  details; nothing is stored — Adam reviews and attaches it at fulfillment. */
+-// The office enters the formation date from the filed Articles when it
+-// prepares the S election (Adam, 6 Sep 2026: "We will manually enter it when
+-// the S-election form is created"). Entering it builds the package, posts it
+-// to the client, and starts their two-week window.
++// Correct the formation date supplied by the client. Existing encrypted
++// questionnaire numbers are required; the package waits if its EIN is missing.
+ app.post("/admin/services/:id/s-election-formation-date", async (c) => {
+   const admin = await requireAdmin(c);
+   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+@@ -1189,6 +1162,9 @@ app.post("/admin/services/:id/s-election-formation-date", async (c) => {
+   return c.json({ data: { ok: true, documentId: built.documentId, editableUntil: built.editableUntil } });
+ });
+ 
++/** Draft S election package for admin review: instructions + cover letter +
++ *  the filled official Form 2553. Generated on demand from the encrypted
++ *  details; nothing is stored — Adam reviews and attaches it at fulfillment. */
+ app.get("/admin/services/:id/s-election-draft", async (c) => {
+   const admin = await requireAdmin(c);
+   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+@@ -1447,9 +1423,6 @@ async function carryEinIntoSElections(args: { clientId: string; companyOrderId:
+   return rebuilt;
+ }
+ 
+-/** Package documents still carrying no company after the backfill — hand
+- *  uploads whose titles name no company. Adam opens this in his admin
+- *  session to see what is left (7 Sep 2026). */
+ /** Delete one certificate copy (Adam, 15 Sep 2026: "the user has the ability
+  *  to delete older certificates"). Certificates only: the Articles and the
+  *  designations are replaced, never removed. Gone from the client's portal
+@@ -1496,6 +1469,9 @@ app.post("/admin/documents/:id/replace", async (c) => {
+   return c.json({ data: { ok: true } });
+ });
+ 
++/** Package documents still carrying no company after the backfill — hand
++ *  uploads whose titles name no company. Adam opens this in his admin
++ *  session to see what is left (7 Sep 2026). */
+ app.get("/admin/documents/unscoped", async (c) => {
+   const admin = await requireAdmin(c);
+   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+diff --git a/webapp/server/routes-ops.ts b/webapp/server/routes-ops.ts
+index 713274f..ff0e456 100644
+--- a/webapp/server/routes-ops.ts
++++ b/webapp/server/routes-ops.ts
+@@ -214,8 +214,6 @@ if (!env.isProd) {
+     return c.json({ data: { token } });
+   });
+ 
+-  // Dev-only: backdate a client's formation payment so e2e can exercise the
+-  // S election 65-day ordering window without waiting.
+   // Dev-only: reset a client's OA profile (answers AND revision) so the UI
+   // walkthrough harness can replay deterministically. Added when a reset via
+   // a huge rev poisoned the monotonic guard and every later autosave was
+@@ -229,6 +227,8 @@ if (!env.isProd) {
+     return c.json({ data: { ok: true } });
+   });
+ 
++  // Dev-only: backdate a client's formation payment so e2e can exercise the
++  // S election 65-day ordering window without waiting.
+   app.post("/dev/age-formation", async (c) => {
+     const { email, days } = (await c.req.json()) as { email: string; days: number };
+     const db = await getDb();
+@@ -290,8 +290,8 @@ app.get("/cron/sunbiz-sync", async (c) => {
+   return c.json({ data: report });
+ });
+ 
+-/** Daily sweep so expired packages are destroyed even if nobody signs in.
+- *  Vercel cron calls this; a shared secret keeps it from being public. */
++/** Daily sweep removes expired questionnaire numbers without deleting the
++ *  client-retained encrypted documents. The shared cron secret protects it. */
+ app.get("/cron/purge", async (c) => {
+   const auth = c.req.header("authorization") ?? "";
+   const secret = env.CRON_SECRET;
+diff --git a/webapp/server/routes-portal.ts b/webapp/server/routes-portal.ts
+index c3c8a3d..e712fdf 100644
+--- a/webapp/server/routes-portal.ts
++++ b/webapp/server/routes-portal.ts
+@@ -194,7 +194,6 @@ export const oaAnswersSchema = z.object({
+   multiOwner: z.boolean().optional(),
+   effectiveDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+   authorized: z.boolean().optional(),
+-  contributionToCompany: z.string().max(300).optional(),
+   ownershipMode: z.enum(["percent", "fraction"]).optional(),
+   members: z
+     .array(
+@@ -207,7 +206,6 @@ export const oaAnswersSchema = z.object({
+         percentage: z.number().min(0).max(100).optional(),
+         numerator: z.number().int().min(0).max(100_000).optional(),
+         denominator: z.number().int().min(1).max(100_000).optional(),
+-        contribution: z.string().max(300).optional(),
+         // Any person or entity (s. 4.11), so no person-name rule (13 Sep 2026).
+         todBeneficiary: z.string().max(300).optional(),
+         // A backup may be a class ("my children in equal shares"), so no name rule.
+@@ -227,7 +225,6 @@ export const oaAnswersSchema = z.object({
+     .array(
+       z.object({
+         purpose: z.string().max(300).optional(),
+-        contribution: z.string().max(300).optional(),
+         specialTerms: z.string().max(2000).optional(),
+       }),
+     )
+@@ -261,7 +258,6 @@ export const oaAnswersSchema = z.object({
+         percentage: z.number().min(0).max(100).optional(),
+         numerator: z.number().int().min(0).max(100_000).optional(),
+         denominator: z.number().int().min(1).max(100_000).optional(),
+-        contribution: z.string().max(300).optional(),
+         // Any person or entity (s. 4.11), so no person-name rule (13 Sep 2026).
+         todBeneficiary: z.string().max(300).optional(),
+         // A backup may be a class ("my children in equal shares"), so no name rule.
+@@ -302,19 +298,12 @@ export const SPOUSAL_FORM_LABEL: Record<"TBE" | "JTWROS", string> = {
+   JTWROS: "joint tenants with right of survivorship",
+ };
+ 
+-// Who owns the company, as the client last said. The intake list is only the
+-// starting point: member-managed filings list members as AMBR, and an owner
+-// who is also a manager may appear as MGR. Current answers do not amend that
+-// public filing; inaccurate filed information needs an appropriate correction. An
+-// untouched draft carries shares but no names, which is how the two are told
+-// apart. Every document that names the owners resolves them HERE — otherwise
+-// two documents generated the same afternoon disagree about who owns the company.
+-/** A person's printed legal name, suffix set off by a comma — the form's
+- *  fullPersonName, server-side. Exhibit A and the signature blocks print
+- *  this verbatim, so "John Smith, Jr." must survive the whole path. */
+ /** Operating agreements a company may keep in its documents list. */
+ export const OA_KEEP_MAX = 5;
+ 
++/** A person's printed legal name, suffix set off by a comma — the form's
++ *  fullPersonName, server-side. Exhibit A and the signature blocks print
++ *  this verbatim, so "John Smith, Jr." must survive the whole path. */
+ export function personLegalName(first?: string, last?: string, suffix?: string): string {
+   const base = [first, last].map((s) => (s ?? "").trim()).filter(Boolean).join(" ");
+   const sfx = (suffix ?? "").trim().replace(/^,\s*/, "");
+@@ -322,6 +311,13 @@ export function personLegalName(first?: string, last?: string, suffix?: string):
+   return sfx ? `${base}, ${sfx}` : base;
+ }
+ 
++// Who owns the company, as the client last said. The intake list is only the
++// starting point: member-managed filings list members as AMBR, and an owner
++// who is also a manager may appear as MGR. Current answers do not amend that
++// public filing; inaccurate filed information needs an appropriate correction. An
++// untouched draft carries shares but no names, which is how the two are told
++// apart. Every document that names the owners resolves them HERE — otherwise
++// two documents generated the same afternoon disagree about who owns the company.
+ export function effectiveOwners(
+   seedMembers: { name: string; address: string }[],
+   answers: { members?: { name?: string; address?: string }[] } | null | undefined,
+@@ -343,7 +339,7 @@ export async function savedOaAnswers(clientId: string, orderId?: string | null):
+   return (typeof raw === "string" ? JSON.parse(raw) : raw) as z.infer<typeof oaAnswersSchema>;
+ }
+ 
+-/** "August 5, 2026" → "2026-08-05"; "" when the text is not a date. */
++/** "August 5, 2026" → "2026-08-05"; null when the text is not a date. */
+ export function isoFromPrinted(printed: string): string | null {
+   const m = printed.trim().match(/^([A-Za-z]+) (\d{1,2}), (\d{4})$/);
+   if (!m) return null;
+@@ -529,10 +525,8 @@ export async function sElectionEligibility(clientId: string, orderId?: string |
+   return { eligible: true, reason: "ok", orderBy: orderBy.toISOString(), formationPaidAt: paidAt.toISOString() };
+ }
+ 
+-/** How long a client may edit and re-download the S election package before we
+- *  destroy it. The package IS the clients' copy of Form 2553, complete with
+- *  every owner's Social Security number, so it does not live here longer than
+- *  it has to. */
++/** The editing window after fulfillment. Questionnaire numbers are purged
++ *  afterward; the encrypted delivered document remains until the client deletes it. */
+ export const S_ELECTION_EDIT_DAYS = 14;
+ 
+ export interface SElectionStoredDetails {
+@@ -582,8 +576,6 @@ export async function purgeExpiredSElections(): Promise<number> {
+  *  name SPLIT (first/middle/last/suffix) — the responsible party is the
+  *  person who owns or controls the LLC, typically its manager (SS-4
+  *  instructions, "Responsible party defined"). */
+-/** The client's answer that the LLC already has an EIN: nothing else is
+- *  needed, and no application is made. */
+ export const einDetailsSchema = z
+   .object({
+     responsibleFirst: z.string().min(1, "The responsible party's first name is required.").max(100),
+@@ -645,8 +637,6 @@ export const einDetailsSchema = z
+     message: "Tell us which of the special activities applies.",
+   });
+ 
+-/** irs.gov, "Valid EINs": every prefix an IRS campus, the online
+- *  application, or the SBA has ever assigned. Anything else is a typo. */
+ /** The EIN we obtained for the company, typed by the office with the CP 575
+  *  letter (Adam, 7 Sep 2026: "there should be a field to enter it so it gets
+  *  added to the 2553"). Null until an EIN order for the company itself is
+@@ -756,12 +746,6 @@ export const sElectionDetailsSchema = z
+     message: "Ownership percentages must total exactly 100%.",
+   });
+ 
+-/** Build the Form 2553 package from the stored details and the office's
+- *  formation date, post it to the client's documents (replacing an earlier
+- *  copy), mark the order fulfilled — which starts the two-week clock — and
+- *  tell the client it is ready. Shared by the client's submission (when the
+- *  date is already on file, i.e. an edit inside the window) and by the
+- *  office entering the date. */
+ /** The formation date is the default for the election's effective date and
+  *  for each owner's acquisition date wherever the client left them blank.
+  *  The blanks stay blank in what is stored, so a later correction of the
+@@ -774,6 +758,10 @@ export function withFormationDefaults(d: SElectionStoredDetails): { effectiveDat
+   };
+ }
+ 
++/** Build and post the encrypted Form 2553 package, replacing its prior copy,
++ *  and notify the client. Shared by client submission, office date correction,
++ *  and completion after the company EIN arrives. The first fulfillment starts
++ *  the editing window; rebuilding does not extend it. */
+ export async function postSElectionPackage(args: {
+   so: { id: string; client_id: string; llc_name: string };
+   merged: SElectionStoredDetails;
+@@ -894,8 +882,8 @@ app.get("/auth/me", async (c) => {
+   const session = await getSession(c);
+   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+   const db = await getDb();
+-  const rows = await db.query<{ email: string; name: string; pending_email: string | null; ra_cancellation_requested_at: string | null }>(
+-    "SELECT email, name, pending_email, ra_cancellation_requested_at FROM clients WHERE id = $1",
++  const rows = await db.query<{ email: string; name: string; pending_email: string | null }>(
++    "SELECT email, name, pending_email FROM clients WHERE id = $1",
+     [session.clientId],
+   );
+   return c.json({
+@@ -903,17 +891,6 @@ app.get("/auth/me", async (c) => {
+       email: rows[0]?.email ?? "",
+       name: rows[0]?.name ?? "",
+       pendingEmail: rows[0]?.pending_email ?? null,
+-      raCancellationRequestedAt: rows[0]?.ra_cancellation_requested_at ?? null,
+-      // The registered-agent renewal date, from the newest formed order that
+-      // took our service (14 Sep 2026).
+-      raRenewalDate: await db
+-        .query<{ ra_renewal_date: unknown }>("SELECT ra_renewal_date FROM orders WHERE client_id = $1 AND ra_renewal_date IS NOT NULL ORDER BY formed_at DESC NULLS LAST LIMIT 1", [session.clientId])
+-        .then((r) => (r[0]?.ra_renewal_date ? isoDate(r[0].ra_renewal_date) : null)),
+-      // Whether any paid order took our registered agent service: the agent
+-      // card is shown only then (14 Sep 2026: every client saw it).
+-      raService: await db
+-        .query<{ payload: unknown }>("SELECT payload FROM orders WHERE client_id = $1 AND status <> 'pending_payment'", [session.clientId])
+-        .then((rows) => rows.some((r) => ((typeof r.payload === "string" ? JSON.parse(r.payload) : r.payload) as { registeredAgent?: { choice?: string } } | null)?.registeredAgent?.choice === "SERVICE")),
+       // The portal shows a banner and an Exit when the admin is looking.
+       viewingAsAdmin: session.viewingAsAdmin,
+     },
+@@ -1113,7 +1090,6 @@ app.get("/portal/oa", async (c) => {
+       version,
+       multiOwner,
+       memberManaged,
+-      blocked: false,
+       todayEastern: easternDateIso(),
+       templateVersion: OA_TEMPLATE_VERSION,
+       answers: savedAnswers,
+@@ -1334,7 +1310,7 @@ app.post("/portal/oa/generate", async (c) => {
+         percentage: shareValue(ownershipMode, cplShare),
+         percentageLabel: shareLabel(ownershipMode, cplShare),
+         jointHolding: SPOUSAL_FORM_LABEL[cpl.form],
+-        contribution: cpl.contribution ?? "",
++        contribution: "", // Filled from the asset list below.
+         // The "last surviving spouse" words are Exhibit A's own row now.
+         todBeneficiary: cpl.todBeneficiary ?? "",
+         todBackup: cpl.todBackup ?? "",
+@@ -1364,7 +1340,7 @@ app.post("/portal/oa/generate", async (c) => {
+         address: m.address,
+         percentage: shareValue(multiOwner ? ownershipMode : "percent", mShare),
+         percentageLabel: shareLabel(multiOwner ? ownershipMode : "percent", mShare),
+-        contribution: ans?.contribution ?? "",
++        contribution: "", // Filled from the asset list below.
+         // Only an individual may designate (s. 4.11): a company or trust
+         // prints None whatever was typed.
+         todBeneficiary: isEntity ? "" : ans?.todBeneficiary ?? "",
+@@ -2606,7 +2582,7 @@ app.post("/portal/registered-agent/cancel", async (c) => {
+   if (!order) return c.json(err("No company found on your account.", "NO_LLC"), 400);
+   const tookService = ((typeof order.payload === "string" ? JSON.parse(order.payload) : order.payload) as { registeredAgent?: { choice?: string } } | null)?.registeredAgent?.choice === "SERVICE";
+   if (!tookService) {
+-    return c.json(err(`${order.llc_name} is its own registered agent; there is nothing to cancel.`, "NOT_OUR_SERVICE"), 400);
++    return c.json(err(`${order.llc_name} did not take our registered agent service; there is nothing to cancel.`, "NOT_OUR_SERVICE"), 400);
+   }
+   if (order.ra_cancellation_requested_at) {
+     return c.json({ data: { raCancellationRequestedAt: order.ra_cancellation_requested_at } });
+diff --git a/webapp/server/statement.ts b/webapp/server/statement.ts
+index ff4bdf7..cb96411 100644
+--- a/webapp/server/statement.ts
++++ b/webapp/server/statement.ts
+@@ -4,7 +4,7 @@
+  * appointed us to sign and file their Articles under s. 605.0102(8)(a), so a
+  * bank reading the public record can see why the name on the Articles is not
+  * a member's. The master, templates-statement-of-authorized-representative.md,
+- * carries every word; this fills its six slots and nothing else.
++ * carries every word; this fills its seven slots and nothing else.
+  */
+ import { readFileSync } from "node:fs";
+ import statementRaw from "./templates-statement-of-authorized-representative.md";
+diff --git a/webapp/src/pages/admin/AdminDashboard.tsx b/webapp/src/pages/admin/AdminDashboard.tsx
+index e1d0100..8c12034 100644
+--- a/webapp/src/pages/admin/AdminDashboard.tsx
++++ b/webapp/src/pages/admin/AdminDashboard.tsx
+@@ -442,10 +442,6 @@ function ChangeEmailDialog({ client }: { client: AdminClient }) {
+   );
+ }
+ 
+-/** The client roster. The RA variant shows the LLCs we serve as registered
+- *  agent for — that is what the relationship attaches to — and keeps a client
+- *  listed after a cancellation request until we are replaced as agent of
+- *  record (the chip carries that state). */
+ /** The client's name in parts. Accounts carry one string built as "First
+  *  Last, Suffix"; the earliest paid order has the parts, and the string is
+  *  split for the few accounts that predate that. */
+@@ -482,6 +478,10 @@ const SORTERS: Record<SortKey, (a: AdminClient, b: AdminClient) => number> = {
+   since: (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+ };
+ 
++/** The client roster. The RA variant shows the LLCs we serve as registered
++ *  agent for — that is what the relationship attaches to — and keeps a client
++ *  listed after a cancellation request until we are replaced as agent of
++ *  record (the chip carries that state). */
+ function ClientsTable({
+   clients,
+   variant,
+@@ -495,27 +495,22 @@ function ClientsTable({
+   // Until a heading is tapped the rows stay newest first.
+   const [query, setQuery] = useState<string>("");
+   const [sort, setSort] = useState<{ key: SortKey; dir: "asc" | "desc" } | null>(null);
+-  const sortable = true;
+   const q = query.trim().toLowerCase();
+   const shown = clients
+     .filter((cl) => !q || [cl.name, cl.email, displayName(cl), ...(cl.companies ?? []).map((c) => c.llc_name), ...(cl.ra_llcs ?? [])].some((s) => (s ?? "").toLowerCase().includes(q)))
+     .sort((a, b) => (sort ? SORTERS[sort.key](a, b) * (sort.dir === "asc" ? 1 : -1) : 0));
+   const toggle = (key: SortKey) => setSort((s) => (s?.key === key ? { key, dir: s.dir === "asc" ? "desc" : "asc" } : { key, dir: "asc" }));
+-  const Head = ({ k, label }: { k: SortKey; label: string }) =>
+-    sortable ? (
++  const Head = ({ k, label }: { k: SortKey; label: string }) => (
+       <th className="px-3 py-3 font-medium">
+         <button type="button" onClick={() => toggle(k)} className="inline-flex items-center gap-1 uppercase tracking-[0.14em] hover:text-foreground" data-testid={`sort-${k}`} aria-sort={sort?.key === k ? (sort.dir === "asc" ? "ascending" : "descending") : "none"}>
+           {label}
+           {sort?.key === k ? (sort.dir === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />) : <ArrowUpDown className="h-3 w-3 opacity-40" />}
+         </button>
+       </th>
+-    ) : (
+-      <th className="px-3 py-3 font-medium">{label}</th>
+     );
+   return (
+     <div className="mt-4">
+-      {sortable ? (
+-        <Input
++      <Input
+           value={query}
+           onChange={(e) => setQuery(e.target.value)}
+           placeholder="Search by name, email, or company"
+@@ -523,7 +518,6 @@ function ClientsTable({
+           className="max-w-md rounded-full"
+           data-testid="client-search"
+         />
+-      ) : null}
+     <div className="mt-4 overflow-x-auto rounded-2xl border border-border bg-card">
+       <table className="w-full min-w-[560px] text-sm">
+         <thead>
+diff --git a/webapp/src/pages/admin/OrderBoard.tsx b/webapp/src/pages/admin/OrderBoard.tsx
+index 950af0f..e9ff8f7 100644
+--- a/webapp/src/pages/admin/OrderBoard.tsx
++++ b/webapp/src/pages/admin/OrderBoard.tsx
+@@ -18,15 +18,10 @@ export interface BoardOrder {
+   contact_email: string;
+   llc_name: string;
+   status: string;
+-  total_cents: number;
+   created_at: string;
+-  paid_at: string | null;
+-  filed_at: string | null;
+   formed_at: string | null;
+   series_count: number;
+-  ein_purchased: boolean;
+   ra_service: boolean;
+-  ein_outstanding: boolean;
+   cert_status_purchased: boolean;
+   certified_copy_purchased: boolean;
+   cert_status_uploaded: boolean;
+diff --git a/webapp/src/pages/admin/OrderDetail.tsx b/webapp/src/pages/admin/OrderDetail.tsx
+index 0cd97cf..21afcb4 100644
+--- a/webapp/src/pages/admin/OrderDetail.tsx
++++ b/webapp/src/pages/admin/OrderDetail.tsx
+@@ -43,7 +43,6 @@ interface OrderDetailData {
+   copiedFields: Record<string, boolean>;
+   series: { name: string; covered: boolean }[];
+   documents: { id: string; kind: string; title: string; createdAt: string }[];
+-  services: { id: string; type: string; status: string; llc_name: string }[];
+   hasArticles: boolean;
+   /** The client appointed us to sign the Articles: the Statement of
+    *  Authorized Representative is made when the Articles go up, and the
+diff --git a/webapp/src/pages/admin/ServiceOrdersSection.tsx b/webapp/src/pages/admin/ServiceOrdersSection.tsx
+index 57f03ce..609653b 100644
+--- a/webapp/src/pages/admin/ServiceOrdersSection.tsx
++++ b/webapp/src/pages/admin/ServiceOrdersSection.tsx
+@@ -72,11 +72,6 @@ const day = (iso: string | null) =>
+ 
+ 
+ 
+-/** The one-line name for a service order. The surrounding card or dialog
+- *  already names the LLC, so series names are shortened to their own part —
+- *  "Jimmy Flanagan, LLC - PS 3" reads "PS 3". Never truncated, only wrapped. */
+-
+-
+ /** The fulfill flow for one service order, opened from a company card. The
+  *  caller owns which order is being viewed; everything else — secret detail
+  *  fetch, attachment, the fulfill action — lives here. */
+diff --git a/webapp/src/pages/admin/serviceOrders.helpers.ts b/webapp/src/pages/admin/serviceOrders.helpers.ts
+index 8bd08a5..04a4c9c 100644
+--- a/webapp/src/pages/admin/serviceOrders.helpers.ts
++++ b/webapp/src/pages/admin/serviceOrders.helpers.ts
+@@ -2,13 +2,6 @@
+ // file exports only components (react-refresh) — split 29 Aug 2026.
+ import type { AdminServiceOrder } from "./ServiceOrdersSection";
+ 
+-export const money = (cents: number) => `$${(cents / 100).toFixed(2)}`;
+-export const STATUS_STYLE: Record<string, string> = {
+-  fulfilled: "bg-trust/10 text-trust",
+-  in_progress: "bg-amber-100 text-amber-900",
+-  awaiting_info: "bg-secondary text-muted-foreground",
+-  pending_payment: "bg-secondary text-muted-foreground",
+-};
+ export const serviceIsOpen = (s: AdminServiceOrder) => s.status === "awaiting_info" || s.status === "in_progress";
+ 
+ /** A service order bought AFTER the company was formed — a new order from an
+@@ -18,6 +11,9 @@ export const serviceIsOpen = (s: AdminServiceOrder) => s.status === "awaiting_in
+  *  still owing them stays in column two. */
+ export const boughtAfterFormation = (s: AdminServiceOrder, formedAt: string | null) =>
+   !!formedAt && serviceIsOpen(s) && new Date(s.created_at).getTime() > new Date(formedAt).getTime();
++/** The one-line name for a service order. The surrounding card or dialog
++ *  already names the LLC, so series names are shortened to their own part —
++ *  "Jimmy Flanagan, LLC - PS 3" reads "PS 3". Never truncated, only wrapped. */
+ export function serviceLabel(s: AdminServiceOrder, llcName: string, long = false): string {
+   const short = (name?: string) => {
+     if (!name) return "";
+diff --git a/webapp/src/pages/portal/OAQuestionnaire.tsx b/webapp/src/pages/portal/OAQuestionnaire.tsx
+index 6782f7f..46724aa 100644
+--- a/webapp/src/pages/portal/OAQuestionnaire.tsx
++++ b/webapp/src/pages/portal/OAQuestionnaire.tsx
+@@ -51,7 +51,6 @@ interface OaData {
+   version: string;
+   multiOwner: boolean;
+   memberManaged: boolean;
+-  blocked: boolean;
+   todayEastern: string;
+   templateVersion: string;
+   answers: Answers;
+@@ -122,7 +121,6 @@ export default function OAQuestionnaire() {
+         sElection: saved.sElection ?? false,
+         effectiveDate: saved.effectiveDate ?? data.todayEastern,
+         authorized: saved.authorized ?? false,
+-        contributionToCompany: saved.contributionToCompany ?? "",
+         multiOwner: saved.multiOwner ?? data.multiOwner,
+         // Once the client has edited the owners, the draft IS the list — it may
+         // be longer or shorter than the one captured at formation.
+diff --git a/webapp/src/pages/portal/PortalDashboard.tsx b/webapp/src/pages/portal/PortalDashboard.tsx
+index 5472374..07ceb36 100644
+--- a/webapp/src/pages/portal/PortalDashboard.tsx
++++ b/webapp/src/pages/portal/PortalDashboard.tsx
+@@ -47,10 +47,6 @@ interface Me {
+   email: string;
+   name: string;
+   pendingEmail: string | null;
+-  raCancellationRequestedAt: string | null;
+-  raRenewalDate?: string | null;
+-  /** True when a paid order took our registered agent service. */
+-  raService?: boolean;
+   viewingAsAdmin?: boolean;
+ }
+ 
+@@ -347,7 +343,6 @@ function RegisteredAgentCard({ company }: { company: CompanyInfo }) {
+   });
+ 
+   const requestedAt = company.raCancellationRequestedAt;
+-  const me = { raRenewalDate: company.raRenewalDate };
+ 
+   return (
+     <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card">
+@@ -378,7 +373,7 @@ function RegisteredAgentCard({ company }: { company: CompanyInfo }) {
+           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+             <div className="text-sm text-muted-foreground">
+               <p>
+-                {company.raEndedDate ? `Our registered-agent appointment ends on ${company.raEndedDate}.` : company.raAppointmentDate ? `Your registered agent service is active${me?.raRenewalDate ? ` and renews on ${new Date(`${me.raRenewalDate}T12:00:00`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}` : ""}.` : "Your appointment date has not yet been recorded. Your first service year begins when our appointment takes effect."} You may give cancellation notice here at any time. Give notice at least 30 days before renewal and provide replacement proof by renewal to avoid a resignation charge.
++                {company.raEndedDate ? `Our registered-agent appointment ends on ${company.raEndedDate}.` : company.raAppointmentDate ? `Your registered agent service is active${company.raRenewalDate ? ` and renews on ${new Date(`${company.raRenewalDate}T12:00:00`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}` : ""}.` : "Your appointment date has not yet been recorded. Your first service year begins when our appointment takes effect."} You may give cancellation notice here at any time. Give notice at least 30 days before renewal and provide replacement proof by renewal to avoid a resignation charge.
+               </p>
+               {/* The card kept for the renewal, or why none is (16 Sep 2026). */}
+               {company.cardStatus === "on_file" ? (
+diff --git a/webapp/src/pages/portal/oaTypes.ts b/webapp/src/pages/portal/oaTypes.ts
+index 1245405..3785cc5 100644
+--- a/webapp/src/pages/portal/oaTypes.ts
++++ b/webapp/src/pages/portal/oaTypes.ts
+@@ -13,7 +13,6 @@ export interface MemberAnswer {
+   percentage?: number;
+   numerator?: number;
+   denominator?: number;
+-  contribution?: string;
+   todBeneficiary?: string;
+   todBackup?: string;
+   /** A company or trust as owner signs through a person (Adam, 13 Sep 2026). */
+@@ -23,7 +22,6 @@ export interface MemberAnswer {
+ }
+ export interface SeriesAnswer {
+   purpose?: string;
+-  contribution?: string;
+   specialTerms?: string;
+ 
+ }
+@@ -34,7 +32,6 @@ export interface CoupleAnswer {
+   percentage?: number;
+   numerator?: number;
+   denominator?: number;
+-  contribution?: string;
+   todBeneficiary?: string;
+   todBackup?: string;
+ }
+@@ -59,7 +56,6 @@ export interface Answers {
+   multiOwner?: boolean;
+   effectiveDate?: string;
+   authorized?: boolean;
+-  contributionToCompany?: string;
+   members?: MemberAnswer[];
+   /** Who signs for each Manager that is a company, in the seed's manager order. */
+   managerSigners?: { name?: string; title?: string }[];

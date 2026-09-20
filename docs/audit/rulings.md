@@ -97,3 +97,5 @@ Adam. A new ruling is added the day it is given.
 - Ruling 54: "Batch 19: preserve the manager-managed Articles sentence and the office workflow that uses it; remove only the unused member-managed alternative. Adam clarified: “That is the language that will be added to the articles of a manager managed LLC. But we do that in the office”, then approved the clarified proposal with “Go. Approve all”."
 
 - Ruling 109: "Batch 19 review item 12: leave the internal fee grouping unchanged, as recommended in response to “Why does this matter?” and included in the clarified scope approved by “Go. Approve all”. No pricing or customer-facing fee change."
+
+- Ruling 187, part notify-options: "Batch 20 item 10: Leave the notification options unchanged. The server accepts them, tests exercise them, and the document-upload screen has a real notification checkbox. The proposed cleanup deletion is rejected."

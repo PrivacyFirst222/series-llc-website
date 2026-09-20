@@ -1209,13 +1209,14 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: The refusal is rendered inside the Services card (ServicesCard.tsx:252, 363, 416, 505), and the dashboard places Orders in progress above that card: PortalDashboard.tsx:747 `<OrdersInProgress …/>`, then :761 `<ServicesCard …/>`. The same wrong direction is at routes-portal.ts:2049 ("is already on order — see your orders below."), :2119-2120 and :2134 ("already ordered — see your orders below.").
   - Replace with: "You already have an S election order — see Orders in progress above." (and "— see Orders in progress above." at 2049, 2119, 2120, 2134)
   - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **158. [B132]** — **open**
+- **158. [B132]** — **implemented**
   - Client portal, registered agent card — the refusal when a company did not take our service — `webapp/server/routes-portal.ts:2584`
   - Reads: return c.json(err(`${order.llc_name} is its own registered agent; there is nothing to cancel.`, "NOT_OUR_SERVICE"), 400);
   - Claims: A company that did not take our service is its own registered agent.
   - True: The only other choice is SELF (validation.ts:15), under which the client names an individual — first and last name (validation.ts:223-232) — who accepts personally; the company is never its own agent. The sentence reaches the screen through PortalDashboard.tsx:426.
   - Replace with: return c.json(err(`${order.llc_name} did not take our registered agent service; there is nothing to cancel.`, "NOT_OUR_SERVICE"), 400);
   - Codex (housekeeping-only): routes-portal.ts:2584 calls a SELF-agent LLC its own agent, but SELF names an individual. Contrary to the finding’s delivery assertion, PortalDashboard.tsx:426 shows a generic cancellation error, so this exact server sentence is not currently shown.
+  - Fixed: batch 20 revision 1, commit , by Codex; protected by 2 assertion(s).
 - **159. [B133]** — **implemented**
   - Client portal, Services card — buying another series, the one refusal for every shape problem — `webapp/server/routes-portal.ts:1966`
   - Reads: if (!body.success) return c.json(err("A series identifier is required.", "INVALID_INPUT"), 400);
@@ -1254,7 +1255,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: The screen has no line for it: PortalDashboard.tsx:488-494 `deleteGeneration = useMutation({ mutationFn: (id) => api.delete(`/api/portal/oa/generations/${id}`), onSuccess: … })` has no onError, and nothing renders deleteGeneration.isError — a refused delete (or a lost connection) leaves the row in place with no message.
   - Replace with: In PortalDashboard.tsx add `onError: (e) => setDeleteError(e instanceof ApiError ? e.message : "We could not delete that agreement. Try again.")` and render it under the agreements list; and make the refusal say what it means: err("That agreement is no longer on your account.", "NOT_FOUND").
   - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **164. [B138]** — **date: implemented; blocked-field: open**
+- **164. [B138]** — **implemented**
   - Client portal, operating agreement questionnaire — the seed carries no Florida date for the effective-date box — `webapp/server/routes-portal.ts:1135`
   - Reads: return c.json({     data: {       seed,       version,       multiOwner,       memberManaged,       blocked: false,       templateVersion: OA_TEMPLATE_VERSION,       answers: savedAnswers,       generations,     },   });
   - Claims: Everything the questionnaire needs to open is here.
@@ -1262,13 +1263,15 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: Add `todayEastern: easternDateIso(),` to the data object and drop `blocked: false`; then OAQuestionnaire.tsx:57 and AmendAgreement.tsx:26 default from it.
   - Part "date" — implemented: The questionnaire seed carries todayEastern, so the questionnaire and amendment forms default from Florida's date. — same defect as 128 (florida-date)
   - Fixed (date): batch 10 revision 1, commit , by Codex; protected by 1 assertion(s).
-  - Part "blocked-field" — open: `blocked: false` is written and read nowhere; dropped from the response and the type.
+  - Part "blocked-field" — implemented: `blocked: false` is written and read nowhere; dropped from the response and the type.
+  - Fixed (blocked-field): batch 20 revision 1, commit , by Codex; protected by 2 assertion(s).
   - Former part "all" (retired by 001-part-level-links, now date, blocked-field): The whole finding.
-- **165. [A66h]** — **open** — housekeeping
+- **165. [A66h]** — **implemented** — housekeeping
   - Housekeeping: four contribution answer fields saved and never used; two account-route values nothing reads; S election deadline printed 03/21/2027 in one place (Adam's ported module).
   - Codex (disputed): The four obsolete contribution fields are present in oaTypes.ts and superseded by computeCapital in routes-portal.ts:1449-1479; account response fields are unused. However, the alleged printed “03/21/2027” is not present in product source and no file/line is supplied for it.
   - **Codex rejected the proposed replacement:** Retain the evidenced code-only fields as housekeeping; remove or locate and quote the purported deadline before proposing a correction. This compound item cannot be confirmed wholesale.
   - Corrected after Codex's review: The '03/21/2027' print exists nowhere in the product (searched src, server and docs). Keep the code-only fields.
+  - Fixed: batch 20 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **166. [B71]** — **implemented** — housekeeping
   - Client portal, questionnaire Ownership card, the Equal ownership button — `webapp/src/pages/portal/OwnershipEditor.tsx:82`
   - Reads: const ok = window.confirm(`${rows.length} owners can't split 100% evenly — 33.33 three times is 99.99. Use fractions instead (1/${rows.length} each)?`);
@@ -1285,13 +1288,14 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Codex (duplicate): Same unanimity-default defect as136, repeated in the OrdersInProgress.tsx:137 comment. The comment changes no reader-facing text.
   - Fixed: batch 15 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
-- **168. [B78]** — **open** — housekeeping
+- **168. [B78]** — **implemented** — housekeeping
   - Client portal, Sign in page and Reset page — code only — `webapp/src/pages/portal/PortalDashboard.tsx:45`
   - Reads: raCancellationRequestedAt: string | null; raRenewalDate?: string | null; raService?: boolean;
   - Claims: The dashboard reads these three fields from /api/auth/me.
   - True: Nothing reads them: RegisteredAgentCard takes CompanyInfo (:301-313, :320), and :335 builds a shim `const me = { raRenewalDate: company.raRenewalDate }` so the old `me?.raRenewalDate` reads at :367 and :404 still compile. The route still computes and sends them (routes-portal.ts:950-962).
   - Replace with: Drop the three fields from `Me`, delete the shim at :335, and read `company.raRenewalDate` at :367 and :404.
   - Codex (housekeeping-only): PortalDashboard.tsx:45-48 types three unused account RA values and :335 creates a shim from CompanyInfo; visible RA state already comes from the company. Removing the redundant fields/shim preserves displayed text.
+  - Fixed: batch 20 revision 1, commit , by Codex; protected by 3 assertion(s).
 - **169. [B79]** — **implemented** — housekeeping
   - Client portal, deleting a self-generated agreement — code only — `webapp/src/pages/portal/PortalDashboard.tsx:725`
   - Reads: const ok = window.confirm(
@@ -1299,7 +1303,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: webapp/CLAUDE.md (ux): 'Use Dialog/AlertDialog from shadcn/ui, not window.alert() or window.confirm().' The same file uses AlertDialog for the cancellation at :386-423.
   - Replace with: An AlertDialog with the two sentences at :727-728 and the actions 'Keep it' / 'Delete'.
   - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **170. [B139]** — **open** — housekeeping
+- **170. [B139]** — **implemented** — housekeeping
   - Server, portal routes — stale and misplaced comments — `webapp/server/routes-portal.ts:287`
   - Reads: // Who owns the company, as the client last said. … /** A person's printed legal name … */ /** Operating agreements a company may keep in its documents list. */ export const OA_KEEP_MAX = 5;
   - Claims: Each comment describes the declaration beneath it.
@@ -1307,6 +1311,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: Move each docstring to the declaration it describes; change :327 to "null when the text is not a date"; change :513-516 to "before the Social Security numbers are destroyed and the package replaced with a record copy"; delete :638-639; delete the office sentence at :803-805.
   - Codex (housekeeping-only): routes-portal.ts:287-295/327/513-516/638-639/701-702/800-805 contain the cited misplaced or stale comments; none of those comments is rendered.
   - **Codex rejected the proposed replacement:** Move the docstrings and correct null/obsolete office handling as proposed, but describe deletion of the live SSN field rather than implying destruction of every retained copy.
+  - Fixed: batch 20 revision 1, commit , by Codex; protected by 3 assertion(s).
 - **N1.04. [substantive]** — **implemented**
   - S-election package, company address on Form2553 and its record copy — `webapp/server/routes-portal.ts:828`
   - Reads: const seed = await oaSeed(so.client_id);
@@ -1525,23 +1530,29 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - True: No year: an S election order viewed a year on (the SSNs are gone at 14 days but the row stays, :186-187) reads 'Placed: Sep 5' whichever year it was. AdminDashboard.tsx:226-227's `day` prints the year.
   - Replace with: { month: "short", day: "numeric", year: "numeric" }
   - Fixed: batch 10 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **187. [A79h]** — **open** — housekeeping
+- **187. [A79h]** — **comments: implemented; unused-fields: implemented; unused-helpers: implemented; dead-branches: implemented; notify-options: open** — housekeeping
   - Housekeeping: eleven misplaced or stale comments; three unused board fields; two unused helpers; dead branches; unreachable notify options.
   - Codex (housekeeping-only): The cited family contains real code-only issues: AdminDashboard.tsx:497 constant sortable, OrderBoard.tsx unused declarations, OrderDetail.tsx:45 unused services, serviceOrders.helpers.ts unused exports, and orphan ServiceOrdersSection.tsx:74-77 comment.
   - **Codex rejected the proposed replacement:** Do not certify the summary’s exact eleven/three counts: raw bucket4 itself identifies five unused board fields, and gives no complete eleven-comment list. Remove only enumerated, verified unused code; reader-facing defects are separately assessed.
-  - Part "comments" — open: Eleven misplaced or stale comments in the office code.
-  - Part "unused-fields" — open: The unused board and drawer fields and the columns and subquery that feed them. An intentional work bundle: 190 (five board fields) and 191 (the drawer's services field) are distinct repairs done together.
-  - Part "unused-helpers" — open: The two unused helpers in serviceOrders.helpers.ts.
-  - Part "dead-branches" — open: The dead branches behind a constant that is always true.
+  - Ruling, 2026-09-20 (notify-options): Batch 20 item 10: Leave the notification options unchanged. The server accepts them, tests exercise them, and the document-upload screen has a real notification checkbox. The proposed cleanup deletion is rejected.
+  - Part "comments" — implemented: Eleven misplaced or stale comments in the office code.
+  - Fixed (comments): batch 20 revision 1, commit , by Codex; protected by 3 assertion(s).
+  - Part "unused-fields" — implemented: The unused board and drawer fields and the columns and subquery that feed them. An intentional work bundle: 190 (five board fields) and 191 (the drawer's services field) are distinct repairs done together.
+  - Fixed (unused-fields): batch 20 revision 1, commit , by Codex; protected by 3 assertion(s).
+  - Part "unused-helpers" — implemented: The two unused helpers in serviceOrders.helpers.ts.
+  - Fixed (unused-helpers): batch 20 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Part "dead-branches" — implemented: The dead branches behind a constant that is always true.
+  - Fixed (dead-branches): batch 20 revision 1, commit , by Codex; protected by 2 assertion(s).
   - Part "notify-options" — open: The unreachable notify options.
   - Former part "all" (retired by 001-part-level-links, now comments, unused-fields, unused-helpers, dead-branches, notify-options): The whole finding.
-- **188. [B90]** — **open** — housekeeping; same defect as 187 (dead-branches)
+- **188. [B90]** — **implemented** — housekeeping; same defect as 187 (dead-branches)
   - Office, both client tabs — code only — `webapp/src/pages/admin/AdminDashboard.tsx:497`
   - Reads: const sortable = true;
   - Claims: —
   - True: A constant that is always true: the `: (` branches at :511-513 (plain heading) and :525 (no search box) can never render.
   - Replace with: Delete the constant and the two dead branches.
   - Codex (duplicate): Same dead sortable branch already included in187/A79h; AdminDashboard.tsx:497 assigns true unconditionally, leaving the alternate header/search branches unreachable.
+  - Fixed: batch 20 revision 1, commit , by Codex; protected by 2 assertion(s).
 - **189. [B92]** — **open** — housekeeping
   - Office, the order board — code only — `webapp/src/pages/admin/OrderBoard.tsx:258`
   - Reads: for (const o of orders) { if (o.client_id && !newestByClient.has(o.client_id)) newestByClient.set(o.client_id, o.id); }
@@ -1550,34 +1561,38 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: for (const o of orders) { if (o.status !== "pending_payment" && o.client_id && !newestByClient.has(o.client_id)) newestByClient.set(o.client_id, o.id); }
   - Codex (disputed): OrderBoard.tsx:258-260 does not exclude pending_payment, but the claimed normal abandoned checkout cannot carry this client_id: routes-payments.ts:367-385 inserts the pending order without client_id and :83 links it only after successful payment. The finding assumes an unsupported database state.
   - Corrected after Codex's review: A pending order carries no client until payment, so the scenario needs malformed data. Harmless defensive housekeeping.
-- **190. [B93]** — **open** — housekeeping; same defect as 187 (unused-fields)
+- **190. [B93]** — **implemented** — housekeeping; same defect as 187 (unused-fields)
   - Office, the order board — code only — `webapp/src/pages/admin/OrderBoard.tsx:19`
   - Reads: total_cents: number; created_at: string; paid_at: string | null; filed_at: string | null; … ein_purchased: boolean; … ein_outstanding: boolean;
   - Claims: —
   - True: total_cents, paid_at, filed_at, ein_purchased and ein_outstanding each appear exactly once in the file (their declaration); the board renders none of them, and routes-admin.ts:215-223 computes ein_outstanding with a subquery for nothing. A79h counted three; there are five.
   - Replace with: Drop the five fields from BoardOrder and the matching columns/subquery from the /admin/orders SELECT, or use them.
   - Codex (duplicate): Same unused board fields already included in187/A79h (raw bucket4 explicitly lists all five); the narrower finding corrects the summary’s three-versus-five count.
-- **191. [B94]** — **open** — housekeeping; same defect as 187 (unused-fields)
+  - Fixed: batch 20 revision 1, commit , by Codex; protected by 3 assertion(s).
+- **191. [B94]** — **implemented** — housekeeping; same defect as 187 (unused-fields)
   - Office, the order drawer — code only — `webapp/src/pages/admin/OrderDetail.tsx:45`
   - Reads: services: { id: string; type: string; status: string; llc_name: string }[];
   - Claims: —
   - True: `d.services` is never read; the drawer's service rows come from the `services` prop (:251, :834). The route still assembles the array.
   - Replace with: Drop the field from OrderDetailData and from the route's response.
   - Codex (duplicate): Same unused OrderDetailData.services already included in187/A79h raw bucket4; the component renders its services prop instead.
-- **192. [B95]** — **open** — housekeeping; same defect as 187 (unused-helpers)
+  - Fixed: batch 20 revision 1, commit , by Codex; protected by 3 assertion(s).
+- **192. [B95]** — **implemented** — housekeeping; same defect as 187 (unused-helpers)
   - Office, service-order helpers — code only — `webapp/src/pages/admin/serviceOrders.helpers.ts:5`
   - Reads: export const money = (cents: number) => `$${(cents / 100).toFixed(2)}`; export const STATUS_STYLE: Record<string, string> = { … };
   - Claims: —
   - True: Neither is imported anywhere under webapp/src (the three importers take boughtAfterFormation, serviceIsOpen, serviceLabel, summaryOf). `money` here prints '$50.00' while the portal's money (services.helpers.ts:15-17) prints '$50' — a second format for one price, unused.
   - Replace with: Delete both exports.
   - Codex (duplicate): Same unused money and STATUS_STYLE exports already included in187/A79h; the actual importers take the other helpers.
-- **193. [B97]** — **open** — housekeeping; same defect as 187 (comments)
+  - Fixed: batch 20 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **193. [B97]** — **implemented** — housekeeping; same defect as 187 (comments)
   - Office, the Fulfil dialog — code only — `webapp/src/pages/admin/ServiceOrdersSection.tsx:74`
   - Reads: /** The one-line name for a service order. The surrounding card or dialog already names the LLC, so series names are shortened to their own part — "Jimmy Flanagan, LLC - PS 3" reads "PS 3". Never truncated, only wrapped. */
   - Claims: Documents the function beneath it.
   - True: Nothing is beneath it: serviceLabel moved to serviceOrders.helpers.ts:21 on 29 Aug 2026 and the comment stayed. Counted in A79h.
   - Replace with: Delete lines 74-77 (or move the comment above serviceLabel in serviceOrders.helpers.ts).
   - Codex (duplicate): Same orphan serviceLabel docstring already counted in187/A79h, as this finding itself notes.
+  - Fixed: batch 20 revision 1, commit , by Codex; protected by 3 assertion(s).
 - **N1.03. [substantive]** — **implemented**
   - Office, fulfilling an S-election package manually; client record-copy retention — `webapp/server/routes-admin.ts:1372`
   - Reads: await db.query(
@@ -1817,27 +1832,30 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Replace with: Publish the manual on first boot when no 'owners-manual' row exists (call refreshOwnersManual(false) from the cron and from app start), or word it 'will be in your portal's library'.
   - **Codex rejected the proposed replacement:** Ensure an awaited successful publication before the first welcome or state availability only after checking the library. An unawaited app-start call or unconditional will-be promise does not establish availability.
   - Fixed: batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **220. [B109]** — **open** — housekeeping
+- **220. [B109]** — **implemented** — housekeeping
   - 'About the card you paid with' email (prepaid gift card), the renewal date in parentheses — `webapp/server/email.ts:107`
   - Reads: Before your renewal date${renewalDate ? ` (${escapeHtml(renewalDate)})` : ""} you will receive an email with a payment link.
   - Claims: The date can be shown.
   - True: The email is sent from saveRenewalCard at payment (routes-payments.ts:66), and renewals.ts:108-109 reads ra_renewal_date then — but the date is written only at formation (routes-admin.ts:862), so it is always NULL here and the parenthesis never prints. Dead branch; the sentence without the date is true.
   - Replace with: Drop the renewalDate parameter (renewals.ts:108-109, email.ts:99, :107), or send the gift-card email at formation when the date exists.
   - Codex (housekeeping-only): saveRenewalCard reads ra_renewal_date at renewals.ts:108–109 during initial payment, before the formation upload sets it; the optional date parameter changes no currently emitted initial-payment email. fulfillPaidRenewal uses saveCardFromPayment directly, not this gift-card email.
-- **221. [B110]** — **open** — housekeeping
+  - Fixed: batch 20 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **221. [B110]** — **implemented** — housekeeping
   - Registered agent renewal paid through its payment link — where the client lands afterwards — `webapp/server/renewals.ts:164`
   - Reads: redirectUrl: `${env.PUBLIC_BASE_URL}/portal?renewed=${row.id}`,
   - Claims: The portal will acknowledge the payment.
   - True: Nothing in webapp/src reads a `renewed` query parameter (grep of src for 'renewed': no matches); the client lands on the plain portal and the only acknowledgment is the receipt email (renewals.ts:308-309).
   - Replace with: Either read `renewed` on the portal and show 'Thank you — your registered agent service is renewed through [date]' on the Registered agent service card, or redirect to `/portal` and drop the parameter.
   - Codex (housekeeping-only): renewals.ts:164 appends renewed=<id>; the portal does not consume it. The query parameter itself promises no acknowledgment to a reader, who still receives a receipt email.
-- **222. [B115]** — **open** — housekeeping
+  - Fixed: batch 20 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **222. [B115]** — **implemented** — housekeeping
   - Office order drawer query — `webapp/server/routes-admin.ts:359`
   - Reads: SELECT *, rejected_at, ra_renewal_date FROM orders WHERE id = $1
   - Claims: Nothing a reader sees.
   - True: `*` already returns rejected_at and ra_renewal_date; the two names are redundant.
   - Replace with: SELECT * FROM orders WHERE id = $1
   - Codex (housekeeping-only): routes-admin.ts:359 selects *, rejected_at, ra_renewal_date; * already includes the two named columns and no reader-visible value changes.
+  - Fixed: batch 20 revision 1, commit , by Codex; protected by 2 assertion(s).
 - **223. [B117]** — **implemented** — housekeeping
   - Nightly database backup — what it contains — `webapp/server/backup.ts:17`
   - Reads: export const BACKUP_TABLES = ["clients", "orders", "service_orders", "documents", "oa_profiles", "oa_generations", "library_documents", "webhook_events", "fl_sync_state", "contact_messages"] as const;
@@ -1870,13 +1888,14 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - **Codex rejected the proposed replacement:** Document both lifetimes and require migration/re-encryption of ALL live encrypted secrets before key retirement; pending EIN secrets and retained S-election secrets both matter.
   - Corrected after Codex's review: Pending EIN secrets matter as well as the 14-day S election window. Rotate only when no encrypted secret of either kind is live, or re-encrypt first.
   - Fixed: batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **227. [B121]** — **open** — housekeeping
+- **227. [B121]** — **implemented** — housekeeping
   - Environment notes — `webapp/server/env.ts:35`
   - Reads: /** Shared secret for the daily purge cron. Required in production. */
   - Claims: One cron uses it.
   - True: Six do: /cron/ra-renewals, /cron/library-refresh, /cron/sunbiz-sync, /cron/purge, /cron/db-backup, /cron/file-mirror (routes-ops.ts:257-328; vercel.json crons).
   - Replace with: /** Shared secret for the nightly crons (renewals, library refresh, Sunbiz sync, purge, backup, mirror). Required in production. */
   - Codex (housekeeping-only): env.ts:35 describes CRON_SECRET as the daily purge secret; routes-ops.ts:257–328 uses it for six jobs. The original description is incomplete rather than exclusive, and no reader-facing text changes.
+  - Fixed: batch 20 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **228. [B122]** — **open** — housekeeping; same defect as 127
   - Taxation label helper (the label A59 says disagrees with the portal pill) — `webapp/server/datetime.ts:44`
   - Reads: if (version === "single-s" || version === "member-single-s") return "Single-Member S Corporation";
@@ -2345,13 +2364,14 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: A professional LLC may admit any chosen beneficiary after agreement to be bound, without a professional-eligibility qualification.
   - True: oa.ts:389–397 changes only professional cover/preamble/recital; it leaves the ordinary admission and transfer clauses unchanged. 2026 §§621.09(2),621.11(2) restrict membership/transfers to eligible licensed individuals or professional entities;621.08 also limits the business purpose despite the ordinary §1.4 any-lawful-business wording. Entirechapter opened: https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0621/0621.html
   - Replace with: For a professional limited liability company, every transfer and admission under this Agreement, including a transfer on death, is subject to Chapter 621, Florida Statutes. A proposed recipient may be admitted only if eligible under s. 621.09(2), and no transfer may violate s. 621.11(2). The Company's business is limited as s. 621.08 requires, notwithstanding the general-purpose wording of Section 1.4.
-- **N2.23. [housekeeping]** — **open** — housekeeping
+- **N2.23. [housekeeping]** — **implemented** — housekeeping
   - Statement generator, source comment — webapp/server/statement.ts:7 — `webapp/server/statement.ts:7`
   - Reads:  * carries every word; this fills its six slots and nothing else.
   - Claims: The template has six distinct slots.
   - True: The master uses seven distinct placeholders: COMPANY NAME, DOCUMENT NUMBER, SIGNATURE, SIGNER NAME, SIGNER TITLE, DATE and EDITION. statement.ts fills all seven correctly.
   - Replace with:  * carries every word; this fills its seven slots and nothing else.
-- **N2.24. [housekeeping]** — **open** — housekeeping
+  - Fixed: batch 20 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **N2.24. [housekeeping]** — **implemented** — housekeeping
   - PDF generator, encryption source comment — webapp/server/pdf-render.ts:636 — `webapp/server/pdf-render.ts:636`
   - Reads:       // The library's writer encrypts STREAMS only, never strings, so any Info
   -       // metadata in an encrypted document is written plaintext into a file
@@ -2364,6 +2384,7 @@ A status reads: open → assigned (to a batch) → implemented → accepted (by 
   - Claims: Encrypted documents carry no Info metadata dictionary.
   - True: The later implementation at654 calls setMeta and655 encryptStrings; setMeta545–550 writes title/author/subject/producer/date. The older comment says the opposite of the code below it.
   - Replace with: // Metadata strings are encrypted with the other indirect-object strings below, so the encrypted PDF can retain its Info dictionary.
+  - Fixed: batch 20 revision 1, commit , by Codex; protected by 1 assertion(s).
 - **N2.25. [substantive]** — **implemented** — waits on Adam's ruling
   - Operating Agreement Instructions, optional deadlock provision (§5(c)) — docs/oa-instructions.md:63 — `docs/oa-instructions.md:63`
   - Reads: **(c) Deadlock Buy-Sell ("Shotgun") — §13.2.** For companies that can split 50/50 (two equal owners, or two equal factions), a deadlock otherwise has no exit short of a lawsuit to dissolve the company. The shotgun works like cutting a cake: after a 60-day deadlock, either substantial owner may name a single price for the whole company; the *other* side then chooses whether to buy or sell at that price. Naming the price honestly is self-enforcing — name it too low and you get bought out cheap; too high and you overpay. **Caution:** the mechanism favors the owner with more cash, since the poorer side may be forced to sell even at a fair price. To omit it, replace the text of §13.2 with "[Reserved.]". Omit it if ownership is not evenly split (a majority can always outvote a deadlock) or if the owners' finances are badly mismatched.

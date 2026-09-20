@@ -18,15 +18,10 @@ export interface BoardOrder {
   contact_email: string;
   llc_name: string;
   status: string;
-  total_cents: number;
   created_at: string;
-  paid_at: string | null;
-  filed_at: string | null;
   formed_at: string | null;
   series_count: number;
-  ein_purchased: boolean;
   ra_service: boolean;
-  ein_outstanding: boolean;
   cert_status_purchased: boolean;
   certified_copy_purchased: boolean;
   cert_status_uploaded: boolean;

@@ -43,7 +43,6 @@ interface OrderDetailData {
   copiedFields: Record<string, boolean>;
   series: { name: string; covered: boolean }[];
   documents: { id: string; kind: string; title: string; createdAt: string }[];
-  services: { id: string; type: string; status: string; llc_name: string }[];
   hasArticles: boolean;
   /** The client appointed us to sign the Articles: the Statement of
    *  Authorized Representative is made when the Articles go up, and the

@@ -4,7 +4,7 @@
  * appointed us to sign and file their Articles under s. 605.0102(8)(a), so a
  * bank reading the public record can see why the name on the Articles is not
  * a member's. The master, templates-statement-of-authorized-representative.md,
- * carries every word; this fills its six slots and nothing else.
+ * carries every word; this fills its seven slots and nothing else.
  */
 import { readFileSync } from "node:fs";
 import statementRaw from "./templates-statement-of-authorized-representative.md";

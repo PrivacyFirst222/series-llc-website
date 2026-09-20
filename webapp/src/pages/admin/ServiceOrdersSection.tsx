@@ -72,11 +72,6 @@ const day = (iso: string | null) =>
 
 
 
-/** The one-line name for a service order. The surrounding card or dialog
- *  already names the LLC, so series names are shortened to their own part —
- *  "Jimmy Flanagan, LLC - PS 3" reads "PS 3". Never truncated, only wrapped. */
-
-
 /** The fulfill flow for one service order, opened from a company card. The
  *  caller owns which order is being viewed; everything else — secret detail
  *  fetch, attachment, the fulfill action — lives here. */

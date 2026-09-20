@@ -194,7 +194,6 @@ export const oaAnswersSchema = z.object({
   multiOwner: z.boolean().optional(),
   effectiveDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   authorized: z.boolean().optional(),
-  contributionToCompany: z.string().max(300).optional(),
   ownershipMode: z.enum(["percent", "fraction"]).optional(),
   members: z
     .array(
@@ -207,7 +206,6 @@ export const oaAnswersSchema = z.object({
         percentage: z.number().min(0).max(100).optional(),
         numerator: z.number().int().min(0).max(100_000).optional(),
         denominator: z.number().int().min(1).max(100_000).optional(),
-        contribution: z.string().max(300).optional(),
         // Any person or entity (s. 4.11), so no person-name rule (13 Sep 2026).
         todBeneficiary: z.string().max(300).optional(),
         // A backup may be a class ("my children in equal shares"), so no name rule.
@@ -227,7 +225,6 @@ export const oaAnswersSchema = z.object({
     .array(
       z.object({
         purpose: z.string().max(300).optional(),
-        contribution: z.string().max(300).optional(),
         specialTerms: z.string().max(2000).optional(),
       }),
     )
@@ -261,7 +258,6 @@ export const oaAnswersSchema = z.object({
         percentage: z.number().min(0).max(100).optional(),
         numerator: z.number().int().min(0).max(100_000).optional(),
         denominator: z.number().int().min(1).max(100_000).optional(),
-        contribution: z.string().max(300).optional(),
         // Any person or entity (s. 4.11), so no person-name rule (13 Sep 2026).
         todBeneficiary: z.string().max(300).optional(),
         // A backup may be a class ("my children in equal shares"), so no name rule.
@@ -302,19 +298,12 @@ export const SPOUSAL_FORM_LABEL: Record<"TBE" | "JTWROS", string> = {
   JTWROS: "joint tenants with right of survivorship",
 };
 
-// Who owns the company, as the client last said. The intake list is only the
-// starting point: member-managed filings list members as AMBR, and an owner
-// who is also a manager may appear as MGR. Current answers do not amend that
-// public filing; inaccurate filed information needs an appropriate correction. An
-// untouched draft carries shares but no names, which is how the two are told
-// apart. Every document that names the owners resolves them HERE — otherwise
-// two documents generated the same afternoon disagree about who owns the company.
-/** A person's printed legal name, suffix set off by a comma — the form's
- *  fullPersonName, server-side. Exhibit A and the signature blocks print
- *  this verbatim, so "John Smith, Jr." must survive the whole path. */
 /** Operating agreements a company may keep in its documents list. */
 export const OA_KEEP_MAX = 5;
 
+/** A person's printed legal name, suffix set off by a comma — the form's
+ *  fullPersonName, server-side. Exhibit A and the signature blocks print
+ *  this verbatim, so "John Smith, Jr." must survive the whole path. */
 export function personLegalName(first?: string, last?: string, suffix?: string): string {
   const base = [first, last].map((s) => (s ?? "").trim()).filter(Boolean).join(" ");
   const sfx = (suffix ?? "").trim().replace(/^,\s*/, "");
@@ -322,6 +311,13 @@ export function personLegalName(first?: string, last?: string, suffix?: string):
   return sfx ? `${base}, ${sfx}` : base;
 }
 
+// Who owns the company, as the client last said. The intake list is only the
+// starting point: member-managed filings list members as AMBR, and an owner
+// who is also a manager may appear as MGR. Current answers do not amend that
+// public filing; inaccurate filed information needs an appropriate correction. An
+// untouched draft carries shares but no names, which is how the two are told
+// apart. Every document that names the owners resolves them HERE — otherwise
+// two documents generated the same afternoon disagree about who owns the company.
 export function effectiveOwners(
   seedMembers: { name: string; address: string }[],
   answers: { members?: { name?: string; address?: string }[] } | null | undefined,
@@ -343,7 +339,7 @@ export async function savedOaAnswers(clientId: string, orderId?: string | null):
   return (typeof raw === "string" ? JSON.parse(raw) : raw) as z.infer<typeof oaAnswersSchema>;
 }
 
-/** "August 5, 2026" → "2026-08-05"; "" when the text is not a date. */
+/** "August 5, 2026" → "2026-08-05"; null when the text is not a date. */
 export function isoFromPrinted(printed: string): string | null {
   const m = printed.trim().match(/^([A-Za-z]+) (\d{1,2}), (\d{4})$/);
   if (!m) return null;
@@ -529,10 +525,8 @@ export async function sElectionEligibility(clientId: string, orderId?: string | 
   return { eligible: true, reason: "ok", orderBy: orderBy.toISOString(), formationPaidAt: paidAt.toISOString() };
 }
 
-/** How long a client may edit and re-download the S election package before we
- *  destroy it. The package IS the clients' copy of Form 2553, complete with
- *  every owner's Social Security number, so it does not live here longer than
- *  it has to. */
+/** The editing window after fulfillment. Questionnaire numbers are purged
+ *  afterward; the encrypted delivered document remains until the client deletes it. */
 export const S_ELECTION_EDIT_DAYS = 14;
 
 export interface SElectionStoredDetails {
@@ -582,8 +576,6 @@ export async function purgeExpiredSElections(): Promise<number> {
  *  name SPLIT (first/middle/last/suffix) — the responsible party is the
  *  person who owns or controls the LLC, typically its manager (SS-4
  *  instructions, "Responsible party defined"). */
-/** The client's answer that the LLC already has an EIN: nothing else is
- *  needed, and no application is made. */
 export const einDetailsSchema = z
   .object({
     responsibleFirst: z.string().min(1, "The responsible party's first name is required.").max(100),
@@ -645,8 +637,6 @@ export const einDetailsSchema = z
     message: "Tell us which of the special activities applies.",
   });
 
-/** irs.gov, "Valid EINs": every prefix an IRS campus, the online
- *  application, or the SBA has ever assigned. Anything else is a typo. */
 /** The EIN we obtained for the company, typed by the office with the CP 575
  *  letter (Adam, 7 Sep 2026: "there should be a field to enter it so it gets
  *  added to the 2553"). Null until an EIN order for the company itself is
@@ -756,12 +746,6 @@ export const sElectionDetailsSchema = z
     message: "Ownership percentages must total exactly 100%.",
   });
 
-/** Build the Form 2553 package from the stored details and the office's
- *  formation date, post it to the client's documents (replacing an earlier
- *  copy), mark the order fulfilled — which starts the two-week clock — and
- *  tell the client it is ready. Shared by the client's submission (when the
- *  date is already on file, i.e. an edit inside the window) and by the
- *  office entering the date. */
 /** The formation date is the default for the election's effective date and
  *  for each owner's acquisition date wherever the client left them blank.
  *  The blanks stay blank in what is stored, so a later correction of the
@@ -774,6 +758,10 @@ export function withFormationDefaults(d: SElectionStoredDetails): { effectiveDat
   };
 }
 
+/** Build and post the encrypted Form 2553 package, replacing its prior copy,
+ *  and notify the client. Shared by client submission, office date correction,
+ *  and completion after the company EIN arrives. The first fulfillment starts
+ *  the editing window; rebuilding does not extend it. */
 export async function postSElectionPackage(args: {
   so: { id: string; client_id: string; llc_name: string };
   merged: SElectionStoredDetails;
@@ -894,8 +882,8 @@ app.get("/auth/me", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const db = await getDb();
-  const rows = await db.query<{ email: string; name: string; pending_email: string | null; ra_cancellation_requested_at: string | null }>(
-    "SELECT email, name, pending_email, ra_cancellation_requested_at FROM clients WHERE id = $1",
+  const rows = await db.query<{ email: string; name: string; pending_email: string | null }>(
+    "SELECT email, name, pending_email FROM clients WHERE id = $1",
     [session.clientId],
   );
   return c.json({
@@ -903,17 +891,6 @@ app.get("/auth/me", async (c) => {
       email: rows[0]?.email ?? "",
       name: rows[0]?.name ?? "",
       pendingEmail: rows[0]?.pending_email ?? null,
-      raCancellationRequestedAt: rows[0]?.ra_cancellation_requested_at ?? null,
-      // The registered-agent renewal date, from the newest formed order that
-      // took our service (14 Sep 2026).
-      raRenewalDate: await db
-        .query<{ ra_renewal_date: unknown }>("SELECT ra_renewal_date FROM orders WHERE client_id = $1 AND ra_renewal_date IS NOT NULL ORDER BY formed_at DESC NULLS LAST LIMIT 1", [session.clientId])
-        .then((r) => (r[0]?.ra_renewal_date ? isoDate(r[0].ra_renewal_date) : null)),
-      // Whether any paid order took our registered agent service: the agent
-      // card is shown only then (14 Sep 2026: every client saw it).
-      raService: await db
-        .query<{ payload: unknown }>("SELECT payload FROM orders WHERE client_id = $1 AND status <> 'pending_payment'", [session.clientId])
-        .then((rows) => rows.some((r) => ((typeof r.payload === "string" ? JSON.parse(r.payload) : r.payload) as { registeredAgent?: { choice?: string } } | null)?.registeredAgent?.choice === "SERVICE")),
       // The portal shows a banner and an Exit when the admin is looking.
       viewingAsAdmin: session.viewingAsAdmin,
     },
@@ -1113,7 +1090,6 @@ app.get("/portal/oa", async (c) => {
       version,
       multiOwner,
       memberManaged,
-      blocked: false,
       todayEastern: easternDateIso(),
       templateVersion: OA_TEMPLATE_VERSION,
       answers: savedAnswers,
@@ -1334,7 +1310,7 @@ app.post("/portal/oa/generate", async (c) => {
         percentage: shareValue(ownershipMode, cplShare),
         percentageLabel: shareLabel(ownershipMode, cplShare),
         jointHolding: SPOUSAL_FORM_LABEL[cpl.form],
-        contribution: cpl.contribution ?? "",
+        contribution: "", // Filled from the asset list below.
         // The "last surviving spouse" words are Exhibit A's own row now.
         todBeneficiary: cpl.todBeneficiary ?? "",
         todBackup: cpl.todBackup ?? "",
@@ -1364,7 +1340,7 @@ app.post("/portal/oa/generate", async (c) => {
         address: m.address,
         percentage: shareValue(multiOwner ? ownershipMode : "percent", mShare),
         percentageLabel: shareLabel(multiOwner ? ownershipMode : "percent", mShare),
-        contribution: ans?.contribution ?? "",
+        contribution: "", // Filled from the asset list below.
         // Only an individual may designate (s. 4.11): a company or trust
         // prints None whatever was typed.
         todBeneficiary: isEntity ? "" : ans?.todBeneficiary ?? "",
@@ -2606,7 +2582,7 @@ app.post("/portal/registered-agent/cancel", async (c) => {
   if (!order) return c.json(err("No company found on your account.", "NO_LLC"), 400);
   const tookService = ((typeof order.payload === "string" ? JSON.parse(order.payload) : order.payload) as { registeredAgent?: { choice?: string } } | null)?.registeredAgent?.choice === "SERVICE";
   if (!tookService) {
-    return c.json(err(`${order.llc_name} is its own registered agent; there is nothing to cancel.`, "NOT_OUR_SERVICE"), 400);
+    return c.json(err(`${order.llc_name} did not take our registered agent service; there is nothing to cancel.`, "NOT_OUR_SERVICE"), 400);
   }
   if (order.ra_cancellation_requested_at) {
     return c.json({ data: { raCancellationRequestedAt: order.ra_cancellation_requested_at } });

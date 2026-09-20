@@ -9356,14 +9356,46 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T16:31:06.963Z",
+              "event": "assigned",
+              "batch": "20",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T16:36:35.469Z",
+              "event": "implemented",
+              "batch": "20",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "20",
+          "fix": {
+            "batch": "20",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/server/routes-portal.ts",
+                "text": "${order.llc_name} did not take our registered agent service; there is nothing to cancel."
+              },
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "RA cancel for a company that is its own agent is refused by name"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -9722,14 +9754,45 @@
         {
           "key": "blocked-field",
           "scope": "`blocked: false` is written and read nowhere; dropped from the response and the type.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-18T03:48:21.611Z",
               "event": "recorded by migration 001-part-level-links"
+            },
+            {
+              "at": "2026-09-20T16:31:06.963Z",
+              "event": "assigned",
+              "batch": "20",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T16:36:35.469Z",
+              "event": "implemented",
+              "batch": "20",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "20",
+          "fix": {
+            "batch": "20",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "absent",
+                "text": "blocked: false,"
+              },
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "OA seed routes to member-managed (no longer blocked)"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -9771,14 +9834,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T16:31:06.963Z",
+              "event": "assigned",
+              "batch": "20",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T16:36:35.469Z",
+              "event": "implemented",
+              "batch": "20",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "20",
+          "fix": {
+            "batch": "20",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch20 165: asset contributions survive removal of obsolete answer fields"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -9941,14 +10031,50 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T16:31:06.963Z",
+              "event": "assigned",
+              "batch": "20",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T16:36:35.469Z",
+              "event": "implemented",
+              "batch": "20",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "20",
+          "fix": {
+            "batch": "20",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/server/routes-portal.ts",
+                "text": "SELECT email, name, pending_email FROM clients WHERE id = $1"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/src/pages/portal/PortalDashboard.tsx",
+                "text": "interface Me {\n  email: string;\n  name: string;\n  pendingEmail: string | null;\n  viewingAsAdmin?: boolean;\n}"
+              },
+              {
+                "kind": "absent",
+                "text": "const me = { raRenewalDate: company.raRenewalDate };"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -10028,14 +10154,51 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T16:31:06.963Z",
+              "event": "assigned",
+              "batch": "20",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T16:36:35.469Z",
+              "event": "implemented",
+              "batch": "20",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "20",
+          "fix": {
+            "batch": "20",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/server/routes-portal.ts",
+                "text": "null when the text is not a date. */"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/server/routes-portal.ts",
+                "text": " *  afterward; the encrypted delivered document remains until the client deletes it. */"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/server/routes-portal.ts",
+                "text": " *  the editing window; rebuilding does not extend it. */\nexport async function postSElectionPackage("
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -11089,50 +11252,180 @@
         {
           "key": "comments",
           "scope": "Eleven misplaced or stale comments in the office code.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-18T03:48:21.611Z",
               "event": "recorded by migration 001-part-level-links"
+            },
+            {
+              "at": "2026-09-20T16:31:06.963Z",
+              "event": "assigned",
+              "batch": "20",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T16:36:35.469Z",
+              "event": "implemented",
+              "batch": "20",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "20",
+          "fix": {
+            "batch": "20",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/server/routes-admin.ts",
+                "text": "/** Record that the office sent the Articles to the Division. */\napp.post(\"/admin/orders/:id/filed\","
+              },
+              {
+                "kind": "present",
+                "file": "webapp/server/routes-admin.ts",
+                "text": " *  its document id and storage key; callers validate the document number first. */\nasync function issueStatement("
+              },
+              {
+                "kind": "present",
+                "file": "webapp/src/pages/admin/serviceOrders.helpers.ts",
+                "text": " *  \"Jimmy Flanagan, LLC - PS 3\" reads \"PS 3\". Never truncated, only wrapped. */\nexport function serviceLabel"
+              }
+            ]
+          }
         },
         {
           "key": "unused-fields",
           "scope": "The unused board and drawer fields and the columns and subquery that feed them. An intentional work bundle: 190 (five board fields) and 191 (the drawer's services field) are distinct repairs done together.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-18T03:48:21.611Z",
               "event": "recorded by migration 001-part-level-links"
+            },
+            {
+              "at": "2026-09-20T16:31:06.963Z",
+              "event": "assigned",
+              "batch": "20",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T16:36:35.469Z",
+              "event": "implemented",
+              "batch": "20",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "20",
+          "fix": {
+            "batch": "20",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "absent",
+                "text": "ein_outstanding"
+              },
+              {
+                "kind": "absent",
+                "text": "ein_purchased"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/src/pages/admin/OrderDetail.tsx",
+                "text": "interface OrderDetailData {\n  id: string;\n  clientId: string | null;\n  /** A conversion designates series for a company already on file. */\n  filingPath: \"NEW\" | \"CONVERT\";\n  existingLlcName: string;\n  sunbizDocumentNumber: string;\n  llcName: string;\n  alternateNames: string[];\n  status: string;\n  contactName: string;\n  contactEmail: string;\n  createdAt: string;\n  filedAt: string | null;\n  formedAt: string | null;\n  rejectedAt: string | null;\n  groups: FilingGroup[];\n  seriesFiledAt: string | null;\n  copiedFields: Record<string, boolean>;\n  series: { name: string; covered: boolean }[];\n  documents: { id: string; kind: string; title: string; createdAt: string }[];\n  hasArticles: boolean;\n  /** The client appointed us to sign the Articles: the Statement of\n   *  Authorized Representative is made when the Articles go up, and the\n   *  upload needs the Florida document number to name the company. */\n  articlesSignedByUs: boolean;\n  certStatusPurchased: boolean;\n  certifiedCopyPurchased: boolean;\n  hasCertStatus: boolean;\n  hasCertifiedCopy: boolean;\n  /** The company's Florida document number, once the office typed it. */\n  documentNumber: string;\n  /** The order took our registered agent service. */\n  raService: boolean;\n  raRenewalDate: string | null;\n}"
+              }
+            ]
+          }
         },
         {
           "key": "unused-helpers",
           "scope": "The two unused helpers in serviceOrders.helpers.ts.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-18T03:48:21.611Z",
               "event": "recorded by migration 001-part-level-links"
+            },
+            {
+              "at": "2026-09-20T16:31:06.963Z",
+              "event": "assigned",
+              "batch": "20",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T16:36:35.469Z",
+              "event": "implemented",
+              "batch": "20",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "20",
+          "fix": {
+            "batch": "20",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/src/pages/admin/serviceOrders.helpers.ts",
+                "text": "import type { AdminServiceOrder } from \"./ServiceOrdersSection\";\n\nexport const serviceIsOpen"
+              }
+            ]
+          }
         },
         {
           "key": "dead-branches",
           "scope": "The dead branches behind a constant that is always true.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-18T03:48:21.611Z",
               "event": "recorded by migration 001-part-level-links"
+            },
+            {
+              "at": "2026-09-20T16:31:06.963Z",
+              "event": "assigned",
+              "batch": "20",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T16:36:35.469Z",
+              "event": "implemented",
+              "batch": "20",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "20",
+          "fix": {
+            "batch": "20",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "absent",
+                "text": "const sortable = true;"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/src/pages/admin/AdminDashboard.tsx",
+                "text": "const Head = ({ k, label }: { k: SortKey; label: string }) => ("
+              }
+            ]
+          }
         },
         {
           "key": "notify-options",
@@ -11189,17 +11482,48 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T16:31:06.963Z",
+              "event": "assigned",
+              "batch": "20",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T16:36:35.469Z",
+              "event": "implemented",
+              "batch": "20",
+              "revision": 1,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "187",
             "part": "dead-branches"
+          },
+          "batch": "20",
+          "fix": {
+            "batch": "20",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "absent",
+                "text": "const sortable = true;"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/src/pages/admin/AdminDashboard.tsx",
+                "text": "const Head = ({ k, label }: { k: SortKey; label: string }) => ("
+              }
+            ]
           }
         }
       ],
@@ -11254,17 +11578,52 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T16:31:06.963Z",
+              "event": "assigned",
+              "batch": "20",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T16:36:35.469Z",
+              "event": "implemented",
+              "batch": "20",
+              "revision": 1,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "187",
             "part": "unused-fields"
+          },
+          "batch": "20",
+          "fix": {
+            "batch": "20",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "absent",
+                "text": "ein_outstanding"
+              },
+              {
+                "kind": "absent",
+                "text": "ein_purchased"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/src/pages/admin/OrderDetail.tsx",
+                "text": "interface OrderDetailData {\n  id: string;\n  clientId: string | null;\n  /** A conversion designates series for a company already on file. */\n  filingPath: \"NEW\" | \"CONVERT\";\n  existingLlcName: string;\n  sunbizDocumentNumber: string;\n  llcName: string;\n  alternateNames: string[];\n  status: string;\n  contactName: string;\n  contactEmail: string;\n  createdAt: string;\n  filedAt: string | null;\n  formedAt: string | null;\n  rejectedAt: string | null;\n  groups: FilingGroup[];\n  seriesFiledAt: string | null;\n  copiedFields: Record<string, boolean>;\n  series: { name: string; covered: boolean }[];\n  documents: { id: string; kind: string; title: string; createdAt: string }[];\n  hasArticles: boolean;\n  /** The client appointed us to sign the Articles: the Statement of\n   *  Authorized Representative is made when the Articles go up, and the\n   *  upload needs the Florida document number to name the company. */\n  articlesSignedByUs: boolean;\n  certStatusPurchased: boolean;\n  certifiedCopyPurchased: boolean;\n  hasCertStatus: boolean;\n  hasCertifiedCopy: boolean;\n  /** The company's Florida document number, once the office typed it. */\n  documentNumber: string;\n  /** The order took our registered agent service. */\n  raService: boolean;\n  raRenewalDate: string | null;\n}"
+              }
+            ]
           }
         }
       ],
@@ -11288,17 +11647,52 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T16:31:06.963Z",
+              "event": "assigned",
+              "batch": "20",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T16:36:35.469Z",
+              "event": "implemented",
+              "batch": "20",
+              "revision": 1,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "187",
             "part": "unused-fields"
+          },
+          "batch": "20",
+          "fix": {
+            "batch": "20",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "absent",
+                "text": "ein_outstanding"
+              },
+              {
+                "kind": "absent",
+                "text": "ein_purchased"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/src/pages/admin/OrderDetail.tsx",
+                "text": "interface OrderDetailData {\n  id: string;\n  clientId: string | null;\n  /** A conversion designates series for a company already on file. */\n  filingPath: \"NEW\" | \"CONVERT\";\n  existingLlcName: string;\n  sunbizDocumentNumber: string;\n  llcName: string;\n  alternateNames: string[];\n  status: string;\n  contactName: string;\n  contactEmail: string;\n  createdAt: string;\n  filedAt: string | null;\n  formedAt: string | null;\n  rejectedAt: string | null;\n  groups: FilingGroup[];\n  seriesFiledAt: string | null;\n  copiedFields: Record<string, boolean>;\n  series: { name: string; covered: boolean }[];\n  documents: { id: string; kind: string; title: string; createdAt: string }[];\n  hasArticles: boolean;\n  /** The client appointed us to sign the Articles: the Statement of\n   *  Authorized Representative is made when the Articles go up, and the\n   *  upload needs the Florida document number to name the company. */\n  articlesSignedByUs: boolean;\n  certStatusPurchased: boolean;\n  certifiedCopyPurchased: boolean;\n  hasCertStatus: boolean;\n  hasCertifiedCopy: boolean;\n  /** The company's Florida document number, once the office typed it. */\n  documentNumber: string;\n  /** The order took our registered agent service. */\n  raService: boolean;\n  raRenewalDate: string | null;\n}"
+              }
+            ]
           }
         }
       ],
@@ -11322,17 +11716,44 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T16:31:06.963Z",
+              "event": "assigned",
+              "batch": "20",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T16:36:35.469Z",
+              "event": "implemented",
+              "batch": "20",
+              "revision": 1,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "187",
             "part": "unused-helpers"
+          },
+          "batch": "20",
+          "fix": {
+            "batch": "20",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/src/pages/admin/serviceOrders.helpers.ts",
+                "text": "import type { AdminServiceOrder } from \"./ServiceOrdersSection\";\n\nexport const serviceIsOpen"
+              }
+            ]
           }
         }
       ],
@@ -11356,17 +11777,54 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T16:31:06.963Z",
+              "event": "assigned",
+              "batch": "20",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T16:36:35.469Z",
+              "event": "implemented",
+              "batch": "20",
+              "revision": 1,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "187",
             "part": "comments"
+          },
+          "batch": "20",
+          "fix": {
+            "batch": "20",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/server/routes-admin.ts",
+                "text": "/** Record that the office sent the Articles to the Division. */\napp.post(\"/admin/orders/:id/filed\","
+              },
+              {
+                "kind": "present",
+                "file": "webapp/server/routes-admin.ts",
+                "text": " *  its document id and storage key; callers validate the document number first. */\nasync function issueStatement("
+              },
+              {
+                "kind": "present",
+                "file": "webapp/src/pages/admin/serviceOrders.helpers.ts",
+                "text": " *  \"Jimmy Flanagan, LLC - PS 3\" reads \"PS 3\". Never truncated, only wrapped. */\nexport function serviceLabel"
+              }
+            ]
           }
         }
       ],
@@ -13015,14 +13473,40 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T16:31:06.963Z",
+              "event": "assigned",
+              "batch": "20",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T16:36:35.469Z",
+              "event": "implemented",
+              "batch": "20",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "20",
+          "fix": {
+            "batch": "20",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "absent",
+                "text": "About the card you paid with"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -13045,14 +13529,40 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T16:31:06.963Z",
+              "event": "assigned",
+              "batch": "20",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T16:36:35.469Z",
+              "event": "implemented",
+              "batch": "20",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "20",
+          "fix": {
+            "batch": "20",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "absent",
+                "text": "/portal?renewed="
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -13075,14 +13585,45 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T16:31:06.963Z",
+              "event": "assigned",
+              "batch": "20",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T16:36:35.469Z",
+              "event": "implemented",
+              "batch": "20",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "20",
+          "fix": {
+            "batch": "20",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "absent",
+                "text": "SELECT *, rejected_at, ra_renewal_date FROM orders"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/server/routes-admin.ts",
+                "text": "\"SELECT * FROM orders WHERE id = $1\", [c.req.param(\"id\")])"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -13334,14 +13875,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T16:31:06.963Z",
+              "event": "assigned",
+              "batch": "20",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T16:36:35.469Z",
+              "event": "implemented",
+              "batch": "20",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "20",
+          "fix": {
+            "batch": "20",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/server/env.ts",
+                "text": "/** Shared secret for scheduled maintenance jobs. Required in production. */"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -17698,14 +18266,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T16:31:06.963Z",
+              "event": "assigned",
+              "batch": "20",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T16:36:35.469Z",
+              "event": "implemented",
+              "batch": "20",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "20",
+          "fix": {
+            "batch": "20",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/server/statement.ts",
+                "text": "this fills its seven slots and nothing else."
+              }
+            ]
+          }
         }
       ]
     },
@@ -17722,14 +18317,41 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-20T16:31:06.963Z",
+              "event": "assigned",
+              "batch": "20",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-20T16:36:35.469Z",
+              "event": "implemented",
+              "batch": "20",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "20",
+          "fix": {
+            "batch": "20",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/server/pdf-render.ts",
+                "text": "// Metadata strings are encrypted with the other indirect-object strings\n      // below, so the encrypted PDF can retain its Info dictionary."
+              }
+            ]
+          }
         }
       ]
     },
@@ -19429,6 +20051,13 @@
       "kind": "ruling",
       "item": "109",
       "text": "Batch 19 review item 12: leave the internal fee grouping unchanged, as recommended in response to “Why does this matter?” and included in the clarified scope approved by “Go. Approve all”. No pricing or customer-facing fee change."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "187",
+      "text": "Batch 20 item 10: Leave the notification options unchanged. The server accepts them, tests exercise them, and the document-upload screen has a real notification checkbox. The proposed cleanup deletion is rejected.",
+      "part": "notify-options"
     }
   ],
   "batches": [
@@ -20016,6 +20645,25 @@
         },
         {
           "at": "2026-09-20T15:45:23.170Z",
+          "event": "implemented"
+        }
+      ]
+    },
+    {
+      "id": "20",
+      "revision": 1,
+      "frozenHash": "6a48da0db305795a7b40bb3ae31530f3576d4a53fc4bf9377cd0456a2555a193",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "29d7b470bcedcd03abe4842f171fb624f3e497ff",
+      "history": [
+        {
+          "at": "2026-09-20T16:31:06.964Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-20T16:36:35.469Z",
           "event": "implemented"
         }
       ]

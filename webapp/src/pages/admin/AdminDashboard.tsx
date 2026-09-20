@@ -442,10 +442,6 @@ function ChangeEmailDialog({ client }: { client: AdminClient }) {
   );
 }
 
-/** The client roster. The RA variant shows the LLCs we serve as registered
- *  agent for — that is what the relationship attaches to — and keeps a client
- *  listed after a cancellation request until we are replaced as agent of
- *  record (the chip carries that state). */
 /** The client's name in parts. Accounts carry one string built as "First
  *  Last, Suffix"; the earliest paid order has the parts, and the string is
  *  split for the few accounts that predate that. */
@@ -482,6 +478,10 @@ const SORTERS: Record<SortKey, (a: AdminClient, b: AdminClient) => number> = {
   since: (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
 };
 
+/** The client roster. The RA variant shows the LLCs we serve as registered
+ *  agent for — that is what the relationship attaches to — and keeps a client
+ *  listed after a cancellation request until we are replaced as agent of
+ *  record (the chip carries that state). */
 function ClientsTable({
   clients,
   variant,
@@ -495,27 +495,22 @@ function ClientsTable({
   // Until a heading is tapped the rows stay newest first.
   const [query, setQuery] = useState<string>("");
   const [sort, setSort] = useState<{ key: SortKey; dir: "asc" | "desc" } | null>(null);
-  const sortable = true;
   const q = query.trim().toLowerCase();
   const shown = clients
     .filter((cl) => !q || [cl.name, cl.email, displayName(cl), ...(cl.companies ?? []).map((c) => c.llc_name), ...(cl.ra_llcs ?? [])].some((s) => (s ?? "").toLowerCase().includes(q)))
     .sort((a, b) => (sort ? SORTERS[sort.key](a, b) * (sort.dir === "asc" ? 1 : -1) : 0));
   const toggle = (key: SortKey) => setSort((s) => (s?.key === key ? { key, dir: s.dir === "asc" ? "desc" : "asc" } : { key, dir: "asc" }));
-  const Head = ({ k, label }: { k: SortKey; label: string }) =>
-    sortable ? (
+  const Head = ({ k, label }: { k: SortKey; label: string }) => (
       <th className="px-3 py-3 font-medium">
         <button type="button" onClick={() => toggle(k)} className="inline-flex items-center gap-1 uppercase tracking-[0.14em] hover:text-foreground" data-testid={`sort-${k}`} aria-sort={sort?.key === k ? (sort.dir === "asc" ? "ascending" : "descending") : "none"}>
           {label}
           {sort?.key === k ? (sort.dir === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />) : <ArrowUpDown className="h-3 w-3 opacity-40" />}
         </button>
       </th>
-    ) : (
-      <th className="px-3 py-3 font-medium">{label}</th>
     );
   return (
     <div className="mt-4">
-      {sortable ? (
-        <Input
+      <Input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search by name, email, or company"
@@ -523,7 +518,6 @@ function ClientsTable({
           className="max-w-md rounded-full"
           data-testid="client-search"
         />
-      ) : null}
     <div className="mt-4 overflow-x-auto rounded-2xl border border-border bg-card">
       <table className="w-full min-w-[560px] text-sm">
         <thead>

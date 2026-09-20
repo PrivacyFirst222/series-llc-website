@@ -47,10 +47,6 @@ interface Me {
   email: string;
   name: string;
   pendingEmail: string | null;
-  raCancellationRequestedAt: string | null;
-  raRenewalDate?: string | null;
-  /** True when a paid order took our registered agent service. */
-  raService?: boolean;
   viewingAsAdmin?: boolean;
 }
 
@@ -347,7 +343,6 @@ function RegisteredAgentCard({ company }: { company: CompanyInfo }) {
   });
 
   const requestedAt = company.raCancellationRequestedAt;
-  const me = { raRenewalDate: company.raRenewalDate };
 
   return (
     <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card">
@@ -378,7 +373,7 @@ function RegisteredAgentCard({ company }: { company: CompanyInfo }) {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="text-sm text-muted-foreground">
               <p>
-                {company.raEndedDate ? `Our registered-agent appointment ends on ${company.raEndedDate}.` : company.raAppointmentDate ? `Your registered agent service is active${me?.raRenewalDate ? ` and renews on ${new Date(`${me.raRenewalDate}T12:00:00`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}` : ""}.` : "Your appointment date has not yet been recorded. Your first service year begins when our appointment takes effect."} You may give cancellation notice here at any time. Give notice at least 30 days before renewal and provide replacement proof by renewal to avoid a resignation charge.
+                {company.raEndedDate ? `Our registered-agent appointment ends on ${company.raEndedDate}.` : company.raAppointmentDate ? `Your registered agent service is active${company.raRenewalDate ? ` and renews on ${new Date(`${company.raRenewalDate}T12:00:00`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}` : ""}.` : "Your appointment date has not yet been recorded. Your first service year begins when our appointment takes effect."} You may give cancellation notice here at any time. Give notice at least 30 days before renewal and provide replacement proof by renewal to avoid a resignation charge.
               </p>
               {/* The card kept for the renewal, or why none is (16 Sep 2026). */}
               {company.cardStatus === "on_file" ? (

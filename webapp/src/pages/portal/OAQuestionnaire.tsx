@@ -51,7 +51,6 @@ interface OaData {
   version: string;
   multiOwner: boolean;
   memberManaged: boolean;
-  blocked: boolean;
   todayEastern: string;
   templateVersion: string;
   answers: Answers;
@@ -122,7 +121,6 @@ export default function OAQuestionnaire() {
         sElection: saved.sElection ?? false,
         effectiveDate: saved.effectiveDate ?? data.todayEastern,
         authorized: saved.authorized ?? false,
-        contributionToCompany: saved.contributionToCompany ?? "",
         multiOwner: saved.multiOwner ?? data.multiOwner,
         // Once the client has edited the owners, the draft IS the list — it may
         // be longer or shorter than the one captured at formation.

@@ -172,25 +172,18 @@ app.get("/admin/orders", async (c) => {
   const qRaw = (c.req.query("q") ?? "").trim().slice(0, 100);
   const where = qRaw ? `WHERE o.llc_name ILIKE $1 OR o.contact_email ILIKE $1 OR o.contact_name ILIKE $1` : "";
   const params = qRaw ? [`%${qRaw}%`] : [];
-  // Everything a card on the board shows, in one query. series_count and
-  // ein_purchased are on the card because they change what "finished" means:
-  // an order can look complete with a series undesignated or an EIN still owed.
+  // Fields displayed by the board. Outstanding service work is loaded by
+  // the separate service-orders query before a card can count as complete.
   const rows = await db.query(
     `SELECT o.id, o.client_id, o.contact_name, o.contact_email, o.package, o.llc_name,
-            o.status, o.service_fee_cents, o.state_fees_cents, o.total_cents,
-            o.created_at, o.paid_at, o.filed_at, o.formed_at,
+            o.status, o.service_fee_cents, o.state_fees_cents,
+            o.created_at, o.formed_at,
             COALESCE(jsonb_array_length(o.payload->'series'), 0) AS series_count,
-            COALESCE((o.payload->'optionalDocuments'->>'ein')::boolean, false) AS ein_purchased,
             COALESCE((o.payload->'optionalDocuments'->>'certificateOfStatus')::boolean, false) AS cert_status_purchased,
             COALESCE((o.payload->'optionalDocuments'->>'certifiedCopy')::boolean, false) AS certified_copy_purchased,
             EXISTS (SELECT 1 FROM documents d WHERE d.order_id = o.id AND d.kind = 'certificate-of-status' AND COALESCE(d.meta->>'source', 'card') <> 'portal') AS cert_status_uploaded,
             EXISTS (SELECT 1 FROM documents d WHERE d.order_id = o.id AND d.kind = 'certified-copy' AND COALESCE(d.meta->>'source', 'card') <> 'portal') AS certified_copy_uploaded,
-            (o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_service,
-            EXISTS (
-              SELECT 1 FROM service_orders s
-               WHERE s.formation_order_id = o.id AND s.type = 'ein'
-                 AND s.status <> 'fulfilled'
-            ) AS ein_outstanding
+            (o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_service
        FROM orders o
       ${where}
       ORDER BY o.created_at DESC LIMIT 200`,
@@ -203,8 +196,6 @@ app.get("/admin/orders", async (c) => {
   return c.json({ data: { orders: rows, total: Number(total[0].c), shown: rows.length } });
 });
 
-/** Sent to the Division. The only transition on the board a person performs —
- *  nothing in this system can observe a filing on sunbiz. */
 /** The board's own words for a status, for messages the office reads. */
 const BOARD_LABEL: Record<string, string> = { pending_payment: "Pending payment", paid: "New Orders", filed: "With The State", formed: "Complete" };
 /** Where a refusal says the order is (15 Sep 2026): a formed order sits in
@@ -230,6 +221,7 @@ const isCardCert = (d: { kind: string; meta: unknown }, kind: string): boolean =
 const isConversionPayload = (payload: unknown): boolean =>
   ((typeof payload === "string" ? JSON.parse(payload) : payload) as { filingPath?: string } | null)?.filingPath === "CONVERT";
 
+/** Record that the office sent the Articles to the Division. */
 app.post("/admin/orders/:id/filed", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
@@ -278,8 +270,6 @@ app.post("/admin/orders/:id/unfiled", async (c) => {
   return c.json({ data: { ok: true } });
 });
 
-/** Which fields have been copied into the state's form. Stored per order so an
- *  interrupted filing resumes on whatever machine you pick it up on. */
 // The second check-off: the Protected Series Designations are filed only
 // after the Division forms the base LLC (Adam, 30 Aug 2026). Idempotent.
 app.post("/admin/orders/:id/series-filed", async (c) => {
@@ -296,6 +286,8 @@ app.post("/admin/orders/:id/series-filed", async (c) => {
   return c.json({ data: { ok: true } });
 });
 
+/** Which fields have been copied into the state's form. Stored per order so an
+ *  interrupted filing resumes on whatever machine you pick it up on. */
 app.post("/admin/orders/:id/copied", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
@@ -329,7 +321,7 @@ app.get("/admin/orders/:id", async (c) => {
     payload: unknown; copied_fields: unknown; created_at: string;
     paid_at: string | null; filed_at: string | null; formed_at: string | null;
     contact_name: string; contact_email: string; total_cents: number;
-  }>("SELECT *, rejected_at, ra_renewal_date FROM orders WHERE id = $1", [c.req.param("id")]);
+  }>("SELECT * FROM orders WHERE id = $1", [c.req.param("id")]);
   if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
   const o = rows[0];
   const payload = typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload;
@@ -341,16 +333,6 @@ app.get("/admin/orders/:id", async (c) => {
         `SELECT id, kind, title, meta, created_at FROM documents
           WHERE client_id = $1 AND order_id = $2 ORDER BY created_at`,
         [o.client_id, o.id],
-      )
-    : [];
-
-  // Services bought against this formation — the EIN is the one that changes
-  // what "done" means, and its SSNs stay in the service record, not here.
-  const services = o.client_id
-    ? await db.query<{ id: string; type: string; status: string; llc_name: string }>(
-        `SELECT id, type, status, llc_name FROM service_orders
-          WHERE formation_order_id = $1 ORDER BY created_at`,
-        [o.id],
       )
     : [];
 
@@ -413,7 +395,6 @@ app.get("/admin/orders/:id", async (c) => {
         title: d.title,
         createdAt: d.created_at,
       })),
-      services,
       hasArticles: docs.some((d) => d.kind === "articles"),
       certStatusPurchased: !!(payload as { optionalDocuments?: { certificateOfStatus?: boolean } }).optionalDocuments?.certificateOfStatus,
       certifiedCopyPurchased: !!(payload as { optionalDocuments?: { certifiedCopy?: boolean } }).optionalDocuments?.certifiedCopy,
@@ -429,29 +410,13 @@ app.get("/admin/orders/:id", async (c) => {
   });
 });
 
-/** The Articles and the Protected Series Designations, in one action.
- *
- *  This is the only way an order becomes "formed": the same request that writes
- *  the documents sets the status and emails the client, so the board can never
- *  show a completed order whose client has an empty portal. One PSD document may
- *  cover several series — Florida allows it — so coverage is declared per file
- *  and checked against the order's own series list. Miss one and this refuses. */
-// The filed Articles come back from the Division while the order is With The
-// State, and go up here (Adam's sequence, 30 Aug 2026; the card offers the
-// upload at that stage only, 14 Sep 2026): the PDF is stored against the
-// order, the status does not move, and the client is not emailed — they hear
-// once, at formed. A wrong file is replaced later by the formed-step package
-// upload, which retires priors.
-/** Statement of Authorized Representative (Adam, 13 Sep 2026): made the
- *  moment the filed Articles go up, for an order whose client appointed us to
- *  sign them, and stored under the company beside the Articles. A later
- *  Articles upload replaces it. Returns the message to refuse with when the
- *  document number the Statement needs is missing. */
 function appointedUs(payload: unknown): boolean {
   const p = (typeof payload === "string" ? JSON.parse(payload) : payload) as { certifications?: { articlesSignedBy?: string } } | null;
   return p?.certifications?.articlesSignedBy === "SERVICE";
 }
 const DOC_NUMBER_NEEDED = "This client appointed us to sign. Enter the Florida document number so the Statement of Authorized Representative can name the company.";
+/** Generate and store the Statement beside the company's Articles. Returns
+ *  its document id and storage key; callers validate the document number first. */
 async function issueStatement(
   db: Awaited<ReturnType<typeof getDb>>,
   o: { id: string; client_id: string | null; llc_name: string; payload?: unknown },
@@ -485,6 +450,12 @@ async function issueStatement(
   return { id: row[0].id, storageKey: stored.storageKey };
 }
 
+// The filed Articles come back from the Division while the order is With The
+// State, and go up here (Adam's sequence, 30 Aug 2026; the card offers the
+// upload at that stage only, 14 Sep 2026): the PDF is stored against the
+// order, the status does not move, and the client is not emailed — they hear
+// once, at formed. A wrong file is replaced later by the formed-step package
+// upload, which retires priors.
 app.post("/admin/orders/:id/articles", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
@@ -599,6 +570,13 @@ app.post("/admin/orders/:id/certificates", async (c) => {
   return c.json({ data: { uploaded, notified } });
 });
 
+/** The Articles and the Protected Series Designations, in one action.
+ *
+ *  This is the only way an order becomes "formed": the same request that writes
+ *  the documents sets the status and emails the client, so the board can never
+ *  show a completed order whose client has an empty portal. One PSD document may
+ *  cover several series — Florida allows it — so coverage is declared per file
+ *  and checked against the order's own series list. Miss one and this refuses. */
 app.post("/admin/orders/:id/formation-documents", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
@@ -1135,13 +1113,8 @@ app.get("/admin/services/:id", async (c) => {
   });
 });
 
-/** Draft S election package for admin review: instructions + cover letter +
- *  the filled official Form 2553. Generated on demand from the encrypted
- *  details; nothing is stored — Adam reviews and attaches it at fulfillment. */
-// The office enters the formation date from the filed Articles when it
-// prepares the S election (Adam, 6 Sep 2026: "We will manually enter it when
-// the S-election form is created"). Entering it builds the package, posts it
-// to the client, and starts their two-week window.
+// Correct the formation date supplied by the client. Existing encrypted
+// questionnaire numbers are required; the package waits if its EIN is missing.
 app.post("/admin/services/:id/s-election-formation-date", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
@@ -1189,6 +1162,9 @@ app.post("/admin/services/:id/s-election-formation-date", async (c) => {
   return c.json({ data: { ok: true, documentId: built.documentId, editableUntil: built.editableUntil } });
 });
 
+/** Draft S election package for admin review: instructions + cover letter +
+ *  the filled official Form 2553. Generated on demand from the encrypted
+ *  details; nothing is stored — Adam reviews and attaches it at fulfillment. */
 app.get("/admin/services/:id/s-election-draft", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
@@ -1447,9 +1423,6 @@ async function carryEinIntoSElections(args: { clientId: string; companyOrderId: 
   return rebuilt;
 }
 
-/** Package documents still carrying no company after the backfill — hand
- *  uploads whose titles name no company. Adam opens this in his admin
- *  session to see what is left (7 Sep 2026). */
 /** Delete one certificate copy (Adam, 15 Sep 2026: "the user has the ability
  *  to delete older certificates"). Certificates only: the Articles and the
  *  designations are replaced, never removed. Gone from the client's portal
@@ -1496,6 +1469,9 @@ app.post("/admin/documents/:id/replace", async (c) => {
   return c.json({ data: { ok: true } });
 });
 
+/** Package documents still carrying no company after the backfill — hand
+ *  uploads whose titles name no company. Adam opens this in his admin
+ *  session to see what is left (7 Sep 2026). */
 app.get("/admin/documents/unscoped", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);

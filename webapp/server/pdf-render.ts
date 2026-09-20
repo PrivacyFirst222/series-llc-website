@@ -635,14 +635,8 @@ async function finishWithPermissions(doc: PDFDocument, title: string, wm: Waterm
       }) => Promise<void> | void;
     };
     if (typeof anyDoc.encrypt === "function") {
-      // The library's writer encrypts STREAMS only, never strings, so any Info
-      // metadata in an encrypted document is written plaintext into a file
-      // that declares string encryption — and every reader "decrypts" it into
-      // garbage (Codex PDF-001; confirmed against PDFWriter.encrypt, which
-      // tests `object instanceof PDFStream`). No string we set can survive,
-      // so the encrypted document carries NO Info dictionary: viewers then
-      // fall back to the clean filename. The watermark on every page, not the
-      // metadata, is what identifies the licensee.
+      // Metadata strings are encrypted with the other indirect-object strings
+      // below, so the encrypted PDF can retain its Info dictionary.
       await anyDoc.encrypt({
         ownerPassword: `mfsl-${Math.random().toString(36).slice(2)}${Date.now().toString(36)}`,
         // Clients may print and add their own notes/signatures; the underlying
