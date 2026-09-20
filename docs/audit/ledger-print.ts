@@ -27,10 +27,11 @@ export function renderList(l: Ledger): string {
   out.push("GENERATED from docs/audit/ledger.json by `bun run docs/audit/ledger-print.ts list`. Do not edit: the commit step refuses a copy that differs from the ledger. The auditors' original files are unchanged under docs/audit/sources/ and docs/audit/runs/.");
   out.push("");
   const sightings = live.flatMap((i) => i.parts.filter((p) => p.canonical));
-  out.push(`${l.items.length} records: 267 from the 16 Sep working list, 67 from Codex's audit (N1.01–N4.11), and ${l.items.filter(i => i.id.startsWith("AUD-")).length} from later checked audit intakes. ${l.items.filter((i) => i.verdict === "dropped").length} dropped after Codex's review, ${l.items.filter((i) => i.verdict === "optional").length} optional wording, ${sightings.length} second sightings of another item's part. Released: ${live.filter(done).length} of ${live.length}.`);
+  const imported = l.items.filter(i => i.id.startsWith("AUD-")).length;
+  out.push(`${l.items.length} records: 267 from the 16 Sep working list and 67 from Codex's audit (N1.01–N4.11)${imported ? `, plus ${imported} from later checked audit intakes` : ""}. ${l.items.filter((i) => i.verdict === "dropped").length} dropped after Codex's review, ${l.items.filter((i) => i.verdict === "optional").length} optional wording, ${sightings.length} second sightings of another item's part. Released: ${live.filter(done).length} of ${live.length}.`);
   out.push("");
   out.push("A status reads: open → assigned (to a batch) → implemented → accepted (by Adam, by exact commit) → released.");
-  out.push("For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-session.ts. The historical coverage-check.ts alone does not establish complete prior-item reconciliation. Audit completion does not approve repairs or publication.");
+  if (l.batches.some(b => b.id === "audit-mechanism") || imported) out.push("For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-session.ts. The historical coverage-check.ts alone does not establish complete prior-item reconciliation. Audit completion does not approve repairs or publication.");
   for (const area of AREAS) {
     const inArea = l.items.filter((i) => i.area === area);
     if (inArea.length === 0) continue;
