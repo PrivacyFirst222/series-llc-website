@@ -139,7 +139,9 @@ export function validateStep(
       const finalName = buildFinalLlcName(data.desiredLlcName, data.llcDesignator);
       if (finalName && !nameContainsLegalDesignator(finalName)) {
         e.desiredLlcName =
-          "Florida LLC name must include LLC, L.L.C., or Limited Liability Company.";
+          !data.llcDesignator
+            ? "Choose a designator above to complete the name."
+            : "Choose a valid company designator.";
       }
       const endingProblem = typedDesignatorProblem(data.desiredLlcName, data.formationType);
       if (endingProblem) e.desiredLlcName = endingProblem;
