@@ -196,11 +196,17 @@ s. 14.1 on s. 605.2501(2) — neither is in the non-variable list.
   transferees and managers; the record prevails as to others who reasonably rely
   on it.
 - **s. 605.0103(4)** — a non-member is deemed to know of a limitation on
-  authority to transfer real property under s. 605.0302(7), and to have notice
-  of dissolution, termination, entity transactions, and a manager-managed
-  declaration 90 days after the relevant filing takes effect. A limitation in
-  the articles on authority to transfer real property is NOT notice to a
-  non-member unless recorded in the real property records.
+  authority to transfer real property under s. 605.0302(7). Dissolution,
+  termination, and the listed entity transactions give deemed notice 90 days
+  after the specified filings become effective. A manager-managed declaration
+  in the original articles gives deemed notice under subsection (4)(b)4,
+  without that additional 90-day wait. If the declaration is added or changed
+  by amendment or amendment and restatement, notice of the addition or change
+  may not become effective until 90 days after that filing's effective date.
+  An articles provision limiting authority to transfer real property is not
+  notice to a person who is not a member or manager unless the limitation
+  appears in an affidavit, certificate, or other instrument bearing the
+  company's name and recorded in the applicable real property records.
 - **s. 605.0108(1)** — "A limited liability company is an entity distinct from
   its members."
 
@@ -381,8 +387,18 @@ on Online Sunshine, not inferred from Chapter 605 alone.
   s. 605.0105(1) permits.
 - **s. 605.0405** — no distribution if the company could not then pay its debts as
   they come due, or if total assets would be less than total liabilities plus
-  preferential amounts. s. 605.0406 — consenting members/managers personally
-  liable for the excess; action barred after 2 years.
+  preferential amounts.
+- **s. 605.0406** — a member of a member-managed LLC or manager of a
+  manager-managed LLC who consents to a distribution violating s. 605.0405
+  AND, in consenting, fails to comply with s. 605.04091 is personally liable
+  to the company for the excess. Under subsection (2), if the operating
+  agreement of a member-managed LLC expressly relieves a member of authority
+  and responsibility to consent to distributions and assigns them to other
+  members, subsection (1) liability applies to those other members instead.
+  Subsection (3) separately makes a recipient who knows the distribution
+  violates s. 605.0405 liable to the company for the excess received. An
+  action under this section is barred unless commenced within 2 years after
+  the distribution.
 
 **Management, duties, liability**
 - **s. 605.0407(1)** — member-managed by default; "managing member" alone does

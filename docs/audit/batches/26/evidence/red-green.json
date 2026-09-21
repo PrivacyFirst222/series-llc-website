@@ -1,0 +1,11 @@
+{
+  "mechanism": "Existing replayStatic; two recorded replacements, baseline rejected for missing corrections and surviving retired wording",
+  "baselineFailures": [
+    "item AUD-post-batches-2026-09-20-4a344e2-ROOT-NOTES-NOTICE-REVIEW: the fixed wording is gone from webapp/server/chapter-605-notes.md: \"- **s. 605.0103(4)** — a non-member is deemed to know of a limitation on\n  authority to tr\"",
+    "item AUD-post-batches-2026-09-20-4a344e2-ROOT-NOTES-NOTICE-REVIEW: retired wording is back in webapp/server/chapter-605-notes.md (1×): \"- **s. 605.0103(4)** — a non-member is deemed to know of a limitation on\n  authority to tr\"",
+    "item AUD-post-batches-2026-09-20-4a344e2-ROOT-NOTES-DISTRIBUTION-REVIEW: the fixed wording is gone from webapp/server/chapter-605-notes.md: \"\n- **s. 605.0406** — a member of a member-managed LLC or manager of a\n  manager-managed LL\"",
+    "item AUD-post-batches-2026-09-20-4a344e2-ROOT-NOTES-DISTRIBUTION-REVIEW: retired wording is back in webapp/server/chapter-605-notes.md (1×): \" s. 605.0406 — consenting members/managers personally\n  liable for the excess; action barr\""
+  ],
+  "correctedFailures": [],
+  "approvedFindings": 2
+}
