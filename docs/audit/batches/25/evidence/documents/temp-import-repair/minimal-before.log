@@ -1,0 +1,38 @@
+0 one true
+Module {
+  default: 1,
+}
+0 two true
+ResolveMessage: Cannot find module '/private/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/batch25-import-repro-IbLzRf/two.mjs' from ''
+1 one true
+Module {
+  default: 1,
+}
+1 two true
+Module {
+  default: 1,
+}
+2 one true
+Module {
+  default: 1,
+}
+2 two true
+Module {
+  default: 1,
+}
+3 one true
+Module {
+  default: 1,
+}
+3 two true
+Module {
+  default: 1,
+}
+4 one true
+Module {
+  default: 1,
+}
+4 two true
+Module {
+  default: 1,
+}

@@ -1,0 +1,223 @@
+{
+  "batch": "25",
+  "revision": 1,
+  "base": "2559e18f5094b70c8eba1eb64e3c3519aa609f3e",
+  "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d",
+  "packageId": "2e97a3a8f44c",
+  "diffSha": "c4045aa9e88ec0e2da9e574368d4527803496a8b5288c0c55db29ef2e3737e6a",
+  "createdAt": "2026-09-21T06:32:29.106Z",
+  "runId": "25-r1-1789971494132",
+  "partial": null,
+  "required": [
+    "typecheck",
+    "lint",
+    "unit",
+    "facts",
+    "guard",
+    "documents",
+    "server",
+    "walk",
+    "assertions",
+    "dropbox-unchanged",
+    "checkout-unchanged",
+    "ledger-controls"
+  ],
+  "checks": [
+    {
+      "name": "typecheck",
+      "command": "bun run typecheck",
+      "cwd": "/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/review-commit-TRfBmJ/webapp",
+      "exit": 0,
+      "skipped": false,
+      "log": "/Users/adam/.fpsllc/reviews/25-r1-1dc6c7244911b85a45144d9e4e38a9dec4d4118d-2e97a3a8f44c/checks/typecheck.log",
+      "seconds": 4
+    },
+    {
+      "name": "lint",
+      "command": "bun run lint",
+      "cwd": "/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/review-commit-TRfBmJ/webapp",
+      "exit": 0,
+      "skipped": false,
+      "log": "/Users/adam/.fpsllc/reviews/25-r1-1dc6c7244911b85a45144d9e4e38a9dec4d4118d-2e97a3a8f44c/checks/lint.log",
+      "seconds": 2
+    },
+    {
+      "name": "unit",
+      "command": "bun run test",
+      "cwd": "/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/review-commit-TRfBmJ/webapp",
+      "exit": 0,
+      "skipped": false,
+      "log": "/Users/adam/.fpsllc/reviews/25-r1-1dc6c7244911b85a45144d9e4e38a9dec4d4118d-2e97a3a8f44c/checks/unit.log",
+      "seconds": 4
+    },
+    {
+      "name": "facts",
+      "command": "bun run ../docs/facts-check.ts",
+      "cwd": "/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/review-commit-TRfBmJ/webapp",
+      "exit": 0,
+      "skipped": false,
+      "log": "/Users/adam/.fpsllc/reviews/25-r1-1dc6c7244911b85a45144d9e4e38a9dec4d4118d-2e97a3a8f44c/checks/facts.log",
+      "seconds": 0
+    },
+    {
+      "name": "ledger-controls",
+      "command": "bun run ../docs/audit/repair-check.ts",
+      "cwd": "/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/review-commit-TRfBmJ/webapp",
+      "exit": 0,
+      "skipped": false,
+      "log": "/Users/adam/.fpsllc/reviews/25-r1-1dc6c7244911b85a45144d9e4e38a9dec4d4118d-2e97a3a8f44c/checks/ledger-controls.log",
+      "seconds": 103
+    },
+    {
+      "name": "guard",
+      "command": "bun run ../docs/audit/guard.ts",
+      "cwd": "/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/review-commit-TRfBmJ/webapp",
+      "exit": 0,
+      "skipped": false,
+      "log": "/Users/adam/.fpsllc/reviews/25-r1-1dc6c7244911b85a45144d9e4e38a9dec4d4118d-2e97a3a8f44c/checks/guard.log",
+      "seconds": 0
+    },
+    {
+      "name": "documents",
+      "command": "bash -c python3 docs/provision-map.py && python3 docs/coverage-605.py && python3 docs/event-map.py && python3 docs/docs-consistency.py && python3 docs/structure.py && python3 docs/drafting-lint.py webapp/server/templates-oa-*.md && python3 docs/format-check.py docs/word/*.docx",
+      "cwd": "/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/review-commit-TRfBmJ",
+      "exit": 0,
+      "skipped": false,
+      "log": "/Users/adam/.fpsllc/reviews/25-r1-1dc6c7244911b85a45144d9e4e38a9dec4d4118d-2e97a3a8f44c/checks/documents.log",
+      "seconds": 0
+    },
+    {
+      "name": "server",
+      "command": "bun run server/e2e.ts",
+      "cwd": "/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/review-commit-TRfBmJ/webapp",
+      "exit": 0,
+      "skipped": false,
+      "log": "/Users/adam/.fpsllc/reviews/25-r1-1dc6c7244911b85a45144d9e4e38a9dec4d4118d-2e97a3a8f44c/checks/server.log",
+      "seconds": 26
+    },
+    {
+      "name": "walk",
+      "command": "bun run behavioral",
+      "cwd": "/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/review-commit-TRfBmJ/webapp",
+      "exit": 1,
+      "skipped": false,
+      "log": "/Users/adam/.fpsllc/reviews/25-r1-1dc6c7244911b85a45144d9e4e38a9dec4d4118d-2e97a3a8f44c/checks/walk.log",
+      "seconds": 709
+    },
+    {
+      "name": "assertions",
+      "command": "bun run scripts/audit-assert.ts --results /Users/adam/.fpsllc/reviews/25-r1-1dc6c7244911b85a45144d9e4e38a9dec4d4118d-2e97a3a8f44c/checks/server-results.jsonl --results /Users/adam/.fpsllc/reviews/25-r1-1dc6c7244911b85a45144d9e4e38a9dec4d4118d-2e97a3a8f44c/checks/walk-results.jsonl --commit 1dc6c7244911b85a45144d9e4e38a9dec4d4118d --run 25-r1-1789971494132",
+      "cwd": "/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/review-commit-TRfBmJ/webapp",
+      "exit": 0,
+      "skipped": false,
+      "log": "/Users/adam/.fpsllc/reviews/25-r1-1dc6c7244911b85a45144d9e4e38a9dec4d4118d-2e97a3a8f44c/checks/assertions.log",
+      "seconds": 5
+    },
+    {
+      "name": "dropbox-unchanged",
+      "command": "every file's path and content hash, before and after the run",
+      "cwd": "",
+      "exit": 0,
+      "skipped": false,
+      "log": "/Users/adam/.fpsllc/reviews/25-r1-1dc6c7244911b85a45144d9e4e38a9dec4d4118d-2e97a3a8f44c/dropbox-after.json",
+      "seconds": 0
+    },
+    {
+      "name": "checkout-unchanged",
+      "command": "the checkout is still 1dc6c7244911b85a45144d9e4e38a9dec4d4118d, with no tracked file modified",
+      "cwd": "/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/review-commit-TRfBmJ",
+      "exit": 0,
+      "skipped": false,
+      "log": "",
+      "seconds": 0
+    }
+  ],
+  "docs": [
+    {
+      "path": "docs/word/FPSLLC Operating Agreement - Member-Managed Multi-Member (Partnership) - DRAFT.docx",
+      "sha": "7ac92c8fbca33b5e2eb48f688403333d703d950fa4b4ccb0d85a6f2842b457d5"
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement - Member-Managed (S Corporation) - DRAFT.docx",
+      "sha": "bad21a047d18da28c8e1ca5f09a5e5c4922151c9c1e7a8def322a94484c33d3e"
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement - Manager-Managed Multi-Member (Partnership) - DRAFT.docx",
+      "sha": "2543d4a4b6a1782b8a6aa971b2748c7b22d0186fb2c6feaa31f1dec0d6e82bbd"
+    },
+    {
+      "path": "docs/word/FPSLLC Statement of Authorized Representative - FORM.docx",
+      "sha": "d76c83082637f6bdb4d421e1f55e523604d9fe7651c4fc835e113ab4ffd4dcf0"
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement - Manager-Managed (S Corporation) - DRAFT.docx",
+      "sha": "118e1992a29489ee639ff600c07bd34199c6b79f9bd3c4faeec88ba5d5bed48c"
+    },
+    {
+      "path": "docs/word/SMMMDE - FPSLLC Operating Agreement - Manager-Managed Single Member (Disregarded) - DRAFT.docx",
+      "sha": "33ecab19c713e12bd4ab9783b2aa468874d39f7f475457dc6ff10866ea779ed2"
+    },
+    {
+      "path": "docs/word/SMMMS - FPSLLC Operating Agreement - Manager-Managed Single Member (S Corporation) - DRAFT.docx",
+      "sha": "9aef6b4043b4a129332b1af63dfa18f792dad3bc25d544f2f415efa8f17339a4"
+    },
+    {
+      "path": "docs/word/SMMEMDE - FPSLLC Operating Agreement - Member-Managed Single Member (Disregarded) - DRAFT.docx",
+      "sha": "1e162f7e6bb557f6a22a3eb999eb532bd7f2fd5bfa75dbdfc15e6eb54de8c656"
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement Instructions - DRAFT.docx",
+      "sha": "41fdb5d2fbb4c455957865e57dbaa4772d0f72505e598cedce8321c389d5917e"
+    },
+    {
+      "path": "docs/word/SMMEMS - FPSLLC Operating Agreement - Member-Managed Single Member (S Corporation) - DRAFT.docx",
+      "sha": "dd8a28e94f77e143c8ae31085fdd07e027df3619bad7447ff41e503f01947a75"
+    },
+    {
+      "path": "docs/word/Series LLC Owners Manual - REVISED DRAFT.docx",
+      "sha": "81e018a0fb1220aee0e9e0f91bb3c17516ef1ae1425a6aaed5ebea95b9db4b53"
+    },
+    {
+      "path": "docs/word/FPSLLC Amendment to Operating Agreement - FORM.docx",
+      "sha": "f855339aeb8b2185a15a2a0f94f8b33b5c11c67cc4f83096fd332ad290204ca6"
+    }
+  ],
+  "site": [
+    {
+      "path": "apple-touch-icon.png",
+      "sha": "632f1b573dc9c4ecc87c2f612de13ba469ccd0e48af6991272868da6822f211f"
+    },
+    {
+      "path": "assets/index-6o_FORR8.css",
+      "sha": "991950ba6f5c7aa8a83410bd0bfa572737f58a9701a328d1fb6b261690a5aea8"
+    },
+    {
+      "path": "assets/index-DKsbV0Iu.js",
+      "sha": "08d1b3f8441330b139e31875800543ae3dba6389daf67630c31da34ef6b37863"
+    },
+    {
+      "path": "favicon.ico",
+      "sha": "11eb6254db1402e695d02f9336cec568ef5e041f3d58ef9590d1c90e38246bc8"
+    },
+    {
+      "path": "favicon.svg",
+      "sha": "a6df7bbe74c46972e03fce5f47b105fa4e2ea27e60caa55a1f91dce572b09fd5"
+    },
+    {
+      "path": "index.html",
+      "sha": "1c1bcbee32d6c3f68ba2afb251e7d6970e0da6d84d90ab9b4e8e5c52c136156c"
+    },
+    {
+      "path": "og-base.png",
+      "sha": "df1d7eb5fc9757884f64394c18acee3c9c91e07f0ed3044f8572ae900e3feea5"
+    },
+    {
+      "path": "placeholder.svg",
+      "sha": "64badf7aabda0b9630b87020ffb6095cb858ccbcf66b355c2aa08b1063954d3b"
+    },
+    {
+      "path": "robots.txt",
+      "sha": "a3d27b3ca5ce32341fa9f96f01169b521b1657c05d1860c45d1e53a6258e9e8b"
+    }
+  ]
+}

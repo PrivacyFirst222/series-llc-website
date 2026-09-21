@@ -1,0 +1,745 @@
+$ bun run behavioral
+(in /var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/review-commit-TRfBmJ/webapp, checked out at 1dc6c7244911b85a45144d9e4e38a9dec4d4118d; exit 1)
+
+vite v8.2.2 building client environment for production...
+transforming...
+✓ 1852 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                     1.78 kB │ gzip:   0.73 kB
+dist/assets/index-6o_FORR8.css     53.71 kB │ gzip:  10.44 kB
+dist/assets/index-DKsbV0Iu.js   1,123.53 kB │ gzip: 311.98 kB
+
+✓ built in 620ms
+(using existing dist/ — run `bun run behavioral` to rebuild first)
+review server: process 55018, started by this command from /private/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/review-commit-TRfBmJ/webapp, owns port 51038; it reports offline = true and no live connections (database, square, blob, resend, dropbox, smarty, sunbiz all off); database: a throwaway folder
+
+▶ Run A: new LLC, member-managed, our RA, probes + back-walk, from the pricing card
+    · Eligibility & basics
+    · Your information
+    · LLC name
+    · Principal office address
+    · Mailing address
+    · Your protected series
+    · Registered agent
+    · Management structure
+    · Initial members
+    · Business purpose
+    · Effective date
+    · Correspondence contact
+    · Optional documents and services
+    · Review your information
+    · Eligibility & basics
+    · Your information
+    · LLC name
+    · Principal office address
+    · Mailing address
+    · Your protected series
+    · Registered agent
+    · Management structure
+    · Initial members
+    · Business purpose
+    · Effective date
+    · Correspondence contact
+    · Optional documents and services
+    · Review your information
+  ✓ A stored payload matches every on-screen choice (total $624.00)
+
+▶ Run B: new LLC, member-managed, self RA, entity member
+    · Eligibility & basics
+    · Your information
+    · LLC name
+    · Principal office address
+    · Mailing address
+    · Your protected series
+    · Registered agent
+    · Registered agent acceptance
+    · Management structure
+    · Initial members
+    · Business purpose
+    · Effective date
+    · Correspondence contact
+    · Optional documents and services
+    · Review your information
+  ✓ B stored payload matches every on-screen choice (total $624.00)
+
+▶ Run C: new PLLC, member-managed, self RA, phone-sized
+    · Eligibility & basics
+    · Your information
+    · LLC name
+    · Principal office address
+    · Mailing address
+    · Your protected series
+    · Registered agent
+    · Registered agent acceptance
+    · Management structure
+    · Initial members
+    · Business purpose
+    · Effective date
+    · Correspondence contact
+    · Optional documents and services
+    · Review your information
+  ✓ C stored payload matches every on-screen choice (total $624.00)
+
+▶ Run D: new PLLC, manager-managed, our RA, EIN + S election
+    · Eligibility & basics
+    · Your information
+    · LLC name
+    · Principal office address
+    · Mailing address
+    · Your protected series
+    · Registered agent
+    · Management structure
+    · Managers
+    · Business purpose
+    · Effective date
+    · Correspondence contact
+    · Optional documents and services
+    · Review your information
+  ✓ D stored payload matches every on-screen choice (total $769.00)
+
+▶ Run E: conversion, member-managed, our RA, from the pricing card
+    · Eligibility & basics
+    · Your information
+    · Your existing LLC
+    · Principal office address
+    · Mailing address
+    · Your protected series
+    · Registered agent
+    · Management structure
+    · Initial members
+    · Correspondence contact
+    · Optional documents and services
+    · Review your information
+  ✓ E stored payload matches every on-screen choice (total $524.00)
+
+▶ Run F: conversion, manager-managed, self RA
+    · Eligibility & basics
+    · Your information
+    · Your existing LLC
+    · Principal office address
+    · Mailing address
+    · Your protected series
+    · Registered agent
+    · Management structure
+    · Managers
+    · Correspondence contact
+    · Optional documents and services
+    · Review your information
+  ✓ F stored payload matches every on-screen choice (total $499.00)
+
+▶ Run G: new LLC, exact name only, dated, certificates, 4 series
+    · Eligibility & basics
+    · Your information
+    · LLC name
+    · Principal office address
+    · Mailing address
+    · Your protected series
+    · Registered agent
+    · Management structure
+    · Initial members
+    · Business purpose
+    · Effective date
+    · Correspondence contact
+    · Optional documents and services
+    · Review your information
+  ✓ G stored payload matches every on-screen choice (total $729.00)
+
+▶ Run H: new LLC, entity manager, separate LLC mailing, we sign (audit H)
+    · Eligibility & basics
+    · Your information
+    · LLC name
+    · Principal office address
+    · Mailing address
+    · Your protected series
+    · Registered agent
+    · Management structure
+    · Managers
+    · Business purpose
+    · Effective date
+    · Correspondence contact
+    · Optional documents and services
+    · Review your information
+  ✓ H stored payload matches every on-screen choice (total $624.00)
+
+▶ Run I: new PLLC, manager-managed, self RA (P.L.L.C.)
+    · Eligibility & basics
+    · Your information
+    · LLC name
+    · Principal office address
+    · Mailing address
+    · Your protected series
+    · Registered agent
+    · Registered agent acceptance
+    · Management structure
+    · Managers
+    · Business purpose
+    · Effective date
+    · Correspondence contact
+    · Optional documents and services
+    · Review your information
+  ✓ I stored payload matches every on-screen choice (total $624.00)
+
+▶ Run J: minimum: every optional field blank, exact name only (audit J)
+    · Eligibility & basics
+    · Your information
+    · LLC name
+    · Principal office address
+    · Mailing address
+    · Your protected series
+    · Registered agent
+    · Management structure
+    · Initial members
+    · Business purpose
+    · Effective date
+    · Correspondence contact
+    · Optional documents and services
+    · Review your information
+  ✓ J stored payload matches every on-screen choice (total $624.00)
+
+▶ Run K: maximum: two alternates, five series, three managers, separate LLC mailing, every add-on, dated, we sign (audit K)
+    · Eligibility & basics
+    · Your information
+    · LLC name
+    · Principal office address
+    · Mailing address
+    · Your protected series
+    · Registered agent
+    · Management structure
+    · Managers
+    · Business purpose
+    · Effective date
+    · Correspondence contact
+    · Optional documents and services
+    · Review your information
+  ✓ K stored payload matches every on-screen choice (total $924.00)
+
+▶ Run L: new LLC, manager-managed, self RA, individual manager (audit B)
+    · Eligibility & basics
+    · Your information
+    · LLC name
+    · Principal office address
+    · Mailing address
+    · Your protected series
+    · Registered agent
+    · Registered agent acceptance
+    · Management structure
+    · Managers
+    · Business purpose
+    · Effective date
+    · Correspondence contact
+    · Optional documents and services
+    · Review your information
+  ✓ L stored payload matches every on-screen choice (total $624.00)
+
+▶ Run M: conversion, member-managed, keeps its own agent (audit E)
+    · Eligibility & basics
+    · Your information
+    · Your existing LLC
+    · Principal office address
+    · Mailing address
+    · Your protected series
+    · Registered agent
+    · Management structure
+    · Initial members
+    · Correspondence contact
+    · Optional documents and services
+    · Review your information
+  ✓ M stored payload matches every on-screen choice (total $499.00)
+
+▶ Run N: conversion to PLLC, manager-managed, switches to our RA (audit F)
+    · Eligibility & basics
+    · Your information
+    · Your existing LLC
+    · Principal office address
+    · Mailing address
+    · Your protected series
+    · Registered agent
+    · Management structure
+    · Managers
+    · Correspondence contact
+    · Optional documents and services
+    · Review your information
+  ✓ N stored payload matches every on-screen choice (total $524.00)
+
+▶ Suggested owners journey (run D, manager-managed)
+
+▶ Action-needed journey (formed company, intake EIN + S election)
+
+▶ OA questionnaire journey (multi-owner, spouses)
+  ✓ OA journey: every on-screen answer survived into the assembled agreement
+  ✓ OA-I: couple plus solo owner, fractions, transfer on death, unpairing
+  ✓ AMEND: amendment page, notice, typed changes, listed under the agreement, read off the PDF
+
+▶ Confirmation page without a reference
+
+▶ Entity signers journey (run H: company as Manager, trust as owner)
+  ✓ entity signers: asked, required, and printed as dictated
+
+▶ Statement of Authorized Representative (run H, we sign)
+  ✓ statement: number required, made on upload, listed under the Articles
+  ✓ self-agent portal: no agent card
+
+▶ Words that match the product (audit, 13 Sep 2026)
+  ✓ words: payment page, filing sheet, and public pages match the product
+
+▶ Documents order journey (run G, with both certificates)
+
+▶ Conversion at the office (run E)
+
+▶ Clients tab: companies and View portal
+
+▶ Completed-order journey (draft cleared)
+    · Eligibility & basics
+    · Eligibility & basics
+
+▶ Clear-form-data journey (intake)
+    · Eligibility & basics
+    · Eligibility & basics
+
+▶ Persistent toast journey (contact form)
+  ✓ error toast persists and dies only by its X
+
+Requests to other machines stopped in the browser: fonts.googleapis.com, images.unsplash.com
+
+Behavioral gate: 1303 checks, 0 failures.
+{"label":"B1-N02 registered-agent payment browser title","ok":true,"detail":"Registered Agent Payment — MyFloridaSeriesLLC.com"}
+{"label":"B1-N02 unknown route keeps not-found title","ok":true,"detail":"Page Not Found — MyFloridaSeriesLLC.com"}
+{"label":"B2-01 series preview CONVERT Beta, LLC","ok":true,"detail":"Full name: Beta, LLC, PS 1"}
+{"label":"B2-01 series preview NEW Beta, LLC","ok":true,"detail":"Full name: Alpha, LLC, PS 1"}
+{"label":"B2-01 series preview CONVERT empty","ok":true,"detail":"Full name: [Your LLC Name], PS 1"}
+{"label":"B1-N03 clear cancels queued debounce","ok":true,"detail":[]}
+{"label":"B1-N03 clear ignores late response","ok":true,"detail":""}
+{"label":"B1-N03 newest address survives late older result","ok":true,"detail":"5678 New St, Orlando FL 32803"}
+{"label":"B1-N03 selection closes suggestions","ok":true,"detail":{"value":"5678 New St"}}
+{"label":"B1-N03 controlled value replacement ignores old request","ok":true,"detail":""}
+{"label":"B1-N03 unmount aborts request","ok":true,"detail":true}
+{"label":"B2-03 latest company choices survive old response","ok":true,"detail":"Your existing LLC\n\nTell us which existing company you want to add protected series to. Enter the name exactly as it appears on Sunbiz, along with its document number, so we file against the right entity.\n\nExisting LLC name*\n\nOn file with the Division of Corporations — tap yours to fill in the name as filed and its document number:\n\nCurrent LLCActive · L00000000001\n\nExactly as it appears with the Florida Division of Corporations, including the designator.\n\nSunbiz document number*\n\nFound on your Sunbiz record — usually letter-and-digit, e.g. L24000123456.\n\nBecause the company is already on file, there is no name availability check, and you skip the $125 filing fee for the Articles and Registered Agent (if you keep your existing Registered Agent)."}
+{"label":"B2-03 latest company choices survive old failure","ok":true,"detail":"Your existing LLC\n\nTell us which existing company you want to add protected series to. Enter the name exactly as it appears on Sunbiz, along with its document number, so we file against the right entity.\n\nExisting LLC name*\n\nOn file with the Division of Corporations — tap yours to fill in the name as filed and its document number:\n\nCurrent LLCActive · L00000000001\n\nExactly as it appears with the Florida Division of Corporations, including the designator.\n\nSunbiz document number*\n\nFound on your Sunbiz record — usually letter-and-digit, e.g. L24000123456.\n\nBecause the company is already on file, there is no name availability check, and you skip the $125 filing fee for the Articles and Registered Agent (if you keep your existing Registered Agent)."}
+{"label":"B2-03 old response cannot clear latest loading state","ok":true,"detail":"Your existing LLC\n\nTell us which existing company you want to add protected series to. Enter the name exactly as it appears on Sunbiz, along with its document number, so we file against the right entity.\n\nExisting LLC name*\n\nLooking up the company on Florida's records…\n\nExactly as it appears with the Florida Division of Corporations, including the designator.\n\nSunbiz document number*\n\nFound on your Sunbiz record — usually letter-and-digit, e.g. L24000123456.\n\nBecause the company is already on file, there is no name availability check, and you skip the $125 filing fee for the Articles and Registered Agent (if you keep your existing Registered Agent)."}
+{"label":"B2-03 selecting current result fills correct company and number","ok":true,"detail":{"name":"Current LLC","number":"L00000000001"}}
+{"label":"B2-03 short query immediately clears obsolete loading","ok":true,"detail":"Your existing LLC\n\nTell us which existing company you want to add protected series to. Enter the name exactly as it appears on Sunbiz, along with its document number, so we file against the right entity.\n\nExisting LLC name*\n\nExactly as it appears with the Florida Division of Corporations, including the designator.\n\nSunbiz document number*\n\nFound on your Sunbiz record — usually letter-and-digit, e.g. L24000123456.\n\nBecause the company is already on file, there is no name availability check, and you skip the $125 filing fee for the Articles and Registered Agent (if you keep your existing Registered Agent)."}
+{"label":"B2-03 short query never displays old matches","ok":true,"detail":"Your existing LLC\n\nTell us which existing company you want to add protected series to. Enter the name exactly as it appears on Sunbiz, along with its document number, so we file against the right entity.\n\nExisting LLC name*\n\nExactly as it appears with the Florida Division of Corporations, including the designator.\n\nSunbiz document number*\n\nFound on your Sunbiz record — usually letter-and-digit, e.g. L24000123456.\n\nBecause the company is already on file, there is no name availability check, and you skip the $125 filing fee for the Articles and Registered Agent (if you keep your existing Registered Agent)."}
+{"label":"B2-02 conversion ignores abandoned new name","ok":true,"detail":{"errors":{},"submittedEnglishErrors":{}}}
+{"label":"B2-02 source answers preserved: conversion ignores abandoned new name","ok":true,"detail":true}
+{"label":"B2-02 new formation ignores abandoned existing company","ok":true,"detail":{"errors":{"llcDesignator":"Choose a designator.","alternateName1":"Give an alternate name, or check the exact-name-only box below.","nameCheck":"We check your names against Florida's records automatically — give it a moment to finish, then press Continue again.","desiredLlcName":"Choose a designator above to complete the name.","nameSearchAcknowledgment":"Acknowledgment is required.","governmentAffiliationAcknowledgment":"Acknowledgment is required.","lawfulPurposeNameAcknowledgment":"Acknowledgment is required."},"submittedEnglishErrors":{}}}
+{"label":"B2-02 source answers preserved: new formation ignores abandoned existing company","ok":true,"detail":true}
+{"label":"B2-02 exact-only ignores disabled alternates","ok":true,"detail":{"errors":{"desiredLlcName":"LLC name is required.","llcDesignator":"Choose a designator.","nameSearchAcknowledgment":"Acknowledgment is required.","governmentAffiliationAcknowledgment":"Acknowledgment is required.","lawfulPurposeNameAcknowledgment":"Acknowledgment is required."},"submittedEnglishErrors":{}}}
+{"label":"B2-02 source answers preserved: exact-only ignores disabled alternates","ok":true,"detail":true}
+{"label":"B2-02 mailing-same ignores discarded mailing address","ok":true,"detail":{"errors":{},"submittedEnglishErrors":{}}}
+{"label":"B2-02 source answers preserved: mailing-same ignores discarded mailing address","ok":true,"detail":true}
+{"label":"B2-02 entity manager ignores hidden person","ok":true,"detail":{"errors":{},"submittedEnglishErrors":{}}}
+{"label":"B2-02 source answers preserved: entity manager ignores hidden person","ok":true,"detail":true}
+{"label":"B2-02 individual member ignores hidden entity","ok":true,"detail":{"errors":{},"submittedEnglishErrors":{}}}
+{"label":"B2-02 source answers preserved: individual member ignores hidden entity","ok":true,"detail":true}
+{"label":"B2-02 conversion ignores Articles purpose","ok":true,"detail":{"errors":{},"submittedEnglishErrors":{}}}
+{"label":"B2-02 source answers preserved: conversion ignores Articles purpose","ok":true,"detail":true}
+{"label":"B2-02 general purpose ignores disabled specific text","ok":true,"detail":{"errors":{},"submittedEnglishErrors":{}}}
+{"label":"B2-02 source answers preserved: general purpose ignores disabled specific text","ok":true,"detail":true}
+{"label":"B2-02 appointed signer ignores hidden self signature","ok":true,"detail":{"errors":{"articlesSignerAppointment":"Please appoint us as your authorized representative, or choose to sign yourself.","atLeastOneMemberAcknowledgment":"Acknowledgment is required.","accuracyAcknowledgment":"Acknowledgment is required.","addressAccuracyAcknowledgment":"Acknowledgment is required.","termsOfServiceAcknowledgment":"You must agree to the Terms of Service to continue.","publicRecordAcknowledgment":"Acknowledgment is required.","legalAdviceAcknowledgment":"Acknowledgment is required."},"submittedEnglishErrors":{}}}
+{"label":"B2-02 source answers preserved: appointed signer ignores hidden self signature","ok":true,"detail":true}
+{"label":"B2-02 retained agent ignores hidden acceptance","ok":true,"detail":{"errors":{},"submittedEnglishErrors":{}}}
+{"label":"B2-02 source answers preserved: retained agent ignores hidden acceptance","ok":true,"detail":true}
+{"label":"B2-02 individual manager ignores hidden entity","ok":true,"detail":{"errors":{},"submittedEnglishErrors":{}}}
+{"label":"B2-02 source answers preserved: individual manager ignores hidden entity","ok":true,"detail":true}
+{"label":"B2-02 entity member ignores hidden person","ok":true,"detail":{"errors":{},"submittedEnglishErrors":{}}}
+{"label":"B2-02 source answers preserved: entity member ignores hidden person","ok":true,"detail":true}
+{"label":"B2-02 member-managed ignores discarded managers","ok":true,"detail":{"errors":{},"submittedEnglishErrors":{}}}
+{"label":"B2-02 source answers preserved: member-managed ignores discarded managers","ok":true,"detail":true}
+{"label":"B2-02 manager-managed ignores discarded members","ok":true,"detail":{"errors":{},"submittedEnglishErrors":{}}}
+{"label":"B2-02 source answers preserved: manager-managed ignores discarded members","ok":true,"detail":true}
+{"label":"B2-02 service agent ignores abandoned personal details","ok":true,"detail":{"errors":{"raRenewalCardConsent":"Please agree to keep a card on file for the yearly renewal."},"submittedEnglishErrors":{}}}
+{"label":"B2-02 source answers preserved: service agent ignores abandoned personal details","ok":true,"detail":true}
+{"label":"B2-02 retained entity agent ignores hidden individual","ok":true,"detail":{"errors":{"registeredAgentStreetAddress1":"Street address required.","registeredAgentCity":"City required.","registeredAgentZip":"Enter a 5-digit ZIP code or ZIP+4.","registeredAgentExistingRecordAcknowledgment":"Confirm the agent and address match the Division’s existing record."},"submittedEnglishErrors":{}}}
+{"label":"B2-02 source answers preserved: retained entity agent ignores hidden individual","ok":true,"detail":true}
+{"label":"B2-02 personal agent ignores hidden entity","ok":true,"detail":{"errors":{"registeredAgentStreetAddress1":"Street address required.","registeredAgentCity":"City required.","registeredAgentZip":"Enter a 5-digit ZIP code or ZIP+4.","registeredAgentResidencyAcknowledgment":"Confirm that you live in Florida and this is your business address and the registered office.","registeredAgentNotSameAsLlc":"Acknowledgment is required.","registeredAgentPhysicalAddressAcknowledgment":"Acknowledgment is required."},"submittedEnglishErrors":{}}}
+{"label":"B2-02 source answers preserved: personal agent ignores hidden entity","ok":true,"detail":true}
+{"label":"B2-02 filed-date ignores discarded requested date","ok":true,"detail":{"errors":{},"submittedEnglishErrors":{}}}
+{"label":"B2-02 source answers preserved: filed-date ignores discarded requested date","ok":true,"detail":true}
+{"label":"B2-02 obsolete correspondence fields never block","ok":true,"detail":{"errors":{"correspondentName":"Name required."},"submittedEnglishErrors":{}}}
+{"label":"B2-02 source answers preserved: obsolete correspondence fields never block","ok":true,"detail":true}
+{"label":"B2-02 active agent name still rejects unsupported alphabet","ok":true,"detail":{"errors":{"registeredAgentStreetAddress1":"Street address required.","registeredAgentCity":"City required.","registeredAgentZip":"Enter a 5-digit ZIP code or ZIP+4.","registeredAgentResidencyAcknowledgment":"Confirm that you live in Florida and this is your business address and the registered office.","registeredAgentNotSameAsLlc":"Acknowledgment is required.","registeredAgentPhysicalAddressAcknowledgment":"Acknowledgment is required.","registeredAgentFirstName":"Please use English letters (A–Z). Numbers, spaces and standard punctuation are also allowed. Replace the highlighted characters to continue."},"submittedEnglishErrors":{"registeredAgent.name":"Please use English letters (A–Z). Numbers, spaces and standard punctuation are also allowed. Replace the highlighted characters to continue.","registeredAgent.firstName":"Please use English letters (A–Z). Numbers, spaces and standard punctuation are also allowed. Replace the highlighted characters to continue."}}}
+{"label":"B2-02 source answers preserved: active agent name still rejects unsupported alphabet","ok":true,"detail":true}
+{"label":"B2-02 selected existing name still rejects unsupported alphabet","ok":true,"detail":{"errors":{"sunbizDocumentNumber":"Sunbiz document number is required.","existingLlcName":"Please use English letters (A–Z). Numbers, spaces and standard punctuation are also allowed. Replace the highlighted characters to continue."},"submittedEnglishErrors":{"existingLlcName":"Please use English letters (A–Z). Numbers, spaces and standard punctuation are also allowed. Replace the highlighted characters to continue."}}}
+{"label":"B2-02 source answers preserved: selected existing name still rejects unsupported alphabet","ok":true,"detail":true}
+{"label":"B2-02 selected new name still rejects unsupported alphabet","ok":true,"detail":{"errors":{"llcDesignator":"Choose a designator.","alternateName1":"Give an alternate name, or check the exact-name-only box below.","nameCheck":"We check your names against Florida's records automatically — give it a moment to finish, then press Continue again.","desiredLlcName":"Please use English letters (A–Z). Numbers, spaces and standard punctuation are also allowed. Replace the highlighted characters to continue.","nameSearchAcknowledgment":"Acknowledgment is required.","governmentAffiliationAcknowledgment":"Acknowledgment is required.","lawfulPurposeNameAcknowledgment":"Acknowledgment is required."},"submittedEnglishErrors":{"llcName.desiredName":"Please use English letters (A–Z). Numbers, spaces and standard punctuation are also allowed. Replace the highlighted characters to continue.","llcName.finalName":"Please use English letters (A–Z). Numbers, spaces and standard punctuation are also allowed. Replace the highlighted characters to continue."}}}
+{"label":"B2-02 source answers preserved: selected new name still rejects unsupported alphabet","ok":true,"detail":true}
+{"label":"B2-02 active alternate still rejects unsupported alphabet","ok":true,"detail":{"errors":{"desiredLlcName":"LLC name is required.","llcDesignator":"Choose a designator.","nameCheck":"We check your names against Florida's records automatically — give it a moment to finish, then press Continue again.","nameSearchAcknowledgment":"Acknowledgment is required.","governmentAffiliationAcknowledgment":"Acknowledgment is required.","lawfulPurposeNameAcknowledgment":"Acknowledgment is required.","alternateName1":"Please use English letters (A–Z). Numbers, spaces and standard punctuation are also allowed. Replace the highlighted characters to continue."},"submittedEnglishErrors":{"llcName.alternateNames.0":"Please use English letters (A–Z). Numbers, spaces and standard punctuation are also allowed. Replace the highlighted characters to continue."}}}
+{"label":"B2-02 source answers preserved: active alternate still rejects unsupported alphabet","ok":true,"detail":true}
+{"label":"B2-02 active mailing address still rejects unsupported alphabet","ok":true,"detail":{"errors":{"mailingAddress.address1":"Please use English letters (A–Z). Numbers, spaces and standard punctuation are also allowed. Replace the highlighted characters to continue."},"submittedEnglishErrors":{"mailingAddress.address1":"Please use English letters (A–Z). Numbers, spaces and standard punctuation are also allowed. Replace the highlighted characters to continue."}}}
+{"label":"B2-02 source answers preserved: active mailing address still rejects unsupported alphabet","ok":true,"detail":true}
+{"label":"B2-02 specific purpose still rejects unsupported alphabet","ok":true,"detail":{"errors":{"businessPurposeText":"Please use English letters (A–Z). Numbers, spaces and standard punctuation are also allowed. Replace the highlighted characters to continue."},"submittedEnglishErrors":{"purpose.businessPurposeText":"Please use English letters (A–Z). Numbers, spaces and standard punctuation are also allowed. Replace the highlighted characters to continue."}}}
+{"label":"B2-02 source answers preserved: specific purpose still rejects unsupported alphabet","ok":true,"detail":true}
+{"label":"B2-02 active signer still rejects unsupported alphabet","ok":true,"detail":{"errors":{"authorizedRepresentativeName":"Please use English letters (A–Z). Numbers, spaces and standard punctuation are also allowed. Replace the highlighted characters to continue.","authorizedRepresentativeSignature":"Electronic signature required.","authorizedRepresentativeSignatureCheckbox":"Acknowledgment is required.","atLeastOneMemberAcknowledgment":"Acknowledgment is required.","accuracyAcknowledgment":"Acknowledgment is required.","addressAccuracyAcknowledgment":"Acknowledgment is required.","termsOfServiceAcknowledgment":"You must agree to the Terms of Service to continue.","publicRecordAcknowledgment":"Acknowledgment is required.","legalAdviceAcknowledgment":"Acknowledgment is required."},"submittedEnglishErrors":{"certifications.authorizedRepresentativeName":"Please use English letters (A–Z). Numbers, spaces and standard punctuation are also allowed. Replace the highlighted characters to continue."}}}
+{"label":"B2-02 source answers preserved: active signer still rejects unsupported alphabet","ok":true,"detail":true}
+{"label":"B2-02 service choice cannot invent renewal permission","ok":true,"detail":{"raRenewalCardConsent":"Please agree to keep a card on file for the yearly renewal."}}
+{"label":"B2-02 selected English answers reach payload unchanged","ok":true,"detail":{"filingPath":"NEW","existingLlcName":"","sunbizDocumentNumber":"","formationType":"DOMESTIC_LLC","llcName":{"desiredName":"Alpha","designator":"LLC","finalName":"Alpha, LLC","alternateNames":[],"exactNameOnly":false},"principalOfficeAddress":{"address1":"","address2":"","city":"","state":"","zip":"","country":"United States"},"mailingAddress":{"address1":"42 Oak St","city":"Orlando","state":"FL","zip":"32803","country":"United States"},"registeredAgent":{"choice":"","type":"","name":"","firstName":"","lastName":"","suffix":"","businessEntityName":"","address":{"address1":"","address2":"","city":"","state":"FL","zip":"","country":"United States"},"email":"","phone":"","renewalCardConsent":false,"acceptance":{"accepted":false,"acceptanceName":"","capacity":"","electronicSignature":"","signatureAuthorizationConfirmed":false}},"management":{"structure":"MANAGER_MANAGED","includeManagementStatementInArticles":true,"managersOrAuthorizedRepresentatives":[]},"members":{"collectForInternalRecords":true,"includeMembersInArticles":false,"memberList":[]},"purpose":{"purposeType":"SPECIFIC","businessPurposeText":"Investment holdings"},"effectiveDate":{"option":"FILED_BY_DIVISION","requestedEffectiveDate":null},"client":{"firstName":"","lastName":"","suffix":"","name":"","email":"","phone":"","address":{"address1":"","address2":"","city":"","state":"","zip":"","country":"United States"}},"correspondence":{"name":"","company":"","email":"","phone":"","address":null},"optionalDocuments":{"certificateOfStatus":false,"certifiedCopy":false,"ein":false,"sElection":false},"series":[],"estimatedStateFees":{"articlesOfOrganization":100,"registeredAgentDesignation":25,"certificateOfStatus":0,"certifiedCopy":0,"additionalSeriesFee":0,"additionalSeriesPrepFee":0,"estimatedTotal":125},"certifications":{"articlesSignedBy":"SELF","articlesSignerAppointed":false,"authorizedRepresentativeName":"","authorizedRepresentativeTitle":"","authorizedRepresentativeSignature":"","atLeastOneMemberAcknowledged":false,"accuracyAcknowledged":false,"publicRecordAcknowledged":false,"notLegalAdviceAcknowledged":false,"seriesOwnershipAcknowledged":false,"conversionAuthorityAcknowledged":false},"acknowledgments":{"isFloridaDomesticEntityOnly":false,"notLegalAdvice":false,"publicRecordNotice":false,"nameSearchAcknowledgment":false,"governmentAffiliationAcknowledgment":false,"lawfulPurposeNameAcknowledgment":false,"registeredAgentNotSameAsLlc":false,"registeredAgentPhysicalAddressAcknowledgment":false,"registeredAgentResidencyAcknowledgment":false,"registeredAgentExistingRecordAcknowledgment":false,"registeredAgentSeriesAgreementAcknowledgment":false,"registeredAgentAcceptanceCheckbox":false,"registeredAgentSignatureAuthorizationCheckbox":false,"authorizedRepresentativeSignatureCheckbox":false,"addressAccuracyAcknowledgment":false,"termsOfServiceAcknowledgment":false,"sElectionFilingAcknowledgment":false},"nameCheck":null,"metadata":{"submittedAt":"2026-09-21T06:31:30.162Z","ipAddress":"","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.7922.34 Safari/537.36","formVersion":"fl-llc-formation-v2-agent-consent"}}}
+{"label":"All component probes stayed offline","ok":true,"detail":{"blocked":[],"unexpected":[]}}
+Batch 22 form: 72/72 probes passed
+{"label":"B3-02 first application can be certified","ok":true}
+{"label":"B3-02 reopening same application clears certification","ok":true}
+{"label":"B3-02 reopening preserves nonsensitive answers","ok":true}
+{"label":"B3-02 different application is not certified","ok":true}
+{"label":"B3-02 different application cannot submit before certification","ok":true}
+{"label":"B3-02 different application does not receive prior answers","ok":true}
+{"label":"B3-03 failure leaves same dialog and email for retry","ok":true}
+{"label":"B3-03 failure does not promise inbox delivery","ok":true}
+{"label":"B3-03 same request can retry immediately","ok":true}
+{"label":"B3-03 old-address notice failure is disclosed separately","ok":true}
+{"label":"B3-03 sign-in email remains unchanged before confirmation","ok":true}
+{"label":"B3-03 successful retry clears previous warning","ok":true}
+{"label":"B3-05 ninety-nine owners still permits owner100","ok":true}
+{"label":"B3-05 owner100 is editable","ok":true}
+{"label":"B3-05 blank Add owner cannot create101","ok":true}
+{"label":"B3-05 owner capacity explained before entry","ok":true}
+{"label":"B3-05 suggestion fills existing blank100","ok":true}
+{"label":"B3-05 save includes all100 owners","ok":true}
+{"label":"B3-05 suggestion cannot append101 when all rows filled","ok":true}
+{"label":"B3-05 full100 owner contribution allocations all render","ok":true}
+{"label":"B3-05 full100 allocations survive save payload","ok":true}
+{"label":"B3-05 generation submits all100 owners and allocations","ok":true}
+{"label":"B3-02/B3-03/B3-05 no browser runtime errors","ok":true,"detail":[]}
+{"label":"B3-02/B3-03/B3-05 all requests remain local","ok":true,"detail":[]}
+Batch22 portal: 24/24 checks passed
+{"label":"batch22 B6-01 GET /portal/oa rejects all six invalid company selections before writes","ok":true,"detail":[{"id":"f7729a85-53d8-4041-b0bd-9e4e9c2cd419","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"foreign","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"unpaid","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"bad-id","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":" ","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true}]}
+{"label":"batch22 B6-01 PUT /portal/oa/answers rejects all six invalid company selections before writes","ok":true,"detail":[{"id":"c1067ca6-a331-43da-a470-527491686ee3","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"foreign","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"unpaid","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"bad-id","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":" ","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true}]}
+{"label":"batch22 B6-01 POST /portal/oa/generate rejects all six invalid company selections before writes","ok":true,"detail":[{"id":"45ff501e-9e7d-4115-8f65-16a1a1f9bd00","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"foreign","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"unpaid","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"bad-id","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":" ","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true}]}
+{"label":"batch22 B6-01 POST /portal/series/consent rejects all six invalid company selections before writes","ok":true,"detail":[{"id":"4ae301dc-207b-4f49-b911-37605c5d864f","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"foreign","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"unpaid","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"bad-id","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":" ","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true}]}
+{"label":"batch22 B6-01 POST /portal/oa/amend rejects all six invalid company selections before writes","ok":true,"detail":[{"id":"75255a59-c5cb-42e8-9b2e-f54967a9638e","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"foreign","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"unpaid","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"bad-id","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":" ","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true}]}
+{"label":"batch22 B6-01 GET /portal/services rejects all six invalid company selections before writes","ok":true,"detail":[{"id":"2217a26a-222d-4021-8c4b-396005e3ad05","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"foreign","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"unpaid","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"bad-id","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":" ","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true}]}
+{"label":"batch22 B6-01 POST /portal/services/s-election rejects all six invalid company selections before writes","ok":true,"detail":[{"id":"89e4f4a2-f56e-42f9-83d3-a80cefca17d2","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"foreign","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"unpaid","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"bad-id","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":" ","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true}]}
+{"label":"batch22 B6-01 POST /portal/services/series rejects all six invalid company selections before writes","ok":true,"detail":[{"id":"9c4c1c61-09da-4112-a386-a2bf336d11db","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"foreign","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"unpaid","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"bad-id","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":" ","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true}]}
+{"label":"batch22 B6-01 POST /portal/services/certificate rejects all six invalid company selections before writes","ok":true,"detail":[{"id":"27220b74-ceaf-47fe-92a5-0f4c95ca3c4c","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"foreign","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"unpaid","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"bad-id","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":" ","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true}]}
+{"label":"batch22 B6-01 POST /portal/services/ein rejects all six invalid company selections before writes","ok":true,"detail":[{"id":"dc196927-7ca5-4013-a59a-acb72a3c0ed5","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"foreign","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"unpaid","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"bad-id","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":" ","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true}]}
+{"label":"batch22 B6-01 POST /portal/registered-agent/cancel rejects all six invalid company selections before writes","ok":true,"detail":[{"id":"838f397b-6e9e-4901-b165-0b7e3b023ccd","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"foreign","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"unpaid","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":"bad-id","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true},{"id":" ","status":400,"code":"COMPANY_NOT_FOUND","unchanged":true}]}
+{"label":"batch22 B6-01 /portal/series/consent rejects explicitly null or wrong-type company","ok":true}
+{"label":"batch22 B6-01 /portal/registered-agent/cancel rejects explicitly null or wrong-type company","ok":true}
+{"label":"batch22 B6-01 owned company and omitted default remain distinct","ok":true}
+{"label":"batch22 B3-05 100 owners and 100 contribution shares save and reload exactly","ok":true,"detail":{"status":200,"members":100}}
+{"label":"batch22 B3-05 101 members refused without overwriting saved draft","ok":true,"detail":{"status":400}}
+{"label":"batch22 B3-05 101 shares refused without overwriting saved draft","ok":true,"detail":{"status":400}}
+{"label":"batch22 B3-05 101 unitIds refused without overwriting saved draft","ok":true,"detail":{"status":400}}
+{"label":"batch22 B3-05 member actual generated PDF retains all 100 owners and contributions","ok":true,"detail":{"status":200,"printed":true,"contributions":true}}
+{"label":"batch22 B3-05 member-s actual generated PDF retains all 100 owners and contributions","ok":true,"detail":{"status":200,"printed":true,"contributions":true}}
+{"label":"batch22 B3-05 multi actual generated PDF retains all 100 owners and contributions","ok":true,"detail":{"status":200,"printed":true,"contributions":true}}
+{"label":"batch22 B3-05 s actual generated PDF retains all 100 owners and contributions","ok":true,"detail":{"status":200,"printed":true,"contributions":true}}
+{"label":"batch22 B3-05 100 owners in 50 couples save and generate every ownership unit","ok":true,"detail":{"save":200,"generate":200}}
+{"label":"batch22 B3-03 confirmation refusal returns truthful retry and preserves earlier pending request","ok":true,"detail":{"status":503,"response":{"error":{"message":"We could not send the confirmation link. Please try again.","code":"EMAIL_SEND_FAILED"}},"account":{"email":"batch22@example.test","pending_email":"pending22@example.test"}}}
+{"label":"batch22 B3-03 provider response without acceptance identifier is refused","ok":true,"detail":{"status":503}}
+{"label":"batch22 B3-03 response waits for provider acceptance","ok":true}
+{"label":"batch22 B3-03 old-address notice failure is separate from sent confirmation","ok":true,"detail":{"status":200,"response":{"data":{"ok":true,"pendingEmail":"warning22@example.test","oldAddressNoticeSent":false}}}}
+{"label":"batch22 B3-03 retry confirms both sends without changing sign-in","ok":true,"detail":{"status":200,"response":{"data":{"ok":true,"pendingEmail":"warning22@example.test","oldAddressNoticeSent":true}}}}
+{"label":"batch22 B3-03 older in-flight different-address request cannot replace newer successful request","ok":true,"detail":{"newer":200,"older":409,"latestTokenActive":true}}
+{"label":"batch22 B3-03 older in-flight same-address request cannot replace newer successful request","ok":true,"detail":{"newer":200,"older":409,"latestTokenActive":true}}
+{"label":"batch22 B3-03 overlapping same-address activation admits only one change","ok":true,"detail":{"statuses":[200,409]}}
+{"label":"batch22 B3-03 only confirmed link changes sign-in","ok":true,"detail":{"status":200}}
+{"label":"batch22 B3-03 password change during send cannot resurrect pending email","ok":true,"detail":{"status":409,"account":{"email":"warning22@example.test","pending_email":null}}}
+{"label":"B4-EMAIL-ERROR-EMPTY failed history names retrieval error","ok":true}
+{"label":"B4-EMAIL-ERROR-EMPTY failed history never claims no mail sent","ok":true}
+{"label":"B4-EMAIL-ERROR-EMPTY history Retry is available","ok":true}
+{"label":"B4-EMAIL-ERROR-EMPTY history retry prevents duplicate clicks","ok":true}
+{"label":"B4-EMAIL-ERROR-EMPTY retry performs one lookup and restores history","ok":true}
+{"label":"B4-EMAIL-ERROR-EMPTY body failure names retrieval error","ok":true}
+{"label":"B4-EMAIL-ERROR-EMPTY body failure is not endless loading","ok":true}
+{"label":"B4-EMAIL-ERROR-EMPTY body Retry is available","ok":true}
+{"label":"B4-EMAIL-ERROR-EMPTY body retry restores actual email","ok":true}
+{"label":"B4-EMAIL-ERROR-EMPTY successful body remains sandboxed","ok":true}
+{"label":"B4-EMAIL-ERROR-EMPTY body failure does not trap office in detail","ok":true}
+{"label":"B4-EMAIL-ERROR-EMPTY successful empty lookup keeps correct empty message","ok":true}
+{"label":"B4-EMAIL-ERROR-EMPTY successful empty lookup has no error or Retry","ok":true}
+{"label":"B4-EMAIL-ERROR-EMPTY cached empty history does not mask failed refresh","ok":true}
+{"label":"B4-EIN-ERROR-MISSING failed detail names retrieval error","ok":true}
+{"label":"B4-EIN-ERROR-MISSING failed detail never claims TIN not provided","ok":true}
+{"label":"B4-EIN-ERROR-MISSING assistant hidden until successful retrieval","ok":true}
+{"label":"B4-EIN-ERROR-MISSING detail Retry is available","ok":true}
+{"label":"B4-EIN-ERROR-MISSING retry loads supplied TIN and actual assistant","ok":true}
+{"label":"B4-EIN-ERROR-MISSING successful lookup has real responsible party","ok":true}
+{"label":"B4-EIN-ERROR-MISSING successful assistant preserves all21 answer rows","ok":true}
+{"label":"B4-EIN-ERROR-MISSING failed refresh hides cached assistant and TIN","ok":true}
+{"label":"B4-EIN-ERROR-MISSING failed refresh exposes Retry","ok":true}
+{"label":"B4-EIN-ERROR-MISSING assistant progress survives retry","ok":true}
+{"label":"B4-EIN-ERROR-MISSING successful lookup of absent TIN says not yet provided","ok":true}
+{"label":"B4-EIN-ERROR-MISSING absent TIN is not a transport error","ok":true}
+{"label":"B4-EIN-ERROR-MISSING loading does not claim missing TIN","ok":true}
+{"label":"B4-EIN-ERROR-MISSING assistant hidden while initial load pending","ok":true}
+{"label":"B4-RESTORE-S-ELECTION-SECRET-STATE recovery status names the missing numbers","ok":true}
+{"label":"B4-RESTORE-S-ELECTION-SECRET-STATE recovery button available","ok":true}
+{"label":"B4-RESTORE-S-ELECTION-SECRET-STATE stale on-file hints removed for both joint owners","ok":true}
+{"label":"B4-RESTORE-S-ELECTION-SECRET-STATE both joint-owner numbers explicitly required","ok":true}
+{"label":"B4-RESTORE-S-ELECTION-SECRET-STATE saved nonsensitive details remain","ok":true}
+{"label":"B4-RESTORE-S-ELECTION-SECRET-STATE entered numbers clear their required warnings","ok":true}
+{"label":"B4-RESTORE-S-ELECTION-SECRET-STATE freshly typed numbers never written to localStorage","ok":true}
+{"label":"B4-RESTORE-S-ELECTION-SECRET-STATE close and reopen preserves newly typed numbers in memory","ok":true}
+{"label":"B4 office no product browser runtime errors","ok":true,"detail":[]}
+{"label":"B4 office only known sandbox instrumentation exception, if body loaded","ok":true,"detail":["SecurityError: Failed to read the 'serviceWorker' property from 'Navigator': Service worker is disabled because the context is sandboxed and lacks the 'allow-same-origin' flag.\n    at <anonymous>:3:15\n    at <anonymous>:5:7"]}
+{"label":"B4 office no unexpected API calls","ok":true,"detail":[]}
+{"label":"B4 office requests remained local","ok":true,"detail":[]}
+Batch23 office: 40/40 checks passed
+{"label":"batch23 pending account change still sends renewal to confirmed old address","ok":true,"detail":{"ok":true,"found":[{"to":["portal-confirmed-old@example.test"],"subject":"Your registered agent service renews on November 19, 2026"}]}}
+{"label":"batch23 real client confirmation changes account email","ok":true,"detail":{"status":200,"account":{"email":"portal-confirmed-current@example.test","pending_email":null}}}
+{"label":"batch23 portal-confirmed: notice uses current address","ok":true,"detail":{"ok":true,"found":[{"to":["portal-confirmed-current@example.test"],"subject":"Your registered agent service renews on November 19, 2026"}],"originalEmail":"portal-confirmed-old@example.test","exactAttachment":true}}
+{"label":"batch23 portal-confirmed: resignation-due uses current address","ok":true,"detail":{"ok":true,"found":[{"to":["portal-confirmed-current@example.test"],"subject":"Registered-agent resignation due — Notice resignation-due LLC"}],"originalEmail":"portal-confirmed-old@example.test","exactAttachment":true}}
+{"label":"batch23 portal-confirmed: decline uses current address","ok":true,"detail":{"ok":true,"found":[{"to":["portal-confirmed-current@example.test"],"subject":"Action needed: your registered agent renewal charge was declined"}],"originalEmail":"portal-confirmed-old@example.test","exactAttachment":true}}
+{"label":"batch23 portal-confirmed: receipt uses current address","ok":true,"detail":{"ok":true,"found":[{"to":["portal-confirmed-current@example.test"],"subject":"Registered agent service renewed — Notice receipt LLC"}],"originalEmail":"portal-confirmed-old@example.test","exactAttachment":true}}
+{"label":"batch23 portal-confirmed: resignation-receipt uses current address","ok":true,"detail":{"ok":true,"found":[{"to":["portal-confirmed-current@example.test"],"subject":"Registered-agent resignation payment — Notice resignation-receipt LLC"}],"originalEmail":"portal-confirmed-old@example.test","exactAttachment":true}}
+{"label":"batch23 portal-confirmed: resignation-copy uses current address","ok":true,"detail":{"ok":true,"found":[{"to":["portal-confirmed-current@example.test"],"subject":"Registered-agent resignation — Notice resignation-copy LLC","attachmentBytes":[678]}],"originalEmail":"portal-confirmed-old@example.test","routeStatus":200,"exactAttachment":true}}
+{"label":"batch23 portal-confirmed: resend existing resignation copy uses current address","ok":true,"detail":{"status":200,"ok":true,"found":[{"to":["portal-confirmed-current@example.test"],"subject":"Registered-agent resignation — Notice resignation-copy LLC","attachmentBytes":[678]}]}}
+{"label":"batch23 portal-confirmed: every original order email remains historical","ok":true,"detail":[{"contact_email":"portal-confirmed-old@example.test"},{"contact_email":"portal-confirmed-old@example.test"},{"contact_email":"portal-confirmed-old@example.test"},{"contact_email":"portal-confirmed-old@example.test"},{"contact_email":"portal-confirmed-old@example.test"},{"contact_email":"portal-confirmed-old@example.test"},{"contact_email":"portal-confirmed-old@example.test"},{"contact_email":"portal-confirmed-old@example.test"}]}
+{"label":"batch23 real office override changes account email","ok":true,"detail":{"status":200,"account":{"email":"office-override-current@example.test"}}}
+{"label":"batch23 office-override: notice uses current address","ok":true,"detail":{"ok":true,"found":[{"to":["office-override-current@example.test"],"subject":"Your registered agent service renews on November 19, 2026"}],"originalEmail":"office-override-old@example.test","exactAttachment":true}}
+{"label":"batch23 office-override: resignation-due uses current address","ok":true,"detail":{"ok":true,"found":[{"to":["office-override-current@example.test"],"subject":"Registered-agent resignation due — Notice resignation-due LLC"}],"originalEmail":"office-override-old@example.test","exactAttachment":true}}
+{"label":"batch23 office-override: decline uses current address","ok":true,"detail":{"ok":true,"found":[{"to":["office-override-current@example.test"],"subject":"Action needed: your registered agent renewal charge was declined"}],"originalEmail":"office-override-old@example.test","exactAttachment":true}}
+{"label":"batch23 office-override: receipt uses current address","ok":true,"detail":{"ok":true,"found":[{"to":["office-override-current@example.test"],"subject":"Registered agent service renewed — Notice receipt LLC"}],"originalEmail":"office-override-old@example.test","exactAttachment":true}}
+{"label":"batch23 office-override: resignation-receipt uses current address","ok":true,"detail":{"ok":true,"found":[{"to":["office-override-current@example.test"],"subject":"Registered-agent resignation payment — Notice resignation-receipt LLC"}],"originalEmail":"office-override-old@example.test","exactAttachment":true}}
+{"label":"batch23 office-override: resignation-copy uses current address","ok":true,"detail":{"ok":true,"found":[{"to":["office-override-current@example.test"],"subject":"Registered-agent resignation — Notice resignation-copy LLC","attachmentBytes":[678]}],"originalEmail":"office-override-old@example.test","routeStatus":200,"exactAttachment":true}}
+{"label":"batch23 office-override: resend existing resignation copy uses current address","ok":true,"detail":{"status":200,"ok":true,"found":[{"to":["office-override-current@example.test"],"subject":"Registered-agent resignation — Notice resignation-copy LLC","attachmentBytes":[678]}]}}
+{"label":"batch23 office-override: every original order email remains historical","ok":true,"detail":[{"contact_email":"office-override-old@example.test"},{"contact_email":"office-override-old@example.test"},{"contact_email":"office-override-old@example.test"},{"contact_email":"office-override-old@example.test"},{"contact_email":"office-override-old@example.test"},{"contact_email":"office-override-old@example.test"},{"contact_email":"office-override-old@example.test"}]}
+{"label":"batch23 missing current account refuses notice and retains retryable error","ok":true,"detail":{"status":"notice_pending","notice_sent_at":null,"notice_error":"Error: No current client email is available for this registered-agent notice","lock_until":null}}
+{"label":"batch23 notice retries successfully after current account recipient is restored","ok":true,"detail":{"ok":true,"found":[{"to":["office-override-current@example.test"],"subject":"Your registered agent service renews on November 19, 2026"}],"retryState":{"status":"link_sent","notice_error":null,"notice_sent_at":"2026-09-20T12:00:00.000Z"}}}
+{"label":"batch23 missing receipt address does not reverse confirmed payment","ok":true,"detail":{"fulfillmentError":"","renewal":{"status":"charged"},"mailCount":0}}
+{"label":"batch23 notice probes made no outside network requests","ok":true,"detail":[]}
+{"label":"batch23 B5-ARTICLES-METADATA CLIENT omitted number preserved","ok":true,"detail":{"status":200,"number":"L26000123456"}}
+{"label":"batch23 B5-ARTICLES-METADATA CLIENT corrected number saved","ok":true,"detail":{"status":200,"number":"L26000987654"}}
+{"label":"batch23 B5-ARTICLES-METADATA CLIENT invalid correction refused before document writes","ok":true,"detail":{"status":400}}
+{"label":"batch23 B5-ARTICLES-METADATA CLIENT office sees corrected number","ok":true,"detail":{"number":"L26000987654"}}
+{"label":"batch23 B5-ARTICLES-METADATA SERVICE omitted number preserved","ok":true,"detail":{"status":200,"number":"L26000123456"}}
+{"label":"batch23 B5-ARTICLES-METADATA SERVICE corrected number saved","ok":true,"detail":{"status":200,"number":"L26000987654"}}
+{"label":"batch23 B5-ARTICLES-METADATA SERVICE invalid correction refused before document writes","ok":true,"detail":{"status":400}}
+{"label":"batch23 B5-ARTICLES-METADATA SERVICE office sees corrected number","ok":true,"detail":{"number":"L26000987654"}}
+{"label":"batch23 B5-ARTICLES-METADATA Statement agrees with corrected Articles","ok":true,"detail":[{"meta":{"documentNumber":"L26000987654"}}]}
+{"label":"batch23 B4-RESTORE-S-ELECTION-SECRET-STATE backup excludes all temporary numbers","ok":true}
+{"label":"batch23 B4-RESTORE-S-ELECTION-SECRET-STATE pending never-generated package requests reentry","ok":true,"detail":{"status":"awaiting_info","details":{"ein":"","phone":"3055550100","einPending":true,"officerName":"Recovery Client","officerTitle":"Member","shareholders":[{"name":"Recovery Client","joint":"tbe","name2":"Second Owner","address":"100 Main Street, Miami FL 33101","ssnLast4":"","percentage":100,"dateAcquired":"2026-09-16","ssnLast4Second":""}],"effectiveDate":"2026-09-16","dateIncorporated":"2026-09-16","taxpayerNumbersNoticeAt":"2026-09-21T06:31:46.599Z","taxpayerNumbersRequired":true},"ein_secret":null}}
+{"label":"batch23 B4-RESTORE-S-ELECTION-SECRET-STATE preserves answers but clears both on-file hints","ok":true,"detail":[{"name":"Recovery Client","joint":"tbe","name2":"Second Owner","address":"100 Main Street, Miami FL 33101","ssnLast4":"","percentage":100,"dateAcquired":"2026-09-16","ssnLast4Second":""}]}
+{"label":"batch23 B4-RESTORE-S-ELECTION-SECRET-STATE automatic email directs reentry at current address without secrets","ok":true,"detail":[{"from":"MyFloridaSeriesLLC <onboarding@resend.dev>","to":["current23@example.test"],"subject":"Action needed for your S election — Recovery LLC","html":"<div style=\"font-family:Arial,sans-serif;max-width:560px;margin:auto;padding:24px\"><p><strong>MyFloridaSeriesLLC</strong></p><p>We need the owners’ Social Security numbers again to complete the S corporation election package for <strong>Recovery LLC</strong>. Your other saved answers remain available.</p><p>Sign in to your client portal, select this company, and open <strong>Re-enter taxpayer numbers</strong> under <strong>Orders in progress</strong>. Enter each owner’s number and submit the form securely.</p><p>Do not send Social Security numbers by email.</p><p><a href=\"http://localhost:8000/portal\">Open your client portal</a></p></div>"},{"from":"MyFloridaSeriesLLC <onboarding@resend.dev>","to":["current23@example.test"],"subject":"Action needed for your S election — Recovery LLC","html":"<div style=\"font-family:Arial,sans-serif;max-width:560px;margin:auto;padding:24px\"><p><strong>MyFloridaSeriesLLC</strong></p><p>We need the owners’ Social Security numbers again to complete the S corporation election package for <strong>Recovery LLC</strong>. Your other saved answers remain available.</p><p>Sign in to your client portal, select this company, and open <strong>Re-enter taxpayer numbers</strong> under <strong>Orders in progress</strong>. Enter each owner’s number and submit the form securely.</p><p>Do not send Social Security numbers by email.</p><p><a href=\"http://localhost:8000/portal\">Open your client portal</a></p></div>"},{"from":"MyFloridaSeriesLLC <onboarding@resend.dev>","to":["current23@example.test"],"subject":"Action needed for your S election — Recovery LLC","html":"<div style=\"font-family:Arial,sans-serif;max-width:560px;margin:auto;padding:24px\"><p><strong>MyFloridaSeriesLLC</strong></p><p>We need the owners’ Social Security numbers again to complete the S corporation election package for <strong>Recovery LLC</strong>. Your other saved answers remain available.</p><p>Sign in to your client portal, select this company, and open <strong>Re-enter taxpayer numbers</strong> under <strong>Orders in progress</strong>. Enter each owner’s number and submit the form securely.</p><p>Do not send Social Security numbers by email.</p><p><a href=\"http://localhost:8000/portal\">Open your client portal</a></p></div>"}]}
+{"label":"batch23 B4-RESTORE-S-ELECTION-SECRET-STATE fulfilled cancelled deleted and unstarted unchanged","ok":true,"detail":[{"status":"fulfilled","details":{"ein":"","phone":"3055550100","einPending":true,"officerName":"Recovery Client","officerTitle":"Member","shareholders":[{"name":"Recovery Client","joint":"tbe","name2":"Second Owner","address":"100 Main Street, Miami FL 33101","ssnLast4":"6789","percentage":100,"dateAcquired":"2026-09-16","ssnLast4Second":"4321"}],"effectiveDate":"2026-09-16","dateIncorporated":"2026-09-16"},"ein_secret":null},{"status":"cancelled","details":{"ein":"","phone":"3055550100","einPending":true,"officerName":"Recovery Client","officerTitle":"Member","shareholders":[{"name":"Recovery Client","joint":"tbe","name2":"Second Owner","address":"100 Main Street, Miami FL 33101","ssnLast4":"6789","percentage":100,"dateAcquired":"2026-09-16","ssnLast4Second":"4321"}],"effectiveDate":"2026-09-16","dateIncorporated":"2026-09-16"},"ein_secret":null},{"status":"in_progress","details":{"ein":"","phone":"3055550100","einPending":true,"officerName":"Recovery Client","officerTitle":"Member","shareholders":[{"name":"Recovery Client","joint":"tbe","name2":"Second Owner","address":"100 Main Street, Miami FL 33101","ssnLast4":"6789","percentage":100,"dateAcquired":"2026-09-16","ssnLast4Second":"4321"}],"effectiveDate":"2026-09-16","dateIncorporated":"2026-09-16","documentDeletedAt":"2026-09-16"},"ein_secret":null},{"status":"awaiting_info","details":{},"ein_secret":null}]}
+{"label":"batch23 B4-RESTORE-S-ELECTION-SECRET-STATE actual portal returns recovery action","ok":true,"detail":{"id":"a2706d55-0495-43d6-adf1-8f5899ee6d06","type":"s-election","status":"awaiting_info","llc_name":"Recovery LLC","details":{"ein":"","phone":"3055550100","einPending":true,"officerName":"Recovery Client","officerTitle":"Member","shareholders":[{"name":"Recovery Client","joint":"tbe","name2":"Second Owner","address":"100 Main Street, Miami FL 33101","ssnLast4":"","percentage":100,"dateAcquired":"2026-09-16","ssnLast4Second":""}],"effectiveDate":"2026-09-16","dateIncorporated":"2026-09-16","taxpayerNumbersNoticeAt":"2026-09-21T06:31:46.599Z","taxpayerNumbersRequired":true},"amount_cents":0,"created_at":"2026-09-21T06:31:45.852Z","paid_at":"2026-09-21T06:31:45.852Z","fulfilled_at":null,"editableUntil":null,"editable":false,"documentId":null}}
+{"label":"batch23 B4-RESTORE-S-ELECTION-SECRET-STATE EIN arrival saves issued EIN and requests missing numbers","ok":true,"detail":{"status":200,"updated":{"status":"awaiting_info","details":{"ein":"881234567","phone":"3055550100","einSource":"letter","einPending":false,"officerName":"Recovery Client","officerTitle":"Member","shareholders":[{"name":"Recovery Client","joint":"tbe","name2":"Second Owner","address":"100 Main Street, Miami FL 33101","ssnLast4":"","percentage":100,"dateAcquired":"2026-09-16","ssnLast4Second":""}],"effectiveDate":"2026-09-16","dateIncorporated":"2026-09-16","taxpayerNumbersNoticeAt":"2026-09-21T06:31:46.599Z","taxpayerNumbersRequired":true},"ein_secret":null}}}
+{"label":"batch23 B4-RESTORE-S-ELECTION-SECRET-STATE direct EIN arrival flags and emails never-generated unflagged order","ok":true,"detail":{"neverUpdated":{"status":"awaiting_info","details":{"ein":"881234567","phone":"3055550100","einSource":"letter","einPending":false,"officerName":"Recovery Client","officerTitle":"Member","shareholders":[{"name":"Recovery Client","joint":"tbe","name2":"Second Owner","address":"100 Main Street, Miami FL 33101","ssnLast4":"","percentage":100,"dateAcquired":"2026-09-16","ssnLast4Second":""}],"effectiveDate":"2026-09-16","dateIncorporated":"2026-09-16","taxpayerNumbersNoticeAt":"2026-09-21T06:31:46.619Z","taxpayerNumbersRequired":true},"ein_secret":null},"newMails":[{"from":"MyFloridaSeriesLLC <onboarding@resend.dev>","to":["current23@example.test"],"subject":"Action needed for your S election — Never Generated LLC","html":"<div style=\"font-family:Arial,sans-serif;max-width:560px;margin:auto;padding:24px\"><p><strong>MyFloridaSeriesLLC</strong></p><p>We need the owners’ Social Security numbers again to complete the S corporation election package for <strong>Never Generated LLC</strong>. Your other saved answers remain available.</p><p>Sign in to your client portal, select this company, and open <strong>Re-enter taxpayer numbers</strong> under <strong>Orders in progress</strong>. Enter each owner’s number and submit the form securely.</p><p>Do not send Social Security numbers by email.</p><p><a href=\"http://localhost:8000/portal\">Open your client portal</a></p></div>"}]}}
+{"label":"batch23 B4-RESTORE-S-ELECTION-SECRET-STATE EIN arrival does not touch other company","ok":true}
+{"label":"batch23 B4-RESTORE-S-ELECTION-SECRET-STATE actual blank SSNs refused","ok":true,"detail":{"status":400,"blankError":{"error":{"message":"Each owner's SSN must be 9 digits.","code":"INVALID_INPUT"}}}}
+{"label":"batch23 B4-RESTORE-S-ELECTION-SECRET-STATE reentry generates package and clears recovery flag","ok":true,"detail":{"status":200,"answer":{"data":{"ok":true,"documentId":"73ed95f2-da62-4899-9990-84535b26f70e","editableUntil":"2026-10-05T06:31:46.000Z"}},"saved":{"status":"fulfilled","details":{"ein":"881234567","phone":"3055550100","einSource":"letter","documentId":"73ed95f2-da62-4899-9990-84535b26f70e","einPending":false,"certifiedAt":"2026-09-21T06:31:46.623Z","officerName":"Recovery Client","officerTitle":"Member","shareholders":[{"name":"Recovery Client","joint":"tbe","name2":"Second Owner","address":"100 Main Street, Miami FL 33101","address2":"","ssnLast4":"6789","percentage":100,"dateAcquired":"2026-09-16","ssnLast4Second":"4321"}],"effectiveDate":"2026-09-16","filingDeadline":"2026-11-30","dateIncorporated":"2026-09-16","timingAcknowledgedAt":"2026-09-21T06:31:46.623Z","eligibilityAcknowledgedAt":"2026-09-21T06:31:46.623Z"}}}}
+{"label":"batch23 B4-RESTORE-S-ELECTION-SECRET-STATE generated document encrypted and company scoped","ok":true,"detail":{"order_id":"b4a39fb9-7b1f-4b2c-98b5-3a3fa6619d1c","storage_key":"dev:585b61cc25f10d23cc630c82-S_Corporation_Election_Package_Form_2553_Recovery_LLC_2026-09-21-0231ET.pdf.encrypted","meta":{"sensitive":true,"serviceOrderId":"a2706d55-0495-43d6-adf1-8f5899ee6d06"}}}
+{"label":"batch23 B4-RESTORE-S-ELECTION-SECRET-STATE no taxpayer numbers in any email","ok":true}
+{"label":"batch23 B4-RESTORE-S-ELECTION-SECRET-STATE failed email leaves restored records actionable","ok":true,"detail":{"result":{"tables":14,"files":5,"excludedDeleted":0,"recoveryNotifications":{"sent":0,"failed":3}},"pending":{"status":"awaiting_info","details":{"ein":"","phone":"3055550100","einPending":true,"officerName":"Recovery Client","officerTitle":"Member","shareholders":[{"name":"Recovery Client","joint":"tbe","name2":"Second Owner","address":"100 Main Street, Miami FL 33101","ssnLast4":"","percentage":100,"dateAcquired":"2026-09-16","ssnLast4Second":""}],"effectiveDate":"2026-09-16","dateIncorporated":"2026-09-16","taxpayerNumbersRequired":true},"ein_secret":null}}}
+{"label":"batch23 B4-RESTORE-S-ELECTION-SECRET-STATE failed email never marked sent","ok":true,"detail":{"ein":"","phone":"3055550100","einPending":true,"officerName":"Recovery Client","officerTitle":"Member","shareholders":[{"name":"Recovery Client","joint":"tbe","name2":"Second Owner","address":"100 Main Street, Miami FL 33101","ssnLast4":"","percentage":100,"dateAcquired":"2026-09-16","ssnLast4Second":""}],"effectiveDate":"2026-09-16","dateIncorporated":"2026-09-16","taxpayerNumbersRequired":true}}
+{"label":"batch23 B4-RESTORE-S-ELECTION-SECRET-STATE failed restore email retries when EIN arrives","ok":true,"detail":{"status":200,"details":{"ein":"881234567","phone":"3055550100","einSource":"letter","einPending":false,"officerName":"Recovery Client","officerTitle":"Member","shareholders":[{"name":"Recovery Client","joint":"tbe","name2":"Second Owner","address":"100 Main Street, Miami FL 33101","ssnLast4":"","percentage":100,"dateAcquired":"2026-09-16","ssnLast4Second":""}],"effectiveDate":"2026-09-16","dateIncorporated":"2026-09-16","taxpayerNumbersNoticeAt":"2026-09-21T06:31:57.330Z","taxpayerNumbersRequired":true}}}
+25/25 Batch 23 recovery checks passed
+{"label":"B3-01 series owned by a three-owner parent defaults to one member","ok":true}
+{"label":"B3-01 count-dependent hint does not call series several-member partnership","ok":true}
+{"label":"B3-01 actual submitted payload carries one for series","ok":true,"detail":{"id":"d195b0dd-4cf9-4209-9bae-427b5b1a5f2b","count":1,"status":200}}
+{"label":"B3-01 actual route persists series count one","ok":true,"detail":1}
+{"label":"B3-01 office IRS assistant reads one from saved application","ok":true}
+{"label":"B3-01 parent-company EIN still defaults to its three members","ok":true}
+{"label":"B3-01 parent-company submitted count stays three","ok":true,"detail":{"count":3,"status":200}}
+{"label":"B3-01 parent office count stays three","ok":true}
+{"label":"B3-01 editing other series does not leak count to first series","ok":true}
+{"label":"B3-01 explicit answer survives close and reopen","ok":true}
+{"label":"B3-01 explicit answer survives browser reload","ok":true}
+{"label":"B3-01 explicit answer is not overwritten at submission","ok":true,"detail":{"count":4,"status":200}}
+{"label":"B3-01 office receives explicit client count","ok":true}
+{"label":"B3-01 series default remains one when parent owner list unavailable","ok":true}
+{"label":"B3-01 company empty-owner fallback remains one","ok":true}
+{"label":"B1-N01 Terms renders exact approved refund and delivery wording","ok":true}
+{"label":"B1-N01 Terms removes immediate-generation claim","ok":true}
+{"label":"B1-N01 FAQ renders exact same approved refund and delivery wording","ok":true}
+{"label":"B1-N01 FAQ removes immediate-generation claim","ok":true}
+{"label":"B1-N04 actual questionnaire shows exact approved general deadline","ok":true}
+{"label":"B1-N04 deadline notice and acknowledgment show no computed calendar date","ok":true}
+{"label":"B1-N04 deadline acknowledgment remains required","ok":true}
+{"label":"B1-N04 Monday after Sunday deadline is insufficient preparation time, not late","ok":true}
+{"label":"B1-N04 insufficient-window explanation shows no computed calendar deadline","ok":true}
+{"label":"Batch24 browser no runtime errors","ok":true,"detail":[]}
+{"label":"Batch24 browser no unexpected endpoints","ok":true,"detail":[]}
+{"label":"Batch24 browser no external requests","ok":true,"detail":[]}
+Batch24 browser: 27/27 checks passed
+{"ok":true,"label":"batch24 Sunday rollover"}
+{"ok":true,"label":"batch24 Saturday rollover"}
+{"ok":true,"label":"batch24 DC Emancipation Day"}
+{"ok":true,"label":"batch24 Saturday holiday observed Friday"}
+{"ok":true,"label":"batch24 Labor Day"}
+{"ok":true,"label":"batch24 Christmas Friday"}
+{"ok":true,"label":"batch24 New Year Friday"}
+{"ok":true,"label":"batch24 next-year New Year observed December31"}
+{"ok":true,"label":"batch24 weekend then Washington birthday"}
+{"ok":true,"label":"batch24 Emancipation Friday"}
+{"ok":true,"label":"batch24 Sunday Emancipation observed Monday"}
+{"ok":true,"label":"batch24 Saturday inauguration has no Friday substitute"}
+{"ok":true,"label":"batch24 inauguration and MLK"}
+{"ok":true,"label":"batch24 ordinary weekday unchanged"}
+{"ok":true,"label":"batch24 month-end arithmetic"}
+{"ok":true,"label":"batch24 leap-year arithmetic"}
+{"ok":true,"label":"batch24 five-day preparation guard 2026-03-11"}
+{"ok":true,"label":"batch24 five-day preparation guard 2026-03-12"}
+{"ok":true,"label":"batch24 five-day preparation guard 2026-03-16"}
+{"ok":true,"label":"batch24 five-day preparation guard 2026-03-17"}
+{"ok":true,"label":"batch24 rolled deadline day still timely"}
+{"ok":true,"label":"batch24 formation ordering retained"}
+{"ok":true,"label":"batch24 invalid calendar input rejected"}
+{"ok":true,"label":"batch24 general timing wording 2026-01-02"}
+{"ok":true,"label":"batch24 general timing wording 2026-03-16"}
+{"ok":true,"label":"batch24 general timing wording 2026-03-17"}
+{"ok":true,"label":"batch24 filing responsibility acknowledgment retained"}
+{"ok":true,"label":"batch24 issued EIN required unchanged"}
+{"ok":true,"label":"batch24 filing-package approved general deadline"}
+{"ok":true,"label":"batch24 filing-package no calculated deadline"}
+{"ok":true,"label":"batch24 filing-package real form identity retained"}
+{"ok":true,"label":"batch24 record-copy approved general deadline"}
+{"ok":true,"label":"batch24 record-copy no calculated deadline"}
+{"ok":true,"label":"batch24 record-copy real form identity retained"}
+{"ok":true,"label":"batch24 record copy warning retained"}
+35/35 Batch24 timing checks passed
+PASS all twelve published Word mappings checked: 12
+CHECK_RESULT {"suite": "batch25-word", "label": "all twelve published Word mappings checked", "ok": true, "detail": 12, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-single.md tracked Word contains the current generator output: []
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-single.md tracked Word contains the current generator output", "ok": true, "detail": [], "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-single.md complete table cell matrix: {'expectedRows': [8, 2, 7, 6], 'actualRows': [8, 2, 7, 6]}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-single.md complete table cell matrix", "ok": true, "detail": {"expectedRows": [8, 2, 7, 6], "actualRows": [8, 2, 7, 6]}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-single.md entity signature controls become indents: {'expected': 6, 'actual': 6, 'controlLeaks': 0}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-single.md entity signature controls become indents", "ok": true, "detail": {"expected": 6, "actual": 6, "controlLeaks": 0}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-single.md all baseline text and drafting choices retained: {'beforeChars': 46540, 'afterChars': 46540}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-single.md all baseline text and drafting choices retained", "ok": true, "detail": {"beforeChars": 46540, "afterChars": 46540}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-multi.md tracked Word contains the current generator output: []
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-multi.md tracked Word contains the current generator output", "ok": true, "detail": [], "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-multi.md complete table cell matrix: {'expectedRows': [3, 2, 3, 2, 7, 6], 'actualRows': [3, 2, 3, 2, 7, 6]}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-multi.md complete table cell matrix", "ok": true, "detail": {"expectedRows": [3, 2, 3, 2, 7, 6], "actualRows": [3, 2, 3, 2, 7, 6]}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-multi.md entity signature controls become indents: {'expected': 6, 'actual': 6, 'controlLeaks': 0}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-multi.md entity signature controls become indents", "ok": true, "detail": {"expected": 6, "actual": 6, "controlLeaks": 0}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-multi.md all baseline text and drafting choices retained: {'beforeChars': 70948, 'afterChars': 70948}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-multi.md all baseline text and drafting choices retained", "ok": true, "detail": {"beforeChars": 70948, "afterChars": 70948}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-s.md tracked Word contains the current generator output: []
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-s.md tracked Word contains the current generator output", "ok": true, "detail": [], "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-s.md complete table cell matrix: {'expectedRows': [3, 2, 3, 2, 7, 6], 'actualRows': [3, 2, 3, 2, 7, 6]}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-s.md complete table cell matrix", "ok": true, "detail": {"expectedRows": [3, 2, 3, 2, 7, 6], "actualRows": [3, 2, 3, 2, 7, 6]}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-s.md entity signature controls become indents: {'expected': 6, 'actual': 6, 'controlLeaks': 0}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-s.md entity signature controls become indents", "ok": true, "detail": {"expected": 6, "actual": 6, "controlLeaks": 0}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-s.md all baseline text and drafting choices retained: {'beforeChars': 73672, 'afterChars': 73672}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-s.md all baseline text and drafting choices retained", "ok": true, "detail": {"beforeChars": 73672, "afterChars": 73672}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-member.md tracked Word contains the current generator output: []
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member.md tracked Word contains the current generator output", "ok": true, "detail": [], "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-member.md complete table cell matrix: {'expectedRows': [3, 2, 3, 2, 7, 6], 'actualRows': [3, 2, 3, 2, 7, 6]}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member.md complete table cell matrix", "ok": true, "detail": {"expectedRows": [3, 2, 3, 2, 7, 6], "actualRows": [3, 2, 3, 2, 7, 6]}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-member.md entity signature controls become indents: {'expected': 4, 'actual': 4, 'controlLeaks': 0}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member.md entity signature controls become indents", "ok": true, "detail": {"expected": 4, "actual": 4, "controlLeaks": 0}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-member.md all baseline text and drafting choices retained: {'beforeChars': 68877, 'afterChars': 68877}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member.md all baseline text and drafting choices retained", "ok": true, "detail": {"beforeChars": 68877, "afterChars": 68877}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-member-s.md tracked Word contains the current generator output: []
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-s.md tracked Word contains the current generator output", "ok": true, "detail": [], "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-member-s.md complete table cell matrix: {'expectedRows': [3, 2, 3, 2, 7, 6], 'actualRows': [3, 2, 3, 2, 7, 6]}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-s.md complete table cell matrix", "ok": true, "detail": {"expectedRows": [3, 2, 3, 2, 7, 6], "actualRows": [3, 2, 3, 2, 7, 6]}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-member-s.md entity signature controls become indents: {'expected': 4, 'actual': 4, 'controlLeaks': 0}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-s.md entity signature controls become indents", "ok": true, "detail": {"expected": 4, "actual": 4, "controlLeaks": 0}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-member-s.md all baseline text and drafting choices retained: {'beforeChars': 71546, 'afterChars': 71546}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-s.md all baseline text and drafting choices retained", "ok": true, "detail": {"beforeChars": 71546, "afterChars": 71546}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-single-s.md tracked Word contains the current generator output: []
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-single-s.md tracked Word contains the current generator output", "ok": true, "detail": [], "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-single-s.md complete table cell matrix: {'expectedRows': [8, 2, 7, 6], 'actualRows': [8, 2, 7, 6]}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-single-s.md complete table cell matrix", "ok": true, "detail": {"expectedRows": [8, 2, 7, 6], "actualRows": [8, 2, 7, 6]}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-single-s.md entity signature controls become indents: {'expected': 6, 'actual': 6, 'controlLeaks': 0}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-single-s.md entity signature controls become indents", "ok": true, "detail": {"expected": 6, "actual": 6, "controlLeaks": 0}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-single-s.md all baseline text and drafting choices retained: {'beforeChars': 51883, 'afterChars': 51883}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-single-s.md all baseline text and drafting choices retained", "ok": true, "detail": {"beforeChars": 51883, "afterChars": 51883}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-member-single.md tracked Word contains the current generator output: []
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-single.md tracked Word contains the current generator output", "ok": true, "detail": [], "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-member-single.md complete table cell matrix: {'expectedRows': [8, 2, 7, 6], 'actualRows': [8, 2, 7, 6]}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-single.md complete table cell matrix", "ok": true, "detail": {"expectedRows": [8, 2, 7, 6], "actualRows": [8, 2, 7, 6]}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-member-single.md entity signature controls become indents: {'expected': 4, 'actual': 4, 'controlLeaks': 0}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-single.md entity signature controls become indents", "ok": true, "detail": {"expected": 4, "actual": 4, "controlLeaks": 0}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-member-single.md all baseline text and drafting choices retained: {'beforeChars': 41682, 'afterChars': 41682}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-single.md all baseline text and drafting choices retained", "ok": true, "detail": {"beforeChars": 41682, "afterChars": 41682}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-member-single-s.md tracked Word contains the current generator output: []
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-single-s.md tracked Word contains the current generator output", "ok": true, "detail": [], "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-member-single-s.md complete table cell matrix: {'expectedRows': [8, 2, 7, 6], 'actualRows': [8, 2, 7, 6]}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-single-s.md complete table cell matrix", "ok": true, "detail": {"expectedRows": [8, 2, 7, 6], "actualRows": [8, 2, 7, 6]}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-member-single-s.md entity signature controls become indents: {'expected': 4, 'actual': 4, 'controlLeaks': 0}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-single-s.md entity signature controls become indents", "ok": true, "detail": {"expected": 4, "actual": 4, "controlLeaks": 0}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-member-single-s.md all baseline text and drafting choices retained: {'beforeChars': 46795, 'afterChars': 46795}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-single-s.md all baseline text and drafting choices retained", "ok": true, "detail": {"beforeChars": 46795, "afterChars": 46795}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-amendment.md tracked Word contains the current generator output: []
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-amendment.md tracked Word contains the current generator output", "ok": true, "detail": [], "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-amendment.md complete table cell matrix: {'expectedRows': [], 'actualRows': []}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-amendment.md complete table cell matrix", "ok": true, "detail": {"expectedRows": [], "actualRows": []}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-amendment.md entity signature controls become indents: {'expected': 4, 'actual': 4, 'controlLeaks': 0}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-amendment.md entity signature controls become indents", "ok": true, "detail": {"expected": 4, "actual": 4, "controlLeaks": 0}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-oa-amendment.md all baseline text and drafting choices retained: {'beforeChars': 2110, 'afterChars': 2110}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-amendment.md all baseline text and drafting choices retained", "ok": true, "detail": {"beforeChars": 2110, "afterChars": 2110}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS docs/owners-manual.md tracked Word contains the current generator output: []
+CHECK_RESULT {"suite": "batch25-word", "label": "docs/owners-manual.md tracked Word contains the current generator output", "ok": true, "detail": [], "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS docs/owners-manual.md complete table cell matrix: {'expectedRows': [14, 5, 12, 5, 5, 4, 5, 7, 5], 'actualRows': [14, 5, 12, 5, 5, 4, 5, 7, 5]}
+CHECK_RESULT {"suite": "batch25-word", "label": "docs/owners-manual.md complete table cell matrix", "ok": true, "detail": {"expectedRows": [14, 5, 12, 5, 5, 4, 5, 7, 5], "actualRows": [14, 5, 12, 5, 5, 4, 5, 7, 5]}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS docs/owners-manual.md entity signature controls become indents: {'expected': 0, 'actual': 116, 'controlLeaks': 0}
+CHECK_RESULT {"suite": "batch25-word", "label": "docs/owners-manual.md entity signature controls become indents", "ok": true, "detail": {"expected": 0, "actual": 116, "controlLeaks": 0}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS docs/owners-manual.md all baseline text and drafting choices retained: {'beforeChars': 100463, 'afterChars': 100463}
+CHECK_RESULT {"suite": "batch25-word", "label": "docs/owners-manual.md all baseline text and drafting choices retained", "ok": true, "detail": {"beforeChars": 100463, "afterChars": 100463}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-statement-of-authorized-representative.md tracked Word contains the current generator output: []
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-statement-of-authorized-representative.md tracked Word contains the current generator output", "ok": true, "detail": [], "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-statement-of-authorized-representative.md complete table cell matrix: {'expectedRows': [], 'actualRows': []}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-statement-of-authorized-representative.md complete table cell matrix", "ok": true, "detail": {"expectedRows": [], "actualRows": []}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-statement-of-authorized-representative.md entity signature controls become indents: {'expected': 2, 'actual': 2, 'controlLeaks': 0}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-statement-of-authorized-representative.md entity signature controls become indents", "ok": true, "detail": {"expected": 2, "actual": 2, "controlLeaks": 0}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS webapp/server/templates-statement-of-authorized-representative.md all baseline text and drafting choices retained: {'beforeChars': 3035, 'afterChars': 3035}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-statement-of-authorized-representative.md all baseline text and drafting choices retained", "ok": true, "detail": {"beforeChars": 3035, "afterChars": 3035}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS docs/oa-instructions.md tracked Word contains the current generator output: []
+CHECK_RESULT {"suite": "batch25-word", "label": "docs/oa-instructions.md tracked Word contains the current generator output", "ok": true, "detail": [], "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS docs/oa-instructions.md complete table cell matrix: {'expectedRows': [5, 7], 'actualRows': [5, 7]}
+CHECK_RESULT {"suite": "batch25-word", "label": "docs/oa-instructions.md complete table cell matrix", "ok": true, "detail": {"expectedRows": [5, 7], "actualRows": [5, 7]}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS docs/oa-instructions.md entity signature controls become indents: {'expected': 0, 'actual': 0, 'controlLeaks': 0}
+CHECK_RESULT {"suite": "batch25-word", "label": "docs/oa-instructions.md entity signature controls become indents", "ok": true, "detail": {"expected": 0, "actual": 0, "controlLeaks": 0}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS docs/oa-instructions.md all baseline text and drafting choices retained: {'beforeChars': 16310, 'afterChars': 16310}
+CHECK_RESULT {"suite": "batch25-word", "label": "docs/oa-instructions.md all baseline text and drafting choices retained", "ok": true, "detail": {"beforeChars": 16310, "afterChars": 16310}, "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS comment-wrapped data and totals remain in first table; blank separates second table: [[['Owner', 'Share'], ['[NAME]', '100%'], ['Total', '100%']], [['Other', 'Value'], ['A', 'B']]]
+CHECK_RESULT {"suite": "batch25-word", "label": "comment-wrapped data and totals remain in first table; blank separates second table", "ok": true, "detail": [[["Owner", "Share"], ["[NAME]", "100%"], ["Total", "100%"]], [["Other", "Value"], ["A", "B"]]], "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS intervening ordinary paragraph stays outside tables: ['Outside paragraph.']
+CHECK_RESULT {"suite": "batch25-word", "label": "intervening ordinary paragraph stays outside tables", "ok": true, "detail": ["Outside paragraph."], "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+PASS table header repeat and body row no-split survive: all fixture rows
+CHECK_RESULT {"suite": "batch25-word", "label": "table header repeat and body row no-split survive", "ok": true, "detail": "all fixture rows", "commit": "1dc6c7244911b85a45144d9e4e38a9dec4d4118d", "run": "25-r1-1789971494132"}
+Batch 25 Word: 52/52 checks passed
+{"ok":true,"label":"batch25 manual actual 9 tables and 53 source rows retained once"}
+{"ok":true,"label":"batch25 manual actual first data rows have headings on same page"}
+{"ok":true,"label":"batch25 manual actual continued tables repeat headings"}
+{"ok":true,"label":"batch25 manual all narrative blocks retained in source order"}
+{"ok":true,"label":"batch25 manual table-only pages contribute to pagination accounting"}
+{"ok":true,"label":"batch25 manual layout revision invalidates cached manual"}
+{"ok":true,"label":"batch25 manual 90-row table repeats headings on every page"}
+{"ok":true,"label":"batch25 manual 90-row table preserves all rows once in order"}
+{"ok":true,"label":"batch25 manual overheight first row does not strand chapter heading"}
+{"ok":true,"label":"batch25 manual overheight row preserves all cell words once in order"}
+{"ok":true,"label":"batch25 manual overheight row continues with headers"}
+{"ok":true,"label":"batch25 manual overheight row stays inside body bounds"}
+{"ok":true,"label":"batch25 manual impossible table header fails clearly"}
+{"ok":true,"label":"batch25 manual header-only table remains supported"}
+14/14 Batch25 Manual checks passed
+{"ok":true,"label":"batch25 documents bracketed names satisfy existing alphabet policy"}
+{"ok":true,"label":"batch25 documents amendment accepted bracket values render"}
+{"ok":true,"label":"batch25 documents amendment typed punctuation literal"}
+{"ok":true,"label":"batch25 documents amendment typed paragraphs preserved"}
+{"ok":true,"label":"batch25 documents amendment title decoded"}
+{"ok":true,"label":"batch25 documents amendment no encoded entities leak"}
+{"ok":true,"label":"batch25 documents statement accepted bracket values render"}
+{"ok":true,"label":"batch25 documents statement title decoded"}
+{"ok":true,"label":"batch25 documents statement no encoded entities leak"}
+{"ok":true,"label":"batch25 documents amendment typed ordinary control"}
+{"ok":true,"label":"batch25 documents amendment attached ordinary control"}
+{"ok":true,"label":"batch25 documents literal client marker [COMPANY NAME]"}
+{"ok":true,"label":"batch25 documents literal client marker [SIGNER NAME]"}
+{"ok":true,"label":"batch25 documents literal client marker [[indent]]"}
+{"ok":true,"label":"batch25 documents literal client marker [[pagebreak]]"}
+{"ok":true,"label":"batch25 documents literal client marker Form document"}
+{"ok":true,"label":"batch25 documents literal client marker &#91;FAKE&#93;"}
+{"ok":true,"label":"batch25 documents literal client marker By: __________"}
+{"ok":true,"label":"batch25 documents raw blank required fields rejected \" \""}
+{"ok":true,"label":"batch25 documents raw blank required fields rejected \"\\n\\r\""}
+{"ok":true,"label":"batch25 documents raw blank required fields rejected \"\\t\\n\""}
+{"ok":true,"label":"batch25 documents oa-amendment genuine unresolved master slot refused"}
+
+$ vite build && bun run scripts/behavioral.ts && bun run scripts/batch22-form-check.ts && bun run scripts/batch22-portal-check.ts && bun run server/batch22-check.ts && bun run scripts/batch23-office-check.ts && bun run server/batch23-notices-check.ts && bun run server/batch23-recovery-check.ts && bun run scripts/batch24-ein-check.ts && bun run scripts/batch24-timing-check.ts && python3 ../docs/batch25-word-check.py && bun run scripts/batch25-manual-check.ts && bun run scripts/batch25-documents-check.ts
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+Removing XFA form data as pdf-lib does not support reading or writing XFA. Set preserveXFA: true in load options to keep XFA data.
+Removing XFA form data as pdf-lib does not support reading or writing XFA. Set preserveXFA: true in load options to keep XFA data.
+error: Cannot find module '/private/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/batch25-documents-4JSRkI/statement-fault.mjs' from ''
+
+Bun v1.3.14 (macOS arm64)
+error: script "behavioral" exited with code 1

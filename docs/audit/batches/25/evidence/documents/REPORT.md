@@ -42,3 +42,7 @@ Final evidence: red-final.log, green-final.log, red-final and green-final PDFs/M
 Early harness mistakes were corrected before final reproduction: one bracket syntax error, a Python helper named inspect.py that shadowed Python's standard library, and a margin check initially counted an unchanged trailing whitespace glyph. Retained early logs are labeled setup/intermediate, not evidence of product defects. Final geometry checks count visible ink. The former exact4-page assertion was corrected to disallow added blank pages while allowing the fixed ordinary consent to use3.
 
 The PDF skill artifact-operation marker ran successfully before first PDF generation. All generated files are isolated review evidence; no Dropbox or production package was modified.
+
+## Full-review harness follow-up
+
+The exact-commit review at 1dc6c72 exposed a fresh-temp-directory module-resolution failure in this check script, after the amendment fault probe. Only the harness was corrected to write both fault bundles before either dynamic import. Three fresh default-mode runs and one explicit-evidence run now pass43/43; the identical updated baseline harness still reports19/43 with the same labels and verdicts. All24 PDF readback/geometry records and all product-source hashes are unchanged. See temp-import-repair/REPORT.md, verification.json and source-hashes-followup.json; the failed run and earlier evidence remain retained.

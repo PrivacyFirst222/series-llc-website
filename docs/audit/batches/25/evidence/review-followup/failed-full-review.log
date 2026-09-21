@@ -1,0 +1,18 @@
+review: batch 25 revision 1; checked out 1dc6c7244911b85a45144d9e4e38a9dec4d4118d in /var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/review-commit-TRfBmJ — every check, the build and the site run from there (offline comparison baseline is 2559e18)
+  typecheck … passed (4s)
+  lint … passed (2s)
+  unit … passed (4s)
+  facts … passed (0s)
+  ledger-controls … passed (103s)
+  guard … passed (0s)
+  documents … passed (0s)
+  server … passed (26s)
+  walk … FAILED, exit 1 — see /Users/adam/.fpsllc/reviews/25-r1-1dc6c7244911b85a45144d9e4e38a9dec4d4118d-2e97a3a8f44c/checks/walk.log
+  assertions … passed (5s)
+  building the review site from the checkout … kept in the package
+  dropbox-unchanged … 54 files, identical paths and contents
+  checkout-unchanged … still 1dc6c72, no tracked file modified
+
+review package: /Users/adam/.fpsllc/reviews/25-r1-1dc6c7244911b85a45144d9e4e38a9dec4d4118d-2e97a3a8f44c
+package id: 2e97a3a8f44c   commit: 1dc6c7244911b85a45144d9e4e38a9dec4d4118d
+NOT READY for Adam: walk did not pass.
